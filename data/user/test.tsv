@@ -1,0 +1,6 @@
+# suzume user dictionary - test vocabulary
+# Format: surface<TAB>pos<TAB>reading<TAB>cost
+
+# Cooking terms (料理用語)
+玉ねぎ	NOUN	たまねぎ	0.5
+みじん切り	NOUN	みじんぎり	0.5

@@ -1,0 +1,68 @@
+# Build directories
+build/
+build-*/
+cmake-build-*/
+dist/
+*.o
+*.a
+*.so
+*.dylib
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+_deps/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.bak
+.DS_Store
+
+# Claude Code configuration
+.claude/
+CLAUDE.md
+
+# Design documents (internal)
+backup/
+
+# Cache
+.cache/
+
+# Generated files
+*.log
+*.out
+
+# Test outputs (CMake CTest output directory)
+/Testing/
+*.gcov
+*.gcda
+*.gcno
+
+# Binaries (in build directory only)
+/build/suzume
+/build/suzume-cli
+*.exe
+
+# Compiled dictionaries
+*.dic
+
+# Dependencies
+third_party/*
+!third_party/CMakeLists.txt
+
+# Coverage reports
+coverage/
+*.info
+
+# Python
+__pycache__/
+*.py[oc]
+*.egg-info
+.venv/

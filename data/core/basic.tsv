@@ -1,0 +1,216 @@
+# suzume core dictionary - basic vocabulary
+# Format: surface<TAB>pos<TAB>reading<TAB>cost<TAB>conj_type
+# This file contains prefixes, suffixes, counters, and interjections.
+
+# ========================================
+# Prefixes (接頭語)
+# ========================================
+お	OTHER		1.0
+ご	OTHER		1.0
+御	OTHER		1.0
+不	OTHER		1.0
+未	OTHER		1.0
+非	OTHER		1.0
+無	OTHER		1.0
+超	OTHER		1.0
+大	OTHER		1.0
+小	OTHER		1.0
+新	OTHER		1.0
+旧	OTHER		1.0
+全	OTHER		1.0
+半	OTHER		1.0
+再	OTHER		1.0
+前	OTHER		1.0
+後	OTHER		1.0
+各	OTHER		1.0
+両	OTHER		1.0
+最	OTHER		1.0
+高	OTHER		1.0
+低	OTHER		1.0
+長	OTHER		1.0
+短	OTHER		1.0
+若	OTHER		1.0
+老	OTHER		1.0
+準	OTHER		1.0
+副	OTHER		1.0
+総	OTHER		1.0
+本	OTHER		1.0
+
+# ========================================
+# Suffixes (接尾語) - derivational
+# ========================================
+# Note: Some suffixes are in core_low_info.tsv with higher cost
+さん	OTHER		0.8
+様	OTHER		0.8
+君	OTHER		0.8
+氏	OTHER		0.8
+先生	OTHER		0.8
+殿	OTHER		0.8
+ちゃん	OTHER		0.8
+たち	OTHER		1.0
+ら	OTHER		1.0
+さ	OTHER		1.0
+み	OTHER		1.0
+め	OTHER		1.0
+がち	OTHER		1.0
+っぽい	OTHER		1.0
+らしい	OTHER		1.0
+げ	OTHER		1.0
+ぶり	OTHER		1.0
+づくり	OTHER		1.0
+がかり	OTHER		1.0
+まみれ	OTHER		1.0
+ずくめ	OTHER		1.0
+だらけ	OTHER		1.0
+がたい	OTHER		1.0
+やすい	OTHER		1.0
+にくい	OTHER		1.0
+づらい	OTHER		1.0
+かねる	OTHER		1.0
+すぎる	OTHER		1.0
+そう	OTHER		1.0
+よう	OTHER		1.0
+係	OTHER		1.0
+担当	OTHER		1.0
+部	OTHER		1.0
+課	OTHER		1.0
+局	OTHER		1.0
+室	OTHER		1.0
+所	OTHER		1.0
+場	OTHER		1.0
+屋	OTHER		1.0
+店	OTHER		1.0
+
+# ========================================
+# Counters (助数詞)
+# ========================================
+# General counters
+人	OTHER		0.8
+個	OTHER		0.8
+枚	OTHER		0.8
+台	OTHER		0.8
+冊	OTHER		0.8
+匹	OTHER		0.8
+頭	OTHER		0.8
+羽	OTHER		0.8
+件	OTHER		0.8
+軒	OTHER		0.8
+組	OTHER		0.8
+足	OTHER		0.8
+通	OTHER		0.8
+点	OTHER		0.8
+品	OTHER		0.8
+杯	OTHER		0.8
+発	OTHER		0.8
+着	OTHER		0.8
+
+# Time counters
+年	OTHER		0.8
+月	OTHER		0.8
+日	OTHER		0.8
+時	OTHER		0.8
+分	OTHER		0.8
+秒	OTHER		0.8
+週	OTHER		0.8
+世紀	OTHER		0.8
+
+# Measurement counters
+円	OTHER		0.8
+回	OTHER		0.8
+度	OTHER		0.8
+階	OTHER		0.8
+番	OTHER		0.8
+位	OTHER		0.8
+号	OTHER		0.8
+歳	OTHER		0.8
+才	OTHER		0.8
+倍	OTHER		0.8
+割	OTHER		0.8
+厘	OTHER		0.8
+パーセント	OTHER		0.8
+キロ	OTHER		0.8
+メートル	OTHER		0.8
+グラム	OTHER		0.8
+リットル	OTHER		0.8
+
+# ========================================
+# Time Nouns (時間名詞)
+# ========================================
+# Days (日)
+今日	NOUN	きょう	0.5
+明日	NOUN	あした	0.5
+昨日	NOUN	きのう	0.5
+明後日	NOUN	あさって	0.5
+一昨日	NOUN	おととい	0.5
+毎日	NOUN	まいにち	0.5
+
+# Time of day (時間帯)
+今朝	NOUN	けさ	0.5
+今晩	NOUN	こんばん	0.5
+今夜	NOUN	こんや	0.5
+昨夜	NOUN	さくや	0.5
+朝	NOUN	あさ	0.6
+昼	NOUN	ひる	0.6
+夜	NOUN	よる	0.6
+夕方	NOUN	ゆうがた	0.6
+
+# Weeks (週)
+今週	NOUN	こんしゅう	0.5
+来週	NOUN	らいしゅう	0.5
+先週	NOUN	せんしゅう	0.5
+毎週	NOUN	まいしゅう	0.5
+
+# Months (月)
+今月	NOUN	こんげつ	0.5
+来月	NOUN	らいげつ	0.5
+先月	NOUN	せんげつ	0.5
+毎月	NOUN	まいつき	0.5
+
+# Years (年)
+今年	NOUN	ことし	0.5
+来年	NOUN	らいねん	0.5
+去年	NOUN	きょねん	0.5
+昨年	NOUN	さくねん	0.5
+毎年	NOUN	まいとし	0.5
+
+# Other time expressions
+今	NOUN	いま	0.5
+現在	NOUN	げんざい	0.5
+最近	NOUN	さいきん	0.5
+将来	NOUN	しょうらい	0.5
+過去	NOUN	かこ	0.5
+未来	NOUN	みらい	0.5
+
+# ========================================
+# Interjections (感動詞)
+# ========================================
+# Emotion
+ああ	OTHER		1.0
+おお	OTHER		1.0
+まあ	OTHER		1.0
+わあ	OTHER		1.0
+うわ	OTHER		1.0
+やった	OTHER		1.0
+
+# Response
+はい	OTHER		1.0
+いいえ	OTHER		1.0
+ええ	OTHER		1.0
+うん	OTHER		1.0
+ううん	OTHER		1.0
+いや	OTHER		1.0
+
+# Surprise
+えっ	OTHER		1.0
+あっ	OTHER		1.0
+おっ	OTHER		1.0
+へえ	OTHER		1.0
+ふうん	OTHER		1.0
+ほう	OTHER		1.0
+
+# Calling
+ねえ	OTHER		1.0
+おい	OTHER		1.0
+もしもし	OTHER		1.0
+すみません	OTHER		1.0
+ごめん	OTHER		1.0

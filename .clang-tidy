@@ -1,0 +1,21 @@
+---
+Checks: >
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  -clang-analyzer-cplusplus.NewDeleteLeaks,
+  -clang-analyzer-core.uninitialized.Assign,
+  cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -readability-function-cognitive-complexity,
+  -modernize-use-trailing-return-type,
+  -modernize-use-nodiscard,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-magic-numbers
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*/src/(core|normalize|dictionary|analysis|postprocess|cli)/.*'
+FormatStyle: file
+CheckOptions:
+  - key: SystemHeaderFilterRegex
+    value: '.*(_deps|build|third_party)/.*'
