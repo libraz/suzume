@@ -606,6 +606,29 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateVerbCandidates(
         continue;  // Skip particle/copula patterns
       }
 
+      // Skip patterns where hiragana part is a known suffix in dictionary
+      // (e.g., たち, さん, ら, etc.) - let NOUN+suffix split win instead
+      // Only skip if kanji is 2+ characters, as single kanji + suffix
+      // could be a valid verb stem (立ち → 立つ)
+      // Note: Only skip for OTHER (suffixes), not VERB (する is a verb, not suffix)
+      bool is_suffix_pattern = false;
+      if (kanji_end - start_pos >= 2 && dict_manager_ != nullptr) {
+        auto suffix_results = dict_manager_->lookup(hiragana_part, 0);
+        for (const auto& result : suffix_results) {
+          if (result.entry != nullptr &&
+              result.entry->surface == hiragana_part &&
+              result.entry->is_low_info &&
+              result.entry->pos == core::PartOfSpeech::Other) {
+            // This hiragana part is a registered suffix - skip verb candidate
+            is_suffix_pattern = true;
+            break;
+          }
+        }
+      }
+      if (is_suffix_pattern) {
+        continue;
+      }
+
       // Skip patterns that end with particles (noun renyokei + particle)
       // e.g., 切りに (切り + に), 飲みに (飲み + に), 行きに (行き + に)
       // These are nominalized verb stems followed by particles, not verb forms

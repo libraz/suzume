@@ -139,6 +139,20 @@ inline std::vector<DictionaryEntry> getLowInfoEntries() {
       {"感", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
       {"力", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
       {"度", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
+
+      // Plural suffixes (複数接尾語) - essential for proper tokenization
+      // Low cost (0.5) to ensure NOUN+suffix is preferred over VERB interpretation
+      {"たち", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
+      {"ら", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
+      {"ども", POS::Other, 0.8F, "", false, false, true, CT::None, ""},
+      {"がた", POS::Other, 0.8F, "", false, false, true, CT::None, ""},
+
+      // Honorific suffixes (敬称接尾語)
+      {"さん", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
+      {"様", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
+      {"ちゃん", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
+      {"くん", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
+      {"氏", POS::Other, 0.8F, "", false, false, true, CT::None, ""},
   };
 }
 

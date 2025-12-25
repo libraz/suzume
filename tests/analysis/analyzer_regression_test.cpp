@@ -1611,5 +1611,231 @@ TEST(AnalyzerTest, Regression_Adverb_Moshi) {
   EXPECT_TRUE(found_moshi) << "もし should be found";
 }
 
+// =============================================================================
+// Regression: Suru verb renyokei (サ変動詞連用形)
+// =============================================================================
+// Bug: 分割し was parsed as NOUN + OTHER instead of VERB
+// Fix: Added renyokei matching to inflection module
+
+TEST(AnalyzerTest, Regression_SuruRenyokei_Bunkatsu) {
+  // 分割し、結合する - 分割し should be recognized as verb
+  Suzume analyzer;
+  auto result = analyzer.analyze("分割し、結合する");
+  ASSERT_GE(result.size(), 2);
+
+  bool found_bunkatsu = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "分割し") {
+      found_bunkatsu = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Verb)
+          << "分割し should be Verb";
+      EXPECT_EQ(mor.lemma, "分割する")
+          << "分割し lemma should be 分割する";
+    }
+  }
+  EXPECT_TRUE(found_bunkatsu) << "分割し should be found";
+}
+
+TEST(AnalyzerTest, Regression_SuruRenyokei_InSentence) {
+  // Full sentence with suru verb renyokei
+  Suzume analyzer;
+  auto result = analyzer.analyze("文章を単語に分割し、それぞれの品詞を特定する");
+  ASSERT_GE(result.size(), 8);
+
+  bool found_bunkatsu = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "分割し") {
+      found_bunkatsu = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Verb)
+          << "分割し should be Verb";
+    }
+  }
+  EXPECT_TRUE(found_bunkatsu) << "分割し should be found in sentence";
+}
+
+// =============================================================================
+// Regression: それぞれ adverb recognition
+// =============================================================================
+// Bug: それぞれ was split into それ + ぞれ
+// Fix: Added それぞれ to adverbs dictionary
+
+TEST(AnalyzerTest, Regression_Sorezore_SingleToken) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("それぞれの意見を述べる");
+  ASSERT_GE(result.size(), 4);
+
+  bool found_sorezore = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "それぞれ") {
+      found_sorezore = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Adverb)
+          << "それぞれ should be Adverb";
+    }
+  }
+  EXPECT_TRUE(found_sorezore)
+      << "それぞれ should be found as single token, not split";
+}
+
+// =============================================================================
+// Regression: Nominalized noun recognition (連用形転成名詞)
+// =============================================================================
+// Bug: 手助け was split into 手助 + け
+// Fix: Added nominalized noun candidate generation
+
+TEST(AnalyzerTest, Regression_NominalizedNoun_Tedasuke) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("手助けをする");
+  ASSERT_GE(result.size(), 3);
+
+  bool found_tedasuke = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "手助け") {
+      found_tedasuke = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Noun)
+          << "手助け should be Noun";
+    }
+  }
+  EXPECT_TRUE(found_tedasuke)
+      << "手助け should be found as single token, not split";
+}
+
+TEST(AnalyzerTest, Regression_NominalizedNoun_Kiri) {
+  // 切り should be nominalized noun, に should be particle
+  Suzume analyzer;
+  auto result = analyzer.analyze("みじん切りにする");
+  ASSERT_GE(result.size(), 3);
+
+  bool found_kiri = false;
+  bool found_ni = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "切り") {
+      found_kiri = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Noun)
+          << "切り should be Noun";
+    }
+    if (mor.surface == "に") {
+      found_ni = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Particle)
+          << "に should be Particle";
+    }
+  }
+  EXPECT_TRUE(found_kiri) << "切り should be found as nominalized noun";
+  EXPECT_TRUE(found_ni) << "に should be found as particle";
+}
+
+// =============================================================================
+// Regression: Suru verb te-form should not split
+// =============================================================================
+// Bug: 勉強して was split into 勉強し + て
+// Fix: Skip suru renyokei candidate when followed by て/た
+
+TEST(AnalyzerTest, Regression_SuruTeForm_NotSplit) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("勉強して");
+  ASSERT_EQ(result.size(), 1) << "勉強して should be single token";
+
+  EXPECT_EQ(result[0].surface, "勉強して");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
+      << "勉強して should be Verb";
+  EXPECT_EQ(result[0].lemma, "勉強する")
+      << "勉強して lemma should be 勉強する";
+}
+
+TEST(AnalyzerTest, Regression_SuruTaForm_NotSplit) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("勉強した");
+  ASSERT_EQ(result.size(), 1) << "勉強した should be single token";
+
+  EXPECT_EQ(result[0].surface, "勉強した");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
+      << "勉強した should be Verb";
+  EXPECT_EQ(result[0].lemma, "勉強する")
+      << "勉強した lemma should be 勉強する";
+}
+
+// =============================================================================
+// Regression: Adverbs should not be split
+// =============================================================================
+// Bug: たくさん was split into た + くさん
+// Bug: いつも was split into いつ + も
+// Bug: まず was recognized as OTHER instead of ADV
+// Fix: Register these adverbs in Layer 1 with appropriate cost
+
+TEST(AnalyzerTest, Regression_TakusanAdverb) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("たくさんの本");
+  ASSERT_GE(result.size(), 2);
+
+  EXPECT_EQ(result[0].surface, "たくさん");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adverb)
+      << "たくさん should be Adverb, not split";
+}
+
+TEST(AnalyzerTest, Regression_ItsumoAdverb) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("いつも元気");
+  ASSERT_GE(result.size(), 2);
+
+  EXPECT_EQ(result[0].surface, "いつも");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adverb)
+      << "いつも should be Adverb, not split into いつ+も";
+}
+
+TEST(AnalyzerTest, Regression_MazuAdverb) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("まず確認する");
+  ASSERT_GE(result.size(), 2);
+
+  EXPECT_EQ(result[0].surface, "まず");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adverb)
+      << "まず should be Adverb";
+}
+
+// =============================================================================
+// Regression: Noun + suffix should not be verb
+// =============================================================================
+// Bug: 学生たち was parsed as single VERB (立つ conjugation)
+// Bug: 子供たち was parsed as single VERB
+// Fix: Skip VERB candidate when hiragana suffix is in dictionary as suffix
+
+TEST(AnalyzerTest, Regression_NounPlusTachi) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("学生たち");
+  ASSERT_EQ(result.size(), 2);
+
+  EXPECT_EQ(result[0].surface, "学生");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Noun)
+      << "学生 should be Noun";
+  EXPECT_EQ(result[1].surface, "たち");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Other)
+      << "たち should be Other (suffix)";
+}
+
+TEST(AnalyzerTest, Regression_NounPlusSan) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("田中さん");
+  ASSERT_EQ(result.size(), 2);
+
+  EXPECT_EQ(result[0].surface, "田中");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Noun)
+      << "田中 should be Noun";
+  EXPECT_EQ(result[1].surface, "さん");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Other)
+      << "さん should be Other (suffix)";
+}
+
+TEST(AnalyzerTest, Regression_KodomoTachi) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("子供たちが遊ぶ");
+  ASSERT_GE(result.size(), 3);
+
+  EXPECT_EQ(result[0].surface, "子供");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Noun)
+      << "子供 should be Noun";
+  EXPECT_EQ(result[1].surface, "たち");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Other)
+      << "たち should be Other (suffix)";
+}
+
 }  // namespace
 }  // namespace suzume::analysis

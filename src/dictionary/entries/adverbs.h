@@ -44,6 +44,9 @@ inline std::vector<DictionaryEntry> getAdverbEntries() {
       {"すごく", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"めっちゃ", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},  // colloquial
       {"かなり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
+      // Low cost to beat た(AUX)+くさん(OTHER) combination
+      {"たくさん", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"沢山", POS::Adverb, 0.3F, "", false, false, false, CT::None, "たくさん"},
       {"もっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"ずっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"さらに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
@@ -84,7 +87,8 @@ inline std::vector<DictionaryEntry> getAdverbEntries() {
       {"もう", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"やっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"ついに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"いつも", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
+      // Lower cost for いつも to beat いつ(PRON)+も(PARTICLE) combination
+      {"いつも", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
       {"たまに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"よく", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"たびたび", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
@@ -110,6 +114,12 @@ inline std::vector<DictionaryEntry> getAdverbEntries() {
       // Other - hiragana only
       {"やはり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"やっぱり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
+
+      // Sequence adverbs (順序副詞)
+      // Note: 最初に、次に、最後に are not registered here because they should
+      // be analyzed as NOUN+PARTICLE (最初+に, etc.) per existing tests
+      {"まず", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"先ず", POS::Adverb, 0.3F, "", false, false, false, CT::None, "まず"},
 
       // Formal/Business adverbs (敬語・ビジネス)
       {"何卒", POS::Adverb, 0.3F, "", false, false, false, CT::None, "なにとぞ"},
