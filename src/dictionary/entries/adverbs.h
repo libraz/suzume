@@ -66,6 +66,9 @@ inline std::vector<DictionaryEntry> getAdverbEntries() {
       {"こう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
       {"ああ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
       {"どう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      // Distributive adverbs (分配副詞)
+      {"それぞれ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"おのおの", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       // Interrogative adverbs (疑問副詞) - compounds of demonstratives
       {"どうして", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
       {"どうしても", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},

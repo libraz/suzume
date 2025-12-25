@@ -798,6 +798,22 @@ TEST_F(InflectionTest, WakeNiWaIkanaiIchidan) {
   EXPECT_EQ(result.base_form, "食べる");
 }
 
+// ===== Suru verb renyokei (conjunctive form) =====
+
+TEST_F(InflectionTest, SuruRenyokeiBunkatsu) {
+  // 分割し (divide - conjunctive form)
+  auto result = inflection_.getBest("分割し");
+  EXPECT_EQ(result.base_form, "分割する");
+  EXPECT_EQ(result.verb_type, VerbType::Suru);
+}
+
+TEST_F(InflectionTest, SuruRenyokeiBenkyo) {
+  // 勉強し (study - conjunctive form)
+  auto result = inflection_.getBest("勉強し");
+  EXPECT_EQ(result.base_form, "勉強する");
+  EXPECT_EQ(result.verb_type, VerbType::Suru);
+}
+
 }  // namespace
 }  // namespace grammar
 }  // namespace suzume

@@ -155,6 +155,12 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
     auto na_adjs =
         generateNaAdjectiveCandidates(text, codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), na_adjs.begin(), na_adjs.end());
+
+    // Generate nominalized noun candidates (kanji + short hiragana)
+    // e.g., 手助け, 片付け, 引き上げ
+    auto nom_nouns =
+        generateNominalizedNounCandidates(text, codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), nom_nouns.begin(), nom_nouns.end());
   }
 
   // Generate hiragana verb candidates (pure hiragana verbs like いく, くる)
@@ -596,8 +602,30 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateVerbCandidates(
           hiragana_part == "か" || hiragana_part == "の" || hiragana_part == "から" ||
           hiragana_part == "まで" || hiragana_part == "より" || hiragana_part == "ほど" ||
           hiragana_part == "です" || hiragana_part == "だ" || hiragana_part == "だった" ||
-          hiragana_part == "でした" || hiragana_part == "である") {
+          hiragana_part == "でした" || hiragana_part == "でし" || hiragana_part == "である") {
         continue;  // Skip particle/copula patterns
+      }
+
+      // Skip patterns that end with particles (noun renyokei + particle)
+      // e.g., 切りに (切り + に), 飲みに (飲み + に), 行きに (行き + に)
+      // These are nominalized verb stems followed by particles, not verb forms
+      size_t hp_size = hiragana_part.size();
+      if (hp_size >= 6) {  // At least 2 hiragana (6 bytes)
+        // Get last hiragana character (particle candidate)
+        char32_t last_char = codepoints[end_pos - 1];
+        if (last_char == U'に' || last_char == U'で' || last_char == U'を' ||
+            last_char == U'が' || last_char == U'は' || last_char == U'も' ||
+            last_char == U'へ' || last_char == U'の' || last_char == U'と') {
+          // Check if the preceding part could be a valid verb renyokei
+          // Renyokei typically ends in い/り/き/ぎ/し/み/び/ち/に
+          char32_t second_last_char = codepoints[end_pos - 2];
+          if (second_last_char == U'い' || second_last_char == U'り' ||
+              second_last_char == U'き' || second_last_char == U'ぎ' ||
+              second_last_char == U'し' || second_last_char == U'み' ||
+              second_last_char == U'び' || second_last_char == U'ち') {
+            continue;  // Skip - likely nominalized noun + particle
+          }
+        }
       }
 
       // Check if this looks like a conjugated verb
@@ -627,6 +655,17 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateVerbCandidates(
                 last_char == U'て' || last_char == U'ね' || last_char == U'へ' ||
                 last_char == U'め' || last_char == U'れ') {
               continue;  // Skip - e-row stem is typically ichidan, not godan
+            }
+          }
+
+          // Skip Suru verb renyokei (し) if followed by te/ta form particles
+          // e.g., "勉強して" should be parsed as single token, not "勉強し" + "て"
+          if (best.verb_type == grammar::VerbType::Suru &&
+              hiragana_part == "し" && end_pos < codepoints.size()) {
+            char32_t next_char = codepoints[end_pos];
+            if (next_char == U'て' || next_char == U'た' ||
+                next_char == U'で' || next_char == U'だ') {
+              continue;  // Skip - let the longer te-form candidate win
             }
           }
 
@@ -1015,6 +1054,126 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateHiraganaAdjectiveCan
             [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
               return lhs.cost < rhs.cost;
             });
+
+  return candidates;
+}
+
+std::vector<UnknownCandidate> UnknownWordGenerator::generateNominalizedNounCandidates(
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) const {
+  std::vector<UnknownCandidate> candidates;
+
+  if (start_pos >= char_types.size() ||
+      char_types[start_pos] != normalize::CharType::Kanji) {
+    return candidates;
+  }
+
+  // Find kanji portion (typically 1-3 characters for nominalized nouns)
+  size_t kanji_end = start_pos;
+  while (kanji_end < char_types.size() &&
+         kanji_end - start_pos < 4 &&  // Max 4 kanji
+         char_types[kanji_end] == normalize::CharType::Kanji) {
+    ++kanji_end;
+  }
+
+  // Need at least 1 kanji
+  if (kanji_end == start_pos) {
+    return candidates;
+  }
+
+  // Look for 1-2 hiragana after kanji (nominalization endings)
+  if (kanji_end >= char_types.size() ||
+      char_types[kanji_end] != normalize::CharType::Hiragana) {
+    return candidates;
+  }
+
+  // Check for common nominalization patterns:
+  // - Single hiragana: け, げ, せ, い, り, ち, き, ぎ, し, み, び, に, etc.
+  // - Double hiragana: 上げ, 下げ, 付け, 入り, etc.
+  char32_t first_hiragana = codepoints[kanji_end];
+
+  // Skip particles that never form nominalizations
+  if (first_hiragana == U'を' || first_hiragana == U'が' ||
+      first_hiragana == U'は' || first_hiragana == U'も' ||
+      first_hiragana == U'へ' || first_hiragana == U'の' ||
+      first_hiragana == U'に' || first_hiragana == U'で' ||
+      first_hiragana == U'と' || first_hiragana == U'や' ||
+      first_hiragana == U'か') {
+    return candidates;
+  }
+
+  // Common nominalization endings (renyokei stems)
+  // Single char: け(ける), げ(げる), せ(せる), い(う/く), り(る), ち(つ), etc.
+  bool is_nominalization_ending = (
+      first_hiragana == U'け' || first_hiragana == U'げ' ||
+      first_hiragana == U'せ' || first_hiragana == U'い' ||
+      first_hiragana == U'り' || first_hiragana == U'ち' ||
+      first_hiragana == U'き' || first_hiragana == U'ぎ' ||
+      first_hiragana == U'し' || first_hiragana == U'み' ||
+      first_hiragana == U'び' || first_hiragana == U'え' ||
+      first_hiragana == U'れ' || first_hiragana == U'め');
+
+  if (!is_nominalization_ending) {
+    return candidates;
+  }
+
+  // Check for 1 or 2 hiragana (e.g., け or 上げ)
+  size_t hiragana_end = kanji_end + 1;
+
+  // Check for 2-hiragana patterns if second char is also valid
+  if (hiragana_end < char_types.size() &&
+      char_types[hiragana_end] == normalize::CharType::Hiragana) {
+    char32_t second_hiragana = codepoints[hiragana_end];
+    // Common 2-char nominalization endings
+    // 上げ, 下げ, 付け, 入り, 上り, 下り, etc.
+    if (second_hiragana == U'げ' || second_hiragana == U'け' ||
+        second_hiragana == U'り' || second_hiragana == U'い' ||
+        second_hiragana == U'え' || second_hiragana == U'し') {
+      // Generate 2-hiragana candidate
+      std::string surface = extractSubstring(codepoints, start_pos, hiragana_end + 1);
+      if (!surface.empty()) {
+        UnknownCandidate candidate;
+        candidate.surface = surface;
+        candidate.start = start_pos;
+        candidate.end = hiragana_end + 1;
+        candidate.pos = core::PartOfSpeech::Noun;
+        // Good cost to compete with kanji-only + hiragana-other split
+        candidate.cost = 0.8F;
+        candidate.has_suffix = false;
+        candidates.push_back(candidate);
+      }
+    }
+  }
+
+  // Generate 1-hiragana candidate
+  // Only if the next character is NOT a particle that would indicate verb+aux pattern
+  // e.g., "飲みながら" should parse as verb, not "飲み" (noun) + "ながら" (particle)
+  bool skip_single_char = false;
+  if (kanji_end + 1 < char_types.size() &&
+      char_types[kanji_end + 1] == normalize::CharType::Hiragana) {
+    char32_t next_char = codepoints[kanji_end + 1];
+    // Skip if followed by common auxiliary beginnings
+    // ながら, ない, なく, etc.
+    if (next_char == U'な') {
+      skip_single_char = true;
+    }
+  }
+
+  if (!skip_single_char) {
+    std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
+    if (!surface.empty()) {
+      UnknownCandidate candidate;
+      candidate.surface = surface;
+      candidate.start = start_pos;
+      candidate.end = kanji_end + 1;
+      candidate.pos = core::PartOfSpeech::Noun;
+      // Higher cost to avoid competing with verb candidates
+      candidate.cost = 1.2F;
+      candidate.has_suffix = false;
+      candidates.push_back(candidate);
+    }
+  }
 
   return candidates;
 }

@@ -1013,6 +1013,27 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         }
       }
 
+      // Suru verb stems should not contain particles like で, に, etc.
+      // This prevents "本でし" from being parsed as Suru verb "本でする"
+      // Valid suru stems are typically all-kanji (勉強, 検討) or katakana loan words
+      if (ending.verb_type == VerbType::Suru && !stem.empty()) {
+        // Check if stem ends with common particles/hiragana that shouldn't be in suru stems
+        bool invalid_stem = false;
+        if (stem.size() >= 3) {
+          std::string_view last_char = std::string_view(stem).substr(stem.size() - 3);
+          // These hiragana at the end of stem indicate a particle or non-suru pattern
+          if (last_char == "で" || last_char == "に" || last_char == "を" ||
+              last_char == "が" || last_char == "は" || last_char == "も" ||
+              last_char == "と" || last_char == "へ" || last_char == "か" ||
+              last_char == "や" || last_char == "の") {
+            invalid_stem = true;
+          }
+        }
+        if (invalid_stem) {
+          continue;  // Skip suru verbs with particle-like endings
+        }
+      }
+
       // Build base form
       std::string base_form = stem + ending.base_suffix;
 
@@ -1098,10 +1119,16 @@ std::vector<InflectionCandidate> Inflection::analyze(
     }
   }
 
-  // Also try direct verb stem matching (for base forms only)
-  // Only match base form when no auxiliaries are found
+  // Also try direct verb stem matching (for base forms and standalone renyokei)
+  // Match base form (e.g., 分割する)
   auto base_candidates = matchVerbStem(surface, {}, conn::kVerbBase);
   for (auto& cand : base_candidates) {
+    candidates.push_back(std::move(cand));
+  }
+
+  // Match renyokei (e.g., 分割し) - used when verb connects to another phrase
+  auto renyokei_candidates = matchVerbStem(surface, {}, conn::kVerbRenyokei);
+  for (auto& cand : renyokei_candidates) {
     candidates.push_back(std::move(cand));
   }
 

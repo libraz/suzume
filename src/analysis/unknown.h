@@ -128,6 +128,19 @@ class UnknownWordGenerator {
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
+   * @brief Generate nominalized noun candidates (kanji + short hiragana)
+   *
+   * Detects nominalized verb stems (連用形転成名詞) like:
+   *   - 手助け (from 手助ける)
+   *   - 片付け (from 片付ける)
+   *   - 引き上げ (from 引き上げる)
+   */
+  std::vector<UnknownCandidate> generateNominalizedNounCandidates(
+      std::string_view text, const std::vector<char32_t>& codepoints,
+      size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
    * @brief Generate candidates for same-type sequences
    */
   std::vector<UnknownCandidate> generateBySameType(
