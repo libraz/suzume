@@ -1,0 +1,95 @@
+/**
+ * @file char_patterns.cpp
+ * @brief Character pattern utilities for Japanese verb/adjective analysis
+ */
+
+#include "char_patterns.h"
+
+namespace suzume::grammar {
+
+// Onbin endings: い, っ, ん
+const char* kOnbinEndings[] = {"い", "っ", "ん"};
+const size_t kOnbinCount = 3;
+
+// Mizenkei (a-row) endings: か, が, さ, た, な, ば, ま, ら, わ
+const char* kMizenkeiEndings[] = {"か", "が", "さ", "た",  "な",
+                                   "ば", "ま", "ら", "わ"};
+const size_t kMizenkeiCount = 9;
+
+// Renyokei (i-row) endings: き, ぎ, し, ち, に, び, み, り
+const char* kRenyokeiEndings[] = {"き", "ぎ", "し", "ち",
+                                   "に", "び", "み", "り"};
+const size_t kRenyokeiCount = 8;
+
+bool endsWithERow(std::string_view stem) {
+  if (stem.size() < 3) {
+    return false;
+  }
+  // Get last character (UTF-8: hiragana is 3 bytes)
+  std::string_view last = stem.substr(stem.size() - 3);
+  // E-row hiragana: え, け, せ, て, ね, へ, め, れ, べ, ぺ, げ, ぜ, で
+  return last == "え" || last == "け" || last == "せ" || last == "て" ||
+         last == "ね" || last == "へ" || last == "め" || last == "れ" ||
+         last == "べ" || last == "ぺ" || last == "げ" || last == "ぜ" ||
+         last == "で";
+}
+
+bool endsWithChar(std::string_view stem, const char* chars[], size_t count) {
+  if (stem.size() < 3) {
+    return false;
+  }
+  std::string_view last = stem.substr(stem.size() - 3);
+  for (size_t idx = 0; idx < count; ++idx) {
+    if (last == chars[idx]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool isAllKanji(std::string_view stem) {
+  if (stem.empty()) {
+    return false;
+  }
+  size_t pos = 0;
+  while (pos < stem.size()) {
+    const unsigned char* ptr =
+        reinterpret_cast<const unsigned char*>(stem.data() + pos);
+    if ((ptr[0] & 0xF0) != 0xE0) {
+      return false;  // Not a 3-byte UTF-8 sequence
+    }
+    char32_t codepoint =
+        ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
+    // CJK Unified Ideographs: U+4E00-U+9FFF
+    // CJK Extension A: U+3400-U+4DBF
+    bool is_kanji = (codepoint >= 0x4E00 && codepoint <= 0x9FFF) ||
+                    (codepoint >= 0x3400 && codepoint <= 0x4DBF);
+    if (!is_kanji) {
+      return false;
+    }
+    pos += 3;
+  }
+  return true;
+}
+
+bool endsWithKanji(std::string_view stem) {
+  if (stem.size() < 3) {
+    return false;
+  }
+  // Decode last UTF-8 character
+  // Kanji in UTF-8 is 3 bytes: E4-E9 xx xx (U+4E00-U+9FFF)
+  const unsigned char* ptr =
+      reinterpret_cast<const unsigned char*>(stem.data() + stem.size() - 3);
+  if ((ptr[0] & 0xF0) == 0xE0) {
+    // 3-byte UTF-8 sequence
+    char32_t codepoint =
+        ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
+    // CJK Unified Ideographs: U+4E00-U+9FFF
+    // CJK Extension A: U+3400-U+4DBF
+    return (codepoint >= 0x4E00 && codepoint <= 0x9FFF) ||
+           (codepoint >= 0x3400 && codepoint <= 0x4DBF);
+  }
+  return false;
+}
+
+}  // namespace suzume::grammar

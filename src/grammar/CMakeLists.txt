@@ -1,10 +1,14 @@
 # Grammar module CMakeLists.txt
 
 add_library(suzume_grammar STATIC
+  auxiliaries.cpp
+  char_patterns.cpp
   conjugation.cpp
   conjugator.cpp
   connection.cpp
   inflection.cpp
+  inflection_scorer.cpp
+  verb_endings.cpp
 )
 
 target_include_directories(suzume_grammar PUBLIC

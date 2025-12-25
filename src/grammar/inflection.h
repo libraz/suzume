@@ -15,6 +15,7 @@
 #include <string_view>
 #include <vector>
 
+#include "auxiliaries.h"
 #include "conjugation.h"
 #include "conjugator.h"
 #include "connection.h"
@@ -22,26 +23,15 @@
 namespace suzume::grammar {
 
 /**
- * @brief Auxiliary entry for inflection analysis
- */
-struct AuxiliaryEntry {
-  std::string surface;      // Surface form: ています
-  std::string lemma;        // Base form: いる
-  uint16_t left_id;         // What this requires (e.g., kAuxTeiru)
-  uint16_t right_id;        // What this provides (e.g., kAuxOutMasu)
-  uint16_t required_conn;   // Required connection from preceding (e.g., kAuxOutTe)
-};
-
-/**
  * @brief Analysis candidate from inflection analysis
  */
 struct InflectionCandidate {
-  std::string base_form;    // Inferred base form: 住む
-  std::string stem;         // Stem: 住
-  std::string suffix;       // Suffix chain: んでいます
-  VerbType verb_type;       // Verb type: GodanMa
-  float confidence;         // Confidence: 0.0-1.0
-  std::vector<std::string> morphemes;  // Decomposed: [ん, で, い, ます]
+  std::string base_form;   ///< Inferred base form: 住む
+  std::string stem;        ///< Stem: 住
+  std::string suffix;      ///< Suffix chain: んでいます
+  VerbType verb_type;      ///< Verb type: GodanMa
+  float confidence;        ///< Confidence: 0.0-1.0
+  std::vector<std::string> morphemes;  ///< Decomposed: [ん, で, い, ます]
 };
 
 /**
@@ -55,7 +45,7 @@ struct InflectionCandidate {
  */
 class Inflection {
  public:
-  Inflection();
+  Inflection() = default;
 
   /**
    * @brief Analyze surface form and infer base form
@@ -75,12 +65,6 @@ class Inflection {
   InflectionCandidate getBest(std::string_view surface) const;
 
  private:
-  Conjugator conjugator_;
-  std::vector<AuxiliaryEntry> auxiliaries_;
-  ConnectionMatrix conn_matrix_;
-
-  void initAuxiliaries();
-
   // Try matching auxiliary at end of surface
   std::vector<std::pair<const AuxiliaryEntry*, size_t>>
   matchAuxiliaries(std::string_view surface) const;

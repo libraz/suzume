@@ -26,11 +26,19 @@ set(TEST_SOURCES
   dictionary/double_array_test.cpp
   dictionary/binary_dict_test.cpp
   dictionary/core_dict_test.cpp
-  grammar/inflection_test.cpp
-  pretokenizer/pretokenizer_test.cpp
+  grammar/inflection_basic_test.cpp
+  grammar/inflection_potential_test.cpp
+  grammar/inflection_compound_test.cpp
+  grammar/inflection_complex_test.cpp
+  pretokenizer/pretokenizer_url_test.cpp
+  pretokenizer/pretokenizer_number_test.cpp
+  pretokenizer/pretokenizer_text_test.cpp
   analysis/analyzer_basic_test.cpp
   analysis/analyzer_particle_test.cpp
-  analysis/analyzer_grammar_test.cpp
+  analysis/analyzer_grammar_auxiliary_test.cpp
+  analysis/analyzer_grammar_adjective_test.cpp
+  analysis/analyzer_grammar_pattern_test.cpp
+  analysis/analyzer_grammar_suru_test.cpp
   analysis/analyzer_verb_test.cpp
   analysis/analyzer_usecase_business_test.cpp
   analysis/analyzer_usecase_conversation_test.cpp
@@ -39,8 +47,17 @@ set(TEST_SOURCES
   analysis/analyzer_usecase_casual_test.cpp
   analysis/analyzer_usecase_mixed_test.cpp
   analysis/analyzer_usecase_realworld_test.cpp
-  analysis/analyzer_regression_test.cpp
-  analysis/analyzer_strict_test.cpp
+  analysis/analyzer_regression_particle_test.cpp
+  analysis/analyzer_regression_copula_test.cpp
+  analysis/analyzer_regression_adjective_test.cpp
+  analysis/analyzer_regression_verb_test.cpp
+  analysis/analyzer_regression_compound_test.cpp
+  analysis/analyzer_regression_misc_test.cpp
+  analysis/analyzer_strict_greeting_test.cpp
+  analysis/analyzer_strict_word_test.cpp
+  analysis/analyzer_strict_particle_test.cpp
+  analysis/analyzer_strict_expression_test.cpp
+  analysis/analyzer_strict_compound_test.cpp
   analysis/analyzer_prefix_test.cpp
 )
 

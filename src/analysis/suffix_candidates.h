@@ -1,0 +1,87 @@
+/**
+ * @file suffix_candidates.h
+ * @brief Suffix-based unknown word candidate generation
+ */
+
+#ifndef SUZUME_ANALYSIS_SUFFIX_CANDIDATES_H_
+#define SUZUME_ANALYSIS_SUFFIX_CANDIDATES_H_
+
+#include <string>
+#include <string_view>
+#include <vector>
+
+#include "core/types.h"
+#include "normalize/char_type.h"
+
+namespace suzume::analysis {
+
+struct UnknownCandidate;
+struct UnknownOptions;
+
+/**
+ * @brief Extract substring from codepoints to UTF-8
+ * @param codepoints Vector of Unicode codepoints
+ * @param start Start index (inclusive)
+ * @param end End index (exclusive)
+ * @return UTF-8 encoded string
+ */
+std::string extractSubstring(const std::vector<char32_t>& codepoints,
+                             size_t start, size_t end);
+
+/**
+ * @brief Suffix entry for kanji compounds
+ */
+struct SuffixEntry {
+  std::string_view suffix;
+  core::PartOfSpeech pos;
+};
+
+/**
+ * @brief Get list of kanji compound suffixes
+ */
+const std::vector<SuffixEntry>& getSuffixEntries();
+
+/**
+ * @brief Get list of na-adjective forming suffixes (的, etc.)
+ */
+const std::vector<std::string_view>& getNaAdjSuffixes();
+
+/**
+ * @brief Generate candidates with suffix separation
+ *
+ * Detects kanji compounds that end with common suffixes (化, 性, 者, etc.)
+ * and generates both the full compound and the stem as candidates.
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param char_types Character types for each position
+ * @param options Unknown word generation options
+ * @return Vector of candidates
+ */
+std::vector<UnknownCandidate> generateWithSuffix(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const UnknownOptions& options);
+
+/**
+ * @brief Generate nominalized noun candidates
+ *
+ * Detects nominalized verb stems (連用形転成名詞) like:
+ *   - 手助け (from 手助ける)
+ *   - 片付け (from 片付ける)
+ *   - 引き上げ (from 引き上げる)
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param char_types Character types for each position
+ * @return Vector of candidates
+ */
+std::vector<UnknownCandidate> generateNominalizedNounCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types);
+
+}  // namespace suzume::analysis
+
+#endif  // SUZUME_ANALYSIS_SUFFIX_CANDIDATES_H_
