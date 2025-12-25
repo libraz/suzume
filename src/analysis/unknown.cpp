@@ -908,6 +908,30 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAdjectiveCandidates(
       continue;  // Skip - likely te-form + aux pattern
     }
 
+    // Skip patterns ending with verb passive/potential/causative negative renyokei
+    // 〜られなく, 〜れなく, 〜させなく, 〜せなく, 〜されなく are all verb forms,
+    // not i-adjectives. E.g., 食べられなく = 食べられる + ない (negative renyokei)
+    if (hiragana_part.size() >= 12 &&  // られなく = 12 bytes
+        hiragana_part.substr(hiragana_part.size() - 12) == "られなく") {
+      continue;  // Skip - passive/potential negative renyokei
+    }
+    if (hiragana_part.size() >= 9 &&  // れなく = 9 bytes
+        hiragana_part.substr(hiragana_part.size() - 9) == "れなく") {
+      continue;  // Skip - passive/potential negative renyokei
+    }
+    if (hiragana_part.size() >= 12 &&  // させなく = 12 bytes
+        hiragana_part.substr(hiragana_part.size() - 12) == "させなく") {
+      continue;  // Skip - causative negative renyokei
+    }
+    if (hiragana_part.size() >= 9 &&  // せなく = 9 bytes
+        hiragana_part.substr(hiragana_part.size() - 9) == "せなく") {
+      continue;  // Skip - causative negative renyokei
+    }
+    if (hiragana_part.size() >= 12 &&  // されなく = 12 bytes
+        hiragana_part.substr(hiragana_part.size() - 12) == "されなく") {
+      continue;  // Skip - passive negative renyokei
+    }
+
     auto best = inflection_.getBest(surface);
     // Require confidence >= 0.5 for i-adjectives
     // Base forms like 寒い get exactly 0.5, conjugated forms like 美しかった get 0.68+

@@ -814,6 +814,31 @@ TEST_F(InflectionTest, SuruRenyokeiBenkyo) {
   EXPECT_EQ(result.verb_type, VerbType::Suru);
 }
 
+// ===== Passive/Potential negative te-form (られなくて) =====
+
+TEST_F(InflectionTest, PassivePotentialNegativeTe_Ichidan) {
+  // 食べられなくて (couldn't eat - te form)
+  auto result = inflection_.getBest("食べられなくて");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionTest, CausativeNegativeTe_Ichidan) {
+  // 食べさせなくて (didn't let eat - te form)
+  auto result = inflection_.getBest("食べさせなくて");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+// ===== Conditional form with 2-kanji stem =====
+
+TEST_F(InflectionTest, ConditionalBa_TwoKanjiStem) {
+  // 頑張れば (if one works hard)
+  auto result = inflection_.getBest("頑張れば");
+  EXPECT_EQ(result.base_form, "頑張る");
+  EXPECT_EQ(result.verb_type, VerbType::GodanRa);
+}
+
 }  // namespace
 }  // namespace grammar
 }  // namespace suzume

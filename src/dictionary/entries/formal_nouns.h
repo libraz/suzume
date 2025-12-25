@@ -44,8 +44,11 @@ inline std::vector<DictionaryEntry> getFormalNounEntries() {
 
   return {
       // Kanji forms with reading (hiragana auto-generated)
-      {"事", POS::Noun, 2.0F, "", false, true, false, CT::None, "こと"},
-      {"物", POS::Noun, 2.0F, "", false, true, false, CT::None, "もの"},
+      // Note: Formal nouns need lower cost than particle combinations
+      // e.g., "もの" must beat "も"(0.5) + "の"(1.0) after Viterbi scoring
+      // Low cost (0.3) compensates for connection costs in Viterbi
+      {"事", POS::Noun, 0.3F, "", false, true, false, CT::None, "こと"},
+      {"物", POS::Noun, 0.3F, "", false, true, false, CT::None, "もの"},
       {"為", POS::Noun, 2.0F, "", false, true, false, CT::None, "ため"},
       {"所", POS::Noun, 2.0F, "", false, true, false, CT::None, "ところ"},
       {"時", POS::Noun, 2.0F, "", false, true, false, CT::None, "とき"},

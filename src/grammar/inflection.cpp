@@ -442,8 +442,15 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Multi-kanji stems (2+ kanji only) are almost always サ変名詞
   // Such stems should only be parsed as Suru verbs, not Godan or Ichidan
   // This prevents "検討いた" from being parsed as GodanKa "検討く"
+  // Exception: kVerbKatei (conditional form like 頑張れば) is less ambiguous
+  // because the ば-form has a distinct pattern that サ変名詞 doesn't have
   if (stem_len >= 6 && isAllKanji(stem) && type != VerbType::Suru) {
-    base -= 0.40F;  // Strong penalty for all-kanji stems with non-Suru types
+    if (required_conn == conn::kVerbKatei) {
+      // Lighter penalty for conditional form - 頑張れば, 滑れば are valid Godan
+      base -= 0.10F;
+    } else {
+      base -= 0.40F;  // Strong penalty for all-kanji stems with non-Suru types
+    }
   }
 
   // Godan potential form boost: 書けない → 書く is more likely than 書ける
@@ -644,6 +651,8 @@ void Inflection::initAuxiliaries() {
       {"られます", "られる", kAuxReru, kAuxOutMasu, kVerbMizenkei},
       {"られない", "られる", kAuxReru, kAuxOutBase, kVerbMizenkei},
       {"られなかった", "られる", kAuxReru, kAuxOutTa, kVerbMizenkei},
+      {"られなくて", "られる", kAuxReru, kAuxOutTe, kVerbMizenkei},
+      {"れなくて", "れる", kAuxReru, kAuxOutTe, kVerbMizenkei},
 
       // === Causative (せる/させる系) ===
       {"せる", "せる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
@@ -651,12 +660,14 @@ void Inflection::initAuxiliaries() {
       {"せて", "せる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"せない", "せる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       {"せなかった", "せる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
+      {"せなくて", "せる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"せます", "せる", kAuxSeru, kAuxOutMasu, kVerbMizenkei},
       {"させる", "させる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       {"させた", "させる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"させて", "させる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"させない", "させる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       {"させなかった", "させる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
+      {"させなくて", "させる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"させます", "させる", kAuxSeru, kAuxOutMasu, kVerbMizenkei},
 
       // === Causative-passive (させられる系) - for Ichidan ===
@@ -664,6 +675,7 @@ void Inflection::initAuxiliaries() {
       {"させられた", "させられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"させられて", "させられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"させられない", "させられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
+      {"させられなくて", "させられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"させられます", "させられる", kAuxSeru, kAuxOutMasu, kVerbMizenkei},
       // === Causative-passive (せられる系) - for Godan ===
       // 書く → 書か + せられる = 書かせられる
@@ -671,6 +683,7 @@ void Inflection::initAuxiliaries() {
       {"せられた", "せられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"せられて", "せられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"せられない", "せられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
+      {"せられなくて", "せられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"せられます", "せられる", kAuxSeru, kAuxOutMasu, kVerbMizenkei},
       {"せられました", "せられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"せられません", "せられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
@@ -679,6 +692,7 @@ void Inflection::initAuxiliaries() {
       {"された", "される", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"されて", "される", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"されない", "される", kAuxSeru, kAuxOutBase, kVerbMizenkei},
+      {"されなくて", "される", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"されます", "される", kAuxSeru, kAuxOutMasu, kVerbMizenkei},
       {"されました", "される", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"されません", "される", kAuxSeru, kAuxOutBase, kVerbMizenkei},
@@ -1161,10 +1175,13 @@ std::vector<InflectionCandidate> Inflection::analyze(
   }
 
   // Sort by confidence (descending)
-  std::sort(candidates.begin(), candidates.end(),
-            [](const InflectionCandidate& lhs, const InflectionCandidate& rhs) {
-              return lhs.confidence > rhs.confidence;
-            });
+  // Use stable_sort to preserve the original order for candidates with equal
+  // confidence. This ensures consistent behavior regardless of pattern count.
+  std::stable_sort(candidates.begin(), candidates.end(),
+                   [](const InflectionCandidate& lhs,
+                      const InflectionCandidate& rhs) {
+                     return lhs.confidence > rhs.confidence;
+                   });
 
   // Remove duplicates (same base_form and verb_type)
   auto dup_end = std::unique(
