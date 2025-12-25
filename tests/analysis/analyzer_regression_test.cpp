@@ -1406,5 +1406,211 @@ TEST(AnalyzerTest, Regression_Ichidan_OshietemoraruCorrectLemma) {
   EXPECT_TRUE(found_correct) << "教え... verb should be found";
 }
 
+// =============================================================================
+// Regression: Particle filter in verb/adjective candidates
+// =============================================================================
+// Bug: 家にいます was parsed as verb 家にう, 金がない as verb 金ぐ
+// Fix: Added に/が to particle filter in generateVerbCandidates/generateAdjectiveCandidates
+
+TEST(AnalyzerTest, Regression_ParticleFilter_IeNiImasu) {
+  // 家にいます should be: 家 + に + います
+  Suzume analyzer;
+  auto result = analyzer.analyze("家にいます");
+  ASSERT_GE(result.size(), 3) << "家にいます should have at least 3 tokens";
+
+  bool found_ie = false;
+  bool found_ni = false;
+  bool found_imasu = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "家") {
+      found_ie = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Noun) << "家 should be Noun";
+    }
+    if (mor.surface == "に" && mor.pos == core::PartOfSpeech::Particle) {
+      found_ni = true;
+    }
+    if (mor.surface == "います") {
+      found_imasu = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Verb) << "います should be Verb";
+    }
+  }
+  EXPECT_TRUE(found_ie) << "家 should be found as separate token";
+  EXPECT_TRUE(found_ni) << "に should be found as particle";
+  EXPECT_TRUE(found_imasu) << "います should be found as verb";
+}
+
+TEST(AnalyzerTest, Regression_ParticleFilter_KaneGaNai) {
+  // 金がない should be: 金 + が + ない
+  Suzume analyzer;
+  auto result = analyzer.analyze("金がない");
+  ASSERT_GE(result.size(), 3) << "金がない should have at least 3 tokens";
+
+  bool found_kane = false;
+  bool found_ga = false;
+  bool found_nai = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "金") {
+      found_kane = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Noun) << "金 should be Noun";
+    }
+    if (mor.surface == "が" && mor.pos == core::PartOfSpeech::Particle) {
+      found_ga = true;
+    }
+    if (mor.surface == "ない") {
+      found_nai = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Auxiliary) << "ない should be Aux";
+    }
+  }
+  EXPECT_TRUE(found_kane) << "金 should be found as separate token";
+  EXPECT_TRUE(found_ga) << "が should be found as particle";
+  EXPECT_TRUE(found_nai) << "ない should be found as auxiliary";
+}
+
+// =============================================================================
+// Regression: Demonstrative adverb そう
+// =============================================================================
+// Bug: そう was parsed as VERB
+// Fix: Added そう to adverbs.h
+
+TEST(AnalyzerTest, Regression_Adverb_Sou) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("そうですね");
+  ASSERT_GE(result.size(), 2);
+
+  bool found_sou = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "そう") {
+      found_sou = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Adverb)
+          << "そう should be Adverb, not Verb";
+    }
+  }
+  EXPECT_TRUE(found_sou) << "そう should be found";
+}
+
+TEST(AnalyzerTest, Regression_Adverb_SouKamoshirenai) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("そうかもしれません");
+  ASSERT_GE(result.size(), 2);
+
+  bool found_sou = false;
+  bool found_kamoshirenai = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "そう") {
+      found_sou = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Adverb)
+          << "そう should be Adverb";
+    }
+    if (mor.surface == "かもしれません") {
+      found_kamoshirenai = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Auxiliary)
+          << "かもしれません should be Auxiliary";
+    }
+  }
+  EXPECT_TRUE(found_sou) << "そう should be found";
+  EXPECT_TRUE(found_kamoshirenai) << "かもしれません should be found";
+}
+
+// =============================================================================
+// Regression: Auxiliary かもしれない
+// =============================================================================
+// Bug: もしれません was parsed as verb もしれる
+// Fix: Added かもしれない patterns to auxiliaries.h
+
+TEST(AnalyzerTest, Regression_Aux_Kamoshirenai) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("かもしれない");
+  ASSERT_EQ(result.size(), 1) << "かもしれない should be single token";
+
+  EXPECT_EQ(result[0].surface, "かもしれない");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Auxiliary)
+      << "かもしれない should be Auxiliary";
+}
+
+TEST(AnalyzerTest, Regression_Aux_KamoshiremasenInSentence) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("明日は雨かもしれません");
+  ASSERT_GE(result.size(), 3);
+
+  bool found_kamo = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "かもしれません") {
+      found_kamo = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Auxiliary)
+          << "かもしれません should be Auxiliary";
+      EXPECT_EQ(mor.lemma, "かもしれない")
+          << "かもしれません lemma should be かもしれない";
+    }
+  }
+  EXPECT_TRUE(found_kamo) << "かもしれません should be found";
+}
+
+// =============================================================================
+// Regression: Te-form + いる separation
+// =============================================================================
+// Bug: 来ていません was parsed as 来てい(ADJ) + ません
+// Fix: Added て/で to particle filter in generateAdjectiveCandidates
+
+TEST(AnalyzerTest, Regression_TeIru_Kiteimasen) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("来ていません");
+  ASSERT_GE(result.size(), 2);
+
+  // Should not contain 来てい as adjective
+  bool found_kitei_adj = false;
+  bool found_kite_verb = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "来てい" && mor.pos == core::PartOfSpeech::Adjective) {
+      found_kitei_adj = true;
+    }
+    if (mor.surface == "来て" && mor.pos == core::PartOfSpeech::Verb) {
+      found_kite_verb = true;
+    }
+  }
+  EXPECT_FALSE(found_kitei_adj) << "来てい should NOT be parsed as adjective";
+  EXPECT_TRUE(found_kite_verb) << "来て should be parsed as verb";
+}
+
+TEST(AnalyzerTest, Regression_TeIru_Kiteimasu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("来ています");
+  ASSERT_GE(result.size(), 2);
+
+  bool found_kite = false;
+  bool found_imasu = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "来て" && mor.pos == core::PartOfSpeech::Verb) {
+      found_kite = true;
+    }
+    if (mor.surface == "います" && mor.pos == core::PartOfSpeech::Verb) {
+      found_imasu = true;
+    }
+  }
+  EXPECT_TRUE(found_kite) << "来て should be parsed as verb";
+  EXPECT_TRUE(found_imasu) << "います should be parsed as verb";
+}
+
+// =============================================================================
+// Regression: Conditional adverb もし
+// =============================================================================
+// Bug: もし was parsed as OTHER
+// Fix: Added もし to adverbs.h
+
+TEST(AnalyzerTest, Regression_Adverb_Moshi) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("もし雨が降ったら");
+  ASSERT_GE(result.size(), 4);
+
+  bool found_moshi = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "もし") {
+      found_moshi = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Adverb)
+          << "もし should be Adverb";
+    }
+  }
+  EXPECT_TRUE(found_moshi) << "もし should be found";
+}
+
 }  // namespace
 }  // namespace suzume::analysis

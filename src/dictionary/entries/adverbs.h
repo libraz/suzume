@@ -60,6 +60,18 @@ inline std::vector<DictionaryEntry> getAdverbEntries() {
       {"きちんと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"ちゃんと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
 
+      // Demonstrative adverbs (指示副詞) - critical for tokenization
+      // Without these, "そう" is incorrectly parsed as a verb
+      {"そう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"こう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"ああ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"どう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      // Interrogative adverbs (疑問副詞) - compounds of demonstratives
+      {"どうして", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"どうしても", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"どうにか", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"どうも", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+
       // Time adverbs (時間副詞) - hiragana only
       {"すぐ", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"すぐに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
@@ -73,6 +85,12 @@ inline std::vector<DictionaryEntry> getAdverbEntries() {
       {"たまに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"よく", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"たびたび", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
+
+      // Conditional adverbs (条件副詞)
+      {"もし", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
+      {"もしも", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
+      {"仮に", POS::Adverb, 0.5F, "", false, false, false, CT::None, "かりに"},
+      {"万一", POS::Adverb, 0.5F, "", false, false, false, CT::None, "まんいち"},
 
       // Affirmation/Negation adverbs - kanji with reading
       {"必ず", POS::Adverb, 0.5F, "", false, false, false, CT::None, "かならず"},

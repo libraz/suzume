@@ -84,9 +84,13 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
 
   switch (ctype) {
     case normalize::CharType::Kanji:
-      // Kanji: prefer 2-4 characters
+      // Kanji: prefer 2-4 characters, but single kanji is also common (家, 人, 本)
+      // Single kanji should beat suffix entries (cost 1.5) in dictionary
       if (length >= 2 && length <= 4) {
         return base_cost;
+      }
+      if (length == 1) {
+        return base_cost + 0.4F;  // 1.4: prefer over suffix entries (1.5)
       }
       return base_cost + 0.5F;
 
@@ -540,14 +544,19 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateVerbCandidates(
 
   // Check if first hiragana is a particle that can NEVER be part of a verb
   // E.g., "領収書を" - を is a particle, not part of a verb
-  // Note: Exclude が and か from this list because:
+  // Note about が and に:
   // - が can be part of verbs: 上がる, 下がる, 受かる, etc.
+  // - に can be part of verbs: 煮る (niru), etc.
+  // However, these verbs should be in the dictionary, not generated as unknown.
+  // Including が/に here prevents false positives like 金がない→金ぐ, 家にいます→家にう
+  // Note about か:
   // - か can be part of verbs: 書かない (negative), 動かす, etc.
+  // - These are valid conjugation patterns that should be generated
   char32_t first_hiragana = codepoints[kanji_end];
-  if (first_hiragana == U'を' ||
+  if (first_hiragana == U'を' || first_hiragana == U'が' ||
       first_hiragana == U'は' || first_hiragana == U'も' ||
       first_hiragana == U'へ' || first_hiragana == U'の' ||
-      first_hiragana == U'や') {
+      first_hiragana == U'に' || first_hiragana == U'や') {
     return candidates;  // Not a verb - these particles follow nouns
   }
 
@@ -778,12 +787,15 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAdjectiveCandidates(
   }
 
   // Check if first hiragana is a particle that can NEVER be part of an adjective
+  // Note: て is the te-form particle (接続助詞), not part of adjective stems
+  // This prevents "来てい" from being parsed as an adjective (来ている = verb)
   char32_t first_hiragana = codepoints[kanji_end];
   if (first_hiragana == U'を' || first_hiragana == U'が' ||
       first_hiragana == U'は' || first_hiragana == U'も' ||
       first_hiragana == U'へ' || first_hiragana == U'の' ||
-      first_hiragana == U'や') {
-    return candidates;  // These particles follow nouns, not adjective stems
+      first_hiragana == U'に' || first_hiragana == U'や' ||
+      first_hiragana == U'て' || first_hiragana == U'で') {
+    return candidates;  // These particles follow nouns/verbs, not adjective stems
   }
 
   size_t hiragana_end = kanji_end;

@@ -72,6 +72,12 @@ inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"だろう", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
       {"でしょう", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
 
+      // Possibility/Uncertainty (可能性・不確実) - かもしれない forms
+      // Without these, "もしれません" is incorrectly parsed as verb "もしれる"
+      {"かもしれない", POS::Auxiliary, 0.3F, "かもしれない", false, false, false, CT::None, ""},
+      {"かもしれません", POS::Auxiliary, 0.3F, "かもしれない", false, false, false, CT::None, ""},
+      {"かもしれなかった", POS::Auxiliary, 0.3F, "かもしれない", false, false, false, CT::None, ""},
+
       // Desire (願望)
       {"たい", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
       {"たがる", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
