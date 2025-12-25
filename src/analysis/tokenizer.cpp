@@ -99,6 +99,9 @@ core::Lattice Tokenizer::buildLattice(
 
     // Add prefix + noun join candidates (お + 水 → お水)
     addPrefixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
+
+    // Add te-form + auxiliary verb candidates (学んで + いく → 学んで + いきたい)
+    addTeFormAuxiliaryCandidates(lattice, text, codepoints, pos, char_types);
   }
 
   return lattice;
@@ -160,6 +163,18 @@ void Tokenizer::addUnknownCandidates(
     core::Lattice& lattice, std::string_view text,
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
+  // Check for dictionary entries at this position to penalize longer unknown
+  // words. This prevents "明日雨" from being preferred over "明日" + "雨".
+  size_t byte_pos = charPosToBytePos(codepoints, start_pos);
+  auto dict_results = dict_manager_.lookup(text, byte_pos);
+
+  size_t max_dict_length = 0;
+  for (const auto& result : dict_results) {
+    if (result.entry != nullptr) {
+      max_dict_length = std::max(max_dict_length, result.length);
+    }
+  }
+
   // Generate unknown word candidates
   auto candidates =
       unknown_gen_.generate(text, codepoints, start_pos, char_types);
@@ -167,6 +182,22 @@ void Tokenizer::addUnknownCandidates(
   for (const auto& candidate : candidates) {
     uint8_t flags = core::LatticeEdge::kIsUnknown;
     float adjusted_cost = candidate.cost;
+
+    // Penalize unknown words that extend beyond dictionary entries.
+    // When a dictionary entry exists (e.g., "明日"), unknown words that
+    // include it but extend further (e.g., "明日雨") should be penalized
+    // to prefer the dictionary-guided segmentation.
+    //
+    // The penalty must be large enough to overcome single_kanji_penalty (2.0)
+    // applied to following unknown characters. For example:
+    //   - "明日" (dict, 0.5) + "雨" (unk, 1.4 + single_kanji_penalty 2.0) = 3.9
+    //   - "明日雨" (unk, 1.0 + penalty) must be > 3.9
+    // So penalty needs to be at least 3.0 to make dict-guided splits preferred.
+    if (max_dict_length > 0 &&
+        candidate.end - candidate.start > max_dict_length) {
+      // Apply strong penalty to prefer dictionary-guided segmentation
+      adjusted_cost += 3.5F;
+    }
 
     // For verb candidates, check if the hiragana suffix is a known particle
     // If so, the noun+particle path should be preferred over the verb path
@@ -893,6 +924,138 @@ void Tokenizer::addPrefixNounJoinCandidates(
   lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
                   static_cast<uint32_t>(noun_end), core::PartOfSpeech::Noun,
                   final_cost, flags, "");
+}
+
+namespace {
+
+// Te-form auxiliary verb patterns
+// These are common auxiliary verbs that follow て-form
+// Format: {hiragana stem, base form for lemma}
+struct TeFormAuxiliary {
+  const char* stem;      // Stem that appears after て/で (e.g., "い" for いく)
+  const char* base_form; // Base form of the auxiliary (e.g., "いく")
+};
+
+// List of te-form auxiliary verbs
+// These verbs commonly follow て-form to express various aspects
+// Note: "ある" is excluded because で+ある is the copula である, not te-form+aux
+const TeFormAuxiliary kTeFormAuxiliaries[] = {
+    {"い", "いく"},      // 〜ていく (progressive movement away)
+    {"く", "くる"},      // 〜てくる (progressive movement toward)
+    {"み", "みる"},      // 〜てみる (try doing)
+    {"お", "おく"},      // 〜ておく (do in advance)
+    {"しま", "しまう"},  // 〜てしまう (complete/regrettably)
+    {"ちゃ", "しまう"},  // 〜ちゃう (colloquial しまう)
+    {"じゃ", "しまう"},  // 〜じゃう (colloquial しまう after で)
+    {"もら", "もらう"},  // 〜てもらう (receive favor)
+    {"くれ", "くれる"},  // 〜てくれる (give favor to me)
+    {"あげ", "あげる"},  // 〜てあげる (give favor to other)
+    {"や", "やる"},      // 〜てやる (do for someone, casual)
+};
+
+// Cost bonus for te-form + auxiliary pattern (lower = preferred)
+constexpr float kTeFormAuxBonus = -0.8F;
+
+}  // namespace
+
+void Tokenizer::addTeFormAuxiliaryCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) const {
+  using CharType = normalize::CharType;
+
+  if (start_pos >= codepoints.size()) {
+    return;
+  }
+
+  // Look for て or で at this position
+  // て: godan verbs (書いて, 読んで) or ichidan verbs (食べて)
+  // で: godan verbs with certain endings (読んで, 飲んで)
+  char32_t current = codepoints[start_pos];
+  if (current != U'て' && current != U'で') {
+    return;
+  }
+
+  // Check if there's hiragana following (potential auxiliary verb)
+  size_t aux_start = start_pos + 1;
+  if (aux_start >= codepoints.size() ||
+      char_types[aux_start] != CharType::Hiragana) {
+    return;
+  }
+
+  // Get byte positions
+  size_t te_byte = charPosToBytePos(codepoints, start_pos);
+  size_t aux_start_byte = charPosToBytePos(codepoints, aux_start);
+
+  // Find the extent of hiragana following て/で
+  size_t hiragana_end = aux_start;
+  while (hiragana_end < codepoints.size() &&
+         hiragana_end - aux_start < 10 &&
+         char_types[hiragana_end] == CharType::Hiragana) {
+    ++hiragana_end;
+  }
+
+  // Use inflection analysis to check potential auxiliary verbs
+  static grammar::Inflection inflection;
+
+  // Try each auxiliary pattern
+  for (const auto& aux : kTeFormAuxiliaries) {
+    std::string_view stem(aux.stem);
+
+    // Check if the text after て/で starts with this stem
+    std::string_view text_after_te = text.substr(aux_start_byte);
+    if (text_after_te.size() < stem.size()) {
+      continue;
+    }
+
+    // Check if text starts with the auxiliary stem
+    if (text_after_te.substr(0, stem.size()) != stem) {
+      continue;
+    }
+
+    // Found a potential auxiliary! Now try to find the full conjugated form
+    // For example, for いく: い, いき, いく, いった, いきたい, etc.
+    size_t stem_char_len = normalize::utf8::decode(std::string(stem)).size();
+
+    // Try different lengths after the stem to find valid conjugations
+    for (size_t aux_end = aux_start + stem_char_len;
+         aux_end <= hiragana_end && aux_end <= aux_start + 8; ++aux_end) {
+      size_t aux_end_byte = charPosToBytePos(codepoints, aux_end);
+      std::string aux_surface(text.substr(aux_start_byte,
+                                          aux_end_byte - aux_start_byte));
+
+      // Check if this looks like a conjugated form of the auxiliary
+      auto best = inflection.getBest(aux_surface);
+      if (best.confidence > 0.4F && best.base_form == aux.base_form) {
+        // Found a valid auxiliary verb conjugation!
+        // Add the て/で particle as a candidate that ends before the auxiliary
+        // This allows Viterbi to choose: [verb-te] + [auxiliary]
+
+        // First, verify there's a verb ending in て/で before this position
+        // by checking if the previous lattice has a verb candidate ending here
+        // (This is implicit in Viterbi - we just need to provide the split point)
+
+        // Add a low-cost edge for the て/で + auxiliary combination
+        // to encourage splitting at て/で boundary
+        size_t combo_end_byte = aux_end_byte;
+        std::string combo_surface(text.substr(te_byte, combo_end_byte - te_byte));
+
+        // Calculate cost - give strong bonus to encourage this split
+        float final_cost = scorer_.posPrior(core::PartOfSpeech::Verb) +
+                           kTeFormAuxBonus;
+
+        uint8_t flags = core::LatticeEdge::kIsUnknown;
+
+        // Add the auxiliary verb part starting from て/で
+        lattice.addEdge(combo_surface, static_cast<uint32_t>(start_pos),
+                        static_cast<uint32_t>(aux_end), core::PartOfSpeech::Verb,
+                        final_cost, flags, aux.base_form);
+
+        // Found a valid pattern, no need to try longer forms
+        break;
+      }
+    }
+  }
 }
 
 }  // namespace suzume::analysis

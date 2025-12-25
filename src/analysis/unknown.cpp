@@ -834,6 +834,18 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAdjectiveCandidates(
       continue;  // Skip - likely te-form contraction, not i-adjective
     }
 
+    // Skip patterns ending with 〜んでい or 〜でい
+    // These are te-form + auxiliary verb patterns (〜んでいく, 〜ている, etc.)
+    // not i-adjectives. E.g., 学んでい (manande-i) = 学んでいく, not adj
+    if (hiragana_part.size() >= 9 &&  // んでい = 9 bytes
+        hiragana_part.substr(hiragana_part.size() - 9) == "んでい") {
+      continue;  // Skip - likely te-form + aux pattern
+    }
+    if (hiragana_part.size() >= 6 &&  // でい = 6 bytes
+        hiragana_part.substr(hiragana_part.size() - 6) == "でい") {
+      continue;  // Skip - likely te-form + aux pattern
+    }
+
     auto best = inflection_.getBest(surface);
     // Require confidence >= 0.5 for i-adjectives
     // Base forms like 寒い get exactly 0.5, conjugated forms like 美しかった get 0.68+

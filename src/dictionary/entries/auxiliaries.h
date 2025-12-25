@@ -40,28 +40,29 @@ inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
   // All auxiliaries are hiragana-only; reading field is empty
   // Format: {surface, POS, cost, lemma, prefix, formal, low_info, conj, reading}
   return {
-      // Assertion (断定) - Very low cost to prioritize over particle + verb splits
-      // でした must beat で(particle) + した(verb) combination
-      // であった must beat である + た or other splits
+      // Assertion (断定) - Copula conjugations are hardcoded because:
+      // 1. だった cannot be split as だ+った (った is not a valid suffix)
+      // 2. でした/であった would incorrectly split as で+した/で+あった
+      // 3. These are high-frequency forms that require reliable recognition
+      // Very low cost to prioritize over particle + verb splits
       {"だ", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
       {"だった", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
       {"だったら", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
       {"です", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
       {"でした", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
+      {"でしたら", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
       {"である", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
       {"であった", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
       {"であれば", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
-      {"でしたら", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
 
       // Polite (丁寧)
       {"ます", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
       {"ました", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
       {"ません", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
 
-      // Negation (否定)
+      // Negation (否定) - Base forms only
       {"ない", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
       {"ぬ", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
-      {"なかった", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
 
       // Past/Completion (過去・完了)
       {"た", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},

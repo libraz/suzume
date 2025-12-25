@@ -61,6 +61,7 @@ inline std::vector<DictionaryEntry> getParticleEntries() {
       {"て", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"ば", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"たら", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
+      {"ら", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},  // Conditional after た/だ
       {"ながら", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"のに", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"ので", POS::Particle, 0.5F, "", false, false, false, CT::None, ""},  // Reason
