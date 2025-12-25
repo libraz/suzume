@@ -1973,5 +1973,90 @@ TEST(AnalyzerTest, Regression_CopulaAfterNounNotAffected) {
   EXPECT_EQ(result[1].pos, core::PartOfSpeech::Auxiliary);
 }
 
+// =============================================================================
+// Regression: Te-form verb penalty skip
+// =============================================================================
+// Bug: 来て was penalized as NOUN+particle because て is a particle
+// Fix: Skip penalty for te-form endings (て/で) in tokenizer
+
+TEST(AnalyzerTest, Regression_TeFormNoPenalty_Kite) {
+  // 来て should be a verb, not 来(NOUN) + て(PARTICLE)
+  Suzume analyzer;
+  auto result = analyzer.analyze("来て");
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "来て");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+}
+
+TEST(AnalyzerTest, Regression_TeFormNoPenalty_Tabete) {
+  // 食べて should be a verb
+  Suzume analyzer;
+  auto result = analyzer.analyze("食べて");
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "食べて");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "食べる");
+}
+
+TEST(AnalyzerTest, Regression_TeFormNoPenalty_Yonde) {
+  // 読んで should be a verb (de-form)
+  Suzume analyzer;
+  auto result = analyzer.analyze("読んで");
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "読んで");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "読む");
+}
+
+// =============================================================================
+// Regression: Hiragana verb vs noun overlap
+// =============================================================================
+// Bug: います was penalized because いま(今) is in dictionary
+// Fix: Skip penalty for pure hiragana verbs overlapping short dict entries
+
+TEST(AnalyzerTest, Regression_HiraganaVerb_Imasu) {
+  // います should be a verb, not いま(NOUN)+す
+  Suzume analyzer;
+  auto result = analyzer.analyze("います");
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "います");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "いる");
+}
+
+TEST(AnalyzerTest, Regression_HiraganaVerb_Imasen) {
+  // いません should be a verb
+  Suzume analyzer;
+  auto result = analyzer.analyze("いません");
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "いません");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "いる");
+}
+
+// =============================================================================
+// Regression: Suru passive negative past (されなかった)
+// =============================================================================
+// Bug: されなかった pattern was missing
+// Fix: Added されなかった to aux patterns in inflection.cpp
+
+TEST(AnalyzerTest, Regression_SuruPassiveNegativePast) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("開催されなかった");
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "開催されなかった");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "開催する");
+}
+
+TEST(AnalyzerTest, Regression_SuruPassiveNegativePast2) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("勉強されなかった");
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "勉強されなかった");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "勉強する");
+}
+
 }  // namespace
 }  // namespace suzume::analysis

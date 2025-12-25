@@ -309,5 +309,75 @@ TEST(AnalyzerTest, Polite_Moushiageru) {
   ASSERT_FALSE(result.empty());
 }
 
+// ===== Dictionary Verb Stem Conjugation Tests =====
+// These tests verify that verb conjugations are recognized even when
+// the dictionary contains the verb stem (renyokei) as a separate entry.
+// For example, "答え" is in the dictionary as a verb renyokei of "答える",
+// but "答えられなくて" should still be recognized as a single conjugated verb.
+// Note: These tests use the Suzume class which applies postprocessing (lemmatization).
+
+TEST(AnalyzerTest, DictStemConjugation_KotaerarenakuteAsVerb) {
+  // 答えられなくて (couldn't answer) - passive/potential negative te-form
+  // Dictionary has 答え (verb renyokei), but full form should win
+  Suzume suzume;
+  auto result = suzume.analyze("答えられなくて");
+  ASSERT_EQ(result.size(), 1) << "答えられなくて should be a single token";
+  EXPECT_EQ(result[0].surface, "答えられなくて");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "答える");
+}
+
+TEST(AnalyzerTest, DictStemConjugation_KotaerarenakattaAsVerb) {
+  // 答えられなかった (couldn't answer - past) - passive/potential negative past
+  Suzume suzume;
+  auto result = suzume.analyze("答えられなかった");
+  ASSERT_EQ(result.size(), 1) << "答えられなかった should be a single token";
+  EXPECT_EQ(result[0].surface, "答えられなかった");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "答える");
+}
+
+TEST(AnalyzerTest, DictStemConjugation_KangaerarenakattaAsVerb) {
+  // 考えられなかった (couldn't think) - passive/potential negative past
+  Suzume suzume;
+  auto result = suzume.analyze("考えられなかった");
+  ASSERT_EQ(result.size(), 1) << "考えられなかった should be a single token";
+  EXPECT_EQ(result[0].surface, "考えられなかった");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "考える");
+}
+
+TEST(AnalyzerTest, DictStemConjugation_MirarenakuteAsVerb) {
+  // 見られなくて (couldn't see) - passive/potential negative te-form
+  Suzume suzume;
+  auto result = suzume.analyze("見られなくて");
+  ASSERT_EQ(result.size(), 1) << "見られなくて should be a single token";
+  EXPECT_EQ(result[0].surface, "見られなくて");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "見る");
+}
+
+TEST(AnalyzerTest, DictStemConjugation_KakenakattaAsVerb) {
+  // 書けなかった (couldn't write) - potential negative past
+  Suzume suzume;
+  auto result = suzume.analyze("書けなかった");
+  ASSERT_EQ(result.size(), 1) << "書けなかった should be a single token";
+  EXPECT_EQ(result[0].surface, "書けなかった");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "書く");
+}
+
+// Verify that noun + noun splitting still works (not affected by verb fix)
+TEST(AnalyzerTest, DictStemConjugation_NounSplitStillWorks) {
+  // 明日雨 should still split as 明日 + 雨 (not as a single unknown word)
+  Suzume suzume;
+  auto result = suzume.analyze("明日雨");
+  ASSERT_EQ(result.size(), 2) << "明日雨 should be two tokens";
+  EXPECT_EQ(result[0].surface, "明日");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Noun);
+  EXPECT_EQ(result[1].surface, "雨");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Noun);
+}
+
 }  // namespace
 }  // namespace suzume::analysis

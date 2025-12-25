@@ -193,7 +193,52 @@ void Tokenizer::addUnknownCandidates(
     //   - "明日" (dict, 0.5) + "雨" (unk, 1.4 + single_kanji_penalty 2.0) = 3.9
     //   - "明日雨" (unk, 1.0 + penalty) must be > 3.9
     // So penalty needs to be at least 3.0 to make dict-guided splits preferred.
-    if (max_dict_length > 0 &&
+    //
+    // Exception: Skip penalty for verb/adjective candidates when:
+    // 1. The dictionary entry is also a verb/adjective (conjugated forms like
+    //    "答えられなくて" where "答え" is in dictionary as verb renyokei)
+    // 2. The candidate is a pure hiragana verb and the dictionary entry is a
+    //    short particle or noun (1-2 chars). This allows verbs like "できる",
+    //    "される", and "います" to be recognized even though "で", "さ", or
+    //    "いま" (今) are in the dictionary.
+    //    Pure hiragana verbs are validated by the inflection module, so we can
+    //    trust that high-confidence candidates are legitimate verb forms.
+    bool skip_penalty = false;
+    if (candidate.pos == core::PartOfSpeech::Verb ||
+        candidate.pos == core::PartOfSpeech::Adjective) {
+      for (const auto& result : dict_results) {
+        if (result.entry != nullptr) {
+          // Case 1: Dictionary entry is also a verb/adjective
+          if (result.entry->pos == core::PartOfSpeech::Verb ||
+              result.entry->pos == core::PartOfSpeech::Adjective) {
+            skip_penalty = true;
+            break;
+          }
+          // Case 2: Pure hiragana verb candidate vs short dictionary entry
+          // Check if the candidate is all hiragana and the dictionary entry
+          // is short (1-2 chars). This handles cases like:
+          //   - "できなくて" vs "で" (particle)
+          //   - "されなかった" vs "さ" (if さ were a particle)
+          //   - "います" vs "いま" (今, noun)
+          if (result.length <= 2 &&
+              candidate.end - candidate.start >= 3) {  // At least 3 hiragana chars
+            // Verify candidate is all hiragana
+            bool all_hiragana = true;
+            for (size_t idx = candidate.start; idx < candidate.end && idx < char_types.size(); ++idx) {
+              if (char_types[idx] != normalize::CharType::Hiragana) {
+                all_hiragana = false;
+                break;
+              }
+            }
+            if (all_hiragana) {
+              skip_penalty = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+    if (!skip_penalty && max_dict_length > 0 &&
         candidate.end - candidate.start > max_dict_length) {
       // Apply strong penalty to prefer dictionary-guided segmentation
       adjusted_cost += 3.5F;
@@ -201,6 +246,8 @@ void Tokenizer::addUnknownCandidates(
 
     // For verb candidates, check if the hiragana suffix is a known particle
     // If so, the noun+particle path should be preferred over the verb path
+    // Exception: Don't penalize te-form endings (て/で) which are valid verb
+    // conjugation endings, not standalone particles (e.g., 来て, 食べて, 読んで)
     if (candidate.pos == core::PartOfSpeech::Verb &&
         candidate.end > candidate.start) {
       // Find the hiragana suffix portion
@@ -212,19 +259,31 @@ void Tokenizer::addUnknownCandidates(
       }
 
       if (hiragana_start < candidate.end) {
-        // Look up the hiragana suffix in dictionary
-        size_t suffix_byte_pos = charPosToBytePos(codepoints, hiragana_start);
-        auto suffix_results = dict_manager_.lookup(text, suffix_byte_pos);
+        // Extract the hiragana suffix
+        size_t suffix_byte_start = charPosToBytePos(codepoints, hiragana_start);
+        size_t suffix_byte_end = charPosToBytePos(codepoints, candidate.end);
+        std::string_view hiragana_suffix =
+            text.substr(suffix_byte_start, suffix_byte_end - suffix_byte_start);
 
-        for (const auto& result : suffix_results) {
-          if (result.entry != nullptr &&
-              result.entry->pos == core::PartOfSpeech::Particle) {
-            // Check if the particle covers the full hiragana portion
-            size_t suffix_len = candidate.end - hiragana_start;
-            if (result.length == suffix_len) {
-              // The hiragana suffix is a known particle - penalize verb path
-              adjusted_cost += 1.5F;
-              break;
+        // Don't penalize te-form endings (て/で) - these are verb conjugation
+        // endings, not standalone particles following nouns
+        bool is_te_form = (hiragana_suffix == "て" || hiragana_suffix == "で");
+
+        if (!is_te_form) {
+          // Look up the hiragana suffix in dictionary
+          size_t suffix_byte_pos = charPosToBytePos(codepoints, hiragana_start);
+          auto suffix_results = dict_manager_.lookup(text, suffix_byte_pos);
+
+          for (const auto& result : suffix_results) {
+            if (result.entry != nullptr &&
+                result.entry->pos == core::PartOfSpeech::Particle) {
+              // Check if the particle covers the full hiragana portion
+              size_t suffix_len = candidate.end - hiragana_start;
+              if (result.length == suffix_len) {
+                // The hiragana suffix is a known particle - penalize verb path
+                adjusted_cost += 1.5F;
+                break;
+              }
             }
           }
         }

@@ -839,6 +839,73 @@ TEST_F(InflectionTest, ConditionalBa_TwoKanjiStem) {
   EXPECT_EQ(result.verb_type, VerbType::GodanRa);
 }
 
+// ===== Suru passive negative past (されなかった) =====
+
+TEST_F(InflectionTest, SuruPassiveNegativePast) {
+  // されなかった (wasn't done - negative past of される)
+  // Note: Inflection returns される as base form since it's analyzed as
+  // される + なかった. The Suru verb type is only returned for compound forms.
+  auto result = inflection_.getBest("されなかった");
+  EXPECT_EQ(result.base_form, "される");
+  // The pattern matches as Ichidan (される behaves like Ichidan)
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionTest, SuruPassiveNegativePast_Compound) {
+  // 開催されなかった (wasn't held - compound suru)
+  auto result = inflection_.getBest("開催されなかった");
+  EXPECT_EQ(result.base_form, "開催する");
+  EXPECT_EQ(result.verb_type, VerbType::Suru);
+}
+
+// ===== Potential form ambiguity (Godan vs Ichidan) =====
+// These tests verify that Godan potential forms are correctly analyzed
+// rather than being interpreted as Ichidan verbs
+
+TEST_F(InflectionTest, GodanPotentialVsIchidan_KaRow) {
+  // 書けない should be 書く potential, not 書ける negative
+  auto result = inflection_.getBest("書けない");
+  EXPECT_EQ(result.base_form, "書く");
+  EXPECT_EQ(result.verb_type, VerbType::GodanKa);
+}
+
+TEST_F(InflectionTest, GodanPotentialVsIchidan_MaRow) {
+  // 読めない should be 読む potential, not 読める negative
+  auto result = inflection_.getBest("読めない");
+  EXPECT_EQ(result.base_form, "読む");
+  EXPECT_EQ(result.verb_type, VerbType::GodanMa);
+}
+
+TEST_F(InflectionTest, GodanPotentialVsIchidan_SaRow) {
+  // 話せない should be 話す potential
+  auto result = inflection_.getBest("話せない");
+  EXPECT_EQ(result.base_form, "話す");
+  EXPECT_EQ(result.verb_type, VerbType::GodanSa);
+}
+
+// Ensure valid Ichidan verbs are not incorrectly analyzed as Godan potential
+
+TEST_F(InflectionTest, IchidanNotMistakenForPotential_Taberu) {
+  // 食べない should be 食べる negative, not *食ぶ potential
+  auto result = inflection_.getBest("食べない");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionTest, IchidanNotMistakenForPotential_Kangaeru) {
+  // 考えない should be 考える negative, not *考う potential
+  auto result = inflection_.getBest("考えない");
+  EXPECT_EQ(result.base_form, "考える");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionTest, IchidanNotMistakenForPotential_Kotaeru) {
+  // 答えない should be 答える negative, not *答う potential
+  auto result = inflection_.getBest("答えない");
+  EXPECT_EQ(result.base_form, "答える");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
 }  // namespace
 }  // namespace grammar
 }  // namespace suzume

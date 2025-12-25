@@ -257,11 +257,31 @@ float calculateConfidence(VerbType type, std::string_view stem,
     if (endsWithERow(stem)) {
       // E-row endings (食べ, 見せ, etc.) are very common for Ichidan
       // But 2-char stems with e-row ending (書け, 読め) could be Godan potential
-      // Apply penalty when in renyokei context and stem looks like potential
-      if (stem_len == 6 && required_conn == conn::kVerbRenyokei &&
-          endsWithKanji(stem.substr(0, 3))) {
-        // 書け + ませんでした could be Ichidan 書ける or Godan potential 書く
-        // Prefer Godan potential interpretation when first char is kanji
+      // Apply penalty when stem looks like a common Godan potential form:
+      //   - け (ka-row): 書く, 聞く, 行く, etc. - very common
+      //   - め (ma-row): 読む, 飲む, etc. - common
+      //   - せ (sa-row): 話す, 出す, etc. - common
+      //   - れ (ra-row): 取る, 乗る, etc. - common
+      // But NOT:
+      //   - べ (ba-row): 食べる is Ichidan, 飛ぶ → 飛べ is less common
+      //   - え (wa-row): Many Ichidan verbs end in え (考える, 答える, 見える)
+      //   - Others: げ, て, ね, へ - less common as potential forms
+      bool is_common_potential_ending = false;
+      if (stem_len >= 3) {
+        std::string_view last_char = stem.substr(stem_len - 3);
+        is_common_potential_ending = (last_char == "け" || last_char == "め" ||
+                                      last_char == "せ" || last_char == "れ");
+      }
+      // Apply penalty only when:
+      // 1. Stem is 2 chars (kanji + e-row hiragana)
+      // 2. In renyokei/mizenkei context where Godan potential could apply
+      // 3. The e-row ending is a common Godan potential form
+      bool is_potential_context =
+          required_conn == conn::kVerbRenyokei || required_conn == conn::kVerbMizenkei;
+      if (stem_len == 6 && is_potential_context &&
+          endsWithKanji(stem.substr(0, 3)) && is_common_potential_ending) {
+        // 書け could be Ichidan 書ける or Godan potential of 書く
+        // Prefer Godan potential interpretation
         base -= 0.15F;
       } else {
         base += 0.12F;
@@ -692,6 +712,7 @@ void Inflection::initAuxiliaries() {
       {"された", "される", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"されて", "される", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"されない", "される", kAuxSeru, kAuxOutBase, kVerbMizenkei},
+      {"されなかった", "される", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"されなくて", "される", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"されます", "される", kAuxSeru, kAuxOutMasu, kVerbMizenkei},
       {"されました", "される", kAuxSeru, kAuxOutTa, kVerbMizenkei},

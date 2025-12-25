@@ -760,6 +760,10 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateHiraganaVerbCandidat
   }
 
   // Find hiragana sequence, breaking at particle boundaries
+  // Note: Be careful not to break at characters that are part of verb conjugations:
+  //   - か can be part of なかった (negative past) or かった (i-adj past)
+  //   - で can be part of んで (te-form for godan) or できる (potential verb)
+  //   - も can be part of ても (even if) or もらう (receiving verb)
   size_t hiragana_end = start_pos;
   while (hiragana_end < char_types.size() &&
          hiragana_end - start_pos < 12 &&  // Max 12 hiragana for verb + endings
@@ -768,11 +772,40 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateHiraganaVerbCandidat
     // E.g., for "りにする", stop at "り" to not include "にする".
     if (hiragana_end > start_pos) {
       char32_t curr = codepoints[hiragana_end];
+
+      // Check for particle-like characters
       if (curr == U'を' || curr == U'が' || curr == U'は' ||
           curr == U'に' || curr == U'へ' || curr == U'の' ||
-          curr == U'で' || curr == U'と' || curr == U'も' ||
-          curr == U'か' || curr == U'や') {
-        break;  // Stop before the particle
+          curr == U'と' || curr == U'や') {
+        break;  // These are always particles in this context
+      }
+
+      // For か, で, も: check if they're part of verb conjugation patterns
+      // Don't break if they appear in known conjugation contexts
+      if (curr == U'か' || curr == U'で' || curr == U'も') {
+        // Check the preceding character for conjugation patterns
+        char32_t prev = codepoints[hiragana_end - 1];
+
+        // か: OK if preceded by な (なかった = negative past)
+        if (curr == U'か' && prev == U'な') {
+          ++hiragana_end;
+          continue;
+        }
+
+        // で: OK if preceded by ん (んで = te-form) or き (できる)
+        if (curr == U'で' && (prev == U'ん' || prev == U'き')) {
+          ++hiragana_end;
+          continue;
+        }
+
+        // も: OK if preceded by て (ても = even if)
+        if (curr == U'も' && prev == U'て') {
+          ++hiragana_end;
+          continue;
+        }
+
+        // Otherwise, treat as particle
+        break;
       }
     }
     ++hiragana_end;
@@ -796,13 +829,40 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateHiraganaVerbCandidat
     // Only accept verb types (not IAdjective)
     if (best.confidence > 0.48F &&
         best.verb_type != grammar::VerbType::IAdjective) {
+      // Lower cost for higher confidence matches
+      float base_cost = 0.5F + (1.0F - best.confidence) * 0.3F;
+
+      // Check if the base form exists in the dictionary
+      // This gives a significant bonus for conjugations of known verbs
+      // (e.g., できなくて → できる which is in the dictionary)
+      bool is_dictionary_verb = false;
+      if (dict_manager_ != nullptr && !best.base_form.empty()) {
+        auto results = dict_manager_->lookup(best.base_form, 0);
+        for (const auto& result : results) {
+          if (result.entry != nullptr &&
+              result.entry->surface == best.base_form &&
+              result.entry->pos == core::PartOfSpeech::Verb) {
+            is_dictionary_verb = true;
+            break;
+          }
+        }
+      }
+
+      // Give significant bonus for dictionary-verified hiragana verbs
+      // This helps them beat the particle+adj+particle split path
+      // Only apply to longer forms (5+ chars) to avoid boosting short forms like
+      // "あった" (ある) which can interfere with copula recognition (であった)
+      size_t candidate_len = end_pos - start_pos;
+      if (is_dictionary_verb && candidate_len >= 5) {
+        base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;
+      }
+
       UnknownCandidate candidate;
       candidate.surface = surface;
       candidate.start = start_pos;
       candidate.end = end_pos;
       candidate.pos = core::PartOfSpeech::Verb;
-      // Lower cost for higher confidence matches
-      candidate.cost = 0.5F + (1.0F - best.confidence) * 0.3F;
+      candidate.cost = base_cost;
       candidate.has_suffix = false;
       candidates.push_back(candidate);
     }
