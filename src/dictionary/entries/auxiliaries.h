@@ -1,6 +1,27 @@
 #ifndef SUZUME_DICTIONARY_ENTRIES_AUXILIARIES_H_
 #define SUZUME_DICTIONARY_ENTRIES_AUXILIARIES_H_
 
+// =============================================================================
+// Layer 1: Hardcoded Dictionary Entry (entries/*.h)
+// =============================================================================
+// Classification Criteria:
+//   - CLOSED CLASS: Grammatically fixed set with known upper bound
+//   - Rarely changes (tied to language structure, not vocabulary)
+//   - Required for WASM minimal builds
+//
+// This file: Auxiliary Verbs (助動詞) - ~25 entries
+//   - Assertion (断定): だ, です, である
+//   - Polite (丁寧): ます, ました, ません
+//   - Negation (否定): ない, ぬ, なかった
+//   - Past/Completion (過去・完了): た
+//   - Conjecture (推量): う, よう, だろう, でしょう
+//   - Desire (願望): たい, たがる
+//   - Potential/Passive/Causative: れる, られる, せる, させる
+//
+// DO NOT add lexical verbs (食べる, 書く, etc.) here.
+// For vocabulary, use Layer 2 (core.dic) or Layer 3 (user.dic).
+// =============================================================================
+
 #include "core/types.h"
 #include "dictionary/dictionary.h"
 
@@ -14,41 +35,70 @@ namespace suzume::dictionary::entries {
  */
 inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
   using POS = core::PartOfSpeech;
+  using CT = ConjugationType;
 
+  // All auxiliaries are hiragana-only; reading field is empty
+  // Format: {surface, POS, cost, lemma, prefix, formal, low_info, conj, reading}
   return {
-      // Assertion (断定)
-      {"だ", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"です", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"である", POS::Auxiliary, 1.0F, "", false, false, false},
+      // Assertion (断定) - Very low cost to prioritize over particle + verb splits
+      // でした must beat で(particle) + した(verb) combination
+      // であった must beat である + た or other splits
+      {"だ", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
+      {"だった", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
+      {"だったら", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
+      {"です", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
+      {"でした", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
+      {"である", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
+      {"であった", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
+      {"であれば", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
+      {"でしたら", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
 
       // Polite (丁寧)
-      {"ます", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"ました", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"ません", POS::Auxiliary, 1.0F, "", false, false, false},
+      {"ます", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"ました", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"ません", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
 
       // Negation (否定)
-      {"ない", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"ぬ", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"なかった", POS::Auxiliary, 1.0F, "", false, false, false},
+      {"ない", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"ぬ", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"なかった", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
 
       // Past/Completion (過去・完了)
-      {"た", POS::Auxiliary, 1.0F, "", false, false, false},
+      {"た", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
 
       // Conjecture (推量)
-      {"う", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"よう", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"だろう", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"でしょう", POS::Auxiliary, 1.0F, "", false, false, false},
+      {"う", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"よう", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"だろう", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"でしょう", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
 
       // Desire (願望)
-      {"たい", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"たがる", POS::Auxiliary, 1.0F, "", false, false, false},
+      {"たい", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"たがる", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
 
       // Potential/Passive/Causative (可能・受身・使役)
-      {"れる", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"られる", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"せる", POS::Auxiliary, 1.0F, "", false, false, false},
-      {"させる", POS::Auxiliary, 1.0F, "", false, false, false},
+      {"れる", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"られる", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"せる", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"させる", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+
+      // Polite existence (丁寧存在) - ございます conjugations
+      {"ございます", POS::Auxiliary, 0.3F, "ございます", false, false, false, CT::None, ""},
+      {"ございました", POS::Auxiliary, 0.3F, "ございます", false, false, false, CT::None, ""},
+      {"ございましたら", POS::Auxiliary, 0.3F, "ございます", false, false, false, CT::None, ""},
+      {"ございません", POS::Auxiliary, 0.3F, "ございます", false, false, false, CT::None, ""},
+
+      // Request (依頼) - ください
+      {"ください", POS::Auxiliary, 0.3F, "ください", false, false, false, CT::None, ""},
+      {"くださいませ", POS::Auxiliary, 0.3F, "ください", false, false, false, CT::None, ""},
+
+      // Explanatory (説明) - のだ/んだ forms
+      {"のだ", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
+      {"のです", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
+      {"のでした", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
+      {"んだ", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
+      {"んです", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
+      {"んでした", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
   };
 }
 

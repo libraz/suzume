@@ -2,6 +2,8 @@
 #define SUZUME_CORE_VITERBI_H_
 
 #include <algorithm>
+#include <cstdlib>
+#include <iostream>
 #include <limits>
 #include <vector>
 
@@ -52,6 +54,9 @@ class Viterbi {
    */
   template <typename Scorer>
   ViterbiResult solve(const Lattice& lattice, const Scorer& scorer) const {
+    // Check for debug mode via environment variable SUZUME_DEBUG_VITERBI=1
+    static const bool debug_enabled = (std::getenv("SUZUME_DEBUG_VITERBI") != nullptr);
+
     // Use the existing implementation but return edge IDs
     ViterbiResult result;
     result.total_cost = 0.0F;
@@ -77,11 +82,20 @@ class Viterbi {
         // Connection cost from previous edge
         float conn_cost = 0.0F;
         if (prev_edge[pos] >= 0) {
-          const auto& prev = lattice.edgesAt(prev_pos[pos])[prev_edge[pos]];
+          const auto& prev = lattice.edgesAt(prev_pos[pos])[static_cast<size_t>(prev_edge[pos])];
           conn_cost = scorer.connectionCost(prev, edge);
         }
 
         float total = costs[pos] + word_cost + conn_cost;
+
+        if (debug_enabled) {
+          std::cerr << "[Viterbi] pos=" << pos << " edge=" << edge.surface
+                    << " word=" << word_cost << " conn=" << conn_cost
+                    << " total=" << total << " costs[" << edge.end << "]="
+                    << (costs[edge.end] < 1e10 ? costs[edge.end] : -999)
+                    << (total < costs[edge.end] ? " UPDATE" : "") << "\n";
+        }
+
         if (total < costs[edge.end]) {
           costs[edge.end] = total;
           prev_edge[edge.end] = static_cast<int>(idx);
@@ -97,7 +111,7 @@ class Viterbi {
       while (pos > 0 && prev_edge[pos] >= 0) {
         const auto& edges = lattice.edgesAt(prev_pos[pos]);
         if (prev_edge[pos] < static_cast<int>(edges.size())) {
-          result.path.push_back(edges[prev_edge[pos]].id);
+          result.path.push_back(edges[static_cast<size_t>(prev_edge[pos])].id);
         }
         pos = prev_pos[pos];
       }

@@ -111,6 +111,13 @@ CommandArgs parseArgs(int argc, char* argv[]) {
       continue;
     }
 
+    // Debug mode (show lattice candidates and scores)
+    if (arg == "--debug") {
+      args.debug = true;
+      ++idx;
+      continue;
+    }
+
     // Dictionary path
     if ((arg == "-d" || arg == "--dict") && idx + 1 < argc) {
       args.dict_paths.emplace_back(argv[++idx]);

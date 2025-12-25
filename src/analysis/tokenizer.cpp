@@ -5,6 +5,66 @@
 
 namespace suzume::analysis {
 
+namespace {
+
+// V2 Subsidiary verbs for compound verb joining
+// These verbs commonly appear as the second part of compound verbs
+// Format: {surface, conj_type_suffix for detection}
+struct SubsidiaryVerb {
+  const char* surface;
+  const char* base_ending;  // Base form ending for verb type detection
+};
+
+// List of V2 verbs that can form compound verbs
+// Order matters: longer patterns should come first
+const SubsidiaryVerb kSubsidiaryVerbs[] = {
+    {"込む", "む"},      // 読み込む, 飛び込む
+    {"出す", "す"},      // 呼び出す, 書き出す
+    {"始める", "める"},  // 読み始める, 書き始める
+    {"続ける", "ける"},  // 読み続ける, 走り続ける
+    {"続く", "く"},      // 引き続く
+    {"返す", "す"},      // 繰り返す
+    {"返る", "る"},      // 振り返る
+    {"つける", "ける"},  // 見つける
+    {"つかる", "る"},    // 見つかる
+    {"替える", "える"},  // 切り替える
+    {"換える", "える"},  // 入れ換える
+    {"合う", "う"},      // 話し合う
+    {"合わせる", "せる"}, // 組み合わせる
+    {"消す", "す"},      // 取り消す
+    {"過ぎる", "る"},    // 読み過ぎる
+    {"直す", "す"},      // やり直す
+    {"終わる", "る"},    // 読み終わる
+    {"切る", "る"},      // 締め切る
+};
+
+// 連用形 (continuative form) endings for Godan verbs
+// Maps: 連用形 ending -> base form ending
+struct RenyokeiPattern {
+  char32_t renyokei;   // 連用形 ending (e.g., き, み, び)
+  char32_t base;       // Base form ending (e.g., く, む, ぶ)
+};
+
+const RenyokeiPattern kGodanRenyokei[] = {
+    {U'き', U'く'},  // 書き → 書く (カ行)
+    {U'ぎ', U'ぐ'},  // 泳ぎ → 泳ぐ (ガ行)
+    {U'し', U'す'},  // 話し → 話す (サ行)
+    {U'ち', U'つ'},  // 持ち → 持つ (タ行)
+    {U'に', U'ぬ'},  // 死に → 死ぬ (ナ行)
+    {U'び', U'ぶ'},  // 飛び → 飛ぶ (バ行)
+    {U'み', U'む'},  // 読み → 読む (マ行)
+    {U'り', U'る'},  // 取り → 取る (ラ行)
+    {U'い', U'う'},  // 思い → 思う (ワ行)
+};
+
+// Cost bonus for compound verb joining (lower = preferred)
+constexpr float kCompoundVerbBonus = -0.8F;
+
+// Additional bonus when V1 base form is in dictionary
+constexpr float kVerifiedV1Bonus = -0.3F;
+
+}  // namespace
+
 Tokenizer::Tokenizer(const dictionary::DictionaryManager& dict_manager,
                      const Scorer& scorer,
                      const UnknownWordGenerator& unknown_gen)
@@ -33,6 +93,12 @@ core::Lattice Tokenizer::buildLattice(
 
     // Add noun+verb split candidates (本買った → 本 + 買った)
     addNounVerbSplitCandidates(lattice, text, codepoints, pos, char_types);
+
+    // Add compound verb join candidates (飛び + 込む → 飛び込む)
+    addCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
+
+    // Add prefix + noun join candidates (お + 水 → お水)
+    addPrefixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
   }
 
   return lattice;
@@ -85,7 +151,8 @@ void Tokenizer::addDictionaryCandidates(
     lattice.addEdge(result.entry->surface,
                     static_cast<uint32_t>(start_pos),
                     static_cast<uint32_t>(end_pos), result.entry->pos,
-                    result.entry->cost, flags, result.entry->lemma);
+                    result.entry->cost, flags, result.entry->lemma,
+                    result.entry->conj_type);
   }
 }
 
@@ -99,13 +166,46 @@ void Tokenizer::addUnknownCandidates(
 
   for (const auto& candidate : candidates) {
     uint8_t flags = core::LatticeEdge::kIsUnknown;
+    float adjusted_cost = candidate.cost;
+
+    // For verb candidates, check if the hiragana suffix is a known particle
+    // If so, the noun+particle path should be preferred over the verb path
+    if (candidate.pos == core::PartOfSpeech::Verb &&
+        candidate.end > candidate.start) {
+      // Find the hiragana suffix portion
+      size_t hiragana_start = candidate.start;
+      while (hiragana_start < candidate.end &&
+             hiragana_start < char_types.size() &&
+             char_types[hiragana_start] != normalize::CharType::Hiragana) {
+        ++hiragana_start;
+      }
+
+      if (hiragana_start < candidate.end) {
+        // Look up the hiragana suffix in dictionary
+        size_t suffix_byte_pos = charPosToBytePos(codepoints, hiragana_start);
+        auto suffix_results = dict_manager_.lookup(text, suffix_byte_pos);
+
+        for (const auto& result : suffix_results) {
+          if (result.entry != nullptr &&
+              result.entry->pos == core::PartOfSpeech::Particle) {
+            // Check if the particle covers the full hiragana portion
+            size_t suffix_len = candidate.end - hiragana_start;
+            if (result.length == suffix_len) {
+              // The hiragana suffix is a known particle - penalize verb path
+              adjusted_cost += 1.5F;
+              break;
+            }
+          }
+        }
+      }
+    }
 
     // Need to store the surface string
     std::string surface_str(candidate.surface);
 
     lattice.addEdge(surface_str, static_cast<uint32_t>(candidate.start),
                     static_cast<uint32_t>(candidate.end), candidate.pos,
-                    candidate.cost, flags, "");
+                    adjusted_cost, flags, "");
   }
 }
 
@@ -260,12 +360,14 @@ void Tokenizer::addCompoundSplitCandidates(
     // Check if the first part matches a dictionary entry
     auto first_results = dict_manager_.lookup(text, start_byte);
     bool first_in_dict = false;
+    bool first_is_formal_noun = false;
     float first_cost = kSplitBaseCost;
 
     for (const auto& result : first_results) {
       if (result.entry != nullptr && result.length == split_point) {
         first_in_dict = true;
         first_cost = result.entry->cost + kDictSplitBonus;
+        first_is_formal_noun = result.entry->is_formal_noun;
         break;
       }
     }
@@ -288,6 +390,10 @@ void Tokenizer::addCompoundSplitCandidates(
       std::string first_surface(text.substr(start_byte, first_end_byte - start_byte));
       uint8_t flags = first_in_dict ? core::LatticeEdge::kFromDictionary
                                      : core::LatticeEdge::kIsUnknown;
+      // Preserve is_formal_noun flag to prevent postprocessor from merging
+      if (first_is_formal_noun) {
+        flags |= core::LatticeEdge::kIsFormalNoun;
+      }
 
       lattice.addEdge(first_surface, static_cast<uint32_t>(start_pos),
                       static_cast<uint32_t>(first_end), core::PartOfSpeech::Noun,
@@ -322,6 +428,10 @@ constexpr float kVerifiedVerbBonus = -0.8F;
 
 // Maximum noun length (in characters) to consider for splitting
 constexpr size_t kMaxNounLen = 6;
+
+// Maximum hiragana length for verb suffix (to avoid matching too much)
+// Typical verb endings: った(2), ます(2), ている(4), ていました(5)
+constexpr size_t kMaxVerbHiraganaLen = 8;
 
 }  // namespace
 
@@ -359,16 +469,16 @@ void Tokenizer::addNounVerbSplitCandidates(
     return;
   }
 
-  // Find the extent of hiragana sequence
-  size_t hiragana_end = kanji_end;
-  while (hiragana_end < char_types.size() &&
-         hiragana_end - kanji_end < 10 &&
-         char_types[hiragana_end] == CharType::Hiragana) {
-    ++hiragana_end;
+  // Find the maximum extent of hiragana sequence
+  size_t max_hiragana_end = kanji_end;
+  while (max_hiragana_end < char_types.size() &&
+         max_hiragana_end - kanji_end < 10 &&
+         char_types[max_hiragana_end] == CharType::Hiragana) {
+    ++max_hiragana_end;
   }
 
   // Need at least 1 hiragana for verb ending
-  if (hiragana_end <= kanji_end) {
+  if (max_hiragana_end <= kanji_end) {
     return;
   }
 
@@ -381,7 +491,6 @@ void Tokenizer::addNounVerbSplitCandidates(
   for (size_t noun_len = 1; noun_len < kanji_end - start_pos; ++noun_len) {
     size_t verb_start = start_pos + noun_len;
     size_t verb_start_byte = charPosToBytePos(codepoints, verb_start);
-    size_t verb_end_byte = charPosToBytePos(codepoints, hiragana_end);
 
     // Check if noun part is in dictionary
     auto noun_results = dict_manager_.lookup(text, start_byte);
@@ -396,66 +505,394 @@ void Tokenizer::addNounVerbSplitCandidates(
       }
     }
 
-    // Extract the potential verb part (kanji+hiragana after noun)
-    std::string verb_part(text.substr(verb_start_byte, verb_end_byte - verb_start_byte));
+    // Try different hiragana lengths for verb ending
+    // This allows matching "買った" even when followed by more hiragana like "ばかり"
+    size_t hiragana_extent = max_hiragana_end - kanji_end;
+    size_t max_try_len = std::min(hiragana_extent, kMaxVerbHiraganaLen);
 
-    // Check if the verb part looks like a conjugated verb using inflection analysis
-    bool looks_like_verb = false;
-    auto candidates = inflection.analyze(verb_part);
-    for (const auto& cand : candidates) {
-      if (cand.confidence > 0.5F) {
-        looks_like_verb = true;
-        break;
-      }
-    }
+    for (size_t hira_len = 1; hira_len <= max_try_len; ++hira_len) {
+      size_t verb_end = kanji_end + hira_len;
+      size_t verb_end_byte = charPosToBytePos(codepoints, verb_end);
 
-    // Check if any candidate's base form is in dictionary
-    bool base_in_dict = false;
-    for (const auto& cand : candidates) {
-      if (cand.confidence < 0.5F) {
-        continue;  // Skip low confidence candidates
-      }
-      auto base_results = dict_manager_.lookup(cand.base_form, 0);
-      for (const auto& result : base_results) {
-        if (result.entry != nullptr &&
-            result.entry->surface == cand.base_form &&
-            result.entry->pos == core::PartOfSpeech::Verb) {
-          base_in_dict = true;
+      // Extract the potential verb part (kanji+hiragana after noun)
+      std::string verb_part(text.substr(verb_start_byte, verb_end_byte - verb_start_byte));
+
+      // Check if the verb part looks like a conjugated verb using inflection analysis
+      bool looks_like_verb = false;
+      auto candidates = inflection.analyze(verb_part);
+      for (const auto& cand : candidates) {
+        if (cand.confidence > 0.5F) {
+          looks_like_verb = true;
           break;
         }
       }
-      if (base_in_dict) {
+
+      // Check if any candidate's base form is in dictionary
+      bool base_in_dict = false;
+      for (const auto& cand : candidates) {
+        if (cand.confidence < 0.5F) {
+          continue;  // Skip low confidence candidates
+        }
+        auto base_results = dict_manager_.lookup(cand.base_form, 0);
+        for (const auto& result : base_results) {
+          if (result.entry != nullptr &&
+              result.entry->surface == cand.base_form &&
+              result.entry->pos == core::PartOfSpeech::Verb) {
+            base_in_dict = true;
+            break;
+          }
+        }
+        if (base_in_dict) {
+          break;
+        }
+      }
+
+      // Generate split candidates if either:
+      // 1. Noun is in dictionary and verb looks conjugated
+      // 2. Verb base form is in dictionary (strongest signal)
+      if ((noun_in_dict && looks_like_verb) || base_in_dict) {
+        // Add noun candidate with adjusted cost
+        std::string noun_surface(text.substr(start_byte, verb_start_byte - start_byte));
+        float final_noun_cost = noun_cost + kNounVerbSplitBonus;
+
+        // Give extra bonus if verb base form is verified in dictionary
+        // This is the strongest signal that the split is correct
+        if (base_in_dict) {
+          final_noun_cost += kVerifiedVerbBonus;
+        }
+
+        // Give additional bonus if noun is also in dictionary
+        if (noun_in_dict && base_in_dict) {
+          final_noun_cost -= 0.2F;  // Extra bonus for high-confidence splits
+        }
+
+        uint8_t noun_flags = noun_in_dict ? core::LatticeEdge::kFromDictionary
+                                           : core::LatticeEdge::kIsUnknown;
+
+        lattice.addEdge(noun_surface, static_cast<uint32_t>(start_pos),
+                        static_cast<uint32_t>(verb_start), core::PartOfSpeech::Noun,
+                        final_noun_cost, noun_flags, "");
+
+        // Found a valid split for this noun_len, no need to try longer hiragana
+        break;
+      }
+    }
+  }
+}
+
+void Tokenizer::addCompoundVerbJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) const {
+  using CharType = normalize::CharType;
+
+  if (start_pos >= char_types.size()) {
+    return;
+  }
+
+  // Must start with kanji (V1 verb stem)
+  if (char_types[start_pos] != CharType::Kanji) {
+    return;
+  }
+
+  // Find the kanji portion (V1 stem)
+  size_t kanji_end = start_pos + 1;
+  while (kanji_end < char_types.size() && kanji_end - start_pos < 4 &&
+         char_types[kanji_end] == CharType::Kanji) {
+    ++kanji_end;
+  }
+
+  // Next must be hiragana (連用形 ending)
+  if (kanji_end >= char_types.size() ||
+      char_types[kanji_end] != CharType::Hiragana) {
+    return;
+  }
+
+  // Get the hiragana character (potential 連用形 ending)
+  char32_t renyokei_char = codepoints[kanji_end];
+
+  // Check if it's a valid 連用形 ending
+  char32_t base_ending = 0;
+  for (const auto& pattern : kGodanRenyokei) {
+    if (pattern.renyokei == renyokei_char) {
+      base_ending = pattern.base;
+      break;
+    }
+  }
+
+  // If not a 連用形 ending, this might be an Ichidan verb
+  // For Ichidan verbs, the stem directly precedes V2 (e.g., 見 + つける)
+  bool is_ichidan = (base_ending == 0);
+
+  // Position after 連用形 (for Godan) or after stem (for Ichidan)
+  size_t v2_start = is_ichidan ? kanji_end : kanji_end + 1;
+
+  if (v2_start >= codepoints.size()) {
+    return;
+  }
+
+  // Get byte positions
+  size_t start_byte = charPosToBytePos(codepoints, start_pos);
+  size_t v2_start_byte = charPosToBytePos(codepoints, v2_start);
+
+  // Look for V2 (subsidiary verb) at this position
+  for (const auto& v2_verb : kSubsidiaryVerbs) {
+    std::string_view v2_surface(v2_verb.surface);
+
+    // Check if text at v2_start matches this V2 verb
+    if (v2_start_byte + v2_surface.size() > text.size()) {
+      continue;
+    }
+
+    std::string_view text_at_v2 = text.substr(v2_start_byte, v2_surface.size());
+    if (text_at_v2 != v2_surface) {
+      continue;
+    }
+
+    // Found a matching V2! Now verify V1 is a valid verb
+
+    // Build the V1 base form for verification
+    std::string v1_base;
+    size_t v1_end_byte = is_ichidan ? v2_start_byte : charPosToBytePos(codepoints, kanji_end);
+    v1_base = std::string(text.substr(start_byte, v1_end_byte - start_byte));
+
+    if (!is_ichidan) {
+      // For Godan verbs, append the base ending
+      v1_base += normalize::utf8::encode({base_ending});
+    } else {
+      // For Ichidan verbs, append る
+      v1_base += "る";
+    }
+
+    // Check if V1 base form is in dictionary
+    auto v1_results = dict_manager_.lookup(v1_base, 0);
+    bool v1_in_dict = false;
+    for (const auto& result : v1_results) {
+      if (result.entry != nullptr && result.entry->surface == v1_base &&
+          result.entry->pos == core::PartOfSpeech::Verb) {
+        v1_in_dict = true;
         break;
       }
     }
 
-    // Generate split candidates if either:
-    // 1. Noun is in dictionary and verb looks conjugated
-    // 2. Verb base form is in dictionary (strongest signal)
-    if ((noun_in_dict && looks_like_verb) || base_in_dict) {
-      // Add noun candidate with adjusted cost
-      std::string noun_surface(text.substr(start_byte, verb_start_byte - start_byte));
-      float final_noun_cost = noun_cost + kNounVerbSplitBonus;
+    // Calculate compound verb end position
+    size_t compound_end_byte = v2_start_byte + v2_surface.size();
 
-      // Give extra bonus if verb base form is verified in dictionary
-      // This is the strongest signal that the split is correct
-      if (base_in_dict) {
-        final_noun_cost += kVerifiedVerbBonus;
+    // Find character position for compound end
+    size_t compound_end_pos = v2_start;
+    size_t byte_count = v2_start_byte;
+    while (compound_end_pos < codepoints.size() && byte_count < compound_end_byte) {
+      char32_t code = codepoints[compound_end_pos];
+      if (code < 0x80) {
+        byte_count += 1;
+      } else if (code < 0x800) {
+        byte_count += 2;
+      } else if (code < 0x10000) {
+        byte_count += 3;
+      } else {
+        byte_count += 4;
       }
+      ++compound_end_pos;
+    }
 
-      // Give additional bonus if noun is also in dictionary
-      if (noun_in_dict && base_in_dict) {
-        final_noun_cost -= 0.2F;  // Extra bonus for high-confidence splits
-      }
+    // Build the compound verb surface
+    std::string compound_surface(text.substr(start_byte, compound_end_byte - start_byte));
 
-      uint8_t noun_flags = noun_in_dict ? core::LatticeEdge::kFromDictionary
-                                         : core::LatticeEdge::kIsUnknown;
+    // Calculate cost
+    float base_cost = scorer_.posPrior(core::PartOfSpeech::Verb);
+    float final_cost = base_cost + kCompoundVerbBonus;
 
-      lattice.addEdge(noun_surface, static_cast<uint32_t>(start_pos),
-                      static_cast<uint32_t>(verb_start), core::PartOfSpeech::Noun,
-                      final_noun_cost, noun_flags, "");
+    if (v1_in_dict) {
+      final_cost += kVerifiedV1Bonus;
+    }
+
+    // Add compound verb candidate to lattice
+    uint8_t flags = core::LatticeEdge::kFromDictionary;  // Treat as dictionary entry
+
+    lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos),
+                    static_cast<uint32_t>(compound_end_pos), core::PartOfSpeech::Verb,
+                    final_cost, flags, v1_base);  // lemma = V1 base form
+
+    // Only add one compound verb candidate per position
+    // (prefer the first/longest match)
+    return;
+  }
+}
+
+namespace {
+
+// Productive prefixes for prefix+noun joining
+// These are common prefixes that productively combine with nouns
+struct ProductivePrefix {
+  char32_t codepoint;
+  float bonus;       // Cost bonus (lower = more preferred)
+  bool needs_kanji;  // True if the noun part should start with kanji
+};
+
+// List of productive prefixes
+// Format: {codepoint, bonus, needs_kanji}
+const ProductivePrefix kProductivePrefixes[] = {
+    // Honorific prefixes (お, ご) - very common, productive patterns
+    {U'お', -0.5F, true},   // お水, お金, お店
+    {U'ご', -0.5F, true},   // ご確認, ご連絡, ご注意
+    {U'御', -0.5F, true},   // 御 (formal version of お/ご)
+
+    // Negation prefixes (不, 未, 非, 無) - common in formal/written Japanese
+    {U'不', -0.4F, true},   // 不安, 不要, 不便, 不可能
+    {U'未', -0.4F, true},   // 未経験, 未確認, 未知
+    {U'非', -0.4F, true},   // 非常, 非公開
+    {U'無', -0.4F, true},   // 無理, 無料, 無視
+
+    // Degree/quantity prefixes
+    {U'超', -0.3F, true},   // 超人, 超高速
+    {U'再', -0.4F, true},   // 再開, 再確認
+    {U'準', -0.4F, true},   // 準備, 準決勝
+    {U'副', -0.4F, true},   // 副社長, 副作用
+    {U'総', -0.4F, true},   // 総合, 総数
+    {U'各', -0.4F, true},   // 各地, 各種
+    {U'両', -0.4F, true},   // 両方, 両手
+    {U'最', -0.4F, true},   // 最高, 最新
+    {U'全', -0.4F, true},   // 全部, 全員
+    {U'半', -0.4F, true},   // 半分, 半額
+};
+
+constexpr size_t kNumPrefixes = sizeof(kProductivePrefixes) / sizeof(kProductivePrefixes[0]);
+
+// Maximum noun length (in characters) to consider for joining
+constexpr size_t kMaxNounLenForPrefix = 6;
+
+// Additional bonus when noun part is in dictionary
+constexpr float kVerifiedNounBonus = -0.3F;
+
+}  // namespace
+
+void Tokenizer::addPrefixNounJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) const {
+  using CharType = normalize::CharType;
+
+  if (start_pos >= codepoints.size()) {
+    return;
+  }
+
+  // Check if current character is a productive prefix
+  char32_t current_char = codepoints[start_pos];
+  const ProductivePrefix* matched_prefix = nullptr;
+
+  for (size_t idx = 0; idx < kNumPrefixes; ++idx) {
+    if (kProductivePrefixes[idx].codepoint == current_char) {
+      matched_prefix = &kProductivePrefixes[idx];
+      break;
     }
   }
+
+  if (matched_prefix == nullptr) {
+    return;  // Not a prefix
+  }
+
+  // Check if there's a noun part following
+  size_t noun_start = start_pos + 1;
+  if (noun_start >= codepoints.size()) {
+    return;  // No noun part
+  }
+
+  // For most prefixes, the noun part should start with kanji
+  if (matched_prefix->needs_kanji) {
+    if (char_types[noun_start] != CharType::Kanji) {
+      return;  // Not followed by kanji
+    }
+  } else {
+    // Allow kanji or katakana
+    if (char_types[noun_start] != CharType::Kanji &&
+        char_types[noun_start] != CharType::Katakana) {
+      return;
+    }
+  }
+
+  // Find the end of the noun part
+  // For kanji, extend until non-kanji
+  // For katakana, extend until non-katakana
+  CharType noun_type = char_types[noun_start];
+  size_t noun_end = noun_start + 1;
+
+  while (noun_end < codepoints.size() &&
+         noun_end - noun_start < kMaxNounLenForPrefix &&
+         char_types[noun_end] == noun_type) {
+    ++noun_end;
+  }
+
+  // Need at least 1 character in the noun part
+  if (noun_end <= noun_start) {
+    return;
+  }
+
+  // Check dictionary for compound nouns that may include hiragana
+  // E.g., 買い物 (kanji + hiragana + kanji) should be found as a single noun
+  size_t noun_start_byte = charPosToBytePos(codepoints, noun_start);
+  auto noun_results = dict_manager_.lookup(text, noun_start_byte);
+  bool noun_in_dict = false;
+  size_t dict_noun_end = noun_end;  // May be extended by dictionary lookup
+
+  for (const auto& result : noun_results) {
+    if (result.entry != nullptr &&
+        result.entry->pos == core::PartOfSpeech::Noun) {
+      // Found a noun entry - check if it extends our noun_end
+      if (result.length > dict_noun_end - noun_start) {
+        dict_noun_end = noun_start + result.length;
+        noun_in_dict = true;
+      } else if (result.length == noun_end - noun_start) {
+        noun_in_dict = true;
+      }
+    }
+  }
+
+  // Use the dictionary-extended noun end if available
+  if (dict_noun_end > noun_end) {
+    noun_end = dict_noun_end;
+  } else {
+    // Skip single-kanji noun when followed by hiragana (and not in dictionary)
+    // This is likely a verb stem: お + 伝(kanji) + え(hiragana) = お伝え (verb renyokei)
+    // Common patterns: お伝え, お待ち, お送り, お知らせ (honorific verb forms)
+    if (noun_end - noun_start == 1 && noun_end < codepoints.size()) {
+      if (char_types[noun_end] == CharType::Hiragana) {
+        return;  // Skip - this is likely a verb pattern
+      }
+    }
+  }
+
+  // Also check if the combined form is already in dictionary
+  // If so, let the dictionary candidate handle it
+  size_t start_byte = charPosToBytePos(codepoints, start_pos);
+  auto combined_results = dict_manager_.lookup(text, start_byte);
+
+  for (const auto& result : combined_results) {
+    if (result.entry != nullptr &&
+        result.length == noun_end - start_pos) {
+      // Already in dictionary, no need to add join candidate
+      return;
+    }
+  }
+
+  // Generate joined candidate
+  size_t end_byte = charPosToBytePos(codepoints, noun_end);
+  std::string surface(text.substr(start_byte, end_byte - start_byte));
+
+  // Calculate cost
+  float base_cost = scorer_.posPrior(core::PartOfSpeech::Noun);
+  float final_cost = base_cost + matched_prefix->bonus;
+
+  // Give extra bonus if noun part is in dictionary
+  if (noun_in_dict) {
+    final_cost += kVerifiedNounBonus;
+  }
+
+  // Add the joined candidate
+  uint8_t flags = core::LatticeEdge::kIsUnknown;
+
+  lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
+                  static_cast<uint32_t>(noun_end), core::PartOfSpeech::Noun,
+                  final_cost, flags, "");
 }
 
 }  // namespace suzume::analysis

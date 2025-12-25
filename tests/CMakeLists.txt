@@ -25,14 +25,23 @@ set(TEST_SOURCES
   dictionary/trie_test.cpp
   dictionary/double_array_test.cpp
   dictionary/binary_dict_test.cpp
+  dictionary/core_dict_test.cpp
   grammar/inflection_test.cpp
   pretokenizer/pretokenizer_test.cpp
   analysis/analyzer_basic_test.cpp
   analysis/analyzer_particle_test.cpp
   analysis/analyzer_grammar_test.cpp
   analysis/analyzer_verb_test.cpp
-  analysis/analyzer_usecase_test.cpp
+  analysis/analyzer_usecase_business_test.cpp
+  analysis/analyzer_usecase_conversation_test.cpp
+  analysis/analyzer_usecase_technical_test.cpp
+  analysis/analyzer_usecase_news_test.cpp
+  analysis/analyzer_usecase_casual_test.cpp
+  analysis/analyzer_usecase_mixed_test.cpp
+  analysis/analyzer_usecase_realworld_test.cpp
   analysis/analyzer_regression_test.cpp
+  analysis/analyzer_strict_test.cpp
+  analysis/analyzer_prefix_test.cpp
 )
 
 # Create test executable
@@ -56,5 +65,8 @@ target_link_libraries(suzume_test PRIVATE
   GTest::gtest_main
 )
 
-# Register tests
-gtest_discover_tests(suzume_test)
+# Register tests with working directory set to project root
+# This allows tests to access data files via relative paths (e.g., "data/core/verbs.tsv")
+gtest_discover_tests(suzume_test
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)

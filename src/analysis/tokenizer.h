@@ -98,6 +98,40 @@ class Tokenizer {
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
+   * @brief Add compound verb join candidates
+   *
+   * Detects V1連用形 + V2 patterns and generates compound verb candidates.
+   * V1 = base verb in continuative form (連用形)
+   * V2 = subsidiary verb (出す, 込む, 始める, etc.)
+   *
+   * Examples:
+   *   "飛び込む" → compound verb (飛ぶ + 込む)
+   *   "読み込む" → compound verb (読む + 込む)
+   *   "書き出す" → compound verb (書く + 出す)
+   */
+  void addCompoundVerbJoinCandidates(
+      core::Lattice& lattice, std::string_view text,
+      const std::vector<char32_t>& codepoints, size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
+   * @brief Add prefix + noun join candidates
+   *
+   * Detects productive prefix + noun patterns and generates merged candidates.
+   * Prefixes include: お/ご (honorific), 不/未/非/無 (negation), 超/再/準, etc.
+   *
+   * Examples:
+   *   "お水" → merged as single noun (お + 水)
+   *   "ご確認" → merged as single noun (ご + 確認)
+   *   "不安" → merged as single noun (不 + 安)
+   *   "未経験" → merged as single noun (未 + 経験)
+   */
+  void addPrefixNounJoinCandidates(
+      core::Lattice& lattice, std::string_view text,
+      const std::vector<char32_t>& codepoints, size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
    * @brief Convert character position to byte position
    */
   static size_t charPosToBytePos(const std::vector<char32_t>& codepoints, size_t char_pos);

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "core/types.h"
+#include "dictionary/dictionary.h"
 #include "grammar/inflection.h"
 #include "normalize/char_type.h"
 
@@ -46,7 +47,9 @@ struct UnknownCandidate {
  */
 class UnknownWordGenerator {
  public:
-  explicit UnknownWordGenerator(const UnknownOptions& options = {});
+  explicit UnknownWordGenerator(
+      const UnknownOptions& options = {},
+      const dictionary::DictionaryManager* dict_manager = nullptr);
   ~UnknownWordGenerator() = default;
 
   // Non-copyable, non-movable
@@ -70,7 +73,19 @@ class UnknownWordGenerator {
 
  private:
   UnknownOptions options_;
+  const dictionary::DictionaryManager* dict_manager_;
   grammar::Inflection inflection_;
+
+  /**
+   * @brief Generate compound verb candidates (e.g., 恐れ入ります, 差し上げます)
+   *
+   * Detects patterns like Kanji+Hiragana+Kanji+Hiragana and checks
+   * if the base form exists in dictionary.
+   */
+  std::vector<UnknownCandidate> generateCompoundVerbCandidates(
+      std::string_view text, const std::vector<char32_t>& codepoints,
+      size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate verb candidates (kanji + conjugation endings)
@@ -84,6 +99,30 @@ class UnknownWordGenerator {
    * @brief Generate hiragana verb candidates (pure hiragana verbs like いく, くる)
    */
   std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
+      std::string_view text, const std::vector<char32_t>& codepoints,
+      size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
+   * @brief Generate i-adjective candidates (kanji + conjugation endings)
+   */
+  std::vector<UnknownCandidate> generateAdjectiveCandidates(
+      std::string_view text, const std::vector<char32_t>& codepoints,
+      size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
+   * @brief Generate hiragana i-adjective candidates (pure hiragana like まずい)
+   */
+  std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
+      std::string_view text, const std::vector<char32_t>& codepoints,
+      size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
+   * @brief Generate na-adjective candidates (〜的 patterns)
+   */
+  std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
       std::string_view text, const std::vector<char32_t>& codepoints,
       size_t start_pos,
       const std::vector<normalize::CharType>& char_types) const;

@@ -20,7 +20,8 @@ void Lattice::addEdge(const LatticeEdge& edge) {
 
 size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
                         PartOfSpeech pos, float cost, uint8_t flags,
-                        std::string_view lemma) {
+                        std::string_view lemma,
+                        dictionary::ConjugationType conj_type) {
   if (start > text_length_) {
     return static_cast<size_t>(-1);
   }
@@ -45,6 +46,7 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
   edge.cost = cost;
   edge.flags = static_cast<EdgeFlags>(flags);
   edge.lemma = stored_lemma;
+  edge.conj_type = conj_type;
 
   all_edges_.push_back(edge);
   edges_by_start_[start].push_back(edge);

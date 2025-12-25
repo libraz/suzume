@@ -13,6 +13,30 @@ constexpr uint8_t kFlagFormalNoun = 0x01;
 constexpr uint8_t kFlagLowInfo = 0x02;
 constexpr uint8_t kFlagPrefix = 0x04;
 
+/**
+ * @brief Count UTF-8 characters in a byte range
+ * @param text Full text
+ * @param start_byte Start byte position
+ * @param byte_length Length in bytes
+ * @return Number of UTF-8 characters
+ */
+size_t countUtf8Chars(std::string_view text, size_t start_byte,
+                      size_t byte_length) {
+  size_t char_count = 0;
+  size_t end_byte = start_byte + byte_length;
+
+  for (size_t pos = start_byte; pos < end_byte && pos < text.size();) {
+    auto byte = static_cast<uint8_t>(text[pos]);
+    // Count UTF-8 lead bytes (not continuation bytes 10xxxxxx)
+    if ((byte & 0xC0) != 0x80) {
+      ++char_count;
+    }
+    ++pos;
+  }
+
+  return char_count;
+}
+
 int16_t floatToCost(float cost) {
   return static_cast<int16_t>(cost * 100.0F);
 }
@@ -154,7 +178,8 @@ std::vector<LookupResult> BinaryDictionary::lookup(std::string_view text,
     if (tres.value >= 0 && static_cast<size_t>(tres.value) < entries_.size()) {
       LookupResult result{};
       result.entry_id = static_cast<uint32_t>(tres.value);
-      result.length = tres.length;
+      // Convert byte length from trie to character count
+      result.length = countUtf8Chars(text, start_pos, tres.length);
       result.entry = &entries_[tres.value];
       results.push_back(result);
     }

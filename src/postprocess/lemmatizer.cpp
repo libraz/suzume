@@ -22,6 +22,15 @@ struct VerbEnding {
 // Common verb conjugation endings (simplified)
 // NOTE: Order matters - longer patterns should come first
 const VerbEnding kVerbEndings[] = {
+    // Polite humble forms with おります (longest first)
+    {"しております", "する"},  // している polite humble
+    {"しておりました", "する"},  // していた polite humble
+    {"いたしております", "いたす"},  // している super polite
+    {"いたしておりました", "いたす"},  // していた super polite
+    {"ております", "おる"},  // ている polite humble
+    {"ておりました", "おる"},  // ていた polite humble
+    {"おります", "おる"},  // いる polite humble
+
     // Compound verbs (longest first)
     {"ってしまった", "う"},
     {"ってしまった", "つ"},
@@ -229,6 +238,21 @@ bool Lemmatizer::verifyCandidateWithDictionary(
 }
 
 std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface) const {
+  // First, check if surface itself is a base form in dictionary
+  // (e.g., 差し上げる should return 差し上げる, not 差し上ぐ)
+  if (dict_manager_ != nullptr) {
+    auto results = dict_manager_->lookup(surface, 0);
+    for (const auto& result : results) {
+      if (result.entry != nullptr &&
+          result.entry->surface == surface &&
+          (result.entry->pos == core::PartOfSpeech::Verb ||
+           result.entry->pos == core::PartOfSpeech::Adjective)) {
+        // Surface is a valid base form in dictionary
+        return std::string(surface);
+      }
+    }
+  }
+
   // Get all candidates
   auto candidates = inflection_.analyze(surface);
 
@@ -255,16 +279,19 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface) const {
 }
 
 std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
-  // If lemma is already set, use it
+  // If lemma is already set and different from surface, use it
+  // (lemma == surface means it's a default that may need re-derivation)
   if (!morpheme.lemma.empty() && morpheme.lemma != morpheme.surface) {
     return morpheme.lemma;
   }
 
   // Skip grammar-based lemmatization for non-conjugating POS
-  // Particles, auxiliaries, conjunctions, etc. don't conjugate
+  // Particles, auxiliaries, conjunctions, adverbs, etc. don't conjugate
   switch (morpheme.pos) {
     case core::PartOfSpeech::Particle:
+    case core::PartOfSpeech::Auxiliary:
     case core::PartOfSpeech::Conjunction:
+    case core::PartOfSpeech::Adverb:
     case core::PartOfSpeech::Symbol:
     case core::PartOfSpeech::Other:
       // These don't conjugate - return surface as-is
@@ -275,11 +302,14 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
 
   // Try grammar-based lemmatization for verbs and adjectives
   std::string grammar_result = lemmatizeByGrammar(morpheme.surface);
-  if (grammar_result != morpheme.surface) {
+  // Grammar-based lemmatization is authoritative - use its result even if
+  // it equals the surface (which means the surface is already a dictionary form)
+  // Only fall back to rule-based if grammar analysis returned empty/failed
+  if (!grammar_result.empty()) {
     return grammar_result;
   }
 
-  // Fallback to rule-based for known POS
+  // Fallback to rule-based for known POS (only if grammar failed)
   switch (morpheme.pos) {
     case core::PartOfSpeech::Verb:
       return lemmatizeVerb(morpheme.surface);

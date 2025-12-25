@@ -26,6 +26,16 @@ class DictCompiler {
                                                const std::string& dic_path);
 
   /**
+   * @brief Compile multiple TSV files to a single binary dictionary
+   * @param tsv_paths Input TSV file paths
+   * @param dic_path Output binary dictionary path
+   * @return Number of entries compiled, or error
+   */
+  core::Expected<size_t, core::Error> compileMultiple(
+      const std::vector<std::string>& tsv_paths,
+      const std::string& dic_path);
+
+  /**
    * @brief Compile entries to binary dictionary
    * @param entries TSV entries
    * @param dic_path Output binary dictionary path

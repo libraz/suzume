@@ -424,6 +424,46 @@ bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
               << "\" exists in Layer 1 (hardcoded)\n";
   }
 
+  // Check if the word is already analyzed correctly without adding to dictionary
+  // This prevents redundant entries for words handled by grammar logic
+  Suzume analyzer;
+  auto morphemes = analyzer.analyze(entry.surface);
+
+  if (morphemes.size() == 1 && morphemes[0].surface == entry.surface) {
+    // Already recognized as single token with correct surface
+    std::cout << "Warning: \"" << entry.surface
+              << "\" is already analyzed correctly as single token.\n";
+    std::cout << "  Current analysis: " << morphemes[0].surface << " ["
+              << core::posToString(morphemes[0].pos) << "]\n";
+
+    // Check if POS also matches
+    if (morphemes[0].pos == entry.pos) {
+      // Check if conj_type also matches (for verbs/adjectives)
+      if (entry.conj_type != dictionary::ConjugationType::None) {
+        if (morphemes[0].conj_type == entry.conj_type) {
+          std::cout << "  POS and conjugation type match. Registration is redundant.\n";
+        } else {
+          std::cout << "  POS matches but conjugation type differs.\n";
+          std::cout << "  Current: " << conjTypeToString(morphemes[0].conj_type)
+                    << ", New: " << conjTypeToString(entry.conj_type) << "\n";
+        }
+      } else {
+        std::cout << "  POS matches. Registration may be redundant.\n";
+      }
+    }
+
+    std::cout << "Skip registration? (y/n) " << std::flush;
+    std::string response;
+    if (!std::getline(std::cin, response)) {
+      return true;
+    }
+    response = trim(response);
+    if (!response.empty() && (response[0] == 'y' || response[0] == 'Y')) {
+      std::cout << "Skipped.\n";
+      return true;
+    }
+  }
+
   entries_.push_back(entry);
   modified_ = true;
   std::cout << "Added: " << entry.surface << " ("

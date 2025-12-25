@@ -85,6 +85,7 @@ struct CommandArgs {
   OutputFormat format = OutputFormat::Morpheme;
   bool verbose = false;
   bool very_verbose = false;
+  bool debug = false;
   bool help = false;
   bool no_user_dict = false;
   bool no_core_dict = false;

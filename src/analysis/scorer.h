@@ -21,6 +21,7 @@ struct ScorerOptions {
   float adv_prior = 0.4F;
   float particle_prior = 0.1F;
   float aux_prior = 0.2F;
+  float pronoun_prior = 0.1F;
 
   // Penalties
   float single_kanji_penalty = 2.0F;
@@ -38,7 +39,7 @@ struct ScorerOptions {
   struct OptimalLength {
     size_t noun_min = 2;
     size_t noun_max = 6;
-    size_t verb_min = 2;
+    size_t verb_min = 3;  // Increased from 2 to prevent short verbs like して from getting bonus
     size_t verb_max = 8;
     size_t adj_min = 2;
     size_t adj_max = 6;

@@ -30,6 +30,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"か", "く", VerbType::GodanKa, conn::kVerbMizenkei, false},
       {"く", "く", VerbType::GodanKa, conn::kVerbBase, false},
       {"け", "く", VerbType::GodanKa, conn::kVerbPotential, false},  // Potential stem
+      {"け", "く", VerbType::GodanKa, conn::kVerbKatei, false},      // Hypothetical stem
       {"こ", "く", VerbType::GodanKa, conn::kVerbVolitional, false}, // Volitional stem
 
       // 五段ガ行 (泳ぐ)
@@ -37,6 +38,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"ぎ", "ぐ", VerbType::GodanGa, conn::kVerbRenyokei, false},
       {"が", "ぐ", VerbType::GodanGa, conn::kVerbMizenkei, false},
       {"げ", "ぐ", VerbType::GodanGa, conn::kVerbPotential, false},  // Potential stem
+      {"げ", "ぐ", VerbType::GodanGa, conn::kVerbKatei, false},      // Hypothetical stem
       {"ご", "ぐ", VerbType::GodanGa, conn::kVerbVolitional, false}, // Volitional stem
       {"ぐ", "ぐ", VerbType::GodanGa, conn::kVerbBase, false},       // Base/dictionary form
 
@@ -45,6 +47,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"し", "す", VerbType::GodanSa, conn::kVerbOnbinkei, true},
       {"さ", "す", VerbType::GodanSa, conn::kVerbMizenkei, false},
       {"せ", "す", VerbType::GodanSa, conn::kVerbPotential, false},  // Potential stem
+      {"せ", "す", VerbType::GodanSa, conn::kVerbKatei, false},      // Hypothetical stem
       {"そ", "す", VerbType::GodanSa, conn::kVerbVolitional, false}, // Volitional stem
       {"す", "す", VerbType::GodanSa, conn::kVerbBase, false},       // Base/dictionary form
 
@@ -53,6 +56,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"っ", "る", VerbType::GodanRa, conn::kVerbOnbinkei, true},
       {"り", "る", VerbType::GodanRa, conn::kVerbRenyokei, false},
       {"ら", "る", VerbType::GodanRa, conn::kVerbMizenkei, false},
+      {"れ", "る", VerbType::GodanRa, conn::kVerbKatei, false},      // Hypothetical stem
       {"ろ", "る", VerbType::GodanRa, conn::kVerbVolitional, false}, // Volitional stem
 
       // 五段タ行 (持つ)
@@ -60,6 +64,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"ち", "つ", VerbType::GodanTa, conn::kVerbRenyokei, false},
       {"た", "つ", VerbType::GodanTa, conn::kVerbMizenkei, false},
       {"て", "つ", VerbType::GodanTa, conn::kVerbPotential, false},  // Potential stem
+      {"て", "つ", VerbType::GodanTa, conn::kVerbKatei, false},      // Hypothetical stem
       {"と", "つ", VerbType::GodanTa, conn::kVerbVolitional, false}, // Volitional stem
       {"つ", "つ", VerbType::GodanTa, conn::kVerbBase, false},       // Base/dictionary form
 
@@ -68,6 +73,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"み", "む", VerbType::GodanMa, conn::kVerbRenyokei, false},
       {"ま", "む", VerbType::GodanMa, conn::kVerbMizenkei, false},
       {"め", "む", VerbType::GodanMa, conn::kVerbPotential, false},  // Potential stem
+      {"め", "む", VerbType::GodanMa, conn::kVerbKatei, false},      // Hypothetical stem
       {"も", "む", VerbType::GodanMa, conn::kVerbVolitional, false}, // Volitional stem
       {"む", "む", VerbType::GodanMa, conn::kVerbBase, false},       // Base/dictionary form
 
@@ -76,6 +82,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"び", "ぶ", VerbType::GodanBa, conn::kVerbRenyokei, false},
       {"ば", "ぶ", VerbType::GodanBa, conn::kVerbMizenkei, false},
       {"べ", "ぶ", VerbType::GodanBa, conn::kVerbPotential, false},  // Potential stem
+      {"べ", "ぶ", VerbType::GodanBa, conn::kVerbKatei, false},      // Hypothetical stem
       {"ぼ", "ぶ", VerbType::GodanBa, conn::kVerbVolitional, false}, // Volitional stem
       {"ぶ", "ぶ", VerbType::GodanBa, conn::kVerbBase, false},       // Base/dictionary form
 
@@ -84,6 +91,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"に", "ぬ", VerbType::GodanNa, conn::kVerbRenyokei, false},
       {"な", "ぬ", VerbType::GodanNa, conn::kVerbMizenkei, false},
       {"ね", "ぬ", VerbType::GodanNa, conn::kVerbPotential, false},  // Potential stem
+      {"ね", "ぬ", VerbType::GodanNa, conn::kVerbKatei, false},      // Hypothetical stem
       {"の", "ぬ", VerbType::GodanNa, conn::kVerbVolitional, false}, // Volitional stem
       {"ぬ", "ぬ", VerbType::GodanNa, conn::kVerbBase, false},       // Base/dictionary form
 
@@ -92,6 +100,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"い", "う", VerbType::GodanWa, conn::kVerbRenyokei, false},
       {"わ", "う", VerbType::GodanWa, conn::kVerbMizenkei, false},
       {"え", "う", VerbType::GodanWa, conn::kVerbPotential, false},  // Potential stem
+      {"え", "う", VerbType::GodanWa, conn::kVerbKatei, false},      // Hypothetical stem
       {"お", "う", VerbType::GodanWa, conn::kVerbVolitional, false}, // Volitional stem
       {"う", "う", VerbType::GodanWa, conn::kVerbBase, false},       // Base/dictionary form
 
@@ -99,6 +108,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"", "る", VerbType::Ichidan, conn::kVerbOnbinkei, true},
       {"", "る", VerbType::Ichidan, conn::kVerbRenyokei, false},
       {"", "る", VerbType::Ichidan, conn::kVerbMizenkei, false},
+      {"れ", "る", VerbType::Ichidan, conn::kVerbKatei, false},      // Hypothetical: 食べれ(ば)
       {"よ", "る", VerbType::Ichidan, conn::kVerbVolitional, false}, // Volitional stem
       {"る", "る", VerbType::Ichidan, conn::kVerbBase, false},       // Base/dictionary form
 
@@ -107,6 +117,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"し", "する", VerbType::Suru, conn::kVerbRenyokei, false},
       {"し", "する", VerbType::Suru, conn::kVerbMizenkei, false},  // しない
       {"さ", "する", VerbType::Suru, conn::kVerbMizenkei, false},  // させる/される
+      {"すれ", "する", VerbType::Suru, conn::kVerbKatei, false},   // すれば
       {"しよ", "する", VerbType::Suru, conn::kVerbVolitional, false}, // しよう
       {"する", "する", VerbType::Suru, conn::kVerbBase, false},    // Base/dictionary form
       {"す", "する", VerbType::Suru, conn::kVerbBase, false},      // すべき special
@@ -115,6 +126,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"き", "くる", VerbType::Kuru, conn::kVerbOnbinkei, true},
       {"き", "くる", VerbType::Kuru, conn::kVerbRenyokei, false},
       {"こ", "くる", VerbType::Kuru, conn::kVerbMizenkei, false},
+      {"くれ", "くる", VerbType::Kuru, conn::kVerbKatei, false},     // くれば
       {"こよ", "くる", VerbType::Kuru, conn::kVerbVolitional, false}, // こよう
       {"くる", "くる", VerbType::Kuru, conn::kVerbBase, false},    // Base/dictionary form
 
@@ -165,6 +177,33 @@ const char* kRenyokeiEndings[] = {"き", "ぎ", "し", "ち", "に", "び", "み
 const size_t kRenyokeiCount = 8;
 
 // Check if stem ends with kanji (CJK Unified Ideographs: U+4E00-U+9FFF)
+// Check if entire stem consists only of kanji (no hiragana/katakana)
+// Used to identify サ変名詞 stems that shouldn't be i-adjective stems
+bool isAllKanji(std::string_view stem) {
+  if (stem.empty()) {
+    return false;
+  }
+  size_t pos = 0;
+  while (pos < stem.size()) {
+    const unsigned char* ptr =
+        reinterpret_cast<const unsigned char*>(stem.data() + pos);
+    if ((ptr[0] & 0xF0) != 0xE0) {
+      return false;  // Not a 3-byte UTF-8 sequence
+    }
+    char32_t codepoint = ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) |
+                         (ptr[2] & 0x3F);
+    // CJK Unified Ideographs: U+4E00-U+9FFF
+    // CJK Extension A: U+3400-U+4DBF
+    bool is_kanji = (codepoint >= 0x4E00 && codepoint <= 0x9FFF) ||
+                    (codepoint >= 0x3400 && codepoint <= 0x4DBF);
+    if (!is_kanji) {
+      return false;
+    }
+    pos += 3;
+  }
+  return true;
+}
+
 // Used to identify potential サ変 verb stems (勉強, 準備, etc.)
 bool endsWithKanji(std::string_view stem) {
   if (stem.size() < 3) {
@@ -245,7 +284,20 @@ float calculateConfidence(VerbType type, std::string_view stem,
         // Stem matches Godan conjugation pattern for this context
         base -= 0.15F;
       }
-      // Other endings (起き for onbin, etc.) are valid Ichidan - no penalty
+
+      // Ichidan stem ending in い (kanji + い) in renyokei context is suspicious
+      // Pattern: 行い + ます → 行いる (wrong) vs 行 + います → 行う (correct)
+      // Stems like 行い (kanji + い) are more likely GodanWa renyokei than Ichidan
+      // But 用い (from 用いる) is a valid Ichidan stem
+      // Apply penalty only when stem is exactly 2 chars (6 bytes): kanji + い
+      // Longer stems like 用い are more likely valid Ichidan
+      if (required_conn == conn::kVerbRenyokei && stem_len == 6) {
+        std::string_view last = stem.substr(3);  // Last 3 bytes = 1 hiragana
+        if (last == "い" && endsWithKanji(stem.substr(0, 3))) {
+          // Stem is exactly kanji + い, likely GodanWa renyokei
+          base -= 0.15F;
+        }
+      }
     }
 
     // Single-kanji Ichidan stems are rare but valid (見る, 着る, etc.)
@@ -282,11 +334,48 @@ float calculateConfidence(VerbType type, std::string_view stem,
     base -= 0.25F;  // Strong penalty for single-kanji I-adjective stems
   }
 
+  // I-adjective stems consisting only of 2+ kanji are extremely rare
+  // Such stems are usually サ変名詞 (検討, 勉強, 準備) being misanalyzed
+  // Real i-adjectives have patterns like: 美しい, 楽しい (kanji + hiragana)
+  // This prevents "検討いたす" from being parsed as "検討い" + "たす"
+  if (type == VerbType::IAdjective && stem_len >= 6 && isAllKanji(stem)) {
+    base -= 0.40F;  // Strong penalty for all-kanji i-adjective stems
+  }
+
   // I-adjective stems ending with e-row hiragana are extremely rare
   // E-row endings (食べ, 見え, 教え) are typical of ichidan verb stems
   // This prevents "食べそう" from being parsed as i-adjective "食べい"
   if (type == VerbType::IAdjective && endsWithERow(stem)) {
     base -= 0.35F;  // Strong penalty for e-row i-adjective stems
+  }
+
+  // I-adjective stems ending with a-row hiragana (な, ま, か, etc.) are suspicious
+  // These are typically verb mizenkei forms + ない (食べな, 読ま, 書か)
+  // This prevents "食べなければ" from being parsed as i-adjective "食べない"
+  // Real i-adjectives with ない: 危ない (あぶな), 少ない (すくな)
+  // But these have specific patterns, not random verb stem + な
+  if (type == VerbType::IAdjective && stem_len >= 6) {
+    std::string_view last = stem.substr(stem_len - 3);
+    if (last == "な" || last == "ま" || last == "か" || last == "が" ||
+        last == "さ" || last == "た" || last == "ば" || last == "ら" ||
+        last == "わ") {
+      // Check if there's a hiragana before the a-row ending (verb+mizenkei pattern)
+      // E.g., 食べ + な → 食べな (verb pattern)
+      // vs. 危 + な → あぶな (real adjective stem)
+      if (stem_len >= 9) {
+        std::string_view prev = stem.substr(stem_len - 6, 3);
+        // If previous char is also hiragana, this looks like verb mizenkei
+        if (prev == "べ" || prev == "め" || prev == "せ" || prev == "け" ||
+            prev == "て" || prev == "ね" || prev == "れ" || prev == "え" ||
+            prev == "げ" || prev == "ぜ" || prev == "で" || prev == "ぺ" ||
+            prev == "み" || prev == "き" || prev == "し" || prev == "ち" ||
+            prev == "に" || prev == "ひ" || prev == "り" || prev == "い" ||
+            prev == "ぎ" || prev == "じ" || prev == "ぢ" || prev == "び" ||
+            prev == "ぴ") {
+          base -= 0.30F;  // Penalty for verb mizenkei + a-row pattern
+        }
+      }
+    }
   }
 
   // I-adjective stems that look like godan verb renyokei (kanji + i-row)
@@ -310,7 +399,11 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Godan verb stems in onbinkei context should not end with a-row hiragana
   // a-row endings (か, が, さ, etc.) are mizenkei forms, not onbinkei
   // This prevents "美しかった" from being parsed as verb "美しかる"
-  if (required_conn == conn::kVerbOnbinkei && stem_len >= 6) {
+  // Exception: GodanSa has no phonetic change (音便) - し is the renyokei form
+  // used in て-form context. Stems like いた (from いたす) or はな (from はなす)
+  // can legitimately end with any hiragana, including a-row characters.
+  if (required_conn == conn::kVerbOnbinkei && stem_len >= 6 &&
+      type != VerbType::GodanSa) {
     std::string_view last = stem.substr(stem_len - 3);
     if (last == "か" || last == "が" || last == "さ" || last == "た" ||
         last == "な" || last == "ば" || last == "ま" || last == "ら" ||
@@ -320,14 +413,80 @@ float calculateConfidence(VerbType type, std::string_view stem,
     }
   }
 
+  // Penalty for Godan with e-row stem ending in onbinkei context
+  // Pattern like 伝えいた matches GodanKa (伝え + いた → 伝えく)
+  // But stems ending in e-row are almost always Ichidan verb renyokei forms
+  // Real Godan onbin: 書いた (書く), 飲んだ (飲む) - stems end in kanji
+  // This prevents "伝えいた" from being parsed as GodanKa "伝えく"
+  if (required_conn == conn::kVerbOnbinkei && stem_len >= 6 &&
+      endsWithERow(stem) && type != VerbType::Ichidan) {
+    // E-row endings are ichidan stems, not godan
+    // 伝え, 食べ, 見せ are all ichidan renyokei forms
+    base -= 0.35F;  // Strong penalty
+  }
+
+  // Single-kanji Godan stems in onbinkei context need careful handling
+  // GodanKa/GodanGa have い音便: 書く→書いて (aux=いて), 泳ぐ→泳いで (aux=いで)
+  // Ichidan have no 音便: 用いる→用いて (aux=て)
+  // When stem is single kanji and aux is just て/た (3 bytes), it's likely
+  // the input is actually an Ichidan verb like 用いる (stem=用い, aux=て)
+  // When aux is いて/いた/いで/いだ (6 bytes), it's legitimate GodanKa/GodanGa
+  // This prevents "用いて" (stem=用, aux=いて) from being parsed as GodanKa "用く"
+  // But allows "書いて" (stem=書, aux=いて) to be correctly parsed as GodanKa "書く"
+  // Note: aux_total_len includes all auxiliary suffixes, not just the first one
+  // For simple te-form: aux_total_len is 6 for いて, 3 for て
+
+  // Multi-kanji stems (2+ kanji only) are almost always サ変名詞
+  // Such stems should only be parsed as Suru verbs, not Godan or Ichidan
+  // This prevents "検討いた" from being parsed as GodanKa "検討く"
+  if (stem_len >= 6 && isAllKanji(stem) && type != VerbType::Suru) {
+    base -= 0.40F;  // Strong penalty for all-kanji stems with non-Suru types
+  }
+
   // Godan potential form boost: 書けない → 書く is more likely than 書ける
   // Potential forms of Godan verbs behave like Ichidan, creating ambiguity
-  // Only boost when stem length is 1 char (3 bytes) - typical for potential forms
-  // This prevents false matches like 食べて → 食ぶ (should be 食べる)
-  if (required_conn == conn::kVerbPotential && stem_len == 3) {
+  // Only boost when:
+  // 1. stem length is 1 char (3 bytes) - typical for potential forms
+  // 2. Auxiliary chain has more than just る (aux_total_len > 3)
+  // 3. Single auxiliary (aux_count == 1) - compound patterns like てもらう are
+  //    more likely Ichidan て-form, not Godan potential
+  // This prevents false matches like 食べる → 食ぶ potential (should be Ichidan)
+  // Pattern "Xえる" or "Xべる" is much more likely Ichidan than Godan potential base
+  if (required_conn == conn::kVerbPotential && stem_len == 3 &&
+      aux_total_len > 3 && aux_count == 1) {
     if (type != VerbType::Ichidan && type != VerbType::Suru &&
         type != VerbType::Kuru) {
       base += 0.10F;  // Boost Godan potential interpretation
+    }
+  }
+
+  // Penalty for Godan potential with single-kanji stem in compound patterns
+  // For simple patterns like "書けない" (aux_count=1), Godan potential is often correct
+  // For compound patterns like "食べてもらった" (aux_count>=2), Ichidan is usually correct
+  // The べ/え in "食べ" is part of the Ichidan stem, not a potential suffix
+  // Penalty scales with aux_count to handle very long compound patterns
+  if (required_conn == conn::kVerbPotential && stem_len == 3 && aux_count >= 2) {
+    if (type != VerbType::Ichidan && type != VerbType::Suru &&
+        type != VerbType::Kuru) {
+      // Scale penalty with compound depth: 0.15 base + 0.05 per extra aux
+      float penalty = 0.15F + 0.05F * static_cast<float>(aux_count - 1);
+      base -= std::min(penalty, 0.35F);  // Cap at 0.35
+    }
+  }
+
+  // Penalty for short te-form only matches (て/で alone) with noun-like stems
+  // When the only auxiliary is "て" or "で" (3 bytes), it's often a particle, not verb conjugation
+  // Pattern: 幸いで → 幸いる (WRONG) vs 幸い + で (particle)
+  // But: 食べて → 食べる (CORRECT), やって → やる (CORRECT) are valid
+  // Only apply to stems ending in "い" which are typically na-adjectives
+  if (type == VerbType::Ichidan && required_conn == conn::kVerbOnbinkei &&
+      aux_count == 1 && aux_total_len == 3 && stem_len >= 6) {
+    std::string_view last = stem.substr(stem_len - 3);
+
+    // Stems ending in "い" are likely na-adjectives (幸い, 厄介, etc.)
+    // These should be parsed as noun + particle, not verb conjugation
+    if (last == "い") {
+      base -= 0.40F;  // Strong penalty for な-adjective + particle pattern
     }
   }
 
@@ -386,6 +545,8 @@ void Inflection::initAuxiliaries() {
       {"ます", "ます", kAuxMasu, kAuxOutMasu, kVerbRenyokei},
       {"ました", "ます", kAuxMasu, kAuxOutTa, kVerbRenyokei},
       {"ません", "ます", kAuxMasu, kAuxOutBase, kVerbRenyokei},
+      {"ましょう", "ます", kAuxMasu, kAuxOutBase, kVerbRenyokei},
+      {"ませんでした", "ます", kAuxMasu, kAuxOutTa, kVerbRenyokei},
 
       // === Past (た系) ===
       {"た", "た", kAuxTa, kAuxOutTa, kVerbOnbinkei},
@@ -460,6 +621,7 @@ void Inflection::initAuxiliaries() {
       {"ない", "ない", kAuxNai, kAuxOutBase, kVerbMizenkei},
       {"なかった", "ない", kAuxNai, kAuxOutTa, kVerbMizenkei},
       {"なくて", "ない", kAuxNai, kAuxOutTe, kVerbMizenkei},
+      {"なければ", "ない", kAuxNai, kAuxOutBase, kVerbMizenkei},  // negative conditional
 
       // === Desire (たい系) ===
       {"たい", "たい", kAuxTai, kAuxOutBase, kVerbRenyokei},
@@ -567,6 +729,10 @@ void Inflection::initAuxiliaries() {
       {"ます", "る", kAuxReru, kAuxOutMasu, kVerbPotential},    // 書け + ます
       {"ません", "る", kAuxReru, kAuxOutBase, kVerbPotential},  // 書け + ません
       {"ませんでした", "る", kAuxReru, kAuxOutTa, kVerbPotential},
+
+      // === Conditional form (仮定形 + ば) ===
+      // Attaches to hypothetical stem (e-row for Godan, れ for Ichidan/Suru/Kuru)
+      {"ば", "ば", kAuxNai, kAuxOutBase, kVerbKatei},           // 書けば, 食べれば, すれば
 
       // === Renyokei compounds (連用形 + 補助動詞) ===
       // These attach to renyokei (連用形) directly
@@ -825,9 +991,10 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       }
 
       // Stem should be at least 3 bytes (one Japanese character)
-      // Exception: Suru verb with す→する (empty stem is allowed)
+      // Exception: Suru verb with す/し→する (empty stem is allowed for する)
       if (stem.size() < 3 &&
-          !(ending.verb_type == VerbType::Suru && ending.suffix == "す")) {
+          !(ending.verb_type == VerbType::Suru &&
+            (ending.suffix == "す" || ending.suffix == "し"))) {
         continue;
       }
 

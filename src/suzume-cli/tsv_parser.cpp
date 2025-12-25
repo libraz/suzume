@@ -200,6 +200,18 @@ core::Expected<core::PartOfSpeech, core::Error> TsvParser::parsePos(
   if (str == "OTHER") {
     return core::PartOfSpeech::Other;
   }
+  if (str == "PHRASE") {
+    return core::PartOfSpeech::Other;  // Map PHRASE to Other
+  }
+  if (str == "INTJ") {
+    return core::PartOfSpeech::Other;  // Map INTJ (interjection) to Other
+  }
+  if (str == "PRONOUN" || str == "PRON") {
+    return core::PartOfSpeech::Pronoun;
+  }
+  if (str == "DETERMINER" || str == "DET") {
+    return core::PartOfSpeech::Determiner;
+  }
 
   return core::makeUnexpected(core::Error(
       core::ErrorCode::ParseError,

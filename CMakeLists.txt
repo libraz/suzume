@@ -117,3 +117,49 @@ add_subdirectory(src)
 if(BUILD_TESTING AND NOT BUILD_WASM)
   add_subdirectory(tests)
 endif()
+
+# Dictionary build targets
+set(DICT_DATA_DIR "${CMAKE_SOURCE_DIR}/data")
+
+# Collect TSV files for dictionary build
+file(GLOB CORE_TSV_FILES "${DICT_DATA_DIR}/core/*.tsv")
+file(GLOB USER_TSV_FILES "${DICT_DATA_DIR}/user/*.tsv")
+
+# Custom target: build-dict - Compile all TSV dictionaries to core.dic and user.dic
+# Output goes to data/ directory so that tests and CLI can find them via ./data/core.dic
+add_custom_target(build-dict
+  COMMAND ${CMAKE_COMMAND} -E echo "Building dictionaries..."
+  COMMAND ${CMAKE_BINARY_DIR}/bin/suzume-cli dict compile
+          ${CORE_TSV_FILES} ${DICT_DATA_DIR}/core.dic
+  COMMAND ${CMAKE_BINARY_DIR}/bin/suzume-cli dict compile
+          ${USER_TSV_FILES} ${DICT_DATA_DIR}/user.dic
+  COMMAND ${CMAKE_COMMAND} -E echo "Dictionary build complete: ${DICT_DATA_DIR}"
+  DEPENDS suzume-cli
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMENT "Compiling TSV dictionaries to binary format"
+)
+
+# Collect all core TSV files for validation
+file(GLOB CORE_TSV_FILES "${DICT_DATA_DIR}/core/*.tsv")
+
+# Custom target: validate-dict - Validate all TSV dictionaries
+add_custom_target(validate-dict
+  COMMAND ${CMAKE_COMMAND} -E echo "Validating core dictionaries..."
+  DEPENDS suzume-cli
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMENT "Validating TSV dictionary files"
+)
+
+# Add validation command for each TSV file
+foreach(TSV_FILE ${CORE_TSV_FILES})
+  get_filename_component(TSV_NAME ${TSV_FILE} NAME)
+  add_custom_command(TARGET validate-dict POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "  Validating ${TSV_NAME}..."
+    COMMAND ${CMAKE_BINARY_DIR}/bin/suzume-cli dict validate ${TSV_FILE}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  )
+endforeach()
+
+add_custom_command(TARGET validate-dict POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E echo "All dictionaries validated successfully"
+)

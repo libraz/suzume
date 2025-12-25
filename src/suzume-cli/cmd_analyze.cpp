@@ -146,6 +146,45 @@ int cmdAnalyze(const CommandArgs& args) {
     return 0;
   }
 
+  // Debug mode - show lattice candidates
+  if (args.debug) {
+    core::Lattice lattice(0);
+    auto morphemes = analyzer.analyzeDebug(text, &lattice);
+
+    std::cout << "=== Lattice Candidates ===\n";
+    for (size_t pos = 0; pos < lattice.textLength(); ++pos) {
+      const auto& edges = lattice.edgesAt(pos);
+      if (!edges.empty()) {
+        std::cout << "Position " << pos << ":\n";
+        for (const auto& edge : edges) {
+          std::cout << "  [" << edge.start << "-" << edge.end << "] "
+                    << edge.surface << " (" << core::posToString(edge.pos)
+                    << ") cost=" << edge.cost;
+          if (!edge.lemma.empty()) {
+            std::cout << " lemma=" << edge.lemma;
+          }
+          // Show source info
+          if (edge.fromDictionary()) {
+            std::cout << " [dict";
+            if (edge.fromUserDict()) {
+              std::cout << ":user";
+            }
+            std::cout << "]";
+          }
+          if (edge.isUnknown()) {
+            std::cout << " [unk]";
+          }
+          std::cout << " id=" << edge.id;
+          std::cout << "\n";
+        }
+      }
+    }
+
+    std::cout << "\n=== Result ===\n";
+    outputMorpheme(morphemes);
+    return 0;
+  }
+
   // Normal analysis
   switch (args.format) {
     case OutputFormat::Morpheme: {

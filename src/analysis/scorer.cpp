@@ -13,6 +13,21 @@ const std::unordered_set<std::string_view> kSingleKanjiExceptions = {
     "冬", "朝", "昼", "夜",
 };
 
+// Single hiragana functional words that should not be penalized
+// These are common particles, auxiliaries, and other grammatical elements
+const std::unordered_set<std::string_view> kSingleHiraganaExceptions = {
+    // Case particles (格助詞)
+    "が", "を", "に", "で", "と", "へ", "の",
+    // Binding particles (係助詞)
+    "は", "も",
+    // Final particles (終助詞)
+    "か", "な", "ね", "よ", "わ",
+    // Auxiliary (助動詞)
+    "だ", "た",
+    // Conjunctive particles (接続助詞)
+    "て", "ば",
+};
+
 namespace {
 
 // Convert POS to array index
@@ -49,10 +64,10 @@ constexpr size_t posToIndex(core::PartOfSpeech pos) {
 // clang-format off
 constexpr float kBigramCostTable[11][11] = {
     //        Noun  Verb  Adj   Adv   Part  Aux   Conj  Det   Pron  Sym   Other
-    /* Noun */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 1.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F},
+    /* Noun */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F},
     /* Verb */ {0.2F, 0.8F, 0.8F, 0.5F, 0.0F, 0.0F, 0.5F, 0.5F, 0.2F, 0.5F, 0.5F},
     /* Adj  */ {0.2F, 0.5F, 0.8F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.2F, 0.5F, 0.5F},
-    /* Adv  */ {0.0F, 0.0F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.5F, 0.5F},
+    /* Adv  */ {0.0F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.5F, 0.5F},
     /* Part */ {0.0F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.5F, 0.3F, 0.0F, 0.5F, 0.5F},
     /* Aux  */ {0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.3F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F},
     /* Conj */ {0.0F, 0.2F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.2F, 0.0F, 0.3F, 0.3F},
@@ -81,6 +96,8 @@ float Scorer::posPrior(core::PartOfSpeech pos) const {
       return options_.particle_prior;
     case core::PartOfSpeech::Auxiliary:
       return options_.aux_prior;
+    case core::PartOfSpeech::Pronoun:
+      return options_.pronoun_prior;
     default:
       return 0.5F;
   }
@@ -128,16 +145,20 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Single character penalty
   size_t char_len = edge.end - edge.start;
   if (char_len == 1 && !edge.surface.empty()) {
-    // Check if single kanji exception
-    if (kSingleKanjiExceptions.find(edge.surface) ==
-        kSingleKanjiExceptions.end()) {
-      // Decode first character to check type
-      auto codepoints = normalize::utf8::decode(edge.surface);
-      if (!codepoints.empty()) {
-        normalize::CharType ctype = normalize::classifyChar(codepoints[0]);
-        if (ctype == normalize::CharType::Kanji) {
+    // Decode first character to check type
+    auto codepoints = normalize::utf8::decode(edge.surface);
+    if (!codepoints.empty()) {
+      normalize::CharType ctype = normalize::classifyChar(codepoints[0]);
+      if (ctype == normalize::CharType::Kanji) {
+        // Check if single kanji exception
+        if (kSingleKanjiExceptions.find(edge.surface) ==
+            kSingleKanjiExceptions.end()) {
           cost += options_.single_kanji_penalty;
-        } else if (ctype == normalize::CharType::Hiragana) {
+        }
+      } else if (ctype == normalize::CharType::Hiragana) {
+        // Check if single hiragana exception (functional words)
+        if (kSingleHiraganaExceptions.find(edge.surface) ==
+            kSingleHiraganaExceptions.end()) {
           cost += options_.single_hiragana_penalty;
         }
       }

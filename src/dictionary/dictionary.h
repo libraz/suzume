@@ -43,13 +43,17 @@ struct DictionaryEntry {
   float cost{};              // Cost (lower = preferred)
   std::string lemma;         // Lemma (optional)
 
-  // Flags (placed before conj_type for backward compatibility with aggregate init)
+  // Flags
   bool is_prefix = false;       // Prefix match flag
   bool is_formal_noun = false;  // Formal noun flag
   bool is_low_info = false;     // Low information word flag
 
-  // Conjugation type (placed last for backward compatibility)
+  // Conjugation type
   ConjugationType conj_type{ConjugationType::None};
+
+  // Reading in hiragana (for auto-expansion of adjectives)
+  // Placed last for backward compatibility with existing aggregate init
+  std::string reading;
 };
 
 /**
@@ -101,6 +105,7 @@ class IDictionary {
 // Forward declarations
 class CoreDictionary;
 class UserDictionary;
+class BinaryDictionary;
 
 /**
  * @brief Dictionary manager that combines core and user dictionaries
@@ -136,8 +141,47 @@ class DictionaryManager {
    */
   const CoreDictionary& coreDictionary() const;
 
+  /**
+   * @brief Load core binary dictionary from file
+   * @param path File path
+   * @return true if loaded successfully
+   */
+  bool loadCoreDictionary(const std::string& path);
+
+  /**
+   * @brief Check if core binary dictionary is loaded
+   */
+  bool hasCoreBinaryDictionary() const;
+
+  /**
+   * @brief Load user binary dictionary from file
+   * @param path File path
+   * @return true if loaded successfully
+   */
+  bool loadUserBinaryDictionary(const std::string& path);
+
+  /**
+   * @brief Check if user binary dictionary is loaded
+   */
+  bool hasUserBinaryDictionary() const;
+
+  /**
+   * @brief Try to auto-load core.dic from standard paths
+   * @return true if loaded successfully
+   *
+   * Search order:
+   * 1. $SUZUME_DATA_DIR/core.dic
+   * 2. ./data/core.dic
+   * 3. ~/.suzume/core.dic
+   * 4. /usr/local/share/suzume/core.dic
+   * 5. /usr/share/suzume/core.dic
+   */
+  bool tryAutoLoadCoreDictionary();
+
  private:
   std::unique_ptr<CoreDictionary> core_dict_;
+  std::unique_ptr<BinaryDictionary> core_binary_dict_;
+  std::unique_ptr<BinaryDictionary> user_binary_dict_;
   std::vector<std::shared_ptr<UserDictionary>> user_dicts_;
 };
 

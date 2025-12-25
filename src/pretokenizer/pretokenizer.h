@@ -137,6 +137,42 @@ class PreTokenizer {
   bool tryMatchPercentage(std::string_view text, size_t pos, PreToken& token) const;
 
   /**
+   * @brief Try to match email at position
+   * @param text Input text
+   * @param pos Current position
+   * @param token Output token if matched
+   * @return true if email matched
+   */
+  bool tryMatchEmail(std::string_view text, size_t pos, PreToken& token) const;
+
+  /**
+   * @brief Try to match time at position
+   * @param text Input text
+   * @param pos Current position
+   * @param token Output token if matched
+   * @return true if time matched
+   */
+  bool tryMatchTime(std::string_view text, size_t pos, PreToken& token) const;
+
+  /**
+   * @brief Try to match hashtag at position
+   * @param text Input text
+   * @param pos Current position
+   * @param token Output token if matched
+   * @return true if hashtag matched
+   */
+  bool tryMatchHashtag(std::string_view text, size_t pos, PreToken& token) const;
+
+  /**
+   * @brief Try to match mention at position
+   * @param text Input text
+   * @param pos Current position
+   * @param token Output token if matched
+   * @return true if mention matched
+   */
+  bool tryMatchMention(std::string_view text, size_t pos, PreToken& token) const;
+
+  /**
    * @brief Check if character is sentence boundary
    * @param codepoint Unicode codepoint
    * @return true if sentence boundary

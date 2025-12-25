@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "analysis/analyzer.h"
+#include "dictionary/binary_dict.h"
 #include "dictionary/user_dict.h"
 #include "postprocess/postprocessor.h"
 #include "postprocess/tag_generator.h"
@@ -63,30 +64,24 @@ struct Suzume::Impl {
   analysis::Analyzer analyzer;
   postprocess::Postprocessor postprocessor;
   postprocess::TagGenerator tag_generator;
-  std::shared_ptr<dictionary::UserDictionary> core_dict;
-  std::shared_ptr<dictionary::UserDictionary> user_dict;
+  std::shared_ptr<dictionary::UserDictionary> custom_dict;
 
   Impl(const SuzumeOptions& opts)
       : options(opts),
         analyzer(analysis::AnalyzerOptions{opts.mode, {}, {}}),
         postprocessor(&analyzer.dictionaryManager()),
         tag_generator(opts.tag_options) {
-    // Auto-load core.dic if found
+    // Auto-load core.dic if found (binary format)
     std::string core_path = findDictionary("core.dic");
     if (!core_path.empty()) {
-      core_dict = std::make_shared<dictionary::UserDictionary>();
-      if (core_dict->loadFromFile(core_path).hasValue()) {
-        analyzer.addUserDictionary(core_dict);
-      }
+      analyzer.dictionaryManager().loadCoreDictionary(core_path);
     }
 
-    // Auto-load user.dic if found
+    // Auto-load user.dic if found (binary format)
+    // Note: user.dic is also loaded as core binary dictionary for now
     std::string user_path = findDictionary("user.dic");
     if (!user_path.empty()) {
-      user_dict = std::make_shared<dictionary::UserDictionary>();
-      if (user_dict->loadFromFile(user_path).hasValue()) {
-        analyzer.addUserDictionary(user_dict);
-      }
+      analyzer.dictionaryManager().loadUserBinaryDictionary(user_path);
     }
   }
 };
@@ -103,10 +98,11 @@ Suzume::Suzume(Suzume&&) noexcept = default;
 Suzume& Suzume::operator=(Suzume&&) noexcept = default;
 
 bool Suzume::loadUserDictionary(const std::string& path) {
+  // For CSV/TSV custom dictionaries
   auto dict = std::make_shared<dictionary::UserDictionary>();
   auto result = dict->loadFromFile(path);
   if (result.hasValue()) {
-    impl_->user_dict = dict;
+    impl_->custom_dict = dict;
     impl_->analyzer.addUserDictionary(dict);
     return true;
   }
@@ -114,10 +110,11 @@ bool Suzume::loadUserDictionary(const std::string& path) {
 }
 
 bool Suzume::loadUserDictionaryFromMemory(const char* data, size_t size) {
+  // For CSV/TSV custom dictionaries
   auto dict = std::make_shared<dictionary::UserDictionary>();
   auto result = dict->loadFromMemory(data, size);
   if (result.hasValue()) {
-    impl_->user_dict = dict;
+    impl_->custom_dict = dict;
     impl_->analyzer.addUserDictionary(dict);
     return true;
   }
@@ -126,6 +123,12 @@ bool Suzume::loadUserDictionaryFromMemory(const char* data, size_t size) {
 
 std::vector<core::Morpheme> Suzume::analyze(std::string_view text) const {
   auto morphemes = impl_->analyzer.analyze(text);
+  return impl_->postprocessor.process(morphemes);
+}
+
+std::vector<core::Morpheme> Suzume::analyzeDebug(std::string_view text,
+                                                  core::Lattice* out_lattice) const {
+  auto morphemes = impl_->analyzer.analyzeDebug(text, out_lattice);
   return impl_->postprocessor.process(morphemes);
 }
 

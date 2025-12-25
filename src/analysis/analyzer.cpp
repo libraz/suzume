@@ -12,7 +12,7 @@ Analyzer::Analyzer(const AnalyzerOptions& options)
       normalizer_(),
       pretokenizer_(),
       scorer_(options.scorer_options),
-      unknown_gen_(options.unknown_options),
+      unknown_gen_(options.unknown_options, &dict_manager_),
       tokenizer_(nullptr) {
   tokenizer_ =
       std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
@@ -26,6 +26,20 @@ void Analyzer::addUserDictionary(
   // Rebuild tokenizer with new dictionary
   tokenizer_ =
       std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
+}
+
+bool Analyzer::tryAutoLoadCoreDictionary() {
+  bool loaded = dict_manager_.tryAutoLoadCoreDictionary();
+  if (loaded) {
+    // Rebuild tokenizer with new dictionary
+    tokenizer_ =
+        std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
+  }
+  return loaded;
+}
+
+bool Analyzer::hasCoreBinaryDictionary() const {
+  return dict_manager_.hasCoreBinaryDictionary();
 }
 
 std::vector<core::Morpheme> Analyzer::analyze(std::string_view text) const {
@@ -195,6 +209,7 @@ std::vector<core::Morpheme> Analyzer::analyzeSpan(std::string_view text,
     morpheme.features.score = edge.cost;
     morpheme.is_from_dictionary = edge.fromDictionary();
     morpheme.is_unknown = edge.isUnknown();
+    morpheme.conj_type = edge.conj_type;
 
     morphemes.push_back(std::move(morpheme));
   }
@@ -231,8 +246,66 @@ std::vector<core::Morpheme> Analyzer::pathToMorphemes(const core::ViterbiResult&
     morpheme.features.score = edge.cost;
     morpheme.is_from_dictionary = edge.fromDictionary();
     morpheme.is_unknown = edge.isUnknown();
+    morpheme.conj_type = edge.conj_type;
 
     morphemes.push_back(std::move(morpheme));
+  }
+
+  return morphemes;
+}
+
+std::vector<core::Morpheme> Analyzer::analyzeDebug(std::string_view text,
+                                                   core::Lattice* out_lattice) const {
+  if (text.empty()) {
+    return {};
+  }
+
+  // Normalize text
+  auto norm_result = normalizer_.normalize(text);
+  if (!core::isSuccess(norm_result)) {
+    return {};
+  }
+  std::string normalized = std::get<std::string>(norm_result);
+  if (normalized.empty()) {
+    return {};
+  }
+
+  // Decode to codepoints
+  std::vector<char32_t> codepoints = normalize::utf8::decode(normalized);
+  if (codepoints.empty()) {
+    return {};
+  }
+
+  // Get character types
+  std::vector<normalize::CharType> char_types;
+  char_types.reserve(codepoints.size());
+  for (char32_t code : codepoints) {
+    char_types.push_back(normalize::classifyChar(code));
+  }
+
+  // Build lattice
+  core::Lattice lattice =
+      tokenizer_->buildLattice(normalized, codepoints, char_types);
+
+  // Check if lattice is valid
+  if (!lattice.isValid()) {
+    core::Morpheme morpheme;
+    morpheme.surface = std::string(text);
+    morpheme.pos = core::PartOfSpeech::Noun;
+    morpheme.start_pos = 0;
+    morpheme.end_pos = codepoints.size();
+    return {morpheme};
+  }
+
+  // Run Viterbi
+  core::ViterbiResult vresult = viterbi_.solve(lattice, scorer_);
+
+  // Convert to morphemes
+  auto morphemes = pathToMorphemes(vresult, lattice, text);
+
+  // Move lattice to output if requested (after analysis is done)
+  if (out_lattice != nullptr) {
+    *out_lattice = std::move(lattice);
   }
 
   return morphemes;

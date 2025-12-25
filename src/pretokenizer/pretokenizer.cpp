@@ -374,6 +374,303 @@ bool PreTokenizer::tryMatchPercentage(std::string_view text, size_t pos,
   return true;
 }
 
+bool PreTokenizer::tryMatchEmail(std::string_view text, size_t pos,
+                                  PreToken& token) const {
+  // Match email: local-part@domain
+  // Check that we're not starting in the middle of an email-like string
+  if (pos > 0) {
+    char prev = text[pos - 1];
+    if (isAsciiAlnum(prev) || prev == '.' || prev == '-' || prev == '_' ||
+        prev == '+' || prev == '@') {
+      return false;
+    }
+  }
+
+  size_t start = pos;
+  size_t idx = pos;
+
+  // Parse local-part: alphanumeric, dot, hyphen, underscore, plus
+  while (idx < text.size()) {
+    char chr = text[idx];
+    if (isAsciiAlnum(chr) || chr == '.' || chr == '-' || chr == '_' ||
+        chr == '+') {
+      ++idx;
+    } else {
+      break;
+    }
+  }
+
+  // Local-part must not be empty and must not start/end with dot
+  if (idx == start || text[start] == '.' || text[idx - 1] == '.') {
+    return false;
+  }
+
+  // Must have @
+  if (idx >= text.size() || text[idx] != '@') {
+    return false;
+  }
+  ++idx;
+
+  // Parse domain: alphanumeric, dot, hyphen
+  size_t domain_start = idx;
+  while (idx < text.size()) {
+    char chr = text[idx];
+    if (isAsciiAlnum(chr) || chr == '.' || chr == '-') {
+      ++idx;
+    } else {
+      break;
+    }
+  }
+
+  // Domain must not be empty and must contain at least one dot
+  if (idx == domain_start) {
+    return false;
+  }
+
+  std::string_view domain = text.substr(domain_start, idx - domain_start);
+  if (domain.find('.') == std::string_view::npos) {
+    return false;
+  }
+
+  // Domain must not start/end with dot or hyphen
+  if (domain[0] == '.' || domain[0] == '-' ||
+      domain[domain.size() - 1] == '.' || domain[domain.size() - 1] == '-') {
+    return false;
+  }
+
+  token.surface = std::string(text.substr(start, idx - start));
+  token.start = start;
+  token.end = idx;
+  token.type = PreTokenType::Email;
+  token.pos = core::PartOfSpeech::Noun;
+  return true;
+}
+
+bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos,
+                                PreToken& token) const {
+  // Match patterns: HH時, HH時MM分, HH時MM分SS秒
+  // Check that we're not starting in the middle of a number
+  if (pos > 0) {
+    char prev = text[pos - 1];
+    if (isAsciiDigit(prev)) {
+      return false;
+    }
+    // Also check for full-width digits before this position
+    // This requires looking back at UTF-8 boundary
+  }
+
+  std::string hour_str;
+  size_t idx = parseInteger(text, pos, hour_str);
+
+  if (hour_str.empty() || hour_str.size() > 2) {
+    return false;
+  }
+
+  // Validate hour (0-23 or 1-24)
+  int hour = std::stoi(hour_str);
+  if (hour < 0 || hour > 24) {
+    return false;
+  }
+
+  // Check for 時
+  size_t byte_pos = idx;
+  if (byte_pos >= text.size()) {
+    return false;
+  }
+
+  char32_t codepoint = normalize::decodeUtf8(text, byte_pos);
+  if (codepoint != U'時') {
+    return false;
+  }
+  idx = byte_pos;
+
+  // Try to match minutes
+  std::string min_str;
+  size_t min_end = parseInteger(text, idx, min_str);
+
+  if (!min_str.empty() && min_str.size() <= 2) {
+    int minute = std::stoi(min_str);
+    if (minute >= 0 && minute <= 59) {
+      byte_pos = min_end;
+      if (byte_pos < text.size()) {
+        codepoint = normalize::decodeUtf8(text, byte_pos);
+        if (codepoint == U'分') {
+          idx = byte_pos;
+
+          // Try to match seconds
+          std::string sec_str;
+          size_t sec_end = parseInteger(text, idx, sec_str);
+
+          if (!sec_str.empty() && sec_str.size() <= 2) {
+            int second = std::stoi(sec_str);
+            if (second >= 0 && second <= 59) {
+              byte_pos = sec_end;
+              if (byte_pos < text.size()) {
+                codepoint = normalize::decodeUtf8(text, byte_pos);
+                if (codepoint == U'秒') {
+                  idx = byte_pos;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (idx > pos) {
+    token.surface = std::string(text.substr(pos, idx - pos));
+    token.start = pos;
+    token.end = idx;
+    token.type = PreTokenType::Time;
+    token.pos = core::PartOfSpeech::Noun;
+    return true;
+  }
+
+  return false;
+}
+
+// Check if codepoint is valid for hashtag content
+// Allows: Japanese characters, alphanumeric, underscore
+bool isHashtagChar(char32_t codepoint) {
+  // ASCII alphanumeric and underscore
+  if ((codepoint >= 'a' && codepoint <= 'z') ||
+      (codepoint >= 'A' && codepoint <= 'Z') ||
+      (codepoint >= '0' && codepoint <= '9') || codepoint == '_') {
+    return true;
+  }
+  // Hiragana (U+3040-U+309F)
+  if (codepoint >= 0x3040 && codepoint <= 0x309F) {
+    return true;
+  }
+  // Katakana (U+30A0-U+30FF)
+  if (codepoint >= 0x30A0 && codepoint <= 0x30FF) {
+    return true;
+  }
+  // CJK Unified Ideographs (U+4E00-U+9FFF)
+  if (codepoint >= 0x4E00 && codepoint <= 0x9FFF) {
+    return true;
+  }
+  // Full-width alphanumeric (U+FF00-U+FF5E)
+  if (codepoint >= 0xFF00 && codepoint <= 0xFF5E) {
+    return true;
+  }
+  return false;
+}
+
+bool PreTokenizer::tryMatchHashtag(std::string_view text, size_t pos,
+                                    PreToken& token) const {
+  // Match pattern: # + (Japanese chars | alphanumeric | underscore)+
+  if (pos >= text.size()) {
+    return false;
+  }
+
+  // Check for # (ASCII) or ＃ (full-width)
+  size_t idx = pos;
+  size_t byte_pos = pos;
+  char32_t codepoint = normalize::decodeUtf8(text, byte_pos);
+
+  if (codepoint != '#' && codepoint != U'＃') {
+    return false;
+  }
+  idx = byte_pos;
+
+  // Must have at least one valid hashtag character
+  if (idx >= text.size()) {
+    return false;
+  }
+
+  size_t content_start = idx;
+  while (idx < text.size()) {
+    byte_pos = idx;
+    codepoint = normalize::decodeUtf8(text, byte_pos);
+    if (isHashtagChar(codepoint)) {
+      idx = byte_pos;
+    } else {
+      break;
+    }
+  }
+
+  // Must have content after #
+  if (idx == content_start) {
+    return false;
+  }
+
+  token.surface = std::string(text.substr(pos, idx - pos));
+  token.start = pos;
+  token.end = idx;
+  token.type = PreTokenType::Hashtag;
+  token.pos = core::PartOfSpeech::Noun;
+  return true;
+}
+
+bool PreTokenizer::tryMatchMention(std::string_view text, size_t pos,
+                                    PreToken& token) const {
+  // Match pattern: @ + (alphanumeric | underscore)+
+  // Must NOT be followed by domain (that would be email)
+  if (pos >= text.size()) {
+    return false;
+  }
+
+  // Check for @ (ASCII only for mentions)
+  if (text[pos] != '@') {
+    return false;
+  }
+  size_t idx = pos + 1;
+
+  // Must have at least one valid character
+  if (idx >= text.size()) {
+    return false;
+  }
+
+  // Parse username: alphanumeric and underscore only
+  size_t content_start = idx;
+  while (idx < text.size()) {
+    char chr = text[idx];
+    if (isAsciiAlnum(chr) || chr == '_') {
+      ++idx;
+    } else {
+      break;
+    }
+  }
+
+  // Must have content after @
+  if (idx == content_start) {
+    return false;
+  }
+
+  // Check this is NOT an email (no @ followed by domain with dot)
+  // If followed by @, it's invalid
+  // If the content contains a dot followed by more chars, check if it's email-like
+  std::string_view username = text.substr(content_start, idx - content_start);
+
+  // Simple check: mentions don't have dots in username typically
+  // Also check if there's more content that looks like a domain
+  if (idx < text.size() && text[idx] == '.') {
+    // Might be email-like, check for domain pattern
+    size_t check_pos = idx + 1;
+    while (check_pos < text.size()) {
+      char chr = text[check_pos];
+      if (isAsciiAlnum(chr) || chr == '.' || chr == '-') {
+        ++check_pos;
+      } else {
+        break;
+      }
+    }
+    // If we found something that looks like a domain, skip this as mention
+    if (check_pos > idx + 1) {
+      return false;
+    }
+  }
+
+  token.surface = std::string(text.substr(pos, idx - pos));
+  token.start = pos;
+  token.end = idx;
+  token.type = PreTokenType::Mention;
+  token.pos = core::PartOfSpeech::Noun;
+  return true;
+}
+
 bool PreTokenizer::isSentenceBoundary(char32_t codepoint) const {
   return codepoint == U'。' || codepoint == U'！' || codepoint == U'？' ||
          codepoint == U'!' || codepoint == U'?' || codepoint == U'\n';
@@ -393,8 +690,13 @@ PreTokenResult PreTokenizer::process(std::string_view text) const {
     PreToken token;
 
     // Try to match patterns in priority order
+    // Note: URL must come before Email (URLs contain @ in some cases)
+    // Note: Email must come before Mention (emails have @ followed by domain)
     // Note: Percentage must come before Version to avoid "3.14%" being parsed as version
-    if (tryMatchUrl(text, pos, token) || tryMatchDate(text, pos, token) ||
+    // Note: Date must come before Time (日付 includes 日 which looks like time suffix)
+    if (tryMatchUrl(text, pos, token) || tryMatchEmail(text, pos, token) ||
+        tryMatchHashtag(text, pos, token) || tryMatchMention(text, pos, token) ||
+        tryMatchDate(text, pos, token) || tryMatchTime(text, pos, token) ||
         tryMatchCurrency(text, pos, token) ||
         tryMatchStorage(text, pos, token) ||
         tryMatchPercentage(text, pos, token) ||

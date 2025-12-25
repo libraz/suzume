@@ -132,27 +132,47 @@ int cmdDictValidate(const std::vector<std::string>& args, bool /* verbose */) {
 
 int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
   if (args.empty()) {
-    printError("Usage: suzume-cli dict compile <input.tsv> [output.dic]");
+    printError(
+        "Usage: suzume-cli dict compile <input.tsv>... <output.dic>\n"
+        "       suzume-cli dict compile <input.tsv>  (output: input.dic)");
     return 1;
-  }
-
-  const std::string& tsv_path = args[0];
-  std::string dic_path;
-  if (args.size() >= 2) {
-    dic_path = args[1];
-  } else {
-    // Auto-generate output path: replace .tsv with .dic
-    if (tsv_path.size() >= 4 && tsv_path.substr(tsv_path.size() - 4) == ".tsv") {
-      dic_path = tsv_path.substr(0, tsv_path.size() - 4) + ".dic";
-    } else {
-      dic_path = tsv_path + ".dic";
-    }
   }
 
   DictCompiler compiler;
   compiler.setVerbose(verbose);
 
-  auto result = compiler.compile(tsv_path, dic_path);
+  // Single file mode: dict compile foo.tsv -> foo.dic
+  if (args.size() == 1) {
+    const std::string& tsv_path = args[0];
+    std::string dic_path;
+    if (tsv_path.size() >= 4 &&
+        tsv_path.substr(tsv_path.size() - 4) == ".tsv") {
+      dic_path = tsv_path.substr(0, tsv_path.size() - 4) + ".dic";
+    } else {
+      dic_path = tsv_path + ".dic";
+    }
+
+    auto result = compiler.compile(tsv_path, dic_path);
+    if (!result.hasValue()) {
+      printError("Compile error: " + result.error().message);
+      return 1;
+    }
+
+    std::cout << "Compiled " << result.value() << " entries to " << dic_path
+              << "\n";
+    return 0;
+  }
+
+  // Multi-file mode: last arg is output .dic, rest are input .tsv files
+  const std::string& dic_path = args.back();
+  if (dic_path.size() < 4 || dic_path.substr(dic_path.size() - 4) != ".dic") {
+    printError("Output file must have .dic extension: " + dic_path);
+    return 1;
+  }
+
+  std::vector<std::string> tsv_paths(args.begin(), args.end() - 1);
+
+  auto result = compiler.compileMultiple(tsv_paths, dic_path);
   if (!result.hasValue()) {
     printError("Compile error: " + result.error().message);
     return 1;

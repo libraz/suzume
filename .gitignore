@@ -53,6 +53,13 @@ backup/
 # Compiled dictionaries
 *.dic
 
+# Dictionary cleanup artifacts
+data/core/original/
+data/core/noise/
+data/core/cleaned/
+data/user/original/
+data/user/noise/
+
 # Dependencies
 third_party/*
 !third_party/CMakeLists.txt

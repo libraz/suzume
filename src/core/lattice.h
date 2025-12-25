@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 
+#include "dictionary/dictionary.h"
 #include "types.h"
 
 namespace suzume::core {
@@ -43,6 +44,7 @@ struct LatticeEdge {
   float cost{0.0F};                        // Cost
   EdgeFlags flags{EdgeFlags::None};        // Flags
   std::string_view lemma;                  // Lemma (optional)
+  dictionary::ConjugationType conj_type{dictionary::ConjugationType::None};  // Conjugation type
 
   // Flag constants for compatibility
   static constexpr uint8_t kFromDictionary = static_cast<uint8_t>(EdgeFlags::FromDictionary);
@@ -87,11 +89,13 @@ class Lattice {
    * @param cost Cost
    * @param flags Flags
    * @param lemma Lemma (optional)
+   * @param conj_type Conjugation type (optional)
    * @return Edge ID
    */
   size_t addEdge(std::string_view surface, uint32_t start, uint32_t end,
                  PartOfSpeech pos, float cost, uint8_t flags,
-                 std::string_view lemma = {});
+                 std::string_view lemma = {},
+                 dictionary::ConjugationType conj_type = dictionary::ConjugationType::None);
 
   /**
    * @brief Get all edges starting at a position

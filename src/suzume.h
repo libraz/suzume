@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "analysis/analyzer.h"
+#include "core/lattice.h"
 #include "core/morpheme.h"
 #include "core/types.h"
 #include "dictionary/user_dict.h"
@@ -73,6 +74,15 @@ class Suzume {
    * @return Vector of morphemes
    */
   std::vector<core::Morpheme> analyze(std::string_view text) const;
+
+  /**
+   * @brief Debug analyze - returns lattice for debugging
+   * @param text UTF-8 encoded Japanese text
+   * @param out_lattice Output lattice (if not null)
+   * @return Vector of morphemes
+   */
+  std::vector<core::Morpheme> analyzeDebug(std::string_view text,
+                                           core::Lattice* out_lattice) const;
 
   /**
    * @brief Generate tags from text

@@ -562,5 +562,467 @@ TEST_F(PreTokenizerTest, NoMatch_PlainNumber) {
   EXPECT_FALSE(result.spans.empty());
 }
 
+// ===== Email Tests =====
+
+TEST_F(PreTokenizerTest, MatchEmail_Basic) {
+  auto result = pretokenizer_.process("user@example.com");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "user@example.com");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Email);
+}
+
+TEST_F(PreTokenizerTest, MatchEmail_WithSubdomain) {
+  auto result = pretokenizer_.process("user@mail.example.com");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "user@mail.example.com");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Email);
+}
+
+TEST_F(PreTokenizerTest, MatchEmail_WithPlus) {
+  auto result = pretokenizer_.process("user+tag@example.com");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "user+tag@example.com");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Email);
+}
+
+TEST_F(PreTokenizerTest, MatchEmail_WithDots) {
+  auto result = pretokenizer_.process("first.last@example.com");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "first.last@example.com");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Email);
+}
+
+TEST_F(PreTokenizerTest, MatchEmail_InJapaneseText) {
+  auto result = pretokenizer_.process("連絡先: user@example.com まで");
+  bool found_email = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Email) {
+      found_email = true;
+      EXPECT_EQ(token.surface, "user@example.com");
+    }
+  }
+  EXPECT_TRUE(found_email);
+}
+
+TEST_F(PreTokenizerTest, MatchEmail_MultipleInText) {
+  auto result =
+      pretokenizer_.process("a@example.com と b@example.com");
+  int email_count = 0;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Email) {
+      email_count++;
+    }
+  }
+  EXPECT_EQ(email_count, 2);
+}
+
+TEST_F(PreTokenizerTest, NoMatch_InvalidEmail_NoDomain) {
+  auto result = pretokenizer_.process("user@");
+  bool has_email = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Email) {
+      has_email = true;
+    }
+  }
+  EXPECT_FALSE(has_email);
+}
+
+TEST_F(PreTokenizerTest, NoMatch_InvalidEmail_NoDot) {
+  auto result = pretokenizer_.process("user@localhost");
+  bool has_email = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Email) {
+      has_email = true;
+    }
+  }
+  EXPECT_FALSE(has_email);
+}
+
+TEST_F(PreTokenizerTest, NoMatch_InvalidEmail_StartWithDot) {
+  auto result = pretokenizer_.process(".user@example.com");
+  bool has_email = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Email) {
+      has_email = true;
+    }
+  }
+  EXPECT_FALSE(has_email);
+}
+
+// ===== Time Tests =====
+
+TEST_F(PreTokenizerTest, MatchTime_HourOnly) {
+  auto result = pretokenizer_.process("14時");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "14時");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Time);
+}
+
+TEST_F(PreTokenizerTest, MatchTime_HourMinute) {
+  auto result = pretokenizer_.process("14時30分");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "14時30分");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Time);
+}
+
+TEST_F(PreTokenizerTest, MatchTime_HourMinuteSecond) {
+  auto result = pretokenizer_.process("14時30分45秒");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "14時30分45秒");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Time);
+}
+
+TEST_F(PreTokenizerTest, MatchTime_SingleDigitHour) {
+  auto result = pretokenizer_.process("9時");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "9時");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Time);
+}
+
+TEST_F(PreTokenizerTest, MatchTime_MidnightAndNoon) {
+  auto result = pretokenizer_.process("0時と12時");
+  int time_count = 0;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Time) {
+      time_count++;
+    }
+  }
+  EXPECT_EQ(time_count, 2);
+}
+
+TEST_F(PreTokenizerTest, MatchTime_24Hour) {
+  auto result = pretokenizer_.process("24時");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "24時");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Time);
+}
+
+TEST_F(PreTokenizerTest, MatchTime_InJapaneseText) {
+  auto result = pretokenizer_.process("会議は14時30分から開始");
+  bool found_time = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Time) {
+      found_time = true;
+      EXPECT_EQ(token.surface, "14時30分");
+    }
+  }
+  EXPECT_TRUE(found_time);
+}
+
+TEST_F(PreTokenizerTest, MatchTime_MultipleInText) {
+  auto result =
+      pretokenizer_.process("10時から12時まで");
+  int time_count = 0;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Time) {
+      time_count++;
+    }
+  }
+  EXPECT_EQ(time_count, 2);
+}
+
+TEST_F(PreTokenizerTest, NoMatch_InvalidTime_HourTooLarge) {
+  auto result = pretokenizer_.process("25時");
+  bool has_time = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Time) {
+      has_time = true;
+    }
+  }
+  EXPECT_FALSE(has_time);
+}
+
+TEST_F(PreTokenizerTest, NoMatch_InvalidTime_MinuteTooLarge) {
+  auto result = pretokenizer_.process("14時60分");
+  // Should match only 14時, not 14時60分
+  bool found_partial = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Time && token.surface == "14時") {
+      found_partial = true;
+    }
+  }
+  EXPECT_TRUE(found_partial);
+}
+
+// ===== Complex Tests with Email and Time =====
+
+TEST_F(PreTokenizerTest, Complex_TechnicalDocumentWithEmail) {
+  auto result = pretokenizer_.process(
+      "詳細は user@example.com にお問い合わせください。");
+  bool has_email = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Email) {
+      has_email = true;
+    }
+  }
+  EXPECT_TRUE(has_email);
+}
+
+TEST_F(PreTokenizerTest, Complex_ScheduleWithTime) {
+  auto result = pretokenizer_.process(
+      "2024年12月23日 14時30分に会議室Aで開催。");
+
+  bool has_date = false;
+  bool has_time = false;
+
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Date) has_date = true;
+    if (token.type == PreTokenType::Time) has_time = true;
+  }
+
+  EXPECT_TRUE(has_date);
+  EXPECT_TRUE(has_time);
+}
+
+TEST_F(PreTokenizerTest, Complex_AllPatterns) {
+  auto result = pretokenizer_.process(
+      "2024年12月23日 14時30分。user@example.com へ連絡。"
+      "詳細は https://example.com を参照。価格は100万円、達成率50%。");
+
+  bool has_date = false;
+  bool has_time = false;
+  bool has_email = false;
+  bool has_url = false;
+  bool has_currency = false;
+  bool has_percentage = false;
+
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Date) has_date = true;
+    if (token.type == PreTokenType::Time) has_time = true;
+    if (token.type == PreTokenType::Email) has_email = true;
+    if (token.type == PreTokenType::Url) has_url = true;
+    if (token.type == PreTokenType::Currency) has_currency = true;
+    if (token.type == PreTokenType::Percentage) has_percentage = true;
+  }
+
+  EXPECT_TRUE(has_date);
+  EXPECT_TRUE(has_time);
+  EXPECT_TRUE(has_email);
+  EXPECT_TRUE(has_url);
+  EXPECT_TRUE(has_currency);
+  EXPECT_TRUE(has_percentage);
+}
+
+// ===== Hashtag Tests =====
+
+TEST_F(PreTokenizerTest, MatchHashtag_English) {
+  auto result = pretokenizer_.process("#programming");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "#programming");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Hashtag);
+}
+
+TEST_F(PreTokenizerTest, MatchHashtag_Japanese) {
+  auto result = pretokenizer_.process("#プログラミング");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "#プログラミング");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Hashtag);
+}
+
+TEST_F(PreTokenizerTest, MatchHashtag_Kanji) {
+  auto result = pretokenizer_.process("#日本語");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "#日本語");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Hashtag);
+}
+
+TEST_F(PreTokenizerTest, MatchHashtag_Mixed) {
+  auto result = pretokenizer_.process("#C言語");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "#C言語");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Hashtag);
+}
+
+TEST_F(PreTokenizerTest, MatchHashtag_WithUnderscore) {
+  auto result = pretokenizer_.process("#hello_world");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "#hello_world");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Hashtag);
+}
+
+TEST_F(PreTokenizerTest, MatchHashtag_FullWidth) {
+  auto result = pretokenizer_.process("＃タグ");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "＃タグ");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Hashtag);
+}
+
+TEST_F(PreTokenizerTest, MatchHashtag_InText) {
+  auto result = pretokenizer_.process("今日は #プログラミング を勉強");
+  bool found_hashtag = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Hashtag) {
+      found_hashtag = true;
+      EXPECT_EQ(token.surface, "#プログラミング");
+    }
+  }
+  EXPECT_TRUE(found_hashtag);
+}
+
+TEST_F(PreTokenizerTest, MatchHashtag_MultipleInText) {
+  auto result = pretokenizer_.process("#hello #world #日本");
+  int hashtag_count = 0;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Hashtag) {
+      hashtag_count++;
+    }
+  }
+  EXPECT_EQ(hashtag_count, 3);
+}
+
+TEST_F(PreTokenizerTest, NoMatch_HashtagEmpty) {
+  auto result = pretokenizer_.process("# ");
+  bool has_hashtag = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Hashtag) {
+      has_hashtag = true;
+    }
+  }
+  EXPECT_FALSE(has_hashtag);
+}
+
+TEST_F(PreTokenizerTest, NoMatch_HashtagSymbolOnly) {
+  auto result = pretokenizer_.process("#!");
+  bool has_hashtag = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Hashtag) {
+      has_hashtag = true;
+    }
+  }
+  EXPECT_FALSE(has_hashtag);
+}
+
+// ===== Mention Tests =====
+
+TEST_F(PreTokenizerTest, MatchMention_Basic) {
+  auto result = pretokenizer_.process("@user");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "@user");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Mention);
+}
+
+TEST_F(PreTokenizerTest, MatchMention_WithUnderscore) {
+  auto result = pretokenizer_.process("@user_name");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "@user_name");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Mention);
+}
+
+TEST_F(PreTokenizerTest, MatchMention_WithNumbers) {
+  auto result = pretokenizer_.process("@user123");
+  ASSERT_EQ(result.tokens.size(), 1);
+  EXPECT_EQ(result.tokens[0].surface, "@user123");
+  EXPECT_EQ(result.tokens[0].type, PreTokenType::Mention);
+}
+
+TEST_F(PreTokenizerTest, MatchMention_InText) {
+  auto result = pretokenizer_.process("Thanks @alice for the help");
+  bool found_mention = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Mention) {
+      found_mention = true;
+      EXPECT_EQ(token.surface, "@alice");
+    }
+  }
+  EXPECT_TRUE(found_mention);
+}
+
+TEST_F(PreTokenizerTest, MatchMention_InJapaneseText) {
+  auto result = pretokenizer_.process("@taro さんへ");
+  bool found_mention = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Mention) {
+      found_mention = true;
+      EXPECT_EQ(token.surface, "@taro");
+    }
+  }
+  EXPECT_TRUE(found_mention);
+}
+
+TEST_F(PreTokenizerTest, MatchMention_MultipleInText) {
+  auto result = pretokenizer_.process("@alice and @bob");
+  int mention_count = 0;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Mention) {
+      mention_count++;
+    }
+  }
+  EXPECT_EQ(mention_count, 2);
+}
+
+TEST_F(PreTokenizerTest, NoMatch_MentionEmpty) {
+  auto result = pretokenizer_.process("@ ");
+  bool has_mention = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Mention) {
+      has_mention = true;
+    }
+  }
+  EXPECT_FALSE(has_mention);
+}
+
+TEST_F(PreTokenizerTest, EmailVsMention_EmailWins) {
+  // Email should be detected, not mention
+  auto result = pretokenizer_.process("user@example.com");
+  bool has_email = false;
+  bool has_mention = false;
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Email) has_email = true;
+    if (token.type == PreTokenType::Mention) has_mention = true;
+  }
+  EXPECT_TRUE(has_email);
+  EXPECT_FALSE(has_mention);
+}
+
+// ===== Complex Tests with Hashtag and Mention =====
+
+TEST_F(PreTokenizerTest, Complex_SNSPost) {
+  auto result = pretokenizer_.process(
+      "@alice #hello を投稿しました。詳細は https://example.com を参照。");
+
+  bool has_mention = false;
+  bool has_hashtag = false;
+  bool has_url = false;
+
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Mention) has_mention = true;
+    if (token.type == PreTokenType::Hashtag) has_hashtag = true;
+    if (token.type == PreTokenType::Url) has_url = true;
+  }
+
+  EXPECT_TRUE(has_mention);
+  EXPECT_TRUE(has_hashtag);
+  EXPECT_TRUE(has_url);
+}
+
+TEST_F(PreTokenizerTest, Complex_AllPatternsIncludingSNS) {
+  auto result = pretokenizer_.process(
+      "2024年12月23日 14時30分。@user が #プログラミング について投稿。"
+      "連絡先: contact@example.com 詳細: https://example.com");
+
+  bool has_date = false;
+  bool has_time = false;
+  bool has_mention = false;
+  bool has_hashtag = false;
+  bool has_email = false;
+  bool has_url = false;
+
+  for (const auto& token : result.tokens) {
+    if (token.type == PreTokenType::Date) has_date = true;
+    if (token.type == PreTokenType::Time) has_time = true;
+    if (token.type == PreTokenType::Mention) has_mention = true;
+    if (token.type == PreTokenType::Hashtag) has_hashtag = true;
+    if (token.type == PreTokenType::Email) has_email = true;
+    if (token.type == PreTokenType::Url) has_url = true;
+  }
+
+  EXPECT_TRUE(has_date);
+  EXPECT_TRUE(has_time);
+  EXPECT_TRUE(has_mention);
+  EXPECT_TRUE(has_hashtag);
+  EXPECT_TRUE(has_email);
+  EXPECT_TRUE(has_url);
+}
+
 }  // namespace
 }  // namespace suzume::pretokenizer

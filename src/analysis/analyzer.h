@@ -48,11 +48,31 @@ class Analyzer {
   void addUserDictionary(std::shared_ptr<dictionary::UserDictionary> dict);
 
   /**
+   * @brief Try to auto-load core dictionary from standard paths
+   * @return true if loaded successfully
+   */
+  bool tryAutoLoadCoreDictionary();
+
+  /**
+   * @brief Check if core binary dictionary is loaded
+   */
+  bool hasCoreBinaryDictionary() const;
+
+  /**
    * @brief Analyze text
    * @param text UTF-8 text
    * @return Vector of morphemes
    */
   std::vector<core::Morpheme> analyze(std::string_view text) const;
+
+  /**
+   * @brief Debug analyze - returns lattice information for debugging
+   * @param text UTF-8 text
+   * @param out_lattice Output lattice (if not null)
+   * @return Vector of morphemes
+   */
+  std::vector<core::Morpheme> analyzeDebug(std::string_view text,
+                                           core::Lattice* out_lattice) const;
 
   /**
    * @brief Get analysis mode
@@ -72,6 +92,8 @@ class Analyzer {
   const dictionary::DictionaryManager& dictionaryManager() const {
     return dict_manager_;
   }
+
+  dictionary::DictionaryManager& dictionaryManager() { return dict_manager_; }
 
  private:
   AnalyzerOptions options_;

@@ -2,17 +2,50 @@
 
 A lightweight Japanese morphological analyzer written in C++17.
 
-## Overview
+## Why Suzume?
 
-Suzume is a minimal-dependency Japanese text tokenizer and part-of-speech tagger designed for tag extraction and text classification. It provides boundary detection and lemmatization without requiring large external dictionaries.
+Existing Japanese morphological analyzers (MeCab, ChaSen, etc.) assume:
+- Large dictionaries are always available
+- Dictionary entries are "ground truth"
+- Unknown words are exceptions to minimize
+
+**Suzume takes a different stance:**
+
+| Traditional | Suzume |
+|-------------|--------|
+| Dictionary = correct answer | Dictionary = feature signal |
+| Unknown word = failure | Unknown word = normal case |
+| Incremental decisions | All candidates → Viterbi decides |
+| Large connection tables | Lightweight feature-based decoding |
+| Native runtime only | WASM-first design |
+
+### Key Design Principles
+
+1. **Dictionary-growth-first** — Works with minimal dictionary, improves as you add entries. No catastrophic failures from missing words.
+
+2. **Non-incremental tokenization** — Generates both merge and split candidates, lets Viterbi find global optimum. No premature commitments.
+
+3. **No connection table dependency** — Uses surface features + lightweight POS bigram instead of massive transition matrices. Simple, portable, robust.
+
+4. **Unknown word tolerance** — Character-type sequences, kanji runs, katakana neologisms, alphanumeric compounds are all first-class candidates evaluated alongside dictionary entries.
+
+5. **WASM-ready** — No ICU, no Boost, no file I/O in core. Runs in browser/Node.js with small memory footprint.
+
+### Use Cases
+
+- Search index generation
+- Tag extraction / classification
+- Dictionary bootstrapping pipelines
+- Web/WASM Japanese text processing
+- Domains with high neologism density
 
 ## Features
 
-- **ICU-independent**: Custom UTF-8 normalization without external Unicode libraries
-- **Trie-based dictionary**: Core dictionary + user dictionary support
-- **Viterbi algorithm**: Lattice-based optimal path finding
-- **Verb conjugation analysis**: 800+ inflection patterns (Godan, Ichidan, Suru, Kuru)
-- **Binary dictionary format**: Double-Array Trie with efficient serialization
+- **Zero external dependencies**: Custom UTF-8 normalization (no ICU)
+- **Trie-based dictionary**: Core + user dictionary with Double-Array Trie
+- **Viterbi algorithm**: Lattice-based global optimization
+- **Verb conjugation**: 800+ inflection patterns (Godan, Ichidan, Suru, Kuru)
+- **Binary dictionary**: Efficient serialization format
 - **CLI tool**: Interactive mode, JSON/TSV output, dictionary management
 
 ## Requirements

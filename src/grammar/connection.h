@@ -41,6 +41,7 @@ constexpr uint16_t kVerbOnbinkei = 0x0103;  // 音便形: 書い (te/ta-ready)
 constexpr uint16_t kVerbPotential = 0x0104; // 可能形語幹: 書け (e-row)
 constexpr uint16_t kIAdjStem = 0x0105;      // い形容詞語幹: 美し (ku-form ready)
 constexpr uint16_t kVerbVolitional = 0x0106;  // 意志形: 書こう, 食べよう
+constexpr uint16_t kVerbKatei = 0x0107;       // 仮定形: 書け (e-row for Godan)
 
 // === Auxiliary inputs - what they require (0x02xx) ===
 constexpr uint16_t kAuxMasu = 0x0200;      // ます (requires 連用形)
@@ -61,6 +62,7 @@ constexpr uint16_t kAuxReru = 0x020E;      // れる/られる (requires 未然�
 constexpr uint16_t kAuxSeru = 0x020F;      // せる/させる (requires 未然形)
 constexpr uint16_t kAuxRenyokei = 0x0210;  // 連用形 compounds (すぎる, etc.)
 constexpr uint16_t kAuxSou = 0x0211;       // そう (looks like, requires 連用形)
+constexpr uint16_t kAuxCopula = 0x0212;    // だ/です/である (requires noun/na-adj)
 
 // === Auxiliary outputs - what they provide (0x03xx) ===
 constexpr uint16_t kAuxOutBase = 0x0300;  // Auxiliary in base form
