@@ -58,6 +58,14 @@ inline std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"下げる", POS::Verb, 0.3F, "下げる", false, false, false, CT::Ichidan,
        "さげる"},
 
+      // 見つける: Ichidan (見つけて → 見つける, not 見つく)
+      {"見つける", POS::Verb, 0.3F, "見つける", false, false, false, CT::Ichidan,
+       "みつける"},
+
+      // 見つかる: GodanRa (intransitive pair of 見つける)
+      {"見つかる", POS::Verb, 0.3F, "見つかる", false, false, false, CT::GodanRa,
+       "みつかる"},
+
       // 上がる: GodanRa (intransitive pair of 上げる)
       // Critical for preventing "上がらない" → "上" + "が" + "らない"
       {"上がる", POS::Verb, 0.3F, "上がる", false, false, false, CT::GodanRa,
@@ -66,6 +74,41 @@ inline std::vector<DictionaryEntry> getEssentialVerbEntries() {
       // 下がる: GodanRa (intransitive pair of 下げる)
       {"下がる", POS::Verb, 0.3F, "下がる", false, false, false, CT::GodanRa,
        "さがる"},
+
+      // ========================================
+      // Common Godan verbs (frequently misidentified)
+      // ========================================
+      // 喜ぶ: GodanBa (喜んで → 喜ぶ, not 喜む)
+      {"喜ぶ", POS::Verb, 0.3F, "喜ぶ", false, false, false, CT::GodanBa,
+       "よろこぶ"},
+
+      // 学ぶ: GodanBa (学んで → 学ぶ, not 学む)
+      {"学ぶ", POS::Verb, 0.3F, "学ぶ", false, false, false, CT::GodanBa,
+       "まなぶ"},
+
+      // 遊ぶ: GodanBa (遊んで → 遊ぶ, not 遊む)
+      {"遊ぶ", POS::Verb, 0.3F, "遊ぶ", false, false, false, CT::GodanBa,
+       "あそぶ"},
+
+      // 飛ぶ: GodanBa (飛んで → 飛ぶ, not 飛む)
+      {"飛ぶ", POS::Verb, 0.3F, "飛ぶ", false, false, false, CT::GodanBa,
+       "とぶ"},
+
+      // 呼ぶ: GodanBa (呼んで → 呼ぶ, not 呼む)
+      {"呼ぶ", POS::Verb, 0.3F, "呼ぶ", false, false, false, CT::GodanBa,
+       "よぶ"},
+
+      // 選ぶ: GodanBa (選んで → 選ぶ, not 選む)
+      {"選ぶ", POS::Verb, 0.3F, "選ぶ", false, false, false, CT::GodanBa,
+       "えらぶ"},
+
+      // 並ぶ: GodanBa (並んで → 並ぶ, not 並む)
+      {"並ぶ", POS::Verb, 0.3F, "並ぶ", false, false, false, CT::GodanBa,
+       "ならぶ"},
+
+      // 結ぶ: GodanBa (結んで → 結ぶ, not 結む)
+      {"結ぶ", POS::Verb, 0.3F, "結ぶ", false, false, false, CT::GodanBa,
+       "むすぶ"},
 
       // ========================================
       // Godan verbs with special patterns

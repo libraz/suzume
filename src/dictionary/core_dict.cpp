@@ -233,6 +233,54 @@ std::vector<DictionaryEntry> expandVerbEntry(const DictionaryEntry& entry) {
   return result;
 }
 
+// Expand an i-adjective entry into conjugated forms
+std::vector<DictionaryEntry> expandAdjectiveEntry(const DictionaryEntry& entry) {
+  std::vector<DictionaryEntry> result;
+
+  if (entry.conj_type != ConjugationType::IAdjective) {
+    // Not an i-adjective, no expansion needed
+    result.push_back(entry);
+    return result;
+  }
+
+  // Get stem by removing final い
+  std::string surface = entry.surface;
+  if (surface.size() < 3 || surface.substr(surface.size() - 3) != "い") {
+    // Doesn't end with い, return as-is
+    result.push_back(entry);
+    return result;
+  }
+  std::string stem = surface.substr(0, surface.size() - 3);
+  std::string lemma = entry.lemma.empty() ? entry.surface : entry.lemma;
+
+  // I-adjective conjugation suffixes
+  // Format: {suffix, creates form}
+  static const std::vector<std::pair<std::string, std::string>> kIAdjSuffixes = {
+      {"い", ""},           // Base form
+      {"かった", ""},       // Past
+      {"くない", ""},       // Negative
+      {"くなかった", ""},   // Negative past
+      {"くて", ""},         // Te-form
+      {"ければ", ""},       // Conditional
+      {"く", ""},           // Adverbial
+      {"さ", ""},           // Nominalization
+      {"かったら", ""},     // Conditional past
+      {"くなる", ""},       // Become ~
+      {"くなった", ""},     // Became ~
+      {"そう", ""},         // Looks like ~
+  };
+
+  for (const auto& [suffix, unused] : kIAdjSuffixes) {
+    DictionaryEntry new_entry = entry;
+    new_entry.surface = stem + suffix;
+    new_entry.lemma = lemma;
+    new_entry.conj_type = ConjugationType::None;  // Already expanded
+    result.push_back(new_entry);
+  }
+
+  return result;
+}
+
 }  // namespace
 
 CoreDictionary::CoreDictionary() { initializeEntries(); }
@@ -339,7 +387,38 @@ void CoreDictionary::initializeEntries() {
   addEntries(greetings);
   addEntries(adverbs);
   addEntries(na_adjectives);
-  addEntries(i_adjectives);
+
+  // Add i-adjective entries with conjugation expansion
+  // I-adjectives with ConjugationType::IAdjective will have their conjugated forms auto-generated
+  auto addAdjectiveEntries = [this](const std::vector<DictionaryEntry>& source) {
+    for (const auto& entry : source) {
+      auto expanded = expandAdjectiveEntry(entry);
+      for (const auto& exp_entry : expanded) {
+        auto idx = static_cast<uint32_t>(entries_.size());
+        entries_.push_back(exp_entry);
+        trie_.insert(exp_entry.surface, idx);
+
+        // Auto-generate hiragana entries from reading for base form only
+        // (avoid duplicating conjugated forms for each reading variant)
+        if (!entry.reading.empty() && entry.reading != entry.surface &&
+            exp_entry.surface == entry.surface) {  // Only for base form
+          DictionaryEntry reading_entry = entry;  // Use original entry with conj_type
+          reading_entry.surface = entry.reading;
+          reading_entry.lemma = entry.surface;  // Lemma points to kanji form
+
+          // Also expand reading entry (conj_type is preserved from original)
+          auto reading_expanded = expandAdjectiveEntry(reading_entry);
+          for (const auto& rexp_entry : reading_expanded) {
+            auto ridx = static_cast<uint32_t>(entries_.size());
+            entries_.push_back(rexp_entry);
+            trie_.insert(rexp_entry.surface, ridx);
+          }
+        }
+      }
+    }
+  };
+
+  addAdjectiveEntries(i_adjectives);
 
   // Add verb entries with conjugation expansion
   // Verbs with ConjugationType set will have their conjugated forms auto-generated

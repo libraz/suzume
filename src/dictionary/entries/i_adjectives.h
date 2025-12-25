@@ -93,6 +93,7 @@ inline std::vector<DictionaryEntry> getIAdjectiveEntries() {
       {"若い", POS::Adjective, 0.3F, "若い", false, false, false, CT::IAdjective, "わかい"},
 
       // ===== Quality/Evaluation =====
+      {"面白い", POS::Adjective, 0.3F, "面白い", false, false, false, CT::IAdjective, "おもしろい"},
       {"良い", POS::Adjective, 0.3F, "良い", false, false, false, CT::IAdjective, "よい"},
       {"いい", POS::Adjective, 0.3F, "いい", false, false, false, CT::IAdjective, ""},
       {"悪い", POS::Adjective, 0.3F, "悪い", false, false, false, CT::IAdjective, "わるい"},
@@ -115,6 +116,7 @@ inline std::vector<DictionaryEntry> getIAdjectiveEntries() {
       {"少ない", POS::Adjective, 0.3F, "少ない", false, false, false, CT::IAdjective, "すくない"},
 
       // ===== Emotions/Mental states =====
+      {"可愛い", POS::Adjective, 0.3F, "可愛い", false, false, false, CT::IAdjective, "かわいい"},
       {"嬉しい", POS::Adjective, 0.3F, "嬉しい", false, false, false, CT::IAdjective, "うれしい"},
       {"悲しい", POS::Adjective, 0.3F, "悲しい", false, false, false, CT::IAdjective, "かなしい"},
       {"楽しい", POS::Adjective, 0.3F, "楽しい", false, false, false, CT::IAdjective, "たのしい"},
@@ -141,8 +143,13 @@ inline std::vector<DictionaryEntry> getIAdjectiveEntries() {
       {"不味い", POS::Adjective, 0.3F, "不味い", false, false, false, CT::IAdjective, "まずい"},
 
       // ===== Common hiragana adjectives =====
+      // Note: Adjectives with kanji + reading auto-generate hiragana entries
+      // Only pure-hiragana adjectives need explicit registration here
       {"おいしい", POS::Adjective, 0.3F, "おいしい", false, false, false, CT::IAdjective, ""},
       {"まずい", POS::Adjective, 0.3F, "まずい", false, false, false, CT::IAdjective, ""},
+      {"つまらない", POS::Adjective, 0.3F, "つまらない", false, false, false, CT::IAdjective, ""},
+      {"かわいい", POS::Adjective, 0.3F, "可愛い", false, false, false, CT::IAdjective, ""},
+      {"うるさい", POS::Adjective, 0.3F, "うるさい", false, false, false, CT::IAdjective, ""},
 
       // ===== Colloquial/Slang adjectives =====
       {"やばい", POS::Adjective, 0.3F, "やばい", false, false, false, CT::IAdjective, ""},

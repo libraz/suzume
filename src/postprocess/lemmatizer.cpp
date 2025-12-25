@@ -261,9 +261,12 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface) const {
   }
 
   // If dictionary is available, try to find a verified candidate
+  // For dictionary-verified candidates, use lower confidence threshold (0.3F)
+  // Dictionary verification compensates for confidence penalties from heuristics
+  // (e.g., all-kanji i-adjective stems like 面白 get penalized but are valid)
   if (dict_manager_ != nullptr) {
     for (const auto& candidate : candidates) {
-      if (candidate.confidence > 0.5F && verifyCandidateWithDictionary(candidate)) {
+      if (candidate.confidence > 0.3F && verifyCandidateWithDictionary(candidate)) {
         return candidate.base_form;
       }
     }

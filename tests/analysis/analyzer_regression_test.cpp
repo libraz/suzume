@@ -972,7 +972,8 @@ TEST(AnalyzerTest, Regression_HiraganaAdjective) {
   ASSERT_EQ(result.size(), 1) << "まずかった should be single token";
   EXPECT_EQ(result[0].surface, "まずかった");
   EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective);
-  EXPECT_EQ(result[0].lemma, "まずい");
+  // Hiragana input normalizes to kanji lemma when kanji form exists
+  EXPECT_EQ(result[0].lemma, "不味い");
 }
 
 TEST(AnalyzerTest, Regression_HiraganaAdjective_Oishii) {
