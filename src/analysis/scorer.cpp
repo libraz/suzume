@@ -175,7 +175,19 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
 
 float Scorer::connectionCost(const core::LatticeEdge& prev,
                              const core::LatticeEdge& next) const {
-  return bigramCost(prev.pos, next.pos);
+  float cost = bigramCost(prev.pos, next.pos);
+
+  // Copula だ/です cannot follow verbs
+  // e.g., 食べただ ✗, 食べましただ ✗
+  // Valid: 学生だ ○, 静かだ ○
+  if (prev.pos == core::PartOfSpeech::Verb &&
+      next.pos == core::PartOfSpeech::Auxiliary) {
+    if (next.surface == "だ" || next.surface == "です") {
+      cost += 3.0F;  // Strong penalty for invalid grammar
+    }
+  }
+
+  return cost;
 }
 
 }  // namespace suzume::analysis

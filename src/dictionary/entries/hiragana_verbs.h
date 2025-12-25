@@ -67,10 +67,21 @@ inline std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"はじめる", POS::Verb, 0.3F, "はじめる", false, false, false, CT::Ichidan, ""},
 
       // ========================================
+      // Godan-Ka verbs (五段カ行)
+      // ========================================
+      // いただく (to receive, humble form of もらう) - starts with い
+      // Without this entry, it's incorrectly parsed as i-adjective "いただい"
+      {"いただく", POS::Verb, 0.3F, "いただく", false, false, false, CT::GodanKa, ""},
+
+      // ========================================
       // Godan-Ra verbs (五段ラ行)
       // ========================================
       // わかる (to understand) - starts with わ
       {"わかる", POS::Verb, 0.3F, "わかる", false, false, false, CT::GodanRa, ""},
+
+      // なる (to become) - starts with な
+      // Without this entry, "なりました" splits as "な" + "りました"
+      {"なる", POS::Verb, 0.3F, "なる", false, false, false, CT::GodanRa, ""},
 
       // できあがる (to be completed) - compound hiragana verb
       {"できあがる", POS::Verb, 0.3F, "できあがる", false, false, false, CT::GodanRa, ""},

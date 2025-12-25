@@ -1837,5 +1837,141 @@ TEST(AnalyzerTest, Regression_KodomoTachi) {
       << "たち should be Other (suffix)";
 }
 
+// =============================================================================
+// Regression: いただく verb should not be parsed as i-adjective
+// =============================================================================
+// Bug: いただく was parsed as ADJ with lemma いただい
+// Fix: Added いただく to hiragana_verbs.h as GodanKa verb
+
+TEST(AnalyzerTest, Regression_ItadakuVerb) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("いただく");
+  ASSERT_EQ(result.size(), 1);
+
+  EXPECT_EQ(result[0].surface, "いただく");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
+      << "いただく should be Verb, not Adjective";
+  EXPECT_EQ(result[0].lemma, "いただく");
+}
+
+TEST(AnalyzerTest, Regression_ItadakimasuVerb) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("いただきます");
+  ASSERT_EQ(result.size(), 1);
+
+  EXPECT_EQ(result[0].surface, "いただきます");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "いただく");
+}
+
+// =============================================================================
+// Regression: なる verb should not split as な + りました
+// =============================================================================
+// Bug: なりました was split as な (PARTICLE) + りました (VERB)
+// Fix: Added なる to hiragana_verbs.h as GodanRa verb
+
+TEST(AnalyzerTest, Regression_NaruVerb) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("なりました");
+  ASSERT_EQ(result.size(), 1);
+
+  EXPECT_EQ(result[0].surface, "なりました");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "なる");
+}
+
+TEST(AnalyzerTest, Regression_YoiNiNaru) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("容易になりました");
+  ASSERT_GE(result.size(), 3);
+
+  // Find なりました token
+  bool found = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "なりました") {
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Verb);
+      EXPECT_EQ(mor.lemma, "なる");
+      found = true;
+      break;
+    }
+  }
+  EXPECT_TRUE(found) << "なりました should be single verb token";
+}
+
+// =============================================================================
+// Regression: VERB + だ (copula) should be penalized
+// =============================================================================
+// Bug: 食べさせていただきます was split as 食べさせていた + だ + きます
+// Fix: Added connection cost penalty for VERB → だ (copula)
+
+TEST(AnalyzerTest, Regression_TeItadakimasu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("食べさせていただきます");
+  ASSERT_EQ(result.size(), 1);
+
+  EXPECT_EQ(result[0].surface, "食べさせていただきます");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "食べる");
+}
+
+TEST(AnalyzerTest, Regression_TaioSaseTeItadakimasu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("対応させていただきます");
+  ASSERT_EQ(result.size(), 1);
+
+  EXPECT_EQ(result[0].surface, "対応させていただきます");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "対応する");
+}
+
+// =============================================================================
+// Regression: Suru verb passive polite form (されました)
+// =============================================================================
+// Bug: 開催されました was split as 開催さ (ADJ) + れました (VERB)
+// Fix: Added されました pattern and empty suffix for suru mizenkei
+
+TEST(AnalyzerTest, Regression_SuruPassivePolite) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("開催されました");
+  ASSERT_EQ(result.size(), 1);
+
+  EXPECT_EQ(result[0].surface, "開催されました");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "開催する");
+}
+
+TEST(AnalyzerTest, Regression_SuruPassivePolite2) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("勉強されました");
+  ASSERT_EQ(result.size(), 1);
+
+  EXPECT_EQ(result[0].surface, "勉強されました");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "勉強する");
+}
+
+// Ensure non-suru passives are not affected
+TEST(AnalyzerTest, Regression_GodanPassiveNotAffected) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("奪われた");
+  ASSERT_EQ(result.size(), 1);
+
+  EXPECT_EQ(result[0].surface, "奪われた");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "奪う");
+}
+
+// Ensure copula after noun is not affected
+TEST(AnalyzerTest, Regression_CopulaAfterNounNotAffected) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("学生だ");
+  ASSERT_EQ(result.size(), 2);
+
+  EXPECT_EQ(result[0].surface, "学生");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Noun);
+  EXPECT_EQ(result[1].surface, "だ");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Auxiliary);
+}
+
 }  // namespace
 }  // namespace suzume::analysis

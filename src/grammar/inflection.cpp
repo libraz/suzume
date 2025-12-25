@@ -117,6 +117,9 @@ const std::vector<VerbEnding>& getVerbEndings() {
       {"し", "する", VerbType::Suru, conn::kVerbRenyokei, false},
       {"し", "する", VerbType::Suru, conn::kVerbMizenkei, false},  // しない
       {"さ", "する", VerbType::Suru, conn::kVerbMizenkei, false},  // させる/される
+      // Empty suffix for suru-verb + passive/causative (開催+された → 開催する)
+      // The さ is included in auxiliary patterns like された, させた
+      {"", "する", VerbType::Suru, conn::kVerbMizenkei, false},
       {"すれ", "する", VerbType::Suru, conn::kVerbKatei, false},   // すれば
       {"しよ", "する", VerbType::Suru, conn::kVerbVolitional, false}, // しよう
       {"する", "する", VerbType::Suru, conn::kVerbBase, false},    // Base/dictionary form
@@ -669,12 +672,16 @@ void Inflection::initAuxiliaries() {
       {"せられて", "せられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"せられない", "せられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       {"せられます", "せられる", kAuxSeru, kAuxOutMasu, kVerbMizenkei},
+      {"せられました", "せられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
+      {"せられません", "せられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       // Short form causative-passive for Godan (歩かされる = 歩か + される)
       {"される", "される", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       {"された", "される", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"されて", "される", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"されない", "される", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       {"されます", "される", kAuxSeru, kAuxOutMasu, kVerbMizenkei},
+      {"されました", "される", kAuxSeru, kAuxOutTa, kVerbMizenkei},
+      {"されません", "される", kAuxSeru, kAuxOutBase, kVerbMizenkei},
 
       // === Humble progressive (ておる系) ===
       {"おる", "おる", kAuxTeiru, kAuxOutBase, kAuxOutTe},
@@ -1027,6 +1034,27 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
               last_char == "と" || last_char == "へ" || last_char == "か" ||
               last_char == "や" || last_char == "の") {
             invalid_stem = true;
+          }
+          // For empty suffix suru patterns (e.g., 開催+された), the stem must
+          // NOT end with hiragana that could be part of verb conjugations.
+          // This prevents 奪われた → 奪わ+された → 奪わする (wrong)
+          // Valid suru stems are all-kanji (開催) or katakana (ドライブ)
+          if (ending.suffix.empty() && !aux_chain.empty()) {
+            // Check if last character is hiragana (verb conjugation suffix)
+            // A-row: あ か が さ た な は ば ま ら わ
+            // These are common mizenkei endings for godan verbs
+            if (last_char == "あ" || last_char == "か" || last_char == "が" ||
+                last_char == "さ" || last_char == "た" || last_char == "な" ||
+                last_char == "ば" || last_char == "ま" || last_char == "ら" ||
+                last_char == "わ") {
+              invalid_stem = true;
+            }
+            // Single-kanji stems are NOT valid for empty suffix suru patterns
+            // Real suru verb stems have 2+ kanji (開催, 勉強, 検討)
+            // This prevents 見+られた → 見する (wrong, should be 見る Ichidan)
+            if (stem.size() <= 3) {
+              invalid_stem = true;
+            }
           }
         }
         if (invalid_stem) {
