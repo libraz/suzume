@@ -76,6 +76,13 @@ inline std::vector<DictionaryEntry> getPronounEntries() {
       {"彼女ら", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "かのじょら"},
       {"彼女たち", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "かのじょたち"},
 
+      // Archaic/Samurai (武家・古風)
+      {"拙者", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "せっしゃ"},
+      {"貴殿", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "きでん"},
+      {"某", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "それがし"},
+      {"我輩", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "わがはい"},
+      {"吾輩", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "わがはい"},
+
       // Collective pronouns (集合代名詞)
       {"皆", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "みな"},
       {"皆さん", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "みなさん"},

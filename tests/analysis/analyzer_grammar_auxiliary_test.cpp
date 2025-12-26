@@ -352,5 +352,61 @@ TEST(AnalyzerTest, Regression_Aux_KamoshiremasenInSentence) {
   EXPECT_TRUE(found_kamo) << "かもしれません should be found";
 }
 
+// Archaic/Samurai speech - ござる conjugations
+TEST(AnalyzerTest, CharacterSpeech_Gozatta) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("それでござった");
+  bool found = false;
+  for (const auto& morpheme : result) {
+    if (morpheme.surface == "ござった" &&
+        morpheme.pos == core::PartOfSpeech::Auxiliary) {
+      found = true;
+      EXPECT_EQ(morpheme.lemma, "だった");
+      break;
+    }
+  }
+  EXPECT_TRUE(found) << "ござった should be found as Auxiliary";
+}
+
+TEST(AnalyzerTest, CharacterSpeech_Gozaranu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("知らぬでござらぬ");
+  bool found = false;
+  for (const auto& morpheme : result) {
+    if (morpheme.surface == "ござらぬ" &&
+        morpheme.pos == core::PartOfSpeech::Auxiliary) {
+      found = true;
+      EXPECT_EQ(morpheme.lemma, "ではない");
+      break;
+    }
+  }
+  EXPECT_TRUE(found) << "ござらぬ should be found as Auxiliary";
+}
+
+// Archaic/Samurai pronouns
+TEST(AnalyzerTest, CharacterSpeech_Sessha) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("拙者は侍でござる");
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "拙者");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Pronoun);
+}
+
+TEST(AnalyzerTest, CharacterSpeech_Wagahai) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("我輩は猫である");
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "我輩");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Pronoun);
+}
+
+TEST(AnalyzerTest, CharacterSpeech_Soregashi) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("某が参る");
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "某");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Pronoun);
+}
+
 }  // namespace
 }  // namespace suzume::analysis

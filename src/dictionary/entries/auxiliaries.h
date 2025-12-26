@@ -167,7 +167,11 @@ inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Ninja/Old-fashioned (忍者・古風)
       {"ござる", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
       {"でござる", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"ござった", POS::Auxiliary, 0.3F, "だった", false, false, false, CT::None, ""},
       {"でござった", POS::Auxiliary, 0.3F, "だった", false, false, false, CT::None, ""},
+      {"ござらぬ", POS::Auxiliary, 0.3F, "ではない", false, false, false, CT::None, ""},
+      {"ござらん", POS::Auxiliary, 0.3F, "ではない", false, false, false, CT::None, ""},
+      {"でございます", POS::Auxiliary, 0.3F, "です", false, false, false, CT::None, ""},
       {"ナリ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, "なり"},
       {"なり", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
       {"でナリ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, "でなり"},
