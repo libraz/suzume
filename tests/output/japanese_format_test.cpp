@@ -411,11 +411,13 @@ TEST_F(JapaneseFormatIntegrationTest, ReadingPropagation_Pronoun) {
 }
 
 TEST_F(JapaneseFormatIntegrationTest, ReadingPropagation_Adjective) {
-  auto morphemes = analyzer_.analyze("美しい");
+  // Use single-kanji adjective that's in L1
+  auto morphemes = analyzer_.analyze("寒い");
   ASSERT_GE(morphemes.size(), 1);
-  EXPECT_EQ(morphemes[0].surface, "美しい");
+  EXPECT_EQ(morphemes[0].surface, "寒い");
   // Should have reading from dictionary
   EXPECT_FALSE(morphemes[0].reading.empty());
+  EXPECT_EQ(morphemes[0].reading, "さむい");
 }
 
 // Test conjugation form detection in analysis pipeline

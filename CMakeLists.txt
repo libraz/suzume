@@ -106,6 +106,10 @@ if(BUILD_WASM)
   message(STATUS "Building for WebAssembly")
   set(CMAKE_EXECUTABLE_SUFFIX ".js")
 
+  # Size optimization for WASM
+  add_compile_options(-Os -flto)
+  add_link_options(-Os -flto)
+
   # Emscripten compile options
   add_compile_options(
     -sWASM=1
@@ -123,6 +127,17 @@ if(BUILD_WASM)
     -sALLOW_MEMORY_GROWTH=1
     -sSTACK_SIZE=1048576
   )
+
+  # Embed dictionary files into WASM virtual filesystem
+  set(DICT_DIR "${CMAKE_SOURCE_DIR}/data")
+  if(EXISTS "${DICT_DIR}/core.dic")
+    message(STATUS "Embedding L2 dictionary: core.dic")
+    add_link_options("--embed-file=${DICT_DIR}/core.dic@/data/core.dic")
+  endif()
+  if(EXISTS "${DICT_DIR}/user.dic")
+    message(STATUS "Embedding L3 dictionary: user.dic")
+    add_link_options("--embed-file=${DICT_DIR}/user.dic@/data/user.dic")
+  endif()
 
   # Output directory for npm package
   set(WASM_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/dist")

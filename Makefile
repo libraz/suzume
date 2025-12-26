@@ -1,10 +1,12 @@
 # Suzume Makefile
 # Convenience wrapper for CMake build system
 
-.PHONY: help build test clean rebuild format format-check configure
+.PHONY: help build test clean rebuild format format-check configure \
+        wasm wasm-test wasm-clean wasm-rebuild
 
-# Build directory
+# Build directories
 BUILD_DIR := build
+WASM_BUILD_DIR := build-wasm
 
 # clang-format command (can be overridden: make CLANG_FORMAT=clang-format-18 format)
 CLANG_FORMAT ?= clang-format
@@ -23,12 +25,19 @@ help:
 	@echo "  make format       - Format code with clang-format"
 	@echo "  make format-check - Check code formatting"
 	@echo "  make configure    - Configure CMake"
+	@echo ""
+	@echo "WASM targets:"
+	@echo "  make wasm         - Build WASM module"
+	@echo "  make wasm-test    - Run WASM tests"
+	@echo "  make wasm-clean   - Clean WASM build"
+	@echo "  make wasm-rebuild - Clean and rebuild WASM"
+	@echo ""
 	@echo "  make help         - Show this help message"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make              # Build the project"
 	@echo "  make test         # Run all tests"
-	@echo "  make rebuild      # Clean and rebuild from scratch"
+	@echo "  make wasm         # Build WASM module"
 
 # Configure CMake
 configure:
@@ -67,3 +76,34 @@ format-check:
 	@echo "Checking code formatting..."
 	@find src tests -type f \( -name "*.cpp" -o -name "*.h" \) | xargs $(CLANG_FORMAT) --dry-run --Werror
 	@echo "Format check passed!"
+
+# ============================================
+# WASM Targets
+# ============================================
+
+# Configure WASM build
+wasm-configure:
+	@echo "Configuring WASM build..."
+	emcmake cmake -B $(WASM_BUILD_DIR) -DBUILD_WASM=ON -DCMAKE_BUILD_TYPE=Release
+
+# Build WASM module
+wasm: wasm-configure
+	@echo "Building WASM module..."
+	cmake --build $(WASM_BUILD_DIR) --parallel
+	@echo "WASM build complete!"
+	@ls -lh dist/suzume-wasm.wasm dist/suzume.js
+
+# Run WASM tests
+wasm-test: wasm
+	@echo "Running WASM tests..."
+	yarn test
+	@echo "WASM tests complete!"
+
+# Clean WASM build
+wasm-clean:
+	@echo "Cleaning WASM build..."
+	rm -rf $(WASM_BUILD_DIR)
+	@echo "WASM clean complete!"
+
+# Rebuild WASM from scratch
+wasm-rebuild: wasm-clean wasm
