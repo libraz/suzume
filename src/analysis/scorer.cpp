@@ -171,6 +171,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += options_.optimal_length_bonus;
   }
 
+
   return cost;
 }
 
@@ -191,6 +192,66 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     }
   }
 
+  // Penalize verb renyokei + て/てV for Ichidan verbs
+  // Pattern: 教え + て should be 教えて (te-form), not renyokei + particle
+  // Pattern: 教え + てくれた should be 教えて + くれた, not renyokei + てV compound
+  // Ichidan verb renyokei ends with e-row hiragana (べ, め, せ, け, etc.)
+  // This prevents incorrect splits like 教え+て+あげない or 教え+てくれた
+  if (prev.pos == core::PartOfSpeech::Verb) {
+    bool is_te_pattern = false;
+    // Check if next starts with て (particle or compound verb starting with て)
+    if (next.pos == core::PartOfSpeech::Particle && next.surface == "て") {
+      is_te_pattern = true;
+    } else if (next.pos == core::PartOfSpeech::Verb &&
+               next.surface.size() >= 3 &&
+               next.surface.substr(0, 3) == "て") {
+      // Compound verb starting with て (てくれた, てもらう, etc.)
+      is_te_pattern = true;
+    }
+
+    if (is_te_pattern && !prev.surface.empty() && prev.surface.size() >= 3) {
+      std::string_view last3 = std::string_view(prev.surface).substr(
+          prev.surface.size() - 3);
+      // E-row hiragana (Ichidan verb renyokei endings)
+      if (last3 == "べ" || last3 == "め" || last3 == "せ" ||
+          last3 == "け" || last3 == "げ" || last3 == "て" ||
+          last3 == "ね" || last3 == "れ" || last3 == "え" ||
+          last3 == "で" || last3 == "ぜ" || last3 == "へ" ||
+          last3 == "ぺ") {
+        penalty += 1.5F;  // Prefer te-form over renyokei + て/てV
+        penalty_reason = "ichidan renyokei + te pattern";
+      }
+    }
+  }
+
+  // Boost たい-pattern adjectives following verb renyokei
+  // Pattern: 走り出し + たくなってきた should connect well (desiderative auxiliary)
+  // たい patterns conjugate like i-adjectives but semantically attach to verb renyokei
+  // The ADJ is generated from auxiliary たい patterns: たく, たくない, たくなる, etc.
+  if (prev.pos == core::PartOfSpeech::Verb &&
+      next.pos == core::PartOfSpeech::Adjective &&
+      next.lemma == "たい" && next.surface.size() >= 6) {
+    // Check if prev ends with i-row hiragana (verb renyokei ending)
+    // Godan renyokei: み, き, ぎ, し, ち, び, り, い, に (e.g., 書き, 読み, 話し)
+    // Ichidan renyokei: ends with e-row or just the stem (e.g., 食べ, 見)
+    // Suru renyokei: し
+    if (!prev.surface.empty() && prev.surface.size() >= 3) {
+      std::string_view last3 = std::string_view(prev.surface).substr(
+          prev.surface.size() - 3);
+      // I-row hiragana (common renyokei endings)
+      if (last3 == "み" || last3 == "き" || last3 == "ぎ" ||
+          last3 == "し" || last3 == "ち" || last3 == "び" ||
+          last3 == "り" || last3 == "い" || last3 == "に" ||
+          // E-row hiragana (ichidan renyokei)
+          last3 == "べ" || last3 == "め" || last3 == "せ" ||
+          last3 == "け" || last3 == "げ" || last3 == "て" ||
+          last3 == "ね" || last3 == "れ" || last3 == "え") {
+        penalty -= 0.8F;  // Bonus: reduce connection cost for たい after renyokei
+        penalty_reason = "tai-pattern after verb renyokei";
+      }
+    }
+  }
+
   // Penalize 安い (やすい) following noun that looks like verb renyokei
   // Pattern: 読み + やすい should be 読みやすい (easy to read), not 読み + 安い (cheap)
   // Verb renyokei typically ends with i-row hiragana (み, き, ぎ, し, ち, び, り, い, に)
@@ -206,6 +267,42 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
           last3 == "り" || last3 == "い" || last3 == "に") {
         penalty += 2.0F;  // Strong penalty - prefer verb + やすい auxiliary
         penalty_reason = "yasui adj after renyokei-like noun";
+      }
+    }
+  }
+
+  // Penalize NOUN + compound verb auxiliary when noun looks like verb renyokei
+  // Pattern: 読み + 終わる should be verb renyokei + auxiliary, not noun + verb
+  // Compound verb auxiliaries: 終わる, 始める, 過ぎる, 続ける, 直す, 合う, 出す, 込む, 切る, etc.
+  // Check by surface pattern since lemma may not be set during lattice construction
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      next.pos == core::PartOfSpeech::Verb &&
+      next.surface.size() >= 3) {
+    // Check if next starts with compound verb auxiliary kanji
+    // Get first 3 bytes (one kanji character in UTF-8)
+    std::string_view first_char = next.surface.substr(0, 3);
+    bool is_compound_aux = (first_char == "終" || first_char == "始" ||
+                            first_char == "過" || first_char == "続" ||
+                            first_char == "直" || first_char == "合" ||
+                            first_char == "出" || first_char == "込" ||
+                            first_char == "切" || first_char == "損" ||
+                            first_char == "返" || first_char == "忘" ||
+                            first_char == "残" || first_char == "掛");
+    if (is_compound_aux) {
+      // Check if prev ends with i-row hiragana (likely verb renyokei)
+      if (!prev.surface.empty() && prev.surface.size() >= 3) {
+        std::string_view last3 = std::string_view(prev.surface).substr(
+            prev.surface.size() - 3);
+        if (last3 == "み" || last3 == "き" || last3 == "ぎ" ||
+            last3 == "し" || last3 == "ち" || last3 == "び" ||
+            last3 == "り" || last3 == "い" || last3 == "に" ||
+            // E-row for ichidan renyokei
+            last3 == "べ" || last3 == "め" || last3 == "せ" ||
+            last3 == "け" || last3 == "げ" || last3 == "て" ||
+            last3 == "ね" || last3 == "れ" || last3 == "え") {
+          penalty += 0.5F;  // Penalty to let verb renyokei + auxiliary win
+          penalty_reason = "compound aux after renyokei-like noun";
+        }
       }
     }
   }

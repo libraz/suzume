@@ -141,6 +141,22 @@ float calculateConfidence(VerbType type, std::string_view stem,
     base -= 0.30F;
   }
 
+  // GodanWa disambiguation for っ-onbin patterns with all-kanji stems
+  // Three verb types share っ-onbin: GodanWa (買う), GodanRa (取る), GodanTa (持つ)
+  // For multi-kanji stems (2+ kanji), GodanWa is much more common:
+  //   - 手伝う, 買い求う, 争う, 戦う, 追い払う (all GodanWa)
+  //   - GodanRa verbs rarely have 2+ kanji stems
+  //   - GodanTa verbs rarely have 2+ kanji stems
+  // Single-kanji stems are ambiguous: 取る (GodanRa), 持つ (GodanTa), 買う (GodanWa)
+  // Hiragana stems like いらっしゃ (→ いらっしゃる GodanRa) should NOT be affected
+  if (required_conn == conn::kVerbOnbinkei && stem_len >= 6 && isAllKanji(stem)) {
+    if (type == VerbType::GodanWa) {
+      base += 0.10F;  // Boost GodanWa for multi-kanji stems
+    } else if (type == VerbType::GodanRa || type == VerbType::GodanTa) {
+      base -= 0.05F;  // Slight penalty for GodanRa/GodanTa with multi-kanji stems
+    }
+  }
+
   // Kuru validation: only 来る/くる conjugates as Kuru
   // Valid Kuru stems:
   // - "来" (kanji form: 来なかった → 来る)
@@ -302,8 +318,18 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // This prevents "検討いた" from being parsed as GodanKa "検討く"
   // Exception: kVerbKatei (conditional form like 頑張れば) is less ambiguous
   // because the ば-form has a distinct pattern that サ変名詞 doesn't have
+  // Exception: っ-onbin verbs (GodanWa/Ra/Ta) are legitimate with 2-kanji stems
+  //   - 手伝う → 手伝って (GodanWa) is valid, not サ変
+  //   - But 検討 + いて could be サ変 (検討している) or GodanKa (検討く - wrong)
   if (stem_len >= 6 && isAllKanji(stem) && type != VerbType::Suru) {
-    if (required_conn == conn::kVerbKatei) {
+    // Skip penalty for っ-onbin verbs (GodanWa/Ra/Ta) in onbinkei context
+    // These are legitimate Godan verbs, not サ変名詞 misanalyses
+    bool is_tsu_onbin_type = (type == VerbType::GodanWa ||
+                              type == VerbType::GodanRa ||
+                              type == VerbType::GodanTa);
+    if (required_conn == conn::kVerbOnbinkei && is_tsu_onbin_type) {
+      // No penalty for っ-onbin patterns - these are legitimate Godan verbs
+    } else if (required_conn == conn::kVerbKatei) {
       // Lighter penalty for conditional form - 頑張れば, 滑れば are valid Godan
       base -= 0.10F;
     } else {

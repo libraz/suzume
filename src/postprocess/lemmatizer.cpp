@@ -296,8 +296,9 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
   }
 
   // Fall back to the best candidate if no dictionary match found
+  // Use >= 0.5F threshold since inflection_scorer caps minimum at 0.5F
   const auto& best = candidates.front();
-  if (!best.base_form.empty() && best.confidence > 0.5F) {
+  if (!best.base_form.empty() && best.confidence >= 0.5F) {
     return best.base_form;
   }
 

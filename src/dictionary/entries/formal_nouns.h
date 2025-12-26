@@ -50,7 +50,8 @@ inline std::vector<DictionaryEntry> getFormalNounEntries() {
       {"事", POS::Noun, 0.3F, "", false, true, false, CT::None, "こと"},
       {"物", POS::Noun, 0.3F, "", false, true, false, CT::None, "もの"},
       {"為", POS::Noun, 2.0F, "", false, true, false, CT::None, "ため"},
-      {"所", POS::Noun, 2.0F, "", false, true, false, CT::None, "ところ"},
+      {"所", POS::Noun, 1.0F, "", false, true, false, CT::None, "ところ"},
+      {"ところ", POS::Noun, 0.3F, "", false, true, false, CT::None, ""},  // Aspectual: Vたところだ
       {"時", POS::Noun, 2.0F, "", false, true, false, CT::None, "とき"},
       {"内", POS::Noun, 2.0F, "", false, true, false, CT::None, "うち"},
       {"通り", POS::Noun, 2.0F, "", false, true, false, CT::None, "とおり"},

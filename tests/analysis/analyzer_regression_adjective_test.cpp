@@ -669,5 +669,86 @@ TEST(AnalyzerTest, Regression_Nakereba_KakaNakereba_Verb) {
   EXPECT_TRUE(found_verb) << "書かなければ should be recognized as verb";
 }
 
+// =============================================================================
+// Regression: 手伝って lemma should be 手伝う (GodanWa), not 手伝る (GodanRa)
+// =============================================================================
+// Bug: 手伝って was getting lemma 手伝る due to equal confidence for
+//      GodanWa/GodanRa/GodanTa in っ-onbin context with all-kanji stems
+// Fix: Added GodanWa boost for multi-kanji stems in onbinkei context
+
+TEST(AnalyzerTest, Regression_TetsudatteAgenai_Split) {
+  // 手伝ってあげない should be split: 手伝って (verb) + あげない (verb)
+  // Not: 手伝ってあげない as single verb
+  // Benefactive verbs (あげる) in negative form should split at te-form boundary
+  Suzume analyzer;
+  auto result = analyzer.analyze("手伝ってあげない");
+  ASSERT_GE(result.size(), 2) << "手伝ってあげない should have at least 2 tokens";
+
+  bool found_tetsudatte = false;
+  bool found_agenai = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "手伝って" && mor.pos == core::PartOfSpeech::Verb) {
+      found_tetsudatte = true;
+      EXPECT_EQ(mor.lemma, "手伝う") << "手伝って lemma should be 手伝う (GodanWa)";
+    }
+    if (mor.surface == "あげない" && mor.pos == core::PartOfSpeech::Verb) {
+      found_agenai = true;
+      EXPECT_EQ(mor.lemma, "あげる") << "あげない lemma should be あげる";
+    }
+  }
+  EXPECT_TRUE(found_tetsudatte) << "手伝って should be recognized";
+  EXPECT_TRUE(found_agenai) << "あげない should be recognized";
+}
+
+TEST(AnalyzerTest, Regression_Tetsudatte_LemmaGodanWa) {
+  // 手伝って should have lemma 手伝う (GodanWa), not 手伝る (GodanRa)
+  Suzume analyzer;
+  auto result = analyzer.analyze("手伝って");
+  ASSERT_EQ(result.size(), 1) << "手伝って should be single token";
+  EXPECT_EQ(result[0].surface, "手伝って");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "手伝う") << "手伝って lemma should be 手伝う (GodanWa)";
+}
+
+TEST(AnalyzerTest, Regression_HashiridashiTakunattekita_TaiPattern) {
+  // 走り出したくなってきた should be split: 走り出し (verb) + たくなってきた (adj)
+  // Not: 走り出し + た + くなってきた (where くなってきた is wrongly parsed as verb)
+  // たくなってきた is a たい-pattern adjective (lemma=たい) that follows verb renyokei
+  Suzume analyzer;
+  auto result = analyzer.analyze("走り出したくなってきた");
+  ASSERT_EQ(result.size(), 2) << "走り出したくなってきた should have 2 tokens";
+
+  EXPECT_EQ(result[0].surface, "走り出し");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "走り出す");
+
+  EXPECT_EQ(result[1].surface, "たくなってきた");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Adjective);
+  EXPECT_EQ(result[1].lemma, "たい");
+}
+
+TEST(AnalyzerTest, Regression_TokoroDatta_FormalNoun) {
+  // ところだった should not be split as と + ころだった
+  // ところ is a formal noun used in aspectual patterns (Vたところだ = "just V'd")
+  Suzume analyzer;
+  auto result = analyzer.analyze("勉強させられていたところだった");
+
+  // Find ところ and verify it's not split into と + ころ
+  bool found_tokoro = false;
+  bool found_to = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "ところ") {
+      found_tokoro = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Noun)
+          << "ところ should be formal noun";
+    }
+    if (mor.surface == "と" && mor.pos == core::PartOfSpeech::Particle) {
+      found_to = true;  // This would indicate wrong split
+    }
+  }
+  EXPECT_TRUE(found_tokoro) << "ところ should be recognized as formal noun";
+  EXPECT_FALSE(found_to) << "と particle should not appear (wrong split)";
+}
+
 }  // namespace
 }  // namespace suzume::analysis
