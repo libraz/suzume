@@ -187,6 +187,24 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     }
   }
 
+  // Penalize 安い (やすい) following noun that looks like verb renyokei
+  // Pattern: 読み + やすい should be 読みやすい (easy to read), not 読み + 安い (cheap)
+  // Verb renyokei typically ends with i-row hiragana (み, き, ぎ, し, ち, び, り, い, に)
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      next.pos == core::PartOfSpeech::Adjective &&
+      next.surface == "やすい" && next.lemma == "安い") {
+    // Check if prev ends with i-row hiragana (likely verb renyokei)
+    if (!prev.surface.empty() && prev.surface.size() >= 3) {
+      std::string_view last3 = std::string_view(prev.surface).substr(
+          prev.surface.size() - 3);
+      if (last3 == "み" || last3 == "き" || last3 == "ぎ" ||
+          last3 == "し" || last3 == "ち" || last3 == "び" ||
+          last3 == "り" || last3 == "い" || last3 == "に") {
+        cost += 2.0F;  // Strong penalty - prefer verb + やすい auxiliary
+      }
+    }
+  }
+
   return cost;
 }
 

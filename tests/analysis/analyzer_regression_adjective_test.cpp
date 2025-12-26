@@ -481,6 +481,44 @@ TEST(AnalyzerTest, Regression_ShiSou_UreshiSou_Adjective) {
 }
 
 // =============================================================================
+// Regression: 〜やすい auxiliary vs 安い adjective
+// =============================================================================
+// Bug: 読みやすい in context was split as 読み (noun) + やすい (安い)
+// Fix: Added connection cost penalty for やすい (安い) after verb renyokei-like nouns
+
+TEST(AnalyzerTest, Regression_Yasui_YomiYasui_Context) {
+  // この本は読みやすい - should be 読みやすい (easy to read), not 読み + 安い
+  Suzume analyzer;
+  auto result = analyzer.analyze("この本は読みやすい");
+  ASSERT_GE(result.size(), 4);
+
+  bool found_yomiyasui = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "読みやすい" && mor.pos == core::PartOfSpeech::Adjective) {
+      found_yomiyasui = true;
+    }
+  }
+  EXPECT_TRUE(found_yomiyasui)
+      << "読みやすい should be single adjective (easy to read)";
+}
+
+TEST(AnalyzerTest, Regression_Yasui_Yasui_Standalone) {
+  // この服は安い - should be 安い (cheap) as standalone adjective
+  Suzume analyzer;
+  auto result = analyzer.analyze("この服は安い");
+  ASSERT_GE(result.size(), 4);
+
+  bool found_yasui = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "安い" && mor.lemma == "安い" &&
+        mor.pos == core::PartOfSpeech::Adjective) {
+      found_yasui = true;
+    }
+  }
+  EXPECT_TRUE(found_yasui) << "安い should be recognized as cheap adjective";
+}
+
+// =============================================================================
 // Regression: 〜なければ conditional not adjective
 // =============================================================================
 // Bug: 行かなければ was incorrectly analyzed as adjective (行かない + ければ)
