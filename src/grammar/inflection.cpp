@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+#include "core/debug.h"
 #include "inflection_scorer.h"
 #include "verb_endings.h"
 
@@ -23,6 +24,11 @@ Inflection::matchAuxiliaries(std::string_view surface) const {
       size_t start = surface.size() - aux.surface.size();
       if (surface.substr(start) == aux.surface) {
         matches.emplace_back(&aux, aux.surface.size());
+        SUZUME_DEBUG_AUX("  [AUX MATCH] \"" << surface << "\" ends with \""
+                         << aux.surface << "\" (lemma=" << aux.lemma
+                         << ", left_id=0x" << std::hex << aux.left_id
+                         << ", right_id=0x" << aux.right_id
+                         << ", requires=0x" << aux.required_conn << std::dec << ")\n");
       }
     }
   }
@@ -78,6 +84,14 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // (prevents "書いて" from being parsed as Ichidan "書いてる")
       if (ending.suffix.empty() && aux_chain.empty() &&
           ending.verb_type == VerbType::Ichidan) {
+        continue;
+      }
+
+      // Reject stems starting with て (hiragana)
+      // Japanese verb stems never start with て - it's always a te-form particle
+      // This prevents てあげる from being parsed as a verb (should be て + あげる)
+      // Real verbs with te-sound use kanji: 照る (teru), 出る (deru)
+      if (stem.size() >= 3 && stem.substr(0, 3) == "て") {
         continue;
       }
 
@@ -185,6 +199,12 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
           actual_verb_type, stem, aux_total_len, aux_chain.size(), required_conn);
       candidate.morphemes = aux_chain;
 
+      SUZUME_DEBUG_INFL("  [STEM MATCH] \"" << remaining << "\" → base=\""
+                        << base_form << "\" stem=\"" << stem
+                        << "\" type=" << static_cast<int>(actual_verb_type)
+                        << " suffix=\"" << suffix_str
+                        << "\" conf=" << candidate.confidence << "\n");
+
       candidates.push_back(candidate);
     }
   }
@@ -235,8 +255,12 @@ std::vector<InflectionCandidate> Inflection::analyze(
   std::string key(surface);
   auto iter = cache_.find(key);
   if (iter != cache_.end()) {
+    SUZUME_DEBUG_INFL("[INFLECTION] \"" << surface << "\" (cached, "
+                      << iter->second.size() << " candidates)\n");
     return iter->second;
   }
+
+  SUZUME_DEBUG_INFL("[INFLECTION] Analyzing \"" << surface << "\"\n");
 
   std::vector<InflectionCandidate> candidates;
   candidates.reserve(32);  // Typical max candidates
@@ -291,6 +315,20 @@ std::vector<InflectionCandidate> Inflection::analyze(
         return lhs.base_form == rhs.base_form && lhs.verb_type == rhs.verb_type;
       });
   candidates.erase(dup_end, candidates.end());
+
+  // Debug: print final candidates
+  if (core::Debug::isInflectionEnabled() && !candidates.empty()) {
+    core::Debug::log() << "[INFLECTION] Results for \"" << surface << "\":\n";
+    for (size_t i = 0; i < candidates.size() && i < 5; ++i) {
+      const auto& c = candidates[i];
+      core::Debug::log() << "  " << (i + 1) << ". base=\"" << c.base_form
+                         << "\" type=" << static_cast<int>(c.verb_type)
+                         << " conf=" << c.confidence << "\n";
+    }
+    if (candidates.size() > 5) {
+      core::Debug::log() << "  ... and " << (candidates.size() - 5) << " more\n";
+    }
+  }
 
   // Cache the result
   cache_[key] = candidates;

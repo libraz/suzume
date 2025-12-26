@@ -1,5 +1,6 @@
 #include "analysis/scorer.h"
 
+#include "core/debug.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 
@@ -175,7 +176,9 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
 
 float Scorer::connectionCost(const core::LatticeEdge& prev,
                              const core::LatticeEdge& next) const {
-  float cost = bigramCost(prev.pos, next.pos);
+  float base_cost = bigramCost(prev.pos, next.pos);
+  float penalty = 0.0F;
+  const char* penalty_reason = nullptr;
 
   // Copula だ/です cannot follow verbs
   // e.g., 食べただ ✗, 食べましただ ✗
@@ -183,7 +186,8 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.pos == core::PartOfSpeech::Verb &&
       next.pos == core::PartOfSpeech::Auxiliary) {
     if (next.surface == "だ" || next.surface == "です") {
-      cost += 3.0F;  // Strong penalty for invalid grammar
+      penalty += 3.0F;  // Strong penalty for invalid grammar
+      penalty_reason = "copula after verb";
     }
   }
 
@@ -200,12 +204,25 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       if (last3 == "み" || last3 == "き" || last3 == "ぎ" ||
           last3 == "し" || last3 == "ち" || last3 == "び" ||
           last3 == "り" || last3 == "い" || last3 == "に") {
-        cost += 2.0F;  // Strong penalty - prefer verb + やすい auxiliary
+        penalty += 2.0F;  // Strong penalty - prefer verb + やすい auxiliary
+        penalty_reason = "yasui adj after renyokei-like noun";
       }
     }
   }
 
-  return cost;
+  float total = base_cost + penalty;
+
+  SUZUME_DEBUG_CONN("[CONN] \"" << prev.surface << "\" ("
+                    << core::posToString(prev.pos) << ") → \""
+                    << next.surface << "\" ("
+                    << core::posToString(next.pos) << "): "
+                    << "base=" << base_cost);
+  if (penalty > 0.0F && penalty_reason != nullptr) {
+    SUZUME_DEBUG_CONN(" + penalty=" << penalty << " (" << penalty_reason << ")");
+  }
+  SUZUME_DEBUG_CONN(" = " << total << "\n");
+
+  return total;
 }
 
 }  // namespace suzume::analysis

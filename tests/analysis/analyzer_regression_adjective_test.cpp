@@ -224,6 +224,87 @@ TEST(AnalyzerTest, Regression_TeKuNotAdjective) {
   EXPECT_TRUE(found_kurenai) << "くれない should be recognized as verb";
 }
 
+// Regression: Benefactive te-form should split correctly
+TEST(AnalyzerTest, Regression_TeMorau_Separate) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("食べてもらわない");
+  ASSERT_GE(result.size(), 2);
+
+  bool found_tabete = false;
+  bool found_morawanai = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "食べて" && mor.pos == core::PartOfSpeech::Verb) {
+      found_tabete = true;
+    }
+    if (mor.surface == "もらわない" && mor.pos == core::PartOfSpeech::Verb) {
+      found_morawanai = true;
+    }
+  }
+  EXPECT_TRUE(found_tabete) << "食べて should be recognized as verb";
+  EXPECT_TRUE(found_morawanai) << "もらわない should be recognized as verb";
+}
+
+// Regression: Progressive negative should stay unified
+TEST(AnalyzerTest, Regression_TeInai_Unified) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("食べていない");
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "食べていない");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "食べる");
+}
+
+// Regression: Aspectual te-form negatives should stay unified
+TEST(AnalyzerTest, Regression_TeShimawanai_Unified) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("忘れてしまわない");
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "忘れてしまわない");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "忘れる");
+}
+
+TEST(AnalyzerTest, Regression_TeIkanai_Unified) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("走っていかない");
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "走っていかない");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "走る");
+}
+
+// Regression: Benefactive positive forms should stay unified
+TEST(AnalyzerTest, Regression_TeAgeru_Unified) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("見てあげる");
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "見てあげる");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "見る");
+}
+
+// Regression: Godan verb + benefactive negative should split correctly
+TEST(AnalyzerTest, Regression_GodanTeAgenai_Split) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("書いてあげない");
+  ASSERT_GE(result.size(), 2);
+
+  bool found_kaite = false;
+  bool found_agenai = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "書いて" && mor.pos == core::PartOfSpeech::Verb) {
+      found_kaite = true;
+      EXPECT_EQ(mor.lemma, "書く");
+    }
+    if (mor.surface == "あげない" && mor.pos == core::PartOfSpeech::Verb) {
+      found_agenai = true;
+      EXPECT_EQ(mor.lemma, "あげる");
+    }
+  }
+  EXPECT_TRUE(found_kaite) << "書いて should be recognized as verb";
+  EXPECT_TRUE(found_agenai) << "あげない should be recognized as verb";
+}
+
 // =============================================================================
 // Regression: Hiragana adjective conjugation
 // =============================================================================

@@ -133,20 +133,21 @@ constexpr float kVerifiedNounBonus = -0.3F;
 struct TeFormAuxiliary {
   const char* stem;
   const char* base_form;
+  bool is_benefactive;  // Benefactive verbs should not form negative compounds
 };
 
 const TeFormAuxiliary kTeFormAuxiliaries[] = {
-    {"い", "いく"},      // 〜ていく
-    {"く", "くる"},      // 〜てくる
-    {"み", "みる"},      // 〜てみる
-    {"お", "おく"},      // 〜ておく
-    {"しま", "しまう"},  // 〜てしまう
-    {"ちゃ", "しまう"},  // 〜ちゃう (colloquial)
-    {"じゃ", "しまう"},  // 〜じゃう (colloquial)
-    {"もら", "もらう"},  // 〜てもらう
-    {"くれ", "くれる"},  // 〜てくれる
-    {"あげ", "あげる"},  // 〜てあげる
-    {"や", "やる"},      // 〜てやる
+    {"い", "いく", false},      // 〜ていく
+    {"く", "くる", false},      // 〜てくる
+    {"み", "みる", false},      // 〜てみる
+    {"お", "おく", false},      // 〜ておく
+    {"しま", "しまう", false},  // 〜てしまう
+    {"ちゃ", "しまう", false},  // 〜ちゃう (colloquial)
+    {"じゃ", "しまう", false},  // 〜じゃう (colloquial)
+    {"もら", "もらう", true},   // 〜てもらう (benefactive)
+    {"くれ", "くれる", true},   // 〜てくれる (benefactive)
+    {"あげ", "あげる", true},   // 〜てあげる (benefactive)
+    {"や", "やる", true},       // 〜てやる (benefactive)
 };
 
 // Cost bonus for te-form + auxiliary pattern
@@ -637,6 +638,26 @@ void addTeFormAuxiliaryCandidates(
 
       auto best = inflection.getBest(aux_surface);
       if (best.confidence > 0.4F && best.base_form == aux.base_form) {
+        // Skip negative forms of benefactive verbs
+        // E.g., てあげない should be split as て + あげない, not combined
+        // This allows proper analysis of patterns like 教えてあげない
+        if (aux.is_benefactive) {
+          // Check if the surface ends with negative patterns
+          bool is_negative = (aux_surface.size() >= 6 &&
+                              (aux_surface.substr(aux_surface.size() - 6) == "ない" ||
+                               aux_surface.substr(aux_surface.size() - 6) == "なく"));
+          if (aux_surface.size() >= 12) {
+            std::string_view suffix = std::string_view(aux_surface).substr(
+                aux_surface.size() - 12);
+            if (suffix == "なかった" || suffix == "なくて") {
+              is_negative = true;
+            }
+          }
+          if (is_negative) {
+            continue;  // Don't create compound for benefactive negative
+          }
+        }
+
         size_t combo_end_byte = aux_end_byte;
         std::string combo_surface(text.substr(te_byte, combo_end_byte - te_byte));
 

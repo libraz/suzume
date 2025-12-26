@@ -2,11 +2,11 @@
 #define SUZUME_CORE_VITERBI_H_
 
 #include <algorithm>
-#include <cstdlib>
 #include <iostream>
 #include <limits>
 #include <vector>
 
+#include "debug.h"
 #include "lattice.h"
 #include "morpheme.h"
 
@@ -54,9 +54,6 @@ class Viterbi {
    */
   template <typename Scorer>
   ViterbiResult solve(const Lattice& lattice, const Scorer& scorer) const {
-    // Check for debug mode via environment variable SUZUME_DEBUG_VITERBI=1
-    static const bool debug_enabled = (std::getenv("SUZUME_DEBUG_VITERBI") != nullptr);
-
     // Use the existing implementation but return edge IDs
     ViterbiResult result;
     result.total_cost = 0.0F;
@@ -88,13 +85,11 @@ class Viterbi {
 
         float total = costs[pos] + word_cost + conn_cost;
 
-        if (debug_enabled) {
-          std::cerr << "[Viterbi] pos=" << pos << " edge=" << edge.surface
-                    << " word=" << word_cost << " conn=" << conn_cost
-                    << " total=" << total << " costs[" << edge.end << "]="
+        SUZUME_DEBUG_VITERBI("[VITERBI] pos=" << pos << " \"" << edge.surface
+                    << "\" word=" << word_cost << " conn=" << conn_cost
+                    << " total=" << total << " best[" << edge.end << "]="
                     << (costs[edge.end] < 1e10 ? costs[edge.end] : -999)
-                    << (total < costs[edge.end] ? " UPDATE" : "") << "\n";
-        }
+                    << (total < costs[edge.end] ? " UPDATE" : "") << "\n");
 
         if (total < costs[edge.end]) {
           costs[edge.end] = total;
@@ -116,6 +111,17 @@ class Viterbi {
         pos = prev_pos[pos];
       }
       std::reverse(result.path.begin(), result.path.end());
+    }
+
+    // Debug: print final path
+    if (Debug::isViterbiEnabled() && !result.path.empty()) {
+      Debug::log() << "[VITERBI] Best path (cost=" << result.total_cost << "): ";
+      for (size_t i = 0; i < result.path.size(); ++i) {
+        const auto& edge = lattice.getEdge(result.path[i]);
+        if (i > 0) Debug::log() << " → ";
+        Debug::log() << "\"" << edge.surface << "\"";
+      }
+      Debug::log() << "\n";
     }
 
     return result;

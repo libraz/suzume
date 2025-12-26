@@ -30,6 +30,7 @@ set(TEST_SOURCES
   grammar/inflection_potential_test.cpp
   grammar/inflection_compound_test.cpp
   grammar/inflection_complex_test.cpp
+  grammar/auxiliary_generator_test.cpp
   pretokenizer/pretokenizer_url_test.cpp
   pretokenizer/pretokenizer_number_test.cpp
   pretokenizer/pretokenizer_text_test.cpp

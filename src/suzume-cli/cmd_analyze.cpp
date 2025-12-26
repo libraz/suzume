@@ -1,5 +1,6 @@
 #include "cmd_analyze.h"
 
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 
@@ -202,10 +203,21 @@ int cmdAnalyze(const CommandArgs& args) {
 
   // Debug mode - show lattice candidates
   if (args.debug) {
+    // Enable all debug output when --debug is used
+    // Note: setenv is POSIX, may need alternative on Windows
+#ifdef _WIN32
+    _putenv_s("SUZUME_DEBUG", "1");
+#else
+    setenv("SUZUME_DEBUG", "1", 1);
+#endif
+
+    std::cout << "=== Debug Mode ===\n";
+    std::cout << "Input: \"" << text << "\"\n\n";
+
     core::Lattice lattice(0);
     auto morphemes = analyzer.analyzeDebug(text, &lattice);
 
-    std::cout << "=== Lattice Candidates ===\n";
+    std::cout << "\n=== Lattice Candidates ===\n";
     for (size_t pos = 0; pos < lattice.textLength(); ++pos) {
       const auto& edges = lattice.edgesAt(pos);
       if (!edges.empty()) {

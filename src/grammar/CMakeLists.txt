@@ -2,6 +2,7 @@
 
 add_library(suzume_grammar STATIC
   auxiliaries.cpp
+  auxiliary_generator.cpp
   char_patterns.cpp
   conjugation.cpp
   conjugator.cpp
