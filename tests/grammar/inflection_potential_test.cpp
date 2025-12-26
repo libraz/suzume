@@ -16,6 +16,32 @@ class InflectionPotentialTest : public ::testing::Test {
   Inflection inflection_;
 };
 
+// ===== Pure potential forms (書ける, 読める, etc.) =====
+
+TEST_F(InflectionPotentialTest, PurePotentialKaRow) {
+  auto result = inflection_.getBest("書ける");
+  EXPECT_EQ(result.base_form, "書く");
+  EXPECT_EQ(result.verb_type, VerbType::GodanKa);
+}
+
+TEST_F(InflectionPotentialTest, PurePotentialMaRow) {
+  auto result = inflection_.getBest("読める");
+  EXPECT_EQ(result.base_form, "読む");
+  EXPECT_EQ(result.verb_type, VerbType::GodanMa);
+}
+
+TEST_F(InflectionPotentialTest, PurePotentialSaRow) {
+  auto result = inflection_.getBest("話せる");
+  EXPECT_EQ(result.base_form, "話す");
+  EXPECT_EQ(result.verb_type, VerbType::GodanSa);
+}
+
+TEST_F(InflectionPotentialTest, PurePotentialGaRow) {
+  auto result = inflection_.getBest("泳げる");
+  EXPECT_EQ(result.base_form, "泳ぐ");
+  EXPECT_EQ(result.verb_type, VerbType::GodanGa);
+}
+
 // ===== Potential negative/past forms =====
 
 TEST_F(InflectionPotentialTest, PotentialNegativePastKaRow) {

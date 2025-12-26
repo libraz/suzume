@@ -48,23 +48,29 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // But NOT:
       //   - べ (ba-row): 食べる is Ichidan, 飛ぶ → 飛べ is less common
       //   - え (wa-row): Many Ichidan verbs end in え (考える, 答える, 見える)
-      //   - Others: げ, て, ね, へ - less common as potential forms
+      //   - げ (ga-row): 泳ぐ, 急ぐ, etc. - moderately common
+      //   - Others: て, ね, へ - less common as potential forms
       bool is_common_potential_ending = false;
       if (stem_len >= 3) {
         std::string_view last_char = stem.substr(stem_len - 3);
         is_common_potential_ending = (last_char == "け" || last_char == "め" ||
-                                      last_char == "せ" || last_char == "れ");
+                                      last_char == "せ" || last_char == "れ" ||
+                                      last_char == "げ");
       }
       // Apply penalty only when:
       // 1. Stem is 2 chars (kanji + e-row hiragana)
-      // 2. In renyokei/mizenkei context where Godan potential could apply
-      // 3. The e-row ending is a common Godan potential form
+      // 2. In a context where Godan potential interpretation is possible
+      // 3. The e-row ending is a common Godan potential form (け, め, せ, れ)
+      // Note: kVerbBase is included because pure potential forms like 読める
+      // are parsed as Ichidan with る base ending, but should prefer Godan potential
       bool is_potential_context =
-          required_conn == conn::kVerbRenyokei || required_conn == conn::kVerbMizenkei;
+          required_conn == conn::kVerbRenyokei ||
+          required_conn == conn::kVerbMizenkei ||
+          required_conn == conn::kVerbBase;
       if (stem_len == 6 && is_potential_context &&
           endsWithKanji(stem.substr(0, 3)) && is_common_potential_ending) {
-        // 話せ could be Ichidan 話せる or Godan potential of 話す
-        // Prefer Godan potential interpretation (話す is more common than using 話せる directly)
+        // 読め could be Ichidan 読める or Godan potential of 読む
+        // Prefer Godan potential interpretation (読む is more common than treating 読める as Ichidan)
         // Strong penalty to overcome the 0.95 cap tie
         base -= 0.35F;
       } else {
