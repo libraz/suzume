@@ -1,72 +1,65 @@
 # Suzume
 
-A lightweight Japanese morphological analyzer written in C++17.
+A lightweight Japanese morphological analyzer that runs in browsers and Node.js.
 
 ## Why Suzume?
 
-Existing Japanese morphological analyzers (MeCab, ChaSen, etc.) assume:
-- Large dictionaries are always available
-- Dictionary entries are "ground truth"
-- Unknown words are exceptions to minimize
+**Works without a large dictionary.** Most analyzers break down when they encounter unknown words. Suzume treats unknown words as normal—it generates candidates from character patterns and lets Viterbi pick the best path.
 
-**Suzume takes a different stance:**
+**Runs anywhere.** No ICU, no Boost, no external dependencies. The same code runs natively or as WebAssembly in your browser.
 
-| Traditional | Suzume |
-|-------------|--------|
-| Dictionary = correct answer | Dictionary = feature signal |
-| Unknown word = failure | Unknown word = normal case |
-| Incremental decisions | All candidates → Viterbi decides |
-| Large connection tables | Lightweight feature-based decoding |
-| Native runtime only | WASM-first design |
+**Grows with your dictionary.** Start with minimal entries, add words as needed. The analyzer improves naturally without retraining or rebuilding connection tables.
 
-### Key Design Principles
+| Traditional Analyzers | Suzume |
+|----------------------|--------|
+| Breaks on unknown words | Handles them gracefully |
+| Requires large dictionaries | Works with minimal dictionary |
+| Native runtime only | Browser + Node.js + Native |
+| Complex setup | `npm install suzume` |
 
-1. **Dictionary-growth-first** — Works with minimal dictionary, improves as you add entries. No catastrophic failures from missing words.
+## Installation
 
-2. **Non-incremental tokenization** — Generates both merge and split candidates, lets Viterbi find global optimum. No premature commitments.
-
-3. **No connection table dependency** — Uses surface features + lightweight POS bigram instead of massive transition matrices. Simple, portable, robust.
-
-4. **Unknown word tolerance** — Character-type sequences, kanji runs, katakana neologisms, alphanumeric compounds are all first-class candidates evaluated alongside dictionary entries.
-
-5. **WASM-ready** — No ICU, no Boost, no file I/O in core. Runs in browser/Node.js with small memory footprint.
-
-### Use Cases
-
-- Search index generation
-- Tag extraction / classification
-- Dictionary bootstrapping pipelines
-- Web/WASM Japanese text processing
-- Domains with high neologism density
-
-## Features
-
-- **Zero external dependencies**: Custom UTF-8 normalization (no ICU)
-- **Trie-based dictionary**: Core + user dictionary with Double-Array Trie
-- **Viterbi algorithm**: Lattice-based global optimization
-- **Verb conjugation**: 800+ inflection patterns (Godan, Ichidan, Suru, Kuru)
-- **Binary dictionary**: Efficient serialization format
-- **CLI tool**: Interactive mode, JSON/TSV output, dictionary management
-
-## Requirements
-
-- C++17 compiler (GCC 9+ or Clang 10+)
-- CMake 3.15+
-- Make
-
-## Build
+### npm (Browser / Node.js)
 
 ```bash
-make          # Build the project
-make test     # Run tests
-make clean    # Clean build
-make rebuild  # Clean and rebuild
-make help     # Show all targets
+npm install suzume
 ```
 
-## Usage
+### Build from Source (C++)
 
-### Library API
+```bash
+make          # Build
+make test     # Run tests
+```
+
+Requirements: C++17 compiler, CMake 3.15+
+
+## Quick Start
+
+### JavaScript / TypeScript
+
+```typescript
+import { Suzume } from 'suzume';
+
+const suzume = await Suzume.create();
+
+// Morphological analysis
+const result = suzume.analyze('すもももももももものうち');
+for (const m of result) {
+  console.log(`${m.surface}\t${m.pos}\t${m.baseForm}`);
+}
+
+// Tag extraction
+const tags = suzume.generateTags('東京スカイツリーに行きました');
+console.log(tags); // ['東京', 'スカイツリー', ...]
+
+// Add custom words (CSV: surface,pos,cost,lemma)
+suzume.loadUserDictionary('スカイツリー,NOUN');
+
+suzume.destroy();
+```
+
+### C++
 
 ```cpp
 #include "suzume.h"
@@ -74,96 +67,94 @@ make help     # Show all targets
 suzume::Suzume analyzer;
 auto result = analyzer.analyze("私は東京に住んでいます");
 
-for (const auto& morpheme : result) {
-    std::cout << morpheme.surface << "\t"
-              << core::posToString(morpheme.pos) << "\t"
-              << morpheme.lemma << std::endl;
+for (const auto& m : result) {
+    std::cout << m.surface << "\t" << m.lemma << std::endl;
 }
 ```
 
 ### CLI
 
 ```bash
-# Morphological analysis
 suzume-cli "私は東京に住んでいます"
-
-# JSON output
-suzume-cli analyze -f json "Hello world"
-
-# Compile user dictionary
-suzume-cli dict compile user.tsv
-
-# Use compiled dictionary
-suzume-cli -d user.dic "テキスト"
-
-# Interactive mode
-suzume-cli dict -i
+suzume-cli analyze -f json "テキスト"    # JSON output
+suzume-cli analyze -f chasen "テキスト"  # ChaSen format
+suzume-cli -i                            # Interactive mode
 ```
 
-### Output Example
+## Features
 
-```
-私           NOUN      私
-は           PARTICLE  は
-東京         NOUN      東京
-に           PARTICLE  に
-住んでいます  VERB      住む
-```
+- **800+ verb conjugation patterns** — Godan, Ichidan, Suru, Kuru, and compound forms
+- **Pre-tokenizer** — Preserves URLs, emails, dates, and numbers as single tokens
+- **User dictionary** — Add domain-specific terms at runtime
+- **Multiple output formats** — JSON, TSV, ChaSen-compatible
+
+## Use Cases
+
+- Search index generation
+- Tag extraction for classification
+- Web apps with client-side Japanese processing
+- Domains with lots of neologisms and proper nouns
+
+## Design Philosophy
+
+Traditional analyzers (MeCab, ChaSen, etc.) treat dictionary entries as ground truth and unknown words as failures. This works for well-resourced domains like news articles, but breaks down for:
+
+- User-generated content with neologisms
+- Domain-specific terminology
+- Lightweight environments (WASM, embedded)
+
+Suzume takes a different approach:
+
+**Dictionary as feature, not answer.** Dictionary matches add confidence but aren't required. The analyzer generates candidates from character patterns (kanji runs, katakana sequences, alphanumeric compounds) and evaluates them alongside dictionary entries.
+
+**Non-incremental tokenization.** Instead of making greedy left-to-right decisions, Suzume builds a lattice of all possible segmentations and uses Viterbi to find the globally optimal path.
+
+**No connection table dependency.** Traditional analyzers rely on massive POS transition matrices. Suzume uses lightweight surface features and POS bigrams, making it portable and robust to dictionary changes.
 
 ## Dictionary
 
-### Structure
-
 ```
 data/
-├── core/           # Source TSV files (version controlled)
-│   └── basic.tsv
+├── core/           # Source TSV files
 ├── user/           # User TSV files
-├── core.dic        # Compiled core dictionary (auto-loaded)
-└── user.dic        # Compiled user dictionary (auto-loaded)
+├── core.dic        # Compiled dictionary (auto-loaded)
+└── user.dic        # User dictionary (auto-loaded)
 ```
 
-### Auto-load Search Order
+**TSV format** (tab-separated): `surface	pos	reading	cost	conj_type`
+**CSV format** (comma-separated): `surface,pos,cost,lemma`
 
-Suzume automatically loads `core.dic` and `user.dic` from the first found path:
+Minimum required fields: `surface,pos`
 
-1. `$SUZUME_DATA_DIR`
-2. `./data/`
-3. `~/.suzume/`
-4. `/usr/local/share/suzume/`
-5. `/usr/share/suzume/`
-
-### Compiling Dictionaries
+Auto-load search order: `$SUZUME_DATA_DIR` → `./data/` → `~/.suzume/` → `/usr/local/share/suzume/`
 
 ```bash
-# Compile TSV to binary dictionary (output to data/core.dic)
-suzume-cli dict compile data/core/basic.tsv data/core.dic
-
-# Auto-generate output path (input.tsv -> input.dic)
-suzume-cli dict compile user.tsv
+# Compile TSV to binary
+suzume-cli dict compile user.tsv user.dic
 ```
 
 ## Project Structure
 
 ```
 suzume/
-├── src/
+├── src/                   # C++ source
 │   ├── suzume.h/cpp       # Public API
-│   ├── core/              # Types, lattice, Viterbi
-│   ├── normalize/         # UTF-8, character classification
-│   ├── dictionary/        # Trie, Double-Array, binary format
-│   ├── grammar/           # Conjugation, inflection (800+ patterns)
-│   ├── analysis/          # Tokenizer, scorer, unknown word handling
-│   ├── postprocess/       # Lemmatization, tag generation
-│   └── suzume-cli/        # CLI tool
-├── data/                  # Dictionary data
-└── tests/                 # Unit tests (Google Test)
+│   ├── suzume_c.h/cpp     # C API for WASM
+│   └── ...
+├── js/                    # TypeScript wrapper
+├── dist/                  # WASM build output
+├── data/                  # Dictionary files
+└── tests/                 # Unit tests
 ```
 
 ## License
 
-MIT License
+[MIT License](LICENSE)
 
-## Author
+## Contributing
 
-libraz
+Contributions are welcome! Please feel free to submit issues and pull requests.
+
+## Authors
+
+- libraz <libraz@libraz.net>

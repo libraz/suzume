@@ -1,91 +1,65 @@
 # Suzume
 
-C++17 製の軽量日本語形態素解析ライブラリ。
+ブラウザと Node.js で動く、軽量な日本語形態素解析ライブラリです。
 
-## これは車輪の再発明か？
+## Suzume の特長
 
-部分的にはそうだが、目的・制約・設計思想が既存とは明確に異なる。
+**辞書が少なくても動きます。** 従来の解析器は未知語に弱く、辞書にない単語で精度が落ちます。Suzume は未知語を文字パターンから候補生成し、辞書語と同列に評価します。辞書が不完全でも壊れません。
 
-日本語形態素解析は ChaSen / MeCab 以降、何度も再実装されてきた分野であり、「再発明そのもの」が問題になる領域ではない。本プロジェクトは、現代的な制約と用途を前提に、形態素解析の役割を再定義した実装である。
+**どこでも動きます。** ICU や Boost への依存がありません。同じコードがネイティブでも、ブラウザの WebAssembly でも動作します。
 
-### 既存手法の前提
+**辞書を育てられます。** 最小限の辞書から始めて、必要に応じて単語を追加できます。接続表の再構築や再学習は不要です。
 
-従来の解析器は以下を暗黙の前提としている：
+| 従来の解析器 | Suzume |
+|-------------|--------|
+| 未知語で精度低下 | 未知語も適切に処理 |
+| 大規模辞書が必須 | 最小辞書でも動作 |
+| ネイティブ実行のみ | ブラウザ + Node.js + ネイティブ |
+| セットアップが複雑 | `npm install suzume` |
 
-- 大規模辞書が常に存在する
-- 辞書に載っている語が「正解」である
-- 未知語は例外であり、なるべく出さない
-- 接続表（品詞遷移コスト）が解析の中心
+## インストール
 
-これらは新聞・学術用途では合理的だったが、Web / WASM / 新語過多 / タグ生成といった用途では前提が崩れている。
+### npm（ブラウザ / Node.js）
 
-### Suzume の前提
+```bash
+npm install suzume
+```
 
-- 辞書は最初から完璧ではない
-- 新語・固有名詞・複合語が大量に出現する
-- 辞書は後から育てるもの
-- 解析結果は「意味処理」の前段に過ぎない
-- WASM や軽量環境で動く必要がある
-
-つまり **「辞書前提」ではなく「辞書成長前提」** の設計。
-
-## 何が違うのか
-
-| 従来 | Suzume |
-|------|--------|
-| 辞書一致 ≒ 正解 | 辞書一致 = 加点要素のひとつ |
-| 未知語 = 失敗 | 未知語 = 通常ケース |
-| 局所判断の積み重ね | 全候補生成 → Viterbi で大域最適 |
-| 巨大接続表が必須 | 表層特徴 + 軽量 POS bigram |
-| ネイティブ実行前提 | WASM ファースト |
-
-### 技術的ポイント
-
-**辞書を「正解」ではなく「特徴量」として扱う**
-
-辞書が少なくても解析は壊れない。辞書を足すほど精度が自然に上がる。辞書不足による誤解析が致命傷にならない。
-
-**分かち書きを逐次確定しない**
-
-結合候補・分割候補をすべて並べてから、Viterbi で全体最適を選ぶ。複合語・新語・長い名詞列に対して、後戻り不能な誤判定を避けられる。
-
-**接続表に依存しない**
-
-品詞遷移の巨大な接続表を前提にしない。表層特徴・文脈特徴・軽量な品詞 bigram による feature-based decoding を採用。実装が単純、WASM で扱える、辞書増減による破綻が起きにくい。
-
-**未知語を例外として扱わない**
-
-文字種連続・漢字連接・カタカナ新語・英数字混在語を積極的に候補生成し、辞書語と同列に評価する。
-
-## 想定ユースケース
-
-- 検索インデックス生成
-- タグ生成・分類
-- 辞書育成パイプライン
-- Web / WASM 上での日本語解析
-- 新語・固有名詞が多いドメイン
-
-## 機能
-
-- **外部依存ゼロ**: ICU 不要のカスタム UTF-8 正規化
-- **Trie ベース辞書**: Double-Array Trie によるコア＋ユーザー辞書
-- **Viterbi**: ラティスベースの大域最適化
-- **動詞活用**: 800 以上の活用パターン（五段・一段・サ変・カ変）
-- **バイナリ辞書**: 効率的なシリアライズ形式
-- **CLI**: 対話モード、JSON/TSV 出力、辞書管理
-
-## ビルド
+### ソースからビルド（C++）
 
 ```bash
 make          # ビルド
 make test     # テスト実行
-make clean    # クリーン
-make rebuild  # クリーン＆リビルド
 ```
 
-## 使い方
+必要環境: C++17 コンパイラ、CMake 3.15+
 
-### ライブラリ
+## クイックスタート
+
+### JavaScript / TypeScript
+
+```typescript
+import { Suzume } from 'suzume';
+
+const suzume = await Suzume.create();
+
+// 形態素解析
+const result = suzume.analyze('すもももももももものうち');
+for (const m of result) {
+  console.log(`${m.surface}\t${m.pos}\t${m.baseForm}`);
+}
+
+// タグ抽出
+const tags = suzume.generateTags('東京スカイツリーに行きました');
+console.log(tags); // ['東京', 'スカイツリー', ...]
+
+// ユーザー辞書の追加 (CSV: surface,pos,cost,lemma)
+suzume.loadUserDictionary('スカイツリー,NOUN');
+
+suzume.destroy();
+```
+
+### C++
 
 ```cpp
 #include "suzume.h"
@@ -93,52 +67,94 @@ make rebuild  # クリーン＆リビルド
 suzume::Suzume analyzer;
 auto result = analyzer.analyze("私は東京に住んでいます");
 
-for (const auto& morpheme : result) {
-    std::cout << morpheme.surface << "\t"
-              << core::posToString(morpheme.pos) << "\t"
-              << morpheme.lemma << std::endl;
+for (const auto& m : result) {
+    std::cout << m.surface << "\t" << m.lemma << std::endl;
 }
 ```
 
 ### CLI
 
 ```bash
-# 形態素解析
 suzume-cli "私は東京に住んでいます"
-
-# JSON 出力
-suzume-cli analyze -f json "テキスト"
-
-# 辞書コンパイル
-suzume-cli dict compile user.tsv
-
-# 対話モード
-suzume-cli -i
+suzume-cli analyze -f json "テキスト"    # JSON 出力
+suzume-cli analyze -f chasen "テキスト"  # ChaSen 形式
+suzume-cli -i                            # 対話モード
 ```
 
-### 出力例
+## 機能
 
-```
-私           NOUN      私
-は           PARTICLE  は
-東京         NOUN      東京
-に           PARTICLE  に
-住んでいます  VERB      住む
-```
+- **800 以上の動詞活用パターン** — 五段・一段・サ変・カ変、複合動詞に対応
+- **プリトークナイザー** — URL、メール、日付、数値を単一トークンとして保持
+- **ユーザー辞書** — ドメイン固有の用語を実行時に追加可能
+- **複数の出力形式** — JSON、TSV、ChaSen 互換形式
+
+## 想定ユースケース
+
+- 検索インデックスの生成
+- タグ抽出・分類
+- クライアントサイドで日本語処理する Web アプリ
+- 新語・固有名詞が多いドメイン
+
+## 設計思想
+
+従来の解析器（MeCab、ChaSen など）は、辞書エントリを正解として扱い、未知語を失敗とみなします。新聞記事のような整備されたドメインでは有効ですが、以下のケースでは破綻します：
+
+- 新語が頻出するユーザー生成コンテンツ
+- ドメイン固有の専門用語
+- 軽量環境（WASM、組み込み）
+
+Suzume は異なるアプローチを取ります。
+
+**辞書は正解ではなく特徴量。** 辞書一致は信頼度を上げますが、必須ではありません。文字パターン（漢字連続、カタカナ列、英数字複合語）から候補を生成し、辞書語と同列に評価します。
+
+**非逐次的なトークン化。** 左から右への貪欲な決定ではなく、すべての分割可能性をラティスとして構築し、Viterbi で大域最適解を求めます。
+
+**接続表に依存しない。** 従来の解析器は巨大な品詞遷移行列を必要とします。Suzume は軽量な表層特徴と品詞 bigram を使用するため、可搬性が高く、辞書変更にも頑健です。
 
 ## 辞書
 
 ```
 data/
-├── core/           # ソース TSV（バージョン管理対象）
+├── core/           # ソース TSV
 ├── user/           # ユーザー TSV
-├── core.dic        # コンパイル済みコア辞書（自動読込）
-└── user.dic        # コンパイル済みユーザー辞書（自動読込）
+├── core.dic        # コンパイル済み辞書（自動読込）
+└── user.dic        # ユーザー辞書（自動読込）
 ```
 
-自動読込の検索順序:
-`$SUZUME_DATA_DIR` → `./data/` → `~/.suzume/` → `/usr/local/share/suzume/` → `/usr/share/suzume/`
+**TSV 形式**（タブ区切り）: `surface	pos	reading	cost	conj_type`
+**CSV 形式**（カンマ区切り）: `surface,pos,cost,lemma`
+
+最小必須フィールド: `surface,pos`
+
+自動読込の検索順序: `$SUZUME_DATA_DIR` → `./data/` → `~/.suzume/` → `/usr/local/share/suzume/`
+
+```bash
+# TSV をバイナリにコンパイル
+suzume-cli dict compile user.tsv user.dic
+```
+
+## プロジェクト構成
+
+```
+suzume/
+├── src/                   # C++ ソース
+│   ├── suzume.h/cpp       # 公開 API
+│   ├── suzume_c.h/cpp     # WASM 用 C API
+│   └── ...
+├── js/                    # TypeScript ラッパー
+├── dist/                  # WASM ビルド出力
+├── data/                  # 辞書ファイル
+└── tests/                 # ユニットテスト
+```
 
 ## ライセンス
 
-MIT License
+[MIT License](LICENSE)
+
+## コントリビューション
+
+Issue や Pull Request を歓迎します。
+
+## 作者
+
+- libraz <libraz@libraz.net>
