@@ -25,6 +25,13 @@ struct UnknownOptions {
   // Suffix separation
   bool separate_suffix = true;
   float suffix_separation_bonus = -0.3F;
+
+  // Character speech patterns (キャラ語尾)
+  // When enabled, short hiragana/katakana at sentence-end positions
+  // are treated as potential character speech suffixes with lower cost.
+  bool enable_character_speech = true;
+  float character_speech_cost = 0.6F;  // Higher than dict suffix (0.5) to prefer dict
+  size_t max_character_speech_length = 4;  // Max codepoints for pattern match
 };
 
 /**
@@ -162,6 +169,20 @@ class UnknownWordGenerator {
    * @brief Generate candidates with suffix separation
    */
   std::vector<UnknownCandidate> generateWithSuffix(
+      std::string_view text, const std::vector<char32_t>& codepoints,
+      size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
+   * @brief Generate character speech pattern candidates (キャラ語尾)
+   *
+   * For unknown hiragana/katakana sequences at potential sentence-end positions,
+   * generates low-cost auxiliary candidates. This allows recognition of novel
+   * character speech patterns not in the hardcoded dictionary.
+   *
+   * Examples: ナリ, ござる, だわ, etc.
+   */
+  std::vector<UnknownCandidate> generateCharacterSpeechCandidates(
       std::string_view text, const std::vector<char32_t>& codepoints,
       size_t start_pos,
       const std::vector<normalize::CharType>& char_types) const;

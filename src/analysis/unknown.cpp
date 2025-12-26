@@ -180,6 +180,13 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
     candidates.insert(candidates.end(), suffix.begin(), suffix.end());
   }
 
+  // Generate character speech candidates (キャラ語尾)
+  if (options_.enable_character_speech) {
+    auto char_speech =
+        generateCharacterSpeechCandidates(text, codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), char_speech.begin(), char_speech.end());
+  }
+
   return candidates;
 }
 
@@ -388,6 +395,128 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateNominalizedNounCandi
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
   return analysis::generateNominalizedNounCandidates(codepoints, start_pos, char_types);
+}
+
+std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandidates(
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) const {
+  std::vector<UnknownCandidate> candidates;
+
+  if (start_pos >= char_types.size()) {
+    return candidates;
+  }
+
+  normalize::CharType start_type = char_types[start_pos];
+
+  // Only for hiragana or katakana starting positions
+  if (start_type != normalize::CharType::Hiragana &&
+      start_type != normalize::CharType::Katakana) {
+    return candidates;
+  }
+
+  // Skip if starting with common particles (these are handled by dictionary)
+  if (start_type == normalize::CharType::Hiragana) {
+    char32_t first_char = codepoints[start_pos];
+    if (first_char == U'を' || first_char == U'が' || first_char == U'は' ||
+        first_char == U'に' || first_char == U'へ' || first_char == U'の' ||
+        first_char == U'で' || first_char == U'と' || first_char == U'も') {
+      return candidates;
+    }
+    // Skip small kana (ゃゅょぁぃぅぇぉっ) - these don't start words
+    if (first_char == U'ゃ' || first_char == U'ゅ' || first_char == U'ょ' ||
+        first_char == U'ぁ' || first_char == U'ぃ' || first_char == U'ぅ' ||
+        first_char == U'ぇ' || first_char == U'ぉ' || first_char == U'っ') {
+      return candidates;
+    }
+  }
+
+  // Skip small katakana as well
+  if (start_type == normalize::CharType::Katakana) {
+    char32_t first_char = codepoints[start_pos];
+    if (first_char == U'ャ' || first_char == U'ュ' || first_char == U'ョ' ||
+        first_char == U'ァ' || first_char == U'ィ' || first_char == U'ゥ' ||
+        first_char == U'ェ' || first_char == U'ォ' || first_char == U'ッ') {
+      return candidates;
+    }
+  }
+
+  // Skip common suffixes and particles that are handled by dictionary
+  // These are not character speech patterns
+  if (start_type == normalize::CharType::Hiragana) {
+    char32_t first_char = codepoints[start_pos];
+    if (first_char == U'た' || first_char == U'さ' || first_char == U'ら' ||
+        first_char == U'く' || first_char == U'あ' || first_char == U'け') {
+      return candidates;
+    }
+  }
+
+  size_t max_len = options_.max_character_speech_length;
+  size_t text_len = char_types.size();
+
+  // Find end of same-type sequence (limited to max_character_speech_length)
+  size_t end_pos = start_pos + 1;
+  while (end_pos < text_len && end_pos - start_pos < max_len &&
+         char_types[end_pos] == start_type) {
+    ++end_pos;
+  }
+
+  // Check if this could be a sentence-end position
+  auto isSentenceEndPosition = [&](size_t pos) -> bool {
+    if (pos >= text_len) {
+      return true;  // End of text
+    }
+
+    char32_t next_char = codepoints[pos];
+
+    // Punctuation marks
+    if (next_char == U'。' || next_char == U'！' || next_char == U'？' ||
+        next_char == U'、' || next_char == U',' || next_char == U'.' ||
+        next_char == U'!' || next_char == U'?' || next_char == U'…' ||
+        next_char == U'」' || next_char == U'』' || next_char == U'"' ||
+        next_char == U'\n' || next_char == U'\r') {
+      return true;
+    }
+
+    // Whitespace (space, full-width space, tab)
+    if (next_char == U' ' || next_char == U'\u3000' || next_char == U'\t') {
+      return true;
+    }
+
+    return false;
+  };
+
+  // Generate candidates for different lengths
+  for (size_t len = 1; len <= end_pos - start_pos; ++len) {
+    size_t candidate_end = start_pos + len;
+
+    // Only generate if this position could be sentence-end
+    if (!isSentenceEndPosition(candidate_end)) {
+      continue;
+    }
+
+    std::string surface = extractSubstringLocal(codepoints, start_pos, candidate_end);
+
+    if (!surface.empty()) {
+      // Skip patterns ending with そう - these are aspectual auxiliary patterns
+      // that should be handled by verb/adjective + そう analysis, not as character speech
+      if (surface.size() >= 6 && surface.substr(surface.size() - 6) == "そう") {
+        continue;
+      }
+
+      UnknownCandidate candidate;
+      candidate.surface = surface;
+      candidate.start = start_pos;
+      candidate.end = candidate_end;
+      // Mark as Auxiliary so it connects properly after verbs/adjectives
+      candidate.pos = core::PartOfSpeech::Auxiliary;
+      candidate.cost = options_.character_speech_cost;
+      candidate.has_suffix = false;
+      candidates.push_back(candidate);
+    }
+  }
+
+  return candidates;
 }
 
 }  // namespace suzume::analysis

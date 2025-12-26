@@ -106,6 +106,91 @@ inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"んだ", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
       {"んです", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
       {"んでした", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
+
+      // Kuruwa-kotoba (廓言葉) - Yoshiwara courtesan speech
+      // ありんす series (polite existence, from あります)
+      {"ありんす", POS::Auxiliary, 0.3F, "ある", false, false, false, CT::None, ""},
+      {"ありんした", POS::Auxiliary, 0.3F, "ある", false, false, false, CT::None, ""},
+      {"ありんせん", POS::Auxiliary, 0.3F, "ある", false, false, false, CT::None, ""},
+      // ざんす series (polite existence, from ございます)
+      {"ざんす", POS::Auxiliary, 0.3F, "ある", false, false, false, CT::None, ""},
+      {"ざました", POS::Auxiliary, 0.3F, "ある", false, false, false, CT::None, ""},
+      {"ざんせん", POS::Auxiliary, 0.3F, "ある", false, false, false, CT::None, ""},
+      // でありんす (copula + ありんす)
+      {"でありんす", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"でありんした", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+
+      // =========================================================================
+      // Character speech patterns (キャラクター語尾/役割語)
+      // Stylistic variants used in anime/games/literature.
+      // For katakana entries, hiragana versions are also registered.
+      // =========================================================================
+
+      // Cat-like (猫系) - にゃ語尾
+      {"にゃ", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, ""},
+      {"にゃん", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, ""},
+      {"にゃー", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, ""},
+      {"ニャ", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, "にゃ"},
+      {"ニャン", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, "にゃん"},
+      {"ニャー", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, "にゃー"},
+      // Compound forms (だ/です + にゃ) - very low cost to beat verb misrecognition
+      // lemma is だよ/ですよ because にゃ functions as よ (sentence-ending particle)
+      {"だにゃ", POS::Auxiliary, 0.01F, "だよ", false, false, false, CT::None, ""},
+      {"だにゃん", POS::Auxiliary, 0.01F, "だよ", false, false, false, CT::None, ""},
+      {"ですにゃ", POS::Auxiliary, 0.01F, "ですよ", false, false, false, CT::None, ""},
+      {"ですにゃん", POS::Auxiliary, 0.01F, "ですよ", false, false, false, CT::None, ""},
+
+      // Squid character (イカ娘) - ゲソ語尾
+      {"ゲソ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, "げそ"},
+      {"げそ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"でゲソ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, "でげそ"},
+      {"でげそ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+
+      // Ojou-sama/Lady speech (お嬢様言葉)
+      // Lower cost to beat です+わ(particle) split
+      {"ですわ", POS::Auxiliary, 0.1F, "です", false, false, false, CT::None, ""},
+      {"ましたわ", POS::Auxiliary, 0.1F, "ました", false, false, false, CT::None, ""},
+      {"ませんわ", POS::Auxiliary, 0.1F, "ません", false, false, false, CT::None, ""},
+      {"ですの", POS::Auxiliary, 0.1F, "です", false, false, false, CT::None, ""},
+      {"ますの", POS::Auxiliary, 0.1F, "ます", false, false, false, CT::None, ""},
+      {"だわ", POS::Auxiliary, 0.1F, "だ", false, false, false, CT::None, ""},
+
+      // Youth slang (若者言葉)
+      {"っす", POS::Auxiliary, 0.3F, "です", false, false, false, CT::None, ""},
+      {"っした", POS::Auxiliary, 0.3F, "でした", false, false, false, CT::None, ""},
+      {"っすか", POS::Auxiliary, 0.3F, "ですか", false, false, false, CT::None, ""},
+
+      // Rabbit-like (兎系)
+      {"ぴょん", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"ピョン", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, "ぴょん"},
+
+      // Ninja/Old-fashioned (忍者・古風)
+      {"ござる", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"でござる", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"でござった", POS::Auxiliary, 0.3F, "だった", false, false, false, CT::None, ""},
+      {"ナリ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, "なり"},
+      {"なり", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"でナリ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, "でなり"},
+      {"でなり", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+
+      // Elderly/Archaic (老人・古風) - じゃ語尾
+      {"じゃ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"じゃな", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"のじゃ", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
+      {"じゃろう", POS::Auxiliary, 0.3F, "だろう", false, false, false, CT::None, ""},
+
+      // Regional dialects as character speech (方言系)
+      {"ぜよ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"だべ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"やんけ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"やで", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"やねん", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"だっちゃ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"ばい", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+
+      // Robot/Mechanical (ロボット・機械)
+      {"デス", POS::Auxiliary, 0.3F, "です", false, false, false, CT::None, "です"},
+      {"マス", POS::Auxiliary, 0.3F, "ます", false, false, false, CT::None, "ます"},
   };
 }
 

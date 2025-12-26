@@ -9,6 +9,7 @@
 #include <cstring>
 #include <new>
 
+#include "grammar/conjugation.h"
 #include "suzume.h"
 
 // Internal handle structure
@@ -74,6 +75,33 @@ SUZUME_EXPORT suzume_result_t* suzume_analyze(suzume_t handle,
       auto* reading = new char[morph.reading.size() + 1];
       std::strcpy(reading, morph.reading.c_str());
       result->morphemes[idx].reading = reading;
+
+      // Japanese POS
+      auto pos_ja_str = suzume::core::posToJapanese(morph.pos);
+      auto* pos_ja = new char[pos_ja_str.size() + 1];
+      std::memcpy(pos_ja, pos_ja_str.data(), pos_ja_str.size());
+      pos_ja[pos_ja_str.size()] = '\0';
+      result->morphemes[idx].pos_ja = pos_ja;
+
+      // Conjugation type and form (for verbs and adjectives)
+      if (morph.pos == suzume::core::PartOfSpeech::Verb ||
+          morph.pos == suzume::core::PartOfSpeech::Adjective) {
+        auto verb_type = suzume::grammar::conjTypeToVerbType(morph.conj_type);
+        auto conj_type_str = suzume::grammar::verbTypeToJapanese(verb_type);
+        auto* conj_type = new char[conj_type_str.size() + 1];
+        std::memcpy(conj_type, conj_type_str.data(), conj_type_str.size());
+        conj_type[conj_type_str.size()] = '\0';
+        result->morphemes[idx].conj_type = conj_type;
+
+        auto conj_form_str = suzume::grammar::conjFormToJapanese(morph.conj_form);
+        auto* conj_form = new char[conj_form_str.size() + 1];
+        std::memcpy(conj_form, conj_form_str.data(), conj_form_str.size());
+        conj_form[conj_form_str.size()] = '\0';
+        result->morphemes[idx].conj_form = conj_form;
+      } else {
+        result->morphemes[idx].conj_type = nullptr;
+        result->morphemes[idx].conj_form = nullptr;
+      }
     }
 
     return result;
@@ -97,6 +125,12 @@ SUZUME_EXPORT void suzume_result_free(suzume_result_t* result) {
       delete[] const_cast<char*>(result->morphemes[idx].base_form);
       // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       delete[] const_cast<char*>(result->morphemes[idx].reading);
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+      delete[] const_cast<char*>(result->morphemes[idx].pos_ja);
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+      delete[] const_cast<char*>(result->morphemes[idx].conj_type);
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+      delete[] const_cast<char*>(result->morphemes[idx].conj_form);
     }
     delete[] result->morphemes;
   }

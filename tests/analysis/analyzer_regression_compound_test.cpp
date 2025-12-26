@@ -371,5 +371,218 @@ TEST(AnalyzerTest, Regression_KodomoTachi) {
       << "たち should be Other (suffix)";
 }
 
+// =============================================================================
+// Regression: Compound verb patterns (複合動詞パターン)
+// =============================================================================
+// Bug: 読み終わったら was parsed as 読み(NOUN) + 終わったら(VERB)
+// Fix: Viterbi (position, POS) pair tracking allows VERB path to survive
+//      until connection costs determine the winner
+
+TEST(AnalyzerTest, Regression_CompoundVerb_YomiOwattara) {
+  // 読み終わったら should be 読み(VERB renyokei) + 終わったら(compound aux)
+  Suzume analyzer;
+  auto result = analyzer.analyze("読み終わったら");
+  ASSERT_EQ(result.size(), 2) << "読み終わったら should have 2 tokens";
+
+  EXPECT_EQ(result[0].surface, "読み");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
+      << "読み should be Verb (renyokei), not Noun";
+  EXPECT_EQ(result[0].lemma, "読む") << "読み lemma should be 読む";
+
+  EXPECT_EQ(result[1].surface, "終わったら");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Verb)
+      << "終わったら should be Verb";
+  EXPECT_EQ(result[1].lemma, "終わる") << "終わったら lemma should be 終わる";
+}
+
+TEST(AnalyzerTest, Regression_CompoundVerb_YomiTsuzukeru) {
+  // 読み続ける can be single token or split - either is acceptable
+  // The key is that if split, 読み should be VERB not NOUN
+  Suzume analyzer;
+  auto result = analyzer.analyze("読み続ける");
+  ASSERT_GE(result.size(), 1) << "読み続ける should have at least 1 token";
+
+  // Check first token
+  if (result.size() == 1) {
+    // Single token case
+    EXPECT_EQ(result[0].surface, "読み続ける");
+    EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
+        << "読み続ける should be Verb";
+  } else {
+    // Split case - 読み should be VERB not NOUN
+    EXPECT_EQ(result[0].surface, "読み");
+    EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
+        << "読み should be Verb (renyokei), not Noun";
+  }
+}
+
+TEST(AnalyzerTest, Regression_CompoundVerb_ArukinagaraHanasu) {
+  // 歩きながら話す should keep ながら form intact
+  Suzume analyzer;
+  auto result = analyzer.analyze("歩きながら話す");
+  ASSERT_GE(result.size(), 2) << "歩きながら話す should have at least 2 tokens";
+
+  bool found_arukinagara = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "歩きながら") {
+      found_arukinagara = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Verb)
+          << "歩きながら should be Verb";
+      EXPECT_EQ(mor.lemma, "歩く") << "歩きながら lemma should be 歩く";
+    }
+  }
+  EXPECT_TRUE(found_arukinagara) << "歩きながら should be found as single token";
+}
+
+TEST(AnalyzerTest, Regression_CompoundVerb_TabenagaraAruku) {
+  // 食べながら歩く should keep ながら form intact (Ichidan verb)
+  Suzume analyzer;
+  auto result = analyzer.analyze("食べながら歩く");
+  ASSERT_GE(result.size(), 2) << "食べながら歩く should have at least 2 tokens";
+
+  bool found_tabenagara = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "食べながら") {
+      found_tabenagara = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Verb)
+          << "食べながら should be Verb";
+      EXPECT_EQ(mor.lemma, "食べる") << "食べながら lemma should be 食べる";
+    }
+  }
+  EXPECT_TRUE(found_tabenagara) << "食べながら should be found as single token";
+}
+
+// =============================================================================
+// Regression: Viterbi (position, POS) pair tracking
+// =============================================================================
+// These tests verify that the Viterbi algorithm correctly handles cases where
+// multiple POS candidates exist at the same position, allowing connection
+// costs to determine the optimal path.
+
+TEST(AnalyzerTest, Regression_Viterbi_RenyokeiVsNoun_Sou) {
+  // Verify VERB renyokei + そう is preferred over NOUN + そう
+  // 降りそう: 降り should be VERB (renyokei of 降りる), not NOUN
+  Suzume analyzer;
+  auto result = analyzer.analyze("降りそう");
+  ASSERT_GE(result.size(), 2) << "降りそう should have at least 2 tokens";
+
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
+      << "降り should be Verb (renyokei), not Noun";
+}
+
+TEST(AnalyzerTest, Regression_Viterbi_TeFormNotSplit) {
+  // Te-form should not be split: 走って should be single token
+  Suzume analyzer;
+  auto result = analyzer.analyze("走っている");
+  ASSERT_GE(result.size(), 1) << "走っている should have tokens";
+
+  // Check that 走っ is not split from て
+  bool found_hashitte = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "走って" || mor.surface == "走っている") {
+      found_hashitte = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Verb)
+          << "走って/走っている should be Verb";
+    }
+  }
+  EXPECT_TRUE(found_hashitte)
+      << "走って or 走っている should be found (not split as 走っ + て)";
+}
+
+TEST(AnalyzerTest, Regression_Viterbi_MultiMorphemePreference) {
+  // When costs are equal, prefer fewer morphemes (longer tokens)
+  // いつも should be single ADV, not いつ + も
+  Suzume analyzer;
+  auto result = analyzer.analyze("いつも来る");
+  ASSERT_GE(result.size(), 2) << "いつも来る should have at least 2 tokens";
+
+  EXPECT_EQ(result[0].surface, "いつも")
+      << "いつも should be single token, not split as いつ+も";
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adverb)
+      << "いつも should be Adverb";
+}
+
+// =============================================================================
+// Compound verbs with hiragana V2 (ひらがな補助動詞)
+// =============================================================================
+// Moved from analyzer_regression_verb_test.cpp
+// Bug: Compound verbs written with hiragana V2 (走りだす, 飛びこむ) were not
+// recognized
+// Fix: Added reading field to SubsidiaryVerb struct to match both kanji and
+// hiragana
+
+TEST(AnalyzerTest, Regression_CompoundVerb_HiraganaV2_Dasu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("走りだしたくなかった");
+
+  // Should recognize compound verb with hiragana だし
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "走りだし");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "走り出す");  // Lemma uses kanji form
+}
+
+TEST(AnalyzerTest, Regression_CompoundVerb_HiraganaV2_Komu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("飛びこみたい");
+
+  // Should recognize compound verb with hiragana こみ
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "飛びこみ");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "飛び込む");  // Lemma uses kanji form
+}
+
+TEST(AnalyzerTest, Regression_CompoundVerb_HiraganaV2_Sugiru) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("読みすぎた");
+
+  // Should recognize compound verb with hiragana すぎ
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "読みすぎ");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "読み過ぎる");  // Lemma uses kanji form
+}
+
+// Verify kanji V2 still works
+TEST(AnalyzerTest, Regression_CompoundVerb_KanjiV2_Dasu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("走り出したくなかった");
+
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "走り出し");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "走り出す");
+}
+
+// =============================================================================
+// All-hiragana compound verbs (全ひらがな複合動詞)
+// =============================================================================
+// Moved from analyzer_regression_verb_test.cpp
+// Bug: All-hiragana compound verbs (やりなおす, わかりあう) were not recognized
+// Fix: Added addHiraganaCompoundVerbJoinCandidates function
+
+TEST(AnalyzerTest, Regression_HiraganaCompoundVerb_YariNaosu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("やりなおしたい");
+
+  // Should recognize やりなおし as compound verb
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "やりなおし");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "やり直す");  // Lemma uses kanji V2
+}
+
+TEST(AnalyzerTest, Regression_HiraganaCompoundVerb_WakariAu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("わかりあう");
+
+  // Should recognize as compound verb
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "わかりあう");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "わかり合う");  // Lemma uses kanji V2
+}
+
 }  // namespace
 }  // namespace suzume::analysis

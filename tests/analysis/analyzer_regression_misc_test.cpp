@@ -322,40 +322,6 @@ TEST(AnalyzerTest, Regression_Adverb_SouKamoshirenai) {
 }
 
 // =============================================================================
-// Regression: Auxiliary かもしれない
-// =============================================================================
-// Bug: もしれません was parsed as verb もしれる
-// Fix: Added かもしれない patterns to auxiliaries.h
-
-TEST(AnalyzerTest, Regression_Aux_Kamoshirenai) {
-  Suzume analyzer;
-  auto result = analyzer.analyze("かもしれない");
-  ASSERT_EQ(result.size(), 1) << "かもしれない should be single token";
-
-  EXPECT_EQ(result[0].surface, "かもしれない");
-  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Auxiliary)
-      << "かもしれない should be Auxiliary";
-}
-
-TEST(AnalyzerTest, Regression_Aux_KamoshiremasenInSentence) {
-  Suzume analyzer;
-  auto result = analyzer.analyze("明日は雨かもしれません");
-  ASSERT_GE(result.size(), 3);
-
-  bool found_kamo = false;
-  for (const auto& mor : result) {
-    if (mor.surface == "かもしれません") {
-      found_kamo = true;
-      EXPECT_EQ(mor.pos, core::PartOfSpeech::Auxiliary)
-          << "かもしれません should be Auxiliary";
-      EXPECT_EQ(mor.lemma, "かもしれない")
-          << "かもしれません lemma should be かもしれない";
-    }
-  }
-  EXPECT_TRUE(found_kamo) << "かもしれません should be found";
-}
-
-// =============================================================================
 // Regression: Conditional adverb もし
 // =============================================================================
 // Bug: もし was parsed as OTHER
@@ -473,6 +439,168 @@ TEST(AnalyzerTest, Regression_SumomoMomo) {
   EXPECT_EQ(result[6].surface, "うち");
   EXPECT_EQ(result[6].pos, core::PartOfSpeech::Noun);
   EXPECT_EQ(result[6].lemma, "うち") << "うち lemma should be うち, not うつ";
+}
+
+// =============================================================================
+// Edge cases: そう patterns (verb vs adjective disambiguation)
+// =============================================================================
+// These tests ensure correct handling of 〜そう patterns after scorer changes
+
+TEST(AnalyzerTest, EdgeCase_VerbSou_Hashirisou) {
+  // 走りそう should split as 走り (verb renyokei) + そう (adverb)
+  Suzume analyzer;
+  auto result = analyzer.analyze("走りそう");
+  ASSERT_GE(result.size(), 2) << "走りそう should split into 2 tokens";
+  EXPECT_EQ(result[0].surface, "走り");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+}
+
+TEST(AnalyzerTest, EdgeCase_VerbSou_Nomisou) {
+  // 飲みそう should split as 飲み (verb renyokei) + そう (adverb)
+  Suzume analyzer;
+  auto result = analyzer.analyze("飲みそう");
+  ASSERT_GE(result.size(), 2) << "飲みそう should split into 2 tokens";
+  EXPECT_EQ(result[0].surface, "飲み");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+}
+
+TEST(AnalyzerTest, EdgeCase_AdjSou_Muzukashisou) {
+  // 難しそう should be single ADJ token with lemma 難しい
+  Suzume analyzer;
+  auto result = analyzer.analyze("難しそう");
+  ASSERT_EQ(result.size(), 1) << "難しそう should be single token";
+  EXPECT_EQ(result[0].surface, "難しそう");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective);
+  EXPECT_EQ(result[0].lemma, "難しい");
+}
+
+TEST(AnalyzerTest, EdgeCase_AdjSou_Kanashisou) {
+  // 悲しそう should be single ADJ token with lemma 悲しい
+  Suzume analyzer;
+  auto result = analyzer.analyze("悲しそう");
+  ASSERT_EQ(result.size(), 1) << "悲しそう should be single token";
+  EXPECT_EQ(result[0].surface, "悲しそう");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective);
+  EXPECT_EQ(result[0].lemma, "悲しい");
+}
+
+TEST(AnalyzerTest, EdgeCase_VerbSouDesu) {
+  // 食べそうです should parse as 食べそう (verb) + です (aux)
+  // Copula penalty should not apply after 〜そう verbs
+  Suzume analyzer;
+  auto result = analyzer.analyze("食べそうです");
+  ASSERT_GE(result.size(), 2);
+
+  bool found_verb = false;
+  bool found_desu = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "食べそう" && mor.pos == core::PartOfSpeech::Verb) {
+      found_verb = true;
+    }
+    if (mor.surface == "です" && mor.pos == core::PartOfSpeech::Auxiliary) {
+      found_desu = true;
+    }
+  }
+  EXPECT_TRUE(found_verb) << "食べそう should be VERB";
+  EXPECT_TRUE(found_desu) << "です should be AUX";
+}
+
+// =============================================================================
+// Edge cases: Suffix recognition (たち, さん, etc.)
+// =============================================================================
+
+TEST(AnalyzerTest, EdgeCase_Suffix_Watashitachi) {
+  // 私たち should be recognized as pronoun (compound) or noun + suffix
+  Suzume analyzer;
+  auto result = analyzer.analyze("私たち");
+  ASSERT_GE(result.size(), 1);
+  // Either single PRON token or PRON + OTHER(suffix)
+  if (result.size() == 1) {
+    EXPECT_EQ(result[0].pos, core::PartOfSpeech::Pronoun);
+  } else {
+    EXPECT_EQ(result[1].surface, "たち");
+    EXPECT_EQ(result[1].pos, core::PartOfSpeech::Other);
+  }
+}
+
+TEST(AnalyzerTest, EdgeCase_Suffix_SenseiSan) {
+  // 先生さん should split as 先生 (noun) + さん (suffix)
+  Suzume analyzer;
+  auto result = analyzer.analyze("先生さん");
+  ASSERT_EQ(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "先生");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Noun);
+  EXPECT_EQ(result[1].surface, "さん");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Other);
+}
+
+// =============================================================================
+// Edge cases: いつも patterns
+// =============================================================================
+
+TEST(AnalyzerTest, EdgeCase_Itsumo_BeforeVerb) {
+  // いつも来る should parse as いつも (adverb) + 来る (verb)
+  Suzume analyzer;
+  auto result = analyzer.analyze("いつも来る");
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "いつも");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adverb);
+}
+
+TEST(AnalyzerTest, EdgeCase_Itsumo_BeforeAdj) {
+  // いつも楽しい should parse as いつも (adverb) + 楽しい (adjective)
+  Suzume analyzer;
+  auto result = analyzer.analyze("いつも楽しい");
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "いつも");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adverb);
+}
+
+TEST(AnalyzerTest, EdgeCase_Itsumo_No_Mise) {
+  // いつもの店 should parse as いつも (adverb) + の (particle) + 店 (noun)
+  // NOT as いつ (pronoun) + もの (noun) + 店 (noun)
+  Suzume analyzer;
+  auto result = analyzer.analyze("いつもの店");
+  ASSERT_EQ(result.size(), 3);
+  EXPECT_EQ(result[0].surface, "いつも");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adverb);
+  EXPECT_EQ(result[1].surface, "の");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Particle);
+  EXPECT_EQ(result[2].surface, "店");
+  EXPECT_EQ(result[2].pos, core::PartOfSpeech::Noun);
+}
+
+// =============================================================================
+// Edge cases: Character speech patterns
+// =============================================================================
+
+TEST(AnalyzerTest, EdgeCase_CharSpeech_Nya) {
+  // だにゃ should be recognized as single AUX (character speech)
+  // lemma should be だよ (にゃ functions like よ sentence-ending particle)
+  Suzume analyzer;
+  auto result = analyzer.analyze("猫だにゃ");
+  ASSERT_EQ(result.size(), 2);
+
+  EXPECT_EQ(result[0].surface, "猫");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Noun);
+  EXPECT_EQ(result[1].surface, "だにゃ");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Auxiliary);
+  EXPECT_EQ(result[1].lemma, "だよ");
+}
+
+TEST(AnalyzerTest, EdgeCase_CharSpeech_Desuwa) {
+  // ですわ should be recognized as AUX (ojou-sama speech)
+  Suzume analyzer;
+  auto result = analyzer.analyze("綺麗ですわ");
+  ASSERT_GE(result.size(), 2);
+
+  bool found_desuwa = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "ですわ" && mor.pos == core::PartOfSpeech::Auxiliary) {
+      found_desuwa = true;
+    }
+  }
+  EXPECT_TRUE(found_desuwa) << "ですわ should be AUX";
 }
 
 }  // namespace

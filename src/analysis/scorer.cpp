@@ -171,6 +171,44 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += options_.optimal_length_bonus;
   }
 
+  // Penalize verbs ending with そう (likely verb renyokei + そう auxiliary)
+  // E.g., 降りそう should split as 降り + そう, not single verb
+  // Note: Adjectives like おいしそう should remain as single token
+  if (edge.pos == core::PartOfSpeech::Verb && edge.surface.size() >= 6) {
+    std::string_view surface = edge.surface;
+    if (surface.size() >= 6 &&
+        surface.substr(surface.size() - 6) == "そう") {
+      cost += 1.0F;  // Penalty to prefer verb + そう split
+    }
+    // Also penalize verbs ending with そうです (verb + そう + です)
+    // E.g., 食べそうです should split as 食べそう + です
+    if (surface.size() >= 12 &&
+        surface.substr(surface.size() - 12) == "そうです") {
+      cost += 1.5F;  // Stronger penalty to prefer verb+そう + です split
+    }
+  }
+
+  // Penalize unknown adjectives ending with そう with invalid lemma
+  // E.g., 食べそう should not be ADJ with lemma 食べい (invalid)
+  // Valid: おいしそう with lemma おいしい (ends with しい)
+  // Valid: 難しそう with lemma 難しい (ends with しい)
+  if (edge.pos == core::PartOfSpeech::Adjective &&
+      !edge.fromDictionary() &&
+      edge.surface.size() >= 6) {
+    std::string_view surface = edge.surface;
+    if (surface.size() >= 6 &&
+        surface.substr(surface.size() - 6) == "そう") {
+      // Check if lemma ends with しい (valid i-adjective pattern)
+      bool valid_adj_lemma = false;
+      if (edge.lemma.size() >= 6 &&
+          edge.lemma.substr(edge.lemma.size() - 6) == "しい") {
+        valid_adj_lemma = true;
+      }
+      if (!valid_adj_lemma) {
+        cost += 1.5F;  // Penalty for invalid adjective + そう pattern
+      }
+    }
+  }
 
   return cost;
 }
@@ -184,11 +222,20 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Copula だ/です cannot follow verbs
   // e.g., 食べただ ✗, 食べましただ ✗
   // Valid: 学生だ ○, 静かだ ○
+  // Exception: 〜そう + です is valid (e.g., しそうです, 食べそうです)
   if (prev.pos == core::PartOfSpeech::Verb &&
       next.pos == core::PartOfSpeech::Auxiliary) {
     if (next.surface == "だ" || next.surface == "です") {
-      penalty += 3.0F;  // Strong penalty for invalid grammar
-      penalty_reason = "copula after verb";
+      // Check if prev ends with そう (aspectual auxiliary pattern)
+      bool is_sou_pattern = false;
+      if (prev.surface.size() >= 6 &&
+          prev.surface.substr(prev.surface.size() - 6) == "そう") {
+        is_sou_pattern = true;
+      }
+      if (!is_sou_pattern) {
+        penalty += 3.0F;  // Strong penalty for invalid grammar
+        penalty_reason = "copula after verb";
+      }
     }
   }
 
@@ -220,6 +267,37 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
           last3 == "ぺ") {
         penalty += 1.5F;  // Prefer te-form over renyokei + て/てV
         penalty_reason = "ichidan renyokei + te pattern";
+      }
+    }
+  }
+
+  // Penalize Noun/Verb + て for te-form split patterns
+  // This handles both Godan 音便 and Ichidan patterns when prev is Noun
+  // (Ichidan with Verb is handled above)
+  //
+  // Godan 音便 patterns:
+  //   書い + て should be 書いて (te-form), not split
+  //   走っ + て should be 走って (te-form), not split
+  //   読ん + で should be 読んで (te-form), not split
+  // Ichidan patterns (when prev is Noun due to lattice ambiguity):
+  //   教え + て should be 教えて (te-form), not split
+  if ((prev.pos == core::PartOfSpeech::Noun ||
+       prev.pos == core::PartOfSpeech::Verb) &&
+      next.pos == core::PartOfSpeech::Particle &&
+      (next.surface == "て" || next.surface == "で")) {
+    if (!prev.surface.empty() && prev.surface.size() >= 3) {
+      std::string_view last3 = std::string_view(prev.surface).substr(
+          prev.surface.size() - 3);
+      // Godan 音便 endings: い (イ音便), っ (促音便), ん (撥音便)
+      // Ichidan endings: e-row hiragana (べ, め, せ, け, げ, て, ね, れ, え, etc.)
+      if (last3 == "い" || last3 == "っ" || last3 == "ん" ||
+          last3 == "べ" || last3 == "め" || last3 == "せ" ||
+          last3 == "け" || last3 == "げ" || last3 == "て" ||
+          last3 == "ね" || last3 == "れ" || last3 == "え" ||
+          last3 == "で" || last3 == "ぜ" || last3 == "へ" ||
+          last3 == "ぺ") {
+        penalty += 1.5F;  // Prefer te-form over split
+        penalty_reason = "te-form split pattern";
       }
     }
   }
@@ -268,6 +346,65 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
         penalty += 2.0F;  // Strong penalty - prefer verb + やすい auxiliary
         penalty_reason = "yasui adj after renyokei-like noun";
       }
+    }
+  }
+
+  // Penalize VERB + ながら (PARTICLE) split when verb is in renyokei form
+  // Pattern: 飲み + ながら should be 飲みながら (single token), not split
+  // This prevents incorrect splits when longer forms exist in the lattice
+  if (prev.pos == core::PartOfSpeech::Verb &&
+      next.pos == core::PartOfSpeech::Particle &&
+      next.surface == "ながら") {
+    if (!prev.surface.empty() && prev.surface.size() >= 3) {
+      std::string_view last3 = std::string_view(prev.surface).substr(
+          prev.surface.size() - 3);
+      // I-row hiragana (Godan renyokei) and e-row (Ichidan renyokei)
+      if (last3 == "み" || last3 == "き" || last3 == "ぎ" ||
+          last3 == "し" || last3 == "ち" || last3 == "び" ||
+          last3 == "り" || last3 == "い" || last3 == "に" ||
+          last3 == "べ" || last3 == "め" || last3 == "せ" ||
+          last3 == "け" || last3 == "げ" || last3 == "て" ||
+          last3 == "ね" || last3 == "れ" || last3 == "え") {
+        penalty += 1.0F;  // Penalty - prefer single ながら token
+        penalty_reason = "nagara split after renyokei verb";
+      }
+    }
+  }
+
+  // Penalize NOUN + そう (appearance auxiliary) when noun looks like verb renyokei
+  // Pattern: 話し + そう should be verb renyokei + そう auxiliary, not noun + adverb
+  // Verb renyokei typically ends with i-row hiragana
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      next.pos == core::PartOfSpeech::Adverb &&
+      next.surface == "そう") {
+    if (!prev.surface.empty() && prev.surface.size() >= 3) {
+      std::string_view last3 = std::string_view(prev.surface).substr(
+          prev.surface.size() - 3);
+      // I-row hiragana (Godan renyokei) and e-row (Ichidan renyokei)
+      if (last3 == "み" || last3 == "き" || last3 == "ぎ" ||
+          last3 == "し" || last3 == "ち" || last3 == "び" ||
+          last3 == "り" || last3 == "い" || last3 == "に" ||
+          last3 == "べ" || last3 == "め" || last3 == "せ" ||
+          last3 == "け" || last3 == "げ" || last3 == "て" ||
+          last3 == "ね" || last3 == "れ" || last3 == "え") {
+        penalty += 0.5F;  // Penalty - prefer verb renyokei + そう auxiliary
+        penalty_reason = "sou aux after renyokei-like noun";
+      }
+    }
+  }
+
+  // Penalize AUX だ/です + character speech suffix (にゃ, にゃん, わ, etc.)
+  // Pattern: だ + にゃ should be だにゃ (single token), not split
+  // Character speech variants like だにゃ, ですわ should be single tokens
+  if (prev.pos == core::PartOfSpeech::Auxiliary &&
+      next.pos == core::PartOfSpeech::Auxiliary) {
+    if ((prev.surface == "だ" || prev.surface == "です") &&
+        (next.surface == "にゃ" || next.surface == "にゃん" ||
+         next.surface == "わ" || next.surface == "のだ" ||
+         next.surface == "よ" || next.surface == "ね" ||
+         next.surface == "ぞ" || next.surface == "さ")) {
+      penalty += 1.0F;  // Penalty to prefer single token character speech
+      penalty_reason = "split character speech pattern";
     }
   }
 
