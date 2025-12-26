@@ -119,6 +119,11 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"られなかった", "られる", kAuxReru, kAuxOutTa, kVerbMizenkei},
       {"られなくて", "られる", kAuxReru, kAuxOutTe, kVerbMizenkei},
       {"れなくて", "れる", kAuxReru, kAuxOutTe, kVerbMizenkei},
+      // Passive + なくなる (stop being done) - Godan verbs (読まれなくなった)
+      {"れなくなる", "れる", kAuxReru, kAuxOutBase, kVerbMizenkei},
+      {"れなくなった", "れる", kAuxReru, kAuxOutTa, kVerbMizenkei},
+      {"れなくなって", "れる", kAuxReru, kAuxOutTe, kVerbMizenkei},
+      // Passive + なくなる - Ichidan verbs (食べられなくなった) - already added in potential section
 
       // === Causative (せる/させる系) ===
       {"せる", "せる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
@@ -143,6 +148,10 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"させられない", "させられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       {"させられなくて", "させられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       {"させられます", "させられる", kAuxSeru, kAuxOutMasu, kVerbMizenkei},
+      // Causative-passive + なくなる (stop being made to do something)
+      {"させられなくなる", "させられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
+      {"させられなくなった", "させられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
+      {"させられなくなって", "させられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       // === Causative-passive (せられる系) - for Godan ===
       // 書く → 書か + せられる = 書かせられる
       {"せられる", "せられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
@@ -153,6 +162,10 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"せられます", "せられる", kAuxSeru, kAuxOutMasu, kVerbMizenkei},
       {"せられました", "せられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"せられません", "せられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
+      // Causative-passive + なくなる (stop being made to do something) - Godan
+      {"せられなくなる", "せられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
+      {"せられなくなった", "せられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
+      {"せられなくなって", "せられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       // Short form causative-passive for Godan (歩かされる = 歩か + される)
       {"される", "される", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       {"された", "される", kAuxSeru, kAuxOutTa, kVerbMizenkei},
@@ -422,6 +435,24 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"なくなって", "なくなる", kAuxNai, kAuxOutTe, kVerbPotential},
       {"なくなってしまう", "なくなる", kAuxNai, kAuxOutBase, kVerbPotential},
       {"なくなってしまった", "なくなる", kAuxNai, kAuxOutTa, kVerbPotential},
+
+      // === Ichidan mizenkei + なくなる (stop doing) ===
+      // 食べなくなる = stop eating (Ichidan verb mizenkei + なくなる)
+      // Note: Ichidan mizenkei = stem (食べ), so 食べ + なくなった → 食べる
+      {"なくなる", "なくなる", kAuxNai, kAuxOutBase, kVerbMizenkei},
+      {"なくなった", "なくなる", kAuxNai, kAuxOutTa, kVerbMizenkei},
+      {"なくなって", "なくなる", kAuxNai, kAuxOutTe, kVerbMizenkei},
+      {"なくなってしまう", "なくなる", kAuxNai, kAuxOutBase, kVerbMizenkei},
+      {"なくなってしまった", "なくなる", kAuxNai, kAuxOutTa, kVerbMizenkei},
+
+      // === Ichidan potential + なくなる (stop being able to) ===
+      // 食べられなくなる = stop being able to eat (Ichidan verb + られ + なくなる)
+      {"られなくなる", "られる", kAuxReru, kAuxOutBase, kVerbMizenkei},
+      {"られなくなった", "られる", kAuxReru, kAuxOutTa, kVerbMizenkei},
+      {"られなくなって", "られる", kAuxReru, kAuxOutTe, kVerbMizenkei},
+      {"られなくなってしまう", "られる", kAuxReru, kAuxOutBase, kVerbMizenkei},
+      {"られなくなってしまった", "られる", kAuxReru, kAuxOutTa, kVerbMizenkei},
+
   };
 
   // Sort by surface length (longest first) for greedy matching

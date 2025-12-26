@@ -40,7 +40,8 @@ struct ScorerOptions {
     size_t noun_min = 2;
     size_t noun_max = 6;
     size_t verb_min = 3;  // Increased from 2 to prevent short verbs like して from getting bonus
-    size_t verb_max = 8;
+    size_t verb_max = 12; // Increased to accommodate long conjugated forms
+                          // e.g., かけられなくなった (9 chars), 食べさせられなくなった (10 chars)
     size_t adj_min = 2;
     size_t adj_max = 6;
     size_t katakana_min = 3;

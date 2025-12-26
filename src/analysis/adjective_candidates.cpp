@@ -137,6 +137,47 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       continue;  // Skip - passive negative renyokei
     }
 
+    // Skip patterns ending with 〜れなくなった (passive negative + become + past)
+    // E.g., 読まれなくなった = 読む + れる + なくなる + た
+    if (hiragana_part.size() >= 21 &&  // れなくなった = 21 bytes
+        hiragana_part.substr(hiragana_part.size() - 21) == "れなくなった") {
+      continue;  // Skip - passive negative + become pattern
+    }
+    if (hiragana_part.size() >= 24 &&  // られなくなった = 24 bytes
+        hiragana_part.substr(hiragana_part.size() - 24) == "られなくなった") {
+      continue;  // Skip - passive/potential negative + become pattern
+    }
+
+    // Skip patterns ending with 〜なく when followed by なった/なる
+    // E.g., 食べなく + なった is actually 食べなくなった (verb form)
+    // Check if the text continues with なった/なる/なって
+    if (hiragana_part.size() >= 6 &&  // なく = 6 bytes
+        hiragana_part.substr(hiragana_part.size() - 6) == "なく" &&
+        end_pos < codepoints.size()) {
+      // Check following characters for なった/なる/なって
+      char32_t next_char = codepoints[end_pos];
+      if (next_char == U'な') {
+        continue;  // Skip - likely verb negative + なる pattern
+      }
+    }
+
+    // Skip patterns that are causative stems (〜べさ, 〜ませ, etc.)
+    // E.g., 食べさ is the start of 食べさせる (causative)
+    // These end in さ but are followed by せ in the full form
+    if (hiragana_part == "べさ" || hiragana_part == "べさせ" ||
+        hiragana_part == "べさせら" || hiragana_part == "べさせられ") {
+      continue;  // Skip - ichidan causative stem patterns
+    }
+    // Skip patterns ending with causative-passive 〜させられなくなった
+    if (hiragana_part.size() >= 30 &&  // させられなくなった = 30 bytes
+        hiragana_part.substr(hiragana_part.size() - 30) == "させられなくなった") {
+      continue;  // Skip - causative-passive negative + become pattern
+    }
+    if (hiragana_part.size() >= 27 &&  // せられなくなった = 27 bytes
+        hiragana_part.substr(hiragana_part.size() - 27) == "せられなくなった") {
+      continue;  // Skip - causative-passive negative + become pattern
+    }
+
     auto best = inflection.getBest(surface);
     // Require confidence >= 0.5 for i-adjectives
     // Base forms like 寒い get exactly 0.5, conjugated forms like 美しかった get 0.68+
@@ -285,6 +326,37 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
 
     if (surface.empty()) {
       continue;
+    }
+
+    // Skip patterns ending with verb passive/potential/causative negative renyokei
+    // 〜られなく, 〜れなく, 〜させなく, 〜せなく are all verb forms, not i-adjectives.
+    // E.g., けられなく = ける + られ + ない (verb passive negative renyokei)
+    // Also skip 〜かけられなく, 〜けられなく which are clearly verb patterns
+    if (surface.size() >= 12 &&  // られなく = 12 bytes
+        surface.substr(surface.size() - 12) == "られなく") {
+      continue;  // Skip - passive/potential negative renyokei
+    }
+    if (surface.size() >= 9 &&  // れなく = 9 bytes
+        surface.substr(surface.size() - 9) == "れなく") {
+      continue;  // Skip - passive/potential negative renyokei
+    }
+    if (surface.size() >= 12 &&  // させなく = 12 bytes
+        surface.substr(surface.size() - 12) == "させなく") {
+      continue;  // Skip - causative negative renyokei
+    }
+    if (surface.size() >= 9 &&  // せなく = 9 bytes
+        surface.substr(surface.size() - 9) == "せなく") {
+      continue;  // Skip - causative negative renyokei
+    }
+    if (surface.size() >= 12 &&  // されなく = 12 bytes
+        surface.substr(surface.size() - 12) == "されなく") {
+      continue;  // Skip - passive negative renyokei
+    }
+    // Skip patterns ending with 〜かなく (verb negative renyokei of godan verbs)
+    // E.g., いかなく = いく + ない, かかなく = かく + ない
+    if (surface.size() >= 9 &&  // かなく = 9 bytes
+        surface.substr(surface.size() - 9) == "かなく") {
+      continue;  // Skip - godan negative renyokei
     }
 
     // Check if this looks like a conjugated i-adjective

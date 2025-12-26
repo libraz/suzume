@@ -224,5 +224,110 @@ TEST_F(InflectionCompoundTest, PassiveCausativeCompound) {
   EXPECT_EQ(result.base_form, "書く");
 }
 
+// ===== Ichidan potential + nakunaru (stop being able to) =====
+
+TEST_F(InflectionCompoundTest, IchidanPotentialNakunaru) {
+  auto result = inflection_.getBest("食べられなくなる");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionCompoundTest, IchidanPotentialNakunatta) {
+  auto result = inflection_.getBest("食べられなくなった");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionCompoundTest, IchidanPotentialNakunatte) {
+  auto result = inflection_.getBest("食べられなくなって");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionCompoundTest, IchidanPotentialNakunatteShimatta) {
+  auto result = inflection_.getBest("食べられなくなってしまった");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionCompoundTest, IchidanPotentialNakunaru_Miru) {
+  auto result = inflection_.getBest("見られなくなる");
+  EXPECT_EQ(result.base_form, "見る");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+// ===== Ichidan mizenkei + なくなる (stop doing) =====
+// 食べなくなった = stopped eating (食べ mizenkei + なくなった)
+
+TEST_F(InflectionCompoundTest, IchidanMizenkeiNakunaru) {
+  auto result = inflection_.getBest("食べなくなる");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionCompoundTest, IchidanMizenkeiNakunatta) {
+  auto result = inflection_.getBest("食べなくなった");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionCompoundTest, IchidanMizenkeiNakunatte) {
+  auto result = inflection_.getBest("食べなくなって");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionCompoundTest, IchidanMizenkeiNakunatteShimatta) {
+  auto result = inflection_.getBest("食べなくなってしまった");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionCompoundTest, IchidanMizenkeiNakunaru_Miru) {
+  auto result = inflection_.getBest("見なくなる");
+  EXPECT_EQ(result.base_form, "見る");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionCompoundTest, IchidanMizenkeiNakunatta_Shiraberu) {
+  // 調べなくなった = stopped investigating
+  auto result = inflection_.getBest("調べなくなった");
+  EXPECT_EQ(result.base_form, "調べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+// ===== Godan potential + なくなる (become unable to) =====
+// 話せなくなった = became unable to speak (話せ potential + なくなった)
+
+TEST_F(InflectionCompoundTest, GodanPotentialNakunaru_Hanasu) {
+  auto result = inflection_.getBest("話せなくなる");
+  EXPECT_EQ(result.base_form, "話す");
+  EXPECT_EQ(result.verb_type, VerbType::GodanSa);
+}
+
+TEST_F(InflectionCompoundTest, GodanPotentialNakunatta_Hanasu) {
+  auto result = inflection_.getBest("話せなくなった");
+  EXPECT_EQ(result.base_form, "話す");
+  EXPECT_EQ(result.verb_type, VerbType::GodanSa);
+}
+
+TEST_F(InflectionCompoundTest, GodanPotentialNakunatta_Yomu) {
+  auto result = inflection_.getBest("読めなくなった");
+  EXPECT_EQ(result.base_form, "読む");
+  EXPECT_EQ(result.verb_type, VerbType::GodanMa);
+}
+
+TEST_F(InflectionCompoundTest, GodanPotentialNakunatta_Kaku) {
+  auto result = inflection_.getBest("書けなくなった");
+  EXPECT_EQ(result.base_form, "書く");
+  EXPECT_EQ(result.verb_type, VerbType::GodanKa);
+}
+
+TEST_F(InflectionCompoundTest, GodanPotentialNakunatteShimatta_Hanasu) {
+  auto result = inflection_.getBest("話せなくなってしまった");
+  EXPECT_EQ(result.base_form, "話す");
+  EXPECT_EQ(result.verb_type, VerbType::GodanSa);
+}
+
 }  // namespace
 }  // namespace suzume::grammar

@@ -201,12 +201,12 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
   //   - な→なる/なくす
   //   - て→できる
   //   - や→やる (important: must NOT skip や)
+  //   - か→かける/かえる/かう/かく (important: must NOT skip か)
   if (start_type == normalize::CharType::Hiragana) {
     char32_t first_char = codepoints[start_pos];
     if (first_char == U'を' || first_char == U'が' || first_char == U'は' ||
         first_char == U'に' || first_char == U'へ' || first_char == U'の' ||
-        first_char == U'か' || first_char == U'ね' ||
-        first_char == U'よ' || first_char == U'わ') {
+        first_char == U'ね' || first_char == U'よ' || first_char == U'わ') {
       return candidates;  // Let dictionary handle these
     }
 

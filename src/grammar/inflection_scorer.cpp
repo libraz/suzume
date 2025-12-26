@@ -63,9 +63,10 @@ float calculateConfidence(VerbType type, std::string_view stem,
           required_conn == conn::kVerbRenyokei || required_conn == conn::kVerbMizenkei;
       if (stem_len == 6 && is_potential_context &&
           endsWithKanji(stem.substr(0, 3)) && is_common_potential_ending) {
-        // 書け could be Ichidan 書ける or Godan potential of 書く
-        // Prefer Godan potential interpretation
-        base -= 0.15F;
+        // 話せ could be Ichidan 話せる or Godan potential of 話す
+        // Prefer Godan potential interpretation (話す is more common than using 話せる directly)
+        // Strong penalty to overcome the 0.95 cap tie
+        base -= 0.35F;
       } else {
         base += 0.12F;
       }
@@ -271,6 +272,15 @@ float calculateConfidence(VerbType type, std::string_view stem,
         type != VerbType::Kuru) {
       base += 0.10F;  // Boost Godan potential interpretation
     }
+  }
+
+  // Penalty for GodanBa potential interpretation
+  // GodanBa verbs (飛ぶ, 呼ぶ, 遊ぶ, etc.) are rare compared to Ichidan verbs ending in べる
+  // (食べる, 調べる, 比べる, etc.). When we see stem + べ in potential context,
+  // it's much more likely to be Ichidan than GodanBa potential.
+  // Example: 食べなくなった → 食べる (Ichidan) not 食ぶ (non-existent GodanBa)
+  if (required_conn == conn::kVerbPotential && type == VerbType::GodanBa) {
+    base -= 0.25F;  // Strong penalty for GodanBa potential
   }
 
   // Penalty for Godan potential with single-kanji stem in compound patterns

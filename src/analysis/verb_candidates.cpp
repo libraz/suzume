@@ -357,11 +357,11 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
   //   - な→なる/なくす
   //   - て→できる
   //   - や→やる (important: must NOT skip や)
+  //   - か→かける/かえる/かう/かく (important: must NOT skip か)
   char32_t first_char = codepoints[start_pos];
   if (first_char == U'を' || first_char == U'が' || first_char == U'は' ||
       first_char == U'に' || first_char == U'へ' || first_char == U'の' ||
-      first_char == U'か' || first_char == U'ね' ||
-      first_char == U'よ' || first_char == U'わ') {
+      first_char == U'ね' || first_char == U'よ' || first_char == U'わ') {
     return candidates;
   }
 
@@ -480,6 +480,27 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       size_t candidate_len = end_pos - start_pos;
       if (is_dictionary_verb && candidate_len >= 5) {
         base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;
+      } else if (candidate_len >= 7 && best.confidence >= 0.8F) {
+        // For long hiragana verb forms (7+ chars) with high confidence,
+        // give a bonus even without dictionary verification.
+        // This helps forms like かけられなくなった (9 chars) beat the
+        // particle+verb split path (か + けられなくなった).
+        // The length requirement (7+ chars) helps avoid false positives.
+        //
+        // When the verb starts with a character that's commonly mistaken for
+        // a particle (か, は, が, etc.), give an extra strong bonus because
+        // the particle split path is very likely to compete.
+        bool starts_with_particle_char =
+            (first_char == U'か' || first_char == U'は' || first_char == U'が' ||
+             first_char == U'を' || first_char == U'に' || first_char == U'で' ||
+             first_char == U'と' || first_char == U'も' || first_char == U'へ');
+        if (starts_with_particle_char) {
+          // Extra strong bonus for forms starting with particle-like char
+          // e.g., かけられなくなった should strongly beat か + けられなくなった
+          base_cost = 0.05F + (1.0F - best.confidence) * 0.1F;
+        } else {
+          base_cost = 0.2F + (1.0F - best.confidence) * 0.2F;
+        }
       }
 
       UnknownCandidate candidate;

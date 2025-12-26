@@ -114,6 +114,14 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
                 last_char == "わ") {
               invalid_stem = true;
             }
+            // E-row: け げ せ て ね べ め れ え
+            // These are common potential stems or Ichidan stem endings
+            // This prevents 話せ + なくなった → 話せする (wrong)
+            if (last_char == "け" || last_char == "げ" || last_char == "せ" ||
+                last_char == "て" || last_char == "ね" || last_char == "べ" ||
+                last_char == "め" || last_char == "れ" || last_char == "え") {
+              invalid_stem = true;
+            }
             // Single-kanji stems are NOT valid for empty suffix suru patterns
             // Real suru verb stems have 2+ kanji (開催, 勉強, 検討)
             // This prevents 見+られた → 見する (wrong, should be 見る Ichidan)
