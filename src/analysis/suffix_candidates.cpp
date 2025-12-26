@@ -12,12 +12,8 @@ namespace suzume::analysis {
 
 std::string extractSubstring(const std::vector<char32_t>& codepoints,
                              size_t start, size_t end) {
-  if (start >= codepoints.size() || end > codepoints.size() || start >= end) {
-    return "";
-  }
-  std::vector<char32_t> sub(codepoints.begin() + static_cast<std::ptrdiff_t>(start),
-                             codepoints.begin() + static_cast<std::ptrdiff_t>(end));
-  return normalize::utf8::encode(sub);
+  // Use encodeRange directly to avoid intermediate vector allocation
+  return normalize::encodeRange(codepoints, start, end);
 }
 
 const std::vector<SuffixEntry>& getSuffixEntries() {

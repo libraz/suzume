@@ -13,6 +13,7 @@
 
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include "auxiliaries.h"
@@ -80,6 +81,10 @@ class Inflection {
       std::string_view remaining,
       const std::vector<std::string>& aux_chain,
       uint16_t required_conn) const;
+
+  // Cache for analyze() results (mutable for const methods)
+  mutable std::unordered_map<std::string, std::vector<InflectionCandidate>>
+      cache_;
 };
 
 }  // namespace suzume::grammar

@@ -37,6 +37,8 @@ struct UnknownCandidate {
   core::PartOfSpeech pos{core::PartOfSpeech::Noun};
   float cost{0.0F};
   bool has_suffix{false};
+  std::string lemma;  // Base form (for verbs/adjectives)
+  dictionary::ConjugationType conj_type{dictionary::ConjugationType::None};
 };
 
 /**

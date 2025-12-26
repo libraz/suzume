@@ -210,7 +210,7 @@ std::vector<DictionaryEntry> expandVerbEntry(const DictionaryEntry& entry) {
         DictionaryEntry new_entry = entry;
         new_entry.surface = surface;
         new_entry.lemma = lemma;
-        new_entry.conj_type = ConjugationType::None;  // Already expanded
+        // Preserve conj_type for ChaSen output
         result.push_back(new_entry);
       }
       return result;
@@ -226,7 +226,7 @@ std::vector<DictionaryEntry> expandVerbEntry(const DictionaryEntry& entry) {
     DictionaryEntry new_entry = entry;
     new_entry.surface = stem + form.suffix;
     new_entry.lemma = lemma;
-    new_entry.conj_type = ConjugationType::None;  // Already expanded
+    // Preserve conj_type for ChaSen output
     result.push_back(new_entry);
   }
 
@@ -274,7 +274,7 @@ std::vector<DictionaryEntry> expandAdjectiveEntry(const DictionaryEntry& entry) 
     DictionaryEntry new_entry = entry;
     new_entry.surface = stem + suffix;
     new_entry.lemma = lemma;
-    new_entry.conj_type = ConjugationType::None;  // Already expanded
+    // Preserve conj_type for ChaSen output
     result.push_back(new_entry);
   }
 

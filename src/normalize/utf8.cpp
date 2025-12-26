@@ -151,4 +151,17 @@ std::string fromCodepoints(const std::vector<char32_t>& codepoints) {
   return result;
 }
 
+std::string encodeRange(const std::vector<char32_t>& codepoints,
+                        size_t start, size_t end) {
+  if (start >= codepoints.size() || end > codepoints.size() || start >= end) {
+    return "";
+  }
+  std::string result;
+  result.reserve((end - start) * 3);  // Estimate for Japanese
+  for (size_t idx = start; idx < end; ++idx) {
+    encodeUtf8(codepoints[idx], result);
+  }
+  return result;
+}
+
 }  // namespace suzume::normalize

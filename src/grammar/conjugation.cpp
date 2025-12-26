@@ -391,4 +391,114 @@ std::vector<ConjugatedForm> Conjugation::generateIAdjective(const std::string& s
   return forms;
 }
 
+std::string_view verbTypeToString(VerbType type) {
+  switch (type) {
+    case VerbType::Ichidan:
+      return "ichidan";
+    case VerbType::GodanKa:
+      return "godan-ka";
+    case VerbType::GodanGa:
+      return "godan-ga";
+    case VerbType::GodanSa:
+      return "godan-sa";
+    case VerbType::GodanTa:
+      return "godan-ta";
+    case VerbType::GodanNa:
+      return "godan-na";
+    case VerbType::GodanBa:
+      return "godan-ba";
+    case VerbType::GodanMa:
+      return "godan-ma";
+    case VerbType::GodanRa:
+      return "godan-ra";
+    case VerbType::GodanWa:
+      return "godan-wa";
+    case VerbType::Suru:
+      return "suru";
+    case VerbType::Kuru:
+      return "kuru";
+    case VerbType::IAdjective:
+      return "i-adj";
+    case VerbType::Unknown:
+    default:
+      return "";
+  }
+}
+
+std::string_view verbTypeToJapanese(VerbType type) {
+  switch (type) {
+    case VerbType::Ichidan:
+      return "一段";
+    case VerbType::GodanKa:
+      return "五段・カ行";
+    case VerbType::GodanGa:
+      return "五段・ガ行";
+    case VerbType::GodanSa:
+      return "五段・サ行";
+    case VerbType::GodanTa:
+      return "五段・タ行";
+    case VerbType::GodanNa:
+      return "五段・ナ行";
+    case VerbType::GodanBa:
+      return "五段・バ行";
+    case VerbType::GodanMa:
+      return "五段・マ行";
+    case VerbType::GodanRa:
+      return "五段・ラ行";
+    case VerbType::GodanWa:
+      return "五段・ワ行";
+    case VerbType::Suru:
+      return "サ変";
+    case VerbType::Kuru:
+      return "カ変";
+    case VerbType::IAdjective:
+      return "形容詞";
+    case VerbType::Unknown:
+    default:
+      return "";
+  }
+}
+
+std::string_view conjFormToString(ConjForm form) {
+  switch (form) {
+    case ConjForm::Base:
+      return "base";
+    case ConjForm::Mizenkei:
+      return "mizenkei";
+    case ConjForm::Renyokei:
+      return "renyokei";
+    case ConjForm::Onbinkei:
+      return "onbinkei";
+    case ConjForm::Kateikei:
+      return "kateikei";
+    case ConjForm::Meireikei:
+      return "meireikei";
+    case ConjForm::Ishikei:
+      return "ishikei";
+    default:
+      return "";
+  }
+}
+
+std::string_view conjFormToJapanese(ConjForm form) {
+  switch (form) {
+    case ConjForm::Base:
+      return "終止形";
+    case ConjForm::Mizenkei:
+      return "未然形";
+    case ConjForm::Renyokei:
+      return "連用形";
+    case ConjForm::Onbinkei:
+      return "連用形";
+    case ConjForm::Kateikei:
+      return "仮定形";
+    case ConjForm::Meireikei:
+      return "命令形";
+    case ConjForm::Ishikei:
+      return "意志形";
+    default:
+      return "";
+  }
+}
+
 }  // namespace grammar

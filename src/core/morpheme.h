@@ -6,6 +6,7 @@
 #include <string_view>
 
 #include "dictionary/dictionary.h"
+#include "grammar/conjugation.h"
 #include "types.h"
 
 namespace suzume::core {
@@ -21,7 +22,9 @@ struct Morpheme {
   size_t end{0};                         // End character index
   PartOfSpeech pos{PartOfSpeech::Noun};  // Part of speech
   std::string lemma;                     // Lemma (for verbs/adjectives)
+  std::string reading;                   // Reading in hiragana
   dictionary::ConjugationType conj_type{dictionary::ConjugationType::None};  // Conjugation type
+  grammar::ConjForm conj_form{grammar::ConjForm::Base};  // Conjugation form
 
   // Aliases for compatibility
   size_t start_pos = 0;  // Alias for start

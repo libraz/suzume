@@ -31,6 +31,35 @@ std::string_view posToString(PartOfSpeech pos) {
   }
 }
 
+std::string_view posToJapanese(PartOfSpeech pos) {
+  switch (pos) {
+    case PartOfSpeech::Noun:
+      return "名詞";
+    case PartOfSpeech::Verb:
+      return "動詞";
+    case PartOfSpeech::Adjective:
+      return "形容詞";
+    case PartOfSpeech::Adverb:
+      return "副詞";
+    case PartOfSpeech::Particle:
+      return "助詞";
+    case PartOfSpeech::Auxiliary:
+      return "助動詞";
+    case PartOfSpeech::Conjunction:
+      return "接続詞";
+    case PartOfSpeech::Determiner:
+      return "連体詞";
+    case PartOfSpeech::Pronoun:
+      return "代名詞";
+    case PartOfSpeech::Symbol:
+      return "記号";
+    case PartOfSpeech::Other:
+    case PartOfSpeech::Unknown:
+    default:
+      return "その他";
+  }
+}
+
 PartOfSpeech stringToPos(std::string_view str) {
   // English names
   if (str == "NOUN" || str == "名詞") {

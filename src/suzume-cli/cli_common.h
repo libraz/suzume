@@ -15,7 +15,8 @@ enum class OutputFormat {
   Morpheme,  // Default: surface TAB pos TAB lemma
   Tags,      // Tags only, one per line
   Json,      // JSON format
-  Tsv        // TSV with all fields
+  Tsv,       // TSV with all fields
+  Chasen     // ChaSen-like format (Japanese POS, conjugation info)
 };
 
 /**

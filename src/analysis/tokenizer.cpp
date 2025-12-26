@@ -93,7 +93,7 @@ void Tokenizer::addDictionaryCandidates(
                     static_cast<uint32_t>(start_pos),
                     static_cast<uint32_t>(end_pos), result.entry->pos,
                     result.entry->cost, flags, result.entry->lemma,
-                    result.entry->conj_type);
+                    result.entry->conj_type, result.entry->reading);
   }
 }
 
@@ -196,7 +196,7 @@ void Tokenizer::addUnknownCandidates(
 
     lattice.addEdge(surface_str, static_cast<uint32_t>(candidate.start),
                     static_cast<uint32_t>(candidate.end), candidate.pos,
-                    adjusted_cost, flags, "");
+                    adjusted_cost, flags, candidate.lemma, candidate.conj_type);
   }
 }
 

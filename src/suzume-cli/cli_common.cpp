@@ -18,6 +18,9 @@ OutputFormat parseOutputFormat(std::string_view str) {
   if (str == "tsv") {
     return OutputFormat::Tsv;
   }
+  if (str == "chasen") {
+    return OutputFormat::Chasen;
+  }
   return OutputFormat::Morpheme;
 }
 
@@ -31,6 +34,8 @@ std::string_view outputFormatToString(OutputFormat fmt) {
       return "json";
     case OutputFormat::Tsv:
       return "tsv";
+    case OutputFormat::Chasen:
+      return "chasen";
   }
   return "morpheme";
 }
@@ -207,7 +212,7 @@ Commands:
 Global Options:
   -d, --dict PATH        Load user dictionary (can specify multiple)
   -m, --mode MODE        Analysis mode: normal, search, split
-  -f, --format FMT       Output format: morpheme, tags, json, tsv
+  -f, --format FMT       Output format: morpheme, tags, json, tsv, chasen
   -V, --verbose          Verbose output
   -VV, --very-verbose    Very verbose output (includes lattice dump)
   --no-user-dict         Disable user dictionary
@@ -236,17 +241,25 @@ Usage:
 Options:
   -d, --dict PATH        Load user dictionary (can specify multiple)
   -m, --mode MODE        Analysis mode: normal, search, split
-  -f, --format FMT       Output format: morpheme, tags, json, tsv
+  -f, --format FMT       Output format: morpheme, tags, json, tsv, chasen
   -V, --verbose          Verbose output
   --no-user-dict         Disable user dictionary
   --compare              Compare with/without user dictionary
   -h, --help             Show this help
+
+Output Formats:
+  morpheme               surface TAB pos TAB lemma (default)
+  tags                   Tags only, one per line
+  json                   JSON format
+  tsv                    TSV with all fields (surface, pos, lemma, start, end)
+  chasen                 ChaSen-like format (Japanese POS, conjugation info)
 
 Examples:
   suzume-cli "text"
   suzume-cli analyze "text"
   suzume-cli analyze -d user.dic "text"
   suzume-cli analyze -f json "text"
+  suzume-cli analyze -f chasen "text"
   suzume-cli analyze --compare -d user.dic "text"
   echo "text" | suzume-cli analyze
 )";

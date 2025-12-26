@@ -3,11 +3,33 @@
 #include <iostream>
 #include <sstream>
 
+#include "grammar/conjugation.h"
+#include "normalize/utf8.h"
 #include "suzume.h"
 
 namespace suzume::cli {
 
 namespace {
+
+// Convert hiragana to katakana
+std::string hiraganaToKatakana(std::string_view hiragana) {
+  if (hiragana.empty()) {
+    return "";
+  }
+
+  std::vector<char32_t> codepoints = normalize::utf8::decode(hiragana);
+
+  for (char32_t& cp : codepoints) {
+    // Hiragana range: U+3041-U+3096
+    // Katakana range: U+30A1-U+30F6
+    // Offset: 0x60 (96)
+    if (cp >= 0x3041 && cp <= 0x3096) {
+      cp += 0x60;
+    }
+  }
+
+  return normalize::utf8::encode(codepoints);
+}
 
 void outputMorpheme(const std::vector<core::Morpheme>& morphemes) {
   for (const auto& morpheme : morphemes) {
@@ -51,6 +73,38 @@ void outputTsv(const std::vector<core::Morpheme>& morphemes) {
               << mor.lemma << "\t" << mor.start_pos << "\t" << mor.end_pos
               << "\n";
   }
+}
+
+void outputChasen(const std::vector<core::Morpheme>& morphemes) {
+  for (const auto& mor : morphemes) {
+    // Surface form
+    std::cout << mor.surface << "\t";
+
+    // Reading (in katakana)
+    if (!mor.reading.empty()) {
+      std::cout << hiraganaToKatakana(mor.reading) << "\t";
+    } else {
+      std::cout << "*\t";
+    }
+
+    // Lemma (base form)
+    std::cout << mor.getLemma() << "\t";
+
+    // Part of speech (Japanese)
+    std::cout << core::posToJapanese(mor.pos) << "\t";
+
+    // Conjugation type and form (for verbs and adjectives)
+    if (mor.pos == core::PartOfSpeech::Verb ||
+        mor.pos == core::PartOfSpeech::Adjective) {
+      auto verb_type = grammar::conjTypeToVerbType(mor.conj_type);
+      std::cout << grammar::verbTypeToJapanese(verb_type) << "\t";
+      std::cout << grammar::conjFormToJapanese(mor.conj_form);
+    } else {
+      std::cout << "*\t*";
+    }
+    std::cout << "\n";
+  }
+  std::cout << "EOS\n";
 }
 
 core::AnalysisMode parseMode(const std::string& mode_str) {
@@ -205,6 +259,11 @@ int cmdAnalyze(const CommandArgs& args) {
     case OutputFormat::Tsv: {
       auto morphemes = analyzer.analyze(text);
       outputTsv(morphemes);
+      break;
+    }
+    case OutputFormat::Chasen: {
+      auto morphemes = analyzer.analyze(text);
+      outputChasen(morphemes);
       break;
     }
   }

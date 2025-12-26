@@ -21,7 +21,8 @@ void Lattice::addEdge(const LatticeEdge& edge) {
 size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
                         PartOfSpeech pos, float cost, uint8_t flags,
                         std::string_view lemma,
-                        dictionary::ConjugationType conj_type) {
+                        dictionary::ConjugationType conj_type,
+                        std::string_view reading) {
   if (start > text_length_) {
     return static_cast<size_t>(-1);
   }
@@ -37,6 +38,13 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
     stored_lemma = lemma_storage_.back();
   }
 
+  // Store reading if provided
+  std::string_view stored_reading;
+  if (!reading.empty()) {
+    reading_storage_.emplace_back(reading);
+    stored_reading = reading_storage_.back();
+  }
+
   LatticeEdge edge;
   edge.id = static_cast<uint32_t>(all_edges_.size());
   edge.start = start;
@@ -46,6 +54,7 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
   edge.cost = cost;
   edge.flags = static_cast<EdgeFlags>(flags);
   edge.lemma = stored_lemma;
+  edge.reading = stored_reading;
   edge.conj_type = conj_type;
 
   all_edges_.push_back(edge);
@@ -104,6 +113,7 @@ void Lattice::clear() {
   all_edges_.clear();
   surface_storage_.clear();
   lemma_storage_.clear();
+  reading_storage_.clear();
   edge_count_ = 0;
 }
 

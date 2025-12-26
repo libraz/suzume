@@ -326,7 +326,105 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
 void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
   for (auto& morpheme : morphemes) {
     morpheme.lemma = lemmatize(morpheme);
+    morpheme.conj_form = detectConjForm(morpheme.surface, morpheme.lemma, morpheme.pos);
   }
+}
+
+grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface,
+                                             std::string_view lemma,
+                                             core::PartOfSpeech pos) {
+  // Only verbs and adjectives have conjugation forms
+  if (pos != core::PartOfSpeech::Verb &&
+      pos != core::PartOfSpeech::Adjective) {
+    return grammar::ConjForm::Base;
+  }
+
+  // If surface equals lemma, it's the base form
+  if (surface == lemma) {
+    return grammar::ConjForm::Base;
+  }
+
+  // Check for negative forms (mizenkei)
+  if (endsWith(surface, "ない") || endsWith(surface, "なかった") ||
+      endsWith(surface, "ぬ") || endsWith(surface, "ず") ||
+      endsWith(surface, "ません") || endsWith(surface, "なく") ||
+      endsWith(surface, "なくて") || endsWith(surface, "なければ") ||
+      endsWith(surface, "なきゃ") || endsWith(surface, "なくても")) {
+    return grammar::ConjForm::Mizenkei;
+  }
+
+  // Check for passive/causative (mizenkei)
+  if (endsWith(surface, "れる") || endsWith(surface, "られる") ||
+      endsWith(surface, "せる") || endsWith(surface, "させる") ||
+      endsWith(surface, "れた") || endsWith(surface, "られた") ||
+      endsWith(surface, "せた") || endsWith(surface, "させた") ||
+      endsWith(surface, "される") || endsWith(surface, "された")) {
+    return grammar::ConjForm::Mizenkei;
+  }
+
+  // Check for volitional form (ishikei)
+  if (endsWith(surface, "う") || endsWith(surface, "よう") ||
+      endsWith(surface, "まい")) {
+    // Distinguish from godan base form ending in う
+    if (surface != lemma) {
+      return grammar::ConjForm::Ishikei;
+    }
+  }
+
+  // Check for conditional form (kateikei)
+  if (endsWith(surface, "ば") || endsWith(surface, "れば")) {
+    return grammar::ConjForm::Kateikei;
+  }
+
+  // Check for imperative form (meireikei)
+  if (endsWith(surface, "ろ") || endsWith(surface, "よ") ||
+      endsWith(surface, "なさい")) {
+    // Check if it's likely an imperative
+    if (surface.size() > 3 && surface != lemma) {
+      return grammar::ConjForm::Meireikei;
+    }
+  }
+
+  // Check for te-form onbin patterns (onbinkei)
+  if (endsWith(surface, "って") || endsWith(surface, "いて") ||
+      endsWith(surface, "いで") || endsWith(surface, "んで") ||
+      endsWith(surface, "った") || endsWith(surface, "いた") ||
+      endsWith(surface, "いだ") || endsWith(surface, "んだ")) {
+    return grammar::ConjForm::Onbinkei;
+  }
+
+  // Check for renyokei (te-form, ta-form, masu-form, etc.)
+  if (endsWith(surface, "て") || endsWith(surface, "で") ||
+      endsWith(surface, "た") || endsWith(surface, "だ") ||
+      endsWith(surface, "ます") || endsWith(surface, "ました") ||
+      endsWith(surface, "まして") || endsWith(surface, "ている") ||
+      endsWith(surface, "ていた") || endsWith(surface, "ておく") ||
+      endsWith(surface, "てある") || endsWith(surface, "てみる") ||
+      endsWith(surface, "てくる") || endsWith(surface, "ていく") ||
+      endsWith(surface, "てしまう") || endsWith(surface, "ちゃう") ||
+      endsWith(surface, "たい") || endsWith(surface, "たかった") ||
+      endsWith(surface, "たら") || endsWith(surface, "たり") ||
+      endsWith(surface, "きた") || endsWith(surface, "してる") ||
+      endsWith(surface, "してた") || endsWith(surface, "しています") ||
+      endsWith(surface, "していた") || endsWith(surface, "しました")) {
+    return grammar::ConjForm::Renyokei;
+  }
+
+  // For i-adjectives
+  if (pos == core::PartOfSpeech::Adjective) {
+    if (endsWith(surface, "く") || endsWith(surface, "くて") ||
+        endsWith(surface, "かった") || endsWith(surface, "ければ") ||
+        endsWith(surface, "さ") || endsWith(surface, "そう")) {
+      return grammar::ConjForm::Renyokei;
+    }
+  }
+
+  // Default to renyokei for conjugated forms we couldn't classify
+  if (surface != lemma) {
+    return grammar::ConjForm::Renyokei;
+  }
+
+  return grammar::ConjForm::Base;
 }
 
 }  // namespace postprocess

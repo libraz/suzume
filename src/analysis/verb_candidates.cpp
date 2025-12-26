@@ -124,6 +124,9 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
           // Low cost to prefer dictionary-verified compound verbs
           cand.cost = 0.3F;
           cand.has_suffix = false;
+          // Note: Don't set lemma here - let lemmatizer derive it more accurately
+          // Only set conj_type for conjugation pattern info
+          cand.conj_type = grammar::verbTypeToConjType(infl_cand.verb_type);
           candidates.push_back(cand);
           return candidates;  // Return first valid match
         }
@@ -317,6 +320,9 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Lower cost for higher confidence matches
           candidate.cost = 0.4F + (1.0F - best.confidence) * 0.3F;
           candidate.has_suffix = false;
+          // Note: Don't set lemma here - let lemmatizer derive it more accurately
+          // Only set conj_type for conjugation pattern info
+          candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
           candidates.push_back(candidate);
           // Don't break - try other stem lengths too
         }
@@ -483,6 +489,9 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       candidate.pos = core::PartOfSpeech::Verb;
       candidate.cost = base_cost;
       candidate.has_suffix = false;
+      // Note: Don't set lemma here - let lemmatizer derive it more accurately
+      // Only set conj_type for conjugation pattern info
+      candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
       candidates.push_back(candidate);
     }
   }

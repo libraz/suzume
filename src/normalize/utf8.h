@@ -82,6 +82,16 @@ std::vector<char32_t> toCodepoints(std::string_view str);
 std::string fromCodepoints(const std::vector<char32_t>& codepoints);
 
 /**
+ * @brief Encode a range of codepoints to UTF-8 string (no intermediate vector)
+ * @param codepoints Vector of codepoints
+ * @param start Start index (inclusive)
+ * @param end End index (exclusive)
+ * @return UTF-8 string, or empty if range is invalid
+ */
+std::string encodeRange(const std::vector<char32_t>& codepoints,
+                        size_t start, size_t end);
+
+/**
  * @brief Namespace alias for convenience
  */
 namespace utf8 {

@@ -46,6 +46,17 @@ class Lemmatizer {
    */
   void lemmatizeAll(std::vector<core::Morpheme>& morphemes) const;
 
+  /**
+   * @brief Detect conjugation form from surface and lemma
+   * @param surface Surface form (conjugated)
+   * @param lemma Base form
+   * @param pos Part of speech
+   * @return Detected conjugation form
+   */
+  static grammar::ConjForm detectConjForm(std::string_view surface,
+                                          std::string_view lemma,
+                                          core::PartOfSpeech pos);
+
  private:
   grammar::Inflection inflection_;
   const dictionary::DictionaryManager* dict_manager_{nullptr};

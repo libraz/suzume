@@ -15,6 +15,7 @@ namespace suzume::grammar {
 std::vector<std::pair<const AuxiliaryEntry*, size_t>>
 Inflection::matchAuxiliaries(std::string_view surface) const {
   std::vector<std::pair<const AuxiliaryEntry*, size_t>> matches;
+  matches.reserve(8);  // Typical max matches
   const auto& auxiliaries = getAuxiliaries();
 
   for (const auto& aux : auxiliaries) {
@@ -34,6 +35,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
     const std::vector<std::string>& aux_chain,
     uint16_t required_conn) const {
   std::vector<InflectionCandidate> candidates;
+  candidates.reserve(16);  // Typical max candidates
   const auto& endings = getVerbEndings();
 
   for (const auto& ending : endings) {
@@ -161,6 +163,7 @@ std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(
     const std::vector<std::string>& aux_chain,
     uint16_t required_conn) const {
   std::vector<InflectionCandidate> candidates;
+  candidates.reserve(32);  // Typical max candidates
 
   // Try to find more auxiliaries
   auto matches = matchAuxiliaries(surface);
@@ -194,7 +197,22 @@ std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(
 
 std::vector<InflectionCandidate> Inflection::analyze(
     std::string_view surface) const {
+  // Check cache first
+  std::string key(surface);
+  auto iter = cache_.find(key);
+  if (iter != cache_.end()) {
+    return iter->second;
+  }
+
   std::vector<InflectionCandidate> candidates;
+  candidates.reserve(32);  // Typical max candidates
+
+  // Early return for very short strings (less than 2 Japanese characters)
+  // A conjugated verb needs at least stem + ending
+  if (surface.size() < 6) {  // 2 Japanese chars = 6 bytes in UTF-8
+    cache_[key] = candidates;
+    return candidates;
+  }
 
   // First, try to match auxiliaries from the end
   auto matches = matchAuxiliaries(surface);
@@ -240,14 +258,33 @@ std::vector<InflectionCandidate> Inflection::analyze(
       });
   candidates.erase(dup_end, candidates.end());
 
+  // Cache the result
+  cache_[key] = candidates;
   return candidates;
 }
 
 bool Inflection::looksConjugated(std::string_view surface) const {
+  // Check cache first to avoid copying
+  std::string key(surface);
+  auto iter = cache_.find(key);
+  if (iter != cache_.end()) {
+    return !iter->second.empty();
+  }
   return !analyze(surface).empty();
 }
 
 InflectionCandidate Inflection::getBest(std::string_view surface) const {
+  // Check cache first to avoid copying the entire vector
+  std::string key(surface);
+  auto iter = cache_.find(key);
+  if (iter != cache_.end()) {
+    if (iter->second.empty()) {
+      return {};
+    }
+    return iter->second.front();  // Only copy the first element
+  }
+
+  // Not in cache, do full analysis
   auto candidates = analyze(surface);
   if (candidates.empty()) {
     return {};

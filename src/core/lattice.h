@@ -44,6 +44,7 @@ struct LatticeEdge {
   float cost{0.0F};                        // Cost
   EdgeFlags flags{EdgeFlags::None};        // Flags
   std::string_view lemma;                  // Lemma (optional)
+  std::string_view reading;                // Reading in hiragana (optional)
   dictionary::ConjugationType conj_type{dictionary::ConjugationType::None};  // Conjugation type
 
   // Flag constants for compatibility
@@ -90,12 +91,14 @@ class Lattice {
    * @param flags Flags
    * @param lemma Lemma (optional)
    * @param conj_type Conjugation type (optional)
+   * @param reading Reading in hiragana (optional)
    * @return Edge ID
    */
   size_t addEdge(std::string_view surface, uint32_t start, uint32_t end,
                  PartOfSpeech pos, float cost, uint8_t flags,
                  std::string_view lemma = {},
-                 dictionary::ConjugationType conj_type = dictionary::ConjugationType::None);
+                 dictionary::ConjugationType conj_type = dictionary::ConjugationType::None,
+                 std::string_view reading = {});
 
   /**
    * @brief Get all edges starting at a position
@@ -136,6 +139,7 @@ class Lattice {
   std::vector<LatticeEdge> all_edges_;  // All edges for getEdge()
   std::deque<std::string> surface_storage_;  // Storage for surface strings (deque for stable pointers)
   std::deque<std::string> lemma_storage_;    // Storage for lemma strings (deque for stable pointers)
+  std::deque<std::string> reading_storage_;  // Storage for reading strings (deque for stable pointers)
   static const std::vector<LatticeEdge> empty_edges_;
 };
 

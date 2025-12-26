@@ -156,6 +156,26 @@ inline VerbType conjTypeToVerbType(dictionary::ConjugationType conj_type) {
 }
 
 /**
+ * @brief Convert VerbType to string (English)
+ */
+std::string_view verbTypeToString(VerbType type);
+
+/**
+ * @brief Convert VerbType to Japanese string
+ */
+std::string_view verbTypeToJapanese(VerbType type);
+
+/**
+ * @brief Convert ConjForm to string (English)
+ */
+std::string_view conjFormToString(ConjForm form);
+
+/**
+ * @brief Convert ConjForm to Japanese string
+ */
+std::string_view conjFormToJapanese(ConjForm form);
+
+/**
  * @brief Convert VerbType to ConjugationType
  */
 inline dictionary::ConjugationType verbTypeToConjType(VerbType verb_type) {

@@ -35,9 +35,14 @@ enum class AnalysisMode : uint8_t {
 };
 
 /**
- * @brief Convert part of speech to string
+ * @brief Convert part of speech to string (English)
  */
 std::string_view posToString(PartOfSpeech pos);
+
+/**
+ * @brief Convert part of speech to Japanese string
+ */
+std::string_view posToJapanese(PartOfSpeech pos);
 
 /**
  * @brief Convert string to part of speech
