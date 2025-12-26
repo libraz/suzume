@@ -178,6 +178,25 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       continue;  // Skip - causative-passive negative + become pattern
     }
 
+    // Skip Godan verb renyokei + そう patterns (飲みそう, 書きそう, etc.)
+    // These are verb + そう auxiliary patterns, not i-adjectives.
+    // Pattern: single kanji + renyokei suffix (i-row) + そう
+    // Renyokei suffixes: み, き, ぎ, ち, び, り, に (7 patterns)
+    // Note: し is excluded because it's used in adjective stems (難し, 楽し, 美し)
+    // Note: We only skip when hiragana is exactly renyokei + そう (9 bytes)
+    // to avoid blocking adjective patterns with longer stems
+    if (kanji_end == start_pos + 1 && hiragana_part.size() == 9) {
+      // Check if pattern is exactly: renyokei suffix + そう
+      std::string_view renyokei_char = std::string_view(hiragana_part).substr(0, 3);
+      if ((renyokei_char == "み" || renyokei_char == "き" ||
+           renyokei_char == "ぎ" || renyokei_char == "ち" ||
+           renyokei_char == "び" || renyokei_char == "り" ||
+           renyokei_char == "に") &&
+          hiragana_part.substr(3) == "そう") {
+        continue;  // Skip - likely verb renyokei + そう, not i-adjective
+      }
+    }
+
     // Skip patterns that are clearly verb negatives, not adjectives
     // 〜かない, 〜がない, 〜さない, 〜たない, 〜ばない, 〜まない, 〜らない, 〜わない
     // are Godan verb mizenkei + ない patterns (書かない, 急がない, 話さない, etc.)
