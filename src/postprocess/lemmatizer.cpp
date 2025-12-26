@@ -164,6 +164,13 @@ const VerbEnding kVerbEndings[] = {
 
 // Adjective endings
 const VerbEnding kAdjectiveEndings[] = {
+    {"そうだった", "い"},
+    {"そうです", "い"},
+    {"そうだ", "い"},
+    {"そうに", "い"},
+    {"そうな", "い"},
+    {"そう", "い"},
+    {"くなかった", "い"},
     {"くない", "い"},
     {"かった", "い"},
     {"くて", "い"},
@@ -237,7 +244,8 @@ bool Lemmatizer::verifyCandidateWithDictionary(
   return false;
 }
 
-std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface) const {
+std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
+                                            core::PartOfSpeech pos) const {
   // First, check if surface itself is a base form in dictionary
   // (e.g., 差し上げる should return 差し上げる, not 差し上ぐ)
   if (dict_manager_ != nullptr) {
@@ -258,6 +266,21 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface) const {
 
   if (candidates.empty()) {
     return std::string(surface);
+  }
+
+  // Filter candidates by POS if specified
+  // For Adjective POS, only accept IAdjective verb_type
+  // This prevents 美味しそう (ADJ) from getting lemma 美味する (Suru verb)
+  if (pos == core::PartOfSpeech::Adjective) {
+    std::vector<grammar::InflectionCandidate> filtered;
+    for (const auto& c : candidates) {
+      if (c.verb_type == grammar::VerbType::IAdjective) {
+        filtered.push_back(c);
+      }
+    }
+    if (!filtered.empty()) {
+      candidates = std::move(filtered);
+    }
   }
 
   // If dictionary is available, try to find a verified candidate
@@ -306,7 +329,8 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   }
 
   // Try grammar-based lemmatization for verbs and adjectives
-  std::string grammar_result = lemmatizeByGrammar(morpheme.surface);
+  // Pass POS to filter candidates appropriately
+  std::string grammar_result = lemmatizeByGrammar(morpheme.surface, morpheme.pos);
   // Grammar-based lemmatization is authoritative - use its result even if
   // it equals the surface (which means the surface is already a dictionary form)
   // Only fall back to rule-based if grammar analysis returned empty/failed

@@ -178,36 +178,60 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       continue;  // Skip - causative-passive negative + become pattern
     }
 
-    auto best = inflection.getBest(surface);
-    // Require confidence >= 0.5 for i-adjectives
-    // Base forms like 寒い get exactly 0.5, conjugated forms like 美しかった get 0.68+
-    if (best.confidence >= 0.5F &&
-        best.verb_type == grammar::VerbType::IAdjective) {
-      // Filter out false positives: いたす honorific pattern
-      // Invalid patterns (all have た after the candidate):
-      //   - サ変名詞 + いたす: 検討いたします, 勉強いたしました
-      //   - Verb renyokei + いたす: 伝えいたします, 申しいたします
-      // Valid patterns:
-      //   - 面白いな (next char is な)
-      //   - 寒いよ (next char is よ)
-      //   - 面白い (end of text)
-      // Key insight: if minimum confidence (0.5) and next char is た, skip
-      if (best.confidence <= 0.5F) {
-        if (end_pos < codepoints.size() && codepoints[end_pos] == U'た') {
-          continue;  // Skip - likely いたす honorific pattern
-        }
+    // Skip patterns that are clearly verb negatives, not adjectives
+    // 〜かない, 〜がない, 〜さない, 〜たない, 〜ばない, 〜まない, 〜らない, 〜わない
+    // are Godan verb mizenkei + ない patterns (書かない, 急がない, 話さない, etc.)
+    // 〜しない is Suru verb + ない (説明しない, 勉強しない, etc.)
+    // 〜べない is Ichidan verb + ない (食べない, etc.)
+    if (hiragana_part.size() >= 9) {  // かない = 9 bytes
+      std::string_view last9 = std::string_view(hiragana_part).substr(hiragana_part.size() - 9);
+      if (last9 == "かない" || last9 == "がない" || last9 == "さない" ||
+          last9 == "たない" || last9 == "ばない" || last9 == "まない" ||
+          last9 == "らない" || last9 == "わない" || last9 == "なない" ||
+          last9 == "しない" || last9 == "べない" || last9 == "めない" ||
+          last9 == "せない" || last9 == "てない" || last9 == "ねない" ||
+          last9 == "けない" || last9 == "げない" || last9 == "れない") {
+        continue;  // Skip - verb negative pattern, not adjective
       }
+    }
 
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = end_pos;
-      candidate.pos = core::PartOfSpeech::Adjective;
-      // Lower base cost (0.2F) to beat verb candidates after POS prior adjustment
-      // ADJ prior (0.3) is higher than VERB prior (0.2), so we need lower edge cost
-      candidate.cost = 0.2F + (1.0F - best.confidence) * 0.3F;
-      candidate.has_suffix = false;
-      candidates.push_back(candidate);
+    // Check all candidates for IAdjective, not just the best one
+    // This handles cases like 美味しそう where Suru (美味する) may have higher
+    // confidence than IAdjective (美味しい), but we still want to generate
+    // an adjective candidate for the lattice to choose from
+    auto all_candidates = inflection.analyze(surface);
+    for (const auto& cand : all_candidates) {
+      // Require confidence >= 0.5 for i-adjectives
+      // Base forms like 寒い get exactly 0.5, conjugated forms like 美しかった get 0.68+
+      if (cand.confidence >= 0.5F &&
+          cand.verb_type == grammar::VerbType::IAdjective) {
+        // Filter out false positives: いたす honorific pattern
+        // Invalid patterns (all have た after the candidate):
+        //   - サ変名詞 + いたす: 検討いたします, 勉強いたしました
+        //   - Verb renyokei + いたす: 伝えいたします, 申しいたします
+        // Valid patterns:
+        //   - 面白いな (next char is な)
+        //   - 寒いよ (next char is よ)
+        //   - 面白い (end of text)
+        // Key insight: if minimum confidence (0.5) and next char is た, skip
+        if (cand.confidence <= 0.5F) {
+          if (end_pos < codepoints.size() && codepoints[end_pos] == U'た') {
+            continue;  // Skip - likely いたす honorific pattern
+          }
+        }
+
+        UnknownCandidate candidate;
+        candidate.surface = surface;
+        candidate.start = start_pos;
+        candidate.end = end_pos;
+        candidate.pos = core::PartOfSpeech::Adjective;
+        // Lower base cost (0.2F) to beat verb candidates after POS prior adjustment
+        // ADJ prior (0.3) is higher than VERB prior (0.2), so we need lower edge cost
+        candidate.cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
+        candidate.has_suffix = false;
+        candidates.push_back(candidate);
+        break;  // Only add one adjective candidate per surface
+      }
     }
   }
 
@@ -359,19 +383,25 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       continue;  // Skip - godan negative renyokei
     }
 
-    // Check if this looks like a conjugated i-adjective
-    auto best = inflection.getBest(surface);
-    if (best.confidence >= 0.5F &&
-        best.verb_type == grammar::VerbType::IAdjective) {
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = end_pos;
-      candidate.pos = core::PartOfSpeech::Adjective;
-      // Lower cost for higher confidence matches
-      candidate.cost = 0.3F + (1.0F - best.confidence) * 0.3F;
-      candidate.has_suffix = false;
-      candidates.push_back(candidate);
+    // Check all candidates for IAdjective, not just the best one
+    // This handles cases where Suru interpretation may have higher confidence
+    auto all_candidates = inflection.analyze(surface);
+    for (const auto& cand : all_candidates) {
+      // For hiragana-only adjectives, require higher confidence (0.55) than
+      // kanji+hiragana adjectives (0.50) to avoid false positives like しそう → しい
+      if (cand.confidence >= 0.55F &&
+          cand.verb_type == grammar::VerbType::IAdjective) {
+        UnknownCandidate candidate;
+        candidate.surface = surface;
+        candidate.start = start_pos;
+        candidate.end = end_pos;
+        candidate.pos = core::PartOfSpeech::Adjective;
+        // Lower cost for higher confidence matches
+        candidate.cost = 0.3F + (1.0F - cand.confidence) * 0.3F;
+        candidate.has_suffix = false;
+        candidates.push_back(candidate);
+        break;  // Only add one adjective candidate per surface
+      }
     }
   }
 

@@ -65,8 +65,11 @@ class Lemmatizer {
    * @brief Lemmatize using grammar-based inflection analysis
    *
    * If dictionary is available, verifies candidates against it.
+   * @param surface The surface form to lemmatize
+   * @param pos Optional POS to filter candidates (Adjective filters to IAdjective only)
    */
-  std::string lemmatizeByGrammar(std::string_view surface) const;
+  std::string lemmatizeByGrammar(std::string_view surface,
+                                  core::PartOfSpeech pos = core::PartOfSpeech::Other) const;
 
   /**
    * @brief Verify candidate base form against dictionary

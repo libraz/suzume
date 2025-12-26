@@ -103,6 +103,8 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"たい", "たい", kAuxTai, kAuxOutBase, kVerbRenyokei},
       {"たかった", "たい", kAuxTai, kAuxOutTa, kVerbRenyokei},
       {"たくない", "たい", kAuxTai, kAuxOutBase, kVerbRenyokei},
+      {"たくなかった", "たい", kAuxTai, kAuxOutTa, kVerbRenyokei},
+      {"たくて", "たい", kAuxTai, kAuxOutTe, kVerbRenyokei},
 
       // === Passive/Potential (れる/られる系) ===
       {"れる", "れる", kAuxReru, kAuxOutBase, kVerbMizenkei},
@@ -152,6 +154,12 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"させられなくなる", "させられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       {"させられなくなった", "させられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"させられなくなって", "させられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
+      // Causative-passive + たい (want to be made to do)
+      {"させられたい", "させられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
+      {"させられたかった", "させられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
+      {"させられたくない", "させられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
+      {"させられたくなかった", "させられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
+      {"させられたくて", "させられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       // === Causative-passive (せられる系) - for Godan ===
       // 書く → 書か + せられる = 書かせられる
       {"せられる", "せられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
@@ -166,6 +174,12 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"せられなくなる", "せられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       {"せられなくなった", "せられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
       {"せられなくなって", "せられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
+      // Causative-passive + たい (want to be made to do) - Godan
+      {"せられたい", "せられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
+      {"せられたかった", "せられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
+      {"せられたくない", "せられる", kAuxSeru, kAuxOutBase, kVerbMizenkei},
+      {"せられたくなかった", "せられる", kAuxSeru, kAuxOutTa, kVerbMizenkei},
+      {"せられたくて", "せられる", kAuxSeru, kAuxOutTe, kVerbMizenkei},
       // Short form causative-passive for Godan (歩かされる = 歩か + される)
       {"される", "される", kAuxSeru, kAuxOutBase, kVerbMizenkei},
       {"された", "される", kAuxSeru, kAuxOutTa, kVerbMizenkei},
@@ -300,6 +314,10 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"くなった", "い", kAuxNai, kAuxOutTa, kIAdjStem},    // 美し + くなった
       {"くなって", "い", kAuxNai, kAuxOutTe, kIAdjStem},    // 美し + くなって
       {"そう", "い", kAuxNai, kAuxOutBase, kIAdjStem},      // 美し + そう (looks like)
+      {"そうだ", "い", kAuxNai, kAuxOutBase, kIAdjStem},    // 美し + そうだ
+      {"そうだった", "い", kAuxNai, kAuxOutTa, kIAdjStem},  // 美し + そうだった
+      {"そうに", "い", kAuxNai, kAuxOutBase, kIAdjStem},    // 美し + そうに (adverbially)
+      {"そうな", "い", kAuxNai, kAuxOutBase, kIAdjStem},    // 美し + そうな (attributively)
       {"さ", "い", kAuxNai, kAuxOutBase, kIAdjStem},        // 美し + さ (noun form)
       // I-adjective + すぎる (excess: too ~)
       {"すぎる", "い", kAuxRenyokei, kAuxOutBase, kIAdjStem},     // 難し + すぎる

@@ -329,5 +329,45 @@ TEST_F(InflectionCompoundTest, GodanPotentialNakunatteShimatta_Hanasu) {
   EXPECT_EQ(result.verb_type, VerbType::GodanSa);
 }
 
+// ===== Causative-passive + tai =====
+
+TEST_F(InflectionCompoundTest, CausativePassiveTai_Ichidan) {
+  auto result = inflection_.getBest("食べさせられたくなかった");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionCompoundTest, CausativePassiveTaiNegative_Godan) {
+  auto result = inflection_.getBest("書かせられたくない");
+  EXPECT_EQ(result.base_form, "書く");
+  EXPECT_EQ(result.verb_type, VerbType::GodanKa);
+}
+
+TEST_F(InflectionCompoundTest, CausativePassiveTai_GodanWa) {
+  auto result = inflection_.getBest("歌わせられたかった");
+  EXPECT_EQ(result.base_form, "歌う");
+  EXPECT_EQ(result.verb_type, VerbType::GodanWa);
+}
+
+// ===== Basic tai negative forms =====
+
+TEST_F(InflectionCompoundTest, TaiNegativePast_Ichidan) {
+  auto result = inflection_.getBest("食べたくなかった");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionCompoundTest, TaiNegativePast_Godan) {
+  auto result = inflection_.getBest("行きたくなかった");
+  EXPECT_EQ(result.base_form, "行く");
+  EXPECT_EQ(result.verb_type, VerbType::GodanKa);
+}
+
+TEST_F(InflectionCompoundTest, TaiTeForm_Ichidan) {
+  auto result = inflection_.getBest("食べたくて");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
 }  // namespace
 }  // namespace suzume::grammar

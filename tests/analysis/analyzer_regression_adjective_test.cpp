@@ -300,5 +300,85 @@ TEST(AnalyzerTest, Regression_NaAdjective_BusinessEmail) {
   EXPECT_TRUE(found_desu) << "です should be found";
 }
 
+// =============================================================================
+// Regression: I-adjective + そう vs Suru verb + そう disambiguation
+// =============================================================================
+// Bug: 美味しそう was incorrectly analyzed as verb (美味する + そう)
+// Fix: Check all inflection candidates, not just the best one;
+//      Added 美味しい to L2 dictionary as I_ADJ
+
+TEST(AnalyzerTest, Regression_IAdjectiveSou_Oishisou) {
+  // 美味しそう should be recognized as adjective with lemma 美味しい
+  Suzume analyzer;
+  auto result = analyzer.analyze("美味しそう");
+  ASSERT_FALSE(result.empty());
+
+  EXPECT_EQ(result.size(), 1) << "美味しそう should be single token";
+  if (!result.empty()) {
+    EXPECT_EQ(result[0].surface, "美味しそう");
+    EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective)
+        << "美味しそう should be Adjective, not Verb";
+    EXPECT_EQ(result[0].lemma, "美味しい")
+        << "美味しそう lemma should be 美味しい";
+  }
+}
+
+TEST(AnalyzerTest, Regression_IAdjectiveSou_Kanashisou) {
+  // 悲しそう should be recognized as adjective with lemma 悲しい
+  Suzume analyzer;
+  auto result = analyzer.analyze("悲しそう");
+  ASSERT_FALSE(result.empty());
+
+  EXPECT_EQ(result.size(), 1) << "悲しそう should be single token";
+  if (!result.empty()) {
+    EXPECT_EQ(result[0].surface, "悲しそう");
+    EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective)
+        << "悲しそう should be Adjective";
+    EXPECT_EQ(result[0].lemma, "悲しい")
+        << "悲しそう lemma should be 悲しい";
+  }
+}
+
+TEST(AnalyzerTest, Regression_IAdjectiveSou_InSentence) {
+  // 美味しそうに食べている - 美味しそう should be adjective
+  Suzume analyzer;
+  auto result = analyzer.analyze("美味しそうに食べている");
+  ASSERT_GE(result.size(), 3);
+
+  bool found_oishisou = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "美味しそう") {
+      found_oishisou = true;
+      EXPECT_EQ(mor.pos, core::PartOfSpeech::Adjective)
+          << "美味しそう should be Adjective";
+      EXPECT_EQ(mor.lemma, "美味しい")
+          << "美味しそう lemma should be 美味しい";
+    }
+  }
+  EXPECT_TRUE(found_oishisou) << "美味しそう should be found";
+}
+
+TEST(AnalyzerTest, Regression_SuruVerbSou_ChikokuShisou) {
+  // 遅刻しそう should be segmented as 遅刻 (noun) + しそう (verb)
+  // This is the correct analysis for SURU nouns
+  Suzume analyzer;
+  auto result = analyzer.analyze("遅刻しそう");
+  ASSERT_GE(result.size(), 2) << "Should have at least 2 tokens";
+
+  bool found_chikoku = false;
+  bool found_shisou = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "遅刻" && mor.pos == core::PartOfSpeech::Noun) {
+      found_chikoku = true;
+    }
+    if (mor.surface == "しそう" && mor.pos == core::PartOfSpeech::Verb) {
+      found_shisou = true;
+      EXPECT_EQ(mor.lemma, "する") << "しそう lemma should be する";
+    }
+  }
+  EXPECT_TRUE(found_chikoku) << "遅刻 should be recognized as noun";
+  EXPECT_TRUE(found_shisou) << "しそう should be recognized as verb";
+}
+
 }  // namespace
 }  // namespace suzume::analysis

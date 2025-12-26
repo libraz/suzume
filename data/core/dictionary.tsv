@@ -10,6 +10,7 @@
 
 # === adjectives (i-adjectives) ===
 # Note: 〜らしい patterns (子供らしい, etc.) handled by inflection analyzer
+美味しい	ADJECTIVE	おいしい	1.0	I_ADJ
 気持ちいい	ADJECTIVE	きもちいい	1.0	I_ADJ
 申し訳ない	ADJECTIVE	もうしわけない	1.0	I_ADJ
 晴れ晴れしい	ADJECTIVE	はればれしい	1.0	I_ADJ
@@ -159,6 +160,8 @@ C&R	NOUN		0.5
 
 # === verbs ===
 # Note: Basic noun+する patterns handled by inflection analyzer
+# SURU nouns (nouns that take する to become verbs)
+遅刻	NOUN	ちこく	0.5
 
 # === compound_nouns (from greetings.h - open class) ===
 # These are verb-derived compound nouns that should be in Layer 2
