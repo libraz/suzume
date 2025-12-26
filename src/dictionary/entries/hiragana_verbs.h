@@ -76,6 +76,9 @@ inline std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       // ========================================
       // Godan-Ra verbs (五段ラ行)
       // ========================================
+      // やる (to do) - starts with や, used in compound verbs (やり直す, etc.)
+      {"やる", POS::Verb, 0.3F, "やる", false, false, false, CT::GodanRa, ""},
+
       // わかる (to understand) - starts with わ
       {"わかる", POS::Verb, 0.3F, "わかる", false, false, false, CT::GodanRa, ""},
 

@@ -439,11 +439,21 @@ TEST(AnalyzerTest, Regression_TeIru_Kiteimasen) {
 TEST(AnalyzerTest, Regression_TeIru_Kiteimasu) {
   Suzume analyzer;
   auto result = analyzer.analyze("来ています");
-  ASSERT_GE(result.size(), 2);
+  ASSERT_GE(result.size(), 1);
 
-  bool found_kite = false;
-  bool found_imasu = false;
+  // Accept either:
+  // 1. Single token: 来ています → 来る (progressive as single unit)
+  // 2. Split tokens: 来て + います → 来る + いる
+  // Both are valid morphological analyses
+
+  bool found_kiteimasu = false;  // Single token
+  bool found_kite = false;       // Split: first part
+  bool found_imasu = false;      // Split: second part
   for (const auto& mor : result) {
+    if (mor.surface == "来ています" && mor.pos == core::PartOfSpeech::Verb &&
+        mor.lemma == "来る") {
+      found_kiteimasu = true;
+    }
     if (mor.surface == "来て" && mor.pos == core::PartOfSpeech::Verb) {
       found_kite = true;
     }
@@ -451,8 +461,9 @@ TEST(AnalyzerTest, Regression_TeIru_Kiteimasu) {
       found_imasu = true;
     }
   }
-  EXPECT_TRUE(found_kite) << "来て should be parsed as verb";
-  EXPECT_TRUE(found_imasu) << "います should be parsed as verb";
+
+  bool is_valid = found_kiteimasu || (found_kite && found_imasu);
+  EXPECT_TRUE(is_valid) << "来ています should be parsed as verb(s) with lemma 来る";
 }
 
 // =============================================================================
@@ -734,6 +745,123 @@ TEST(AnalyzerTest, Regression_SuruPassiveNegativePast2) {
   EXPECT_EQ(result[0].surface, "勉強されなかった");
   EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
   EXPECT_EQ(result[0].lemma, "勉強する");
+}
+
+// =============================================================================
+// Regression: Compound verb + desiderative negative past (走り出したくなかった)
+// =============================================================================
+// Bug: 走り出したくなかった was split incorrectly as 走り出した + くなかった
+//      and くなかった was being analyzed as verb form of くる (Ichidan)
+// Fix: 1) Rejected Ichidan candidates with stems く/す/こ in inflection.cpp
+//      2) Added subsidiary verb renyokei forms (出し, 込み, etc.) in join_candidates.cpp
+//      3) Build compound verb base form (走り出す) for lemma
+
+TEST(AnalyzerTest, Regression_CompoundVerbDesiderativeNegativePast) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("走り出したくなかった");
+
+  // Should be split as: 走り出し (compound verb) + たくなかった (desiderative)
+  ASSERT_GE(result.size(), 2);
+
+  // First token should be the compound verb with correct lemma
+  EXPECT_EQ(result[0].surface, "走り出し");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "走り出す");
+
+  // Second token should be desiderative auxiliary
+  EXPECT_EQ(result[1].surface, "たくなかった");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Adjective);
+  EXPECT_EQ(result[1].lemma, "たい");
+}
+
+// Ensure くなかった is NOT analyzed as くる verb form
+TEST(AnalyzerTest, Regression_KuNakatta_NotKuruVerb) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("くなかった");
+
+  // くなかった should NOT have lemma くる
+  for (const auto& mor : result) {
+    EXPECT_NE(mor.lemma, "くる")
+        << "くなかった should NOT be analyzed as くる verb form";
+  }
+}
+
+// =============================================================================
+// Regression: Compound verbs with hiragana V2 (ひらがな補助動詞)
+// =============================================================================
+// Bug: Compound verbs written with hiragana V2 (走りだす, 飛びこむ) were not recognized
+// Fix: Added reading field to SubsidiaryVerb struct to match both kanji and hiragana
+
+TEST(AnalyzerTest, Regression_CompoundVerb_HiraganaV2_Dasu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("走りだしたくなかった");
+
+  // Should recognize compound verb with hiragana だし
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "走りだし");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "走り出す");  // Lemma uses kanji form
+}
+
+TEST(AnalyzerTest, Regression_CompoundVerb_HiraganaV2_Komu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("飛びこみたい");
+
+  // Should recognize compound verb with hiragana こみ
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "飛びこみ");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "飛び込む");  // Lemma uses kanji form
+}
+
+TEST(AnalyzerTest, Regression_CompoundVerb_HiraganaV2_Sugiru) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("読みすぎた");
+
+  // Should recognize compound verb with hiragana すぎ
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "読みすぎ");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "読み過ぎる");  // Lemma uses kanji form
+}
+
+// Verify kanji V2 still works
+TEST(AnalyzerTest, Regression_CompoundVerb_KanjiV2_Dasu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("走り出したくなかった");
+
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "走り出し");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "走り出す");
+}
+
+// =============================================================================
+// Regression: All-hiragana compound verbs (全ひらがな複合動詞)
+// =============================================================================
+// Bug: All-hiragana compound verbs (やりなおす, わかりあう) were not recognized
+// Fix: Added addHiraganaCompoundVerbJoinCandidates function
+
+TEST(AnalyzerTest, Regression_HiraganaCompoundVerb_YariNaosu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("やりなおしたい");
+
+  // Should recognize やりなおし as compound verb
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "やりなおし");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "やり直す");  // Lemma uses kanji V2
+}
+
+TEST(AnalyzerTest, Regression_HiraganaCompoundVerb_WakariAu) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("わかりあう");
+
+  // Should recognize as compound verb
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "わかりあう");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "わかり合う");  // Lemma uses kanji V2
 }
 
 }  // namespace

@@ -49,6 +49,9 @@ core::Lattice Tokenizer::buildLattice(
     // Add compound verb join candidates (飛び + 込む → 飛び込む)
     addCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
 
+    // Add hiragana compound verb join candidates (やり + なおす → やりなおす)
+    addHiraganaCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
+
     // Add prefix + noun join candidates (お + 水 → お水)
     addPrefixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
 
@@ -230,6 +233,14 @@ void Tokenizer::addCompoundVerbJoinCandidates(
     const std::vector<normalize::CharType>& char_types) const {
   analysis::addCompoundVerbJoinCandidates(lattice, text, codepoints, start_pos,
                                            char_types, dict_manager_, scorer_);
+}
+
+void Tokenizer::addHiraganaCompoundVerbJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) const {
+  analysis::addHiraganaCompoundVerbJoinCandidates(
+      lattice, text, codepoints, start_pos, char_types, dict_manager_, scorer_);
 }
 
 void Tokenizer::addPrefixNounJoinCandidates(

@@ -282,5 +282,44 @@ TEST_F(InflectionBasicTest, VerbSou_Taberu) {
   EXPECT_EQ(result.verb_type, VerbType::Ichidan);
 }
 
+// ===== Irregular verb validation =====
+// くなかった should NOT be analyzed as Ichidan くる (来る is Kuru, not Ichidan)
+// This regression test ensures we don't incorrectly treat くなかった as a conjugation of くる
+TEST_F(InflectionBasicTest, KuNakatta_NotIchidanKuru) {
+  auto result = inflection_.getBest("くなかった");
+  // The Ichidan interpretation with stem く → base form くる should be rejected
+  EXPECT_NE(result.base_form, "くる");
+}
+
+// すなかった should NOT be analyzed as Ichidan する (する is Suru, not Ichidan)
+TEST_F(InflectionBasicTest, SuNakatta_NotIchidanSuru) {
+  auto result = inflection_.getBest("すなかった");
+  // The Ichidan interpretation with stem す → base form する should be rejected
+  EXPECT_NE(result.base_form, "する");
+}
+
+// Verify valid Kuru conjugations still work
+TEST_F(InflectionBasicTest, Kuru_ValidConjugations) {
+  // 来なかった is the correct negative past of 来る
+  auto result = inflection_.getBest("来なかった");
+  EXPECT_EQ(result.base_form, "来る");
+  EXPECT_EQ(result.verb_type, VerbType::Kuru);
+}
+
+// Verify valid Suru conjugations still work
+TEST_F(InflectionBasicTest, Suru_ValidConjugations) {
+  // しなかった is the correct negative past of する
+  auto result = inflection_.getBest("勉強しなかった");
+  EXPECT_EQ(result.base_form, "勉強する");
+  EXPECT_EQ(result.verb_type, VerbType::Suru);
+}
+
+// Verify たくなかった (desiderative negative past) works correctly
+TEST_F(InflectionBasicTest, Desiderative_TakuNakatta) {
+  auto result = inflection_.getBest("食べたくなかった");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
 }  // namespace
 }  // namespace suzume::grammar

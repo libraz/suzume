@@ -15,30 +15,54 @@ namespace {
 
 // V2 Subsidiary verbs for compound verb joining
 struct SubsidiaryVerb {
-  const char* surface;
+  const char* surface;      // Kanji form (or hiragana if no kanji)
+  const char* reading;      // Hiragana reading (nullptr if same as surface)
   const char* base_ending;  // Base form ending for verb type detection
+  const char* base_form;    // Base form for lemma generation
 };
 
 // List of V2 verbs that can form compound verbs
+// Includes both base forms and renyokei forms for auxiliary attachment
+// Reading field enables matching both kanji and hiragana patterns
 const SubsidiaryVerb kSubsidiaryVerbs[] = {
-    {"込む", "む"},      // 読み込む, 飛び込む
-    {"出す", "す"},      // 呼び出す, 書き出す
-    {"始める", "める"},  // 読み始める, 書き始める
-    {"続ける", "ける"},  // 読み続ける, 走り続ける
-    {"続く", "く"},      // 引き続く
-    {"返す", "す"},      // 繰り返す
-    {"返る", "る"},      // 振り返る
-    {"つける", "ける"},  // 見つける
-    {"つかる", "る"},    // 見つかる
-    {"替える", "える"},  // 切り替える
-    {"換える", "える"},  // 入れ換える
-    {"合う", "う"},      // 話し合う
-    {"合わせる", "せる"}, // 組み合わせる
-    {"消す", "す"},      // 取り消す
-    {"過ぎる", "る"},    // 読み過ぎる
-    {"直す", "す"},      // やり直す
-    {"終わる", "る"},    // 読み終わる
-    {"切る", "る"},      // 締め切る
+    // Base forms (終止形)
+    {"込む", "こむ", "む", "込む"},          // 読み込む, 飛び込む, 飛びこむ
+    {"出す", "だす", "す", "出す"},          // 呼び出す, 書き出す, 走りだす
+    {"始める", "はじめる", "める", "始める"}, // 読み始める, 読みはじめる
+    {"続ける", "つづける", "ける", "続ける"}, // 読み続ける, 読みつづける
+    {"続く", "つづく", "く", "続く"},        // 引き続く
+    {"返す", "かえす", "す", "返す"},        // 繰り返す, 繰りかえす
+    {"返る", "かえる", "る", "返る"},        // 振り返る, 振りかえる
+    {"つける", nullptr, "ける", "つける"},  // 見つける (already hiragana)
+    {"つかる", nullptr, "る", "つかる"},    // 見つかる (already hiragana)
+    {"替える", "かえる", "える", "替える"}, // 切り替える
+    {"換える", "かえる", "える", "換える"}, // 入れ換える
+    {"合う", "あう", "う", "合う"},          // 話し合う, 話しあう
+    {"合わせる", "あわせる", "せる", "合わせる"}, // 組み合わせる
+    {"消す", "けす", "す", "消す"},          // 取り消す
+    {"過ぎる", "すぎる", "る", "過ぎる"},    // 読み過ぎる, 読みすぎる
+    {"直す", "なおす", "す", "直す"},        // やり直す, やりなおす
+    {"終わる", "おわる", "る", "終わる"},    // 読み終わる, 読みおわる
+    {"切る", "きる", "る", "切る"},          // 締め切る, 締めきる
+    // Renyokei forms (連用形) for たい/たくなかった/etc. attachment
+    {"込み", "こみ", "む", "込む"},          // 読み込みたい, 飛びこみたい
+    {"出し", "だし", "す", "出す"},          // 走り出したい, 走りだしたい
+    {"始め", "はじめ", "める", "始める"},    // 読み始めたい
+    {"続け", "つづけ", "ける", "続ける"},    // 読み続けたい
+    {"続き", "つづき", "く", "続く"},        // 引き続きたい
+    {"返し", "かえし", "す", "返す"},        // 繰り返したい
+    {"返り", "かえり", "る", "返る"},        // 振り返りたい
+    {"つけ", nullptr, "ける", "つける"},    // 見つけたい
+    {"つかり", nullptr, "る", "つかる"},    // 見つかりたい
+    {"替え", "かえ", "える", "替える"},      // 切り替えたい
+    {"換え", "かえ", "える", "換える"},      // 入れ換えたい
+    {"合い", "あい", "う", "合う"},          // 話し合いたい
+    {"合わせ", "あわせ", "せる", "合わせる"}, // 組み合わせたい
+    {"消し", "けし", "す", "消す"},          // 取り消したい
+    {"過ぎ", "すぎ", "る", "過ぎる"},        // 読み過ぎたい, 読みすぎたい
+    {"直し", "なおし", "す", "直す"},        // やり直したい
+    {"終わり", "おわり", "る", "終わる"},    // 読み終わりたい
+    {"切り", "きり", "る", "切る"},          // 締め切りたい
 };
 
 // 連用形 (continuative form) endings for Godan verbs
@@ -189,14 +213,33 @@ void addCompoundVerbJoinCandidates(
   // Look for V2 (subsidiary verb)
   for (const auto& v2_verb : kSubsidiaryVerbs) {
     std::string_view v2_surface(v2_verb.surface);
+    std::string_view v2_reading(v2_verb.reading ? v2_verb.reading : "");
 
-    // Check if text at v2_start matches this V2 verb
-    if (v2_start_byte + v2_surface.size() > text.size()) {
-      continue;
+    // Check if text at v2_start matches this V2 verb (kanji or reading)
+    bool matched_kanji = false;
+    bool matched_reading = false;
+    size_t matched_len = 0;
+
+    // Try kanji match first
+    if (v2_start_byte + v2_surface.size() <= text.size()) {
+      std::string_view text_at_v2 = text.substr(v2_start_byte, v2_surface.size());
+      if (text_at_v2 == v2_surface) {
+        matched_kanji = true;
+        matched_len = v2_surface.size();
+      }
     }
 
-    std::string_view text_at_v2 = text.substr(v2_start_byte, v2_surface.size());
-    if (text_at_v2 != v2_surface) {
+    // Try reading (hiragana) match if kanji didn't match
+    if (!matched_kanji && !v2_reading.empty() &&
+        v2_start_byte + v2_reading.size() <= text.size()) {
+      std::string_view text_at_v2 = text.substr(v2_start_byte, v2_reading.size());
+      if (text_at_v2 == v2_reading) {
+        matched_reading = true;
+        matched_len = v2_reading.size();
+      }
+    }
+
+    if (!matched_kanji && !matched_reading) {
       continue;
     }
 
@@ -222,8 +265,8 @@ void addCompoundVerbJoinCandidates(
       }
     }
 
-    // Calculate compound verb end position
-    size_t compound_end_byte = v2_start_byte + v2_surface.size();
+    // Calculate compound verb end position using matched length
+    size_t compound_end_byte = v2_start_byte + matched_len;
 
     // Find character position for compound end
     size_t compound_end_pos = v2_start;
@@ -245,6 +288,14 @@ void addCompoundVerbJoinCandidates(
     // Build the compound verb surface
     std::string compound_surface(text.substr(start_byte, compound_end_byte - start_byte));
 
+    // Build compound verb base form (V1 renyokei + V2 base form)
+    // e.g., 走り + 出す = 走り出す, 走り + だす = 走り出す
+    std::string compound_base;
+    size_t v1_renyokei_end = is_ichidan ? v2_start_byte : charPosToBytePos(codepoints, kanji_end + 1);
+    compound_base = std::string(text.substr(start_byte, v1_renyokei_end - start_byte));
+    // Use the pre-defined base_form for V2 (always in kanji form for consistency)
+    compound_base += v2_verb.base_form;
+
     // Calculate cost
     float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
     float final_cost = base_cost + kCompoundVerbBonus;
@@ -257,9 +308,152 @@ void addCompoundVerbJoinCandidates(
 
     lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos),
                     static_cast<uint32_t>(compound_end_pos), core::PartOfSpeech::Verb,
-                    final_cost, flags, v1_base);
+                    final_cost, flags, compound_base);
 
     return;
+  }
+}
+
+void addHiraganaCompoundVerbJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const dictionary::DictionaryManager& dict_manager,
+    const Scorer& scorer) {
+  using CharType = normalize::CharType;
+
+  if (start_pos >= char_types.size()) {
+    return;
+  }
+
+  // Must start with hiragana (for all-hiragana compound verbs like やりなおす)
+  if (char_types[start_pos] != CharType::Hiragana) {
+    return;
+  }
+
+  // Get byte position for start
+  size_t start_byte = charPosToBytePos(codepoints, start_pos);
+
+  // For each V2 subsidiary verb, check if it appears after a potential V1
+  for (const auto& v2_verb : kSubsidiaryVerbs) {
+    // Only consider V2 with readings (hiragana patterns)
+    if (v2_verb.reading == nullptr) {
+      continue;
+    }
+    std::string_view v2_reading(v2_verb.reading);
+
+    // For hiragana compound verbs, V1 must be at least 2 characters
+    // Try different V1 lengths (2-4 characters)
+    for (size_t v1_len = 2; v1_len <= 4; ++v1_len) {
+      size_t v2_start = start_pos + v1_len;
+      if (v2_start >= codepoints.size()) {
+        break;
+      }
+
+      // All characters in V1 must be hiragana
+      bool all_hiragana = true;
+      for (size_t idx = start_pos; idx < v2_start; ++idx) {
+        if (char_types[idx] != CharType::Hiragana) {
+          all_hiragana = false;
+          break;
+        }
+      }
+      if (!all_hiragana) {
+        continue;
+      }
+
+      size_t v2_start_byte = charPosToBytePos(codepoints, v2_start);
+
+      // Check if V2 reading matches at v2_start
+      if (v2_start_byte + v2_reading.size() > text.size()) {
+        continue;
+      }
+      std::string_view text_at_v2 = text.substr(v2_start_byte, v2_reading.size());
+      if (text_at_v2 != v2_reading) {
+        continue;
+      }
+
+      // Extract V1 portion and determine its base form
+      std::string_view v1_surface = text.substr(start_byte, v2_start_byte - start_byte);
+
+      // Get the last character of V1 to determine verb type
+      char32_t last_char = codepoints[v2_start - 1];
+
+      // Check if it's a valid renyokei ending
+      char32_t base_ending = 0;
+      for (const auto& pattern : kGodanRenyokei) {
+        if (pattern.renyokei == last_char) {
+          base_ending = pattern.base;
+          break;
+        }
+      }
+
+      // Build V1 base form
+      std::string v1_base;
+      bool is_ichidan = (base_ending == 0);
+
+      if (!is_ichidan) {
+        // Godan: replace last char with base ending
+        v1_base = std::string(v1_surface.substr(0, v1_surface.size() - 3));  // Remove last hiragana (3 bytes)
+        v1_base += normalize::utf8::encode({base_ending});
+      } else {
+        // Ichidan: add る
+        v1_base = std::string(v1_surface) + "る";
+      }
+
+      // Verify V1 is in dictionary as a verb
+      auto v1_results = dict_manager.lookup(v1_base, 0);
+      bool v1_in_dict = false;
+      for (const auto& result : v1_results) {
+        if (result.entry != nullptr && result.entry->surface == v1_base &&
+            result.entry->pos == core::PartOfSpeech::Verb) {
+          v1_in_dict = true;
+          break;
+        }
+      }
+
+      if (!v1_in_dict) {
+        continue;  // V1 must be a known verb for hiragana compounds
+      }
+
+      // Calculate compound verb end position
+      size_t compound_end_byte = v2_start_byte + v2_reading.size();
+
+      // Find character position for compound end
+      size_t compound_end_pos = v2_start;
+      size_t byte_count = v2_start_byte;
+      while (compound_end_pos < codepoints.size() && byte_count < compound_end_byte) {
+        char32_t code = codepoints[compound_end_pos];
+        if (code < 0x80) {
+          byte_count += 1;
+        } else if (code < 0x800) {
+          byte_count += 2;
+        } else if (code < 0x10000) {
+          byte_count += 3;
+        } else {
+          byte_count += 4;
+        }
+        ++compound_end_pos;
+      }
+
+      // Build compound verb surface and base form
+      std::string compound_surface(text.substr(start_byte, compound_end_byte - start_byte));
+
+      // Compound base = V1 renyokei + V2 base form (in kanji)
+      std::string compound_base = std::string(v1_surface) + v2_verb.base_form;
+
+      // Calculate cost
+      float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
+      float final_cost = base_cost + kCompoundVerbBonus + kVerifiedV1Bonus;
+
+      uint8_t flags = core::LatticeEdge::kFromDictionary;
+
+      lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos),
+                      static_cast<uint32_t>(compound_end_pos), core::PartOfSpeech::Verb,
+                      final_cost, flags, compound_base);
+
+      return;  // Found a match, stop searching
+    }
   }
 }
 

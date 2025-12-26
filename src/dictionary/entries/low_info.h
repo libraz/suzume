@@ -75,7 +75,7 @@ inline std::vector<DictionaryEntry> getLowInfoEntries() {
       {"もらう", POS::Verb, 2.0F, "もらう", false, false, true, CT::GodanWa, ""},
       {"くれる", POS::Verb, 2.0F, "くれる", false, false, true, CT::Ichidan, ""},
       {"あげる", POS::Verb, 2.0F, "あげる", false, false, true, CT::Ichidan, ""},
-      {"やる", POS::Verb, 2.0F, "やる", false, false, true, CT::GodanRa, ""},
+      // やる is now in hiragana_verbs.h with lower cost for compound verb support
       {"みる", POS::Verb, 2.0F, "みる", false, false, true, CT::Ichidan, ""},
       {"おく", POS::Verb, 2.0F, "おく", false, false, true, CT::GodanKa, ""},
       {"しまう", POS::Verb, 2.0F, "しまう", false, false, true, CT::GodanWa, ""},

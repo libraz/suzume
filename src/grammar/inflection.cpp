@@ -63,10 +63,14 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       }
 
       // Stem should be at least 3 bytes (one Japanese character)
-      // Exception: Suru verb with す/し→する (empty stem is allowed for する)
+      // Exceptions for irregular verbs where the suffix IS the conjugated form:
+      // - Suru verb with す/し→する (empty stem is allowed)
+      // - Kuru verb with こ/き→くる (empty stem is allowed for mizenkei/renyokei)
       if (stem.size() < 3 &&
           !(ending.verb_type == VerbType::Suru &&
-            (ending.suffix == "す" || ending.suffix == "し"))) {
+            (ending.suffix == "す" || ending.suffix == "し")) &&
+          !(ending.verb_type == VerbType::Kuru &&
+            (ending.suffix == "こ" || ending.suffix == "き"))) {
         continue;
       }
 
@@ -83,6 +87,28 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         if (stem != "い" && stem != "行") {
           continue;  // Skip invalid irregular pattern
         }
+      }
+
+      // Validate Ichidan: reject stems that would create irregular verb base forms
+      // くる (来る) is Kuru verb, not Ichidan. Stem く + る = くる is INVALID.
+      // する is Suru verb, not Ichidan. Stem す + る = する is INVALID.
+      // こる is not a valid verb - こ is Kuru mizenkei suffix, not Ichidan stem.
+      // This prevents くなかった from being parsed as Ichidan く + なかった = くる
+      // Note: 来 (kanji) is handled separately - 来なかった should become 来る (Kuru)
+      if (ending.verb_type == VerbType::Ichidan && stem.size() == 3) {
+        if (stem == "く" || stem == "す" || stem == "こ") {
+          continue;  // Skip - these are irregular verbs (hiragana), not Ichidan
+        }
+      }
+
+      // Special handling for kanji 来: should be Kuru, not Ichidan
+      // Remap 来 + Ichidan patterns to Kuru verb type
+      VerbType actual_verb_type = ending.verb_type;
+      std::string actual_base_suffix = ending.base_suffix;
+      if (ending.verb_type == VerbType::Ichidan && stem == "来") {
+        actual_verb_type = VerbType::Kuru;
+        // For Kuru, base form is 来る (stem + る)
+        actual_base_suffix = "る";
       }
 
       // Suru verb stems should not contain particles like で, に, etc.
@@ -135,8 +161,8 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         }
       }
 
-      // Build base form
-      std::string base_form = stem + ending.base_suffix;
+      // Build base form (use actual_base_suffix for special cases like 来→来る)
+      std::string base_form = stem + actual_base_suffix;
 
       // Build suffix chain string
       std::string suffix_str = ending.suffix;
@@ -154,9 +180,9 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       candidate.base_form = base_form;
       candidate.stem = stem;
       candidate.suffix = suffix_str;
-      candidate.verb_type = ending.verb_type;
+      candidate.verb_type = actual_verb_type;  // Use remapped type for 来→Kuru
       candidate.confidence = calculateConfidence(
-          ending.verb_type, stem, aux_total_len, aux_chain.size(), required_conn);
+          actual_verb_type, stem, aux_total_len, aux_chain.size(), required_conn);
       candidate.morphemes = aux_chain;
 
       candidates.push_back(candidate);

@@ -115,6 +115,20 @@ class Tokenizer {
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
+   * @brief Add hiragana compound verb join candidates
+   *
+   * Detects all-hiragana V1連用形 + V2 patterns where V1 is a known dictionary verb.
+   *
+   * Examples:
+   *   "やりなおす" → compound verb (やる + なおす)
+   *   "やりなおしたい" → やりなおし + たい
+   */
+  void addHiraganaCompoundVerbJoinCandidates(
+      core::Lattice& lattice, std::string_view text,
+      const std::vector<char32_t>& codepoints, size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
    * @brief Add prefix + noun join candidates
    *
    * Detects productive prefix + noun patterns and generates merged candidates.

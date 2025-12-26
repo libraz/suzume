@@ -49,6 +49,31 @@ void addCompoundVerbJoinCandidates(
     const Scorer& scorer);
 
 /**
+ * @brief Add hiragana compound verb join candidates
+ *
+ * Detects all-hiragana V1連用形 + V2 patterns where V1 is a known dictionary verb.
+ * This handles compound verbs written entirely in hiragana like やりなおす.
+ *
+ * Examples:
+ *   "やりなおす" → compound verb (やる + なおす)
+ *   "やりなおしたい" → やりなおし + たい
+ *
+ * @param lattice Lattice to add candidates to
+ * @param text Original text
+ * @param codepoints Unicode codepoints
+ * @param start_pos Starting position in codepoints
+ * @param char_types Character types for each position
+ * @param dict_manager Dictionary manager for lookups
+ * @param scorer Scorer for POS priors
+ */
+void addHiraganaCompoundVerbJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const dictionary::DictionaryManager& dict_manager,
+    const Scorer& scorer);
+
+/**
  * @brief Add prefix + noun join candidates
  *
  * Detects productive prefix + noun patterns and generates merged candidates.

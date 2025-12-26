@@ -141,11 +141,26 @@ float calculateConfidence(VerbType type, std::string_view stem,
     base -= 0.30F;
   }
 
-  // Kuru validation: only 来る conjugates as Kuru
+  // Kuru validation: only 来る/くる conjugates as Kuru
+  // Valid Kuru stems:
+  // - "来" (kanji form: 来なかった → 来る)
+  // - "" (empty, when suffix is こ/き: こなかった → くる)
   if (type == VerbType::Kuru) {
-    if (stem != "来") {
-      // Any stem other than 来 is invalid for Kuru
+    if (stem != "来" && !stem.empty()) {
+      // Any stem other than 来 or empty is invalid for Kuru
       base -= 0.25F;
+    }
+  }
+
+  // Ichidan validation: reject base forms that would be irregular verbs
+  // くる (来る) is カ変, not 一段. Stem く + る = くる is INVALID for Ichidan.
+  // する is サ変, not 一段. Stem す + る = する is INVALID for Ichidan.
+  // こる is not a valid verb - こ is Kuru mizenkei suffix, not Ichidan stem.
+  // E.g., くなかった should NOT be parsed as Ichidan く + なかった = くる
+  // E.g., こなかった should NOT be parsed as Ichidan こ + なかった = こる
+  if (type == VerbType::Ichidan && stem_len == 3) {
+    if (stem == "く" || stem == "す" || stem == "こ") {
+      base -= 0.60F;  // Strong penalty - these are irregular verbs, not Ichidan
     }
   }
 
