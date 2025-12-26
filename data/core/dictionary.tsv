@@ -14,6 +14,33 @@
 気持ちいい	ADJECTIVE	きもちいい	1.0	I_ADJ
 申し訳ない	ADJECTIVE	もうしわけない	1.0	I_ADJ
 晴れ晴れしい	ADJECTIVE	はればれしい	1.0	I_ADJ
+# Common 〜しい adjectives (to distinguish from verb renyokei + そう patterns)
+# e.g., 難しそう (adj) vs 話しそう (verb) - both have kanji + し + そう structure
+難しい	ADJECTIVE	むずかしい	0.8	I_ADJ
+楽しい	ADJECTIVE	たのしい	0.8	I_ADJ
+美しい	ADJECTIVE	うつくしい	0.8	I_ADJ
+悲しい	ADJECTIVE	かなしい	0.8	I_ADJ
+嬉しい	ADJECTIVE	うれしい	0.8	I_ADJ
+悔しい	ADJECTIVE	くやしい	0.8	I_ADJ
+親しい	ADJECTIVE	したしい	0.8	I_ADJ
+怪しい	ADJECTIVE	あやしい	0.8	I_ADJ
+珍しい	ADJECTIVE	めずらしい	0.8	I_ADJ
+涼しい	ADJECTIVE	すずしい	0.8	I_ADJ
+正しい	ADJECTIVE	ただしい	0.8	I_ADJ
+新しい	ADJECTIVE	あたらしい	0.8	I_ADJ
+激しい	ADJECTIVE	はげしい	0.8	I_ADJ
+厳しい	ADJECTIVE	きびしい	0.8	I_ADJ
+寂しい	ADJECTIVE	さびしい	0.8	I_ADJ
+優しい	ADJECTIVE	やさしい	0.8	I_ADJ
+苦しい	ADJECTIVE	くるしい	0.8	I_ADJ
+恥ずかしい	ADJECTIVE	はずかしい	0.8	I_ADJ
+忙しい	ADJECTIVE	いそがしい	0.8	I_ADJ
+欲しい	ADJECTIVE	ほしい	0.8	I_ADJ
+恋しい	ADJECTIVE	こいしい	0.8	I_ADJ
+著しい	ADJECTIVE	いちじるしい	0.8	I_ADJ
+懐かしい	ADJECTIVE	なつかしい	0.8	I_ADJ
+騒がしい	ADJECTIVE	さわがしい	0.8	I_ADJ
+喧しい	ADJECTIVE	やかましい	0.8	I_ADJ
 
 # === adverbs ===
 # Note: なかなか, いつも are in L1 adverbs.h

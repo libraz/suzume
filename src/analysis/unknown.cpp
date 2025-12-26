@@ -361,7 +361,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAdjectiveCandidates(
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
   return analysis::generateAdjectiveCandidates(
-      codepoints, start_pos, char_types, inflection_);
+      codepoints, start_pos, char_types, inflection_, dict_manager_);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateHiraganaAdjectiveCandidates(

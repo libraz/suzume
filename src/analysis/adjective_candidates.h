@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "core/types.h"
+#include "dictionary/dictionary.h"
 #include "grammar/inflection.h"
 #include "normalize/char_type.h"
 
@@ -27,13 +28,15 @@ struct UnknownOptions;
  * @param start_pos Start position (character index)
  * @param char_types Character types for each position
  * @param inflection Inflection analyzer for conjugation detection
+ * @param dict_manager Dictionary manager for base form validation (optional)
  * @return Vector of candidates
  */
 std::vector<UnknownCandidate> generateAdjectiveCandidates(
     const std::vector<char32_t>& codepoints,
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection);
+    const grammar::Inflection& inflection,
+    const dictionary::DictionaryManager* dict_manager = nullptr);
 
 /**
  * @brief Generate na-adjective candidates (〜的 patterns)

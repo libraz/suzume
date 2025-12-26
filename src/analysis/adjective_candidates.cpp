@@ -25,7 +25,8 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     const std::vector<char32_t>& codepoints,
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection) {
+    const grammar::Inflection& inflection,
+    const dictionary::DictionaryManager* dict_manager) {
   std::vector<UnknownCandidate> candidates;
 
   if (start_pos >= char_types.size() ||
@@ -182,7 +183,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // These are verb + そう auxiliary patterns, not i-adjectives.
     // Pattern: single kanji + renyokei suffix (i-row) + そう
     // Renyokei suffixes: み, き, ぎ, ち, び, り, に (7 patterns)
-    // Note: し is excluded because it's used in adjective stems (難し, 楽し, 美し)
+    // Note: し is handled specially below with dictionary validation
     // Note: We only skip when hiragana is exactly renyokei + そう (9 bytes)
     // to avoid blocking adjective patterns with longer stems
     if (kanji_end == start_pos + 1 && hiragana_part.size() == 9) {
@@ -194,6 +195,47 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
            renyokei_char == "に") &&
           hiragana_part.substr(3) == "そう") {
         continue;  // Skip - likely verb renyokei + そう, not i-adjective
+      }
+
+      // For し + そう patterns (話しそう, 難しそう, etc.), check dictionary
+      // to distinguish verb renyokei + そう from adjective + そう.
+      // 難しそう → base: 難しい (in dictionary) → allow adjective candidate
+      // 話しそう → base: 話しい (not in dictionary) → skip
+      if (renyokei_char == "し" && hiragana_part.substr(3) == "そう") {
+        if (dict_manager != nullptr) {
+          // Construct base form: kanji + しい
+          std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+          std::string base_form = kanji_stem + "しい";
+          auto lookup = dict_manager->lookup(base_form, 0);
+          if (lookup.empty()) {
+            continue;  // Base form not in dictionary, skip adjective candidate
+          }
+          // Check if any entry is an adjective with exact match
+          // (length should match the entire base_form)
+          size_t base_form_chars = 0;
+          for (size_t i = 0; i < base_form.size(); ) {
+            auto byte = static_cast<uint8_t>(base_form[i]);
+            if ((byte & 0x80) == 0) { i += 1; }
+            else if ((byte & 0xE0) == 0xC0) { i += 2; }
+            else if ((byte & 0xF0) == 0xE0) { i += 3; }
+            else { i += 4; }
+            ++base_form_chars;
+          }
+          bool found_adjective = false;
+          for (const auto& result : lookup) {
+            if (result.length == base_form_chars &&
+                result.entry != nullptr &&
+                result.entry->pos == core::PartOfSpeech::Adjective) {
+              found_adjective = true;
+              break;
+            }
+          }
+          if (!found_adjective) {
+            continue;  // Not an adjective in dictionary, skip
+          }
+        }
+        // If no dict_manager, fall through to generate candidate
+        // (backwards compatibility)
       }
     }
 
