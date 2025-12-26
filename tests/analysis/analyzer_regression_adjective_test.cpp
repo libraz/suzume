@@ -380,5 +380,105 @@ TEST(AnalyzerTest, Regression_SuruVerbSou_ChikokuShisou) {
   EXPECT_TRUE(found_shisou) << "しそう should be recognized as verb";
 }
 
+// =============================================================================
+// Regression: し+そう disambiguation (verb renyokei vs adjective stem)
+// =============================================================================
+// Bug: 話しそう was incorrectly analyzed as adjective (話しい + そう)
+// Fix: Added dictionary validation for し+そう patterns - only generate
+//      adjective candidate if base form (kanji + しい) exists in dictionary
+
+TEST(AnalyzerTest, Regression_ShiSou_HanashiSou_Verb) {
+  // 話しそう should be 話す (verb) + そう, NOT 話しい (adjective)
+  // 話しい is not a valid adjective in Japanese
+  Suzume analyzer;
+  auto result = analyzer.analyze("話しそう");
+  ASSERT_GE(result.size(), 2) << "話しそう should have at least 2 tokens";
+
+  bool found_hanashi = false;
+  bool found_sou = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "話し" && mor.pos == core::PartOfSpeech::Verb) {
+      found_hanashi = true;
+      EXPECT_EQ(mor.lemma, "話す") << "話し lemma should be 話す";
+    }
+    if (mor.surface == "そう" && mor.pos == core::PartOfSpeech::Adverb) {
+      found_sou = true;
+    }
+  }
+  EXPECT_TRUE(found_hanashi) << "話し should be recognized as verb (renyokei)";
+  EXPECT_TRUE(found_sou) << "そう should be recognized as adverb";
+}
+
+TEST(AnalyzerTest, Regression_ShiSou_MuzukashiSou_Adjective) {
+  // 難しそう should be adjective with lemma 難しい
+  // 難しい IS a valid adjective in dictionary
+  Suzume analyzer;
+  auto result = analyzer.analyze("難しそう");
+  ASSERT_FALSE(result.empty());
+
+  EXPECT_EQ(result.size(), 1) << "難しそう should be single token";
+  if (!result.empty()) {
+    EXPECT_EQ(result[0].surface, "難しそう");
+    EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective)
+        << "難しそう should be Adjective";
+    EXPECT_EQ(result[0].lemma, "難しい")
+        << "難しそう lemma should be 難しい";
+  }
+}
+
+TEST(AnalyzerTest, Regression_ShiSou_TanoshiSou_Adjective) {
+  // 楽しそう should be adjective with lemma 楽しい
+  Suzume analyzer;
+  auto result = analyzer.analyze("楽しそう");
+  ASSERT_FALSE(result.empty());
+
+  EXPECT_EQ(result.size(), 1) << "楽しそう should be single token";
+  if (!result.empty()) {
+    EXPECT_EQ(result[0].surface, "楽しそう");
+    EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective)
+        << "楽しそう should be Adjective";
+    EXPECT_EQ(result[0].lemma, "楽しい")
+        << "楽しそう lemma should be 楽しい";
+  }
+}
+
+TEST(AnalyzerTest, Regression_ShiSou_TameshiSou_Verb) {
+  // 試しそう should be 試す (verb) + そう, NOT 試しい (adjective)
+  // 試しい is not a valid adjective in Japanese
+  Suzume analyzer;
+  auto result = analyzer.analyze("試しそう");
+  ASSERT_GE(result.size(), 2) << "試しそう should have at least 2 tokens";
+
+  bool found_tameshi = false;
+  bool found_sou = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "試し" && mor.pos == core::PartOfSpeech::Verb) {
+      found_tameshi = true;
+      EXPECT_EQ(mor.lemma, "試す") << "試し lemma should be 試す";
+    }
+    if (mor.surface == "そう" && mor.pos == core::PartOfSpeech::Adverb) {
+      found_sou = true;
+    }
+  }
+  EXPECT_TRUE(found_tameshi) << "試し should be recognized as verb (renyokei)";
+  EXPECT_TRUE(found_sou) << "そう should be recognized as adverb";
+}
+
+TEST(AnalyzerTest, Regression_ShiSou_UreshiSou_Adjective) {
+  // 嬉しそう should be adjective with lemma 嬉しい
+  Suzume analyzer;
+  auto result = analyzer.analyze("嬉しそう");
+  ASSERT_FALSE(result.empty());
+
+  EXPECT_EQ(result.size(), 1) << "嬉しそう should be single token";
+  if (!result.empty()) {
+    EXPECT_EQ(result[0].surface, "嬉しそう");
+    EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective)
+        << "嬉しそう should be Adjective";
+    EXPECT_EQ(result[0].lemma, "嬉しい")
+        << "嬉しそう lemma should be 嬉しい";
+  }
+}
+
 }  // namespace
 }  // namespace suzume::analysis
