@@ -28,6 +28,11 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"た", "た", kAuxTa, kAuxOutTa, kVerbOnbinkei},
       {"だ", "た", kAuxTa, kAuxOutTa, kVerbOnbinkei},
 
+      // === Conditional (たら系) ===
+      // 食べたら, 書いたら, 読んだら (if/when did X)
+      {"たら", "たら", kAuxTa, kAuxOutBase, kVerbOnbinkei},
+      {"だら", "たら", kAuxTa, kAuxOutBase, kVerbOnbinkei},
+
       // === Te-form (て系) ===
       {"て", "て", kAuxTe, kAuxOutTe, kVerbOnbinkei},
       {"で", "て", kAuxTe, kAuxOutTe, kVerbOnbinkei},
@@ -78,8 +83,10 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       // === Attempt (てみる系) ===
       {"みる", "みる", kAuxTemiru, kAuxOutBase, kAuxOutTe},
       {"みた", "みる", kAuxTemiru, kAuxOutTa, kAuxOutTe},
+      {"みたら", "みる", kAuxTemiru, kAuxOutBase, kAuxOutTe},  // conditional
       {"みて", "みる", kAuxTemiru, kAuxOutTe, kAuxOutTe},
       {"みます", "みる", kAuxTemiru, kAuxOutMasu, kAuxOutTe},
+      {"みれば", "みる", kAuxTemiru, kAuxOutBase, kAuxOutTe},  // conditional ば
 
       // === Benefactive (てもらう/てくれる/てあげる系) ===
       {"もらう", "もらう", kAuxTemorau, kAuxOutBase, kAuxOutTe},
@@ -258,8 +265,12 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"すぎている", "すぎる", kAuxRenyokei, kAuxOutBase, kVerbRenyokei},
       {"やすい", "やすい", kAuxRenyokei, kAuxOutBase, kVerbRenyokei},
       {"やすかった", "やすい", kAuxRenyokei, kAuxOutTa, kVerbRenyokei},
+      {"やすく", "やすい", kAuxRenyokei, kAuxOutBase, kVerbRenyokei},    // renyokei
+      {"やすくて", "やすい", kAuxRenyokei, kAuxOutTe, kVerbRenyokei},    // te-form
       {"にくい", "にくい", kAuxRenyokei, kAuxOutBase, kVerbRenyokei},
       {"にくかった", "にくい", kAuxRenyokei, kAuxOutTa, kVerbRenyokei},
+      {"にくく", "にくい", kAuxRenyokei, kAuxOutBase, kVerbRenyokei},    // renyokei
+      {"にくくて", "にくい", kAuxRenyokei, kAuxOutTe, kVerbRenyokei},    // te-form
       {"かける", "かける", kAuxRenyokei, kAuxOutBase, kVerbRenyokei},
       {"かけた", "かける", kAuxRenyokei, kAuxOutTa, kVerbRenyokei},
       {"かけて", "かける", kAuxRenyokei, kAuxOutTe, kVerbRenyokei},

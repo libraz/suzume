@@ -292,6 +292,8 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         // ADJ prior (0.3) is higher than VERB prior (0.2), so we need lower edge cost
         candidate.cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
         candidate.has_suffix = false;
+        // Set lemma to base form from inflection analysis (e.g., 使いやすく → 使いやすい)
+        candidate.lemma = cand.base_form;
         candidates.push_back(candidate);
         break;  // Only add one adjective candidate per surface
       }
@@ -462,6 +464,8 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         // Lower cost for higher confidence matches
         candidate.cost = 0.3F + (1.0F - cand.confidence) * 0.3F;
         candidate.has_suffix = false;
+        // Set lemma to base form from inflection analysis
+        candidate.lemma = cand.base_form;
         candidates.push_back(candidate);
         break;  // Only add one adjective candidate per surface
       }

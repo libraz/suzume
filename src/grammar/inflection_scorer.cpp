@@ -132,6 +132,15 @@ float calculateConfidence(VerbType type, std::string_view stem,
     }
   }
 
+  // GodanRa validation: single-hiragana stems are typically Ichidan, not GodanRa
+  // Verbs like みる (to see), きる (to cut/wear), にる (to boil) are Ichidan
+  // Godan Ra verbs usually have at least 2 chars in stem (帰る, 走る, 取る)
+  // Apply penalty to GodanRa interpretation for single-hiragana stems
+  if (type == VerbType::GodanRa && stem_len == 3 && !endsWithKanji(stem)) {
+    // Single hiragana stem (み, き, に, etc.) - likely Ichidan, not GodanRa
+    base -= 0.30F;
+  }
+
   // Kuru validation: only 来る conjugates as Kuru
   if (type == VerbType::Kuru) {
     if (stem != "来") {
