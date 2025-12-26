@@ -183,18 +183,25 @@ float calculateConfidence(VerbType type, std::string_view stem,
         last == "さ" || last == "た" || last == "ば" || last == "ら" ||
         last == "わ") {
       // Check if there's a hiragana before the a-row ending (verb+mizenkei pattern)
-      // E.g., 食べ + な → 食べな (verb pattern)
+      // E.g., 食べ + な → 食べな (ichidan verb pattern)
+      //       行 + か + な → 行かな (godan verb mizenkei + な)
       // vs. 危 + な → あぶな (real adjective stem)
       if (stem_len >= 9) {
         std::string_view prev = stem.substr(stem_len - 6, 3);
-        // If previous char is also hiragana, this looks like verb mizenkei
+        // If previous char is hiragana, this looks like verb mizenkei
+        // Include all rows: a-row (godan mizenkei), e-row (ichidan), i-row, etc.
         if (prev == "べ" || prev == "め" || prev == "せ" || prev == "け" ||
             prev == "て" || prev == "ね" || prev == "れ" || prev == "え" ||
             prev == "げ" || prev == "ぜ" || prev == "で" || prev == "ぺ" ||
             prev == "み" || prev == "き" || prev == "し" || prev == "ち" ||
             prev == "に" || prev == "ひ" || prev == "り" || prev == "い" ||
             prev == "ぎ" || prev == "じ" || prev == "ぢ" || prev == "び" ||
-            prev == "ぴ") {
+            prev == "ぴ" ||
+            // a-row: godan verb mizenkei markers (書か, 読ま, 行か, etc.)
+            prev == "か" || prev == "が" || prev == "さ" || prev == "ざ" ||
+            prev == "た" || prev == "だ" || prev == "な" || prev == "ば" ||
+            prev == "ぱ" || prev == "ま" || prev == "ら" || prev == "わ" ||
+            prev == "あ" || prev == "は") {
           base -= 0.30F;  // Penalty for verb mizenkei + a-row pattern
         }
       }
@@ -216,6 +223,13 @@ float calculateConfidence(VerbType type, std::string_view stem,
       if (endsWithKanji(stem.substr(0, 3))) {
         base -= 0.30F;  // Penalty for kanji + i-row pattern
       }
+    }
+    // Short stems ending with な (しな, 来な) are likely verb negative patterns
+    // E.g., しなければ → しない (する negative) misanalyzed as adjective
+    //       来なければ → 来ない (来る negative) misanalyzed as adjective
+    // Real 2-char i-adjectives ending with な are extremely rare
+    if (last == "な") {
+      base -= 0.35F;  // Strong penalty for short な-ending stems
     }
   }
 

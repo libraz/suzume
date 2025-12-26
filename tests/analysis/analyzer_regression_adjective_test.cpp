@@ -480,5 +480,75 @@ TEST(AnalyzerTest, Regression_ShiSou_UreshiSou_Adjective) {
   }
 }
 
+// =============================================================================
+// Regression: 〜なければ conditional not adjective
+// =============================================================================
+// Bug: 行かなければ was incorrectly analyzed as adjective (行かない + ければ)
+// Fix: Added a-row hiragana to penalty check in inflection_scorer.cpp
+//      and added penalty for short な-ending stems (しな, 来な)
+
+TEST(AnalyzerTest, Regression_Nakereba_IkaNakereba_Verb) {
+  // 行かなければ should be 行く (verb), not 行かない (adjective)
+  Suzume analyzer;
+  auto result = analyzer.analyze("行かなければ");
+  ASSERT_FALSE(result.empty());
+
+  bool found_verb = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "行かなければ" && mor.pos == core::PartOfSpeech::Verb) {
+      found_verb = true;
+      EXPECT_EQ(mor.lemma, "行く") << "行かなければ lemma should be 行く";
+    }
+  }
+  EXPECT_TRUE(found_verb) << "行かなければ should be recognized as verb";
+}
+
+TEST(AnalyzerTest, Regression_Nakereba_ShiNakereba_Verb) {
+  // しなければ should be する (verb), not しない (adjective)
+  Suzume analyzer;
+  auto result = analyzer.analyze("しなければならない");
+  ASSERT_FALSE(result.empty());
+
+  bool found_suru = false;
+  for (const auto& mor : result) {
+    if (mor.pos == core::PartOfSpeech::Verb && mor.lemma == "する") {
+      found_suru = true;
+    }
+  }
+  EXPECT_TRUE(found_suru) << "しなければならない should contain する verb";
+}
+
+TEST(AnalyzerTest, Regression_Nakereba_KoNakereba_Verb) {
+  // 来なければ should be 来る (verb), not 来ない (adjective)
+  Suzume analyzer;
+  auto result = analyzer.analyze("来なければ");
+  ASSERT_FALSE(result.empty());
+
+  bool found_verb = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "来なければ" && mor.pos == core::PartOfSpeech::Verb) {
+      found_verb = true;
+      EXPECT_EQ(mor.lemma, "来る") << "来なければ lemma should be 来る";
+    }
+  }
+  EXPECT_TRUE(found_verb) << "来なければ should be recognized as verb";
+}
+
+TEST(AnalyzerTest, Regression_Nakereba_KakaNakereba_Verb) {
+  // 書かなければ should be 書く (verb), not 書かない (adjective)
+  Suzume analyzer;
+  auto result = analyzer.analyze("書かなければ");
+  ASSERT_FALSE(result.empty());
+
+  bool found_verb = false;
+  for (const auto& mor : result) {
+    if (mor.surface == "書かなければ" && mor.pos == core::PartOfSpeech::Verb) {
+      found_verb = true;
+      EXPECT_EQ(mor.lemma, "書く") << "書かなければ lemma should be 書く";
+    }
+  }
+  EXPECT_TRUE(found_verb) << "書かなければ should be recognized as verb";
+}
+
 }  // namespace
 }  // namespace suzume::analysis
