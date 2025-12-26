@@ -122,6 +122,21 @@ TEST_F(InflectionComplexTest, SugiruIchidan) {
   EXPECT_EQ(result.base_form, "食べる");
 }
 
+TEST_F(InflectionComplexTest, SugiruIAdjective) {
+  auto result = inflection_.getBest("難しすぎる");
+  EXPECT_EQ(result.base_form, "難しい");
+}
+
+TEST_F(InflectionComplexTest, SugiruIAdjectiveTe) {
+  auto result = inflection_.getBest("難しすぎて");
+  EXPECT_EQ(result.base_form, "難しい");
+}
+
+TEST_F(InflectionComplexTest, SugiruIAdjectiveTa) {
+  auto result = inflection_.getBest("高すぎた");
+  EXPECT_EQ(result.base_form, "高い");
+}
+
 // ===== yasui/nikui =====
 
 TEST_F(InflectionComplexTest, YasuiGodanKa) {

@@ -141,6 +141,16 @@ float calculateConfidence(VerbType type, std::string_view stem,
     base -= 0.25F;  // Strong penalty for single-kanji I-adjective stems
   }
 
+  // I-adjective stems ending with "し" are very common (難しい, 美しい, 楽しい, 苦しい)
+  // When followed by すぎる/やすい/にくい auxiliaries, boost confidence
+  // This helps disambiguate 難しすぎる (難しい + すぎる) vs 難す (Godan-Sa)
+  if (type == VerbType::IAdjective && stem_len >= 6 && aux_count >= 1) {
+    std::string_view last = stem.substr(stem_len - 3);
+    if (last == "し") {
+      base += 0.15F;  // Boost for 〜しい adjectives with auxiliaries
+    }
+  }
+
   // I-adjective stems consisting only of 2+ kanji are extremely rare
   // Such stems are usually サ変名詞 (検討, 勉強, 準備) being misanalyzed
   // Real i-adjectives have patterns like: 美しい, 楽しい (kanji + hiragana)

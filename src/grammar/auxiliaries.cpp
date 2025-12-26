@@ -301,6 +301,15 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"くなって", "い", kAuxNai, kAuxOutTe, kIAdjStem},    // 美し + くなって
       {"そう", "い", kAuxNai, kAuxOutBase, kIAdjStem},      // 美し + そう (looks like)
       {"さ", "い", kAuxNai, kAuxOutBase, kIAdjStem},        // 美し + さ (noun form)
+      // I-adjective + すぎる (excess: too ~)
+      {"すぎる", "い", kAuxRenyokei, kAuxOutBase, kIAdjStem},     // 難し + すぎる
+      {"すぎた", "い", kAuxRenyokei, kAuxOutTa, kIAdjStem},       // 難し + すぎた
+      {"すぎて", "い", kAuxRenyokei, kAuxOutTe, kIAdjStem},       // 難し + すぎて
+      {"すぎている", "い", kAuxRenyokei, kAuxOutBase, kIAdjStem}, // 難し + すぎている
+      {"すぎない", "い", kAuxRenyokei, kAuxOutBase, kIAdjStem},   // 難し + すぎない
+      {"すぎなかった", "い", kAuxRenyokei, kAuxOutTa, kIAdjStem}, // 難し + すぎなかった
+      {"すぎます", "い", kAuxRenyokei, kAuxOutMasu, kIAdjStem},   // 難し + すぎます
+      {"すぎました", "い", kAuxRenyokei, kAuxOutTa, kIAdjStem},   // 難し + すぎました
 
       // === Volitional + とする (ようとする: attempting) ===
       // 書こうとする = trying to write
