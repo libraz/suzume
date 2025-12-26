@@ -236,5 +236,51 @@ TEST_F(InflectionBasicTest, SuruPassiveNegativePast_Compound) {
   EXPECT_EQ(result.verb_type, VerbType::Suru);
 }
 
+// ===== Volitional forms (意志形) =====
+
+TEST_F(InflectionBasicTest, GodanVolitional_Iku) {
+  auto result = inflection_.getBest("行こう");
+  EXPECT_EQ(result.base_form, "行く");
+  EXPECT_EQ(result.verb_type, VerbType::GodanKa);
+}
+
+TEST_F(InflectionBasicTest, GodanVolitional_Hashiru) {
+  auto result = inflection_.getBest("走ろう");
+  EXPECT_EQ(result.base_form, "走る");
+  EXPECT_EQ(result.verb_type, VerbType::GodanRa);
+}
+
+TEST_F(InflectionBasicTest, IchidanVolitional_Taberu) {
+  auto result = inflection_.getBest("食べよう");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
+TEST_F(InflectionBasicTest, HiraganaVolitional_Ikou) {
+  auto result = inflection_.getBest("いこう");
+  EXPECT_EQ(result.base_form, "いく");
+  EXPECT_EQ(result.verb_type, VerbType::GodanKa);
+}
+
+// ===== Verb + そう (appearance/likelihood) =====
+
+TEST_F(InflectionBasicTest, VerbSou_Furi) {
+  auto result = inflection_.getBest("降りそうだ");
+  EXPECT_EQ(result.base_form, "降る");
+  EXPECT_EQ(result.verb_type, VerbType::GodanRa);
+}
+
+TEST_F(InflectionBasicTest, VerbSou_Nomu) {
+  auto result = inflection_.getBest("飲みそう");
+  EXPECT_EQ(result.base_form, "飲む");
+  EXPECT_EQ(result.verb_type, VerbType::GodanMa);
+}
+
+TEST_F(InflectionBasicTest, VerbSou_Taberu) {
+  auto result = inflection_.getBest("食べそうだ");
+  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_EQ(result.verb_type, VerbType::Ichidan);
+}
+
 }  // namespace
 }  // namespace suzume::grammar

@@ -329,6 +329,11 @@ std::vector<AuxiliaryEntry> initAuxiliaries() {
       {"すぎます", "い", kAuxRenyokei, kAuxOutMasu, kIAdjStem},   // 難し + すぎます
       {"すぎました", "い", kAuxRenyokei, kAuxOutTa, kIAdjStem},   // 難し + すぎました
 
+      // === Volitional endings (意志形) ===
+      // Standalone volitional forms: 書こう, 食べよう, 行こう
+      {"う", "う", kAuxNai, kAuxOutBase, kVerbVolitional},    // Godan: 書こ+う
+      {"よう", "よう", kAuxNai, kAuxOutBase, kVerbVolitional}, // Ichidan: 食べ+よう
+
       // === Volitional + とする (ようとする: attempting) ===
       // 書こうとする = trying to write
       {"うとする", "とする", kAuxNai, kAuxOutBase, kVerbVolitional},

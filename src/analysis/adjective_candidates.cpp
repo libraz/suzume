@@ -179,29 +179,31 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       continue;  // Skip - causative-passive negative + become pattern
     }
 
-    // Skip Godan verb renyokei + そう patterns (飲みそう, 書きそう, etc.)
+    // Skip Godan verb renyokei + そう patterns (飲みそう, 降りそうだ, etc.)
     // These are verb + そう auxiliary patterns, not i-adjectives.
-    // Pattern: single kanji + renyokei suffix (i-row) + そう
+    // Pattern: single kanji + renyokei suffix (i-row) + そう/そうだ/そうです...
     // Renyokei suffixes: み, き, ぎ, ち, び, り, に (7 patterns)
     // Note: し is handled specially below with dictionary validation
-    // Note: We only skip when hiragana is exactly renyokei + そう (9 bytes)
-    // to avoid blocking adjective patterns with longer stems
-    if (kanji_end == start_pos + 1 && hiragana_part.size() == 9) {
-      // Check if pattern is exactly: renyokei suffix + そう
+    if (kanji_end == start_pos + 1 && hiragana_part.size() >= 9) {
+      // Check if pattern starts with: renyokei suffix + そう
       std::string_view renyokei_char = std::string_view(hiragana_part).substr(0, 3);
       if ((renyokei_char == "み" || renyokei_char == "き" ||
            renyokei_char == "ぎ" || renyokei_char == "ち" ||
            renyokei_char == "び" || renyokei_char == "り" ||
            renyokei_char == "に") &&
-          hiragana_part.substr(3) == "そう") {
+          hiragana_part.size() >= 9 &&
+          hiragana_part.substr(3, 6) == "そう") {
+        // This is verb renyokei + そう pattern (with optional だ/です/etc.)
         continue;  // Skip - likely verb renyokei + そう, not i-adjective
       }
 
-      // For し + そう patterns (話しそう, 難しそう, etc.), check dictionary
+      // For し + そう patterns (話しそう, 話しそうだ, 難しそう, etc.), check dictionary
       // to distinguish verb renyokei + そう from adjective + そう.
       // 難しそう → base: 難しい (in dictionary) → allow adjective candidate
       // 話しそう → base: 話しい (not in dictionary) → skip
-      if (renyokei_char == "し" && hiragana_part.substr(3) == "そう") {
+      if (renyokei_char == "し" &&
+          hiragana_part.size() >= 9 &&
+          hiragana_part.substr(3, 6) == "そう") {
         if (dict_manager != nullptr) {
           // Construct base form: kanji + しい
           std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
