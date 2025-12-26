@@ -1,0 +1,73 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // === C++ Tasks ===
+    {
+      "label": "C++: Configure (Debug)",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["-B", "build", "-DCMAKE_BUILD_TYPE=Debug"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "C++: Build",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "build", "--parallel"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "C++: Test",
+      "type": "shell",
+      "command": "ctest",
+      "args": ["--test-dir", "build", "--output-on-failure"],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "C++: Build WASM",
+      "type": "shell",
+      "command": "emcmake",
+      "args": ["cmake", "-B", "build-wasm", "-DBUILD_WASM=ON"],
+      "group": "build",
+      "problemMatcher": []
+    },
+
+    // === JS/WASM Tasks ===
+    {
+      "label": "JS: Install",
+      "type": "shell",
+      "command": "yarn",
+      "args": ["install"],
+      "problemMatcher": []
+    },
+    {
+      "label": "JS: Lint",
+      "type": "shell",
+      "command": "yarn",
+      "args": ["lint"],
+      "problemMatcher": []
+    },
+    {
+      "label": "JS: Test",
+      "type": "shell",
+      "command": "yarn",
+      "args": ["test"],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "JS: Build",
+      "type": "shell",
+      "command": "yarn",
+      "args": ["build"],
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}

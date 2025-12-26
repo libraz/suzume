@@ -289,8 +289,10 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   }
 
   // Skip grammar-based lemmatization for non-conjugating POS
-  // Particles, auxiliaries, conjunctions, adverbs, etc. don't conjugate
+  // Only verbs and adjectives conjugate
   switch (morpheme.pos) {
+    case core::PartOfSpeech::Noun:
+    case core::PartOfSpeech::Pronoun:
     case core::PartOfSpeech::Particle:
     case core::PartOfSpeech::Auxiliary:
     case core::PartOfSpeech::Conjunction:

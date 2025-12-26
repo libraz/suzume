@@ -428,5 +428,42 @@ TEST(AnalyzerTest, Regression_MazuAdverb) {
       << "まず should be Adverb";
 }
 
+// =============================================================================
+// Regression: Famous tongue twister parsing
+// =============================================================================
+// すもももももももものうち (李も桃も桃のうち)
+// This is a classic Japanese parsing challenge.
+// Correct: すもも/も/もも/も/もも/の/うち
+
+TEST(AnalyzerTest, Regression_SumomoMomo) {
+  Suzume analyzer;
+  auto result = analyzer.analyze("すもももももももものうち");
+
+  // Expected: すもも + も + もも + も + もも + の + うち = 7 tokens
+  ASSERT_EQ(result.size(), 7) << "Expected 7 tokens for すもももももももものうち";
+
+  EXPECT_EQ(result[0].surface, "すもも");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Noun);
+
+  EXPECT_EQ(result[1].surface, "も");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Particle);
+
+  EXPECT_EQ(result[2].surface, "もも");
+  EXPECT_EQ(result[2].pos, core::PartOfSpeech::Noun);
+
+  EXPECT_EQ(result[3].surface, "も");
+  EXPECT_EQ(result[3].pos, core::PartOfSpeech::Particle);
+
+  EXPECT_EQ(result[4].surface, "もも");
+  EXPECT_EQ(result[4].pos, core::PartOfSpeech::Noun);
+
+  EXPECT_EQ(result[5].surface, "の");
+  EXPECT_EQ(result[5].pos, core::PartOfSpeech::Particle);
+
+  EXPECT_EQ(result[6].surface, "うち");
+  EXPECT_EQ(result[6].pos, core::PartOfSpeech::Noun);
+  EXPECT_EQ(result[6].lemma, "うち") << "うち lemma should be うち, not うつ";
+}
+
 }  // namespace
 }  // namespace suzume::analysis

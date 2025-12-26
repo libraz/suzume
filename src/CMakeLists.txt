@@ -30,12 +30,30 @@ target_include_directories(suzume
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# WASM C API library
+# WASM C API library and executable
 if(BUILD_WASM)
   add_library(suzume_c STATIC
     suzume_c.cpp
   )
   target_link_libraries(suzume_c PUBLIC suzume)
+
+  # WASM executable (produces .js + .wasm)
+  add_executable(suzume-wasm
+    suzume_c.cpp
+  )
+  target_link_libraries(suzume-wasm PRIVATE suzume)
+
+  # Copy output to dist directory (keep original names for JS compatibility)
+  add_custom_command(TARGET suzume-wasm POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${WASM_OUTPUT_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "$<TARGET_FILE_DIR:suzume-wasm>/suzume-wasm.js"
+      "${WASM_OUTPUT_DIR}/suzume.js"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "$<TARGET_FILE_DIR:suzume-wasm>/suzume-wasm.wasm"
+      "${WASM_OUTPUT_DIR}/suzume-wasm.wasm"
+    COMMENT "Copying WASM files to dist/"
+  )
 endif()
 
 # CLI executable (legacy)

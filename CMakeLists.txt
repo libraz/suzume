@@ -105,10 +105,27 @@ include_directories(${SOURCE_DIR})
 if(BUILD_WASM)
   message(STATUS "Building for WebAssembly")
   set(CMAKE_EXECUTABLE_SUFFIX ".js")
-  add_compile_options(-s WASM=1 -s MODULARIZE=1 -s EXPORT_ES6=1)
-  add_link_options(-s WASM=1 -s MODULARIZE=1 -s EXPORT_ES6=1)
-  add_link_options(-s EXPORTED_FUNCTIONS="['_malloc','_free']")
-  add_link_options(-s EXPORTED_RUNTIME_METHODS="['cwrap','ccall','UTF8ToString','stringToUTF8']")
+
+  # Emscripten compile options
+  add_compile_options(
+    -sWASM=1
+    -sMODULARIZE=1
+    -sEXPORT_ES6=1
+  )
+
+  # Emscripten link options
+  add_link_options(
+    -sWASM=1
+    -sMODULARIZE=1
+    -sEXPORT_ES6=1
+    "-sEXPORTED_FUNCTIONS=['_malloc','_free','_suzume_create','_suzume_destroy','_suzume_analyze','_suzume_result_free','_suzume_generate_tags','_suzume_tags_free','_suzume_load_user_dict','_suzume_version','_suzume_malloc','_suzume_free']"
+    "-sEXPORTED_RUNTIME_METHODS=['cwrap','ccall','UTF8ToString','stringToUTF8','lengthBytesUTF8','HEAPU32']"
+    -sALLOW_MEMORY_GROWTH=1
+    -sSTACK_SIZE=1048576
+  )
+
+  # Output directory for npm package
+  set(WASM_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/dist")
 endif()
 
 # Add subdirectories

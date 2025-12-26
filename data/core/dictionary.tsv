@@ -198,3 +198,13 @@ C&R	NOUN		0.5
 # === common vocabulary ===
 # NOTE: High-frequency items moved to L1 (common_vocabulary.h) for tokenization accuracy
 # Add additional vocabulary here that doesn't require L1 registration
+
+# Fruits (for すもももももももものうち)
+# Cost balanced: higher than formal noun もの (0.3) to prefer particle も between
+もも	NOUN	もも	1.0
+桃	NOUN	もも	0.5
+すもも	NOUN	すもも	1.0
+李	NOUN	すもも	0.5
+
+# Formal nouns (hiragana forms)
+うち	NOUN	うち	0.5

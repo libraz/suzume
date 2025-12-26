@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    // C++
+    "llvm-vs-code-extensions.vscode-clangd",
+    "xaver.clang-format",
+    "ms-vscode.cmake-tools",
+    "twxs.cmake",
+
+    // TypeScript/JavaScript
+    "biomejs.biome",
+    "vitest.explorer",
+
+    // General
+    "editorconfig.editorconfig"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.cpptools"
+  ]
+}

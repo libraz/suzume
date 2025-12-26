@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C++: Debug CLI",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/bin/suzume-cli",
+      "args": ["analyze", "すもももももももものうち"],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "C++: Build"
+    },
+    {
+      "name": "C++: Debug Tests",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/bin/suzume_test",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "C++: Build"
+    },
+    {
+      "name": "JS: Debug Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
+      "args": ["run", "--reporter=verbose"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}
