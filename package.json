@@ -69,6 +69,8 @@
     "pre-commit": "yarn lint-staged"
   },
   "lint-staged": {
-    "*.{ts,js}": ["biome check --write"]
+    "*.{ts,js}": [
+      "biome check --write"
+    ]
   }
 }

@@ -2,7 +2,7 @@
 # Convenience wrapper for CMake build system
 
 .PHONY: help build test clean rebuild format format-check configure \
-        wasm wasm-test wasm-clean wasm-rebuild
+        wasm wasm-test wasm-clean wasm-rebuild dict
 
 # Build directories
 BUILD_DIR := build
@@ -19,7 +19,8 @@ help:
 	@echo ""
 	@echo "Available targets:"
 	@echo "  make build        - Build the project (default)"
-	@echo "  make test         - Run all tests"
+	@echo "  make dict         - Build dictionaries"
+	@echo "  make test         - Run all tests (includes dict)"
 	@echo "  make clean        - Clean build directory"
 	@echo "  make rebuild      - Clean and rebuild"
 	@echo "  make format       - Format code with clang-format"
@@ -50,8 +51,14 @@ build: configure
 	cmake --build $(BUILD_DIR) --parallel
 	@echo "Build complete!"
 
+# Build dictionaries
+dict: build
+	@echo "Building dictionaries..."
+	cmake --build $(BUILD_DIR) --target build-dict
+	@echo "Dictionary build complete!"
+
 # Run tests
-test: build
+test: dict
 	@echo "Running tests..."
 	ctest --test-dir $(BUILD_DIR) --output-on-failure
 	@echo "Tests complete!"
