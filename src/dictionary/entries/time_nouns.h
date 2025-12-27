@@ -2,17 +2,21 @@
 #define SUZUME_DICTIONARY_ENTRIES_TIME_NOUNS_H_
 
 // =============================================================================
-// ⚠️ DEPRECATED: This file should be migrated to Layer 2 (core.dic)
+// ⚠️ DEPRECATED: Entries migrated to Layer 2 (data/core/dictionary.tsv)
 // =============================================================================
 // This file contains OPEN CLASS vocabulary that does not belong in Layer 1:
 //   - Time nouns (時間名詞): Nouns are open class
 //   - Examples: 今日, 明日, 昨日, 今週, 来月, 今年, etc.
 //
-// Current status: WASM fallback
+// Current status: WASM fallback (entries also in dictionary.tsv)
 //   - Kept for WASM minimal builds where core.dic is not available
-//   - Native builds should load these from core.dic when implemented
+//   - Native builds with core.dic will have duplicate entries (same cost)
+//   - Canonical source: data/core/dictionary.tsv (section: time_nouns.h migration)
 //
-// Migration target: data/core/basic.tsv
+// Migration status: COMPLETED (2025-12-27)
+//   - All entries copied to data/core/dictionary.tsv
+//   - This file remains for WASM fallback compatibility
+//   - TODO: Add #ifdef SUZUME_WASM conditional compilation
 //
 // Layer 1 Criteria (this file DOES NOT meet):
 //   ❌ CLOSED CLASS: Nouns are open class (new words can be coined)

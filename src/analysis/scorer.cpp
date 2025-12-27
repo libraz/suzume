@@ -297,7 +297,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
             last3 == "べ" || last3 == "め" || last3 == "せ" ||
             last3 == "け" || last3 == "げ" || last3 == "て" ||
             last3 == "ね" || last3 == "れ" || last3 == "え") {
-          cost += 1.5F;  // Penalty for likely verb+ない pattern
+          cost += scorer::kPenaltyVerbNaiPattern;
         }
       }
     }
@@ -389,7 +389,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
           last3 == "ね" || last3 == "れ" || last3 == "え" ||
           last3 == "で" || last3 == "ぜ" || last3 == "へ" ||
           last3 == "ぺ") {
-        penalty += 1.5F;  // Prefer te-form over split
+        penalty += scorer::kPenaltyTeFormSplit;
         penalty_reason = "te-form split pattern";
       }
     }

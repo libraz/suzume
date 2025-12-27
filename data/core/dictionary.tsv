@@ -238,3 +238,173 @@ C&R	NOUN		0.5
 
 # Formal nouns (hiragana forms)
 うち	NOUN	うち	0.5
+
+# =============================================================================
+# Entries migrated from low_info.h (DEPRECATED WASM fallback)
+# =============================================================================
+
+# === honorific_pattern_verbs ===
+# For お + renyokei + いたす/します patterns
+伝え	VERB	つたえ	0.5	ICHIDAN
+伝える	VERB	つたえる	0.5	ICHIDAN
+知らせ	VERB	しらせ	0.5	ICHIDAN
+知らせる	VERB	しらせる	0.5	ICHIDAN
+届け	VERB	とどけ	0.5	ICHIDAN
+届ける	VERB	とどける	0.5	ICHIDAN
+答え	VERB	こたえ	0.5	ICHIDAN
+答える	VERB	こたえる	0.5	ICHIDAN
+教え	VERB	おしえ	0.5	ICHIDAN
+教える	VERB	おしえる	0.5	ICHIDAN
+見せ	VERB	みせ	0.5	ICHIDAN
+見せる	VERB	みせる	0.5	ICHIDAN
+聞かせ	VERB	きかせ	0.5	ICHIDAN
+待ち	VERB	まち	0.5	GODAN_TA
+願い	VERB	ねがい	0.5	GODAN_WA
+願う	VERB	ねがう	0.5	GODAN_WA
+
+# === low_info_verbs ===
+# Common verbs with low information content (high cost to prefer specific verbs)
+ある	VERB	ある	2.0	GODAN_RA
+いる	VERB	いる	2.0	ICHIDAN
+おる	VERB	おる	2.0	GODAN_RA
+くる	VERB	くる	2.0	KURU
+いく	VERB	いく	2.0	GODAN_KA
+くれる	VERB	くれる	2.0	ICHIDAN
+あげる	VERB	あげる	2.0	ICHIDAN
+みる	VERB	みる	2.0	ICHIDAN
+おく	VERB	おく	2.0	GODAN_KA
+しまう	VERB	しまう	2.0	GODAN_WA
+
+# === common_godan_wa_verbs ===
+# Common verbs with っ-onbin ambiguity
+買う	VERB	かう	1.0	GODAN_WA
+言う	VERB	いう	1.0	GODAN_WA
+思う	VERB	おもう	1.0	GODAN_WA
+使う	VERB	つかう	1.0	GODAN_WA
+会う	VERB	あう	1.0	GODAN_WA
+払う	VERB	はらう	1.0	GODAN_WA
+洗う	VERB	あらう	1.0	GODAN_WA
+歌う	VERB	うたう	1.0	GODAN_WA
+習う	VERB	ならう	1.0	GODAN_WA
+笑う	VERB	わらう	1.0	GODAN_WA
+違う	VERB	ちがう	1.0	GODAN_WA
+追う	VERB	おう	1.0	GODAN_WA
+誘う	VERB	さそう	1.0	GODAN_WA
+拾う	VERB	ひろう	1.0	GODAN_WA
+
+# === common_godan_ra_verbs ===
+取る	VERB	とる	1.0	GODAN_RA
+乗る	VERB	のる	1.0	GODAN_RA
+送る	VERB	おくる	1.0	GODAN_RA
+作る	VERB	つくる	1.0	GODAN_RA
+知る	VERB	しる	1.0	GODAN_RA
+座る	VERB	すわる	1.0	GODAN_RA
+帰る	VERB	かえる	1.0	GODAN_RA
+入る	VERB	はいる	1.0	GODAN_RA
+走る	VERB	はしる	1.0	GODAN_RA
+売る	VERB	うる	1.0	GODAN_RA
+切る	VERB	きる	1.0	GODAN_RA
+
+# === common_godan_ta_verbs ===
+持つ	VERB	もつ	1.0	GODAN_TA
+待つ	VERB	まつ	1.0	GODAN_TA
+立つ	VERB	たつ	1.0	GODAN_TA
+打つ	VERB	うつ	1.0	GODAN_TA
+勝つ	VERB	かつ	1.0	GODAN_TA
+育つ	VERB	そだつ	1.0	GODAN_TA
+
+# === yoi_conjugations ===
+# Irregular adjective よい (良い) conjugations
+よい	ADJECTIVE	よい	0.3	I_ADJ
+よく	ADVERB	よく	0.5
+よくない	ADJECTIVE	よくない	0.5	I_ADJ
+よくて	ADJECTIVE	よくて	0.5	I_ADJ
+よかった	ADJECTIVE	よかった	0.5	I_ADJ
+よければ	ADJECTIVE	よければ	0.5	I_ADJ
+
+# === suffixes ===
+# Common suffixes (接尾語)
+的	OTHER	てき	1.5
+化	OTHER	か	1.5
+性	OTHER	せい	1.5
+率	OTHER	りつ	1.5
+法	OTHER	ほう	1.5
+論	OTHER	ろん	1.5
+者	OTHER	しゃ	1.5
+家	OTHER	か	1.5
+員	OTHER	いん	1.5
+式	OTHER	しき	1.5
+感	OTHER	かん	1.5
+力	OTHER	りょく	1.5
+度	OTHER	ど	1.5
+
+# === plural_suffixes ===
+# Plural suffixes (複数接尾語) - low cost for NOUN+suffix pattern
+たち	OTHER	たち	0.5
+ら	OTHER	ら	0.5
+ども	OTHER	ども	0.8
+がた	OTHER	がた	0.8
+
+# === honorific_suffixes ===
+# Honorific suffixes (敬称接尾語)
+さん	OTHER	さん	0.5
+様	OTHER	さま	0.5
+ちゃん	OTHER	ちゃん	0.5
+くん	OTHER	くん	0.5
+氏	OTHER	し	0.8
+
+# =============================================================================
+# Entries migrated from time_nouns.h (DEPRECATED WASM fallback)
+# =============================================================================
+
+# === time_nouns_days ===
+# Days (日)
+今日	NOUN	きょう	0.5
+明日	NOUN	あした	0.5
+昨日	NOUN	きのう	0.5
+明後日	NOUN	あさって	0.5
+一昨日	NOUN	おととい	0.5
+毎日	NOUN	まいにち	0.5
+
+# === time_nouns_daytime ===
+# Time of day (時間帯)
+今朝	NOUN	けさ	0.5
+毎朝	NOUN	まいあさ	0.5
+今晩	NOUN	こんばん	0.5
+今夜	NOUN	こんや	0.5
+昨夜	NOUN	さくや	0.5
+朝	NOUN	あさ	0.6
+昼	NOUN	ひる	0.6
+夜	NOUN	よる	0.6
+夕方	NOUN	ゆうがた	0.6
+
+# === time_nouns_weeks ===
+# Weeks (週)
+今週	NOUN	こんしゅう	0.5
+来週	NOUN	らいしゅう	0.5
+先週	NOUN	せんしゅう	0.5
+毎週	NOUN	まいしゅう	0.5
+
+# === time_nouns_months ===
+# Months (月)
+今月	NOUN	こんげつ	0.5
+来月	NOUN	らいげつ	0.5
+先月	NOUN	せんげつ	0.5
+毎月	NOUN	まいつき	0.5
+
+# === time_nouns_years ===
+# Years (年)
+今年	NOUN	ことし	0.5
+来年	NOUN	らいねん	0.5
+去年	NOUN	きょねん	0.5
+昨年	NOUN	さくねん	0.5
+毎年	NOUN	まいとし	0.5
+
+# === time_nouns_other ===
+# Other time expressions
+今	NOUN	いま	0.5
+現在	NOUN	げんざい	0.5
+最近	NOUN	さいきん	0.5
+将来	NOUN	しょうらい	0.5
+過去	NOUN	かこ	0.5
+未来	NOUN	みらい	0.5

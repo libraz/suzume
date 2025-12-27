@@ -81,6 +81,17 @@ constexpr float kBonusAdjKuNaru = 0.5F;
 // E.g., 読み + 終わる should be verb renyokei + auxiliary
 constexpr float kPenaltyCompoundAuxAfterRenyokei = 0.5F;
 
+// Unknown adjective with lemma ending in ない where stem looks like verb mizenkei
+// E.g., 走らなければ with lemma 走らない is likely verb+aux, not true adjective
+// True adjectives: 少ない, 危ない (stem doesn't end in あ段)
+// Verb patterns: 走らない, 書かない (stem ends in あ段 = verb mizenkei)
+constexpr float kPenaltyVerbNaiPattern = 1.5F;
+
+// Noun/Verb + て/で split when prev ends with Godan onbin or Ichidan ending
+// E.g., 書い + て should be 書いて (te-form), not split
+// E.g., 教え + て should be 教えて (te-form), not split
+constexpr float kPenaltyTeFormSplit = 1.5F;
+
 }  // namespace suzume::analysis::scorer
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONSTANTS_H_
