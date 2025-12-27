@@ -211,21 +211,21 @@
     },
     {
       "id": "te_iru_kiteimasen",
-      "description": "来ていません - te+iru negative: 来て should be verb",
+      "description": "来ていません - te+iru negative polite form",
       "input": "来ていません",
       "expected": [
         {"surface": "来て", "pos": "Verb", "lemma": "来る"},
-        {"surface": "いま", "pos": "Noun", "lemma": "今"},
-        {"surface": "せん", "pos": "Auxiliary"}
+        {"surface": "いません", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["regression", "te_form", "iru"]
     },
     {
       "id": "te_iru_kiteimasu",
-      "description": "来ています - te+iru unified token",
+      "description": "来ています - te-form + progressive auxiliary",
       "input": "来ています",
       "expected": [
-        {"surface": "来ています", "pos": "Verb", "lemma": "来る"}
+        {"surface": "来て", "pos": "Verb", "lemma": "来る"},
+        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["regression", "te_form", "iru"]
     },
@@ -378,21 +378,21 @@
     },
     {
       "id": "hiragana_verb_imasu",
-      "description": "います - should be verb, not いま(noun)+す",
+      "description": "います - auxiliary form of いる",
       "input": "います",
       "expected": [
-        {"surface": "います", "pos": "Verb", "lemma": "いる"}
+        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"}
       ],
-      "tags": ["regression", "hiragana_verb"]
+      "tags": ["regression", "auxiliary"]
     },
     {
       "id": "hiragana_verb_imasen",
-      "description": "いません - should be single verb token",
+      "description": "いません - auxiliary form of いる",
       "input": "いません",
       "expected": [
-        {"surface": "いません", "pos": "Verb", "lemma": "いる"}
+        {"surface": "いません", "pos": "Auxiliary", "lemma": "いる"}
       ],
-      "tags": ["regression", "hiragana_verb"]
+      "tags": ["regression", "auxiliary"]
     },
     {
       "id": "suru_passive_neg_past",
@@ -423,14 +423,13 @@
       "tags": ["regression", "compound", "desiderative"]
     },
     {
-      "id": "kunakatta_not_kuru",
-      "description": "くなかった - should NOT be analyzed as くる verb form",
-      "input": "くなかった",
+      "id": "yokunakatta_adjective_negative_past",
+      "description": "良くなかった - adjective negative past form",
+      "input": "良くなかった",
       "expected": [
-        {"surface": "くな", "pos": "Other"},
-        {"surface": "かった", "pos": "Verb", "lemma": "かつ"}
+        {"surface": "良くなかった", "pos": "Adjective", "lemma": "良い"}
       ],
-      "tags": ["regression", "not_kuru"]
+      "tags": ["regression", "adjective", "negative"]
     }
   ]
 }

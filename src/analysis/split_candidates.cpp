@@ -15,12 +15,20 @@ namespace {
 // Cost bonuses for mixed script joining (lower cost = preferred)
 constexpr float kAlphaKanjiBonus = -0.3F;    // Web開発, AI研究
 constexpr float kAlphaKatakanaBonus = -0.3F; // APIリクエスト
-constexpr float kDigitKanjiBonus = -0.2F;    // 3月, 100人
+
+// Digit+kanji counter bonuses by kanji length
+// Common counters: 分, 月, 年, 日, 時, 人, 回, 本, 円, 個, 台 (1 kanji)
+// Compound counters: 分間, 時間, 日間, 年間, 週間 (2 kanji)
+// Rare: 3+ kanji after digits
+constexpr float kDigitKanji1Bonus = -0.2F;   // 5分, 3月, 100人
+constexpr float kDigitKanji2Bonus = -0.2F;   // 5分間, 3時間 (same as 1-kanji)
+constexpr float kDigitKanji3Penalty = 0.5F;  // Rare, likely wrong segmentation
 
 // Maximum lengths for mixed script segments
 constexpr size_t kMaxAlphaLen = 12;   // Reasonable limit for English words
 constexpr size_t kMaxDigitLen = 8;    // Reasonable limit for numbers
 constexpr size_t kMaxJapaneseLen = 8; // Reasonable limit for Japanese part
+constexpr size_t kMaxDigitKanjiLen = 3; // Max kanji for digit+kanji (counters)
 
 // Minimum kanji sequence length for compound splitting
 constexpr size_t kMinCompoundLen = 4;
@@ -84,46 +92,72 @@ void addMixedScriptCandidates(
 
   CharType second_type = char_types[first_end];
 
-  // Determine if this is a valid mixed script pattern
-  float bonus = 0.0F;
+  // Validate and get base bonus based on pattern type
+  bool is_digit_kanji = false;
+  float base_bonus = 0.0F;
+  size_t max_second_len = kMaxJapaneseLen;
+
   if (first_type == CharType::Alphabet) {
     if (second_type == CharType::Kanji) {
-      bonus = kAlphaKanjiBonus;
+      base_bonus = kAlphaKanjiBonus;
     } else if (second_type == CharType::Katakana) {
-      bonus = kAlphaKatakanaBonus;
+      base_bonus = kAlphaKatakanaBonus;
     } else {
       return;  // Not a valid pattern
     }
   } else if (first_type == CharType::Digit) {
     if (second_type == CharType::Kanji) {
-      bonus = kDigitKanjiBonus;
+      is_digit_kanji = true;
+      max_second_len = kMaxDigitKanjiLen;  // Limit kanji length for counters
     } else {
       return;  // Not a valid pattern
     }
   }
 
-  // Find the end of the second segment
-  size_t second_end = first_end + 1;
-  while (second_end < char_types.size() &&
-         second_end - first_end < kMaxJapaneseLen &&
-         char_types[second_end] == second_type) {
-    ++second_end;
+  // Find the maximum extent of the second segment
+  size_t max_end = first_end + 1;
+  while (max_end < char_types.size() &&
+         max_end - first_end < max_second_len &&
+         char_types[max_end] == second_type) {
+    ++max_end;
   }
 
-  // Generate merged candidate
   size_t start_byte = charPosToBytePos(codepoints, start_pos);
-  size_t end_byte = charPosToBytePos(codepoints, second_end);
-
-  std::string surface(text.substr(start_byte, end_byte - start_byte));
-
-  // Base cost from POS prior, plus bonus for mixed script joining
   float base_cost = scorer.posPrior(core::PartOfSpeech::Noun);
-  float final_cost = base_cost + bonus;
-
   uint8_t flags = core::LatticeEdge::kIsUnknown;
-  lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
-                  static_cast<uint32_t>(second_end), core::PartOfSpeech::Noun,
-                  final_cost, flags, "");
+
+  if (is_digit_kanji) {
+    // For digit+kanji, generate multiple candidates with length-based costs
+    // This allows Viterbi to choose the best segmentation
+    for (size_t kanji_len = 1; kanji_len <= max_end - first_end; ++kanji_len) {
+      size_t candidate_end = first_end + kanji_len;
+      size_t end_byte = charPosToBytePos(codepoints, candidate_end);
+      std::string surface(text.substr(start_byte, end_byte - start_byte));
+
+      // Apply length-based bonus/penalty
+      float length_adjustment;
+      if (kanji_len == 1) {
+        length_adjustment = kDigitKanji1Bonus;  // Best: 5分, 3月
+      } else if (kanji_len == 2) {
+        length_adjustment = kDigitKanji2Bonus;  // Good: 5分間, 3時間
+      } else {
+        length_adjustment = kDigitKanji3Penalty;  // Rare: penalize
+      }
+
+      float final_cost = base_cost + length_adjustment;
+      lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
+                      static_cast<uint32_t>(candidate_end),
+                      core::PartOfSpeech::Noun, final_cost, flags, "");
+    }
+  } else {
+    // For alphabet+kanji/katakana, generate single candidate (original behavior)
+    size_t end_byte = charPosToBytePos(codepoints, max_end);
+    std::string surface(text.substr(start_byte, end_byte - start_byte));
+    float final_cost = base_cost + base_bonus;
+    lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
+                    static_cast<uint32_t>(max_end), core::PartOfSpeech::Noun,
+                    final_cost, flags, "");
+  }
 }
 
 void addCompoundSplitCandidates(
@@ -274,13 +308,15 @@ void addNounVerbSplitCandidates(
     size_t verb_start = start_pos + noun_len;
     size_t verb_start_byte = charPosToBytePos(codepoints, verb_start);
 
-    // Check if noun part is in dictionary
+    // Check if noun part is in dictionary as NOUN
+    // Only consider actual NOUN entries, not ADV/VERB/etc.
     auto noun_results = dict_manager.lookup(text, start_byte);
     bool noun_in_dict = false;
     float noun_cost = 1.0F;
 
     for (const auto& result : noun_results) {
-      if (result.entry != nullptr && result.length == noun_len) {
+      if (result.entry != nullptr && result.length == noun_len &&
+          result.entry->pos == core::PartOfSpeech::Noun) {
         noun_in_dict = true;
         noun_cost = result.entry->cost;
         break;

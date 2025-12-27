@@ -64,7 +64,7 @@ namespace suzume::analysis {
 // static
 void Scorer::logAdjustment(float amount, const char* reason) {
   if (amount != 0.0F) {
-    SUZUME_DEBUG_SCORE("  " << reason << ": "
+    SUZUME_DEBUG_LOG("  " << reason << ": "
                             << (amount > 0 ? "+" : "") << amount << "\n");
   }
 }
@@ -117,7 +117,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   float pos_prior = posPrior(edge.pos);
   float cost = base_cost + pos_prior;
 
-  SUZUME_DEBUG_SCORE("[WORD] \"" << edge.surface << "\" ("
+  SUZUME_DEBUG_LOG("[WORD] \"" << edge.surface << "\" ("
                      << core::posToString(edge.pos) << "): "
                      << "base=" << base_cost << " pos=" << pos_prior << "\n");
 
@@ -291,7 +291,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     }
   }
 
-  SUZUME_DEBUG_SCORE("[WORD] → total=" << cost << "\n");
+  SUZUME_DEBUG_LOG("[WORD] → total=" << cost << "\n");
   return cost;
 }
 
@@ -306,19 +306,19 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
 
   float total = base_cost + penalty;
 
-  SUZUME_DEBUG_CONN("[CONN] \"" << prev.surface << "\" ("
+  SUZUME_DEBUG_LOG("[CONN] \"" << prev.surface << "\" ("
                     << core::posToString(prev.pos) << ") → \""
                     << next.surface << "\" ("
                     << core::posToString(next.pos) << "): "
                     << "base=" << base_cost);
   if (penalty != 0.0F && penalty_reason != nullptr) {
     if (penalty > 0.0F) {
-      SUZUME_DEBUG_CONN(" + penalty=" << penalty << " (" << penalty_reason << ")");
+      SUZUME_DEBUG_LOG(" + penalty=" << penalty << " (" << penalty_reason << ")");
     } else {
-      SUZUME_DEBUG_CONN(" + bonus=" << -penalty << " (" << penalty_reason << ")");
+      SUZUME_DEBUG_LOG(" + bonus=" << -penalty << " (" << penalty_reason << ")");
     }
   }
-  SUZUME_DEBUG_CONN(" = " << total << "\n");
+  SUZUME_DEBUG_LOG(" = " << total << "\n");
 
   return total;
 }

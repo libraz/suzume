@@ -59,6 +59,12 @@ constexpr float kBonusIchidanERow = 0.12F;
 // Stem matches Godan conjugation pattern in this context
 constexpr float kPenaltyIchidanLooksGodan = 0.15F;
 
+// Ichidan stem ending in kanji + い in renyokei context
+// Pattern: 手伝い+ます → 手伝いる (wrong) should be 手伝+います → 手伝う
+// This is much more suspicious than generic "looks godan" pattern
+// Real ichidan verbs ending in い (用いる) are very rare
+constexpr float kPenaltyIchidanKanjiI = 0.35F;
+
 // Single kanji stem with single long aux (causative-passive pattern)
 // E.g., 見させられた (legitimate Ichidan)
 constexpr float kBonusIchidanCausativePassive = 0.10F;
@@ -66,6 +72,11 @@ constexpr float kBonusIchidanCausativePassive = 0.10F;
 // Single kanji stem with multiple aux or short single aux
 // Likely wrong match via される pattern
 constexpr float kPenaltyIchidanSingleKanjiMultiAux = 0.30F;
+
+// Kanji + single hiragana stem pattern (人い, 玉い)
+// Real Ichidan verbs have kanji-only stems (見る) or pure hiragana (いる)
+// This pattern is likely NOUN + verb misanalysis
+constexpr float kPenaltyIchidanKanjiHiraganaStem = 0.50F;
 
 // く/す/こ as Ichidan stem - these are irregular verbs
 constexpr float kPenaltyIchidanIrregularStem = 0.60F;
@@ -198,6 +209,16 @@ constexpr float kPenaltySuruSingleKanji = 0.15F;
 // Empty stem with Suru/Kuru imperative (しろ, せよ, こい)
 // These must win over competing Ichidan/Godan interpretations
 constexpr float kBonusSuruKuruImperative = 0.05F;
+
+// =============================================================================
+// Volitional Form Validation
+// =============================================================================
+
+// Ichidan volitional with godan-like stem ending (く, す, etc.)
+// E.g., 続く + よう → 続くる (wrong) - should be 続こう
+// True ichidan volitional: 食べ + よう = 食べよう (e-row ending)
+// Godan volitional: 書 + こ + う = 書こう (o-row stem)
+constexpr float kPenaltyIchidanVolitionalGodanStem = 0.50F;
 
 }  // namespace suzume::grammar::inflection
 

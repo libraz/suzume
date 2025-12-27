@@ -35,6 +35,7 @@ inline std::vector<DictionaryEntry> getAdverbEntries() {
 
   return {
       // Degree adverbs (程度副詞) - kanji with reading
+      {"大変", POS::Adverb, -1.0F, "", false, false, false, CT::None, "たいへん"},
       {"全く", POS::Adverb, 0.5F, "", false, false, false, CT::None, "まったく"},
       {"全然", POS::Adverb, 0.5F, "", false, false, false, CT::None, "ぜんぜん"},
       {"少し", POS::Adverb, 0.5F, "", false, false, false, CT::None, "すこし"},

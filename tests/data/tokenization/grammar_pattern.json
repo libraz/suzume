@@ -1,0 +1,707 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "onomatopoeia_wakuwaku",
+      "description": "わくわくする (excited)",
+      "input": "わくわくする",
+      "expected": [
+        {"surface": "わくわく", "pos": "Adverb"},
+        {"surface": "する", "pos": "Verb"}
+      ],
+      "tags": ["grammar", "onomatopoeia"]
+    },
+    {
+      "id": "onomatopoeia_kirakira",
+      "description": "キラキラ光る (sparkling)",
+      "input": "キラキラ光る",
+      "expected": [
+        {"surface": "キラキラ", "pos": "Noun"},
+        {"surface": "光る", "pos": "Verb", "lemma": "光る"}
+      ],
+      "tags": ["grammar", "onomatopoeia"]
+    },
+    {
+      "id": "onomatopoeia_gatagata",
+      "description": "ガタガタ揺れる (shaking)",
+      "input": "ガタガタ揺れる",
+      "expected": [
+        {"surface": "ガタガタ", "pos": "Noun"},
+        {"surface": "揺れる", "pos": "Verb", "lemma": "揺れる"}
+      ],
+      "tags": ["grammar", "onomatopoeia"]
+    },
+    {
+      "id": "counter_nin",
+      "description": "三人の学生 (three students)",
+      "input": "三人の学生",
+      "expected": [
+        {"surface": "三人", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "学生", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "counter"]
+    },
+    {
+      "id": "counter_hon",
+      "description": "二本のペン (two pens)",
+      "input": "二本のペン",
+      "expected": [
+        {"surface": "二本", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "ペン", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "counter"]
+    },
+    {
+      "id": "counter_ko",
+      "description": "五個のリンゴ (five apples)",
+      "input": "五個のリンゴ",
+      "expected": [
+        {"surface": "五個", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "リンゴ", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "counter"]
+    },
+    {
+      "id": "counter_mai",
+      "description": "十枚の紙 (ten sheets of paper)",
+      "input": "十枚の紙",
+      "expected": [
+        {"surface": "十枚", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "紙", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "counter"]
+    },
+    {
+      "id": "counter_satsu",
+      "description": "三冊の本 (three books)",
+      "input": "三冊の本",
+      "expected": [
+        {"surface": "三冊", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "本", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "counter"]
+    },
+    {
+      "id": "conjunction_shikashi",
+      "description": "しかし問題がある (however, there is a problem)",
+      "input": "しかし問題がある",
+      "expected": [
+        {"surface": "しかし", "pos": "Conjunction"},
+        {"surface": "問題", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "ある", "pos": "Determiner"}
+      ],
+      "tags": ["grammar", "conjunction"]
+    },
+    {
+      "id": "conjunction_sorede",
+      "description": "それで帰った (so went home)",
+      "input": "それで帰った",
+      "expected": [
+        {"surface": "それ", "pos": "Pronoun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "帰った", "pos": "Verb"}
+      ],
+      "tags": ["grammar", "conjunction"]
+    },
+    {
+      "id": "conjunction_demo",
+      "description": "でも大丈夫 (but it's okay)",
+      "input": "でも大丈夫",
+      "expected": [
+        {"surface": "でも", "pos": "Conjunction"},
+        {"surface": "大丈夫", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "conjunction"]
+    },
+    {
+      "id": "pattern_na_adjective",
+      "description": "静かな部屋 (quiet room)",
+      "input": "静かな部屋",
+      "expected": [
+        {"surface": "静かな", "pos": "Adjective", "lemma": "静か"},
+        {"surface": "部屋", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "pattern"]
+    },
+    {
+      "id": "pattern_i_adjective",
+      "description": "高い山 (high mountain)",
+      "input": "高い山",
+      "expected": [
+        {"surface": "高い", "pos": "Adjective"},
+        {"surface": "山", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "pattern"]
+    },
+    {
+      "id": "pattern_te_form",
+      "description": "食べて寝る (eat and sleep)",
+      "input": "食べて寝る",
+      "expected": [
+        {"surface": "食べて", "pos": "Verb"},
+        {"surface": "寝る", "pos": "Verb", "lemma": "寝る"}
+      ],
+      "tags": ["grammar", "pattern"]
+    },
+    {
+      "id": "pattern_conditional_ba",
+      "description": "行けば分かる (if you go you will understand)",
+      "input": "行けば分かる",
+      "expected": [
+        {"surface": "行けば", "pos": "Verb", "lemma": "行く"},
+        {"surface": "分かる", "pos": "Verb"}
+      ],
+      "tags": ["grammar", "pattern", "conditional"]
+    },
+    {
+      "id": "pattern_conditional_tara",
+      "description": "行ったら教えて (if you go, tell me)",
+      "input": "行ったら教えて",
+      "expected": [
+        {"surface": "行ったら", "pos": "Verb"},
+        {"surface": "教えて", "pos": "Verb"}
+      ],
+      "tags": ["grammar", "pattern", "conditional"]
+    },
+    {
+      "id": "pattern_conditional_nara",
+      "description": "君なら大丈夫 (if it's you, it's okay)",
+      "input": "君なら大丈夫",
+      "expected": [
+        {"surface": "君", "pos": "Noun"},
+        {"surface": "なら", "pos": "Particle"},
+        {"surface": "大丈夫", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "pattern", "conditional"]
+    },
+    {
+      "id": "noun_de_sokkoude",
+      "description": "速攻で (immediately)",
+      "input": "速攻で",
+      "expected": [
+        {"surface": "速攻", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-de"]
+    },
+    {
+      "id": "noun_de_byousokude",
+      "description": "秒速で (at lightning speed)",
+      "input": "秒速で",
+      "expected": [
+        {"surface": "秒速", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-de"]
+    },
+    {
+      "id": "noun_de_bakusokude",
+      "description": "爆速で (at explosive speed)",
+      "input": "爆速で",
+      "expected": [
+        {"surface": "爆速", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-de"]
+    },
+    {
+      "id": "noun_de_kousokude",
+      "description": "光速で (at the speed of light)",
+      "input": "光速で",
+      "expected": [
+        {"surface": "光速", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-de"]
+    },
+    {
+      "id": "noun_de_kakuteide",
+      "description": "確定で (definitely)",
+      "input": "確定で",
+      "expected": [
+        {"surface": "確定", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-de"]
+    },
+    {
+      "id": "noun_de_sokkoude_katakana",
+      "description": "ソッコーで (immediately - katakana)",
+      "input": "ソッコーで",
+      "expected": [
+        {"surface": "ソッコー", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-de"]
+    },
+    {
+      "id": "taru_adj_kizento",
+      "description": "毅然と (resolutely)",
+      "input": "毅然と",
+      "expected": [
+        {"surface": "毅然", "pos": "Noun"},
+        {"surface": "と", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "taru-adjective"]
+    },
+    {
+      "id": "taru_adj_heizento",
+      "description": "平然と (calmly)",
+      "input": "平然と",
+      "expected": [
+        {"surface": "平然", "pos": "Noun"},
+        {"surface": "と", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "taru-adjective"]
+    },
+    {
+      "id": "taru_adj_taizento",
+      "description": "泰然と (composedly)",
+      "input": "泰然と",
+      "expected": [
+        {"surface": "泰然", "pos": "Noun"},
+        {"surface": "と", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "taru-adjective"]
+    },
+    {
+      "id": "taru_adj_sassouto",
+      "description": "颯爽と (gallantly)",
+      "input": "颯爽と",
+      "expected": [
+        {"surface": "颯爽", "pos": "Noun"},
+        {"surface": "と", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "taru-adjective"]
+    },
+    {
+      "id": "taru_adj_hatsuratsuto",
+      "description": "溌剌と (vigorously)",
+      "input": "溌剌と",
+      "expected": [
+        {"surface": "溌剌", "pos": "Noun"},
+        {"surface": "と", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "taru-adjective"]
+    },
+    {
+      "id": "taru_adj_yuuzento",
+      "description": "悠然と (leisurely)",
+      "input": "悠然と",
+      "expected": [
+        {"surface": "悠然", "pos": "Noun"},
+        {"surface": "と", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "taru-adjective"]
+    },
+    {
+      "id": "noun_ni_saigoni",
+      "description": "最後に (finally)",
+      "input": "最後に",
+      "expected": [
+        {"surface": "最後", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-ni"]
+    },
+    {
+      "id": "noun_ni_saishoni",
+      "description": "最初に (first)",
+      "input": "最初に",
+      "expected": [
+        {"surface": "最初", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-ni"]
+    },
+    {
+      "id": "noun_ni_doujini",
+      "description": "同時に (simultaneously)",
+      "input": "同時に",
+      "expected": [
+        {"surface": "同時", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-ni"]
+    },
+    {
+      "id": "noun_ni_hantaini",
+      "description": "反対に (conversely)",
+      "input": "反対に",
+      "expected": [
+        {"surface": "反対", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-ni"]
+    },
+    {
+      "id": "noun_ni_ippanni",
+      "description": "一般に (generally)",
+      "input": "一般に",
+      "expected": [
+        {"surface": "一般", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-ni"]
+    },
+    {
+      "id": "noun_ni_shidaini",
+      "description": "次第に (gradually)",
+      "input": "次第に",
+      "expected": [
+        {"surface": "次第", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-ni"]
+    },
+    {
+      "id": "noun_ni_ikkini",
+      "description": "一気に (at once)",
+      "input": "一気に",
+      "expected": [
+        {"surface": "一気", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-ni"]
+    },
+    {
+      "id": "noun_ni_isseini",
+      "description": "一斉に (all at once)",
+      "input": "一斉に",
+      "expected": [
+        {"surface": "一斉", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-ni"]
+    },
+    {
+      "id": "noun_ni_koini",
+      "description": "故意に (intentionally)",
+      "input": "故意に",
+      "expected": [
+        {"surface": "故意", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-ni"]
+    },
+    {
+      "id": "noun_ni_muishikini",
+      "description": "無意識に (unconsciously)",
+      "input": "無意識に",
+      "expected": [
+        {"surface": "無意識", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "noun-ni"]
+    },
+    {
+      "id": "complex_relative_clause",
+      "description": "昨日買った本を読んでいる (reading the book I bought yesterday)",
+      "input": "昨日買った本を読んでいる",
+      "expected": [
+        {"surface": "昨日", "pos": "Noun"},
+        {"surface": "買った", "pos": "Verb", "lemma": "買う"},
+        {"surface": "本", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "読んで", "pos": "Verb", "lemma": "読む"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+      ],
+      "tags": ["grammar", "complex"]
+    },
+    {
+      "id": "complex_embedded",
+      "description": "彼が来ることを知っている (know that he is coming)",
+      "input": "彼が来ることを知っている",
+      "expected": [
+        {"surface": "彼", "pos": "Pronoun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "来る", "pos": "Verb"},
+        {"surface": "こと", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "知って", "pos": "Verb", "lemma": "知る"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+      ],
+      "tags": ["grammar", "complex"]
+    },
+    {
+      "id": "complex_multiple_clauses",
+      "description": "雨が降ったので、家にいた (stayed home because it rained)",
+      "input": "雨が降ったので、家にいた",
+      "expected": [
+        {"surface": "雨", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "降った", "pos": "Verb"},
+        {"surface": "ので", "pos": "Particle"},
+        {"surface": "家", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "いた", "pos": "Verb"}
+      ],
+      "tags": ["grammar", "complex"]
+    },
+    {
+      "id": "time_noun_kinou",
+      "description": "昨日 (yesterday)",
+      "input": "昨日",
+      "expected": [
+        {"surface": "昨日", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "time-noun"]
+    },
+    {
+      "id": "time_noun_ashita",
+      "description": "明日行く (go tomorrow)",
+      "input": "明日行く",
+      "expected": [
+        {"surface": "明日", "pos": "Noun"},
+        {"surface": "行く", "pos": "Verb"}
+      ],
+      "tags": ["grammar", "time-noun"]
+    },
+    {
+      "id": "time_noun_kyou",
+      "description": "今日は暑い (it's hot today)",
+      "input": "今日は暑い",
+      "expected": [
+        {"surface": "今日", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "暑い", "pos": "Adjective"}
+      ],
+      "tags": ["grammar", "time-noun"]
+    },
+    {
+      "id": "formal_noun_koto",
+      "description": "勉強すること (studying)",
+      "input": "勉強すること",
+      "expected": [
+        {"surface": "勉強する", "pos": "Verb"},
+        {"surface": "こと", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "formal-noun"]
+    },
+    {
+      "id": "formal_noun_mono",
+      "description": "食べるもの (something to eat)",
+      "input": "食べるもの",
+      "expected": [
+        {"surface": "食べる", "pos": "Verb"},
+        {"surface": "もの", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "formal-noun"]
+    },
+    {
+      "id": "formal_noun_tokoro",
+      "description": "食べるところ (place to eat)",
+      "input": "食べるところ",
+      "expected": [
+        {"surface": "食べる", "pos": "Verb"},
+        {"surface": "ところ", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "formal-noun"]
+    },
+    {
+      "id": "formal_noun_wake",
+      "description": "そういうわけ (that's why)",
+      "input": "そういうわけ",
+      "expected": [
+        {"surface": "そう", "pos": "Adverb"},
+        {"surface": "いうわけ", "pos": "Auxiliary"}
+      ],
+      "tags": ["grammar", "formal-noun"]
+    },
+    {
+      "id": "loanword_katakana",
+      "description": "コンピューター (computer)",
+      "input": "コンピューター",
+      "expected": [
+        {"surface": "コンピューター", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "loanword"]
+    },
+    {
+      "id": "loanword_mixed",
+      "description": "インターネット接続 (internet connection)",
+      "input": "インターネット接続",
+      "expected": [
+        {"surface": "インターネット接続", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "loanword"]
+    },
+    {
+      "id": "loanword_with_particle",
+      "description": "メールを送る (send email)",
+      "input": "メールを送る",
+      "expected": [
+        {"surface": "メール", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "送る", "pos": "Verb"}
+      ],
+      "tags": ["grammar", "loanword"]
+    },
+    {
+      "id": "abbreviation_koukou",
+      "description": "高校生 (high school student)",
+      "input": "高校生",
+      "expected": [
+        {"surface": "高校生", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "abbreviation"]
+    },
+    {
+      "id": "symbol_parentheses",
+      "description": "東京（とうきょう） (Tokyo with reading)",
+      "input": "東京（とうきょう）",
+      "expected": [
+        {"surface": "東京", "pos": "Noun"},
+        {"surface": "（", "pos": "Symbol"},
+        {"surface": "とうきょう", "pos": "Noun"},
+        {"surface": "）", "pos": "Symbol"}
+      ],
+      "tags": ["grammar", "symbol"]
+    },
+    {
+      "id": "symbol_brackets",
+      "description": "「こんにちは」と言った (said 'hello')",
+      "input": "「こんにちは」と言った",
+      "expected": [
+        {"surface": "こんにちは", "pos": "Other"},
+        {"surface": "と", "pos": "Particle"},
+        {"surface": "言った", "pos": "Verb"}
+      ],
+      "tags": ["grammar", "symbol"]
+    },
+    {
+      "id": "colloquial_tte",
+      "description": "行くって言った (said I'll go)",
+      "input": "行くって言った",
+      "expected": [
+        {"surface": "行く", "pos": "Verb"},
+        {"surface": "って", "pos": "Particle"},
+        {"surface": "言った", "pos": "Verb", "lemma": "言う"}
+      ],
+      "tags": ["grammar", "colloquial"]
+    },
+    {
+      "id": "colloquial_jan",
+      "description": "いいじゃん (it's fine, isn't it)",
+      "input": "いいじゃん",
+      "expected": [
+        {"surface": "いい", "pos": "Adjective"},
+        {"surface": "じゃん", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "colloquial"]
+    },
+    {
+      "id": "colloquial_cha",
+      "description": "行っちゃった (went and did it)",
+      "input": "行っちゃった",
+      "expected": [
+        {"surface": "行っちゃった", "pos": "Verb", "lemma": "行く"}
+      ],
+      "tags": ["grammar", "colloquial"]
+    },
+    {
+      "id": "colloquial_toku",
+      "description": "やっとく (will do it in advance)",
+      "input": "やっとく",
+      "expected": [
+        {"surface": "やっ", "pos": "Verb", "lemma": "やる"},
+        {"surface": "とく", "pos": "Auxiliary"}
+      ],
+      "tags": ["grammar", "colloquial"]
+    },
+    {
+      "id": "numeric_japanese",
+      "description": "百二十三 (123 in Japanese)",
+      "input": "百二十三",
+      "expected": [
+        {"surface": "百二十三", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric"]
+    },
+    {
+      "id": "numeric_mixed",
+      "description": "3時間 (3 hours)",
+      "input": "3時間",
+      "expected": [
+        {"surface": "3時間", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric"]
+    },
+    {
+      "id": "numeric_ordinal",
+      "description": "第一回 (first time)",
+      "input": "第一回",
+      "expected": [
+        {"surface": "第一回", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric"]
+    },
+    {
+      "id": "aux_adj_yomiyasui_context",
+      "description": "この本は読みやすい (this book is easy to read)",
+      "input": "この本は読みやすい",
+      "expected": [
+        {"surface": "この", "pos": "Determiner"},
+        {"surface": "本", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "読みやすい", "pos": "Adjective", "lemma": "読みやすい"}
+      ],
+      "tags": ["grammar", "auxiliary-adjective", "regression"]
+    },
+    {
+      "id": "aux_adj_yasui_standalone",
+      "description": "この服は安い (this clothes is cheap)",
+      "input": "この服は安い",
+      "expected": [
+        {"surface": "この", "pos": "Determiner"},
+        {"surface": "服", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "安い", "pos": "Adjective", "lemma": "安い"}
+      ],
+      "tags": ["grammar", "auxiliary-adjective", "regression"]
+    },
+    {
+      "id": "nakereba_ika",
+      "description": "行かなければ (if not go)",
+      "input": "行かなければ",
+      "expected": [
+        {"surface": "行かなければ", "pos": "Verb", "lemma": "行く"}
+      ],
+      "tags": ["grammar", "conditional", "nakereba", "regression"]
+    },
+    {
+      "id": "nakereba_shi",
+      "description": "しなければならない (must do)",
+      "input": "しなければならない",
+      "expected": [
+        {"surface": "しなければ", "pos": "Verb", "lemma": "する"},
+        {"surface": "ならない", "pos": "Verb", "lemma": "なる"}
+      ],
+      "tags": ["grammar", "conditional", "nakereba", "review"]
+    },
+    {
+      "id": "nakereba_ko",
+      "description": "来なければ (if not come)",
+      "input": "来なければ",
+      "expected": [
+        {"surface": "来なければ", "pos": "Verb", "lemma": "来る"}
+      ],
+      "tags": ["grammar", "conditional", "nakereba", "regression"]
+    },
+    {
+      "id": "nakereba_kaka",
+      "description": "書かなければ (if not write)",
+      "input": "書かなければ",
+      "expected": [
+        {"surface": "書かなければ", "pos": "Verb", "lemma": "書く"}
+      ],
+      "tags": ["grammar", "conditional", "nakereba", "regression"]
+    }
+  ]
+}

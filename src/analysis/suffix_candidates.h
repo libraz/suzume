@@ -82,6 +82,27 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types);
 
+/**
+ * @brief Generate kanji + hiragana compound noun candidates
+ *
+ * Detects compound nouns with kanji prefix and hiragana suffix:
+ *   - 玉ねぎ (tamanegi - onion)
+ *   - 水たまり (mizutamari - puddle)
+ *   - 雨だれ (amadare - raindrop)
+ *
+ * Distinguished from verb conjugations by requiring longer hiragana
+ * portions that don't match typical conjugation patterns.
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param char_types Character types for each position
+ * @return Vector of candidates
+ */
+std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types);
+
 }  // namespace suzume::analysis
 
 #endif  // SUZUME_ANALYSIS_SUFFIX_CANDIDATES_H_

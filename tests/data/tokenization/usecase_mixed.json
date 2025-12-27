@@ -1,0 +1,542 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "mixed_script_alphabet_kanji",
+      "description": "Mixed script: alphabet + kanji",
+      "input": "Web開発の基礎",
+      "expected": [
+        {"surface": "web開発", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "基礎", "pos": "Noun"}
+      ],
+      "tags": ["mixed_script"]
+    },
+    {
+      "id": "mixed_script_alphabet_katakana",
+      "description": "Mixed script: alphabet + katakana",
+      "input": "APIリクエスト処理",
+      "expected": [
+        {"surface": "apiリクエスト処理", "pos": "Noun"}
+      ],
+      "tags": ["mixed_script"]
+    },
+    {
+      "id": "mixed_script_digit_kanji",
+      "description": "Mixed script: digit + kanji",
+      "input": "3月の予定",
+      "expected": [
+        {"surface": "3月", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "予定", "pos": "Noun"}
+      ],
+      "tags": ["mixed_script"]
+    },
+    {
+      "id": "mixed_script_multiple_digit_kanji",
+      "description": "Mixed script: multiple digits + kanji",
+      "input": "100人が参加",
+      "expected": [
+        {"surface": "100人", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "参加", "pos": "Noun"}
+      ],
+      "tags": ["mixed_script"]
+    },
+    {
+      "id": "english_with_particle",
+      "description": "English word followed by particle",
+      "input": "今日はMeetingがあります",
+      "expected": [
+        {"surface": "今日", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "meeting", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "あります", "pos": "Verb", "lemma": "ある"}
+      ],
+      "tags": ["english_in_japanese"]
+    },
+    {
+      "id": "english_camelcase",
+      "description": "CamelCase should be preserved",
+      "input": "getUserDataを呼び出す",
+      "expected": [
+        {"surface": "getuserdata", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "呼び出す", "pos": "Verb", "lemma": "呼ぶ"}
+      ],
+      "tags": ["english_in_japanese"]
+    },
+    {
+      "id": "english_snakecase",
+      "description": "snake_case should be preserved",
+      "input": "user_nameを設定",
+      "expected": [
+        {"surface": "user", "pos": "Noun"},
+        {"surface": "name", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "設定", "pos": "Noun"}
+      ],
+      "tags": ["english_in_japanese"]
+    },
+    {
+      "id": "english_abbreviation",
+      "description": "Abbreviation",
+      "input": "APIを呼ぶ",
+      "expected": [
+        {"surface": "api", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "呼ぶ", "pos": "Verb"}
+      ],
+      "tags": ["english_in_japanese"]
+    },
+    {
+      "id": "english_technical_term",
+      "description": "Technical term with Japanese",
+      "input": "APIを使ってデータを取得する",
+      "expected": [
+        {"surface": "api", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "使って", "pos": "Verb", "lemma": "使う"},
+        {"surface": "データ", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "取得する", "pos": "Verb"}
+      ],
+      "tags": ["english_in_japanese"]
+    },
+    {
+      "id": "english_brand_name",
+      "description": "Brand name in sentence",
+      "input": "iPhoneを買いました",
+      "expected": [
+        {"surface": "iphone", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "買いました", "pos": "Verb", "lemma": "買う"}
+      ],
+      "tags": ["english_in_japanese"]
+    },
+    {
+      "id": "english_email_send",
+      "description": "email + particle",
+      "input": "emailを送る",
+      "expected": [
+        {"surface": "email", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "送る", "pos": "Verb"}
+      ],
+      "tags": ["english_in_japanese"]
+    },
+    {
+      "id": "english_server_connect",
+      "description": "server + particle",
+      "input": "serverに接続",
+      "expected": [
+        {"surface": "server", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "接続", "pos": "Noun"}
+      ],
+      "tags": ["english_in_japanese"]
+    },
+    {
+      "id": "compound_four_kanji",
+      "description": "4 kanji compound",
+      "input": "人工知能の研究",
+      "expected": [
+        {"surface": "人工知能", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "研究", "pos": "Noun"}
+      ],
+      "tags": ["compound_noun"]
+    },
+    {
+      "id": "compound_long_kanji",
+      "description": "Long kanji compound",
+      "input": "東京都知事選挙",
+      "expected": [
+        {"surface": "東京都知事選挙", "pos": "Noun"}
+      ],
+      "tags": ["compound_noun"]
+    },
+    {
+      "id": "compound_with_particle",
+      "description": "Compound noun followed by particle",
+      "input": "情報処理技術者が",
+      "expected": [
+        {"surface": "情報処理技術者", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"}
+      ],
+      "tags": ["compound_noun"]
+    },
+    {
+      "id": "compound_natural_language",
+      "description": "Natural language processing",
+      "input": "自然言語処理技術",
+      "expected": [
+        {"surface": "自然言語処理技術", "pos": "Noun"}
+      ],
+      "tags": ["compound_noun"]
+    },
+    {
+      "id": "compound_organization",
+      "description": "Organization name",
+      "input": "国立研究所で働く",
+      "expected": [
+        {"surface": "国立研究所", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "働く", "pos": "Verb"}
+      ],
+      "tags": ["compound_noun"]
+    },
+    {
+      "id": "expression_ni_tsuite",
+      "description": "について (regarding)",
+      "input": "日本の文化について話す",
+      "expected": [
+        {"surface": "日本", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "文化", "pos": "Noun"},
+        {"surface": "について", "pos": "Particle"},
+        {"surface": "話す", "pos": "Verb"}
+      ],
+      "tags": ["compound_expression"]
+    },
+    {
+      "id": "expression_ni_yotte",
+      "description": "によって (by means of)",
+      "input": "場合によって対応が変わる",
+      "expected": [
+        {"surface": "場合", "pos": "Noun"},
+        {"surface": "によって", "pos": "Particle"},
+        {"surface": "対応", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "変わる", "pos": "Verb"}
+      ],
+      "tags": ["compound_expression"]
+    },
+    {
+      "id": "expression_to_shite",
+      "description": "として (as)",
+      "input": "教師として働いている",
+      "expected": [
+        {"surface": "教師", "pos": "Noun"},
+        {"surface": "として", "pos": "Particle"},
+        {"surface": "働いて", "pos": "Verb", "lemma": "働く"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+      ],
+      "tags": ["compound_expression"]
+    },
+    {
+      "id": "prefix_honorific_o",
+      "description": "お茶 as lexicalized noun",
+      "input": "お茶を飲む",
+      "expected": [
+        {"surface": "お茶", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "飲む", "pos": "Verb"}
+      ],
+      "tags": ["prefix_suffix"]
+    },
+    {
+      "id": "prefix_honorific_go",
+      "description": "ご prefix",
+      "input": "ご飯を食べる",
+      "expected": [
+        {"surface": "ご飯", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "食べる", "pos": "Verb"}
+      ],
+      "tags": ["prefix_suffix"]
+    },
+    {
+      "id": "prefix_negation_fu",
+      "description": "不 prefix",
+      "input": "不可能だ",
+      "expected": [
+        {"surface": "不可能", "pos": "Noun"},
+        {"surface": "だ", "pos": "Auxiliary"}
+      ],
+      "tags": ["prefix_suffix"]
+    },
+    {
+      "id": "prefix_negation_mi",
+      "description": "未 prefix",
+      "input": "未確認の情報",
+      "expected": [
+        {"surface": "未確認", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "情報", "pos": "Noun"}
+      ],
+      "tags": ["prefix_suffix"]
+    },
+    {
+      "id": "prefix_negation_hi",
+      "description": "非 prefix",
+      "input": "非公開の資料",
+      "expected": [
+        {"surface": "非公開", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "資料", "pos": "Noun"}
+      ],
+      "tags": ["prefix_suffix"]
+    },
+    {
+      "id": "suffix_teki",
+      "description": "的 suffix",
+      "input": "国際的な問題",
+      "expected": [
+        {"surface": "国際的", "pos": "Adjective"},
+        {"surface": "な", "pos": "Particle"},
+        {"surface": "問題", "pos": "Noun"}
+      ],
+      "tags": ["prefix_suffix"]
+    },
+    {
+      "id": "suffix_ka",
+      "description": "化 suffix",
+      "input": "自動化する",
+      "expected": [
+        {"surface": "自動化", "pos": "Noun"},
+        {"surface": "する", "pos": "Verb"}
+      ],
+      "tags": ["prefix_suffix"]
+    },
+    {
+      "id": "suffix_sei",
+      "description": "性 suffix",
+      "input": "可能性がある",
+      "expected": [
+        {"surface": "可能性", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "ある", "pos": "Determiner"}
+      ],
+      "tags": ["prefix_suffix"]
+    },
+    {
+      "id": "suffix_san",
+      "description": "さん suffix",
+      "input": "田中さんが来た",
+      "expected": [
+        {"surface": "田中", "pos": "Noun"},
+        {"surface": "さん", "pos": "Other"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "来た", "pos": "Verb", "lemma": "来る"}
+      ],
+      "tags": ["prefix_suffix"]
+    },
+    {
+      "id": "suffix_sensei",
+      "description": "先生 suffix",
+      "input": "山田先生の授業",
+      "expected": [
+        {"surface": "山田先生", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "授業", "pos": "Noun"}
+      ],
+      "tags": ["prefix_suffix"]
+    },
+    {
+      "id": "number_text_effort",
+      "description": "Text after emoji context",
+      "input": "今日も頑張ろう",
+      "expected": [
+        {"surface": "今日", "pos": "Noun"},
+        {"surface": "も", "pos": "Particle"},
+        {"surface": "頑張", "pos": "Noun"},
+        {"surface": "ろう", "pos": "Auxiliary"}
+      ],
+      "tags": ["number_special"]
+    },
+    {
+      "id": "number_units",
+      "description": "Numbers with Japanese units",
+      "input": "体重が3キロ減った",
+      "expected": [
+        {"surface": "体重", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "3キロ", "pos": "Noun"},
+        {"surface": "減った", "pos": "Verb", "lemma": "減る"}
+      ],
+      "tags": ["number_special"]
+    },
+    {
+      "id": "number_url_like",
+      "description": "URL-like mixed content",
+      "input": "example.comで登録してください",
+      "expected": [
+        {"surface": "example", "pos": "Noun"},
+        {"surface": "com", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "登録して", "pos": "Verb", "lemma": "登録する"},
+        {"surface": "ください", "pos": "Auxiliary"}
+      ],
+      "tags": ["number_special"]
+    },
+    {
+      "id": "number_counter_nin",
+      "description": "People counter",
+      "input": "3人で行く",
+      "expected": [
+        {"surface": "3人", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "行く", "pos": "Verb"}
+      ],
+      "tags": ["number_special"]
+    },
+    {
+      "id": "number_counter_kai",
+      "description": "Times counter",
+      "input": "5回目の挑戦",
+      "expected": [
+        {"surface": "5回目", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "挑戦", "pos": "Noun"}
+      ],
+      "tags": ["number_special"]
+    },
+    {
+      "id": "number_currency",
+      "description": "Currency",
+      "input": "100万円の買い物",
+      "expected": [
+        {"surface": "100万円", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "買い物", "pos": "Noun"}
+      ],
+      "tags": ["number_special"]
+    },
+    {
+      "id": "number_percent",
+      "description": "Percentage",
+      "input": "売上が50%増加",
+      "expected": [
+        {"surface": "売上", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "50%増加", "pos": "Noun"}
+      ],
+      "tags": ["number_special"]
+    },
+    {
+      "id": "pronoun_watashi",
+      "description": "私",
+      "input": "私は学生です",
+      "expected": [
+        {"surface": "私", "pos": "Pronoun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "学生", "pos": "Noun"},
+        {"surface": "です", "pos": "Auxiliary"}
+      ],
+      "tags": ["pronoun"]
+    },
+    {
+      "id": "pronoun_kore",
+      "description": "これ with verb te-form 見て",
+      "input": "これを見て",
+      "expected": [
+        {"surface": "これ", "pos": "Pronoun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "見て", "pos": "Verb", "lemma": "見る"}
+      ],
+      "tags": ["pronoun"]
+    },
+    {
+      "id": "pronoun_sore",
+      "description": "それ",
+      "input": "それは違う",
+      "expected": [
+        {"surface": "それ", "pos": "Pronoun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "違う", "pos": "Verb"}
+      ],
+      "tags": ["pronoun"]
+    },
+    {
+      "id": "pronoun_are",
+      "description": "あれ",
+      "input": "あれが欲しい",
+      "expected": [
+        {"surface": "あれ", "pos": "Pronoun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "欲しい", "pos": "Adjective"}
+      ],
+      "tags": ["pronoun"]
+    },
+    {
+      "id": "pronoun_dare",
+      "description": "誰",
+      "input": "誰が来た",
+      "expected": [
+        {"surface": "誰", "pos": "Pronoun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "来た", "pos": "Verb", "lemma": "来る"}
+      ],
+      "tags": ["pronoun"]
+    },
+    {
+      "id": "pronoun_nani",
+      "description": "何",
+      "input": "何を食べる",
+      "expected": [
+        {"surface": "何", "pos": "Pronoun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "食べる", "pos": "Verb"}
+      ],
+      "tags": ["pronoun"]
+    },
+    {
+      "id": "symbol_brackets",
+      "description": "Brackets",
+      "input": "AI（人工知能）の発展",
+      "expected": [
+        {"surface": "ai", "pos": "Noun"},
+        {"surface": "人工知能", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "発展", "pos": "Noun"}
+      ],
+      "tags": ["symbol"]
+    },
+    {
+      "id": "symbol_japanese_quotes",
+      "description": "Japanese quotes",
+      "input": "「こんにちは」と言った",
+      "expected": [
+        {"surface": "こんにちは", "pos": "Other"},
+        {"surface": "と", "pos": "Particle"},
+        {"surface": "言った", "pos": "Verb", "lemma": "言う"}
+      ],
+      "tags": ["symbol"]
+    },
+    {
+      "id": "admin_prefecture",
+      "description": "Prefecture",
+      "input": "東京都に住む",
+      "expected": [
+        {"surface": "東京都", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "住む", "pos": "Verb"}
+      ],
+      "tags": ["administrative"]
+    },
+    {
+      "id": "admin_city",
+      "description": "City",
+      "input": "横浜市で働く",
+      "expected": [
+        {"surface": "横浜市", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "働く", "pos": "Verb"}
+      ],
+      "tags": ["administrative"]
+    },
+    {
+      "id": "admin_ward",
+      "description": "Ward",
+      "input": "渋谷区から来た",
+      "expected": [
+        {"surface": "渋谷区", "pos": "Noun"},
+        {"surface": "から", "pos": "Particle"},
+        {"surface": "来た", "pos": "Verb", "lemma": "来る"}
+      ],
+      "tags": ["administrative"]
+    }
+  ]
+}

@@ -103,6 +103,36 @@ constexpr float kPenaltyTakuteAfterRenyokei = 1.5F;
 // Should be なり(VERB, なる) + たかった
 constexpr float kPenaltyTaiAfterAux = 1.0F;
 
+// AUX(ません形) + で(PARTICLE) split
+// E.g., ございません + で + した should be ございません + でした
+// The で after negative polite forms is part of でした (copula past), not a particle
+constexpr float kPenaltyMasenDeSplit = 2.0F;
+
+// に (PARTICLE) + よる (NOUN, lemma 夜) split
+// When followed by と, should prefer compound particle によると
+// E.g., 報告によると should use compound particle, not に + 夜 + と
+constexpr float kPenaltyYoruNightAfterNi = 1.5F;
+
+// Conditional verb (ending with ば) + result verb
+// E.g., あれば + 手伝います - very common grammatical pattern
+// Offsets the high VERB→VERB base cost (0.8) for conditional clauses
+constexpr float kBonusConditionalVerbToVerb = 0.7F;
+
+// Verb renyokei + compound auxiliary verb
+// E.g., 読み + 終わる, 書き + 始める, 走り + 続ける
+// Offsets the VERB→VERB base cost (0.8) for compound verb patterns
+// Must be >= 0.8 to make VERB→VERB cheaper than NOUN→NOUN (0.0)
+constexpr float kBonusVerbRenyokeiCompoundAux = 1.0F;
+
+// NOUN + いる/います/いません (AUX) penalty
+// いる auxiliary should only follow te-form verbs (食べている), not nouns
+// E.g., 手伝 + います should be 手伝います (single verb), not noun + aux
+constexpr float kPenaltyIruAuxAfterNoun = 2.0F;
+
+// Te-form VERB + いる/います/いません (AUX) bonus
+// E.g., 食べて + いる, 走って + います - progressive aspect pattern
+constexpr float kBonusIruAuxAfterTeForm = 0.5F;
+
 }  // namespace suzume::analysis::scorer
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONSTANTS_H_

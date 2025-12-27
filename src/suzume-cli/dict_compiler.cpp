@@ -32,8 +32,11 @@ core::Expected<size_t, core::Error> DictCompiler::compile(
   size_t issue_count = suzume::cli::TsvParser::validate(entries, &issues);
   if (issue_count > 0) {
     for (const auto& issue : issues) {
-      printWarning(issue);
+      printError(issue);
     }
+    return core::makeUnexpected(core::Error(
+        core::ErrorCode::InvalidInput,
+        "Validation failed: " + std::to_string(issue_count) + " error(s)"));
   }
 
   return compileEntries(entries, dic_path);
@@ -189,6 +192,18 @@ core::Expected<size_t, core::Error> DictCompiler::compileMultiple(
       printInfo("Skipped " + std::to_string(skipped) +
                 " duplicate surfaces during merge");
     }
+  }
+
+  // Validate entries
+  std::vector<std::string> issues;
+  size_t issue_count = suzume::cli::TsvParser::validate(unique_entries, &issues);
+  if (issue_count > 0) {
+    for (const auto& issue : issues) {
+      printError(issue);
+    }
+    return core::makeUnexpected(core::Error(
+        core::ErrorCode::InvalidInput,
+        "Validation failed: " + std::to_string(issue_count) + " error(s)"));
   }
 
   return compileEntries(unique_entries, dic_path);

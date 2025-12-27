@@ -1,0 +1,306 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "aux_desu",
+      "description": "Copula です",
+      "input": "これは本です",
+      "expected": [
+        {"surface": "これ", "pos": "Pronoun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "本", "pos": "Noun"},
+        {"surface": "です", "pos": "Auxiliary"}
+      ],
+      "tags": ["auxiliary", "copula"]
+    },
+    {
+      "id": "aux_masu",
+      "description": "Polite auxiliary ます",
+      "input": "食べます",
+      "expected": [
+        {"surface": "食べます", "pos": "Verb", "lemma": "食べる"}
+      ],
+      "tags": ["auxiliary", "polite"]
+    },
+    {
+      "id": "aux_tai",
+      "description": "Desiderative auxiliary たい",
+      "input": "行きたい",
+      "expected": [
+        {"surface": "行きたい", "pos": "Verb", "lemma": "行く"}
+      ],
+      "tags": ["auxiliary", "desiderative"]
+    },
+    {
+      "id": "aux_nai",
+      "description": "Negative auxiliary ない",
+      "input": "行かない",
+      "expected": [
+        {"surface": "行かない", "pos": "Verb", "lemma": "行く"}
+      ],
+      "tags": ["auxiliary", "negative"]
+    },
+    {
+      "id": "keigo_irassharu",
+      "description": "Honorific verb いらっしゃる",
+      "input": "先生がいらっしゃる",
+      "expected": [
+        {"surface": "先生", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "いらっ", "pos": "Other"},
+        {"surface": "しゃる", "pos": "Verb"}
+      ],
+      "tags": ["keigo", "honorific"]
+    },
+    {
+      "id": "keigo_gozaimasu",
+      "description": "Polite auxiliary ございます",
+      "input": "ございます",
+      "expected": [
+        {"surface": "ございます", "pos": "Auxiliary"}
+      ],
+      "tags": ["keigo", "polite"]
+    },
+    {
+      "id": "keigo_itadaku",
+      "description": "Humble verb いただく",
+      "input": "いただきます",
+      "expected": [
+        {"surface": "いただきます", "pos": "Verb", "lemma": "いただく"}
+      ],
+      "tags": ["keigo", "humble"]
+    },
+    {
+      "id": "keigo_kudasaru",
+      "description": "Honorific verb くださる",
+      "input": "教えてくださる",
+      "expected": [
+        {"surface": "教えてくださる", "pos": "Verb", "lemma": "教える"}
+      ],
+      "tags": ["keigo", "honorific"]
+    },
+    {
+      "id": "keigo_o_prefix",
+      "description": "Honorific prefix お",
+      "input": "お忙しいところ",
+      "expected": [
+        {"surface": "お", "pos": "Other"},
+        {"surface": "忙しい", "pos": "Adjective"},
+        {"surface": "ところ", "pos": "Noun"}
+      ],
+      "tags": ["keigo", "prefix"]
+    },
+    {
+      "id": "keigo_go_prefix",
+      "description": "Honorific prefix ご",
+      "input": "ご確認ください",
+      "expected": [
+        {"surface": "ご確認", "pos": "Noun"},
+        {"surface": "ください", "pos": "Auxiliary"}
+      ],
+      "tags": ["keigo", "prefix"]
+    },
+    {
+      "id": "kuruwa_arinsu",
+      "description": "Kuruwa-kotoba ありんす",
+      "input": "ここにありんす",
+      "expected": [
+        {"surface": "ここ", "pos": "Pronoun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "ありんす", "pos": "Auxiliary", "lemma": "ある"}
+      ],
+      "tags": ["character_speech", "kuruwa"]
+    },
+    {
+      "id": "kuruwa_dearinsu",
+      "description": "Kuruwa-kotoba でありんす",
+      "input": "そうでありんす",
+      "expected": [
+        {"surface": "そう", "pos": "Adverb"},
+        {"surface": "でありんす", "pos": "Auxiliary", "lemma": "だ"}
+      ],
+      "tags": ["character_speech", "kuruwa"]
+    },
+    {
+      "id": "kuruwa_arinshita",
+      "description": "Kuruwa-kotoba でありんした",
+      "input": "でありんしたか",
+      "expected": [
+        {"surface": "でありんした", "pos": "Auxiliary", "lemma": "だ"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["character_speech", "kuruwa"]
+    },
+    {
+      "id": "character_danya",
+      "description": "Cat-like speech だにゃ",
+      "input": "猫だにゃ",
+      "expected": [
+        {"surface": "猫", "pos": "Noun"},
+        {"surface": "だにゃ", "pos": "Auxiliary", "lemma": "だよ"}
+      ],
+      "tags": ["character_speech", "cat"]
+    },
+    {
+      "id": "character_nyan",
+      "description": "Cat-like speech にゃん",
+      "input": "食べるにゃん",
+      "expected": [
+        {"surface": "食べる", "pos": "Verb"},
+        {"surface": "にゃん", "pos": "Auxiliary", "lemma": "よ"}
+      ],
+      "tags": ["character_speech", "cat"]
+    },
+    {
+      "id": "character_geso",
+      "description": "Squid character でゲソ",
+      "input": "吾輩は猫でゲソ",
+      "expected": [
+        {"surface": "吾輩", "pos": "Pronoun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "猫", "pos": "Noun"},
+        {"surface": "でゲソ", "pos": "Auxiliary", "lemma": "だ"}
+      ],
+      "tags": ["character_speech", "squid"]
+    },
+    {
+      "id": "character_desuwa",
+      "description": "Ojou-sama speech ですわ",
+      "input": "お嬢様ですわ",
+      "expected": [
+        {"surface": "お嬢様", "pos": "Noun"},
+        {"surface": "ですわ", "pos": "Auxiliary", "lemma": "です"}
+      ],
+      "tags": ["character_speech", "ojousama"]
+    },
+    {
+      "id": "character_dawa",
+      "description": "Feminine speech だわ",
+      "input": "そうだわ",
+      "expected": [
+        {"surface": "そう", "pos": "Adverb"},
+        {"surface": "だわ", "pos": "Auxiliary", "lemma": "だ"}
+      ],
+      "tags": ["character_speech", "feminine"]
+    },
+    {
+      "id": "character_ssu",
+      "description": "Youth slang っす",
+      "input": "いいっす",
+      "expected": [
+        {"surface": "いい", "pos": "Adjective"},
+        {"surface": "っす", "pos": "Auxiliary", "lemma": "です"}
+      ],
+      "tags": ["character_speech", "youth"]
+    },
+    {
+      "id": "character_gozaru",
+      "description": "Ninja/Old-fashioned ござる",
+      "input": "これでござる",
+      "expected": [
+        {"surface": "これ", "pos": "Pronoun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "ござる", "pos": "Auxiliary", "lemma": "だ"}
+      ],
+      "tags": ["character_speech", "ninja"]
+    },
+    {
+      "id": "character_jarou",
+      "description": "Elderly speech じゃろう",
+      "input": "そうじゃろう",
+      "expected": [
+        {"surface": "そう", "pos": "Adverb"},
+        {"surface": "じゃろう", "pos": "Auxiliary", "lemma": "だろう"}
+      ],
+      "tags": ["character_speech", "elderly"]
+    },
+    {
+      "id": "character_yade",
+      "description": "Kansai dialect やで",
+      "input": "そうやで",
+      "expected": [
+        {"surface": "そう", "pos": "Adverb"},
+        {"surface": "やで", "pos": "Auxiliary", "lemma": "だ"}
+      ],
+      "tags": ["character_speech", "dialect"]
+    },
+    {
+      "id": "aux_kamoshirenai",
+      "description": "Auxiliary かもしれない",
+      "input": "かもしれない",
+      "expected": [
+        {"surface": "かもしれない", "pos": "Auxiliary"}
+      ],
+      "tags": ["auxiliary", "possibility"]
+    },
+    {
+      "id": "aux_kamoshiremasen",
+      "description": "Auxiliary かもしれません in sentence",
+      "input": "明日は雨かもしれません",
+      "expected": [
+        {"surface": "明日", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "雨", "pos": "Noun"},
+        {"surface": "かもしれません", "pos": "Auxiliary", "lemma": "かもしれない"}
+      ],
+      "tags": ["auxiliary", "possibility"]
+    },
+    {
+      "id": "character_gozatta",
+      "description": "Samurai speech ござった",
+      "input": "それでござった",
+      "expected": [
+        {"surface": "それ", "pos": "Pronoun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "ござった", "pos": "Auxiliary", "lemma": "だった"}
+      ],
+      "tags": ["character_speech", "samurai"]
+    },
+    {
+      "id": "character_gozaranu",
+      "description": "Samurai speech ござらぬ",
+      "input": "知らぬでござらぬ",
+      "expected": [
+        {"surface": "知らぬ", "pos": "Verb"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "ござらぬ", "pos": "Auxiliary", "lemma": "ではない"}
+      ],
+      "tags": ["character_speech", "samurai"]
+    },
+    {
+      "id": "pronoun_sessha",
+      "description": "Samurai pronoun 拙者",
+      "input": "拙者は侍でござる",
+      "expected": [
+        {"surface": "拙者", "pos": "Pronoun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "侍", "pos": "Noun"},
+        {"surface": "でござる", "pos": "Auxiliary", "lemma": "だ"}
+      ],
+      "tags": ["character_speech", "samurai", "pronoun"]
+    },
+    {
+      "id": "pronoun_wagahai",
+      "description": "Old-fashioned pronoun 我輩",
+      "input": "我輩は猫である",
+      "expected": [
+        {"surface": "我輩", "pos": "Pronoun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "猫", "pos": "Noun"},
+        {"surface": "である", "pos": "Auxiliary"}
+      ],
+      "tags": ["character_speech", "pronoun"]
+    },
+    {
+      "id": "pronoun_soregashi",
+      "description": "Samurai pronoun 某",
+      "input": "某が参る",
+      "expected": [
+        {"surface": "某", "pos": "Pronoun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "参る", "pos": "Verb"}
+      ],
+      "tags": ["character_speech", "samurai", "pronoun"]
+    }
+  ]
+}

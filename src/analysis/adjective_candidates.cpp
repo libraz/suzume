@@ -168,48 +168,47 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         // This is verb renyokei + そう pattern (with optional だ/です/etc.)
         continue;  // Skip - likely verb renyokei + そう, not i-adjective
       }
+    }
 
-      // For し + そう patterns (話しそう, 話しそうだ, 難しそう, etc.), check dictionary
-      // to distinguish verb renyokei + そう from adjective + そう.
-      // 難しそう → base: 難しい (in dictionary) → allow adjective candidate
-      // 話しそう → base: 話しい (not in dictionary) → skip
-      if (renyokei_char == "し" &&
-          hiragana_part.size() >= 9 &&
-          hiragana_part.substr(3, 6) == "そう") {
-        if (dict_manager != nullptr) {
-          // Construct base form: kanji + しい
-          std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-          std::string base_form = kanji_stem + "しい";
-          auto lookup = dict_manager->lookup(base_form, 0);
-          if (lookup.empty()) {
-            continue;  // Base form not in dictionary, skip adjective candidate
-          }
-          // Check if any entry is an adjective with exact match
-          // (length should match the entire base_form)
-          size_t base_form_chars = 0;
-          for (size_t i = 0; i < base_form.size(); ) {
-            auto byte = static_cast<uint8_t>(base_form[i]);
-            if ((byte & 0x80) == 0) { i += 1; }
-            else if ((byte & 0xE0) == 0xC0) { i += 2; }
-            else if ((byte & 0xF0) == 0xE0) { i += 3; }
-            else { i += 4; }
-            ++base_form_chars;
-          }
-          bool found_adjective = false;
-          for (const auto& result : lookup) {
-            if (result.length == base_form_chars &&
-                result.entry != nullptr &&
-                result.entry->pos == core::PartOfSpeech::Adjective) {
-              found_adjective = true;
-              break;
-            }
-          }
-          if (!found_adjective) {
-            continue;  // Not an adjective in dictionary, skip
+    // For し + そう patterns (話しそう, 難しそう, 美味しそう, etc.), check dictionary
+    // to distinguish verb renyokei + そう from adjective + そう.
+    // Works for both single and multi-kanji stems.
+    // 難しそう → base: 難しい (in dictionary) → allow adjective candidate
+    // 美味しそう → base: 美味しい (in dictionary) → allow adjective candidate
+    // 話しそう → base: 話しい (not in dictionary) → skip
+    bool is_dict_adjective = false;
+    if (hiragana_part.size() >= 9 &&
+        hiragana_part.substr(0, 3) == "し" &&
+        hiragana_part.substr(3, 6) == "そう") {
+      if (dict_manager != nullptr) {
+        // Construct base form: kanji + しい
+        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+        std::string base_form = kanji_stem + "しい";
+        auto lookup = dict_manager->lookup(base_form, 0);
+        if (lookup.empty()) {
+          continue;  // Base form not in dictionary, skip adjective candidate
+        }
+        // Check if any entry is an adjective with exact match
+        size_t base_form_chars = 0;
+        for (size_t i = 0; i < base_form.size(); ) {
+          auto byte = static_cast<uint8_t>(base_form[i]);
+          if ((byte & 0x80) == 0) { i += 1; }
+          else if ((byte & 0xE0) == 0xC0) { i += 2; }
+          else if ((byte & 0xF0) == 0xE0) { i += 3; }
+          else { i += 4; }
+          ++base_form_chars;
+        }
+        for (const auto& result : lookup) {
+          if (result.length == base_form_chars &&
+              result.entry != nullptr &&
+              result.entry->pos == core::PartOfSpeech::Adjective) {
+            is_dict_adjective = true;
+            break;
           }
         }
-        // If no dict_manager, fall through to generate candidate
-        // (backwards compatibility)
+        if (!is_dict_adjective) {
+          continue;  // Not an adjective in dictionary, skip
+        }
       }
     }
 
@@ -252,7 +251,13 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         candidate.pos = core::PartOfSpeech::Adjective;
         // Lower base cost (0.2F) to beat verb candidates after POS prior adjustment
         // ADJ prior (0.3) is higher than VERB prior (0.2), so we need lower edge cost
-        candidate.cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
+        float cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
+        // Bonus for adjectives confirmed in dictionary (美味しそう, 難しそう, etc.)
+        // This helps beat false-positive suru verb candidates (美味する is invalid)
+        if (is_dict_adjective) {
+          cost -= 0.25F;
+        }
+        candidate.cost = cost;
         candidate.has_suffix = false;
         // Set lemma to base form from inflection analysis (e.g., 使いやすく → 使いやすい)
         candidate.lemma = cand.base_form;
@@ -335,10 +340,11 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
   }
 
   // Skip if starting character is a particle that is NEVER an adjective stem
+  // Note: や is NOT included because やばい, やわらかい are valid i-adjectives
   char32_t first_char = codepoints[start_pos];
   if (first_char == U'を' || first_char == U'が' || first_char == U'は' ||
       first_char == U'に' || first_char == U'へ' || first_char == U'の' ||
-      first_char == U'か' || first_char == U'や' || first_char == U'ね' ||
+      first_char == U'か' || first_char == U'ね' ||
       first_char == U'よ' || first_char == U'わ' || first_char == U'で' ||
       first_char == U'と' || first_char == U'も') {
     return candidates;

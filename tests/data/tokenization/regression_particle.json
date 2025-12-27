@@ -54,7 +54,8 @@
       "expected": [
         {"surface": "電車", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "遅れている", "pos": "Verb", "lemma": "遅れる"},
+        {"surface": "遅れて", "pos": "Verb", "lemma": "遅れる"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"},
         {"surface": "ので", "pos": "Particle", "lemma": "ので"},
         {"surface": "遅刻", "pos": "Noun"},
         {"surface": "しそう", "pos": "Verb", "lemma": "する"},
@@ -69,7 +70,7 @@
       "expected": [
         {"surface": "家", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "います", "pos": "Verb", "lemma": "いる"}
+        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["regression", "particle", "filter"]
     },

@@ -61,7 +61,7 @@ inline std::vector<DictionaryEntry> getCommonVocabularyEntries() {
       {"お問い合わせ", POS::Noun, 0.5F, "", false, false, false, CT::None,
        "おといあわせ"},
       {"お待ち", POS::Noun, 0.5F, "", false, false, false, CT::None, "おまち"},
-      {"お知らせ", POS::Noun, 0.5F, "", false, false, false, CT::None,
+      {"お知らせ", POS::Noun, 0.5F, "", false, true, false, CT::None,
        "おしらせ"},
       {"お申し込み", POS::Noun, 0.5F, "", false, false, false, CT::None,
        "おもうしこみ"},

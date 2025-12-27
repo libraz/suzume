@@ -43,27 +43,6 @@ set(TEST_SOURCES
   pretokenizer/pretokenizer_url_test.cpp
   pretokenizer/pretokenizer_number_test.cpp
   pretokenizer/pretokenizer_text_test.cpp
-  analysis/analyzer_basic_test.cpp
-  analysis/analyzer_particle_test.cpp
-  analysis/analyzer_grammar_auxiliary_test.cpp
-  analysis/analyzer_grammar_adjective_test.cpp
-  analysis/analyzer_grammar_pattern_test.cpp
-  analysis/analyzer_grammar_suru_test.cpp
-  analysis/analyzer_verb_test.cpp
-  analysis/analyzer_usecase_business_test.cpp
-  analysis/analyzer_usecase_conversation_test.cpp
-  analysis/analyzer_usecase_technical_test.cpp
-  analysis/analyzer_usecase_news_test.cpp
-  analysis/analyzer_usecase_casual_test.cpp
-  analysis/analyzer_slang_test.cpp
-  analysis/analyzer_usecase_mixed_test.cpp
-  analysis/analyzer_usecase_realworld_test.cpp
-  analysis/analyzer_strict_greeting_test.cpp
-  analysis/analyzer_strict_word_test.cpp
-  analysis/analyzer_strict_particle_test.cpp
-  analysis/analyzer_strict_expression_test.cpp
-  analysis/analyzer_strict_compound_test.cpp
-  analysis/analyzer_prefix_test.cpp
   analysis/connection_rules_test.cpp
   output/japanese_format_test.cpp
   integration/data_driven_sample_test.cpp
@@ -74,6 +53,27 @@ set(TEST_SOURCES
   integration/regression_verb_test.cpp
   integration/regression_compound_test.cpp
   integration/suru_imperative_test.cpp
+  integration/strict_word_test.cpp
+  integration/strict_greeting_test.cpp
+  integration/strict_particle_test.cpp
+  integration/strict_compound_test.cpp
+  integration/strict_expression_test.cpp
+  integration/usecase_business_test.cpp
+  integration/usecase_casual_test.cpp
+  integration/usecase_conversation_test.cpp
+  integration/usecase_mixed_test.cpp
+  integration/usecase_news_test.cpp
+  integration/usecase_technical_test.cpp
+  integration/usecase_realworld_test.cpp
+  integration/grammar_adjective_test.cpp
+  integration/grammar_pattern_test.cpp
+  integration/basic_test.cpp
+  integration/particle_test.cpp
+  integration/grammar_auxiliary_test.cpp
+  integration/slang_test.cpp
+  integration/verb_test.cpp
+  integration/prefix_test.cpp
+  integration/grammar_suru_test.cpp
 )
 
 # Create test executable

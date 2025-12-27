@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "compound_verb_yobidasu",
+      "description": "呼び出す - び should not be standalone",
+      "input": "呼び出す",
+      "expected": [
+        {"surface": "呼び出す", "pos": "Verb", "lemma": "呼ぶ"}
+      ],
+      "tags": ["strict", "compound", "verb"]
+    },
+    {
+      "id": "compound_verb_yomikomu",
+      "description": "読み込む - み should not be standalone",
+      "input": "読み込む",
+      "expected": [
+        {"surface": "読み込む", "pos": "Verb", "lemma": "読み込む"}
+      ],
+      "tags": ["strict", "compound", "verb"]
+    },
+    {
+      "id": "compound_verb_kakidasu",
+      "description": "書き出す - き should not be standalone",
+      "input": "書き出す",
+      "expected": [
+        {"surface": "書き出す", "pos": "Verb", "lemma": "書く"}
+      ],
+      "tags": ["strict", "compound", "verb"]
+    },
+    {
+      "id": "compound_verb_tobikomu",
+      "description": "飛び込む - び should not be standalone",
+      "input": "飛び込む",
+      "expected": [
+        {"surface": "飛び込む", "pos": "Verb", "lemma": "飛び込む"}
+      ],
+      "tags": ["strict", "compound", "verb"]
+    },
+    {
+      "id": "compound_verb_torikesu",
+      "description": "取り消す - り should not be standalone",
+      "input": "取り消す",
+      "expected": [
+        {"surface": "取り消す", "pos": "Verb", "lemma": "取り消す"}
+      ],
+      "tags": ["strict", "compound", "verb"]
+    },
+    {
+      "id": "compound_verb_hikitsuzuki",
+      "description": "引き続き should not be fragmented into 4+ pieces",
+      "input": "引き続き",
+      "expected": [
+        {"surface": "引き続き", "pos": "Verb", "lemma": "引き続く"}
+      ],
+      "tags": ["strict", "compound", "verb"]
+    },
+    {
+      "id": "compound_noun_kaimono",
+      "description": "買い物 should be at most 2 tokens",
+      "input": "買い物",
+      "expected": [
+        {"surface": "買い物", "pos": "Noun"}
+      ],
+      "tags": ["strict", "compound", "noun"]
+    },
+    {
+      "id": "compound_verb_in_sentence",
+      "description": "データを読み込む - を particle should be recognized",
+      "input": "データを読み込む",
+      "expected": [
+        {"surface": "データ", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "読み込む", "pos": "Verb", "lemma": "読み込む"}
+      ],
+      "tags": ["strict", "compound", "verb", "sentence"]
+    },
+    {
+      "id": "compound_noun_shizengengoshori",
+      "description": "自然言語処理 should be at most 3 tokens",
+      "input": "自然言語処理",
+      "expected": [
+        {"surface": "自然言語処理", "pos": "Noun"}
+      ],
+      "tags": ["strict", "compound", "noun"]
+    },
+    {
+      "id": "compound_noun_jinkouchinou",
+      "description": "人工知能 should be at most 2 tokens",
+      "input": "人工知能",
+      "expected": [
+        {"surface": "人工知能", "pos": "Noun"}
+      ],
+      "tags": ["strict", "compound", "noun"]
+    },
+    {
+      "id": "compound_noun_kikaigakushuu",
+      "description": "機械学習 should be at most 2 tokens",
+      "input": "機械学習",
+      "expected": [
+        {"surface": "機械学習", "pos": "Noun"}
+      ],
+      "tags": ["strict", "compound", "noun"]
+    }
+  ]
+}

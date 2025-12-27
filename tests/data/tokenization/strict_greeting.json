@@ -1,0 +1,132 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "konnichiwa_single",
+      "description": "こんにちは should be single token",
+      "input": "こんにちは",
+      "expected": [
+        {"surface": "こんにちは", "pos": "Other"}
+      ],
+      "tags": ["strict", "greeting"]
+    },
+    {
+      "id": "ohayougozaimasu",
+      "description": "おはようございます should be at most 2 tokens",
+      "input": "おはようございます",
+      "expected": [
+        {"surface": "おはよう", "pos": "Other"},
+        {"surface": "ございます", "pos": "Auxiliary"}
+      ],
+      "tags": ["strict", "greeting"]
+    },
+    {
+      "id": "arigatougozaimasu",
+      "description": "ありがとうございます should be at most 2 tokens",
+      "input": "ありがとうございます",
+      "expected": [
+        {"surface": "ありがとう", "pos": "Other"},
+        {"surface": "ございます", "pos": "Auxiliary"}
+      ],
+      "tags": ["strict", "greeting"]
+    },
+    {
+      "id": "sumimasen_single",
+      "description": "すみません should be single token",
+      "input": "すみません",
+      "expected": [
+        {"surface": "すみません", "pos": "Other", "lemma": "すみません"}
+      ],
+      "tags": ["strict", "greeting"]
+    },
+    {
+      "id": "ocha_single",
+      "description": "お茶 should be single token",
+      "input": "お茶",
+      "expected": [
+        {"surface": "お茶", "pos": "Noun"}
+      ],
+      "tags": ["strict", "honorific"]
+    },
+    {
+      "id": "gohan_single",
+      "description": "ご飯 should be single token",
+      "input": "ご飯",
+      "expected": [
+        {"surface": "ご飯", "pos": "Noun"}
+      ],
+      "tags": ["strict", "honorific"]
+    },
+    {
+      "id": "onegai_single",
+      "description": "お願い should be single token",
+      "input": "お願い",
+      "expected": [
+        {"surface": "お願い", "pos": "Noun"}
+      ],
+      "tags": ["strict", "honorific"]
+    },
+    {
+      "id": "otsukareama_single",
+      "description": "お疲れ様 should be single token",
+      "input": "お疲れ様",
+      "expected": [
+        {"surface": "お疲れ様", "pos": "Noun"}
+      ],
+      "tags": ["strict", "honorific"]
+    },
+    {
+      "id": "osewa_ni_natte_orimasu",
+      "description": "お世話になっております should contain お世話",
+      "input": "お世話になっております",
+      "expected": [
+        {"surface": "お世話", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "なって", "pos": "Verb", "lemma": "なる"},
+        {"surface": "おります", "pos": "Auxiliary"}
+      ],
+      "tags": ["strict", "business"]
+    },
+    {
+      "id": "yoroshiku_onegai_itashimasu",
+      "description": "よろしくお願いいたします should contain よろしく and お願い",
+      "input": "よろしくお願いいたします",
+      "expected": [
+        {"surface": "よろしく", "pos": "Adverb"},
+        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
+      ],
+      "tags": ["strict", "business"]
+    },
+    {
+      "id": "ikaga_deshouka",
+      "description": "いかがでしょうか should contain いかが as single token",
+      "input": "いかがでしょうか",
+      "expected": [
+        {"surface": "いかが", "pos": "Adverb"},
+        {"surface": "でしょう", "pos": "Auxiliary"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["strict", "business"]
+    },
+    {
+      "id": "gozaimasu_single",
+      "description": "ございます should not be over-fragmented",
+      "input": "ございます",
+      "expected": [
+        {"surface": "ございます", "pos": "Auxiliary"}
+      ],
+      "tags": ["strict", "keigo"]
+    },
+    {
+      "id": "otsukare_sama_desu",
+      "description": "お疲れ様です should not over-fragment",
+      "input": "お疲れ様です",
+      "expected": [
+        {"surface": "お疲れ様", "pos": "Noun"},
+        {"surface": "です", "pos": "Auxiliary"}
+      ],
+      "tags": ["strict", "keigo"]
+    }
+  ]
+}

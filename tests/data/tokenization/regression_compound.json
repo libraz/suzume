@@ -222,10 +222,11 @@
     },
     {
       "id": "viterbi_te_form_not_split",
-      "description": "走っている - te-form not split",
+      "description": "走っている - te-form splits with progressive auxiliary",
       "input": "走っている",
       "expected": [
-        {"surface": "走っている", "pos": "Verb", "lemma": "走る"}
+        {"surface": "走って", "pos": "Verb", "lemma": "走る"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["regression", "viterbi", "te_form"]
     },
@@ -297,6 +298,54 @@
         {"surface": "わかりあう", "pos": "Verb", "lemma": "わかり合う"}
       ],
       "tags": ["regression", "compound_verb", "hiragana"]
+    },
+    {
+      "id": "kanji_hiragana_compound_tamanegi",
+      "description": "玉ねぎ - single kanji + hiragana compound noun",
+      "input": "玉ねぎ",
+      "expected": [
+        {"surface": "玉ねぎ", "pos": "Noun"}
+      ],
+      "tags": ["regression", "compound_noun", "kanji_hiragana"]
+    },
+    {
+      "id": "kanji_hiragana_compound_hidaruma",
+      "description": "火だるま - single kanji + hiragana compound noun",
+      "input": "火だるま",
+      "expected": [
+        {"surface": "火だるま", "pos": "Noun"}
+      ],
+      "tags": ["regression", "compound_noun", "kanji_hiragana"]
+    },
+    {
+      "id": "kanji_hiragana_compound_mizutamari",
+      "description": "水たまり - single kanji + hiragana compound noun",
+      "input": "水たまり",
+      "expected": [
+        {"surface": "水たまり", "pos": "Noun"}
+      ],
+      "tags": ["regression", "compound_noun", "kanji_hiragana"]
+    },
+    {
+      "id": "kanji_copula_not_compound",
+      "description": "神だった - should split noun + copula (not compound)",
+      "input": "神だった",
+      "expected": [
+        {"surface": "神", "pos": "Noun"},
+        {"surface": "だった", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "copula", "not_compound"]
+    },
+    {
+      "id": "kanji_hiragana_sentence",
+      "description": "玉ねぎを切る - compound in sentence",
+      "input": "玉ねぎを切る",
+      "expected": [
+        {"surface": "玉ねぎ", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "切る", "pos": "Verb"}
+      ],
+      "tags": ["regression", "compound_noun", "kanji_hiragana"]
     }
   ]
 }

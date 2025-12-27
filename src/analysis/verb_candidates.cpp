@@ -277,6 +277,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Reject Godan verbs with stems ending in e-row hiragana
           // E-row endings (え,け,せ,て,ね,へ,め,れ) are typically ichidan stems
           // E.g., "伝えいた" falsely matches as GodanKa "伝えく" but 伝える is ichidan
+          // Exception: GodanRa (passive/causative) with "られ" suffix is valid
+          // E.g., "定められた" has stem "定め" (ichidan) + passive suffix
           bool is_godan = (best.verb_type == grammar::VerbType::GodanKa ||
                            best.verb_type == grammar::VerbType::GodanGa ||
                            best.verb_type == grammar::VerbType::GodanSa ||
@@ -292,7 +294,14 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             if (last_char == U'え' || last_char == U'け' || last_char == U'せ' ||
                 last_char == U'て' || last_char == U'ね' || last_char == U'へ' ||
                 last_char == U'め' || last_char == U'れ') {
-              continue;  // Skip - e-row stem is typically ichidan, not godan
+              // Exception: GodanRa with passive/causative suffix (られ) is valid
+              // This occurs with ichidan verb stem + passive auxiliary
+              bool is_passive_pattern =
+                  (best.verb_type == grammar::VerbType::GodanRa &&
+                   surface.find("られ") != std::string::npos);
+              if (!is_passive_pattern) {
+                continue;  // Skip - e-row stem is typically ichidan, not godan
+              }
             }
           }
 
@@ -313,7 +322,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           candidate.end = end_pos;
           candidate.pos = core::PartOfSpeech::Verb;
           // Lower cost for higher confidence matches
-          candidate.cost = 0.4F + (1.0F - best.confidence) * 0.3F;
+          float base_cost = 0.4F + (1.0F - best.confidence) * 0.3F;
+          // Suru verbs get a bonus to recognize as single verb (勉強する, 延期する)
+          if (best.verb_type == grammar::VerbType::Suru) {
+            base_cost -= 0.2F;
+          }
+          candidate.cost = base_cost;
           candidate.has_suffix = false;
           // Note: Don't set lemma here - let lemmatizer derive it more accurately
           // Only set conj_type for conjugation pattern info
@@ -357,10 +371,17 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
   // Skip if starting with demonstrative pronouns (これ, それ, あれ, どれ, etc.)
   // These are commonly mistaken for verbs (これる, それる, etc.)
+  // Exception: あれば is the conditional form of ある (verb), not pronoun + particle
   if (start_pos + 1 < codepoints.size()) {
     char32_t second_char = codepoints[start_pos + 1];
     if (normalize::isDemonstrativeStart(first_char, second_char)) {
-      return candidates;
+      // Check if followed by conditional ば - if so, it might be verb conditional form
+      // E.g., あれば = ある (verb) + ば, not あれ (pronoun) + ば
+      bool is_conditional_form = (start_pos + 2 < codepoints.size() &&
+                                  codepoints[start_pos + 2] == U'ば');
+      if (!is_conditional_form) {
+        return candidates;
+      }
     }
 
     // Skip if starting with 「ない」(auxiliary verb/i-adjective for negation)
@@ -464,8 +485,12 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       // This helps them beat the particle+adj+particle split path
       // Only apply to longer forms (5+ chars) to avoid boosting short forms like
       // "あった" (ある) which can interfere with copula recognition (であった)
+      // Exception: Conditional forms (ending with ば) are unambiguous and should
+      // get the bonus even if short (e.g., あれば = ある conditional)
       size_t candidate_len = end_pos - start_pos;
-      if (is_dictionary_verb && candidate_len >= 5) {
+      bool is_conditional = (surface.size() >= 3 &&
+                             surface.substr(surface.size() - 3) == "ば");
+      if (is_dictionary_verb && (candidate_len >= 5 || is_conditional)) {
         base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;
       } else if (candidate_len >= 7 && best.confidence >= 0.8F) {
         // For long hiragana verb forms (7+ chars) with high confidence,

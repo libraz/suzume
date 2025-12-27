@@ -104,10 +104,11 @@
     },
     {
       "id": "te_inai_unified",
-      "description": "食べていない - progressive negative should be single token",
+      "description": "食べていない - progressive negative splits",
       "input": "食べていない",
       "expected": [
-        {"surface": "食べていない", "pos": "Verb", "lemma": "食べる"}
+        {"surface": "食べて", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "いない", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["regression", "te_form", "progressive"]
     },
@@ -214,7 +215,8 @@
       "expected": [
         {"surface": "美味しそう", "pos": "Adjective", "lemma": "美味しい"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "食べている", "pos": "Verb", "lemma": "食べる"}
+        {"surface": "食べて", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["regression", "i_adjective", "sou"]
     },

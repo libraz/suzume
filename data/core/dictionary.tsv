@@ -408,3 +408,22 @@ C&R	NOUN		0.5
 将来	NOUN	しょうらい	0.5
 過去	NOUN	かこ	0.5
 未来	NOUN	みらい	0.5
+
+# === 五段ラ行動詞（漢字+する pattern）===
+# These are Godan-ra verbs, not Godan-sa verbs.
+# Pattern: 漢字 + する (e.g., 対する, 関する)
+# Conjugation: 対する → 対さ/対し/対する/対する/対すれ/対せよ
+対する	VERB	たいする	0.3	GODAN_RA
+関する	VERB	かんする	0.3	GODAN_RA
+属する	VERB	ぞくする	0.3	GODAN_RA
+発する	VERB	はっする	0.3	GODAN_RA
+接する	VERB	せっする	0.3	GODAN_RA
+反する	VERB	はんする	0.3	GODAN_RA
+達する	VERB	たっする	0.3	GODAN_RA
+適する	VERB	てきする	0.3	GODAN_RA
+課する	VERB	かする	0.3	GODAN_RA
+解する	VERB	かいする	0.3	GODAN_RA
+介する	VERB	かいする	0.3	GODAN_RA
+帰する	VERB	きする	0.3	GODAN_RA
+欲する	VERB	ほっする	0.3	GODAN_RA
+資する	VERB	しする	0.3	GODAN_RA

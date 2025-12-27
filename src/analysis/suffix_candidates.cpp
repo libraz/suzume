@@ -218,4 +218,140 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
   return candidates;
 }
 
+std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) {
+  std::vector<UnknownCandidate> candidates;
+
+  if (start_pos >= char_types.size() ||
+      char_types[start_pos] != normalize::CharType::Kanji) {
+    return candidates;
+  }
+
+  // Find kanji portion (1 character only for compound nouns)
+  size_t kanji_end = start_pos;
+  while (kanji_end < char_types.size() &&
+         kanji_end - start_pos < 1 &&
+         char_types[kanji_end] == normalize::CharType::Kanji) {
+    ++kanji_end;
+  }
+
+  size_t kanji_len = kanji_end - start_pos;
+  if (kanji_len == 0) {
+    return candidates;
+  }
+
+  // Need hiragana after kanji
+  if (kanji_end >= char_types.size() ||
+      char_types[kanji_end] != normalize::CharType::Hiragana) {
+    return candidates;
+  }
+
+  // Find hiragana portion (2-4 characters)
+  size_t hiragana_end = kanji_end;
+  while (hiragana_end < char_types.size() &&
+         hiragana_end - kanji_end < 4 &&
+         char_types[hiragana_end] == normalize::CharType::Hiragana) {
+    char32_t ch = codepoints[hiragana_end];
+    if (ch == U'を' || ch == U'が' || ch == U'は' || ch == U'も' ||
+        ch == U'へ' || ch == U'の' || ch == U'に' || ch == U'で' ||
+        ch == U'と' || ch == U'や' || ch == U'か') {
+      break;
+    }
+    ++hiragana_end;
+  }
+
+  size_t hiragana_len = hiragana_end - kanji_end;
+  if (hiragana_len < 2) {
+    return candidates;
+  }
+
+  char32_t first_hira = codepoints[kanji_end];
+  char32_t second_hira = (hiragana_len >= 2) ? codepoints[kanji_end + 1] : 0;
+
+  // Skip small kana at start - morphologically invalid
+  if (first_hira == U'ゃ' || first_hira == U'ゅ' || first_hira == U'ょ' ||
+      first_hira == U'ぁ' || first_hira == U'ぃ' || first_hira == U'ぅ' ||
+      first_hira == U'ぇ' || first_hira == U'ぉ' || first_hira == U'っ') {
+    return candidates;
+  }
+
+  // Check if pattern looks like a grammatical suffix
+  // These get high cost to let verb/adjective candidates win
+  bool looks_like_aux = false;
+
+  if (hiragana_len >= 2) {
+    // te/ta form, copula patterns
+    if (second_hira == U'て' || second_hira == U'た' ||
+        second_hira == U'で' || second_hira == U'だ') {
+      looks_like_aux = true;
+    }
+    // ます, ない
+    if ((first_hira == U'ま' && second_hira == U'す') ||
+        (first_hira == U'な' && second_hira == U'い')) {
+      looks_like_aux = true;
+    }
+    // れる, られる, せる, させる
+    if ((first_hira == U'れ' && second_hira == U'る') ||
+        (first_hira == U'せ' && second_hira == U'る')) {
+      looks_like_aux = true;
+    }
+    // だった, だろう
+    if (first_hira == U'だ' && (second_hira == U'っ' || second_hira == U'ろ')) {
+      looks_like_aux = true;
+    }
+    // なら, なかった
+    if (first_hira == U'な' && (second_hira == U'ら' || second_hira == U'か')) {
+      looks_like_aux = true;
+    }
+    // Renyokei + そう/たい/ます
+    bool is_renyokei = (first_hira == U'し' || first_hira == U'み' ||
+                        first_hira == U'き' || first_hira == U'ぎ' ||
+                        first_hira == U'ち' || first_hira == U'り' ||
+                        first_hira == U'い' || first_hira == U'び');
+    if (is_renyokei && (second_hira == U'そ' || second_hira == U'た' ||
+                        second_hira == U'ま')) {
+      looks_like_aux = true;
+    }
+  }
+
+  // Ichidan verb pattern (e-row + る)
+  bool is_e_row = (first_hira == U'え' || first_hira == U'け' ||
+                   first_hira == U'げ' || first_hira == U'せ' ||
+                   first_hira == U'て' || first_hira == U'ね' ||
+                   first_hira == U'べ' || first_hira == U'め' ||
+                   first_hira == U'れ');
+  if (is_e_row && hiragana_len == 2 && second_hira == U'る') {
+    looks_like_aux = true;
+  }
+
+  // Patterns ending with る
+  char32_t last_hira = codepoints[hiragana_end - 1];
+  if (last_hira == U'る' && hiragana_len >= 2) {
+    looks_like_aux = true;
+  }
+
+  // Patterns ending with て/で (verb te-form)
+  // e.g., 基づいて, 考えて - these are verb conjugations, not compound nouns
+  if ((last_hira == U'て' || last_hira == U'で') && hiragana_len >= 2) {
+    looks_like_aux = true;
+  }
+
+  // Generate candidate with cost based on pattern
+  std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
+  if (!surface.empty()) {
+    UnknownCandidate candidate;
+    candidate.surface = surface;
+    candidate.start = start_pos;
+    candidate.end = hiragana_end;
+    candidate.pos = core::PartOfSpeech::Noun;
+    candidate.cost = looks_like_aux ? 3.5F : 1.0F;
+    candidate.has_suffix = false;
+    candidates.push_back(candidate);
+  }
+
+  return candidates;
+}
+
 }  // namespace suzume::analysis

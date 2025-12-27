@@ -398,6 +398,193 @@ ConnectionRuleResult checkTakuTeSplit(const core::LatticeEdge& prev,
           "taku + te split (should be takute)"};
 }
 
+// Rule 13: AUX(ません形) + で(PARTICLE) split penalty
+// Prevents ございません + で + した from being preferred over ございません + でした
+// The で after negative polite forms should be part of でした (copula past)
+ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
+                                       const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Auxiliary ||
+      next.pos != core::PartOfSpeech::Particle) {
+    return {};
+  }
+
+  if (next.surface != "で") {
+    return {};
+  }
+
+  // Check if prev ends with ません (negative polite form)
+  // UTF-8: ません = 9 bytes
+  if (prev.surface.size() < 9) {
+    return {};
+  }
+  std::string_view last9 = prev.surface.substr(prev.surface.size() - 9);
+  if (last9 != "ません") {
+    return {};
+  }
+
+  return {ConnectionPattern::MasenDeSplit, scorer::kPenaltyMasenDeSplit,
+          "masen + de split (should be masen + deshita)"};
+}
+
+// Rule 14: に (PARTICLE) + よる (NOUN, lemma 夜) split penalty
+// Discourages parsing に + よる(夜) when compound particle によると is available
+// E.g., 報告によると should use によると compound particle
+ConnectionRuleResult checkYoruNightAfterNi(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Particle ||
+      next.pos != core::PartOfSpeech::Noun) {
+    return {};
+  }
+
+  if (prev.surface != "に") {
+    return {};
+  }
+
+  // Check if next is よる with lemma 夜 (night)
+  if (next.surface != "よる" || next.lemma != "夜") {
+    return {};
+  }
+
+  return {ConnectionPattern::YoruNightAfterNi, scorer::kPenaltyYoruNightAfterNi,
+          "yoru(night) after ni (prefer compound particle)"};
+}
+
+// Rule 15: Conditional verb (ending with ば) + verb (bonus)
+// E.g., あれば + 手伝います - grammatically correct conditional clause
+// This offsets the high VERB→VERB base cost for conditional patterns
+ConnectionRuleResult checkConditionalVerbToVerb(const core::LatticeEdge& prev,
+                                                const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  // Check if prev verb ends with ば (conditional form)
+  if (prev.surface.size() < 3) {
+    return {};
+  }
+  std::string_view last3 = prev.surface.substr(prev.surface.size() - 3);
+  if (last3 != "ば") {
+    return {};
+  }
+
+  // Bonus (negative value) for conditional clause pattern
+  return {ConnectionPattern::ConditionalVerbToVerb,
+          -scorer::kBonusConditionalVerbToVerb,
+          "conditional verb to result verb"};
+}
+
+// Rule 16: Verb renyokei + compound auxiliary verb (bonus)
+// E.g., 読み + 終わる, 書き + 始める, 走り + 続ける
+// This gives bonus for proper VERB→VERB compound verb patterns
+ConnectionRuleResult checkVerbRenyokeiCompoundAux(const core::LatticeEdge& prev,
+                                                  const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  // Check if next starts with compound verb auxiliary kanji
+  if (next.surface.size() < 3) {
+    return {};
+  }
+  std::string_view first_char = next.surface.substr(0, 3);
+  if (!normalize::isCompoundVerbAuxStart(first_char)) {
+    return {};
+  }
+
+  // Check if prev ends with renyokei marker
+  if (!endsWithRenyokeiMarker(prev.surface)) {
+    return {};
+  }
+
+  // Bonus (negative value) for compound verb pattern
+  return {ConnectionPattern::VerbRenyokeiCompoundAux,
+          -scorer::kBonusVerbRenyokeiCompoundAux,
+          "verb renyokei + compound aux verb"};
+}
+
+// Helper: Check if surface is いる auxiliary form
+bool isIruAuxiliary(std::string_view surface) {
+  return surface == "いる" || surface == "います" || surface == "いました" ||
+         surface == "いません" || surface == "いない" ||
+         surface == "いなかった" || surface == "いれば";
+}
+
+// Rule 15: NOUN + いる/います (AUX) penalty
+// いる auxiliary should only follow te-form verbs, not nouns
+ConnectionRuleResult checkIruAuxAfterNoun(const core::LatticeEdge& prev,
+                                          const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Noun ||
+      next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  if (!isIruAuxiliary(next.surface)) {
+    return {};
+  }
+
+  return {ConnectionPattern::IruAuxAfterNoun, scorer::kPenaltyIruAuxAfterNoun,
+          "iru aux after noun (should be verb)"};
+}
+
+// Rule 16: Te-form VERB + いる/います (AUX) bonus
+// Progressive aspect pattern: 食べている, 走っています
+ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  if (!isIruAuxiliary(next.surface)) {
+    return {};
+  }
+
+  // Check if prev ends with te-form (て or で)
+  if (prev.surface.size() < 3) {
+    return {};
+  }
+  std::string_view last_char = prev.surface.substr(prev.surface.size() - 3);
+  if (last_char != "て" && last_char != "で") {
+    return {};
+  }
+
+  // Bonus (negative value) for te-form + iru pattern
+  return {ConnectionPattern::IruAuxAfterTeForm, -scorer::kBonusIruAuxAfterTeForm,
+          "te-form verb + iru aux (progressive)"};
+}
+
+// Check for formal noun followed by kanji (should be compound word)
+// e.g., 所 + 在する → should be 所在する
+ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
+                                                const core::LatticeEdge& next) {
+  // Check if prev is a formal noun (single kanji)
+  // Note: Also check is_formal_noun flag directly for edges without the flag
+  bool is_formal =
+      prev.isFormalNoun() ||
+      (prev.pos == core::PartOfSpeech::Noun && prev.surface.size() == 3 &&
+       (prev.surface == "所" || prev.surface == "物" || prev.surface == "事" ||
+        prev.surface == "時" || prev.surface == "方" || prev.surface == "為"));
+
+  if (!is_formal) {
+    return {};
+  }
+
+  // Check if next starts with kanji (0xE4-0xE9 range in UTF-8)
+  if (next.surface.empty()) {
+    return {};
+  }
+  auto first_byte = static_cast<unsigned char>(next.surface[0]);
+  if (first_byte < 0xE4 || first_byte > 0xE9) {
+    return {};
+  }
+
+  // Penalty for formal noun + kanji pattern
+  return {ConnectionPattern::FormalNounBeforeKanji, 3.0F,
+          "formal noun before kanji (should be compound)"};
+}
+
 }  // namespace
 
 // =============================================================================
@@ -468,6 +655,41 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
   }
 
   result = checkTakuTeSplit(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkMasenDeSplit(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkYoruNightAfterNi(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkConditionalVerbToVerb(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkVerbRenyokeiCompoundAux(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkIruAuxAfterNoun(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkIruAuxAfterTeForm(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkFormalNounBeforeKanji(prev, next);
   if (result.pattern != ConnectionPattern::None) {
     return result;
   }

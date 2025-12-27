@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -39,5 +40,21 @@ struct TestSuite {
   // Filter cases by tag
   std::vector<TestCase> filterByTag(const std::string& tag) const;
 };
+
+// Google Test printing support
+inline void PrintTo(const ExpectedMorpheme& m, std::ostream* os) {
+  *os << "{surface: \"" << m.surface << "\"";
+  if (!m.pos.empty()) {
+    *os << ", pos: \"" << m.pos << "\"";
+  }
+  if (!m.lemma.empty()) {
+    *os << ", lemma: \"" << m.lemma << "\"";
+  }
+  *os << "}";
+}
+
+inline void PrintTo(const TestCase& tc, std::ostream* os) {
+  *os << tc.id << ": \"" << tc.input << "\"";
+}
 
 }  // namespace suzume::test

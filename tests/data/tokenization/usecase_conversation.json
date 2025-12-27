@@ -1,0 +1,424 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "conv_weather",
+      "input": "今日は寒いですね",
+      "expected": [
+        {"surface": "今日", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "寒い", "pos": "Adjective"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "ね", "pos": "Particle"}
+      ],
+      "tags": ["conversation"]
+    },
+    {
+      "id": "conv_directions",
+      "input": "駅までどうやって行きますか",
+      "expected": [
+        {"surface": "駅", "pos": "Noun"},
+        {"surface": "まで", "pos": "Particle"},
+        {"surface": "どう", "pos": "Adverb"},
+        {"surface": "やって", "pos": "Verb", "lemma": "やる"},
+        {"surface": "行きます", "pos": "Verb", "lemma": "行く"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["conversation"]
+    },
+    {
+      "id": "conv_polite_request",
+      "input": "ちょっと待ってください",
+      "expected": [
+        {"surface": "ちょっと", "pos": "Adverb"},
+        {"surface": "待って", "pos": "Verb", "lemma": "待つ"},
+        {"surface": "ください", "pos": "Auxiliary"}
+      ],
+      "tags": ["conversation"]
+    },
+    {
+      "id": "conv_thankyou",
+      "input": "ありがとうございます",
+      "expected": [
+        {"surface": "ありがとう", "pos": "Other"},
+        {"surface": "ございます", "pos": "Auxiliary"}
+      ],
+      "tags": ["conversation"]
+    },
+    {
+      "id": "conv_ohayou",
+      "input": "おはようございます",
+      "expected": [
+        {"surface": "おはよう", "pos": "Other"},
+        {"surface": "ございます", "pos": "Auxiliary"}
+      ],
+      "tags": ["conversation"]
+    },
+    {
+      "id": "conv_konnichiwa",
+      "input": "こんにちは",
+      "expected": [
+        {"surface": "こんにちは", "pos": "Other"}
+      ],
+      "tags": ["conversation"]
+    },
+    {
+      "id": "conv_apology",
+      "input": "すみませんでした",
+      "expected": [
+        {"surface": "すみません", "pos": "Other"},
+        {"surface": "でした", "pos": "Auxiliary"}
+      ],
+      "tags": ["conversation"]
+    },
+    {
+      "id": "conv_where",
+      "input": "トイレはどこですか",
+      "expected": [
+        {"surface": "トイレ", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "どこ", "pos": "Pronoun"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["conversation"]
+    },
+    {
+      "id": "conv_what",
+      "input": "これは何ですか",
+      "expected": [
+        {"surface": "これ", "pos": "Pronoun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "何", "pos": "Pronoun"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["conversation"]
+    },
+    {
+      "id": "conv_want",
+      "input": "水が欲しいです",
+      "expected": [
+        {"surface": "水", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "欲しい", "pos": "Noun"},
+        {"surface": "です", "pos": "Auxiliary"}
+      ],
+      "tags": ["conversation"]
+    },
+    {
+      "id": "sched_meeting",
+      "input": "明日の10時に会議があります",
+      "expected": [
+        {"surface": "明日", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "10時", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "会議", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "あります", "pos": "Verb", "lemma": "ある"}
+      ],
+      "tags": ["schedule"]
+    },
+    {
+      "id": "sched_nextweek",
+      "input": "来週の金曜日はいかがですか",
+      "expected": [
+        {"surface": "来週", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "金曜日", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "いかが", "pos": "Adverb"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["schedule"]
+    },
+    {
+      "id": "sched_busy",
+      "input": "今週は忙しいので来週にしましょう",
+      "expected": [
+        {"surface": "今週", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "忙しい", "pos": "Adjective"},
+        {"surface": "ので", "pos": "Particle"},
+        {"surface": "来週", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "しましょう", "pos": "Verb", "lemma": "する"}
+      ],
+      "tags": ["schedule"]
+    },
+    {
+      "id": "sched_suggestion",
+      "input": "3時ごろはどうですか",
+      "expected": [
+        {"surface": "3時", "pos": "Noun"},
+        {"surface": "ごろ", "pos": "Other"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "どう", "pos": "Adverb"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["schedule"]
+    },
+    {
+      "id": "sched_confirmation",
+      "input": "明日の約束を確認したいのですが",
+      "expected": [
+        {"surface": "明日", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "約束", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "確認したい", "pos": "Verb", "lemma": "確認する"},
+        {"surface": "のです", "pos": "Auxiliary", "lemma": "のだ"},
+        {"surface": "が", "pos": "Particle"}
+      ],
+      "tags": ["schedule"]
+    },
+    {
+      "id": "sched_cancel",
+      "input": "予定をキャンセルしてもいいですか",
+      "expected": [
+        {"surface": "予定", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "キャンセル", "pos": "Noun"},
+        {"surface": "して", "pos": "Verb", "lemma": "する"},
+        {"surface": "も", "pos": "Particle"},
+        {"surface": "いい", "pos": "Adjective"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["schedule"]
+    },
+    {
+      "id": "shop_price",
+      "input": "これはいくらですか",
+      "expected": [
+        {"surface": "これ", "pos": "Pronoun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "いくら", "pos": "Pronoun"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["shopping"]
+    },
+    {
+      "id": "shop_payment",
+      "input": "カードで払えますか",
+      "expected": [
+        {"surface": "カード", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "払えます", "pos": "Verb", "lemma": "払う"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["shopping"]
+    },
+    {
+      "id": "shop_quantity",
+      "input": "これを3つください",
+      "expected": [
+        {"surface": "これ", "pos": "Pronoun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "3", "pos": "Noun"},
+        {"surface": "つく", "pos": "Verb"},
+        {"surface": "ださい", "pos": "Adjective"}
+      ],
+      "tags": ["shopping"]
+    },
+    {
+      "id": "shop_bag",
+      "input": "袋をお願いします",
+      "expected": [
+        {"surface": "袋", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "します", "pos": "Verb", "lemma": "する"}
+      ],
+      "tags": ["shopping"]
+    },
+    {
+      "id": "shop_receipt",
+      "input": "領収書をください",
+      "expected": [
+        {"surface": "領収書", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "ください", "pos": "Auxiliary"}
+      ],
+      "tags": ["shopping"]
+    },
+    {
+      "id": "shop_discount",
+      "input": "もう少し安くなりますか",
+      "expected": [
+        {"surface": "もう", "pos": "Adverb"},
+        {"surface": "少し", "pos": "Adverb"},
+        {"surface": "安く", "pos": "Adjective", "lemma": "安い"},
+        {"surface": "なります", "pos": "Verb", "lemma": "なる"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["shopping"]
+    },
+    {
+      "id": "shop_size",
+      "input": "大きいサイズはありますか",
+      "expected": [
+        {"surface": "大きいサイズ", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "あります", "pos": "Verb", "lemma": "ある"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["shopping"]
+    },
+    {
+      "id": "shop_color",
+      "input": "他の色はありますか",
+      "expected": [
+        {"surface": "他", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "色", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "あります", "pos": "Verb", "lemma": "ある"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["shopping"]
+    },
+    {
+      "id": "travel_reservation",
+      "input": "来週の金曜日に二名で予約したいのですが",
+      "expected": [
+        {"surface": "来週", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "金曜日", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "二名", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "予約したい", "pos": "Verb", "lemma": "予約する"},
+        {"surface": "のです", "pos": "Auxiliary", "lemma": "のだ"},
+        {"surface": "が", "pos": "Particle"}
+      ],
+      "tags": ["travel"]
+    },
+    {
+      "id": "travel_train",
+      "input": "次は新宿、新宿です",
+      "expected": [
+        {"surface": "次", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "新宿", "pos": "Noun"},
+        {"surface": "新宿", "pos": "Noun"},
+        {"surface": "です", "pos": "Auxiliary"}
+      ],
+      "tags": ["travel"]
+    },
+    {
+      "id": "travel_delay",
+      "input": "電車が10分ほど遅れております",
+      "expected": [
+        {"surface": "電車", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "10分", "pos": "Noun"},
+        {"surface": "ほど", "pos": "Particle"},
+        {"surface": "遅れております", "pos": "Verb", "lemma": "遅れる"}
+      ],
+      "tags": ["travel"]
+    },
+    {
+      "id": "travel_platform",
+      "input": "東京行きは何番線ですか",
+      "expected": [
+        {"surface": "東京行き", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "何", "pos": "Pronoun"},
+        {"surface": "番線", "pos": "Noun"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["travel"]
+    },
+    {
+      "id": "travel_ticket",
+      "input": "大阪までの切符を一枚ください",
+      "expected": [
+        {"surface": "大阪", "pos": "Noun"},
+        {"surface": "まで", "pos": "Particle"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "切符", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "一枚", "pos": "Noun"},
+        {"surface": "ください", "pos": "Auxiliary"}
+      ],
+      "tags": ["travel"]
+    },
+    {
+      "id": "travel_hotel",
+      "input": "今夜泊まれる部屋はありますか",
+      "expected": [
+        {"surface": "今夜", "pos": "Noun"},
+        {"surface": "泊まれる", "pos": "Verb"},
+        {"surface": "部屋", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "あります", "pos": "Verb", "lemma": "ある"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["travel"]
+    },
+    {
+      "id": "restaurant_order",
+      "input": "ラーメンを一つお願いします",
+      "expected": [
+        {"surface": "ラーメン", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "一つ", "pos": "Verb"},
+        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "します", "pos": "Verb", "lemma": "する"}
+      ],
+      "tags": ["restaurant"]
+    },
+    {
+      "id": "restaurant_menu",
+      "input": "メニューを見せてください",
+      "expected": [
+        {"surface": "メニュー", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "見せて", "pos": "Verb", "lemma": "見せる"},
+        {"surface": "ください", "pos": "Auxiliary"}
+      ],
+      "tags": ["restaurant"]
+    },
+    {
+      "id": "restaurant_recommendation",
+      "input": "おすすめは何ですか",
+      "expected": [
+        {"surface": "おすすめ", "pos": "Other"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "何", "pos": "Pronoun"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["restaurant"]
+    },
+    {
+      "id": "restaurant_allergy",
+      "input": "卵は入っていますか",
+      "expected": [
+        {"surface": "卵", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "入って", "pos": "Verb", "lemma": "入る"},
+        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["restaurant"]
+    },
+    {
+      "id": "restaurant_bill",
+      "input": "お会計をお願いします",
+      "expected": [
+        {"surface": "お会計", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "します", "pos": "Verb", "lemma": "する"}
+      ],
+      "tags": ["restaurant"]
+    }
+  ]
+}

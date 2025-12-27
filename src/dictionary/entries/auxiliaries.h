@@ -74,8 +74,8 @@ inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Conjecture (推量)
       {"う", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
       {"よう", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
-      {"だろう", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
-      {"でしょう", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"だろう", POS::Auxiliary, 0.5F, "", false, false, false, CT::None, ""},
+      {"でしょう", POS::Auxiliary, 0.5F, "", false, false, false, CT::None, ""},
 
       // Possibility/Uncertainty (可能性・不確実) - かもしれない forms
       // Without these, "もしれません" is incorrectly parsed as verb "もしれる"
@@ -108,6 +108,18 @@ inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Request (依頼) - ください
       {"ください", POS::Auxiliary, 0.3F, "ください", false, false, false, CT::None, ""},
       {"くださいませ", POS::Auxiliary, 0.3F, "ください", false, false, false, CT::None, ""},
+
+      // Progressive/Continuous (進行・継続) - いる conjugations
+      // Used after te-form verbs: 食べている (is eating), 見ていた (was watching)
+      // Splits te-form + auxiliary for grammatically accurate analysis
+      // Note: いた is NOT included to avoid breaking いたす (致す) verb
+      {"いる", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
+      {"います", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
+      {"いました", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
+      {"いません", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
+      {"いない", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
+      {"いなかった", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
+      {"いれば", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
 
       // Explanatory (説明) - のだ/んだ forms
       {"のだ", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
@@ -194,13 +206,14 @@ inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"じゃろう", POS::Auxiliary, 0.3F, "だろう", false, false, false, CT::None, ""},
 
       // Regional dialects as character speech (方言系)
-      {"ぜよ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
-      {"だべ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
-      {"やんけ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
-      {"やで", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
-      {"やねん", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
-      {"だっちゃ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
-      {"ばい", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      // Higher cost (1.0) to avoid false positives like やばい → まじや+ばい
+      {"ぜよ", POS::Auxiliary, 1.0F, "だ", false, false, false, CT::None, ""},
+      {"だべ", POS::Auxiliary, 1.0F, "だ", false, false, false, CT::None, ""},
+      {"やんけ", POS::Auxiliary, 1.0F, "だ", false, false, false, CT::None, ""},
+      {"やで", POS::Auxiliary, 1.0F, "だ", false, false, false, CT::None, ""},
+      {"やねん", POS::Auxiliary, 1.0F, "だ", false, false, false, CT::None, ""},
+      {"だっちゃ", POS::Auxiliary, 1.0F, "だ", false, false, false, CT::None, ""},
+      {"ばい", POS::Auxiliary, 1.0F, "だ", false, false, false, CT::None, ""},
 
       // Robot/Mechanical (ロボット・機械)
       {"デス", POS::Auxiliary, 0.3F, "です", false, false, false, CT::None, "です"},

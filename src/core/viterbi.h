@@ -126,7 +126,7 @@ class Viterbi {
           float total = state_info.cost + word_cost + conn_cost + kTransitionCost;
           ViterbiStateKey next_key{edge.end, edge.pos};
 
-          SUZUME_DEBUG_VITERBI("[VITERBI] pos=" << pos << " \"" << edge.surface
+          SUZUME_DEBUG_LOG("[VITERBI] pos=" << pos << " \"" << edge.surface
                       << "\" (from " << posToString(state_key.pos_tag) << ")"
                       << " word=" << word_cost << " conn=" << conn_cost
                       << " total=" << total << "\n");
@@ -169,12 +169,12 @@ class Viterbi {
     }
 
     // Debug: print final path
-    if (Debug::isViterbiEnabled() && !result.path.empty()) {
+    if (Debug::isEnabled() && !result.path.empty()) {
       Debug::log() << "[VITERBI] Best path (cost=" << result.total_cost << "): ";
       for (size_t i = 0; i < result.path.size(); ++i) {
         const auto& edge = lattice.getEdge(result.path[i]);
         if (i > 0) Debug::log() << " → ";
-        Debug::log() << "\"" << edge.surface << "\"";
+        Debug::log() << "\"" << edge.surface << "\"(" << posToString(edge.pos) << ")";
       }
       Debug::log() << "\n";
     }

@@ -38,39 +38,38 @@ inline std::vector<DictionaryEntry> getCompoundParticleEntries() {
   using POS = core::PartOfSpeech;
   using CT = ConjugationType;
 
-  // Compound particles have low cost (0.3F) to prefer them over split alternatives
-  // e.g., "として" should win over "と" + "して" (verb)
-  // All are hiragana-only; reading field is empty
+  // Compound particles: grammaticalized forms functioning as single units
+  // Hiragana-only forms are strongly grammaticalized and should remain as units
+  // Forms with kanji (に基づいて, に限って, etc.) should be analyzed as
+  // particle + verb to preserve verb conjugation information
   // Format: {surface, POS, cost, lemma, prefix, formal, low_info, conj, reading}
   return {
-      // Relation (関連)
+      // Relation (関連) - hiragana only
       {"について", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"に関して", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"に対して", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
 
-      // Cause/Means (原因・手段)
+      // Cause/Means (原因・手段) - hiragana only
       {"によって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
       {"により", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
       {"によると", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
 
-      // Place/Situation (場所・状況)
+      // Place/Situation (場所・状況) - hiragana only
       {"において", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
       {"にて", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
 
-      // Capacity/Viewpoint (資格・観点)
+      // Capacity/Viewpoint (資格・観点) - hiragana only
       {"として", POS::Particle, 0.1F, "", false, false, false, CT::None, ""},
       {"にとって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
 
-      // Range/Limitation (範囲・限定)
-      {"に限って", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"に限り", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      // Duration/Scope (範囲・期間) - hiragana only
+      {"にわたって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      {"にわたり", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      {"にあたって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      {"にあたり", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
 
-      // Basis (根拠)
-      {"に基づいて", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"に基づき", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-
-      // Comparison (比較)
-      {"に比べて", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      // Topic/Means (話題・手段) - hiragana only
+      {"をめぐって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      {"をめぐり", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      {"をもって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
   };
 }
 

@@ -86,7 +86,14 @@ enum class ConnectionPattern {
   AdjKuNaru,               // 形容詞く → なる (become pattern)
   CompoundAuxAfterRenyokei,// 連用形的名詞 → 複合動詞補助
   TakuTeSplit,             // 動詞たく形 → て (should be たくて as single token)
-  TakuteAfterRenyokei      // 動詞連用形 → たくて (should be single token)
+  TakuteAfterRenyokei,     // 動詞連用形 → たくて (should be single token)
+  MasenDeSplit,            // AUXません形 → で (should be でした as single token)
+  YoruNightAfterNi,        // に → よる(夜) (should prefer compound particle によると)
+  ConditionalVerbToVerb,   // 条件形動詞 → 動詞 (e.g., あれば + 手伝う)
+  VerbRenyokeiCompoundAux, // 動詞連用形 → 補助動詞 (e.g., 読み + 終わる)
+  IruAuxAfterNoun,         // 名詞 → いる/います (AUX) (invalid pattern)
+  IruAuxAfterTeForm,       // テ形動詞 → いる/います (AUX) (progressive aspect)
+  FormalNounBeforeKanji    // 形式名詞 → 漢字で始まる語 (invalid: 所+在する should be 所在する)
 };
 
 /**

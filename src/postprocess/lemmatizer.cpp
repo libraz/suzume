@@ -336,6 +336,21 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   // it equals the surface (which means the surface is already a dictionary form)
   // Only fall back to rule-based if grammar analysis returned empty/failed
   if (!grammar_result.empty()) {
+    // Check for 五段ラ行動詞 pattern: 漢字+す → 漢字+する
+    // e.g., 対す → 対する, 関す → 関する
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        endsWith(grammar_result, "す") && !endsWith(grammar_result, "する") &&
+        dict_manager_ != nullptr) {
+      std::string suru_form = grammar_result.substr(0, grammar_result.size() - 3) + "する";
+      auto lookup = dict_manager_->lookup(suru_form, 0);
+      for (const auto& r : lookup) {
+        if (r.entry != nullptr &&
+            r.entry->surface == suru_form &&
+            r.entry->pos == core::PartOfSpeech::Verb) {
+          return suru_form;
+        }
+      }
+    }
     return grammar_result;
   }
 

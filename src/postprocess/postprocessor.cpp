@@ -1,5 +1,7 @@
 #include "postprocess/postprocessor.h"
 
+#include "core/debug.h"
+
 namespace suzume::postprocess {
 
 Postprocessor::Postprocessor(const PostprocessOptions& options)
@@ -46,6 +48,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNounCompounds(const std::vector<
       // Collect consecutive nouns
       core::Morpheme merged = current;
       size_t merge_end = idx + 1;
+      size_t merge_count = 1;
 
       while (merge_end < morphemes.size()) {
         const auto& next = morphemes[merge_end];
@@ -60,9 +63,19 @@ std::vector<core::Morpheme> Postprocessor::mergeNounCompounds(const std::vector<
           merged.end = next.end;
           merged.end_pos = next.end_pos;
           ++merge_end;
+          ++merge_count;
         } else {
           break;
         }
+      }
+
+      if (merge_count > 1) {
+        SUZUME_DEBUG_LOG("[POSTPROC] Merged " << merge_count << " nouns: ");
+        for (size_t i = idx; i < merge_end; ++i) {
+          if (i > idx) core::Debug::log() << " + ";
+          core::Debug::log() << "\"" << morphemes[i].surface << "\"";
+        }
+        core::Debug::log() << " → \"" << merged.surface << "\"\n";
       }
 
       result.push_back(merged);

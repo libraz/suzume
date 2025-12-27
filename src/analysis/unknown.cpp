@@ -106,6 +106,12 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
 
     case normalize::CharType::Hiragana:
       // Hiragana only: usually function words
+      // Add length penalty for longer sequences to encourage proper segmentation
+      // e.g., まじやばい should split into まじ + やばい, not stay as one word
+      // Penalty: +0.5 per character beyond 3 characters
+      if (length >= 4) {
+        return base_cost + 1.0F + (static_cast<float>(length) - 3.0F) * 0.5F;
+      }
       return base_cost + 1.0F;
 
     default:
@@ -150,6 +156,13 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
     auto nom_nouns =
         generateNominalizedNounCandidates(text, codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), nom_nouns.begin(), nom_nouns.end());
+
+    // Generate kanji + hiragana compound noun candidates
+    // e.g., 玉ねぎ, 水たまり
+    auto compound_nouns =
+        generateKanjiHiraganaCompoundCandidates(codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), compound_nouns.begin(),
+                      compound_nouns.end());
   }
 
   // Generate hiragana verb candidates (pure hiragana verbs like いく, くる)

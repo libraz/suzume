@@ -380,22 +380,28 @@ TEST_F(JapaneseFormatIntegrationTest, VerbWithConjType_GodanKa) {
 }
 
 TEST_F(JapaneseFormatIntegrationTest, VerbWithConjType_Suru) {
+  // Progressive form splits into te-form + auxiliary
   auto morphemes = analyzer_.analyze("しています");
-  ASSERT_EQ(morphemes.size(), 1);
-  EXPECT_EQ(morphemes[0].surface, "しています");
+  ASSERT_EQ(morphemes.size(), 2);
+  EXPECT_EQ(morphemes[0].surface, "して");
   EXPECT_EQ(morphemes[0].getLemma(), "する");
   EXPECT_EQ(morphemes[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(morphemes[1].surface, "います");
+  EXPECT_EQ(morphemes[1].pos, core::PartOfSpeech::Auxiliary);
 
   auto verb_type = grammar::conjTypeToVerbType(morphemes[0].conj_type);
   EXPECT_EQ(verb_type, grammar::VerbType::Suru);
 }
 
 TEST_F(JapaneseFormatIntegrationTest, VerbWithConjType_GodanMa) {
+  // Progressive form now splits into te-form + auxiliary
   auto morphemes = analyzer_.analyze("読んでいます");
-  ASSERT_EQ(morphemes.size(), 1);
-  EXPECT_EQ(morphemes[0].surface, "読んでいます");
+  ASSERT_EQ(morphemes.size(), 2);
+  EXPECT_EQ(morphemes[0].surface, "読んで");
   EXPECT_EQ(morphemes[0].getLemma(), "読む");
   EXPECT_EQ(morphemes[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(morphemes[1].surface, "います");
+  EXPECT_EQ(morphemes[1].pos, core::PartOfSpeech::Auxiliary);
 
   auto verb_type = grammar::conjTypeToVerbType(morphemes[0].conj_type);
   EXPECT_EQ(verb_type, grammar::VerbType::GodanMa);

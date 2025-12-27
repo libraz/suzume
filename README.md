@@ -1,6 +1,9 @@
 # Suzume
 
-A lightweight Japanese morphological analyzer that runs in browsers and Node.js.
+A lightweight Japanese tokenizer that runs in browsers and Node.js.
+
+> **Note:** Suzume is not a general-purpose morphological analyzer like MeCab.
+> It is designed for unknown word handling, search indexing, and client-side use.
 
 ## Why Suzume?
 
