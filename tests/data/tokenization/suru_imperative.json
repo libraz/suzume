@@ -1,0 +1,101 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "suru_imperative_shiro",
+      "input": "勉強しろ",
+      "expected": [
+        {"surface": "勉強しろ", "pos": "Verb", "lemma": "勉強する"}
+      ],
+      "tags": ["suru", "imperative"]
+    },
+    {
+      "id": "suru_imperative_seyo",
+      "input": "勉強せよ",
+      "expected": [
+        {"surface": "勉強せよ", "pos": "Verb", "lemma": "勉強する"}
+      ],
+      "tags": ["suru", "imperative"]
+    },
+    {
+      "id": "suru_imperative_renshu",
+      "input": "練習しろ",
+      "expected": [
+        {"surface": "練習しろ", "pos": "Verb", "lemma": "練習する"}
+      ],
+      "tags": ["suru", "imperative"]
+    },
+    {
+      "id": "suru_imperative_undou",
+      "input": "運動せよ",
+      "expected": [
+        {"surface": "運動せよ", "pos": "Verb", "lemma": "運動する"}
+      ],
+      "tags": ["suru", "imperative"]
+    },
+    {
+      "id": "suru_imperative_setsumei",
+      "input": "説明しろ",
+      "expected": [
+        {"surface": "説明しろ", "pos": "Verb", "lemma": "説明する"}
+      ],
+      "tags": ["suru", "imperative"]
+    },
+    {
+      "id": "suru_base_form",
+      "input": "勉強する",
+      "expected": [
+        {"surface": "勉強する", "pos": "Verb", "lemma": "勉強する"}
+      ],
+      "tags": ["suru", "base"]
+    },
+    {
+      "id": "suru_past",
+      "input": "勉強した",
+      "expected": [
+        {"surface": "勉強した", "pos": "Verb", "lemma": "勉強する"}
+      ],
+      "tags": ["suru", "past"]
+    },
+    {
+      "id": "suru_te_form",
+      "input": "勉強して",
+      "expected": [
+        {"surface": "勉強して", "pos": "Verb", "lemma": "勉強する"}
+      ],
+      "tags": ["suru", "te-form"]
+    },
+    {
+      "id": "suru_conditional",
+      "input": "勉強すれば",
+      "expected": [
+        {"surface": "勉強すれば", "pos": "Verb", "lemma": "勉強する"}
+      ],
+      "tags": ["suru", "conditional"]
+    },
+    {
+      "id": "suru_volitional",
+      "input": "勉強しよう",
+      "expected": [
+        {"surface": "勉強しよう", "pos": "Verb", "lemma": "勉強する"}
+      ],
+      "tags": ["suru", "volitional"]
+    },
+    {
+      "id": "standalone_shiro",
+      "input": "しろ",
+      "expected": [
+        {"surface": "しろ", "pos": "Verb", "lemma": "する"}
+      ],
+      "tags": ["suru", "imperative", "standalone"]
+    },
+    {
+      "id": "standalone_seyo",
+      "input": "せよ",
+      "expected": [
+        {"surface": "せよ", "pos": "Verb", "lemma": "する"}
+      ],
+      "tags": ["suru", "imperative", "standalone"]
+    }
+  ]
+}

@@ -1,8 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
-// Common test helper functions and fixtures for Suzume analyzer tests.
-// These utilities reduce code duplication across test files.
+// Common test helper functions for Suzume analyzer tests.
 
 #pragma once
 

@@ -88,6 +88,11 @@ constexpr float kPenaltyVerbNaiPattern = 1.5F;
 // E.g., 教え + て should be 教えて (te-form), not split
 constexpr float kPenaltyTeFormSplit = 1.5F;
 
+// VERB + て split when verb ends with たく (desire adverbial form)
+// E.g., 食べたく + て should be 食べたくて (single token)
+// This prevents splitting たくて into たく + て
+constexpr float kPenaltyTakuTeSplit = 2.0F;
+
 }  // namespace suzume::analysis::scorer
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONSTANTS_H_

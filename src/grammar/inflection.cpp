@@ -306,11 +306,23 @@ std::vector<InflectionCandidate> Inflection::analyze(
     candidates.push_back(std::move(cand));
   }
 
-  // Note: Imperative forms (e.g., 書け, 食べろ, しろ) are NOT matched standalone.
-  // Adding meireikei matching here causes regression with conditional forms
+  // Note: General imperative forms (e.g., 書け, 食べろ) are NOT matched standalone.
+  // Adding full meireikei matching causes regression with conditional forms
   // (食べれば gets split as 食べれ + ば because 食べれ matches GodanRa meireikei).
-  // Imperatives are handled via:
-  // 1. Dictionary lookup (しろ, やめろ, etc.)
+  //
+  // However, Suru imperatives (しろ, せよ) are safe to match because:
+  // - する conditional is すれば (not しれば/しろば)
+  // - No overlap with any conditional pattern
+  auto suru_meireikei_candidates =
+      matchVerbStem(surface, {}, conn::kVerbMeireikei);
+  for (auto& cand : suru_meireikei_candidates) {
+    // Only include Suru verb imperatives to avoid conditional form regression
+    if (cand.verb_type == VerbType::Suru) {
+      candidates.push_back(std::move(cand));
+    }
+  }
+  // Other imperatives are handled via:
+  // 1. Dictionary lookup (やめろ, etc.)
   // 2. Auxiliary chain matching for compound patterns
 
   // Sort by confidence (descending)

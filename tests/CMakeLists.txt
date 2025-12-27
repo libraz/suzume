@@ -58,12 +58,9 @@ set(TEST_SOURCES
   analysis/analyzer_slang_test.cpp
   analysis/analyzer_usecase_mixed_test.cpp
   analysis/analyzer_usecase_realworld_test.cpp
-  analysis/analyzer_regression_particle_test.cpp
-  analysis/analyzer_regression_copula_test.cpp
   analysis/analyzer_regression_adjective_test.cpp
   analysis/analyzer_regression_verb_test.cpp
   analysis/analyzer_regression_compound_test.cpp
-  analysis/analyzer_regression_misc_test.cpp
   analysis/analyzer_strict_greeting_test.cpp
   analysis/analyzer_strict_word_test.cpp
   analysis/analyzer_strict_particle_test.cpp
@@ -73,6 +70,10 @@ set(TEST_SOURCES
   analysis/connection_rules_test.cpp
   output/japanese_format_test.cpp
   integration/data_driven_sample_test.cpp
+  integration/regression_copula_test.cpp
+  integration/regression_particle_test.cpp
+  integration/regression_misc_test.cpp
+  integration/suru_imperative_test.cpp
 )
 
 # Create test executable

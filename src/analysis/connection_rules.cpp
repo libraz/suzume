@@ -326,6 +326,33 @@ ConnectionRuleResult checkCompoundAuxAfterRenyokei(
           "compound aux after renyokei-like noun"};
 }
 
+// Rule 11: Verb たく + て split penalty
+// Prevents 食べたく + て from being preferred over 食べたくて
+ConnectionRuleResult checkTakuTeSplit(const core::LatticeEdge& prev,
+                                      const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Particle) {
+    return {};
+  }
+
+  if (next.surface != "て") {
+    return {};
+  }
+
+  // Check if prev ends with たく (desire adverbial form)
+  // UTF-8: たく = 6 bytes
+  if (prev.surface.size() < 6) {
+    return {};
+  }
+  std::string_view last6 = prev.surface.substr(prev.surface.size() - 6);
+  if (last6 != "たく") {
+    return {};
+  }
+
+  return {ConnectionPattern::TakuTeSplit, scorer::kPenaltyTakuTeSplit,
+          "taku + te split (should be takute)"};
+}
+
 }  // namespace
 
 // =============================================================================
@@ -386,6 +413,11 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
   }
 
   result = checkCompoundAuxAfterRenyokei(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkTakuTeSplit(prev, next);
   if (result.pattern != ConnectionPattern::None) {
     return result;
   }

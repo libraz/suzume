@@ -1,8 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
 // Minimal JSON loader for test case files.
-// This is a simple, self-contained parser for the test case JSON format.
 
 #pragma once
 

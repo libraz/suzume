@@ -1,0 +1,69 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "datta_copula_pos",
+      "description": "だった should be recognized as Auxiliary, not Verb",
+      "input": "神だった",
+      "expected": [
+        {"surface": "神", "pos": "Noun"},
+        {"surface": "だった", "pos": "Auxiliary", "lemma": "だった"}
+      ],
+      "tags": ["regression", "copula", "datta"]
+    },
+    {
+      "id": "datta_copula_lemma",
+      "description": "だった lemma should be だった, not だる",
+      "input": "本だった",
+      "expected": [
+        {"surface": "本", "pos": "Noun"},
+        {"surface": "だった", "pos": "Auxiliary", "lemma": "だった"}
+      ],
+      "tags": ["regression", "copula", "datta"]
+    },
+    {
+      "id": "datta_in_sentence",
+      "description": "Full sentence with だった",
+      "input": "ワンマンライブのセットリストが神だった",
+      "expected": [
+        {"surface": "ワンマンライブ", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "セットリスト", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "神", "pos": "Noun"},
+        {"surface": "だった", "pos": "Auxiliary", "lemma": "だった"}
+      ],
+      "tags": ["regression", "copula", "datta", "sentence"]
+    },
+    {
+      "id": "deshita_copula",
+      "description": "でした (polite past copula) should be Auxiliary",
+      "input": "本でした",
+      "expected": [
+        {"surface": "本", "pos": "Noun"},
+        {"surface": "でした", "pos": "Auxiliary", "lemma": "でした"}
+      ],
+      "tags": ["regression", "copula", "deshita"]
+    },
+    {
+      "id": "deatta_copula",
+      "description": "であった (formal past copula) should be Auxiliary",
+      "input": "重要であった",
+      "expected": [
+        {"surface": "重要", "pos": "Adjective"},
+        {"surface": "であった", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "copula", "deatta"]
+    },
+    {
+      "id": "copula_after_noun",
+      "description": "Basic copula だ after noun",
+      "input": "学生だ",
+      "expected": [
+        {"surface": "学生", "pos": "Noun"},
+        {"surface": "だ", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "copula", "da"]
+    }
+  ]
+}

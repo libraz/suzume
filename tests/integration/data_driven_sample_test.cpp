@@ -1,8 +1,3 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
-// Sample data-driven test demonstrating the JSON-based test infrastructure.
-
 #include "data_driven_test.h"
 
 namespace suzume::test {

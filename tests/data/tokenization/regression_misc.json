@@ -1,0 +1,348 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "shisou_lemma",
+      "description": "遅刻しそう should split as 遅刻 (noun) + しそう (verb)",
+      "input": "遅刻しそう",
+      "expected": [
+        {"surface": "遅刻", "pos": "Noun"},
+        {"surface": "しそう", "pos": "Verb", "lemma": "する"}
+      ],
+      "tags": ["regression", "sou", "verb"]
+    },
+    {
+      "id": "sou_auxiliary_pattern",
+      "description": "食べそう should have lemma 食べる",
+      "input": "食べそう",
+      "expected": [
+        {"surface": "食べそう", "pos": "Verb", "lemma": "食べる"}
+      ],
+      "tags": ["regression", "sou", "verb"]
+    },
+    {
+      "id": "sou_with_desu",
+      "description": "遅刻しそうです splits correctly",
+      "input": "遅刻しそうです",
+      "expected": [
+        {"surface": "遅刻", "pos": "Noun"},
+        {"surface": "しそう", "pos": "Verb", "lemma": "する"},
+        {"surface": "です", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "sou", "verb"]
+    },
+    {
+      "id": "colloquial_adverb_meccha",
+      "description": "めっちゃ should be Adverb",
+      "input": "めっちゃ面白い",
+      "expected": [
+        {"surface": "めっちゃ", "pos": "Adverb"},
+        {"surface": "面白い", "pos": "Adjective"}
+      ],
+      "tags": ["regression", "adverb", "colloquial"]
+    },
+    {
+      "id": "conjunction_nimokakawarazu",
+      "description": "にもかかわらず should be single Conjunction",
+      "input": "にもかかわらず",
+      "expected": [
+        {"surface": "にもかかわらず", "pos": "Conjunction"}
+      ],
+      "tags": ["regression", "conjunction"]
+    },
+    {
+      "id": "determiner_souiu",
+      "description": "そういう should be Determiner",
+      "input": "そういうこと",
+      "expected": [
+        {"surface": "そういう", "pos": "Determiner"},
+        {"surface": "こと", "pos": "Noun", "lemma": "事"}
+      ],
+      "tags": ["regression", "determiner"]
+    },
+    {
+      "id": "adverb_imasugu",
+      "description": "今すぐ should be Adverb",
+      "input": "今すぐ行く",
+      "expected": [
+        {"surface": "今すぐ", "pos": "Adverb"},
+        {"surface": "行く", "pos": "Verb"}
+      ],
+      "tags": ["regression", "adverb"]
+    },
+    {
+      "id": "nai_nda_split",
+      "description": "ないんだ should split into 2 tokens",
+      "input": "ないんだ",
+      "expected": [
+        {"surface": "ない", "pos": "Auxiliary"},
+        {"surface": "んだ", "pos": "Auxiliary", "lemma": "のだ"}
+      ],
+      "tags": ["regression", "auxiliary", "nda"]
+    },
+    {
+      "id": "nai_nda_in_sentence",
+      "description": "知らないんだ - んだ should be Auxiliary",
+      "input": "知らないんだ",
+      "expected": [
+        {"surface": "知らない", "pos": "Verb", "lemma": "知る"},
+        {"surface": "んだ", "pos": "Auxiliary", "lemma": "のだ"}
+      ],
+      "tags": ["regression", "auxiliary", "nda"]
+    },
+    {
+      "id": "time_noun_maiasa_split",
+      "description": "毎朝コーヒー should split into 2 tokens",
+      "input": "毎朝コーヒー",
+      "expected": [
+        {"surface": "毎朝", "pos": "Noun"},
+        {"surface": "コーヒー", "pos": "Noun"}
+      ],
+      "tags": ["regression", "time_noun"]
+    },
+    {
+      "id": "time_noun_full_sentence",
+      "description": "毎朝コーヒーを飲みながら新聞を読む",
+      "input": "毎朝コーヒーを飲みながら新聞を読む",
+      "expected": [
+        {"surface": "毎朝", "pos": "Noun"},
+        {"surface": "コーヒー", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "飲みながら", "pos": "Verb", "lemma": "飲む"},
+        {"surface": "新聞", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "読む", "pos": "Verb"}
+      ],
+      "tags": ["regression", "time_noun", "complex"]
+    },
+    {
+      "id": "formal_noun_tsuke_split",
+      "description": "日付けで should split 付け from で",
+      "input": "日付けで",
+      "expected": [
+        {"surface": "日付け", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"}
+      ],
+      "tags": ["regression", "formal_noun"]
+    },
+    {
+      "id": "formal_noun_date_with_tsuke",
+      "description": "2024年12月23日付けで",
+      "input": "2024年12月23日付けで",
+      "expected": [
+        {"surface": "2024年12月23日", "pos": "Noun"},
+        {"surface": "付け", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"}
+      ],
+      "tags": ["regression", "formal_noun", "date"]
+    },
+    {
+      "id": "adverb_sou",
+      "description": "そう should be Adverb, not Verb",
+      "input": "そうですね",
+      "expected": [
+        {"surface": "そう", "pos": "Adverb"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "ね", "pos": "Particle"}
+      ],
+      "tags": ["regression", "adverb", "sou"]
+    },
+    {
+      "id": "adverb_sou_kamoshirenai",
+      "description": "そうかもしれません",
+      "input": "そうかもしれません",
+      "expected": [
+        {"surface": "そう", "pos": "Adverb"},
+        {"surface": "かもしれません", "pos": "Auxiliary", "lemma": "かもしれない"}
+      ],
+      "tags": ["regression", "adverb", "sou"]
+    },
+    {
+      "id": "adverb_moshi",
+      "description": "もし should be Adverb",
+      "input": "もし雨が降ったら",
+      "expected": [
+        {"surface": "もし", "pos": "Adverb"},
+        {"surface": "雨", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "降ったら", "pos": "Verb", "lemma": "降る"}
+      ],
+      "tags": ["regression", "adverb"]
+    },
+    {
+      "id": "sorezore_single_token",
+      "description": "それぞれ should be single Adverb token",
+      "input": "それぞれの意見を述べる",
+      "expected": [
+        {"surface": "それぞれ", "pos": "Adverb"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "意見", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "述べる", "pos": "Verb"}
+      ],
+      "tags": ["regression", "adverb"]
+    },
+    {
+      "id": "takusan_adverb",
+      "description": "たくさん should be Adverb, not split",
+      "input": "たくさんの本",
+      "expected": [
+        {"surface": "たくさん", "pos": "Adverb"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "本", "pos": "Noun"}
+      ],
+      "tags": ["regression", "adverb"]
+    },
+    {
+      "id": "itsumo_adverb",
+      "description": "いつも should be Adverb, not split",
+      "input": "いつも元気",
+      "expected": [
+        {"surface": "いつも", "pos": "Adverb"},
+        {"surface": "元気", "pos": "Noun"}
+      ],
+      "tags": ["regression", "adverb"]
+    },
+    {
+      "id": "mazu_adverb",
+      "description": "まず should be Adverb",
+      "input": "まず確認する",
+      "expected": [
+        {"surface": "まず", "pos": "Adverb"},
+        {"surface": "確認する", "pos": "Verb"}
+      ],
+      "tags": ["regression", "adverb"]
+    },
+    {
+      "id": "sumomo_momo",
+      "description": "Famous tongue twister すもももももももものうち",
+      "input": "すもももももももものうち",
+      "expected": [
+        {"surface": "すもも", "pos": "Noun"},
+        {"surface": "も", "pos": "Particle"},
+        {"surface": "もも", "pos": "Noun"},
+        {"surface": "も", "pos": "Particle"},
+        {"surface": "もも", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "うち", "pos": "Noun"}
+      ],
+      "tags": ["regression", "famous"]
+    },
+    {
+      "id": "verb_sou_hashirisou",
+      "description": "走りそう should be single VERB token",
+      "input": "走りそう",
+      "expected": [
+        {"surface": "走りそう", "pos": "Verb", "lemma": "走る"}
+      ],
+      "tags": ["regression", "sou", "verb"]
+    },
+    {
+      "id": "verb_sou_nomisou",
+      "description": "飲みそう should be single VERB token",
+      "input": "飲みそう",
+      "expected": [
+        {"surface": "飲みそう", "pos": "Verb", "lemma": "飲む"}
+      ],
+      "tags": ["regression", "sou", "verb"]
+    },
+    {
+      "id": "adj_sou_muzukashisou",
+      "description": "難しそう should be single ADJ token",
+      "input": "難しそう",
+      "expected": [
+        {"surface": "難しそう", "pos": "Adjective", "lemma": "難しい"}
+      ],
+      "tags": ["regression", "sou", "adjective"]
+    },
+    {
+      "id": "adj_sou_kanashisou",
+      "description": "悲しそう should be single ADJ token",
+      "input": "悲しそう",
+      "expected": [
+        {"surface": "悲しそう", "pos": "Adjective", "lemma": "悲しい"}
+      ],
+      "tags": ["regression", "sou", "adjective"]
+    },
+    {
+      "id": "verb_sou_desu",
+      "description": "食べそうです should split correctly",
+      "input": "食べそうです",
+      "expected": [
+        {"surface": "食べそう", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "です", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "sou", "verb"]
+    },
+    {
+      "id": "suffix_watashitachi",
+      "description": "私たち should be single PRON token",
+      "input": "私たち",
+      "expected": [
+        {"surface": "私たち", "pos": "Pronoun"}
+      ],
+      "tags": ["regression", "suffix", "pronoun"]
+    },
+    {
+      "id": "suffix_sensei_san",
+      "description": "先生さん should split as 先生 + さん",
+      "input": "先生さん",
+      "expected": [
+        {"surface": "先生", "pos": "Noun"},
+        {"surface": "さん", "pos": "Other"}
+      ],
+      "tags": ["regression", "suffix"]
+    },
+    {
+      "id": "itsumo_before_verb",
+      "description": "いつも来る",
+      "input": "いつも来る",
+      "expected": [
+        {"surface": "いつも", "pos": "Adverb"},
+        {"surface": "来る", "pos": "Verb"}
+      ],
+      "tags": ["regression", "adverb", "itsumo"]
+    },
+    {
+      "id": "itsumo_before_adj",
+      "description": "いつも楽しい",
+      "input": "いつも楽しい",
+      "expected": [
+        {"surface": "いつも", "pos": "Adverb"},
+        {"surface": "楽しい", "pos": "Adjective"}
+      ],
+      "tags": ["regression", "adverb", "itsumo"]
+    },
+    {
+      "id": "itsumo_no_mise",
+      "description": "いつもの店 - NOT いつ + もの + 店",
+      "input": "いつもの店",
+      "expected": [
+        {"surface": "いつも", "pos": "Adverb"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "店", "pos": "Noun"}
+      ],
+      "tags": ["regression", "adverb", "itsumo"]
+    },
+    {
+      "id": "char_speech_nya",
+      "description": "だにゃ character speech",
+      "input": "猫だにゃ",
+      "expected": [
+        {"surface": "猫", "pos": "Noun"},
+        {"surface": "だにゃ", "pos": "Auxiliary", "lemma": "だよ"}
+      ],
+      "tags": ["regression", "character_speech"]
+    },
+    {
+      "id": "char_speech_desuwa",
+      "description": "ですわ ojou-sama speech",
+      "input": "綺麗ですわ",
+      "expected": [
+        {"surface": "綺麗", "pos": "Adjective"},
+        {"surface": "ですわ", "pos": "Auxiliary", "lemma": "です"}
+      ],
+      "tags": ["regression", "character_speech"]
+    }
+  ]
+}

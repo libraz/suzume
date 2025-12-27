@@ -1,6 +1,3 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
 // Data-driven test infrastructure using Google Test parameterized tests.
 
 #pragma once

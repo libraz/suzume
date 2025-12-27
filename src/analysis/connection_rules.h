@@ -84,7 +84,8 @@ enum class ConnectionPattern {
   SouAfterRenyokei,        // 連用形的名詞 → そう (auxiliary pattern)
   CharacterSpeechSplit,    // だ/です → キャラ発話接尾辞
   AdjKuNaru,               // 形容詞く → なる (become pattern)
-  CompoundAuxAfterRenyokei // 連用形的名詞 → 複合動詞補助
+  CompoundAuxAfterRenyokei,// 連用形的名詞 → 複合動詞補助
+  TakuTeSplit              // 動詞たく形 → て (should be たくて as single token)
 };
 
 /**

@@ -1,0 +1,88 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "wo_particle_separation",
+      "description": "を should be recognized as separate particle",
+      "input": "本をなくした",
+      "expected": [
+        {"surface": "本", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "なくした", "pos": "Verb", "lemma": "なくす"}
+      ],
+      "tags": ["regression", "particle", "wo"]
+    },
+    {
+      "id": "wo_not_merged_with_verb",
+      "description": "をなくして should not be merged as single token",
+      "input": "をなくして",
+      "expected": [
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "なくし", "pos": "Verb", "lemma": "なくす"},
+        {"surface": "て", "pos": "Particle"}
+      ],
+      "tags": ["regression", "particle", "wo"]
+    },
+    {
+      "id": "wo_in_complex_sentence",
+      "description": "を should be separate particle in complex sentence",
+      "input": "昨日買ったばかりの本をなくしてしまった",
+      "expected": [
+        {"surface": "昨日", "pos": "Noun"},
+        {"surface": "買った", "pos": "Verb", "lemma": "買う"},
+        {"surface": "ばかり", "pos": "Particle"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "本", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "なくしてしまった", "pos": "Verb", "lemma": "なくす"}
+      ],
+      "tags": ["regression", "particle", "wo", "complex"]
+    },
+    {
+      "id": "node_lemma",
+      "description": "ので lemma should be ので, not のる",
+      "input": "ので",
+      "expected": [
+        {"surface": "ので", "pos": "Particle", "lemma": "ので"}
+      ],
+      "tags": ["regression", "particle", "node"]
+    },
+    {
+      "id": "node_in_sentence",
+      "description": "ので in sentence should have correct lemma",
+      "input": "電車が遅れているので遅刻しそうです",
+      "expected": [
+        {"surface": "電車", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "遅れている", "pos": "Verb", "lemma": "遅れる"},
+        {"surface": "ので", "pos": "Particle", "lemma": "ので"},
+        {"surface": "遅刻", "pos": "Noun"},
+        {"surface": "しそう", "pos": "Verb", "lemma": "する"},
+        {"surface": "です", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "particle", "node", "complex"]
+    },
+    {
+      "id": "particle_filter_ie_ni_imasu",
+      "description": "家にいます should be split as 家 + に + います",
+      "input": "家にいます",
+      "expected": [
+        {"surface": "家", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "います", "pos": "Verb", "lemma": "いる"}
+      ],
+      "tags": ["regression", "particle", "filter"]
+    },
+    {
+      "id": "particle_filter_kane_ga_nai",
+      "description": "金がない should be split as 金 + が + ない",
+      "input": "金がない",
+      "expected": [
+        {"surface": "金", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "ない", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "particle", "filter"]
+    }
+  ]
+}
