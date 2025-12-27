@@ -78,7 +78,7 @@ inline std::vector<DictionaryEntry> getIAdjectiveEntries() {
       {"重い", POS::Adjective, 0.3F, "重い", false, false, false, CT::IAdjective, "おもい"},
       {"軽い", POS::Adjective, 0.3F, "軽い", false, false, false, CT::IAdjective, "かるい"},
       {"固い", POS::Adjective, 0.3F, "固い", false, false, false, CT::IAdjective, "かたい"},
-      {"濃い", POS::Adjective, 0.3F, "濃い", false, false, false, CT::IAdjective, "こい"},
+      {"濃い", POS::Adjective, 0.3F, "濃い", false, false, false, CT::IAdjective, ""},  // No hiragana entry: こい conflicts with 来い (imperative)
       {"短い", POS::Adjective, 0.3F, "短い", false, false, false, CT::IAdjective, "みじかい"},
 
       // ===== Time/Speed =====

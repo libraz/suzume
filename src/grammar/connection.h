@@ -42,6 +42,7 @@ constexpr uint16_t kVerbPotential = 0x0104; // 可能形語幹: 書け (e-row)
 constexpr uint16_t kIAdjStem = 0x0105;      // い形容詞語幹: 美し (ku-form ready)
 constexpr uint16_t kVerbVolitional = 0x0106;  // 意志形: 書こう, 食べよう
 constexpr uint16_t kVerbKatei = 0x0107;       // 仮定形: 書け (e-row for Godan)
+constexpr uint16_t kVerbMeireikei = 0x0108;   // 命令形: 書け, 食べろ, しろ
 
 // === Auxiliary inputs - what they require (0x02xx) ===
 constexpr uint16_t kAuxMasu = 0x0200;      // ます (requires 連用形)

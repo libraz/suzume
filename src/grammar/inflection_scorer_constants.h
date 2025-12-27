@@ -77,6 +77,11 @@ constexpr float kPenaltyIchidanIrregularStem = 0.60F;
 // Single hiragana stem (み, き, に) - likely Ichidan, not GodanRa
 constexpr float kPenaltyGodanRaSingleHiragana = 0.30F;
 
+// In kVerbKatei context, i-row ending stems like 起き (from 起きる) are Ichidan
+// GodanRa verbs typically have kanji-only stems in this context (走れば → 走)
+constexpr float kBonusIchidanKateiIRow = 0.12F;
+constexpr float kPenaltyGodanRaKateiIRow = 0.10F;
+
 // =============================================================================
 // GodanWa/Ra/Ta Disambiguation
 // =============================================================================
@@ -185,6 +190,14 @@ constexpr float kBonusGodanSaSingleKanji = 0.10F;
 
 // Single-kanji stem with Suru - penalize
 constexpr float kPenaltySuruSingleKanji = 0.15F;
+
+// =============================================================================
+// Suru/Kuru Imperative Boost
+// =============================================================================
+
+// Empty stem with Suru/Kuru imperative (しろ, せよ, こい)
+// These must win over competing Ichidan/Godan interpretations
+constexpr float kBonusSuruKuruImperative = 0.05F;
 
 }  // namespace suzume::grammar::inflection
 

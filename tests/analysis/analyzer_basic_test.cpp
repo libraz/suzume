@@ -8,9 +8,12 @@
 #include <gtest/gtest.h>
 
 #include "suzume.h"
+#include "test_helpers.h"
 
 namespace suzume::analysis {
 namespace {
+
+using suzume::test::hasSurface;
 
 TEST(AnalyzerTest, AnalyzeEmptyStringReturnsEmpty) {
   AnalyzerOptions options;
@@ -166,17 +169,6 @@ TEST(AnalyzerTest, SpecialChar_OldKana) {
 // =============================================================================
 // Bug regression tests (without external dictionaries)
 // =============================================================================
-
-namespace {
-
-bool hasSurface(const std::vector<core::Morpheme>& morphemes, const std::string& target) {
-  for (const auto& m : morphemes) {
-    if (m.surface == target) return true;
-  }
-  return false;
-}
-
-}  // namespace
 
 TEST(AnalyzerBugTest, DesuNe_ShouldNotBeSune) {
   // Bug: "ですね" was split as "で" + "すね" instead of "です" + "ね"

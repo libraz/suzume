@@ -700,6 +700,10 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   // === てくる/ていく extended (いった, いって) ===
   entries.push_back({"いった", "いった", "いく", kAuxTeiku, kAuxOutTa, kAuxOutTe});
   entries.push_back({"いって", "いって", "いく", kAuxTeiku, kAuxOutTe, kAuxOutTe});
+
+  // === Imperative forms for te-form compounds ===
+  // てこい (持ってこい, やってこい) - kuru imperative after te-form
+  entries.push_back({"こい", "こい", "くる", kAuxTekuru, kAuxOutBase, kAuxOutTe});
 }
 
 }  // namespace

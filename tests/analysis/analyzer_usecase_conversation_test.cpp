@@ -8,31 +8,13 @@
 #include <gtest/gtest.h>
 
 #include "suzume.h"
+#include "test_helpers.h"
 
 namespace suzume::analysis {
 namespace {
 
-// Helper function to check if a particle exists in the result
-bool hasParticle(const std::vector<core::Morpheme>& result,
-                 const std::string& surface) {
-  for (const auto& mor : result) {
-    if (mor.surface == surface && mor.pos == core::PartOfSpeech::Particle) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Helper function to check if a surface exists in the result
-bool hasSurface(const std::vector<core::Morpheme>& result,
-                const std::string& surface) {
-  for (const auto& mor : result) {
-    if (mor.surface == surface) {
-      return true;
-    }
-  }
-  return false;
-}
+using suzume::test::hasParticle;
+using suzume::test::hasSurface;
 
 // ===== Everyday Conversation Tests (日常会話) =====
 

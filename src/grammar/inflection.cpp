@@ -71,12 +71,19 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // Stem should be at least 3 bytes (one Japanese character)
       // Exceptions for irregular verbs where the suffix IS the conjugated form:
       // - Suru verb with す/し→する (empty stem is allowed)
+      // - Suru verb with しろ/せよ→する (imperative, empty stem allowed)
+      // - Suru verb with すれ→する (hypothetical, empty stem allowed)
       // - Kuru verb with こ/き→くる (empty stem is allowed for mizenkei/renyokei)
+      // - Kuru verb with こい→くる (imperative, empty stem allowed)
+      // - Kuru verb with くれ→くる (hypothetical, empty stem allowed)
       if (stem.size() < 3 &&
           !(ending.verb_type == VerbType::Suru &&
-            (ending.suffix == "す" || ending.suffix == "し")) &&
+            (ending.suffix == "す" || ending.suffix == "し" ||
+             ending.suffix == "しろ" || ending.suffix == "せよ" ||
+             ending.suffix == "すれ")) &&
           !(ending.verb_type == VerbType::Kuru &&
-            (ending.suffix == "こ" || ending.suffix == "き"))) {
+            (ending.suffix == "こ" || ending.suffix == "き" ||
+             ending.suffix == "こい" || ending.suffix == "くれ"))) {
         continue;
       }
 
@@ -298,6 +305,13 @@ std::vector<InflectionCandidate> Inflection::analyze(
   for (auto& cand : renyokei_candidates) {
     candidates.push_back(std::move(cand));
   }
+
+  // Note: Imperative forms (e.g., 書け, 食べろ, しろ) are NOT matched standalone.
+  // Adding meireikei matching here causes regression with conditional forms
+  // (食べれば gets split as 食べれ + ば because 食べれ matches GodanRa meireikei).
+  // Imperatives are handled via:
+  // 1. Dictionary lookup (しろ, やめろ, etc.)
+  // 2. Auxiliary chain matching for compound patterns
 
   // Sort by confidence (descending)
   // Use stable_sort to preserve the original order for candidates with equal

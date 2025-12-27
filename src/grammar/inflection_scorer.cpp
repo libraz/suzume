@@ -142,6 +142,21 @@ float calculateConfidence(VerbType type, std::string_view stem,
     base -= inflection::kPenaltyGodanRaSingleHiragana;
   }
 
+  // In kVerbKatei (conditional) context, stems ending in i-row hiragana suggest Ichidan
+  // Examples: 起き(る), 生き(る), 過ぎ(る) - Ichidan verbs with i-row stems
+  // vs. 走(る), 取(る) - GodanRa verbs where stem is typically kanji-only
+  // The i-row ending indicates the character is part of the Ichidan stem
+  if (required_conn == conn::kVerbKatei && stem_len >= 6) {
+    bool has_irow_ending = endsWithChar(stem, kRenyokeiEndings, kRenyokeiCount);
+    if (has_irow_ending) {
+      if (type == VerbType::Ichidan) {
+        base += inflection::kBonusIchidanKateiIRow;
+      } else if (type == VerbType::GodanRa) {
+        base -= inflection::kPenaltyGodanRaKateiIRow;
+      }
+    }
+  }
+
   // GodanWa disambiguation for っ-onbin patterns with all-kanji stems
   // Three verb types share っ-onbin: GodanWa (買う), GodanRa (取る), GodanTa (持つ)
   // For multi-kanji stems (2+ kanji), GodanWa is much more common:
@@ -167,6 +182,14 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // Any stem other than 来 or empty is invalid for Kuru
       base -= inflection::kPenaltyKuruInvalidStem;
     }
+  }
+
+  // Suru/Kuru imperative boost: しろ, せよ, こい have empty stems
+  // These must win over competing Ichidan/Godan interpretations
+  // (しろ vs しる, こい vs こう)
+  if (stem.empty() && required_conn == conn::kVerbMeireikei &&
+      (type == VerbType::Suru || type == VerbType::Kuru)) {
+    base += inflection::kBonusSuruKuruImperative;
   }
 
   // Ichidan validation: reject base forms that would be irregular verbs

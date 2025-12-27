@@ -8,19 +8,12 @@
 #include <gtest/gtest.h>
 
 #include "suzume.h"
+#include "test_helpers.h"
 
 namespace suzume::analysis {
 namespace {
 
-// Helper: Get surface forms as vector
-std::vector<std::string> getSurfaces(const std::vector<core::Morpheme>& result) {
-  std::vector<std::string> surfaces;
-  surfaces.reserve(result.size());
-  for (const auto& mor : result) {
-    surfaces.push_back(mor.surface);
-  }
-  return surfaces;
-}
+using suzume::test::getSurfaces;
 
 // Base class for tests that need core dictionary
 class AnalyzerTestBase : public ::testing::Test {

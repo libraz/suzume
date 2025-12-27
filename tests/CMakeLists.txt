@@ -17,8 +17,14 @@ enable_testing()
 # Include Google Test module
 include(GoogleTest)
 
+# Common test utilities
+set(TEST_COMMON_SOURCES
+  common/test_helpers.cpp
+)
+
 # Test source files
 set(TEST_SOURCES
+  ${TEST_COMMON_SOURCES}
   core/types_test.cpp
   normalize/utf8_test.cpp
   normalize/normalizer_test.cpp
@@ -30,6 +36,7 @@ set(TEST_SOURCES
   grammar/inflection_potential_test.cpp
   grammar/inflection_compound_test.cpp
   grammar/inflection_complex_test.cpp
+  grammar/inflection_imperative_test.cpp
   grammar/auxiliary_generator_test.cpp
   pretokenizer/pretokenizer_url_test.cpp
   pretokenizer/pretokenizer_number_test.cpp
@@ -70,6 +77,7 @@ add_executable(suzume_test ${TEST_SOURCES})
 # Include directories
 target_include_directories(suzume_test PRIVATE
   ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/common
 )
 
 # Link libraries

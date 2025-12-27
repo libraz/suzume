@@ -127,6 +127,7 @@ std::vector<std::pair<std::string, std::string>> getSuruConjugations(
       {stem + "したら", stem + "する"},    // Conditional
       {stem + "すれば", stem + "する"},    // Conditional
       {stem + "しろ", stem + "する"},      // Imperative
+      {stem + "せよ", stem + "する"},      // Imperative (classical)
       {stem + "しよう", stem + "する"},    // Volitional
       {stem + "している", stem + "する"},  // Progressive
       {stem + "しています", stem + "する"},// Progressive polite

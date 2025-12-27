@@ -110,6 +110,15 @@ inline std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"する", POS::Verb, 0.5F, "する", false, false, false, CT::Suru, ""},
 
       // ========================================
+      // Kuru verb imperative only (カ変動詞命令形)
+      // ========================================
+      // こい (come!) - imperative of くる
+      // Note: Full Kuru conjugation expansion is NOT done here because
+      // forms like きた, きます conflict with てきた, できます patterns.
+      // Only the imperative form is registered as it's unambiguous.
+      {"こい", POS::Verb, 0.2F, "くる", false, false, false, CT::None, ""},
+
+      // ========================================
       // Nouns derived from verbs (kept as-is, no expansion)
       // ========================================
       {"できあがり", POS::Noun, 0.3F, "できあがり", false, false, false, CT::None, ""},
