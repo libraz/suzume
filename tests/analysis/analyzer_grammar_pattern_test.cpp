@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Grammar tests for sentence patterns, conjunctions, counters, time nouns, etc.
 
 #include "analysis/analyzer.h"

@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Grammar tests for suru verbs (サ変動詞)
 
 #include "analysis/analyzer.h"

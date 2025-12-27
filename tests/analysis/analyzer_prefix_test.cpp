@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Prefix + noun joining tests
 //
 // Tests for productive お/ご + noun patterns and other prefix + noun patterns.

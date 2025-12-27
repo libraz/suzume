@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Inflection tests: Imperative form (命令形) patterns
 //
 // Note: Standalone imperative matching (書け, 食べろ) via Inflection::analyze()

@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Strict analyzer tests: Verb conjugation, Suffix, Interrogative, Common nouns,
 // Lemma correctness
 

@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Particle (助詞) analyzer tests
 
 #include "analysis/analyzer.h"

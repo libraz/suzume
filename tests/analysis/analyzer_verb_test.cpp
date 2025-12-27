@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Verb conjugation analyzer tests (五段・一段・複合動詞)
 
 #include "analysis/analyzer.h"

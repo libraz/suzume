@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Casual/SNS use case analyzer tests (informal, social media, reviews)
 
 #include "analysis/analyzer.h"

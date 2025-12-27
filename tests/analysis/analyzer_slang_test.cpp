@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Slang and internet term analyzer tests (スラング・ネット用語)
 
 #include "analysis/analyzer.h"

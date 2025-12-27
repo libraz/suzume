@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Technical use case analyzer tests (documentation, programming, complex)
 
 #include "analysis/analyzer.h"

@@ -58,9 +58,6 @@ set(TEST_SOURCES
   analysis/analyzer_slang_test.cpp
   analysis/analyzer_usecase_mixed_test.cpp
   analysis/analyzer_usecase_realworld_test.cpp
-  analysis/analyzer_regression_adjective_test.cpp
-  analysis/analyzer_regression_verb_test.cpp
-  analysis/analyzer_regression_compound_test.cpp
   analysis/analyzer_strict_greeting_test.cpp
   analysis/analyzer_strict_word_test.cpp
   analysis/analyzer_strict_particle_test.cpp
@@ -73,6 +70,9 @@ set(TEST_SOURCES
   integration/regression_copula_test.cpp
   integration/regression_particle_test.cpp
   integration/regression_misc_test.cpp
+  integration/regression_adjective_test.cpp
+  integration/regression_verb_test.cpp
+  integration/regression_compound_test.cpp
   integration/suru_imperative_test.cpp
 )
 

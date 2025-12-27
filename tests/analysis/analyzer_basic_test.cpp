@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Basic analyzer functionality tests
 
 #include "analysis/analyzer.h"

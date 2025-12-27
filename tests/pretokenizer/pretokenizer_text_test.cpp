@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Pretokenizer tests for text patterns (sentence boundary, hashtag, mention,
 // complex cases, edge cases)
 

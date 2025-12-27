@@ -1,0 +1,432 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "i_adj_kanashii",
+      "description": "悲しい should be recognized as Adjective",
+      "input": "悲しい",
+      "expected": [
+        {"surface": "悲しい", "pos": "Adjective", "lemma": "悲しい"}
+      ],
+      "tags": ["regression", "i_adjective"]
+    },
+    {
+      "id": "i_adj_utsukushikatta",
+      "description": "美しかった should be Adjective with lemma 美しい",
+      "input": "美しかった",
+      "expected": [
+        {"surface": "美しかった", "pos": "Adjective", "lemma": "美しい"}
+      ],
+      "tags": ["regression", "i_adjective", "past"]
+    },
+    {
+      "id": "adj_particle_omoshiroina",
+      "description": "面白いな should split as 面白い + な",
+      "input": "面白いな",
+      "expected": [
+        {"surface": "面白い", "pos": "Adjective", "lemma": "面白い"},
+        {"surface": "な", "pos": "Particle"}
+      ],
+      "tags": ["regression", "i_adjective", "particle"]
+    },
+    {
+      "id": "irregular_adj_ii",
+      "description": "いいよね - irregular adjective いい + sentence-ending particles",
+      "input": "いいよね",
+      "expected": [
+        {"surface": "いい", "pos": "Adjective"},
+        {"surface": "よ", "pos": "Particle"},
+        {"surface": "ね", "pos": "Particle"}
+      ],
+      "tags": ["regression", "i_adjective", "irregular"]
+    },
+    {
+      "id": "single_kanji_samui",
+      "description": "今日は寒いですね - single-kanji i-adjective 寒い",
+      "input": "今日は寒いですね",
+      "expected": [
+        {"surface": "今日", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "寒い", "pos": "Adjective", "lemma": "寒い"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "ね", "pos": "Particle"}
+      ],
+      "tags": ["regression", "i_adjective"]
+    },
+    {
+      "id": "na_adj_suki",
+      "description": "好き should be single Adjective token",
+      "input": "好き",
+      "expected": [
+        {"surface": "好き", "pos": "Adjective"}
+      ],
+      "tags": ["regression", "na_adjective"]
+    },
+    {
+      "id": "na_adj_suki_na",
+      "description": "好きな食べ物 - na-adjective attributive form",
+      "input": "好きな食べ物",
+      "expected": [
+        {"surface": "好き", "pos": "Adjective"},
+        {"surface": "な", "pos": "Particle"},
+        {"surface": "食べ物", "pos": "Noun"}
+      ],
+      "tags": ["regression", "na_adjective"]
+    },
+    {
+      "id": "na_adj_kirai",
+      "description": "嫌い should be single Adjective token",
+      "input": "嫌い",
+      "expected": [
+        {"surface": "嫌い", "pos": "Adjective"}
+      ],
+      "tags": ["regression", "na_adjective"]
+    },
+    {
+      "id": "te_ku_not_adj_matte",
+      "description": "待ってくれない should be 待って + くれない, not adjective",
+      "input": "待ってくれない",
+      "expected": [
+        {"surface": "待って", "pos": "Verb", "lemma": "待つ"},
+        {"surface": "くれない", "pos": "Verb", "lemma": "くれる"}
+      ],
+      "tags": ["regression", "te_form", "benefactive"]
+    },
+    {
+      "id": "te_morau_separate",
+      "description": "食べてもらわない - benefactive te-form should split",
+      "input": "食べてもらわない",
+      "expected": [
+        {"surface": "食べて", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "もらわない", "pos": "Verb", "lemma": "もらう"}
+      ],
+      "tags": ["regression", "te_form", "benefactive"]
+    },
+    {
+      "id": "te_inai_unified",
+      "description": "食べていない - progressive negative should be single token",
+      "input": "食べていない",
+      "expected": [
+        {"surface": "食べていない", "pos": "Verb", "lemma": "食べる"}
+      ],
+      "tags": ["regression", "te_form", "progressive"]
+    },
+    {
+      "id": "te_shimawanai_unified",
+      "description": "忘れてしまわない - aspectual te-form should be single token",
+      "input": "忘れてしまわない",
+      "expected": [
+        {"surface": "忘れてしまわない", "pos": "Verb", "lemma": "忘れる"}
+      ],
+      "tags": ["regression", "te_form", "aspectual"]
+    },
+    {
+      "id": "te_ikanai_unified",
+      "description": "走っていかない - aspectual te-form should be single token",
+      "input": "走っていかない",
+      "expected": [
+        {"surface": "走っていかない", "pos": "Verb", "lemma": "走る"}
+      ],
+      "tags": ["regression", "te_form", "aspectual"]
+    },
+    {
+      "id": "te_ageru_unified",
+      "description": "見てあげる - benefactive positive should be single token",
+      "input": "見てあげる",
+      "expected": [
+        {"surface": "見てあげる", "pos": "Verb", "lemma": "見る"}
+      ],
+      "tags": ["regression", "te_form", "benefactive"]
+    },
+    {
+      "id": "godan_te_agenai_split",
+      "description": "書いてあげない - godan benefactive negative should split",
+      "input": "書いてあげない",
+      "expected": [
+        {"surface": "書いて", "pos": "Verb", "lemma": "書く"},
+        {"surface": "あげない", "pos": "Verb", "lemma": "あげる"}
+      ],
+      "tags": ["regression", "te_form", "benefactive"]
+    },
+    {
+      "id": "hiragana_adj_mazukatta",
+      "description": "まずかった - hiragana adjective conjugation",
+      "input": "まずかった",
+      "expected": [
+        {"surface": "まずかった", "pos": "Adjective", "lemma": "まずい"}
+      ],
+      "tags": ["regression", "i_adjective", "hiragana"]
+    },
+    {
+      "id": "hiragana_adj_oishikunai",
+      "description": "おいしくない - hiragana adjective negative",
+      "input": "おいしくない",
+      "expected": [
+        {"surface": "おいしくない", "pos": "Adjective", "lemma": "おいしい"}
+      ],
+      "tags": ["regression", "i_adjective", "hiragana"]
+    },
+    {
+      "id": "na_adj_saiwai_desu",
+      "description": "幸いです - na-adjective + copula",
+      "input": "幸いです",
+      "expected": [
+        {"surface": "幸い", "pos": "Adjective"},
+        {"surface": "です", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "na_adjective", "copula"]
+    },
+    {
+      "id": "na_adj_business_email",
+      "description": "ご返信いただけますと幸いです - business email pattern",
+      "input": "ご返信いただけますと幸いです",
+      "expected": [
+        {"surface": "ご返信", "pos": "Noun"},
+        {"surface": "いただけます", "pos": "Verb", "lemma": "いただく"},
+        {"surface": "と", "pos": "Particle"},
+        {"surface": "幸い", "pos": "Adjective"},
+        {"surface": "です", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "na_adjective", "business"]
+    },
+    {
+      "id": "i_adj_sou_oishisou",
+      "description": "美味しそう - i-adjective + そう pattern",
+      "input": "美味しそう",
+      "expected": [
+        {"surface": "美味しそう", "pos": "Adjective", "lemma": "美味しい"}
+      ],
+      "tags": ["regression", "i_adjective", "sou"]
+    },
+    {
+      "id": "i_adj_sou_kanashisou",
+      "description": "悲しそう - i-adjective + そう pattern",
+      "input": "悲しそう",
+      "expected": [
+        {"surface": "悲しそう", "pos": "Adjective", "lemma": "悲しい"}
+      ],
+      "tags": ["regression", "i_adjective", "sou"]
+    },
+    {
+      "id": "i_adj_sou_in_sentence",
+      "description": "美味しそうに食べている - adjective sou in sentence",
+      "input": "美味しそうに食べている",
+      "expected": [
+        {"surface": "美味しそう", "pos": "Adjective", "lemma": "美味しい"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "食べている", "pos": "Verb", "lemma": "食べる"}
+      ],
+      "tags": ["regression", "i_adjective", "sou"]
+    },
+    {
+      "id": "suru_verb_sou_chikoku",
+      "description": "遅刻しそう - suru noun + しそう verb",
+      "input": "遅刻しそう",
+      "expected": [
+        {"surface": "遅刻", "pos": "Noun"},
+        {"surface": "しそう", "pos": "Verb", "lemma": "する"}
+      ],
+      "tags": ["regression", "suru", "sou"]
+    },
+    {
+      "id": "shi_sou_hanashisou_verb",
+      "description": "話しそう - verb renyokei + そう, not adjective",
+      "input": "話しそう",
+      "expected": [
+        {"surface": "話し", "pos": "Verb", "lemma": "話す"},
+        {"surface": "そう", "pos": "Adverb"}
+      ],
+      "tags": ["regression", "verb", "sou"]
+    },
+    {
+      "id": "shi_sou_muzukashisou_adj",
+      "description": "難しそう - true adjective ending in しい + そう",
+      "input": "難しそう",
+      "expected": [
+        {"surface": "難しそう", "pos": "Adjective", "lemma": "難しい"}
+      ],
+      "tags": ["regression", "i_adjective", "sou"]
+    },
+    {
+      "id": "shi_sou_tanoshisou_adj",
+      "description": "楽しそう - true adjective ending in しい + そう",
+      "input": "楽しそう",
+      "expected": [
+        {"surface": "楽しそう", "pos": "Adjective", "lemma": "楽しい"}
+      ],
+      "tags": ["regression", "i_adjective", "sou"]
+    },
+    {
+      "id": "shi_sou_tameshisou_verb",
+      "description": "試しそう - verb renyokei + そう, not adjective",
+      "input": "試しそう",
+      "expected": [
+        {"surface": "試し", "pos": "Verb", "lemma": "試す"},
+        {"surface": "そう", "pos": "Adverb"}
+      ],
+      "tags": ["regression", "verb", "sou"]
+    },
+    {
+      "id": "shi_sou_ureshisou_adj",
+      "description": "嬉しそう - true adjective ending in しい + そう",
+      "input": "嬉しそう",
+      "expected": [
+        {"surface": "嬉しそう", "pos": "Adjective", "lemma": "嬉しい"}
+      ],
+      "tags": ["regression", "i_adjective", "sou"]
+    },
+    {
+      "id": "tetsudatte_agenai_split",
+      "description": "手伝ってあげない - te-form + benefactive negative should split",
+      "input": "手伝ってあげない",
+      "expected": [
+        {"surface": "手伝って", "pos": "Verb", "lemma": "手伝う"},
+        {"surface": "あげない", "pos": "Verb", "lemma": "あげる"}
+      ],
+      "tags": ["regression", "te_form", "benefactive", "lemma"]
+    },
+    {
+      "id": "tetsudatte_lemma",
+      "description": "手伝って should have lemma 手伝う (GodanWa)",
+      "input": "手伝って",
+      "expected": [
+        {"surface": "手伝って", "pos": "Verb", "lemma": "手伝う"}
+      ],
+      "tags": ["regression", "te_form", "lemma"]
+    },
+    {
+      "id": "tai_pattern_hashiridashi",
+      "description": "走り出したくなってきた - たい pattern follows verb renyokei",
+      "input": "走り出したくなってきた",
+      "expected": [
+        {"surface": "走り出し", "pos": "Verb", "lemma": "走り出す"},
+        {"surface": "たくなってきた", "pos": "Adjective", "lemma": "たい"}
+      ],
+      "tags": ["regression", "tai", "pattern"]
+    },
+    {
+      "id": "tokoro_formal_noun",
+      "description": "勉強させられていたところだった - ところ formal noun",
+      "input": "勉強させられていたところだった",
+      "expected": [
+        {"surface": "勉強させられていた", "pos": "Verb", "lemma": "勉強する"},
+        {"surface": "ところ", "pos": "Noun"},
+        {"surface": "だった", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "formal_noun"]
+    },
+    {
+      "id": "adj_ku_naru_tai",
+      "description": "美しくなりたかった - ADJ連用形 + なる + たい pattern",
+      "input": "美しくなりたかった",
+      "expected": [
+        {"surface": "美しく", "pos": "Adjective", "lemma": "美しい"},
+        {"surface": "なり", "pos": "Verb", "lemma": "なる"},
+        {"surface": "たかった", "pos": "Adjective", "lemma": "たい"}
+      ],
+      "tags": ["regression", "i_adjective", "naru", "tai"]
+    },
+    {
+      "id": "nari_takatta_not_particle",
+      "description": "なりたかった - should be なり + たかった, not な + りたかった",
+      "input": "なりたかった",
+      "expected": [
+        {"surface": "なり", "pos": "Verb", "lemma": "なる"},
+        {"surface": "たかった", "pos": "Adjective", "lemma": "たい"}
+      ],
+      "tags": ["regression", "verb", "tai"]
+    },
+    {
+      "id": "verb_nai_conditional_hashiranakereba",
+      "description": "走らなければならない - verb+ない conditional, not adjective",
+      "input": "走らなければならない",
+      "expected": [
+        {"surface": "走らなければ", "pos": "Verb", "lemma": "走る"},
+        {"surface": "ならない", "pos": "Verb", "lemma": "なる"}
+      ],
+      "tags": ["regression", "verb", "conditional"]
+    },
+    {
+      "id": "true_adj_nai_sukunai",
+      "description": "少ない is a true adjective, not verb+ない",
+      "input": "少ない",
+      "expected": [
+        {"surface": "少ない", "pos": "Adjective", "lemma": "少ない"}
+      ],
+      "tags": ["regression", "i_adjective", "nai"]
+    },
+    {
+      "id": "true_adj_nai_abunai",
+      "description": "危ない is a true adjective, not verb+ない",
+      "input": "危ない",
+      "expected": [
+        {"surface": "危ない", "pos": "Adjective", "lemma": "危ない"}
+      ],
+      "tags": ["regression", "i_adjective", "nai"]
+    },
+    {
+      "id": "verb_not_adj_tabesugite",
+      "description": "食べすぎてしまいそう - verb, not adjective",
+      "input": "食べすぎてしまいそう",
+      "expected": [
+        {"surface": "食べすぎて", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "しまいそう", "pos": "Verb", "lemma": "しまう"}
+      ],
+      "tags": ["regression", "verb", "te_form"]
+    },
+    {
+      "id": "verb_neg_cond_minakereba",
+      "description": "見なければ - verb negative conditional",
+      "input": "見なければ",
+      "expected": [
+        {"surface": "見なければ", "pos": "Verb", "lemma": "見る"}
+      ],
+      "tags": ["regression", "verb", "conditional"]
+    },
+    {
+      "id": "verb_neg_cond_konakereba",
+      "description": "来なければ - kuru verb negative conditional",
+      "input": "来なければ",
+      "expected": [
+        {"surface": "来なければ", "pos": "Verb", "lemma": "来る"}
+      ],
+      "tags": ["regression", "verb", "conditional", "irregular"]
+    },
+    {
+      "id": "compound_adj_yomiyasui",
+      "description": "読みやすい - compound adjective (verb renyokei + やすい)",
+      "input": "読みやすい",
+      "expected": [
+        {"surface": "読みやすい", "pos": "Adjective", "lemma": "読みやすい"}
+      ],
+      "tags": ["regression", "compound_adjective"]
+    },
+    {
+      "id": "compound_adj_tsukainikui",
+      "description": "使いにくい - compound adjective (verb renyokei + にくい)",
+      "input": "使いにくい",
+      "expected": [
+        {"surface": "使いにくい", "pos": "Adjective", "lemma": "使いにくい"}
+      ],
+      "tags": ["regression", "compound_adjective"]
+    },
+    {
+      "id": "two_kanji_adj_omoshiroi",
+      "description": "面白い - 2-kanji adjective",
+      "input": "面白い",
+      "expected": [
+        {"surface": "面白い", "pos": "Adjective", "lemma": "面白い"}
+      ],
+      "tags": ["regression", "i_adjective"]
+    },
+    {
+      "id": "two_kanji_adj_kawaii",
+      "description": "可愛い - 2-kanji adjective",
+      "input": "可愛い",
+      "expected": [
+        {"surface": "可愛い", "pos": "Adjective", "lemma": "可愛い"}
+      ],
+      "tags": ["regression", "i_adjective"]
+    }
+  ]
+}

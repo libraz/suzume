@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Strict analyzer tests: Greetings, Honorific prefixes, Business phrases, Keigo
 
 #include "analysis/analyzer.h"

@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // News/Media use case analyzer tests (news, weather, sports, academic)
 
 #include "analysis/analyzer.h"

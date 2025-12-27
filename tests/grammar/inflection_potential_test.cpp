@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Inflection tests: Potential forms, Potential negative/past,
 // Potential + naru, Potential form ambiguity
 

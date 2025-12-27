@@ -1,0 +1,302 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "script_boundary_ascii_to_verb",
+      "description": "iphone買った - ASCII to Japanese verb boundary",
+      "input": "iphone買った",
+      "expected": [
+        {"surface": "iphone買", "pos": "Noun"},
+        {"surface": "った", "pos": "Verb"}
+      ],
+      "tags": ["regression", "script_boundary"]
+    },
+    {
+      "id": "script_boundary_particleless",
+      "description": "本買った - noun verb without particle",
+      "input": "本買った",
+      "expected": [
+        {"surface": "本", "pos": "Noun"},
+        {"surface": "買った", "pos": "Verb", "lemma": "買う"}
+      ],
+      "tags": ["regression", "script_boundary"]
+    },
+    {
+      "id": "script_boundary_te_form",
+      "description": "買ってきた - compound verb with te-form",
+      "input": "買ってきた",
+      "expected": [
+        {"surface": "買ってきた", "pos": "Verb", "lemma": "買う"}
+      ],
+      "tags": ["regression", "compound_verb", "te_form"]
+    },
+    {
+      "id": "prefix_compound_noun",
+      "description": "お買い物 - prefix + compound noun",
+      "input": "お買い物",
+      "expected": [
+        {"surface": "お買い物", "pos": "Noun"}
+      ],
+      "tags": ["regression", "prefix", "compound_noun"]
+    },
+    {
+      "id": "compound_noun_nomikai",
+      "description": "飲み会 - compound noun",
+      "input": "飲み会",
+      "expected": [
+        {"surface": "飲み会", "pos": "Noun"}
+      ],
+      "tags": ["regression", "compound_noun"]
+    },
+    {
+      "id": "compound_split_mainichi_densha",
+      "description": "毎日電車 - should split into two nouns",
+      "input": "毎日電車",
+      "expected": [
+        {"surface": "毎日", "pos": "Noun"},
+        {"surface": "電車", "pos": "Noun"}
+      ],
+      "tags": ["regression", "compound_split"]
+    },
+    {
+      "id": "compound_split_with_particle",
+      "description": "毎日電車で通勤 - compound nouns with particle",
+      "input": "毎日電車で通勤",
+      "expected": [
+        {"surface": "毎日", "pos": "Noun"},
+        {"surface": "電車", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "通勤", "pos": "Noun"}
+      ],
+      "tags": ["regression", "compound_split"]
+    },
+    {
+      "id": "compound_noun_tabemono",
+      "description": "食べ物 - compound noun",
+      "input": "食べ物",
+      "expected": [
+        {"surface": "食べ物", "pos": "Noun"}
+      ],
+      "tags": ["regression", "compound_noun"]
+    },
+    {
+      "id": "compound_noun_nomimono",
+      "description": "飲み物 - compound noun",
+      "input": "飲み物",
+      "expected": [
+        {"surface": "飲み物", "pos": "Noun"}
+      ],
+      "tags": ["regression", "compound_noun"]
+    },
+    {
+      "id": "compound_noun_kaimono",
+      "description": "買い物 - compound noun",
+      "input": "買い物",
+      "expected": [
+        {"surface": "買い物", "pos": "Noun"}
+      ],
+      "tags": ["regression", "compound_noun"]
+    },
+    {
+      "id": "compound_noun_kaimono_ni_iku",
+      "description": "買い物に行く - compound noun + particle + verb",
+      "input": "買い物に行く",
+      "expected": [
+        {"surface": "買い物", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "行く", "pos": "Verb"}
+      ],
+      "tags": ["regression", "compound_noun"]
+    },
+    {
+      "id": "noun_tanoshimi",
+      "description": "楽しみ - noun (not split)",
+      "input": "楽しみ",
+      "expected": [
+        {"surface": "楽しみ", "pos": "Noun"}
+      ],
+      "tags": ["regression", "noun"]
+    },
+    {
+      "id": "nominalized_noun_tedasuke",
+      "description": "手助けをする - nominalized noun",
+      "input": "手助けをする",
+      "expected": [
+        {"surface": "手助け", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "する", "pos": "Verb"}
+      ],
+      "tags": ["regression", "nominalized_noun"]
+    },
+    {
+      "id": "nominalized_noun_kiri",
+      "description": "みじん切りにする - nominalized noun 切り",
+      "input": "みじん切りにする",
+      "expected": [
+        {"surface": "みじん", "pos": "Other"},
+        {"surface": "切り", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "する", "pos": "Verb"}
+      ],
+      "tags": ["regression", "nominalized_noun"]
+    },
+    {
+      "id": "noun_plus_tachi",
+      "description": "学生たち - noun + suffix",
+      "input": "学生たち",
+      "expected": [
+        {"surface": "学生", "pos": "Noun"},
+        {"surface": "たち", "pos": "Other"}
+      ],
+      "tags": ["regression", "suffix"]
+    },
+    {
+      "id": "noun_plus_san",
+      "description": "田中さん - noun + honorific suffix",
+      "input": "田中さん",
+      "expected": [
+        {"surface": "田中", "pos": "Noun"},
+        {"surface": "さん", "pos": "Other"}
+      ],
+      "tags": ["regression", "suffix"]
+    },
+    {
+      "id": "kodomo_tachi",
+      "description": "子供たちが遊ぶ - noun + suffix in sentence",
+      "input": "子供たちが遊ぶ",
+      "expected": [
+        {"surface": "子供", "pos": "Noun"},
+        {"surface": "たち", "pos": "Other"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "遊ぶ", "pos": "Verb"}
+      ],
+      "tags": ["regression", "suffix"]
+    },
+    {
+      "id": "compound_verb_yomi_owattara",
+      "description": "読み終わったら - compound verb pattern",
+      "input": "読み終わったら",
+      "expected": [
+        {"surface": "読み", "pos": "Verb", "lemma": "読む"},
+        {"surface": "終わったら", "pos": "Verb", "lemma": "終わる"}
+      ],
+      "tags": ["regression", "compound_verb"]
+    },
+    {
+      "id": "compound_verb_yomi_tsuzukeru",
+      "description": "読み続ける - compound verb",
+      "input": "読み続ける",
+      "expected": [
+        {"surface": "読み続ける", "pos": "Verb", "lemma": "読む"}
+      ],
+      "tags": ["regression", "compound_verb"]
+    },
+    {
+      "id": "compound_verb_aruki_nagara",
+      "description": "歩きながら話す - nagara form godan",
+      "input": "歩きながら話す",
+      "expected": [
+        {"surface": "歩きながら", "pos": "Verb", "lemma": "歩く"},
+        {"surface": "話す", "pos": "Verb"}
+      ],
+      "tags": ["regression", "compound_verb", "nagara"]
+    },
+    {
+      "id": "compound_verb_tabe_nagara",
+      "description": "食べながら歩く - nagara form ichidan",
+      "input": "食べながら歩く",
+      "expected": [
+        {"surface": "食べながら", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "歩く", "pos": "Verb"}
+      ],
+      "tags": ["regression", "compound_verb", "nagara"]
+    },
+    {
+      "id": "viterbi_renyokei_sou",
+      "description": "降りそう - verb + sou unified",
+      "input": "降りそう",
+      "expected": [
+        {"surface": "降りそう", "pos": "Verb", "lemma": "降る"}
+      ],
+      "tags": ["regression", "viterbi", "sou"]
+    },
+    {
+      "id": "viterbi_te_form_not_split",
+      "description": "走っている - te-form not split",
+      "input": "走っている",
+      "expected": [
+        {"surface": "走っている", "pos": "Verb", "lemma": "走る"}
+      ],
+      "tags": ["regression", "viterbi", "te_form"]
+    },
+    {
+      "id": "viterbi_multi_morpheme_preference",
+      "description": "いつも来る - prefer longer token",
+      "input": "いつも来る",
+      "expected": [
+        {"surface": "いつも", "pos": "Adverb"},
+        {"surface": "来る", "pos": "Verb"}
+      ],
+      "tags": ["regression", "viterbi"]
+    },
+    {
+      "id": "compound_verb_hiragana_v2_dasu",
+      "description": "走りだしたくなかった - hiragana subsidiary verb",
+      "input": "走りだしたくなかった",
+      "expected": [
+        {"surface": "走りだし", "pos": "Verb", "lemma": "走り出す"},
+        {"surface": "たくなかった", "pos": "Adjective", "lemma": "たい"}
+      ],
+      "tags": ["regression", "compound_verb", "hiragana_v2"]
+    },
+    {
+      "id": "compound_verb_hiragana_v2_komu",
+      "description": "飛びこみたい - hiragana subsidiary verb",
+      "input": "飛びこみたい",
+      "expected": [
+        {"surface": "飛びこみ", "pos": "Verb", "lemma": "飛び込む"},
+        {"surface": "たい", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "compound_verb", "hiragana_v2"]
+    },
+    {
+      "id": "compound_verb_hiragana_v2_sugiru",
+      "description": "読みすぎた - hiragana subsidiary verb",
+      "input": "読みすぎた",
+      "expected": [
+        {"surface": "読みすぎ", "pos": "Verb", "lemma": "読み過ぎる"},
+        {"surface": "た", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "compound_verb", "hiragana_v2"]
+    },
+    {
+      "id": "compound_verb_kanji_v2_dasu",
+      "description": "走り出したくなかった - kanji subsidiary verb",
+      "input": "走り出したくなかった",
+      "expected": [
+        {"surface": "走り出し", "pos": "Verb", "lemma": "走り出す"},
+        {"surface": "たくなかった", "pos": "Adjective", "lemma": "たい"}
+      ],
+      "tags": ["regression", "compound_verb", "kanji_v2"]
+    },
+    {
+      "id": "hiragana_compound_verb_yari_naosu",
+      "description": "やりなおしたい - all-hiragana compound verb",
+      "input": "やりなおしたい",
+      "expected": [
+        {"surface": "やりなおし", "pos": "Verb", "lemma": "やり直す"},
+        {"surface": "たい", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "compound_verb", "hiragana"]
+    },
+    {
+      "id": "hiragana_compound_verb_wakari_au",
+      "description": "わかりあう - all-hiragana compound verb",
+      "input": "わかりあう",
+      "expected": [
+        {"surface": "わかりあう", "pos": "Verb", "lemma": "わかり合う"}
+      ],
+      "tags": ["regression", "compound_verb", "hiragana"]
+    }
+  ]
+}

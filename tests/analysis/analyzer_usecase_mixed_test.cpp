@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Mixed script and edge case analyzer tests
 // Based on design_v2_practical.md and edge_cases.md
 

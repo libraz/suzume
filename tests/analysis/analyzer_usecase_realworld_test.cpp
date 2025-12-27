@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Real-world use case tests based on design.md and edge_cases.md
 // Tests practical Japanese text patterns: mixed scripts, pretokenizer patterns,
 // compound nouns, prefixes/suffixes, and complex expressions.

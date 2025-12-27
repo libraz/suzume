@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Grammar tests for na-adjectives (〜的 pattern, L1 hardcoded na-adjectives)
 
 #include "analysis/analyzer.h"

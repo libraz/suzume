@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Auxiliary generator compatibility tests
 // Ensures new generator produces all patterns from old hardcoded implementation
 

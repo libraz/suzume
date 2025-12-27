@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Strict analyzer tests: Mixed script, Contractions, Symbols, Complex
 // expressions, Real world sentences
 

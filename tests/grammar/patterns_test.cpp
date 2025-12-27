@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Pattern detection tests: verb negative patterns
 //
 // Tests for grammar/patterns.h functions that detect verb forms

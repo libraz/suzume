@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Business use case analyzer tests (emails, documents, finance, legal, etc.)
 // Based on design_v2_practical.md and edge_cases.md
 

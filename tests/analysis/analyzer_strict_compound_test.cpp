@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Strict analyzer tests: Compound verbs, Compound nouns
 
 #include "analysis/analyzer.h"

@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Inflection tests: Compound verb patterns (temiru, teshimau, temorau, etc.),
 // Triple/Quadruple compounds, Passive/Causative + compound
 

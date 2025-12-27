@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Conversation use case analyzer tests (daily life, schedule, shopping, etc.)
 
 #include "analysis/analyzer.h"

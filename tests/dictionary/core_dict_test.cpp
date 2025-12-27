@@ -1,6 +1,4 @@
-// Copyright 2024 Libraz Team
-// SPDX-License-Identifier: MIT
-//
+
 // Tests for CoreDictionary verb conjugation expansion
 
 #include "dictionary/core_dict.h"
