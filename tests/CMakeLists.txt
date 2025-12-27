@@ -70,6 +70,7 @@ set(TEST_SOURCES
   analysis/analyzer_strict_expression_test.cpp
   analysis/analyzer_strict_compound_test.cpp
   analysis/analyzer_prefix_test.cpp
+  analysis/connection_rules_test.cpp
   output/japanese_format_test.cpp
   integration/data_driven_sample_test.cpp
 )
