@@ -93,6 +93,16 @@ constexpr float kPenaltyTeFormSplit = 1.5F;
 // This prevents splitting たくて into たく + て
 constexpr float kPenaltyTakuTeSplit = 2.0F;
 
+// VERB renyokei + たくて (ADJ) split
+// E.g., 飲み + たくて should be 飲みたくて (single token)
+// This prevents splitting at the boundary before たくて
+constexpr float kPenaltyTakuteAfterRenyokei = 1.5F;
+
+// AUX + たい adjective pattern
+// E.g., なり(AUX, だ) + たかった is unnatural
+// Should be なり(VERB, なる) + たかった
+constexpr float kPenaltyTaiAfterAux = 1.0F;
+
 }  // namespace suzume::analysis::scorer
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONSTANTS_H_

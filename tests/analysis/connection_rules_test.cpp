@@ -176,14 +176,35 @@ TEST_F(ConnectionRuleTest, TeFormSplit_GodanOnbin) {
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyTeFormSplit);
 }
 
-TEST_F(ConnectionRuleTest, TaiAfterRenyokei_Bonus) {
-  // Verb renyokei + たく (adjective with lemma たい) should get bonus
+TEST_F(ConnectionRuleTest, TaiAfterRenyokei_ShortForm_NoBonus) {
+  // Short たい forms (たくない, たくて, etc.) should NOT get bonus
+  // They should be unified with the verb as single token by inflection analyzer
   auto prev = makeEdge("読み", core::PartOfSpeech::Verb);
   auto next = makeEdge("たくない", core::PartOfSpeech::Adjective, "たい");
 
   auto result = evaluateConnectionRules(prev, next);
+  EXPECT_EQ(result.pattern, ConnectionPattern::None);
+  EXPECT_FLOAT_EQ(result.adjustment, 0.0F);
+}
+
+TEST_F(ConnectionRuleTest, TaiAfterRenyokei_LongForm_Bonus) {
+  // Long たい forms (たくなってきた, etc.) should get bonus
+  auto prev = makeEdge("走り出し", core::PartOfSpeech::Verb);
+  auto next = makeEdge("たくなってきた", core::PartOfSpeech::Adjective, "たい");
+
+  auto result = evaluateConnectionRules(prev, next);
   EXPECT_EQ(result.pattern, ConnectionPattern::TaiAfterRenyokei);
   EXPECT_FLOAT_EQ(result.adjustment, -scorer::kBonusTaiAfterRenyokei);
+}
+
+TEST_F(ConnectionRuleTest, TaiAfterAux_Penalty) {
+  // AUX + たい pattern (e.g., なり(だ) + たかった) should get penalty
+  auto prev = makeEdge("なり", core::PartOfSpeech::Auxiliary, "だ");
+  auto next = makeEdge("たかった", core::PartOfSpeech::Adjective, "たい");
+
+  auto result = evaluateConnectionRules(prev, next);
+  EXPECT_EQ(result.pattern, ConnectionPattern::TaiAfterRenyokei);
+  EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyTaiAfterAux);
 }
 
 TEST_F(ConnectionRuleTest, YasuiAfterRenyokei_Penalty) {

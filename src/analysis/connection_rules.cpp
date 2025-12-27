@@ -168,23 +168,42 @@ ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
           "te-form split pattern"};
 }
 
-// Rule 4: Verb renyokei + たい adjective (bonus)
+// Rule 4: Verb renyokei + たい adjective handling
+// Two cases:
+// 1. Short forms (たくて, たくない, etc.): No bonus - should be unified as single token
+// 2. Long forms (たくなってきた, etc.): Give bonus for proper connection
+// Also penalizes AUX + たい patterns (e.g., なり(だ) + たかった)
 ConnectionRuleResult checkTaiAfterRenyokei(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb ||
-      next.pos != core::PartOfSpeech::Adjective) {
+  if (next.pos != core::PartOfSpeech::Adjective || next.lemma != "たい") {
     return {};
   }
 
-  if (next.lemma != "たい" || next.surface.size() < 6) {
+  // Penalize AUX + たい pattern (e.g., なり(だ) + たかった)
+  if (prev.pos == core::PartOfSpeech::Auxiliary) {
+    return {ConnectionPattern::TaiAfterRenyokei, scorer::kPenaltyTaiAfterAux,
+            "tai-pattern after auxiliary (unnatural)"};
+  }
+
+  // Only process VERB + たい
+  if (prev.pos != core::PartOfSpeech::Verb) {
     return {};
   }
 
+  // Short たい forms (たくて, たくない, たかった, たければ, etc.)
+  // These are <= 12 bytes (4 hiragana chars) and should be unified with verb
+  // Don't give bonus - let inflection analyzer handle as single token
+  if (next.surface.size() <= 12) {
+    return {};
+  }
+
+  // Long たい forms (たくなってきた, たくてたまらない, etc.)
+  // These are complex compound patterns that benefit from bonus
   if (!endsWithRenyokeiMarker(prev.surface)) {
     return {};
   }
 
-  // Bonus (negative value)
+  // Bonus (negative value) for long compound patterns
   return {ConnectionPattern::TaiAfterRenyokei, -scorer::kBonusTaiAfterRenyokei,
           "tai-pattern after verb renyokei"};
 }
@@ -326,11 +345,37 @@ ConnectionRuleResult checkCompoundAuxAfterRenyokei(
           "compound aux after renyokei-like noun"};
 }
 
-// Rule 11: Verb たく + て split penalty
+// Rule 11: VERB renyokei + たくて (ADJ) split penalty
+// Prevents 飲み + たくて from being preferred over 飲みたくて
+ConnectionRuleResult checkTakuteAfterRenyokei(const core::LatticeEdge& prev,
+                                              const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Adjective) {
+    return {};
+  }
+
+  // Check if next is たくて form (ADJ with lemma たい)
+  if (next.lemma != "たい" || next.surface != "たくて") {
+    return {};
+  }
+
+  // Check if prev ends with renyokei marker
+  if (!endsWithRenyokeiMarker(prev.surface)) {
+    return {};
+  }
+
+  return {ConnectionPattern::TakuteAfterRenyokei,
+          scorer::kPenaltyTakuteAfterRenyokei,
+          "takute adj after renyokei verb"};
+}
+
+// Rule 12: Verb/Adjective たく + て split penalty
 // Prevents 食べたく + て from being preferred over 食べたくて
+// Also handles ADJ case: 見たく (ADJ) + て should be 見たくて
 ConnectionRuleResult checkTakuTeSplit(const core::LatticeEdge& prev,
                                       const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb ||
+  if ((prev.pos != core::PartOfSpeech::Verb &&
+       prev.pos != core::PartOfSpeech::Adjective) ||
       next.pos != core::PartOfSpeech::Particle) {
     return {};
   }
@@ -413,6 +458,11 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
   }
 
   result = checkCompoundAuxAfterRenyokei(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkTakuteAfterRenyokei(prev, next);
   if (result.pattern != ConnectionPattern::None) {
     return result;
   }
