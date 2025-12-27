@@ -9,6 +9,7 @@ add_library(suzume_grammar STATIC
   connection.cpp
   inflection.cpp
   inflection_scorer.cpp
+  patterns.cpp
   verb_endings.cpp
 )
 

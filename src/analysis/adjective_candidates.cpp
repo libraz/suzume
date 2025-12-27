@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+#include "grammar/patterns.h"
 #include "suffix_candidates.h"
 #include "unknown.h"
 
@@ -117,36 +118,14 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // Skip patterns ending with verb passive/potential/causative negative renyokei
     // 〜られなく, 〜れなく, 〜させなく, 〜せなく, 〜されなく are all verb forms,
     // not i-adjectives. E.g., 食べられなく = 食べられる + ない (negative renyokei)
-    if (hiragana_part.size() >= 12 &&  // られなく = 12 bytes
-        hiragana_part.substr(hiragana_part.size() - 12) == "られなく") {
-      continue;  // Skip - passive/potential negative renyokei
-    }
-    if (hiragana_part.size() >= 9 &&  // れなく = 9 bytes
-        hiragana_part.substr(hiragana_part.size() - 9) == "れなく") {
-      continue;  // Skip - passive/potential negative renyokei
-    }
-    if (hiragana_part.size() >= 12 &&  // させなく = 12 bytes
-        hiragana_part.substr(hiragana_part.size() - 12) == "させなく") {
-      continue;  // Skip - causative negative renyokei
-    }
-    if (hiragana_part.size() >= 9 &&  // せなく = 9 bytes
-        hiragana_part.substr(hiragana_part.size() - 9) == "せなく") {
-      continue;  // Skip - causative negative renyokei
-    }
-    if (hiragana_part.size() >= 12 &&  // されなく = 12 bytes
-        hiragana_part.substr(hiragana_part.size() - 12) == "されなく") {
-      continue;  // Skip - passive negative renyokei
+    if (grammar::endsWithPassiveCausativeNegativeRenyokei(hiragana_part)) {
+      continue;  // Skip - passive/potential/causative negative renyokei
     }
 
     // Skip patterns ending with 〜れなくなった (passive negative + become + past)
     // E.g., 読まれなくなった = 読む + れる + なくなる + た
-    if (hiragana_part.size() >= 21 &&  // れなくなった = 21 bytes
-        hiragana_part.substr(hiragana_part.size() - 21) == "れなくなった") {
-      continue;  // Skip - passive negative + become pattern
-    }
-    if (hiragana_part.size() >= 24 &&  // られなくなった = 24 bytes
-        hiragana_part.substr(hiragana_part.size() - 24) == "られなくなった") {
-      continue;  // Skip - passive/potential negative + become pattern
+    if (grammar::endsWithNegativeBecomePattern(hiragana_part)) {
+      continue;  // Skip - passive/causative negative + become pattern
     }
 
     // Skip patterns ending with 〜なく when followed by なった/なる
@@ -169,15 +148,8 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         hiragana_part == "べさせら" || hiragana_part == "べさせられ") {
       continue;  // Skip - ichidan causative stem patterns
     }
-    // Skip patterns ending with causative-passive 〜させられなくなった
-    if (hiragana_part.size() >= 30 &&  // させられなくなった = 30 bytes
-        hiragana_part.substr(hiragana_part.size() - 30) == "させられなくなった") {
-      continue;  // Skip - causative-passive negative + become pattern
-    }
-    if (hiragana_part.size() >= 27 &&  // せられなくなった = 27 bytes
-        hiragana_part.substr(hiragana_part.size() - 27) == "せられなくなった") {
-      continue;  // Skip - causative-passive negative + become pattern
-    }
+    // Note: causative-passive 〜させられなくなった patterns are already covered
+    // by endsWithNegativeBecomePattern above
 
     // Skip Godan verb renyokei + そう patterns (飲みそう, 降りそうだ, etc.)
     // These are verb + そう auxiliary patterns, not i-adjectives.
@@ -242,20 +214,10 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     }
 
     // Skip patterns that are clearly verb negatives, not adjectives
-    // 〜かない, 〜がない, 〜さない, 〜たない, 〜ばない, 〜まない, 〜らない, 〜わない
-    // are Godan verb mizenkei + ない patterns (書かない, 急がない, 話さない, etc.)
-    // 〜しない is Suru verb + ない (説明しない, 勉強しない, etc.)
-    // 〜べない is Ichidan verb + ない (食べない, etc.)
-    if (hiragana_part.size() >= 9) {  // かない = 9 bytes
-      std::string_view last9 = std::string_view(hiragana_part).substr(hiragana_part.size() - 9);
-      if (last9 == "かない" || last9 == "がない" || last9 == "さない" ||
-          last9 == "たない" || last9 == "ばない" || last9 == "まない" ||
-          last9 == "らない" || last9 == "わない" || last9 == "なない" ||
-          last9 == "しない" || last9 == "べない" || last9 == "めない" ||
-          last9 == "せない" || last9 == "てない" || last9 == "ねない" ||
-          last9 == "けない" || last9 == "げない" || last9 == "れない") {
-        continue;  // Skip - verb negative pattern, not adjective
-      }
+    // 〜かない, 〜がない, etc. are Godan verb mizenkei + ない patterns
+    // 〜しない is Suru verb + ない, 〜べない is Ichidan verb + ない
+    if (grammar::endsWithVerbNegative(hiragana_part)) {
+      continue;  // Skip - verb negative pattern, not adjective
     }
 
     // Check all candidates for IAdjective, not just the best one
@@ -418,33 +380,14 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     }
 
     // Skip patterns ending with verb passive/potential/causative negative renyokei
-    // 〜られなく, 〜れなく, 〜させなく, 〜せなく are all verb forms, not i-adjectives.
-    // E.g., けられなく = ける + られ + ない (verb passive negative renyokei)
-    // Also skip 〜かけられなく, 〜けられなく which are clearly verb patterns
-    if (surface.size() >= 12 &&  // られなく = 12 bytes
-        surface.substr(surface.size() - 12) == "られなく") {
-      continue;  // Skip - passive/potential negative renyokei
-    }
-    if (surface.size() >= 9 &&  // れなく = 9 bytes
-        surface.substr(surface.size() - 9) == "れなく") {
-      continue;  // Skip - passive/potential negative renyokei
-    }
-    if (surface.size() >= 12 &&  // させなく = 12 bytes
-        surface.substr(surface.size() - 12) == "させなく") {
-      continue;  // Skip - causative negative renyokei
-    }
-    if (surface.size() >= 9 &&  // せなく = 9 bytes
-        surface.substr(surface.size() - 9) == "せなく") {
-      continue;  // Skip - causative negative renyokei
-    }
-    if (surface.size() >= 12 &&  // されなく = 12 bytes
-        surface.substr(surface.size() - 12) == "されなく") {
-      continue;  // Skip - passive negative renyokei
+    // 〜られなく, 〜れなく, 〜させなく, 〜せなく, 〜されなく are all verb forms,
+    // not i-adjectives. E.g., けられなく = ける + られ + ない
+    if (grammar::endsWithPassiveCausativeNegativeRenyokei(surface)) {
+      continue;  // Skip - passive/potential/causative negative renyokei
     }
     // Skip patterns ending with 〜かなく (verb negative renyokei of godan verbs)
-    // E.g., いかなく = いく + ない, かかなく = かく + ない
-    if (surface.size() >= 9 &&  // かなく = 9 bytes
-        surface.substr(surface.size() - 9) == "かなく") {
+    // E.g., いかなく = いく + ない
+    if (grammar::endsWithGodanNegativeRenyokei(surface)) {
       continue;  // Skip - godan negative renyokei
     }
 

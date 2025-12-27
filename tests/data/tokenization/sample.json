@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "basic_noun",
+      "input": "世界",
+      "expected": [
+        {"surface": "世界", "pos": "Noun"}
+      ],
+      "tags": ["basic", "noun"]
+    },
+    {
+      "id": "basic_verb_masu",
+      "input": "食べます",
+      "expected": [
+        {"surface": "食べます", "pos": "Verb", "lemma": "食べる"}
+      ],
+      "tags": ["basic", "verb", "polite"]
+    },
+    {
+      "id": "noun_particle",
+      "input": "本を",
+      "expected": [
+        {"surface": "本", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"}
+      ],
+      "tags": ["basic", "particle"]
+    },
+    {
+      "id": "copula_da",
+      "input": "学生だ",
+      "expected": [
+        {"surface": "学生", "pos": "Noun"},
+        {"surface": "だ", "pos": "Auxiliary"}
+      ],
+      "tags": ["basic", "copula"]
+    },
+    {
+      "id": "adjective_basic",
+      "input": "美しい",
+      "expected": [
+        {"surface": "美しい", "pos": "Adjective", "lemma": "美しい"}
+      ],
+      "tags": ["basic", "adjective"]
+    }
+  ]
+}

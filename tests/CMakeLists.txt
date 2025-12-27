@@ -20,6 +20,7 @@ include(GoogleTest)
 # Common test utilities
 set(TEST_COMMON_SOURCES
   common/test_helpers.cpp
+  common/test_case.cpp
 )
 
 # Test source files
@@ -38,6 +39,7 @@ set(TEST_SOURCES
   grammar/inflection_complex_test.cpp
   grammar/inflection_imperative_test.cpp
   grammar/auxiliary_generator_test.cpp
+  grammar/patterns_test.cpp
   pretokenizer/pretokenizer_url_test.cpp
   pretokenizer/pretokenizer_number_test.cpp
   pretokenizer/pretokenizer_text_test.cpp
@@ -69,6 +71,7 @@ set(TEST_SOURCES
   analysis/analyzer_strict_compound_test.cpp
   analysis/analyzer_prefix_test.cpp
   output/japanese_format_test.cpp
+  integration/data_driven_sample_test.cpp
 )
 
 # Create test executable
