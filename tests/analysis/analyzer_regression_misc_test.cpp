@@ -510,17 +510,13 @@ TEST(AnalyzerTest, EdgeCase_VerbSouDesu) {
 // =============================================================================
 
 TEST(AnalyzerTest, EdgeCase_Suffix_Watashitachi) {
-  // 私たち should be recognized as pronoun (compound) or noun + suffix
+  // 私たち → 1トークン (PRON)
+  // 設計方針: 代名詞+複数接尾辞は単一トークンとして解析
   Suzume analyzer;
   auto result = analyzer.analyze("私たち");
-  ASSERT_GE(result.size(), 1);
-  // Either single PRON token or PRON + OTHER(suffix)
-  if (result.size() == 1) {
-    EXPECT_EQ(result[0].pos, core::PartOfSpeech::Pronoun);
-  } else {
-    EXPECT_EQ(result[1].surface, "たち");
-    EXPECT_EQ(result[1].pos, core::PartOfSpeech::Other);
-  }
+  ASSERT_EQ(result.size(), 1);
+  EXPECT_EQ(result[0].surface, "私たち");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Pronoun);
 }
 
 TEST(AnalyzerTest, EdgeCase_Suffix_SenseiSan) {

@@ -40,6 +40,52 @@ std::string_view charTypeToString(CharType type);
  */
 bool canCombine(CharType first_type, CharType second_type);
 
+/**
+ * @brief Check if character is a common particle (助詞)
+ *
+ * Common particles that never form verb stems: を, が, は, に, へ, の
+ * These appear in multiple contexts and warrant a shared predicate.
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is a common particle
+ */
+bool isCommonParticle(char32_t ch);
+
+/**
+ * @brief Check if character cannot be verb stem after kanji
+ *
+ * In patterns like 漢字+ひらがな, these characters indicate a particle
+ * follows the noun rather than a verb conjugation.
+ * Includes common particles + も, や
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is never a verb stem after kanji
+ */
+bool isNeverVerbStemAfterKanji(char32_t ch);
+
+/**
+ * @brief Check if character cannot be verb stem at start of hiragana word
+ *
+ * These characters cannot begin hiragana verb stems.
+ * Includes common particles + ね, よ, わ (sentence-final particles)
+ *
+ * @param ch Unicode codepoint
+ * @return true if character cannot start a hiragana verb stem
+ */
+bool isNeverVerbStemAtStart(char32_t ch);
+
+/**
+ * @brief Check if pair starts a demonstrative pronoun
+ *
+ * Checks for patterns: こ/そ/あ/ど + れ/こ/ち
+ * These are demonstrative pronouns like これ, それ, あれ, どれ, etc.
+ *
+ * @param first First character
+ * @param second Second character
+ * @return true if pair starts a demonstrative pronoun
+ */
+bool isDemonstrativeStart(char32_t first, char32_t second);
+
 }  // namespace suzume::normalize
 
 #endif  // SUZUME_NORMALIZE_CHAR_TYPE_H_

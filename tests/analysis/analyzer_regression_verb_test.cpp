@@ -437,33 +437,15 @@ TEST(AnalyzerTest, Regression_TeIru_Kiteimasen) {
 }
 
 TEST(AnalyzerTest, Regression_TeIru_Kiteimasu) {
+  // て形複合動詞: 来ています → 1トークン (来る)
+  // 設計方針: て形 + いる/ある/しまう等は単一トークンとして解析
   Suzume analyzer;
   auto result = analyzer.analyze("来ています");
-  ASSERT_GE(result.size(), 1);
+  ASSERT_EQ(result.size(), 1);
 
-  // Accept either:
-  // 1. Single token: 来ています → 来る (progressive as single unit)
-  // 2. Split tokens: 来て + います → 来る + いる
-  // Both are valid morphological analyses
-
-  bool found_kiteimasu = false;  // Single token
-  bool found_kite = false;       // Split: first part
-  bool found_imasu = false;      // Split: second part
-  for (const auto& mor : result) {
-    if (mor.surface == "来ています" && mor.pos == core::PartOfSpeech::Verb &&
-        mor.lemma == "来る") {
-      found_kiteimasu = true;
-    }
-    if (mor.surface == "来て" && mor.pos == core::PartOfSpeech::Verb) {
-      found_kite = true;
-    }
-    if (mor.surface == "います" && mor.pos == core::PartOfSpeech::Verb) {
-      found_imasu = true;
-    }
-  }
-
-  bool is_valid = found_kiteimasu || (found_kite && found_imasu);
-  EXPECT_TRUE(is_valid) << "来ています should be parsed as verb(s) with lemma 来る";
+  EXPECT_EQ(result[0].surface, "来ています");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "来る");
 }
 
 // =============================================================================

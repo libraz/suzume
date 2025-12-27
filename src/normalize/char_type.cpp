@@ -112,4 +112,31 @@ bool canCombine(CharType first_type, CharType second_type) {
   return false;
 }
 
+bool isCommonParticle(char32_t ch) {
+  // Common particles: を, が, は, に, へ, の
+  return ch == U'を' || ch == U'が' || ch == U'は' ||
+         ch == U'に' || ch == U'へ' || ch == U'の';
+}
+
+bool isNeverVerbStemAfterKanji(char32_t ch) {
+  // Common particles + も, や
+  // These follow nouns as particles, not as verb conjugation starts
+  // Note: か is excluded - can be part of verb conjugation (書かない, 動かす)
+  return isCommonParticle(ch) || ch == U'も' || ch == U'や';
+}
+
+bool isNeverVerbStemAtStart(char32_t ch) {
+  // Common particles + ね, よ, わ (sentence-final particles)
+  // Note: も, や are excluded - can start verbs (もらう, やる)
+  return isCommonParticle(ch) || ch == U'ね' || ch == U'よ' || ch == U'わ';
+}
+
+bool isDemonstrativeStart(char32_t first, char32_t second) {
+  // Check for こ/そ/あ/ど + れ/こ/ち patterns (demonstrative pronouns)
+  // Examples: これ, それ, あれ, どれ, ここ, そこ, あそこ, どこ, etc.
+  return (first == U'こ' || first == U'そ' ||
+          first == U'あ' || first == U'ど') &&
+         (second == U'れ' || second == U'こ' || second == U'ち');
+}
+
 }  // namespace suzume::normalize

@@ -1,5 +1,6 @@
 #include "analysis/scorer.h"
 
+#include "analysis/scorer_constants.h"
 #include "core/debug.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
@@ -178,13 +179,13 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     std::string_view surface = edge.surface;
     if (surface.size() >= 6 &&
         surface.substr(surface.size() - 6) == "そう") {
-      cost += 1.0F;  // Penalty to prefer verb + そう split
+      cost += scorer::kPenaltyVerbSou;
     }
     // Also penalize verbs ending with そうです (verb + そう + です)
     // E.g., 食べそうです should split as 食べそう + です
     if (surface.size() >= 12 &&
         surface.substr(surface.size() - 12) == "そうです") {
-      cost += 1.5F;  // Stronger penalty to prefer verb+そう + です split
+      cost += scorer::kPenaltyVerbSouDesu;
     }
   }
 
@@ -205,7 +206,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
         valid_adj_lemma = true;
       }
       if (!valid_adj_lemma) {
-        cost += 1.5F;  // Penalty for invalid adjective + そう pattern
+        cost += scorer::kPenaltyInvalidAdjSou;
       }
     }
   }
@@ -239,7 +240,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
              ch == U'出' || ch == U'寝' || ch == U'得' || ch == U'経' ||
              ch == U'着' || ch == U'居');
         if (!valid_single_stem) {
-          cost += 2.0F;  // Strong penalty for invalid たい pattern
+          cost += scorer::kPenaltyInvalidTaiPattern;
         }
       }
     }
@@ -258,7 +259,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
         surface.find("でしま") != std::string_view::npos ||
         surface.find("ている") != std::string_view::npos ||
         surface.find("でいる") != std::string_view::npos) {
-      cost += 2.0F;  // Strong penalty
+      cost += scorer::kPenaltyVerbAuxInAdj;
     }
   }
 
@@ -267,7 +268,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary()) {
     if (edge.surface == "しまい" || edge.surface == "じまい") {
-      cost += 3.0F;  // Strong penalty - this is しまう renyokei, not adjective
+      cost += scorer::kPenaltyShimaiAsAdj;
     }
   }
 
@@ -325,7 +326,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
         is_sou_pattern = true;
       }
       if (!is_sou_pattern) {
-        penalty += 3.0F;  // Strong penalty for invalid grammar
+        penalty += scorer::kPenaltyCopulaAfterVerb;
         penalty_reason = "copula after verb";
       }
     }
@@ -357,7 +358,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
           last3 == "ね" || last3 == "れ" || last3 == "え" ||
           last3 == "で" || last3 == "ぜ" || last3 == "へ" ||
           last3 == "ぺ") {
-        penalty += 1.5F;  // Prefer te-form over renyokei + て/てV
+        penalty += scorer::kPenaltyIchidanRenyokeiTe;
         penalty_reason = "ichidan renyokei + te pattern";
       }
     }
@@ -416,7 +417,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
           last3 == "べ" || last3 == "め" || last3 == "せ" ||
           last3 == "け" || last3 == "げ" || last3 == "て" ||
           last3 == "ね" || last3 == "れ" || last3 == "え") {
-        penalty -= 0.8F;  // Bonus: reduce connection cost for たい after renyokei
+        penalty -= scorer::kBonusTaiAfterRenyokei;
         penalty_reason = "tai-pattern after verb renyokei";
       }
     }
@@ -435,7 +436,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       if (last3 == "み" || last3 == "き" || last3 == "ぎ" ||
           last3 == "し" || last3 == "ち" || last3 == "び" ||
           last3 == "り" || last3 == "い" || last3 == "に") {
-        penalty += 2.0F;  // Strong penalty - prefer verb + やすい auxiliary
+        penalty += scorer::kPenaltyYasuiAfterRenyokei;
         penalty_reason = "yasui adj after renyokei-like noun";
       }
     }
@@ -457,7 +458,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
           last3 == "べ" || last3 == "め" || last3 == "せ" ||
           last3 == "け" || last3 == "げ" || last3 == "て" ||
           last3 == "ね" || last3 == "れ" || last3 == "え") {
-        penalty += 1.0F;  // Penalty - prefer single ながら token
+        penalty += scorer::kPenaltyNagaraSplit;
         penalty_reason = "nagara split after renyokei verb";
       }
     }
@@ -479,7 +480,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
           last3 == "べ" || last3 == "め" || last3 == "せ" ||
           last3 == "け" || last3 == "げ" || last3 == "て" ||
           last3 == "ね" || last3 == "れ" || last3 == "え") {
-        penalty += 0.5F;  // Penalty - prefer verb renyokei + そう auxiliary
+        penalty += scorer::kPenaltySouAfterRenyokei;
         penalty_reason = "sou aux after renyokei-like noun";
       }
     }
@@ -495,7 +496,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
          next.surface == "わ" || next.surface == "のだ" ||
          next.surface == "よ" || next.surface == "ね" ||
          next.surface == "ぞ" || next.surface == "さ")) {
-      penalty += 1.0F;  // Penalty to prefer single token character speech
+      penalty += scorer::kPenaltyCharacterSpeechSplit;
       penalty_reason = "split character speech pattern";
     }
   }
@@ -514,7 +515,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
         if (next.lemma == "なる" ||
             (next.surface.size() >= 6 &&
              next.surface.substr(0, 6) == "なり")) {
-          penalty -= 0.5F;  // Bonus: reduce connection cost for ADJく + なる
+          penalty -= scorer::kBonusAdjKuNaru;
           penalty_reason = "adj-ku + naru pattern";
         }
       }
@@ -550,7 +551,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
             last3 == "べ" || last3 == "め" || last3 == "せ" ||
             last3 == "け" || last3 == "げ" || last3 == "て" ||
             last3 == "ね" || last3 == "れ" || last3 == "え") {
-          penalty += 0.5F;  // Penalty to let verb renyokei + auxiliary win
+          penalty += scorer::kPenaltyCompoundAuxAfterRenyokei;
           penalty_reason = "compound aux after renyokei-like noun";
         }
       }

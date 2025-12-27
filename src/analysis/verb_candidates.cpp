@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "grammar/conjugation.h"
+#include "normalize/char_type.h"
 #include "suffix_candidates.h"
 #include "unknown.h"
 
@@ -172,17 +173,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   // E.g., "領収書を" - を is a particle, not part of a verb
   // Note about が and に:
   // - が can be part of verbs: 上がる, 下がる, 受かる, etc.
-  // - に can be part of verbs: 煮る (niru), etc.
-  // However, these verbs should be in the dictionary, not generated as unknown.
-  // Including が/に here prevents false positives like 金がない→金ぐ, 家にいます→家にう
-  // Note about か:
-  // - か can be part of verbs: 書かない (negative), 動かす, etc.
-  // - These are valid conjugation patterns that should be generated
+  // Check if the hiragana after kanji is a particle (not a verb conjugation)
+  // e.g., 金がない → 金 + が + ない, not 金ぐ
+  // Note about か: excluded - can be part of verb conjugation (書かない, 動かす)
   char32_t first_hiragana = codepoints[kanji_end];
-  if (first_hiragana == U'を' || first_hiragana == U'が' ||
-      first_hiragana == U'は' || first_hiragana == U'も' ||
-      first_hiragana == U'へ' || first_hiragana == U'の' ||
-      first_hiragana == U'に' || first_hiragana == U'や') {
+  if (normalize::isNeverVerbStemAfterKanji(first_hiragana)) {
     return candidates;  // Not a verb - these particles follow nouns
   }
 
@@ -353,15 +348,10 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
   }
 
   // Skip if starting character is a particle that is NEVER a verb stem
-  // Note: Exclude characters that CAN be verb stems:
-  //   - な→なる/なくす
-  //   - て→できる
-  //   - や→やる (important: must NOT skip や)
-  //   - か→かける/かえる/かう/かく (important: must NOT skip か)
+  // Note: Characters that CAN be verb stems are NOT skipped:
+  //   - な→なる/なくす, て→できる, や→やる, か→かける/かえる
   char32_t first_char = codepoints[start_pos];
-  if (first_char == U'を' || first_char == U'が' || first_char == U'は' ||
-      first_char == U'に' || first_char == U'へ' || first_char == U'の' ||
-      first_char == U'ね' || first_char == U'よ' || first_char == U'わ') {
+  if (normalize::isNeverVerbStemAtStart(first_char)) {
     return candidates;
   }
 
@@ -369,10 +359,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
   // These are commonly mistaken for verbs (これる, それる, etc.)
   if (start_pos + 1 < codepoints.size()) {
     char32_t second_char = codepoints[start_pos + 1];
-    // Check for こ/そ/あ/ど + れ/こ/ち patterns (demonstrative pronouns)
-    if ((first_char == U'こ' || first_char == U'そ' ||
-         first_char == U'あ' || first_char == U'ど') &&
-        (second_char == U'れ' || second_char == U'こ' || second_char == U'ち')) {
+    if (normalize::isDemonstrativeStart(first_char, second_char)) {
       return candidates;
     }
 

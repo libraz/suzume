@@ -13,6 +13,7 @@
 #include <algorithm>
 
 #include "adjective_candidates.h"
+#include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "suffix_candidates.h"
 #include "verb_candidates.h"
@@ -217,16 +218,11 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
 
   // For hiragana starting with single-character particles that are NEVER verb stems,
   // don't generate unknown candidates. These should be recognized by dictionary lookup.
-  // Note: Exclude characters that CAN be verb stems:
-  //   - な→なる/なくす
-  //   - て→できる
-  //   - や→やる (important: must NOT skip や)
-  //   - か→かける/かえる/かう/かく (important: must NOT skip か)
+  // Note: Characters that CAN be verb stems are NOT skipped:
+  //   - な→なる/なくす, て→できる, や→やる, か→かける/かえる
   if (start_type == normalize::CharType::Hiragana) {
     char32_t first_char = codepoints[start_pos];
-    if (first_char == U'を' || first_char == U'が' || first_char == U'は' ||
-        first_char == U'に' || first_char == U'へ' || first_char == U'の' ||
-        first_char == U'ね' || first_char == U'よ' || first_char == U'わ') {
+    if (normalize::isNeverVerbStemAtStart(first_char)) {
       return candidates;  // Let dictionary handle these
     }
 
@@ -234,10 +230,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
     // These should be recognized by dictionary lookup, not generated as unknown words.
     if (start_pos + 1 < codepoints.size()) {
       char32_t second_char = codepoints[start_pos + 1];
-      // Check for こ/そ/あ/ど + れ/こ/ち patterns (demonstrative pronouns)
-      if ((first_char == U'こ' || first_char == U'そ' ||
-           first_char == U'あ' || first_char == U'ど') &&
-          (second_char == U'れ' || second_char == U'こ' || second_char == U'ち')) {
+      if (normalize::isDemonstrativeStart(first_char, second_char)) {
         return candidates;
       }
     }
@@ -253,11 +246,11 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
     // swallowing particles into unknown words (e.g., don't create "ぎをみじん")
     if (start_type == normalize::CharType::Hiragana) {
       char32_t curr_char = codepoints[end_pos];
+      // Common particles + で, と, も, か (additional word boundaries)
       // Note: Don't include「や」as it's also the stem of「やる」verb
-      if (curr_char == U'を' || curr_char == U'が' || curr_char == U'は' ||
-          curr_char == U'に' || curr_char == U'へ' || curr_char == U'の' ||
-          curr_char == U'で' || curr_char == U'と' || curr_char == U'も' ||
-          curr_char == U'か') {
+      if (normalize::isCommonParticle(curr_char) ||
+          curr_char == U'で' || curr_char == U'と' ||
+          curr_char == U'も' || curr_char == U'か') {
         break;  // Stop before the particle
       }
     }

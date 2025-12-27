@@ -64,15 +64,12 @@ inline std::vector<DictionaryEntry> getLowInfoEntries() {
       {"願う", POS::Verb, 0.5F, "願う", false, false, false, CT::GodanWa, ""},
 
       // Low information verbs (低情報量動詞)
-      {"する", POS::Verb, 2.0F, "する", false, false, true, CT::Suru, ""},
+      // Note: する, なる, できる, もらう are in hiragana_verbs.h with lower cost
       {"ある", POS::Verb, 2.0F, "ある", false, false, true, CT::GodanRa, ""},
       {"いる", POS::Verb, 2.0F, "いる", false, false, true, CT::Ichidan, ""},
-      {"なる", POS::Verb, 2.0F, "なる", false, false, true, CT::GodanRa, ""},
-      {"できる", POS::Verb, 2.0F, "できる", false, false, true, CT::Ichidan, ""},
       {"おる", POS::Verb, 2.0F, "おる", false, false, true, CT::GodanRa, ""},
       {"くる", POS::Verb, 2.0F, "くる", false, false, true, CT::Kuru, ""},
       {"いく", POS::Verb, 2.0F, "いく", false, false, true, CT::GodanKa, ""},
-      {"もらう", POS::Verb, 2.0F, "もらう", false, false, true, CT::GodanWa, ""},
       {"くれる", POS::Verb, 2.0F, "くれる", false, false, true, CT::Ichidan, ""},
       {"あげる", POS::Verb, 2.0F, "あげる", false, false, true, CT::Ichidan, ""},
       // やる is now in hiragana_verbs.h with lower cost for compound verb support
@@ -115,10 +112,9 @@ inline std::vector<DictionaryEntry> getLowInfoEntries() {
       {"勝つ", POS::Verb, 1.0F, "勝つ", false, false, false, CT::GodanTa, ""},
       {"育つ", POS::Verb, 1.0F, "育つ", false, false, false, CT::GodanTa, ""},
 
-      // Irregular adjective いい (良い)
-      {"いい", POS::Adjective, 0.3F, "いい", false, false, false, CT::IAdjective, ""},
+      // Irregular adjective よい (良い) conjugations
+      // Note: いい and 良い are in i_adjectives.h
       {"よい", POS::Adjective, 0.3F, "よい", false, false, false, CT::IAdjective, ""},
-      {"良い", POS::Adjective, 0.3F, "よい", false, false, false, CT::IAdjective, "よい"},
       {"よく", POS::Adverb, 0.5F, "よい", false, false, false, CT::IAdjective, ""},
       {"よくない", POS::Adjective, 0.5F, "よい", false, false, false, CT::IAdjective, ""},
       {"よくて", POS::Adjective, 0.5F, "よい", false, false, false, CT::IAdjective, ""},
