@@ -526,4 +526,98 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
   return candidates;
 }
 
+std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const grammar::Inflection& inflection) {
+  std::vector<UnknownCandidate> candidates;
+
+  // Only process katakana-starting positions
+  if (start_pos >= char_types.size() ||
+      char_types[start_pos] != normalize::CharType::Katakana) {
+    return candidates;
+  }
+
+  // Find katakana portion (1-8 characters for slang verb stems)
+  size_t kata_end = start_pos;
+  while (kata_end < char_types.size() &&
+         kata_end - start_pos < 8 &&
+         char_types[kata_end] == normalize::CharType::Katakana) {
+    ++kata_end;
+  }
+
+  // Need at least 1 katakana character
+  if (kata_end == start_pos) {
+    return candidates;
+  }
+
+  // Must be followed by hiragana (conjugation endings)
+  if (kata_end >= char_types.size() ||
+      char_types[kata_end] != normalize::CharType::Hiragana) {
+    return candidates;
+  }
+
+  // Check if first hiragana could be a verb ending
+  // Common verb endings start with: る, っ, ん, ら, り, れ, ろ, さ, し, せ, た, て, etc.
+  char32_t first_hira = codepoints[kata_end];
+  // Skip if it's clearly a particle (を, が, は, に, へ, の, で, と, も, や)
+  if (first_hira == U'を' || first_hira == U'が' || first_hira == U'は' ||
+      first_hira == U'に' || first_hira == U'へ' || first_hira == U'の' ||
+      first_hira == U'で' || first_hira == U'と' || first_hira == U'も' ||
+      first_hira == U'や') {
+    return candidates;
+  }
+
+  // Find hiragana portion (conjugation endings, up to 10 chars)
+  size_t hira_end = kata_end;
+  while (hira_end < char_types.size() &&
+         hira_end - kata_end < 10 &&
+         char_types[hira_end] == normalize::CharType::Hiragana) {
+    ++hira_end;
+  }
+
+  // Need at least 1 hiragana for conjugation
+  if (hira_end <= kata_end) {
+    return candidates;
+  }
+
+  // Try different ending lengths, starting from longest
+  for (size_t end_pos = hira_end; end_pos > kata_end; --end_pos) {
+    std::string surface = extractSubstring(codepoints, start_pos, end_pos);
+
+    if (surface.empty()) {
+      continue;
+    }
+
+    // Check if this looks like a conjugated verb using inflection analyzer
+    auto best = inflection.getBest(surface);
+
+    // Only accept verb types (not IAdjective) and require reasonable confidence
+    if (best.confidence > 0.5F &&
+        best.verb_type != grammar::VerbType::IAdjective) {
+      UnknownCandidate candidate;
+      candidate.surface = surface;
+      candidate.start = start_pos;
+      candidate.end = end_pos;
+      candidate.pos = core::PartOfSpeech::Verb;
+      // Lower cost than pure katakana noun to prefer verb reading
+      // Cost: 0.4-0.55 based on confidence (lower = better)
+      candidate.cost = 0.4F + (1.0F - best.confidence) * 0.3F;
+      candidate.has_suffix = false;
+      candidate.lemma = best.base_form;  // Set lemma from inflection analysis
+      candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
+      candidates.push_back(candidate);
+    }
+  }
+
+  // Sort by cost
+  std::sort(candidates.begin(), candidates.end(),
+            [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
+              return lhs.cost < rhs.cost;
+            });
+
+  return candidates;
+}
+
 }  // namespace suzume::analysis

@@ -481,4 +481,98 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
   return candidates;
 }
 
+std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const grammar::Inflection& inflection) {
+  std::vector<UnknownCandidate> candidates;
+
+  // Only process katakana-starting positions
+  if (start_pos >= char_types.size() ||
+      char_types[start_pos] != normalize::CharType::Katakana) {
+    return candidates;
+  }
+
+  // Find katakana portion (1-6 characters for slang adjective stems)
+  // e.g., エモ, キモ, ウザ, ダサ, etc.
+  size_t kata_end = start_pos;
+  while (kata_end < char_types.size() &&
+         kata_end - start_pos < 6 &&
+         char_types[kata_end] == normalize::CharType::Katakana) {
+    ++kata_end;
+  }
+
+  // Need at least 1 katakana character
+  if (kata_end == start_pos) {
+    return candidates;
+  }
+
+  // Must be followed by hiragana (i-adjective endings)
+  if (kata_end >= char_types.size() ||
+      char_types[kata_end] != normalize::CharType::Hiragana) {
+    return candidates;
+  }
+
+  // Check if first hiragana is a valid i-adjective ending start
+  // I-adjective endings: い, か(った), く(ない/て), け(れば), さ(そう), etc.
+  char32_t first_hira = codepoints[kata_end];
+  if (first_hira != U'い' && first_hira != U'か' &&
+      first_hira != U'く' && first_hira != U'け' &&
+      first_hira != U'さ') {
+    return candidates;
+  }
+
+  // Find hiragana portion (up to 8 chars for conjugation endings)
+  size_t hira_end = kata_end;
+  while (hira_end < char_types.size() &&
+         hira_end - kata_end < 8 &&
+         char_types[hira_end] == normalize::CharType::Hiragana) {
+    ++hira_end;
+  }
+
+  // Need at least 1 hiragana for the い ending
+  if (hira_end <= kata_end) {
+    return candidates;
+  }
+
+  // Try different ending lengths, starting from longest
+  for (size_t end_pos = hira_end; end_pos > kata_end; --end_pos) {
+    std::string surface = extractSubstring(codepoints, start_pos, end_pos);
+
+    if (surface.empty()) {
+      continue;
+    }
+
+    // Check all candidates for IAdjective
+    auto all_candidates = inflection.analyze(surface);
+    for (const auto& cand : all_candidates) {
+      // Require confidence >= 0.5 for i-adjectives
+      if (cand.confidence >= 0.5F &&
+          cand.verb_type == grammar::VerbType::IAdjective) {
+        UnknownCandidate candidate;
+        candidate.surface = surface;
+        candidate.start = start_pos;
+        candidate.end = end_pos;
+        candidate.pos = core::PartOfSpeech::Adjective;
+        // Lower cost than pure katakana noun to prefer adjective reading
+        // Cost: 0.2-0.35 based on confidence (lower = better)
+        candidate.cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
+        candidate.has_suffix = false;
+        candidate.lemma = cand.base_form;
+        candidates.push_back(candidate);
+        break;  // Only add one adjective candidate per surface
+      }
+    }
+  }
+
+  // Sort by cost
+  std::sort(candidates.begin(), candidates.end(),
+            [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
+              return lhs.cost < rhs.cost;
+            });
+
+  return candidates;
+}
+
 }  // namespace suzume::analysis

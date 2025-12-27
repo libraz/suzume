@@ -187,6 +187,29 @@ float calculateConfidence(VerbType type, std::string_view stem,
     base -= 0.25F;  // Strong penalty for single-kanji I-adjective stems
   }
 
+  // I-adjective stems containing verb+auxiliary patterns are not real adjectives
+  // E.g., 食べすぎてしま (from 食べすぎてしまい) is verb+auxiliary, not adjective
+  // Pattern: stem contains てしま/でしま (te-form + shimau) → verb compound
+  // Pattern: stem contains ている/でいる (te-form + iru) → verb compound
+  // Pattern: stem contains てお/でお (te-form + oku) → verb compound
+  if (type == VerbType::IAdjective && stem_len >= 12) {
+    // Check for common auxiliary patterns in the stem
+    bool has_aux_pattern =
+        stem.find("てしま") != std::string_view::npos ||
+        stem.find("でしま") != std::string_view::npos ||
+        stem.find("ている") != std::string_view::npos ||
+        stem.find("でいる") != std::string_view::npos ||
+        stem.find("ておい") != std::string_view::npos ||
+        stem.find("でおい") != std::string_view::npos ||
+        stem.find("てき") != std::string_view::npos ||  // てくる pattern
+        stem.find("でき") != std::string_view::npos;
+    if (has_aux_pattern) {
+      base -= 0.45F;  // Strong penalty - this is verb+auxiliary, not adjective
+      // Note: This penalty may be clamped by the floor at return.
+      // Additional penalty is applied in scorer.cpp for lattice cost.
+    }
+  }
+
   // I-adjective stems ending with "し" are very common (難しい, 美しい, 楽しい, 苦しい)
   // When followed by すぎる/やすい/にくい auxiliaries, boost confidence
   // This helps disambiguate 難しすぎる (難しい + すぎる) vs 難す (Godan-Sa)
@@ -197,12 +220,37 @@ float calculateConfidence(VerbType type, std::string_view stem,
     }
   }
 
-  // I-adjective stems consisting only of 2+ kanji are extremely rare
+  // Boost for verb renyokei + やすい/にくい compound adjective patterns
+  // E.g., 読みやすい (easy to read), 使いにくい (hard to use)
+  // The stem will be verb_renyokei + やす/にく (e.g., 読みやす, 使いにく)
+  if (type == VerbType::IAdjective && stem_len >= 9) {
+    std::string_view last6 = stem.substr(stem_len - 6);
+    if (last6 == "やす" || last6 == "にく") {
+      // Check if the part before やす/にく ends with verb renyokei marker
+      std::string_view before = stem.substr(0, stem_len - 6);
+      if (!before.empty() && before.size() >= 3) {
+        std::string_view last3 = before.substr(before.size() - 3);
+        // i-row (godan renyokei) and e-row (ichidan renyokei)
+        if (last3 == "み" || last3 == "き" || last3 == "ぎ" ||
+            last3 == "し" || last3 == "ち" || last3 == "び" ||
+            last3 == "り" || last3 == "い" || last3 == "に" ||
+            last3 == "べ" || last3 == "め" || last3 == "せ" ||
+            last3 == "け" || last3 == "げ" || last3 == "て" ||
+            last3 == "ね" || last3 == "れ" || last3 == "え") {
+          base += 0.35F;  // Strong boost for compound adjective pattern
+        }
+      }
+    }
+  }
+
+  // I-adjective stems consisting only of 3+ kanji are extremely rare
   // Such stems are usually サ変名詞 (検討, 勉強, 準備) being misanalyzed
   // Real i-adjectives have patterns like: 美しい, 楽しい (kanji + hiragana)
   // This prevents "検討いたす" from being parsed as "検討い" + "たす"
-  if (type == VerbType::IAdjective && stem_len >= 6 && isAllKanji(stem)) {
-    base -= 0.40F;  // Strong penalty for all-kanji i-adjective stems
+  // Exception: 2-kanji stems (6 bytes) can be valid adjectives:
+  //   面白い (おもしろい), 可愛い (かわいい), 美味い (うまい)
+  if (type == VerbType::IAdjective && stem_len >= 9 && isAllKanji(stem)) {
+    base -= 0.40F;  // Strong penalty for 3+ kanji i-adjective stems
   }
 
   // I-adjective stems ending with e-row hiragana are extremely rare
@@ -264,12 +312,21 @@ float calculateConfidence(VerbType type, std::string_view stem,
         base -= 0.30F;  // Penalty for kanji + i-row pattern
       }
     }
-    // Short stems ending with な (しな, 来な) are likely verb negative patterns
-    // E.g., しなければ → しない (する negative) misanalyzed as adjective
-    //       来なければ → 来ない (来る negative) misanalyzed as adjective
-    // Real 2-char i-adjectives ending with な are extremely rare
+    // Single-kanji + な stems are usually verb negatives, not adjectives
+    // E.g., 見なければ → 見ない (verb negative), not adjective
+    //       来なければ → 来ない (verb negative), not adjective
+    // Exceptions: 少ない, 危ない are true adjectives (finite, small set)
+    // Also penalize hiragana + な (しな, こな = suru/kuru negative)
     if (last == "な") {
-      base -= 0.35F;  // Strong penalty for short な-ending stems
+      std::string_view first = stem.substr(0, 3);
+      if (!endsWithKanji(first)) {
+        // Hiragana + な (verb mizenkei like しな, こな)
+        base -= 0.35F;
+      } else if (first != "少" && first != "危") {
+        // Single kanji + な that's NOT a known adjective stem
+        // Most are verb negatives (見な, 出な, 来な, 寝な, etc.)
+        base -= 0.35F;
+      }
     }
   }
 
@@ -279,12 +336,17 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Exception: GodanSa has no phonetic change (音便) - し is the renyokei form
   // used in て-form context. Stems like いた (from いたす) or はな (from はなす)
   // can legitimately end with any hiragana, including a-row characters.
+  // Exception: GodanRa with わ-ending stems (終わる, 変わる, 代わる, etc.)
+  // These verbs have わ as part of the stem: 終わ + った = 終わった
   if (required_conn == conn::kVerbOnbinkei && stem_len >= 6 &&
       type != VerbType::GodanSa) {
     std::string_view last = stem.substr(stem_len - 3);
-    if (last == "か" || last == "が" || last == "さ" || last == "た" ||
-        last == "な" || last == "ば" || last == "ま" || last == "ら" ||
-        last == "わ") {
+    // Skip penalty for GodanRa with わ ending - legitimate pattern for 終わる etc.
+    bool is_godan_ra_wa = (type == VerbType::GodanRa && last == "わ");
+    if (!is_godan_ra_wa &&
+        (last == "か" || last == "が" || last == "さ" || last == "た" ||
+         last == "な" || last == "ば" || last == "ま" || last == "ら" ||
+         last == "わ")) {
       // Stems ending in a-row are suspicious for onbinkei context
       base -= 0.30F;
     }
@@ -321,7 +383,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Exception: っ-onbin verbs (GodanWa/Ra/Ta) are legitimate with 2-kanji stems
   //   - 手伝う → 手伝って (GodanWa) is valid, not サ変
   //   - But 検討 + いて could be サ変 (検討している) or GodanKa (検討く - wrong)
-  if (stem_len >= 6 && isAllKanji(stem) && type != VerbType::Suru) {
+  // Skip IAdjective - it has separate handling at line 246-254
+  if (stem_len >= 6 && isAllKanji(stem) && type != VerbType::Suru &&
+      type != VerbType::IAdjective) {
     // Skip penalty for っ-onbin verbs (GodanWa/Ra/Ta) in onbinkei context
     // These are legitimate Godan verbs, not サ変名詞 misanalyses
     bool is_tsu_onbin_type = (type == VerbType::GodanWa ||
@@ -432,7 +496,11 @@ float calculateConfidence(VerbType type, std::string_view stem,
     }
   }
 
-  return std::min(0.95F, std::max(0.5F, base));
+  // Floor confidence at 0.3 to allow heavy penalties to differentiate
+  // grammatically invalid patterns (e.g., e-row adjective stems like 食べい)
+  // from valid patterns. The 0.5 threshold in adjective_candidates.cpp
+  // will reject candidates below 0.5.
+  return std::min(0.95F, std::max(0.3F, base));
 }
 
 }  // namespace suzume::grammar

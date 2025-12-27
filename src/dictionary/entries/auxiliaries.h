@@ -60,8 +60,12 @@ inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"ました", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
       {"ません", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
 
-      // Negation (否定) - Base forms only
-      {"ない", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      // Negation (否定) - ない conjugations (i-adjective pattern)
+      // Use higher cost (1.0F) to not break compound verb forms like 説明しない
+      {"ない", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
+      {"なかった", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
+      {"なくて", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
+      {"なければ", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
       {"ぬ", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
 
       // Past/Completion (過去・完了)
@@ -79,8 +83,14 @@ inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"かもしれません", POS::Auxiliary, 0.3F, "かもしれない", false, false, false, CT::None, ""},
       {"かもしれなかった", POS::Auxiliary, 0.3F, "かもしれない", false, false, false, CT::None, ""},
 
-      // Desire (願望)
-      {"たい", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      // Desire (願望) - たい conjugations (i-adjective pattern)
+      // Base form is Auxiliary, conjugated forms are Adjective (i-adjective conjugation)
+      {"たい", POS::Auxiliary, 0.3F, "たい", false, false, false, CT::None, ""},
+      {"たかった", POS::Adjective, 0.3F, "たい", false, false, false, CT::IAdjective, ""},
+      {"たくない", POS::Adjective, 0.3F, "たい", false, false, false, CT::IAdjective, ""},
+      {"たくなかった", POS::Adjective, 0.3F, "たい", false, false, false, CT::IAdjective, ""},
+      {"たくて", POS::Adjective, 0.3F, "たい", false, false, false, CT::IAdjective, ""},
+      {"たければ", POS::Adjective, 0.3F, "たい", false, false, false, CT::IAdjective, ""},
       {"たがる", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
 
       // Potential/Passive/Causative (可能・受身・使役)

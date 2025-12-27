@@ -77,6 +77,25 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     const grammar::Inflection& inflection,
     const dictionary::DictionaryManager* dict_manager);
 
+/**
+ * @brief Generate katakana verb candidates (e.g., バズる, サボる, ググる)
+ *
+ * Detects patterns like Katakana + る/った/って/れる/らない etc.
+ * where the katakana stem is followed by hiragana conjugation endings.
+ * This handles slang/internet verbs that use katakana stems.
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param char_types Character types for each position
+ * @param inflection Inflection analyzer for conjugation detection
+ * @return Vector of candidates
+ */
+std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const grammar::Inflection& inflection);
+
 }  // namespace suzume::analysis
 
 #endif  // SUZUME_ANALYSIS_VERB_CANDIDATES_H_

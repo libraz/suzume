@@ -165,6 +165,19 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
                       hiragana_adjs.end());
   }
 
+  // Generate katakana verb/adjective candidates (slang: バズる, エモい, etc.)
+  if (char_types[start_pos] == normalize::CharType::Katakana) {
+    auto kata_verbs =
+        generateKatakanaVerbCandidates(codepoints, start_pos, char_types,
+                                       inflection_);
+    candidates.insert(candidates.end(), kata_verbs.begin(), kata_verbs.end());
+
+    auto kata_adjs =
+        generateKatakanaAdjectiveCandidates(codepoints, start_pos, char_types,
+                                            inflection_);
+    candidates.insert(candidates.end(), kata_adjs.begin(), kata_adjs.end());
+  }
+
   // Generate by same type
   auto same_type = generateBySameType(text, codepoints, start_pos, char_types);
   candidates.insert(candidates.end(), same_type.begin(), same_type.end());

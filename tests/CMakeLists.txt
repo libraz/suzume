@@ -46,6 +46,7 @@ set(TEST_SOURCES
   analysis/analyzer_usecase_technical_test.cpp
   analysis/analyzer_usecase_news_test.cpp
   analysis/analyzer_usecase_casual_test.cpp
+  analysis/analyzer_slang_test.cpp
   analysis/analyzer_usecase_mixed_test.cpp
   analysis/analyzer_usecase_realworld_test.cpp
   analysis/analyzer_regression_particle_test.cpp

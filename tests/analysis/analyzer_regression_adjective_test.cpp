@@ -642,5 +642,147 @@ TEST(AnalyzerTest, Regression_TokoroDatta_FormalNoun) {
   EXPECT_FALSE(found_to) << "と particle should not appear (wrong split)";
 }
 
+// =============================================================================
+// Regression: ADJ連用形 + なる pattern
+// =============================================================================
+// Bug: 美しくなりたかった was split as 美しく + な(particle) + りたかった
+// Fix: Should be 美しく + なり(なる) + たかった(たい)
+
+TEST(AnalyzerTest, Regression_AdjKuNaruTakatta) {
+  // 美しくなりたかった = "wanted to become beautiful"
+  // Pattern: ADJ連用形(く) + なる + たい
+  Suzume analyzer;
+  auto result = analyzer.analyze("美しくなりたかった");
+  ASSERT_GE(result.size(), 3) << "Should have at least 3 tokens";
+
+  // First token: 美しく (adjective adverbial form)
+  EXPECT_EQ(result[0].surface, "美しく");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective);
+  EXPECT_EQ(result[0].lemma, "美しい");
+
+  // Second token: なり (verb renyokei of なる)
+  EXPECT_EQ(result[1].surface, "なり");
+  EXPECT_EQ(result[1].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[1].lemma, "なる");
+
+  // Third token: たかった (desiderative past, conjugates like i-adjective)
+  EXPECT_EQ(result[2].surface, "たかった");
+  EXPECT_EQ(result[2].pos, core::PartOfSpeech::Adjective);
+  EXPECT_EQ(result[2].lemma, "たい");
+}
+
+TEST(AnalyzerTest, Regression_NariTakatta_NotParticle) {
+  // なりたかった should NOT be split as な(particle) + りたかった
+  Suzume analyzer;
+  auto result = analyzer.analyze("なりたかった");
+
+  // Verify な(particle) is NOT present
+  for (const auto& mor : result) {
+    if (mor.surface == "な" && mor.pos == core::PartOfSpeech::Particle) {
+      FAIL() << "な should not be analyzed as particle in なりたかった";
+    }
+    // Also verify りたかった with invalid lemma is not present
+    if (mor.surface == "りたかった" && mor.lemma == "りたい") {
+      FAIL() << "りたかった with lemma りたい is invalid";
+    }
+  }
+
+  // Should have なり + たかった
+  ASSERT_GE(result.size(), 2);
+  EXPECT_EQ(result[0].surface, "なり");
+  EXPECT_EQ(result[0].lemma, "なる");
+}
+
+// =============================================================================
+// Regression: Verb+ない should not be misidentified as adjective
+// =============================================================================
+// Bug: 走らなければ was analyzed as ADJ with lemma=走らない
+// Fix: Should be VERB with lemma=走る (verb + ない conditional form)
+
+TEST(AnalyzerTest, Regression_HashiranaKereba_NotAdjective) {
+  // 走らなければならない = "must run"
+  // 走らなければ should be verb form, not adjective
+  Suzume analyzer;
+  auto result = analyzer.analyze("走らなければならない");
+  ASSERT_GE(result.size(), 1);
+
+  // First token should be 走らなければ with lemma 走る (verb)
+  EXPECT_EQ(result[0].surface, "走らなければ");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
+      << "走らなければ should be Verb, not Adjective";
+  EXPECT_EQ(result[0].lemma, "走る")
+      << "走らなければ lemma should be 走る, not 走らない";
+}
+
+TEST(AnalyzerTest, Regression_TrueAdjectiveNai_Sukunai) {
+  // 少ない is a true adjective, not verb+ない
+  Suzume analyzer;
+  auto result = analyzer.analyze("少ない");
+  ASSERT_EQ(result.size(), 1);
+
+  EXPECT_EQ(result[0].surface, "少ない");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective)
+      << "少ない should be Adjective";
+  EXPECT_EQ(result[0].lemma, "少ない")
+      << "少ない lemma should be 少ない";
+}
+
+TEST(AnalyzerTest, Regression_TrueAdjectiveNai_Abunai) {
+  // 危ない is a true adjective, not verb+ない
+  Suzume analyzer;
+  auto result = analyzer.analyze("危ない");
+  ASSERT_EQ(result.size(), 1);
+
+  EXPECT_EQ(result[0].surface, "危ない");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective)
+      << "危ない should be Adjective";
+  EXPECT_EQ(result[0].lemma, "危ない")
+      << "危ない lemma should be 危ない";
+}
+
+// Regression: 食べすぎてしまいそう was incorrectly analyzed as:
+//   食べすぎて (ADJ, lemma=食べい) + しまいそう
+// Fix: Should be analyzed with verb lemma=食べる (e-row stems are never adjectives)
+
+TEST(AnalyzerTest, Regression_TabeSugiteShimaiSou_VerbNotAdjective) {
+  // 食べすぎてしまいそう = "seems like (I) will end up eating too much"
+  // 食べすぎて should be verb form with lemma 食べる, not adjective
+  Suzume analyzer;
+  auto result = analyzer.analyze("食べすぎてしまいそう");
+  ASSERT_GE(result.size(), 1);
+
+  // First token should have lemma 食べる (verb), not 食べい (adjective)
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
+      << "食べすぎて should be Verb, not Adjective";
+  EXPECT_EQ(result[0].lemma, "食べる")
+      << "食べすぎて lemma should be 食べる";
+}
+
+TEST(AnalyzerTest, Regression_VerbNegative_MinaKereba_NotAdjective) {
+  // 見なければ = "if (one) doesn't see" - verb negative conditional
+  // Should NOT be parsed as adjective 見ない
+  Suzume analyzer;
+  auto result = analyzer.analyze("見なければ");
+  ASSERT_GE(result.size(), 1);
+
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
+      << "見なければ should be Verb, not Adjective";
+  EXPECT_EQ(result[0].lemma, "見る")
+      << "見なければ lemma should be 見る";
+}
+
+TEST(AnalyzerTest, Regression_VerbNegative_KoNaKereba_NotAdjective) {
+  // 来なければ = "if (one) doesn't come" - kuru verb negative conditional
+  // Should NOT be parsed as adjective 来ない
+  Suzume analyzer;
+  auto result = analyzer.analyze("来なければ");
+  ASSERT_GE(result.size(), 1);
+
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
+      << "来なければ should be Verb, not Adjective";
+  EXPECT_EQ(result[0].lemma, "来る")
+      << "来なければ lemma should be 来る";
+}
+
 }  // namespace
 }  // namespace suzume::analysis

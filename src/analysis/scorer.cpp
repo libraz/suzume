@@ -210,6 +210,98 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     }
   }
 
+  // Penalize unknown adjectives with lemma ending in たい where stem is invalid
+  // E.g., りたかった with lemma りたい is invalid (り is not a valid verb stem)
+  // Valid: 食べたかった with lemma 食べたい (食べ is valid verb stem)
+  // Valid: したかった with lemma したい (し is suru stem)
+  // Valid: 見たかった with lemma 見たい (見 is miru stem)
+  // Valid: 来たかった with lemma 来たい (来 is kuru stem)
+  if (edge.pos == core::PartOfSpeech::Adjective &&
+      !edge.fromDictionary() &&
+      edge.lemma.size() >= 6) {  // たい = 6 bytes
+    std::string_view lemma = edge.lemma;
+    // Check if lemma ends with たい
+    if (lemma.size() >= 6 &&
+        lemma.substr(lemma.size() - 6) == "たい") {
+      // Get the stem before たい
+      std::string_view stem = lemma.substr(0, lemma.size() - 6);
+      // Decode stem to count codepoints
+      auto stem_str = std::string(stem);
+      auto codepoints = normalize::utf8::decode(stem_str);
+
+      // Very short stems (1 char) are usually invalid unless they're known verb stems
+      // Known single-char verb stems: し(する), 見(見る), 来(来る), い(いる), 出(出る), etc.
+      if (codepoints.size() == 1) {
+        char32_t ch = codepoints[0];
+        // Allow known single-character verb stems
+        bool valid_single_stem =
+            (ch == U'し' || ch == U'見' || ch == U'来' || ch == U'い' ||
+             ch == U'出' || ch == U'寝' || ch == U'得' || ch == U'経' ||
+             ch == U'着' || ch == U'居');
+        if (!valid_single_stem) {
+          cost += 2.0F;  // Strong penalty for invalid たい pattern
+        }
+      }
+    }
+  }
+
+  // Penalize unknown adjectives containing verb+auxiliary patterns in surface
+  // E.g., 食べすぎてしまい should be verb+しまう, not adjective
+  // These patterns are also checked in inflection_scorer.cpp but the confidence floor
+  // (0.5) limits the penalty effect. This scorer penalty ensures lattice cost is affected.
+  if (edge.pos == core::PartOfSpeech::Adjective &&
+      !edge.fromDictionary() &&
+      edge.surface.size() >= 12) {
+    std::string_view surface = edge.surface;
+    // Check for auxiliary patterns: てしま, でしま, ている, etc.
+    if (surface.find("てしま") != std::string_view::npos ||
+        surface.find("でしま") != std::string_view::npos ||
+        surface.find("ている") != std::string_view::npos ||
+        surface.find("でいる") != std::string_view::npos) {
+      cost += 2.0F;  // Strong penalty
+    }
+  }
+
+  // Penalize しまい/じまい as adjective - these are verb しまう renyokei
+  // E.g., 食べてしまい should not have しまい parsed as adjective
+  if (edge.pos == core::PartOfSpeech::Adjective &&
+      !edge.fromDictionary()) {
+    if (edge.surface == "しまい" || edge.surface == "じまい") {
+      cost += 3.0F;  // Strong penalty - this is しまう renyokei, not adjective
+    }
+  }
+
+  // Penalize unknown adjectives with lemma ending in ない where stem looks like verb mizenkei
+  // E.g., 走らなければ with lemma 走らない is likely verb+aux, not true adjective
+  // True adjectives ending in ない: 少ない, 危ない, つまらない (stem doesn't end in あ段)
+  // Verb+ない patterns: 走らない, 書かない, 読まない (stem ends in あ段 = verb mizenkei)
+  if (edge.pos == core::PartOfSpeech::Adjective &&
+      !edge.fromDictionary() &&
+      edge.lemma.size() >= 9) {  // ない = 6 bytes, need at least 1 char before
+    std::string_view lemma = edge.lemma;
+    // Check if lemma ends with ない
+    if (lemma.size() >= 9 &&
+        lemma.substr(lemma.size() - 6) == "ない") {
+      // Get the stem before ない
+      std::string_view stem = lemma.substr(0, lemma.size() - 6);
+      // Check the last character of stem
+      if (stem.size() >= 3) {
+        std::string_view last3 = stem.substr(stem.size() - 3);
+        // あ段 hiragana (Godan verb mizenkei endings)
+        // ら, か, が, さ, た, な, ば, ま, わ, あ
+        if (last3 == "ら" || last3 == "か" || last3 == "が" ||
+            last3 == "さ" || last3 == "た" || last3 == "ば" ||
+            last3 == "ま" || last3 == "わ" || last3 == "あ" ||
+            // Also check for ichidan-like patterns (e-row + ない is less common for adj)
+            last3 == "べ" || last3 == "め" || last3 == "せ" ||
+            last3 == "け" || last3 == "げ" || last3 == "て" ||
+            last3 == "ね" || last3 == "れ" || last3 == "え") {
+          cost += 1.5F;  // Penalty for likely verb+ない pattern
+        }
+      }
+    }
+  }
+
   return cost;
 }
 
@@ -405,6 +497,27 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
          next.surface == "ぞ" || next.surface == "さ")) {
       penalty += 1.0F;  // Penalty to prefer single token character speech
       penalty_reason = "split character speech pattern";
+    }
+  }
+
+  // Boost ADJ(連用形・く) → VERB(なる/なり) pattern
+  // Pattern: 美しく + なる/なりたかった should connect well (to become beautiful)
+  // This is a very common grammatical pattern in Japanese
+  if (prev.pos == core::PartOfSpeech::Adjective &&
+      next.pos == core::PartOfSpeech::Verb) {
+    // Check if prev ends with く (adjective adverbial form)
+    if (!prev.surface.empty() && prev.surface.size() >= 3) {
+      std::string_view last3 = std::string_view(prev.surface).substr(
+          prev.surface.size() - 3);
+      if (last3 == "く") {
+        // Check if next is なる or starts with なり
+        if (next.lemma == "なる" ||
+            (next.surface.size() >= 6 &&
+             next.surface.substr(0, 6) == "なり")) {
+          penalty -= 0.5F;  // Bonus: reduce connection cost for ADJく + なる
+          penalty_reason = "adj-ku + naru pattern";
+        }
+      }
     }
   }
 

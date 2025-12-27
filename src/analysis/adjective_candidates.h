@@ -74,6 +74,25 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     const std::vector<normalize::CharType>& char_types,
     const grammar::Inflection& inflection);
 
+/**
+ * @brief Generate katakana i-adjective candidates (e.g., エモい, キモい, ウザい)
+ *
+ * Detects patterns like Katakana + い/かった/くない etc.
+ * where the katakana stem is followed by i-adjective conjugation endings.
+ * This handles slang/internet adjectives that use katakana stems.
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param char_types Character types for each position
+ * @param inflection Inflection analyzer for conjugation detection
+ * @return Vector of candidates
+ */
+std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const grammar::Inflection& inflection);
+
 }  // namespace suzume::analysis
 
 #endif  // SUZUME_ANALYSIS_ADJECTIVE_CANDIDATES_H_
