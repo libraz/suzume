@@ -3,6 +3,7 @@
 add_library(suzume_normalize STATIC
   normalizer.cpp
   char_type.cpp
+  exceptions.cpp
   utf8.cpp
 )
 

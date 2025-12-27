@@ -3,60 +3,36 @@
 #include "analysis/scorer_constants.h"
 #include "core/debug.h"
 #include "normalize/char_type.h"
+#include "normalize/exceptions.h"
 #include "normalize/utf8.h"
-
-namespace suzume::analysis {
-
-const std::unordered_set<std::string_view> kSingleKanjiExceptions = {
-    "人", "日", "月", "年", "時", "分", "秒", "本", "冊", "個",
-    "枚", "台", "回", "件", "円", "点", "度", "番", "階", "歳",
-    "国", "市", "県", "区", "町", "村", "上", "下", "中", "外",
-    "内", "前", "後", "東", "西", "南", "北", "春", "夏", "秋",
-    "冬", "朝", "昼", "夜",
-};
-
-// Single hiragana functional words that should not be penalized
-// These are common particles, auxiliaries, and other grammatical elements
-const std::unordered_set<std::string_view> kSingleHiraganaExceptions = {
-    // Case particles (格助詞)
-    "が", "を", "に", "で", "と", "へ", "の",
-    // Binding particles (係助詞)
-    "は", "も",
-    // Final particles (終助詞)
-    "か", "な", "ね", "よ", "わ",
-    // Auxiliary (助動詞)
-    "だ", "た",
-    // Conjunctive particles (接続助詞)
-    "て", "ば",
-};
 
 namespace {
 
 // Convert POS to array index
-constexpr size_t posToIndex(core::PartOfSpeech pos) {
+constexpr size_t posToIndex(suzume::core::PartOfSpeech pos) {
   switch (pos) {
-    case core::PartOfSpeech::Noun:
+    case suzume::core::PartOfSpeech::Noun:
       return 0;
-    case core::PartOfSpeech::Verb:
+    case suzume::core::PartOfSpeech::Verb:
       return 1;
-    case core::PartOfSpeech::Adjective:
+    case suzume::core::PartOfSpeech::Adjective:
       return 2;
-    case core::PartOfSpeech::Adverb:
+    case suzume::core::PartOfSpeech::Adverb:
       return 3;
-    case core::PartOfSpeech::Particle:
+    case suzume::core::PartOfSpeech::Particle:
       return 4;
-    case core::PartOfSpeech::Auxiliary:
+    case suzume::core::PartOfSpeech::Auxiliary:
       return 5;
-    case core::PartOfSpeech::Conjunction:
+    case suzume::core::PartOfSpeech::Conjunction:
       return 6;
-    case core::PartOfSpeech::Determiner:
+    case suzume::core::PartOfSpeech::Determiner:
       return 7;
-    case core::PartOfSpeech::Pronoun:
+    case suzume::core::PartOfSpeech::Pronoun:
       return 8;
-    case core::PartOfSpeech::Symbol:
+    case suzume::core::PartOfSpeech::Symbol:
       return 9;
-    case core::PartOfSpeech::Other:
-    case core::PartOfSpeech::Unknown:
+    case suzume::core::PartOfSpeech::Other:
+    case suzume::core::PartOfSpeech::Unknown:
       return 10;
   }
   return 10;
@@ -81,6 +57,8 @@ constexpr float kBigramCostTable[11][11] = {
 // clang-format on
 
 }  // namespace
+
+namespace suzume::analysis {
 
 Scorer::Scorer(const ScorerOptions& options) : options_(options) {}
 
@@ -153,14 +131,12 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       normalize::CharType ctype = normalize::classifyChar(codepoints[0]);
       if (ctype == normalize::CharType::Kanji) {
         // Check if single kanji exception
-        if (kSingleKanjiExceptions.find(edge.surface) ==
-            kSingleKanjiExceptions.end()) {
+        if (!normalize::isSingleKanjiException(edge.surface)) {
           cost += options_.single_kanji_penalty;
         }
       } else if (ctype == normalize::CharType::Hiragana) {
         // Check if single hiragana exception (functional words)
-        if (kSingleHiraganaExceptions.find(edge.surface) ==
-            kSingleHiraganaExceptions.end()) {
+        if (!normalize::isSingleHiraganaException(edge.surface)) {
           cost += options_.single_hiragana_penalty;
         }
       }
@@ -235,11 +211,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       if (codepoints.size() == 1) {
         char32_t ch = codepoints[0];
         // Allow known single-character verb stems
-        bool valid_single_stem =
-            (ch == U'し' || ch == U'見' || ch == U'来' || ch == U'い' ||
-             ch == U'出' || ch == U'寝' || ch == U'得' || ch == U'経' ||
-             ch == U'着' || ch == U'居');
-        if (!valid_single_stem) {
+        if (!normalize::isValidSingleCharVerbStem(ch)) {
           cost += scorer::kPenaltyInvalidTaiPattern;
         }
       }
@@ -532,14 +504,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     // Check if next starts with compound verb auxiliary kanji
     // Get first 3 bytes (one kanji character in UTF-8)
     std::string_view first_char = next.surface.substr(0, 3);
-    bool is_compound_aux = (first_char == "終" || first_char == "始" ||
-                            first_char == "過" || first_char == "続" ||
-                            first_char == "直" || first_char == "合" ||
-                            first_char == "出" || first_char == "込" ||
-                            first_char == "切" || first_char == "損" ||
-                            first_char == "返" || first_char == "忘" ||
-                            first_char == "残" || first_char == "掛");
-    if (is_compound_aux) {
+    if (normalize::isCompoundVerbAuxStart(first_char)) {
       // Check if prev ends with i-row hiragana (likely verb renyokei)
       if (!prev.surface.empty() && prev.surface.size() >= 3) {
         std::string_view last3 = std::string_view(prev.surface).substr(

@@ -1,9 +1,6 @@
 #ifndef SUZUME_ANALYSIS_SCORER_H_
 #define SUZUME_ANALYSIS_SCORER_H_
 
-#include <string_view>
-#include <unordered_set>
-
 #include "analysis/interfaces.h"
 #include "core/lattice.h"
 #include "core/types.h"
@@ -48,11 +45,6 @@ struct ScorerOptions {
     size_t katakana_max = 12;
   } optimal_length;
 };
-
-/**
- * @brief Single kanji exceptions that can stand alone
- */
-extern const std::unordered_set<std::string_view> kSingleKanjiExceptions;
 
 /**
  * @brief Scoring calculator for morphological analysis
