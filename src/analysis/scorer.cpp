@@ -60,6 +60,14 @@ constexpr float kBigramCostTable[11][11] = {
 
 namespace suzume::analysis {
 
+// static
+void Scorer::logAdjustment(float amount, const char* reason) {
+  if (amount != 0.0F) {
+    SUZUME_DEBUG_SCORE("  " << reason << ": "
+                            << (amount > 0 ? "+" : "") << amount << "\n");
+  }
+}
+
 Scorer::Scorer(const ScorerOptions& options) : options_(options) {}
 
 float Scorer::posPrior(core::PartOfSpeech pos) const {
@@ -104,22 +112,32 @@ bool Scorer::isOptimalLength(const core::LatticeEdge& edge) const {
 }
 
 float Scorer::wordCost(const core::LatticeEdge& edge) const {
-  float cost = edge.cost + posPrior(edge.pos);
+  float base_cost = edge.cost;
+  float pos_prior = posPrior(edge.pos);
+  float cost = base_cost + pos_prior;
+
+  SUZUME_DEBUG_SCORE("[WORD] \"" << edge.surface << "\" ("
+                     << core::posToString(edge.pos) << "): "
+                     << "base=" << base_cost << " pos=" << pos_prior << "\n");
 
   // Dictionary bonus
   if (edge.fromDictionary()) {
     cost += options_.dictionary_bonus;
+    logAdjustment(options_.dictionary_bonus, "dictionary");
   }
   if (edge.fromUserDict()) {
     cost += options_.user_dict_bonus;
+    logAdjustment(options_.user_dict_bonus, "user_dict");
   }
 
   // Formal noun / low info penalty
   if (edge.isFormalNoun()) {
     cost += options_.formal_noun_penalty;
+    logAdjustment(options_.formal_noun_penalty, "formal_noun");
   }
   if (edge.isLowInfo()) {
     cost += options_.low_info_penalty;
+    logAdjustment(options_.low_info_penalty, "low_info");
   }
 
   // Single character penalty
@@ -133,11 +151,13 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
         // Check if single kanji exception
         if (!normalize::isSingleKanjiException(edge.surface)) {
           cost += options_.single_kanji_penalty;
+          logAdjustment(options_.single_kanji_penalty, "single_kanji");
         }
       } else if (ctype == normalize::CharType::Hiragana) {
         // Check if single hiragana exception (functional words)
         if (!normalize::isSingleHiraganaException(edge.surface)) {
           cost += options_.single_hiragana_penalty;
+          logAdjustment(options_.single_hiragana_penalty, "single_hiragana");
         }
       }
     }
@@ -146,24 +166,14 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Optimal length bonus
   if (isOptimalLength(edge)) {
     cost += options_.optimal_length_bonus;
+    logAdjustment(options_.optimal_length_bonus, "optimal_length");
   }
 
-  // Penalize verbs ending with そう (likely verb renyokei + そう auxiliary)
-  // E.g., 降りそう should split as 降り + そう, not single verb
-  // Note: Adjectives like おいしそう should remain as single token
-  if (edge.pos == core::PartOfSpeech::Verb && edge.surface.size() >= 6) {
-    std::string_view surface = edge.surface;
-    if (surface.size() >= 6 &&
-        surface.substr(surface.size() - 6) == "そう") {
-      cost += scorer::kPenaltyVerbSou;
-    }
-    // Also penalize verbs ending with そうです (verb + そう + です)
-    // E.g., 食べそうです should split as 食べそう + です
-    if (surface.size() >= 12 &&
-        surface.substr(surface.size() - 12) == "そうです") {
-      cost += scorer::kPenaltyVerbSouDesu;
-    }
-  }
+  // Note: kPenaltyVerbSou was removed to unify verb+そう as single token
+  // Previously: 走りそう → 走り + そう (2 tokens)
+  // Now: 走りそう → 走る (1 token), matching 食べそう → 食べる (1 token)
+  // サ変+そう (遅刻しそう) remains 2 tokens because 遅刻 is a dictionary noun
+  // See: backup/technical_debt_action_plan.md section 3.3
 
   // Penalize unknown adjectives ending with そう with invalid lemma
   // E.g., 食べそう should not be ADJ with lemma 食べい (invalid)
@@ -183,6 +193,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       }
       if (!valid_adj_lemma) {
         cost += scorer::kPenaltyInvalidAdjSou;
+        logAdjustment(scorer::kPenaltyInvalidAdjSou, "invalid_adj_sou");
       }
     }
   }
@@ -213,6 +224,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
         // Allow known single-character verb stems
         if (!normalize::isValidSingleCharVerbStem(ch)) {
           cost += scorer::kPenaltyInvalidTaiPattern;
+          logAdjustment(scorer::kPenaltyInvalidTaiPattern, "invalid_tai_pattern");
         }
       }
     }
@@ -232,6 +244,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
         surface.find("ている") != std::string_view::npos ||
         surface.find("でいる") != std::string_view::npos) {
       cost += scorer::kPenaltyVerbAuxInAdj;
+      logAdjustment(scorer::kPenaltyVerbAuxInAdj, "verb_aux_in_adj");
     }
   }
 
@@ -241,6 +254,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       !edge.fromDictionary()) {
     if (edge.surface == "しまい" || edge.surface == "じまい") {
       cost += scorer::kPenaltyShimaiAsAdj;
+      logAdjustment(scorer::kPenaltyShimaiAsAdj, "shimai_as_adj");
     }
   }
 
@@ -270,11 +284,13 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
             last3 == "け" || last3 == "げ" || last3 == "て" ||
             last3 == "ね" || last3 == "れ" || last3 == "え") {
           cost += scorer::kPenaltyVerbNaiPattern;
+          logAdjustment(scorer::kPenaltyVerbNaiPattern, "verb_nai_pattern");
         }
       }
     }
   }
 
+  SUZUME_DEBUG_SCORE("[WORD] → total=" << cost << "\n");
   return cost;
 }
 
@@ -530,8 +546,12 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
                     << next.surface << "\" ("
                     << core::posToString(next.pos) << "): "
                     << "base=" << base_cost);
-  if (penalty > 0.0F && penalty_reason != nullptr) {
-    SUZUME_DEBUG_CONN(" + penalty=" << penalty << " (" << penalty_reason << ")");
+  if (penalty != 0.0F && penalty_reason != nullptr) {
+    if (penalty > 0.0F) {
+      SUZUME_DEBUG_CONN(" + penalty=" << penalty << " (" << penalty_reason << ")");
+    } else {
+      SUZUME_DEBUG_CONN(" + bonus=" << -penalty << " (" << penalty_reason << ")");
+    }
   }
   SUZUME_DEBUG_CONN(" = " << total << "\n");
 

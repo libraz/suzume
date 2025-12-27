@@ -8,6 +8,7 @@
  *   SUZUME_DEBUG_INFL=1  - Inflection analysis
  *   SUZUME_DEBUG_CONN=1  - Connection cost details
  *   SUZUME_DEBUG_VITERBI=1 - Viterbi algorithm steps
+ *   SUZUME_DEBUG_SCORE=1 - Word cost details (bonuses/penalties)
  */
 
 #ifndef SUZUME_CORE_DEBUG_H_
@@ -55,6 +56,12 @@ class Debug {
     return enabled;
   }
 
+  static bool isScoreEnabled() {
+    static const bool enabled =
+        isEnabled() || (std::getenv("SUZUME_DEBUG_SCORE") != nullptr);
+    return enabled;
+  }
+
   // Print helpers
   static void printHeader(std::string_view title) {
     std::cerr << "\n=== " << title << " ===\n";
@@ -79,6 +86,7 @@ class Debug {
 #define SUZUME_DEBUG_INFL(expr) SUZUME_DEBUG_LOG(Inflection, expr)
 #define SUZUME_DEBUG_CONN(expr) SUZUME_DEBUG_LOG(Connection, expr)
 #define SUZUME_DEBUG_VITERBI(expr) SUZUME_DEBUG_LOG(Viterbi, expr)
+#define SUZUME_DEBUG_SCORE(expr) SUZUME_DEBUG_LOG(Score, expr)
 
 }  // namespace suzume::core
 

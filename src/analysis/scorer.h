@@ -95,6 +95,13 @@ class Scorer : public IScorer {
    * @brief Check if edge has optimal length
    */
   bool isOptimalLength(const core::LatticeEdge& edge) const;
+
+  /**
+   * @brief Log adjustment for debug output
+   * @param amount Adjustment amount (negative = bonus, positive = penalty)
+   * @param reason Description of the adjustment
+   */
+  static void logAdjustment(float amount, const char* reason);
 };
 
 }  // namespace suzume::analysis

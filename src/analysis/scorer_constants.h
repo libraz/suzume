@@ -18,13 +18,9 @@ namespace suzume::analysis::scorer {
 // Edge Costs (Unigram penalties for invalid patterns)
 // =============================================================================
 
-// Verb ending with そう should split as verb + そう auxiliary
-// E.g., 降りそう → 降り + そう, not single verb
-constexpr float kPenaltyVerbSou = 1.0F;
-
-// Verb ending with そうです should split further
-// E.g., 食べそうです → 食べそう + です
-constexpr float kPenaltyVerbSouDesu = 1.5F;
+// Note: kPenaltyVerbSou and kPenaltyVerbSouDesu were removed
+// to unify verb+そう as single token (走りそう → 走る, like 食べそう → 食べる)
+// See: backup/technical_debt_action_plan.md section 3.3
 
 // Unknown adjective ending with そう but invalid lemma
 // Valid: おいしそう (lemma おいしい), Invalid: 食べそう (lemma 食べい)

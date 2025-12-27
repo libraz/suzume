@@ -460,14 +460,15 @@ TEST(AnalyzerTest, Regression_CompoundVerb_TabenagaraAruku) {
 // costs to determine the optimal path.
 
 TEST(AnalyzerTest, Regression_Viterbi_RenyokeiVsNoun_Sou) {
-  // Verify VERB renyokei + そう is preferred over NOUN + そう
-  // 降りそう: 降り should be VERB (renyokei of 降りる), not NOUN
+  // 降りそう should be single VERB token (unified verb+そう pattern)
+  // See: technical_debt_action_plan.md section 3.3
   Suzume analyzer;
   auto result = analyzer.analyze("降りそう");
-  ASSERT_GE(result.size(), 2) << "降りそう should have at least 2 tokens";
+  ASSERT_EQ(result.size(), 1) << "降りそう should be single token";
 
+  EXPECT_EQ(result[0].surface, "降りそう");
   EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb)
-      << "降り should be Verb (renyokei), not Noun";
+      << "降りそう should be Verb";
 }
 
 TEST(AnalyzerTest, Regression_Viterbi_TeFormNotSplit) {

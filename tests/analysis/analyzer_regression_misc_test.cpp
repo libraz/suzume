@@ -447,21 +447,25 @@ TEST(AnalyzerTest, Regression_SumomoMomo) {
 // These tests ensure correct handling of 〜そう patterns after scorer changes
 
 TEST(AnalyzerTest, EdgeCase_VerbSou_Hashirisou) {
-  // 走りそう should split as 走り (verb renyokei) + そう (adverb)
+  // 走りそう should be single VERB token with lemma 走る
+  // (Unified with 食べそう as single token - see technical_debt_action_plan.md 3.3)
   Suzume analyzer;
   auto result = analyzer.analyze("走りそう");
-  ASSERT_GE(result.size(), 2) << "走りそう should split into 2 tokens";
-  EXPECT_EQ(result[0].surface, "走り");
+  ASSERT_EQ(result.size(), 1) << "走りそう should be single token";
+  EXPECT_EQ(result[0].surface, "走りそう");
   EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "走る");
 }
 
 TEST(AnalyzerTest, EdgeCase_VerbSou_Nomisou) {
-  // 飲みそう should split as 飲み (verb renyokei) + そう (adverb)
+  // 飲みそう should be single VERB token with lemma 飲む
+  // (Unified with 食べそう as single token - see technical_debt_action_plan.md 3.3)
   Suzume analyzer;
   auto result = analyzer.analyze("飲みそう");
-  ASSERT_GE(result.size(), 2) << "飲みそう should split into 2 tokens";
-  EXPECT_EQ(result[0].surface, "飲み");
+  ASSERT_EQ(result.size(), 1) << "飲みそう should be single token";
+  EXPECT_EQ(result[0].surface, "飲みそう");
   EXPECT_EQ(result[0].pos, core::PartOfSpeech::Verb);
+  EXPECT_EQ(result[0].lemma, "飲む");
 }
 
 TEST(AnalyzerTest, EdgeCase_AdjSou_Muzukashisou) {

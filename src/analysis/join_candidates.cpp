@@ -43,7 +43,10 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"過ぎる", "すぎる", "る", "過ぎる"},    // 読み過ぎる, 読みすぎる
     {"直す", "なおす", "す", "直す"},        // やり直す, やりなおす
     {"終わる", "おわる", "る", "終わる"},    // 読み終わる, 読みおわる
+    {"終える", "おえる", "える", "終える"},  // 読み終える, 読みおえる (ichidan)
     {"切る", "きる", "る", "切る"},          // 締め切る, 締めきる
+    {"切れる", "きれる", "れる", "切れる"},  // 使い切れる (ichidan)
+    {"出る", "でる", "る", "出る"},          // 飛び出る (ichidan)
     // Renyokei forms (連用形) for たい/たくなかった/etc. attachment
     {"込み", "こみ", "む", "込む"},          // 読み込みたい, 飛びこみたい
     {"出し", "だし", "す", "出す"},          // 走り出したい, 走りだしたい
@@ -62,7 +65,11 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"過ぎ", "すぎ", "る", "過ぎる"},        // 読み過ぎたい, 読みすぎたい
     {"直し", "なおし", "す", "直す"},        // やり直したい
     {"終わり", "おわり", "る", "終わる"},    // 読み終わりたい
+    {"終え", "おえ", "える", "終える"},      // 読み終えたい (ichidan renyokei)
     {"切り", "きり", "る", "切る"},          // 締め切りたい
+    {"切れ", "きれ", "れる", "切れる"},      // 使い切れたい (ichidan renyokei)
+    // Note: "出" (で) renyokei is NOT added because it conflicts with particle で
+    // 飛び出る forms like 飛び出たい are handled by the base form "出る" entry
 };
 
 // 連用形 (continuative form) endings for Godan verbs
