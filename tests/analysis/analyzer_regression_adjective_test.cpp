@@ -784,5 +784,63 @@ TEST(AnalyzerTest, Regression_VerbNegative_KoNaKereba_NotAdjective) {
       << "来なければ lemma should be 来る";
 }
 
+// Regression: 読みやすい was parsed as 読む (verb) instead of compound adjective
+// Fix: Boost confidence for verb renyokei + やすい/にくい patterns
+
+TEST(AnalyzerTest, Regression_CompoundAdjective_YomiYasui) {
+  // 読みやすい = "easy to read" - compound adjective (verb renyokei + やすい)
+  Suzume analyzer;
+  auto result = analyzer.analyze("読みやすい");
+  ASSERT_EQ(result.size(), 1) << "読みやすい should be single token";
+
+  EXPECT_EQ(result[0].surface, "読みやすい");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective)
+      << "読みやすい should be Adjective";
+  EXPECT_EQ(result[0].lemma, "読みやすい")
+      << "読みやすい lemma should be 読みやすい";
+}
+
+TEST(AnalyzerTest, Regression_CompoundAdjective_TsukaiNikui) {
+  // 使いにくい = "hard to use" - compound adjective (verb renyokei + にくい)
+  Suzume analyzer;
+  auto result = analyzer.analyze("使いにくい");
+  ASSERT_EQ(result.size(), 1) << "使いにくい should be single token";
+
+  EXPECT_EQ(result[0].surface, "使いにくい");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective)
+      << "使いにくい should be Adjective";
+  EXPECT_EQ(result[0].lemma, "使いにくい")
+      << "使いにくい lemma should be 使いにくい";
+}
+
+// Regression: 面白い was parsed as 面白 (noun) + い instead of adjective
+// Fix: Exclude IAdjective from general all-kanji penalty, allow 2-kanji stems
+
+TEST(AnalyzerTest, Regression_TwoKanjiAdjective_Omoshiroi) {
+  // 面白い = "interesting" - 2-kanji adjective
+  Suzume analyzer;
+  auto result = analyzer.analyze("面白い");
+  ASSERT_EQ(result.size(), 1) << "面白い should be single token";
+
+  EXPECT_EQ(result[0].surface, "面白い");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective)
+      << "面白い should be Adjective";
+  EXPECT_EQ(result[0].lemma, "面白い")
+      << "面白い lemma should be 面白い";
+}
+
+TEST(AnalyzerTest, Regression_TwoKanjiAdjective_Kawaii) {
+  // 可愛い = "cute" - 2-kanji adjective
+  Suzume analyzer;
+  auto result = analyzer.analyze("可愛い");
+  ASSERT_EQ(result.size(), 1) << "可愛い should be single token";
+
+  EXPECT_EQ(result[0].surface, "可愛い");
+  EXPECT_EQ(result[0].pos, core::PartOfSpeech::Adjective)
+      << "可愛い should be Adjective";
+  EXPECT_EQ(result[0].lemma, "可愛い")
+      << "可愛い lemma should be 可愛い";
+}
+
 }  // namespace
 }  // namespace suzume::analysis
