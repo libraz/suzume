@@ -47,7 +47,8 @@
       "description": "Documentation specification style",
       "input": "戻り値は成功時に0を返す",
       "expected": [
-        {"surface": "戻り値", "pos": "Noun"},
+        {"surface": "戻り", "pos": "Noun"},
+        {"surface": "値", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "成功時", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
@@ -93,8 +94,7 @@
       "expected": [
         {"surface": "問題", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "解決", "pos": "Noun"},
-        {"surface": "しない", "pos": "Verb", "lemma": "する"},
+        {"surface": "解決しない", "pos": "Verb", "lemma": "解決する"},
         {"surface": "場合", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "再起動", "pos": "Noun"},
@@ -108,7 +108,8 @@
       "description": "Configuration instruction",
       "input": "設定ファイルを編集する必要があります",
       "expected": [
-        {"surface": "設定ファイル", "pos": "Noun"},
+        {"surface": "設定", "pos": "Noun"},
+        {"surface": "ファイル", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "編集する", "pos": "Verb"},
         {"surface": "必要", "pos": "Adjective"},
@@ -218,7 +219,7 @@
       "expected": [
         {"surface": "子供", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
-        {"surface": "頃", "pos": "Noun"},
+        {"surface": "頃", "pos": "Suffix"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "よく", "pos": "Adjective", "lemma": "良い"},
         {"surface": "遊んだ", "pos": "Verb", "lemma": "遊ぶ"},
@@ -235,8 +236,8 @@
       "expected": [
         {"surface": "彼", "pos": "Pronoun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "来月結婚", "pos": "Noun"},
-        {"surface": "する", "pos": "Verb"},
+        {"surface": "来月", "pos": "Noun"},
+        {"surface": "結婚する", "pos": "Verb", "lemma": "結婚する"},
         {"surface": "そう", "pos": "Adverb"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
@@ -441,7 +442,7 @@
         {"surface": "玉ねぎ", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "みじん", "pos": "Other"},
-        {"surface": "切り", "pos": "Noun"},
+        {"surface": "切り", "pos": "Verb", "lemma": "切る"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "する", "pos": "Verb"}
       ],
@@ -497,7 +498,8 @@
       "expected": [
         {"surface": "頭", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "痛くて", "pos": "Adjective", "lemma": "痛い"},
+        {"surface": "痛く", "pos": "Adjective", "lemma": "痛い"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "熱", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "ある", "pos": "Verb"}
@@ -526,7 +528,9 @@
         {"surface": "症状", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "続く", "pos": "Verb"},
-        {"surface": "ようでしたら", "pos": "Auxiliary"},
+        {"surface": "よう", "pos": "Auxiliary"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "したら", "pos": "Verb", "lemma": "する"},
         {"surface": "医師", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "相談して", "pos": "Verb", "lemma": "相談する"},

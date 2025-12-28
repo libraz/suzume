@@ -90,7 +90,8 @@
       "description": "独立行政法人情報処理推進機構 - very long compound",
       "input": "独立行政法人情報処理推進機構",
       "expected": [
-        {"surface": "独立行政法人情報処理推進機構", "pos": "Noun"}
+        {"surface": "独立行政法人", "pos": "Noun"},
+        {"surface": "情報処理推進機構", "pos": "Noun"}
       ],
       "tags": ["basic", "edge-case"]
     },
@@ -290,7 +291,7 @@
     },
     {
       "id": "suru_itashite",
-      "description": "いたしております - humble suru verb",
+      "description": "いたしております - humble suru verb unified",
       "input": "いたしております",
       "expected": [
         {"surface": "いたしております", "pos": "Verb", "lemma": "いたす"}
@@ -299,7 +300,7 @@
     },
     {
       "id": "suru_kentou",
-      "description": "検討いたしております - suru noun + itasu",
+      "description": "検討いたしております - suru noun + itasu unified",
       "input": "検討いたしております",
       "expected": [
         {"surface": "検討", "pos": "Noun"},

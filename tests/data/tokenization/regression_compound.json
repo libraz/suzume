@@ -6,8 +6,8 @@
       "description": "iphone買った - ASCII to Japanese verb boundary",
       "input": "iphone買った",
       "expected": [
-        {"surface": "iphone買", "pos": "Noun"},
-        {"surface": "った", "pos": "Verb"}
+        {"surface": "iphone", "pos": "Noun"},
+        {"surface": "買った", "pos": "Verb", "lemma": "買う"}
       ],
       "tags": ["regression", "script_boundary"]
     },
@@ -131,11 +131,11 @@
     },
     {
       "id": "nominalized_noun_kiri",
-      "description": "みじん切りにする - nominalized noun 切り",
+      "description": "みじん切りにする - 切り analyzed as verb stem",
       "input": "みじん切りにする",
       "expected": [
         {"surface": "みじん", "pos": "Other"},
-        {"surface": "切り", "pos": "Noun"},
+        {"surface": "切り", "pos": "Verb", "lemma": "切る"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "する", "pos": "Verb"}
       ],

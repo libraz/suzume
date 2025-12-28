@@ -18,14 +18,14 @@
 | 未知語で精度低下 | 未知語も適切に処理 |
 | 大規模辞書が必須 | 最小辞書でも動作 |
 | ネイティブ実行のみ | ブラウザ + Node.js + ネイティブ |
-| セットアップが複雑 | `npm install suzume` |
+| セットアップが複雑 | `npm install @libraz/suzume` |
 
 ## インストール
 
 ### npm（ブラウザ / Node.js）
 
 ```bash
-npm install suzume
+npm install @libraz/suzume
 ```
 
 ### ソースからビルド（C++）
@@ -42,7 +42,7 @@ make test     # テスト実行
 ### JavaScript / TypeScript
 
 ```typescript
-import { Suzume } from 'suzume';
+import { Suzume } from '@libraz/suzume';
 
 const suzume = await Suzume.create();
 

@@ -161,6 +161,18 @@ void Tokenizer::addUnknownCandidates(
         }
       }
     }
+
+    // Case 3: Colloquial verb contractions (ておく→っとく, てしまう→っちゃう/っじゃう)
+    // These are valid verb endings that shouldn't be penalized for length
+    if (!skip_penalty && candidate.pos == core::PartOfSpeech::Verb) {
+      // Check if surface ends with colloquial contraction patterns
+      std::string_view surface = candidate.surface;
+      if ((surface.size() >= 9 && surface.substr(surface.size() - 9) == "っとく") ||
+          (surface.size() >= 12 && surface.substr(surface.size() - 12) == "っちゃう") ||
+          (surface.size() >= 12 && surface.substr(surface.size() - 12) == "っじゃう")) {
+        skip_penalty = true;
+      }
+    }
     if (!skip_penalty && max_dict_length > 0 &&
         candidate.end - candidate.start > max_dict_length) {
       adjusted_cost += 3.5F;
@@ -185,8 +197,10 @@ void Tokenizer::addUnknownCandidates(
         std::string_view hiragana_suffix =
             text.substr(suffix_byte_start, suffix_byte_end - suffix_byte_start);
 
-        // Don't penalize te-form endings
-        bool is_te_form = (hiragana_suffix == "て" || hiragana_suffix == "で");
+        // Don't penalize te-form endings (including godan onbin forms)
+        bool is_te_form = (hiragana_suffix == "て" || hiragana_suffix == "で" ||
+                           hiragana_suffix == "って" || hiragana_suffix == "んで" ||
+                           hiragana_suffix == "いて" || hiragana_suffix == "いで");
 
         if (!is_te_form) {
           size_t suffix_byte_pos = charPosToBytePos(codepoints, hiragana_start);

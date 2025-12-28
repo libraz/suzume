@@ -95,14 +95,12 @@
     },
     {
       "id": "email_response_request",
-      "description": "Response request: ご返信いただけますと幸いです",
+      "description": "Response request: ご返信いただけますと幸いです (itadakemasu = potential of itadaku)",
       "input": "ご返信いただけますと幸いです",
       "expected": [
         {"surface": "ご", "pos": "Prefix"},
-        {"surface": "返信い", "pos": "Noun"},
-        {"surface": "た", "pos": "Auxiliary"},
-        {"surface": "だ", "pos": "Auxiliary"},
-        {"surface": "けます", "pos": "Verb", "lemma": "ける"},
+        {"surface": "返信", "pos": "Noun"},
+        {"surface": "いただけます", "pos": "Verb", "lemma": "いただく"},
         {"surface": "と", "pos": "Particle"},
         {"surface": "幸い", "pos": "Adjective"},
         {"surface": "です", "pos": "Auxiliary"}

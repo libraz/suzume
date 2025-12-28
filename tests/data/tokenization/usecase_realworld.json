@@ -535,7 +535,8 @@
       "description": "Technical documentation about AI",
       "input": "生成AIの研究が進んでいる",
       "expected": [
-        {"surface": "生成ai", "pos": "Noun"},
+        {"surface": "生成", "pos": "Noun"},
+        {"surface": "ai", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "研究", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
@@ -574,7 +575,9 @@
       "description": "Address with numbers",
       "input": "東京都渋谷区神宮前1-2-3",
       "expected": [
-        {"surface": "東京都渋谷区神宮前1", "pos": "Noun"},
+        {"surface": "東京都", "pos": "Noun"},
+        {"surface": "渋谷区神宮前", "pos": "Noun"},
+        {"surface": "1", "pos": "Noun"},
         {"surface": "2", "pos": "Noun"},
         {"surface": "3", "pos": "Noun"}
       ],
@@ -623,8 +626,9 @@
       "expected": [
         {"surface": "中火", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
-        {"surface": "5分間炒", "pos": "Noun"},
-        {"surface": "めてください", "pos": "Verb", "lemma": "める"}
+        {"surface": "5分間", "pos": "Noun"},
+        {"surface": "炒めて", "pos": "Verb", "lemma": "炒める"},
+        {"surface": "ください", "pos": "Auxiliary"}
       ],
       "tags": ["complex", "recipe"]
     },

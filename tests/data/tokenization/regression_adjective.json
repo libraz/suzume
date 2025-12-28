@@ -113,11 +113,10 @@
     },
     {
       "id": "te_shimawanai_unified",
-      "description": "忘れてしまわない - aspectual te-form should be single token",
+      "description": "忘れてしまわない - unified compound verb",
       "input": "忘れてしまわない",
       "expected": [
-        {"surface": "忘れて", "pos": "Verb", "lemma": "忘れる"},
-        {"surface": "しまわない", "pos": "Verb", "lemma": "しまう"}
+        {"surface": "忘れてしまわない", "pos": "Verb", "lemma": "忘れる"}
       ],
       "tags": ["regression", "te_form", "aspectual"]
     },
@@ -179,14 +178,12 @@
     },
     {
       "id": "na_adj_business_email",
-      "description": "ご返信いただけますと幸いです - business email pattern",
+      "description": "ご返信いただけますと幸いです - business email pattern (itadakemasu = potential of itadaku)",
       "input": "ご返信いただけますと幸いです",
       "expected": [
         {"surface": "ご", "pos": "Prefix"},
-        {"surface": "返信い", "pos": "Noun"},
-        {"surface": "た", "pos": "Auxiliary"},
-        {"surface": "だ", "pos": "Auxiliary"},
-        {"surface": "けます", "pos": "Verb", "lemma": "ける"},
+        {"surface": "返信", "pos": "Noun"},
+        {"surface": "いただけます", "pos": "Verb", "lemma": "いただく"},
         {"surface": "と", "pos": "Particle"},
         {"surface": "幸い", "pos": "Adjective"},
         {"surface": "です", "pos": "Auxiliary"}

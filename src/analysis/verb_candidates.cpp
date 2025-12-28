@@ -435,14 +435,13 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
       // Check for particle-like characters
       if (curr == U'を' || curr == U'が' || curr == U'は' ||
-          curr == U'に' || curr == U'へ' || curr == U'の' ||
-          curr == U'と' || curr == U'や') {
+          curr == U'に' || curr == U'へ' || curr == U'の' || curr == U'や') {
         break;  // These are always particles in this context
       }
 
-      // For か, で, も: check if they're part of verb conjugation patterns
+      // For か, で, も, と: check if they're part of verb conjugation patterns
       // Don't break if they appear in known conjugation contexts
-      if (curr == U'か' || curr == U'で' || curr == U'も') {
+      if (curr == U'か' || curr == U'で' || curr == U'も' || curr == U'と') {
         // Check the preceding character for conjugation patterns
         char32_t prev = codepoints[hiragana_end - 1];
 
@@ -460,6 +459,13 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
         // も: OK if preceded by て (ても = even if)
         if (curr == U'も' && prev == U'て') {
+          ++hiragana_end;
+          continue;
+        }
+
+        // と: OK if preceded by っ (っとく = ておく contraction)
+        // やっとく = やって + おく where ておく → とく
+        if (curr == U'と' && prev == U'っ') {
           ++hiragana_end;
           continue;
         }
@@ -485,28 +491,49 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     }
 
     // Check if this looks like a conjugated verb
-    auto best = inflection.getBest(surface);
-    // Only accept verb types (not IAdjective)
-    if (best.confidence > 0.48F &&
-        best.verb_type != grammar::VerbType::IAdjective) {
-      // Lower cost for higher confidence matches
-      float base_cost = 0.5F + (1.0F - best.confidence) * 0.3F;
+    // First try the best match, but also check all candidates for dictionary verbs
+    auto all_candidates = inflection.analyze(surface);
+    grammar::InflectionCandidate best;
+    bool is_dictionary_verb = false;
 
-      // Check if the base form exists in the dictionary
-      // This gives a significant bonus for conjugations of known verbs
-      // (e.g., できなくて → できる which is in the dictionary)
-      bool is_dictionary_verb = false;
-      if (dict_manager != nullptr && !best.base_form.empty()) {
-        auto results = dict_manager->lookup(best.base_form, 0);
+    // Look through all candidates to find one whose base form is in the dictionary
+    // This helps with cases like やっとく where やる (conf=0.43) is correct but
+    // やつ (conf=0.73) incorrectly gets higher confidence
+    if (dict_manager != nullptr) {
+      for (const auto& cand : all_candidates) {
+        if (cand.verb_type == grammar::VerbType::IAdjective ||
+            cand.base_form.empty()) {
+          continue;
+        }
+        auto results = dict_manager->lookup(cand.base_form, 0);
         for (const auto& result : results) {
           if (result.entry != nullptr &&
-              result.entry->surface == best.base_form &&
+              result.entry->surface == cand.base_form &&
               result.entry->pos == core::PartOfSpeech::Verb) {
+            // Found a dictionary verb - use this candidate
+            best = cand;
             is_dictionary_verb = true;
             break;
           }
         }
+        if (is_dictionary_verb) {
+          break;
+        }
       }
+    }
+
+    // If no dictionary match, use the best confidence match
+    if (!is_dictionary_verb && !all_candidates.empty()) {
+      best = inflection.getBest(surface);
+    }
+
+    // Only accept verb types (not IAdjective) with sufficient confidence
+    // Lower threshold for dictionary-verified verbs
+    float conf_threshold = is_dictionary_verb ? 0.35F : 0.48F;
+    if (best.confidence > conf_threshold &&
+        best.verb_type != grammar::VerbType::IAdjective) {
+      // Lower cost for higher confidence matches
+      float base_cost = 0.5F + (1.0F - best.confidence) * 0.3F;
 
       // Give significant bonus for dictionary-verified hiragana verbs
       // This helps them beat the particle+adj+particle split path
@@ -517,7 +544,13 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       size_t candidate_len = end_pos - start_pos;
       bool is_conditional = (surface.size() >= 3 &&
                              surface.substr(surface.size() - 3) == "ば");
-      if (is_dictionary_verb && (candidate_len >= 5 || is_conditional)) {
+      // Check for っとく pattern (ておく contraction: やっとく, 見っとく)
+      // This is a common colloquial pattern that should get bonus treatment
+      // Note: っとく is 9 bytes in UTF-8 (3 bytes per hiragana)
+      bool is_teoku_contraction = (surface.size() >= 9 &&
+                                   surface.substr(surface.size() - 9) == "っとく");
+      if (is_dictionary_verb &&
+          (candidate_len >= 5 || is_conditional || is_teoku_contraction)) {
         base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;
       } else if (candidate_len >= 7 && best.confidence >= 0.8F) {
         // For long hiragana verb forms (7+ chars) with high confidence,

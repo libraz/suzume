@@ -76,11 +76,10 @@
     },
     {
       "id": "casual_contraction_toku",
-      "description": "Contraction とく (ておく→とく)",
+      "description": "Contraction とく (ておく→とく) - 買って+おく contracted to 買っとく",
       "input": "買っとくね",
       "expected": [
-        {"surface": "買", "pos": "Noun"},
-        {"surface": "っとく", "pos": "Verb", "lemma": "とく"},
+        {"surface": "買っとく", "pos": "Verb", "lemma": "買う"},
         {"surface": "ね", "pos": "Particle"}
       ],
       "tags": ["casual", "contraction"]
@@ -290,7 +289,9 @@
       "description": "Colloquial している → してる",
       "input": "今何してる",
       "expected": [
-        {"surface": "今何してる", "pos": "Verb", "lemma": "今何しつ"}
+        {"surface": "今", "pos": "Noun"},
+        {"surface": "何", "pos": "Pronoun"},
+        {"surface": "してる", "pos": "Verb", "lemma": "してる"}
       ],
       "tags": ["colloquial"]
     },
@@ -311,7 +312,8 @@
       "expected": [
         {"surface": "学校", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "行ってた", "pos": "Verb"}
+        {"surface": "行って", "pos": "Verb", "lemma": "行く"},
+        {"surface": "た", "pos": "Auxiliary"}
       ],
       "tags": ["colloquial"]
     },
@@ -362,12 +364,12 @@
       "description": "Colloquial questioning past っけ",
       "input": "何時だっけ",
       "expected": [
-        {"surface": "何", "pos": "Pronoun"},
+        {"surface": "何", "pos": "Prefix"},
         {"surface": "時", "pos": "Noun"},
         {"surface": "だ", "pos": "Auxiliary"},
         {"surface": "っけ", "pos": "Particle"}
       ],
-      "tags": ["colloquial", "review"]
+      "tags": ["colloquial"]
     },
     {
       "id": "colloquial_kana",

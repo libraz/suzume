@@ -147,7 +147,6 @@
 
 ご飯	NOUN	ごはん	0.3
 Wi-Fi	NOUN		0.5
-C&R	NOUN		0.5
 子どもの貧困	NOUN	こどものひんこん	0.5
 食器洗い乾燥機	NOUN	しょっきあらいかんそうき	0.5
 投資ファンド	NOUN	とうしふぁんど	0.5
@@ -316,6 +315,4 @@ C&R	NOUN		0.5
 将来	NOUN	しょうらい	0.5
 過去	NOUN	かこ	0.5
 未来	NOUN	みらい	0.5
-
-# === 五段ラ行動詞 migrated to L1 (essential_verbs.h) ===
-# 対する, 関する, etc. - all moved to L1 for auto-conjugation
+菓子	NOUN	かし	1.0

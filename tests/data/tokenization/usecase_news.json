@@ -424,7 +424,7 @@
         {"surface": "読み", "pos": "Verb", "lemma": "読む"},
         {"surface": "込まれて", "pos": "Verb", "lemma": "込む"},
         {"surface": "いない", "pos": "Auxiliary", "lemma": "いる"},
-        {"surface": "こと", "pos": "Noun", "lemma": "事"},
+        {"surface": "こと", "pos": "Noun", "lemma": "こと"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["long"]
@@ -491,13 +491,13 @@
     },
     {
       "id": "education_group_work",
-      "description": "Group work instruction",
+      "description": "Group work instruction - compound verb with split ください",
       "input": "グループで話し合ってください",
       "expected": [
         {"surface": "グループ", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
         {"surface": "話し", "pos": "Verb", "lemma": "話す"},
-        {"surface": "合って", "pos": "Verb", "lemma": "合る"},
+        {"surface": "合って", "pos": "Verb", "lemma": "合う"},
         {"surface": "ください", "pos": "Auxiliary"}
       ],
       "tags": ["education"]

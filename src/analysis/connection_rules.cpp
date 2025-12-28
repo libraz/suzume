@@ -159,8 +159,16 @@ ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
     return {};
   }
 
-  // Check for godan onbin or ichidan endings
-  if (!endsWithOnbinMarker(prev.surface) && !endsWithERow(prev.surface)) {
+  // Check for godan onbin, ichidan endings, or godan renyokei i-row endings
+  // Godan te-form patterns:
+  //   - 書く → 書いて (onbin: い + て)
+  //   - 読む → 読んで (onbin: ん + で)
+  //   - 話す → 話して (renyokei: し + て, i-row ending)
+  //   - いたす → いたして (renyokei: し + て)
+  // Ichidan te-form patterns:
+  //   - 食べる → 食べて (e-row ending)
+  if (!endsWithOnbinMarker(prev.surface) && !endsWithERow(prev.surface) &&
+      !endsWithIRow(prev.surface)) {
     return {};
   }
 
@@ -837,6 +845,46 @@ ConnectionRuleResult checkNounBeforeVerbAux(const core::LatticeEdge& prev,
           "noun before verb-specific aux"};
 }
 
+// Rule: NOUN + まい(AUX) penalty
+// まい (negative conjecture) attaches to verb stems:
+// - Godan 終止形: 行くまい, 書くまい
+// - Ichidan 未然形: 食べまい, 出来まい
+// NOUN + まい is grammatically invalid - should be VERB stem + まい
+ConnectionRuleResult checkMaiAfterNoun(const core::LatticeEdge& prev,
+                                       const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Noun ||
+      next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  if (next.surface != "まい") {
+    return {};
+  }
+
+  // Penalty to prefer verb stem + まい over noun + まい
+  return {ConnectionPattern::NounBeforeVerbAux, 1.5F,
+          "mai aux after noun (should be verb stem)"};
+}
+
+// Check for invalid PARTICLE + AUX pattern
+// Auxiliaries (助動詞) attach to verb/adjective stems, not particles
+// PARTICLE + AUX is grammatically invalid in most cases
+// Examples of invalid patterns:
+//   と + う (particle + volitional)
+//   に + た (particle + past)
+//   を + ない (particle + negative)
+ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Particle ||
+      next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  // Penalty - auxiliaries should attach to verb/adj stems, not particles
+  return {ConnectionPattern::ParticleBeforeAux, 3.0F,
+          "aux after particle (invalid)"};
+}
+
 }  // namespace
 
 // =============================================================================
@@ -977,6 +1025,16 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
   }
 
   result = checkNounBeforeVerbAux(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkMaiAfterNoun(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkAuxAfterParticle(prev, next);
   if (result.pattern != ConnectionPattern::None) {
     return result;
   }

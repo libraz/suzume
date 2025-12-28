@@ -1,5 +1,5 @@
 {
-  "name": "suzume",
+  "name": "@libraz/suzume",
   "version": "1.0.0",
   "type": "module",
   "packageManager": "yarn@4.12.0",

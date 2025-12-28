@@ -23,16 +23,16 @@
     },
     {
       "id": "botchan_impossible_jump",
-      "description": "そこから飛び降りる事は出来まい - compound verb + negative presumption auxiliary",
+      "description": "そこから飛び降りる事は出来まい - compound verb split + negative presumption unified",
       "input": "そこから飛び降りる事は出来まい",
       "expected": [
         {"surface": "そこ", "pos": "Pronoun"},
         {"surface": "から", "pos": "Particle"},
-        {"surface": "飛び降りる", "pos": "Verb", "lemma": "飛び降りる"},
+        {"surface": "飛び", "pos": "Noun"},
+        {"surface": "降りる", "pos": "Verb", "lemma": "降りる"},
         {"surface": "事", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "出来", "pos": "Verb", "lemma": "出来る"},
-        {"surface": "まい", "pos": "Auxiliary", "lemma": "まい"}
+        {"surface": "出来まい", "pos": "Verb", "lemma": "出来る"}
       ],
       "tags": ["literature", "botchan"]
     }

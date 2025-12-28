@@ -100,7 +100,8 @@ enum class ConnectionPattern {
   PrefixToShortStemHiraganaAdj,  // PREFIX → 短語幹純ひらがなADJ (e.g., お + いしい)
   SuffixAfterSymbol,       // SYMBOL → SUFFIX (invalid: 、家 should be NOUN, not SUFFIX)
   PrefixBeforeVerb,        // PREFIX → VERB (invalid: 何してる - 何 should be PRON)
-  NounBeforeVerbAux        // NOUN → verb-specific AUX (invalid: 行き(NOUN) + ましょう)
+  NounBeforeVerbAux,       // NOUN → verb-specific AUX (invalid: 行き(NOUN) + ましょう)
+  ParticleBeforeAux        // PARTICLE → AUX (invalid: と + う should not happen)
 };
 
 /**

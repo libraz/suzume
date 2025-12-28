@@ -371,6 +371,15 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"う", "う", "う", kAuxNai, kAuxOutBase, kVerbVolitional});
   entries.push_back({"よう", "よう", "よう", kAuxNai, kAuxOutBase, kVerbVolitional});
 
+  // === Negative conjecture まい (打消推量) ===
+  // まい attaches to:
+  // - Godan 終止形: 行くまい, 書くまい, 言うまい
+  // - Ichidan 未然形: 食べまい, 見まい, 出来まい (でき + まい)
+  // - Kuru 未然形: こまい
+  // - Suru 未然形: しまい
+  entries.push_back({"まい", "まい", "まい", kAuxNai, kAuxOutBase, kVerbBase});
+  entries.push_back({"まい", "まい", "まい", kAuxNai, kAuxOutBase, kVerbMizenkei});
+
   // === Volitional + とする ===
   entries.push_back({"うとする", "うとする", "とする", kAuxNai, kAuxOutBase, kVerbVolitional});
   entries.push_back({"うとした", "うとした", "とする", kAuxNai, kAuxOutTa, kVerbVolitional});
@@ -483,8 +492,10 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"じゃって", "じゃって", "しまう", kAuxTeshimau, kAuxOutTe, kVerbOnbinkei});
 
   // === Colloquial ておく contraction ===
-  entries.push_back({"とく", "とく", "おく", kAuxTeoku, kAuxOutBase, kAuxOutTe});
-  entries.push_back({"といた", "といた", "おく", kAuxTeoku, kAuxOutTa, kAuxOutTe});
+  // やっとく, 見とく - connects to 音便形 (like ちゃう/じゃう)
+  entries.push_back({"とく", "とく", "おく", kAuxTeoku, kAuxOutBase, kVerbOnbinkei});
+  entries.push_back({"といた", "といた", "おく", kAuxTeoku, kAuxOutTa, kVerbOnbinkei});
+  entries.push_back({"といて", "といて", "おく", kAuxTeoku, kAuxOutTe, kVerbOnbinkei});
 
   // === Polite forms ===
   entries.push_back({"おる", "おる", "おる", kAuxTeiru, kAuxOutBase, kAuxOutTe});

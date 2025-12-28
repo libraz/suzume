@@ -14,12 +14,11 @@
     },
     {
       "id": "wo_not_merged_with_verb",
-      "description": "をなくして should not be merged as single token",
+      "description": "を should not be merged with verb, なくして is unified te-form",
       "input": "をなくして",
       "expected": [
         {"surface": "を", "pos": "Particle"},
-        {"surface": "なくし", "pos": "Verb", "lemma": "なくす"},
-        {"surface": "て", "pos": "Particle"}
+        {"surface": "なくして", "pos": "Verb", "lemma": "なくす"}
       ],
       "tags": ["regression", "particle", "wo"]
     },

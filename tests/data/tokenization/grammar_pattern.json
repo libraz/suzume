@@ -608,11 +608,10 @@
     },
     {
       "id": "colloquial_toku",
-      "description": "やっとく (will do it in advance)",
+      "description": "やっとく (will do it in advance) - contraction of やって+おく",
       "input": "やっとく",
       "expected": [
-        {"surface": "やっ", "pos": "Verb", "lemma": "やる"},
-        {"surface": "とく", "pos": "Auxiliary"}
+        {"surface": "やっとく", "pos": "Verb", "lemma": "やる"}
       ],
       "tags": ["grammar", "colloquial"]
     },

@@ -53,6 +53,23 @@ float calculateConfidence(VerbType type, std::string_view stem,
     logConfidenceAdjustment(inflection::kBonusStemOneChar, "stem_one_char");
   }
 
+  // Small kana (拗音) cannot start a verb stem
+  // ょ, ゃ, ゅ, ぁ, ぃ, ぅ, ぇ, ぉ, っ are always part of compound sounds
+  // E.g., きょう is valid, but ょう alone cannot be a word
+  if (stem_len >= 3) {
+    std::string_view first_char = stem.substr(0, 3);
+    if (first_char == "ょ" || first_char == "ゃ" || first_char == "ゅ" ||
+        first_char == "ぁ" || first_char == "ぃ" || first_char == "ぅ" ||
+        first_char == "ぇ" || first_char == "ぉ" ||
+        first_char == "ョ" || first_char == "ャ" || first_char == "ュ" ||
+        first_char == "ァ" || first_char == "ィ" || first_char == "ゥ" ||
+        first_char == "ェ" || first_char == "ォ") {
+      // Heavily penalize - this is grammatically impossible
+      base -= 1.0F;
+      logConfidenceAdjustment(-1.0F, "small_kana_stem_invalid");
+    }
+  }
+
   // Longer auxiliary chain = higher confidence (matched more grammar)
   float aux_bonus = static_cast<float>(aux_total_len) * inflection::kBonusAuxLengthPerByte;
   base += aux_bonus;
@@ -439,19 +456,22 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // I-adjective stems that look like godan verb renyokei (kanji + i-row)
   // Pattern: 書き, 読み, 飲み (2 chars = 6 bytes, ends with i-row hiragana)
   // These are typical godan verb stems, not i-adjective stems
-  // This prevents "書きそう" from being parsed as i-adjective "書きい"
-  // Apply when the stem could be confused with verb renyokei
-  //
-  // NOTE: き is excluded from penalty because 大きい is a common i-adjective.
-  // The lattice scoring will disambiguate 書きそう (verb+aux) vs 大きそう (adj+aux)
-  // based on connection costs and other factors.
+  // This prevents "書きすぎる" from being parsed as i-adjective "書きい"
   if (type == VerbType::IAdjective && stem_len == 6) {
     std::string_view last = stem.substr(3);  // Last 3 bytes = 1 hiragana
-    // Exclude き - real adjectives like 大きい use this pattern
-    // Exclude し - common in real i-adj stems like 美し, 楽し (handled elsewhere)
-    if (last == "ぎ" || last == "ち" ||
-        last == "に" || last == "び" || last == "み" || last == "り" ||
-        last == "い") {
+    // き: Apply penalty for godan renyokei pattern (書き, 聞き, etc.)
+    //     Exception: 大きい is a real adjective - stem is exactly "大き"
+    // し: Excluded - common in real i-adj stems like 美し, 楽し (handled elsewhere)
+    if (last == "き") {
+      std::string_view first = stem.substr(0, 3);
+      // Only 大き is a valid adjective stem ending in き
+      if (first != "大" && endsWithKanji(first)) {
+        base -= inflection::kPenaltyIAdjGodanRenyokeiPattern;
+        logConfidenceAdjustment(-inflection::kPenaltyIAdjGodanRenyokeiPattern, "i_adj_godan_renyokei_ki");
+      }
+    } else if (last == "ぎ" || last == "ち" ||
+               last == "に" || last == "び" || last == "み" || last == "り" ||
+               last == "い") {
       // Check if first char is kanji (typical verb renyokei pattern)
       if (endsWithKanji(stem.substr(0, 3))) {
         base -= inflection::kPenaltyIAdjGodanRenyokeiPattern;

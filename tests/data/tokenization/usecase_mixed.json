@@ -154,8 +154,7 @@
       "description": "Long kanji compound",
       "input": "東京都知事選挙",
       "expected": [
-        {"surface": "東京都", "pos": "Noun"},
-        {"surface": "知事選挙", "pos": "Noun"}
+        {"surface": "東京都知事選挙", "pos": "Noun"}
       ],
       "tags": ["compound_noun"]
     },

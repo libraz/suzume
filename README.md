@@ -18,14 +18,14 @@ A lightweight Japanese tokenizer that runs in browsers and Node.js.
 | Breaks on unknown words | Handles them gracefully |
 | Requires large dictionaries | Works with minimal dictionary |
 | Native runtime only | Browser + Node.js + Native |
-| Complex setup | `npm install suzume` |
+| Complex setup | `npm install @libraz/suzume` |
 
 ## Installation
 
 ### npm (Browser / Node.js)
 
 ```bash
-npm install suzume
+npm install @libraz/suzume
 ```
 
 ### Build from Source (C++)
@@ -42,7 +42,7 @@ Requirements: C++17 compiler, CMake 3.15+
 ### JavaScript / TypeScript
 
 ```typescript
-import { Suzume } from 'suzume';
+import { Suzume } from '@libraz/suzume';
 
 const suzume = await Suzume.create();
 

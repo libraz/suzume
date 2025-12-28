@@ -70,6 +70,13 @@ inline std::vector<DictionaryEntry> getParticleEntries() {
       {"けど", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"けれども", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
 
+      // Quotation particles (引用助詞)
+      // って is colloquial form of と for quotation/topic marking
+      // Example: 行くって言った (said they're going), 明日って何曜日？ (what day is tomorrow?)
+      // Cost 0.8F to avoid splitting te-form verbs like 手伝って, 買って
+      // The connection rules will handle VERB→って vs NOUN→って distinction
+      {"って", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
+
       // Final particles (終助詞)
       {"か", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
       {"な", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
@@ -79,6 +86,7 @@ inline std::vector<DictionaryEntry> getParticleEntries() {
       {"の", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
       {"じゃん", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},  // Colloquial
       {"っけ", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},  // Recall
+      {"かしら", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},  // Uncertainty/wonder (女性語)
 
       // Adverbial particles (副助詞)
       {"ばかり", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},

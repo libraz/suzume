@@ -77,6 +77,12 @@ inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"だろう", POS::Auxiliary, 0.5F, "", false, false, false, CT::None, ""},
       {"でしょう", POS::Auxiliary, 0.5F, "", false, false, false, CT::None, ""},
 
+      // Negative conjecture (否定推量/打消推量) - まい
+      // Attaches to 終止形: 行くまい, 食べまい, 出来まい
+      // Expresses negative intention or negative conjecture
+      // Cost 0.3F to beat i-adjective misanalysis (e.g., 出来まい should not be parsed as adj 出来まい)
+      {"まい", POS::Auxiliary, 0.3F, "まい", false, false, false, CT::None, ""},
+
       // Possibility/Uncertainty (可能性・不確実) - かもしれない forms
       // Without these, "もしれません" is incorrectly parsed as verb "もしれる"
       {"かもしれない", POS::Auxiliary, 0.3F, "かもしれない", false, false, false, CT::None, ""},

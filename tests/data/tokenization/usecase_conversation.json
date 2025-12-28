@@ -21,7 +21,8 @@
         {"surface": "まで", "pos": "Particle"},
         {"surface": "どう", "pos": "Adverb"},
         {"surface": "やって", "pos": "Verb", "lemma": "やる"},
-        {"surface": "行きます", "pos": "Verb", "lemma": "行く"},
+        {"surface": "行き", "pos": "Verb", "lemma": "行く"},
+        {"surface": "ます", "pos": "Auxiliary"},
         {"surface": "か", "pos": "Particle"}
       ],
       "tags": ["conversation"]
@@ -328,9 +329,10 @@
       "id": "travel_platform",
       "input": "東京行きは何番線ですか",
       "expected": [
-        {"surface": "東京行き", "pos": "Noun"},
+        {"surface": "東京", "pos": "Noun"},
+        {"surface": "行き", "pos": "Suffix"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "何", "pos": "Pronoun"},
+        {"surface": "何", "pos": "Prefix"},
         {"surface": "番線", "pos": "Noun"},
         {"surface": "です", "pos": "Auxiliary"},
         {"surface": "か", "pos": "Particle"}

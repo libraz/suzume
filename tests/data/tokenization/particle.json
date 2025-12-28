@@ -184,12 +184,11 @@
     },
     {
       "id": "sentence_ending_kashira",
-      "description": "Feminine wonder particle かしら",
+      "description": "Feminine wonder particle かしら (unified)",
       "input": "大丈夫かしら",
       "expected": [
         {"surface": "大丈夫", "pos": "Noun"},
-        {"surface": "か", "pos": "Particle"},
-        {"surface": "しら", "pos": "Auxiliary"}
+        {"surface": "かしら", "pos": "Particle"}
       ],
       "tags": ["particle", "sentence_ending"]
     },

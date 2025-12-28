@@ -49,6 +49,18 @@ inline std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"用いる", POS::Verb, 0.3F, "用いる", false, false, false, CT::Ichidan,
        "もちいる"},
 
+      // 降りる: Ichidan (降りて → 降りる, not 降る)
+      // Common verb for "to descend/get off", used in compound verbs like 飛び降りる
+      {"降りる", POS::Verb, 0.3F, "降りる", false, false, false, CT::Ichidan,
+       "おりる"},
+
+      // 出来る: Ichidan, potential/can do (できます → できる)
+      // Very common verb, often written with kanji 出来る
+      {"出来る", POS::Verb, 0.3F, "出来る", false, false, false, CT::Ichidan,
+       "できる"},
+      {"できる", POS::Verb, 0.3F, "できる", false, false, false, CT::Ichidan,
+       "できる"},
+
       // 上げる: Ichidan, not GodanGa (上げます → 上げる, not 上ぐ)
       // Used frequently as auxiliary verb (〜てあげる)
       {"上げる", POS::Verb, 0.3F, "上げる", false, false, false, CT::Ichidan,
@@ -271,11 +283,14 @@ inline std::vector<DictionaryEntry> getEssentialVerbEntries() {
       // ========================================
       // Common GodanWa verbs (ワ行五段) - from L2 dictionary
       // ========================================
+      {"手伝う", POS::Verb, 1.0F, "手伝う", false, false, false, CT::GodanWa, "てつだう"},
       {"買う", POS::Verb, 1.0F, "買う", false, false, false, CT::GodanWa, "かう"},
       {"言う", POS::Verb, 1.0F, "言う", false, false, false, CT::GodanWa, "いう"},
       {"思う", POS::Verb, 1.0F, "思う", false, false, false, CT::GodanWa, "おもう"},
       {"使う", POS::Verb, 1.0F, "使う", false, false, false, CT::GodanWa, "つかう"},
       {"会う", POS::Verb, 1.0F, "会う", false, false, false, CT::GodanWa, "あう"},
+      // 合う: to match/fit/combine - used in compound verbs like 話し合う
+      {"合う", POS::Verb, 1.0F, "合う", false, false, false, CT::GodanWa, "あう"},
       {"払う", POS::Verb, 1.0F, "払う", false, false, false, CT::GodanWa, "はらう"},
       {"洗う", POS::Verb, 1.0F, "洗う", false, false, false, CT::GodanWa, "あらう"},
       {"歌う", POS::Verb, 1.0F, "歌う", false, false, false, CT::GodanWa, "うたう"},
@@ -290,6 +305,8 @@ inline std::vector<DictionaryEntry> getEssentialVerbEntries() {
       // ========================================
       // Common GodanRa verbs (ラ行五段) - from L2 dictionary
       // ========================================
+      // 降る: to fall (rain, snow) - disambiguate from 降りる (to descend)
+      {"降る", POS::Verb, 1.0F, "降る", false, false, false, CT::GodanRa, "ふる"},
       {"取る", POS::Verb, 1.0F, "取る", false, false, false, CT::GodanRa, "とる"},
       {"乗る", POS::Verb, 1.0F, "乗る", false, false, false, CT::GodanRa, "のる"},
       {"送る", POS::Verb, 1.0F, "送る", false, false, false, CT::GodanRa, "おくる"},
