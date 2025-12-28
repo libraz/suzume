@@ -22,6 +22,8 @@ std::string_view posToString(PartOfSpeech pos) {
       return "DET";
     case PartOfSpeech::Pronoun:
       return "PRON";
+    case PartOfSpeech::Suffix:
+      return "SUFFIX";
     case PartOfSpeech::Symbol:
       return "SYMBOL";
     case PartOfSpeech::Other:
@@ -51,6 +53,8 @@ std::string_view posToJapanese(PartOfSpeech pos) {
       return "連体詞";
     case PartOfSpeech::Pronoun:
       return "代名詞";
+    case PartOfSpeech::Suffix:
+      return "接尾辞";
     case PartOfSpeech::Symbol:
       return "記号";
     case PartOfSpeech::Other:
@@ -88,6 +92,9 @@ PartOfSpeech stringToPos(std::string_view str) {
   }
   if (str == "PRON" || str == "代名詞") {
     return PartOfSpeech::Pronoun;
+  }
+  if (str == "SUFFIX" || str == "接尾辞") {
+    return PartOfSpeech::Suffix;
   }
   if (str == "SYMBOL" || str == "記号") {
     return PartOfSpeech::Symbol;

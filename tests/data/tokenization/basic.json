@@ -454,11 +454,10 @@
     },
     {
       "id": "na_adj_arata",
-      "description": "新たな - na-adjective",
+      "description": "新たな - na-adjective attributive form",
       "input": "新たな",
       "expected": [
-        {"surface": "新た", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"}
+        {"surface": "新たな", "pos": "Adjective", "lemma": "新た"}
       ],
       "tags": ["basic", "na-adjective"]
     },

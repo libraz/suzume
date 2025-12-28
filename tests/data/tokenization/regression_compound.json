@@ -142,7 +142,7 @@
     },
     {
       "id": "noun_plus_tachi",
-      "description": "学生たち - noun + suffix",
+      "description": "学生たち - noun + suffix split",
       "input": "学生たち",
       "expected": [
         {"surface": "学生", "pos": "Noun"},
@@ -152,7 +152,7 @@
     },
     {
       "id": "noun_plus_san",
-      "description": "田中さん - noun + honorific suffix",
+      "description": "田中さん - noun + honorific suffix split",
       "input": "田中さん",
       "expected": [
         {"surface": "田中", "pos": "Noun"},
@@ -162,11 +162,10 @@
     },
     {
       "id": "kodomo_tachi",
-      "description": "子供たちが遊ぶ - noun + suffix in sentence",
+      "description": "子供たちが遊ぶ - noun + suffix merged",
       "input": "子供たちが遊ぶ",
       "expected": [
-        {"surface": "子供", "pos": "Noun"},
-        {"surface": "たち", "pos": "Other"},
+        {"surface": "子供たち", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "遊ぶ", "pos": "Verb"}
       ],

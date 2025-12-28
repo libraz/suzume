@@ -21,7 +21,7 @@ namespace suzume {
 struct SuzumeOptions {
   core::AnalysisMode mode = core::AnalysisMode::Normal;
   bool lemmatize = true;
-  bool merge_compounds = true;
+  bool merge_compounds = false;
   postprocess::TagGeneratorOptions tag_options;
 };
 

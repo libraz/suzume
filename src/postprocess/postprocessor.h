@@ -14,7 +14,7 @@ namespace suzume::postprocess {
  * @brief Post-processing options
  */
 struct PostprocessOptions {
-  bool merge_noun_compounds = true;  // Merge consecutive nouns
+  bool merge_noun_compounds = false;  // Merge consecutive nouns
   bool lemmatize = true;             // Apply lemmatization
   bool remove_symbols = true;        // Remove symbol-only morphemes
   size_t min_surface_length = 1;     // Minimum surface length to keep
@@ -53,6 +53,21 @@ class Postprocessor {
    * @brief Merge consecutive nouns
    */
   static std::vector<core::Morpheme> mergeNounCompounds(const std::vector<core::Morpheme>& morphemes);
+
+  /**
+   * @brief Merge NOUN/PRONOUN + SUFFIX into compound noun
+   */
+  static std::vector<core::Morpheme> mergeNounSuffix(const std::vector<core::Morpheme>& morphemes);
+
+  /**
+   * @brief Merge consecutive numeric expressions (e.g., 3億 + 5000万円 → 3億5000万円)
+   */
+  static std::vector<core::Morpheme> mergeNumericExpressions(const std::vector<core::Morpheme>& morphemes);
+
+  /**
+   * @brief Merge na-adjective + な into attributive form (e.g., 静か + な → 静かな)
+   */
+  static std::vector<core::Morpheme> mergeNaAdjectiveNa(const std::vector<core::Morpheme>& morphemes);
 
   /**
    * @brief Remove unwanted morphemes

@@ -58,6 +58,8 @@ inline std::vector<DictionaryEntry> getConjunctionEntries() {
       {"けれども", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
       {"ところが", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
       {"それでも", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
+      {"でも", POS::Conjunction, 0.5F, "", false, false, false, CT::None, ""},
+      {"だって", POS::Conjunction, 0.5F, "", false, false, false, CT::None, ""},
       {"にもかかわらず", POS::Conjunction, 0.5F, "", false, false, false, CT::None, ""},
 
       // Parallel/Addition (並列・添加) - kanji with reading

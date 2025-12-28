@@ -5,6 +5,7 @@
 
 #include "split_candidates.h"
 
+#include "core/debug.h"
 #include "grammar/inflection.h"
 #include "tokenizer_utils.h"
 
@@ -145,6 +146,8 @@ void addMixedScriptCandidates(
       }
 
       float final_cost = base_cost + length_adjustment;
+      SUZUME_DEBUG_LOG("[SPLIT_MIX] \"" << surface << "\": digit+kanji"
+                        << kanji_len << " adj=" << length_adjustment << "\n");
       lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
                       static_cast<uint32_t>(candidate_end),
                       core::PartOfSpeech::Noun, final_cost, flags, "");
@@ -154,6 +157,9 @@ void addMixedScriptCandidates(
     size_t end_byte = charPosToBytePos(codepoints, max_end);
     std::string surface(text.substr(start_byte, end_byte - start_byte));
     float final_cost = base_cost + base_bonus;
+    SUZUME_DEBUG_LOG("[SPLIT_MIX] \"" << surface << "\": alpha+"
+                      << (second_type == CharType::Kanji ? "kanji" : "katakana")
+                      << " bonus=" << base_bonus << "\n");
     lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
                     static_cast<uint32_t>(max_end), core::PartOfSpeech::Noun,
                     final_cost, flags, "");
@@ -376,6 +382,11 @@ void addNounVerbSplitCandidates(
         if (noun_in_dict && base_in_dict) {
           final_noun_cost -= 0.2F;
         }
+
+        SUZUME_DEBUG_LOG("[SPLIT_NV] \"" << noun_surface << "\" + \"" << verb_part
+                          << "\": noun_dict=" << noun_in_dict
+                          << " verb_dict=" << base_in_dict
+                          << " cost=" << final_noun_cost << "\n");
 
         uint8_t noun_flags = noun_in_dict ? core::LatticeEdge::kFromDictionary
                                            : core::LatticeEdge::kIsUnknown;

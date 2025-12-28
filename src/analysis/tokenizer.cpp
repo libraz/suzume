@@ -11,6 +11,7 @@
 
 #include "analysis/tokenizer.h"
 
+#include "core/debug.h"
 #include "join_candidates.h"
 #include "split_candidates.h"
 #include "tokenizer_utils.h"
@@ -125,8 +126,15 @@ void Tokenizer::addUnknownCandidates(
 
     // Penalize unknown words that extend beyond dictionary entries
     bool skip_penalty = false;
-    if (candidate.pos == core::PartOfSpeech::Verb ||
-        candidate.pos == core::PartOfSpeech::Adjective) {
+
+    // Skip penalty for adverbs (onomatopoeia like わくわく)
+    if (candidate.pos == core::PartOfSpeech::Adverb) {
+      skip_penalty = true;
+    }
+
+    if (!skip_penalty &&
+        (candidate.pos == core::PartOfSpeech::Verb ||
+         candidate.pos == core::PartOfSpeech::Adjective)) {
       for (const auto& result : dict_results) {
         if (result.entry != nullptr) {
           // Case 1: Dictionary entry is also a verb/adjective
@@ -156,6 +164,9 @@ void Tokenizer::addUnknownCandidates(
     if (!skip_penalty && max_dict_length > 0 &&
         candidate.end - candidate.start > max_dict_length) {
       adjusted_cost += 3.5F;
+      SUZUME_DEBUG_LOG("[TOK_UNK] \"" << candidate.surface
+                        << "\": +3.5 (exceeds_dict_length, dict_max="
+                        << max_dict_length << ")\n");
     }
 
     // For verb candidates, check if the hiragana suffix is a known particle
@@ -187,6 +198,9 @@ void Tokenizer::addUnknownCandidates(
               size_t suffix_len = candidate.end - hiragana_start;
               if (result.length == suffix_len) {
                 adjusted_cost += 1.5F;
+                SUZUME_DEBUG_LOG("[TOK_UNK] \"" << candidate.surface
+                                  << "\": +1.5 (particle_suffix=\""
+                                  << hiragana_suffix << "\")\n");
                 break;
               }
             }

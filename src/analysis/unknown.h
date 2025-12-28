@@ -188,6 +188,18 @@ class UnknownWordGenerator {
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
+   * @brief Generate ABAB-type onomatopoeia candidates
+   *
+   * Detects 4-character hiragana/katakana patterns where characters 1-2
+   * match characters 3-4, like わくわく, きらきら, どきどき.
+   * These are recognized as adverbs.
+   */
+  std::vector<UnknownCandidate> generateOnomatopoeiaCandidates(
+      const std::vector<char32_t>& codepoints,
+      size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
    * @brief Get max length for character type
    */
   size_t getMaxLength(normalize::CharType ctype) const;

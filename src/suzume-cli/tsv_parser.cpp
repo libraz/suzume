@@ -212,6 +212,9 @@ core::Expected<core::PartOfSpeech, core::Error> TsvParser::parsePos(
   if (str == "DETERMINER" || str == "DET") {
     return core::PartOfSpeech::Determiner;
   }
+  if (str == "SUFFIX") {
+    return core::PartOfSpeech::Suffix;
+  }
 
   return core::makeUnexpected(core::Error(
       core::ErrorCode::ParseError,

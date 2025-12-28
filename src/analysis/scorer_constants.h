@@ -133,6 +133,15 @@ constexpr float kPenaltyIruAuxAfterNoun = 2.0F;
 // E.g., 食べて + いる, 走って + います - progressive aspect pattern
 constexpr float kBonusIruAuxAfterTeForm = 0.5F;
 
+// Te-form VERB + VERB bonus
+// E.g., 関して + 報告する, 調べて + わかる - te-form continuation pattern
+// Offsets the high VERB→VERB base cost (0.8) when prev verb ends with て/で
+constexpr float kBonusTeFormVerbToVerb = 0.8F;
+
+// Suffix at sentence start penalty
+// Suffix should only follow nouns/pronouns, not appear at sentence start
+constexpr float kPenaltySuffixAtStart = 3.0F;
+
 }  // namespace suzume::analysis::scorer
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONSTANTS_H_

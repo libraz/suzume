@@ -126,33 +126,33 @@ inline std::vector<DictionaryEntry> getLowInfoEntries() {
       {"よければ", POS::Adjective, 0.5F, "よい", false, false, false, CT::IAdjective, ""},
 
       // Suffixes (接尾語)
-      {"的", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"化", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"性", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"率", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"法", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"論", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"者", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"家", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"員", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"式", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"感", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"力", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
-      {"度", POS::Other, 1.5F, "", false, false, true, CT::None, ""},
+      {"的", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"化", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"性", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"率", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"法", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"論", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"者", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"家", POS::Suffix, 1.5F, "か", false, false, true, CT::None, ""},
+      {"員", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"式", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"感", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"力", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"度", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
 
       // Plural suffixes (複数接尾語) - essential for proper tokenization
       // Low cost (0.5) to ensure NOUN+suffix is preferred over VERB interpretation
-      {"たち", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
-      {"ら", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
-      {"ども", POS::Other, 0.8F, "", false, false, true, CT::None, ""},
-      {"がた", POS::Other, 0.8F, "", false, false, true, CT::None, ""},
+      {"たち", POS::Suffix, 0.5F, "", false, false, true, CT::None, ""},
+      {"ら", POS::Suffix, 0.5F, "", false, false, true, CT::None, ""},
+      {"ども", POS::Suffix, 0.8F, "", false, false, true, CT::None, ""},
+      {"がた", POS::Suffix, 0.8F, "", false, false, true, CT::None, ""},
 
       // Honorific suffixes (敬称接尾語)
-      {"さん", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
-      {"様", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
-      {"ちゃん", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
-      {"くん", POS::Other, 0.5F, "", false, false, true, CT::None, ""},
-      {"氏", POS::Other, 0.8F, "", false, false, true, CT::None, ""},
+      {"さん", POS::Suffix, 0.5F, "", false, false, true, CT::None, ""},
+      {"様", POS::Suffix, 0.5F, "", false, false, true, CT::None, ""},
+      {"ちゃん", POS::Suffix, 0.5F, "", false, false, true, CT::None, ""},
+      {"くん", POS::Suffix, 0.5F, "", false, false, true, CT::None, ""},
+      {"氏", POS::Suffix, 0.8F, "", false, false, true, CT::None, ""},
   };
 }
 

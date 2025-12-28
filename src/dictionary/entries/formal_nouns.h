@@ -48,7 +48,9 @@ inline std::vector<DictionaryEntry> getFormalNounEntries() {
       // e.g., "もの" must beat "も"(0.5) + "の"(1.0) after Viterbi scoring
       // Low cost (0.3) compensates for connection costs in Viterbi
       {"事", POS::Noun, 0.3F, "", false, true, false, CT::None, "こと"},
+      {"こと", POS::Noun, -0.5F, "事", false, true, false, CT::None, ""},  // Formal noun after verb 連体形
       {"物", POS::Noun, 0.3F, "", false, true, false, CT::None, "もの"},
+      {"もの", POS::Noun, -0.5F, "物", false, true, false, CT::None, ""},  // Formal noun after verb 連体形
       {"為", POS::Noun, 2.0F, "", false, true, false, CT::None, "ため"},
       {"所", POS::Noun, 1.0F, "", false, true, false, CT::None, "ところ"},
       {"ところ", POS::Noun, 0.3F, "", false, true, false, CT::None, ""},  // Aspectual: Vたところだ

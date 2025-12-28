@@ -129,6 +129,15 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
     return candidates;
   }
 
+  // Generate ABAB-type onomatopoeia candidates first (わくわく, きらきら, etc.)
+  // This needs to be checked before isNeverVerbStemAtStart filters out わ, etc.
+  if (char_types[start_pos] == normalize::CharType::Hiragana) {
+    auto onomatopoeia =
+        generateOnomatopoeiaCandidates(codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), onomatopoeia.begin(),
+                      onomatopoeia.end());
+  }
+
   // Generate verb candidates (kanji + hiragana conjugation endings)
   if (char_types[start_pos] == normalize::CharType::Kanji) {
     auto verbs = generateVerbCandidates(text, codepoints, start_pos, char_types);
@@ -530,6 +539,50 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
       // Mark as Auxiliary so it connects properly after verbs/adjectives
       candidate.pos = core::PartOfSpeech::Auxiliary;
       candidate.cost = options_.character_speech_cost;
+      candidate.has_suffix = false;
+      candidates.push_back(candidate);
+    }
+  }
+
+  return candidates;
+}
+
+std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) const {
+  std::vector<UnknownCandidate> candidates;
+
+  // Need at least 4 characters for ABAB pattern
+  if (start_pos + 3 >= codepoints.size()) {
+    return candidates;
+  }
+
+  // Check if we have 4 consecutive hiragana characters
+  for (size_t i = 0; i < 4; ++i) {
+    if (start_pos + i >= char_types.size() ||
+        char_types[start_pos + i] != normalize::CharType::Hiragana) {
+      return candidates;
+    }
+  }
+
+  // Check ABAB pattern: characters 0-1 must match characters 2-3
+  char32_t ch0 = codepoints[start_pos];
+  char32_t ch1 = codepoints[start_pos + 1];
+  char32_t ch2 = codepoints[start_pos + 2];
+  char32_t ch3 = codepoints[start_pos + 3];
+
+  if (ch0 == ch2 && ch1 == ch3) {
+    // ABAB pattern detected (e.g., わくわく, きらきら, どきどき)
+    std::string surface = extractSubstringLocal(codepoints, start_pos, start_pos + 4);
+
+    if (!surface.empty()) {
+      UnknownCandidate candidate;
+      candidate.surface = surface;
+      candidate.start = start_pos;
+      candidate.end = start_pos + 4;
+      candidate.pos = core::PartOfSpeech::Adverb;
+      candidate.cost = 0.1F;  // Very low cost to prefer over particle + adj splits
       candidate.has_suffix = false;
       candidates.push_back(candidate);
     }

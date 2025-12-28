@@ -36,8 +36,7 @@
       "description": "論理的な説明 (logical explanation) - attributive form",
       "input": "論理的な説明",
       "expected": [
-        {"surface": "論理的", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "論理的な", "pos": "Adjective", "lemma": "論理的"},
         {"surface": "説明", "pos": "Noun"}
       ],
       "tags": ["grammar", "na-adjective", "teki", "attributive"]
@@ -47,8 +46,7 @@
       "description": "効率的な方法 (efficient method) - attributive form",
       "input": "効率的な方法",
       "expected": [
-        {"surface": "効率的", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "効率的な", "pos": "Adjective", "lemma": "効率的"},
         {"surface": "方法", "pos": "Noun"}
       ],
       "tags": ["grammar", "na-adjective", "teki", "attributive"]
@@ -113,8 +111,7 @@
       "description": "科学的な根拠 (scientific evidence)",
       "input": "科学的な根拠",
       "expected": [
-        {"surface": "科学的", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "科学的な", "pos": "Adjective", "lemma": "科学的"},
         {"surface": "根拠", "pos": "Noun"}
       ],
       "tags": ["grammar", "na-adjective", "teki", "attributive"]
@@ -184,8 +181,7 @@
       "description": "静かな部屋 (quiet room) - attributive form",
       "input": "静かな部屋",
       "expected": [
-        {"surface": "静か", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "静かな", "pos": "Adjective", "lemma": "静か"},
         {"surface": "部屋", "pos": "Noun"}
       ],
       "tags": ["grammar", "na-adjective", "l1", "attributive"]
@@ -195,8 +191,7 @@
       "description": "大切な人 (important person) - attributive form",
       "input": "大切な人",
       "expected": [
-        {"surface": "大切", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "大切な", "pos": "Adjective", "lemma": "大切"},
         {"surface": "人", "pos": "Noun"}
       ],
       "tags": ["grammar", "na-adjective", "l1", "attributive"]
@@ -206,8 +201,7 @@
       "description": "便利な道具 (convenient tool) - attributive form",
       "input": "便利な道具",
       "expected": [
-        {"surface": "便利", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "便利な", "pos": "Adjective", "lemma": "便利"},
         {"surface": "道具", "pos": "Noun"}
       ],
       "tags": ["grammar", "na-adjective", "l1", "attributive"]
@@ -291,8 +285,7 @@
       "description": "必要な情報 (necessary information)",
       "input": "必要な情報",
       "expected": [
-        {"surface": "必要", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "必要な", "pos": "Adjective", "lemma": "必要"},
         {"surface": "情報", "pos": "Noun"}
       ],
       "tags": ["grammar", "na-adjective"]
@@ -312,8 +305,7 @@
       "description": "有名な人 (famous person)",
       "input": "有名な人",
       "expected": [
-        {"surface": "有名", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "有名な", "pos": "Adjective", "lemma": "有名"},
         {"surface": "人", "pos": "Noun"}
       ],
       "tags": ["grammar", "na-adjective"]
@@ -333,8 +325,7 @@
       "description": "複雑な問題 (complex problem)",
       "input": "複雑な問題",
       "expected": [
-        {"surface": "複雑", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "複雑な", "pos": "Adjective", "lemma": "複雑"},
         {"surface": "問題", "pos": "Noun"}
       ],
       "tags": ["grammar", "na-adjective"]
@@ -344,8 +335,7 @@
       "description": "重要な決定 (important decision)",
       "input": "重要な決定",
       "expected": [
-        {"surface": "重要", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "重要な", "pos": "Adjective", "lemma": "重要"},
         {"surface": "決定", "pos": "Noun"}
       ],
       "tags": ["grammar", "na-adjective"]
@@ -474,8 +464,7 @@
       "description": "さすがな人 (attributive form)",
       "input": "さすがな人",
       "expected": [
-        {"surface": "さすが", "pos": "Adjective", "lemma": "流石"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "さすがな", "pos": "Adjective", "lemma": "流石"},
         {"surface": "人", "pos": "Noun"}
       ],
       "tags": ["grammar", "na-adjective", "sasuga"]

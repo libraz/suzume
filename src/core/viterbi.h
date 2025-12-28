@@ -118,6 +118,16 @@ class Viterbi {
             const auto& prev_edges = lattice.edgesAt(state_info.prev_state.pos);
             const auto& prev = prev_edges[static_cast<size_t>(state_info.prev_edge)];
             conn_cost = scorer.connectionCost(prev, edge);
+          } else {
+            // BOS (beginning of sentence) connection cost
+            // Suffix should not appear at sentence start
+            if (edge.pos == PartOfSpeech::Suffix) {
+              conn_cost = 3.0F;  // High penalty for suffix at BOS
+            }
+            // Conjunction at sentence start is natural (e.g., でも, しかし)
+            if (edge.pos == PartOfSpeech::Conjunction) {
+              conn_cost = -0.5F;  // Bonus for conjunction at BOS
+            }
           }
 
           // Small per-transition cost to prefer fewer morphemes (longer tokens)

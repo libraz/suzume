@@ -30,30 +30,33 @@ constexpr size_t posToIndex(suzume::core::PartOfSpeech pos) {
       return 7;
     case suzume::core::PartOfSpeech::Pronoun:
       return 8;
-    case suzume::core::PartOfSpeech::Symbol:
+    case suzume::core::PartOfSpeech::Suffix:
       return 9;
+    case suzume::core::PartOfSpeech::Symbol:
+      return 10;
     case suzume::core::PartOfSpeech::Other:
     case suzume::core::PartOfSpeech::Unknown:
-      return 10;
+      return 11;
   }
-  return 10;
+  return 11;
 }
 
 // Bigram cost table [prev][next]
 // clang-format off
-constexpr float kBigramCostTable[11][11] = {
-    //        Noun  Verb  Adj   Adv   Part  Aux   Conj  Det   Pron  Sym   Other
-    /* Noun */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F},
-    /* Verb */ {0.2F, 0.8F, 0.8F, 0.5F, 0.0F, 0.0F, 0.5F, 0.5F, 0.2F, 0.5F, 0.5F},
-    /* Adj  */ {0.2F, 0.5F, 0.8F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.2F, 0.5F, 0.5F},
-    /* Adv  */ {0.0F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.5F, 0.5F},
-    /* Part */ {0.0F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.5F, 0.3F, 0.0F, 0.5F, 0.5F},
-    /* Aux  */ {0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.3F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F},
-    /* Conj */ {0.0F, 0.2F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.2F, 0.0F, 0.3F, 0.3F},
-    /* Det  */ {0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.8F, 0.0F, 0.5F, 0.5F},
-    /* Pron */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 1.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F},
-    /* Sym  */ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.0F, 0.2F},
-    /* Other*/ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F},
+constexpr float kBigramCostTable[12][12] = {
+    //        Noun  Verb  Adj   Adv   Part  Aux   Conj  Det   Pron  Suff  Sym   Other
+    /* Noun */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 0.0F, 0.5F, 0.5F, 0.5F, 0.0F, 0.5F, 0.5F},
+    /* Verb */ {0.2F, 0.8F, 0.8F, 0.5F, 0.0F, 0.0F, 0.5F, 0.5F, 0.2F, 0.8F, 0.5F, 0.5F},
+    /* Adj  */ {0.2F, 0.5F, 0.8F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.2F, 0.8F, 0.5F, 0.5F},
+    /* Adv  */ {0.0F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.8F, 0.5F, 0.5F},
+    /* Part */ {0.0F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.5F, 0.3F, 0.0F, 1.0F, 0.5F, 0.5F},
+    /* Aux  */ {0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.3F, 0.5F, 0.5F, 0.5F, 0.8F, 0.5F, 0.5F},
+    /* Conj */ {0.0F, 0.2F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.2F, 0.0F, 1.0F, 0.3F, 0.3F},
+    /* Det  */ {0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.8F, 0.0F, 0.8F, 0.5F, 0.5F},
+    /* Pron */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 1.0F, 0.5F, 0.5F, 0.5F, 0.0F, 0.5F, 0.5F},
+    /* Suff */ {0.5F, 0.8F, 0.8F, 0.5F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.3F, 0.5F, 0.5F},
+    /* Sym  */ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.5F, 0.0F, 0.2F},
+    /* Other*/ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.5F, 0.2F, 0.2F},
 };
 // clang-format on
 
@@ -118,8 +121,11 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   float cost = base_cost + pos_prior;
 
   SUZUME_DEBUG_LOG("[WORD] \"" << edge.surface << "\" ("
-                     << core::posToString(edge.pos) << "): "
-                     << "base=" << base_cost << " pos=" << pos_prior << "\n");
+                     << core::posToString(edge.pos) << ") lemma=\""
+                     << edge.lemma << "\" "
+                     << (edge.fromDictionary() ? "[dict]" :
+                         edge.isUnknown() ? "[unk]" : "[infl]")
+                     << ": base=" << base_cost << " pos=" << pos_prior << "\n");
 
   // Dictionary bonus
   if (edge.fromDictionary()) {

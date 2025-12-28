@@ -67,8 +67,7 @@
       "description": "好きな食べ物 - na-adjective attributive form",
       "input": "好きな食べ物",
       "expected": [
-        {"surface": "好き", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "好きな", "pos": "Adjective", "lemma": "好き"},
         {"surface": "食べ物", "pos": "Noun"}
       ],
       "tags": ["regression", "na_adjective"]

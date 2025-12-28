@@ -324,19 +324,19 @@ C&R	NOUN		0.5
 
 # === suffixes ===
 # Common suffixes (接尾語)
-的	OTHER	てき	1.5
-化	OTHER	か	1.5
-性	OTHER	せい	1.5
-率	OTHER	りつ	1.5
-法	OTHER	ほう	1.5
-論	OTHER	ろん	1.5
-者	OTHER	しゃ	1.5
-家	OTHER	か	1.5
-員	OTHER	いん	1.5
-式	OTHER	しき	1.5
-感	OTHER	かん	1.5
-力	OTHER	りょく	1.5
-度	OTHER	ど	1.5
+的	SUFFIX	てき	1.5
+化	SUFFIX	か	1.5
+性	SUFFIX	せい	1.5
+率	SUFFIX	りつ	1.5
+法	SUFFIX	ほう	1.5
+論	SUFFIX	ろん	1.5
+者	SUFFIX	しゃ	1.5
+家	SUFFIX	か	1.5
+員	SUFFIX	いん	1.5
+式	SUFFIX	しき	1.5
+感	SUFFIX	かん	1.5
+力	SUFFIX	りょく	1.5
+度	SUFFIX	ど	1.5
 
 # === plural_suffixes ===
 # Plural suffixes (複数接尾語) - low cost for NOUN+suffix pattern
@@ -427,3 +427,4 @@ C&R	NOUN		0.5
 帰する	VERB	きする	0.3	GODAN_RA
 欲する	VERB	ほっする	0.3	GODAN_RA
 資する	VERB	しする	0.3	GODAN_RA
+引っ越す	VERB	ひっこす	0.3	GODAN_SA

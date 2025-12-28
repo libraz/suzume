@@ -555,6 +555,62 @@ ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
           "te-form verb + iru aux (progressive)"};
 }
 
+// Helper: Check if verb is an auxiliary verb pattern (補助動詞)
+// These should be treated as Auxiliary, not independent Verb
+bool isAuxiliaryVerbPattern(std::string_view surface, std::string_view lemma) {
+  // Check lemma for auxiliary verb patterns
+  // いる/おる (progressive/state), しまう (completion), みる (try),
+  // おく (preparation), いく/くる (direction), あげる/もらう/くれる (giving)
+  if (lemma == "いる" || lemma == "おる" || lemma == "しまう" ||
+      lemma == "みる" || lemma == "おく" || lemma == "いく" ||
+      lemma == "くる" || lemma == "あげる" || lemma == "もらう" ||
+      lemma == "くれる" || lemma == "ある") {
+    return true;
+  }
+
+  // Check surface for polite forms
+  if (surface == "います" || surface == "おります" ||
+      surface == "しまいます" || surface == "みます" ||
+      surface == "おきます" || surface == "いきます" ||
+      surface == "きます" || surface == "あります" ||
+      surface == "ございます") {
+    return true;
+  }
+
+  return false;
+}
+
+// Rule 17: Te-form VERB + VERB bonus
+// E.g., 関して + 報告する, 調べて + わかる - te-form verb sequence
+// This offsets the high VERB→VERB base cost for te-form patterns
+// Excludes auxiliary verb patterns (いる, おる, しまう, etc.) which should be AUX
+ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  // Check if prev verb ends with te-form (て or で)
+  if (prev.surface.size() < 3) {
+    return {};
+  }
+  std::string_view last_char = prev.surface.substr(prev.surface.size() - 3);
+  if (last_char != "て" && last_char != "で") {
+    return {};
+  }
+
+  // Exclude auxiliary verb patterns - these should be Auxiliary, not Verb
+  // E.g., なって + おります should have おります as AUX
+  if (isAuxiliaryVerbPattern(next.surface, next.lemma)) {
+    return {};
+  }
+
+  // Bonus (negative value) for te-form + verb pattern
+  return {ConnectionPattern::TeFormVerbToVerb, -scorer::kBonusTeFormVerbToVerb,
+          "te-form verb to verb"};
+}
+
 // Check for formal noun followed by kanji (should be compound word)
 // e.g., 所 + 在する → should be 所在する
 ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
@@ -685,6 +741,11 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
   }
 
   result = checkIruAuxAfterTeForm(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkTeFormVerbToVerb(prev, next);
   if (result.pattern != ConnectionPattern::None) {
     return result;
   }
