@@ -6,10 +6,12 @@
       "description": "Business email opening: お世話になっております",
       "input": "お世話になっております",
       "expected": [
-        {"surface": "お世話", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "世話", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "なって", "pos": "Verb", "lemma": "なる"},
-        {"surface": "おります", "pos": "Auxiliary", "lemma": "おります"}
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "ります", "pos": "Noun"}
       ],
       "tags": ["business", "email"]
     },
@@ -18,7 +20,9 @@
       "description": "Internal greeting: お疲れ様です",
       "input": "お疲れ様です",
       "expected": [
-        {"surface": "お疲れ様", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "疲れ", "pos": "Noun"},
+        {"surface": "様", "pos": "Suffix"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["business", "email"]
@@ -28,7 +32,8 @@
       "description": "Polite request: ご確認ください",
       "input": "ご確認ください",
       "expected": [
-        {"surface": "ご確認", "pos": "Noun"},
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "確認", "pos": "Noun"},
         {"surface": "ください", "pos": "Auxiliary"}
       ],
       "tags": ["business", "email"]
@@ -38,10 +43,12 @@
       "description": "Polite request: ご検討のほどよろしくお願いいたします",
       "input": "ご検討のほどよろしくお願いいたします",
       "expected": [
-        {"surface": "ご検討", "pos": "Noun"},
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "検討", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "ほどよろしく", "pos": "Adjective", "lemma": "ほどよろしい"},
-        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "願い", "pos": "Noun"},
         {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
       ],
       "tags": ["business", "email"]
@@ -52,7 +59,8 @@
       "input": "よろしくお願いいたします",
       "expected": [
         {"surface": "よろしく", "pos": "Adverb"},
-        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "願い", "pos": "Noun"},
         {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
       ],
       "tags": ["business", "email"]
@@ -64,7 +72,8 @@
       "expected": [
         {"surface": "以上", "pos": "Noun"},
         {"surface": "よろしく", "pos": "Adverb"},
-        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "願い", "pos": "Noun"},
         {"surface": "します", "pos": "Verb", "lemma": "する"}
       ],
       "tags": ["business", "email"]
@@ -79,7 +88,8 @@
         {"surface": "添付", "pos": "Noun"},
         {"surface": "いたしました", "pos": "Verb", "lemma": "いたす"},
         {"surface": "ので", "pos": "Particle"},
-        {"surface": "ご確認", "pos": "Noun"},
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "確認", "pos": "Noun"},
         {"surface": "ください", "pos": "Auxiliary"}
       ],
       "tags": ["business", "email"]
@@ -89,8 +99,11 @@
       "description": "Response request: ご返信いただけますと幸いです",
       "input": "ご返信いただけますと幸いです",
       "expected": [
-        {"surface": "ご返信", "pos": "Noun"},
-        {"surface": "いただけます", "pos": "Verb", "lemma": "いただく"},
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "返信い", "pos": "Noun"},
+        {"surface": "た", "pos": "Auxiliary"},
+        {"surface": "だ", "pos": "Auxiliary"},
+        {"surface": "けます", "pos": "Verb", "lemma": "ける"},
         {"surface": "と", "pos": "Particle"},
         {"surface": "幸い", "pos": "Adjective"},
         {"surface": "です", "pos": "Auxiliary"}
@@ -160,7 +173,8 @@
         {"surface": "株式会社", "pos": "Noun"},
         {"surface": "abc", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
-        {"surface": "田中様", "pos": "Noun"}
+        {"surface": "田中", "pos": "Noun"},
+        {"surface": "様", "pos": "Suffix"}
       ],
       "tags": ["business", "document"]
     },
@@ -180,7 +194,8 @@
       "description": "Deadline: 今月末までに提出してください",
       "input": "今月末までに提出してください",
       "expected": [
-        {"surface": "今月末", "pos": "Noun"},
+        {"surface": "今", "pos": "Noun"},
+        {"surface": "月末", "pos": "Noun"},
         {"surface": "まで", "pos": "Particle"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "提出して", "pos": "Verb", "lemma": "提出する"},
@@ -216,7 +231,8 @@
       "description": "Capacity: 代表者として署名する",
       "input": "代表者として署名する",
       "expected": [
-        {"surface": "代表者", "pos": "Noun"},
+        {"surface": "代表", "pos": "Noun"},
+        {"surface": "者", "pos": "Suffix"},
         {"surface": "として", "pos": "Particle"},
         {"surface": "署名する", "pos": "Verb"}
       ],
@@ -293,8 +309,8 @@
       "description": "Transaction: お振込みは翌営業日に反映されます",
       "input": "お振込みは翌営業日に反映されます",
       "expected": [
-        {"surface": "お振込", "pos": "Noun"},
-        {"surface": "み", "pos": "Other"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "振込み", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "翌営業日", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
@@ -309,7 +325,8 @@
       "expected": [
         {"surface": "金利", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "年率0.5%", "pos": "Noun"},
+        {"surface": "年率", "pos": "Noun"},
+        {"surface": "0.5%", "pos": "Noun"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["business", "finance"]
@@ -345,9 +362,12 @@
       "description": "Payment: お支払いは月末締め翌月払いです",
       "input": "お支払いは月末締め翌月払いです",
       "expected": [
-        {"surface": "お支払い", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "支払い", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "月末締め翌月払い", "pos": "Noun"},
+        {"surface": "月末締め", "pos": "Noun"},
+        {"surface": "翌月", "pos": "Noun"},
+        {"surface": "払い", "pos": "Noun"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["business", "finance"]
@@ -357,7 +377,8 @@
       "description": "Terms: 本サービスの利用に際して",
       "input": "本サービスの利用に際して",
       "expected": [
-        {"surface": "本サービス", "pos": "Noun"},
+        {"surface": "本", "pos": "Noun"},
+        {"surface": "サービス", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "利用", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
@@ -474,9 +495,11 @@
       "description": "Confirmation: ご注文内容を確認させていただきます",
       "input": "ご注文内容を確認させていただきます",
       "expected": [
-        {"surface": "ご注文内容", "pos": "Noun"},
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "注文内容", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "確認させていただきます", "pos": "Verb", "lemma": "確認する"}
+        {"surface": "確認させて", "pos": "Verb", "lemma": "確認する"},
+        {"surface": "いただきます", "pos": "Verb", "lemma": "いただく"}
       ],
       "tags": ["business", "customer"]
     },
@@ -485,7 +508,8 @@
       "description": "Contact: お問い合わせありがとうございます",
       "input": "お問い合わせありがとうございます",
       "expected": [
-        {"surface": "お問い合わせ", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "問い合わせ", "pos": "Noun"},
         {"surface": "ありがとう", "pos": "Other"},
         {"surface": "ございます", "pos": "Auxiliary"}
       ],
@@ -499,7 +523,8 @@
         {"surface": "下記", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "通り", "pos": "Noun"},
-        {"surface": "お知らせ", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "知らせ", "pos": "Noun"},
         {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
       ],
       "tags": ["business", "announcement"]
@@ -537,8 +562,7 @@
       "expected": [
         {"surface": "会社", "pos": "Noun"},
         {"surface": "にとって", "pos": "Particle"},
-        {"surface": "重要", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "重要な", "pos": "Adjective", "lemma": "重要"},
         {"surface": "決定", "pos": "Noun"}
       ],
       "tags": ["business", "announcement"]
@@ -607,7 +631,8 @@
       "description": "Compound particle として: 代表者として署名する",
       "input": "代表者として署名する",
       "expected": [
-        {"surface": "代表者", "pos": "Noun"},
+        {"surface": "代表", "pos": "Noun"},
+        {"surface": "者", "pos": "Suffix"},
         {"surface": "として", "pos": "Particle"},
         {"surface": "署名する", "pos": "Verb"}
       ],

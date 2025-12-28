@@ -35,7 +35,8 @@
       "description": "お買い物 - prefix + compound noun",
       "input": "お買い物",
       "expected": [
-        {"surface": "お買い物", "pos": "Noun"}
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "買い物", "pos": "Noun"}
       ],
       "tags": ["regression", "prefix", "compound_noun"]
     },
@@ -146,7 +147,7 @@
       "input": "学生たち",
       "expected": [
         {"surface": "学生", "pos": "Noun"},
-        {"surface": "たち", "pos": "Other"}
+        {"surface": "たち", "pos": "Suffix"}
       ],
       "tags": ["regression", "suffix"]
     },
@@ -156,16 +157,17 @@
       "input": "田中さん",
       "expected": [
         {"surface": "田中", "pos": "Noun"},
-        {"surface": "さん", "pos": "Other"}
+        {"surface": "さん", "pos": "Suffix"}
       ],
       "tags": ["regression", "suffix"]
     },
     {
       "id": "kodomo_tachi",
-      "description": "子供たちが遊ぶ - noun + suffix merged",
+      "description": "子供たちが遊ぶ - noun + suffix split",
       "input": "子供たちが遊ぶ",
       "expected": [
-        {"surface": "子供たち", "pos": "Noun"},
+        {"surface": "子供", "pos": "Noun"},
+        {"surface": "たち", "pos": "Suffix"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "遊ぶ", "pos": "Verb"}
       ],

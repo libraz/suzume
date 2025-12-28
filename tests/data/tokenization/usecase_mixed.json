@@ -17,7 +17,8 @@
       "description": "Mixed script: alphabet + katakana",
       "input": "APIリクエスト処理",
       "expected": [
-        {"surface": "apiリクエスト処理", "pos": "Noun"}
+        {"surface": "apiリクエスト", "pos": "Noun"},
+        {"surface": "処理", "pos": "Noun"}
       ],
       "tags": ["mixed_script"]
     },
@@ -153,7 +154,8 @@
       "description": "Long kanji compound",
       "input": "東京都知事選挙",
       "expected": [
-        {"surface": "東京都知事選挙", "pos": "Noun"}
+        {"surface": "東京都", "pos": "Noun"},
+        {"surface": "知事選挙", "pos": "Noun"}
       ],
       "tags": ["compound_noun"]
     },
@@ -162,7 +164,8 @@
       "description": "Compound noun followed by particle",
       "input": "情報処理技術者が",
       "expected": [
-        {"surface": "情報処理技術者", "pos": "Noun"},
+        {"surface": "情報処理技術", "pos": "Noun"},
+        {"surface": "者", "pos": "Suffix"},
         {"surface": "が", "pos": "Particle"}
       ],
       "tags": ["compound_noun"]
@@ -172,7 +175,8 @@
       "description": "Natural language processing",
       "input": "自然言語処理技術",
       "expected": [
-        {"surface": "自然言語処理技術", "pos": "Noun"}
+        {"surface": "自然", "pos": "Noun"},
+        {"surface": "言語処理技術", "pos": "Noun"}
       ],
       "tags": ["compound_noun"]
     },
@@ -227,10 +231,11 @@
     },
     {
       "id": "prefix_honorific_o",
-      "description": "お茶 as lexicalized noun",
+      "description": "お + 茶 (honorific prefix + noun)",
       "input": "お茶を飲む",
       "expected": [
-        {"surface": "お茶", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "茶", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "飲む", "pos": "Verb"}
       ],
@@ -241,7 +246,8 @@
       "description": "ご prefix",
       "input": "ご飯を食べる",
       "expected": [
-        {"surface": "ご飯", "pos": "Noun"},
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "飯", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "食べる", "pos": "Verb"}
       ],
@@ -284,8 +290,7 @@
       "description": "的 suffix",
       "input": "国際的な問題",
       "expected": [
-        {"surface": "国際的", "pos": "Adjective"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "国際的な", "pos": "Adjective", "lemma": "国際的"},
         {"surface": "問題", "pos": "Noun"}
       ],
       "tags": ["prefix_suffix"]
@@ -302,10 +307,11 @@
     },
     {
       "id": "suffix_sei",
-      "description": "性 suffix",
+      "description": "性 suffix - split from noun",
       "input": "可能性がある",
       "expected": [
-        {"surface": "可能性", "pos": "Noun"},
+        {"surface": "可能", "pos": "Noun"},
+        {"surface": "性", "pos": "Suffix"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "ある", "pos": "Determiner"}
       ],
@@ -313,10 +319,11 @@
     },
     {
       "id": "suffix_san",
-      "description": "さん suffix - merged with noun",
+      "description": "さん suffix - split from noun (CLAUDE.md: honorifics separate)",
       "input": "田中さんが来た",
       "expected": [
-        {"surface": "田中さん", "pos": "Noun"},
+        {"surface": "田中", "pos": "Noun"},
+        {"surface": "さん", "pos": "Suffix"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "来た", "pos": "Verb", "lemma": "来る"}
       ],
@@ -410,7 +417,8 @@
       "expected": [
         {"surface": "売上", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "50%増加", "pos": "Noun"}
+        {"surface": "50%", "pos": "Noun"},
+        {"surface": "増加", "pos": "Noun"}
       ],
       "tags": ["number_special"]
     },

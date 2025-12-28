@@ -641,6 +641,119 @@ ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
           "formal noun before kanji (should be compound)"};
 }
 
+// Rule: Same particle repeated (も + も, の + の, etc.)
+// This is grammatically rare - usually different particles or NOUN between them
+// Exception: と + と can occur in quotation patterns
+ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
+                                                const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Particle ||
+      next.pos != core::PartOfSpeech::Particle) {
+    return {};
+  }
+
+  // Same single-character particle repeated
+  if (prev.surface.size() == 3 && next.surface.size() == 3 &&
+      prev.surface == next.surface) {
+    // Exception: と + と in quotation (〜と言ったとか)
+    if (prev.surface == "と") {
+      return {};
+    }
+    return {ConnectionPattern::SameParticleRepeated, 2.0F,
+            "same particle repeated"};
+  }
+
+  return {};
+}
+
+// Rule: PREFIX → short-stem pure hiragana adjective
+// E.g., お + いしい is likely misanalysis (should be おいしい)
+// Valid short hiragana adjectives (すごい, うまい, やばい) are in dictionary
+// Unknown short-stem (≤2 chars) hiragana adjectives after PREFIX are penalized
+ConnectionRuleResult checkPrefixToShortStemHiraganaAdj(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  // Previous must be PREFIX
+  if (prev.pos != core::PartOfSpeech::Prefix) {
+    return {};
+  }
+
+  // Next must be unknown adjective
+  if (next.pos != core::PartOfSpeech::Adjective || next.fromDictionary()) {
+    return {};
+  }
+
+  // Check if lemma is at least valid length (2 chars = 6 bytes for い-adj)
+  if (next.lemma.size() < 6) {
+    return {};
+  }
+
+  // Check stem length: lemma minus final い (3 bytes)
+  size_t stem_bytes = next.lemma.size() - 3;
+  size_t stem_chars = stem_bytes / 3;  // Hiragana = 3 bytes per char
+
+  // Only penalize short stems (≤2 chars like いしい, but not おいしい)
+  if (stem_chars > 2) {
+    return {};
+  }
+
+  // Check if lemma is pure hiragana
+  for (size_t i = 0; i < next.lemma.size(); i += 3) {
+    if (i + 2 >= next.lemma.size()) break;
+    auto b0 = static_cast<unsigned char>(next.lemma[i]);
+    auto b1 = static_cast<unsigned char>(next.lemma[i + 1]);
+    // Hiragana range: E3 81 80 - E3 82 9F
+    if (b0 != 0xE3 || (b1 != 0x81 && b1 != 0x82)) {
+      return {};  // Not pure hiragana
+    }
+  }
+
+  return {ConnectionPattern::PrefixToShortStemHiraganaAdj,
+          scorer::kPenaltyShortStemHiraganaAdj,
+          "prefix to short-stem hiragana adj"};
+}
+
+// Rule: Hiragana noun starting with particle character after NOUN
+// Japanese grammar: NOUN is very likely to be followed by PARTICLE
+// If a hiragana noun starts with common particle (も、の、が、を、に、は、で、と、へ、か),
+// prefer splitting off the particle.
+// Example: すもも(NOUN) + もも(NOUN) should prefer すもも + も(PARTICLE) + もも
+ConnectionRuleResult checkHiraganaNounStartsWithParticle(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  // Previous must be NOUN (content word likely followed by particle)
+  if (prev.pos != core::PartOfSpeech::Noun) {
+    return {};
+  }
+
+  // Next must be NOUN (we're penalizing noun-noun when particle split is better)
+  if (next.pos != core::PartOfSpeech::Noun) {
+    return {};
+  }
+
+  // Next surface must be pure hiragana (check first byte range: 0xE3 8X XX)
+  if (next.surface.size() < 3) {
+    return {};
+  }
+  auto b0 = static_cast<unsigned char>(next.surface[0]);
+  auto b1 = static_cast<unsigned char>(next.surface[1]);
+  // Hiragana range in UTF-8: E3 81 80 - E3 82 9F
+  if (b0 != 0xE3 || (b1 != 0x81 && b1 != 0x82)) {
+    return {};
+  }
+
+  // Check if first character is a common particle
+  // も、の、が、を、に、は、で、と、へ、か、や
+  std::string_view first3 = next.surface.substr(0, 3);
+  if (first3 == "も" || first3 == "の" || first3 == "が" ||
+      first3 == "を" || first3 == "に" || first3 == "は" ||
+      first3 == "で" || first3 == "と" || first3 == "へ" ||
+      first3 == "か" || first3 == "や") {
+    // Penalty to prefer NOUN + PARTICLE over NOUN + NOUN(starts with particle)
+    return {ConnectionPattern::HiraganaNounStartsWithParticle, 1.5F,
+            "hiragana noun starts with particle char"};
+  }
+
+  return {};
+}
+
 }  // namespace
 
 // =============================================================================
@@ -751,6 +864,21 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
   }
 
   result = checkFormalNounBeforeKanji(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkHiraganaNounStartsWithParticle(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkSameParticleRepeated(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkPrefixToShortStemHiraganaAdj(prev, next);
   if (result.pattern != ConnectionPattern::None) {
     return result;
   }

@@ -73,6 +73,18 @@ inline std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       // Without this entry, it's incorrectly parsed as i-adjective "いただい"
       {"いただく", POS::Verb, 0.3F, "いただく", false, false, false, CT::GodanKa, ""},
 
+      // とく (contraction of ておく) - auxiliary verb for "do in advance"
+      // Without this, "買っとく" incorrectly splits as 買+っとく(ADJ)
+      {"とく", POS::Verb, 0.3F, "とく", false, false, true, CT::GodanKa, ""},
+      // っとく form for verbs with っ-onbin (買っとく, やっとく, etc.)
+      {"っとく", POS::Verb, -0.5F, "とく", false, false, true, CT::GodanKa, ""},
+
+      // てく (contraction of ていく) - auxiliary verb for "go on doing"
+      // Without this, "食べてく" incorrectly splits
+      {"てく", POS::Verb, 0.3F, "てく", false, false, true, CT::GodanKa, ""},
+      // っていく pattern
+      {"ってく", POS::Verb, -0.5F, "てく", false, false, true, CT::GodanKa, ""},
+
       // ========================================
       // Godan-Ra verbs (五段ラ行)
       // ========================================

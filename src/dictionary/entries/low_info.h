@@ -125,6 +125,14 @@ inline std::vector<DictionaryEntry> getLowInfoEntries() {
       {"よかった", POS::Adjective, 0.5F, "よい", false, false, false, CT::IAdjective, ""},
       {"よければ", POS::Adjective, 0.5F, "よい", false, false, false, CT::IAdjective, ""},
 
+      // Prefixes (接頭辞)
+      // Only honorific prefixes are registered here.
+      // Kanji prefixes (不, 非, 未, etc.) are handled by join_candidates.cpp
+      // to form compound words (e.g., 不可能, 非公開 as single tokens).
+      {"お", POS::Prefix, 0.3F, "", true, false, false, CT::None, ""},  // Honorific
+      {"ご", POS::Prefix, 0.3F, "", true, false, false, CT::None, ""},  // Honorific (kanji nouns)
+      {"御", POS::Prefix, 1.0F, "", true, false, false, CT::None, ""},  // Kanji form of お/ご
+
       // Suffixes (接尾語)
       {"的", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
       {"化", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
@@ -133,7 +141,7 @@ inline std::vector<DictionaryEntry> getLowInfoEntries() {
       {"法", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
       {"論", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
       {"者", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
-      {"家", POS::Suffix, 1.5F, "か", false, false, true, CT::None, ""},
+      {"家", POS::Suffix, 2.5F, "か", false, false, true, CT::None, ""},  // Higher cost: 作家, 画家 etc.
       {"員", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
       {"式", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
       {"感", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
@@ -146,6 +154,11 @@ inline std::vector<DictionaryEntry> getLowInfoEntries() {
       {"ら", POS::Suffix, 0.5F, "", false, false, true, CT::None, ""},
       {"ども", POS::Suffix, 0.8F, "", false, false, true, CT::None, ""},
       {"がた", POS::Suffix, 0.8F, "", false, false, true, CT::None, ""},
+
+      // Temporal suffixes (時間接尾語)
+      // Low cost (-2.5) to offset BOS penalty (3.0) at chunk boundaries
+      {"ごろ", POS::Suffix, -2.5F, "", false, false, true, CT::None, ""},
+      {"頃", POS::Suffix, -2.5F, "", false, false, true, CT::None, ""},
 
       // Honorific suffixes (敬称接尾語)
       {"さん", POS::Suffix, 0.5F, "", false, false, true, CT::None, ""},

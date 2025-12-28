@@ -37,6 +37,13 @@ constexpr float kPenaltyVerbAuxInAdj = 2.0F;
 // しまい/じまい parsed as adjective (should be しまう renyokei)
 constexpr float kPenaltyShimaiAsAdj = 3.0F;
 
+// Short-stem pure hiragana unknown adjective penalty
+// Valid short hiragana adjectives (すごい, うまい, やばい) are in dictionary
+// Unknown short-stem (≤2 chars) hiragana adjectives are likely misanalysis
+// E.g., いしい (stem いし = 2 chars) from お+いしい is not a real adjective
+// But おいしい (stem おいし = 3 chars) should not be penalized
+constexpr float kPenaltyShortStemHiraganaAdj = 3.0F;
+
 // =============================================================================
 // Connection Costs (Bigram penalties/bonuses)
 // =============================================================================

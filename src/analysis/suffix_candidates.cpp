@@ -277,6 +277,17 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     return candidates;
   }
 
+  // Skip patterns ending with ん - likely honorific suffixes
+  // e.g., さん, くん, ちゃん, たん should split as NOUN + SUFFIX
+  // This is a grammatical pattern: hiragana ending with ん after single kanji
+  // is typically an honorific suffix, not a compound noun
+  if (kanji_len == 1 && hiragana_len >= 2) {
+    char32_t last_hira = codepoints[hiragana_end - 1];
+    if (last_hira == U'ん') {
+      return candidates;
+    }
+  }
+
   // Check if pattern looks like a grammatical suffix
   // These get high cost to let verb/adjective candidates win
   bool looks_like_aux = false;

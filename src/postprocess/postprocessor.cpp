@@ -15,8 +15,14 @@ std::vector<core::Morpheme> Postprocessor::process(
     const std::vector<core::Morpheme>& morphemes) const {
   std::vector<core::Morpheme> result = morphemes;
 
-  // Merge NOUN + SUFFIX into compound nouns (always applied)
-  result = mergeNounSuffix(result);
+  // Note: NOUN + SUFFIX merging is intentionally disabled.
+  // We keep tokens separate: PREFIX + NOUN + SUFFIX
+  // e.g., お姉さん → お(PREFIX) + 姉(NOUN) + さん(SUFFIX)
+  // result = mergeNounSuffix(result);
+
+  // Convert PREFIX + VERB to PREFIX + NOUN (renyoukei nominalization)
+  // e.g., お願い → お(PREFIX) + 願い(NOUN), not 願い(VERB)
+  result = convertPrefixVerbToNoun(result);
 
   // Merge consecutive numeric expressions (always applied)
   result = mergeNumericExpressions(result);
@@ -120,6 +126,42 @@ std::vector<core::Morpheme> Postprocessor::filterMorphemes(
   return result;
 }
 
+std::vector<core::Morpheme> Postprocessor::convertPrefixVerbToNoun(
+    const std::vector<core::Morpheme>& morphemes) {
+  if (morphemes.size() < 2) {
+    return morphemes;
+  }
+
+  std::vector<core::Morpheme> result;
+  result.reserve(morphemes.size());
+
+  for (size_t i = 0; i < morphemes.size(); ++i) {
+    core::Morpheme m = morphemes[i];
+
+    // Check if previous morpheme was PREFIX (お or ご)
+    if (i > 0 && morphemes[i - 1].pos == core::PartOfSpeech::Prefix) {
+      const std::string& prefix_surface = morphemes[i - 1].surface;
+      // Only for honorific prefixes お and ご
+      if (prefix_surface == "お" || prefix_surface == "ご" ||
+          prefix_surface == "御") {
+        // Convert VERB to NOUN (renyoukei nominalization)
+        // e.g., 願い(VERB) → 願い(NOUN) after お
+        if (m.pos == core::PartOfSpeech::Verb) {
+          m.pos = core::PartOfSpeech::Noun;
+          // Keep surface as lemma for nominalized form
+          m.lemma = m.surface;
+          SUZUME_DEBUG_LOG("[POSTPROC] Nominalized: " << m.surface
+                           << " (VERB → NOUN after " << prefix_surface << ")\n");
+        }
+      }
+    }
+
+    result.push_back(m);
+  }
+
+  return result;
+}
+
 std::vector<core::Morpheme> Postprocessor::mergeNounSuffix(
     const std::vector<core::Morpheme>& morphemes) {
   if (morphemes.empty()) {
@@ -210,6 +252,56 @@ bool isNumericExpression(const std::string& surface) {
   return isDigitChar(first_ch);
 }
 
+// Check if surface ends with a digit
+bool endsWithDigit(const std::string& surface) {
+  if (surface.empty()) return false;
+
+  // Get last character (UTF-8)
+  size_t i = surface.size();
+  while (i > 0 && (surface[i - 1] & 0xC0) == 0x80) {
+    --i;
+  }
+  if (i == 0) return false;
+
+  char32_t last_ch = 0;
+  size_t start = i - 1;
+  if ((surface[start] & 0x80) == 0) {
+    last_ch = static_cast<char32_t>(surface[start]);
+  } else if ((surface[start] & 0xE0) == 0xC0 && start + 1 < surface.size()) {
+    last_ch = ((surface[start] & 0x1F) << 6) | (surface[start + 1] & 0x3F);
+  } else if ((surface[start] & 0xF0) == 0xE0 && start + 2 < surface.size()) {
+    last_ch = ((surface[start] & 0x0F) << 12) |
+              ((surface[start + 1] & 0x3F) << 6) | (surface[start + 2] & 0x3F);
+  }
+
+  return isDigitChar(last_ch);
+}
+
+// Check if surface looks like a unit (short noun that can follow numbers)
+// Examples: 時間, 分, キロ, メートル, 円, ゴールド, etc.
+bool looksLikeUnit(const std::string& surface) {
+  if (surface.empty()) return false;
+
+  // Units are typically 1-4 characters
+  // Count UTF-8 codepoints
+  size_t codepoints = 0;
+  for (size_t i = 0; i < surface.size(); ) {
+    if ((surface[i] & 0x80) == 0) {
+      ++i;
+    } else if ((surface[i] & 0xE0) == 0xC0) {
+      i += 2;
+    } else if ((surface[i] & 0xF0) == 0xE0) {
+      i += 3;
+    } else {
+      i += 4;
+    }
+    ++codepoints;
+  }
+
+  // Units are typically 1-5 characters (e.g., キロ, メートル, パーセント)
+  return codepoints >= 1 && codepoints <= 5;
+}
+
 // Check if surface ends with a numeric unit that can be followed by more numbers
 bool endsWithContinuableUnit(const std::string& surface) {
   if (surface.empty()) return false;
@@ -256,7 +348,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(
   while (idx < morphemes.size()) {
     const auto& current = morphemes[idx];
 
-    // Check if this is a numeric expression that can be merged
+    // Pattern 1: Merge large numbers (3億 + 5000万円)
     if (current.pos == core::PartOfSpeech::Noun &&
         isNumericExpression(current.surface) &&
         endsWithContinuableUnit(current.surface)) {
@@ -294,10 +386,60 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(
 
       result.push_back(merged);
       idx = merge_end;
-    } else {
-      result.push_back(current);
-      ++idx;
+      continue;
     }
+
+    // Pattern 2: Merge number + unit (3 + 時間, 100 + ゴールド, 3時 + 間)
+    if (current.pos == core::PartOfSpeech::Noun &&
+        isNumericExpression(current.surface) &&
+        endsWithDigit(current.surface) &&
+        idx + 1 < morphemes.size()) {
+      const auto& next = morphemes[idx + 1];
+      if (next.pos == core::PartOfSpeech::Noun && looksLikeUnit(next.surface)) {
+        core::Morpheme merged = current;
+        merged.surface += next.surface;
+        merged.lemma = merged.surface;
+        merged.end = next.end;
+        merged.end_pos = next.end_pos;
+
+        SUZUME_DEBUG_LOG("[POSTPROC] Merged number+unit: \""
+                         << current.surface << "\" + \"" << next.surface
+                         << "\" → \"" << merged.surface << "\"\n");
+
+        result.push_back(merged);
+        idx += 2;
+        continue;
+      }
+    }
+
+    // Pattern 3: Merge numeric with unit suffix (3時 + 間 → 3時間)
+    if (current.pos == core::PartOfSpeech::Noun &&
+        isNumericExpression(current.surface) &&
+        idx + 1 < morphemes.size()) {
+      const auto& next = morphemes[idx + 1];
+      // Check for common time/counter suffixes that get split
+      if (next.pos == core::PartOfSpeech::Noun &&
+          (next.surface == "間" || next.surface == "半" ||
+           next.surface == "前" || next.surface == "後" ||
+           next.surface == "目")) {
+        core::Morpheme merged = current;
+        merged.surface += next.surface;
+        merged.lemma = merged.surface;
+        merged.end = next.end;
+        merged.end_pos = next.end_pos;
+
+        SUZUME_DEBUG_LOG("[POSTPROC] Merged numeric+suffix: \""
+                         << current.surface << "\" + \"" << next.surface
+                         << "\" → \"" << merged.surface << "\"\n");
+
+        result.push_back(merged);
+        idx += 2;
+        continue;
+      }
+    }
+
+    result.push_back(current);
+    ++idx;
   }
 
   return result;

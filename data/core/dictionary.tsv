@@ -116,7 +116,6 @@
 またな	OTHER		1.0
 初見です	OTHER		1.0
 はじめまして	OTHER		1.0
-お邪魔します	OTHER		1.0
 マジかよ	OTHER		1.0
 ガチかよ	OTHER		1.0
 はぁ？	OTHER		1.0
@@ -131,15 +130,12 @@
 待ってました	OTHER		1.0
 さすがです	OTHER		1.0
 がんば	OTHER		1.0
-おちついて	OTHER		1.0
 あいよ	OTHER		1.0
 いくよ	OTHER		1.0
-ちょっと待って	OTHER		1.0
-ごめんね	OTHER		1.0
+ごめん	OTHER		1.0
 ありがと	OTHER		1.0
 なるほど	OTHER		1.0
 そうだね	OTHER		1.0
-お腹すいた	OTHER		1.0
 
 # === idioms ===
 柳の下にいつも泥鰌はいない	NOUN	やなぎのしたにいつもどじょうはいない	0.5
@@ -238,6 +234,10 @@ C&R	NOUN		0.5
 
 # Formal nouns (hiragana forms)
 うち	NOUN	うち	0.5
+ところ	NOUN	ところ	0.3
+こと	NOUN	こと	0.3
+もの	NOUN	もの	0.3
+とき	NOUN	とき	0.3
 
 # =============================================================================
 # Entries migrated from low_info.h (DEPRECATED WASM fallback)
@@ -346,12 +346,8 @@ C&R	NOUN		0.5
 がた	OTHER	がた	0.8
 
 # === honorific_suffixes ===
-# Honorific suffixes (敬称接尾語)
-さん	OTHER	さん	0.5
-様	OTHER	さま	0.5
-ちゃん	OTHER	ちゃん	0.5
-くん	OTHER	くん	0.5
-氏	OTHER	し	0.8
+# Honorific suffixes (敬称接尾語) - Moved to L1 (low_info.h) as SUFFIX
+# さん, 様, ちゃん, くん, etc. are in src/dictionary/entries/low_info.h
 
 # =============================================================================
 # Entries migrated from time_nouns.h (DEPRECATED WASM fallback)

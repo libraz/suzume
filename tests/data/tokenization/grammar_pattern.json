@@ -174,7 +174,7 @@
       "description": "君なら大丈夫 (if it's you, it's okay)",
       "input": "君なら大丈夫",
       "expected": [
-        {"surface": "君", "pos": "Noun"},
+        {"surface": "君", "pos": "Pronoun"},
         {"surface": "なら", "pos": "Particle"},
         {"surface": "大丈夫", "pos": "Noun"}
       ],
@@ -528,7 +528,8 @@
       "description": "インターネット接続 (internet connection)",
       "input": "インターネット接続",
       "expected": [
-        {"surface": "インターネット接続", "pos": "Noun"}
+        {"surface": "インターネット", "pos": "Noun"},
+        {"surface": "接続", "pos": "Noun"}
       ],
       "tags": ["grammar", "loanword"]
     },
@@ -634,6 +635,42 @@
       "tags": ["grammar", "numeric"]
     },
     {
+      "id": "numeric_unit_kilo",
+      "description": "3キロ (3 kilograms)",
+      "input": "3キロ",
+      "expected": [
+        {"surface": "3キロ", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit"]
+    },
+    {
+      "id": "numeric_unit_game_gold",
+      "description": "100ゴールド (game currency)",
+      "input": "100ゴールド",
+      "expected": [
+        {"surface": "100ゴールド", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit", "game"]
+    },
+    {
+      "id": "numeric_unit_game_adena",
+      "description": "50アデナ (game currency)",
+      "input": "50アデナ",
+      "expected": [
+        {"surface": "50アデナ", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit", "game"]
+    },
+    {
+      "id": "numeric_unit_game_kero",
+      "description": "1000ケロ (game currency)",
+      "input": "1000ケロ",
+      "expected": [
+        {"surface": "1000ケロ", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit", "game"]
+    },
+    {
       "id": "numeric_ordinal",
       "description": "第一回 (first time)",
       "input": "第一回",
@@ -702,6 +739,96 @@
         {"surface": "書かなければ", "pos": "Verb", "lemma": "書く"}
       ],
       "tags": ["grammar", "conditional", "nakereba", "regression"]
+    },
+    {
+      "id": "numeric_unit_meter",
+      "description": "10メートル (10 meters)",
+      "input": "10メートル",
+      "expected": [
+        {"surface": "10メートル", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit"]
+    },
+    {
+      "id": "numeric_unit_cm",
+      "description": "5センチ (5 centimeters)",
+      "input": "5センチ",
+      "expected": [
+        {"surface": "5センチ", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit"]
+    },
+    {
+      "id": "numeric_unit_gram",
+      "description": "200グラム (200 grams)",
+      "input": "200グラム",
+      "expected": [
+        {"surface": "200グラム", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit"]
+    },
+    {
+      "id": "numeric_unit_yen",
+      "description": "500円 (500 yen)",
+      "input": "500円",
+      "expected": [
+        {"surface": "500円", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit"]
+    },
+    {
+      "id": "numeric_unit_dollar",
+      "description": "100ドル (100 dollars)",
+      "input": "100ドル",
+      "expected": [
+        {"surface": "100ドル", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit"]
+    },
+    {
+      "id": "numeric_unit_percent",
+      "description": "80パーセント (80 percent)",
+      "input": "80パーセント",
+      "expected": [
+        {"surface": "80パーセント", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit"]
+    },
+    {
+      "id": "numeric_unit_calorie",
+      "description": "300カロリー (300 calories)",
+      "input": "300カロリー",
+      "expected": [
+        {"surface": "300カロリー", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit"]
+    },
+    {
+      "id": "numeric_unit_liter",
+      "description": "2リットル (2 liters)",
+      "input": "2リットル",
+      "expected": [
+        {"surface": "2リットル", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit"]
+    },
+    {
+      "id": "numeric_unit_page",
+      "description": "50ページ (50 pages)",
+      "input": "50ページ",
+      "expected": [
+        {"surface": "50ページ", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit"]
+    },
+    {
+      "id": "numeric_unit_point",
+      "description": "1000ポイント (1000 points)",
+      "input": "1000ポイント",
+      "expected": [
+        {"surface": "1000ポイント", "pos": "Noun"}
+      ],
+      "tags": ["grammar", "numeric", "unit"]
     }
   ]
 }

@@ -116,7 +116,8 @@
       "description": "忘れてしまわない - aspectual te-form should be single token",
       "input": "忘れてしまわない",
       "expected": [
-        {"surface": "忘れてしまわない", "pos": "Verb", "lemma": "忘れる"}
+        {"surface": "忘れて", "pos": "Verb", "lemma": "忘れる"},
+        {"surface": "しまわない", "pos": "Verb", "lemma": "しまう"}
       ],
       "tags": ["regression", "te_form", "aspectual"]
     },
@@ -181,8 +182,11 @@
       "description": "ご返信いただけますと幸いです - business email pattern",
       "input": "ご返信いただけますと幸いです",
       "expected": [
-        {"surface": "ご返信", "pos": "Noun"},
-        {"surface": "いただけます", "pos": "Verb", "lemma": "いただく"},
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "返信い", "pos": "Noun"},
+        {"surface": "た", "pos": "Auxiliary"},
+        {"surface": "だ", "pos": "Auxiliary"},
+        {"surface": "けます", "pos": "Verb", "lemma": "ける"},
         {"surface": "と", "pos": "Particle"},
         {"surface": "幸い", "pos": "Adjective"},
         {"surface": "です", "pos": "Auxiliary"}

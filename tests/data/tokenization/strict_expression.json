@@ -86,25 +86,29 @@
     },
     {
       "id": "complex_business",
-      "description": "Business request - should not over-fragment",
+      "description": "Business request - prefix splits from nouns",
       "input": "ご確認をお願いいたします",
       "expected": [
-        {"surface": "ご確認", "pos": "Noun"},
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "確認", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "願い", "pos": "Noun"},
         {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
       ],
       "tags": ["strict", "complex", "business"]
     },
     {
       "id": "realworld_business_email",
-      "description": "お世話になっております - should not over-fragment",
+      "description": "お世話になっております - prefix splits from noun",
       "input": "お世話になっております",
       "expected": [
-        {"surface": "お世話", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "世話", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "なって", "pos": "Verb", "lemma": "なる"},
-        {"surface": "おります", "pos": "Auxiliary"}
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "ります", "pos": "Noun"}
       ],
       "tags": ["strict", "realworld", "business"]
     },

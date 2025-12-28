@@ -61,6 +61,7 @@ inline std::vector<DictionaryEntry> getParticleEntries() {
       {"て", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"ば", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"たら", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
+      {"なら", POS::Particle, 0.5F, "", false, false, false, CT::None, ""},  // Conditional (ならば)
       {"ら", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},  // Conditional after た/だ
       {"ながら", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"のに", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
@@ -76,6 +77,8 @@ inline std::vector<DictionaryEntry> getParticleEntries() {
       {"よ", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
       {"わ", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
       {"の", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
+      {"じゃん", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},  // Colloquial
+      {"っけ", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},  // Recall
 
       // Adverbial particles (副助詞)
       {"ばかり", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},

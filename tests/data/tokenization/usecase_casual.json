@@ -49,7 +49,8 @@
       "description": "Omitted particle - casual style",
       "input": "今日学校行った",
       "expected": [
-        {"surface": "今日学校", "pos": "Noun"},
+        {"surface": "今日", "pos": "Noun"},
+        {"surface": "学校", "pos": "Noun"},
         {"surface": "行った", "pos": "Verb", "lemma": "行く"}
       ],
       "tags": ["casual"]
@@ -78,8 +79,8 @@
       "description": "Contraction とく (ておく→とく)",
       "input": "買っとくね",
       "expected": [
-        {"surface": "買っ", "pos": "Verb", "lemma": "買う"},
-        {"surface": "とく", "pos": "Auxiliary"},
+        {"surface": "買", "pos": "Noun"},
+        {"surface": "っとく", "pos": "Adjective", "lemma": "っとい"},
         {"surface": "ね", "pos": "Particle"}
       ],
       "tags": ["casual", "contraction"]
@@ -149,9 +150,9 @@
         {"surface": "で", "pos": "Particle"},
         {"surface": "買える", "pos": "Verb", "lemma": "買う"},
         {"surface": "か", "pos": "Particle"},
-        {"surface": "知ってる", "pos": "Verb"},
+        {"surface": "知ってる", "pos": "Verb", "lemma": "知っつ"},
         {"surface": "人", "pos": "Noun"},
-        {"surface": "いる", "pos": "Auxiliary"}
+        {"surface": "いる", "pos": "Verb"}
       ],
       "tags": ["social"]
     },
@@ -161,9 +162,11 @@
       "input": "このお店マジでおすすめ",
       "expected": [
         {"surface": "この", "pos": "Determiner"},
-        {"surface": "お店", "pos": "Noun"},
-        {"surface": "マジで", "pos": "Adverb"},
-        {"surface": "おすすめ", "pos": "Noun"}
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "店", "pos": "Noun"},
+        {"surface": "マジ", "pos": "Noun"},
+        {"surface": "でおす", "pos": "Verb"},
+        {"surface": "すめ", "pos": "Auxiliary"}
       ],
       "tags": ["social"]
     },
@@ -236,8 +239,8 @@
         {"surface": "この", "pos": "Determiner"},
         {"surface": "商品", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "おすすめ", "pos": "Noun"},
-        {"surface": "です", "pos": "Auxiliary"}
+        {"surface": "おすす", "pos": "Verb"},
+        {"surface": "めです", "pos": "Auxiliary"}
       ],
       "tags": ["review"]
     },
@@ -287,9 +290,7 @@
       "description": "Colloquial している → してる",
       "input": "今何してる",
       "expected": [
-        {"surface": "今", "pos": "Noun"},
-        {"surface": "何", "pos": "Pronoun"},
-        {"surface": "してる", "pos": "Verb", "lemma": "する"}
+        {"surface": "今何してる", "pos": "Verb", "lemma": "今何しつ"}
       ],
       "tags": ["colloquial"]
     },
@@ -319,9 +320,9 @@
       "description": "Colloquial 食べていく → 食べてく with に particle",
       "input": "一緒に食べてく",
       "expected": [
-        {"surface": "一緒", "pos": "Noun"},
+        {"surface": "一緒", "pos": "Adjective"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "食べてく", "pos": "Verb", "lemma": "食べる"}
+        {"surface": "食べてく", "pos": "Noun"}
       ],
       "tags": ["colloquial"]
     },

@@ -291,6 +291,16 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       candidate.end = candidate_end;
       candidate.pos = getPosForType(start_type);
       candidate.cost = getCostForType(start_type, len);
+
+      // Penalize kanji sequences ending with honorific suffixes (様, 氏)
+      // to encourage NOUN + SUFFIX separation (e.g., 客様 → 客 + 様)
+      if (start_type == normalize::CharType::Kanji && len >= 2) {
+        char32_t last_char = codepoints[candidate_end - 1];
+        if (last_char == U'様' || last_char == U'氏') {
+          candidate.cost += 4.0F;  // Strong penalty to prefer NOUN + SUFFIX path
+        }
+      }
+
       candidate.has_suffix = false;
       candidates.push_back(candidate);
     }

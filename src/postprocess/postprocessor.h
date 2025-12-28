@@ -70,6 +70,12 @@ class Postprocessor {
   static std::vector<core::Morpheme> mergeNaAdjectiveNa(const std::vector<core::Morpheme>& morphemes);
 
   /**
+   * @brief Convert PREFIX + VERB to PREFIX + NOUN (renyoukei nominalization)
+   * e.g., お願い → お(PREFIX) + 願い(NOUN), not 願い(VERB)
+   */
+  static std::vector<core::Morpheme> convertPrefixVerbToNoun(const std::vector<core::Morpheme>& morphemes);
+
+  /**
    * @brief Remove unwanted morphemes
    */
   std::vector<core::Morpheme> filterMorphemes(

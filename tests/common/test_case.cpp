@@ -14,6 +14,8 @@ core::PartOfSpeech ExpectedMorpheme::posEnum() const {
   if (pos == "Conjunction") return core::PartOfSpeech::Conjunction;
   if (pos == "Determiner") return core::PartOfSpeech::Determiner;
   if (pos == "Pronoun") return core::PartOfSpeech::Pronoun;
+  if (pos == "Prefix") return core::PartOfSpeech::Prefix;
+  if (pos == "Suffix") return core::PartOfSpeech::Suffix;
   if (pos == "Symbol") return core::PartOfSpeech::Symbol;
   if (pos == "Other") return core::PartOfSpeech::Other;
   return core::PartOfSpeech::Unknown;

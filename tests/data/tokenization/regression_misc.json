@@ -289,7 +289,7 @@
       "input": "先生さん",
       "expected": [
         {"surface": "先生", "pos": "Noun"},
-        {"surface": "さん", "pos": "Other"}
+        {"surface": "さん", "pos": "Suffix"}
       ],
       "tags": ["regression", "suffix"]
     },

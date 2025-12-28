@@ -40,60 +40,68 @@
       "tags": ["strict", "greeting"]
     },
     {
-      "id": "ocha_single",
-      "description": "お茶 should be single token",
+      "id": "ocha_split",
+      "description": "お茶 splits into prefix and noun",
       "input": "お茶",
       "expected": [
-        {"surface": "お茶", "pos": "Noun"}
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "茶", "pos": "Noun"}
       ],
       "tags": ["strict", "honorific"]
     },
     {
-      "id": "gohan_single",
-      "description": "ご飯 should be single token",
+      "id": "gohan_split",
+      "description": "ご飯 splits into prefix and noun",
       "input": "ご飯",
       "expected": [
-        {"surface": "ご飯", "pos": "Noun"}
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "飯", "pos": "Noun"}
       ],
       "tags": ["strict", "honorific"]
     },
     {
-      "id": "onegai_single",
-      "description": "お願い should be single token",
+      "id": "onegai_split",
+      "description": "お願い splits into prefix and noun",
       "input": "お願い",
       "expected": [
-        {"surface": "お願い", "pos": "Noun"}
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "願い", "pos": "Noun"}
       ],
       "tags": ["strict", "honorific"]
     },
     {
-      "id": "otsukareama_single",
-      "description": "お疲れ様 should be single token",
+      "id": "otsukareama_split",
+      "description": "お疲れ様 splits into prefix, noun, and suffix",
       "input": "お疲れ様",
       "expected": [
-        {"surface": "お疲れ様", "pos": "Noun"}
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "疲れ", "pos": "Noun"},
+        {"surface": "様", "pos": "Suffix"}
       ],
       "tags": ["strict", "honorific"]
     },
     {
       "id": "osewa_ni_natte_orimasu",
-      "description": "お世話になっております should contain お世話",
+      "description": "お世話になっております splits お prefix and contains おります as prefix+noun",
       "input": "お世話になっております",
       "expected": [
-        {"surface": "お世話", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "世話", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "なって", "pos": "Verb", "lemma": "なる"},
-        {"surface": "おります", "pos": "Auxiliary"}
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "ります", "pos": "Noun"}
       ],
       "tags": ["strict", "business"]
     },
     {
       "id": "yoroshiku_onegai_itashimasu",
-      "description": "よろしくお願いいたします should contain よろしく and お願い",
+      "description": "よろしくお願いいたします splits お prefix from 願い",
       "input": "よろしくお願いいたします",
       "expected": [
         {"surface": "よろしく", "pos": "Adverb"},
-        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "願い", "pos": "Noun"},
         {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
       ],
       "tags": ["strict", "business"]
@@ -120,10 +128,12 @@
     },
     {
       "id": "otsukare_sama_desu",
-      "description": "お疲れ様です should not over-fragment",
+      "description": "お疲れ様です splits into prefix, noun, suffix, and auxiliary",
       "input": "お疲れ様です",
       "expected": [
-        {"surface": "お疲れ様", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "疲れ", "pos": "Noun"},
+        {"surface": "様", "pos": "Suffix"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["strict", "keigo"]

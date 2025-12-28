@@ -6,8 +6,8 @@
       "description": "お伝えいたします - honorific verb pattern",
       "input": "お伝えいたします",
       "expected": [
-        {"surface": "お", "pos": "Other"},
-        {"surface": "伝え", "pos": "Verb", "lemma": "伝える"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "伝え", "pos": "Noun"},
         {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
       ],
       "tags": ["regression", "honorific", "verb"]
@@ -318,7 +318,8 @@
       "description": "食べさせていただきます - causative + itadaku unified",
       "input": "食べさせていただきます",
       "expected": [
-        {"surface": "食べさせていただきます", "pos": "Verb", "lemma": "食べる"}
+        {"surface": "食べさせて", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "いただきます", "pos": "Verb", "lemma": "いただく"}
       ],
       "tags": ["regression", "te_form", "itadaku"]
     },
@@ -327,7 +328,8 @@
       "description": "対応させていただきます - suru causative + itadaku",
       "input": "対応させていただきます",
       "expected": [
-        {"surface": "対応させていただきます", "pos": "Verb", "lemma": "対応する"}
+        {"surface": "対応させて", "pos": "Verb", "lemma": "対応する"},
+        {"surface": "いただきます", "pos": "Verb", "lemma": "いただく"}
       ],
       "tags": ["regression", "suru", "itadaku"]
     },

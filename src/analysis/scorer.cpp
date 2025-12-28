@@ -30,33 +30,36 @@ constexpr size_t posToIndex(suzume::core::PartOfSpeech pos) {
       return 7;
     case suzume::core::PartOfSpeech::Pronoun:
       return 8;
-    case suzume::core::PartOfSpeech::Suffix:
+    case suzume::core::PartOfSpeech::Prefix:
       return 9;
-    case suzume::core::PartOfSpeech::Symbol:
+    case suzume::core::PartOfSpeech::Suffix:
       return 10;
+    case suzume::core::PartOfSpeech::Symbol:
+      return 11;
     case suzume::core::PartOfSpeech::Other:
     case suzume::core::PartOfSpeech::Unknown:
-      return 11;
+      return 12;
   }
-  return 11;
+  return 12;
 }
 
 // Bigram cost table [prev][next]
 // clang-format off
-constexpr float kBigramCostTable[12][12] = {
-    //        Noun  Verb  Adj   Adv   Part  Aux   Conj  Det   Pron  Suff  Sym   Other
-    /* Noun */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 0.0F, 0.5F, 0.5F, 0.5F, 0.0F, 0.5F, 0.5F},
-    /* Verb */ {0.2F, 0.8F, 0.8F, 0.5F, 0.0F, 0.0F, 0.5F, 0.5F, 0.2F, 0.8F, 0.5F, 0.5F},
-    /* Adj  */ {0.2F, 0.5F, 0.8F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.2F, 0.8F, 0.5F, 0.5F},
-    /* Adv  */ {0.0F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.8F, 0.5F, 0.5F},
-    /* Part */ {0.0F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.5F, 0.3F, 0.0F, 1.0F, 0.5F, 0.5F},
-    /* Aux  */ {0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.3F, 0.5F, 0.5F, 0.5F, 0.8F, 0.5F, 0.5F},
-    /* Conj */ {0.0F, 0.2F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.2F, 0.0F, 1.0F, 0.3F, 0.3F},
-    /* Det  */ {0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.8F, 0.0F, 0.8F, 0.5F, 0.5F},
-    /* Pron */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 1.0F, 0.5F, 0.5F, 0.5F, 0.0F, 0.5F, 0.5F},
-    /* Suff */ {0.5F, 0.8F, 0.8F, 0.5F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.3F, 0.5F, 0.5F},
-    /* Sym  */ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.5F, 0.0F, 0.2F},
-    /* Other*/ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.5F, 0.2F, 0.2F},
+constexpr float kBigramCostTable[13][13] = {
+    //        Noun  Verb  Adj   Adv   Part  Aux   Conj  Det   Pron  Pref  Suff  Sym   Other
+    /* Noun */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 0.0F, 0.5F, 0.5F, 0.5F, 1.0F,-0.8F, 0.5F, 0.5F},
+    /* Verb */ {0.2F, 0.8F, 0.8F, 0.5F, 0.0F, 0.0F, 0.5F, 0.5F, 0.2F, 1.0F, 0.8F, 0.5F, 0.5F},
+    /* Adj  */ {0.2F, 0.5F, 0.8F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.2F, 1.0F, 0.8F, 0.5F, 0.5F},
+    /* Adv  */ {0.0F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 1.0F, 0.8F, 0.5F, 0.5F},
+    /* Part */ {0.0F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.5F, 0.3F, 0.0F, 1.0F, 1.0F, 0.5F, 0.5F},
+    /* Aux  */ {0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.3F, 0.5F, 0.5F, 0.5F, 1.0F, 0.8F, 0.5F, 0.5F},
+    /* Conj */ {0.0F, 0.2F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.2F, 0.0F, 0.3F, 1.0F, 0.3F, 0.3F},
+    /* Det  */ {0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.8F, 0.0F, 1.0F, 0.8F, 0.5F, 0.5F},
+    /* Pron */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 1.0F, 0.5F, 0.5F, 0.5F, 1.0F, 0.0F, 0.5F, 0.5F},
+    /* Pref */{-1.5F, -0.5F,-0.3F, 0.5F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F},
+    /* Suff */ {0.5F, 0.8F, 0.8F, 0.5F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 1.0F, 0.3F, 0.5F, 0.5F},
+    /* Sym  */ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.5F, 0.0F, 0.2F},
+    /* Other*/ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.5F, 0.5F, 0.2F, 0.2F},
 };
 // clang-format on
 
@@ -148,8 +151,13 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   }
 
   // Single character penalty
+  // Note: SUFFIX and PREFIX are exempt from single-character penalties
+  // because they are grammatically expected to be single characters
+  // (e.g., 様, 氏 as suffix; お, ご as prefix)
   size_t char_len = edge.end - edge.start;
-  if (char_len == 1 && !edge.surface.empty()) {
+  if (char_len == 1 && !edge.surface.empty() &&
+      edge.pos != core::PartOfSpeech::Suffix &&
+      edge.pos != core::PartOfSpeech::Prefix) {
     // Decode first character to check type
     auto codepoints = normalize::utf8::decode(edge.surface);
     if (!codepoints.empty()) {
@@ -264,6 +272,9 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       logAdjustment(scorer::kPenaltyShimaiAsAdj, "shimai_as_adj");
     }
   }
+
+  // Note: Short-stem hiragana adjective penalty moved to connectionCost
+  // It only applies after PREFIX (e.g., お+いしい) not standalone (e.g., まずい)
 
   // Penalize unknown adjectives with lemma ending in ない where stem looks like verb mizenkei
   // E.g., 走らなければ with lemma 走らない is likely verb+aux, not true adjective

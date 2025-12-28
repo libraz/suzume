@@ -15,7 +15,8 @@
       "description": "ご飯を食べる - verb lemma should not be 食ぶ",
       "input": "ご飯を食べる",
       "expected": [
-        {"surface": "ご飯", "pos": "Noun"},
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "飯", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "食べる", "pos": "Verb", "lemma": "食べる"}
       ],
@@ -70,19 +71,21 @@
     },
     {
       "id": "gohan_lemma",
-      "description": "ご飯 lemma should be ご飯",
+      "description": "ご飯 splits into prefix + noun",
       "input": "ご飯",
       "expected": [
-        {"surface": "ご飯", "pos": "Noun", "lemma": "ご飯"}
+        {"surface": "ご", "pos": "Prefix", "lemma": "ご"},
+        {"surface": "飯", "pos": "Noun", "lemma": "飯"}
       ],
       "tags": ["strict", "noun", "lemma"]
     },
     {
       "id": "ocha_lemma",
-      "description": "お茶 lemma should be お茶",
+      "description": "お茶 splits into prefix + noun",
       "input": "お茶",
       "expected": [
-        {"surface": "お茶", "pos": "Noun", "lemma": "お茶"}
+        {"surface": "お", "pos": "Prefix", "lemma": "お"},
+        {"surface": "茶", "pos": "Noun", "lemma": "茶"}
       ],
       "tags": ["strict", "noun", "lemma"]
     },

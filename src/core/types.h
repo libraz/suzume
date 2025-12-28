@@ -21,6 +21,7 @@ enum class PartOfSpeech : uint8_t {
   Conjunction, // 接続詞
   Determiner,  // 連体詞
   Pronoun,     // 代名詞
+  Prefix,      // 接頭辞
   Suffix,      // 接尾辞
   Symbol,      // 記号
   Other        // その他

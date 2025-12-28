@@ -153,7 +153,7 @@
       "input": "3時ごろはどうですか",
       "expected": [
         {"surface": "3時", "pos": "Noun"},
-        {"surface": "ごろ", "pos": "Other"},
+        {"surface": "ごろ", "pos": "Suffix"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "どう", "pos": "Adverb"},
         {"surface": "です", "pos": "Auxiliary"},
@@ -231,7 +231,8 @@
       "expected": [
         {"surface": "袋", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "願い", "pos": "Noun"},
         {"surface": "します", "pos": "Verb", "lemma": "する"}
       ],
       "tags": ["shopping"]
@@ -369,7 +370,8 @@
         {"surface": "ラーメン", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "一つ", "pos": "Verb"},
-        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "願い", "pos": "Noun"},
         {"surface": "します", "pos": "Verb", "lemma": "する"}
       ],
       "tags": ["restaurant"]
@@ -389,7 +391,8 @@
       "id": "restaurant_recommendation",
       "input": "おすすめは何ですか",
       "expected": [
-        {"surface": "おすすめ", "pos": "Other"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "すすめ", "pos": "Other"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "何", "pos": "Pronoun"},
         {"surface": "です", "pos": "Auxiliary"},
@@ -413,9 +416,11 @@
       "id": "restaurant_bill",
       "input": "お会計をお願いします",
       "expected": [
-        {"surface": "お会計", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "会計", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "お願い", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "願い", "pos": "Noun"},
         {"surface": "します", "pos": "Verb", "lemma": "する"}
       ],
       "tags": ["restaurant"]

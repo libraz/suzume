@@ -80,7 +80,8 @@
       "description": "自然言語処理 should be at most 3 tokens",
       "input": "自然言語処理",
       "expected": [
-        {"surface": "自然言語処理", "pos": "Noun"}
+        {"surface": "自然", "pos": "Noun"},
+        {"surface": "言語処理", "pos": "Noun"}
       ],
       "tags": ["strict", "compound", "noun"]
     },

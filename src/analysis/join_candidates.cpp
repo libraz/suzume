@@ -104,10 +104,9 @@ struct ProductivePrefix {
 };
 
 const ProductivePrefix kProductivePrefixes[] = {
-    // Honorific prefixes
-    {U'お', -0.5F, true},   // お水, お金, お店
-    {U'ご', -0.5F, true},   // ご確認, ご連絡, ご注意
-    {U'御', -0.5F, true},   // 御 (formal version)
+    // Note: Honorific prefixes お, ご, 御 are NOT included here.
+    // They should be tokenized separately as PREFIX + NOUN.
+    // E.g., お水 → お(PREFIX) + 水(NOUN), not お水(NOUN)
 
     // Negation prefixes
     {U'不', -0.4F, true},   // 不安, 不要, 不便

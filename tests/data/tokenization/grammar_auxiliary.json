@@ -81,11 +81,11 @@
     },
     {
       "id": "keigo_o_prefix",
-      "description": "Honorific prefix お",
+      "description": "Honorific prefix お with adjective",
       "input": "お忙しいところ",
       "expected": [
-        {"surface": "お", "pos": "Other"},
-        {"surface": "忙しい", "pos": "Adjective"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "忙しい", "pos": "Adjective", "lemma": "忙しい"},
         {"surface": "ところ", "pos": "Noun"}
       ],
       "tags": ["keigo", "prefix"]
@@ -95,7 +95,8 @@
       "description": "Honorific prefix ご",
       "input": "ご確認ください",
       "expected": [
-        {"surface": "ご確認", "pos": "Noun"},
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "確認", "pos": "Noun"},
         {"surface": "ください", "pos": "Auxiliary"}
       ],
       "tags": ["keigo", "prefix"]
@@ -168,7 +169,9 @@
       "description": "Ojou-sama speech ですわ",
       "input": "お嬢様ですわ",
       "expected": [
-        {"surface": "お嬢様", "pos": "Noun"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "嬢", "pos": "Noun"},
+        {"surface": "様", "pos": "Suffix"},
         {"surface": "ですわ", "pos": "Auxiliary", "lemma": "です"}
       ],
       "tags": ["character_speech", "ojousama"]
