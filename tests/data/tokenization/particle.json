@@ -83,12 +83,12 @@
     },
     {
       "id": "case_particle_mo",
-      "description": "Conjunctive particle も",
+      "description": "Conjunctive particle も with verb+aux split",
       "input": "私も行きたい",
       "expected": [
         {"surface": "私", "pos": "Pronoun"},
         {"surface": "も", "pos": "Particle"},
-        {"surface": "行き", "pos": "Noun"},
+        {"surface": "行き", "pos": "Verb", "lemma": "行く"},
         {"surface": "たい", "pos": "Auxiliary"}
       ],
       "tags": ["particle", "case"]
@@ -130,10 +130,11 @@
     },
     {
       "id": "sentence_ending_ka",
-      "description": "Question particle か",
+      "description": "Question particle か with verb+aux split",
       "input": "行きますか",
       "expected": [
-        {"surface": "行きます", "pos": "Verb", "lemma": "行く"},
+        {"surface": "行き", "pos": "Verb", "lemma": "行く"},
+        {"surface": "ます", "pos": "Auxiliary"},
         {"surface": "か", "pos": "Particle"}
       ],
       "tags": ["particle", "sentence_ending"]

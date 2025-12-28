@@ -24,10 +24,11 @@
     },
     {
       "id": "aux_tai",
-      "description": "Desiderative auxiliary たい",
+      "description": "Desiderative auxiliary たい (split: verb stem + aux)",
       "input": "行きたい",
       "expected": [
-        {"surface": "行きたい", "pos": "Verb", "lemma": "行く"}
+        {"surface": "行き", "pos": "Verb", "lemma": "行く"},
+        {"surface": "たい", "pos": "Auxiliary"}
       ],
       "tags": ["auxiliary", "desiderative"]
     },

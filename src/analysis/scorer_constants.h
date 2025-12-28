@@ -149,6 +149,19 @@ constexpr float kBonusTeFormVerbToVerb = 0.8F;
 // Suffix should only follow nouns/pronouns, not appear at sentence start
 constexpr float kPenaltySuffixAtStart = 3.0F;
 
+// Suffix after punctuation/symbol penalty
+// After 、。etc., a word is unlikely to be a suffix (e.g., 、家 should be NOUN)
+constexpr float kPenaltySuffixAfterSymbol = 1.0F;
+
+// Prefix before verb/auxiliary penalty
+// Prefixes should attach to nouns/suffixes, not verbs (e.g., 何してる - 何 is PRON)
+constexpr float kPenaltyPrefixBeforeVerb = 2.0F;
+
+// Noun before verb-specific auxiliary penalty
+// Verb auxiliaries (ます/ましょう/たい/ない) require verb stem, not nouns
+// E.g., 行き(NOUN) + ましょう is invalid - should be 行き(VERB) + ましょう
+constexpr float kPenaltyNounBeforeVerbAux = 2.0F;
+
 }  // namespace suzume::analysis::scorer
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONSTANTS_H_

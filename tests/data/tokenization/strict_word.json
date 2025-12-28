@@ -12,15 +12,14 @@
     },
     {
       "id": "gohan_wo_taberu",
-      "description": "ご飯を食べる - verb lemma should not be 食ぶ",
+      "description": "ご飯を食べる - ご飯 is L2 dictionary word",
       "input": "ご飯を食べる",
       "expected": [
-        {"surface": "ご", "pos": "Prefix"},
-        {"surface": "飯", "pos": "Noun"},
+        {"surface": "ご飯", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "食べる", "pos": "Verb", "lemma": "食べる"}
       ],
-      "tags": ["strict", "verb", "lemma"]
+      "tags": ["strict", "verb", "lemma", "dictionary"]
     },
     {
       "id": "tsuke_not_split",
@@ -71,13 +70,12 @@
     },
     {
       "id": "gohan_lemma",
-      "description": "ご飯 splits into prefix + noun",
+      "description": "ご飯 - L2 dictionary word",
       "input": "ご飯",
       "expected": [
-        {"surface": "ご", "pos": "Prefix", "lemma": "ご"},
-        {"surface": "飯", "pos": "Noun", "lemma": "飯"}
+        {"surface": "ご飯", "pos": "Noun", "lemma": "ご飯"}
       ],
-      "tags": ["strict", "noun", "lemma"]
+      "tags": ["strict", "noun", "lemma", "dictionary"]
     },
     {
       "id": "ocha_lemma",

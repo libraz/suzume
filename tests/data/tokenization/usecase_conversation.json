@@ -263,7 +263,8 @@
       "id": "shop_size",
       "input": "大きいサイズはありますか",
       "expected": [
-        {"surface": "大きいサイズ", "pos": "Noun"},
+        {"surface": "大きい", "pos": "Adjective"},
+        {"surface": "サイズ", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "あります", "pos": "Verb", "lemma": "ある"},
         {"surface": "か", "pos": "Particle"}

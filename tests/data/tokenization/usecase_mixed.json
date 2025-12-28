@@ -243,15 +243,14 @@
     },
     {
       "id": "prefix_honorific_go",
-      "description": "ご prefix",
+      "description": "ご飯 - L2 dictionary word",
       "input": "ご飯を食べる",
       "expected": [
-        {"surface": "ご", "pos": "Prefix"},
-        {"surface": "飯", "pos": "Noun"},
+        {"surface": "ご飯", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "食べる", "pos": "Verb"}
       ],
-      "tags": ["prefix_suffix"]
+      "tags": ["prefix_suffix", "dictionary"]
     },
     {
       "id": "prefix_negation_fu",
@@ -307,13 +306,13 @@
     },
     {
       "id": "suffix_sei",
-      "description": "性 suffix - split from noun",
+      "description": "性 suffix - split from noun with existential ある (verb)",
       "input": "可能性がある",
       "expected": [
         {"surface": "可能", "pos": "Noun"},
         {"surface": "性", "pos": "Suffix"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "ある", "pos": "Determiner"}
+        {"surface": "ある", "pos": "Verb", "lemma": "ある"}
       ],
       "tags": ["prefix_suffix"]
     },

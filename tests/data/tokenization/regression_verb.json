@@ -62,10 +62,11 @@
     },
     {
       "id": "mashou_ikimashou",
-      "description": "行きましょう - volitional form",
+      "description": "行きましょう - volitional form (split: verb stem + aux)",
       "input": "行きましょう",
       "expected": [
-        {"surface": "行きましょう", "pos": "Verb", "lemma": "行く"}
+        {"surface": "行き", "pos": "Verb", "lemma": "行く"},
+        {"surface": "ましょう", "pos": "Auxiliary"}
       ],
       "tags": ["regression", "mashou", "volitional"]
     },
@@ -380,21 +381,21 @@
     },
     {
       "id": "hiragana_verb_imasu",
-      "description": "います - auxiliary form of いる",
+      "description": "います - polite form of verb いる (to exist/be)",
       "input": "います",
       "expected": [
-        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"}
+        {"surface": "います", "pos": "Verb", "lemma": "いる"}
       ],
-      "tags": ["regression", "auxiliary"]
+      "tags": ["regression", "verb"]
     },
     {
       "id": "hiragana_verb_imasen",
-      "description": "いません - auxiliary form of いる",
+      "description": "いません - negative polite form of verb いる (to exist/be)",
       "input": "いません",
       "expected": [
-        {"surface": "いません", "pos": "Auxiliary", "lemma": "いる"}
+        {"surface": "いません", "pos": "Verb", "lemma": "いる"}
       ],
-      "tags": ["regression", "auxiliary"]
+      "tags": ["regression", "verb"]
     },
     {
       "id": "suru_passive_neg_past",

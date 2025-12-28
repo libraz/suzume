@@ -14,6 +14,8 @@ const std::unordered_set<std::string_view> kSingleKanjiExceptions = {
     "枚", "台", "回", "件", "円", "点", "度", "番", "階", "歳",
     // Administrative units (行政単位)
     "国", "市", "県", "区", "町", "村",
+    // Common standalone nouns (基本名詞)
+    "家", "駅", "店", "道", "海", "山", "川", "森", "空", "雨",
     // Spatial relations (空間)
     "上", "下", "中", "外", "内", "前", "後",
     // Directions (方角)
@@ -22,6 +24,8 @@ const std::unordered_set<std::string_view> kSingleKanjiExceptions = {
     "春", "夏", "秋", "冬",
     // Times of day (時間帯)
     "朝", "昼", "夜",
+    // Interrogatives (疑問詞)
+    "何", "誰",
 };
 
 // =============================================================================

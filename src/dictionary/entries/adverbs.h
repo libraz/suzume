@@ -89,9 +89,11 @@ inline std::vector<DictionaryEntry> getAdverbEntries() {
       {"やっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"ついに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       // Very low cost for いつも to beat いつ(PRON)+もの(NOUN) combination
-      // Cost must be low enough: いつも→の→店 path needs to beat いつ+もの+店 path
-      // Issue: ADV→PARTICLE connection is 0.5, but PRON→NOUN is 0, so need negative cost
-      {"いつも", POS::Adverb, -0.2F, "", false, false, false, CT::None, ""},
+      // Path comparison with 店(unknown, cost ~3.4):
+      //   いつも(-1.8) + の(0.6) + conn(0.5) + 店(3.4) ≈ 2.7
+      //   いつ(0.1) + もの(-1.2) + 店(3.4) ≈ 2.3
+      // Need extra -0.2 to overcome the 0.4 gap + some margin
+      {"いつも", POS::Adverb, -1.2F, "", false, false, false, CT::None, ""},
       {"たまに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"よく", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"たびたび", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},

@@ -132,6 +132,7 @@ inline std::vector<DictionaryEntry> getLowInfoEntries() {
       {"お", POS::Prefix, 0.3F, "", true, false, false, CT::None, ""},  // Honorific
       {"ご", POS::Prefix, 0.3F, "", true, false, false, CT::None, ""},  // Honorific (kanji nouns)
       {"御", POS::Prefix, 1.0F, "", true, false, false, CT::None, ""},  // Kanji form of お/ご
+      {"何", POS::Prefix, 0.8F, "なん", true, false, false, CT::None, ""},  // 何番, 何号, 何人, 何星人 (higher cost to lose to PRON when standalone)
 
       // Suffixes (接尾語)
       {"的", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
@@ -147,6 +148,9 @@ inline std::vector<DictionaryEntry> getLowInfoEntries() {
       {"感", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
       {"力", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
       {"度", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
+      {"線", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},  // 山手線, 1番線, 新幹線
+      {"行き", POS::Suffix, 0.5F, "いき", false, false, true, CT::None, ""},  // 東京行き, 成田行き (bound for)
+      {"行", POS::Suffix, 1.5F, "ゆき", false, false, true, CT::None, ""},  // Alternative reading
 
       // Plural suffixes (複数接尾語) - essential for proper tokenization
       // Low cost (0.5) to ensure NOUN+suffix is preferred over VERB interpretation

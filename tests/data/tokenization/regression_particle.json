@@ -49,7 +49,7 @@
     },
     {
       "id": "node_in_sentence",
-      "description": "ので in sentence should have correct lemma",
+      "description": "ので in sentence - suru-verb unified",
       "input": "電車が遅れているので遅刻しそうです",
       "expected": [
         {"surface": "電車", "pos": "Noun"},
@@ -57,20 +57,19 @@
         {"surface": "遅れて", "pos": "Verb", "lemma": "遅れる"},
         {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"},
         {"surface": "ので", "pos": "Particle", "lemma": "ので"},
-        {"surface": "遅刻", "pos": "Noun"},
-        {"surface": "しそう", "pos": "Verb", "lemma": "する"},
+        {"surface": "遅刻しそう", "pos": "Verb", "lemma": "遅刻する"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
-      "tags": ["regression", "particle", "node", "complex"]
+      "tags": ["regression", "particle", "node", "complex", "suru"]
     },
     {
       "id": "particle_filter_ie_ni_imasu",
-      "description": "家にいます should be split as 家 + に + います",
+      "description": "家にいます - existential verb いる (to be at home)",
       "input": "家にいます",
       "expected": [
         {"surface": "家", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"}
+        {"surface": "います", "pos": "Verb", "lemma": "いる"}
       ],
       "tags": ["regression", "particle", "filter"]
     },

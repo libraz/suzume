@@ -10,7 +10,7 @@
 
 # === adult_games_comics ===
 ノベルゲーム	NOUN	のべるげーむ	0.5
-胸糞悪い	ADJ	むなくそわるい	0.5
+胸糞悪い	ADJ	むなくそわるい	0.5	I_ADJ
 マインドコントロール	NOUN	まいんどこんとろーる	0.5
 秘密の関係	NOUN	ひみつのかんけい	0.5
 BAD END	NOUN	ばっどえんど	0.5
@@ -466,7 +466,7 @@ Mika Pikazo	PROPN	みかぴかぞー	0.5
 ネタにマジレス	PHRASE	ねたにまじれす	0.5
 華麗にスルー	PHRASE	かれいにするー	0.5
 半年ROMれ	PHRASE	はんとしろむれ	0.5
-ROMる	VERB	ろむる	0.5
+ROMる	VERB	ろむる	0.5	GODAN_RA
 なんJ	PROPN	なんじぇい	0.5
 なんでも実況J	PROPN	なんでもじっきょうじぇい	0.5
 FF外から失礼	PHRASE	えふえふがいからしつれい	0.5
@@ -771,9 +771,9 @@ TOP DANDY	PROPN	とっぷだんでぃ	0.5
 アキバ大好き!祭り	PROPN	あきばだいすきまつり	0.5
 Candy Fruit	PROPN	きゃんでぃふるーと	0.5
 P.A.R.M.S	PROPN	ぱーむす	0.5
-ゆめかわいい	ADJ	ゆめかわいい	0.5
+ゆめかわいい	ADJ	ゆめかわいい	0.5	I_ADJ
 病みかわ	NOUN	やみかわ	0.5
-病みかわいい	ADJ	やみかわいい	0.5
+病みかわいい	ADJ	やみかわいい	0.5	I_ADJ
 BIGO LIVE	PROPN	びごらいぶ	0.5
 Apple Podcast	PROPN	あっぷるぽっどきゃすと	0.5
 ガイドライン違反	NOUN	がいどらいんいはん	0.5

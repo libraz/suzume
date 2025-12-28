@@ -192,19 +192,29 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
 
   // Penalize unknown adjectives ending with そう with invalid lemma
   // E.g., 食べそう should not be ADJ with lemma 食べい (invalid)
-  // Valid: おいしそう with lemma おいしい (ends with しい)
-  // Valid: 難しそう with lemma 難しい (ends with しい)
+  // Valid patterns (common i-adjective endings):
+  //   しい: おいしい, 難しい, 美しい, 楽しい, etc. (productive pattern)
+  //   さい: 小さい (small - common adjective)
+  //   きい: 大きい (validated at candidate generation via verb lookup)
+  // Invalid patterns (verb renyoukei + い):
+  //   べい: 食べい (食べる), みい: 読みい (読む), etc.
+  // Note: きい patterns are validated in adjective_candidates.cpp by checking
+  // if stem + く exists as a verb (e.g., 書く exists → 書きい invalid)
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary() &&
       edge.surface.size() >= 6) {
     std::string_view surface = edge.surface;
     if (surface.size() >= 6 &&
         surface.substr(surface.size() - 6) == "そう") {
-      // Check if lemma ends with しい (valid i-adjective pattern)
+      // Check if lemma ends with valid i-adjective pattern
       bool valid_adj_lemma = false;
-      if (edge.lemma.size() >= 6 &&
-          edge.lemma.substr(edge.lemma.size() - 6) == "しい") {
-        valid_adj_lemma = true;
+      if (edge.lemma.size() >= 6) {
+        std::string_view ending = edge.lemma.substr(edge.lemma.size() - 6);
+        // Accept しい, さい, きい as valid i-adjective endings
+        // Note: きい is validated at candidate generation (verb stem check)
+        if (ending == "しい" || ending == "さい" || ending == "きい") {
+          valid_adj_lemma = true;
+        }
       }
       if (!valid_adj_lemma) {
         cost += scorer::kPenaltyInvalidAdjSou;

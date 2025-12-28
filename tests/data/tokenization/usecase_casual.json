@@ -80,7 +80,7 @@
       "input": "買っとくね",
       "expected": [
         {"surface": "買", "pos": "Noun"},
-        {"surface": "っとく", "pos": "Adjective", "lemma": "っとい"},
+        {"surface": "っとく", "pos": "Verb", "lemma": "とく"},
         {"surface": "ね", "pos": "Particle"}
       ],
       "tags": ["casual", "contraction"]

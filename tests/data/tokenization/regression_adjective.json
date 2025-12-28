@@ -225,11 +225,10 @@
     },
     {
       "id": "suru_verb_sou_chikoku",
-      "description": "遅刻しそう - suru noun + しそう verb",
+      "description": "遅刻しそう - unified suru-verb",
       "input": "遅刻しそう",
       "expected": [
-        {"surface": "遅刻", "pos": "Noun"},
-        {"surface": "しそう", "pos": "Verb", "lemma": "する"}
+        {"surface": "遅刻しそう", "pos": "Verb", "lemma": "遅刻する"}
       ],
       "tags": ["regression", "suru", "sou"]
     },

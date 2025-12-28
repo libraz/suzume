@@ -97,7 +97,10 @@ enum class ConnectionPattern {
   TeFormVerbToVerb,        // テ形動詞 → 動詞 (e.g., 関して + 報告する)
   HiraganaNounStartsWithParticle,  // ひらがな名詞が助詞で始まる (e.g., もも after すもも)
   SameParticleRepeated,    // 同じ助詞が連続 (e.g., も + も)
-  PrefixToShortStemHiraganaAdj  // PREFIX → 短語幹純ひらがなADJ (e.g., お + いしい)
+  PrefixToShortStemHiraganaAdj,  // PREFIX → 短語幹純ひらがなADJ (e.g., お + いしい)
+  SuffixAfterSymbol,       // SYMBOL → SUFFIX (invalid: 、家 should be NOUN, not SUFFIX)
+  PrefixBeforeVerb,        // PREFIX → VERB (invalid: 何してる - 何 should be PRON)
+  NounBeforeVerbAux        // NOUN → verb-specific AUX (invalid: 行き(NOUN) + ましょう)
 };
 
 /**

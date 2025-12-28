@@ -154,12 +154,13 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // Skip Godan verb renyokei + そう patterns (飲みそう, 降りそうだ, etc.)
     // These are verb + そう auxiliary patterns, not i-adjectives.
     // Pattern: single kanji + renyokei suffix (i-row) + そう/そうだ/そうです...
-    // Renyokei suffixes: み, き, ぎ, ち, び, り, に (7 patterns)
+    // Renyokei suffixes: み, ぎ, ち, び, り, に (6 patterns, き handled below)
     // Note: し is handled specially below with dictionary validation
+    // Note: き is also handled specially because 大きい exists as an adjective
     if (kanji_end == start_pos + 1 && hiragana_part.size() >= 9) {
       // Check if pattern starts with: renyokei suffix + そう
       std::string_view renyokei_char = std::string_view(hiragana_part).substr(0, 3);
-      if ((renyokei_char == "み" || renyokei_char == "き" ||
+      if ((renyokei_char == "み" ||
            renyokei_char == "ぎ" || renyokei_char == "ち" ||
            renyokei_char == "び" || renyokei_char == "り" ||
            renyokei_char == "に") &&
@@ -212,6 +213,45 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       }
     }
 
+    // For き + そう patterns, check if stem + く exists as a verb.
+    // If a godan-ku verb exists, this is likely verb renyoukei + そう, not adjective.
+    // 書きそう → 書く (verb exists) → skip adjective candidate
+    // 大きそう → 大く (verb doesn't exist) → allow adjective candidate
+    // This is the inverse of し pattern: we check for verb existence, not adjective.
+    if (hiragana_part.size() >= 9 &&
+        hiragana_part.substr(0, 3) == "き" &&
+        hiragana_part.substr(3, 6) == "そう") {
+      if (dict_manager != nullptr) {
+        // Construct potential verb form: kanji + く
+        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+        std::string verb_form = kanji_stem + "く";
+        auto lookup = dict_manager->lookup(verb_form, 0);
+        // Check if any entry is a verb with exact match
+        size_t verb_form_chars = 0;
+        for (size_t i = 0; i < verb_form.size(); ) {
+          auto byte = static_cast<uint8_t>(verb_form[i]);
+          if ((byte & 0x80) == 0) { i += 1; }
+          else if ((byte & 0xE0) == 0xC0) { i += 2; }
+          else if ((byte & 0xF0) == 0xE0) { i += 3; }
+          else { i += 4; }
+          ++verb_form_chars;
+        }
+        bool is_godan_ku_verb = false;
+        for (const auto& result : lookup) {
+          if (result.length == verb_form_chars &&
+              result.entry != nullptr &&
+              result.entry->pos == core::PartOfSpeech::Verb) {
+            is_godan_ku_verb = true;
+            break;
+          }
+        }
+        if (is_godan_ku_verb) {
+          continue;  // Verb exists, so this is verb renyoukei + そう, skip adjective
+        }
+        // No verb found, allow adjective candidate (e.g., 大きそう → 大きい)
+      }
+    }
+
     // Skip patterns that are clearly verb negatives, not adjectives
     // 〜かない, 〜がない, etc. are Godan verb mizenkei + ない patterns
     // 〜しない is Suru verb + ない, 〜べない is Ichidan verb + ない
@@ -224,6 +264,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // confidence than IAdjective (美味しい), but we still want to generate
     // an adjective candidate for the lattice to choose from
     auto all_candidates = inflection.analyze(surface);
+
     for (const auto& cand : all_candidates) {
       // Require confidence >= 0.5 for i-adjectives
       // Base forms like 寒い get exactly 0.5, conjugated forms like 美しかった get 0.68+

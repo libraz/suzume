@@ -155,12 +155,12 @@
     },
     {
       "id": "multi_verb_purpose",
-      "description": "Purpose clause with verb",
+      "description": "Purpose clause with verb renyoukei",
       "input": "本を買いに行った",
       "expected": [
         {"surface": "本", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "買い", "pos": "Noun"},
+        {"surface": "買い", "pos": "Verb", "lemma": "買う"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "行った", "pos": "Verb", "lemma": "行く"}
       ],
@@ -194,9 +194,9 @@
       "description": "Polite verb 申し上げる",
       "input": "ご報告申し上げます",
       "expected": [
-        {"surface": "ご報告申", "pos": "Noun"},
-        {"surface": "し", "pos": "Other"},
-        {"surface": "上げます", "pos": "Verb", "lemma": "上げる"}
+        {"surface": "ご", "pos": "Prefix"},
+        {"surface": "報告", "pos": "Noun"},
+        {"surface": "申し上げます", "pos": "Verb", "lemma": "申し上げる"}
       ],
       "tags": ["verb", "polite"]
     },

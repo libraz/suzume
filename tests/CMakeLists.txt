@@ -65,6 +65,7 @@ set(TEST_SOURCES
   integration/usecase_news_test.cpp
   integration/usecase_technical_test.cpp
   integration/usecase_realworld_test.cpp
+  integration/usecase_botchan_test.cpp
   integration/grammar_adjective_test.cpp
   integration/grammar_pattern_test.cpp
   integration/basic_test.cpp

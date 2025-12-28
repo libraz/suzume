@@ -51,13 +51,12 @@
     },
     {
       "id": "gohan_split",
-      "description": "ご飯 splits into prefix and noun",
+      "description": "ご飯 - L2 dictionary word as single noun",
       "input": "ご飯",
       "expected": [
-        {"surface": "ご", "pos": "Prefix"},
-        {"surface": "飯", "pos": "Noun"}
+        {"surface": "ご飯", "pos": "Noun"}
       ],
-      "tags": ["strict", "honorific"]
+      "tags": ["strict", "honorific", "dictionary"]
     },
     {
       "id": "onegai_split",
@@ -82,15 +81,14 @@
     },
     {
       "id": "osewa_ni_natte_orimasu",
-      "description": "お世話になっております splits お prefix and contains おります as prefix+noun",
+      "description": "お世話になっております - humble progressive of なる",
       "input": "お世話になっております",
       "expected": [
         {"surface": "お", "pos": "Prefix"},
         {"surface": "世話", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "なって", "pos": "Verb", "lemma": "なる"},
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "ります", "pos": "Noun"}
+        {"surface": "おります", "pos": "Verb", "lemma": "おる"}
       ],
       "tags": ["strict", "business"]
     },

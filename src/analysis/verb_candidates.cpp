@@ -327,6 +327,33 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           if (best.verb_type == grammar::VerbType::Suru) {
             base_cost -= 0.2F;
           }
+          // Check if base form exists in dictionary - significant bonus for known verbs
+          // This helps 行われた (base=行う) beat 行(suffix)+われた split
+          // BUT skip compound adjective patterns (verb renyoukei + にくい/やすい/がたい)
+          // e.g., 使いにくい should be ADJECTIVE, not VERB
+          bool is_compound_adj_pattern =
+              (surface.size() >= 12 &&  // At least 4 chars (e.g., 使いにくい = 5 chars = 15 bytes)
+               (surface.find("にくい") != std::string::npos ||
+                surface.find("にくく") != std::string::npos ||
+                surface.find("にくか") != std::string::npos ||
+                surface.find("やすい") != std::string::npos ||
+                surface.find("やすく") != std::string::npos ||
+                surface.find("やすか") != std::string::npos ||
+                surface.find("がたい") != std::string::npos ||
+                surface.find("がたく") != std::string::npos));
+          if (dict_manager != nullptr && !best.base_form.empty() &&
+              !is_compound_adj_pattern) {
+            auto results = dict_manager->lookup(best.base_form, 0);
+            for (const auto& result : results) {
+              if (result.entry != nullptr &&
+                  result.entry->surface == best.base_form &&
+                  result.entry->pos == core::PartOfSpeech::Verb) {
+                // Found in dictionary - give strong bonus
+                base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;
+                break;
+              }
+            }
+          }
           candidate.cost = base_cost;
           candidate.has_suffix = false;
           // Note: Don't set lemma here - let lemmatizer derive it more accurately

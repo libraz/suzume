@@ -1,6 +1,6 @@
 # suzume core dictionary - cleaned entries
 # Format: surface	pos	reading	cost
-# 
+#
 # Only entries that suzume cannot handle without dictionary:
 # - Mixed character type compounds (Web開発, etc.)
 # - Fixed expressions with particles (鬼滅の刃, etc.)
@@ -118,7 +118,7 @@
 はじめまして	OTHER		1.0
 マジかよ	OTHER		1.0
 ガチかよ	OTHER		1.0
-はぁ？	OTHER		1.0
+はぁ	OTHER		1.0
 だよな	OTHER		1.0
 だよね	OTHER		1.0
 激しく同意	OTHER		1.0
@@ -127,7 +127,6 @@
 だるい	OTHER		1.0
 えーと	OTHER		1.0
 えっと	OTHER		1.0
-待ってました	OTHER		1.0
 さすがです	OTHER		1.0
 がんば	OTHER		1.0
 あいよ	OTHER		1.0
@@ -141,38 +140,19 @@
 柳の下にいつも泥鰌はいない	NOUN	やなぎのしたにいつもどじょうはいない	0.5
 失敗は成功の母	NOUN	しっぱいはせいこうのはは	0.5
 最初から最後まで	NOUN	さいしょからさいごまで	0.5
-交通安全	NOUN	こうつうあんぜん	0.5
-
-# === medical ===
-メタボリックシンドローム	NOUN	めたぼりっくしんどろーむ	0.5
-呼吸困難	NOUN	こきゅうこんなん	0.5
 
 # === nouns ===
 # Note: Internet-specific nouns and brand names moved to data/user/dictionary.tsv (L3)
+# Common compound nouns with prefix
+
+ご飯	NOUN	ごはん	0.3
 Wi-Fi	NOUN		0.5
-メジャーアイドル	NOUN	めじゃーあいどる	0.5
-サンダースネイク	NOUN	さんだーすねいく	0.5
-アイヌ語MIX	NOUN	あいぬごみっくす	0.5
 C&R	NOUN		0.5
-ブラックリスト	NOUN	ぶらっくりすと	0.5
-ドライブレコーダー	NOUN	どらいぶれこーだー	0.5
-リサイクルショップ	NOUN	りさいくるしょっぷ	0.5
-グランドピアノ	NOUN	ぐらんどぴあの	0.5
 子どもの貧困	NOUN	こどものひんこん	0.5
 食器洗い乾燥機	NOUN	しょっきあらいかんそうき	0.5
-サーバーサイド	NOUN	さーばーさいど	0.5
-クライアントサイド	NOUN	くらいあんとさいど	0.5
 投資ファンド	NOUN	とうしふぁんど	0.5
 オプション取引	NOUN	おぷしょんとりひき	0.5
-感謝の気持ち	NOUN	かんしゃのきもち	0.5
-欲求不満	NOUN	よっきゅうふまん	0.5
 
-# === physics ===
-光速度不変	NOUN	こうそくどふへん	0.5
-
-# === seasonings ===
-グレープシードオイル	NOUN	ぐれーぷしーどおいる	0.5
-ホワイトソース	NOUN	ほわいとそーす	0.5
 
 # === suffixes ===
 がたい	OTHER		1.0
@@ -180,11 +160,6 @@ C&R	NOUN		0.5
 
 # === time_nouns ===
 # Note: しばらく is in adverbs section
-
-# === verbs ===
-# Note: Basic noun+する patterns handled by inflection analyzer
-# SURU nouns (nouns that take する to become verbs)
-遅刻	NOUN	ちこく	0.5
 
 # === compound_nouns (from greetings.h - open class) ===
 # These are verb-derived compound nouns that should be in Layer 2
@@ -228,9 +203,7 @@ C&R	NOUN		0.5
 # Fruits (for すもももももももものうち)
 # Cost balanced: higher than formal noun もの (0.3) to prefer particle も between
 もも	NOUN	もも	1.0
-桃	NOUN	もも	0.5
 すもも	NOUN	すもも	1.0
-李	NOUN	すもも	0.5
 
 # Formal nouns (hiragana forms)
 うち	NOUN	うち	0.5
@@ -243,75 +216,14 @@ C&R	NOUN		0.5
 # Entries migrated from low_info.h (DEPRECATED WASM fallback)
 # =============================================================================
 
-# === honorific_pattern_verbs ===
-# For お + renyokei + いたす/します patterns
-伝え	VERB	つたえ	0.5	ICHIDAN
-伝える	VERB	つたえる	0.5	ICHIDAN
-知らせ	VERB	しらせ	0.5	ICHIDAN
-知らせる	VERB	しらせる	0.5	ICHIDAN
-届け	VERB	とどけ	0.5	ICHIDAN
-届ける	VERB	とどける	0.5	ICHIDAN
-答え	VERB	こたえ	0.5	ICHIDAN
-答える	VERB	こたえる	0.5	ICHIDAN
-教え	VERB	おしえ	0.5	ICHIDAN
-教える	VERB	おしえる	0.5	ICHIDAN
-見せ	VERB	みせ	0.5	ICHIDAN
-見せる	VERB	みせる	0.5	ICHIDAN
-聞かせ	VERB	きかせ	0.5	ICHIDAN
-待ち	VERB	まち	0.5	GODAN_TA
-願い	VERB	ねがい	0.5	GODAN_WA
-願う	VERB	ねがう	0.5	GODAN_WA
+# === Verbs (partial L1 migration) ===
+# Common verbs moved to L1 for auto-conjugation
+# Auxiliary verbs kept here to avoid conjugation conflicts
+# (e.g., ある → あれ conflicts with pronoun あれ)
 
 # === low_info_verbs ===
-# Common verbs with low information content (high cost to prefer specific verbs)
-ある	VERB	ある	2.0	GODAN_RA
-いる	VERB	いる	2.0	ICHIDAN
-おる	VERB	おる	2.0	GODAN_RA
-くる	VERB	くる	2.0	KURU
-いく	VERB	いく	2.0	GODAN_KA
-くれる	VERB	くれる	2.0	ICHIDAN
-あげる	VERB	あげる	2.0	ICHIDAN
-みる	VERB	みる	2.0	ICHIDAN
-おく	VERB	おく	2.0	GODAN_KA
-しまう	VERB	しまう	2.0	GODAN_WA
-
-# === common_godan_wa_verbs ===
-# Common verbs with っ-onbin ambiguity
-買う	VERB	かう	1.0	GODAN_WA
-言う	VERB	いう	1.0	GODAN_WA
-思う	VERB	おもう	1.0	GODAN_WA
-使う	VERB	つかう	1.0	GODAN_WA
-会う	VERB	あう	1.0	GODAN_WA
-払う	VERB	はらう	1.0	GODAN_WA
-洗う	VERB	あらう	1.0	GODAN_WA
-歌う	VERB	うたう	1.0	GODAN_WA
-習う	VERB	ならう	1.0	GODAN_WA
-笑う	VERB	わらう	1.0	GODAN_WA
-違う	VERB	ちがう	1.0	GODAN_WA
-追う	VERB	おう	1.0	GODAN_WA
-誘う	VERB	さそう	1.0	GODAN_WA
-拾う	VERB	ひろう	1.0	GODAN_WA
-
-# === common_godan_ra_verbs ===
-取る	VERB	とる	1.0	GODAN_RA
-乗る	VERB	のる	1.0	GODAN_RA
-送る	VERB	おくる	1.0	GODAN_RA
-作る	VERB	つくる	1.0	GODAN_RA
-知る	VERB	しる	1.0	GODAN_RA
-座る	VERB	すわる	1.0	GODAN_RA
-帰る	VERB	かえる	1.0	GODAN_RA
-入る	VERB	はいる	1.0	GODAN_RA
-走る	VERB	はしる	1.0	GODAN_RA
-売る	VERB	うる	1.0	GODAN_RA
-切る	VERB	きる	1.0	GODAN_RA
-
-# === common_godan_ta_verbs ===
-持つ	VERB	もつ	1.0	GODAN_TA
-待つ	VERB	まつ	1.0	GODAN_TA
-立つ	VERB	たつ	1.0	GODAN_TA
-打つ	VERB	うつ	1.0	GODAN_TA
-勝つ	VERB	かつ	1.0	GODAN_TA
-育つ	VERB	そだつ	1.0	GODAN_TA
+# Moved to L1 (essential_verbs.h) with auto-conjugation
+# Pronoun あれ has lower cost (0.2) to beat verb あれ (imperative of ある)
 
 # === yoi_conjugations ===
 # Irregular adjective よい (良い) conjugations
@@ -405,22 +317,5 @@ C&R	NOUN		0.5
 過去	NOUN	かこ	0.5
 未来	NOUN	みらい	0.5
 
-# === 五段ラ行動詞（漢字+する pattern）===
-# These are Godan-ra verbs, not Godan-sa verbs.
-# Pattern: 漢字 + する (e.g., 対する, 関する)
-# Conjugation: 対する → 対さ/対し/対する/対する/対すれ/対せよ
-対する	VERB	たいする	0.3	GODAN_RA
-関する	VERB	かんする	0.3	GODAN_RA
-属する	VERB	ぞくする	0.3	GODAN_RA
-発する	VERB	はっする	0.3	GODAN_RA
-接する	VERB	せっする	0.3	GODAN_RA
-反する	VERB	はんする	0.3	GODAN_RA
-達する	VERB	たっする	0.3	GODAN_RA
-適する	VERB	てきする	0.3	GODAN_RA
-課する	VERB	かする	0.3	GODAN_RA
-解する	VERB	かいする	0.3	GODAN_RA
-介する	VERB	かいする	0.3	GODAN_RA
-帰する	VERB	きする	0.3	GODAN_RA
-欲する	VERB	ほっする	0.3	GODAN_RA
-資する	VERB	しする	0.3	GODAN_RA
-引っ越す	VERB	ひっこす	0.3	GODAN_SA
+# === 五段ラ行動詞 migrated to L1 (essential_verbs.h) ===
+# 対する, 関する, etc. - all moved to L1 for auto-conjugation

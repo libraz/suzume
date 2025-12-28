@@ -99,7 +99,10 @@ inline std::vector<DictionaryEntry> getPronounEntries() {
       {"そちら", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
 
       // Demonstrative - distal (遠称) - hiragana only
-      {"あれ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
+      // あれ cost tuning: 0.8 + low_info=false balances standalone vs conditional
+      // - Standalone: pronoun word_cost=-0.1 < verb word_cost=0 (pronoun wins)
+      // - With ば: pronoun+ば path > verb あれば path (verb wins)
+      {"あれ", POS::Pronoun, 0.8F, "", false, false, false, CT::None, ""},
       {"あそこ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
       {"あちら", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
 

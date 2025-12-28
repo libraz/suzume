@@ -72,9 +72,10 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
 
   switch (ctype) {
     case normalize::CharType::Kanji:
-      // Kanji: prefer 2-4 characters, but single kanji is also common (家, 人, 本)
+      // Kanji: prefer 2-8 characters for compound nouns and place names
+      // E.g., 神奈川県横浜市 (7 chars) should not be penalized
       // Single kanji should beat suffix entries (cost 1.5) in dictionary
-      if (length >= 2 && length <= 4) {
+      if (length >= 2 && length <= 8) {
         return base_cost;
       }
       if (length == 1) {

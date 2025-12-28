@@ -94,7 +94,7 @@
         {"surface": "しかし", "pos": "Conjunction"},
         {"surface": "問題", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "ある", "pos": "Determiner"}
+        {"surface": "ある", "pos": "Verb", "lemma": "ある"}
       ],
       "tags": ["grammar", "conjunction"]
     },

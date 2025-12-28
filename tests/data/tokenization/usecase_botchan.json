@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "cases": [
+    {
+      "id": "botchan_opening",
+      "description": "坊っちゃん冒頭 - 親譲りの無鉄砲で小供の時から損ばかりしている",
+      "input": "親譲りの無鉄砲で小供の時から損ばかりしている",
+      "expected": [
+        {"surface": "親譲り", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "無鉄砲", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "小供", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "時", "pos": "Noun"},
+        {"surface": "から", "pos": "Particle"},
+        {"surface": "損", "pos": "Noun"},
+        {"surface": "ばかり", "pos": "Particle"},
+        {"surface": "して", "pos": "Verb", "lemma": "する"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+      ],
+      "tags": ["literature", "botchan"]
+    },
+    {
+      "id": "botchan_impossible_jump",
+      "description": "そこから飛び降りる事は出来まい - compound verb + negative presumption auxiliary",
+      "input": "そこから飛び降りる事は出来まい",
+      "expected": [
+        {"surface": "そこ", "pos": "Pronoun"},
+        {"surface": "から", "pos": "Particle"},
+        {"surface": "飛び降りる", "pos": "Verb", "lemma": "飛び降りる"},
+        {"surface": "事", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "出来", "pos": "Verb", "lemma": "出来る"},
+        {"surface": "まい", "pos": "Auxiliary", "lemma": "まい"}
+      ],
+      "tags": ["literature", "botchan"]
+    }
+  ]
+}

@@ -314,7 +314,7 @@
         {"surface": "の", "pos": "Particle"},
         {"surface": "限界", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "ある", "pos": "Determiner"}
+        {"surface": "ある", "pos": "Verb", "lemma": "ある"}
       ],
       "tags": ["academic"]
     },

@@ -327,13 +327,12 @@
     },
     {
       "id": "go_rice",
-      "description": "Honorific ご + 飯",
+      "description": "ご飯 - common word registered in L2 dictionary",
       "input": "ご飯",
       "expected": [
-        {"surface": "ご", "pos": "Prefix"},
-        {"surface": "飯", "pos": "Noun"}
+        {"surface": "ご飯", "pos": "Noun"}
       ],
-      "tags": ["prefix", "go"]
+      "tags": ["prefix", "go", "dictionary"]
     },
     {
       "id": "go_look",

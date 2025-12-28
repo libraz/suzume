@@ -100,15 +100,14 @@
     },
     {
       "id": "realworld_business_email",
-      "description": "お世話になっております - prefix splits from noun",
+      "description": "お世話になっております - humble progressive form",
       "input": "お世話になっております",
       "expected": [
         {"surface": "お", "pos": "Prefix"},
         {"surface": "世話", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "なって", "pos": "Verb", "lemma": "なる"},
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "ります", "pos": "Noun"}
+        {"surface": "おります", "pos": "Verb", "lemma": "おる"}
       ],
       "tags": ["strict", "realworld", "business"]
     },

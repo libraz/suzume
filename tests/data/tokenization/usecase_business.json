@@ -10,8 +10,7 @@
         {"surface": "世話", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "なって", "pos": "Verb", "lemma": "なる"},
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "ります", "pos": "Noun"}
+        {"surface": "おります", "pos": "Verb", "lemma": "おる"}
       ],
       "tags": ["business", "email"]
     },

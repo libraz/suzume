@@ -577,6 +577,17 @@ bool isAuxiliaryVerbPattern(std::string_view surface, std::string_view lemma) {
     return true;
   }
 
+  // Check surface for negative/past forms of auxiliary verbs
+  // This handles cases where lemma is empty (unknown word analysis)
+  if (surface == "くれない" || surface == "くれなかった" ||
+      surface == "あげない" || surface == "あげなかった" ||
+      surface == "もらわない" || surface == "もらわなかった" ||
+      surface == "しまわない" || surface == "しまわなかった" ||
+      surface == "いない" || surface == "いなかった" ||
+      surface == "おらない" || surface == "おらなかった") {
+    return true;
+  }
+
   return false;
 }
 
@@ -754,6 +765,78 @@ ConnectionRuleResult checkHiraganaNounStartsWithParticle(
   return {};
 }
 
+// Rule: SYMBOL + SUFFIX penalty
+// After punctuation (、。etc.), a word is unlikely to be a suffix
+// E.g., 、家 should be 家(NOUN), not 家(SUFFIX meaning "-ist" as in 作家)
+ConnectionRuleResult checkSuffixAfterSymbol(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Symbol ||
+      next.pos != core::PartOfSpeech::Suffix) {
+    return {};
+  }
+
+  return {ConnectionPattern::SuffixAfterSymbol,
+          scorer::kPenaltySuffixAfterSymbol, "suffix after punctuation"};
+}
+
+// Rule: PREFIX + VERB penalty
+// Prefixes should attach to nouns/suffixes, not verbs
+// E.g., 何してる - 何 should be PRON, not PREFIX
+ConnectionRuleResult checkPrefixBeforeVerb(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Prefix) {
+    return {};
+  }
+
+  if (next.pos != core::PartOfSpeech::Verb &&
+      next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  return {ConnectionPattern::PrefixBeforeVerb, scorer::kPenaltyPrefixBeforeVerb,
+          "prefix before verb"};
+}
+
+// Helper: Check if auxiliary is verb-specific (requires verb stem, not nouns)
+// Verb-specific: ます/ましょう/ました, たい/たかった, ない/なかった (verb negation)
+// NOT verb-specific: だ/です (copula can follow nouns)
+bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma) {
+  // ます form auxiliaries (require masu-stem)
+  if (surface.size() >= 6) {
+    std::string_view first6 = surface.substr(0, 6);
+    if (first6 == "ます" || first6 == "まし" || first6 == "ませ") {
+      return true;
+    }
+  }
+  // Check lemma for ます
+  if (lemma == "ます") {
+    return true;
+  }
+  // たい form (desire) - always verb-specific
+  if (lemma == "たい") {
+    return true;
+  }
+  return false;
+}
+
+// Rule: NOUN + verb-specific AUX penalty
+// Verb auxiliaries like ます/ましょう/たい require verb stem, not nouns
+// E.g., 行き(NOUN) + ましょう is invalid - should be 行き(VERB) + ましょう
+ConnectionRuleResult checkNounBeforeVerbAux(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Noun ||
+      next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  if (!isVerbSpecificAuxiliary(next.surface, next.lemma)) {
+    return {};
+  }
+
+  return {ConnectionPattern::NounBeforeVerbAux, scorer::kPenaltyNounBeforeVerbAux,
+          "noun before verb-specific aux"};
+}
+
 }  // namespace
 
 // =============================================================================
@@ -879,6 +962,21 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
   }
 
   result = checkPrefixToShortStemHiraganaAdj(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkSuffixAfterSymbol(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkPrefixBeforeVerb(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkNounBeforeVerbAux(prev, next);
   if (result.pattern != ConnectionPattern::None) {
     return result;
   }

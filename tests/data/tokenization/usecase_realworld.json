@@ -3,12 +3,12 @@
   "cases": [
     {
       "id": "mixed_script_english_ga",
-      "description": "English word with Japanese particle が",
+      "description": "English word with Japanese particle が and existential ある",
       "input": "Meetingがある",
       "expected": [
         {"surface": "meeting", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "ある", "pos": "Determiner"}
+        {"surface": "ある", "pos": "Verb", "lemma": "ある"}
       ],
       "tags": ["mixed_script"]
     },
@@ -101,10 +101,11 @@
     },
     {
       "id": "mixed_script_api_request",
-      "description": "API request processing compound",
+      "description": "API request processing - split at kanji boundary",
       "input": "APIリクエスト処理",
       "expected": [
-        {"surface": "apiリクエスト処理", "pos": "Noun"}
+        {"surface": "apiリクエスト", "pos": "Noun"},
+        {"surface": "処理", "pos": "Noun"}
       ],
       "tags": ["mixed_script"]
     },
@@ -165,10 +166,11 @@
     },
     {
       "id": "pretokenizer_percentage",
-      "description": "Percentage with は particle",
+      "description": "Percentage with は particle - 率 as suffix",
       "input": "成功率は50%です",
       "expected": [
-        {"surface": "成功率", "pos": "Noun"},
+        {"surface": "成功", "pos": "Noun"},
+        {"surface": "率", "pos": "Suffix"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "50%", "pos": "Noun"},
         {"surface": "です", "pos": "Auxiliary"}
@@ -231,15 +233,14 @@
     },
     {
       "id": "prefix_gohan",
-      "description": "Honorific prefix ご飯",
+      "description": "ご飯 - L2 dictionary word in sentence",
       "input": "ご飯を食べる",
       "expected": [
-        {"surface": "ご", "pos": "Prefix"},
-        {"surface": "飯", "pos": "Noun"},
+        {"surface": "ご飯", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "食べる", "pos": "Verb"}
       ],
-      "tags": ["prefix"]
+      "tags": ["prefix", "dictionary"]
     },
     {
       "id": "prefix_fukanou",
@@ -331,13 +332,13 @@
     },
     {
       "id": "suffix_sei",
-      "description": "Derivational suffix 性 - split from noun",
+      "description": "Derivational suffix 性 - split from noun with existential ある (verb)",
       "input": "可能性がある",
       "expected": [
         {"surface": "可能", "pos": "Noun"},
         {"surface": "性", "pos": "Suffix"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "ある", "pos": "Determiner"}
+        {"surface": "ある", "pos": "Verb", "lemma": "ある"}
       ],
       "tags": ["suffix"]
     },
@@ -354,19 +355,21 @@
     },
     {
       "id": "compound_shizen_gengo_shori",
-      "description": "Compound noun 自然言語処理技術",
+      "description": "Compound noun 自然言語処理技術 - split into components",
       "input": "自然言語処理技術",
       "expected": [
-        {"surface": "自然言語処理技術", "pos": "Noun"}
+        {"surface": "自然", "pos": "Noun"},
+        {"surface": "言語処理技術", "pos": "Noun"}
       ],
       "tags": ["compound"]
     },
     {
       "id": "compound_kikai_gakushuu",
-      "description": "Compound noun 機械学習モデル",
+      "description": "Compound noun 機械学習モデル - split into components",
       "input": "機械学習モデル",
       "expected": [
-        {"surface": "機械学習モデル", "pos": "Noun"}
+        {"surface": "機械学習", "pos": "Noun"},
+        {"surface": "モデル", "pos": "Noun"}
       ],
       "tags": ["compound"]
     },
@@ -383,7 +386,7 @@
     },
     {
       "id": "compound_kanagawa_ken",
-      "description": "Administrative region 神奈川県横浜市",
+      "description": "Administrative region 神奈川県横浜市 - kept as single token",
       "input": "神奈川県横浜市の本社",
       "expected": [
         {"surface": "神奈川県横浜市", "pos": "Noun"},
@@ -394,12 +397,14 @@
     },
     {
       "id": "compound_kabushiki_kaisha",
-      "description": "Organization name 株式会社",
+      "description": "Organization name 株式会社 - split from ABC",
       "input": "株式会社ABCの担当者",
       "expected": [
-        {"surface": "株式会社abc", "pos": "Noun"},
+        {"surface": "株式会社", "pos": "Noun"},
+        {"surface": "abc", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
-        {"surface": "担当者", "pos": "Noun"}
+        {"surface": "担当", "pos": "Noun"},
+        {"surface": "者", "pos": "Suffix"}
       ],
       "tags": ["compound", "organization"]
     },

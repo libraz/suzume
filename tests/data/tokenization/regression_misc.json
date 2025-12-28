@@ -3,13 +3,12 @@
   "cases": [
     {
       "id": "shisou_lemma",
-      "description": "遅刻しそう should split as 遅刻 (noun) + しそう (verb)",
+      "description": "遅刻しそう - suru-verb unified as single token",
       "input": "遅刻しそう",
       "expected": [
-        {"surface": "遅刻", "pos": "Noun"},
-        {"surface": "しそう", "pos": "Verb", "lemma": "する"}
+        {"surface": "遅刻しそう", "pos": "Verb", "lemma": "遅刻する"}
       ],
-      "tags": ["regression", "sou", "verb"]
+      "tags": ["regression", "sou", "verb", "suru"]
     },
     {
       "id": "sou_auxiliary_pattern",
@@ -22,14 +21,13 @@
     },
     {
       "id": "sou_with_desu",
-      "description": "遅刻しそうです splits correctly",
+      "description": "遅刻しそうです - suru-verb + です",
       "input": "遅刻しそうです",
       "expected": [
-        {"surface": "遅刻", "pos": "Noun"},
-        {"surface": "しそう", "pos": "Verb", "lemma": "する"},
+        {"surface": "遅刻しそう", "pos": "Verb", "lemma": "遅刻する"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
-      "tags": ["regression", "sou", "verb"]
+      "tags": ["regression", "sou", "verb", "suru"]
     },
     {
       "id": "colloquial_adverb_meccha",
@@ -56,7 +54,7 @@
       "input": "そういうこと",
       "expected": [
         {"surface": "そういう", "pos": "Determiner"},
-        {"surface": "こと", "pos": "Noun", "lemma": "事"}
+        {"surface": "こと", "pos": "Noun", "lemma": "こと"}
       ],
       "tags": ["regression", "determiner"]
     },
