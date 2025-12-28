@@ -249,6 +249,14 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       return candidates;  // Let dictionary handle these
     }
 
+    // Skip small kana (拗音・促音) - Japanese words don't start with these
+    // ゃゅょぁぃぅぇぉっ are always part of compound sounds (e.g., きょう not ょう)
+    if (first_char == U'ゃ' || first_char == U'ゅ' || first_char == U'ょ' ||
+        first_char == U'ぁ' || first_char == U'ぃ' || first_char == U'ぅ' ||
+        first_char == U'ぇ' || first_char == U'ぉ' || first_char == U'っ') {
+      return candidates;  // Phonologically impossible word start
+    }
+
     // Skip if starting with demonstrative pronouns (これ, それ, あれ, どれ, etc.)
     // These should be recognized by dictionary lookup, not generated as unknown words.
     if (start_pos + 1 < codepoints.size()) {

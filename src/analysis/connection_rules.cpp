@@ -873,6 +873,7 @@ ConnectionRuleResult checkMaiAfterNoun(const core::LatticeEdge& prev,
 //   と + う (particle + volitional)
 //   に + た (particle + past)
 //   を + ない (particle + negative)
+// Note: Long dictionary AUX (like なかった) after particles is valid
 ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next) {
   if (prev.pos != core::PartOfSpeech::Particle ||
@@ -880,9 +881,41 @@ ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
     return {};
   }
 
-  // Penalty - auxiliaries should attach to verb/adj stems, not particles
+  // Don't penalize long dictionary AUX (2+ chars) - valid patterns
+  // e.g., は + なかった, で + ある
+  if (next.fromDictionary() && next.surface.size() > 3) {
+    return {};
+  }
+
+  // Penalize short/unknown AUX after particle
   return {ConnectionPattern::ParticleBeforeAux, 3.0F,
-          "aux after particle (invalid)"};
+          "short/unknown aux after particle (likely split)"};
+}
+
+// Check for PARTICLE + hiragana OTHER pattern
+// Hiragana OTHER after particle is often a split error in reading contexts
+// e.g., と + うきょう in とうきょう should not be split
+ConnectionRuleResult checkParticleBeforeHiraganaOther(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Particle ||
+      next.pos != core::PartOfSpeech::Other) {
+    return {};
+  }
+
+  // Check if it starts with hiragana
+  if (next.surface.size() < 3) {
+    return {};
+  }
+  auto b0 = static_cast<unsigned char>(next.surface[0]);
+  auto b1 = static_cast<unsigned char>(next.surface[1]);
+  if (b0 != 0xE3 || (b1 != 0x81 && b1 != 0x82)) {
+    return {};
+  }
+
+  // Penalty based on length: single char = 2.5, multi-char = 1.0
+  float penalty = (next.surface.size() == 3) ? 2.5F : 1.0F;
+  return {ConnectionPattern::ParticleBeforeAux, penalty,
+          "hiragana other after particle (likely split)"};
 }
 
 }  // namespace
@@ -1035,6 +1068,11 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
   }
 
   result = checkAuxAfterParticle(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkParticleBeforeHiraganaOther(prev, next);
   if (result.pattern != ConnectionPattern::None) {
     return result;
   }

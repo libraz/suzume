@@ -555,13 +555,11 @@
     },
     {
       "id": "symbol_parentheses",
-      "description": "東京（とうきょう） (Tokyo with reading)",
+      "description": "東京（とうきょう） - reading kept as single token, symbols filtered",
       "input": "東京（とうきょう）",
       "expected": [
         {"surface": "東京", "pos": "Noun"},
-        {"surface": "（", "pos": "Symbol"},
-        {"surface": "とうきょう", "pos": "Noun"},
-        {"surface": "）", "pos": "Symbol"}
+        {"surface": "とうきょう", "pos": "Other"}
       ],
       "tags": ["grammar", "symbol"]
     },

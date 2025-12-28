@@ -159,13 +159,13 @@
     },
     {
       "id": "complex_time_noun_verb_split_tomorrow",
-      "description": "Time noun split - tomorrow",
+      "description": "Time noun split - tomorrow (はず is formal noun)",
       "input": "明日届くはずです",
       "expected": [
         {"surface": "明日", "pos": "Noun"},
         {"surface": "届く", "pos": "Verb"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "ずです", "pos": "Auxiliary"}
+        {"surface": "はず", "pos": "Noun"},
+        {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["complex", "regression"]
     },

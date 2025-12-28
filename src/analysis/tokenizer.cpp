@@ -173,12 +173,42 @@ void Tokenizer::addUnknownCandidates(
         skip_penalty = true;
       }
     }
+
+    // Case 4: Pure hiragana OTHER (likely readings/furigana)
+    // Reduce penalty for long varied hiragana sequences
+    bool reduced_penalty = false;
+    if (!skip_penalty && candidate.pos == core::PartOfSpeech::Other &&
+        candidate.end - candidate.start >= 4) {
+      bool all_hiragana = true;
+      bool all_same = true;
+      char32_t first_cp = 0;
+      for (size_t idx = candidate.start;
+           idx < candidate.end && idx < char_types.size(); ++idx) {
+        if (char_types[idx] != normalize::CharType::Hiragana) {
+          all_hiragana = false;
+          break;
+        }
+        if (idx < codepoints.size()) {
+          if (idx == candidate.start) {
+            first_cp = codepoints[idx];
+          } else if (codepoints[idx] != first_cp) {
+            all_same = false;
+          }
+        }
+      }
+      if (all_hiragana && !all_same) {
+        reduced_penalty = true;
+      }
+    }
+
     if (!skip_penalty && max_dict_length > 0 &&
         candidate.end - candidate.start > max_dict_length) {
-      adjusted_cost += 3.5F;
-      SUZUME_DEBUG_LOG("[TOK_UNK] \"" << candidate.surface
-                        << "\": +3.5 (exceeds_dict_length, dict_max="
-                        << max_dict_length << ")\n");
+      float penalty = reduced_penalty ? 1.0F : 3.5F;
+      adjusted_cost += penalty;
+      SUZUME_DEBUG_LOG("[TOK_UNK] \"" << candidate.surface << "\": +"
+                        << penalty << " (exceeds_dict_length"
+                        << (reduced_penalty ? ", pure_hiragana" : "")
+                        << ", dict_max=" << max_dict_length << ")\n");
     }
 
     // For verb candidates, check if the hiragana suffix is a known particle

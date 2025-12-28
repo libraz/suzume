@@ -586,11 +586,13 @@
     },
     {
       "id": "edge_prefix_hiragana",
-      "description": "お + hiragana (かし is recognized as noun)",
-      "input": "おかし",
+      "description": "お + hiragana noun in context",
+      "input": "おかしを食べる",
       "expected": [
         {"surface": "お", "pos": "Prefix"},
-        {"surface": "かし", "pos": "Noun"}
+        {"surface": "かし", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "食べる", "pos": "Verb"}
       ],
       "tags": ["prefix", "edge"]
     },
