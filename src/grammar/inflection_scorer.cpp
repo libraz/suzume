@@ -105,11 +105,23 @@ float calculateConfidence(VerbType type, std::string_view stem,
       //   - げ (ga-row): 泳ぐ, 急ぐ, etc. - moderately common
       //   - Others: て, ね, へ - less common as potential forms
       bool is_common_potential_ending = false;
+      bool is_copula_de_pattern = false;
       if (stem_len >= core::kJapaneseCharBytes) {
         std::string_view last_char = stem.substr(stem_len - core::kJapaneseCharBytes);
         is_common_potential_ending = (last_char == "け" || last_char == "め" ||
                                       last_char == "せ" || last_char == "れ" ||
                                       last_char == "げ");
+        // Kanji + で patterns in mizenkei context are usually copula, not verb stems
+        // e.g., 嫌でない = 嫌 + で + ない (copula negation), NOT 嫌でる + ない
+        // Valid exceptions like 茹でる have stems where the kanji is rarely standalone
+        if (last_char == "で" && stem_len == core::kTwoJapaneseCharBytes &&
+            required_conn == conn::kVerbMizenkei) {
+          std::string_view first_char = stem.substr(0, core::kJapaneseCharBytes);
+          if (endsWithKanji(first_char)) {
+            // Single kanji + で in mizenkei context: likely copula pattern
+            is_copula_de_pattern = true;
+          }
+        }
       }
       // Apply penalty only when:
       // 1. Stem is 2 chars (kanji + e-row hiragana)
@@ -125,7 +137,12 @@ float calculateConfidence(VerbType type, std::string_view stem,
           required_conn == conn::kVerbRenyokei ||
           required_conn == conn::kVerbMizenkei ||
           (required_conn == conn::kVerbBase && aux_count > 0);
-      if (stem_len == core::kTwoJapaneseCharBytes && is_potential_context &&
+      if (is_copula_de_pattern) {
+        // Strong penalty: kanji + で in mizenkei is almost always copula
+        // e.g., 嫌でない should be 嫌 + で + ない, not 嫌でる + ない
+        base -= 0.70F;
+        logConfidenceAdjustment(-0.70F, "ichidan_copula_de_pattern");
+      } else if (stem_len == core::kTwoJapaneseCharBytes && is_potential_context &&
           endsWithKanji(stem.substr(0, core::kJapaneseCharBytes)) && is_common_potential_ending) {
         // 読め could be Ichidan 読める or Godan potential of 読む
         // Prefer Godan potential interpretation (読む is more common than treating 読める as Ichidan)

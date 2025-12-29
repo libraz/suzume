@@ -513,6 +513,27 @@
         {"surface": "間違った", "pos": "Verb", "lemma": "間違う"}
       ],
       "tags": ["regression", "verb"]
+    },
+    {
+      "id": "time_noun_jibun",
+      "description": "時分 should be recognized as separate Noun",
+      "input": "若い時分",
+      "expected": [
+        {"surface": "若い", "pos": "Adjective"},
+        {"surface": "時分", "pos": "Noun", "lemma": "時分"}
+      ],
+      "tags": ["regression", "noun", "time"]
+    },
+    {
+      "id": "time_noun_jibun_sentence",
+      "description": "居る時分学校 should split 時分 as separate token",
+      "input": "居る時分学校",
+      "expected": [
+        {"surface": "居る", "pos": "Verb", "lemma": "居る"},
+        {"surface": "時分", "pos": "Noun", "lemma": "時分"},
+        {"surface": "学校", "pos": "Noun"}
+      ],
+      "tags": ["regression", "noun", "time"]
     }
   ]
 }

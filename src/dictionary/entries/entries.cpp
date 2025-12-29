@@ -548,6 +548,8 @@ std::vector<DictionaryEntry> getTimeNounEntries() {
       {"将来", POS::Noun, 0.5F, "", false, true, false, CT::None, "しょうらい"},
       {"過去", POS::Noun, 0.5F, "", false, true, false, CT::None, "かこ"},
       {"未来", POS::Noun, 0.5F, "", false, true, false, CT::None, "みらい"},
+      // 時分: time period, around that time (e.g., その時分, 若い時分)
+      {"時分", POS::Noun, 0.5F, "時分", false, true, false, CT::None, "じぶん"},
   };
 }
 
@@ -1071,6 +1073,19 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       // 知れる: for かもしれない decomposition (か + も + しれない)
       {"知れる", POS::Verb, 0.3F, "知れる", false, false, false, CT::Ichidan, "しれる"},
       {"しれる", POS::Verb, 0.3F, "しれる", false, false, false, CT::Ichidan, "しれる"},
+
+      // Common Ichidan verbs with i-row stems (漢字+き/ぎ/り/ち/み)
+      // These get ichidan_kanji_i_row_stem penalty without dictionary registration
+      {"起きる", POS::Verb, 0.3F, "起きる", false, false, false, CT::Ichidan, "おきる"},
+      {"落ちる", POS::Verb, 0.3F, "落ちる", false, false, false, CT::Ichidan, "おちる"},
+      {"生きる", POS::Verb, 0.3F, "生きる", false, false, false, CT::Ichidan, "いきる"},
+      {"過ぎる", POS::Verb, 0.3F, "過ぎる", false, false, false, CT::Ichidan, "すぎる"},
+      {"尽きる", POS::Verb, 0.3F, "尽きる", false, false, false, CT::Ichidan, "つきる"},
+      {"浴びる", POS::Verb, 0.3F, "浴びる", false, false, false, CT::Ichidan, "あびる"},
+
+      // Ichidan verbs ending in で (affected by copula_de_pattern penalty)
+      {"茹でる", POS::Verb, 0.3F, "茹でる", false, false, false, CT::Ichidan, "ゆでる"},
+      {"撫でる", POS::Verb, 0.3F, "撫でる", false, false, false, CT::Ichidan, "なでる"},
 
       // Common Godan verbs (frequently misidentified)
       {"喜ぶ", POS::Verb, 0.3F, "喜ぶ", false, false, false, CT::GodanBa, "よろこぶ"},

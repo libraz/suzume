@@ -65,6 +65,50 @@
         {"surface": "だ", "pos": "Auxiliary"}
       ],
       "tags": ["regression", "copula", "da"]
+    },
+    {
+      "id": "copula_denai_iya",
+      "description": "嫌でない - na-adjective copula negation",
+      "input": "嫌でない",
+      "expected": [
+        {"surface": "嫌", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "ない", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "copula", "denai"]
+    },
+    {
+      "id": "copula_denai_suki",
+      "description": "好きでない - na-adjective copula negation",
+      "input": "好きでない",
+      "expected": [
+        {"surface": "好き", "pos": "Adjective"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "ない", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "copula", "denai"]
+    },
+    {
+      "id": "copula_denai_shizuka",
+      "description": "静かでない - na-adjective copula negation",
+      "input": "静かでない",
+      "expected": [
+        {"surface": "静か", "pos": "Adjective"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "ない", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "copula", "denai"]
+    },
+    {
+      "id": "copula_denai_kirei",
+      "description": "きれいでない - na-adjective copula negation",
+      "input": "きれいでない",
+      "expected": [
+        {"surface": "きれい", "pos": "Adjective"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "ない", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "copula", "denai"]
     }
   ]
 }

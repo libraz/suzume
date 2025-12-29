@@ -315,22 +315,27 @@ std::vector<InflectionCandidate> Inflection::analyze(
     candidates.push_back(std::move(cand));
   }
 
-  // Note: General imperative forms (e.g., 書け, 食べろ) are NOT matched standalone.
-  // Adding full meireikei matching causes regression with conditional forms
-  // (食べれば gets split as 食べれ + ば because 食べれ matches GodanRa meireikei).
+  // Note: Godan imperative forms (e.g., 書け, 読め) are NOT matched standalone
+  // because they can conflict with conditional forms:
+  // - 読めば could be split as 読め + ば (where 読め matches GodanMa meireikei)
+  // - Similarly for other e-row endings: け, せ, れ, げ, etc.
   //
-  // However, Suru imperatives (しろ, せよ) are safe to match because:
-  // - する conditional is すれば (not しれば/しろば)
-  // - No overlap with any conditional pattern
-  auto suru_meireikei_candidates =
+  // However, these imperative forms ARE safe to match:
+  // - Suru (しろ, せよ): する conditional is すれば (no overlap)
+  // - Ichidan (食べろ, 起きろ): conditional is 食べれば (no ろ/よ forms)
+  // - Kuru (こい): くる conditional is くれば (no overlap)
+  auto meireikei_candidates =
       matchVerbStem(surface, {}, conn::kVerbMeireikei);
-  for (auto& cand : suru_meireikei_candidates) {
-    // Only include Suru verb imperatives to avoid conditional form regression
-    if (cand.verb_type == VerbType::Suru) {
+  for (auto& cand : meireikei_candidates) {
+    // Include Suru, Ichidan, and Kuru imperatives (safe patterns)
+    // Exclude Godan imperatives to avoid conditional form regression
+    if (cand.verb_type == VerbType::Suru ||
+        cand.verb_type == VerbType::Ichidan ||
+        cand.verb_type == VerbType::Kuru) {
       candidates.push_back(std::move(cand));
     }
   }
-  // Other imperatives are handled via:
+  // Godan imperatives are handled via:
   // 1. Dictionary lookup (やめろ, etc.)
   // 2. Auxiliary chain matching for compound patterns
 

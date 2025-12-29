@@ -487,6 +487,78 @@
         {"surface": "しれない", "pos": "Verb", "lemma": "しれる"}
       ],
       "tags": ["regression", "ichidan", "negative"]
+    },
+    {
+      "id": "imperative_tabero",
+      "description": "食べろ - ichidan verb imperative form",
+      "input": "食べろ",
+      "expected": [
+        {"surface": "食べろ", "pos": "Verb", "lemma": "食べる"}
+      ],
+      "tags": ["regression", "ichidan", "imperative"]
+    },
+    {
+      "id": "imperative_okiro",
+      "description": "起きろ - ichidan verb imperative form",
+      "input": "起きろ",
+      "expected": [
+        {"surface": "起きろ", "pos": "Verb", "lemma": "起きる"}
+      ],
+      "tags": ["regression", "ichidan", "imperative"]
+    },
+    {
+      "id": "imperative_ochiro",
+      "description": "落ちろ - ichidan verb imperative form",
+      "input": "落ちろ",
+      "expected": [
+        {"surface": "落ちろ", "pos": "Verb", "lemma": "落ちる"}
+      ],
+      "tags": ["regression", "ichidan", "imperative"]
+    },
+    {
+      "id": "imperative_ikiro",
+      "description": "生きろ - ichidan verb imperative form",
+      "input": "生きろ",
+      "expected": [
+        {"surface": "生きろ", "pos": "Verb", "lemma": "生きる"}
+      ],
+      "tags": ["regression", "ichidan", "imperative"]
+    },
+    {
+      "id": "imperative_miro",
+      "description": "見ろ - single-kanji ichidan verb imperative",
+      "input": "見ろ",
+      "expected": [
+        {"surface": "見ろ", "pos": "Verb", "lemma": "見る"}
+      ],
+      "tags": ["regression", "ichidan", "imperative"]
+    },
+    {
+      "id": "imperative_nero",
+      "description": "寝ろ - single-kanji ichidan verb imperative",
+      "input": "寝ろ",
+      "expected": [
+        {"surface": "寝ろ", "pos": "Verb", "lemma": "寝る"}
+      ],
+      "tags": ["regression", "ichidan", "imperative"]
+    },
+    {
+      "id": "ichidan_yudenai",
+      "description": "茹でない - ichidan verb ending in で negative",
+      "input": "茹でない",
+      "expected": [
+        {"surface": "茹でない", "pos": "Verb", "lemma": "茹でる"}
+      ],
+      "tags": ["regression", "ichidan", "negative"]
+    },
+    {
+      "id": "ichidan_nadenai",
+      "description": "撫でない - ichidan verb ending in で negative",
+      "input": "撫でない",
+      "expected": [
+        {"surface": "撫でない", "pos": "Verb", "lemma": "撫でる"}
+      ],
+      "tags": ["regression", "ichidan", "negative"]
     }
   ]
 }
