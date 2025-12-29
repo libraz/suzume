@@ -150,7 +150,7 @@
         {"surface": "で", "pos": "Particle"},
         {"surface": "買える", "pos": "Verb", "lemma": "買う"},
         {"surface": "か", "pos": "Particle"},
-        {"surface": "知ってる", "pos": "Verb", "lemma": "知っつ"},
+        {"surface": "知ってる", "pos": "Verb", "lemma": "知る"},
         {"surface": "人", "pos": "Noun"},
         {"surface": "いる", "pos": "Verb"}
       ],
@@ -298,24 +298,22 @@
     },
     {
       "id": "colloquial_miteta",
-      "description": "Colloquial 見ていた → 見てた - splits with 見る registered",
+      "description": "Colloquial 見ていた → 見てた - unified contracted form",
       "input": "テレビ見てた",
       "expected": [
         {"surface": "テレビ", "pos": "Noun"},
-        {"surface": "見て", "pos": "Verb", "lemma": "見る"},
-        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
+        {"surface": "見てた", "pos": "Verb", "lemma": "見る"}
       ],
       "tags": ["colloquial"]
     },
     {
       "id": "colloquial_itteta",
-      "description": "Colloquial 行っていた → 行ってた with に particle",
+      "description": "Colloquial 行っていた → 行ってた - unified contracted form",
       "input": "学校に行ってた",
       "expected": [
         {"surface": "学校", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "行って", "pos": "Verb", "lemma": "行く"},
-        {"surface": "た", "pos": "Auxiliary"}
+        {"surface": "行ってた", "pos": "Verb", "lemma": "行く"}
       ],
       "tags": ["colloquial"]
     },

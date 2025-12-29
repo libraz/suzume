@@ -116,11 +116,16 @@ ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
     // Single-character auxiliary after te-form
     // Only valid patterns: part of contracted forms handled elsewhere
     // Invalid: standalone "る", "た" that should be part of てる/てた
-    // Only penalize "る" - it should be part of てる contraction
-    // "た" is valid past tense marker (食べた, 行った)
     if (next.surface == "る") {
       return {ConnectionPattern::InvalidTeFormAux, 5.0F,
               "invalid single-char aux after te-form"};
+    }
+    // "た" after te-form is likely contracted -ていた form (買ってた, 見てた)
+    // Add penalty to prefer unified てた analysis over split て + た
+    // This handles the colloquial contraction ている → てる, ていた → てた
+    if (next.surface == "た") {
+      return {ConnectionPattern::InvalidTeFormAux, 1.5F,
+              "te-form + ta (likely contracted teita)"};
     }
   }
 

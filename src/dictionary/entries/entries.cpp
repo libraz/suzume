@@ -1257,6 +1257,7 @@ std::vector<DictionaryEntry> getCommonVocabularyEntries() {
       {"食べ物", POS::Noun, 0.3F, "", false, false, false, CT::None, "たべもの"},
       {"飲み物", POS::Noun, 0.3F, "", false, false, false, CT::None, "のみもの"},
       {"買い物", POS::Noun, 0.3F, "", false, false, false, CT::None, "かいもの"},
+      {"手助け", POS::Noun, 0.3F, "", false, false, false, CT::None, "てだすけ"},
 
       // Counter suffixes (数助詞): つ - only valid for 1-9
       {"1つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "ひとつ"},

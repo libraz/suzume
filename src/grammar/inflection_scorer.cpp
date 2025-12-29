@@ -176,12 +176,15 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // Check for suru-verb imperative pattern: multi-kanji + せ
       // e.g., 勉強せ, 検討せ, 運動せ - these are suru-verb imperative stems, not Ichidan
       // The pattern kanji+ + せ is more likely suru-verb せよ/しろ form
+      // Note: Only applies to 2+ kanji stems, not single kanji + せ
+      // Single kanji + せ (話せ, 見せ) is more likely Godan potential form
       bool is_suru_imperative_pattern = false;
       if (stem_len >= core::kTwoJapaneseCharBytes) {
         std::string_view last_char = stem.substr(stem_len - core::kJapaneseCharBytes);
         if (last_char == "せ") {
           std::string_view stem_before_se = stem.substr(0, stem_len - core::kJapaneseCharBytes);
-          if (isAllKanji(stem_before_se)) {
+          // Only apply to 2+ kanji stems (勉強, 検討, etc.), not single kanji (話, 見)
+          if (isAllKanji(stem_before_se) && stem_before_se.size() >= core::kTwoJapaneseCharBytes) {
             // Multi-kanji + せ: likely suru-verb imperative, not Ichidan
             is_suru_imperative_pattern = true;
           }

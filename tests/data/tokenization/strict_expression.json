@@ -45,11 +45,10 @@
     },
     {
       "id": "contraction_miteta",
-      "description": "見てた - splits into te-form + past auxiliary",
+      "description": "見てた - unified contracted form of 見ていた",
       "input": "見てた",
       "expected": [
-        {"surface": "見て", "pos": "Verb", "lemma": "見る"},
-        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
+        {"surface": "見てた", "pos": "Verb", "lemma": "見る"}
       ],
       "tags": ["strict", "contraction"]
     },

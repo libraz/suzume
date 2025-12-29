@@ -528,10 +528,17 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"でて", "でて", "いる", kAuxTeiru, kAuxOutTe, kAuxOutTe});
   entries.push_back({"でない", "でない", "いる", kAuxTeiru, kAuxOutBase, kAuxOutTe});
   entries.push_back({"でなかった", "でなかった", "いる", kAuxTeiru, kAuxOutTa, kAuxOutTe});
-  // Godan onbin versions: 読んでた = 読ん(onbin) + でた
+  // Godan onbin versions: 読んでた = 読ん(onbin) + でた (voiced sokuonbin)
   entries.push_back({"でる", "でる", "いる", kAuxTeiru, kAuxOutBase, kVerbOnbinkei});
   entries.push_back({"でた", "でた", "いる", kAuxTeiru, kAuxOutTa, kVerbOnbinkei});
   entries.push_back({"でない", "でない", "いる", kAuxTeiru, kAuxOutBase, kVerbOnbinkei});
+  // Godan sokuonbin versions: 知ってる = 知っ(sokuonbin stem) + てる
+  // For GodanRa (知る→知っ), GodanTa (持つ→持っ), GodanWa (買う→買っ)
+  // Note: aux is "てる" not "ってる" so that stem remains "知っ" ending with っ
+  entries.push_back({"てる", "てる", "いる", kAuxTeiru, kAuxOutBase, kVerbOnbinkei});
+  entries.push_back({"てた", "てた", "いる", kAuxTeiru, kAuxOutTa, kVerbOnbinkei});
+  entries.push_back({"てない", "てない", "いる", kAuxTeiru, kAuxOutBase, kVerbOnbinkei});
+  entries.push_back({"てなかった", "てなかった", "いる", kAuxTeiru, kAuxOutTa, kVerbOnbinkei});
 
   // === Suru-verb specific ている contractions ===
   // してる = し + ている contraction, full patterns for suru-verbs

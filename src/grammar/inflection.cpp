@@ -77,13 +77,14 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // - Kuru verb with こ/き→くる (empty stem is allowed for mizenkei/renyokei)
       // - Kuru verb with こい→くる (imperative, empty stem allowed)
       // - Kuru verb with くれ→くる (hypothetical, empty stem allowed)
+      // NOTE: Suru with empty suffix + empty stem + aux is NOT allowed
+      // (e.g., なかった should NOT become する)
+      // Valid Suru patterns require non-empty suffix (し, さ) to connect to aux
       if (stem.size() < core::kJapaneseCharBytes &&
           !(ending.verb_type == VerbType::Suru &&
             (ending.suffix == "す" || ending.suffix == "し" ||
              ending.suffix == "しろ" || ending.suffix == "せよ" ||
-             ending.suffix == "すれ" ||
-             // Empty suffix allowed when auxiliaries like してる are matched
-             (ending.suffix.empty() && !aux_chain.empty()))) &&
+             ending.suffix == "すれ")) &&
           !(ending.verb_type == VerbType::Kuru &&
             (ending.suffix == "こ" || ending.suffix == "き" ||
              ending.suffix == "こい" || ending.suffix == "くれ"))) {
@@ -125,6 +126,18 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       if (ending.verb_type == VerbType::Ichidan && stem.size() == core::kJapaneseCharBytes) {
         if (stem == "く" || stem == "す" || stem == "こ") {
           continue;  // Skip - these are irregular verbs (hiragana), not Ichidan
+        }
+      }
+
+      // Validate Ichidan: reject stems ending with small tsu (っ)
+      // Ichidan verbs do NOT have onbin (音便) forms, so stems never end with っ
+      // Stems ending with っ are always from Godan verbs (知る→知っ, 買う→買っ, 持つ→持っ)
+      // This prevents 買っ from being parsed as Ichidan 買っる
+      if (ending.verb_type == VerbType::Ichidan &&
+          stem.size() >= core::kJapaneseCharBytes) {
+        std::string_view last_char = std::string_view(stem).substr(stem.size() - core::kJapaneseCharBytes);
+        if (last_char == "っ") {
+          continue;  // Skip - Ichidan stems never end with っ
         }
       }
 
