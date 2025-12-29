@@ -1,5 +1,6 @@
 #include "dictionary/core_dict.h"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -334,13 +335,11 @@ void CoreDictionary::initializeEntries() {
                    hiragana_verbs.size() + essential_verbs.size() +
                    common_vocabulary.size());
 
-  // Add entries and build trie
+  // Collect entries (trie built after sorting)
   // Also auto-generates hiragana entries from reading field
   auto addEntries = [this](const std::vector<DictionaryEntry>& source) {
     for (const auto& entry : source) {
-      auto idx = static_cast<uint32_t>(entries_.size());
       entries_.push_back(entry);
-      trie_.insert(entry.surface, idx);
 
       // Auto-generate hiragana entry from reading if available
       // Only for safe POS types (closed class / function words)
@@ -368,10 +367,7 @@ void CoreDictionary::initializeEntries() {
           DictionaryEntry reading_entry = entry;
           reading_entry.surface = entry.reading;
           reading_entry.lemma = entry.surface;  // Lemma points to kanji form
-
-          auto reading_idx = static_cast<uint32_t>(entries_.size());
           entries_.push_back(reading_entry);
-          trie_.insert(reading_entry.surface, reading_idx);
         }
       }
     }
@@ -396,9 +392,7 @@ void CoreDictionary::initializeEntries() {
     for (const auto& entry : source) {
       auto expanded = expandAdjectiveEntry(entry);
       for (const auto& exp_entry : expanded) {
-        auto idx = static_cast<uint32_t>(entries_.size());
         entries_.push_back(exp_entry);
-        trie_.insert(exp_entry.surface, idx);
 
         // Auto-generate hiragana entries from reading for base form only
         // (avoid duplicating conjugated forms for each reading variant)
@@ -411,9 +405,7 @@ void CoreDictionary::initializeEntries() {
           // Also expand reading entry (conj_type is preserved from original)
           auto reading_expanded = expandAdjectiveEntry(reading_entry);
           for (const auto& rexp_entry : reading_expanded) {
-            auto ridx = static_cast<uint32_t>(entries_.size());
             entries_.push_back(rexp_entry);
-            trie_.insert(rexp_entry.surface, ridx);
           }
         }
       }
@@ -428,9 +420,7 @@ void CoreDictionary::initializeEntries() {
     for (const auto& entry : source) {
       auto expanded = expandVerbEntry(entry);
       for (const auto& exp_entry : expanded) {
-        auto idx = static_cast<uint32_t>(entries_.size());
         entries_.push_back(exp_entry);
-        trie_.insert(exp_entry.surface, idx);
       }
     }
   };
@@ -438,22 +428,96 @@ void CoreDictionary::initializeEntries() {
   addVerbEntries(hiragana_verbs);
   addVerbEntries(essential_verbs);
   addEntries(common_vocabulary);
+
+  // Sort entries by surface for Double-Array compatibility
+  // Use stable_sort to preserve relative order of entries with same surface
+  std::stable_sort(entries_.begin(), entries_.end(),
+                   [](const DictionaryEntry& lhs, const DictionaryEntry& rhs) {
+                     return lhs.surface < rhs.surface;
+                   });
+
+  // Build Double-Array trie
+  buildTrie();
 }
+
+void CoreDictionary::buildTrie() {
+  if (entries_.empty()) {
+    return;
+  }
+
+  // Build unique keys with first occurrence index
+  std::vector<std::string> keys;
+  std::vector<int32_t> values;
+
+  // Entries are sorted by surface, so extract unique keys
+  std::string prev_surface;
+  for (size_t idx = 0; idx < entries_.size(); ++idx) {
+    const auto& surface = entries_[idx].surface;
+    if (surface != prev_surface) {
+      keys.push_back(surface);
+      values.push_back(static_cast<int32_t>(idx));
+      prev_surface = surface;
+    }
+  }
+
+  // Build the Double-Array trie
+  trie_.build(keys, values);
+}
+
+namespace {
+
+/**
+ * @brief Count UTF-8 characters in a byte range
+ */
+size_t countUtf8Chars(std::string_view text, size_t start_byte,
+                      size_t byte_length) {
+  size_t char_count = 0;
+  size_t end_byte = start_byte + byte_length;
+
+  for (size_t pos = start_byte; pos < end_byte && pos < text.size();) {
+    auto byte = static_cast<uint8_t>(text[pos]);
+    if ((byte & 0xC0) != 0x80) {
+      ++char_count;
+    }
+    ++pos;
+  }
+
+  return char_count;
+}
+
+}  // namespace
 
 std::vector<LookupResult> CoreDictionary::lookup(std::string_view text,
                                                  size_t start_pos) const {
   std::vector<LookupResult> results;
 
-  auto matches = trie_.prefixMatch(text, start_pos);
-  for (const auto& [length, entry_ids] : matches) {
-    for (uint32_t idx : entry_ids) {
-      if (idx < entries_.size()) {
-        LookupResult result{};
-        result.entry_id = idx;
-        result.length = length;
-        result.entry = &entries_[idx];
-        results.push_back(result);
+  if (entries_.empty() || start_pos >= text.size()) {
+    return results;
+  }
+
+  // Use Double-Array common prefix search
+  auto trie_results = trie_.commonPrefixSearch(text, start_pos);
+
+  for (const auto& tres : trie_results) {
+    if (tres.value < 0 || static_cast<size_t>(tres.value) >= entries_.size()) {
+      continue;
+    }
+
+    size_t first_idx = static_cast<size_t>(tres.value);
+    const std::string& matched_surface = entries_[first_idx].surface;
+
+    // Collect all entries with the same surface (consecutive in sorted array)
+    for (size_t idx = first_idx; idx < entries_.size(); ++idx) {
+      if (entries_[idx].surface != matched_surface) {
+        break;
       }
+
+      LookupResult result{};
+      result.entry_id = static_cast<uint32_t>(idx);
+      // Convert byte length to character count
+      result.length = countUtf8Chars(text, start_pos, tres.length);
+      result.entry = &entries_[idx];
+      results.push_back(result);
     }
   }
 

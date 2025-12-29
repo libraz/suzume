@@ -2,7 +2,7 @@
 #define SUZUME_DICTIONARY_CORE_DICT_H_
 
 #include "dictionary/dictionary.h"
-#include "dictionary/trie.h"
+#include "dictionary/double_array.h"
 
 #include <memory>
 #include <vector>
@@ -15,6 +15,10 @@ namespace suzume::dictionary {
  * Contains particles, auxiliary verbs, conjunctions,
  * formal nouns, and low information words.
  * Compiled into the binary for WASM compatibility.
+ *
+ * Uses Double-Array Trie for efficient O(m) lookup where m is key length.
+ * This improves WASM startup time and memory efficiency compared to
+ * the traditional hash-based Trie.
  */
 class CoreDictionary : public IDictionary {
  public:
@@ -43,13 +47,22 @@ class CoreDictionary : public IDictionary {
   size_t size() const override { return entries_.size(); }
 
  private:
+  // Entries sorted by surface for Double-Array compatibility
   std::vector<DictionaryEntry> entries_;
-  Trie trie_;
+
+  // Double-Array Trie storing (surface -> first_entry_index)
+  // Multiple entries with same surface are stored consecutively
+  DoubleArray trie_;
 
   /**
-   * @brief Initialize entries from hardcoded data
+   * @brief Initialize entries from hardcoded data and build trie
    */
   void initializeEntries();
+
+  /**
+   * @brief Build Double-Array trie from sorted entries
+   */
+  void buildTrie();
 };
 
 }  // namespace suzume::dictionary
