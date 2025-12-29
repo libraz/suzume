@@ -7,8 +7,10 @@
 
 #include <algorithm>
 
+#include "core/utf8_constants.h"
 #include "grammar/conjugation.h"
 #include "normalize/char_type.h"
+#include "normalize/exceptions.h"
 #include "suffix_candidates.h"
 #include "unknown.h"
 
@@ -216,13 +218,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // Check for particle/copula patterns that should NOT be treated as verbs
       // Kanji + particle or copula (で, に, を, が, は, も, へ, と, や, か, の, etc.)
       std::string hiragana_part = extractSubstring(codepoints, kanji_end, end_pos);
-      if (hiragana_part == "で" || hiragana_part == "に" || hiragana_part == "を" ||
-          hiragana_part == "が" || hiragana_part == "は" || hiragana_part == "も" ||
-          hiragana_part == "へ" || hiragana_part == "と" || hiragana_part == "や" ||
-          hiragana_part == "か" || hiragana_part == "の" || hiragana_part == "から" ||
-          hiragana_part == "まで" || hiragana_part == "より" || hiragana_part == "ほど" ||
-          hiragana_part == "です" || hiragana_part == "だ" || hiragana_part == "だった" ||
-          hiragana_part == "でした" || hiragana_part == "でし" || hiragana_part == "である") {
+      if (normalize::isParticleOrCopula(hiragana_part)) {
         continue;  // Skip particle/copula patterns
       }
 
@@ -253,7 +249,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // e.g., 切りに (切り + に), 飲みに (飲み + に), 行きに (行き + に)
       // These are nominalized verb stems followed by particles, not verb forms
       size_t hp_size = hiragana_part.size();
-      if (hp_size >= 6) {  // At least 2 hiragana (6 bytes)
+      if (hp_size >= core::kTwoJapaneseCharBytes) {  // At least 2 hiragana
         // Get last hiragana character (particle candidate)
         char32_t last_char = codepoints[end_pos - 1];
         if (last_char == U'に' || last_char == U'で' || last_char == U'を' ||
@@ -558,13 +554,12 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       // Exception: Conditional forms (ending with ば) are unambiguous and should
       // get the bonus even if short (e.g., あれば = ある conditional)
       size_t candidate_len = end_pos - start_pos;
-      bool is_conditional = (surface.size() >= 3 &&
-                             surface.substr(surface.size() - 3) == "ば");
+      bool is_conditional = (surface.size() >= core::kJapaneseCharBytes &&
+                             surface.substr(surface.size() - core::kJapaneseCharBytes) == "ば");
       // Check for っとく pattern (ておく contraction: やっとく, 見っとく)
       // This is a common colloquial pattern that should get bonus treatment
-      // Note: っとく is 9 bytes in UTF-8 (3 bytes per hiragana)
-      bool is_teoku_contraction = (surface.size() >= 9 &&
-                                   surface.substr(surface.size() - 9) == "っとく");
+      bool is_teoku_contraction = (surface.size() >= core::kThreeJapaneseCharBytes &&
+                                   surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "っとく");
       if (is_dictionary_verb &&
           (candidate_len >= 5 || is_conditional || is_teoku_contraction)) {
         base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;

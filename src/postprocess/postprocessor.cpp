@@ -1,6 +1,7 @@
 #include "postprocess/postprocessor.h"
 
 #include "core/debug.h"
+#include "core/utf8_constants.h"
 
 namespace suzume::postprocess {
 
@@ -465,8 +466,8 @@ std::vector<core::Morpheme> Postprocessor::mergeNaAdjectiveNa(
         morphemes[idx + 1].surface == "な") {
       // Check if the adjective is a na-adjective (doesn't end with い)
       bool is_na_adj = true;
-      if (current.surface.size() >= 3) {
-        std::string_view last3 = current.surface.substr(current.surface.size() - 3);
+      if (current.surface.size() >= core::kJapaneseCharBytes) {
+        std::string_view last3 = current.surface.substr(current.surface.size() - core::kJapaneseCharBytes);
         // i-adjectives end with い (exceptions: きれい, きらい, 嫌い, みたい)
         if (last3 == "い" && current.surface != "きれい" &&
             current.surface != "きらい" && current.surface != "嫌い" &&

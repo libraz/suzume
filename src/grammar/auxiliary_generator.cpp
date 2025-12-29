@@ -7,14 +7,16 @@
 
 #include <algorithm>
 
+#include "core/utf8_constants.h"
+
 namespace suzume::grammar {
 
 namespace {
 
 // UTF-8 helper: drop last character (assumes valid UTF-8 hiragana)
 std::string dropLastChar(const std::string& s) {
-  if (s.size() >= 3) {
-    return s.substr(0, s.size() - 3);
+  if (s.size() >= core::kJapaneseCharBytes) {
+    return s.substr(0, s.size() - core::kJapaneseCharBytes);
   }
   return s;
 }

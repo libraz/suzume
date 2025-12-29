@@ -5,6 +5,8 @@
 
 #include "char_patterns.h"
 
+#include "core/utf8_constants.h"
+
 namespace suzume::grammar {
 
 // Onbin endings: い, っ, ん
@@ -22,11 +24,11 @@ const char* kRenyokeiEndings[] = {"き", "ぎ", "し", "ち",
 const size_t kRenyokeiCount = 8;
 
 bool endsWithERow(std::string_view stem) {
-  if (stem.size() < 3) {
+  if (stem.size() < core::kJapaneseCharBytes) {
     return false;
   }
   // Get last character (UTF-8: hiragana is 3 bytes)
-  std::string_view last = stem.substr(stem.size() - 3);
+  std::string_view last = stem.substr(stem.size() - core::kJapaneseCharBytes);
   // E-row hiragana: え, け, せ, て, ね, へ, め, れ, べ, ぺ, げ, ぜ, で
   return last == "え" || last == "け" || last == "せ" || last == "て" ||
          last == "ね" || last == "へ" || last == "め" || last == "れ" ||
@@ -35,10 +37,10 @@ bool endsWithERow(std::string_view stem) {
 }
 
 bool endsWithChar(std::string_view stem, const char* chars[], size_t count) {
-  if (stem.size() < 3) {
+  if (stem.size() < core::kJapaneseCharBytes) {
     return false;
   }
-  std::string_view last = stem.substr(stem.size() - 3);
+  std::string_view last = stem.substr(stem.size() - core::kJapaneseCharBytes);
   for (size_t idx = 0; idx < count; ++idx) {
     if (last == chars[idx]) {
       return true;
@@ -67,19 +69,19 @@ bool isAllKanji(std::string_view stem) {
     if (!is_kanji) {
       return false;
     }
-    pos += 3;
+    pos += core::kJapaneseCharBytes;
   }
   return true;
 }
 
 bool endsWithKanji(std::string_view stem) {
-  if (stem.size() < 3) {
+  if (stem.size() < core::kJapaneseCharBytes) {
     return false;
   }
   // Decode last UTF-8 character
   // Kanji in UTF-8 is 3 bytes: E4-E9 xx xx (U+4E00-U+9FFF)
   const unsigned char* ptr =
-      reinterpret_cast<const unsigned char*>(stem.data() + stem.size() - 3);
+      reinterpret_cast<const unsigned char*>(stem.data() + stem.size() - core::kJapaneseCharBytes);
   if ((ptr[0] & 0xF0) == 0xE0) {
     // 3-byte UTF-8 sequence
     char32_t codepoint =

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "core/utf8_constants.h"
 #include "grammar/conjugation.h"
 
 namespace suzume::postprocess {
@@ -341,7 +342,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     if (morpheme.pos == core::PartOfSpeech::Verb &&
         endsWith(grammar_result, "す") && !endsWith(grammar_result, "する") &&
         dict_manager_ != nullptr) {
-      std::string suru_form = grammar_result.substr(0, grammar_result.size() - 3) + "する";
+      std::string suru_form = grammar_result.substr(0, grammar_result.size() - core::kJapaneseCharBytes) + "する";
       auto lookup = dict_manager_->lookup(suru_form, 0);
       for (const auto& r : lookup) {
         if (r.entry != nullptr &&
@@ -422,7 +423,7 @@ grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface,
   if (endsWith(surface, "ろ") || endsWith(surface, "よ") ||
       endsWith(surface, "なさい")) {
     // Check if it's likely an imperative
-    if (surface.size() > 3 && surface != lemma) {
+    if (surface.size() > core::kJapaneseCharBytes && surface != lemma) {
       return grammar::ConjForm::Meireikei;
     }
   }

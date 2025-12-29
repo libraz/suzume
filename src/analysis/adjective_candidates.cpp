@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+#include "core/utf8_constants.h"
 #include "grammar/patterns.h"
 #include "suffix_candidates.h"
 #include "unknown.h"
@@ -98,20 +99,20 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // These are te-form contractions (〜ていく→〜てく), not i-adjectives.
     // E.g., 待ってく (matte-ku) = 待っていく, not an adjective
     std::string hiragana_part = extractSubstring(codepoints, kanji_end, end_pos);
-    if (hiragana_part.size() >= 6 &&  // At least 2 hiragana (っ + く = 6 bytes)
-        hiragana_part.substr(0, 3) == "っ") {  // Starts with っ
+    if (hiragana_part.size() >= core::kTwoJapaneseCharBytes &&
+        hiragana_part.substr(0, core::kJapaneseCharBytes) == "っ") {  // Starts with っ
       continue;  // Skip - likely te-form contraction, not i-adjective
     }
 
     // Skip patterns ending with 〜んでい or 〜でい
     // These are te-form + auxiliary verb patterns (〜んでいく, 〜ている, etc.)
     // not i-adjectives. E.g., 学んでい (manande-i) = 学んでいく, not adj
-    if (hiragana_part.size() >= 9 &&  // んでい = 9 bytes
-        hiragana_part.substr(hiragana_part.size() - 9) == "んでい") {
+    if (hiragana_part.size() >= core::kThreeJapaneseCharBytes &&
+        hiragana_part.substr(hiragana_part.size() - core::kThreeJapaneseCharBytes) == "んでい") {
       continue;  // Skip - likely te-form + aux pattern
     }
-    if (hiragana_part.size() >= 6 &&  // でい = 6 bytes
-        hiragana_part.substr(hiragana_part.size() - 6) == "でい") {
+    if (hiragana_part.size() >= core::kTwoJapaneseCharBytes &&
+        hiragana_part.substr(hiragana_part.size() - core::kTwoJapaneseCharBytes) == "でい") {
       continue;  // Skip - likely te-form + aux pattern
     }
 
@@ -131,8 +132,8 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // Skip patterns ending with 〜なく when followed by なった/なる
     // E.g., 食べなく + なった is actually 食べなくなった (verb form)
     // Check if the text continues with なった/なる/なって
-    if (hiragana_part.size() >= 6 &&  // なく = 6 bytes
-        hiragana_part.substr(hiragana_part.size() - 6) == "なく" &&
+    if (hiragana_part.size() >= core::kTwoJapaneseCharBytes &&
+        hiragana_part.substr(hiragana_part.size() - core::kTwoJapaneseCharBytes) == "なく" &&
         end_pos < codepoints.size()) {
       // Check following characters for なった/なる/なって
       char32_t next_char = codepoints[end_pos];
@@ -157,15 +158,15 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // Renyokei suffixes: み, ぎ, ち, び, り, に (6 patterns, き handled below)
     // Note: し is handled specially below with dictionary validation
     // Note: き is also handled specially because 大きい exists as an adjective
-    if (kanji_end == start_pos + 1 && hiragana_part.size() >= 9) {
+    if (kanji_end == start_pos + 1 && hiragana_part.size() >= core::kThreeJapaneseCharBytes) {
       // Check if pattern starts with: renyokei suffix + そう
-      std::string_view renyokei_char = std::string_view(hiragana_part).substr(0, 3);
+      std::string_view renyokei_char = std::string_view(hiragana_part).substr(0, core::kJapaneseCharBytes);
       if ((renyokei_char == "み" ||
            renyokei_char == "ぎ" || renyokei_char == "ち" ||
            renyokei_char == "び" || renyokei_char == "り" ||
            renyokei_char == "に") &&
-          hiragana_part.size() >= 9 &&
-          hiragana_part.substr(3, 6) == "そう") {
+          hiragana_part.size() >= core::kThreeJapaneseCharBytes &&
+          hiragana_part.substr(core::kJapaneseCharBytes, core::kTwoJapaneseCharBytes) == "そう") {
         // This is verb renyokei + そう pattern (with optional だ/です/etc.)
         continue;  // Skip - likely verb renyokei + そう, not i-adjective
       }
@@ -178,9 +179,9 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // 美味しそう → base: 美味しい (in dictionary) → allow adjective candidate
     // 話しそう → base: 話しい (not in dictionary) → skip
     bool is_dict_adjective = false;
-    if (hiragana_part.size() >= 9 &&
-        hiragana_part.substr(0, 3) == "し" &&
-        hiragana_part.substr(3, 6) == "そう") {
+    if (hiragana_part.size() >= core::kThreeJapaneseCharBytes &&
+        hiragana_part.substr(0, core::kJapaneseCharBytes) == "し" &&
+        hiragana_part.substr(core::kJapaneseCharBytes, core::kTwoJapaneseCharBytes) == "そう") {
       if (dict_manager != nullptr) {
         // Construct base form: kanji + しい
         std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
@@ -218,9 +219,9 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // 書きそう → 書く (verb exists) → skip adjective candidate
     // 大きそう → 大く (verb doesn't exist) → allow adjective candidate
     // This is the inverse of し pattern: we check for verb existence, not adjective.
-    if (hiragana_part.size() >= 9 &&
-        hiragana_part.substr(0, 3) == "き" &&
-        hiragana_part.substr(3, 6) == "そう") {
+    if (hiragana_part.size() >= core::kThreeJapaneseCharBytes &&
+        hiragana_part.substr(0, core::kJapaneseCharBytes) == "き" &&
+        hiragana_part.substr(core::kJapaneseCharBytes, core::kTwoJapaneseCharBytes) == "そう") {
       if (dict_manager != nullptr) {
         // Construct potential verb form: kanji + く
         std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);

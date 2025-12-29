@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "core/utf8_constants.h"
 #include "dictionary/entries/adverbs.h"
 #include "dictionary/entries/auxiliaries.h"
 #include "dictionary/entries/common_vocabulary.h"
@@ -143,8 +144,8 @@ std::string getVerbStem(const std::string& base_form, ConjugationType type) {
   switch (type) {
     case ConjugationType::Ichidan:
       // Remove る (3 bytes in UTF-8)
-      if (base_form.size() >= 3) {
-        return base_form.substr(0, base_form.size() - 3);
+      if (base_form.size() >= core::kJapaneseCharBytes) {
+        return base_form.substr(0, base_form.size() - core::kJapaneseCharBytes);
       }
       break;
     case ConjugationType::GodanRa:
@@ -157,8 +158,8 @@ std::string getVerbStem(const std::string& base_form, ConjugationType type) {
     case ConjugationType::GodanBa:
     case ConjugationType::GodanNa:
       // Remove last hiragana (3 bytes in UTF-8)
-      if (base_form.size() >= 3) {
-        return base_form.substr(0, base_form.size() - 3);
+      if (base_form.size() >= core::kJapaneseCharBytes) {
+        return base_form.substr(0, base_form.size() - core::kJapaneseCharBytes);
       }
       break;
     case ConjugationType::Suru:
@@ -166,9 +167,9 @@ std::string getVerbStem(const std::string& base_form, ConjugationType type) {
       if (base_form == "する") {
         return "";
       }
-      if (base_form.size() >= 6 &&
-          base_form.substr(base_form.size() - 6) == "する") {
-        return base_form.substr(0, base_form.size() - 6);
+      if (base_form.size() >= core::kTwoJapaneseCharBytes &&
+          base_form.substr(base_form.size() - core::kTwoJapaneseCharBytes) == "する") {
+        return base_form.substr(0, base_form.size() - core::kTwoJapaneseCharBytes);
       }
       break;
     default:
@@ -246,12 +247,12 @@ std::vector<DictionaryEntry> expandAdjectiveEntry(const DictionaryEntry& entry) 
 
   // Get stem by removing final い
   std::string surface = entry.surface;
-  if (surface.size() < 3 || surface.substr(surface.size() - 3) != "い") {
+  if (surface.size() < core::kJapaneseCharBytes || surface.substr(surface.size() - core::kJapaneseCharBytes) != "い") {
     // Doesn't end with い, return as-is
     result.push_back(entry);
     return result;
   }
-  std::string stem = surface.substr(0, surface.size() - 3);
+  std::string stem = surface.substr(0, surface.size() - core::kJapaneseCharBytes);
   std::string lemma = entry.lemma.empty() ? entry.surface : entry.lemma;
 
   // I-adjective conjugation suffixes

@@ -1,6 +1,7 @@
 #include "analysis/connection_rules.h"
 
 #include "analysis/scorer_constants.h"
+#include "core/utf8_constants.h"
 #include "normalize/exceptions.h"
 
 namespace suzume::analysis {
@@ -27,10 +28,10 @@ static constexpr size_t kOnbinCount =
     sizeof(kOnbinChars) / sizeof(kOnbinChars[0]);
 
 bool endsWithIRow(std::string_view surface) {
-  if (surface.size() < 3) {
+  if (surface.size() < core::kJapaneseCharBytes) {
     return false;
   }
-  std::string_view last3 = surface.substr(surface.size() - 3);
+  std::string_view last3 = surface.substr(surface.size() - core::kJapaneseCharBytes);
   for (size_t i = 0; i < kIRowCount; ++i) {
     if (last3 == kIRowChars[i]) {
       return true;
@@ -40,10 +41,10 @@ bool endsWithIRow(std::string_view surface) {
 }
 
 bool endsWithERow(std::string_view surface) {
-  if (surface.size() < 3) {
+  if (surface.size() < core::kJapaneseCharBytes) {
     return false;
   }
-  std::string_view last3 = surface.substr(surface.size() - 3);
+  std::string_view last3 = surface.substr(surface.size() - core::kJapaneseCharBytes);
   for (size_t i = 0; i < kERowCount; ++i) {
     if (last3 == kERowChars[i]) {
       return true;
@@ -57,10 +58,10 @@ bool endsWithRenyokeiMarker(std::string_view surface) {
 }
 
 bool endsWithOnbinMarker(std::string_view surface) {
-  if (surface.size() < 3) {
+  if (surface.size() < core::kJapaneseCharBytes) {
     return false;
   }
-  std::string_view last3 = surface.substr(surface.size() - 3);
+  std::string_view last3 = surface.substr(surface.size() - core::kJapaneseCharBytes);
   for (size_t i = 0; i < kOnbinCount; ++i) {
     if (last3 == kOnbinChars[i]) {
       return true;
@@ -70,25 +71,25 @@ bool endsWithOnbinMarker(std::string_view surface) {
 }
 
 bool endsWithKuForm(std::string_view surface) {
-  if (surface.size() < 3) {
+  if (surface.size() < core::kJapaneseCharBytes) {
     return false;
   }
-  return surface.substr(surface.size() - 3) == "く";
+  return surface.substr(surface.size() - core::kJapaneseCharBytes) == "く";
 }
 
 bool startsWithTe(std::string_view surface) {
-  if (surface.size() < 3) {
+  if (surface.size() < core::kJapaneseCharBytes) {
     return false;
   }
-  std::string_view first3 = surface.substr(0, 3);
+  std::string_view first3 = surface.substr(0, core::kJapaneseCharBytes);
   return first3 == "て" || first3 == "で";
 }
 
 bool endsWithSou(std::string_view surface) {
-  if (surface.size() < 6) {
+  if (surface.size() < core::kTwoJapaneseCharBytes) {
     return false;
   }
-  return surface.substr(surface.size() - 6) == "そう";
+  return surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "そう";
 }
 
 // =============================================================================
@@ -315,7 +316,8 @@ ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
   // Check if next is なる or starts with なり
   bool is_naru =
       next.lemma == "なる" ||
-      (next.surface.size() >= 6 && next.surface.substr(0, 6) == "なり");
+      (next.surface.size() >= core::kTwoJapaneseCharBytes &&
+       next.surface.substr(0, core::kTwoJapaneseCharBytes) == "なり");
 
   if (!is_naru) {
     return {};
@@ -334,12 +336,12 @@ ConnectionRuleResult checkCompoundAuxAfterRenyokei(
     return {};
   }
 
-  if (next.surface.size() < 3) {
+  if (next.surface.size() < core::kJapaneseCharBytes) {
     return {};
   }
 
   // Check if next starts with compound verb auxiliary kanji
-  std::string_view first_char = next.surface.substr(0, 3);
+  std::string_view first_char = next.surface.substr(0, core::kJapaneseCharBytes);
   if (!normalize::isCompoundVerbAuxStart(first_char)) {
     return {};
   }
@@ -393,11 +395,10 @@ ConnectionRuleResult checkTakuTeSplit(const core::LatticeEdge& prev,
   }
 
   // Check if prev ends with たく (desire adverbial form)
-  // UTF-8: たく = 6 bytes
-  if (prev.surface.size() < 6) {
+  if (prev.surface.size() < core::kTwoJapaneseCharBytes) {
     return {};
   }
-  std::string_view last6 = prev.surface.substr(prev.surface.size() - 6);
+  std::string_view last6 = prev.surface.substr(prev.surface.size() - core::kTwoJapaneseCharBytes);
   if (last6 != "たく") {
     return {};
   }
@@ -468,10 +469,10 @@ ConnectionRuleResult checkConditionalVerbToVerb(const core::LatticeEdge& prev,
   }
 
   // Check if prev verb ends with ば (conditional form)
-  if (prev.surface.size() < 3) {
+  if (prev.surface.size() < core::kJapaneseCharBytes) {
     return {};
   }
-  std::string_view last3 = prev.surface.substr(prev.surface.size() - 3);
+  std::string_view last3 = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
   if (last3 != "ば") {
     return {};
   }
@@ -493,10 +494,10 @@ ConnectionRuleResult checkVerbRenyokeiCompoundAux(const core::LatticeEdge& prev,
   }
 
   // Check if next starts with compound verb auxiliary kanji
-  if (next.surface.size() < 3) {
+  if (next.surface.size() < core::kJapaneseCharBytes) {
     return {};
   }
-  std::string_view first_char = next.surface.substr(0, 3);
+  std::string_view first_char = next.surface.substr(0, core::kJapaneseCharBytes);
   if (!normalize::isCompoundVerbAuxStart(first_char)) {
     return {};
   }
@@ -550,10 +551,10 @@ ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
   }
 
   // Check if prev ends with te-form (て or で)
-  if (prev.surface.size() < 3) {
+  if (prev.surface.size() < core::kJapaneseCharBytes) {
     return {};
   }
-  std::string_view last_char = prev.surface.substr(prev.surface.size() - 3);
+  std::string_view last_char = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
   if (last_char != "て" && last_char != "で") {
     return {};
   }
@@ -611,10 +612,10 @@ ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
   }
 
   // Check if prev verb ends with te-form (て or で)
-  if (prev.surface.size() < 3) {
+  if (prev.surface.size() < core::kJapaneseCharBytes) {
     return {};
   }
-  std::string_view last_char = prev.surface.substr(prev.surface.size() - 3);
+  std::string_view last_char = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
   if (last_char != "て" && last_char != "で") {
     return {};
   }
@@ -638,7 +639,8 @@ ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
   // Note: Also check is_formal_noun flag directly for edges without the flag
   bool is_formal =
       prev.isFormalNoun() ||
-      (prev.pos == core::PartOfSpeech::Noun && prev.surface.size() == 3 &&
+      (prev.pos == core::PartOfSpeech::Noun &&
+       prev.surface.size() == core::kJapaneseCharBytes &&
        (prev.surface == "所" || prev.surface == "物" || prev.surface == "事" ||
         prev.surface == "時" || prev.surface == "方" || prev.surface == "為"));
 
@@ -671,7 +673,8 @@ ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
   }
 
   // Same single-character particle repeated
-  if (prev.surface.size() == 3 && next.surface.size() == 3 &&
+  if (prev.surface.size() == core::kJapaneseCharBytes &&
+      next.surface.size() == core::kJapaneseCharBytes &&
       prev.surface == next.surface) {
     // Exception: と + と in quotation (〜と言ったとか)
     if (prev.surface == "と") {
@@ -700,14 +703,14 @@ ConnectionRuleResult checkPrefixToShortStemHiraganaAdj(
     return {};
   }
 
-  // Check if lemma is at least valid length (2 chars = 6 bytes for い-adj)
-  if (next.lemma.size() < 6) {
+  // Check if lemma is at least valid length (2 chars for い-adj)
+  if (next.lemma.size() < core::kTwoJapaneseCharBytes) {
     return {};
   }
 
-  // Check stem length: lemma minus final い (3 bytes)
-  size_t stem_bytes = next.lemma.size() - 3;
-  size_t stem_chars = stem_bytes / 3;  // Hiragana = 3 bytes per char
+  // Check stem length: lemma minus final い
+  size_t stem_bytes = next.lemma.size() - core::kJapaneseCharBytes;
+  size_t stem_chars = stem_bytes / core::kJapaneseCharBytes;
 
   // Only penalize short stems (≤2 chars like いしい, but not おいしい)
   if (stem_chars > 2) {
@@ -715,7 +718,7 @@ ConnectionRuleResult checkPrefixToShortStemHiraganaAdj(
   }
 
   // Check if lemma is pure hiragana
-  for (size_t i = 0; i < next.lemma.size(); i += 3) {
+  for (size_t i = 0; i < next.lemma.size(); i += core::kJapaneseCharBytes) {
     if (i + 2 >= next.lemma.size()) break;
     auto b0 = static_cast<unsigned char>(next.lemma[i]);
     auto b1 = static_cast<unsigned char>(next.lemma[i + 1]);
@@ -748,7 +751,7 @@ ConnectionRuleResult checkHiraganaNounStartsWithParticle(
   }
 
   // Next surface must be pure hiragana (check first byte range: 0xE3 8X XX)
-  if (next.surface.size() < 3) {
+  if (next.surface.size() < core::kJapaneseCharBytes) {
     return {};
   }
   auto b0 = static_cast<unsigned char>(next.surface[0]);
@@ -760,7 +763,7 @@ ConnectionRuleResult checkHiraganaNounStartsWithParticle(
 
   // Check if first character is a common particle
   // も、の、が、を、に、は、で、と、へ、か、や
-  std::string_view first3 = next.surface.substr(0, 3);
+  std::string_view first3 = next.surface.substr(0, core::kJapaneseCharBytes);
   if (first3 == "も" || first3 == "の" || first3 == "が" ||
       first3 == "を" || first3 == "に" || first3 == "は" ||
       first3 == "で" || first3 == "と" || first3 == "へ" ||
@@ -810,8 +813,8 @@ ConnectionRuleResult checkPrefixBeforeVerb(const core::LatticeEdge& prev,
 // NOT verb-specific: だ/です (copula can follow nouns)
 bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma) {
   // ます form auxiliaries (require masu-stem)
-  if (surface.size() >= 6) {
-    std::string_view first6 = surface.substr(0, 6);
+  if (surface.size() >= core::kTwoJapaneseCharBytes) {
+    std::string_view first6 = surface.substr(0, core::kTwoJapaneseCharBytes);
     if (first6 == "ます" || first6 == "まし" || first6 == "ませ") {
       return true;
     }
@@ -883,7 +886,7 @@ ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
 
   // Don't penalize long dictionary AUX (2+ chars) - valid patterns
   // e.g., は + なかった, で + ある
-  if (next.fromDictionary() && next.surface.size() > 3) {
+  if (next.fromDictionary() && next.surface.size() > core::kJapaneseCharBytes) {
     return {};
   }
 
@@ -930,7 +933,7 @@ ConnectionRuleResult checkParticleBeforeHiraganaOther(
   }
 
   // Check if it starts with hiragana
-  if (next.surface.size() < 3) {
+  if (next.surface.size() < core::kJapaneseCharBytes) {
     return {};
   }
   auto b0 = static_cast<unsigned char>(next.surface[0]);
@@ -940,7 +943,7 @@ ConnectionRuleResult checkParticleBeforeHiraganaOther(
   }
 
   // Penalty based on length: single char = 2.5, multi-char = 1.0
-  float penalty = (next.surface.size() == 3) ? 2.5F : 1.0F;
+  float penalty = (next.surface.size() == core::kJapaneseCharBytes) ? 2.5F : 1.0F;
   return {ConnectionPattern::ParticleBeforeAux, penalty,
           "hiragana other after particle (likely split)"};
 }

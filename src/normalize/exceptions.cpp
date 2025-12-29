@@ -91,4 +91,38 @@ const std::unordered_set<std::string_view> kCompoundVerbAuxFirstChars = {
     "掛",  // 掛ける (kakeru) - to start doing
 };
 
+// =============================================================================
+// Particle Strings
+// =============================================================================
+// Particles that should not be treated as verb endings when generating
+// verb candidates from kanji + hiragana patterns.
+
+const std::unordered_set<std::string_view> kParticleStrings = {
+    // Case particles (格助詞)
+    "が", "を", "に", "で", "と", "へ", "の",
+    // Binding particles (係助詞)
+    "は", "も",
+    // Other particles (副助詞・接続助詞)
+    "や", "か",
+    // Compound particles (複合助詞)
+    "から", "まで", "より", "ほど",
+};
+
+// =============================================================================
+// Copula Strings
+// =============================================================================
+// Copula and auxiliary verb patterns that should not be treated as verb
+// endings when generating verb candidates from kanji + hiragana patterns.
+
+const std::unordered_set<std::string_view> kCopulaStrings = {
+    // Basic copula (基本形)
+    "だ", "です",
+    // Past forms (過去形)
+    "だった", "でした",
+    // Partial forms (途中形) - for mid-word positions
+    "でし",
+    // Formal copula (文語形)
+    "である",
+};
+
 }  // namespace suzume::normalize

@@ -5,6 +5,8 @@
 
 #include "conjugator.h"
 
+#include "core/utf8_constants.h"
+
 namespace suzume::grammar {
 
 namespace {
@@ -73,8 +75,8 @@ std::vector<StemForm> Conjugator::generateStems(const std::string& base_form,
 
   // Get base suffix (e.g., く for GodanKa)
   std::string base_suffix;
-  if (base_form.size() >= 3) {
-    base_suffix = base_form.substr(base_form.size() - 3);
+  if (base_form.size() >= core::kJapaneseCharBytes) {
+    base_suffix = base_form.substr(base_form.size() - core::kJapaneseCharBytes);
   }
 
   switch (type) {

@@ -3,6 +3,7 @@
 #include "analysis/connection_rules.h"
 #include "analysis/scorer_constants.h"
 #include "core/debug.h"
+#include "core/utf8_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -221,14 +222,14 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // if stem + く exists as a verb (e.g., 書く exists → 書きい invalid)
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary() &&
-      edge.surface.size() >= 6) {
+      edge.surface.size() >= core::kTwoJapaneseCharBytes) {
     std::string_view surface = edge.surface;
-    if (surface.size() >= 6 &&
-        surface.substr(surface.size() - 6) == "そう") {
+    if (surface.size() >= core::kTwoJapaneseCharBytes &&
+        surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "そう") {
       // Check if lemma ends with valid i-adjective pattern
       bool valid_adj_lemma = false;
-      if (edge.lemma.size() >= 6) {
-        std::string_view ending = edge.lemma.substr(edge.lemma.size() - 6);
+      if (edge.lemma.size() >= core::kTwoJapaneseCharBytes) {
+        std::string_view ending = edge.lemma.substr(edge.lemma.size() - core::kTwoJapaneseCharBytes);
         // Accept しい, さい, きい as valid i-adjective endings
         // Note: きい is validated at candidate generation (verb stem check)
         if (ending == "しい" || ending == "さい" || ending == "きい") {
@@ -250,13 +251,13 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Valid: 来たかった with lemma 来たい (来 is kuru stem)
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary() &&
-      edge.lemma.size() >= 6) {  // たい = 6 bytes
+      edge.lemma.size() >= core::kTwoJapaneseCharBytes) {
     std::string_view lemma = edge.lemma;
     // Check if lemma ends with たい
-    if (lemma.size() >= 6 &&
-        lemma.substr(lemma.size() - 6) == "たい") {
+    if (lemma.size() >= core::kTwoJapaneseCharBytes &&
+        lemma.substr(lemma.size() - core::kTwoJapaneseCharBytes) == "たい") {
       // Get the stem before たい
-      std::string_view stem = lemma.substr(0, lemma.size() - 6);
+      std::string_view stem = lemma.substr(0, lemma.size() - core::kTwoJapaneseCharBytes);
       // Decode stem to count codepoints
       auto stem_str = std::string(stem);
       auto codepoints = normalize::utf8::decode(stem_str);
@@ -311,16 +312,16 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Verb+ない patterns: 走らない, 書かない, 読まない (stem ends in あ段 = verb mizenkei)
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary() &&
-      edge.lemma.size() >= 9) {  // ない = 6 bytes, need at least 1 char before
+      edge.lemma.size() >= core::kThreeJapaneseCharBytes) {  // ない + at least 1 char before
     std::string_view lemma = edge.lemma;
     // Check if lemma ends with ない
-    if (lemma.size() >= 9 &&
-        lemma.substr(lemma.size() - 6) == "ない") {
+    if (lemma.size() >= core::kThreeJapaneseCharBytes &&
+        lemma.substr(lemma.size() - core::kTwoJapaneseCharBytes) == "ない") {
       // Get the stem before ない
-      std::string_view stem = lemma.substr(0, lemma.size() - 6);
+      std::string_view stem = lemma.substr(0, lemma.size() - core::kTwoJapaneseCharBytes);
       // Check the last character of stem
-      if (stem.size() >= 3) {
-        std::string_view last3 = stem.substr(stem.size() - 3);
+      if (stem.size() >= core::kJapaneseCharBytes) {
+        std::string_view last3 = stem.substr(stem.size() - core::kJapaneseCharBytes);
         // あ段 hiragana (Godan verb mizenkei endings)
         // ら, か, が, さ, た, な, ば, ま, わ, あ
         if (last3 == "ら" || last3 == "か" || last3 == "が" ||

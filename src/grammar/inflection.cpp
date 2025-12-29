@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "core/debug.h"
+#include "core/utf8_constants.h"
 #include "inflection_scorer.h"
 #include "verb_endings.h"
 
@@ -76,7 +77,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // - Kuru verb with こ/き→くる (empty stem is allowed for mizenkei/renyokei)
       // - Kuru verb with こい→くる (imperative, empty stem allowed)
       // - Kuru verb with くれ→くる (hypothetical, empty stem allowed)
-      if (stem.size() < 3 &&
+      if (stem.size() < core::kJapaneseCharBytes &&
           !(ending.verb_type == VerbType::Suru &&
             (ending.suffix == "す" || ending.suffix == "し" ||
              ending.suffix == "しろ" || ending.suffix == "せよ" ||
@@ -98,7 +99,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // Japanese verb stems never start with て - it's always a te-form particle
       // This prevents てあげる from being parsed as a verb (should be て + あげる)
       // Real verbs with te-sound use kanji: 照る (teru), 出る (deru)
-      if (stem.size() >= 3 && stem.substr(0, 3) == "て") {
+      if (stem.size() >= core::kJapaneseCharBytes && stem.substr(0, core::kJapaneseCharBytes) == "て") {
         continue;
       }
 
@@ -116,7 +117,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // こる is not a valid verb - こ is Kuru mizenkei suffix, not Ichidan stem.
       // This prevents くなかった from being parsed as Ichidan く + なかった = くる
       // Note: 来 (kanji) is handled separately - 来なかった should become 来る (Kuru)
-      if (ending.verb_type == VerbType::Ichidan && stem.size() == 3) {
+      if (ending.verb_type == VerbType::Ichidan && stem.size() == core::kJapaneseCharBytes) {
         if (stem == "く" || stem == "す" || stem == "こ") {
           continue;  // Skip - these are irregular verbs (hiragana), not Ichidan
         }
@@ -138,8 +139,8 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       if (ending.verb_type == VerbType::Suru && !stem.empty()) {
         // Check if stem ends with common particles/hiragana that shouldn't be in suru stems
         bool invalid_stem = false;
-        if (stem.size() >= 3) {
-          std::string_view last_char = std::string_view(stem).substr(stem.size() - 3);
+        if (stem.size() >= core::kJapaneseCharBytes) {
+          std::string_view last_char = std::string_view(stem).substr(stem.size() - core::kJapaneseCharBytes);
           // These hiragana at the end of stem indicate a particle or non-suru pattern
           if (last_char == "で" || last_char == "に" || last_char == "を" ||
               last_char == "が" || last_char == "は" || last_char == "も" ||
@@ -150,7 +151,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
           // Reject suru stems containing て/で (te-form markers) anywhere in longer stems
           // E.g., "基づいて処理" should be 基づいて(verb) + 処理する, not a single suru verb
           // This check applies to stems >= 9 bytes (3+ characters) to avoid false positives
-          if (stem.size() >= 9 &&
+          if (stem.size() >= core::kThreeJapaneseCharBytes &&
               (stem.find("て") != std::string::npos ||
                stem.find("で") != std::string::npos)) {
             invalid_stem = true;
@@ -180,7 +181,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
             // Single-kanji stems are NOT valid for empty suffix suru patterns
             // Real suru verb stems have 2+ kanji (開催, 勉強, 検討)
             // This prevents 見+られた → 見する (wrong, should be 見る Ichidan)
-            if (stem.size() <= 3) {
+            if (stem.size() <= core::kJapaneseCharBytes) {
               invalid_stem = true;
             }
           }
@@ -282,7 +283,7 @@ std::vector<InflectionCandidate> Inflection::analyze(
 
   // Early return for very short strings (less than 2 Japanese characters)
   // A conjugated verb needs at least stem + ending
-  if (surface.size() < 6) {  // 2 Japanese chars = 6 bytes in UTF-8
+  if (surface.size() < core::kTwoJapaneseCharBytes) {  // 2 Japanese chars = 6 bytes in UTF-8
     cache_[key] = candidates;
     return candidates;
   }

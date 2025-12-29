@@ -5,6 +5,7 @@
 
 #include "join_candidates.h"
 
+#include "core/utf8_constants.h"
 #include "grammar/inflection.h"
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
@@ -401,7 +402,7 @@ void addHiraganaCompoundVerbJoinCandidates(
 
       if (!is_ichidan) {
         // Godan: replace last char with base ending
-        v1_base = std::string(v1_surface.substr(0, v1_surface.size() - 3));  // Remove last hiragana (3 bytes)
+        v1_base = std::string(v1_surface.substr(0, v1_surface.size() - core::kJapaneseCharBytes));  // Remove last hiragana
         v1_base += normalize::utf8::encode({base_ending});
       } else {
         // Ichidan: add る
@@ -649,9 +650,9 @@ void addTeFormAuxiliaryCandidates(
         // This allows proper analysis of patterns like 教えてあげない
         if (aux.is_benefactive) {
           // Check if the surface ends with negative patterns
-          bool is_negative = (aux_surface.size() >= 6 &&
-                              (aux_surface.substr(aux_surface.size() - 6) == "ない" ||
-                               aux_surface.substr(aux_surface.size() - 6) == "なく"));
+          bool is_negative = (aux_surface.size() >= core::kTwoJapaneseCharBytes &&
+                              (aux_surface.substr(aux_surface.size() - core::kTwoJapaneseCharBytes) == "ない" ||
+                               aux_surface.substr(aux_surface.size() - core::kTwoJapaneseCharBytes) == "なく"));
           if (aux_surface.size() >= 12) {
             std::string_view suffix = std::string_view(aux_surface).substr(
                 aux_surface.size() - 12);

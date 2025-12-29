@@ -7,6 +7,8 @@
 
 #include <algorithm>
 
+#include "core/utf8_constants.h"
+
 namespace suzume::grammar {
 
 namespace {
@@ -68,7 +70,7 @@ std::string Conjugation::getStem(const std::string& base_form, VerbType type) {
   }
 
   size_t len = base_form.size();
-  if (len < 3) {
+  if (len < core::kJapaneseCharBytes) {
     return base_form;
   }
 
@@ -85,34 +87,34 @@ std::string Conjugation::getStem(const std::string& base_form, VerbType type) {
     case VerbType::GodanWa:
     case VerbType::IAdjective:
       // Remove last hiragana (3 bytes in UTF-8)
-      return base_form.substr(0, len - 3);
+      return base_form.substr(0, len - core::kJapaneseCharBytes);
 
     case VerbType::Suru:
       if (base_form == "する") {
         return "";
       }
       // Xする → X (remove する = 6 bytes)
-      if (len >= 6) {
-        return base_form.substr(0, len - 6);
+      if (len >= core::kTwoJapaneseCharBytes) {
+        return base_form.substr(0, len - core::kTwoJapaneseCharBytes);
       }
       return "";
 
     case VerbType::Kuru:
       // 来る → 来 (remove る = 3 bytes)
-      return base_form.substr(0, len - 3);
+      return base_form.substr(0, len - core::kJapaneseCharBytes);
 
     default:
-      return base_form.substr(0, len - 3);
+      return base_form.substr(0, len - core::kJapaneseCharBytes);
   }
 }
 
 VerbType Conjugation::detectType(const std::string& base_form) {
-  if (base_form.empty() || base_form.size() < 3) {
+  if (base_form.empty() || base_form.size() < core::kJapaneseCharBytes) {
     return VerbType::Unknown;
   }
 
   // Check last character
-  std::string last = base_form.substr(base_form.size() - 3);
+  std::string last = base_form.substr(base_form.size() - core::kJapaneseCharBytes);
 
   // Special verbs
   if (base_form == "する") {
@@ -123,8 +125,8 @@ VerbType Conjugation::detectType(const std::string& base_form) {
   }
 
   // サ変複合動詞
-  if (base_form.size() >= 6 &&
-      base_form.substr(base_form.size() - 6) == "する") {
+  if (base_form.size() >= core::kTwoJapaneseCharBytes &&
+      base_form.substr(base_form.size() - core::kTwoJapaneseCharBytes) == "する") {
     return VerbType::Suru;
   }
 
@@ -139,8 +141,8 @@ VerbType Conjugation::detectType(const std::string& base_form) {
   if (last == "る") {
     // If second-to-last char is え段 or い段, likely 一段
     // This is a heuristic - not always correct
-    if (base_form.size() >= 6) {
-      std::string prev = base_form.substr(base_form.size() - 6, 3);
+    if (base_form.size() >= core::kTwoJapaneseCharBytes) {
+      std::string prev = base_form.substr(base_form.size() - core::kTwoJapaneseCharBytes, core::kJapaneseCharBytes);
       // え段: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
       // い段: い, き, し, ち, に, ひ, み, り, ぎ, じ, ぢ, び, ぴ
       if (prev == "べ" || prev == "め" || prev == "せ" || prev == "て" ||

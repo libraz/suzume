@@ -72,6 +72,36 @@ inline bool isCompoundVerbAuxStart(std::string_view first_char) {
          kCompoundVerbAuxFirstChars.end();
 }
 
+// =============================================================================
+// Particle/Copula Sets (for verb candidate filtering)
+// =============================================================================
+
+// Particle strings that should not be treated as verb endings
+// Includes case particles (格助詞), binding particles (係助詞), and compound particles
+extern const std::unordered_set<std::string_view> kParticleStrings;
+
+// Copula/auxiliary verb patterns that should not be treated as verb endings
+extern const std::unordered_set<std::string_view> kCopulaStrings;
+
+// =============================================================================
+// Particle/Copula Lookup Functions
+// =============================================================================
+
+// Check if surface is a particle (should not be verb ending)
+inline bool isParticle(std::string_view surface) {
+  return kParticleStrings.find(surface) != kParticleStrings.end();
+}
+
+// Check if surface is a copula pattern (should not be verb ending)
+inline bool isCopula(std::string_view surface) {
+  return kCopulaStrings.find(surface) != kCopulaStrings.end();
+}
+
+// Check if surface is either particle or copula
+inline bool isParticleOrCopula(std::string_view surface) {
+  return isParticle(surface) || isCopula(surface);
+}
+
 }  // namespace suzume::normalize
 
 #endif  // SUZUME_NORMALIZE_EXCEPTIONS_H_
