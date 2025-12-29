@@ -2,72 +2,29 @@
 
 #include "analysis/scorer_constants.h"
 #include "core/utf8_constants.h"
+#include "grammar/char_patterns.h"
 #include "normalize/exceptions.h"
 
 namespace suzume::analysis {
 
 // =============================================================================
-// Stem Ending Pattern Detection
+// Stem Ending Pattern Detection (using grammar::char_patterns)
 // =============================================================================
 
-// i-row hiragana characters (godan renyokei markers)
-// UTF-8: each hiragana is 3 bytes
-static constexpr std::string_view kIRowChars[] = {
-    "み", "き", "ぎ", "し", "ち", "に", "び", "り", "い"};
-static constexpr size_t kIRowCount = sizeof(kIRowChars) / sizeof(kIRowChars[0]);
-
-// e-row hiragana characters (ichidan renyokei markers)
-static constexpr std::string_view kERowChars[] = {
-    "べ", "め", "せ", "け", "げ", "て", "ね", "れ", "え",
-    "で", "ぜ", "へ", "ぺ"};
-static constexpr size_t kERowCount = sizeof(kERowChars) / sizeof(kERowChars[0]);
-
-// Onbin markers for godan te/ta-form stems
-static constexpr std::string_view kOnbinChars[] = {"い", "っ", "ん"};
-static constexpr size_t kOnbinCount =
-    sizeof(kOnbinChars) / sizeof(kOnbinChars[0]);
-
 bool endsWithIRow(std::string_view surface) {
-  if (surface.size() < core::kJapaneseCharBytes) {
-    return false;
-  }
-  std::string_view last3 = surface.substr(surface.size() - core::kJapaneseCharBytes);
-  for (size_t i = 0; i < kIRowCount; ++i) {
-    if (last3 == kIRowChars[i]) {
-      return true;
-    }
-  }
-  return false;
+  return grammar::endsWithIRow(surface);
 }
 
 bool endsWithERow(std::string_view surface) {
-  if (surface.size() < core::kJapaneseCharBytes) {
-    return false;
-  }
-  std::string_view last3 = surface.substr(surface.size() - core::kJapaneseCharBytes);
-  for (size_t i = 0; i < kERowCount; ++i) {
-    if (last3 == kERowChars[i]) {
-      return true;
-    }
-  }
-  return false;
+  return grammar::endsWithERow(surface);
 }
 
 bool endsWithRenyokeiMarker(std::string_view surface) {
-  return endsWithIRow(surface) || endsWithERow(surface);
+  return grammar::endsWithRenyokeiMarker(surface);
 }
 
 bool endsWithOnbinMarker(std::string_view surface) {
-  if (surface.size() < core::kJapaneseCharBytes) {
-    return false;
-  }
-  std::string_view last3 = surface.substr(surface.size() - core::kJapaneseCharBytes);
-  for (size_t i = 0; i < kOnbinCount; ++i) {
-    if (last3 == kOnbinChars[i]) {
-      return true;
-    }
-  }
-  return false;
+  return grammar::endsWithOnbin(surface);
 }
 
 bool endsWithKuForm(std::string_view surface) {
@@ -636,13 +593,12 @@ ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
 ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
                                                 const core::LatticeEdge& next) {
   // Check if prev is a formal noun (single kanji)
-  // Note: Also check is_formal_noun flag directly for edges without the flag
+  // Note: Also check centralized formal noun set for edges without the flag
   bool is_formal =
       prev.isFormalNoun() ||
       (prev.pos == core::PartOfSpeech::Noun &&
        prev.surface.size() == core::kJapaneseCharBytes &&
-       (prev.surface == "所" || prev.surface == "物" || prev.surface == "事" ||
-        prev.surface == "時" || prev.surface == "方" || prev.surface == "為"));
+       normalize::isFormalNounSurface(prev.surface));
 
   if (!is_formal) {
     return {};

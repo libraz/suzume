@@ -59,6 +59,42 @@ extern const size_t kMizenkeiCount;
 extern const char* kRenyokeiEndings[];
 extern const size_t kRenyokeiCount;
 
+// Full i-row hiragana: み, き, ぎ, し, ち, に, び, り, い
+// Includes い for u-verbs (会う→会い) and stem patterns
+extern const char* kIRowEndings[];
+extern const size_t kIRowCount;
+
+// E-row hiragana for Ichidan renyokei: べ, め, せ, け, げ, て, ね, れ, え, で, ぜ, へ, ぺ
+extern const char* kERowEndings[];
+extern const size_t kERowCount;
+
+/**
+ * @brief Check if stem ends with i-row hiragana (godan renyokei markers)
+ * @param stem The stem to check
+ * @return True if the stem ends with i-row hiragana
+ *
+ * I-row hiragana includes: み, き, ぎ, し, ち, に, び, り, い
+ */
+bool endsWithIRow(std::string_view stem);
+
+/**
+ * @brief Check if stem ends with onbin marker (音便)
+ * @param stem The stem to check
+ * @return True if the stem ends with い, っ, or ん
+ *
+ * Used for te-form and ta-form detection.
+ */
+bool endsWithOnbin(std::string_view stem);
+
+/**
+ * @brief Check if stem ends with renyokei marker (連用形)
+ * @param stem The stem to check
+ * @return True if the stem ends with i-row or e-row hiragana
+ *
+ * Combines godan (i-row) and ichidan (e-row) renyokei patterns.
+ */
+bool endsWithRenyokeiMarker(std::string_view stem);
+
 }  // namespace suzume::grammar
 
 #endif  // SUZUME_GRAMMAR_CHAR_PATTERNS_H_

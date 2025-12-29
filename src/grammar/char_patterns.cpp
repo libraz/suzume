@@ -23,17 +23,30 @@ const char* kRenyokeiEndings[] = {"き", "ぎ", "し", "ち",
                                    "に", "び", "み", "り"};
 const size_t kRenyokeiCount = 8;
 
+// Full i-row hiragana including い for u-verb stems
+const char* kIRowEndings[] = {"み", "き", "ぎ", "し", "ち",
+                               "に", "び", "り", "い"};
+const size_t kIRowCount = 9;
+
+// E-row hiragana for Ichidan renyokei
+const char* kERowEndings[] = {"べ", "め", "せ", "け", "げ", "て", "ね",
+                               "れ", "え", "で", "ぜ", "へ", "ぺ"};
+const size_t kERowCount = 13;
+
+bool endsWithIRow(std::string_view stem) {
+  return endsWithChar(stem, kIRowEndings, kIRowCount);
+}
+
 bool endsWithERow(std::string_view stem) {
-  if (stem.size() < core::kJapaneseCharBytes) {
-    return false;
-  }
-  // Get last character (UTF-8: hiragana is 3 bytes)
-  std::string_view last = stem.substr(stem.size() - core::kJapaneseCharBytes);
-  // E-row hiragana: え, け, せ, て, ね, へ, め, れ, べ, ぺ, げ, ぜ, で
-  return last == "え" || last == "け" || last == "せ" || last == "て" ||
-         last == "ね" || last == "へ" || last == "め" || last == "れ" ||
-         last == "べ" || last == "ぺ" || last == "げ" || last == "ぜ" ||
-         last == "で";
+  return endsWithChar(stem, kERowEndings, kERowCount);
+}
+
+bool endsWithOnbin(std::string_view stem) {
+  return endsWithChar(stem, kOnbinEndings, kOnbinCount);
+}
+
+bool endsWithRenyokeiMarker(std::string_view stem) {
+  return endsWithIRow(stem) || endsWithERow(stem);
 }
 
 bool endsWithChar(std::string_view stem, const char* chars[], size_t count) {

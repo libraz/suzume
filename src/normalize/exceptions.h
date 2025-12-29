@@ -102,6 +102,19 @@ inline bool isParticleOrCopula(std::string_view surface) {
   return isParticle(surface) || isCopula(surface);
 }
 
+// =============================================================================
+// Formal Noun Strings (形式名詞)
+// =============================================================================
+
+// Formal nouns (形式名詞) - single kanji nouns with abstract grammatical functions
+// These should be recognized even when not flagged from dictionary lookup
+extern const std::unordered_set<std::string_view> kFormalNounStrings;
+
+// Check if surface is a formal noun
+inline bool isFormalNounSurface(std::string_view surface) {
+  return kFormalNounStrings.find(surface) != kFormalNounStrings.end();
+}
+
 }  // namespace suzume::normalize
 
 #endif  // SUZUME_NORMALIZE_EXCEPTIONS_H_

@@ -369,18 +369,10 @@ float calculateConfidence(VerbType type, std::string_view stem,
     if (last6 == "やす" || last6 == "にく") {
       // Check if the part before やす/にく ends with verb renyokei marker
       std::string_view before = stem.substr(0, stem_len - core::kTwoJapaneseCharBytes);
-      if (!before.empty() && before.size() >= core::kJapaneseCharBytes) {
-        std::string_view last3 = before.substr(before.size() - core::kJapaneseCharBytes);
-        // i-row (godan renyokei) and e-row (ichidan renyokei)
-        if (last3 == "み" || last3 == "き" || last3 == "ぎ" ||
-            last3 == "し" || last3 == "ち" || last3 == "び" ||
-            last3 == "り" || last3 == "い" || last3 == "に" ||
-            last3 == "べ" || last3 == "め" || last3 == "せ" ||
-            last3 == "け" || last3 == "げ" || last3 == "て" ||
-            last3 == "ね" || last3 == "れ" || last3 == "え") {
-          base += inflection::kBonusIAdjCompoundYasuiNikui;
-          logConfidenceAdjustment(inflection::kBonusIAdjCompoundYasuiNikui, "i_adj_compound_yasui_nikui");
-        }
+      // Use centralized renyokei marker check (i-row for godan, e-row for ichidan)
+      if (endsWithRenyokeiMarker(before)) {
+        base += inflection::kBonusIAdjCompoundYasuiNikui;
+        logConfidenceAdjustment(inflection::kBonusIAdjCompoundYasuiNikui, "i_adj_compound_yasui_nikui");
       }
     }
   }

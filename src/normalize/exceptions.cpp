@@ -125,4 +125,20 @@ const std::unordered_set<std::string_view> kCopulaStrings = {
     "である",
 };
 
+// =============================================================================
+// Formal Noun Strings (形式名詞)
+// =============================================================================
+// Single kanji nouns with abstract grammatical functions.
+// These are often used in compound patterns like 所在する, 時間, etc.
+// When followed by kanji, they may form compound words.
+
+const std::unordered_set<std::string_view> kFormalNounStrings = {
+    "所",  // tokoro - place (所在, 所持)
+    "物",  // mono - thing (物事, 物語)
+    "事",  // koto - matter (事実, 事件)
+    "時",  // toki - time (時間, 時代)
+    "方",  // kata/hou - direction/person (方法, 方向)
+    "為",  // tame - sake/benefit (為替)
+};
+
 }  // namespace suzume::normalize
