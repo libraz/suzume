@@ -21,17 +21,6 @@
 
 namespace suzume::analysis {
 
-namespace {
-
-// Extract substring from codepoints to UTF-8 (local copy for internal use)
-std::string extractSubstringLocal(const std::vector<char32_t>& codepoints,
-                                   size_t start, size_t end) {
-  // Use encodeRange directly to avoid intermediate vector allocation
-  return normalize::encodeRange(codepoints, start, end);
-}
-
-}  // namespace
-
 UnknownWordGenerator::UnknownWordGenerator(
     const UnknownOptions& options,
     const dictionary::DictionaryManager* dict_manager)
@@ -292,7 +281,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
   // Generate candidates for different lengths
   for (size_t len = 1; len <= end_pos - start_pos; ++len) {
     size_t candidate_end = start_pos + len;
-    std::string surface = extractSubstringLocal(codepoints, start_pos, candidate_end);
+    std::string surface = extractSubstring(codepoints, start_pos, candidate_end);
 
     if (!surface.empty()) {
       UnknownCandidate candidate;
@@ -370,7 +359,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAlphanumeric(
 
   // Only add if mixed (pure sequences handled by generateBySameType)
   if (has_alpha && has_digit && end_pos > start_pos + 1) {
-    std::string surface = extractSubstringLocal(codepoints, start_pos, end_pos);
+    std::string surface = extractSubstring(codepoints, start_pos, end_pos);
 
     if (!surface.empty()) {
       UnknownCandidate candidate;
@@ -560,7 +549,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
       continue;
     }
 
-    std::string surface = extractSubstringLocal(codepoints, start_pos, candidate_end);
+    std::string surface = extractSubstring(codepoints, start_pos, candidate_end);
 
     if (!surface.empty()) {
       // Skip patterns ending with そう - these are aspectual auxiliary patterns
@@ -619,7 +608,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
 
   if (ch0 == ch2 && ch1 == ch3) {
     // ABAB pattern detected (e.g., わくわく, きらきら, どきどき)
-    std::string surface = extractSubstringLocal(codepoints, start_pos, start_pos + 4);
+    std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
 
     if (!surface.empty()) {
       UnknownCandidate candidate;

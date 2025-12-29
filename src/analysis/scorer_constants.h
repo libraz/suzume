@@ -10,6 +10,30 @@
 // Naming convention:
 //   kPenalty* - increases cost (discourages pattern)
 //   kBonus*   - decreases cost (encourages pattern)
+//
+// =============================================================================
+// Cost Scale Reference
+// =============================================================================
+// The scoring system uses additive costs where lower = preferred.
+// Typical cost ranges across the codebase:
+//
+//   [-2.5, -0.5] Boosted patterns (ごろ suffix, common contractions)
+//   [0.0,  0.3]  Very common closed-class items (particles, copula)
+//   [0.3,  0.5]  Common functional words (aux verbs, pronouns)
+//   [0.5,  0.8]  Less frequent particles, binding words
+//   [1.0,  1.5]  Standard open-class cost, mild penalties
+//   [1.5,  2.0]  Moderate penalties for questionable patterns
+//   [2.0,  3.0]  Strong penalties for grammatically invalid patterns
+//
+// Penalty/Bonus magnitudes:
+//   0.5  - Small adjustment, tips the scale
+//   0.8  - Medium adjustment, offsets base connection costs
+//   1.0  - Standard penalty/bonus
+//   1.5  - Strong preference/discouragement
+//   2.0+ - Near-prohibition of pattern
+//
+// Base connection costs (from scorer.cpp):
+//   NOUN→NOUN: 0.0, VERB→VERB: 0.8, NOUN→VERB: 0.2, etc.
 // =============================================================================
 
 namespace suzume::analysis::scorer {
