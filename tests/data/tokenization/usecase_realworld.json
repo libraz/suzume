@@ -6,7 +6,7 @@
       "description": "English word with Japanese particle が and existential ある",
       "input": "Meetingがある",
       "expected": [
-        {"surface": "meeting", "pos": "Noun"},
+        {"surface": "Meeting", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "ある", "pos": "Verb", "lemma": "ある"}
       ],
@@ -39,7 +39,7 @@
       "description": "CamelCase identifier with particle",
       "input": "getUserDataを呼ぶ",
       "expected": [
-        {"surface": "getuserdata", "pos": "Noun"},
+        {"surface": "getUserData", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "呼ぶ", "pos": "Verb"}
       ],
@@ -62,7 +62,7 @@
       "description": "API abbreviation with particle",
       "input": "APIを呼ぶ",
       "expected": [
-        {"surface": "api", "pos": "Noun"},
+        {"surface": "API", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "呼ぶ", "pos": "Verb"}
       ],
@@ -73,7 +73,7 @@
       "description": "HTTP abbreviation with katakana",
       "input": "HTTPエラー",
       "expected": [
-        {"surface": "httpエラー", "pos": "Noun"}
+        {"surface": "HTTPエラー", "pos": "Noun"}
       ],
       "tags": ["mixed_script"]
     },
@@ -82,7 +82,7 @@
       "description": "Web development with の particle",
       "input": "Web開発の基礎",
       "expected": [
-        {"surface": "web開発", "pos": "Noun"},
+        {"surface": "Web開発", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "基礎", "pos": "Noun"}
       ],
@@ -93,7 +93,7 @@
       "description": "AI research with が particle",
       "input": "AI研究が進む",
       "expected": [
-        {"surface": "ai研究", "pos": "Noun"},
+        {"surface": "AI研究", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "進む", "pos": "Verb"}
       ],
@@ -104,7 +104,7 @@
       "description": "API request processing - split at kanji boundary",
       "input": "APIリクエスト処理",
       "expected": [
-        {"surface": "apiリクエスト", "pos": "Noun"},
+        {"surface": "APIリクエスト", "pos": "Noun"},
         {"surface": "処理", "pos": "Noun"}
       ],
       "tags": ["mixed_script"]
@@ -401,7 +401,7 @@
       "input": "株式会社ABCの担当者",
       "expected": [
         {"surface": "株式会社", "pos": "Noun"},
-        {"surface": "abc", "pos": "Noun"},
+        {"surface": "ABC", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "担当", "pos": "Noun"},
         {"surface": "者", "pos": "Suffix"}
@@ -536,7 +536,7 @@
       "input": "生成AIの研究が進んでいる",
       "expected": [
         {"surface": "生成", "pos": "Noun"},
-        {"surface": "ai", "pos": "Noun"},
+        {"surface": "AI", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "研究", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
@@ -550,7 +550,7 @@
       "description": "Product name with number",
       "input": "iPhone15を買った",
       "expected": [
-        {"surface": "iphone15", "pos": "Noun"},
+        {"surface": "iPhone15", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "買った", "pos": "Verb", "lemma": "買う"}
       ],
@@ -612,7 +612,7 @@
       "description": "Casual conversation with LINE",
       "input": "LINEで連絡するね",
       "expected": [
-        {"surface": "line", "pos": "Noun"},
+        {"surface": "LINE", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
         {"surface": "連絡する", "pos": "Verb", "lemma": "連絡する"},
         {"surface": "ね", "pos": "Particle"}

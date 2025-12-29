@@ -17,6 +17,7 @@ struct SuzumeHandle {
   suzume::Suzume instance;
 
   SuzumeHandle() : instance() {}
+  explicit SuzumeHandle(const suzume::SuzumeOptions& opts) : instance(opts) {}
 };
 
 extern "C" {
@@ -24,6 +25,19 @@ extern "C" {
 SUZUME_EXPORT suzume_t suzume_create(void) {
   try {
     return new SuzumeHandle();
+  } catch (...) {
+    return nullptr;
+  }
+}
+
+SUZUME_EXPORT suzume_t suzume_create_with_options(const suzume_options_t* options) {
+  try {
+    suzume::SuzumeOptions opts;
+    if (options != nullptr) {
+      opts.normalize_options.preserve_vu = (options->preserve_vu != 0);
+      opts.normalize_options.preserve_case = (options->preserve_case != 0);
+    }
+    return new SuzumeHandle(opts);
   } catch (...) {
     return nullptr;
   }

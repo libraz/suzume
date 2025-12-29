@@ -56,13 +56,28 @@ typedef struct {
   size_t count;  /**< Number of tags */
 } suzume_tags_t;
 
+/**
+ * @brief Normalization options structure
+ */
+typedef struct {
+  int preserve_vu;    /**< Preserve ヴ (don't normalize to ビ etc.) */
+  int preserve_case;  /**< Preserve case (don't lowercase ASCII) */
+} suzume_options_t;
+
 // --- Lifecycle functions ---
 
 /**
- * @brief Create a new Suzume instance
+ * @brief Create a new Suzume instance with default options
  * @return Handle to Suzume instance, or NULL on failure
  */
 SUZUME_EXPORT suzume_t suzume_create(void);
+
+/**
+ * @brief Create a new Suzume instance with options
+ * @param options Pointer to options structure
+ * @return Handle to Suzume instance, or NULL on failure
+ */
+SUZUME_EXPORT suzume_t suzume_create_with_options(const suzume_options_t* options);
 
 /**
  * @brief Destroy Suzume instance and free resources

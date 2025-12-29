@@ -9,6 +9,13 @@ namespace {
 
 class NormalizerTest : public ::testing::Test {
  protected:
+  // Use explicit normalization options to test conversion functionality
+  NormalizerTest() {
+    NormalizeOptions opts;
+    opts.preserve_vu = false;    // Enable ヴ→ビ conversion for testing
+    opts.preserve_case = false;  // Enable lowercase conversion for testing
+    normalizer_ = Normalizer(opts);
+  }
   Normalizer normalizer_;
 };
 
@@ -404,21 +411,21 @@ TEST_F(NormalizerTest, ExtendedChar_RomanNumerals) {
 // ===== Normalization Options Tests =====
 
 TEST(NormalizerOptionsTest, PreserveVu_Default) {
-  // Default: ヴ→ブ conversion enabled
+  // Default: ヴ is preserved (preserve_vu=true)
   Normalizer normalizer;
   auto result = normalizer.normalize("ヴィトン");
   ASSERT_TRUE(core::isSuccess(result));
-  EXPECT_EQ(std::get<std::string>(result), "ビトン");
+  EXPECT_EQ(std::get<std::string>(result), "ヴィトン");
 }
 
-TEST(NormalizerOptionsTest, PreserveVu_Enabled) {
-  // With preserve_vu: ヴ is kept as-is
+TEST(NormalizerOptionsTest, PreserveVu_Disabled) {
+  // With preserve_vu=false: ヴ→ビ conversion enabled
   NormalizeOptions opts;
-  opts.preserve_vu = true;
+  opts.preserve_vu = false;
   Normalizer normalizer(opts);
   auto result = normalizer.normalize("ヴィトン");
   ASSERT_TRUE(core::isSuccess(result));
-  EXPECT_EQ(std::get<std::string>(result), "ヴィトン");
+  EXPECT_EQ(std::get<std::string>(result), "ビトン");
 }
 
 TEST(NormalizerOptionsTest, PreserveVu_LouisVuitton) {
@@ -440,21 +447,21 @@ TEST(NormalizerOptionsTest, PreserveVu_MixedText) {
 }
 
 TEST(NormalizerOptionsTest, PreserveCase_Default) {
-  // Default: uppercase→lowercase conversion enabled
+  // Default: case is preserved (preserve_case=true)
   Normalizer normalizer;
   auto result = normalizer.normalize("Hello World");
   ASSERT_TRUE(core::isSuccess(result));
-  EXPECT_EQ(std::get<std::string>(result), "hello world");
+  EXPECT_EQ(std::get<std::string>(result), "Hello World");
 }
 
-TEST(NormalizerOptionsTest, PreserveCase_Enabled) {
-  // With preserve_case: case is kept as-is
+TEST(NormalizerOptionsTest, PreserveCase_Disabled) {
+  // With preserve_case=false: uppercase→lowercase conversion enabled
   NormalizeOptions opts;
-  opts.preserve_case = true;
+  opts.preserve_case = false;
   Normalizer normalizer(opts);
   auto result = normalizer.normalize("Hello World");
   ASSERT_TRUE(core::isSuccess(result));
-  EXPECT_EQ(std::get<std::string>(result), "Hello World");
+  EXPECT_EQ(std::get<std::string>(result), "hello world");
 }
 
 TEST(NormalizerOptionsTest, PreserveCase_FullwidthAlpha) {
@@ -488,20 +495,20 @@ TEST(NormalizerOptionsTest, BothOptionsEnabled) {
 TEST(NormalizerOptionsTest, SetOptionsAfterConstruction) {
   Normalizer normalizer;
 
-  // Default behavior
+  // Default behavior: preserve case (preserve_case=true by default)
   auto result1 = normalizer.normalize("Hello");
   ASSERT_TRUE(core::isSuccess(result1));
-  EXPECT_EQ(std::get<std::string>(result1), "hello");
+  EXPECT_EQ(std::get<std::string>(result1), "Hello");
 
-  // Change options
+  // Change options to enable lowercase conversion
   NormalizeOptions opts;
-  opts.preserve_case = true;
+  opts.preserve_case = false;
   normalizer.setOptions(opts);
 
-  // New behavior
+  // New behavior: lowercase
   auto result2 = normalizer.normalize("Hello");
   ASSERT_TRUE(core::isSuccess(result2));
-  EXPECT_EQ(std::get<std::string>(result2), "Hello");
+  EXPECT_EQ(std::get<std::string>(result2), "hello");
 }
 
 // ===== Error Handling Tests =====

@@ -168,7 +168,7 @@
       "input": "株式会社ABCの田中様",
       "expected": [
         {"surface": "株式会社", "pos": "Noun"},
-        {"surface": "abc", "pos": "Noun"},
+        {"surface": "ABC", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "田中", "pos": "Noun"},
         {"surface": "様", "pos": "Suffix"}

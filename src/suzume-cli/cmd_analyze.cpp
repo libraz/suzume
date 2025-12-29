@@ -160,6 +160,9 @@ int cmdAnalyze(const CommandArgs& args) {
   // Create analyzer
   SuzumeOptions options;
   options.mode = parseMode(args.mode);
+  // Default is preserve (true), flags invert to normalize
+  options.normalize_options.preserve_vu = !args.normalize_vu;
+  options.normalize_options.preserve_case = !args.lowercase;
 
   Suzume analyzer(options);
 

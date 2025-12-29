@@ -6,7 +6,7 @@
       "description": "Mixed script: alphabet + kanji",
       "input": "Web開発の基礎",
       "expected": [
-        {"surface": "web開発", "pos": "Noun"},
+        {"surface": "Web開発", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "基礎", "pos": "Noun"}
       ],
@@ -17,7 +17,7 @@
       "description": "Mixed script: alphabet + katakana",
       "input": "APIリクエスト処理",
       "expected": [
-        {"surface": "apiリクエスト", "pos": "Noun"},
+        {"surface": "APIリクエスト", "pos": "Noun"},
         {"surface": "処理", "pos": "Noun"}
       ],
       "tags": ["mixed_script"]
@@ -51,7 +51,7 @@
       "expected": [
         {"surface": "今日", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "meeting", "pos": "Noun"},
+        {"surface": "Meeting", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "あります", "pos": "Verb", "lemma": "ある"}
       ],
@@ -62,7 +62,7 @@
       "description": "CamelCase should be preserved",
       "input": "getUserDataを呼び出す",
       "expected": [
-        {"surface": "getuserdata", "pos": "Noun"},
+        {"surface": "getUserData", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "呼び出す", "pos": "Verb", "lemma": "呼ぶ"}
       ],
@@ -85,7 +85,7 @@
       "description": "Abbreviation",
       "input": "APIを呼ぶ",
       "expected": [
-        {"surface": "api", "pos": "Noun"},
+        {"surface": "API", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "呼ぶ", "pos": "Verb"}
       ],
@@ -96,7 +96,7 @@
       "description": "Technical term with Japanese",
       "input": "APIを使ってデータを取得する",
       "expected": [
-        {"surface": "api", "pos": "Noun"},
+        {"surface": "API", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "使って", "pos": "Verb", "lemma": "使う"},
         {"surface": "データ", "pos": "Noun"},
@@ -110,7 +110,7 @@
       "description": "Brand name in sentence",
       "input": "iPhoneを買いました",
       "expected": [
-        {"surface": "iphone", "pos": "Noun"},
+        {"surface": "iPhone", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "買いました", "pos": "Verb", "lemma": "買う"}
       ],
@@ -491,7 +491,7 @@
       "description": "Brackets",
       "input": "AI（人工知能）の発展",
       "expected": [
-        {"surface": "ai", "pos": "Noun"},
+        {"surface": "AI", "pos": "Noun"},
         {"surface": "人工知能", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "発展", "pos": "Noun"}

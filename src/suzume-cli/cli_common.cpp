@@ -165,6 +165,20 @@ CommandArgs parseArgs(int argc, char* argv[]) {
       continue;
     }
 
+    // Normalization: convert ヴ→ビ
+    if (arg == "--normalize-vu") {
+      args.normalize_vu = true;
+      ++idx;
+      continue;
+    }
+
+    // Normalization: convert to lowercase
+    if (arg == "--lowercase") {
+      args.lowercase = true;
+      ++idx;
+      continue;
+    }
+
     // Command or positional argument
     if (arg[0] != '-') {
       if (args.command.empty()) {
@@ -218,6 +232,8 @@ Global Options:
   --no-user-dict         Disable user dictionary
   --no-core-dict         Disable core dictionary
   --compare              Compare with/without user dictionary
+  --normalize-vu         Normalize ヴ to ビ etc. (default: preserve)
+  --lowercase            Convert ASCII to lowercase (default: preserve)
   -h, --help             Show help
   -v, --version          Show version
 
@@ -245,6 +261,8 @@ Options:
   -V, --verbose          Verbose output
   --no-user-dict         Disable user dictionary
   --compare              Compare with/without user dictionary
+  --normalize-vu         Normalize ヴ to ビ etc. (default: preserve)
+  --lowercase            Convert ASCII to lowercase (default: preserve)
   -h, --help             Show this help
 
 Output Formats:
@@ -261,6 +279,7 @@ Examples:
   suzume-cli analyze -f json "text"
   suzume-cli analyze -f chasen "text"
   suzume-cli analyze --compare -d user.dic "text"
+  suzume-cli analyze --normalize-vu "ヴァイオリン"
   echo "text" | suzume-cli analyze
 )";
 }

@@ -64,7 +64,7 @@
       "input": "このAPIは認証が必要です",
       "expected": [
         {"surface": "この", "pos": "Determiner"},
-        {"surface": "api", "pos": "Noun"},
+        {"surface": "API", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "認証", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},

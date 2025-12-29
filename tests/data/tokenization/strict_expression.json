@@ -6,7 +6,7 @@
       "description": "API with を particle",
       "input": "APIを呼ぶ",
       "expected": [
-        {"surface": "api", "pos": "Noun"},
+        {"surface": "API", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "呼ぶ", "pos": "Verb"}
       ],
@@ -17,7 +17,7 @@
       "description": "CamelCase function name preserved with を particle",
       "input": "getUserDataを呼ぶ",
       "expected": [
-        {"surface": "getuserdata", "pos": "Noun"},
+        {"surface": "getUserData", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "呼ぶ", "pos": "Verb"}
       ],
@@ -57,7 +57,7 @@
       "description": "AI（人工知能）- should recognize AI and 人工知能",
       "input": "AI（人工知能）",
       "expected": [
-        {"surface": "ai", "pos": "Noun"},
+        {"surface": "AI", "pos": "Noun"},
         {"surface": "人工知能", "pos": "Noun"}
       ],
       "tags": ["strict", "symbol"]
@@ -76,7 +76,7 @@
       "description": "Python technical sentence with particles",
       "input": "Pythonで機械学習を実装する",
       "expected": [
-        {"surface": "python", "pos": "Noun"},
+        {"surface": "Python", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
         {"surface": "機械学習", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},

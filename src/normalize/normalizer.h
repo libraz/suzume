@@ -13,10 +13,10 @@ namespace suzume::normalize {
  */
 struct NormalizeOptions {
   // Preserve ヴ (vu) characters instead of converting to バビブベボ
-  bool preserve_vu = false;
+  bool preserve_vu = true;
 
   // Preserve case (don't convert to lowercase)
-  bool preserve_case = false;
+  bool preserve_case = true;
 };
 
 /**

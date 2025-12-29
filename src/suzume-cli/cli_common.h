@@ -91,6 +91,10 @@ struct CommandArgs {
   bool no_user_dict = false;
   bool no_core_dict = false;
   bool compare = false;
+
+  // Normalization options (defaults preserve original)
+  bool normalize_vu = false;    // --normalize-vu: convert ヴ→ビ
+  bool lowercase = false;       // --lowercase: convert to lowercase
 };
 
 /**
