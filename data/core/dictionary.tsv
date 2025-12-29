@@ -10,6 +10,8 @@
 
 # === adjectives (i-adjectives) ===
 # Note: 〜らしい patterns (子供らしい, etc.) handled by inflection analyzer
+しんどい	ADJECTIVE	しんどい	0.8	I_ADJ
+上手い	ADJECTIVE	うまい	0.8	I_ADJ
 美味しい	ADJECTIVE	おいしい	1.0	I_ADJ
 気持ちいい	ADJECTIVE	きもちいい	1.0	I_ADJ
 申し訳ない	ADJECTIVE	もうしわけない	1.0	I_ADJ
@@ -156,6 +158,9 @@ Wi-Fi	NOUN		0.5
 なまむぎ	NOUN	なまむぎ	0.3
 なまごめ	NOUN	なまごめ	0.3
 なまたまご	NOUN	なまたまご	0.3
+
+# Common hiragana nouns (prevent particle mis-split)
+おかし	NOUN	おかし	0.3
 
 # === suffixes ===
 がたい	OTHER		1.0

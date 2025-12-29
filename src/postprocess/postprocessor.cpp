@@ -465,14 +465,18 @@ std::vector<core::Morpheme> Postprocessor::mergeNaAdjectiveNa(
         morphemes[idx + 1].pos == core::PartOfSpeech::Particle &&
         morphemes[idx + 1].surface == "な") {
       // Check if the adjective is a na-adjective (doesn't end with い)
+      // Use lemma for checking since surface may be normalized
       bool is_na_adj = true;
-      if (current.surface.size() >= core::kJapaneseCharBytes) {
-        std::string_view last3 = current.surface.substr(current.surface.size() - core::kJapaneseCharBytes);
+      std::string_view check_str = current.lemma.empty() ? current.surface : current.lemma;
+      if (check_str.size() >= core::kJapaneseCharBytes) {
+        std::string_view last_char = check_str.substr(check_str.size() - core::kJapaneseCharBytes);
         // i-adjectives end with い (exceptions: きれい, きらい, 嫌い, みたい)
-        if (last3 == "い" && current.surface != "きれい" &&
-            current.surface != "きらい" && current.surface != "嫌い" &&
-            current.surface != "みたい") {
+        if (last_char == "い" && check_str != "きれい" &&
+            check_str != "きらい" && check_str != "嫌い" &&
+            check_str != "みたい") {
           is_na_adj = false;
+          SUZUME_DEBUG_LOG("[POSTPROC] Detected i-adjective: \"" << check_str
+                           << "\", not merging with な\n");
         }
       }
 

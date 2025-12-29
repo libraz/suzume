@@ -228,12 +228,16 @@ void Tokenizer::addUnknownCandidates(
         std::string_view hiragana_suffix =
             text.substr(suffix_byte_start, suffix_byte_end - suffix_byte_start);
 
-        // Don't penalize te-form endings (including godan onbin forms)
-        bool is_te_form = (hiragana_suffix == "て" || hiragana_suffix == "で" ||
-                           hiragana_suffix == "って" || hiragana_suffix == "んで" ||
-                           hiragana_suffix == "いて" || hiragana_suffix == "いで");
+        // Don't penalize verb conjugation endings
+        // - te-form: て/で/って/んで/いて/いで
+        // - renyoukei し: extremely common for suru/godan verbs (分割し, 話し)
+        bool is_verb_ending =
+            (hiragana_suffix == "て" || hiragana_suffix == "で" ||
+             hiragana_suffix == "って" || hiragana_suffix == "んで" ||
+             hiragana_suffix == "いて" || hiragana_suffix == "いで" ||
+             hiragana_suffix == "し");
 
-        if (!is_te_form) {
+        if (!is_verb_ending) {
           size_t suffix_byte_pos = charPosToBytePos(codepoints, hiragana_start);
           auto suffix_results = dict_manager_.lookup(text, suffix_byte_pos);
 

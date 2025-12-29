@@ -227,6 +227,12 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
     return result;
   }
 
+  // Particle rules
+  result = checkShiParticleConnection(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
   return {};  // No pattern matched
 }
 

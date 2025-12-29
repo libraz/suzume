@@ -144,6 +144,9 @@ ConnectionRuleResult checkSuffixAfterSymbol(const core::LatticeEdge& prev,
 ConnectionRuleResult checkParticleBeforeHiraganaOther(
     const core::LatticeEdge& prev, const core::LatticeEdge& next);
 
+ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
+                                                const core::LatticeEdge& next);
+
 }  // namespace connection_rules
 }  // namespace suzume::analysis
 

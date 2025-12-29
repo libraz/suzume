@@ -250,6 +250,95 @@
         {"surface": "て", "pos": "Particle"}
       ],
       "tags": ["slang", "adjective", "conjugation"]
+    },
+    {
+      "id": "adj_shindoi_base",
+      "description": "Colloquial adjective しんどい base form",
+      "input": "しんどい",
+      "expected": [
+        {"surface": "しんどい", "pos": "Adjective", "lemma": "しんどい"}
+      ],
+      "tags": ["slang", "adjective", "colloquial"]
+    },
+    {
+      "id": "adj_shindoi_negative",
+      "description": "Colloquial adjective しんどい negative form",
+      "input": "しんどくない",
+      "expected": [
+        {"surface": "しんどくない", "pos": "Adjective", "lemma": "しんどい"}
+      ],
+      "tags": ["slang", "adjective", "colloquial"]
+    },
+    {
+      "id": "adj_toutoi_base",
+      "description": "Single-kanji i-adjective 尊い base form",
+      "input": "尊い",
+      "expected": [
+        {"surface": "尊い", "pos": "Adjective", "lemma": "尊い"}
+      ],
+      "tags": ["slang", "adjective", "internet"]
+    },
+    {
+      "id": "adj_toutoi_sugiru",
+      "description": "尊い + すぎる pattern",
+      "input": "尊すぎて",
+      "expected": [
+        {"surface": "尊すぎ", "pos": "Verb", "lemma": "尊過ぎる"},
+        {"surface": "て", "pos": "Auxiliary"}
+      ],
+      "tags": ["slang", "adjective", "internet"]
+    },
+    {
+      "id": "phrase_majide_toutoi",
+      "description": "Internet slang phrase マジで尊い",
+      "input": "マジで尊い",
+      "expected": [
+        {"surface": "マジで", "pos": "Adverb"},
+        {"surface": "尊い", "pos": "Adjective", "lemma": "尊い"}
+      ],
+      "tags": ["slang", "phrase", "internet"]
+    },
+    {
+      "id": "phrase_toutoi_shindoi",
+      "description": "Colloquial phrase 尊すぎてしんどい",
+      "input": "尊すぎてしんどい",
+      "expected": [
+        {"surface": "尊すぎ", "pos": "Verb", "lemma": "尊過ぎる"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "しんどい", "pos": "Adjective", "lemma": "しんどい"}
+      ],
+      "tags": ["slang", "phrase", "internet"]
+    },
+    {
+      "id": "particle_shi_iadj",
+      "description": "Conjunctive particle し after i-adjective",
+      "input": "上手いし",
+      "expected": [
+        {"surface": "上手い", "pos": "Adjective", "lemma": "上手い"},
+        {"surface": "し", "pos": "Particle"}
+      ],
+      "tags": ["slang", "particle", "shi"]
+    },
+    {
+      "id": "particle_shi_katakana_adj",
+      "description": "Conjunctive particle し after katakana adjective",
+      "input": "エモいし",
+      "expected": [
+        {"surface": "エモい", "pos": "Adjective"},
+        {"surface": "し", "pos": "Particle"}
+      ],
+      "tags": ["slang", "particle", "shi"]
+    },
+    {
+      "id": "particle_shi_phrase",
+      "description": "Conjunctive particle し in casual phrase",
+      "input": "エモいしバズってる",
+      "expected": [
+        {"surface": "エモい", "pos": "Adjective"},
+        {"surface": "し", "pos": "Particle"},
+        {"surface": "バズってる", "pos": "Verb", "lemma": "バズる"}
+      ],
+      "tags": ["slang", "particle", "shi", "phrase"]
     }
   ]
 }

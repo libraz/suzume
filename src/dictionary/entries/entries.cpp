@@ -44,6 +44,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
       {"けれど", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"けど", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"けれども", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
+      {"し", POS::Particle, 1.2F, "", false, false, false, CT::None, ""},  // 列挙・理由
 
       // Quotation particles (引用助詞)
       {"って", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
@@ -940,6 +941,8 @@ std::vector<DictionaryEntry> getIAdjectiveEntries() {
       {"暗い", POS::Adjective, 0.3F, "暗い", false, false, false, CT::IAdjective, "くらい"},
       {"狡い", POS::Adjective, 0.3F, "狡い", false, false, false, CT::IAdjective, "ずるい"},
       {"旨い", POS::Adjective, 0.3F, "旨い", false, false, false, CT::IAdjective, "うまい"},
+      {"上手い", POS::Adjective, 0.3F, "上手い", false, false, false, CT::IAdjective, "うまい"},
+      {"尊い", POS::Adjective, 0.3F, "尊い", false, false, false, CT::IAdjective, "とうとい"},
 
       // Special irregular adjective いい (良い/よい variant)
       // Uses CT::None because いい only has terminal/attributive forms.

@@ -104,7 +104,9 @@ enum class ConnectionPattern {
   ParticleBeforeAux,       // PARTICLE → AUX (invalid: と + う should not happen)
   NounBeforeNaAdj,         // NOUN → みたい etc (valid: 猫みたい)
   VerbBeforeNaAdj,         // VERB → みたい etc (valid: 食べるみたい)
-  InvalidTeFormAux         // テ形VERB → 無効単独AUX (e.g., して+る - should be してる)
+  InvalidTeFormAux,        // テ形VERB → 無効単独AUX (e.g., して+る - should be してる)
+  ShiParticleAfterPredicate,  // 活用語 → し接続助詞 (valid: 上手いし, 食べるし)
+  ShiParticleAfterNoun     // 名詞 → し接続助詞 (invalid: 本し - noun can't directly connect)
 };
 
 /**

@@ -265,5 +265,54 @@ ConnectionRuleResult checkParticleBeforeHiraganaOther(
           "hiragana other after particle (likely split)"};
 }
 
+// Rule: Conjunctive particle し after predicate (ADJ/VERB/AUX)
+// Valid: 上手いし, 食べるし, 高いし, 行くし, だし
+// Invalid: 本し (noun cannot directly connect to し)
+ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
+                                                const core::LatticeEdge& next) {
+  // Only applies to し particle
+  if (next.pos != core::PartOfSpeech::Particle || next.surface != "し") {
+    return {};
+  }
+
+  // Check previous POS
+  switch (prev.pos) {
+    case core::PartOfSpeech::Adjective:
+      // ADJ + し: valid (上手いし, 高いし)
+      // Must end with い for i-adjective shuushikei
+      if (prev.surface.size() >= core::kJapaneseCharBytes &&
+          prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes) ==
+              "い") {
+        return {ConnectionPattern::ShiParticleAfterPredicate, -0.5F,
+                "i-adj + shi particle (valid)"};
+      }
+      // Na-adj needs だ/な before し, so no bonus for bare na-adj
+      return {};
+
+    case core::PartOfSpeech::Verb:
+      // VERB + し: valid if shuushikei (終止形)
+      // Shuushikei ends with う段 (う、く、す、つ、ぬ、ふ、む、ゆ、る)
+      // or る for ichidan verbs
+      if (!prev.surface.empty()) {
+        return {ConnectionPattern::ShiParticleAfterPredicate, -0.3F,
+                "verb + shi particle (valid)"};
+      }
+      return {};
+
+    case core::PartOfSpeech::Auxiliary:
+      // AUX + し: valid (だし, ないし, たし)
+      return {ConnectionPattern::ShiParticleAfterPredicate, -0.3F,
+              "aux + shi particle (valid)"};
+
+    case core::PartOfSpeech::Noun:
+      // NOUN + し: invalid (本し - should be 本だし with copula)
+      return {ConnectionPattern::ShiParticleAfterNoun, 1.5F,
+              "noun + shi particle (invalid, needs copula)"};
+
+    default:
+      return {};
+  }
+}
+
 }  // namespace connection_rules
 }  // namespace suzume::analysis
