@@ -1,0 +1,411 @@
+#include "analysis/connection_rules_internal.h"
+
+namespace suzume::analysis {
+namespace connection_rules {
+
+// =============================================================================
+// Helper Function: Check if verb is an auxiliary verb pattern (補助動詞)
+// =============================================================================
+
+bool isAuxiliaryVerbPattern(std::string_view surface, std::string_view lemma) {
+  // Check lemma for auxiliary verb patterns
+  // いる/おる (progressive/state), しまう (completion), みる (try),
+  // おく (preparation), いく/くる (direction), あげる/もらう/くれる (giving)
+  if (lemma == "いる" || lemma == "おる" || lemma == "しまう" ||
+      lemma == "みる" || lemma == "おく" || lemma == "いく" ||
+      lemma == "くる" || lemma == "あげる" || lemma == "もらう" ||
+      lemma == "くれる" || lemma == "ある") {
+    return true;
+  }
+
+  // Check surface for polite forms
+  if (surface == "います" || surface == "おります" ||
+      surface == "しまいます" || surface == "みます" ||
+      surface == "おきます" || surface == "いきます" ||
+      surface == "きます" || surface == "あります" ||
+      surface == "ございます") {
+    return true;
+  }
+
+  // Check surface for negative/past forms of auxiliary verbs
+  // This handles cases where lemma is empty (unknown word analysis)
+  if (surface == "くれない" || surface == "くれなかった" ||
+      surface == "あげない" || surface == "あげなかった" ||
+      surface == "もらわない" || surface == "もらわなかった" ||
+      surface == "しまわない" || surface == "しまわなかった" ||
+      surface == "いない" || surface == "いなかった" ||
+      surface == "おらない" || surface == "おらなかった") {
+    return true;
+  }
+
+  return false;
+}
+
+// =============================================================================
+// Verb Conjugation Rules
+// =============================================================================
+
+// Rule 1: Copula だ/です cannot follow verbs (except そう pattern)
+ConnectionRuleResult checkCopulaAfterVerb(const core::LatticeEdge& prev,
+                                          const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  if (next.surface != "だ" && next.surface != "です") {
+    return {};
+  }
+
+  // Exception: 〜そう + です is valid
+  if (endsWithSou(prev.surface)) {
+    return {};
+  }
+
+  return {ConnectionPattern::CopulaAfterVerb, scorer::kPenaltyCopulaAfterVerb,
+          "copula after verb"};
+}
+
+// Rule 2: Ichidan renyokei + て/てV split should be avoided
+ConnectionRuleResult checkIchidanRenyokeiTe(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  // Check if next starts with て
+  bool is_te_pattern = false;
+  if (next.pos == core::PartOfSpeech::Particle && next.surface == "て") {
+    is_te_pattern = true;
+  } else if (next.pos == core::PartOfSpeech::Verb && startsWithTe(next.surface)) {
+    is_te_pattern = true;
+  }
+
+  if (!is_te_pattern) {
+    return {};
+  }
+
+  // Check if prev ends with e-row (ichidan renyokei)
+  if (!endsWithERow(prev.surface)) {
+    return {};
+  }
+
+  return {ConnectionPattern::IchidanRenyokeiTe, scorer::kPenaltyIchidanRenyokeiTe,
+          "ichidan renyokei + te pattern"};
+}
+
+// Rule 3: Te-form split (音便形 or 一段形 → て/で)
+ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
+                                      const core::LatticeEdge& next) {
+  if ((prev.pos != core::PartOfSpeech::Noun &&
+       prev.pos != core::PartOfSpeech::Verb) ||
+      next.pos != core::PartOfSpeech::Particle) {
+    return {};
+  }
+
+  if (next.surface != "て" && next.surface != "で") {
+    return {};
+  }
+
+  // Check for godan onbin, ichidan endings, or godan renyokei i-row endings
+  // Godan te-form patterns:
+  //   - 書く → 書いて (onbin: い + て)
+  //   - 読む → 読んで (onbin: ん + で)
+  //   - 話す → 話して (renyokei: し + て, i-row ending)
+  //   - いたす → いたして (renyokei: し + て)
+  // Ichidan te-form patterns:
+  //   - 食べる → 食べて (e-row ending)
+  if (!endsWithOnbinMarker(prev.surface) && !endsWithERow(prev.surface) &&
+      !endsWithIRow(prev.surface)) {
+    return {};
+  }
+
+  return {ConnectionPattern::TeFormSplit, scorer::kPenaltyTeFormSplit,
+          "te-form split pattern"};
+}
+
+// Rule 4: Verb renyokei + たい adjective handling
+// Two cases:
+// 1. Short forms (たくて, たくない, etc.): No bonus - should be unified as single token
+// 2. Long forms (たくなってきた, etc.): Give bonus for proper connection
+// Also penalizes AUX + たい patterns (e.g., なり(だ) + たかった)
+ConnectionRuleResult checkTaiAfterRenyokei(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next) {
+  if (next.pos != core::PartOfSpeech::Adjective || next.lemma != "たい") {
+    return {};
+  }
+
+  // Penalize AUX + たい pattern (e.g., なり(だ) + たかった)
+  if (prev.pos == core::PartOfSpeech::Auxiliary) {
+    return {ConnectionPattern::TaiAfterRenyokei, scorer::kPenaltyTaiAfterAux,
+            "tai-pattern after auxiliary (unnatural)"};
+  }
+
+  // Only process VERB + たい
+  if (prev.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  // Short たい forms (たくて, たくない, たかった, たければ, etc.)
+  // These are <= 12 bytes (4 hiragana chars) and should be unified with verb
+  // Don't give bonus - let inflection analyzer handle as single token
+  if (next.surface.size() <= 12) {
+    return {};
+  }
+
+  // Long たい forms (たくなってきた, たくてたまらない, etc.)
+  // These are complex compound patterns that benefit from bonus
+  if (!endsWithRenyokeiMarker(prev.surface)) {
+    return {};
+  }
+
+  // Bonus (negative value) for long compound patterns
+  return {ConnectionPattern::TaiAfterRenyokei, -scorer::kBonusTaiAfterRenyokei,
+          "tai-pattern after verb renyokei"};
+}
+
+// Rule 5: Renyokei-like noun + やすい (安い) penalty
+ConnectionRuleResult checkYasuiAfterRenyokei(const core::LatticeEdge& prev,
+                                             const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Noun ||
+      next.pos != core::PartOfSpeech::Adjective) {
+    return {};
+  }
+
+  if (next.surface != "やすい" || next.lemma != "安い") {
+    return {};
+  }
+
+  if (!endsWithIRow(prev.surface)) {
+    return {};
+  }
+
+  return {ConnectionPattern::YasuiAfterRenyokei, scorer::kPenaltyYasuiAfterRenyokei,
+          "yasui adj after renyokei-like noun"};
+}
+
+// Rule 6: Verb renyokei + ながら split penalty
+ConnectionRuleResult checkNagaraSplit(const core::LatticeEdge& prev,
+                                      const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Particle) {
+    return {};
+  }
+
+  if (next.surface != "ながら") {
+    return {};
+  }
+
+  if (!endsWithRenyokeiMarker(prev.surface)) {
+    return {};
+  }
+
+  return {ConnectionPattern::NagaraSplit, scorer::kPenaltyNagaraSplit,
+          "nagara split after renyokei verb"};
+}
+
+// Rule 7: Renyokei-like noun + そう (adverb) penalty
+ConnectionRuleResult checkSouAfterRenyokei(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Noun ||
+      next.pos != core::PartOfSpeech::Adverb) {
+    return {};
+  }
+
+  if (next.surface != "そう") {
+    return {};
+  }
+
+  if (!endsWithRenyokeiMarker(prev.surface)) {
+    return {};
+  }
+
+  return {ConnectionPattern::SouAfterRenyokei, scorer::kPenaltySouAfterRenyokei,
+          "sou aux after renyokei-like noun"};
+}
+
+// Rule 10: Renyokei-like noun + compound verb auxiliary penalty
+ConnectionRuleResult checkCompoundAuxAfterRenyokei(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Noun ||
+      next.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  if (next.surface.size() < core::kJapaneseCharBytes) {
+    return {};
+  }
+
+  // Check if next starts with compound verb auxiliary kanji
+  std::string_view first_char = next.surface.substr(0, core::kJapaneseCharBytes);
+  if (!normalize::isCompoundVerbAuxStart(first_char)) {
+    return {};
+  }
+
+  if (!endsWithRenyokeiMarker(prev.surface)) {
+    return {};
+  }
+
+  return {ConnectionPattern::CompoundAuxAfterRenyokei,
+          scorer::kPenaltyCompoundAuxAfterRenyokei,
+          "compound aux after renyokei-like noun"};
+}
+
+// Rule 11: VERB renyokei + たくて (ADJ) split penalty
+// Prevents 飲み + たくて from being preferred over 飲みたくて
+ConnectionRuleResult checkTakuteAfterRenyokei(const core::LatticeEdge& prev,
+                                              const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Adjective) {
+    return {};
+  }
+
+  // Check if next is たくて form (ADJ with lemma たい)
+  if (next.lemma != "たい" || next.surface != "たくて") {
+    return {};
+  }
+
+  // Check if prev ends with renyokei marker
+  if (!endsWithRenyokeiMarker(prev.surface)) {
+    return {};
+  }
+
+  return {ConnectionPattern::TakuteAfterRenyokei,
+          scorer::kPenaltyTakuteAfterRenyokei,
+          "takute adj after renyokei verb"};
+}
+
+// Rule 12: Verb/Adjective たく + て split penalty
+// Prevents 食べたく + て from being preferred over 食べたくて
+// Also handles ADJ case: 見たく (ADJ) + て should be 見たくて
+ConnectionRuleResult checkTakuTeSplit(const core::LatticeEdge& prev,
+                                      const core::LatticeEdge& next) {
+  if ((prev.pos != core::PartOfSpeech::Verb &&
+       prev.pos != core::PartOfSpeech::Adjective) ||
+      next.pos != core::PartOfSpeech::Particle) {
+    return {};
+  }
+
+  if (next.surface != "て") {
+    return {};
+  }
+
+  // Check if prev ends with たく (desire adverbial form)
+  if (prev.surface.size() < core::kTwoJapaneseCharBytes) {
+    return {};
+  }
+  std::string_view last6 = prev.surface.substr(prev.surface.size() - core::kTwoJapaneseCharBytes);
+  if (last6 != "たく") {
+    return {};
+  }
+
+  return {ConnectionPattern::TakuTeSplit, scorer::kPenaltyTakuTeSplit,
+          "taku + te split (should be takute)"};
+}
+
+// Rule 15: Conditional verb (ending with ば) + verb (bonus)
+// E.g., あれば + 手伝います - grammatically correct conditional clause
+// This offsets the high VERB→VERB base cost for conditional patterns
+ConnectionRuleResult checkConditionalVerbToVerb(const core::LatticeEdge& prev,
+                                                const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  // Check if prev verb ends with ば (conditional form)
+  if (prev.surface.size() < core::kJapaneseCharBytes) {
+    return {};
+  }
+  std::string_view last3 = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
+  if (last3 != "ば") {
+    return {};
+  }
+
+  // Bonus (negative value) for conditional clause pattern
+  return {ConnectionPattern::ConditionalVerbToVerb,
+          -scorer::kBonusConditionalVerbToVerb,
+          "conditional verb to result verb"};
+}
+
+// Rule 16: Verb renyokei + compound auxiliary verb (bonus)
+// E.g., 読み + 終わる, 書き + 始める, 走り + 続ける
+// This gives bonus for proper VERB→VERB compound verb patterns
+ConnectionRuleResult checkVerbRenyokeiCompoundAux(const core::LatticeEdge& prev,
+                                                  const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  // Check if next starts with compound verb auxiliary kanji
+  if (next.surface.size() < core::kJapaneseCharBytes) {
+    return {};
+  }
+  std::string_view first_char = next.surface.substr(0, core::kJapaneseCharBytes);
+  if (!normalize::isCompoundVerbAuxStart(first_char)) {
+    return {};
+  }
+
+  // Check if prev ends with renyokei marker
+  if (!endsWithRenyokeiMarker(prev.surface)) {
+    return {};
+  }
+
+  // Bonus (negative value) for compound verb pattern
+  return {ConnectionPattern::VerbRenyokeiCompoundAux,
+          -scorer::kBonusVerbRenyokeiCompoundAux,
+          "verb renyokei + compound aux verb"};
+}
+
+// Rule 17: Te-form VERB + VERB bonus
+// E.g., 関して + 報告する, 調べて + わかる - te-form verb sequence
+// This offsets the high VERB→VERB base cost for te-form patterns
+// Excludes auxiliary verb patterns (いる, おる, しまう, etc.) which should be AUX
+ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  // Check if prev verb ends with te-form (て or で)
+  if (prev.surface.size() < core::kJapaneseCharBytes) {
+    return {};
+  }
+  std::string_view last_char = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
+  if (last_char != "て" && last_char != "で") {
+    return {};
+  }
+
+  // Exclude auxiliary verb patterns - these should be Auxiliary, not Verb
+  // E.g., なって + おります should have おります as AUX
+  if (isAuxiliaryVerbPattern(next.surface, next.lemma)) {
+    return {};
+  }
+
+  // Bonus (negative value) for te-form + verb pattern
+  return {ConnectionPattern::TeFormVerbToVerb, -scorer::kBonusTeFormVerbToVerb,
+          "te-form verb to verb"};
+}
+
+// Rule: PREFIX + VERB penalty
+// Prefixes should attach to nouns/suffixes, not verbs
+// E.g., 何してる - 何 should be PRON, not PREFIX
+ConnectionRuleResult checkPrefixBeforeVerb(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Prefix) {
+    return {};
+  }
+
+  if (next.pos != core::PartOfSpeech::Verb &&
+      next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  return {ConnectionPattern::PrefixBeforeVerb, scorer::kPenaltyPrefixBeforeVerb,
+          "prefix before verb"};
+}
+
+}  // namespace connection_rules
+}  // namespace suzume::analysis

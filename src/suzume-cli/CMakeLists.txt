@@ -10,6 +10,8 @@ add_executable(suzume-cli
   tsv_parser.cpp
   dict_compiler.cpp
   interactive.cpp
+  interactive_commands.cpp
+  interactive_utils.cpp
 )
 
 target_include_directories(suzume-cli PRIVATE

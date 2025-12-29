@@ -4,6 +4,9 @@ add_library(suzume_analysis STATIC
   adjective_candidates.cpp
   analyzer.cpp
   connection_rules.cpp
+  connection_rules_aux.cpp
+  connection_rules_other.cpp
+  connection_rules_verb.cpp
   join_candidates.cpp
   scorer.cpp
   split_candidates.cpp
