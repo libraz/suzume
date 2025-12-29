@@ -109,6 +109,42 @@
         {"surface": "ない", "pos": "Auxiliary"}
       ],
       "tags": ["regression", "copula", "denai"]
+    },
+    {
+      "id": "copula_demonai_kanojo",
+      "description": "彼女でもない - particle も + ない, not verb もなう",
+      "input": "彼女でもない",
+      "expected": [
+        {"surface": "彼女", "pos": "Pronoun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "も", "pos": "Particle"},
+        {"surface": "ない", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "copula", "demonai", "T37"]
+    },
+    {
+      "id": "copula_demonai_sore",
+      "description": "それでもない - particle も + ない pattern",
+      "input": "それでもない",
+      "expected": [
+        {"surface": "それ", "pos": "Pronoun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "も", "pos": "Particle"},
+        {"surface": "ない", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "copula", "demonai", "T37"]
+    },
+    {
+      "id": "copula_dewanai",
+      "description": "彼女ではない - particle は + ない pattern",
+      "input": "彼女ではない",
+      "expected": [
+        {"surface": "彼女", "pos": "Pronoun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "ない", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "copula", "dewanai", "T37"]
     }
   ]
 }

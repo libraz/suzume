@@ -13,7 +13,8 @@
       "id": "basic_verb_masu",
       "input": "食べます",
       "expected": [
-        {"surface": "食べます", "pos": "Verb", "lemma": "食べる"}
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["basic", "verb", "polite"]
     },

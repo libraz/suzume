@@ -110,6 +110,9 @@ ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
 ConnectionRuleResult checkMitaiAfterNounOrVerb(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next);
 
+ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next);
+
 // =============================================================================
 // Other Connection Rules (connection_rules_other.cpp)
 // =============================================================================

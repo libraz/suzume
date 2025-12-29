@@ -84,10 +84,11 @@
     },
     {
       "id": "ichidan_taberu_tai",
-      "description": "Ichidan verb 食べる desiderative form",
+      "description": "Ichidan verb 食べる desiderative form (split: verb + aux)",
       "input": "食べたい",
       "expected": [
-        {"surface": "食べたい", "pos": "Verb", "lemma": "食べる"}
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "たい", "pos": "Auxiliary", "lemma": "たい"}
       ],
       "tags": ["verb", "ichidan"]
     },
@@ -102,12 +103,11 @@
     },
     {
       "id": "compound_tabe_hajimeru",
-      "description": "Compound verb 食べ始める",
+      "description": "Compound verb 食べ始める (split: verb renyokei + verb)",
       "input": "食べ始める",
       "expected": [
-        {"surface": "食", "pos": "Noun"},
-        {"surface": "べ", "pos": "Other"},
-        {"surface": "始める", "pos": "Verb"}
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "始める", "pos": "Verb", "lemma": "始める"}
       ],
       "tags": ["verb", "compound"]
     },
@@ -142,7 +142,7 @@
     },
     {
       "id": "multi_verb_sequential",
-      "description": "Sequential verb actions",
+      "description": "Sequential verb actions - te/ta-form unified",
       "input": "起きて朝ご飯を食べた",
       "expected": [
         {"surface": "起きて", "pos": "Verb", "lemma": "起きる"},

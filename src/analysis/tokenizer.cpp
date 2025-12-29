@@ -12,6 +12,7 @@
 #include "analysis/tokenizer.h"
 
 #include "core/debug.h"
+#include "core/utf8_constants.h"
 #include "join_candidates.h"
 #include "split_candidates.h"
 #include "tokenizer_utils.h"
@@ -167,9 +168,9 @@ void Tokenizer::addUnknownCandidates(
     if (!skip_penalty && candidate.pos == core::PartOfSpeech::Verb) {
       // Check if surface ends with colloquial contraction patterns
       std::string_view surface = candidate.surface;
-      if ((surface.size() >= 9 && surface.substr(surface.size() - 9) == "っとく") ||
-          (surface.size() >= 12 && surface.substr(surface.size() - 12) == "っちゃう") ||
-          (surface.size() >= 12 && surface.substr(surface.size() - 12) == "っじゃう")) {
+      if ((surface.size() >= core::kThreeJapaneseCharBytes && surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "っとく") ||
+          (surface.size() >= core::kFourJapaneseCharBytes && surface.substr(surface.size() - core::kFourJapaneseCharBytes) == "っちゃう") ||
+          (surface.size() >= core::kFourJapaneseCharBytes && surface.substr(surface.size() - core::kFourJapaneseCharBytes) == "っじゃう")) {
         skip_penalty = true;
       }
     }

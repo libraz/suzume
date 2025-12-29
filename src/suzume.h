@@ -11,6 +11,7 @@
 #include "core/morpheme.h"
 #include "core/types.h"
 #include "dictionary/user_dict.h"
+#include "normalize/normalizer.h"
 #include "postprocess/tag_generator.h"
 
 namespace suzume {
@@ -23,6 +24,7 @@ struct SuzumeOptions {
   bool lemmatize = true;
   bool merge_compounds = false;
   postprocess::TagGeneratorOptions tag_options;
+  normalize::NormalizeOptions normalize_options;
 };
 
 /**

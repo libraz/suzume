@@ -5,6 +5,8 @@
 
 #include "char_patterns.h"
 
+#include <unordered_set>
+
 #include "core/utf8_constants.h"
 
 namespace suzume::grammar {
@@ -105,6 +107,96 @@ bool endsWithKanji(std::string_view stem) {
            (codepoint >= 0x3400 && codepoint <= 0x4DBF);
   }
   return false;
+}
+
+bool containsKanji(std::string_view stem) {
+  if (stem.empty()) {
+    return false;
+  }
+  size_t pos = 0;
+  while (pos + core::kJapaneseCharBytes <= stem.size()) {
+    const unsigned char* ptr =
+        reinterpret_cast<const unsigned char*>(stem.data() + pos);
+    if ((ptr[0] & 0xF0) == 0xE0) {
+      // 3-byte UTF-8 sequence
+      char32_t codepoint =
+          ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
+      // CJK Unified Ideographs: U+4E00-U+9FFF
+      // CJK Extension A: U+3400-U+4DBF
+      bool is_kanji = (codepoint >= 0x4E00 && codepoint <= 0x9FFF) ||
+                      (codepoint >= 0x3400 && codepoint <= 0x4DBF);
+      if (is_kanji) {
+        return true;
+      }
+      pos += core::kJapaneseCharBytes;
+    } else {
+      // Skip non-3-byte sequences
+      pos += 1;
+    }
+  }
+  return false;
+}
+
+bool containsKatakana(std::string_view stem) {
+  if (stem.empty()) {
+    return false;
+  }
+  size_t pos = 0;
+  while (pos + core::kJapaneseCharBytes <= stem.size()) {
+    const unsigned char* ptr =
+        reinterpret_cast<const unsigned char*>(stem.data() + pos);
+    if ((ptr[0] & 0xF0) == 0xE0) {
+      // 3-byte UTF-8 sequence
+      char32_t codepoint =
+          ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
+      // Katakana: U+30A0-U+30FF
+      // Katakana Phonetic Extensions: U+31F0-U+31FF
+      bool is_katakana = (codepoint >= 0x30A0 && codepoint <= 0x30FF) ||
+                         (codepoint >= 0x31F0 && codepoint <= 0x31FF);
+      if (is_katakana) {
+        return true;
+      }
+      pos += core::kJapaneseCharBytes;
+    } else {
+      // Skip non-3-byte sequences
+      pos += 1;
+    }
+  }
+  return false;
+}
+
+bool isPureHiragana(std::string_view stem) {
+  if (stem.empty()) {
+    return false;
+  }
+  size_t pos = 0;
+  while (pos < stem.size()) {
+    const unsigned char* ptr =
+        reinterpret_cast<const unsigned char*>(stem.data() + pos);
+    if ((ptr[0] & 0xF0) != 0xE0) {
+      return false;  // Not a 3-byte UTF-8 sequence (not hiragana)
+    }
+    char32_t codepoint =
+        ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
+    // Hiragana: U+3040-U+309F
+    bool is_hiragana = (codepoint >= 0x3040 && codepoint <= 0x309F);
+    if (!is_hiragana) {
+      return false;
+    }
+    pos += core::kJapaneseCharBytes;
+  }
+  return true;
+}
+
+bool isSmallKana(std::string_view ch) {
+  // Static set for O(1) lookup - initialized once
+  static const std::unordered_set<std::string_view> kSmallKana = {
+      // Hiragana small kana (拗音・促音)
+      "ょ", "ゃ", "ゅ", "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "っ",
+      // Katakana small kana
+      "ョ", "ャ", "ュ", "ァ", "ィ", "ゥ", "ェ", "ォ", "ッ"
+  };
+  return kSmallKana.count(ch) > 0;
 }
 
 }  // namespace suzume::grammar

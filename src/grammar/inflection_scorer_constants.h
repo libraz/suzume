@@ -203,6 +203,32 @@ constexpr float kBonusGodanSaSingleKanji = 0.10F;
 constexpr float kPenaltySuruSingleKanji = 0.15F;
 
 // =============================================================================
+// Single Hiragana Stem Particle Penalty
+// =============================================================================
+
+// Single-hiragana stem (も, は, が, etc.) in mizenkei context
+// These are common particles, not verb stems
+// E.g., もない → も(PARTICLE) + ない(AUX), not もる(VERB)
+constexpr float kPenaltyIchidanSingleHiraganaParticleStem = 0.45F;
+
+// Pure hiragana verb stems (multiple chars) are rare
+// Most real verbs have kanji stems or are in dictionary
+// E.g., もな(う), なまむ are not real verbs
+// Exception: some valid hiragana verbs like いる, ある are in dictionary
+constexpr float kPenaltyPureHiraganaStem = 0.35F;
+
+// Single-hiragana Godan stem penalty
+// E.g., まむ has stem ま which is not a real verb
+// Real verbs like み(る), き(る) are Ichidan, handled by dictionary
+constexpr float kPenaltyGodanSingleHiraganaStem = 0.40F;
+
+// Godan (non-Ra) pure hiragana multi-char stem penalty
+// Coined verbs use GodanRa (ググる, ディスる), never other types
+// Real Godan verbs are written in kanji (読む, 泳ぐ, 話す, etc.)
+// Pure hiragana stems like なま(む), まむ(ぐ) are almost never real
+constexpr float kPenaltyGodanNonRaPureHiraganaStem = 0.45F;
+
+// =============================================================================
 // Suru/Kuru Imperative Boost
 // =============================================================================
 
@@ -219,6 +245,48 @@ constexpr float kBonusSuruKuruImperative = 0.05F;
 // True ichidan volitional: 食べ + よう = 食べよう (e-row ending)
 // Godan volitional: 書 + こ + う = 書こう (o-row stem)
 constexpr float kPenaltyIchidanVolitionalGodanStem = 0.50F;
+
+// =============================================================================
+// Additional Inline Penalties (Extracted from inflection_scorer.cpp)
+// =============================================================================
+
+// Small kana (拗音) cannot start a verb stem - grammatically impossible
+// ょ, ゃ, ゅ, ぁ, ぃ, ぅ, ぇ, ぉ are always part of compound sounds
+constexpr float kPenaltySmallKanaStemInvalid = 1.0F;
+
+// Ichidan verbs do NOT have onbin (音便) forms
+// Ichidan te-form uses renyokei + て, Godan uses onbinkei + て/で
+constexpr float kPenaltyIchidanOnbinInvalid = 0.50F;
+
+// Ichidan stems ending in て as base form (来て→来てる) is usually wrong
+// Exception: 捨てる, 棄てる have legitimate て-ending stems
+constexpr float kPenaltyIchidanTeStemBaseInvalid = 0.50F;
+
+// All-kanji + で patterns are usually copula, not verb stems
+// e.g., 公園で = NOUN + copula, 嫌でない = 嫌 + で + ない
+constexpr float kPenaltyIchidanCopulaDePattern = 0.70F;
+
+// Ichidan stems cannot end in u-row hiragana (う, く, す, つ, etc.)
+// U-row endings are Godan dictionary forms (読む, 書く, 話す, etc.)
+constexpr float kPenaltyIchidanURowStemInvalid = 0.50F;
+
+// Single-kanji Ichidan stem with onbinkei context (侍で as Ichidan) is wrong
+constexpr float kPenaltyIchidanSingleKanjiOnbinInvalid = 0.60F;
+
+// Particle + な stem pattern for GodanWa (もな, はな, etc.)
+// These are likely PARTICLE + ない misparse
+constexpr float kPenaltyGodanWaParticleNaStem = 0.45F;
+
+// I-adjective stems ending with "づ" are invalid (verb onbin pattern)
+constexpr float kPenaltyIAdjZuStemInvalid = 0.50F;
+
+// Ichidan stem that looks like noun + い pattern in mizenkei context
+// 間違いない → 間違い(NOUN) + ない(AUX), not 間違いる(VERB)
+constexpr float kPenaltyIchidanNounIMizenkei = 0.30F;
+
+// Suru stems containing te-form markers (て/で) are invalid
+// E.g., "基づいて処理" should be verb te-form + noun
+constexpr float kPenaltySuruTeFormStemInvalid = 0.80F;
 
 }  // namespace suzume::grammar::inflection
 

@@ -486,18 +486,60 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"られなくなった", "られなくなった", "られる", kAuxReru, kAuxOutTa, kVerbMizenkei});
 
   // === Colloquial てしまう contractions ===
+  // Note: Connect to both kVerbOnbinkei (for Godan) and kVerbRenyokei (for Ichidan)
+  // because ちゃう replaces てしまう, and て connects to onbin for Godan but renyokei for Ichidan
+  // Godan: 書いちゃった = 書い (onbin) + ちゃった
+  // Ichidan: 食べちゃった = 食べ (renyokei) + ちゃった
   entries.push_back({"ちゃう", "ちゃう", "しまう", kAuxTeshimau, kAuxOutBase, kVerbOnbinkei});
   entries.push_back({"ちゃった", "ちゃった", "しまう", kAuxTeshimau, kAuxOutTa, kVerbOnbinkei});
   entries.push_back({"ちゃって", "ちゃって", "しまう", kAuxTeshimau, kAuxOutTe, kVerbOnbinkei});
   entries.push_back({"じゃう", "じゃう", "しまう", kAuxTeshimau, kAuxOutBase, kVerbOnbinkei});
   entries.push_back({"じゃった", "じゃった", "しまう", kAuxTeshimau, kAuxOutTa, kVerbOnbinkei});
   entries.push_back({"じゃって", "じゃって", "しまう", kAuxTeshimau, kAuxOutTe, kVerbOnbinkei});
+  // Renyokei versions for Ichidan verbs (ちゃう only, not じゃう)
+  // じゃう is for Godan voiced onbin (読んで→読んじゃ), not Ichidan
+  // Ichidan uses unvoiced て (食べて→食べちゃ)
+  entries.push_back({"ちゃう", "ちゃう", "しまう", kAuxTeshimau, kAuxOutBase, kVerbRenyokei});
+  entries.push_back({"ちゃった", "ちゃった", "しまう", kAuxTeshimau, kAuxOutTa, kVerbRenyokei});
+  entries.push_back({"ちゃって", "ちゃって", "しまう", kAuxTeshimau, kAuxOutTe, kVerbRenyokei});
 
   // === Colloquial ておく contraction ===
   // やっとく, 見とく - connects to 音便形 (like ちゃう/じゃう)
   entries.push_back({"とく", "とく", "おく", kAuxTeoku, kAuxOutBase, kVerbOnbinkei});
   entries.push_back({"といた", "といた", "おく", kAuxTeoku, kAuxOutTa, kVerbOnbinkei});
   entries.push_back({"といて", "といて", "おく", kAuxTeoku, kAuxOutTe, kVerbOnbinkei});
+
+  // === Colloquial ている contraction (てる) ===
+  // してる, 食べてる, 見てる - contracts ている to てる
+  // These connect after te-form verbs (kAuxOutTe)
+  entries.push_back({"てる", "てる", "いる", kAuxTeiru, kAuxOutBase, kAuxOutTe});
+  entries.push_back({"てた", "てた", "いる", kAuxTeiru, kAuxOutTa, kAuxOutTe});
+  entries.push_back({"てて", "てて", "いる", kAuxTeiru, kAuxOutTe, kAuxOutTe});
+  entries.push_back({"てない", "てない", "いる", kAuxTeiru, kAuxOutBase, kAuxOutTe});
+  entries.push_back({"てなかった", "てなかった", "いる", kAuxTeiru, kAuxOutTa, kAuxOutTe});
+  // Ichidan renyokei versions: 見てた = 見(renyokei) + てた
+  // The て is part of the contracted aux, not a separate particle
+  entries.push_back({"てる", "てる", "いる", kAuxTeiru, kAuxOutBase, kVerbRenyokei});
+  entries.push_back({"てた", "てた", "いる", kAuxTeiru, kAuxOutTa, kVerbRenyokei});
+  entries.push_back({"てない", "てない", "いる", kAuxTeiru, kAuxOutBase, kVerbRenyokei});
+  // でる/でた for voiced te-form (読んでる, 遊んでた)
+  entries.push_back({"でる", "でる", "いる", kAuxTeiru, kAuxOutBase, kAuxOutTe});
+  entries.push_back({"でた", "でた", "いる", kAuxTeiru, kAuxOutTa, kAuxOutTe});
+  entries.push_back({"でて", "でて", "いる", kAuxTeiru, kAuxOutTe, kAuxOutTe});
+  entries.push_back({"でない", "でない", "いる", kAuxTeiru, kAuxOutBase, kAuxOutTe});
+  entries.push_back({"でなかった", "でなかった", "いる", kAuxTeiru, kAuxOutTa, kAuxOutTe});
+  // Godan onbin versions: 読んでた = 読ん(onbin) + でた
+  entries.push_back({"でる", "でる", "いる", kAuxTeiru, kAuxOutBase, kVerbOnbinkei});
+  entries.push_back({"でた", "でた", "いる", kAuxTeiru, kAuxOutTa, kVerbOnbinkei});
+  entries.push_back({"でない", "でない", "いる", kAuxTeiru, kAuxOutBase, kVerbOnbinkei});
+
+  // === Suru-verb specific ている contractions ===
+  // してる = し + ている contraction, full patterns for suru-verbs
+  // Note: These use empty stem (stem="") for suru-verb matching
+  entries.push_back({"してる", "してる", "いる", kAuxTeiru, kAuxOutBase, kVerbOnbinkei});
+  entries.push_back({"してた", "してた", "いる", kAuxTeiru, kAuxOutTa, kVerbOnbinkei});
+  entries.push_back({"してない", "してない", "いる", kAuxTeiru, kAuxOutBase, kVerbOnbinkei});
+  entries.push_back({"してなかった", "してなかった", "いる", kAuxTeiru, kAuxOutTa, kVerbOnbinkei});
 
   // === Polite forms ===
   entries.push_back({"おる", "おる", "おる", kAuxTeiru, kAuxOutBase, kAuxOutTe});

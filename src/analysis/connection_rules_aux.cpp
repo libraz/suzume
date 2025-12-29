@@ -8,9 +8,20 @@ namespace connection_rules {
 // =============================================================================
 
 bool isIruAuxiliary(std::string_view surface) {
-  return surface == "いる" || surface == "います" || surface == "いました" ||
-         surface == "いません" || surface == "いない" ||
-         surface == "いなかった" || surface == "いれば";
+  // Full forms
+  if (surface == "いる" || surface == "います" || surface == "いました" ||
+      surface == "いません" || surface == "いない" ||
+      surface == "いなかった" || surface == "いれば") {
+    return true;
+  }
+  // Contracted forms (てる/でる = ている contraction)
+  if (surface == "てる" || surface == "てた" || surface == "てて" ||
+      surface == "てない" || surface == "てなかった" ||
+      surface == "でる" || surface == "でた" || surface == "でて" ||
+      surface == "でない" || surface == "でなかった") {
+    return true;
+  }
+  return false;
 }
 
 bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma) {
@@ -80,6 +91,42 @@ ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
           "te-form verb + iru aux (progressive)"};
 }
 
+// Rule 17: Te-form VERB + invalid single-char AUX penalty
+// Single-character AUX like "る" after te-form is usually wrong
+// E.g., "してる" should NOT be split as "して" + "る"
+// Valid single-char patterns: only when part of proper iru contraction
+ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  // Check if prev ends with te-form (て or で)
+  if (prev.surface.size() < core::kJapaneseCharBytes) {
+    return {};
+  }
+  std::string_view last_char = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
+  if (last_char != "て" && last_char != "で") {
+    return {};
+  }
+
+  // Check if next is single-character hiragana AUX that's NOT valid iru auxiliary
+  if (next.surface.size() == core::kJapaneseCharBytes) {
+    // Single-character auxiliary after te-form
+    // Only valid patterns: part of contracted forms handled elsewhere
+    // Invalid: standalone "る", "た" that should be part of てる/てた
+    // Only penalize "る" - it should be part of てる contraction
+    // "た" is valid past tense marker (食べた, 行った)
+    if (next.surface == "る") {
+      return {ConnectionPattern::InvalidTeFormAux, 5.0F,
+              "invalid single-char aux after te-form"};
+    }
+  }
+
+  return {};
+}
+
 // Rule 13: AUX(ません形) + で(PARTICLE) split penalty
 // Prevents ございません + で + した from being preferred over ございません + でした
 // The で after negative polite forms should be part of でした (copula past)
@@ -95,11 +142,11 @@ ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
   }
 
   // Check if prev ends with ません (negative polite form)
-  // UTF-8: ません = 9 bytes
-  if (prev.surface.size() < 9) {
+  // UTF-8: ません = 9 bytes (3 hiragana chars)
+  if (prev.surface.size() < core::kThreeJapaneseCharBytes) {
     return {};
   }
-  std::string_view last9 = prev.surface.substr(prev.surface.size() - 9);
+  std::string_view last9 = prev.surface.substr(prev.surface.size() - core::kThreeJapaneseCharBytes);
   if (last9 != "ません") {
     return {};
   }

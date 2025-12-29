@@ -86,6 +86,29 @@ bool isNeverVerbStemAtStart(char32_t ch);
  */
 bool isDemonstrativeStart(char32_t first, char32_t second);
 
+/**
+ * @brief Check if character is never an adjective stem after kanji
+ *
+ * In patterns like 漢字+ひらがな, these characters indicate a particle
+ * follows rather than an adjective conjugation.
+ * Includes isNeverVerbStemAfterKanji + て, で (te-form particles)
+ *
+ * @param ch Unicode codepoint
+ * @return true if character cannot start an adjective stem after kanji
+ */
+bool isNeverAdjectiveStemAfterKanji(char32_t ch);
+
+/**
+ * @brief Check if character is a sentence-final or common particle
+ *
+ * Extended particle check including common particles and sentence-final particles.
+ * Includes: を, が, は, に, へ, の, か, ね, よ, わ, で, と, も
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is an extended particle
+ */
+bool isExtendedParticle(char32_t ch);
+
 }  // namespace suzume::normalize
 
 #endif  // SUZUME_NORMALIZE_CHAR_TYPE_H_

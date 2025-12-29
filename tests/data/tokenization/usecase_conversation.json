@@ -216,15 +216,15 @@
     },
     {
       "id": "shop_quantity",
+      "description": "Counter expression 3つ + ください - ください as aux",
       "input": "これを3つください",
       "expected": [
         {"surface": "これ", "pos": "Pronoun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "3", "pos": "Noun"},
-        {"surface": "つく", "pos": "Verb"},
-        {"surface": "ださい", "pos": "Adjective"}
+        {"surface": "3つ", "pos": "Noun"},
+        {"surface": "ください", "pos": "Auxiliary", "lemma": "ください"}
       ],
-      "tags": ["shopping"]
+      "tags": ["shopping", "counter"]
     },
     {
       "id": "shop_bag",
@@ -315,15 +315,17 @@
     },
     {
       "id": "travel_delay",
+      "description": "Formal ております pattern - おります as verb",
       "input": "電車が10分ほど遅れております",
       "expected": [
         {"surface": "電車", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "10分", "pos": "Noun"},
         {"surface": "ほど", "pos": "Particle"},
-        {"surface": "遅れております", "pos": "Verb", "lemma": "遅れる"}
+        {"surface": "遅れて", "pos": "Verb", "lemma": "遅れる"},
+        {"surface": "おります", "pos": "Verb", "lemma": "おる"}
       ],
-      "tags": ["travel"]
+      "tags": ["travel", "formal"]
     },
     {
       "id": "travel_platform",

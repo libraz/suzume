@@ -1,65 +1,83 @@
 # Suzume
 
-A lightweight Japanese tokenizer that runs in browsers and Node.js.
+**Japanese Tokenizer That Actually Works in the Browser**
 
-> **Note:** Suzume is not a general-purpose morphological analyzer like MeCab.
-> It is designed for unknown word handling, search indexing, and client-side use.
+Tired of MeCab's 50MB dictionary? Suzume brings lightweight Japanese tokenization to the frontend — under 250KB gzipped, no server required.
+
+> **Suzume is not a dictionary-based morphological analyzer.**
+> It is a lightweight, feature-driven tokenizer designed for real-world Japanese text on the web.
+
+📖 **[Documentation](https://suzume.libraz.net)** · 🎮 **[Live Demo](https://suzume.libraz.net/#demo)**
 
 ## Why Suzume?
 
-**Works without a large dictionary.** Most analyzers break down when they encounter unknown words. Suzume treats unknown words as normal—it generates candidates from character patterns and lets Viterbi pick the best path.
+| | MeCab / Sudachi | Suzume |
+|---|-----------------|--------|
+| **Design Goal** | Linguistic accuracy | Frontend stability |
+| **Size** | 50MB+ dictionary | < 250KB gzipped |
+| **Runtime** | Server-side | Browser + Node.js + Native |
+| **Unknown Words** | May break | Robust by design |
 
-**Runs anywhere.** No ICU, no Boost, no external dependencies. The same code runs natively or as WebAssembly in your browser.
+> Suzume is designed for frontend and edge environments, where large dictionaries and server-side processing are not viable.
 
-**Grows with your dictionary.** Start with minimal entries, add words as needed. The analyzer improves naturally without retraining or rebuilding connection tables.
+### Key Features
 
-| Traditional Analyzers | Suzume |
-|----------------------|--------|
-| Breaks on unknown words | Handles them gracefully |
-| Requires large dictionaries | Works with minimal dictionary |
-| Native runtime only | Browser + Node.js + Native |
-| Complex setup | `npm install @libraz/suzume` |
+- 🚫 **No Dictionary Hell** — Forget about managing 50MB+ dictionary files
+- 🖥️ **True Client-Side** — Runs 100% in the browser, no API calls
+- 🔮 **Robust to Unknown Words** — Designed to not break on new or noisy input
+- ⚡ **Production Ready** — C++ compiled to WASM, TypeScript support
+
+## What Suzume is NOT
+
+- Not a full morphological analyzer like MeCab or Sudachi
+- Not a replacement for dictionary-based NLP pipelines
+- Not designed for deep linguistic or grammatical analysis
+
+If you need academic-grade linguistic analysis, use MeCab or Sudachi. Suzume is for when you need **stable tokenization in constrained environments**.
 
 ## Installation
-
-### npm (Browser / Node.js)
 
 ```bash
 npm install @libraz/suzume
 ```
 
-### Build from Source (C++)
-
+Or use yarn/pnpm/bun:
 ```bash
-make          # Build
-make test     # Run tests
+yarn add @libraz/suzume
+pnpm add @libraz/suzume
+bun add @libraz/suzume
 ```
-
-Requirements: C++17 compiler, CMake 3.15+
 
 ## Quick Start
 
 ### JavaScript / TypeScript
 
 ```typescript
-import { Suzume } from '@libraz/suzume';
+import { Suzume } from '@libraz/suzume'
 
-const suzume = await Suzume.create();
+const suzume = await Suzume.create()
 
-// Morphological analysis
-const result = suzume.analyze('すもももももももものうち');
-for (const m of result) {
-  console.log(`${m.surface}\t${m.pos}\t${m.baseForm}`);
+const tokens = suzume.analyze('すもももももももものうち')
+for (const t of tokens) {
+  console.log(`${t.surface} [${t.posJa}]`)
 }
 
 // Tag extraction
-const tags = suzume.generateTags('東京スカイツリーに行きました');
-console.log(tags); // ['東京', 'スカイツリー', ...]
+const tags = suzume.generateTags('東京スカイツリーに行きました')
+console.log(tags) // ['東京', 'スカイツリー']
 
-// Add custom words (CSV: surface,pos,cost,lemma)
-suzume.loadUserDictionary('スカイツリー,NOUN');
+suzume.destroy()
+```
 
-suzume.destroy();
+### Browser (CDN)
+
+```html
+<script type="module">
+  import { Suzume } from 'https://esm.sh/@libraz/suzume'
+
+  const suzume = await Suzume.create()
+  console.log(suzume.analyze('こんにちは'))
+</script>
 ```
 
 ### C++
@@ -67,88 +85,36 @@ suzume.destroy();
 ```cpp
 #include "suzume.h"
 
-suzume::Suzume analyzer;
-auto result = analyzer.analyze("私は東京に住んでいます");
+suzume::Suzume tokenizer;
+auto tokens = tokenizer.analyze("東京に行きました");
 
-for (const auto& m : result) {
-    std::cout << m.surface << "\t" << m.lemma << std::endl;
+for (const auto& t : tokens) {
+    std::cout << t.surface << "\t" << t.lemma << std::endl;
 }
 ```
 
-### CLI
+Build from source (requires C++17, CMake 3.15+):
 
 ```bash
-suzume-cli "私は東京に住んでいます"
-suzume-cli analyze -f json "テキスト"    # JSON output
-suzume-cli analyze -f chasen "テキスト"  # ChaSen format
-suzume-cli -i                            # Interactive mode
+make          # Build
+make test     # Run tests
 ```
 
-## Features
+## Documentation
 
-- **800+ verb conjugation patterns** — Godan, Ichidan, Suru, Kuru, and compound forms
-- **Pre-tokenizer** — Preserves URLs, emails, dates, and numbers as single tokens
-- **User dictionary** — Add domain-specific terms at runtime
-- **Multiple output formats** — JSON, TSV, ChaSen-compatible
+Full documentation is available at **[suzume.libraz.net](https://suzume.libraz.net)**:
+
+- [Getting Started](https://suzume.libraz.net/docs/getting-started) — Installation and basic usage
+- [API Reference](https://suzume.libraz.net/docs/api) — Complete API documentation
+- [User Dictionary](https://suzume.libraz.net/docs/user-dictionary) — Adding custom words
+- [How It Works](https://suzume.libraz.net/docs/how-it-works) — Technical deep-dive
 
 ## Use Cases
 
-- Search index generation
-- Tag extraction for classification
-- Web apps with client-side Japanese processing
-- Domains with lots of neologisms and proper nouns
-
-## Design Philosophy
-
-Traditional analyzers (MeCab, ChaSen, etc.) treat dictionary entries as ground truth and unknown words as failures. This works for well-resourced domains like news articles, but breaks down for:
-
-- User-generated content with neologisms
-- Domain-specific terminology
-- Lightweight environments (WASM, embedded)
-
-Suzume takes a different approach:
-
-**Dictionary as feature, not answer.** Dictionary matches add confidence but aren't required. The analyzer generates candidates from character patterns (kanji runs, katakana sequences, alphanumeric compounds) and evaluates them alongside dictionary entries.
-
-**Non-incremental tokenization.** Instead of making greedy left-to-right decisions, Suzume builds a lattice of all possible segmentations and uses Viterbi to find the globally optimal path.
-
-**No connection table dependency.** Traditional analyzers rely on massive POS transition matrices. Suzume uses lightweight surface features and POS bigrams, making it portable and robust to dictionary changes.
-
-## Dictionary
-
-```
-data/
-├── core/           # Source TSV files
-├── user/           # User TSV files
-├── core.dic        # Compiled dictionary (auto-loaded)
-└── user.dic        # User dictionary (auto-loaded)
-```
-
-**TSV format** (tab-separated): `surface	pos	reading	cost	conj_type`
-**CSV format** (comma-separated): `surface,pos,cost,lemma`
-
-Minimum required fields: `surface,pos`
-
-Auto-load search order: `$SUZUME_DATA_DIR` → `./data/` → `~/.suzume/` → `/usr/local/share/suzume/`
-
-```bash
-# Compile TSV to binary
-suzume-cli dict compile user.tsv user.dic
-```
-
-## Project Structure
-
-```
-suzume/
-├── src/                   # C++ source
-│   ├── suzume.h/cpp       # Public API
-│   ├── suzume_c.h/cpp     # C API for WASM
-│   └── ...
-├── js/                    # TypeScript wrapper
-├── dist/                  # WASM build output
-├── data/                  # Dictionary files
-└── tests/                 # Unit tests
-```
+- **Search indexing** — Tokenize text for full-text search
+- **Tag extraction** — Generate keywords for classification
+- **Browser apps** — Client-side Japanese processing without a server
+- **User-generated content** — Stable tokenization for noisy input
 
 ## License
 
@@ -156,8 +122,8 @@ suzume/
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit issues and pull requests.
+Contributions welcome! Please submit issues and pull requests on GitHub.
 
-## Authors
+## Author
 
-- libraz <libraz@libraz.net>
+libraz <libraz@libraz.net>

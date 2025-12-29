@@ -9,7 +9,7 @@ namespace suzume::analysis {
 
 Analyzer::Analyzer(const AnalyzerOptions& options)
     : options_(options),
-      normalizer_(),
+      normalizer_(options.normalize_options),
       pretokenizer_(),
       scorer_(options.scorer_options),
       unknown_gen_(options.unknown_options, &dict_manager_),

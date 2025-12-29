@@ -1,7 +1,9 @@
 #include "suzume.h"
 
 #include <cstdlib>
+#ifndef __EMSCRIPTEN__
 #include <filesystem>
+#endif
 #include <vector>
 
 #include "analysis/analyzer.h"
@@ -14,6 +16,12 @@ namespace suzume {
 
 namespace {
 
+#ifdef __EMSCRIPTEN__
+// WASM: Use embedded dictionary paths directly (Emscripten VFS)
+std::string findDictionary(const std::string& filename) {
+  return "/data/" + filename;
+}
+#else
 namespace fs = std::filesystem;
 
 /**
@@ -56,6 +64,7 @@ std::string findDictionary(const std::string& filename) {
   }
   return "";
 }
+#endif  // __EMSCRIPTEN__
 
 }  // namespace
 
@@ -68,7 +77,7 @@ struct Suzume::Impl {
 
   Impl(const SuzumeOptions& opts)
       : options(opts),
-        analyzer(analysis::AnalyzerOptions{opts.mode, {}, {}}),
+        analyzer(analysis::AnalyzerOptions{opts.mode, {}, {}, opts.normalize_options}),
         postprocessor(&analyzer.dictionaryManager()),
         tag_generator(opts.tag_options) {
     // Auto-load core.dic if found (binary format)

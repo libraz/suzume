@@ -67,10 +67,11 @@
     },
     {
       "id": "masu_kakunin_shimasu",
-      "description": "Suru verb 確認します polite form",
+      "description": "Suru verb 確認します polite form - MeCab互換分割",
       "input": "確認します",
       "expected": [
-        {"surface": "確認します", "pos": "Verb", "lemma": "確認する"}
+        {"surface": "確認し", "pos": "Verb", "lemma": "確認する"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["suru", "polite"]
     },

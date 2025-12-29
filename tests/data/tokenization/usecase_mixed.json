@@ -340,13 +340,12 @@
     },
     {
       "id": "number_text_effort",
-      "description": "Text after emoji context",
+      "description": "Volitional form 頑張ろう as single verb",
       "input": "今日も頑張ろう",
       "expected": [
         {"surface": "今日", "pos": "Noun"},
         {"surface": "も", "pos": "Particle"},
-        {"surface": "頑張", "pos": "Noun"},
-        {"surface": "ろう", "pos": "Auxiliary"}
+        {"surface": "頑張ろう", "pos": "Verb", "lemma": "頑張る"}
       ],
       "tags": ["number_special"]
     },

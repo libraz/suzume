@@ -139,4 +139,20 @@ bool isDemonstrativeStart(char32_t first, char32_t second) {
          (second == U'れ' || second == U'こ' || second == U'ち');
 }
 
+bool isNeverAdjectiveStemAfterKanji(char32_t ch) {
+  // Common particles + も, や + て, で (te-form particles)
+  // て/で indicate te-form patterns (食べている), not adjective stems
+  return isNeverVerbStemAfterKanji(ch) || ch == U'て' || ch == U'で';
+}
+
+bool isExtendedParticle(char32_t ch) {
+  // Extended particle check for various contexts
+  // Common particles: を, が, は, に, へ, の
+  // Sentence-final: か, ね, よ, わ
+  // Additional: で, と, も
+  return isCommonParticle(ch) || ch == U'か' || ch == U'ね' ||
+         ch == U'よ' || ch == U'わ' || ch == U'で' ||
+         ch == U'と' || ch == U'も';
+}
+
 }  // namespace suzume::normalize

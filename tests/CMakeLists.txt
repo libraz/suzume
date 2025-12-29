@@ -33,6 +33,8 @@ set(TEST_SOURCES
   dictionary/double_array_test.cpp
   dictionary/binary_dict_test.cpp
   dictionary/core_dict_test.cpp
+  dictionary/user_dict_test.cpp
+  grammar/conjugation_test.cpp
   grammar/inflection_basic_test.cpp
   grammar/inflection_potential_test.cpp
   grammar/inflection_compound_test.cpp
@@ -45,6 +47,7 @@ set(TEST_SOURCES
   pretokenizer/pretokenizer_text_test.cpp
   analysis/connection_rules_test.cpp
   output/japanese_format_test.cpp
+  postprocess/tag_generator_test.cpp
   integration/data_driven_sample_test.cpp
   integration/regression_copula_test.cpp
   integration/regression_particle_test.cpp

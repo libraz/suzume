@@ -401,6 +401,109 @@ TEST_F(NormalizerTest, ExtendedChar_RomanNumerals) {
   ASSERT_TRUE(core::isSuccess(result));
 }
 
+// ===== Normalization Options Tests =====
+
+TEST(NormalizerOptionsTest, PreserveVu_Default) {
+  // Default: ヴ→ブ conversion enabled
+  Normalizer normalizer;
+  auto result = normalizer.normalize("ヴィトン");
+  ASSERT_TRUE(core::isSuccess(result));
+  EXPECT_EQ(std::get<std::string>(result), "ビトン");
+}
+
+TEST(NormalizerOptionsTest, PreserveVu_Enabled) {
+  // With preserve_vu: ヴ is kept as-is
+  NormalizeOptions opts;
+  opts.preserve_vu = true;
+  Normalizer normalizer(opts);
+  auto result = normalizer.normalize("ヴィトン");
+  ASSERT_TRUE(core::isSuccess(result));
+  EXPECT_EQ(std::get<std::string>(result), "ヴィトン");
+}
+
+TEST(NormalizerOptionsTest, PreserveVu_LouisVuitton) {
+  NormalizeOptions opts;
+  opts.preserve_vu = true;
+  Normalizer normalizer(opts);
+  auto result = normalizer.normalize("ルイ・ヴィトン");
+  ASSERT_TRUE(core::isSuccess(result));
+  EXPECT_EQ(std::get<std::string>(result), "ルイ・ヴィトン");
+}
+
+TEST(NormalizerOptionsTest, PreserveVu_MixedText) {
+  NormalizeOptions opts;
+  opts.preserve_vu = true;
+  Normalizer normalizer(opts);
+  auto result = normalizer.normalize("ヴァイオリンとピアノ");
+  ASSERT_TRUE(core::isSuccess(result));
+  EXPECT_EQ(std::get<std::string>(result), "ヴァイオリンとピアノ");
+}
+
+TEST(NormalizerOptionsTest, PreserveCase_Default) {
+  // Default: uppercase→lowercase conversion enabled
+  Normalizer normalizer;
+  auto result = normalizer.normalize("Hello World");
+  ASSERT_TRUE(core::isSuccess(result));
+  EXPECT_EQ(std::get<std::string>(result), "hello world");
+}
+
+TEST(NormalizerOptionsTest, PreserveCase_Enabled) {
+  // With preserve_case: case is kept as-is
+  NormalizeOptions opts;
+  opts.preserve_case = true;
+  Normalizer normalizer(opts);
+  auto result = normalizer.normalize("Hello World");
+  ASSERT_TRUE(core::isSuccess(result));
+  EXPECT_EQ(std::get<std::string>(result), "Hello World");
+}
+
+TEST(NormalizerOptionsTest, PreserveCase_FullwidthAlpha) {
+  NormalizeOptions opts;
+  opts.preserve_case = true;
+  Normalizer normalizer(opts);
+  auto result = normalizer.normalize("ＡＢＣＤＥＦ");
+  ASSERT_TRUE(core::isSuccess(result));
+  EXPECT_EQ(std::get<std::string>(result), "ABCDEF");
+}
+
+TEST(NormalizerOptionsTest, PreserveCase_MixedJapaneseEnglish) {
+  NormalizeOptions opts;
+  opts.preserve_case = true;
+  Normalizer normalizer(opts);
+  auto result = normalizer.normalize("Tokyo Tower");
+  ASSERT_TRUE(core::isSuccess(result));
+  EXPECT_EQ(std::get<std::string>(result), "Tokyo Tower");
+}
+
+TEST(NormalizerOptionsTest, BothOptionsEnabled) {
+  NormalizeOptions opts;
+  opts.preserve_vu = true;
+  opts.preserve_case = true;
+  Normalizer normalizer(opts);
+  auto result = normalizer.normalize("LOUIS VUITTONのヴァッグ");
+  ASSERT_TRUE(core::isSuccess(result));
+  EXPECT_EQ(std::get<std::string>(result), "LOUIS VUITTONのヴァッグ");
+}
+
+TEST(NormalizerOptionsTest, SetOptionsAfterConstruction) {
+  Normalizer normalizer;
+
+  // Default behavior
+  auto result1 = normalizer.normalize("Hello");
+  ASSERT_TRUE(core::isSuccess(result1));
+  EXPECT_EQ(std::get<std::string>(result1), "hello");
+
+  // Change options
+  NormalizeOptions opts;
+  opts.preserve_case = true;
+  normalizer.setOptions(opts);
+
+  // New behavior
+  auto result2 = normalizer.normalize("Hello");
+  ASSERT_TRUE(core::isSuccess(result2));
+  EXPECT_EQ(std::get<std::string>(result2), "Hello");
+}
+
 // ===== Error Handling Tests =====
 
 TEST_F(NormalizerTest, ErrorHandling_InvalidUtf8) {

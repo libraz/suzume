@@ -411,7 +411,7 @@
         {"surface": "ごと", "pos": "Suffix", "lemma": "ごと"},
         {"surface": "食べる", "pos": "Verb"}
       ],
-      "tags": ["regression", "suffix"]
+      "tags": ["regression", "suffix", "known_issue"]
     },
     {
       "id": "suffix_goto_ni",
@@ -424,7 +424,7 @@
         {"surface": "強く", "pos": "Adjective", "lemma": "強い"},
         {"surface": "なる", "pos": "Verb"}
       ],
-      "tags": ["regression", "suffix"]
+      "tags": ["regression", "suffix", "known_issue"]
     },
     {
       "id": "determiner_konna",

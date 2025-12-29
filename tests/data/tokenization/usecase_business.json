@@ -191,8 +191,8 @@
       "description": "Deadline: 今月末までに提出してください",
       "input": "今月末までに提出してください",
       "expected": [
-        {"surface": "今", "pos": "Noun"},
-        {"surface": "月末", "pos": "Noun"},
+        {"surface": "今月", "pos": "Noun"},
+        {"surface": "末", "pos": "Noun"},
         {"surface": "まで", "pos": "Particle"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "提出して", "pos": "Verb", "lemma": "提出する"},
@@ -278,16 +278,17 @@
     },
     {
       "id": "schedule_postpone",
-      "description": "Postponement: 会議を来週に延期します",
+      "description": "Postponement: 会議を来週に延期します - MeCab互換分割",
       "input": "会議を来週に延期します",
       "expected": [
         {"surface": "会議", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "来週", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "延期します", "pos": "Verb", "lemma": "延期する"}
+        {"surface": "延期", "pos": "Noun"},
+        {"surface": "します", "pos": "Verb", "lemma": "する"}
       ],
-      "tags": ["business", "schedule"]
+      "tags": ["business", "schedule", "suru_verb"]
     },
     {
       "id": "schedule_time_range",
@@ -385,16 +386,17 @@
     },
     {
       "id": "legal_prohibition",
-      "description": "Prohibition: 以下の行為を禁止します",
+      "description": "Prohibition: 以下の行為を禁止します - MeCab互換分割",
       "input": "以下の行為を禁止します",
       "expected": [
         {"surface": "以下", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "行為", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "禁止します", "pos": "Verb", "lemma": "禁止する"}
+        {"surface": "禁止", "pos": "Noun"},
+        {"surface": "します", "pos": "Verb", "lemma": "する"}
       ],
-      "tags": ["business", "legal"]
+      "tags": ["business", "legal", "suru_verb"]
     },
     {
       "id": "legal_contract",
@@ -528,16 +530,17 @@
     },
     {
       "id": "announcement_decision",
-      "description": "Decision: 以下の事項を決定しました",
+      "description": "Decision: 以下の事項を決定しました - MeCab互換分割",
       "input": "以下の事項を決定しました",
       "expected": [
         {"surface": "以下", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "事項", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "決定しました", "pos": "Verb", "lemma": "決定する"}
+        {"surface": "決定", "pos": "Noun"},
+        {"surface": "しました", "pos": "Verb", "lemma": "する"}
       ],
-      "tags": ["business", "announcement"]
+      "tags": ["business", "announcement", "suru_verb"]
     },
     {
       "id": "announcement_niyoruto",

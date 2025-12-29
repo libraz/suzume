@@ -103,7 +103,8 @@ enum class ConnectionPattern {
   NounBeforeVerbAux,       // NOUN → verb-specific AUX (invalid: 行き(NOUN) + ましょう)
   ParticleBeforeAux,       // PARTICLE → AUX (invalid: と + う should not happen)
   NounBeforeNaAdj,         // NOUN → みたい etc (valid: 猫みたい)
-  VerbBeforeNaAdj          // VERB → みたい etc (valid: 食べるみたい)
+  VerbBeforeNaAdj,         // VERB → みたい etc (valid: 食べるみたい)
+  InvalidTeFormAux         // テ形VERB → 無効単独AUX (e.g., して+る - should be してる)
 };
 
 /**

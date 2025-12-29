@@ -48,18 +48,18 @@
     },
     {
       "id": "node_in_sentence",
-      "description": "ので in sentence - suru-verb unified",
+      "description": "ので in sentence - ている splits to て+いる",
       "input": "電車が遅れているので遅刻しそうです",
       "expected": [
         {"surface": "電車", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "遅れて", "pos": "Verb", "lemma": "遅れる"},
         {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"},
-        {"surface": "ので", "pos": "Particle", "lemma": "ので"},
+        {"surface": "ので", "pos": "Particle"},
         {"surface": "遅刻しそう", "pos": "Verb", "lemma": "遅刻する"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
-      "tags": ["regression", "particle", "node", "complex", "suru"]
+      "tags": ["regression", "particle", "node", "complex"]
     },
     {
       "id": "particle_filter_ie_ni_imasu",

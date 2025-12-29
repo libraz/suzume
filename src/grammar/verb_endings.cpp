@@ -117,6 +117,9 @@ const std::vector<VerbEnding>& getVerbEndings() {
       // Empty suffix for suru-verb + passive/causative (開催+された → 開催する)
       // The さ is included in auxiliary patterns like された, させた
       {"", "する", VerbType::Suru, conn::kVerbMizenkei, false},
+      // Empty suffix for suru-verb + してる/してた contraction
+      // (勉強+してる → 勉強する, 勉強+してた → 勉強する)
+      {"", "する", VerbType::Suru, conn::kVerbOnbinkei, true},
       {"すれ", "する", VerbType::Suru, conn::kVerbKatei, false},   // すれば
       {"しろ", "する", VerbType::Suru, conn::kVerbMeireikei, false}, // Imperative: しろ
       {"せよ", "する", VerbType::Suru, conn::kVerbMeireikei, false}, // Imperative (classical): せよ

@@ -315,6 +315,34 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
           }
 
+          // Skip verb + dictionary auxiliary combinations (ます, ました, ましょう)
+          // e.g., "食べます" should split into "食べ" + "ます" (dictionary AUX)
+          // e.g., "読みます" should split into "読み" + "ます" (dictionary AUX)
+          // This prevents combined analysis from winning due to optimal_length bonus
+          // EXCEPTION: Don't skip suru-verb passive/causative patterns
+          // e.g., "開催されました" should be a single VERB token, not split
+          if (surface.size() >= core::kTwoJapaneseCharBytes) {  // At least 2 chars (stem) + 2 chars (aux)
+            // Check if surface ends with ます/ました/ましょう/ません
+            bool has_masu_aux = false;
+            if (surface.size() >= core::kFourJapaneseCharBytes && surface.substr(surface.size() - core::kFourJapaneseCharBytes) == "ましょう") {
+              has_masu_aux = true;
+            } else if (surface.size() >= core::kThreeJapaneseCharBytes &&
+                       (surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "ました" ||
+                        surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "ません")) {
+              has_masu_aux = true;
+            } else if (surface.size() >= core::kTwoJapaneseCharBytes && surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "ます") {
+              has_masu_aux = true;
+            }
+            // Don't skip suru-verb passive/causative patterns (され, させ)
+            // These should be recognized as single verb tokens
+            bool is_suru_passive_causative = (best.verb_type == grammar::VerbType::Suru &&
+                (surface.find("され") != std::string::npos ||
+                 surface.find("させ") != std::string::npos));
+            if (has_masu_aux && !is_suru_passive_causative) {
+              continue;  // Skip - let the split (verb + dictionary aux) win
+            }
+          }
+
           UnknownCandidate candidate;
           candidate.surface = surface;
           candidate.start = start_pos;
@@ -331,7 +359,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // BUT skip compound adjective patterns (verb renyoukei + にくい/やすい/がたい)
           // e.g., 使いにくい should be ADJECTIVE, not VERB
           bool is_compound_adj_pattern =
-              (surface.size() >= 12 &&  // At least 4 chars (e.g., 使いにくい = 5 chars = 15 bytes)
+              (surface.size() >= core::kFourJapaneseCharBytes &&  // At least 4 chars (e.g., 使いにくい = 5 chars = 15 bytes)
                (surface.find("にくい") != std::string::npos ||
                 surface.find("にくく") != std::string::npos ||
                 surface.find("にくか") != std::string::npos ||
@@ -372,6 +400,45 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           candidates.push_back(candidate);
           // Don't break - try other stem lengths too
         }
+      }
+    }
+  }
+
+  // Try Ichidan renyokei pattern: kanji + e-row hiragana (食べ, 見せ, 教え)
+  // These are standalone verb forms that connect to ます, ましょう, etc.
+  // The stem IS the entire surface (no conjugation suffix)
+  // Check if first hiragana after kanji is e-row
+  if (kanji_end < hiragana_end) {
+    char32_t first_hira = codepoints[kanji_end];
+    // E-row hiragana: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
+    bool is_erow = (first_hira == U'え' || first_hira == U'け' || first_hira == U'せ' ||
+                    first_hira == U'て' || first_hira == U'ね' || first_hira == U'へ' ||
+                    first_hira == U'め' || first_hira == U'れ' || first_hira == U'げ' ||
+                    first_hira == U'ぜ' || first_hira == U'で' || first_hira == U'べ' ||
+                    first_hira == U'ぺ');
+    if (is_erow) {
+      // Surface is kanji + first e-row hiragana only (e.g., 食べ from 食べます)
+      size_t renyokei_end = kanji_end + 1;
+      std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
+      auto best = inflection.getBest(surface);
+      if (best.confidence > 0.48F && best.verb_type == grammar::VerbType::Ichidan) {
+        UnknownCandidate candidate;
+        candidate.surface = surface;
+        candidate.start = start_pos;
+        candidate.end = renyokei_end;
+        candidate.pos = core::PartOfSpeech::Verb;
+        // Negative cost to strongly favor split over combined analysis
+        // Combined forms get optimal_length bonus (-0.5), so we need to be lower
+        float base_cost = -0.2F + (1.0F - best.confidence) * 0.1F;
+        candidate.cost = base_cost;
+        candidate.has_suffix = false;
+        candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
+#ifdef SUZUME_DEBUG_INFO
+        candidate.origin = CandidateOrigin::VerbKanji;
+        candidate.confidence = best.confidence;
+        candidate.pattern = "ichidan_renyokei";
+#endif
+        candidates.push_back(candidate);
       }
     }
   }
@@ -443,9 +510,8 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     if (hiragana_end > start_pos) {
       char32_t curr = codepoints[hiragana_end];
 
-      // Check for particle-like characters
-      if (curr == U'を' || curr == U'が' || curr == U'は' ||
-          curr == U'に' || curr == U'へ' || curr == U'の' || curr == U'や') {
+      // Check for particle-like characters (common particles + も, や)
+      if (normalize::isNeverVerbStemAfterKanji(curr)) {
         break;  // These are always particles in this context
       }
 

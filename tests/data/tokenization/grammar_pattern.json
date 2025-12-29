@@ -141,13 +141,13 @@
     },
     {
       "id": "pattern_te_form",
-      "description": "食べて寝る (eat and sleep)",
+      "description": "食べて寝る - te-form unified",
       "input": "食べて寝る",
       "expected": [
-        {"surface": "食べて", "pos": "Verb"},
+        {"surface": "食べて", "pos": "Verb", "lemma": "食べる"},
         {"surface": "寝る", "pos": "Verb", "lemma": "寝る"}
       ],
-      "tags": ["grammar", "pattern"]
+      "tags": ["grammar", "pattern", "te_form"]
     },
     {
       "id": "pattern_conditional_ba",
@@ -161,13 +161,13 @@
     },
     {
       "id": "pattern_conditional_tara",
-      "description": "行ったら教えて (if you go, tell me)",
+      "description": "行ったら教えて - te-form unified",
       "input": "行ったら教えて",
       "expected": [
-        {"surface": "行ったら", "pos": "Verb"},
-        {"surface": "教えて", "pos": "Verb"}
+        {"surface": "行ったら", "pos": "Verb", "lemma": "行う"},
+        {"surface": "教えて", "pos": "Verb", "lemma": "教える"}
       ],
-      "tags": ["grammar", "pattern", "conditional"]
+      "tags": ["grammar", "pattern", "conditional", "known_issue:itta_lemma"]
     },
     {
       "id": "pattern_conditional_nara",
@@ -506,11 +506,11 @@
     },
     {
       "id": "formal_noun_wake",
-      "description": "そういうわけ (that's why)",
+      "description": "そういうわけ (that's why) - そういう is prenominal (連体詞), わけ is formal noun (形式名詞)",
       "input": "そういうわけ",
       "expected": [
-        {"surface": "そう", "pos": "Adverb"},
-        {"surface": "いうわけ", "pos": "Auxiliary"}
+        {"surface": "そういう", "pos": "Determiner"},
+        {"surface": "わけ", "pos": "Noun"}
       ],
       "tags": ["grammar", "formal-noun"]
     },

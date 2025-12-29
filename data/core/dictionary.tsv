@@ -152,6 +152,10 @@ Wi-Fi	NOUN		0.5
 投資ファンド	NOUN	とうしふぁんど	0.5
 オプション取引	NOUN	おぷしょんとりひき	0.5
 
+# Tongue twister words (早口言葉)
+なまむぎ	NOUN	なまむぎ	0.3
+なまごめ	NOUN	なまごめ	0.3
+なまたまご	NOUN	なまたまご	0.3
 
 # === suffixes ===
 がたい	OTHER		1.0

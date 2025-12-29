@@ -1,7 +1,9 @@
 #include "dictionary/dictionary.h"
 
 #include <cstdlib>
+#ifndef __EMSCRIPTEN__
 #include <filesystem>
+#endif
 
 #include "dictionary/binary_dict.h"
 #include "dictionary/core_dict.h"
@@ -99,12 +101,17 @@ bool DictionaryManager::hasUserBinaryDictionary() const {
 }
 
 bool DictionaryManager::tryAutoLoadCoreDictionary() {
-  namespace fs = std::filesystem;
-
   // Already loaded
   if (hasCoreBinaryDictionary()) {
     return true;
   }
+
+#ifdef __EMSCRIPTEN__
+  // WASM: Dictionaries are embedded and loaded via Suzume::Impl constructor
+  // This function is not used in WASM builds
+  return false;
+#else
+  namespace fs = std::filesystem;
 
   std::vector<std::string> search_paths;
 
@@ -136,6 +143,7 @@ bool DictionaryManager::tryAutoLoadCoreDictionary() {
   }
 
   return false;
+#endif  // __EMSCRIPTEN__
 }
 
 }  // namespace suzume::dictionary

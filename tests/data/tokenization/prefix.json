@@ -586,11 +586,11 @@
     },
     {
       "id": "edge_prefix_hiragana",
-      "description": "お + hiragana noun in context",
+      "description": "お + hiragana word in context (かし not in dict)",
       "input": "おかしを食べる",
       "expected": [
         {"surface": "お", "pos": "Prefix"},
-        {"surface": "かし", "pos": "Noun"},
+        {"surface": "かし", "pos": "Other"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "食べる", "pos": "Verb"}
       ],

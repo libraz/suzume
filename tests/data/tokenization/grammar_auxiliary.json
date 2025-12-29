@@ -15,10 +15,11 @@
     },
     {
       "id": "aux_masu",
-      "description": "Polite auxiliary ます",
+      "description": "Polite auxiliary ます (split: Ichidan verb stem + aux)",
       "input": "食べます",
       "expected": [
-        {"surface": "食べます", "pos": "Verb", "lemma": "食べる"}
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["auxiliary", "polite"]
     },
@@ -72,7 +73,7 @@
     },
     {
       "id": "keigo_kudasaru",
-      "description": "Honorific verb くださる - te-form splits",
+      "description": "Honorific verb くださる - te-form unified",
       "input": "教えてくださる",
       "expected": [
         {"surface": "教えて", "pos": "Verb", "lemma": "教える"},

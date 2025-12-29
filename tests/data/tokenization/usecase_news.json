@@ -195,16 +195,15 @@
     },
     {
       "id": "sports_ranking",
-      "description": "Ranking",
+      "description": "Ranking - ている progressive as unified verb",
       "input": "現在3位につけている",
       "expected": [
         {"surface": "現在", "pos": "Noun"},
         {"surface": "3位", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "つけて", "pos": "Verb", "lemma": "つける"},
-        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+        {"surface": "つけている", "pos": "Verb", "lemma": "つける"}
       ],
-      "tags": ["sports"]
+      "tags": ["sports", "progressive"]
     },
     {
       "id": "sports_injury",
@@ -445,7 +444,7 @@
     },
     {
       "id": "education_student_question",
-      "description": "Student question",
+      "description": "Student question - verb stem + ません splits",
       "input": "この問題の解き方が分かりません",
       "expected": [
         {"surface": "この", "pos": "Determiner"},
@@ -454,9 +453,10 @@
         {"surface": "解き", "pos": "Noun"},
         {"surface": "方", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "分かりません", "pos": "Verb", "lemma": "分かる"}
+        {"surface": "分かり", "pos": "Verb", "lemma": "分かる"},
+        {"surface": "ません", "pos": "Auxiliary"}
       ],
-      "tags": ["education"]
+      "tags": ["education", "polite_negative"]
     },
     {
       "id": "education_assignment",

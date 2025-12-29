@@ -26,11 +26,12 @@
     },
     {
       "id": "casual_desire",
-      "description": "Desire expression with 食べたい",
+      "description": "Desire expression with 食べたい - verb+aux split",
       "input": "ラーメン食べたい",
       "expected": [
         {"surface": "ラーメン", "pos": "Noun"},
-        {"surface": "食べたい", "pos": "Verb", "lemma": "食べる"}
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "たい", "pos": "Auxiliary", "lemma": "たい"}
       ],
       "tags": ["casual"]
     },
@@ -286,12 +287,12 @@
     },
     {
       "id": "colloquial_shiteru",
-      "description": "Colloquial している → してる",
+      "description": "Colloquial している → してる - lemma is dictionary form",
       "input": "今何してる",
       "expected": [
         {"surface": "今", "pos": "Noun"},
         {"surface": "何", "pos": "Pronoun"},
-        {"surface": "してる", "pos": "Verb", "lemma": "してる"}
+        {"surface": "してる", "pos": "Verb", "lemma": "する"}
       ],
       "tags": ["colloquial"]
     },
@@ -320,12 +321,13 @@
     },
     {
       "id": "colloquial_tabeteku",
-      "description": "Colloquial 食べていく → 食べてく with に particle",
+      "description": "Colloquial 食べていく → 食べてく - te-form + てく aux split",
       "input": "一緒に食べてく",
       "expected": [
         {"surface": "一緒", "pos": "Adjective"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "食べてく", "pos": "Noun"}
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "てく", "pos": "Auxiliary", "lemma": "てく"}
       ],
       "tags": ["colloquial"]
     },

@@ -348,7 +348,7 @@
     },
     {
       "id": "ichidan_tabete",
-      "description": "食べて - ichidan te-form",
+      "description": "食べて - ichidan te-form (unified token)",
       "input": "食べて",
       "expected": [
         {"surface": "食べて", "pos": "Verb", "lemma": "食べる"}
@@ -357,7 +357,7 @@
     },
     {
       "id": "ichidan_tabeta",
-      "description": "食べた - ichidan past",
+      "description": "食べた - ichidan past (unified token)",
       "input": "食べた",
       "expected": [
         {"surface": "食べた", "pos": "Verb", "lemma": "食べる"}

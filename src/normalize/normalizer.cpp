@@ -6,25 +6,36 @@ namespace suzume::normalize {
 
 namespace {
 
-// Full-width ASCII to half-width
-char32_t fullwidthToHalfwidth(char32_t codepoint) {
+// Full-width ASCII to half-width (with case preservation option)
+char32_t fullwidthToHalfwidth(char32_t codepoint, bool preserve_case) {
   // Full-width digits (０-９) -> half-width (0-9)
   if (codepoint >= 0xFF10 && codepoint <= 0xFF19) {
     return codepoint - 0xFF10 + '0';
   }
-  // Full-width uppercase (Ａ-Ｚ) -> half-width lowercase (a-z)
+  // Full-width uppercase (Ａ-Ｚ)
   if (codepoint >= 0xFF21 && codepoint <= 0xFF3A) {
-    return codepoint - 0xFF21 + 'a';
+    if (preserve_case) {
+      return codepoint - 0xFF21 + 'A';  // Keep uppercase
+    }
+    return codepoint - 0xFF21 + 'a';  // Convert to lowercase
   }
   // Full-width lowercase (ａ-ｚ) -> half-width lowercase (a-z)
   if (codepoint >= 0xFF41 && codepoint <= 0xFF5A) {
     return codepoint - 0xFF41 + 'a';
   }
-  // Half-width uppercase (A-Z) -> lowercase (a-z)
+  // Half-width uppercase (A-Z)
   if (codepoint >= 'A' && codepoint <= 'Z') {
-    return codepoint - 'A' + 'a';
+    if (preserve_case) {
+      return codepoint;  // Keep uppercase
+    }
+    return codepoint - 'A' + 'a';  // Convert to lowercase
   }
   return codepoint;
+}
+
+// Full-width ASCII to half-width (default: lowercase)
+char32_t fullwidthToHalfwidth(char32_t codepoint) {
+  return fullwidthToHalfwidth(codepoint, false);
 }
 
 // Half-width katakana to full-width
@@ -200,9 +211,10 @@ core::Result<std::string> Normalizer::normalize(std::string_view text) const {
   while (pos < text.size()) {
     char32_t codepoint = decodeUtf8(text, pos);
 
-    // Check for half-width dakuten/handakuten combining
-    // Need to peek at next char before normalizing current
-    char32_t normalized_cp = normalizeChar(codepoint);
+    // Apply normalization with options
+    char32_t normalized_cp =
+        fullwidthToHalfwidth(codepoint, options_.preserve_case);
+    normalized_cp = halfwidthKatakanaToFullwidth(normalized_cp);
 
     // Look ahead for half-width dakuten/handakuten
     size_t next_pos = pos;
@@ -229,12 +241,14 @@ core::Result<std::string> Normalizer::normalize(std::string_view text) const {
 
     codepoint = normalized_cp;
 
-    // Handle vu-series normalization (ヴァ→バ, etc.)
-    if (codepoint == kKatakanaVu || codepoint == kHiraganaVu) {
+    // Handle vu-series normalization (ヴァ→バ, etc.) - skip if preserve_vu
+    if (!options_.preserve_vu &&
+        (codepoint == kKatakanaVu || codepoint == kHiraganaVu)) {
       next_pos = pos;
       if (next_pos < text.size()) {
         char32_t next_cp = decodeUtf8(text, next_pos);
-        next_cp = normalizeChar(next_cp);
+        next_cp = fullwidthToHalfwidth(next_cp, options_.preserve_case);
+        next_cp = halfwidthKatakanaToFullwidth(next_cp);
         char32_t normalized = normalizeVuSequence(codepoint, next_cp);
         if (normalized != 0) {
           // Consume the small vowel and output normalized character

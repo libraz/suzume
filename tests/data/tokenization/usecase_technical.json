@@ -214,7 +214,7 @@
     },
     {
       "id": "complex_experience",
-      "description": "Past experience",
+      "description": "Past experience - 活用形は1トークン",
       "input": "子供の頃によく遊んだ場所を訪れた",
       "expected": [
         {"surface": "子供", "pos": "Noun"},
@@ -273,28 +273,29 @@
     },
     {
       "id": "multi_clause_reason_kara",
-      "description": "Reason clause with kara",
+      "description": "Reason clause with kara - 活用形は1トークン",
       "input": "疲れたから早く寝ます",
       "expected": [
         {"surface": "疲れた", "pos": "Verb", "lemma": "疲れる"},
         {"surface": "から", "pos": "Particle"},
         {"surface": "早く", "pos": "Adjective", "lemma": "早い"},
-        {"surface": "寝ます", "pos": "Verb"}
+        {"surface": "寝ます", "pos": "Verb", "lemma": "寝る"}
       ],
       "tags": ["multi-clause"]
     },
     {
       "id": "multi_clause_reason_node",
-      "description": "Reason clause with node",
+      "description": "Reason clause with node - MeCab互換分割",
       "input": "忙しいので後で連絡します",
       "expected": [
         {"surface": "忙しい", "pos": "Adjective"},
         {"surface": "ので", "pos": "Particle"},
         {"surface": "後", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
-        {"surface": "連絡します", "pos": "Verb", "lemma": "連絡する"}
+        {"surface": "連絡", "pos": "Noun"},
+        {"surface": "します", "pos": "Verb", "lemma": "する"}
       ],
-      "tags": ["multi-clause"]
+      "tags": ["multi-clause", "suru_verb"]
     },
     {
       "id": "multi_clause_contrast_kedo",

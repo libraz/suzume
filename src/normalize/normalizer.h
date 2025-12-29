@@ -9,17 +9,30 @@
 namespace suzume::normalize {
 
 /**
+ * @brief Normalization options
+ */
+struct NormalizeOptions {
+  // Preserve ヴ (vu) characters instead of converting to バビブベボ
+  bool preserve_vu = false;
+
+  // Preserve case (don't convert to lowercase)
+  bool preserve_case = false;
+};
+
+/**
  * @brief Text normalizer for Japanese text
  *
  * Performs:
  * - Full-width to half-width conversion (alphanumeric)
  * - Half-width to full-width katakana conversion
  * - Combining dakuten normalization
- * - Case normalization (lowercase)
+ * - Case normalization (lowercase) - controllable via options
+ * - Vu-series normalization (ヴ→ブ) - controllable via options
  */
 class Normalizer {
  public:
   Normalizer() = default;
+  explicit Normalizer(const NormalizeOptions& options) : options_(options) {}
   ~Normalizer() = default;
 
   // Copyable and movable (stateless)
@@ -48,6 +61,19 @@ class Normalizer {
    * @return true if normalization would change the text
    */
   bool needsNormalization(std::string_view text) const;
+
+  /**
+   * @brief Get current options
+   */
+  const NormalizeOptions& options() const { return options_; }
+
+  /**
+   * @brief Set options
+   */
+  void setOptions(const NormalizeOptions& options) { options_ = options; }
+
+ private:
+  NormalizeOptions options_;
 };
 
 }  // namespace suzume::normalize

@@ -472,9 +472,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
   // Skip if starting with common particles (these are handled by dictionary)
   if (start_type == normalize::CharType::Hiragana) {
     char32_t first_char = codepoints[start_pos];
-    if (first_char == U'を' || first_char == U'が' || first_char == U'は' ||
-        first_char == U'に' || first_char == U'へ' || first_char == U'の' ||
-        first_char == U'で' || first_char == U'と' || first_char == U'も') {
+    if (normalize::isExtendedParticle(first_char)) {
       return candidates;
     }
     // Skip small kana (ゃゅょぁぃぅぇぉっ) - these don't start words
@@ -559,13 +557,25 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
         continue;
       }
 
+      // Calculate character count (not byte count)
+      size_t char_count = surface.size() / core::kJapaneseCharBytes;
+
+      // Apply length-based penalty for character speech
+      // Short patterns (1-2 chars) like ぜ, のだ are common
+      // Longer patterns like まむぎ (3+ chars) are rare
+      float length_penalty = 0.0F;
+      if (char_count >= 3) {
+        // Penalty increases with length: 3chars=+2.0, 4chars=+4.0, etc.
+        length_penalty = static_cast<float>(char_count - 2) * 2.0F;
+      }
+
       UnknownCandidate candidate;
       candidate.surface = surface;
       candidate.start = start_pos;
       candidate.end = candidate_end;
       // Mark as Auxiliary so it connects properly after verbs/adjectives
       candidate.pos = core::PartOfSpeech::Auxiliary;
-      candidate.cost = options_.character_speech_cost;
+      candidate.cost = options_.character_speech_cost + length_penalty;
       candidate.has_suffix = false;
 #ifdef SUZUME_DEBUG_INFO
       candidate.origin = CandidateOrigin::CharacterSpeech;

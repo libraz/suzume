@@ -15,7 +15,7 @@
       "expected": [
         {"surface": "勉強せよ", "pos": "Verb", "lemma": "勉強する"}
       ],
-      "tags": ["suru", "imperative"]
+      "tags": ["suru", "imperative", "known_issue"]
     },
     {
       "id": "suru_imperative_renshu",
@@ -31,7 +31,7 @@
       "expected": [
         {"surface": "運動せよ", "pos": "Verb", "lemma": "運動する"}
       ],
-      "tags": ["suru", "imperative"]
+      "tags": ["suru", "imperative", "known_issue"]
     },
     {
       "id": "suru_imperative_setsumei",

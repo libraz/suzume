@@ -81,7 +81,9 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
           !(ending.verb_type == VerbType::Suru &&
             (ending.suffix == "す" || ending.suffix == "し" ||
              ending.suffix == "しろ" || ending.suffix == "せよ" ||
-             ending.suffix == "すれ")) &&
+             ending.suffix == "すれ" ||
+             // Empty suffix allowed when auxiliaries like してる are matched
+             (ending.suffix.empty() && !aux_chain.empty()))) &&
           !(ending.verb_type == VerbType::Kuru &&
             (ending.suffix == "こ" || ending.suffix == "き" ||
              ending.suffix == "こい" || ending.suffix == "くれ"))) {
@@ -90,8 +92,11 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
 
       // Skip Ichidan with empty suffix when no auxiliaries matched
       // (prevents "書いて" from being parsed as Ichidan "書いてる")
+      // Exception: Allow standalone renyokei matching for verb + AUX patterns
+      // (e.g., 食べ + ます, 見 + ましょう) - these connect to dictionary AUX
       if (ending.suffix.empty() && aux_chain.empty() &&
-          ending.verb_type == VerbType::Ichidan) {
+          ending.verb_type == VerbType::Ichidan &&
+          required_conn != conn::kVerbRenyokei) {
         continue;
       }
 

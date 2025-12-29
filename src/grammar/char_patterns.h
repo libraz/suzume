@@ -47,6 +47,34 @@ bool isAllKanji(std::string_view stem);
  */
 bool endsWithKanji(std::string_view stem);
 
+/**
+ * @brief Check if stem contains any kanji character
+ * @param stem The stem to check
+ * @return True if at least one character is kanji
+ *
+ * Used to identify pure hiragana/katakana stems (no kanji).
+ */
+bool containsKanji(std::string_view stem);
+
+/**
+ * @brief Check if stem contains any katakana character
+ * @param stem The stem to check
+ * @return True if at least one character is katakana
+ *
+ * Used to identify loanword verb/adjective stems (バズる, エモい, etc.)
+ */
+bool containsKatakana(std::string_view stem);
+
+/**
+ * @brief Check if stem consists only of hiragana characters
+ * @param stem The stem to check
+ * @return True if all characters are hiragana (no kanji, katakana, etc.)
+ *
+ * Used to identify pure hiragana verb stems which are rare for Godan verbs.
+ * Real Godan verbs typically have kanji stems (読む, 書く, 泳ぐ).
+ */
+bool isPureHiragana(std::string_view stem);
+
 // Onbin endings: い, っ, ん
 extern const char* kOnbinEndings[];
 extern const size_t kOnbinCount;
@@ -94,6 +122,17 @@ bool endsWithOnbin(std::string_view stem);
  * Combines godan (i-row) and ichidan (e-row) renyokei patterns.
  */
 bool endsWithRenyokeiMarker(std::string_view stem);
+
+/**
+ * @brief Check if character is small kana (拗音・促音)
+ * @param ch UTF-8 encoded character (3 bytes for Japanese)
+ * @return True if the character is small kana
+ *
+ * Small kana includes: ょ, ゃ, ゅ, ぁ, ぃ, ぅ, ぇ, ぉ, っ (hiragana)
+ *                      ョ, ャ, ュ, ァ, ィ, ゥ, ェ, ォ, ッ (katakana)
+ * These characters cannot start a word independently.
+ */
+bool isSmallKana(std::string_view ch);
 
 }  // namespace suzume::grammar
 

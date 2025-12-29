@@ -25,6 +25,7 @@ struct AnalyzerOptions {
   core::AnalysisMode mode = core::AnalysisMode::Normal;
   ScorerOptions scorer_options;
   UnknownOptions unknown_options;
+  normalize::NormalizeOptions normalize_options;
 };
 
 /**

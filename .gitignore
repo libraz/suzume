@@ -75,6 +75,7 @@ node_modules/
 
 # Coverage reports
 coverage/
+coverage-report/
 *.info
 
 # Python

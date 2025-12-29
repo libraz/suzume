@@ -60,11 +60,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
   // Note: て is the te-form particle (接続助詞), not part of adjective stems
   // This prevents "来てい" from being parsed as an adjective (来ている = verb)
   char32_t first_hiragana = codepoints[kanji_end];
-  if (first_hiragana == U'を' || first_hiragana == U'が' ||
-      first_hiragana == U'は' || first_hiragana == U'も' ||
-      first_hiragana == U'へ' || first_hiragana == U'の' ||
-      first_hiragana == U'に' || first_hiragana == U'や' ||
-      first_hiragana == U'て' || first_hiragana == U'で') {
+  if (normalize::isNeverAdjectiveStemAfterKanji(first_hiragana)) {
     return candidates;  // These particles follow nouns/verbs, not adjective stems
   }
 
@@ -394,11 +390,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
   // Skip if starting character is a particle that is NEVER an adjective stem
   // Note: や is NOT included because やばい, やわらかい are valid i-adjectives
   char32_t first_char = codepoints[start_pos];
-  if (first_char == U'を' || first_char == U'が' || first_char == U'は' ||
-      first_char == U'に' || first_char == U'へ' || first_char == U'の' ||
-      first_char == U'か' || first_char == U'ね' ||
-      first_char == U'よ' || first_char == U'わ' || first_char == U'で' ||
-      first_char == U'と' || first_char == U'も') {
+  if (normalize::isExtendedParticle(first_char)) {
     return candidates;
   }
 
@@ -414,10 +406,8 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     // This allows patterns like まずかった, おいしくない
     if (hiragana_end - start_pos >= 3) {
       char32_t curr = codepoints[hiragana_end];
-      if (curr == U'を' || curr == U'が' || curr == U'は' ||
-          curr == U'に' || curr == U'へ' || curr == U'の' ||
-          curr == U'で' || curr == U'と' || curr == U'も' ||
-          curr == U'や') {
+      // Break at extended particle boundaries + や
+      if (normalize::isExtendedParticle(curr) || curr == U'や') {
         break;  // Stop before the particle
       }
     }

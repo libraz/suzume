@@ -33,7 +33,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
       {"しか", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
 
       // Conjunctive particles (接続助詞)
-      {"て", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
+      {"て", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
       {"ば", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"たら", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"なら", POS::Particle, 0.5F, "", false, false, false, CT::None, ""},
@@ -92,6 +92,8 @@ std::vector<DictionaryEntry> getCompoundParticleEntries() {
       // Capacity/Viewpoint (資格・観点)
       {"として", POS::Particle, 0.1F, "", false, false, false, CT::None, ""},
       {"にとって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      // Note: 漢字を含む複合助詞（に対して、に関して等）は分割する方針
+      // See CLAUDE.md: "複合助詞 with kanji | 分割 | に関して → に+関して"
 
       // Duration/Scope (範囲・期間)
       {"にわたって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
@@ -126,6 +128,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"ます", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
       {"ました", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
       {"ません", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      {"ましょう", POS::Auxiliary, 1.0F, "ます", false, false, false, CT::None, ""},
 
       // Negation (否定)
       {"ない", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
@@ -462,7 +465,10 @@ std::vector<DictionaryEntry> getPronounEntries() {
       {"いくつ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
       {"いくら", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
       {"どう", POS::Adverb, 0.5F, "", false, false, true, CT::None, ""},
-      {"どうして", POS::Adverb, 0.5F, "", false, false, true, CT::None, ""},
+      // Note: どうして needs very low cost to prevent split when followed by verb
+      // The te-form bonus makes どう+して+VERB cheaper than どうして+VERB
+      // is_low_info=false because interrogatives carry high semantic information
+      {"どうして", POS::Adverb, -0.2F, "", false, false, false, CT::None, ""},
       {"なぜ", POS::Adverb, 0.5F, "", false, false, true, CT::None, ""},
       {"どんな", POS::Adverb, 0.5F, "", false, false, true, CT::None, ""},
   };
@@ -707,7 +713,8 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"少し", POS::Adverb, 0.5F, "", false, false, false, CT::None, "すこし"},
       {"結構", POS::Adverb, 0.5F, "", false, false, false, CT::None, "けっこう"},
       // Degree adverbs - hiragana only
-      {"とても", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
+      // Note: とても needs low cost to prevent と+て+も split
+      {"とても", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},
       {"すごく", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"めっちゃ", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"かなり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
@@ -846,7 +853,10 @@ std::vector<DictionaryEntry> getNaAdjectiveEntries() {
 
       // Hiragana na-adjectives
       {"だめ", POS::Adjective, 0.3F, "だめ", false, false, false, CT::NaAdjective, ""},
-      {"みたい", POS::Adjective, 0.1F, "みたい", false, false, false, CT::NaAdjective, ""},
+      // NOTE: Higher cost (0.6) to prevent "読みたい" from being parsed as 読+みたい
+      // instead of 読み+たい (want to read). Legitimate uses like "猫みたい" still work
+      // because 猫 as dictionary NOUN has lower cost than 読 as unknown NOUN.
+      {"みたい", POS::Adjective, 0.6F, "みたい", false, false, false, CT::NaAdjective, ""},
 
       // Business/formal na-adjectives
       {"幸い", POS::Adjective, 0.3F, "", false, false, false, CT::NaAdjective, "さいわい"},
@@ -1189,6 +1199,15 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"走る", POS::Verb, 1.0F, "走る", false, false, false, CT::GodanRa, "はしる"},
       {"売る", POS::Verb, 1.0F, "売る", false, false, false, CT::GodanRa, "うる"},
       {"切る", POS::Verb, 1.0F, "切る", false, false, false, CT::GodanRa, "きる"},
+      // Multi-kanji GodanRa verbs (often misclassified as GodanWa due to っ-onbin)
+      {"頑張る", POS::Verb, 0.3F, "頑張る", false, false, false, CT::GodanRa, "がんばる"},
+      {"止まる", POS::Verb, 0.3F, "止まる", false, false, false, CT::GodanRa, "とまる"},
+      {"集まる", POS::Verb, 0.3F, "集まる", false, false, false, CT::GodanRa, "あつまる"},
+      {"助かる", POS::Verb, 0.3F, "助かる", false, false, false, CT::GodanRa, "たすかる"},
+      {"決まる", POS::Verb, 0.3F, "決まる", false, false, false, CT::GodanRa, "きまる"},
+      {"始まる", POS::Verb, 0.3F, "始まる", false, false, false, CT::GodanRa, "はじまる"},
+      {"泊まる", POS::Verb, 0.3F, "泊まる", false, false, false, CT::GodanRa, "とまる"},
+      {"当たる", POS::Verb, 0.3F, "当たる", false, false, false, CT::GodanRa, "あたる"},
 
       // Common GodanTa verbs
       {"持つ", POS::Verb, 1.0F, "持つ", false, false, false, CT::GodanTa, "もつ"},
@@ -1238,6 +1257,17 @@ std::vector<DictionaryEntry> getCommonVocabularyEntries() {
       {"食べ物", POS::Noun, 0.3F, "", false, false, false, CT::None, "たべもの"},
       {"飲み物", POS::Noun, 0.3F, "", false, false, false, CT::None, "のみもの"},
       {"買い物", POS::Noun, 0.3F, "", false, false, false, CT::None, "かいもの"},
+
+      // Counter suffixes (数助詞): つ - only valid for 1-9
+      {"1つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "ひとつ"},
+      {"2つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "ふたつ"},
+      {"3つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "みっつ"},
+      {"4つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "よっつ"},
+      {"5つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "いつつ"},
+      {"6つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "むっつ"},
+      {"7つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "ななつ"},
+      {"8つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "やっつ"},
+      {"9つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "ここのつ"},
   };
 }
 

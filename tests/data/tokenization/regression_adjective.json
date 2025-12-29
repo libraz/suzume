@@ -93,7 +93,7 @@
     },
     {
       "id": "te_morau_separate",
-      "description": "食べてもらわない - benefactive te-form should split",
+      "description": "食べてもらわない - te-form unified + auxiliary verb",
       "input": "食べてもらわない",
       "expected": [
         {"surface": "食べて", "pos": "Verb", "lemma": "食べる"},
@@ -103,7 +103,7 @@
     },
     {
       "id": "te_inai_unified",
-      "description": "食べていない - progressive negative splits",
+      "description": "食べていない - te-form unified + auxiliary",
       "input": "食べていない",
       "expected": [
         {"surface": "食べて", "pos": "Verb", "lemma": "食べる"},
@@ -113,7 +113,7 @@
     },
     {
       "id": "te_shimawanai_unified",
-      "description": "忘れてしまわない - unified compound verb",
+      "description": "忘れてしまわない - unified verb te-form compound",
       "input": "忘れてしまわない",
       "expected": [
         {"surface": "忘れてしまわない", "pos": "Verb", "lemma": "忘れる"}
@@ -141,7 +141,7 @@
     },
     {
       "id": "godan_te_agenai_split",
-      "description": "書いてあげない - godan benefactive negative should split",
+      "description": "書いてあげない - te-form unified + auxiliary verb",
       "input": "書いてあげない",
       "expected": [
         {"surface": "書いて", "pos": "Verb", "lemma": "書く"},
@@ -211,7 +211,7 @@
     },
     {
       "id": "i_adj_sou_in_sentence",
-      "description": "美味しそうに食べている - adjective sou in sentence",
+      "description": "美味しそうに食べている - adjective sou in sentence with te-form unified",
       "input": "美味しそうに食べている",
       "expected": [
         {"surface": "美味しそう", "pos": "Adjective", "lemma": "美味しい"},

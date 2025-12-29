@@ -210,6 +210,11 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
     return result;
   }
 
+  result = checkInvalidTeFormAux(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
   // Other rules
   result = checkParticleBeforeHiraganaOther(prev, next);
   if (result.pattern != ConnectionPattern::None) {
