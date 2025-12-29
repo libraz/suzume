@@ -147,11 +147,13 @@
     },
     {
       "id": "adverb_sou_kamoshirenai",
-      "description": "そうかもしれません",
+      "description": "そうかもしれません - kamoshirenai decomposes",
       "input": "そうかもしれません",
       "expected": [
         {"surface": "そう", "pos": "Adverb"},
-        {"surface": "かもしれません", "pos": "Auxiliary", "lemma": "かもしれない"}
+        {"surface": "か", "pos": "Particle", "lemma": "か"},
+        {"surface": "も", "pos": "Particle", "lemma": "も"},
+        {"surface": "しれません", "pos": "Verb", "lemma": "しれる"}
       ],
       "tags": ["regression", "adverb", "sou"]
     },

@@ -550,7 +550,7 @@
         {"surface": "お", "pos": "Prefix"},
         {"surface": "水", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["prefix", "sentence"]
     },
@@ -561,7 +561,7 @@
       "expected": [
         {"surface": "ご", "pos": "Prefix"},
         {"surface": "確認", "pos": "Noun"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["prefix", "sentence"]
     },

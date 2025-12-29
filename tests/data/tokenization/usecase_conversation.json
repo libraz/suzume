@@ -33,7 +33,7 @@
       "expected": [
         {"surface": "ちょっと", "pos": "Adverb"},
         {"surface": "待って", "pos": "Verb", "lemma": "待つ"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["conversation"]
     },
@@ -42,7 +42,7 @@
       "input": "ありがとうございます",
       "expected": [
         {"surface": "ありがとう", "pos": "Other"},
-        {"surface": "ございます", "pos": "Auxiliary"}
+        {"surface": "ございます", "pos": "Auxiliary", "lemma": "ございます"}
       ],
       "tags": ["conversation"]
     },
@@ -51,7 +51,7 @@
       "input": "おはようございます",
       "expected": [
         {"surface": "おはよう", "pos": "Other"},
-        {"surface": "ございます", "pos": "Auxiliary"}
+        {"surface": "ございます", "pos": "Auxiliary", "lemma": "ございます"}
       ],
       "tags": ["conversation"]
     },
@@ -244,7 +244,7 @@
       "expected": [
         {"surface": "領収書", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["shopping"]
     },
@@ -349,7 +349,7 @@
         {"surface": "切符", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "一枚", "pos": "Noun"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["travel"]
     },
@@ -386,7 +386,7 @@
         {"surface": "メニュー", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "見せて", "pos": "Verb", "lemma": "見せる"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["restaurant"]
     },

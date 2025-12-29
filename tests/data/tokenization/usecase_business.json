@@ -33,7 +33,7 @@
       "expected": [
         {"surface": "ご", "pos": "Prefix"},
         {"surface": "確認", "pos": "Noun"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["business", "email"]
     },
@@ -89,7 +89,7 @@
         {"surface": "ので", "pos": "Particle"},
         {"surface": "ご", "pos": "Prefix"},
         {"surface": "確認", "pos": "Noun"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["business", "email"]
     },
@@ -196,7 +196,7 @@
         {"surface": "まで", "pos": "Particle"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "提出して", "pos": "Verb", "lemma": "提出する"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["business", "document"]
     },
@@ -483,7 +483,7 @@
         {"surface": "手続き", "pos": "Noun"},
         {"surface": "について", "pos": "Particle"},
         {"surface": "教えて", "pos": "Verb", "lemma": "教える"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["business", "customer"]
     },
@@ -508,7 +508,7 @@
         {"surface": "お", "pos": "Prefix"},
         {"surface": "問い合わせ", "pos": "Noun"},
         {"surface": "ありがとう", "pos": "Other"},
-        {"surface": "ございます", "pos": "Auxiliary"}
+        {"surface": "ございます", "pos": "Auxiliary", "lemma": "ございます"}
       ],
       "tags": ["business", "customer"]
     },

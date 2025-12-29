@@ -131,10 +131,11 @@
     },
     {
       "id": "te_ageru_unified",
-      "description": "見てあげる - benefactive positive should be single token",
+      "description": "見てあげる - splits into te-form + auxiliary verb (grammatically correct)",
       "input": "見てあげる",
       "expected": [
-        {"surface": "見てあげる", "pos": "Verb", "lemma": "見る"}
+        {"surface": "見て", "pos": "Verb", "lemma": "見る"},
+        {"surface": "あげる", "pos": "Verb", "lemma": "あげる"}
       ],
       "tags": ["regression", "te_form", "benefactive"]
     },

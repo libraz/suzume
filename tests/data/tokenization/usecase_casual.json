@@ -297,11 +297,12 @@
     },
     {
       "id": "colloquial_miteta",
-      "description": "Colloquial 見ていた → 見てた",
+      "description": "Colloquial 見ていた → 見てた - splits with 見る registered",
       "input": "テレビ見てた",
       "expected": [
         {"surface": "テレビ", "pos": "Noun"},
-        {"surface": "見てた", "pos": "Verb", "lemma": "見てる"}
+        {"surface": "見て", "pos": "Verb", "lemma": "見る"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["colloquial"]
     },

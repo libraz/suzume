@@ -380,7 +380,7 @@
         {"surface": "言語", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "選択して", "pos": "Verb", "lemma": "選択する"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["long"]
     },
@@ -439,7 +439,7 @@
         {"surface": "35ページ", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "開いて", "pos": "Verb", "lemma": "開く"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["education"]
     },
@@ -469,7 +469,7 @@
         {"surface": "宿題", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "提出して", "pos": "Verb", "lemma": "提出する"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["education"]
     },
@@ -498,7 +498,7 @@
         {"surface": "で", "pos": "Particle"},
         {"surface": "話し", "pos": "Verb", "lemma": "話す"},
         {"surface": "合って", "pos": "Verb", "lemma": "合う"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["education"]
     }

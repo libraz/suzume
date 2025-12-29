@@ -16,7 +16,7 @@
       "input": "おはようございます",
       "expected": [
         {"surface": "おはよう", "pos": "Other"},
-        {"surface": "ございます", "pos": "Auxiliary"}
+        {"surface": "ございます", "pos": "Auxiliary", "lemma": "ございます"}
       ],
       "tags": ["strict", "greeting"]
     },
@@ -26,7 +26,7 @@
       "input": "ありがとうございます",
       "expected": [
         {"surface": "ありがとう", "pos": "Other"},
-        {"surface": "ございます", "pos": "Auxiliary"}
+        {"surface": "ございます", "pos": "Auxiliary", "lemma": "ございます"}
       ],
       "tags": ["strict", "greeting"]
     },
@@ -120,7 +120,7 @@
       "description": "ございます should not be over-fragmented",
       "input": "ございます",
       "expected": [
-        {"surface": "ございます", "pos": "Auxiliary"}
+        {"surface": "ございます", "pos": "Auxiliary", "lemma": "ございます"}
       ],
       "tags": ["strict", "keigo"]
     },

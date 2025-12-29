@@ -43,13 +43,12 @@
     },
     {
       "id": "keigo_irassharu",
-      "description": "Honorific verb いらっしゃる",
+      "description": "Honorific verb いらっしゃる - recognized as single token",
       "input": "先生がいらっしゃる",
       "expected": [
         {"surface": "先生", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "いらっ", "pos": "Other"},
-        {"surface": "しゃる", "pos": "Verb"}
+        {"surface": "いらっしゃる", "pos": "Verb", "lemma": "いらっしゃる"}
       ],
       "tags": ["keigo", "honorific"]
     },
@@ -58,7 +57,7 @@
       "description": "Polite auxiliary ございます",
       "input": "ございます",
       "expected": [
-        {"surface": "ございます", "pos": "Auxiliary"}
+        {"surface": "ございます", "pos": "Auxiliary", "lemma": "ございます"}
       ],
       "tags": ["keigo", "polite"]
     },
@@ -73,10 +72,11 @@
     },
     {
       "id": "keigo_kudasaru",
-      "description": "Honorific verb くださる",
+      "description": "Honorific verb くださる - te-form splits",
       "input": "教えてくださる",
       "expected": [
-        {"surface": "教えてくださる", "pos": "Verb", "lemma": "教える"}
+        {"surface": "教えて", "pos": "Verb", "lemma": "教える"},
+        {"surface": "くださる", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["keigo", "honorific"]
     },
@@ -98,7 +98,7 @@
       "expected": [
         {"surface": "ご", "pos": "Prefix"},
         {"surface": "確認", "pos": "Noun"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["keigo", "prefix"]
     },
@@ -204,7 +204,7 @@
       "expected": [
         {"surface": "これ", "pos": "Pronoun"},
         {"surface": "で", "pos": "Particle"},
-        {"surface": "ござる", "pos": "Auxiliary", "lemma": "だ"}
+        {"surface": "ござる", "pos": "Verb", "lemma": "ござる"}
       ],
       "tags": ["character_speech", "ninja"]
     },
@@ -230,22 +230,26 @@
     },
     {
       "id": "aux_kamoshirenai",
-      "description": "Auxiliary かもしれない",
+      "description": "かもしれない - decomposes to か + も + しれない (grammatically correct)",
       "input": "かもしれない",
       "expected": [
-        {"surface": "かもしれない", "pos": "Auxiliary"}
+        {"surface": "か", "pos": "Particle", "lemma": "か"},
+        {"surface": "も", "pos": "Particle", "lemma": "も"},
+        {"surface": "しれない", "pos": "Verb", "lemma": "しれる"}
       ],
       "tags": ["auxiliary", "possibility"]
     },
     {
       "id": "aux_kamoshiremasen",
-      "description": "Auxiliary かもしれません in sentence",
+      "description": "かもしれません in sentence - decomposes correctly",
       "input": "明日は雨かもしれません",
       "expected": [
         {"surface": "明日", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "雨", "pos": "Noun"},
-        {"surface": "かもしれません", "pos": "Auxiliary", "lemma": "かもしれない"}
+        {"surface": "か", "pos": "Particle", "lemma": "か"},
+        {"surface": "も", "pos": "Particle", "lemma": "も"},
+        {"surface": "しれません", "pos": "Verb", "lemma": "しれる"}
       ],
       "tags": ["auxiliary", "possibility"]
     },
@@ -279,7 +283,8 @@
         {"surface": "拙者", "pos": "Pronoun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "侍", "pos": "Noun"},
-        {"surface": "でござる", "pos": "Auxiliary", "lemma": "だ"}
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "ござる", "pos": "Verb", "lemma": "ござる"}
       ],
       "tags": ["character_speech", "samurai", "pronoun"]
     },

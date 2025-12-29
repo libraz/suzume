@@ -480,7 +480,7 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
       {"よう", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
       {"ほう", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
       {"わけ", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
-      {"はず", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
+      {"はず", POS::Noun, 0.3F, "はず", false, true, false, CT::None, "はず"},
       {"つもり", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
       {"まま", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
   };
@@ -956,6 +956,52 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       // Kuru verb imperative only (カ変動詞命令形)
       {"こい", POS::Verb, 0.2F, "くる", false, false, false, CT::None, ""},
 
+      // Special honorific verbs (特殊敬語動詞)
+      // These have irregular conjugation patterns, so we register each form individually
+      // with CT::None to prevent incorrect dynamic generation
+      // くださる系 (kudasaru - to give/do for me)
+      {"くださる", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
+      {"くださって", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
+      {"くださった", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
+      {"ください", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
+      {"くださらない", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
+      {"くださいます", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
+      {"くださいました", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
+      {"くださいませ", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
+      // おっしゃる系 (ossharu - to say, honorific)
+      {"おっしゃる", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
+      {"おっしゃって", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
+      {"おっしゃった", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
+      {"おっしゃい", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
+      {"おっしゃいます", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
+      {"おっしゃいました", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
+      {"おっしゃらない", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
+      // いらっしゃる系 (irassharu - to be/go/come, honorific)
+      {"いらっしゃる", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
+      {"いらっしゃって", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
+      {"いらっしゃった", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
+      {"いらっしゃい", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
+      {"いらっしゃいます", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
+      {"いらっしゃいました", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
+      {"いらっしゃらない", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
+      {"いらっしゃいませ", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
+      // なさる系 (nasaru - to do, honorific)
+      {"なさる", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
+      {"なさって", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
+      {"なさった", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
+      {"なさい", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
+      {"なさいます", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
+      {"なさいました", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
+      {"なさらない", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
+      {"なさいませ", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
+      // ござる系 (gozaru - old-fashioned/ninja speech)
+      {"ござる", POS::Verb, 0.3F, "ござる", false, false, false, CT::None, ""},
+      // ございます系 (modern polite form, treated as base with AUX)
+      {"ございます", POS::Auxiliary, 0.3F, "ございます", false, false, false, CT::None, ""},
+      {"ございました", POS::Auxiliary, 0.3F, "ございます", false, false, false, CT::None, ""},
+      {"ございません", POS::Auxiliary, 0.3F, "ございます", false, false, false, CT::None, ""},
+      {"ございませんでした", POS::Auxiliary, 0.3F, "ございます", false, false, false, CT::None, ""},
+
       // Nouns derived from verbs
       {"できあがり", POS::Noun, 0.3F, "できあがり", false, false, false, CT::None, ""},
   };
@@ -977,6 +1023,25 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"見つかる", POS::Verb, 0.3F, "見つかる", false, false, false, CT::GodanRa, "みつかる"},
       {"上がる", POS::Verb, 0.3F, "上がる", false, false, false, CT::GodanRa, "あがる"},
       {"下がる", POS::Verb, 0.3F, "下がる", false, false, false, CT::GodanRa, "さがる"},
+
+      // Single-kanji Ichidan verbs (単漢字一段動詞)
+      // These are critical for correct lemmatization of negation forms
+      // Without these, 見ない → 見なう (wrong) instead of 見る (correct)
+      {"見る", POS::Verb, 0.3F, "見る", false, false, false, CT::Ichidan, "みる"},
+      {"寝る", POS::Verb, 0.3F, "寝る", false, false, false, CT::Ichidan, "ねる"},
+      {"着る", POS::Verb, 0.3F, "着る", false, false, false, CT::Ichidan, "きる"},
+      {"得る", POS::Verb, 0.3F, "得る", false, false, false, CT::Ichidan, "える"},
+      {"出る", POS::Verb, 0.3F, "出る", false, false, false, CT::Ichidan, "でる"},
+      {"経る", POS::Verb, 0.3F, "経る", false, false, false, CT::Ichidan, "へる"},
+      {"似る", POS::Verb, 0.3F, "似る", false, false, false, CT::Ichidan, "にる"},
+      {"煮る", POS::Verb, 0.3F, "煮る", false, false, false, CT::Ichidan, "にる"},
+      {"居る", POS::Verb, 0.3F, "居る", false, false, false, CT::Ichidan, "いる"},
+      {"射る", POS::Verb, 0.3F, "射る", false, false, false, CT::Ichidan, "いる"},
+      {"干る", POS::Verb, 0.3F, "干る", false, false, false, CT::Ichidan, "ひる"},
+      {"鋳る", POS::Verb, 0.3F, "鋳る", false, false, false, CT::Ichidan, "いる"},
+      // 知れる: for かもしれない decomposition (か + も + しれない)
+      {"知れる", POS::Verb, 0.3F, "知れる", false, false, false, CT::Ichidan, "しれる"},
+      {"しれる", POS::Verb, 0.3F, "しれる", false, false, false, CT::Ichidan, "しれる"},
 
       // Common Godan verbs (frequently misidentified)
       {"喜ぶ", POS::Verb, 0.3F, "喜ぶ", false, false, false, CT::GodanBa, "よろこぶ"},

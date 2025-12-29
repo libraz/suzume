@@ -371,7 +371,7 @@
         {"surface": "com", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
         {"surface": "登録して", "pos": "Verb", "lemma": "登録する"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["number_special"]
     },

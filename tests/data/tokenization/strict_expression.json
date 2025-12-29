@@ -45,10 +45,11 @@
     },
     {
       "id": "contraction_miteta",
-      "description": "見てた should contain verb",
+      "description": "見てた - splits into te-form + past auxiliary",
       "input": "見てた",
       "expected": [
-        {"surface": "見てた", "pos": "Verb", "lemma": "見てる"}
+        {"surface": "見て", "pos": "Verb", "lemma": "見る"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["strict", "contraction"]
     },

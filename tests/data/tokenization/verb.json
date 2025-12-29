@@ -168,13 +168,12 @@
     },
     {
       "id": "honorific_irassharu",
-      "description": "Honorific verb いらっしゃる",
+      "description": "Honorific verb いらっしゃる - recognized as single token",
       "input": "先生がいらっしゃいます",
       "expected": [
         {"surface": "先生", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "いらっ", "pos": "Other"},
-        {"surface": "しゃいます", "pos": "Verb", "lemma": "しゃう"}
+        {"surface": "いらっしゃいます", "pos": "Verb", "lemma": "いらっしゃる"}
       ],
       "tags": ["verb", "honorific"]
     },

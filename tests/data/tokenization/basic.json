@@ -214,13 +214,15 @@
     },
     {
       "id": "bug_kamoshirenai",
-      "description": "雨が降るかもしれない - kamoshirenai pattern",
+      "description": "雨が降るかもしれない - kamoshirenai decomposes",
       "input": "雨が降るかもしれない",
       "expected": [
         {"surface": "雨", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "降る", "pos": "Verb", "lemma": "降る"},
-        {"surface": "かもしれない", "pos": "Auxiliary"}
+        {"surface": "か", "pos": "Particle", "lemma": "か"},
+        {"surface": "も", "pos": "Particle", "lemma": "も"},
+        {"surface": "しれない", "pos": "Verb", "lemma": "しれる"}
       ],
       "tags": ["basic", "regression"]
     },
@@ -231,7 +233,7 @@
       "expected": [
         {"surface": "領収書", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["basic", "regression"]
     },

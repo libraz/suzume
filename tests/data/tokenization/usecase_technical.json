@@ -38,7 +38,7 @@
         {"surface": "複雑すぎる", "pos": "Verb", "lemma": "複雑過ぎる"},
         {"surface": "ので", "pos": "Particle"},
         {"surface": "分割して", "pos": "Verb", "lemma": "分割する"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["technical", "documentation"]
     },
@@ -83,7 +83,7 @@
         {"surface": "コマンド", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "実行して", "pos": "Verb", "lemma": "実行する"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["technical", "documentation"]
     },
@@ -99,7 +99,7 @@
         {"surface": "は", "pos": "Particle"},
         {"surface": "再起動", "pos": "Noun"},
         {"surface": "して", "pos": "Verb", "lemma": "する"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["technical", "documentation"]
     },
@@ -516,7 +516,7 @@
         {"surface": "一錠", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "服用して", "pos": "Verb", "lemma": "服用する"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["medical"]
     },
@@ -534,7 +534,7 @@
         {"surface": "医師", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "相談して", "pos": "Verb", "lemma": "相談する"},
-        {"surface": "ください", "pos": "Auxiliary"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["medical"]
     },
