@@ -92,8 +92,12 @@ inline std::vector<DictionaryEntry> getParticleEntries() {
       {"ばかり", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
       {"だけ", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
       {"ほど", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
-      {"くらい", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
+      {"くらい", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},  // Low cost to beat 暗い(ADJ)
+      {"ぐらい", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},  // Voiced form of くらい
       {"など", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
+      {"なんて", POS::Particle, 0.5F, "", false, false, false, CT::None, ""},  // Belittling/surprise
+      {"ってば", POS::Particle, 0.5F, "", false, false, false, CT::None, ""},  // Emphatic final
+      {"ったら", POS::Particle, 0.5F, "", false, false, false, CT::None, ""},  // Topic/exclamation
   };
 }
 

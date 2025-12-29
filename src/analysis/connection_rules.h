@@ -101,7 +101,9 @@ enum class ConnectionPattern {
   SuffixAfterSymbol,       // SYMBOL → SUFFIX (invalid: 、家 should be NOUN, not SUFFIX)
   PrefixBeforeVerb,        // PREFIX → VERB (invalid: 何してる - 何 should be PRON)
   NounBeforeVerbAux,       // NOUN → verb-specific AUX (invalid: 行き(NOUN) + ましょう)
-  ParticleBeforeAux        // PARTICLE → AUX (invalid: と + う should not happen)
+  ParticleBeforeAux,       // PARTICLE → AUX (invalid: と + う should not happen)
+  NounBeforeNaAdj,         // NOUN → みたい etc (valid: 猫みたい)
+  VerbBeforeNaAdj          // VERB → みたい etc (valid: 食べるみたい)
 };
 
 /**

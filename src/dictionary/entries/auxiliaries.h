@@ -83,6 +83,22 @@ inline std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Cost 0.3F to beat i-adjective misanalysis (e.g., 出来まい should not be parsed as adj 出来まい)
       {"まい", POS::Auxiliary, 0.3F, "まい", false, false, false, CT::None, ""},
 
+      // Obligation (当為) - べき forms
+      // Attaches to 終止形: すべき, 食べるべき, 行くべき
+      // Expresses obligation or appropriateness
+      // Cost 0.3F to prevent VERB「べきる」misrecognition
+      {"べき", POS::Auxiliary, 0.5F, "べき", false, false, false, CT::None, ""},
+      {"べきだ", POS::Auxiliary, 0.3F, "べき", false, false, false, CT::None, ""},
+      {"べきだった", POS::Auxiliary, 0.3F, "べき", false, false, false, CT::None, ""},
+      {"べきで", POS::Auxiliary, 0.3F, "べき", false, false, false, CT::None, ""},
+      {"べきでは", POS::Auxiliary, 0.3F, "べき", false, false, false, CT::None, ""},
+
+      // Polite imperative (丁寧命令) - なさい
+      // Attaches to 連用形: 食べなさい, 書きなさい, しなさい
+      // Polite command form (softer than imperative)
+      // Cost 0.3F to prevent ADJ「なさい」misrecognition
+      {"なさい", POS::Auxiliary, 0.3F, "なさい", false, false, false, CT::None, ""},
+
       // Possibility/Uncertainty (可能性・不確実) - かもしれない forms
       // Without these, "もしれません" is incorrectly parsed as verb "もしれる"
       {"かもしれない", POS::Auxiliary, 0.3F, "かもしれない", false, false, false, CT::None, ""},

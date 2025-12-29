@@ -478,6 +478,36 @@
         {"surface": "に", "pos": "Particle"}
       ],
       "tags": ["grammar", "na-adjective", "sasuga"]
+    },
+    {
+      "id": "na_mitai_noun",
+      "description": "猫みたい (like a cat) - NOUN + みたい pattern",
+      "input": "猫みたい",
+      "expected": [
+        {"surface": "猫", "pos": "Noun"},
+        {"surface": "みたい", "pos": "Adjective", "lemma": "みたい"}
+      ],
+      "tags": ["grammar", "na-adjective", "mitai"]
+    },
+    {
+      "id": "na_mitai_na",
+      "description": "猫みたいな (like a cat - attributive)",
+      "input": "猫みたいな",
+      "expected": [
+        {"surface": "猫", "pos": "Noun"},
+        {"surface": "みたいな", "pos": "Adjective", "lemma": "みたい"}
+      ],
+      "tags": ["grammar", "na-adjective", "mitai"]
+    },
+    {
+      "id": "na_mitai_verb",
+      "description": "食べるみたい (seems like eating) - VERB + みたい pattern",
+      "input": "食べるみたい",
+      "expected": [
+        {"surface": "食べる", "pos": "Verb"},
+        {"surface": "みたい", "pos": "Adjective", "lemma": "みたい"}
+      ],
+      "tags": ["grammar", "na-adjective", "mitai"]
     }
   ]
 }

@@ -305,6 +305,57 @@
         {"surface": "参る", "pos": "Verb"}
       ],
       "tags": ["character_speech", "samurai", "pronoun"]
+    },
+    {
+      "id": "aux_mai_negative_conjecture",
+      "description": "Negative conjecture auxiliary まい",
+      "input": "行くまい",
+      "expected": [
+        {"surface": "行く", "pos": "Verb"},
+        {"surface": "まい", "pos": "Auxiliary", "lemma": "まい"}
+      ],
+      "tags": ["auxiliary", "negative_conjecture"]
+    },
+    {
+      "id": "aux_beki_obligation",
+      "description": "Obligation auxiliary べき",
+      "input": "行くべき",
+      "expected": [
+        {"surface": "行く", "pos": "Verb"},
+        {"surface": "べき", "pos": "Auxiliary", "lemma": "べき"}
+      ],
+      "tags": ["auxiliary", "obligation"]
+    },
+    {
+      "id": "aux_bekida_obligation",
+      "description": "Obligation auxiliary べき with copula",
+      "input": "食べるべきだった",
+      "expected": [
+        {"surface": "食べる", "pos": "Verb"},
+        {"surface": "べき", "pos": "Auxiliary", "lemma": "べき"},
+        {"surface": "だった", "pos": "Auxiliary"}
+      ],
+      "tags": ["auxiliary", "obligation"]
+    },
+    {
+      "id": "aux_nasai_polite_imperative",
+      "description": "Polite imperative auxiliary なさい (with godan verb)",
+      "input": "書きなさい",
+      "expected": [
+        {"surface": "書き", "pos": "Verb", "lemma": "書く"},
+        {"surface": "なさい", "pos": "Auxiliary", "lemma": "なさい"}
+      ],
+      "tags": ["auxiliary", "polite_imperative"]
+    },
+    {
+      "id": "aux_nasai_with_ichidan",
+      "description": "Polite imperative with ichidan verb (TODO: lemma should be 起きる not 起く - Phase 3C fix needed)",
+      "input": "起きなさい",
+      "expected": [
+        {"surface": "起き", "pos": "Verb"},
+        {"surface": "なさい", "pos": "Auxiliary", "lemma": "なさい"}
+      ],
+      "tags": ["auxiliary", "polite_imperative", "TODO_lemma_fix"]
     }
   ]
 }

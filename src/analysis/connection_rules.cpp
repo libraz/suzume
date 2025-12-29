@@ -892,6 +892,33 @@ ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
           "short/unknown aux after particle (likely split)"};
 }
 
+// Check for NOUN/VERB → みたい (ADJ) pattern
+// みたい is a na-adjective meaning "like ~" or "seems like ~"
+// Valid patterns:
+//   - NOUN + みたい: 猫みたい (like a cat)
+//   - VERB終止形 + みたい: 食べるみたい (seems like eating)
+// Without this bonus, unknown words like "猫みたい" may be parsed as a single VERB
+ConnectionRuleResult checkMitaiAfterNounOrVerb(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next) {
+  if (next.pos != core::PartOfSpeech::Adjective || next.surface != "みたい") {
+    return {};
+  }
+
+  // Bonus for NOUN + みたい (strong bonus to beat unknown verb analysis)
+  if (prev.pos == core::PartOfSpeech::Noun) {
+    return {ConnectionPattern::NounBeforeNaAdj, -3.0F,
+            "noun + mitai (resemblance pattern)"};
+  }
+
+  // Bonus for VERB + みたい (終止形/連体形)
+  if (prev.pos == core::PartOfSpeech::Verb) {
+    return {ConnectionPattern::VerbBeforeNaAdj, -1.0F,
+            "verb + mitai (hearsay/appearance pattern)"};
+  }
+
+  return {};
+}
+
 // Check for PARTICLE + hiragana OTHER pattern
 // Hiragana OTHER after particle is often a split error in reading contexts
 // e.g., と + うきょう in とうきょう should not be split
@@ -1073,6 +1100,11 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
   }
 
   result = checkParticleBeforeHiraganaOther(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
+  result = checkMitaiAfterNounOrVerb(prev, next);
   if (result.pattern != ConnectionPattern::None) {
     return result;
   }

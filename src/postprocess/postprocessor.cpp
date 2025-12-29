@@ -467,9 +467,10 @@ std::vector<core::Morpheme> Postprocessor::mergeNaAdjectiveNa(
       bool is_na_adj = true;
       if (current.surface.size() >= 3) {
         std::string_view last3 = current.surface.substr(current.surface.size() - 3);
-        // i-adjectives end with い (いい is special case)
+        // i-adjectives end with い (exceptions: きれい, きらい, 嫌い, みたい)
         if (last3 == "い" && current.surface != "きれい" &&
-            current.surface != "きらい" && current.surface != "嫌い") {
+            current.surface != "きらい" && current.surface != "嫌い" &&
+            current.surface != "みたい") {
           is_na_adj = false;
         }
       }

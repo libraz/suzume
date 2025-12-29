@@ -130,6 +130,12 @@ inline std::vector<DictionaryEntry> getNaAdjectiveEntries() {
       {"だめ", POS::Adjective, 0.3F, "だめ", false, false, false, CT::NaAdjective,
        ""},
 
+      // みたい - resemblance/similarity (〜のようだ)
+      // Without this, みたいな gets split as みたい(VERB) + な(PARTICLE)
+      // Na-adjective: postprocessor merges ADJ + な into unified form
+      {"みたい", POS::Adjective, 0.1F, "みたい", false, false, false, CT::NaAdjective,
+       ""},
+
       // Business/formal na-adjectives
       {"幸い", POS::Adjective, 0.3F, "", false, false, false, CT::NaAdjective,
        "さいわい"},

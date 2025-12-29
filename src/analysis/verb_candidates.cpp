@@ -354,6 +354,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               }
             }
           }
+          // Penalty for verb candidates containing みたい suffix
+          // みたい is a na-adjective (like ~, seems ~), not a verb suffix
+          // E.g., 猫みたい should be 猫 + みたい, not VERB 猫む
+          if (surface.find("みたい") != std::string::npos) {
+            base_cost += 1.5F;
+          }
           candidate.cost = base_cost;
           candidate.has_suffix = false;
           // Note: Don't set lemma here - let lemmatizer derive it more accurately

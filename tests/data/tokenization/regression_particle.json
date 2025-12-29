@@ -82,6 +82,57 @@
         {"surface": "ない", "pos": "Auxiliary"}
       ],
       "tags": ["regression", "particle", "filter"]
+    },
+    {
+      "id": "kurai_degree_particle",
+      "description": "くらい should be particle (degree), not 暗い adjective",
+      "input": "これくらい",
+      "expected": [
+        {"surface": "これ", "pos": "Pronoun"},
+        {"surface": "くらい", "pos": "Particle"}
+      ],
+      "tags": ["regression", "particle", "kurai"]
+    },
+    {
+      "id": "gurai_degree_particle",
+      "description": "ぐらい (voiced form of くらい) degree particle",
+      "input": "これぐらい",
+      "expected": [
+        {"surface": "これ", "pos": "Pronoun"},
+        {"surface": "ぐらい", "pos": "Particle"}
+      ],
+      "tags": ["regression", "particle", "gurai"]
+    },
+    {
+      "id": "nante_belittling_particle",
+      "description": "なんて belittling/surprise particle",
+      "input": "なんて言うの",
+      "expected": [
+        {"surface": "なんて", "pos": "Particle"},
+        {"surface": "言う", "pos": "Verb"},
+        {"surface": "の", "pos": "Particle"}
+      ],
+      "tags": ["regression", "particle", "nante"]
+    },
+    {
+      "id": "tteba_emphatic_particle",
+      "description": "ってば emphatic final particle",
+      "input": "もうってば",
+      "expected": [
+        {"surface": "もう", "pos": "Adverb"},
+        {"surface": "ってば", "pos": "Particle"}
+      ],
+      "tags": ["regression", "particle", "tteba"]
+    },
+    {
+      "id": "ttara_topic_particle",
+      "description": "ったら topic/exclamation particle",
+      "input": "あなたったら",
+      "expected": [
+        {"surface": "あなた", "pos": "Pronoun"},
+        {"surface": "ったら", "pos": "Particle"}
+      ],
+      "tags": ["regression", "particle", "ttara"]
     }
   ]
 }
