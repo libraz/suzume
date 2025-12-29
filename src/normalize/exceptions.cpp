@@ -141,4 +141,19 @@ const std::unordered_set<std::string_view> kFormalNounStrings = {
     "為",  // tame - sake/benefit (為替)
 };
 
+// =============================================================================
+// Particle Codepoints
+// =============================================================================
+// Case and binding particles as char32_t codepoints for character-level checks.
+// Used to filter strings starting with particles during candidate generation.
+
+const std::unordered_set<char32_t> kParticleCodepoints = {
+    // Case particles (格助詞)
+    U'が', U'を', U'に', U'で', U'と', U'へ', U'の',
+    // Binding particles (係助詞)
+    U'は', U'も',
+    // Other particles (副助詞)
+    U'や', U'か',
+};
+
 }  // namespace suzume::normalize

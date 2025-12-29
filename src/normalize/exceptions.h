@@ -115,6 +115,20 @@ inline bool isFormalNounSurface(std::string_view surface) {
   return kFormalNounStrings.find(surface) != kFormalNounStrings.end();
 }
 
+// =============================================================================
+// Particle Codepoints (for character-level filtering)
+// =============================================================================
+
+// Case particles (格助詞) and binding particles (係助詞) as codepoints
+// Used to filter out strings that start with particles from verb/adjective analysis
+// を, が, は, も, へ, の, に, で, と, や, か
+extern const std::unordered_set<char32_t> kParticleCodepoints;
+
+// Check if a codepoint is a case/binding particle
+inline bool isParticleCodepoint(char32_t ch) {
+  return kParticleCodepoints.find(ch) != kParticleCodepoints.end();
+}
+
 }  // namespace suzume::normalize
 
 #endif  // SUZUME_NORMALIZE_EXCEPTIONS_H_

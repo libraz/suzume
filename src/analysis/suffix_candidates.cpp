@@ -5,6 +5,7 @@
 
 #include "suffix_candidates.h"
 
+#include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "unknown.h"
 
@@ -274,9 +275,7 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
          hiragana_end - kanji_end < 4 &&
          char_types[hiragana_end] == normalize::CharType::Hiragana) {
     char32_t ch = codepoints[hiragana_end];
-    if (ch == U'を' || ch == U'が' || ch == U'は' || ch == U'も' ||
-        ch == U'へ' || ch == U'の' || ch == U'に' || ch == U'で' ||
-        ch == U'と' || ch == U'や' || ch == U'か') {
+    if (normalize::isParticleCodepoint(ch)) {
       break;
     }
     ++hiragana_end;

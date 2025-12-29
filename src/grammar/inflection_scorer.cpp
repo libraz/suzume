@@ -38,7 +38,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
 
   // Stem length penalties/bonuses
   // Very long stems are suspicious (likely wrong analysis)
-  if (stem_len >= 12) {
+  if (stem_len >= core::kFourJapaneseCharBytes) {
     base -= inflection::kPenaltyStemVeryLong;
     logConfidenceAdjustment(-inflection::kPenaltyStemVeryLong, "stem_very_long");
   } else if (stem_len >= core::kThreeJapaneseCharBytes) {
@@ -188,7 +188,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
     if (stem_len == core::kJapaneseCharBytes && endsWithKanji(stem)) {
       if (aux_count == 0) {
         // Base form like 寝る, 見る - no penalty (valid dictionary form)
-      } else if (aux_count == 1 && aux_total_len >= 12) {
+      } else if (aux_count == 1 && aux_total_len >= core::kFourJapaneseCharBytes) {
         // Single long aux match like させられた (15 bytes) or させられる (15 bytes)
         // This is legitimate Ichidan causative-passive (見させられた → 見る)
         base += inflection::kBonusIchidanCausativePassive;
@@ -331,7 +331,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Pattern: stem contains てしま/でしま (te-form + shimau) → verb compound
   // Pattern: stem contains ている/でいる (te-form + iru) → verb compound
   // Pattern: stem contains てお/でお (te-form + oku) → verb compound
-  if (type == VerbType::IAdjective && stem_len >= 12) {
+  if (type == VerbType::IAdjective && stem_len >= core::kFourJapaneseCharBytes) {
     // Check for common auxiliary patterns in the stem
     bool has_aux_pattern =
         stem.find("てしま") != std::string_view::npos ||

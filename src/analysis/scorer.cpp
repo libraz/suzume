@@ -281,7 +281,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // (0.5) limits the penalty effect. This scorer penalty ensures lattice cost is affected.
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary() &&
-      edge.surface.size() >= 12) {
+      edge.surface.size() >= core::kFourJapaneseCharBytes) {
     std::string_view surface = edge.surface;
     // Check for auxiliary patterns: てしま, でしま, ている, etc.
     if (surface.find("てしま") != std::string_view::npos ||

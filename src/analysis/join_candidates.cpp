@@ -653,9 +653,9 @@ void addTeFormAuxiliaryCandidates(
           bool is_negative = (aux_surface.size() >= core::kTwoJapaneseCharBytes &&
                               (aux_surface.substr(aux_surface.size() - core::kTwoJapaneseCharBytes) == "ない" ||
                                aux_surface.substr(aux_surface.size() - core::kTwoJapaneseCharBytes) == "なく"));
-          if (aux_surface.size() >= 12) {
+          if (aux_surface.size() >= core::kFourJapaneseCharBytes) {
             std::string_view suffix = std::string_view(aux_surface).substr(
-                aux_surface.size() - 12);
+                aux_surface.size() - core::kFourJapaneseCharBytes);
             if (suffix == "なかった" || suffix == "なくて") {
               is_negative = true;
             }

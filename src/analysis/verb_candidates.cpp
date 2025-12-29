@@ -252,9 +252,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (hp_size >= core::kTwoJapaneseCharBytes) {  // At least 2 hiragana
         // Get last hiragana character (particle candidate)
         char32_t last_char = codepoints[end_pos - 1];
-        if (last_char == U'に' || last_char == U'で' || last_char == U'を' ||
-            last_char == U'が' || last_char == U'は' || last_char == U'も' ||
-            last_char == U'へ' || last_char == U'の' || last_char == U'と') {
+        if (normalize::isParticleCodepoint(last_char)) {
           // Check if the preceding part could be a valid verb renyokei
           // Renyokei typically ends in い/り/き/ぎ/し/み/び/ち/に
           char32_t second_last_char = codepoints[end_pos - 2];
@@ -649,11 +647,8 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
   // Check if first hiragana could be a verb ending
   // Common verb endings start with: る, っ, ん, ら, り, れ, ろ, さ, し, せ, た, て, etc.
   char32_t first_hira = codepoints[kata_end];
-  // Skip if it's clearly a particle (を, が, は, に, へ, の, で, と, も, や)
-  if (first_hira == U'を' || first_hira == U'が' || first_hira == U'は' ||
-      first_hira == U'に' || first_hira == U'へ' || first_hira == U'の' ||
-      first_hira == U'で' || first_hira == U'と' || first_hira == U'も' ||
-      first_hira == U'や') {
+  // Skip if it's clearly a particle
+  if (normalize::isParticleCodepoint(first_hira)) {
     return candidates;
   }
 
