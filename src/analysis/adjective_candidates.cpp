@@ -302,6 +302,11 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         candidate.has_suffix = false;
         // Set lemma to base form from inflection analysis (e.g., 使いやすく → 使いやすい)
         candidate.lemma = cand.base_form;
+#ifdef SUZUME_DEBUG_INFO
+        candidate.origin = CandidateOrigin::AdjectiveI;
+        candidate.confidence = cand.confidence;
+        candidate.pattern = "i_adjective";
+#endif
         candidates.push_back(candidate);
         break;  // Only add one adjective candidate per surface
       }
@@ -359,6 +364,11 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
         // Low cost to prefer this over noun interpretation
         candidate.cost = 0.3F;
         candidate.has_suffix = true;
+#ifdef SUZUME_DEBUG_INFO
+        candidate.origin = CandidateOrigin::AdjectiveNa;
+        candidate.confidence = 1.0F;
+        candidate.pattern = "na_adjective_teki";
+#endif
         candidates.push_back(candidate);
         break;  // Use first matching suffix
       }
@@ -456,6 +466,11 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         candidate.has_suffix = false;
         // Set lemma to base form from inflection analysis
         candidate.lemma = cand.base_form;
+#ifdef SUZUME_DEBUG_INFO
+        candidate.origin = CandidateOrigin::AdjectiveIHiragana;
+        candidate.confidence = cand.confidence;
+        candidate.pattern = "i_adjective_hira";
+#endif
         candidates.push_back(candidate);
         break;  // Only add one adjective candidate per surface
       }
@@ -550,6 +565,11 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
         candidate.cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
         candidate.has_suffix = false;
         candidate.lemma = cand.base_form;
+#ifdef SUZUME_DEBUG_INFO
+        candidate.origin = CandidateOrigin::AdjectiveI;  // Katakana i-adj
+        candidate.confidence = cand.confidence;
+        candidate.pattern = "i_adjective_kata";
+#endif
         candidates.push_back(candidate);
         break;  // Only add one adjective candidate per surface
       }

@@ -22,7 +22,10 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
                         PartOfSpeech pos, float cost, uint8_t flags,
                         std::string_view lemma,
                         dictionary::ConjugationType conj_type,
-                        std::string_view reading) {
+                        std::string_view reading,
+                        [[maybe_unused]] CandidateOrigin origin,
+                        [[maybe_unused]] float origin_confidence,
+                        [[maybe_unused]] std::string_view origin_detail) {
   if (start > text_length_) {
     return static_cast<size_t>(-1);
   }
@@ -45,6 +48,15 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
     stored_reading = reading_storage_.back();
   }
 
+#ifdef SUZUME_DEBUG_INFO
+  // Store origin_detail if provided (debug only)
+  std::string_view stored_origin_detail;
+  if (!origin_detail.empty()) {
+    origin_detail_storage_.emplace_back(origin_detail);
+    stored_origin_detail = origin_detail_storage_.back();
+  }
+#endif
+
   LatticeEdge edge;
   edge.id = static_cast<uint32_t>(all_edges_.size());
   edge.start = start;
@@ -56,6 +68,11 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
   edge.lemma = stored_lemma;
   edge.reading = stored_reading;
   edge.conj_type = conj_type;
+#ifdef SUZUME_DEBUG_INFO
+  edge.origin = origin;
+  edge.origin_confidence = origin_confidence;
+  edge.origin_detail = stored_origin_detail;
+#endif
 
   all_edges_.push_back(edge);
   edges_by_start_[start].push_back(edge);
@@ -114,6 +131,9 @@ void Lattice::clear() {
   surface_storage_.clear();
   lemma_storage_.clear();
   reading_storage_.clear();
+#ifdef SUZUME_DEBUG_INFO
+  origin_detail_storage_.clear();
+#endif
   edge_count_ = 0;
 }
 

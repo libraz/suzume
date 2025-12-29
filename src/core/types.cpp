@@ -123,4 +123,46 @@ bool isFunctionWord(PartOfSpeech pos) {
   return pos == PartOfSpeech::Particle || pos == PartOfSpeech::Auxiliary;
 }
 
+const char* originToString(CandidateOrigin origin) {
+  switch (origin) {
+    case CandidateOrigin::Dictionary:
+      return "dict";
+    case CandidateOrigin::VerbKanji:
+      return "verb_kanji";
+    case CandidateOrigin::VerbHiragana:
+      return "verb_hira";
+    case CandidateOrigin::VerbKatakana:
+      return "verb_kata";
+    case CandidateOrigin::VerbCompound:
+      return "verb_compound";
+    case CandidateOrigin::AdjectiveI:
+      return "adj_i";
+    case CandidateOrigin::AdjectiveIHiragana:
+      return "adj_i_hira";
+    case CandidateOrigin::AdjectiveNa:
+      return "adj_na";
+    case CandidateOrigin::NominalizedNoun:
+      return "noun_nominalized";
+    case CandidateOrigin::SuffixPattern:
+      return "suffix";
+    case CandidateOrigin::SameType:
+      return "same_type";
+    case CandidateOrigin::Alphanumeric:
+      return "alphanum";
+    case CandidateOrigin::Onomatopoeia:
+      return "onomatopoeia";
+    case CandidateOrigin::CharacterSpeech:
+      return "char_speech";
+    case CandidateOrigin::Split:
+      return "split";
+    case CandidateOrigin::Join:
+      return "join";
+    case CandidateOrigin::KanjiHiraganaCompound:
+      return "kanji_hira_compound";
+    case CandidateOrigin::Unknown:
+    default:
+      return "unknown";
+  }
+}
+
 }  // namespace suzume::core

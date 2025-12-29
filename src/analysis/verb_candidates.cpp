@@ -128,6 +128,11 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
           // Note: Don't set lemma here - let lemmatizer derive it more accurately
           // Only set conj_type for conjugation pattern info
           cand.conj_type = grammar::verbTypeToConjType(infl_cand.verb_type);
+#ifdef SUZUME_DEBUG_INFO
+          cand.origin = CandidateOrigin::VerbCompound;
+          cand.confidence = infl_cand.confidence;
+          cand.pattern = grammar::verbTypeToString(infl_cand.verb_type);
+#endif
           candidates.push_back(cand);
           return candidates;  // Return first valid match
         }
@@ -365,6 +370,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Note: Don't set lemma here - let lemmatizer derive it more accurately
           // Only set conj_type for conjugation pattern info
           candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
+#ifdef SUZUME_DEBUG_INFO
+          candidate.origin = CandidateOrigin::VerbKanji;
+          candidate.confidence = best.confidence;
+          candidate.pattern = grammar::verbTypeToString(best.verb_type);
+#endif
           candidates.push_back(candidate);
           // Don't break - try other stem lengths too
         }
@@ -591,6 +601,11 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       // Note: Don't set lemma here - let lemmatizer derive it more accurately
       // Only set conj_type for conjugation pattern info
       candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::VerbHiragana;
+      candidate.confidence = best.confidence;
+      candidate.pattern = grammar::verbTypeToString(best.verb_type);
+#endif
       candidates.push_back(candidate);
     }
   }
@@ -685,6 +700,11 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
       candidate.has_suffix = false;
       candidate.lemma = best.base_form;  // Set lemma from inflection analysis
       candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::VerbKatakana;
+      candidate.confidence = best.confidence;
+      candidate.pattern = grammar::verbTypeToString(best.verb_type);
+#endif
       candidates.push_back(candidate);
     }
   }

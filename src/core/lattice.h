@@ -47,6 +47,13 @@ struct LatticeEdge {
   std::string_view reading;                // Reading in hiragana (optional)
   dictionary::ConjugationType conj_type{dictionary::ConjugationType::None};  // Conjugation type
 
+#ifdef SUZUME_DEBUG_INFO
+  // Debug: candidate origin tracking (excluded from release/WASM builds)
+  CandidateOrigin origin{CandidateOrigin::Unknown};
+  float origin_confidence{0.0F};           // Inflection confidence (for debug)
+  std::string_view origin_detail;          // Pattern detail (e.g., "ichidan_te_form")
+#endif
+
   // Flag constants for compatibility
   static constexpr uint8_t kFromDictionary = static_cast<uint8_t>(EdgeFlags::FromDictionary);
   static constexpr uint8_t kFromUserDict = static_cast<uint8_t>(EdgeFlags::FromUserDict);
@@ -92,13 +99,19 @@ class Lattice {
    * @param lemma Lemma (optional)
    * @param conj_type Conjugation type (optional)
    * @param reading Reading in hiragana (optional)
+   * @param origin Candidate origin for debug (optional)
+   * @param origin_confidence Origin confidence for debug (optional)
+   * @param origin_detail Origin detail pattern for debug (optional)
    * @return Edge ID
    */
   size_t addEdge(std::string_view surface, uint32_t start, uint32_t end,
                  PartOfSpeech pos, float cost, uint8_t flags,
                  std::string_view lemma = {},
                  dictionary::ConjugationType conj_type = dictionary::ConjugationType::None,
-                 std::string_view reading = {});
+                 std::string_view reading = {},
+                 CandidateOrigin origin = CandidateOrigin::Unknown,
+                 float origin_confidence = 0.0F,
+                 std::string_view origin_detail = {});
 
   /**
    * @brief Get all edges starting at a position
@@ -140,6 +153,9 @@ class Lattice {
   std::deque<std::string> surface_storage_;  // Storage for surface strings (deque for stable pointers)
   std::deque<std::string> lemma_storage_;    // Storage for lemma strings (deque for stable pointers)
   std::deque<std::string> reading_storage_;  // Storage for reading strings (deque for stable pointers)
+#ifdef SUZUME_DEBUG_INFO
+  std::deque<std::string> origin_detail_storage_;  // Storage for origin detail strings (deque for stable pointers)
+#endif
   static const std::vector<LatticeEdge> empty_edges_;
 };
 

@@ -27,18 +27,22 @@ help:
 	@echo "  make format-check - Check code formatting"
 	@echo "  make configure    - Configure CMake"
 	@echo ""
-	@echo "WASM targets:"
+	@echo "WASM targets (debug info disabled for smaller binary):"
 	@echo "  make wasm         - Build WASM module"
 	@echo "  make wasm-test    - Run WASM tests"
 	@echo "  make wasm-clean   - Clean WASM build"
 	@echo "  make wasm-rebuild - Clean and rebuild WASM"
 	@echo ""
+	@echo "Options:"
+	@echo "  CMAKE_OPTIONS     - Extra CMake options (e.g., -DENABLE_DEBUG_INFO=OFF)"
+	@echo ""
 	@echo "  make help         - Show this help message"
 	@echo ""
 	@echo "Examples:"
-	@echo "  make              # Build the project"
-	@echo "  make test         # Run all tests"
-	@echo "  make wasm         # Build WASM module"
+	@echo "  make                                  # Build the project"
+	@echo "  make test                             # Run all tests"
+	@echo "  make wasm                             # Build WASM module"
+	@echo "  make CMAKE_OPTIONS=-DENABLE_DEBUG_INFO=OFF  # Build without debug info"
 
 # Configure CMake
 configure:
@@ -88,10 +92,10 @@ format-check:
 # WASM Targets
 # ============================================
 
-# Configure WASM build
+# Configure WASM build (debug info disabled for smaller binary)
 wasm-configure:
 	@echo "Configuring WASM build..."
-	emcmake cmake -B $(WASM_BUILD_DIR) -DBUILD_WASM=ON -DCMAKE_BUILD_TYPE=Release
+	emcmake cmake -B $(WASM_BUILD_DIR) -DBUILD_WASM=ON -DENABLE_DEBUG_INFO=OFF -DCMAKE_BUILD_TYPE=Release
 
 # Build WASM module
 wasm: wasm-configure

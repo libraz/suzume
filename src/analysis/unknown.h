@@ -11,6 +11,9 @@
 
 namespace suzume::analysis {
 
+// Use CandidateOrigin from core::
+using core::CandidateOrigin;
+
 /**
  * @brief Unknown word generation options
  */
@@ -46,6 +49,13 @@ struct UnknownCandidate {
   bool has_suffix{false};
   std::string lemma;  // Base form (for verbs/adjectives)
   dictionary::ConjugationType conj_type{dictionary::ConjugationType::None};
+
+#ifdef SUZUME_DEBUG_INFO
+  // Debug: candidate origin tracking (excluded from release/WASM builds)
+  CandidateOrigin origin{CandidateOrigin::Unknown};
+  float confidence{0.0F};  // Inflection analysis confidence (for verbs/adj)
+  std::string pattern;     // Pattern detail (e.g., "ichidan_te_form")
+#endif
 };
 
 /**

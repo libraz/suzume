@@ -89,6 +89,11 @@ std::vector<UnknownCandidate> generateWithSuffix(
         stem.pos = core::PartOfSpeech::Noun;
         stem.cost = 1.0F + options.suffix_separation_bonus;
         stem.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+        stem.origin = CandidateOrigin::SuffixPattern;
+        stem.confidence = 1.0F;
+        stem.pattern = "stem_before_" + std::string(suffix);
+#endif
         candidates.push_back(stem);
 
         // Add whole word candidate too
@@ -99,6 +104,11 @@ std::vector<UnknownCandidate> generateWithSuffix(
         whole.pos = core::PartOfSpeech::Noun;
         whole.cost = 1.2F;
         whole.has_suffix = true;
+#ifdef SUZUME_DEBUG_INFO
+        whole.origin = CandidateOrigin::SuffixPattern;
+        whole.confidence = 1.0F;
+        whole.pattern = "with_suffix_" + std::string(suffix);
+#endif
         candidates.push_back(whole);
 
         break;  // Use longest matching suffix
@@ -186,6 +196,11 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
         candidate.pos = core::PartOfSpeech::Noun;
         candidate.cost = 0.8F;
         candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+        candidate.origin = CandidateOrigin::NominalizedNoun;
+        candidate.confidence = 0.8F;
+        candidate.pattern = "nominalized_2hira";
+#endif
         candidates.push_back(candidate);
       }
     }
@@ -211,6 +226,11 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
       candidate.pos = core::PartOfSpeech::Noun;
       candidate.cost = 1.2F;
       candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::NominalizedNoun;
+      candidate.confidence = 0.6F;
+      candidate.pattern = "nominalized_1hira";
+#endif
       candidates.push_back(candidate);
     }
   }
@@ -359,6 +379,11 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     candidate.pos = core::PartOfSpeech::Noun;
     candidate.cost = looks_like_aux ? 3.5F : 1.0F;
     candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+    candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
+    candidate.confidence = looks_like_aux ? 0.3F : 0.8F;
+    candidate.pattern = looks_like_aux ? "aux_like" : "compound";
+#endif
     candidates.push_back(candidate);
   }
 

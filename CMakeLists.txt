@@ -13,6 +13,20 @@ option(BUILD_CLI "Build CLI executable" ON)
 option(BUILD_TESTING "Build tests" ON)
 option(BUILD_WASM "Build for WebAssembly" OFF)
 option(ENABLE_COVERAGE "Enable code coverage" OFF)
+option(ENABLE_DEBUG_INFO "Enable debug origin tracking in candidates" ON)
+
+# Disable debug info for WASM builds by default
+if(BUILD_WASM AND NOT DEFINED CACHE{ENABLE_DEBUG_INFO})
+  set(ENABLE_DEBUG_INFO OFF CACHE BOOL "Enable debug origin tracking in candidates" FORCE)
+endif()
+
+# Add debug info compile definition
+if(ENABLE_DEBUG_INFO)
+  add_compile_definitions(SUZUME_DEBUG_INFO)
+  message(STATUS "Debug origin tracking: ENABLED")
+else()
+  message(STATUS "Debug origin tracking: DISABLED")
+endif()
 
 # Output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

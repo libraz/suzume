@@ -123,12 +123,31 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   float pos_prior = posPrior(edge.pos);
   float cost = base_cost + pos_prior;
 
-  SUZUME_DEBUG_LOG("[WORD] \"" << edge.surface << "\" ("
-                     << core::posToString(edge.pos) << ") lemma=\""
-                     << edge.lemma << "\" "
-                     << (edge.fromDictionary() ? "[dict]" :
-                         edge.isUnknown() ? "[unk]" : "[infl]")
-                     << ": base=" << base_cost << " pos=" << pos_prior << "\n");
+  // Debug output with origin info
+  if (core::Debug::isEnabled()) {
+    core::Debug::log() << "[WORD] \"" << edge.surface << "\" ("
+                       << core::posToString(edge.pos) << ") lemma=\""
+                       << edge.lemma << "\" ";
+    if (edge.fromDictionary()) {
+      core::Debug::log() << "[dict]";
+    } else if (edge.isUnknown()) {
+#ifdef SUZUME_DEBUG_INFO
+      core::Debug::log() << "[unk:" << core::originToString(edge.origin);
+      if (!edge.origin_detail.empty()) {
+        core::Debug::log() << " " << edge.origin_detail;
+      }
+      if (edge.origin_confidence > 0.0F) {
+        core::Debug::log() << " conf=" << edge.origin_confidence;
+      }
+      core::Debug::log() << "]";
+#else
+      core::Debug::log() << "[unk]";
+#endif
+    } else {
+      core::Debug::log() << "[infl]";
+    }
+    core::Debug::log() << ": base=" << base_cost << " pos=" << pos_prior << "\n";
+  }
 
   // Dictionary bonus
   if (edge.fromDictionary()) {

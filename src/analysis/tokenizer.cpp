@@ -255,9 +255,17 @@ void Tokenizer::addUnknownCandidates(
 
     std::string surface_str(candidate.surface);
 
+#ifdef SUZUME_DEBUG_INFO
+    lattice.addEdge(surface_str, static_cast<uint32_t>(candidate.start),
+                    static_cast<uint32_t>(candidate.end), candidate.pos,
+                    adjusted_cost, flags, candidate.lemma, candidate.conj_type,
+                    {},  // reading
+                    candidate.origin, candidate.confidence, candidate.pattern);
+#else
     lattice.addEdge(surface_str, static_cast<uint32_t>(candidate.start),
                     static_cast<uint32_t>(candidate.end), candidate.pos,
                     adjusted_cost, flags, candidate.lemma, candidate.conj_type);
+#endif
   }
 }
 

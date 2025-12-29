@@ -311,6 +311,18 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       }
 
       candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::SameType;
+      candidate.confidence = 1.0F;
+      switch (start_type) {
+        case normalize::CharType::Kanji: candidate.pattern = "kanji_seq"; break;
+        case normalize::CharType::Katakana: candidate.pattern = "kata_seq"; break;
+        case normalize::CharType::Hiragana: candidate.pattern = "hira_seq"; break;
+        case normalize::CharType::Alphabet: candidate.pattern = "alpha_seq"; break;
+        case normalize::CharType::Digit: candidate.pattern = "digit_seq"; break;
+        default: candidate.pattern = "other_seq"; break;
+      }
+#endif
       candidates.push_back(candidate);
     }
   }
@@ -367,6 +379,11 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAlphanumeric(
       candidate.pos = core::PartOfSpeech::Noun;
       candidate.cost = 0.8F;
       candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::Alphanumeric;
+      candidate.confidence = 1.0F;
+      candidate.pattern = "alphanum_mixed";
+#endif
       candidates.push_back(candidate);
     }
   }
@@ -559,6 +576,13 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
       candidate.pos = core::PartOfSpeech::Auxiliary;
       candidate.cost = options_.character_speech_cost;
       candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::CharacterSpeech;
+      candidate.confidence = 0.5F;
+      candidate.pattern = (start_type == normalize::CharType::Hiragana)
+                              ? "char_speech_hira"
+                              : "char_speech_kata";
+#endif
       candidates.push_back(candidate);
     }
   }
@@ -603,6 +627,11 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
       candidate.pos = core::PartOfSpeech::Adverb;
       candidate.cost = 0.1F;  // Very low cost to prefer over particle + adj splits
       candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::Onomatopoeia;
+      candidate.confidence = 1.0F;
+      candidate.pattern = "abab_pattern";
+#endif
       candidates.push_back(candidate);
     }
   }
