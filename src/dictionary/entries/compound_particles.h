@@ -18,10 +18,9 @@
 // For vocabulary, use Layer 2 (core.dic) or Layer 3 (user.dic).
 // =============================================================================
 
-#include "core/types.h"
-#include "dictionary/dictionary.h"
-
 #include <vector>
+
+#include "dictionary/dictionary.h"
 
 namespace suzume::dictionary::entries {
 
@@ -34,44 +33,7 @@ namespace suzume::dictionary::entries {
  *
  * @return Vector of dictionary entries for compound particles
  */
-inline std::vector<DictionaryEntry> getCompoundParticleEntries() {
-  using POS = core::PartOfSpeech;
-  using CT = ConjugationType;
-
-  // Compound particles: grammaticalized forms functioning as single units
-  // Hiragana-only forms are strongly grammaticalized and should remain as units
-  // Forms with kanji (に基づいて, に限って, etc.) should be analyzed as
-  // particle + verb to preserve verb conjugation information
-  // Format: {surface, POS, cost, lemma, prefix, formal, low_info, conj, reading}
-  return {
-      // Relation (関連) - hiragana only
-      {"について", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-
-      // Cause/Means (原因・手段) - hiragana only
-      {"によって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"により", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"によると", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-
-      // Place/Situation (場所・状況) - hiragana only
-      {"において", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"にて", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-
-      // Capacity/Viewpoint (資格・観点) - hiragana only
-      {"として", POS::Particle, 0.1F, "", false, false, false, CT::None, ""},
-      {"にとって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-
-      // Duration/Scope (範囲・期間) - hiragana only
-      {"にわたって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"にわたり", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"にあたって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"にあたり", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-
-      // Topic/Means (話題・手段) - hiragana only
-      {"をめぐって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"をめぐり", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"をもって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-  };
-}
+std::vector<DictionaryEntry> getCompoundParticleEntries();
 
 }  // namespace suzume::dictionary::entries
 

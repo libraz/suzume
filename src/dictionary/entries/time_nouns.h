@@ -24,10 +24,9 @@
 //   ✅ Needed for WASM: Only reason this file exists
 // =============================================================================
 
-#include "core/types.h"
-#include "dictionary/dictionary.h"
-
 #include <vector>
+
+#include "dictionary/dictionary.h"
 
 namespace suzume::dictionary::entries {
 
@@ -42,60 +41,7 @@ namespace suzume::dictionary::entries {
  *
  * @return Vector of dictionary entries for time nouns
  */
-inline std::vector<DictionaryEntry> getTimeNounEntries() {
-  using POS = core::PartOfSpeech;
-  using CT = ConjugationType;
-
-  // Note: Time nouns use is_formal_noun=true to enable hiragana auto-expansion
-  // This is a pragmatic choice - time nouns are functionally a closed class
-  return {
-      // Days (日)
-      {"今日", POS::Noun, 0.5F, "", false, true, false, CT::None, "きょう"},
-      {"明日", POS::Noun, 0.5F, "", false, true, false, CT::None, "あした"},
-      {"昨日", POS::Noun, 0.5F, "", false, true, false, CT::None, "きのう"},
-      {"明後日", POS::Noun, 0.5F, "", false, true, false, CT::None, "あさって"},
-      {"一昨日", POS::Noun, 0.5F, "", false, true, false, CT::None, "おととい"},
-      {"毎日", POS::Noun, 0.5F, "", false, true, false, CT::None, "まいにち"},
-
-      // Time of day (時間帯)
-      {"今朝", POS::Noun, 0.5F, "", false, true, false, CT::None, "けさ"},
-      {"毎朝", POS::Noun, 0.5F, "", false, true, false, CT::None, "まいあさ"},
-      {"今晩", POS::Noun, 0.5F, "", false, true, false, CT::None, "こんばん"},
-      {"今夜", POS::Noun, 0.5F, "", false, true, false, CT::None, "こんや"},
-      {"昨夜", POS::Noun, 0.5F, "", false, true, false, CT::None, "さくや"},
-      {"朝", POS::Noun, 0.6F, "", false, true, false, CT::None, "あさ"},
-      {"昼", POS::Noun, 0.6F, "", false, true, false, CT::None, "ひる"},
-      {"夜", POS::Noun, 0.6F, "", false, true, false, CT::None, "よる"},
-      {"夕方", POS::Noun, 0.6F, "", false, true, false, CT::None, "ゆうがた"},
-
-      // Weeks (週)
-      {"今週", POS::Noun, 0.5F, "", false, true, false, CT::None, "こんしゅう"},
-      {"来週", POS::Noun, 0.5F, "", false, true, false, CT::None, "らいしゅう"},
-      {"先週", POS::Noun, 0.5F, "", false, true, false, CT::None, "せんしゅう"},
-      {"毎週", POS::Noun, 0.5F, "", false, true, false, CT::None, "まいしゅう"},
-
-      // Months (月)
-      {"今月", POS::Noun, 0.5F, "", false, true, false, CT::None, "こんげつ"},
-      {"来月", POS::Noun, 0.5F, "", false, true, false, CT::None, "らいげつ"},
-      {"先月", POS::Noun, 0.5F, "", false, true, false, CT::None, "せんげつ"},
-      {"毎月", POS::Noun, 0.5F, "", false, true, false, CT::None, "まいつき"},
-
-      // Years (年)
-      {"今年", POS::Noun, 0.5F, "", false, true, false, CT::None, "ことし"},
-      {"来年", POS::Noun, 0.5F, "", false, true, false, CT::None, "らいねん"},
-      {"去年", POS::Noun, 0.5F, "", false, true, false, CT::None, "きょねん"},
-      {"昨年", POS::Noun, 0.5F, "", false, true, false, CT::None, "さくねん"},
-      {"毎年", POS::Noun, 0.5F, "", false, true, false, CT::None, "まいとし"},
-
-      // Other time expressions
-      {"今", POS::Noun, 0.5F, "", false, true, false, CT::None, "いま"},
-      {"現在", POS::Noun, 0.5F, "", false, true, false, CT::None, "げんざい"},
-      {"最近", POS::Noun, 0.5F, "", false, true, false, CT::None, "さいきん"},
-      {"将来", POS::Noun, 0.5F, "", false, true, false, CT::None, "しょうらい"},
-      {"過去", POS::Noun, 0.5F, "", false, true, false, CT::None, "かこ"},
-      {"未来", POS::Noun, 0.5F, "", false, true, false, CT::None, "みらい"},
-  };
-}
+std::vector<DictionaryEntry> getTimeNounEntries();
 
 }  // namespace suzume::dictionary::entries
 

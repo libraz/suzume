@@ -24,7 +24,6 @@
 
 #include <vector>
 
-#include "core/types.h"
 #include "dictionary/dictionary.h"
 
 namespace suzume::dictionary::entries {
@@ -37,22 +36,7 @@ namespace suzume::dictionary::entries {
  *
  * @return Vector of dictionary entries for common vocabulary
  */
-inline std::vector<DictionaryEntry> getCommonVocabularyEntries() {
-  using POS = core::PartOfSpeech;
-  using CT = ConjugationType;
-
-  // Format: {surface, POS, cost, lemma, prefix, formal, low_info, conj, reading}
-  return {
-      // ========================================
-      // Compound nouns (複合名詞)
-      // ========================================
-      {"飲み会", POS::Noun, 0.3F, "", false, false, false, CT::None, "のみかい"},
-      {"楽しみ", POS::Noun, 0.3F, "", false, false, false, CT::None, "たのしみ"},
-      {"食べ物", POS::Noun, 0.3F, "", false, false, false, CT::None, "たべもの"},
-      {"飲み物", POS::Noun, 0.3F, "", false, false, false, CT::None, "のみもの"},
-      {"買い物", POS::Noun, 0.3F, "", false, false, false, CT::None, "かいもの"},
-  };
-}
+std::vector<DictionaryEntry> getCommonVocabularyEntries();
 
 }  // namespace suzume::dictionary::entries
 

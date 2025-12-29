@@ -23,10 +23,9 @@
 // For vocabulary, use Layer 2 (core.dic) or Layer 3 (user.dic).
 // =============================================================================
 
-#include "core/types.h"
-#include "dictionary/dictionary.h"
-
 #include <vector>
+
+#include "dictionary/dictionary.h"
 
 namespace suzume::dictionary::entries {
 
@@ -38,38 +37,7 @@ namespace suzume::dictionary::entries {
  *
  * @return Vector of dictionary entries for formal nouns
  */
-inline std::vector<DictionaryEntry> getFormalNounEntries() {
-  using POS = core::PartOfSpeech;
-  using CT = ConjugationType;
-
-  return {
-      // Kanji forms with reading (hiragana auto-generated)
-      // Note: Formal nouns need lower cost than particle combinations
-      // e.g., "もの" must beat "も"(0.5) + "の"(1.0) after Viterbi scoring
-      // Low cost (0.3) compensates for connection costs in Viterbi
-      {"事", POS::Noun, 0.3F, "", false, true, false, CT::None, "こと"},
-      {"こと", POS::Noun, -0.5F, "事", false, true, false, CT::None, ""},  // Formal noun after verb 連体形
-      {"物", POS::Noun, 0.3F, "", false, true, false, CT::None, "もの"},
-      {"もの", POS::Noun, -0.5F, "物", false, true, false, CT::None, ""},  // Formal noun after verb 連体形
-      {"為", POS::Noun, 2.0F, "", false, true, false, CT::None, "ため"},
-      {"所", POS::Noun, 1.0F, "", false, true, false, CT::None, "ところ"},
-      {"ところ", POS::Noun, 0.3F, "", false, true, false, CT::None, ""},  // Aspectual: Vたところだ
-      {"時", POS::Noun, 2.0F, "", false, true, false, CT::None, "とき"},
-      {"内", POS::Noun, 2.0F, "", false, true, false, CT::None, "うち"},
-      {"通り", POS::Noun, 2.0F, "", false, true, false, CT::None, "とおり"},
-      {"限り", POS::Noun, 2.0F, "", false, true, false, CT::None, "かぎり"},
-      // Suffix-like formal nouns (prevent merging with preceding nouns)
-      {"付け", POS::Noun, 0.3F, "", false, true, false, CT::None, "つけ"},
-      {"付", POS::Noun, 0.5F, "", false, true, false, CT::None, "つけ"},
-      // Hiragana-only forms (no common kanji equivalent)
-      {"よう", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
-      {"ほう", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
-      {"わけ", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
-      {"はず", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
-      {"つもり", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
-      {"まま", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
-  };
-}
+std::vector<DictionaryEntry> getFormalNounEntries();
 
 }  // namespace suzume::dictionary::entries
 

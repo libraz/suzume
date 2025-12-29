@@ -19,7 +19,6 @@
 
 #include <vector>
 
-#include "core/types.h"
 #include "dictionary/dictionary.h"
 
 namespace suzume::dictionary::entries {
@@ -29,110 +28,7 @@ namespace suzume::dictionary::entries {
  *
  * @return Vector of dictionary entries for common adverbs
  */
-inline std::vector<DictionaryEntry> getAdverbEntries() {
-  using POS = core::PartOfSpeech;
-  using CT = ConjugationType;
-
-  return {
-      // Degree adverbs (程度副詞) - kanji with reading
-      {"大変", POS::Adverb, -1.0F, "", false, false, false, CT::None, "たいへん"},
-      {"全く", POS::Adverb, 0.5F, "", false, false, false, CT::None, "まったく"},
-      {"全然", POS::Adverb, 0.5F, "", false, false, false, CT::None, "ぜんぜん"},
-      {"少し", POS::Adverb, 0.5F, "", false, false, false, CT::None, "すこし"},
-      {"結構", POS::Adverb, 0.5F, "", false, false, false, CT::None, "けっこう"},
-      // Degree adverbs - hiragana only
-      {"とても", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"すごく", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"めっちゃ", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},  // colloquial
-      {"かなり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      // Low cost to beat た(AUX)+くさん(OTHER) combination
-      {"たくさん", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-      {"沢山", POS::Adverb, 0.3F, "", false, false, false, CT::None, "たくさん"},
-      {"もっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"ずっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"さらに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"まさに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"あまり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"なかなか", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"ほとんど", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"ちょっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-
-      // Manner adverbs (様態副詞) - hiragana only
-      {"ゆっくり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"しっかり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"はっきり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"きちんと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"ちゃんと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-
-      // Demonstrative adverbs (指示副詞) - critical for tokenization
-      // Without these, "そう" is incorrectly parsed as a verb
-      {"そう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-      {"こう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-      {"ああ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-      {"どう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-      // Distributive adverbs (分配副詞)
-      {"それぞれ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-      {"おのおの", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      // Interrogative adverbs (疑問副詞) - compounds of demonstratives
-      {"どうして", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-      {"どうしても", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-      {"どうにか", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-      {"どうも", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-
-      // Time adverbs (時間副詞) - hiragana only
-      {"すぐ", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"すぐに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      // Time adverbs (時間副詞) - kanji with reading
-      {"今すぐ", POS::Adverb, 0.5F, "", false, false, false, CT::None, "いますぐ"},
-      {"まだ", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"もう", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"やっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"ついに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      // Very low cost for いつも to beat いつ(PRON)+もの(NOUN) combination
-      // Path comparison with 店(unknown, cost ~3.4):
-      //   いつも(-1.8) + の(0.6) + conn(0.5) + 店(3.4) ≈ 2.7
-      //   いつ(0.1) + もの(-1.2) + 店(3.4) ≈ 2.3
-      // Need extra -0.2 to overcome the 0.4 gap + some margin
-      {"いつも", POS::Adverb, -1.2F, "", false, false, false, CT::None, ""},
-      {"たまに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"よく", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"たびたび", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-
-      // Conditional adverbs (条件副詞)
-      {"もし", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"もしも", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"仮に", POS::Adverb, 0.5F, "", false, false, false, CT::None, "かりに"},
-      {"万一", POS::Adverb, 0.5F, "", false, false, false, CT::None, "まんいち"},
-
-      // Affirmation/Negation adverbs - kanji with reading
-      {"必ず", POS::Adverb, 0.5F, "", false, false, false, CT::None, "かならず"},
-      {"決して", POS::Adverb, 0.5F, "", false, false, false, CT::None, "けっして"},
-      // Affirmation/Negation - hiragana only
-      {"きっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"たぶん", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"おそらく", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-
-      // Other common adverbs - kanji with reading
-      {"実は", POS::Adverb, 0.5F, "", false, false, false, CT::None, "じつは"},
-      {"特に", POS::Adverb, 0.5F, "", false, false, false, CT::None, "とくに"},
-      {"主に", POS::Adverb, 0.5F, "", false, false, false, CT::None, "おもに"},
-      // Other - hiragana only
-      {"やはり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"やっぱり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-
-      // Sequence adverbs (順序副詞)
-      // Note: 最初に、次に、最後に are not registered here because they should
-      // be analyzed as NOUN+PARTICLE (最初+に, etc.) per existing tests
-      {"まず", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-      {"先ず", POS::Adverb, 0.3F, "", false, false, false, CT::None, "まず"},
-
-      // Formal/Business adverbs (敬語・ビジネス)
-      {"何卒", POS::Adverb, 0.3F, "", false, false, false, CT::None, "なにとぞ"},
-      {"誠に", POS::Adverb, 0.3F, "", false, false, false, CT::None, "まことに"},
-      {"甚だ", POS::Adverb, 0.5F, "", false, false, false, CT::None, "はなはだ"},
-      {"恐縮", POS::Noun, 0.3F, "", false, false, false, CT::None, "きょうしゅく"},
-  };
-}
+std::vector<DictionaryEntry> getAdverbEntries();
 
 }  // namespace suzume::dictionary::entries
 

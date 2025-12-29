@@ -8,6 +8,7 @@ add_library(suzume_dictionary STATIC
   double_array.cpp
   binary_dict.cpp
   string_pool.cpp
+  entries/entries.cpp
 )
 
 target_include_directories(suzume_dictionary

@@ -23,10 +23,9 @@
 //   ❌ Business vocabulary
 // =============================================================================
 
-#include "core/types.h"
-#include "dictionary/dictionary.h"
-
 #include <vector>
+
+#include "dictionary/dictionary.h"
 
 namespace suzume::dictionary::entries {
 
@@ -38,27 +37,7 @@ namespace suzume::dictionary::entries {
  *
  * @return Vector of dictionary entries for greetings
  */
-inline std::vector<DictionaryEntry> getGreetingEntries() {
-  using POS = core::PartOfSpeech;
-  using CT = ConjugationType;
-
-  // All greetings are hiragana-only; reading field is empty
-  // Format: {surface, POS, cost, lemma, prefix, formal, low_info, conj, reading}
-  return {
-      // ===== Basic Greetings (基本挨拶) =====
-      {"こんにちは", POS::Other, 0.3F, "こんにちは", false, false, false, CT::None, ""},
-      {"こんばんは", POS::Other, 0.3F, "こんばんは", false, false, false, CT::None, ""},
-      {"おはよう", POS::Other, 0.3F, "おはよう", false, false, false, CT::None, ""},
-      {"おやすみ", POS::Other, 0.3F, "おやすみ", false, false, false, CT::None, ""},
-      {"さようなら", POS::Other, 0.3F, "さようなら", false, false, false, CT::None, ""},
-
-      // ===== Thanks and Apologies (感謝・謝罪) =====
-      {"ありがとう", POS::Other, 0.3F, "ありがとう", false, false, false, CT::None, ""},
-      {"すみません", POS::Other, 0.3F, "すみません", false, false, false, CT::None, ""},
-      {"ごめんなさい", POS::Other, 0.3F, "ごめんなさい", false, false, false, CT::None, ""},
-      {"ごめん", POS::Other, 0.3F, "ごめん", false, false, false, CT::None, ""},
-  };
-}
+std::vector<DictionaryEntry> getGreetingEntries();
 
 }  // namespace suzume::dictionary::entries
 
