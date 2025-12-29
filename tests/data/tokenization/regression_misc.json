@@ -343,6 +343,176 @@
         {"surface": "ですわ", "pos": "Auxiliary", "lemma": "です"}
       ],
       "tags": ["regression", "character_speech"]
+    },
+    {
+      "id": "formal_noun_hazu_da",
+      "description": "はずだ - formal noun hazu + copula",
+      "input": "はずだ",
+      "expected": [
+        {"surface": "はず", "pos": "Noun", "lemma": "はず"},
+        {"surface": "だ", "pos": "Auxiliary", "lemma": "だ"}
+      ],
+      "tags": ["regression", "formal_noun"]
+    },
+    {
+      "id": "formal_noun_hazu_ganai",
+      "description": "はずがない - formal noun hazu + negative",
+      "input": "はずがない",
+      "expected": [
+        {"surface": "はず", "pos": "Noun", "lemma": "はず"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "ない", "pos": "Auxiliary", "lemma": "ない"}
+      ],
+      "tags": ["regression", "formal_noun"]
+    },
+    {
+      "id": "formal_noun_kuru_hazu_datta",
+      "description": "来るはずだった - verb + hazu + past copula",
+      "input": "来るはずだった",
+      "expected": [
+        {"surface": "来る", "pos": "Verb", "lemma": "来る"},
+        {"surface": "はず", "pos": "Noun", "lemma": "はず"},
+        {"surface": "だった", "pos": "Auxiliary", "lemma": "だった"}
+      ],
+      "tags": ["regression", "formal_noun"]
+    },
+    {
+      "id": "conjunction_chinamini",
+      "description": "ちなみに should be Conjunction, not ちなむ verb",
+      "input": "ちなみに今日は晴れです",
+      "expected": [
+        {"surface": "ちなみに", "pos": "Conjunction"},
+        {"surface": "今日", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "晴れ", "pos": "Noun"},
+        {"surface": "です", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "conjunction"]
+    },
+    {
+      "id": "adverb_tatoe",
+      "description": "たとえ should be Adverb (conditional)",
+      "input": "たとえ雨でも行く",
+      "expected": [
+        {"surface": "たとえ", "pos": "Adverb"},
+        {"surface": "雨", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "も", "pos": "Particle"},
+        {"surface": "行く", "pos": "Verb"}
+      ],
+      "tags": ["regression", "adverb"]
+    },
+    {
+      "id": "suffix_goto_food",
+      "description": "皮ごと食べる - ごと as suffix",
+      "input": "皮ごと食べる",
+      "expected": [
+        {"surface": "皮", "pos": "Noun"},
+        {"surface": "ごと", "pos": "Suffix", "lemma": "ごと"},
+        {"surface": "食べる", "pos": "Verb"}
+      ],
+      "tags": ["regression", "suffix"]
+    },
+    {
+      "id": "suffix_goto_ni",
+      "description": "日ごとに強くなる - ごと + に pattern",
+      "input": "日ごとに強くなる",
+      "expected": [
+        {"surface": "日", "pos": "Noun"},
+        {"surface": "ごと", "pos": "Suffix", "lemma": "ごと"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "強く", "pos": "Adjective", "lemma": "強い"},
+        {"surface": "なる", "pos": "Verb"}
+      ],
+      "tags": ["regression", "suffix"]
+    },
+    {
+      "id": "determiner_konna",
+      "description": "こんな should be Determiner",
+      "input": "こんな天気",
+      "expected": [
+        {"surface": "こんな", "pos": "Determiner"},
+        {"surface": "天気", "pos": "Noun"}
+      ],
+      "tags": ["regression", "determiner"]
+    },
+    {
+      "id": "determiner_sonna",
+      "description": "そんな should be Determiner",
+      "input": "そんなことない",
+      "expected": [
+        {"surface": "そんな", "pos": "Determiner"},
+        {"surface": "こと", "pos": "Noun"},
+        {"surface": "ない", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "determiner"]
+    },
+    {
+      "id": "determiner_anna",
+      "description": "あんな should be Determiner",
+      "input": "あんな人",
+      "expected": [
+        {"surface": "あんな", "pos": "Determiner"},
+        {"surface": "人", "pos": "Noun"}
+      ],
+      "tags": ["regression", "determiner"]
+    },
+    {
+      "id": "determiner_donna",
+      "description": "どんな should be Determiner",
+      "input": "どんな問題",
+      "expected": [
+        {"surface": "どんな", "pos": "Determiner"},
+        {"surface": "問題", "pos": "Noun"}
+      ],
+      "tags": ["regression", "determiner"]
+    },
+    {
+      "id": "auxiliary_machigainai",
+      "description": "間違いない should be Auxiliary (certainty idiom)",
+      "input": "間違いない",
+      "expected": [
+        {"surface": "間違いない", "pos": "Auxiliary", "lemma": "間違いない"}
+      ],
+      "tags": ["regression", "auxiliary", "certainty"]
+    },
+    {
+      "id": "auxiliary_chigainai",
+      "description": "違いない should be Auxiliary (certainty idiom)",
+      "input": "違いない",
+      "expected": [
+        {"surface": "違いない", "pos": "Auxiliary", "lemma": "違いない"}
+      ],
+      "tags": ["regression", "auxiliary", "certainty"]
+    },
+    {
+      "id": "auxiliary_ni_chigainai",
+      "description": "に違いない certainty expression - に is particle, 違いない is auxiliary",
+      "input": "彼に違いない",
+      "expected": [
+        {"surface": "彼", "pos": "Pronoun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "違いない", "pos": "Auxiliary", "lemma": "違いない"}
+      ],
+      "tags": ["regression", "auxiliary", "certainty"]
+    },
+    {
+      "id": "verb_machigau",
+      "description": "間違う should be single Verb token",
+      "input": "間違う",
+      "expected": [
+        {"surface": "間違う", "pos": "Verb", "lemma": "間違う"}
+      ],
+      "tags": ["regression", "verb"]
+    },
+    {
+      "id": "verb_machigatta",
+      "description": "間違った should have lemma 間違う",
+      "input": "間違った",
+      "expected": [
+        {"surface": "間違った", "pos": "Verb", "lemma": "間違う"}
+      ],
+      "tags": ["regression", "verb"]
     }
   ]
 }

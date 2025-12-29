@@ -433,6 +433,60 @@
         {"surface": "良くなかった", "pos": "Adjective", "lemma": "良い"}
       ],
       "tags": ["regression", "adjective", "negative"]
+    },
+    {
+      "id": "ichidan_miru_negative",
+      "description": "見ない - single-kanji ichidan verb negative",
+      "input": "見ない",
+      "expected": [
+        {"surface": "見ない", "pos": "Verb", "lemma": "見る"}
+      ],
+      "tags": ["regression", "ichidan", "negative"]
+    },
+    {
+      "id": "ichidan_neru_negative",
+      "description": "寝ない - single-kanji ichidan verb negative",
+      "input": "寝ない",
+      "expected": [
+        {"surface": "寝ない", "pos": "Verb", "lemma": "寝る"}
+      ],
+      "tags": ["regression", "ichidan", "negative"]
+    },
+    {
+      "id": "ichidan_kiru_negative",
+      "description": "着ない - single-kanji ichidan verb negative",
+      "input": "着ない",
+      "expected": [
+        {"surface": "着ない", "pos": "Verb", "lemma": "着る"}
+      ],
+      "tags": ["regression", "ichidan", "negative"]
+    },
+    {
+      "id": "ichidan_eru_negative",
+      "description": "得ない - single-kanji ichidan verb negative",
+      "input": "得ない",
+      "expected": [
+        {"surface": "得ない", "pos": "Verb", "lemma": "得る"}
+      ],
+      "tags": ["regression", "ichidan", "negative"]
+    },
+    {
+      "id": "ichidan_deru_negative",
+      "description": "出ない - single-kanji ichidan verb negative",
+      "input": "出ない",
+      "expected": [
+        {"surface": "出ない", "pos": "Verb", "lemma": "出る"}
+      ],
+      "tags": ["regression", "ichidan", "negative"]
+    },
+    {
+      "id": "ichidan_shirenai",
+      "description": "しれない - shirenai for kamoshirenai decomposition",
+      "input": "しれない",
+      "expected": [
+        {"surface": "しれない", "pos": "Verb", "lemma": "しれる"}
+      ],
+      "tags": ["regression", "ichidan", "negative"]
     }
   ]
 }

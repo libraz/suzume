@@ -50,6 +50,7 @@ set(TEST_SOURCES
   integration/regression_particle_test.cpp
   integration/regression_misc_test.cpp
   integration/regression_adjective_test.cpp
+  integration/adjective_irregular_test.cpp
   integration/regression_verb_test.cpp
   integration/regression_compound_test.cpp
   integration/suru_imperative_test.cpp

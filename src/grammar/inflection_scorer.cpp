@@ -633,6 +633,27 @@ float calculateConfidence(VerbType type, std::string_view stem,
     }
   }
 
+  // Penalty for Ichidan stems that look like noun + い pattern in mizenkei context
+  // 間違いない → 間違い(NOUN) + ない(AUX), not 間違い + ない = 間違いる(VERB)
+  // 違いない → 違い(NOUN) + ない(AUX), not 違いる(VERB)
+  // Pattern: stem ends with kanji + い, often a noun form of a verb
+  // Common noun patterns: 間違い (from 間違う), 違い (from 違う), 誤り(異なり)...
+  // These should be analyzed as NOUN + ない, not Ichidan verb conjugation
+  if (type == VerbType::Ichidan && required_conn == conn::kVerbMizenkei &&
+      stem_len >= core::kTwoJapaneseCharBytes) {
+    std::string_view last = stem.substr(stem_len - core::kJapaneseCharBytes);
+    if (last == "い") {
+      // Check if the character before い is kanji (common noun pattern)
+      std::string_view prev = stem.substr(stem_len - core::kTwoJapaneseCharBytes, core::kJapaneseCharBytes);
+      if (endsWithKanji(prev)) {
+        // This is likely kanji + い noun pattern, not Ichidan verb
+        // 間違い, 違い, 争い, 戦い etc. are all nouns
+        base -= 0.30F;
+        logConfidenceAdjustment(-0.30F, "ichidan_noun_i_mizenkei");
+      }
+    }
+  }
+
   // Suru vs GodanSa disambiguation
   // Multi-kanji stems strongly suggest サ変 verb (勉強する, 準備する)
   // Single-kanji stems (出す, 消す) are typically GodanSa
