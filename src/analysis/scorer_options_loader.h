@@ -236,6 +236,7 @@ inline void ScorerOptionsLoader::applyEdgeOptions(EdgeOptions& opts, const JsonV
   SET_OPT(opts, penalty_short_stem_hiragana_adj, json, "penalty_short_stem_hiragana_adj");
   SET_OPT(opts, penalty_verb_tai_rashii, json, "penalty_verb_tai_rashii");
   SET_OPT(opts, penalty_verb_nai_pattern, json, "penalty_verb_nai_pattern");
+  SET_OPT(opts, bonus_unified_verb_aux, json, "bonus_unified_verb_aux");
 }
 
 inline void ScorerOptionsLoader::applyConnectionOptions(ConnectionOptions& opts, const JsonValue& json) {

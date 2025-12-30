@@ -38,6 +38,10 @@ struct EdgeOptions {
 
   // Unknown adjective with verb+ない pattern
   float penalty_verb_nai_pattern = 1.5F;
+
+  // Bonus for unified verb forms containing auxiliary patterns (てしまった, てもらった, etc.)
+  // This helps unified forms beat split paths when the te-form has a dictionary entry
+  float bonus_unified_verb_aux = 0.3F;
 };
 
 /// Options for connection (bigram) scoring penalties/bonuses

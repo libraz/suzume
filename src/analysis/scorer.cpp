@@ -345,6 +345,30 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     }
   }
 
+  // Bonus for unified verb forms containing te-form + auxiliary verb patterns
+  // E.g., 言ってしまった, 教えてもらった, 食べている - these should stay unified
+  // This bonus helps unified forms beat split paths where the te-form has a dictionary entry
+  if (edge.pos == core::PartOfSpeech::Verb &&
+      !edge.fromDictionary() &&
+      edge.surface.size() >= core::kFiveJapaneseCharBytes) {
+    std::string_view surface = edge.surface;
+    if (surface.find(scorer::kPatternTeShima) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeShima) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeIru) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeIru) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeMora) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeMora) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeOku) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeOku) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeAge) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeAge) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeKure) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeKure) != std::string_view::npos) {
+      cost -= edgeOpts().bonus_unified_verb_aux;
+      logAdjustment(-edgeOpts().bonus_unified_verb_aux, "unified_verb_aux");
+    }
+  }
+
   // Note: Short-stem hiragana adjective penalty moved to connectionCost
   // It only applies after PREFIX (e.g., お+いしい) not standalone (e.g., まずい)
 

@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+#include "analysis/scorer_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
@@ -600,9 +601,18 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
         char32_t prev = codepoints[hiragana_end - 1];
 
         // か: OK if preceded by な (なかった = negative past)
-        if (curr == U'か' && prev == U'な') {
-          ++hiragana_end;
-          continue;
+        //    Also OK if followed by れ (かれ = ichidan stem like つかれる, ふざける)
+        if (curr == U'か') {
+          if (prev == U'な') {
+            ++hiragana_end;
+            continue;
+          }
+          // Check if followed by れ (ichidan stem pattern)
+          if (hiragana_end + 1 < codepoints.size() &&
+              codepoints[hiragana_end + 1] == U'れ') {
+            ++hiragana_end;
+            continue;
+          }
         }
 
         // で: OK if preceded by ん (んで = te-form) or き (できる)
@@ -681,9 +691,78 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       best = inflection.getBest(surface);
     }
 
+    // Filter out 2-char hiragana that don't end with valid verb endings
+    // Valid endings: る (dictionary form), て/で (te-form), た/だ (past)
+    // This prevents false positives like まじ, ため from being recognized as verbs
+    size_t pre_filter_len = end_pos - start_pos;
+    if (pre_filter_len == 2 && surface.size() >= core::kJapaneseCharBytes) {
+      // Use string_view directly into surface to avoid dangling reference
+      // (surface.substr() returns a temporary std::string)
+      std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes,
+                                  core::kJapaneseCharBytes);
+      if (last_char != "る" && last_char != "て" && last_char != "で" &&
+          last_char != "た" && last_char != "だ") {
+        continue;  // Skip 2-char hiragana not ending with valid verb suffix
+      }
+    }
+
+    // Filter out i-adjective conjugation suffixes (standalone, not verb candidates)
+    // See scorer_constants.h for documentation on these patterns.
+    if (surface == scorer::kIAdjPastKatta || surface == scorer::kIAdjPastKattara ||
+        surface == scorer::kIAdjTeKute || surface == scorer::kIAdjNegKunai ||
+        surface == scorer::kIAdjCondKereba || surface == scorer::kIAdjStemKa ||
+        surface == scorer::kIAdjNegStemKuna || surface == scorer::kIAdjCondStemKere) {
+      continue;  // Skip i-adjective conjugation patterns
+    }
+
+    // Note: Common adverbs/onomatopoeia (ぴったり, はっきり, etc.) are filtered
+    // by the dictionary lookup below - they are registered as Adverb in L1 dictionary.
+
+    // Filter out old kana forms (ゐ=wi, ゑ=we) that look like verbs
+    // ゐる is old kana for いる (auxiliary), not a standalone verb
+    if (surface.size() >= core::kJapaneseCharBytes) {
+      std::string_view first_char(surface.data(), core::kJapaneseCharBytes);
+      if (first_char == "ゐ" || first_char == "ゑ") {
+        continue;  // Skip old kana patterns
+      }
+    }
+
+    // Filter out words that exist in dictionary as non-verb entries
+    // e.g., あなた (pronoun), わたし (pronoun) should not be verb candidates
+    if (dict_manager != nullptr) {
+      auto dict_results = dict_manager->lookup(surface, 0);
+      bool has_non_verb_entry = false;
+      for (const auto& result : dict_results) {
+        if (result.entry != nullptr &&
+            result.entry->surface == surface &&
+            result.entry->pos != core::PartOfSpeech::Verb) {
+          has_non_verb_entry = true;
+          break;
+        }
+      }
+      if (has_non_verb_entry) {
+        continue;  // Skip - dictionary has non-verb entry for this surface
+      }
+    }
+
+    // Check for 3-4 char hiragana verb ending with た/だ (past form) BEFORE threshold check
+    // e.g., つかれた (疲れた), ねむった (眠った), おきた (起きた)
+    // These need lower threshold because ichidan_pure_hiragana_stem penalty reduces confidence
+    size_t pre_check_len = end_pos - start_pos;
+    bool looks_like_past_form = false;
+    if ((pre_check_len == 3 || pre_check_len == 4) &&
+        surface.size() >= core::kJapaneseCharBytes) {
+      std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes,
+                                  core::kJapaneseCharBytes);
+      if (last_char == "た" || last_char == "だ") {
+        looks_like_past_form = true;
+      }
+    }
+
     // Only accept verb types (not IAdjective) with sufficient confidence
-    // Lower threshold for dictionary-verified verbs
-    float conf_threshold = is_dictionary_verb ? 0.35F : 0.48F;
+    // Lower threshold for dictionary-verified verbs and medium-length past forms
+    float conf_threshold = is_dictionary_verb ? 0.35F :
+                           looks_like_past_form ? 0.25F : 0.48F;
     if (best.confidence > conf_threshold &&
         best.verb_type != grammar::VerbType::IAdjective) {
       // Lower cost for higher confidence matches
@@ -718,6 +797,20 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
         }
       }
 
+      // Check for 3-4 char hiragana verb ending with た/だ (past form)
+      // e.g., つかれた (疲れた), ねむった (眠った), おきた (起きた)
+      // These medium-length verbs need a bonus to beat particle splits like つ+か+れた
+      // Note: Lower confidence threshold (0.25) because ichidan_pure_hiragana_stem penalty
+      // reduces confidence significantly for pure hiragana verbs
+      bool is_medium_past_form = false;
+      if ((candidate_len == 3 || candidate_len == 4) && best.confidence >= 0.25F) {
+        std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes,
+                                    core::kJapaneseCharBytes);
+        if (last_char == "た" || last_char == "だ") {
+          is_medium_past_form = true;
+        }
+      }
+
       if (is_dictionary_verb &&
           (candidate_len >= 5 || is_conditional || is_teoku_contraction)) {
         base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;
@@ -741,6 +834,11 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
         } else {
           base_cost = -0.3F + (1.0F - best.confidence) * 0.1F;
         }
+      } else if (is_medium_past_form) {
+        // Medium-length past form verbs (3-4 chars ending with た/だ)
+        // e.g., つかれた (conf=0.43) should beat つ+か+れた split
+        // Give bonus to compete with particle splits
+        base_cost = 0.2F + (1.0F - best.confidence) * 0.2F;
       } else if (candidate_len >= 7 && best.confidence >= 0.8F) {
         // For long hiragana verb forms (7+ chars) with high confidence,
         // give a bonus even without dictionary verification.

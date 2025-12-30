@@ -302,10 +302,33 @@ constexpr const char* kPatternTeShima = "てしま";  // て+しまう
 constexpr const char* kPatternDeShima = "でしま";  // で+しまう (voiced)
 constexpr const char* kPatternTeIru = "ている";    // て+いる
 constexpr const char* kPatternDeIru = "でいる";    // で+いる (voiced)
+constexpr const char* kPatternTeMora = "てもら";   // て+もらう
+constexpr const char* kPatternDeMora = "でもら";   // で+もらう (voiced)
+constexpr const char* kPatternTeOku = "ておく";    // て+おく
+constexpr const char* kPatternDeOku = "でおく";    // で+おく (voiced)
+constexpr const char* kPatternTeAge = "てあげ";    // て+あげる
+constexpr const char* kPatternDeAge = "であげ";    // で+あげる (voiced)
+constexpr const char* kPatternTeKure = "てくれ";   // て+くれる
+constexpr const char* kPatternDeKure = "でくれ";   // で+くれる (voiced)
 
 // Specific surfaces that are verb forms, not adjectives
 constexpr const char* kSurfaceShimai = "しまい";   // しまう renyokei
 constexpr const char* kSurfaceJimai = "じまい";    // じまう renyokei (voiced)
+
+// I-adjective conjugation suffixes (standalone, not verb candidates)
+// These patterns are conjugation endings for i-adjectives:
+// - か行: past (高かった), conditional past (高かったら)
+// - く行: te-form (高くて), negative (高くない)
+// - け行: conditional (高ければ)
+// When appearing standalone without a stem, these should NOT be verb candidates.
+constexpr const char* kIAdjPastKatta = "かった";      // i-adj past: 高い→高かった
+constexpr const char* kIAdjPastKattara = "かったら";  // i-adj conditional past
+constexpr const char* kIAdjStemKa = "かっ";           // i-adj past stem
+constexpr const char* kIAdjTeKute = "くて";           // i-adj te-form: 高い→高くて
+constexpr const char* kIAdjNegKunai = "くない";       // i-adj negative: 高い→高くない
+constexpr const char* kIAdjNegStemKuna = "くな";      // i-adj negative stem
+constexpr const char* kIAdjCondKereba = "ければ";     // i-adj conditional: 高い→高ければ
+constexpr const char* kIAdjCondStemKere = "けれ";     // i-adj conditional stem
 
 }  // namespace suzume::analysis::scorer
 

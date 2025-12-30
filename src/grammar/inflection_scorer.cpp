@@ -515,13 +515,15 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Single-hiragana stem penalty for Godan verbs (non-Ra/Wa)
   // Single-char hiragana stems like ま(む), む(ぐ) are almost never real verbs
   // Real single-char verbs (み, き, に for ichidan) are handled separately
-  // Exception: GodanRa/GodanWa have separate handling
+  // Exception: GodanRa has separate handling (godan_ra_single_hiragana)
   // Exception: い(く) is a valid GodanKa verb (行く)
-  bool is_godan_non_ra_wa = (type == VerbType::GodanKa || type == VerbType::GodanGa ||
-                             type == VerbType::GodanSa || type == VerbType::GodanTa ||
-                             type == VerbType::GodanNa || type == VerbType::GodanBa ||
-                             type == VerbType::GodanMa);
-  if (is_godan_non_ra_wa && stem_len == core::kJapaneseCharBytes && !containsKanji(stem)) {
+  // GodanWa with single hiragana stem (ら→らう, ま→まう) are typically not real verbs
+  // Real GodanWa verbs like 買う, 舞う use kanji stems
+  bool is_godan_non_ra = (type == VerbType::GodanKa || type == VerbType::GodanGa ||
+                          type == VerbType::GodanSa || type == VerbType::GodanTa ||
+                          type == VerbType::GodanNa || type == VerbType::GodanBa ||
+                          type == VerbType::GodanMa || type == VerbType::GodanWa);
+  if (is_godan_non_ra && stem_len == core::kJapaneseCharBytes && !containsKanji(stem)) {
     // Exception: い(く) = 行く is valid
     if (!(type == VerbType::GodanKa && stem == "い")) {
       base -= inflection::kPenaltyGodanSingleHiraganaStem;

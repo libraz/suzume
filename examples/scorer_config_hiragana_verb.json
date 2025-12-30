@@ -1,0 +1,7 @@
+{
+  "inflection": {
+    "penalty_pure_hiragana_stem": 0.15,
+    "penalty_stem_long": 0.05,
+    "hiragana_verb_confidence_threshold": 0.35
+  }
+}
