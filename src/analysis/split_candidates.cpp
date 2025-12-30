@@ -5,6 +5,7 @@
 
 #include "split_candidates.h"
 
+#include "candidate_constants.h"
 #include "core/debug.h"
 #include "grammar/inflection.h"
 #include "tokenizer_utils.h"
@@ -13,17 +14,11 @@ namespace suzume::analysis {
 
 namespace {
 
-// Cost bonuses for mixed script joining (lower cost = preferred)
-constexpr float kAlphaKanjiBonus = -0.3F;    // Web開発, AI研究
-constexpr float kAlphaKatakanaBonus = -0.3F; // APIリクエスト
-
-// Digit+kanji counter bonuses by kanji length
-// Common counters: 分, 月, 年, 日, 時, 人, 回, 本, 円, 個, 台 (1 kanji)
-// Compound counters: 分間, 時間, 日間, 年間, 週間 (2 kanji)
-// Rare: 3+ kanji after digits
-constexpr float kDigitKanji1Bonus = -0.2F;   // 5分, 3月, 100人
-constexpr float kDigitKanji2Bonus = -0.2F;   // 5分間, 3時間 (same as 1-kanji)
-constexpr float kDigitKanji3Penalty = 0.5F;  // Rare, likely wrong segmentation
+// Cost bonuses imported from candidate_constants.h:
+// candidate::kAlphaKanjiBonus, kAlphaKatakanaBonus
+// candidate::kDigitKanji1Bonus, kDigitKanji2Bonus, kDigitKanji3Penalty
+// candidate::kDictSplitBonus, kSplitBaseCost
+// candidate::kNounVerbSplitBonus, kVerifiedVerbBonus
 
 // Maximum lengths for mixed script segments
 constexpr size_t kMaxAlphaLen = 12;   // Reasonable limit for English words
@@ -36,18 +31,6 @@ constexpr size_t kMinCompoundLen = 4;
 
 // Maximum kanji sequence length to consider
 constexpr size_t kMaxCompoundLen = 10;
-
-// Bonus for dictionary-guided splits (lower = preferred)
-constexpr float kDictSplitBonus = -0.5F;
-
-// Base cost for split candidates
-constexpr float kSplitBaseCost = 1.0F;
-
-// Cost bonus for noun+verb splits (lower = preferred)
-constexpr float kNounVerbSplitBonus = -1.0F;
-
-// Additional bonus when verb base form is verified in dictionary
-constexpr float kVerifiedVerbBonus = -0.8F;
 
 // Maximum noun length (in characters) to consider for splitting
 constexpr size_t kMaxNounLen = 6;
@@ -100,9 +83,9 @@ void addMixedScriptCandidates(
 
   if (first_type == CharType::Alphabet) {
     if (second_type == CharType::Kanji) {
-      base_bonus = kAlphaKanjiBonus;
+      base_bonus = candidate::kAlphaKanjiBonus;
     } else if (second_type == CharType::Katakana) {
-      base_bonus = kAlphaKatakanaBonus;
+      base_bonus = candidate::kAlphaKatakanaBonus;
     } else {
       return;  // Not a valid pattern
     }
@@ -138,11 +121,11 @@ void addMixedScriptCandidates(
       // Apply length-based bonus/penalty
       float length_adjustment;
       if (kanji_len == 1) {
-        length_adjustment = kDigitKanji1Bonus;  // Best: 5分, 3月
+        length_adjustment = candidate::kDigitKanji1Bonus;  // Best: 5分, 3月
       } else if (kanji_len == 2) {
-        length_adjustment = kDigitKanji2Bonus;  // Good: 5分間, 3時間
+        length_adjustment = candidate::kDigitKanji2Bonus;  // Good: 5分間, 3時間
       } else {
-        length_adjustment = kDigitKanji3Penalty;  // Rare: penalize
+        length_adjustment = candidate::kDigitKanji3Penalty;  // Rare: penalize
       }
 
       float final_cost = base_cost + length_adjustment;
@@ -209,12 +192,12 @@ void addCompoundSplitCandidates(
     auto first_results = dict_manager.lookup(text, start_byte);
     bool first_in_dict = false;
     bool first_is_formal_noun = false;
-    float first_cost = kSplitBaseCost;
+    float first_cost = candidate::kSplitBaseCost;
 
     for (const auto& result : first_results) {
       if (result.entry != nullptr && result.length == split_point) {
         first_in_dict = true;
-        first_cost = result.entry->cost + kDictSplitBonus;
+        first_cost = result.entry->cost + candidate::kDictSplitBonus;
         first_is_formal_noun = result.entry->is_formal_noun;
         break;
       }
@@ -373,10 +356,10 @@ void addNounVerbSplitCandidates(
       // Generate split candidates if conditions are met
       if ((noun_in_dict && looks_like_verb) || base_in_dict) {
         std::string noun_surface(text.substr(start_byte, verb_start_byte - start_byte));
-        float final_noun_cost = noun_cost + kNounVerbSplitBonus;
+        float final_noun_cost = noun_cost + candidate::kNounVerbSplitBonus;
 
         if (base_in_dict) {
-          final_noun_cost += kVerifiedVerbBonus;
+          final_noun_cost += candidate::kVerifiedVerbBonus;
         }
 
         if (noun_in_dict && base_in_dict) {

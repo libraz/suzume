@@ -195,6 +195,73 @@ constexpr float kPenaltyPrefixBeforeVerb = 2.0F;
 // E.g., 行き(NOUN) + ましょう is invalid - should be 行き(VERB) + ましょう
 constexpr float kPenaltyNounBeforeVerbAux = 2.0F;
 
+// =============================================================================
+// Auxiliary Connection Rules (extracted from inline literals)
+// =============================================================================
+
+// Invalid single-char aux (る) after te-form
+// E.g., して + る should be してる (contraction), not split
+constexpr float kPenaltyInvalidSingleCharAux = 5.0F;
+
+// Te-form + た (likely contracted -ていた form)
+// E.g., 見て + た should be 見てた (見ていた contraction)
+constexpr float kPenaltyTeFormTaContraction = 1.5F;
+
+// NOUN + まい (negative conjecture) penalty
+// まい attaches to verb stems, not nouns
+constexpr float kPenaltyNounMai = 1.5F;
+
+// Short/unknown aux after particle
+// PARTICLE + short AUX is grammatically invalid
+constexpr float kPenaltyShortAuxAfterParticle = 3.0F;
+
+// NOUN + みたい (resemblance pattern) bonus
+// E.g., 猫みたい (like a cat) - very common pattern
+constexpr float kBonusNounMitai = 3.0F;
+
+// VERB + みたい (hearsay/appearance) bonus
+// E.g., 食べるみたい (seems like eating)
+constexpr float kBonusVerbMitai = 1.0F;
+
+// =============================================================================
+// Other Connection Rules (extracted from inline literals)
+// =============================================================================
+
+// Formal noun + kanji penalty
+// E.g., 所 + 在する should be 所在する (compound)
+constexpr float kPenaltyFormalNounBeforeKanji = 3.0F;
+
+// Same particle repeated penalty
+// E.g., も + も is grammatically rare
+constexpr float kPenaltySameParticleRepeated = 2.0F;
+
+// Hiragana noun starts with particle char penalty
+// E.g., もも after NOUN should prefer も(PARTICLE) + もも
+constexpr float kPenaltyHiraganaNounStartsWithParticle = 1.5F;
+
+// Particle before hiragana OTHER penalty (single char)
+// E.g., と + う in とうきょう split
+constexpr float kPenaltyParticleBeforeSingleHiraganaOther = 2.5F;
+
+// Particle before hiragana OTHER penalty (multi char)
+constexpr float kPenaltyParticleBeforeMultiHiraganaOther = 1.0F;
+
+// し particle after i-adjective (valid pattern)
+// E.g., 上手いし, 高いし
+constexpr float kBonusShiAfterIAdj = 0.5F;
+
+// し particle after verb (valid pattern)
+// E.g., 食べるし, 行くし
+constexpr float kBonusShiAfterVerb = 0.3F;
+
+// し particle after auxiliary (valid pattern)
+// E.g., だし, ないし, たし
+constexpr float kBonusShiAfterAux = 0.3F;
+
+// し particle after noun (invalid, needs copula)
+// E.g., 本し should be 本だし
+constexpr float kPenaltyShiAfterNoun = 1.5F;
+
 }  // namespace suzume::analysis::scorer
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONSTANTS_H_

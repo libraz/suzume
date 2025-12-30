@@ -10,10 +10,7 @@ namespace connection_rules {
 // Rule 9: Adjective く + なる (bonus)
 ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
                                     const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Adjective ||
-      next.pos != core::PartOfSpeech::Verb) {
-    return {};
-  }
+  if (!isAdjToVerb(prev, next)) return {};
 
   if (!endsWithKuForm(prev.surface)) {
     return {};
@@ -40,15 +37,10 @@ ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
 // Unknown short-stem (≤2 chars) hiragana adjectives after PREFIX are penalized
 ConnectionRuleResult checkPrefixToShortStemHiraganaAdj(
     const core::LatticeEdge& prev, const core::LatticeEdge& next) {
-  // Previous must be PREFIX
-  if (prev.pos != core::PartOfSpeech::Prefix) {
-    return {};
-  }
+  if (!isPrefixToAdj(prev, next)) return {};
 
-  // Next must be unknown adjective
-  if (next.pos != core::PartOfSpeech::Adjective || next.fromDictionary()) {
-    return {};
-  }
+  // Next must be unknown adjective (dictionary adjectives are valid)
+  if (next.fromDictionary()) return {};
 
   // Check if lemma is at least valid length (2 chars for い-adj)
   if (next.lemma.size() < core::kTwoJapaneseCharBytes) {
@@ -65,15 +57,7 @@ ConnectionRuleResult checkPrefixToShortStemHiraganaAdj(
   }
 
   // Check if lemma is pure hiragana
-  for (size_t i = 0; i < next.lemma.size(); i += core::kJapaneseCharBytes) {
-    if (i + 2 >= next.lemma.size()) break;
-    auto b0 = static_cast<unsigned char>(next.lemma[i]);
-    auto b1 = static_cast<unsigned char>(next.lemma[i + 1]);
-    // Hiragana range: E3 81 80 - E3 82 9F
-    if (b0 != 0xE3 || (b1 != 0x81 && b1 != 0x82)) {
-      return {};  // Not pure hiragana
-    }
-  }
+  if (!grammar::isPureHiragana(next.lemma)) return {};
 
   return {ConnectionPattern::PrefixToShortStemHiraganaAdj,
           scorer::kPenaltyShortStemHiraganaAdj,
@@ -83,10 +67,7 @@ ConnectionRuleResult checkPrefixToShortStemHiraganaAdj(
 // Rule 8: だ/です + character speech suffix split penalty
 ConnectionRuleResult checkCharacterSpeechSplit(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Auxiliary ||
-      next.pos != core::PartOfSpeech::Auxiliary) {
-    return {};
-  }
+  if (!isAuxToAux(prev, next)) return {};
 
   if (prev.surface != "だ" && prev.surface != "です") {
     return {};
@@ -109,14 +90,9 @@ ConnectionRuleResult checkCharacterSpeechSplit(const core::LatticeEdge& prev,
 // E.g., 報告によると should use によると compound particle
 ConnectionRuleResult checkYoruNightAfterNi(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Particle ||
-      next.pos != core::PartOfSpeech::Noun) {
-    return {};
-  }
+  if (!isParticleToNoun(prev, next)) return {};
 
-  if (prev.surface != "に") {
-    return {};
-  }
+  if (prev.surface != "に") return {};
 
   // Check if next is よる with lemma 夜 (night)
   if (next.surface != "よる" || next.lemma != "夜") {
@@ -153,7 +129,8 @@ ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
   }
 
   // Penalty for formal noun + kanji pattern
-  return {ConnectionPattern::FormalNounBeforeKanji, 3.0F,
+  return {ConnectionPattern::FormalNounBeforeKanji,
+          scorer::kPenaltyFormalNounBeforeKanji,
           "formal noun before kanji (should be compound)"};
 }
 
@@ -162,10 +139,7 @@ ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
 // Exception: と + と can occur in quotation patterns
 ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Particle ||
-      next.pos != core::PartOfSpeech::Particle) {
-    return {};
-  }
+  if (!isParticleToParticle(prev, next)) return {};
 
   // Same single-character particle repeated
   if (prev.surface.size() == core::kJapaneseCharBytes &&
@@ -175,8 +149,8 @@ ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
     if (prev.surface == "と") {
       return {};
     }
-    return {ConnectionPattern::SameParticleRepeated, 2.0F,
-            "same particle repeated"};
+    return {ConnectionPattern::SameParticleRepeated,
+            scorer::kPenaltySameParticleRepeated, "same particle repeated"};
   }
 
   return {};
@@ -189,26 +163,10 @@ ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
 // Example: すもも(NOUN) + もも(NOUN) should prefer すもも + も(PARTICLE) + もも
 ConnectionRuleResult checkHiraganaNounStartsWithParticle(
     const core::LatticeEdge& prev, const core::LatticeEdge& next) {
-  // Previous must be NOUN (content word likely followed by particle)
-  if (prev.pos != core::PartOfSpeech::Noun) {
-    return {};
-  }
+  if (!isNounToNoun(prev, next)) return {};
 
-  // Next must be NOUN (we're penalizing noun-noun when particle split is better)
-  if (next.pos != core::PartOfSpeech::Noun) {
-    return {};
-  }
-
-  // Next surface must be pure hiragana (check first byte range: 0xE3 8X XX)
-  if (next.surface.size() < core::kJapaneseCharBytes) {
-    return {};
-  }
-  auto b0 = static_cast<unsigned char>(next.surface[0]);
-  auto b1 = static_cast<unsigned char>(next.surface[1]);
-  // Hiragana range in UTF-8: E3 81 80 - E3 82 9F
-  if (b0 != 0xE3 || (b1 != 0x81 && b1 != 0x82)) {
-    return {};
-  }
+  // Next surface must start with hiragana
+  if (!grammar::startsWithHiragana(next.surface)) return {};
 
   // Check if first character is a common particle
   // も、の、が、を、に、は、で、と、へ、か、や
@@ -218,7 +176,8 @@ ConnectionRuleResult checkHiraganaNounStartsWithParticle(
       first3 == "で" || first3 == "と" || first3 == "へ" ||
       first3 == "か" || first3 == "や") {
     // Penalty to prefer NOUN + PARTICLE over NOUN + NOUN(starts with particle)
-    return {ConnectionPattern::HiraganaNounStartsWithParticle, 1.5F,
+    return {ConnectionPattern::HiraganaNounStartsWithParticle,
+            scorer::kPenaltyHiraganaNounStartsWithParticle,
             "hiragana noun starts with particle char"};
   }
 
@@ -230,10 +189,7 @@ ConnectionRuleResult checkHiraganaNounStartsWithParticle(
 // E.g., 、家 should be 家(NOUN), not 家(SUFFIX meaning "-ist" as in 作家)
 ConnectionRuleResult checkSuffixAfterSymbol(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Symbol ||
-      next.pos != core::PartOfSpeech::Suffix) {
-    return {};
-  }
+  if (!isSymbolToSuffix(prev, next)) return {};
 
   return {ConnectionPattern::SuffixAfterSymbol,
           scorer::kPenaltySuffixAfterSymbol, "suffix after punctuation"};
@@ -244,23 +200,15 @@ ConnectionRuleResult checkSuffixAfterSymbol(const core::LatticeEdge& prev,
 // e.g., と + うきょう in とうきょう should not be split
 ConnectionRuleResult checkParticleBeforeHiraganaOther(
     const core::LatticeEdge& prev, const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Particle ||
-      next.pos != core::PartOfSpeech::Other) {
-    return {};
-  }
+  if (!isParticleToOther(prev, next)) return {};
 
   // Check if it starts with hiragana
-  if (next.surface.size() < core::kJapaneseCharBytes) {
-    return {};
-  }
-  auto b0 = static_cast<unsigned char>(next.surface[0]);
-  auto b1 = static_cast<unsigned char>(next.surface[1]);
-  if (b0 != 0xE3 || (b1 != 0x81 && b1 != 0x82)) {
-    return {};
-  }
+  if (!grammar::startsWithHiragana(next.surface)) return {};
 
   // Penalty based on length: single char = 2.5, multi-char = 1.0
-  float penalty = (next.surface.size() == core::kJapaneseCharBytes) ? 2.5F : 1.0F;
+  float penalty = (next.surface.size() == core::kJapaneseCharBytes)
+                      ? scorer::kPenaltyParticleBeforeSingleHiraganaOther
+                      : scorer::kPenaltyParticleBeforeMultiHiraganaOther;
   return {ConnectionPattern::ParticleBeforeAux, penalty,
           "hiragana other after particle (likely split)"};
 }
@@ -283,8 +231,8 @@ ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
       if (prev.surface.size() >= core::kJapaneseCharBytes &&
           prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes) ==
               "い") {
-        return {ConnectionPattern::ShiParticleAfterPredicate, -0.5F,
-                "i-adj + shi particle (valid)"};
+        return {ConnectionPattern::ShiParticleAfterPredicate,
+                -scorer::kBonusShiAfterIAdj, "i-adj + shi particle (valid)"};
       }
       // Na-adj needs だ/な before し, so no bonus for bare na-adj
       return {};
@@ -294,19 +242,20 @@ ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
       // Shuushikei ends with う段 (う、く、す、つ、ぬ、ふ、む、ゆ、る)
       // or る for ichidan verbs
       if (!prev.surface.empty()) {
-        return {ConnectionPattern::ShiParticleAfterPredicate, -0.3F,
-                "verb + shi particle (valid)"};
+        return {ConnectionPattern::ShiParticleAfterPredicate,
+                -scorer::kBonusShiAfterVerb, "verb + shi particle (valid)"};
       }
       return {};
 
     case core::PartOfSpeech::Auxiliary:
       // AUX + し: valid (だし, ないし, たし)
-      return {ConnectionPattern::ShiParticleAfterPredicate, -0.3F,
-              "aux + shi particle (valid)"};
+      return {ConnectionPattern::ShiParticleAfterPredicate,
+              -scorer::kBonusShiAfterAux, "aux + shi particle (valid)"};
 
     case core::PartOfSpeech::Noun:
       // NOUN + し: invalid (本し - should be 本だし with copula)
-      return {ConnectionPattern::ShiParticleAfterNoun, 1.5F,
+      return {ConnectionPattern::ShiParticleAfterNoun,
+              scorer::kPenaltyShiAfterNoun,
               "noun + shi particle (invalid, needs copula)"};
 
     default:

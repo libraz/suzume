@@ -199,4 +199,18 @@ bool isSmallKana(std::string_view ch) {
   return kSmallKana.count(ch) > 0;
 }
 
+bool startsWithHiragana(std::string_view s) {
+  if (s.size() < core::kJapaneseCharBytes) {
+    return false;
+  }
+  const auto* ptr = reinterpret_cast<const unsigned char*>(s.data());
+  if ((ptr[0] & 0xF0) != 0xE0) {
+    return false;  // Not a 3-byte UTF-8 sequence
+  }
+  char32_t codepoint =
+      ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
+  // Hiragana: U+3040-U+309F
+  return codepoint >= 0x3040 && codepoint <= 0x309F;
+}
+
 }  // namespace suzume::grammar

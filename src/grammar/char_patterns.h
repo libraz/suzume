@@ -134,6 +134,16 @@ bool endsWithRenyokeiMarker(std::string_view stem);
  */
 bool isSmallKana(std::string_view ch);
 
+/**
+ * @brief Check if string starts with a hiragana character
+ * @param s The string to check
+ * @return True if the first character is hiragana (U+3040-U+309F)
+ *
+ * Used to quickly check if a word starts with hiragana.
+ * Checks the first 3 bytes of UTF-8 encoded string.
+ */
+bool startsWithHiragana(std::string_view s);
+
 }  // namespace suzume::grammar
 
 #endif  // SUZUME_GRAMMAR_CHAR_PATTERNS_H_

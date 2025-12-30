@@ -5,6 +5,7 @@
 
 #include "join_candidates.h"
 
+#include "candidate_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/inflection.h"
 #include "normalize/utf8.h"
@@ -91,11 +92,8 @@ const RenyokeiPattern kGodanRenyokei[] = {
     {U'い', U'う'},  // 思い → 思う
 };
 
-// Cost bonus for compound verb joining (lower = preferred)
-constexpr float kCompoundVerbBonus = -0.8F;
-
-// Additional bonus when V1 base form is in dictionary
-constexpr float kVerifiedV1Bonus = -0.3F;
+// Cost bonuses imported from candidate_constants.h:
+// candidate::kCompoundVerbBonus, candidate::kVerifiedV1Bonus
 
 // Productive prefixes for prefix+noun joining
 struct ProductivePrefix {
@@ -133,8 +131,8 @@ constexpr size_t kNumPrefixes = sizeof(kProductivePrefixes) / sizeof(kProductive
 // Maximum noun length for prefix joining
 constexpr size_t kMaxNounLenForPrefix = 6;
 
-// Additional bonus when noun part is in dictionary
-constexpr float kVerifiedNounBonus = -0.3F;
+// Cost bonus imported from candidate_constants.h:
+// candidate::kVerifiedNounBonus
 
 // Te-form auxiliary verb patterns
 struct TeFormAuxiliary {
@@ -157,8 +155,8 @@ const TeFormAuxiliary kTeFormAuxiliaries[] = {
     {"や", "やる", true},       // 〜てやる (benefactive)
 };
 
-// Cost bonus for te-form + auxiliary pattern
-constexpr float kTeFormAuxBonus = -0.8F;
+// Cost bonus imported from candidate_constants.h:
+// candidate::kTeFormAuxBonus
 
 }  // namespace
 
@@ -306,10 +304,10 @@ void addCompoundVerbJoinCandidates(
 
     // Calculate cost
     float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
-    float final_cost = base_cost + kCompoundVerbBonus;
+    float final_cost = base_cost + candidate::kCompoundVerbBonus;
 
     if (v1_in_dict) {
-      final_cost += kVerifiedV1Bonus;
+      final_cost += candidate::kVerifiedV1Bonus;
     }
 
     uint8_t flags = core::LatticeEdge::kFromDictionary;
@@ -452,7 +450,8 @@ void addHiraganaCompoundVerbJoinCandidates(
 
       // Calculate cost
       float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
-      float final_cost = base_cost + kCompoundVerbBonus + kVerifiedV1Bonus;
+      float final_cost = base_cost + candidate::kCompoundVerbBonus +
+                         candidate::kVerifiedV1Bonus;
 
       uint8_t flags = core::LatticeEdge::kFromDictionary;
 
@@ -572,7 +571,7 @@ void addPrefixNounJoinCandidates(
   float final_cost = base_cost + matched_prefix->bonus;
 
   if (noun_in_dict) {
-    final_cost += kVerifiedNounBonus;
+    final_cost += candidate::kVerifiedNounBonus;
   }
 
   uint8_t flags = core::LatticeEdge::kIsUnknown;
@@ -669,7 +668,7 @@ void addTeFormAuxiliaryCandidates(
         std::string combo_surface(text.substr(te_byte, combo_end_byte - te_byte));
 
         float final_cost = scorer.posPrior(core::PartOfSpeech::Verb) +
-                           kTeFormAuxBonus;
+                           candidate::kTeFormAuxBonus;
 
         uint8_t flags = core::LatticeEdge::kIsUnknown;
 

@@ -19,6 +19,133 @@ namespace suzume::analysis {
 namespace connection_rules {
 
 // =============================================================================
+// POS Pair Matchers (Step 0-0: Code reduction helpers)
+// =============================================================================
+// These inline functions reduce repetitive POS condition checks across
+// connection rule files. Each replaces a 3-line condition block with 1 line.
+
+// Verb connection patterns
+inline bool isVerbToAux(const core::LatticeEdge& prev,
+                        const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Verb &&
+         next.pos == core::PartOfSpeech::Auxiliary;
+}
+
+inline bool isVerbToVerb(const core::LatticeEdge& prev,
+                         const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Verb &&
+         next.pos == core::PartOfSpeech::Verb;
+}
+
+inline bool isVerbToParticle(const core::LatticeEdge& prev,
+                             const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Verb &&
+         next.pos == core::PartOfSpeech::Particle;
+}
+
+inline bool isVerbToAdj(const core::LatticeEdge& prev,
+                        const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Verb &&
+         next.pos == core::PartOfSpeech::Adjective;
+}
+
+// Noun connection patterns
+inline bool isNounToAux(const core::LatticeEdge& prev,
+                        const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Noun &&
+         next.pos == core::PartOfSpeech::Auxiliary;
+}
+
+inline bool isNounToVerb(const core::LatticeEdge& prev,
+                         const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Noun &&
+         next.pos == core::PartOfSpeech::Verb;
+}
+
+inline bool isNounToAdj(const core::LatticeEdge& prev,
+                        const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Noun &&
+         next.pos == core::PartOfSpeech::Adjective;
+}
+
+inline bool isNounToAdv(const core::LatticeEdge& prev,
+                        const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Noun &&
+         next.pos == core::PartOfSpeech::Adverb;
+}
+
+inline bool isNounToNoun(const core::LatticeEdge& prev,
+                         const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Noun &&
+         next.pos == core::PartOfSpeech::Noun;
+}
+
+// Adjective connection patterns
+inline bool isAdjToVerb(const core::LatticeEdge& prev,
+                        const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Adjective &&
+         next.pos == core::PartOfSpeech::Verb;
+}
+
+// Auxiliary connection patterns
+inline bool isAuxToAux(const core::LatticeEdge& prev,
+                       const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Auxiliary &&
+         next.pos == core::PartOfSpeech::Auxiliary;
+}
+
+inline bool isAuxToParticle(const core::LatticeEdge& prev,
+                            const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Auxiliary &&
+         next.pos == core::PartOfSpeech::Particle;
+}
+
+// Particle connection patterns
+inline bool isParticleToAux(const core::LatticeEdge& prev,
+                            const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Particle &&
+         next.pos == core::PartOfSpeech::Auxiliary;
+}
+
+inline bool isParticleToNoun(const core::LatticeEdge& prev,
+                             const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Particle &&
+         next.pos == core::PartOfSpeech::Noun;
+}
+
+inline bool isParticleToOther(const core::LatticeEdge& prev,
+                              const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Particle &&
+         next.pos == core::PartOfSpeech::Other;
+}
+
+inline bool isParticleToParticle(const core::LatticeEdge& prev,
+                                 const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Particle &&
+         next.pos == core::PartOfSpeech::Particle;
+}
+
+// Prefix connection patterns
+inline bool isPrefixToVerb(const core::LatticeEdge& prev,
+                           const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Prefix &&
+         next.pos == core::PartOfSpeech::Verb;
+}
+
+inline bool isPrefixToAdj(const core::LatticeEdge& prev,
+                          const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Prefix &&
+         next.pos == core::PartOfSpeech::Adjective;
+}
+
+// Symbol connection patterns
+inline bool isSymbolToSuffix(const core::LatticeEdge& prev,
+                             const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Symbol &&
+         next.pos == core::PartOfSpeech::Suffix;
+}
+
+// =============================================================================
 // Helper Functions (shared across rule files)
 // =============================================================================
 

@@ -48,10 +48,7 @@ bool isAuxiliaryVerbPattern(std::string_view surface, std::string_view lemma) {
 // Rule 1: Copula だ/です cannot follow verbs (except そう pattern)
 ConnectionRuleResult checkCopulaAfterVerb(const core::LatticeEdge& prev,
                                           const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb ||
-      next.pos != core::PartOfSpeech::Auxiliary) {
-    return {};
-  }
+  if (!isVerbToAux(prev, next)) return {};
 
   if (next.surface != "だ" && next.surface != "です") {
     return {};
@@ -69,21 +66,14 @@ ConnectionRuleResult checkCopulaAfterVerb(const core::LatticeEdge& prev,
 // Rule 2: Ichidan renyokei + て/てV split should be avoided
 ConnectionRuleResult checkIchidanRenyokeiTe(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb) {
-    return {};
-  }
+  if (prev.pos != core::PartOfSpeech::Verb) return {};
 
   // Check if next starts with て
-  bool is_te_pattern = false;
-  if (next.pos == core::PartOfSpeech::Particle && next.surface == "て") {
-    is_te_pattern = true;
-  } else if (next.pos == core::PartOfSpeech::Verb && startsWithTe(next.surface)) {
-    is_te_pattern = true;
-  }
+  bool is_te_pattern =
+      (next.pos == core::PartOfSpeech::Particle && next.surface == "て") ||
+      (next.pos == core::PartOfSpeech::Verb && startsWithTe(next.surface));
 
-  if (!is_te_pattern) {
-    return {};
-  }
+  if (!is_te_pattern) return {};
 
   // Check if prev ends with e-row (ichidan renyokei)
   if (!endsWithERow(prev.surface)) {
@@ -97,15 +87,14 @@ ConnectionRuleResult checkIchidanRenyokeiTe(const core::LatticeEdge& prev,
 // Rule 3: Te-form split (音便形 or 一段形 → て/で)
 ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
                                       const core::LatticeEdge& next) {
-  if ((prev.pos != core::PartOfSpeech::Noun &&
-       prev.pos != core::PartOfSpeech::Verb) ||
-      next.pos != core::PartOfSpeech::Particle) {
+  // NOUN/VERB + PARTICLE pattern (can't simplify to single helper)
+  if (next.pos != core::PartOfSpeech::Particle) return {};
+  if (prev.pos != core::PartOfSpeech::Noun &&
+      prev.pos != core::PartOfSpeech::Verb) {
     return {};
   }
 
-  if (next.surface != "て" && next.surface != "で") {
-    return {};
-  }
+  if (next.surface != "て" && next.surface != "で") return {};
 
   // Check for godan onbin, ichidan endings, or godan renyokei i-row endings
   // Godan te-form patterns:
@@ -167,14 +156,9 @@ ConnectionRuleResult checkTaiAfterRenyokei(const core::LatticeEdge& prev,
 // Rule 5: Renyokei-like noun + やすい (安い) penalty
 ConnectionRuleResult checkYasuiAfterRenyokei(const core::LatticeEdge& prev,
                                              const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Noun ||
-      next.pos != core::PartOfSpeech::Adjective) {
-    return {};
-  }
+  if (!isNounToAdj(prev, next)) return {};
 
-  if (next.surface != "やすい" || next.lemma != "安い") {
-    return {};
-  }
+  if (next.surface != "やすい" || next.lemma != "安い") return {};
 
   if (!endsWithIRow(prev.surface)) {
     return {};
@@ -187,14 +171,9 @@ ConnectionRuleResult checkYasuiAfterRenyokei(const core::LatticeEdge& prev,
 // Rule 6: Verb renyokei + ながら split penalty
 ConnectionRuleResult checkNagaraSplit(const core::LatticeEdge& prev,
                                       const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb ||
-      next.pos != core::PartOfSpeech::Particle) {
-    return {};
-  }
+  if (!isVerbToParticle(prev, next)) return {};
 
-  if (next.surface != "ながら") {
-    return {};
-  }
+  if (next.surface != "ながら") return {};
 
   if (!endsWithRenyokeiMarker(prev.surface)) {
     return {};
@@ -207,14 +186,9 @@ ConnectionRuleResult checkNagaraSplit(const core::LatticeEdge& prev,
 // Rule 7: Renyokei-like noun + そう (adverb) penalty
 ConnectionRuleResult checkSouAfterRenyokei(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Noun ||
-      next.pos != core::PartOfSpeech::Adverb) {
-    return {};
-  }
+  if (!isNounToAdv(prev, next)) return {};
 
-  if (next.surface != "そう") {
-    return {};
-  }
+  if (next.surface != "そう") return {};
 
   if (!endsWithRenyokeiMarker(prev.surface)) {
     return {};
@@ -227,14 +201,9 @@ ConnectionRuleResult checkSouAfterRenyokei(const core::LatticeEdge& prev,
 // Rule 10: Renyokei-like noun + compound verb auxiliary penalty
 ConnectionRuleResult checkCompoundAuxAfterRenyokei(
     const core::LatticeEdge& prev, const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Noun ||
-      next.pos != core::PartOfSpeech::Verb) {
-    return {};
-  }
+  if (!isNounToVerb(prev, next)) return {};
 
-  if (next.surface.size() < core::kJapaneseCharBytes) {
-    return {};
-  }
+  if (next.surface.size() < core::kJapaneseCharBytes) return {};
 
   // Check if next starts with compound verb auxiliary kanji
   std::string_view first_char = next.surface.substr(0, core::kJapaneseCharBytes);
@@ -255,15 +224,10 @@ ConnectionRuleResult checkCompoundAuxAfterRenyokei(
 // Prevents 飲み + たくて from being preferred over 飲みたくて
 ConnectionRuleResult checkTakuteAfterRenyokei(const core::LatticeEdge& prev,
                                               const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb ||
-      next.pos != core::PartOfSpeech::Adjective) {
-    return {};
-  }
+  if (!isVerbToAdj(prev, next)) return {};
 
   // Check if next is たくて form (ADJ with lemma たい)
-  if (next.lemma != "たい" || next.surface != "たくて") {
-    return {};
-  }
+  if (next.lemma != "たい" || next.surface != "たくて") return {};
 
   // Check if prev ends with renyokei marker
   if (!endsWithRenyokeiMarker(prev.surface)) {
@@ -280,15 +244,14 @@ ConnectionRuleResult checkTakuteAfterRenyokei(const core::LatticeEdge& prev,
 // Also handles ADJ case: 見たく (ADJ) + て should be 見たくて
 ConnectionRuleResult checkTakuTeSplit(const core::LatticeEdge& prev,
                                       const core::LatticeEdge& next) {
-  if ((prev.pos != core::PartOfSpeech::Verb &&
-       prev.pos != core::PartOfSpeech::Adjective) ||
-      next.pos != core::PartOfSpeech::Particle) {
+  // VERB/ADJ + PARTICLE pattern
+  if (next.pos != core::PartOfSpeech::Particle) return {};
+  if (prev.pos != core::PartOfSpeech::Verb &&
+      prev.pos != core::PartOfSpeech::Adjective) {
     return {};
   }
 
-  if (next.surface != "て") {
-    return {};
-  }
+  if (next.surface != "て") return {};
 
   // Check if prev ends with たく (desire adverbial form)
   if (prev.surface.size() < core::kTwoJapaneseCharBytes) {
@@ -308,15 +271,10 @@ ConnectionRuleResult checkTakuTeSplit(const core::LatticeEdge& prev,
 // This offsets the high VERB→VERB base cost for conditional patterns
 ConnectionRuleResult checkConditionalVerbToVerb(const core::LatticeEdge& prev,
                                                 const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb ||
-      next.pos != core::PartOfSpeech::Verb) {
-    return {};
-  }
+  if (!isVerbToVerb(prev, next)) return {};
 
   // Check if prev verb ends with ば (conditional form)
-  if (prev.surface.size() < core::kJapaneseCharBytes) {
-    return {};
-  }
+  if (prev.surface.size() < core::kJapaneseCharBytes) return {};
   std::string_view last3 = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
   if (last3 != "ば") {
     return {};
@@ -333,15 +291,10 @@ ConnectionRuleResult checkConditionalVerbToVerb(const core::LatticeEdge& prev,
 // This gives bonus for proper VERB→VERB compound verb patterns
 ConnectionRuleResult checkVerbRenyokeiCompoundAux(const core::LatticeEdge& prev,
                                                   const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb ||
-      next.pos != core::PartOfSpeech::Verb) {
-    return {};
-  }
+  if (!isVerbToVerb(prev, next)) return {};
 
   // Check if next starts with compound verb auxiliary kanji
-  if (next.surface.size() < core::kJapaneseCharBytes) {
-    return {};
-  }
+  if (next.surface.size() < core::kJapaneseCharBytes) return {};
   std::string_view first_char = next.surface.substr(0, core::kJapaneseCharBytes);
   if (!normalize::isCompoundVerbAuxStart(first_char)) {
     return {};
@@ -364,15 +317,10 @@ ConnectionRuleResult checkVerbRenyokeiCompoundAux(const core::LatticeEdge& prev,
 // Excludes auxiliary verb patterns (いる, おる, しまう, etc.) which should be AUX
 ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb ||
-      next.pos != core::PartOfSpeech::Verb) {
-    return {};
-  }
+  if (!isVerbToVerb(prev, next)) return {};
 
   // Check if prev verb ends with te-form (て or で)
-  if (prev.surface.size() < core::kJapaneseCharBytes) {
-    return {};
-  }
+  if (prev.surface.size() < core::kJapaneseCharBytes) return {};
   std::string_view last_char = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
   if (last_char != "て" && last_char != "で") {
     return {};
@@ -389,15 +337,12 @@ ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
           "te-form verb to verb"};
 }
 
-// Rule: PREFIX + VERB penalty
+// Rule: PREFIX + VERB/AUX penalty
 // Prefixes should attach to nouns/suffixes, not verbs
 // E.g., 何してる - 何 should be PRON, not PREFIX
 ConnectionRuleResult checkPrefixBeforeVerb(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Prefix) {
-    return {};
-  }
-
+  if (prev.pos != core::PartOfSpeech::Prefix) return {};
   if (next.pos != core::PartOfSpeech::Verb &&
       next.pos != core::PartOfSpeech::Auxiliary) {
     return {};
@@ -413,15 +358,10 @@ ConnectionRuleResult checkPrefixBeforeVerb(const core::LatticeEdge& prev,
 // Applies when: prev ends with e-row (ichidan renyokei) or onbin marker
 ConnectionRuleResult checkTokuContractionSplit(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb ||
-      next.pos != core::PartOfSpeech::Particle) {
-    return {};
-  }
+  if (!isVerbToParticle(prev, next)) return {};
 
   // Check if next is と particle
-  if (next.surface != "と") {
-    return {};
-  }
+  if (next.surface != "と") return {};
 
   // Check if prev verb ends with renyokei-like pattern
   // Ichidan: ends with e-row (べ, け, て, etc.)

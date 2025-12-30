@@ -51,14 +51,9 @@ bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma) {
 // いる auxiliary should only follow te-form verbs, not nouns
 ConnectionRuleResult checkIruAuxAfterNoun(const core::LatticeEdge& prev,
                                           const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Noun ||
-      next.pos != core::PartOfSpeech::Auxiliary) {
-    return {};
-  }
+  if (!isNounToAux(prev, next)) return {};
 
-  if (!isIruAuxiliary(next.surface)) {
-    return {};
-  }
+  if (!isIruAuxiliary(next.surface)) return {};
 
   return {ConnectionPattern::IruAuxAfterNoun, scorer::kPenaltyIruAuxAfterNoun,
           "iru aux after noun (should be verb)"};
@@ -68,14 +63,9 @@ ConnectionRuleResult checkIruAuxAfterNoun(const core::LatticeEdge& prev,
 // Progressive aspect pattern: 食べている, 走っています
 ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb ||
-      next.pos != core::PartOfSpeech::Auxiliary) {
-    return {};
-  }
+  if (!isVerbToAux(prev, next)) return {};
 
-  if (!isIruAuxiliary(next.surface)) {
-    return {};
-  }
+  if (!isIruAuxiliary(next.surface)) return {};
 
   // Check if prev ends with te-form (て or で)
   if (prev.surface.size() < core::kJapaneseCharBytes) {
@@ -97,10 +87,7 @@ ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
 // Valid single-char patterns: only when part of proper iru contraction
 ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Verb ||
-      next.pos != core::PartOfSpeech::Auxiliary) {
-    return {};
-  }
+  if (!isVerbToAux(prev, next)) return {};
 
   // Check if prev ends with te-form (て or で)
   if (prev.surface.size() < core::kJapaneseCharBytes) {
@@ -117,14 +104,16 @@ ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
     // Only valid patterns: part of contracted forms handled elsewhere
     // Invalid: standalone "る", "た" that should be part of てる/てた
     if (next.surface == "る") {
-      return {ConnectionPattern::InvalidTeFormAux, 5.0F,
+      return {ConnectionPattern::InvalidTeFormAux,
+              scorer::kPenaltyInvalidSingleCharAux,
               "invalid single-char aux after te-form"};
     }
     // "た" after te-form is likely contracted -ていた form (買ってた, 見てた)
     // Add penalty to prefer unified てた analysis over split て + た
     // This handles the colloquial contraction ている → てる, ていた → てた
     if (next.surface == "た") {
-      return {ConnectionPattern::InvalidTeFormAux, 1.5F,
+      return {ConnectionPattern::InvalidTeFormAux,
+              scorer::kPenaltyTeFormTaContraction,
               "te-form + ta (likely contracted teita)"};
     }
   }
@@ -137,14 +126,9 @@ ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
 // The で after negative polite forms should be part of でした (copula past)
 ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
                                        const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Auxiliary ||
-      next.pos != core::PartOfSpeech::Particle) {
-    return {};
-  }
+  if (!isAuxToParticle(prev, next)) return {};
 
-  if (next.surface != "で") {
-    return {};
-  }
+  if (next.surface != "で") return {};
 
   // Check if prev ends with ません (negative polite form)
   // UTF-8: ません = 9 bytes (3 hiragana chars)
@@ -165,14 +149,9 @@ ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
 // E.g., 行き(NOUN) + ましょう is invalid - should be 行き(VERB) + ましょう
 ConnectionRuleResult checkNounBeforeVerbAux(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Noun ||
-      next.pos != core::PartOfSpeech::Auxiliary) {
-    return {};
-  }
+  if (!isNounToAux(prev, next)) return {};
 
-  if (!isVerbSpecificAuxiliary(next.surface, next.lemma)) {
-    return {};
-  }
+  if (!isVerbSpecificAuxiliary(next.surface, next.lemma)) return {};
 
   return {ConnectionPattern::NounBeforeVerbAux, scorer::kPenaltyNounBeforeVerbAux,
           "noun before verb-specific aux"};
@@ -185,17 +164,12 @@ ConnectionRuleResult checkNounBeforeVerbAux(const core::LatticeEdge& prev,
 // NOUN + まい is grammatically invalid - should be VERB stem + まい
 ConnectionRuleResult checkMaiAfterNoun(const core::LatticeEdge& prev,
                                        const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Noun ||
-      next.pos != core::PartOfSpeech::Auxiliary) {
-    return {};
-  }
+  if (!isNounToAux(prev, next)) return {};
 
-  if (next.surface != "まい") {
-    return {};
-  }
+  if (next.surface != "まい") return {};
 
   // Penalty to prefer verb stem + まい over noun + まい
-  return {ConnectionPattern::NounBeforeVerbAux, 1.5F,
+  return {ConnectionPattern::NounBeforeVerbAux, scorer::kPenaltyNounMai,
           "mai aux after noun (should be verb stem)"};
 }
 
@@ -209,10 +183,7 @@ ConnectionRuleResult checkMaiAfterNoun(const core::LatticeEdge& prev,
 // Note: Long dictionary AUX (like なかった) after particles is valid
 ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next) {
-  if (prev.pos != core::PartOfSpeech::Particle ||
-      next.pos != core::PartOfSpeech::Auxiliary) {
-    return {};
-  }
+  if (!isParticleToAux(prev, next)) return {};
 
   // Don't penalize long dictionary AUX (2+ chars) - valid patterns
   // e.g., は + なかった, で + ある
@@ -221,7 +192,8 @@ ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
   }
 
   // Penalize short/unknown AUX after particle
-  return {ConnectionPattern::ParticleBeforeAux, 3.0F,
+  return {ConnectionPattern::ParticleBeforeAux,
+          scorer::kPenaltyShortAuxAfterParticle,
           "short/unknown aux after particle (likely split)"};
 }
 
@@ -239,13 +211,13 @@ ConnectionRuleResult checkMitaiAfterNounOrVerb(const core::LatticeEdge& prev,
 
   // Bonus for NOUN + みたい (strong bonus to beat unknown verb analysis)
   if (prev.pos == core::PartOfSpeech::Noun) {
-    return {ConnectionPattern::NounBeforeNaAdj, -3.0F,
+    return {ConnectionPattern::NounBeforeNaAdj, -scorer::kBonusNounMitai,
             "noun + mitai (resemblance pattern)"};
   }
 
   // Bonus for VERB + みたい (終止形/連体形)
   if (prev.pos == core::PartOfSpeech::Verb) {
-    return {ConnectionPattern::VerbBeforeNaAdj, -1.0F,
+    return {ConnectionPattern::VerbBeforeNaAdj, -scorer::kBonusVerbMitai,
             "verb + mitai (hearsay/appearance pattern)"};
   }
 
