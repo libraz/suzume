@@ -1,0 +1,37 @@
+{
+  "version": "1.0",
+  "description": "Contraction patterns (てる、ちゃう)",
+  "cases": [
+    {
+      "id": "contraction_shiteru",
+      "description": "してる should contain verb component",
+      "input": "してる",
+      "expected": [
+        {
+          "surface": "してる",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "strict",
+        "contraction"
+      ]
+    },
+    {
+      "id": "contraction_miteta",
+      "description": "見てた - unified contracted form of 見ていた",
+      "input": "見てた",
+      "expected": [
+        {
+          "surface": "見てた",
+          "pos": "Verb",
+          "lemma": "見る"
+        }
+      ],
+      "tags": [
+        "strict",
+        "contraction"
+      ]
+    }
+  ]
+}

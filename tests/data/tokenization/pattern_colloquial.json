@@ -1,0 +1,392 @@
+{
+  "version": "1.0",
+  "description": "Colloquial and slang patterns",
+  "cases": [
+    {
+      "id": "choon_sugoi",
+      "description": "すごーい (colloquial すごい with extended vowel)",
+      "input": "すごーい",
+      "expected": [
+        {
+          "surface": "すごーい",
+          "pos": "Adjective",
+          "lemma": "すごい"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "i-adjective",
+        "colloquial",
+        "choon"
+      ]
+    },
+    {
+      "id": "choon_yabai",
+      "description": "やばーい (colloquial やばい with extended vowel)",
+      "input": "やばーい",
+      "expected": [
+        {
+          "surface": "やばーい",
+          "pos": "Adjective",
+          "lemma": "やばい"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "i-adjective",
+        "colloquial",
+        "choon"
+      ]
+    },
+    {
+      "id": "choon_kawaii",
+      "description": "かわいー (colloquial かわいい with extended vowel)",
+      "input": "かわいー",
+      "expected": [
+        {
+          "surface": "かわいー",
+          "pos": "Adjective",
+          "lemma": "かわいい"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "i-adjective",
+        "colloquial",
+        "choon"
+      ]
+    },
+    {
+      "id": "choon_sugoi_sentence",
+      "description": "すごーいね (colloquial すごい in sentence)",
+      "input": "すごーいね",
+      "expected": [
+        {
+          "surface": "すごーい",
+          "pos": "Adjective",
+          "lemma": "すごい"
+        },
+        {
+          "surface": "ね",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "i-adjective",
+        "colloquial",
+        "choon"
+      ]
+    },
+    {
+      "id": "choon_yabai_yo",
+      "description": "やばーいよ (colloquial やばい with sentence final)",
+      "input": "やばーいよ",
+      "expected": [
+        {
+          "surface": "やばーい",
+          "pos": "Adjective",
+          "lemma": "やばい"
+        },
+        {
+          "surface": "よ",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "i-adjective",
+        "colloquial",
+        "choon"
+      ]
+    },
+    {
+      "id": "choon_consecutive_sugoi",
+      "description": "すごーーい (consecutive prolonged marks)",
+      "input": "すごーーい",
+      "expected": [
+        {
+          "surface": "すごーーい",
+          "pos": "Adjective",
+          "lemma": "すごい"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "i-adjective",
+        "colloquial",
+        "choon",
+        "consecutive"
+      ]
+    },
+    {
+      "id": "choon_consecutive_kawaii",
+      "description": "かわいーー (consecutive prolonged marks at end)",
+      "input": "かわいーー",
+      "expected": [
+        {
+          "surface": "かわいーー",
+          "pos": "Adjective",
+          "lemma": "かわいい"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "i-adjective",
+        "colloquial",
+        "choon",
+        "consecutive"
+      ]
+    },
+    {
+      "id": "colloquial_tte",
+      "description": "行くって言った (said I'll go)",
+      "input": "行くって言った",
+      "expected": [
+        {
+          "surface": "行く",
+          "pos": "Verb"
+        },
+        {
+          "surface": "って",
+          "pos": "Particle"
+        },
+        {
+          "surface": "言った",
+          "pos": "Verb",
+          "lemma": "言う"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "colloquial"
+      ]
+    },
+    {
+      "id": "colloquial_cha",
+      "description": "行っちゃった (went and did it)",
+      "input": "行っちゃった",
+      "expected": [
+        {
+          "surface": "行っちゃった",
+          "pos": "Verb",
+          "lemma": "行く"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "colloquial"
+      ]
+    },
+    {
+      "id": "colloquial_toku",
+      "description": "やっとく (will do it in advance) - contraction of やって+おく",
+      "input": "やっとく",
+      "expected": [
+        {
+          "surface": "やっとく",
+          "pos": "Verb",
+          "lemma": "やる"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "colloquial"
+      ]
+    },
+    {
+      "id": "phrase_meccha_emoi",
+      "description": "Slang phrase めっちゃエモい",
+      "input": "めっちゃエモい",
+      "expected": [
+        {
+          "surface": "めっちゃ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "エモい",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "slang",
+        "phrase"
+      ]
+    },
+    {
+      "id": "phrase_cho_bazutta",
+      "description": "Slang phrase 超バズった",
+      "input": "超バズった",
+      "expected": [
+        {
+          "surface": "超",
+          "pos": "Noun"
+        },
+        {
+          "surface": "バズった",
+          "pos": "Verb",
+          "lemma": "バズる"
+        }
+      ],
+      "tags": [
+        "slang",
+        "phrase"
+      ]
+    },
+    {
+      "id": "phrase_majide_kimoi",
+      "description": "Slang phrase マジでキモい",
+      "input": "マジでキモい",
+      "expected": [
+        {
+          "surface": "マジで",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "キモい",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "slang",
+        "phrase"
+      ]
+    },
+    {
+      "id": "phrase_gachide_saboru",
+      "description": "Slang phrase ガチでサボる",
+      "input": "ガチでサボる",
+      "expected": [
+        {
+          "surface": "ガチ",
+          "pos": "Noun"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
+        },
+        {
+          "surface": "サボる",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "slang",
+        "phrase"
+      ]
+    },
+    {
+      "id": "phrase_majide_toutoi",
+      "description": "Internet slang phrase マジで尊い",
+      "input": "マジで尊い",
+      "expected": [
+        {
+          "surface": "マジで",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "尊い",
+          "pos": "Adjective",
+          "lemma": "尊い"
+        }
+      ],
+      "tags": [
+        "slang",
+        "phrase",
+        "internet"
+      ]
+    },
+    {
+      "id": "phrase_toutoi_shindoi",
+      "description": "Colloquial phrase 尊すぎてしんどい",
+      "input": "尊すぎてしんどい",
+      "expected": [
+        {
+          "surface": "尊すぎ",
+          "pos": "Verb",
+          "lemma": "尊過ぎる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "しんどい",
+          "pos": "Adjective",
+          "lemma": "しんどい"
+        }
+      ],
+      "tags": [
+        "slang",
+        "phrase",
+        "internet"
+      ]
+    },
+    {
+      "id": "noun_oshi_standalone",
+      "description": "Nominalized noun 推し standalone (T54)",
+      "input": "推し",
+      "expected": [
+        {
+          "surface": "推し",
+          "pos": "Noun",
+          "lemma": "推し"
+        }
+      ],
+      "tags": [
+        "slang",
+        "noun",
+        "internet",
+        "otaku"
+      ]
+    },
+    {
+      "id": "noun_oshi_particle_no",
+      "description": "Nominalized noun 推し with particle の",
+      "input": "推しの",
+      "expected": [
+        {
+          "surface": "推し",
+          "pos": "Noun",
+          "lemma": "推し"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "slang",
+        "noun",
+        "internet",
+        "otaku"
+      ]
+    },
+    {
+      "id": "phrase_oshi_live",
+      "description": "Internet slang phrase 推しのライブ",
+      "input": "推しのライブ",
+      "expected": [
+        {
+          "surface": "推し",
+          "pos": "Noun",
+          "lemma": "推し"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ライブ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "slang",
+        "phrase",
+        "internet",
+        "otaku"
+      ]
+    }
+  ]
+}

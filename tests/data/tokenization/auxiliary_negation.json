@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "description": "Negation auxiliaries (ない、ぬ)",
+  "cases": [
+    {
+      "id": "aux_nai",
+      "description": "Negative auxiliary ない",
+      "input": "行かない",
+      "expected": [
+        {
+          "surface": "行かない",
+          "pos": "Verb",
+          "lemma": "行く"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "negative"
+      ]
+    }
+  ]
+}

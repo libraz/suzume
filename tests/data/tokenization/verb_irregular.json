@@ -1,0 +1,1121 @@
+{
+  "version": "1.0",
+  "description": "Irregular verbs (する、くる)",
+  "cases": [
+    {
+      "id": "bug_shiteimasu",
+      "description": "勉強しています - suru verb with progressive",
+      "input": "勉強しています",
+      "expected": [
+        {
+          "surface": "勉強して",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        },
+        {
+          "surface": "います",
+          "pos": "Auxiliary",
+          "lemma": "いる"
+        }
+      ],
+      "tags": [
+        "basic",
+        "suru"
+      ]
+    },
+    {
+      "id": "suru_shite",
+      "description": "勉強して - te-form of suru verb",
+      "input": "勉強して",
+      "expected": [
+        {
+          "surface": "勉強して",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": [
+        "basic",
+        "suru"
+      ]
+    },
+    {
+      "id": "suru_shita",
+      "description": "勉強した - past form of suru verb",
+      "input": "勉強した",
+      "expected": [
+        {
+          "surface": "勉強した",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": [
+        "basic",
+        "suru"
+      ]
+    },
+    {
+      "id": "suru_shinai",
+      "description": "しない - negative of する",
+      "input": "しない",
+      "expected": [
+        {
+          "surface": "しない",
+          "pos": "Verb",
+          "lemma": "する"
+        }
+      ],
+      "tags": [
+        "basic",
+        "suru"
+      ]
+    },
+    {
+      "id": "suru_itashite",
+      "description": "いたしております - humble suru verb unified",
+      "input": "いたしております",
+      "expected": [
+        {
+          "surface": "いたしております",
+          "pos": "Verb",
+          "lemma": "いたす"
+        }
+      ],
+      "tags": [
+        "basic",
+        "suru"
+      ]
+    },
+    {
+      "id": "suru_kentou",
+      "description": "検討いたしております - suru noun + itasu unified",
+      "input": "検討いたしております",
+      "expected": [
+        {
+          "surface": "検討",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いたしております",
+          "pos": "Verb",
+          "lemma": "いたす"
+        }
+      ],
+      "tags": [
+        "basic",
+        "suru"
+      ]
+    },
+    {
+      "id": "suru_noun_itashimasu",
+      "description": "勉強いたします - suru noun + itashimasu",
+      "input": "勉強いたします",
+      "expected": [
+        {
+          "surface": "勉強",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いたします",
+          "pos": "Verb",
+          "lemma": "いたす"
+        }
+      ],
+      "tags": [
+        "basic",
+        "suru"
+      ]
+    },
+    {
+      "id": "suru_noun_shita",
+      "description": "検討した - suru noun compound",
+      "input": "検討した",
+      "expected": [
+        {
+          "surface": "検討した",
+          "pos": "Verb",
+          "lemma": "検討する"
+        }
+      ],
+      "tags": [
+        "basic",
+        "suru"
+      ]
+    },
+    {
+      "id": "teki_kouritsuteki_sagyousuru",
+      "description": "効率的に作業する (work efficiently)",
+      "input": "効率的に作業する",
+      "expected": [
+        {
+          "surface": "効率的",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "作業する",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "teki",
+        "sentence"
+      ]
+    },
+    {
+      "id": "teki_sekkyokuteki_sankasuru",
+      "description": "積極的に参加する (participate proactively)",
+      "input": "積極的に参加する",
+      "expected": [
+        {
+          "surface": "積極的",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "参加する",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "teki"
+      ]
+    },
+    {
+      "id": "teki_gutaiteki_setsumeisuru",
+      "description": "具体的に説明する (explain concretely)",
+      "input": "具体的に説明する",
+      "expected": [
+        {
+          "surface": "具体的",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "説明する",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "teki"
+      ]
+    },
+    {
+      "id": "na_teineini_setsumeisuru",
+      "description": "丁寧に説明する (explain politely)",
+      "input": "丁寧に説明する",
+      "expected": [
+        {
+          "surface": "丁寧",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "説明する",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "sentence"
+      ]
+    },
+    {
+      "id": "complex_embedded",
+      "description": "彼が来ることを知っている (know that he is coming)",
+      "input": "彼が来ることを知っている",
+      "expected": [
+        {
+          "surface": "彼",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "来る",
+          "pos": "Verb"
+        },
+        {
+          "surface": "こと",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "知って",
+          "pos": "Verb",
+          "lemma": "知る"
+        },
+        {
+          "surface": "いる",
+          "pos": "Auxiliary",
+          "lemma": "いる"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "complex"
+      ]
+    },
+    {
+      "id": "formal_noun_koto",
+      "description": "勉強すること (studying)",
+      "input": "勉強すること",
+      "expected": [
+        {
+          "surface": "勉強する",
+          "pos": "Verb"
+        },
+        {
+          "surface": "こと",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "formal-noun"
+      ]
+    },
+    {
+      "id": "basic_benkyou_suru",
+      "description": "Suru verb 勉強する base form",
+      "input": "勉強する",
+      "expected": [
+        {
+          "surface": "勉強する",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "basic"
+      ]
+    },
+    {
+      "id": "basic_bunseki_suru",
+      "description": "Suru verb 分析する base form",
+      "input": "分析する",
+      "expected": [
+        {
+          "surface": "分析する",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "suru",
+        "basic"
+      ]
+    },
+    {
+      "id": "basic_kakunin_suru",
+      "description": "Suru verb 確認する base form",
+      "input": "確認する",
+      "expected": [
+        {
+          "surface": "確認する",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "suru",
+        "basic"
+      ]
+    },
+    {
+      "id": "basic_setsumei_suru",
+      "description": "Suru verb 説明する base form",
+      "input": "説明する",
+      "expected": [
+        {
+          "surface": "説明する",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "suru",
+        "basic"
+      ]
+    },
+    {
+      "id": "basic_shori_suru",
+      "description": "Suru verb 処理する base form",
+      "input": "処理する",
+      "expected": [
+        {
+          "surface": "処理する",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "suru",
+        "basic"
+      ]
+    },
+    {
+      "id": "teiru_benkyou_shiteiru",
+      "description": "Suru verb 勉強している progressive",
+      "input": "勉強している",
+      "expected": [
+        {
+          "surface": "勉強して",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        },
+        {
+          "surface": "いる",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "suru",
+        "progressive"
+      ]
+    },
+    {
+      "id": "masu_kakunin_shimasu",
+      "description": "Suru verb 確認します polite form - MeCab互換分割",
+      "input": "確認します",
+      "expected": [
+        {
+          "surface": "確認し",
+          "pos": "Verb",
+          "lemma": "確認する"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
+      ],
+      "tags": [
+        "suru",
+        "polite"
+      ]
+    },
+    {
+      "id": "nai_setsumei_shinai",
+      "description": "Suru verb 説明しない negative",
+      "input": "説明しない",
+      "expected": [
+        {
+          "surface": "説明しない",
+          "pos": "Verb",
+          "lemma": "説明する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "negative"
+      ]
+    },
+    {
+      "id": "tai_ryokou_shitai",
+      "description": "Suru verb 旅行したい desiderative",
+      "input": "旅行したい",
+      "expected": [
+        {
+          "surface": "旅行したい",
+          "pos": "Verb",
+          "lemma": "旅行する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "desiderative"
+      ]
+    },
+    {
+      "id": "passive_shori_sareru",
+      "description": "Suru verb 処理される passive",
+      "input": "処理される",
+      "expected": [
+        {
+          "surface": "処理される",
+          "pos": "Verb",
+          "lemma": "処理する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "passive"
+      ]
+    },
+    {
+      "id": "causative_benkyou_saseru",
+      "description": "Suru verb 勉強させる causative",
+      "input": "勉強させる",
+      "expected": [
+        {
+          "surface": "勉強させる",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "causative"
+      ]
+    },
+    {
+      "id": "suru_verb_sou_chikoku",
+      "description": "遅刻しそう - suru-verb renyokei + そう (動詞+助動詞 → 分割)",
+      "input": "遅刻しそう",
+      "expected": [
+        {
+          "surface": "遅刻し",
+          "pos": "Verb",
+          "lemma": "遅刻する"
+        },
+        {
+          "surface": "そう",
+          "pos": "Adverb"
+        }
+      ],
+      "tags": [
+        "suru",
+        "sou"
+      ]
+    },
+    {
+      "id": "kanjiru_lemma",
+      "description": "B24: 感じる verbs should have correct lemma, not 感じする",
+      "input": "感じて",
+      "expected": [
+        {
+          "surface": "感じて",
+          "pos": "Verb",
+          "lemma": "感じる"
+        }
+      ],
+      "tags": [
+        "ichidan",
+        "lemma"
+      ]
+    },
+    {
+      "id": "shikata_noun",
+      "description": "B25: 仕方ない should be NOUN + AUX, not VERB (仕方する)",
+      "input": "仕方ない",
+      "expected": [
+        {
+          "surface": "仕方",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary",
+          "lemma": "ない"
+        }
+      ],
+      "tags": [
+        "noun",
+        "negation"
+      ]
+    },
+    {
+      "id": "nominalized_noun_tedasuke",
+      "description": "手助けをする - nominalized noun",
+      "input": "手助けをする",
+      "expected": [
+        {
+          "surface": "手助け",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "nominalized_noun"
+      ]
+    },
+    {
+      "id": "nominalized_noun_kiri",
+      "description": "みじん切りにする - みじん切り is a cooking term noun",
+      "input": "みじん切りにする",
+      "expected": [
+        {
+          "surface": "みじん切り",
+          "pos": "Noun",
+          "lemma": "みじん切り"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "nominalized_noun"
+      ]
+    },
+    {
+      "id": "viterbi_multi_morpheme_preference",
+      "description": "いつも来る - prefer longer token",
+      "input": "いつも来る",
+      "expected": [
+        {
+          "surface": "いつも",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "来る",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "viterbi"
+      ]
+    },
+    {
+      "id": "sou_with_desu",
+      "description": "遅刻しそうです - suru-verb renyokei + そう + です",
+      "input": "遅刻しそうです",
+      "expected": [
+        {
+          "surface": "遅刻し",
+          "pos": "Verb",
+          "lemma": "遅刻する"
+        },
+        {
+          "surface": "そう",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "sou",
+        "verb",
+        "suru"
+      ]
+    },
+    {
+      "id": "formal_noun_kuru_hazu_datta",
+      "description": "来るはずだった - verb + hazu + past copula",
+      "input": "来るはずだった",
+      "expected": [
+        {
+          "surface": "来る",
+          "pos": "Verb",
+          "lemma": "来る"
+        },
+        {
+          "surface": "はず",
+          "pos": "Noun",
+          "lemma": "はず"
+        },
+        {
+          "surface": "だった",
+          "pos": "Auxiliary",
+          "lemma": "だった"
+        }
+      ],
+      "tags": [
+        "formal_noun"
+      ]
+    },
+    {
+      "id": "godan_sa_oshite",
+      "description": "押して should be GodanSa verb (押す), not Suru (押しする)",
+      "input": "押して",
+      "expected": [
+        {
+          "surface": "押して",
+          "pos": "Verb",
+          "lemma": "押す"
+        }
+      ],
+      "tags": [
+        "verb",
+        "godan-sa",
+        "lemma"
+      ]
+    },
+    {
+      "id": "godan_sa_dashite",
+      "description": "出して should be GodanSa verb (出す), not Suru (出しする)",
+      "input": "出して",
+      "expected": [
+        {
+          "surface": "出して",
+          "pos": "Verb",
+          "lemma": "出す"
+        }
+      ],
+      "tags": [
+        "verb",
+        "godan-sa",
+        "lemma"
+      ]
+    },
+    {
+      "id": "godan_sa_hanashite",
+      "description": "話して should be GodanSa verb (話す), not Suru (話しする)",
+      "input": "話して",
+      "expected": [
+        {
+          "surface": "話して",
+          "pos": "Verb",
+          "lemma": "話す"
+        }
+      ],
+      "tags": [
+        "verb",
+        "godan-sa",
+        "lemma"
+      ]
+    },
+    {
+      "id": "ichidan_dekimai",
+      "description": "出来まい should be Ichidan verb (出来る), not Suru (出来する)",
+      "input": "出来まい",
+      "expected": [
+        {
+          "surface": "出来まい",
+          "pos": "Verb",
+          "lemma": "出来る"
+        }
+      ],
+      "tags": [
+        "verb",
+        "ichidan",
+        "lemma"
+      ]
+    },
+    {
+      "id": "ichidan_dekinai",
+      "description": "出来ない should be Ichidan verb (出来る), not Suru (出来する)",
+      "input": "出来ない",
+      "expected": [
+        {
+          "surface": "出来ない",
+          "pos": "Verb",
+          "lemma": "出来る"
+        }
+      ],
+      "tags": [
+        "verb",
+        "ichidan",
+        "lemma"
+      ]
+    },
+    {
+      "id": "adverb_mushiro",
+      "description": "むしろ should be Adverb (not Verb むする)",
+      "input": "むしろ簡単だ",
+      "expected": [
+        {
+          "surface": "むしろ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "簡単",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "だ",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "adverb"
+      ]
+    },
+    {
+      "id": "suru_noun_itasu",
+      "description": "検討いたします - suru-noun + itasu pattern",
+      "input": "検討いたします",
+      "expected": [
+        {
+          "surface": "検討",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いたします",
+          "pos": "Verb",
+          "lemma": "いたす"
+        }
+      ],
+      "tags": [
+        "suru",
+        "honorific"
+      ]
+    },
+    {
+      "id": "suru_renyokei_bunkatsu",
+      "description": "分割し、結合する - suru renyokei",
+      "input": "分割し、結合する",
+      "expected": [
+        {
+          "surface": "分割し",
+          "pos": "Verb",
+          "lemma": "分割する"
+        },
+        {
+          "surface": "結合する",
+          "pos": "Verb",
+          "lemma": "結合する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "renyokei"
+      ]
+    },
+    {
+      "id": "suru_renyokei_sentence",
+      "description": "文章を単語に分割し... - suru renyokei in sentence",
+      "input": "文章を単語に分割し、それぞれの品詞を特定する",
+      "expected": [
+        {
+          "surface": "文章",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "単語",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "分割し",
+          "pos": "Verb",
+          "lemma": "分割する"
+        },
+        {
+          "surface": "それぞれ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "品詞",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "特定する",
+          "pos": "Verb",
+          "lemma": "特定する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "renyokei"
+      ]
+    },
+    {
+      "id": "taio_sasete_itadakimasu",
+      "description": "対応させていただきます - suru causative + itadaku",
+      "input": "対応させていただきます",
+      "expected": [
+        {
+          "surface": "対応させて",
+          "pos": "Verb",
+          "lemma": "対応する"
+        },
+        {
+          "surface": "いただきます",
+          "pos": "Verb",
+          "lemma": "いただく"
+        }
+      ],
+      "tags": [
+        "suru",
+        "itadaku"
+      ]
+    },
+    {
+      "id": "suru_passive_polite",
+      "description": "開催されました - suru passive polite",
+      "input": "開催されました",
+      "expected": [
+        {
+          "surface": "開催されました",
+          "pos": "Verb",
+          "lemma": "開催する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "passive",
+        "known_issue"
+      ]
+    },
+    {
+      "id": "suru_passive_polite_2",
+      "description": "勉強されました - suru passive polite",
+      "input": "勉強されました",
+      "expected": [
+        {
+          "surface": "勉強されました",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "passive",
+        "known_issue"
+      ]
+    },
+    {
+      "id": "suru_passive_neg_past",
+      "description": "開催されなかった - suru passive negative past",
+      "input": "開催されなかった",
+      "expected": [
+        {
+          "surface": "開催されなかった",
+          "pos": "Verb",
+          "lemma": "開催する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "passive",
+        "negative"
+      ]
+    },
+    {
+      "id": "suru_passive_neg_past_2",
+      "description": "勉強されなかった - suru passive negative past",
+      "input": "勉強されなかった",
+      "expected": [
+        {
+          "surface": "勉強されなかった",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "passive",
+        "negative"
+      ]
+    },
+    {
+      "id": "suru_imperative_shiro",
+      "input": "勉強しろ",
+      "expected": [
+        {
+          "surface": "勉強しろ",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "imperative"
+      ]
+    },
+    {
+      "id": "suru_imperative_seyo",
+      "input": "勉強せよ",
+      "expected": [
+        {
+          "surface": "勉強せよ",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "imperative",
+        "known_issue"
+      ]
+    },
+    {
+      "id": "suru_imperative_renshu",
+      "input": "練習しろ",
+      "expected": [
+        {
+          "surface": "練習しろ",
+          "pos": "Verb",
+          "lemma": "練習する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "imperative"
+      ]
+    },
+    {
+      "id": "suru_imperative_undou",
+      "input": "運動せよ",
+      "expected": [
+        {
+          "surface": "運動せよ",
+          "pos": "Verb",
+          "lemma": "運動する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "imperative",
+        "known_issue"
+      ]
+    },
+    {
+      "id": "suru_imperative_setsumei",
+      "input": "説明しろ",
+      "expected": [
+        {
+          "surface": "説明しろ",
+          "pos": "Verb",
+          "lemma": "説明する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "imperative"
+      ]
+    },
+    {
+      "id": "suru_conditional",
+      "input": "勉強すれば",
+      "expected": [
+        {
+          "surface": "勉強すれば",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "conditional"
+      ]
+    },
+    {
+      "id": "suru_volitional",
+      "input": "勉強しよう",
+      "expected": [
+        {
+          "surface": "勉強しよう",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "volitional"
+      ]
+    },
+    {
+      "id": "standalone_shiro",
+      "input": "しろ",
+      "expected": [
+        {
+          "surface": "しろ",
+          "pos": "Verb",
+          "lemma": "する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "imperative",
+        "standalone"
+      ]
+    },
+    {
+      "id": "standalone_seyo",
+      "input": "せよ",
+      "expected": [
+        {
+          "surface": "せよ",
+          "pos": "Verb",
+          "lemma": "する"
+        }
+      ],
+      "tags": [
+        "suru",
+        "imperative",
+        "standalone"
+      ]
+    },
+    {
+      "id": "ichidan_taberu_base",
+      "description": "Ichidan verb 食べる base form",
+      "input": "食べる",
+      "expected": [
+        {
+          "surface": "食べる",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "verb",
+        "ichidan"
+      ]
+    },
+    {
+      "id": "symbol_brackets",
+      "description": "「こんにちは」と言った (said 'hello')",
+      "input": "「こんにちは」と言った",
+      "expected": [
+        {
+          "surface": "こんにちは",
+          "pos": "Other"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        },
+        {
+          "surface": "言った",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "symbol"
+      ]
+    }
+  ]
+}

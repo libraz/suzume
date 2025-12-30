@@ -1,0 +1,142 @@
+{
+  "version": "1.0",
+  "description": "Formal nouns (こと、もの、ところ)",
+  "cases": [
+    {
+      "id": "tokoro_formal_noun",
+      "description": "勉強させられていたところだった - ところ formal noun",
+      "input": "勉強させられていたところだった",
+      "expected": [
+        {
+          "surface": "勉強させられていた",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        },
+        {
+          "surface": "ところ",
+          "pos": "Noun"
+        },
+        {
+          "surface": "だった",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "formal_noun"
+      ]
+    },
+    {
+      "id": "formal_noun_tsuke_split",
+      "description": "日付けで should split 付け from で",
+      "input": "日付けで",
+      "expected": [
+        {
+          "surface": "日付け",
+          "pos": "Noun"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "formal_noun"
+      ]
+    },
+    {
+      "id": "formal_noun_date_with_tsuke",
+      "description": "2024年12月23日付けで",
+      "input": "2024年12月23日付けで",
+      "expected": [
+        {
+          "surface": "2024年12月23日",
+          "pos": "Noun"
+        },
+        {
+          "surface": "付け",
+          "pos": "Noun"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "formal_noun",
+        "date"
+      ]
+    },
+    {
+      "id": "formal_noun_hazu_da",
+      "description": "はずだ - formal noun hazu + copula",
+      "input": "はずだ",
+      "expected": [
+        {
+          "surface": "はず",
+          "pos": "Noun",
+          "lemma": "はず"
+        },
+        {
+          "surface": "だ",
+          "pos": "Auxiliary",
+          "lemma": "だ"
+        }
+      ],
+      "tags": [
+        "formal_noun"
+      ]
+    },
+    {
+      "id": "formal_noun_hazu_ganai",
+      "description": "はずがない - formal noun hazu + negative",
+      "input": "はずがない",
+      "expected": [
+        {
+          "surface": "はず",
+          "pos": "Noun",
+          "lemma": "はず"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary",
+          "lemma": "ない"
+        }
+      ],
+      "tags": [
+        "formal_noun"
+      ]
+    },
+    {
+      "id": "noun_hoka",
+      "description": "ほか should be single Noun (not ほ+か)",
+      "input": "思いのほかうまい",
+      "expected": [
+        {
+          "surface": "思い",
+          "pos": "Verb",
+          "lemma": "思う"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ほか",
+          "pos": "Noun"
+        },
+        {
+          "surface": "うまい",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "noun",
+        "formal_noun"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,225 @@
+{
+  "version": "1.0",
+  "description": "Sentence-ending particles (ね、よ、な)",
+  "cases": [
+    {
+      "id": "sentence_ending_ka",
+      "description": "Question particle か with verb+aux split",
+      "input": "行きますか",
+      "expected": [
+        {
+          "surface": "行き",
+          "pos": "Verb",
+          "lemma": "行く"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "か",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "particle",
+        "sentence_ending"
+      ]
+    },
+    {
+      "id": "sentence_ending_ne",
+      "description": "Confirmation particle ね",
+      "input": "いいですね",
+      "expected": [
+        {
+          "surface": "いい",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "ね",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "particle",
+        "sentence_ending"
+      ]
+    },
+    {
+      "id": "sentence_ending_yo",
+      "description": "Emphasis particle よ",
+      "input": "行くよ",
+      "expected": [
+        {
+          "surface": "行く",
+          "pos": "Verb"
+        },
+        {
+          "surface": "よ",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "particle",
+        "sentence_ending"
+      ]
+    },
+    {
+      "id": "sentence_ending_wane",
+      "description": "Feminine sentence ending わね",
+      "input": "そうだわね",
+      "expected": [
+        {
+          "surface": "そう",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "だわ",
+          "pos": "Auxiliary",
+          "lemma": "だ"
+        },
+        {
+          "surface": "ね",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "particle",
+        "sentence_ending"
+      ]
+    },
+    {
+      "id": "sentence_ending_kana",
+      "description": "Wonder particle かな",
+      "input": "行けるかな",
+      "expected": [
+        {
+          "surface": "行ける",
+          "pos": "Verb",
+          "lemma": "行く"
+        },
+        {
+          "surface": "か",
+          "pos": "Particle"
+        },
+        {
+          "surface": "な",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "particle",
+        "sentence_ending"
+      ]
+    },
+    {
+      "id": "sentence_ending_kashira",
+      "description": "Feminine wonder particle かしら (unified)",
+      "input": "大丈夫かしら",
+      "expected": [
+        {
+          "surface": "大丈夫",
+          "pos": "Noun"
+        },
+        {
+          "surface": "かしら",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "particle",
+        "sentence_ending"
+      ]
+    },
+    {
+      "id": "sentence_ending_zo",
+      "description": "Masculine emphasis particle ぞ",
+      "input": "行くぞ",
+      "expected": [
+        {
+          "surface": "行く",
+          "pos": "Verb"
+        },
+        {
+          "surface": "ぞ",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "particle",
+        "sentence_ending"
+      ]
+    },
+    {
+      "id": "sentence_ending_ze",
+      "description": "Masculine casual particle ぜ",
+      "input": "やるぜ",
+      "expected": [
+        {
+          "surface": "やる",
+          "pos": "Verb"
+        },
+        {
+          "surface": "ぜ",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "particle",
+        "sentence_ending"
+      ]
+    },
+    {
+      "id": "sentence_ending_yone",
+      "description": "Sentence ending particles よ + ね",
+      "input": "いいよね",
+      "expected": [
+        {
+          "surface": "いい",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "よ",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ね",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "strict",
+        "particle",
+        "sentence_ending"
+      ]
+    },
+    {
+      "id": "sentence_ending_kana_58bde2",
+      "description": "Sentence ending particles か + な",
+      "input": "行くかな",
+      "expected": [
+        {
+          "surface": "行く",
+          "pos": "Verb"
+        },
+        {
+          "surface": "か",
+          "pos": "Particle"
+        },
+        {
+          "surface": "な",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "strict",
+        "particle",
+        "sentence_ending"
+      ]
+    }
+  ]
+}

@@ -1,545 +1,82 @@
 {
   "version": "1.0",
+  "description": "Basic tokenization tests",
   "cases": [
-    {
-      "id": "analyze_simple_kanji",
-      "description": "Simple kanji word 世界",
-      "input": "世界",
-      "expected": [
-        {"surface": "世界", "pos": "Noun"}
-      ],
-      "tags": ["basic"]
-    },
-    {
-      "id": "analyze_with_particle",
-      "description": "私は - pronoun with particle",
-      "input": "私は",
-      "expected": [
-        {"surface": "私", "pos": "Pronoun"},
-        {"surface": "は", "pos": "Particle"}
-      ],
-      "tags": ["basic", "particle"]
-    },
     {
       "id": "analyze_hiragana",
       "description": "こんにちは - greeting",
       "input": "こんにちは",
       "expected": [
-        {"surface": "こんにちは", "pos": "Other"}
+        {
+          "surface": "こんにちは",
+          "pos": "Other",
+          "lemma": "こんにちは"
+        }
       ],
-      "tags": ["basic", "hiragana"]
-    },
-    {
-      "id": "analyze_mixed_text",
-      "description": "私は猫が好き - mixed sentence",
-      "input": "私は猫が好き",
-      "expected": [
-        {"surface": "私", "pos": "Pronoun"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "猫", "pos": "Noun"},
-        {"surface": "が", "pos": "Particle"},
-        {"surface": "好き", "pos": "Adjective"}
-      ],
-      "tags": ["basic", "sentence"]
-    },
-    {
-      "id": "analyze_multiple_sentences",
-      "description": "今日は天気です",
-      "input": "今日は天気です",
-      "expected": [
-        {"surface": "今日", "pos": "Noun"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "天気", "pos": "Noun"},
-        {"surface": "です", "pos": "Auxiliary"}
-      ],
-      "tags": ["basic", "sentence"]
-    },
-    {
-      "id": "morpheme_has_lemma",
-      "description": "は particle has lemma",
-      "input": "は",
-      "expected": [
-        {"surface": "は", "pos": "Particle", "lemma": "は"}
-      ],
-      "tags": ["basic", "particle"]
-    },
-    {
-      "id": "edge_mixed_punctuation",
-      "description": "えっ！？本当に？ - mixed punctuation",
-      "input": "えっ！？本当に？",
-      "expected": [
-        {"surface": "えっ", "pos": "Auxiliary"},
-        {"surface": "本当", "pos": "Adjective"},
-        {"surface": "に", "pos": "Particle"}
-      ],
-      "tags": ["basic", "edge-case"]
-    },
-    {
-      "id": "edge_repeated_char",
-      "description": "あああああ - repeated character",
-      "input": "あああああ",
-      "expected": [
-        {"surface": "あ", "pos": "Other"},
-        {"surface": "ああ", "pos": "Adverb"},
-        {"surface": "ああ", "pos": "Adverb"}
-      ],
-      "tags": ["basic", "edge-case"]
-    },
-    {
-      "id": "edge_very_long_word",
-      "description": "独立行政法人情報処理推進機構 - very long compound",
-      "input": "独立行政法人情報処理推進機構",
-      "expected": [
-        {"surface": "独立行政法人", "pos": "Noun"},
-        {"surface": "情報処理推進機構", "pos": "Noun"}
-      ],
-      "tags": ["basic", "edge-case"]
-    },
-    {
-      "id": "edge_single_kanji",
-      "description": "空 - single kanji",
-      "input": "空",
-      "expected": [
-        {"surface": "空", "pos": "Noun"}
-      ],
-      "tags": ["basic", "edge-case"]
+      "tags": [
+        "basic",
+        "hiragana"
+      ]
     },
     {
       "id": "edge_single_hiragana",
       "description": "あ - single hiragana",
       "input": "あ",
       "expected": [
-        {"surface": "あ", "pos": "Other"}
+        {
+          "surface": "あ",
+          "pos": "Other"
+        }
       ],
-      "tags": ["basic", "edge-case"]
+      "tags": [
+        "basic",
+        "edge-case"
+      ]
     },
     {
-      "id": "edge_single_katakana",
-      "description": "ア - single katakana",
-      "input": "ア",
+      "id": "conjunction_nimokakawarazu",
+      "description": "にもかかわらず should be single Conjunction",
+      "input": "にもかかわらず",
       "expected": [
-        {"surface": "ア", "pos": "Auxiliary"}
+        {
+          "surface": "にもかかわらず",
+          "pos": "Conjunction"
+        }
       ],
-      "tags": ["basic", "edge-case"]
+      "tags": [
+        "conjunction"
+      ]
     },
     {
-      "id": "special_long_vowel",
-      "description": "コーヒー - long vowel mark",
-      "input": "コーヒー",
+      "id": "symbol_quotation",
+      "description": "「こんにちは」- should recognize こんにちは",
+      "input": "「こんにちは」",
       "expected": [
-        {"surface": "コーヒー", "pos": "Noun"}
+        {
+          "surface": "こんにちは",
+          "pos": "Other"
+        }
       ],
-      "tags": ["basic", "special-char"]
+      "tags": [
+        "strict",
+        "symbol"
+      ]
     },
     {
-      "id": "special_small_tsu",
-      "description": "ちょっと待って - small tsu",
-      "input": "ちょっと待って",
+      "id": "sumimasen_single",
+      "description": "すみません should be single token",
+      "input": "すみません",
       "expected": [
-        {"surface": "ちょっと", "pos": "Adverb"},
-        {"surface": "待って", "pos": "Verb"}
+        {
+          "surface": "すみません",
+          "pos": "Other",
+          "lemma": "すみません"
+        }
       ],
-      "tags": ["basic", "special-char"]
-    },
-    {
-      "id": "special_kurikaeshi",
-      "description": "人々が集まる - iteration mark should be grouped with kanji",
-      "input": "人々が集まる",
-      "expected": [
-        {"surface": "人々", "pos": "Noun"},
-        {"surface": "が", "pos": "Particle"},
-        {"surface": "集まる", "pos": "Verb"}
-      ],
-      "tags": ["basic", "special-char"]
-    },
-    {
-      "id": "special_old_kana",
-      "description": "ゐる - old kana",
-      "input": "ゐる",
-      "expected": [
-        {"surface": "ゐる", "pos": "Auxiliary"}
-      ],
-      "tags": ["basic", "special-char"]
-    },
-    {
-      "id": "bug_desune",
-      "description": "いいですね - should have です + ね",
-      "input": "いいですね",
-      "expected": [
-        {"surface": "いい", "pos": "Adjective"},
-        {"surface": "です", "pos": "Auxiliary"},
-        {"surface": "ね", "pos": "Particle"}
-      ],
-      "tags": ["basic", "regression"]
-    },
-    {
-      "id": "bug_totemo",
-      "description": "とても面白い - とても should be one adverb",
-      "input": "とても面白い",
-      "expected": [
-        {"surface": "とても", "pos": "Adverb"},
-        {"surface": "面白い", "pos": "Adjective"}
-      ],
-      "tags": ["basic", "regression"]
-    },
-    {
-      "id": "bug_nagakatta",
-      "description": "長かったです - adjective past form",
-      "input": "長かったです",
-      "expected": [
-        {"surface": "長かった", "pos": "Adjective", "lemma": "長い"},
-        {"surface": "です", "pos": "Auxiliary"}
-      ],
-      "tags": ["basic", "regression"]
-    },
-    {
-      "id": "bug_shiteimasu",
-      "description": "勉強しています - suru verb with progressive",
-      "input": "勉強しています",
-      "expected": [
-        {"surface": "勉強して", "pos": "Verb", "lemma": "勉強する"},
-        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"}
-      ],
-      "tags": ["basic", "regression", "suru"]
-    },
-    {
-      "id": "bug_manandeimasu",
-      "description": "学んでいます - verb with progressive",
-      "input": "学んでいます",
-      "expected": [
-        {"surface": "学んで", "pos": "Verb", "lemma": "学ぶ"},
-        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"}
-      ],
-      "tags": ["basic", "regression"]
-    },
-    {
-      "id": "bug_kamoshirenai",
-      "description": "雨が降るかもしれない - kamoshirenai decomposes",
-      "input": "雨が降るかもしれない",
-      "expected": [
-        {"surface": "雨", "pos": "Noun"},
-        {"surface": "が", "pos": "Particle"},
-        {"surface": "降る", "pos": "Verb", "lemma": "降る"},
-        {"surface": "か", "pos": "Particle", "lemma": "か"},
-        {"surface": "も", "pos": "Particle", "lemma": "も"},
-        {"surface": "しれない", "pos": "Verb", "lemma": "しれる"}
-      ],
-      "tags": ["basic", "regression"]
-    },
-    {
-      "id": "bug_ryoushuusho",
-      "description": "領収書をください - particle should not be absorbed",
-      "input": "領収書をください",
-      "expected": [
-        {"surface": "領収書", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
-      ],
-      "tags": ["basic", "regression"]
-    },
-    {
-      "id": "bug_dekiru",
-      "description": "できます - should not split",
-      "input": "できます",
-      "expected": [
-        {"surface": "できます", "pos": "Verb", "lemma": "できる"}
-      ],
-      "tags": ["basic", "regression"]
-    },
-    {
-      "id": "bug_morau",
-      "description": "もらって - should not split",
-      "input": "もらって",
-      "expected": [
-        {"surface": "もらって", "pos": "Verb", "lemma": "もらう"}
-      ],
-      "tags": ["basic", "regression"]
-    },
-    {
-      "id": "bug_wakaru",
-      "description": "わからない - should not split",
-      "input": "わからない",
-      "expected": [
-        {"surface": "わからない", "pos": "Verb", "lemma": "わかる"}
-      ],
-      "tags": ["basic", "regression"]
-    },
-    {
-      "id": "suru_shite",
-      "description": "勉強して - te-form of suru verb",
-      "input": "勉強して",
-      "expected": [
-        {"surface": "勉強して", "pos": "Verb", "lemma": "勉強する"}
-      ],
-      "tags": ["basic", "suru"]
-    },
-    {
-      "id": "suru_shita",
-      "description": "勉強した - past form of suru verb",
-      "input": "勉強した",
-      "expected": [
-        {"surface": "勉強した", "pos": "Verb", "lemma": "勉強する"}
-      ],
-      "tags": ["basic", "suru"]
-    },
-    {
-      "id": "suru_shinai",
-      "description": "しない - negative of する",
-      "input": "しない",
-      "expected": [
-        {"surface": "しない", "pos": "Verb", "lemma": "する"}
-      ],
-      "tags": ["basic", "suru"]
-    },
-    {
-      "id": "suru_itashite",
-      "description": "いたしております - humble suru verb unified",
-      "input": "いたしております",
-      "expected": [
-        {"surface": "いたしております", "pos": "Verb", "lemma": "いたす"}
-      ],
-      "tags": ["basic", "suru"]
-    },
-    {
-      "id": "suru_kentou",
-      "description": "検討いたしております - suru noun + itasu unified",
-      "input": "検討いたしております",
-      "expected": [
-        {"surface": "検討", "pos": "Noun"},
-        {"surface": "いたしております", "pos": "Verb", "lemma": "いたす"}
-      ],
-      "tags": ["basic", "suru"]
-    },
-    {
-      "id": "ichidan_taberu",
-      "description": "食べる - ichidan verb",
-      "input": "食べる",
-      "expected": [
-        {"surface": "食べる", "pos": "Verb", "lemma": "食べる"}
-      ],
-      "tags": ["basic", "ichidan"]
-    },
-    {
-      "id": "ichidan_mieru",
-      "description": "見える - ichidan verb",
-      "input": "見える",
-      "expected": [
-        {"surface": "見える", "pos": "Verb", "lemma": "見える"}
-      ],
-      "tags": ["basic", "ichidan"]
-    },
-    {
-      "id": "ichidan_tsutaeru",
-      "description": "伝える - ichidan verb",
-      "input": "伝える",
-      "expected": [
-        {"surface": "伝える", "pos": "Verb", "lemma": "伝える"}
-      ],
-      "tags": ["basic", "ichidan"]
-    },
-    {
-      "id": "ichidan_oshieru",
-      "description": "教える - ichidan verb",
-      "input": "教える",
-      "expected": [
-        {"surface": "教える", "pos": "Verb", "lemma": "教える"}
-      ],
-      "tags": ["basic", "ichidan"]
-    },
-    {
-      "id": "ichidan_tabete",
-      "description": "食べて - ichidan te-form (unified token)",
-      "input": "食べて",
-      "expected": [
-        {"surface": "食べて", "pos": "Verb", "lemma": "食べる"}
-      ],
-      "tags": ["basic", "ichidan"]
-    },
-    {
-      "id": "ichidan_tabeta",
-      "description": "食べた - ichidan past (unified token)",
-      "input": "食べた",
-      "expected": [
-        {"surface": "食べた", "pos": "Verb", "lemma": "食べる"}
-      ],
-      "tags": ["basic", "ichidan"]
-    },
-    {
-      "id": "ichidan_tabenai",
-      "description": "食べない - ichidan negative",
-      "input": "食べない",
-      "expected": [
-        {"surface": "食べない", "pos": "Verb", "lemma": "食べる"}
-      ],
-      "tags": ["basic", "ichidan"]
-    },
-    {
-      "id": "godan_itashimasu",
-      "description": "いたします - godan sa verb",
-      "input": "いたします",
-      "expected": [
-        {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
-      ],
-      "tags": ["basic", "godan"]
-    },
-    {
-      "id": "suru_noun_itashimasu",
-      "description": "勉強いたします - suru noun + itashimasu",
-      "input": "勉強いたします",
-      "expected": [
-        {"surface": "勉強", "pos": "Noun"},
-        {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
-      ],
-      "tags": ["basic", "suru"]
-    },
-    {
-      "id": "suru_noun_shita",
-      "description": "検討した - suru noun compound",
-      "input": "検討した",
-      "expected": [
-        {"surface": "検討した", "pos": "Verb", "lemma": "検討する"}
-      ],
-      "tags": ["basic", "suru"]
-    },
-    {
-      "id": "pronoun_anata",
-      "description": "あなた - hiragana pronoun",
-      "input": "あなた",
-      "expected": [
-        {"surface": "あなた", "pos": "Pronoun", "lemma": "貴方"}
-      ],
-      "tags": ["basic", "pronoun"]
-    },
-    {
-      "id": "pronoun_watashitachi",
-      "description": "私たち - plural pronoun",
-      "input": "私たち",
-      "expected": [
-        {"surface": "私たち", "pos": "Pronoun"}
-      ],
-      "tags": ["basic", "pronoun"]
-    },
-    {
-      "id": "pronoun_bokutachi",
-      "description": "僕たち - plural pronoun",
-      "input": "僕たち",
-      "expected": [
-        {"surface": "僕たち", "pos": "Pronoun"}
-      ],
-      "tags": ["basic", "pronoun"]
-    },
-    {
-      "id": "pronoun_oretachi",
-      "description": "俺たち - plural pronoun",
-      "input": "俺たち",
-      "expected": [
-        {"surface": "俺たち", "pos": "Pronoun"}
-      ],
-      "tags": ["basic", "pronoun"]
-    },
-    {
-      "id": "pronoun_minasan",
-      "description": "皆さん - collective pronoun",
-      "input": "皆さん",
-      "expected": [
-        {"surface": "皆さん", "pos": "Pronoun"}
-      ],
-      "tags": ["basic", "pronoun"]
-    },
-    {
-      "id": "pronoun_minna",
-      "description": "みんな - collective pronoun",
-      "input": "みんな",
-      "expected": [
-        {"surface": "みんな", "pos": "Pronoun"}
-      ],
-      "tags": ["basic", "pronoun"]
-    },
-    {
-      "id": "na_adj_arata",
-      "description": "新たな - na-adjective attributive form",
-      "input": "新たな",
-      "expected": [
-        {"surface": "新たな", "pos": "Adjective", "lemma": "新た"}
-      ],
-      "tags": ["basic", "na-adjective"]
-    },
-    {
-      "id": "na_adj_daisuki",
-      "description": "大好き - na-adjective",
-      "input": "大好き",
-      "expected": [
-        {"surface": "大好き", "pos": "Adjective"}
-      ],
-      "tags": ["basic", "na-adjective"]
-    },
-    {
-      "id": "na_adj_daikirai",
-      "description": "大嫌い - na-adjective",
-      "input": "大嫌い",
-      "expected": [
-        {"surface": "大嫌い", "pos": "Adjective"}
-      ],
-      "tags": ["basic", "na-adjective"]
-    },
-    {
-      "id": "na_adj_daisuki_sentence",
-      "description": "あなたが大好きです",
-      "input": "あなたが大好きです",
-      "expected": [
-        {"surface": "あなた", "pos": "Pronoun"},
-        {"surface": "が", "pos": "Particle"},
-        {"surface": "大好き", "pos": "Adjective"},
-        {"surface": "です", "pos": "Auxiliary"}
-      ],
-      "tags": ["basic", "na-adjective", "sentence"]
-    },
-    {
-      "id": "hiragana_verb_yaru",
-      "description": "やる - hiragana verb",
-      "input": "やる",
-      "expected": [
-        {"surface": "やる", "pos": "Verb", "lemma": "やる"}
-      ],
-      "tags": ["basic", "hiragana-verb"]
-    },
-    {
-      "id": "hiragana_verb_yatta",
-      "description": "やった - hiragana verb past",
-      "input": "やった",
-      "expected": [
-        {"surface": "やった", "pos": "Verb", "lemma": "やる"}
-      ],
-      "tags": ["basic", "hiragana-verb"]
-    },
-    {
-      "id": "hiragana_verb_yatte",
-      "description": "やって - hiragana verb te-form",
-      "input": "やって",
-      "expected": [
-        {"surface": "やって", "pos": "Verb", "lemma": "やる"}
-      ],
-      "tags": ["basic", "hiragana-verb"]
-    },
-    {
-      "id": "hiragana_verb_yarasareta",
-      "description": "やらされた - causative-passive",
-      "input": "やらされた",
-      "expected": [
-        {"surface": "やらされた", "pos": "Verb", "lemma": "やる"}
-      ],
-      "tags": ["basic", "hiragana-verb"]
-    },
-    {
-      "id": "hiragana_verb_sentence",
-      "description": "仕事をやらされた",
-      "input": "仕事をやらされた",
-      "expected": [
-        {"surface": "仕事", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "やらされた", "pos": "Verb", "lemma": "やる"}
-      ],
-      "tags": ["basic", "hiragana-verb", "sentence"]
+      "tags": [
+        "strict",
+        "greeting"
+      ]
     }
   ]
 }

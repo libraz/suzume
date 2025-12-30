@@ -1,0 +1,1061 @@
+{
+  "version": "1.0",
+  "description": "General nouns",
+  "cases": [
+    {
+      "id": "analyze_simple_kanji",
+      "description": "Simple kanji word 世界",
+      "input": "世界",
+      "expected": [
+        {
+          "surface": "世界",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "basic"
+      ]
+    },
+    {
+      "id": "edge_very_long_word",
+      "description": "独立行政法人情報処理推進機構 - very long compound",
+      "input": "独立行政法人情報処理推進機構",
+      "expected": [
+        {
+          "surface": "独立行政法人",
+          "pos": "Noun"
+        },
+        {
+          "surface": "情報処理推進機構",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "basic",
+        "edge-case"
+      ]
+    },
+    {
+      "id": "edge_single_kanji",
+      "description": "空 - single kanji",
+      "input": "空",
+      "expected": [
+        {
+          "surface": "空",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "basic",
+        "edge-case"
+      ]
+    },
+    {
+      "id": "special_long_vowel",
+      "description": "コーヒー - long vowel mark",
+      "input": "コーヒー",
+      "expected": [
+        {
+          "surface": "コーヒー",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "basic",
+        "special-char"
+      ]
+    },
+    {
+      "id": "conjunction_demo",
+      "description": "でも大丈夫 (but it's okay)",
+      "input": "でも大丈夫",
+      "expected": [
+        {
+          "surface": "でも",
+          "pos": "Conjunction"
+        },
+        {
+          "surface": "大丈夫",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "conjunction"
+      ]
+    },
+    {
+      "id": "time_noun_kinou",
+      "description": "昨日 (yesterday)",
+      "input": "昨日",
+      "expected": [
+        {
+          "surface": "昨日",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "time-noun"
+      ]
+    },
+    {
+      "id": "loanword_katakana",
+      "description": "コンピューター (computer)",
+      "input": "コンピューター",
+      "expected": [
+        {
+          "surface": "コンピューター",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "loanword"
+      ]
+    },
+    {
+      "id": "loanword_mixed",
+      "description": "インターネット接続 (internet connection)",
+      "input": "インターネット接続",
+      "expected": [
+        {
+          "surface": "インターネット",
+          "pos": "Noun"
+        },
+        {
+          "surface": "接続",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "loanword"
+      ]
+    },
+    {
+      "id": "abbreviation_koukou",
+      "description": "高校生 (high school student)",
+      "input": "高校生",
+      "expected": [
+        {
+          "surface": "高校生",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "abbreviation"
+      ]
+    },
+    {
+      "id": "symbol_parentheses",
+      "description": "東京（とうきょう） - reading kept as single token, symbols filtered",
+      "input": "東京（とうきょう）",
+      "expected": [
+        {
+          "surface": "東京",
+          "pos": "Noun"
+        },
+        {
+          "surface": "とうきょう",
+          "pos": "Other"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "symbol"
+      ]
+    },
+    {
+      "id": "numeric_japanese",
+      "description": "百二十三 (123 in Japanese)",
+      "input": "百二十三",
+      "expected": [
+        {
+          "surface": "百二十三",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric"
+      ]
+    },
+    {
+      "id": "numeric_mixed",
+      "description": "3時間 (3 hours)",
+      "input": "3時間",
+      "expected": [
+        {
+          "surface": "3時間",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric"
+      ]
+    },
+    {
+      "id": "numeric_unit_kilo",
+      "description": "3キロ (3 kilograms)",
+      "input": "3キロ",
+      "expected": [
+        {
+          "surface": "3キロ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "id": "numeric_unit_game_gold",
+      "description": "100ゴールド (game currency)",
+      "input": "100ゴールド",
+      "expected": [
+        {
+          "surface": "100ゴールド",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit",
+        "game"
+      ]
+    },
+    {
+      "id": "numeric_unit_game_adena",
+      "description": "50アデナ (game currency)",
+      "input": "50アデナ",
+      "expected": [
+        {
+          "surface": "50アデナ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit",
+        "game"
+      ]
+    },
+    {
+      "id": "numeric_unit_game_kero",
+      "description": "1000ケロ (game currency)",
+      "input": "1000ケロ",
+      "expected": [
+        {
+          "surface": "1000ケロ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit",
+        "game"
+      ]
+    },
+    {
+      "id": "numeric_ordinal",
+      "description": "第一回 (first time)",
+      "input": "第一回",
+      "expected": [
+        {
+          "surface": "第一回",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric"
+      ]
+    },
+    {
+      "id": "numeric_unit_meter",
+      "description": "10メートル (10 meters)",
+      "input": "10メートル",
+      "expected": [
+        {
+          "surface": "10メートル",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "id": "numeric_unit_cm",
+      "description": "5センチ (5 centimeters)",
+      "input": "5センチ",
+      "expected": [
+        {
+          "surface": "5センチ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "id": "numeric_unit_gram",
+      "description": "200グラム (200 grams)",
+      "input": "200グラム",
+      "expected": [
+        {
+          "surface": "200グラム",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "id": "numeric_unit_yen",
+      "description": "500円 (500 yen)",
+      "input": "500円",
+      "expected": [
+        {
+          "surface": "500円",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "id": "numeric_unit_dollar",
+      "description": "100ドル (100 dollars)",
+      "input": "100ドル",
+      "expected": [
+        {
+          "surface": "100ドル",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "id": "numeric_unit_percent",
+      "description": "80パーセント (80 percent)",
+      "input": "80パーセント",
+      "expected": [
+        {
+          "surface": "80パーセント",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "id": "numeric_unit_calorie",
+      "description": "300カロリー (300 calories)",
+      "input": "300カロリー",
+      "expected": [
+        {
+          "surface": "300カロリー",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "id": "numeric_unit_liter",
+      "description": "2リットル (2 liters)",
+      "input": "2リットル",
+      "expected": [
+        {
+          "surface": "2リットル",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "id": "numeric_unit_page",
+      "description": "50ページ (50 pages)",
+      "input": "50ページ",
+      "expected": [
+        {
+          "surface": "50ページ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "id": "numeric_unit_point",
+      "description": "1000ポイント (1000 points)",
+      "input": "1000ポイント",
+      "expected": [
+        {
+          "surface": "1000ポイント",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "id": "nandemoari_noun",
+      "description": "B31: 何でもあり should be noun idiom",
+      "input": "何でもありだな",
+      "expected": [
+        {
+          "surface": "何でもあり",
+          "pos": "Noun"
+        },
+        {
+          "surface": "だ",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "な",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "noun",
+        "idiom"
+      ]
+    },
+    {
+      "id": "shibire_noun",
+      "description": "B37: しびれ should be NOUN, not し+びれ split",
+      "input": "しびれを切らす",
+      "expected": [
+        {
+          "surface": "しびれ",
+          "pos": "Noun",
+          "lemma": "しびれ"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "切らす",
+          "pos": "Verb",
+          "lemma": "切らす"
+        }
+      ],
+      "tags": [
+        "noun"
+      ]
+    },
+    {
+      "id": "hitoaji_noun",
+      "description": "B41: ひと味 should be NOUN, not ひ+と+味 split",
+      "input": "ひと味違う",
+      "expected": [
+        {
+          "surface": "ひと味",
+          "pos": "Noun",
+          "lemma": "ひと味"
+        },
+        {
+          "surface": "違う",
+          "pos": "Verb",
+          "lemma": "違う"
+        }
+      ],
+      "tags": [
+        "noun"
+      ]
+    },
+    {
+      "id": "nuigurumi_noun",
+      "description": "B42: ぬいぐるみ should be NOUN, not OTHER",
+      "input": "ぬいぐるみ",
+      "expected": [
+        {
+          "surface": "ぬいぐるみ",
+          "pos": "Noun",
+          "lemma": "ぬいぐるみ"
+        }
+      ],
+      "tags": [
+        "noun"
+      ]
+    },
+    {
+      "id": "uriage_noun",
+      "description": "B43: 売り上げ should be NOUN when followed by case particle",
+      "input": "売り上げを伸ばす",
+      "expected": [
+        {
+          "surface": "売り上げ",
+          "pos": "Noun",
+          "lemma": "売り上げ"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "伸ばす",
+          "pos": "Verb",
+          "lemma": "伸ばす"
+        }
+      ],
+      "tags": [
+        "noun"
+      ]
+    },
+    {
+      "id": "moridakusan_noun",
+      "description": "B44: 盛りだくさん should be NOUN, not 盛りだく+さん split",
+      "input": "盛りだくさん",
+      "expected": [
+        {
+          "surface": "盛りだくさん",
+          "pos": "Noun",
+          "lemma": "盛りだくさん"
+        }
+      ],
+      "tags": [
+        "noun"
+      ]
+    },
+    {
+      "id": "compound_split_mainichi_densha",
+      "description": "毎日電車 - should split into two nouns",
+      "input": "毎日電車",
+      "expected": [
+        {
+          "surface": "毎日",
+          "pos": "Noun"
+        },
+        {
+          "surface": "電車",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "compound_split"
+      ]
+    },
+    {
+      "id": "noun_tanoshimi",
+      "description": "楽しみ - noun (not split)",
+      "input": "楽しみ",
+      "expected": [
+        {
+          "surface": "楽しみ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "noun"
+      ]
+    },
+    {
+      "id": "decchiage_noun",
+      "description": "でっちあげ should be single NOUN",
+      "input": "でっちあげ",
+      "expected": [
+        {
+          "surface": "でっちあげ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "noun",
+        "L2"
+      ]
+    },
+    {
+      "id": "hou_noun",
+      "description": "ほう in ほうがいい should be NOUN",
+      "input": "ほうがいい",
+      "expected": [
+        {
+          "surface": "ほう",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "いい",
+          "pos": "Adjective",
+          "lemma": "よい"
+        }
+      ],
+      "tags": [
+        "noun",
+        "L1"
+      ]
+    },
+    {
+      "id": "kikkake_noun",
+      "description": "きっかけ should be single NOUN",
+      "input": "きっかけで",
+      "expected": [
+        {
+          "surface": "きっかけ",
+          "pos": "Noun"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "noun",
+        "L2"
+      ]
+    },
+    {
+      "id": "ookina_det",
+      "description": "大きな should be DET (rentaishi)",
+      "input": "大きな議論",
+      "expected": [
+        {
+          "surface": "大きな",
+          "pos": "Determiner"
+        },
+        {
+          "surface": "議論",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "determiner",
+        "L1"
+      ]
+    },
+    {
+      "id": "kanemoke_noun",
+      "description": "金儲け should be single NOUN",
+      "input": "金儲けする",
+      "expected": [
+        {
+          "surface": "金儲け",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb",
+          "lemma": "する"
+        }
+      ],
+      "tags": [
+        "noun",
+        "L2"
+      ]
+    },
+    {
+      "id": "adana_noun",
+      "description": "あだ名 should be single NOUN",
+      "input": "あだ名をつける",
+      "expected": [
+        {
+          "surface": "あだ名",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "つける",
+          "pos": "Verb",
+          "lemma": "つける"
+        }
+      ],
+      "tags": [
+        "noun",
+        "L2"
+      ]
+    },
+    {
+      "id": "nashikuzushi_noun",
+      "description": "なし崩し should be single NOUN",
+      "input": "なし崩し的",
+      "expected": [
+        {
+          "surface": "なし崩し",
+          "pos": "Noun"
+        },
+        {
+          "surface": "的",
+          "pos": "Suffix"
+        }
+      ],
+      "tags": [
+        "noun",
+        "L2"
+      ]
+    },
+    {
+      "id": "time_noun_maiasa_split",
+      "description": "毎朝コーヒー should split into 2 tokens",
+      "input": "毎朝コーヒー",
+      "expected": [
+        {
+          "surface": "毎朝",
+          "pos": "Noun"
+        },
+        {
+          "surface": "コーヒー",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "time_noun"
+      ]
+    },
+    {
+      "id": "determiner_konna",
+      "description": "こんな should be Determiner",
+      "input": "こんな天気",
+      "expected": [
+        {
+          "surface": "こんな",
+          "pos": "Determiner"
+        },
+        {
+          "surface": "天気",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "determiner"
+      ]
+    },
+    {
+      "id": "determiner_anna",
+      "description": "あんな should be Determiner",
+      "input": "あんな人",
+      "expected": [
+        {
+          "surface": "あんな",
+          "pos": "Determiner"
+        },
+        {
+          "surface": "人",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "determiner"
+      ]
+    },
+    {
+      "id": "determiner_donna",
+      "description": "どんな should be Determiner",
+      "input": "どんな問題",
+      "expected": [
+        {
+          "surface": "どんな",
+          "pos": "Determiner"
+        },
+        {
+          "surface": "問題",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "determiner"
+      ]
+    },
+    {
+      "id": "time_noun_jibun",
+      "description": "時分 should be recognized as separate Noun",
+      "input": "若い時分",
+      "expected": [
+        {
+          "surface": "若い",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "時分",
+          "pos": "Noun",
+          "lemma": "時分"
+        }
+      ],
+      "tags": [
+        "noun",
+        "time"
+      ]
+    },
+    {
+      "id": "time_noun_jibun_sentence",
+      "description": "居る時分学校 should split 時分 as separate token",
+      "input": "居る時分学校",
+      "expected": [
+        {
+          "surface": "居る",
+          "pos": "Verb",
+          "lemma": "居る"
+        },
+        {
+          "surface": "時分",
+          "pos": "Noun",
+          "lemma": "時分"
+        },
+        {
+          "surface": "学校",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "noun",
+        "time"
+      ]
+    },
+    {
+      "id": "iteration_mark_hitobito",
+      "description": "人々 - iteration mark should be grouped with kanji",
+      "input": "人々",
+      "expected": [
+        {
+          "surface": "人々",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "unicode",
+        "odoriji"
+      ]
+    },
+    {
+      "id": "iteration_mark_hibi",
+      "description": "日々 - iteration mark should be grouped with kanji",
+      "input": "日々",
+      "expected": [
+        {
+          "surface": "日々",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "unicode",
+        "odoriji"
+      ]
+    },
+    {
+      "id": "iteration_mark_tokidoki",
+      "description": "時々 - iteration mark should be grouped with kanji",
+      "input": "時々",
+      "expected": [
+        {
+          "surface": "時々",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "unicode",
+        "odoriji"
+      ]
+    },
+    {
+      "id": "katakana_sugita_split",
+      "description": "ワンパターンすぎた should split as noun + すぎた, not ワンパター + ンすぎた",
+      "input": "ワンパターンすぎた",
+      "expected": [
+        {
+          "surface": "ワンパターン",
+          "pos": "Noun"
+        },
+        {
+          "surface": "すぎた",
+          "pos": "Verb",
+          "lemma": "すぎる"
+        }
+      ],
+      "tags": [
+        "noun",
+        "katakana",
+        "sugiru",
+        "split"
+      ]
+    },
+    {
+      "id": "katakana_sugite_split",
+      "description": "シンプルすぎて should split as noun + すぎて, not シンプ + ルすぎて",
+      "input": "シンプルすぎて",
+      "expected": [
+        {
+          "surface": "シンプル",
+          "pos": "Noun"
+        },
+        {
+          "surface": "すぎて",
+          "pos": "Verb",
+          "lemma": "すぎる"
+        }
+      ],
+      "tags": [
+        "noun",
+        "katakana",
+        "sugiru",
+        "split"
+      ]
+    },
+    {
+      "id": "gohan_lemma",
+      "description": "ご飯 - L2 dictionary word",
+      "input": "ご飯",
+      "expected": [
+        {
+          "surface": "ご飯",
+          "pos": "Noun",
+          "lemma": "ご飯"
+        }
+      ],
+      "tags": [
+        "strict",
+        "noun",
+        "lemma",
+        "dictionary"
+      ]
+    },
+    {
+      "id": "ocha_lemma",
+      "description": "お茶 splits into prefix + noun",
+      "input": "お茶",
+      "expected": [
+        {
+          "surface": "お",
+          "pos": "Prefix",
+          "lemma": "お"
+        },
+        {
+          "surface": "茶",
+          "pos": "Noun",
+          "lemma": "茶"
+        }
+      ],
+      "tags": [
+        "strict",
+        "noun",
+        "lemma"
+      ]
+    },
+    {
+      "id": "noun_split_works",
+      "description": "Noun + noun splitting still works",
+      "input": "明日雨",
+      "expected": [
+        {
+          "surface": "明日",
+          "pos": "Noun"
+        },
+        {
+          "surface": "雨",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "noun",
+        "split"
+      ]
+    },
+    {
+      "id": "symbol_brackets_ba1aab",
+      "description": "AI（人工知能）- should recognize AI and 人工知能",
+      "input": "AI（人工知能）",
+      "expected": [
+        {
+          "surface": "AI",
+          "pos": "Noun"
+        },
+        {
+          "surface": "人工知能",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "strict",
+        "symbol"
+      ]
+    },
+    {
+      "id": "suffix_sensei_130f42",
+      "description": "Honorific suffix 先生",
+      "input": "佐藤先生の授業",
+      "expected": [
+        {
+          "surface": "佐藤先生",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "授業",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "suffix"
+      ]
+    },
+    {
+      "id": "suffix_teki_6677fb",
+      "description": "Derivational suffix 的",
+      "input": "国際的な会議",
+      "expected": [
+        {
+          "surface": "国際的な",
+          "pos": "Adjective",
+          "lemma": "国際的"
+        },
+        {
+          "surface": "会議",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "suffix"
+      ]
+    }
+  ]
+}

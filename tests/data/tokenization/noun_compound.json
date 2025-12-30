@@ -1,0 +1,341 @@
+{
+  "version": "1.0",
+  "description": "Compound nouns",
+  "cases": [
+    {
+      "id": "usankusai_adj",
+      "description": "B27: 胡散臭い should be single adjective",
+      "input": "胡散臭い団体",
+      "expected": [
+        {
+          "surface": "胡散臭い",
+          "pos": "Adjective",
+          "lemma": "胡散臭い"
+        },
+        {
+          "surface": "団体",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "adjective",
+        "compound"
+      ]
+    },
+    {
+      "id": "hikikomori_noun",
+      "description": "B30: 引きこもり should be single noun",
+      "input": "引きこもり",
+      "expected": [
+        {
+          "surface": "引きこもり",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "noun",
+        "compound"
+      ]
+    },
+    {
+      "id": "prefix_compound_noun",
+      "description": "お買い物 - prefix + compound noun",
+      "input": "お買い物",
+      "expected": [
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "買い物",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "prefix",
+        "compound_noun"
+      ]
+    },
+    {
+      "id": "compound_noun_nomikai",
+      "description": "飲み会 - compound noun",
+      "input": "飲み会",
+      "expected": [
+        {
+          "surface": "飲み会",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "compound_noun"
+      ]
+    },
+    {
+      "id": "compound_noun_tabemono",
+      "description": "食べ物 - compound noun",
+      "input": "食べ物",
+      "expected": [
+        {
+          "surface": "食べ物",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "compound_noun"
+      ]
+    },
+    {
+      "id": "compound_noun_nomimono",
+      "description": "飲み物 - compound noun",
+      "input": "飲み物",
+      "expected": [
+        {
+          "surface": "飲み物",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "compound_noun"
+      ]
+    },
+    {
+      "id": "compound_noun_kaimono",
+      "description": "買い物 - compound noun",
+      "input": "買い物",
+      "expected": [
+        {
+          "surface": "買い物",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "compound_noun"
+      ]
+    },
+    {
+      "id": "compound_noun_kaimono_ni_iku",
+      "description": "買い物に行く - compound noun + particle + verb",
+      "input": "買い物に行く",
+      "expected": [
+        {
+          "surface": "買い物",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "行く",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "compound_noun"
+      ]
+    },
+    {
+      "id": "kanji_hiragana_compound_tamanegi",
+      "description": "玉ねぎ - single kanji + hiragana compound noun",
+      "input": "玉ねぎ",
+      "expected": [
+        {
+          "surface": "玉ねぎ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "compound_noun",
+        "kanji_hiragana"
+      ]
+    },
+    {
+      "id": "kanji_hiragana_compound_hidaruma",
+      "description": "火だるま - single kanji + hiragana compound noun",
+      "input": "火だるま",
+      "expected": [
+        {
+          "surface": "火だるま",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "compound_noun",
+        "kanji_hiragana"
+      ]
+    },
+    {
+      "id": "kanji_hiragana_compound_mizutamari",
+      "description": "水たまり - single kanji + hiragana compound noun",
+      "input": "水たまり",
+      "expected": [
+        {
+          "surface": "水たまり",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "compound_noun",
+        "kanji_hiragana"
+      ]
+    },
+    {
+      "id": "kanji_hiragana_sentence",
+      "description": "玉ねぎを切る - compound in sentence",
+      "input": "玉ねぎを切る",
+      "expected": [
+        {
+          "surface": "玉ねぎ",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "切る",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "compound_noun",
+        "kanji_hiragana"
+      ]
+    },
+    {
+      "id": "noun_kongo",
+      "description": "今後 should be single Noun (not 今+後)",
+      "input": "今後の方針",
+      "expected": [
+        {
+          "surface": "今後",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "方針",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "noun",
+        "compound"
+      ]
+    },
+    {
+      "id": "compound_noun_shizengengoshori",
+      "description": "自然言語処理 should be at most 3 tokens",
+      "input": "自然言語処理",
+      "expected": [
+        {
+          "surface": "自然",
+          "pos": "Noun"
+        },
+        {
+          "surface": "言語処理",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "strict",
+        "compound",
+        "noun"
+      ]
+    },
+    {
+      "id": "compound_noun_jinkouchinou",
+      "description": "人工知能 should be at most 2 tokens",
+      "input": "人工知能",
+      "expected": [
+        {
+          "surface": "人工知能",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "strict",
+        "compound",
+        "noun"
+      ]
+    },
+    {
+      "id": "compound_noun_kikaigakushuu",
+      "description": "機械学習 should be at most 2 tokens",
+      "input": "機械学習",
+      "expected": [
+        {
+          "surface": "機械学習",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "strict",
+        "compound",
+        "noun"
+      ]
+    },
+    {
+      "id": "nitsuite_compound",
+      "description": "について should be recognized as compound particle",
+      "input": "日本について",
+      "expected": [
+        {
+          "surface": "日本",
+          "pos": "Noun"
+        },
+        {
+          "surface": "について",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "strict",
+        "particle",
+        "compound"
+      ]
+    },
+    {
+      "id": "niyotte_compound",
+      "description": "によって should be recognized as compound particle",
+      "input": "風によって",
+      "expected": [
+        {
+          "surface": "風",
+          "pos": "Noun"
+        },
+        {
+          "surface": "によって",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "strict",
+        "particle",
+        "compound"
+      ]
+    },
+    {
+      "id": "toshite_compound",
+      "description": "として should be recognized as compound particle",
+      "input": "代表として",
+      "expected": [
+        {
+          "surface": "代表",
+          "pos": "Noun"
+        },
+        {
+          "surface": "として",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "strict",
+        "particle",
+        "compound"
+      ]
+    }
+  ]
+}

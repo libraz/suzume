@@ -1,0 +1,221 @@
+{
+  "version": "1.0",
+  "description": "Suffixes (さん、的、化)",
+  "cases": [
+    {
+      "id": "noun_plus_tachi",
+      "description": "学生たち - noun + suffix split",
+      "input": "学生たち",
+      "expected": [
+        {
+          "surface": "学生",
+          "pos": "Noun"
+        },
+        {
+          "surface": "たち",
+          "pos": "Suffix"
+        }
+      ],
+      "tags": [
+        "suffix"
+      ]
+    },
+    {
+      "id": "noun_plus_san",
+      "description": "田中さん - noun + honorific suffix split",
+      "input": "田中さん",
+      "expected": [
+        {
+          "surface": "田中",
+          "pos": "Noun"
+        },
+        {
+          "surface": "さん",
+          "pos": "Suffix"
+        }
+      ],
+      "tags": [
+        "suffix"
+      ]
+    },
+    {
+      "id": "kodomo_tachi",
+      "description": "子供たちが遊ぶ - noun + suffix split",
+      "input": "子供たちが遊ぶ",
+      "expected": [
+        {
+          "surface": "子供",
+          "pos": "Noun"
+        },
+        {
+          "surface": "たち",
+          "pos": "Suffix"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "遊ぶ",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "suffix"
+      ]
+    },
+    {
+      "id": "suffix_sensei_san",
+      "description": "先生さん should split as 先生 + さん",
+      "input": "先生さん",
+      "expected": [
+        {
+          "surface": "先生",
+          "pos": "Noun"
+        },
+        {
+          "surface": "さん",
+          "pos": "Suffix"
+        }
+      ],
+      "tags": [
+        "suffix"
+      ]
+    },
+    {
+      "id": "suffix_goto_food",
+      "description": "皮ごと食べる - ごと as suffix",
+      "input": "皮ごと食べる",
+      "expected": [
+        {
+          "surface": "皮",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ごと",
+          "pos": "Suffix",
+          "lemma": "ごと"
+        },
+        {
+          "surface": "食べる",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "suffix",
+        "known_issue"
+      ]
+    },
+    {
+      "id": "suffix_goto_ni",
+      "description": "日ごとに強くなる - ごと + に pattern",
+      "input": "日ごとに強くなる",
+      "expected": [
+        {
+          "surface": "日",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ごと",
+          "pos": "Suffix",
+          "lemma": "ごと"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "強く",
+          "pos": "Adjective",
+          "lemma": "強い"
+        },
+        {
+          "surface": "なる",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "suffix",
+        "known_issue"
+      ]
+    },
+    {
+      "id": "counter_kagetsu",
+      "description": "数ヶ月 should split as number + ヶ月 counter suffix",
+      "input": "数ヶ月",
+      "expected": [
+        {
+          "surface": "数",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ヶ月",
+          "pos": "Suffix",
+          "lemma": "ヶ月"
+        }
+      ],
+      "tags": [
+        "counter",
+        "suffix"
+      ]
+    },
+    {
+      "id": "counter_kasho",
+      "description": "数ヶ所 should split as number + ヶ所 counter suffix",
+      "input": "数ヶ所",
+      "expected": [
+        {
+          "surface": "数",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ヶ所",
+          "pos": "Suffix",
+          "lemma": "ヶ所"
+        }
+      ],
+      "tags": [
+        "counter",
+        "suffix"
+      ]
+    },
+    {
+      "id": "tsuke_not_split",
+      "description": "付けで should not split into 付 + け",
+      "input": "付けで",
+      "expected": [
+        {
+          "surface": "付け",
+          "pos": "Noun"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "strict",
+        "suffix"
+      ]
+    },
+    {
+      "id": "hizuke_de",
+      "description": "日付けで - 付け should not split",
+      "input": "日付けで",
+      "expected": [
+        {
+          "surface": "日付け",
+          "pos": "Noun"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "strict",
+        "suffix"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1139 @@
+{
+  "version": "1.0",
+  "description": "Na-adjectives (ナ形容詞)",
+  "cases": [
+    {
+      "id": "na_adj_arata",
+      "description": "新たな - na-adjective attributive form",
+      "input": "新たな",
+      "expected": [
+        {
+          "surface": "新たな",
+          "pos": "Adjective",
+          "lemma": "新た"
+        }
+      ],
+      "tags": [
+        "basic",
+        "na-adjective"
+      ]
+    },
+    {
+      "id": "na_adj_daisuki",
+      "description": "大好き - na-adjective",
+      "input": "大好き",
+      "expected": [
+        {
+          "surface": "大好き",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "basic",
+        "na-adjective"
+      ]
+    },
+    {
+      "id": "na_adj_daikirai",
+      "description": "大嫌い - na-adjective",
+      "input": "大嫌い",
+      "expected": [
+        {
+          "surface": "大嫌い",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "basic",
+        "na-adjective"
+      ]
+    },
+    {
+      "id": "na_adj_daisuki_sentence",
+      "description": "あなたが大好きです",
+      "input": "あなたが大好きです",
+      "expected": [
+        {
+          "surface": "あなた",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "大好き",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "basic",
+        "na-adjective",
+        "sentence"
+      ]
+    },
+    {
+      "id": "teki_riseitekini",
+      "description": "理性的に (rationally) - 〜的 pattern",
+      "input": "理性的に",
+      "expected": [
+        {
+          "surface": "理性的",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "teki"
+      ]
+    },
+    {
+      "id": "teki_ronritekini",
+      "description": "論理的に (logically) - 〜的 pattern",
+      "input": "論理的に",
+      "expected": [
+        {
+          "surface": "論理的",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "teki"
+      ]
+    },
+    {
+      "id": "teki_kouritsutekini",
+      "description": "効率的に (efficiently) - 〜的 pattern",
+      "input": "効率的に",
+      "expected": [
+        {
+          "surface": "効率的",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "teki"
+      ]
+    },
+    {
+      "id": "teki_ronritekina",
+      "description": "論理的な説明 (logical explanation) - attributive form",
+      "input": "論理的な説明",
+      "expected": [
+        {
+          "surface": "論理的な",
+          "pos": "Adjective",
+          "lemma": "論理的"
+        },
+        {
+          "surface": "説明",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "teki",
+        "attributive"
+      ]
+    },
+    {
+      "id": "teki_kouritsutekina",
+      "description": "効率的な方法 (efficient method) - attributive form",
+      "input": "効率的な方法",
+      "expected": [
+        {
+          "surface": "効率的な",
+          "pos": "Adjective",
+          "lemma": "効率的"
+        },
+        {
+          "surface": "方法",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "teki",
+        "attributive"
+      ]
+    },
+    {
+      "id": "teki_riseitekini_kangaeru",
+      "description": "理性的に考える (think rationally)",
+      "input": "理性的に考える",
+      "expected": [
+        {
+          "surface": "理性的",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "考える",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "teki",
+        "sentence"
+      ]
+    },
+    {
+      "id": "teki_kanjouteki_naru",
+      "description": "感情的になる (become emotional)",
+      "input": "感情的になる",
+      "expected": [
+        {
+          "surface": "感情的",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "なる",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "teki",
+        "sentence"
+      ]
+    },
+    {
+      "id": "teki_kagakutekina_konkyo",
+      "description": "科学的な根拠 (scientific evidence)",
+      "input": "科学的な根拠",
+      "expected": [
+        {
+          "surface": "科学的な",
+          "pos": "Adjective",
+          "lemma": "科学的"
+        },
+        {
+          "surface": "根拠",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "teki",
+        "attributive"
+      ]
+    },
+    {
+      "id": "na_teineini",
+      "description": "丁寧に (politely) - L1 na-adjective",
+      "input": "丁寧に",
+      "expected": [
+        {
+          "surface": "丁寧",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "l1"
+      ]
+    },
+    {
+      "id": "na_shinchouni",
+      "description": "慎重に (carefully) - L1 na-adjective",
+      "input": "慎重に",
+      "expected": [
+        {
+          "surface": "慎重",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "l1"
+      ]
+    },
+    {
+      "id": "na_jouzuni",
+      "description": "上手に (skillfully) - L1 na-adjective",
+      "input": "上手に",
+      "expected": [
+        {
+          "surface": "上手",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "l1"
+      ]
+    },
+    {
+      "id": "na_shizukani",
+      "description": "静かに (quietly) - L1 na-adjective",
+      "input": "静かに",
+      "expected": [
+        {
+          "surface": "静か",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "l1"
+      ]
+    },
+    {
+      "id": "na_kireini",
+      "description": "綺麗に (beautifully) - L1 na-adjective",
+      "input": "綺麗に",
+      "expected": [
+        {
+          "surface": "綺麗",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "l1"
+      ]
+    },
+    {
+      "id": "na_kantanni",
+      "description": "簡単に (simply) - L1 na-adjective",
+      "input": "簡単に",
+      "expected": [
+        {
+          "surface": "簡単",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "l1"
+      ]
+    },
+    {
+      "id": "na_shizukana_heya",
+      "description": "静かな部屋 (quiet room) - attributive form",
+      "input": "静かな部屋",
+      "expected": [
+        {
+          "surface": "静かな",
+          "pos": "Adjective",
+          "lemma": "静か"
+        },
+        {
+          "surface": "部屋",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "l1",
+        "attributive"
+      ]
+    },
+    {
+      "id": "na_taisetsuna_hito",
+      "description": "大切な人 (important person) - attributive form",
+      "input": "大切な人",
+      "expected": [
+        {
+          "surface": "大切な",
+          "pos": "Adjective",
+          "lemma": "大切"
+        },
+        {
+          "surface": "人",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "l1",
+        "attributive"
+      ]
+    },
+    {
+      "id": "na_benrina_dougu",
+      "description": "便利な道具 (convenient tool) - attributive form",
+      "input": "便利な道具",
+      "expected": [
+        {
+          "surface": "便利な",
+          "pos": "Adjective",
+          "lemma": "便利"
+        },
+        {
+          "surface": "道具",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "l1",
+        "attributive"
+      ]
+    },
+    {
+      "id": "na_hiragana_shinchouni",
+      "description": "しんちょうに (carefully - hiragana)",
+      "input": "しんちょうに",
+      "expected": [
+        {
+          "surface": "しんちょう",
+          "pos": "Adjective",
+          "lemma": "慎重"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "hiragana"
+      ]
+    },
+    {
+      "id": "na_hiragana_teineini",
+      "description": "ていねいに (politely - hiragana)",
+      "input": "ていねいに",
+      "expected": [
+        {
+          "surface": "ていねい",
+          "pos": "Adjective",
+          "lemma": "丁寧"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "hiragana"
+      ]
+    },
+    {
+      "id": "na_hiragana_shizukani",
+      "description": "しずかに (quietly - hiragana)",
+      "input": "しずかに",
+      "expected": [
+        {
+          "surface": "しずか",
+          "pos": "Adjective",
+          "lemma": "静か"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "hiragana"
+      ]
+    },
+    {
+      "id": "na_shizukani_hanasu",
+      "description": "静かに話す (speak quietly)",
+      "input": "静かに話す",
+      "expected": [
+        {
+          "surface": "静か",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "話す",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "sentence"
+      ]
+    },
+    {
+      "id": "na_jouzuni_utau",
+      "description": "上手に歌う (sing skillfully)",
+      "input": "上手に歌う",
+      "expected": [
+        {
+          "surface": "上手",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "歌う",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "sentence"
+      ]
+    },
+    {
+      "id": "na_shinchouni_kangaeru",
+      "description": "慎重に考える (think carefully)",
+      "input": "慎重に考える",
+      "expected": [
+        {
+          "surface": "慎重",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "考える",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "sentence"
+      ]
+    },
+    {
+      "id": "na_hitsuyouna_jouhou",
+      "description": "必要な情報 (necessary information)",
+      "input": "必要な情報",
+      "expected": [
+        {
+          "surface": "必要な",
+          "pos": "Adjective",
+          "lemma": "必要"
+        },
+        {
+          "surface": "情報",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective"
+      ]
+    },
+    {
+      "id": "na_tokubetsuni",
+      "description": "特別に (specially)",
+      "input": "特別に",
+      "expected": [
+        {
+          "surface": "特別",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective"
+      ]
+    },
+    {
+      "id": "na_yuumeina_hito",
+      "description": "有名な人 (famous person)",
+      "input": "有名な人",
+      "expected": [
+        {
+          "surface": "有名な",
+          "pos": "Adjective",
+          "lemma": "有名"
+        },
+        {
+          "surface": "人",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective"
+      ]
+    },
+    {
+      "id": "na_shizenni",
+      "description": "自然に (naturally)",
+      "input": "自然に",
+      "expected": [
+        {
+          "surface": "自然",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective"
+      ]
+    },
+    {
+      "id": "na_fukuzatsuna_mondai",
+      "description": "複雑な問題 (complex problem)",
+      "input": "複雑な問題",
+      "expected": [
+        {
+          "surface": "複雑な",
+          "pos": "Adjective",
+          "lemma": "複雑"
+        },
+        {
+          "surface": "問題",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective"
+      ]
+    },
+    {
+      "id": "na_juuyouna_kettei",
+      "description": "重要な決定 (important decision)",
+      "input": "重要な決定",
+      "expected": [
+        {
+          "surface": "重要な",
+          "pos": "Adjective",
+          "lemma": "重要"
+        },
+        {
+          "surface": "決定",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective"
+      ]
+    },
+    {
+      "id": "na_hijouni",
+      "description": "非常に (extremely)",
+      "input": "非常に",
+      "expected": [
+        {
+          "surface": "非常",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "extended"
+      ]
+    },
+    {
+      "id": "na_hontouni",
+      "description": "本当に (really)",
+      "input": "本当に",
+      "expected": [
+        {
+          "surface": "本当",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "extended"
+      ]
+    },
+    {
+      "id": "na_isshoni",
+      "description": "一緒に (together)",
+      "input": "一緒に",
+      "expected": [
+        {
+          "surface": "一緒",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "extended"
+      ]
+    },
+    {
+      "id": "na_bimyouni",
+      "description": "微妙に (subtly)",
+      "input": "微妙に",
+      "expected": [
+        {
+          "surface": "微妙",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "extended"
+      ]
+    },
+    {
+      "id": "na_hinpanni",
+      "description": "頻繁に (frequently)",
+      "input": "頻繁に",
+      "expected": [
+        {
+          "surface": "頻繁",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "extended"
+      ]
+    },
+    {
+      "id": "na_kakujitsuni",
+      "description": "確実に (certainly)",
+      "input": "確実に",
+      "expected": [
+        {
+          "surface": "確実",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "extended"
+      ]
+    },
+    {
+      "id": "na_murini",
+      "description": "無理に (forcibly)",
+      "input": "無理に",
+      "expected": [
+        {
+          "surface": "無理",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "extended"
+      ]
+    },
+    {
+      "id": "na_eienni",
+      "description": "永遠に (eternally)",
+      "input": "永遠に",
+      "expected": [
+        {
+          "surface": "永遠",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "extended"
+      ]
+    },
+    {
+      "id": "na_mugenni",
+      "description": "無限に (infinitely)",
+      "input": "無限に",
+      "expected": [
+        {
+          "surface": "無限",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "extended"
+      ]
+    },
+    {
+      "id": "na_mettani",
+      "description": "滅多に (rarely)",
+      "input": "滅多に",
+      "expected": [
+        {
+          "surface": "滅多",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "extended"
+      ]
+    },
+    {
+      "id": "na_sasugani",
+      "description": "さすがに (as expected)",
+      "input": "さすがに",
+      "expected": [
+        {
+          "surface": "さすが",
+          "pos": "Adjective",
+          "lemma": "流石"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "sasuga"
+      ]
+    },
+    {
+      "id": "na_sasuga_base",
+      "description": "さすが (as expected - base form)",
+      "input": "さすが",
+      "expected": [
+        {
+          "surface": "さすが",
+          "pos": "Adjective",
+          "lemma": "流石"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "sasuga"
+      ]
+    },
+    {
+      "id": "na_sasugana_hito",
+      "description": "さすがな人 (attributive form)",
+      "input": "さすがな人",
+      "expected": [
+        {
+          "surface": "さすがな",
+          "pos": "Adjective",
+          "lemma": "流石"
+        },
+        {
+          "surface": "人",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "sasuga"
+      ]
+    },
+    {
+      "id": "na_sasuga_kanji",
+      "description": "流石に (kanji form)",
+      "input": "流石に",
+      "expected": [
+        {
+          "surface": "流石",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "sasuga"
+      ]
+    },
+    {
+      "id": "na_mitai_noun",
+      "description": "猫みたい (like a cat) - NOUN + みたい pattern",
+      "input": "猫みたい",
+      "expected": [
+        {
+          "surface": "猫",
+          "pos": "Noun"
+        },
+        {
+          "surface": "みたい",
+          "pos": "Adjective",
+          "lemma": "みたい"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "mitai"
+      ]
+    },
+    {
+      "id": "na_mitai_na",
+      "description": "猫みたいな (like a cat - attributive)",
+      "input": "猫みたいな",
+      "expected": [
+        {
+          "surface": "猫",
+          "pos": "Noun"
+        },
+        {
+          "surface": "みたいな",
+          "pos": "Adjective",
+          "lemma": "みたい"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "mitai"
+      ]
+    },
+    {
+      "id": "na_mitai_verb",
+      "description": "食べるみたい (seems like eating) - VERB + みたい pattern",
+      "input": "食べるみたい",
+      "expected": [
+        {
+          "surface": "食べる",
+          "pos": "Verb"
+        },
+        {
+          "surface": "みたい",
+          "pos": "Adjective",
+          "lemma": "みたい"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "na-adjective",
+        "mitai"
+      ]
+    },
+    {
+      "id": "na_adj_suki",
+      "description": "好き should be single Adjective token",
+      "input": "好き",
+      "expected": [
+        {
+          "surface": "好き",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "na_adjective"
+      ]
+    },
+    {
+      "id": "na_adj_suki_na",
+      "description": "好きな食べ物 - na-adjective attributive form",
+      "input": "好きな食べ物",
+      "expected": [
+        {
+          "surface": "好きな",
+          "pos": "Adjective",
+          "lemma": "好き"
+        },
+        {
+          "surface": "食べ物",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "na_adjective"
+      ]
+    },
+    {
+      "id": "na_adj_kirai",
+      "description": "嫌い should be single Adjective token",
+      "input": "嫌い",
+      "expected": [
+        {
+          "surface": "嫌い",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "na_adjective"
+      ]
+    },
+    {
+      "id": "na_adj_saiwai_desu",
+      "description": "幸いです - na-adjective + copula",
+      "input": "幸いです",
+      "expected": [
+        {
+          "surface": "幸い",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "na_adjective",
+        "copula"
+      ]
+    },
+    {
+      "id": "na_adj_business_email",
+      "description": "ご返信いただけますと幸いです - business email pattern (itadakemasu = potential of itadaku)",
+      "input": "ご返信いただけますと幸いです",
+      "expected": [
+        {
+          "surface": "ご",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "返信",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いただけます",
+          "pos": "Verb",
+          "lemma": "いただく"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        },
+        {
+          "surface": "幸い",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "na_adjective",
+        "business"
+      ]
+    }
+  ]
+}

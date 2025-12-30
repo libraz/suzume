@@ -1,0 +1,382 @@
+{
+  "version": "1.0",
+  "description": "Politeness auxiliaries (ます、です)",
+  "cases": [
+    {
+      "id": "analyze_multiple_sentences",
+      "description": "今日は天気です",
+      "input": "今日は天気です",
+      "expected": [
+        {
+          "surface": "今日",
+          "pos": "Noun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "天気",
+          "pos": "Noun"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "basic",
+        "sentence"
+      ]
+    },
+    {
+      "id": "bug_desune",
+      "description": "いいですね - should have です + ね",
+      "input": "いいですね",
+      "expected": [
+        {
+          "surface": "いい",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "ね",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "basic"
+      ]
+    },
+    {
+      "id": "bug_nagakatta",
+      "description": "長かったです - adjective past form",
+      "input": "長かったです",
+      "expected": [
+        {
+          "surface": "長かった",
+          "pos": "Adjective",
+          "lemma": "長い"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "basic"
+      ]
+    },
+    {
+      "id": "bug_manandeimasu",
+      "description": "学んでいます - verb with progressive",
+      "input": "学んでいます",
+      "expected": [
+        {
+          "surface": "学んで",
+          "pos": "Verb",
+          "lemma": "学ぶ"
+        },
+        {
+          "surface": "います",
+          "pos": "Auxiliary",
+          "lemma": "いる"
+        }
+      ],
+      "tags": [
+        "basic"
+      ]
+    },
+    {
+      "id": "bug_dekiru",
+      "description": "できます - should not split",
+      "input": "できます",
+      "expected": [
+        {
+          "surface": "できます",
+          "pos": "Verb",
+          "lemma": "できる"
+        }
+      ],
+      "tags": [
+        "basic"
+      ]
+    },
+    {
+      "id": "aux_masu",
+      "description": "Polite auxiliary ます (split: Ichidan verb stem + aux)",
+      "input": "食べます",
+      "expected": [
+        {
+          "surface": "食べ",
+          "pos": "Verb",
+          "lemma": "食べる"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "polite"
+      ]
+    },
+    {
+      "id": "character_desuwa",
+      "description": "Ojou-sama speech ですわ",
+      "input": "お嬢様ですわ",
+      "expected": [
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "嬢",
+          "pos": "Noun"
+        },
+        {
+          "surface": "様",
+          "pos": "Suffix"
+        },
+        {
+          "surface": "ですわ",
+          "pos": "Auxiliary",
+          "lemma": "です"
+        }
+      ],
+      "tags": [
+        "character_speech",
+        "ojousama"
+      ]
+    },
+    {
+      "id": "char_speech_desuwa",
+      "description": "ですわ ojou-sama speech",
+      "input": "綺麗ですわ",
+      "expected": [
+        {
+          "surface": "綺麗",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "ですわ",
+          "pos": "Auxiliary",
+          "lemma": "です"
+        }
+      ],
+      "tags": [
+        "character_speech"
+      ]
+    },
+    {
+      "id": "particle_filter_ie_ni_imasu",
+      "description": "家にいます - existential verb いる (to be at home)",
+      "input": "家にいます",
+      "expected": [
+        {
+          "surface": "家",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "います",
+          "pos": "Verb",
+          "lemma": "いる"
+        }
+      ],
+      "tags": [
+        "particle",
+        "filter"
+      ]
+    },
+    {
+      "id": "itadakimasu_verb",
+      "description": "いただきます - polite form",
+      "input": "いただきます",
+      "expected": [
+        {
+          "surface": "いただきます",
+          "pos": "Verb",
+          "lemma": "いただく"
+        }
+      ],
+      "tags": [
+        "hiragana_verb"
+      ]
+    },
+    {
+      "id": "realworld_business_email",
+      "description": "お世話になっております - humble progressive form",
+      "input": "お世話になっております",
+      "expected": [
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "世話",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "なって",
+          "pos": "Verb",
+          "lemma": "なる"
+        },
+        {
+          "surface": "おります",
+          "pos": "Verb",
+          "lemma": "おる"
+        }
+      ],
+      "tags": [
+        "strict",
+        "realworld",
+        "business"
+      ]
+    },
+    {
+      "id": "realworld_shopping",
+      "description": "これはいくらですか - should have particles",
+      "input": "これはいくらですか",
+      "expected": [
+        {
+          "surface": "これ",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "いくら",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "か",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "strict",
+        "realworld",
+        "conversation"
+      ]
+    },
+    {
+      "id": "realworld_weather",
+      "description": "今日は暑いですね - should recognize 今日",
+      "input": "今日は暑いですね",
+      "expected": [
+        {
+          "surface": "今日",
+          "pos": "Noun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "暑い",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "ね",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "strict",
+        "realworld",
+        "conversation"
+      ]
+    },
+    {
+      "id": "ohayougozaimasu",
+      "description": "おはようございます should be at most 2 tokens",
+      "input": "おはようございます",
+      "expected": [
+        {
+          "surface": "おはよう",
+          "pos": "Other"
+        },
+        {
+          "surface": "ございます",
+          "pos": "Auxiliary",
+          "lemma": "ございます"
+        }
+      ],
+      "tags": [
+        "strict",
+        "greeting"
+      ]
+    },
+    {
+      "id": "arigatougozaimasu",
+      "description": "ありがとうございます should be at most 2 tokens",
+      "input": "ありがとうございます",
+      "expected": [
+        {
+          "surface": "ありがとう",
+          "pos": "Other"
+        },
+        {
+          "surface": "ございます",
+          "pos": "Auxiliary",
+          "lemma": "ございます"
+        }
+      ],
+      "tags": [
+        "strict",
+        "greeting"
+      ]
+    },
+    {
+      "id": "yoroshiku_onegai_itashimasu",
+      "description": "よろしくお願いいたします splits お prefix from 願い",
+      "input": "よろしくお願いいたします",
+      "expected": [
+        {
+          "surface": "よろしく",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "願い",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いたします",
+          "pos": "Verb",
+          "lemma": "いたす"
+        }
+      ],
+      "tags": [
+        "strict",
+        "business"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "version": "1.0",
+  "description": "Taru-adjectives and irregular adjectives",
+  "cases": [
+    {
+      "id": "taru_adj_kizento",
+      "description": "毅然と (resolutely)",
+      "input": "毅然と",
+      "expected": [
+        {
+          "surface": "毅然",
+          "pos": "Noun"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "taru-adjective"
+      ]
+    },
+    {
+      "id": "taru_adj_heizento",
+      "description": "平然と (calmly)",
+      "input": "平然と",
+      "expected": [
+        {
+          "surface": "平然",
+          "pos": "Noun"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "taru-adjective"
+      ]
+    },
+    {
+      "id": "taru_adj_taizento",
+      "description": "泰然と (composedly)",
+      "input": "泰然と",
+      "expected": [
+        {
+          "surface": "泰然",
+          "pos": "Noun"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "taru-adjective"
+      ]
+    },
+    {
+      "id": "taru_adj_sassouto",
+      "description": "颯爽と (gallantly)",
+      "input": "颯爽と",
+      "expected": [
+        {
+          "surface": "颯爽",
+          "pos": "Noun"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "taru-adjective"
+      ]
+    },
+    {
+      "id": "taru_adj_hatsuratsuto",
+      "description": "溌剌と (vigorously)",
+      "input": "溌剌と",
+      "expected": [
+        {
+          "surface": "溌剌",
+          "pos": "Noun"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "taru-adjective"
+      ]
+    },
+    {
+      "id": "taru_adj_yuuzento",
+      "description": "悠然と (leisurely)",
+      "input": "悠然と",
+      "expected": [
+        {
+          "surface": "悠然",
+          "pos": "Noun"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "taru-adjective"
+      ]
+    }
+  ]
+}

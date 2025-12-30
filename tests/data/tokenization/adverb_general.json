@@ -1,0 +1,427 @@
+{
+  "version": "1.0",
+  "description": "General adverbs",
+  "cases": [
+    {
+      "id": "edge_repeated_char",
+      "description": "あああああ - repeated character",
+      "input": "あああああ",
+      "expected": [
+        {
+          "surface": "あ",
+          "pos": "Other"
+        },
+        {
+          "surface": "ああ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "ああ",
+          "pos": "Adverb"
+        }
+      ],
+      "tags": [
+        "basic",
+        "edge-case"
+      ]
+    },
+    {
+      "id": "andake_adv",
+      "description": "B32: あんだけ should be single adverb",
+      "input": "あんだけ",
+      "expected": [
+        {
+          "surface": "あんだけ",
+          "pos": "Adverb",
+          "lemma": "あれだけ"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "colloquial"
+      ]
+    },
+    {
+      "id": "kondake_adv",
+      "description": "B32: こんだけ should be single adverb",
+      "input": "こんだけ",
+      "expected": [
+        {
+          "surface": "こんだけ",
+          "pos": "Adverb",
+          "lemma": "これだけ"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "colloquial"
+      ]
+    },
+    {
+      "id": "sondake_adv",
+      "description": "B32: そんだけ should be single adverb",
+      "input": "そんだけ",
+      "expected": [
+        {
+          "surface": "そんだけ",
+          "pos": "Adverb",
+          "lemma": "それだけ"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "colloquial"
+      ]
+    },
+    {
+      "id": "hitokiwa_adv",
+      "description": "B34: 一際 should be adverb",
+      "input": "一際高い",
+      "expected": [
+        {
+          "surface": "一際",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "高い",
+          "pos": "Adjective",
+          "lemma": "高い"
+        }
+      ],
+      "tags": [
+        "adverb"
+      ]
+    },
+    {
+      "id": "omowazu_adv",
+      "description": "B36: 思わず should be ADV, not NOUN",
+      "input": "思わず言ってしまった",
+      "expected": [
+        {
+          "surface": "思わず",
+          "pos": "Adverb",
+          "lemma": "思わず"
+        },
+        {
+          "surface": "言ってしまった",
+          "pos": "Verb",
+          "lemma": "言う"
+        }
+      ],
+      "tags": [
+        "adverb"
+      ]
+    },
+    {
+      "id": "gazen_adv",
+      "description": "俄然 should be ADV, not NOUN (compound split fix)",
+      "input": "俄然注目",
+      "expected": [
+        {
+          "surface": "俄然",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "注目",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "split_fix"
+      ]
+    },
+    {
+      "id": "colloquial_adverb_meccha",
+      "description": "めっちゃ should be Adverb",
+      "input": "めっちゃ面白い",
+      "expected": [
+        {
+          "surface": "めっちゃ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "面白い",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "colloquial"
+      ]
+    },
+    {
+      "id": "adverb_imasugu",
+      "description": "今すぐ should be Adverb",
+      "input": "今すぐ行く",
+      "expected": [
+        {
+          "surface": "今すぐ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "行く",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "adverb"
+      ]
+    },
+    {
+      "id": "adverb_moshi",
+      "description": "もし should be Adverb",
+      "input": "もし雨が降ったら",
+      "expected": [
+        {
+          "surface": "もし",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "雨",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "降ったら",
+          "pos": "Verb",
+          "lemma": "降る"
+        }
+      ],
+      "tags": [
+        "adverb"
+      ]
+    },
+    {
+      "id": "sorezore_single_token",
+      "description": "それぞれ should be single Adverb token",
+      "input": "それぞれの意見を述べる",
+      "expected": [
+        {
+          "surface": "それぞれ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "意見",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "述べる",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "adverb"
+      ]
+    },
+    {
+      "id": "takusan_adverb",
+      "description": "たくさん should be Adverb, not split",
+      "input": "たくさんの本",
+      "expected": [
+        {
+          "surface": "たくさん",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "本",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "adverb"
+      ]
+    },
+    {
+      "id": "itsumo_adverb",
+      "description": "いつも should be Adverb, not split",
+      "input": "いつも元気",
+      "expected": [
+        {
+          "surface": "いつも",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "元気",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "adverb"
+      ]
+    },
+    {
+      "id": "mazu_adverb",
+      "description": "まず should be Adverb",
+      "input": "まず確認する",
+      "expected": [
+        {
+          "surface": "まず",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "確認する",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "adverb"
+      ]
+    },
+    {
+      "id": "itsumo_before_adj",
+      "description": "いつも楽しい",
+      "input": "いつも楽しい",
+      "expected": [
+        {
+          "surface": "いつも",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "楽しい",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "itsumo"
+      ]
+    },
+    {
+      "id": "itsumo_no_mise",
+      "description": "いつもの店 - NOT いつ + もの + 店",
+      "input": "いつもの店",
+      "expected": [
+        {
+          "surface": "いつも",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "店",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "itsumo"
+      ]
+    },
+    {
+      "id": "adverb_tatoe",
+      "description": "たとえ should be Adverb (conditional)",
+      "input": "たとえ雨でも行く",
+      "expected": [
+        {
+          "surface": "たとえ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "雨",
+          "pos": "Noun"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
+        },
+        {
+          "surface": "も",
+          "pos": "Particle"
+        },
+        {
+          "surface": "行く",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "adverb"
+      ]
+    },
+    {
+      "id": "adverb_amari_nimo",
+      "description": "あまりにも - あまり should be ADV, not VERB あまる",
+      "input": "あまりにも",
+      "expected": [
+        {
+          "surface": "あまり",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "も",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "scoring"
+      ]
+    },
+    {
+      "id": "ikaga_single",
+      "description": "いかが should be single token",
+      "input": "いかが",
+      "expected": [
+        {
+          "surface": "いかが",
+          "pos": "Adverb"
+        }
+      ],
+      "tags": [
+        "strict",
+        "interrogative"
+      ]
+    },
+    {
+      "id": "doushite_single",
+      "description": "どうして should be single token",
+      "input": "どうして",
+      "expected": [
+        {
+          "surface": "どうして",
+          "pos": "Adverb"
+        }
+      ],
+      "tags": [
+        "strict",
+        "interrogative"
+      ]
+    },
+    {
+      "id": "yoroshiku_single",
+      "description": "よろしく should be single token",
+      "input": "よろしく",
+      "expected": [
+        {
+          "surface": "よろしく",
+          "pos": "Adverb"
+        }
+      ],
+      "tags": [
+        "strict",
+        "common"
+      ]
+    }
+  ]
+}

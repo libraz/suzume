@@ -1,0 +1,227 @@
+{
+  "version": "1.0",
+  "description": "Compound adjectives (〜やすい、〜にくい、〜すぎる)",
+  "cases": [
+    {
+      "id": "aux_sugiru_standalone",
+      "description": "Auxiliary verb すぎる standalone te-form (T55)",
+      "input": "すぎて",
+      "expected": [
+        {
+          "surface": "すぎて",
+          "pos": "Verb",
+          "lemma": "すぎる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "sugiru"
+      ]
+    },
+    {
+      "id": "aux_sugiru_dict",
+      "description": "Auxiliary verb すぎる dictionary form",
+      "input": "すぎる",
+      "expected": [
+        {
+          "surface": "すぎる",
+          "pos": "Verb",
+          "lemma": "すぎる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "sugiru"
+      ]
+    },
+    {
+      "id": "aux_adj_yomiyasui_context",
+      "description": "この本は読みやすい (this book is easy to read)",
+      "input": "この本は読みやすい",
+      "expected": [
+        {
+          "surface": "この",
+          "pos": "Determiner"
+        },
+        {
+          "surface": "本",
+          "pos": "Noun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "読みやすい",
+          "pos": "Adjective",
+          "lemma": "読みやすい"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "auxiliary-adjective"
+      ]
+    },
+    {
+      "id": "compound_adj_yomiyasui",
+      "description": "読みやすい - compound adjective (verb renyokei + やすい)",
+      "input": "読みやすい",
+      "expected": [
+        {
+          "surface": "読みやすい",
+          "pos": "Adjective",
+          "lemma": "読みやすい"
+        }
+      ],
+      "tags": [
+        "compound_adjective"
+      ]
+    },
+    {
+      "id": "compound_adj_tsukainikui",
+      "description": "使いにくい - compound adjective (verb renyokei + にくい)",
+      "input": "使いにくい",
+      "expected": [
+        {
+          "surface": "使いにくい",
+          "pos": "Adjective",
+          "lemma": "使いにくい"
+        }
+      ],
+      "tags": [
+        "compound_adjective"
+      ]
+    },
+    {
+      "id": "adj_sugiru_toutoi",
+      "description": "尊すぎる - i-adjective stem + すぎる compound verb",
+      "input": "尊すぎる",
+      "expected": [
+        {
+          "surface": "尊すぎる",
+          "pos": "Verb",
+          "lemma": "尊過ぎる"
+        }
+      ],
+      "tags": [
+        "adj_sugiru"
+      ]
+    },
+    {
+      "id": "adj_sugiru_takai",
+      "description": "高すぎる - i-adjective stem + すぎる compound verb",
+      "input": "高すぎる",
+      "expected": [
+        {
+          "surface": "高すぎる",
+          "pos": "Verb",
+          "lemma": "高過ぎる"
+        }
+      ],
+      "tags": [
+        "adj_sugiru"
+      ]
+    },
+    {
+      "id": "adj_sugiru_inflected_te",
+      "description": "尊すぎて - i-adjective + すぎる te-form splits",
+      "input": "尊すぎて",
+      "expected": [
+        {
+          "surface": "尊すぎ",
+          "pos": "Verb",
+          "lemma": "尊過ぎる"
+        },
+        {
+          "surface": "て",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "adj_sugiru"
+      ]
+    },
+    {
+      "id": "adj_sugiru_inflected_ta",
+      "description": "高すぎた - i-adjective + すぎる past tense splits",
+      "input": "高すぎた",
+      "expected": [
+        {
+          "surface": "高すぎ",
+          "pos": "Verb",
+          "lemma": "高過ぎる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "adj_sugiru"
+      ]
+    },
+    {
+      "id": "adj_sugiru_in_sentence",
+      "description": "この値段は高すぎる - adj+sugiru in context",
+      "input": "この値段は高すぎる",
+      "expected": [
+        {
+          "surface": "この",
+          "pos": "Determiner"
+        },
+        {
+          "surface": "値段",
+          "pos": "Noun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "高すぎる",
+          "pos": "Verb",
+          "lemma": "高過ぎる"
+        }
+      ],
+      "tags": [
+        "adj_sugiru"
+      ]
+    },
+    {
+      "id": "katakana_sugiru_pattern",
+      "description": "ワンパターンすぎる should have lemma ワンパターンすぎる, not ワンパターンる",
+      "input": "ワンパターンすぎる",
+      "expected": [
+        {
+          "surface": "ワンパターンすぎる",
+          "pos": "Verb",
+          "lemma": "ワンパターンすぎる"
+        }
+      ],
+      "tags": [
+        "verb",
+        "katakana",
+        "sugiru",
+        "lemma"
+      ]
+    },
+    {
+      "id": "katakana_sugiru_simple",
+      "description": "シンプルすぎる should have lemma シンプルすぎる, not シンプルる",
+      "input": "シンプルすぎる",
+      "expected": [
+        {
+          "surface": "シンプルすぎる",
+          "pos": "Verb",
+          "lemma": "シンプルすぎる"
+        }
+      ],
+      "tags": [
+        "verb",
+        "katakana",
+        "sugiru",
+        "lemma"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,358 @@
+{
+  "version": "1.0",
+  "description": "Pronouns",
+  "cases": [
+    {
+      "id": "pronoun_anata",
+      "description": "あなた - hiragana pronoun",
+      "input": "あなた",
+      "expected": [
+        {
+          "surface": "あなた",
+          "pos": "Pronoun",
+          "lemma": "貴方"
+        }
+      ],
+      "tags": [
+        "basic",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "pronoun_watashitachi",
+      "description": "私たち - plural pronoun",
+      "input": "私たち",
+      "expected": [
+        {
+          "surface": "私たち",
+          "pos": "Pronoun"
+        }
+      ],
+      "tags": [
+        "basic",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "pronoun_bokutachi",
+      "description": "僕たち - plural pronoun",
+      "input": "僕たち",
+      "expected": [
+        {
+          "surface": "僕たち",
+          "pos": "Pronoun"
+        }
+      ],
+      "tags": [
+        "basic",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "pronoun_oretachi",
+      "description": "俺たち - plural pronoun",
+      "input": "俺たち",
+      "expected": [
+        {
+          "surface": "俺たち",
+          "pos": "Pronoun"
+        }
+      ],
+      "tags": [
+        "basic",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "pronoun_minasan",
+      "description": "皆さん - collective pronoun",
+      "input": "皆さん",
+      "expected": [
+        {
+          "surface": "皆さん",
+          "pos": "Pronoun"
+        }
+      ],
+      "tags": [
+        "basic",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "pronoun_minna",
+      "description": "みんな - collective pronoun",
+      "input": "みんな",
+      "expected": [
+        {
+          "surface": "みんな",
+          "pos": "Pronoun"
+        }
+      ],
+      "tags": [
+        "basic",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "pronoun_sessha",
+      "description": "Samurai pronoun 拙者",
+      "input": "拙者は侍でござる",
+      "expected": [
+        {
+          "surface": "拙者",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "侍",
+          "pos": "Noun"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ござる",
+          "pos": "Verb",
+          "lemma": "ござる"
+        }
+      ],
+      "tags": [
+        "character_speech",
+        "samurai",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "pronoun_wagahai",
+      "description": "Old-fashioned pronoun 我輩",
+      "input": "我輩は猫である",
+      "expected": [
+        {
+          "surface": "我輩",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "猫",
+          "pos": "Noun"
+        },
+        {
+          "surface": "である",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "character_speech",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "pronoun_soregashi",
+      "description": "Samurai pronoun 某",
+      "input": "某が参る",
+      "expected": [
+        {
+          "surface": "某",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "参る",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "character_speech",
+        "samurai",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "omae_pron",
+      "description": "B39: お前 should be PRON, not PREFIX+NOUN split",
+      "input": "お前の話",
+      "expected": [
+        {
+          "surface": "お前",
+          "pos": "Pronoun",
+          "lemma": "お前"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "話",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "pronoun"
+      ]
+    },
+    {
+      "id": "pronoun_koitsu",
+      "description": "こいつ should be single Pronoun (not こい+つ)",
+      "input": "こいつがバレた",
+      "expected": [
+        {
+          "surface": "こいつ",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "バレた",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "pronoun",
+        "demonstrative"
+      ]
+    },
+    {
+      "id": "pronoun_soitsu",
+      "description": "そいつ should be single Pronoun",
+      "input": "そいつは誰だ",
+      "expected": [
+        {
+          "surface": "そいつ",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "誰",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "だ",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "pronoun",
+        "demonstrative"
+      ]
+    },
+    {
+      "id": "pronoun_aitsu",
+      "description": "あいつ should be single Pronoun",
+      "input": "あいつが来た",
+      "expected": [
+        {
+          "surface": "あいつ",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "来た",
+          "pos": "Verb",
+          "lemma": "来る"
+        }
+      ],
+      "tags": [
+        "pronoun",
+        "demonstrative"
+      ]
+    },
+    {
+      "id": "pronoun_doitsu",
+      "description": "どいつ should be single Pronoun",
+      "input": "どいつが犯人だ",
+      "expected": [
+        {
+          "surface": "どいつ",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "犯人",
+          "pos": "Noun"
+        },
+        {
+          "surface": "だ",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "pronoun",
+        "demonstrative"
+      ]
+    },
+    {
+      "id": "pronoun_sore_ec6ed6",
+      "description": "Demonstrative pronoun それ",
+      "input": "それは何",
+      "expected": [
+        {
+          "surface": "それ",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "何",
+          "pos": "Pronoun"
+        }
+      ],
+      "tags": [
+        "pronoun"
+      ]
+    },
+    {
+      "id": "pronoun_sore_01338d",
+      "description": "それ should be recognized as pronoun",
+      "input": "それは何ですか",
+      "expected": [
+        {
+          "surface": "それ",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "何",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "か",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "strict",
+        "pronoun"
+      ]
+    }
+  ]
+}

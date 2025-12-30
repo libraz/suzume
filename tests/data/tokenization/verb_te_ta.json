@@ -1,0 +1,339 @@
+{
+  "version": "1.0",
+  "description": "Te-form and ta-form patterns",
+  "cases": [
+    {
+      "id": "yokute_te_form",
+      "description": "よくて splits into よく + て (adverbial + particle)",
+      "input": "よくて",
+      "expected": [
+        {
+          "surface": "よく",
+          "pos": "Adjective",
+          "lemma": "良い"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "irregular",
+        "i_adjective",
+        "yoi",
+        "te_form"
+      ]
+    },
+    {
+      "id": "pattern_te_form",
+      "description": "食べて寝る - te-form unified",
+      "input": "食べて寝る",
+      "expected": [
+        {
+          "surface": "食べて",
+          "pos": "Verb",
+          "lemma": "食べる"
+        },
+        {
+          "surface": "寝る",
+          "pos": "Verb",
+          "lemma": "寝る"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "pattern",
+        "te_form"
+      ]
+    },
+    {
+      "id": "te_ku_not_adj_matte",
+      "description": "待ってくれない should be 待って + くれない, not adjective",
+      "input": "待ってくれない",
+      "expected": [
+        {
+          "surface": "待って",
+          "pos": "Verb",
+          "lemma": "待つ"
+        },
+        {
+          "surface": "くれない",
+          "pos": "Verb",
+          "lemma": "くれる"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "benefactive"
+      ]
+    },
+    {
+      "id": "te_morau_separate",
+      "description": "食べてもらわない - te-form unified + auxiliary verb",
+      "input": "食べてもらわない",
+      "expected": [
+        {
+          "surface": "食べて",
+          "pos": "Verb",
+          "lemma": "食べる"
+        },
+        {
+          "surface": "もらわない",
+          "pos": "Verb",
+          "lemma": "もらう"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "benefactive"
+      ]
+    },
+    {
+      "id": "te_inai_unified",
+      "description": "食べていない - te-form unified + auxiliary",
+      "input": "食べていない",
+      "expected": [
+        {
+          "surface": "食べて",
+          "pos": "Verb",
+          "lemma": "食べる"
+        },
+        {
+          "surface": "いない",
+          "pos": "Auxiliary",
+          "lemma": "いる"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "progressive"
+      ]
+    },
+    {
+      "id": "te_shimawanai_unified",
+      "description": "忘れてしまわない - unified verb te-form compound",
+      "input": "忘れてしまわない",
+      "expected": [
+        {
+          "surface": "忘れてしまわない",
+          "pos": "Verb",
+          "lemma": "忘れる"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "aspectual"
+      ]
+    },
+    {
+      "id": "te_ikanai_unified",
+      "description": "走っていかない - aspectual te-form should be single token",
+      "input": "走っていかない",
+      "expected": [
+        {
+          "surface": "走っていかない",
+          "pos": "Verb",
+          "lemma": "走る"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "aspectual"
+      ]
+    },
+    {
+      "id": "te_ageru_unified",
+      "description": "見てあげる - splits into te-form + auxiliary verb (grammatically correct)",
+      "input": "見てあげる",
+      "expected": [
+        {
+          "surface": "見て",
+          "pos": "Verb",
+          "lemma": "見る"
+        },
+        {
+          "surface": "あげる",
+          "pos": "Verb",
+          "lemma": "あげる"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "benefactive"
+      ]
+    },
+    {
+      "id": "godan_te_agenai_split",
+      "description": "書いてあげない - te-form unified + auxiliary verb",
+      "input": "書いてあげない",
+      "expected": [
+        {
+          "surface": "書いて",
+          "pos": "Verb",
+          "lemma": "書く"
+        },
+        {
+          "surface": "あげない",
+          "pos": "Verb",
+          "lemma": "あげる"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "benefactive"
+      ]
+    },
+    {
+      "id": "tetsudatte_agenai_split",
+      "description": "手伝ってあげない - te-form + benefactive negative should split",
+      "input": "手伝ってあげない",
+      "expected": [
+        {
+          "surface": "手伝って",
+          "pos": "Verb",
+          "lemma": "手伝う"
+        },
+        {
+          "surface": "あげない",
+          "pos": "Verb",
+          "lemma": "あげる"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "benefactive",
+        "lemma"
+      ]
+    },
+    {
+      "id": "tetsudatte_lemma",
+      "description": "手伝って should have lemma 手伝う (GodanWa)",
+      "input": "手伝って",
+      "expected": [
+        {
+          "surface": "手伝って",
+          "pos": "Verb",
+          "lemma": "手伝う"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "lemma"
+      ]
+    },
+    {
+      "id": "viterbi_te_form_not_split",
+      "description": "走っている - te-form splits with progressive auxiliary",
+      "input": "走っている",
+      "expected": [
+        {
+          "surface": "走って",
+          "pos": "Verb",
+          "lemma": "走る"
+        },
+        {
+          "surface": "いる",
+          "pos": "Auxiliary",
+          "lemma": "いる"
+        }
+      ],
+      "tags": [
+        "viterbi",
+        "te_form"
+      ]
+    },
+    {
+      "id": "te_iru_kiteimasen",
+      "description": "来ていません - te+iru negative polite form",
+      "input": "来ていません",
+      "expected": [
+        {
+          "surface": "来て",
+          "pos": "Verb",
+          "lemma": "来る"
+        },
+        {
+          "surface": "いません",
+          "pos": "Auxiliary",
+          "lemma": "いる"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "iru"
+      ]
+    },
+    {
+      "id": "te_iru_kiteimasu",
+      "description": "来ています - te-form + progressive auxiliary",
+      "input": "来ています",
+      "expected": [
+        {
+          "surface": "来て",
+          "pos": "Verb",
+          "lemma": "来る"
+        },
+        {
+          "surface": "います",
+          "pos": "Auxiliary",
+          "lemma": "いる"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "iru"
+      ]
+    },
+    {
+      "id": "te_itadakimasu",
+      "description": "食べさせていただきます - causative + itadaku unified",
+      "input": "食べさせていただきます",
+      "expected": [
+        {
+          "surface": "食べさせて",
+          "pos": "Verb",
+          "lemma": "食べる"
+        },
+        {
+          "surface": "いただきます",
+          "pos": "Verb",
+          "lemma": "いただく"
+        }
+      ],
+      "tags": [
+        "te_form",
+        "itadaku"
+      ]
+    },
+    {
+      "id": "te_form_kite",
+      "description": "来て - te-form should be verb",
+      "input": "来て",
+      "expected": [
+        {
+          "surface": "来て",
+          "pos": "Verb",
+          "lemma": "来る"
+        }
+      ],
+      "tags": [
+        "te_form"
+      ]
+    },
+    {
+      "id": "te_form_yonde",
+      "description": "読んで - de-form should be verb",
+      "input": "読んで",
+      "expected": [
+        {
+          "surface": "読んで",
+          "pos": "Verb",
+          "lemma": "読む"
+        }
+      ],
+      "tags": [
+        "te_form"
+      ]
+    }
+  ]
+}
