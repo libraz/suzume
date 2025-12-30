@@ -56,6 +56,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
       {"よ", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
       {"わ", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
       {"の", POS::Particle, 1.0F, "", false, false, false, CT::None, ""},
+      {"ん", POS::Particle, 0.5F, "の", false, false, false, CT::None, ""},  // colloquial の
       {"じゃん", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"っけ", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"かしら", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
@@ -137,6 +138,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"なくて", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
       {"なければ", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
       {"ぬ", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      // Colloquial negation (口語否定) - じゃ = では
+      {"じゃない", POS::Auxiliary, 0.3F, "ではない", false, false, false, CT::None, ""},
+      {"じゃなかった", POS::Auxiliary, 0.3F, "ではない", false, false, false, CT::None, ""},
+      {"じゃなくて", POS::Auxiliary, 0.3F, "ではない", false, false, false, CT::None, ""},
 
       // Past/Completion (過去・完了)
       {"た", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
@@ -144,8 +149,8 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Conjecture (推量)
       {"う", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
       {"よう", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
-      {"だろう", POS::Auxiliary, 0.5F, "", false, false, false, CT::None, ""},
-      {"でしょう", POS::Auxiliary, 0.5F, "", false, false, false, CT::None, ""},
+      {"だろう", POS::Auxiliary, 0.3F, "", false, false, false, CT::None, ""},
+      {"でしょう", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
 
       // Negative conjecture (否定推量)
       {"まい", POS::Auxiliary, 0.3F, "まい", false, false, false, CT::None, ""},
@@ -452,6 +457,12 @@ std::vector<DictionaryEntry> getPronounEntries() {
       {"あそこ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
       {"あちら", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
 
+      // Demonstrative - person reference (こそあど+いつ)
+      {"こいつ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
+      {"そいつ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
+      {"あいつ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
+      {"どいつ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
+
       // Demonstrative - interrogative (不定称)
       {"どれ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
       {"どこ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
@@ -502,6 +513,8 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
       {"はず", POS::Noun, 0.3F, "はず", false, true, false, CT::None, "はず"},
       {"つもり", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
       {"まま", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
+      {"ほか", POS::Noun, 0.3F, "ほか", false, true, false, CT::None, ""},
+      {"他", POS::Noun, 0.3F, "ほか", false, true, false, CT::None, "ほか"},
   };
 }
 
@@ -779,6 +792,15 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"仮に", POS::Adverb, 0.5F, "", false, false, false, CT::None, "かりに"},
       {"万一", POS::Adverb, 0.5F, "", false, false, false, CT::None, "まんいち"},
 
+      // Contrast adverbs (対比副詞)
+      {"むしろ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+
+      // Colloquial degree adverbs (口語程度副詞)
+      {"どんだけ", POS::Adverb, 0.3F, "どれだけ", false, false, false, CT::None, ""},
+
+      // Superlative adverbs (最上級副詞)
+      {"一番", POS::Adverb, 0.3F, "", false, false, false, CT::None, "いちばん"},
+
       // Affirmation/Negation adverbs - kanji with reading
       {"必ず", POS::Adverb, 0.5F, "", false, false, false, CT::None, "かならず"},
       {"決して", POS::Adverb, 0.5F, "", false, false, false, CT::None, "けっして"},
@@ -950,6 +972,7 @@ std::vector<DictionaryEntry> getIAdjectiveEntries() {
       {"狡い", POS::Adjective, 0.3F, "狡い", false, false, false, CT::IAdjective, "ずるい"},
       {"旨い", POS::Adjective, 0.3F, "旨い", false, false, false, CT::IAdjective, "うまい"},
       {"上手い", POS::Adjective, 0.3F, "上手い", false, false, false, CT::IAdjective, "うまい"},
+      {"うまい", POS::Adjective, 0.2F, "うまい", false, false, false, CT::IAdjective, ""},  // neutral lemma for hiragana
       {"尊い", POS::Adjective, 0.3F, "尊い", false, false, false, CT::IAdjective, "とうとい"},
 
       // Special irregular adjective いい (良い/よい variant)
@@ -1074,6 +1097,7 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"見つける", POS::Verb, 0.3F, "見つける", false, false, false, CT::Ichidan, "みつける"},
       {"見つかる", POS::Verb, 0.3F, "見つかる", false, false, false, CT::GodanRa, "みつかる"},
       {"上がる", POS::Verb, 0.3F, "上がる", false, false, false, CT::GodanRa, "あがる"},
+      {"挙がる", POS::Verb, 0.3F, "挙がる", false, false, false, CT::GodanRa, "あがる"},
       {"下がる", POS::Verb, 0.3F, "下がる", false, false, false, CT::GodanRa, "さがる"},
 
       // Single-kanji Ichidan verbs (単漢字一段動詞)
@@ -1123,6 +1147,12 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"伴う", POS::Verb, 0.3F, "伴う", false, false, false, CT::GodanWa, "ともなう"},
       {"伴い", POS::Verb, 0.3F, "伴う", false, false, false, CT::GodanWa, "ともない"},
 
+      // Godan verbs with っ-onbin (促音便) - disambiguation required
+      // These verbs share the same っ-onbin pattern, making them ambiguous without dictionary
+      {"目立つ", POS::Verb, 0.3F, "目立つ", false, false, false, CT::GodanTa, "めだつ"},
+      {"疑う", POS::Verb, 0.3F, "疑う", false, false, false, CT::GodanWa, "うたがう"},
+      {"過疎る", POS::Verb, 0.3F, "過疎る", false, false, false, CT::GodanRa, "かそる"},
+
       // Compound verbs (敬語複合動詞)
       {"恐れ入る", POS::Verb, 0.3F, "恐れ入る", false, false, false, CT::GodanRa, "おそれいる"},
       {"申し上げる", POS::Verb, 0.3F, "申し上げる", false, false, false, CT::Ichidan, "もうしあげる"},
@@ -1135,6 +1165,7 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
 
       // Common GodanKa verbs
       {"書く", POS::Verb, 0.3F, "書く", false, false, false, CT::GodanKa, "かく"},
+      {"説く", POS::Verb, 0.3F, "説く", false, false, false, CT::GodanKa, "とく"},
       {"聞く", POS::Verb, 0.3F, "聞く", false, false, false, CT::GodanKa, "きく"},
       {"効く", POS::Verb, 0.3F, "効く", false, false, false, CT::GodanKa, "きく"},
       {"利く", POS::Verb, 0.3F, "利く", false, false, false, CT::GodanKa, "きく"},

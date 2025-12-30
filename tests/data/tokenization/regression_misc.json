@@ -796,6 +796,127 @@
         {"surface": "らしい", "pos": "Adjective", "lemma": "らしい"}
       ],
       "tags": ["regression", "verb", "rashii", "tai", "conjecture"]
+    },
+    {
+      "id": "pronoun_koitsu",
+      "description": "こいつ should be single Pronoun (not こい+つ)",
+      "input": "こいつがバレた",
+      "expected": [
+        {"surface": "こいつ", "pos": "Pronoun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "バレた", "pos": "Verb"}
+      ],
+      "tags": ["regression", "pronoun", "demonstrative"]
+    },
+    {
+      "id": "pronoun_soitsu",
+      "description": "そいつ should be single Pronoun",
+      "input": "そいつは誰だ",
+      "expected": [
+        {"surface": "そいつ", "pos": "Pronoun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "誰", "pos": "Pronoun"},
+        {"surface": "だ", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "pronoun", "demonstrative"]
+    },
+    {
+      "id": "pronoun_aitsu",
+      "description": "あいつ should be single Pronoun",
+      "input": "あいつが来た",
+      "expected": [
+        {"surface": "あいつ", "pos": "Pronoun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "来た", "pos": "Verb", "lemma": "来る"}
+      ],
+      "tags": ["regression", "pronoun", "demonstrative"]
+    },
+    {
+      "id": "pronoun_doitsu",
+      "description": "どいつ should be single Pronoun",
+      "input": "どいつが犯人だ",
+      "expected": [
+        {"surface": "どいつ", "pos": "Pronoun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "犯人", "pos": "Noun"},
+        {"surface": "だ", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "pronoun", "demonstrative"]
+    },
+    {
+      "id": "onbin_kasoru_lemma",
+      "description": "過疎っている should have lemma 過疎る (not 過疎う)",
+      "input": "過疎っている",
+      "expected": [
+        {"surface": "過疎って", "pos": "Verb", "lemma": "過疎る"},
+        {"surface": "いる", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "verb", "onbin", "lemma"]
+    },
+    {
+      "id": "onbin_medatsu_lemma",
+      "description": "目立った should have lemma 目立つ (not 目立う/目立る)",
+      "input": "目立った",
+      "expected": [
+        {"surface": "目立った", "pos": "Verb", "lemma": "目立つ"}
+      ],
+      "tags": ["regression", "verb", "onbin", "lemma"]
+    },
+    {
+      "id": "onbin_utagau_lemma",
+      "description": "疑ってしまう should have lemma 疑う (not 疑る)",
+      "input": "疑ってしまう",
+      "expected": [
+        {"surface": "疑って", "pos": "Verb", "lemma": "疑う"},
+        {"surface": "しまう", "pos": "Verb"}
+      ],
+      "tags": ["regression", "verb", "onbin", "lemma"]
+    },
+    {
+      "id": "adverb_mushiro",
+      "description": "むしろ should be Adverb (not Verb むする)",
+      "input": "むしろ簡単だ",
+      "expected": [
+        {"surface": "むしろ", "pos": "Adverb"},
+        {"surface": "簡単", "pos": "Adjective"},
+        {"surface": "だ", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "adverb"]
+    },
+    {
+      "id": "verb_agaru_kanji_variant",
+      "description": "挙がっている should tokenize correctly with lemma 挙がる",
+      "input": "批判が挙がっている",
+      "expected": [
+        {"surface": "批判", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "挙がって", "pos": "Verb", "lemma": "挙がる"},
+        {"surface": "いる", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "verb", "kanji_variant"]
+    },
+    {
+      "id": "noun_kongo",
+      "description": "今後 should be single Noun (not 今+後)",
+      "input": "今後の方針",
+      "expected": [
+        {"surface": "今後", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "方針", "pos": "Noun"}
+      ],
+      "tags": ["regression", "noun", "compound"]
+    },
+    {
+      "id": "noun_hoka",
+      "description": "ほか should be single Noun (not ほ+か)",
+      "input": "思いのほかうまい",
+      "expected": [
+        {"surface": "思い", "pos": "Verb", "lemma": "思う"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "ほか", "pos": "Noun"},
+        {"surface": "うまい", "pos": "Adjective"}
+      ],
+      "tags": ["regression", "noun", "formal_noun"]
     }
   ]
 }

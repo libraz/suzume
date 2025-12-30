@@ -97,11 +97,11 @@ constexpr float kPenaltyGodanRaKateiIRow = 0.10F;
 // GodanWa/Ra/Ta Disambiguation
 // =============================================================================
 
-// Multi-kanji stem with っ-onbin - boost GodanWa
-constexpr float kBonusGodanWaMultiKanji = 0.10F;
+// Multi-kanji stem with っ-onbin - no bias (dictionary handles disambiguation)
+constexpr float kBonusGodanWaMultiKanji = 0.0F;
 
-// Multi-kanji stem with っ-onbin - slight penalty for GodanRa/Ta
-constexpr float kPenaltyGodanRaTaMultiKanji = 0.05F;
+// Multi-kanji stem with っ-onbin - no bias (dictionary handles disambiguation)
+constexpr float kPenaltyGodanRaTaMultiKanji = 0.0F;
 
 // =============================================================================
 // Kuru Validation
@@ -257,6 +257,10 @@ constexpr float kPenaltyIchidanVolitionalGodanStem = 0.50F;
 // Small kana (拗音) cannot start a verb stem - grammatically impossible
 // ょ, ゃ, ゅ, ぁ, ぃ, ぅ, ぇ, ぉ are always part of compound sounds
 constexpr float kPenaltySmallKanaStemInvalid = 1.0F;
+
+// ん cannot start a verb stem in Japanese - grammatically impossible
+// E.g., んじゃする is wrong - should split as ん + じゃない
+constexpr float kPenaltyNStartStemInvalid = 1.0F;
 
 // Ichidan verbs do NOT have onbin (音便) forms
 // Ichidan te-form uses renyokei + て, Godan uses onbinkei + て/で

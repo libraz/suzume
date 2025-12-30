@@ -64,6 +64,12 @@ float calculateConfidence(VerbType type, std::string_view stem,
       base -= inflection::kPenaltySmallKanaStemInvalid;
       logConfidenceAdjustment(-inflection::kPenaltySmallKanaStemInvalid, "small_kana_stem_invalid");
     }
+    // ん cannot start a verb stem in Japanese
+    // E.g., んじゃする is impossible - should be ん + じゃない
+    if (first_char == "ん") {
+      base -= inflection::kPenaltyNStartStemInvalid;
+      logConfidenceAdjustment(-inflection::kPenaltyNStartStemInvalid, "n_start_stem_invalid");
+    }
   }
 
   // Longer auxiliary chain = higher confidence (matched more grammar)

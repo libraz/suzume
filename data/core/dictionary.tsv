@@ -325,6 +325,7 @@ Wi-Fi	NOUN		0.5
 # === time_nouns_other ===
 # Other time expressions
 今	NOUN	いま	0.5
+今後	NOUN	こんご	0.5
 現在	NOUN	げんざい	0.5
 最近	NOUN	さいきん	0.5
 将来	NOUN	しょうらい	0.5
