@@ -51,6 +51,21 @@ bool endsWithRenyokeiMarker(std::string_view stem) {
   return endsWithIRow(stem) || endsWithERow(stem);
 }
 
+bool isERowCodepoint(char32_t cp) {
+  // え段: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
+  return cp == U'え' || cp == U'け' || cp == U'せ' || cp == U'て' ||
+         cp == U'ね' || cp == U'へ' || cp == U'め' || cp == U'れ' ||
+         cp == U'げ' || cp == U'ぜ' || cp == U'で' || cp == U'べ' ||
+         cp == U'ぺ';
+}
+
+bool isIRowCodepoint(char32_t cp) {
+  // い段: い, き, ぎ, し, ち, に, ひ, び, み, り
+  return cp == U'い' || cp == U'き' || cp == U'ぎ' || cp == U'し' ||
+         cp == U'ち' || cp == U'に' || cp == U'ひ' || cp == U'び' ||
+         cp == U'み' || cp == U'り';
+}
+
 bool endsWithChar(std::string_view stem, const char* chars[], size_t count) {
   if (stem.size() < core::kJapaneseCharBytes) {
     return false;

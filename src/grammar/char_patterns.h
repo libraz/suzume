@@ -106,6 +106,24 @@ extern const size_t kERowCount;
 bool endsWithIRow(std::string_view stem);
 
 /**
+ * @brief Check if a codepoint is e-row hiragana
+ * @param cp Unicode codepoint to check
+ * @return True if the codepoint is e-row hiragana
+ *
+ * E-row includes: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
+ */
+bool isERowCodepoint(char32_t cp);
+
+/**
+ * @brief Check if a codepoint is i-row hiragana
+ * @param cp Unicode codepoint to check
+ * @return True if the codepoint is i-row hiragana
+ *
+ * I-row includes: い, き, ぎ, し, ち, に, ひ, び, み, り
+ */
+bool isIRowCodepoint(char32_t cp);
+
+/**
  * @brief Check if stem ends with onbin marker (音便)
  * @param stem The stem to check
  * @return True if the stem ends with い, っ, or ん

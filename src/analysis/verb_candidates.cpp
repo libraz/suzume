@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "core/utf8_constants.h"
+#include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
@@ -290,9 +291,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           if (is_godan && stem_end > kanji_end && stem_end <= codepoints.size()) {
             // Check if the last character of the stem is e-row hiragana
             char32_t last_char = codepoints[stem_end - 1];
-            if (last_char == U'え' || last_char == U'け' || last_char == U'せ' ||
-                last_char == U'て' || last_char == U'ね' || last_char == U'へ' ||
-                last_char == U'め' || last_char == U'れ') {
+            if (grammar::isERowCodepoint(last_char)) {
               // Exception: GodanRa with passive/causative suffix (られ) is valid
               // This occurs with ichidan verb stem + passive auxiliary
               bool is_passive_pattern =
@@ -411,12 +410,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   if (kanji_end < hiragana_end) {
     char32_t first_hira = codepoints[kanji_end];
     // E-row hiragana: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
-    bool is_erow = (first_hira == U'え' || first_hira == U'け' || first_hira == U'せ' ||
-                    first_hira == U'て' || first_hira == U'ね' || first_hira == U'へ' ||
-                    first_hira == U'め' || first_hira == U'れ' || first_hira == U'げ' ||
-                    first_hira == U'ぜ' || first_hira == U'で' || first_hira == U'べ' ||
-                    first_hira == U'ぺ');
-    if (is_erow) {
+    if (grammar::isERowCodepoint(first_hira)) {
       // Surface is kanji + first e-row hiragana only (e.g., 食べ from 食べます)
       size_t renyokei_end = kanji_end + 1;
       std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);

@@ -93,8 +93,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
     if (stem_len >= core::kJapaneseCharBytes) {
       std::string_view last_char = stem.substr(stem_len - core::kJapaneseCharBytes);
       if (last_char == "っ" || last_char == "ん" || last_char == "い") {
-        base -= 0.60F;
-        logConfidenceAdjustment(-0.60F, "ichidan_onbin_marker_stem_invalid");
+        base -= inflection::kPenaltyIchidanOnbinMarkerStemInvalid;
+        logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid, "ichidan_onbin_marker_stem_invalid");
       }
     }
 
@@ -205,8 +205,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
       } else if (is_suru_imperative_pattern) {
         // Strong penalty: kanji+ + せ is suru-verb imperative, not Ichidan
         // e.g., 勉強せ = 勉強する imperative, not 勉強せる
-        base -= 0.40F;
-        logConfidenceAdjustment(-0.40F, "ichidan_suru_imperative_se_pattern");
+        base -= inflection::kPenaltyIchidanSuruImperativeSePattern;
+        logConfidenceAdjustment(-inflection::kPenaltyIchidanSuruImperativeSePattern, "ichidan_suru_imperative_se_pattern");
       } else if (stem_len == core::kTwoJapaneseCharBytes && is_potential_context &&
           endsWithKanji(stem.substr(0, core::kJapaneseCharBytes)) && is_common_potential_ending) {
         // 読め could be Ichidan 読める or Godan potential of 読む
@@ -404,16 +404,16 @@ float calculateConfidence(VerbType type, std::string_view stem,
   if (type == VerbType::GodanTa && stem_len >= core::kJapaneseCharBytes) {
     std::string_view last_char = stem.substr(stem_len - core::kJapaneseCharBytes);
     if (last_char == "っ" || last_char == "ん" || last_char == "い") {
-      base -= 0.50F;
-      logConfidenceAdjustment(-0.50F, "godan_ta_onbin_stem_invalid");
+      base -= inflection::kPenaltyGodanTaOnbinStemInvalid;
+      logConfidenceAdjustment(-inflection::kPenaltyGodanTaOnbinStemInvalid, "godan_ta_onbin_stem_invalid");
     }
     // GodanTa uses った for te-form onbin, not てた
     // 見てた should be Ichidan 見る, not GodanTa 見つ
     // GodanTa te-form: 持つ → 持った → 持ってた
     // If aux starts with て (not っ), it's wrong for GodanTa
     if (required_conn == conn::kVerbRenyokei && aux_total_len > 0) {
-      base -= 0.40F;
-      logConfidenceAdjustment(-0.40F, "godan_ta_te_aux_invalid");
+      base -= inflection::kPenaltyGodanTaTeAuxInvalid;
+      logConfidenceAdjustment(-inflection::kPenaltyGodanTaTeAuxInvalid, "godan_ta_te_aux_invalid");
     }
   }
 
@@ -777,7 +777,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
     } else if (required_conn == conn::kVerbRenyokei && aux_total_len >= core::kTwoJapaneseCharBytes) {
       // Lighter penalty for polite form (renyokei + ます/います)
       // E.g., 手伝います, 書きます - clearly verb conjugations
-      // aux_total_len >= 6 covers います (6 bytes) and ます (6 bytes) patterns
+      // kTwoJapaneseCharBytes covers います/ます patterns
       base -= inflection::kPenaltyAllKanjiNonSuruKatei;
       logConfidenceAdjustment(-inflection::kPenaltyAllKanjiNonSuruKatei, "all_kanji_non_suru_renyokei_masu");
     } else {
@@ -878,8 +878,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
       required_conn == conn::kVerbOnbinkei) {
     std::string_view last_char = stem.substr(stem_len - core::kJapaneseCharBytes);
     if (last_char == "っ" || last_char == "ん" || last_char == "い") {
-      base -= 0.50F;
-      logConfidenceAdjustment(-0.50F, "suru_onbin_stem_invalid");
+      base -= inflection::kPenaltySuruOnbinStemInvalid;
+      logConfidenceAdjustment(-inflection::kPenaltySuruOnbinStemInvalid, "suru_onbin_stem_invalid");
     }
   }
 

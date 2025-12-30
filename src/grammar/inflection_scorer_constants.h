@@ -288,6 +288,30 @@ constexpr float kPenaltyIchidanNounIMizenkei = 0.30F;
 // E.g., "基づいて処理" should be verb te-form + noun
 constexpr float kPenaltySuruTeFormStemInvalid = 0.80F;
 
+// =============================================================================
+// Onbin Marker Validation
+// =============================================================================
+
+// Ichidan stem ending with Godan onbin markers (っ, ん, い)
+// These are Godan onbin forms: 行っ(く), 読ん(む), 書い(く)
+// E.g., 行っ + てた → 行っる (wrong) - should be 行く
+constexpr float kPenaltyIchidanOnbinMarkerStemInvalid = 0.60F;
+
+// Ichidan stem with Suru imperative せ pattern
+// E.g., irregular analysis of させる/せる forms
+constexpr float kPenaltyIchidanSuruImperativeSePattern = 0.40F;
+
+// GodanTa stem with invalid onbin pattern
+// E.g., stem ending in characters that can't form valid た-row verb
+constexpr float kPenaltyGodanTaOnbinStemInvalid = 0.50F;
+
+// GodanTa with invalid て/た auxiliary connection
+constexpr float kPenaltyGodanTaTeAuxInvalid = 0.40F;
+
+// Suru verb with onbin-like stem (shouldn't have onbin)
+// Suru verbs conjugate regularly without onbin: 勉強した, not *勉強っ+た
+constexpr float kPenaltySuruOnbinStemInvalid = 0.50F;
+
 }  // namespace suzume::grammar::inflection
 
 #endif  // SUZUME_GRAMMAR_INFLECTION_SCORER_CONSTANTS_H_
