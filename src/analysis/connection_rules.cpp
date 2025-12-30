@@ -122,6 +122,11 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
     return result;
   }
 
+  result = checkTokuContractionSplit(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
   // Auxiliary rules
   result = checkMasenDeSplit(prev, next);
   if (result.pattern != ConnectionPattern::None) {

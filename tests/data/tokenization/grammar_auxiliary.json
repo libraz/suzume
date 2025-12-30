@@ -362,6 +362,78 @@
         {"surface": "なさい", "pos": "Auxiliary", "lemma": "なさい"}
       ],
       "tags": ["auxiliary", "polite_imperative", "TODO_lemma_fix"]
+    },
+    {
+      "id": "aux_toku_ichidan",
+      "description": "Colloquial ておく contraction とく with ichidan verb (見とく = 見ておく)",
+      "input": "見とく",
+      "expected": [
+        {"surface": "見とく", "pos": "Verb", "lemma": "見る"}
+      ],
+      "tags": ["auxiliary", "colloquial", "contraction"]
+    },
+    {
+      "id": "aux_toku_ichidan_past",
+      "description": "Colloquial ておく contraction といた with ichidan verb (見といた = 見ておいた)",
+      "input": "見といた",
+      "expected": [
+        {"surface": "見といた", "pos": "Verb", "lemma": "見る"}
+      ],
+      "tags": ["auxiliary", "colloquial", "contraction"]
+    },
+    {
+      "id": "aux_toku_ichidan_te",
+      "description": "Colloquial ておく contraction といて with ichidan verb (見といて = 見ておいて)",
+      "input": "見といて",
+      "expected": [
+        {"surface": "見といて", "pos": "Verb", "lemma": "見る"}
+      ],
+      "tags": ["auxiliary", "colloquial", "contraction"]
+    },
+    {
+      "id": "aux_toku_ichidan_long",
+      "description": "Colloquial ておく contraction with 2-char ichidan verb (食べとく = 食べておく)",
+      "input": "食べとく",
+      "expected": [
+        {"surface": "食べとく", "pos": "Verb", "lemma": "食べる"}
+      ],
+      "tags": ["auxiliary", "colloquial", "contraction"]
+    },
+    {
+      "id": "aux_doku_godan",
+      "description": "Colloquial ておく contraction どく with godan onbin (読んどく = 読んでおく)",
+      "input": "読んどく",
+      "expected": [
+        {"surface": "読んどく", "pos": "Verb", "lemma": "読む"}
+      ],
+      "tags": ["auxiliary", "colloquial", "contraction"]
+    },
+    {
+      "id": "aux_doku_godan_past",
+      "description": "Colloquial ておく contraction どいた with godan onbin (読んどいた = 読んでおいた)",
+      "input": "読んどいた",
+      "expected": [
+        {"surface": "読んどいた", "pos": "Verb", "lemma": "読む"}
+      ],
+      "tags": ["auxiliary", "colloquial", "contraction"]
+    },
+    {
+      "id": "aux_toku_godan_sokuon",
+      "description": "Colloquial ておく contraction with godan sokuonbin (やっとく = やっておく)",
+      "input": "やっとく",
+      "expected": [
+        {"surface": "やっとく", "pos": "Verb", "lemma": "やる"}
+      ],
+      "tags": ["auxiliary", "colloquial", "contraction"]
+    },
+    {
+      "id": "aux_toku_godan_irow",
+      "description": "Colloquial ておく contraction with godan i-onbin (書いとく = 書いておく)",
+      "input": "書いとく",
+      "expected": [
+        {"surface": "書いとく", "pos": "Verb", "lemma": "書く"}
+      ],
+      "tags": ["auxiliary", "colloquial", "contraction"]
     }
   ]
 }

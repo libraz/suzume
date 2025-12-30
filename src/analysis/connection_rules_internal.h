@@ -85,6 +85,9 @@ ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
 ConnectionRuleResult checkPrefixBeforeVerb(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next);
 
+ConnectionRuleResult checkTokuContractionSplit(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next);
+
 // =============================================================================
 // Auxiliary Connection Rules (connection_rules_aux.cpp)
 // =============================================================================

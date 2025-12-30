@@ -407,5 +407,35 @@ ConnectionRuleResult checkPrefixBeforeVerb(const core::LatticeEdge& prev,
           "prefix before verb"};
 }
 
+// Rule: VERB (renyokei) + と (PARTICLE) penalty
+// E.g., 食べ + と is likely part of 食べといた/食べとく contraction
+// This split should be penalized to prefer the single token interpretation
+// Applies when: prev ends with e-row (ichidan renyokei) or onbin marker
+ConnectionRuleResult checkTokuContractionSplit(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next) {
+  if (prev.pos != core::PartOfSpeech::Verb ||
+      next.pos != core::PartOfSpeech::Particle) {
+    return {};
+  }
+
+  // Check if next is と particle
+  if (next.surface != "と") {
+    return {};
+  }
+
+  // Check if prev verb ends with renyokei-like pattern
+  // Ichidan: ends with e-row (べ, け, て, etc.)
+  // Godan onbin: ends with ん, っ, い (after te-form contraction)
+  bool is_erow = grammar::endsWithERow(prev.surface);
+  bool is_onbin = grammar::endsWithOnbin(prev.surface);
+
+  if (!is_erow && !is_onbin) {
+    return {};
+  }
+
+  return {ConnectionPattern::TokuContractionSplit,
+          scorer::kPenaltyTokuContractionSplit, "toku contraction split"};
+}
+
 }  // namespace connection_rules
 }  // namespace suzume::analysis

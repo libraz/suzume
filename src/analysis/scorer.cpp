@@ -275,6 +275,31 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     }
   }
 
+  // Penalize adjectives with lemma containing verb contraction patterns
+  // E.g., 読んどい (yondoi), 飲んどい (nondoi), 見とい (mitoi) - invalid adjectives
+  // These suggest verb + とく/どく contraction misanalyzed as adjective
+  if (edge.pos == core::PartOfSpeech::Adjective &&
+      !edge.fromDictionary() &&
+      edge.lemma.size() >= core::kTwoJapaneseCharBytes) {
+    // Check for patterns that look like verb contractions
+    // んどい/んとい: verb onbin + contraction (読んどい, 飲んどい)
+    // 〜とい: verb renyokei + contraction (見とい, 食べとい)
+    bool is_ndoi_pattern = (edge.lemma.find("んどい") != std::string::npos ||
+                            edge.lemma.find("んとい") != std::string::npos);
+    bool is_toi_pattern = false;
+    // Check if lemma ends with とい and stem doesn't look natural for adjective
+    if (edge.lemma.size() >= core::kTwoJapaneseCharBytes &&
+        edge.lemma.substr(edge.lemma.size() - core::kTwoJapaneseCharBytes) == "とい") {
+      // 〜とい pattern: likely verb renyokei + といて contraction
+      // Exception: dictionary adjectives (none known with とい ending)
+      is_toi_pattern = true;
+    }
+    if (is_ndoi_pattern || is_toi_pattern) {
+      cost += scorer::kPenaltyVerbOnbinAsAdj;
+      logAdjustment(scorer::kPenaltyVerbOnbinAsAdj, "verb_contraction_as_adj");
+    }
+  }
+
   // Penalize unknown adjectives containing verb+auxiliary patterns in surface
   // E.g., 食べすぎてしまい should be verb+しまう, not adjective
   // These patterns are also checked in inflection_scorer.cpp but the confidence floor

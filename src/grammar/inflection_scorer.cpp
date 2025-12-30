@@ -304,6 +304,12 @@ float calculateConfidence(VerbType type, std::string_view stem,
           base -= inflection::kPenaltyIchidanSingleKanjiOnbinInvalid;
           logConfidenceAdjustment(-inflection::kPenaltyIchidanSingleKanjiOnbinInvalid, "ichidan_single_kanji_onbin_invalid");
         }
+      } else if (aux_count == 1 && aux_total_len == core::kTwoJapaneseCharBytes &&
+                 required_conn == conn::kVerbRenyokei) {
+        // 2-char aux with renyokei connection: とく, ちゃう, てる, etc.
+        // Valid colloquial patterns for Ichidan (見とく → 見る + とく)
+        // No penalty - these are legitimate contractions
+        // NOTE: 3-char patterns like すぎた should still get penalty (高い + すぎた, not 高る + すぎた)
       } else {
         // Multiple aux matches or longer single match (like せる, されて)
         // Likely wrong match via potential/passive pattern

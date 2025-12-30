@@ -504,10 +504,20 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"ちゃって", "ちゃって", "しまう", kAuxTeshimau, kAuxOutTe, kVerbRenyokei});
 
   // === Colloquial ておく contraction ===
-  // やっとく, 見とく - connects to 音便形 (like ちゃう/じゃう)
+  // Godan onbin: やっとく, 書いとく - connects to 音便形
   entries.push_back({"とく", "とく", "おく", kAuxTeoku, kAuxOutBase, kVerbOnbinkei});
   entries.push_back({"といた", "といた", "おく", kAuxTeoku, kAuxOutTa, kVerbOnbinkei});
   entries.push_back({"といて", "といて", "おく", kAuxTeoku, kAuxOutTe, kVerbOnbinkei});
+  // Ichidan renyokei: 見とく, 食べとく - connects to 連用形
+  entries.push_back({"とく", "とく", "おく", kAuxTeoku, kAuxOutBase, kVerbRenyokei});
+  entries.push_back({"といた", "といた", "おく", kAuxTeoku, kAuxOutTa, kVerbRenyokei});
+  entries.push_back({"といて", "といて", "おく", kAuxTeoku, kAuxOutTe, kVerbRenyokei});
+  // Voiced onbin: 読んどく, 飲んどく, 死んどく - で→ど contraction
+  // Pattern is: 読ん (onbin stem) + どく (voiced contraction)
+  // Same structure as でる/でた for ている contraction
+  entries.push_back({"どく", "どく", "おく", kAuxTeoku, kAuxOutBase, kVerbOnbinkei});
+  entries.push_back({"どいた", "どいた", "おく", kAuxTeoku, kAuxOutTa, kVerbOnbinkei});
+  entries.push_back({"どいて", "どいて", "おく", kAuxTeoku, kAuxOutTe, kVerbOnbinkei});
 
   // === Colloquial ている contraction (てる) ===
   // してる, 食べてる, 見てる - contracts ている to てる

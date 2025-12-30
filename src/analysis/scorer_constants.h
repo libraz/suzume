@@ -61,6 +61,10 @@ constexpr float kPenaltyVerbAuxInAdj = 2.0F;
 // しまい/じまい parsed as adjective (should be しまう renyokei)
 constexpr float kPenaltyShimaiAsAdj = 3.0F;
 
+// Adjective lemma containing verb onbin + contraction patterns (んどい, んとい)
+// E.g., 読んどい from 読んどく - invalid adjective, should be verb とく contraction
+constexpr float kPenaltyVerbOnbinAsAdj = 2.0F;
+
 // Short-stem pure hiragana unknown adjective penalty
 // Valid short hiragana adjectives (すごい, うまい, やばい) are in dictionary
 // Unknown short-stem (≤2 chars) hiragana adjectives are likely misanalysis
@@ -154,6 +158,11 @@ constexpr float kBonusConditionalVerbToVerb = 0.7F;
 // Offsets the VERB→VERB base cost (0.8) for compound verb patterns
 // Must be >= 0.8 to make VERB→VERB cheaper than NOUN→NOUN (0.0)
 constexpr float kBonusVerbRenyokeiCompoundAux = 1.0F;
+
+// Verb renyokei + と (PARTICLE) pattern
+// E.g., 食べ + と is likely part of 食べといた/食べとく contraction
+// This split should be penalized to prefer the single token interpretation
+constexpr float kPenaltyTokuContractionSplit = 1.5F;
 
 // NOUN + いる/います/いません (AUX) penalty
 // いる auxiliary should only follow te-form verbs (食べている), not nouns

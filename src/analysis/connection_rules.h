@@ -106,7 +106,8 @@ enum class ConnectionPattern {
   VerbBeforeNaAdj,         // VERB → みたい etc (valid: 食べるみたい)
   InvalidTeFormAux,        // テ形VERB → 無効単独AUX (e.g., して+る - should be してる)
   ShiParticleAfterPredicate,  // 活用語 → し接続助詞 (valid: 上手いし, 食べるし)
-  ShiParticleAfterNoun     // 名詞 → し接続助詞 (invalid: 本し - noun can't directly connect)
+  ShiParticleAfterNoun,       // 名詞 → し接続助詞 (invalid: 本し - noun can't directly connect)
+  TokuContractionSplit        // VERB(連用形) → と (invalid: 食べ + と should be 食べといた)
 };
 
 /**
