@@ -64,13 +64,6 @@ class Viterbi {
   Viterbi& operator=(Viterbi&&) = default;
 
   /**
-   * @brief Find optimal path through the lattice
-   * @param lattice Lattice graph
-   * @return Vector of morphemes on the optimal path
-   */
-  std::vector<Morpheme> findBestPath(const Lattice& lattice);
-
-  /**
    * @brief Solve with custom scorer (returns edge IDs)
    * @param lattice Lattice graph
    * @param scorer Custom scorer
@@ -191,23 +184,6 @@ class Viterbi {
 
     return result;
   }
-
-  /**
-   * @brief Get connection cost between two POS
-   * @param left Left POS
-   * @param right Right POS
-   * @return Connection cost
-   */
-  static float connectionCost(PartOfSpeech left, PartOfSpeech right);
-
- private:
-  struct Node {
-    float cost{0.0F};
-    int prev_edge{-1};
-    int prev_node{-1};
-  };
-
-  std::vector<std::vector<Node>> nodes_;
 };
 
 }  // namespace suzume::core

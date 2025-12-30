@@ -153,12 +153,7 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
   char32_t first_hiragana = codepoints[kanji_end];
 
   // Skip particles that never form nominalizations
-  if (first_hiragana == U'を' || first_hiragana == U'が' ||
-      first_hiragana == U'は' || first_hiragana == U'も' ||
-      first_hiragana == U'へ' || first_hiragana == U'の' ||
-      first_hiragana == U'に' || first_hiragana == U'で' ||
-      first_hiragana == U'と' || first_hiragana == U'や' ||
-      first_hiragana == U'か') {
+  if (normalize::isParticleCodepoint(first_hiragana)) {
     return candidates;
   }
 

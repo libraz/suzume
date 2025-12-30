@@ -83,56 +83,6 @@ class Trie {
   size_t entry_count_{0};
 };
 
-/**
- * @brief Compact read-only trie for memory efficiency
- *
- * Serialized format for reduced memory usage.
- */
-class CompactTrie {
- public:
-  CompactTrie() = default;
-  ~CompactTrie() = default;
-
-  // Non-copyable, movable
-  CompactTrie(const CompactTrie&) = delete;
-  CompactTrie& operator=(const CompactTrie&) = delete;
-  CompactTrie(CompactTrie&&) = default;
-  CompactTrie& operator=(CompactTrie&&) = default;
-
-  /**
-   * @brief Build from regular Trie
-   */
-  void build(const Trie& trie);
-
-  /**
-   * @brief Load from memory
-   * @param data Pointer to data
-   * @param size Data size
-   * @return true on success
-   */
-  bool loadFromMemory(const char* data, size_t size);
-
-  /**
-   * @brief Serialize to bytes
-   * @return Serialized data
-   */
-  std::vector<char> serialize() const;
-
-  /**
-   * @brief Exact match lookup
-   */
-  static std::vector<uint32_t> lookup(std::string_view key);
-
-  /**
-   * @brief Prefix match lookup
-   */
-  static std::vector<std::pair<size_t, std::vector<uint32_t>>> prefixMatch(std::string_view text, size_t start_pos = 0);
-
- private:
-  std::vector<char> data_;
-  bool loaded_ = false;
-};
-
 }  // namespace suzume::dictionary
 
 #endif  // SUZUME_DICTIONARY_TRIE_H_

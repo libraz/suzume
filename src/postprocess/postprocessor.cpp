@@ -2,6 +2,7 @@
 
 #include "core/debug.h"
 #include "core/utf8_constants.h"
+#include "normalize/utf8.h"
 
 namespace suzume::postprocess {
 
@@ -235,21 +236,8 @@ bool isNumericUnit(char32_t ch) {
 bool isNumericExpression(const std::string& surface) {
   if (surface.empty()) return false;
 
-  // Decode first character
-  size_t i = 0;
-  char32_t first_ch = 0;
-  if ((surface[0] & 0x80) == 0) {
-    first_ch = static_cast<char32_t>(surface[0]);
-  } else if ((surface[0] & 0xE0) == 0xC0 && i + 1 < surface.size()) {
-    first_ch = ((surface[0] & 0x1F) << 6) | (surface[1] & 0x3F);
-  } else if ((surface[0] & 0xF0) == 0xE0 && i + 2 < surface.size()) {
-    first_ch = ((surface[0] & 0x0F) << 12) | ((surface[1] & 0x3F) << 6) |
-               (surface[2] & 0x3F);
-  } else if ((surface[0] & 0xF8) == 0xF0 && i + 3 < surface.size()) {
-    first_ch = ((surface[0] & 0x07) << 18) | ((surface[1] & 0x3F) << 12) |
-               ((surface[2] & 0x3F) << 6) | (surface[3] & 0x3F);
-  }
-
+  size_t pos = 0;
+  char32_t first_ch = suzume::normalize::decodeUtf8(surface, pos);
   return isDigitChar(first_ch);
 }
 
@@ -257,25 +245,10 @@ bool isNumericExpression(const std::string& surface) {
 bool endsWithDigit(const std::string& surface) {
   if (surface.empty()) return false;
 
-  // Get last character (UTF-8)
-  size_t i = surface.size();
-  while (i > 0 && (surface[i - 1] & 0xC0) == 0x80) {
-    --i;
-  }
-  if (i == 0) return false;
+  auto codepoints = suzume::normalize::toCodepoints(surface);
+  if (codepoints.empty()) return false;
 
-  char32_t last_ch = 0;
-  size_t start = i - 1;
-  if ((surface[start] & 0x80) == 0) {
-    last_ch = static_cast<char32_t>(surface[start]);
-  } else if ((surface[start] & 0xE0) == 0xC0 && start + 1 < surface.size()) {
-    last_ch = ((surface[start] & 0x1F) << 6) | (surface[start + 1] & 0x3F);
-  } else if ((surface[start] & 0xF0) == 0xE0 && start + 2 < surface.size()) {
-    last_ch = ((surface[start] & 0x0F) << 12) |
-              ((surface[start + 1] & 0x3F) << 6) | (surface[start + 2] & 0x3F);
-  }
-
-  return isDigitChar(last_ch);
+  return isDigitChar(codepoints.back());
 }
 
 // Check if surface looks like a unit (short noun that can follow numbers)
@@ -283,52 +256,19 @@ bool endsWithDigit(const std::string& surface) {
 bool looksLikeUnit(const std::string& surface) {
   if (surface.empty()) return false;
 
-  // Units are typically 1-4 characters
-  // Count UTF-8 codepoints
-  size_t codepoints = 0;
-  for (size_t i = 0; i < surface.size(); ) {
-    if ((surface[i] & 0x80) == 0) {
-      ++i;
-    } else if ((surface[i] & 0xE0) == 0xC0) {
-      i += 2;
-    } else if ((surface[i] & 0xF0) == 0xE0) {
-      i += 3;
-    } else {
-      i += 4;
-    }
-    ++codepoints;
-  }
-
   // Units are typically 1-5 characters (e.g., キロ, メートル, パーセント)
-  return codepoints >= 1 && codepoints <= 5;
+  size_t len = suzume::normalize::utf8Length(surface);
+  return len >= 1 && len <= 5;
 }
 
 // Check if surface ends with a numeric unit that can be followed by more numbers
 bool endsWithContinuableUnit(const std::string& surface) {
   if (surface.empty()) return false;
 
-  // Get last character (UTF-8)
-  size_t i = surface.size();
-  while (i > 0 && (surface[i - 1] & 0xC0) == 0x80) {
-    --i;
-  }
-  if (i == 0) return false;
+  auto codepoints = suzume::normalize::toCodepoints(surface);
+  if (codepoints.empty()) return false;
 
-  char32_t last_ch = 0;
-  size_t start = i - 1;
-  if ((surface[start] & 0x80) == 0) {
-    last_ch = static_cast<char32_t>(surface[start]);
-  } else if ((surface[start] & 0xE0) == 0xC0 && start + 1 < surface.size()) {
-    last_ch = ((surface[start] & 0x1F) << 6) | (surface[start + 1] & 0x3F);
-  } else if ((surface[start] & 0xF0) == 0xE0 && start + 2 < surface.size()) {
-    last_ch = ((surface[start] & 0x0F) << 12) |
-              ((surface[start + 1] & 0x3F) << 6) | (surface[start + 2] & 0x3F);
-  } else if ((surface[start] & 0xF8) == 0xF0 && start + 3 < surface.size()) {
-    last_ch = ((surface[start] & 0x07) << 18) |
-              ((surface[start + 1] & 0x3F) << 12) |
-              ((surface[start + 2] & 0x3F) << 6) | (surface[start + 3] & 0x3F);
-  }
-
+  char32_t last_ch = codepoints.back();
   // Units that can be followed by more numbers (兆, 億, 万, 千, 百)
   return last_ch == U'兆' || last_ch == U'億' || last_ch == U'万' ||
          last_ch == U'千' || last_ch == U'百';

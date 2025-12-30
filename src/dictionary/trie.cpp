@@ -69,30 +69,4 @@ void Trie::clear() {
   entry_count_ = 0;
 }
 
-// CompactTrie implementation (simplified - uses regular Trie internally for now)
-void CompactTrie::build(const Trie& trie) {
-  // TODO: Implement actual compact serialization
-  (void)trie;
-  loaded_ = true;
-}
-
-bool CompactTrie::loadFromMemory(const char* data, size_t size) {
-  data_.assign(data, data + size);
-  loaded_ = true;
-  return true;
-}
-
-std::vector<char> CompactTrie::serialize() const { return data_; }
-
-std::vector<uint32_t> CompactTrie::lookup(std::string_view /*key*/) {
-  // TODO: Implement
-  return {};
-}
-
-std::vector<std::pair<size_t, std::vector<uint32_t>>> CompactTrie::prefixMatch(std::string_view /*text*/,
-                                                                               size_t /*start_pos*/) {
-  // TODO: Implement
-  return {};
-}
-
 }  // namespace suzume::dictionary

@@ -71,9 +71,15 @@ struct LatticeEdge {
 
 /**
  * @brief Lattice graph for morpheme candidates
+ *
+ * @note Maximum number of edges is limited to UINT32_MAX to prevent ID overflow.
+ *       In practice, this limit is never reached with normal text.
  */
 class Lattice {
  public:
+  /// Maximum number of edges (limited by uint32_t ID)
+  static constexpr size_t kMaxEdges = static_cast<size_t>(UINT32_MAX);
+
   explicit Lattice(size_t text_length);
   ~Lattice() = default;
 
