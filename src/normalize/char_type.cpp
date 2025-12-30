@@ -155,4 +155,10 @@ bool isExtendedParticle(char32_t ch) {
          ch == U'と' || ch == U'も';
 }
 
+bool isProlongedSoundMark(char32_t ch) {
+  // U+30FC: Katakana-Hiragana Prolonged Sound Mark (ー)
+  // Used in both katakana and colloquial hiragana (すごーい, やばーい)
+  return ch == 0x30FC;
+}
+
 }  // namespace suzume::normalize

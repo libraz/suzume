@@ -508,6 +508,53 @@
         {"surface": "みたい", "pos": "Adjective", "lemma": "みたい"}
       ],
       "tags": ["grammar", "na-adjective", "mitai"]
+    },
+    {
+      "id": "choon_sugoi",
+      "description": "すごーい (colloquial すごい with extended vowel)",
+      "input": "すごーい",
+      "expected": [
+        {"surface": "すごーい", "pos": "Adjective", "lemma": "すごい"}
+      ],
+      "tags": ["grammar", "i-adjective", "colloquial", "choon"]
+    },
+    {
+      "id": "choon_yabai",
+      "description": "やばーい (colloquial やばい with extended vowel)",
+      "input": "やばーい",
+      "expected": [
+        {"surface": "やばーい", "pos": "Adjective", "lemma": "やばい"}
+      ],
+      "tags": ["grammar", "i-adjective", "colloquial", "choon"]
+    },
+    {
+      "id": "choon_kawaii",
+      "description": "かわいー (colloquial かわいい with extended vowel)",
+      "input": "かわいー",
+      "expected": [
+        {"surface": "かわいー", "pos": "Adjective", "lemma": "かわいい"}
+      ],
+      "tags": ["grammar", "i-adjective", "colloquial", "choon"]
+    },
+    {
+      "id": "choon_sugoi_sentence",
+      "description": "すごーいね (colloquial すごい in sentence)",
+      "input": "すごーいね",
+      "expected": [
+        {"surface": "すごーい", "pos": "Adjective", "lemma": "すごい"},
+        {"surface": "ね", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "i-adjective", "colloquial", "choon"]
+    },
+    {
+      "id": "choon_yabai_yo",
+      "description": "やばーいよ (colloquial やばい with sentence final)",
+      "input": "やばーいよ",
+      "expected": [
+        {"surface": "やばーい", "pos": "Adjective", "lemma": "やばい"},
+        {"surface": "よ", "pos": "Particle"}
+      ],
+      "tags": ["grammar", "i-adjective", "colloquial", "choon"]
     }
   ]
 }

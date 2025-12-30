@@ -109,6 +109,18 @@ bool isNeverAdjectiveStemAfterKanji(char32_t ch);
  */
 bool isExtendedParticle(char32_t ch);
 
+/**
+ * @brief Check if character is the prolonged sound mark (長音符)
+ *
+ * The prolonged sound mark (ー, U+30FC) is used to extend vowel sounds.
+ * It appears in katakana words but is also commonly used in
+ * colloquial hiragana (すごーい, やばーい).
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is the prolonged sound mark
+ */
+bool isProlongedSoundMark(char32_t ch);
+
 }  // namespace suzume::normalize
 
 #endif  // SUZUME_NORMALIZE_CHAR_TYPE_H_

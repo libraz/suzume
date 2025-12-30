@@ -9,6 +9,7 @@
 
 #include "core/utf8_constants.h"
 #include "grammar/patterns.h"
+#include "normalize/utf8.h"
 #include "suffix_candidates.h"
 #include "unknown.h"
 
@@ -20,6 +21,154 @@ namespace {
 const std::vector<std::string_view> kNaAdjSuffixes = {
     "的",  // 理性的, 論理的, etc.
 };
+
+// Get the vowel for a given hiragana/katakana character (for prolonged sound mark expansion)
+// Returns the appropriate long vowel character based on the preceding character's row
+char32_t getVowelForChar(char32_t ch) {
+  // Hiragana vowel rows:
+  // あ row (a): あ か が さ ざ た だ な は ば ぱ ま や ら わ
+  // い row (i): い き ぎ し じ ち ぢ に ひ び ぴ み り
+  // う row (u): う く ぐ す ず つ づ ぬ ふ ぶ ぷ む ゆ る
+  // え row (e): え け げ せ ぜ て で ね へ べ ぺ め れ
+  // お row (o): お こ ご そ ぞ と ど の ほ ぼ ぽ も よ ろ を
+
+  // A-row characters
+  if (ch == U'あ' || ch == U'か' || ch == U'が' || ch == U'さ' || ch == U'ざ' ||
+      ch == U'た' || ch == U'だ' || ch == U'な' || ch == U'は' || ch == U'ば' ||
+      ch == U'ぱ' || ch == U'ま' || ch == U'や' || ch == U'ら' || ch == U'わ') {
+    return U'あ';
+  }
+  // I-row characters
+  if (ch == U'い' || ch == U'き' || ch == U'ぎ' || ch == U'し' || ch == U'じ' ||
+      ch == U'ち' || ch == U'ぢ' || ch == U'に' || ch == U'ひ' || ch == U'び' ||
+      ch == U'ぴ' || ch == U'み' || ch == U'り') {
+    return U'い';
+  }
+  // U-row characters
+  if (ch == U'う' || ch == U'く' || ch == U'ぐ' || ch == U'す' || ch == U'ず' ||
+      ch == U'つ' || ch == U'づ' || ch == U'ぬ' || ch == U'ふ' || ch == U'ぶ' ||
+      ch == U'ぷ' || ch == U'む' || ch == U'ゆ' || ch == U'る') {
+    return U'う';
+  }
+  // E-row characters
+  if (ch == U'え' || ch == U'け' || ch == U'げ' || ch == U'せ' || ch == U'ぜ' ||
+      ch == U'て' || ch == U'で' || ch == U'ね' || ch == U'へ' || ch == U'べ' ||
+      ch == U'ぺ' || ch == U'め' || ch == U'れ') {
+    return U'え';
+  }
+  // O-row characters
+  if (ch == U'お' || ch == U'こ' || ch == U'ご' || ch == U'そ' || ch == U'ぞ' ||
+      ch == U'と' || ch == U'ど' || ch == U'の' || ch == U'ほ' || ch == U'ぼ' ||
+      ch == U'ぽ' || ch == U'も' || ch == U'よ' || ch == U'ろ' || ch == U'を') {
+    return U'お';
+  }
+
+  // Small kana (ゃゅょ) - treat as their base vowel
+  if (ch == U'ゃ') return U'あ';
+  if (ch == U'ゅ') return U'う';
+  if (ch == U'ょ') return U'お';
+
+  // Default to the character itself if not recognized
+  return ch;
+}
+
+// Normalize prolonged sound marks (ー) to vowels based on preceding character
+// e.g., すごーい → すごおい, やばーい → やばあい
+std::string normalizeProlongedSoundMark(const std::vector<char32_t>& codepoints,
+                                         size_t start, size_t end) {
+  std::string result;
+  result.reserve((end - start) * 3);  // Japanese chars are typically 3 bytes
+
+  for (size_t i = start; i < end; ++i) {
+    char32_t ch = codepoints[i];
+
+    // Check for prolonged sound mark (ー, U+30FC)
+    if (ch == 0x30FC && i > start) {
+      // Replace with the vowel of the previous character
+      char32_t prev = codepoints[i - 1];
+      // If previous was also ー, get the vowel from the char before that
+      if (prev == 0x30FC && i >= start + 2) {
+        prev = codepoints[i - 2];
+      }
+      char32_t vowel = getVowelForChar(prev);
+      normalize::encodeUtf8(vowel, result);
+    } else {
+      normalize::encodeUtf8(ch, result);
+    }
+  }
+
+  return result;
+}
+
+// Check if sequence contains a prolonged sound mark
+bool containsProlongedSoundMark(const std::vector<char32_t>& codepoints,
+                                 size_t start, size_t end) {
+  for (size_t i = start; i < end; ++i) {
+    if (codepoints[i] == 0x30FC) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Normalize the base form of an adjective by removing double vowels created by
+// prolonged sound mark normalization.
+// e.g., すごおい → すごい, やばあい → やばい
+// But keep legitimate double vowels: かわいい → かわいい
+std::string normalizeBaseForm(const std::string& base_form,
+                               const std::vector<char32_t>& original_codepoints,
+                               size_t start, size_t end) {
+  // Check if original ends with ーい pattern (ー before final い)
+  if (end < start + 2) {
+    return base_form;
+  }
+
+  bool ends_with_choon_i = false;
+  size_t choon_pos = 0;
+  for (size_t i = start; i < end - 1; ++i) {
+    if (original_codepoints[i] == 0x30FC) {
+      // Check if next char is い
+      if (i + 1 < end && original_codepoints[i + 1] == U'い') {
+        ends_with_choon_i = true;
+        choon_pos = i;
+        break;
+      }
+    }
+  }
+
+  if (!ends_with_choon_i) {
+    return base_form;
+  }
+
+  // Get the character before ー to determine which vowel was extended
+  char32_t prev_char = (choon_pos > start) ? original_codepoints[choon_pos - 1] : 0;
+  char32_t extended_vowel = getVowelForChar(prev_char);
+
+  // If the extended vowel is い, keep the double い (e.g., かわいい)
+  if (extended_vowel == U'い') {
+    return base_form;
+  }
+
+  // Remove the extra vowel from base form
+  // base_form is like すごおい, we want すごい (remove お before い)
+  // The pattern is: stem + extra_vowel + い → stem + い
+  if (base_form.size() >= core::kTwoJapaneseCharBytes) {
+    std::string vowel_str;
+    normalize::encodeUtf8(extended_vowel, vowel_str);
+
+    // Check if base_form ends with vowel + い
+    size_t check_pos = base_form.size() - core::kTwoJapaneseCharBytes;
+    std::string_view suffix(base_form.data() + check_pos, core::kTwoJapaneseCharBytes);
+    std::string expected_suffix = vowel_str + "い";
+
+    if (suffix == expected_suffix) {
+      // Remove the vowel, keep the い
+      return base_form.substr(0, check_pos) + "い";
+    }
+  }
+
+  return base_form;
+}
 
 }  // namespace
 
@@ -389,33 +538,57 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
 
   // Skip if starting character is a particle that is NEVER an adjective stem
   // Note: や is NOT included because やばい, やわらかい are valid i-adjectives
+  // Note: か and わ are included in isExtendedParticle, but we handle かわいい
+  // specially below by checking if the sequence forms a valid adjective
   char32_t first_char = codepoints[start_pos];
-  if (normalize::isExtendedParticle(first_char)) {
-    return candidates;
-  }
 
   // Find hiragana sequence, breaking at particle boundaries
   // Note: For i-adjectives, we allow longer sequences because conjugation
   // patterns include か (かった), く (くない), etc.
+  // Also include prolonged sound mark (ー) as part of the sequence
   size_t hiragana_end = start_pos;
   while (hiragana_end < char_types.size() &&
-         hiragana_end - start_pos < 10 &&  // Max 10 hiragana for adjective + endings
-         char_types[hiragana_end] == normalize::CharType::Hiragana) {
+         hiragana_end - start_pos < 10) {  // Max 10 chars for adjective + endings
+    normalize::CharType curr_type = char_types[hiragana_end];
+    char32_t curr_char = codepoints[hiragana_end];
+
+    // Allow hiragana and prolonged sound mark (ー)
+    bool is_valid = (curr_type == normalize::CharType::Hiragana);
+    if (!is_valid && normalize::isProlongedSoundMark(curr_char)) {
+      is_valid = true;
+    }
+
+    if (!is_valid) {
+      break;
+    }
+
     // Only break at strong particle boundaries (を, が, は, に, etc.)
-    // after the first 3 hiragana (minimum adjective stem length)
+    // after the first 3 characters (minimum adjective stem length)
     // This allows patterns like まずかった, おいしくない
-    if (hiragana_end - start_pos >= 3) {
-      char32_t curr = codepoints[hiragana_end];
-      // Break at extended particle boundaries + や
-      if (normalize::isExtendedParticle(curr) || curr == U'や') {
-        break;  // Stop before the particle
+    // But skip this check for prolonged sound marks and when followed by ー
+    if (hiragana_end - start_pos >= 3 && !normalize::isProlongedSoundMark(curr_char)) {
+      // Check if next char is ー - if so, don't break (e.g., かわいー)
+      bool next_is_prolonged = (hiragana_end + 1 < char_types.size() &&
+                                 normalize::isProlongedSoundMark(codepoints[hiragana_end + 1]));
+      if (!next_is_prolonged) {
+        // Break at extended particle boundaries + や
+        if (normalize::isExtendedParticle(curr_char) || curr_char == U'や') {
+          break;  // Stop before the particle
+        }
       }
     }
     ++hiragana_end;
   }
 
-  // Need at least 3 hiragana for an i-adjective (e.g., あつい)
+  // Need at least 3 characters for an i-adjective (e.g., あつい)
   if (hiragana_end <= start_pos + 2) {
+    return candidates;
+  }
+
+  // Check if this is an extended particle at start that should be skipped
+  // unless the sequence contains a prolonged sound mark (かわいー pattern)
+  if (normalize::isExtendedParticle(first_char) &&
+      !containsProlongedSoundMark(codepoints, start_pos, hiragana_end)) {
     return candidates;
   }
 
@@ -439,28 +612,50 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       continue;  // Skip - godan negative renyokei
     }
 
+    // Normalize prolonged sound marks before analysis
+    // e.g., すごーい → すごおい, やばーい → やばあい
+    std::string analysis_surface = surface;
+    bool has_prolonged = containsProlongedSoundMark(codepoints, start_pos, end_pos);
+    if (has_prolonged) {
+      analysis_surface = normalizeProlongedSoundMark(codepoints, start_pos, end_pos);
+    }
+
     // Check all candidates for IAdjective, not just the best one
     // This handles cases where Suru interpretation may have higher confidence
-    auto all_candidates = inflection.analyze(surface);
+    auto all_candidates = inflection.analyze(analysis_surface);
     for (const auto& cand : all_candidates) {
       // For hiragana-only adjectives, require higher confidence (0.55) than
       // kanji+hiragana adjectives (0.50) to avoid false positives like しそう → しい
-      if (cand.confidence >= 0.55F &&
+      // For patterns with prolonged sound marks, lower threshold (0.50) since these
+      // are intentional colloquial expressions (すごーい, やばーい)
+      float confidence_threshold = has_prolonged ? 0.50F : 0.55F;
+      if (cand.confidence >= confidence_threshold &&
           cand.verb_type == grammar::VerbType::IAdjective) {
         UnknownCandidate candidate;
-        candidate.surface = surface;
+        candidate.surface = surface;  // Keep original surface with ー
         candidate.start = start_pos;
         candidate.end = end_pos;
         candidate.pos = core::PartOfSpeech::Adjective;
         // Lower cost for higher confidence matches
-        candidate.cost = 0.3F + (1.0F - cand.confidence) * 0.3F;
+        // Slightly boost prolonged sound mark patterns as they're common in colloquial speech
+        float cost = 0.3F + (1.0F - cand.confidence) * 0.3F;
+        if (has_prolonged) {
+          cost -= 0.1F;  // Bonus for colloquial patterns
+        }
+        candidate.cost = cost;
         candidate.has_suffix = false;
         // Set lemma to base form from inflection analysis
-        candidate.lemma = cand.base_form;
+        // For prolonged sound mark patterns, normalize the base form
+        // e.g., すごおい → すごい, やばあい → やばい
+        if (has_prolonged) {
+          candidate.lemma = normalizeBaseForm(cand.base_form, codepoints, start_pos, end_pos);
+        } else {
+          candidate.lemma = cand.base_form;
+        }
 #ifdef SUZUME_DEBUG_INFO
         candidate.origin = CandidateOrigin::AdjectiveIHiragana;
         candidate.confidence = cand.confidence;
-        candidate.pattern = "i_adjective_hira";
+        candidate.pattern = has_prolonged ? "i_adjective_hira_choon" : "i_adjective_hira";
 #endif
         candidates.push_back(candidate);
         break;  // Only add one adjective candidate per surface

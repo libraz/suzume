@@ -261,12 +261,31 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
 
   // Find end of same-type sequence
   size_t end_pos = start_pos + 1;
-  while (end_pos < char_types.size() && end_pos - start_pos < max_len &&
-         char_types[end_pos] == start_type) {
+  while (end_pos < char_types.size() && end_pos - start_pos < max_len) {
+    normalize::CharType curr_type = char_types[end_pos];
+    char32_t curr_char = codepoints[end_pos];
+
+    // Check if current character matches the sequence type
+    bool matches_type = (curr_type == start_type);
+
+    // Special handling for prolonged sound mark (ー) in hiragana sequences
+    // Colloquial expressions like すごーい, やばーい, かわいー use ー in hiragana
+    if (!matches_type && start_type == normalize::CharType::Hiragana &&
+        normalize::isProlongedSoundMark(curr_char)) {
+      // Check if followed by hiragana or end of text (かわいー)
+      if (end_pos + 1 >= char_types.size() ||
+          char_types[end_pos + 1] == normalize::CharType::Hiragana) {
+        matches_type = true;  // Treat ー as part of hiragana sequence
+      }
+    }
+
+    if (!matches_type) {
+      break;
+    }
+
     // For hiragana, break at common particle characters to avoid
     // swallowing particles into unknown words (e.g., don't create "ぎをみじん")
     if (start_type == normalize::CharType::Hiragana) {
-      char32_t curr_char = codepoints[end_pos];
       // Common particles + で, と, も, か (additional word boundaries)
       // Note: Don't include「や」as it's also the stem of「やる」verb
       if (normalize::isCommonParticle(curr_char) ||

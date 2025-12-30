@@ -145,16 +145,24 @@ void Tokenizer::addUnknownCandidates(
             break;
           }
           // Case 2: Pure hiragana verb candidate vs short dictionary entry
+          // Also allow prolonged sound mark (ー) as part of hiragana sequence
+          // for colloquial patterns like すごーい, やばーい, かわいー
           if (result.length <= 2 &&
               candidate.end - candidate.start >= 3) {
-            bool all_hiragana = true;
+            bool all_hiragana_or_choon = true;
             for (size_t idx = candidate.start; idx < candidate.end && idx < char_types.size(); ++idx) {
-              if (char_types[idx] != normalize::CharType::Hiragana) {
-                all_hiragana = false;
+              bool is_valid = (char_types[idx] == normalize::CharType::Hiragana);
+              // Allow prolonged sound mark (ー, U+30FC) as part of hiragana
+              if (!is_valid && idx < codepoints.size() &&
+                  normalize::isProlongedSoundMark(codepoints[idx])) {
+                is_valid = true;
+              }
+              if (!is_valid) {
+                all_hiragana_or_choon = false;
                 break;
               }
             }
-            if (all_hiragana) {
+            if (all_hiragana_or_choon) {
               skip_penalty = true;
               break;
             }
@@ -177,16 +185,23 @@ void Tokenizer::addUnknownCandidates(
 
     // Case 4: Pure hiragana OTHER (likely readings/furigana)
     // Reduce penalty for long varied hiragana sequences
+    // Also allow prolonged sound mark (ー) as part of hiragana sequence
     bool reduced_penalty = false;
     if (!skip_penalty && candidate.pos == core::PartOfSpeech::Other &&
         candidate.end - candidate.start >= 4) {
-      bool all_hiragana = true;
+      bool all_hiragana_or_choon = true;
       bool all_same = true;
       char32_t first_cp = 0;
       for (size_t idx = candidate.start;
            idx < candidate.end && idx < char_types.size(); ++idx) {
-        if (char_types[idx] != normalize::CharType::Hiragana) {
-          all_hiragana = false;
+        bool is_valid = (char_types[idx] == normalize::CharType::Hiragana);
+        // Allow prolonged sound mark (ー, U+30FC) as part of hiragana
+        if (!is_valid && idx < codepoints.size() &&
+            normalize::isProlongedSoundMark(codepoints[idx])) {
+          is_valid = true;
+        }
+        if (!is_valid) {
+          all_hiragana_or_choon = false;
           break;
         }
         if (idx < codepoints.size()) {
@@ -197,7 +212,7 @@ void Tokenizer::addUnknownCandidates(
           }
         }
       }
-      if (all_hiragana && !all_same) {
+      if (all_hiragana_or_choon && !all_same) {
         reduced_penalty = true;
       }
     }
