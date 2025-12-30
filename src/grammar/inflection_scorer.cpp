@@ -83,11 +83,12 @@ float calculateConfidence(VerbType type, std::string_view stem,
     // Ichidan te-form uses renyokei + て: 食べて, 見て (NOT で)
     // Godan te-form uses onbinkei + て/で: 読んで, 書いて
     // If we're analyzing Ichidan in onbinkei context, it's USUALLY wrong
-    // EXCEPTION: E-row stems (食べ, 忘れ, 教え) are legitimate Ichidan verbs
-    // and their te-form (食べて, 忘れて) IS connected via kVerbOnbinkei
+    // EXCEPTION: Ichidan stems end with E-row (下一段: 食べ, 忘れ) or I-row (上一段: 感じ, 見)
+    // and their te-form IS connected via kVerbOnbinkei
     // EXCEPTION: すぎ (→ すぎる) is a legitimate Ichidan verb commonly used as auxiliary
-    // Only apply penalty to non-e-row stems that shouldn't be Ichidan
-    if (required_conn == conn::kVerbOnbinkei && !endsWithERow(stem) && stem != "すぎ") {
+    // Only apply penalty to stems that shouldn't be Ichidan (not E-row, not I-row)
+    if (required_conn == conn::kVerbOnbinkei && !endsWithERow(stem) && !endsWithIRow(stem) &&
+        stem != "すぎ") {
       base -= inflection::kPenaltyIchidanOnbinInvalid;
       logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinInvalid, "ichidan_onbin_invalid");
     }

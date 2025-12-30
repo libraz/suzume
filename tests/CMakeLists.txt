@@ -56,6 +56,7 @@ set(TEST_SOURCES
   integration/adjective_irregular_test.cpp
   integration/regression_verb_test.cpp
   integration/regression_compound_test.cpp
+  integration/regression_bugs_20251230_test.cpp
   integration/suru_imperative_test.cpp
   integration/strict_word_test.cpp
   integration/strict_greeting_test.cpp

@@ -515,6 +515,10 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
       {"まま", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
       {"ほか", POS::Noun, 0.3F, "ほか", false, true, false, CT::None, ""},
       {"他", POS::Noun, 0.3F, "ほか", false, true, false, CT::None, "ほか"},
+      // Abstract nouns that don't form suru-verbs
+      {"仕方", POS::Noun, 0.3F, "", false, true, false, CT::None, "しかた"},
+      // B35: Idiom component (eaves bracket - used in うだつが上がらない)
+      {"うだつ", POS::Noun, 0.3F, "うだつ", false, true, false, CT::None, ""},
   };
 }
 
@@ -797,6 +801,12 @@ std::vector<DictionaryEntry> getAdverbEntries() {
 
       // Colloquial degree adverbs (口語程度副詞)
       {"どんだけ", POS::Adverb, 0.3F, "どれだけ", false, false, false, CT::None, ""},
+      {"あんだけ", POS::Adverb, 0.3F, "あれだけ", false, false, false, CT::None, ""},
+      {"こんだけ", POS::Adverb, 0.3F, "これだけ", false, false, false, CT::None, ""},
+      {"そんだけ", POS::Adverb, 0.3F, "それだけ", false, false, false, CT::None, ""},
+
+      // Emphatic adverbs (強調副詞)
+      {"一際", POS::Adverb, 0.3F, "", false, false, false, CT::None, "ひときわ"},
 
       // Superlative adverbs (最上級副詞)
       {"一番", POS::Adverb, 0.3F, "", false, false, false, CT::None, "いちばん"},
@@ -905,6 +915,10 @@ std::vector<DictionaryEntry> getNaAdjectiveEntries() {
 // =============================================================================
 std::vector<DictionaryEntry> getIAdjectiveEntries() {
   return {
+      // Existential adjective 無い (non-existence) - kanji form only
+      // Hiragana ない is already registered as negation auxiliary, no reading expansion
+      {"無い", POS::Adjective, 0.3F, "無い", false, false, false, CT::IAdjective, ""},
+
       // Temperature/Sensation
       {"寒い", POS::Adjective, 0.3F, "寒い", false, false, false, CT::IAdjective, "さむい"},
       {"暑い", POS::Adjective, 0.3F, "暑い", false, false, false, CT::IAdjective, "あつい"},
@@ -1098,7 +1112,10 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"見つかる", POS::Verb, 0.3F, "見つかる", false, false, false, CT::GodanRa, "みつかる"},
       {"上がる", POS::Verb, 0.3F, "上がる", false, false, false, CT::GodanRa, "あがる"},
       {"挙がる", POS::Verb, 0.3F, "挙がる", false, false, false, CT::GodanRa, "あがる"},
+      {"あがる", POS::Verb, 0.3F, "あがる", false, false, false, CT::GodanRa, "あがる"},
       {"下がる", POS::Verb, 0.3F, "下がる", false, false, false, CT::GodanRa, "さがる"},
+      // B26: Colloquial verb with long stem (intrude/meddle)
+      {"出しゃばる", POS::Verb, 0.3F, "出しゃばる", false, false, false, CT::GodanRa, "でしゃばる"},
 
       // Single-kanji Ichidan verbs (単漢字一段動詞)
       // These are critical for correct lemmatization of negation forms
@@ -1266,6 +1283,7 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"答える", POS::Verb, 0.5F, "答える", false, false, false, CT::Ichidan, "こたえる"},
       {"教える", POS::Verb, 0.5F, "教える", false, false, false, CT::Ichidan, "おしえる"},
       {"見せる", POS::Verb, 0.5F, "見せる", false, false, false, CT::Ichidan, "みせる"},
+      {"入れる", POS::Verb, 0.5F, "入れる", false, false, false, CT::Ichidan, "いれる"},
 
       // ~する Godan verbs (サ変ラ行)
       {"対する", POS::Verb, 0.3F, "対する", false, false, false, CT::GodanRa, "たいする"},

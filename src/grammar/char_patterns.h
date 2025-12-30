@@ -87,8 +87,8 @@ extern const size_t kMizenkeiCount;
 extern const char* kRenyokeiEndings[];
 extern const size_t kRenyokeiCount;
 
-// Full i-row hiragana: み, き, ぎ, し, ち, に, び, り, い
-// Includes い for u-verbs (会う→会い) and stem patterns
+// Full i-row hiragana: み, き, ぎ, し, じ, ち, ぢ, に, び, り, い
+// Includes い for u-verbs (会う→会い), じ/ぢ for ichidan verbs (感じる, etc.)
 extern const char* kIRowEndings[];
 extern const size_t kIRowCount;
 

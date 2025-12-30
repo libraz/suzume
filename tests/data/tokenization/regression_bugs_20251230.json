@@ -1,0 +1,163 @@
+{
+  "version": "1.0",
+  "description": "Regression tests for bugs fixed on 2025-12-30 (B23-B35)",
+  "cases": [
+    {
+      "id": "B23_ireru_lemma",
+      "description": "B23: 入れる should have lemma 入れる, not 入る",
+      "input": "ツッコミを入れた",
+      "expected": [
+        {"surface": "ツッコミ", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "入れた", "pos": "Verb", "lemma": "入れる"}
+      ],
+      "tags": ["regression", "B23", "ichidan", "lemma"]
+    },
+    {
+      "id": "B24_kanjiru_lemma",
+      "description": "B24: 感じる verbs should have correct lemma, not 感じする",
+      "input": "感じて",
+      "expected": [
+        {"surface": "感じて", "pos": "Verb", "lemma": "感じる"}
+      ],
+      "tags": ["regression", "B24", "ichidan", "lemma"]
+    },
+    {
+      "id": "B24_shinjiru_lemma",
+      "description": "B24: 信じる should have correct lemma",
+      "input": "信じた",
+      "expected": [
+        {"surface": "信じた", "pos": "Verb", "lemma": "信じる"}
+      ],
+      "tags": ["regression", "B24", "ichidan", "lemma"]
+    },
+    {
+      "id": "B24_ronjiru_lemma",
+      "description": "B24: 論じる should have correct lemma",
+      "input": "論じた",
+      "expected": [
+        {"surface": "論じた", "pos": "Verb", "lemma": "論じる"}
+      ],
+      "tags": ["regression", "B24", "ichidan", "lemma"]
+    },
+    {
+      "id": "B25_shikata_noun",
+      "description": "B25: 仕方ない should be NOUN + AUX, not VERB (仕方する)",
+      "input": "仕方ない",
+      "expected": [
+        {"surface": "仕方", "pos": "Noun"},
+        {"surface": "ない", "pos": "Auxiliary", "lemma": "ない"}
+      ],
+      "tags": ["regression", "B25", "noun", "negation"]
+    },
+    {
+      "id": "B26_deshabaru_verb",
+      "description": "B26: 出しゃばる te-form should be single token",
+      "input": "出しゃばってくる",
+      "expected": [
+        {"surface": "出しゃばって", "pos": "Verb", "lemma": "出しゃばる"},
+        {"surface": "くる", "pos": "Verb", "lemma": "くる"}
+      ],
+      "tags": ["regression", "B26", "godan", "te_form"]
+    },
+    {
+      "id": "B27_usankusai_adj",
+      "description": "B27: 胡散臭い should be single adjective",
+      "input": "胡散臭い団体",
+      "expected": [
+        {"surface": "胡散臭い", "pos": "Adjective", "lemma": "胡散臭い"},
+        {"surface": "団体", "pos": "Noun"}
+      ],
+      "tags": ["regression", "B27", "adjective", "compound"]
+    },
+    {
+      "id": "B29_umaku_iku",
+      "description": "B29: 上手くいく should split as ADJ + VERB",
+      "input": "上手くいって",
+      "expected": [
+        {"surface": "上手く", "pos": "Adjective", "lemma": "上手い"},
+        {"surface": "いって", "pos": "Verb", "lemma": "いく"}
+      ],
+      "tags": ["regression", "B29", "adjective", "verb"]
+    },
+    {
+      "id": "B30_hikikomori_noun",
+      "description": "B30: 引きこもり should be single noun",
+      "input": "引きこもり",
+      "expected": [
+        {"surface": "引きこもり", "pos": "Noun"}
+      ],
+      "tags": ["regression", "B30", "noun", "compound"]
+    },
+    {
+      "id": "B31_nandemoari_noun",
+      "description": "B31: 何でもあり should be noun idiom",
+      "input": "何でもありだな",
+      "expected": [
+        {"surface": "何でもあり", "pos": "Noun"},
+        {"surface": "だ", "pos": "Auxiliary"},
+        {"surface": "な", "pos": "Particle"}
+      ],
+      "tags": ["regression", "B31", "noun", "idiom"]
+    },
+    {
+      "id": "B32_andake_adv",
+      "description": "B32: あんだけ should be single adverb",
+      "input": "あんだけ",
+      "expected": [
+        {"surface": "あんだけ", "pos": "Adverb", "lemma": "あれだけ"}
+      ],
+      "tags": ["regression", "B32", "adverb", "colloquial"]
+    },
+    {
+      "id": "B32_kondake_adv",
+      "description": "B32: こんだけ should be single adverb",
+      "input": "こんだけ",
+      "expected": [
+        {"surface": "こんだけ", "pos": "Adverb", "lemma": "これだけ"}
+      ],
+      "tags": ["regression", "B32", "adverb", "colloquial"]
+    },
+    {
+      "id": "B32_sondake_adv",
+      "description": "B32: そんだけ should be single adverb",
+      "input": "そんだけ",
+      "expected": [
+        {"surface": "そんだけ", "pos": "Adverb", "lemma": "それだけ"}
+      ],
+      "tags": ["regression", "B32", "adverb", "colloquial"]
+    },
+    {
+      "id": "B33_naku_adj",
+      "description": "B33: 無く should be adjective renyoukei",
+      "input": "休むこと無く",
+      "expected": [
+        {"surface": "休む", "pos": "Verb", "lemma": "休む"},
+        {"surface": "こと", "pos": "Noun"},
+        {"surface": "無く", "pos": "Adjective", "lemma": "無い"}
+      ],
+      "tags": ["regression", "B33", "adjective", "kanji"]
+    },
+    {
+      "id": "B34_hitokiwa_adv",
+      "description": "B34: 一際 should be adverb",
+      "input": "一際高い",
+      "expected": [
+        {"surface": "一際", "pos": "Adverb"},
+        {"surface": "高い", "pos": "Adjective", "lemma": "高い"}
+      ],
+      "tags": ["regression", "B34", "adverb"]
+    },
+    {
+      "id": "B35_agaranai_verb",
+      "description": "B35: あがらない should be single verb",
+      "input": "うだつがあがらない",
+      "expected": [
+        {"surface": "うだつ", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "あがらない", "pos": "Verb", "lemma": "あがる"}
+      ],
+      "tags": ["regression", "B35", "verb", "hiragana"]
+    }
+  ]
+}

@@ -43,6 +43,8 @@
 懐かしい	ADJECTIVE	なつかしい	0.8	I_ADJ
 騒がしい	ADJECTIVE	さわがしい	0.8	I_ADJ
 喧しい	ADJECTIVE	やかましい	0.8	I_ADJ
+# B27: Compound adjective - suspicious/shady
+胡散臭い	ADJECTIVE	うさんくさい	0.8	I_ADJ
 
 # === adverbs ===
 # Note: なかなか, いつも are in L1 adverbs.h
@@ -334,3 +336,15 @@ Wi-Fi	NOUN		0.5
 時分	NOUN	じぶん	0.5
 菓子	NOUN	かし	1.0
 猫	NOUN	ねこ	0.5
+
+# === bug fixes B26/B30/B31/B35 ===
+# B26: Godan-ra verb with しゃ stem (intrude/meddle)
+出しゃばる	VERB	でしゃばる	0.8	GODAN_RA
+# B30: Compound noun (social withdrawal/hikikomori)
+引きこもり	NOUN	ひきこもり	0.5
+# B31: Idiomatic expression (anything goes)
+何でもあり	NOUN	なんでもあり	0.5
+# B35: Hiragana verb (to rise/go up)
+あがる	VERB	あがる	0.8	GODAN_RA
+# B35: Idiom component (eaves bracket - used in "uatsuga agaranai")
+うだつ	NOUN	うだつ	0.8

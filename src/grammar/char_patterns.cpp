@@ -26,9 +26,10 @@ const char* kRenyokeiEndings[] = {"き", "ぎ", "し", "ち",
 const size_t kRenyokeiCount = 8;
 
 // Full i-row hiragana including い for u-verb stems
-const char* kIRowEndings[] = {"み", "き", "ぎ", "し", "ち",
+// Includes voiced variants じ (from し) and ぢ (from ち) for ichidan verbs
+const char* kIRowEndings[] = {"み", "き", "ぎ", "し", "じ", "ち", "ぢ",
                                "に", "び", "り", "い"};
-const size_t kIRowCount = 9;
+const size_t kIRowCount = 11;
 
 // E-row hiragana for Ichidan renyokei
 const char* kERowEndings[] = {"べ", "め", "せ", "け", "げ", "て", "ね",
