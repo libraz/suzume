@@ -173,6 +173,11 @@ Wi-Fi	NOUN		0.5
 # These are verb-derived compound nouns that should be in Layer 2
 取り扱い	NOUN	とりあつかい	0.3
 取り組み	NOUN	とりくみ	0.3
+
+# === nominalized_nouns (verb renyokei → noun) ===
+# Colloquial/internet nouns derived from verb renyokei forms
+# 推し: from 推す (to push/support), used as "favorite person/thing"
+推し	NOUN	おし	0.3
 呼び出し	NOUN	よびだし	0.3
 打ち合わせ	NOUN	うちあわせ	0.3
 思い出	NOUN	おもいで	0.3

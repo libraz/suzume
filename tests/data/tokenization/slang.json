@@ -339,6 +339,36 @@
         {"surface": "バズってる", "pos": "Verb", "lemma": "バズる"}
       ],
       "tags": ["slang", "particle", "shi", "phrase"]
+    },
+    {
+      "id": "noun_oshi_standalone",
+      "description": "Nominalized noun 推し standalone (T54)",
+      "input": "推し",
+      "expected": [
+        {"surface": "推し", "pos": "Noun", "lemma": "推し"}
+      ],
+      "tags": ["slang", "noun", "internet", "otaku"]
+    },
+    {
+      "id": "noun_oshi_particle_no",
+      "description": "Nominalized noun 推し with particle の",
+      "input": "推しの",
+      "expected": [
+        {"surface": "推し", "pos": "Noun", "lemma": "推し"},
+        {"surface": "の", "pos": "Particle"}
+      ],
+      "tags": ["slang", "noun", "internet", "otaku"]
+    },
+    {
+      "id": "phrase_oshi_live",
+      "description": "Internet slang phrase 推しのライブ",
+      "input": "推しのライブ",
+      "expected": [
+        {"surface": "推し", "pos": "Noun", "lemma": "推し"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "ライブ", "pos": "Noun"}
+      ],
+      "tags": ["slang", "phrase", "internet", "otaku"]
     }
   ]
 }

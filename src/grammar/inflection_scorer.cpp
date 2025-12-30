@@ -79,8 +79,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
     // If we're analyzing Ichidan in onbinkei context, it's USUALLY wrong
     // EXCEPTION: E-row stems (食べ, 忘れ, 教え) are legitimate Ichidan verbs
     // and their te-form (食べて, 忘れて) IS connected via kVerbOnbinkei
+    // EXCEPTION: すぎ (→ すぎる) is a legitimate Ichidan verb commonly used as auxiliary
     // Only apply penalty to non-e-row stems that shouldn't be Ichidan
-    if (required_conn == conn::kVerbOnbinkei && !endsWithERow(stem)) {
+    if (required_conn == conn::kVerbOnbinkei && !endsWithERow(stem) && stem != "すぎ") {
       base -= inflection::kPenaltyIchidanOnbinInvalid;
       logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinInvalid, "ichidan_onbin_invalid");
     }
@@ -359,8 +360,12 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // - Pure hiragana Ichidan exists (いる, できる) but are in dictionary
   // - Stems like まじ(る), ふえ(る) in hiragana are usually not verbs
   // Exception: single-char hiragana stems (み, き) are handled separately
+  // Exception: すぎ (→ すぎる) is a very common auxiliary verb pattern
+  //   - Used after verb renyokei: 食べすぎる (eat too much)
+  //   - Used after i-adjective stem: 高すぎる (too expensive)
+  //   - Must be recognized as legitimate Ichidan verb
   if (type == VerbType::Ichidan && stem_len >= core::kTwoJapaneseCharBytes &&
-      isPureHiragana(stem)) {
+      isPureHiragana(stem) && stem != "すぎ") {
     base -= inflection::kPenaltyPureHiraganaStem;
     logConfidenceAdjustment(-inflection::kPenaltyPureHiraganaStem, "ichidan_pure_hiragana_stem");
   }

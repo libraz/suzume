@@ -434,6 +434,33 @@
         {"surface": "書いとく", "pos": "Verb", "lemma": "書く"}
       ],
       "tags": ["auxiliary", "colloquial", "contraction"]
+    },
+    {
+      "id": "aux_sugiru_standalone",
+      "description": "Auxiliary verb すぎる standalone te-form (T55)",
+      "input": "すぎて",
+      "expected": [
+        {"surface": "すぎて", "pos": "Verb", "lemma": "すぎる"}
+      ],
+      "tags": ["auxiliary", "sugiru"]
+    },
+    {
+      "id": "aux_sugiru_verb",
+      "description": "Auxiliary verb すぎる after verb (食べすぎて)",
+      "input": "食べすぎて",
+      "expected": [
+        {"surface": "食べすぎて", "pos": "Verb", "lemma": "食べる"}
+      ],
+      "tags": ["auxiliary", "sugiru"]
+    },
+    {
+      "id": "aux_sugiru_dict",
+      "description": "Auxiliary verb すぎる dictionary form",
+      "input": "すぎる",
+      "expected": [
+        {"surface": "すぎる", "pos": "Verb", "lemma": "すぎる"}
+      ],
+      "tags": ["auxiliary", "sugiru"]
     }
   ]
 }
