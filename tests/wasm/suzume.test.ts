@@ -308,4 +308,101 @@ describe('Suzume WASM', () => {
 
     resultFree(resultPtr);
   });
+
+  describe('with preserveSymbols option', () => {
+    let handleWithSymbols: number;
+
+    beforeAll(() => {
+      const createWithOptions = module.cwrap('suzume_create_with_options', 'number', [
+        'number',
+      ]) as (optionsPtr: number) => number;
+
+      // Allocate options struct (3 ints = 12 bytes)
+      const optionsPtr = module._malloc(12);
+      const HEAP32 = new Int32Array(
+        (module as unknown as { HEAP32: { buffer: ArrayBuffer } }).HEAP32.buffer,
+      );
+      HEAP32[optionsPtr >> 2] = 1; // preserve_vu = true
+      HEAP32[(optionsPtr >> 2) + 1] = 1; // preserve_case = true
+      HEAP32[(optionsPtr >> 2) + 2] = 1; // preserve_symbols = true
+
+      handleWithSymbols = createWithOptions(optionsPtr);
+      module._free(optionsPtr);
+    });
+
+    afterAll(() => {
+      if (handleWithSymbols && module) {
+        const destroy = module.cwrap('suzume_destroy', null, ['number']) as (h: number) => void;
+        destroy(handleWithSymbols);
+      }
+    });
+
+    it('should preserve emoji when preserveSymbols is enabled', () => {
+      const analyze = module.cwrap('suzume_analyze', 'number', ['number', 'number']) as (
+        h: number,
+        t: number,
+      ) => number;
+      const resultFree = module.cwrap('suzume_result_free', null, ['number']) as (
+        r: number,
+      ) => void;
+
+      const text = 'こんにちは😊';
+      const textBytes = module.lengthBytesUTF8(text) + 1;
+      const textPtr = module._malloc(textBytes);
+      module.stringToUTF8(text, textPtr, textBytes);
+
+      const resultPtr = analyze(handleWithSymbols, textPtr);
+      module._free(textPtr);
+
+      expect(resultPtr).toBeGreaterThan(0);
+
+      const morphemesPtr = module.HEAPU32[resultPtr >> 2];
+      const count = module.HEAPU32[(resultPtr >> 2) + 1];
+
+      // Should have 2 morphemes: こんにちは and 😊
+      expect(count).toBe(2);
+
+      // Check last morpheme is emoji symbol
+      const MORPHEME_SIZE = 28;
+      const lastMorphPtr = morphemesPtr + (count - 1) * MORPHEME_SIZE;
+      const surfacePtr = module.HEAPU32[lastMorphPtr >> 2];
+      const posPtr = module.HEAPU32[(lastMorphPtr >> 2) + 1];
+
+      const surface = module.UTF8ToString(surfacePtr);
+      const pos = module.UTF8ToString(posPtr);
+
+      expect(surface).toBe('😊');
+      expect(pos).toBe('SYMBOL');
+
+      resultFree(resultPtr);
+    });
+
+    it('should remove emoji by default', () => {
+      const analyze = module.cwrap('suzume_analyze', 'number', ['number', 'number']) as (
+        h: number,
+        t: number,
+      ) => number;
+      const resultFree = module.cwrap('suzume_result_free', null, ['number']) as (
+        r: number,
+      ) => void;
+
+      const text = 'こんにちは😊';
+      const textBytes = module.lengthBytesUTF8(text) + 1;
+      const textPtr = module._malloc(textBytes);
+      module.stringToUTF8(text, textPtr, textBytes);
+
+      // Use default handle (without preserveSymbols)
+      const resultPtr = analyze(handle, textPtr);
+      module._free(textPtr);
+
+      expect(resultPtr).toBeGreaterThan(0);
+
+      const count = module.HEAPU32[(resultPtr >> 2) + 1];
+
+      // Should have only 1 morpheme (emoji removed)
+      expect(count).toBe(1);
+
+      resultFree(resultPtr);
+    });
+  });
 });

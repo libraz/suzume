@@ -23,6 +23,7 @@ struct SuzumeOptions {
   core::AnalysisMode mode = core::AnalysisMode::Normal;
   bool lemmatize = true;
   bool merge_compounds = false;
+  bool remove_symbols = true;  // Remove symbol-only morphemes (default: true)
   postprocess::TagGeneratorOptions tag_options;
   normalize::NormalizeOptions normalize_options;
 };

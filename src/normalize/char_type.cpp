@@ -58,12 +58,49 @@ CharType classifyChar(char32_t codepoint) {
     return CharType::Symbol;
   }
 
-  // Emoji ranges (simplified)
+  // Emoji ranges (comprehensive, Unicode 15.0+)
   if ((codepoint >= 0x1F600 && codepoint <= 0x1F64F) ||  // Emoticons
       (codepoint >= 0x1F300 && codepoint <= 0x1F5FF) ||  // Misc Symbols and Pictographs
       (codepoint >= 0x1F680 && codepoint <= 0x1F6FF) ||  // Transport and Map
+      (codepoint >= 0x1F700 && codepoint <= 0x1F77F) ||  // Alchemical Symbols
+      (codepoint >= 0x1F780 && codepoint <= 0x1F7FF) ||  // Geometric Shapes Extended
+      (codepoint >= 0x1F800 && codepoint <= 0x1F8FF) ||  // Supplemental Arrows-C
+      (codepoint >= 0x1F900 && codepoint <= 0x1F9FF) ||  // Supplemental Symbols and Pictographs
+      (codepoint >= 0x1FA00 && codepoint <= 0x1FA6F) ||  // Chess Symbols
+      (codepoint >= 0x1FA70 && codepoint <= 0x1FAFF) ||  // Symbols and Pictographs Extended-A
+      (codepoint >= 0x1FB00 && codepoint <= 0x1FBFF) ||  // Symbols for Legacy Computing
       (codepoint >= 0x2600 && codepoint <= 0x26FF) ||    // Misc symbols
-      (codepoint >= 0x2700 && codepoint <= 0x27BF)) {    // Dingbats
+      (codepoint >= 0x2700 && codepoint <= 0x27BF) ||    // Dingbats
+      (codepoint >= 0x2300 && codepoint <= 0x23FF) ||    // Misc Technical (⌚⌛⏰ etc.)
+      (codepoint >= 0x2B50 && codepoint <= 0x2B55) ||    // Stars and circles (⭐⭕ etc.)
+      (codepoint >= 0x2934 && codepoint <= 0x2935) ||    // Arrows
+      (codepoint >= 0x25AA && codepoint <= 0x25AB) ||    // Squares
+      (codepoint >= 0x25B6 && codepoint <= 0x25C0) ||    // Triangles
+      (codepoint >= 0x25FB && codepoint <= 0x25FE) ||    // Squares
+      (codepoint >= 0x2614 && codepoint <= 0x2615) ||    // Umbrella, hot beverage
+      (codepoint >= 0x2648 && codepoint <= 0x2653) ||    // Zodiac signs
+      (codepoint >= 0x267F && codepoint <= 0x267F) ||    // Wheelchair
+      (codepoint >= 0x2693 && codepoint <= 0x2693) ||    // Anchor
+      (codepoint >= 0x26A1 && codepoint <= 0x26A1) ||    // High voltage
+      (codepoint >= 0x26AA && codepoint <= 0x26AB) ||    // Circles
+      (codepoint >= 0x26BD && codepoint <= 0x26BE) ||    // Sports balls
+      (codepoint >= 0x26C4 && codepoint <= 0x26C5) ||    // Snowman, sun
+      (codepoint >= 0x26CE && codepoint <= 0x26CE) ||    // Ophiuchus
+      (codepoint >= 0x26D4 && codepoint <= 0x26D4) ||    // No entry
+      (codepoint >= 0x26EA && codepoint <= 0x26EA) ||    // Church
+      (codepoint >= 0x26F2 && codepoint <= 0x26F3) ||    // Fountain, golf
+      (codepoint >= 0x26F5 && codepoint <= 0x26F5) ||    // Sailboat
+      (codepoint >= 0x26FA && codepoint <= 0x26FA) ||    // Tent
+      (codepoint >= 0x26FD && codepoint <= 0x26FD) ||    // Fuel pump
+      (codepoint >= 0x231A && codepoint <= 0x231B) ||    // Watch, hourglass
+      (codepoint >= 0x23E9 && codepoint <= 0x23F3) ||    // Media controls
+      (codepoint >= 0x23F8 && codepoint <= 0x23FA) ||    // Media controls
+      (codepoint >= 0x200D && codepoint <= 0x200D) ||    // ZWJ (Zero Width Joiner)
+      (codepoint >= 0xFE0E && codepoint <= 0xFE0F) ||    // Variation selectors
+      (codepoint >= 0x20E3 && codepoint <= 0x20E3) ||    // Combining enclosing keycap
+      (codepoint >= 0xE0020 && codepoint <= 0xE007F) ||  // Tag characters (flags)
+      (codepoint >= 0x1F1E6 && codepoint <= 0x1F1FF) ||  // Regional Indicator Symbols
+      (codepoint >= 0x1F3FB && codepoint <= 0x1F3FF)) {  // Skin tone modifiers
     return CharType::Emoji;
   }
 
@@ -126,9 +163,11 @@ bool isNeverVerbStemAfterKanji(char32_t ch) {
 }
 
 bool isNeverVerbStemAtStart(char32_t ch) {
-  // Common particles + ね, よ, わ (sentence-final particles)
+  // Common particles + よ, わ (sentence-final particles)
   // Note: も, や are excluded - can start verbs (もらう, やる)
-  return isCommonParticle(ch) || ch == U'ね' || ch == U'よ' || ch == U'わ';
+  // Note: ね is excluded - 寝る (neru, to sleep) is a common ichidan verb
+  //       Connection rules will handle invalid ね(particle) + AUX patterns
+  return isCommonParticle(ch) || ch == U'よ' || ch == U'わ';
 }
 
 bool isDemonstrativeStart(char32_t first, char32_t second) {
@@ -159,6 +198,30 @@ bool isProlongedSoundMark(char32_t ch) {
   // U+30FC: Katakana-Hiragana Prolonged Sound Mark (ー)
   // Used in both katakana and colloquial hiragana (すごーい, やばーい)
   return ch == 0x30FC;
+}
+
+bool isEmojiModifier(char32_t ch) {
+  // ZWJ (Zero Width Joiner) - combines emojis
+  if (ch == 0x200D) return true;
+
+  // Variation Selectors (text vs emoji presentation)
+  if (ch >= 0xFE0E && ch <= 0xFE0F) return true;
+
+  // Skin tone modifiers (Fitzpatrick scale)
+  if (ch >= 0x1F3FB && ch <= 0x1F3FF) return true;
+
+  // Combining Enclosing Keycap
+  if (ch == 0x20E3) return true;
+
+  // Tag characters (used in subdivision flags)
+  if (ch >= 0xE0020 && ch <= 0xE007F) return true;
+
+  return false;
+}
+
+bool isRegionalIndicator(char32_t ch) {
+  // Regional Indicator Symbols (A-Z for country flags)
+  return ch >= 0x1F1E6 && ch <= 0x1F1FF;
 }
 
 }  // namespace suzume::normalize

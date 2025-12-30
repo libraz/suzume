@@ -163,6 +163,8 @@ int cmdAnalyze(const CommandArgs& args) {
   // Default is preserve (true), flags invert to normalize
   options.normalize_options.preserve_vu = !args.normalize_vu;
   options.normalize_options.preserve_case = !args.lowercase;
+  // Default is remove symbols (true), flag inverts to preserve
+  options.remove_symbols = !args.preserve_symbols;
 
   Suzume analyzer(options);
 

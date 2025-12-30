@@ -26,6 +26,18 @@ interface EmscriptenModule {
 }
 
 /**
+ * Options for creating a Suzume instance
+ */
+export interface SuzumeOptions {
+  /** Preserve ヴ (don't normalize to ビ etc.), default: true */
+  preserveVu?: boolean;
+  /** Preserve case (don't lowercase ASCII), default: true */
+  preserveCase?: boolean;
+  /** Preserve symbols/emoji in output, default: false */
+  preserveSymbols?: boolean;
+}
+
+/**
  * Morpheme - A single unit of morphological analysis
  */
 export interface Morpheme {
@@ -93,10 +105,12 @@ export class Suzume {
   /**
    * Create a new Suzume instance
    *
-   * @param wasmPath - Optional path to WASM file (defaults to './suzume.wasm')
+   * @param options - Optional configuration options
    * @returns Promise resolving to Suzume instance
    */
-  static async create(wasmPath?: string): Promise<Suzume> {
+  static async create(options?: SuzumeOptions & { wasmPath?: string }): Promise<Suzume> {
+    const wasmPath = options?.wasmPath;
+
     // Dynamic import of the Emscripten-generated module
     const createModule = await import('./suzume.js');
     const module: EmscriptenModule = await createModule.default({
@@ -108,8 +122,42 @@ export class Suzume {
       },
     });
 
-    const createHandle = module.cwrap('suzume_create', 'number', []) as () => number;
-    const handle = createHandle();
+    let handle: number;
+
+    if (
+      options &&
+      (options.preserveVu !== undefined ||
+        options.preserveCase !== undefined ||
+        options.preserveSymbols !== undefined)
+    ) {
+      // Create with options
+      // suzume_options_t layout: 3 ints (12 bytes on wasm32)
+      const OPTIONS_SIZE = 12;
+      const optionsPtr = module._malloc(OPTIONS_SIZE);
+
+      try {
+        const HEAP32 = new Int32Array(
+          (module as unknown as { HEAP32: { buffer: ArrayBuffer } }).HEAP32.buffer,
+        );
+        // preserve_vu: default true
+        HEAP32[optionsPtr >> 2] = options.preserveVu !== false ? 1 : 0;
+        // preserve_case: default true
+        HEAP32[(optionsPtr >> 2) + 1] = options.preserveCase !== false ? 1 : 0;
+        // preserve_symbols: default false
+        HEAP32[(optionsPtr >> 2) + 2] = options.preserveSymbols === true ? 1 : 0;
+
+        const createWithOptions = module.cwrap('suzume_create_with_options', 'number', [
+          'number',
+        ]) as (optionsPtr: number) => number;
+        handle = createWithOptions(optionsPtr);
+      } finally {
+        module._free(optionsPtr);
+      }
+    } else {
+      // Create with default options
+      const createHandle = module.cwrap('suzume_create', 'number', []) as () => number;
+      handle = createHandle();
+    }
 
     if (handle === 0) {
       throw new Error('Failed to create Suzume instance');

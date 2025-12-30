@@ -121,6 +121,32 @@ bool isExtendedParticle(char32_t ch);
  */
 bool isProlongedSoundMark(char32_t ch);
 
+/**
+ * @brief Check if character is an emoji modifier
+ *
+ * Emoji modifiers include:
+ * - ZWJ (Zero Width Joiner, U+200D): combines emojis (👨‍👩‍👧)
+ * - Variation Selectors (U+FE0E-FE0F): text vs emoji presentation
+ * - Skin tone modifiers (U+1F3FB-1F3FF): 🏻🏼🏽🏾🏿
+ * - Combining Enclosing Keycap (U+20E3): keycap emojis (1️⃣)
+ * - Tag characters (U+E0020-E007F): regional flags (🏴󠁧󠁢󠁥󠁮󠁧󠁿)
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is an emoji modifier
+ */
+bool isEmojiModifier(char32_t ch);
+
+/**
+ * @brief Check if character is a Regional Indicator Symbol
+ *
+ * Regional indicators (U+1F1E6-1F1FF) are used in pairs to form
+ * country flag emojis (e.g., 🇯🇵 = U+1F1EF U+1F1F5).
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is a regional indicator
+ */
+bool isRegionalIndicator(char32_t ch);
+
 }  // namespace suzume::normalize
 
 #endif  // SUZUME_NORMALIZE_CHAR_TYPE_H_

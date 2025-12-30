@@ -560,6 +560,24 @@
         {"surface": "撫でない", "pos": "Verb", "lemma": "撫でる"}
       ],
       "tags": ["regression", "ichidan", "negative"]
+    },
+    {
+      "id": "hiragana_nete",
+      "description": "ねて - hiragana te-form of 寝る should be single verb",
+      "input": "ねて",
+      "expected": [
+        {"surface": "ねて", "pos": "Verb", "lemma": "ねる"}
+      ],
+      "tags": ["regression", "ichidan", "te_form", "hiragana"]
+    },
+    {
+      "id": "hiragana_dete",
+      "description": "でて - hiragana te-form of 出る should be single verb",
+      "input": "でて",
+      "expected": [
+        {"surface": "でて", "pos": "Verb", "lemma": "でる"}
+      ],
+      "tags": ["regression", "ichidan", "te_form", "hiragana"]
     }
   ]
 }

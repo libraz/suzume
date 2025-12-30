@@ -183,6 +183,32 @@ void Tokenizer::addUnknownCandidates(
       }
     }
 
+    // Case 5: Short hiragana verb candidates ending with te/de-form
+    // Handles cases like ねて (寝る), でて (出る), みて (見る) where
+    // dictionary only has kanji form but surface is pure hiragana.
+    // These 2-char patterns don't meet Case 2's ≥3 char threshold.
+    if (!skip_penalty && candidate.pos == core::PartOfSpeech::Verb) {
+      std::string_view surface = candidate.surface;
+      size_t len = candidate.end - candidate.start;
+      // Check for 2-char hiragana verbs ending in て/で
+      if (len == 2 && surface.size() >= core::kJapaneseCharBytes) {
+        bool all_hiragana = true;
+        for (size_t idx = candidate.start; idx < candidate.end && idx < char_types.size(); ++idx) {
+          if (char_types[idx] != normalize::CharType::Hiragana) {
+            all_hiragana = false;
+            break;
+          }
+        }
+        if (all_hiragana) {
+          // Check if ends with て or で (te-form markers)
+          std::string_view last_char = surface.substr(surface.size() - core::kJapaneseCharBytes);
+          if (last_char == "て" || last_char == "で") {
+            skip_penalty = true;
+          }
+        }
+      }
+    }
+
     // Case 4: Pure hiragana OTHER (likely readings/furigana)
     // Reduce penalty for long varied hiragana sequences
     // Also allow prolonged sound mark (ー) as part of hiragana sequence

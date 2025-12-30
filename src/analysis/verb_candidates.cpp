@@ -624,9 +624,45 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       // This is a common colloquial pattern that should get bonus treatment
       bool is_teoku_contraction = (surface.size() >= core::kThreeJapaneseCharBytes &&
                                    surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "っとく");
+      // Check for short te/de-form (e.g., ねて, でて, みて)
+      // These are 2-char hiragana verbs that need a bonus to beat particle splits
+      bool is_short_te_form = false;
+      if (candidate_len == 2 && best.confidence >= 0.7F) {
+        // Check last char in bytes (UTF-8)
+        // て = E3 81 A6, で = E3 81 A7
+        if (surface.size() >= 3) {
+          char c1 = surface[surface.size() - 3];
+          char c2 = surface[surface.size() - 2];
+          char c3 = surface[surface.size() - 1];
+          if (c1 == '\xE3' && c2 == '\x81' && (c3 == '\xA6' || c3 == '\xA7')) {
+            is_short_te_form = true;
+          }
+        }
+      }
+
       if (is_dictionary_verb &&
           (candidate_len >= 5 || is_conditional || is_teoku_contraction)) {
         base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;
+      } else if (is_short_te_form) {
+        // Short te-form with high confidence: give strong bonus to beat particle splits
+        // e.g., ねて (conf=0.79) should beat ね(PARTICLE) + て(PARTICLE)
+        // Particle path total cost can be as low as 0.002 due to dictionary bonuses,
+        // so we need negative cost to compete. After adding POS prior (0.2 for verb),
+        // the total needs to be below 0.002, so base needs to be below -0.2.
+        //
+        // When the first char is a common particle (で, に, etc.), these particles
+        // have very low cost (e.g., で: -0.4), making particle+て path even cheaper
+        // (total around -0.5). Need extra strong bonus for these cases.
+        bool starts_with_common_particle =
+            (first_char == U'で' || first_char == U'に' || first_char == U'が' ||
+             first_char == U'を' || first_char == U'は' || first_char == U'の' ||
+             first_char == U'へ');
+        if (starts_with_common_particle) {
+          // Extra strong bonus: need to beat particle paths around -0.5
+          base_cost = -0.8F + (1.0F - best.confidence) * 0.1F;
+        } else {
+          base_cost = -0.3F + (1.0F - best.confidence) * 0.1F;
+        }
       } else if (candidate_len >= 7 && best.confidence >= 0.8F) {
         // For long hiragana verb forms (7+ chars) with high confidence,
         // give a bonus even without dictionary verification.

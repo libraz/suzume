@@ -281,6 +281,20 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       }
     }
 
+    // Special handling for emoji modifiers (ZWJ, variation selectors, skin tones)
+    // These should always be grouped with the preceding emoji
+    if (!matches_type && start_type == normalize::CharType::Emoji &&
+        normalize::isEmojiModifier(curr_char)) {
+      matches_type = true;  // Treat modifiers as part of emoji sequence
+    }
+
+    // Special handling for regional indicators (country flags)
+    // Two regional indicators together form a flag emoji (e.g., 🇯🇵)
+    if (!matches_type && start_type == normalize::CharType::Emoji &&
+        normalize::isRegionalIndicator(curr_char)) {
+      matches_type = true;  // Treat regional indicators as part of emoji sequence
+    }
+
     if (!matches_type) {
       break;
     }

@@ -79,6 +79,7 @@ set(TEST_SOURCES
   integration/verb_test.cpp
   integration/prefix_test.cpp
   integration/grammar_suru_test.cpp
+  integration/unicode_emoji_test.cpp
 )
 
 # Create test executable

@@ -461,6 +461,43 @@
         {"surface": "すぎる", "pos": "Verb", "lemma": "すぎる"}
       ],
       "tags": ["auxiliary", "sugiru"]
+    },
+    {
+      "id": "hiragana_verb_netai",
+      "description": "Hiragana verb 寝たい - not split as particle+aux (T56)",
+      "input": "ねたい",
+      "expected": [
+        {"surface": "ねたい", "pos": "Verb", "lemma": "ねる"}
+      ],
+      "tags": ["hiragana_verb", "desiderative"]
+    },
+    {
+      "id": "hiragana_verb_netai_sentence",
+      "description": "Hiragana verb 寝たい in sentence context (T56)",
+      "input": "そろそろねたい",
+      "expected": [
+        {"surface": "そろそろ", "pos": "Adverb", "lemma": "そろそろ"},
+        {"surface": "ねたい", "pos": "Verb", "lemma": "ねる"}
+      ],
+      "tags": ["hiragana_verb", "desiderative"]
+    },
+    {
+      "id": "hiragana_verb_detai",
+      "description": "Hiragana verb 出たい - not split as particle+aux (T56)",
+      "input": "でたい",
+      "expected": [
+        {"surface": "でたい", "pos": "Verb", "lemma": "でる"}
+      ],
+      "tags": ["hiragana_verb", "desiderative"]
+    },
+    {
+      "id": "hiragana_verb_neru",
+      "description": "Hiragana verb 寝る dictionary form (T56)",
+      "input": "ねる",
+      "expected": [
+        {"surface": "ねる", "pos": "Verb", "lemma": "ねる"}
+      ],
+      "tags": ["hiragana_verb"]
     }
   ]
 }

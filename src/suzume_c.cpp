@@ -36,6 +36,7 @@ SUZUME_EXPORT suzume_t suzume_create_with_options(const suzume_options_t* option
     if (options != nullptr) {
       opts.normalize_options.preserve_vu = (options->preserve_vu != 0);
       opts.normalize_options.preserve_case = (options->preserve_case != 0);
+      opts.remove_symbols = (options->preserve_symbols == 0);
     }
     return new SuzumeHandle(opts);
   } catch (...) {

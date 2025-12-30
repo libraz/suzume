@@ -95,6 +95,9 @@ struct CommandArgs {
   // Normalization options (defaults preserve original)
   bool normalize_vu = false;    // --normalize-vu: convert ヴ→ビ
   bool lowercase = false;       // --lowercase: convert to lowercase
+
+  // Postprocess options
+  bool preserve_symbols = false; // --preserve-symbols: keep symbols in output
 };
 
 /**

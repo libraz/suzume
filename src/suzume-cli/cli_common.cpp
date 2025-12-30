@@ -179,6 +179,13 @@ CommandArgs parseArgs(int argc, char* argv[]) {
       continue;
     }
 
+    // Postprocess: preserve symbols
+    if (arg == "--preserve-symbols") {
+      args.preserve_symbols = true;
+      ++idx;
+      continue;
+    }
+
     // Command or positional argument
     if (arg[0] != '-') {
       if (args.command.empty()) {
@@ -234,6 +241,7 @@ Global Options:
   --compare              Compare with/without user dictionary
   --normalize-vu         Normalize ヴ to ビ etc. (default: preserve)
   --lowercase            Convert ASCII to lowercase (default: preserve)
+  --preserve-symbols     Keep symbols/emoji in output (default: remove)
   -h, --help             Show help
   -v, --version          Show version
 
@@ -263,6 +271,7 @@ Options:
   --compare              Compare with/without user dictionary
   --normalize-vu         Normalize ヴ to ビ etc. (default: preserve)
   --lowercase            Convert ASCII to lowercase (default: preserve)
+  --preserve-symbols     Keep symbols/emoji in output (default: remove)
   -h, --help             Show this help
 
 Output Formats:

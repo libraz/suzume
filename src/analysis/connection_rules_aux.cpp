@@ -180,10 +180,20 @@ ConnectionRuleResult checkMaiAfterNoun(const core::LatticeEdge& prev,
 //   と + う (particle + volitional)
 //   に + た (particle + past)
 //   を + ない (particle + negative)
-// Note: Long dictionary AUX (like なかった) after particles is valid
+//   ね + たい (particle + desire) - should be 寝たい (want to sleep)
+// Note: Long dictionary AUX (like なかった, である) after particles can be valid
 ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next) {
   if (!isParticleToAux(prev, next)) return {};
+
+  // Verb-specific auxiliaries (たい, ます, etc.) require verb 連用形
+  // These are ALWAYS invalid after particles, even if from dictionary
+  // e.g., ね + たい is invalid (should be 寝たい from verb 寝る)
+  if (isVerbSpecificAuxiliary(next.surface, next.lemma)) {
+    return {ConnectionPattern::ParticleBeforeAux,
+            scorer::kPenaltyShortAuxAfterParticle,
+            "verb-specific aux after particle (grammatically invalid)"};
+  }
 
   // Don't penalize long dictionary AUX (2+ chars) - valid patterns
   // e.g., は + なかった, で + ある

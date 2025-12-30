@@ -57,11 +57,12 @@ typedef struct {
 } suzume_tags_t;
 
 /**
- * @brief Normalization options structure
+ * @brief Analysis options structure
  */
 typedef struct {
-  int preserve_vu;    /**< Preserve ヴ (don't normalize to ビ etc.) */
-  int preserve_case;  /**< Preserve case (don't lowercase ASCII) */
+  int preserve_vu;      /**< Preserve ヴ (don't normalize to ビ etc.) */
+  int preserve_case;    /**< Preserve case (don't lowercase ASCII) */
+  int preserve_symbols; /**< Preserve symbols/emoji (don't remove from output) */
 } suzume_options_t;
 
 // --- Lifecycle functions ---
