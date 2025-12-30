@@ -5,7 +5,17 @@
 // Inflection Scorer Constants
 // =============================================================================
 // Confidence adjustment values for morphological analysis.
-// Positive values increase confidence, negative values decrease it.
+// These values are SUBTRACTED from base confidence (0.6F).
+// Floor is 0.3F, ceiling is 0.95F.
+//
+// NOTE: This file uses a confidence adjustment scale, different from
+// scorer_constants.h which uses cost penalties. The scale relationship:
+//   Confidence penalties → Cost equivalent
+//   0.1-0.2F (trivial)   → minor adjustment
+//   0.3-0.4F (moderate)  → noticeable impact
+//   0.5-0.6F (strong)    → significant reduction
+//   0.7-0.9F (severe)    → near-floor confidence
+//   1.0F+ (prohibitive)  → below floor (effective prohibition)
 //
 // Naming convention:
 //   kBonus*   - positive adjustment (encourages pattern)
@@ -14,6 +24,39 @@
 // =============================================================================
 
 namespace suzume::grammar::inflection {
+
+// =============================================================================
+// Confidence Adjustment Scale
+// =============================================================================
+// Scale constants for consistent confidence adjustments.
+// These mirror scorer_constants.h scale but are calibrated for confidence.
+namespace scale {
+
+// Trivial adjustment - barely noticeable
+constexpr float kTrivial = 0.05F;
+
+// Minor adjustment - slight preference change
+constexpr float kMinor = 0.15F;
+
+// Moderate adjustment - noticeable impact
+constexpr float kModerate = 0.30F;
+
+// Strong adjustment - significant confidence reduction
+constexpr float kStrong = 0.45F;
+
+// Severe adjustment - near-floor confidence
+constexpr float kSevere = 0.60F;
+
+// Prohibitive adjustment - effectively disables pattern
+constexpr float kProhibitive = 0.80F;
+
+// Bonus scale (positive values)
+constexpr float kTrivialBonus = 0.02F;
+constexpr float kMinorBonus = 0.05F;
+constexpr float kModerateBonus = 0.12F;
+constexpr float kStrongBonus = 0.20F;
+
+}  // namespace scale
 
 // =============================================================================
 // Base Configuration
@@ -256,45 +299,47 @@ constexpr float kPenaltyIchidanVolitionalGodanStem = 0.50F;
 
 // Small kana (拗音) cannot start a verb stem - grammatically impossible
 // ょ, ゃ, ゅ, ぁ, ぃ, ぅ, ぇ, ぉ are always part of compound sounds
-constexpr float kPenaltySmallKanaStemInvalid = 1.0F;
+// NOTE: Should effectively prohibit this pattern (brings confidence below floor)
+constexpr float kPenaltySmallKanaStemInvalid = scale::kProhibitive + scale::kModerate;  // 1.1F
 
 // ん cannot start a verb stem in Japanese - grammatically impossible
 // E.g., んじゃする is wrong - should split as ん + じゃない
-constexpr float kPenaltyNStartStemInvalid = 1.0F;
+// NOTE: Should effectively prohibit this pattern (brings confidence below floor)
+constexpr float kPenaltyNStartStemInvalid = scale::kProhibitive + scale::kModerate;  // 1.1F
 
 // Ichidan verbs do NOT have onbin (音便) forms
 // Ichidan te-form uses renyokei + て, Godan uses onbinkei + て/で
-constexpr float kPenaltyIchidanOnbinInvalid = 0.50F;
+constexpr float kPenaltyIchidanOnbinInvalid = scale::kStrong + scale::kTrivial;  // 0.50F
 
 // Ichidan stems ending in て as base form (来て→来てる) is usually wrong
 // Exception: 捨てる, 棄てる have legitimate て-ending stems
-constexpr float kPenaltyIchidanTeStemBaseInvalid = 0.50F;
+constexpr float kPenaltyIchidanTeStemBaseInvalid = scale::kStrong + scale::kTrivial;  // 0.50F
 
 // All-kanji + で patterns are usually copula, not verb stems
 // e.g., 公園で = NOUN + copula, 嫌でない = 嫌 + で + ない
-constexpr float kPenaltyIchidanCopulaDePattern = 0.70F;
+constexpr float kPenaltyIchidanCopulaDePattern = scale::kSevere + scale::kTrivial * 2;  // 0.70F
 
 // Ichidan stems cannot end in u-row hiragana (う, く, す, つ, etc.)
 // U-row endings are Godan dictionary forms (読む, 書く, 話す, etc.)
-constexpr float kPenaltyIchidanURowStemInvalid = 0.50F;
+constexpr float kPenaltyIchidanURowStemInvalid = scale::kStrong + scale::kTrivial;  // 0.50F
 
 // Single-kanji Ichidan stem with onbinkei context (侍で as Ichidan) is wrong
-constexpr float kPenaltyIchidanSingleKanjiOnbinInvalid = 0.60F;
+constexpr float kPenaltyIchidanSingleKanjiOnbinInvalid = scale::kSevere;
 
 // Particle + な stem pattern for GodanWa (もな, はな, etc.)
 // These are likely PARTICLE + ない misparse
-constexpr float kPenaltyGodanWaParticleNaStem = 0.45F;
+constexpr float kPenaltyGodanWaParticleNaStem = scale::kStrong;
 
 // I-adjective stems ending with "づ" are invalid (verb onbin pattern)
-constexpr float kPenaltyIAdjZuStemInvalid = 0.50F;
+constexpr float kPenaltyIAdjZuStemInvalid = scale::kStrong + scale::kTrivial;  // 0.50F
 
 // Ichidan stem that looks like noun + い pattern in mizenkei context
 // 間違いない → 間違い(NOUN) + ない(AUX), not 間違いる(VERB)
-constexpr float kPenaltyIchidanNounIMizenkei = 0.30F;
+constexpr float kPenaltyIchidanNounIMizenkei = scale::kModerate;
 
 // Suru stems containing te-form markers (て/で) are invalid
 // E.g., "基づいて処理" should be verb te-form + noun
-constexpr float kPenaltySuruTeFormStemInvalid = 0.80F;
+constexpr float kPenaltySuruTeFormStemInvalid = scale::kProhibitive;
 
 // =============================================================================
 // Onbin Marker Validation
@@ -303,22 +348,22 @@ constexpr float kPenaltySuruTeFormStemInvalid = 0.80F;
 // Ichidan stem ending with Godan onbin markers (っ, ん, い)
 // These are Godan onbin forms: 行っ(く), 読ん(む), 書い(く)
 // E.g., 行っ + てた → 行っる (wrong) - should be 行く
-constexpr float kPenaltyIchidanOnbinMarkerStemInvalid = 0.60F;
+constexpr float kPenaltyIchidanOnbinMarkerStemInvalid = scale::kSevere;
 
 // Ichidan stem with Suru imperative せ pattern
 // E.g., irregular analysis of させる/せる forms
-constexpr float kPenaltyIchidanSuruImperativeSePattern = 0.40F;
+constexpr float kPenaltyIchidanSuruImperativeSePattern = scale::kModerate + scale::kTrivial * 2;  // 0.40F
 
 // GodanTa stem with invalid onbin pattern
 // E.g., stem ending in characters that can't form valid た-row verb
-constexpr float kPenaltyGodanTaOnbinStemInvalid = 0.50F;
+constexpr float kPenaltyGodanTaOnbinStemInvalid = scale::kStrong + scale::kTrivial;  // 0.50F
 
 // GodanTa with invalid て/た auxiliary connection
-constexpr float kPenaltyGodanTaTeAuxInvalid = 0.40F;
+constexpr float kPenaltyGodanTaTeAuxInvalid = scale::kModerate + scale::kTrivial * 2;  // 0.40F
 
 // Suru verb with onbin-like stem (shouldn't have onbin)
 // Suru verbs conjugate regularly without onbin: 勉強した, not *勉強っ+た
-constexpr float kPenaltySuruOnbinStemInvalid = 0.50F;
+constexpr float kPenaltySuruOnbinStemInvalid = scale::kStrong + scale::kTrivial;  // 0.50F
 
 }  // namespace suzume::grammar::inflection
 

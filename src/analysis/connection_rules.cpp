@@ -50,206 +50,109 @@ bool endsWithSou(std::string_view surface) {
 // Main Rule Evaluation Function
 // =============================================================================
 
+namespace {
+
+// Helper to accumulate rule results
+inline void accumulateRule(ConnectionRuleResult& accumulated,
+                           const ConnectionRuleResult& single) {
+  if (single.pattern != ConnectionPattern::None) {
+    accumulated.adjustment += single.adjustment;
+    accumulated.matched_count++;
+    // Keep first matched pattern for single-match case, otherwise Accumulated
+    if (accumulated.pattern == ConnectionPattern::None) {
+      accumulated.pattern = single.pattern;
+      accumulated.description = single.description;
+    } else if (accumulated.matched_count > 1) {
+      accumulated.pattern = ConnectionPattern::Accumulated;
+      accumulated.description = "Multiple rules matched";
+    }
+  }
+}
+
+}  // namespace
+
 ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
                                              const core::LatticeEdge& next,
                                              const ConnectionOptions& opts) {
-  // Evaluate all rules in order
-  // Currently returns the first matching rule for simplicity
-  // Future: could accumulate all adjustments
+  // Evaluate ALL rules and accumulate adjustments
+  // Multiple rules can apply simultaneously
 
   using namespace connection_rules;
-  ConnectionRuleResult result;
+  ConnectionRuleResult accumulated;
 
   // Verb conjugation rules
-  result = checkCopulaAfterVerb(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkIchidanRenyokeiTe(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkTeFormSplit(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkTaiAfterRenyokei(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkYasuiAfterRenyokei(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkNagaraSplit(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkSouAfterRenyokei(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkCopulaAfterVerb(prev, next, opts));
+  accumulateRule(accumulated, checkIchidanRenyokeiTe(prev, next, opts));
+  accumulateRule(accumulated, checkTeFormSplit(prev, next, opts));
+  accumulateRule(accumulated, checkTaiAfterRenyokei(prev, next, opts));
+  accumulateRule(accumulated, checkYasuiAfterRenyokei(prev, next, opts));
+  accumulateRule(accumulated, checkNagaraSplit(prev, next, opts));
+  accumulateRule(accumulated, checkSouAfterRenyokei(prev, next, opts));
 
   // Other rules
-  result = checkCharacterSpeechSplit(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkAdjKuNaru(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkCharacterSpeechSplit(prev, next, opts));
+  accumulateRule(accumulated, checkAdjKuNaru(prev, next, opts));
 
   // Verb rules (continued)
-  result = checkCompoundAuxAfterRenyokei(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkTakuteAfterRenyokei(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkTakuTeSplit(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkTokuContractionSplit(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkCompoundAuxAfterRenyokei(prev, next, opts));
+  accumulateRule(accumulated, checkTakuteAfterRenyokei(prev, next, opts));
+  accumulateRule(accumulated, checkTakuTeSplit(prev, next, opts));
+  accumulateRule(accumulated, checkTokuContractionSplit(prev, next, opts));
 
   // Auxiliary rules
-  result = checkMasenDeSplit(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkMasenDeSplit(prev, next, opts));
 
   // Other rules
-  result = checkYoruNightAfterNi(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkYoruNightAfterNi(prev, next, opts));
 
   // Verb rules
-  result = checkConditionalVerbToVerb(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkVerbRenyokeiCompoundAux(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkConditionalVerbToVerb(prev, next, opts));
+  accumulateRule(accumulated, checkVerbRenyokeiCompoundAux(prev, next, opts));
 
   // Auxiliary rules
-  result = checkIruAuxAfterNoun(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkIruAuxAfterTeForm(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkIruAuxAfterNoun(prev, next, opts));
+  accumulateRule(accumulated, checkIruAuxAfterTeForm(prev, next, opts));
 
   // Verb rules
-  result = checkTeFormVerbToVerb(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkRashiiAfterPredicate(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkVerbToCaseParticle(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkTeFormVerbToVerb(prev, next, opts));
+  accumulateRule(accumulated, checkRashiiAfterPredicate(prev, next, opts));
+  accumulateRule(accumulated, checkVerbToCaseParticle(prev, next, opts));
 
   // Other rules
-  result = checkFormalNounBeforeKanji(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkHiraganaNounStartsWithParticle(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkSameParticleRepeated(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkPrefixToShortStemHiraganaAdj(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkSuffixAfterSymbol(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkFormalNounBeforeKanji(prev, next, opts));
+  accumulateRule(accumulated, checkHiraganaNounStartsWithParticle(prev, next, opts));
+  accumulateRule(accumulated, checkSameParticleRepeated(prev, next, opts));
+  accumulateRule(accumulated, checkPrefixToShortStemHiraganaAdj(prev, next, opts));
+  accumulateRule(accumulated, checkSuffixAfterSymbol(prev, next, opts));
 
   // Verb rules
-  result = checkPrefixBeforeVerb(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkPrefixBeforeVerb(prev, next, opts));
 
   // Auxiliary rules
-  result = checkNounBeforeVerbAux(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkMaiAfterNoun(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkAuxAfterParticle(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
-
-  result = checkInvalidTeFormAux(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkNounBeforeVerbAux(prev, next, opts));
+  accumulateRule(accumulated, checkMaiAfterNoun(prev, next, opts));
+  accumulateRule(accumulated, checkAuxAfterParticle(prev, next, opts));
+  accumulateRule(accumulated, checkInvalidTeFormAux(prev, next, opts));
 
   // Other rules
-  result = checkParticleBeforeHiraganaOther(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkParticleBeforeHiraganaOther(prev, next, opts));
 
   // Auxiliary rules
-  result = checkMitaiAfterNounOrVerb(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
-  }
+  accumulateRule(accumulated, checkMitaiAfterNounOrVerb(prev, next, opts));
 
   // Particle rules
-  result = checkShiParticleConnection(prev, next, opts);
-  if (result.pattern != ConnectionPattern::None) {
-    return result;
+  accumulateRule(accumulated, checkShiParticleConnection(prev, next, opts));
+
+  // Clamp accumulated adjustment to prevent extreme values
+  if (accumulated.matched_count > 0) {
+    if (accumulated.adjustment < ConnectionRuleResult::kMinAdjustment) {
+      accumulated.adjustment = ConnectionRuleResult::kMinAdjustment;
+    } else if (accumulated.adjustment > ConnectionRuleResult::kMaxAdjustment) {
+      accumulated.adjustment = ConnectionRuleResult::kMaxAdjustment;
+    }
   }
 
-  return {};  // No pattern matched
+  return accumulated;
 }
 
 }  // namespace suzume::analysis

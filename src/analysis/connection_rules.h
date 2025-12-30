@@ -76,6 +76,7 @@ bool endsWithSou(std::string_view surface);
  */
 enum class ConnectionPattern {
   None,                    // No special pattern matched
+  Accumulated,             // Multiple rules matched (cumulative result)
   CopulaAfterVerb,         // VERB → だ/です (invalid unless そう pattern)
   IchidanRenyokeiTe,       // 一段連用形 → て/てV
   TeFormSplit,             // 音便形/一段形 → て/で (split should be avoided)
@@ -115,11 +116,20 @@ enum class ConnectionPattern {
 
 /**
  * @brief Result of connection rule evaluation
+ *
+ * When multiple rules apply, adjustment contains the clamped sum of all
+ * individual adjustments. The matched_count field tracks how many rules
+ * contributed to the final adjustment.
  */
 struct ConnectionRuleResult {
   ConnectionPattern pattern{ConnectionPattern::None};
   float adjustment{0.0F};        // Positive = penalty, negative = bonus
   const char* description{nullptr};
+  int matched_count{0};          // Number of rules that contributed
+
+  // Accumulation limits (prevents extreme penalty stacking)
+  static constexpr float kMinAdjustment = -3.0F;  // Maximum bonus
+  static constexpr float kMaxAdjustment = 5.0F;   // Maximum penalty
 };
 
 // =============================================================================

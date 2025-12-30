@@ -39,6 +39,29 @@
 namespace suzume::analysis::scorer {
 
 // =============================================================================
+// Score Scale Constants
+// =============================================================================
+// Formal scale definitions for consistent penalty/bonus magnitude.
+// All penalty/bonus constants should reference these scale values.
+namespace scale {
+
+// Penalty scale (positive values - higher discourages pattern)
+constexpr float kTrivial = 0.2F;      // Almost no impact
+constexpr float kMinor = 0.5F;        // Slight unnaturalness
+constexpr float kModerate = 1.0F;     // Moderate penalty
+constexpr float kStrong = 1.5F;       // Strong grammatical violation
+constexpr float kSevere = 2.5F;       // Severe violation
+constexpr float kProhibitive = 3.5F;  // Near prohibition
+
+// Bonus scale (negative values - lower encourages pattern)
+constexpr float kSlightBonus = -0.2F;
+constexpr float kModerateBonus = -0.5F;
+constexpr float kStrongBonus = -1.0F;
+constexpr float kVeryStrongBonus = -1.5F;
+
+}  // namespace scale
+
+// =============================================================================
 // Edge Costs (Unigram penalties for invalid patterns)
 // =============================================================================
 
@@ -48,29 +71,29 @@ namespace suzume::analysis::scorer {
 
 // Unknown adjective ending with そう but invalid lemma
 // Valid: おいしそう (lemma おいしい), Invalid: 食べそう (lemma 食べい)
-constexpr float kPenaltyInvalidAdjSou = 1.5F;
+constexpr float kPenaltyInvalidAdjSou = scale::kStrong;
 
 // Unknown adjective with たい pattern where stem is invalid
 // E.g., りたかった is invalid (り is not a valid verb stem)
-constexpr float kPenaltyInvalidTaiPattern = 2.0F;
+constexpr float kPenaltyInvalidTaiPattern = scale::kStrong + scale::kMinor;  // 2.0
 
 // Unknown adjective containing verb+auxiliary patterns
 // E.g., 食べすぎてしまい should be verb+しまう, not adjective
-constexpr float kPenaltyVerbAuxInAdj = 2.0F;
+constexpr float kPenaltyVerbAuxInAdj = scale::kStrong + scale::kMinor;  // 2.0
 
 // しまい/じまい parsed as adjective (should be しまう renyokei)
-constexpr float kPenaltyShimaiAsAdj = 3.0F;
+constexpr float kPenaltyShimaiAsAdj = scale::kSevere + scale::kMinor;  // 3.0
 
 // Adjective lemma containing verb onbin + contraction patterns (んどい, んとい)
 // E.g., 読んどい from 読んどく - invalid adjective, should be verb とく contraction
-constexpr float kPenaltyVerbOnbinAsAdj = 2.0F;
+constexpr float kPenaltyVerbOnbinAsAdj = scale::kStrong + scale::kMinor;  // 2.0
 
 // Short-stem pure hiragana unknown adjective penalty
 // Valid short hiragana adjectives (すごい, うまい, やばい) are in dictionary
 // Unknown short-stem (≤2 chars) hiragana adjectives are likely misanalysis
 // E.g., いしい (stem いし = 2 chars) from お+いしい is not a real adjective
 // But おいしい (stem おいし = 3 chars) should not be penalized
-constexpr float kPenaltyShortStemHiraganaAdj = 3.0F;
+constexpr float kPenaltyShortStemHiraganaAdj = scale::kSevere + scale::kMinor;  // 3.0
 
 // =============================================================================
 // Connection Costs (Bigram penalties/bonuses)
@@ -78,75 +101,75 @@ constexpr float kPenaltyShortStemHiraganaAdj = 3.0F;
 
 // Copula (だ/です) after verb without そう pattern
 // This is grammatically invalid in most cases
-constexpr float kPenaltyCopulaAfterVerb = 3.0F;
+constexpr float kPenaltyCopulaAfterVerb = scale::kSevere + scale::kMinor;  // 3.0
 
 // Ichidan renyokei + て/てV split (should be te-form)
 // E.g., 教え + て should be 教えて
-constexpr float kPenaltyIchidanRenyokeiTe = 1.5F;
+constexpr float kPenaltyIchidanRenyokeiTe = scale::kStrong;
 
 // たい adjective after verb renyokei - this is valid
-// E.g., 食べたい, 読みたい
+// E.g., 食べたい, 読みたい (positive value subtracted as bonus)
 constexpr float kBonusTaiAfterRenyokei = 0.8F;
 
 // 安い (やすい) interpreted as cheap after renyokei-like noun
 // Should be verb + やすい (easy to do)
-constexpr float kPenaltyYasuiAfterRenyokei = 2.0F;
+constexpr float kPenaltyYasuiAfterRenyokei = scale::kStrong + scale::kMinor;  // 2.0
 
 // VERB + ながら split when verb is in renyokei
 // Should be single token like 飲みながら
-constexpr float kPenaltyNagaraSplit = 1.0F;
+constexpr float kPenaltyNagaraSplit = scale::kModerate;
 
 // NOUN + そう when noun looks like verb renyokei
 // Should be verb renyokei + そう auxiliary
-constexpr float kPenaltySouAfterRenyokei = 0.5F;
+constexpr float kPenaltySouAfterRenyokei = scale::kMinor;
 
 // AUX だ/です + character speech suffix split
 // E.g., だ + にゃ should be だにゃ (single token)
-constexpr float kPenaltyCharacterSpeechSplit = 1.0F;
+constexpr float kPenaltyCharacterSpeechSplit = scale::kModerate;
 
 // ADJ(連用形・く) + VERB(なる) pattern
-// E.g., 美しく + なる - very common grammatical pattern
-constexpr float kBonusAdjKuNaru = 0.5F;
+// E.g., 美しく + なる - very common grammatical pattern (positive value subtracted)
+constexpr float kBonusAdjKuNaru = scale::kMinor;
 
 // Compound verb auxiliary after renyokei-like noun
 // E.g., 読み + 終わる should be verb renyokei + auxiliary
-constexpr float kPenaltyCompoundAuxAfterRenyokei = 0.5F;
+constexpr float kPenaltyCompoundAuxAfterRenyokei = scale::kMinor;
 
 // Unknown adjective with lemma ending in ない where stem looks like verb mizenkei
 // E.g., 走らなければ with lemma 走らない is likely verb+aux, not true adjective
 // True adjectives: 少ない, 危ない (stem doesn't end in あ段)
 // Verb patterns: 走らない, 書かない (stem ends in あ段 = verb mizenkei)
-constexpr float kPenaltyVerbNaiPattern = 1.5F;
+constexpr float kPenaltyVerbNaiPattern = scale::kStrong;
 
 // Noun/Verb + て/で split when prev ends with Godan onbin or Ichidan ending
 // E.g., 書い + て should be 書いて (te-form), not split
 // E.g., 教え + て should be 教えて (te-form), not split
-constexpr float kPenaltyTeFormSplit = 1.5F;
+constexpr float kPenaltyTeFormSplit = scale::kStrong;
 
 // VERB + て split when verb ends with たく (desire adverbial form)
 // E.g., 食べたく + て should be 食べたくて (single token)
 // This prevents splitting たくて into たく + て
-constexpr float kPenaltyTakuTeSplit = 2.0F;
+constexpr float kPenaltyTakuTeSplit = scale::kStrong + scale::kMinor;  // 2.0
 
 // VERB renyokei + たくて (ADJ) split
 // E.g., 飲み + たくて should be 飲みたくて (single token)
 // This prevents splitting at the boundary before たくて
-constexpr float kPenaltyTakuteAfterRenyokei = 1.5F;
+constexpr float kPenaltyTakuteAfterRenyokei = scale::kStrong;
 
 // AUX + たい adjective pattern
 // E.g., なり(AUX, だ) + たかった is unnatural
 // Should be なり(VERB, なる) + たかった
-constexpr float kPenaltyTaiAfterAux = 1.0F;
+constexpr float kPenaltyTaiAfterAux = scale::kModerate;
 
 // AUX(ません形) + で(PARTICLE) split
 // E.g., ございません + で + した should be ございません + でした
 // The で after negative polite forms is part of でした (copula past), not a particle
-constexpr float kPenaltyMasenDeSplit = 2.0F;
+constexpr float kPenaltyMasenDeSplit = scale::kStrong + scale::kMinor;  // 2.0
 
 // に (PARTICLE) + よる (NOUN, lemma 夜) split
 // When followed by と, should prefer compound particle によると
 // E.g., 報告によると should use compound particle, not に + 夜 + と
-constexpr float kPenaltyYoruNightAfterNi = 1.5F;
+constexpr float kPenaltyYoruNightAfterNi = scale::kStrong;
 
 // Conditional verb (ending with ば) + result verb
 // E.g., あれば + 手伝います - very common grammatical pattern
@@ -157,21 +180,21 @@ constexpr float kBonusConditionalVerbToVerb = 0.7F;
 // E.g., 読み + 終わる, 書き + 始める, 走り + 続ける
 // Offsets the VERB→VERB base cost (0.8) for compound verb patterns
 // Must be >= 0.8 to make VERB→VERB cheaper than NOUN→NOUN (0.0)
-constexpr float kBonusVerbRenyokeiCompoundAux = 1.0F;
+constexpr float kBonusVerbRenyokeiCompoundAux = scale::kModerate;
 
 // Verb renyokei + と (PARTICLE) pattern
 // E.g., 食べ + と is likely part of 食べといた/食べとく contraction
 // This split should be penalized to prefer the single token interpretation
-constexpr float kPenaltyTokuContractionSplit = 1.5F;
+constexpr float kPenaltyTokuContractionSplit = scale::kStrong;
 
 // NOUN + いる/います/いません (AUX) penalty
 // いる auxiliary should only follow te-form verbs (食べている), not nouns
 // E.g., 手伝 + います should be 手伝います (single verb), not noun + aux
-constexpr float kPenaltyIruAuxAfterNoun = 2.0F;
+constexpr float kPenaltyIruAuxAfterNoun = scale::kStrong + scale::kMinor;  // 2.0
 
 // Te-form VERB + いる/います/いません (AUX) bonus
 // E.g., 食べて + いる, 走って + います - progressive aspect pattern
-constexpr float kBonusIruAuxAfterTeForm = 0.5F;
+constexpr float kBonusIruAuxAfterTeForm = scale::kMinor;
 
 // Te-form VERB + VERB bonus
 // E.g., 関して + 報告する, 調べて + わかる - te-form continuation pattern
@@ -180,20 +203,20 @@ constexpr float kBonusTeFormVerbToVerb = 0.8F;
 
 // Suffix at sentence start penalty
 // Suffix should only follow nouns/pronouns, not appear at sentence start
-constexpr float kPenaltySuffixAtStart = 3.0F;
+constexpr float kPenaltySuffixAtStart = scale::kSevere + scale::kMinor;  // 3.0
 
 // Suffix after punctuation/symbol penalty
 // After 、。etc., a word is unlikely to be a suffix (e.g., 、家 should be NOUN)
-constexpr float kPenaltySuffixAfterSymbol = 1.0F;
+constexpr float kPenaltySuffixAfterSymbol = scale::kModerate;
 
 // Prefix before verb/auxiliary penalty
 // Prefixes should attach to nouns/suffixes, not verbs (e.g., 何してる - 何 is PRON)
-constexpr float kPenaltyPrefixBeforeVerb = 2.0F;
+constexpr float kPenaltyPrefixBeforeVerb = scale::kStrong + scale::kMinor;  // 2.0
 
 // Noun before verb-specific auxiliary penalty
 // Verb auxiliaries (ます/ましょう/たい/ない) require verb stem, not nouns
 // E.g., 行き(NOUN) + ましょう is invalid - should be 行き(VERB) + ましょう
-constexpr float kPenaltyNounBeforeVerbAux = 2.0F;
+constexpr float kPenaltyNounBeforeVerbAux = scale::kStrong + scale::kMinor;  // 2.0
 
 // =============================================================================
 // Auxiliary Connection Rules (extracted from inline literals)
@@ -201,27 +224,29 @@ constexpr float kPenaltyNounBeforeVerbAux = 2.0F;
 
 // Invalid single-char aux (る) after te-form
 // E.g., して + る should be してる (contraction), not split
+// NOTE: Exceeds normal scale (5.0F) - review in P7-1
 constexpr float kPenaltyInvalidSingleCharAux = 5.0F;
 
 // Te-form + た (likely contracted -ていた form)
 // E.g., 見て + た should be 見てた (見ていた contraction)
-constexpr float kPenaltyTeFormTaContraction = 1.5F;
+constexpr float kPenaltyTeFormTaContraction = scale::kStrong;
 
 // NOUN + まい (negative conjecture) penalty
 // まい attaches to verb stems, not nouns
-constexpr float kPenaltyNounMai = 1.5F;
+constexpr float kPenaltyNounMai = scale::kStrong;
 
 // Short/unknown aux after particle
 // PARTICLE + short AUX is grammatically invalid
-constexpr float kPenaltyShortAuxAfterParticle = 3.0F;
+constexpr float kPenaltyShortAuxAfterParticle = scale::kSevere + scale::kMinor;  // 3.0
 
 // NOUN + みたい (resemblance pattern) bonus
 // E.g., 猫みたい (like a cat) - very common pattern
-constexpr float kBonusNounMitai = 3.0F;
+// NOTE: Large bonus (3.0F) - consider review
+constexpr float kBonusNounMitai = scale::kSevere + scale::kMinor;  // 3.0
 
 // VERB + みたい (hearsay/appearance) bonus
 // E.g., 食べるみたい (seems like eating)
-constexpr float kBonusVerbMitai = 1.0F;
+constexpr float kBonusVerbMitai = scale::kModerate;
 
 // =============================================================================
 // Other Connection Rules (extracted from inline literals)
@@ -229,38 +254,38 @@ constexpr float kBonusVerbMitai = 1.0F;
 
 // Formal noun + kanji penalty
 // E.g., 所 + 在する should be 所在する (compound)
-constexpr float kPenaltyFormalNounBeforeKanji = 3.0F;
+constexpr float kPenaltyFormalNounBeforeKanji = scale::kSevere + scale::kMinor;  // 3.0
 
 // Same particle repeated penalty
 // E.g., も + も is grammatically rare
-constexpr float kPenaltySameParticleRepeated = 2.0F;
+constexpr float kPenaltySameParticleRepeated = scale::kStrong + scale::kMinor;  // 2.0
 
 // Hiragana noun starts with particle char penalty
 // E.g., もも after NOUN should prefer も(PARTICLE) + もも
-constexpr float kPenaltyHiraganaNounStartsWithParticle = 1.5F;
+constexpr float kPenaltyHiraganaNounStartsWithParticle = scale::kStrong;
 
 // Particle before hiragana OTHER penalty (single char)
 // E.g., と + う in とうきょう split
-constexpr float kPenaltyParticleBeforeSingleHiraganaOther = 2.5F;
+constexpr float kPenaltyParticleBeforeSingleHiraganaOther = scale::kSevere;
 
 // Particle before hiragana OTHER penalty (multi char)
-constexpr float kPenaltyParticleBeforeMultiHiraganaOther = 1.0F;
+constexpr float kPenaltyParticleBeforeMultiHiraganaOther = scale::kModerate;
 
 // し particle after i-adjective (valid pattern)
-// E.g., 上手いし, 高いし
-constexpr float kBonusShiAfterIAdj = 0.5F;
+// E.g., 上手いし, 高いし (positive value subtracted)
+constexpr float kBonusShiAfterIAdj = scale::kMinor;
 
 // し particle after verb (valid pattern)
-// E.g., 食べるし, 行くし
+// E.g., 食べるし, 行くし (positive value subtracted)
 constexpr float kBonusShiAfterVerb = 0.3F;
 
 // し particle after auxiliary (valid pattern)
-// E.g., だし, ないし, たし
+// E.g., だし, ないし, たし (positive value subtracted)
 constexpr float kBonusShiAfterAux = 0.3F;
 
 // し particle after noun (invalid, needs copula)
 // E.g., 本し should be 本だし
-constexpr float kPenaltyShiAfterNoun = 1.5F;
+constexpr float kPenaltyShiAfterNoun = scale::kStrong;
 
 // らしい (conjecture) after verb/adjective (valid pattern)
 // E.g., 帰るらしい, 美しいらしい
@@ -268,7 +293,7 @@ constexpr float kPenaltyShiAfterNoun = 1.5F;
 constexpr float kBonusRashiiAfterPredicate = 0.8F;
 
 // Verb ending with たいらしい should be split (帰りたいらしい → 帰りたい + らしい)
-constexpr float kPenaltyVerbTaiRashii = 0.5F;
+constexpr float kPenaltyVerbTaiRashii = scale::kMinor;
 
 // =============================================================================
 // Pattern String Constants

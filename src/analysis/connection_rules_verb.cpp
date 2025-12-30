@@ -87,6 +87,7 @@ ConnectionRuleResult checkIchidanRenyokeiTe(const core::LatticeEdge& prev,
 }
 
 // Rule 3: Te-form split (音便形 or 一段形 → て/で)
+// NOTE: Excludes VERB + e-row + "て" which is handled by checkIchidanRenyokeiTe
 ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
                                       const core::LatticeEdge& next,
                                       const ConnectionOptions& opts) {
@@ -107,8 +108,16 @@ ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
   //   - いたす → いたして (renyokei: し + て)
   // Ichidan te-form patterns:
   //   - 食べる → 食べて (e-row ending)
-  if (!endsWithOnbinMarker(prev.surface) && !endsWithERow(prev.surface) &&
-      !endsWithIRow(prev.surface)) {
+  bool has_onbin = endsWithOnbinMarker(prev.surface);
+  bool has_erow = endsWithERow(prev.surface);
+  bool has_irow = endsWithIRow(prev.surface);
+
+  if (!has_onbin && !has_erow && !has_irow) {
+    return {};
+  }
+
+  // Skip VERB + e-row + "て" - already handled by checkIchidanRenyokeiTe
+  if (prev.pos == core::PartOfSpeech::Verb && has_erow && next.surface == "て") {
     return {};
   }
 
