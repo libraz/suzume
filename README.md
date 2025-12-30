@@ -2,38 +2,41 @@
 
 **Japanese Tokenizer That Actually Works in the Browser**
 
-Tired of MeCab's 50MB dictionary? Suzume brings lightweight Japanese tokenization to the frontend — under 250KB gzipped, no server required.
+No more 50MB dictionary files. Lightweight Japanese tokenization under 250KB — runs entirely in the browser, no server required.
 
-> **Suzume is not a dictionary-based morphological analyzer.**
-> It is a lightweight, feature-driven tokenizer designed for real-world Japanese text on the web.
+> **Suzume is a feature-driven tokenizer** designed for real-world Japanese text on the web.
+> The best of both worlds: lightweight footprint meets practical accuracy.
 
 📖 **[Documentation](https://suzume.libraz.net)** · 🎮 **[Live Demo](https://suzume.libraz.net/#demo)**
 
 ## Why Suzume?
 
-| | MeCab / Sudachi | Suzume |
-|---|-----------------|--------|
-| **Design Goal** | Linguistic accuracy | Frontend stability |
-| **Size** | 50MB+ dictionary | < 250KB gzipped |
-| **Runtime** | Server-side | Browser + Node.js + Native |
-| **Unknown Words** | May break | Robust by design |
+| Feature | Traditional Analyzers | Suzume |
+|---------|----------------------|--------|
+| **Bundle Size** | 20–50MB+ (dictionary) | < 250KB gzipped |
+| **Browser Support** | Limited or none | Full support |
+| **Server Required** | Usually yes | No |
+| **Unknown Words** | May struggle | Robust by design |
+| **POS Tagging** | ✓ | ✓ |
+| **Lemmatization** | ✓ | ✓ |
 
-> Suzume is designed for frontend and edge environments, where large dictionaries and server-side processing are not viable.
+> Designed for frontend and edge environments where large dictionaries and server-side processing are not viable.
 
 ### Key Features
 
 - 🚫 **No Dictionary Hell** — Forget about managing 50MB+ dictionary files
-- 🖥️ **True Client-Side** — Runs 100% in the browser, no API calls
-- 🔮 **Robust to Unknown Words** — Designed to not break on new or noisy input
-- ⚡ **Production Ready** — C++ compiled to WASM, TypeScript support
+- 🖥️ **True Client-Side** — Runs 100% in the browser, no API calls, no CORS headaches
+- 🔮 **Robust to Unknown Words** — Brand names, slang, technical terms — stable tokenization every time
+- ⚡ **Production Ready** — C++ compiled to WASM, TypeScript support, works everywhere
 
-## What Suzume is NOT
+## When to Use Suzume
 
-- Not a full morphological analyzer like MeCab or Sudachi
-- Not a replacement for dictionary-based NLP pipelines
-- Not designed for deep linguistic or grammatical analysis
+Suzume is ideal for:
+- **Frontend applications** that need client-side Japanese processing
+- **Edge/serverless environments** with size constraints
+- **User-generated content** where unknown words are common
 
-If you need academic-grade linguistic analysis, use MeCab or Sudachi. Suzume is for when you need **stable tokenization in constrained environments**.
+For deep linguistic research or corpus analysis where dictionary coverage is critical, traditional server-side analyzers may be more appropriate.
 
 ## Installation
 
