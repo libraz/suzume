@@ -262,6 +262,14 @@ constexpr float kBonusShiAfterAux = 0.3F;
 // E.g., 本し should be 本だし
 constexpr float kPenaltyShiAfterNoun = 1.5F;
 
+// らしい (conjecture) after verb/adjective (valid pattern)
+// E.g., 帰るらしい, 美しいらしい
+// Offset VERB/ADJ→ADJ base cost (0.8) to encourage proper split
+constexpr float kBonusRashiiAfterPredicate = 0.8F;
+
+// Verb ending with たいらしい should be split (帰りたいらしい → 帰りたい + らしい)
+constexpr float kPenaltyVerbTaiRashii = 0.5F;
+
 }  // namespace suzume::analysis::scorer
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONSTANTS_H_

@@ -167,6 +167,11 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
     return result;
   }
 
+  result = checkRashiiAfterPredicate(prev, next);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
   // Other rules
   result = checkFormalNounBeforeKanji(prev, next);
   if (result.pattern != ConnectionPattern::None) {

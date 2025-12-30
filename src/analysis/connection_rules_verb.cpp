@@ -377,5 +377,32 @@ ConnectionRuleResult checkTokuContractionSplit(const core::LatticeEdge& prev,
           scorer::kPenaltyTokuContractionSplit, "toku contraction split"};
 }
 
+// Rule: VERB/ADJ → らしい (ADJ) bonus
+// Conjecture auxiliary pattern: 帰るらしい, 美しいらしい
+// This offsets the high VERB/ADJ→ADJ base cost (0.8) for valid rashii patterns
+// Note: Does not apply to NOUN→らしい (男らしい should stay as single token)
+ConnectionRuleResult checkRashiiAfterPredicate(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next) {
+  // Only VERB/ADJ → ADJ pattern
+  if (next.pos != core::PartOfSpeech::Adjective) return {};
+  if (prev.pos != core::PartOfSpeech::Verb &&
+      prev.pos != core::PartOfSpeech::Adjective) {
+    return {};
+  }
+
+  // Check if next is らしい or its conjugated forms
+  if (next.surface != "らしい" && next.surface != "らしかった" &&
+      next.surface != "らしく" && next.surface != "らしくて" &&
+      next.surface != "らしければ" && next.surface != "らしくない" &&
+      next.surface != "らしくなかった") {
+    return {};
+  }
+
+  // Bonus (negative value) for conjecture auxiliary pattern
+  return {ConnectionPattern::RashiiAfterPredicate,
+          -scorer::kBonusRashiiAfterPredicate,
+          "rashii conjecture after verb/adj"};
+}
+
 }  // namespace connection_rules
 }  // namespace suzume::analysis

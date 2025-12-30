@@ -4,6 +4,8 @@
 
 #include "core/utf8_constants.h"
 #include "grammar/conjugation.h"
+#include "normalize/char_type.h"
+#include "normalize/utf8.h"
 
 namespace suzume::postprocess {
 
@@ -338,6 +340,31 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   // If lemma is already set and different from surface, use it
   // (lemma == surface means it's a default that may need re-derivation)
   if (!morpheme.lemma.empty() && morpheme.lemma != morpheme.surface) {
+    // Special fix for katakana + すぎる patterns
+    // The inflection analyzer incorrectly derives lemma like ワンパターンる
+    // when the correct form is ワンパターンすぎる
+    std::string_view surface = morpheme.surface;
+    std::string_view lemma = morpheme.lemma;
+    if (surface.size() >= core::kThreeJapaneseCharBytes &&
+        lemma.size() >= core::kJapaneseCharBytes) {
+      std::string_view surface_ending = surface.substr(surface.size() - core::kThreeJapaneseCharBytes);
+      bool has_sugiru_aux = (surface_ending == "すぎる" || surface_ending == "すぎた" || surface_ending == "すぎて");
+      std::string_view lemma_ending = lemma.substr(lemma.size() - core::kJapaneseCharBytes);
+      // Check if lemma ends with just る but surface ends with すぎる
+      // E.g., surface=ワンパターンすぎる, lemma=ワンパターンる (incorrect)
+      if (has_sugiru_aux && lemma_ending == "る" && lemma.size() < surface.size()) {
+        // Check if the stem (lemma minus る) is katakana
+        std::string stem(lemma.substr(0, lemma.size() - core::kJapaneseCharBytes));
+        if (!stem.empty()) {
+          auto codepoints = normalize::toCodepoints(stem);
+          if (!codepoints.empty() &&
+              normalize::classifyChar(codepoints[0]) == normalize::CharType::Katakana) {
+            // Correct the lemma: stem + すぎる
+            return stem + "すぎる";
+          }
+        }
+      }
+    }
     return morpheme.lemma;
   }
 

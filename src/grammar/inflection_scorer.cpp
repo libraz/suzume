@@ -615,6 +615,18 @@ float calculateConfidence(VerbType type, std::string_view stem,
     logConfidenceAdjustment(-inflection::kPenaltyIAdjERowStem, "i_adj_e_row_stem");
   }
 
+  // I-adjective stems ending with "るらし" or "いらし" are likely verb/adj + rashii pattern
+  // E.g., 帰るらし + い → should be 帰る + らしい (conjecture auxiliary)
+  // E.g., 帰りたいらし + い → should be 帰りたい + らしい
+  // This penalty helps split the compound correctly
+  if (type == VerbType::IAdjective && stem_len >= core::kThreeJapaneseCharBytes) {
+    std::string_view last9 = stem.substr(stem_len - core::kThreeJapaneseCharBytes);
+    if (last9 == "るらし" || last9 == "いらし") {
+      base -= inflection::kPenaltyIAdjVerbRashiiPattern;
+      logConfidenceAdjustment(-inflection::kPenaltyIAdjVerbRashiiPattern, "i_adj_verb_rashii_pattern");
+    }
+  }
+
   // I-adjective stems ending with "づ" are invalid
   // "づ" endings are verb onbin patterns (基づ + いて → 基づいて from 基づく)
   // No real i-adjective has a stem ending in づ

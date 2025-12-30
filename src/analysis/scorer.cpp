@@ -328,6 +328,20 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     }
   }
 
+  // Penalize unknown verbs ending with たいらしい - these should be split
+  // E.g., 帰りたいらしい should be 帰りたい + らしい, not a single verb
+  // This pattern indicates verb+たい+らしい compound that should be tokenized
+  if (edge.pos == core::PartOfSpeech::Verb &&
+      !edge.fromDictionary() &&
+      edge.surface.size() >= core::kFiveJapaneseCharBytes) {
+    std::string_view surface = edge.surface;
+    std::string_view last15 = surface.substr(surface.size() - core::kFiveJapaneseCharBytes);
+    if (last15 == "たいらしい") {
+      cost += scorer::kPenaltyVerbTaiRashii;
+      logAdjustment(scorer::kPenaltyVerbTaiRashii, "verb_tai_rashii_split");
+    }
+  }
+
   // Note: Short-stem hiragana adjective penalty moved to connectionCost
   // It only applies after PREFIX (e.g., お+いしい) not standalone (e.g., まずい)
 

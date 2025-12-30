@@ -690,6 +690,72 @@
         {"surface": "出来ない", "pos": "Verb", "lemma": "出来る"}
       ],
       "tags": ["regression", "verb", "ichidan", "lemma"]
+    },
+    {
+      "id": "katakana_sugiru_pattern",
+      "description": "ワンパターンすぎる should have lemma ワンパターンすぎる, not ワンパターンる",
+      "input": "ワンパターンすぎる",
+      "expected": [
+        {"surface": "ワンパターンすぎる", "pos": "Verb", "lemma": "ワンパターンすぎる"}
+      ],
+      "tags": ["regression", "verb", "katakana", "sugiru", "lemma"]
+    },
+    {
+      "id": "katakana_sugiru_simple",
+      "description": "シンプルすぎる should have lemma シンプルすぎる, not シンプルる",
+      "input": "シンプルすぎる",
+      "expected": [
+        {"surface": "シンプルすぎる", "pos": "Verb", "lemma": "シンプルすぎる"}
+      ],
+      "tags": ["regression", "verb", "katakana", "sugiru", "lemma"]
+    },
+    {
+      "id": "rashii_conjecture_verb",
+      "description": "帰るらしい should split as verb + らしい (conjecture auxiliary)",
+      "input": "帰るらしい",
+      "expected": [
+        {"surface": "帰る", "pos": "Verb", "lemma": "帰る"},
+        {"surface": "らしい", "pos": "Adjective", "lemma": "らしい"}
+      ],
+      "tags": ["regression", "verb", "rashii", "conjecture"]
+    },
+    {
+      "id": "rashii_conjecture_adj",
+      "description": "美しいらしい should split as adjective + らしい (conjecture auxiliary)",
+      "input": "美しいらしい",
+      "expected": [
+        {"surface": "美しい", "pos": "Adjective", "lemma": "美しい"},
+        {"surface": "らしい", "pos": "Adjective", "lemma": "らしい"}
+      ],
+      "tags": ["regression", "adjective", "rashii", "conjecture"]
+    },
+    {
+      "id": "rashii_suffix_otoko",
+      "description": "男らしい should be single token (suffix pattern, not conjecture)",
+      "input": "男らしい",
+      "expected": [
+        {"surface": "男らしい", "pos": "Adjective", "lemma": "男らしい"}
+      ],
+      "tags": ["regression", "adjective", "rashii", "suffix"]
+    },
+    {
+      "id": "rashii_suffix_haru",
+      "description": "春らしい should be single token (suffix pattern, not conjecture)",
+      "input": "春らしい",
+      "expected": [
+        {"surface": "春らしい", "pos": "Adjective", "lemma": "春らしい"}
+      ],
+      "tags": ["regression", "adjective", "rashii", "suffix"]
+    },
+    {
+      "id": "rashii_tai_verb",
+      "description": "帰りたいらしい should split as verb+たい + らしい",
+      "input": "帰りたいらしい",
+      "expected": [
+        {"surface": "帰りたい", "pos": "Verb", "lemma": "帰る"},
+        {"surface": "らしい", "pos": "Adjective", "lemma": "らしい"}
+      ],
+      "tags": ["regression", "verb", "rashii", "tai", "conjecture"]
     }
   ]
 }

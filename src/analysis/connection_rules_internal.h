@@ -277,6 +277,9 @@ ConnectionRuleResult checkParticleBeforeHiraganaOther(
 ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
                                                 const core::LatticeEdge& next);
 
+ConnectionRuleResult checkRashiiAfterPredicate(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next);
+
 }  // namespace connection_rules
 }  // namespace suzume::analysis
 

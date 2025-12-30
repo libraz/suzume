@@ -141,6 +141,10 @@ constexpr float kPenaltyIAdjGodanRenyokeiPattern = 0.30F;
 // Single-kanji + な that's NOT a known adjective (少な, 危な)
 constexpr float kPenaltyIAdjVerbNegativeNa = 0.35F;
 
+// Verb shuushikei + らし pattern (帰るらし → 帰るらしい misanalysis)
+// This should be split as 帰る + らしい, not parsed as single i-adjective
+constexpr float kPenaltyIAdjVerbRashiiPattern = 0.50F;
+
 // =============================================================================
 // Onbinkei (音便) Context Validation
 // =============================================================================
