@@ -594,6 +594,7 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"みる", POS::Verb, 2.0F, "みる", false, false, true, CT::Ichidan, ""},
       {"おく", POS::Verb, 2.0F, "おく", false, false, true, CT::GodanKa, ""},
       {"しまう", POS::Verb, 2.0F, "しまう", false, false, true, CT::GodanWa, ""},
+      {"しめる", POS::Verb, 0.4F, "しめる", false, false, false, CT::Ichidan, ""},  // 占める/締める/閉める - prevent し+めた split
 
       // Common verbs with っ-onbin ambiguity
       {"買う", POS::Verb, 1.0F, "買う", false, false, false, CT::GodanWa, ""},
@@ -725,7 +726,7 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"ずっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"さらに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"まさに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"あまり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
+      {"あまり", POS::Adverb, 0.2F, "", false, false, false, CT::None, ""},  // Lower cost to prefer ADV over verb あまる
       {"なかなか", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"ほとんど", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"ちょっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
@@ -1246,6 +1247,10 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
 
       // Other common verbs
       {"引っ越す", POS::Verb, 0.3F, "引っ越す", false, false, false, CT::GodanSa, "ひっこす"},
+
+      // GodanSa verbs easily confused with Suru verbs
+      // These have kanji + し pattern that looks like Suru verb renyokei
+      {"際す", POS::Verb, 0.3F, "際す", false, false, false, CT::GodanSa, "きわす"},
   };
 }
 

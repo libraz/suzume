@@ -143,10 +143,10 @@
     },
     {
       "id": "special_kurikaeshi",
-      "description": "人々が集まる - iteration mark",
+      "description": "人々が集まる - iteration mark should be grouped with kanji",
       "input": "人々が集まる",
       "expected": [
-        {"surface": "人", "pos": "Noun"},
+        {"surface": "人々", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "集まる", "pos": "Verb"}
       ],

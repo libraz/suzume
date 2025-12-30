@@ -331,11 +331,20 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
       looks_like_aux = true;
     }
     // Renyokei + そう/たい/ます
+    // For godan verbs: し,み,き,ぎ,ち,り,い,び (i-row)
+    // For ichidan verbs: べ,め,け,せ,て,ね,れ,え (e-row) - these are verb stems
     bool is_renyokei = (first_hira == U'し' || first_hira == U'み' ||
                         first_hira == U'き' || first_hira == U'ぎ' ||
                         first_hira == U'ち' || first_hira == U'り' ||
                         first_hira == U'い' || first_hira == U'び');
-    if (is_renyokei && (second_hira == U'そ' || second_hira == U'た' ||
+    bool is_ichidan_stem = (first_hira == U'べ' || first_hira == U'め' ||
+                            first_hira == U'け' || first_hira == U'せ' ||
+                            first_hira == U'て' || first_hira == U'ね' ||
+                            first_hira == U'れ' || first_hira == U'え' ||
+                            first_hira == U'げ' || first_hira == U'ぜ' ||
+                            first_hira == U'で' || first_hira == U'へ' ||
+                            first_hira == U'ぺ');
+    if ((is_renyokei || is_ichidan_stem) && (second_hira == U'そ' || second_hira == U'た' ||
                         second_hira == U'ま')) {
       looks_like_aux = true;
     }

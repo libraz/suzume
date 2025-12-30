@@ -39,6 +39,9 @@ constexpr size_t kThreeJapaneseCharBytes = kJapaneseCharBytes * 3;  // 9
 /// Length of four Japanese characters in bytes
 constexpr size_t kFourJapaneseCharBytes = kJapaneseCharBytes * 4;  // 12
 
+/// Length of five Japanese characters in bytes (e.g., "させられる", "させられた")
+constexpr size_t kFiveJapaneseCharBytes = kJapaneseCharBytes * 5;  // 15
+
 // =============================================================================
 // Helper Macros for Common Suffix Checks
 // =============================================================================

@@ -171,7 +171,7 @@
     },
     {
       "id": "complex_late_for_work",
-      "description": "Excuse for being late - suru-verb unified",
+      "description": "Excuse for being late - verb+そう splits (動詞+助動詞 → 分割)",
       "input": "電車が遅れているので遅刻しそうです",
       "expected": [
         {"surface": "電車", "pos": "Noun"},
@@ -179,7 +179,8 @@
         {"surface": "遅れて", "pos": "Verb", "lemma": "遅れる"},
         {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"},
         {"surface": "ので", "pos": "Particle"},
-        {"surface": "遅刻しそう", "pos": "Verb", "lemma": "遅刻する"},
+        {"surface": "遅刻し", "pos": "Verb", "lemma": "遅刻する"},
+        {"surface": "そう", "pos": "Adverb"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["complex", "suru"]

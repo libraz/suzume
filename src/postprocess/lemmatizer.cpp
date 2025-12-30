@@ -219,6 +219,9 @@ bool Lemmatizer::verifyCandidateWithDictionary(
   // Look up the candidate base form in dictionary
   auto results = dict_manager_->lookup(candidate.base_form, 0);
 
+  bool found_verb_or_adj = false;
+  bool type_matches = false;
+
   for (const auto& result : results) {
     if (result.entry == nullptr) {
       continue;
@@ -235,18 +238,28 @@ bool Lemmatizer::verifyCandidateWithDictionary(
       continue;
     }
 
+    // Found a verb/adjective with matching surface
+    found_verb_or_adj = true;
+
     // Verify conjugation type matches
     auto dict_verb_type = grammar::conjTypeToVerbType(result.entry->conj_type);
     if (dict_verb_type == candidate.verb_type) {
-      return true;  // Exact match found
+      type_matches = true;
+      break;  // Exact match found
     }
   }
 
-  return false;
+  // Accept if base_form exists as verb/adjective in dictionary
+  // Type mismatch is acceptable - inflection analysis may have wrong type
+  // but dictionary presence validates the base_form itself
+  // e.g., 見せられた → base="見せる" with wrong type=GodanRa should still
+  // be accepted because 見せる exists as Ichidan verb in dictionary
+  return found_verb_or_adj;
 }
 
 std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
-                                            core::PartOfSpeech pos) const {
+                                            core::PartOfSpeech pos,
+                                            dictionary::ConjugationType conj_type) const {
   // First, check if surface itself is a base form in dictionary
   // (e.g., 差し上げる should return 差し上げる, not 差し上ぐ)
   if (dict_manager_ != nullptr) {
@@ -276,6 +289,21 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
     std::vector<grammar::InflectionCandidate> filtered;
     for (const auto& c : candidates) {
       if (c.verb_type == grammar::VerbType::IAdjective) {
+        filtered.push_back(c);
+      }
+    }
+    if (!filtered.empty()) {
+      candidates = std::move(filtered);
+    }
+  }
+
+  // Filter candidates by conjugation type if specified
+  // This helps when verb_candidates.cpp has determined the correct verb type
+  // e.g., for 話しそう with conj_type=GodanSa, prefer 話す (GodanSa) over 話しい (IAdjective)
+  if (conj_type != dictionary::ConjugationType::None) {
+    std::vector<grammar::InflectionCandidate> filtered;
+    for (const auto& c : candidates) {
+      if (grammar::verbTypeToConjType(c.verb_type) == conj_type) {
         filtered.push_back(c);
       }
     }
@@ -331,8 +359,8 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   }
 
   // Try grammar-based lemmatization for verbs and adjectives
-  // Pass POS to filter candidates appropriately
-  std::string grammar_result = lemmatizeByGrammar(morpheme.surface, morpheme.pos);
+  // Pass POS and conj_type to filter candidates appropriately
+  std::string grammar_result = lemmatizeByGrammar(morpheme.surface, morpheme.pos, morpheme.conj_type);
   // Grammar-based lemmatization is authoritative - use its result even if
   // it equals the surface (which means the surface is already a dictionary form)
   // Only fall back to rule-based if grammar analysis returned empty/failed

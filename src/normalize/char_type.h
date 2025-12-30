@@ -147,6 +147,18 @@ bool isEmojiModifier(char32_t ch);
  */
 bool isRegionalIndicator(char32_t ch);
 
+/**
+ * @brief Check if character is an ideographic iteration mark (踊り字)
+ *
+ * The iteration mark (々, U+3005) repeats the preceding kanji.
+ * It's used in words like 人々, 日々, 堂々, 時々.
+ * When following a kanji, it should be grouped as part of the kanji sequence.
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is the iteration mark
+ */
+bool isIterationMark(char32_t ch);
+
 }  // namespace suzume::normalize
 
 #endif  // SUZUME_NORMALIZE_CHAR_TYPE_H_

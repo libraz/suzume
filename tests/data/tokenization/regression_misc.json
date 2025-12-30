@@ -3,28 +3,31 @@
   "cases": [
     {
       "id": "shisou_lemma",
-      "description": "遅刻しそう - suru-verb unified as single token",
+      "description": "遅刻しそう - suru-verb renyokei + そう (動詞+助動詞 → 分割)",
       "input": "遅刻しそう",
       "expected": [
-        {"surface": "遅刻しそう", "pos": "Verb", "lemma": "遅刻する"}
+        {"surface": "遅刻し", "pos": "Verb", "lemma": "遅刻する"},
+        {"surface": "そう", "pos": "Adverb"}
       ],
       "tags": ["regression", "sou", "verb", "suru"]
     },
     {
       "id": "sou_auxiliary_pattern",
-      "description": "食べそう should have lemma 食べる",
+      "description": "食べそう - verb renyokei + そう (動詞+助動詞 → 分割)",
       "input": "食べそう",
       "expected": [
-        {"surface": "食べそう", "pos": "Verb", "lemma": "食べる"}
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "そう", "pos": "Adverb"}
       ],
       "tags": ["regression", "sou", "verb"]
     },
     {
       "id": "sou_with_desu",
-      "description": "遅刻しそうです - suru-verb + です",
+      "description": "遅刻しそうです - suru-verb renyokei + そう + です",
       "input": "遅刻しそうです",
       "expected": [
-        {"surface": "遅刻しそう", "pos": "Verb", "lemma": "遅刻する"},
+        {"surface": "遅刻し", "pos": "Verb", "lemma": "遅刻する"},
+        {"surface": "そう", "pos": "Adverb"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["regression", "sou", "verb", "suru"]
@@ -230,19 +233,21 @@
     },
     {
       "id": "verb_sou_hashirisou",
-      "description": "走りそう should be single VERB token",
+      "description": "走りそう - verb renyokei + そう (動詞+助動詞 → 分割)",
       "input": "走りそう",
       "expected": [
-        {"surface": "走りそう", "pos": "Verb", "lemma": "走る"}
+        {"surface": "走り", "pos": "Verb", "lemma": "走る"},
+        {"surface": "そう", "pos": "Adverb"}
       ],
       "tags": ["regression", "sou", "verb"]
     },
     {
       "id": "verb_sou_nomisou",
-      "description": "飲みそう should be single VERB token",
+      "description": "飲みそう - verb renyokei + そう (動詞+助動詞 → 分割)",
       "input": "飲みそう",
       "expected": [
-        {"surface": "飲みそう", "pos": "Verb", "lemma": "飲む"}
+        {"surface": "飲み", "pos": "Verb", "lemma": "飲む"},
+        {"surface": "そう", "pos": "Adverb"}
       ],
       "tags": ["regression", "sou", "verb"]
     },
@@ -266,10 +271,11 @@
     },
     {
       "id": "verb_sou_desu",
-      "description": "食べそうです should split correctly",
+      "description": "食べそうです - verb renyokei + そう + です (動詞+助動詞 → 分割)",
       "input": "食べそうです",
       "expected": [
-        {"surface": "食べそう", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "そう", "pos": "Adverb"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["regression", "sou", "verb"]
@@ -534,6 +540,156 @@
         {"surface": "学校", "pos": "Noun"}
       ],
       "tags": ["regression", "noun", "time"]
+    },
+    {
+      "id": "iteration_mark_hitobito",
+      "description": "人々 - iteration mark should be grouped with kanji",
+      "input": "人々",
+      "expected": [
+        {"surface": "人々", "pos": "Noun"}
+      ],
+      "tags": ["regression", "unicode", "odoriji"]
+    },
+    {
+      "id": "iteration_mark_hibi",
+      "description": "日々 - iteration mark should be grouped with kanji",
+      "input": "日々",
+      "expected": [
+        {"surface": "日々", "pos": "Noun"}
+      ],
+      "tags": ["regression", "unicode", "odoriji"]
+    },
+    {
+      "id": "iteration_mark_tokidoki",
+      "description": "時々 - iteration mark should be grouped with kanji",
+      "input": "時々",
+      "expected": [
+        {"surface": "時々", "pos": "Noun"}
+      ],
+      "tags": ["regression", "unicode", "odoriji"]
+    },
+    {
+      "id": "iteration_mark_doudou",
+      "description": "堂々と - iteration mark + particle",
+      "input": "堂々と",
+      "expected": [
+        {"surface": "堂々", "pos": "Noun"},
+        {"surface": "と", "pos": "Particle"}
+      ],
+      "tags": ["regression", "unicode", "odoriji"]
+    },
+    {
+      "id": "iteration_mark_kokkoku",
+      "description": "刻々と - iteration mark + particle",
+      "input": "刻々と",
+      "expected": [
+        {"surface": "刻々", "pos": "Noun"},
+        {"surface": "と", "pos": "Particle"}
+      ],
+      "tags": ["regression", "unicode", "odoriji"]
+    },
+    {
+      "id": "causative_passive_yoserareru",
+      "description": "寄せられた should have lemma 寄せる (not 寄る)",
+      "input": "寄せられた",
+      "expected": [
+        {"surface": "寄せられた", "pos": "Verb", "lemma": "寄せる"}
+      ],
+      "tags": ["regression", "causative_passive", "lemma"]
+    },
+    {
+      "id": "causative_passive_miserareru",
+      "description": "見せられた should have lemma 見せる (not 見る)",
+      "input": "見せられた",
+      "expected": [
+        {"surface": "見せられた", "pos": "Verb", "lemma": "見せる"}
+      ],
+      "tags": ["regression", "causative_passive", "lemma"]
+    },
+    {
+      "id": "true_causative_passive",
+      "description": "見させられた should have lemma 見る (true causative-passive)",
+      "input": "見させられた",
+      "expected": [
+        {"surface": "見させられた", "pos": "Verb", "lemma": "見る"}
+      ],
+      "tags": ["regression", "causative_passive", "lemma"]
+    },
+    {
+      "id": "adverb_amari_nimo",
+      "description": "あまりにも - あまり should be ADV, not VERB あまる",
+      "input": "あまりにも",
+      "expected": [
+        {"surface": "あまり", "pos": "Adverb"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "も", "pos": "Particle"}
+      ],
+      "tags": ["regression", "adverb", "scoring"]
+    },
+    {
+      "id": "verb_shimeta",
+      "description": "しめた should be VERB with lemma しめる (占める/締める)",
+      "input": "しめた",
+      "expected": [
+        {"surface": "しめた", "pos": "Verb", "lemma": "しめる"}
+      ],
+      "tags": ["regression", "verb", "hiragana"]
+    },
+    {
+      "id": "idiom_aji_wo_shimeta",
+      "description": "味をしめた - idiom should split correctly",
+      "input": "味をしめた",
+      "expected": [
+        {"surface": "味", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "しめた", "pos": "Verb", "lemma": "しめる"}
+      ],
+      "tags": ["regression", "verb", "idiom"]
+    },
+    {
+      "id": "godan_sa_oshite",
+      "description": "押して should be GodanSa verb (押す), not Suru (押しする)",
+      "input": "押して",
+      "expected": [
+        {"surface": "押して", "pos": "Verb", "lemma": "押す"}
+      ],
+      "tags": ["regression", "verb", "godan-sa", "lemma"]
+    },
+    {
+      "id": "godan_sa_dashite",
+      "description": "出して should be GodanSa verb (出す), not Suru (出しする)",
+      "input": "出して",
+      "expected": [
+        {"surface": "出して", "pos": "Verb", "lemma": "出す"}
+      ],
+      "tags": ["regression", "verb", "godan-sa", "lemma"]
+    },
+    {
+      "id": "godan_sa_hanashite",
+      "description": "話して should be GodanSa verb (話す), not Suru (話しする)",
+      "input": "話して",
+      "expected": [
+        {"surface": "話して", "pos": "Verb", "lemma": "話す"}
+      ],
+      "tags": ["regression", "verb", "godan-sa", "lemma"]
+    },
+    {
+      "id": "ichidan_dekimai",
+      "description": "出来まい should be Ichidan verb (出来る), not Suru (出来する)",
+      "input": "出来まい",
+      "expected": [
+        {"surface": "出来まい", "pos": "Verb", "lemma": "出来る"}
+      ],
+      "tags": ["regression", "verb", "ichidan", "lemma"]
+    },
+    {
+      "id": "ichidan_dekinai",
+      "description": "出来ない should be Ichidan verb (出来る), not Suru (出来する)",
+      "input": "出来ない",
+      "expected": [
+        {"surface": "出来ない", "pos": "Verb", "lemma": "出来る"}
+      ],
+      "tags": ["regression", "verb", "ichidan", "lemma"]
     }
   ]
 }

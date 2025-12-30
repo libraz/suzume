@@ -214,10 +214,11 @@
     },
     {
       "id": "viterbi_renyokei_sou",
-      "description": "降りそう - verb + sou unified",
+      "description": "降りそう - verb renyokei + そう (動詞+助動詞 → 分割). Note: lemma 降る vs 降りる is ambiguous",
       "input": "降りそう",
       "expected": [
-        {"surface": "降りそう", "pos": "Verb", "lemma": "降る"}
+        {"surface": "降り", "pos": "Verb", "lemma": "降る"},
+        {"surface": "そう", "pos": "Adverb"}
       ],
       "tags": ["regression", "viterbi", "sou"]
     },

@@ -267,13 +267,57 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       }
 
       // Check if this looks like a conjugated verb
-      auto best = inflection.getBest(surface);
-      // Only accept verb types (not IAdjective) and require confidence > 0.48
-      if (best.confidence > 0.48F &&
-          best.verb_type != grammar::VerbType::IAdjective) {
-        // Verify the stem matches
-        std::string expected_stem = extractSubstring(codepoints, start_pos, stem_end);
-        if (best.stem == expected_stem) {
+      // Get all inflection candidates, not just the best one
+      // This handles cases where the best candidate has wrong stem but a lower-ranked
+      // candidate has the correct stem (e.g., 見なければ where 見なける wins over 見る)
+      auto inflection_results = inflection.analyze(surface);
+      std::string expected_stem = extractSubstring(codepoints, start_pos, stem_end);
+
+      // Find a candidate with matching stem and sufficient confidence
+      // Prefer dictionary-verified candidates when multiple have similar confidence
+      // This handles ambiguous っ-onbin patterns like 待って (待つ/待る/待う)
+      grammar::InflectionCandidate best;
+      best.confidence = 0.0F;
+      grammar::InflectionCandidate dict_verified_best;
+      dict_verified_best.confidence = 0.0F;
+
+      for (const auto& cand : inflection_results) {
+        if (cand.stem == expected_stem &&
+            cand.confidence > 0.48F &&
+            cand.verb_type != grammar::VerbType::IAdjective) {
+          // Check if this candidate's base_form exists in dictionary
+          bool in_dict = false;
+          if (dict_manager != nullptr && !cand.base_form.empty()) {
+            auto results = dict_manager->lookup(cand.base_form, 0);
+            for (const auto& result : results) {
+              if (result.entry != nullptr &&
+                  result.entry->surface == cand.base_form &&
+                  result.entry->pos == core::PartOfSpeech::Verb) {
+                in_dict = true;
+                break;
+              }
+            }
+          }
+
+          if (in_dict) {
+            // Prefer dictionary-verified candidates
+            if (cand.confidence > dict_verified_best.confidence) {
+              dict_verified_best = cand;
+            }
+          }
+          if (cand.confidence > best.confidence) {
+            best = cand;
+          }
+        }
+      }
+
+      // Use dictionary-verified candidate if available and has reasonable confidence
+      if (dict_verified_best.confidence > 0.48F) {
+        best = dict_verified_best;
+      }
+
+      // Only proceed if we found a matching candidate
+      if (best.confidence > 0.48F) {
           // Reject Godan verbs with stems ending in e-row hiragana
           // E-row endings (え,け,せ,て,ね,へ,め,れ) are typically ichidan stems
           // E.g., "伝えいた" falsely matches as GodanKa "伝えく" but 伝える is ichidan
@@ -342,6 +386,34 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
           }
 
+          // Skip verb + そう auxiliary combinations (様態の助動詞)
+          // e.g., "話しそう" should split into "話し" (VERB) + "そう" (AUX/ADVERB)
+          // e.g., "食べそう" should split into "食べ" (VERB) + "そう" (AUX/ADVERB)
+          // e.g., "遅刻しそうです" should split into "遅刻し" + "そう" + "です"
+          // This follows the 動詞+助動詞 → 分割 tokenization rule
+          // EXCEPTION: Don't skip i-adjective + そう patterns (美味しそう, 難しそう)
+          // Those are handled by adjective candidate generation
+          bool has_sou_pattern = false;
+          if (surface.size() >= core::kTwoJapaneseCharBytes) {
+            // Check for そう at end
+            if (surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "そう") {
+              has_sou_pattern = true;
+            }
+            // Check for そうです at end
+            if (surface.size() >= core::kFourJapaneseCharBytes &&
+                surface.substr(surface.size() - core::kFourJapaneseCharBytes) == "そうです") {
+              has_sou_pattern = true;
+            }
+            // Check for そうだ at end
+            if (surface.size() >= core::kThreeJapaneseCharBytes &&
+                surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "そうだ") {
+              has_sou_pattern = true;
+            }
+          }
+          if (has_sou_pattern && best.verb_type != grammar::VerbType::IAdjective) {
+            continue;  // Skip - let the split (verb renyokei + そう) win
+          }
+
           UnknownCandidate candidate;
           candidate.surface = surface;
           candidate.start = start_pos;
@@ -350,8 +422,21 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Lower cost for higher confidence matches
           float base_cost = 0.4F + (1.0F - best.confidence) * 0.3F;
           // Suru verbs get a bonus to recognize as single verb (勉強する, 延期する)
+          // BUT don't give bonus if stem ends with し and is short (1-2 kanji)
+          // because that pattern is likely a GodanSa renyokei, not a Suru stem
+          // e.g., 押しする (stem=押し) shouldn't get bonus - 押し is renyokei of 押す
           if (best.verb_type == grammar::VerbType::Suru) {
-            base_cost -= 0.2F;
+            bool is_likely_godan_renyokei = false;
+            // Check if stem is short (≤2 kanji+1 hiragana = 9 bytes) and ends with し
+            if (!best.stem.empty() &&
+                best.stem.size() <= core::kThreeJapaneseCharBytes &&
+                best.stem.size() >= core::kJapaneseCharBytes &&
+                best.stem.substr(best.stem.size() - core::kJapaneseCharBytes) == "し") {
+              is_likely_godan_renyokei = true;
+            }
+            if (!is_likely_godan_renyokei) {
+              base_cost -= 0.2F;
+            }
           }
           // Check if base form exists in dictionary - significant bonus for known verbs
           // This helps 行われた (base=行う) beat 行(suffix)+われた split
@@ -388,8 +473,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           }
           candidate.cost = base_cost;
           candidate.has_suffix = false;
-          // Note: Don't set lemma here - let lemmatizer derive it more accurately
-          // Only set conj_type for conjugation pattern info
+          // Don't set lemma here - let lemmatizer derive it with dictionary verification
+          // The lemmatizer will use stem-matching logic to pick the correct base form
           candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
 #ifdef SUZUME_DEBUG_INFO
           candidate.origin = CandidateOrigin::VerbKanji;
@@ -399,7 +484,6 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           candidates.push_back(candidate);
           // Don't break - try other stem lengths too
         }
-      }
     }
   }
 

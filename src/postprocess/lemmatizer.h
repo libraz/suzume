@@ -67,9 +67,11 @@ class Lemmatizer {
    * If dictionary is available, verifies candidates against it.
    * @param surface The surface form to lemmatize
    * @param pos Optional POS to filter candidates (Adjective filters to IAdjective only)
+   * @param conj_type Optional conjugation type hint to prefer matching candidates
    */
   std::string lemmatizeByGrammar(std::string_view surface,
-                                  core::PartOfSpeech pos = core::PartOfSpeech::Other) const;
+                                  core::PartOfSpeech pos = core::PartOfSpeech::Other,
+                                  dictionary::ConjugationType conj_type = dictionary::ConjugationType::None) const;
 
   /**
    * @brief Verify candidate base form against dictionary

@@ -288,9 +288,12 @@ float calculateConfidence(VerbType type, std::string_view stem,
     if (stem_len == core::kJapaneseCharBytes && endsWithKanji(stem)) {
       if (aux_count == 0) {
         // Base form like 寝る, 見る - no penalty (valid dictionary form)
-      } else if (aux_count == 1 && aux_total_len >= core::kFourJapaneseCharBytes) {
+      } else if (aux_count == 1 && aux_total_len >= core::kFiveJapaneseCharBytes) {
         // Single long aux match like させられた (15 bytes) or させられる (15 bytes)
         // This is legitimate Ichidan causative-passive (見させられた → 見る)
+        // NOTE: Threshold is 15 bytes (5 chars) to exclude せられる (12 bytes)
+        //       寄せられた (lemma: 寄せる) should NOT get this bonus
+        //       見させられた (lemma: 見る) SHOULD get this bonus
         base += inflection::kBonusIchidanCausativePassive;
         logConfidenceAdjustment(inflection::kBonusIchidanCausativePassive, "ichidan_causative_passive");
       } else if (aux_count == 1 && aux_total_len == core::kJapaneseCharBytes) {
@@ -780,6 +783,12 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // kTwoJapaneseCharBytes covers います/ます patterns
       base -= inflection::kPenaltyAllKanjiNonSuruKatei;
       logConfidenceAdjustment(-inflection::kPenaltyAllKanjiNonSuruKatei, "all_kanji_non_suru_renyokei_masu");
+    } else if (type == VerbType::Ichidan) {
+      // Lighter penalty for Ichidan verbs with kanji stems
+      // Unlike Godan, Ichidan verbs commonly have kanji-only stems: 出来る, 居る
+      // E.g., 出来まい should recognize 出来る (Ichidan), not 出来する (Suru)
+      base -= inflection::kPenaltyAllKanjiNonSuruKatei;
+      logConfidenceAdjustment(-inflection::kPenaltyAllKanjiNonSuruKatei, "all_kanji_non_suru_ichidan");
     } else {
       base -= inflection::kPenaltyAllKanjiNonSuruOther;
       logConfidenceAdjustment(-inflection::kPenaltyAllKanjiNonSuruOther, "all_kanji_non_suru_other");

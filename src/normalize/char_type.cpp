@@ -224,4 +224,10 @@ bool isRegionalIndicator(char32_t ch) {
   return ch >= 0x1F1E6 && ch <= 0x1F1FF;
 }
 
+bool isIterationMark(char32_t ch) {
+  // U+3005: IDEOGRAPHIC ITERATION MARK (々)
+  // Repeats the preceding kanji in words like 人々, 日々, 堂々
+  return ch == 0x3005;
+}
+
 }  // namespace suzume::normalize

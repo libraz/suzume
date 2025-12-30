@@ -295,6 +295,15 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       matches_type = true;  // Treat regional indicators as part of emoji sequence
     }
 
+    // Special handling for ideographic iteration mark (々) in kanji sequences
+    // e.g., 人々, 日々, 堂々, 時々 should be grouped as single tokens
+    // The iteration mark U+3005 is classified as Symbol, but it should be
+    // treated as part of the kanji sequence when following kanji
+    if (!matches_type && start_type == normalize::CharType::Kanji &&
+        normalize::isIterationMark(curr_char)) {
+      matches_type = true;  // Treat 々 as part of kanji sequence
+    }
+
     if (!matches_type) {
       break;
     }

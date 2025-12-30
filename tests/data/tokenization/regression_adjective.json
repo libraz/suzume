@@ -223,10 +223,11 @@
     },
     {
       "id": "suru_verb_sou_chikoku",
-      "description": "遅刻しそう - unified suru-verb",
+      "description": "遅刻しそう - suru-verb renyokei + そう (動詞+助動詞 → 分割)",
       "input": "遅刻しそう",
       "expected": [
-        {"surface": "遅刻しそう", "pos": "Verb", "lemma": "遅刻する"}
+        {"surface": "遅刻し", "pos": "Verb", "lemma": "遅刻する"},
+        {"surface": "そう", "pos": "Adverb"}
       ],
       "tags": ["regression", "suru", "sou"]
     },

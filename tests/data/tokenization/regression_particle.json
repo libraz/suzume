@@ -48,7 +48,7 @@
     },
     {
       "id": "node_in_sentence",
-      "description": "ので in sentence - ている splits to て+いる",
+      "description": "ので in sentence - ている splits to て+いる, verb+そう splits",
       "input": "電車が遅れているので遅刻しそうです",
       "expected": [
         {"surface": "電車", "pos": "Noun"},
@@ -56,7 +56,8 @@
         {"surface": "遅れて", "pos": "Verb", "lemma": "遅れる"},
         {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"},
         {"surface": "ので", "pos": "Particle"},
-        {"surface": "遅刻しそう", "pos": "Verb", "lemma": "遅刻する"},
+        {"surface": "遅刻し", "pos": "Verb", "lemma": "遅刻する"},
+        {"surface": "そう", "pos": "Adverb"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["regression", "particle", "node", "complex"]
