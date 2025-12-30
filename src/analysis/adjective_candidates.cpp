@@ -74,6 +74,7 @@ char32_t getVowelForChar(char32_t ch) {
 
 // Normalize prolonged sound marks (ー) to vowels based on preceding character
 // e.g., すごーい → すごおい, やばーい → やばあい
+// Also handles consecutive marks: すごーーい → すごおおい
 std::string normalizeProlongedSoundMark(const std::vector<char32_t>& codepoints,
                                          size_t start, size_t end) {
   std::string result;
@@ -84,11 +85,13 @@ std::string normalizeProlongedSoundMark(const std::vector<char32_t>& codepoints,
 
     // Check for prolonged sound mark (ー, U+30FC)
     if (ch == 0x30FC && i > start) {
-      // Replace with the vowel of the previous character
-      char32_t prev = codepoints[i - 1];
-      // If previous was also ー, get the vowel from the char before that
-      if (prev == 0x30FC && i >= start + 2) {
-        prev = codepoints[i - 2];
+      // Find the first non-ー character before this position
+      char32_t prev = 0;
+      for (size_t j = i; j > start; --j) {
+        if (!normalize::isProlongedSoundMark(codepoints[j - 1])) {
+          prev = codepoints[j - 1];
+          break;
+        }
       }
       char32_t vowel = getVowelForChar(prev);
       normalize::encodeUtf8(vowel, result);
@@ -111,58 +114,87 @@ bool containsProlongedSoundMark(const std::vector<char32_t>& codepoints,
   return false;
 }
 
-// Normalize the base form of an adjective by removing double vowels created by
+// Normalize the base form of an adjective by removing extra vowels created by
 // prolonged sound mark normalization.
-// e.g., すごおい → すごい, やばあい → やばい
-// But keep legitimate double vowels: かわいい → かわいい
+// Two patterns:
+// 1. すごーい → すごおい → すごい (ー before final い)
+// 2. かわいー → かわいい → かわいい (ー after い, extending the い)
+// For consecutive marks:
+// 1. すごーーい → すごおおい → すごい
+// 2. かわいーー → かわいいい → かわいい
 std::string normalizeBaseForm(const std::string& base_form,
                                const std::vector<char32_t>& original_codepoints,
                                size_t start, size_t end) {
-  // Check if original ends with ーい pattern (ー before final い)
   if (end < start + 2) {
     return base_form;
   }
 
-  bool ends_with_choon_i = false;
-  size_t choon_pos = 0;
-  for (size_t i = start; i < end - 1; ++i) {
+  // Count total prolonged marks in the original
+  size_t choon_count = 0;
+  size_t first_choon_pos = 0;
+  for (size_t i = start; i < end; ++i) {
     if (original_codepoints[i] == 0x30FC) {
-      // Check if next char is い
-      if (i + 1 < end && original_codepoints[i + 1] == U'い') {
-        ends_with_choon_i = true;
-        choon_pos = i;
-        break;
+      if (choon_count == 0) {
+        first_choon_pos = i;
       }
+      ++choon_count;
     }
   }
 
-  if (!ends_with_choon_i) {
+  if (choon_count == 0) {
     return base_form;
   }
 
-  // Get the character before ー to determine which vowel was extended
-  char32_t prev_char = (choon_pos > start) ? original_codepoints[choon_pos - 1] : 0;
+  // Get the character before the first ー to determine which vowel was extended
+  char32_t prev_char = (first_choon_pos > start) ? original_codepoints[first_choon_pos - 1] : 0;
   char32_t extended_vowel = getVowelForChar(prev_char);
 
-  // If the extended vowel is い, keep the double い (e.g., かわいい)
+  // If the extended vowel is い (pattern: かわいー, かわいーー)
+  // The base form should always be with double い (かわいい)
   if (extended_vowel == U'い') {
+    if (choon_count <= 1) {
+      return base_form;  // Single ー after い → keep as is (already correct: かわいい)
+    }
+    // Multiple ー's after い → remove extra い's
+    // かわいいい (from かわいーー) → かわいい
+    size_t extra_i_count = choon_count - 1;  // How many extra い's to remove
+    size_t extra_i_bytes = extra_i_count * core::kJapaneseCharBytes;
+    if (base_form.size() > extra_i_bytes) {
+      // Verify the end has multiple い's
+      bool all_is = true;
+      for (size_t i = 0; i < extra_i_count && all_is; ++i) {
+        size_t pos = base_form.size() - (i + 1) * core::kJapaneseCharBytes;
+        if (base_form.substr(pos, core::kJapaneseCharBytes) != "い") {
+          all_is = false;
+        }
+      }
+      if (all_is) {
+        return base_form.substr(0, base_form.size() - extra_i_bytes);
+      }
+    }
     return base_form;
   }
 
-  // Remove the extra vowel from base form
-  // base_form is like すごおい, we want すごい (remove お before い)
-  // The pattern is: stem + extra_vowel + い → stem + い
-  if (base_form.size() >= core::kTwoJapaneseCharBytes) {
-    std::string vowel_str;
-    normalize::encodeUtf8(extended_vowel, vowel_str);
+  // Other vowels (pattern: すごーい → すごおい → すごい)
+  // Remove the extra vowels from base form
+  std::string vowel_str;
+  normalize::encodeUtf8(extended_vowel, vowel_str);
+  size_t vowel_bytes = vowel_str.size();
+  size_t total_extra_bytes = vowel_bytes * choon_count;
 
-    // Check if base_form ends with vowel + い
-    size_t check_pos = base_form.size() - core::kTwoJapaneseCharBytes;
-    std::string_view suffix(base_form.data() + check_pos, core::kTwoJapaneseCharBytes);
-    std::string expected_suffix = vowel_str + "い";
+  if (base_form.size() >= total_extra_bytes + core::kJapaneseCharBytes) {
+    // Check if base_form ends with (vowel * count) + い
+    size_t check_pos = base_form.size() - total_extra_bytes - core::kJapaneseCharBytes;
+    std::string_view suffix(base_form.data() + check_pos, total_extra_bytes + core::kJapaneseCharBytes);
+
+    std::string expected_suffix;
+    for (size_t i = 0; i < choon_count; ++i) {
+      expected_suffix += vowel_str;
+    }
+    expected_suffix += "い";
 
     if (suffix == expected_suffix) {
-      // Remove the vowel, keep the い
+      // Remove the extra vowels, keep the い
       return base_form.substr(0, check_pos) + "い";
     }
   }
@@ -626,9 +658,10 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     for (const auto& cand : all_candidates) {
       // For hiragana-only adjectives, require higher confidence (0.55) than
       // kanji+hiragana adjectives (0.50) to avoid false positives like しそう → しい
-      // For patterns with prolonged sound marks, lower threshold (0.50) since these
+      // For patterns with prolonged sound marks, lower threshold (0.40) since these
       // are intentional colloquial expressions (すごーい, やばーい)
-      float confidence_threshold = has_prolonged ? 0.50F : 0.55F;
+      // Multiple consecutive marks (すごーーい) result in even lower confidence
+      float confidence_threshold = has_prolonged ? 0.40F : 0.55F;
       if (cand.confidence >= confidence_threshold &&
           cand.verb_type == grammar::VerbType::IAdjective) {
         UnknownCandidate candidate;

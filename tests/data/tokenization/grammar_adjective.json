@@ -555,6 +555,24 @@
         {"surface": "よ", "pos": "Particle"}
       ],
       "tags": ["grammar", "i-adjective", "colloquial", "choon"]
+    },
+    {
+      "id": "choon_consecutive_sugoi",
+      "description": "すごーーい (consecutive prolonged marks)",
+      "input": "すごーーい",
+      "expected": [
+        {"surface": "すごーーい", "pos": "Adjective", "lemma": "すごい"}
+      ],
+      "tags": ["grammar", "i-adjective", "colloquial", "choon", "consecutive"]
+    },
+    {
+      "id": "choon_consecutive_kawaii",
+      "description": "かわいーー (consecutive prolonged marks at end)",
+      "input": "かわいーー",
+      "expected": [
+        {"surface": "かわいーー", "pos": "Adjective", "lemma": "かわいい"}
+      ],
+      "tags": ["grammar", "i-adjective", "colloquial", "choon", "consecutive"]
     }
   ]
 }

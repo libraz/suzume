@@ -270,11 +270,13 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
 
     // Special handling for prolonged sound mark (ー) in hiragana sequences
     // Colloquial expressions like すごーい, やばーい, かわいー use ー in hiragana
+    // Also handle consecutive prolonged marks: すごーーい, やばーーーい
     if (!matches_type && start_type == normalize::CharType::Hiragana &&
         normalize::isProlongedSoundMark(curr_char)) {
-      // Check if followed by hiragana or end of text (かわいー)
+      // Check if followed by hiragana, another ー, or end of text (かわいー)
       if (end_pos + 1 >= char_types.size() ||
-          char_types[end_pos + 1] == normalize::CharType::Hiragana) {
+          char_types[end_pos + 1] == normalize::CharType::Hiragana ||
+          normalize::isProlongedSoundMark(codepoints[end_pos + 1])) {
         matches_type = true;  // Treat ー as part of hiragana sequence
       }
     }
