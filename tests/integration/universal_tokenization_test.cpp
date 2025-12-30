@@ -108,6 +108,11 @@ struct TestDataEntry {
   std::string suite_name;
   std::string json_path;
   TestCase test_case;
+
+  // For GoogleTest to print readable test parameter info
+  friend void PrintTo(const TestDataEntry& entry, std::ostream* os) {
+    *os << entry.suite_name << "/" << entry.test_case.id;
+  }
 };
 
 std::vector<TestDataEntry>& getTestData() {
