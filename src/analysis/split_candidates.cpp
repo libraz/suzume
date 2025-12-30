@@ -195,7 +195,11 @@ void addCompoundSplitCandidates(
     float first_cost = candidate::kSplitBaseCost;
 
     for (const auto& result : first_results) {
-      if (result.entry != nullptr && result.length == split_point) {
+      if (result.entry != nullptr && result.length == split_point &&
+          (result.entry->pos == core::PartOfSpeech::Noun ||
+           result.entry->pos == core::PartOfSpeech::Adjective)) {
+        // Allow NOUN and ADJ (na-adjectives can function as nominal in compounds)
+        // This prevents ADV/VERB from being incorrectly reregistered as NOUN
         first_in_dict = true;
         first_cost = result.entry->cost + candidate::kDictSplitBonus;
         first_is_formal_noun = result.entry->is_formal_noun;
@@ -203,12 +207,14 @@ void addCompoundSplitCandidates(
       }
     }
 
-    // Check if the second part matches a dictionary entry
+    // Check if the second part matches a dictionary entry (NOUN or ADJ)
     auto second_results = dict_manager.lookup(text, first_end_byte);
     bool second_in_dict = false;
 
     for (const auto& result : second_results) {
-      if (result.entry != nullptr && result.length == kanji_len - split_point) {
+      if (result.entry != nullptr && result.length == kanji_len - split_point &&
+          (result.entry->pos == core::PartOfSpeech::Noun ||
+           result.entry->pos == core::PartOfSpeech::Adjective)) {
         second_in_dict = true;
         break;
       }
