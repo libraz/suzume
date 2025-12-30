@@ -7,7 +7,9 @@
 #include <vector>
 
 #include "analysis/analyzer.h"
+#ifndef __EMSCRIPTEN__
 #include "analysis/scorer_options_loader.h"
+#endif
 #include "dictionary/binary_dict.h"
 #include "dictionary/user_dict.h"
 #include "postprocess/postprocessor.h"
@@ -78,12 +80,15 @@ struct Suzume::Impl {
 
   static analysis::ScorerOptions loadScorerConfig(const SuzumeOptions& opts) {
     analysis::ScorerOptions scorer_opts = opts.scorer_options;
+#ifndef __EMSCRIPTEN__
+    // File-based config loading is only available in native builds
     if (!opts.scorer_config_path.empty()) {
       std::string error_msg;
       if (!analysis::ScorerOptionsLoader::loadFromFile(opts.scorer_config_path, scorer_opts, &error_msg)) {
         std::cerr << "warning: Failed to load scorer config: " << error_msg << "\n";
       }
     }
+#endif
     return scorer_opts;
   }
 
