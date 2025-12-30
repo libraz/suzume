@@ -190,12 +190,13 @@
     },
     {
       "id": "polite_moushiageru",
-      "description": "Polite verb 申し上げる",
+      "description": "Polite verb 申し上げる - verb+auxiliary should be split per tokenization rules",
       "input": "ご報告申し上げます",
       "expected": [
         {"surface": "ご", "pos": "Prefix"},
         {"surface": "報告", "pos": "Noun"},
-        {"surface": "申し上げます", "pos": "Verb", "lemma": "申し上げる"}
+        {"surface": "申し上げ", "pos": "Verb", "lemma": "申し上げる"},
+        {"surface": "ます", "pos": "Auxiliary"}
       ],
       "tags": ["verb", "polite"]
     },

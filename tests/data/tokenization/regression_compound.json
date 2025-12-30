@@ -188,7 +188,7 @@
       "description": "読み続ける - compound verb",
       "input": "読み続ける",
       "expected": [
-        {"surface": "読み続ける", "pos": "Verb", "lemma": "読む"}
+        {"surface": "読み続ける", "pos": "Verb", "lemma": "読み続ける"}
       ],
       "tags": ["regression", "compound_verb"]
     },
@@ -348,6 +348,96 @@
         {"surface": "切る", "pos": "Verb"}
       ],
       "tags": ["regression", "compound_noun", "kanji_hiragana"]
+    },
+    {
+      "id": "v1_inflection_fallback_yomikomu",
+      "description": "読み込む - V1 not in dictionary but recognized by inflection analysis",
+      "input": "読み込む",
+      "expected": [
+        {"surface": "読み込む", "pos": "Verb", "lemma": "読み込む"}
+      ],
+      "tags": ["regression", "compound_verb", "v1_fallback"]
+    },
+    {
+      "id": "v1_inflection_fallback_kakidasu",
+      "description": "書き出す - V1 not in dictionary but recognized by inflection analysis",
+      "input": "書き出す",
+      "expected": [
+        {"surface": "書き出す", "pos": "Verb", "lemma": "書き出す"}
+      ],
+      "tags": ["regression", "compound_verb", "v1_fallback"]
+    },
+    {
+      "id": "false_positive_prevention_shiken",
+      "description": "試験に落ちる - noun should NOT be treated as V1 for compound verb",
+      "input": "試験に落ちる",
+      "expected": [
+        {"surface": "試験", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "落ちる", "pos": "Verb"}
+      ],
+      "tags": ["regression", "compound_verb", "false_positive_prevention"]
+    },
+    {
+      "id": "false_positive_prevention_kaigi",
+      "description": "会議に出す - noun should NOT be treated as V1 for compound verb",
+      "input": "会議に出す",
+      "expected": [
+        {"surface": "会議", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "出す", "pos": "Verb"}
+      ],
+      "tags": ["regression", "compound_verb", "false_positive_prevention"]
+    },
+    {
+      "id": "adj_sugiru_toutoi",
+      "description": "尊すぎる - i-adjective stem + すぎる compound verb",
+      "input": "尊すぎる",
+      "expected": [
+        {"surface": "尊すぎる", "pos": "Verb", "lemma": "尊過ぎる"}
+      ],
+      "tags": ["regression", "adj_sugiru"]
+    },
+    {
+      "id": "adj_sugiru_takai",
+      "description": "高すぎる - i-adjective stem + すぎる compound verb",
+      "input": "高すぎる",
+      "expected": [
+        {"surface": "高すぎる", "pos": "Verb", "lemma": "高過ぎる"}
+      ],
+      "tags": ["regression", "adj_sugiru"]
+    },
+    {
+      "id": "adj_sugiru_inflected_te",
+      "description": "尊すぎて - i-adjective + すぎる te-form splits",
+      "input": "尊すぎて",
+      "expected": [
+        {"surface": "尊すぎ", "pos": "Verb", "lemma": "尊過ぎる"},
+        {"surface": "て", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "adj_sugiru"]
+    },
+    {
+      "id": "adj_sugiru_inflected_ta",
+      "description": "高すぎた - i-adjective + すぎる past tense splits",
+      "input": "高すぎた",
+      "expected": [
+        {"surface": "高すぎ", "pos": "Verb", "lemma": "高過ぎる"},
+        {"surface": "た", "pos": "Auxiliary"}
+      ],
+      "tags": ["regression", "adj_sugiru"]
+    },
+    {
+      "id": "adj_sugiru_in_sentence",
+      "description": "この値段は高すぎる - adj+sugiru in context",
+      "input": "この値段は高すぎる",
+      "expected": [
+        {"surface": "この", "pos": "Determiner"},
+        {"surface": "値段", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "高すぎる", "pos": "Verb", "lemma": "高過ぎる"}
+      ],
+      "tags": ["regression", "adj_sugiru"]
     }
   ]
 }

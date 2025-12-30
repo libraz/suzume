@@ -64,7 +64,7 @@
       "expected": [
         {"surface": "getUserData", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "呼び出す", "pos": "Verb", "lemma": "呼ぶ"}
+        {"surface": "呼び出す", "pos": "Verb", "lemma": "呼び出す"}
       ],
       "tags": ["english_in_japanese"]
     },

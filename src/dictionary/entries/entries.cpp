@@ -386,9 +386,9 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
       {"ああいう", POS::Determiner, 0.5F, "", false, false, false, CT::None, ""},
       {"どういう", POS::Determiner, 0.5F, "", false, false, false, CT::None, ""},
 
-      // Determiners with kanji
-      {"大きな", POS::Determiner, 1.0F, "", false, false, false, CT::None, "おおきな"},
-      {"小さな", POS::Determiner, 1.0F, "", false, false, false, CT::None, "ちいさな"},
+      // Determiners with kanji - B51: lowered cost to prioritize over NOUN unknown
+      {"大きな", POS::Determiner, 0.5F, "", false, false, false, CT::None, "おおきな"},
+      {"小さな", POS::Determiner, 0.5F, "", false, false, false, CT::None, "ちいさな"},
   };
 }
 
@@ -508,7 +508,7 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
       {"付", POS::Noun, 0.5F, "", false, true, false, CT::None, "つけ"},
       // Hiragana-only forms
       {"よう", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
-      {"ほう", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
+      {"ほう", POS::Noun, 0.5F, "", false, true, false, CT::None, ""},  // B49: lowered cost
       {"わけ", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
       {"はず", POS::Noun, 0.3F, "はず", false, true, false, CT::None, "はず"},
       {"つもり", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
@@ -807,6 +807,7 @@ std::vector<DictionaryEntry> getAdverbEntries() {
 
       // Emphatic adverbs (強調副詞)
       {"一際", POS::Adverb, 0.3F, "", false, false, false, CT::None, "ひときわ"},
+      {"俄然", POS::Adverb, 0.3F, "", false, false, false, CT::None, "がぜん"},  // B53: suddenly/all of a sudden
 
       // Superlative adverbs (最上級副詞)
       {"一番", POS::Adverb, 0.3F, "", false, false, false, CT::None, "いちばん"},

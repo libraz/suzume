@@ -6,7 +6,7 @@
       "description": "呼び出す - び should not be standalone",
       "input": "呼び出す",
       "expected": [
-        {"surface": "呼び出す", "pos": "Verb", "lemma": "呼ぶ"}
+        {"surface": "呼び出す", "pos": "Verb", "lemma": "呼び出す"}
       ],
       "tags": ["strict", "compound", "verb"]
     },
@@ -24,7 +24,7 @@
       "description": "書き出す - き should not be standalone",
       "input": "書き出す",
       "expected": [
-        {"surface": "書き出す", "pos": "Verb", "lemma": "書く"}
+        {"surface": "書き出す", "pos": "Verb", "lemma": "書き出す"}
       ],
       "tags": ["strict", "compound", "verb"]
     },

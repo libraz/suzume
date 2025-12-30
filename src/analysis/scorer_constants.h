@@ -270,6 +270,43 @@ constexpr float kBonusRashiiAfterPredicate = 0.8F;
 // Verb ending with たいらしい should be split (帰りたいらしい → 帰りたい + らしい)
 constexpr float kPenaltyVerbTaiRashii = 0.5F;
 
+// =============================================================================
+// Pattern String Constants
+// =============================================================================
+// These string constants are used for pattern matching in scoring.
+// Centralizing them improves maintainability and makes patterns discoverable.
+
+// Suffix patterns for auxiliary detection
+constexpr const char* kSuffixSou = "そう";       // conjecture/hearsay
+constexpr const char* kSuffixTai = "たい";       // desire
+constexpr const char* kSuffixNai = "ない";       // negation
+constexpr const char* kSuffixTaiRashii = "たいらしい";  // desire + conjecture
+
+// Valid i-adjective lemma endings (non-verb derived)
+// しい: おいしい, 難しい, 美しい (productive pattern)
+// さい: 小さい
+// きい: 大きい (validated at candidate generation)
+constexpr const char* kAdjEndingShii = "しい";
+constexpr const char* kAdjEndingSai = "さい";
+constexpr const char* kAdjEndingKii = "きい";
+
+// Verb contraction patterns that should not be adjectives
+// んどい/んとい: verb onbin + とく contraction (読んどく→読んどい)
+// とい: verb renyokei + とく contraction (見とく→見とい)
+constexpr const char* kPatternNdoi = "んどい";
+constexpr const char* kPatternNtoi = "んとい";
+constexpr const char* kPatternToi = "とい";
+
+// Verb+auxiliary patterns in surface (should not be adjectives)
+constexpr const char* kPatternTeShima = "てしま";  // て+しまう
+constexpr const char* kPatternDeShima = "でしま";  // で+しまう (voiced)
+constexpr const char* kPatternTeIru = "ている";    // て+いる
+constexpr const char* kPatternDeIru = "でいる";    // で+いる (voiced)
+
+// Specific surfaces that are verb forms, not adjectives
+constexpr const char* kSurfaceShimai = "しまい";   // しまう renyokei
+constexpr const char* kSurfaceJimai = "じまい";    // じまう renyokei (voiced)
+
 }  // namespace suzume::analysis::scorer
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONSTANTS_H_

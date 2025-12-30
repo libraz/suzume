@@ -337,6 +337,12 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
 }
 
 std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
+  // If morpheme is from dictionary and has lemma set, trust it
+  // (even if lemma == surface, which is correct for base forms)
+  if (morpheme.is_from_dictionary && !morpheme.lemma.empty()) {
+    return morpheme.lemma;
+  }
+
   // If lemma is already set and different from surface, use it
   // (lemma == surface means it's a default that may need re-derivation)
   if (!morpheme.lemma.empty() && morpheme.lemma != morpheme.surface) {

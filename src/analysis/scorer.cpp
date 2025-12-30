@@ -4,6 +4,7 @@
 #include "analysis/scorer_constants.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
+#include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -225,14 +226,16 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       edge.surface.size() >= core::kTwoJapaneseCharBytes) {
     std::string_view surface = edge.surface;
     if (surface.size() >= core::kTwoJapaneseCharBytes &&
-        surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "そう") {
+        surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == scorer::kSuffixSou) {
       // Check if lemma ends with valid i-adjective pattern
       bool valid_adj_lemma = false;
       if (edge.lemma.size() >= core::kTwoJapaneseCharBytes) {
         std::string_view ending = edge.lemma.substr(edge.lemma.size() - core::kTwoJapaneseCharBytes);
         // Accept しい, さい, きい as valid i-adjective endings
         // Note: きい is validated at candidate generation (verb stem check)
-        if (ending == "しい" || ending == "さい" || ending == "きい") {
+        if (ending == scorer::kAdjEndingShii ||
+            ending == scorer::kAdjEndingSai ||
+            ending == scorer::kAdjEndingKii) {
           valid_adj_lemma = true;
         }
       }
@@ -255,7 +258,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     std::string_view lemma = edge.lemma;
     // Check if lemma ends with たい
     if (lemma.size() >= core::kTwoJapaneseCharBytes &&
-        lemma.substr(lemma.size() - core::kTwoJapaneseCharBytes) == "たい") {
+        lemma.substr(lemma.size() - core::kTwoJapaneseCharBytes) == scorer::kSuffixTai) {
       // Get the stem before たい
       std::string_view stem = lemma.substr(0, lemma.size() - core::kTwoJapaneseCharBytes);
       // Decode stem to count codepoints
@@ -284,12 +287,12 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     // Check for patterns that look like verb contractions
     // んどい/んとい: verb onbin + contraction (読んどい, 飲んどい)
     // 〜とい: verb renyokei + contraction (見とい, 食べとい)
-    bool is_ndoi_pattern = (edge.lemma.find("んどい") != std::string::npos ||
-                            edge.lemma.find("んとい") != std::string::npos);
+    bool is_ndoi_pattern = (edge.lemma.find(scorer::kPatternNdoi) != std::string::npos ||
+                            edge.lemma.find(scorer::kPatternNtoi) != std::string::npos);
     bool is_toi_pattern = false;
     // Check if lemma ends with とい and stem doesn't look natural for adjective
     if (edge.lemma.size() >= core::kTwoJapaneseCharBytes &&
-        edge.lemma.substr(edge.lemma.size() - core::kTwoJapaneseCharBytes) == "とい") {
+        edge.lemma.substr(edge.lemma.size() - core::kTwoJapaneseCharBytes) == scorer::kPatternToi) {
       // 〜とい pattern: likely verb renyokei + といて contraction
       // Exception: dictionary adjectives (none known with とい ending)
       is_toi_pattern = true;
@@ -309,10 +312,10 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       edge.surface.size() >= core::kFourJapaneseCharBytes) {
     std::string_view surface = edge.surface;
     // Check for auxiliary patterns: てしま, でしま, ている, etc.
-    if (surface.find("てしま") != std::string_view::npos ||
-        surface.find("でしま") != std::string_view::npos ||
-        surface.find("ている") != std::string_view::npos ||
-        surface.find("でいる") != std::string_view::npos) {
+    if (surface.find(scorer::kPatternTeShima) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeShima) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeIru) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeIru) != std::string_view::npos) {
       cost += scorer::kPenaltyVerbAuxInAdj;
       logAdjustment(scorer::kPenaltyVerbAuxInAdj, "verb_aux_in_adj");
     }
@@ -322,7 +325,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // E.g., 食べてしまい should not have しまい parsed as adjective
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary()) {
-    if (edge.surface == "しまい" || edge.surface == "じまい") {
+    if (edge.surface == scorer::kSurfaceShimai || edge.surface == scorer::kSurfaceJimai) {
       cost += scorer::kPenaltyShimaiAsAdj;
       logAdjustment(scorer::kPenaltyShimaiAsAdj, "shimai_as_adj");
     }
@@ -336,7 +339,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       edge.surface.size() >= core::kFiveJapaneseCharBytes) {
     std::string_view surface = edge.surface;
     std::string_view last15 = surface.substr(surface.size() - core::kFiveJapaneseCharBytes);
-    if (last15 == "たいらしい") {
+    if (last15 == scorer::kSuffixTaiRashii) {
       cost += scorer::kPenaltyVerbTaiRashii;
       logAdjustment(scorer::kPenaltyVerbTaiRashii, "verb_tai_rashii_split");
     }
@@ -355,24 +358,15 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     std::string_view lemma = edge.lemma;
     // Check if lemma ends with ない
     if (lemma.size() >= core::kThreeJapaneseCharBytes &&
-        lemma.substr(lemma.size() - core::kTwoJapaneseCharBytes) == "ない") {
+        lemma.substr(lemma.size() - core::kTwoJapaneseCharBytes) == scorer::kSuffixNai) {
       // Get the stem before ない
       std::string_view stem = lemma.substr(0, lemma.size() - core::kTwoJapaneseCharBytes);
-      // Check the last character of stem
-      if (stem.size() >= core::kJapaneseCharBytes) {
-        std::string_view last3 = stem.substr(stem.size() - core::kJapaneseCharBytes);
-        // あ段 hiragana (Godan verb mizenkei endings)
-        // ら, か, が, さ, た, な, ば, ま, わ, あ
-        if (last3 == "ら" || last3 == "か" || last3 == "が" ||
-            last3 == "さ" || last3 == "た" || last3 == "ば" ||
-            last3 == "ま" || last3 == "わ" || last3 == "あ" ||
-            // Also check for ichidan-like patterns (e-row + ない is less common for adj)
-            last3 == "べ" || last3 == "め" || last3 == "せ" ||
-            last3 == "け" || last3 == "げ" || last3 == "て" ||
-            last3 == "ね" || last3 == "れ" || last3 == "え") {
-          cost += scorer::kPenaltyVerbNaiPattern;
-          logAdjustment(scorer::kPenaltyVerbNaiPattern, "verb_nai_pattern");
-        }
+      // Check if stem ends with verb mizenkei marker (あ段) or ichidan renyokei marker (え段)
+      // あ段: Godan verb mizenkei (走らない, 書かない)
+      // え段: Ichidan verb mizenkei (食べない, 見ない - rare, but still verb pattern)
+      if (grammar::endsWithARow(stem) || grammar::endsWithERow(stem)) {
+        cost += scorer::kPenaltyVerbNaiPattern;
+        logAdjustment(scorer::kPenaltyVerbNaiPattern, "verb_nai_pattern");
       }
     }
   }

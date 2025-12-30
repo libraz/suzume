@@ -74,6 +74,31 @@ void addHiraganaCompoundVerbJoinCandidates(
     const Scorer& scorer);
 
 /**
+ * @brief Add adjective + すぎる compound verb candidates
+ *
+ * Detects i-adjective stem + すぎる patterns and generates compound verb candidates.
+ * The pattern ADJ-stem + すぎる becomes a compound verb with lemma ADJ-stem + 過ぎる.
+ *
+ * Examples:
+ *   "高すぎる" → compound verb (高い + すぎる) with lemma "高過ぎる"
+ *   "尊すぎて" → "尊すぎ" (verb, lemma="尊過ぎる") + "て" (auxiliary)
+ *
+ * @param lattice Lattice to add candidates to
+ * @param text Original text
+ * @param codepoints Unicode codepoints
+ * @param start_pos Starting position in codepoints
+ * @param char_types Character types for each position
+ * @param dict_manager Dictionary manager for lookups
+ * @param scorer Scorer for POS priors
+ */
+void addAdjectiveSugiruJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const dictionary::DictionaryManager& dict_manager,
+    const Scorer& scorer);
+
+/**
  * @brief Add prefix + noun join candidates
  *
  * Detects productive prefix + noun patterns and generates merged candidates.

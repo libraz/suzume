@@ -239,8 +239,7 @@
       "input": "お買い上げ",
       "expected": [
         {"surface": "お", "pos": "Prefix"},
-        {"surface": "買い", "pos": "Noun"},
-        {"surface": "上げ", "pos": "Noun"}
+        {"surface": "買い上げ", "pos": "Noun", "lemma": "買い上げ"}
       ],
       "tags": ["prefix", "o"]
     },

@@ -162,6 +162,18 @@ bool isSmallKana(std::string_view ch);
  */
 bool startsWithHiragana(std::string_view s);
 
+/**
+ * @brief Check if stem ends with a-row hiragana (verb mizenkei indicators)
+ * @param stem The stem to check
+ * @return True if stem ends with a-row hiragana
+ *
+ * A-row (あ段) hiragana indicates Godan verb mizenkei (未然形).
+ * Includes: あ, か, が, さ, た, な, ば, ま, ら, わ
+ * Used to detect verb+ない patterns misanalyzed as adjectives.
+ * E.g., 走らない (走ら = 走る mizenkei) should be verb+aux, not adjective.
+ */
+bool endsWithARow(std::string_view stem);
+
 }  // namespace suzume::grammar
 
 #endif  // SUZUME_GRAMMAR_CHAR_PATTERNS_H_

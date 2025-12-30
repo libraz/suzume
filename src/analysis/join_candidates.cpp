@@ -49,6 +49,20 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"切る", "きる", "る", "切る"},          // 締め切る, 締めきる
     {"切れる", "きれる", "れる", "切れる"},  // 使い切れる (ichidan)
     {"出る", "でる", "る", "出る"},          // 飛び出る (ichidan)
+    {"上げる", "あげる", "げる", "上げる"},  // 売り上げる, 取り上げる, 持ち上げる (ichidan)
+    {"上がる", "あがる", "る", "上がる"},    // 立ち上がる, 盛り上がる (godan)
+    {"下げる", "さげる", "げる", "下げる"},  // 引き下げる, 値下げる (ichidan)
+    {"下がる", "さがる", "る", "下がる"},    // 立ち下がる (godan)
+    {"回す", "まわす", "す", "回す"},        // 振り回す, 持ち回す
+    {"回る", "まわる", "る", "回る"},        // 持ち回る, 振り回る
+    {"抜く", "ぬく", "く", "抜く"},          // 追い抜く, 突き抜く
+    {"抜ける", "ぬける", "ける", "抜ける"},  // 突き抜ける (ichidan)
+    {"落とす", "おとす", "す", "落とす"},    // 切り落とす, 打ち落とす
+    {"落ちる", "おちる", "ちる", "落ちる"},  // 転げ落ちる (ichidan)
+    {"掛ける", "かける", "ける", "掛ける"},  // 呼び掛ける, 働き掛ける (ichidan)
+    {"掛かる", "かかる", "る", "掛かる"},    // 取り掛かる (godan)
+    {"付ける", "つける", "ける", "付ける"},  // 押し付ける, 決め付ける (ichidan)
+    {"付く", "つく", "く", "付く"},          // 思い付く, 気付く (godan)
     // Renyokei forms (連用形) for たい/たくなかった/etc. attachment
     {"込み", "こみ", "む", "込む"},          // 読み込みたい, 飛びこみたい
     {"出し", "だし", "す", "出す"},          // 走り出したい, 走りだしたい
@@ -70,6 +84,20 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"終え", "おえ", "える", "終える"},      // 読み終えたい (ichidan renyokei)
     {"切り", "きり", "る", "切る"},          // 締め切りたい
     {"切れ", "きれ", "れる", "切れる"},      // 使い切れたい (ichidan renyokei)
+    {"上げ", "あげ", "げる", "上げる"},      // 売り上げたい (ichidan renyokei)
+    {"上がり", "あがり", "る", "上がる"},    // 立ち上がりたい
+    {"下げ", "さげ", "げる", "下げる"},      // 引き下げたい (ichidan renyokei)
+    {"下がり", "さがり", "る", "下がる"},    // 立ち下がりたい
+    {"回し", "まわし", "す", "回す"},        // 振り回したい
+    {"回り", "まわり", "る", "回る"},        // 持ち回りたい
+    {"抜き", "ぬき", "く", "抜く"},          // 追い抜きたい
+    {"抜け", "ぬけ", "ける", "抜ける"},      // 突き抜けたい (ichidan renyokei)
+    {"落とし", "おとし", "す", "落とす"},    // 切り落としたい
+    {"落ち", "おち", "ちる", "落ちる"},      // 転げ落ちたい (ichidan renyokei)
+    {"掛け", "かけ", "ける", "掛ける"},      // 呼び掛けたい (ichidan renyokei)
+    {"掛かり", "かかり", "る", "掛かる"},    // 取り掛かりたい
+    {"付け", "つけ", "ける", "付ける"},      // 押し付けたい (ichidan renyokei)
+    {"付き", "つき", "く", "付く"},          // 思い付きたい
     // Note: "出" (で) renyokei is NOT added because it conflicts with particle で
     // 飛び出る forms like 飛び出たい are handled by the base form "出る" entry
 };
@@ -262,13 +290,37 @@ void addCompoundVerbJoinCandidates(
 
     // Check if V1 base form is in dictionary
     auto v1_results = dict_manager.lookup(v1_base, 0);
-    bool v1_in_dict = false;
+    bool v1_verified = false;
     for (const auto& result : v1_results) {
       if (result.entry != nullptr && result.entry->surface == v1_base &&
           result.entry->pos == core::PartOfSpeech::Verb) {
-        v1_in_dict = true;
+        v1_verified = true;
         break;
       }
+    }
+
+    // Fallback: use inflection analysis for unknown V1 verbs
+    // This allows compound verbs like 読み込む where 読む is not in dictionary
+    // but is recognizable as a verb by inflection patterns
+    if (!v1_verified) {
+      // Get V1 renyokei form for inflection analysis
+      size_t v1_renyokei_end = is_ichidan ? v2_start_byte : charPosToBytePos(codepoints, kanji_end + 1);
+      std::string v1_renyokei(text.substr(start_byte, v1_renyokei_end - start_byte));
+
+      static grammar::Inflection inflection;
+      auto infl_result = inflection.getBest(v1_renyokei);
+
+      // Accept if inflection analysis identifies it as a verb with reasonable confidence
+      // and the base form matches our constructed v1_base
+      if (infl_result.confidence >= 0.5F && infl_result.base_form == v1_base) {
+        v1_verified = true;
+      }
+    }
+
+    // Only generate compound verb candidates when V1 is a verified verb
+    // This prevents false positives like 試験に落ちる (試験 is not a verb)
+    if (!v1_verified) {
+      continue;
     }
 
     // Calculate compound verb end position using matched length
@@ -302,13 +354,9 @@ void addCompoundVerbJoinCandidates(
     // Use the pre-defined base_form for V2 (always in kanji form for consistency)
     compound_base += v2_verb.base_form;
 
-    // Calculate cost
+    // Calculate cost (V1 is already verified at this point)
     float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
-    float final_cost = base_cost + candidate::kCompoundVerbBonus;
-
-    if (v1_in_dict) {
-      final_cost += candidate::kVerifiedV1Bonus;
-    }
+    float final_cost = base_cost + candidate::kCompoundVerbBonus + candidate::kVerifiedV1Bonus;
 
     uint8_t flags = core::LatticeEdge::kFromDictionary;
 
@@ -409,16 +457,26 @@ void addHiraganaCompoundVerbJoinCandidates(
 
       // Verify V1 is in dictionary as a verb
       auto v1_results = dict_manager.lookup(v1_base, 0);
-      bool v1_in_dict = false;
+      bool v1_verified = false;
       for (const auto& result : v1_results) {
         if (result.entry != nullptr && result.entry->surface == v1_base &&
             result.entry->pos == core::PartOfSpeech::Verb) {
-          v1_in_dict = true;
+          v1_verified = true;
           break;
         }
       }
 
-      if (!v1_in_dict) {
+      // Fallback: use inflection analysis for unknown V1 verbs
+      if (!v1_verified) {
+        static grammar::Inflection inflection;
+        auto infl_result = inflection.getBest(std::string(v1_surface));
+
+        if (infl_result.confidence >= 0.5F && infl_result.base_form == v1_base) {
+          v1_verified = true;
+        }
+      }
+
+      if (!v1_verified) {
         continue;  // V1 must be a known verb for hiragana compounds
       }
 
@@ -460,6 +518,117 @@ void addHiraganaCompoundVerbJoinCandidates(
                       final_cost, flags, compound_base);
 
       return;  // Found a match, stop searching
+    }
+  }
+}
+
+void addAdjectiveSugiruJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const dictionary::DictionaryManager& dict_manager,
+    const Scorer& scorer) {
+  using CharType = normalize::CharType;
+
+  if (start_pos >= char_types.size()) {
+    return;
+  }
+
+  // Must start with kanji (ADJ stem)
+  if (char_types[start_pos] != CharType::Kanji) {
+    return;
+  }
+
+  // Find the kanji portion (ADJ stem) - typically 1-2 kanji
+  size_t kanji_end = start_pos + 1;
+  while (kanji_end < char_types.size() && kanji_end - start_pos < 3 &&
+         char_types[kanji_end] == CharType::Kanji) {
+    ++kanji_end;
+  }
+
+  // Next must be hiragana starting with す (for すぎ)
+  if (kanji_end >= char_types.size() ||
+      char_types[kanji_end] != CharType::Hiragana) {
+    return;
+  }
+
+  // Check if すぎ follows the kanji
+  size_t start_byte = charPosToBytePos(codepoints, start_pos);
+  size_t sugi_start_byte = charPosToBytePos(codepoints, kanji_end);
+
+  std::string_view after_kanji = text.substr(sugi_start_byte);
+  constexpr std::string_view kSugi = "すぎ";
+  if (after_kanji.size() < kSugi.size() ||
+      after_kanji.substr(0, kSugi.size()) != kSugi) {
+    return;
+  }
+
+  // Build the ADJ base form to verify it's a valid i-adjective
+  std::string adj_stem(text.substr(start_byte, sugi_start_byte - start_byte));
+  std::string adj_base = adj_stem + "い";
+
+  // Check if the ADJ base form is in dictionary
+  auto adj_results = dict_manager.lookup(adj_base, 0);
+  bool adj_in_dict = false;
+  for (const auto& result : adj_results) {
+    if (result.entry != nullptr && result.entry->surface == adj_base &&
+        result.entry->pos == core::PartOfSpeech::Adjective) {
+      adj_in_dict = true;
+      break;
+    }
+  }
+
+  // Fallback: use inflection analysis to verify adjective
+  if (!adj_in_dict) {
+    static grammar::Inflection inflection;
+    auto infl_result = inflection.getBest(adj_base);
+
+    // Accept if inflection analysis identifies it as an i-adjective
+    if (infl_result.confidence >= 0.5F && infl_result.base_form == adj_base) {
+      adj_in_dict = true;
+    }
+  }
+
+  if (!adj_in_dict) {
+    return;
+  }
+
+  // Build compound verb base form: ADJ stem + 過ぎる
+  std::string compound_base = adj_stem + "過ぎる";
+
+  // Calculate cost with bonus for verified ADJ
+  float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
+  float final_cost = base_cost + candidate::kCompoundVerbBonus;
+  uint8_t flags = core::LatticeEdge::kFromDictionary;
+
+  // Generate candidates for different forms of すぎる
+  // Pattern 1: ADJ + すぎ (renyokei) - て/た/ない are separate tokens
+  size_t sugi_renyokei_len = 2;  // すぎ is 2 characters
+  size_t renyokei_end_pos = kanji_end + sugi_renyokei_len;
+
+  if (renyokei_end_pos <= codepoints.size()) {
+    size_t renyokei_end_byte = charPosToBytePos(codepoints, renyokei_end_pos);
+    std::string renyokei_surface(text.substr(start_byte, renyokei_end_byte - start_byte));
+
+    lattice.addEdge(renyokei_surface, static_cast<uint32_t>(start_pos),
+                    static_cast<uint32_t>(renyokei_end_pos), core::PartOfSpeech::Verb,
+                    final_cost, flags, compound_base);
+  }
+
+  // Pattern 2: ADJ + すぎる (base form) - as single token
+  constexpr std::string_view kSugiru = "すぎる";
+  if (after_kanji.size() >= kSugiru.size() &&
+      after_kanji.substr(0, kSugiru.size()) == kSugiru) {
+    size_t sugiru_char_len = 3;  // すぎる is 3 characters
+    size_t sugiru_end_pos = kanji_end + sugiru_char_len;
+
+    if (sugiru_end_pos <= codepoints.size()) {
+      size_t sugiru_end_byte = charPosToBytePos(codepoints, sugiru_end_pos);
+      std::string sugiru_surface(text.substr(start_byte, sugiru_end_byte - start_byte));
+
+      lattice.addEdge(sugiru_surface, static_cast<uint32_t>(start_pos),
+                      static_cast<uint32_t>(sugiru_end_pos), core::PartOfSpeech::Verb,
+                      final_cost, flags, compound_base);
     }
   }
 }

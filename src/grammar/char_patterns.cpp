@@ -229,4 +229,15 @@ bool startsWithHiragana(std::string_view s) {
   return codepoint >= 0x3040 && codepoint <= 0x309F;
 }
 
+// A-row (あ段) endings for verb mizenkei detection
+// Includes all mizenkei endings plus あ for completeness
+// Note: Slightly broader than kMizenkeiEndings to catch edge cases
+const char* kARowEndings[] = {"あ", "か", "が", "さ", "た",
+                               "な", "ば", "ま", "ら", "わ"};
+const size_t kARowCount = 10;
+
+bool endsWithARow(std::string_view stem) {
+  return endsWithChar(stem, kARowEndings, kARowCount);
+}
+
 }  // namespace suzume::grammar
