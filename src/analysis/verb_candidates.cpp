@@ -845,6 +845,18 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     return candidates;
   }
 
+  // Reject single-character katakana stem + すぎ pattern
+  // e.g., "ンすぎた" from "ワンパターンすぎた" should not be a verb
+  // This is almost always a misanalysis from incorrect tokenization boundary
+  size_t kata_len = kata_end - start_pos;
+  if (kata_len == 1) {
+    std::string hira_part = extractSubstring(codepoints, kata_end, hira_end);
+    // C++17 compatible: check if starts with "すぎ" (6 bytes)
+    if (hira_part.size() >= 6 && hira_part.compare(0, 6, "すぎ") == 0) {
+      return candidates;  // Skip this candidate
+    }
+  }
+
   // Try different ending lengths, starting from longest
   for (size_t end_pos = hira_end; end_pos > kata_end; --end_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);

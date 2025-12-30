@@ -710,6 +710,46 @@
       "tags": ["regression", "verb", "katakana", "sugiru", "lemma"]
     },
     {
+      "id": "katakana_sugita_split",
+      "description": "ワンパターンすぎた should split as noun + すぎた, not ワンパター + ンすぎた",
+      "input": "ワンパターンすぎた",
+      "expected": [
+        {"surface": "ワンパターン", "pos": "Noun"},
+        {"surface": "すぎた", "pos": "Verb", "lemma": "すぎる"}
+      ],
+      "tags": ["regression", "noun", "katakana", "sugiru", "split"]
+    },
+    {
+      "id": "katakana_sugite_split",
+      "description": "シンプルすぎて should split as noun + すぎて, not シンプ + ルすぎて",
+      "input": "シンプルすぎて",
+      "expected": [
+        {"surface": "シンプル", "pos": "Noun"},
+        {"surface": "すぎて", "pos": "Verb", "lemma": "すぎる"}
+      ],
+      "tags": ["regression", "noun", "katakana", "sugiru", "split"]
+    },
+    {
+      "id": "counter_kagetsu",
+      "description": "数ヶ月 should split as number + ヶ月 counter suffix",
+      "input": "数ヶ月",
+      "expected": [
+        {"surface": "数", "pos": "Noun"},
+        {"surface": "ヶ月", "pos": "Suffix", "lemma": "ヶ月"}
+      ],
+      "tags": ["regression", "counter", "suffix"]
+    },
+    {
+      "id": "counter_kasho",
+      "description": "数ヶ所 should split as number + ヶ所 counter suffix",
+      "input": "数ヶ所",
+      "expected": [
+        {"surface": "数", "pos": "Noun"},
+        {"surface": "ヶ所", "pos": "Suffix", "lemma": "ヶ所"}
+      ],
+      "tags": ["regression", "counter", "suffix"]
+    },
+    {
       "id": "rashii_conjecture_verb",
       "description": "帰るらしい should split as verb + らしい (conjecture auxiliary)",
       "input": "帰るらしい",

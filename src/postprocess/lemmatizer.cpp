@@ -377,6 +377,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     case core::PartOfSpeech::Auxiliary:
     case core::PartOfSpeech::Conjunction:
     case core::PartOfSpeech::Adverb:
+    case core::PartOfSpeech::Suffix:
     case core::PartOfSpeech::Symbol:
     case core::PartOfSpeech::Other:
       // These don't conjugate - return surface as-is

@@ -680,6 +680,13 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"ちゃん", POS::Suffix, 0.5F, "", false, false, true, CT::None, ""},
       {"くん", POS::Suffix, 0.5F, "", false, false, true, CT::None, ""},
       {"氏", POS::Suffix, 0.8F, "", false, false, true, CT::None, ""},
+
+      // Counter suffixes with ヶ (助数詞接尾語)
+      // ヶ is read as か in counters (箇の略字)
+      {"ヶ月", POS::Suffix, 0.3F, "ヶ月", false, false, true, CT::None, "かげつ"},
+      {"ヶ国", POS::Suffix, 0.3F, "ヶ国", false, false, true, CT::None, "かこく"},
+      {"ヶ所", POS::Suffix, 0.3F, "ヶ所", false, false, true, CT::None, "かしょ"},
+      {"ヶ年", POS::Suffix, 0.5F, "ヶ年", false, false, true, CT::None, "かねん"},
   };
 }
 
