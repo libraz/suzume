@@ -158,6 +158,208 @@
         {"surface": "あがらない", "pos": "Verb", "lemma": "あがる"}
       ],
       "tags": ["regression", "B35", "verb", "hiragana"]
+    },
+    {
+      "id": "B36_omowazu_adv",
+      "description": "B36: 思わず should be ADV, not NOUN",
+      "input": "思わず言ってしまった",
+      "expected": [
+        {"surface": "思わず", "pos": "Adverb", "lemma": "思わず"},
+        {"surface": "言ってしまった", "pos": "Verb", "lemma": "言う"}
+      ],
+      "tags": ["regression", "B36", "adverb"]
+    },
+    {
+      "id": "B39_omae_pron",
+      "description": "B39: お前 should be PRON, not PREFIX+NOUN split",
+      "input": "お前の話",
+      "expected": [
+        {"surface": "お前", "pos": "Pronoun", "lemma": "お前"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "話", "pos": "Noun"}
+      ],
+      "tags": ["regression", "B39", "pronoun"]
+    },
+    {
+      "id": "B40_tottoto_adv",
+      "description": "B40: とっとと should be ADV, not OTHER+PARTICLE+PARTICLE split",
+      "input": "とっとと滅びればいい",
+      "expected": [
+        {"surface": "とっとと", "pos": "Adverb", "lemma": "とっとと"},
+        {"surface": "滅びれば", "pos": "Verb", "lemma": "滅びる"},
+        {"surface": "いい", "pos": "Adjective", "lemma": "よい"}
+      ],
+      "tags": ["regression", "B40", "adverb", "onomatopoeia"]
+    },
+    {
+      "id": "B37_shibire_noun",
+      "description": "B37: しびれ should be NOUN, not し+びれ split",
+      "input": "しびれを切らす",
+      "expected": [
+        {"surface": "しびれ", "pos": "Noun", "lemma": "しびれ"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "切らす", "pos": "Verb", "lemma": "切らす"}
+      ],
+      "tags": ["regression", "B37", "noun"]
+    },
+    {
+      "id": "B38_norokeru_verb",
+      "description": "B38: のろける should be VERB, not の+ろけ split",
+      "input": "のろけて見せた",
+      "expected": [
+        {"surface": "のろけて", "pos": "Verb", "lemma": "のろける"},
+        {"surface": "見せた", "pos": "Verb", "lemma": "見せる"}
+      ],
+      "tags": ["regression", "B38", "verb", "ichidan"]
+    },
+    {
+      "id": "B41_hitoaji_noun",
+      "description": "B41: ひと味 should be NOUN, not ひ+と+味 split",
+      "input": "ひと味違う",
+      "expected": [
+        {"surface": "ひと味", "pos": "Noun", "lemma": "ひと味"},
+        {"surface": "違う", "pos": "Verb", "lemma": "違う"}
+      ],
+      "tags": ["regression", "B41", "noun"]
+    },
+    {
+      "id": "B42_nuigurumi_noun",
+      "description": "B42: ぬいぐるみ should be NOUN, not OTHER",
+      "input": "ぬいぐるみ",
+      "expected": [
+        {"surface": "ぬいぐるみ", "pos": "Noun", "lemma": "ぬいぐるみ"}
+      ],
+      "tags": ["regression", "B42", "noun"]
+    },
+    {
+      "id": "B43_uriage_noun",
+      "description": "B43: 売り上げ should be NOUN when followed by case particle",
+      "input": "売り上げを伸ばす",
+      "expected": [
+        {"surface": "売り上げ", "pos": "Noun", "lemma": "売り上げ"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "伸ばす", "pos": "Verb", "lemma": "伸ばす"}
+      ],
+      "tags": ["regression", "B43", "noun"]
+    },
+    {
+      "id": "B44_moridakusan_noun",
+      "description": "B44: 盛りだくさん should be NOUN, not 盛りだく+さん split",
+      "input": "盛りだくさん",
+      "expected": [
+        {"surface": "盛りだくさん", "pos": "Noun", "lemma": "盛りだくさん"}
+      ],
+      "tags": ["regression", "B44", "noun"]
+    },
+    {
+      "id": "B46_toriageru_verb",
+      "description": "B46: とりあげない should be VERB, not と+りあげ split",
+      "input": "とりあげない",
+      "expected": [
+        {"surface": "とりあげない", "pos": "Verb", "lemma": "とりあげる"}
+      ],
+      "tags": ["regression", "B46", "verb", "ichidan"]
+    },
+    {
+      "id": "B60_akirameru_verb",
+      "description": "B60: あきらめられた should be VERB, not あきら+められた split",
+      "input": "あきらめられた",
+      "expected": [
+        {"surface": "あきらめられた", "pos": "Verb", "lemma": "あきらめる"}
+      ],
+      "tags": ["regression", "B60", "verb", "ichidan", "passive"]
+    },
+    {
+      "id": "B65_tsumatta_verb",
+      "description": "B65: 詰まった should be VERB, not NOUN",
+      "input": "息の詰まった",
+      "expected": [
+        {"surface": "息", "pos": "Noun"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "詰まった", "pos": "Verb", "lemma": "詰まる"}
+      ],
+      "tags": ["regression", "B65", "verb", "godan"]
+    },
+    {
+      "id": "B45_nasasou_adj",
+      "description": "B45: なさそう should have lemma ない, not なさい",
+      "input": "やる気がなさそう",
+      "expected": [
+        {"surface": "やる", "pos": "Verb", "lemma": "やる"},
+        {"surface": "気", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "なさそう", "pos": "Adjective", "lemma": "ない"}
+      ],
+      "tags": ["regression", "B45", "adjective", "lemma"]
+    },
+    {
+      "id": "B48_kakatte_verb",
+      "description": "B48: かかっている should not split as か+かって",
+      "input": "かかっている",
+      "expected": [
+        {"surface": "かかって", "pos": "Verb", "lemma": "かかる"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+      ],
+      "tags": ["regression", "B48", "verb", "godan"]
+    },
+    {
+      "id": "B52_majitte_verb",
+      "description": "B52: 交って should have lemma 交う, not 交る",
+      "input": "交っている",
+      "expected": [
+        {"surface": "交って", "pos": "Verb", "lemma": "交う"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+      ],
+      "tags": ["regression", "B52", "verb", "lemma"]
+    },
+    {
+      "id": "B54_hanatteru_verb",
+      "description": "B54: 放ってる should have lemma 放つ, not 放る",
+      "input": "放ってる",
+      "expected": [
+        {"surface": "放ってる", "pos": "Verb", "lemma": "放つ"}
+      ],
+      "tags": ["regression", "B54", "verb", "lemma"]
+    },
+    {
+      "id": "B57_tatakereba_verb",
+      "description": "B57: 叩ければ should be VERB potential-conditional, not ADJ",
+      "input": "叩ければ何でもいい",
+      "expected": [
+        {"surface": "叩ければ", "pos": "Verb", "lemma": "叩ける"},
+        {"surface": "何", "pos": "Pronoun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "も", "pos": "Particle"},
+        {"surface": "いい", "pos": "Adjective", "lemma": "よい"}
+      ],
+      "tags": ["regression", "B57", "verb", "potential", "conditional"]
+    },
+    {
+      "id": "B63_nukedasu_compound",
+      "description": "B63: 抜け出す should be single compound verb, not 抜け+出す split",
+      "input": "抜け出す",
+      "expected": [
+        {"surface": "抜け出す", "pos": "Verb", "lemma": "抜け出す"}
+      ],
+      "tags": ["regression", "B63", "compound_verb", "ichidan"]
+    },
+    {
+      "id": "B63_tabekomeru_compound",
+      "description": "B63: 食べ込む should be single compound verb (ichidan + V2)",
+      "input": "食べ込む",
+      "expected": [
+        {"surface": "食べ込む", "pos": "Verb", "lemma": "食べ込む"}
+      ],
+      "tags": ["regression", "B63", "compound_verb", "ichidan"]
+    },
+    {
+      "id": "B63_kakedasu_compound",
+      "description": "B63: 駆け出す should be single compound verb (ichidan + V2)",
+      "input": "駆け出す",
+      "expected": [
+        {"surface": "駆け出す", "pos": "Verb", "lemma": "駆け出す"}
+      ],
+      "tags": ["regression", "B63", "compound_verb", "ichidan"]
     }
   ]
 }

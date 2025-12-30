@@ -438,13 +438,12 @@
     },
     {
       "id": "recipe_cooking_instruction",
-      "description": "Cooking instruction",
+      "description": "Cooking instruction (みじん切り is a cooking term noun)",
       "input": "玉ねぎをみじん切りにする",
       "expected": [
         {"surface": "玉ねぎ", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "みじん", "pos": "Other"},
-        {"surface": "切り", "pos": "Verb", "lemma": "切る"},
+        {"surface": "みじん切り", "pos": "Noun", "lemma": "みじん切り"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "する", "pos": "Verb"}
       ],

@@ -417,7 +417,8 @@ std::vector<DictionaryEntry> getPronounEntries() {
       {"君", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "きみ"},
       // Second person - hiragana/mixed only
       {"あなた", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
-      {"お前", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "おまえ"},
+      // B39: お前 needs low cost to beat PREFIX(お)+NOUN(前) split (connection bonus -1.5)
+      {"お前", POS::Pronoun, 0.1F, "", false, false, true, CT::None, "おまえ"},
 
       // Second person plural (二人称複数)
       {"あなたたち", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
@@ -837,6 +838,37 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"誠に", POS::Adverb, 0.3F, "", false, false, false, CT::None, "まことに"},
       {"甚だ", POS::Adverb, 0.5F, "", false, false, false, CT::None, "はなはだ"},
       {"恐縮", POS::Noun, 0.3F, "", false, false, false, CT::None, "きょうしゅく"},
+
+      // Onomatopoeia/Mimetic adverbs (オノマトペ・擬態語副詞) - B61/B62
+      // These have opaque etymology and cannot be inferred from patterns
+      {"せっかく", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"うっかり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"すっかり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"ぴったり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"さっぱり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"あっさり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"こっそり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"ぐっすり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"めっきり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"がっかり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"びっくり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"ちゃっかり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"のんびり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"ぼんやり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"どっさり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"ばったり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"きっちり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"ぎっしり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"じっくり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"ちょっぴり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"こってり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"ふっくら", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"ぽっかり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"むっつり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      // B36: 思わず is a lexicalized adverb (involuntarily/unconsciously)
+      {"思わず", POS::Adverb, 0.3F, "", false, false, false, CT::None, "おもわず"},
+      // B40: とっとと is an emphatic adverb (quickly/hurry up)
+      {"とっとと", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
   };
 }
 
@@ -1007,6 +1039,10 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"できる", POS::Verb, 0.3F, "できる", false, false, false, CT::Ichidan, ""},
       {"やめる", POS::Verb, 0.3F, "やめる", false, false, false, CT::Ichidan, ""},
       {"はじめる", POS::Verb, 0.3F, "はじめる", false, false, false, CT::Ichidan, ""},
+      // B38: のろける starts with の (particle-like)
+      {"のろける", POS::Verb, 0.3F, "のろける", false, false, false, CT::Ichidan, ""},
+      // B46: とりあげる starts with と (particle-like)
+      {"とりあげる", POS::Verb, 0.3F, "とりあげる", false, false, false, CT::Ichidan, ""},
 
       // Godan-Ka verbs (五段カ行)
       {"いただく", POS::Verb, 0.3F, "いただく", false, false, false, CT::GodanKa, ""},
@@ -1019,6 +1055,8 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"やる", POS::Verb, 0.3F, "やる", false, false, false, CT::GodanRa, ""},
       {"わかる", POS::Verb, 0.3F, "わかる", false, false, false, CT::GodanRa, ""},
       {"なる", POS::Verb, 0.3F, "なる", false, false, false, CT::GodanRa, ""},
+      // B48: かかる starts with か (particle-like) - prevent か+かって split
+      {"かかる", POS::Verb, 0.3F, "かかる", false, false, false, CT::GodanRa, ""},
       {"できあがる", POS::Verb, 0.3F, "できあがる", false, false, false, CT::GodanRa, ""},
       {"がんばる", POS::Verb, 0.3F, "がんばる", false, false, false, CT::GodanRa, ""},
 
@@ -1117,6 +1155,8 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"下がる", POS::Verb, 0.3F, "下がる", false, false, false, CT::GodanRa, "さがる"},
       // B26: Colloquial verb with long stem (intrude/meddle)
       {"出しゃばる", POS::Verb, 0.3F, "出しゃばる", false, false, false, CT::GodanRa, "でしゃばる"},
+      // B65: 詰まる - past form 詰まった recognized as NOUN without conjugation expansion
+      {"詰まる", POS::Verb, 0.5F, "詰まる", false, false, false, CT::GodanRa, "つまる"},
 
       // Single-kanji Ichidan verbs (単漢字一段動詞)
       // These are critical for correct lemmatization of negation forms
@@ -1170,6 +1210,10 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"目立つ", POS::Verb, 0.3F, "目立つ", false, false, false, CT::GodanTa, "めだつ"},
       {"疑う", POS::Verb, 0.3F, "疑う", false, false, false, CT::GodanWa, "うたがう"},
       {"過疎る", POS::Verb, 0.3F, "過疎る", false, false, false, CT::GodanRa, "かそる"},
+      // B52: 交う - 飛び交う等で使用、交る/交つ/交うの曖昧性を解消
+      {"交う", POS::Verb, 0.3F, "交う", false, false, false, CT::GodanWa, "かう"},
+      // B54: 放つ - 言い放つ等で使用、放る/放つの曖昧性を解消
+      {"放つ", POS::Verb, 0.3F, "放つ", false, false, false, CT::GodanTa, "はなつ"},
 
       // Compound verbs (敬語複合動詞)
       {"恐れ入る", POS::Verb, 0.3F, "恐れ入る", false, false, false, CT::GodanRa, "おそれいる"},

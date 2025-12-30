@@ -257,26 +257,43 @@ std::vector<DictionaryEntry> expandAdjectiveEntry(const DictionaryEntry& entry) 
   std::string lemma = entry.lemma.empty() ? entry.surface : entry.lemma;
 
   // I-adjective conjugation suffixes
-  // Format: {suffix, creates form}
-  static const std::vector<std::pair<std::string, std::string>> kIAdjSuffixes = {
-      {"い", ""},           // Base form
-      {"かった", ""},       // Past
-      {"くない", ""},       // Negative
-      {"くなかった", ""},   // Negative past
-      {"くて", ""},         // Te-form
-      {"ければ", ""},       // Conditional
-      {"く", ""},           // Adverbial
-      {"さ", ""},           // Nominalization
-      {"かったら", ""},     // Conditional past
-      {"くなる", ""},       // Become ~
-      {"くなった", ""},     // Became ~
-      {"そう", ""},         // Looks like ~
+  // Format: {suffix, pos_override} - pos_override: '\0' = use ADJ, 'N' = use NOUN
+  static const std::vector<std::pair<std::string, char>> kIAdjSuffixes = {
+      {"い", '\0'},           // Base form
+      {"かった", '\0'},       // Past
+      {"くない", '\0'},       // Negative
+      {"くなかった", '\0'},   // Negative past
+      {"くて", '\0'},         // Te-form
+      {"ければ", '\0'},       // Conditional
+      {"く", '\0'},           // Adverbial
+      {"さ", 'N'},            // Nominalization (NOUN: 高さ, 美しさ, etc.)
+      {"かったら", '\0'},     // Conditional past
+      {"くなる", '\0'},       // Become ~
+      {"くなった", '\0'},     // Became ~
+      {"そう", '\0'},         // Looks like ~
+      {"さそう", '\0'},       // Looks like ~ (for ない/いい: なさそう, よさそう)
   };
 
-  for (const auto& [suffix, unused] : kIAdjSuffixes) {
+  for (const auto& [suffix, pos_override] : kIAdjSuffixes) {
+    // Skip さそう for normal adjectives (only valid for ない/いい/よい)
+    // Normal adjectives use stem+そう (たかそう), not stem+さそう
+    if (suffix == "さそう") {
+      // Only generate さそう for single-character stems (な from ない, よ from よい)
+      if (stem.size() != core::kJapaneseCharBytes) {
+        continue;
+      }
+    }
     DictionaryEntry new_entry = entry;
     new_entry.surface = stem + suffix;
     new_entry.lemma = lemma;
+    // Use NOUN for nominalization forms (高さ, 美しさ, etc.)
+    if (pos_override == 'N') {
+      new_entry.pos = core::PartOfSpeech::Noun;
+    }
+    // Lower cost for さそう to beat split (よさ+そう) analysis
+    if (suffix == "さそう") {
+      new_entry.cost = -0.5F;
+    }
     // Preserve conj_type for ChaSen output
     result.push_back(new_entry);
   }

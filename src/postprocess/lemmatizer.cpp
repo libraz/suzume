@@ -202,6 +202,19 @@ std::string Lemmatizer::lemmatizeVerb(std::string_view surface) {
 }
 
 std::string Lemmatizer::lemmatizeAdjective(std::string_view surface) {
+  // B45: Special handling for ない adjective + さ + そう pattern
+  // なさそう = ない + さ + そう (looks like there isn't)
+  // Without this, lemmatizer would incorrectly return なさい (from そう → い rule)
+  // This pattern also covers: なさそうな, なさそうに, なさそうだ, etc.
+  if (surface.find("なさそう") == 0) {
+    // Replace なさそう... with ない
+    return "ない";
+  }
+  // Also handle なさ alone (noun form of ない)
+  if (surface == "なさ") {
+    return "ない";
+  }
+
   for (const auto& ending : kAdjectiveEndings) {
     if (endsWith(surface, ending.suffix)) {
       std::string result(surface.substr(0, surface.size() - ending.suffix.size()));
@@ -346,6 +359,15 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   // If lemma is already set and different from surface, use it
   // (lemma == surface means it's a default that may need re-derivation)
   if (!morpheme.lemma.empty() && morpheme.lemma != morpheme.surface) {
+    // B45: Special fix for ない adjective + さ + そう pattern
+    // なさそう = ない + さ + そう (looks like there isn't)
+    // The inflection analyzer incorrectly derives lemma なさい (from なさ + そう)
+    // but the correct lemma is ない (from な + さそう)
+    if (morpheme.pos == core::PartOfSpeech::Adjective &&
+        morpheme.surface.find("なさそう") == 0) {
+      return "ない";
+    }
+
     // Special fix for katakana + すぎる patterns
     // The inflection analyzer incorrectly derives lemma like ワンパターンる
     // when the correct form is ワンパターンすぎる

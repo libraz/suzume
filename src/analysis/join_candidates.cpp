@@ -234,7 +234,19 @@ void addCompoundVerbJoinCandidates(
   bool is_ichidan = (base_ending == 0);
 
   // Position after 連用形 (for Godan) or after stem (for Ichidan)
-  size_t v2_start = is_ichidan ? kanji_end : kanji_end + 1;
+  size_t v2_start;
+  if (is_ichidan) {
+    // For shimo-ichidan verbs (〜ける, 〜べる, etc.), the stem includes
+    // the え-row hiragana (抜け from 抜ける, 食べ from 食べる)
+    // B63: We need to skip this hiragana when looking for V2
+    char32_t hira = codepoints[kanji_end];
+    bool is_e_row_stem = (hira == U'け' || hira == U'せ' || hira == U'て' ||
+                          hira == U'ね' || hira == U'べ' || hira == U'め' ||
+                          hira == U'れ' || hira == U'え' || hira == U'げ');
+    v2_start = is_e_row_stem ? (kanji_end + 1) : kanji_end;
+  } else {
+    v2_start = kanji_end + 1;
+  }
 
   if (v2_start >= codepoints.size()) {
     return;
@@ -312,7 +324,11 @@ void addCompoundVerbJoinCandidates(
 
       // Accept if inflection analysis identifies it as a verb with reasonable confidence
       // and the base form matches our constructed v1_base
-      if (infl_result.confidence >= 0.5F && infl_result.base_form == v1_base) {
+      // B63: For ichidan verbs in compound verb context, use lower threshold (0.25)
+      // because ichidan patterns get penalized by inflection analyzer's potential/godan ambiguity,
+      // but the compound verb context (kanji + e-row + known V2) strongly suggests ichidan verb
+      float min_confidence = is_ichidan ? 0.25F : 0.5F;
+      if (infl_result.confidence >= min_confidence && infl_result.base_form == v1_base) {
         v1_verified = true;
       }
     }

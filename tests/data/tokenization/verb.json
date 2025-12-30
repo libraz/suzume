@@ -103,13 +103,12 @@
     },
     {
       "id": "compound_tabe_hajimeru",
-      "description": "Compound verb 食べ始める (split: verb renyokei + verb)",
+      "description": "Compound verb 食べ始める should be single token (B63: ichidan compound verb fix)",
       "input": "食べ始める",
       "expected": [
-        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
-        {"surface": "始める", "pos": "Verb", "lemma": "始める"}
+        {"surface": "食べ始める", "pos": "Verb", "lemma": "食べ始める"}
       ],
-      "tags": ["verb", "compound"]
+      "tags": ["verb", "compound", "ichidan"]
     },
     {
       "id": "potential_expression",

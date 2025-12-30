@@ -430,6 +430,33 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       }
     }
 
+    // B57: For single kanji + ければ patterns (叩ければ, 引ければ, etc.),
+    // check if the kanji + く is a verb. If so, this is likely verb potential + conditional,
+    // not an adjective pattern.
+    // 叩ければ → 叩く (verb exists) → skip adjective (叩い is not a real adjective)
+    // 寒ければ → 寒い (adjective) - handled separately as hiragana_part starts with け
+    if (kanji_end == start_pos + 1 && hiragana_part == "ければ") {
+      if (dict_manager != nullptr) {
+        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+        std::string verb_form = kanji_stem + "く";
+        auto lookup = dict_manager->lookup(verb_form, 0);
+        // Count characters in verb_form (kanji + く = 2 chars)
+        size_t verb_form_chars = 2;  // Single kanji + く
+        bool is_godan_ku_verb = false;
+        for (const auto& result : lookup) {
+          if (result.length == verb_form_chars &&
+              result.entry != nullptr &&
+              result.entry->pos == core::PartOfSpeech::Verb) {
+            is_godan_ku_verb = true;
+            break;
+          }
+        }
+        if (is_godan_ku_verb) {
+          continue;  // Verb exists, this is verb potential-conditional (叩ける + ば)
+        }
+      }
+    }
+
     // Skip patterns that are clearly verb negatives, not adjectives
     // 〜かない, 〜がない, etc. are Godan verb mizenkei + ない patterns
     // 〜しない is Suru verb + ない, 〜べない is Ichidan verb + ない

@@ -110,10 +110,10 @@
     },
     {
       "id": "yosa_nominalization",
-      "description": "よさ (nominalization) - lemma is 良い",
+      "description": "よさ (nominalization) - NOUN derived from よい (良い)",
       "input": "よさ",
       "expected": [
-        {"surface": "よさ", "pos": "Adjective", "lemma": "良い"}
+        {"surface": "よさ", "pos": "Noun", "lemma": "良い"}
       ],
       "tags": ["irregular", "i_adjective", "yoi", "nominalization"]
     }

@@ -131,11 +131,10 @@
     },
     {
       "id": "nominalized_noun_kiri",
-      "description": "みじん切りにする - 切り analyzed as verb stem",
+      "description": "みじん切りにする - みじん切り is a cooking term noun",
       "input": "みじん切りにする",
       "expected": [
-        {"surface": "みじん", "pos": "Other"},
-        {"surface": "切り", "pos": "Verb", "lemma": "切る"},
+        {"surface": "みじん切り", "pos": "Noun", "lemma": "みじん切り"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "する", "pos": "Verb"}
       ],

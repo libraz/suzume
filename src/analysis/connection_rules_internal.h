@@ -315,6 +315,10 @@ ConnectionRuleResult checkRashiiAfterPredicate(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts);
 
+ConnectionRuleResult checkVerbToCaseParticle(const core::LatticeEdge& prev,
+                                             const core::LatticeEdge& next,
+                                             const ConnectionOptions& opts);
+
 }  // namespace connection_rules
 }  // namespace suzume::analysis
 

@@ -173,6 +173,11 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
     return result;
   }
 
+  result = checkVerbToCaseParticle(prev, next, opts);
+  if (result.pattern != ConnectionPattern::None) {
+    return result;
+  }
+
   // Other rules
   result = checkFormalNounBeforeKanji(prev, next, opts);
   if (result.pattern != ConnectionPattern::None) {

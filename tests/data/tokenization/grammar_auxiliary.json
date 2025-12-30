@@ -446,12 +446,13 @@
     },
     {
       "id": "aux_sugiru_verb",
-      "description": "Auxiliary verb すぎる after verb (食べすぎて)",
+      "description": "Compound verb 食べ過ぎる + て form (B63: ichidan compound verb fix)",
       "input": "食べすぎて",
       "expected": [
-        {"surface": "食べすぎて", "pos": "Verb", "lemma": "食べる"}
+        {"surface": "食べすぎ", "pos": "Verb", "lemma": "食べ過ぎる"},
+        {"surface": "て", "pos": "Auxiliary", "lemma": "て"}
       ],
-      "tags": ["auxiliary", "sugiru"]
+      "tags": ["compound", "sugiru", "ichidan"]
     },
     {
       "id": "aux_sugiru_dict",

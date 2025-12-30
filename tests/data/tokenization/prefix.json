@@ -224,12 +224,11 @@
     },
     {
       "id": "o_receipt",
-      "description": "Honorific お + 受け取り",
+      "description": "Honorific お + 受け取り (nominalized compound noun)",
       "input": "お受け取り",
       "expected": [
         {"surface": "お", "pos": "Prefix"},
-        {"surface": "受け", "pos": "Noun"},
-        {"surface": "取り", "pos": "Noun"}
+        {"surface": "受け取り", "pos": "Noun", "lemma": "受け取り"}
       ],
       "tags": ["prefix", "o"]
     },

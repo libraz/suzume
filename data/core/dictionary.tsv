@@ -179,6 +179,7 @@
 出しゃばる	VERB	でしゃばる	0.8	GODAN_RA
 あがる	VERB	あがる	0.8	GODAN_RA
 相次ぐ	VERB	あいつぐ	0.5	GODAN_GA
+# B65: 詰まる - moved to L1 for conjugation expansion
 
 # --- Ichidan verbs: Disambiguation needed ---
 # These -げる/-ける verbs are often confused with Godan potential forms
@@ -189,6 +190,14 @@
 つける	VERB	つける	0.2	ICHIDAN
 抜ける	VERB	ぬける	0.8	ICHIDAN
 落ちる	VERB	おちる	0.8	ICHIDAN
+# B38: のろける - split as の+ろける
+のろける	VERB	のろける	0.5	ICHIDAN
+# B46: とりあげる - split as と+りあげ
+とりあげる	VERB	とりあげる	0.5	ICHIDAN
+取り上げる	VERB	とりあげる	0.5	ICHIDAN
+# B60: あきらめる - split as あきら+める
+あきらめる	VERB	あきらめる	0.5	ICHIDAN
+諦める	VERB	あきらめる	0.5	ICHIDAN
 
 # =============================================================================
 # NOUNS (名詞)
@@ -253,6 +262,13 @@
 推し	NOUN	おし	0.3
 呼び出し	NOUN	よびだし	0.3
 打ち合わせ	NOUN	うちあわせ	0.3
+売り上げ	NOUN	うりあげ	0.3
+売上げ	NOUN	うりあげ	0.3
+売上	NOUN	うりあげ	0.3
+引き上げ	NOUN	ひきあげ	0.3
+受け取り	NOUN	うけとり	0.3
+貸し出し	NOUN	かしだし	0.3
+みじん切り	NOUN	みじんぎり	0.3
 思い出	NOUN	おもいで	0.3
 手助け	NOUN	てだすけ	0.3
 書き込み	NOUN	かきこみ	0.3
@@ -286,6 +302,18 @@
 食器洗い乾燥機	NOUN	しょっきあらいかんそうき	0.5
 投資ファンド	NOUN	とうしふぁんど	0.5
 オプション取引	NOUN	おぷしょんとりひき	0.5
+# B37: しびれ - split as し+びれ
+しびれ	NOUN	しびれ	0.3
+痺れ	NOUN	しびれ	0.5
+# B41: ひと味 - split as ひ+と+味
+ひと味	NOUN	ひとあじ	0.3
+一味	NOUN	ひとあじ	0.5
+# B42: ぬいぐるみ - recognized as OTHER
+ぬいぐるみ	NOUN	ぬいぐるみ	0.3
+縫いぐるみ	NOUN	ぬいぐるみ	0.5
+# B44: 盛りだくさん - split as 盛りだく+さん
+盛りだくさん	NOUN	もりだくさん	0.3
+盛り沢山	NOUN	もりだくさん	0.5
 
 # --- Foreign/Loanword nouns ---
 Wi-Fi	NOUN		0.5

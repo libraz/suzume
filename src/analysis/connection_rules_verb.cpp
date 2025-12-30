@@ -420,5 +420,43 @@ ConnectionRuleResult checkRashiiAfterPredicate(const core::LatticeEdge& prev,
           "rashii conjecture after verb/adj"};
 }
 
+// Rule: VERB → case particle (を/が/で/へ) penalty
+// Verb renyokei/base form cannot directly connect to case particles
+// E.g., 打ち合わせ(VERB)+を is unnatural; should be 打ち合わせ(NOUN)+を
+// Exception: に is excluded because 連用形+に+移動動詞 is valid (買いに行く)
+// Exception: から is excluded because it's conjunctive (理由), not case particle
+// Exception: まで is excluded because it's adverbial (範囲), not case particle
+// Exception: te-form verbs are excluded (handled separately)
+ConnectionRuleResult checkVerbToCaseParticle(const core::LatticeEdge& prev,
+                                             const core::LatticeEdge& next,
+                                             const ConnectionOptions& opts) {
+  if (!isVerbToParticle(prev, next)) return {};
+
+  // Only apply to true case particles (格助詞): を/が/で/へ
+  // に is excluded: 連用形+に+移動動詞 is valid (買いに行く, 見に来る)
+  // から is excluded: conjunctive particle for reason (疲れたから)
+  // まで is excluded: adverbial particle for range (食べるまで)
+  const auto& surf = next.surface;
+  if (surf != "を" && surf != "が" && surf != "で" && surf != "へ") {
+    return {};
+  }
+
+  // Exclude te-form verbs (て/で ending) - they have different connection patterns
+  if (prev.surface.size() >= core::kJapaneseCharBytes) {
+    std::string_view last = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
+    if (last == "て" || last == "で") {
+      return {};
+    }
+    // Exclude classical negative ぬ + で (知らぬで = 知らないで)
+    // で after ぬ-form is te-form connection, not case particle
+    if (last == "ぬ" && surf == "で") {
+      return {};
+    }
+  }
+
+  return {ConnectionPattern::VerbToCaseParticle, opts.penalty_verb_to_case_particle,
+          "verb to case particle (likely nominalized)"};
+}
+
 }  // namespace connection_rules
 }  // namespace suzume::analysis

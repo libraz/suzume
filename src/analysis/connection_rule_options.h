@@ -86,6 +86,10 @@ struct ConnectionOptions {
   // らしい after verb/adjective bonus
   float bonus_rashii_after_predicate = 0.8F;
 
+  // Verb (renyokei/base) + case particle (を/が/に/で/から/まで/へ)
+  // Penalizes patterns like 打ち合わせ(VERB)+を which should be NOUN+を
+  float penalty_verb_to_case_particle = 1.5F;
+
   // === Auxiliary Connection Rules ===
 
   // AUX + たい pattern
