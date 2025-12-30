@@ -46,6 +46,7 @@ set(TEST_SOURCES
   pretokenizer/pretokenizer_number_test.cpp
   pretokenizer/pretokenizer_text_test.cpp
   analysis/connection_rules_test.cpp
+  analysis/scorer_options_loader_test.cpp
   output/japanese_format_test.cpp
   postprocess/tag_generator_test.cpp
   # Universal test: auto-discovers all JSON files in tests/data/tokenization/

@@ -356,7 +356,8 @@ void addCompoundVerbJoinCandidates(
 
     // Calculate cost (V1 is already verified at this point)
     float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
-    float final_cost = base_cost + candidate::kCompoundVerbBonus + candidate::kVerifiedV1Bonus;
+    const auto& opts = scorer.joinOpts();
+    float final_cost = base_cost + opts.compound_verb_bonus + opts.verified_v1_bonus;
 
     uint8_t flags = core::LatticeEdge::kFromDictionary;
 
@@ -508,8 +509,8 @@ void addHiraganaCompoundVerbJoinCandidates(
 
       // Calculate cost
       float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
-      float final_cost = base_cost + candidate::kCompoundVerbBonus +
-                         candidate::kVerifiedV1Bonus;
+      const auto& opts = scorer.joinOpts();
+      float final_cost = base_cost + opts.compound_verb_bonus + opts.verified_v1_bonus;
 
       uint8_t flags = core::LatticeEdge::kFromDictionary;
 
@@ -598,7 +599,7 @@ void addAdjectiveSugiruJoinCandidates(
 
   // Calculate cost with bonus for verified ADJ
   float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
-  float final_cost = base_cost + candidate::kCompoundVerbBonus;
+  float final_cost = base_cost + scorer.joinOpts().compound_verb_bonus;
   uint8_t flags = core::LatticeEdge::kFromDictionary;
 
   // Generate candidates for different forms of すぎる
@@ -740,7 +741,7 @@ void addPrefixNounJoinCandidates(
   float final_cost = base_cost + matched_prefix->bonus;
 
   if (noun_in_dict) {
-    final_cost += candidate::kVerifiedNounBonus;
+    final_cost += scorer.joinOpts().verified_noun_bonus;
   }
 
   uint8_t flags = core::LatticeEdge::kIsUnknown;
@@ -837,7 +838,7 @@ void addTeFormAuxiliaryCandidates(
         std::string combo_surface(text.substr(te_byte, combo_end_byte - te_byte));
 
         float final_cost = scorer.posPrior(core::PartOfSpeech::Verb) +
-                           candidate::kTeFormAuxBonus;
+                           scorer.joinOpts().te_form_aux_bonus;
 
         uint8_t flags = core::LatticeEdge::kIsUnknown;
 

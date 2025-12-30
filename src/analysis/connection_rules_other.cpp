@@ -9,7 +9,8 @@ namespace connection_rules {
 
 // Rule 9: Adjective く + なる (bonus)
 ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
-                                    const core::LatticeEdge& next) {
+                                    const core::LatticeEdge& next,
+                                    const ConnectionOptions& opts) {
   if (!isAdjToVerb(prev, next)) return {};
 
   if (!endsWithKuForm(prev.surface)) {
@@ -27,7 +28,7 @@ ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
   }
 
   // Bonus (negative value)
-  return {ConnectionPattern::AdjKuNaru, -scorer::kBonusAdjKuNaru,
+  return {ConnectionPattern::AdjKuNaru, -opts.bonus_adj_ku_naru,
           "adj-ku + naru pattern"};
 }
 
@@ -36,7 +37,8 @@ ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
 // Valid short hiragana adjectives (すごい, うまい, やばい) are in dictionary
 // Unknown short-stem (≤2 chars) hiragana adjectives after PREFIX are penalized
 ConnectionRuleResult checkPrefixToShortStemHiraganaAdj(
-    const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& opts) {
   if (!isPrefixToAdj(prev, next)) return {};
 
   // Next must be unknown adjective (dictionary adjectives are valid)
@@ -60,13 +62,14 @@ ConnectionRuleResult checkPrefixToShortStemHiraganaAdj(
   if (!grammar::isPureHiragana(next.lemma)) return {};
 
   return {ConnectionPattern::PrefixToShortStemHiraganaAdj,
-          scorer::kPenaltyShortStemHiraganaAdj,
+          opts.penalty_prefix_short_stem_hiragana_adj,
           "prefix to short-stem hiragana adj"};
 }
 
 // Rule 8: だ/です + character speech suffix split penalty
 ConnectionRuleResult checkCharacterSpeechSplit(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next) {
+                                               const core::LatticeEdge& next,
+                                               const ConnectionOptions& opts) {
   if (!isAuxToAux(prev, next)) return {};
 
   if (prev.surface != "だ" && prev.surface != "です") {
@@ -82,14 +85,15 @@ ConnectionRuleResult checkCharacterSpeechSplit(const core::LatticeEdge& prev,
   }
 
   return {ConnectionPattern::CharacterSpeechSplit,
-          scorer::kPenaltyCharacterSpeechSplit, "split character speech pattern"};
+          opts.penalty_character_speech_split, "split character speech pattern"};
 }
 
 // Rule 14: に (PARTICLE) + よる (NOUN, lemma 夜) split penalty
 // Discourages parsing に + よる(夜) when compound particle によると is available
 // E.g., 報告によると should use によると compound particle
 ConnectionRuleResult checkYoruNightAfterNi(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next) {
+                                           const core::LatticeEdge& next,
+                                           const ConnectionOptions& opts) {
   if (!isParticleToNoun(prev, next)) return {};
 
   if (prev.surface != "に") return {};
@@ -99,14 +103,15 @@ ConnectionRuleResult checkYoruNightAfterNi(const core::LatticeEdge& prev,
     return {};
   }
 
-  return {ConnectionPattern::YoruNightAfterNi, scorer::kPenaltyYoruNightAfterNi,
+  return {ConnectionPattern::YoruNightAfterNi, opts.penalty_yoru_night_after_ni,
           "yoru(night) after ni (prefer compound particle)"};
 }
 
 // Check for formal noun followed by kanji (should be compound word)
 // e.g., 所 + 在する → should be 所在する
 ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
-                                                const core::LatticeEdge& next) {
+                                                const core::LatticeEdge& next,
+                                                const ConnectionOptions& opts) {
   // Check if prev is a formal noun (single kanji)
   // Note: Also check centralized formal noun set for edges without the flag
   bool is_formal =
@@ -130,7 +135,7 @@ ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
 
   // Penalty for formal noun + kanji pattern
   return {ConnectionPattern::FormalNounBeforeKanji,
-          scorer::kPenaltyFormalNounBeforeKanji,
+          opts.penalty_formal_noun_before_kanji,
           "formal noun before kanji (should be compound)"};
 }
 
@@ -138,7 +143,8 @@ ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
 // This is grammatically rare - usually different particles or NOUN between them
 // Exception: と + と can occur in quotation patterns
 ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next) {
+                                               const core::LatticeEdge& next,
+                                               const ConnectionOptions& opts) {
   if (!isParticleToParticle(prev, next)) return {};
 
   // Same single-character particle repeated
@@ -150,7 +156,7 @@ ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
       return {};
     }
     return {ConnectionPattern::SameParticleRepeated,
-            scorer::kPenaltySameParticleRepeated, "same particle repeated"};
+            opts.penalty_same_particle_repeated, "same particle repeated"};
   }
 
   return {};
@@ -162,7 +168,8 @@ ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
 // prefer splitting off the particle.
 // Example: すもも(NOUN) + もも(NOUN) should prefer すもも + も(PARTICLE) + もも
 ConnectionRuleResult checkHiraganaNounStartsWithParticle(
-    const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& opts) {
   if (!isNounToNoun(prev, next)) return {};
 
   // Next surface must start with hiragana
@@ -177,7 +184,7 @@ ConnectionRuleResult checkHiraganaNounStartsWithParticle(
       first3 == "か" || first3 == "や") {
     // Penalty to prefer NOUN + PARTICLE over NOUN + NOUN(starts with particle)
     return {ConnectionPattern::HiraganaNounStartsWithParticle,
-            scorer::kPenaltyHiraganaNounStartsWithParticle,
+            opts.penalty_hiragana_noun_starts_with_particle,
             "hiragana noun starts with particle char"};
   }
 
@@ -188,18 +195,20 @@ ConnectionRuleResult checkHiraganaNounStartsWithParticle(
 // After punctuation (、。etc.), a word is unlikely to be a suffix
 // E.g., 、家 should be 家(NOUN), not 家(SUFFIX meaning "-ist" as in 作家)
 ConnectionRuleResult checkSuffixAfterSymbol(const core::LatticeEdge& prev,
-                                            const core::LatticeEdge& next) {
+                                            const core::LatticeEdge& next,
+                                            const ConnectionOptions& opts) {
   if (!isSymbolToSuffix(prev, next)) return {};
 
   return {ConnectionPattern::SuffixAfterSymbol,
-          scorer::kPenaltySuffixAfterSymbol, "suffix after punctuation"};
+          opts.penalty_suffix_after_symbol, "suffix after punctuation"};
 }
 
 // Check for PARTICLE + hiragana OTHER pattern
 // Hiragana OTHER after particle is often a split error in reading contexts
 // e.g., と + うきょう in とうきょう should not be split
 ConnectionRuleResult checkParticleBeforeHiraganaOther(
-    const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& opts) {
   if (!isParticleToOther(prev, next)) return {};
 
   // Check if it starts with hiragana
@@ -207,8 +216,8 @@ ConnectionRuleResult checkParticleBeforeHiraganaOther(
 
   // Penalty based on length: single char = 2.5, multi-char = 1.0
   float penalty = (next.surface.size() == core::kJapaneseCharBytes)
-                      ? scorer::kPenaltyParticleBeforeSingleHiraganaOther
-                      : scorer::kPenaltyParticleBeforeMultiHiraganaOther;
+                      ? opts.penalty_particle_before_single_hiragana_other
+                      : opts.penalty_particle_before_multi_hiragana_other;
   return {ConnectionPattern::ParticleBeforeAux, penalty,
           "hiragana other after particle (likely split)"};
 }
@@ -217,7 +226,8 @@ ConnectionRuleResult checkParticleBeforeHiraganaOther(
 // Valid: 上手いし, 食べるし, 高いし, 行くし, だし
 // Invalid: 本し (noun cannot directly connect to し)
 ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
-                                                const core::LatticeEdge& next) {
+                                                const core::LatticeEdge& next,
+                                                const ConnectionOptions& opts) {
   // Only applies to し particle
   if (next.pos != core::PartOfSpeech::Particle || next.surface != "し") {
     return {};
@@ -232,7 +242,7 @@ ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
           prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes) ==
               "い") {
         return {ConnectionPattern::ShiParticleAfterPredicate,
-                -scorer::kBonusShiAfterIAdj, "i-adj + shi particle (valid)"};
+                -opts.bonus_shi_after_i_adj, "i-adj + shi particle (valid)"};
       }
       // Na-adj needs だ/な before し, so no bonus for bare na-adj
       return {};
@@ -243,19 +253,19 @@ ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
       // or る for ichidan verbs
       if (!prev.surface.empty()) {
         return {ConnectionPattern::ShiParticleAfterPredicate,
-                -scorer::kBonusShiAfterVerb, "verb + shi particle (valid)"};
+                -opts.bonus_shi_after_verb, "verb + shi particle (valid)"};
       }
       return {};
 
     case core::PartOfSpeech::Auxiliary:
       // AUX + し: valid (だし, ないし, たし)
       return {ConnectionPattern::ShiParticleAfterPredicate,
-              -scorer::kBonusShiAfterAux, "aux + shi particle (valid)"};
+              -opts.bonus_shi_after_aux, "aux + shi particle (valid)"};
 
     case core::PartOfSpeech::Noun:
       // NOUN + し: invalid (本し - should be 本だし with copula)
       return {ConnectionPattern::ShiParticleAfterNoun,
-              scorer::kPenaltyShiAfterNoun,
+              opts.penalty_shi_after_noun,
               "noun + shi particle (invalid, needs copula)"};
 
     default:

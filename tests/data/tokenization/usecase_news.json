@@ -195,13 +195,14 @@
     },
     {
       "id": "sports_ranking",
-      "description": "Ranking - ている progressive as unified verb",
+      "description": "Ranking - ている progressive splits into te-form + いる",
       "input": "現在3位につけている",
       "expected": [
         {"surface": "現在", "pos": "Noun"},
         {"surface": "3位", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "つけている", "pos": "Verb", "lemma": "つける"}
+        {"surface": "つけて", "pos": "Verb", "lemma": "つける"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["sports", "progressive"]
     },

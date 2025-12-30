@@ -331,7 +331,7 @@ void Tokenizer::addCompoundSplitCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   analysis::addCompoundSplitCandidates(lattice, text, codepoints, start_pos,
-                                        char_types, dict_manager_);
+                                        char_types, dict_manager_, scorer_);
 }
 
 void Tokenizer::addNounVerbSplitCandidates(
@@ -339,7 +339,7 @@ void Tokenizer::addNounVerbSplitCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   analysis::addNounVerbSplitCandidates(lattice, text, codepoints, start_pos,
-                                        char_types, dict_manager_);
+                                        char_types, dict_manager_, scorer_);
 }
 
 void Tokenizer::addCompoundVerbJoinCandidates(

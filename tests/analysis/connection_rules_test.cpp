@@ -7,10 +7,14 @@
 
 #include <gtest/gtest.h>
 
+#include "analysis/connection_rule_options.h"
 #include "analysis/scorer_constants.h"
 
 namespace suzume::analysis {
 namespace {
+
+// Default options for testing (matches constexpr defaults)
+const ConnectionOptions kDefaultOpts{};
 
 // Helper to create a test edge
 core::LatticeEdge makeEdge(std::string_view surface, core::PartOfSpeech pos,
@@ -131,7 +135,7 @@ TEST_F(ConnectionRuleTest, CopulaAfterVerb_Penalty) {
   auto prev = makeEdge("食べた", core::PartOfSpeech::Verb);
   auto next = makeEdge("だ", core::PartOfSpeech::Auxiliary);
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::CopulaAfterVerb);
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyCopulaAfterVerb);
 }
@@ -141,7 +145,7 @@ TEST_F(ConnectionRuleTest, CopulaAfterVerb_SouException) {
   auto prev = makeEdge("食べそう", core::PartOfSpeech::Verb);
   auto next = makeEdge("です", core::PartOfSpeech::Auxiliary);
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::None);
   EXPECT_FLOAT_EQ(result.adjustment, 0.0F);
 }
@@ -151,7 +155,7 @@ TEST_F(ConnectionRuleTest, IchidanRenyokeiTe_Penalty) {
   auto prev = makeEdge("食べ", core::PartOfSpeech::Verb);
   auto next = makeEdge("て", core::PartOfSpeech::Particle);
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::IchidanRenyokeiTe);
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyIchidanRenyokeiTe);
 }
@@ -161,7 +165,7 @@ TEST_F(ConnectionRuleTest, IchidanRenyokeiTe_VerbCompound) {
   auto prev = makeEdge("教え", core::PartOfSpeech::Verb);
   auto next = makeEdge("てくれた", core::PartOfSpeech::Verb);
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::IchidanRenyokeiTe);
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyIchidanRenyokeiTe);
 }
@@ -171,7 +175,7 @@ TEST_F(ConnectionRuleTest, TeFormSplit_GodanOnbin) {
   auto prev = makeEdge("書い", core::PartOfSpeech::Noun);
   auto next = makeEdge("て", core::PartOfSpeech::Particle);
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::TeFormSplit);
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyTeFormSplit);
 }
@@ -182,7 +186,7 @@ TEST_F(ConnectionRuleTest, TaiAfterRenyokei_ShortForm_NoBonus) {
   auto prev = makeEdge("読み", core::PartOfSpeech::Verb);
   auto next = makeEdge("たくない", core::PartOfSpeech::Adjective, "たい");
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::None);
   EXPECT_FLOAT_EQ(result.adjustment, 0.0F);
 }
@@ -192,7 +196,7 @@ TEST_F(ConnectionRuleTest, TaiAfterRenyokei_LongForm_Bonus) {
   auto prev = makeEdge("走り出し", core::PartOfSpeech::Verb);
   auto next = makeEdge("たくなってきた", core::PartOfSpeech::Adjective, "たい");
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::TaiAfterRenyokei);
   EXPECT_FLOAT_EQ(result.adjustment, -scorer::kBonusTaiAfterRenyokei);
 }
@@ -202,7 +206,7 @@ TEST_F(ConnectionRuleTest, TaiAfterAux_Penalty) {
   auto prev = makeEdge("なり", core::PartOfSpeech::Auxiliary, "だ");
   auto next = makeEdge("たかった", core::PartOfSpeech::Adjective, "たい");
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::TaiAfterRenyokei);
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyTaiAfterAux);
 }
@@ -212,7 +216,7 @@ TEST_F(ConnectionRuleTest, YasuiAfterRenyokei_Penalty) {
   auto prev = makeEdge("読み", core::PartOfSpeech::Noun);
   auto next = makeEdge("やすい", core::PartOfSpeech::Adjective, "安い");
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::YasuiAfterRenyokei);
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyYasuiAfterRenyokei);
 }
@@ -222,7 +226,7 @@ TEST_F(ConnectionRuleTest, NagaraSplit_Penalty) {
   auto prev = makeEdge("飲み", core::PartOfSpeech::Verb);
   auto next = makeEdge("ながら", core::PartOfSpeech::Particle);
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::NagaraSplit);
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyNagaraSplit);
 }
@@ -232,7 +236,7 @@ TEST_F(ConnectionRuleTest, SouAfterRenyokei_Penalty) {
   auto prev = makeEdge("話し", core::PartOfSpeech::Noun);
   auto next = makeEdge("そう", core::PartOfSpeech::Adverb);
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::SouAfterRenyokei);
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltySouAfterRenyokei);
 }
@@ -242,7 +246,7 @@ TEST_F(ConnectionRuleTest, CharacterSpeechSplit_Penalty) {
   auto prev = makeEdge("だ", core::PartOfSpeech::Auxiliary);
   auto next = makeEdge("にゃ", core::PartOfSpeech::Auxiliary);
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::CharacterSpeechSplit);
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyCharacterSpeechSplit);
 }
@@ -252,7 +256,7 @@ TEST_F(ConnectionRuleTest, AdjKuNaru_Bonus) {
   auto prev = makeEdge("美しく", core::PartOfSpeech::Adjective);
   auto next = makeEdge("なる", core::PartOfSpeech::Verb, "なる");
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::AdjKuNaru);
   EXPECT_FLOAT_EQ(result.adjustment, -scorer::kBonusAdjKuNaru);
 }
@@ -262,7 +266,7 @@ TEST_F(ConnectionRuleTest, CompoundAuxAfterRenyokei_Penalty) {
   auto prev = makeEdge("読み", core::PartOfSpeech::Noun);
   auto next = makeEdge("終わる", core::PartOfSpeech::Verb);
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::CompoundAuxAfterRenyokei);
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyCompoundAuxAfterRenyokei);
 }
@@ -272,7 +276,7 @@ TEST_F(ConnectionRuleTest, NoMatch_ReturnsNone) {
   auto prev = makeEdge("本", core::PartOfSpeech::Noun);
   auto next = makeEdge("を", core::PartOfSpeech::Particle);
 
-  auto result = evaluateConnectionRules(prev, next);
+  auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
   EXPECT_EQ(result.pattern, ConnectionPattern::None);
   EXPECT_FLOAT_EQ(result.adjustment, 0.0F);
   EXPECT_EQ(result.description, nullptr);

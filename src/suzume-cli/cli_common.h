@@ -98,6 +98,9 @@ struct CommandArgs {
 
   // Postprocess options
   bool preserve_symbols = false; // --preserve-symbols: keep symbols in output
+
+  // Scorer config path (for parameter tuning)
+  std::string scorer_config_path;  // --scorer-config PATH
 };
 
 /**

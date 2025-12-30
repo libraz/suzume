@@ -166,6 +166,14 @@ int cmdAnalyze(const CommandArgs& args) {
   // Default is remove symbols (true), flag inverts to preserve
   options.remove_symbols = !args.preserve_symbols;
 
+  // Set scorer config path (loaded internally by Suzume)
+  if (!args.scorer_config_path.empty()) {
+    options.scorer_config_path = args.scorer_config_path;
+    if (args.verbose) {
+      printInfo("Using scorer config: " + args.scorer_config_path);
+    }
+  }
+
   Suzume analyzer(options);
 
   // Load dictionaries

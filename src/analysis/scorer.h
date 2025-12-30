@@ -1,6 +1,8 @@
 #ifndef SUZUME_ANALYSIS_SCORER_H_
 #define SUZUME_ANALYSIS_SCORER_H_
 
+#include "analysis/candidate_options.h"
+#include "analysis/connection_rule_options.h"
 #include "analysis/interfaces.h"
 #include "core/lattice.h"
 #include "core/types.h"
@@ -44,6 +46,14 @@ struct ScorerOptions {
     size_t katakana_min = 3;
     size_t katakana_max = 12;
   } optimal_length;
+
+  // Connection rule options (edge costs and connection costs)
+  // These can be loaded from JSON at runtime for parameter tuning
+  ConnectionRuleOptions connection_rules;
+
+  // Candidate generation options (join/split costs)
+  // These can be loaded from JSON at runtime for parameter tuning
+  CandidateOptions candidates;
 };
 
 /**
@@ -83,8 +93,28 @@ class Scorer : public IScorer {
    */
   float posPrior(core::PartOfSpeech pos) const;
 
+  /**
+   * @brief Get join candidate options
+   */
+  const JoinOptions& joinOpts() const { return options_.candidates.join; }
+
+  /**
+   * @brief Get split candidate options
+   */
+  const SplitOptions& splitOpts() const { return options_.candidates.split; }
+
  private:
   ScorerOptions options_;
+
+  /**
+   * @brief Get edge options for word cost calculation
+   */
+  const EdgeOptions& edgeOpts() const { return options_.connection_rules.edge; }
+
+  /**
+   * @brief Get connection options for connection cost calculation
+   */
+  const ConnectionOptions& connOpts() const { return options_.connection_rules.connection; }
 
   /**
    * @brief Calculate bigram connection cost

@@ -16,6 +16,7 @@
 
 #include <string_view>
 
+#include "analysis/connection_rule_options.h"
 #include "core/lattice.h"
 #include "core/types.h"
 
@@ -128,13 +129,15 @@ struct ConnectionRuleResult {
  * @brief Evaluate all connection rules for a morpheme pair
  * @param prev Previous morpheme
  * @param next Next morpheme
+ * @param opts Connection options (penalty/bonus values)
  * @return Combined adjustment value and matched pattern info
  *
  * Returns the sum of all applicable rule adjustments.
  * Each rule is evaluated independently; multiple rules can apply.
  */
 ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
-                                             const core::LatticeEdge& next);
+                                             const core::LatticeEdge& next,
+                                             const ConnectionOptions& opts);
 
 }  // namespace suzume::analysis
 

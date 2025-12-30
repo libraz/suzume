@@ -240,8 +240,8 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
         }
       }
       if (!valid_adj_lemma) {
-        cost += scorer::kPenaltyInvalidAdjSou;
-        logAdjustment(scorer::kPenaltyInvalidAdjSou, "invalid_adj_sou");
+        cost += edgeOpts().penalty_invalid_adj_sou;
+        logAdjustment(edgeOpts().penalty_invalid_adj_sou, "invalid_adj_sou");
       }
     }
   }
@@ -271,8 +271,8 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
         char32_t ch = codepoints[0];
         // Allow known single-character verb stems
         if (!normalize::isValidSingleCharVerbStem(ch)) {
-          cost += scorer::kPenaltyInvalidTaiPattern;
-          logAdjustment(scorer::kPenaltyInvalidTaiPattern, "invalid_tai_pattern");
+          cost += edgeOpts().penalty_invalid_tai_pattern;
+          logAdjustment(edgeOpts().penalty_invalid_tai_pattern, "invalid_tai_pattern");
         }
       }
     }
@@ -298,8 +298,8 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       is_toi_pattern = true;
     }
     if (is_ndoi_pattern || is_toi_pattern) {
-      cost += scorer::kPenaltyVerbOnbinAsAdj;
-      logAdjustment(scorer::kPenaltyVerbOnbinAsAdj, "verb_contraction_as_adj");
+      cost += edgeOpts().penalty_verb_onbin_as_adj;
+      logAdjustment(edgeOpts().penalty_verb_onbin_as_adj, "verb_contraction_as_adj");
     }
   }
 
@@ -316,8 +316,8 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
         surface.find(scorer::kPatternDeShima) != std::string_view::npos ||
         surface.find(scorer::kPatternTeIru) != std::string_view::npos ||
         surface.find(scorer::kPatternDeIru) != std::string_view::npos) {
-      cost += scorer::kPenaltyVerbAuxInAdj;
-      logAdjustment(scorer::kPenaltyVerbAuxInAdj, "verb_aux_in_adj");
+      cost += edgeOpts().penalty_verb_aux_in_adj;
+      logAdjustment(edgeOpts().penalty_verb_aux_in_adj, "verb_aux_in_adj");
     }
   }
 
@@ -326,8 +326,8 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary()) {
     if (edge.surface == scorer::kSurfaceShimai || edge.surface == scorer::kSurfaceJimai) {
-      cost += scorer::kPenaltyShimaiAsAdj;
-      logAdjustment(scorer::kPenaltyShimaiAsAdj, "shimai_as_adj");
+      cost += edgeOpts().penalty_shimai_as_adj;
+      logAdjustment(edgeOpts().penalty_shimai_as_adj, "shimai_as_adj");
     }
   }
 
@@ -340,8 +340,8 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     std::string_view surface = edge.surface;
     std::string_view last15 = surface.substr(surface.size() - core::kFiveJapaneseCharBytes);
     if (last15 == scorer::kSuffixTaiRashii) {
-      cost += scorer::kPenaltyVerbTaiRashii;
-      logAdjustment(scorer::kPenaltyVerbTaiRashii, "verb_tai_rashii_split");
+      cost += edgeOpts().penalty_verb_tai_rashii;
+      logAdjustment(edgeOpts().penalty_verb_tai_rashii, "verb_tai_rashii_split");
     }
   }
 
@@ -365,8 +365,8 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       // あ段: Godan verb mizenkei (走らない, 書かない)
       // え段: Ichidan verb mizenkei (食べない, 見ない - rare, but still verb pattern)
       if (grammar::endsWithARow(stem) || grammar::endsWithERow(stem)) {
-        cost += scorer::kPenaltyVerbNaiPattern;
-        logAdjustment(scorer::kPenaltyVerbNaiPattern, "verb_nai_pattern");
+        cost += edgeOpts().penalty_verb_nai_pattern;
+        logAdjustment(edgeOpts().penalty_verb_nai_pattern, "verb_nai_pattern");
       }
     }
   }
@@ -380,7 +380,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   float base_cost = bigramCost(prev.pos, next.pos);
 
   // Evaluate connection rules
-  ConnectionRuleResult rule_result = evaluateConnectionRules(prev, next);
+  ConnectionRuleResult rule_result = evaluateConnectionRules(prev, next, connOpts());
   float penalty = rule_result.adjustment;
   const char* penalty_reason = rule_result.description;
 

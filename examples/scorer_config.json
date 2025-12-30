@@ -1,0 +1,76 @@
+{
+  "connection_rules": {
+    "edge": {
+      "penalty_invalid_adj_sou": 1.5,
+      "penalty_invalid_tai_pattern": 2.0,
+      "penalty_verb_aux_in_adj": 2.0,
+      "penalty_shimai_as_adj": 3.0,
+      "penalty_verb_onbin_as_adj": 2.0,
+      "penalty_short_stem_hiragana_adj": 3.0,
+      "penalty_verb_tai_rashii": 0.5,
+      "penalty_verb_nai_pattern": 1.5
+    },
+    "connection": {
+      "penalty_copula_after_verb": 3.0,
+      "penalty_ichidan_renyokei_te": 1.5,
+      "bonus_tai_after_renyokei": 0.8,
+      "penalty_yasui_after_renyokei": 2.0,
+      "penalty_nagara_split": 1.0,
+      "penalty_sou_after_renyokei": 0.3,
+      "penalty_te_form_split": 1.5,
+      "penalty_taku_te_split": 1.5,
+      "penalty_takute_after_renyokei": 2.0,
+      "bonus_conditional_verb_to_verb": -0.3,
+      "bonus_verb_renyokei_compound_aux": -0.4,
+      "penalty_toku_contraction_split": 2.0,
+      "bonus_te_form_verb_to_verb": -0.3,
+      "bonus_rashii_after_predicate": -0.2,
+      "penalty_tai_after_aux": 0.3,
+      "penalty_masen_de_split": 0.5,
+      "penalty_invalid_single_char_aux": 1.0,
+      "penalty_te_form_ta_contraction": 1.5,
+      "penalty_noun_mai": 0.3,
+      "penalty_short_aux_after_particle": 0.5,
+      "bonus_noun_mitai": -0.2,
+      "bonus_verb_mitai": -0.15,
+      "penalty_iru_aux_after_noun": 0.3,
+      "bonus_iru_aux_after_te_form": -0.2,
+      "penalty_character_speech_split": 1.0,
+      "bonus_adj_ku_naru": -0.3,
+      "penalty_compound_aux_after_renyokei": 0.5,
+      "penalty_yoru_night_after_ni": 0.5,
+      "penalty_formal_noun_before_kanji": 0.3,
+      "penalty_same_particle_repeated": 0.5,
+      "penalty_hiragana_noun_starts_with_particle": 0.3,
+      "penalty_particle_before_single_hiragana_other": 0.5,
+      "penalty_particle_before_multi_hiragana_other": 0.3,
+      "bonus_shi_after_i_adj": -0.3,
+      "bonus_shi_after_verb": -0.3,
+      "bonus_shi_after_aux": -0.2,
+      "penalty_shi_after_noun": 0.3,
+      "penalty_suffix_at_start": 1.0,
+      "penalty_suffix_after_symbol": 0.5,
+      "penalty_prefix_before_verb": 0.3,
+      "penalty_noun_before_verb_aux": 0.3
+    }
+  },
+  "candidates": {
+    "join": {
+      "compound_verb_bonus": -0.8,
+      "verified_v1_bonus": -0.3,
+      "verified_noun_bonus": -0.3,
+      "te_form_aux_bonus": -0.8
+    },
+    "split": {
+      "alpha_kanji_bonus": -0.3,
+      "alpha_katakana_bonus": -0.3,
+      "digit_kanji_1_bonus": -0.2,
+      "digit_kanji_2_bonus": -0.2,
+      "digit_kanji_3_penalty": 0.5,
+      "dict_split_bonus": -0.5,
+      "split_base_cost": 1.0,
+      "noun_verb_split_bonus": -1.0,
+      "verified_verb_bonus": -0.8
+    }
+  }
+}

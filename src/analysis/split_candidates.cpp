@@ -81,11 +81,12 @@ void addMixedScriptCandidates(
   float base_bonus = 0.0F;
   size_t max_second_len = kMaxJapaneseLen;
 
+  const auto& opts = scorer.splitOpts();
   if (first_type == CharType::Alphabet) {
     if (second_type == CharType::Kanji) {
-      base_bonus = candidate::kAlphaKanjiBonus;
+      base_bonus = opts.alpha_kanji_bonus;
     } else if (second_type == CharType::Katakana) {
-      base_bonus = candidate::kAlphaKatakanaBonus;
+      base_bonus = opts.alpha_katakana_bonus;
     } else {
       return;  // Not a valid pattern
     }
@@ -121,11 +122,11 @@ void addMixedScriptCandidates(
       // Apply length-based bonus/penalty
       float length_adjustment;
       if (kanji_len == 1) {
-        length_adjustment = candidate::kDigitKanji1Bonus;  // Best: 5分, 3月
+        length_adjustment = opts.digit_kanji_1_bonus;  // Best: 5分, 3月
       } else if (kanji_len == 2) {
-        length_adjustment = candidate::kDigitKanji2Bonus;  // Good: 5分間, 3時間
+        length_adjustment = opts.digit_kanji_2_bonus;  // Good: 5分間, 3時間
       } else {
-        length_adjustment = candidate::kDigitKanji3Penalty;  // Rare: penalize
+        length_adjustment = opts.digit_kanji_3_penalty;  // Rare: penalize
       }
 
       float final_cost = base_cost + length_adjustment;
@@ -153,7 +154,8 @@ void addCompoundSplitCandidates(
     core::Lattice& lattice, std::string_view text,
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager) {
+    const dictionary::DictionaryManager& dict_manager,
+    const Scorer& scorer) {
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -192,7 +194,8 @@ void addCompoundSplitCandidates(
     auto first_results = dict_manager.lookup(text, start_byte);
     bool first_in_dict = false;
     bool first_is_formal_noun = false;
-    float first_cost = candidate::kSplitBaseCost;
+    const auto& opts = scorer.splitOpts();
+    float first_cost = opts.split_base_cost;
 
     for (const auto& result : first_results) {
       if (result.entry != nullptr && result.length == split_point &&
@@ -201,7 +204,7 @@ void addCompoundSplitCandidates(
         // Allow NOUN and ADJ (na-adjectives can function as nominal in compounds)
         // This prevents ADV/VERB from being incorrectly reregistered as NOUN
         first_in_dict = true;
-        first_cost = result.entry->cost + candidate::kDictSplitBonus;
+        first_cost = result.entry->cost + opts.dict_split_bonus;
         first_is_formal_noun = result.entry->is_formal_noun;
         break;
       }
@@ -249,7 +252,8 @@ void addNounVerbSplitCandidates(
     core::Lattice& lattice, std::string_view text,
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager) {
+    const dictionary::DictionaryManager& dict_manager,
+    const Scorer& scorer) {
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -362,10 +366,11 @@ void addNounVerbSplitCandidates(
       // Generate split candidates if conditions are met
       if ((noun_in_dict && looks_like_verb) || base_in_dict) {
         std::string noun_surface(text.substr(start_byte, verb_start_byte - start_byte));
-        float final_noun_cost = noun_cost + candidate::kNounVerbSplitBonus;
+        const auto& opts = scorer.splitOpts();
+        float final_noun_cost = noun_cost + opts.noun_verb_split_bonus;
 
         if (base_in_dict) {
-          final_noun_cost += candidate::kVerifiedVerbBonus;
+          final_noun_cost += opts.verified_verb_bonus;
         }
 
         if (noun_in_dict && base_in_dict) {

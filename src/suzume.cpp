@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "analysis/analyzer.h"
+#include "analysis/scorer_options_loader.h"
 #include "dictionary/binary_dict.h"
 #include "dictionary/user_dict.h"
 #include "postprocess/postprocessor.h"
@@ -75,9 +76,20 @@ struct Suzume::Impl {
   postprocess::TagGenerator tag_generator;
   std::shared_ptr<dictionary::UserDictionary> custom_dict;
 
+  static analysis::ScorerOptions loadScorerConfig(const SuzumeOptions& opts) {
+    analysis::ScorerOptions scorer_opts = opts.scorer_options;
+    if (!opts.scorer_config_path.empty()) {
+      std::string error_msg;
+      if (!analysis::ScorerOptionsLoader::loadFromFile(opts.scorer_config_path, scorer_opts, &error_msg)) {
+        std::cerr << "warning: Failed to load scorer config: " << error_msg << "\n";
+      }
+    }
+    return scorer_opts;
+  }
+
   Impl(const SuzumeOptions& opts)
       : options(opts),
-        analyzer(analysis::AnalyzerOptions{opts.mode, {}, {}, opts.normalize_options}),
+        analyzer(analysis::AnalyzerOptions{opts.mode, loadScorerConfig(opts), {}, opts.normalize_options}),
         postprocessor(&analyzer.dictionaryManager(),
                       postprocess::PostprocessOptions{
                           .merge_noun_compounds = opts.merge_compounds,
