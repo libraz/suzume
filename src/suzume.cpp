@@ -81,12 +81,22 @@ struct Suzume::Impl {
   static analysis::ScorerOptions loadScorerConfig(const SuzumeOptions& opts) {
     analysis::ScorerOptions scorer_opts = opts.scorer_options;
 #ifndef __EMSCRIPTEN__
-    // File-based config loading is only available in native builds
-    if (!opts.scorer_config_path.empty()) {
-      std::string error_msg;
-      if (!analysis::ScorerOptionsLoader::loadFromFile(opts.scorer_config_path, scorer_opts, &error_msg)) {
-        std::cerr << "warning: Failed to load scorer config: " << error_msg << "\n";
+    // Load from environment variables (SUZUME_SCORER_CONFIG and SUZUME_SCORER_*)
+    auto result = analysis::ScorerOptionsLoader::loadFromEnv(scorer_opts);
+
+    // Output status message when config is active (debug feature)
+    if (result.hasConfig()) {
+      std::cerr << "[scorer-config] ";
+      if (!result.config_path.empty()) {
+        std::cerr << "json=" << result.config_path;
+        if (result.env_override_count > 0) {
+          std::cerr << ", ";
+        }
       }
+      if (result.env_override_count > 0) {
+        std::cerr << "env_overrides=" << result.env_override_count;
+      }
+      std::cerr << "\n";
     }
 #endif
     return scorer_opts;

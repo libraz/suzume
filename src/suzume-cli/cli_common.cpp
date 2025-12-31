@@ -186,13 +186,6 @@ CommandArgs parseArgs(int argc, char* argv[]) {
       continue;
     }
 
-    // Scorer config path
-    if (arg == "--scorer-config" && idx + 1 < argc) {
-      args.scorer_config_path = argv[++idx];
-      ++idx;
-      continue;
-    }
-
     // Command or positional argument
     if (arg[0] != '-') {
       if (args.command.empty()) {
@@ -243,7 +236,6 @@ Global Options:
   -f, --format FMT       Output format: morpheme, tags, json, tsv, chasen
   -V, --verbose          Verbose output
   -VV, --very-verbose    Very verbose output (includes lattice dump)
-  --scorer-config PATH   Load scorer parameters from JSON file
   --no-user-dict         Disable user dictionary
   --no-core-dict         Disable core dictionary
   --compare              Compare with/without user dictionary
@@ -275,7 +267,6 @@ Options:
   -m, --mode MODE        Analysis mode: normal, search, split
   -f, --format FMT       Output format: morpheme, tags, json, tsv, chasen
   -V, --verbose          Verbose output
-  --scorer-config PATH   Load scorer parameters from JSON file
   --no-user-dict         Disable user dictionary
   --compare              Compare with/without user dictionary
   --normalize-vu         Normalize ヴ to ビ etc. (default: preserve)

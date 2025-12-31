@@ -181,14 +181,14 @@ class Viterbi {
     }
 
     // Debug: print final path
-    if (Debug::isEnabled() && !result.path.empty()) {
-      Debug::log() << "[VITERBI] Best path (cost=" << result.total_cost << "): ";
+    SUZUME_DEBUG_IF(!result.path.empty()) {
+      SUZUME_DEBUG_STREAM << "[VITERBI] Best path (cost=" << result.total_cost << "): ";
       for (size_t i = 0; i < result.path.size(); ++i) {
         const auto& edge = lattice.getEdge(result.path[i]);
-        if (i > 0) Debug::log() << " → ";
-        Debug::log() << "\"" << edge.surface << "\"(" << posToString(edge.pos) << ")";
+        if (i > 0) SUZUME_DEBUG_STREAM << " → ";
+        SUZUME_DEBUG_STREAM << "\"" << edge.surface << "\"(" << posToString(edge.pos) << ")";
       }
-      Debug::log() << "\n";
+      SUZUME_DEBUG_STREAM << "\n";
     }
 
     return result;

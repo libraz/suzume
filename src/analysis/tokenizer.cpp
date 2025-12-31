@@ -179,9 +179,9 @@ void Tokenizer::addUnknownCandidates(
     if (!skip_penalty && candidate.pos == core::PartOfSpeech::Verb) {
       // Check if surface ends with colloquial contraction patterns
       std::string_view surface = candidate.surface;
-      if ((surface.size() >= core::kThreeJapaneseCharBytes && surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "っとく") ||
-          (surface.size() >= core::kFourJapaneseCharBytes && surface.substr(surface.size() - core::kFourJapaneseCharBytes) == "っちゃう") ||
-          (surface.size() >= core::kFourJapaneseCharBytes && surface.substr(surface.size() - core::kFourJapaneseCharBytes) == "っじゃう")) {
+      if (utf8::endsWith(surface, "っとく") ||
+          utf8::endsWith(surface, "っちゃう") ||
+          utf8::endsWith(surface, "っじゃう")) {
         skip_penalty = true;
       }
     }
@@ -204,7 +204,7 @@ void Tokenizer::addUnknownCandidates(
         }
         if (all_hiragana) {
           // Check if ends with て or で (te-form markers)
-          std::string_view last_char = surface.substr(surface.size() - core::kJapaneseCharBytes);
+          std::string_view last_char = utf8::lastChar(surface);
           if (last_char == "て" || last_char == "で") {
             skip_penalty = true;
           }

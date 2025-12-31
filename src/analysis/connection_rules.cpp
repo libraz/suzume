@@ -25,39 +25,24 @@ bool endsWithOnbinMarker(std::string_view surface) {
 }
 
 bool endsWithKuForm(std::string_view surface) {
-  if (surface.size() < core::kJapaneseCharBytes) {
-    return false;
-  }
-  return surface.substr(surface.size() - core::kJapaneseCharBytes) == "く";
+  return utf8::endsWith(surface, "く");
 }
 
 bool startsWithTe(std::string_view surface) {
-  if (surface.size() < core::kJapaneseCharBytes) {
-    return false;
-  }
-  std::string_view first3 = surface.substr(0, core::kJapaneseCharBytes);
-  return first3 == "て" || first3 == "で";
+  std::string_view first = utf8::firstNBytes(surface, core::kJapaneseCharBytes);
+  return first == "て" || first == "で";
 }
 
 bool endsWithSou(std::string_view surface) {
-  if (surface.size() < core::kTwoJapaneseCharBytes) {
-    return false;
-  }
-  return surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "そう";
+  return utf8::endsWith(surface, "そう");
 }
 
 bool endsWithYou(std::string_view surface) {
-  if (surface.size() < core::kTwoJapaneseCharBytes) {
-    return false;
-  }
-  return surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "よう";
+  return utf8::endsWith(surface, "よう");
 }
 
 bool endsWithNodaBase(std::string_view surface) {
-  if (surface.size() < core::kJapaneseCharBytes) {
-    return false;
-  }
-  std::string_view last = surface.substr(surface.size() - core::kJapaneseCharBytes);
+  std::string_view last = utf8::lastChar(surface);
   return last == "の" || last == "ん";
 }
 

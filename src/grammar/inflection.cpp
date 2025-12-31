@@ -380,16 +380,16 @@ std::vector<InflectionCandidate> Inflection::analyze(
   candidates.erase(dup_end, candidates.end());
 
   // Debug: print final candidates
-  if (core::Debug::isEnabled() && !candidates.empty()) {
-    core::Debug::log() << "[INFLECTION] Results for \"" << surface << "\":\n";
+  SUZUME_DEBUG_IF(!candidates.empty()) {
+    SUZUME_DEBUG_STREAM << "[INFLECTION] Results for \"" << surface << "\":\n";
     for (size_t i = 0; i < candidates.size() && i < 5; ++i) {
       const auto& c = candidates[i];
-      core::Debug::log() << "  " << (i + 1) << ". base=\"" << c.base_form
-                         << "\" type=" << static_cast<int>(c.verb_type)
-                         << " conf=" << c.confidence << "\n";
+      SUZUME_DEBUG_STREAM << "  " << (i + 1) << ". base=\"" << c.base_form
+                          << "\" type=" << static_cast<int>(c.verb_type)
+                          << " conf=" << c.confidence << "\n";
     }
     if (candidates.size() > 5) {
-      core::Debug::log() << "  ... and " << (candidates.size() - 5) << " more\n";
+      SUZUME_DEBUG_STREAM << "  ... and " << (candidates.size() - 5) << " more\n";
     }
   }
 

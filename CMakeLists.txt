@@ -14,18 +14,29 @@ option(BUILD_TESTING "Build tests" ON)
 option(BUILD_WASM "Build for WebAssembly" OFF)
 option(ENABLE_COVERAGE "Enable code coverage" OFF)
 option(ENABLE_DEBUG_INFO "Enable debug origin tracking in candidates" ON)
+option(ENABLE_DEBUG_LOG "Enable debug logging (SUZUME_DEBUG)" ON)
 
-# Disable debug info for WASM builds by default
+# Disable debug features for WASM builds by default
 if(BUILD_WASM AND NOT DEFINED CACHE{ENABLE_DEBUG_INFO})
   set(ENABLE_DEBUG_INFO OFF CACHE BOOL "Enable debug origin tracking in candidates" FORCE)
 endif()
+if(BUILD_WASM AND NOT DEFINED CACHE{ENABLE_DEBUG_LOG})
+  set(ENABLE_DEBUG_LOG OFF CACHE BOOL "Enable debug logging (SUZUME_DEBUG)" FORCE)
+endif()
 
-# Add debug info compile definition
+# Add debug compile definitions
 if(ENABLE_DEBUG_INFO)
   add_compile_definitions(SUZUME_DEBUG_INFO)
   message(STATUS "Debug origin tracking: ENABLED")
 else()
   message(STATUS "Debug origin tracking: DISABLED")
+endif()
+
+if(ENABLE_DEBUG_LOG)
+  add_compile_definitions(SUZUME_DEBUG)
+  message(STATUS "Debug logging: ENABLED")
+else()
+  message(STATUS "Debug logging: DISABLED")
 endif()
 
 # Output directories

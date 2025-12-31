@@ -835,16 +835,10 @@ void addTeFormAuxiliaryCandidates(
         // This allows proper analysis of patterns like 教えてあげない
         if (aux.is_benefactive) {
           // Check if the surface ends with negative patterns
-          bool is_negative = (aux_surface.size() >= core::kTwoJapaneseCharBytes &&
-                              (aux_surface.substr(aux_surface.size() - core::kTwoJapaneseCharBytes) == "ない" ||
-                               aux_surface.substr(aux_surface.size() - core::kTwoJapaneseCharBytes) == "なく"));
-          if (aux_surface.size() >= core::kFourJapaneseCharBytes) {
-            std::string_view suffix = std::string_view(aux_surface).substr(
-                aux_surface.size() - core::kFourJapaneseCharBytes);
-            if (suffix == "なかった" || suffix == "なくて") {
-              is_negative = true;
-            }
-          }
+          bool is_negative = utf8::endsWith(aux_surface, "ない") ||
+                             utf8::endsWith(aux_surface, "なく") ||
+                             utf8::endsWith(aux_surface, "なかった") ||
+                             utf8::endsWith(aux_surface, "なくて");
           if (is_negative) {
             continue;  // Don't create compound for benefactive negative
           }

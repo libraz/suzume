@@ -86,13 +86,13 @@ std::vector<core::Morpheme> Postprocessor::mergeNounCompounds(const std::vector<
         }
       }
 
-      if (merge_count > 1) {
-        SUZUME_DEBUG_LOG("[POSTPROC] Merged " << merge_count << " nouns: ");
+      SUZUME_DEBUG_IF(merge_count > 1) {
+        SUZUME_DEBUG_STREAM << "[POSTPROC] Merged " << merge_count << " nouns: ";
         for (size_t i = idx; i < merge_end; ++i) {
-          if (i > idx) core::Debug::log() << " + ";
-          core::Debug::log() << "\"" << morphemes[i].surface << "\"";
+          if (i > idx) SUZUME_DEBUG_STREAM << " + ";
+          SUZUME_DEBUG_STREAM << "\"" << morphemes[i].surface << "\"";
         }
-        core::Debug::log() << " → \"" << merged.surface << "\"\n";
+        SUZUME_DEBUG_STREAM << " → \"" << merged.surface << "\"\n";
       }
 
       result.push_back(merged);
@@ -197,12 +197,14 @@ std::vector<core::Morpheme> Postprocessor::mergeNounSuffix(
         // Merged at least one suffix - result is always NOUN
         merged.pos = core::PartOfSpeech::Noun;
         merged.lemma = merged.surface;  // Compound noun lemma is itself
-        SUZUME_DEBUG_LOG("[POSTPROC] Merged noun+suffix: ");
-        for (size_t i = idx; i < merge_end; ++i) {
-          if (i > idx) core::Debug::log() << " + ";
-          core::Debug::log() << "\"" << morphemes[i].surface << "\"";
+        SUZUME_DEBUG_BLOCK {
+          SUZUME_DEBUG_STREAM << "[POSTPROC] Merged noun+suffix: ";
+          for (size_t i = idx; i < merge_end; ++i) {
+            if (i > idx) SUZUME_DEBUG_STREAM << " + ";
+            SUZUME_DEBUG_STREAM << "\"" << morphemes[i].surface << "\"";
+          }
+          SUZUME_DEBUG_STREAM << " → \"" << merged.surface << "\"\n";
         }
-        core::Debug::log() << " → \"" << merged.surface << "\"\n";
       }
 
       result.push_back(merged);
@@ -316,13 +318,13 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(
         }
       }
 
-      if (merge_end > idx + 1) {
-        SUZUME_DEBUG_LOG("[POSTPROC] Merged numeric: ");
+      SUZUME_DEBUG_IF(merge_end > idx + 1) {
+        SUZUME_DEBUG_STREAM << "[POSTPROC] Merged numeric: ";
         for (size_t i = idx; i < merge_end; ++i) {
-          if (i > idx) core::Debug::log() << " + ";
-          core::Debug::log() << "\"" << morphemes[i].surface << "\"";
+          if (i > idx) SUZUME_DEBUG_STREAM << " + ";
+          SUZUME_DEBUG_STREAM << "\"" << morphemes[i].surface << "\"";
         }
-        core::Debug::log() << " → \"" << merged.surface << "\"\n";
+        SUZUME_DEBUG_STREAM << " → \"" << merged.surface << "\"\n";
       }
 
       result.push_back(merged);

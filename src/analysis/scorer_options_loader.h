@@ -4,14 +4,25 @@
 // =============================================================================
 // Scorer Options Loader
 // =============================================================================
-// Loads scorer options from JSON configuration files.
+// Loads scorer options from JSON configuration files and environment variables.
 // Provides partial override capability - only specified fields are updated.
+//
+// Environment variable format: SUZUME_SCORER_{SECTION}_{KEY}=value
+//   SECTION: EDGE, CONN, JOIN, SPLIT
+//   KEY: Field name (e.g., penalty_invalid_adj_sou)
+//
+// Priority: Default < JSON file < Environment variables
 // =============================================================================
 
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <unordered_map>
+
+#ifndef __EMSCRIPTEN__
+#include <cstdlib>
+#include <iostream>
+#endif
 
 #include "candidate_options.h"
 #include "connection_rule_options.h"
@@ -37,6 +48,14 @@ struct JsonValue {
   }
 };
 
+/// Result of loading scorer options from environment
+struct ScorerLoadResult {
+  std::string config_path;   // Path to JSON config file (if loaded)
+  int env_override_count{0}; // Number of individual env overrides applied
+
+  bool hasConfig() const { return !config_path.empty() || env_override_count > 0; }
+};
+
 /// Parses JSON and loads scorer options
 class ScorerOptionsLoader {
  public:
@@ -47,6 +66,20 @@ class ScorerOptionsLoader {
   /// @return true on success, false on failure
   static bool loadFromFile(const std::string& path, ScorerOptions& options,
                            std::string* error_msg = nullptr);
+
+#ifndef __EMSCRIPTEN__
+  /// Apply environment variable overrides to scorer options
+  /// Environment variables: SUZUME_SCORER_{SECTION}_{KEY}=value
+  /// @param options Options to modify
+  /// @return Number of overrides applied
+  static int applyEnvOverrides(ScorerOptions& options);
+
+  /// Load scorer options from environment variables
+  /// Checks SUZUME_SCORER_CONFIG for JSON file path, then individual overrides
+  /// @param options Options to modify
+  /// @return Result containing what was loaded
+  static ScorerLoadResult loadFromEnv(ScorerOptions& options);
+#endif
 
  private:
   /// Apply edge options from JSON
@@ -389,6 +422,152 @@ inline bool ScorerOptionsLoader::loadFromFile(const std::string& path, ScorerOpt
 
   return true;
 }
+
+// =============================================================================
+// Environment Variable Override Implementation
+// =============================================================================
+
+#ifndef __EMSCRIPTEN__
+
+namespace env_override_internal {
+
+// Helper to try parsing float from environment variable
+inline bool tryGetEnvFloat(const char* name, float& out) {
+  const char* value = std::getenv(name);
+  if (!value) return false;
+
+  char* end = nullptr;
+  float parsed = std::strtof(value, &end);
+  if (end == value || *end != '\0') {
+    std::cerr << "warning: Invalid value for " << name << ": " << value << "\n";
+    return false;
+  }
+  out = parsed;
+  return true;
+}
+
+// Macro to check and apply single environment variable
+#define TRY_ENV(section, field) \
+  if (tryGetEnvFloat("SUZUME_SCORER_" section "_" #field, opts.field)) count++
+
+}  // namespace env_override_internal
+
+inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
+  using namespace env_override_internal;
+  int count = 0;
+
+  // Edge options (SUZUME_SCORER_EDGE_*)
+  {
+    auto& opts = options.connection_rules.edge;
+    TRY_ENV("EDGE", penalty_invalid_adj_sou);
+    TRY_ENV("EDGE", penalty_invalid_tai_pattern);
+    TRY_ENV("EDGE", penalty_verb_aux_in_adj);
+    TRY_ENV("EDGE", penalty_shimai_as_adj);
+    TRY_ENV("EDGE", penalty_verb_onbin_as_adj);
+    TRY_ENV("EDGE", penalty_short_stem_hiragana_adj);
+    TRY_ENV("EDGE", penalty_verb_tai_rashii);
+    TRY_ENV("EDGE", penalty_verb_nai_pattern);
+    TRY_ENV("EDGE", bonus_unified_verb_aux);
+  }
+
+  // Connection options (SUZUME_SCORER_CONN_*)
+  {
+    auto& opts = options.connection_rules.connection;
+    TRY_ENV("CONN", penalty_copula_after_verb);
+    TRY_ENV("CONN", penalty_ichidan_renyokei_te);
+    TRY_ENV("CONN", bonus_tai_after_renyokei);
+    TRY_ENV("CONN", penalty_yasui_after_renyokei);
+    TRY_ENV("CONN", penalty_nagara_split);
+    TRY_ENV("CONN", penalty_sou_after_renyokei);
+    TRY_ENV("CONN", penalty_te_form_split);
+    TRY_ENV("CONN", penalty_taku_te_split);
+    TRY_ENV("CONN", penalty_takute_after_renyokei);
+    TRY_ENV("CONN", bonus_conditional_verb_to_verb);
+    TRY_ENV("CONN", bonus_verb_renyokei_compound_aux);
+    TRY_ENV("CONN", penalty_toku_contraction_split);
+    TRY_ENV("CONN", bonus_te_form_verb_to_verb);
+    TRY_ENV("CONN", bonus_rashii_after_predicate);
+    TRY_ENV("CONN", penalty_verb_to_case_particle);
+    TRY_ENV("CONN", penalty_tai_after_aux);
+    TRY_ENV("CONN", penalty_masen_de_split);
+    TRY_ENV("CONN", penalty_invalid_single_char_aux);
+    TRY_ENV("CONN", penalty_te_form_ta_contraction);
+    TRY_ENV("CONN", penalty_noun_mai);
+    TRY_ENV("CONN", penalty_short_aux_after_particle);
+    TRY_ENV("CONN", bonus_noun_mitai);
+    TRY_ENV("CONN", bonus_verb_mitai);
+    TRY_ENV("CONN", penalty_iru_aux_after_noun);
+    TRY_ENV("CONN", bonus_iru_aux_after_te_form);
+    TRY_ENV("CONN", penalty_character_speech_split);
+    TRY_ENV("CONN", bonus_adj_ku_naru);
+    TRY_ENV("CONN", penalty_compound_aux_after_renyokei);
+    TRY_ENV("CONN", penalty_yoru_night_after_ni);
+    TRY_ENV("CONN", penalty_formal_noun_before_kanji);
+    TRY_ENV("CONN", penalty_same_particle_repeated);
+    TRY_ENV("CONN", penalty_hiragana_noun_starts_with_particle);
+    TRY_ENV("CONN", penalty_particle_before_single_hiragana_other);
+    TRY_ENV("CONN", penalty_particle_before_multi_hiragana_other);
+    TRY_ENV("CONN", bonus_shi_after_i_adj);
+    TRY_ENV("CONN", bonus_shi_after_verb);
+    TRY_ENV("CONN", bonus_shi_after_aux);
+    TRY_ENV("CONN", penalty_shi_after_noun);
+    TRY_ENV("CONN", penalty_suffix_at_start);
+    TRY_ENV("CONN", penalty_suffix_after_symbol);
+    TRY_ENV("CONN", penalty_prefix_before_verb);
+    TRY_ENV("CONN", penalty_noun_before_verb_aux);
+    TRY_ENV("CONN", penalty_prefix_short_stem_hiragana_adj);
+  }
+
+  // Join options (SUZUME_SCORER_JOIN_*)
+  {
+    auto& opts = options.candidates.join;
+    TRY_ENV("JOIN", compound_verb_bonus);
+    TRY_ENV("JOIN", verified_v1_bonus);
+    TRY_ENV("JOIN", verified_noun_bonus);
+    TRY_ENV("JOIN", te_form_aux_bonus);
+  }
+
+  // Split options (SUZUME_SCORER_SPLIT_*)
+  {
+    auto& opts = options.candidates.split;
+    TRY_ENV("SPLIT", alpha_kanji_bonus);
+    TRY_ENV("SPLIT", alpha_katakana_bonus);
+    TRY_ENV("SPLIT", digit_kanji_1_bonus);
+    TRY_ENV("SPLIT", digit_kanji_2_bonus);
+    TRY_ENV("SPLIT", digit_kanji_3_penalty);
+    TRY_ENV("SPLIT", dict_split_bonus);
+    TRY_ENV("SPLIT", split_base_cost);
+    TRY_ENV("SPLIT", noun_verb_split_bonus);
+    TRY_ENV("SPLIT", verified_verb_bonus);
+  }
+
+  return count;
+}
+
+inline ScorerLoadResult ScorerOptionsLoader::loadFromEnv(ScorerOptions& options) {
+  ScorerLoadResult result;
+
+  // Check for SUZUME_SCORER_CONFIG environment variable (JSON file path)
+  const char* config_path = std::getenv("SUZUME_SCORER_CONFIG");
+  if (config_path && config_path[0] != '\0') {
+    std::string error_msg;
+    if (loadFromFile(config_path, options, &error_msg)) {
+      result.config_path = config_path;
+    } else {
+      std::cerr << "warning: Failed to load scorer config from SUZUME_SCORER_CONFIG: "
+                << error_msg << "\n";
+    }
+  }
+
+  // Apply individual environment variable overrides (highest priority)
+  result.env_override_count = applyEnvOverrides(options);
+
+  return result;
+}
+
+#undef TRY_ENV
+
+#endif  // __EMSCRIPTEN__
 
 }  // namespace suzume::analysis
 

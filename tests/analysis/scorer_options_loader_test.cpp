@@ -292,5 +292,242 @@ TEST_F(DefaultValuesTest, SplitOptionsDefaults) {
   EXPECT_FLOAT_EQ(opts.split_base_cost, 1.0F);
 }
 
+// =============================================================================
+// Environment Variable Override Tests
+// =============================================================================
+
+#ifndef __EMSCRIPTEN__
+
+// Helper RAII class to set/unset environment variables
+class ScopedEnv {
+ public:
+  explicit ScopedEnv(const std::string& name, const std::string& value)
+      : name_(name) {
+    setenv(name.c_str(), value.c_str(), 1);
+  }
+
+  ~ScopedEnv() {
+    unsetenv(name_.c_str());
+  }
+
+ private:
+  std::string name_;
+};
+
+class EnvOverrideTest : public ::testing::Test {};
+
+TEST_F(EnvOverrideTest, SingleEdgeOverride) {
+  ScopedEnv env("SUZUME_SCORER_EDGE_penalty_invalid_adj_sou", "5.5");
+
+  ScorerOptions opts;
+  int count = ScorerOptionsLoader::applyEnvOverrides(opts);
+
+  EXPECT_EQ(count, 1);
+  EXPECT_FLOAT_EQ(opts.connection_rules.edge.penalty_invalid_adj_sou, 5.5F);
+}
+
+TEST_F(EnvOverrideTest, SingleConnectionOverride) {
+  ScopedEnv env("SUZUME_SCORER_CONN_bonus_tai_after_renyokei", "-0.5");
+
+  ScorerOptions opts;
+  int count = ScorerOptionsLoader::applyEnvOverrides(opts);
+
+  EXPECT_EQ(count, 1);
+  EXPECT_FLOAT_EQ(opts.connection_rules.connection.bonus_tai_after_renyokei, -0.5F);
+}
+
+TEST_F(EnvOverrideTest, SingleJoinOverride) {
+  ScopedEnv env("SUZUME_SCORER_JOIN_compound_verb_bonus", "-1.2");
+
+  ScorerOptions opts;
+  int count = ScorerOptionsLoader::applyEnvOverrides(opts);
+
+  EXPECT_EQ(count, 1);
+  EXPECT_FLOAT_EQ(opts.candidates.join.compound_verb_bonus, -1.2F);
+}
+
+TEST_F(EnvOverrideTest, SingleSplitOverride) {
+  ScopedEnv env("SUZUME_SCORER_SPLIT_alpha_kanji_bonus", "-0.45");
+
+  ScorerOptions opts;
+  int count = ScorerOptionsLoader::applyEnvOverrides(opts);
+
+  EXPECT_EQ(count, 1);
+  EXPECT_FLOAT_EQ(opts.candidates.split.alpha_kanji_bonus, -0.45F);
+}
+
+TEST_F(EnvOverrideTest, MultipleOverrides) {
+  ScopedEnv env1("SUZUME_SCORER_EDGE_penalty_invalid_adj_sou", "2.0");
+  ScopedEnv env2("SUZUME_SCORER_CONN_penalty_copula_after_verb", "4.0");
+  ScopedEnv env3("SUZUME_SCORER_JOIN_te_form_aux_bonus", "-0.9");
+
+  ScorerOptions opts;
+  int count = ScorerOptionsLoader::applyEnvOverrides(opts);
+
+  EXPECT_EQ(count, 3);
+  EXPECT_FLOAT_EQ(opts.connection_rules.edge.penalty_invalid_adj_sou, 2.0F);
+  EXPECT_FLOAT_EQ(opts.connection_rules.connection.penalty_copula_after_verb, 4.0F);
+  EXPECT_FLOAT_EQ(opts.candidates.join.te_form_aux_bonus, -0.9F);
+}
+
+TEST_F(EnvOverrideTest, InvalidValueKeepsDefault) {
+  ScopedEnv env("SUZUME_SCORER_EDGE_penalty_invalid_adj_sou", "not_a_number");
+
+  ScorerOptions opts;
+  float original = opts.connection_rules.edge.penalty_invalid_adj_sou;
+  int count = ScorerOptionsLoader::applyEnvOverrides(opts);
+
+  EXPECT_EQ(count, 0);
+  EXPECT_FLOAT_EQ(opts.connection_rules.edge.penalty_invalid_adj_sou, original);
+}
+
+TEST_F(EnvOverrideTest, InvalidValueWithSuffix) {
+  ScopedEnv env("SUZUME_SCORER_EDGE_penalty_invalid_adj_sou", "1.5abc");
+
+  ScorerOptions opts;
+  float original = opts.connection_rules.edge.penalty_invalid_adj_sou;
+  int count = ScorerOptionsLoader::applyEnvOverrides(opts);
+
+  EXPECT_EQ(count, 0);
+  EXPECT_FLOAT_EQ(opts.connection_rules.edge.penalty_invalid_adj_sou, original);
+}
+
+TEST_F(EnvOverrideTest, NegativeValue) {
+  ScopedEnv env("SUZUME_SCORER_CONN_bonus_tai_after_renyokei", "-2.5");
+
+  ScorerOptions opts;
+  int count = ScorerOptionsLoader::applyEnvOverrides(opts);
+
+  EXPECT_EQ(count, 1);
+  EXPECT_FLOAT_EQ(opts.connection_rules.connection.bonus_tai_after_renyokei, -2.5F);
+}
+
+TEST_F(EnvOverrideTest, ZeroValue) {
+  ScopedEnv env("SUZUME_SCORER_EDGE_penalty_invalid_adj_sou", "0");
+
+  ScorerOptions opts;
+  int count = ScorerOptionsLoader::applyEnvOverrides(opts);
+
+  EXPECT_EQ(count, 1);
+  EXPECT_FLOAT_EQ(opts.connection_rules.edge.penalty_invalid_adj_sou, 0.0F);
+}
+
+TEST_F(EnvOverrideTest, ScientificNotation) {
+  ScopedEnv env("SUZUME_SCORER_SPLIT_alpha_kanji_bonus", "1.5e-1");
+
+  ScorerOptions opts;
+  int count = ScorerOptionsLoader::applyEnvOverrides(opts);
+
+  EXPECT_EQ(count, 1);
+  EXPECT_FLOAT_EQ(opts.candidates.split.alpha_kanji_bonus, 0.15F);
+}
+
+TEST_F(EnvOverrideTest, EnvOverridesJsonConfig) {
+  // First load from JSON
+  TempJsonFile file(R"({
+    "connection_rules": {
+      "edge": {
+        "penalty_invalid_adj_sou": 3.0
+      }
+    }
+  })");
+
+  ScorerOptions opts;
+  EXPECT_TRUE(ScorerOptionsLoader::loadFromFile(file.path(), opts));
+  EXPECT_FLOAT_EQ(opts.connection_rules.edge.penalty_invalid_adj_sou, 3.0F);
+
+  // Then apply env override (higher priority)
+  ScopedEnv env("SUZUME_SCORER_EDGE_penalty_invalid_adj_sou", "7.0");
+  ScorerOptionsLoader::applyEnvOverrides(opts);
+
+  EXPECT_FLOAT_EQ(opts.connection_rules.edge.penalty_invalid_adj_sou, 7.0F);
+}
+
+TEST_F(EnvOverrideTest, NoOverridesReturnsZero) {
+  ScorerOptions opts;
+  int count = ScorerOptionsLoader::applyEnvOverrides(opts);
+  EXPECT_EQ(count, 0);
+}
+
+// =============================================================================
+// LoadFromEnv Tests
+// =============================================================================
+
+class LoadFromEnvTest : public ::testing::Test {};
+
+TEST_F(LoadFromEnvTest, NoConfigReturnsEmptyResult) {
+  ScorerOptions opts;
+  auto result = ScorerOptionsLoader::loadFromEnv(opts);
+
+  EXPECT_FALSE(result.hasConfig());
+  EXPECT_TRUE(result.config_path.empty());
+  EXPECT_EQ(result.env_override_count, 0);
+}
+
+TEST_F(LoadFromEnvTest, EnvOverrideOnly) {
+  ScopedEnv env("SUZUME_SCORER_EDGE_penalty_invalid_adj_sou", "3.0");
+
+  ScorerOptions opts;
+  auto result = ScorerOptionsLoader::loadFromEnv(opts);
+
+  EXPECT_TRUE(result.hasConfig());
+  EXPECT_TRUE(result.config_path.empty());
+  EXPECT_EQ(result.env_override_count, 1);
+  EXPECT_FLOAT_EQ(opts.connection_rules.edge.penalty_invalid_adj_sou, 3.0F);
+}
+
+TEST_F(LoadFromEnvTest, ConfigFileOnly) {
+  TempJsonFile file(R"({
+    "connection_rules": {
+      "edge": {
+        "penalty_invalid_adj_sou": 4.0
+      }
+    }
+  })");
+  ScopedEnv env("SUZUME_SCORER_CONFIG", file.path());
+
+  ScorerOptions opts;
+  auto result = ScorerOptionsLoader::loadFromEnv(opts);
+
+  EXPECT_TRUE(result.hasConfig());
+  EXPECT_EQ(result.config_path, file.path());
+  EXPECT_EQ(result.env_override_count, 0);
+  EXPECT_FLOAT_EQ(opts.connection_rules.edge.penalty_invalid_adj_sou, 4.0F);
+}
+
+TEST_F(LoadFromEnvTest, ConfigFileAndEnvOverride) {
+  TempJsonFile file(R"({
+    "connection_rules": {
+      "edge": {
+        "penalty_invalid_adj_sou": 4.0
+      }
+    }
+  })");
+  ScopedEnv env1("SUZUME_SCORER_CONFIG", file.path());
+  ScopedEnv env2("SUZUME_SCORER_EDGE_penalty_invalid_adj_sou", "6.0");
+
+  ScorerOptions opts;
+  auto result = ScorerOptionsLoader::loadFromEnv(opts);
+
+  EXPECT_TRUE(result.hasConfig());
+  EXPECT_EQ(result.config_path, file.path());
+  EXPECT_EQ(result.env_override_count, 1);
+  // Env override takes priority over JSON
+  EXPECT_FLOAT_EQ(opts.connection_rules.edge.penalty_invalid_adj_sou, 6.0F);
+}
+
+TEST_F(LoadFromEnvTest, InvalidConfigFile) {
+  ScopedEnv env("SUZUME_SCORER_CONFIG", "/nonexistent/path.json");
+
+  ScorerOptions opts;
+  auto result = ScorerOptionsLoader::loadFromEnv(opts);
+
+  // Invalid file should not be recorded
+  EXPECT_FALSE(result.hasConfig());
+  EXPECT_TRUE(result.config_path.empty());
+}
+
+#endif  // __EMSCRIPTEN__
+
 }  // namespace
 }  // namespace suzume::analysis
