@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "core/debug.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 
@@ -141,7 +142,12 @@ std::vector<core::Morpheme> Analyzer::analyzeSpan(std::string_view text,
   // Normalize text
   auto norm_result = normalizer_.normalize(text);
   if (!core::isSuccess(norm_result)) {
-    return {};
+    // Log normalization failure (likely invalid UTF-8 input)
+    auto& error = std::get<core::Error>(norm_result);
+    SUZUME_DEBUG_LOG("[ANALYZER] Normalization failed in analyzeSpan: "
+                     << error.message
+                     << " (code=" << static_cast<int>(error.code) << ")\n");
+    return {};  // Return empty vector for invalid input
   }
   std::string normalized = std::get<std::string>(norm_result);
   if (normalized.empty()) {
@@ -151,7 +157,8 @@ std::vector<core::Morpheme> Analyzer::analyzeSpan(std::string_view text,
   // Decode to codepoints
   std::vector<char32_t> codepoints = normalize::utf8::decode(normalized);
   if (codepoints.empty()) {
-    return {};
+    SUZUME_DEBUG_LOG("[ANALYZER] UTF-8 decode failed in analyzeSpan\n");
+    return {};  // Return empty vector for decode failure
   }
 
   // Get character types
@@ -271,7 +278,12 @@ std::vector<core::Morpheme> Analyzer::analyzeDebug(std::string_view text,
   // Normalize text
   auto norm_result = normalizer_.normalize(text);
   if (!core::isSuccess(norm_result)) {
-    return {};
+    // Log normalization failure (likely invalid UTF-8 input)
+    auto& error = std::get<core::Error>(norm_result);
+    SUZUME_DEBUG_LOG("[ANALYZER] Normalization failed in analyzeDebug: "
+                     << error.message
+                     << " (code=" << static_cast<int>(error.code) << ")\n");
+    return {};  // Return empty vector for invalid input
   }
   std::string normalized = std::get<std::string>(norm_result);
   if (normalized.empty()) {
@@ -281,7 +293,8 @@ std::vector<core::Morpheme> Analyzer::analyzeDebug(std::string_view text,
   // Decode to codepoints
   std::vector<char32_t> codepoints = normalize::utf8::decode(normalized);
   if (codepoints.empty()) {
-    return {};
+    SUZUME_DEBUG_LOG("[ANALYZER] UTF-8 decode failed in analyzeDebug\n");
+    return {};  // Return empty vector for decode failure
   }
 
   // Get character types

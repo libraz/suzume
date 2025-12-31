@@ -2,9 +2,9 @@
 #define SUZUME_CORE_VITERBI_H_
 
 #include <algorithm>
+#include <array>
 #include <iostream>
 #include <limits>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -19,27 +19,8 @@ class IScorer;
 
 namespace suzume::core {
 
-/**
- * @brief State key for (position, POS) pair tracking in Viterbi
- */
-struct ViterbiStateKey {
-  size_t pos{0};
-  PartOfSpeech pos_tag{PartOfSpeech::Unknown};
-
-  bool operator==(const ViterbiStateKey& other) const {
-    return pos == other.pos && pos_tag == other.pos_tag;
-  }
-};
-
-/**
- * @brief Hash function for ViterbiStateKey
- */
-struct ViterbiStateKeyHash {
-  size_t operator()(const ViterbiStateKey& key) const {
-    return std::hash<size_t>()(key.pos) ^
-           (std::hash<uint8_t>()(static_cast<uint8_t>(key.pos_tag)) << 4);
-  }
-};
+// Number of PartOfSpeech types (Unknown=0 to Other=13)
+inline constexpr size_t kNumPosTypes = 14;
 
 /**
  * @brief Viterbi result with path and cost
@@ -74,28 +55,44 @@ class Viterbi {
     ViterbiResult result;
     result.total_cost = 0.0F;
 
+    const size_t text_len = lattice.textLength();
+    if (text_len == 0) {
+      return result;
+    }
+
     // State info for (position, POS) pair tracking
+    // Using 2D array: states_by_pos[position][pos_tag_index]
+    // This eliminates hash overhead and O(n) position scanning
     struct StateInfo {
       float cost{std::numeric_limits<float>::max()};
       int prev_edge{-1};
-      ViterbiStateKey prev_state{0, PartOfSpeech::Unknown};
+      size_t prev_pos{0};
+      PartOfSpeech prev_pos_tag{PartOfSpeech::Unknown};
+      bool valid{false};  // Track if this state has been set
     };
 
-    // Track states by (position, POS) pairs instead of just position
-    std::unordered_map<ViterbiStateKey, StateInfo, ViterbiStateKeyHash> states;
-    states[{0, PartOfSpeech::Unknown}] = {0.0F, -1, {0, PartOfSpeech::Unknown}};
+    // Pre-allocate for all positions + 1 (for final position)
+    std::vector<std::array<StateInfo, kNumPosTypes>> states_by_pos(text_len + 1);
+
+    // Initialize BOS state at position 0, POS=Unknown
+    auto& bos_state = states_by_pos[0][static_cast<size_t>(PartOfSpeech::Unknown)];
+    bos_state.cost = 0.0F;
+    bos_state.prev_edge = -1;
+    bos_state.valid = true;
 
     // Forward pass - process positions in order
-    for (size_t pos = 0; pos < lattice.textLength(); ++pos) {
-      // Collect all states at this position (snapshot to avoid iterator invalidation)
-      std::vector<std::pair<ViterbiStateKey, StateInfo>> states_at_pos;
-      for (const auto& [key, info] : states) {
-        if (key.pos == pos) {
-          states_at_pos.push_back({key, info});
+    for (size_t pos = 0; pos < text_len; ++pos) {
+      const auto& states_at_pos = states_by_pos[pos];
+
+      // Check if any valid state exists at this position
+      bool has_valid_state = false;
+      for (size_t i = 0; i < kNumPosTypes; ++i) {
+        if (states_at_pos[i].valid) {
+          has_valid_state = true;
+          break;
         }
       }
-
-      if (states_at_pos.empty()) {
+      if (!has_valid_state) {
         continue;
       }
 
@@ -104,11 +101,16 @@ class Viterbi {
         const auto& edge = edges[idx];
         float word_cost = scorer.wordCost(edge);
 
-        // Try all states at this position (different POS may have different paths)
-        for (const auto& [state_key, state_info] : states_at_pos) {
+        // Try all valid states at this position
+        for (size_t pos_idx = 0; pos_idx < kNumPosTypes; ++pos_idx) {
+          const auto& state_info = states_at_pos[pos_idx];
+          if (!state_info.valid) {
+            continue;
+          }
+
           float conn_cost = 0.0F;
           if (state_info.prev_edge >= 0) {
-            const auto& prev_edges = lattice.edgesAt(state_info.prev_state.pos);
+            const auto& prev_edges = lattice.edgesAt(state_info.prev_pos);
             const auto& prev = prev_edges[static_cast<size_t>(state_info.prev_edge)];
             conn_cost = scorer.connectionCost(prev, edge);
           } else {
@@ -127,46 +129,53 @@ class Viterbi {
           // This breaks ties when paths have equal cost
           constexpr float kTransitionCost = 0.001F;
           float total = state_info.cost + word_cost + conn_cost + kTransitionCost;
-          ViterbiStateKey next_key{edge.end, edge.pos};
+          size_t next_pos_idx = static_cast<size_t>(edge.pos);
 
           SUZUME_DEBUG_LOG("[VITERBI] pos=" << pos << " \"" << edge.surface
-                      << "\" (from " << posToString(state_key.pos_tag) << ")"
+                      << "\" (from " << posToString(static_cast<PartOfSpeech>(pos_idx)) << ")"
                       << " word=" << word_cost << " conn=" << conn_cost
                       << " total=" << total << "\n");
 
-          auto it = states.find(next_key);
-          if (it == states.end() || total < it->second.cost) {
-            states[next_key] = {total, static_cast<int>(idx), state_key};
+          auto& next_state = states_by_pos[edge.end][next_pos_idx];
+          if (!next_state.valid || total < next_state.cost) {
+            next_state.cost = total;
+            next_state.prev_edge = static_cast<int>(idx);
+            next_state.prev_pos = pos;
+            next_state.prev_pos_tag = static_cast<PartOfSpeech>(pos_idx);
+            next_state.valid = true;
           }
         }
       }
     }
 
     // Find best state at final position
-    ViterbiStateKey best_final{lattice.textLength(), PartOfSpeech::Unknown};
+    size_t best_final_pos_idx = 0;
     float best_cost = std::numeric_limits<float>::max();
 
-    for (const auto& [key, info] : states) {
-      if (key.pos == lattice.textLength() && info.cost < best_cost) {
-        best_cost = info.cost;
-        best_final = key;
+    const auto& final_states = states_by_pos[text_len];
+    for (size_t i = 0; i < kNumPosTypes; ++i) {
+      if (final_states[i].valid && final_states[i].cost < best_cost) {
+        best_cost = final_states[i].cost;
+        best_final_pos_idx = i;
       }
     }
 
     // Backtrack
     if (best_cost < std::numeric_limits<float>::max()) {
       result.total_cost = best_cost;
-      ViterbiStateKey current = best_final;
+      size_t current_pos = text_len;
+      size_t current_pos_idx = best_final_pos_idx;
 
-      while (current.pos > 0) {
-        auto it = states.find(current);
-        if (it == states.end() || it->second.prev_edge < 0) {
+      while (current_pos > 0) {
+        const auto& state = states_by_pos[current_pos][current_pos_idx];
+        if (!state.valid || state.prev_edge < 0) {
           break;
         }
 
-        const auto& prev_edges = lattice.edgesAt(it->second.prev_state.pos);
-        result.path.push_back(prev_edges[static_cast<size_t>(it->second.prev_edge)].id);
-        current = it->second.prev_state;
+        const auto& prev_edges = lattice.edgesAt(state.prev_pos);
+        result.path.push_back(prev_edges[static_cast<size_t>(state.prev_edge)].id);
+        current_pos = state.prev_pos;
+        current_pos_idx = static_cast<size_t>(state.prev_pos_tag);
       }
       std::reverse(result.path.begin(), result.path.end());
     }

@@ -159,6 +159,75 @@ bool isRegionalIndicator(char32_t ch);
  */
 bool isIterationMark(char32_t ch);
 
+/**
+ * @brief Check if character is in the A-row (あ段) of hiragana
+ *
+ * A-row hiragana: あ, か, が, さ, ざ, た, だ, な, は, ば, ぱ, ま, や, ら, わ
+ * Used for 未然形 (mizenkei) detection in verb conjugation.
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is in the A-row
+ */
+bool isARowHiragana(char32_t ch);
+
+/**
+ * @brief Check if character is in the I-row (い段) of hiragana
+ *
+ * I-row hiragana: い, き, ぎ, し, じ, ち, ぢ, に, ひ, び, ぴ, み, り
+ * Used for 連用形 (renyoukei) detection in verb conjugation.
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is in the I-row
+ */
+bool isIRowHiragana(char32_t ch);
+
+/**
+ * @brief Check if character is in the U-row (う段) of hiragana
+ *
+ * U-row hiragana: う, く, ぐ, す, ず, つ, づ, ぬ, ふ, ぶ, ぷ, む, ゆ, る
+ * Used for 終止形/連体形 detection (dictionary form).
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is in the U-row
+ */
+bool isURowHiragana(char32_t ch);
+
+/**
+ * @brief Check if character is in the E-row (え段) of hiragana
+ *
+ * E-row hiragana: え, け, げ, せ, ぜ, て, で, ね, へ, べ, ぺ, め, れ
+ * Used for 一段語幹 (ichidan stem) and 仮定形 (hypothetical) detection.
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is in the E-row
+ */
+bool isERowHiragana(char32_t ch);
+
+/**
+ * @brief Check if character is in the O-row (お段) of hiragana
+ *
+ * O-row hiragana: お, こ, ご, そ, ぞ, と, ど, の, ほ, ぼ, ぽ, も, よ, ろ, を
+ * Used for 意志形 (volitional) detection.
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is in the O-row
+ */
+bool isORowHiragana(char32_t ch);
+
+/**
+ * @brief Check if character is a CJK Unified Ideograph (kanji)
+ *
+ * Checks all CJK ranges including:
+ * - CJK Unified Ideographs (U+4E00-U+9FFF)
+ * - CJK Extension A-D
+ * - CJK Compatibility Ideographs
+ * - Kangxi Radicals
+ *
+ * @param ch Unicode codepoint
+ * @return true if character is a kanji
+ */
+bool isKanjiCodepoint(char32_t ch);
+
 }  // namespace suzume::normalize
 
 #endif  // SUZUME_NORMALIZE_CHAR_TYPE_H_

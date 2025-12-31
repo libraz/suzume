@@ -6,6 +6,7 @@
 #include "inflection.h"
 
 #include <algorithm>
+#include <mutex>
 
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -285,13 +286,16 @@ std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(
 
 std::vector<InflectionCandidate> Inflection::analyze(
     std::string_view surface) const {
-  // Check cache first
+  // Check cache first (shared lock for reading)
   std::string key(surface);
-  auto iter = cache_.find(key);
-  if (iter != cache_.end()) {
-    SUZUME_DEBUG_LOG("[INFLECTION] \"" << surface << "\" (cached, "
-                      << iter->second.size() << " candidates)\n");
-    return iter->second;
+  {
+    std::shared_lock<std::shared_mutex> read_lock(cache_mutex_);
+    auto iter = cache_.find(key);
+    if (iter != cache_.end()) {
+      SUZUME_DEBUG_LOG("[INFLECTION] \"" << surface << "\" (cached, "
+                        << iter->second.size() << " candidates)\n");
+      return iter->second;
+    }
   }
 
   SUZUME_DEBUG_LOG("[INFLECTION] Analyzing \"" << surface << "\"\n");
@@ -302,6 +306,7 @@ std::vector<InflectionCandidate> Inflection::analyze(
   // Early return for very short strings (less than 2 Japanese characters)
   // A conjugated verb needs at least stem + ending
   if (surface.size() < core::kTwoJapaneseCharBytes) {  // 2 Japanese chars = 6 bytes in UTF-8
+    std::unique_lock<std::shared_mutex> write_lock(cache_mutex_);
     cache_[key] = candidates;
     return candidates;
   }
@@ -388,30 +393,39 @@ std::vector<InflectionCandidate> Inflection::analyze(
     }
   }
 
-  // Cache the result
-  cache_[key] = candidates;
+  // Cache the result (exclusive lock for writing)
+  {
+    std::unique_lock<std::shared_mutex> write_lock(cache_mutex_);
+    cache_[key] = candidates;
+  }
   return candidates;
 }
 
 bool Inflection::looksConjugated(std::string_view surface) const {
-  // Check cache first to avoid copying
+  // Check cache first to avoid copying (shared lock for reading)
   std::string key(surface);
-  auto iter = cache_.find(key);
-  if (iter != cache_.end()) {
-    return !iter->second.empty();
+  {
+    std::shared_lock<std::shared_mutex> read_lock(cache_mutex_);
+    auto iter = cache_.find(key);
+    if (iter != cache_.end()) {
+      return !iter->second.empty();
+    }
   }
   return !analyze(surface).empty();
 }
 
 InflectionCandidate Inflection::getBest(std::string_view surface) const {
-  // Check cache first to avoid copying the entire vector
+  // Check cache first to avoid copying the entire vector (shared lock for reading)
   std::string key(surface);
-  auto iter = cache_.find(key);
-  if (iter != cache_.end()) {
-    if (iter->second.empty()) {
-      return {};
+  {
+    std::shared_lock<std::shared_mutex> read_lock(cache_mutex_);
+    auto iter = cache_.find(key);
+    if (iter != cache_.end()) {
+      if (iter->second.empty()) {
+        return {};
+      }
+      return iter->second.front();  // Only copy the first element
     }
-    return iter->second.front();  // Only copy the first element
   }
 
   // Not in cache, do full analysis

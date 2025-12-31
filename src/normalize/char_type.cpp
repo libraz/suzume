@@ -230,4 +230,58 @@ bool isIterationMark(char32_t ch) {
   return ch == 0x3005;
 }
 
+bool isARowHiragana(char32_t ch) {
+  // A-row (あ段): あ, か, が, さ, ざ, た, だ, な, は, ば, ぱ, ま, や, ら, わ
+  return ch == U'あ' || ch == U'か' || ch == U'が' ||
+         ch == U'さ' || ch == U'ざ' || ch == U'た' ||
+         ch == U'だ' || ch == U'な' || ch == U'は' ||
+         ch == U'ば' || ch == U'ぱ' || ch == U'ま' ||
+         ch == U'や' || ch == U'ら' || ch == U'わ';
+}
+
+bool isIRowHiragana(char32_t ch) {
+  // I-row (い段): い, き, ぎ, し, じ, ち, ぢ, に, ひ, び, ぴ, み, り
+  return ch == U'い' || ch == U'き' || ch == U'ぎ' ||
+         ch == U'し' || ch == U'じ' || ch == U'ち' ||
+         ch == U'ぢ' || ch == U'に' || ch == U'ひ' ||
+         ch == U'び' || ch == U'ぴ' || ch == U'み' || ch == U'り';
+}
+
+bool isURowHiragana(char32_t ch) {
+  // U-row (う段): う, く, ぐ, す, ず, つ, づ, ぬ, ふ, ぶ, ぷ, む, ゆ, る
+  return ch == U'う' || ch == U'く' || ch == U'ぐ' ||
+         ch == U'す' || ch == U'ず' || ch == U'つ' ||
+         ch == U'づ' || ch == U'ぬ' || ch == U'ふ' ||
+         ch == U'ぶ' || ch == U'ぷ' || ch == U'む' ||
+         ch == U'ゆ' || ch == U'る';
+}
+
+bool isERowHiragana(char32_t ch) {
+  // E-row (え段): え, け, げ, せ, ぜ, て, で, ね, へ, べ, ぺ, め, れ
+  return ch == U'え' || ch == U'け' || ch == U'げ' ||
+         ch == U'せ' || ch == U'ぜ' || ch == U'て' ||
+         ch == U'で' || ch == U'ね' || ch == U'へ' ||
+         ch == U'べ' || ch == U'ぺ' || ch == U'め' || ch == U'れ';
+}
+
+bool isORowHiragana(char32_t ch) {
+  // O-row (お段): お, こ, ご, そ, ぞ, と, ど, の, ほ, ぼ, ぽ, も, よ, ろ, を
+  return ch == U'お' || ch == U'こ' || ch == U'ご' ||
+         ch == U'そ' || ch == U'ぞ' || ch == U'と' ||
+         ch == U'ど' || ch == U'の' || ch == U'ほ' ||
+         ch == U'ぼ' || ch == U'ぽ' || ch == U'も' ||
+         ch == U'よ' || ch == U'ろ' || ch == U'を';
+}
+
+bool isKanjiCodepoint(char32_t ch) {
+  // CJK Unified Ideographs and extensions
+  return (ch >= 0x4E00 && ch <= 0x9FFF) ||    // CJK Unified Ideographs
+         (ch >= 0x3400 && ch <= 0x4DBF) ||    // CJK Extension A
+         (ch >= 0x20000 && ch <= 0x2A6DF) ||  // CJK Extension B
+         (ch >= 0x2A700 && ch <= 0x2B73F) ||  // CJK Extension C
+         (ch >= 0x2B740 && ch <= 0x2B81F) ||  // CJK Extension D
+         (ch >= 0xF900 && ch <= 0xFAFF) ||    // CJK Compatibility Ideographs
+         (ch >= 0x2F00 && ch <= 0x2FDF);      // Kangxi Radicals
+}
+
 }  // namespace suzume::normalize

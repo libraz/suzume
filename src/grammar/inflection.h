@@ -11,6 +11,7 @@
 #ifndef SUZUME_GRAMMAR_INFLECTION_H_
 #define SUZUME_GRAMMAR_INFLECTION_H_
 
+#include <shared_mutex>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -83,6 +84,8 @@ class Inflection {
       uint16_t required_conn) const;
 
   // Cache for analyze() results (mutable for const methods)
+  // Thread-safe: protected by cache_mutex_
+  mutable std::shared_mutex cache_mutex_;
   mutable std::unordered_map<std::string, std::vector<InflectionCandidate>>
       cache_;
 };
