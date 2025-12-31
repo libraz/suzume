@@ -97,11 +97,22 @@ float calculateConfidence(VerbType type, std::string_view stem,
     // These are Godan onbin forms: 行っ(く), 読ん(む), 書い(く)
     // If Ichidan stem ends with these, it's a false match
     // E.g., 行っ + てた → 行っる (wrong) - should be 行く
+    // P5-2: Exception for specific kanji + い ichidan stems (用い, 率い, 報い)
     if (stem_len >= core::kJapaneseCharBytes) {
       std::string_view last_char = stem.substr(stem_len - core::kJapaneseCharBytes);
-      if (last_char == "っ" || last_char == "ん" || last_char == "い") {
+      if (last_char == "っ" || last_char == "ん") {
+        // っ and ん are always onbin markers
         base -= inflection::kPenaltyIchidanOnbinMarkerStemInvalid;
         logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid, "ichidan_onbin_marker_stem_invalid");
+      } else if (last_char == "い") {
+        // い can be onbin marker OR part of legitimate ichidan stem
+        // Only specific kanji + い stems are valid ichidan verbs:
+        // 用い (用いる - to use), 率い (率いる - to lead), 報い (報いる - to repay)
+        bool is_known_kanji_i_stem = (stem == "用い" || stem == "率い" || stem == "報い");
+        if (!is_known_kanji_i_stem) {
+          base -= inflection::kPenaltyIchidanOnbinMarkerStemInvalid;
+          logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid, "ichidan_onbin_marker_stem_invalid");
+        }
       }
     }
 
@@ -336,6 +347,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Real Ichidan verbs have e-row stems (食べ, 見え, 出来) not i-row
   // Kanji + i-row patterns are likely NOUN + verb (いる) misanalysis
   // E.g., 人いる = 人 + いる (not 人い + る)
+  // P5-2: Exception for specific kanji + い stems (用い, 率い, 報い) - valid kami-ichidan
   if (type == VerbType::Ichidan && stem_len == core::kTwoJapaneseCharBytes && aux_count == 0) {
     // 6 bytes = 2 chars (kanji + hiragana)
     // Check if pattern is kanji + i-row hiragana
@@ -358,7 +370,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
         static_cast<unsigned char>(stem[3]) == 0xE3 &&
         static_cast<unsigned char>(stem[4]) == 0x82 &&
         static_cast<unsigned char>(stem[5]) == 0x8A;
-    if (first_is_kanji && (is_i_row || is_ri)) {
+    // Exception: specific known kanji + い stems are valid
+    bool is_known_kanji_i_stem = (stem == "用い" || stem == "率い" || stem == "報い");
+    if (first_is_kanji && (is_i_row || is_ri) && !is_known_kanji_i_stem) {
       base -= inflection::kPenaltyIchidanKanjiHiraganaStem;
       logConfidenceAdjustment(-inflection::kPenaltyIchidanKanjiHiraganaStem, "ichidan_kanji_i_row_stem");
     }
