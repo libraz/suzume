@@ -96,6 +96,28 @@ std::vector<ConjugatedForm> getGodanWaForms() {
   };
 }
 
+// Get conjugated forms for Godan-Ka verbs (いく → い + suffix)
+// Note: Godan-Ka verbs use イ音便 for past/te-form (いった, いって)
+// Note: Polite forms (きます, きました) are NOT included - they should be
+//       analyzed as renyokei + ます auxiliary per CLAUDE.md design
+std::vector<ConjugatedForm> getGodanKaForms() {
+  return {
+      {"く", ""},          // Base: いく
+      {"き", ""},          // Renyokei: いき (used in compounds)
+      {"いた", ""},        // Past: いった (イ音便)
+      {"いて", ""},        // Te-form: いって (イ音便)
+      {"かない", ""},      // Negative: いかない
+      {"かなかった", ""},  // Past negative: いかなかった
+      {"けば", ""},        // Conditional: いけば
+      {"いたら", ""},      // Conditional: いったら
+      {"こう", ""},        // Volitional: いこう
+      {"け", ""},          // Imperative: いけ
+      {"ける", ""},        // Potential: いける
+      {"けない", ""},      // Potential negative: いけない
+      {"けなかった", ""},  // Potential negative past: いけなかった
+  };
+}
+
 // Get conjugated forms for Godan-Sa verbs (いたす → いた + suffix)
 std::vector<ConjugatedForm> getGodanSaForms() {
   return {
@@ -206,6 +228,8 @@ std::vector<DictionaryEntry> expandVerbEntry(const DictionaryEntry& entry) {
     case ConjugationType::GodanSa:
       forms = getGodanSaForms();
       break;
+    // Note: GodanKa is NOT expanded here - only いく needs special handling,
+    // and that's done via explicit entries in hiragana_verbs
     case ConjugationType::Suru: {
       // Special handling for suru
       auto suru_forms = getSuruConjugations(stem);

@@ -374,8 +374,10 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       {"尚", POS::Conjunction, 1.0F, "", false, false, false, CT::None, "なお"},
       // Explanation/Supplement - hiragana only
       {"つまり", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
+      {"たとえば", POS::Conjunction, 0.3F, "", false, false, false, CT::None, ""},  // lower cost to prefer over たとえ+ば split
       {"なぜなら", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
       {"ちなみに", POS::Conjunction, 0.3F, "", false, false, false, CT::None, ""},
+      {"まして", POS::Conjunction, 0.5F, "", false, false, false, CT::None, ""},  // 況して
 
       // Topic change (転換)
       {"さて", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
@@ -550,6 +552,13 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
       {"他", POS::Noun, 0.3F, "ほか", false, true, false, CT::None, "ほか"},
       // Abstract nouns that don't form suru-verbs
       {"仕方", POS::Noun, 0.3F, "", false, true, false, CT::None, "しかた"},
+      {"ありきたり", POS::Noun, 0.3F, "ありきたり", false, true, false, CT::None, ""},  // na-adjective stem, not suru-verb
+      {"たたずまい", POS::Noun, 0.3F, "たたずまい", false, true, false, CT::None, ""},  // noun, not suru-verb
+      // 〜がち forms (V連用形+がち → na-adjective)
+      {"ありがち", POS::Noun, 0.3F, "ありがち", false, true, false, CT::None, ""},
+      {"なりがち", POS::Noun, 0.3F, "なりがち", false, true, false, CT::None, ""},
+      {"忘れがち", POS::Noun, 0.3F, "忘れがち", false, true, false, CT::None, "わすれがち"},
+      {"遅れがち", POS::Noun, 0.3F, "遅れがち", false, true, false, CT::None, "おくれがち"},
       // B35: Idiom component (eaves bracket - used in うだつが上がらない)
       {"うだつ", POS::Noun, 0.3F, "うだつ", false, true, false, CT::None, ""},
   };
@@ -629,6 +638,11 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"見せ", POS::Verb, 0.5F, "見せる", false, false, false, CT::Ichidan, ""},
       {"見せる", POS::Verb, 0.5F, "見せる", false, false, false, CT::Ichidan, ""},
       {"聞かせ", POS::Verb, 0.5F, "聞かせる", false, false, false, CT::Ichidan, ""},
+      {"帯びる", POS::Verb, 0.5F, "帯びる", false, false, false, CT::Ichidan, "おびる"},
+      {"帯び", POS::Verb, 0.5F, "帯びる", false, false, false, CT::Ichidan, ""},
+      // Katakana ichidan verbs (カタカナ一段動詞) - often mistaken for suru-verbs
+      {"バレる", POS::Verb, 0.5F, "バレる", false, false, false, CT::Ichidan, ""},
+      {"バレた", POS::Verb, 0.5F, "バレる", false, false, false, CT::Ichidan, ""},  // past form
       {"待ち", POS::Verb, 0.5F, "待つ", false, false, false, CT::GodanTa, ""},
       {"願い", POS::Verb, 0.5F, "願う", false, false, false, CT::GodanWa, ""},
       {"願う", POS::Verb, 0.5F, "願う", false, false, false, CT::GodanWa, ""},
@@ -662,6 +676,7 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"追う", POS::Verb, 1.0F, "追う", false, false, false, CT::GodanWa, ""},
       {"誘う", POS::Verb, 1.0F, "誘う", false, false, false, CT::GodanWa, ""},
       {"拾う", POS::Verb, 1.0F, "拾う", false, false, false, CT::GodanWa, ""},
+      {"揃う", POS::Verb, 1.0F, "揃う", false, false, false, CT::GodanWa, "そろう"},
       // Common GodanRa verbs
       {"取る", POS::Verb, 1.0F, "取る", false, false, false, CT::GodanRa, ""},
       {"乗る", POS::Verb, 1.0F, "乗る", false, false, false, CT::GodanRa, ""},
@@ -714,6 +729,9 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"ら", POS::Suffix, 0.5F, "ら", false, false, true, CT::None, "ら"},
       {"ども", POS::Suffix, 0.8F, "ども", false, false, true, CT::None, "ども"},
       {"がた", POS::Suffix, 0.8F, "がた", false, false, true, CT::None, "がた"},
+
+      // がち suffix (verb renyokei + がち → na-adjective)
+      {"がち", POS::Suffix, 0.3F, "がち", false, false, true, CT::None, ""},
 
       // Temporal suffixes (時間接尾語)
       {"ごろ", POS::Suffix, -2.5F, "", false, false, true, CT::None, ""},
@@ -905,6 +923,77 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"思わず", POS::Adverb, 0.3F, "", false, false, false, CT::None, "おもわず"},
       // B40: とっとと is an emphatic adverb (quickly/hurry up)
       {"とっとと", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+
+      // D1: High-priority adverbs with opaque etymology (prone to missplit)
+      // Confirmation/Understanding
+      {"なるほど", POS::Adverb, 0.3F, "成程", false, false, false, CT::None, ""},  // I see/indeed
+      {"もちろん", POS::Adverb, 0.3F, "勿論", false, false, false, CT::None, ""},  // of course
+      // State/Degree
+      {"もはや", POS::Adverb, 0.3F, "最早", false, false, false, CT::None, ""},  // no longer/already
+      {"はるかに", POS::Adverb, 0.3F, "遥かに", false, false, false, CT::None, ""},  // far/by far
+      {"まるで", POS::Adverb, 0.3F, "丸で", false, false, false, CT::None, ""},  // as if/completely
+      {"とっても", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // very (colloquial)
+      {"だんだん", POS::Adverb, 0.3F, "段々", false, false, false, CT::None, ""},  // gradually
+      // Surprise/Unexpectedness
+      {"まさか", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // no way/surely not
+      {"いきなり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // suddenly
+      {"ふと", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // suddenly/casually
+      {"たちまち", POS::Adverb, 0.3F, "忽ち", false, false, false, CT::None, ""},  // immediately
+      // Hypothetical/Estimation
+      {"もしかして", POS::Adverb, 0.3F, "若しかして", false, false, false, CT::None, ""},  // perhaps
+      {"ひとまず", POS::Adverb, 0.3F, "一先ず", false, false, false, CT::None, ""},  // for now
+      {"とりあえず", POS::Adverb, 0.3F, "取り敢えず", false, false, false, CT::None, ""},  // for the time being
+      // Volition/Attitude
+      {"ぜひ", POS::Adverb, 0.3F, "是非", false, false, false, CT::None, ""},  // by all means
+      {"あくまで", POS::Adverb, 0.3F, "飽くまで", false, false, false, CT::None, ""},  // to the end
+      {"なるべく", POS::Adverb, 0.3F, "成る可く", false, false, false, CT::None, ""},  // as much as possible
+      // Manner
+      {"なんとなく", POS::Adverb, 0.3F, "何となく", false, false, false, CT::None, ""},  // somehow
+      {"いかにも", POS::Adverb, 0.3F, "如何にも", false, false, false, CT::None, ""},  // indeed/truly
+      {"かえって", POS::Adverb, 0.3F, "却って", false, false, false, CT::None, ""},  // on the contrary
+      {"すでに", POS::Adverb, 0.3F, "既に", false, false, false, CT::None, ""},  // already
+      {"つねに", POS::Adverb, 0.3F, "常に", false, false, false, CT::None, ""},  // always
+      {"ただちに", POS::Adverb, 0.3F, "直ちに", false, false, false, CT::None, ""},  // immediately
+      // Other
+      {"ただ", POS::Adverb, 0.3F, "只", false, false, false, CT::None, ""},  // just/only
+      {"とにかく", POS::Adverb, 0.3F, "兎に角", false, false, false, CT::None, ""},  // anyway
+      {"とりわけ", POS::Adverb, 0.3F, "取り分け", false, false, false, CT::None, ""},  // especially
+      {"かろうじて", POS::Adverb, 0.3F, "辛うじて", false, false, false, CT::None, ""},  // barely
+      {"あらためて", POS::Adverb, 0.3F, "改めて", false, false, false, CT::None, ""},  // again/anew
+      {"あいかわらず", POS::Adverb, 0.3F, "相変わらず", false, false, false, CT::None, ""},  // as usual
+      {"さっそく", POS::Adverb, 0.3F, "早速", false, false, false, CT::None, ""},  // immediately
+
+      // D2: Medium-priority adverbs (less commonly missplit)
+      {"いざ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // when it comes to
+      {"やたら", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // randomly/excessively
+      {"およそ", POS::Adverb, 0.3F, "凡そ", false, false, false, CT::None, ""},  // roughly/approximately
+      {"やがて", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // before long/soon
+      {"つい", POS::Adverb, 1.5F, "", false, false, false, CT::None, ""},  // unintentionally (higher cost to avoid に+つい+て split)
+      {"いまだ", POS::Adverb, 0.3F, "未だ", false, false, false, CT::None, ""},  // still/not yet
+      {"しばしば", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // often
+      {"ともあれ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // anyway
+      {"ふんだん", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // abundantly
+      {"のちほど", POS::Adverb, 0.3F, "後程", false, false, false, CT::None, ""},  // later
+      {"いちはやく", POS::Adverb, 0.3F, "いち早く", false, false, false, CT::None, ""},  // quickly/first
+      {"とかく", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // apt to/prone to
+      {"あらかじめ", POS::Adverb, 0.3F, "予め", false, false, false, CT::None, ""},  // in advance
+      {"おおむね", POS::Adverb, 0.3F, "概ね", false, false, false, CT::None, ""},  // mostly
+      {"わりと", POS::Adverb, 0.3F, "割と", false, false, false, CT::None, ""},  // relatively
+      {"あいにく", POS::Adverb, 0.3F, "生憎", false, false, false, CT::None, ""},  // unfortunately
+      {"たいてい", POS::Adverb, 0.3F, "大抵", false, false, false, CT::None, ""},  // usually
+      {"なんだか", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // somehow
+      {"あれこれ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // this and that
+      {"なおさら", POS::Adverb, 0.3F, "尚更", false, false, false, CT::None, ""},  // all the more
+      {"なにげなく", POS::Adverb, 0.3F, "何気なく", false, false, false, CT::None, ""},  // casually
+      {"ひょっとして", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // possibly
+      {"どうやら", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // apparently
+      {"いっさい", POS::Adverb, 0.3F, "一切", false, false, false, CT::None, ""},  // at all
+      {"ひたすら", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // earnestly
+      {"あえて", POS::Adverb, 0.3F, "敢えて", false, false, false, CT::None, ""},  // daringly
+      {"どうせ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // anyway/after all
+      {"いっそ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // rather
+      {"せいぜい", POS::Adverb, 0.3F, "精々", false, false, false, CT::None, ""},  // at most
+      {"つくづく", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // deeply/keenly
   };
 }
 
@@ -1063,6 +1152,22 @@ std::vector<DictionaryEntry> getIAdjectiveEntries() {
       // All conjugated forms use よ- stem (よかった, よくない, etc.), not い-.
       // Auto-expansion would incorrectly generate いかった, いくない, etc.
       {"いい", POS::Adjective, 0.3F, "よい", false, false, false, CT::None, ""},
+
+      // Hiragana-only adjectives (prevent particle/verb misparse)
+      // These adjectives have no kanji forms or the kanji form is rare
+      {"めでたい", POS::Adjective, 0.3F, "めでたい", false, false, false, CT::IAdjective, ""},  // auspicious
+      {"ありがたい", POS::Adjective, 0.3F, "ありがたい", false, false, false, CT::IAdjective, ""},  // grateful
+      {"おもしろい", POS::Adjective, 0.3F, "おもしろい", false, false, false, CT::IAdjective, ""},  // interesting
+      {"やわらかい", POS::Adjective, 0.3F, "やわらかい", false, false, false, CT::IAdjective, ""},  // soft
+      {"あたたかい", POS::Adjective, 0.3F, "あたたかい", false, false, false, CT::IAdjective, ""},  // warm
+      {"つめたい", POS::Adjective, 0.3F, "つめたい", false, false, false, CT::IAdjective, ""},  // cold
+      {"つまらない", POS::Adjective, 0.3F, "つまらない", false, false, false, CT::IAdjective, ""},  // boring
+      {"たまらない", POS::Adjective, 0.3F, "たまらない", false, false, false, CT::IAdjective, ""},  // unbearable
+      {"くだらない", POS::Adjective, 0.3F, "くだらない", false, false, false, CT::IAdjective, ""},  // trivial
+      {"みっともない", POS::Adjective, 0.3F, "みっともない", false, false, false, CT::IAdjective, ""},  // disgraceful
+      {"しょうもない", POS::Adjective, 0.3F, "しょうもない", false, false, false, CT::IAdjective, ""},  // worthless
+      {"おとなしい", POS::Adjective, 0.3F, "おとなしい", false, false, false, CT::IAdjective, ""},  // quiet/gentle
+      {"すばらしい", POS::Adjective, 0.3F, "すばらしい", false, false, false, CT::IAdjective, ""},  // wonderful
   };
 }
 
@@ -1087,6 +1192,21 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"あきらめる", POS::Verb, 0.3F, "あきらめる", false, false, false, CT::Ichidan, ""},
 
       // Godan-Ka verbs (五段カ行)
+      // いく/ゆく: fundamental verb meaning "to go"
+      // Higher cost to not compete with て-form+いく compound patterns
+      // (走っていく, 見ていく should prefer compound form)
+      // but still recognized for standalone usage (うまくいく)
+      // Explicit conjugated forms needed for proper recognition (e.g., うまくいかなかった)
+      {"いく", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
+      {"いかない", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
+      {"いかなかった", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
+      {"いった", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
+      {"いって", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
+      {"いける", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
+      {"いけない", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
+      {"いけなかった", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
+      {"ゆく", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
+      {"ゆかない", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
       {"いただく", POS::Verb, 0.3F, "いただく", false, false, false, CT::GodanKa, ""},
       {"とく", POS::Verb, 0.3F, "とく", false, false, true, CT::GodanKa, ""},
       {"っとく", POS::Verb, -0.5F, "とく", false, false, true, CT::GodanKa, ""},
