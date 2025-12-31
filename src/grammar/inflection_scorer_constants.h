@@ -365,6 +365,11 @@ constexpr float kPenaltyGodanTaTeAuxInvalid = scale::kModerate + scale::kTrivial
 // Suru verbs conjugate regularly without onbin: 勉強した, not *勉強っ+た
 constexpr float kPenaltySuruOnbinStemInvalid = scale::kStrong + scale::kTrivial;  // 0.50F
 
+// Suru verb negative (〜ない) directly attached to kanji stem
+// True suru negatives use し: 勉強しない, not *勉強ない
+// Pattern like 問題ない should be NOUN + ADJ, not suru-verb negative
+constexpr float kPenaltySuruDirectNai = scale::kProhibitive;  // 3.5F
+
 }  // namespace suzume::grammar::inflection
 
 #endif  // SUZUME_GRAMMAR_INFLECTION_SCORER_CONSTANTS_H_

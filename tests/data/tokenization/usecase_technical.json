@@ -120,7 +120,7 @@
     },
     {
       "id": "complex_lost_item",
-      "description": "Lost item description",
+      "description": "Lost item description; しまった should be auxiliary しまう",
       "input": "昨日買ったばかりの本をなくしてしまった",
       "expected": [
         {"surface": "昨日", "pos": "Noun"},
@@ -129,9 +129,10 @@
         {"surface": "の", "pos": "Particle"},
         {"surface": "本", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "なくしてしまった", "pos": "Verb", "lemma": "なくす"}
+        {"surface": "なくして", "pos": "Verb", "lemma": "なくす"},
+        {"surface": "しまった", "pos": "Auxiliary", "lemma": "しまう"}
       ],
-      "tags": ["complex"]
+      "tags": ["complex", "auxiliary"]
     },
     {
       "id": "complex_time_noun_verb_split_yesterday",

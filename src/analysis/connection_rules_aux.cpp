@@ -24,6 +24,24 @@ bool isIruAuxiliary(std::string_view surface) {
   return false;
 }
 
+bool isShimauAuxiliary(std::string_view surface) {
+  // Full forms (五段ワ行活用)
+  if (surface == "しまう" || surface == "しまった" || surface == "しまって" ||
+      surface == "しまいます" || surface == "しまいました" ||
+      surface == "しまいません" || surface == "しまわない" ||
+      surface == "しまわなかった" || surface == "しまえば") {
+    return true;
+  }
+  // Contracted forms: ちゃう/じゃう = てしまう/でしまう
+  if (surface == "ちゃう" || surface == "ちゃった" || surface == "ちゃって" ||
+      surface == "ちゃいます" || surface == "ちゃいました" ||
+      surface == "じゃう" || surface == "じゃった" || surface == "じゃって" ||
+      surface == "じゃいます" || surface == "じゃいました") {
+    return true;
+  }
+  return false;
+}
+
 bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma) {
   // ます form auxiliaries (require masu-stem)
   if (surface.size() >= core::kTwoJapaneseCharBytes) {
@@ -81,6 +99,31 @@ ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
   // Bonus (negative value) for te-form + iru pattern
   return {ConnectionPattern::IruAuxAfterTeForm, -opts.bonus_iru_aux_after_te_form,
           "te-form verb + iru aux (progressive)"};
+}
+
+// Rule: Te-form VERB + しまう/しまった (AUX) bonus
+// Completive/Regretful aspect pattern: 食べてしまった, 忘れてしまった
+ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next,
+                                               const ConnectionOptions& opts) {
+  if (!isVerbToAux(prev, next)) return {};
+
+  if (!isShimauAuxiliary(next.surface)) return {};
+
+  // Check if prev ends with te-form (て or で)
+  if (prev.surface.size() < core::kJapaneseCharBytes) {
+    return {};
+  }
+  std::string_view last_char =
+      prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
+  if (last_char != "て" && last_char != "で") {
+    return {};
+  }
+
+  // Bonus (negative value) for te-form + shimau pattern
+  return {ConnectionPattern::ShimauAuxAfterTeForm,
+          -opts.bonus_shimau_aux_after_te_form,
+          "te-form verb + shimau aux (completive/regretful)"};
 }
 
 // Rule 17: Te-form VERB + invalid single-char AUX penalty

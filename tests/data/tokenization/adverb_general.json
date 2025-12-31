@@ -94,7 +94,7 @@
     },
     {
       "id": "omowazu_adv",
-      "description": "B36: 思わず should be ADV, not NOUN",
+      "description": "B36: 思わず should be ADV, not NOUN; しまった should be auxiliary しまう",
       "input": "思わず言ってしまった",
       "expected": [
         {
@@ -103,13 +103,19 @@
           "lemma": "思わず"
         },
         {
-          "surface": "言ってしまった",
+          "surface": "言って",
           "pos": "Verb",
           "lemma": "言う"
+        },
+        {
+          "surface": "しまった",
+          "pos": "Auxiliary",
+          "lemma": "しまう"
         }
       ],
       "tags": [
-        "adverb"
+        "adverb",
+        "auxiliary"
       ]
     },
     {

@@ -138,6 +138,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"なくて", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
       {"なければ", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
       {"ぬ", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      // Classical negation (古語否定) - ず attaches to mizenkei (未然形)
+      {"ず", POS::Auxiliary, 0.5F, "ず", false, false, false, CT::None, ""},
+      {"ずに", POS::Auxiliary, 0.5F, "ず", false, false, false, CT::None, ""},
+      {"ずとも", POS::Auxiliary, 0.5F, "ず", false, false, false, CT::None, ""},
       // Colloquial negation (口語否定) - じゃ = では
       {"じゃない", POS::Auxiliary, 0.3F, "ではない", false, false, false, CT::None, ""},
       {"じゃなかった", POS::Auxiliary, 0.3F, "ではない", false, false, false, CT::None, ""},
@@ -210,6 +214,29 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"いない", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
       {"いなかった", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
       {"いれば", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
+
+      // Completive/Regretful (完了・遺憾) - しまう auxiliary
+      // て形 + しまう pattern: 食べてしまった, 忘れてしまった (regret/completion)
+      {"しまう", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"しまった", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"しまって", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"しまいます", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"しまいました", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"しまいません", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"しまわない", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"しまわなかった", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"しまえば", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      // Contracted forms: ちゃう/じゃう = てしまう/でしまう
+      {"ちゃう", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"ちゃった", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"ちゃって", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"ちゃいます", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"ちゃいました", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"じゃう", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"じゃった", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"じゃって", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"じゃいます", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"じゃいました", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
 
       // Explanatory (説明)
       {"のだ", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
@@ -385,6 +412,11 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
       {"そういう", POS::Determiner, 0.5F, "", false, false, false, CT::None, ""},
       {"ああいう", POS::Determiner, 0.5F, "", false, false, false, CT::None, ""},
       {"どういう", POS::Determiner, 0.5F, "", false, false, false, CT::None, ""},
+
+      // Quotative determiners (引用連体詞) - prevents incorrect split like 病+とい+う
+      {"という", POS::Determiner, 0.3F, "という", false, false, false, CT::None, ""},
+      {"といった", POS::Determiner, 0.3F, "という", false, false, false, CT::None, ""},
+      {"っていう", POS::Determiner, 0.5F, "という", false, false, false, CT::None, ""},  // colloquial
 
       // Determiners with kanji - B51: lowered cost to prioritize over NOUN unknown
       {"大きな", POS::Determiner, 0.5F, "", false, false, false, CT::None, "おおきな"},
@@ -1047,6 +1079,12 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"のろける", POS::Verb, 0.3F, "のろける", false, false, false, CT::Ichidan, ""},
       // B46: とりあげる starts with と (particle-like)
       {"とりあげる", POS::Verb, 0.3F, "とりあげる", false, false, false, CT::Ichidan, ""},
+      // Verbs starting with particle-like chars (prevent し+みる, た+ずねる splits)
+      {"しみる", POS::Verb, 0.3F, "しみる", false, false, false, CT::Ichidan, ""},
+      {"たずねる", POS::Verb, 0.3F, "たずねる", false, false, false, CT::Ichidan, ""},
+      {"おぼれる", POS::Verb, 0.3F, "おぼれる", false, false, false, CT::Ichidan, ""},
+      {"そげる", POS::Verb, 0.3F, "そげる", false, false, false, CT::Ichidan, ""},
+      {"あきらめる", POS::Verb, 0.3F, "あきらめる", false, false, false, CT::Ichidan, ""},
 
       // Godan-Ka verbs (五段カ行)
       {"いただく", POS::Verb, 0.3F, "いただく", false, false, false, CT::GodanKa, ""},
@@ -1054,6 +1092,11 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"っとく", POS::Verb, -0.5F, "とく", false, false, true, CT::GodanKa, ""},
       {"てく", POS::Verb, 0.3F, "てく", false, false, true, CT::GodanKa, ""},
       {"ってく", POS::Verb, -0.5F, "てく", false, false, true, CT::GodanKa, ""},
+      // Verbs starting with particle-like chars (prevent お+どろく, き+らめく splits)
+      {"おどろく", POS::Verb, 0.3F, "おどろく", false, false, false, CT::GodanKa, ""},
+      {"きらめく", POS::Verb, 0.3F, "きらめく", false, false, false, CT::GodanKa, ""},
+      {"ひらめく", POS::Verb, 0.3F, "ひらめく", false, false, false, CT::GodanKa, ""},
+      {"つぶやく", POS::Verb, 0.3F, "つぶやく", false, false, false, CT::GodanKa, ""},
 
       // Godan-Ra verbs (五段ラ行)
       {"やる", POS::Verb, 0.3F, "やる", false, false, false, CT::GodanRa, ""},
@@ -1063,12 +1106,34 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"かかる", POS::Verb, 0.3F, "かかる", false, false, false, CT::GodanRa, ""},
       {"できあがる", POS::Verb, 0.3F, "できあがる", false, false, false, CT::GodanRa, ""},
       {"がんばる", POS::Verb, 0.3F, "がんばる", false, false, false, CT::GodanRa, ""},
+      // Verbs starting with particle-like chars (prevent し+ゃべる, た+よる splits)
+      {"しゃべる", POS::Verb, 0.3F, "しゃべる", false, false, false, CT::GodanRa, ""},
+      {"しぼる", POS::Verb, 0.3F, "しぼる", false, false, false, CT::GodanRa, ""},
+      {"たよる", POS::Verb, 0.3F, "たよる", false, false, false, CT::GodanRa, ""},
+      {"たどる", POS::Verb, 0.3F, "たどる", false, false, false, CT::GodanRa, ""},
+      {"かざる", POS::Verb, 0.3F, "かざる", false, false, false, CT::GodanRa, ""},
+      {"かぶる", POS::Verb, 0.3F, "かぶる", false, false, false, CT::GodanRa, ""},
+      {"めくる", POS::Verb, 0.3F, "めくる", false, false, false, CT::GodanRa, ""},
+      {"しまる", POS::Verb, 0.3F, "しまる", false, false, false, CT::GodanRa, ""},
+      {"こだわる", POS::Verb, 0.3F, "こだわる", false, false, false, CT::GodanRa, ""},
 
       // Godan-Wa verbs (五段ワ行)
       {"もらう", POS::Verb, 0.3F, "もらう", false, false, false, CT::GodanWa, ""},
+      // Verbs starting with particle-like chars (prevent した+が+う, ため+ら+う splits)
+      {"したがう", POS::Verb, 0.3F, "したがう", false, false, false, CT::GodanWa, ""},
+      {"ためらう", POS::Verb, 0.3F, "ためらう", false, false, false, CT::GodanWa, ""},
+      {"たわむ", POS::Verb, 0.3F, "たわむ", false, false, false, CT::GodanMa, ""},
 
       // Godan-Sa verbs (五段サ行)
       {"いたす", POS::Verb, 0.3F, "いたす", false, false, false, CT::GodanSa, ""},
+      // Verbs starting with particle-like chars (prevent も+たらす splits)
+      {"もたらす", POS::Verb, 0.3F, "もたらす", false, false, false, CT::GodanSa, ""},
+
+      // Godan-Ta verbs (五段タ行) - particle-like starts
+      {"たもつ", POS::Verb, 0.3F, "たもつ", false, false, false, CT::GodanTa, ""},
+
+      // Godan-Ga verbs (五段ガ行) - particle-like starts
+      {"しのぐ", POS::Verb, 0.3F, "しのぐ", false, false, false, CT::GodanGa, ""},
 
       // Suru verb (サ変動詞)
       {"する", POS::Verb, 0.5F, "する", false, false, false, CT::Suru, ""},

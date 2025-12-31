@@ -107,6 +107,7 @@ enum class ConnectionPattern {
   VerbRenyokeiCompoundAux, // 動詞連用形 → 補助動詞 (e.g., 読み + 終わる)
   IruAuxAfterNoun,         // 名詞 → いる/います (AUX) (invalid pattern)
   IruAuxAfterTeForm,       // テ形動詞 → いる/います (AUX) (progressive aspect)
+  ShimauAuxAfterTeForm,    // テ形動詞 → しまう/しまった (AUX) (completive/regretful)
   FormalNounBeforeKanji,   // 形式名詞 → 漢字で始まる語 (invalid: 所+在する should be 所在する)
   TeFormVerbToVerb,        // テ形動詞 → 動詞 (e.g., 関して + 報告する)
   HiraganaNounStartsWithParticle,  // ひらがな名詞が助詞で始まる (e.g., もも after すもも)

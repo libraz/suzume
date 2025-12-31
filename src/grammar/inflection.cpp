@@ -231,7 +231,8 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       candidate.suffix = suffix_str;
       candidate.verb_type = actual_verb_type;  // Use remapped type for 来→Kuru
       candidate.confidence = calculateConfidence(
-          actual_verb_type, stem, aux_total_len, aux_chain.size(), required_conn);
+          actual_verb_type, stem, aux_total_len, aux_chain.size(), required_conn,
+          suffix_str.size());
       candidate.morphemes = aux_chain;
 
       SUZUME_DEBUG_LOG("  [STEM MATCH] \"" << remaining << "\" → base=\""

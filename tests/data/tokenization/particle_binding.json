@@ -832,7 +832,7 @@
     },
     {
       "id": "wo_in_complex_sentence",
-      "description": "を should be separate particle in complex sentence",
+      "description": "を should be separate particle; しまった should be auxiliary しまう",
       "input": "昨日買ったばかりの本をなくしてしまった",
       "expected": [
         {
@@ -861,15 +861,21 @@
           "pos": "Particle"
         },
         {
-          "surface": "なくしてしまった",
+          "surface": "なくして",
           "pos": "Verb",
           "lemma": "なくす"
+        },
+        {
+          "surface": "しまった",
+          "pos": "Auxiliary",
+          "lemma": "しまう"
         }
       ],
       "tags": [
         "particle",
         "wo",
-        "complex"
+        "complex",
+        "auxiliary"
       ]
     },
     {

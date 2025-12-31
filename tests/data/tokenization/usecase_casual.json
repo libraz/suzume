@@ -68,12 +68,13 @@
     },
     {
       "id": "casual_contraction_chau",
-      "description": "Contraction ちゃう",
+      "description": "Contraction ちゃう - ちゃった is auxiliary form of しまう",
       "input": "食べちゃった",
       "expected": [
-        {"surface": "食べちゃった", "pos": "Verb", "lemma": "食べる"}
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "ちゃった", "pos": "Auxiliary", "lemma": "しまう"}
       ],
-      "tags": ["casual", "contraction"]
+      "tags": ["casual", "contraction", "auxiliary"]
     },
     {
       "id": "casual_contraction_toku",

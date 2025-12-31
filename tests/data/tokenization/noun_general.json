@@ -895,47 +895,39 @@
       ]
     },
     {
-      "id": "katakana_sugita_split",
-      "description": "ワンパターンすぎた should split as noun + すぎた, not ワンパター + ンすぎた",
+      "id": "katakana_sugita_compound",
+      "description": "ワンパターンすぎた recognized as compound verb (noun + すぎる), not ワンパター + ンすぎた",
       "input": "ワンパターンすぎた",
       "expected": [
         {
-          "surface": "ワンパターン",
-          "pos": "Noun"
-        },
-        {
-          "surface": "すぎた",
+          "surface": "ワンパターンすぎた",
           "pos": "Verb",
-          "lemma": "すぎる"
+          "lemma": "ワンパターンすぎる"
         }
       ],
       "tags": [
         "noun",
         "katakana",
         "sugiru",
-        "split"
+        "compound"
       ]
     },
     {
-      "id": "katakana_sugite_split",
-      "description": "シンプルすぎて should split as noun + すぎて, not シンプ + ルすぎて",
+      "id": "katakana_sugite_compound",
+      "description": "シンプルすぎて recognized as compound verb (noun + すぎる), not シンプ + ルすぎて",
       "input": "シンプルすぎて",
       "expected": [
         {
-          "surface": "シンプル",
-          "pos": "Noun"
-        },
-        {
-          "surface": "すぎて",
+          "surface": "シンプルすぎて",
           "pos": "Verb",
-          "lemma": "すぎる"
+          "lemma": "シンプルすぎる"
         }
       ],
       "tags": [
         "noun",
         "katakana",
         "sugiru",
-        "split"
+        "compound"
       ]
     },
     {

@@ -1331,7 +1331,7 @@
     },
     {
       "id": "onbin_utagau_lemma",
-      "description": "疑ってしまう should have lemma 疑う (not 疑る)",
+      "description": "疑ってしまう should have lemma 疑う (not 疑る), しまう is auxiliary verb",
       "input": "疑ってしまう",
       "expected": [
         {
@@ -1341,13 +1341,15 @@
         },
         {
           "surface": "しまう",
-          "pos": "Verb"
+          "pos": "Auxiliary",
+          "lemma": "しまう"
         }
       ],
       "tags": [
         "verb",
         "onbin",
-        "lemma"
+        "lemma",
+        "auxiliary"
       ]
     },
     {

@@ -156,6 +156,12 @@ inline bool isSymbolToSuffix(const core::LatticeEdge& prev,
 bool isIruAuxiliary(std::string_view surface);
 
 /**
+ * @brief Check if surface is しまう auxiliary form
+ * Includes full forms (しまう, しまった) and contracted forms (ちゃう, じゃう)
+ */
+bool isShimauAuxiliary(std::string_view surface);
+
+/**
  * @brief Check if verb is an auxiliary verb pattern (補助動詞)
  * These should be treated as Auxiliary, not independent Verb
  */
@@ -242,6 +248,10 @@ ConnectionRuleResult checkIruAuxAfterNoun(const core::LatticeEdge& prev,
 ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts);
+
+ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next,
+                                               const ConnectionOptions& opts);
 
 ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
                                        const core::LatticeEdge& next,

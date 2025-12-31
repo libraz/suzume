@@ -331,6 +331,7 @@ inline void ScorerOptionsLoader::applyConnectionOptions(ConnectionOptions& opts,
   SET_OPT(opts, bonus_verb_mitai, json, "bonus_verb_mitai");
   SET_OPT(opts, penalty_iru_aux_after_noun, json, "penalty_iru_aux_after_noun");
   SET_OPT(opts, bonus_iru_aux_after_te_form, json, "bonus_iru_aux_after_te_form");
+  SET_OPT(opts, bonus_shimau_aux_after_te_form, json, "bonus_shimau_aux_after_te_form");
   SET_OPT(opts, penalty_character_speech_split, json, "penalty_character_speech_split");
   SET_OPT(opts, bonus_adj_ku_naru, json, "bonus_adj_ku_naru");
   SET_OPT(opts, penalty_compound_aux_after_renyokei, json, "penalty_compound_aux_after_renyokei");
@@ -498,6 +499,7 @@ inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
     TRY_ENV("CONN", bonus_verb_mitai);
     TRY_ENV("CONN", penalty_iru_aux_after_noun);
     TRY_ENV("CONN", bonus_iru_aux_after_te_form);
+    TRY_ENV("CONN", bonus_shimau_aux_after_te_form);
     TRY_ENV("CONN", penalty_character_speech_split);
     TRY_ENV("CONN", bonus_adj_ku_naru);
     TRY_ENV("CONN", penalty_compound_aux_after_renyokei);

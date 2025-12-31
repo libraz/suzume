@@ -27,13 +27,14 @@ namespace suzume::grammar {
 
 float calculateConfidence(VerbType type, std::string_view stem,
                           size_t aux_total_len, size_t aux_count,
-                          uint16_t required_conn) {
+                          uint16_t required_conn, size_t suffix_len) {
   float base = inflection::kBaseConfidence;
   size_t stem_len = stem.size();
 
   SUZUME_DEBUG_LOG("[INFL_SCORE] stem=\"" << stem << "\" type="
                      << static_cast<int>(type) << " aux_len=" << aux_total_len
                      << " aux_count=" << aux_count << " conn=" << required_conn
+                     << " suffix_len=" << suffix_len
                      << ": base=" << base << "\n");
 
   // Stem length penalties/bonuses
@@ -934,6 +935,32 @@ float calculateConfidence(VerbType type, std::string_view stem,
     if (last_char == "っ" || last_char == "ん" || last_char == "い") {
       base -= inflection::kPenaltySuruOnbinStemInvalid;
       logConfidenceAdjustment(-inflection::kPenaltySuruOnbinStemInvalid, "suru_onbin_stem_invalid");
+    }
+  }
+
+  // Reject Suru negative directly attached to kanji stem (問題ない → 問題する + ない)
+  // True suru negatives have し between noun and ない: 勉強しない, not *勉強ない
+  // Pattern like 問題ない should be analyzed as 問題(NOUN) + ない(ADJ), not suru negative
+  //
+  // Detection: Compare suffix_len (verb ending + auxiliaries) with aux_total_len
+  // - 勉強しない: suffix="しない" (9 bytes), aux_len=6, verb_ending=し (3 bytes)
+  //   suffix_len > aux_total_len means verb ending is present (valid)
+  // - 問題ない: suffix="ない" (6 bytes), aux_len=6, verb_ending="" (0 bytes)
+  //   suffix_len == aux_total_len means empty verb ending (invalid for mizenkei+ない)
+  if (type == VerbType::Suru && required_conn == conn::kVerbMizenkei && isAllKanji(stem)) {
+    // Check if verb ending is empty (suffix_len == aux_total_len)
+    // Empty verb ending means direct noun + ない attachment, which is invalid
+    // Valid patterns: しない, しなかった, しなくて, しなければ (all have し verb ending)
+    // Valid patterns with empty suffix: された, させた (さ/せ is part of aux pattern)
+    //
+    // aux_len == 6 (ない) or 12 (なかった) with empty verb suffix is invalid
+    // aux_len >= 9 with empty suffix is likely valid (された=9, させた=9, etc.)
+    bool has_empty_verb_suffix = (suffix_len == aux_total_len);
+    bool is_direct_nai_pattern = has_empty_verb_suffix &&
+        (aux_total_len == 6 || aux_total_len == 12);  // ない or なかった
+    if (is_direct_nai_pattern) {
+      base -= inflection::kPenaltySuruDirectNai;
+      logConfidenceAdjustment(-inflection::kPenaltySuruDirectNai, "suru_direct_nai");
     }
   }
 

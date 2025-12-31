@@ -128,6 +128,9 @@ struct ConnectionOptions {
   // Te-form + いる bonus
   float bonus_iru_aux_after_te_form = scorer::kBonusIruAuxAfterTeForm;
 
+  // Te-form + しまう bonus
+  float bonus_shimau_aux_after_te_form = scorer::kBonusShimauAuxAfterTeForm;
+
   // === Other Connection Rules ===
 
   // AUX だ/です + character speech suffix split

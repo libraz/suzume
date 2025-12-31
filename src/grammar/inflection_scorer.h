@@ -25,6 +25,7 @@ namespace suzume::grammar {
  * @param aux_total_len Total length of matched auxiliary suffixes
  * @param aux_count Number of matched auxiliary suffixes
  * @param required_conn The required connection ID from the auxiliary chain
+ * @param suffix_len Total length of suffix (verb ending + auxiliaries)
  * @return Confidence score in range [0.5, 0.95]
  *
  * Scoring factors include:
@@ -36,7 +37,7 @@ namespace suzume::grammar {
  */
 float calculateConfidence(VerbType type, std::string_view stem,
                           size_t aux_total_len, size_t aux_count,
-                          uint16_t required_conn);
+                          uint16_t required_conn, size_t suffix_len);
 
 }  // namespace suzume::grammar
 

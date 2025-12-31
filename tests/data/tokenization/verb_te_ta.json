@@ -111,18 +111,24 @@
     },
     {
       "id": "te_shimawanai_unified",
-      "description": "忘れてしまわない - unified verb te-form compound",
+      "description": "忘れてしまわない - te-form + しまう auxiliary verb pattern",
       "input": "忘れてしまわない",
       "expected": [
         {
-          "surface": "忘れてしまわない",
+          "surface": "忘れて",
           "pos": "Verb",
           "lemma": "忘れる"
+        },
+        {
+          "surface": "しまわない",
+          "pos": "Auxiliary",
+          "lemma": "しまう"
         }
       ],
       "tags": [
         "te_form",
-        "aspectual"
+        "aspectual",
+        "auxiliary"
       ]
     },
     {

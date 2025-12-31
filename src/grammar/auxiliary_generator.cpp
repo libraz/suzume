@@ -193,6 +193,12 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   // === Conditional ば ===
   entries.push_back({"ば", "ば", "ば", kAuxNai, kAuxOutBase, kVerbKatei});
 
+  // === Classical negation ず (古語否定) - connects to mizenkei ===
+  // 尽きず, せず, 知らず etc.
+  entries.push_back({"ず", "ず", "ず", kAuxNai, kAuxOutBase, kVerbMizenkei});
+  entries.push_back({"ずに", "ずに", "ず", kAuxNai, kAuxOutBase, kVerbMizenkei});
+  entries.push_back({"ずとも", "ずとも", "ず", kAuxNai, kAuxOutBase, kVerbMizenkei});
+
   // === Volitional ===
   entries.push_back({"う", "う", "う", kAuxNai, kAuxOutBase, kVerbVolitional});
   entries.push_back({"よう", "よう", "よう", kAuxNai, kAuxOutBase, kVerbVolitional});

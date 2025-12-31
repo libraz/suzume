@@ -197,6 +197,10 @@ constexpr float kPenaltyIruAuxAfterNoun = scale::kStrong + scale::kMinor;  // 2.
 // E.g., 食べて + いる, 走って + います - progressive aspect pattern
 constexpr float kBonusIruAuxAfterTeForm = scale::kMinor;
 
+// Te-form VERB + しまう/しまった (AUX) bonus
+// E.g., 食べて + しまった, 忘れて + しまう - completive/regretful aspect pattern
+constexpr float kBonusShimauAuxAfterTeForm = scale::kModerate;  // 1.5F
+
 // Te-form VERB + VERB bonus
 // E.g., 関して + 報告する, 調べて + わかる - te-form continuation pattern
 // Offsets the high VERB→VERB base cost (0.8) when prev verb ends with て/で
