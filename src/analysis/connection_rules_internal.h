@@ -319,6 +319,84 @@ ConnectionRuleResult checkVerbToCaseParticle(const core::LatticeEdge& prev,
                                              const core::LatticeEdge& next,
                                              const ConnectionOptions& opts);
 
+// =============================================================================
+// POS-based Dispatch Helpers
+// =============================================================================
+// These functions group rules by prev.pos for efficient dispatch.
+// Each function only evaluates rules that can match the given prev.pos.
+
+/**
+ * @brief Evaluate rules where prev.pos == VERB
+ * Rules: CopulaAfterVerb, IchidanRenyokeiTe, TeFormSplit, TaiAfterRenyokei,
+ *        NagaraSplit, TakuteAfterRenyokei, TakuTeSplit, ConditionalVerbToVerb,
+ *        VerbRenyokeiCompoundAux, TeFormVerbToVerb, TokuContractionSplit,
+ *        RashiiAfterPredicate, VerbToCaseParticle, IruAuxAfterTeForm,
+ *        InvalidTeFormAux, ShiParticleConnection, MitaiAfterNounOrVerb
+ */
+void evaluateVerbRules(const core::LatticeEdge& prev,
+                       const core::LatticeEdge& next,
+                       const ConnectionOptions& opts,
+                       ConnectionRuleResult& accumulated);
+
+/**
+ * @brief Evaluate rules where prev.pos == NOUN
+ * Rules: TeFormSplit, YasuiAfterRenyokei, SouAfterRenyokei,
+ *        CompoundAuxAfterRenyokei, IruAuxAfterNoun, NounBeforeVerbAux,
+ *        MaiAfterNoun, HiraganaNounStartsWithParticle, MitaiAfterNounOrVerb,
+ *        ShiParticleConnection
+ */
+void evaluateNounRules(const core::LatticeEdge& prev,
+                       const core::LatticeEdge& next,
+                       const ConnectionOptions& opts,
+                       ConnectionRuleResult& accumulated);
+
+/**
+ * @brief Evaluate rules where prev.pos == ADJECTIVE
+ * Rules: TakuTeSplit, RashiiAfterPredicate, AdjKuNaru, ShiParticleConnection
+ */
+void evaluateAdjRules(const core::LatticeEdge& prev,
+                      const core::LatticeEdge& next,
+                      const ConnectionOptions& opts,
+                      ConnectionRuleResult& accumulated);
+
+/**
+ * @brief Evaluate rules where prev.pos == AUXILIARY
+ * Rules: TaiAfterRenyokei, CharacterSpeechSplit, MasenDeSplit,
+ *        ShiParticleConnection
+ */
+void evaluateAuxRules(const core::LatticeEdge& prev,
+                      const core::LatticeEdge& next,
+                      const ConnectionOptions& opts,
+                      ConnectionRuleResult& accumulated);
+
+/**
+ * @brief Evaluate rules where prev.pos == PARTICLE
+ * Rules: AuxAfterParticle, YoruNightAfterNi, SameParticleRepeated,
+ *        ParticleBeforeHiraganaOther
+ */
+void evaluateParticleRules(const core::LatticeEdge& prev,
+                           const core::LatticeEdge& next,
+                           const ConnectionOptions& opts,
+                           ConnectionRuleResult& accumulated);
+
+/**
+ * @brief Evaluate rules where prev.pos == PREFIX
+ * Rules: PrefixBeforeVerb, PrefixToShortStemHiraganaAdj
+ */
+void evaluatePrefixRules(const core::LatticeEdge& prev,
+                         const core::LatticeEdge& next,
+                         const ConnectionOptions& opts,
+                         ConnectionRuleResult& accumulated);
+
+/**
+ * @brief Evaluate rules where prev.pos == SYMBOL
+ * Rules: SuffixAfterSymbol
+ */
+void evaluateSymbolRules(const core::LatticeEdge& prev,
+                         const core::LatticeEdge& next,
+                         const ConnectionOptions& opts,
+                         ConnectionRuleResult& accumulated);
+
 }  // namespace connection_rules
 }  // namespace suzume::analysis
 

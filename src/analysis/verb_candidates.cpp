@@ -18,6 +18,127 @@
 
 namespace suzume::analysis {
 
+namespace {
+
+// =============================================================================
+// Pattern Checking Helpers (extracted for maintainability)
+// =============================================================================
+
+/**
+ * @brief Check if surface ends with ます auxiliary patterns
+ *
+ * Skip verb + dictionary auxiliary combinations (ます, ました, ましょう)
+ * e.g., "食べます" should split into "食べ" + "ます" (dictionary AUX)
+ * EXCEPTION: Don't skip suru-verb passive/causative patterns
+ * e.g., "開催されました" should be a single VERB token
+ *
+ * @param surface Verb surface form
+ * @param verb_type Detected verb type from inflection analysis
+ * @return true if this pattern should be skipped
+ */
+inline bool shouldSkipMasuAuxPattern(std::string_view surface,
+                                     grammar::VerbType verb_type) {
+  if (surface.size() < core::kTwoJapaneseCharBytes) {
+    return false;
+  }
+
+  // Check if surface ends with ます/ました/ましょう/ません
+  bool has_masu_aux = false;
+  if (surface.size() >= core::kFourJapaneseCharBytes &&
+      surface.substr(surface.size() - core::kFourJapaneseCharBytes) ==
+          "ましょう") {
+    has_masu_aux = true;
+  } else if (surface.size() >= core::kThreeJapaneseCharBytes &&
+             (surface.substr(surface.size() - core::kThreeJapaneseCharBytes) ==
+                  "ました" ||
+              surface.substr(surface.size() - core::kThreeJapaneseCharBytes) ==
+                  "ません")) {
+    has_masu_aux = true;
+  } else if (surface.size() >= core::kTwoJapaneseCharBytes &&
+             surface.substr(surface.size() - core::kTwoJapaneseCharBytes) ==
+                 "ます") {
+    has_masu_aux = true;
+  }
+
+  if (!has_masu_aux) {
+    return false;
+  }
+
+  // Don't skip suru-verb passive/causative patterns (され, させ)
+  // These should be recognized as single verb tokens
+  bool is_suru_passive_causative =
+      (verb_type == grammar::VerbType::Suru &&
+       (surface.find("され") != std::string::npos ||
+        surface.find("させ") != std::string::npos));
+
+  return !is_suru_passive_causative;
+}
+
+/**
+ * @brief Check if surface ends with そう auxiliary patterns
+ *
+ * Skip verb + そう auxiliary combinations (様態の助動詞)
+ * e.g., "話しそう" should split into "話し" (VERB) + "そう" (AUX/ADVERB)
+ * This follows the 動詞+助動詞 → 分割 tokenization rule
+ *
+ * @param surface Verb surface form
+ * @param verb_type Detected verb type from inflection analysis
+ * @return true if this pattern should be skipped
+ */
+inline bool shouldSkipSouPattern(std::string_view surface,
+                                 grammar::VerbType verb_type) {
+  if (surface.size() < core::kTwoJapaneseCharBytes) {
+    return false;
+  }
+
+  bool has_sou_pattern = false;
+
+  // Check for そう at end
+  if (surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "そう") {
+    has_sou_pattern = true;
+  }
+  // Check for そうです at end
+  if (surface.size() >= core::kFourJapaneseCharBytes &&
+      surface.substr(surface.size() - core::kFourJapaneseCharBytes) ==
+          "そうです") {
+    has_sou_pattern = true;
+  }
+  // Check for そうだ at end
+  if (surface.size() >= core::kThreeJapaneseCharBytes &&
+      surface.substr(surface.size() - core::kThreeJapaneseCharBytes) ==
+          "そうだ") {
+    has_sou_pattern = true;
+  }
+
+  // Don't skip i-adjective patterns (handled by adjective candidate generation)
+  return has_sou_pattern && verb_type != grammar::VerbType::IAdjective;
+}
+
+/**
+ * @brief Check if surface contains compound adjective patterns
+ *
+ * Patterns like verb renyoukei + にくい/やすい/がたい should be ADJECTIVE
+ * e.g., 使いにくい should be ADJ, not VERB
+ *
+ * @param surface Verb surface form
+ * @return true if this is a compound adjective pattern
+ */
+inline bool isCompoundAdjectivePattern(std::string_view surface) {
+  if (surface.size() < core::kFourJapaneseCharBytes) {
+    return false;
+  }
+  return surface.find("にくい") != std::string::npos ||
+         surface.find("にくく") != std::string::npos ||
+         surface.find("にくか") != std::string::npos ||
+         surface.find("やすい") != std::string::npos ||
+         surface.find("やすく") != std::string::npos ||
+         surface.find("やすか") != std::string::npos ||
+         surface.find("がたい") != std::string::npos ||
+         surface.find("がたく") != std::string::npos;
+}
+
+}  // namespace
+
 std::vector<UnknownCandidate> generateCompoundVerbCandidates(
     const std::vector<char32_t>& codepoints,
     size_t start_pos,
@@ -359,59 +480,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
           }
 
-          // Skip verb + dictionary auxiliary combinations (ます, ました, ましょう)
-          // e.g., "食べます" should split into "食べ" + "ます" (dictionary AUX)
-          // e.g., "読みます" should split into "読み" + "ます" (dictionary AUX)
-          // This prevents combined analysis from winning due to optimal_length bonus
-          // EXCEPTION: Don't skip suru-verb passive/causative patterns
-          // e.g., "開催されました" should be a single VERB token, not split
-          if (surface.size() >= core::kTwoJapaneseCharBytes) {  // At least 2 chars (stem) + 2 chars (aux)
-            // Check if surface ends with ます/ました/ましょう/ません
-            bool has_masu_aux = false;
-            if (surface.size() >= core::kFourJapaneseCharBytes && surface.substr(surface.size() - core::kFourJapaneseCharBytes) == "ましょう") {
-              has_masu_aux = true;
-            } else if (surface.size() >= core::kThreeJapaneseCharBytes &&
-                       (surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "ました" ||
-                        surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "ません")) {
-              has_masu_aux = true;
-            } else if (surface.size() >= core::kTwoJapaneseCharBytes && surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "ます") {
-              has_masu_aux = true;
-            }
-            // Don't skip suru-verb passive/causative patterns (され, させ)
-            // These should be recognized as single verb tokens
-            bool is_suru_passive_causative = (best.verb_type == grammar::VerbType::Suru &&
-                (surface.find("され") != std::string::npos ||
-                 surface.find("させ") != std::string::npos));
-            if (has_masu_aux && !is_suru_passive_causative) {
-              continue;  // Skip - let the split (verb + dictionary aux) win
-            }
+          // Skip verb + ます auxiliary patterns
+          if (shouldSkipMasuAuxPattern(surface, best.verb_type)) {
+            continue;  // Skip - let the split (verb + dictionary aux) win
           }
 
-          // Skip verb + そう auxiliary combinations (様態の助動詞)
-          // e.g., "話しそう" should split into "話し" (VERB) + "そう" (AUX/ADVERB)
-          // e.g., "食べそう" should split into "食べ" (VERB) + "そう" (AUX/ADVERB)
-          // e.g., "遅刻しそうです" should split into "遅刻し" + "そう" + "です"
-          // This follows the 動詞+助動詞 → 分割 tokenization rule
-          // EXCEPTION: Don't skip i-adjective + そう patterns (美味しそう, 難しそう)
-          // Those are handled by adjective candidate generation
-          bool has_sou_pattern = false;
-          if (surface.size() >= core::kTwoJapaneseCharBytes) {
-            // Check for そう at end
-            if (surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "そう") {
-              has_sou_pattern = true;
-            }
-            // Check for そうです at end
-            if (surface.size() >= core::kFourJapaneseCharBytes &&
-                surface.substr(surface.size() - core::kFourJapaneseCharBytes) == "そうです") {
-              has_sou_pattern = true;
-            }
-            // Check for そうだ at end
-            if (surface.size() >= core::kThreeJapaneseCharBytes &&
-                surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "そうだ") {
-              has_sou_pattern = true;
-            }
-          }
-          if (has_sou_pattern && best.verb_type != grammar::VerbType::IAdjective) {
+          // Skip verb + そう auxiliary patterns
+          if (shouldSkipSouPattern(surface, best.verb_type)) {
             continue;  // Skip - let the split (verb renyokei + そう) win
           }
 
@@ -441,20 +516,9 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           }
           // Check if base form exists in dictionary - significant bonus for known verbs
           // This helps 行われた (base=行う) beat 行(suffix)+われた split
-          // BUT skip compound adjective patterns (verb renyoukei + にくい/やすい/がたい)
-          // e.g., 使いにくい should be ADJECTIVE, not VERB
-          bool is_compound_adj_pattern =
-              (surface.size() >= core::kFourJapaneseCharBytes &&  // At least 4 chars (e.g., 使いにくい = 5 chars = 15 bytes)
-               (surface.find("にくい") != std::string::npos ||
-                surface.find("にくく") != std::string::npos ||
-                surface.find("にくか") != std::string::npos ||
-                surface.find("やすい") != std::string::npos ||
-                surface.find("やすく") != std::string::npos ||
-                surface.find("やすか") != std::string::npos ||
-                surface.find("がたい") != std::string::npos ||
-                surface.find("がたく") != std::string::npos));
+          // Skip compound adjective patterns (verb renyoukei + にくい/やすい/がたい)
           if (dict_manager != nullptr && !best.base_form.empty() &&
-              !is_compound_adj_pattern) {
+              !isCompoundAdjectivePattern(surface)) {
             auto results = dict_manager->lookup(best.base_form, 0);
             for (const auto& result : results) {
               if (result.entry != nullptr &&
