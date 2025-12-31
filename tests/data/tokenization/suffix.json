@@ -216,6 +216,94 @@
         "strict",
         "suffix"
       ]
+    },
+    {
+      "id": "s6_arigachi",
+      "description": "S6: ありがち should be NOUN, not あり+が+ち",
+      "input": "ありがちだ",
+      "expected": [
+        {
+          "surface": "ありがち",
+          "pos": "Noun",
+          "lemma": "ありがち"
+        },
+        {
+          "surface": "だ",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "s6_fix",
+        "gachi",
+        "regression"
+      ]
+    },
+    {
+      "id": "s6_narigachi",
+      "description": "S6: なりがち should be NOUN, not なり+が+ち",
+      "input": "そうなりがち",
+      "expected": [
+        {
+          "surface": "そう",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "なりがち",
+          "pos": "Noun",
+          "lemma": "なりがち"
+        }
+      ],
+      "tags": [
+        "s6_fix",
+        "gachi",
+        "regression"
+      ]
+    },
+    {
+      "id": "s6_wasuregachi",
+      "description": "S6: 忘れがち should be NOUN, not 忘れ+が+ち",
+      "input": "忘れがちだ",
+      "expected": [
+        {
+          "surface": "忘れがち",
+          "pos": "Noun",
+          "lemma": "忘れがち"
+        },
+        {
+          "surface": "だ",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "s6_fix",
+        "gachi",
+        "regression"
+      ]
+    },
+    {
+      "id": "s6_gachi_suffix",
+      "description": "S6: がち should be recognized as suffix",
+      "input": "遅れがちになる",
+      "expected": [
+        {
+          "surface": "遅れがち",
+          "pos": "Noun",
+          "lemma": "遅れがち"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "なる",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "s6_fix",
+        "gachi",
+        "regression"
+      ]
     }
   ]
 }

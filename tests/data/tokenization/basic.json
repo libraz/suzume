@@ -77,6 +77,48 @@
         "strict",
         "greeting"
       ]
+    },
+    {
+      "id": "d3_tatoeba",
+      "description": "D3: たとえば should be CONJ, not たとえ+ば",
+      "input": "たとえば日本",
+      "expected": [
+        {
+          "surface": "たとえば",
+          "pos": "Conjunction",
+          "lemma": "たとえば"
+        },
+        {
+          "surface": "日本",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "d3_fix",
+        "conjunction",
+        "regression"
+      ]
+    },
+    {
+      "id": "d3_mashite",
+      "description": "D3: まして should be CONJ, not まし+て (suru verb misrecognition)",
+      "input": "まして無理",
+      "expected": [
+        {
+          "surface": "まして",
+          "pos": "Conjunction",
+          "lemma": "まして"
+        },
+        {
+          "surface": "無理",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "d3_fix",
+        "conjunction",
+        "regression"
+      ]
     }
   ]
 }

@@ -408,7 +408,7 @@
     },
     {
       "id": "long_explanation",
-      "description": "Explanation style",
+      "description": "Explanation style - compound verb 読み込む stays as single unit in passive form",
       "input": "この問題が発生する原因は、設定ファイルが正しく読み込まれていないことです",
       "expected": [
         {"surface": "この", "pos": "Determiner"},
@@ -421,8 +421,7 @@
         {"surface": "ファイル", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "正しく", "pos": "Adjective", "lemma": "正しい"},
-        {"surface": "読み", "pos": "Verb", "lemma": "読む"},
-        {"surface": "込まれて", "pos": "Verb", "lemma": "込む"},
+        {"surface": "読み込まれて", "pos": "Verb", "lemma": "読み込む"},
         {"surface": "いない", "pos": "Auxiliary", "lemma": "いる"},
         {"surface": "こと", "pos": "Noun", "lemma": "こと"},
         {"surface": "です", "pos": "Auxiliary"}

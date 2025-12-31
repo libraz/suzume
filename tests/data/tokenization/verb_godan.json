@@ -2590,6 +2590,125 @@
         "strict",
         "pronoun"
       ]
+    },
+    {
+      "id": "s2_sorotte_lemma",
+      "description": "S2: 揃って should have lemma 揃う, not 揃る (GodanWa euphony)",
+      "input": "全員が揃って",
+      "expected": [
+        {
+          "surface": "全員",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "揃って",
+          "pos": "Verb",
+          "lemma": "揃う"
+        }
+      ],
+      "tags": [
+        "s2_fix",
+        "lemma",
+        "regression"
+      ]
+    },
+    {
+      "id": "phase1_2_umaku_ikanakatta",
+      "description": "Phase1-2: うまくいかなかった - いかなかった should be VERB いく, not split",
+      "input": "うまくいかなかった",
+      "expected": [
+        {
+          "surface": "うまく",
+          "pos": "Adjective",
+          "lemma": "うまい"
+        },
+        {
+          "surface": "いかなかった",
+          "pos": "Verb",
+          "lemma": "いく"
+        }
+      ],
+      "tags": [
+        "phase1_2_fix",
+        "iku",
+        "regression"
+      ]
+    },
+    {
+      "id": "phase1_2_iku_basic",
+      "description": "Phase1-2: いく should be recognized as VERB",
+      "input": "どこへいく",
+      "expected": [
+        {
+          "surface": "どこ",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "へ",
+          "pos": "Particle"
+        },
+        {
+          "surface": "いく",
+          "pos": "Verb",
+          "lemma": "いく"
+        }
+      ],
+      "tags": [
+        "phase1_2_fix",
+        "iku",
+        "regression"
+      ]
+    },
+    {
+      "id": "phase1_2_itta",
+      "description": "Phase1-2: いった should be recognized as VERB いく past",
+      "input": "旅行にいった",
+      "expected": [
+        {
+          "surface": "旅行",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "いった",
+          "pos": "Verb",
+          "lemma": "いく"
+        }
+      ],
+      "tags": [
+        "phase1_2_fix",
+        "iku",
+        "regression"
+      ]
+    },
+    {
+      "id": "phase1_2_itte",
+      "description": "Phase1-2: いって should be recognized as VERB いく te-form",
+      "input": "早くいって",
+      "expected": [
+        {
+          "surface": "早く",
+          "pos": "Adjective",
+          "lemma": "早い"
+        },
+        {
+          "surface": "いって",
+          "pos": "Verb",
+          "lemma": "いく"
+        }
+      ],
+      "tags": [
+        "phase1_2_fix",
+        "iku",
+        "regression"
+      ]
     }
   ]
 }

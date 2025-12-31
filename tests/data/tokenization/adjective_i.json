@@ -1099,6 +1099,233 @@
         "adjective",
         "internet"
       ]
+    },
+    {
+      "id": "hiragana_adj_medetai",
+      "description": "Phase2-1: めでたい should be ADJ, not め+でたい",
+      "input": "めでたい話",
+      "expected": [
+        {
+          "surface": "めでたい",
+          "pos": "Adjective",
+          "lemma": "めでたい"
+        },
+        {
+          "surface": "話",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "hiragana",
+        "phase2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "hiragana_adj_arigatai",
+      "description": "Phase2-1: ありがたい should be ADJ, not あり+がたい",
+      "input": "ありがたいです",
+      "expected": [
+        {
+          "surface": "ありがたい",
+          "pos": "Adjective",
+          "lemma": "ありがたい"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "hiragana",
+        "phase2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "hiragana_adj_omoshiroi",
+      "description": "Phase2-1: おもしろい should be ADJ, not お+も+しろい",
+      "input": "おもしろい本",
+      "expected": [
+        {
+          "surface": "おもしろい",
+          "pos": "Adjective",
+          "lemma": "おもしろい"
+        },
+        {
+          "surface": "本",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "hiragana",
+        "phase2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "hiragana_adj_yawarakai",
+      "description": "Phase2-1: やわらかい should be ADJ",
+      "input": "やわらかいパン",
+      "expected": [
+        {
+          "surface": "やわらかい",
+          "pos": "Adjective",
+          "lemma": "やわらかい"
+        },
+        {
+          "surface": "パン",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "hiragana",
+        "phase2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "hiragana_adj_atatakai",
+      "description": "Phase2-1: あたたかい should be ADJ",
+      "input": "あたたかいスープ",
+      "expected": [
+        {
+          "surface": "あたたかい",
+          "pos": "Adjective",
+          "lemma": "あたたかい"
+        },
+        {
+          "surface": "スープ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "hiragana",
+        "phase2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "hiragana_adj_tsumetai",
+      "description": "Phase2-1: つめたい should be ADJ",
+      "input": "つめたい水",
+      "expected": [
+        {
+          "surface": "つめたい",
+          "pos": "Adjective",
+          "lemma": "つめたい"
+        },
+        {
+          "surface": "水",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "hiragana",
+        "phase2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "hiragana_adj_tsumaranai",
+      "description": "Phase2-1: つまらない should be ADJ",
+      "input": "つまらない映画",
+      "expected": [
+        {
+          "surface": "つまらない",
+          "pos": "Adjective",
+          "lemma": "つまらない"
+        },
+        {
+          "surface": "映画",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "hiragana",
+        "phase2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "hiragana_adj_tamaranai",
+      "description": "Phase2-1: たまらない should be ADJ",
+      "input": "たまらない",
+      "expected": [
+        {
+          "surface": "たまらない",
+          "pos": "Adjective",
+          "lemma": "たまらない"
+        }
+      ],
+      "tags": [
+        "hiragana",
+        "phase2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "hiragana_adj_kudaranai",
+      "description": "Phase2-1: くだらない should be ADJ",
+      "input": "くだらない話",
+      "expected": [
+        {
+          "surface": "くだらない",
+          "pos": "Adjective",
+          "lemma": "くだらない"
+        },
+        {
+          "surface": "話",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "hiragana",
+        "phase2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "hiragana_adj_otonashii",
+      "description": "Phase2-1: おとなしい should be ADJ",
+      "input": "おとなしい子",
+      "expected": [
+        {
+          "surface": "おとなしい",
+          "pos": "Adjective",
+          "lemma": "おとなしい"
+        },
+        {
+          "surface": "子",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "hiragana",
+        "phase2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "hiragana_adj_subarashii",
+      "description": "Phase2-1: すばらしい should be ADJ",
+      "input": "すばらしい景色",
+      "expected": [
+        {
+          "surface": "すばらしい",
+          "pos": "Adjective",
+          "lemma": "すばらしい"
+        },
+        {
+          "surface": "景色",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "hiragana",
+        "phase2_fix",
+        "regression"
+      ]
     }
   ]
 }

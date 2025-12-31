@@ -428,6 +428,301 @@
         "strict",
         "common"
       ]
+    },
+    {
+      "id": "d1_naruhodo",
+      "description": "D1: なるほど should be ADV, not なる+ほど",
+      "input": "なるほど",
+      "expected": [
+        {
+          "surface": "なるほど",
+          "pos": "Adverb",
+          "lemma": "成程"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d1_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d1_mochiron",
+      "description": "D1: もちろん should be ADV, not も+ちろん",
+      "input": "もちろん行く",
+      "expected": [
+        {
+          "surface": "もちろん",
+          "pos": "Adverb",
+          "lemma": "勿論"
+        },
+        {
+          "surface": "行く",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d1_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d1_mohaya",
+      "description": "D1: もはや should be ADV, not も+は+や",
+      "input": "もはや遅い",
+      "expected": [
+        {
+          "surface": "もはや",
+          "pos": "Adverb",
+          "lemma": "最早"
+        },
+        {
+          "surface": "遅い",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d1_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d1_ikinari",
+      "description": "D1: いきなり should be ADV, not いき+なり",
+      "input": "いきなり走る",
+      "expected": [
+        {
+          "surface": "いきなり",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "走る",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d1_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d1_toriaezu",
+      "description": "D1: とりあえず should be ADV, not と+りあえず",
+      "input": "とりあえず確認",
+      "expected": [
+        {
+          "surface": "とりあえず",
+          "pos": "Adverb",
+          "lemma": "取り敢えず"
+        },
+        {
+          "surface": "確認",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d1_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d1_zehi",
+      "description": "D1: ぜひ should be ADV, not AUX",
+      "input": "ぜひ行く",
+      "expected": [
+        {
+          "surface": "ぜひ",
+          "pos": "Adverb",
+          "lemma": "是非"
+        },
+        {
+          "surface": "行く",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d1_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d1_tonikaku",
+      "description": "D1: とにかく should be ADV, not と+に+かく",
+      "input": "とにかく始めよう",
+      "expected": [
+        {
+          "surface": "とにかく",
+          "pos": "Adverb",
+          "lemma": "兎に角"
+        },
+        {
+          "surface": "始めよう",
+          "pos": "Verb",
+          "lemma": "始める"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d1_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d1_sudeni",
+      "description": "D1: すでに should be ADV, not す+で+に",
+      "input": "すでに終わった",
+      "expected": [
+        {
+          "surface": "すでに",
+          "pos": "Adverb",
+          "lemma": "既に"
+        },
+        {
+          "surface": "終わった",
+          "pos": "Verb",
+          "lemma": "終わる"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d1_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d2_iza",
+      "description": "D2: いざ should be ADV, not AUX",
+      "input": "いざとなったら",
+      "expected": [
+        {
+          "surface": "いざ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        },
+        {
+          "surface": "なったら",
+          "pos": "Verb",
+          "lemma": "なる"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d2_yatara",
+      "description": "D2: やたら should be ADV",
+      "input": "やたらと高い",
+      "expected": [
+        {
+          "surface": "やたら",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        },
+        {
+          "surface": "高い",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d2_arakajime",
+      "description": "D2: あらかじめ should be ADV",
+      "input": "あらかじめ準備",
+      "expected": [
+        {
+          "surface": "あらかじめ",
+          "pos": "Adverb",
+          "lemma": "予め"
+        },
+        {
+          "surface": "準備",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d2_douse",
+      "description": "D2: どうせ should be ADV",
+      "input": "どうせ無理",
+      "expected": [
+        {
+          "surface": "どうせ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "無理",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d2_hitasura",
+      "description": "D2: ひたすら should be ADV",
+      "input": "ひたすら走る",
+      "expected": [
+        {
+          "surface": "ひたすら",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "走る",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d2_fix",
+        "regression"
+      ]
+    },
+    {
+      "id": "d2_tsukuzuku",
+      "description": "D2: つくづく should be ADV",
+      "input": "つくづく思う",
+      "expected": [
+        {
+          "surface": "つくづく",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "思う",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "d2_fix",
+        "regression"
+      ]
     }
   ]
 }

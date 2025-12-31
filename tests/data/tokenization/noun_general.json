@@ -1048,6 +1048,51 @@
       "tags": [
         "suffix"
       ]
+    },
+    {
+      "id": "s2_arikitari_noun",
+      "description": "S2: ありきたり should be NOUN, not ありきする (suru verb misrecognition)",
+      "input": "ありきたりだ",
+      "expected": [
+        {
+          "surface": "ありきたり",
+          "pos": "Noun",
+          "lemma": "ありきたり"
+        },
+        {
+          "surface": "だ",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "s2_fix",
+        "suru_misrecognition",
+        "regression"
+      ]
+    },
+    {
+      "id": "s2_tatazumai_noun",
+      "description": "S2: たたずまい should be NOUN, not たたずする (suru verb misrecognition)",
+      "input": "たたずまいが良い",
+      "expected": [
+        {
+          "surface": "たたずまい",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "良い",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "s2_fix",
+        "suru_misrecognition",
+        "regression"
+      ]
     }
   ]
 }

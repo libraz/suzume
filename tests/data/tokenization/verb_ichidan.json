@@ -571,6 +571,48 @@
         "verb",
         "ichidan"
       ]
+    },
+    {
+      "id": "s2_obiru_lemma",
+      "description": "S2: 帯び should have lemma 帯びる, not 帯ぶ (Ichidan verb)",
+      "input": "熱を帯びた",
+      "expected": [
+        {
+          "surface": "熱",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "帯びた",
+          "pos": "Verb",
+          "lemma": "帯びる"
+        }
+      ],
+      "tags": [
+        "s2_fix",
+        "lemma",
+        "regression"
+      ]
+    },
+    {
+      "id": "s2_bareru_lemma",
+      "description": "S2: バレた should have lemma バレる, not バレする (Katakana ichidan)",
+      "input": "バレた",
+      "expected": [
+        {
+          "surface": "バレた",
+          "pos": "Verb",
+          "lemma": "バレる"
+        }
+      ],
+      "tags": [
+        "s2_fix",
+        "lemma",
+        "regression"
+      ]
     }
   ]
 }

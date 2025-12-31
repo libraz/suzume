@@ -532,6 +532,180 @@
         "compound",
         "ichidan"
       ]
+    },
+    {
+      "id": "s3_kakemeguru",
+      "description": "S3: 駆け巡った should be compound verb, not split",
+      "input": "世界を駆け巡った",
+      "expected": [
+        {
+          "surface": "世界",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "駆け巡った",
+          "pos": "Verb",
+          "lemma": "駆け巡る"
+        }
+      ],
+      "tags": [
+        "s3_fix",
+        "compound_verb",
+        "regression"
+      ]
+    },
+    {
+      "id": "s3_fukitobasu",
+      "description": "S3: 吹き飛ばす should be compound verb",
+      "input": "風が吹き飛ばす",
+      "expected": [
+        {
+          "surface": "風",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "吹き飛ばす",
+          "pos": "Verb",
+          "lemma": "吹き飛ばす"
+        }
+      ],
+      "tags": [
+        "s3_fix",
+        "compound_verb",
+        "regression"
+      ]
+    },
+    {
+      "id": "s3_enjikitta",
+      "description": "S3: 演じきった should be compound verb with lemma 演じ切る",
+      "input": "役を演じきった",
+      "expected": [
+        {
+          "surface": "役",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "演じきった",
+          "pos": "Verb",
+          "lemma": "演じ切る"
+        }
+      ],
+      "tags": [
+        "s3_fix",
+        "compound_verb",
+        "regression"
+      ]
+    },
+    {
+      "id": "s3_tabesugita_split",
+      "description": "S3: 食べすぎた should split as 食べすぎ + た (renyokei priority)",
+      "input": "食べすぎた",
+      "expected": [
+        {
+          "surface": "食べすぎ",
+          "pos": "Verb",
+          "lemma": "食べ過ぎる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "s3_fix",
+        "compound_verb",
+        "renyokei_priority",
+        "regression"
+      ]
+    },
+    {
+      "id": "s3_hashiridashi_tai_split",
+      "description": "S3: 走り出したくなかった should split as 走り出し + たくなかった",
+      "input": "走り出したくなかった",
+      "expected": [
+        {
+          "surface": "走り出し",
+          "pos": "Verb",
+          "lemma": "走り出す"
+        },
+        {
+          "surface": "たくなかった",
+          "pos": "Adjective",
+          "lemma": "たい"
+        }
+      ],
+      "tags": [
+        "s3_fix",
+        "compound_verb",
+        "renyokei_priority",
+        "regression"
+      ]
+    },
+    {
+      "id": "s3_tobikau",
+      "description": "S3: 飛び交う should be compound verb",
+      "input": "言葉が飛び交う",
+      "expected": [
+        {
+          "surface": "言葉",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "飛び交う",
+          "pos": "Verb",
+          "lemma": "飛び交う"
+        }
+      ],
+      "tags": [
+        "s3_fix",
+        "compound_verb",
+        "regression"
+      ]
+    },
+    {
+      "id": "s3_toriireru",
+      "description": "S3: 取り入れる should be compound verb",
+      "input": "新しい方法を取り入れる",
+      "expected": [
+        {
+          "surface": "新しい",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "方法",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "取り入れる",
+          "pos": "Verb",
+          "lemma": "取り入れる"
+        }
+      ],
+      "tags": [
+        "s3_fix",
+        "compound_verb",
+        "regression"
+      ]
     }
   ]
 }
