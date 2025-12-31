@@ -61,11 +61,15 @@ class ScorerOptionsLoader {
   /// Apply split options from JSON
   static void applySplitOptions(SplitOptions& opts, const JsonValue& json);
 
-  // JSON parser internals
+  // JSON parser internals (exception-free)
   class Parser {
    public:
     explicit Parser(const std::string& json) : json_(json), pos_(0) {}
     JsonValue parse();
+
+    // Error state accessors
+    bool hasError() const { return has_error_; }
+    const std::string& errorMessage() const { return error_message_; }
 
    private:
     JsonValue parseValue();
@@ -77,9 +81,12 @@ class ScorerOptionsLoader {
     char peek() const;
     char consume();
     bool match(char c);
+    void setError(const char* msg);
 
     std::string json_;
-    size_t pos_;
+    size_t pos_{0};
+    bool has_error_{false};
+    std::string error_message_;
   };
 };
 
@@ -92,7 +99,15 @@ inline JsonValue ScorerOptionsLoader::Parser::parse() {
   return parseValue();
 }
 
+inline void ScorerOptionsLoader::Parser::setError(const char* msg) {
+  if (!has_error_) {
+    has_error_ = true;
+    error_message_ = msg;
+  }
+}
+
 inline JsonValue ScorerOptionsLoader::Parser::parseValue() {
+  if (has_error_) return JsonValue{};
   skipWhitespace();
   char c = peek();
   if (c == '{') return parseObject();
@@ -117,48 +132,58 @@ inline JsonValue ScorerOptionsLoader::Parser::parseValue() {
     v.number_value = 0.0F;
     return v;
   }
-  throw std::runtime_error("Unexpected character in JSON");
+  setError("Unexpected character in JSON");
+  return JsonValue{};
 }
 
 inline JsonValue ScorerOptionsLoader::Parser::parseObject() {
   JsonValue result;
+  if (has_error_) return result;
   result.type = JsonValue::Type::Object;
   consume();  // '{'
   skipWhitespace();
-  while (peek() != '}') {
+  while (!has_error_ && peek() != '}' && peek() != '\0') {
     auto key = parseString();
+    if (has_error_) return result;
     skipWhitespace();
-    if (!match(':')) throw std::runtime_error("Expected ':' in object");
+    if (!match(':')) {
+      setError("Expected ':' in object");
+      return result;
+    }
     skipWhitespace();
     result.object_value[key.string_value] = parseValue();
+    if (has_error_) return result;
     skipWhitespace();
     if (peek() == ',') consume();
     skipWhitespace();
   }
-  consume();  // '}'
+  if (peek() == '}') consume();  // '}'
   return result;
 }
 
 inline JsonValue ScorerOptionsLoader::Parser::parseArray() {
   JsonValue result;
+  if (has_error_) return result;
   result.type = JsonValue::Type::Array;
   consume();  // '['
   skipWhitespace();
-  while (peek() != ']') {
+  while (!has_error_ && peek() != ']' && peek() != '\0') {
     parseValue();  // Skip array values for now
+    if (has_error_) return result;
     skipWhitespace();
     if (peek() == ',') consume();
     skipWhitespace();
   }
-  consume();  // ']'
+  if (peek() == ']') consume();  // ']'
   return result;
 }
 
 inline JsonValue ScorerOptionsLoader::Parser::parseString() {
   JsonValue result;
+  if (has_error_) return result;
   result.type = JsonValue::Type::String;
   consume();  // '"'
-  while (pos_ < json_.size() && json_[pos_] != '"') {
+  while (!has_error_ && pos_ < json_.size() && json_[pos_] != '"') {
     if (json_[pos_] == '\\' && pos_ + 1 < json_.size()) {
       pos_++;
       switch (json_[pos_]) {
@@ -173,12 +198,15 @@ inline JsonValue ScorerOptionsLoader::Parser::parseString() {
     }
     pos_++;
   }
-  consume();  // '"'
+  if (pos_ < json_.size() && json_[pos_] == '"') {
+    consume();  // '"'
+  }
   return result;
 }
 
 inline JsonValue ScorerOptionsLoader::Parser::parseNumber() {
   JsonValue result;
+  if (has_error_) return result;
   result.type = JsonValue::Type::Number;
   size_t start = pos_;
   if (peek() == '-') consume();
@@ -192,7 +220,9 @@ inline JsonValue ScorerOptionsLoader::Parser::parseNumber() {
     if (pos_ < json_.size() && (json_[pos_] == '+' || json_[pos_] == '-')) pos_++;
     while (pos_ < json_.size() && (json_[pos_] >= '0' && json_[pos_] <= '9')) pos_++;
   }
-  result.number_value = std::stof(json_.substr(start, pos_ - start));
+  if (pos_ > start) {
+    result.number_value = std::stof(json_.substr(start, pos_ - start));
+  }
   return result;
 }
 
@@ -209,6 +239,10 @@ inline char ScorerOptionsLoader::Parser::peek() const {
 }
 
 inline char ScorerOptionsLoader::Parser::consume() {
+  if (pos_ >= json_.size()) {
+    setError("Unexpected end of JSON");
+    return '\0';
+  }
   return json_[pos_++];
 }
 
@@ -315,46 +349,45 @@ inline bool ScorerOptionsLoader::loadFromFile(const std::string& path, ScorerOpt
   buffer << file.rdbuf();
   std::string json = buffer.str();
 
-  try {
-    Parser parser(json);
-    auto root = parser.parse();
-    if (!root.isObject()) {
-      if (error_msg) *error_msg = "JSON root must be an object";
-      return false;
-    }
+  Parser parser(json);
+  auto root = parser.parse();
 
-    // Apply connection_rules section
-    if (auto* conn_rules = root.get("connection_rules")) {
-      if (conn_rules->isObject()) {
-        if (auto* edge = conn_rules->get("edge")) {
-          if (edge->isObject()) applyEdgeOptions(options.connection_rules.edge, *edge);
-        }
-        if (auto* conn = conn_rules->get("connection")) {
-          if (conn->isObject()) applyConnectionOptions(options.connection_rules.connection, *conn);
-        }
-      }
-    }
-
-    // Apply candidates section
-    if (auto* cands = root.get("candidates")) {
-      if (cands->isObject()) {
-        if (auto* join = cands->get("join")) {
-          if (join->isObject()) applyJoinOptions(options.candidates.join, *join);
-        }
-        if (auto* split = cands->get("split")) {
-          if (split->isObject()) applySplitOptions(options.candidates.split, *split);
-        }
-      }
-    }
-
-    return true;
-  } catch (const std::exception& e) {
-    if (error_msg) *error_msg = std::string("JSON parse error: ") + e.what();
-    return false;
-  } catch (...) {
-    if (error_msg) *error_msg = "Unknown JSON parse error";
+  // Check for parse errors
+  if (parser.hasError()) {
+    if (error_msg) *error_msg = std::string("JSON parse error: ") + parser.errorMessage();
     return false;
   }
+
+  if (!root.isObject()) {
+    if (error_msg) *error_msg = "JSON root must be an object";
+    return false;
+  }
+
+  // Apply connection_rules section
+  if (auto* conn_rules = root.get("connection_rules")) {
+    if (conn_rules->isObject()) {
+      if (auto* edge = conn_rules->get("edge")) {
+        if (edge->isObject()) applyEdgeOptions(options.connection_rules.edge, *edge);
+      }
+      if (auto* conn = conn_rules->get("connection")) {
+        if (conn->isObject()) applyConnectionOptions(options.connection_rules.connection, *conn);
+      }
+    }
+  }
+
+  // Apply candidates section
+  if (auto* cands = root.get("candidates")) {
+    if (cands->isObject()) {
+      if (auto* join = cands->get("join")) {
+        if (join->isObject()) applyJoinOptions(options.candidates.join, *join);
+      }
+      if (auto* split = cands->get("split")) {
+        if (split->isObject()) applySplitOptions(options.candidates.split, *split);
+      }
+    }
+  }
+
+  return true;
 }
 
 }  // namespace suzume::analysis

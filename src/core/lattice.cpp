@@ -4,16 +4,14 @@
 
 namespace suzume::core {
 
-const std::vector<LatticeEdge> Lattice::empty_edges_;
-
-Lattice::Lattice(size_t text_length) : text_length_(text_length), edges_by_start_(text_length + 1) {}
+Lattice::Lattice(size_t text_length) : text_length_(text_length), edge_indices_by_start_(text_length + 1) {}
 
 void Lattice::addEdge(const LatticeEdge& edge) {
   if (edge.start <= text_length_ && all_edges_.size() < kMaxEdges) {
     LatticeEdge new_edge = edge;
     new_edge.id = static_cast<uint32_t>(all_edges_.size());
     all_edges_.push_back(new_edge);
-    edges_by_start_[edge.start].push_back(new_edge);
+    edge_indices_by_start_[edge.start].push_back(new_edge.id);
     ++edge_count_;
   }
 }
@@ -75,17 +73,23 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
 #endif
 
   all_edges_.push_back(edge);
-  edges_by_start_[start].push_back(edge);
+  edge_indices_by_start_[start].push_back(edge.id);
   ++edge_count_;
 
   return edge.id;
 }
 
-const std::vector<LatticeEdge>& Lattice::edgesAt(size_t pos) const {
-  if (pos < edges_by_start_.size()) {
-    return edges_by_start_[pos];
+std::vector<LatticeEdge> Lattice::edgesAt(size_t pos) const {
+  if (pos >= edge_indices_by_start_.size()) {
+    return {};
   }
-  return empty_edges_;
+  const auto& indices = edge_indices_by_start_[pos];
+  std::vector<LatticeEdge> result;
+  result.reserve(indices.size());
+  for (uint32_t idx : indices) {
+    result.push_back(all_edges_[idx]);
+  }
+  return result;
 }
 
 const LatticeEdge& Lattice::getEdge(size_t edge_id) const {
@@ -124,8 +128,8 @@ bool Lattice::isValid() const {
 }
 
 void Lattice::clear() {
-  for (auto& edges : edges_by_start_) {
-    edges.clear();
+  for (auto& indices : edge_indices_by_start_) {
+    indices.clear();
   }
   all_edges_.clear();
   surface_storage_.clear();

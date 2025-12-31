@@ -121,8 +121,11 @@ class Lattice {
 
   /**
    * @brief Get all edges starting at a position
+   * @note Returns by value (indices internally, edges constructed on-demand)
+   *       This enables memory optimization while keeping API compatibility.
+   *       Caller can use: const auto& edges = edgesAt(pos); // lifetime extended
    */
-  const std::vector<LatticeEdge>& edgesAt(size_t pos) const;
+  std::vector<LatticeEdge> edgesAt(size_t pos) const;
 
   /**
    * @brief Get edge by ID
@@ -154,15 +157,14 @@ class Lattice {
  private:
   size_t text_length_{0};
   size_t edge_count_{0};
-  std::vector<std::vector<LatticeEdge>> edges_by_start_;
-  std::vector<LatticeEdge> all_edges_;  // All edges for getEdge()
+  std::vector<std::vector<uint32_t>> edge_indices_by_start_;  // Edge indices per position
+  std::vector<LatticeEdge> all_edges_;  // All edges (primary storage)
   std::deque<std::string> surface_storage_;  // Storage for surface strings (deque for stable pointers)
   std::deque<std::string> lemma_storage_;    // Storage for lemma strings (deque for stable pointers)
   std::deque<std::string> reading_storage_;  // Storage for reading strings (deque for stable pointers)
 #ifdef SUZUME_DEBUG_INFO
   std::deque<std::string> origin_detail_storage_;  // Storage for origin detail strings (deque for stable pointers)
 #endif
-  static const std::vector<LatticeEdge> empty_edges_;
 };
 
 }  // namespace suzume::core
