@@ -254,16 +254,13 @@
     },
     {
       "id": "phrase_gachide_saboru",
-      "description": "Slang phrase ガチでサボる",
+      "description": "Slang phrase ガチでサボる (ガチで as adverb 'seriously')",
       "input": "ガチでサボる",
       "expected": [
         {
-          "surface": "ガチ",
-          "pos": "Noun"
-        },
-        {
-          "surface": "で",
-          "pos": "Particle"
+          "surface": "ガチで",
+          "pos": "Adverb",
+          "lemma": "ガチで"
         },
         {
           "surface": "サボる",

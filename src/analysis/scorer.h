@@ -17,7 +17,7 @@ struct ScorerOptions {
   float noun_prior = 0.0F;
   float verb_prior = 0.2F;
   float adj_prior = 0.3F;
-  float adv_prior = 0.4F;
+  float adv_prior = 0.2F;  // Reduced from 0.4F to avoid penalizing common adverbs
   float particle_prior = 0.1F;
   float aux_prior = 0.2F;
   float pronoun_prior = 0.1F;
@@ -38,7 +38,7 @@ struct ScorerOptions {
   struct OptimalLength {
     size_t noun_min = 2;
     size_t noun_max = 6;
-    size_t verb_min = 3;  // Increased from 2 to prevent short verbs like して from getting bonus
+    size_t verb_min = 3;  // Keep at 3 to avoid promoting verb split (食べた→食べ+た)
     size_t verb_max = 12; // Increased to accommodate long conjugated forms
                           // e.g., かけられなくなった (9 chars), 食べさせられなくなった (10 chars)
     size_t adj_min = 2;
