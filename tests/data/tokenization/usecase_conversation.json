@@ -222,7 +222,7 @@
         {"surface": "これ", "pos": "Pronoun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "3つ", "pos": "Noun"},
-        {"surface": "ください", "pos": "Auxiliary", "lemma": "ください"}
+        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["shopping", "counter"]
     },

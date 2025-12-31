@@ -23,30 +23,112 @@ std::string dropLastChar(const std::string& s) {
 
 // Conjugation suffix with output connection ID
 struct ConjSuffix {
-  std::string suffix;
+  const char* suffix;
   uint16_t right_id;
 };
 
-// === Ichidan conjugation (一段活用) ===
-// いる → いた, いて, います, いない, いなかった...
-std::vector<AuxiliaryEntry> generateIchidanForms(const AuxiliaryBase& base) {
+// =============================================================================
+// Suffix Tables (テーブル駆動活用パターン)
+// =============================================================================
+
+// Full forms with negative (9 suffixes)
+// Pattern: base, ta, tara, te, masu, mashita, nai, nakatta, nakute
+constexpr ConjSuffix kIchidanFull[] = {
+    {"る", conn::kAuxOutBase},   {"た", conn::kAuxOutTa},
+    {"たら", conn::kAuxOutBase}, {"て", conn::kAuxOutTe},
+    {"ます", conn::kAuxOutMasu}, {"ました", conn::kAuxOutTa},
+    {"ない", conn::kAuxOutBase}, {"なかった", conn::kAuxOutTa},
+    {"なくて", conn::kAuxOutTe},
+};
+
+// Te-attachment limited forms (6 suffixes, no negative)
+constexpr ConjSuffix kIchidanTeAttach[] = {
+    {"る", conn::kAuxOutBase},   {"た", conn::kAuxOutTa},
+    {"たら", conn::kAuxOutBase}, {"て", conn::kAuxOutTe},
+    {"ます", conn::kAuxOutMasu}, {"ました", conn::kAuxOutTa},
+};
+
+// Godan-Wa (五段わ行) - full
+constexpr ConjSuffix kGodanWaFull[] = {
+    {"う", conn::kAuxOutBase},       {"った", conn::kAuxOutTa},
+    {"ったら", conn::kAuxOutBase},   {"って", conn::kAuxOutTe},
+    {"います", conn::kAuxOutMasu},   {"いました", conn::kAuxOutTa},
+    {"わない", conn::kAuxOutBase},   {"わなかった", conn::kAuxOutTa},
+    {"わなくて", conn::kAuxOutTe},
+};
+
+// Godan-Wa te-attachment
+constexpr ConjSuffix kGodanWaTeAttach[] = {
+    {"う", conn::kAuxOutBase},     {"った", conn::kAuxOutTa},
+    {"ったら", conn::kAuxOutBase}, {"って", conn::kAuxOutTe},
+    {"います", conn::kAuxOutMasu}, {"いました", conn::kAuxOutTa},
+};
+
+// Godan-Ka (五段か行) - full
+constexpr ConjSuffix kGodanKaFull[] = {
+    {"く", conn::kAuxOutBase},     {"いた", conn::kAuxOutTa},
+    {"いたら", conn::kAuxOutBase}, {"いて", conn::kAuxOutTe},
+    {"きます", conn::kAuxOutMasu}, {"きました", conn::kAuxOutTa},
+    {"かない", conn::kAuxOutBase}, {"かなかった", conn::kAuxOutTa},
+    {"かなくて", conn::kAuxOutTe},
+};
+
+// Godan-Sa (五段さ行) - full
+constexpr ConjSuffix kGodanSaFull[] = {
+    {"す", conn::kAuxOutBase},     {"した", conn::kAuxOutTa},
+    {"したら", conn::kAuxOutBase}, {"して", conn::kAuxOutTe},
+    {"します", conn::kAuxOutMasu}, {"しました", conn::kAuxOutTa},
+    {"さない", conn::kAuxOutBase}, {"さなかった", conn::kAuxOutTa},
+    {"さなくて", conn::kAuxOutTe},
+};
+
+// Godan-Ra (五段ら行) - full
+constexpr ConjSuffix kGodanRaFull[] = {
+    {"る", conn::kAuxOutBase},     {"った", conn::kAuxOutTa},
+    {"ったら", conn::kAuxOutBase}, {"って", conn::kAuxOutTe},
+    {"ります", conn::kAuxOutMasu}, {"りました", conn::kAuxOutTa},
+    {"らない", conn::kAuxOutBase}, {"らなかった", conn::kAuxOutTa},
+    {"らなくて", conn::kAuxOutTe},
+};
+
+// Kuru (カ変) - irregular, full forms
+constexpr ConjSuffix kKuruFull[] = {
+    {"くる", conn::kAuxOutBase},     {"きた", conn::kAuxOutTa},
+    {"きたら", conn::kAuxOutBase},   {"きて", conn::kAuxOutTe},
+    {"きます", conn::kAuxOutMasu},   {"きました", conn::kAuxOutTa},
+    {"こない", conn::kAuxOutBase},   {"こなかった", conn::kAuxOutTa},
+    {"こなくて", conn::kAuxOutTe},
+};
+
+// I-adjective (い形容詞)
+constexpr ConjSuffix kIAdjective[] = {
+    {"い", conn::kAuxOutBase},       {"かった", conn::kAuxOutTa},
+    {"くて", conn::kAuxOutTe},       {"くない", conn::kAuxOutBase},
+    {"くなかった", conn::kAuxOutTa}, {"ければ", conn::kAuxOutBase},
+    {"く", conn::kAuxOutBase},  // adverbial
+};
+
+// Masu (ます) - special (no stem)
+constexpr ConjSuffix kMasu[] = {
+    {"ます", conn::kAuxOutMasu},       {"ました", conn::kAuxOutTa},
+    {"ません", conn::kAuxOutBase},     {"ましょう", conn::kAuxOutBase},
+    {"ませんでした", conn::kAuxOutTa},
+};
+
+// =============================================================================
+// Table-Driven Generation (単一ジェネレータ関数)
+// =============================================================================
+
+// Generate forms using stem + suffix pattern
+template <size_t N>
+std::vector<AuxiliaryEntry> generateWithStem(
+    const AuxiliaryBase& base, const ConjSuffix (&suffixes)[N]) {
   std::string stem = dropLastChar(base.surface);
   std::string reading_stem = dropLastChar(base.reading);
 
-  static const std::vector<ConjSuffix> kSuffixes = {
-      {"る", conn::kAuxOutBase},
-      {"た", conn::kAuxOutTa},
-      {"たら", conn::kAuxOutBase},  // conditional
-      {"て", conn::kAuxOutTe},
-      {"ます", conn::kAuxOutMasu},
-      {"ました", conn::kAuxOutTa},
-      {"ない", conn::kAuxOutBase},
-      {"なかった", conn::kAuxOutTa},
-      {"なくて", conn::kAuxOutTe},
-  };
-
   std::vector<AuxiliaryEntry> result;
-  for (const auto& suf : kSuffixes) {
+  result.reserve(N);
+  for (const auto& suf : suffixes) {
     result.push_back({stem + suf.suffix, reading_stem + suf.suffix,
                       base.surface, base.left_id, suf.right_id,
                       base.required_conn});
@@ -54,289 +136,31 @@ std::vector<AuxiliaryEntry> generateIchidanForms(const AuxiliaryBase& base) {
   return result;
 }
 
-// === Ichidan conjugation for te-form attachments (limited forms) ===
-// くれる → くれた, くれます (NO negative forms)
-// Te-form attachments like てくれる should NOT generate negative forms
-// because the negation should apply to the main verb, not the auxiliary.
-// E.g., 待ってくれない → 待って + くれない (two morphemes)
-//       NOT 待ってくれない as single inflected form
-std::vector<AuxiliaryEntry> generateTeAttachmentIchidanForms(
-    const AuxiliaryBase& base) {
-  std::string stem = dropLastChar(base.surface);
-  std::string reading_stem = dropLastChar(base.reading);
-
-  // Limited forms: base, past, past-conditional, te, polite, polite-past
-  // NO: ない, なかった, なくて (these cause over-matching)
-  static const std::vector<ConjSuffix> kSuffixes = {
-      {"る", conn::kAuxOutBase},
-      {"た", conn::kAuxOutTa},
-      {"たら", conn::kAuxOutBase},
-      {"て", conn::kAuxOutTe},
-      {"ます", conn::kAuxOutMasu},
-      {"ました", conn::kAuxOutTa},
-  };
-
+// Generate forms using full forms (no stem, for irregular verbs)
+template <size_t N>
+std::vector<AuxiliaryEntry> generateFullForms(
+    const AuxiliaryBase& base, const ConjSuffix (&forms)[N]) {
   std::vector<AuxiliaryEntry> result;
-  for (const auto& suf : kSuffixes) {
-    result.push_back({stem + suf.suffix, reading_stem + suf.suffix,
-                      base.surface, base.left_id, suf.right_id,
-                      base.required_conn});
+  result.reserve(N);
+  for (const auto& form : forms) {
+    result.push_back({form.suffix, form.suffix, base.surface,
+                      base.left_id, form.right_id, base.required_conn});
   }
   return result;
 }
 
-// === Godan-Wa conjugation for te-form attachments (limited forms) ===
-// もらう → もらった, もらいます (NO negative forms)
-std::vector<AuxiliaryEntry> generateTeAttachmentGodanWaForms(
-    const AuxiliaryBase& base) {
-  std::string stem = dropLastChar(base.surface);
-  std::string reading_stem = dropLastChar(base.reading);
-
-  static const std::vector<ConjSuffix> kSuffixes = {
-      {"う", conn::kAuxOutBase},
-      {"った", conn::kAuxOutTa},
-      {"ったら", conn::kAuxOutBase},
-      {"って", conn::kAuxOutTe},
-      {"います", conn::kAuxOutMasu},
-      {"いました", conn::kAuxOutTa},
-  };
-
-  std::vector<AuxiliaryEntry> result;
-  for (const auto& suf : kSuffixes) {
-    result.push_back({stem + suf.suffix, reading_stem + suf.suffix,
-                      base.surface, base.left_id, suf.right_id,
-                      base.required_conn});
-  }
-  return result;
-}
-
-// === Godan-Wa conjugation (五段わ行活用) ===
-// しまう → しまった, しまって, しまいます, しまわない...
-std::vector<AuxiliaryEntry> generateGodanWaForms(const AuxiliaryBase& base) {
-  std::string stem = dropLastChar(base.surface);  // しま
-  std::string reading_stem = dropLastChar(base.reading);
-
-  static const std::vector<ConjSuffix> kSuffixes = {
-      {"う", conn::kAuxOutBase},
-      {"った", conn::kAuxOutTa},
-      {"ったら", conn::kAuxOutBase},  // conditional
-      {"って", conn::kAuxOutTe},
-      {"います", conn::kAuxOutMasu},
-      {"いました", conn::kAuxOutTa},
-      {"わない", conn::kAuxOutBase},
-      {"わなかった", conn::kAuxOutTa},
-      {"わなくて", conn::kAuxOutTe},
-  };
-
-  std::vector<AuxiliaryEntry> result;
-  for (const auto& suf : kSuffixes) {
-    result.push_back({stem + suf.suffix, reading_stem + suf.suffix,
-                      base.surface, base.left_id, suf.right_id,
-                      base.required_conn});
-  }
-  return result;
-}
-
-// === Godan-Ka conjugation for te-form attachments (limited forms) ===
-// おく → おいた, おいて, おきます (NO negative forms)
-std::vector<AuxiliaryEntry> generateTeAttachmentGodanKaForms(
-    const AuxiliaryBase& base) {
-  std::string stem = dropLastChar(base.surface);
-  std::string reading_stem = dropLastChar(base.reading);
-
-  static const std::vector<ConjSuffix> kSuffixes = {
-      {"く", conn::kAuxOutBase},
-      {"いた", conn::kAuxOutTa},
-      {"いたら", conn::kAuxOutBase},
-      {"いて", conn::kAuxOutTe},
-      {"きます", conn::kAuxOutMasu},
-      {"きました", conn::kAuxOutTa},
-  };
-
-  std::vector<AuxiliaryEntry> result;
-  for (const auto& suf : kSuffixes) {
-    result.push_back({stem + suf.suffix, reading_stem + suf.suffix,
-                      base.surface, base.left_id, suf.right_id,
-                      base.required_conn});
-  }
-  return result;
-}
-
-// === Godan-Ka conjugation (五段か行活用) ===
-// おく → おいた, おいて, おきます, おかない...
-std::vector<AuxiliaryEntry> generateGodanKaForms(const AuxiliaryBase& base) {
-  std::string stem = dropLastChar(base.surface);  // お
-  std::string reading_stem = dropLastChar(base.reading);
-
-  static const std::vector<ConjSuffix> kSuffixes = {
-      {"く", conn::kAuxOutBase},
-      {"いた", conn::kAuxOutTa},
-      {"いたら", conn::kAuxOutBase},  // conditional
-      {"いて", conn::kAuxOutTe},
-      {"きます", conn::kAuxOutMasu},
-      {"きました", conn::kAuxOutTa},
-      {"かない", conn::kAuxOutBase},
-      {"かなかった", conn::kAuxOutTa},
-      {"かなくて", conn::kAuxOutTe},
-  };
-
-  std::vector<AuxiliaryEntry> result;
-  for (const auto& suf : kSuffixes) {
-    result.push_back({stem + suf.suffix, reading_stem + suf.suffix,
-                      base.surface, base.left_id, suf.right_id,
-                      base.required_conn});
-  }
-  return result;
-}
-
-// === Godan-Sa conjugation (五段さ行活用) ===
-// 出す → 出した, 出して, 出します, 出さない...
-std::vector<AuxiliaryEntry> generateGodanSaForms(const AuxiliaryBase& base) {
-  std::string stem = dropLastChar(base.surface);
-  std::string reading_stem = dropLastChar(base.reading);
-
-  static const std::vector<ConjSuffix> kSuffixes = {
-      {"す", conn::kAuxOutBase},
-      {"した", conn::kAuxOutTa},
-      {"したら", conn::kAuxOutBase},  // conditional
-      {"して", conn::kAuxOutTe},
-      {"します", conn::kAuxOutMasu},
-      {"しました", conn::kAuxOutTa},
-      {"さない", conn::kAuxOutBase},
-      {"さなかった", conn::kAuxOutTa},
-      {"さなくて", conn::kAuxOutTe},
-  };
-
-  std::vector<AuxiliaryEntry> result;
-  for (const auto& suf : kSuffixes) {
-    result.push_back({stem + suf.suffix, reading_stem + suf.suffix,
-                      base.surface, base.left_id, suf.right_id,
-                      base.required_conn});
-  }
-  return result;
-}
-
-// === Godan-Ra conjugation (五段ら行活用) ===
-// 終わる → 終わった, 終わって, 終わります, 終わらない...
-std::vector<AuxiliaryEntry> generateGodanRaForms(const AuxiliaryBase& base) {
-  std::string stem = dropLastChar(base.surface);
-  std::string reading_stem = dropLastChar(base.reading);
-
-  static const std::vector<ConjSuffix> kSuffixes = {
-      {"る", conn::kAuxOutBase},
-      {"った", conn::kAuxOutTa},
-      {"ったら", conn::kAuxOutBase},  // conditional
-      {"って", conn::kAuxOutTe},
-      {"ります", conn::kAuxOutMasu},
-      {"りました", conn::kAuxOutTa},
-      {"らない", conn::kAuxOutBase},
-      {"らなかった", conn::kAuxOutTa},
-      {"らなくて", conn::kAuxOutTe},
-  };
-
-  std::vector<AuxiliaryEntry> result;
-  for (const auto& suf : kSuffixes) {
-    result.push_back({stem + suf.suffix, reading_stem + suf.suffix,
-                      base.surface, base.left_id, suf.right_id,
-                      base.required_conn});
-  }
-  return result;
-}
-
-// === Kuru conjugation (カ変活用) ===
-// === Kuru conjugation for te-form attachments (limited forms) ===
-// くる → きた, きて, きます (NO negative forms)
-std::vector<AuxiliaryEntry> generateTeAttachmentKuruForms(
-    const AuxiliaryBase& base) {
-  static const std::vector<std::pair<std::string, uint16_t>> kForms = {
-      {"くる", conn::kAuxOutBase},
-      {"きた", conn::kAuxOutTa},
-      {"きたら", conn::kAuxOutBase},
-      {"きて", conn::kAuxOutTe},
-      {"きます", conn::kAuxOutMasu},
-      {"きました", conn::kAuxOutTa},
-  };
-
-  std::vector<AuxiliaryEntry> result;
-  for (const auto& [form, right_id] : kForms) {
-    result.push_back({form, form, base.surface,
-                      base.left_id, right_id, base.required_conn});
-  }
-  return result;
-}
-
-// くる → きた, きて, きます, こない...
-// NOTE: Kuru is irregular - forms are complete (no stem + suffix)
-std::vector<AuxiliaryEntry> generateKuruForms(const AuxiliaryBase& base) {
-  // Kuru is completely irregular - use full forms directly
-  static const std::vector<std::pair<std::string, uint16_t>> kForms = {
-      {"くる", conn::kAuxOutBase},
-      {"きた", conn::kAuxOutTa},
-      {"きたら", conn::kAuxOutBase},  // conditional
-      {"きて", conn::kAuxOutTe},
-      {"きます", conn::kAuxOutMasu},
-      {"きました", conn::kAuxOutTa},
-      {"こない", conn::kAuxOutBase},
-      {"こなかった", conn::kAuxOutTa},
-      {"こなくて", conn::kAuxOutTe},
-  };
-
-  std::vector<AuxiliaryEntry> result;
-  for (const auto& [form, right_id] : kForms) {
-    // For Kuru, the form is complete - no stem prefix needed
-    result.push_back({form, form, base.surface,
-                      base.left_id, right_id, base.required_conn});
-  }
-  return result;
-}
-
-// === I-Adjective conjugation (い形容詞活用) ===
-// ない → なかった, なくて, なければ...
-// たい → たかった, たくて, たくない...
-std::vector<AuxiliaryEntry> generateIAdjectiveForms(const AuxiliaryBase& base) {
-  std::string stem = dropLastChar(base.surface);  // な, た
-  std::string reading_stem = dropLastChar(base.reading);
-
-  static const std::vector<ConjSuffix> kSuffixes = {
-      {"い", conn::kAuxOutBase},
-      {"かった", conn::kAuxOutTa},
-      {"くて", conn::kAuxOutTe},
-      {"くない", conn::kAuxOutBase},
-      {"くなかった", conn::kAuxOutTa},
-      {"ければ", conn::kAuxOutBase},
-      {"く", conn::kAuxOutBase},  // adverbial form
-  };
-
-  std::vector<AuxiliaryEntry> result;
-  for (const auto& suf : kSuffixes) {
-    result.push_back({stem + suf.suffix, reading_stem + suf.suffix,
-                      base.surface, base.left_id, suf.right_id,
-                      base.required_conn});
-  }
-  return result;
-}
-
-// === Masu conjugation (ます活用) ===
-// ます → ました, ません, ましょう...
+// Generate Masu forms (special: fixed lemma "ます")
 std::vector<AuxiliaryEntry> generateMasuForms(const AuxiliaryBase& base) {
-  static const std::vector<std::pair<std::string, uint16_t>> kForms = {
-      {"ます", conn::kAuxOutMasu},
-      {"ました", conn::kAuxOutTa},
-      {"ません", conn::kAuxOutBase},
-      {"ましょう", conn::kAuxOutBase},
-      {"ませんでした", conn::kAuxOutTa},
-  };
-
   std::vector<AuxiliaryEntry> result;
-  for (const auto& [form, right_id] : kForms) {
-    result.push_back({form, form, "ます", base.left_id, right_id,
-                      base.required_conn});
+  result.reserve(std::size(kMasu));
+  for (const auto& form : kMasu) {
+    result.push_back({form.suffix, form.suffix, "ます",
+                      base.left_id, form.right_id, base.required_conn});
   }
   return result;
 }
 
-// === No conjugation (活用なし) ===
-// た, て, たら, etc. - single form only
+// No conjugation - single form only
 std::vector<AuxiliaryEntry> generateNoConjForms(const AuxiliaryBase& base) {
   return {{base.surface, base.reading, base.surface, base.left_id,
            conn::kAuxOutBase, base.required_conn}};
@@ -834,29 +658,22 @@ std::vector<AuxiliaryEntry> expandAuxiliaryBase(const AuxiliaryBase& base) {
 
   switch (base.conj_type) {
     case VerbType::Ichidan:
-      if (is_benefactive) {
-        return generateTeAttachmentIchidanForms(base);
-      }
-      return generateIchidanForms(base);
+      return is_benefactive ? generateWithStem(base, kIchidanTeAttach)
+                            : generateWithStem(base, kIchidanFull);
     case VerbType::GodanWa:
-      if (is_benefactive) {
-        return generateTeAttachmentGodanWaForms(base);
-      }
-      return generateGodanWaForms(base);
+      return is_benefactive ? generateWithStem(base, kGodanWaTeAttach)
+                            : generateWithStem(base, kGodanWaFull);
     case VerbType::GodanKa:
-      // GodanKa te-attachments (おく, いく) should keep full forms
-      return generateGodanKaForms(base);
+      return generateWithStem(base, kGodanKaFull);
     case VerbType::GodanSa:
-      return generateGodanSaForms(base);
+      return generateWithStem(base, kGodanSaFull);
     case VerbType::GodanRa:
-      return generateGodanRaForms(base);
+      return generateWithStem(base, kGodanRaFull);
     case VerbType::Kuru:
-      // Kuru te-attachment (てくる) should keep full forms
-      return generateKuruForms(base);
+      return generateFullForms(base, kKuruFull);
     case VerbType::IAdjective:
-      return generateIAdjectiveForms(base);
+      return generateWithStem(base, kIAdjective);
     case VerbType::Unknown:
-      // Special handling for ます
       if (base.surface == "ます") {
         return generateMasuForms(base);
       }
