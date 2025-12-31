@@ -174,6 +174,20 @@ bool startsWithHiragana(std::string_view s);
  */
 bool endsWithARow(std::string_view stem);
 
+/**
+ * @brief Get the vowel row character for any hiragana character
+ * @param ch Unicode codepoint to check
+ * @return The vowel (あ/い/う/え/お) for the character's row, or ch if not hiragana
+ *
+ * Used for prolonged sound mark (ー) expansion: すごーい → すごおい
+ * Handles:
+ * - All basic hiragana (あ-ん)
+ * - Voiced variants (が, ざ, だ, ば, etc.)
+ * - Semi-voiced variants (ぱ, ぴ, ぷ, ぺ, ぽ)
+ * - Small kana (ゃ→あ, ゅ→う, ょ→お)
+ */
+char32_t getVowelForChar(char32_t ch);
+
 }  // namespace suzume::grammar
 
 #endif  // SUZUME_GRAMMAR_CHAR_PATTERNS_H_
