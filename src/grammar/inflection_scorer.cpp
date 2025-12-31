@@ -106,10 +106,12 @@ float calculateConfidence(VerbType type, std::string_view stem,
         logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid, "ichidan_onbin_marker_stem_invalid");
       } else if (last_char == "い") {
         // い can be onbin marker OR part of legitimate ichidan stem
-        // Only specific kanji + い stems are valid ichidan verbs:
-        // 用い (用いる - to use), 率い (率いる - to lead), 報い (報いる - to repay)
-        bool is_known_kanji_i_stem = (stem == "用い" || stem == "率い" || stem == "報い");
-        if (!is_known_kanji_i_stem) {
+        // Valid い-ending ichidan stems:
+        // - Single-char い (from いる - to exist/be) P5-3
+        // - 用い (用いる - to use), 率い (率いる - to lead), 報い (報いる - to repay) P5-2
+        bool is_valid_i_stem = (stem == "い" ||  // P5-3: いる
+                                stem == "用い" || stem == "率い" || stem == "報い");
+        if (!is_valid_i_stem) {
           base -= inflection::kPenaltyIchidanOnbinMarkerStemInvalid;
           logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid, "ichidan_onbin_marker_stem_invalid");
         }
@@ -168,10 +170,11 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // 3. The e-row ending is a common Godan potential form (け, め, せ, れ)
       // Note: kVerbBase is included because pure potential forms like 読める
       // are parsed as Ichidan with る base ending, but should prefer Godan potential
-      // Exception: For kVerbBase with no auxiliaries (aux_count == 0), this is a
-      // direct base form match like 晴れる. No ambiguity exists - it's clearly
-      // an Ichidan verb. The penalty only applies when auxiliaries like ない are
-      // attached (e.g., 読めない could be 読める+ない or 読む potential+ない).
+      // WHEN auxiliaries are attached (e.g., 読めない → 読む potential + ない).
+      // P5-1: Verified - current design is intentional:
+      // Pure potential forms (書ける, 読める) are treated as independent Ichidan verbs
+      // when aux_count==0. This is a deliberate design choice.
+      // With auxiliaries (書けない, 読めなかった), they correctly trace back to Godan.
       bool is_potential_context =
           required_conn == conn::kVerbRenyokei ||
           required_conn == conn::kVerbMizenkei ||
@@ -332,6 +335,11 @@ float calculateConfidence(VerbType type, std::string_view stem,
         // Valid colloquial patterns for Ichidan (見とく → 見る + とく)
         // No penalty - these are legitimate contractions
         // NOTE: 3-char patterns like すぎた should still get penalty (高い + すぎた, not 高る + すぎた)
+      } else if (aux_count == 1 && aux_total_len == core::kTwoJapaneseCharBytes &&
+                 required_conn == conn::kVerbMizenkei) {
+        // P5-4: 2-char aux with mizenkei connection: ない, ぬ, etc.
+        // Valid negative forms for single-kanji Ichidan (見ない → 見る + ない)
+        // No penalty - these are legitimate conjugations
       } else {
         // Multiple aux matches or longer single match (like せる, されて)
         // Likely wrong match via potential/passive pattern
@@ -388,8 +396,10 @@ float calculateConfidence(VerbType type, std::string_view stem,
   //   - Used after verb renyokei: 食べすぎる (eat too much)
   //   - Used after i-adjective stem: 高すぎる (too expensive)
   //   - Must be recognized as legitimate Ichidan verb
+  // P5-3: Added exception for でき (from できる - to be able)
+  bool is_valid_hiragana_stem = (stem == "すぎ" || stem == "でき");
   if (type == VerbType::Ichidan && stem_len >= core::kTwoJapaneseCharBytes &&
-      isPureHiragana(stem) && stem != "すぎ") {
+      isPureHiragana(stem) && !is_valid_hiragana_stem) {
     base -= inflection::kPenaltyPureHiraganaStem;
     logConfidenceAdjustment(-inflection::kPenaltyPureHiraganaStem, "ichidan_pure_hiragana_stem");
   }
