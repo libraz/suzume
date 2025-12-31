@@ -66,6 +66,18 @@ bool startsWithTe(std::string_view surface);
  */
 bool endsWithSou(std::string_view surface);
 
+/**
+ * @brief Check if surface ends with よう (appearance/intention pattern)
+ * Used for ようだ/ようです patterns
+ */
+bool endsWithYou(std::string_view surface);
+
+/**
+ * @brief Check if surface ends with の or ん (nominalizer/contracted form)
+ * Used for のだ/んだ/んです patterns (explanatory copula)
+ */
+bool endsWithNodaBase(std::string_view surface);
+
 // =============================================================================
 // Connection Pattern Enumeration
 // =============================================================================

@@ -314,10 +314,17 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       edge.surface.size() >= core::kFourJapaneseCharBytes) {
     std::string_view surface = edge.surface;
     // Check for auxiliary patterns: てしま, でしま, ている, etc.
+    // P4-6: Expanded with additional patterns (てみる, ていく, てくる, etc.)
     if (surface.find(scorer::kPatternTeShima) != std::string_view::npos ||
         surface.find(scorer::kPatternDeShima) != std::string_view::npos ||
         surface.find(scorer::kPatternTeIru) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeIru) != std::string_view::npos) {
+        surface.find(scorer::kPatternDeIru) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeMiru) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeMiru) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeIku) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeIku) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeKuru) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeKuru) != std::string_view::npos) {
       cost += edgeOpts().penalty_verb_aux_in_adj;
       logAdjustment(edgeOpts().penalty_verb_aux_in_adj, "verb_aux_in_adj");
     }
@@ -354,6 +361,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       !edge.fromDictionary() &&
       edge.surface.size() >= core::kFiveJapaneseCharBytes) {
     std::string_view surface = edge.surface;
+    // P4-6: Expanded auxiliary verb pattern list
     if (surface.find(scorer::kPatternTeShima) != std::string_view::npos ||
         surface.find(scorer::kPatternDeShima) != std::string_view::npos ||
         surface.find(scorer::kPatternTeIru) != std::string_view::npos ||
@@ -365,7 +373,17 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
         surface.find(scorer::kPatternTeAge) != std::string_view::npos ||
         surface.find(scorer::kPatternDeAge) != std::string_view::npos ||
         surface.find(scorer::kPatternTeKure) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeKure) != std::string_view::npos) {
+        surface.find(scorer::kPatternDeKure) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeMiru) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeMiru) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeIku) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeIku) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeKuru) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeKuru) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeAru) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeAru) != std::string_view::npos ||
+        surface.find(scorer::kPatternTeOru) != std::string_view::npos ||
+        surface.find(scorer::kPatternDeOru) != std::string_view::npos) {
       cost -= edgeOpts().bonus_unified_verb_aux;
       logAdjustment(-edgeOpts().bonus_unified_verb_aux, "unified_verb_aux");
     }

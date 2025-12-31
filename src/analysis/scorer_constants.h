@@ -25,12 +25,13 @@
 //   [1.5,  2.0]  Moderate penalties for questionable patterns
 //   [2.0,  3.0]  Strong penalties for grammatically invalid patterns
 //
-// Penalty/Bonus magnitudes:
-//   0.5  - Small adjustment, tips the scale
-//   0.8  - Medium adjustment, offsets base connection costs
-//   1.0  - Standard penalty/bonus
-//   1.5  - Strong preference/discouragement
-//   2.0+ - Near-prohibition of pattern
+// Penalty/Bonus magnitudes (see scale:: namespace for formal constants):
+//   scale::kTrivial (0.2F)     - Almost no impact
+//   scale::kMinor (0.5F)       - Small adjustment, tips the scale
+//   scale::kModerate (1.0F)    - Standard penalty/bonus
+//   scale::kStrong (1.5F)      - Strong preference/discouragement
+//   scale::kSevere (2.5F)      - Severe violation
+//   scale::kProhibitive (3.5F) - Near-prohibition of pattern
 //
 // Base connection costs (from scorer.cpp):
 //   NOUN→NOUN: 0.0, VERB→VERB: 0.8, NOUN→VERB: 0.2, etc.
@@ -224,8 +225,8 @@ constexpr float kPenaltyNounBeforeVerbAux = scale::kStrong + scale::kMinor;  // 
 
 // Invalid single-char aux (る) after te-form
 // E.g., して + る should be してる (contraction), not split
-// NOTE: Exceeds normal scale (5.0F) - review in P7-1
-constexpr float kPenaltyInvalidSingleCharAux = 5.0F;
+// P7-1: Normalized to scale::kProhibitive (was 5.0F)
+constexpr float kPenaltyInvalidSingleCharAux = scale::kProhibitive;
 
 // Te-form + た (likely contracted -ていた form)
 // E.g., 見て + た should be 見てた (見ていた contraction)
@@ -241,7 +242,8 @@ constexpr float kPenaltyShortAuxAfterParticle = scale::kSevere + scale::kMinor; 
 
 // NOUN + みたい (resemblance pattern) bonus
 // E.g., 猫みたい (like a cat) - very common pattern
-// NOTE: Large bonus (3.0F) - consider review
+// P7-2: Large bonus (3.0F) intentional - required to override unknown verb analysis
+// Without this, みたい tends to be parsed as verb rather than auxiliary
 constexpr float kBonusNounMitai = scale::kSevere + scale::kMinor;  // 3.0
 
 // VERB + みたい (hearsay/appearance) bonus
@@ -335,6 +337,18 @@ constexpr const char* kPatternTeAge = "てあげ";    // て+あげる
 constexpr const char* kPatternDeAge = "であげ";    // で+あげる (voiced)
 constexpr const char* kPatternTeKure = "てくれ";   // て+くれる
 constexpr const char* kPatternDeKure = "でくれ";   // で+くれる (voiced)
+
+// P4-6: Additional auxiliary verb patterns
+constexpr const char* kPatternTeMiru = "てみる";   // て+みる (試行: try to)
+constexpr const char* kPatternDeMiru = "でみる";   // で+みる (voiced)
+constexpr const char* kPatternTeIku = "ていく";    // て+いく (方向: going)
+constexpr const char* kPatternDeIku = "でいく";    // で+いく (voiced)
+constexpr const char* kPatternTeKuru = "てくる";   // て+くる (方向: coming)
+constexpr const char* kPatternDeKuru = "でくる";   // で+くる (voiced)
+constexpr const char* kPatternTeAru = "てある";    // て+ある (状態: resultative)
+constexpr const char* kPatternDeAru = "である";    // で+ある (voiced)
+constexpr const char* kPatternTeOru = "ておる";    // て+おる (敬語: formal progressive)
+constexpr const char* kPatternDeOru = "でおる";    // で+おる (voiced)
 
 // Specific surfaces that are verb forms, not adjectives
 constexpr const char* kSurfaceShimai = "しまい";   // しまう renyokei

@@ -46,6 +46,21 @@ bool endsWithSou(std::string_view surface) {
   return surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "そう";
 }
 
+bool endsWithYou(std::string_view surface) {
+  if (surface.size() < core::kTwoJapaneseCharBytes) {
+    return false;
+  }
+  return surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "よう";
+}
+
+bool endsWithNodaBase(std::string_view surface) {
+  if (surface.size() < core::kJapaneseCharBytes) {
+    return false;
+  }
+  std::string_view last = surface.substr(surface.size() - core::kJapaneseCharBytes);
+  return last == "の" || last == "ん";
+}
+
 // =============================================================================
 // Main Rule Evaluation Function
 // =============================================================================

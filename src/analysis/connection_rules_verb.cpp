@@ -45,7 +45,9 @@ bool isAuxiliaryVerbPattern(std::string_view surface, std::string_view lemma) {
 // Verb Conjugation Rules
 // =============================================================================
 
-// Rule 1: Copula だ/です cannot follow verbs (except そう pattern)
+// Rule 1: Copula だ/です cannot follow verbs (except certain patterns)
+// P4-1: Added のだ/んです exception
+// P4-2: Added ようだ exception (そうだ already handled)
 ConnectionRuleResult checkCopulaAfterVerb(const core::LatticeEdge& prev,
                                           const core::LatticeEdge& next,
                                           const ConnectionOptions& opts) {
@@ -55,8 +57,21 @@ ConnectionRuleResult checkCopulaAfterVerb(const core::LatticeEdge& prev,
     return {};
   }
 
-  // Exception: 〜そう + です is valid
+  // Exception 1: 〜そう + だ/です is valid (hearsay/appearance)
+  // E.g., 走りそうだ, 走りそうです
   if (endsWithSou(prev.surface)) {
+    return {};
+  }
+
+  // Exception 2: 〜よう + だ/です is valid (appearance/intention)
+  // E.g., 帰るようだ, 帰るようです
+  if (endsWithYou(prev.surface)) {
+    return {};
+  }
+
+  // Exception 3: 〜の/〜ん + だ/です is valid (explanatory copula)
+  // E.g., 食べるのだ, 食べるんです (nominalized verb + copula)
+  if (endsWithNodaBase(prev.surface)) {
     return {};
   }
 
@@ -87,6 +102,8 @@ ConnectionRuleResult checkIchidanRenyokeiTe(const core::LatticeEdge& prev,
 }
 
 // Rule 3: Te-form split (音便形 or 一段形 → て/で)
+// P4-4: Penalty encourages unified te-form; subsequent morphemes (から, も, etc.)
+//       correctly attach to unified form (e.g., 食べて + から, not 食べ + て + から)
 // NOTE: Excludes VERB + e-row + "て" which is handled by checkIchidanRenyokeiTe
 ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
                                       const core::LatticeEdge& next,
@@ -126,10 +143,14 @@ ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
 }
 
 // Rule 4: Verb renyokei + たい adjective handling
-// Two cases:
-// 1. Short forms (たくて, たくない, etc.): No bonus - should be unified as single token
-// 2. Long forms (たくなってきた, etc.): Give bonus for proper connection
-// Also penalizes AUX + たい patterns (e.g., なり(だ) + たかった)
+// P4-3: Verb-only for bonus; AUX penalty is intentional separate case
+//
+// Bonus cases (VERB only):
+// - Short forms (たくて, たくない, etc.): No bonus - should be unified as single token
+// - Long forms (たくなってきた, etc.): Give bonus for proper verb renyokei connection
+//
+// Penalty case (AUX):
+// - AUX + たい patterns (e.g., なり(だ) + たかった): Penalize as unnatural
 ConnectionRuleResult checkTaiAfterRenyokei(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts) {
@@ -360,6 +381,9 @@ ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
 }
 
 // Rule: PREFIX + VERB/AUX penalty
+// P4-5: Honorific patterns work correctly because this penalty discourages
+//       PREFIX→VERB, encouraging PREFIX→NOUN (renyokei as noun) instead.
+//       E.g., お帰りになる → お(PREFIX)+帰り(NOUN)+に(PARTICLE)+なる(VERB)
 // Prefixes should attach to nouns/suffixes, not verbs
 // E.g., 何してる - 何 should be PRON, not PREFIX
 ConnectionRuleResult checkPrefixBeforeVerb(const core::LatticeEdge& prev,
