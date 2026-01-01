@@ -749,7 +749,7 @@
     },
     {
       "id": "deshabaru_verb",
-      "description": "B26: 出しゃばる te-form should be single token",
+      "description": "B26: 出しゃばる te-form should be single token, くる is auxiliary",
       "input": "出しゃばってくる",
       "expected": [
         {
@@ -759,7 +759,7 @@
         },
         {
           "surface": "くる",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "lemma": "くる"
         }
       ],

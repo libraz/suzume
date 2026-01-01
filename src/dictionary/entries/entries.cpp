@@ -239,6 +239,17 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"じゃいます", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
       {"じゃいました", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
 
+      // Directional auxiliaries (方向補助動詞)
+      // て形 + いく/くる pattern: 見ていく (going), 見てくる (coming back)
+      // Cost 1.5F so VERB (1.2F) wins for standalone usage, but AUX wins after て-form
+      // due to favorable VERB→AUX bigram connection (typically -0.5F bonus)
+      // Note: いく already gets char_speech AUX candidates, くる needs explicit entries
+      {"くる", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
+      {"きます", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
+      {"きました", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
+      {"きた", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
+      {"こない", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
+
       // Explanatory (説明)
       {"のだ", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
       {"のです", POS::Auxiliary, 0.3F, "のだ", false, false, false, CT::None, ""},
@@ -420,6 +431,16 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
       {"という", POS::Determiner, 0.3F, "という", false, false, false, CT::None, ""},
       {"といった", POS::Determiner, 0.3F, "という", false, false, false, CT::None, ""},
       {"っていう", POS::Determiner, 0.5F, "という", false, false, false, CT::None, ""},  // colloquial
+
+      // Quotative verb forms (引用動詞活用形) - to + 言う conjugations
+      // These compete with と(PARTICLE) + いって(行く, cost 1.2F) paths
+      {"といって", POS::Verb, 0.3F, "いう", false, false, false, CT::None, ""},
+      {"といっては", POS::Verb, 0.3F, "いう", false, false, false, CT::None, ""},
+      {"といっても", POS::Conjunction, -1.5F, "といっても", false, false, false, CT::None, ""},
+      {"そういって", POS::Verb, 0.3F, "いう", false, false, false, CT::None, ""},
+      {"こういって", POS::Verb, 0.3F, "いう", false, false, false, CT::None, ""},
+      {"ああいって", POS::Verb, 0.3F, "いう", false, false, false, CT::None, ""},
+      {"どういって", POS::Verb, 0.3F, "いう", false, false, false, CT::None, ""},
 
       // Determiners with kanji - B51: lowered cost to prioritize over NOUN unknown
       {"大きな", POS::Determiner, 0.5F, "", false, false, false, CT::None, "おおきな"},
@@ -1224,6 +1245,18 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"いけなかった", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
       {"ゆく", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
       {"ゆかない", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
+      // くる: fundamental verb meaning "to come"
+      // Higher cost to not compete with て-form+くる compound patterns
+      // (見てくる, 帰ってくる should prefer compound form)
+      // but still recognized for standalone usage (気が来る)
+      {"くる", POS::Verb, 1.2F, "くる", false, false, false, CT::Kuru, ""},
+      {"こない", POS::Verb, 1.2F, "くる", false, false, false, CT::Kuru, ""},
+      {"こなかった", POS::Verb, 1.2F, "くる", false, false, false, CT::Kuru, ""},
+      {"きた", POS::Verb, 1.2F, "くる", false, false, false, CT::Kuru, ""},
+      {"きて", POS::Verb, 1.2F, "くる", false, false, false, CT::Kuru, ""},
+      {"きている", POS::Verb, 1.2F, "くる", false, false, false, CT::Kuru, ""},
+      {"こられる", POS::Verb, 1.2F, "くる", false, false, false, CT::Kuru, ""},
+      {"こられない", POS::Verb, 1.2F, "くる", false, false, false, CT::Kuru, ""},
       // いただく系 (itadaku - to receive, honorific)
       // Uses explicit forms like other honorific verbs (not auto-expanded)
       // This ensures いただきます stays as single token (not split as いただき+ます)
@@ -1495,10 +1528,11 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"築く", POS::Verb, 0.3F, "築く", false, false, false, CT::GodanKa, "きずく"},
 
       // Basic auxiliary verbs (補助動詞)
+      // Note: くる/いく are defined with higher cost earlier to avoid
+      // competing with て-form compound patterns
       {"ある", POS::Verb, 0.3F, "ある", false, false, true, CT::GodanRa, "ある"},
       {"いる", POS::Verb, 0.3F, "いる", false, false, true, CT::Ichidan, "いる"},
       {"おる", POS::Verb, 0.3F, "おる", false, false, true, CT::GodanRa, "おる"},
-      {"くる", POS::Verb, 0.3F, "くる", false, false, true, CT::Kuru, "くる"},
       {"くれる", POS::Verb, 0.3F, "くれる", false, false, true, CT::Ichidan, "くれる"},
       {"あげる", POS::Verb, 0.3F, "あげる", false, false, true, CT::Ichidan, "あげる"},
       {"みる", POS::Verb, 0.3F, "みる", false, false, true, CT::Ichidan, "みる"},
@@ -1602,6 +1636,7 @@ std::vector<DictionaryEntry> getCommonVocabularyEntries() {
       {"買い物", POS::Noun, 0.3F, "", false, false, false, CT::None, "かいもの"},
       {"手助け", POS::Noun, 0.3F, "", false, false, false, CT::None, "てだすけ"},
       {"おすすめ", POS::Noun, 0.3F, "", false, false, false, CT::None, "おすすめ"},
+      {"勘違い", POS::Noun, 0.3F, "", false, false, false, CT::None, "かんちがい"},
 
       // Counter suffixes (数助詞): つ - only valid for 1-9
       {"1つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "ひとつ"},
