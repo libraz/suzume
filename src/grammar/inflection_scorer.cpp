@@ -21,6 +21,15 @@ void logConfidenceAdjustment(float amount, const char* reason) {
                             << (amount > 0 ? "+" : "") << amount << "\n");
   }
 }
+
+// Helper to check if a string matches any item in a const array
+template <size_t N>
+bool isInArray(std::string_view s, const char* const (&arr)[N]) {
+  for (size_t i = 0; i < N; ++i) {
+    if (s == arr[i]) return true;
+  }
+  return false;
+}
 }  // namespace
 
 namespace suzume::grammar {
@@ -89,7 +98,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
     // EXCEPTION: すぎ (→ すぎる) is a legitimate Ichidan verb commonly used as auxiliary
     // Only apply penalty to stems that shouldn't be Ichidan (not E-row, not I-row)
     if (required_conn == conn::kVerbOnbinkei && !endsWithERow(stem) && !endsWithIRow(stem) &&
-        stem != "すぎ") {
+        !isInArray(stem, inflection::kValidHiraganaStemExceptions)) {
       base -= inflection::kPenaltyIchidanOnbinInvalid;
       logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinInvalid, "ichidan_onbin_invalid");
     }
@@ -111,7 +120,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
         // - Single-char い (from いる - to exist/be) P5-3
         // - 用い (用いる - to use), 率い (率いる - to lead), 報い (報いる - to repay) P5-2
         bool is_valid_i_stem = (stem == "い" ||  // P5-3: いる
-                                stem == "用い" || stem == "率い" || stem == "報い");
+                                isInArray(stem, inflection::kValidKanjiIStemExceptions));
         if (!is_valid_i_stem) {
           base -= inflection::kPenaltyIchidanOnbinMarkerStemInvalid;
           logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid, "ichidan_onbin_marker_stem_invalid");
@@ -190,7 +199,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
         if (last_char == "て") {
           // Check if this is a known exception (捨て, 棄て)
           std::string_view stem_before_te = stem.substr(0, stem_len - core::kJapaneseCharBytes);
-          if (stem_before_te != "捨" && stem_before_te != "棄") {
+          if (!isInArray(stem_before_te, inflection::kTeEndingStemExceptionKanji)) {
             is_te_stem_in_base_context = true;
           }
         }
@@ -380,7 +389,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
         static_cast<unsigned char>(stem[4]) == 0x82 &&
         static_cast<unsigned char>(stem[5]) == 0x8A;
     // Exception: specific known kanji + い stems are valid
-    bool is_known_kanji_i_stem = (stem == "用い" || stem == "率い" || stem == "報い");
+    bool is_known_kanji_i_stem = isInArray(stem, inflection::kValidKanjiIStemExceptions);
     if (first_is_kanji && (is_i_row || is_ri) && !is_known_kanji_i_stem) {
       base -= inflection::kPenaltyIchidanKanjiHiraganaStem;
       logConfidenceAdjustment(-inflection::kPenaltyIchidanKanjiHiraganaStem, "ichidan_kanji_i_row_stem");
@@ -398,7 +407,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   //   - Used after i-adjective stem: 高すぎる (too expensive)
   //   - Must be recognized as legitimate Ichidan verb
   // P5-3: Added exception for でき (from できる - to be able)
-  bool is_valid_hiragana_stem = (stem == "すぎ" || stem == "でき");
+  bool is_valid_hiragana_stem = isInArray(stem, inflection::kValidHiraganaStemExceptions);
   if (type == VerbType::Ichidan && stem_len >= core::kTwoJapaneseCharBytes &&
       isPureHiragana(stem) && !is_valid_hiragana_stem) {
     base -= inflection::kPenaltyPureHiraganaStem;
@@ -475,7 +484,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // - "来" (kanji form: 来なかった → 来る)
   // - "" (empty, when suffix is こ/き: こなかった → くる)
   if (type == VerbType::Kuru) {
-    if (stem != "来" && !stem.empty()) {
+    if (stem != inflection::kKuruKanji && !stem.empty()) {
       // Any stem other than 来 or empty is invalid for Kuru
       base -= inflection::kPenaltyKuruInvalidStem;
       logConfidenceAdjustment(-inflection::kPenaltyKuruInvalidStem, "kuru_invalid_stem");
@@ -498,7 +507,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // E.g., くなかった should NOT be parsed as Ichidan く + なかった = くる
   // E.g., こなかった should NOT be parsed as Ichidan こ + なかった = こる
   if (type == VerbType::Ichidan && stem_len == core::kJapaneseCharBytes) {
-    if (stem == "く" || stem == "す" || stem == "こ") {
+    if (isInArray(stem, inflection::kInvalidIchidanSingleStems)) {
       base -= inflection::kPenaltyIchidanIrregularStem;
       logConfidenceAdjustment(-inflection::kPenaltyIchidanIrregularStem, "ichidan_irregular_stem");
     }
@@ -511,10 +520,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   if (type == VerbType::Ichidan && stem_len == core::kJapaneseCharBytes &&
       required_conn == conn::kVerbMizenkei && !endsWithKanji(stem)) {
     // Check if stem is a common particle
-    if (stem == "も" || stem == "は" || stem == "が" || stem == "を" ||
-        stem == "に" || stem == "へ" || stem == "と" || stem == "で" ||
-        stem == "よ" || stem == "ね" || stem == "わ" || stem == "な" ||
-        stem == "か" || stem == "ぞ" || stem == "さ" || stem == "ば") {
+    if (isInArray(stem, inflection::kParticleStemList)) {
       base -= inflection::kPenaltyIchidanSingleHiraganaParticleStem;
       logConfidenceAdjustment(-inflection::kPenaltyIchidanSingleHiraganaParticleStem, "ichidan_single_hiragana_particle_stem");
     }
@@ -529,9 +535,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
     std::string_view second = stem.substr(core::kJapaneseCharBytes);
     // If first char is a common particle and second is な, this is likely
     // a misparse of PARTICLE + ない(adjective/aux)
-    if (second == "な" && (first == "も" || first == "は" || first == "が" ||
-                           first == "を" || first == "に" || first == "へ" ||
-                           first == "と" || first == "で" || first == "か")) {
+    if (second == "な" && isInArray(first, inflection::kParticleNaStemPrefixes)) {
       base -= inflection::kPenaltyGodanWaParticleNaStem;
       logConfidenceAdjustment(-inflection::kPenaltyGodanWaParticleNaStem, "godan_wa_particle_na_stem");
     }

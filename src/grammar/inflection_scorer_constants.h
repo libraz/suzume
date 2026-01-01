@@ -370,6 +370,67 @@ constexpr float kPenaltySuruOnbinStemInvalid = scale::kStrong + scale::kTrivial;
 // Pattern like 問題ない should be NOUN + ADJ, not suru-verb negative
 constexpr float kPenaltySuruDirectNai = scale::kProhibitive;  // 3.5F
 
+// =============================================================================
+// Stem Exception Lists (Valid or Invalid Patterns)
+// =============================================================================
+
+// Valid kanji + い Ichidan stems (kami-ichidan verbs)
+// These are exceptions to the general rule that kanji + い is Godan renyokei
+inline constexpr const char* kValidKanjiIStemExceptions[] = {
+    "用い",   // 用いる (to use)
+    "率い",   // 率いる (to lead)
+    "報い"    // 報いる (to repay)
+};
+inline constexpr size_t kValidKanjiIStemExceptionCount =
+    sizeof(kValidKanjiIStemExceptions) / sizeof(kValidKanjiIStemExceptions[0]);
+
+// Valid て-ending Ichidan stems (exceptions to て-form confusion)
+// 捨てる, 棄てる have legitimate て-ending stems
+inline constexpr const char* kTeEndingStemExceptionKanji[] = {
+    "捨",     // 捨てる (to throw away)
+    "棄"      // 棄てる (to abandon)
+};
+inline constexpr size_t kTeEndingStemExceptionKanjiCount =
+    sizeof(kTeEndingStemExceptionKanji) / sizeof(kTeEndingStemExceptionKanji[0]);
+
+// Invalid single-hiragana stems for Ichidan (these are irregular verbs)
+// く → くる (Kuru), す → する (Suru), こ → Kuru mizenkei
+inline constexpr const char* kInvalidIchidanSingleStems[] = {
+    "く",     // くる (Kuru verb)
+    "す",     // する (Suru verb)
+    "こ"      // Kuru mizenkei suffix
+};
+inline constexpr size_t kInvalidIchidanSingleStemCount =
+    sizeof(kInvalidIchidanSingleStems) / sizeof(kInvalidIchidanSingleStems[0]);
+
+// Valid pure-hiragana Ichidan stems (common auxiliary patterns)
+inline constexpr const char* kValidHiraganaStemExceptions[] = {
+    "すぎ",   // すぎる (to exceed, auxiliary: too much)
+    "でき"    // できる (to be able)
+};
+inline constexpr size_t kValidHiraganaStemExceptionCount =
+    sizeof(kValidHiraganaStemExceptions) / sizeof(kValidHiraganaStemExceptions[0]);
+
+// Kuru verb kanji (来)
+inline constexpr const char* kKuruKanji = "来";
+
+// Common particles that cannot be verb stems
+// Used for Ichidan single-hiragana particle stem validation
+inline constexpr const char* kParticleStemList[] = {
+    "も", "は", "が", "を", "に", "へ", "と", "で",
+    "よ", "ね", "わ", "な", "か", "ぞ", "さ", "ば"
+};
+inline constexpr size_t kParticleStemListCount =
+    sizeof(kParticleStemList) / sizeof(kParticleStemList[0]);
+
+// Particles that form invalid な-stem patterns with GodanWa
+// E.g., もな (も + ない), はな (は + ない)
+inline constexpr const char* kParticleNaStemPrefixes[] = {
+    "も", "は", "が", "を", "に", "へ", "と", "で", "か"
+};
+inline constexpr size_t kParticleNaStemPrefixCount =
+    sizeof(kParticleNaStemPrefixes) / sizeof(kParticleNaStemPrefixes[0]);
+
 }  // namespace suzume::grammar::inflection
 
 #endif  // SUZUME_GRAMMAR_INFLECTION_SCORER_CONSTANTS_H_

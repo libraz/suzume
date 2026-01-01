@@ -72,5 +72,32 @@
       "noun_verb_split_bonus": -1.0,
       "verified_verb_bonus": -0.8
     }
+  },
+  "unary": {
+    "noun_prior": 0.0,
+    "verb_prior": 0.2,
+    "adj_prior": 0.3,
+    "adv_prior": 0.2,
+    "particle_prior": 0.1,
+    "aux_prior": 0.2,
+    "pronoun_prior": 0.1,
+    "single_kanji_penalty": 2.0,
+    "single_hiragana_penalty": 1.5,
+    "symbol_penalty": 1.0,
+    "formal_noun_penalty": 1.0,
+    "low_info_penalty": 0.5,
+    "dictionary_bonus": -1.0,
+    "user_dict_bonus": -2.0,
+    "optimal_length_bonus": -0.5,
+    "optimal_length": {
+      "noun_min": 2,
+      "noun_max": 6,
+      "verb_min": 3,
+      "verb_max": 12,
+      "adj_min": 2,
+      "adj_max": 6,
+      "katakana_min": 3,
+      "katakana_max": 12
+    }
   }
 }
