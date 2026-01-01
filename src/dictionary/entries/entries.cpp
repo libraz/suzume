@@ -723,6 +723,9 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"線", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
       {"行き", POS::Suffix, 0.5F, "いき", false, false, true, CT::None, ""},
       {"行", POS::Suffix, 1.5F, "ゆき", false, false, true, CT::None, ""},
+      // Medical suffixes (医療接尾辞)
+      {"病", POS::Suffix, 1.5F, "びょう", false, false, true, CT::None, ""},
+      {"症", POS::Suffix, 1.5F, "しょう", false, false, true, CT::None, ""},
 
       // Plural suffixes (複数接尾語)
       {"たち", POS::Suffix, 0.5F, "たち", false, false, true, CT::None, "たち"},
@@ -833,6 +836,9 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"今すぐ", POS::Adverb, 0.5F, "", false, false, false, CT::None, "いますぐ"},
       {"まだ", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"もう", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
+      // のち (後): temporal noun meaning "after/later", common in weather forecasts
+      // (晴れのち曇り = sunny, later cloudy). Low cost to prevent の+ち split.
+      {"のち", POS::Noun, 0.1F, "後", false, false, false, CT::None, ""},
       {"やっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"ついに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"いつも", POS::Adverb, -1.2F, "", false, false, false, CT::None, ""},
@@ -994,6 +1000,9 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"いっそ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // rather
       {"せいぜい", POS::Adverb, 0.3F, "精々", false, false, false, CT::None, ""},  // at most
       {"つくづく", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // deeply/keenly
+      // Onomatopoeia/mimetic words (prevent particle splits)
+      {"ほんわか", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // gently warm
+      {"しどろもどろ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // incoherent
   };
 }
 
@@ -1168,6 +1177,16 @@ std::vector<DictionaryEntry> getIAdjectiveEntries() {
       {"しょうもない", POS::Adjective, 0.3F, "しょうもない", false, false, false, CT::IAdjective, ""},  // worthless
       {"おとなしい", POS::Adjective, 0.3F, "おとなしい", false, false, false, CT::IAdjective, ""},  // quiet/gentle
       {"すばらしい", POS::Adjective, 0.3F, "すばらしい", false, false, false, CT::IAdjective, ""},  // wonderful
+      // Additional hiragana adjectives (prevent particle/suru misparse)
+      {"あぶない", POS::Adjective, 0.3F, "あぶない", false, false, false, CT::IAdjective, ""},  // dangerous
+      {"だらしない", POS::Adjective, 0.3F, "だらしない", false, false, false, CT::IAdjective, ""},  // sloppy
+      {"ものたりない", POS::Adjective, 0.3F, "ものたりない", false, false, false, CT::IAdjective, ""},  // unsatisfying
+      {"いたたまれない", POS::Adjective, 0.3F, "いたたまれない", false, false, false, CT::IAdjective, ""},  // unbearable
+      {"かたじけない", POS::Adjective, 0.3F, "かたじけない", false, false, false, CT::IAdjective, ""},  // grateful (archaic)
+      {"おびただしい", POS::Adjective, 0.3F, "おびただしい", false, false, false, CT::IAdjective, ""},  // enormous
+      {"かまびすしい", POS::Adjective, 0.3F, "かまびすしい", false, false, false, CT::IAdjective, ""},  // noisy
+      {"うやうやしい", POS::Adjective, 0.3F, "うやうやしい", false, false, false, CT::IAdjective, ""},  // respectful
+      {"こころもとない", POS::Adjective, 0.3F, "こころもとない", false, false, false, CT::IAdjective, ""},  // anxious/uneasy
   };
 }
 
@@ -1190,6 +1209,7 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"おぼれる", POS::Verb, 0.3F, "おぼれる", false, false, false, CT::Ichidan, ""},
       {"そげる", POS::Verb, 0.3F, "そげる", false, false, false, CT::Ichidan, ""},
       {"あきらめる", POS::Verb, 0.3F, "あきらめる", false, false, false, CT::Ichidan, ""},
+      {"たばねる", POS::Verb, 0.3F, "たばねる", false, false, false, CT::Ichidan, ""},  // to bundle
 
       // Godan-Ka verbs (五段カ行)
       // いく/ゆく: fundamental verb meaning "to go"
@@ -1217,6 +1237,8 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"きらめく", POS::Verb, 0.3F, "きらめく", false, false, false, CT::GodanKa, ""},
       {"ひらめく", POS::Verb, 0.3F, "ひらめく", false, false, false, CT::GodanKa, ""},
       {"つぶやく", POS::Verb, 0.3F, "つぶやく", false, false, false, CT::GodanKa, ""},
+      {"あざむく", POS::Verb, 0.3F, "あざむく", false, false, false, CT::GodanKa, ""},  // to deceive
+      {"もがく", POS::Verb, 0.3F, "もがく", false, false, false, CT::GodanKa, ""},  // to struggle
 
       // Godan-Ra verbs (五段ラ行)
       {"やる", POS::Verb, 0.3F, "やる", false, false, false, CT::GodanRa, ""},
@@ -1236,13 +1258,17 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"めくる", POS::Verb, 0.3F, "めくる", false, false, false, CT::GodanRa, ""},
       {"しまる", POS::Verb, 0.3F, "しまる", false, false, false, CT::GodanRa, ""},
       {"こだわる", POS::Verb, 0.3F, "こだわる", false, false, false, CT::GodanRa, ""},
+      {"あなどる", POS::Verb, 0.3F, "あなどる", false, false, false, CT::GodanRa, ""},  // to despise
 
       // Godan-Wa verbs (五段ワ行)
       {"もらう", POS::Verb, 0.3F, "もらう", false, false, false, CT::GodanWa, ""},
       // Verbs starting with particle-like chars (prevent した+が+う, ため+ら+う splits)
       {"したがう", POS::Verb, 0.3F, "したがう", false, false, false, CT::GodanWa, ""},
       {"ためらう", POS::Verb, 0.3F, "ためらう", false, false, false, CT::GodanWa, ""},
+      // うかがう (伺う) - prevent う+か+が+う split
+      {"うかがう", POS::Verb, 0.3F, "うかがう", false, false, false, CT::GodanWa, ""},
       {"たわむ", POS::Verb, 0.3F, "たわむ", false, false, false, CT::GodanMa, ""},
+      {"たたずむ", POS::Verb, 0.3F, "たたずむ", false, false, false, CT::GodanMa, ""},  // to stand still
 
       // Godan-Sa verbs (五段サ行)
       {"いたす", POS::Verb, 0.3F, "いたす", false, false, false, CT::GodanSa, ""},

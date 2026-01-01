@@ -85,14 +85,13 @@
     },
     {
       "id": "weather_forecast",
-      "description": "Weather forecast",
+      "description": "Weather forecast with のち (after) as temporal noun",
       "input": "明日は晴れのち曇りでしょう",
       "expected": [
         {"surface": "明日", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "晴れ", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "ち", "pos": "Other"},
+        {"surface": "のち", "pos": "Noun", "lemma": "後"},
         {"surface": "曇り", "pos": "Noun"},
         {"surface": "でしょう", "pos": "Auxiliary"}
       ],
@@ -491,13 +490,12 @@
     },
     {
       "id": "education_group_work",
-      "description": "Group work instruction - compound verb with split ください",
+      "description": "Group work instruction - compound verb 話し合う unified with split ください",
       "input": "グループで話し合ってください",
       "expected": [
         {"surface": "グループ", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
-        {"surface": "話し", "pos": "Verb", "lemma": "話す"},
-        {"surface": "合って", "pos": "Verb", "lemma": "合う"},
+        {"surface": "話し合って", "pos": "Verb", "lemma": "話し合う"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["education"]

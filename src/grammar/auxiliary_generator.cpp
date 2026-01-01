@@ -315,6 +315,20 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"られなくなる", "られなくなる", "られる", kAuxReru, kAuxOutBase, kVerbMizenkei});
   entries.push_back({"られなくなった", "られなくなった", "られる", kAuxReru, kAuxOutTa, kVerbMizenkei});
 
+  // === Passive + たい (desiderative) ===
+  // E.g., 食べられたい (want to be eaten/able to eat), 見られたい (want to be seen)
+  entries.push_back({"られたい", "られたい", "られる", kAuxReru, kAuxOutBase, kVerbMizenkei});
+  entries.push_back({"られたかった", "られたかった", "られる", kAuxReru, kAuxOutTa, kVerbMizenkei});
+  entries.push_back({"られたくて", "られたくて", "られる", kAuxReru, kAuxOutTe, kVerbMizenkei});
+  entries.push_back({"られたくない", "られたくない", "られる", kAuxReru, kAuxOutBase, kVerbMizenkei});
+  entries.push_back({"られたくなかった", "られたくなかった", "られる", kAuxReru, kAuxOutTa, kVerbMizenkei});
+  // Godan passive + たい (e.g., 読まれたい, 書かれたい)
+  entries.push_back({"れたい", "れたい", "れる", kAuxReru, kAuxOutBase, kVerbMizenkei});
+  entries.push_back({"れたかった", "れたかった", "れる", kAuxReru, kAuxOutTa, kVerbMizenkei});
+  entries.push_back({"れたくて", "れたくて", "れる", kAuxReru, kAuxOutTe, kVerbMizenkei});
+  entries.push_back({"れたくない", "れたくない", "れる", kAuxReru, kAuxOutBase, kVerbMizenkei});
+  entries.push_back({"れたくなかった", "れたくなかった", "れる", kAuxReru, kAuxOutTa, kVerbMizenkei});
+
   // === Colloquial てしまう contractions ===
   // Note: Connect to both kVerbOnbinkei (for Godan) and kVerbRenyokei (for Ichidan)
   // because ちゃう replaces てしまう, and て connects to onbin for Godan but renyokei for Ichidan

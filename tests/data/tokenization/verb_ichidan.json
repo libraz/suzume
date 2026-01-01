@@ -613,6 +613,58 @@
         "lemma",
         "regression"
       ]
+    },
+    {
+      "id": "s4_tabaneru",
+      "description": "S4: たばねる should be VERB (not た+ば+ねる)",
+      "input": "たばねる",
+      "expected": [
+        {
+          "surface": "たばねる",
+          "pos": "Verb",
+          "lemma": "たばねる"
+        }
+      ],
+      "tags": ["s4_fix", "hiragana_verb", "regression"]
+    },
+    {
+      "id": "passive_desiderative_miraretai",
+      "description": "S1: 見られたい (want to be seen) passive+desiderative",
+      "input": "見られたい",
+      "expected": [
+        {
+          "surface": "見られたい",
+          "pos": "Verb",
+          "lemma": "見る"
+        }
+      ],
+      "tags": ["s1_fix", "passive", "desiderative", "regression"]
+    },
+    {
+      "id": "passive_desiderative_taberaretai",
+      "description": "S1: 食べられたい (want to be eaten/able to eat) passive+desiderative",
+      "input": "食べられたい",
+      "expected": [
+        {
+          "surface": "食べられたい",
+          "pos": "Verb",
+          "lemma": "食べる"
+        }
+      ],
+      "tags": ["s1_fix", "passive", "desiderative", "regression"]
+    },
+    {
+      "id": "passive_desiderative_aisaretai",
+      "description": "S1: 愛されたい (want to be loved) passive+desiderative",
+      "input": "愛されたい",
+      "expected": [
+        {
+          "surface": "愛されたい",
+          "pos": "Verb",
+          "lemma": "愛す"
+        }
+      ],
+      "tags": ["s1_fix", "passive", "desiderative", "regression"]
     }
   ]
 }

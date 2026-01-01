@@ -723,6 +723,30 @@
         "d2_fix",
         "regression"
       ]
+    },
+    {
+      "id": "s7_honwaka",
+      "description": "S7: ほんわか should be ADV (not ほん+わ+か)",
+      "input": "ほんわか",
+      "expected": [
+        {
+          "surface": "ほんわか",
+          "pos": "Adverb"
+        }
+      ],
+      "tags": ["s7_fix", "onomatopoeia", "regression"]
+    },
+    {
+      "id": "s7_shidoromodoro",
+      "description": "S7: しどろもどろ should be ADV (not し+どろ+も+どろ)",
+      "input": "しどろもどろ",
+      "expected": [
+        {
+          "surface": "しどろもどろ",
+          "pos": "Adverb"
+        }
+      ],
+      "tags": ["s7_fix", "onomatopoeia", "regression"]
     }
   ]
 }

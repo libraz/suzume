@@ -222,6 +222,75 @@
         "sugiru",
         "lemma"
       ]
+    },
+    {
+      "id": "katakana_sugiru_hard",
+      "description": "ハードすぎる - different katakana word + sugiru",
+      "input": "ハードすぎる",
+      "expected": [
+        {
+          "surface": "ハードすぎる",
+          "pos": "Verb",
+          "lemma": "ハードすぎる"
+        }
+      ],
+      "tags": [
+        "verb",
+        "katakana",
+        "sugiru"
+      ]
+    },
+    {
+      "id": "katakana_sugiru_negative",
+      "description": "シンプルすぎない - katakana + sugiru negative form",
+      "input": "シンプルすぎない",
+      "expected": [
+        {
+          "surface": "シンプルすぎ",
+          "pos": "Verb",
+          "lemma": "シンプルすぎる"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "verb",
+        "katakana",
+        "sugiru",
+        "negative"
+      ]
+    },
+    {
+      "id": "katakana_sugiru_in_context",
+      "description": "このデザインはシンプルすぎる - katakana + sugiru in sentence",
+      "input": "このデザインはシンプルすぎる",
+      "expected": [
+        {
+          "surface": "この",
+          "pos": "Determiner"
+        },
+        {
+          "surface": "デザイン",
+          "pos": "Noun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "シンプルすぎる",
+          "pos": "Verb",
+          "lemma": "シンプルすぎる"
+        }
+      ],
+      "tags": [
+        "verb",
+        "katakana",
+        "sugiru",
+        "context"
+      ]
     }
   ]
 }

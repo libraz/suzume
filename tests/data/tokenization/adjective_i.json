@@ -1326,6 +1326,151 @@
         "phase2_fix",
         "regression"
       ]
+    },
+    {
+      "id": "s5_abunai",
+      "description": "S5 fix: あぶない should be ADJ (not VERB あぶする)",
+      "input": "あぶない橋",
+      "expected": [
+        {
+          "surface": "あぶない",
+          "pos": "Adjective",
+          "lemma": "あぶない"
+        },
+        {
+          "surface": "橋",
+          "pos": "Noun"
+        }
+      ],
+      "tags": ["s5_fix", "hiragana", "regression"]
+    },
+    {
+      "id": "s5_darashinai",
+      "description": "S5 fix: だらしない should be ADJ (not だ+らしする)",
+      "input": "だらしない格好",
+      "expected": [
+        {
+          "surface": "だらしない",
+          "pos": "Adjective",
+          "lemma": "だらしない"
+        },
+        {
+          "surface": "格好",
+          "pos": "Noun"
+        }
+      ],
+      "tags": ["s5_fix", "hiragana", "regression"]
+    },
+    {
+      "id": "s5_monotarinai",
+      "description": "S5 fix: ものたりない should be ADJ (not もの+たりする)",
+      "input": "ものたりない結果",
+      "expected": [
+        {
+          "surface": "ものたりない",
+          "pos": "Adjective",
+          "lemma": "ものたりない"
+        },
+        {
+          "surface": "結果",
+          "pos": "Noun"
+        }
+      ],
+      "tags": ["s5_fix", "hiragana", "regression"]
+    },
+    {
+      "id": "s5_itatamarenai",
+      "description": "S5 fix: いたたまれない should be ADJ",
+      "input": "いたたまれない気持ち",
+      "expected": [
+        {
+          "surface": "いたたまれない",
+          "pos": "Adjective",
+          "lemma": "いたたまれない"
+        },
+        {
+          "surface": "気持ち",
+          "pos": "Noun"
+        }
+      ],
+      "tags": ["s5_fix", "hiragana", "regression"]
+    },
+    {
+      "id": "s5_katajikenai",
+      "description": "S5 fix: かたじけない should be ADJ (not VERB かたじく)",
+      "input": "かたじけない",
+      "expected": [
+        {
+          "surface": "かたじけない",
+          "pos": "Adjective",
+          "lemma": "かたじけない"
+        }
+      ],
+      "tags": ["s5_fix", "hiragana", "regression"]
+    },
+    {
+      "id": "s5_obitadashii",
+      "description": "S5 fix: おびただしい should be ADJ (not お+びただしい)",
+      "input": "おびただしい数",
+      "expected": [
+        {
+          "surface": "おびただしい",
+          "pos": "Adjective",
+          "lemma": "おびただしい"
+        },
+        {
+          "surface": "数",
+          "pos": "Noun"
+        }
+      ],
+      "tags": ["s5_fix", "hiragana", "regression"]
+    },
+    {
+      "id": "s5_kamabisushii",
+      "description": "S5 fix: かまびすしい should be ADJ (not か+まびすしい)",
+      "input": "かまびすしい声",
+      "expected": [
+        {
+          "surface": "かまびすしい",
+          "pos": "Adjective",
+          "lemma": "かまびすしい"
+        },
+        {
+          "surface": "声",
+          "pos": "Noun"
+        }
+      ],
+      "tags": ["s5_fix", "hiragana", "regression"]
+    },
+    {
+      "id": "s5_uyauyashii",
+      "description": "S5 fix: うやうやしい should be ADJ (not う+やうやしい)",
+      "input": "うやうやしい態度",
+      "expected": [
+        {
+          "surface": "うやうやしい",
+          "pos": "Adjective",
+          "lemma": "うやうやしい"
+        },
+        {
+          "surface": "態度",
+          "pos": "Noun"
+        }
+      ],
+      "tags": ["s5_fix", "hiragana", "regression"]
+    },
+    {
+      "id": "s5_kokoromotonai",
+      "description": "S5 fix: こころもとない should be ADJ (not ここ+ろ+も+と+ない)",
+      "input": "こころもとない",
+      "expected": [
+        {
+          "surface": "こころもとない",
+          "pos": "Adjective",
+          "lemma": "こころもとない"
+        }
+      ],
+      "tags": ["s5_fix", "hiragana", "regression"]
     }
   ]
 }

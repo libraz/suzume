@@ -706,6 +706,32 @@
         "compound_verb",
         "regression"
       ]
+    },
+    {
+      "id": "s3_yarinaosu",
+      "description": "S3: やり直す (hiragana V1 + kanji V2) compound verb",
+      "input": "やり直す",
+      "expected": [
+        {
+          "surface": "やり直す",
+          "pos": "Verb",
+          "lemma": "やり直す"
+        }
+      ],
+      "tags": ["s3_fix", "compound_verb", "hiragana_kanji", "regression"]
+    },
+    {
+      "id": "s3_adj_not_compound",
+      "description": "S3: 美しかった should be ADJ not compound verb (not 美し+交った)",
+      "input": "美しかった",
+      "expected": [
+        {
+          "surface": "美しかった",
+          "pos": "Adjective",
+          "lemma": "美しい"
+        }
+      ],
+      "tags": ["s3_fix", "adjective", "no_false_positive", "regression"]
     }
   ]
 }

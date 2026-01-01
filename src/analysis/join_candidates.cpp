@@ -352,32 +352,39 @@ void addCompoundVerbJoinCandidates(
           base_ending == "える" || base_ending == "げる" || base_ending == "てる" ||
           base_ending == "せる" || base_ending == "ちる") {
 
-        // Case 1: Hiragana V2 inflected forms (e.g., きった from きる)
+        // Case 1: Hiragana V2 inflected forms (e.g., きった from きる, かった from かう)
         // Try different lengths for V2 inflected form (shortest match first)
         for (size_t v2_end = v2_start + 2; v2_end <= v2_hiragana_end; ++v2_end) {
           size_t v2_end_byte = charPosToBytePos(codepoints, v2_end);
           std::string v2_text(text.substr(v2_start_byte, v2_end_byte - v2_start_byte));
 
-          auto infl_result = inflection.getBest(v2_text);
-          // Check if this matches the V2 base form (using reading for comparison)
-          // Use 0.3 threshold for inflected forms since short stems get lower confidence
-          // Require the suffix to contain actual auxiliary patterns (た/て/etc.),
-          // not just renyokei endings (し/み/etc.) to ensure complete inflected form
+          // Use analyze() to get all candidates, not just the best one.
+          // This is needed because for ambiguous stems (e.g., かった could be
+          // from かる, かつ, or かう), we need to find the one matching our V2.
+          auto infl_results = inflection.analyze(v2_text);
           std::string expected_base = std::string(v2_reading);
-          bool has_aux_suffix = !infl_result.suffix.empty() &&
-              (infl_result.suffix.find("た") != std::string::npos ||
-               infl_result.suffix.find("て") != std::string::npos ||
-               infl_result.suffix.find("ない") != std::string::npos ||
-               infl_result.suffix.find("れ") != std::string::npos ||
-               infl_result.suffix.find("ます") != std::string::npos);
-          if (infl_result.confidence >= 0.3F &&
-              infl_result.base_form == expected_base &&
-              has_aux_suffix) {
-            matched_inflected = true;
-            matched_len = v2_end_byte - v2_start_byte;
-            inflection_includes_aux = true;  // Mark that this match includes aux
-            break;
+
+          for (const auto& infl_result : infl_results) {
+            // Check if this matches the V2 base form (using reading for comparison)
+            // Use 0.3 threshold for inflected forms since short stems get lower confidence
+            // Require the suffix to contain actual auxiliary patterns (た/て/etc.),
+            // not just renyokei endings (し/み/etc.) to ensure complete inflected form
+            bool has_aux_suffix = !infl_result.suffix.empty() &&
+                (infl_result.suffix.find("た") != std::string::npos ||
+                 infl_result.suffix.find("て") != std::string::npos ||
+                 infl_result.suffix.find("ない") != std::string::npos ||
+                 infl_result.suffix.find("れ") != std::string::npos ||
+                 infl_result.suffix.find("ます") != std::string::npos);
+            if (infl_result.confidence >= 0.3F &&
+                infl_result.base_form == expected_base &&
+                has_aux_suffix) {
+              matched_inflected = true;
+              matched_len = v2_end_byte - v2_start_byte;
+              inflection_includes_aux = true;  // Mark that this match includes aux
+              break;
+            }
           }
+          if (matched_inflected) break;
         }
 
         // Case 2: Kanji V2 inflected forms (e.g., 巡った from 巡る)
@@ -425,23 +432,27 @@ void addCompoundVerbJoinCandidates(
                     size_t v2_end_byte = charPosToBytePos(codepoints, v2_end);
                     std::string v2_text(text.substr(v2_start_byte, v2_end_byte - v2_start_byte));
 
-                    auto infl_result = inflection.getBest(v2_text);
-                    // Check if base form matches V2 surface (kanji form)
-                    // Require the suffix to contain actual auxiliary patterns
-                    bool has_aux_suffix = !infl_result.suffix.empty() &&
-                        (infl_result.suffix.find("た") != std::string::npos ||
-                         infl_result.suffix.find("て") != std::string::npos ||
-                         infl_result.suffix.find("ない") != std::string::npos ||
-                         infl_result.suffix.find("れ") != std::string::npos ||
-                         infl_result.suffix.find("ます") != std::string::npos);
-                    if (infl_result.confidence >= 0.35F &&
-                        infl_result.base_form == v2_surface &&
-                        has_aux_suffix) {
-                      matched_inflected = true;
-                      matched_len = v2_end_byte - v2_start_byte;
-                      inflection_includes_aux = true;  // Mark that this match includes aux
-                      break;
+                    // Use analyze() to search all candidates for matching base form
+                    auto infl_results = inflection.analyze(v2_text);
+                    for (const auto& infl_result : infl_results) {
+                      // Check if base form matches V2 surface (kanji form)
+                      // Require the suffix to contain actual auxiliary patterns
+                      bool has_aux_suffix = !infl_result.suffix.empty() &&
+                          (infl_result.suffix.find("た") != std::string::npos ||
+                           infl_result.suffix.find("て") != std::string::npos ||
+                           infl_result.suffix.find("ない") != std::string::npos ||
+                           infl_result.suffix.find("れ") != std::string::npos ||
+                           infl_result.suffix.find("ます") != std::string::npos);
+                      if (infl_result.confidence >= 0.35F &&
+                          infl_result.base_form == v2_surface &&
+                          has_aux_suffix) {
+                        matched_inflected = true;
+                        matched_len = v2_end_byte - v2_start_byte;
+                        inflection_includes_aux = true;  // Mark that this match includes aux
+                        break;
+                      }
                     }
+                    if (matched_inflected) break;
                   }
                 }
               }
@@ -533,6 +544,23 @@ void addCompoundVerbJoinCandidates(
     // This prevents false positives like 試験に落ちる (試験 is not a verb)
     if (!v1_verified) {
       continue;
+    }
+
+    // For inflected V2 matches (Case 1/2), check if the full surface could be
+    // an adjective instead of a compound verb. This prevents false positives
+    // like 美しかった (adjective) being parsed as 美し+交った (compound verb).
+    if (matched_inflected && inflection_includes_aux) {
+      // Calculate full compound surface
+      size_t compound_end_byte = v2_start_byte + matched_len;
+      std::string full_surface(text.substr(start_byte, compound_end_byte - start_byte));
+
+      // Check if full surface could be an i-adjective
+      auto full_infl = inflection.getBest(full_surface);
+      if (full_infl.confidence >= 0.5F &&
+          full_infl.verb_type == grammar::VerbType::IAdjective) {
+        // Full surface is likely an adjective, skip compound verb
+        continue;
+      }
     }
 
     // Build compound verb base form (V1 renyokei + V2 base form)
@@ -655,12 +683,30 @@ void addHiraganaCompoundVerbJoinCandidates(
 
       size_t v2_start_byte = charPosToBytePos(codepoints, v2_start);
 
-      // Check if V2 reading matches at v2_start
-      if (v2_start_byte + v2_reading.size() > text.size()) {
-        continue;
+      // Check if V2 reading (hiragana) or surface (kanji) matches at v2_start
+      std::string_view v2_surface(v2_verb.surface);
+      size_t matched_v2_len = 0;
+      bool use_kanji_lemma = false;
+
+      // Try hiragana reading match first
+      if (v2_start_byte + v2_reading.size() <= text.size()) {
+        std::string_view text_at_v2 = text.substr(v2_start_byte, v2_reading.size());
+        if (text_at_v2 == v2_reading) {
+          matched_v2_len = v2_reading.size();
+        }
       }
-      std::string_view text_at_v2 = text.substr(v2_start_byte, v2_reading.size());
-      if (text_at_v2 != v2_reading) {
+
+      // Try kanji surface match if hiragana didn't match
+      // This handles patterns like やり + 直す (hiragana V1 + kanji V2)
+      if (matched_v2_len == 0 && v2_start_byte + v2_surface.size() <= text.size()) {
+        std::string_view text_at_v2 = text.substr(v2_start_byte, v2_surface.size());
+        if (text_at_v2 == v2_surface) {
+          matched_v2_len = v2_surface.size();
+          use_kanji_lemma = true;
+        }
+      }
+
+      if (matched_v2_len == 0) {
         continue;
       }
 
@@ -718,7 +764,7 @@ void addHiraganaCompoundVerbJoinCandidates(
       }
 
       // Calculate compound verb end position
-      size_t compound_end_byte = v2_start_byte + v2_reading.size();
+      size_t compound_end_byte = v2_start_byte + matched_v2_len;
 
       // Find character position for compound end
       size_t compound_end_pos = v2_start;
@@ -858,6 +904,92 @@ void addAdjectiveSugiruJoinCandidates(
       after_kanji.substr(0, kSugiru.size()) == kSugiru) {
     size_t sugiru_char_len = 3;  // すぎる is 3 characters
     size_t sugiru_end_pos = kanji_end + sugiru_char_len;
+
+    if (sugiru_end_pos <= codepoints.size()) {
+      size_t sugiru_end_byte = charPosToBytePos(codepoints, sugiru_end_pos);
+      std::string sugiru_surface(text.substr(start_byte, sugiru_end_byte - start_byte));
+
+      lattice.addEdge(sugiru_surface, static_cast<uint32_t>(start_pos),
+                      static_cast<uint32_t>(sugiru_end_pos), core::PartOfSpeech::Verb,
+                      final_cost, flags, compound_base);
+    }
+  }
+}
+
+void addKatakanaSugiruJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const Scorer& scorer) {
+  using CharType = normalize::CharType;
+
+  if (start_pos >= char_types.size()) {
+    return;
+  }
+
+  // Must start with katakana
+  if (char_types[start_pos] != CharType::Katakana) {
+    return;
+  }
+
+  // Find the katakana portion (minimum 2 characters for meaningful words)
+  size_t katakana_end = start_pos + 1;
+  while (katakana_end < char_types.size() &&
+         char_types[katakana_end] == CharType::Katakana) {
+    ++katakana_end;
+  }
+
+  // Need at least 2 katakana characters
+  if (katakana_end - start_pos < 2) {
+    return;
+  }
+
+  // Next must be hiragana starting with す (for すぎ)
+  if (katakana_end >= char_types.size() ||
+      char_types[katakana_end] != CharType::Hiragana) {
+    return;
+  }
+
+  // Check if すぎ follows the katakana
+  size_t start_byte = charPosToBytePos(codepoints, start_pos);
+  size_t sugi_start_byte = charPosToBytePos(codepoints, katakana_end);
+
+  std::string_view after_katakana = text.substr(sugi_start_byte);
+  constexpr std::string_view kSugi = "すぎ";
+  if (after_katakana.size() < kSugi.size() ||
+      after_katakana.substr(0, kSugi.size()) != kSugi) {
+    return;
+  }
+
+  // Build compound verb base form: KATAKANA + すぎる
+  std::string katakana_part(text.substr(start_byte, sugi_start_byte - start_byte));
+  std::string compound_base = katakana_part + "すぎる";
+
+  // Calculate cost with bonus for katakana+sugiru pattern
+  float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
+  float final_cost = base_cost + scorer.joinOpts().compound_verb_bonus;
+  uint8_t flags = core::LatticeEdge::kFromDictionary;
+
+  // Generate candidates for different forms of すぎる
+  // Pattern 1: KATAKANA + すぎ (renyokei) - て/た/ない are separate tokens
+  size_t sugi_renyokei_len = 2;  // すぎ is 2 characters
+  size_t renyokei_end_pos = katakana_end + sugi_renyokei_len;
+
+  if (renyokei_end_pos <= codepoints.size()) {
+    size_t renyokei_end_byte = charPosToBytePos(codepoints, renyokei_end_pos);
+    std::string renyokei_surface(text.substr(start_byte, renyokei_end_byte - start_byte));
+
+    lattice.addEdge(renyokei_surface, static_cast<uint32_t>(start_pos),
+                    static_cast<uint32_t>(renyokei_end_pos), core::PartOfSpeech::Verb,
+                    final_cost, flags, compound_base);
+  }
+
+  // Pattern 2: KATAKANA + すぎる (base form) - as single token
+  constexpr std::string_view kSugiru = "すぎる";
+  if (after_katakana.size() >= kSugiru.size() &&
+      after_katakana.substr(0, kSugiru.size()) == kSugiru) {
+    size_t sugiru_char_len = 3;  // すぎる is 3 characters
+    size_t sugiru_end_pos = katakana_end + sugiru_char_len;
 
     if (sugiru_end_pos <= codepoints.size()) {
       size_t sugiru_end_byte = charPosToBytePos(codepoints, sugiru_end_pos);

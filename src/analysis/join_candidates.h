@@ -99,6 +99,30 @@ void addAdjectiveSugiruJoinCandidates(
     const Scorer& scorer);
 
 /**
+ * @brief Add katakana word + すぎる compound verb candidates
+ *
+ * Detects katakana word + すぎる patterns and generates compound verb candidates.
+ * The pattern KATAKANA + すぎる becomes a compound verb.
+ *
+ * Examples:
+ *   "ワンパターンすぎる" → compound verb with lemma "ワンパターンすぎる"
+ *   "シンプルすぎる" → compound verb with lemma "シンプルすぎる"
+ *   "シンプルすぎた" → "シンプルすぎ" (verb) + "た" (auxiliary)
+ *
+ * @param lattice Lattice to add candidates to
+ * @param text Original text
+ * @param codepoints Unicode codepoints
+ * @param start_pos Starting position in codepoints
+ * @param char_types Character types for each position
+ * @param scorer Scorer for POS priors
+ */
+void addKatakanaSugiruJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const Scorer& scorer);
+
+/**
  * @brief Add prefix + noun join candidates
  *
  * Detects productive prefix + noun patterns and generates merged candidates.

@@ -2709,6 +2709,100 @@
         "iku",
         "regression"
       ]
+    },
+    {
+      "id": "s4_ukagau_base",
+      "description": "S4: うかがう should be recognized as Godan-Wa verb (prevent う+か+が+う split)",
+      "input": "うかがう",
+      "expected": [
+        {
+          "surface": "うかがう",
+          "pos": "Verb",
+          "lemma": "うかがう"
+        }
+      ],
+      "tags": [
+        "s4_fix",
+        "hiragana_verb",
+        "regression"
+      ]
+    },
+    {
+      "id": "s4_ukagatta",
+      "description": "S4: うかがった should be recognized as Godan-Wa verb past form",
+      "input": "話をうかがった",
+      "expected": [
+        {
+          "surface": "話",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "うかがった",
+          "pos": "Verb",
+          "lemma": "うかがう"
+        }
+      ],
+      "tags": [
+        "s4_fix",
+        "hiragana_verb",
+        "regression"
+      ]
+    },
+    {
+      "id": "s4_azamuku",
+      "description": "S4: あざむく should be VERB (not あ+ざ+む+く)",
+      "input": "あざむく",
+      "expected": [
+        {
+          "surface": "あざむく",
+          "pos": "Verb",
+          "lemma": "あざむく"
+        }
+      ],
+      "tags": ["s4_fix", "hiragana_verb", "regression"]
+    },
+    {
+      "id": "s4_mogaku",
+      "description": "S4: もがく should be VERB (not も+が+く)",
+      "input": "もがく",
+      "expected": [
+        {
+          "surface": "もがく",
+          "pos": "Verb",
+          "lemma": "もがく"
+        }
+      ],
+      "tags": ["s4_fix", "hiragana_verb", "regression"]
+    },
+    {
+      "id": "s4_anadoru",
+      "description": "S4: あなどる should be VERB (not あ+な+どる)",
+      "input": "あなどる",
+      "expected": [
+        {
+          "surface": "あなどる",
+          "pos": "Verb",
+          "lemma": "あなどる"
+        }
+      ],
+      "tags": ["s4_fix", "hiragana_verb", "regression"]
+    },
+    {
+      "id": "s4_tatazumu",
+      "description": "S4: たたずむ should be VERB (not た+た+ずむ)",
+      "input": "たたずむ",
+      "expected": [
+        {
+          "surface": "たたずむ",
+          "pos": "Verb",
+          "lemma": "たたずむ"
+        }
+      ],
+      "tags": ["s4_fix", "hiragana_verb", "regression"]
     }
   ]
 }

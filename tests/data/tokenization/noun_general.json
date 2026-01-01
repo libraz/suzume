@@ -896,13 +896,17 @@
     },
     {
       "id": "katakana_sugita_compound",
-      "description": "ワンパターンすぎた recognized as compound verb (noun + すぎる), not ワンパター + ンすぎた",
+      "description": "ワンパターンすぎた recognized as compound verb (noun + すぎる) with た split, not ワンパター + ンすぎた",
       "input": "ワンパターンすぎた",
       "expected": [
         {
-          "surface": "ワンパターンすぎた",
+          "surface": "ワンパターンすぎ",
           "pos": "Verb",
           "lemma": "ワンパターンすぎる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -914,13 +918,17 @@
     },
     {
       "id": "katakana_sugite_compound",
-      "description": "シンプルすぎて recognized as compound verb (noun + すぎる), not シンプ + ルすぎて",
+      "description": "シンプルすぎて recognized as compound verb (noun + すぎる) with て split, not シンプ + ルすぎて",
       "input": "シンプルすぎて",
       "expected": [
         {
-          "surface": "シンプルすぎて",
+          "surface": "シンプルすぎ",
           "pos": "Verb",
           "lemma": "シンプルすぎる"
+        },
+        {
+          "surface": "て",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -1091,6 +1099,49 @@
       "tags": [
         "s2_fix",
         "suru_misrecognition",
+        "regression"
+      ]
+    },
+    {
+      "id": "d4_nochi_temporal",
+      "description": "D4: のち should be recognized as temporal NOUN (後), prevent の+ち split",
+      "input": "のち",
+      "expected": [
+        {
+          "surface": "のち",
+          "pos": "Noun",
+          "lemma": "後"
+        }
+      ],
+      "tags": [
+        "d4_fix",
+        "temporal_noun",
+        "regression"
+      ]
+    },
+    {
+      "id": "d4_nochi_weather",
+      "description": "D4: 晴れのち曇り - weather forecast pattern with のち (after)",
+      "input": "晴れのち曇り",
+      "expected": [
+        {
+          "surface": "晴れ",
+          "pos": "Noun"
+        },
+        {
+          "surface": "のち",
+          "pos": "Noun",
+          "lemma": "後"
+        },
+        {
+          "surface": "曇り",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "d4_fix",
+        "temporal_noun",
+        "weather",
         "regression"
       ]
     }
