@@ -219,6 +219,7 @@ void Tokenizer::addUnknownCandidates(
     // Reduce penalty for long varied hiragana sequences
     // Also allow prolonged sound mark (ー) as part of hiragana sequence
     bool reduced_penalty = false;
+    bool skip_dict_penalty = false;
     if (!skip_penalty && candidate.pos == core::PartOfSpeech::Other &&
         candidate.end - candidate.start >= 4) {
       bool all_hiragana_or_choon = true;
@@ -249,10 +250,51 @@ void Tokenizer::addUnknownCandidates(
       }
     }
 
+    // Skip dict length penalty for katakana sequences (loanwords)
+    // Loanwords like マスカラ, デスクトップ often exceed dictionary coverage
+    if (!skip_penalty && candidate.pos == core::PartOfSpeech::Noun &&
+        candidate.end - candidate.start >= 3) {
+      bool all_katakana = true;
+      for (size_t idx = candidate.start;
+           idx < candidate.end && idx < char_types.size(); ++idx) {
+        if (char_types[idx] != normalize::CharType::Katakana &&
+            !(idx < codepoints.size() &&
+              normalize::isProlongedSoundMark(codepoints[idx]))) {
+          all_katakana = false;
+          break;
+        }
+      }
+      if (all_katakana) {
+        skip_dict_penalty = true;
+      }
+    }
+
+    // Skip dict length penalty for short kanji sequences (2-3 chars)
+    // Common words like 人工, 知能, 処理 may not be in dictionary
+    if (!skip_penalty && !skip_dict_penalty &&
+        candidate.pos == core::PartOfSpeech::Noun) {
+      size_t len = candidate.end - candidate.start;
+      if (len >= 2 && len <= 3) {
+        bool all_kanji = true;
+        for (size_t idx = candidate.start;
+             idx < candidate.end && idx < char_types.size(); ++idx) {
+          if (char_types[idx] != normalize::CharType::Kanji) {
+            all_kanji = false;
+            break;
+          }
+        }
+        if (all_kanji) {
+          skip_dict_penalty = true;
+        }
+      }
+    }
+
     // Skip exceeds_dict_length penalty for suffix pattern candidates
     // These are morphologically recognized patterns (e.g., がち, っぽい)
     // that should not be penalized for exceeding dictionary coverage
-    if (!skip_penalty && !candidate.has_suffix && max_dict_length > 0 &&
+    // Also skip for katakana loanwords (マスカラ, デスクトップ)
+    if (!skip_penalty && !skip_dict_penalty && !candidate.has_suffix &&
+        max_dict_length > 0 &&
         candidate.end - candidate.start > max_dict_length) {
       float penalty = reduced_penalty ? 1.0F : 3.5F;
       adjusted_cost += penalty;

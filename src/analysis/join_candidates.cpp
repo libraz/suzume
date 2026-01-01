@@ -1106,6 +1106,22 @@ void addPrefixNounJoinCandidates(
   float base_cost = scorer.posPrior(core::PartOfSpeech::Noun);
   float final_cost = base_cost + matched_prefix->bonus;
 
+  // Apply length penalty to prevent over-concatenation
+  // Prefix + noun should be 2-3 chars total for most verified cases
+  // (e.g., 全員=2, 再開=2, 不安=2)
+  // Longer unverified combinations should be split
+  size_t total_len = noun_end - start_pos;
+  if (total_len >= 4 && !noun_in_dict) {
+    // Strong penalty for unverified 4+ char combinations
+    // Must overcome: prefix_bonus(-0.4) + optimal_length_bonus(-0.5) = -0.9
+    // Target: make final cost higher than split path (~1.0)
+    // Penalty: +2.0 base, +0.5 per extra char
+    final_cost += 2.0F + 0.5F * static_cast<float>(total_len - 4);
+  } else if (total_len == 3 && !noun_in_dict) {
+    // Moderate penalty for 3-char unverified
+    final_cost += 0.8F;
+  }
+
   if (noun_in_dict) {
     final_cost += scorer.joinOpts().verified_noun_bonus;
   }

@@ -64,23 +64,43 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
 
   switch (ctype) {
     case normalize::CharType::Kanji:
-      // Kanji: prefer 2-8 characters for compound nouns and place names
-      // E.g., 神奈川県横浜市 (7 chars) should not be penalized
-      // Single kanji should beat suffix entries (cost 1.5) in dictionary
-      if (length >= 2 && length <= 8) {
-        return base_cost;
-      }
+      // Kanji: prefer 2 characters as optimal (most common word length)
+      // Apply graduated penalty for longer sequences to prevent over-concatenation
+      // E.g., 今夏最高 should split to 今+夏+最高, not stay as single word
+      // Penalties must overcome optimal_length bonus (-0.5) in scorer
       if (length == 1) {
         return base_cost + 0.4F;  // 1.4: prefer over suffix entries (1.5)
       }
-      return base_cost + 0.5F;
+      if (length == 2) {
+        return base_cost;  // 2 chars: optimal (most common word length)
+      }
+      if (length == 3) {
+        return base_cost + 0.3F;  // 3 chars: light penalty
+      }
+      if (length == 4) {
+        return base_cost + 0.8F;  // 4 chars: moderate penalty (1.8 base)
+      }
+      if (length >= 5 && length <= 6) {
+        return base_cost + 1.5F;  // 5-6 chars: strong penalty
+      }
+      return base_cost + 2.5F;  // 7+ chars: very strong penalty
 
     case normalize::CharType::Katakana:
-      // Katakana: prefer 3-8 characters
-      if (length >= 3 && length <= 8) {
-        return base_cost;
+      // Katakana: prefer 4+ characters for loanwords (マスカラ, デスクトップ)
+      // Penalize short sequences to prevent splits like マ+スカラ
+      if (length == 1) {
+        return base_cost + 1.5F;  // Strong penalty for 1-char
       }
-      return base_cost + 0.3F;
+      if (length == 2) {
+        return base_cost + 1.0F;  // Moderate penalty for 2-char
+      }
+      if (length == 3) {
+        return base_cost + 0.3F;  // Light penalty for 3-char
+      }
+      if (length >= 4 && length <= 10) {
+        return base_cost;  // Optimal: 4-10 chars
+      }
+      return base_cost + 0.3F;  // 11+ chars: light penalty
 
     case normalize::CharType::Alphabet:
       // Alphabet: prefer longer sequences for identifiers/words

@@ -335,8 +335,9 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"ばい", POS::Auxiliary, 1.0F, "だ", false, false, false, CT::None, ""},
 
       // Robot/Mechanical (ロボット・機械)
-      {"デス", POS::Auxiliary, 0.3F, "です", false, false, false, CT::None, "です"},
-      {"マス", POS::Auxiliary, 0.3F, "ます", false, false, false, CT::None, "ます"},
+      // Moderate cost: avoid マスカラ/デスク splits, but allow as sentence-final
+      {"デス", POS::Auxiliary, 1.2F, "です", false, false, false, CT::None, "です"},
+      {"マス", POS::Auxiliary, 1.2F, "ます", false, false, false, CT::None, "ます"},
   };
 }
 
@@ -399,6 +400,10 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       {"ところで", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
       {"では", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
       {"それでは", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
+
+      // Addition/Emphasis (添加・強調) - B-5
+      // のみならず: not only... but also - prevent の+みな+ら+ず split (N6)
+      {"のみならず", POS::Conjunction, -0.5F, "", false, false, false, CT::None, ""},
   };
 }
 
@@ -641,6 +646,19 @@ std::vector<DictionaryEntry> getTimeNounEntries() {
       {"未来", POS::Noun, 0.5F, "", false, true, false, CT::None, "みらい"},
       // 時分: time period, around that time (e.g., その時分, 若い時分)
       {"時分", POS::Noun, 0.5F, "時分", false, true, false, CT::None, "じぶん"},
+      // Time-related temporal nouns (時間関係名詞)
+      // 以来: since then - prevent 以来下着 over-concatenation
+      {"以来", POS::Noun, -0.5F, "以来", false, true, false, CT::None, "いらい"},
+      // 時間: time (duration) - prevent 時間すら → 時+間すら split
+      {"時間", POS::Noun, 0.1F, "時間", false, true, false, CT::None, "じかん"},
+
+      // Hiragana time nouns (ひらがな時間名詞) - B-7
+      // あと: after - prevent あ+と particle split (N1)
+      {"あと", POS::Noun, -0.5F, "後", false, true, false, CT::None, ""},
+      // まえ: before - prevent まえ(OTHER) confusion (N1)
+      {"まえ", POS::Noun, -0.5F, "前", false, true, false, CT::None, ""},
+      // あとで: later (adverbial) - prevent あと+で split
+      {"あとで", POS::Adverb, -0.8F, "後で", false, false, false, CT::None, ""},
   };
 }
 
@@ -696,6 +714,8 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"ご", POS::Prefix, 0.3F, "", true, false, false, CT::None, ""},
       {"御", POS::Prefix, 1.0F, "", true, false, false, CT::None, ""},
       {"何", POS::Prefix, 0.8F, "なん", true, false, false, CT::None, ""},
+      // Temporal prefixes (時間接頭辞) - prevent over-concatenation like 今夏最高
+      {"今", POS::Prefix, -0.5F, "いま", true, false, false, CT::None, ""},
 
       // Suffixes (接尾語)
       {"的", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
@@ -742,12 +762,27 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"くん", POS::Suffix, 0.5F, "", false, false, true, CT::None, ""},
       {"氏", POS::Suffix, 0.8F, "", false, false, true, CT::None, ""},
 
+      // Place/organization suffixes (場所・組織接尾語)
+      // 店: shop/store suffix - prevent 店原宿店 over-concatenation
+      {"店", POS::Suffix, -0.3F, "てん", false, false, true, CT::None, ""},
+
+      // Human counter suffix (人数接尾語)
+      // 人: person counter - prevent 人達成 over-concatenation
+      {"人", POS::Suffix, -0.3F, "にん", false, false, true, CT::None, ""},
+
       // Counter suffixes with ヶ (助数詞接尾語)
       // ヶ is read as か in counters (箇の略字)
       {"ヶ月", POS::Suffix, 0.3F, "ヶ月", false, false, true, CT::None, "かげつ"},
       {"ヶ国", POS::Suffix, 0.3F, "ヶ国", false, false, true, CT::None, "かこく"},
       {"ヶ所", POS::Suffix, 0.3F, "ヶ所", false, false, true, CT::None, "かしょ"},
       {"ヶ年", POS::Suffix, 0.5F, "ヶ年", false, false, true, CT::None, "かねん"},
+
+      // Descriptive suffixes (記述接尾語) - B-2
+      // だらけ: covered with - prevent だ｜ら｜け split
+      {"だらけ", POS::Suffix, -0.5F, "だらけ", false, false, true, CT::None, ""},
+      // ずつ/づつ: each/at a time - prevent OTHER confusion
+      {"ずつ", POS::Suffix, -0.5F, "ずつ", false, false, true, CT::None, ""},
+      {"づつ", POS::Suffix, -0.5F, "ずつ", false, false, true, CT::None, ""},  // variant spelling
   };
 }
 
@@ -768,6 +803,10 @@ std::vector<DictionaryEntry> getGreetingEntries() {
       {"すみません", POS::Other, 0.3F, "すみません", false, false, false, CT::None, ""},
       {"ごめんなさい", POS::Other, 0.3F, "ごめんなさい", false, false, false, CT::None, ""},
       {"ごめん", POS::Other, 0.3F, "ごめん", false, false, false, CT::None, ""},
+
+      // Interjections (感動詞) - B-6
+      // はてな: what?/hmm - prevent は+て+な split (N8)
+      {"はてな", POS::Other, -0.5F, "はてな", false, false, false, CT::None, ""},
   };
 }
 
@@ -1011,6 +1050,17 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       // Livedoor corpus fixes: closed-class adverbs mistokenized as OTHER
       {"いずれ", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},  // eventually/either
       {"早くも", POS::Adverb, -1.5F, "", false, false, false, CT::None, "はやくも"},  // already/so soon
+
+      // Additional adverbs from comprehensive fix plan (B-1)
+      {"全て", POS::Adverb, 0.1F, "", false, false, false, CT::None, "すべて"},  // all - prevent 全｜て split
+      {"すべて", POS::Adverb, 0.1F, "全て", false, false, false, CT::None, ""},  // all (hiragana)
+      {"実に", POS::Adverb, -0.5F, "", false, false, false, CT::None, "じつに"},  // indeed - prevent 実｜に split (N7)
+      {"最も", POS::Adverb, 0.1F, "", false, false, false, CT::None, "もっとも"},  // most - prevent 最｜も split
+      {"もっとも", POS::Adverb, 0.1F, "最も", false, false, false, CT::None, ""},  // most (hiragana)
+      {"なんとも", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},  // cannot - prevent な｜ん｜と｜も split
+      {"今や", POS::Adverb, -0.5F, "", false, false, false, CT::None, "いまや"},  // now - prevent 今+や(OTHER)
+      {"初めて", POS::Adverb, -0.5F, "", false, false, false, CT::None, "はじめて"},  // first time - prevent VERB confusion
+      {"到底", POS::Adverb, 0.1F, "", false, false, false, CT::None, "とうてい"},  // utterly - prevent NOUN confusion (N11)
   };
 }
 
