@@ -824,6 +824,7 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       // (晴れのち曇り = sunny, later cloudy). Low cost to prevent の+ち split.
       {"のち", POS::Noun, 0.1F, "後", false, false, false, CT::None, ""},
       {"やっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
+      {"ようやく", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},  // Low cost to prevent よう+やく split
       {"ついに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"いつも", POS::Adverb, -1.2F, "", false, false, false, CT::None, ""},
       {"たまに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
@@ -849,6 +850,13 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       // Emphatic adverbs (強調副詞)
       {"一際", POS::Adverb, 0.3F, "", false, false, false, CT::None, "ひときわ"},
       {"俄然", POS::Adverb, 0.3F, "", false, false, false, CT::None, "がぜん"},  // B53: suddenly/all of a sudden
+      // とんと: "at all/completely" (with negative), e.g., とんと分からない
+      // Low cost to prevent と+ん+と particle split
+      {"とんと", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},
+      // てっきり: "surely/certainly" (mistaken assumption), e.g., てっきり来ると思った
+      {"てっきり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      // からっきし: "not at all" (with negative), e.g., からっきし駄目だ
+      {"からっきし", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
 
       // Superlative adverbs (最上級副詞)
       {"一番", POS::Adverb, 0.3F, "", false, false, false, CT::None, "いちばん"},

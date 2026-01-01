@@ -128,6 +128,7 @@ void evaluateNounRules(const core::LatticeEdge& prev,
   // NOUN → PARTICLE rules
   accumulateRule(accumulated, checkTeFormSplit(prev, next, opts));
   accumulateRule(accumulated, checkShiParticleConnection(prev, next, opts));
+  accumulateRule(accumulated, checkNaParticleAfterKanjiNoun(prev, next, opts));
 
   // NOUN → ADJ rules
   accumulateRule(accumulated, checkYasuiAfterRenyokei(prev, next, opts));

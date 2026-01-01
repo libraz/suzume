@@ -308,6 +308,14 @@ constexpr float kBonusShiAfterAux = 0.3F;
 // E.g., 本し should be 本だし
 constexpr float kPenaltyShiAfterNoun = scale::kStrong;
 
+// な particle after kanji noun (likely na-adjective pattern)
+// E.g., 獰猛な should prefer ADJ interpretation over NOUN + PARTICLE
+// When a 2+ kanji noun is followed by な(PARTICLE), it's almost always
+// a na-adjective stem. Penalty shifts preference away from PARTICLE.
+// Using severe penalty because PARTICLE → NOUN connection cost is 0,
+// so we need sufficient penalty to prefer other paths.
+constexpr float kPenaltyNaParticleAfterKanjiNoun = scale::kSevere;  // 2.5
+
 // らしい (conjecture) after verb/adjective (valid pattern)
 // E.g., 帰るらしい, 美しいらしい
 // Offset VERB/ADJ→ADJ base cost (0.8) to encourage proper split

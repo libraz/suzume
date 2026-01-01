@@ -363,6 +363,10 @@ ConnectionRuleResult checkVerbToCaseParticle(const core::LatticeEdge& prev,
                                              const core::LatticeEdge& next,
                                              const ConnectionOptions& opts);
 
+ConnectionRuleResult checkNaParticleAfterKanjiNoun(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& opts);
+
 // =============================================================================
 // POS-based Dispatch Helpers
 // =============================================================================

@@ -243,8 +243,7 @@
         {"surface": "実験", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "結果", "pos": "Noun"},
-        {"surface": "有意", "pos": "Noun"},
-        {"surface": "な", "pos": "Particle"},
+        {"surface": "有意な", "pos": "Adjective", "lemma": "有意"},
         {"surface": "差", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "認められた", "pos": "Verb", "lemma": "認める"}

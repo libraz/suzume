@@ -181,6 +181,11 @@ struct ConnectionOptions {
   // し after noun penalty
   float penalty_shi_after_noun = scorer::kPenaltyShiAfterNoun;
 
+  // な particle after kanji noun penalty
+  // Kanji noun + な(PARTICLE) is almost always na-adjective pattern
+  float penalty_na_particle_after_kanji_noun =
+      scorer::kPenaltyNaParticleAfterKanjiNoun;
+
   // Suffix at sentence start
   float penalty_suffix_at_start = scorer::kPenaltySuffixAtStart;
 

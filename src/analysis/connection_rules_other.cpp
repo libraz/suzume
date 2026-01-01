@@ -378,5 +378,36 @@ ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
   }
 }
 
+// Rule: Kanji NOUN + な(PARTICLE) penalty
+// When a kanji compound noun is followed by な particle, it's almost always
+// a na-adjective pattern (獰猛な, 静かな, 便利な)
+// The な particle (prohibition/emphasis) is rare after nouns.
+// Penalty shifts preference to NOUN + AUX(な) or registered ADJ patterns.
+ConnectionRuleResult checkNaParticleAfterKanjiNoun(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& opts) {
+  // Check if prev is NOUN
+  if (prev.pos != core::PartOfSpeech::Noun) return {};
+
+  // Check if next is PARTICLE with surface "な"
+  if (next.pos != core::PartOfSpeech::Particle ||
+      next.surface != "な") {
+    return {};
+  }
+
+  // Check if prev surface is kanji (potential na-adjective stem)
+  // At least 2 characters for typical na-adjective stems
+  if (prev.surface.size() < core::kTwoJapaneseCharBytes) return {};
+
+  // Check if prev starts with kanji (0xE4-0xE9 range in UTF-8)
+  auto first_byte = static_cast<unsigned char>(prev.surface[0]);
+  if (first_byte < 0xE4 || first_byte > 0xE9) return {};
+
+  // Apply penalty to shift preference to na-adjective pattern
+  return {ConnectionPattern::NaParticleAfterKanjiNoun,
+          opts.penalty_na_particle_after_kanji_noun,
+          "kanji noun + na particle (likely na-adjective)"};
+}
+
 }  // namespace connection_rules
 }  // namespace suzume::analysis

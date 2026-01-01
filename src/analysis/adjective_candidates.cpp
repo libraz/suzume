@@ -497,14 +497,16 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
     ++kanji_end;
   }
 
-  // Need at least 2 kanji (stem + 的)
-  if (kanji_end - start_pos < 2) {
+  size_t kanji_len = kanji_end - start_pos;
+
+  // Need at least 2 kanji
+  if (kanji_len < 2) {
     return candidates;
   }
 
   std::string kanji_seq = extractSubstring(codepoints, start_pos, kanji_end);
 
-  // Check for na-adjective suffixes (的)
+  // Pattern 1: Check for na-adjective suffixes (的)
   for (const auto& suffix : kNaAdjSuffixes) {
     // Check if kanji_seq ends with suffix
     if (kanji_seq.size() >= suffix.size()) {
@@ -529,6 +531,27 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
         break;  // Use first matching suffix
       }
     }
+  }
+
+  // Pattern 2: Check for kanji compound + な pattern (e.g., 獰猛な)
+  // Generate ADJ candidate for kanji portion when followed by な
+  if (kanji_end < codepoints.size() && codepoints[kanji_end] == U'な') {
+    // Found kanji compound + な - potential na-adjective stem
+    UnknownCandidate candidate;
+    candidate.surface = kanji_seq;
+    candidate.start = start_pos;
+    candidate.end = kanji_end;
+    candidate.pos = core::PartOfSpeech::Adjective;
+    // Cost similar to dictionary na-adjectives but with small penalty for unknown
+    // Dictionary na-adj stems have cost 0.5, so use similar value
+    candidate.cost = 0.5F;
+    candidate.has_suffix = true;  // Has な suffix following
+#ifdef SUZUME_DEBUG_INFO
+    candidate.origin = CandidateOrigin::AdjectiveNa;
+    candidate.confidence = 0.8F;  // Lower confidence for unknown pattern
+    candidate.pattern = "na_adjective_stem";
+#endif
+    candidates.push_back(candidate);
   }
 
   return candidates;

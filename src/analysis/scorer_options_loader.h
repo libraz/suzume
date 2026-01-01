@@ -346,6 +346,8 @@ inline void ScorerOptionsLoader::applyConnectionOptions(ConnectionOptions& opts,
   SET_OPT(opts, bonus_shi_after_verb, json, "bonus_shi_after_verb");
   SET_OPT(opts, bonus_shi_after_aux, json, "bonus_shi_after_aux");
   SET_OPT(opts, penalty_shi_after_noun, json, "penalty_shi_after_noun");
+  SET_OPT(opts, penalty_na_particle_after_kanji_noun, json,
+          "penalty_na_particle_after_kanji_noun");
   SET_OPT(opts, penalty_suffix_at_start, json, "penalty_suffix_at_start");
   SET_OPT(opts, penalty_suffix_after_symbol, json, "penalty_suffix_after_symbol");
   SET_OPT(opts, penalty_prefix_before_verb, json, "penalty_prefix_before_verb");
@@ -515,6 +517,7 @@ inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
     TRY_ENV("CONN", bonus_shi_after_verb);
     TRY_ENV("CONN", bonus_shi_after_aux);
     TRY_ENV("CONN", penalty_shi_after_noun);
+    TRY_ENV("CONN", penalty_na_particle_after_kanji_noun);
     TRY_ENV("CONN", penalty_suffix_at_start);
     TRY_ENV("CONN", penalty_suffix_after_symbol);
     TRY_ENV("CONN", penalty_prefix_before_verb);
