@@ -581,6 +581,24 @@ float calculateConfidence(VerbType type, std::string_view stem,
     logConfidenceAdjustment(-pen, "godan_hiragana_rare_stem");
   }
 
+  // GodanNa (ナ行五段) is extremely rare - only 死ぬ exists in modern Japanese
+  // In ん-onbin context, penalize GodanNa to prefer GodanMa/GodanBa
+  // E.g., 跳んだ → 跳ぶ (GodanBa) is correct, not 跳ぬ (GodanNa)
+  // E.g., 読んだ → 読む (GodanMa) is correct, not 読ぬ (GodanNa)
+  // Exception: 死ぬ (to die) is the only GodanNa verb - BOOST 死 stem instead
+  // This applies to single-kanji stems in onbinkei context
+  if (type == VerbType::GodanNa && required_conn == conn::kVerbOnbinkei) {
+    // Exception for 死ぬ - the only GodanNa verb in modern Japanese
+    // Boost 死 stem to beat GodanMa/GodanBa interpretations
+    if (stem == "死") {
+      base += inflection::scale::kMinorBonus;
+      logConfidenceAdjustment(inflection::scale::kMinorBonus, "godan_na_shinu_boost");
+    } else {
+      base -= inflection::kPenaltyGodanNaRare;
+      logConfidenceAdjustment(-inflection::kPenaltyGodanNaRare, "godan_na_rare");
+    }
+  }
+
   // I-adjective validation: single-kanji stems are very rare
   // Most I-adjectives have multi-character stems (美しい, 高い, 長い)
   // Single-kanji stems like 書い (from mismatched 書く) are usually wrong
@@ -833,6 +851,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Exception: っ-onbin verbs (GodanWa/Ra/Ta) are legitimate with 2-kanji stems
   //   - 手伝う → 手伝って (GodanWa) is valid, not サ変
   //   - But 検討 + いて could be サ変 (検討している) or GodanKa (検討く - wrong)
+  // Exception: GodanSa verbs with 2-kanji stems exist (目指す, 見逃す, etc.)
+  //   - These are NOT サ変名詞, they are true Godan verbs ending in す
   // Skip IAdjective - it has separate handling at line 246-254
   if (stem_len >= core::kTwoJapaneseCharBytes && isAllKanji(stem) && type != VerbType::Suru &&
       type != VerbType::IAdjective) {
@@ -841,7 +861,14 @@ float calculateConfidence(VerbType type, std::string_view stem,
     bool is_tsu_onbin_type = (type == VerbType::GodanWa ||
                               type == VerbType::GodanRa ||
                               type == VerbType::GodanTa);
-    if (required_conn == conn::kVerbOnbinkei && is_tsu_onbin_type) {
+    // GodanSa verbs like 目指す, 見逃す have 2-kanji stems
+    // These should NOT be penalized as サ変名詞
+    if (type == VerbType::GodanSa) {
+      // GodanSa with 2-kanji stem: use lighter penalty (same as kVerbKatei)
+      // This allows 目指す, 見逃す to compete fairly with サ変 interpretations
+      base -= inflection::kPenaltyAllKanjiNonSuruKatei;
+      logConfidenceAdjustment(-inflection::kPenaltyAllKanjiNonSuruKatei, "all_kanji_godan_sa");
+    } else if (required_conn == conn::kVerbOnbinkei && is_tsu_onbin_type) {
       // No penalty for っ-onbin patterns - these are legitimate Godan verbs
     } else if (required_conn == conn::kVerbKatei) {
       // Lighter penalty for conditional form - 頑張れば, 滑れば are valid Godan
@@ -993,6 +1020,19 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Single-kanji stems (出す, 消す) are typically GodanSa
   // Stems ending in hiragana/katakana suggest Godan verb (話す, 返す)
   if (endsWithKanji(stem)) {
+    // In kVerbBase context, Suru with short suffix (す only = 3 bytes) is suspicious
+    // Suru base form is normally "する" (suffix="する", 6 bytes)
+    // The "す" suffix pattern is for すべき (classical) only
+    // When stem + す = 目指す, this should be GodanSa, not Suru
+    // Penalize Suru with 3-byte suffix in kVerbBase context
+    if (type == VerbType::Suru && required_conn == conn::kVerbBase &&
+        suffix_len == core::kJapaneseCharBytes) {
+      // Strong penalty: Suru verbs don't end in just す in base form
+      // 勉強する (not 勉強す), 準備する (not 準備す)
+      base -= inflection::kPenaltyGodanSaTwoKanji;  // Reuse existing constant
+      logConfidenceAdjustment(-inflection::kPenaltyGodanSaTwoKanji, "suru_short_suffix_base");
+    }
+
     bool is_shi_context = (required_conn == conn::kVerbRenyokei ||
                            required_conn == conn::kVerbOnbinkei);
     if (is_shi_context) {

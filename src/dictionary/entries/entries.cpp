@@ -95,6 +95,9 @@ std::vector<DictionaryEntry> getCompoundParticleEntries() {
       // Capacity/Viewpoint (資格・観点)
       {"として", POS::Particle, 0.1F, "", false, false, false, CT::None, ""},
       {"にとって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      // にとっても: にとって + も (even for X)
+      // Prevent に + とっても(ADV) misparse
+      {"にとっても", POS::Particle, -0.5F, "", false, false, false, CT::None, ""},
       // Note: 漢字を含む複合助詞（に対して、に関して等）は分割する方針
       // See CLAUDE.md: "複合助詞 with kanji | 分割 | に関して → に+関して"
 
@@ -1004,6 +1007,10 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       // Onomatopoeia/mimetic words (prevent particle splits)
       {"ほんわか", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // gently warm
       {"しどろもどろ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // incoherent
+
+      // Livedoor corpus fixes: closed-class adverbs mistokenized as OTHER
+      {"いずれ", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},  // eventually/either
+      {"早くも", POS::Adverb, -1.5F, "", false, false, false, CT::None, "はやくも"},  // already/so soon
   };
 }
 

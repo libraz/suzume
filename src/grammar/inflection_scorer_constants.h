@@ -50,6 +50,9 @@ constexpr float kSevere = 0.60F;
 // Prohibitive adjustment - effectively disables pattern
 constexpr float kProhibitive = 0.80F;
 
+// Very rare verb type adjustment
+constexpr float kVeryRare = 0.25F;
+
 // Bonus scale (positive values)
 constexpr float kTrivialBonus = 0.02F;
 constexpr float kMinorBonus = 0.05F;
@@ -191,6 +194,11 @@ constexpr float kPenaltyIAdjVerbRashiiPattern = 0.50F;
 // =============================================================================
 // Onbinkei (音便) Context Validation
 // =============================================================================
+
+// GodanNa (ナ行) is extremely rare - only 死ぬ exists
+// In ん-onbin context, GodanNa should be heavily penalized
+// E.g., 跳んだ → 跳ぶ (GodanBa) is much more likely than 跳ぬ (GodanNa)
+constexpr float kPenaltyGodanNaRare = scale::kVeryRare;
 
 // a-row ending in onbinkei context - suspicious for most Godan verbs
 constexpr float kPenaltyOnbinkeiARowStem = 0.30F;
