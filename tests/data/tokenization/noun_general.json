@@ -1236,6 +1236,66 @@
         "long_word",
         "regression"
       ]
+    },
+    {
+      "id": "s3_hiragana_noun_hashi",
+      "description": "S3: はし (橋/箸) should be recognized as NOUN, not split as は+し",
+      "input": "はしがかかる",
+      "expected": [
+        {"surface": "はし", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "かかる", "pos": "Verb", "lemma": "かかる"}
+      ],
+      "tags": [
+        "s3_fix",
+        "hiragana_noun",
+        "regression"
+      ]
+    },
+    {
+      "id": "s3_hiragana_noun_niku",
+      "description": "S3: にく (肉) should be recognized as NOUN, not split as に+く",
+      "input": "にくをたべる",
+      "expected": [
+        {"surface": "にく", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "たべる", "pos": "Verb", "lemma": "たべる"}
+      ],
+      "tags": [
+        "s3_fix",
+        "hiragana_noun",
+        "regression"
+      ]
+    },
+    {
+      "id": "s3_hiragana_noun_hana",
+      "description": "S3: はな (花/鼻) should be recognized as NOUN",
+      "input": "はなをみる",
+      "expected": [
+        {"surface": "はな", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "みる", "pos": "Verb", "lemma": "みる"}
+      ],
+      "tags": [
+        "s3_fix",
+        "hiragana_noun",
+        "regression"
+      ]
+    },
+    {
+      "id": "s3_hiragana_noun_nori",
+      "description": "S3: のり (海苔) should be recognized as NOUN",
+      "input": "のりをたべる",
+      "expected": [
+        {"surface": "のり", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "たべる", "pos": "Verb", "lemma": "たべる"}
+      ],
+      "tags": [
+        "s3_fix",
+        "hiragana_noun",
+        "regression"
+      ]
     }
   ]
 }

@@ -331,6 +331,10 @@ ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts);
 
+ConnectionRuleResult checkSuspiciousParticleSequence(const core::LatticeEdge& prev,
+                                                     const core::LatticeEdge& next,
+                                                     const ConnectionOptions& opts);
+
 ConnectionRuleResult checkHiraganaNounStartsWithParticle(
     const core::LatticeEdge& prev, const core::LatticeEdge& next,
     const ConnectionOptions& opts);

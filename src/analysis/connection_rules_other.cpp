@@ -168,6 +168,62 @@ ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
   return {};
 }
 
+// Rule: Suspicious particle sequence (different particles in unlikely pattern)
+// This catches cases where a hiragana noun was split into particles
+// E.g., は + し + が likely means はし (noun) was split incorrectly
+//
+// Suspicious patterns:
+// - し after short particle: し is listing particle, should follow predicates
+// - が/を after short particle: case particles usually follow nouns, not particles
+//
+// Valid compound patterns (exceptions):
+// - には, では, からは, へは - case + topic
+// - にも, でも, からも, へも - case + も
+// - とは - quotative + topic
+// - からの, への, での - case + の
+ConnectionRuleResult checkSuspiciousParticleSequence(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& opts) {
+  if (!isParticleToParticle(prev, next)) return {};
+
+  // Both must be single-character particles
+  if (prev.surface.size() != core::kJapaneseCharBytes ||
+      next.surface.size() != core::kJapaneseCharBytes) {
+    return {};
+  }
+
+  // Check for valid compound particle patterns
+  std::string_view p = prev.surface;
+  std::string_view n = next.surface;
+
+  // Valid compounds: case + topic marker (は/も/の)
+  // には, では, とは, へは, からは etc.
+  if ((p == "に" || p == "で" || p == "と" || p == "へ") &&
+      (n == "は" || n == "も" || n == "の")) {
+    return {};  // Valid compound
+  }
+
+  // し/な after short particle is suspicious
+  // し as listing particle (し接続助詞) should follow predicates, not particles
+  // な as prohibition/emphasis particle (するな, 来たな) should follow verbs
+  if (n == "し" || n == "な") {
+    return {ConnectionPattern::SuspiciousParticleSequence,
+            opts.penalty_suspicious_particle_sequence,
+            "particle after short particle (likely split)"};
+  }
+
+  // が/を after certain particles is suspicious
+  // These case particles usually follow nouns, not other particles
+  // Exceptions: のが, ので are valid
+  if ((n == "が" || n == "を") && p != "の") {
+    return {ConnectionPattern::SuspiciousParticleSequence,
+            opts.penalty_suspicious_particle_sequence,
+            "case particle after short particle (likely split)"};
+  }
+
+  return {};
+}
+
 // Rule: Hiragana noun starting with particle character after NOUN
 // Japanese grammar: NOUN is very likely to be followed by PARTICLE
 // If a hiragana noun starts with common particle (も、の、が、を、に、は、で、と、へ、か),

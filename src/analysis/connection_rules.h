@@ -112,6 +112,7 @@ enum class ConnectionPattern {
   TeFormVerbToVerb,        // テ形動詞 → 動詞 (e.g., 関して + 報告する)
   HiraganaNounStartsWithParticle,  // ひらがな名詞が助詞で始まる (e.g., もも after すもも)
   SameParticleRepeated,    // 同じ助詞が連続 (e.g., も + も)
+  SuspiciousParticleSequence, // 不自然な助詞連続 (e.g., は + し + が likely split noun)
   PrefixToHiraganaAdj,        // PREFIX → 純ひらがなADJ (e.g., お + こがましい)
   ParticleBeforeHiraganaAdj,  // PARTICLE → 純ひらがなADJ (e.g., は + なはだしい)
   SuffixAfterSymbol,       // SYMBOL → SUFFIX (invalid: 、家 should be NOUN, not SUFFIX)

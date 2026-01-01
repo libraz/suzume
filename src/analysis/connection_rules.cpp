@@ -185,6 +185,7 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
 
   // PARTICLE → PARTICLE rules
   accumulateRule(accumulated, checkSameParticleRepeated(prev, next, opts));
+  accumulateRule(accumulated, checkSuspiciousParticleSequence(prev, next, opts));
 
   // PARTICLE → OTHER rules
   accumulateRule(accumulated, checkParticleBeforeHiraganaOther(prev, next, opts));

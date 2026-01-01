@@ -154,6 +154,9 @@ struct ConnectionOptions {
   // Same particle repeated
   float penalty_same_particle_repeated = scorer::kPenaltySameParticleRepeated;
 
+  // Suspicious particle sequence (different particles in unlikely pattern)
+  float penalty_suspicious_particle_sequence = scorer::kPenaltySuspiciousParticleSequence;
+
   // Hiragana noun starts with particle char
   float penalty_hiragana_noun_starts_with_particle = scorer::kPenaltyHiraganaNounStartsWithParticle;
 

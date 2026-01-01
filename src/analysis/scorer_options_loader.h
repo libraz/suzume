@@ -338,6 +338,7 @@ inline void ScorerOptionsLoader::applyConnectionOptions(ConnectionOptions& opts,
   SET_OPT(opts, penalty_yoru_night_after_ni, json, "penalty_yoru_night_after_ni");
   SET_OPT(opts, penalty_formal_noun_before_kanji, json, "penalty_formal_noun_before_kanji");
   SET_OPT(opts, penalty_same_particle_repeated, json, "penalty_same_particle_repeated");
+  SET_OPT(opts, penalty_suspicious_particle_sequence, json, "penalty_suspicious_particle_sequence");
   SET_OPT(opts, penalty_hiragana_noun_starts_with_particle, json, "penalty_hiragana_noun_starts_with_particle");
   SET_OPT(opts, penalty_particle_before_single_hiragana_other, json, "penalty_particle_before_single_hiragana_other");
   SET_OPT(opts, penalty_particle_before_multi_hiragana_other, json, "penalty_particle_before_multi_hiragana_other");
@@ -506,6 +507,7 @@ inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
     TRY_ENV("CONN", penalty_yoru_night_after_ni);
     TRY_ENV("CONN", penalty_formal_noun_before_kanji);
     TRY_ENV("CONN", penalty_same_particle_repeated);
+    TRY_ENV("CONN", penalty_suspicious_particle_sequence);
     TRY_ENV("CONN", penalty_hiragana_noun_starts_with_particle);
     TRY_ENV("CONN", penalty_particle_before_single_hiragana_other);
     TRY_ENV("CONN", penalty_particle_before_multi_hiragana_other);

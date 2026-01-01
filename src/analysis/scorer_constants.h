@@ -271,6 +271,11 @@ constexpr float kPenaltyFormalNounBeforeKanji = scale::kSevere + scale::kMinor; 
 // E.g., も + も is grammatically rare
 constexpr float kPenaltySameParticleRepeated = scale::kStrong + scale::kMinor;  // 2.0
 
+// Suspicious particle sequence penalty (different particles in unlikely sequence)
+// E.g., は + し + が suggests a noun like はし was split incorrectly
+// し as listing particle should follow predicates, not particles
+constexpr float kPenaltySuspiciousParticleSequence = scale::kStrong;  // 2.5
+
 // Hiragana noun starts with particle char penalty
 // E.g., もも after NOUN should prefer も(PARTICLE) + もも
 constexpr float kPenaltyHiraganaNounStartsWithParticle = scale::kStrong;

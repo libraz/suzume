@@ -245,14 +245,21 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
 
   normalize::CharType start_type = char_types[start_pos];
 
-  // For hiragana starting with single-character particles that are NEVER verb stems,
-  // don't generate unknown candidates. These should be recognized by dictionary lookup.
-  // Note: Characters that CAN be verb stems are NOT skipped:
-  //   - な→なる/なくす, て→できる, や→やる, か→かける/かえる
+  // Track if sequence starts with a particle character
+  // These sequences may be valid nouns (はし, はな, etc.) despite starting with particles
+  bool started_with_particle = false;
+
+  // For hiragana starting with common particle characters (は, に, へ, の),
+  // we still generate candidates but with a penalty, as they could be nouns.
+  // Examples: はし (橋/箸), はな (花/鼻), にく (肉), へや (部屋), のり (海苔), etc.
+  // Note: を, が are excluded - they almost never start nouns
+  // Note: よ, わ are excluded - they are sentence-final particles
   if (start_type == normalize::CharType::Hiragana) {
     char32_t first_char = codepoints[start_pos];
-    if (normalize::isNeverVerbStemAtStart(first_char)) {
-      return candidates;  // Let dictionary handle these
+    // Only は, に, へ, の can start hiragana nouns
+    if (first_char == U'は' || first_char == U'に' ||
+        first_char == U'へ' || first_char == U'の') {
+      started_with_particle = true;  // Generate but with penalty
     }
 
     // Skip small kana (拗音・促音) - Japanese words don't start with these
@@ -327,12 +334,21 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
     // For hiragana, break at common particle characters to avoid
     // swallowing particles into unknown words (e.g., don't create "ぎをみじん")
     if (start_type == normalize::CharType::Hiragana) {
-      // Common particles + で, と, も, か (additional word boundaries)
-      // Note: Don't include「や」as it's also the stem of「やる」verb
-      if (normalize::isCommonParticle(curr_char) ||
-          curr_char == U'で' || curr_char == U'と' ||
-          curr_char == U'も' || curr_char == U'か') {
-        break;  // Stop before the particle
+      // Always break at を and が (case particles that never start words)
+      // This applies even if we started with a particle character
+      if (curr_char == U'を' || curr_char == U'が') {
+        break;
+      }
+      // For non-particle starts, also break at other particles
+      // This allows generating nouns like はし, はな, にく, etc.
+      if (!started_with_particle) {
+        // Common particles (は, に, へ, の) + で, と, も, か (word boundaries)
+        // Note: Don't include「や」as it's also the stem of「やる」verb
+        if (curr_char == U'は' || curr_char == U'に' || curr_char == U'へ' ||
+            curr_char == U'の' || curr_char == U'で' || curr_char == U'と' ||
+            curr_char == U'も' || curr_char == U'か') {
+          break;  // Stop before the particle
+        }
       }
     }
     ++end_pos;
@@ -348,7 +364,10 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       candidate.surface = surface;
       candidate.start = start_pos;
       candidate.end = candidate_end;
-      candidate.pos = getPosForType(start_type);
+      // Particle-start hiragana sequences are potential nouns (はし, はな, にく)
+      // Use NOUN POS instead of OTHER to avoid exceeds_dict_length penalty
+      candidate.pos = started_with_particle ? core::PartOfSpeech::Noun
+                                            : getPosForType(start_type);
       candidate.cost = getCostForType(start_type, len);
 
       // Penalize kanji sequences ending with honorific suffixes (様, 氏)
@@ -373,14 +392,33 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
         }
       }
 
-      candidate.has_suffix = false;
+      // Penalize hiragana sequences starting with particle characters
+      // These could be nouns (はし, はな, にく) but are less likely than
+      // the particle interpretation, unless the particle path has connection penalties
+      // Constraints:
+      // - Only len=2 is allowed (typical pattern: は+し, に+く, の+り)
+      // - Longer sequences are too risky (e.g., によれ should be に+よれ, not a noun)
+      if (started_with_particle) {
+        if (len != 2) {
+          continue;  // Only generate 2-char candidates
+        }
+        // Add moderate penalty - let connection rules decide which path is better
+        candidate.cost += 1.0F;
+        // Mark as has_suffix to skip exceeds_dict_length penalty in tokenizer
+        // These are morphologically recognized patterns (potential nouns)
+        candidate.has_suffix = true;
+      } else {
+        candidate.has_suffix = false;
+      }
 #ifdef SUZUME_DEBUG_INFO
       candidate.origin = CandidateOrigin::SameType;
-      candidate.confidence = 1.0F;
+      candidate.confidence = started_with_particle ? 0.7F : 1.0F;
       switch (start_type) {
         case normalize::CharType::Kanji: candidate.pattern = "kanji_seq"; break;
         case normalize::CharType::Katakana: candidate.pattern = "kata_seq"; break;
-        case normalize::CharType::Hiragana: candidate.pattern = "hira_seq"; break;
+        case normalize::CharType::Hiragana:
+          candidate.pattern = started_with_particle ? "hira_noun_seq" : "hira_seq";
+          break;
         case normalize::CharType::Alphabet: candidate.pattern = "alpha_seq"; break;
         case normalize::CharType::Digit: candidate.pattern = "digit_seq"; break;
         default: candidate.pattern = "other_seq"; break;
