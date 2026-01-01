@@ -132,6 +132,12 @@ inline bool isParticleToParticle(const core::LatticeEdge& prev,
          next.pos == core::PartOfSpeech::Particle;
 }
 
+inline bool isParticleToVerb(const core::LatticeEdge& prev,
+                             const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Particle &&
+         next.pos == core::PartOfSpeech::Verb;
+}
+
 // Prefix connection patterns
 inline bool isPrefixToVerb(const core::LatticeEdge& prev,
                            const core::LatticeEdge& next) {
@@ -324,6 +330,10 @@ ConnectionRuleResult checkSuffixAfterSymbol(const core::LatticeEdge& prev,
                                             const ConnectionOptions& opts);
 
 ConnectionRuleResult checkParticleBeforeHiraganaOther(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& opts);
+
+ConnectionRuleResult checkParticleBeforeHiraganaVerb(
     const core::LatticeEdge& prev, const core::LatticeEdge& next,
     const ConnectionOptions& opts);
 

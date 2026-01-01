@@ -188,6 +188,9 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
 
   // PARTICLE → OTHER rules
   accumulateRule(accumulated, checkParticleBeforeHiraganaOther(prev, next, opts));
+
+  // PARTICLE → VERB rules
+  accumulateRule(accumulated, checkParticleBeforeHiraganaVerb(prev, next, opts));
 }
 
 void evaluatePrefixRules(const core::LatticeEdge& prev,

@@ -1471,6 +1471,54 @@
         }
       ],
       "tags": ["s5_fix", "hiragana", "regression"]
+    },
+    {
+      "id": "s1_yabai_base",
+      "description": "S1 fix: やばい should be ADJ (not VERB やばう)",
+      "input": "やばい",
+      "expected": [
+        {
+          "surface": "やばい",
+          "pos": "Adjective",
+          "lemma": "やばい"
+        }
+      ],
+      "tags": ["s1_fix", "hiragana", "slang", "regression"]
+    },
+    {
+      "id": "s1_yabai_sentence",
+      "description": "S1 fix: まじでやばい - slang adjective in context",
+      "input": "まじでやばい",
+      "expected": [
+        {"surface": "まじで", "pos": "Adverb"},
+        {"surface": "やばい", "pos": "Adjective", "lemma": "やばい"}
+      ],
+      "tags": ["s1_fix", "hiragana", "slang", "regression"]
+    },
+    {
+      "id": "s1_nasasou_adj",
+      "description": "S1 fix: なさそう should be ADJ ない + そう (not VERB なさる)",
+      "input": "なさそう",
+      "expected": [
+        {
+          "surface": "なさそう",
+          "pos": "Adjective",
+          "lemma": "ない"
+        }
+      ],
+      "tags": ["s1_fix", "hiragana", "sou_pattern", "regression"]
+    },
+    {
+      "id": "s1_nasasou_sentence",
+      "description": "S1 fix: やる気がなさそう - ない + そう in sentence",
+      "input": "やる気がなさそう",
+      "expected": [
+        {"surface": "やる", "pos": "Verb", "lemma": "やる"},
+        {"surface": "気", "pos": "Noun"},
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "なさそう", "pos": "Adjective", "lemma": "ない"}
+      ],
+      "tags": ["s1_fix", "hiragana", "sou_pattern", "regression"]
     }
   ]
 }

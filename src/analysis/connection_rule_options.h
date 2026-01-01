@@ -163,6 +163,9 @@ struct ConnectionOptions {
   // Particle before multi hiragana OTHER
   float penalty_particle_before_multi_hiragana_other = scorer::kPenaltyParticleBeforeMultiHiraganaOther;
 
+  // Particle before hiragana VERB (likely split of hiragana verb)
+  float penalty_particle_before_hiragana_verb = scorer::kPenaltyParticleBeforeHiraganaVerb;
+
   // し after i-adjective bonus
   float bonus_shi_after_i_adj = scorer::kBonusShiAfterIAdj;
 

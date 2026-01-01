@@ -2829,6 +2829,30 @@
         }
       ],
       "tags": ["iku_irregular", "lemma", "regression"]
+    },
+    {
+      "id": "causative_passive_yarasareta",
+      "description": "やらされた - causative-passive of やる, not i-adj やらい",
+      "input": "やらされた",
+      "expected": [
+        {
+          "surface": "やらされた",
+          "pos": "Verb",
+          "lemma": "やる"
+        }
+      ],
+      "tags": ["causative-passive", "hiragana-verb", "regression"]
+    },
+    {
+      "id": "causative_passive_sentence",
+      "description": "仕事をやらされた - causative-passive in sentence context",
+      "input": "仕事をやらされた",
+      "expected": [
+        {"surface": "仕事", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "やらされた", "pos": "Verb", "lemma": "やる"}
+      ],
+      "tags": ["causative-passive", "hiragana-verb", "regression"]
     }
   ]
 }

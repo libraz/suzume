@@ -166,8 +166,8 @@
         {"surface": "お", "pos": "Prefix"},
         {"surface": "店", "pos": "Noun"},
         {"surface": "マジ", "pos": "Noun"},
-        {"surface": "でおす", "pos": "Verb"},
-        {"surface": "すめ", "pos": "Auxiliary"}
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "おすすめ", "pos": "Noun"}
       ],
       "tags": ["social"]
     },
@@ -240,8 +240,8 @@
         {"surface": "この", "pos": "Determiner"},
         {"surface": "商品", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "おすす", "pos": "Verb"},
-        {"surface": "めです", "pos": "Auxiliary"}
+        {"surface": "おすすめ", "pos": "Noun"},
+        {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["review"]
     },

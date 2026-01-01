@@ -682,11 +682,20 @@ float calculateConfidence(VerbType type, std::string_view stem,
     if (last == "な" || last == "ま" || last == "か" || last == "が" ||
         last == "さ" || last == "た" || last == "ば" || last == "ら" ||
         last == "わ") {
+      // 2-character pure hiragana stems ending in ら are typically verb mizenkei
+      // E.g., やら (from やる) + さ + れた = やらされた (causative-passive)
+      // Only penalize ら endings - other a-row endings may be valid i-adj stems
+      // E.g., やば (やばい), なさ (なさい with そう) are valid i-adjectives
+      if (stem_len == core::kTwoJapaneseCharBytes && isPureHiragana(stem) &&
+          last == "ら") {
+        base -= inflection::kPenaltyIAdjMizenkeiPattern;
+        logConfidenceAdjustment(-inflection::kPenaltyIAdjMizenkeiPattern, "i_adj_2char_ra_stem");
+      }
       // Check if there's a hiragana before the a-row ending (verb+mizenkei pattern)
       // E.g., 食べ + な → 食べな (ichidan verb pattern)
       //       行 + か + な → 行かな (godan verb mizenkei + な)
       // vs. 危 + な → あぶな (real adjective stem)
-      if (stem_len >= core::kThreeJapaneseCharBytes) {
+      else if (stem_len >= core::kThreeJapaneseCharBytes) {
         std::string_view prev = stem.substr(stem_len - core::kTwoJapaneseCharBytes, core::kJapaneseCharBytes);
         // If previous char is hiragana, this looks like verb mizenkei
         // Include all rows: a-row (godan mizenkei), e-row (ichidan), i-row, etc.

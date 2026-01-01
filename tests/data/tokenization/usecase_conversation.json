@@ -396,8 +396,7 @@
       "id": "restaurant_recommendation",
       "input": "おすすめは何ですか",
       "expected": [
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "すすめ", "pos": "Other"},
+        {"surface": "おすすめ", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "何", "pos": "Pronoun"},
         {"surface": "です", "pos": "Auxiliary"},

@@ -340,6 +340,41 @@
       "tags": [
         "te_form"
       ]
+    },
+    {
+      "id": "s1_particle_te_form",
+      "description": "につけて standalone - NOUN 付け wins over unknown VERB (known limitation)",
+      "input": "につけて",
+      "expected": [
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "つけ", "pos": "Noun", "lemma": "付け"},
+        {"surface": "て", "pos": "Auxiliary"}
+      ],
+      "tags": ["known_limitation", "te_form", "particle"]
+    },
+    {
+      "id": "s1_particle_te_iru",
+      "description": "S1 fix: につけている - progressive after particle should not be penalized",
+      "input": "につけている",
+      "expected": [
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "つけて", "pos": "Verb", "lemma": "つける"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+      ],
+      "tags": ["s1_fix", "te_form", "progressive", "particle", "regression"]
+    },
+    {
+      "id": "s1_ranking_sentence",
+      "description": "S1 fix: 現在3位につけている - ranking context",
+      "input": "現在3位につけている",
+      "expected": [
+        {"surface": "現在", "pos": "Noun"},
+        {"surface": "3位", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "つけて", "pos": "Verb", "lemma": "つける"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+      ],
+      "tags": ["s1_fix", "te_form", "progressive", "regression"]
     }
   ]
 }

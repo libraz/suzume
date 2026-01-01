@@ -222,6 +222,49 @@ ConnectionRuleResult checkParticleBeforeHiraganaOther(
           "hiragana other after particle (likely split)"};
 }
 
+// Check for PARTICLE + hiragana VERB pattern
+// Short particles followed by unknown hiragana verbs are often erroneous splits
+// e.g., し + まる in しまる should be single VERB しまる
+// e.g., た + よる in たよる should be single VERB たよる
+// Exception: Te-forms (ending with て/で) are valid verb forms after particles
+// e.g., に + つけて (te-form of つける) is valid
+ConnectionRuleResult checkParticleBeforeHiraganaVerb(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& opts) {
+  if (!isParticleToVerb(prev, next)) return {};
+
+  // Only apply to single-char particles (most prone to false splits)
+  if (prev.surface.size() > core::kJapaneseCharBytes) return {};
+
+  // Only penalize if the verb is unknown (not from dictionary)
+  // Dictionary verbs after particles are often valid (e.g., が + 見える)
+  if (next.fromDictionary()) return {};
+
+  // Only apply to pure hiragana verbs
+  if (!grammar::startsWithHiragana(next.surface)) return {};
+
+  // Don't penalize te-forms - they are valid verb forms after particles
+  // e.g., に + つけて, を + 食べて, が + 見えて
+  if (next.surface.size() >= core::kJapaneseCharBytes) {
+    std::string_view last = next.surface.substr(next.surface.size() - core::kJapaneseCharBytes);
+    if (last == "て" || last == "で") {
+      return {};  // Valid te-form, no penalty
+    }
+  }
+
+  // Don't penalize ている/でいる progressive forms
+  if (next.surface.size() >= core::kThreeJapaneseCharBytes) {
+    std::string_view last3 = next.surface.substr(next.surface.size() - core::kThreeJapaneseCharBytes);
+    if (last3 == "ている" || last3 == "でいる") {
+      return {};  // Valid progressive form, no penalty
+    }
+  }
+
+  return {ConnectionPattern::ParticleBeforeAux,
+          opts.penalty_particle_before_hiragana_verb,
+          "single-char particle before unknown hiragana verb (likely split)"};
+}
+
 // Rule: Conjunctive particle し after predicate (ADJ/VERB/AUX)
 // Valid: 上手いし, 食べるし, 高いし, 行くし, だし
 // Invalid: 本し (noun cannot directly connect to し)
