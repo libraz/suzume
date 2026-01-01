@@ -517,7 +517,8 @@ inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
     TRY_ENV("CONN", penalty_suffix_after_symbol);
     TRY_ENV("CONN", penalty_prefix_before_verb);
     TRY_ENV("CONN", penalty_noun_before_verb_aux);
-    TRY_ENV("CONN", penalty_prefix_short_stem_hiragana_adj);
+    TRY_ENV("CONN", penalty_prefix_hiragana_adj);
+    TRY_ENV("CONN", penalty_particle_before_hiragana_adj);
   }
 
   // Join options (SUZUME_SCORER_JOIN_*)

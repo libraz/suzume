@@ -191,6 +191,9 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
 
   // PARTICLE → VERB rules
   accumulateRule(accumulated, checkParticleBeforeHiraganaVerb(prev, next, opts));
+
+  // PARTICLE → ADJ rules
+  accumulateRule(accumulated, checkParticleBeforeHiraganaAdj(prev, next, opts));
 }
 
 void evaluatePrefixRules(const core::LatticeEdge& prev,
@@ -201,7 +204,7 @@ void evaluatePrefixRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkPrefixBeforeVerb(prev, next, opts));
 
   // PREFIX → ADJ rules
-  accumulateRule(accumulated, checkPrefixToShortStemHiraganaAdj(prev, next, opts));
+  accumulateRule(accumulated, checkPrefixToHiraganaAdj(prev, next, opts));
 }
 
 void evaluateSymbolRules(const core::LatticeEdge& prev,

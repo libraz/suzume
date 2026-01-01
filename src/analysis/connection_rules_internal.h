@@ -138,6 +138,12 @@ inline bool isParticleToVerb(const core::LatticeEdge& prev,
          next.pos == core::PartOfSpeech::Verb;
 }
 
+inline bool isParticleToAdj(const core::LatticeEdge& prev,
+                            const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Particle &&
+         next.pos == core::PartOfSpeech::Adjective;
+}
+
 // Prefix connection patterns
 inline bool isPrefixToVerb(const core::LatticeEdge& prev,
                            const core::LatticeEdge& next) {
@@ -301,7 +307,11 @@ ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
                                     const core::LatticeEdge& next,
                                     const ConnectionOptions& opts);
 
-ConnectionRuleResult checkPrefixToShortStemHiraganaAdj(
+ConnectionRuleResult checkPrefixToHiraganaAdj(const core::LatticeEdge& prev,
+                                              const core::LatticeEdge& next,
+                                              const ConnectionOptions& opts);
+
+ConnectionRuleResult checkParticleBeforeHiraganaAdj(
     const core::LatticeEdge& prev, const core::LatticeEdge& next,
     const ConnectionOptions& opts);
 
@@ -402,7 +412,8 @@ void evaluateAuxRules(const core::LatticeEdge& prev,
 /**
  * @brief Evaluate rules where prev.pos == PARTICLE
  * Rules: AuxAfterParticle, YoruNightAfterNi, SameParticleRepeated,
- *        ParticleBeforeHiraganaOther
+ *        ParticleBeforeHiraganaOther, ParticleBeforeHiraganaVerb,
+ *        ParticleBeforeHiraganaAdj
  */
 void evaluateParticleRules(const core::LatticeEdge& prev,
                            const core::LatticeEdge& next,
@@ -411,7 +422,7 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
 
 /**
  * @brief Evaluate rules where prev.pos == PREFIX
- * Rules: PrefixBeforeVerb, PrefixToShortStemHiraganaAdj
+ * Rules: PrefixBeforeVerb, PrefixToHiraganaAdj
  */
 void evaluatePrefixRules(const core::LatticeEdge& prev,
                          const core::LatticeEdge& next,

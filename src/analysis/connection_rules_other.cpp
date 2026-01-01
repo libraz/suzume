@@ -32,13 +32,15 @@ ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
           "adj-ku + naru pattern"};
 }
 
-// Rule: PREFIX → short-stem pure hiragana adjective
+// Rule: PREFIX → pure hiragana adjective (unknown)
 // E.g., お + いしい is likely misanalysis (should be おいしい)
-// Valid short hiragana adjectives (すごい, うまい, やばい) are in dictionary
-// Unknown short-stem (≤2 chars) hiragana adjectives after PREFIX are penalized
-ConnectionRuleResult checkPrefixToShortStemHiraganaAdj(
-    const core::LatticeEdge& prev, const core::LatticeEdge& next,
-    const ConnectionOptions& opts) {
+// E.g., お + こがましい is likely misanalysis (should be おこがましい)
+// Valid hiragana adjectives (すごい, うまい, やばい) are in dictionary
+// Honorific prefix お typically goes with kanji adjectives (お美しい, お高い)
+// Unknown pure hiragana adjectives after PREFIX are penalized
+ConnectionRuleResult checkPrefixToHiraganaAdj(const core::LatticeEdge& prev,
+                                              const core::LatticeEdge& next,
+                                              const ConnectionOptions& opts) {
   if (!isPrefixToAdj(prev, next)) return {};
 
   // Next must be unknown adjective (dictionary adjectives are valid)
@@ -49,21 +51,25 @@ ConnectionRuleResult checkPrefixToShortStemHiraganaAdj(
     return {};
   }
 
-  // Check stem length: lemma minus final い
-  size_t stem_bytes = next.lemma.size() - core::kJapaneseCharBytes;
-  size_t stem_chars = stem_bytes / core::kJapaneseCharBytes;
-
-  // Only penalize short stems (≤2 chars like いしい, but not おいしい)
-  if (stem_chars > 2) {
-    return {};
-  }
-
   // Check if lemma is pure hiragana
+  // Kanji-containing adjectives after PREFIX are valid (お美しい, お高い)
   if (!grammar::isPureHiragana(next.lemma)) return {};
 
-  return {ConnectionPattern::PrefixToShortStemHiraganaAdj,
-          opts.penalty_prefix_short_stem_hiragana_adj,
-          "prefix to short-stem hiragana adj"};
+  return {ConnectionPattern::PrefixToHiraganaAdj,
+          opts.penalty_prefix_hiragana_adj, "prefix to hiragana adj"};
+}
+
+// Note: PARTICLE → ADJ penalty was removed because:
+// 1. Particles like が, を, に before adjectives are grammatically valid
+// 2. The penalty for は + なはだしい at start causes worse fragmentation
+// 3. The proper fix is in adjective candidate generation (C2 task) to not break
+//    at particle characters within hiragana adjectives like はなはだしい
+// The PREFIX → ADJ rule (checkPrefixToHiraganaAdj) is kept since お/ご prefixes
+// before unknown hiragana adjectives are almost always misanalysis.
+ConnectionRuleResult checkParticleBeforeHiraganaAdj(
+    const core::LatticeEdge& /*prev*/, const core::LatticeEdge& /*next*/,
+    const ConnectionOptions& /*opts*/) {
+  return {};  // Disabled - see comment above
 }
 
 // Rule 8: だ/です + character speech suffix split penalty

@@ -1519,6 +1519,26 @@
         {"surface": "なさそう", "pos": "Adjective", "lemma": "ない"}
       ],
       "tags": ["s1_fix", "hiragana", "sou_pattern", "regression"]
+    },
+    {
+      "id": "s2_okogamashii",
+      "description": "S2 fix: おこがましい should be single ADJ, not お(PREFIX)+こがましい(ADJ)",
+      "input": "おこがましい",
+      "expected": [
+        {"surface": "おこがましい", "pos": "Adjective", "lemma": "おこがましい"}
+      ],
+      "tags": ["s2_fix", "hiragana", "prefix_split", "regression"]
+    },
+    {
+      "id": "s2_okogamashii_sentence",
+      "description": "S2 fix: おこがましい in sentence context",
+      "input": "おこがましいですが",
+      "expected": [
+        {"surface": "おこがましい", "pos": "Adjective", "lemma": "おこがましい"},
+        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "が", "pos": "Particle"}
+      ],
+      "tags": ["s2_fix", "hiragana", "prefix_split", "regression"]
     }
   ]
 }

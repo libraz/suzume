@@ -89,12 +89,11 @@ constexpr float kPenaltyShimaiAsAdj = scale::kSevere + scale::kMinor;  // 3.0
 // E.g., 読んどい from 読んどく - invalid adjective, should be verb とく contraction
 constexpr float kPenaltyVerbOnbinAsAdj = scale::kStrong + scale::kMinor;  // 2.0
 
-// Short-stem pure hiragana unknown adjective penalty
-// Valid short hiragana adjectives (すごい, うまい, やばい) are in dictionary
-// Unknown short-stem (≤2 chars) hiragana adjectives are likely misanalysis
-// E.g., いしい (stem いし = 2 chars) from お+いしい is not a real adjective
-// But おいしい (stem おいし = 3 chars) should not be penalized
-constexpr float kPenaltyShortStemHiraganaAdj = scale::kSevere + scale::kMinor;  // 3.0
+// Pure hiragana unknown adjective penalty (after PREFIX or single PARTICLE)
+// Valid hiragana adjectives (すごい, うまい, おこがましい) are in dictionary
+// Unknown pure hiragana adjectives after PREFIX/PARTICLE are likely misanalysis
+// E.g., お+こがましい should be おこがましい, は+なはだしい should be はなはだしい
+constexpr float kPenaltyHiraganaAdj = scale::kSevere + scale::kMinor;  // 3.0
 
 // =============================================================================
 // Connection Costs (Bigram penalties/bonuses)

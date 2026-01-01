@@ -32,8 +32,8 @@ struct EdgeOptions {
   // Adjective lemma containing verb onbin + contraction patterns
   float penalty_verb_onbin_as_adj = scorer::kPenaltyVerbOnbinAsAdj;
 
-  // Short-stem pure hiragana unknown adjective
-  float penalty_short_stem_hiragana_adj = scorer::kPenaltyShortStemHiraganaAdj;
+  // Pure hiragana unknown adjective (unused, kept for config compatibility)
+  float penalty_short_stem_hiragana_adj = scorer::kPenaltyHiraganaAdj;
 
   // Verb ending with たいらしい (should be split)
   float penalty_verb_tai_rashii = scorer::kPenaltyVerbTaiRashii;
@@ -190,9 +190,13 @@ struct ConnectionOptions {
   // Noun before verb-specific auxiliary
   float penalty_noun_before_verb_aux = scorer::kPenaltyNounBeforeVerbAux;
 
-  // PREFIX + short-stem pure hiragana adjective
-  // Used in connection context (お + いしい is likely misanalysis)
-  float penalty_prefix_short_stem_hiragana_adj = scorer::kPenaltyShortStemHiraganaAdj;
+  // PREFIX + pure hiragana adjective
+  // Used in connection context (お + こがましい is likely misanalysis)
+  float penalty_prefix_hiragana_adj = scorer::kPenaltyHiraganaAdj;
+
+  // PARTICLE + pure hiragana adjective
+  // Used in connection context (は + なはだしい is likely misanalysis)
+  float penalty_particle_before_hiragana_adj = scorer::kPenaltyHiraganaAdj;
 };
 
 /// Combined options for all connection rule scoring
