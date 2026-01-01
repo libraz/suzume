@@ -45,7 +45,8 @@
         {"surface": "ご", "pos": "Prefix"},
         {"surface": "検討", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
-        {"surface": "ほどよろしく", "pos": "Adjective", "lemma": "ほどよろしい"},
+        {"surface": "ほど", "pos": "Particle"},
+        {"surface": "よろしく", "pos": "Adverb"},
         {"surface": "お", "pos": "Prefix"},
         {"surface": "願い", "pos": "Noun"},
         {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}

@@ -546,21 +546,23 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     return candidates;
   }
 
-  // Skip if starting character is a particle that is NEVER an adjective stem
-  // Note: や is NOT included because やばい, やわらかい are valid i-adjectives
-  // Note: か and わ are included in isExtendedParticle, but we handle かわいい
-  // specially below by checking if the sequence forms a valid adjective
   char32_t first_char = codepoints[start_pos];
 
-  // Find hiragana sequence, breaking at particle boundaries
-  // Note: For i-adjectives, we allow longer sequences because conjugation
-  // patterns include か (かった), く (くない), etc.
-  // Also include prolonged sound mark (ー) as part of the sequence
-  size_t hiragana_end = start_pos;
-  while (hiragana_end < char_types.size() &&
-         hiragana_end - start_pos < 10) {  // Max 10 chars for adjective + endings
-    normalize::CharType curr_type = char_types[hiragana_end];
-    char32_t curr_char = codepoints[hiragana_end];
+  // Skip if first character is を (wo) - this is always a particle, never an adjective stem
+  // Unlike other particles (は, か, わ, etc.) that can start valid adjectives,
+  // を is exclusively an object marker and never begins a Japanese adjective
+  if (first_char == U'を') {
+    return candidates;
+  }
+
+  // STEP 1: Find maximum hiragana sequence (without breaking at particles)
+  // This allows us to analyze the full sequence first for adjectives like
+  // はなはだしい, かわいい, わびしい that contain particle characters
+  size_t max_hiragana_end = start_pos;
+  while (max_hiragana_end < char_types.size() &&
+         max_hiragana_end - start_pos < 10) {  // Max 10 chars for adjective + endings
+    normalize::CharType curr_type = char_types[max_hiragana_end];
+    char32_t curr_char = codepoints[max_hiragana_end];
 
     // Allow hiragana and prolonged sound mark (ー)
     bool is_valid = (curr_type == normalize::CharType::Hiragana);
@@ -571,34 +573,112 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     if (!is_valid) {
       break;
     }
-
-    // Only break at strong particle boundaries (を, が, は, に, etc.)
-    // after the first 3 characters (minimum adjective stem length)
-    // This allows patterns like まずかった, おいしくない
-    // But skip this check for prolonged sound marks and when followed by ー
-    if (hiragana_end - start_pos >= 3 && !normalize::isProlongedSoundMark(curr_char)) {
-      // Check if next char is ー - if so, don't break (e.g., かわいー)
-      bool next_is_prolonged = (hiragana_end + 1 < char_types.size() &&
-                                 normalize::isProlongedSoundMark(codepoints[hiragana_end + 1]));
-      if (!next_is_prolonged) {
-        // Break at extended particle boundaries + や
-        if (normalize::isExtendedParticle(curr_char) || curr_char == U'や') {
-          break;  // Stop before the particle
-        }
-      }
-    }
-    ++hiragana_end;
+    ++max_hiragana_end;
   }
 
   // Need at least 3 characters for an i-adjective (e.g., あつい)
-  if (hiragana_end <= start_pos + 2) {
+  if (max_hiragana_end <= start_pos + 2) {
     return candidates;
   }
 
-  // Check if this is an extended particle at start that should be skipped
-  // unless the sequence contains a prolonged sound mark (かわいー pattern)
-  if (normalize::isExtendedParticle(first_char) &&
-      !containsProlongedSoundMark(codepoints, start_pos, hiragana_end)) {
+  // STEP 2: Determine the hiragana_end for candidate generation
+  // If first char is a particle, we only allow the full sequence if it's a valid adjective
+  // Otherwise, we break at particle boundaries for shorter subsequences
+  size_t hiragana_end = max_hiragana_end;
+  bool starts_with_particle = normalize::isExtendedParticle(first_char);
+  bool has_prolonged = containsProlongedSoundMark(codepoints, start_pos, max_hiragana_end);
+
+  // For particle-starting sequences without prolonged sound marks,
+  // we first check if the full sequence is a valid adjective.
+  // If not, we'll skip generating candidates (the lattice will find the particle split)
+  size_t valid_adj_min_end = start_pos;  // Minimum end position for a valid adjective
+  if (starts_with_particle && !has_prolonged) {
+    // Check if the full sequence (or any length) forms a valid adjective
+    // Use lower threshold (0.50) for particle-starting sequences to catch
+    // words like かわいい (confidence=0.51)
+    for (size_t end = max_hiragana_end; end > start_pos + 2; --end) {
+      std::string test_surface = extractSubstring(codepoints, start_pos, end);
+
+      // Skip patterns ending with just く (adverbial form)
+      // This prevents よろしく, わくわく from being validated as adjectives
+      if (test_surface.size() >= core::kJapaneseCharBytes &&
+          test_surface.substr(test_surface.size() - core::kJapaneseCharBytes) == "く") {
+        // Allow くない (negative form), but skip just く
+        if (test_surface.size() < core::kThreeJapaneseCharBytes ||
+            test_surface.substr(test_surface.size() - core::kThreeJapaneseCharBytes) != "くない") {
+          continue;  // Skip - adverbial form, not adjective
+        }
+      }
+
+      // Skip patterns ending with just ない (negative auxiliary misidentified as adjective)
+      // This prevents でもない from being validated as an adjective
+      // Valid patterns: くない (adjective negative), but ない alone after particles is auxiliary
+      if (test_surface.size() >= core::kTwoJapaneseCharBytes &&
+          test_surface.substr(test_surface.size() - core::kTwoJapaneseCharBytes) == "ない") {
+        // Allow くない (adjective negative form)
+        if (test_surface.size() < core::kThreeJapaneseCharBytes ||
+            test_surface.substr(test_surface.size() - core::kThreeJapaneseCharBytes) != "くない") {
+          continue;  // Skip - likely negative auxiliary, not adjective
+        }
+      }
+
+      auto test_candidates = inflection.analyze(test_surface);
+      for (const auto& cand : test_candidates) {
+        if (cand.verb_type == grammar::VerbType::IAdjective &&
+            cand.confidence >= 0.50F) {
+          // For particle-starting sequences, require stem length >= 2 characters
+          // This prevents に+そうな from being recognized as にい (invalid)
+          // Real adjectives have stems of at least 2 chars: あつい, かわいい, etc.
+          size_t stem_chars = 0;
+          for (size_t i = 0; i < cand.stem.size(); ) {
+            auto byte = static_cast<uint8_t>(cand.stem[i]);
+            if ((byte & 0x80) == 0) { i += 1; }
+            else if ((byte & 0xE0) == 0xC0) { i += 2; }
+            else if ((byte & 0xF0) == 0xE0) { i += 3; }
+            else { i += 4; }
+            ++stem_chars;
+          }
+          if (stem_chars < 2) {
+            continue;  // Stem too short for a valid adjective
+          }
+          valid_adj_min_end = end;
+          break;
+        }
+      }
+      if (valid_adj_min_end > start_pos) {
+        break;  // Found a valid adjective length
+      }
+    }
+    // If no valid adjective found, skip this sequence
+    // (the lattice will find a better split with the particle)
+    if (valid_adj_min_end == start_pos) {
+      return candidates;
+    }
+    // Use the valid adjective length as hiragana_end
+    hiragana_end = valid_adj_min_end;
+  } else if (!starts_with_particle) {
+    // For non-particle-starting sequences, apply particle boundary breaking
+    // This handles cases like おいしい where we don't want to extend past particles
+    hiragana_end = start_pos;
+    while (hiragana_end < max_hiragana_end) {
+      char32_t curr_char = codepoints[hiragana_end];
+
+      // Only break at strong particle boundaries after minimum stem length
+      if (hiragana_end - start_pos >= 3 && !normalize::isProlongedSoundMark(curr_char)) {
+        bool next_is_prolonged = (hiragana_end + 1 < char_types.size() &&
+                                   normalize::isProlongedSoundMark(codepoints[hiragana_end + 1]));
+        if (!next_is_prolonged) {
+          if (normalize::isExtendedParticle(curr_char) || curr_char == U'や') {
+            break;  // Stop before the particle
+          }
+        }
+      }
+      ++hiragana_end;
+    }
+  }
+
+  // Need at least 3 characters after determining hiragana_end
+  if (hiragana_end <= start_pos + 2) {
     return candidates;
   }
 
@@ -622,6 +702,32 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       continue;  // Skip - godan negative renyokei
     }
 
+    // Skip patterns ending with just く (adverbial form of i-adjective)
+    // This prevents よろしく, わくわく from being recognized as adjectives.
+    // Valid i-adjective endings: い, かった, くない, ければ, さ, そう, etc.
+    // Note: くない is valid (negative), but just く is adverbial (not adjective POS)
+    if (surface.size() >= core::kJapaneseCharBytes &&
+        surface.substr(surface.size() - core::kJapaneseCharBytes) == "く") {
+      // Check if it's くない (negative form) - that's valid
+      if (surface.size() < core::kThreeJapaneseCharBytes ||
+          surface.substr(surface.size() - core::kThreeJapaneseCharBytes) != "くない") {
+        continue;  // Skip - just く ending (adverbial form)
+      }
+    }
+
+    // Skip patterns ending with just ない (negative auxiliary misidentified as adjective)
+    // This prevents でもない from being recognized as an adjective when starting with particle
+    // Valid patterns: くない (adjective negative), but ない alone after particles is auxiliary
+    if (starts_with_particle &&
+        surface.size() >= core::kTwoJapaneseCharBytes &&
+        surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "ない") {
+      // Allow くない (adjective negative form)
+      if (surface.size() < core::kThreeJapaneseCharBytes ||
+          surface.substr(surface.size() - core::kThreeJapaneseCharBytes) != "くない") {
+        continue;  // Skip - likely negative auxiliary, not adjective
+      }
+    }
+
     // Normalize prolonged sound marks before analysis
     // e.g., すごーい → すごおい, やばーい → やばあい
     std::string analysis_surface = surface;
@@ -639,9 +745,28 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       // For patterns with prolonged sound marks, lower threshold (0.40) since these
       // are intentional colloquial expressions (すごーい, やばーい)
       // Multiple consecutive marks (すごーーい) result in even lower confidence
-      float confidence_threshold = has_prolonged ? 0.40F : 0.55F;
+      // For particle-starting sequences, lower threshold (0.50) since these have
+      // already been validated as forming valid adjectives (はなはだしい, かわいい)
+      float confidence_threshold = has_prolonged ? 0.40F :
+                                   starts_with_particle ? 0.50F : 0.55F;
       if (cand.confidence >= confidence_threshold &&
           cand.verb_type == grammar::VerbType::IAdjective) {
+        // For particle-starting sequences, require stem length >= 2 characters
+        // This prevents に+そうな from being recognized as にい (invalid)
+        if (starts_with_particle) {
+          size_t stem_chars = 0;
+          for (size_t i = 0; i < cand.stem.size(); ) {
+            auto byte = static_cast<uint8_t>(cand.stem[i]);
+            if ((byte & 0x80) == 0) { i += 1; }
+            else if ((byte & 0xE0) == 0xC0) { i += 2; }
+            else if ((byte & 0xF0) == 0xE0) { i += 3; }
+            else { i += 4; }
+            ++stem_chars;
+          }
+          if (stem_chars < 2) {
+            continue;  // Stem too short for a valid adjective
+          }
+        }
         UnknownCandidate candidate;
         candidate.surface = surface;  // Keep original surface with ー
         candidate.start = start_pos;
@@ -652,6 +777,12 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         float cost = 0.3F + (1.0F - cand.confidence) * 0.3F;
         if (has_prolonged) {
           cost -= 0.1F;  // Bonus for colloquial patterns
+        }
+        // Strong bonus for adjectives starting with particle characters
+        // This helps はなはだしい, かわいい, わびしい beat the particle+adj split
+        // The full word being recognized as a valid adjective indicates it should be kept together
+        if (starts_with_particle) {
+          cost -= 0.6F;  // Significant bonus to beat particle split paths
         }
         candidate.cost = cost;
         candidate.has_suffix = false;

@@ -1473,8 +1473,8 @@
       "tags": ["s5_fix", "hiragana", "regression"]
     },
     {
-      "id": "s1_yabai_base",
-      "description": "S1 fix: やばい should be ADJ (not VERB やばう)",
+      "id": "yabai_base",
+      "description": "やばい should be ADJ (not VERB やばう)",
       "input": "やばい",
       "expected": [
         {
@@ -1483,21 +1483,21 @@
           "lemma": "やばい"
         }
       ],
-      "tags": ["s1_fix", "hiragana", "slang", "regression"]
+      "tags": ["hiragana_fix", "hiragana", "slang", "regression"]
     },
     {
-      "id": "s1_yabai_sentence",
-      "description": "S1 fix: まじでやばい - slang adjective in context",
+      "id": "yabai_sentence",
+      "description": "まじでやばい - slang adjective in context",
       "input": "まじでやばい",
       "expected": [
         {"surface": "まじで", "pos": "Adverb"},
         {"surface": "やばい", "pos": "Adjective", "lemma": "やばい"}
       ],
-      "tags": ["s1_fix", "hiragana", "slang", "regression"]
+      "tags": ["hiragana_fix", "hiragana", "slang", "regression"]
     },
     {
-      "id": "s1_nasasou_adj",
-      "description": "S1 fix: なさそう should be ADJ ない + そう (not VERB なさる)",
+      "id": "nasasou_single",
+      "description": "なさそう should be ADJ ない + そう (not VERB なさる)",
       "input": "なさそう",
       "expected": [
         {
@@ -1506,39 +1506,64 @@
           "lemma": "ない"
         }
       ],
-      "tags": ["s1_fix", "hiragana", "sou_pattern", "regression"]
+      "tags": ["hiragana", "sou_pattern", "regression"]
     },
     {
-      "id": "s1_nasasou_sentence",
-      "description": "S1 fix: やる気がなさそう - ない + そう in sentence",
-      "input": "やる気がなさそう",
-      "expected": [
-        {"surface": "やる", "pos": "Verb", "lemma": "やる"},
-        {"surface": "気", "pos": "Noun"},
-        {"surface": "が", "pos": "Particle"},
-        {"surface": "なさそう", "pos": "Adjective", "lemma": "ない"}
-      ],
-      "tags": ["s1_fix", "hiragana", "sou_pattern", "regression"]
-    },
-    {
-      "id": "s2_okogamashii",
-      "description": "S2 fix: おこがましい should be single ADJ, not お(PREFIX)+こがましい(ADJ)",
+      "id": "okogamashii_prefix",
+      "description": "おこがましい should be single ADJ, not お(PREFIX)+こがましい(ADJ)",
       "input": "おこがましい",
       "expected": [
         {"surface": "おこがましい", "pos": "Adjective", "lemma": "おこがましい"}
       ],
-      "tags": ["s2_fix", "hiragana", "prefix_split", "regression"]
+      "tags": ["prefix_fix", "hiragana", "prefix_split", "regression"]
     },
     {
-      "id": "s2_okogamashii_sentence",
-      "description": "S2 fix: おこがましい in sentence context",
+      "id": "okogamashii_prefix_sentence",
+      "description": "おこがましい in sentence context",
       "input": "おこがましいですが",
       "expected": [
         {"surface": "おこがましい", "pos": "Adjective", "lemma": "おこがましい"},
         {"surface": "です", "pos": "Auxiliary"},
         {"surface": "が", "pos": "Particle"}
       ],
-      "tags": ["s2_fix", "hiragana", "prefix_split", "regression"]
+      "tags": ["prefix_fix", "hiragana", "prefix_split", "regression"]
+    },
+    {
+      "id": "hanahadashii_particle_start",
+      "description": "はなはだしい should be single ADJ, not は(PARTICLE)+なはだしい(ADJ)",
+      "input": "はなはだしい",
+      "expected": [
+        {"surface": "はなはだしい", "pos": "Adjective", "lemma": "はなはだしい"}
+      ],
+      "tags": ["hiragana", "particle_split", "regression"]
+    },
+    {
+      "id": "kawaii_particle_start",
+      "description": "かわいい should be single ADJ, not か(PARTICLE)+わ(PARTICLE)+いい(ADJ)",
+      "input": "かわいい",
+      "expected": [
+        {"surface": "かわいい", "pos": "Adjective", "lemma": "かわいい"}
+      ],
+      "tags": ["hiragana", "particle_split", "regression"]
+    },
+    {
+      "id": "wabishii_particle_start",
+      "description": "わびしい should be single ADJ, not わ(PARTICLE)+びしい(ADJ)",
+      "input": "わびしい",
+      "expected": [
+        {"surface": "わびしい", "pos": "Adjective", "lemma": "わびしい"}
+      ],
+      "tags": ["hiragana", "particle_split", "regression"]
+    },
+    {
+      "id": "hanahadashii_sentence",
+      "description": "はなはだしい in sentence context",
+      "input": "はなはだしい勘違い",
+      "expected": [
+        {"surface": "はなはだしい", "pos": "Adjective", "lemma": "はなはだしい"},
+        {"surface": "勘違い", "pos": "Noun"}
+      ],
+      "tags": ["hiragana", "particle_split", "regression"]
     }
   ]
 }

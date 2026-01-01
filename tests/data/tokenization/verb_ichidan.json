@@ -638,7 +638,7 @@
           "lemma": "見る"
         }
       ],
-      "tags": ["s1_fix", "passive", "desiderative", "regression"]
+      "tags": ["particle_fix", "passive", "desiderative", "regression"]
     },
     {
       "id": "passive_desiderative_taberaretai",
@@ -651,7 +651,7 @@
           "lemma": "食べる"
         }
       ],
-      "tags": ["s1_fix", "passive", "desiderative", "regression"]
+      "tags": ["particle_fix", "passive", "desiderative", "regression"]
     },
     {
       "id": "passive_desiderative_aisaretai",
@@ -664,7 +664,7 @@
           "lemma": "愛す"
         }
       ],
-      "tags": ["s1_fix", "passive", "desiderative", "regression"]
+      "tags": ["particle_fix", "passive", "desiderative", "regression"]
     }
   ]
 }
