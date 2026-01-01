@@ -7,6 +7,7 @@
 
 #include <unordered_set>
 
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 
 namespace suzume::grammar {
@@ -53,19 +54,11 @@ bool endsWithRenyokeiMarker(std::string_view stem) {
 }
 
 bool isERowCodepoint(char32_t cp) {
-  // え段: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
-  return cp == U'え' || cp == U'け' || cp == U'せ' || cp == U'て' ||
-         cp == U'ね' || cp == U'へ' || cp == U'め' || cp == U'れ' ||
-         cp == U'げ' || cp == U'ぜ' || cp == U'で' || cp == U'べ' ||
-         cp == U'ぺ';
+  return kana::isERowCodepoint(cp);
 }
 
 bool isIRowCodepoint(char32_t cp) {
-  // い段: い, き, ぎ, し, じ, ち, ぢ, に, ひ, び, ぴ, み, り
-  return cp == U'い' || cp == U'き' || cp == U'ぎ' || cp == U'し' ||
-         cp == U'じ' || cp == U'ち' || cp == U'ぢ' || cp == U'に' ||
-         cp == U'ひ' || cp == U'び' || cp == U'ぴ' || cp == U'み' ||
-         cp == U'り';
+  return kana::isIRowCodepoint(cp);
 }
 
 bool endsWithChar(std::string_view stem, const char* chars[], size_t count) {
@@ -87,18 +80,11 @@ bool isAllKanji(std::string_view stem) {
   }
   size_t pos = 0;
   while (pos < stem.size()) {
-    const unsigned char* ptr =
-        reinterpret_cast<const unsigned char*>(stem.data() + pos);
-    if ((ptr[0] & 0xF0) != 0xE0) {
-      return false;  // Not a 3-byte UTF-8 sequence
+    if (!utf8::is3ByteUtf8At(stem, pos)) {
+      return false;
     }
-    char32_t codepoint =
-        ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
-    // CJK Unified Ideographs: U+4E00-U+9FFF
-    // CJK Extension A: U+3400-U+4DBF
-    bool is_kanji = (codepoint >= 0x4E00 && codepoint <= 0x9FFF) ||
-                    (codepoint >= 0x3400 && codepoint <= 0x4DBF);
-    if (!is_kanji) {
+    char32_t codepoint = utf8::decode3ByteUtf8At(stem, pos);
+    if (!kana::isKanjiCodepoint(codepoint)) {
       return false;
     }
     pos += core::kJapaneseCharBytes;
@@ -107,23 +93,8 @@ bool isAllKanji(std::string_view stem) {
 }
 
 bool endsWithKanji(std::string_view stem) {
-  if (stem.size() < core::kJapaneseCharBytes) {
-    return false;
-  }
-  // Decode last UTF-8 character
-  // Kanji in UTF-8 is 3 bytes: E4-E9 xx xx (U+4E00-U+9FFF)
-  const unsigned char* ptr =
-      reinterpret_cast<const unsigned char*>(stem.data() + stem.size() - core::kJapaneseCharBytes);
-  if ((ptr[0] & 0xF0) == 0xE0) {
-    // 3-byte UTF-8 sequence
-    char32_t codepoint =
-        ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
-    // CJK Unified Ideographs: U+4E00-U+9FFF
-    // CJK Extension A: U+3400-U+4DBF
-    return (codepoint >= 0x4E00 && codepoint <= 0x9FFF) ||
-           (codepoint >= 0x3400 && codepoint <= 0x4DBF);
-  }
-  return false;
+  char32_t cp = utf8::decodeLastChar(stem);
+  return cp != 0 && kana::isKanjiCodepoint(cp);
 }
 
 bool containsKanji(std::string_view stem) {
@@ -132,22 +103,13 @@ bool containsKanji(std::string_view stem) {
   }
   size_t pos = 0;
   while (pos + core::kJapaneseCharBytes <= stem.size()) {
-    const unsigned char* ptr =
-        reinterpret_cast<const unsigned char*>(stem.data() + pos);
-    if ((ptr[0] & 0xF0) == 0xE0) {
-      // 3-byte UTF-8 sequence
-      char32_t codepoint =
-          ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
-      // CJK Unified Ideographs: U+4E00-U+9FFF
-      // CJK Extension A: U+3400-U+4DBF
-      bool is_kanji = (codepoint >= 0x4E00 && codepoint <= 0x9FFF) ||
-                      (codepoint >= 0x3400 && codepoint <= 0x4DBF);
-      if (is_kanji) {
+    if (utf8::is3ByteUtf8At(stem, pos)) {
+      char32_t codepoint = utf8::decode3ByteUtf8At(stem, pos);
+      if (kana::isKanjiCodepoint(codepoint)) {
         return true;
       }
       pos += core::kJapaneseCharBytes;
     } else {
-      // Skip non-3-byte sequences
       pos += 1;
     }
   }
@@ -160,22 +122,13 @@ bool containsKatakana(std::string_view stem) {
   }
   size_t pos = 0;
   while (pos + core::kJapaneseCharBytes <= stem.size()) {
-    const unsigned char* ptr =
-        reinterpret_cast<const unsigned char*>(stem.data() + pos);
-    if ((ptr[0] & 0xF0) == 0xE0) {
-      // 3-byte UTF-8 sequence
-      char32_t codepoint =
-          ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
-      // Katakana: U+30A0-U+30FF
-      // Katakana Phonetic Extensions: U+31F0-U+31FF
-      bool is_katakana = (codepoint >= 0x30A0 && codepoint <= 0x30FF) ||
-                         (codepoint >= 0x31F0 && codepoint <= 0x31FF);
-      if (is_katakana) {
+    if (utf8::is3ByteUtf8At(stem, pos)) {
+      char32_t codepoint = utf8::decode3ByteUtf8At(stem, pos);
+      if (kana::isKatakanaCodepoint(codepoint)) {
         return true;
       }
       pos += core::kJapaneseCharBytes;
     } else {
-      // Skip non-3-byte sequences
       pos += 1;
     }
   }
@@ -188,16 +141,11 @@ bool isPureHiragana(std::string_view stem) {
   }
   size_t pos = 0;
   while (pos < stem.size()) {
-    const unsigned char* ptr =
-        reinterpret_cast<const unsigned char*>(stem.data() + pos);
-    if ((ptr[0] & 0xF0) != 0xE0) {
-      return false;  // Not a 3-byte UTF-8 sequence (not hiragana)
+    if (!utf8::is3ByteUtf8At(stem, pos)) {
+      return false;
     }
-    char32_t codepoint =
-        ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
-    // Hiragana: U+3040-U+309F
-    bool is_hiragana = (codepoint >= 0x3040 && codepoint <= 0x309F);
-    if (!is_hiragana) {
+    char32_t codepoint = utf8::decode3ByteUtf8At(stem, pos);
+    if (!kana::isHiraganaCodepoint(codepoint)) {
       return false;
     }
     pos += core::kJapaneseCharBytes;
@@ -217,17 +165,8 @@ bool isSmallKana(std::string_view ch) {
 }
 
 bool startsWithHiragana(std::string_view s) {
-  if (s.size() < core::kJapaneseCharBytes) {
-    return false;
-  }
-  const auto* ptr = reinterpret_cast<const unsigned char*>(s.data());
-  if ((ptr[0] & 0xF0) != 0xE0) {
-    return false;  // Not a 3-byte UTF-8 sequence
-  }
-  char32_t codepoint =
-      ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
-  // Hiragana: U+3040-U+309F
-  return codepoint >= 0x3040 && codepoint <= 0x309F;
+  char32_t cp = utf8::decodeFirstChar(s);
+  return cp != 0 && kana::isHiraganaCodepoint(cp);
 }
 
 // A-row (あ段) endings for verb mizenkei detection

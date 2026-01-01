@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+#include "analysis/scorer_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/patterns.h"
@@ -294,7 +295,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
            renyokei_char == "び" || renyokei_char == "り" ||
            renyokei_char == "に") &&
           hiragana_part.size() >= core::kThreeJapaneseCharBytes &&
-          hiragana_part.substr(core::kJapaneseCharBytes, core::kTwoJapaneseCharBytes) == "そう") {
+          hiragana_part.substr(core::kJapaneseCharBytes, core::kTwoJapaneseCharBytes) == scorer::kSuffixSou) {
         // This is verb renyokei + そう pattern (with optional だ/です/etc.)
         continue;  // Skip - likely verb renyokei + そう, not i-adjective
       }

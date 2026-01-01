@@ -1,6 +1,7 @@
 #include "analysis/connection_rules.h"
 
 #include "analysis/connection_rules_internal.h"
+#include "analysis/scorer_constants.h"
 
 namespace suzume::analysis {
 
@@ -34,7 +35,7 @@ bool startsWithTe(std::string_view surface) {
 }
 
 bool endsWithSou(std::string_view surface) {
-  return utf8::endsWith(surface, "そう");
+  return utf8::endsWith(surface, scorer::kSuffixSou);
 }
 
 bool endsWithYou(std::string_view surface) {

@@ -95,19 +95,22 @@ inline bool shouldSkipSouPattern(std::string_view surface,
   bool has_sou_pattern = false;
 
   // Check for そう at end
-  if (surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "そう") {
+  if (surface.substr(surface.size() - core::kTwoJapaneseCharBytes) ==
+      scorer::kSuffixSou) {
     has_sou_pattern = true;
   }
-  // Check for そうです at end
+  // Check for そうです at end (そう + です)
+  constexpr const char* kSouDesu = "そうです";
   if (surface.size() >= core::kFourJapaneseCharBytes &&
       surface.substr(surface.size() - core::kFourJapaneseCharBytes) ==
-          "そうです") {
+          kSouDesu) {
     has_sou_pattern = true;
   }
-  // Check for そうだ at end
+  // Check for そうだ at end (そう + だ)
+  constexpr const char* kSouDa = "そうだ";
   if (surface.size() >= core::kThreeJapaneseCharBytes &&
       surface.substr(surface.size() - core::kThreeJapaneseCharBytes) ==
-          "そうだ") {
+          kSouDa) {
     has_sou_pattern = true;
   }
 

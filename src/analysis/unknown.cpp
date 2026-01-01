@@ -13,6 +13,7 @@
 #include <algorithm>
 
 #include "adjective_candidates.h"
+#include "analysis/scorer_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
@@ -664,7 +665,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
       // Skip patterns ending with そう - these are aspectual auxiliary patterns
       // that should be handled by verb/adjective + そう analysis, not as character speech
       if (surface.size() >= core::kTwoJapaneseCharBytes &&
-          surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "そう") {
+          surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == scorer::kSuffixSou) {
         continue;
       }
 

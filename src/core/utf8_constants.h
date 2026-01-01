@@ -140,6 +140,53 @@ using suzume::core::kThreeJapaneseCharBytes;
   return dropLast(s, kTwoJapaneseCharBytes);
 }
 
+// =============================================================================
+// UTF-8 Decoding Utilities for Japanese Characters
+// =============================================================================
+// These functions decode 3-byte UTF-8 sequences (Japanese characters).
+// They replace the common pattern:
+//   const unsigned char* ptr = reinterpret_cast<const unsigned char*>(s.data() + pos);
+//   if ((ptr[0] & 0xF0) != 0xE0) { return false; }
+//   char32_t cp = ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
+
+/// Check if byte at position starts a 3-byte UTF-8 sequence
+/// @param s The string to check
+/// @param pos Byte position
+/// @return true if position starts a 3-byte sequence (Japanese character)
+[[nodiscard]] inline bool is3ByteUtf8At(std::string_view s, size_t pos) noexcept {
+  if (pos + kJapaneseCharBytes > s.size()) return false;
+  auto byte = static_cast<unsigned char>(s[pos]);
+  return (byte & 0xF0) == 0xE0;
+}
+
+/// Decode 3-byte UTF-8 at position (assumes valid 3-byte sequence)
+/// @param s The string to decode from
+/// @param pos Byte position (must be valid 3-byte start)
+/// @return Unicode codepoint
+[[nodiscard]] inline char32_t decode3ByteUtf8At(std::string_view s, size_t pos) noexcept {
+  const auto* ptr = reinterpret_cast<const unsigned char*>(s.data() + pos);
+  return static_cast<char32_t>(
+      ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F));
+}
+
+/// Decode last Japanese character as codepoint
+/// @param s The string (must have at least 3 bytes)
+/// @return Unicode codepoint, or 0 if invalid
+[[nodiscard]] inline char32_t decodeLastChar(std::string_view s) noexcept {
+  if (s.size() < kJapaneseCharBytes) return 0;
+  size_t pos = s.size() - kJapaneseCharBytes;
+  if (!is3ByteUtf8At(s, pos)) return 0;
+  return decode3ByteUtf8At(s, pos);
+}
+
+/// Decode first Japanese character as codepoint
+/// @param s The string (must have at least 3 bytes)
+/// @return Unicode codepoint, or 0 if invalid
+[[nodiscard]] inline char32_t decodeFirstChar(std::string_view s) noexcept {
+  if (!is3ByteUtf8At(s, 0)) return 0;
+  return decode3ByteUtf8At(s, 0);
+}
+
 }  // namespace utf8
 
 #endif  // SUZUME_CORE_UTF8_CONSTANTS_H_
