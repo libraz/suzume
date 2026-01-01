@@ -2889,6 +2889,50 @@
         {"surface": "あらって", "pos": "Verb", "lemma": "あらう"}
       ],
       "tags": ["p4", "godanwa", "hiragana-verb", "te-form", "unknown"]
+    },
+    {
+      "id": "kanji_totta_godanra",
+      "description": "取った - GodanRa past form",
+      "input": "本を取った",
+      "expected": [
+        {"surface": "本", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "取った", "pos": "Verb", "lemma": "取る"}
+      ],
+      "tags": ["godanra", "kanji-verb", "past-form"]
+    },
+    {
+      "id": "kanji_motte_godanta",
+      "description": "持って - GodanTa te-form",
+      "input": "荷物を持って",
+      "expected": [
+        {"surface": "荷物", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "持って", "pos": "Verb", "lemma": "持つ"}
+      ],
+      "tags": ["godanta", "kanji-verb", "te-form"]
+    },
+    {
+      "id": "kanji_aratta_godanwa",
+      "description": "洗った - GodanWa past form (kanji)",
+      "input": "手を洗った",
+      "expected": [
+        {"surface": "手", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "洗った", "pos": "Verb", "lemma": "洗う"}
+      ],
+      "tags": ["godanwa", "kanji-verb", "past-form"]
+    },
+    {
+      "id": "kanji_suwatta_godanra",
+      "description": "座った - GodanRa past form",
+      "input": "椅子に座った",
+      "expected": [
+        {"surface": "椅子", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "座った", "pos": "Verb", "lemma": "座る"}
+      ],
+      "tags": ["godanra", "kanji-verb", "past-form"]
     }
   ]
 }
