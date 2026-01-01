@@ -4,7 +4,7 @@
   "cases": [
     {
       "id": "edge_repeated_char",
-      "description": "あああああ - repeated character",
+      "description": "あああああ - repeated character (first あ separate, ああああ as doubled pattern)",
       "input": "あああああ",
       "expected": [
         {
@@ -12,11 +12,7 @@
           "pos": "Other"
         },
         {
-          "surface": "ああ",
-          "pos": "Adverb"
-        },
-        {
-          "surface": "ああ",
+          "surface": "ああああ",
           "pos": "Adverb"
         }
       ],

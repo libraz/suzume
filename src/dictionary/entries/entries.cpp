@@ -88,7 +88,8 @@ std::vector<DictionaryEntry> getCompoundParticleEntries() {
       {"によると", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
 
       // Place/Situation (場所・状況)
-      {"において", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      // Lower cost to prevent split as に + おいて (verb)
+      {"において", POS::Particle, -0.3F, "", false, false, false, CT::None, ""},
       {"にて", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
 
       // Capacity/Viewpoint (資格・観点)
@@ -539,7 +540,8 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
       {"通り", POS::Noun, 2.0F, "", false, true, false, CT::None, "とおり"},
       {"限り", POS::Noun, 2.0F, "", false, true, false, CT::None, "かぎり"},
       // Suffix-like formal nouns
-      {"付け", POS::Noun, 0.3F, "", false, true, false, CT::None, "つけ"},
+      // Lower cost for 付け to compete with verb_kanji ichidan pattern
+      {"付け", POS::Noun, -0.3F, "", false, true, false, CT::None, "つけ"},
       {"付", POS::Noun, 0.5F, "", false, true, false, CT::None, "つけ"},
       // Hiragana-only forms
       {"よう", POS::Noun, 2.0F, "", false, true, false, CT::None, ""},
@@ -554,11 +556,7 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
       {"仕方", POS::Noun, 0.3F, "", false, true, false, CT::None, "しかた"},
       {"ありきたり", POS::Noun, 0.3F, "ありきたり", false, true, false, CT::None, ""},  // na-adjective stem, not suru-verb
       {"たたずまい", POS::Noun, 0.3F, "たたずまい", false, true, false, CT::None, ""},  // noun, not suru-verb
-      // 〜がち forms (V連用形+がち → na-adjective)
-      {"ありがち", POS::Noun, 0.3F, "ありがち", false, true, false, CT::None, ""},
-      {"なりがち", POS::Noun, 0.3F, "なりがち", false, true, false, CT::None, ""},
-      {"忘れがち", POS::Noun, 0.3F, "忘れがち", false, true, false, CT::None, "わすれがち"},
-      {"遅れがち", POS::Noun, 0.3F, "遅れがち", false, true, false, CT::None, "おくれがち"},
+      // NOTE: 〜がち forms are now handled by generateGachiSuffixCandidates() in suffix_candidates.cpp
       // B35: Idiom component (eaves bracket - used in うだつが上がらない)
       {"うだつ", POS::Noun, 0.3F, "うだつ", false, true, false, CT::None, ""},
   };
@@ -732,9 +730,8 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"ら", POS::Suffix, 0.5F, "ら", false, false, true, CT::None, "ら"},
       {"ども", POS::Suffix, 0.8F, "ども", false, false, true, CT::None, "ども"},
       {"がた", POS::Suffix, 0.8F, "がた", false, false, true, CT::None, "がた"},
-
-      // がち suffix (verb renyokei + がち → na-adjective)
-      {"がち", POS::Suffix, 0.3F, "がち", false, false, true, CT::None, ""},
+      // NOTE: がち suffix is now handled by generateGachiSuffixCandidates() and
+      // generateProductiveSuffixCandidates() - no dictionary entry needed
 
       // Temporal suffixes (時間接尾語)
       {"ごろ", POS::Suffix, -2.5F, "", false, false, true, CT::None, ""},
@@ -1227,7 +1224,23 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"いけなかった", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
       {"ゆく", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
       {"ゆかない", POS::Verb, 1.2F, "いく", false, false, false, CT::GodanKa, ""},
-      {"いただく", POS::Verb, 0.3F, "いただく", false, false, false, CT::GodanKa, ""},
+      // いただく系 (itadaku - to receive, honorific)
+      // Uses explicit forms like other honorific verbs (not auto-expanded)
+      // This ensures いただきます stays as single token (not split as いただき+ます)
+      {"いただく", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただいて", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただいた", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただき", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただかない", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただきます", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただきました", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただきまして", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただきたい", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただける", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただけます", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただければ", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただけない", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
+      {"いただけません", POS::Verb, 0.3F, "いただく", false, false, false, CT::None, ""},
       {"とく", POS::Verb, 0.3F, "とく", false, false, true, CT::GodanKa, ""},
       {"っとく", POS::Verb, -0.5F, "とく", false, false, true, CT::GodanKa, ""},
       {"てく", POS::Verb, 0.3F, "てく", false, false, true, CT::GodanKa, ""},
@@ -1259,6 +1272,8 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"しまる", POS::Verb, 0.3F, "しまる", false, false, false, CT::GodanRa, ""},
       {"こだわる", POS::Verb, 0.3F, "こだわる", false, false, false, CT::GodanRa, ""},
       {"あなどる", POS::Verb, 0.3F, "あなどる", false, false, false, CT::GodanRa, ""},  // to despise
+      {"たたる", POS::Verb, 0.3F, "たたる", false, false, false, CT::GodanRa, ""},  // to curse (祟る)
+      {"あおる", POS::Verb, 0.3F, "あおる", false, false, false, CT::GodanRa, ""},  // to incite (煽る)
 
       // Godan-Wa verbs (五段ワ行)
       {"もらう", POS::Verb, 0.3F, "もらう", false, false, false, CT::GodanWa, ""},
@@ -1280,6 +1295,8 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
 
       // Godan-Ga verbs (五段ガ行) - particle-like starts
       {"しのぐ", POS::Verb, 0.3F, "しのぐ", false, false, false, CT::GodanGa, ""},
+      // Kanji compound verbs (漢字複合動詞) - common GodanGa patterns
+      {"相次ぐ", POS::Verb, 0.3F, "相次ぐ", false, false, false, CT::GodanGa, ""},  // to follow one after another
 
       // Suru verb (サ変動詞)
       {"する", POS::Verb, 0.5F, "する", false, false, false, CT::Suru, ""},
@@ -1436,9 +1453,11 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"差し上げる", POS::Verb, 0.3F, "差し上げる", false, false, false, CT::Ichidan, "さしあげる"},
 
       // Special Godan verbs with irregular euphonic changes
+      // 行く has irregular ta/te forms (行った/行って instead of 行いた/行いて)
+      // Base form uses GodanKa expansion, explicit forms use CT::None to prevent re-expansion
       {"行く", POS::Verb, 0.3F, "行く", false, false, false, CT::GodanKa, "いく"},
-      {"行った", POS::Verb, 0.3F, "行く", false, false, false, CT::GodanKa, "いった"},
-      {"行って", POS::Verb, 0.3F, "行く", false, false, false, CT::GodanKa, "いって"},
+      {"行った", POS::Verb, 0.1F, "行く", false, false, false, CT::None, "いった"},
+      {"行って", POS::Verb, 0.1F, "行く", false, false, false, CT::None, "いって"},
 
       // Common GodanKa verbs
       {"書く", POS::Verb, 0.3F, "書く", false, false, false, CT::GodanKa, "かく"},

@@ -103,6 +103,42 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types);
 
+/**
+ * @brief Generate productive suffix candidates for hiragana sequences
+ *
+ * Detects productive suffix patterns attached to verb stems:
+ *   - V連用形 + がち (tendency): ありがち、なりがち
+ *   - V連用形 + っぽい (resemblance): 忘れっぽい、怒りっぽい
+ *
+ * These patterns allow recognition without explicit dictionary entries.
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param char_types Character types for each position
+ * @return Vector of candidates
+ */
+std::vector<UnknownCandidate> generateProductiveSuffixCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types);
+
+/**
+ * @brief Generate がち suffix candidates for kanji+hiragana sequences
+ *
+ * Detects kanji verb stem + がち patterns:
+ *   - 忘れがち (忘れる renyokei + がち)
+ *   - 遅れがち (遅れる renyokei + がち)
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param char_types Character types for each position
+ * @return Vector of candidates
+ */
+std::vector<UnknownCandidate> generateGachiSuffixCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types);
+
 }  // namespace suzume::analysis
 
 #endif  // SUZUME_ANALYSIS_SUFFIX_CANDIDATES_H_

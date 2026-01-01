@@ -2803,6 +2803,32 @@
         }
       ],
       "tags": ["s4_fix", "hiragana_verb", "regression"]
+    },
+    {
+      "id": "itta_lemma_iku",
+      "description": "行った lemma should be 行く (not 行う)",
+      "input": "行った",
+      "expected": [
+        {
+          "surface": "行った",
+          "pos": "Verb",
+          "lemma": "行く"
+        }
+      ],
+      "tags": ["iku_irregular", "lemma", "regression"]
+    },
+    {
+      "id": "itte_lemma_iku",
+      "description": "行って lemma should be 行く (not 行う)",
+      "input": "行って",
+      "expected": [
+        {
+          "surface": "行って",
+          "pos": "Verb",
+          "lemma": "行く"
+        }
+      ],
+      "tags": ["iku_irregular", "lemma", "regression"]
     }
   ]
 }

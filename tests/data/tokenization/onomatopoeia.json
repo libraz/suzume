@@ -22,13 +22,45 @@
       ]
     },
     {
+      "id": "onomatopoeia_nyanyaa",
+      "description": "ニャーニャー (cat meow) - AA doubled pattern with small kana",
+      "input": "ニャーニャー",
+      "expected": [
+        {
+          "surface": "ニャーニャー",
+          "pos": "Adverb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "onomatopoeia",
+        "aa_pattern"
+      ]
+    },
+    {
+      "id": "onomatopoeia_wanwan",
+      "description": "ワンワン (dog bark) - AA doubled pattern",
+      "input": "ワンワン",
+      "expected": [
+        {
+          "surface": "ワンワン",
+          "pos": "Adverb"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "onomatopoeia",
+        "aa_pattern"
+      ]
+    },
+    {
       "id": "onomatopoeia_kirakira",
       "description": "キラキラ光る (sparkling)",
       "input": "キラキラ光る",
       "expected": [
         {
           "surface": "キラキラ",
-          "pos": "Noun"
+          "pos": "Adverb"
         },
         {
           "surface": "光る",
@@ -48,7 +80,7 @@
       "expected": [
         {
           "surface": "ガタガタ",
-          "pos": "Noun"
+          "pos": "Adverb"
         },
         {
           "surface": "揺れる",
@@ -515,7 +547,7 @@
     },
     {
       "id": "fukkura_adv",
-      "description": "ふっくら should be ADV (B62) - NOTE: 焼ける ichidan lemma needs separate fix (currently 焼く godan)",
+      "description": "ふっくら should be ADV (B62) - 焼ける is Ichidan verb",
       "input": "ふっくら焼けた",
       "expected": [
         {
@@ -525,7 +557,7 @@
         {
           "surface": "焼けた",
           "pos": "Verb",
-          "lemma": "焼く"
+          "lemma": "焼ける"
         }
       ],
       "tags": [

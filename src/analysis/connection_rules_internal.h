@@ -50,6 +50,12 @@ inline bool isVerbToAdj(const core::LatticeEdge& prev,
          next.pos == core::PartOfSpeech::Adjective;
 }
 
+inline bool isVerbToNoun(const core::LatticeEdge& prev,
+                         const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Verb &&
+         next.pos == core::PartOfSpeech::Noun;
+}
+
 // Noun connection patterns
 inline bool isNounToAux(const core::LatticeEdge& prev,
                         const core::LatticeEdge& next) {
@@ -200,6 +206,10 @@ ConnectionRuleResult checkYasuiAfterRenyokei(const core::LatticeEdge& prev,
 ConnectionRuleResult checkNagaraSplit(const core::LatticeEdge& prev,
                                       const core::LatticeEdge& next,
                                       const ConnectionOptions& opts);
+
+ConnectionRuleResult checkKataAfterRenyokei(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next,
+                                            const ConnectionOptions& opts);
 
 ConnectionRuleResult checkSouAfterRenyokei(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,

@@ -117,8 +117,14 @@ constexpr float kBonusTaiAfterRenyokei = 0.8F;
 constexpr float kPenaltyYasuiAfterRenyokei = scale::kStrong + scale::kMinor;  // 2.0
 
 // VERB + ながら split when verb is in renyokei
-// Should be single token like 飲みながら
-constexpr float kPenaltyNagaraSplit = scale::kModerate;
+// Should be single token like 飲みながら, 歩きながら
+// Strong penalty needed because dictionary renyokei entries (e.g., 歩き) have low cost
+constexpr float kPenaltyNagaraSplit = scale::kStrong;
+
+// VERB renyokei + 方 when verb should be nominalized
+// 解き方, 読み方, 書き方 - the verb renyokei is used as a nominalized noun
+// Strong penalty to force nominalized noun candidate
+constexpr float kPenaltyKataAfterRenyokei = scale::kStrong;
 
 // NOUN + そう when noun looks like verb renyokei
 // Should be verb renyokei + そう auxiliary

@@ -219,6 +219,23 @@ ConnectionRuleResult checkNagaraSplit(const core::LatticeEdge& prev,
           "nagara split after renyokei verb"};
 }
 
+// Rule 6b: Verb renyokei + 方 penalty (should be nominalized)
+// 解き方, 読み方, 書き方 - the verb should be nominalized, not VERB
+ConnectionRuleResult checkKataAfterRenyokei(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next,
+                                            const ConnectionOptions& opts) {
+  if (!isVerbToNoun(prev, next)) return {};
+
+  if (next.surface != "方") return {};
+
+  if (!endsWithRenyokeiMarker(prev.surface)) {
+    return {};
+  }
+
+  return {ConnectionPattern::KataAfterRenyokei, opts.penalty_kata_after_renyokei,
+          "kata after renyokei verb (should be nominalized)"};
+}
+
 // Rule 7: Renyokei-like noun + そう (adverb) penalty
 ConnectionRuleResult checkSouAfterRenyokei(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,

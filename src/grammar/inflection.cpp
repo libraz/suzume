@@ -233,6 +233,19 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       candidate.confidence = calculateConfidence(
           actual_verb_type, stem, aux_total_len, aux_chain.size(), required_conn,
           suffix_str.size());
+
+      // Ichidan verbs use て/た for te/ta-form, NOT で/だ
+      // で/だ are only used for 撥音便 Godan verbs (読む→読んで/読んだ, 遊ぶ→遊んで/遊んだ)
+      // Penalize Ichidan + で/だ combinations heavily
+      if (actual_verb_type == VerbType::Ichidan &&
+          suffix_str.size() >= core::kJapaneseCharBytes) {
+        std::string_view first_char = suffix_str.substr(0, core::kJapaneseCharBytes);
+        if (first_char == "で" || first_char == "だ") {
+          candidate.confidence -= 0.6F;  // Strong penalty
+          SUZUME_DEBUG_LOG("  ichidan_voiced_te_ta_invalid: -0.6\n");
+        }
+      }
+
       candidate.morphemes = aux_chain;
 
       SUZUME_DEBUG_LOG("  [STEM MATCH] \"" << remaining << "\" → base=\""

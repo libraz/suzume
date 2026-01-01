@@ -14,6 +14,7 @@
 
 #include "adjective_candidates.h"
 #include "core/utf8_constants.h"
+#include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "suffix_candidates.h"
@@ -122,7 +123,9 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
 
   // Generate ABAB-type onomatopoeia candidates first (わくわく, きらきら, etc.)
   // This needs to be checked before isNeverVerbStemAtStart filters out わ, etc.
-  if (char_types[start_pos] == normalize::CharType::Hiragana) {
+  // Also handles katakana patterns (ニャーニャー, ワンワン, etc.)
+  if (char_types[start_pos] == normalize::CharType::Hiragana ||
+      char_types[start_pos] == normalize::CharType::Katakana) {
     auto onomatopoeia =
         generateOnomatopoeiaCandidates(codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), onomatopoeia.begin(),
@@ -163,6 +166,13 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
         generateKanjiHiraganaCompoundCandidates(codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), compound_nouns.begin(),
                       compound_nouns.end());
+
+    // Generate がち suffix candidates for kanji verb stems
+    // e.g., 忘れがち, 遅れがち
+    auto gachi_suffix =
+        generateGachiSuffixCandidates(codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), gachi_suffix.begin(),
+                      gachi_suffix.end());
   }
 
   // Generate hiragana verb candidates (pure hiragana verbs like いく, くる)
@@ -177,6 +187,12 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
         generateHiraganaAdjectiveCandidates(text, codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), hiragana_adjs.begin(),
                       hiragana_adjs.end());
+
+    // Generate productive suffix candidates (ありがち, 忘れっぽい, etc.)
+    auto productive_suffix =
+        generateProductiveSuffixCandidates(codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), productive_suffix.begin(),
+                      productive_suffix.end());
   }
 
   // Generate katakana verb/adjective candidates (slang: バズる, エモい, etc.)
@@ -341,6 +357,19 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
         char32_t last_char = codepoints[candidate_end - 1];
         if (last_char == U'様' || last_char == U'氏') {
           candidate.cost += 4.0F;  // Strong penalty to prefer NOUN + SUFFIX path
+        }
+      }
+
+      // Penalize kanji sequences that extend past iteration mark (々)
+      // e.g., 時々妙 should be split as 時々 + 妙, not kept as one compound
+      // The pattern kanji+々 is a complete reduplication that rarely extends further
+      if (start_type == normalize::CharType::Kanji && len >= 3) {
+        for (size_t i = start_pos + 1; i < candidate_end - 1; ++i) {
+          if (normalize::isIterationMark(codepoints[i])) {
+            // Found 々 in the middle - penalize extending past it
+            candidate.cost += 5.0F;
+            break;
+          }
         }
       }
 
@@ -641,43 +670,116 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
     const std::vector<normalize::CharType>& char_types) const {
   std::vector<UnknownCandidate> candidates;
 
-  // Need at least 4 characters for ABAB pattern
+  // Need at least 4 characters for patterns
   if (start_pos + 3 >= codepoints.size()) {
     return candidates;
   }
 
-  // Check if we have 4 consecutive hiragana characters
-  for (size_t i = 0; i < 4; ++i) {
-    if (start_pos + i >= char_types.size() ||
-        char_types[start_pos + i] != normalize::CharType::Hiragana) {
-      return candidates;
+  normalize::CharType start_type = char_types[start_pos];
+
+  // Helper to check if a character belongs to the same script group or is a modifier
+  auto isSameScriptOrModifier = [&](size_t pos) -> bool {
+    if (pos >= char_types.size()) return false;
+    if (pos >= codepoints.size()) return false;
+    // Same char type
+    if (char_types[pos] == start_type) return true;
+    // Prolonged sound mark (ー) can appear in both hiragana and katakana words
+    if (normalize::isProlongedSoundMark(codepoints[pos])) return true;
+    return false;
+  };
+
+  // Helper to check if a character is small kana (part of previous mora)
+  auto isSmallKanaAt = [&](size_t pos) -> bool {
+    if (pos >= codepoints.size()) return false;
+    std::string ch = normalize::encodeRange(codepoints, pos, pos + 1);
+    return grammar::isSmallKana(ch);
+  };
+
+  // Find the extent of same-script sequence (including ー)
+  size_t seq_end = start_pos;
+  while (seq_end < codepoints.size() && isSameScriptOrModifier(seq_end)) {
+    ++seq_end;
+  }
+
+  size_t seq_len = seq_end - start_pos;
+
+  // Try AA pattern: first half equals second half (ニャーニャー, ワンワン)
+  // Sequence must have even length and be at least 4 chars
+  if (seq_len >= 4 && seq_len % 2 == 0) {
+    size_t half_len = seq_len / 2;
+    bool is_aa = true;
+
+    // Check if first half equals second half
+    for (size_t i = 0; i < half_len; ++i) {
+      if (codepoints[start_pos + i] != codepoints[start_pos + half_len + i]) {
+        is_aa = false;
+        break;
+      }
+    }
+
+    if (is_aa) {
+      // Verify the first char of each half is not small kana
+      // (small kana should be part of previous mora, not start a unit)
+      if (!isSmallKanaAt(start_pos) && !isSmallKanaAt(start_pos + half_len)) {
+        std::string surface = extractSubstring(codepoints, start_pos, seq_end);
+
+        if (!surface.empty()) {
+          UnknownCandidate candidate;
+          candidate.surface = surface;
+          candidate.start = start_pos;
+          candidate.end = seq_end;
+          candidate.pos = core::PartOfSpeech::Adverb;
+          candidate.cost = -1.0F;  // Very strong preference for doubled patterns
+          candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
+#ifdef SUZUME_DEBUG_INFO
+          candidate.origin = CandidateOrigin::Onomatopoeia;
+          candidate.confidence = 1.0F;
+          candidate.pattern = "aa_doubled";
+#endif
+          candidates.push_back(candidate);
+          return candidates;  // Found a match, return early
+        }
+      }
     }
   }
 
-  // Check ABAB pattern: characters 0-1 must match characters 2-3
-  char32_t ch0 = codepoints[start_pos];
-  char32_t ch1 = codepoints[start_pos + 1];
-  char32_t ch2 = codepoints[start_pos + 2];
-  char32_t ch3 = codepoints[start_pos + 3];
+  // Try ABAB pattern for exactly 4 chars (traditional pattern)
+  if (seq_len >= 4) {
+    // Check if all 4 chars are the expected type
+    bool valid = true;
+    for (size_t i = 0; i < 4; ++i) {
+      if (!isSameScriptOrModifier(start_pos + i)) {
+        valid = false;
+        break;
+      }
+    }
 
-  if (ch0 == ch2 && ch1 == ch3) {
-    // ABAB pattern detected (e.g., わくわく, きらきら, どきどき)
-    std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
+    if (valid) {
+      char32_t ch0 = codepoints[start_pos];
+      char32_t ch1 = codepoints[start_pos + 1];
+      char32_t ch2 = codepoints[start_pos + 2];
+      char32_t ch3 = codepoints[start_pos + 3];
 
-    if (!surface.empty()) {
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = start_pos + 4;
-      candidate.pos = core::PartOfSpeech::Adverb;
-      candidate.cost = 0.1F;  // Very low cost to prefer over particle + adj splits
-      candidate.has_suffix = false;
+      if (ch0 == ch2 && ch1 == ch3 && !isSmallKanaAt(start_pos)) {
+        // ABAB pattern detected (e.g., わくわく, きらきら, どきどき)
+        std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
+
+        if (!surface.empty()) {
+          UnknownCandidate candidate;
+          candidate.surface = surface;
+          candidate.start = start_pos;
+          candidate.end = start_pos + 4;
+          candidate.pos = core::PartOfSpeech::Adverb;
+          candidate.cost = 0.1F;  // Very low cost to prefer over particle + adj splits
+          candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
 #ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::Onomatopoeia;
-      candidate.confidence = 1.0F;
-      candidate.pattern = "abab_pattern";
+          candidate.origin = CandidateOrigin::Onomatopoeia;
+          candidate.confidence = 1.0F;
+          candidate.pattern = "abab_pattern";
 #endif
-      candidates.push_back(candidate);
+          candidates.push_back(candidate);
+        }
+      }
     }
   }
 

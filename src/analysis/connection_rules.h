@@ -124,7 +124,8 @@ enum class ConnectionPattern {
   ShiParticleAfterNoun,       // 名詞 → し接続助詞 (invalid: 本し - noun can't directly connect)
   TokuContractionSplit,       // VERB(連用形) → と (invalid: 食べ + と should be 食べといた)
   RashiiAfterPredicate,       // VERB/ADJ → らしい(ADJ) (conjecture auxiliary: 帰るらしい)
-  VerbToCaseParticle          // VERB → case particle (を/が/に/で) (likely nominalized verb)
+  VerbToCaseParticle,         // VERB → case particle (を/が/に/で) (likely nominalized verb)
+  KataAfterRenyokei           // 動詞連用形 → 方 (should be nominalized: 解き方, 読み方)
 };
 
 /**

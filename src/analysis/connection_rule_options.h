@@ -65,6 +65,9 @@ struct ConnectionOptions {
   // VERB + ながら split
   float penalty_nagara_split = scorer::kPenaltyNagaraSplit;
 
+  // VERB renyokei + 方 (should be nominalized)
+  float penalty_kata_after_renyokei = scorer::kPenaltyKataAfterRenyokei;
+
   // NOUN + そう when noun looks like verb renyokei
   float penalty_sou_after_renyokei = scorer::kPenaltySouAfterRenyokei;
 

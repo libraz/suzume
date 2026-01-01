@@ -304,6 +304,111 @@
         "gachi",
         "regression"
       ]
+    },
+    {
+      "id": "kata_yomikata",
+      "description": "読み方 - nominalized verb + 方 (way of reading)",
+      "input": "読み方",
+      "expected": [
+        {
+          "surface": "読み",
+          "pos": "Noun"
+        },
+        {
+          "surface": "方",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "kata",
+        "nominalized"
+      ]
+    },
+    {
+      "id": "kata_kakikata",
+      "description": "書き方 - nominalized verb + 方 (way of writing)",
+      "input": "書き方",
+      "expected": [
+        {
+          "surface": "書き",
+          "pos": "Noun"
+        },
+        {
+          "surface": "方",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "kata",
+        "nominalized"
+      ]
+    },
+    {
+      "id": "kata_tsukaikata",
+      "description": "使い方 - nominalized verb + 方 (way of using)",
+      "input": "使い方",
+      "expected": [
+        {
+          "surface": "使い",
+          "pos": "Noun"
+        },
+        {
+          "surface": "方",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "kata",
+        "nominalized"
+      ]
+    },
+    {
+      "id": "kata_vs_person_utsukushii",
+      "description": "美しい方 - adjective + 方 (person, not method)",
+      "input": "美しい方",
+      "expected": [
+        {
+          "surface": "美しい",
+          "pos": "Adjective",
+          "lemma": "美しい"
+        },
+        {
+          "surface": "方",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "kata",
+        "person"
+      ]
+    },
+    {
+      "id": "kata_vs_person_kaita",
+      "description": "書いた方がいい - ta-form + 方 (person/should, not method)",
+      "input": "書いた方がいい",
+      "expected": [
+        {
+          "surface": "書いた",
+          "pos": "Verb",
+          "lemma": "書く"
+        },
+        {
+          "surface": "方",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "いい",
+          "pos": "Adjective"
+        }
+      ],
+      "tags": [
+        "kata",
+        "recommendation"
+      ]
     }
   ]
 }

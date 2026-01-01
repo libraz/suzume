@@ -895,6 +895,30 @@
       ]
     },
     {
+      "id": "iteration_mark_tokidoki_myouni",
+      "description": "時々妙に - should split at 々 boundary, not merge into 時々妙",
+      "input": "時々妙に",
+      "expected": [
+        {
+          "surface": "時々",
+          "pos": "Noun"
+        },
+        {
+          "surface": "妙",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "unicode",
+        "odoriji",
+        "regression"
+      ]
+    },
+    {
       "id": "katakana_sugita_compound",
       "description": "ワンパターンすぎた recognized as compound verb (noun + すぎる) with た split, not ワンパター + ンすぎた",
       "input": "ワンパターンすぎた",

@@ -1,6 +1,7 @@
 #include "dictionary/core_dict.h"
 
 #include <algorithm>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -111,10 +112,30 @@ std::vector<ConjugatedForm> getGodanKaForms() {
       {"けば", ""},        // Conditional: いけば
       {"いたら", ""},      // Conditional: いったら
       {"こう", ""},        // Volitional: いこう
-      {"け", ""},          // Imperative: いけ
+      // Imperative (け) intentionally omitted - conflicts with potential stems
+      // (e.g., 焼け imperative vs 焼ける Ichidan stem)
       {"ける", ""},        // Potential: いける
       {"けない", ""},      // Potential negative: いけない
       {"けなかった", ""},  // Potential negative past: いけなかった
+  };
+}
+
+// Get conjugated forms for Godan-Ga verbs (しのぐ → しの + suffix)
+// Note: Godan-Ga verbs use イ音便 for past/te-form (しのいだ, しのいで)
+std::vector<ConjugatedForm> getGodanGaForms() {
+  return {
+      {"ぐ", ""},          // Base: しのぐ
+      {"ぎ", ""},          // Renyokei: しのぎ (used in compounds)
+      {"いだ", ""},        // Past: しのいだ (イ音便)
+      {"いで", ""},        // Te-form: しのいで (イ音便)
+      {"がない", ""},      // Negative: しのがない
+      {"がなかった", ""},  // Past negative: しのがなかった
+      {"げば", ""},        // Conditional: しのげば
+      {"いだら", ""},      // Conditional: しのいだら
+      {"ごう", ""},        // Volitional: しのごう
+      // Imperative (げ) intentionally omitted - conflicts with potential stems
+      {"げる", ""},        // Potential: しのげる
+      {"げない", ""},      // Potential negative: しのげない
   };
 }
 
@@ -228,8 +249,12 @@ std::vector<DictionaryEntry> expandVerbEntry(const DictionaryEntry& entry) {
     case ConjugationType::GodanSa:
       forms = getGodanSaForms();
       break;
-    // Note: GodanKa is NOT expanded here - only いく needs special handling,
-    // and that's done via explicit entries in hiragana_verbs
+    case ConjugationType::GodanKa:
+      forms = getGodanKaForms();
+      break;
+    case ConjugationType::GodanGa:
+      forms = getGodanGaForms();
+      break;
     case ConjugationType::Suru: {
       // Special handling for suru
       auto suru_forms = getSuruConjugations(stem);
@@ -491,14 +516,29 @@ void CoreDictionary::buildTrie() {
   std::vector<int32_t> values;
 
   // Entries are sorted by surface, so extract unique keys
+  // Store the first index for each surface - lookup() will collect all
+  // consecutive entries with the same surface
   std::string prev_surface;
+  size_t first_idx = 0;
+
   for (size_t idx = 0; idx < entries_.size(); ++idx) {
-    const auto& surface = entries_[idx].surface;
-    if (surface != prev_surface) {
-      keys.push_back(surface);
-      values.push_back(static_cast<int32_t>(idx));
-      prev_surface = surface;
+    const auto& entry = entries_[idx];
+    if (entry.surface != prev_surface) {
+      // New surface - save previous first if exists
+      if (!prev_surface.empty()) {
+        keys.push_back(prev_surface);
+        values.push_back(static_cast<int32_t>(first_idx));
+      }
+      // Start tracking new surface
+      prev_surface = entry.surface;
+      first_idx = idx;
     }
+    // For same surface, first_idx stays unchanged (first occurrence)
+  }
+  // Don't forget the last surface
+  if (!prev_surface.empty()) {
+    keys.push_back(prev_surface);
+    values.push_back(static_cast<int32_t>(first_idx));
   }
 
   // Build the Double-Array trie

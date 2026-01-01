@@ -249,7 +249,10 @@ void Tokenizer::addUnknownCandidates(
       }
     }
 
-    if (!skip_penalty && max_dict_length > 0 &&
+    // Skip exceeds_dict_length penalty for suffix pattern candidates
+    // These are morphologically recognized patterns (e.g., がち, っぽい)
+    // that should not be penalized for exceeding dictionary coverage
+    if (!skip_penalty && !candidate.has_suffix && max_dict_length > 0 &&
         candidate.end - candidate.start > max_dict_length) {
       float penalty = reduced_penalty ? 1.0F : 3.5F;
       adjusted_cost += penalty;

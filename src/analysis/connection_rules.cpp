@@ -108,6 +108,9 @@ void evaluateVerbRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkTakuteAfterRenyokei(prev, next, opts));
   accumulateRule(accumulated, checkRashiiAfterPredicate(prev, next, opts));
   accumulateRule(accumulated, checkMitaiAfterNounOrVerb(prev, next, opts));
+
+  // VERB → NOUN rules
+  accumulateRule(accumulated, checkKataAfterRenyokei(prev, next, opts));
 }
 
 void evaluateNounRules(const core::LatticeEdge& prev,
