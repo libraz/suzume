@@ -379,12 +379,7 @@ ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
                                            const ConnectionOptions& opts) {
   if (!isVerbToVerb(prev, next)) return {};
 
-  // Check if prev verb ends with te-form (て or で)
-  if (prev.surface.size() < core::kJapaneseCharBytes) return {};
-  std::string_view last_char = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
-  if (last_char != "て" && last_char != "で") {
-    return {};
-  }
+  if (!endsWithTeForm(prev.surface)) return {};
 
   // Exclude auxiliary verb patterns - these should be Auxiliary, not Verb
   // E.g., なって + おります should have おります as AUX

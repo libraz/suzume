@@ -100,6 +100,16 @@ class ScorerOptionsLoader {
   /// Apply optimal length options from JSON
   static void applyOptimalLengthOptions(ScorerOptions::OptimalLength& opts, const JsonValue& json);
 
+  /// Apply bigram override options from JSON
+  static void applyBigramOptions(ScorerOptions::BigramOverrides& opts, const JsonValue& json);
+
+  /// Apply verb candidate options from JSON
+  static void applyVerbCandidateOptions(VerbCandidateOptions& opts, const JsonValue& json);
+
+  /// Apply inflection scorer options from JSON
+  static void applyInflectionOptions(grammar::InflectionScorerOptions& opts,
+                                     const JsonValue& json);
+
   // JSON parser internals (exception-free)
   class Parser {
    public:
@@ -428,6 +438,94 @@ inline void ScorerOptionsLoader::applyOptimalLengthOptions(
   SET_SIZE_OPT(opts, katakana_max, json, "katakana_max");
 }
 
+inline void ScorerOptionsLoader::applyBigramOptions(
+    ScorerOptions::BigramOverrides& opts, const JsonValue& json) {
+  SET_OPT(opts, noun_to_suffix, json, "noun_to_suffix");
+  SET_OPT(opts, prefix_to_noun, json, "prefix_to_noun");
+  SET_OPT(opts, prefix_to_verb, json, "prefix_to_verb");
+  SET_OPT(opts, pron_to_aux, json, "pron_to_aux");
+  SET_OPT(opts, verb_to_verb, json, "verb_to_verb");
+  SET_OPT(opts, verb_to_noun, json, "verb_to_noun");
+  SET_OPT(opts, verb_to_aux, json, "verb_to_aux");
+  SET_OPT(opts, adj_to_aux, json, "adj_to_aux");
+  SET_OPT(opts, adj_to_verb, json, "adj_to_verb");
+  SET_OPT(opts, adj_to_adj, json, "adj_to_adj");
+  SET_OPT(opts, part_to_verb, json, "part_to_verb");
+  SET_OPT(opts, part_to_noun, json, "part_to_noun");
+  SET_OPT(opts, aux_to_part, json, "aux_to_part");
+  SET_OPT(opts, aux_to_aux, json, "aux_to_aux");
+}
+
+inline void ScorerOptionsLoader::applyVerbCandidateOptions(
+    VerbCandidateOptions& opts, const JsonValue& json) {
+  // Confidence thresholds
+  SET_OPT(opts, confidence_low, json, "confidence_low");
+  SET_OPT(opts, confidence_standard, json, "confidence_standard");
+  SET_OPT(opts, confidence_past_te, json, "confidence_past_te");
+  SET_OPT(opts, confidence_ichidan_dict, json, "confidence_ichidan_dict");
+  SET_OPT(opts, confidence_dict_verb, json, "confidence_dict_verb");
+  SET_OPT(opts, confidence_katakana, json, "confidence_katakana");
+  SET_OPT(opts, confidence_high, json, "confidence_high");
+  SET_OPT(opts, confidence_very_high, json, "confidence_very_high");
+  // Base costs
+  SET_OPT(opts, base_cost_standard, json, "base_cost_standard");
+  SET_OPT(opts, base_cost_high, json, "base_cost_high");
+  SET_OPT(opts, base_cost_low, json, "base_cost_low");
+  SET_OPT(opts, base_cost_verified, json, "base_cost_verified");
+  SET_OPT(opts, base_cost_long_verified, json, "base_cost_long_verified");
+  // Bonuses
+  SET_OPT(opts, bonus_dict_match, json, "bonus_dict_match");
+  SET_OPT(opts, bonus_ichidan, json, "bonus_ichidan");
+  SET_OPT(opts, bonus_long_dict, json, "bonus_long_dict");
+  SET_OPT(opts, bonus_long_verified, json, "bonus_long_verified");
+  // Penalties
+  SET_OPT(opts, penalty_single_char, json, "penalty_single_char");
+  // Scaling
+  SET_OPT(opts, confidence_cost_scale, json, "confidence_cost_scale");
+}
+
+inline void ScorerOptionsLoader::applyInflectionOptions(
+    grammar::InflectionScorerOptions& opts, const JsonValue& json) {
+  // Base configuration
+  SET_OPT(opts, base_confidence, json, "base_confidence");
+  SET_OPT(opts, confidence_floor, json, "confidence_floor");
+  SET_OPT(opts, confidence_ceiling, json, "confidence_ceiling");
+
+  // Stem length adjustments
+  SET_OPT(opts, penalty_stem_very_long, json, "penalty_stem_very_long");
+  SET_OPT(opts, penalty_stem_long, json, "penalty_stem_long");
+  SET_OPT(opts, bonus_stem_two_char, json, "bonus_stem_two_char");
+  SET_OPT(opts, bonus_aux_length_per_byte, json, "bonus_aux_length_per_byte");
+
+  // Ichidan validation
+  SET_OPT(opts, penalty_ichidan_potential_ambiguity, json, "penalty_ichidan_potential_ambiguity");
+  SET_OPT(opts, bonus_ichidan_e_row, json, "bonus_ichidan_e_row");
+  SET_OPT(opts, penalty_ichidan_looks_godan, json, "penalty_ichidan_looks_godan");
+  SET_OPT(opts, penalty_ichidan_kanji_i, json, "penalty_ichidan_kanji_i");
+  SET_OPT(opts, penalty_ichidan_kanji_hiragana_stem, json, "penalty_ichidan_kanji_hiragana_stem");
+  SET_OPT(opts, penalty_ichidan_irregular_stem, json, "penalty_ichidan_irregular_stem");
+
+  // I-Adjective validation
+  SET_OPT(opts, penalty_i_adj_single_kanji, json, "penalty_i_adj_single_kanji");
+  SET_OPT(opts, penalty_i_adj_verb_aux_pattern, json, "penalty_i_adj_verb_aux_pattern");
+  SET_OPT(opts, bonus_i_adj_compound_yasui_nikui, json, "bonus_i_adj_compound_yasui_nikui");
+  SET_OPT(opts, penalty_i_adj_e_row_stem, json, "penalty_i_adj_e_row_stem");
+  SET_OPT(opts, penalty_i_adj_verb_rashii_pattern, json, "penalty_i_adj_verb_rashii_pattern");
+
+  // Suru vs GodanSa disambiguation
+  SET_OPT(opts, bonus_suru_two_kanji, json, "bonus_suru_two_kanji");
+  SET_OPT(opts, penalty_godan_sa_two_kanji, json, "penalty_godan_sa_two_kanji");
+  SET_OPT(opts, bonus_godan_sa_single_kanji, json, "bonus_godan_sa_single_kanji");
+  SET_OPT(opts, penalty_suru_single_kanji, json, "penalty_suru_single_kanji");
+
+  // Single hiragana stem penalties
+  SET_OPT(opts, penalty_ichidan_single_hiragana_particle, json,
+          "penalty_ichidan_single_hiragana_particle");
+  SET_OPT(opts, penalty_pure_hiragana_stem, json, "penalty_pure_hiragana_stem");
+  SET_OPT(opts, penalty_godan_single_hiragana_stem, json, "penalty_godan_single_hiragana_stem");
+  SET_OPT(opts, penalty_godan_non_ra_pure_hiragana, json, "penalty_godan_non_ra_pure_hiragana");
+}
+
 #undef SET_SIZE_OPT
 #undef SET_OPT
 
@@ -484,6 +582,27 @@ inline bool ScorerOptionsLoader::loadFromFile(const std::string& path, ScorerOpt
   if (auto* unary = root.get("unary")) {
     if (unary->isObject()) {
       applyUnaryOptions(options, *unary);
+    }
+  }
+
+  // Apply bigram section (POS pair cost overrides)
+  if (auto* bigram = root.get("bigram")) {
+    if (bigram->isObject()) {
+      applyBigramOptions(options.bigram, *bigram);
+    }
+  }
+
+  // Apply verb_candidates section (verb candidate generation options)
+  if (auto* verb_cand = root.get("verb_candidates")) {
+    if (verb_cand->isObject()) {
+      applyVerbCandidateOptions(options.candidates.verb, *verb_cand);
+    }
+  }
+
+  // Apply inflection section (inflection scorer confidence adjustments)
+  if (auto* infl = root.get("inflection")) {
+    if (infl->isObject()) {
+      applyInflectionOptions(options.inflection, *infl);
     }
   }
 
@@ -671,6 +790,91 @@ inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
       opts.katakana_max = static_cast<size_t>(size_helper);
       count++;
     }
+  }
+
+  // Bigram options (SUZUME_SCORER_BIGRAM_*)
+  {
+    auto& opts = options.bigram;
+    TRY_ENV("BIGRAM", noun_to_suffix);
+    TRY_ENV("BIGRAM", prefix_to_noun);
+    TRY_ENV("BIGRAM", prefix_to_verb);
+    TRY_ENV("BIGRAM", pron_to_aux);
+    TRY_ENV("BIGRAM", verb_to_verb);
+    TRY_ENV("BIGRAM", verb_to_noun);
+    TRY_ENV("BIGRAM", verb_to_aux);
+    TRY_ENV("BIGRAM", adj_to_aux);
+    TRY_ENV("BIGRAM", adj_to_verb);
+    TRY_ENV("BIGRAM", adj_to_adj);
+    TRY_ENV("BIGRAM", part_to_verb);
+    TRY_ENV("BIGRAM", part_to_noun);
+    TRY_ENV("BIGRAM", aux_to_part);
+    TRY_ENV("BIGRAM", aux_to_aux);
+  }
+
+  // Verb candidate options (SUZUME_SCORER_VERB_*)
+  {
+    auto& opts = options.candidates.verb;
+    // Confidence thresholds
+    TRY_ENV("VERB", confidence_low);
+    TRY_ENV("VERB", confidence_standard);
+    TRY_ENV("VERB", confidence_past_te);
+    TRY_ENV("VERB", confidence_ichidan_dict);
+    TRY_ENV("VERB", confidence_dict_verb);
+    TRY_ENV("VERB", confidence_katakana);
+    TRY_ENV("VERB", confidence_high);
+    TRY_ENV("VERB", confidence_very_high);
+    // Base costs
+    TRY_ENV("VERB", base_cost_standard);
+    TRY_ENV("VERB", base_cost_high);
+    TRY_ENV("VERB", base_cost_low);
+    TRY_ENV("VERB", base_cost_verified);
+    TRY_ENV("VERB", base_cost_long_verified);
+    // Bonuses
+    TRY_ENV("VERB", bonus_dict_match);
+    TRY_ENV("VERB", bonus_ichidan);
+    TRY_ENV("VERB", bonus_long_dict);
+    TRY_ENV("VERB", bonus_long_verified);
+    // Penalties
+    TRY_ENV("VERB", penalty_single_char);
+    // Scaling
+    TRY_ENV("VERB", confidence_cost_scale);
+  }
+
+  // Inflection scorer options (SUZUME_SCORER_INFL_*)
+  {
+    auto& opts = options.inflection;
+    // Base configuration
+    TRY_ENV("INFL", base_confidence);
+    TRY_ENV("INFL", confidence_floor);
+    TRY_ENV("INFL", confidence_ceiling);
+    // Stem length adjustments
+    TRY_ENV("INFL", penalty_stem_very_long);
+    TRY_ENV("INFL", penalty_stem_long);
+    TRY_ENV("INFL", bonus_stem_two_char);
+    TRY_ENV("INFL", bonus_aux_length_per_byte);
+    // Ichidan validation
+    TRY_ENV("INFL", penalty_ichidan_potential_ambiguity);
+    TRY_ENV("INFL", bonus_ichidan_e_row);
+    TRY_ENV("INFL", penalty_ichidan_looks_godan);
+    TRY_ENV("INFL", penalty_ichidan_kanji_i);
+    TRY_ENV("INFL", penalty_ichidan_kanji_hiragana_stem);
+    TRY_ENV("INFL", penalty_ichidan_irregular_stem);
+    // I-Adjective validation
+    TRY_ENV("INFL", penalty_i_adj_single_kanji);
+    TRY_ENV("INFL", penalty_i_adj_verb_aux_pattern);
+    TRY_ENV("INFL", bonus_i_adj_compound_yasui_nikui);
+    TRY_ENV("INFL", penalty_i_adj_e_row_stem);
+    TRY_ENV("INFL", penalty_i_adj_verb_rashii_pattern);
+    // Suru vs GodanSa disambiguation
+    TRY_ENV("INFL", bonus_suru_two_kanji);
+    TRY_ENV("INFL", penalty_godan_sa_two_kanji);
+    TRY_ENV("INFL", bonus_godan_sa_single_kanji);
+    TRY_ENV("INFL", penalty_suru_single_kanji);
+    // Single hiragana stem penalties
+    TRY_ENV("INFL", penalty_ichidan_single_hiragana_particle);
+    TRY_ENV("INFL", penalty_pure_hiragana_stem);
+    TRY_ENV("INFL", penalty_godan_single_hiragana_stem);
+    TRY_ENV("INFL", penalty_godan_non_ra_pure_hiragana);
   }
 
   return count;

@@ -95,6 +95,11 @@ constexpr float kPenaltyVerbOnbinAsAdj = scale::kStrong + scale::kMinor;  // 2.0
 // E.g., お+こがましい should be おこがましい, は+なはだしい should be はなはだしい
 constexpr float kPenaltyHiraganaAdj = scale::kSevere + scale::kMinor;  // 3.0
 
+// Bonus for unified verb forms containing auxiliary patterns
+// E.g., 食べてしまった (unified) beats 食べて + しまった (split)
+// When te-form has a dictionary entry, unified forms need this bonus to compete
+constexpr float kBonusUnifiedVerbAux = 0.3F;
+
 // =============================================================================
 // Connection Costs (Bigram penalties/bonuses)
 // =============================================================================
@@ -323,6 +328,11 @@ constexpr float kBonusRashiiAfterPredicate = 0.8F;
 
 // Verb ending with たいらしい should be split (帰りたいらしい → 帰りたい + らしい)
 constexpr float kPenaltyVerbTaiRashii = scale::kMinor;
+
+// Verb (renyokei/base) + case particle (を/が/に/で/から/まで/へ)
+// Penalizes patterns like 打ち合わせ(VERB)+を which should be NOUN+を
+// Verbal nouns used as objects should be NOUN, not VERB
+constexpr float kPenaltyVerbToCaseParticle = scale::kStrong;  // 1.5
 
 // =============================================================================
 // Pattern String Constants

@@ -34,6 +34,14 @@ bool startsWithTe(std::string_view surface) {
   return first == "て" || first == "で";
 }
 
+bool endsWithTeForm(std::string_view surface) {
+  if (surface.size() < core::kJapaneseCharBytes) {
+    return false;
+  }
+  std::string_view last = surface.substr(surface.size() - core::kJapaneseCharBytes);
+  return last == "て" || last == "で";
+}
+
 bool endsWithSou(std::string_view surface) {
   return utf8::endsWith(surface, scorer::kSuffixSou);
 }

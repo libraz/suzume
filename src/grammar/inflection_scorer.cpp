@@ -8,10 +8,16 @@
 #include <algorithm>
 
 #include "char_patterns.h"
-#include "core/utf8_constants.h"
 #include "connection.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
+#include "core/utf8_constants.h"
 #include "inflection_scorer_constants.h"
+
+// Helper macro to get option value or fall back to constant
+// Usage: GET_OPT(penalty_stem_very_long, inflection::kPenaltyStemVeryLong)
+#define GET_OPT(field, default_val) \
+  (opts ? suzume::grammar::InflectionScorerOptions::getOrDefault(opts->field, default_val) : default_val)
 
 namespace {
 // Helper to log confidence adjustments
@@ -36,8 +42,9 @@ namespace suzume::grammar {
 
 float calculateConfidence(VerbType type, std::string_view stem,
                           size_t aux_total_len, size_t aux_count,
-                          uint16_t required_conn, size_t suffix_len) {
-  float base = inflection::kBaseConfidence;
+                          uint16_t required_conn, size_t suffix_len,
+                          const InflectionScorerOptions* opts) {
+  float base = GET_OPT(base_confidence, inflection::kBaseConfidence);
   size_t stem_len = stem.size();
 
   SUZUME_DEBUG_LOG("[INFL_SCORE] stem=\"" << stem << "\" type="
@@ -49,15 +56,18 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Stem length penalties/bonuses
   // Very long stems are suspicious (likely wrong analysis)
   if (stem_len >= core::kFourJapaneseCharBytes) {
-    base -= inflection::kPenaltyStemVeryLong;
-    logConfidenceAdjustment(-inflection::kPenaltyStemVeryLong, "stem_very_long");
+    float pen = GET_OPT(penalty_stem_very_long, inflection::kPenaltyStemVeryLong);
+    base -= pen;
+    logConfidenceAdjustment(-pen, "stem_very_long");
   } else if (stem_len >= core::kThreeJapaneseCharBytes) {
-    base -= inflection::kPenaltyStemLong;
-    logConfidenceAdjustment(-inflection::kPenaltyStemLong, "stem_long");
+    float pen = GET_OPT(penalty_stem_long, inflection::kPenaltyStemLong);
+    base -= pen;
+    logConfidenceAdjustment(-pen, "stem_long");
   } else if (stem_len >= core::kTwoJapaneseCharBytes) {
     // 2-char stems (6 bytes) are common
-    base += inflection::kBonusStemTwoChar;
-    logConfidenceAdjustment(inflection::kBonusStemTwoChar, "stem_two_char");
+    float bon = GET_OPT(bonus_stem_two_char, inflection::kBonusStemTwoChar);
+    base += bon;
+    logConfidenceAdjustment(bon, "stem_two_char");
   } else if (stem_len >= core::kJapaneseCharBytes) {
     // 1-char stems (3 bytes) are possible but less common
     base += inflection::kBonusStemOneChar;
@@ -83,7 +93,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
   }
 
   // Longer auxiliary chain = higher confidence (matched more grammar)
-  float aux_bonus = static_cast<float>(aux_total_len) * inflection::kBonusAuxLengthPerByte;
+  float aux_per_byte = GET_OPT(bonus_aux_length_per_byte, inflection::kBonusAuxLengthPerByte);
+  float aux_bonus = static_cast<float>(aux_total_len) * aux_per_byte;
   base += aux_bonus;
   logConfidenceAdjustment(aux_bonus, "aux_length");
 
@@ -243,11 +254,13 @@ float calculateConfidence(VerbType type, std::string_view stem,
         // 読め could be Ichidan 読める or Godan potential of 読む
         // Prefer Godan potential interpretation (読む is more common than treating 読める as Ichidan)
         // Strong penalty to overcome the 0.95 cap tie
-        base -= inflection::kPenaltyIchidanPotentialAmbiguity;
-        logConfidenceAdjustment(-inflection::kPenaltyIchidanPotentialAmbiguity, "ichidan_potential_ambiguity");
+        float pen = GET_OPT(penalty_ichidan_potential_ambiguity, inflection::kPenaltyIchidanPotentialAmbiguity);
+        base -= pen;
+        logConfidenceAdjustment(-pen, "ichidan_potential_ambiguity");
       } else {
-        base += inflection::kBonusIchidanERow;
-        logConfidenceAdjustment(inflection::kBonusIchidanERow, "ichidan_e_row");
+        float bon = GET_OPT(bonus_ichidan_e_row, inflection::kBonusIchidanERow);
+        base += bon;
+        logConfidenceAdjustment(bon, "ichidan_e_row");
       }
     } else {
       // Check for context-specific Godan patterns
@@ -268,8 +281,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
 
       if (looks_godan) {
         // Stem matches Godan conjugation pattern for this context
-        base -= inflection::kPenaltyIchidanLooksGodan;
-        logConfidenceAdjustment(-inflection::kPenaltyIchidanLooksGodan, "ichidan_looks_godan");
+        float pen = GET_OPT(penalty_ichidan_looks_godan, inflection::kPenaltyIchidanLooksGodan);
+        base -= pen;
+        logConfidenceAdjustment(-pen, "ichidan_looks_godan");
       }
 
       // Ichidan stems cannot end in u-row hiragana (う, く, す, つ, ぬ, ふ, む, る)
@@ -302,8 +316,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
         if (last3 == "い" && endsWithKanji(prev3)) {
           // Stem ends with kanji + い, likely Godan renyokei misanalysis
           // Use stronger penalty than generic "looks godan"
-          base -= inflection::kPenaltyIchidanKanjiI;
-          logConfidenceAdjustment(-inflection::kPenaltyIchidanKanjiI, "ichidan_kanji_i_renyokei");
+          float pen = GET_OPT(penalty_ichidan_kanji_i, inflection::kPenaltyIchidanKanjiI);
+          base -= pen;
+          logConfidenceAdjustment(-pen, "ichidan_kanji_i_renyokei");
         }
       }
     }
@@ -369,30 +384,16 @@ float calculateConfidence(VerbType type, std::string_view stem,
   if (type == VerbType::Ichidan && stem_len == core::kTwoJapaneseCharBytes && aux_count == 0) {
     // 6 bytes = 2 chars (kanji + hiragana)
     // Check if pattern is kanji + i-row hiragana
-    bool first_is_kanji = stem.size() >= core::kJapaneseCharBytes && (static_cast<unsigned char>(stem[0]) >= 0xE4);
-    // i-row hiragana: い(E3 81 84), き(E3 81 8D), し(E3 81 97), ち(E3 81 A1),
-    // に(E3 81 AB), み(E3 81 BF), り(E3 82 8A), ぎ(E3 81 8E), び(E3 81 B3)
-    bool is_i_row = stem.size() >= core::kTwoJapaneseCharBytes &&
-        static_cast<unsigned char>(stem[3]) == 0xE3 &&
-        static_cast<unsigned char>(stem[4]) == 0x81 &&
-        (static_cast<unsigned char>(stem[5]) == 0x84 ||  // い
-         static_cast<unsigned char>(stem[5]) == 0x8D ||  // き
-         static_cast<unsigned char>(stem[5]) == 0x97 ||  // し
-         static_cast<unsigned char>(stem[5]) == 0xA1 ||  // ち
-         static_cast<unsigned char>(stem[5]) == 0xAB ||  // に
-         static_cast<unsigned char>(stem[5]) == 0xBF ||  // み
-         static_cast<unsigned char>(stem[5]) == 0x8E ||  // ぎ
-         static_cast<unsigned char>(stem[5]) == 0xB3);   // び
-    // り is E3 82 8A (different byte pattern)
-    bool is_ri = stem.size() >= core::kTwoJapaneseCharBytes &&
-        static_cast<unsigned char>(stem[3]) == 0xE3 &&
-        static_cast<unsigned char>(stem[4]) == 0x82 &&
-        static_cast<unsigned char>(stem[5]) == 0x8A;
+    char32_t first_cp = utf8::decodeFirstChar(stem);
+    char32_t second_cp = utf8::decode3ByteUtf8At(stem, core::kJapaneseCharBytes);
+    bool first_is_kanji = kana::isKanjiCodepoint(first_cp);
+    bool is_i_row = kana::isIRowCodepoint(second_cp);
     // Exception: specific known kanji + い stems are valid
     bool is_known_kanji_i_stem = isInArray(stem, inflection::kValidKanjiIStemExceptions);
-    if (first_is_kanji && (is_i_row || is_ri) && !is_known_kanji_i_stem) {
-      base -= inflection::kPenaltyIchidanKanjiHiraganaStem;
-      logConfidenceAdjustment(-inflection::kPenaltyIchidanKanjiHiraganaStem, "ichidan_kanji_i_row_stem");
+    if (first_is_kanji && is_i_row && !is_known_kanji_i_stem) {
+      float pen = GET_OPT(penalty_ichidan_kanji_hiragana_stem, inflection::kPenaltyIchidanKanjiHiraganaStem);
+      base -= pen;
+      logConfidenceAdjustment(-pen, "ichidan_kanji_i_row_stem");
     }
   }
 
@@ -410,8 +411,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
   bool is_valid_hiragana_stem = isInArray(stem, inflection::kValidHiraganaStemExceptions);
   if (type == VerbType::Ichidan && stem_len >= core::kTwoJapaneseCharBytes &&
       isPureHiragana(stem) && !is_valid_hiragana_stem) {
-    base -= inflection::kPenaltyPureHiraganaStem;
-    logConfidenceAdjustment(-inflection::kPenaltyPureHiraganaStem, "ichidan_pure_hiragana_stem");
+    float pen = GET_OPT(penalty_pure_hiragana_stem, inflection::kPenaltyPureHiraganaStem);
+    base -= pen;
+    logConfidenceAdjustment(-pen, "ichidan_pure_hiragana_stem");
   }
 
   // GodanRa validation: single-hiragana stems are typically Ichidan, not GodanRa
@@ -508,8 +510,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // E.g., こなかった should NOT be parsed as Ichidan こ + なかった = こる
   if (type == VerbType::Ichidan && stem_len == core::kJapaneseCharBytes) {
     if (isInArray(stem, inflection::kInvalidIchidanSingleStems)) {
-      base -= inflection::kPenaltyIchidanIrregularStem;
-      logConfidenceAdjustment(-inflection::kPenaltyIchidanIrregularStem, "ichidan_irregular_stem");
+      float pen = GET_OPT(penalty_ichidan_irregular_stem, inflection::kPenaltyIchidanIrregularStem);
+      base -= pen;
+      logConfidenceAdjustment(-pen, "ichidan_irregular_stem");
     }
   }
 
@@ -521,8 +524,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
       required_conn == conn::kVerbMizenkei && !endsWithKanji(stem)) {
     // Check if stem is a common particle
     if (isInArray(stem, inflection::kParticleStemList)) {
-      base -= inflection::kPenaltyIchidanSingleHiraganaParticleStem;
-      logConfidenceAdjustment(-inflection::kPenaltyIchidanSingleHiraganaParticleStem, "ichidan_single_hiragana_particle_stem");
+      float pen = GET_OPT(penalty_ichidan_single_hiragana_particle, inflection::kPenaltyIchidanSingleHiraganaParticleStem);
+      base -= pen;
+      logConfidenceAdjustment(-pen, "ichidan_single_hiragana_particle_stem");
     }
   }
 
@@ -555,8 +559,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
   if (is_godan_non_ra && stem_len == core::kJapaneseCharBytes && !containsKanji(stem)) {
     // Exception: い(く) = 行く is valid
     if (!(type == VerbType::GodanKa && stem == "い")) {
-      base -= inflection::kPenaltyGodanSingleHiraganaStem;
-      logConfidenceAdjustment(-inflection::kPenaltyGodanSingleHiraganaStem, "godan_single_hiragana_stem");
+      float pen = GET_OPT(penalty_godan_single_hiragana_stem, inflection::kPenaltyGodanSingleHiraganaStem);
+      base -= pen;
+      logConfidenceAdjustment(-pen, "godan_single_hiragana_stem");
     }
   }
 
@@ -571,16 +576,18 @@ float calculateConfidence(VerbType type, std::string_view stem,
                                   type == VerbType::GodanNa || type == VerbType::GodanBa);
   if (is_godan_hiragana_rare && stem_len >= core::kTwoJapaneseCharBytes &&
       isPureHiragana(stem)) {
-    base -= inflection::kPenaltyGodanNonRaPureHiraganaStem;
-    logConfidenceAdjustment(-inflection::kPenaltyGodanNonRaPureHiraganaStem, "godan_hiragana_rare_stem");
+    float pen = GET_OPT(penalty_godan_non_ra_pure_hiragana, inflection::kPenaltyGodanNonRaPureHiraganaStem);
+    base -= pen;
+    logConfidenceAdjustment(-pen, "godan_hiragana_rare_stem");
   }
 
   // I-adjective validation: single-kanji stems are very rare
   // Most I-adjectives have multi-character stems (美しい, 高い, 長い)
   // Single-kanji stems like 書い (from mismatched 書く) are usually wrong
   if (type == VerbType::IAdjective && stem_len == core::kJapaneseCharBytes) {
-    base -= inflection::kPenaltyIAdjSingleKanji;
-    logConfidenceAdjustment(-inflection::kPenaltyIAdjSingleKanji, "i_adj_single_kanji");
+    float pen = GET_OPT(penalty_i_adj_single_kanji, inflection::kPenaltyIAdjSingleKanji);
+    base -= pen;
+    logConfidenceAdjustment(-pen, "i_adj_single_kanji");
   }
 
   // I-adjective stems containing verb+auxiliary patterns are not real adjectives
@@ -600,8 +607,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
         stem.find("てき") != std::string_view::npos ||  // てくる pattern
         stem.find("でき") != std::string_view::npos;
     if (has_aux_pattern) {
-      base -= inflection::kPenaltyIAdjVerbAuxPattern;
-      logConfidenceAdjustment(-inflection::kPenaltyIAdjVerbAuxPattern, "i_adj_verb_aux_pattern");
+      float pen = GET_OPT(penalty_i_adj_verb_aux_pattern, inflection::kPenaltyIAdjVerbAuxPattern);
+      base -= pen;
+      logConfidenceAdjustment(-pen, "i_adj_verb_aux_pattern");
       // Note: This penalty may be clamped by the floor at return.
       // Additional penalty is applied in scorer.cpp for lattice cost.
     }
@@ -628,8 +636,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
       std::string_view before = stem.substr(0, stem_len - core::kTwoJapaneseCharBytes);
       // Use centralized renyokei marker check (i-row for godan, e-row for ichidan)
       if (endsWithRenyokeiMarker(before)) {
-        base += inflection::kBonusIAdjCompoundYasuiNikui;
-        logConfidenceAdjustment(inflection::kBonusIAdjCompoundYasuiNikui, "i_adj_compound_yasui_nikui");
+        float bon = GET_OPT(bonus_i_adj_compound_yasui_nikui, inflection::kBonusIAdjCompoundYasuiNikui);
+        base += bon;
+        logConfidenceAdjustment(bon, "i_adj_compound_yasui_nikui");
       }
     }
   }
@@ -649,8 +658,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // E-row endings (食べ, 見え, 教え) are typical of ichidan verb stems
   // This prevents "食べそう" from being parsed as i-adjective "食べい"
   if (type == VerbType::IAdjective && endsWithERow(stem)) {
-    base -= inflection::kPenaltyIAdjERowStem;
-    logConfidenceAdjustment(-inflection::kPenaltyIAdjERowStem, "i_adj_e_row_stem");
+    float pen = GET_OPT(penalty_i_adj_e_row_stem, inflection::kPenaltyIAdjERowStem);
+    base -= pen;
+    logConfidenceAdjustment(-pen, "i_adj_e_row_stem");
   }
 
   // I-adjective stems ending with "るらし" or "いらし" are likely verb/adj + rashii pattern
@@ -660,8 +670,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
   if (type == VerbType::IAdjective && stem_len >= core::kThreeJapaneseCharBytes) {
     std::string_view last9 = stem.substr(stem_len - core::kThreeJapaneseCharBytes);
     if (last9 == "るらし" || last9 == "いらし") {
-      base -= inflection::kPenaltyIAdjVerbRashiiPattern;
-      logConfidenceAdjustment(-inflection::kPenaltyIAdjVerbRashiiPattern, "i_adj_verb_rashii_pattern");
+      float pen = GET_OPT(penalty_i_adj_verb_rashii_pattern, inflection::kPenaltyIAdjVerbRashiiPattern);
+      base -= pen;
+      logConfidenceAdjustment(-pen, "i_adj_verb_rashii_pattern");
     }
   }
 
@@ -990,11 +1001,13 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // Longer stems (9+ bytes) might be verb compounds (考え直す)
       if (stem_len == core::kTwoJapaneseCharBytes) {
         if (type == VerbType::Suru) {
-          base += inflection::kBonusSuruTwoKanji;
-          logConfidenceAdjustment(inflection::kBonusSuruTwoKanji, "suru_two_kanji");
+          float bon = GET_OPT(bonus_suru_two_kanji, inflection::kBonusSuruTwoKanji);
+          base += bon;
+          logConfidenceAdjustment(bon, "suru_two_kanji");
         } else if (type == VerbType::GodanSa) {
-          base -= inflection::kPenaltyGodanSaTwoKanji;
-          logConfidenceAdjustment(-inflection::kPenaltyGodanSaTwoKanji, "godan_sa_two_kanji");
+          float pen = GET_OPT(penalty_godan_sa_two_kanji, inflection::kPenaltyGodanSaTwoKanji);
+          base -= pen;
+          logConfidenceAdjustment(-pen, "godan_sa_two_kanji");
         }
       } else if (stem_len >= core::kThreeJapaneseCharBytes) {
         // Longer stems (3+ kanji) might be verb compounds - reduce boost
@@ -1005,19 +1018,22 @@ float calculateConfidence(VerbType type, std::string_view stem,
       } else if (stem_len == core::kJapaneseCharBytes) {
         // Single-kanji stem: prefer GodanSa (出す, 消す, etc.)
         if (type == VerbType::GodanSa) {
-          base += inflection::kBonusGodanSaSingleKanji;
-          logConfidenceAdjustment(inflection::kBonusGodanSaSingleKanji, "godan_sa_single_kanji");
+          float bon = GET_OPT(bonus_godan_sa_single_kanji, inflection::kBonusGodanSaSingleKanji);
+          base += bon;
+          logConfidenceAdjustment(bon, "godan_sa_single_kanji");
         } else if (type == VerbType::Suru) {
-          base -= inflection::kPenaltySuruSingleKanji;
-          logConfidenceAdjustment(-inflection::kPenaltySuruSingleKanji, "suru_single_kanji");
+          float pen = GET_OPT(penalty_suru_single_kanji, inflection::kPenaltySuruSingleKanji);
+          base -= pen;
+          logConfidenceAdjustment(-pen, "suru_single_kanji");
         }
       }
     }
     // In mizenkei context for single-kanji, also boost GodanSa
     if (required_conn == conn::kVerbMizenkei && stem_len == core::kJapaneseCharBytes) {
       if (type == VerbType::GodanSa) {
-        base += inflection::kBonusGodanSaSingleKanji;
-        logConfidenceAdjustment(inflection::kBonusGodanSaSingleKanji, "godan_sa_single_kanji_mizenkei");
+        float bon = GET_OPT(bonus_godan_sa_single_kanji, inflection::kBonusGodanSaSingleKanji);
+        base += bon;
+        logConfidenceAdjustment(bon, "godan_sa_single_kanji_mizenkei");
       }
     }
 
@@ -1038,10 +1054,13 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // grammatically invalid patterns (e.g., e-row adjective stems like 食べい)
   // from valid patterns. The 0.5 threshold in adjective_candidates.cpp
   // will reject candidates below 0.5.
-  float result = std::min(inflection::kConfidenceCeiling,
-                          std::max(inflection::kConfidenceFloor, base));
+  float ceiling = GET_OPT(confidence_ceiling, inflection::kConfidenceCeiling);
+  float floor = GET_OPT(confidence_floor, inflection::kConfidenceFloor);
+  float result = std::min(ceiling, std::max(floor, base));
   SUZUME_DEBUG_LOG("[INFL_SCORE] → confidence=" << result << "\n");
   return result;
 }
+
+#undef GET_OPT
 
 }  // namespace suzume::grammar

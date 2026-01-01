@@ -87,14 +87,7 @@ ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
 
   if (!isIruAuxiliary(next.surface)) return {};
 
-  // Check if prev ends with te-form (て or で)
-  if (prev.surface.size() < core::kJapaneseCharBytes) {
-    return {};
-  }
-  std::string_view last_char = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
-  if (last_char != "て" && last_char != "で") {
-    return {};
-  }
+  if (!endsWithTeForm(prev.surface)) return {};
 
   // Bonus (negative value) for te-form + iru pattern
   return {ConnectionPattern::IruAuxAfterTeForm, -opts.bonus_iru_aux_after_te_form,
@@ -110,15 +103,7 @@ ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
 
   if (!isShimauAuxiliary(next.surface)) return {};
 
-  // Check if prev ends with te-form (て or で)
-  if (prev.surface.size() < core::kJapaneseCharBytes) {
-    return {};
-  }
-  std::string_view last_char =
-      prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
-  if (last_char != "て" && last_char != "で") {
-    return {};
-  }
+  if (!endsWithTeForm(prev.surface)) return {};
 
   // Bonus (negative value) for te-form + shimau pattern
   return {ConnectionPattern::ShimauAuxAfterTeForm,
@@ -135,14 +120,7 @@ ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
                                            const ConnectionOptions& opts) {
   if (!isVerbToAux(prev, next)) return {};
 
-  // Check if prev ends with te-form (て or で)
-  if (prev.surface.size() < core::kJapaneseCharBytes) {
-    return {};
-  }
-  std::string_view last_char = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
-  if (last_char != "て" && last_char != "で") {
-    return {};
-  }
+  if (!endsWithTeForm(prev.surface)) return {};
 
   // Check if next is single-character hiragana AUX that's NOT valid iru auxiliary
   if (next.surface.size() == core::kJapaneseCharBytes) {

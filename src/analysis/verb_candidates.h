@@ -8,6 +8,7 @@
 
 #include <vector>
 
+#include "analysis/candidate_options.h"
 #include "core/types.h"
 #include "dictionary/dictionary.h"
 #include "grammar/inflection.h"
@@ -35,7 +36,8 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager);
+    const dictionary::DictionaryManager* dict_manager,
+    const VerbCandidateOptions& verb_opts = {});
 
 /**
  * @brief Generate verb candidates (kanji + conjugation endings)
@@ -55,7 +57,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager);
+    const dictionary::DictionaryManager* dict_manager,
+    const VerbCandidateOptions& verb_opts = {});
 
 /**
  * @brief Generate hiragana verb candidates (pure hiragana verbs like いく, くる)
@@ -75,7 +78,8 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager);
+    const dictionary::DictionaryManager* dict_manager,
+    const VerbCandidateOptions& verb_opts = {});
 
 /**
  * @brief Generate katakana verb candidates (e.g., バズる, サボる, ググる)
@@ -94,7 +98,8 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     const std::vector<char32_t>& codepoints,
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection);
+    const grammar::Inflection& inflection,
+    const VerbCandidateOptions& verb_opts = {});
 
 }  // namespace suzume::analysis
 

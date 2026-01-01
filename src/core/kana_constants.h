@@ -170,6 +170,10 @@ inline bool isKanjiCodepoint(char32_t cp) {
   return (cp >= 0x4E00 && cp <= 0x9FFF) || (cp >= 0x3400 && cp <= 0x4DBF);
 }
 
+inline bool isOnbinCodepoint(char32_t cp) {
+  return cp == U'い' || cp == U'っ' || cp == U'ん';
+}
+
 inline bool isSmallKanaCodepoint(char32_t cp) {
   // Hiragana small kana
   if (cp == U'ゃ' || cp == U'ゅ' || cp == U'ょ' ||

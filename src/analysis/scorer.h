@@ -1,11 +1,15 @@
 #ifndef SUZUME_ANALYSIS_SCORER_H_
 #define SUZUME_ANALYSIS_SCORER_H_
 
+#include <cmath>
+#include <limits>
+
 #include "analysis/candidate_options.h"
 #include "analysis/connection_rule_options.h"
 #include "analysis/interfaces.h"
 #include "core/lattice.h"
 #include "core/types.h"
+#include "grammar/inflection_scorer.h"
 
 namespace suzume::analysis {
 
@@ -47,6 +51,35 @@ struct ScorerOptions {
     size_t katakana_max = 12;
   } optimal_length;
 
+  // Bigram cost overrides (NaN = use default table value)
+  // Only frequently-adjusted pairs are exposed for tuning
+  // Format: {prev}_{next} where prev/next are POS categories
+  struct BigramOverrides {
+    // High-impact pairs (adjust with caution)
+    float noun_to_suffix = std::numeric_limits<float>::quiet_NaN();   // default: -0.8
+    float prefix_to_noun = std::numeric_limits<float>::quiet_NaN();   // default: -1.5
+    float prefix_to_verb = std::numeric_limits<float>::quiet_NaN();   // default: -0.5
+    float pron_to_aux = std::numeric_limits<float>::quiet_NaN();      // default: 0.2
+
+    // Verb connections
+    float verb_to_verb = std::numeric_limits<float>::quiet_NaN();     // default: 0.8
+    float verb_to_noun = std::numeric_limits<float>::quiet_NaN();     // default: 0.2
+    float verb_to_aux = std::numeric_limits<float>::quiet_NaN();      // default: 0.0
+
+    // Adjective connections
+    float adj_to_aux = std::numeric_limits<float>::quiet_NaN();       // default: 0.5
+    float adj_to_verb = std::numeric_limits<float>::quiet_NaN();      // default: 0.5
+    float adj_to_adj = std::numeric_limits<float>::quiet_NaN();       // default: 0.8
+
+    // Particle connections
+    float part_to_verb = std::numeric_limits<float>::quiet_NaN();     // default: 0.2
+    float part_to_noun = std::numeric_limits<float>::quiet_NaN();     // default: 0.0
+
+    // Auxiliary connections
+    float aux_to_part = std::numeric_limits<float>::quiet_NaN();      // default: 0.0
+    float aux_to_aux = std::numeric_limits<float>::quiet_NaN();       // default: 0.3
+  } bigram;
+
   // Connection rule options (edge costs and connection costs)
   // These can be loaded from JSON at runtime for parameter tuning
   ConnectionRuleOptions connection_rules;
@@ -54,6 +87,12 @@ struct ScorerOptions {
   // Candidate generation options (join/split costs)
   // These can be loaded from JSON at runtime for parameter tuning
   CandidateOptions candidates;
+
+  // Inflection scorer options (confidence adjustments)
+  // These override values in inflection_scorer_constants.h
+  // NaN = use default constexpr value
+  // Defined in grammar/inflection_scorer.h
+  grammar::InflectionScorerOptions inflection;
 };
 
 /**
@@ -118,8 +157,9 @@ class Scorer : public IScorer {
 
   /**
    * @brief Calculate bigram connection cost
+   * Uses BigramOverrides if set, otherwise falls back to default table
    */
-  static float bigramCost(core::PartOfSpeech prev, core::PartOfSpeech next);
+  float bigramCost(core::PartOfSpeech prev, core::PartOfSpeech next) const;
 
   /**
    * @brief Check if edge has optimal length

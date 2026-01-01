@@ -200,7 +200,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
   if (char_types[start_pos] == normalize::CharType::Katakana) {
     auto kata_verbs =
         generateKatakanaVerbCandidates(codepoints, start_pos, char_types,
-                                       inflection_);
+                                       inflection_, options_.verb_candidate_options);
     candidates.insert(candidates.end(), kata_verbs.begin(), kata_verbs.end());
 
     auto kata_adjs =
@@ -507,7 +507,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCompoundVerbCandidat
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
   return analysis::generateCompoundVerbCandidates(
-      codepoints, start_pos, char_types, inflection_, dict_manager_);
+      codepoints, start_pos, char_types, inflection_, dict_manager_,
+      options_.verb_candidate_options);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateVerbCandidates(
@@ -516,7 +517,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateVerbCandidates(
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
   return analysis::generateVerbCandidates(
-      codepoints, start_pos, char_types, inflection_, dict_manager_);
+      codepoints, start_pos, char_types, inflection_, dict_manager_,
+      options_.verb_candidate_options);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateHiraganaVerbCandidates(
@@ -525,7 +527,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateHiraganaVerbCandidat
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
   return analysis::generateHiraganaVerbCandidates(
-      codepoints, start_pos, char_types, inflection_, dict_manager_);
+      codepoints, start_pos, char_types, inflection_, dict_manager_,
+      options_.verb_candidate_options);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateAdjectiveCandidates(

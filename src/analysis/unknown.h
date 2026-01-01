@@ -4,6 +4,7 @@
 #include <string_view>
 #include <vector>
 
+#include "analysis/candidate_options.h"
 #include "core/types.h"
 #include "dictionary/dictionary.h"
 #include "grammar/inflection.h"
@@ -35,6 +36,9 @@ struct UnknownOptions {
   bool enable_character_speech = true;
   float character_speech_cost = 0.6F;  // Higher than dict suffix (0.5) to prefer dict
   size_t max_character_speech_length = 4;  // Max codepoints for pattern match
+
+  // Verb candidate generation options
+  VerbCandidateOptions verb_candidate_options;
 };
 
 /**

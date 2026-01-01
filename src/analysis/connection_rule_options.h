@@ -43,7 +43,7 @@ struct EdgeOptions {
 
   // Bonus for unified verb forms containing auxiliary patterns (てしまった, てもらった, etc.)
   // This helps unified forms beat split paths when the te-form has a dictionary entry
-  float bonus_unified_verb_aux = 0.3F;  // Not in scorer_constants.h yet
+  float bonus_unified_verb_aux = scorer::kBonusUnifiedVerbAux;
 };
 
 /// Options for connection (bigram) scoring penalties/bonuses
@@ -97,7 +97,7 @@ struct ConnectionOptions {
 
   // Verb (renyokei/base) + case particle (を/が/に/で/から/まで/へ)
   // Penalizes patterns like 打ち合わせ(VERB)+を which should be NOUN+を
-  float penalty_verb_to_case_particle = scorer::scale::kStrong;  // 1.5F
+  float penalty_verb_to_case_particle = scorer::kPenaltyVerbToCaseParticle;
 
   // === Auxiliary Connection Rules ===
 

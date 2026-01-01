@@ -686,7 +686,6 @@ void addHiraganaCompoundVerbJoinCandidates(
       // Check if V2 reading (hiragana) or surface (kanji) matches at v2_start
       std::string_view v2_surface(v2_verb.surface);
       size_t matched_v2_len = 0;
-      bool use_kanji_lemma = false;
 
       // Try hiragana reading match first
       if (v2_start_byte + v2_reading.size() <= text.size()) {
@@ -702,7 +701,6 @@ void addHiraganaCompoundVerbJoinCandidates(
         std::string_view text_at_v2 = text.substr(v2_start_byte, v2_surface.size());
         if (text_at_v2 == v2_surface) {
           matched_v2_len = v2_surface.size();
-          use_kanji_lemma = true;
         }
       }
 

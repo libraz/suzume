@@ -22,6 +22,65 @@ namespace suzume::analysis {
 namespace {
 
 // =============================================================================
+// Common Utility Helpers
+// =============================================================================
+
+/**
+ * @brief Check if a base form exists in dictionary as a verb
+ *
+ * @param dict_manager Dictionary manager
+ * @param base_form The base form (lemma) to check
+ * @return true if the base form is registered as a verb in dictionary
+ */
+inline bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager,
+                               std::string_view base_form) {
+  if (dict_manager == nullptr || base_form.empty()) {
+    return false;
+  }
+  auto results = dict_manager->lookup(base_form, 0);
+  for (const auto& result : results) {
+    if (result.entry != nullptr && result.entry->surface == base_form &&
+        result.entry->pos == core::PartOfSpeech::Verb) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * @brief Check if a surface has a non-verb entry in dictionary
+ *
+ * @param dict_manager Dictionary manager
+ * @param surface The surface form to check
+ * @return true if there's a non-verb entry for this surface
+ */
+inline bool hasNonVerbDictionaryEntry(
+    const dictionary::DictionaryManager* dict_manager,
+    std::string_view surface) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  auto results = dict_manager->lookup(surface, 0);
+  for (const auto& result : results) {
+    if (result.entry != nullptr && result.entry->surface == surface &&
+        result.entry->pos != core::PartOfSpeech::Verb) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * @brief Sort candidates by cost (lowest cost first)
+ */
+inline void sortCandidatesByCost(std::vector<UnknownCandidate>& candidates) {
+  std::sort(candidates.begin(), candidates.end(),
+            [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
+              return lhs.cost < rhs.cost;
+            });
+}
+
+// =============================================================================
 // Pattern Checking Helpers (extracted for maintainability)
 // =============================================================================
 
@@ -148,7 +207,8 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager) {
+    const dictionary::DictionaryManager* dict_manager,
+    const VerbCandidateOptions& verb_opts) {
   std::vector<UnknownCandidate> candidates;
 
   // Requires dictionary to verify base forms
@@ -224,7 +284,7 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
     auto inflection_candidates = inflection.analyze(surface);
 
     for (const auto& infl_cand : inflection_candidates) {
-      if (infl_cand.confidence < 0.4F) {
+      if (infl_cand.confidence < verb_opts.confidence_low) {
         continue;
       }
 
@@ -252,7 +312,7 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
           cand.end = end_pos;
           cand.pos = core::PartOfSpeech::Verb;
           // Low cost to prefer dictionary-verified compound verbs
-          cand.cost = 0.3F;
+          cand.cost = verb_opts.base_cost_low;
           cand.has_suffix = false;
           // Note: Don't set lemma here - let lemmatizer derive it more accurately
           // Only set conj_type for conjugation pattern info
@@ -277,7 +337,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager) {
+    const dictionary::DictionaryManager* dict_manager,
+    const VerbCandidateOptions& verb_opts) {
   std::vector<UnknownCandidate> candidates;
 
   if (start_pos >= char_types.size() ||
@@ -409,21 +470,10 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
       for (const auto& cand : inflection_results) {
         if (cand.stem == expected_stem &&
-            cand.confidence > 0.48F &&
+            cand.confidence > verb_opts.confidence_standard &&
             cand.verb_type != grammar::VerbType::IAdjective) {
           // Check if this candidate's base_form exists in dictionary
-          bool in_dict = false;
-          if (dict_manager != nullptr && !cand.base_form.empty()) {
-            auto results = dict_manager->lookup(cand.base_form, 0);
-            for (const auto& result : results) {
-              if (result.entry != nullptr &&
-                  result.entry->surface == cand.base_form &&
-                  result.entry->pos == core::PartOfSpeech::Verb) {
-                in_dict = true;
-                break;
-              }
-            }
-          }
+          bool in_dict = isVerbInDictionary(dict_manager, cand.base_form);
 
           if (in_dict) {
             // Prefer dictionary-verified candidates
@@ -438,12 +488,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       }
 
       // Use dictionary-verified candidate if available and has reasonable confidence
-      if (dict_verified_best.confidence > 0.48F) {
+      if (dict_verified_best.confidence > verb_opts.confidence_standard) {
         best = dict_verified_best;
       }
 
       // Only proceed if we found a matching candidate
-      if (best.confidence > 0.48F) {
+      if (best.confidence > verb_opts.confidence_standard) {
           // Reject Godan verbs with stems ending in e-row hiragana
           // E-row endings (え,け,せ,て,ね,へ,め,れ) are typically ichidan stems
           // E.g., "伝えいた" falsely matches as GodanKa "伝えく" but 伝える is ichidan
@@ -500,7 +550,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           candidate.end = end_pos;
           candidate.pos = core::PartOfSpeech::Verb;
           // Lower cost for higher confidence matches
-          float base_cost = 0.4F + (1.0F - best.confidence) * 0.3F;
+          float base_cost = verb_opts.base_cost_standard + (1.0F - best.confidence) * verb_opts.confidence_cost_scale;
           // Suru verbs get a bonus to recognize as single verb (勉強する, 延期する)
           // BUT don't give bonus if stem ends with し and is short (1-2 kanji)
           // because that pattern is likely a GodanSa renyokei, not a Suru stem
@@ -515,30 +565,23 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               is_likely_godan_renyokei = true;
             }
             if (!is_likely_godan_renyokei) {
-              base_cost -= 0.2F;
+              base_cost += verb_opts.bonus_dict_match;
             }
           }
           // Check if base form exists in dictionary - significant bonus for known verbs
           // This helps 行われた (base=行う) beat 行(suffix)+われた split
           // Skip compound adjective patterns (verb renyoukei + にくい/やすい/がたい)
-          if (dict_manager != nullptr && !best.base_form.empty() &&
-              !isCompoundAdjectivePattern(surface)) {
-            auto results = dict_manager->lookup(best.base_form, 0);
-            for (const auto& result : results) {
-              if (result.entry != nullptr &&
-                  result.entry->surface == best.base_form &&
-                  result.entry->pos == core::PartOfSpeech::Verb) {
-                // Found in dictionary - give strong bonus
-                base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;
-                break;
-              }
-            }
+          if (!isCompoundAdjectivePattern(surface) &&
+              isVerbInDictionary(dict_manager, best.base_form)) {
+            // Found in dictionary - give strong bonus
+            base_cost = verb_opts.base_cost_verified +
+                        (1.0F - best.confidence) * verb_opts.confidence_cost_scale_medium;
           }
           // Penalty for verb candidates containing みたい suffix
           // みたい is a na-adjective (like ~, seems ~), not a verb suffix
           // E.g., 猫みたい should be 猫 + みたい, not VERB 猫む
           if (surface.find("みたい") != std::string::npos) {
-            base_cost += 1.5F;
+            base_cost += verb_opts.penalty_single_char;
           }
           candidate.cost = base_cost;
           candidate.has_suffix = false;
@@ -570,7 +613,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       size_t renyokei_end = kanji_end + 1;
       std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
       auto best = inflection.getBest(surface);
-      if (best.confidence > 0.48F && best.verb_type == grammar::VerbType::Ichidan) {
+      if (best.confidence > verb_opts.confidence_standard && best.verb_type == grammar::VerbType::Ichidan) {
         UnknownCandidate candidate;
         candidate.surface = surface;
         candidate.start = start_pos;
@@ -578,7 +621,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         candidate.pos = core::PartOfSpeech::Verb;
         // Negative cost to strongly favor split over combined analysis
         // Combined forms get optimal_length bonus (-0.5), so we need to be lower
-        float base_cost = -0.2F + (1.0F - best.confidence) * 0.1F;
+        float base_cost = verb_opts.bonus_ichidan + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_small;
         candidate.cost = base_cost;
         candidate.has_suffix = false;
         candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
@@ -593,10 +636,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   }
 
   // Sort by cost and return best candidates
-  std::sort(candidates.begin(), candidates.end(),
-            [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
-              return lhs.cost < rhs.cost;
-            });
+  sortCandidatesByCost(candidates);
 
   return candidates;
 }
@@ -606,7 +646,8 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager) {
+    const dictionary::DictionaryManager* dict_manager,
+    const VerbCandidateOptions& verb_opts) {
   std::vector<UnknownCandidate> candidates;
 
   if (start_pos >= char_types.size() ||
@@ -743,15 +784,9 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
             cand.base_form.empty()) {
           continue;
         }
-        auto results = dict_manager->lookup(cand.base_form, 0);
-        for (const auto& result : results) {
-          if (result.entry != nullptr &&
-              result.entry->surface == cand.base_form &&
-              result.entry->pos == core::PartOfSpeech::Verb) {
-            // Found a dictionary verb - collect this candidate
-            dict_matches.push_back(cand);
-            break;
-          }
+        if (isVerbInDictionary(dict_manager, cand.base_form)) {
+          // Found a dictionary verb - collect this candidate
+          dict_matches.push_back(cand);
         }
       }
 
@@ -845,20 +880,8 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
     // Filter out words that exist in dictionary as non-verb entries
     // e.g., あなた (pronoun), わたし (pronoun) should not be verb candidates
-    if (dict_manager != nullptr) {
-      auto dict_results = dict_manager->lookup(surface, 0);
-      bool has_non_verb_entry = false;
-      for (const auto& result : dict_results) {
-        if (result.entry != nullptr &&
-            result.entry->surface == surface &&
-            result.entry->pos != core::PartOfSpeech::Verb) {
-          has_non_verb_entry = true;
-          break;
-        }
-      }
-      if (has_non_verb_entry) {
-        continue;  // Skip - dictionary has non-verb entry for this surface
-      }
+    if (hasNonVerbDictionaryEntry(dict_manager, surface)) {
+      continue;  // Skip - dictionary has non-verb entry for this surface
     }
 
     // Check for 3-4 char hiragana verb ending with た/だ (past form) BEFORE threshold check
@@ -905,7 +928,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
             bool found_ichidan = false;
             for (const auto& cand : all_candidates) {
               if (cand.verb_type == grammar::VerbType::Ichidan &&
-                  cand.confidence >= 0.28F) {
+                  cand.confidence >= verb_opts.confidence_ichidan_dict) {
                 // Skip invalid るる pattern (e.g., つかれるる)
                 if (cand.base_form.size() >= 2 * core::kJapaneseCharBytes) {
                   std::string_view ending(
@@ -943,13 +966,13 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     // Lower threshold for dictionary-verified verbs, past/te forms, and ichidan dict forms
     // Ichidan dict forms get very low threshold (0.28) because pure hiragana stems
     // with 3+ chars get multiple penalties (stem_long + ichidan_pure_hiragana_stem)
-    float conf_threshold = is_dictionary_verb ? 0.35F :
-                           (looks_like_past_form || looks_like_te_form) ? 0.25F :
-                           looks_like_ichidan_dict_form ? 0.28F : 0.48F;
+    float conf_threshold = is_dictionary_verb ? verb_opts.confidence_dict_verb :
+                           (looks_like_past_form || looks_like_te_form) ? verb_opts.confidence_past_te :
+                           looks_like_ichidan_dict_form ? verb_opts.confidence_ichidan_dict : verb_opts.confidence_standard;
     if (best.confidence > conf_threshold &&
         best.verb_type != grammar::VerbType::IAdjective) {
       // Lower cost for higher confidence matches
-      float base_cost = 0.5F + (1.0F - best.confidence) * 0.3F;
+      float base_cost = verb_opts.base_cost_high + (1.0F - best.confidence) * verb_opts.confidence_cost_scale;
 
       // Give significant bonus for dictionary-verified hiragana verbs
       // This helps them beat the particle+adj+particle split path
@@ -967,7 +990,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       // Check for short te/de-form (e.g., ねて, でて, みて)
       // These are 2-char hiragana verbs that need a bonus to beat particle splits
       bool is_short_te_form = false;
-      if (candidate_len == 2 && best.confidence >= 0.7F) {
+      if (candidate_len == 2 && best.confidence >= verb_opts.confidence_high) {
         // Check last char in bytes (UTF-8)
         // て = E3 81 A6, で = E3 81 A7
         if (surface.size() >= 3) {
@@ -986,7 +1009,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       // Note: Lower confidence threshold (0.25) because ichidan_pure_hiragana_stem penalty
       // reduces confidence significantly for pure hiragana verbs
       bool is_medium_past_form = false;
-      if ((candidate_len == 3 || candidate_len == 4) && best.confidence >= 0.25F) {
+      if ((candidate_len == 3 || candidate_len == 4) && best.confidence >= verb_opts.confidence_past_te) {
         std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes,
                                     core::kJapaneseCharBytes);
         if (last_char == "た" || last_char == "だ") {
@@ -996,7 +1019,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
       if (is_dictionary_verb &&
           (candidate_len >= 5 || is_conditional || is_teoku_contraction)) {
-        base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;
+        base_cost = verb_opts.base_cost_verified + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_medium;
       } else if (is_short_te_form) {
         // Short te-form with high confidence: give strong bonus to beat particle splits
         // e.g., ねて (conf=0.79) should beat ね(PARTICLE) + て(PARTICLE)
@@ -1013,15 +1036,15 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
              first_char == U'へ');
         if (starts_with_common_particle) {
           // Extra strong bonus: need to beat particle paths around -0.5
-          base_cost = -0.8F + (1.0F - best.confidence) * 0.1F;
+          base_cost = verb_opts.bonus_long_verified + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_small;
         } else {
-          base_cost = -0.3F + (1.0F - best.confidence) * 0.1F;
+          base_cost = verb_opts.bonus_long_dict + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_small;
         }
       } else if (is_medium_past_form) {
         // Medium-length past form verbs (3-4 chars ending with た/だ)
         // e.g., つかれた (conf=0.43) should beat つ+か+れた split
         // Give bonus to compete with particle splits
-        base_cost = 0.2F + (1.0F - best.confidence) * 0.2F;
+        base_cost = verb_opts.confidence_cost_scale_medium + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_medium;
       } else if (looks_like_ichidan_dict_form) {
         // Ichidan dictionary form (e-row stem + る)
         // e.g., たべる (conf=0.39), しらべる, つかれる
@@ -1031,11 +1054,11 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
             (first_char == U'た' || first_char == U'で' || first_char == U'に');
         if (starts_with_aux_like_char) {
           // Extra bonus: need to beat た(AUX) + べる(AUX) split
-          base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;
+          base_cost = verb_opts.base_cost_verified + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_medium;
         } else {
-          base_cost = 0.3F + (1.0F - best.confidence) * 0.2F;
+          base_cost = verb_opts.base_cost_low + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_medium;
         }
-      } else if (candidate_len >= 7 && best.confidence >= 0.8F) {
+      } else if (candidate_len >= 7 && best.confidence >= verb_opts.confidence_very_high) {
         // For long hiragana verb forms (7+ chars) with high confidence,
         // give a bonus even without dictionary verification.
         // This helps forms like かけられなくなった (9 chars) beat the
@@ -1052,9 +1075,9 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
         if (starts_with_particle_char) {
           // Extra strong bonus for forms starting with particle-like char
           // e.g., かけられなくなった should strongly beat か + けられなくなった
-          base_cost = 0.05F + (1.0F - best.confidence) * 0.1F;
+          base_cost = verb_opts.base_cost_long_verified + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_small;
         } else {
-          base_cost = 0.2F + (1.0F - best.confidence) * 0.2F;
+          base_cost = verb_opts.confidence_cost_scale_medium + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_medium;
         }
       }
 
@@ -1080,10 +1103,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
   }
 
   // Sort by cost
-  std::sort(candidates.begin(), candidates.end(),
-            [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
-              return lhs.cost < rhs.cost;
-            });
+  sortCandidatesByCost(candidates);
 
   return candidates;
 }
@@ -1092,7 +1112,8 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     const std::vector<char32_t>& codepoints,
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection) {
+    const grammar::Inflection& inflection,
+    const VerbCandidateOptions& verb_opts) {
   std::vector<UnknownCandidate> candidates;
 
   // Only process katakana-starting positions
@@ -1165,7 +1186,7 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     auto best = inflection.getBest(surface);
 
     // Only accept verb types (not IAdjective) and require reasonable confidence
-    if (best.confidence > 0.5F &&
+    if (best.confidence > verb_opts.confidence_katakana &&
         best.verb_type != grammar::VerbType::IAdjective) {
       UnknownCandidate candidate;
       candidate.surface = surface;
@@ -1174,7 +1195,7 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
       candidate.pos = core::PartOfSpeech::Verb;
       // Lower cost than pure katakana noun to prefer verb reading
       // Cost: 0.4-0.55 based on confidence (lower = better)
-      candidate.cost = 0.4F + (1.0F - best.confidence) * 0.3F;
+      candidate.cost = verb_opts.base_cost_standard + (1.0F - best.confidence) * verb_opts.confidence_cost_scale;
       candidate.has_suffix = false;
       candidate.lemma = best.base_form;  // Set lemma from inflection analysis
       candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
@@ -1188,10 +1209,7 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
   }
 
   // Sort by cost
-  std::sort(candidates.begin(), candidates.end(),
-            [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
-              return lhs.cost < rhs.cost;
-            });
+  sortCandidatesByCost(candidates);
 
   return candidates;
 }

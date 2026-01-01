@@ -57,9 +57,14 @@ bool endsWithOnbinMarker(std::string_view surface);
 bool endsWithKuForm(std::string_view surface);
 
 /**
- * @brief Check if surface ends with te-form marker (て or で)
+ * @brief Check if surface starts with te-form marker (て or で)
  */
 bool startsWithTe(std::string_view surface);
+
+/**
+ * @brief Check if surface ends with te-form marker (て or で)
+ */
+bool endsWithTeForm(std::string_view surface);
 
 /**
  * @brief Check if surface ends with そう (auxiliary pattern)

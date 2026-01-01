@@ -1,5 +1,7 @@
 #include "analysis/scorer.h"
 
+#include <cmath>
+
 #include "analysis/connection_rules.h"
 #include "analysis/scorer_constants.h"
 #include "core/debug.h"
@@ -102,7 +104,45 @@ float Scorer::posPrior(core::PartOfSpeech pos) const {
   }
 }
 
-float Scorer::bigramCost(core::PartOfSpeech prev, core::PartOfSpeech next) {
+float Scorer::bigramCost(core::PartOfSpeech prev, core::PartOfSpeech next) const {
+  // Check for BigramOverrides first (NaN = use default)
+  const auto& bg = options_.bigram;
+
+  // Helper lambda to check if override is set
+  auto isSet = [](float v) { return !std::isnan(v); };
+
+  // Check specific pair overrides
+  using POS = core::PartOfSpeech;
+  if (prev == POS::Noun && next == POS::Suffix && isSet(bg.noun_to_suffix))
+    return bg.noun_to_suffix;
+  if (prev == POS::Prefix && next == POS::Noun && isSet(bg.prefix_to_noun))
+    return bg.prefix_to_noun;
+  if (prev == POS::Prefix && next == POS::Verb && isSet(bg.prefix_to_verb))
+    return bg.prefix_to_verb;
+  if (prev == POS::Pronoun && next == POS::Auxiliary && isSet(bg.pron_to_aux))
+    return bg.pron_to_aux;
+  if (prev == POS::Verb && next == POS::Verb && isSet(bg.verb_to_verb))
+    return bg.verb_to_verb;
+  if (prev == POS::Verb && next == POS::Noun && isSet(bg.verb_to_noun))
+    return bg.verb_to_noun;
+  if (prev == POS::Verb && next == POS::Auxiliary && isSet(bg.verb_to_aux))
+    return bg.verb_to_aux;
+  if (prev == POS::Adjective && next == POS::Auxiliary && isSet(bg.adj_to_aux))
+    return bg.adj_to_aux;
+  if (prev == POS::Adjective && next == POS::Verb && isSet(bg.adj_to_verb))
+    return bg.adj_to_verb;
+  if (prev == POS::Adjective && next == POS::Adjective && isSet(bg.adj_to_adj))
+    return bg.adj_to_adj;
+  if (prev == POS::Particle && next == POS::Verb && isSet(bg.part_to_verb))
+    return bg.part_to_verb;
+  if (prev == POS::Particle && next == POS::Noun && isSet(bg.part_to_noun))
+    return bg.part_to_noun;
+  if (prev == POS::Auxiliary && next == POS::Particle && isSet(bg.aux_to_part))
+    return bg.aux_to_part;
+  if (prev == POS::Auxiliary && next == POS::Auxiliary && isSet(bg.aux_to_aux))
+    return bg.aux_to_aux;
+
+  // Fall back to default table
   return kBigramCostTable[posToIndex(prev)][posToIndex(next)];
 }
 
