@@ -159,14 +159,13 @@
     },
     {
       "id": "social_recommendation",
-      "description": "Recommendation post",
+      "description": "Recommendation post - マジで is ADV (seriously/really)",
       "input": "このお店マジでおすすめ",
       "expected": [
         {"surface": "この", "pos": "Determiner"},
         {"surface": "お", "pos": "Prefix"},
         {"surface": "店", "pos": "Noun"},
-        {"surface": "マジ", "pos": "Noun"},
-        {"surface": "で", "pos": "Particle"},
+        {"surface": "マジで", "pos": "Adverb"},
         {"surface": "おすすめ", "pos": "Noun"}
       ],
       "tags": ["social"]

@@ -111,8 +111,15 @@ bool Scorer::isOptimalLength(const core::LatticeEdge& edge) const {
   const auto& opt = options_.optimal_length;
 
   switch (edge.pos) {
-    case core::PartOfSpeech::Noun:
+    case core::PartOfSpeech::Noun: {
+      // Use katakana limits for katakana sequences (longer foreign words)
+      auto codepoints = normalize::utf8::decode(edge.surface);
+      if (!codepoints.empty() &&
+          normalize::classifyChar(codepoints[0]) == normalize::CharType::Katakana) {
+        return length >= opt.katakana_min && length <= opt.katakana_max;
+      }
       return length >= opt.noun_min && length <= opt.noun_max;
+    }
     case core::PartOfSpeech::Verb:
       return length >= opt.verb_min && length <= opt.verb_max;
     case core::PartOfSpeech::Adjective:

@@ -1168,6 +1168,74 @@
         "weather",
         "regression"
       ]
+    },
+    {
+      "id": "l1_long_katakana_communication",
+      "description": "L1: コミュニケーション (9 chars) should be single NOUN, not split",
+      "input": "コミュニケーション",
+      "expected": [
+        {
+          "surface": "コミュニケーション",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "l1_fix",
+        "katakana",
+        "long_word",
+        "regression"
+      ]
+    },
+    {
+      "id": "l1_long_katakana_documentation",
+      "description": "L1: ドキュメンテーション (10 chars) should be single NOUN",
+      "input": "ドキュメンテーション",
+      "expected": [
+        {
+          "surface": "ドキュメンテーション",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "l1_fix",
+        "katakana",
+        "long_word",
+        "regression"
+      ]
+    },
+    {
+      "id": "l1_long_katakana_infrastructure",
+      "description": "L1: インフラストラクチャー (11 chars) should be single NOUN",
+      "input": "インフラストラクチャー",
+      "expected": [
+        {
+          "surface": "インフラストラクチャー",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "l1_fix",
+        "katakana",
+        "long_word",
+        "regression"
+      ]
+    },
+    {
+      "id": "l1_long_katakana_accessibility",
+      "description": "L1: アクセシビリティ (8 chars) should be single NOUN",
+      "input": "アクセシビリティ",
+      "expected": [
+        {
+          "surface": "アクセシビリティ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "l1_fix",
+        "katakana",
+        "long_word",
+        "regression"
+      ]
     }
   ]
 }

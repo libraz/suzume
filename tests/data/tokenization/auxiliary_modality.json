@@ -4,12 +4,12 @@
   "cases": [
     {
       "id": "edge_single_katakana",
-      "description": "ア - single katakana",
+      "description": "ア - single katakana (letter name, NOUN)",
       "input": "ア",
       "expected": [
         {
           "surface": "ア",
-          "pos": "Auxiliary"
+          "pos": "Noun"
         }
       ],
       "tags": [

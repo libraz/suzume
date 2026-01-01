@@ -642,6 +642,12 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
         length_penalty = static_cast<float>(char_count - 2) * 2.0F;
       }
 
+      // Katakana character speech is very rare (most katakana are loanword nouns)
+      // Apply penalty to prefer NOUN interpretation for katakana words like パン, キロ
+      if (start_type == normalize::CharType::Katakana) {
+        length_penalty += 0.8F;  // Prefer katakana NOUN over char_speech AUX
+      }
+
       UnknownCandidate candidate;
       candidate.surface = surface;
       candidate.start = start_pos;
