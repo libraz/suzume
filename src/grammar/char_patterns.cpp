@@ -61,10 +61,11 @@ bool isERowCodepoint(char32_t cp) {
 }
 
 bool isIRowCodepoint(char32_t cp) {
-  // い段: い, き, ぎ, し, ち, に, ひ, び, み, り
+  // い段: い, き, ぎ, し, じ, ち, ぢ, に, ひ, び, ぴ, み, り
   return cp == U'い' || cp == U'き' || cp == U'ぎ' || cp == U'し' ||
-         cp == U'ち' || cp == U'に' || cp == U'ひ' || cp == U'び' ||
-         cp == U'み' || cp == U'り';
+         cp == U'じ' || cp == U'ち' || cp == U'ぢ' || cp == U'に' ||
+         cp == U'ひ' || cp == U'び' || cp == U'ぴ' || cp == U'み' ||
+         cp == U'り';
 }
 
 bool endsWithChar(std::string_view stem, const char* chars[], size_t count) {

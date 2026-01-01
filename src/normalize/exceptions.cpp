@@ -26,6 +26,8 @@ const std::unordered_set<std::string_view> kSingleKanjiExceptions = {
     "朝", "昼", "夜",
     // Interrogatives (疑問詞)
     "何", "誰",
+    // Pronouns (代名詞) - very common standalone kanji
+    "私", "僕", "俺", "君", "彼", "我",
 };
 
 // =============================================================================

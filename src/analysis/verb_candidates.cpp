@@ -553,15 +553,17 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     }
   }
 
-  // Try Ichidan renyokei pattern: kanji + e-row hiragana (食べ, 見せ, 教え)
+  // Try Ichidan renyokei pattern: kanji + e-row/i-row hiragana
+  // 下一段 (shimo-ichidan): e-row ending (食べ, 見せ, 教え)
+  // 上一段 (kami-ichidan): i-row ending (感じ, 見, 居)
   // These are standalone verb forms that connect to ます, ましょう, etc.
   // The stem IS the entire surface (no conjugation suffix)
-  // Check if first hiragana after kanji is e-row
   if (kanji_end < hiragana_end) {
     char32_t first_hira = codepoints[kanji_end];
     // E-row hiragana: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
-    if (grammar::isERowCodepoint(first_hira)) {
-      // Surface is kanji + first e-row hiragana only (e.g., 食べ from 食べます)
+    // I-row hiragana: い, き, し, ち, に, ひ, み, り, ぎ, じ, ぢ, び, ぴ
+    if (grammar::isERowCodepoint(first_hira) || grammar::isIRowCodepoint(first_hira)) {
+      // Surface is kanji + first e/i-row hiragana only (e.g., 食べ from 食べます, 感じ from 感じる)
       size_t renyokei_end = kanji_end + 1;
       std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
       auto best = inflection.getBest(surface);

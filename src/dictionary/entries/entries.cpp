@@ -454,18 +454,21 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
 std::vector<DictionaryEntry> getPronounEntries() {
   return {
       // First person (一人称) - kanji with reading
-      {"私", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "わたし"},
+      // Note: 私/俺 have lower cost to encourage splits (第一私は → 第一+私+は)
+      // But 僕 keeps higher cost due to compounds like 下僕
+      {"私", POS::Pronoun, 0.3F, "", false, false, false, CT::None, "わたし"},
       {"僕", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "ぼく"},
-      {"俺", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "おれ"},
+      {"俺", POS::Pronoun, 0.3F, "", false, false, false, CT::None, "おれ"},
       // First person - hiragana only
       {"わたくし", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
 
       // First person plural (一人称複数)
-      {"私たち", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "わたしたち"},
-      {"僕たち", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "ぼくたち"},
-      {"僕ら", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "ぼくら"},
-      {"俺たち", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "おれたち"},
-      {"俺ら", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "おれら"},
+      // Lower cost to beat single pronoun + suffix split
+      {"私たち", POS::Pronoun, 0.2F, "", false, false, false, CT::None, "わたしたち"},
+      {"僕たち", POS::Pronoun, 0.2F, "", false, false, false, CT::None, "ぼくたち"},
+      {"僕ら", POS::Pronoun, 0.2F, "", false, false, false, CT::None, "ぼくら"},
+      {"俺たち", POS::Pronoun, 0.2F, "", false, false, false, CT::None, "おれたち"},
+      {"俺ら", POS::Pronoun, 0.2F, "", false, false, false, CT::None, "おれら"},
       {"我々", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "われわれ"},
 
       // Second person (二人称) - kanji with reading
@@ -850,6 +853,12 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       // Emphatic adverbs (強調副詞)
       {"一際", POS::Adverb, 0.3F, "", false, false, false, CT::None, "ひときわ"},
       {"俄然", POS::Adverb, 0.3F, "", false, false, false, CT::None, "がぜん"},  // B53: suddenly/all of a sudden
+      // Degree/manner adverbs (程度副詞)
+      // 別段: "particularly/especially" (often with negative), e.g., 別段恐ろしくない
+      {"別段", POS::Adverb, 0.1F, "", false, false, false, CT::None, "べつだん"},
+      {"多分", POS::Adverb, 0.1F, "", false, false, false, CT::None, "たぶん"},
+      {"随分", POS::Adverb, 0.1F, "", false, false, false, CT::None, "ずいぶん"},
+      {"大分", POS::Adverb, 0.1F, "", false, false, false, CT::None, "だいぶ"},
       // とんと: "at all/completely" (with negative), e.g., とんと分からない
       // Low cost to prevent と+ん+と particle split
       {"とんと", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},
