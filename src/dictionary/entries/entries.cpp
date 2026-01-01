@@ -1537,7 +1537,11 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"あげる", POS::Verb, 0.3F, "あげる", false, false, true, CT::Ichidan, "あげる"},
       {"みる", POS::Verb, 0.3F, "みる", false, false, true, CT::Ichidan, "みる"},
       {"おく", POS::Verb, 0.3F, "おく", false, false, true, CT::GodanKa, "おく"},
-      {"しまう", POS::Verb, 0.3F, "しまう", false, false, true, CT::GodanWa, "しまう"},
+      // Cost 0.25F (slightly lower than しまる 0.3F) because:
+      // - Pure hiragana しまった is much more commonly しまう (completive) than しまる (close)
+      // - When both generate しまった, しまう should win the tie
+      // Note: is_low_info=false to avoid +0.5 penalty that would negate the cost advantage
+      {"しまう", POS::Verb, 0.25F, "しまう", false, false, false, CT::GodanWa, "しまう"},
 
       // Common GodanWa verbs
       {"手伝う", POS::Verb, 1.0F, "手伝う", false, false, false, CT::GodanWa, "てつだう"},

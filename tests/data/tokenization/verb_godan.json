@@ -2853,6 +2853,42 @@
         {"surface": "やらされた", "pos": "Verb", "lemma": "やる"}
       ],
       "tags": ["causative-passive", "hiragana-verb", "regression"]
+    },
+    {
+      "id": "p4_shimatta_past",
+      "description": "しまった - GodanWa past form, lemma should be しまう not しまる",
+      "input": "しまった",
+      "expected": [
+        {"surface": "しまった", "pos": "Verb", "lemma": "しまう"}
+      ],
+      "tags": ["p4", "godanwa", "hiragana-verb", "past-form"]
+    },
+    {
+      "id": "p4_shimatte_te",
+      "description": "しまって - GodanWa te-form, lemma should be しまう",
+      "input": "しまって",
+      "expected": [
+        {"surface": "しまって", "pos": "Verb", "lemma": "しまう"}
+      ],
+      "tags": ["p4", "godanwa", "hiragana-verb", "te-form"]
+    },
+    {
+      "id": "p4_aratta_past",
+      "description": "あらった - GodanWa past form without dictionary, lemma should be あらう",
+      "input": "あらった",
+      "expected": [
+        {"surface": "あらった", "pos": "Verb", "lemma": "あらう"}
+      ],
+      "tags": ["p4", "godanwa", "hiragana-verb", "past-form", "unknown"]
+    },
+    {
+      "id": "p4_aratte_te",
+      "description": "あらって - GodanWa te-form without dictionary, lemma should be あらう",
+      "input": "あらって",
+      "expected": [
+        {"surface": "あらって", "pos": "Verb", "lemma": "あらう"}
+      ],
+      "tags": ["p4", "godanwa", "hiragana-verb", "te-form", "unknown"]
     }
   ]
 }

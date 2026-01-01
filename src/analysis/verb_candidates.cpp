@@ -6,6 +6,7 @@
 #include "verb_candidates.h"
 
 #include <algorithm>
+#include <cmath>
 
 #include "analysis/scorer_constants.h"
 #include "core/utf8_constants.h"
@@ -724,10 +725,14 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     grammar::InflectionCandidate best;
     bool is_dictionary_verb = false;
 
-    // Look through all candidates to find one whose base form is in the dictionary
-    // This helps with cases like やっとく where やる (conf=0.43) is correct but
-    // やつ (conf=0.73) incorrectly gets higher confidence
+    // Look through all candidates to find ones whose base form is in the dictionary
+    // Collect all matches and select the best one based on:
+    // 1. Higher confidence
+    // 2. GodanWa > GodanRa/GodanTa when tied (う verbs are much more common for hiragana)
+    // This helps with cases like しまった where しまう (GodanWa) should beat しまる (GodanRa)
     if (dict_manager != nullptr) {
+      std::vector<grammar::InflectionCandidate> dict_matches;
+
       for (const auto& cand : all_candidates) {
         if (cand.verb_type == grammar::VerbType::IAdjective ||
             cand.base_form.empty()) {
@@ -738,21 +743,63 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
           if (result.entry != nullptr &&
               result.entry->surface == cand.base_form &&
               result.entry->pos == core::PartOfSpeech::Verb) {
-            // Found a dictionary verb - use this candidate
-            best = cand;
-            is_dictionary_verb = true;
+            // Found a dictionary verb - collect this candidate
+            dict_matches.push_back(cand);
             break;
           }
         }
-        if (is_dictionary_verb) {
-          break;
+      }
+
+      // Select the best dictionary match
+      if (!dict_matches.empty()) {
+        is_dictionary_verb = true;
+        best = dict_matches[0];
+
+        for (size_t i = 1; i < dict_matches.size(); ++i) {
+          const auto& cand = dict_matches[i];
+          // Higher confidence wins
+          if (cand.confidence > best.confidence + 0.01F) {
+            best = cand;
+          } else if (std::abs(cand.confidence - best.confidence) <= 0.01F) {
+            // When confidence is tied (within 0.01), prefer GodanWa over GodanRa/GodanTa
+            // Rationale: For pure hiragana stems, う verbs (しまう, あらう, かう) are
+            // much more common than る/つ verbs with the same stem pattern.
+            // GodanRa: rare for pure hiragana (most are kanji: 走る, 帰る)
+            // GodanTa: rare (持つ, 勝つ, etc. - usually with kanji)
+            // GodanWa: very common in hiragana (しまう, あらう, まよう, etc.)
+            if (cand.verb_type == grammar::VerbType::GodanWa &&
+                (best.verb_type == grammar::VerbType::GodanRa ||
+                 best.verb_type == grammar::VerbType::GodanTa)) {
+              best = cand;
+            }
+          }
         }
       }
     }
 
-    // If no dictionary match, use the best confidence match
+    // If no dictionary match, select best candidate with GodanWa preference
+    // When confidence is tied, GodanWa should beat GodanRa/GodanTa because
+    // う verbs (あらう, かう, まよう) are much more common than る/つ verbs
+    // for pure hiragana stems
     if (!is_dictionary_verb && !all_candidates.empty()) {
-      best = inflection.getBest(surface);
+      best = all_candidates[0];
+      for (size_t i = 1; i < all_candidates.size(); ++i) {
+        const auto& cand = all_candidates[i];
+        if (cand.verb_type == grammar::VerbType::IAdjective) {
+          continue;
+        }
+        // Higher confidence wins
+        if (cand.confidence > best.confidence + 0.01F) {
+          best = cand;
+        } else if (std::abs(cand.confidence - best.confidence) <= 0.01F) {
+          // When confidence is tied (within 0.01), prefer GodanWa over GodanRa/GodanTa
+          if (cand.verb_type == grammar::VerbType::GodanWa &&
+              (best.verb_type == grammar::VerbType::GodanRa ||
+               best.verb_type == grammar::VerbType::GodanTa)) {
+            best = cand;
+          }
+        }
+      }
     }
 
     // Filter out 2-char hiragana that don't end with valid verb endings
@@ -814,12 +861,16 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     // These need lower threshold because ichidan_pure_hiragana_stem penalty reduces confidence
     size_t pre_check_len = end_pos - start_pos;
     bool looks_like_past_form = false;
+    bool looks_like_te_form = false;
     if ((pre_check_len == 3 || pre_check_len == 4) &&
         surface.size() >= core::kJapaneseCharBytes) {
       std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes,
                                   core::kJapaneseCharBytes);
       if (last_char == "た" || last_char == "だ") {
         looks_like_past_form = true;
+      } else if (last_char == "て" || last_char == "で") {
+        // Te-form verbs (あらって, しまって, かって) need lower threshold too
+        looks_like_te_form = true;
       }
     }
 
@@ -843,15 +894,39 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
           bool is_te_iru_contraction = (stem_end == U'て' || stem_end == U'で');
           if (!is_te_iru_contraction) {
             // Find ichidan candidate to use for verb type and base form
+            // For dictionary forms (e-row stem + る), prefer longer valid stems
+            // Valid: つかれる (e-row ending), Invalid: つかれるる (るる pattern)
+            grammar::InflectionCandidate best_ichidan;
+            bool found_ichidan = false;
             for (const auto& cand : all_candidates) {
               if (cand.verb_type == grammar::VerbType::Ichidan &&
                   cand.confidence >= 0.28F) {
-                looks_like_ichidan_dict_form = true;
-                // Use ichidan candidate as best if pattern matches
-                if (best.verb_type != grammar::VerbType::Ichidan) {
-                  best = cand;
+                // Skip invalid るる pattern (e.g., つかれるる)
+                if (cand.base_form.size() >= 2 * core::kJapaneseCharBytes) {
+                  std::string_view ending(
+                      cand.base_form.data() + cand.base_form.size() - 2 * core::kJapaneseCharBytes,
+                      2 * core::kJapaneseCharBytes);
+                  if (ending == "るる") {
+                    continue;  // Skip invalid pattern
+                  }
                 }
-                break;
+                if (!found_ichidan) {
+                  best_ichidan = cand;
+                  found_ichidan = true;
+                } else if (cand.base_form.size() > best_ichidan.base_form.size()) {
+                  // Prefer longer base form (e.g., つかれる > つかる)
+                  best_ichidan = cand;
+                }
+              }
+            }
+            if (found_ichidan) {
+              looks_like_ichidan_dict_form = true;
+              // Use ichidan candidate as best if pattern matches
+              if (best.verb_type != grammar::VerbType::Ichidan) {
+                best = best_ichidan;
+              } else if (best_ichidan.base_form.size() > best.base_form.size()) {
+                // Even if already Ichidan, prefer longer base form
+                best = best_ichidan;
               }
             }
           }
@@ -860,11 +935,11 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     }
 
     // Only accept verb types (not IAdjective) with sufficient confidence
-    // Lower threshold for dictionary-verified verbs, past forms, and ichidan dict forms
+    // Lower threshold for dictionary-verified verbs, past/te forms, and ichidan dict forms
     // Ichidan dict forms get very low threshold (0.28) because pure hiragana stems
     // with 3+ chars get multiple penalties (stem_long + ichidan_pure_hiragana_stem)
     float conf_threshold = is_dictionary_verb ? 0.35F :
-                           looks_like_past_form ? 0.25F :
+                           (looks_like_past_form || looks_like_te_form) ? 0.25F :
                            looks_like_ichidan_dict_form ? 0.28F : 0.48F;
     if (best.confidence > conf_threshold &&
         best.verb_type != grammar::VerbType::IAdjective) {
@@ -985,8 +1060,10 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       candidate.pos = core::PartOfSpeech::Verb;
       candidate.cost = base_cost;
       candidate.has_suffix = false;
-      // Note: Don't set lemma here - let lemmatizer derive it more accurately
-      // Only set conj_type for conjugation pattern info
+      // Set lemma from inflection analysis for pure hiragana verbs
+      // This is essential for P4 (ひらがな動詞活用展開) to work without dictionary
+      // The lemmatizer can't derive lemma accurately for unknown verbs
+      candidate.lemma = best.base_form;
       candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
 #ifdef SUZUME_DEBUG_INFO
       candidate.origin = CandidateOrigin::VerbHiragana;
