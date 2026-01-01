@@ -823,10 +823,49 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       }
     }
 
+    // Check for ichidan dictionary form (e-row stem + る)
+    // e.g., たべる (食べる), しらべる (調べる), つかれる (疲れる)
+    // These need lower threshold because ichidan_pure_hiragana_stem penalty reduces confidence
+    // Note: Check pattern structure directly, not verb_type, because when multiple
+    // candidates have the same confidence, the godan candidate may be returned first
+    // Exception: Exclude てる pattern (て + る) which is the ている contraction
+    // e.g., してる should be する+ている, not しる (ichidan)
+    bool looks_like_ichidan_dict_form = false;
+    if (pre_check_len >= 3 && surface.size() >= core::kTwoJapaneseCharBytes) {
+      std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes,
+                                  core::kJapaneseCharBytes);
+      if (last_char == "る" && end_pos >= 2) {
+        // Check if second-to-last char is e-row hiragana (ichidan stem ending)
+        char32_t stem_end = codepoints[end_pos - 2];
+        if (grammar::isERowCodepoint(stem_end)) {
+          // Exclude てる pattern (ている contraction) - this should be suru/godan + ている
+          // not ichidan dictionary form
+          bool is_te_iru_contraction = (stem_end == U'て' || stem_end == U'で');
+          if (!is_te_iru_contraction) {
+            // Find ichidan candidate to use for verb type and base form
+            for (const auto& cand : all_candidates) {
+              if (cand.verb_type == grammar::VerbType::Ichidan &&
+                  cand.confidence >= 0.28F) {
+                looks_like_ichidan_dict_form = true;
+                // Use ichidan candidate as best if pattern matches
+                if (best.verb_type != grammar::VerbType::Ichidan) {
+                  best = cand;
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
     // Only accept verb types (not IAdjective) with sufficient confidence
-    // Lower threshold for dictionary-verified verbs and medium-length past forms
+    // Lower threshold for dictionary-verified verbs, past forms, and ichidan dict forms
+    // Ichidan dict forms get very low threshold (0.28) because pure hiragana stems
+    // with 3+ chars get multiple penalties (stem_long + ichidan_pure_hiragana_stem)
     float conf_threshold = is_dictionary_verb ? 0.35F :
-                           looks_like_past_form ? 0.25F : 0.48F;
+                           looks_like_past_form ? 0.25F :
+                           looks_like_ichidan_dict_form ? 0.28F : 0.48F;
     if (best.confidence > conf_threshold &&
         best.verb_type != grammar::VerbType::IAdjective) {
       // Lower cost for higher confidence matches
@@ -903,6 +942,19 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
         // e.g., つかれた (conf=0.43) should beat つ+か+れた split
         // Give bonus to compete with particle splits
         base_cost = 0.2F + (1.0F - best.confidence) * 0.2F;
+      } else if (looks_like_ichidan_dict_form) {
+        // Ichidan dictionary form (e-row stem + る)
+        // e.g., たべる (conf=0.39), しらべる, つかれる
+        // These are highly likely to be real verbs, give modest bonus
+        // Starting with particle-like chars (た, etc.) needs stronger bonus
+        bool starts_with_aux_like_char =
+            (first_char == U'た' || first_char == U'で' || first_char == U'に');
+        if (starts_with_aux_like_char) {
+          // Extra bonus: need to beat た(AUX) + べる(AUX) split
+          base_cost = 0.1F + (1.0F - best.confidence) * 0.2F;
+        } else {
+          base_cost = 0.3F + (1.0F - best.confidence) * 0.2F;
+        }
       } else if (candidate_len >= 7 && best.confidence >= 0.8F) {
         // For long hiragana verb forms (7+ chars) with high confidence,
         // give a bonus even without dictionary verification.

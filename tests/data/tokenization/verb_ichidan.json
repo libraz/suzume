@@ -628,6 +628,71 @@
       "tags": ["s4_fix", "hiragana_verb", "regression"]
     },
     {
+      "id": "hiragana_taberu_dict",
+      "description": "たべる hiragana ichidan dictionary form (not た+べる split)",
+      "input": "たべる",
+      "expected": [
+        {
+          "surface": "たべる",
+          "pos": "Verb",
+          "lemma": "たべる"
+        }
+      ],
+      "tags": ["hiragana_verb", "ichidan"]
+    },
+    {
+      "id": "hiragana_shiraberu_dict",
+      "description": "しらべる hiragana ichidan dictionary form",
+      "input": "しらべる",
+      "expected": [
+        {
+          "surface": "しらべる",
+          "pos": "Verb",
+          "lemma": "しらべる"
+        }
+      ],
+      "tags": ["hiragana_verb", "ichidan"]
+    },
+    {
+      "id": "hiragana_tsukareru_dict",
+      "description": "つかれる hiragana ichidan dictionary form",
+      "input": "つかれる",
+      "expected": [
+        {
+          "surface": "つかれる",
+          "pos": "Verb",
+          "lemma": "つかれる"
+        }
+      ],
+      "tags": ["hiragana_verb", "ichidan"]
+    },
+    {
+      "id": "hiragana_taoreru_dict",
+      "description": "たおれる hiragana ichidan dictionary form",
+      "input": "たおれる",
+      "expected": [
+        {
+          "surface": "たおれる",
+          "pos": "Verb",
+          "lemma": "たおれる"
+        }
+      ],
+      "tags": ["hiragana_verb", "ichidan"]
+    },
+    {
+      "id": "hiragana_shiteru_contraction",
+      "description": "してる should be する+ている contraction (not しる)",
+      "input": "してる",
+      "expected": [
+        {
+          "surface": "してる",
+          "pos": "Verb",
+          "lemma": "する"
+        }
+      ],
+      "tags": ["hiragana_verb", "contraction"]
+    },
+    {
       "id": "passive_desiderative_miraretai",
       "description": "S1: 見られたい (want to be seen) passive+desiderative",
       "input": "見られたい",
