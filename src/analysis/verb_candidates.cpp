@@ -803,6 +803,97 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     }
   }
 
+  // Generate Ichidan stem candidates for passive/potential auxiliary patterns
+  // E.g., 信じられべき (信じ + られべき), 認められた (認め + られた)
+  // These connect to られ+X (passive/potential auxiliary forms)
+  // Unlike Godan mizenkei which uses れ+X, Ichidan uses られ+X
+  {
+    // Check if followed by られ+X pattern (られた, られる, られべき, られます, etc.)
+    bool has_rare_suffix = false;
+    size_t stem_end = 0;
+
+    // Pattern 1: Kanji + E/I row hiragana + られ+X (e.g., 信じ+られべき, 認め+られた)
+    if (kanji_end < hiragana_end) {
+      char32_t first_hira = codepoints[kanji_end];
+      if (grammar::isERowCodepoint(first_hira) || grammar::isIRowCodepoint(first_hira)) {
+        size_t ichidan_stem_end = kanji_end + 1;
+        // Check for られ pattern (at least 2 chars)
+        if (ichidan_stem_end + 1 < codepoints.size() &&
+            codepoints[ichidan_stem_end] == U'ら' &&
+            codepoints[ichidan_stem_end + 1] == U'れ') {
+          has_rare_suffix = true;
+          stem_end = ichidan_stem_end;
+        }
+      }
+    }
+
+    // Pattern 2: Single kanji + られ+X (e.g., 見+られべき)
+    // Only for known single-kanji Ichidan verbs
+    if (!has_rare_suffix && kanji_end == start_pos + 1) {
+      char32_t kanji_char = codepoints[start_pos];
+      // Common single-kanji Ichidan verbs:
+      // 見(みる), 居(いる), 着(きる), 寝(ねる), 煮(にる), 似(にる)
+      // 経(へる), 干(ひる), 射(いる), 得(える/うる)
+      bool is_single_kanji_ichidan =
+          (kanji_char == U'見' || kanji_char == U'居' || kanji_char == U'着' ||
+           kanji_char == U'寝' || kanji_char == U'煮' || kanji_char == U'似' ||
+           kanji_char == U'経' || kanji_char == U'干' || kanji_char == U'射' ||
+           kanji_char == U'得');
+      if (is_single_kanji_ichidan) {
+        // Check for られ suffix right after the single kanji
+        if (kanji_end + 1 < codepoints.size() &&
+            codepoints[kanji_end] == U'ら' &&
+            codepoints[kanji_end + 1] == U'れ') {
+          has_rare_suffix = true;
+          stem_end = kanji_end;
+        }
+      }
+    }
+
+    if (has_rare_suffix && stem_end > start_pos) {
+      std::string surface = extractSubstring(codepoints, start_pos, stem_end);
+      // Construct base form: stem + る (e.g., 信じ → 信じる, 見 → 見る)
+      std::string base_form = surface + "る";
+
+      // Verify the base form exists in dictionary or is valid Ichidan verb
+      bool is_valid_verb = isVerbInDictionary(dict_manager, base_form);
+      if (!is_valid_verb) {
+        // Check if inflection analyzer recognizes this as Ichidan verb
+        // Use >= threshold to include edge cases like 信じる (conf=0.3)
+        auto infl_result = inflection.getBest(base_form);
+        is_valid_verb = infl_result.confidence >= 0.3F &&
+                        infl_result.verb_type == grammar::VerbType::Ichidan;
+      }
+
+      if (is_valid_verb) {
+        UnknownCandidate candidate;
+        candidate.surface = surface;
+        candidate.start = start_pos;
+        candidate.end = stem_end;
+        candidate.pos = core::PartOfSpeech::Verb;
+        // Negative cost to beat single-verb inflection path (which gets optimal_length -0.5 bonus)
+        // For complex aux chains like られ+なくて, need more aggressive bonus
+        // Split path: stem(-0.5) + pos(0.2) + aux_chain ≈ -0.5
+        // Single path: base(~0.1) + pos(0.2) + optimal_length(-0.5) ≈ -0.2
+        candidate.cost = -0.5F;
+        candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
+        candidate.lemma = base_form;
+        candidate.conj_type = grammar::verbTypeToConjType(grammar::VerbType::Ichidan);
+        SUZUME_DEBUG_BLOCK {
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
+                              << " ichidan_stem_rare lemma=" << base_form
+                              << " cost=" << candidate.cost << "\n";
+        }
+#ifdef SUZUME_DEBUG_INFO
+        candidate.origin = CandidateOrigin::VerbKanji;
+        candidate.confidence = 0.9F;
+        candidate.pattern = "ichidan_stem_rare";
+#endif
+        candidates.push_back(candidate);
+      }
+    }
+  }
+
   // Generate Godan mizenkei stem candidates for auxiliary separation
   // E.g., 書か (from 書く), 読ま (from 読む), 話さ (from 話す)
   // These connect to passive (れる), causative (せる), negative (ない)

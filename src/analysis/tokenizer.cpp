@@ -385,6 +385,11 @@ void Tokenizer::addUnknownCandidates(
 
     std::string surface_str(candidate.surface);
 
+    // Set HasSuffix flag for verb/adj candidates with suffix marking
+    if (candidate.has_suffix) {
+      flags |= static_cast<uint8_t>(core::EdgeFlags::HasSuffix);
+    }
+
 #ifdef SUZUME_DEBUG_INFO
     lattice.addEdge(surface_str, static_cast<uint32_t>(candidate.start),
                     static_cast<uint32_t>(candidate.end), candidate.pos,

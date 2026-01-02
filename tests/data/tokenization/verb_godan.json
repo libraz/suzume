@@ -1160,18 +1160,23 @@
     },
     {
       "id": "causative_passive_yoserareru",
-      "description": "寄せられた should have lemma 寄せる (not 寄る)",
+      "description": "寄せられた - MeCab互換分割 (寄せ + られた)",
       "input": "寄せられた",
       "expected": [
         {
-          "surface": "寄せられた",
+          "surface": "寄せ",
           "pos": "Verb",
           "lemma": "寄せる"
+        },
+        {
+          "surface": "られた",
+          "pos": "Auxiliary",
+          "lemma": "られる"
         }
       ],
       "tags": [
-        "causative_passive",
-        "lemma"
+        "passive",
+        "ichidan"
       ]
     },
     {
@@ -2607,18 +2612,28 @@
     },
     {
       "id": "dict_stem_mirarenakute",
-      "description": "Dictionary stem 見 with conjugation",
+      "description": "見られなくて - MeCab互換分割",
       "input": "見られなくて",
       "expected": [
         {
-          "surface": "見られなくて",
+          "surface": "見",
           "pos": "Verb",
           "lemma": "見る"
+        },
+        {
+          "surface": "られ",
+          "pos": "Auxiliary",
+          "lemma": "られる"
+        },
+        {
+          "surface": "なくて",
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
-        "verb",
-        "conjugation"
+        "passive",
+        "ichidan"
       ]
     },
     {

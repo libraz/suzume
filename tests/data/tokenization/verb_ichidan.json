@@ -694,16 +694,26 @@
     },
     {
       "id": "passive_desiderative_miraretai",
-      "description": "S1: 見られたい (want to be seen) passive+desiderative",
+      "description": "S1: 見られたい (want to be seen) - MeCab互換分割",
       "input": "見られたい",
       "expected": [
         {
-          "surface": "見られたい",
+          "surface": "見",
           "pos": "Verb",
           "lemma": "見る"
+        },
+        {
+          "surface": "られ",
+          "pos": "Auxiliary",
+          "lemma": "られる"
+        },
+        {
+          "surface": "たい",
+          "pos": "Auxiliary",
+          "lemma": "たい"
         }
       ],
-      "tags": ["particle_fix", "passive", "desiderative", "regression"]
+      "tags": ["passive", "desiderative", "ichidan"]
     },
     {
       "id": "passive_desiderative_taberaretai",

@@ -20,7 +20,9 @@ enum class EdgeFlags : uint8_t {
   FromDictionary = 1 << 0,
   FromUserDict = 1 << 1,
   IsFormalNoun = 1 << 2,
-  IsLowInfo = 1 << 3
+  IsLowInfo = 1 << 3,
+  // Note: bit 4 is reserved for kIsUnknown legacy constant
+  HasSuffix = 1 << 5  // Has suffix following (e.g., verb stem + aux)
 };
 
 inline EdgeFlags operator|(EdgeFlags lhs, EdgeFlags rhs) {
@@ -66,6 +68,7 @@ struct LatticeEdge {
   bool fromUserDict() const { return hasFlag(flags, EdgeFlags::FromUserDict); }
   bool isFormalNoun() const { return hasFlag(flags, EdgeFlags::IsFormalNoun); }
   bool isLowInfo() const { return hasFlag(flags, EdgeFlags::IsLowInfo); }
+  bool hasSuffix() const { return hasFlag(flags, EdgeFlags::HasSuffix); }
   bool isUnknown() const { return (static_cast<uint8_t>(flags) & kIsUnknown) != 0; }
 };
 

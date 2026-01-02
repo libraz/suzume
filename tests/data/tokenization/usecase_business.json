@@ -419,15 +419,15 @@
     },
     {
       "id": "legal_niyotte",
-      "description": "Cause: 法律によって定められた - MeCab互換分割 (known_issue: 定め parsed as NOUN)",
+      "description": "Cause: 法律によって定められた - MeCab互換分割",
       "input": "法律によって定められた",
       "expected": [
         {"surface": "法律", "pos": "Noun"},
         {"surface": "によって", "pos": "Particle"},
-        {"surface": "定め", "pos": "Noun"},
+        {"surface": "定め", "pos": "Verb", "lemma": "定める"},
         {"surface": "られた", "pos": "Auxiliary", "lemma": "られる"}
       ],
-      "tags": ["business", "legal", "known_issue"]
+      "tags": ["business", "legal"]
     },
     {
       "id": "legal_nioite",

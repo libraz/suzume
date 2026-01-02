@@ -382,6 +382,236 @@
       ]
     },
     {
+      "id": "beki_classical_ichidan_passive",
+      "description": "Classical べき with Ichidan passive: 食べられべき (should be eaten)",
+      "input": "食べられべき",
+      "expected": [
+        {
+          "surface": "食べ",
+          "pos": "Verb",
+          "lemma": "食べる"
+        },
+        {
+          "surface": "られべき",
+          "pos": "Auxiliary",
+          "lemma": "られる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "classical",
+        "passive",
+        "ichidan"
+      ]
+    },
+    {
+      "id": "beki_classical_ichidan_passive_kangae",
+      "description": "Classical べき with Ichidan passive: 考えられべき (should be considered)",
+      "input": "考えられべき",
+      "expected": [
+        {
+          "surface": "考え",
+          "pos": "Verb",
+          "lemma": "考える"
+        },
+        {
+          "surface": "られべき",
+          "pos": "Auxiliary",
+          "lemma": "られる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "classical",
+        "passive",
+        "ichidan"
+      ]
+    },
+    {
+      "id": "beki_classical_godan_sa_passive",
+      "description": "Classical べき with GodanSa passive: 話されべき (should be spoken)",
+      "input": "話されべき",
+      "expected": [
+        {
+          "surface": "話さ",
+          "pos": "Verb",
+          "lemma": "話す"
+        },
+        {
+          "surface": "れべき",
+          "pos": "Auxiliary",
+          "lemma": "れる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "classical",
+        "passive",
+        "godan"
+      ]
+    },
+    {
+      "id": "beki_classical_godan_sa_passive_ai",
+      "description": "Classical べき with GodanSa passive: 愛されべき (should be loved)",
+      "input": "愛されべき",
+      "expected": [
+        {
+          "surface": "愛さ",
+          "pos": "Verb",
+          "lemma": "愛す"
+        },
+        {
+          "surface": "れべき",
+          "pos": "Auxiliary",
+          "lemma": "れる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "classical",
+        "passive",
+        "godan"
+      ]
+    },
+    {
+      "id": "beki_classical_suru_passive_shori",
+      "description": "Classical べき with Suru passive: 処理されべき (should be processed)",
+      "input": "処理されべき",
+      "expected": [
+        {
+          "surface": "処理",
+          "pos": "Noun",
+          "lemma": "処理"
+        },
+        {
+          "surface": "されべき",
+          "pos": "Auxiliary",
+          "lemma": "される"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "classical",
+        "passive",
+        "suru"
+      ]
+    },
+    {
+      "id": "beki_classical_causative_passive",
+      "description": "Classical べき with causative-passive: 食べさせられべき (should be made to eat)",
+      "input": "食べさせられべき",
+      "expected": [
+        {
+          "surface": "食べ",
+          "pos": "Verb",
+          "lemma": "食べる"
+        },
+        {
+          "surface": "させ",
+          "pos": "Auxiliary",
+          "lemma": "させる"
+        },
+        {
+          "surface": "られべき",
+          "pos": "Auxiliary",
+          "lemma": "られる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "classical",
+        "causative",
+        "passive"
+      ]
+    },
+    {
+      "id": "beki_classical_ichidan_shinji",
+      "description": "Classical べき with Ichidan passive: 信じられべき (should be believed)",
+      "input": "信じられべき",
+      "expected": [
+        {
+          "surface": "信じ",
+          "pos": "Verb",
+          "lemma": "信じる"
+        },
+        {
+          "surface": "られべき",
+          "pos": "Auxiliary",
+          "lemma": "られる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "classical",
+        "passive",
+        "ichidan"
+      ]
+    },
+    {
+      "id": "beki_classical_single_kanji_mi",
+      "description": "Classical べき with single-kanji Ichidan: 見られべき (should be seen)",
+      "input": "見られべき",
+      "expected": [
+        {
+          "surface": "見",
+          "pos": "Verb",
+          "lemma": "見る"
+        },
+        {
+          "surface": "られべき",
+          "pos": "Auxiliary",
+          "lemma": "られる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "classical",
+        "passive",
+        "ichidan"
+      ]
+    },
+    {
+      "id": "ichidan_causative_passive_shiraseru",
+      "description": "Causative passive: 知らせられた (was informed)",
+      "input": "知らせられた",
+      "expected": [
+        {"surface": "知らせ", "pos": "Verb", "lemma": "知らせる"},
+        {"surface": "られた", "pos": "Auxiliary", "lemma": "られる"}
+      ],
+      "tags": ["passive", "causative", "ichidan"]
+    },
+    {
+      "id": "ichidan_causative_passive_kikaseru",
+      "description": "Causative passive: 聞かせられた (was made to listen)",
+      "input": "聞かせられた",
+      "expected": [
+        {"surface": "聞かせ", "pos": "Verb", "lemma": "聞かせる"},
+        {"surface": "られた", "pos": "Auxiliary", "lemma": "られる"}
+      ],
+      "tags": ["passive", "causative", "ichidan"]
+    },
+    {
+      "id": "ichidan_irow_passive_obiru",
+      "description": "I-row ichidan passive: 帯びられた",
+      "input": "帯びられた",
+      "expected": [
+        {"surface": "帯び", "pos": "Verb", "lemma": "帯びる"},
+        {"surface": "られた", "pos": "Auxiliary", "lemma": "られる"}
+      ],
+      "tags": ["passive", "ichidan"]
+    },
+    {
+      "id": "ichidan_passive_negative_past",
+      "description": "Passive negative past: 伝えられなかった",
+      "input": "伝えられなかった",
+      "expected": [
+        {"surface": "伝え", "pos": "Verb", "lemma": "伝える"},
+        {"surface": "られ", "pos": "Auxiliary", "lemma": "られる"},
+        {"surface": "なかった", "pos": "Auxiliary", "lemma": "ない"}
+      ],
+      "tags": ["passive", "negative", "past", "ichidan"]
+    },
+    {
       "id": "aux_nasai_polite_imperative",
       "description": "Polite imperative auxiliary なさい (with godan verb)",
       "input": "書きなさい",

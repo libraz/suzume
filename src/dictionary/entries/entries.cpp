@@ -746,24 +746,11 @@ std::vector<DictionaryEntry> getTimeNounEntries() {
 // =============================================================================
 std::vector<DictionaryEntry> getLowInfoEntries() {
   return {
-      // Honorific pattern verbs
-      {"伝え", POS::Verb, 0.5F, "伝える", false, false, false, CT::Ichidan, ""},
-      {"伝える", POS::Verb, 0.5F, "伝える", false, false, false, CT::Ichidan, ""},
-      {"知らせ", POS::Verb, 0.5F, "知らせる", false, false, false, CT::Ichidan, ""},
-      {"知らせる", POS::Verb, 0.5F, "知らせる", false, false, false, CT::Ichidan, ""},
-      {"届け", POS::Verb, 0.5F, "届ける", false, false, false, CT::Ichidan, ""},
-      {"届ける", POS::Verb, 0.5F, "届ける", false, false, false, CT::Ichidan, ""},
-      {"答え", POS::Verb, 0.5F, "答える", false, false, false, CT::Ichidan, ""},
-      {"答える", POS::Verb, 0.5F, "答える", false, false, false, CT::Ichidan, ""},
-      {"教え", POS::Verb, 0.5F, "教える", false, false, false, CT::Ichidan, ""},
-      {"教える", POS::Verb, 0.5F, "教える", false, false, false, CT::Ichidan, ""},
-      {"認め", POS::Verb, 0.5F, "認める", false, false, false, CT::Ichidan, ""},
-      {"認める", POS::Verb, 0.5F, "認める", false, false, false, CT::Ichidan, ""},
-      {"見せ", POS::Verb, 0.5F, "見せる", false, false, false, CT::Ichidan, ""},
-      {"見せる", POS::Verb, 0.5F, "見せる", false, false, false, CT::Ichidan, ""},
+      // Most ichidan renyokei stems removed - handled by verb_candidates.cpp ichidan_stem_rare pattern
+      // 伝え/伝える, 届け/届ける, 答え/答える, 教え/教える, 認め/認める, 見せ/見せる, 帯び/帯びる
+      // Keep causative patterns (知らせ, 聞かせ) - kanji+ら+せ not handled by E/I row pattern
+      {"知らせ", POS::Verb, 0.3F, "知らせる", false, false, false, CT::Ichidan, ""},  // 知らせる renyokei
       {"聞かせ", POS::Verb, 0.5F, "聞かせる", false, false, false, CT::Ichidan, ""},
-      {"帯びる", POS::Verb, 0.5F, "帯びる", false, false, false, CT::Ichidan, "おびる"},
-      {"帯び", POS::Verb, 0.5F, "帯びる", false, false, false, CT::Ichidan, ""},
       // Katakana ichidan verbs (カタカナ一段動詞) - often mistaken for suru-verbs
       {"バレる", POS::Verb, 0.5F, "バレる", false, false, false, CT::Ichidan, ""},
       {"バレた", POS::Verb, 0.5F, "バレる", false, false, false, CT::Ichidan, ""},  // past form
