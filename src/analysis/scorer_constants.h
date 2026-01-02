@@ -211,6 +211,12 @@ constexpr float kBonusIruAuxAfterTeForm = scale::kMinor;
 // E.g., 食べて + しまった, 忘れて + しまう - completive/regretful aspect pattern
 constexpr float kBonusShimauAuxAfterTeForm = scale::kModerate;  // 1.5F
 
+// Verb renyokei + そう (AUX) bonus
+// E.g., 降り + そう, 切れ + そう - appearance auxiliary pattern
+// Helps AUX beat ADV when preceded by verb renyokei form
+// Value compensates for higher AUX cost (1.0F) to ensure VERB→AUX wins over VERB→ADV
+constexpr float kBonusSouAuxAfterRenyokei = 1.3F;
+
 // Te-form VERB + VERB bonus
 // E.g., 関して + 報告する, 調べて + わかる - te-form continuation pattern
 // Offsets the high VERB→VERB base cost (0.8) when prev verb ends with て/で
@@ -358,6 +364,7 @@ constexpr const char* kSuffixNai = "ない";       // negation
 constexpr const char* kSuffixTaiRashii = "たいらしい";  // desire + conjecture
 constexpr const char* kSuffixSan = "さん";       // contracted negative (さ+ん) or honorific
 constexpr const char* kSuffixN = "ん";           // contracted negative (〜ない→〜ん)
+constexpr const char* kSuffixShi = "し";         // suru renyokei ending
 constexpr const char* kLemmaSuru = "する";       // suru verb lemma suffix
 
 // Valid i-adjective lemma endings (non-verb derived)

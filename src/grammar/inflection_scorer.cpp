@@ -469,13 +469,21 @@ float calculateConfidence(VerbType type, std::string_view stem,
   //   - 手伝う, 買い求う, 争う, 戦う, 追い払う (all GodanWa)
   //   - GodanRa verbs rarely have 2+ kanji stems
   //   - GodanTa verbs rarely have 2+ kanji stems
-  // Single-kanji stems are ambiguous: 取る (GodanRa), 持つ (GodanTa), 買う (GodanWa)
+  // For single-kanji stems, GodanWa is also more common than GodanRa/Ta:
+  //   - 云う, 貰う, 失う, 言う, 問う, 酔う, 追う (all GodanWa)
+  //   - GodanRa: 取る, 知る, 切る (fewer verbs)
+  //   - GodanTa: 持つ, 打つ, 待つ (fewer verbs)
   // Hiragana stems like いらっしゃ (→ いらっしゃる GodanRa) should NOT be affected
-  if (required_conn == conn::kVerbOnbinkei && stem_len >= core::kTwoJapaneseCharBytes && isAllKanji(stem)) {
-    if (type == VerbType::GodanWa) {
+  if (required_conn == conn::kVerbOnbinkei && isAllKanji(stem)) {
+    // For multi-kanji stems, GodanWa is more common than GodanRa/Ta
+    // (手伝う, 買い求う, 争う vs. rare multi-kanji GodanRa/Ta)
+    // For single-kanji stems, disambiguation is done via dictionary lookup
+    // in verb_candidates.cpp (see kBonusDictionaryVerb)
+    if (type == VerbType::GodanWa && stem_len >= core::kTwoJapaneseCharBytes) {
       base += inflection::kBonusGodanWaMultiKanji;
       logConfidenceAdjustment(inflection::kBonusGodanWaMultiKanji, "godan_wa_multi_kanji");
-    } else if (type == VerbType::GodanRa || type == VerbType::GodanTa) {
+    } else if ((type == VerbType::GodanRa || type == VerbType::GodanTa) &&
+               stem_len >= core::kTwoJapaneseCharBytes) {
       base -= inflection::kPenaltyGodanRaTaMultiKanji;
       logConfidenceAdjustment(-inflection::kPenaltyGodanRaTaMultiKanji, "godan_ra_ta_multi_kanji");
     }
@@ -604,18 +612,21 @@ float calculateConfidence(VerbType type, std::string_view stem,
   }
 
   // GodanNa (ナ行五段) is extremely rare - only 死ぬ exists in modern Japanese
-  // In ん-onbin context, penalize GodanNa to prefer GodanMa/GodanBa
-  // E.g., 跳んだ → 跳ぶ (GodanBa) is correct, not 跳ぬ (GodanNa)
-  // E.g., 読んだ → 読む (GodanMa) is correct, not 読ぬ (GodanNa)
+  // Apply penalty to all GodanNa interpretations except 死ぬ:
+  // - In ん-onbin context: penalize to prefer GodanMa/GodanBa (跳んだ→跳ぶ, not 跳ぬ)
+  // - In base form context: penalize to prefer VERB+ぬ(AUX) (消えぬ→消え+ぬ, not 消えぬ)
   // Exception: 死ぬ (to die) is the only GodanNa verb - BOOST 死 stem instead
-  // This applies to single-kanji stems in onbinkei context
-  if (type == VerbType::GodanNa && required_conn == conn::kVerbOnbinkei) {
+  if (type == VerbType::GodanNa) {
     // Exception for 死ぬ - the only GodanNa verb in modern Japanese
-    // Boost 死 stem to beat GodanMa/GodanBa interpretations
+    // Boost 死 stem to beat GodanMa/GodanBa and VERB+ぬ interpretations
     if (stem == "死") {
       base += inflection::scale::kMinorBonus;
       logConfidenceAdjustment(inflection::scale::kMinorBonus, "godan_na_shinu_boost");
     } else {
+      // For base form context (〜ぬ as dictionary form), apply strong penalty
+      // to prefer VERB(未然形)+ぬ(AUX) interpretation (文語否定)
+      // E.g., 消えぬ → 消え(消える)+ぬ(AUX), not 消えぬ(GodanNa verb)
+      // E.g., 揃わぬ → 揃わ(揃う)+ぬ(AUX), not 揃わぬ(GodanNa verb)
       base -= inflection::kPenaltyGodanNaRare;
       logConfidenceAdjustment(-inflection::kPenaltyGodanNaRare, "godan_na_rare");
     }

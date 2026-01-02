@@ -145,6 +145,9 @@ struct ConnectionOptions {
   // Te-form + しまう bonus
   float bonus_shimau_aux_after_te_form = scorer::kBonusShimauAuxAfterTeForm;
 
+  // Verb renyokei + そう (appearance auxiliary) bonus
+  float bonus_sou_aux_after_renyokei = scorer::kBonusSouAuxAfterRenyokei;
+
   // === Other Connection Rules ===
 
   // AUX だ/です + character speech suffix split

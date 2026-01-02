@@ -143,7 +143,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"なかった", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
       {"なくて", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
       {"なければ", POS::Auxiliary, 1.0F, "ない", false, false, false, CT::None, ""},
-      {"ぬ", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
+      // Classical negation ぬ (文語否定 連体形) - attaches to mizenkei (未然形)
+      // E.g., 消えぬ炎, 揃わぬ意見, 知れぬ心
+      // Negative cost to beat NOUN interpretations considering AUX→NOUN connection cost (0.5)
+      {"ぬ", POS::Auxiliary, -1.0F, "ぬ", false, false, false, CT::None, ""},
       // Classical negation (古語否定) - ず attaches to mizenkei (未然形)
       {"ず", POS::Auxiliary, 0.5F, "ず", false, false, false, CT::None, ""},
       {"ずに", POS::Auxiliary, 0.5F, "ず", false, false, false, CT::None, ""},
@@ -412,16 +415,21 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       {"すると", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
       {"だから", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
       {"そのため", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
+      // したがって: hiragana form - prevent したがう(VERB) interpretation at sentence start
+      {"したがって", POS::Conjunction, -0.5F, "従って", false, false, false, CT::None, ""},
 
       // Adversative (逆接)
       {"しかし", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
       {"だが", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
       {"けれども", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
-      {"ところが", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
+      // ところが: "however, but" - prevent ところ(NOUN)+が(PARTICLE) split (cost -1.6)
+      {"ところが", POS::Conjunction, -1.5F, "", false, false, false, CT::None, ""},
       {"それでも", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
       {"でも", POS::Conjunction, 0.5F, "", false, false, false, CT::None, ""},
       {"だって", POS::Conjunction, 0.5F, "", false, false, false, CT::None, ""},
       {"にもかかわらず", POS::Conjunction, 0.5F, "", false, false, false, CT::None, ""},
+      // ものの: "although" - prevent もの(NOUN)+の(PARTICLE) split
+      {"ものの", POS::Conjunction, -1.0F, "", false, false, false, CT::None, ""},
 
       // Parallel/Addition (並列・添加) - kanji with reading
       {"又", POS::Conjunction, 1.0F, "", false, false, false, CT::None, "また"},
@@ -439,6 +447,8 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       // Alternative - hiragana only
       {"または", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
       {"それとも", POS::Conjunction, 1.0F, "", false, false, false, CT::None, ""},
+      // あるいは: hiragana form - prevent あるい(ADJ)+は(PARTICLE) split
+      {"あるいは", POS::Conjunction, -0.5F, "或いは", false, false, false, CT::None, ""},
 
       // Explanation/Supplement (説明・補足) - kanji with reading
       {"即ち", POS::Conjunction, 1.0F, "", false, false, false, CT::None, "すなわち"},
@@ -461,6 +471,26 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       // Addition/Emphasis (添加・強調) - B-5
       // のみならず: not only... but also - prevent の+みな+ら+ず split (N6)
       {"のみならず", POS::Conjunction, -0.5F, "", false, false, false, CT::None, ""},
+
+      // Additional conjunctions/adverbs (工程3)
+      // いわば: "so to speak, as it were" - prevent OTHER or い+わ+ば split
+      {"いわば", POS::Conjunction, 0.1F, "言わば", false, false, false, CT::None, ""},
+      {"言わば", POS::Conjunction, 0.1F, "", false, false, false, CT::None, "いわば"},
+      // さもないと: "otherwise" - prevent さ+も+ない+と split
+      {"さもないと", POS::Conjunction, 0.1F, "", false, false, false, CT::None, ""},
+      {"さもなければ", POS::Conjunction, 0.1F, "", false, false, false, CT::None, ""},
+
+      // Additional conjunctions (工程4)
+      // そんなら: "in that case" - prevent そんな(DET)+ら(PARTICLE) split
+      {"そんなら", POS::Conjunction, -1.0F, "其んなら", false, false, false, CT::None, ""},
+      // それにしても: "even so, nevertheless" - prevent それ+に+して+も split
+      {"それにしても", POS::Conjunction, -2.0F, "", false, false, false, CT::None, ""},
+      // ともかく: "anyway, at any rate" - prevent と+も+かく split
+      {"ともかく", POS::Adverb, -1.5F, "", false, false, false, CT::None, ""},
+      // いずれにしても: "in any case" - prevent いずれ+に+して+も split
+      {"いずれにしても", POS::Conjunction, -2.5F, "", false, false, false, CT::None, ""},
+      // いずれにせよ: "in any case" (formal) - prevent split
+      {"いずれにせよ", POS::Conjunction, -2.0F, "", false, false, false, CT::None, ""},
   };
 }
 
@@ -932,6 +962,12 @@ std::vector<DictionaryEntry> getAdverbEntries() {
 
       // Demonstrative adverbs (指示副詞)
       {"そう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      // Appearance auxiliary そう (様態助動詞) - VERB連用形 + そう
+      // E.g., 降りそう (looks like it will fall), 切れそう (looks like it will break)
+      // Cost balanced so that:
+      // - VERB→そう(AUX) wins (VERB→AUX conn=0, total lower than VERB→ADV conn=0.3)
+      // - PARTICLE→そう(ADV) wins (PARTICLE→ADV conn=0.3 + ADV cost 0.5 < PARTICLE→AUX conn=0.5 + AUX cost 0.6)
+      {"そう", POS::Auxiliary, 1.0F, "そう", false, false, false, CT::None, ""},
       {"こう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
       {"ああ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
       {"どう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
@@ -1160,6 +1196,32 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       // Low cost (-0.5) to split patterns like 第一毛. Compounds like 第一回 are
       // protected by their dictionary entries or unknown compound generation.
       {"第一", POS::Adverb, -0.5F, "", false, false, false, CT::None, "だいいち"},
+
+      // Closed-class adverbs prone to missplit (工程3)
+      // なにしろ: "anyway, at any rate" - prevent なに+しろ(VERB) split
+      // Very low cost needed because なに(PRON) + しろ(VERB) is a strong parse
+      {"なにしろ", POS::Adverb, -1.5F, "何しろ", false, false, false, CT::None, ""},
+      {"何しろ", POS::Adverb, -1.5F, "", false, false, false, CT::None, "なにしろ"},
+      // あたかも: "as if, just like" - prevent あた+か+も split
+      {"あたかも", POS::Adverb, 0.1F, "恰も", false, false, false, CT::None, ""},
+      {"恰も", POS::Adverb, 0.1F, "", false, false, false, CT::None, "あたかも"},
+      // さながら: "just like, as though" - prevent さ+ながら split
+      {"さながら", POS::Adverb, 0.1F, "宛ら", false, false, false, CT::None, ""},
+      // もしかすると: "perhaps, maybe" - prevent も+しか+する+と split
+      {"もしかすると", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},
+      // ちっとも: "not at all" (with negative) - prevent ちっ+と+も split
+      {"ちっとも", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},
+      // 大いに: "greatly, very much" - prevent 大い(NOUN)+に split
+      {"大いに", POS::Adverb, 0.1F, "", false, false, false, CT::None, "おおいに"},
+      // 今更 / いまさら: "at this late hour" - prevent いまさ(ADJ)+ら split
+      {"今更", POS::Adverb, 0.1F, "", false, false, false, CT::None, "いまさら"},
+      {"いまさら", POS::Adverb, 0.1F, "今更", false, false, false, CT::None, ""},
+      // 咄嗟に / とっさに: "instantly, reflexively" - prevent とっさ(ADJ)+に split
+      {"咄嗟に", POS::Adverb, 0.1F, "", false, false, false, CT::None, "とっさに"},
+      {"とっさに", POS::Adverb, 0.1F, "咄嗟に", false, false, false, CT::None, ""},
+      // 頻りに / しきりに: "frequently, incessantly" - prevent しきり(VERB)+に split
+      {"頻りに", POS::Adverb, 0.1F, "", false, false, false, CT::None, "しきりに"},
+      {"しきりに", POS::Adverb, 0.1F, "頻りに", false, false, false, CT::None, ""},
   };
 }
 
@@ -1600,6 +1662,10 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"茹でる", POS::Verb, 0.3F, "茹でる", false, false, false, CT::Ichidan, "ゆでる"},
       {"撫でる", POS::Verb, 0.3F, "撫でる", false, false, false, CT::Ichidan, "なでる"},
 
+      // GodanNa verb - only 死ぬ exists in modern Japanese
+      // Critical: Without this, 死ぬ gets misanalyzed as 死(stem)+ぬ(aux)→死る(wrong)
+      {"死ぬ", POS::Verb, 0.1F, "死ぬ", false, false, false, CT::GodanNa, "しぬ"},
+
       // Common Godan verbs (frequently misidentified)
       {"喜ぶ", POS::Verb, 0.3F, "喜ぶ", false, false, false, CT::GodanBa, "よろこぶ"},
       {"学ぶ", POS::Verb, 0.3F, "学ぶ", false, false, false, CT::GodanBa, "まなぶ"},
@@ -1706,6 +1772,22 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"誘う", POS::Verb, 1.0F, "誘う", false, false, false, CT::GodanWa, "さそう"},
       {"拾う", POS::Verb, 1.0F, "拾う", false, false, false, CT::GodanWa, "ひろう"},
       {"願う", POS::Verb, 0.5F, "願う", false, false, false, CT::GodanWa, "ねがう"},
+      // Single-kanji GodanWa verbs (っ-onbin disambiguation)
+      // っ-onbin (促音便) is inherently ambiguous: 云った could be 云う/云る/云つ
+      // For multi-kanji stems, GodanWa is statistically preferred (手伝う, 買い求う).
+      // For single-kanji stems, this statistical preference doesn't hold (張る, 取る
+      // are common GodanRa). Dictionary entries are the ONLY reliable solution for
+      // single-kanji っ-onbin disambiguation - scoring alone cannot distinguish them.
+      {"云う", POS::Verb, 0.5F, "云う", false, false, false, CT::GodanWa, "いう"},
+      {"貰う", POS::Verb, 0.5F, "貰う", false, false, false, CT::GodanWa, "もらう"},
+      {"失う", POS::Verb, 0.5F, "失う", false, false, false, CT::GodanWa, "うしなう"},
+      {"食う", POS::Verb, 0.5F, "食う", false, false, false, CT::GodanWa, "くう"},
+      {"吸う", POS::Verb, 0.5F, "吸う", false, false, false, CT::GodanWa, "すう"},
+      {"問う", POS::Verb, 0.5F, "問う", false, false, false, CT::GodanWa, "とう"},
+      {"負う", POS::Verb, 0.5F, "負う", false, false, false, CT::GodanWa, "おう"},
+      {"沿う", POS::Verb, 0.5F, "沿う", false, false, false, CT::GodanWa, "そう"},
+      {"狂う", POS::Verb, 0.5F, "狂う", false, false, false, CT::GodanWa, "くるう"},
+      {"酔う", POS::Verb, 0.5F, "酔う", false, false, false, CT::GodanWa, "よう"},
 
       // Common GodanRa verbs
       {"降る", POS::Verb, 1.0F, "降る", false, false, false, CT::GodanRa, "ふる"},
@@ -1720,6 +1802,10 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"走る", POS::Verb, 1.0F, "走る", false, false, false, CT::GodanRa, "はしる"},
       {"売る", POS::Verb, 1.0F, "売る", false, false, false, CT::GodanRa, "うる"},
       {"切る", POS::Verb, 1.0F, "切る", false, false, false, CT::GodanRa, "きる"},
+      // Single-kanji GodanRa verbs (っ-onbin disambiguation)
+      // See comment above for GodanWa - dictionary is required for single-kanji stems.
+      {"張る", POS::Verb, 0.5F, "張る", false, false, false, CT::GodanRa, "はる"},
+      {"減る", POS::Verb, 0.5F, "減る", false, false, false, CT::GodanRa, "へる"},
       // Multi-kanji GodanRa verbs (often misclassified as GodanWa due to っ-onbin)
       {"頑張る", POS::Verb, 0.3F, "頑張る", false, false, false, CT::GodanRa, "がんばる"},
       {"止まる", POS::Verb, 0.3F, "止まる", false, false, false, CT::GodanRa, "とまる"},
@@ -1737,6 +1823,12 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"打つ", POS::Verb, 1.0F, "打つ", false, false, false, CT::GodanTa, "うつ"},
       {"勝つ", POS::Verb, 1.0F, "勝つ", false, false, false, CT::GodanTa, "かつ"},
       {"育つ", POS::Verb, 1.0F, "育つ", false, false, false, CT::GodanTa, "そだつ"},
+      // Single-kanji GodanTa verbs (っ-onbin disambiguation)
+      // See GodanWa comment - dictionary is required for single-kanji stems.
+      // 経つ: lower cost than 経る(Ichidan,へる) to ensure 経って→経つ not 経る
+      {"経つ", POS::Verb, 0.2F, "経つ", false, false, false, CT::GodanTa, "たつ"},
+      {"建つ", POS::Verb, 0.5F, "建つ", false, false, false, CT::GodanTa, "たつ"},
+      {"発つ", POS::Verb, 0.5F, "発つ", false, false, false, CT::GodanTa, "たつ"},
 
       // Common Ichidan verbs
       {"伝える", POS::Verb, 0.5F, "伝える", false, false, false, CT::Ichidan, "つたえる"},

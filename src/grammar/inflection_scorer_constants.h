@@ -149,6 +149,11 @@ constexpr float kBonusGodanWaMultiKanji = 0.0F;
 // Multi-kanji stem with っ-onbin - no bias (dictionary handles disambiguation)
 constexpr float kPenaltyGodanRaTaMultiKanji = 0.0F;
 
+// Bonus for verb candidates whose base form exists in dictionary
+// This helps disambiguate っ-onbin patterns (GodanWa/Ra/Ta/Ka all share っ-onbin)
+// e.g., 張って → 張る (in dict) vs 張う (not in dict) - prefer 張る
+constexpr float kBonusDictionaryVerb = 0.1F;
+
 // =============================================================================
 // Kuru Validation
 // =============================================================================

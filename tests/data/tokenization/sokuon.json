@@ -1,0 +1,47 @@
+{
+  "name": "Sokuon",
+  "description": "Tests for sokuon (促音) patterns: 漢字+っ+漢字/平仮名",
+  "cases": [
+    {
+      "id": "sokuon_kanji_kanji",
+      "description": "Kanji + っ + Kanji pattern (横っ面) with known GodanRa verb",
+      "input": "横っ面を張って",
+      "expected": [
+        {"surface": "横っ面", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "張って", "pos": "Verb", "lemma": "張る"}
+      ],
+      "tags": ["sokuon", "compound"]
+    },
+    {
+      "id": "sokuon_kanji_kanji_totte",
+      "description": "Kanji + っ + Kanji pattern (取っ手)",
+      "input": "取っ手を持つ",
+      "expected": [
+        {"surface": "取っ手", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "持つ", "pos": "Verb", "lemma": "持つ"}
+      ],
+      "tags": ["sokuon", "compound"]
+    },
+    {
+      "id": "sokuon_verb_ta_form",
+      "description": "Verb ta-form with っ should NOT match sokuon compound pattern",
+      "input": "減った",
+      "expected": [
+        {"surface": "減った", "pos": "Verb", "lemma": "減る"}
+      ],
+      "tags": ["sokuon", "verb"]
+    },
+    {
+      "id": "sokuon_verb_te_form",
+      "description": "Verb te-form with っ should NOT match sokuon compound pattern",
+      "input": "勝って帰った",
+      "expected": [
+        {"surface": "勝って", "pos": "Verb", "lemma": "勝つ"},
+        {"surface": "帰った", "pos": "Verb", "lemma": "帰る"}
+      ],
+      "tags": ["sokuon", "verb"]
+    }
+  ]
+}

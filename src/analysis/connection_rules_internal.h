@@ -275,6 +275,10 @@ ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts);
 
+ConnectionRuleResult checkSouAuxAfterVerbRenyokei(const core::LatticeEdge& prev,
+                                                   const core::LatticeEdge& next,
+                                                   const ConnectionOptions& opts);
+
 ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
                                        const core::LatticeEdge& next,
                                        const ConnectionOptions& opts);

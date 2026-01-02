@@ -96,6 +96,7 @@ void evaluateVerbRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkCopulaAfterVerb(prev, next, opts));
   accumulateRule(accumulated, checkIruAuxAfterTeForm(prev, next, opts));
   accumulateRule(accumulated, checkShimauAuxAfterTeForm(prev, next, opts));
+  accumulateRule(accumulated, checkSouAuxAfterVerbRenyokei(prev, next, opts));
   accumulateRule(accumulated, checkInvalidTeFormAux(prev, next, opts));
 
   // VERB → VERB rules

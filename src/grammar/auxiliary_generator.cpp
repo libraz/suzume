@@ -199,6 +199,10 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"ずに", "ずに", "ず", kAuxNai, kAuxOutBase, kVerbMizenkei});
   entries.push_back({"ずとも", "ずとも", "ず", kAuxNai, kAuxOutBase, kVerbMizenkei});
 
+  // === Classical negation ぬ (文語否定 連体形) - connects to mizenkei ===
+  // 消えぬ炎, 揃わぬ意見, 知れぬ心 etc.
+  entries.push_back({"ぬ", "ぬ", "ぬ", kAuxNai, kAuxOutBase, kVerbMizenkei});
+
   // === Volitional ===
   entries.push_back({"う", "う", "う", kAuxNai, kAuxOutBase, kVerbVolitional});
   entries.push_back({"よう", "よう", "よう", kAuxNai, kAuxOutBase, kVerbVolitional});

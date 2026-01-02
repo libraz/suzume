@@ -576,18 +576,215 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
   }
 
   size_t hiragana_len = hiragana_end - kanji_end;
-  if (hiragana_len < 2) {
+  char32_t first_hira = codepoints[kanji_end];
+
+  // Handle sokuon (っ) pattern FIRST, before the hiragana_len check
+  // Pattern: 漢字 + っ + (漢字 or 平仮名) - e.g., 横っ面, 取っ手, 引っ込む
+  // These are valid compound words where hiragana portion may be just 1 char (っ)
+  if (first_hira == U'っ') {
+    // Need at least one more character after っ
+    size_t sokuon_pos = kanji_end;  // Position of っ
+    if (sokuon_pos + 1 < char_types.size()) {
+      normalize::CharType next_type = char_types[sokuon_pos + 1];
+
+      if (next_type == normalize::CharType::Kanji) {
+        // Pattern: 漢字 + っ + 漢字 (e.g., 横っ面, 取っ手)
+        size_t kanji2_end = sokuon_pos + 1;
+        while (kanji2_end < char_types.size() &&
+               kanji2_end - (sokuon_pos + 1) < 3 &&
+               char_types[kanji2_end] == normalize::CharType::Kanji) {
+          ++kanji2_end;
+        }
+
+        // Generate candidates for each length
+        for (size_t end_pos = sokuon_pos + 2; end_pos <= kanji2_end; ++end_pos) {
+          std::string surface = extractSubstring(codepoints, start_pos, end_pos);
+          if (!surface.empty()) {
+            UnknownCandidate candidate;
+            candidate.surface = surface;
+            candidate.start = start_pos;
+            candidate.end = end_pos;
+            candidate.pos = core::PartOfSpeech::Noun;
+            candidate.cost = 0.5F;  // Bonus for sokuon compounds
+            candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+            candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
+            candidate.confidence = 0.9F;
+            candidate.pattern = "kanji_sokuon_kanji";
+#endif
+            candidates.push_back(candidate);
+          }
+        }
+      } else if (next_type == normalize::CharType::Hiragana) {
+        // Pattern: 漢字 + っ + 平仮名 (e.g., 引っ込む, 突っ走る)
+        // BUT skip if っ is followed by た/て (verb conjugation endings)
+        // e.g., 減った, 勝って are verb forms, not compound nouns
+        char32_t next_hira = codepoints[sokuon_pos + 1];
+        if (next_hira == U'た' || next_hira == U'て') {
+          return candidates;  // Skip - this is a verb conjugation, not a compound noun
+        }
+        size_t hira2_end = sokuon_pos + 1;
+        while (hira2_end < char_types.size() &&
+               hira2_end - (sokuon_pos + 1) < 4 &&
+               char_types[hira2_end] == normalize::CharType::Hiragana) {
+          char32_t ch = codepoints[hira2_end];
+          if (normalize::isParticleCodepoint(ch)) {
+            break;
+          }
+          ++hira2_end;
+        }
+
+        if (hira2_end > sokuon_pos + 1) {
+          std::string surface = extractSubstring(codepoints, start_pos, hira2_end);
+          if (!surface.empty()) {
+            UnknownCandidate candidate;
+            candidate.surface = surface;
+            candidate.start = start_pos;
+            candidate.end = hira2_end;
+            candidate.pos = core::PartOfSpeech::Noun;
+            candidate.cost = 1.0F;
+            candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+            candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
+            candidate.confidence = 0.7F;
+            candidate.pattern = "kanji_sokuon_hira";
+#endif
+            candidates.push_back(candidate);
+          }
+        }
+      }
+    }
+    // Return after handling sokuon - don't continue to normal hiragana logic
     return candidates;
   }
 
-  char32_t first_hira = codepoints[kanji_end];
+  if (hiragana_len < 2) {
+    return candidates;
+  }
   char32_t second_hira = (hiragana_len >= 2) ? codepoints[kanji_end + 1] : 0;
 
   // Skip small kana at start - morphologically invalid
+  // EXCEPTION: っ (sokuon) can appear in compound patterns like 横っ面, 取っ手, 引っ込む
+  // These are valid words where kanji + っ + (kanji or hiragana) forms a compound
   if (first_hira == U'ゃ' || first_hira == U'ゅ' || first_hira == U'ょ' ||
       first_hira == U'ぁ' || first_hira == U'ぃ' || first_hira == U'ぅ' ||
-      first_hira == U'ぇ' || first_hira == U'ぉ' || first_hira == U'っ') {
+      first_hira == U'ぇ' || first_hira == U'ぉ') {
     return candidates;
+  }
+
+  // Handle sokuon (っ) pattern: 漢字 + っ + (漢字 or 平仮名)
+  // Examples: 横っ面, 取っ手, 引っ込む
+  if (first_hira == U'っ') {
+    // Need at least one more character after っ
+    size_t sokuon_pos = kanji_end;  // Position of っ
+    if (sokuon_pos + 1 >= char_types.size()) {
+      return candidates;  // っ at end - cannot form valid compound
+    }
+
+    // Check what follows っ
+    normalize::CharType next_type = char_types[sokuon_pos + 1];
+    if (next_type == normalize::CharType::Kanji) {
+      // Pattern: 漢字 + っ + 漢字 (e.g., 横っ面, 取っ手)
+      // Find end of kanji sequence after っ
+      size_t kanji2_end = sokuon_pos + 1;
+      while (kanji2_end < char_types.size() &&
+             kanji2_end - (sokuon_pos + 1) < 3 &&  // Max 3 kanji after っ
+             char_types[kanji2_end] == normalize::CharType::Kanji) {
+        ++kanji2_end;
+      }
+
+      // Generate candidate(s) for kanji + っ + kanji pattern
+      for (size_t end_pos = sokuon_pos + 2; end_pos <= kanji2_end; ++end_pos) {
+        std::string surface = extractSubstring(codepoints, start_pos, end_pos);
+        if (!surface.empty()) {
+          UnknownCandidate candidate;
+          candidate.surface = surface;
+          candidate.start = start_pos;
+          candidate.end = end_pos;
+          candidate.pos = core::PartOfSpeech::Noun;
+          // Give bonus to sokuon compounds - they are real words
+          candidate.cost = 0.5F;
+          candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+          candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
+          candidate.confidence = 0.9F;
+          candidate.pattern = "kanji_sokuon_kanji";
+#endif
+          candidates.push_back(candidate);
+        }
+      }
+
+      // Also check if there's hiragana after the second kanji (e.g., patterns like 取っ手さばき)
+      if (kanji2_end < char_types.size() &&
+          char_types[kanji2_end] == normalize::CharType::Hiragana) {
+        // Find hiragana portion after second kanji
+        size_t hira_end = kanji2_end;
+        while (hira_end < char_types.size() &&
+               hira_end - kanji2_end < 4 &&
+               char_types[hira_end] == normalize::CharType::Hiragana) {
+          char32_t ch = codepoints[hira_end];
+          if (normalize::isParticleCodepoint(ch)) {
+            break;
+          }
+          ++hira_end;
+        }
+
+        if (hira_end > kanji2_end) {
+          std::string surface = extractSubstring(codepoints, start_pos, hira_end);
+          if (!surface.empty()) {
+            UnknownCandidate candidate;
+            candidate.surface = surface;
+            candidate.start = start_pos;
+            candidate.end = hira_end;
+            candidate.pos = core::PartOfSpeech::Noun;
+            candidate.cost = 0.8F;  // Slightly higher cost for longer compounds
+            candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+            candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
+            candidate.confidence = 0.8F;
+            candidate.pattern = "kanji_sokuon_kanji_hira";
+#endif
+            candidates.push_back(candidate);
+          }
+        }
+      }
+    } else if (next_type == normalize::CharType::Hiragana) {
+      // Pattern: 漢字 + っ + 平仮名 (e.g., 引っ込む, 突っ走る)
+      // Find end of hiragana after っ
+      size_t hira2_end = sokuon_pos + 1;
+      while (hira2_end < char_types.size() &&
+             hira2_end - (sokuon_pos + 1) < 4 &&
+             char_types[hira2_end] == normalize::CharType::Hiragana) {
+        char32_t ch = codepoints[hira2_end];
+        if (normalize::isParticleCodepoint(ch)) {
+          break;
+        }
+        ++hira2_end;
+      }
+
+      // Need at least one hiragana after っ (not counting っ itself)
+      if (hira2_end > sokuon_pos + 1) {
+        std::string surface = extractSubstring(codepoints, start_pos, hira2_end);
+        if (!surface.empty()) {
+          UnknownCandidate candidate;
+          candidate.surface = surface;
+          candidate.start = start_pos;
+          candidate.end = hira2_end;
+          candidate.pos = core::PartOfSpeech::Noun;
+          // These could be verb stems (引っ込), give moderate cost
+          candidate.cost = 1.0F;
+          candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+          candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
+          candidate.confidence = 0.7F;
+          candidate.pattern = "kanji_sokuon_hira";
+#endif
+          candidates.push_back(candidate);
+        }
+      }
+    }
+
+    return candidates;  // Sokuon pattern handled, don't fall through to normal logic
   }
 
   // Skip patterns ending with ん - likely honorific suffixes

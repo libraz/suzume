@@ -50,6 +50,37 @@ inline bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager
 }
 
 /**
+ * @brief Check if a verb is in dictionary with matching conjugation type
+ *
+ * This is important for っ-onbin disambiguation where the same surface (e.g., 経る)
+ * may exist as different verb types (Ichidan へる vs GodanRa たる). We should only
+ * consider it a dictionary match if the verb types are compatible.
+ *
+ * @param dict_manager Dictionary manager
+ * @param base_form The base form (lemma) to check
+ * @param verb_type The verb type from inflection analysis
+ * @return true if dictionary has a matching verb with compatible conjugation type
+ */
+inline bool isVerbInDictionaryWithType(
+    const dictionary::DictionaryManager* dict_manager,
+    std::string_view base_form,
+    grammar::VerbType verb_type) {
+  if (dict_manager == nullptr || base_form.empty()) {
+    return false;
+  }
+  auto expected_conj = grammar::verbTypeToConjType(verb_type);
+  auto results = dict_manager->lookup(base_form, 0);
+  for (const auto& result : results) {
+    if (result.entry != nullptr && result.entry->surface == base_form &&
+        result.entry->pos == core::PartOfSpeech::Verb &&
+        result.entry->conj_type == expected_conj) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * @brief Check if a surface has a non-verb entry in dictionary
  *
  * @param dict_manager Dictionary manager
@@ -643,7 +674,17 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             cand.confidence > conf_threshold &&
             cand.verb_type != grammar::VerbType::IAdjective) {
           // Check if this candidate's base_form exists in dictionary
-          bool in_dict = isVerbInDictionary(dict_manager, cand.base_form);
+          // For っ-onbin patterns (GodanRa/Ta/Wa/Ka), use type-aware lookup to avoid
+          // mismatches like 経る(GodanRa) matching 経る(Ichidan) when 経つ(GodanTa) is correct.
+          // For other patterns (Suru verbs, Ichidan, etc.), use simple lookup.
+          bool is_onbin_type = (cand.verb_type == grammar::VerbType::GodanRa ||
+                                cand.verb_type == grammar::VerbType::GodanTa ||
+                                cand.verb_type == grammar::VerbType::GodanWa ||
+                                cand.verb_type == grammar::VerbType::GodanKa);
+          bool in_dict = is_onbin_type
+                             ? isVerbInDictionaryWithType(dict_manager, cand.base_form,
+                                                          cand.verb_type)
+                             : isVerbInDictionary(dict_manager, cand.base_form);
 
           if (in_dict) {
             // Prefer dictionary-verified candidates

@@ -26,7 +26,7 @@
     },
     {
       "id": "verb_not_adj_tabesugite",
-      "description": "食べすぎてしまいそう - verb compound (食べ過ぎる), not adjective (B63 ichidan compound fix)",
+      "description": "食べすぎてしまいそう - verb compound (食べ過ぎる) + て + しまう + そう (B63 ichidan compound fix)",
       "input": "食べすぎてしまいそう",
       "expected": [
         {
@@ -35,9 +35,18 @@
           "lemma": "食べ過ぎる"
         },
         {
-          "surface": "てしまいそう",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "しまい",
           "pos": "Verb",
           "lemma": "しまう"
+        },
+        {
+          "surface": "そう",
+          "pos": "Auxiliary",
+          "lemma": "そう"
         }
       ],
       "tags": [

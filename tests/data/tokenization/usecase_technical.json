@@ -181,7 +181,7 @@
         {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"},
         {"surface": "ので", "pos": "Particle"},
         {"surface": "遅刻し", "pos": "Verb", "lemma": "遅刻する"},
-        {"surface": "そう", "pos": "Adverb"},
+        {"surface": "そう", "pos": "Auxiliary", "lemma": "そう"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["complex", "suru"]

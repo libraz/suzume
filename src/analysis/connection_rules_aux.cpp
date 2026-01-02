@@ -58,6 +58,12 @@ bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma) {
   if (lemma == "たい") {
     return true;
   }
+  // そう form (appearance auxiliary) - requires verb renyokei
+  // PARTICLE + そう(AUX) is invalid; そう as adverb is the correct interpretation
+  // E.g., にそう should be に + そう(ADV), not PARTICLE + そう(AUX)
+  if (lemma == "そう" && surface == "そう") {
+    return true;
+  }
   return false;
 }
 
@@ -109,6 +115,43 @@ ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
   return {ConnectionPattern::ShimauAuxAfterTeForm,
           -opts.bonus_shimau_aux_after_te_form,
           "te-form verb + shimau aux (completive/regretful)"};
+}
+
+// Rule: VERB renyokei + そう (AUX) bonus
+// Appearance auxiliary pattern: 降りそう (looks like falling), 切れそう (looks like breaking)
+// Gives bonus to help AUX beat ADV when preceded by verb renyokei form
+ConnectionRuleResult checkSouAuxAfterVerbRenyokei(const core::LatticeEdge& prev,
+                                                   const core::LatticeEdge& next,
+                                                   const ConnectionOptions& opts) {
+  if (!isVerbToAux(prev, next)) return {};
+
+  if (next.surface != "そう" || next.lemma != "そう") return {};
+
+  // Verb must end with renyokei marker (i-row, e-row for ichidan, or onbin markers)
+  if (!endsWithRenyokeiMarker(prev.surface)) return {};
+
+  // For し-ending verbs that are NOT verified (hasSuffix=false), apply reduced
+  // bonus so that i-adjective candidates (美味しそう→美味しい) can compete.
+  // Verified verbs (hasSuffix=true) get the full bonus.
+  // Unverified し-ending verbs might be fake suru-verbs (美味する) that should
+  // lose to adjective candidates.
+  bool ends_with_shi = utf8::endsWith(prev.surface, scorer::kSuffixShi);
+  bool is_shi_producing_verb = (prev.conj_type == dictionary::ConjugationType::Suru ||
+                                 prev.conj_type == dictionary::ConjugationType::GodanSa);
+  bool is_unverified = !prev.hasSuffix();
+
+  if (ends_with_shi && is_shi_producing_verb && is_unverified) {
+    // Reduced bonus for unverified し-ending verbs
+    // Balance: AUX must beat ADV (-0.044), but ADJ (-0.165) must beat AUX
+    // With bonus=0.25: AUX=0.156-0.25=-0.094 beats ADV (-0.044 > -0.094)
+    // And ADJ beats AUX: -0.165 < -0.094
+    return {ConnectionPattern::SouAfterRenyokei, -0.25F,
+            "verb renyokei + sou aux (unverified shi-verb, reduced)"};
+  }
+
+  // Full bonus for verified verbs and non-し patterns
+  return {ConnectionPattern::SouAfterRenyokei, -opts.bonus_sou_aux_after_renyokei,
+          "verb renyokei + sou aux (appearance)"};
 }
 
 // Rule 17: Te-form VERB + invalid single-char AUX penalty

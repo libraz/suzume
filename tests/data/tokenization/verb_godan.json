@@ -661,7 +661,8 @@
         },
         {
           "surface": "そう",
-          "pos": "Adverb"
+          "pos": "Auxiliary",
+          "lemma": "そう"
         }
       ],
       "tags": [
@@ -681,7 +682,8 @@
         },
         {
           "surface": "そう",
-          "pos": "Adverb"
+          "pos": "Auxiliary",
+          "lemma": "そう"
         }
       ],
       "tags": [
@@ -1016,7 +1018,8 @@
         },
         {
           "surface": "そう",
-          "pos": "Adverb"
+          "pos": "Auxiliary",
+          "lemma": "そう"
         }
       ],
       "tags": [
@@ -1076,7 +1079,8 @@
         },
         {
           "surface": "そう",
-          "pos": "Adverb"
+          "pos": "Auxiliary",
+          "lemma": "そう"
         }
       ],
       "tags": [
@@ -1096,7 +1100,8 @@
         },
         {
           "surface": "そう",
-          "pos": "Adverb"
+          "pos": "Auxiliary",
+          "lemma": "そう"
         }
       ],
       "tags": [
@@ -1116,7 +1121,8 @@
         },
         {
           "surface": "そう",
-          "pos": "Adverb"
+          "pos": "Auxiliary",
+          "lemma": "そう"
         },
         {
           "surface": "です",
