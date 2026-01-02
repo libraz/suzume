@@ -295,7 +295,8 @@ constexpr float kPenaltyParticleBeforeMultiHiraganaOther = scale::kModerate;
 // Particle before hiragana VERB penalty
 // E.g., し + まる in しまる split - likely an erroneous split of a hiragana verb
 // This prevents splits like し(PARTICLE) + まる(VERB) when しまる should be single VERB
-constexpr float kPenaltyParticleBeforeHiraganaVerb = scale::kSevere;
+// Also handles は + ちみつ in はちみつ - particle bonus (-0.4) requires strong penalty
+constexpr float kPenaltyParticleBeforeHiraganaVerb = scale::kProhibitive;
 
 // し particle after i-adjective (valid pattern)
 // E.g., 上手いし, 高いし (positive value subtracted)

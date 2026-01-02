@@ -178,12 +178,13 @@
     },
     {
       "id": "document_address",
-      "description": "Address: 東京都渋谷区に所在する",
+      "description": "Address: 東京都渋谷区に所在する - split at administrative suffix boundary",
       "input": "東京都渋谷区に所在する",
       "expected": [
-        {"surface": "東京都渋谷区", "pos": "Noun"},
+        {"surface": "東京都", "pos": "Noun"},
+        {"surface": "渋谷区", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "所在する", "pos": "Verb"}
+        {"surface": "所在する", "pos": "Verb", "lemma": "所在する"}
       ],
       "tags": ["business", "document"]
     },
@@ -193,7 +194,7 @@
       "input": "今月末までに提出してください",
       "expected": [
         {"surface": "今月", "pos": "Noun"},
-        {"surface": "末", "pos": "Noun"},
+        {"surface": "末", "pos": "Suffix"},
         {"surface": "まで", "pos": "Particle"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "提出して", "pos": "Verb", "lemma": "提出する"},

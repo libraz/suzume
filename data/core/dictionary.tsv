@@ -204,10 +204,9 @@
 # =============================================================================
 
 # --- Formal nouns (形式名詞) - hiragana forms ---
+# Note: もの/こと are in L1 with appropriate costs
 うち	NOUN	うち	0.5
 ところ	NOUN	ところ	0.3
-こと	NOUN	こと	0.3
-もの	NOUN	もの	0.3
 とき	NOUN	とき	0.3
 
 # --- Time nouns: Days ---
@@ -414,4 +413,4 @@ Wi-Fi	NOUN		0.5
 いくよ	OTHER		1.0
 ごめん	OTHER		1.0
 ありがと	OTHER		1.0
-おすすめ	Noun	0.4	おすすめ	
+おすすめ	NOUN	おすすめ	0.4

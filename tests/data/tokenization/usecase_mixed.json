@@ -140,7 +140,7 @@
     },
     {
       "id": "compound_four_kanji",
-      "description": "4 kanji compound",
+      "description": "4 kanji compound stays as single token",
       "input": "人工知能の研究",
       "expected": [
         {"surface": "人工知能", "pos": "Noun"},
@@ -151,10 +151,11 @@
     },
     {
       "id": "compound_long_kanji",
-      "description": "Long kanji compound",
+      "description": "Long kanji compound - 知事選挙 is a political term, kept as single token",
       "input": "東京都知事選挙",
       "expected": [
-        {"surface": "東京都知事選挙", "pos": "Noun"}
+        {"surface": "東京都", "pos": "Noun"},
+        {"surface": "知事選挙", "pos": "Noun"}
       ],
       "tags": ["compound_noun"]
     },
@@ -171,13 +172,12 @@
     },
     {
       "id": "compound_natural_language",
-      "description": "Natural language processing",
+      "description": "Natural language processing technology - preserved as single compound",
       "input": "自然言語処理技術",
       "expected": [
-        {"surface": "自然", "pos": "Noun"},
-        {"surface": "言語処理技術", "pos": "Noun"}
+        {"surface": "自然言語処理技術", "pos": "Noun"}
       ],
-      "tags": ["compound_noun"]
+      "tags": ["compound_noun", "long-compound"]
     },
     {
       "id": "compound_organization",

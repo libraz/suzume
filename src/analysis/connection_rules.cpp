@@ -143,6 +143,9 @@ void evaluateNounRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkYasuiAfterRenyokei(prev, next, opts));
   accumulateRule(accumulated, checkMitaiAfterNounOrVerb(prev, next, opts));
 
+  // VERB/ADJ/AUX → ADJ rules
+  accumulateRule(accumulated, checkKuraiAdjectiveAfterPredicate(prev, next, opts));
+
   // NOUN → ADV rules
   accumulateRule(accumulated, checkSouAfterRenyokei(prev, next, opts));
 
@@ -205,6 +208,9 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
 
   // PARTICLE → ADJ rules
   accumulateRule(accumulated, checkParticleBeforeHiraganaAdj(prev, next, opts));
+
+  // PARTICLE → SUFFIX rules
+  accumulateRule(accumulated, checkSuffixAfterNaParticle(prev, next, opts));
 }
 
 void evaluatePrefixRules(const core::LatticeEdge& prev,

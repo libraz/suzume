@@ -64,26 +64,17 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
 
   switch (ctype) {
     case normalize::CharType::Kanji:
-      // Kanji: prefer 2 characters as optimal (most common word length)
-      // Apply graduated penalty for longer sequences to prevent over-concatenation
-      // E.g., 今夏最高 should split to 今+夏+最高, not stay as single word
-      // Penalties must overcome optimal_length bonus (-0.5) in scorer
+      // Kanji: 2-6 characters are common compound word lengths
+      // Keep compounds connected by default - splitting should be driven by
+      // PREFIX/SUFFIX markers or dictionary entries, not length heuristics
+      // E.g., 自然言語処理 should stay as one token (no evidence to split)
+      // But 今夏最高 splits because 今 is marked as PREFIX
       if (length == 1) {
         return base_cost + 0.4F;  // 1.4: prefer over suffix entries (1.5)
       }
-      if (length == 2) {
-        return base_cost;  // 2 chars: optimal (most common word length)
-      }
-      if (length == 3) {
-        return base_cost + 0.3F;  // 3 chars: light penalty
-      }
-      if (length == 4) {
-        return base_cost + 0.8F;  // 4 chars: moderate penalty (1.8 base)
-      }
-      if (length >= 5 && length <= 6) {
-        return base_cost + 1.5F;  // 5-6 chars: strong penalty
-      }
-      return base_cost + 2.5F;  // 7+ chars: very strong penalty
+      // 2+ chars: all valid compound lengths, no penalty
+      // Long compounds like 独立行政法人情報処理推進機構 should stay as one token
+      return base_cost;
 
     case normalize::CharType::Katakana:
       // Katakana: prefer 4+ characters for loanwords (マスカラ, デスクトップ)
@@ -194,6 +185,12 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
         generateGachiSuffixCandidates(codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), gachi_suffix.begin(),
                       gachi_suffix.end());
+
+    // Generate counter candidates for numeral + つ patterns
+    // e.g., 一つ, 二つ, ..., 九つ (closed class)
+    auto counters =
+        generateCounterCandidates(codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), counters.begin(), counters.end());
   }
 
   // Generate hiragana verb candidates (pure hiragana verbs like いく, くる)
@@ -227,6 +224,13 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
         generateKatakanaAdjectiveCandidates(codepoints, start_pos, char_types,
                                             inflection_);
     candidates.insert(candidates.end(), kata_adjs.begin(), kata_adjs.end());
+  }
+
+  // Generate counter candidates for digit + つ patterns (e.g., 3つ, 10個)
+  if (char_types[start_pos] == normalize::CharType::Digit) {
+    auto counters =
+        generateCounterCandidates(codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), counters.begin(), counters.end());
   }
 
   // Generate by same type
@@ -707,7 +711,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
       // Katakana character speech is very rare (most katakana are loanword nouns)
       // Apply penalty to prefer NOUN interpretation for katakana words like パン, キロ
       if (start_type == normalize::CharType::Katakana) {
-        length_penalty += 0.8F;  // Prefer katakana NOUN over char_speech AUX
+        length_penalty += 1.0F;  // Prefer katakana NOUN over char_speech AUX
       }
 
       UnknownCandidate candidate;
@@ -844,6 +848,53 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
           candidate.origin = CandidateOrigin::Onomatopoeia;
           candidate.confidence = 1.0F;
           candidate.pattern = "abab_pattern";
+#endif
+          candidates.push_back(candidate);
+        }
+      }
+    }
+  }
+
+  // Try ABり pattern for 3 chars (e.g., どさり, ばたり, ぐったり, じっくり)
+  // These are onomatopoeia that often end with り and are mistaken for verbs
+  if (seq_len >= 3 && start_type == normalize::CharType::Hiragana) {
+    // Check if ends with り
+    char32_t last_char = codepoints[start_pos + seq_len - 1];
+    if (last_char == U'り') {
+      // For 3-char patterns like どさり, ばたり
+      if (seq_len == 3) {
+        std::string surface = extractSubstring(codepoints, start_pos, start_pos + 3);
+        if (!surface.empty()) {
+          UnknownCandidate candidate;
+          candidate.surface = surface;
+          candidate.start = start_pos;
+          candidate.end = start_pos + 3;
+          candidate.pos = core::PartOfSpeech::Adverb;
+          candidate.cost = 0.3F;  // Lower than verb to prefer adverb interpretation
+          candidate.has_suffix = true;
+#ifdef SUZUME_DEBUG_INFO
+          candidate.origin = CandidateOrigin::Onomatopoeia;
+          candidate.confidence = 0.7F;
+          candidate.pattern = "ab_ri_pattern";
+#endif
+          candidates.push_back(candidate);
+        }
+      }
+      // For 4-char patterns like ぐったり, じっくり (small tsu + CV + り)
+      else if (seq_len == 4 && isSmallKanaAt(start_pos + 1)) {
+        std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
+        if (!surface.empty()) {
+          UnknownCandidate candidate;
+          candidate.surface = surface;
+          candidate.start = start_pos;
+          candidate.end = start_pos + 4;
+          candidate.pos = core::PartOfSpeech::Adverb;
+          candidate.cost = 0.2F;  // Low cost for doubled consonant patterns
+          candidate.has_suffix = true;
+#ifdef SUZUME_DEBUG_INFO
+          candidate.origin = CandidateOrigin::Onomatopoeia;
+          candidate.confidence = 0.8F;
+          candidate.pattern = "xtu_cv_ri_pattern";
 #endif
           candidates.push_back(candidate);
         }

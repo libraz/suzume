@@ -41,7 +41,7 @@ struct ScorerOptions {
   // Optimal length range
   struct OptimalLength {
     size_t noun_min = 2;
-    size_t noun_max = 6;
+    size_t noun_max = 16;  // Long compounds like 独立行政法人情報処理推進機構
     size_t verb_min = 3;  // Keep at 3 to avoid promoting verb split (食べた→食べ+た)
     size_t verb_max = 12; // Increased to accommodate long conjugated forms
                           // e.g., かけられなくなった (9 chars), 食べさせられなくなった (10 chars)

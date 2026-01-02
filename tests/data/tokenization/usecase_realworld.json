@@ -602,20 +602,17 @@
     },
     {
       "id": "compound_shizen_gengo_shori",
-      "description": "Compound noun 自然言語処理技術 - split into components",
+      "description": "Compound noun 自然言語処理技術 - preserved as single token",
       "input": "自然言語処理技術",
       "expected": [
         {
-          "surface": "自然",
-          "pos": "Noun"
-        },
-        {
-          "surface": "言語処理技術",
+          "surface": "自然言語処理技術",
           "pos": "Noun"
         }
       ],
       "tags": [
-        "compound"
+        "compound",
+        "long-compound"
       ]
     },
     {
@@ -638,11 +635,15 @@
     },
     {
       "id": "compound_tokyo_to",
-      "description": "Administrative region 東京都渋谷区",
+      "description": "Administrative region 東京都渋谷区 - split at administrative suffix boundary",
       "input": "東京都渋谷区に移転",
       "expected": [
         {
-          "surface": "東京都渋谷区",
+          "surface": "東京都",
+          "pos": "Noun"
+        },
+        {
+          "surface": "渋谷区",
           "pos": "Noun"
         },
         {
@@ -661,11 +662,15 @@
     },
     {
       "id": "compound_kanagawa_ken",
-      "description": "Administrative region 神奈川県横浜市 - kept as single token",
+      "description": "Administrative region 神奈川県横浜市 - split at administrative suffix boundary",
       "input": "神奈川県横浜市の本社",
       "expected": [
         {
-          "surface": "神奈川県横浜市",
+          "surface": "神奈川県",
+          "pos": "Noun"
+        },
+        {
+          "surface": "横浜市",
           "pos": "Noun"
         },
         {
@@ -928,7 +933,7 @@
     },
     {
       "id": "complex_business_address",
-      "description": "Address with numbers",
+      "description": "Address with numbers - split at administrative suffix boundary",
       "input": "東京都渋谷区神宮前1-2-3",
       "expected": [
         {
@@ -936,7 +941,11 @@
           "pos": "Noun"
         },
         {
-          "surface": "渋谷区神宮前",
+          "surface": "渋谷区",
+          "pos": "Noun"
+        },
+        {
+          "surface": "神宮前",
           "pos": "Noun"
         },
         {

@@ -634,12 +634,12 @@
     },
     {
       "id": "na_shizenni",
-      "description": "自然に (naturally)",
+      "description": "自然に (naturally) - 自然 is NOUN to preserve compound words like 自然言語処理",
       "input": "自然に",
       "expected": [
         {
           "surface": "自然",
-          "pos": "Adjective"
+          "pos": "Noun"
         },
         {
           "surface": "に",
@@ -648,7 +648,7 @@
       ],
       "tags": [
         "grammar",
-        "na-adjective"
+        "design-decision"
       ]
     },
     {
@@ -1133,6 +1133,42 @@
       "tags": [
         "na_adjective",
         "business"
+      ]
+    },
+    {
+      "id": "na_hanayakana",
+      "description": "華やかな (gorgeous) - kanji+やか pattern na-adjective",
+      "input": "華やかな",
+      "expected": [
+        {
+          "surface": "華やかな",
+          "pos": "Adjective",
+          "lemma": "華やか"
+        }
+      ],
+      "tags": [
+        "na-adjective",
+        "pattern"
+      ]
+    },
+    {
+      "id": "na_shizennahuukei",
+      "description": "自然な風景 (natural scenery) - na-adjective modifying noun",
+      "input": "自然な風景",
+      "expected": [
+        {
+          "surface": "自然な",
+          "pos": "Adjective",
+          "lemma": "自然"
+        },
+        {
+          "surface": "風景",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "na-adjective",
+        "modifier"
       ]
     }
   ]

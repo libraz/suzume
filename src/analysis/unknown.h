@@ -19,7 +19,7 @@ using core::CandidateOrigin;
  * @brief Unknown word generation options
  */
 struct UnknownOptions {
-  size_t max_kanji_length = 8;
+  size_t max_kanji_length = 16;  // Long compounds like 独立行政法人情報処理推進機構
   size_t max_katakana_length = 16;
   size_t max_alphabet_length = 20;
   size_t max_alphanumeric_length = 24;

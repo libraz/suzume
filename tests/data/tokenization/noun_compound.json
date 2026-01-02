@@ -204,7 +204,7 @@
     },
     {
       "id": "noun_kongo",
-      "description": "今後 should be single Noun (not 今+後)",
+      "description": "今後 is recognized as single compound noun from dictionary",
       "input": "今後の方針",
       "expected": [
         {
@@ -227,15 +227,11 @@
     },
     {
       "id": "compound_noun_shizengengoshori",
-      "description": "自然言語処理 should be at most 3 tokens",
+      "description": "自然言語処理 stays as single compound (6 chars)",
       "input": "自然言語処理",
       "expected": [
         {
-          "surface": "自然",
-          "pos": "Noun"
-        },
-        {
-          "surface": "言語処理",
+          "surface": "自然言語処理",
           "pos": "Noun"
         }
       ],
@@ -247,7 +243,7 @@
     },
     {
       "id": "compound_noun_jinkouchinou",
-      "description": "人工知能 should be at most 2 tokens",
+      "description": "人工知能 should stay as single compound",
       "input": "人工知能",
       "expected": [
         {
@@ -263,7 +259,7 @@
     },
     {
       "id": "compound_noun_kikaigakushuu",
-      "description": "機械学習 should be at most 2 tokens",
+      "description": "機械学習 should stay as single compound",
       "input": "機械学習",
       "expected": [
         {
@@ -334,6 +330,66 @@
       "tags": [
         "strict",
         "particle",
+        "compound"
+      ]
+    },
+    {
+      "id": "ima_kanji_konka",
+      "description": "今夏 (this summer) - 今+kanji compound preserved as single token",
+      "input": "今夏",
+      "expected": [
+        {
+          "surface": "今夏",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "time-noun",
+        "compound"
+      ]
+    },
+    {
+      "id": "ima_kanji_konban",
+      "description": "今晩 (tonight) - 今+kanji compound preserved as single token",
+      "input": "今晩",
+      "expected": [
+        {
+          "surface": "今晩",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "time-noun",
+        "compound"
+      ]
+    },
+    {
+      "id": "ima_kanji_konki",
+      "description": "今期 (this term) - 今+kanji compound preserved as single token",
+      "input": "今期",
+      "expected": [
+        {
+          "surface": "今期",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "time-noun",
+        "compound"
+      ]
+    },
+    {
+      "id": "ima_kanji_konkai",
+      "description": "今回 (this time) - 今+kanji compound preserved as single token",
+      "input": "今回",
+      "expected": [
+        {
+          "surface": "今回",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "time-noun",
         "compound"
       ]
     }

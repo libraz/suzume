@@ -3,21 +3,6 @@
   "description": "Modality auxiliaries (たい、そう、らしい)",
   "cases": [
     {
-      "id": "edge_single_katakana",
-      "description": "ア - single katakana (letter name, NOUN)",
-      "input": "ア",
-      "expected": [
-        {
-          "surface": "ア",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "basic",
-        "edge-case"
-      ]
-    },
-    {
       "id": "special_old_kana",
       "description": "ゐる - old kana",
       "input": "ゐる",

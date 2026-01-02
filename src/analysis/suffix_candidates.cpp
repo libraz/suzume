@@ -32,6 +32,23 @@ const std::vector<SuffixEntry>& getSuffixEntries() {
       {"感", core::PartOfSpeech::Suffix},
       {"力", core::PartOfSpeech::Suffix},
       {"度", core::PartOfSpeech::Suffix},
+      {"方", core::PartOfSpeech::Suffix},  // 歩き方, やり方 (V連用形+方)
+      {"中", core::PartOfSpeech::Suffix},  // 世界中, 人間中 (N3)
+      // Administrative suffixes (行政接尾辞)
+      {"県", core::PartOfSpeech::Suffix},
+      {"都", core::PartOfSpeech::Suffix},
+      {"府", core::PartOfSpeech::Suffix},
+      {"道", core::PartOfSpeech::Suffix},
+      {"市", core::PartOfSpeech::Suffix},
+      {"区", core::PartOfSpeech::Suffix},
+      {"町", core::PartOfSpeech::Suffix},
+      {"村", core::PartOfSpeech::Suffix},
+      {"庁", core::PartOfSpeech::Suffix},
+      {"署", core::PartOfSpeech::Suffix},
+      {"局", core::PartOfSpeech::Suffix},
+      {"省", core::PartOfSpeech::Suffix},
+      {"院", core::PartOfSpeech::Suffix},
+      {"所", core::PartOfSpeech::Suffix},
   };
   return kSuffixes;
 }
@@ -262,6 +279,62 @@ std::vector<UnknownCandidate> generateGachiSuffixCandidates(
   return candidates;
 }
 
+// Administrative suffix codepoints for intermediate boundary detection
+const std::vector<char32_t>& getAdminSuffixCodepoints() {
+  static const std::vector<char32_t> kAdminSuffixes = {
+      U'県', U'都', U'府', U'道', U'市', U'区', U'町', U'村'};
+  return kAdminSuffixes;
+}
+
+std::vector<UnknownCandidate> generateAdminBoundaryCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) {
+  std::vector<UnknownCandidate> candidates;
+
+  if (start_pos >= char_types.size() ||
+      char_types[start_pos] != normalize::CharType::Kanji) {
+    return candidates;
+  }
+
+  const auto& admin_suffixes = getAdminSuffixCodepoints();
+
+  // Scan through kanji sequence looking for administrative suffixes
+  for (size_t pos = start_pos + 1; pos < char_types.size() && pos < start_pos + 6; ++pos) {
+    if (char_types[pos] != normalize::CharType::Kanji) {
+      break;
+    }
+
+    char32_t cp = codepoints[pos];
+    bool is_admin_suffix = std::find(admin_suffixes.begin(), admin_suffixes.end(), cp) !=
+                           admin_suffixes.end();
+
+    if (is_admin_suffix) {
+      // Found administrative suffix at position pos
+      // Generate candidate from start_pos to pos+1 (including the suffix)
+      size_t end_with_suffix = pos + 1;
+      std::string surface = extractSubstring(codepoints, start_pos, end_with_suffix);
+
+      UnknownCandidate candidate;
+      candidate.surface = surface;
+      candidate.start = start_pos;
+      candidate.end = end_with_suffix;
+      candidate.pos = core::PartOfSpeech::Noun;
+      // Give bonus to proper administrative boundaries
+      candidate.cost = 0.3F;
+      candidate.has_suffix = true;
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::SuffixPattern;
+      candidate.confidence = 0.95F;
+      candidate.pattern = "admin_boundary";
+#endif
+      candidates.push_back(candidate);
+    }
+  }
+
+  return candidates;
+}
+
 std::vector<UnknownCandidate> generateWithSuffix(
     const std::vector<char32_t>& codepoints,
     size_t start_pos,
@@ -273,6 +346,10 @@ std::vector<UnknownCandidate> generateWithSuffix(
       char_types[start_pos] != normalize::CharType::Kanji) {
     return candidates;
   }
+
+  // First, generate candidates for administrative boundaries
+  auto admin_candidates = generateAdminBoundaryCandidates(codepoints, start_pos, char_types);
+  candidates.insert(candidates.end(), admin_candidates.begin(), admin_candidates.end());
 
   // Find kanji sequence
   size_t end_pos = start_pos;
@@ -549,6 +626,19 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     if (first_hira == U'な' && (second_hira == U'ら' || second_hira == U'か')) {
       looks_like_aux = true;
     }
+    // Godan verb shuushikei (終止形) pattern
+    // e.g., 休む, 行く, 泳ぐ, 話す, 立つ, 死ぬ, 飛ぶ, 取る
+    // If first hiragana is a godan verb ending, kanji+first hiragana likely forms
+    // a complete verb, and the rest starts a new word
+    // 休むこと → 休む(VERB) + こと(NOUN), not 休むこ(NOUN) + と(PARTICLE)
+    bool is_godan_shuushikei = (first_hira == U'む' || first_hira == U'う' ||
+                                first_hira == U'く' || first_hira == U'ぐ' ||
+                                first_hira == U'す' || first_hira == U'つ' ||
+                                first_hira == U'ぬ' || first_hira == U'ぶ' ||
+                                first_hira == U'る');
+    if (is_godan_shuushikei) {
+      looks_like_aux = true;
+    }
     // Renyokei + そう/たい/ます
     // For godan verbs: し,み,き,ぎ,ち,り,い,び (i-row)
     // For ichidan verbs: べ,め,け,せ,て,ね,れ,え (e-row) - these are verb stems
@@ -591,6 +681,14 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     looks_like_aux = true;
   }
 
+  // Patterns ending with お (prefix marker)
+  // e.g., 一つお should be 一つ + お(PREFIX), not 一つお(NOUN)
+  // お is very commonly used as honorific prefix, so it should not be absorbed
+  // into compound nouns
+  if (last_hira == U'お') {
+    looks_like_aux = true;
+  }
+
   // Generate candidate with cost based on pattern
   std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
   if (!surface.empty()) {
@@ -607,6 +705,124 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     candidate.pattern = looks_like_aux ? "aux_like" : "compound";
 #endif
     candidates.push_back(candidate);
+  }
+
+  return candidates;
+}
+
+namespace {
+// Check if a character is a numeral (Arabic or kanji)
+bool isNumeralChar(char32_t c) {
+  // Arabic numerals (half-width and full-width)
+  if ((c >= U'0' && c <= U'9') || (c >= U'０' && c <= U'９')) {
+    return true;
+  }
+  // Kanji numerals
+  if (c == U'一' || c == U'二' || c == U'三' || c == U'四' || c == U'五' ||
+      c == U'六' || c == U'七' || c == U'八' || c == U'九' || c == U'十' ||
+      c == U'百' || c == U'千' || c == U'万') {
+    return true;
+  }
+  return false;
+}
+}  // namespace
+
+std::vector<UnknownCandidate> generateCounterCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) {
+  std::vector<UnknownCandidate> candidates;
+
+  // Need at least 2 characters (numeral + counter suffix)
+  if (start_pos + 1 >= codepoints.size()) {
+    return candidates;
+  }
+
+  // First character(s) must be numeral(s)
+  if (!isNumeralChar(codepoints[start_pos])) {
+    return candidates;
+  }
+
+  // Find the end of the numeral sequence
+  size_t numeral_end = start_pos;
+  while (numeral_end < codepoints.size() &&
+         isNumeralChar(codepoints[numeral_end])) {
+    ++numeral_end;
+  }
+
+  // Must have at least one character after numerals
+  if (numeral_end >= codepoints.size()) {
+    return candidates;
+  }
+
+  // Check for counter suffix (つ for native counters)
+  char32_t next = codepoints[numeral_end];
+  if (next == U'つ') {
+    // Generate counter candidate: Nつ
+    std::string surface =
+        extractSubstring(codepoints, start_pos, numeral_end + 1);
+    if (!surface.empty()) {
+      UnknownCandidate candidate;
+      candidate.surface = surface;
+      candidate.start = start_pos;
+      candidate.end = numeral_end + 1;
+      candidate.pos = core::PartOfSpeech::Noun;
+      candidate.cost = -0.5F;  // Strong bonus to beat verb candidates
+      candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::Counter;
+      candidate.confidence = 0.95F;
+      candidate.pattern = "counter_tsu";
+#endif
+      candidates.push_back(candidate);
+    }
+  }
+
+  // Check for katakana unit suffix (e.g., キロ, ドル, メートル, パーセント)
+  // Generate digit + katakana unit candidates like 3キロ, 100ドル, 80パーセント
+  if (numeral_end < char_types.size() &&
+      char_types[numeral_end] == normalize::CharType::Katakana) {
+    // Find end of katakana sequence
+    size_t unit_end = numeral_end;
+    while (unit_end < codepoints.size() &&
+           unit_end < char_types.size() &&
+           char_types[unit_end] == normalize::CharType::Katakana) {
+      ++unit_end;
+    }
+
+    // Generate candidate for digit + katakana unit
+    size_t unit_len = unit_end - numeral_end;
+    if (unit_len >= 1 && unit_len <= 8) {  // Reasonable unit length 1-8 chars
+      std::string surface = extractSubstring(codepoints, start_pos, unit_end);
+      if (!surface.empty()) {
+        UnknownCandidate candidate;
+        candidate.surface = surface;
+        candidate.start = start_pos;
+        candidate.end = unit_end;
+        candidate.pos = core::PartOfSpeech::Noun;
+
+        // Penalize numbers starting with 0 (e.g., "00ポイント" is unnatural)
+        // "0ドル" is fine, but "00ドル", "000キロ" are not typical Japanese patterns
+        bool starts_with_zero_prefix = false;
+        if (numeral_end - start_pos >= 2 && codepoints[start_pos] == U'0') {
+          starts_with_zero_prefix = true;
+        }
+
+        // Give bonus to prefer combined token over split
+        // Longer units get slightly more bonus (キロ, ドル vs キログラム, パーセント)
+        // Strong bonus (-0.5) to beat optimal_length bonuses on split candidates
+        candidate.cost = starts_with_zero_prefix
+                             ? 2.0F  // Penalize unnatural zero-prefix numbers
+                             : -0.5F - (static_cast<float>(unit_len) * 0.05F);
+        candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+        candidate.origin = CandidateOrigin::Counter;
+        candidate.confidence = starts_with_zero_prefix ? 0.3F : 0.9F;
+        candidate.pattern = "numeric_unit_katakana";
+#endif
+        candidates.push_back(candidate);
+      }
+    }
   }
 
   return candidates;

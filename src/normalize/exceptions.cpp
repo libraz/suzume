@@ -27,8 +27,8 @@ const std::unordered_set<std::string_view> kSingleKanjiExceptions = {
     "東", "西", "南", "北",
     // Seasons (季節)
     "春", "夏", "秋", "冬",
-    // Times of day (時間帯)
-    "朝", "昼", "夜",
+    // Times of day and temporal nouns (時間帯・時間名詞)
+    "朝", "昼", "夜", "今",
     // Interrogatives (疑問詞)
     "何", "誰",
     // Pronouns (代名詞) - very common standalone kanji
@@ -98,6 +98,14 @@ const std::unordered_set<std::string_view> kCompoundVerbAuxFirstChars = {
     "忘",  // 忘れる (wasureru) - to forget to do
     "残",  // 残す (nokosu) - to leave undone
     "掛",  // 掛ける (kakeru) - to start doing
+    // Additional compound verb auxiliaries
+    "取",  // 取る (toru) - 読み取る, 聞き取る
+    "上",  // 上げる (ageru) - 引き上げる, 持ち上げる
+    "下",  // 下げる/下ろす (sageru/orosu) - 引き下げる, 持ち下げる
+    "付",  // 付ける (tsukeru) - 見付ける, 気付く
+    "着",  // 着く/着ける (tsuku/tsukeru) - 落ち着く, 落ち着ける
+    "締",  // 締まる/締める (shimaru/shimeru) - 引き締まる, 引き締める
+    "詰",  // 詰める (tsumeru) - 張り詰める, 追い詰める
 };
 
 // =============================================================================

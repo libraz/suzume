@@ -60,6 +60,7 @@ enum class CandidateOrigin : uint8_t {
   Split,               // 分割候補 (NOUN+VERB)
   Join,                // 結合候補 (複合動詞結合)
   KanjiHiraganaCompound,  // 漢字+ひらがな複合名詞 (玉ねぎ)
+  Counter,             // 数量詞パターン (一つ〜九つ)
 };
 
 /**

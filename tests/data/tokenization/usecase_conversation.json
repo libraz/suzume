@@ -374,7 +374,7 @@
       "expected": [
         {"surface": "ラーメン", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "一つ", "pos": "Verb"},
+        {"surface": "一つ", "pos": "Noun"},
         {"surface": "お", "pos": "Prefix"},
         {"surface": "願い", "pos": "Noun"},
         {"surface": "します", "pos": "Verb", "lemma": "する"}

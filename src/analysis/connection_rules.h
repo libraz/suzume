@@ -133,7 +133,8 @@ enum class ConnectionPattern {
   RashiiAfterPredicate,       // VERB/ADJ → らしい(ADJ) (conjecture auxiliary: 帰るらしい)
   VerbToCaseParticle,         // VERB → case particle (を/が/に/で) (likely nominalized verb)
   KataAfterRenyokei,          // 動詞連用形 → 方 (should be nominalized: 解き方, 読み方)
-  NaParticleAfterKanjiNoun    // 漢字NOUN → な(PARTICLE) (likely na-adjective stem: 獰猛な)
+  NaParticleAfterKanjiNoun,   // 漢字NOUN → な(PARTICLE) (likely na-adjective stem: 獰猛な)
+  KuraiAdjAfterPredicate      // VERB/ADJ/AUX → くらい(ADJ) (should be PARTICLE: いられぬくらい)
 };
 
 /**

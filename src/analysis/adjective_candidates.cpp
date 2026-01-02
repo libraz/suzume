@@ -500,7 +500,60 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
 
   size_t kanji_len = kanji_end - start_pos;
 
-  // Need at least 2 kanji
+  // Pattern 0: Kanji(1) + やか/らか/か + な patterns (e.g., 華やかな, 豊かな, 静かな)
+  // These are common na-adjective patterns with kanji stem + hiragana suffix
+  if (kanji_len == 1 && kanji_end < char_types.size() &&
+      char_types[kanji_end] == normalize::CharType::Hiragana) {
+    // Check for やか/らか/か patterns
+    size_t hira_end = kanji_end;
+    while (hira_end < char_types.size() &&
+           hira_end - kanji_end < 4 &&
+           char_types[hira_end] == normalize::CharType::Hiragana) {
+      ++hira_end;
+    }
+
+    std::string full_surface = extractSubstring(codepoints, start_pos, hira_end);
+    size_t hira_len = hira_end - kanji_end;
+
+    // Check if ends with な (na-adjective conjugation)
+    bool ends_with_na = (hira_end > kanji_end && codepoints[hira_end - 1] == U'な');
+
+    if (ends_with_na && hira_len >= 2) {
+      // Extract stem (without な)
+      std::string stem = extractSubstring(codepoints, start_pos, hira_end - 1);
+      size_t stem_hira_len = hira_len - 1;
+
+      // Check for やか/らか/か patterns
+      bool is_yaka_pattern = false;
+      if (stem_hira_len >= 2) {
+        std::string stem_suffix = extractSubstring(codepoints, kanji_end, hira_end - 1);
+        is_yaka_pattern = (stem_suffix == "やか" || stem_suffix == "らか" ||
+                          stem_suffix == "か");
+      } else if (stem_hira_len == 1) {
+        // Single か (e.g., 豊か, 静か)
+        is_yaka_pattern = (codepoints[kanji_end] == U'か');
+      }
+
+      if (is_yaka_pattern) {
+        UnknownCandidate candidate;
+        candidate.surface = stem;  // Stem without な
+        candidate.start = start_pos;
+        candidate.end = hira_end - 1;  // Exclude な
+        candidate.pos = core::PartOfSpeech::Adjective;
+        candidate.cost = 0.2F;  // Low cost for common pattern
+        candidate.has_suffix = true;
+#ifdef SUZUME_DEBUG_INFO
+        candidate.origin = CandidateOrigin::AdjectiveNa;
+        candidate.confidence = 0.9F;
+        candidate.pattern = "na_adj_yaka_raka";
+#endif
+        candidates.push_back(candidate);
+        return candidates;  // Return early for clear pattern match
+      }
+    }
+  }
+
+  // Need at least 2 kanji for other patterns
   if (kanji_len < 2) {
     return candidates;
   }
@@ -796,17 +849,24 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         candidate.start = start_pos;
         candidate.end = end_pos;
         candidate.pos = core::PartOfSpeech::Adjective;
-        // Lower cost for higher confidence matches
-        // Slightly boost prolonged sound mark patterns as they're common in colloquial speech
-        float cost = 0.3F + (1.0F - cand.confidence) * 0.3F;
+        // Base cost for hiragana i-adjective candidates
+        // Use neutral base (0.0F) to avoid false positives like につい
+        // which should be parsed as に(PARTICLE)+ついて(VERB)
+        float cost = 0.0F + (1.0F - cand.confidence) * 0.5F;
         if (has_prolonged) {
-          cost -= 0.1F;  // Bonus for colloquial patterns
+          cost -= 0.1F;  // Bonus for colloquial patterns like すごーい
         }
-        // Strong bonus for adjectives starting with particle characters
-        // This helps はなはだしい, かわいい, わびしい beat the particle+adj split
-        // The full word being recognized as a valid adjective indicates it should be kept together
+        // Length-based bonus for adjectives starting with particle characters
+        // Short sequences (3 chars like につい) are likely verb te-forms
+        // Longer sequences (4+ chars like かわいい, はなはだしい) are real adjectives
         if (starts_with_particle) {
-          cost -= 0.6F;  // Significant bonus to beat particle split paths
+          size_t char_count = end_pos - start_pos;
+          if (char_count >= 5) {
+            cost -= 0.5F;  // Strong bonus for long adjectives (はなはだしい)
+          } else if (char_count >= 4) {
+            cost -= 0.35F;  // Moderate bonus for medium adjectives (かわいい)
+          }
+          // No bonus for 3-char sequences (につい) - let dictionary entries win
         }
         candidate.cost = cost;
         candidate.has_suffix = false;

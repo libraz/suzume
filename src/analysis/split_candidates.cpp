@@ -366,6 +366,24 @@ void addNounVerbSplitCandidates(
       // Generate split candidates if conditions are met
       if ((noun_in_dict && looks_like_verb) || base_in_dict) {
         std::string noun_surface(text.substr(start_byte, verb_start_byte - start_byte));
+
+        // Skip split if noun + first kanji of verb forms a known compound
+        // e.g., 上+手く should not split because 上手 is a dictionary word
+        if (verb_start < kanji_end) {
+          size_t compound_end_byte = charPosToBytePos(codepoints, verb_start + 1);
+          std::string compound(text.substr(start_byte, compound_end_byte - start_byte));
+          auto compound_results = dict_manager.lookup(compound, 0);
+          bool compound_in_dict = false;
+          for (const auto& result : compound_results) {
+            if (result.entry != nullptr && result.entry->surface == compound) {
+              compound_in_dict = true;
+              break;
+            }
+          }
+          if (compound_in_dict) {
+            continue;  // Skip this split, prefer compound word
+          }
+        }
         const auto& opts = scorer.splitOpts();
         float final_noun_cost = noun_cost + opts.noun_verb_split_bonus;
 

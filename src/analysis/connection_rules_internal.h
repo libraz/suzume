@@ -343,6 +343,10 @@ ConnectionRuleResult checkSuffixAfterSymbol(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts);
 
+ConnectionRuleResult checkSuffixAfterNaParticle(const core::LatticeEdge& prev,
+                                                const core::LatticeEdge& next,
+                                                const ConnectionOptions& opts);
+
 ConnectionRuleResult checkParticleBeforeHiraganaOther(
     const core::LatticeEdge& prev, const core::LatticeEdge& next,
     const ConnectionOptions& opts);
@@ -364,6 +368,10 @@ ConnectionRuleResult checkVerbToCaseParticle(const core::LatticeEdge& prev,
                                              const ConnectionOptions& opts);
 
 ConnectionRuleResult checkNaParticleAfterKanjiNoun(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& opts);
+
+ConnectionRuleResult checkKuraiAdjectiveAfterPredicate(
     const core::LatticeEdge& prev, const core::LatticeEdge& next,
     const ConnectionOptions& opts);
 

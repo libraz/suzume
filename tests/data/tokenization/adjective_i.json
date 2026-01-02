@@ -1564,6 +1564,16 @@
         {"surface": "勘違い", "pos": "Noun"}
       ],
       "tags": ["hiragana", "particle_split", "regression"]
+    },
+    {
+      "id": "okashiito",
+      "description": "おかしいと - hiragana i-adjective followed by quotative particle",
+      "input": "おかしいと",
+      "expected": [
+        {"surface": "おかしい", "pos": "Adjective", "lemma": "おかしい"},
+        {"surface": "と", "pos": "Particle"}
+      ],
+      "tags": ["hiragana", "i-adjective"]
     }
   ]
 }

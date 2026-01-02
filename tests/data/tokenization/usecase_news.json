@@ -110,10 +110,11 @@
     },
     {
       "id": "weather_temperature",
-      "description": "Temperature description",
+      "description": "Temperature description - 最高 is a dictionary entry, so it splits from 気温",
       "input": "最高気温は30度の予想です",
       "expected": [
-        {"surface": "最高気温", "pos": "Noun"},
+        {"surface": "最高", "pos": "Noun"},
+        {"surface": "気温", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "30度", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},

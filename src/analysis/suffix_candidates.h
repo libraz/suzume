@@ -139,6 +139,25 @@ std::vector<UnknownCandidate> generateGachiSuffixCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types);
 
+/**
+ * @brief Generate counter candidates for numeral + つ patterns
+ *
+ * Detects closed-class counter patterns:
+ *   - 一つ (hitotsu), 二つ (futatsu), ..., 九つ (kokonotsu)
+ *
+ * This is a closed class of 9 patterns, recognized as grammatical pattern
+ * rather than dictionary entries.
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param char_types Character types for each position
+ * @return Vector of candidates
+ */
+std::vector<UnknownCandidate> generateCounterCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types);
+
 }  // namespace suzume::analysis
 
 #endif  // SUZUME_ANALYSIS_SUFFIX_CANDIDATES_H_

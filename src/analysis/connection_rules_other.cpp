@@ -139,6 +139,18 @@ ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
     return {};
   }
 
+  // Exception: こと + i-adjective is a valid grammatical construction
+  // e.g., こと無く (without doing), こと無い (there is nothing to...)
+  // These hiragana formal nouns can naturally precede i-adjectives
+  if (next.pos == core::PartOfSpeech::Adjective) {
+    // Hiragana formal nouns: こと, もの, ところ, わけ, はず
+    if (prev.surface == "こと" || prev.surface == "もの" ||
+        prev.surface == "ところ" || prev.surface == "わけ" ||
+        prev.surface == "はず") {
+      return {};  // No penalty for valid formal noun + ADJ pattern
+    }
+  }
+
   // Penalty for formal noun + kanji pattern
   return {ConnectionPattern::FormalNounBeforeKanji,
           opts.penalty_formal_noun_before_kanji,
@@ -265,6 +277,22 @@ ConnectionRuleResult checkSuffixAfterSymbol(const core::LatticeEdge& prev,
           opts.penalty_suffix_after_symbol, "suffix after punctuation"};
 }
 
+// Rule: PARTICLE + SUFFIX penalty
+// After particles, SUFFIX is usually wrong - NOUN is expected
+// E.g., 大切な人 should be 人(NOUN), not 人(SUFFIX)
+// E.g., いつもの店 should be 店(NOUN), not 店(SUFFIX)
+// SUFFIX is for counters like 三人 where 人 follows a number, not particle
+ConnectionRuleResult checkSuffixAfterNaParticle(const core::LatticeEdge& prev,
+                                                const core::LatticeEdge& next,
+                                                const ConnectionOptions& /*opts*/) {
+  if (prev.pos != core::PartOfSpeech::Particle) return {};
+  if (next.pos != core::PartOfSpeech::Suffix) return {};
+
+  // Moderate penalty - particle should typically be followed by NOUN, not SUFFIX
+  return {ConnectionPattern::SuffixAfterSymbol,
+          scorer::scale::kModerate, "suffix after particle (should be noun)"};
+}
+
 // Check for PARTICLE + hiragana OTHER pattern
 // Hiragana OTHER after particle is often a split error in reading contexts
 // e.g., と + うきょう in とうきょう should not be split
@@ -298,19 +326,31 @@ ConnectionRuleResult checkParticleBeforeHiraganaVerb(
   // Only apply to single-char particles (most prone to false splits)
   if (prev.surface.size() > core::kJapaneseCharBytes) return {};
 
-  // Only penalize if the verb is unknown (not from dictionary)
-  // Dictionary verbs after particles are often valid (e.g., が + 見える)
+  // Only penalize if the verb is unknown (not from dictionary or recognized by
+  // inflection system) Dictionary verbs after particles are often valid (e.g.,
+  // が + 見える) Also exempt verbs recognized by inflection system (have lemma)
+  // e.g., たべる is recognized as ichidan verb with lemma "たべる"
   if (next.fromDictionary()) return {};
+  if (!next.lemma.empty()) return {};  // Recognized by inflection system
 
   // Only apply to pure hiragana verbs
   if (!grammar::startsWithHiragana(next.surface)) return {};
 
   // Don't penalize te-forms - they are valid verb forms after particles
   // e.g., に + つけて, を + 食べて, が + 見えて
+  // Exception: Very short te-forms (2 chars like けて) are often erroneous splits
+  // e.g., が + けて in 心がけて should be single verb 心がける
   if (next.surface.size() >= core::kJapaneseCharBytes) {
     std::string_view last = next.surface.substr(next.surface.size() - core::kJapaneseCharBytes);
     if (last == "て" || last == "で") {
-      return {};  // Valid te-form, no penalty
+      // Short te-forms (2 chars) get moderate penalty - often erroneous splits
+      // e.g., けて, して (from 1-char stem verbs) are rare and usually wrong
+      if (next.surface.size() <= core::kTwoJapaneseCharBytes) {
+        return {ConnectionPattern::ParticleBeforeAux,
+                scorer::scale::kModerate,
+                "single-char particle before short te-form (likely split)"};
+      }
+      return {};  // Valid te-form (3+ chars), no penalty
     }
   }
 
@@ -407,6 +447,28 @@ ConnectionRuleResult checkNaParticleAfterKanjiNoun(
   return {ConnectionPattern::NaParticleAfterKanjiNoun,
           opts.penalty_na_particle_after_kanji_noun,
           "kanji noun + na particle (likely na-adjective)"};
+}
+
+// Rule: VERB/ADJ/AUX + くらい(ADJ) penalty
+// When くらい follows a predicate, it's usually the particle (extent/degree),
+// not the adjective 暗い (dark). E.g., いられぬくらいだ → くらい is PARTICLE
+ConnectionRuleResult checkKuraiAdjectiveAfterPredicate(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& /* opts */) {
+  // Only apply to くらい as ADJ
+  if (next.pos != core::PartOfSpeech::Adjective) return {};
+  if (next.surface != "くらい" && next.lemma != "暗い") return {};
+
+  // Check if prev is a predicate (VERB, ADJ, AUX)
+  bool is_predicate = (prev.pos == core::PartOfSpeech::Verb ||
+                       prev.pos == core::PartOfSpeech::Adjective ||
+                       prev.pos == core::PartOfSpeech::Auxiliary);
+  if (!is_predicate) return {};
+
+  // Strong penalty to prefer PARTICLE interpretation
+  return {ConnectionPattern::KuraiAdjAfterPredicate,
+          scorer::scale::kStrong,
+          "kurai adjective after predicate (prefer particle)"};
 }
 
 }  // namespace connection_rules

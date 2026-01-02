@@ -18,21 +18,17 @@
     },
     {
       "id": "edge_very_long_word",
-      "description": "独立行政法人情報処理推進機構 - very long compound",
+      "description": "独立行政法人情報処理推進機構 - very long compound preserved as single token",
       "input": "独立行政法人情報処理推進機構",
       "expected": [
         {
-          "surface": "独立行政法人",
-          "pos": "Noun"
-        },
-        {
-          "surface": "情報処理推進機構",
+          "surface": "独立行政法人情報処理推進機構",
           "pos": "Noun"
         }
       ],
       "tags": [
-        "basic",
-        "edge-case"
+        "edge-case",
+        "long-compound"
       ]
     },
     {
@@ -1295,6 +1291,18 @@
         "s3_fix",
         "hiragana_noun",
         "regression"
+      ]
+    },
+    {
+      "id": "katakana_mascara",
+      "description": "マスカラ (mascara) - katakana loanword preserved as single token",
+      "input": "マスカラ",
+      "expected": [
+        {"surface": "マスカラ", "pos": "Noun"}
+      ],
+      "tags": [
+        "katakana",
+        "loanword"
       ]
     }
   ]

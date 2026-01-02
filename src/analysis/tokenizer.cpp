@@ -269,12 +269,14 @@ void Tokenizer::addUnknownCandidates(
       }
     }
 
-    // Skip dict length penalty for short kanji sequences (2-3 chars)
-    // Common words like 人工, 知能, 処理 may not be in dictionary
+    // Skip dict length penalty for kanji compound sequences (2-6 chars)
+    // Common compounds like 人工知能, 自然言語処理 may not be in dictionary
+    // Keep compounds connected - splitting should be driven by PREFIX/SUFFIX
+    // markers or dictionary entries, not length heuristics
     if (!skip_penalty && !skip_dict_penalty &&
         candidate.pos == core::PartOfSpeech::Noun) {
       size_t len = candidate.end - candidate.start;
-      if (len >= 2 && len <= 3) {
+      if (len >= 2 && len <= 6) {
         bool all_kanji = true;
         for (size_t idx = candidate.start;
              idx < candidate.end && idx < char_types.size(); ++idx) {
@@ -293,7 +295,10 @@ void Tokenizer::addUnknownCandidates(
     // These are morphologically recognized patterns (e.g., がち, っぽい)
     // that should not be penalized for exceeding dictionary coverage
     // Also skip for katakana loanwords (マスカラ, デスクトップ)
-    if (!skip_penalty && !skip_dict_penalty && !candidate.has_suffix &&
+    // Also skip for Suru verb candidates (所在する, 延期する) - these are productive
+    bool is_suru_verb = (candidate.pos == core::PartOfSpeech::Verb &&
+                         candidate.conj_type == dictionary::ConjugationType::Suru);
+    if (!skip_penalty && !skip_dict_penalty && !candidate.has_suffix && !is_suru_verb &&
         max_dict_length > 0 &&
         candidate.end - candidate.start > max_dict_length) {
       float penalty = reduced_penalty ? 1.0F : 3.5F;

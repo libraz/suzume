@@ -80,12 +80,13 @@ std::vector<DictionaryEntry> getParticleEntries() {
 std::vector<DictionaryEntry> getCompoundParticleEntries() {
   return {
       // Relation (関連)
-      {"について", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      // Lower cost (0.0F) to beat false positive adjective candidates like につい
+      {"について", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
 
       // Cause/Means (原因・手段)
-      {"によって", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"により", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
-      {"によると", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
+      {"によって", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
+      {"により", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
+      {"によると", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
 
       // Place/Situation (場所・状況)
       // Lower cost to prevent split as に + おいて (verb)
@@ -436,8 +437,9 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
       {"どういう", POS::Determiner, 0.5F, "", false, false, false, CT::None, ""},
 
       // Quotative determiners (引用連体詞) - prevents incorrect split like 病+とい+う
-      {"という", POS::Determiner, 0.3F, "という", false, false, false, CT::None, ""},
-      {"といった", POS::Determiner, 0.3F, "という", false, false, false, CT::None, ""},
+      // Lower cost to beat と(PARTICLE,-0.4)+いった(VERB,-0.034)+conn(0.2)=-0.232
+      {"という", POS::Determiner, -0.2F, "という", false, false, false, CT::None, ""},
+      {"といった", POS::Determiner, -0.5F, "という", false, false, false, CT::None, ""},
       {"っていう", POS::Determiner, 0.5F, "という", false, false, false, CT::None, ""},  // colloquial
 
       // Quotative verb forms (引用動詞活用形) - to + 言う conjugations
@@ -485,7 +487,8 @@ std::vector<DictionaryEntry> getPronounEntries() {
       // Second person - hiragana/mixed only
       {"あなた", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
       // B39: お前 needs low cost to beat PREFIX(お)+NOUN(前) split (connection bonus -1.5)
-      {"お前", POS::Pronoun, 0.1F, "", false, false, true, CT::None, "おまえ"},
+      // PREFIX→NOUN path has cost ~-1.2, so お前 needs cost < -1.2 to win
+      {"お前", POS::Pronoun, -1.5F, "", false, false, true, CT::None, "おまえ"},
 
       // Second person plural (二人称複数)
       {"あなたたち", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
@@ -559,11 +562,12 @@ std::vector<DictionaryEntry> getPronounEntries() {
 // =============================================================================
 std::vector<DictionaryEntry> getFormalNounEntries() {
   return {
-      // Kanji forms with reading
-      {"事", POS::Noun, 0.3F, "", false, true, false, CT::None, "こと"},
-      {"こと", POS::Noun, -0.5F, "事", false, true, false, CT::None, ""},
-      {"物", POS::Noun, 0.3F, "", false, true, false, CT::None, "もの"},
-      {"もの", POS::Noun, -0.5F, "物", false, true, false, CT::None, ""},
+      // Formal nouns (形式名詞) - hiragana form is canonical in modern Japanese
+      // こと/もの are grammatical function words, hiragana is preferred
+      {"事", POS::Noun, 0.3F, "こと", false, true, false, CT::None, "こと"},
+      {"こと", POS::Noun, -0.5F, "", false, true, false, CT::None, ""},
+      {"物", POS::Noun, 0.3F, "もの", false, true, false, CT::None, "もの"},
+      {"もの", POS::Noun, 0.25F, "", false, true, false, CT::None, ""},
       {"為", POS::Noun, 2.0F, "", false, true, false, CT::None, "ため"},
       {"所", POS::Noun, 1.0F, "", false, true, false, CT::None, "ところ"},
       {"ところ", POS::Noun, 0.3F, "", false, true, false, CT::None, ""},
@@ -598,52 +602,58 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
 // Time Nouns (時間名詞)
 // =============================================================================
 std::vector<DictionaryEntry> getTimeNounEntries() {
+  // Time nouns are NOT formal nouns (形式名詞)
+  // Formal nouns: こと, もの, ところ - abstract grammatical function words
+  // Time nouns: 明日, 今日 - concrete time references, should split from following words
+  // is_formal_noun=false allows 明日雨 → 明日|雨 (correct split)
   return {
-      // Days (日)
-      {"今日", POS::Noun, 0.5F, "", false, true, false, CT::None, "きょう"},
-      {"明日", POS::Noun, 0.5F, "", false, true, false, CT::None, "あした"},
-      {"昨日", POS::Noun, 0.5F, "", false, true, false, CT::None, "きのう"},
-      {"明後日", POS::Noun, 0.5F, "", false, true, false, CT::None, "あさって"},
-      {"一昨日", POS::Noun, 0.5F, "", false, true, false, CT::None, "おととい"},
-      {"毎日", POS::Noun, 0.5F, "", false, true, false, CT::None, "まいにち"},
+      // Days (日) - very low cost to beat PREFIX(-0.5)+NOUN(1.4)+bonus(-1.5) ≈ -1.1
+      {"今日", POS::Noun, -1.5F, "", false, false, false, CT::None, "きょう"},
+      {"明日", POS::Noun, -1.5F, "", false, false, false, CT::None, "あした"},
+      {"昨日", POS::Noun, -1.5F, "", false, false, false, CT::None, "きのう"},
+      {"明後日", POS::Noun, 0.5F, "", false, false, false, CT::None, "あさって"},
+      {"一昨日", POS::Noun, 0.5F, "", false, false, false, CT::None, "おととい"},
+      {"毎日", POS::Noun, 0.5F, "", false, false, false, CT::None, "まいにち"},
 
       // Time of day (時間帯)
-      {"今朝", POS::Noun, 0.5F, "", false, true, false, CT::None, "けさ"},
-      {"毎朝", POS::Noun, 0.5F, "", false, true, false, CT::None, "まいあさ"},
-      {"今晩", POS::Noun, 0.5F, "", false, true, false, CT::None, "こんばん"},
-      {"今夜", POS::Noun, 0.5F, "", false, true, false, CT::None, "こんや"},
-      {"昨夜", POS::Noun, 0.5F, "", false, true, false, CT::None, "さくや"},
-      {"朝", POS::Noun, 0.6F, "", false, true, false, CT::None, "あさ"},
-      {"昼", POS::Noun, 0.6F, "", false, true, false, CT::None, "ひる"},
-      {"夜", POS::Noun, 0.6F, "", false, true, false, CT::None, "よる"},
-      {"夕方", POS::Noun, 0.6F, "", false, true, false, CT::None, "ゆうがた"},
+      {"今朝", POS::Noun, 0.5F, "", false, false, false, CT::None, "けさ"},
+      {"毎朝", POS::Noun, 0.5F, "", false, false, false, CT::None, "まいあさ"},
+      {"今晩", POS::Noun, 0.5F, "", false, false, false, CT::None, "こんばん"},
+      {"今夜", POS::Noun, 0.5F, "", false, false, false, CT::None, "こんや"},
+      {"昨夜", POS::Noun, 0.5F, "", false, false, false, CT::None, "さくや"},
+      {"朝", POS::Noun, 0.6F, "", false, false, false, CT::None, "あさ"},
+      {"昼", POS::Noun, 0.6F, "", false, false, false, CT::None, "ひる"},
+      {"夜", POS::Noun, 0.6F, "", false, false, false, CT::None, "よる"},
+      {"夕方", POS::Noun, 0.6F, "", false, false, false, CT::None, "ゆうがた"},
 
       // Weeks (週)
-      {"今週", POS::Noun, 0.5F, "", false, true, false, CT::None, "こんしゅう"},
-      {"来週", POS::Noun, 0.5F, "", false, true, false, CT::None, "らいしゅう"},
-      {"先週", POS::Noun, 0.5F, "", false, true, false, CT::None, "せんしゅう"},
-      {"毎週", POS::Noun, 0.5F, "", false, true, false, CT::None, "まいしゅう"},
+      {"今週", POS::Noun, 0.5F, "", false, false, false, CT::None, "こんしゅう"},
+      {"来週", POS::Noun, 0.5F, "", false, false, false, CT::None, "らいしゅう"},
+      {"先週", POS::Noun, 0.5F, "", false, false, false, CT::None, "せんしゅう"},
+      {"毎週", POS::Noun, 0.5F, "", false, false, false, CT::None, "まいしゅう"},
 
       // Months (月)
-      {"今月", POS::Noun, 0.5F, "", false, true, false, CT::None, "こんげつ"},
-      {"来月", POS::Noun, 0.5F, "", false, true, false, CT::None, "らいげつ"},
-      {"先月", POS::Noun, 0.5F, "", false, true, false, CT::None, "せんげつ"},
-      {"毎月", POS::Noun, 0.5F, "", false, true, false, CT::None, "まいつき"},
+      {"今月", POS::Noun, 0.5F, "", false, false, false, CT::None, "こんげつ"},
+      {"来月", POS::Noun, 0.5F, "", false, false, false, CT::None, "らいげつ"},
+      {"先月", POS::Noun, 0.5F, "", false, false, false, CT::None, "せんげつ"},
+      {"毎月", POS::Noun, 0.5F, "", false, false, false, CT::None, "まいつき"},
 
       // Years (年)
-      {"今年", POS::Noun, 0.5F, "", false, true, false, CT::None, "ことし"},
-      {"来年", POS::Noun, 0.5F, "", false, true, false, CT::None, "らいねん"},
-      {"去年", POS::Noun, 0.5F, "", false, true, false, CT::None, "きょねん"},
-      {"昨年", POS::Noun, 0.5F, "", false, true, false, CT::None, "さくねん"},
-      {"毎年", POS::Noun, 0.5F, "", false, true, false, CT::None, "まいとし"},
+      {"今年", POS::Noun, 0.5F, "", false, false, false, CT::None, "ことし"},
+      {"来年", POS::Noun, 0.5F, "", false, false, false, CT::None, "らいねん"},
+      {"去年", POS::Noun, 0.5F, "", false, false, false, CT::None, "きょねん"},
+      {"昨年", POS::Noun, 0.5F, "", false, false, false, CT::None, "さくねん"},
+      {"毎年", POS::Noun, 0.5F, "", false, false, false, CT::None, "まいとし"},
 
       // Other time expressions
-      {"今", POS::Noun, 0.5F, "", false, true, false, CT::None, "いま"},
-      {"現在", POS::Noun, 0.5F, "", false, true, false, CT::None, "げんざい"},
-      {"最近", POS::Noun, 0.5F, "", false, true, false, CT::None, "さいきん"},
-      {"将来", POS::Noun, 0.5F, "", false, true, false, CT::None, "しょうらい"},
-      {"過去", POS::Noun, 0.5F, "", false, true, false, CT::None, "かこ"},
-      {"未来", POS::Noun, 0.5F, "", false, true, false, CT::None, "みらい"},
+      // is_formal_noun=false: 今 is not a formal noun (not こと/もの/ところ pattern)
+      // Prevents penalty when followed by kanji (今何 should split, not compound)
+      {"今", POS::Noun, 0.5F, "", false, false, false, CT::None, "いま"},
+      {"現在", POS::Noun, 0.5F, "", false, false, false, CT::None, "げんざい"},
+      {"最近", POS::Noun, 0.5F, "", false, false, false, CT::None, "さいきん"},
+      {"将来", POS::Noun, 0.5F, "", false, false, false, CT::None, "しょうらい"},
+      {"過去", POS::Noun, 0.5F, "", false, false, false, CT::None, "かこ"},
+      {"未来", POS::Noun, 0.5F, "", false, false, false, CT::None, "みらい"},
       // 時分: time period, around that time (e.g., その時分, 若い時分)
       {"時分", POS::Noun, 0.5F, "時分", false, true, false, CT::None, "じぶん"},
       // Time-related temporal nouns (時間関係名詞)
@@ -659,6 +669,20 @@ std::vector<DictionaryEntry> getTimeNounEntries() {
       {"まえ", POS::Noun, -0.5F, "前", false, true, false, CT::None, ""},
       // あとで: later (adverbial) - prevent あと+で split
       {"あとで", POS::Adverb, -0.8F, "後で", false, false, false, CT::None, ""},
+
+      // Kanji time/position nouns (漢字時間/位置名詞) - prevent over-concatenation
+      // 後: after - prevent 後猫 concatenation (N2)
+      {"後", POS::Noun, 0.5F, "後", false, true, false, CT::None, ""},
+      // 前: before/in front
+      {"前", POS::Noun, 0.5F, "前", false, true, false, CT::None, ""},
+      // 上: above/up - prevent 上今 concatenation (N5)
+      {"上", POS::Noun, 0.5F, "上", false, true, false, CT::None, ""},
+      // 下: below/down
+      {"下", POS::Noun, 0.5F, "下", false, true, false, CT::None, ""},
+      // 中: middle/inside (also used as suffix, but needs base entry)
+      {"中", POS::Noun, 0.5F, "中", false, true, false, CT::None, ""},
+      // 時: time - prevent 時妙な concatenation (N5)
+      {"時", POS::Noun, 0.5F, "時", false, true, false, CT::None, ""},
   };
 }
 
@@ -689,6 +713,14 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"待ち", POS::Verb, 0.5F, "待つ", false, false, false, CT::GodanTa, ""},
       {"願い", POS::Verb, 0.5F, "願う", false, false, false, CT::GodanWa, ""},
 
+      // Nominalized verbs (連用形名詞) - prevent misanalysis as adjective
+      {"支払い", POS::Noun, 0.3F, "支払い", false, false, false, CT::None, "しはらい"},
+      {"払い", POS::Noun, 0.5F, "払い", false, false, false, CT::None, "はらい"},
+      {"見舞い", POS::Noun, 0.3F, "見舞い", false, false, false, CT::None, "みまい"},
+
+      // Counter units (助数詞につく名詞) - enable 何+番線 split
+      {"番線", POS::Noun, -0.5F, "番線", false, false, false, CT::None, "ばんせん"},
+
       // Low information verbs (低情報量動詞)
       {"ある", POS::Verb, 2.0F, "ある", false, false, true, CT::GodanRa, ""},
       {"いる", POS::Verb, 2.0F, "いる", false, false, true, CT::Ichidan, ""},
@@ -713,9 +745,11 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"お", POS::Prefix, 0.3F, "", true, false, false, CT::None, ""},
       {"ご", POS::Prefix, 0.3F, "", true, false, false, CT::None, ""},
       {"御", POS::Prefix, 1.0F, "", true, false, false, CT::None, ""},
-      {"何", POS::Prefix, 0.8F, "なん", true, false, false, CT::None, ""},
-      // Temporal prefixes (時間接頭辞) - prevent over-concatenation like 今夏最高
-      {"今", POS::Prefix, -0.5F, "いま", true, false, false, CT::None, ""},
+      {"何", POS::Prefix, 0.3F, "なん", true, false, false, CT::None, ""},  // Interrogative prefix (何番線→何+番線)
+      // Temporal prefix with moderate cost (higher than NOUN -0.5F)
+      // PREFIX→NOUN bigram bonus (-1.5) makes effective cost: 0.5-1.5 = -1.0
+      // But NOUN→NOUN/PRON has no bonus, so NOUN (-0.5) + connection (0) = -0.5 can compete
+      {"今", POS::Prefix, 0.5F, "", true, false, false, CT::None, ""},
 
       // Suffixes (接尾語)
       {"的", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},
@@ -750,6 +784,10 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"ごろ", POS::Suffix, -2.5F, "", false, false, true, CT::None, ""},
       {"頃", POS::Suffix, -2.5F, "", false, false, true, CT::None, ""},
 
+      // Time period suffixes (時間接尾語)
+      // 末: end of (月末, 年末, 週末)
+      {"末", POS::Suffix, 0.0F, "まつ", false, false, true, CT::None, ""},
+
       // Completive/Distributive suffixes (全体・分配接尾語)
       // ごと: "together with" (皮ごと食べる), "every" (日ごと)
       {"ごと", POS::Suffix, 0.3F, "ごと", false, false, true, CT::None, ""},
@@ -764,11 +802,13 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
 
       // Place/organization suffixes (場所・組織接尾語)
       // 店: shop/store suffix - prevent 店原宿店 over-concatenation
-      {"店", POS::Suffix, -0.3F, "てん", false, false, true, CT::None, ""},
-
+      // Also add NOUN entry for cases like "いつもの店"
+      {"店", POS::Suffix, 0.3F, "てん", false, false, true, CT::None, ""},
       // Human counter suffix (人数接尾語)
-      // 人: person counter - prevent 人達成 over-concatenation
-      {"人", POS::Suffix, -0.3F, "にん", false, false, true, CT::None, ""},
+      // 人: person counter - SUFFIX with higher cost to let NOUN win after VERB/DET
+      // Cost 0.8F: VERB→SUFFIX(1.2)+0.8=2.0 loses to VERB→NOUN(0.2)+unknown(1.4)=1.6
+      // NOUN→SUFFIX(-0.8)+0.8=0.0 wins for counter patterns (3人)
+      {"人", POS::Suffix, 0.8F, "にん", false, false, true, CT::None, ""},
 
       // Counter suffixes with ヶ (助数詞接尾語)
       // ヶ is read as か in counters (箇の略字)
@@ -862,7 +902,8 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       // Time adverbs (時間副詞)
       {"すぐ", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"すぐに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"今すぐ", POS::Adverb, 0.5F, "", false, false, false, CT::None, "いますぐ"},
+      // 今すぐ needs low cost to beat 今(PREFIX) + すぐ(ADV) split
+      {"今すぐ", POS::Adverb, -1.0F, "", false, false, false, CT::None, "いますぐ"},
       {"まだ", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"もう", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       // のち (後): temporal noun meaning "after/later", common in weather forecasts
@@ -871,7 +912,7 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"やっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"ようやく", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},  // Low cost to prevent よう+やく split
       {"ついに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
-      {"いつも", POS::Adverb, -1.2F, "", false, false, false, CT::None, ""},
+      {"いつも", POS::Adverb, 0.0F, "", false, false, false, CT::None, ""},
       {"たまに", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"よく", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"たびたび", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
@@ -1080,7 +1121,7 @@ std::vector<DictionaryEntry> getNaAdjectiveEntries() {
       {"簡単", POS::Adjective, 0.5F, "", false, false, false, CT::NaAdjective, "かんたん"},
       {"丁寧", POS::Adjective, 0.5F, "", false, false, false, CT::NaAdjective, "ていねい"},
       {"正確", POS::Adjective, 0.5F, "", false, false, false, CT::NaAdjective, "せいかく"},
-      {"自然", POS::Adjective, 0.5F, "", false, false, false, CT::NaAdjective, "しぜん"},
+      // NOTE: 自然 removed - 自然言語処理 等の複合語保持を優先
       {"普通", POS::Adjective, 0.5F, "", false, false, false, CT::NaAdjective, "ふつう"},
       {"特別", POS::Adjective, 0.5F, "", false, false, false, CT::NaAdjective, "とくべつ"},
       {"便利", POS::Adjective, 0.5F, "", false, false, false, CT::NaAdjective, "べんり"},
@@ -1393,10 +1434,11 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       // is more practical than implementing a dedicated ConjugationType::Honorific.
       //
       // くださる系 (kudasaru - to give/do for me)
-      {"くださる", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
-      {"くださって", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
-      {"くださった", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
-      {"ください", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
+      // Lower cost to prefer VERB over AUX in patterns like ご確認ください
+      {"くださる", POS::Verb, 0.1F, "くださる", false, false, false, CT::None, ""},
+      {"くださって", POS::Verb, 0.1F, "くださる", false, false, false, CT::None, ""},
+      {"くださった", POS::Verb, 0.1F, "くださる", false, false, false, CT::None, ""},
+      {"ください", POS::Verb, 0.1F, "くださる", false, false, false, CT::None, ""},
       {"くださらない", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
       {"くださいます", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
       {"くださいました", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
@@ -1682,16 +1724,20 @@ std::vector<DictionaryEntry> getCommonVocabularyEntries() {
       {"おすすめ", POS::Noun, 0.3F, "", false, false, false, CT::None, "おすすめ"},
       {"勘違い", POS::Noun, 0.3F, "", false, false, false, CT::None, "かんちがい"},
 
-      // Counter suffixes (数助詞): つ - only valid for 1-9
-      {"1つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "ひとつ"},
-      {"2つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "ふたつ"},
-      {"3つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "みっつ"},
-      {"4つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "よっつ"},
-      {"5つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "いつつ"},
-      {"6つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "むっつ"},
-      {"7つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "ななつ"},
-      {"8つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "やっつ"},
-      {"9つ", POS::Noun, 0.3F, "", false, false, false, CT::None, "ここのつ"},
+      // Degree nouns (程度名詞) - 複合語境界として重要
+      {"最高", POS::Noun, 0.1F, "", false, false, false, CT::None, "さいこう"},
+      {"最低", POS::Noun, 0.1F, "", false, false, false, CT::None, "さいてい"},
+      {"最大", POS::Noun, 0.1F, "", false, false, false, CT::None, "さいだい"},
+      {"最小", POS::Noun, 0.1F, "", false, false, false, CT::None, "さいしょう"},
+
+      // Iteration mark compounds (踊り字複合語) - prevent X + 々 split
+      {"人々", POS::Noun, -0.5F, "", false, false, false, CT::None, "ひとびと"},
+      {"日々", POS::Noun, -0.5F, "", false, false, false, CT::None, "ひび"},
+      {"国々", POS::Noun, -0.5F, "", false, false, false, CT::None, "くにぐに"},
+      {"色々", POS::Noun, -0.5F, "", false, false, false, CT::None, "いろいろ"},
+      {"時々", POS::Noun, -0.5F, "", false, false, false, CT::None, "ときどき"},
+      {"様々", POS::Adjective, -0.5F, "", false, false, false, CT::NaAdjective, "さまざま"},
+
   };
 }
 

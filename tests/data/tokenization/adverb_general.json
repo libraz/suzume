@@ -743,6 +743,52 @@
         }
       ],
       "tags": ["s7_fix", "onomatopoeia", "regression"]
+    },
+    {
+      "id": "adv_atode",
+      "description": "あとで (later) - time adverb, not あ+と+で particle split",
+      "input": "あとで",
+      "expected": [
+        {
+          "surface": "あとで",
+          "pos": "Adverb",
+          "lemma": "後で"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "time"
+      ]
+    },
+    {
+      "id": "adv_toutei",
+      "description": "到底 (utterly/by no means) - adverb for negative expressions",
+      "input": "到底",
+      "expected": [
+        {
+          "surface": "到底",
+          "pos": "Adverb"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "degree"
+      ]
+    },
+    {
+      "id": "adv_izure",
+      "description": "いずれ (eventually/either) - adverb for future time or choice",
+      "input": "いずれ",
+      "expected": [
+        {
+          "surface": "いずれ",
+          "pos": "Adverb"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "time"
+      ]
     }
   ]
 }
