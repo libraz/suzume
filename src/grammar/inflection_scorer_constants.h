@@ -257,6 +257,11 @@ constexpr float kBonusGodanSaSingleKanji = 0.10F;
 // Single-kanji stem with Suru - penalize
 constexpr float kPenaltySuruSingleKanji = 0.15F;
 
+// Pure hiragana stem (3+ chars) with GodanSa or Suru - very rare
+// Valid hiragana GodanSa verbs like なくす, もらす have 2-char stems
+// Longer stems like おねえす are invalid (おねえさん = noun + suffix)
+constexpr float kPenaltyGodanSaSuruPureHiraganaLongStem = scale::kStrong;
+
 // =============================================================================
 // Single Hiragana Stem Particle Penalty
 // =============================================================================

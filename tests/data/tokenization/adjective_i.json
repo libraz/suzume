@@ -1574,6 +1574,33 @@
         {"surface": "と", "pos": "Particle"}
       ],
       "tags": ["hiragana", "i-adjective"]
+    },
+    {
+      "id": "contracted_kudaranai_base",
+      "description": "くだらん - contracted form of くだらない",
+      "input": "くだらん",
+      "expected": [
+        {"surface": "くだらん", "pos": "Adjective", "lemma": "くだらない"}
+      ],
+      "tags": ["contraction", "colloquial", "regression"]
+    },
+    {
+      "id": "contracted_kudaranai_past",
+      "description": "くだらんかった - contracted past form of くだらなかった",
+      "input": "くだらんかった",
+      "expected": [
+        {"surface": "くだらんかった", "pos": "Adjective", "lemma": "くだらない"}
+      ],
+      "tags": ["contraction", "colloquial", "regression"]
+    },
+    {
+      "id": "contracted_tsumaranai_base",
+      "description": "つまらん - contracted form of つまらない",
+      "input": "つまらん",
+      "expected": [
+        {"surface": "つまらん", "pos": "Adjective", "lemma": "つまらない"}
+      ],
+      "tags": ["contraction", "colloquial", "regression"]
     }
   ]
 }

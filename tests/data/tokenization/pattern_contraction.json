@@ -32,6 +32,103 @@
         "strict",
         "contraction"
       ]
+    },
+    {
+      "id": "contracted_neg_wakaran",
+      "description": "わからん - contracted negative of わかる (わからない→わからん)",
+      "input": "わからん",
+      "expected": [
+        {
+          "surface": "わからん",
+          "pos": "Verb",
+          "lemma": "わかる"
+        }
+      ],
+      "tags": ["contraction", "colloquial", "regression"]
+    },
+    {
+      "id": "contracted_neg_nainda",
+      "description": "ないんだ - ない + んだ should not split as な + いん + だ",
+      "input": "ないんだ",
+      "expected": [
+        {
+          "surface": "ない",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "んだ",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": ["contraction", "auxiliary", "regression"]
+    },
+    {
+      "id": "honorific_tanaka_san",
+      "description": "田中さん - should split as NOUN + SUFFIX, not VERB",
+      "input": "田中さん",
+      "expected": [
+        {
+          "surface": "田中",
+          "pos": "Noun"
+        },
+        {
+          "surface": "さん",
+          "pos": "Suffix"
+        }
+      ],
+      "tags": ["honorific", "suffix", "regression"]
+    },
+    {
+      "id": "honorific_oneesan",
+      "description": "おねえさん - should not be parsed as verb おねえす",
+      "input": "おねえさん",
+      "expected": [
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "ねえさん",
+          "pos": "Noun"
+        }
+      ],
+      "tags": ["honorific", "regression"]
+    },
+    {
+      "id": "honorific_onesan_kanji",
+      "description": "お姉さん - prefix + kanji noun + suffix",
+      "input": "お姉さん",
+      "expected": [
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "姉",
+          "pos": "Noun"
+        },
+        {
+          "surface": "さん",
+          "pos": "Suffix"
+        }
+      ],
+      "tags": ["honorific", "suffix", "regression"]
+    },
+    {
+      "id": "honorific_gibosan",
+      "description": "義母さん - compound noun + suffix",
+      "input": "義母さん",
+      "expected": [
+        {
+          "surface": "義母",
+          "pos": "Noun"
+        },
+        {
+          "surface": "さん",
+          "pos": "Suffix"
+        }
+      ],
+      "tags": ["honorific", "suffix", "regression"]
     }
   ]
 }

@@ -47,6 +47,7 @@ std::vector<ConjugatedForm> getIchidanForms() {
       {"ました", ""},    // Polite past: 食べました
       {"て", ""},        // Te-form: 食べて
       {"ない", ""},      // Negative: 食べない
+      {"ん", ""},        // Contracted negative: 食べん (colloquial)
       {"ません", ""},    // Polite negative: 食べません
       {"なかった", ""},  // Past negative: 食べなかった
       {"れば", ""},      // Conditional: 食べれば
@@ -66,6 +67,7 @@ std::vector<ConjugatedForm> getGodanRaForms() {
       {"りました", ""},  // Polite past: わかりました
       {"って", ""},      // Te-form: わかって
       {"らない", ""},    // Negative: わからない
+      {"らん", ""},      // Contracted negative: わからん (colloquial)
       {"りません", ""},  // Polite negative: わかりません
       {"らなかった", ""},// Past negative: わからなかった
       {"れば", ""},      // Conditional: わかれば
@@ -85,6 +87,7 @@ std::vector<ConjugatedForm> getGodanWaForms() {
       {"いました", ""},  // Polite past: もらいました
       {"って", ""},      // Te-form: もらって
       {"わない", ""},    // Negative: もらわない
+      {"わん", ""},      // Contracted negative: もらわん (colloquial)
       {"いません", ""},  // Polite negative: もらいません
       {"わなかった", ""},// Past negative: もらわなかった
       {"えば", ""},      // Conditional: もらえば
@@ -108,6 +111,7 @@ std::vector<ConjugatedForm> getGodanKaForms() {
       {"いた", ""},        // Past: いった (イ音便)
       {"いて", ""},        // Te-form: いって (イ音便)
       {"かない", ""},      // Negative: いかない
+      {"かん", ""},        // Contracted negative: いかん (colloquial)
       {"かなかった", ""},  // Past negative: いかなかった
       {"けば", ""},        // Conditional: いけば
       {"いたら", ""},      // Conditional: いったら
@@ -129,6 +133,7 @@ std::vector<ConjugatedForm> getGodanGaForms() {
       {"いだ", ""},        // Past: しのいだ (イ音便)
       {"いで", ""},        // Te-form: しのいで (イ音便)
       {"がない", ""},      // Negative: しのがない
+      {"がん", ""},        // Contracted negative: しのがん (colloquial)
       {"がなかった", ""},  // Past negative: しのがなかった
       {"げば", ""},        // Conditional: しのげば
       {"いだら", ""},      // Conditional: しのいだら
@@ -149,6 +154,7 @@ std::vector<ConjugatedForm> getGodanSaForms() {
       {"しました", ""},  // Polite past: いたしました
       {"して", ""},      // Te-form: いたして
       {"さない", ""},    // Negative: いたさない
+      {"さん", ""},      // Contracted negative: いたさん (colloquial)
       {"しません", ""},  // Polite negative: いたしません
       {"しまして", ""},  // Te-polite: いたしまして
       {"しております", ""},  // Progressive polite: いたしております
@@ -167,6 +173,7 @@ std::vector<std::pair<std::string, std::string>> getSuruConjugations(
       {stem + "しました", stem + "する"},  // Polite past
       {stem + "して", stem + "する"},      // Te-form
       {stem + "しない", stem + "する"},    // Negative
+      {stem + "せん", stem + "する"},      // Contracted negative (colloquial)
       {stem + "しません", stem + "する"},  // Polite negative
       {stem + "しなかった", stem + "する"},// Past negative
       {stem + "したら", stem + "する"},    // Conditional
@@ -345,6 +352,31 @@ std::vector<DictionaryEntry> expandAdjectiveEntry(const DictionaryEntry& entry) 
     }
     // Preserve conj_type for ChaSen output
     result.push_back(new_entry);
+  }
+
+  // Generate contracted forms for adjectives ending in ない (stem ends with な)
+  // E.g., くだらない → くだらん, くだらなかった → くだらんかった
+  // This handles colloquial contractions: ない→ん, なかった→んかった, etc.
+  if (stem.size() >= core::kJapaneseCharBytes &&
+      stem.substr(stem.size() - core::kJapaneseCharBytes) == "な") {
+    std::string contracted_stem = stem.substr(0, stem.size() - core::kJapaneseCharBytes) + "ん";
+
+    // Contracted form suffixes (parallel to standard forms with な→ん)
+    static const std::vector<std::string> kContractedSuffixes = {
+        "",           // くだらん (base, from くだらない)
+        "かった",     // くだらんかった (past, from くだらなかった)
+        "ければ",     // くだらんければ (conditional, from くだらなければ)
+        "かったら",   // くだらんかったら (conditional past)
+    };
+
+    for (const auto& suffix : kContractedSuffixes) {
+      DictionaryEntry new_entry = entry;
+      new_entry.surface = contracted_stem + suffix;
+      new_entry.lemma = lemma;
+      // Slightly higher cost than standard forms (colloquial)
+      new_entry.cost = entry.cost + 0.1F;
+      result.push_back(new_entry);
+    }
   }
 
   return result;

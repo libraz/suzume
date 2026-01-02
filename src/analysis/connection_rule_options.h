@@ -44,6 +44,14 @@ struct EdgeOptions {
   // Bonus for unified verb forms containing auxiliary patterns (てしまった, てもらった, etc.)
   // This helps unified forms beat split paths when the te-form has a dictionary entry
   float bonus_unified_verb_aux = scorer::kBonusUnifiedVerbAux;
+
+  // Verb ending with さん where stem looks nominal (田中さん, おねえさん)
+  // These should be NOUN + SUFFIX, not VERB with contracted negative
+  float penalty_verb_san_honorific = scorer::kPenaltyVerbSanHonorific;
+
+  // Verb ending with ん (contracted negative) with very short stem (いん)
+  // Short contracted forms are often misanalysis
+  float penalty_verb_contracted_neg_short_stem = scorer::kPenaltyVerbContractedNegShortStem;
 };
 
 /// Options for connection (bigram) scoring penalties/bonuses

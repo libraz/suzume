@@ -581,6 +581,28 @@ float calculateConfidence(VerbType type, std::string_view stem,
     logConfidenceAdjustment(-pen, "godan_hiragana_rare_stem");
   }
 
+  // GodanSa/Suru with pure hiragana long stem (3+ chars) is very rare
+  // Valid hiragana GodanSa verbs: なくす, もらす, こぼす (2-char stems)
+  // Invalid: おねえす, おにいす (3+ char hiragana stems don't form real verbs)
+  // Suru verbs almost never have pure hiragana stems (attach to kanji/katakana nouns)
+  bool is_godan_sa_or_suru = (type == VerbType::GodanSa || type == VerbType::Suru);
+  if (is_godan_sa_or_suru && stem_len >= core::kThreeJapaneseCharBytes &&
+      isPureHiragana(stem)) {
+    base -= inflection::kPenaltyGodanSaSuruPureHiraganaLongStem;
+    logConfidenceAdjustment(-inflection::kPenaltyGodanSaSuruPureHiraganaLongStem,
+                            "godan_sa_suru_pure_hiragana_long_stem");
+  }
+
+  // Suru with single hiragana stem is invalid
+  // E.g., えする, あする - single hiragana are particles, not Suru noun stems
+  // Valid Suru stems: 勉強, ダウンロード (kanji or katakana)
+  if (type == VerbType::Suru && stem_len == core::kJapaneseCharBytes &&
+      isPureHiragana(stem)) {
+    base -= inflection::kPenaltyGodanSaSuruPureHiraganaLongStem;
+    logConfidenceAdjustment(-inflection::kPenaltyGodanSaSuruPureHiraganaLongStem,
+                            "suru_single_hiragana_stem");
+  }
+
   // GodanNa (ナ行五段) is extremely rare - only 死ぬ exists in modern Japanese
   // In ん-onbin context, penalize GodanNa to prefer GodanMa/GodanBa
   // E.g., 跳んだ → 跳ぶ (GodanBa) is correct, not 跳ぬ (GodanNa)

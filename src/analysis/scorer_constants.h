@@ -330,6 +330,16 @@ constexpr float kBonusRashiiAfterPredicate = 0.8F;
 // Verb ending with たいらしい should be split (帰りたいらしい → 帰りたい + らしい)
 constexpr float kPenaltyVerbTaiRashii = scale::kMinor;
 
+// Verb ending with さん (contracted negative) where stem looks nominal
+// E.g., 田中さん should be NOUN + SUFFIX, not VERB (田中する + contracted negative)
+// Applied when: surface ends with さん AND (lemma ends with する OR stem ends with kanji)
+constexpr float kPenaltyVerbSanHonorific = scale::kSevere;  // 2.5
+
+// Verb ending with ん (contracted negative) with very short stem
+// E.g., いん (from いる) is rare and often misanalysis in patterns like ないんだ
+// Applied when: surface ends with ん AND surface is 2 chars AND pure hiragana
+constexpr float kPenaltyVerbContractedNegShortStem = scale::kStrong + scale::kMinor;  // 2.0
+
 // Verb (renyokei/base) + case particle (を/が/に/で/から/まで/へ)
 // Penalizes patterns like 打ち合わせ(VERB)+を which should be NOUN+を
 // Verbal nouns used as objects should be NOUN, not VERB
@@ -346,6 +356,9 @@ constexpr const char* kSuffixSou = "そう";       // conjecture/hearsay
 constexpr const char* kSuffixTai = "たい";       // desire
 constexpr const char* kSuffixNai = "ない";       // negation
 constexpr const char* kSuffixTaiRashii = "たいらしい";  // desire + conjecture
+constexpr const char* kSuffixSan = "さん";       // contracted negative (さ+ん) or honorific
+constexpr const char* kSuffixN = "ん";           // contracted negative (〜ない→〜ん)
+constexpr const char* kLemmaSuru = "する";       // suru verb lemma suffix
 
 // Valid i-adjective lemma endings (non-verb derived)
 // しい: おいしい, 難しい, 美しい (productive pattern)

@@ -241,6 +241,10 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"ません", "ません", "る", kAuxReru, kAuxOutBase, kVerbPotential});
   entries.push_back({"ませんでした", "ませんでした", "る", kAuxReru, kAuxOutTa, kVerbPotential});
 
+  // === Contracted negative (ん) ===
+  // Colloquial contraction: ない → ん (e.g., 書かない → 書かん, わからない → わからん)
+  entries.push_back({"ん", "ん", "ない", kAuxNai, kAuxOutBase, kVerbMizenkei});
+
   // === Negative te-form ===
   entries.push_back({"ないで", "ないで", "ないで", kAuxNai, kAuxOutTe, kVerbMizenkei});
   entries.push_back({"ないでいる", "ないでいる", "ないで", kAuxNai, kAuxOutBase, kVerbMizenkei});
