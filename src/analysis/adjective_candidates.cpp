@@ -11,6 +11,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/patterns.h"
+#include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "suffix_candidates.h"
 #include "unknown.h"
@@ -590,6 +591,16 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
   // Pattern 2: Check for kanji compound + な pattern (e.g., 獰猛な)
   // Generate ADJ candidate for kanji portion when followed by な
   if (kanji_end < codepoints.size() && codepoints[kanji_end] == U'な') {
+    // Skip if first character is a formal noun (形式名詞)
+    // e.g., 時妙な should be 時+妙な, not 時妙(ADJ)+な
+    // Formal nouns (時, 事, 所, etc.) are standalone grammatical words
+    std::string first_char_str;
+    normalize::encodeUtf8(codepoints[start_pos], first_char_str);
+    if (normalize::isFormalNounSurface(first_char_str)) {
+      // Don't generate na-adjective candidate for formal noun + kanji patterns
+      return candidates;
+    }
+
     // Found kanji compound + な - potential na-adjective stem
     UnknownCandidate candidate;
     candidate.surface = kanji_seq;

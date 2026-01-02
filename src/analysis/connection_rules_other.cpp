@@ -139,16 +139,12 @@ ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
     return {};
   }
 
-  // Exception: こと + i-adjective is a valid grammatical construction
-  // e.g., こと無く (without doing), こと無い (there is nothing to...)
-  // These hiragana formal nouns can naturally precede i-adjectives
+  // Exception: formal noun + adjective is a valid grammatical construction
+  // e.g., こと無く (without doing), 時妙な (strange at that time)
+  // Formal nouns can naturally precede adjectives when the adjective is a
+  // separate word, not part of a compound
   if (next.pos == core::PartOfSpeech::Adjective) {
-    // Hiragana formal nouns: こと, もの, ところ, わけ, はず
-    if (prev.surface == "こと" || prev.surface == "もの" ||
-        prev.surface == "ところ" || prev.surface == "わけ" ||
-        prev.surface == "はず") {
-      return {};  // No penalty for valid formal noun + ADJ pattern
-    }
+    return {};  // No penalty for formal noun + ADJ pattern
   }
 
   // Penalty for formal noun + kanji pattern

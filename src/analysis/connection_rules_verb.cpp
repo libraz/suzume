@@ -138,6 +138,13 @@ ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
     return {};
   }
 
+  // Skip dictionary NOUN + e-row + "で" - these are legitimate splits
+  // e.g., 付け(NOUN) + で(PARTICLE) in "日付けで"
+  if (prev.pos == core::PartOfSpeech::Noun && prev.fromDictionary() &&
+      has_erow && next.surface == "で") {
+    return {};
+  }
+
   return {ConnectionPattern::TeFormSplit, opts.penalty_te_form_split,
           "te-form split pattern"};
 }

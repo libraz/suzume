@@ -851,6 +851,10 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       // NOUN→SUFFIX(-0.8)+0.8=0.0 wins for counter patterns (3人)
       {"人", POS::Suffix, 0.8F, "にん", false, false, true, CT::None, ""},
 
+      // Occurrence counter suffix (回数接尾語)
+      // 回: times/occurrences - 第一回, 3回, 何回
+      {"回", POS::Suffix, 0.5F, "かい", false, false, true, CT::None, ""},
+
       // Counter suffixes with ヶ (助数詞接尾語)
       // ヶ is read as か in counters (箇の略字)
       {"ヶ月", POS::Suffix, 0.3F, "ヶ月", false, false, true, CT::None, "かげつ"},
@@ -1146,6 +1150,16 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"今や", POS::Adverb, -0.5F, "", false, false, false, CT::None, "いまや"},  // now - prevent 今+や(OTHER)
       {"初めて", POS::Adverb, -0.5F, "", false, false, false, CT::None, "はじめて"},  // first time - prevent VERB confusion
       {"到底", POS::Adverb, 0.1F, "", false, false, false, CT::None, "とうてい"},  // utterly - prevent NOUN confusion (N11)
+
+      // Compound adverbs (複合副詞) - functional expressions
+      // その上: "moreover/in addition" - needs low cost to beat その+上今 compound
+      {"その上", POS::Adverb, -0.5F, "", false, false, false, CT::None, "そのうえ"},
+      // その後: "after that" - needs low cost to beat その+後猫 compound
+      {"その後", POS::Adverb, -0.5F, "", false, false, false, CT::None, "そのあと"},
+      // 第一: "first of all/firstly" - adverbial usage in classical/formal text
+      // Low cost (-0.5) to split patterns like 第一毛. Compounds like 第一回 are
+      // protected by their dictionary entries or unknown compound generation.
+      {"第一", POS::Adverb, -0.5F, "", false, false, false, CT::None, "だいいち"},
   };
 }
 
@@ -1198,6 +1212,11 @@ std::vector<DictionaryEntry> getNaAdjectiveEntries() {
       {"無限", POS::Adjective, 0.5F, "", false, false, false, CT::NaAdjective, "むげん"},
       {"滅多", POS::Adjective, 0.5F, "", false, false, false, CT::NaAdjective, "めった"},
       {"一緒", POS::Adjective, 0.5F, "", false, false, false, CT::NaAdjective, "いっしょ"},
+
+      // Single-kanji na-adjectives (単漢字形容動詞)
+      // These need explicit entries to avoid single_kanji penalty (+2.0)
+      // 妙: "strange/mysterious" - common in classical text (この時妙なものだと思った)
+      {"妙", POS::Adjective, 0.3F, "", false, false, false, CT::NaAdjective, "みょう"},
 
       // Adverbial na-adjectives
       {"流石", POS::Adjective, 0.5F, "", false, false, false, CT::NaAdjective, "さすが"},
@@ -1773,6 +1792,11 @@ std::vector<DictionaryEntry> getCommonVocabularyEntries() {
       {"最低", POS::Noun, 0.1F, "", false, false, false, CT::None, "さいてい"},
       {"最大", POS::Noun, 0.1F, "", false, false, false, CT::None, "さいだい"},
       {"最小", POS::Noun, 0.1F, "", false, false, false, CT::None, "さいしょう"},
+
+      // Single-kanji nouns that need dictionary entry to avoid penalty
+      // 毛: common standalone noun (第一毛, 白毛), but also in compounds (ムダ毛, 産毛)
+      // Cost 0.5 balances standalone use vs compound formation
+      {"毛", POS::Noun, 0.5F, "", false, false, false, CT::None, "け"},
 
       // Iteration mark compounds (踊り字複合語) - prevent X + 々 split
       {"人々", POS::Noun, -0.5F, "", false, false, false, CT::None, "ひとびと"},

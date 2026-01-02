@@ -777,11 +777,26 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     // E-row hiragana: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
     // I-row hiragana: い, き, し, ち, に, ひ, み, り, ぎ, じ, ぢ, び, ぴ
     if (grammar::isERowCodepoint(first_hira) || grammar::isIRowCodepoint(first_hira)) {
-      // Surface is kanji + first e/i-row hiragana only (e.g., 食べ from 食べます, 感じ from 感じる)
-      size_t renyokei_end = kanji_end + 1;
-      std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
-      auto best = inflection.getBest(surface);
-      if (best.confidence > verb_opts.confidence_standard && best.verb_type == grammar::VerbType::Ichidan) {
+      // Skip hiragana commonly used as particles after single kanji
+      // で (te-form/particle), に (particle), へ (particle) are rarely Ichidan stem endings
+      // These almost always represent kanji + particle (雨で→雨+で, 本に→本+に)
+      bool is_common_particle = (first_hira == U'で' || first_hira == U'に' || first_hira == U'へ');
+      bool is_single_kanji = (kanji_end == start_pos + 1);
+      if (is_common_particle && is_single_kanji) {
+        // Skip this pattern - it's almost certainly noun + particle
+      } else {
+        // Surface is kanji + first e/i-row hiragana only (e.g., 食べ from 食べます, 感じ from 感じる)
+        size_t renyokei_end = kanji_end + 1;
+        std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
+        auto best = inflection.getBest(surface);
+        // Use different thresholds for e-row vs i-row patterns:
+        // - I-row (じ, み, etc.): lower threshold (0.28) - these are distinctively verb stems
+        //   and get penalized by ichidan_kanji_i_row_stem, so need lower threshold
+        // - E-row (べ, せ, etc.): standard threshold (0.48) - these are common patterns
+        //   that don't need special handling
+        bool is_i_row = grammar::isIRowCodepoint(first_hira);
+        float conf_threshold = is_i_row ? verb_opts.confidence_ichidan_dict : verb_opts.confidence_standard;
+        if (best.confidence > conf_threshold && best.verb_type == grammar::VerbType::Ichidan) {
         UnknownCandidate candidate;
         candidate.surface = surface;
         candidate.start = start_pos;
@@ -799,6 +814,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         candidate.pattern = "ichidan_renyokei";
 #endif
         candidates.push_back(candidate);
+        }
       }
     }
   }

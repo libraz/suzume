@@ -262,12 +262,16 @@
     },
     {
       "id": "numeric_ordinal",
-      "description": "第一回 (first time)",
+      "description": "第一回 (first time) - 第一 is adverb, 回 is counter suffix",
       "input": "第一回",
       "expected": [
         {
-          "surface": "第一回",
-          "pos": "Noun"
+          "surface": "第一",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "回",
+          "pos": "Suffix"
         }
       ],
       "tags": [
@@ -892,7 +896,7 @@
     },
     {
       "id": "iteration_mark_tokidoki_myouni",
-      "description": "時々妙に - should split at 々 boundary, not merge into 時々妙",
+      "description": "時々妙に - should split at 々 boundary, 妙 is na-adjective (妙に = strangely)",
       "input": "時々妙に",
       "expected": [
         {
@@ -901,7 +905,7 @@
         },
         {
           "surface": "妙",
-          "pos": "Noun"
+          "pos": "Adjective"
         },
         {
           "surface": "に",

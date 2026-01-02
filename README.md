@@ -2,7 +2,7 @@
 
 **Japanese Tokenizer That Actually Works in the Browser**
 
-No more 50MB dictionary files. Lightweight Japanese tokenization under 250KB — runs entirely in the browser, no server required.
+No more 50MB dictionary files. Lightweight Japanese tokenization under 300KB — runs entirely in the browser, no server required.
 
 > **Suzume is a feature-driven tokenizer** designed for real-world Japanese text on the web.
 > The best of both worlds: lightweight footprint meets practical accuracy.
@@ -13,7 +13,7 @@ No more 50MB dictionary files. Lightweight Japanese tokenization under 250KB —
 
 | Feature | Traditional Analyzers | Suzume |
 |---------|----------------------|--------|
-| **Bundle Size** | 20–50MB+ (dictionary) | < 250KB gzipped |
+| **Bundle Size** | 20–50MB+ (dictionary) | < 300KB gzipped |
 | **Browser Support** | Limited or none | Full support |
 | **Server Required** | Usually yes | No |
 | **Unknown Words** | May struggle | Robust by design |
