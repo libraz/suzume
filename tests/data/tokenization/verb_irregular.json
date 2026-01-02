@@ -522,6 +522,98 @@
       ]
     },
     {
+      "id": "kanjiru_dict_form",
+      "description": "感じる dictionary form - kanji + i-row stem ichidan verb",
+      "input": "感じる",
+      "expected": [
+        {
+          "surface": "感じる",
+          "pos": "Verb",
+          "lemma": "感じる"
+        }
+      ],
+      "tags": [
+        "ichidan",
+        "dict_form"
+      ]
+    },
+    {
+      "id": "kanjiru_past",
+      "description": "感じた past form - should be single verb token",
+      "input": "感じた",
+      "expected": [
+        {
+          "surface": "感じた",
+          "pos": "Verb",
+          "lemma": "感じる"
+        }
+      ],
+      "tags": [
+        "ichidan",
+        "past"
+      ]
+    },
+    {
+      "id": "kanji_ga_atta",
+      "description": "感じがあった - nominalized 感じ as NOUN followed by が particle",
+      "input": "感じがあった",
+      "expected": [
+        {
+          "surface": "感じ",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "あった",
+          "pos": "Verb",
+          "lemma": "ある"
+        }
+      ],
+      "tags": [
+        "nominalization",
+        "particle"
+      ]
+    },
+    {
+      "id": "shinjiru_dict_form",
+      "description": "信じる dictionary form - another kanji + i-row stem ichidan verb",
+      "input": "信じる",
+      "expected": [
+        {
+          "surface": "信じる",
+          "pos": "Verb",
+          "lemma": "信じる"
+        }
+      ],
+      "tags": [
+        "ichidan",
+        "dict_form"
+      ]
+    },
+    {
+      "id": "hito_iru_split",
+      "description": "人いる should split as NOUN + VERB, not single verb",
+      "input": "人いる",
+      "expected": [
+        {
+          "surface": "人",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いる",
+          "pos": "Verb",
+          "lemma": "いる"
+        }
+      ],
+      "tags": [
+        "split",
+        "noun_verb"
+      ]
+    },
+    {
       "id": "shikata_noun",
       "description": "B25: 仕方ない should be NOUN + AUX, not VERB (仕方する)",
       "input": "仕方ない",

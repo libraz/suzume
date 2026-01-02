@@ -124,6 +124,9 @@ struct ConnectionOptions {
   // NOUN + まい
   float penalty_noun_mai = scorer::kPenaltyNounMai;
 
+  // NOUN (i-row ending) + る/て/た(AUX) - likely ichidan verb split
+  float penalty_noun_irow_to_verb_aux = scorer::scale::kStrong;
+
   // Short/unknown aux after particle
   float penalty_short_aux_after_particle = scorer::kPenaltyShortAuxAfterParticle;
 

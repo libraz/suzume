@@ -130,6 +130,7 @@ void evaluateNounRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkIruAuxAfterNoun(prev, next, opts));
   accumulateRule(accumulated, checkNounBeforeVerbAux(prev, next, opts));
   accumulateRule(accumulated, checkMaiAfterNoun(prev, next, opts));
+  accumulateRule(accumulated, checkNounIRowToVerbAux(prev, next, opts));
 
   // NOUN → VERB rules
   accumulateRule(accumulated, checkCompoundAuxAfterRenyokei(prev, next, opts));

@@ -605,8 +605,42 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       dict_verified_best.confidence = 0.0F;
 
       for (const auto& cand : inflection_results) {
+        // Use lower threshold for ichidan verbs with i-row stems (感じる, 信じる)
+        // These get ichidan_kanji_i_row_stem penalty which reduces confidence
+        // But NOT for e-row stems (て/で), which are often te-form splits
+        // Also NOT for single-kanji + い patterns (人い → 人 + いる, not a verb)
+        bool is_i_row_ichidan = false;
+        if (cand.verb_type == grammar::VerbType::Ichidan &&
+            !cand.stem.empty() &&
+            cand.stem.size() >= core::kJapaneseCharBytes) {
+          std::string_view last_char(
+              cand.stem.data() + cand.stem.size() - core::kJapaneseCharBytes,
+              core::kJapaneseCharBytes);
+          if (grammar::endsWithIRow(last_char)) {
+            // Stem has at least 2 chars?
+            if (cand.stem.size() >= 2 * core::kJapaneseCharBytes) {
+              // Check if stem is single-kanji + い (e.g., 人い)
+              // This pattern is almost always NOUN + いる, not a single verb
+              // Valid ichidan stems are typically multi-char (感じ, 信じ, etc.)
+              std::string kanji_part(cand.stem.data(),
+                                     cand.stem.size() - core::kJapaneseCharBytes);
+              // If kanji part is exactly 1 kanji (3 bytes), it's likely NOUN + いる
+              bool is_single_kanji_i =
+                  (kanji_part.size() == core::kJapaneseCharBytes &&
+                   last_char == "い");
+              // Multi-char kanji portion like 感じ is a valid ichidan stem
+              is_i_row_ichidan = !is_single_kanji_i;
+            } else {
+              // Single char stem - not a valid i-row ichidan pattern
+              is_i_row_ichidan = false;
+            }
+          }
+        }
+        float conf_threshold = is_i_row_ichidan
+                                   ? verb_opts.confidence_ichidan_dict
+                                   : verb_opts.confidence_standard;
         if (cand.stem == expected_stem &&
-            cand.confidence > verb_opts.confidence_standard &&
+            cand.confidence > conf_threshold &&
             cand.verb_type != grammar::VerbType::IAdjective) {
           // Check if this candidate's base_form exists in dictionary
           bool in_dict = isVerbInDictionary(dict_manager, cand.base_form);
@@ -629,7 +663,28 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       }
 
       // Only proceed if we found a matching candidate
-      if (best.confidence > verb_opts.confidence_standard) {
+      // Use lower threshold for valid i-row ichidan stems (感じ, 信じ, etc.)
+      // but not single-kanji + い patterns (人い → 人 + いる)
+      bool proceed_is_i_row_ichidan = false;
+      if (best.verb_type == grammar::VerbType::Ichidan &&
+          !best.stem.empty() &&
+          best.stem.size() >= 2 * core::kJapaneseCharBytes) {
+        std::string_view last_char(
+            best.stem.data() + best.stem.size() - core::kJapaneseCharBytes,
+            core::kJapaneseCharBytes);
+        if (grammar::endsWithIRow(last_char)) {
+          std::string kanji_part(best.stem.data(),
+                                 best.stem.size() - core::kJapaneseCharBytes);
+          bool is_single_kanji_i =
+              (kanji_part.size() == core::kJapaneseCharBytes &&
+               last_char == "い");
+          proceed_is_i_row_ichidan = !is_single_kanji_i;
+        }
+      }
+      float proceed_threshold = proceed_is_i_row_ichidan
+                                    ? verb_opts.confidence_ichidan_dict
+                                    : verb_opts.confidence_standard;
+      if (best.confidence > proceed_threshold) {
           // Reject Godan verbs with stems ending in e-row hiragana
           // E-row endings (え,け,せ,て,ね,へ,め,れ) are typically ichidan stems
           // E.g., "伝えいた" falsely matches as GodanKa "伝えく" but 伝える is ichidan
@@ -743,9 +798,33 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             base_cost += verb_opts.penalty_single_char;
           }
           candidate.cost = base_cost;
-          // Set has_suffix for dict-verified candidates to skip exceeds_dict_length penalty
-          // in tokenizer.cpp (the base form exists in dictionary as a verb)
-          candidate.has_suffix = in_dict;
+          // Set has_suffix to skip exceeds_dict_length penalty in tokenizer.cpp
+          // This applies when:
+          // 1. Base form exists in dictionary as verb (in_dict)
+          // 2. OR: Ichidan verb with valid i-row stem (感じる, not 人いる)
+          //    that passes confidence threshold
+          bool is_ichidan = (best.verb_type == grammar::VerbType::Ichidan);
+          bool has_valid_ichidan_stem = false;
+          if (is_ichidan && !best.stem.empty() &&
+              best.stem.size() >= 2 * core::kJapaneseCharBytes) {
+            // Check if stem ends with i-row hiragana (not e-row)
+            // E-row endings are often te-form (見て) or copula (嫌で), not ichidan stems
+            // Also exclude single-kanji + い patterns (人い → 人 + いる)
+            std::string_view last_char(
+                best.stem.data() + best.stem.size() - core::kJapaneseCharBytes,
+                core::kJapaneseCharBytes);
+            if (grammar::endsWithIRow(last_char)) {
+              std::string kanji_part(best.stem.data(),
+                                     best.stem.size() - core::kJapaneseCharBytes);
+              bool is_single_kanji_i =
+                  (kanji_part.size() == core::kJapaneseCharBytes &&
+                   last_char == "い");
+              has_valid_ichidan_stem = !is_single_kanji_i;
+            }
+          }
+          bool recognized_ichidan = is_ichidan && has_valid_ichidan_stem &&
+                                    best.confidence > verb_opts.confidence_ichidan_dict;
+          candidate.has_suffix = in_dict || recognized_ichidan;
           SUZUME_DEBUG_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                 << " base=" << best.base_form
@@ -1274,9 +1353,11 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes,
                                   core::kJapaneseCharBytes);
       if (last_char == "る" && end_pos >= 2) {
-        // Check if second-to-last char is e-row hiragana (ichidan stem ending)
+        // Check if second-to-last char is e-row or i-row hiragana (ichidan stem ending)
+        // E-row: 食べる, 見える, 調べる
+        // I-row: 感じる, 信じる (kanji + i-row + る pattern)
         char32_t stem_end = codepoints[end_pos - 2];
-        if (grammar::isERowCodepoint(stem_end)) {
+        if (grammar::isERowCodepoint(stem_end) || grammar::isIRowCodepoint(stem_end)) {
           // Exclude てる pattern (ている contraction) - this should be suru/godan + ている
           // not ichidan dictionary form
           bool is_te_iru_contraction = (stem_end == U'て' || stem_end == U'で');

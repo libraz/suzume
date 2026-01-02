@@ -147,6 +147,13 @@ ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
     return {};  // No penalty for formal noun + ADJ pattern
   }
 
+  // Exception: formal noun + pronoun (interrogatives)
+  // e.g., 時何だか (when something/what), 所誰 (where someone)
+  // Interrogative pronouns (何, 誰) are standalone words, not compound parts
+  if (next.pos == core::PartOfSpeech::Pronoun) {
+    return {};  // No penalty for formal noun + PRON pattern
+  }
+
   // Penalty for formal noun + kanji pattern
   return {ConnectionPattern::FormalNounBeforeKanji,
           opts.penalty_formal_noun_before_kanji,

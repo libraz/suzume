@@ -200,6 +200,30 @@ ConnectionRuleResult checkMaiAfterNoun(const core::LatticeEdge& prev,
           "mai aux after noun (should be verb stem)"};
 }
 
+// Rule: NOUN (i-row ending) + る/て/た(AUX) penalty
+// When a noun ends with i-row hiragana (じ, み, び, etc.) and is followed by
+// る/て/た(AUX), it's likely a misanalyzed ichidan verb (e.g., 感じ+る → 感じる).
+// Nouns cannot take verb conjugation suffixes - this is grammatically invalid.
+// Exception: だ/です copula is valid after nouns (handled by separate rule)
+ConnectionRuleResult checkNounIRowToVerbAux(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next,
+                                            const ConnectionOptions& opts) {
+  if (!isNounToAux(prev, next)) return {};
+
+  // Target verb conjugation markers: る (terminal), て (te-form), た (past)
+  // These are verb suffixes that nouns cannot take
+  if (next.surface != "る" && next.surface != "て" && next.surface != "た") {
+    return {};
+  }
+
+  // Check if noun ends with i-row hiragana (ichidan stem pattern)
+  if (!endsWithIRow(prev.surface)) return {};
+
+  // Strong penalty to prefer verb interpretation over NOUN + る/て/た split
+  return {ConnectionPattern::NounBeforeVerbAux, opts.penalty_noun_irow_to_verb_aux,
+          "noun (i-row) + ru/te/ta aux (likely ichidan verb)"};
+}
+
 // Check for invalid PARTICLE + AUX pattern
 // Auxiliaries (助動詞) attach to verb/adjective stems, not particles
 // PARTICLE + AUX is grammatically invalid in most cases

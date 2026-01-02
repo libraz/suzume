@@ -257,7 +257,6 @@
 未来	NOUN	みらい	0.5
 時分	NOUN	じぶん	0.5
 
-# --- Nominalized nouns (verb renyokei → noun) ---
 推し	NOUN	おし	0.3
 呼び出し	NOUN	よびだし	0.3
 打ち合わせ	NOUN	うちあわせ	0.3
@@ -429,11 +428,9 @@ Wi-Fi	NOUN		0.5
 ヤミ金	NOUN	やみきん	0.5
 ウソ電話	NOUN	うそでんわ	0.5
 デマ情報	NOUN	でまじょうほう	0.5
-モラハラ	NOUN	もらはら	0.5
-パワハラ	NOUN	ぱわはら	0.5
-セクハラ	NOUN	せくはら	0.5
-アラフォー	NOUN	あらふぉー	0.5
-アラサー	NOUN	あらさー	0.5
-コスパ	NOUN	こすぱ	0.5
-タイパ	NOUN	たいぱ	0.5
 ガチ勢	NOUN	がちぜい	0.5
+
+# These are verb renyokei forms commonly used as standalone nouns
+# 感じ needs higher cost to not beat 感じる conjugations
+# 感じがあった should parse as 感じ(NOUN) + が, but 感じた should be 感じ(VERB) + た
+感じ	NOUN	かんじ	0.8

@@ -287,6 +287,10 @@ ConnectionRuleResult checkMaiAfterNoun(const core::LatticeEdge& prev,
                                        const core::LatticeEdge& next,
                                        const ConnectionOptions& opts);
 
+ConnectionRuleResult checkNounIRowToVerbAux(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next,
+                                            const ConnectionOptions& opts);
+
 ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts);
