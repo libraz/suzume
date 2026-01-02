@@ -743,15 +743,16 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             base_cost += verb_opts.penalty_single_char;
           }
           candidate.cost = base_cost;
+          // Set has_suffix for dict-verified candidates to skip exceeds_dict_length penalty
+          // in tokenizer.cpp (the base form exists in dictionary as a verb)
+          candidate.has_suffix = in_dict;
           SUZUME_DEBUG_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                 << " base=" << best.base_form
                                 << " cost=" << base_cost
-                                << " in_dict=" << in_dict << "\n";
+                                << " in_dict=" << in_dict
+                                << " has_suffix=" << candidate.has_suffix << "\n";
           }
-          // Set has_suffix for dict-verified candidates to skip exceeds_dict_length penalty
-          // in tokenizer.cpp (the base form exists in dictionary as a verb)
-          candidate.has_suffix = in_dict;
           // Don't set lemma here - let lemmatizer derive it with dictionary verification
           // The lemmatizer will use stem-matching logic to pick the correct base form
           candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);

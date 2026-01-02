@@ -133,10 +133,12 @@ void Tokenizer::addUnknownCandidates(
 
     // Penalize unknown words that extend beyond dictionary entries
     bool skip_penalty = false;
+    [[maybe_unused]] const char* skip_reason = nullptr;
 
     // Skip penalty for adverbs (onomatopoeia like わくわく)
     if (candidate.pos == core::PartOfSpeech::Adverb) {
       skip_penalty = true;
+      skip_reason = "adverb";
     }
 
     if (!skip_penalty &&
@@ -148,6 +150,7 @@ void Tokenizer::addUnknownCandidates(
           if (result.entry->pos == core::PartOfSpeech::Verb ||
               result.entry->pos == core::PartOfSpeech::Adjective) {
             skip_penalty = true;
+            skip_reason = "dict_has_verb_adj";
             break;
           }
           // Case 2: Pure hiragana verb candidate vs short dictionary entry
@@ -170,6 +173,7 @@ void Tokenizer::addUnknownCandidates(
             }
             if (all_hiragana_or_choon) {
               skip_penalty = true;
+              skip_reason = "pure_hiragana_verb";
               break;
             }
           }
@@ -186,6 +190,7 @@ void Tokenizer::addUnknownCandidates(
           utf8::endsWith(surface, "っちゃう") ||
           utf8::endsWith(surface, "っじゃう")) {
         skip_penalty = true;
+        skip_reason = "colloquial_contraction";
       }
     }
 
@@ -210,6 +215,7 @@ void Tokenizer::addUnknownCandidates(
           std::string_view last_char = utf8::lastChar(surface);
           if (last_char == "て" || last_char == "で") {
             skip_penalty = true;
+            skip_reason = "short_te_form";
           }
         }
       }
@@ -220,6 +226,7 @@ void Tokenizer::addUnknownCandidates(
     // Also allow prolonged sound mark (ー) as part of hiragana sequence
     bool reduced_penalty = false;
     bool skip_dict_penalty = false;
+    [[maybe_unused]] const char* skip_dict_reason = nullptr;
     if (!skip_penalty && candidate.pos == core::PartOfSpeech::Other &&
         candidate.end - candidate.start >= 4) {
       bool all_hiragana_or_choon = true;
@@ -266,6 +273,7 @@ void Tokenizer::addUnknownCandidates(
       }
       if (all_katakana) {
         skip_dict_penalty = true;
+        skip_dict_reason = "all_katakana";
       }
     }
 
@@ -287,6 +295,7 @@ void Tokenizer::addUnknownCandidates(
         }
         if (all_kanji) {
           skip_dict_penalty = true;
+          skip_dict_reason = "all_kanji_compound";
         }
       }
     }
@@ -298,15 +307,34 @@ void Tokenizer::addUnknownCandidates(
     // Also skip for Suru verb candidates (所在する, 延期する) - these are productive
     bool is_suru_verb = (candidate.pos == core::PartOfSpeech::Verb &&
                          candidate.conj_type == dictionary::ConjugationType::Suru);
-    if (!skip_penalty && !skip_dict_penalty && !candidate.has_suffix && !is_suru_verb &&
-        max_dict_length > 0 &&
-        candidate.end - candidate.start > max_dict_length) {
-      float penalty = reduced_penalty ? 1.0F : 3.5F;
-      adjusted_cost += penalty;
-      SUZUME_DEBUG_LOG("[TOK_UNK] \"" << candidate.surface << "\": +"
-                        << penalty << " (exceeds_dict_length"
-                        << (reduced_penalty ? ", pure_hiragana" : "")
-                        << ", dict_max=" << max_dict_length << ")\n");
+    bool exceeds_dict = (max_dict_length > 0 &&
+                         candidate.end - candidate.start > max_dict_length);
+    if (exceeds_dict) {
+      if (skip_penalty) {
+        SUZUME_DEBUG_LOG("[TOK_SKIP] \"" << candidate.surface << "\" ("
+                          << core::posToString(candidate.pos) << "): "
+                          << "skip exceeds_dict_length (" << skip_reason << ")\n");
+      } else if (skip_dict_penalty) {
+        SUZUME_DEBUG_LOG("[TOK_SKIP] \"" << candidate.surface << "\" ("
+                          << core::posToString(candidate.pos) << "): "
+                          << "skip exceeds_dict_length (" << skip_dict_reason << ")\n");
+      } else if (is_suru_verb) {
+        SUZUME_DEBUG_LOG("[TOK_SKIP] \"" << candidate.surface << "\" ("
+                          << core::posToString(candidate.pos) << "): "
+                          << "skip exceeds_dict_length (suru_verb)\n");
+      } else if (candidate.has_suffix) {
+        SUZUME_DEBUG_LOG("[TOK_SKIP] \"" << candidate.surface << "\" ("
+                          << core::posToString(candidate.pos) << "): "
+                          << "skip exceeds_dict_length (has_suffix)\n");
+      } else {
+        float penalty = reduced_penalty ? 1.0F : 3.5F;
+        adjusted_cost += penalty;
+        SUZUME_DEBUG_LOG("[TOK_UNK] \"" << candidate.surface << "\" ("
+                          << core::posToString(candidate.pos) << "): +"
+                          << penalty << " (exceeds_dict_length"
+                          << (reduced_penalty ? ", pure_hiragana" : "")
+                          << ", dict_max=" << max_dict_length << ")\n");
+      }
     }
 
     // For verb candidates, check if the hiragana suffix is a known particle
