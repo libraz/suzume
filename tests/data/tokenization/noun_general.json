@@ -1038,11 +1038,15 @@
     },
     {
       "id": "suffix_sensei_130f42",
-      "description": "Honorific suffix 先生",
+      "description": "Honorific suffix 先生 (name + suffix split)",
       "input": "佐藤先生の授業",
       "expected": [
         {
-          "surface": "佐藤先生",
+          "surface": "佐藤",
+          "pos": "Noun"
+        },
+        {
+          "surface": "先生",
           "pos": "Noun"
         },
         {
@@ -1303,6 +1307,89 @@
       "tags": [
         "katakana",
         "loanword"
+      ]
+    },
+    {
+      "id": "compound_kyou_chuu",
+      "description": "今日中 (within today) as single compound noun with bound noun 中",
+      "input": "今日中に届く",
+      "expected": [
+        {"surface": "今日中", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "届く", "pos": "Verb", "lemma": "届く"}
+      ],
+      "tags": [
+        "compound",
+        "time"
+      ]
+    },
+    {
+      "id": "compound_sekai_chuu",
+      "description": "世界中 (throughout the world) as single compound noun",
+      "input": "世界中で話題",
+      "expected": [
+        {"surface": "世界中", "pos": "Noun"},
+        {"surface": "で", "pos": "Particle"},
+        {"surface": "話題", "pos": "Noun"}
+      ],
+      "tags": [
+        "compound",
+        "spatial"
+      ]
+    },
+    {
+      "id": "compound_ichinichi_chuu",
+      "description": "一日中 (all day long) as single compound noun",
+      "input": "一日中働く",
+      "expected": [
+        {"surface": "一日中", "pos": "Noun"},
+        {"surface": "働く", "pos": "Verb", "lemma": "働く"}
+      ],
+      "tags": [
+        "compound",
+        "time"
+      ]
+    },
+    {
+      "id": "time_kyou_split",
+      "description": "今日 splits correctly when followed by other kanji",
+      "input": "今日学校行った",
+      "expected": [
+        {"surface": "今日", "pos": "Noun"},
+        {"surface": "学校", "pos": "Noun"},
+        {"surface": "行った", "pos": "Verb", "lemma": "行く"}
+      ],
+      "tags": [
+        "time",
+        "split"
+      ]
+    },
+    {
+      "id": "compound_yoku_eigyoubi",
+      "description": "翌営業日 (next business day) as single compound",
+      "input": "翌営業日に届く",
+      "expected": [
+        {"surface": "翌営業日", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "届く", "pos": "Verb", "lemma": "届く"}
+      ],
+      "tags": [
+        "compound",
+        "business"
+      ]
+    },
+    {
+      "id": "compound_senkou_kenkyuu",
+      "description": "先行研究 (prior research) as single compound in academic context",
+      "input": "先行研究を参照",
+      "expected": [
+        {"surface": "先行研究", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "参照", "pos": "Noun"}
+      ],
+      "tags": [
+        "compound",
+        "academic"
       ]
     }
   ]

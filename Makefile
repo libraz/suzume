@@ -44,10 +44,10 @@ help:
 	@echo "  make wasm                             # Build WASM module"
 	@echo "  make CMAKE_OPTIONS=-DENABLE_DEBUG_INFO=OFF  # Build without debug info"
 
-# Configure CMake
+# Configure CMake (always runs to pick up new test files)
 configure:
 	@mkdir -p $(BUILD_DIR)
-	cd $(BUILD_DIR) && cmake -DCMAKE_BUILD_TYPE=Release $(CMAKE_OPTIONS) ..
+	@cmake -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=Release $(CMAKE_OPTIONS)
 
 # Build the project
 build: configure

@@ -5,6 +5,8 @@
 
 #include "suffix_candidates.h"
 
+#include <unordered_set>
+
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "unknown.h"
@@ -33,7 +35,8 @@ const std::vector<SuffixEntry>& getSuffixEntries() {
       {"力", core::PartOfSpeech::Suffix},
       {"度", core::PartOfSpeech::Suffix},
       {"方", core::PartOfSpeech::Suffix},  // 歩き方, やり方 (V連用形+方)
-      {"中", core::PartOfSpeech::Suffix},  // 世界中, 人間中 (N3)
+      // Note: 中 removed - it's a bound noun (形式名詞), not a suffix
+      // N中 compounds (今日中, 世界中, 一日中) are handled as compound nouns
       // Administrative suffixes (行政接尾辞)
       {"県", core::PartOfSpeech::Suffix},
       {"都", core::PartOfSpeech::Suffix},
@@ -822,6 +825,144 @@ std::vector<UnknownCandidate> generateCounterCandidates(
 #endif
         candidates.push_back(candidate);
       }
+    }
+  }
+
+  return candidates;
+}
+
+// =============================================================================
+// Prefix + Single Kanji Compound Candidates (接頭的複合語)
+// =============================================================================
+
+namespace {
+
+// Prefix-like kanji that can form compounds with single kanji
+// These are kanji that commonly appear at the start of temporal compounds
+// Note: 本 excluded - too many non-prefix uses (本当, 本人, 本社, etc.)
+// Note: 全/各/両/諸 excluded - require more context to determine compound boundary
+const std::unordered_set<char32_t>& getPrefixLikeKanji() {
+  static const std::unordered_set<char32_t> kPrefixKanji = {
+      U'今',  // 今日, 今週, 今月, 今年, 今朝, 今晩, 今夜
+      U'来',  // 来日, 来週, 来月, 来年
+      U'先',  // 先日, 先週, 先月, 先年
+      U'昨',  // 昨日, 昨年
+      U'翌',  // 翌日, 翌週, 翌月, 翌年
+      U'毎',  // 毎日, 毎週, 毎月, 毎年
+  };
+  return kPrefixKanji;
+}
+
+// Interrogative kanji that should NOT form compounds
+// These act as strong anchors in the dictionary
+const std::unordered_set<char32_t>& getInterrogativeKanji() {
+  static const std::unordered_set<char32_t> kInterrogatives = {
+      U'何',  // 何 (なに/なん) - what
+      U'誰',  // 誰 (だれ) - who
+      U'幾',  // 幾 (いく) - how many (幾つ, 幾日)
+  };
+  return kInterrogatives;
+}
+
+}  // namespace
+
+bool isPrefixLikeKanji(char32_t cp) {
+  const auto& prefix_kanji = getPrefixLikeKanji();
+  return prefix_kanji.find(cp) != prefix_kanji.end();
+}
+
+std::vector<UnknownCandidate> generatePrefixCompoundCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) {
+  std::vector<UnknownCandidate> candidates;
+
+  // Need at least 2 kanji characters
+  if (start_pos + 1 >= codepoints.size()) {
+    return candidates;
+  }
+
+  // First character must be kanji
+  if (start_pos >= char_types.size() ||
+      char_types[start_pos] != normalize::CharType::Kanji) {
+    return candidates;
+  }
+
+  // Check if first character is a prefix-like kanji
+  char32_t first_char = codepoints[start_pos];
+  const auto& prefix_kanji = getPrefixLikeKanji();
+  if (prefix_kanji.find(first_char) == prefix_kanji.end()) {
+    return candidates;
+  }
+
+  // Second character must also be kanji
+  if (start_pos + 1 >= char_types.size() ||
+      char_types[start_pos + 1] != normalize::CharType::Kanji) {
+    return candidates;
+  }
+
+  // Skip if second character is an interrogative (何, 誰, etc.)
+  // These act as anchors and should not form compounds with prefix
+  char32_t second_char = codepoints[start_pos + 1];
+  const auto& interrogatives = getInterrogativeKanji();
+  if (interrogatives.find(second_char) != interrogatives.end()) {
+    return candidates;  // Don't generate compound, let dictionary anchor win
+  }
+
+  // Generate 2-character compound (prefix + single kanji) ONLY when:
+  // - Not followed by more kanji, OR
+  // - Followed by 中 (which becomes 3-char compound below)
+  // This prevents invalid splits like 翌営|業日 (should be 翌営業日)
+  bool followed_by_kanji = (start_pos + 2 < char_types.size() &&
+                            char_types[start_pos + 2] == normalize::CharType::Kanji);
+  bool followed_by_chuu = (followed_by_kanji &&
+                           start_pos + 2 < codepoints.size() &&
+                           codepoints[start_pos + 2] == U'中');
+
+  if (!followed_by_kanji || followed_by_chuu) {
+    std::string surface = extractSubstring(codepoints, start_pos, start_pos + 2);
+    if (!surface.empty()) {
+      UnknownCandidate candidate;
+      candidate.surface = surface;
+      candidate.start = start_pos;
+      candidate.end = start_pos + 2;
+      candidate.pos = core::PartOfSpeech::Noun;
+      // Strong bonus to prefer compound over split
+      // Must beat: single_kanji(1.4+2) + single_kanji(1.4+2) = 6.8
+      // And compete with dictionary entries
+      candidate.cost = -1.0F;
+      candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::PrefixCompound;
+      candidate.confidence = 0.9F;
+      candidate.pattern = "prefix_single_kanji";
+#endif
+      candidates.push_back(candidate);
+    }
+  }
+
+  // Also generate 3-character compound if followed by 中 (bound noun)
+  // e.g., 今日中, 一日中, 世界中
+  if (start_pos + 2 < codepoints.size() &&
+      start_pos + 2 < char_types.size() &&
+      char_types[start_pos + 2] == normalize::CharType::Kanji &&
+      codepoints[start_pos + 2] == U'中') {
+    std::string surface3 = extractSubstring(codepoints, start_pos, start_pos + 3);
+    if (!surface3.empty()) {
+      UnknownCandidate candidate;
+      candidate.surface = surface3;
+      candidate.start = start_pos;
+      candidate.end = start_pos + 3;
+      candidate.pos = core::PartOfSpeech::Noun;
+      // Even stronger bonus for N中 compounds
+      candidate.cost = -1.5F;
+      candidate.has_suffix = false;
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::PrefixCompound;
+      candidate.confidence = 0.95F;
+      candidate.pattern = "prefix_kanji_chuu";
+#endif
+      candidates.push_back(candidate);
     }
   }
 

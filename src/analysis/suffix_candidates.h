@@ -158,6 +158,37 @@ std::vector<UnknownCandidate> generateCounterCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types);
 
+/**
+ * @brief Generate prefix + single kanji compound candidates
+ *
+ * Detects temporal/prefix compounds:
+ *   - 今日 (kyou - today), 今週 (konshuu - this week)
+ *   - 本日 (honjitsu - today formal)
+ *
+ * The generated compound competes with split analysis.
+ * Interrogatives (何, 誰, etc.) act as anchors to prevent over-concatenation.
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param char_types Character types for each position
+ * @return Vector of candidates
+ */
+std::vector<UnknownCandidate> generatePrefixCompoundCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types);
+
+/**
+ * @brief Check if a codepoint is a prefix-like kanji
+ *
+ * Returns true for kanji that commonly form temporal/formal compounds:
+ * 今, 本, 来, 先, 昨, 翌, 毎, 全, 各, 両, 諸
+ *
+ * @param cp Unicode codepoint to check
+ * @return true if prefix-like kanji
+ */
+bool isPrefixLikeKanji(char32_t cp);
+
 }  // namespace suzume::analysis
 
 #endif  // SUZUME_ANALYSIS_SUFFIX_CANDIDATES_H_

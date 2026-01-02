@@ -365,7 +365,7 @@
       "description": "Colloquial questioning past っけ",
       "input": "何時だっけ",
       "expected": [
-        {"surface": "何", "pos": "Prefix"},
+        {"surface": "何", "pos": "Pronoun"},
         {"surface": "時", "pos": "Noun"},
         {"surface": "だ", "pos": "Auxiliary"},
         {"surface": "っけ", "pos": "Particle"}

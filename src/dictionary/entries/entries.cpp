@@ -540,8 +540,10 @@ std::vector<DictionaryEntry> getPronounEntries() {
       {"どちら", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
 
       // Indefinite (不定代名詞) - kanji with reading
-      {"誰", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "だれ"},
-      {"何", POS::Pronoun, 0.5F, "", false, false, true, CT::None, "なに"},
+      // Low cost to act as strong anchors against prefix compounds (今何 → 今+何)
+      // Cost -1.5 to beat: 今(1.4) + 何(-1.9) + conn(0.5) = 0.0 < 今何(0.5)
+      {"誰", POS::Pronoun, -1.5F, "", false, false, true, CT::None, "だれ"},
+      {"何", POS::Pronoun, -1.5F, "", false, false, true, CT::None, "なに"},
 
       // Interrogatives (疑問詞)
       {"いつ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
@@ -604,11 +606,10 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
 std::vector<DictionaryEntry> getTimeNounEntries() {
   // Time nouns are NOT formal nouns (形式名詞)
   // Formal nouns: こと, もの, ところ - abstract grammatical function words
-  // Time nouns: 明日, 今日 - concrete time references, should split from following words
-  // is_formal_noun=false allows 明日雨 → 明日|雨 (correct split)
+  // Time nouns: 明日, 昨日, 今日 - concrete time references
   return {
-      // Days (日) - very low cost to beat PREFIX(-0.5)+NOUN(1.4)+bonus(-1.5) ≈ -1.1
-      {"今日", POS::Noun, -1.5F, "", false, false, false, CT::None, "きょう"},
+      // Days (日)
+      {"今日", POS::Noun, 0.3F, "", false, false, false, CT::None, "きょう"},
       {"明日", POS::Noun, -1.5F, "", false, false, false, CT::None, "あした"},
       {"昨日", POS::Noun, -1.5F, "", false, false, false, CT::None, "きのう"},
       {"明後日", POS::Noun, 0.5F, "", false, false, false, CT::None, "あさって"},
@@ -646,9 +647,7 @@ std::vector<DictionaryEntry> getTimeNounEntries() {
       {"毎年", POS::Noun, 0.5F, "", false, false, false, CT::None, "まいとし"},
 
       // Other time expressions
-      // is_formal_noun=false: 今 is not a formal noun (not こと/もの/ところ pattern)
-      // Prevents penalty when followed by kanji (今何 should split, not compound)
-      {"今", POS::Noun, 0.5F, "", false, false, false, CT::None, "いま"},
+      // Note: 今 handled by prefix+single_kanji candidate generation
       {"現在", POS::Noun, 0.5F, "", false, false, false, CT::None, "げんざい"},
       {"最近", POS::Noun, 0.5F, "", false, false, false, CT::None, "さいきん"},
       {"将来", POS::Noun, 0.5F, "", false, false, false, CT::None, "しょうらい"},
@@ -746,10 +745,7 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"ご", POS::Prefix, 0.3F, "", true, false, false, CT::None, ""},
       {"御", POS::Prefix, 1.0F, "", true, false, false, CT::None, ""},
       {"何", POS::Prefix, 0.3F, "なん", true, false, false, CT::None, ""},  // Interrogative prefix (何番線→何+番線)
-      // Temporal prefix with moderate cost (higher than NOUN -0.5F)
-      // PREFIX→NOUN bigram bonus (-1.5) makes effective cost: 0.5-1.5 = -1.0
-      // But NOUN→NOUN/PRON has no bonus, so NOUN (-0.5) + connection (0) = -0.5 can compete
-      {"今", POS::Prefix, 0.5F, "", true, false, false, CT::None, ""},
+      // Note: 今 (PREFIX) removed to allow 今日中 etc. as compound nouns
 
       // Suffixes (接尾語)
       {"的", POS::Suffix, 1.5F, "", false, false, true, CT::None, ""},

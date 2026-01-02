@@ -309,8 +309,10 @@ void addNounVerbSplitCandidates(
 
     // Check if noun part is in dictionary as NOUN
     // Only consider actual NOUN entries, not ADV/VERB/etc.
+    // Skip formal nouns (中, 上, 下, etc.) - they shouldn't split from preceding noun
     auto noun_results = dict_manager.lookup(text, start_byte);
     bool noun_in_dict = false;
+    bool is_formal_noun = false;
     float noun_cost = 1.0F;
 
     for (const auto& result : noun_results) {
@@ -318,8 +320,15 @@ void addNounVerbSplitCandidates(
           result.entry->pos == core::PartOfSpeech::Noun) {
         noun_in_dict = true;
         noun_cost = result.entry->cost;
+        is_formal_noun = result.entry->is_formal_noun;
         break;
       }
+    }
+
+    // Skip N+V split if noun is a formal/bound noun (e.g., 中, 上, 下)
+    // These typically attach to preceding nouns, not verbs
+    if (is_formal_noun) {
+      continue;
     }
 
     // Try different hiragana lengths for verb ending

@@ -14,6 +14,7 @@
 #include "grammar/conjugation.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
+#include "normalize/utf8.h"
 #include "suffix_candidates.h"
 #include "unknown.h"
 
@@ -566,6 +567,16 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
             if (!is_likely_godan_renyokei) {
               base_cost += verb_opts.bonus_dict_match;
+            }
+          }
+          // Penalize ALL verb candidates with prefix-like kanji at start
+          // e.g., 今何する/今何してる should split, not be single verb
+          // This applies to all verb types (suru, ichidan, godan)
+          if (best.stem.size() >= core::kTwoJapaneseCharBytes) {
+            auto stem_codepoints = normalize::utf8::decode(best.stem);
+            if (!stem_codepoints.empty() && isPrefixLikeKanji(stem_codepoints[0])) {
+              // Heavy penalty to force split
+              base_cost += 3.0F;
             }
           }
           // Check if base form exists in dictionary - significant bonus for known verbs

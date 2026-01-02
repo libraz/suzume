@@ -210,7 +210,7 @@
 とき	NOUN	とき	0.3
 
 # --- Time nouns: Days ---
-今日	NOUN	きょう	0.5
+# 今日: Removed to allow 今日中 as single token (handled by scoring)
 明日	NOUN	あした	0.5
 昨日	NOUN	きのう	0.5
 明後日	NOUN	あさって	0.5
@@ -248,7 +248,7 @@
 毎年	NOUN	まいとし	0.5
 
 # --- Time nouns: Other ---
-今	NOUN	いま	0.5
+# 今: Removed to allow 今日中 etc. as single tokens (handled by scoring)
 今後	NOUN	こんご	0.5
 現在	NOUN	げんざい	0.5
 最近	NOUN	さいきん	0.5
@@ -288,7 +288,7 @@
 
 # --- Compound nouns ---
 引きこもり	NOUN	ひきこもり	0.5
-何でもあり	NOUN	なんでもあり	0.5
+何でもあり	NOUN	なんでもあり	-3.0
 でっち上げ	NOUN	でっちあげ	0.5
 でっちあげ	NOUN	でっちあげ	0.5
 きっかけ	NOUN	きっかけ	0

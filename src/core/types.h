@@ -61,6 +61,7 @@ enum class CandidateOrigin : uint8_t {
   Join,                // 結合候補 (複合動詞結合)
   KanjiHiraganaCompound,  // 漢字+ひらがな複合名詞 (玉ねぎ)
   Counter,             // 数量詞パターン (一つ〜九つ)
+  PrefixCompound,      // 接頭的複合語 (今日, 本日, 全国)
 };
 
 /**

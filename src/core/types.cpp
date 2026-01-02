@@ -161,6 +161,8 @@ const char* originToString(CandidateOrigin origin) {
       return "kanji_hira_compound";
     case CandidateOrigin::Counter:
       return "counter";
+    case CandidateOrigin::PrefixCompound:
+      return "prefix_compound";
     case CandidateOrigin::Unknown:
     default:
       return "unknown";

@@ -329,10 +329,11 @@
     },
     {
       "id": "suffix_sensei",
-      "description": "先生 suffix",
+      "description": "先生 suffix (name + suffix split)",
       "input": "山田先生の授業",
       "expected": [
-        {"surface": "山田先生", "pos": "Noun"},
+        {"surface": "山田", "pos": "Noun"},
+        {"surface": "先生", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "授業", "pos": "Noun"}
       ],

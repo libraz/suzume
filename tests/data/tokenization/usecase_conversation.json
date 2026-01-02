@@ -334,7 +334,7 @@
         {"surface": "東京", "pos": "Noun"},
         {"surface": "行き", "pos": "Suffix"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "何", "pos": "Prefix"},
+        {"surface": "何", "pos": "Pronoun"},
         {"surface": "番線", "pos": "Noun"},
         {"surface": "です", "pos": "Auxiliary"},
         {"surface": "か", "pos": "Particle"}

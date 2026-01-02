@@ -191,6 +191,13 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
     auto counters =
         generateCounterCandidates(codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), counters.begin(), counters.end());
+
+    // Generate prefix + single kanji compound candidates
+    // e.g., 今日, 今週, 本日, 全国 (prefix-like compounds)
+    auto prefix_compounds =
+        generatePrefixCompoundCandidates(codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), prefix_compounds.begin(),
+                      prefix_compounds.end());
   }
 
   // Generate hiragana verb candidates (pure hiragana verbs like いく, くる)
