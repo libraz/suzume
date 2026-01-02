@@ -31,7 +31,7 @@
     },
     {
       "id": "news_event",
-      "description": "Event description",
+      "description": "Event description - passive verb 行われた",
       "input": "昨日、記者会見が行われた",
       "expected": [
         {"surface": "昨日", "pos": "Noun"},
@@ -39,7 +39,7 @@
         {"surface": "が", "pos": "Particle"},
         {"surface": "行われた", "pos": "Verb", "lemma": "行う"}
       ],
-      "tags": ["news"]
+      "tags": ["news", "passive"]
     },
     {
       "id": "news_incident",
@@ -238,7 +238,7 @@
     },
     {
       "id": "academic_result",
-      "description": "Research result",
+      "description": "Research result - passive verb 認められた",
       "input": "実験の結果、有意な差が認められた",
       "expected": [
         {"surface": "実験", "pos": "Noun"},
@@ -247,9 +247,10 @@
         {"surface": "有意な", "pos": "Adjective", "lemma": "有意"},
         {"surface": "差", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "認められた", "pos": "Verb", "lemma": "認める"}
+        {"surface": "認め", "pos": "Verb", "lemma": "認める"},
+        {"surface": "られた", "pos": "Auxiliary", "lemma": "られる"}
       ],
-      "tags": ["academic"]
+      "tags": ["academic", "passive"]
     },
     {
       "id": "academic_conclusion",
@@ -286,19 +287,17 @@
     },
     {
       "id": "academic_reference",
-      "description": "Reference citation",
+      "description": "Reference citation - compound particle によれば",
       "input": "先行研究によれば効果が確認されている",
       "expected": [
         {"surface": "先行研究", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "よ", "pos": "Particle"},
-        {"surface": "れば", "pos": "Other"},
+        {"surface": "によれば", "pos": "Particle"},
         {"surface": "効果", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "確認されて", "pos": "Verb", "lemma": "確認する"},
         {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
       ],
-      "tags": ["academic"]
+      "tags": ["academic", "compound-particle"]
     },
     {
       "id": "academic_limitation",

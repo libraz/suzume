@@ -61,6 +61,10 @@ bool isIRowCodepoint(char32_t cp) {
   return kana::isIRowCodepoint(cp);
 }
 
+bool isARowCodepoint(char32_t cp) {
+  return kana::isARowCodepoint(cp);
+}
+
 bool endsWithChar(std::string_view stem, const char* chars[], size_t count) {
   if (stem.size() < core::kJapaneseCharBytes) {
     return false;
@@ -226,6 +230,36 @@ char32_t getVowelForChar(char32_t ch) {
 
   // Default to the character itself if not recognized
   return ch;
+}
+
+std::string_view godanBaseSuffixFromARow(char32_t a_row_cp) {
+  switch (a_row_cp) {
+    case U'か': return "く";  // GodanKa: 書く
+    case U'が': return "ぐ";  // GodanGa: 泳ぐ
+    case U'さ': return "す";  // GodanSa: 話す
+    case U'た': return "つ";  // GodanTa: 持つ
+    case U'な': return "ぬ";  // GodanNa: 死ぬ
+    case U'ば': return "ぶ";  // GodanBa: 遊ぶ
+    case U'ま': return "む";  // GodanMa: 読む
+    case U'ら': return "る";  // GodanRa: 取る
+    case U'わ': return "う";  // GodanWa: 買う
+    default: return "";
+  }
+}
+
+VerbType verbTypeFromARowCodepoint(char32_t a_row_cp) {
+  switch (a_row_cp) {
+    case U'か': return VerbType::GodanKa;
+    case U'が': return VerbType::GodanGa;
+    case U'さ': return VerbType::GodanSa;
+    case U'た': return VerbType::GodanTa;
+    case U'な': return VerbType::GodanNa;
+    case U'ば': return VerbType::GodanBa;
+    case U'ま': return VerbType::GodanMa;
+    case U'ら': return VerbType::GodanRa;
+    case U'わ': return VerbType::GodanWa;
+    default: return VerbType::Unknown;
+  }
 }
 
 }  // namespace suzume::grammar

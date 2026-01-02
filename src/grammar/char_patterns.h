@@ -8,6 +8,8 @@
 
 #include <string_view>
 
+#include "conjugation.h"  // VerbType
+
 namespace suzume::grammar {
 
 /**
@@ -124,6 +126,16 @@ bool isERowCodepoint(char32_t cp);
 bool isIRowCodepoint(char32_t cp);
 
 /**
+ * @brief Check if a codepoint is a-row hiragana
+ * @param cp Unicode codepoint to check
+ * @return True if the codepoint is a-row hiragana
+ *
+ * A-row includes: あ, か, が, さ, ざ, た, だ, な, は, ば, ぱ, ま, や, ら, わ
+ * Used for verb mizenkei (未然形) detection in passive/causative patterns.
+ */
+bool isARowCodepoint(char32_t cp);
+
+/**
  * @brief Check if stem ends with onbin marker (音便)
  * @param stem The stem to check
  * @return True if the stem ends with い, っ, or ん
@@ -187,6 +199,31 @@ bool endsWithARow(std::string_view stem);
  * - Small kana (ゃ→あ, ゅ→う, ょ→お)
  */
 char32_t getVowelForChar(char32_t ch);
+
+/**
+ * @brief Get Godan verb base suffix from A-row mizenkei ending
+ * @param a_row_cp A-row codepoint (か, さ, た, etc.)
+ * @return Corresponding u-row ending (く, す, つ, etc.), or empty if invalid
+ *
+ * Mapping:
+ * - か → く (GodanKa: 書く)
+ * - が → ぐ (GodanGa: 泳ぐ)
+ * - さ → す (GodanSa: 話す)
+ * - た → つ (GodanTa: 持つ)
+ * - な → ぬ (GodanNa: 死ぬ)
+ * - ば → ぶ (GodanBa: 遊ぶ)
+ * - ま → む (GodanMa: 読む)
+ * - ら → る (GodanRa: 取る)
+ * - わ → う (GodanWa: 買う)
+ */
+std::string_view godanBaseSuffixFromARow(char32_t a_row_cp);
+
+/**
+ * @brief Get VerbType from A-row mizenkei ending
+ * @param a_row_cp A-row codepoint (か, さ, た, etc.)
+ * @return Corresponding VerbType, or Unknown if invalid
+ */
+VerbType verbTypeFromARowCodepoint(char32_t a_row_cp);
 
 }  // namespace suzume::grammar
 

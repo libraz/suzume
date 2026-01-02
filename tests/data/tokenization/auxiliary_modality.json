@@ -266,6 +266,122 @@
       ]
     },
     {
+      "id": "classical_beki_godan_passive_kaku",
+      "description": "Classical べき with Godan passive: 書かれべき (should be written)",
+      "input": "書かれべき",
+      "expected": [
+        {
+          "surface": "書か",
+          "pos": "Verb",
+          "lemma": "書く"
+        },
+        {
+          "surface": "れべき",
+          "pos": "Auxiliary",
+          "lemma": "れる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "obligation",
+        "classical",
+        "passive"
+      ]
+    },
+    {
+      "id": "classical_beki_godan_passive_oyogu",
+      "description": "Classical べき with Godan passive: 泳がれべき (noun-registered kanji edge case)",
+      "input": "泳がれべき",
+      "expected": [
+        {
+          "surface": "泳が",
+          "pos": "Verb",
+          "lemma": "泳ぐ"
+        },
+        {
+          "surface": "れべき",
+          "pos": "Auxiliary",
+          "lemma": "れる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "obligation",
+        "classical",
+        "passive"
+      ]
+    },
+    {
+      "id": "classical_beki_godan_passive_yomu",
+      "description": "Classical べき with Godan passive: 読まれべき (should be read)",
+      "input": "読まれべき",
+      "expected": [
+        {
+          "surface": "読ま",
+          "pos": "Verb",
+          "lemma": "読む"
+        },
+        {
+          "surface": "れべき",
+          "pos": "Auxiliary",
+          "lemma": "れる"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "obligation",
+        "classical",
+        "passive"
+      ]
+    },
+    {
+      "id": "classical_beki_suru_passive",
+      "description": "Classical べき with Suru passive: 装飾されべき (should be decorated)",
+      "input": "装飾されべき",
+      "expected": [
+        {
+          "surface": "装飾",
+          "pos": "Noun"
+        },
+        {
+          "surface": "されべき",
+          "pos": "Auxiliary",
+          "lemma": "される"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "obligation",
+        "classical",
+        "passive",
+        "suru"
+      ]
+    },
+    {
+      "id": "beki_false_positive_prevention",
+      "description": "金がない should NOT trigger べき mizenkei split (negative test)",
+      "input": "金がない",
+      "expected": [
+        {
+          "surface": "金",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary",
+          "lemma": "ない"
+        }
+      ],
+      "tags": [
+        "auxiliary",
+        "negative_test"
+      ]
+    },
+    {
       "id": "aux_nasai_polite_imperative",
       "description": "Polite imperative auxiliary なさい (with godan verb)",
       "input": "書きなさい",
@@ -517,7 +633,7 @@
     },
     {
       "id": "tai_pattern_hashiridashi",
-      "description": "走り出したくなってきた - たい pattern follows verb renyokei",
+      "description": "走り出したくなってきた - たい pattern follows verb renyokei, なって+きた pattern",
       "input": "走り出したくなってきた",
       "expected": [
         {
@@ -526,9 +642,19 @@
           "lemma": "走り出す"
         },
         {
-          "surface": "たくなってきた",
-          "pos": "Adjective",
+          "surface": "たく",
+          "pos": "Auxiliary",
           "lemma": "たい"
+        },
+        {
+          "surface": "なって",
+          "pos": "Verb",
+          "lemma": "なる"
+        },
+        {
+          "surface": "きた",
+          "pos": "Auxiliary",
+          "lemma": "くる"
         }
       ],
       "tags": [

@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "core/utf8_constants.h"
+#include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
@@ -421,19 +422,15 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   // it equals the surface (which means the surface is already a dictionary form)
   // Only fall back to rule-based if grammar analysis returned empty/failed
   if (!grammar_result.empty()) {
-    // Check for 五段ラ行動詞 pattern: 漢字+す → 漢字+する
-    // e.g., 対す → 対する, 関す → 関する
+    // Check for サ変動詞 classical form: 漢字2文字以上+す → 漢字+する
+    // e.g., 勉強す → 勉強する, 運動す → 運動する
+    // Single kanji + す (出す, 消す) are GodanSa, not Suru
     if (morpheme.pos == core::PartOfSpeech::Verb &&
-        endsWith(grammar_result, "す") && !endsWith(grammar_result, "する") &&
-        dict_manager_ != nullptr) {
-      std::string suru_form = grammar_result.substr(0, grammar_result.size() - core::kJapaneseCharBytes) + "する";
-      auto lookup = dict_manager_->lookup(suru_form, 0);
-      for (const auto& r : lookup) {
-        if (r.entry != nullptr &&
-            r.entry->surface == suru_form &&
-            r.entry->pos == core::PartOfSpeech::Verb) {
-          return suru_form;
-        }
+        endsWith(grammar_result, "す") && !endsWith(grammar_result, "する")) {
+      std::string stem = grammar_result.substr(0, grammar_result.size() - core::kJapaneseCharBytes);
+      // Check if stem is 2+ kanji characters (6+ bytes)
+      if (stem.size() >= core::kTwoJapaneseCharBytes && grammar::isAllKanji(stem)) {
+        return stem + "する";
       }
     }
     return grammar_result;

@@ -300,6 +300,8 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"されて", "されて", "される", kAuxSeru, kAuxOutTe, kVerbMizenkei});
   entries.push_back({"されない", "されない", "される", kAuxSeru, kAuxOutBase, kVerbMizenkei});
   entries.push_back({"されます", "されます", "される", kAuxSeru, kAuxOutMasu, kVerbMizenkei});
+  // Classical べき pattern for Suru passive (装飾されべき → 装飾 + されべき)
+  entries.push_back({"されべき", "されべき", "される", kAuxSeru, kAuxOutBase, kVerbMizenkei});
 
   // === なくなる patterns ===
   entries.push_back({"なくなる", "なくなる", "なくなる", kAuxNai, kAuxOutBase, kVerbMizenkei});
@@ -332,6 +334,9 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"れたくて", "れたくて", "れる", kAuxReru, kAuxOutTe, kVerbMizenkei});
   entries.push_back({"れたくない", "れたくない", "れる", kAuxReru, kAuxOutBase, kVerbMizenkei});
   entries.push_back({"れたくなかった", "れたくなかった", "れる", kAuxReru, kAuxOutTa, kVerbMizenkei});
+  // Passive + べき (classical obligation: 書かれべき, 読まれべき)
+  entries.push_back({"れべき", "れべき", "れる", kAuxReru, kAuxOutBase, kVerbMizenkei});
+  entries.push_back({"られべき", "られべき", "られる", kAuxReru, kAuxOutBase, kVerbMizenkei});
 
   // === Colloquial てしまう contractions ===
   // Note: Connect to both kVerbOnbinkei (for Godan) and kVerbRenyokei (for Ichidan)

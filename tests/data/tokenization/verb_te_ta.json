@@ -292,13 +292,22 @@
     },
     {
       "id": "te_itadakimasu",
-      "description": "食べさせていただきます - causative + itadaku unified",
+      "description": "食べさせていただきます - causative + itadaku MeCab互換分割",
       "input": "食べさせていただきます",
       "expected": [
         {
-          "surface": "食べさせて",
+          "surface": "食べ",
           "pos": "Verb",
           "lemma": "食べる"
+        },
+        {
+          "surface": "させ",
+          "pos": "Auxiliary",
+          "lemma": "させる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "いただきます",

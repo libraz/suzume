@@ -4,13 +4,31 @@
   "cases": [
     {
       "id": "tokoro_formal_noun",
-      "description": "勉強させられていたところだった - ところ formal noun",
+      "description": "勉強させられていたところだった - ところ formal noun - MeCab互換分割",
       "input": "勉強させられていたところだった",
       "expected": [
         {
-          "surface": "勉強させられていた",
+          "surface": "勉強",
+          "pos": "Noun"
+        },
+        {
+          "surface": "させ",
+          "pos": "Auxiliary",
+          "lemma": "させる"
+        },
+        {
+          "surface": "られ",
+          "pos": "Auxiliary",
+          "lemma": "られる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "いた",
           "pos": "Verb",
-          "lemma": "勉強する"
+          "lemma": "いる"
         },
         {
           "surface": "ところ",
@@ -18,7 +36,8 @@
         },
         {
           "surface": "だった",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "lemma": "だった"
         }
       ],
       "tags": [

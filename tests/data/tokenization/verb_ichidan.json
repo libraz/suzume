@@ -707,13 +707,23 @@
     },
     {
       "id": "passive_desiderative_taberaretai",
-      "description": "S1: 食べられたい (want to be eaten/able to eat) passive+desiderative",
+      "description": "S1: 食べられたい (want to be eaten/able to eat) passive+desiderative - MeCab互換分割",
       "input": "食べられたい",
       "expected": [
         {
-          "surface": "食べられたい",
+          "surface": "食べ",
           "pos": "Verb",
           "lemma": "食べる"
+        },
+        {
+          "surface": "られ",
+          "pos": "Auxiliary",
+          "lemma": "られる"
+        },
+        {
+          "surface": "たい",
+          "pos": "Auxiliary",
+          "lemma": "たい"
         }
       ],
       "tags": ["particle_fix", "passive", "desiderative", "regression"]

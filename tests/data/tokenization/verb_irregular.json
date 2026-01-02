@@ -451,13 +451,17 @@
     },
     {
       "id": "passive_shori_sareru",
-      "description": "Suru verb 処理される passive",
+      "description": "Suru verb 処理される passive - MeCab互換分割",
       "input": "処理される",
       "expected": [
         {
-          "surface": "処理される",
-          "pos": "Verb",
-          "lemma": "処理する"
+          "surface": "処理",
+          "pos": "Noun"
+        },
+        {
+          "surface": "される",
+          "pos": "Auxiliary",
+          "lemma": "される"
         }
       ],
       "tags": [
@@ -853,13 +857,21 @@
     },
     {
       "id": "taio_sasete_itadakimasu",
-      "description": "対応させていただきます - suru causative + itadaku",
+      "description": "対応させていただきます - suru causative + itadaku - MeCab互換分割",
       "input": "対応させていただきます",
       "expected": [
         {
-          "surface": "対応させて",
-          "pos": "Verb",
-          "lemma": "対応する"
+          "surface": "対応",
+          "pos": "Noun"
+        },
+        {
+          "surface": "させ",
+          "pos": "Auxiliary",
+          "lemma": "させる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "いただきます",

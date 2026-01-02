@@ -96,18 +96,23 @@
     },
     {
       "id": "script_boundary_te_form",
-      "description": "買ってきた - compound verb with te-form",
+      "description": "買ってきた - te-form + subsidiary auxiliary split",
       "input": "買ってきた",
       "expected": [
         {
-          "surface": "買ってきた",
+          "surface": "買って",
           "pos": "Verb",
           "lemma": "買う"
+        },
+        {
+          "surface": "きた",
+          "pos": "Auxiliary",
+          "lemma": "くる"
         }
       ],
       "tags": [
-        "compound_verb",
-        "te_form"
+        "te_form",
+        "auxiliary"
       ]
     },
     {

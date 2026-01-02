@@ -754,6 +754,89 @@
         "onomatopoeia",
         "ok"
       ]
+    },
+    {
+      "id": "dosari_adv",
+      "description": "どさり should be ADV (ABり型: heavy object falling)",
+      "input": "どさりと倒れた",
+      "expected": [
+        {
+          "surface": "どさり",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        },
+        {
+          "surface": "倒れた",
+          "pos": "Verb",
+          "lemma": "倒れる"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "onomatopoeia",
+        "ab_ri_pattern"
+      ]
+    },
+    {
+      "id": "batari_adv",
+      "description": "ばたり should be ADV (ABり型: falling sound)",
+      "input": "ばたりと倒れた",
+      "expected": [
+        {
+          "surface": "ばたり",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        },
+        {
+          "surface": "倒れた",
+          "pos": "Verb",
+          "lemma": "倒れる"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "onomatopoeia",
+        "ab_ri_pattern"
+      ]
+    },
+    {
+      "id": "gatari_adv",
+      "description": "がたり should be ADV (ABり型: hard object collision)",
+      "input": "がたりと音がした",
+      "expected": [
+        {
+          "surface": "がたり",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        },
+        {
+          "surface": "音",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "した",
+          "pos": "Verb",
+          "lemma": "する"
+        }
+      ],
+      "tags": [
+        "adverb",
+        "onomatopoeia",
+        "ab_ri_pattern"
+      ]
     }
   ]
 }

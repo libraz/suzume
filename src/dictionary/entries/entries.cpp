@@ -87,6 +87,7 @@ std::vector<DictionaryEntry> getCompoundParticleEntries() {
       {"によって", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
       {"により", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
       {"によると", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
+      {"によれば", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
 
       // Place/Situation (場所・状況)
       // Lower cost to prevent split as に + おいて (verb)
@@ -171,6 +172,58 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"べきで", POS::Auxiliary, 0.3F, "べき", false, false, false, CT::None, ""},
       {"べきでは", POS::Auxiliary, 0.3F, "べき", false, false, false, CT::None, ""},
 
+      // === Individual auxiliary forms for auxiliary separation (Phase 3) ===
+      // Passive/Potential (受身・可能) - attaches to mizenkei (未然形)
+      // れ: Godan passive stem (書か+れ+る → 書かれる)
+      {"れ", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      {"れる", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      {"れた", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      {"れて", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      {"れない", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      {"れます", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      {"れべき", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      // られ: Ichidan passive/potential stem (食べ+られ+る → 食べられる)
+      {"られ", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+      {"られる", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+      {"られた", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+      {"られて", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+      {"られない", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+      {"られます", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+      {"られべき", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+
+      // Suru passive (サ変受身) - attaches to サ変名詞 (装飾+される → 装飾される)
+      {"される", POS::Auxiliary, 0.2F, "される", false, false, false, CT::Ichidan, ""},
+      {"された", POS::Auxiliary, 0.2F, "される", false, false, false, CT::Ichidan, ""},
+      {"されて", POS::Auxiliary, 0.2F, "される", false, false, false, CT::Ichidan, ""},
+      {"されない", POS::Auxiliary, 0.2F, "される", false, false, false, CT::Ichidan, ""},
+      {"されます", POS::Auxiliary, 0.2F, "される", false, false, false, CT::Ichidan, ""},
+      {"されべき", POS::Auxiliary, 0.2F, "される", false, false, false, CT::Ichidan, ""},
+
+      // Causative (使役) - attaches to mizenkei (未然形)
+      // せ: Godan causative stem (書か+せ+る → 書かせる)
+      {"せ", POS::Auxiliary, 0.3F, "せる", false, false, false, CT::Ichidan, ""},
+      {"せる", POS::Auxiliary, 0.3F, "せる", false, false, false, CT::Ichidan, ""},
+      {"せた", POS::Auxiliary, 0.3F, "せる", false, false, false, CT::Ichidan, ""},
+      {"せて", POS::Auxiliary, 0.3F, "せる", false, false, false, CT::Ichidan, ""},
+      {"せない", POS::Auxiliary, 0.3F, "せる", false, false, false, CT::Ichidan, ""},
+      {"せます", POS::Auxiliary, 0.3F, "せる", false, false, false, CT::Ichidan, ""},
+      // させ: Ichidan/Suru causative stem (食べ+させ+る → 食べさせる)
+      {"させ", POS::Auxiliary, 0.3F, "させる", false, false, false, CT::Ichidan, ""},
+      {"させる", POS::Auxiliary, 0.3F, "させる", false, false, false, CT::Ichidan, ""},
+      {"させた", POS::Auxiliary, 0.3F, "させる", false, false, false, CT::Ichidan, ""},
+      {"させて", POS::Auxiliary, 0.3F, "させる", false, false, false, CT::Ichidan, ""},
+      {"させない", POS::Auxiliary, 0.3F, "させる", false, false, false, CT::Ichidan, ""},
+      {"させます", POS::Auxiliary, 0.3F, "させる", false, false, false, CT::Ichidan, ""},
+
+      // Desiderative conjugated forms (願望活用形) - attaches to renyokei (連用形)
+      // たく: 願望連用形 (食べ+たく+ない → 食べたくない)
+      {"たく", POS::Auxiliary, 0.3F, "たい", false, false, false, CT::IAdjective, ""},
+      {"たくない", POS::Auxiliary, 0.3F, "たい", false, false, false, CT::IAdjective, ""},
+      {"たくなかった", POS::Auxiliary, 0.3F, "たい", false, false, false, CT::IAdjective, ""},
+      {"たくて", POS::Auxiliary, 0.3F, "たい", false, false, false, CT::IAdjective, ""},
+      {"たかっ", POS::Auxiliary, 0.3F, "たい", false, false, false, CT::IAdjective, ""},
+      {"たかった", POS::Auxiliary, 0.3F, "たい", false, false, false, CT::IAdjective, ""},
+
       // Polite imperative (丁寧命令)
       {"なさい", POS::Auxiliary, 0.3F, "なさい", false, false, false, CT::None, ""},
 
@@ -251,7 +304,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"くる", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
       {"きます", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
       {"きました", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
-      {"きた", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
+      // Lower cost for きた to beat colloquial ってき split in patterns like なってきた
+      // Cost 0.5F: word_cost = 0.5 + 0.2(pos) - 1.0(dict) = -0.3
+      // This beats な+ってき+た path cost of -1.296 when combined with なって(-0.998)
+      {"きた", POS::Auxiliary, 0.5F, "くる", false, false, false, CT::None, ""},
       {"こない", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
 
       // Explanatory (説明)
@@ -701,6 +757,8 @@ std::vector<DictionaryEntry> getLowInfoEntries() {
       {"答える", POS::Verb, 0.5F, "答える", false, false, false, CT::Ichidan, ""},
       {"教え", POS::Verb, 0.5F, "教える", false, false, false, CT::Ichidan, ""},
       {"教える", POS::Verb, 0.5F, "教える", false, false, false, CT::Ichidan, ""},
+      {"認め", POS::Verb, 0.5F, "認める", false, false, false, CT::Ichidan, ""},
+      {"認める", POS::Verb, 0.5F, "認める", false, false, false, CT::Ichidan, ""},
       {"見せ", POS::Verb, 0.5F, "見せる", false, false, false, CT::Ichidan, ""},
       {"見せる", POS::Verb, 0.5F, "見せる", false, false, false, CT::Ichidan, ""},
       {"聞かせ", POS::Verb, 0.5F, "聞かせる", false, false, false, CT::Ichidan, ""},
@@ -992,7 +1050,10 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"のんびり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
       {"ぼんやり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
       {"どっさり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"どさり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // ABり型: 重い物が落ちる音
       {"ばったり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+      {"ばたり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // ABり型: 倒れる音
+      {"がたり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},  // ABり型: 硬い物がぶつかる音
       {"きっちり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
       {"ぎっしり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
       {"じっくり", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
