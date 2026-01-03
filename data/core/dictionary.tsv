@@ -182,6 +182,11 @@
 怒鳴る	VERB	どなる	0.5	GODAN_RA
 # B65: 詰まる - moved to L1 for conjugation expansion
 
+# --- Godan verbs: Classical/literary (wagahai) ---
+# W-017: Fix incorrect lemma generation
+逢う	VERB	あう	0.5	GODAN_WA
+見出す	VERB	みいだす	0.5	GODAN_SA
+
 # --- Ichidan verbs: Disambiguation needed ---
 # These -げる/-ける verbs are often confused with Godan potential forms
 上げる	VERB	あげる	0.8	ICHIDAN
