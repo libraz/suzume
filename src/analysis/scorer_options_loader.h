@@ -335,6 +335,7 @@ inline void ScorerOptionsLoader::applyConnectionOptions(ConnectionOptions& opts,
   SET_OPT(opts, bonus_conditional_verb_to_verb, json, "bonus_conditional_verb_to_verb");
   SET_OPT(opts, bonus_verb_renyokei_compound_aux, json, "bonus_verb_renyokei_compound_aux");
   SET_OPT(opts, penalty_toku_contraction_split, json, "penalty_toku_contraction_split");
+  SET_OPT(opts, penalty_teku_re_missegmentation, json, "penalty_teku_re_missegmentation");
   SET_OPT(opts, bonus_te_form_verb_to_verb, json, "bonus_te_form_verb_to_verb");
   SET_OPT(opts, bonus_rashii_after_predicate, json, "bonus_rashii_after_predicate");
   SET_OPT(opts, penalty_tai_after_aux, json, "penalty_tai_after_aux");
@@ -673,6 +674,7 @@ inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
     TRY_ENV("CONN", bonus_conditional_verb_to_verb);
     TRY_ENV("CONN", bonus_verb_renyokei_compound_aux);
     TRY_ENV("CONN", penalty_toku_contraction_split);
+    TRY_ENV("CONN", penalty_teku_re_missegmentation);
     TRY_ENV("CONN", bonus_te_form_verb_to_verb);
     TRY_ENV("CONN", bonus_rashii_after_predicate);
     TRY_ENV("CONN", penalty_verb_to_case_particle);

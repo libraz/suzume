@@ -196,6 +196,10 @@ constexpr float kPenaltyIAdjVerbNegativeNa = 0.35F;
 // This should be split as 帰る + らしい, not parsed as single i-adjective
 constexpr float kPenaltyIAdjVerbRashiiPattern = 0.50F;
 
+// Embedded particle in stem (ものがい → should be もの+が+いう, not adjective)
+// Particles like が, は, を, に, へ, の inside the stem indicate incorrect segmentation
+constexpr float kPenaltyIAdjEmbeddedParticle = scale::kStrong;
+
 // =============================================================================
 // Onbinkei (音便) Context Validation
 // =============================================================================
@@ -266,6 +270,11 @@ constexpr float kPenaltySuruSingleKanji = 0.15F;
 // Valid hiragana GodanSa verbs like なくす, もらす have 2-char stems
 // Longer stems like おねえす are invalid (おねえさん = noun + suffix)
 constexpr float kPenaltyGodanSaSuruPureHiraganaLongStem = scale::kStrong;
+
+// Godan stems ending in て/で - indicates te-form, not valid Godan stem
+// E.g., してく → して + く is wrong; して is te-form of する, not a GodanKu stem
+// Real Godan verbs: 書く (stem 書), 読む (stem 読) - stems never end in て/で
+constexpr float kPenaltyGodanTeStem = scale::kStrong;
 
 // =============================================================================
 // Single Hiragana Stem Particle Penalty

@@ -1468,6 +1468,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
         // か: OK if preceded by な (なかった = negative past)
         //    Also OK if followed by れ (かれ = ichidan stem like つかれる, ふざける)
+        //    Also OK if followed by んで/んだ (onbin te/ta-form: つかんで, 歩かんで)
         if (curr == U'か') {
           if (prev == U'な') {
             ++hiragana_end;
@@ -1476,6 +1477,15 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
           // Check if followed by れ (ichidan stem pattern)
           if (hiragana_end + 1 < codepoints.size() &&
               codepoints[hiragana_end + 1] == U'れ') {
+            ++hiragana_end;
+            continue;
+          }
+          // Check if followed by んで/んだ (GodanMa/Na/Ba onbin te/ta-form)
+          // e.g., つかんで (掴んで), 歩かんで (歩かない colloquial negative te-form)
+          if (hiragana_end + 2 < codepoints.size() &&
+              codepoints[hiragana_end + 1] == U'ん' &&
+              (codepoints[hiragana_end + 2] == U'で' ||
+               codepoints[hiragana_end + 2] == U'だ')) {
             ++hiragana_end;
             continue;
           }
@@ -1599,6 +1609,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
     // Filter out 2-char hiragana that don't end with valid verb endings
     // Valid endings: る (dictionary form), て/で (te-form), た/だ (past)
+    // Also: れ (Ichidan renyokei/meireikei like くれ from くれる)
     // This prevents false positives like まじ, ため from being recognized as verbs
     size_t pre_filter_len = end_pos - start_pos;
     if (pre_filter_len == 2 && surface.size() >= core::kJapaneseCharBytes) {
@@ -1607,7 +1618,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes,
                                   core::kJapaneseCharBytes);
       if (last_char != "る" && last_char != "て" && last_char != "で" &&
-          last_char != "た" && last_char != "だ") {
+          last_char != "た" && last_char != "だ" && last_char != "れ") {
         continue;  // Skip 2-char hiragana not ending with valid verb suffix
       }
     }
@@ -1723,9 +1734,21 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     // Lower threshold for dictionary-verified verbs, past/te forms, and ichidan dict forms
     // Ichidan dict forms get very low threshold (0.28) because pure hiragana stems
     // with 3+ chars get multiple penalties (stem_long + ichidan_pure_hiragana_stem)
-    float conf_threshold = is_dictionary_verb ? verb_opts.confidence_dict_verb :
-                           (looks_like_past_form || looks_like_te_form) ? verb_opts.confidence_past_te :
-                           looks_like_ichidan_dict_form ? verb_opts.confidence_ichidan_dict : verb_opts.confidence_standard;
+    // When both is_dictionary_verb AND (past/te form) apply, use the lower threshold
+    // This handles cases like つかんで (掴んで) where confidence is ~0.3
+    float conf_threshold;
+    if (is_dictionary_verb && (looks_like_past_form || looks_like_te_form)) {
+      // Dictionary verb in past/te form: use lower of the two thresholds
+      conf_threshold = std::min(verb_opts.confidence_dict_verb, verb_opts.confidence_past_te);
+    } else if (is_dictionary_verb) {
+      conf_threshold = verb_opts.confidence_dict_verb;
+    } else if (looks_like_past_form || looks_like_te_form) {
+      conf_threshold = verb_opts.confidence_past_te;
+    } else if (looks_like_ichidan_dict_form) {
+      conf_threshold = verb_opts.confidence_ichidan_dict;
+    } else {
+      conf_threshold = verb_opts.confidence_standard;
+    }
     if (best.confidence > conf_threshold &&
         best.verb_type != grammar::VerbType::IAdjective) {
       // Lower cost for higher confidence matches

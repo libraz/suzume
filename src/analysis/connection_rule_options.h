@@ -97,6 +97,9 @@ struct ConnectionOptions {
   // Verb renyokei + と contraction split
   float penalty_toku_contraction_split = scorer::kPenaltyTokuContractionSplit;
 
+  // てく/ってく + れ* mis-segmentation (should be て + くれる)
+  float penalty_teku_re_missegmentation = scorer::kPenaltyTekuReMissegmentation;
+
   // Te-form VERB + VERB bonus
   float bonus_te_form_verb_to_verb = scorer::kBonusTeFormVerbToVerb;
 

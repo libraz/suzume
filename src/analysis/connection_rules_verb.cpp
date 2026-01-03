@@ -447,6 +447,32 @@ ConnectionRuleResult checkTokuContractionSplit(const core::LatticeEdge& prev,
           opts.penalty_toku_contraction_split, "toku contraction split"};
 }
 
+// Rule: てく/ってく + れ* pattern (colloquial ていく mis-segmentation)
+// When "てく" (colloquial form of ていく) is followed by れ-starting auxiliary,
+// it's almost always a mis-segmentation of てくれる pattern.
+// E.g., つけてくれない → つけ + てく + れない is wrong
+//       should be → つけて + くれない or つけてくれない
+// This rule penalizes VERB "てく"/"ってく" followed by AUX starting with "れ"
+ConnectionRuleResult checkTekuReMissegmentation(const core::LatticeEdge& prev,
+                                                 const core::LatticeEdge& next,
+                                                 const ConnectionOptions& opts) {
+  // Check if prev is VERB
+  if (prev.pos != core::PartOfSpeech::Verb) return {};
+
+  // Check if prev surface is てく or ってく (colloquial ていく)
+  if (prev.surface != "てく" && prev.surface != "ってく") return {};
+
+  // Check if next is AUX starting with れ
+  if (next.pos != core::PartOfSpeech::Auxiliary) return {};
+  if (next.surface.size() < core::kJapaneseCharBytes) return {};
+  if (next.surface.substr(0, core::kJapaneseCharBytes) != "れ") return {};
+
+  // Apply strong penalty - this pattern is almost always wrong
+  return {ConnectionPattern::TekuReMissegmentation,
+          opts.penalty_teku_re_missegmentation,
+          "teku + re mis-segmentation (should be te + kureru)"};
+}
+
 // Rule: VERB/ADJ → らしい (ADJ) bonus
 // Conjecture auxiliary pattern: 帰るらしい, 美しいらしい
 // This offsets the high VERB/ADJ→ADJ base cost (0.8) for valid rashii patterns

@@ -60,6 +60,7 @@ struct InflectionScorerOptions {
   float penalty_pure_hiragana_stem = std::numeric_limits<float>::quiet_NaN();
   float penalty_godan_single_hiragana_stem = std::numeric_limits<float>::quiet_NaN();
   float penalty_godan_non_ra_pure_hiragana = std::numeric_limits<float>::quiet_NaN();
+  float penalty_godan_te_stem = std::numeric_limits<float>::quiet_NaN();
 
   /// Helper to get value with fallback to constant
   template<typename T>

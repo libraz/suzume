@@ -601,6 +601,21 @@ float calculateConfidence(VerbType type, std::string_view stem,
                             "godan_sa_suru_pure_hiragana_long_stem");
   }
 
+  // Godan verbs with stems ending in て/で are almost always invalid
+  // The て/で ending indicates a te-form, not a valid verb stem
+  // E.g., してく → して + く is wrong; it's a te-form, not a GodanKu stem
+  // Real Godan verbs: 書く (stem 書), 読む (stem 読) - stems never end in て/で
+  // Exception: Some Ichidan verbs have て/で in stem (捨てる, 建てる), but those
+  // are handled separately. This penalty applies to Godan types only.
+  if (is_godan_non_ra && stem_len >= core::kTwoJapaneseCharBytes) {
+    std::string_view last_char = stem.substr(stem_len - core::kJapaneseCharBytes);
+    if (last_char == "て" || last_char == "で") {
+      float pen = GET_OPT(penalty_godan_te_stem, inflection::kPenaltyGodanTeStem);
+      base -= pen;
+      logConfidenceAdjustment(-pen, "godan_te_stem_invalid");
+    }
+  }
+
   // Suru with 1 or 2 hiragana stem is invalid
   // E.g., えする, あする, みくする - pure hiragana are not valid Suru noun stems
   // Valid Suru stems: 勉強, ダウンロード (kanji or katakana)
@@ -664,6 +679,19 @@ float calculateConfidence(VerbType type, std::string_view stem,
       logConfidenceAdjustment(-pen, "i_adj_verb_aux_pattern");
       // Note: This penalty may be clamped by the floor at return.
       // Additional penalty is applied in scorer.cpp for lattice cost.
+    }
+  }
+
+  // I-adjective 2-char stems containing subject/object markers are invalid
+  // E.g., のが, のを, がお, をか are not valid adjective stems (particle combinations)
+  // Note: Longer stems CAN contain が/を in real adjectives (おこがましい, etc.)
+  // so we only apply this penalty to short 2-char stems
+  if (type == VerbType::IAdjective && stem_len == core::kTwoJapaneseCharBytes) {
+    std::string_view first = stem.substr(0, core::kJapaneseCharBytes);
+    std::string_view second = stem.substr(core::kJapaneseCharBytes);
+    if (first == "が" || first == "を" || second == "が" || second == "を") {
+      base -= inflection::kPenaltyIAdjEmbeddedParticle;
+      logConfidenceAdjustment(-inflection::kPenaltyIAdjEmbeddedParticle, "i_adj_embedded_particle");
     }
   }
 

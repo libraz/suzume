@@ -135,7 +135,8 @@ enum class ConnectionPattern {
   KataAfterRenyokei,          // 動詞連用形 → 方 (should be nominalized: 解き方, 読み方)
   NaParticleAfterKanjiNoun,   // 漢字NOUN → な(PARTICLE) (likely na-adjective stem: 獰猛な)
   KuraiAdjAfterPredicate,     // VERB/ADJ/AUX → くらい(ADJ) (should be PARTICLE: いられぬくらい)
-  SuruRenyokeiToTeVerb        // NOUN(し ending) → VERB(て始まり) (should be suru-verb te-form)
+  SuruRenyokeiToTeVerb,       // NOUN(し ending) → VERB(て始まり) (should be suru-verb te-form)
+  TekuReMissegmentation       // てく/ってく → れ* (should be て + くれる, not ていく + れる)
 };
 
 /**

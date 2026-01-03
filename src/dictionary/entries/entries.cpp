@@ -334,13 +334,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"なんし", POS::Auxiliary, 0.3F, "ます", false, false, false, CT::None, ""},
       {"なんした", POS::Auxiliary, 0.3F, "ます", false, false, false, CT::None, ""},
 
-      // Cat-like (猫系)
+      // Cat-like (猫系) - hiragana only, katakana conflicts with onomatopoeia
       {"にゃ", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, ""},
       {"にゃん", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, ""},
       {"にゃー", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, ""},
-      {"ニャ", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, "にゃ"},
-      {"ニャン", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, "にゃん"},
-      {"ニャー", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, "にゃー"},
       {"だにゃ", POS::Auxiliary, 0.01F, "だよ", false, false, false, CT::None, ""},
       {"だにゃん", POS::Auxiliary, 0.01F, "だよ", false, false, false, CT::None, ""},
       {"ですにゃ", POS::Auxiliary, 0.01F, "ですよ", false, false, false, CT::None, ""},
@@ -520,10 +517,11 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
       {"おかしな", POS::Determiner, 1.0F, "", false, false, false, CT::None, ""},
 
       // Demonstrative manner determiners (指示様態連体詞)
-      {"こういう", POS::Determiner, 0.5F, "", false, false, false, CT::None, ""},
-      {"そういう", POS::Determiner, 0.5F, "", false, false, false, CT::None, ""},
-      {"ああいう", POS::Determiner, 0.5F, "", false, false, false, CT::None, ""},
-      {"どういう", POS::Determiner, 0.5F, "", false, false, false, CT::None, ""},
+      // Lower cost to compete with X + いう (VERB cost 0.3) splits
+      {"こういう", POS::Determiner, -0.3F, "", false, false, false, CT::None, ""},
+      {"そういう", POS::Determiner, -0.3F, "", false, false, false, CT::None, ""},
+      {"ああいう", POS::Determiner, -0.3F, "", false, false, false, CT::None, ""},
+      {"どういう", POS::Determiner, -0.3F, "", false, false, false, CT::None, ""},
 
       // Quotative determiners (引用連体詞) - prevents incorrect split like 病+とい+う
       // Lower cost to beat と(PARTICLE,-0.4)+いった(VERB,-0.034)+conn(0.2)=-0.232

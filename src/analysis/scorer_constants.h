@@ -198,6 +198,12 @@ constexpr float kBonusVerbRenyokeiCompoundAux = scale::kModerate;
 // This split should be penalized to prefer the single token interpretation
 constexpr float kPenaltyTokuContractionSplit = scale::kStrong;
 
+// てく/ってく + れ* mis-segmentation penalty
+// When てく (colloquial ていく) is followed by れ-starting AUX, it's almost
+// always a mis-segmentation of てくれる pattern.
+// E.g., つけてくれない → つけ + てく + れない is wrong; should be つけて + くれない
+constexpr float kPenaltyTekuReMissegmentation = scale::kProhibitive;
+
 // NOUN + いる/います/いません (AUX) penalty
 // いる auxiliary should only follow te-form verbs (食べている), not nouns
 // E.g., 手伝 + います should be 手伝います (single verb), not noun + aux

@@ -259,6 +259,10 @@ ConnectionRuleResult checkTokuContractionSplit(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts);
 
+ConnectionRuleResult checkTekuReMissegmentation(const core::LatticeEdge& prev,
+                                                const core::LatticeEdge& next,
+                                                const ConnectionOptions& opts);
+
 // =============================================================================
 // Auxiliary Connection Rules (connection_rules_aux.cpp)
 // =============================================================================
