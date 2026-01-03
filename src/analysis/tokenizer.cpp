@@ -19,6 +19,55 @@
 
 namespace suzume::analysis {
 
+namespace {
+
+/**
+ * @brief Get the vowel character (あいうえお) for a hiragana's ending vowel
+ *
+ * Maps any hiragana to its vowel row character.
+ * E.g., た→あ, き→い, す→う, て→え, の→お
+ * Returns 0 for characters without vowels (ん, っ) or non-hiragana.
+ */
+inline char32_t getHiraganaVowel(char32_t c) {
+  // あ-row (a-vowel)
+  if (c == U'あ' || c == U'ぁ' || c == U'か' || c == U'が' || c == U'さ' ||
+      c == U'ざ' || c == U'た' || c == U'だ' || c == U'な' || c == U'は' ||
+      c == U'ば' || c == U'ぱ' || c == U'ま' || c == U'や' || c == U'ゃ' ||
+      c == U'ら' || c == U'わ') {
+    return U'あ';
+  }
+  // い-row (i-vowel)
+  if (c == U'い' || c == U'ぃ' || c == U'き' || c == U'ぎ' || c == U'し' ||
+      c == U'じ' || c == U'ち' || c == U'ぢ' || c == U'に' || c == U'ひ' ||
+      c == U'び' || c == U'ぴ' || c == U'み' || c == U'り') {
+    return U'い';
+  }
+  // う-row (u-vowel)
+  if (c == U'う' || c == U'ぅ' || c == U'く' || c == U'ぐ' || c == U'す' ||
+      c == U'ず' || c == U'つ' || c == U'づ' || c == U'ぬ' || c == U'ふ' ||
+      c == U'ぶ' || c == U'ぷ' || c == U'む' || c == U'ゆ' || c == U'ゅ' ||
+      c == U'る') {
+    return U'う';
+  }
+  // え-row (e-vowel)
+  if (c == U'え' || c == U'ぇ' || c == U'け' || c == U'げ' || c == U'せ' ||
+      c == U'ぜ' || c == U'て' || c == U'で' || c == U'ね' || c == U'へ' ||
+      c == U'べ' || c == U'ぺ' || c == U'め' || c == U'れ') {
+    return U'え';
+  }
+  // お-row (o-vowel)
+  if (c == U'お' || c == U'ぉ' || c == U'こ' || c == U'ご' || c == U'そ' ||
+      c == U'ぞ' || c == U'と' || c == U'ど' || c == U'の' || c == U'ほ' ||
+      c == U'ぼ' || c == U'ぽ' || c == U'も' || c == U'よ' || c == U'ょ' ||
+      c == U'ろ' || c == U'を') {
+    return U'お';
+  }
+  // No vowel: ん, っ, punctuation, non-hiragana
+  return 0;
+}
+
+}  // namespace
+
 Tokenizer::Tokenizer(const dictionary::DictionaryManager& dict_manager,
                      const Scorer& scorer,
                      const UnknownWordGenerator& unknown_gen)
@@ -109,12 +158,13 @@ void Tokenizer::addDictionaryCandidates(
     // Emphatic suffix pattern: word + っ/ッ/ー/ぁぃぅぇぉ/ァィゥェォ (colloquial emphasis)
     // E.g., です→ですっ, ます→ますっ, 行く→行くっ, やばいーー, だぁー
     // Handles consecutive sokuon (っっ), chouon (ーー), and small vowels (ぁぃぅぇぉ)
+    // Also handles vowel repetition: きた + ああああ → きたああああ
     // Only apply to verbs, auxiliaries, and adjectives (typical emphatic targets)
     if (end_pos < codepoints.size() &&
         (result.entry->pos == core::PartOfSpeech::Verb ||
          result.entry->pos == core::PartOfSpeech::Auxiliary ||
          result.entry->pos == core::PartOfSpeech::Adjective)) {
-      // Count consecutive emphatic characters
+      // Count consecutive emphatic characters (sokuon/chouon/small vowels)
       size_t emphatic_end = end_pos;
       std::string emphatic_suffix;
       while (emphatic_end < codepoints.size()) {
@@ -155,17 +205,64 @@ void Tokenizer::addDictionaryCandidates(
         ++emphatic_end;
       }
 
+      // Track standard emphatic chars separately for cost calculation
+      size_t standard_emphatic_chars = emphatic_suffix.size() / 3;
+
+      // Also check for repeated vowels matching the final character's vowel
+      // E.g., きた + ああああ → きたああああ (た ends in あ-vowel)
+      // Requires at least 2 consecutive vowels to be considered emphatic
+      size_t vowel_repeat_count = 0;
+      if (end_pos > start_pos && emphatic_end < codepoints.size()) {
+        // Get final character of the dictionary entry
+        char32_t final_char = codepoints[end_pos - 1];
+        char32_t expected_vowel = getHiraganaVowel(final_char);
+
+        if (expected_vowel != 0) {
+          size_t vowel_start = emphatic_end;
+
+          // Count consecutive occurrences of the expected vowel
+          while (emphatic_end < codepoints.size() &&
+                 codepoints[emphatic_end] == expected_vowel) {
+            ++vowel_repeat_count;
+            ++emphatic_end;
+          }
+
+          // Require at least 2 repeated vowels for emphatic pattern
+          if (vowel_repeat_count >= 2) {
+            for (size_t i = 0; i < vowel_repeat_count; ++i) {
+              // Convert codepoint to UTF-8
+              emphatic_suffix += static_cast<char>(0xE0 | ((expected_vowel >> 12) & 0x0F));
+              emphatic_suffix += static_cast<char>(0x80 | ((expected_vowel >> 6) & 0x3F));
+              emphatic_suffix += static_cast<char>(0x80 | (expected_vowel & 0x3F));
+            }
+          } else {
+            // Not enough repetition, reset position
+            emphatic_end = vowel_start;
+            vowel_repeat_count = 0;
+          }
+        }
+      }
+
       // Add emphatic variant if we found any emphatic characters
       if (!emphatic_suffix.empty()) {
         std::string emphatic_surface = result.entry->surface + emphatic_suffix;
-        // Cost penalty scales with length to prefer shorter forms
-        float cost_penalty = 0.3F * static_cast<float>(emphatic_suffix.size() / 3);
+        float cost_adjustment;
+
+        if (vowel_repeat_count >= 2) {
+          // Give a BONUS for vowel repetition to compete with split alternatives
+          // E.g., きたああああ should beat きた + ああああ
+          float char_count = static_cast<float>(emphatic_suffix.size() / 3);
+          cost_adjustment = -0.5F + 0.05F * char_count;
+        } else {
+          // Standard emphatic chars (sokuon/chouon/small vowels) use penalty
+          cost_adjustment = 0.3F * static_cast<float>(standard_emphatic_chars);
+        }
 
         lattice.addEdge(emphatic_surface,
                         static_cast<uint32_t>(start_pos),
                         static_cast<uint32_t>(emphatic_end),
                         result.entry->pos,
-                        result.entry->cost + cost_penalty,
+                        result.entry->cost + cost_adjustment,
                         flags,
                         result.entry->lemma,
                         result.entry->conj_type,

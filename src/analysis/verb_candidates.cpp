@@ -164,6 +164,51 @@ inline std::string codepointToUtf8(char32_t c) {
 }
 
 /**
+ * @brief Get the vowel character (あいうえお) for a hiragana's ending vowel
+ *
+ * Maps any hiragana to its vowel row character.
+ * E.g., た→あ, き→い, す→う, て→え, の→お
+ * Returns 0 for characters without vowels (ん, っ) or non-hiragana.
+ */
+inline char32_t getHiraganaVowel(char32_t c) {
+  // あ-row (a-vowel)
+  if (c == U'あ' || c == U'ぁ' || c == U'か' || c == U'が' || c == U'さ' ||
+      c == U'ざ' || c == U'た' || c == U'だ' || c == U'な' || c == U'は' ||
+      c == U'ば' || c == U'ぱ' || c == U'ま' || c == U'や' || c == U'ゃ' ||
+      c == U'ら' || c == U'わ') {
+    return U'あ';
+  }
+  // い-row (i-vowel)
+  if (c == U'い' || c == U'ぃ' || c == U'き' || c == U'ぎ' || c == U'し' ||
+      c == U'じ' || c == U'ち' || c == U'ぢ' || c == U'に' || c == U'ひ' ||
+      c == U'び' || c == U'ぴ' || c == U'み' || c == U'り') {
+    return U'い';
+  }
+  // う-row (u-vowel)
+  if (c == U'う' || c == U'ぅ' || c == U'く' || c == U'ぐ' || c == U'す' ||
+      c == U'ず' || c == U'つ' || c == U'づ' || c == U'ぬ' || c == U'ふ' ||
+      c == U'ぶ' || c == U'ぷ' || c == U'む' || c == U'ゆ' || c == U'ゅ' ||
+      c == U'る') {
+    return U'う';
+  }
+  // え-row (e-vowel)
+  if (c == U'え' || c == U'ぇ' || c == U'け' || c == U'げ' || c == U'せ' ||
+      c == U'ぜ' || c == U'て' || c == U'で' || c == U'ね' || c == U'へ' ||
+      c == U'べ' || c == U'ぺ' || c == U'め' || c == U'れ') {
+    return U'え';
+  }
+  // お-row (o-vowel)
+  if (c == U'お' || c == U'ぉ' || c == U'こ' || c == U'ご' || c == U'そ' ||
+      c == U'ぞ' || c == U'と' || c == U'ど' || c == U'の' || c == U'ほ' ||
+      c == U'ぼ' || c == U'ぽ' || c == U'も' || c == U'よ' || c == U'ょ' ||
+      c == U'ろ' || c == U'を') {
+    return U'お';
+  }
+  // No vowel: ん, っ, punctuation, non-hiragana
+  return 0;
+}
+
+/**
  * @brief Check if position is likely part of a verb te/ta-form, not emphatic
  *
  * っ followed by て/た is almost always part of the verb te-form (e.g., いって, 行った)
@@ -223,15 +268,57 @@ inline void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
       }
     }
 
+    // Track standard emphatic chars separately for cost calculation
+    size_t standard_emphatic_chars = emphatic_suffix.size() / core::kJapaneseCharBytes;
+
+    // Also check for repeated vowels matching the final character's vowel
+    // E.g., きた + ああああ → きたああああ (た ends in あ-vowel)
+    // Requires at least 2 consecutive vowels to be considered emphatic
+    size_t vowel_repeat_count = 0;
+    if (cand.end > 0 && emphatic_end < codepoints.size()) {
+      char32_t final_char = codepoints[cand.end - 1];
+      char32_t expected_vowel = getHiraganaVowel(final_char);
+
+      if (expected_vowel != 0) {
+        size_t vowel_start = emphatic_end;
+
+        // Count consecutive occurrences of the expected vowel
+        while (emphatic_end < codepoints.size() &&
+               codepoints[emphatic_end] == expected_vowel) {
+          ++vowel_repeat_count;
+          ++emphatic_end;
+        }
+
+        // Require at least 2 repeated vowels for emphatic pattern
+        if (vowel_repeat_count >= 2) {
+          for (size_t i = 0; i < vowel_repeat_count; ++i) {
+            emphatic_suffix += codepointToUtf8(expected_vowel);
+          }
+        } else {
+          // Not enough repetition, reset position
+          emphatic_end = vowel_start;
+          vowel_repeat_count = 0;
+        }
+      }
+    }
+
     // Add emphatic variant if we found any emphatic characters
     if (!emphatic_suffix.empty()) {
       UnknownCandidate emphatic_cand = cand;
       emphatic_cand.surface += emphatic_suffix;
       emphatic_cand.end = emphatic_end;
-      // Cost penalty scales with length to prefer shorter forms
-      emphatic_cand.cost +=
-          0.3F *
-          static_cast<float>(emphatic_suffix.size() / core::kJapaneseCharBytes);
+      float cost_adjustment;
+
+      if (vowel_repeat_count >= 2) {
+        // Give a BONUS for vowel repetition to compete with split alternatives
+        float char_count =
+            static_cast<float>(emphatic_suffix.size() / core::kJapaneseCharBytes);
+        cost_adjustment = -0.5F + 0.05F * char_count;
+      } else {
+        // Standard emphatic chars (sokuon/chouon/small vowels) use penalty
+        cost_adjustment = 0.3F * static_cast<float>(standard_emphatic_chars);
+      }
+      emphatic_cand.cost += cost_adjustment;
 #ifdef SUZUME_DEBUG_INFO
       emphatic_cand.pattern += "_emphatic";
 #endif
