@@ -601,14 +601,15 @@ float calculateConfidence(VerbType type, std::string_view stem,
                             "godan_sa_suru_pure_hiragana_long_stem");
   }
 
-  // Suru with single hiragana stem is invalid
-  // E.g., えする, あする - single hiragana are particles, not Suru noun stems
+  // Suru with 1 or 2 hiragana stem is invalid
+  // E.g., えする, あする, みくする - pure hiragana are not valid Suru noun stems
   // Valid Suru stems: 勉強, ダウンロード (kanji or katakana)
-  if (type == VerbType::Suru && stem_len == core::kJapaneseCharBytes &&
+  // Note: GodanSa 2-char stems ARE valid (なくす, もらす), so this only applies to Suru
+  if (type == VerbType::Suru && stem_len <= core::kTwoJapaneseCharBytes &&
       isPureHiragana(stem)) {
     base -= inflection::kPenaltyGodanSaSuruPureHiraganaLongStem;
     logConfidenceAdjustment(-inflection::kPenaltyGodanSaSuruPureHiraganaLongStem,
-                            "suru_single_hiragana_stem");
+                            "suru_short_hiragana_stem");
   }
 
   // GodanNa (ナ行五段) is extremely rare - only 死ぬ exists in modern Japanese
