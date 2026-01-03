@@ -115,6 +115,17 @@
         "grammar",
         "taru-adjective"
       ]
+    },
+    {
+      "id": "det_onaji",
+      "description": "同じ should be DET (連体詞), not VERB (W-015)",
+      "input": "同じ事を",
+      "expected": [
+        {"surface": "同じ", "pos": "Determiner"},
+        {"surface": "事", "pos": "Noun", "lemma": "こと"},
+        {"surface": "を", "pos": "Particle"}
+      ],
+      "tags": ["determiner", "wagahai", "W-015"]
     }
   ]
 }

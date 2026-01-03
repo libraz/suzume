@@ -804,6 +804,15 @@
         }
       ],
       "tags": ["ichidan", "polite", "single_kanji"]
+    },
+    {
+      "id": "irareru_potential",
+      "description": "いられる - potential/passive of いる (W-014)",
+      "input": "いられる",
+      "expected": [
+        {"surface": "いられる", "pos": "Verb", "lemma": "いる"}
+      ],
+      "tags": ["ichidan", "potential", "wagahai", "W-014"]
     }
   ]
 }

@@ -3054,6 +3054,15 @@
         {"surface": "座った", "pos": "Verb", "lemma": "座る"}
       ],
       "tags": ["godanra", "kanji-verb", "past-form"]
+    },
+    {
+      "id": "kanji_atta_godanwa_au",
+      "description": "逢った - GodanWa past, lemma should be 逢う not 逢る (W-017)",
+      "input": "逢った",
+      "expected": [
+        {"surface": "逢った", "pos": "Verb", "lemma": "逢う"}
+      ],
+      "tags": ["godanwa", "classical", "wagahai", "W-017"]
     }
   ]
 }

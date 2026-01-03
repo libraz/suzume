@@ -1601,6 +1601,50 @@
         {"surface": "つまらん", "pos": "Adjective", "lemma": "つまらない"}
       ],
       "tags": ["contraction", "colloquial", "regression"]
+    },
+    {
+      "id": "classical_yoi_zen",
+      "description": "善い - classical variant of よい (W-013)",
+      "input": "善いか",
+      "expected": [
+        {"surface": "善い", "pos": "Adjective", "lemma": "よい"},
+        {"surface": "か", "pos": "Particle"}
+      ],
+      "tags": ["classical", "wagahai", "W-013"]
+    },
+    {
+      "id": "classical_yoi_kou",
+      "description": "好い - classical variant of よい (W-013)",
+      "input": "好いのは",
+      "expected": [
+        {"surface": "好い", "pos": "Adjective", "lemma": "よい"},
+        {"surface": "の", "pos": "Particle"},
+        {"surface": "は", "pos": "Particle"}
+      ],
+      "tags": ["classical", "wagahai", "W-013"]
+    },
+    {
+      "id": "classical_samushi",
+      "description": "寒し - classical shuushikei of 寒い (W-014)",
+      "input": "寒さは寒し",
+      "expected": [
+        {"surface": "寒さ", "pos": "Noun", "lemma": "寒い"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "寒し", "pos": "Adjective", "lemma": "寒い"}
+      ],
+      "tags": ["classical", "wagahai", "W-014"]
+    },
+    {
+      "id": "embedded_particle_gao_penalty",
+      "description": "がお should not be recognized as i-adj stem (W-001)",
+      "input": "がおさんである",
+      "expected": [
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "さん", "pos": "Suffix"},
+        {"surface": "である", "pos": "Auxiliary"}
+      ],
+      "tags": ["penalty", "wagahai", "W-001"]
     }
   ]
 }

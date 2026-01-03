@@ -837,6 +837,26 @@
         "onomatopoeia",
         "ab_ri_pattern"
       ]
+    },
+    {
+      "id": "nya_doubled_katakana",
+      "description": "ニャーニャー - cat onomatopoeia, not AUX よ (W-007)",
+      "input": "ニャーニャーと",
+      "expected": [
+        {"surface": "ニャーニャー", "pos": "Adverb"},
+        {"surface": "と", "pos": "Particle"}
+      ],
+      "tags": ["katakana", "animal", "wagahai", "W-007"]
+    },
+    {
+      "id": "nya_hiragana_aux",
+      "description": "にゃー - dialectal AUX should still work",
+      "input": "行くにゃー",
+      "expected": [
+        {"surface": "行く", "pos": "Verb", "lemma": "行く"},
+        {"surface": "にゃー", "pos": "Auxiliary", "lemma": "よ"}
+      ],
+      "tags": ["dialectal", "cat_speech", "W-007"]
     }
   ]
 }

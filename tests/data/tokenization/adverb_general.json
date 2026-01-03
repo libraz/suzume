@@ -945,6 +945,26 @@
         {"surface": "完成", "pos": "Noun"}
       ],
       "tags": ["adverb", "degree"]
+    },
+    {
+      "id": "adv_toutei_wagahai",
+      "description": "到底 should be ADV, not NOUN (W-012)",
+      "input": "到底助からない",
+      "expected": [
+        {"surface": "到底", "pos": "Adverb"},
+        {"surface": "助からない", "pos": "Verb", "lemma": "助かる"}
+      ],
+      "tags": ["adverb", "degree", "wagahai", "W-012"]
+    },
+    {
+      "id": "adv_futatabi_wagahai",
+      "description": "再び should be ADV, not NOUN (W-012)",
+      "input": "再び見る",
+      "expected": [
+        {"surface": "再び", "pos": "Adverb"},
+        {"surface": "見る", "pos": "Verb", "lemma": "見る"}
+      ],
+      "tags": ["adverb", "time", "wagahai", "W-012"]
     }
   ]
 }
