@@ -1462,6 +1462,11 @@ std::vector<DictionaryEntry> getIAdjectiveEntries() {
       {"かまびすしい", POS::Adjective, 0.3F, "かまびすしい", false, false, false, CT::IAdjective, ""},  // noisy
       {"うやうやしい", POS::Adjective, 0.3F, "うやうやしい", false, false, false, CT::IAdjective, ""},  // respectful
       {"こころもとない", POS::Adjective, 0.3F, "こころもとない", false, false, false, CT::IAdjective, ""},  // anxious/uneasy
+
+      // Classical adjective forms (古語形容詞終止形) - シク活用
+      // Only add forms that don't conflict with modern 〜そう patterns
+      // 寒し = 寒い終止形 (寒さは寒し pattern in wagahai)
+      {"寒し", POS::Adjective, 0.3F, "寒い", false, false, false, CT::None, "さむし"},
   };
 }
 
@@ -1795,6 +1800,7 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       // competing with て-form compound patterns
       {"ある", POS::Verb, 0.3F, "ある", false, false, true, CT::GodanRa, "ある"},
       {"いる", POS::Verb, 0.3F, "いる", false, false, true, CT::Ichidan, "いる"},
+      {"いられる", POS::Verb, 0.3F, "いる", false, false, true, CT::Ichidan, "いられる"},  // potential/passive of いる
       {"おる", POS::Verb, 0.3F, "おる", false, false, true, CT::GodanRa, "おる"},
       {"くれる", POS::Verb, 0.3F, "くれる", false, false, true, CT::Ichidan, "くれる"},
       {"あげる", POS::Verb, 0.3F, "あげる", false, false, true, CT::Ichidan, "あげる"},
