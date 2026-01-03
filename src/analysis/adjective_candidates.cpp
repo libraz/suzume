@@ -155,6 +155,120 @@ std::string normalizeBaseForm(const std::string& base_form,
   return base_form;
 }
 
+// =============================================================================
+// Emphatic Pattern Helpers (口語強調パターン)
+// =============================================================================
+
+/**
+ * @brief Check if character is an emphatic suffix character
+ *
+ * Emphatic characters used in colloquial speech:
+ * - Sokuon: っ, ッ
+ * - Chouon: ー
+ * - Small vowels: ぁぃぅぇぉ, ァィゥェォ
+ */
+inline bool isEmphaticChar(char32_t c) {
+  return c == core::hiragana::kSmallTsu ||  // っ
+         c == U'ッ' ||                       // katakana sokuon
+         c == U'ー' ||                       // chouon
+         // Small hiragana vowels
+         c == U'ぁ' || c == U'ぃ' || c == U'ぅ' || c == U'ぇ' || c == U'ぉ' ||
+         // Small katakana vowels
+         c == U'ァ' || c == U'ィ' || c == U'ゥ' || c == U'ェ' || c == U'ォ';
+}
+
+/**
+ * @brief Convert codepoint to UTF-8 string (3-byte Japanese chars)
+ */
+inline std::string codepointToUtf8(char32_t c) {
+  std::string result;
+  result += static_cast<char>(0xE0 | ((c >> 12) & 0x0F));
+  result += static_cast<char>(0x80 | ((c >> 6) & 0x3F));
+  result += static_cast<char>(0x80 | (c & 0x3F));
+  return result;
+}
+
+/**
+ * @brief Check if position is likely part of a verb te/ta-form, not emphatic
+ *
+ * っ followed by て/た is almost always part of the verb te-form (e.g., いって, 行った)
+ * rather than an emphatic sokuon. We should not treat this as emphatic.
+ */
+inline bool isTeTaFormSokuon(const std::vector<char32_t>& codepoints,
+                             size_t sokuon_pos) {
+  if (sokuon_pos + 1 >= codepoints.size()) {
+    return false;  // Sokuon at end - could be emphatic
+  }
+  char32_t next = codepoints[sokuon_pos + 1];
+  // っ+て, っ+た patterns are te/ta forms, not emphatic
+  return next == core::hiragana::kTe || next == core::hiragana::kTa;
+}
+
+/**
+ * @brief Extend candidates with emphatic suffix variants
+ *
+ * For each adjective candidate, checks if input continues with emphatic
+ * characters (っ/ッ/ー/small vowels) and creates an extended variant.
+ * E.g., すごい → すごいっっ, やばい → やばいー
+ *
+ * Special handling for っ (sokuon):
+ * - っ followed by て/た is part of verb te/ta-form, not emphatic
+ * - っ at end of input or followed by other emphatic chars is emphatic
+ *
+ * @param candidates Candidates to extend (modified in place)
+ * @param codepoints Input text codepoints
+ */
+inline void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
+                                const std::vector<char32_t>& codepoints) {
+  std::vector<UnknownCandidate> emphatic_variants;
+
+  for (const auto& cand : candidates) {
+    // Only extend adjective candidates
+    if (cand.pos != core::PartOfSpeech::Adjective) {
+      continue;
+    }
+
+    // Check if there are emphatic characters after the candidate
+    size_t emphatic_end = cand.end;
+    std::string emphatic_suffix;
+
+    while (emphatic_end < codepoints.size()) {
+      char32_t c = codepoints[emphatic_end];
+      if (isEmphaticChar(c)) {
+        // Special case: っ followed by て/た is verb te-form, not emphatic
+        if ((c == core::hiragana::kSmallTsu || c == U'ッ') &&
+            isTeTaFormSokuon(codepoints, emphatic_end)) {
+          break;  // Stop - this is part of a verb, not emphatic
+        }
+        emphatic_suffix += codepointToUtf8(c);
+        ++emphatic_end;
+      } else {
+        break;
+      }
+    }
+
+    // Add emphatic variant if we found any emphatic characters
+    if (!emphatic_suffix.empty()) {
+      UnknownCandidate emphatic_cand = cand;
+      emphatic_cand.surface += emphatic_suffix;
+      emphatic_cand.end = emphatic_end;
+      // Cost penalty scales with length to prefer shorter forms
+      emphatic_cand.cost +=
+          0.3F *
+          static_cast<float>(emphatic_suffix.size() / core::kJapaneseCharBytes);
+#ifdef SUZUME_DEBUG_INFO
+      emphatic_cand.pattern += "_emphatic";
+#endif
+      emphatic_variants.push_back(std::move(emphatic_cand));
+    }
+  }
+
+  // Add all emphatic variants
+  for (auto& var : emphatic_variants) {
+    candidates.push_back(std::move(var));
+  }
+}
+
 }  // namespace
 
 std::vector<UnknownCandidate> generateAdjectiveCandidates(
@@ -470,6 +584,9 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       }
     }
   }
+
+  // Add emphatic variants (すごい → すごいっっ, etc.)
+  addEmphaticVariants(candidates, codepoints);
 
   std::sort(candidates.begin(), candidates.end(),
             [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
@@ -900,6 +1017,9 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     }
   }
 
+  // Add emphatic variants (まずい → まずいっ, etc.)
+  addEmphaticVariants(candidates, codepoints);
+
   // Sort by cost
   std::sort(candidates.begin(), candidates.end(),
             [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
@@ -998,6 +1118,9 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
       }
     }
   }
+
+  // Add emphatic variants (エグい → エグいっ, etc.)
+  addEmphaticVariants(candidates, codepoints);
 
   // Sort by cost
   std::sort(candidates.begin(), candidates.end(),

@@ -105,6 +105,73 @@ void Tokenizer::addDictionaryCandidates(
                     static_cast<uint32_t>(end_pos), result.entry->pos,
                     result.entry->cost, flags, result.entry->lemma,
                     result.entry->conj_type, result.entry->reading);
+
+    // Emphatic suffix pattern: word + っ/ッ/ー/ぁぃぅぇぉ/ァィゥェォ (colloquial emphasis)
+    // E.g., です→ですっ, ます→ますっ, 行く→行くっ, やばいーー, だぁー
+    // Handles consecutive sokuon (っっ), chouon (ーー), and small vowels (ぁぃぅぇぉ)
+    // Only apply to verbs, auxiliaries, and adjectives (typical emphatic targets)
+    if (end_pos < codepoints.size() &&
+        (result.entry->pos == core::PartOfSpeech::Verb ||
+         result.entry->pos == core::PartOfSpeech::Auxiliary ||
+         result.entry->pos == core::PartOfSpeech::Adjective)) {
+      // Count consecutive emphatic characters
+      size_t emphatic_end = end_pos;
+      std::string emphatic_suffix;
+      while (emphatic_end < codepoints.size()) {
+        char32_t c = codepoints[emphatic_end];
+        // Sokuon (促音)
+        if (c == core::hiragana::kSmallTsu) {
+          emphatic_suffix += "っ";
+        } else if (c == U'ッ') {
+          emphatic_suffix += "ッ";
+        // Chouon (長音)
+        } else if (c == U'ー') {
+          emphatic_suffix += "ー";
+        // Small hiragana vowels (小書きひらがな母音)
+        } else if (c == U'ぁ') {
+          emphatic_suffix += "ぁ";
+        } else if (c == U'ぃ') {
+          emphatic_suffix += "ぃ";
+        } else if (c == U'ぅ') {
+          emphatic_suffix += "ぅ";
+        } else if (c == U'ぇ') {
+          emphatic_suffix += "ぇ";
+        } else if (c == U'ぉ') {
+          emphatic_suffix += "ぉ";
+        // Small katakana vowels (小書きカタカナ母音)
+        } else if (c == U'ァ') {
+          emphatic_suffix += "ァ";
+        } else if (c == U'ィ') {
+          emphatic_suffix += "ィ";
+        } else if (c == U'ゥ') {
+          emphatic_suffix += "ゥ";
+        } else if (c == U'ェ') {
+          emphatic_suffix += "ェ";
+        } else if (c == U'ォ') {
+          emphatic_suffix += "ォ";
+        } else {
+          break;
+        }
+        ++emphatic_end;
+      }
+
+      // Add emphatic variant if we found any emphatic characters
+      if (!emphatic_suffix.empty()) {
+        std::string emphatic_surface = result.entry->surface + emphatic_suffix;
+        // Cost penalty scales with length to prefer shorter forms
+        float cost_penalty = 0.3F * static_cast<float>(emphatic_suffix.size() / 3);
+
+        lattice.addEdge(emphatic_surface,
+                        static_cast<uint32_t>(start_pos),
+                        static_cast<uint32_t>(emphatic_end),
+                        result.entry->pos,
+                        result.entry->cost + cost_penalty,
+                        flags,
+                        result.entry->lemma,
+                        result.entry->conj_type,
+                        result.entry->reading);
+      }
+    }
   }
 }
 

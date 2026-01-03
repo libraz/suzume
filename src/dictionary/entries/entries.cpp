@@ -43,6 +43,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
       {"ので", POS::Particle, 0.5F, "", false, false, false, CT::None, ""},
       {"けれど", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"けど", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
+      {"けども", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"けれども", POS::Particle, 0.8F, "", false, false, false, CT::None, ""},
       {"し", POS::Particle, 1.2F, "", false, false, false, CT::None, ""},  // 列挙・理由
 
@@ -330,6 +331,8 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"ざんせん", POS::Auxiliary, 0.3F, "ある", false, false, false, CT::None, ""},
       {"でありんす", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
       {"でありんした", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
+      {"なんし", POS::Auxiliary, 0.3F, "ます", false, false, false, CT::None, ""},
+      {"なんした", POS::Auxiliary, 0.3F, "ます", false, false, false, CT::None, ""},
 
       // Cat-like (猫系)
       {"にゃ", POS::Auxiliary, 0.3F, "よ", false, false, false, CT::None, ""},
@@ -978,10 +981,11 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"ほぼ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
 
       // Quantity/degree adverbs often incorrectly tagged as NOUN
-      {"少々", POS::Adverb, 0.1F, "", false, false, false, CT::None, "しょうしょう"},
-      {"多少", POS::Adverb, 0.1F, "", false, false, false, CT::None, "たしょう"},
-      {"若干", POS::Adverb, 0.1F, "", false, false, false, CT::None, "じゃっかん"},
-      {"大体", POS::Adverb, 0.1F, "", false, false, false, CT::None, "だいたい"},
+      // Lower cost (-0.5) to beat SPLIT_NV bonus when followed by verb
+      {"少々", POS::Adverb, -0.5F, "", false, false, false, CT::None, "しょうしょう"},
+      {"多少", POS::Adverb, -0.5F, "", false, false, false, CT::None, "たしょう"},
+      {"若干", POS::Adverb, -0.5F, "", false, false, false, CT::None, "じゃっかん"},
+      {"大体", POS::Adverb, -0.5F, "", false, false, false, CT::None, "だいたい"},
       // Hiragana forms need negative cost to prevent splitting
       {"だいたい", POS::Adverb, -0.5F, "大体", false, false, false, CT::None, ""},
       {"いったい", POS::Adverb, -0.5F, "一体", false, false, false, CT::None, ""},

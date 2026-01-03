@@ -348,6 +348,17 @@ Wi-Fi	NOUN		0.5
 猫	NOUN	ねこ	0.5
 うだつ	NOUN	うだつ	0.8
 
+# --- Net slang (ネットスラング) ---
+# Modern internet slang terms that don't follow regular morphological patterns
+ぱおん	NOUN	ぱおん	0.3
+わかりみ	NOUN	わかりみ	0.3
+つらみ	NOUN	つらみ	0.3
+うれしみ	NOUN	うれしみ	0.3
+やばみ	NOUN	やばみ	0.3
+ぴえん	NOUN	ぴえん	0.3
+草	NOUN	くさ	0.5
+ワロタ	NOUN	わろた	0.5
+
 # --- Suru-verb nouns (サ変名詞) ---
 # These need explicit entries to prevent 漢字+い misinterpretation as i-adjective
 # e.g., 検討いたしております would become 検討い(ADJ)+たしております without this
@@ -406,10 +417,25 @@ Wi-Fi	NOUN		0.5
 なるほど	OTHER		1.0
 そうだね	OTHER		1.0
 
-# --- Fillers/Hesitation ---
+# --- Fillers/Hesitation (フィラー・間投詞) ---
+# Note: Variable-length prolonged patterns (うわーーー) handled by emphatic pattern in tokenizer
 はぁ	OTHER		1.0
-えーと	OTHER		1.0
-えっと	OTHER		1.0
+えー	OTHER		0.8
+えーと	OTHER		0.5
+えーっと	OTHER		0.5
+えっと	OTHER		0.5
+あー	OTHER		0.8
+あーあ	OTHER		0.5
+うわ	OTHER		0.8
+うわー	OTHER		0.5
+うわーー	OTHER		0.5
+おー	OTHER		0.8
+おおー	OTHER		0.5
+へー	OTHER		0.8
+ほー	OTHER		0.8
+ふーん	OTHER		0.5
+うーん	OTHER		0.5
+んー	OTHER		0.8
 
 # --- Colloquial expressions ---
 だるい	OTHER		1.0
