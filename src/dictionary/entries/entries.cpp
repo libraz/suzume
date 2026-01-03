@@ -515,6 +515,7 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
       {"あらゆる", POS::Determiner, 1.0F, "", false, false, false, CT::None, ""},
       {"いわゆる", POS::Determiner, 1.0F, "", false, false, false, CT::None, ""},
       {"おかしな", POS::Determiner, 1.0F, "", false, false, false, CT::None, ""},
+      {"同じ", POS::Determiner, -0.3F, "", false, false, false, CT::None, "おなじ"},  // same - prevent VERB confusion
 
       // Demonstrative manner determiners (指示様態連体詞)
       // Lower cost to compete with X + いう (VERB cost 0.3) splits
@@ -1225,7 +1226,8 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"なんとも", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},  // cannot - prevent な｜ん｜と｜も split
       {"今や", POS::Adverb, -0.5F, "", false, false, false, CT::None, "いまや"},  // now - prevent 今+や(OTHER)
       {"初めて", POS::Adverb, -0.5F, "", false, false, false, CT::None, "はじめて"},  // first time - prevent VERB confusion
-      {"到底", POS::Adverb, 0.1F, "", false, false, false, CT::None, "とうてい"},  // utterly - prevent NOUN confusion (N11)
+      {"到底", POS::Adverb, -1.0F, "", false, false, false, CT::None, "とうてい"},  // utterly - beat SPLIT_NV NOUN
+      {"再び", POS::Adverb, -0.5F, "", false, false, false, CT::None, "ふたたび"},  // again - prevent NOUN confusion
 
       // Compound adverbs (複合副詞) - functional expressions
       // その上: "moreover/in addition" - needs low cost to beat その+上今 compound
@@ -1407,6 +1409,8 @@ std::vector<DictionaryEntry> getIAdjectiveEntries() {
 
       // Quality/Evaluation
       {"良い", POS::Adjective, 0.3F, "良い", false, false, false, CT::IAdjective, "よい"},
+      {"善い", POS::Adjective, 0.3F, "よい", false, false, false, CT::IAdjective, "よい"},  // classical variant of 良い
+      {"好い", POS::Adjective, 0.3F, "よい", false, false, false, CT::IAdjective, "よい"},  // classical variant of 良い
       {"悪い", POS::Adjective, 0.3F, "悪い", false, false, false, CT::IAdjective, "わるい"},
       {"強い", POS::Adjective, 0.3F, "強い", false, false, false, CT::IAdjective, "つよい"},
       {"弱い", POS::Adjective, 0.3F, "弱い", false, false, false, CT::IAdjective, "よわい"},
