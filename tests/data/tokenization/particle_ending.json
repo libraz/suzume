@@ -220,6 +220,24 @@
         "particle",
         "sentence_ending"
       ]
+    },
+    {
+      "id": "conjunctive_kedomo",
+      "description": "だけども - conjunctive particle けども",
+      "input": "だけども",
+      "expected": [
+        {
+          "surface": "だ",
+          "pos": "Auxiliary",
+          "lemma": "だ"
+        },
+        {
+          "surface": "けども",
+          "pos": "Particle",
+          "lemma": "けども"
+        }
+      ],
+      "tags": ["conjunctive", "sentence_ending"]
     }
   ]
 }

@@ -384,6 +384,114 @@
         "internet",
         "otaku"
       ]
+    },
+    {
+      "id": "emphatic_sokuon_desu",
+      "description": "ですっ - emphatic sokuon after auxiliary",
+      "input": "大丈夫ですっ",
+      "expected": [
+        {
+          "surface": "大丈夫",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ですっ",
+          "pos": "Auxiliary",
+          "lemma": "ですっ"
+        }
+      ],
+      "tags": ["emphatic", "sokuon"]
+    },
+    {
+      "id": "emphatic_sokuon_verb",
+      "description": "行くっ - emphatic sokuon after verb",
+      "input": "行くっ",
+      "expected": [
+        {
+          "surface": "行くっ",
+          "pos": "Verb",
+          "lemma": "行く"
+        }
+      ],
+      "tags": ["emphatic", "sokuon"]
+    },
+    {
+      "id": "emphatic_sokuon_multiple",
+      "description": "ますっっ - multiple emphatic sokuon",
+      "input": "ますっっ",
+      "expected": [
+        {
+          "surface": "ますっっ",
+          "pos": "Auxiliary",
+          "lemma": "ますっっ"
+        }
+      ],
+      "tags": ["emphatic", "sokuon"]
+    },
+    {
+      "id": "emphatic_sokuon_past",
+      "description": "来たっ - emphatic sokuon after past form",
+      "input": "来たっ",
+      "expected": [
+        {
+          "surface": "来たっ",
+          "pos": "Verb",
+          "lemma": "来たっ"
+        }
+      ],
+      "tags": ["emphatic", "sokuon"]
+    },
+    {
+      "id": "vowel_repeat_kita",
+      "description": "きたああああ - vowel repetition for emphasis",
+      "input": "きたああああ",
+      "expected": [
+        {
+          "surface": "きたああああ",
+          "pos": "Auxiliary",
+          "lemma": "くる"
+        }
+      ],
+      "tags": ["emphatic", "vowel_repeat"]
+    },
+    {
+      "id": "vowel_repeat_sugoi",
+      "description": "すごいいいい - vowel repetition for emphasis",
+      "input": "すごいいいい",
+      "expected": [
+        {
+          "surface": "すごいいいい",
+          "pos": "Adjective",
+          "lemma": "すごい"
+        }
+      ],
+      "tags": ["emphatic", "vowel_repeat"]
+    },
+    {
+      "id": "vowel_repeat_iku",
+      "description": "いくうう - vowel repetition for emphasis",
+      "input": "いくうう",
+      "expected": [
+        {
+          "surface": "いくうう",
+          "pos": "Verb",
+          "lemma": "いく"
+        }
+      ],
+      "tags": ["emphatic", "vowel_repeat"]
+    },
+    {
+      "id": "vowel_repeat_yabai",
+      "description": "やばいいい - vowel repetition for emphasis",
+      "input": "やばいいい",
+      "expected": [
+        {
+          "surface": "やばいいい",
+          "pos": "Adjective",
+          "lemma": "やばい"
+        }
+      ],
+      "tags": ["emphatic", "vowel_repeat"]
     }
   ]
 }

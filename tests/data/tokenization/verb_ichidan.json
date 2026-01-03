@@ -750,6 +750,60 @@
         }
       ],
       "tags": ["particle_fix", "passive", "desiderative", "regression"]
+    },
+    {
+      "id": "single_kanji_ichidan_neru_masu",
+      "description": "寝ます - single-kanji ichidan 寝る with polite auxiliary",
+      "input": "寝ます",
+      "expected": [
+        {
+          "surface": "寝",
+          "pos": "Verb",
+          "lemma": "寝る"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
+      ],
+      "tags": ["ichidan", "polite", "single_kanji"]
+    },
+    {
+      "id": "single_kanji_ichidan_miru_masu",
+      "description": "見ます - single-kanji ichidan 見る with polite auxiliary",
+      "input": "見ます",
+      "expected": [
+        {
+          "surface": "見",
+          "pos": "Verb",
+          "lemma": "見る"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
+      ],
+      "tags": ["ichidan", "polite", "single_kanji"]
+    },
+    {
+      "id": "single_kanji_ichidan_deru_masu",
+      "description": "出ます - single-kanji ichidan 出る with polite auxiliary",
+      "input": "出ます",
+      "expected": [
+        {
+          "surface": "出",
+          "pos": "Verb",
+          "lemma": "出る"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
+      ],
+      "tags": ["ichidan", "polite", "single_kanji"]
     }
   ]
 }

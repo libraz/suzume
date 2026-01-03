@@ -377,6 +377,37 @@
         "strict",
         "business"
       ]
+    },
+    {
+      "id": "kuruwa_nanshi_standalone",
+      "description": "なんし - kuruwa-kotoba polite auxiliary (archaic courtesan speech)",
+      "input": "なんし",
+      "expected": [
+        {
+          "surface": "なんし",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
+      ],
+      "tags": ["character_speech", "kuruwa"]
+    },
+    {
+      "id": "kuruwa_oide_nanshi",
+      "description": "おいでなんし - kuruwa-kotoba polite invitation",
+      "input": "おいでなんし",
+      "expected": [
+        {
+          "surface": "おいで",
+          "pos": "Verb",
+          "lemma": "いらっしゃる"
+        },
+        {
+          "surface": "なんし",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
+      ],
+      "tags": ["character_speech", "kuruwa"]
     }
   ]
 }
