@@ -64,16 +64,8 @@ TEST_F(CoreDictVerbExpansionTest, Ichidan_BaseForm) {
   EXPECT_TRUE(hasVerbEntry("できる", "できる"));
 }
 
-TEST_F(CoreDictVerbExpansionTest, Ichidan_PoliteForm) {
-  EXPECT_TRUE(hasVerbEntry("できます", "できる"));
-}
-
 TEST_F(CoreDictVerbExpansionTest, Ichidan_PastForm) {
   EXPECT_TRUE(hasVerbEntry("できた", "できる"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, Ichidan_PolitePastForm) {
-  EXPECT_TRUE(hasVerbEntry("できました", "できる"));
 }
 
 TEST_F(CoreDictVerbExpansionTest, Ichidan_TeForm) {
@@ -82,10 +74,6 @@ TEST_F(CoreDictVerbExpansionTest, Ichidan_TeForm) {
 
 TEST_F(CoreDictVerbExpansionTest, Ichidan_NegativeForm) {
   EXPECT_TRUE(hasVerbEntry("できない", "できる"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, Ichidan_PoliteNegativeForm) {
-  EXPECT_TRUE(hasVerbEntry("できません", "できる"));
 }
 
 TEST_F(CoreDictVerbExpansionTest, Ichidan_ConditionalBa) {
@@ -108,16 +96,8 @@ TEST_F(CoreDictVerbExpansionTest, GodanRa_Renyokei) {
   EXPECT_TRUE(hasVerbEntry("わかり", "わかる"));
 }
 
-TEST_F(CoreDictVerbExpansionTest, GodanRa_PoliteForm) {
-  EXPECT_TRUE(hasVerbEntry("わかります", "わかる"));
-}
-
 TEST_F(CoreDictVerbExpansionTest, GodanRa_PastForm) {
   EXPECT_TRUE(hasVerbEntry("わかった", "わかる"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, GodanRa_PolitePastForm) {
-  EXPECT_TRUE(hasVerbEntry("わかりました", "わかる"));
 }
 
 TEST_F(CoreDictVerbExpansionTest, GodanRa_TeForm) {
@@ -126,10 +106,6 @@ TEST_F(CoreDictVerbExpansionTest, GodanRa_TeForm) {
 
 TEST_F(CoreDictVerbExpansionTest, GodanRa_NegativeForm) {
   EXPECT_TRUE(hasVerbEntry("わからない", "わかる"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, GodanRa_PoliteNegativeForm) {
-  EXPECT_TRUE(hasVerbEntry("わかりません", "わかる"));
 }
 
 // =============================================================================
@@ -142,10 +118,6 @@ TEST_F(CoreDictVerbExpansionTest, GodanWa_BaseForm) {
 
 TEST_F(CoreDictVerbExpansionTest, GodanWa_Renyokei) {
   EXPECT_TRUE(hasVerbEntry("もらい", "もらう"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, GodanWa_PoliteForm) {
-  EXPECT_TRUE(hasVerbEntry("もらいます", "もらう"));
 }
 
 TEST_F(CoreDictVerbExpansionTest, GodanWa_PastForm) {
@@ -180,22 +152,6 @@ TEST_F(CoreDictVerbExpansionTest, GodanSa_Renyokei) {
   EXPECT_TRUE(hasVerbEntry("いたし", "いたす"));
 }
 
-TEST_F(CoreDictVerbExpansionTest, GodanSa_PoliteForm) {
-  EXPECT_TRUE(hasVerbEntry("いたします", "いたす"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, GodanSa_PolitePastForm) {
-  EXPECT_TRUE(hasVerbEntry("いたしました", "いたす"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, GodanSa_PoliteTeForm) {
-  EXPECT_TRUE(hasVerbEntry("いたしまして", "いたす"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, GodanSa_ProgressivePolite) {
-  EXPECT_TRUE(hasVerbEntry("いたしております", "いたす"));
-}
-
 // =============================================================================
 // Suru verb expansion (する)
 // =============================================================================
@@ -204,16 +160,8 @@ TEST_F(CoreDictVerbExpansionTest, Suru_BaseForm) {
   EXPECT_TRUE(hasVerbEntry("する", "する"));
 }
 
-TEST_F(CoreDictVerbExpansionTest, Suru_PoliteForm) {
-  EXPECT_TRUE(hasVerbEntry("します", "する"));
-}
-
 TEST_F(CoreDictVerbExpansionTest, Suru_PastForm) {
   EXPECT_TRUE(hasVerbEntry("した", "する"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, Suru_PolitePastForm) {
-  EXPECT_TRUE(hasVerbEntry("しました", "する"));
 }
 
 TEST_F(CoreDictVerbExpansionTest, Suru_TeForm) {
@@ -222,10 +170,6 @@ TEST_F(CoreDictVerbExpansionTest, Suru_TeForm) {
 
 TEST_F(CoreDictVerbExpansionTest, Suru_NegativeForm) {
   EXPECT_TRUE(hasVerbEntry("しない", "する"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, Suru_PoliteNegativeForm) {
-  EXPECT_TRUE(hasVerbEntry("しません", "する"));
 }
 
 TEST_F(CoreDictVerbExpansionTest, Suru_ConditionalBa) {
@@ -244,10 +188,6 @@ TEST_F(CoreDictVerbExpansionTest, Suru_Progressive) {
   EXPECT_TRUE(hasVerbEntry("している", "する"));
 }
 
-TEST_F(CoreDictVerbExpansionTest, Suru_ProgressivePolite) {
-  EXPECT_TRUE(hasVerbEntry("しています", "する"));
-}
-
 // =============================================================================
 // Essential verbs expansion (伴う - GodanWa from essential_verbs.h)
 // =============================================================================
@@ -258,10 +198,6 @@ TEST_F(CoreDictVerbExpansionTest, EssentialVerb_Tomonau_Base) {
 
 TEST_F(CoreDictVerbExpansionTest, EssentialVerb_Tomonau_Renyokei) {
   EXPECT_TRUE(hasVerbEntry("伴い", "伴う"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, EssentialVerb_Tomonau_Polite) {
-  EXPECT_TRUE(hasVerbEntry("伴います", "伴う"));
 }
 
 TEST_F(CoreDictVerbExpansionTest, EssentialVerb_Tomonau_Past) {

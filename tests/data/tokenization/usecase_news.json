@@ -384,7 +384,7 @@
     },
     {
       "id": "long_complex_condition",
-      "description": "Complex conditional",
+      "description": "Complex conditional - います as single auxiliary",
       "input": "もし明日の天気が良ければ、公園でピクニックをしようと思っています",
       "expected": [
         {"surface": "もし", "pos": "Adverb"},
@@ -473,7 +473,7 @@
     },
     {
       "id": "education_explanation",
-      "description": "Teacher explanation",
+      "description": "Teacher explanation (split: verb stem + polite aux)",
       "input": "この公式は次のように使います",
       "expected": [
         {"surface": "この", "pos": "Determiner"},
@@ -483,7 +483,8 @@
         {"surface": "の", "pos": "Particle"},
         {"surface": "よう", "pos": "Auxiliary"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "使います", "pos": "Verb", "lemma": "使う"}
+        {"surface": "使い", "pos": "Verb", "lemma": "使う"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["education"]
     },

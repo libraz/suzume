@@ -26,12 +26,12 @@ bool endsWithOnbinMarker(std::string_view surface) {
 }
 
 bool endsWithKuForm(std::string_view surface) {
-  return utf8::endsWith(surface, "く");
+  return utf8::endsWith(surface, scorer::kFormKu);
 }
 
 bool startsWithTe(std::string_view surface) {
   std::string_view first = utf8::firstNBytes(surface, core::kJapaneseCharBytes);
-  return first == "て" || first == "で";
+  return first == scorer::kFormTe || first == scorer::kFormDe;
 }
 
 bool endsWithTeForm(std::string_view surface) {
@@ -39,7 +39,7 @@ bool endsWithTeForm(std::string_view surface) {
     return false;
   }
   std::string_view last = surface.substr(surface.size() - core::kJapaneseCharBytes);
-  return last == "て" || last == "で";
+  return last == scorer::kFormTe || last == scorer::kFormDe;
 }
 
 bool endsWithSou(std::string_view surface) {
@@ -47,12 +47,12 @@ bool endsWithSou(std::string_view surface) {
 }
 
 bool endsWithYou(std::string_view surface) {
-  return utf8::endsWith(surface, "よう");
+  return utf8::endsWith(surface, scorer::kFormYou);
 }
 
 bool endsWithNodaBase(std::string_view surface) {
   std::string_view last = utf8::lastChar(surface);
-  return last == "の" || last == "ん";
+  return last == scorer::kParticleNo || last == scorer::kSuffixN;
 }
 
 // =============================================================================
@@ -135,6 +135,7 @@ void evaluateNounRules(const core::LatticeEdge& prev,
 
   // NOUN → VERB rules
   accumulateRule(accumulated, checkCompoundAuxAfterRenyokei(prev, next, opts));
+  accumulateRule(accumulated, checkSuruRenyokeiToTeVerb(prev, next, opts));
 
   // NOUN → PARTICLE rules
   accumulateRule(accumulated, checkTeFormSplit(prev, next, opts));

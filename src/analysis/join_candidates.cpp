@@ -7,6 +7,7 @@
 
 #include "candidate_constants.h"
 #include "core/utf8_constants.h"
+#include "grammar/char_patterns.h"
 #include "grammar/inflection.h"
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
@@ -73,6 +74,8 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"倒す", "たおす", "す", "倒す"},        // 打ち倒す, 蹴り倒す (godan)
     {"分ける", "わける", "ける", "分ける"},  // 切り分ける, 振り分ける (ichidan)
     {"立てる", "たてる", "てる", "立てる"},  // 組み立てる, 打ち立てる (ichidan)
+    {"広げる", "ひろげる", "げる", "広げる"},  // 繰り広げる, 押し広げる (ichidan)
+    {"起こす", "おこす", "す", "起こす"},      // 引き起こす, 呼び起こす (godan)
     // Renyokei forms (連用形) for たい/たくなかった/etc. attachment
     {"込み", "こみ", "む", "込む"},          // 読み込みたい, 飛びこみたい
     {"出し", "だし", "す", "出す"},          // 走り出したい, 走りだしたい
@@ -117,6 +120,8 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"倒し", "たおし", "す", "倒す"},        // 打ち倒したい
     {"分け", "わけ", "ける", "分ける"},      // 切り分けたい (ichidan renyokei)
     {"立て", "たて", "てる", "立てる"},      // 組み立てたい (ichidan renyokei)
+    {"広げ", "ひろげ", "げる", "広げる"},    // 繰り広げたい (ichidan renyokei)
+    {"起こし", "おこし", "す", "起こす"},    // 引き起こしたい (godan renyokei)
     // Note: "出" (で) renyokei is NOT added because it conflicts with particle で
     // 飛び出る forms like 飛び出たい are handled by the base form "出る" entry
 };
@@ -261,14 +266,15 @@ void addCompoundVerbJoinCandidates(
     // - Suru-variant: じ/ぢ (演じ from 演じる, 感じ from 感じる)
     // B63: We need to skip this hiragana when looking for V2
     char32_t hira = codepoints[kanji_end];
-    bool is_e_row_stem = (hira == U'け' || hira == U'せ' || hira == U'て' ||
-                          hira == U'ね' || hira == U'べ' || hira == U'め' ||
-                          hira == U'れ' || hira == U'え' || hira == U'げ');
-    // Include i-row stems for kami-ichidan verbs: 落ちる, 起きる, 過ぎる, etc.
-    // and サ変-derived verbs: 演じる, 感じる, 論じる, etc.
-    bool is_i_row_stem = (hira == U'ち' || hira == U'き' || hira == U'ぎ' ||
-                          hira == U'じ' || hira == U'び' || hira == U'み' ||
-                          hira == U'に' || hira == U'り' || hira == U'い');
+    bool is_e_row_stem = grammar::isERowCodepoint(hira);
+    // Note: I-row includes some chars also in kGodanRenyokei (き, ぎ, し, ち, etc.)
+    // but by the time we reach this branch (is_ichidan=true), those cases
+    // have already been excluded because they set base_ending in the loop above.
+    bool is_i_row_stem = grammar::isIRowCodepoint(hira);
+
+    // For E/I-row stems (valid ichidan patterns), V2 starts after the stem
+    // For non-E/I-row, look for V2 starting at the hiragana position (e.g., つける)
+    // This allows patterns like 見 + つける = 見つける where つ is U-row
     v2_start = (is_e_row_stem || is_i_row_stem) ? (kanji_end + 1) : kanji_end;
   } else {
     v2_start = kanji_end + 1;
@@ -494,13 +500,23 @@ void addCompoundVerbJoinCandidates(
     if (!v1_verified) {
       bool use_inflection_fallback = true;
 
+      // B65: For multi-kanji stems (2+ kanji), require dictionary match.
+      // This prevents spurious compound verbs like 大体分交う where 大体分 is
+      // incorrectly analyzed as a verb stem. The inflection analyzer is too lenient
+      // for long kanji sequences, accepting them with low confidence.
+      // Single-kanji stems like 見 (from 見つける) are more likely to be real verbs.
+      size_t kanji_count = kanji_end - start_pos;
+      if (kanji_count >= 2) {
+        // Multi-kanji stem: don't use inflection fallback
+        use_inflection_fallback = false;
+      }
+
       // Special case: single-kanji + に patterns
       // に is both a common particle and the renyokei of Godan-Na verbs (死に→死ぬ).
       // But Godan-Na verbs are rare, while kanji+に+VERB is a very common pattern
       // (e.g., 本について = 本 + に + ついて, not 本ぬ compound).
       // Block inflection fallback for single-kanji + に to prevent false positives.
       char32_t renyokei_char = codepoints[kanji_end];
-      size_t kanji_count = kanji_end - start_pos;
       if (!is_ichidan && kanji_count == 1 && renyokei_char == U'に') {
         use_inflection_fallback = false;
       }

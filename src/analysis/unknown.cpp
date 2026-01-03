@@ -434,8 +434,17 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
         if (len != 2) {
           continue;  // Only generate 2-char candidates
         }
-        // Add moderate penalty - let connection rules decide which path is better
-        candidate.cost += 1.0F;
+        // Check if this is a reduplicated pattern (same character repeated)
+        // Reduplicated hiragana like はは (母), ちち (父) are likely real words
+        bool is_reduplicated = (codepoints[start_pos] == codepoints[start_pos + 1]);
+        if (is_reduplicated) {
+          // Small bonus for reduplicated patterns - they're often real words
+          // This helps はは (母) beat は+は (particle sequence)
+          candidate.cost -= 0.5F;
+        } else {
+          // Add moderate penalty - let connection rules decide which path is better
+          candidate.cost += 1.0F;
+        }
         // Mark as has_suffix to skip exceeds_dict_length penalty in tokenizer
         // These are morphologically recognized patterns (potential nouns)
         candidate.has_suffix = true;

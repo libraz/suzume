@@ -46,14 +46,15 @@
     },
     {
       "id": "english_with_particle",
-      "description": "English word followed by particle",
+      "description": "English word followed by particle (split: verb stem + polite aux)",
       "input": "今日はMeetingがあります",
       "expected": [
         {"surface": "今日", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "Meeting", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "あります", "pos": "Verb", "lemma": "ある"}
+        {"surface": "あり", "pos": "Verb", "lemma": "ある"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["english_in_japanese"]
     },
@@ -107,12 +108,13 @@
     },
     {
       "id": "english_brand_name",
-      "description": "Brand name in sentence",
+      "description": "Brand name in sentence - verb with polite past aux",
       "input": "iPhoneを買いました",
       "expected": [
         {"surface": "iPhone", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "買いました", "pos": "Verb", "lemma": "買う"}
+        {"surface": "買い", "pos": "Verb", "lemma": "買う"},
+        {"surface": "ました", "pos": "Auxiliary", "lemma": "ました"}
       ],
       "tags": ["english_in_japanese"]
     },

@@ -752,8 +752,10 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // E.g., やら (from やる) + さ + れた = やらされた (causative-passive)
       // Only penalize ら endings - other a-row endings may be valid i-adj stems
       // E.g., やば (やばい), なさ (なさい with そう) are valid i-adjectives
+      // Exception: つら (辛い), きら (嫌い) are valid i-adjective stems
       if (stem_len == core::kTwoJapaneseCharBytes && isPureHiragana(stem) &&
-          last == "ら") {
+          last == "ら" &&
+          !isInArray(stem, inflection::kValidIAdjRaStemExceptions)) {
         base -= inflection::kPenaltyIAdjMizenkeiPattern;
         logConfidenceAdjustment(-inflection::kPenaltyIAdjMizenkeiPattern, "i_adj_2char_ra_stem");
       }

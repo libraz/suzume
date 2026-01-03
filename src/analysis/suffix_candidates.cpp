@@ -7,6 +7,7 @@
 
 #include <unordered_set>
 
+#include "core/utf8_constants.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "unknown.h"
@@ -887,6 +888,19 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
   // into compound nouns
   if (last_hira == U'お') {
     looks_like_aux = true;
+  }
+
+  // Skip NOUN generation for pure auxiliary patterns
+  // These should always be verb stem + auxiliary, never a compound noun
+  // e.g., 寝ます should be 寝(VERB) + ます(AUX), not 寝ます(NOUN)
+  if (hiragana_len == 2) {
+    using namespace suzume::core::hiragana;
+    char32_t h1 = codepoints[kanji_end];
+    char32_t h2 = codepoints[kanji_end + 1];
+    // ます, ない - pure polite/negative auxiliaries
+    if ((h1 == kMa && h2 == kSu) || (h1 == kNa && h2 == kI)) {
+      return candidates;  // Skip NOUN generation entirely
+    }
   }
 
   // Generate candidate with cost based on pattern

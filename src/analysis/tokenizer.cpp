@@ -362,7 +362,10 @@ void Tokenizer::addUnknownCandidates(
              hiragana_suffix == "いて" || hiragana_suffix == "いで" ||
              hiragana_suffix == "し");
 
-        if (!is_verb_ending) {
+        // Skip penalty if:
+        // - Known verb conjugation ending (te-form, renyoukei)
+        // - Candidate has has_suffix flag (mizenkei for ぬ/れべき patterns)
+        if (!is_verb_ending && !candidate.has_suffix) {
           size_t suffix_byte_pos = charPosToBytePos(codepoints, hiragana_start);
           auto suffix_results = dict_manager_.lookup(text, suffix_byte_pos);
 

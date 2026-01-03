@@ -1,0 +1,97 @@
+{
+  "version": "1.0",
+  "description": "Interjections and greetings (感動詞・挨拶)",
+  "cases": [
+    {
+      "id": "gomennasai_unified",
+      "description": "ごめんなさい - apology as single token",
+      "input": "ごめんなさい",
+      "expected": [
+        {
+          "surface": "ごめんなさい",
+          "pos": "Other",
+          "lemma": "ごめんなさい"
+        }
+      ],
+      "tags": ["interjection", "apology"]
+    },
+    {
+      "id": "ohayou",
+      "description": "おはよう - morning greeting",
+      "input": "おはよう",
+      "expected": [
+        {
+          "surface": "おはよう",
+          "pos": "Other",
+          "lemma": "おはよう"
+        }
+      ],
+      "tags": ["interjection", "greeting"]
+    },
+    {
+      "id": "arigatou",
+      "description": "ありがとう - thanks",
+      "input": "ありがとう",
+      "expected": [
+        {
+          "surface": "ありがとう",
+          "pos": "Other",
+          "lemma": "ありがとう"
+        }
+      ],
+      "tags": ["interjection", "thanks"]
+    },
+    {
+      "id": "sumimasen",
+      "description": "すみません - excuse me/sorry",
+      "input": "すみません",
+      "expected": [
+        {
+          "surface": "すみません",
+          "pos": "Other",
+          "lemma": "すみません"
+        }
+      ],
+      "tags": ["interjection", "apology"]
+    },
+    {
+      "id": "konnichiwa",
+      "description": "こんにちは - hello (daytime greeting)",
+      "input": "こんにちは",
+      "expected": [
+        {
+          "surface": "こんにちは",
+          "pos": "Other",
+          "lemma": "こんにちは"
+        }
+      ],
+      "tags": ["interjection", "greeting"]
+    },
+    {
+      "id": "konbanwa",
+      "description": "こんばんは - good evening",
+      "input": "こんばんは",
+      "expected": [
+        {
+          "surface": "こんばんは",
+          "pos": "Other",
+          "lemma": "こんばんは"
+        }
+      ],
+      "tags": ["interjection", "greeting"]
+    },
+    {
+      "id": "sayonara",
+      "description": "さようなら - goodbye",
+      "input": "さようなら",
+      "expected": [
+        {
+          "surface": "さようなら",
+          "pos": "Other",
+          "lemma": "さようなら"
+        }
+      ],
+      "tags": ["interjection", "greeting"]
+    }
+  ]
+}

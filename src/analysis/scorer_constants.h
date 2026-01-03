@@ -328,6 +328,11 @@ constexpr float kPenaltyShiAfterNoun = scale::kStrong;
 // so we need sufficient penalty to prefer other paths.
 constexpr float kPenaltyNaParticleAfterKanjiNoun = scale::kSevere;  // 2.5
 
+// NOUN(し ending) + VERB(て starting) penalty
+// Penalizes patterns like 説明し(NOUN) + てくれます(VERB)
+// This suggests suru-verb te-form that should be single VERB
+constexpr float kPenaltySuruRenyokeiToTeVerb = scale::kModerate;  // 1.5
+
 // らしい (conjecture) after verb/adjective (valid pattern)
 // E.g., 帰るらしい, 美しいらしい
 // Offset VERB/ADJ→ADJ base cost (0.8) to encourage proper split
@@ -366,6 +371,48 @@ constexpr const char* kSuffixSan = "さん";       // contracted negative (さ+�
 constexpr const char* kSuffixN = "ん";           // contracted negative (〜ない→〜ん)
 constexpr const char* kSuffixShi = "し";         // suru renyokei ending
 constexpr const char* kLemmaSuru = "する";       // suru verb lemma suffix
+
+// Verb conjugation form markers
+constexpr const char* kFormTe = "て";            // te-form (unvoiced)
+constexpr const char* kFormDe = "で";            // te-form (voiced)
+constexpr const char* kFormKu = "く";            // ku-form (adverbial)
+constexpr const char* kFormYou = "よう";         // volitional form
+constexpr const char* kFormTa = "た";            // past tense
+constexpr const char* kFormRu = "る";            // terminal form suffix
+
+// Common particles
+constexpr const char* kParticleNo = "の";        // genitive/nominalizer
+constexpr const char* kParticleGa = "が";        // nominative
+constexpr const char* kParticleWo = "を";        // accusative
+constexpr const char* kParticleNi = "に";        // dative/locative
+constexpr const char* kParticleHa = "は";        // topic marker
+constexpr const char* kParticleMo = "も";        // also/even
+constexpr const char* kParticleTo = "と";        // quotative/comitative
+constexpr const char* kParticleHe = "へ";        // directional
+constexpr const char* kParticleKa = "か";        // question marker
+constexpr const char* kParticleYa = "や";        // listing marker
+constexpr const char* kParticleNa = "な";        // na-adjective copula/prohibition
+
+// Auxiliary lemmas
+constexpr const char* kLemmaIru = "いる";        // progressive auxiliary
+constexpr const char* kLemmaOru = "おる";        // humble progressive
+constexpr const char* kLemmaShimau = "しまう";   // completive auxiliary
+constexpr const char* kLemmaMiru = "みる";       // try doing
+constexpr const char* kLemmaOku = "おく";        // preparatory
+constexpr const char* kLemmaIku = "いく";        // continuing/going
+constexpr const char* kLemmaKuru = "くる";       // coming/becoming
+constexpr const char* kLemmaAgeru = "あげる";    // giving (up)
+constexpr const char* kLemmaMorau = "もらう";    // receiving
+constexpr const char* kLemmaKureru = "くれる";   // receiving (favor)
+constexpr const char* kLemmaAru = "ある";        // existence/state
+constexpr const char* kLemmaNaru = "なる";       // become
+constexpr const char* kLemmaMasu = "ます";       // polite suffix
+constexpr const char* kLemmaMai = "まい";        // negative volitional
+
+// Copula and sentence-final expressions
+constexpr const char* kCopulaDa = "だ";          // plain copula
+constexpr const char* kCopulaDesu = "です";      // polite copula
+constexpr const char* kSuffixMasen = "ません";   // polite negative
 
 // Valid i-adjective lemma endings (non-verb derived)
 // しい: おいしい, 難しい, 美しい (productive pattern)

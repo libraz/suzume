@@ -24,6 +24,23 @@ namespace suzume::analysis {
 namespace {
 
 // =============================================================================
+// Single-kanji Ichidan verbs (単漢字一段動詞)
+// =============================================================================
+// Common single-kanji Ichidan verbs from L1 dictionary:
+// 見(みる), 居(いる), 着(きる), 寝(ねる), 煮(にる), 似(にる)
+// 経(へる), 干(ひる), 射(いる), 得(える/うる), 出(でる), 鋳(いる)
+constexpr char32_t kSingleKanjiIchidan[] = {
+    U'見', U'居', U'着', U'寝', U'煮', U'似',
+    U'経', U'干', U'射', U'得', U'出', U'鋳'};
+
+inline bool isSingleKanjiIchidan(char32_t c) {
+  for (char32_t k : kSingleKanjiIchidan) {
+    if (c == k) return true;
+  }
+  return false;
+}
+
+// =============================================================================
 // Common Utility Helpers
 // =============================================================================
 
@@ -967,19 +984,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     // Only for known single-kanji Ichidan verbs
     if (!has_rare_suffix && kanji_end == start_pos + 1) {
       char32_t kanji_char = codepoints[start_pos];
-      // Common single-kanji Ichidan verbs:
-      // 見(みる), 居(いる), 着(きる), 寝(ねる), 煮(にる), 似(にる)
-      // 経(へる), 干(ひる), 射(いる), 得(える/うる)
-      bool is_single_kanji_ichidan =
-          (kanji_char == U'見' || kanji_char == U'居' || kanji_char == U'着' ||
-           kanji_char == U'寝' || kanji_char == U'煮' || kanji_char == U'似' ||
-           kanji_char == U'経' || kanji_char == U'干' || kanji_char == U'射' ||
-           kanji_char == U'得');
-      if (is_single_kanji_ichidan) {
+      if (isSingleKanjiIchidan(kanji_char)) {
         // Check for られ suffix right after the single kanji
+        using namespace suzume::core::hiragana;
         if (kanji_end + 1 < codepoints.size() &&
-            codepoints[kanji_end] == U'ら' &&
-            codepoints[kanji_end + 1] == U'れ') {
+            codepoints[kanji_end] == kRa &&
+            codepoints[kanji_end + 1] == kRe) {
           has_rare_suffix = true;
           stem_end = kanji_end;
         }
@@ -1030,6 +1040,49 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     }
   }
 
+  // Generate single-kanji Ichidan verb candidates for polite auxiliary patterns
+  // E.g., 寝ます → 寝(VERB) + ます(AUX), 見ます → 見(VERB) + ます(AUX)
+  // These are single-kanji Ichidan verbs followed by ます or ない
+  if (kanji_end == start_pos + 1 && hiragana_end > kanji_end) {
+    char32_t kanji_char = codepoints[start_pos];
+
+    if (isSingleKanjiIchidan(kanji_char)) {
+      // Check if followed by polite ます or negative ない
+      using namespace suzume::core::hiragana;
+      char32_t h1 = codepoints[kanji_end];
+      char32_t h2 = (kanji_end + 1 < codepoints.size()) ? codepoints[kanji_end + 1] : 0;
+      bool is_polite_aux = (h1 == kMa && h2 == kSu);
+      bool is_negative_aux = (h1 == kNa && h2 == kI);
+
+      if (is_polite_aux || is_negative_aux) {
+        std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
+        std::string base_form = surface + "る";
+
+        UnknownCandidate candidate;
+        candidate.surface = surface;
+        candidate.start = start_pos;
+        candidate.end = kanji_end;
+        candidate.pos = core::PartOfSpeech::Verb;
+        // Strong bonus to beat NOUN candidate from unknown word generator
+        candidate.cost = -0.5F;
+        candidate.has_suffix = true;
+        candidate.lemma = base_form;
+        candidate.conj_type = grammar::verbTypeToConjType(grammar::VerbType::Ichidan);
+        SUZUME_DEBUG_BLOCK {
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
+                              << " single_kanji_ichidan_polite lemma=" << base_form
+                              << " cost=" << candidate.cost << "\n";
+        }
+#ifdef SUZUME_DEBUG_INFO
+        candidate.origin = CandidateOrigin::VerbKanji;
+        candidate.confidence = 0.9F;
+        candidate.pattern = "single_kanji_ichidan_polite";
+#endif
+        candidates.push_back(candidate);
+      }
+    }
+  }
+
   // Generate Godan mizenkei stem candidates for auxiliary separation
   // E.g., 書か (from 書く), 読ま (from 読む), 話さ (from 話す)
   // These connect to passive (れる), causative (せる), negative (ない)
@@ -1041,10 +1094,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // Check if followed by passive/causative auxiliary pattern
       if (mizenkei_end < hiragana_end) {
         char32_t next_char = codepoints[mizenkei_end];
-        // Only generate mizenkei candidates for classical べき patterns
-        // E.g., 書かれべき, 読まれべき (not 書かれる, 読まれる)
+        // Generate mizenkei candidates for:
+        // 1. Classical べき patterns: 書かれべき, 読まれべき
+        // 2. Classical negation ぬ: 揃わぬ, 知らぬ, 行かぬ
         // Standard passive (れる/られる) should remain as compound tokens
         bool is_beki_pattern = false;
+        bool is_nu_pattern = false;
         if (next_char == U'れ' && mizenkei_end + 2 < codepoints.size()) {
           // Check for れべき pattern
           if (codepoints[mizenkei_end + 1] == U'べ' &&
@@ -1052,7 +1107,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             is_beki_pattern = true;
           }
         }
-        if (is_beki_pattern) {
+        // Check for classical negation ぬ pattern
+        // E.g., 揃わぬ → 揃わ (mizenkei) + ぬ (AUX)
+        if (next_char == U'ぬ') {
+          is_nu_pattern = true;
+        }
+        if (is_beki_pattern || is_nu_pattern) {
           // Derive VerbType from the A-row ending (e.g., か → GodanKa)
           grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(first_hira);
           if (verb_type != grammar::VerbType::Unknown) {
@@ -1095,15 +1155,25 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                 candidate.start = start_pos;
                 candidate.end = mizenkei_end;
                 candidate.pos = core::PartOfSpeech::Verb;
-                // Low cost for dictionary-verified mizenkei candidates
-                candidate.cost = 0.2F;
-                candidate.has_suffix = false;
+                // Cost varies by pattern:
+                // - ぬ pattern: negative cost (-0.5F) to beat combined verb form
+                //   揃わぬ(VERB) gets ~-0.1 total, so split needs lower cost
+                // - べき pattern: moderate cost (0.2F) for classical obligation
+                candidate.cost = is_nu_pattern ? -0.5F : 0.2F;
+                candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
                 candidate.lemma = base_form;  // Set lemma to base form
                 candidate.conj_type = grammar::verbTypeToConjType(verb_type);
+                SUZUME_DEBUG_BLOCK {
+                  SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
+                                      << " godan_mizenkei lemma=" << base_form
+                                      << " cost=" << candidate.cost
+                                      << " pattern=" << (is_nu_pattern ? "nu" : "beki")
+                                      << "\n";
+                }
 #ifdef SUZUME_DEBUG_INFO
                 candidate.origin = CandidateOrigin::VerbKanji;
                 candidate.confidence = 0.9F;  // High confidence for verified mizenkei
-                candidate.pattern = "godan_mizenkei";
+                candidate.pattern = is_nu_pattern ? "godan_mizenkei_nu" : "godan_mizenkei";
 #endif
                 candidates.push_back(candidate);
               }

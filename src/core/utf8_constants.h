@@ -42,6 +42,41 @@ constexpr size_t kFourJapaneseCharBytes = kJapaneseCharBytes * 4;  // 12
 /// Length of five Japanese characters in bytes (e.g., "させられる", "させられた")
 constexpr size_t kFiveJapaneseCharBytes = kJapaneseCharBytes * 5;  // 15
 
+// =============================================================================
+// Hiragana Codepoint Constants for Auxiliary Patterns
+// =============================================================================
+// Common hiragana codepoints used in verb/auxiliary pattern detection.
+// Using named constants improves readability and maintainability.
+
+namespace hiragana {
+
+// Polite auxiliary ます
+constexpr char32_t kMa = U'ま';  // ま (0x307E)
+constexpr char32_t kSu = U'す';  // す (0x3059)
+
+// Negative auxiliary ない
+constexpr char32_t kNa = U'な';  // な (0x306A)
+constexpr char32_t kI = U'い';   // い (0x3044)
+
+// Passive/potential られる
+constexpr char32_t kRa = U'ら';  // ら (0x3089)
+constexpr char32_t kRe = U'れ';  // れ (0x308C)
+constexpr char32_t kRu = U'る';  // る (0x308B)
+
+// Te/ta forms
+constexpr char32_t kTe = U'て';  // て (0x3066)
+constexpr char32_t kTa = U'た';  // た (0x305F)
+constexpr char32_t kDe = U'で';  // で (0x3067)
+constexpr char32_t kDa = U'だ';  // だ (0x3060)
+
+// Sokuon (促音)
+constexpr char32_t kSmallTsu = U'っ';  // っ (0x3063)
+
+// Common particles
+constexpr char32_t kO = U'お';  // お (0x304A) - prefix marker
+
+}  // namespace hiragana
+
 }  // namespace suzume::core
 
 // =============================================================================

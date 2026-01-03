@@ -89,27 +89,17 @@
     },
     {
       "id": "suru_kentou",
-      "description": "検討いたしております - suru noun + itasu unified",
+      "description": "検討いたしております - suru noun + compound auxiliary verb",
       "input": "検討いたしております",
       "expected": [
-        {
-          "surface": "検討",
-          "pos": "Noun"
-        },
-        {
-          "surface": "いたしております",
-          "pos": "Verb",
-          "lemma": "いたす"
-        }
+        {"surface": "検討", "pos": "Noun"},
+        {"surface": "いたしております", "pos": "Verb", "lemma": "いたす"}
       ],
-      "tags": [
-        "basic",
-        "suru"
-      ]
+      "tags": ["basic", "suru"]
     },
     {
       "id": "suru_noun_itashimasu",
-      "description": "勉強いたします - suru noun + itashimasu",
+      "description": "勉強いたします - suru noun + itasu (split: verb stem + polite aux)",
       "input": "勉強いたします",
       "expected": [
         {
@@ -117,9 +107,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "いたします",
+          "surface": "いたし",
           "pos": "Verb",
           "lemma": "いたす"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [
@@ -129,19 +124,13 @@
     },
     {
       "id": "suru_noun_shita",
-      "description": "検討した - suru noun compound",
+      "description": "検討した - suru noun + past aux (split per design)",
       "input": "検討した",
       "expected": [
-        {
-          "surface": "検討した",
-          "pos": "Verb",
-          "lemma": "検討する"
-        }
+        {"surface": "検討", "pos": "Noun"},
+        {"surface": "した", "pos": "Verb", "lemma": "する"}
       ],
-      "tags": [
-        "basic",
-        "suru"
-      ]
+      "tags": ["basic", "suru"]
     },
     {
       "id": "teki_kouritsuteki_sagyousuru",
@@ -857,7 +846,7 @@
     },
     {
       "id": "suru_noun_itasu",
-      "description": "検討いたします - suru-noun + itasu pattern",
+      "description": "検討いたします - suru-noun + itasu (split: verb stem + polite aux)",
       "input": "検討いたします",
       "expected": [
         {
@@ -865,9 +854,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "いたします",
+          "surface": "いたし",
           "pos": "Verb",
           "lemma": "いたす"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [

@@ -429,6 +429,16 @@ inline constexpr const char* kValidHiraganaStemExceptions[] = {
 inline constexpr size_t kValidHiraganaStemExceptionCount =
     sizeof(kValidHiraganaStemExceptions) / sizeof(kValidHiraganaStemExceptions[0]);
 
+// Valid 2-char hiragana i-adjective stems ending in ら
+// These are exceptions to the rule that penalizes 2-char ら-ending stems as verb mizenkei
+// E.g., つら (辛い/つらい), きら (嫌い/きらい) are valid i-adjective stems
+inline constexpr const char* kValidIAdjRaStemExceptions[] = {
+    "つら",   // 辛い (つらい) - painful, hard
+    "きら"    // 嫌い (きらい) - dislike
+};
+inline constexpr size_t kValidIAdjRaStemExceptionCount =
+    sizeof(kValidIAdjRaStemExceptions) / sizeof(kValidIAdjRaStemExceptions[0]);
+
 // Kuru verb kanji (来)
 inline constexpr const char* kKuruKanji = "来";
 

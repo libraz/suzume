@@ -39,16 +39,15 @@ struct ConjugatedForm {
 };
 
 // Get conjugated forms for Ichidan verbs (食べる → 食べ + suffix)
+// Note: Polite forms (ます, ました, ません) are NOT included - they should be
+//       analyzed as renyokei + auxiliary per CLAUDE.md design
 std::vector<ConjugatedForm> getIchidanForms() {
   return {
       {"る", ""},        // Base: 食べる
-      {"ます", ""},      // Polite: 食べます
       {"た", ""},        // Past: 食べた
-      {"ました", ""},    // Polite past: 食べました
       {"て", ""},        // Te-form: 食べて
       {"ない", ""},      // Negative: 食べない
       {"ん", ""},        // Contracted negative: 食べん (colloquial)
-      {"ません", ""},    // Polite negative: 食べません
       {"なかった", ""},  // Past negative: 食べなかった
       {"れば", ""},      // Conditional: 食べれば
       {"たら", ""},      // Conditional: 食べたら
@@ -58,17 +57,17 @@ std::vector<ConjugatedForm> getIchidanForms() {
 }
 
 // Get conjugated forms for Godan-Ra verbs (わかる → わか + suffix)
+// Note: Polite forms (ります, りました, りません) are NOT included - they should be
+//       analyzed as renyokei + auxiliary per CLAUDE.md design
 std::vector<ConjugatedForm> getGodanRaForms() {
   return {
       {"る", ""},        // Base: わかる
       {"り", ""},        // Renyokei: わかり (used in compounds or as noun)
-      {"ります", ""},    // Polite: わかります
       {"った", ""},      // Past: わかった
-      {"りました", ""},  // Polite past: わかりました
       {"って", ""},      // Te-form: わかって
       {"らない", ""},    // Negative: わからない
       {"らん", ""},      // Contracted negative: わからん (colloquial)
-      {"りません", ""},  // Polite negative: わかりません
+      {"らぬ", ""},      // Classical negative: わからぬ (archaic/literary)
       {"らなかった", ""},// Past negative: わからなかった
       {"れば", ""},      // Conditional: わかれば
       {"ったら", ""},    // Conditional: わかったら
@@ -78,24 +77,22 @@ std::vector<ConjugatedForm> getGodanRaForms() {
 }
 
 // Get conjugated forms for Godan-Wa verbs (もらう → もら + suffix)
+// Note: Polite forms (います, いました, いません) are NOT included - they should be
+//       analyzed as renyokei + auxiliary per CLAUDE.md design
 std::vector<ConjugatedForm> getGodanWaForms() {
   return {
       {"う", ""},        // Base: もらう
       {"い", ""},        // Renyokei: もらい (used in compounds or as noun)
-      {"います", ""},    // Polite: もらいます
       {"った", ""},      // Past: もらった
-      {"いました", ""},  // Polite past: もらいました
       {"って", ""},      // Te-form: もらって
       {"わない", ""},    // Negative: もらわない
       {"わん", ""},      // Contracted negative: もらわん (colloquial)
-      {"いません", ""},  // Polite negative: もらいません
       {"わなかった", ""},// Past negative: もらわなかった
       {"えば", ""},      // Conditional: もらえば
       {"ったら", ""},    // Conditional: もらったら
       {"おう", ""},      // Volitional: もらおう
       {"え", ""},        // Imperative: もらえ
       {"える", ""},      // Potential: もらえる
-      {"えます", ""},    // Potential polite: もらえます
       {"えない", ""},    // Potential negative: もらえない
   };
 }
@@ -145,36 +142,31 @@ std::vector<ConjugatedForm> getGodanGaForms() {
 }
 
 // Get conjugated forms for Godan-Sa verbs (いたす → いた + suffix)
+// Note: Polite forms (します, しました, しません) are NOT included - they should be
+//       analyzed as renyokei + auxiliary per CLAUDE.md design
 std::vector<ConjugatedForm> getGodanSaForms() {
   return {
       {"す", ""},        // Base: いたす
       {"し", ""},        // Renyokei: いたし (used in compounds)
-      {"します", ""},    // Polite: いたします
       {"した", ""},      // Past: いたした
-      {"しました", ""},  // Polite past: いたしました
       {"して", ""},      // Te-form: いたして
       {"さない", ""},    // Negative: いたさない
       {"さん", ""},      // Contracted negative: いたさん (colloquial)
-      {"しません", ""},  // Polite negative: いたしません
-      {"しまして", ""},  // Te-polite: いたしまして
-      {"しております", ""},  // Progressive polite: いたしております
-      {"しておりました", ""}, // Past progressive polite: いたしておりました
   };
 }
 
 // Generate Suru forms (irregular)
+// Note: Polite forms (します, しました, しません) are NOT included - they should be
+//       analyzed as renyokei + auxiliary per CLAUDE.md design
 std::vector<std::pair<std::string, std::string>> getSuruConjugations(
     const std::string& stem) {
   // stem is empty for する itself
   return {
       {stem + "する", stem + "する"},      // Base
-      {stem + "します", stem + "する"},    // Polite
       {stem + "した", stem + "する"},      // Past
-      {stem + "しました", stem + "する"},  // Polite past
       {stem + "して", stem + "する"},      // Te-form
       {stem + "しない", stem + "する"},    // Negative
       {stem + "せん", stem + "する"},      // Contracted negative (colloquial)
-      {stem + "しません", stem + "する"},  // Polite negative
       {stem + "しなかった", stem + "する"},// Past negative
       {stem + "したら", stem + "する"},    // Conditional
       {stem + "すれば", stem + "する"},    // Conditional
@@ -182,9 +174,7 @@ std::vector<std::pair<std::string, std::string>> getSuruConjugations(
       {stem + "せよ", stem + "する"},      // Imperative (classical)
       {stem + "しよう", stem + "する"},    // Volitional
       {stem + "している", stem + "する"},  // Progressive
-      {stem + "しています", stem + "する"},// Progressive polite
       {stem + "していた", stem + "する"},  // Past progressive
-      {stem + "していました", stem + "する"},// Past progressive polite
   };
 }
 

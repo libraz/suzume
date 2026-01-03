@@ -17,6 +17,39 @@
         "auxiliary",
         "negative"
       ]
+    },
+    {
+      "id": "aux_nu_kienu",
+      "description": "消えぬ - classical negation ぬ, should be VERB+AUX not NOUN",
+      "input": "消えぬ炎",
+      "expected": [
+        {"surface": "消え", "pos": "Verb", "lemma": "消える"},
+        {"surface": "ぬ", "pos": "Auxiliary", "lemma": "ぬ"},
+        {"surface": "炎", "pos": "Noun"}
+      ],
+      "tags": ["auxiliary", "negative", "classical"]
+    },
+    {
+      "id": "aux_nu_sorowanu",
+      "description": "揃わぬ - classical negation ぬ with godan verb",
+      "input": "揃わぬ意見",
+      "expected": [
+        {"surface": "揃わ", "pos": "Verb", "lemma": "揃う"},
+        {"surface": "ぬ", "pos": "Auxiliary", "lemma": "ぬ"},
+        {"surface": "意見", "pos": "Noun"}
+      ],
+      "tags": ["auxiliary", "negative", "classical"]
+    },
+    {
+      "id": "aux_nu_shirenu",
+      "description": "知れぬ - classical negation ぬ with potential verb",
+      "input": "知れぬ心",
+      "expected": [
+        {"surface": "知れ", "pos": "Verb", "lemma": "知る"},
+        {"surface": "ぬ", "pos": "Auxiliary", "lemma": "ぬ"},
+        {"surface": "心", "pos": "Noun"}
+      ],
+      "tags": ["auxiliary", "negative", "classical"]
     }
   ]
 }

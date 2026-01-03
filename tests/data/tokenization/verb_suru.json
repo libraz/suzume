@@ -1,0 +1,189 @@
+{
+  "version": "1.0",
+  "description": "Suru-verb patterns with subsidiary verbs (kureru, kudasaru, iru, aru, oku)",
+  "cases": [
+    {
+      "id": "suru_te_kureru",
+      "description": "説明してくれます - suru noun + compound subsidiary verb",
+      "input": "説明してくれます",
+      "expected": [
+        {"surface": "説明", "pos": "Noun"},
+        {"surface": "してくれます", "pos": "Verb", "lemma": "する"}
+      ],
+      "tags": ["suru", "subsidiary", "kureru", "polite"]
+    },
+    {
+      "id": "suru_te_kudasai",
+      "description": "確認してください - suru te-form + kudasai (polite request)",
+      "input": "確認してください",
+      "expected": [
+        {
+          "surface": "確認して",
+          "pos": "Verb",
+          "lemma": "確認する"
+        },
+        {
+          "surface": "ください",
+          "pos": "Verb",
+          "lemma": "くださる"
+        }
+      ],
+      "tags": ["suru", "subsidiary", "kudasaru", "polite"]
+    },
+    {
+      "id": "suru_te_imasu",
+      "description": "勉強しています - suru te-form + iru polite (progressive)",
+      "input": "勉強しています",
+      "expected": [
+        {
+          "surface": "勉強して",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        },
+        {
+          "surface": "います",
+          "pos": "Auxiliary",
+          "lemma": "いる"
+        }
+      ],
+      "tags": ["suru", "subsidiary", "iru", "polite"]
+    },
+    {
+      "id": "suru_te_arimasu",
+      "description": "確認してあります - suru noun + compound subsidiary verb",
+      "input": "確認してあります",
+      "expected": [
+        {"surface": "確認", "pos": "Noun"},
+        {"surface": "してあります", "pos": "Verb", "lemma": "する"}
+      ],
+      "tags": ["suru", "subsidiary", "aru", "polite"]
+    },
+    {
+      "id": "suru_te_okimasu",
+      "description": "準備しておきます - suru noun + shiteokimasu (preparatory polite) - tokenizes as noun + compound verb",
+      "input": "準備しておきます",
+      "expected": [
+        {
+          "surface": "準備",
+          "pos": "Noun",
+          "lemma": "準備"
+        },
+        {
+          "surface": "しておきます",
+          "pos": "Verb",
+          "lemma": "する"
+        }
+      ],
+      "tags": ["suru", "subsidiary", "oku", "polite"]
+    },
+    {
+      "id": "suru_te_morau",
+      "description": "説明してもらう - suru te-form + morau (receiving benefit) - unified as single verb",
+      "input": "説明してもらう",
+      "expected": [
+        {
+          "surface": "説明してもらう",
+          "pos": "Verb",
+          "lemma": "説明する"
+        }
+      ],
+      "tags": ["suru", "subsidiary", "morau", "unified"]
+    },
+    {
+      "id": "suru_te_ageru",
+      "description": "説明してあげる - suru te-form + ageru (giving benefit) - unified as single verb",
+      "input": "説明してあげる",
+      "expected": [
+        {
+          "surface": "説明してあげる",
+          "pos": "Verb",
+          "lemma": "説明する"
+        }
+      ],
+      "tags": ["suru", "subsidiary", "ageru", "unified"]
+    },
+    {
+      "id": "suru_te_shimau",
+      "description": "勉強してしまう - suru te-form + shimau (completion/regret)",
+      "input": "勉強してしまう",
+      "expected": [
+        {
+          "surface": "勉強して",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        },
+        {
+          "surface": "しまう",
+          "pos": "Auxiliary",
+          "lemma": "しまう"
+        }
+      ],
+      "tags": ["suru", "subsidiary", "shimau"]
+    },
+    {
+      "id": "suru_te_miru",
+      "description": "説明してみる - suru te-form + miru (trying) - unified as single verb",
+      "input": "説明してみる",
+      "expected": [
+        {
+          "surface": "説明してみる",
+          "pos": "Verb",
+          "lemma": "説明する"
+        }
+      ],
+      "tags": ["suru", "subsidiary", "miru", "unified"]
+    },
+    {
+      "id": "suru_te_hoshii",
+      "description": "説明してほしい - suru te-form + hoshii (wanting someone to) - unified as single verb",
+      "input": "説明してほしい",
+      "expected": [
+        {
+          "surface": "説明してほしい",
+          "pos": "Verb",
+          "lemma": "説明する"
+        }
+      ],
+      "tags": ["suru", "subsidiary", "hoshii", "unified"]
+    },
+    {
+      "id": "suru_te_kureru_plain",
+      "description": "説明してくれる - suru te-form + kureru plain - unified as single verb",
+      "input": "説明してくれる",
+      "expected": [
+        {
+          "surface": "説明してくれる",
+          "pos": "Verb",
+          "lemma": "説明する"
+        }
+      ],
+      "tags": ["suru", "subsidiary", "kureru", "unified"]
+    },
+    {
+      "id": "suru_te_iku",
+      "description": "勉強していく - suru te-form + iku (continuing action) - unified as single verb",
+      "input": "勉強していく",
+      "expected": [
+        {
+          "surface": "勉強していく",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": ["suru", "subsidiary", "iku", "unified"]
+    },
+    {
+      "id": "suru_te_kuru",
+      "description": "勉強してくる - suru te-form + kuru (going to do) - unified as single verb",
+      "input": "勉強してくる",
+      "expected": [
+        {
+          "surface": "勉強してくる",
+          "pos": "Verb",
+          "lemma": "勉強する"
+        }
+      ],
+      "tags": ["suru", "subsidiary", "kuru", "unified"]
+    }
+  ]
+}

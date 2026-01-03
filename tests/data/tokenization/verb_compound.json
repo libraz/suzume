@@ -397,13 +397,18 @@
     },
     {
       "id": "humble_osoreirimasu",
-      "description": "恐れ入ります - humble verb single token",
+      "description": "恐れ入ります - humble verb (split: verb stem + polite aux)",
       "input": "恐れ入ります",
       "expected": [
         {
-          "surface": "恐れ入ります",
+          "surface": "恐れ入り",
           "pos": "Verb",
           "lemma": "恐れ入る"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [

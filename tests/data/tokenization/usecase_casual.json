@@ -172,10 +172,11 @@
     },
     {
       "id": "social_announcement",
-      "description": "Personal announcement",
+      "description": "Personal announcement (split: verb stem + polite aux)",
       "input": "引っ越しました",
       "expected": [
-        {"surface": "引っ越しました", "pos": "Verb", "lemma": "引っ越す"}
+        {"surface": "引っ越し", "pos": "Verb", "lemma": "引っ越す"},
+        {"surface": "ました", "pos": "Auxiliary", "lemma": "ました"}
       ],
       "tags": ["social"]
     },

@@ -472,7 +472,7 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       // のみならず: not only... but also - prevent の+みな+ら+ず split (N6)
       {"のみならず", POS::Conjunction, -0.5F, "", false, false, false, CT::None, ""},
 
-      // Additional conjunctions/adverbs (工程3)
+      // Additional conjunctions/adverbs
       // いわば: "so to speak, as it were" - prevent OTHER or い+わ+ば split
       {"いわば", POS::Conjunction, 0.1F, "言わば", false, false, false, CT::None, ""},
       {"言わば", POS::Conjunction, 0.1F, "", false, false, false, CT::None, "いわば"},
@@ -480,7 +480,7 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       {"さもないと", POS::Conjunction, 0.1F, "", false, false, false, CT::None, ""},
       {"さもなければ", POS::Conjunction, 0.1F, "", false, false, false, CT::None, ""},
 
-      // Additional conjunctions (工程4)
+      // Additional conjunctions
       // そんなら: "in that case" - prevent そんな(DET)+ら(PARTICLE) split
       {"そんなら", POS::Conjunction, -1.0F, "其んなら", false, false, false, CT::None, ""},
       // それにしても: "even so, nevertheless" - prevent それ+に+して+も split
@@ -603,6 +603,11 @@ std::vector<DictionaryEntry> getPronounEntries() {
       {"これ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
       {"ここ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
       {"こちら", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
+      // Colloquial demonstratives - prevent っち split
+      {"こっち", POS::Pronoun, 0.1F, "", false, false, true, CT::None, ""},
+      {"そっち", POS::Pronoun, 0.1F, "", false, false, true, CT::None, ""},
+      {"あっち", POS::Pronoun, 0.1F, "", false, false, true, CT::None, ""},
+      {"どっち", POS::Pronoun, 0.1F, "", false, false, true, CT::None, ""},
 
       // Demonstrative - medial (中称)
       {"それ", POS::Pronoun, 0.5F, "", false, false, true, CT::None, ""},
@@ -916,12 +921,30 @@ std::vector<DictionaryEntry> getGreetingEntries() {
       // Thanks and Apologies (感謝・謝罪)
       {"ありがとう", POS::Other, 0.3F, "ありがとう", false, false, false, CT::None, ""},
       {"すみません", POS::Other, 0.3F, "すみません", false, false, false, CT::None, ""},
-      {"ごめんなさい", POS::Other, 0.3F, "ごめんなさい", false, false, false, CT::None, ""},
+      {"ごめんなさい", POS::Other, -0.5F, "ごめんなさい", false, false, false, CT::None, ""},  // Prefer unified over ごめん+なさい split
       {"ごめん", POS::Other, 0.3F, "ごめん", false, false, false, CT::None, ""},
 
       // Interjections (感動詞) - B-6
       // はてな: what?/hmm - prevent は+て+な split (N8)
       {"はてな", POS::Other, -0.5F, "はてな", false, false, false, CT::None, ""},
+
+      // Honorific expressions (敬語表現)
+      // おいで: honorific "come/go/be" - prevent お+い+で split
+      // おいでになる, おいでください patterns need this to be recognized as a unit
+      {"おいで", POS::Verb, -0.5F, "いらっしゃる", false, false, false, CT::Ichidan, ""},
+      // おいでになる compound form (more explicit recognition)
+      {"おいでになる", POS::Verb, -1.5F, "いらっしゃる", false, false, false, CT::Ichidan, ""},
+      // ご覧になる (goran ni naru) - honorific "to see/look"
+      {"ご覧になる", POS::Verb, -1.5F, "ご覧になる", false, false, false, CT::Ichidan, "ごらんになる"},
+      {"ご覧になった", POS::Verb, -1.5F, "ご覧になる", false, false, false, CT::Ichidan, "ごらんになった"},
+      {"ご覧になって", POS::Verb, -1.5F, "ご覧になる", false, false, false, CT::Ichidan, "ごらんになって"},
+      {"ご覧になれる", POS::Verb, -1.5F, "ご覧になる", false, false, false, CT::Ichidan, "ごらんになれる"},
+      {"ご覧になります", POS::Verb, -1.5F, "ご覧になる", false, false, false, CT::Ichidan, "ごらんになります"},
+
+      // Common nouns prone to incorrect splitting
+      // おやじ: father (colloquial) - prevent お+やじ split
+      {"おやじ", POS::Noun, -0.5F, "親父", false, false, false, CT::None, ""},
+      {"親父", POS::Noun, 0.3F, "", false, false, false, CT::None, "おやじ"},
   };
 }
 
@@ -952,6 +975,21 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       {"なかなか", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"ほとんど", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
       {"ちょっと", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
+      {"ほぼ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
+
+      // Quantity/degree adverbs often incorrectly tagged as NOUN
+      {"少々", POS::Adverb, 0.1F, "", false, false, false, CT::None, "しょうしょう"},
+      {"多少", POS::Adverb, 0.1F, "", false, false, false, CT::None, "たしょう"},
+      {"若干", POS::Adverb, 0.1F, "", false, false, false, CT::None, "じゃっかん"},
+      {"大体", POS::Adverb, 0.1F, "", false, false, false, CT::None, "だいたい"},
+      // Hiragana forms need negative cost to prevent splitting
+      {"だいたい", POS::Adverb, -0.5F, "大体", false, false, false, CT::None, ""},
+      {"いったい", POS::Adverb, -0.5F, "一体", false, false, false, CT::None, ""},
+      // せめて needs low cost to beat VERB interpretation (せめる te-form)
+      {"せめて", POS::Adverb, -0.3F, "", false, false, false, CT::None, ""},
+      // さすが needs low cost to beat ADJ interpretation (流石)
+      {"さすが", POS::Adverb, 0.0F, "流石", false, false, false, CT::None, ""},
+      {"流石", POS::Adverb, 0.0F, "", false, false, false, CT::None, "さすが"},
 
       // Manner adverbs (様態副詞)
       {"ゆっくり", POS::Adverb, 0.5F, "", false, false, false, CT::None, ""},
@@ -1197,7 +1235,7 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       // protected by their dictionary entries or unknown compound generation.
       {"第一", POS::Adverb, -0.5F, "", false, false, false, CT::None, "だいいち"},
 
-      // Closed-class adverbs prone to missplit (工程3)
+      // Closed-class adverbs prone to missplit
       // なにしろ: "anyway, at any rate" - prevent なに+しろ(VERB) split
       // Very low cost needed because なに(PRON) + しろ(VERB) is a strong parse
       {"なにしろ", POS::Adverb, -1.5F, "何しろ", false, false, false, CT::None, ""},
@@ -1222,6 +1260,13 @@ std::vector<DictionaryEntry> getAdverbEntries() {
       // 頻りに / しきりに: "frequently, incessantly" - prevent しきり(VERB)+に split
       {"頻りに", POS::Adverb, 0.1F, "", false, false, false, CT::None, "しきりに"},
       {"しきりに", POS::Adverb, 0.1F, "頻りに", false, false, false, CT::None, ""},
+
+      // Adverbs incorrectly tagged as OTHER
+      // さほど: "not so much" (with negative) - prevent さ+ほど split
+      {"さほど", POS::Adverb, 0.1F, "", false, false, false, CT::None, ""},
+      // もっぱら: "exclusively, solely" - prevent も+っぱ+ら split
+      {"もっぱら", POS::Adverb, 0.1F, "専ら", false, false, false, CT::None, ""},
+      {"専ら", POS::Adverb, 0.1F, "", false, false, false, CT::None, "もっぱら"},
   };
 }
 
@@ -1495,6 +1540,7 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       // Godan-Ra verbs (五段ラ行)
       {"やる", POS::Verb, 0.3F, "やる", false, false, false, CT::GodanRa, ""},
       {"わかる", POS::Verb, 0.3F, "わかる", false, false, false, CT::GodanRa, ""},
+      {"分かる", POS::Verb, 0.3F, "分かる", false, false, false, CT::GodanRa, "わかる"},
       {"なる", POS::Verb, 0.3F, "なる", false, false, false, CT::GodanRa, ""},
       // B48: かかる starts with か (particle-like) - prevent か+かって split
       {"かかる", POS::Verb, 0.3F, "かかる", false, false, false, CT::GodanRa, ""},

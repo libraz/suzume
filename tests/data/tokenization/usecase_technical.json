@@ -105,7 +105,7 @@
     },
     {
       "id": "tech_doc_configuration",
-      "description": "Configuration instruction",
+      "description": "Configuration instruction (split: verb stem + polite aux)",
       "input": "設定ファイルを編集する必要があります",
       "expected": [
         {"surface": "設定", "pos": "Noun"},
@@ -114,7 +114,8 @@
         {"surface": "編集する", "pos": "Verb"},
         {"surface": "必要", "pos": "Adjective"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "あります", "pos": "Verb", "lemma": "ある"}
+        {"surface": "あり", "pos": "Verb", "lemma": "ある"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["technical", "documentation"]
     },
@@ -247,7 +248,7 @@
     },
     {
       "id": "multi_clause_conditional_tara",
-      "description": "Conditional sentence with tara",
+      "description": "Conditional sentence with tara (split: verb stem + polite aux)",
       "input": "雨が降ったら、試合は中止になります",
       "expected": [
         {"surface": "雨", "pos": "Noun"},
@@ -257,45 +258,48 @@
         {"surface": "は", "pos": "Particle"},
         {"surface": "中止", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "なります", "pos": "Verb", "lemma": "なる"}
+        {"surface": "なり", "pos": "Verb", "lemma": "なる"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["multi-clause"]
     },
     {
       "id": "multi_clause_conditional_ba",
-      "description": "Conditional sentence with ba",
+      "description": "Conditional sentence with ba (split: verb stem + polite aux)",
       "input": "時間があれば手伝います",
       "expected": [
         {"surface": "時間", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "あれば", "pos": "Verb", "lemma": "ある"},
-        {"surface": "手伝います", "pos": "Verb", "lemma": "手伝う"}
+        {"surface": "手伝い", "pos": "Verb", "lemma": "手伝う"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["multi-clause"]
     },
     {
       "id": "multi_clause_reason_kara",
-      "description": "Reason clause with kara - 活用形は1トークン",
+      "description": "Reason clause with kara - single-kanji Ichidan verb + polite auxiliary",
       "input": "疲れたから早く寝ます",
       "expected": [
         {"surface": "疲れた", "pos": "Verb", "lemma": "疲れる"},
         {"surface": "から", "pos": "Particle"},
         {"surface": "早く", "pos": "Adjective", "lemma": "早い"},
-        {"surface": "寝ます", "pos": "Verb", "lemma": "寝る"}
+        {"surface": "寝", "pos": "Verb", "lemma": "寝る"},
+        {"surface": "ます", "pos": "Auxiliary"}
       ],
       "tags": ["multi-clause"]
     },
     {
       "id": "multi_clause_reason_node",
-      "description": "Reason clause with node - MeCab互換分割",
+      "description": "Reason clause with node - suru compound verb with polite aux",
       "input": "忙しいので後で連絡します",
       "expected": [
         {"surface": "忙しい", "pos": "Adjective"},
         {"surface": "ので", "pos": "Particle"},
         {"surface": "後", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
-        {"surface": "連絡", "pos": "Noun"},
-        {"surface": "します", "pos": "Verb", "lemma": "する"}
+        {"surface": "連絡し", "pos": "Verb", "lemma": "連絡する"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["multi-clause", "suru_verb"]
     },
@@ -542,12 +546,13 @@
     },
     {
       "id": "medical_allergy",
-      "description": "Allergy question",
+      "description": "Allergy question (split: verb stem + polite aux)",
       "input": "アレルギーはありますか",
       "expected": [
         {"surface": "アレルギー", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "あります", "pos": "Verb", "lemma": "ある"},
+        {"surface": "あり", "pos": "Verb", "lemma": "ある"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"},
         {"surface": "か", "pos": "Particle"}
       ],
       "tags": ["medical"]

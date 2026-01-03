@@ -117,7 +117,8 @@
         {"surface": "に", "pos": "Particle"},
         {"surface": "会議", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "あります", "pos": "Verb", "lemma": "ある"}
+        {"surface": "あり", "pos": "Verb", "lemma": "ある"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["schedule"]
     },
@@ -205,11 +206,13 @@
     },
     {
       "id": "shop_payment",
+      "description": "Payment method: カードで払えますか - potential verb with polite aux",
       "input": "カードで払えますか",
       "expected": [
         {"surface": "カード", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
-        {"surface": "払えます", "pos": "Verb", "lemma": "払う"},
+        {"surface": "払え", "pos": "Verb"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"},
         {"surface": "か", "pos": "Particle"}
       ],
       "tags": ["shopping"]
@@ -255,7 +258,8 @@
         {"surface": "もう", "pos": "Adverb"},
         {"surface": "少し", "pos": "Adverb"},
         {"surface": "安く", "pos": "Adjective", "lemma": "安い"},
-        {"surface": "なります", "pos": "Verb", "lemma": "なる"},
+        {"surface": "なり", "pos": "Verb", "lemma": "なる"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"},
         {"surface": "か", "pos": "Particle"}
       ],
       "tags": ["shopping"]
@@ -267,7 +271,8 @@
         {"surface": "大きい", "pos": "Adjective"},
         {"surface": "サイズ", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "あります", "pos": "Verb", "lemma": "ある"},
+        {"surface": "あり", "pos": "Verb", "lemma": "ある"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"},
         {"surface": "か", "pos": "Particle"}
       ],
       "tags": ["shopping"]
@@ -280,7 +285,8 @@
         {"surface": "の", "pos": "Particle"},
         {"surface": "色", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "あります", "pos": "Verb", "lemma": "ある"},
+        {"surface": "あり", "pos": "Verb", "lemma": "ある"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"},
         {"surface": "か", "pos": "Particle"}
       ],
       "tags": ["shopping"]
@@ -315,7 +321,7 @@
     },
     {
       "id": "travel_delay",
-      "description": "Formal ております pattern - おります as verb",
+      "description": "Formal ております pattern (split: verb stem + polite aux)",
       "input": "電車が10分ほど遅れております",
       "expected": [
         {"surface": "電車", "pos": "Noun"},
@@ -323,7 +329,8 @@
         {"surface": "10分", "pos": "Noun"},
         {"surface": "ほど", "pos": "Particle"},
         {"surface": "遅れて", "pos": "Verb", "lemma": "遅れる"},
-        {"surface": "おります", "pos": "Verb", "lemma": "おる"}
+        {"surface": "おり", "pos": "Verb", "lemma": "おる"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["travel", "formal"]
     },
@@ -363,7 +370,8 @@
         {"surface": "泊まれる", "pos": "Verb"},
         {"surface": "部屋", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "あります", "pos": "Verb", "lemma": "ある"},
+        {"surface": "あり", "pos": "Verb", "lemma": "ある"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"},
         {"surface": "か", "pos": "Particle"}
       ],
       "tags": ["travel"]

@@ -165,41 +165,15 @@
     },
     {
       "id": "aux_kamoshiremasen",
-      "description": "かもしれません in sentence - decomposes correctly",
+      "description": "かもしれません in sentence - grammaticalized modal as single auxiliary",
       "input": "明日は雨かもしれません",
       "expected": [
-        {
-          "surface": "明日",
-          "pos": "Noun"
-        },
-        {
-          "surface": "は",
-          "pos": "Particle"
-        },
-        {
-          "surface": "雨",
-          "pos": "Noun"
-        },
-        {
-          "surface": "か",
-          "pos": "Particle",
-          "lemma": "か"
-        },
-        {
-          "surface": "も",
-          "pos": "Particle",
-          "lemma": "も"
-        },
-        {
-          "surface": "しれません",
-          "pos": "Verb",
-          "lemma": "しれる"
-        }
+        {"surface": "明日", "pos": "Noun"},
+        {"surface": "は", "pos": "Particle"},
+        {"surface": "雨", "pos": "Noun"},
+        {"surface": "かもしれません", "pos": "Auxiliary", "lemma": "かもしれない"}
       ],
-      "tags": [
-        "auxiliary",
-        "possibility"
-      ]
+      "tags": ["auxiliary", "possibility"]
     },
     {
       "id": "aux_mai_negative_conjecture",
@@ -998,33 +972,13 @@
     },
     {
       "id": "adverb_sou_kamoshirenai",
-      "description": "そうかもしれません - kamoshirenai decomposes",
+      "description": "そうかもしれません - grammaticalized modal as single auxiliary",
       "input": "そうかもしれません",
       "expected": [
-        {
-          "surface": "そう",
-          "pos": "Adverb"
-        },
-        {
-          "surface": "か",
-          "pos": "Particle",
-          "lemma": "か"
-        },
-        {
-          "surface": "も",
-          "pos": "Particle",
-          "lemma": "も"
-        },
-        {
-          "surface": "しれません",
-          "pos": "Verb",
-          "lemma": "しれる"
-        }
+        {"surface": "そう", "pos": "Adverb"},
+        {"surface": "かもしれません", "pos": "Auxiliary", "lemma": "かもしれない"}
       ],
-      "tags": [
-        "adverb",
-        "sou"
-      ]
+      "tags": ["adverb", "sou"]
     },
     {
       "id": "determiner_sonna",

@@ -46,22 +46,23 @@ bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma) {
   // ます form auxiliaries (require masu-stem)
   if (surface.size() >= core::kTwoJapaneseCharBytes) {
     std::string_view first6 = surface.substr(0, core::kTwoJapaneseCharBytes);
-    if (first6 == "ます" || first6 == "まし" || first6 == "ませ") {
+    if (first6 == scorer::kLemmaMasu ||
+        first6 == "まし" || first6 == "ませ") {  // masu conjugations
       return true;
     }
   }
   // Check lemma for ます
-  if (lemma == "ます") {
+  if (lemma == scorer::kLemmaMasu) {
     return true;
   }
   // たい form (desire) - always verb-specific
-  if (lemma == "たい") {
+  if (lemma == scorer::kSuffixTai) {
     return true;
   }
   // そう form (appearance auxiliary) - requires verb renyokei
   // PARTICLE + そう(AUX) is invalid; そう as adverb is the correct interpretation
   // E.g., にそう should be に + そう(ADV), not PARTICLE + そう(AUX)
-  if (lemma == "そう" && surface == "そう") {
+  if (lemma == scorer::kSuffixSou && surface == scorer::kSuffixSou) {
     return true;
   }
   return false;
@@ -125,7 +126,7 @@ ConnectionRuleResult checkSouAuxAfterVerbRenyokei(const core::LatticeEdge& prev,
                                                    const ConnectionOptions& opts) {
   if (!isVerbToAux(prev, next)) return {};
 
-  if (next.surface != "そう" || next.lemma != "そう") return {};
+  if (next.surface != scorer::kSuffixSou || next.lemma != scorer::kSuffixSou) return {};
 
   // Verb must end with renyokei marker (i-row, e-row for ichidan, or onbin markers)
   if (!endsWithRenyokeiMarker(prev.surface)) return {};
@@ -169,16 +170,16 @@ ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
   if (next.surface.size() == core::kJapaneseCharBytes) {
     // Single-character auxiliary after te-form
     // Only valid patterns: part of contracted forms handled elsewhere
-    // Invalid: standalone "る", "た" that should be part of てる/てた
-    if (next.surface == "る") {
+    // Invalid: standalone る, た that should be part of てる/てた
+    if (next.surface == scorer::kFormRu) {
       return {ConnectionPattern::InvalidTeFormAux,
               opts.penalty_invalid_single_char_aux,
               "invalid single-char aux after te-form"};
     }
-    // "た" after te-form is likely contracted -ていた form (買ってた, 見てた)
+    // た after te-form is likely contracted -ていた form (買ってた, 見てた)
     // Add penalty to prefer unified てた analysis over split て + た
     // This handles the colloquial contraction ている → てる, ていた → てた
-    if (next.surface == "た") {
+    if (next.surface == scorer::kFormTa) {
       return {ConnectionPattern::InvalidTeFormAux,
               opts.penalty_te_form_ta_contraction,
               "te-form + ta (likely contracted teita)"};
@@ -196,7 +197,7 @@ ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
                                        const ConnectionOptions& opts) {
   if (!isAuxToParticle(prev, next)) return {};
 
-  if (next.surface != "で") return {};
+  if (next.surface != scorer::kFormDe) return {};
 
   // Check if prev ends with ません (negative polite form)
   // UTF-8: ません = 9 bytes (3 hiragana chars)
@@ -204,7 +205,7 @@ ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
     return {};
   }
   std::string_view last9 = prev.surface.substr(prev.surface.size() - core::kThreeJapaneseCharBytes);
-  if (last9 != "ません") {
+  if (last9 != scorer::kSuffixMasen) {
     return {};
   }
 
@@ -236,7 +237,7 @@ ConnectionRuleResult checkMaiAfterNoun(const core::LatticeEdge& prev,
                                        const ConnectionOptions& opts) {
   if (!isNounToAux(prev, next)) return {};
 
-  if (next.surface != "まい") return {};
+  if (next.surface != scorer::kLemmaMai) return {};
 
   // Penalty to prefer verb stem + まい over noun + まい
   return {ConnectionPattern::NounBeforeVerbAux, opts.penalty_noun_mai,
@@ -255,7 +256,9 @@ ConnectionRuleResult checkNounIRowToVerbAux(const core::LatticeEdge& prev,
 
   // Target verb conjugation markers: る (terminal), て (te-form), た (past)
   // These are verb suffixes that nouns cannot take
-  if (next.surface != "る" && next.surface != "て" && next.surface != "た") {
+  if (next.surface != scorer::kFormRu &&
+      next.surface != scorer::kFormTe &&
+      next.surface != scorer::kFormTa) {
     return {};
   }
 

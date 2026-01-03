@@ -129,7 +129,7 @@
     },
     {
       "id": "honorific_verb_otsutae",
-      "description": "お伝えいたします - honorific verb pattern",
+      "description": "お伝えいたします - honorific verb pattern (split: verb stem + polite aux)",
       "input": "お伝えいたします",
       "expected": [
         {
@@ -141,9 +141,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "いたします",
+          "surface": "いたし",
           "pos": "Verb",
           "lemma": "いたす"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [

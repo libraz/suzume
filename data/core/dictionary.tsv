@@ -179,6 +179,7 @@
 出しゃばる	VERB	でしゃばる	0.8	GODAN_RA
 あがる	VERB	あがる	0.8	GODAN_RA
 相次ぐ	VERB	あいつぐ	0.5	GODAN_GA
+怒鳴る	VERB	どなる	0.5	GODAN_RA
 # B65: 詰まる - moved to L1 for conjugation expansion
 
 # --- Ichidan verbs: Disambiguation needed ---
@@ -347,6 +348,12 @@ Wi-Fi	NOUN		0.5
 猫	NOUN	ねこ	0.5
 うだつ	NOUN	うだつ	0.8
 
+# --- Suru-verb nouns (サ変名詞) ---
+# These need explicit entries to prevent 漢字+い misinterpretation as i-adjective
+# e.g., 検討いたしております would become 検討い(ADJ)+たしております without this
+# Low cost (-0.5) to beat unknown ADJ candidates with optimal_length bonus
+検討	NOUN	けんとう	-0.5
+
 # =============================================================================
 # SUFFIXES (接尾辞)
 # =============================================================================
@@ -429,6 +436,20 @@ Wi-Fi	NOUN		0.5
 ウソ電話	NOUN	うそでんわ	0.5
 デマ情報	NOUN	でまじょうほう	0.5
 ガチ勢	NOUN	がちぜい	0.5
+
+# --- サブカル・スラング複合名詞 ---
+# カタカナ+漢字/ひらがな混合で誤分割されるもののみ
+コロ助	NOUN	ころすけ	0.3
+ドラえもん	NOUN	どらえもん	0.3
+のび太	NOUN	のびた	0.3
+パパ活	NOUN	ぱぱかつ	0.3
+推し活	NOUN	おしかつ	0.3
+陰キャ	NOUN	いんきゃ	0.3
+陽キャ	NOUN	ようきゃ	0.3
+神ゲー	NOUN	かみげー	0.3
+コミュ障	NOUN	こみゅしょう	0.3
+好きピ	NOUN	すきぴ	0.3
+彼ピ	NOUN	かれぴ	0.3
 
 # These are verb renyokei forms commonly used as standalone nouns
 # 感じ needs higher cost to not beat 感じる conjugations

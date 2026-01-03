@@ -914,18 +914,18 @@
     },
     {
       "id": "na_sasuga_base",
-      "description": "さすが (as expected - base form)",
+      "description": "さすが (as expected - standalone is ADV, not ADJ)",
       "input": "さすが",
       "expected": [
         {
           "surface": "さすが",
-          "pos": "Adjective",
+          "pos": "Adverb",
           "lemma": "流石"
         }
       ],
       "tags": [
         "grammar",
-        "na-adjective",
+        "adverb",
         "sasuga"
       ]
     },

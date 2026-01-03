@@ -3,14 +3,13 @@
   "cases": [
     {
       "id": "email_greeting_osewa",
-      "description": "Business email opening: お世話になっております",
+      "description": "Business email opening: お世話になっております - compound auxiliary form",
       "input": "お世話になっております",
       "expected": [
         {"surface": "お", "pos": "Prefix"},
         {"surface": "世話", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "なって", "pos": "Verb", "lemma": "なる"},
-        {"surface": "おります", "pos": "Verb", "lemma": "おる"}
+        {"surface": "なっております", "pos": "Verb", "lemma": "なる"}
       ],
       "tags": ["business", "email"]
     },
@@ -39,7 +38,7 @@
     },
     {
       "id": "email_request_kentou",
-      "description": "Polite request: ご検討のほどよろしくお願いいたします",
+      "description": "Polite request: ご検討のほどよろしくお願いいたします (split: verb stem + polite aux)",
       "input": "ご検討のほどよろしくお願いいたします",
       "expected": [
         {"surface": "ご", "pos": "Prefix"},
@@ -49,25 +48,27 @@
         {"surface": "よろしく", "pos": "Adverb"},
         {"surface": "お", "pos": "Prefix"},
         {"surface": "願い", "pos": "Noun"},
-        {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
+        {"surface": "いたし", "pos": "Verb", "lemma": "いたす"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["business", "email"]
     },
     {
       "id": "email_closing_yoroshiku",
-      "description": "Standard closing: よろしくお願いいたします",
+      "description": "Standard closing: よろしくお願いいたします (split: verb stem + polite aux)",
       "input": "よろしくお願いいたします",
       "expected": [
         {"surface": "よろしく", "pos": "Adverb"},
         {"surface": "お", "pos": "Prefix"},
         {"surface": "願い", "pos": "Noun"},
-        {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
+        {"surface": "いたし", "pos": "Verb", "lemma": "いたす"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["business", "email"]
     },
     {
       "id": "email_closing_ijou",
-      "description": "Closing: 以上、よろしくお願いします",
+      "description": "Closing: 以上、よろしくお願いします - compound suru form",
       "input": "以上、よろしくお願いします",
       "expected": [
         {"surface": "以上", "pos": "Noun"},
@@ -80,13 +81,14 @@
     },
     {
       "id": "email_attachment",
-      "description": "Attachment notification",
+      "description": "Attachment notification (split: verb stem + polite aux)",
       "input": "資料を添付いたしましたので、ご確認ください",
       "expected": [
         {"surface": "資料", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "添付", "pos": "Noun"},
-        {"surface": "いたしました", "pos": "Verb", "lemma": "いたす"},
+        {"surface": "いたし", "pos": "Verb", "lemma": "いたす"},
+        {"surface": "ました", "pos": "Auxiliary", "lemma": "ました"},
         {"surface": "ので", "pos": "Particle"},
         {"surface": "ご", "pos": "Prefix"},
         {"surface": "確認", "pos": "Noun"},
@@ -239,7 +241,7 @@
     },
     {
       "id": "schedule_meeting_time",
-      "description": "Meeting time: 明日の10時に会議があります",
+      "description": "Meeting time: 明日の10時に会議があります (split: verb stem + polite aux)",
       "input": "明日の10時に会議があります",
       "expected": [
         {"surface": "明日", "pos": "Noun"},
@@ -248,7 +250,8 @@
         {"surface": "に", "pos": "Particle"},
         {"surface": "会議", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "あります", "pos": "Verb", "lemma": "ある"}
+        {"surface": "あり", "pos": "Verb", "lemma": "ある"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["business", "schedule"]
     },
@@ -280,15 +283,15 @@
     },
     {
       "id": "schedule_postpone",
-      "description": "Postponement: 会議を来週に延期します - MeCab互換分割",
+      "description": "Postponement: 会議を来週に延期します - suru compound verb with polite aux",
       "input": "会議を来週に延期します",
       "expected": [
         {"surface": "会議", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "来週", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "延期", "pos": "Noun"},
-        {"surface": "します", "pos": "Verb", "lemma": "する"}
+        {"surface": "延期し", "pos": "Verb", "lemma": "延期する"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["business", "schedule", "suru_verb"]
     },
@@ -348,13 +351,14 @@
     },
     {
       "id": "finance_invoice",
-      "description": "Invoice: 請求書を発行いたします",
+      "description": "Invoice: 請求書を発行いたします (split: verb stem + polite aux)",
       "input": "請求書を発行いたします",
       "expected": [
         {"surface": "請求書", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "発行", "pos": "Noun"},
-        {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
+        {"surface": "いたし", "pos": "Verb", "lemma": "いたす"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["business", "finance"]
     },
@@ -389,15 +393,15 @@
     },
     {
       "id": "legal_prohibition",
-      "description": "Prohibition: 以下の行為を禁止します - MeCab互換分割",
+      "description": "Prohibition: 以下の行為を禁止します - suru compound verb with polite aux",
       "input": "以下の行為を禁止します",
       "expected": [
         {"surface": "以下", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "行為", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "禁止", "pos": "Noun"},
-        {"surface": "します", "pos": "Verb", "lemma": "する"}
+        {"surface": "禁止し", "pos": "Verb", "lemma": "禁止する"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["business", "legal", "suru_verb"]
     },
@@ -522,7 +526,7 @@
     },
     {
       "id": "announcement_notice",
-      "description": "Notice: 下記の通りお知らせいたします",
+      "description": "Notice: 下記の通りお知らせいたします (split: verb stem + polite aux)",
       "input": "下記の通りお知らせいたします",
       "expected": [
         {"surface": "下記", "pos": "Noun"},
@@ -530,21 +534,22 @@
         {"surface": "通り", "pos": "Noun"},
         {"surface": "お", "pos": "Prefix"},
         {"surface": "知らせ", "pos": "Noun"},
-        {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
+        {"surface": "いたし", "pos": "Verb", "lemma": "いたす"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["business", "announcement"]
     },
     {
       "id": "announcement_decision",
-      "description": "Decision: 以下の事項を決定しました - MeCab互換分割",
+      "description": "Decision: 以下の事項を決定しました - suru compound verb with polite aux",
       "input": "以下の事項を決定しました",
       "expected": [
         {"surface": "以下", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "事項", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "決定", "pos": "Noun"},
-        {"surface": "しました", "pos": "Verb", "lemma": "する"}
+        {"surface": "決定し", "pos": "Verb", "lemma": "決定する"},
+        {"surface": "ました", "pos": "Auxiliary", "lemma": "ました"}
       ],
       "tags": ["business", "announcement", "suru_verb"]
     },

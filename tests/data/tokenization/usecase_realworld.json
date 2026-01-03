@@ -897,7 +897,7 @@
     },
     {
       "id": "complex_business_invoice",
-      "description": "Business invoice style",
+      "description": "Business invoice style (split: verb stem + polite aux)",
       "input": "100万円の請求書を送付いたしました",
       "expected": [
         {
@@ -921,9 +921,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "いたしました",
+          "surface": "いたし",
           "pos": "Verb",
           "lemma": "いたす"
+        },
+        {
+          "surface": "ました",
+          "pos": "Auxiliary",
+          "lemma": "ました"
         }
       ],
       "tags": [

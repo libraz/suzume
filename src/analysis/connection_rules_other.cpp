@@ -19,7 +19,7 @@ ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
 
   // Check if next is なる or starts with なり
   bool is_naru =
-      next.lemma == "なる" ||
+      next.lemma == scorer::kLemmaNaru ||
       (next.surface.size() >= core::kTwoJapaneseCharBytes &&
        next.surface.substr(0, core::kTwoJapaneseCharBytes) == "なり");
 
@@ -78,7 +78,7 @@ ConnectionRuleResult checkCharacterSpeechSplit(const core::LatticeEdge& prev,
                                                const ConnectionOptions& opts) {
   if (!isAuxToAux(prev, next)) return {};
 
-  if (prev.surface != "だ" && prev.surface != "です") {
+  if (prev.surface != scorer::kCopulaDa && prev.surface != scorer::kCopulaDesu) {
     return {};
   }
 
@@ -102,7 +102,7 @@ ConnectionRuleResult checkYoruNightAfterNi(const core::LatticeEdge& prev,
                                            const ConnectionOptions& opts) {
   if (!isParticleToNoun(prev, next)) return {};
 
-  if (prev.surface != "に") return {};
+  if (prev.surface != scorer::kParticleNi) return {};
 
   // Check if next is よる with lemma 夜 (night)
   if (next.surface != "よる" || next.lemma != "夜") {
@@ -173,7 +173,7 @@ ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
       next.surface.size() == core::kJapaneseCharBytes &&
       prev.surface == next.surface) {
     // Exception: と + と in quotation (〜と言ったとか)
-    if (prev.surface == "と") {
+    if (prev.surface == scorer::kParticleTo) {
       return {};
     }
     return {ConnectionPattern::SameParticleRepeated,
@@ -213,15 +213,17 @@ ConnectionRuleResult checkSuspiciousParticleSequence(
 
   // Valid compounds: case + topic marker (は/も/の)
   // には, では, とは, へは, からは etc.
-  if ((p == "に" || p == "で" || p == "と" || p == "へ") &&
-      (n == "は" || n == "も" || n == "の")) {
+  if ((p == scorer::kParticleNi || p == scorer::kFormDe ||
+       p == scorer::kParticleTo || p == scorer::kParticleHe) &&
+      (n == scorer::kParticleHa || n == scorer::kParticleMo ||
+       n == scorer::kParticleNo)) {
     return {};  // Valid compound
   }
 
   // し/な after short particle is suspicious
   // し as listing particle (し接続助詞) should follow predicates, not particles
   // な as prohibition/emphasis particle (するな, 来たな) should follow verbs
-  if (n == "し" || n == "な") {
+  if (n == scorer::kSuffixShi || n == scorer::kParticleNa) {
     return {ConnectionPattern::SuspiciousParticleSequence,
             opts.penalty_suspicious_particle_sequence,
             "particle after short particle (likely split)"};
@@ -230,7 +232,8 @@ ConnectionRuleResult checkSuspiciousParticleSequence(
   // が/を after certain particles is suspicious
   // These case particles usually follow nouns, not other particles
   // Exceptions: のが, ので are valid
-  if ((n == "が" || n == "を") && p != "の") {
+  if ((n == scorer::kParticleGa || n == scorer::kParticleWo) &&
+      p != scorer::kParticleNo) {
     return {ConnectionPattern::SuspiciousParticleSequence,
             opts.penalty_suspicious_particle_sequence,
             "case particle after short particle (likely split)"};
@@ -255,10 +258,12 @@ ConnectionRuleResult checkHiraganaNounStartsWithParticle(
   // Check if first character is a common particle
   // も、の、が、を、に、は、で、と、へ、か、や
   std::string_view first3 = next.surface.substr(0, core::kJapaneseCharBytes);
-  if (first3 == "も" || first3 == "の" || first3 == "が" ||
-      first3 == "を" || first3 == "に" || first3 == "は" ||
-      first3 == "で" || first3 == "と" || first3 == "へ" ||
-      first3 == "か" || first3 == "や") {
+  if (first3 == scorer::kParticleMo || first3 == scorer::kParticleNo ||
+      first3 == scorer::kParticleGa || first3 == scorer::kParticleWo ||
+      first3 == scorer::kParticleNi || first3 == scorer::kParticleHa ||
+      first3 == scorer::kFormDe || first3 == scorer::kParticleTo ||
+      first3 == scorer::kParticleHe || first3 == scorer::kParticleKa ||
+      first3 == scorer::kParticleYa) {
     // Penalty to prefer NOUN + PARTICLE over NOUN + NOUN(starts with particle)
     return {ConnectionPattern::HiraganaNounStartsWithParticle,
             opts.penalty_hiragana_noun_starts_with_particle,
@@ -345,7 +350,7 @@ ConnectionRuleResult checkParticleBeforeHiraganaVerb(
   // e.g., が + けて in 心がけて should be single verb 心がける
   if (next.surface.size() >= core::kJapaneseCharBytes) {
     std::string_view last = next.surface.substr(next.surface.size() - core::kJapaneseCharBytes);
-    if (last == "て" || last == "で") {
+    if (last == scorer::kFormTe || last == scorer::kFormDe) {
       // Short te-forms (2 chars) get moderate penalty - often erroneous splits
       // e.g., けて, して (from 1-char stem verbs) are rare and usually wrong
       if (next.surface.size() <= core::kTwoJapaneseCharBytes) {
@@ -360,7 +365,7 @@ ConnectionRuleResult checkParticleBeforeHiraganaVerb(
   // Don't penalize ている/でいる progressive forms
   if (next.surface.size() >= core::kThreeJapaneseCharBytes) {
     std::string_view last3 = next.surface.substr(next.surface.size() - core::kThreeJapaneseCharBytes);
-    if (last3 == "ている" || last3 == "でいる") {
+    if (last3 == scorer::kPatternTeIru || last3 == scorer::kPatternDeIru) {
       return {};  // Valid progressive form, no penalty
     }
   }
@@ -377,7 +382,7 @@ ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
                                                 const core::LatticeEdge& next,
                                                 const ConnectionOptions& opts) {
   // Only applies to し particle
-  if (next.pos != core::PartOfSpeech::Particle || next.surface != "し") {
+  if (next.pos != core::PartOfSpeech::Particle || next.surface != scorer::kSuffixShi) {
     return {};
   }
 
@@ -388,7 +393,7 @@ ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
       // Must end with い for i-adjective shuushikei
       if (prev.surface.size() >= core::kJapaneseCharBytes &&
           prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes) ==
-              "い") {
+              "い") {  // i-adjective ending
         return {ConnectionPattern::ShiParticleAfterPredicate,
                 -opts.bonus_shi_after_i_adj, "i-adj + shi particle (valid)"};
       }
@@ -432,9 +437,9 @@ ConnectionRuleResult checkNaParticleAfterKanjiNoun(
   // Check if prev is NOUN
   if (prev.pos != core::PartOfSpeech::Noun) return {};
 
-  // Check if next is PARTICLE with surface "な"
+  // Check if next is PARTICLE with surface な
   if (next.pos != core::PartOfSpeech::Particle ||
-      next.surface != "な") {
+      next.surface != scorer::kParticleNa) {
     return {};
   }
 

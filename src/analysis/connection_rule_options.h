@@ -219,6 +219,11 @@ struct ConnectionOptions {
   // PARTICLE + pure hiragana adjective
   // Used in connection context (は + なはだしい is likely misanalysis)
   float penalty_particle_before_hiragana_adj = scorer::kPenaltyHiraganaAdj;
+
+  // NOUN(し ending) + VERB(て starting) penalty
+  // Penalizes patterns like 説明し(NOUN) + てくれます(VERB)
+  // This is likely suru-verb te-form that should be parsed as single VERB
+  float penalty_suru_renyokei_to_te_verb = scorer::kPenaltySuruRenyokeiToTeVerb;
 };
 
 /// Combined options for all connection rule scoring

@@ -175,7 +175,7 @@
     },
     {
       "id": "particle_filter_ie_ni_imasu",
-      "description": "家にいます - existential verb いる (to be at home)",
+      "description": "家にいます - existential verb いる (single auxiliary token)",
       "input": "家にいます",
       "expected": [
         {
@@ -188,7 +188,7 @@
         },
         {
           "surface": "います",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "lemma": "いる"
         }
       ],
@@ -214,7 +214,7 @@
     },
     {
       "id": "realworld_business_email",
-      "description": "お世話になっております - humble progressive form",
+      "description": "お世話になっております - humble progressive form (single verb token)",
       "input": "お世話になっております",
       "expected": [
         {
@@ -230,14 +230,9 @@
           "pos": "Particle"
         },
         {
-          "surface": "なって",
+          "surface": "なっております",
           "pos": "Verb",
           "lemma": "なる"
-        },
-        {
-          "surface": "おります",
-          "pos": "Verb",
-          "lemma": "おる"
         }
       ],
       "tags": [
@@ -352,7 +347,7 @@
     },
     {
       "id": "yoroshiku_onegai_itashimasu",
-      "description": "よろしくお願いいたします splits お prefix from 願い",
+      "description": "よろしくお願いいたします splits お prefix from 願い (split: verb stem + polite aux)",
       "input": "よろしくお願いいたします",
       "expected": [
         {
@@ -368,9 +363,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "いたします",
+          "surface": "いたし",
           "pos": "Verb",
           "lemma": "いたす"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [

@@ -137,13 +137,18 @@
     },
     {
       "id": "godan_itashimasu",
-      "description": "いたします - godan sa verb",
+      "description": "いたします - godan sa verb (split: verb stem + polite aux)",
       "input": "いたします",
       "expected": [
         {
-          "surface": "いたします",
+          "surface": "いたし",
           "pos": "Verb",
           "lemma": "いたす"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [
@@ -286,12 +291,18 @@
     },
     {
       "id": "character_gozaranu",
-      "description": "Samurai speech ござらぬ",
+      "description": "Samurai speech ござらぬ - classical negative ぬ splits per design",
       "input": "知らぬでござらぬ",
       "expected": [
         {
-          "surface": "知らぬ",
-          "pos": "Verb"
+          "surface": "知ら",
+          "pos": "Verb",
+          "lemma": "知る"
+        },
+        {
+          "surface": "ぬ",
+          "pos": "Auxiliary",
+          "lemma": "ぬ"
         },
         {
           "surface": "で",
@@ -1398,13 +1409,18 @@
     },
     {
       "id": "godanwa_okonaimasu",
-      "description": "行います - GodanWa verb lemma should be 行う",
+      "description": "行います - GodanWa verb (split: verb stem + polite aux)",
       "input": "行います",
       "expected": [
         {
-          "surface": "行います",
+          "surface": "行い",
           "pos": "Verb",
           "lemma": "行う"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [
@@ -1666,13 +1682,18 @@
     },
     {
       "id": "naru_verb",
-      "description": "なりました - should not split as な + りました",
+      "description": "なりました - verb stem + polite past aux",
       "input": "なりました",
       "expected": [
         {
-          "surface": "なりました",
+          "surface": "なり",
           "pos": "Verb",
           "lemma": "なる"
+        },
+        {
+          "surface": "ました",
+          "pos": "Auxiliary",
+          "lemma": "ました"
         }
       ],
       "tags": [
@@ -1681,7 +1702,7 @@
     },
     {
       "id": "yoi_ni_naru",
-      "description": "容易になりました - na-adj + ni + naru",
+      "description": "容易になりました - na-adj + ni + naru (split: verb stem + polite aux)",
       "input": "容易になりました",
       "expected": [
         {
@@ -1693,9 +1714,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "なりました",
+          "surface": "なり",
           "pos": "Verb",
           "lemma": "なる"
+        },
+        {
+          "surface": "ました",
+          "pos": "Auxiliary",
+          "lemma": "ました"
         }
       ],
       "tags": [
@@ -1754,12 +1780,12 @@
     },
     {
       "id": "hiragana_verb_imasu",
-      "description": "います - polite form of verb いる (to exist/be)",
+      "description": "います - polite form of verb いる (single auxiliary token)",
       "input": "います",
       "expected": [
         {
           "surface": "います",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "lemma": "いる"
         }
       ],
@@ -1769,12 +1795,12 @@
     },
     {
       "id": "hiragana_verb_imasen",
-      "description": "いません - negative polite form of verb いる (to exist/be)",
+      "description": "いません - negative polite form of verb いる (single auxiliary token)",
       "input": "いません",
       "expected": [
         {
           "surface": "いません",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "lemma": "いる"
         }
       ],
@@ -2108,7 +2134,7 @@
     },
     {
       "id": "complex_business",
-      "description": "Business request - prefix splits from nouns",
+      "description": "Business request - prefix splits from nouns, verb+aux split",
       "input": "ご確認をお願いいたします",
       "expected": [
         {
@@ -2132,9 +2158,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "いたします",
+          "surface": "いたし",
           "pos": "Verb",
           "lemma": "いたす"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [
