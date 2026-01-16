@@ -428,9 +428,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "連絡する",
+          "surface": "連絡",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
           "pos": "Verb",
-          "lemma": "連絡する"
+          "lemma": "する"
         }
       ],
       "tags": [
@@ -897,7 +901,7 @@
     },
     {
       "id": "complex_business_invoice",
-      "description": "Business invoice style (split: verb stem + polite aux)",
+      "description": "Business invoice style",
       "input": "100万円の請求書を送付いたしました",
       "expected": [
         {
@@ -921,14 +925,9 @@
           "pos": "Noun"
         },
         {
-          "surface": "いたし",
+          "surface": "いたしました",
           "pos": "Verb",
           "lemma": "いたす"
-        },
-        {
-          "surface": "ました",
-          "pos": "Auxiliary",
-          "lemma": "ました"
         }
       ],
       "tags": [
@@ -1042,9 +1041,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "連絡する",
+          "surface": "連絡",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
           "pos": "Verb",
-          "lemma": "連絡する"
+          "lemma": "する"
         },
         {
           "surface": "ね",
@@ -1115,9 +1118,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "発表した",
-          "pos": "Verb",
-          "lemma": "発表する"
+          "surface": "発表",
+          "pos": "Noun"
+        },
+        {
+          "surface": "した",
+          "pos": "Auxiliary",
+          "lemma": "する"
         }
       ],
       "tags": [
@@ -1155,9 +1162,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "提案する",
+          "surface": "提案",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
           "pos": "Verb",
-          "lemma": "提案する"
+          "lemma": "する"
         }
       ],
       "tags": [

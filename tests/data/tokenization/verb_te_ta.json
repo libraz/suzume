@@ -4,13 +4,13 @@
   "cases": [
     {
       "id": "yokute_te_form",
-      "description": "よくて splits into よく + て (adverbial + particle)",
+      "description": "よくて splits into よく + て - MeCab-compatible lemma",
       "input": "よくて",
       "expected": [
         {
           "surface": "よく",
           "pos": "Adjective",
-          "lemma": "良い"
+          "lemma": "よい"
         },
         {
           "surface": "て",
@@ -149,13 +149,17 @@
     },
     {
       "id": "te_ageru_unified",
-      "description": "見てあげる - splits into te-form + auxiliary verb (grammatically correct)",
+      "description": "見てあげる - MeCab互換分割 (見 + て + あげる)",
       "input": "見てあげる",
       "expected": [
         {
-          "surface": "見て",
+          "surface": "見",
           "pos": "Verb",
           "lemma": "見る"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "あげる",
@@ -352,11 +356,11 @@
     },
     {
       "id": "particle_te_form",
-      "description": "につけて standalone - NOUN 付け wins over unknown VERB (known limitation)",
+      "description": "につけて standalone - NOUN つけ wins over unknown VERB - MeCab-compatible lemma",
       "input": "につけて",
       "expected": [
         {"surface": "に", "pos": "Particle"},
-        {"surface": "つけ", "pos": "Noun", "lemma": "付け"},
+        {"surface": "つけ", "pos": "Noun", "lemma": "つけ"},
         {"surface": "て", "pos": "Auxiliary"}
       ],
       "tags": ["known_limitation", "te_form", "particle"]

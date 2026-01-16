@@ -84,19 +84,13 @@
     },
     {
       "id": "ichidan_tabeta",
-      "description": "食べた - ichidan past (unified token)",
+      "description": "食べた - ichidan past (MeCab: 食べ + た split)",
       "input": "食べた",
       "expected": [
-        {
-          "surface": "食べた",
-          "pos": "Verb",
-          "lemma": "食べる"
-        }
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
-      "tags": [
-        "basic",
-        "ichidan"
-      ]
+      "tags": ["basic", "ichidan"]
     },
     {
       "id": "ichidan_tabenai",
@@ -116,63 +110,39 @@
     },
     {
       "id": "ireru_lemma",
-      "description": "B23: 入れる should have lemma 入れる, not 入る",
+      "description": "B23: 入れた - MeCab splits 入れ + た",
       "input": "ツッコミを入れた",
       "expected": [
-        {
-          "surface": "ツッコミ",
-          "pos": "Noun"
-        },
-        {
-          "surface": "を",
-          "pos": "Particle"
-        },
-        {
-          "surface": "入れた",
-          "pos": "Verb",
-          "lemma": "入れる"
-        }
+        {"surface": "ツッコミ", "pos": "Noun"},
+        {"surface": "を", "pos": "Particle"},
+        {"surface": "入れ", "pos": "Verb", "lemma": "入れる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
-      "tags": [
-        "ichidan",
-        "lemma"
-      ]
+      "tags": ["ichidan", "lemma"]
     },
     {
       "id": "shinjiru_lemma",
-      "description": "B24: 信じる should have correct lemma",
+      "description": "B24: 信じた - MeCab splits 信じ + た",
       "input": "信じた",
       "expected": [
-        {
-          "surface": "信じた",
-          "pos": "Verb",
-          "lemma": "信じる"
-        }
+        {"surface": "信じ", "pos": "Verb", "lemma": "信じる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
-      "tags": [
-        "ichidan",
-        "lemma"
-      ]
+      "tags": ["ichidan", "lemma"]
     },
     {
       "id": "ronjiru_lemma",
-      "description": "B24: 論じる should have correct lemma",
+      "description": "B24: 論じた - MeCab splits 論じ + た",
       "input": "論じた",
       "expected": [
-        {
-          "surface": "論じた",
-          "pos": "Verb",
-          "lemma": "論じる"
-        }
+        {"surface": "論じ", "pos": "Verb", "lemma": "論じる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
-      "tags": [
-        "ichidan",
-        "lemma"
-      ]
+      "tags": ["ichidan", "lemma"]
     },
     {
       "id": "norokeru_verb",
-      "description": "B38: のろける should be VERB, not の+ろけ split",
+      "description": "B38: のろける should be VERB, not の+ろけ split (MeCab: 見せた → 見せ+た)",
       "input": "のろけて見せた",
       "expected": [
         {
@@ -181,9 +151,14 @@
           "lemma": "のろける"
         },
         {
-          "surface": "見せた",
+          "surface": "見せ",
           "pos": "Verb",
           "lemma": "見せる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -574,7 +549,7 @@
     },
     {
       "id": "s2_obiru_lemma",
-      "description": "S2: 帯び should have lemma 帯びる, not 帯ぶ (Ichidan verb)",
+      "description": "S2: 帯び should have lemma 帯びる (MeCab: 帯びた → 帯び+た)",
       "input": "熱を帯びた",
       "expected": [
         {
@@ -586,9 +561,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "帯びた",
+          "surface": "帯び",
           "pos": "Verb",
           "lemma": "帯びる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -681,12 +661,12 @@
     },
     {
       "id": "hiragana_shiteru_contraction",
-      "description": "してる should be する+ている contraction (not しる)",
+      "description": "してる - する+ている contraction as auxiliary (not しる)",
       "input": "してる",
       "expected": [
         {
           "surface": "してる",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "lemma": "する"
         }
       ],
@@ -740,13 +720,18 @@
     },
     {
       "id": "passive_desiderative_aisaretai",
-      "description": "S1: 愛されたい (want to be loved) passive+desiderative",
+      "description": "S1: 愛されたい (want to be loved) passive+desiderative - MeCab互換分割",
       "input": "愛されたい",
       "expected": [
         {
-          "surface": "愛されたい",
+          "surface": "愛され",
           "pos": "Verb",
           "lemma": "愛す"
+        },
+        {
+          "surface": "たい",
+          "pos": "Auxiliary",
+          "lemma": "たい"
         }
       ],
       "tags": ["particle_fix", "passive", "desiderative", "regression"]

@@ -3,7 +3,7 @@
   "cases": [
     {
       "id": "news_announcement",
-      "description": "News announcement pattern",
+      "description": "News announcement pattern - MeCab互換分割",
       "input": "政府は新しい政策を発表した",
       "expected": [
         {"surface": "政府", "pos": "Noun"},
@@ -11,7 +11,9 @@
         {"surface": "新しい", "pos": "Adjective"},
         {"surface": "政策", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "発表した", "pos": "Verb", "lemma": "発表する"}
+        {"surface": "発表", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["news"]
     },
@@ -31,46 +33,51 @@
     },
     {
       "id": "news_event",
-      "description": "Event description - passive verb 行われた",
+      "description": "Event description - passive verb 行われた MeCab互換分割",
       "input": "昨日、記者会見が行われた",
       "expected": [
         {"surface": "昨日", "pos": "Noun"},
         {"surface": "記者会見", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "行われた", "pos": "Verb", "lemma": "行う"}
+        {"surface": "行わ", "pos": "Verb", "lemma": "行う"},
+        {"surface": "れた", "pos": "Auxiliary", "lemma": "れる"}
       ],
       "tags": ["news", "passive"]
     },
     {
       "id": "news_incident",
-      "description": "Incident report",
+      "description": "Incident report - MeCab互換分割",
       "input": "事故で3人が負傷した",
       "expected": [
         {"surface": "事故", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
         {"surface": "3人", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "負傷した", "pos": "Verb", "lemma": "負傷する"}
+        {"surface": "負傷", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["news"]
     },
     {
       "id": "news_investigation",
-      "description": "Investigation report",
+      "description": "Investigation report - MeCab互換分割",
       "input": "警察は原因を調査している",
       "expected": [
         {"surface": "警察", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "原因", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "調査して", "pos": "Verb", "lemma": "調査する"},
+        {"surface": "調査", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["news"]
     },
     {
       "id": "news_election",
-      "description": "Election news",
+      "description": "Election news - MeCab互換分割",
       "input": "選挙で与党が過半数を獲得した",
       "expected": [
         {"surface": "選挙", "pos": "Noun"},
@@ -79,7 +86,9 @@
         {"surface": "が", "pos": "Particle"},
         {"surface": "過半数", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "獲得した", "pos": "Verb", "lemma": "獲得する"}
+        {"surface": "獲得", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["news"]
     },
@@ -99,12 +108,16 @@
     },
     {
       "id": "weather_warning",
-      "description": "Weather warning",
+      "description": "Weather warning - MeCab互換分割（大雨警報は複合語として統一）",
       "input": "大雨警報が発令されました",
       "expected": [
         {"surface": "大雨警報", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "発令されました", "pos": "Verb", "lemma": "発令する"}
+        {"surface": "発令", "pos": "Noun"},
+        {"surface": "さ", "pos": "Verb", "lemma": "する"},
+        {"surface": "れ", "pos": "Auxiliary", "lemma": "れる"},
+        {"surface": "まし", "pos": "Auxiliary", "lemma": "ます"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["weather"]
     },
@@ -153,7 +166,7 @@
     },
     {
       "id": "sports_game_result",
-      "description": "Game result",
+      "description": "Game result - MeCab互換分割",
       "input": "日本代表が2対1で勝利した",
       "expected": [
         {"surface": "日本代表", "pos": "Noun"},
@@ -161,7 +174,9 @@
         {"surface": "2対", "pos": "Noun"},
         {"surface": "1", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
-        {"surface": "勝利した", "pos": "Verb", "lemma": "勝利する"}
+        {"surface": "勝利", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["sports"]
     },
@@ -208,21 +223,22 @@
     },
     {
       "id": "sports_injury",
-      "description": "Injury report",
+      "description": "Injury report - MeCab互換分割",
       "input": "選手は怪我のため欠場する",
       "expected": [
         {"surface": "選手", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "怪我", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
-        {"surface": "ため", "pos": "Other"},
-        {"surface": "欠場する", "pos": "Verb"}
+        {"surface": "ため", "pos": "Noun", "lemma": "為"},
+        {"surface": "欠場", "pos": "Noun"},
+        {"surface": "する", "pos": "Verb", "lemma": "する"}
       ],
       "tags": ["sports"]
     },
     {
       "id": "academic_hypothesis",
-      "description": "Academic hypothesis",
+      "description": "Academic hypothesis - MeCab互換分割",
       "input": "本研究では以下の仮説を検証する",
       "expected": [
         {"surface": "本研究", "pos": "Noun"},
@@ -232,7 +248,8 @@
         {"surface": "の", "pos": "Particle"},
         {"surface": "仮説", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "検証する", "pos": "Verb"}
+        {"surface": "検証", "pos": "Noun"},
+        {"surface": "する", "pos": "Verb", "lemma": "する"}
       ],
       "tags": ["academic"]
     },
@@ -272,7 +289,7 @@
     },
     {
       "id": "academic_method",
-      "description": "Method description",
+      "description": "Method description - MeCab互換分割",
       "input": "本研究ではアンケート調査を実施した",
       "expected": [
         {"surface": "本研究", "pos": "Noun"},
@@ -281,20 +298,24 @@
         {"surface": "アンケート", "pos": "Noun"},
         {"surface": "調査", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "実施した", "pos": "Verb", "lemma": "実施する"}
+        {"surface": "実施", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["academic"]
     },
     {
       "id": "academic_reference",
-      "description": "Reference citation - compound particle によれば",
+      "description": "Reference citation - compound particle によれば MeCab互換分割",
       "input": "先行研究によれば効果が確認されている",
       "expected": [
         {"surface": "先行研究", "pos": "Noun"},
         {"surface": "によれば", "pos": "Particle"},
         {"surface": "効果", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "確認されて", "pos": "Verb", "lemma": "確認する"},
+        {"surface": "確認", "pos": "Noun"},
+        {"surface": "さ", "pos": "Verb", "lemma": "する"},
+        {"surface": "れて", "pos": "Auxiliary", "lemma": "れる"},
         {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["academic", "compound-particle"]
@@ -318,7 +339,7 @@
     },
     {
       "id": "long_news_article",
-      "description": "News article style long sentence",
+      "description": "News article style long sentence - MeCab互換分割",
       "input": "政府は昨日の閣議で、新しい経済政策を正式に決定したと発表した",
       "expected": [
         {"surface": "政府", "pos": "Noun"},
@@ -332,9 +353,13 @@
         {"surface": "を", "pos": "Particle"},
         {"surface": "正式", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "決定した", "pos": "Verb", "lemma": "決定する"},
+        {"surface": "決定", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"},
         {"surface": "と", "pos": "Particle"},
-        {"surface": "発表した", "pos": "Verb", "lemma": "発表する"}
+        {"surface": "発表", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["long"]
     },
@@ -362,22 +387,25 @@
     },
     {
       "id": "long_instructions",
-      "description": "Multi-step instructions",
+      "description": "Multi-step instructions - MeCab互換分割（設定画面は複合語として統一）",
       "input": "まず電源ボタンを押して起動し、次に設定画面から言語を選択してください",
       "expected": [
         {"surface": "まず", "pos": "Adverb"},
         {"surface": "電源", "pos": "Noun"},
         {"surface": "ボタン", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "押して", "pos": "Verb", "lemma": "押す"},
-        {"surface": "起動し", "pos": "Verb", "lemma": "起動する"},
-        {"surface": "次", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
+        {"surface": "押し", "pos": "Verb", "lemma": "押す"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "起動", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "次に", "pos": "Adverb"},
         {"surface": "設定画面", "pos": "Noun"},
         {"surface": "から", "pos": "Particle"},
         {"surface": "言語", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "選択して", "pos": "Verb", "lemma": "選択する"},
+        {"surface": "選択", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["long"]
@@ -406,13 +434,14 @@
     },
     {
       "id": "long_explanation",
-      "description": "Explanation style - compound verb 読み込む stays as single unit in passive form",
+      "description": "Explanation style - MeCab互換分割",
       "input": "この問題が発生する原因は、設定ファイルが正しく読み込まれていないことです",
       "expected": [
         {"surface": "この", "pos": "Determiner"},
         {"surface": "問題", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "発生する", "pos": "Verb"},
+        {"surface": "発生", "pos": "Noun"},
+        {"surface": "する", "pos": "Verb", "lemma": "する"},
         {"surface": "原因", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "設定", "pos": "Noun"},
@@ -458,7 +487,7 @@
     },
     {
       "id": "education_assignment",
-      "description": "Homework assignment",
+      "description": "Homework assignment - MeCab互換分割",
       "input": "明日までに宿題を提出してください",
       "expected": [
         {"surface": "明日", "pos": "Noun"},
@@ -466,7 +495,9 @@
         {"surface": "に", "pos": "Particle"},
         {"surface": "宿題", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "提出して", "pos": "Verb", "lemma": "提出する"},
+        {"surface": "提出", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["education"]

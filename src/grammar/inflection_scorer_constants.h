@@ -401,12 +401,30 @@ constexpr float kPenaltySuruDirectNai = scale::kProhibitive;  // 3.5F
 // Stem Exception Lists (Valid or Invalid Patterns)
 // =============================================================================
 
-// Valid kanji + い Ichidan stems (kami-ichidan verbs)
-// These are exceptions to the general rule that kanji + い is Godan renyokei
+// Valid kanji + i-row Ichidan stems
+// These are exceptions to the general rule that kanji + i-row hiragana is Godan renyokei
+// Includes: 漢字+い (上一段), 漢字+じ (ザ行一段), etc.
 inline constexpr const char* kValidKanjiIStemExceptions[] = {
+    // 漢字+い (kami-ichidan / 上一段)
     "用い",   // 用いる (to use)
     "率い",   // 率いる (to lead)
-    "報い"    // 報いる (to repay)
+    "報い",   // 報いる (to repay)
+    // 漢字+じ (za-row ichidan / ザ行一段)
+    "論じ",   // 論じる (to discuss)
+    "信じ",   // 信じる (to believe)
+    "感じ",   // 感じる (to feel)
+    "応じ",   // 応じる (to respond)
+    "演じ",   // 演じる (to perform)
+    "生じ",   // 生じる (to arise)
+    "禁じ",   // 禁じる (to prohibit)
+    "通じ",   // 通じる (to communicate)
+    "命じ",   // 命じる (to order)
+    "準じ",   // 準じる (to conform)
+    "案じ",   // 案じる (to worry)
+    "重んじ", // 重んじる (to value)
+    // 漢字+び (ba-row ichidan)
+    "帯び",   // 帯びる (to wear)
+    "浴び"    // 浴びる (to bathe)
 };
 inline constexpr size_t kValidKanjiIStemExceptionCount =
     sizeof(kValidKanjiIStemExceptions) / sizeof(kValidKanjiIStemExceptions[0]);

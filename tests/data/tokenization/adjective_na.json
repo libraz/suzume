@@ -440,13 +440,13 @@
     },
     {
       "id": "na_hiragana_shinchouni",
-      "description": "しんちょうに (carefully - hiragana)",
+      "description": "しんちょうに (carefully - hiragana) - MeCab-compatible lemma",
       "input": "しんちょうに",
       "expected": [
         {
           "surface": "しんちょう",
           "pos": "Adjective",
-          "lemma": "慎重"
+          "lemma": "しんちょう"
         },
         {
           "surface": "に",
@@ -461,13 +461,13 @@
     },
     {
       "id": "na_hiragana_teineini",
-      "description": "ていねいに (politely - hiragana)",
+      "description": "ていねいに (politely - hiragana) - MeCab-compatible lemma",
       "input": "ていねいに",
       "expected": [
         {
           "surface": "ていねい",
           "pos": "Adjective",
-          "lemma": "丁寧"
+          "lemma": "ていねい"
         },
         {
           "surface": "に",
@@ -482,13 +482,13 @@
     },
     {
       "id": "na_hiragana_shizukani",
-      "description": "しずかに (quietly - hiragana)",
+      "description": "しずかに (quietly - hiragana) - MeCab-compatible lemma",
       "input": "しずかに",
       "expected": [
         {
           "surface": "しずか",
           "pos": "Adjective",
-          "lemma": "静か"
+          "lemma": "しずか"
         },
         {
           "surface": "に",
@@ -893,13 +893,13 @@
     },
     {
       "id": "na_sasugani",
-      "description": "さすがに (as expected)",
+      "description": "さすがに (as expected) - MeCab-compatible lemma",
       "input": "さすがに",
       "expected": [
         {
           "surface": "さすが",
           "pos": "Adjective",
-          "lemma": "流石"
+          "lemma": "さすが"
         },
         {
           "surface": "に",
@@ -914,13 +914,13 @@
     },
     {
       "id": "na_sasuga_base",
-      "description": "さすが (as expected - standalone is ADV, not ADJ)",
+      "description": "さすが (as expected - standalone is ADV, not ADJ) - MeCab-compatible lemma",
       "input": "さすが",
       "expected": [
         {
           "surface": "さすが",
           "pos": "Adverb",
-          "lemma": "流石"
+          "lemma": "さすが"
         }
       ],
       "tags": [
@@ -931,13 +931,13 @@
     },
     {
       "id": "na_sasugana_hito",
-      "description": "さすがな人 (attributive form)",
+      "description": "さすがな人 (attributive form) - MeCab-compatible lemma",
       "input": "さすがな人",
       "expected": [
         {
           "surface": "さすがな",
           "pos": "Adjective",
-          "lemma": "流石"
+          "lemma": "さすが"
         },
         {
           "surface": "人",

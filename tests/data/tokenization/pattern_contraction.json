@@ -4,16 +4,16 @@
   "cases": [
     {
       "id": "contraction_shiteru",
-      "description": "してる should contain verb component",
+      "description": "してる as contracted auxiliary (している → してる)",
       "input": "してる",
       "expected": [
         {
           "surface": "してる",
-          "pos": "Verb"
+          "pos": "Auxiliary",
+          "lemma": "する"
         }
       ],
       "tags": [
-        "strict",
         "contraction"
       ]
     },

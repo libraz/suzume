@@ -39,6 +39,13 @@ bool endsWithIRow(std::string_view surface);
 bool endsWithERow(std::string_view surface);
 
 /**
+ * @brief Check if surface ends with a-row hiragana (godan mizenkei marker)
+ * Matches: ば, ま, さ, か, が, た, な, ら, あ, だ, ざ, は, ぱ, わ
+ * Used to detect godan verb mizenkei forms for negative attachment
+ */
+bool endsWithARow(std::string_view surface);
+
+/**
  * @brief Check if surface ends with renyokei marker (either i-row or e-row)
  * Used to detect verb renyokei forms for auxiliary attachment
  */
@@ -98,6 +105,7 @@ enum class ConnectionPattern {
   IchidanRenyokeiTe,       // 一段連用形 → て/てV
   TeFormSplit,             // 音便形/一段形 → て/で (split should be avoided)
   TaiAfterRenyokei,        // 動詞連用形 → たい (valid auxiliary)
+  TaAfterRenyokei,         // 動詞連用形 → た (past tense auxiliary)
   YasuiAfterRenyokei,      // 連用形的名詞 → 安い (should be やすい aux)
   NagaraSplit,             // 動詞連用形 → ながら (split should be avoided)
   SouAfterRenyokei,        // 連用形的名詞 → そう (auxiliary pattern)
@@ -136,7 +144,9 @@ enum class ConnectionPattern {
   NaParticleAfterKanjiNoun,   // 漢字NOUN → な(PARTICLE) (likely na-adjective stem: 獰猛な)
   KuraiAdjAfterPredicate,     // VERB/ADJ/AUX → くらい(ADJ) (should be PARTICLE: いられぬくらい)
   SuruRenyokeiToTeVerb,       // NOUN(し ending) → VERB(て始まり) (should be suru-verb te-form)
-  TekuReMissegmentation       // てく/ってく → れ* (should be て + くれる, not ていく + れる)
+  TekuReMissegmentation,      // てく/ってく → れ* (should be て + くれる, not ていく + れる)
+  MasuRenyokeiToTa,           // AUX(まし/ませ) → AUX(た/ん) (MeCab-compatible masu split)
+  NaiAfterVerbMizenkei        // 動詞未然形 → ない (MeCab-compatible negative split)
 };
 
 /**

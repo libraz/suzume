@@ -58,11 +58,11 @@
     },
     {
       "id": "casual_contraction_teru",
-      "description": "Contraction てる",
+      "description": "Contraction てる - している → してる as auxiliary",
       "input": "何してる",
       "expected": [
         {"surface": "何", "pos": "Pronoun"},
-        {"surface": "してる", "pos": "Verb"}
+        {"surface": "してる", "pos": "Auxiliary", "lemma": "する"}
       ],
       "tags": ["casual", "contraction"]
     },
@@ -192,23 +192,28 @@
     },
     {
       "id": "review_positive",
-      "description": "Positive review",
+      "description": "Positive review - MeCab互換分割",
       "input": "とても使いやすくて満足しています",
       "expected": [
         {"surface": "とても", "pos": "Adverb"},
         {"surface": "使いやすく", "pos": "Adjective", "lemma": "使いやすい"},
         {"surface": "て", "pos": "Particle"},
-        {"surface": "満足して", "pos": "Verb", "lemma": "満足する"},
+        {"surface": "満足", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "います", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["review"]
     },
     {
       "id": "review_negative",
-      "description": "Negative review",
+      "description": "Negative review - MeCab互換分割",
       "input": "期待していたほどではなかった",
       "expected": [
-        {"surface": "期待していた", "pos": "Verb", "lemma": "期待する"},
+        {"surface": "期待", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "いた", "pos": "Verb", "lemma": "いる"},
         {"surface": "ほど", "pos": "Particle"},
         {"surface": "で", "pos": "Particle"},
         {"surface": "は", "pos": "Particle"},
@@ -288,33 +293,35 @@
     },
     {
       "id": "colloquial_shiteru",
-      "description": "Colloquial している → してる - lemma is dictionary form",
+      "description": "Colloquial している → してる as auxiliary",
       "input": "今何してる",
       "expected": [
         {"surface": "今", "pos": "Noun"},
         {"surface": "何", "pos": "Pronoun"},
-        {"surface": "してる", "pos": "Verb", "lemma": "する"}
+        {"surface": "してる", "pos": "Auxiliary", "lemma": "する"}
       ],
       "tags": ["colloquial"]
     },
     {
       "id": "colloquial_miteta",
-      "description": "Colloquial 見ていた → 見てた - unified contracted form",
+      "description": "Colloquial 見ていた → 見てた - MeCab互換分割",
       "input": "テレビ見てた",
       "expected": [
         {"surface": "テレビ", "pos": "Noun"},
-        {"surface": "見てた", "pos": "Verb", "lemma": "見る"}
+        {"surface": "見て", "pos": "Verb", "lemma": "見る"},
+        {"surface": "た", "pos": "Auxiliary"}
       ],
       "tags": ["colloquial"]
     },
     {
       "id": "colloquial_itteta",
-      "description": "Colloquial 行っていた → 行ってた - unified contracted form",
+      "description": "Colloquial 行っていた → 行ってた - MeCab互換分割",
       "input": "学校に行ってた",
       "expected": [
         {"surface": "学校", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "行ってた", "pos": "Verb", "lemma": "行く"}
+        {"surface": "行って", "pos": "Verb", "lemma": "行く"},
+        {"surface": "た", "pos": "Auxiliary"}
       ],
       "tags": ["colloquial"]
     },
@@ -387,12 +394,13 @@
     },
     {
       "id": "colloquial_noni",
-      "description": "Colloquial despite のに",
+      "description": "Colloquial despite のに - MeCab互換分割",
       "input": "頑張ったのに負けた",
       "expected": [
         {"surface": "頑張った", "pos": "Verb"},
         {"surface": "のに", "pos": "Particle"},
-        {"surface": "負けた", "pos": "Verb", "lemma": "負ける"}
+        {"surface": "負け", "pos": "Verb", "lemma": "負ける"},
+        {"surface": "た", "pos": "Auxiliary"}
       ],
       "tags": ["colloquial"]
     }

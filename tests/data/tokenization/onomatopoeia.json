@@ -144,7 +144,7 @@
     },
     {
       "id": "ukkari_adv",
-      "description": "うっかり should be ADV (B62)",
+      "description": "うっかり should be ADV (B62) - MeCab互換分割",
       "input": "うっかり忘れた",
       "expected": [
         {
@@ -152,9 +152,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "忘れた",
+          "surface": "忘れ",
           "pos": "Verb",
           "lemma": "忘れる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -224,7 +228,7 @@
     },
     {
       "id": "assari_adv",
-      "description": "あっさり should be ADV (B62)",
+      "description": "あっさり should be ADV (B62) - MeCab互換分割",
       "input": "あっさり負けた",
       "expected": [
         {
@@ -232,9 +236,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "負けた",
+          "surface": "負け",
           "pos": "Verb",
           "lemma": "負ける"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -264,7 +272,7 @@
     },
     {
       "id": "gussuri_adv",
-      "description": "ぐっすり should be ADV (B62)",
+      "description": "ぐっすり should be ADV (B62) - MeCab互換分割",
       "input": "ぐっすり眠れた",
       "expected": [
         {
@@ -272,9 +280,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "眠れた",
+          "surface": "眠れ",
           "pos": "Verb",
           "lemma": "眠れる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -304,7 +316,7 @@
     },
     {
       "id": "gakkari_adv",
-      "description": "がっかり should be ADV (B62)",
+      "description": "がっかり should be ADV (B62) - MeCab互換分割",
       "input": "がっかりした",
       "expected": [
         {
@@ -312,9 +324,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "した",
+          "surface": "し",
           "pos": "Verb",
           "lemma": "する"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -324,7 +340,7 @@
     },
     {
       "id": "bikkuri_adv",
-      "description": "びっくり should be ADV (B62)",
+      "description": "びっくり should be ADV (B62) - MeCab互換分割",
       "input": "びっくりした",
       "expected": [
         {
@@ -332,9 +348,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "した",
+          "surface": "し",
           "pos": "Verb",
           "lemma": "する"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -344,7 +364,7 @@
     },
     {
       "id": "chakkari_adv",
-      "description": "ちゃっかり should be ADV (B62) - NOTE: 得する tokenization needs separate fix",
+      "description": "ちゃっかり should be ADV (B62) - MeCab互換分割",
       "input": "ちゃっかり得した",
       "expected": [
         {
@@ -352,9 +372,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "得した",
+          "surface": "得し",
           "pos": "Verb",
           "lemma": "得す"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -383,7 +407,7 @@
     },
     {
       "id": "bonyari_adv",
-      "description": "ぼんやり should be ADV (B62) - NOTE: te-form compound needs separate fix",
+      "description": "ぼんやり should be ADV (B62) - MeCab互換分割",
       "input": "ぼんやり見ていた",
       "expected": [
         {
@@ -391,9 +415,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "見て",
+          "surface": "見",
           "pos": "Verb",
           "lemma": "見る"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "いた",
@@ -547,7 +575,7 @@
     },
     {
       "id": "fukkura_adv",
-      "description": "ふっくら should be ADV (B62) - 焼ける is Ichidan verb",
+      "description": "ふっくら should be ADV (B62) - MeCab互換分割",
       "input": "ふっくら焼けた",
       "expected": [
         {
@@ -555,9 +583,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "焼けた",
+          "surface": "焼け",
           "pos": "Verb",
           "lemma": "焼ける"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -757,7 +789,7 @@
     },
     {
       "id": "dosari_adv",
-      "description": "どさり should be ADV (ABり型: heavy object falling)",
+      "description": "どさり should be ADV (ABり型) - MeCab互換分割",
       "input": "どさりと倒れた",
       "expected": [
         {
@@ -769,9 +801,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "倒れた",
+          "surface": "倒れ",
           "pos": "Verb",
           "lemma": "倒れる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -782,7 +818,7 @@
     },
     {
       "id": "batari_adv",
-      "description": "ばたり should be ADV (ABり型: falling sound)",
+      "description": "ばたり should be ADV (ABり型) - MeCab互換分割",
       "input": "ばたりと倒れた",
       "expected": [
         {
@@ -794,9 +830,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "倒れた",
+          "surface": "倒れ",
           "pos": "Verb",
           "lemma": "倒れる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -807,7 +847,7 @@
     },
     {
       "id": "gatari_adv",
-      "description": "がたり should be ADV (ABり型: hard object collision)",
+      "description": "がたり should be ADV (ABり型) - MeCab互換分割",
       "input": "がたりと音がした",
       "expected": [
         {
@@ -827,9 +867,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "した",
+          "surface": "し",
           "pos": "Verb",
           "lemma": "する"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [

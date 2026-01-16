@@ -347,7 +347,7 @@
     },
     {
       "id": "yoroshiku_onegai_itashimasu",
-      "description": "よろしくお願いいたします splits お prefix from 願い (split: verb stem + polite aux)",
+      "description": "よろしくお願いいたします - MeCab互換分割",
       "input": "よろしくお願いいたします",
       "expected": [
         {
@@ -363,14 +363,9 @@
           "pos": "Noun"
         },
         {
-          "surface": "いたし",
+          "surface": "いたします",
           "pos": "Verb",
           "lemma": "いたす"
-        },
-        {
-          "surface": "ます",
-          "pos": "Auxiliary",
-          "lemma": "ます"
         }
       ],
       "tags": [

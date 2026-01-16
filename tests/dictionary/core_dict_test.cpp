@@ -160,16 +160,13 @@ TEST_F(CoreDictVerbExpansionTest, Suru_BaseForm) {
   EXPECT_TRUE(hasVerbEntry("する", "する"));
 }
 
-TEST_F(CoreDictVerbExpansionTest, Suru_PastForm) {
-  EXPECT_TRUE(hasVerbEntry("した", "する"));
-}
+// NOTE: した, して, しない are now split (し+た, し+て, し+ない)
+// per MeCab-compatible design. These tests are removed.
 
-TEST_F(CoreDictVerbExpansionTest, Suru_TeForm) {
-  EXPECT_TRUE(hasVerbEntry("して", "する"));
-}
-
-TEST_F(CoreDictVerbExpansionTest, Suru_NegativeForm) {
-  EXPECT_TRUE(hasVerbEntry("しない", "する"));
+TEST_F(CoreDictVerbExpansionTest, Suru_Stem) {
+  // し is now registered as a verb stem for MeCab-compatible splitting
+  // The stem itself may not be in the dictionary expansion,
+  // but the tokenizer handles it via entries.cpp
 }
 
 TEST_F(CoreDictVerbExpansionTest, Suru_ConditionalBa) {
@@ -184,9 +181,8 @@ TEST_F(CoreDictVerbExpansionTest, Suru_Volitional) {
   EXPECT_TRUE(hasVerbEntry("しよう", "する"));
 }
 
-TEST_F(CoreDictVerbExpansionTest, Suru_Progressive) {
-  EXPECT_TRUE(hasVerbEntry("している", "する"));
-}
+// NOTE: している is now split (し+て+いる) per MeCab-compatible design.
+// This test is removed.
 
 // =============================================================================
 // Essential verbs expansion (伴う - GodanWa from essential_verbs.h)

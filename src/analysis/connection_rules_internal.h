@@ -211,6 +211,10 @@ ConnectionRuleResult checkTaiAfterRenyokei(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts);
 
+ConnectionRuleResult checkTaAfterRenyokei(const core::LatticeEdge& prev,
+                                          const core::LatticeEdge& next,
+                                          const ConnectionOptions& opts);
+
 ConnectionRuleResult checkYasuiAfterRenyokei(const core::LatticeEdge& prev,
                                              const core::LatticeEdge& next,
                                              const ConnectionOptions& opts);
@@ -390,6 +394,14 @@ ConnectionRuleResult checkNaParticleAfterKanjiNoun(
 ConnectionRuleResult checkKuraiAdjectiveAfterPredicate(
     const core::LatticeEdge& prev, const core::LatticeEdge& next,
     const ConnectionOptions& opts);
+
+ConnectionRuleResult checkMasuRenyokeiToTa(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next,
+                                           const ConnectionOptions& opts);
+
+ConnectionRuleResult checkNaiAfterVerbMizenkei(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next,
+                                               const ConnectionOptions& opts);
 
 // =============================================================================
 // POS-based Dispatch Helpers

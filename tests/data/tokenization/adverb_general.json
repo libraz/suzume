@@ -277,8 +277,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "確認する",
-          "pos": "Verb"
+          "surface": "確認",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb",
+          "lemma": "する"
         }
       ],
       "tags": [
@@ -806,7 +811,8 @@
       "input": "大いに期待する",
       "expected": [
         {"surface": "大いに", "pos": "Adverb", "lemma": "大いに"},
-        {"surface": "期待する", "pos": "Verb"}
+        {"surface": "期待", "pos": "Noun"},
+        {"surface": "する", "pos": "Verb", "lemma": "する"}
       ],
       "tags": ["adverb", "split_prevention"]
     },
@@ -898,20 +904,20 @@
     },
     {
       "id": "adv_daitai_hiragana",
-      "description": "だいたい should be ADV, not だ+いたい split",
+      "description": "だいたい should be ADV - MeCab-compatible lemma is hiragana",
       "input": "だいたい終わった",
       "expected": [
-        {"surface": "だいたい", "pos": "Adverb", "lemma": "大体"},
+        {"surface": "だいたい", "pos": "Adverb", "lemma": "だいたい"},
         {"surface": "終わった", "pos": "Verb", "lemma": "終わる"}
       ],
       "tags": ["adverb", "degree", "split_prevention"]
     },
     {
       "id": "adv_ittai",
-      "description": "いったい should be ADV, not いっ+たい split",
+      "description": "いったい should be ADV, not いっ+たい split (MeCab-compatible hiragana lemma)",
       "input": "いったい何だ",
       "expected": [
-        {"surface": "いったい", "pos": "Adverb", "lemma": "一体"},
+        {"surface": "いったい", "pos": "Adverb", "lemma": "いったい"},
         {"surface": "何", "pos": "Pronoun"},
         {"surface": "だ", "pos": "Auxiliary"}
       ],
@@ -929,10 +935,10 @@
     },
     {
       "id": "adv_sasuga_standalone",
-      "description": "さすが standalone should be ADV",
+      "description": "さすが standalone should be ADV (MeCab-compatible hiragana lemma)",
       "input": "さすが",
       "expected": [
-        {"surface": "さすが", "pos": "Adverb", "lemma": "流石"}
+        {"surface": "さすが", "pos": "Adverb", "lemma": "さすが"}
       ],
       "tags": ["adverb", "evaluation"]
     },

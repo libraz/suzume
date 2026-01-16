@@ -108,7 +108,7 @@
     },
     {
       "id": "deshita_copula",
-      "description": "でした (polite past copula) should be Auxiliary",
+      "description": "でした (polite past copula) - MeCab splits as でし + た",
       "input": "本でした",
       "expected": [
         {
@@ -116,9 +116,13 @@
           "pos": "Noun"
         },
         {
-          "surface": "でした",
+          "surface": "でし",
           "pos": "Auxiliary",
-          "lemma": "でした"
+          "lemma": "です"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [

@@ -503,44 +503,96 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       }
     }
 
-    // For し + そう patterns (話しそう, 難しそう, 美味しそう, etc.), check dictionary
-    // to distinguish verb renyokei + そう from adjective + そう.
+    // For し + そう patterns (話しそう, 難しそう, 美味しそう, etc.), use inflection
+    // analysis to distinguish verb renyokei + そう from adjective + そう.
     // Works for both single and multi-kanji stems.
-    // 難しそう → base: 難しい (in dictionary) → allow adjective candidate
-    // 美味しそう → base: 美味しい (in dictionary) → allow adjective candidate
-    // 話しそう → base: 話しい (not in dictionary) → skip
+    // 難しそう → 難しい has higher confidence than 難す → allow adjective candidate
+    // 美味しそう → 美味しい has higher confidence than 美味す → allow adjective candidate
+    // 話しそう → 話す is in dictionary (handled by dict lookup below) → skip
+    //
+    // Strategy: Compare adjective confidence with verb confidence.
+    // If adjective confidence is higher, prefer adjective interpretation.
+    // For dictionary-registered verbs, the dictionary lookup below will handle them.
     bool is_dict_adjective = false;
     if (hiragana_part.size() >= core::kThreeJapaneseCharBytes &&
         hiragana_part.substr(0, core::kJapaneseCharBytes) == "し" &&
         hiragana_part.substr(core::kJapaneseCharBytes, core::kTwoJapaneseCharBytes) == "そう") {
+      std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+
+      // Get adjective confidence for kanji + しい
+      std::string adj_form = kanji_stem + "しい";
+      float adj_confidence = 0.0F;
+      auto adj_results = inflection.analyze(adj_form);
+      for (const auto& result : adj_results) {
+        if (result.verb_type == grammar::VerbType::IAdjective &&
+            result.confidence > adj_confidence) {
+          adj_confidence = result.confidence;
+        }
+      }
+
+      // Get verb confidence for kanji + す
+      std::string verb_form = kanji_stem + "す";
+      float verb_confidence = 0.0F;
+      auto verb_results = inflection.analyze(verb_form);
+      for (const auto& result : verb_results) {
+        if (result.verb_type == grammar::VerbType::GodanSa &&
+            result.confidence > verb_confidence) {
+          verb_confidence = result.confidence;
+        }
+      }
+
+      // Use dictionary to check for real verbs like 話す, 出す
+      bool is_dict_verb = false;
       if (dict_manager != nullptr) {
-        // Construct base form: kanji + しい
-        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-        std::string base_form = kanji_stem + "しい";
-        auto lookup = dict_manager->lookup(base_form, 0);
-        if (lookup.empty()) {
-          continue;  // Base form not in dictionary, skip adjective candidate
-        }
-        // Check if any entry is an adjective with exact match
-        size_t base_form_chars = 0;
-        for (size_t i = 0; i < base_form.size(); ) {
-          auto byte = static_cast<uint8_t>(base_form[i]);
-          if ((byte & 0x80) == 0) { i += 1; }
-          else if ((byte & 0xE0) == 0xC0) { i += 2; }
-          else if ((byte & 0xF0) == 0xE0) { i += 3; }
-          else { i += 4; }
-          ++base_form_chars;
-        }
+        auto lookup = dict_manager->lookup(verb_form, 0);
         for (const auto& result : lookup) {
-          if (result.length == base_form_chars &&
-              result.entry != nullptr &&
-              result.entry->pos == core::PartOfSpeech::Adjective) {
-            is_dict_adjective = true;
+          if (result.entry != nullptr &&
+              result.entry->pos == core::PartOfSpeech::Verb) {
+            is_dict_verb = true;
             break;
           }
         }
-        if (!is_dict_adjective) {
-          continue;  // Not an adjective in dictionary, skip
+      }
+
+      if (is_dict_verb) {
+        continue;  // Real verb exists in dictionary, prefer verb interpretation
+      }
+
+      // Check for suru-verb patterns: if kanji stem is 2+ characters and ends with
+      // kanji, it's likely a suru-verb (遅刻しそう → 遅刻する, not 遅刻しい)
+      // Single-kanji patterns like 難しそう (難しい) are valid adjectives.
+      // Exception: known adjectives like 美味しい should still be allowed.
+      size_t kanji_char_count = kanji_end - start_pos;
+      if (kanji_char_count >= 2) {
+        // Check if this is a known adjective in dictionary (e.g., 美味しい)
+        std::string adj_full = kanji_stem + "しい";
+        bool is_known_adj = false;
+        if (dict_manager != nullptr) {
+          auto lookup = dict_manager->lookup(adj_full, 0);
+          for (const auto& result : lookup) {
+            if (result.entry != nullptr &&
+                result.entry->pos == core::PartOfSpeech::Adjective) {
+              is_known_adj = true;
+              break;
+            }
+          }
+        }
+        if (!is_known_adj) {
+          // Multi-kanji + し + そう without known adjective is suru-verb + auxiliary
+          // (遅刻しそう, 勉強しそう, 検討しそう, etc.)
+          continue;
+        }
+        // Known adjective like 美味しい, allow the candidate
+        is_dict_adjective = true;
+      } else {
+        // Single-kanji pattern, use confidence comparison
+        // If adjective confidence is meaningfully higher than verb confidence,
+        // allow adjective candidate
+        // The 0.03 margin prevents ties from incorrectly producing adjective candidates
+        if (adj_confidence >= 0.6F && adj_confidence >= verb_confidence + 0.03F) {
+          is_dict_adjective = true;
+        } else {
+          continue;
         }
       }
     }
@@ -656,6 +708,13 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         // This helps beat false-positive suru verb candidates (美味する is invalid)
         if (is_dict_adjective) {
           cost -= 0.25F;
+        }
+        // Penalty for non-dictionary i-adjective nominalization (さ ending)
+        // This prevents false positives like 勉強さ (from non-existent 勉強い)
+        // from beating suru-verb split path (勉強 + さ + れる)
+        if (!is_dict_adjective && surface.size() >= 3 &&
+            surface.substr(surface.size() - 3) == "さ") {
+          cost += 1.5F;  // Strong penalty for unconfirmed さ nominalization
         }
         candidate.cost = cost;
         candidate.has_suffix = false;

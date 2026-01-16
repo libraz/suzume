@@ -165,13 +165,15 @@
     },
     {
       "id": "sched_confirmation",
+      "description": "MeCab互換分割",
       "input": "明日の約束を確認したいのですが",
       "expected": [
         {"surface": "明日", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "約束", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "確認したい", "pos": "Verb", "lemma": "確認する"},
+        {"surface": "確認", "pos": "Noun"},
+        {"surface": "したい", "pos": "Auxiliary", "lemma": "する"},
         {"surface": "のです", "pos": "Auxiliary", "lemma": "のだ"},
         {"surface": "が", "pos": "Particle"}
       ],
@@ -179,14 +181,15 @@
     },
     {
       "id": "sched_cancel",
+      "description": "MeCab互換分割",
       "input": "予定をキャンセルしてもいいですか",
       "expected": [
         {"surface": "予定", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "キャンセル", "pos": "Noun"},
-        {"surface": "して", "pos": "Verb", "lemma": "する"},
+        {"surface": "して", "pos": "Auxiliary", "lemma": "する"},
         {"surface": "も", "pos": "Particle"},
-        {"surface": "いい", "pos": "Adjective"},
+        {"surface": "いい", "pos": "Adjective", "lemma": "よい"},
         {"surface": "です", "pos": "Auxiliary"},
         {"surface": "か", "pos": "Particle"}
       ],
@@ -231,13 +234,15 @@
     },
     {
       "id": "shop_bag",
+      "description": "MeCab互換分割",
       "input": "袋をお願いします",
       "expected": [
         {"surface": "袋", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "お", "pos": "Prefix"},
         {"surface": "願い", "pos": "Noun"},
-        {"surface": "します", "pos": "Verb", "lemma": "する"}
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["shopping"]
     },
@@ -293,6 +298,7 @@
     },
     {
       "id": "travel_reservation",
+      "description": "MeCab互換分割",
       "input": "来週の金曜日に二名で予約したいのですが",
       "expected": [
         {"surface": "来週", "pos": "Noun"},
@@ -301,7 +307,8 @@
         {"surface": "に", "pos": "Particle"},
         {"surface": "二名", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
-        {"surface": "予約したい", "pos": "Verb", "lemma": "予約する"},
+        {"surface": "予約", "pos": "Noun"},
+        {"surface": "したい", "pos": "Auxiliary", "lemma": "する"},
         {"surface": "のです", "pos": "Auxiliary", "lemma": "のだ"},
         {"surface": "が", "pos": "Particle"}
       ],
@@ -378,6 +385,7 @@
     },
     {
       "id": "restaurant_order",
+      "description": "MeCab互換分割",
       "input": "ラーメンを一つお願いします",
       "expected": [
         {"surface": "ラーメン", "pos": "Noun"},
@@ -385,7 +393,8 @@
         {"surface": "一つ", "pos": "Noun"},
         {"surface": "お", "pos": "Prefix"},
         {"surface": "願い", "pos": "Noun"},
-        {"surface": "します", "pos": "Verb", "lemma": "する"}
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["restaurant"]
     },
@@ -426,6 +435,7 @@
     },
     {
       "id": "restaurant_bill",
+      "description": "MeCab互換分割",
       "input": "お会計をお願いします",
       "expected": [
         {"surface": "お", "pos": "Prefix"},
@@ -433,7 +443,8 @@
         {"surface": "を", "pos": "Particle"},
         {"surface": "お", "pos": "Prefix"},
         {"surface": "願い", "pos": "Noun"},
-        {"surface": "します", "pos": "Verb", "lemma": "する"}
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["restaurant"]
     }

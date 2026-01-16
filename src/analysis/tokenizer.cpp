@@ -116,6 +116,24 @@ core::Lattice Tokenizer::buildLattice(
     addTeFormAuxiliaryCandidates(lattice, text, codepoints, pos, char_types);
   }
 
+  // Fallback: ensure every position has at least one edge
+  // This prevents the lattice from becoming invalid when no candidates are generated
+  // (e.g., positions starting with small kana like っ, ゃ, ゅ, ょ)
+  for (size_t pos = 0; pos < codepoints.size(); ++pos) {
+    if (lattice.edgesAt(pos).empty()) {
+      // Generate a single-character fallback candidate with high penalty
+      size_t byte_start = charPosToBytePos(codepoints, pos);
+      size_t byte_end = charPosToBytePos(codepoints, pos + 1);
+      std::string surface(text.substr(byte_start, byte_end - byte_start));
+
+      // Use OTHER POS with high cost - this should only be chosen as last resort
+      constexpr float kFallbackCost = 5.0F;
+      lattice.addEdge(surface, static_cast<uint32_t>(pos),
+                      static_cast<uint32_t>(pos + 1), core::PartOfSpeech::Other,
+                      kFallbackCost, core::LatticeEdge::kIsUnknown);
+    }
+  }
+
   return lattice;
 }
 

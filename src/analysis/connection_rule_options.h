@@ -67,6 +67,17 @@ struct ConnectionOptions {
   // たい adjective after verb renyokei (bonus = positive value subtracted)
   float bonus_tai_after_renyokei = scorer::kBonusTaiAfterRenyokei;
 
+  // た auxiliary after verb renyokei (MeCab compatibility: prefer stem + た split)
+  float bonus_ta_after_renyokei = 2.5F;
+
+  // AUX(まし/ませ) → AUX(た/ん) (MeCab-compatible masu conjugation split)
+  // This bonus helps しました → し + まし + た beat しまし + た
+  float bonus_masu_renyokei_to_ta = 2.5F;
+
+  // 動詞未然形 → ない (MeCab-compatible negative split)
+  // This bonus helps 食べない → 食べ + ない beat 食べない (unified)
+  float bonus_nai_after_verb_mizenkei = 2.5F;
+
   // やすい (cheap) after renyokei-like noun
   float penalty_yasui_after_renyokei = scorer::kPenaltyYasuiAfterRenyokei;
 

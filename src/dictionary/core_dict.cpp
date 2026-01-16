@@ -156,25 +156,34 @@ std::vector<ConjugatedForm> getGodanSaForms() {
 }
 
 // Generate Suru forms (irregular)
-// Note: Polite forms (します, しました, しません) are NOT included - they should be
-//       analyzed as renyokei + auxiliary per CLAUDE.md design
+// Note: For MeCab compatibility, only generate forms that should NOT be split.
+// Forms like した, して, しない, している should be analyzed as split forms:
+//   - した → し(VERB) + た(AUX)
+//   - して → し(VERB) + て(PARTICLE)
+//   - しない → し(VERB) + ない(AUX)
+//   - している → し(VERB) + て(PARTICLE) + いる(AUX)
 std::vector<std::pair<std::string, std::string>> getSuruConjugations(
     const std::string& stem) {
   // stem is empty for する itself
   return {
-      {stem + "する", stem + "する"},      // Base
-      {stem + "した", stem + "する"},      // Past
-      {stem + "して", stem + "する"},      // Te-form
-      {stem + "しない", stem + "する"},    // Negative
-      {stem + "せん", stem + "する"},      // Contracted negative (colloquial)
-      {stem + "しなかった", stem + "する"},// Past negative
-      {stem + "したら", stem + "する"},    // Conditional
-      {stem + "すれば", stem + "する"},    // Conditional
-      {stem + "しろ", stem + "する"},      // Imperative
-      {stem + "せよ", stem + "する"},      // Imperative (classical)
-      {stem + "しよう", stem + "する"},    // Volitional
-      {stem + "している", stem + "する"},  // Progressive
-      {stem + "していた", stem + "する"},  // Past progressive
+      {stem + "する", stem + "する"},      // Base form (終止形)
+      // Forms that can't be easily split - keep as compound
+      {stem + "すれば", stem + "する"},    // Conditional (仮定形)
+      {stem + "しろ", stem + "する"},      // Imperative (命令形)
+      {stem + "せよ", stem + "する"},      // Imperative classical (命令形・古語)
+      // Note: しよう should be しよ+う but keep compound for now
+      {stem + "しよう", stem + "する"},    // Volitional (意志形)
+      // Contracted negative (colloquial) - keep as compound
+      {stem + "せん", stem + "する"},      // Contracted negative (口語否定)
+      // Conditional past - split would be し+たら, keep compound for simplicity
+      {stem + "したら", stem + "する"},    // Conditional (条件形)
+      // Removed for MeCab compatibility (should be split):
+      // - した → し + た
+      // - して → し + て
+      // - しない → し + ない
+      // - しなかった → し + なかった
+      // - している → し + て + いる
+      // - していた → し + て + いた
   };
 }
 
@@ -454,7 +463,7 @@ void CoreDictionary::initializeEntries() {
         if (should_expand) {
           DictionaryEntry reading_entry = entry;
           reading_entry.surface = entry.reading;
-          reading_entry.lemma = entry.surface;  // Lemma points to kanji form
+          reading_entry.lemma = entry.reading;  // Lemma is the reading itself (MeCab-compatible)
           entries_.push_back(reading_entry);
         }
       }
@@ -488,7 +497,7 @@ void CoreDictionary::initializeEntries() {
             exp_entry.surface == entry.surface) {  // Only for base form
           DictionaryEntry reading_entry = entry;  // Use original entry with conj_type
           reading_entry.surface = entry.reading;
-          reading_entry.lemma = entry.surface;  // Lemma points to kanji form
+          reading_entry.lemma = entry.reading;  // Lemma is the reading itself (MeCab-compatible)
 
           // Also expand reading entry (conj_type is preserved from original)
           auto reading_expanded = expandAdjectiveEntry(reading_entry);

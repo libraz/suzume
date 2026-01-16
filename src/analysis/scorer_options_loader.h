@@ -15,9 +15,9 @@
 // =============================================================================
 
 #include <fstream>
+#include <map>
 #include <sstream>
 #include <string>
-#include <unordered_map>
 
 #ifndef __EMSCRIPTEN__
 #include <cstdlib>
@@ -36,7 +36,7 @@ struct JsonValue {
   Type type = Type::Null;
   float number_value = 0.0F;
   std::string string_value;
-  std::unordered_map<std::string, JsonValue> object_value;
+  std::map<std::string, JsonValue> object_value;
 
   bool isNumber() const { return type == Type::Number; }
   bool isObject() const { return type == Type::Object; }

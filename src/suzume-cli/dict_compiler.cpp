@@ -106,7 +106,7 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
           reading_entry.surface = tsv_entry.reading;
           reading_entry.pos = tsv_entry.pos;
           reading_entry.cost = tsv_entry.cost;
-          reading_entry.lemma = tsv_entry.surface;  // Lemma is the kanji form
+          reading_entry.lemma = tsv_entry.reading;  // Lemma is the reading itself (MeCab-compatible)
 
           writer.addEntry(reading_entry, tsv_entry.conj_type);
           ++entries_compiled_;

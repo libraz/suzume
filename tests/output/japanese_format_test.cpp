@@ -386,14 +386,16 @@ TEST_F(JapaneseFormatIntegrationTest, VerbWithConjType_GodanKa) {
 }
 
 TEST_F(JapaneseFormatIntegrationTest, VerbWithConjType_Suru) {
-  // Progressive form splits into te-form + auxiliary
+  // MeCab-compatible split: し + て + います
   auto morphemes = analyzer_.analyze("しています");
-  ASSERT_EQ(morphemes.size(), 2);
-  EXPECT_EQ(morphemes[0].surface, "して");
+  ASSERT_EQ(morphemes.size(), 3);
+  EXPECT_EQ(morphemes[0].surface, "し");
   EXPECT_EQ(morphemes[0].getLemma(), "する");
   EXPECT_EQ(morphemes[0].pos, core::PartOfSpeech::Verb);
-  EXPECT_EQ(morphemes[1].surface, "います");
-  EXPECT_EQ(morphemes[1].pos, core::PartOfSpeech::Auxiliary);
+  EXPECT_EQ(morphemes[1].surface, "て");
+  EXPECT_EQ(morphemes[1].pos, core::PartOfSpeech::Particle);
+  EXPECT_EQ(morphemes[2].surface, "います");
+  EXPECT_EQ(morphemes[2].pos, core::PartOfSpeech::Auxiliary);
 
   auto verb_type = grammar::conjTypeToVerbType(morphemes[0].conj_type);
   EXPECT_EQ(verb_type, grammar::VerbType::Suru);

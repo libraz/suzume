@@ -148,6 +148,13 @@ ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
     return {};
   }
 
+  // Skip suru-verb stem し(VERB, lemma=する) + て - MeCab-compatible split
+  // e.g., 勉強して → 勉強 + し(VERB) + て(PARTICLE)
+  if (prev.pos == core::PartOfSpeech::Verb && prev.surface == scorer::kSuffixShi &&
+      prev.lemma == "する" && next.surface == scorer::kFormTe) {
+    return {};
+  }
+
   return {ConnectionPattern::TeFormSplit, opts.penalty_te_form_split,
           "te-form split pattern"};
 }
@@ -195,6 +202,72 @@ ConnectionRuleResult checkTaiAfterRenyokei(const core::LatticeEdge& prev,
   // Bonus (negative value) for long compound patterns
   return {ConnectionPattern::TaiAfterRenyokei, -opts.bonus_tai_after_renyokei,
           "tai-pattern after verb renyokei"};
+}
+
+// Rule 4b: Verb renyokei + た auxiliary handling (MeCab compatibility)
+// Give bonus to split pattern: verb renyokei + た
+// This enables 入れた → 入れ + た, 論じた → 論じ + た, etc.
+// Does NOT apply to 音便形 (書い+た, 買っ+た, 飛ん+た should stay unified)
+ConnectionRuleResult checkTaAfterRenyokei(const core::LatticeEdge& prev,
+                                          const core::LatticeEdge& next,
+                                          const ConnectionOptions& opts) {
+  // Only process VERB → AUX(た)
+  if (prev.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+  if (next.pos != core::PartOfSpeech::Auxiliary || next.surface != "た") {
+    return {};
+  }
+
+  // Check if prev is a valid verb renyokei (連用形)
+  // Valid patterns:
+  // - Ends with i-row hiragana (五段連用形: 書き, 読み, 話し) or e-row (一段連用形: 食べ, 入れ)
+  // EXCLUDE 音便形 (い, っ, ん) - these should stay unified with た
+  // 書いた should NOT split (イ音便)
+  // 買った should NOT split (促音便)
+  // 飛んだ should NOT split (撥音便)
+  if (!endsWithRenyokeiMarker(prev.surface)) {
+    return {};
+  }
+  if (endsWithOnbinMarker(prev.surface)) {
+    return {};  // 音便形 - do not split
+  }
+
+  // Give bonus (negative value) to prefer this split
+  return {ConnectionPattern::TaAfterRenyokei, -opts.bonus_ta_after_renyokei,
+          "ta-aux after verb renyokei (MeCab compatible split)"};
+}
+
+// Rule 4c: Verb mizenkei + ない auxiliary handling (MeCab compatibility)
+// Give bonus to split pattern: verb mizenkei + ない
+// This enables 食べない → 食べ + ない, しれない → しれ + ない, etc.
+// Mizenkei patterns:
+// - 一段: え段 (食べ, しれ) - same as renyokei
+// - 五段: あ段 (書か, 読ま)
+// Note: 音便形 + ない doesn't exist (ない attaches to mizenkei, not onbin)
+ConnectionRuleResult checkNaiAfterVerbMizenkei(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next,
+                                               const ConnectionOptions& opts) {
+  // Only process VERB → AUX(ない)
+  if (prev.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+  if (next.pos != core::PartOfSpeech::Auxiliary || next.surface != "ない") {
+    return {};
+  }
+
+  // Check if prev is a valid verb mizenkei (未然形)
+  // Valid patterns:
+  // - 一段: ends with e-row hiragana (食べ, しれ, 見)
+  // - 五段: ends with a-row hiragana (書か, 読ま, 話さ)
+  // Note: 五段 mizenkei ends with あ段, not い段
+  if (!endsWithRenyokeiMarker(prev.surface) && !endsWithARow(prev.surface)) {
+    return {};
+  }
+
+  // Give bonus (negative value) to prefer this split
+  return {ConnectionPattern::NaiAfterVerbMizenkei, -opts.bonus_nai_after_verb_mizenkei,
+          "nai-aux after verb mizenkei (MeCab compatible split)"};
 }
 
 // Rule 5: Renyokei-like noun + やすい (安い) penalty

@@ -4,13 +4,13 @@
   "cases": [
     {
       "id": "pronoun_anata",
-      "description": "あなた - hiragana pronoun",
+      "description": "あなた - hiragana pronoun, MeCab-compatible lemma is hiragana",
       "input": "あなた",
       "expected": [
         {
           "surface": "あなた",
           "pos": "Pronoun",
-          "lemma": "貴方"
+          "lemma": "あなた"
         }
       ],
       "tags": [

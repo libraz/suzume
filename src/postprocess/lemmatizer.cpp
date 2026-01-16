@@ -35,6 +35,111 @@ const VerbEnding kVerbEndings[] = {
     {"ておりました", "おる"},  // ていた polite humble
     {"おります", "おる"},  // いる polite humble
 
+    // Suru-verb te-form + subsidiary verbs (longest first)
+    // These are compound patterns where [noun]して[subsidiary] → [noun]する
+    // Progressive forms of subsidiary verbs (補助動詞進行形) - longest first
+    {"してもらっています", "する"},
+    {"してもらっていた", "する"},
+    {"してもらっている", "する"},
+    {"してあげています", "する"},
+    {"してあげていた", "する"},
+    {"してあげている", "する"},
+    {"してくれています", "する"},
+    {"してくれていた", "する"},
+    {"してくれている", "する"},
+    {"してきています", "する"},
+    {"してきていた", "する"},
+    {"してきている", "する"},
+    {"していっています", "する"},
+    {"していっていた", "する"},
+    {"していっている", "する"},
+    // Base forms of subsidiary verbs (補助動詞基本形)
+    {"してもらう", "する"},
+    {"してもらった", "する"},
+    {"してもらって", "する"},
+    {"してあげる", "する"},
+    {"してあげた", "する"},
+    {"してあげて", "する"},
+    {"してみる", "する"},
+    {"してみた", "する"},
+    {"してみて", "する"},
+    {"してくれる", "する"},
+    {"してくれた", "する"},
+    {"してくれて", "する"},
+    {"していく", "する"},
+    {"していった", "する"},
+    {"していって", "する"},
+    {"してくる", "する"},
+    {"してきた", "する"},
+    {"してきて", "する"},
+    {"しておく", "する"},
+    {"しておいた", "する"},
+    {"しておいて", "する"},
+    {"してしまう", "する"},
+    {"してしまった", "する"},
+    {"してしまって", "する"},
+
+    // Suru-verb colloquial contractions (サ変動詞口語縮約形)
+    // してしまう → しちゃう/しちまう
+    {"しちゃいます", "する"},
+    {"しちゃう", "する"},
+    {"しちゃった", "する"},
+    {"しちゃって", "する"},
+    {"しちまう", "する"},
+    {"しちまった", "する"},
+    {"しちまって", "する"},
+    // しておく → しとく
+    {"しときます", "する"},
+    {"しとく", "する"},
+    {"しといた", "する"},
+    {"しといて", "する"},
+    // している → してる
+    {"してました", "する"},
+    {"してます", "する"},
+    {"してる", "する"},
+    {"してた", "する"},
+    // Negative te-form (否定て形)
+    {"しなくて", "する"},
+    {"しないで", "する"},
+
+    // Colloquial とく/どく contractions (ておく → とく)
+    // Ichidan: stem + とく → stem + る
+    {"とく", "る"},      // 見とく → 見る, 食べとく → 食べる
+    {"といた", "る"},    // 見といた → 見る
+    {"といて", "る"},    // 見といて → 見る
+    // Godan onbinkei: stem + んどく → stem + む/ぶ/ぬ
+    {"んどく", "む"},    // 読んどく → 読む
+    {"んどいた", "む"},  // 読んどいた → 読む
+    {"んどいて", "む"},  // 読んどいて → 読む
+    // Godan i-row onbinkei: stem + いとく → stem + く
+    {"いとく", "く"},    // 書いとく → 書く
+    {"いといた", "く"},  // 書いといた → 書く
+    {"いといて", "く"},  // 書いといて → 書く
+    // Godan sokuon + とく: stem + っとく → stem + う/つ/る
+    {"っとく", "う"},    // 買っとく → 買う
+    {"っといた", "う"},  // 買っといた → 買う
+    {"っといて", "う"},  // 買っといて → 買う
+
+    // Colloquial てる/でる contractions (ている → てる)
+    // Godan sokuon: stem + ってる → stem + う/つ/る
+    {"ってる", "う"},    // 買ってる → 買う, 待ってる → 待つ
+    {"ってた", "う"},    // 買ってた → 買う
+    // Godan i-row: stem + いてる → stem + く
+    {"いてる", "く"},    // 書いてる → 書く
+    {"いてた", "く"},    // 書いてた → 書く
+    // Godan n-row: stem + んでる → stem + む/ぶ/ぬ
+    {"んでる", "む"},    // 読んでる → 読む
+    {"んでた", "む"},    // 読んでた → 読む
+    // Ichidan: stem + てる → stem + る
+    {"てる", "る"},      // 見てる → 見る, 食べてる → 食べる
+    {"てた", "る"},      // 見てた → 見る
+
+    // Volitional form (意志形)
+    // Ichidan: stem + よう → stem + る
+    {"めよう", "める"},  // 始めよう → 始める (avoid false positive on godan)
+    {"べよう", "べる"},  // 食べよう → 食べる
+    {"ねよう", "ねる"},  // 寝よう → 寝る
+
     // Compound verbs (longest first)
     {"ってしまった", "う"},
     {"ってしまった", "つ"},
@@ -76,7 +181,18 @@ const VerbEnding kVerbEndings[] = {
     {"していった", "す"},
     {"ていった", "る"},
 
-    // Passive forms
+    // Passive forms (dictionary)
+    {"われる", "う"},
+    {"かれる", "く"},
+    {"がれる", "ぐ"},
+    {"される", "す"},
+    {"たれる", "つ"},
+    {"なれる", "ぬ"},
+    {"まれる", "む"},
+    {"ばれる", "ぶ"},
+    {"られる", "る"},
+
+    // Passive forms (past)
     {"われた", "う"},
     {"かれた", "く"},
     {"がれた", "ぐ"},
@@ -87,7 +203,73 @@ const VerbEnding kVerbEndings[] = {
     {"ばれた", "ぶ"},
     {"られた", "る"},
 
-    // Causative forms
+    // Passive forms (te-form)
+    {"われて", "う"},
+    {"かれて", "く"},
+    {"がれて", "ぐ"},
+    {"されて", "す"},
+    {"たれて", "つ"},
+    {"なれて", "ぬ"},
+    {"まれて", "む"},
+    {"ばれて", "ぶ"},
+    {"られて", "る"},
+
+    // Passive forms (negative)
+    {"われない", "う"},
+    {"かれない", "く"},
+    {"がれない", "ぐ"},
+    {"されない", "す"},
+    {"たれない", "つ"},
+    {"なれない", "ぬ"},
+    {"まれない", "む"},
+    {"ばれない", "ぶ"},
+    {"られない", "る"},
+
+    // Passive forms (polite)
+    {"われます", "う"},
+    {"かれます", "く"},
+    {"がれます", "ぐ"},
+    {"されます", "す"},
+    {"たれます", "つ"},
+    {"なれます", "ぬ"},
+    {"まれます", "む"},
+    {"ばれます", "ぶ"},
+    {"られます", "る"},
+
+    // Passive forms (polite past)
+    {"われました", "う"},
+    {"かれました", "く"},
+    {"がれました", "ぐ"},
+    {"されました", "す"},
+    {"たれました", "つ"},
+    {"なれました", "ぬ"},
+    {"まれました", "む"},
+    {"ばれました", "ぶ"},
+    {"られました", "る"},
+
+    // Passive forms (progressive)
+    {"われている", "う"},
+    {"かれている", "く"},
+    {"がれている", "ぐ"},
+    {"されている", "す"},
+    {"たれている", "つ"},
+    {"なれている", "ぬ"},
+    {"まれている", "む"},
+    {"ばれている", "ぶ"},
+    {"られている", "る"},
+
+    // Causative forms (dictionary)
+    {"わせる", "う"},
+    {"かせる", "く"},
+    {"がせる", "ぐ"},
+    {"させる", "す"},
+    {"たせる", "つ"},
+    {"なせる", "ぬ"},
+    {"ませる", "む"},
+    {"ばせる", "ぶ"},
+    {"らせる", "る"},
+
+    // Causative forms (past)
     {"わせた", "う"},
     {"かせた", "く"},
     {"がせた", "ぐ"},
@@ -97,6 +279,17 @@ const VerbEnding kVerbEndings[] = {
     {"ませた", "む"},
     {"ばせた", "ぶ"},
     {"らせた", "る"},
+
+    // Causative forms (te-form)
+    {"わせて", "う"},
+    {"かせて", "く"},
+    {"がせて", "ぐ"},
+    {"させて", "す"},
+    {"たせて", "つ"},
+    {"なせて", "ぬ"},
+    {"ませて", "む"},
+    {"ばせて", "ぶ"},
+    {"らせて", "る"},
 
     // Causative-passive forms
     {"わされた", "う"},
@@ -394,6 +587,19 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
         }
       }
     }
+
+    // Check for サ変動詞 classical form: 漢字2文字以上+す → 漢字+する
+    // e.g., 確認す → 確認する, 運動す → 運動する
+    // Single kanji + す (出す, 消す) are GodanSa, not Suru
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        endsWith(morpheme.lemma, "す") && !endsWith(morpheme.lemma, "する")) {
+      std::string stem = morpheme.lemma.substr(0, morpheme.lemma.size() - core::kJapaneseCharBytes);
+      // Check if stem is 2+ kanji characters (6+ bytes)
+      if (stem.size() >= core::kTwoJapaneseCharBytes && grammar::isAllKanji(stem)) {
+        return stem + "する";
+      }
+    }
+
     return morpheme.lemma;
   }
 
@@ -433,6 +639,34 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
         return stem + "する";
       }
     }
+    // Check for compound verbs that conjugate like サ変: [kanji]しる → [kanji]する
+    // e.g., 対しる → 対する, 関しる → 関する, 反しる → 反する
+    // These verbs are incorrectly analyzed as ichidan (stem + る) but should be サ変-like
+    // Note: 応じる, 存じる are actual ichidan verbs (not サ変)
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        endsWith(grammar_result, "しる")) {
+      std::string stem = grammar_result.substr(0, grammar_result.size() - core::kTwoJapaneseCharBytes);
+      // Check if stem is a single kanji that forms a compound verb with する
+      // Common patterns: 対する, 関する, 反する, 接する, 属する, 達する, etc.
+      if (stem.size() == core::kJapaneseCharBytes && grammar::isAllKanji(stem)) {
+        return stem + "する";
+      }
+    }
+    // For passive verbs, grammar-based returns the passive form as base (e.g., いわれる)
+    // but we want the original base verb (e.g., いう). Use rule-based lemmatization instead.
+    // Pattern: 〜れる endings are passive forms of godan verbs
+    if (morpheme.pos == core::PartOfSpeech::Verb && grammar_result == morpheme.surface) {
+      std::string rule_result = lemmatizeVerb(morpheme.surface);
+      if (rule_result != morpheme.surface) {
+        return rule_result;
+      }
+    }
+    // B45: Special fix for ない adjective + さ + そう pattern
+    // Grammar incorrectly returns なさい, but correct lemma is ない
+    // The surface なさそう with grammar result なさい should return ない
+    if (grammar_result == "なさい" && morpheme.surface.find("なさそう") != std::string::npos) {
+      return "ない";
+    }
     return grammar_result;
   }
 
@@ -449,7 +683,119 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
 
 void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
   for (auto& morpheme : morphemes) {
-    morpheme.lemma = lemmatize(morpheme);
+    // B45: Special fix for ない adjective + さ + そう pattern
+    // The adjective candidate generator sets lemma to なさい, but correct is ない
+    // なさそう = ない + さそう (looks like there isn't)
+    if (morpheme.pos == core::PartOfSpeech::Adjective &&
+        morpheme.surface.find("なさそう") != std::string::npos &&
+        morpheme.lemma == "なさい") {
+      morpheme.lemma = "ない";
+    }
+
+    // Fix classical suru-verb lemma: 漢字2文字以上+す → 漢字+する
+    // e.g., 確認す → 確認する, 運動す → 運動する
+    // The verb_candidates sometimes returns classical form that needs conversion
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        !morpheme.lemma.empty() &&
+        endsWith(morpheme.lemma, "す") && !endsWith(morpheme.lemma, "する")) {
+      std::string stem = morpheme.lemma.substr(0, morpheme.lemma.size() - core::kJapaneseCharBytes);
+      // Check if stem is 2+ kanji characters (6+ bytes)
+      if (stem.size() >= core::kTwoJapaneseCharBytes && grammar::isAllKanji(stem)) {
+        morpheme.lemma = stem + "する";
+      }
+    }
+
+    // Preserve lemma if intentionally set (e.g., from verb_candidates for passive verbs)
+    // Recalculate if:
+    // 1. Lemma is empty, OR
+    // 2. Lemma equals surface AND it's a conjugated form (not dictionary form)
+    //    Dictionary forms end with: る, う, く, ぐ, す, つ, ぬ, ぶ, む (verbs), い (adjectives)
+    bool needs_lemmatization = morpheme.lemma.empty();
+    if (!needs_lemmatization && morpheme.lemma == morpheme.surface) {
+      if (morpheme.pos == core::PartOfSpeech::Verb) {
+        // Check if surface looks like a dictionary form verb
+        // Dictionary form verbs end with: る, う, く, ぐ, す, つ, ぬ, ぶ, む
+        bool is_dict_form = endsWith(morpheme.surface, "る") ||
+                            endsWith(morpheme.surface, "う") ||
+                            endsWith(morpheme.surface, "く") ||
+                            endsWith(morpheme.surface, "ぐ") ||
+                            endsWith(morpheme.surface, "す") ||
+                            endsWith(morpheme.surface, "つ") ||
+                            endsWith(morpheme.surface, "ぬ") ||
+                            endsWith(morpheme.surface, "ぶ") ||
+                            endsWith(morpheme.surface, "む");
+        // If it's a dictionary form, lemma == surface is correct
+        // If it's a conjugated form (て, た, ない, etc.), recalculate
+        if (!is_dict_form) {
+          needs_lemmatization = true;
+        }
+        // But passive verbs ending in 〜れる need lemmatization even though they end with る
+        // E.g., いわれる → いう, かかれる → かく
+        if (is_dict_form && (endsWith(morpheme.surface, "われる") ||
+                             endsWith(morpheme.surface, "かれる") ||
+                             endsWith(morpheme.surface, "がれる") ||
+                             endsWith(morpheme.surface, "される") ||  // す verb passive
+                             endsWith(morpheme.surface, "たれる") ||
+                             endsWith(morpheme.surface, "なれる") ||
+                             endsWith(morpheme.surface, "まれる") ||
+                             endsWith(morpheme.surface, "ばれる") ||
+                             endsWith(morpheme.surface, "られる"))) {
+          needs_lemmatization = true;
+        }
+        // Causative forms need lemmatization
+        // E.g., 勉強させる → 勉強する, 書かせる → 書く
+        if (is_dict_form && (endsWith(morpheme.surface, "させる") ||
+                             endsWith(morpheme.surface, "わせる") ||
+                             endsWith(morpheme.surface, "かせる") ||
+                             endsWith(morpheme.surface, "がせる") ||
+                             endsWith(morpheme.surface, "たせる") ||
+                             endsWith(morpheme.surface, "なせる") ||
+                             endsWith(morpheme.surface, "ばせる") ||
+                             endsWith(morpheme.surface, "ませる") ||
+                             endsWith(morpheme.surface, "らせる"))) {
+          needs_lemmatization = true;
+        }
+        // Suru-verb te-form + subsidiary verb patterns need lemmatization
+        // E.g., 説明してもらう → 説明する, 勉強してくる → 勉強する
+        if (is_dict_form && (endsWith(morpheme.surface, "してもらう") ||
+                             endsWith(morpheme.surface, "してあげる") ||
+                             endsWith(morpheme.surface, "してみる") ||
+                             endsWith(morpheme.surface, "してくれる") ||
+                             endsWith(morpheme.surface, "していく") ||
+                             endsWith(morpheme.surface, "してくる") ||
+                             endsWith(morpheme.surface, "しておく") ||
+                             endsWith(morpheme.surface, "してしまう"))) {
+          needs_lemmatization = true;
+        }
+        // Colloquial とく/どく contractions need lemmatization
+        // E.g., 見とく → 見る, 読んどく → 読む, 書いとく → 書く
+        if (is_dict_form && (endsWith(morpheme.surface, "とく") ||
+                             endsWith(morpheme.surface, "んどく"))) {
+          needs_lemmatization = true;
+        }
+        // Colloquial てる/でる contractions need lemmatization
+        // E.g., 見てる → 見る, 読んでる → 読む, 買ってる → 買う
+        if (is_dict_form && (endsWith(morpheme.surface, "てる") ||
+                             endsWith(morpheme.surface, "でる") ||
+                             endsWith(morpheme.surface, "ってる"))) {
+          needs_lemmatization = true;
+        }
+        // Volitional form needs lemmatization
+        // E.g., 始めよう → 始める, 食べよう → 食べる
+        if (endsWith(morpheme.surface, "よう")) {
+          needs_lemmatization = true;
+        }
+      } else if (morpheme.pos == core::PartOfSpeech::Adjective) {
+        // Check if surface looks like a dictionary form adjective (ends with い)
+        bool is_dict_form = endsWith(morpheme.surface, "い");
+        if (!is_dict_form) {
+          needs_lemmatization = true;
+        }
+      }
+    }
+    if (needs_lemmatization) {
+      morpheme.lemma = lemmatize(morpheme);
+    }
     morpheme.conj_form = detectConjForm(morpheme.surface, morpheme.lemma, morpheme.pos);
   }
 }

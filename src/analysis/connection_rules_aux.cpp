@@ -213,6 +213,29 @@ ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
           "masen + de split (should be masen + deshita)"};
 }
 
+// Rule: AUX(まし/ませ) → AUX(た/ん) bonus
+// MeCab-compatible split: しました → し + まし + た
+// This bonus helps the correct path beat incorrect paths like しまし(VERB) + た
+// Without this, the ta_after_renyokei bonus (-2.5) makes VERB + た win
+ConnectionRuleResult checkMasuRenyokeiToTa(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next,
+                                           const ConnectionOptions& opts) {
+  if (!isAuxToAux(prev, next)) return {};
+
+  // Check if prev is ます conjugation (まし/ませ with lemma ます)
+  if (prev.lemma != scorer::kLemmaMasu) return {};
+
+  // まし (ます連用形) or ませ (ます未然形)
+  if (prev.surface != "まし" && prev.surface != "ませ") return {};
+
+  // Check if next is た/ん (past/negative)
+  if (next.surface != scorer::kFormTa && next.surface != "ん") return {};
+
+  // Give bonus (negative value) to prefer this MeCab-compatible split
+  return {ConnectionPattern::MasuRenyokeiToTa, -opts.bonus_masu_renyokei_to_ta,
+          "masu-renyokei + ta/n (MeCab-compatible split)"};
+}
+
 // Rule: NOUN + verb-specific AUX penalty
 // Verb auxiliaries like ます/ましょう/たい require verb stem, not nouns
 // E.g., 行き(NOUN) + ましょう is invalid - should be 行き(VERB) + ましょう

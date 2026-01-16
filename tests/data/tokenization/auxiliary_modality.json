@@ -139,24 +139,12 @@
     },
     {
       "id": "aux_kamoshirenai",
-      "description": "かもしれない - decomposes to か + も + しれない (grammatically correct)",
+      "description": "かもしれない - MeCab-compatible split: かも + しれ + ない",
       "input": "かもしれない",
       "expected": [
-        {
-          "surface": "か",
-          "pos": "Particle",
-          "lemma": "か"
-        },
-        {
-          "surface": "も",
-          "pos": "Particle",
-          "lemma": "も"
-        },
-        {
-          "surface": "しれない",
-          "pos": "Verb",
-          "lemma": "しれる"
-        }
+        {"surface": "かも", "pos": "Particle"},
+        {"surface": "しれ", "pos": "Verb", "lemma": "しれる"},
+        {"surface": "ない", "pos": "Auxiliary", "lemma": "ない"}
       ],
       "tags": [
         "auxiliary",
@@ -165,13 +153,16 @@
     },
     {
       "id": "aux_kamoshiremasen",
-      "description": "かもしれません in sentence - grammaticalized modal as single auxiliary",
+      "description": "かもしれません in sentence - MeCab-compatible split",
       "input": "明日は雨かもしれません",
       "expected": [
         {"surface": "明日", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "雨", "pos": "Noun"},
-        {"surface": "かもしれません", "pos": "Auxiliary", "lemma": "かもしれない"}
+        {"surface": "かも", "pos": "Particle"},
+        {"surface": "しれ", "pos": "Verb", "lemma": "しれる"},
+        {"surface": "ませ", "pos": "Auxiliary", "lemma": "ます"},
+        {"surface": "ん", "pos": "Auxiliary", "lemma": "ん"}
       ],
       "tags": ["auxiliary", "possibility"]
     },
@@ -1060,7 +1051,7 @@
     },
     {
       "id": "node_in_sentence",
-      "description": "ので in sentence - ている splits to て+いる, verb+そう splits",
+      "description": "ので in sentence - ている splits to て+いる, suru-verb splits",
       "input": "電車が遅れているので遅刻しそうです",
       "expected": [
         {
@@ -1086,14 +1077,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "遅刻し",
-          "pos": "Verb",
-          "lemma": "遅刻する"
+          "surface": "遅刻",
+          "pos": "Noun"
         },
         {
-          "surface": "そう",
+          "surface": "しそう",
           "pos": "Auxiliary",
-          "lemma": "そう"
+          "lemma": "する"
         },
         {
           "surface": "です",

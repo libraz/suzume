@@ -16,20 +16,21 @@
     },
     {
       "id": "tech_doc_programming_term",
-      "description": "Programming terminology with Japanese",
+      "description": "Programming terminology - MeCab互換分割",
       "input": "変数に値を代入する",
       "expected": [
         {"surface": "変数", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "値", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "代入する", "pos": "Verb", "lemma": "代入する"}
+        {"surface": "代入", "pos": "Noun"},
+        {"surface": "する", "pos": "Verb", "lemma": "する"}
       ],
       "tags": ["technical", "documentation"]
     },
     {
       "id": "tech_doc_code_review",
-      "description": "Code review comment",
+      "description": "Code review comment - MeCab互換分割",
       "input": "この関数は複雑すぎるので分割してください",
       "expected": [
         {"surface": "この", "pos": "Determiner"},
@@ -37,7 +38,9 @@
         {"surface": "は", "pos": "Particle"},
         {"surface": "複雑すぎる", "pos": "Verb", "lemma": "複雑過ぎる"},
         {"surface": "ので", "pos": "Particle"},
-        {"surface": "分割して", "pos": "Verb", "lemma": "分割する"},
+        {"surface": "分割", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["technical", "documentation"]
@@ -75,43 +78,48 @@
     },
     {
       "id": "tech_doc_install_guide",
-      "description": "Installation guide",
+      "description": "Installation guide - MeCab互換分割",
       "input": "以下のコマンドを実行してください",
       "expected": [
         {"surface": "以下", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "コマンド", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "実行して", "pos": "Verb", "lemma": "実行する"},
+        {"surface": "実行", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["technical", "documentation"]
     },
     {
       "id": "tech_doc_troubleshooting",
-      "description": "Troubleshooting",
+      "description": "Troubleshooting - MeCab互換分割",
       "input": "問題が解決しない場合は再起動してください",
       "expected": [
         {"surface": "問題", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "解決しない", "pos": "Verb", "lemma": "解決する"},
+        {"surface": "解決", "pos": "Noun"},
+        {"surface": "しない", "pos": "Verb", "lemma": "する"},
         {"surface": "場合", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "再起動", "pos": "Noun"},
-        {"surface": "して", "pos": "Verb", "lemma": "する"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["technical", "documentation"]
     },
     {
       "id": "tech_doc_configuration",
-      "description": "Configuration instruction (split: verb stem + polite aux)",
+      "description": "Configuration instruction - MeCab互換分割",
       "input": "設定ファイルを編集する必要があります",
       "expected": [
         {"surface": "設定", "pos": "Noun"},
         {"surface": "ファイル", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "編集する", "pos": "Verb"},
+        {"surface": "編集", "pos": "Noun"},
+        {"surface": "する", "pos": "Verb", "lemma": "する"},
         {"surface": "必要", "pos": "Adjective"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "あり", "pos": "Verb", "lemma": "ある"},
@@ -173,7 +181,7 @@
     },
     {
       "id": "complex_late_for_work",
-      "description": "Excuse for being late - verb+そう splits (動詞+助動詞 → 分割)",
+      "description": "Excuse for being late - MeCab互換分割",
       "input": "電車が遅れているので遅刻しそうです",
       "expected": [
         {"surface": "電車", "pos": "Noun"},
@@ -181,8 +189,8 @@
         {"surface": "遅れて", "pos": "Verb", "lemma": "遅れる"},
         {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"},
         {"surface": "ので", "pos": "Particle"},
-        {"surface": "遅刻し", "pos": "Verb", "lemma": "遅刻する"},
-        {"surface": "そう", "pos": "Auxiliary", "lemma": "そう"},
+        {"surface": "遅刻", "pos": "Noun"},
+        {"surface": "しそう", "pos": "Auxiliary", "lemma": "する"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["complex", "suru"]
@@ -204,12 +212,13 @@
     },
     {
       "id": "complex_study_abroad",
-      "description": "Study abroad plan",
+      "description": "Study abroad plan - MeCab互換分割",
       "input": "来年から留学するつもりです",
       "expected": [
         {"surface": "来年", "pos": "Noun"},
         {"surface": "から", "pos": "Particle"},
-        {"surface": "留学する", "pos": "Verb"},
+        {"surface": "留学", "pos": "Noun"},
+        {"surface": "する", "pos": "Verb", "lemma": "する"},
         {"surface": "つもり", "pos": "Noun"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
@@ -224,7 +233,7 @@
         {"surface": "の", "pos": "Particle"},
         {"surface": "頃", "pos": "Suffix"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "よく", "pos": "Adjective", "lemma": "良い"},
+        {"surface": "よく", "pos": "Adjective", "lemma": "よい"},
         {"surface": "遊んだ", "pos": "Verb", "lemma": "遊ぶ"},
         {"surface": "場所", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
@@ -234,14 +243,15 @@
     },
     {
       "id": "complex_hearsay",
-      "description": "Hearsay expression",
+      "description": "Hearsay expression - MeCab互換分割",
       "input": "彼は来月結婚するそうです",
       "expected": [
         {"surface": "彼", "pos": "Pronoun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "来月", "pos": "Noun"},
-        {"surface": "結婚する", "pos": "Verb", "lemma": "結婚する"},
-        {"surface": "そう", "pos": "Adverb"},
+        {"surface": "結婚", "pos": "Noun"},
+        {"surface": "する", "pos": "Verb", "lemma": "する"},
+        {"surface": "そう", "pos": "Auxiliary", "lemma": "そう"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["complex"]
@@ -298,7 +308,8 @@
         {"surface": "ので", "pos": "Particle"},
         {"surface": "後", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
-        {"surface": "連絡し", "pos": "Verb", "lemma": "連絡する"},
+        {"surface": "連絡", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
         {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["multi-clause", "suru_verb"]
@@ -308,7 +319,8 @@
       "description": "Contrastive clause with kedo",
       "input": "勉強したけど、試験に落ちた",
       "expected": [
-        {"surface": "勉強した", "pos": "Verb", "lemma": "勉強する"},
+        {"surface": "勉強", "pos": "Noun"},
+        {"surface": "した", "pos": "Auxiliary", "lemma": "する"},
         {"surface": "けど", "pos": "Particle"},
         {"surface": "試験", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
@@ -339,7 +351,8 @@
         {"surface": "音楽", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "聴きながら", "pos": "Verb", "lemma": "聴く"},
-        {"surface": "勉強する", "pos": "Verb", "lemma": "勉強する"}
+        {"surface": "勉強", "pos": "Noun"},
+        {"surface": "する", "pos": "Verb", "lemma": "する"}
       ],
       "tags": ["multi-clause"]
     },
@@ -352,8 +365,8 @@
         {"surface": "の", "pos": "Particle"},
         {"surface": "ため", "pos": "Noun", "lemma": "為"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "運動して", "pos": "Verb", "lemma": "運動する"},
-        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+        {"surface": "運動", "pos": "Noun"},
+        {"surface": "している", "pos": "Auxiliary", "lemma": "する"}
       ],
       "tags": ["multi-clause"]
     },
@@ -521,7 +534,9 @@
         {"surface": "に", "pos": "Particle"},
         {"surface": "一錠", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "服用して", "pos": "Verb", "lemma": "服用する"},
+        {"surface": "服用", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["medical"]
@@ -539,7 +554,9 @@
         {"surface": "したら", "pos": "Verb", "lemma": "する"},
         {"surface": "医師", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "相談して", "pos": "Verb", "lemma": "相談する"},
+        {"surface": "相談", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["medical"]

@@ -17,6 +17,10 @@ bool endsWithERow(std::string_view surface) {
   return grammar::endsWithERow(surface);
 }
 
+bool endsWithARow(std::string_view surface) {
+  return grammar::endsWithARow(surface);
+}
+
 bool endsWithRenyokeiMarker(std::string_view surface) {
   return grammar::endsWithRenyokeiMarker(surface);
 }
@@ -99,6 +103,8 @@ void evaluateVerbRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkSouAuxAfterVerbRenyokei(prev, next, opts));
   accumulateRule(accumulated, checkInvalidTeFormAux(prev, next, opts));
   accumulateRule(accumulated, checkTekuReMissegmentation(prev, next, opts));
+  accumulateRule(accumulated, checkTaAfterRenyokei(prev, next, opts));
+  accumulateRule(accumulated, checkNaiAfterVerbMizenkei(prev, next, opts));
 
   // VERB → VERB rules
   accumulateRule(accumulated, checkIchidanRenyokeiTe(prev, next, opts));
@@ -181,6 +187,7 @@ void evaluateAuxRules(const core::LatticeEdge& prev,
                       ConnectionRuleResult& accumulated) {
   // AUX → AUX rules
   accumulateRule(accumulated, checkCharacterSpeechSplit(prev, next, opts));
+  accumulateRule(accumulated, checkMasuRenyokeiToTa(prev, next, opts));
 
   // AUX → PARTICLE rules
   accumulateRule(accumulated, checkMasenDeSplit(prev, next, opts));

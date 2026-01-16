@@ -59,13 +59,13 @@
     },
     {
       "id": "yokatta_past",
-      "description": "よかった (past form) - lemma is 良い (kanji form registered in dictionary)",
+      "description": "よかった (past form) - MeCab-compatible lemma is よい",
       "input": "よかった",
       "expected": [
         {
           "surface": "よかった",
           "pos": "Adjective",
-          "lemma": "良い"
+          "lemma": "よい"
         }
       ],
       "tags": [
@@ -77,13 +77,13 @@
     },
     {
       "id": "yokunai_negative",
-      "description": "よくない (negative form) - lemma is 良い",
+      "description": "よくない (negative form) - MeCab-compatible lemma is よい",
       "input": "よくない",
       "expected": [
         {
           "surface": "よくない",
           "pos": "Adjective",
-          "lemma": "良い"
+          "lemma": "よい"
         }
       ],
       "tags": [
@@ -95,13 +95,13 @@
     },
     {
       "id": "yokereba_conditional",
-      "description": "よければ (conditional) - lemma is 良い",
+      "description": "よければ (conditional) - MeCab-compatible lemma is よい",
       "input": "よければ",
       "expected": [
         {
           "surface": "よければ",
           "pos": "Adjective",
-          "lemma": "良い"
+          "lemma": "よい"
         }
       ],
       "tags": [
@@ -113,13 +113,13 @@
     },
     {
       "id": "yoku_adverbial",
-      "description": "よく (adverbial form) - lemma is 良い",
+      "description": "よく (adverbial form) - MeCab-compatible lemma is よい",
       "input": "よく分かる",
       "expected": [
         {
           "surface": "よく",
           "pos": "Adjective",
-          "lemma": "良い"
+          "lemma": "よい"
         },
         {
           "surface": "分かる",
@@ -157,13 +157,13 @@
     },
     {
       "id": "yokatta_desu_polite_past",
-      "description": "よかったです - polite past form, lemma is 良い",
+      "description": "よかったです - polite past form, MeCab-compatible lemma is よい",
       "input": "よかったです",
       "expected": [
         {
           "surface": "よかった",
           "pos": "Adjective",
-          "lemma": "良い"
+          "lemma": "よい"
         },
         {
           "surface": "です",
@@ -206,13 +206,13 @@
     },
     {
       "id": "yosa_nominalization",
-      "description": "よさ (nominalization) - NOUN derived from よい (良い)",
+      "description": "よさ (nominalization) - NOUN derived from よい, MeCab-compatible lemma",
       "input": "よさ",
       "expected": [
         {
           "surface": "よさ",
           "pos": "Noun",
-          "lemma": "良い"
+          "lemma": "よい"
         }
       ],
       "tags": [
@@ -633,27 +633,12 @@
       "description": "美しくなりたかった - ADJ連用形 + なる + たい pattern",
       "input": "美しくなりたかった",
       "expected": [
-        {
-          "surface": "美しく",
-          "pos": "Adjective",
-          "lemma": "美しい"
-        },
-        {
-          "surface": "なり",
-          "pos": "Verb",
-          "lemma": "なる"
-        },
-        {
-          "surface": "たかった",
-          "pos": "Auxiliary",
-          "lemma": "たい"
-        }
+        {"surface": "美しく", "pos": "Adjective", "lemma": "美しい"},
+        {"surface": "なり", "pos": "Verb", "lemma": "なる"},
+        {"surface": "たかっ", "pos": "Auxiliary", "lemma": "たい"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
-      "tags": [
-        "i_adjective",
-        "naru",
-        "tai"
-      ]
+      "tags": ["i_adjective", "naru", "tai"]
     },
     {
       "id": "true_adj_nai_sukunai",
