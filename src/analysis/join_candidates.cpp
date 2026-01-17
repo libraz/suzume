@@ -1166,6 +1166,13 @@ void addTeFormAuxiliaryCandidates(
     return;
   }
 
+  // Skip if preceded by suru renyokei "し" - MeCab splits し+て+auxiliary
+  // E.g., してみる → し + て + みる, してしまう → し + て + しまう
+  // This prevents generating combined "てみる" candidate when it should be split
+  if (start_pos > 0 && codepoints[start_pos - 1] == U'し') {
+    return;
+  }
+
   // Check if there's hiragana following
   size_t aux_start = start_pos + 1;
   if (aux_start >= codepoints.size() ||

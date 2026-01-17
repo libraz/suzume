@@ -72,18 +72,27 @@
     },
     {
       "id": "bug_manandeimasu",
-      "description": "学んでいます - verb with progressive",
+      "description": "学んでいます - MeCab-compatible: 学ん + で + い + ます",
       "input": "学んでいます",
       "expected": [
         {
-          "surface": "学んで",
+          "surface": "学ん",
           "pos": "Verb",
           "lemma": "学ぶ"
         },
         {
-          "surface": "います",
-          "pos": "Auxiliary",
+          "surface": "で",
+          "pos": "Particle"
+        },
+        {
+          "surface": "い",
+          "pos": "Verb",
           "lemma": "いる"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [
@@ -92,13 +101,18 @@
     },
     {
       "id": "bug_dekiru",
-      "description": "できます - should not split",
+      "description": "できます - MeCab-compatible: でき + ます",
       "input": "できます",
       "expected": [
         {
-          "surface": "できます",
+          "surface": "でき",
           "pos": "Verb",
           "lemma": "できる"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [
@@ -384,7 +398,10 @@
           "lemma": "ます"
         }
       ],
-      "tags": ["character_speech", "kuruwa"]
+      "tags": [
+        "character_speech",
+        "kuruwa"
+      ]
     },
     {
       "id": "kuruwa_oide_nanshi",
@@ -402,7 +419,10 @@
           "lemma": "ます"
         }
       ],
-      "tags": ["character_speech", "kuruwa"]
+      "tags": [
+        "character_speech",
+        "kuruwa"
+      ]
     }
   ]
 }

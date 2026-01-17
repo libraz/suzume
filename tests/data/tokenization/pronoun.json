@@ -133,7 +133,7 @@
       "expected": [
         {
           "surface": "我輩",
-          "pos": "Pronoun"
+          "pos": "Noun"
         },
         {
           "surface": "は",
@@ -144,8 +144,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "である",
-          "pos": "Auxiliary"
+          "surface": "で",
+          "pos": "Auxiliary",
+          "lemma": "だ"
+        },
+        {
+          "surface": "ある",
+          "pos": "Auxiliary",
+          "lemma": "ある"
         }
       ],
       "tags": [

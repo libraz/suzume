@@ -728,7 +728,8 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
 }
 
 void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
-  for (auto& morpheme : morphemes) {
+  for (size_t i = 0; i < morphemes.size(); ++i) {
+    auto& morpheme = morphemes[i];
     // B45: Special fix for ない adjective + さ + そう pattern
     // The adjective candidate generator sets lemma to なさい, but correct is ない
     // なさそう = ない + さそう (looks like there isn't)
@@ -842,13 +843,19 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
     if (needs_lemmatization) {
       morpheme.lemma = lemmatize(morpheme);
     }
-    morpheme.conj_form = detectConjForm(morpheme.surface, morpheme.lemma, morpheme.pos);
+    // Get next morpheme's lemma for context-dependent conj_form detection
+    std::string_view next_lemma;
+    if (i + 1 < morphemes.size()) {
+      next_lemma = morphemes[i + 1].lemma;
+    }
+    morpheme.conj_form = detectConjForm(morpheme.surface, morpheme.lemma, morpheme.pos, next_lemma);
   }
 }
 
 grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface,
                                              std::string_view lemma,
-                                             core::PartOfSpeech pos) {
+                                             core::PartOfSpeech pos,
+                                             std::string_view next_lemma) {
   // Only verbs and adjectives have conjugation forms
   if (pos != core::PartOfSpeech::Verb &&
       pos != core::PartOfSpeech::Adjective) {
@@ -858,6 +865,28 @@ grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface,
   // If surface equals lemma, it's the base form
   if (surface == lemma) {
     return grammar::ConjForm::Base;
+  }
+
+  // For ichidan verbs, mizenkei and renyokei have the same surface form
+  // (e.g., 食べ for both). Use next morpheme to distinguish:
+  // - ない/ぬ/よう → Mizenkei
+  // - て/た/ます → Renyokei
+  if (pos == core::PartOfSpeech::Verb && endsWith(lemma, "る")) {
+    // Check if this looks like an ichidan verb stem (lemma ends with る, surface is stem)
+    // Ichidan verb stem = lemma without final る
+    if (lemma.size() >= 3 && surface.size() >= 3) {
+      std::string_view lemma_stem(lemma.data(), lemma.size() - 3);  // Remove る (3 bytes)
+      if (surface == lemma_stem && !next_lemma.empty()) {
+        // This is an ichidan verb stem - check what follows
+        if (next_lemma == "ない" || next_lemma == "ぬ" || next_lemma == "ず" ||
+            next_lemma == "よう" || next_lemma == "まい" ||
+            next_lemma == "れる" || next_lemma == "られる" ||  // passive
+            next_lemma == "せる" || next_lemma == "させる") {  // causative
+          return grammar::ConjForm::Mizenkei;
+        }
+        // て/た/ます → Renyokei (will be caught by default below)
+      }
+    }
   }
 
   // Check for negative forms (mizenkei)

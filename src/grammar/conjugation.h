@@ -83,6 +83,27 @@ class Conjugation {
                                        VerbType type) const;
 
   /**
+   * @brief Suffix info for dictionary expansion (MeCab-compatible)
+   */
+  struct DictionarySuffix {
+    std::string suffix;      // Suffix to add to stem: った
+    bool is_potential;       // True if this is a potential form
+  };
+
+  /**
+   * @brief Generate suffixes for dictionary expansion (MeCab-compatible)
+   *
+   * Returns only forms that should NOT be split by MeCab:
+   * - Excludes ます系 (should be split as 連用形 + ます)
+   * - Excludes compound forms like ている (should be split)
+   * - Includes colloquial contractions (ん negative)
+   *
+   * @param type Verb type
+   * @return Vector of suffixes to generate dictionary entries
+   */
+  std::vector<DictionarySuffix> getDictionarySuffixes(VerbType type) const;
+
+  /**
    * @brief Get verb stem from base form
    */
   static std::string getStem(const std::string& base_form, VerbType type);

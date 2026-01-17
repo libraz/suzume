@@ -124,17 +124,22 @@
     },
     {
       "id": "adj_sugiru_inflected_te",
-      "description": "尊すぎて - i-adjective + すぎる te-form splits",
+      "description": "尊すぎて - MeCab-compatible: ADJ stem (ガル接続) + すぎ + て",
       "input": "尊すぎて",
       "expected": [
         {
-          "surface": "尊すぎ",
+          "surface": "尊",
+          "pos": "Adjective",
+          "lemma": "尊い"
+        },
+        {
+          "surface": "すぎ",
           "pos": "Verb",
-          "lemma": "尊過ぎる"
+          "lemma": "すぎる"
         },
         {
           "surface": "て",
-          "pos": "Auxiliary"
+          "pos": "Particle"
         }
       ],
       "tags": [

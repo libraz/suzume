@@ -31,7 +31,7 @@
     },
     {
       "id": "kanji_copula_not_compound",
-      "description": "神だった - should split noun + copula (not compound)",
+      "description": "神だった - MeCab splits as だっ + た",
       "input": "神だった",
       "expected": [
         {
@@ -39,9 +39,13 @@
           "pos": "Noun"
         },
         {
-          "surface": "だった",
+          "surface": "だっ",
           "pos": "Auxiliary",
-          "lemma": "だった"
+          "lemma": "だ"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -51,7 +55,7 @@
     },
     {
       "id": "datta_copula_lemma",
-      "description": "だった lemma should be だった, not だる",
+      "description": "だった - MeCab splits as だっ + た, lemma is だ",
       "input": "本だった",
       "expected": [
         {
@@ -59,9 +63,13 @@
           "pos": "Noun"
         },
         {
-          "surface": "だった",
+          "surface": "だっ",
           "pos": "Auxiliary",
-          "lemma": "だった"
+          "lemma": "だ"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -71,7 +79,7 @@
     },
     {
       "id": "datta_in_sentence",
-      "description": "Full sentence with だった",
+      "description": "Full sentence with だった - MeCab splits as だっ + た",
       "input": "ワンマンライブのセットリストが神だった",
       "expected": [
         {
@@ -95,9 +103,13 @@
           "pos": "Noun"
         },
         {
-          "surface": "だった",
+          "surface": "だっ",
           "pos": "Auxiliary",
-          "lemma": "だった"
+          "lemma": "だ"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -184,11 +196,13 @@
         },
         {
           "surface": "で",
-          "pos": "Particle"
+          "pos": "Auxiliary",
+          "lemma": "だ"
         },
         {
           "surface": "ない",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -207,11 +221,13 @@
         },
         {
           "surface": "で",
-          "pos": "Particle"
+          "pos": "Auxiliary",
+          "lemma": "だ"
         },
         {
           "surface": "ない",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -230,11 +246,13 @@
         },
         {
           "surface": "で",
-          "pos": "Particle"
+          "pos": "Auxiliary",
+          "lemma": "だ"
         },
         {
           "surface": "ない",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -253,11 +271,13 @@
         },
         {
           "surface": "で",
-          "pos": "Particle"
+          "pos": "Auxiliary",
+          "lemma": "だ"
         },
         {
           "surface": "ない",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -272,11 +292,12 @@
       "expected": [
         {
           "surface": "彼女",
-          "pos": "Pronoun"
+          "pos": "Noun"
         },
         {
           "surface": "で",
-          "pos": "Particle"
+          "pos": "Auxiliary",
+          "lemma": "だ"
         },
         {
           "surface": "も",
@@ -328,11 +349,12 @@
       "expected": [
         {
           "surface": "彼女",
-          "pos": "Pronoun"
+          "pos": "Noun"
         },
         {
           "surface": "で",
-          "pos": "Particle"
+          "pos": "Auxiliary",
+          "lemma": "だ"
         },
         {
           "surface": "は",

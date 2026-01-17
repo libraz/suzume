@@ -860,13 +860,17 @@
           "pos": "Particle"
         },
         {
-          "surface": "進んで",
+          "surface": "進ん",
           "pos": "Verb",
           "lemma": "進む"
         },
         {
+          "surface": "で",
+          "pos": "Particle"
+        },
+        {
           "surface": "いる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "いる"
         }
       ],
@@ -905,16 +909,28 @@
       "input": "100万円の請求書を送付いたしました",
       "expected": [
         {
-          "surface": "100万円",
+          "surface": "100",
           "pos": "Noun"
+        },
+        {
+          "surface": "万",
+          "pos": "Noun"
+        },
+        {
+          "surface": "円",
+          "pos": "Suffix"
         },
         {
           "surface": "の",
           "pos": "Particle"
         },
         {
-          "surface": "請求書",
+          "surface": "請求",
           "pos": "Noun"
+        },
+        {
+          "surface": "書",
+          "pos": "Suffix"
         },
         {
           "surface": "を",
@@ -925,9 +941,19 @@
           "pos": "Noun"
         },
         {
-          "surface": "いたしました",
+          "surface": "いたし",
           "pos": "Verb",
           "lemma": "いたす"
+        },
+        {
+          "surface": "まし",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -1073,13 +1099,21 @@
           "pos": "Particle"
         },
         {
-          "surface": "5分間",
+          "surface": "5",
           "pos": "Noun"
         },
         {
-          "surface": "炒めて",
+          "surface": "分間",
+          "pos": "Suffix"
+        },
+        {
+          "surface": "炒め",
           "pos": "Verb",
           "lemma": "炒める"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "ください",
@@ -1122,9 +1156,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "した",
-          "pos": "Auxiliary",
+          "surface": "し",
+          "pos": "Verb",
           "lemma": "する"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [

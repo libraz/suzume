@@ -146,10 +146,25 @@ enum class ConnectionPattern {
   SuruRenyokeiToTeVerb,       // NOUN(し ending) → VERB(て始まり) (should be suru-verb te-form)
   TekuReMissegmentation,      // てく/ってく → れ* (should be て + くれる, not ていく + れる)
   MasuRenyokeiToTa,           // AUX(まし/ませ) → AUX(た/ん) (MeCab-compatible masu split)
+  NaiRenyokeiToTa,            // AUX(なかっ) → AUX(た) (MeCab-compatible nai split)
+  TaiRenyokeiToTa,            // AUX(たかっ) → AUX(た) (MeCab-compatible tai split)
+  DesuRenyokeiToTa,           // AUX(でし) → AUX(た) (MeCab-compatible desu split)
+  InvalidTaToI,               // AUX(た) → AUX(い) penalty (should be たい, not た+い)
+  TeruRenyokeiToTa,           // VERB(て/で from てる/でる) → AUX(た) (MeCab-compatible てた split)
   NaiAfterVerbMizenkei,       // 動詞未然形 → ない (MeCab-compatible negative split)
   PassiveAfterVerbMizenkei,   // 動詞未然形 → れる/られる (MeCab-compatible passive split)
   PassiveAuxToNaiTa,          // AUX(れ/られ) → AUX(ない/た) (MeCab-compatible passive aux split)
-  VerbToOkuChauContraction    // VERB → AUX(とく/どく/ちゃう) (MeCab-compatible contraction split)
+  VerbToOkuChauContraction,   // VERB → AUX(とく/どく/ちゃう) (MeCab-compatible contraction split)
+  ShireruToMasuNai,           // しれる(VERB) → ます/ない (prefer over する+れる split)
+  RenyokeiToContractedVerb,   // VERB(renyokei) → VERB(てる/でる/とく/どく) (contracted auxiliary)
+  RenyokeiToTeParticle,       // VERB(renyokei/onbinkei) → て/で(PARTICLE) (MeCab-compatible te-form split)
+  TeParticleToAuxVerb,        // て/で(PARTICLE) → いる/しまう/etc. (VERB/AUX) (te-form auxiliary pattern)
+  AdjKuToTeParticle,          // ADJ(く形) → て(PARTICLE) (MeCab-compatible kute split: 美しくて → 美しく + て)
+  ParticleDeToKuruAux,        // PARTICLE(で) → AUX(くる活用形) penalty (できます should be でき + ます)
+  CopulaDeToKuruAux,          // AUX(で, lemma=だ) → くる活用形 penalty (できます should be でき + ます)
+  NaAdjToCopulaDe,            // NOUN/ADJ → で(AUX, lemma=だ) bonus (嫌でない pattern)
+  NaAdjToDekinaiVerb,         // NOUN/ADJ → でない(VERB, lemma=できる) penalty
+  CopulaDeToNai               // で(AUX, lemma=だ) → ない(AUX) bonus (na-adj copula negation)
 };
 
 /**

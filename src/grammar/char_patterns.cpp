@@ -157,6 +157,24 @@ bool isPureHiragana(std::string_view stem) {
   return true;
 }
 
+bool isPureKatakana(std::string_view stem) {
+  if (stem.empty()) {
+    return false;
+  }
+  size_t pos = 0;
+  while (pos < stem.size()) {
+    if (!utf8::is3ByteUtf8At(stem, pos)) {
+      return false;
+    }
+    char32_t codepoint = utf8::decode3ByteUtf8At(stem, pos);
+    if (!kana::isKatakanaCodepoint(codepoint)) {
+      return false;
+    }
+    pos += core::kJapaneseCharBytes;
+  }
+  return true;
+}
+
 bool isSmallKana(std::string_view ch) {
   // Static set for O(1) lookup - initialized once
   static const std::unordered_set<std::string_view> kSmallKana = {

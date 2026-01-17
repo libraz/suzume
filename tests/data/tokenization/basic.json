@@ -125,54 +125,125 @@
       "description": "ところが should be CONJ, not ところ+が split",
       "input": "ところが彼は来なかった",
       "expected": [
-        {"surface": "ところが", "pos": "Conjunction"},
-        {"surface": "彼", "pos": "Pronoun"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "来なかった", "pos": "Verb", "lemma": "来る"}
+        {
+          "surface": "ところが",
+          "pos": "Conjunction"
+        },
+        {
+          "surface": "彼",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "来",
+          "pos": "Verb",
+          "lemma": "来る"
+        },
+        {
+          "surface": "なかっ",
+          "pos": "Auxiliary",
+          "lemma": "ない"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
+        }
       ],
-      "tags": ["conjunction", "split_prevention"]
+      "tags": [
+        "conjunction",
+        "split_prevention"
+      ]
     },
     {
       "id": "conj_aruiha",
       "description": "あるいは should be CONJ, not ADJ+は split - MeCab uses かも as single particle",
       "input": "あるいは違うかも",
       "expected": [
-        {"surface": "あるいは", "pos": "Conjunction", "lemma": "或いは"},
-        {"surface": "違う", "pos": "Verb"},
-        {"surface": "かも", "pos": "Particle"}
+        {
+          "surface": "あるいは",
+          "pos": "Conjunction",
+          "lemma": "或いは"
+        },
+        {
+          "surface": "違う",
+          "pos": "Verb"
+        },
+        {
+          "surface": "かも",
+          "pos": "Particle"
+        }
       ],
-      "tags": ["conjunction", "split_prevention"]
+      "tags": [
+        "conjunction",
+        "split_prevention"
+      ]
     },
     {
       "id": "conj_sonnara",
       "description": "そんなら should be CONJ, not そんな+ら split",
       "input": "そんなら行こう",
       "expected": [
-        {"surface": "そんなら", "pos": "Conjunction"},
-        {"surface": "行こう", "pos": "Verb", "lemma": "行く"}
+        {
+          "surface": "そんなら",
+          "pos": "Conjunction"
+        },
+        {
+          "surface": "行こう",
+          "pos": "Verb",
+          "lemma": "行く"
+        }
       ],
-      "tags": ["conjunction", "split_prevention"]
+      "tags": [
+        "conjunction",
+        "split_prevention"
+      ]
     },
     {
       "id": "conj_sorenishitemo",
       "description": "それにしても should be CONJ, not それ+に+して+も split",
       "input": "それにしても高い",
       "expected": [
-        {"surface": "それにしても", "pos": "Conjunction"},
-        {"surface": "高い", "pos": "Adjective"}
+        {
+          "surface": "それにしても",
+          "pos": "Conjunction"
+        },
+        {
+          "surface": "高い",
+          "pos": "Adjective"
+        }
       ],
-      "tags": ["conjunction", "split_prevention"]
+      "tags": [
+        "conjunction",
+        "split_prevention"
+      ]
     },
     {
       "id": "conj_iwaba",
       "description": "いわば should be CONJ, not OTHER split",
       "input": "いわば奇跡だ",
       "expected": [
-        {"surface": "いわば", "pos": "Conjunction", "lemma": "言わば"},
-        {"surface": "奇跡", "pos": "Noun"},
-        {"surface": "だ", "pos": "Auxiliary"}
+        {
+          "surface": "いわば",
+          "pos": "Conjunction",
+          "lemma": "言わば"
+        },
+        {
+          "surface": "奇跡",
+          "pos": "Noun"
+        },
+        {
+          "surface": "だ",
+          "pos": "Auxiliary"
+        }
       ],
-      "tags": ["conjunction", "split_prevention"]
+      "tags": [
+        "conjunction",
+        "split_prevention"
+      ]
     }
   ]
 }

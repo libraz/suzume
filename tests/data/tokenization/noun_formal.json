@@ -35,9 +35,13 @@
           "pos": "Noun"
         },
         {
-          "surface": "だった",
+          "surface": "だっ",
           "pos": "Auxiliary",
-          "lemma": "だった"
+          "lemma": "だ"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [

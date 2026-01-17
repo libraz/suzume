@@ -735,7 +735,11 @@
           "pos": "Adverb"
         }
       ],
-      "tags": ["s7_fix", "onomatopoeia", "regression"]
+      "tags": [
+        "s7_fix",
+        "onomatopoeia",
+        "regression"
+      ]
     },
     {
       "id": "s7_shidoromodoro",
@@ -747,17 +751,24 @@
           "pos": "Adverb"
         }
       ],
-      "tags": ["s7_fix", "onomatopoeia", "regression"]
+      "tags": [
+        "s7_fix",
+        "onomatopoeia",
+        "regression"
+      ]
     },
     {
       "id": "adv_atode",
-      "description": "あとで (later) - time adverb, not あ+と+で particle split",
+      "description": "あとで (later) - MeCab-compatible split: あと(NOUN) + で(PARTICLE)",
       "input": "あとで",
       "expected": [
         {
-          "surface": "あとで",
-          "pos": "Adverb",
-          "lemma": "後で"
+          "surface": "あと",
+          "pos": "Noun"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
         }
       ],
       "tags": [
@@ -800,177 +811,375 @@
       "description": "ちっとも should be single ADV, not ちっ+と+も split",
       "input": "ちっとも分からない",
       "expected": [
-        {"surface": "ちっとも", "pos": "Adverb"},
-        {"surface": "分からない", "pos": "Verb", "lemma": "分かる"}
+        {
+          "surface": "ちっとも",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "分からない",
+          "pos": "Verb",
+          "lemma": "分かる"
+        }
       ],
-      "tags": ["adverb", "split_prevention"]
+      "tags": [
+        "adverb",
+        "split_prevention"
+      ]
     },
     {
       "id": "adv_ooini",
       "description": "大いに should be single ADV, not 大い+に split",
       "input": "大いに期待する",
       "expected": [
-        {"surface": "大いに", "pos": "Adverb", "lemma": "大いに"},
-        {"surface": "期待", "pos": "Noun"},
-        {"surface": "する", "pos": "Verb", "lemma": "する"}
+        {
+          "surface": "大いに",
+          "pos": "Adverb",
+          "lemma": "大いに"
+        },
+        {
+          "surface": "期待",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb",
+          "lemma": "する"
+        }
       ],
-      "tags": ["adverb", "split_prevention"]
+      "tags": [
+        "adverb",
+        "split_prevention"
+      ]
     },
     {
       "id": "adv_nanishiro",
       "description": "なにしろ should be single ADV, not PRON+VERB split",
       "input": "なにしろ忙しい",
       "expected": [
-        {"surface": "なにしろ", "pos": "Adverb", "lemma": "何しろ"},
-        {"surface": "忙しい", "pos": "Adjective"}
+        {
+          "surface": "なにしろ",
+          "pos": "Adverb",
+          "lemma": "何しろ"
+        },
+        {
+          "surface": "忙しい",
+          "pos": "Adjective"
+        }
       ],
-      "tags": ["adverb", "split_prevention"]
+      "tags": [
+        "adverb",
+        "split_prevention"
+      ]
     },
     {
       "id": "adv_atakamo",
       "description": "あたかも should be single ADV",
       "input": "あたかも夢のよう",
       "expected": [
-        {"surface": "あたかも", "pos": "Adverb", "lemma": "恰も"},
-        {"surface": "夢", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "よう", "pos": "Auxiliary"}
+        {
+          "surface": "あたかも",
+          "pos": "Adverb",
+          "lemma": "恰も"
+        },
+        {
+          "surface": "夢",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "よう",
+          "pos": "Auxiliary"
+        }
       ],
-      "tags": ["adverb", "split_prevention"]
+      "tags": [
+        "adverb",
+        "split_prevention"
+      ]
     },
     {
       "id": "adv_sanagara",
       "description": "さながら should be single ADV",
       "input": "さながら映画のよう",
       "expected": [
-        {"surface": "さながら", "pos": "Adverb", "lemma": "宛ら"},
-        {"surface": "映画", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "よう", "pos": "Auxiliary"}
+        {
+          "surface": "さながら",
+          "pos": "Adverb",
+          "lemma": "宛ら"
+        },
+        {
+          "surface": "映画",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "よう",
+          "pos": "Auxiliary"
+        }
       ],
-      "tags": ["adverb", "split_prevention"]
+      "tags": [
+        "adverb",
+        "split_prevention"
+      ]
     },
     {
       "id": "adv_moshikasuruto",
-      "description": "もしかすると should be single ADV, not particle+verb split",
+      "description": "もしかすると雨かも - MeCab-compatible split: もしか(ADV) + する(VERB) + と(PARTICLE)",
       "input": "もしかすると雨かも",
       "expected": [
-        {"surface": "もしかすると", "pos": "Adverb"},
-        {"surface": "雨", "pos": "Noun"},
-        {"surface": "か", "pos": "Particle"},
-        {"surface": "も", "pos": "Particle"}
+        {
+          "surface": "もしか",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        },
+        {
+          "surface": "雨",
+          "pos": "Noun"
+        },
+        {
+          "surface": "かも",
+          "pos": "Particle"
+        }
       ],
-      "tags": ["adverb", "split_prevention"]
+      "tags": [
+        "adverb",
+        "split_prevention"
+      ]
     },
     {
       "id": "adv_shoushou",
       "description": "少々 should be ADV, not NOUN",
       "input": "少々お待ちください",
       "expected": [
-        {"surface": "少々", "pos": "Adverb"},
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "待ち", "pos": "Noun"},
-        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
+        {
+          "surface": "少々",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "待ち",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ください",
+          "pos": "Verb",
+          "lemma": "くださる"
+        }
       ],
-      "tags": ["adverb", "quantity"]
+      "tags": [
+        "adverb",
+        "quantity"
+      ]
     },
     {
       "id": "adv_tashou",
       "description": "多少 should be ADV, not NOUN",
       "input": "多少高い",
       "expected": [
-        {"surface": "多少", "pos": "Adverb"},
-        {"surface": "高い", "pos": "Adjective"}
+        {
+          "surface": "多少",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "高い",
+          "pos": "Adjective"
+        }
       ],
-      "tags": ["adverb", "quantity"]
+      "tags": [
+        "adverb",
+        "quantity"
+      ]
     },
     {
       "id": "adv_jakkan_standalone",
       "description": "若干 standalone should be ADV",
       "input": "若干",
       "expected": [
-        {"surface": "若干", "pos": "Adverb"}
+        {
+          "surface": "若干",
+          "pos": "Adverb"
+        }
       ],
-      "tags": ["adverb", "quantity"]
+      "tags": [
+        "adverb",
+        "quantity"
+      ]
     },
     {
       "id": "adv_daitai_kanji_standalone",
       "description": "大体 (kanji) standalone should be ADV",
       "input": "大体",
       "expected": [
-        {"surface": "大体", "pos": "Adverb"}
+        {
+          "surface": "大体",
+          "pos": "Adverb"
+        }
       ],
-      "tags": ["adverb", "degree"]
+      "tags": [
+        "adverb",
+        "degree"
+      ]
     },
     {
       "id": "adv_daitai_hiragana",
       "description": "だいたい should be ADV - MeCab-compatible lemma is hiragana",
       "input": "だいたい終わった",
       "expected": [
-        {"surface": "だいたい", "pos": "Adverb", "lemma": "だいたい"},
-        {"surface": "終わった", "pos": "Verb", "lemma": "終わる"}
+        {
+          "surface": "だいたい",
+          "pos": "Adverb",
+          "lemma": "だいたい"
+        },
+        {
+          "surface": "終わった",
+          "pos": "Verb",
+          "lemma": "終わる"
+        }
       ],
-      "tags": ["adverb", "degree", "split_prevention"]
+      "tags": [
+        "adverb",
+        "degree",
+        "split_prevention"
+      ]
     },
     {
       "id": "adv_ittai",
       "description": "いったい should be ADV, not いっ+たい split (MeCab-compatible hiragana lemma)",
       "input": "いったい何だ",
       "expected": [
-        {"surface": "いったい", "pos": "Adverb", "lemma": "いったい"},
-        {"surface": "何", "pos": "Pronoun"},
-        {"surface": "だ", "pos": "Auxiliary"}
+        {
+          "surface": "いったい",
+          "pos": "Adverb",
+          "lemma": "いったい"
+        },
+        {
+          "surface": "何",
+          "pos": "Pronoun"
+        },
+        {
+          "surface": "だ",
+          "pos": "Auxiliary"
+        }
       ],
-      "tags": ["adverb", "interrogative", "split_prevention"]
+      "tags": [
+        "adverb",
+        "interrogative",
+        "split_prevention"
+      ]
     },
     {
       "id": "adv_semete",
       "description": "せめて should be ADV, not VERB せめる te-form",
       "input": "せめて一つ",
       "expected": [
-        {"surface": "せめて", "pos": "Adverb"},
-        {"surface": "一つ", "pos": "Noun"}
+        {
+          "surface": "せめて",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "一つ",
+          "pos": "Noun"
+        }
       ],
-      "tags": ["adverb", "limit"]
+      "tags": [
+        "adverb",
+        "limit"
+      ]
     },
     {
       "id": "adv_sasuga_standalone",
       "description": "さすが standalone should be ADV (MeCab-compatible hiragana lemma)",
       "input": "さすが",
       "expected": [
-        {"surface": "さすが", "pos": "Adverb", "lemma": "さすが"}
+        {
+          "surface": "さすが",
+          "pos": "Adverb",
+          "lemma": "さすが"
+        }
       ],
-      "tags": ["adverb", "evaluation"]
+      "tags": [
+        "adverb",
+        "evaluation"
+      ]
     },
     {
       "id": "adv_hobo",
       "description": "ほぼ should be ADV, not AUX",
       "input": "ほぼ完成",
       "expected": [
-        {"surface": "ほぼ", "pos": "Adverb"},
-        {"surface": "完成", "pos": "Noun"}
+        {
+          "surface": "ほぼ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "完成",
+          "pos": "Noun"
+        }
       ],
-      "tags": ["adverb", "degree"]
+      "tags": [
+        "adverb",
+        "degree"
+      ]
     },
     {
       "id": "adv_toutei_wagahai",
       "description": "到底 should be ADV, not NOUN (W-012)",
       "input": "到底助からない",
       "expected": [
-        {"surface": "到底", "pos": "Adverb"},
-        {"surface": "助からない", "pos": "Verb", "lemma": "助かる"}
+        {
+          "surface": "到底",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "助からない",
+          "pos": "Verb",
+          "lemma": "助かる"
+        }
       ],
-      "tags": ["adverb", "degree", "wagahai", "W-012"]
+      "tags": [
+        "adverb",
+        "degree",
+        "wagahai",
+        "W-012"
+      ]
     },
     {
       "id": "adv_futatabi_wagahai",
       "description": "再び should be ADV, not NOUN (W-012)",
       "input": "再び見る",
       "expected": [
-        {"surface": "再び", "pos": "Adverb"},
-        {"surface": "見る", "pos": "Verb", "lemma": "見る"}
+        {
+          "surface": "再び",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "見る",
+          "pos": "Verb",
+          "lemma": "見る"
+        }
       ],
-      "tags": ["adverb", "time", "wagahai", "W-012"]
+      "tags": [
+        "adverb",
+        "time",
+        "wagahai",
+        "W-012"
+      ]
     }
   ]
 }

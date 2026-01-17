@@ -68,13 +68,17 @@
     },
     {
       "id": "ichidan_tabete",
-      "description": "食べて - ichidan te-form (unified token)",
+      "description": "食べて - MeCab互換分割 (食べ+て)",
       "input": "食べて",
       "expected": [
         {
-          "surface": "食べて",
+          "surface": "食べ",
           "pos": "Verb",
           "lemma": "食べる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         }
       ],
       "tags": [
@@ -206,13 +210,17 @@
     },
     {
       "id": "ichidan_mochiite",
-      "description": "用いて - Ichidan verb te-form",
+      "description": "用いて - MeCab互換分割 (用い+て)",
       "input": "用いて",
       "expected": [
         {
-          "surface": "用いて",
+          "surface": "用い",
           "pos": "Verb",
           "lemma": "用いる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         }
       ],
       "tags": [
@@ -238,18 +246,27 @@
     },
     {
       "id": "ichidan_oshiete_moratta",
-      "description": "教えてもらった - te-form unified + auxiliary verb",
+      "description": "教えてもらった - MeCab互換分割 (教え+て+もらっ+た)",
       "input": "教えてもらった",
       "expected": [
         {
-          "surface": "教えて",
+          "surface": "教え",
           "pos": "Verb",
           "lemma": "教える"
         },
         {
-          "surface": "もらった",
-          "pos": "Verb",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "もらっ",
+          "pos": "Auxiliary",
           "lemma": "もらう"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -339,14 +356,11 @@
     },
     {
       "id": "ichidan_shirenai",
-      "description": "しれない - shirenai for kamoshirenai decomposition",
+      "description": "しれない - MeCab splits しれ + ない",
       "input": "しれない",
       "expected": [
-        {
-          "surface": "しれない",
-          "pos": "Verb",
-          "lemma": "しれる"
-        }
+        {"surface": "しれ", "pos": "Verb", "lemma": "しれる"},
+        {"surface": "ない", "pos": "Auxiliary", "lemma": "ない"}
       ],
       "tags": [
         "ichidan",
@@ -483,13 +497,17 @@
     },
     {
       "id": "hiragana_nete",
-      "description": "ねて - hiragana te-form of 寝る should be single verb",
+      "description": "ねて - MeCab互換分割 (ね+て)",
       "input": "ねて",
       "expected": [
         {
-          "surface": "ねて",
+          "surface": "ね",
           "pos": "Verb",
           "lemma": "ねる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         }
       ],
       "tags": [
@@ -500,13 +518,17 @@
     },
     {
       "id": "hiragana_dete",
-      "description": "でて - hiragana te-form of 出る should be single verb",
+      "description": "でて - MeCab互換分割 (で+て)",
       "input": "でて",
       "expected": [
         {
-          "surface": "でて",
+          "surface": "で",
           "pos": "Verb",
           "lemma": "でる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         }
       ],
       "tags": [

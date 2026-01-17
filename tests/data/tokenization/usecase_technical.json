@@ -9,8 +9,10 @@
         {"surface": "ファイル", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "見つかり", "pos": "Verb", "lemma": "見つかる"},
-        {"surface": "ません", "pos": "Auxiliary"},
-        {"surface": "でした", "pos": "Auxiliary", "lemma": "でした"}
+        {"surface": "ませ", "pos": "Auxiliary", "lemma": "ます"},
+        {"surface": "ん", "pos": "Auxiliary"},
+        {"surface": "でし", "pos": "Auxiliary", "lemma": "です"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["technical", "documentation"]
     },
@@ -100,10 +102,12 @@
         {"surface": "問題", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "解決", "pos": "Noun"},
-        {"surface": "しない", "pos": "Verb", "lemma": "する"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "ない", "pos": "Auxiliary", "lemma": "ない"},
         {"surface": "場合", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "再起動", "pos": "Noun"},
+        {"surface": "再", "pos": "Prefix"},
+        {"surface": "起動", "pos": "Noun"},
         {"surface": "し", "pos": "Verb", "lemma": "する"},
         {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
@@ -133,13 +137,16 @@
       "input": "昨日買ったばかりの本をなくしてしまった",
       "expected": [
         {"surface": "昨日", "pos": "Noun"},
-        {"surface": "買った", "pos": "Verb", "lemma": "買う"},
+        {"surface": "買っ", "pos": "Verb", "lemma": "買う"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"},
         {"surface": "ばかり", "pos": "Particle"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "本", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "なくして", "pos": "Verb", "lemma": "なくす"},
-        {"surface": "しまった", "pos": "Auxiliary", "lemma": "しまう"}
+        {"surface": "なくし", "pos": "Verb", "lemma": "なくす"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "しまっ", "pos": "Verb", "lemma": "しまう"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["complex", "auxiliary"]
     },
@@ -186,11 +193,13 @@
       "expected": [
         {"surface": "電車", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "遅れて", "pos": "Verb", "lemma": "遅れる"},
-        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"},
+        {"surface": "遅れ", "pos": "Verb", "lemma": "遅れる"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "いる", "pos": "Verb", "lemma": "いる"},
         {"surface": "ので", "pos": "Particle"},
         {"surface": "遅刻", "pos": "Noun"},
-        {"surface": "しそう", "pos": "Auxiliary", "lemma": "する"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "そう", "pos": "Noun"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["complex", "suru"]
@@ -231,13 +240,15 @@
       "expected": [
         {"surface": "子供", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
-        {"surface": "頃", "pos": "Suffix"},
+        {"surface": "頃", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "よく", "pos": "Adjective", "lemma": "よい"},
-        {"surface": "遊んだ", "pos": "Verb", "lemma": "遊ぶ"},
+        {"surface": "よく", "pos": "Adverb"},
+        {"surface": "遊ん", "pos": "Verb", "lemma": "遊ぶ"},
+        {"surface": "だ", "pos": "Auxiliary", "lemma": "た"},
         {"surface": "場所", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "訪れた", "pos": "Verb", "lemma": "訪れる"}
+        {"surface": "訪れ", "pos": "Verb", "lemma": "訪れる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["complex"]
     },
@@ -291,11 +302,12 @@
       "description": "Reason clause with kara - single-kanji Ichidan verb + polite auxiliary",
       "input": "疲れたから早く寝ます",
       "expected": [
-        {"surface": "疲れた", "pos": "Verb", "lemma": "疲れる"},
+        {"surface": "疲れ", "pos": "Verb", "lemma": "疲れる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"},
         {"surface": "から", "pos": "Particle"},
         {"surface": "早く", "pos": "Adjective", "lemma": "早い"},
         {"surface": "寝", "pos": "Verb", "lemma": "寝る"},
-        {"surface": "ます", "pos": "Auxiliary"}
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["multi-clause"]
     },
@@ -320,11 +332,13 @@
       "input": "勉強したけど、試験に落ちた",
       "expected": [
         {"surface": "勉強", "pos": "Noun"},
-        {"surface": "した", "pos": "Auxiliary", "lemma": "する"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"},
         {"surface": "けど", "pos": "Particle"},
         {"surface": "試験", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "落ちた", "pos": "Verb", "lemma": "落ちる"}
+        {"surface": "落ち", "pos": "Verb", "lemma": "落ちる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["multi-clause"]
     },
@@ -363,10 +377,12 @@
       "expected": [
         {"surface": "健康", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
-        {"surface": "ため", "pos": "Noun", "lemma": "為"},
+        {"surface": "ため", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "運動", "pos": "Noun"},
-        {"surface": "している", "pos": "Auxiliary", "lemma": "する"}
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "いる", "pos": "Verb", "lemma": "いる"}
       ],
       "tags": ["multi-clause"]
     },
@@ -549,9 +565,9 @@
         {"surface": "症状", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "続く", "pos": "Verb"},
-        {"surface": "よう", "pos": "Auxiliary"},
-        {"surface": "で", "pos": "Particle"},
-        {"surface": "したら", "pos": "Verb", "lemma": "する"},
+        {"surface": "よう", "pos": "Noun"},
+        {"surface": "でし", "pos": "Auxiliary", "lemma": "です"},
+        {"surface": "たら", "pos": "Auxiliary", "lemma": "た"},
         {"surface": "医師", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "相談", "pos": "Noun"},

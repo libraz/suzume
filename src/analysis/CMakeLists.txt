@@ -15,6 +15,9 @@ add_library(suzume_analysis STATIC
   tokenizer_utils.cpp
   unknown.cpp
   verb_candidates.cpp
+  verb_candidates_helpers.cpp
+  verb_candidates_hiragana.cpp
+  verb_candidates_kanji.cpp
 )
 
 target_include_directories(suzume_analysis

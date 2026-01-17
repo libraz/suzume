@@ -393,6 +393,130 @@ std::vector<ConjugatedForm> Conjugation::generateIAdjective(const std::string& s
   return forms;
 }
 
+std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
+    VerbType type) const {
+  std::vector<DictionarySuffix> suffixes;
+
+  switch (type) {
+    case VerbType::Ichidan:
+      // 一段動詞: 食べる → 食べ + suffix
+      // Note: ます系 excluded (should split as 食べ + ます)
+      suffixes = {
+          {"る", false},        // Base: 食べる
+          {"た", false},        // Past: 食べた
+          {"て", false},        // Te-form: 食べて
+          {"ない", false},      // Negative: 食べない
+          {"ん", false},        // Contracted negative: 食べん (colloquial)
+          {"なかった", false},  // Past negative: 食べなかった
+          {"れば", false},      // Conditional: 食べれば
+          {"たら", false},      // Conditional: 食べたら
+          {"よう", false},      // Volitional: 食べよう
+          {"ろ", false},        // Imperative: 食べろ
+      };
+      break;
+
+    case VerbType::GodanKa:
+    case VerbType::GodanGa:
+    case VerbType::GodanSa:
+    case VerbType::GodanTa:
+    case VerbType::GodanNa:
+    case VerbType::GodanBa:
+    case VerbType::GodanMa:
+    case VerbType::GodanRa:
+    case VerbType::GodanWa: {
+      auto it = godan_rows_.find(type);
+      if (it == godan_rows_.end()) {
+        return suffixes;
+      }
+      const auto& row = it->second;
+
+      std::string base = encodeUtf8(row.base_vowel);
+      std::string a = encodeUtf8(row.a_row);
+      std::string i = encodeUtf8(row.i_row);
+      std::string e = encodeUtf8(row.e_row);
+      std::string o = encodeUtf8(row.o_row);
+      std::string ta = row.voiced_ta ? "だ" : "た";
+      std::string te = row.voiced_ta ? "で" : "て";
+
+      // Base form
+      suffixes.push_back({base, false});
+      // Renyokei (for compound usage)
+      suffixes.push_back({i, false});
+
+      // 音便形 + ta/te (サ行以外)
+      if (!row.onbin.empty()) {
+        suffixes.push_back({row.onbin + ta, false});           // Past: 書いた
+        suffixes.push_back({row.onbin + te, false});           // Te-form: 書いて
+        suffixes.push_back({row.onbin + ta + "ら", false});    // Conditional: 書いたら
+      } else {
+        // サ行 (no onbin)
+        suffixes.push_back({i + "た", false});   // Past: 話した
+        suffixes.push_back({i + "て", false});   // Te-form: 話して
+      }
+
+      // Negative forms
+      suffixes.push_back({a + "ない", false});        // Negative: 書かない
+      suffixes.push_back({a + "ん", false});          // Contracted: 書かん
+      suffixes.push_back({a + "ぬ", false});          // Classical: 書かぬ
+      suffixes.push_back({a + "なかった", false});    // Past negative: 書かなかった
+
+      // Conditional
+      suffixes.push_back({e + "ば", false});          // Conditional: 書けば
+
+      // Volitional
+      suffixes.push_back({o + "う", false});          // Volitional: 書こう
+
+      // Imperative (exclude for Ka/Ga to avoid conflict with potential)
+      if (type != VerbType::GodanKa && type != VerbType::GodanGa) {
+        suffixes.push_back({e, false});              // Imperative: 待て
+      }
+
+      // Potential forms (五段 → え段 + る)
+      suffixes.push_back({e + "る", true});           // Potential: 書ける
+      suffixes.push_back({e + "ない", true});         // Potential neg: 書けない
+      suffixes.push_back({e + "なかった", true});     // Potential neg past: 書けなかった
+      break;
+    }
+
+    case VerbType::Suru:
+      // サ変: する (MeCab-compatible: exclude split forms)
+      // した → し + た, so exclude. But keep conditional/imperative.
+      suffixes = {
+          {"する", false},      // Base form
+          {"すれば", false},    // Conditional
+          {"しろ", false},      // Imperative
+          {"せよ", false},      // Imperative (classical)
+          {"しよう", false},    // Volitional
+          {"せん", false},      // Contracted negative (colloquial)
+          {"したら", false},    // Conditional past
+      };
+      break;
+
+    case VerbType::Kuru:
+      // カ変: 来る (irregular - stem changes: く/き/こ)
+      // For hiragana くる, prefix with appropriate stem change
+      suffixes = {
+          {"くる", false},        // Base form
+          {"きた", false},        // Past
+          {"きて", false},        // Te-form
+          {"こない", false},      // Negative
+          {"こなかった", false},  // Past negative
+          {"くれば", false},      // Conditional
+          {"きたら", false},      // Conditional
+          {"こよう", false},      // Volitional
+          {"こい", false},        // Imperative
+          {"こられる", false},    // Potential (formal)
+          {"これる", false},      // Potential (colloquial)
+      };
+      break;
+
+    default:
+      break;
+  }
+
+  return suffixes;
+}
+
 std::string_view verbTypeToString(VerbType type) {
   switch (type) {
     case VerbType::Ichidan:

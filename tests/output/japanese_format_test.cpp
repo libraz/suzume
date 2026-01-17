@@ -357,29 +357,33 @@ class JapaneseFormatIntegrationTest : public ::testing::Test {
 };
 
 // Test that verb analysis includes correct conjugation type
-// Verb+auxiliary splits: 食べました → 食べ + ました
+// MeCab-compatible split: 食べました → 食べ + まし + た
 TEST_F(JapaneseFormatIntegrationTest, VerbWithConjType_Ichidan) {
   auto morphemes = analyzer_.analyze("食べました");
-  ASSERT_EQ(morphemes.size(), 2);
+  ASSERT_EQ(morphemes.size(), 3);
   EXPECT_EQ(morphemes[0].surface, "食べ");
   EXPECT_EQ(morphemes[0].getLemma(), "食べる");
   EXPECT_EQ(morphemes[0].pos, core::PartOfSpeech::Verb);
-  EXPECT_EQ(morphemes[1].surface, "ました");
+  EXPECT_EQ(morphemes[1].surface, "まし");
   EXPECT_EQ(morphemes[1].pos, core::PartOfSpeech::Auxiliary);
+  EXPECT_EQ(morphemes[2].surface, "た");
+  EXPECT_EQ(morphemes[2].pos, core::PartOfSpeech::Auxiliary);
 
   auto verb_type = grammar::conjTypeToVerbType(morphemes[0].conj_type);
   EXPECT_EQ(verb_type, grammar::VerbType::Ichidan);
 }
 
-// Verb+auxiliary splits: 書きました → 書き + ました
+// MeCab-compatible split: 書きました → 書き + まし + た
 TEST_F(JapaneseFormatIntegrationTest, VerbWithConjType_GodanKa) {
   auto morphemes = analyzer_.analyze("書きました");
-  ASSERT_EQ(morphemes.size(), 2);
+  ASSERT_EQ(morphemes.size(), 3);
   EXPECT_EQ(morphemes[0].surface, "書き");
   EXPECT_EQ(morphemes[0].getLemma(), "書く");
   EXPECT_EQ(morphemes[0].pos, core::PartOfSpeech::Verb);
-  EXPECT_EQ(morphemes[1].surface, "ました");
+  EXPECT_EQ(morphemes[1].surface, "まし");
   EXPECT_EQ(morphemes[1].pos, core::PartOfSpeech::Auxiliary);
+  EXPECT_EQ(morphemes[2].surface, "た");
+  EXPECT_EQ(morphemes[2].pos, core::PartOfSpeech::Auxiliary);
 
   auto verb_type = grammar::conjTypeToVerbType(morphemes[0].conj_type);
   EXPECT_EQ(verb_type, grammar::VerbType::GodanKa);
@@ -435,17 +439,21 @@ TEST_F(JapaneseFormatIntegrationTest, ReadingPropagation_Adjective) {
 }
 
 // Test conjugation form detection in analysis pipeline
+// MeCab-compatible split: 食べない → 食べ + ない
 TEST_F(JapaneseFormatIntegrationTest, ConjForm_Mizenkei) {
   auto morphemes = analyzer_.analyze("食べない");
-  ASSERT_EQ(morphemes.size(), 1);
+  ASSERT_EQ(morphemes.size(), 2);
+  EXPECT_EQ(morphemes[0].surface, "食べ");
   EXPECT_EQ(morphemes[0].conj_form, grammar::ConjForm::Mizenkei);
+  EXPECT_EQ(morphemes[1].surface, "ない");
+  EXPECT_EQ(morphemes[1].pos, core::PartOfSpeech::Auxiliary);
 }
 
-// Verb+auxiliary splits: 食べました → 食べ + ました
+// MeCab-compatible split: 食べました → 食べ + まし + た
 // Check ConjForm on the verb stem
 TEST_F(JapaneseFormatIntegrationTest, ConjForm_Renyokei) {
   auto morphemes = analyzer_.analyze("食べました");
-  ASSERT_EQ(morphemes.size(), 2);
+  ASSERT_EQ(morphemes.size(), 3);
   EXPECT_EQ(morphemes[0].conj_form, grammar::ConjForm::Renyokei);
 }
 

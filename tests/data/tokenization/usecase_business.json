@@ -6,671 +6,1751 @@
       "description": "Business email opening: お世話になっております - compound auxiliary form",
       "input": "お世話になっております",
       "expected": [
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "世話", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "なっております", "pos": "Verb", "lemma": "なる"}
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "世話",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "なっております",
+          "pos": "Verb",
+          "lemma": "なる"
+        }
       ],
-      "tags": ["business", "email"]
+      "tags": [
+        "business",
+        "email"
+      ]
     },
     {
       "id": "email_greeting_otsukare",
       "description": "Internal greeting: お疲れ様です",
       "input": "お疲れ様です",
       "expected": [
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "疲れ", "pos": "Noun"},
-        {"surface": "様", "pos": "Suffix"},
-        {"surface": "です", "pos": "Auxiliary"}
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "疲れ",
+          "pos": "Noun"
+        },
+        {
+          "surface": "様",
+          "pos": "Suffix"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
       ],
-      "tags": ["business", "email"]
+      "tags": [
+        "business",
+        "email"
+      ]
     },
     {
       "id": "email_request_kakunin",
       "description": "Polite request: ご確認ください",
       "input": "ご確認ください",
       "expected": [
-        {"surface": "ご", "pos": "Prefix"},
-        {"surface": "確認", "pos": "Noun"},
-        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
+        {
+          "surface": "ご",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "確認",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ください",
+          "pos": "Verb",
+          "lemma": "くださる"
+        }
       ],
-      "tags": ["business", "email"]
+      "tags": [
+        "business",
+        "email"
+      ]
     },
     {
       "id": "email_request_kentou",
       "description": "Polite request: ご検討のほどよろしくお願いいたします - MeCab互換分割",
       "input": "ご検討のほどよろしくお願いいたします",
       "expected": [
-        {"surface": "ご", "pos": "Prefix"},
-        {"surface": "検討", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "ほど", "pos": "Particle"},
-        {"surface": "よろしく", "pos": "Adverb"},
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "願い", "pos": "Noun"},
-        {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
+        {
+          "surface": "ご",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "検討",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ほど",
+          "pos": "Particle"
+        },
+        {
+          "surface": "よろしく",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "願い",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いたします",
+          "pos": "Verb",
+          "lemma": "いたす"
+        }
       ],
-      "tags": ["business", "email"]
+      "tags": [
+        "business",
+        "email"
+      ]
     },
     {
       "id": "email_closing_yoroshiku",
       "description": "Standard closing: よろしくお願いいたします - MeCab互換分割",
       "input": "よろしくお願いいたします",
       "expected": [
-        {"surface": "よろしく", "pos": "Adverb"},
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "願い", "pos": "Noun"},
-        {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
+        {
+          "surface": "よろしく",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "願い",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いたします",
+          "pos": "Verb",
+          "lemma": "いたす"
+        }
       ],
-      "tags": ["business", "email"]
+      "tags": [
+        "business",
+        "email"
+      ]
     },
     {
       "id": "email_closing_ijou",
       "description": "Closing: 以上、よろしくお願いします - MeCab互換分割",
       "input": "以上、よろしくお願いします",
       "expected": [
-        {"surface": "以上", "pos": "Noun"},
-        {"surface": "よろしく", "pos": "Adverb"},
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "願い", "pos": "Noun"},
-        {"surface": "し", "pos": "Verb", "lemma": "する"},
-        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
+        {
+          "surface": "以上",
+          "pos": "Noun"
+        },
+        {
+          "surface": "よろしく",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "願い",
+          "pos": "Noun"
+        },
+        {
+          "surface": "し",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
       ],
-      "tags": ["business", "email"]
+      "tags": [
+        "business",
+        "email"
+      ]
     },
     {
       "id": "email_attachment",
       "description": "Attachment notification - MeCab互換分割",
       "input": "資料を添付いたしましたので、ご確認ください",
       "expected": [
-        {"surface": "資料", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "添付", "pos": "Noun"},
-        {"surface": "いたしまし", "pos": "Verb", "lemma": "いたす"},
-        {"surface": "た", "pos": "Auxiliary", "lemma": "た"},
-        {"surface": "ので", "pos": "Particle"},
-        {"surface": "ご", "pos": "Prefix"},
-        {"surface": "確認", "pos": "Noun"},
-        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
+        {
+          "surface": "資料",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "添付",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いたし",
+          "pos": "Verb",
+          "lemma": "いたす"
+        },
+        {
+          "surface": "まし",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
+        },
+        {
+          "surface": "ので",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ご",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "確認",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ください",
+          "pos": "Verb",
+          "lemma": "くださる"
+        }
       ],
-      "tags": ["business", "email"]
+      "tags": [
+        "business",
+        "email"
+      ]
     },
     {
       "id": "email_response_request",
       "description": "Response request: ご返信いただけますと幸いです (itadakemasu = potential of itadaku)",
       "input": "ご返信いただけますと幸いです",
       "expected": [
-        {"surface": "ご", "pos": "Prefix"},
-        {"surface": "返信", "pos": "Noun"},
-        {"surface": "いただけます", "pos": "Verb", "lemma": "いただく"},
-        {"surface": "と", "pos": "Particle"},
-        {"surface": "幸い", "pos": "Adjective"},
-        {"surface": "です", "pos": "Auxiliary"}
+        {
+          "surface": "ご",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "返信",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いただけます",
+          "pos": "Verb",
+          "lemma": "いただく"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        },
+        {
+          "surface": "幸い",
+          "pos": "Adjective"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
       ],
-      "tags": ["business", "email"]
+      "tags": [
+        "business",
+        "email"
+      ]
     },
     {
       "id": "email_apology",
       "description": "Apology: 申し訳ございませんが",
       "input": "申し訳ございませんが",
       "expected": [
-        {"surface": "申し訳", "pos": "Noun"},
-        {"surface": "ございません", "pos": "Auxiliary", "lemma": "ございます"},
-        {"surface": "が", "pos": "Particle"}
+        {
+          "surface": "申し訳",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ござい",
+          "pos": "Adjective",
+          "lemma": "ござい"
+        },
+        {
+          "surface": "ませ",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        },
+        {
+          "surface": "ん",
+          "pos": "Auxiliary",
+          "lemma": "ん"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        }
       ],
-      "tags": ["business", "email"]
+      "tags": [
+        "business",
+        "email"
+      ]
     },
     {
       "id": "email_question_ikaga",
       "description": "Inquiry: いかがでしょうか",
       "input": "いかがでしょうか",
       "expected": [
-        {"surface": "いかが", "pos": "Adverb"},
-        {"surface": "でしょう", "pos": "Auxiliary"},
-        {"surface": "か", "pos": "Particle"}
+        {
+          "surface": "いかが",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "でしょう",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "か",
+          "pos": "Particle"
+        }
       ],
-      "tags": ["business", "email"]
+      "tags": [
+        "business",
+        "email"
+      ]
     },
     {
       "id": "document_date_full",
       "description": "Full date format: 2024年12月23日付けで",
       "input": "2024年12月23日付けで",
       "expected": [
-        {"surface": "2024年12月23日", "pos": "Noun"},
-        {"surface": "付け", "pos": "Noun"},
-        {"surface": "で", "pos": "Particle"}
+        {
+          "surface": "2024年12月23日",
+          "pos": "Noun"
+        },
+        {
+          "surface": "付け",
+          "pos": "Noun"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
+        }
       ],
-      "tags": ["business", "document"]
+      "tags": [
+        "business",
+        "document"
+      ]
     },
     {
       "id": "document_currency_million",
       "description": "Currency: 100万円の請求書",
       "input": "100万円の請求書",
       "expected": [
-        {"surface": "100万円", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "請求書", "pos": "Noun"}
+        {
+          "surface": "100万円",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "請求書",
+          "pos": "Noun"
+        }
       ],
-      "tags": ["business", "document"]
+      "tags": [
+        "business",
+        "document"
+      ]
     },
     {
       "id": "document_currency_billion",
       "description": "Large currency: 3億5000万円の売上",
       "input": "3億5000万円の売上",
       "expected": [
-        {"surface": "3億5000万円", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "売上", "pos": "Noun"}
+        {
+          "surface": "3億5000万円",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "売上",
+          "pos": "Noun"
+        }
       ],
-      "tags": ["business", "document"]
+      "tags": [
+        "business",
+        "document"
+      ]
     },
     {
       "id": "document_company",
       "description": "Company name: 株式会社ABCの田中様",
       "input": "株式会社ABCの田中様",
       "expected": [
-        {"surface": "株式会社", "pos": "Noun"},
-        {"surface": "ABC", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "田中", "pos": "Noun"},
-        {"surface": "様", "pos": "Suffix"}
+        {
+          "surface": "株式会社",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ABC",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "田中",
+          "pos": "Noun"
+        },
+        {
+          "surface": "様",
+          "pos": "Suffix"
+        }
       ],
-      "tags": ["business", "document"]
+      "tags": [
+        "business",
+        "document"
+      ]
     },
     {
       "id": "document_address",
       "description": "Address: 東京都渋谷区に所在する - MeCab互換分割",
       "input": "東京都渋谷区に所在する",
       "expected": [
-        {"surface": "東京都", "pos": "Noun"},
-        {"surface": "渋谷区", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "所在", "pos": "Noun"},
-        {"surface": "する", "pos": "Verb", "lemma": "する"}
+        {
+          "surface": "東京都",
+          "pos": "Noun"
+        },
+        {
+          "surface": "渋谷区",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "所在",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb",
+          "lemma": "する"
+        }
       ],
-      "tags": ["business", "document"]
+      "tags": [
+        "business",
+        "document"
+      ]
     },
     {
       "id": "document_deadline",
       "description": "Deadline: 今月末までに提出してください - MeCab互換分割",
       "input": "今月末までに提出してください",
       "expected": [
-        {"surface": "今月", "pos": "Noun"},
-        {"surface": "末", "pos": "Suffix", "lemma": "まつ"},
-        {"surface": "まで", "pos": "Particle"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "提出", "pos": "Noun"},
-        {"surface": "し", "pos": "Verb", "lemma": "する"},
-        {"surface": "て", "pos": "Particle"},
-        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
+        {
+          "surface": "今月",
+          "pos": "Noun"
+        },
+        {
+          "surface": "末",
+          "pos": "Suffix",
+          "lemma": "まつ"
+        },
+        {
+          "surface": "まで",
+          "pos": "Particle"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "提出",
+          "pos": "Noun"
+        },
+        {
+          "surface": "し",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ください",
+          "pos": "Verb",
+          "lemma": "くださる"
+        }
       ],
-      "tags": ["business", "document"]
+      "tags": [
+        "business",
+        "document"
+      ]
     },
     {
       "id": "document_nitsuite",
       "description": "Topic marker: 契約内容について確認する - MeCab互換分割",
       "input": "契約内容について確認する",
       "expected": [
-        {"surface": "契約内容", "pos": "Noun"},
-        {"surface": "について", "pos": "Particle"},
-        {"surface": "確認", "pos": "Noun"},
-        {"surface": "する", "pos": "Verb", "lemma": "する"}
+        {
+          "surface": "契約内容",
+          "pos": "Noun"
+        },
+        {
+          "surface": "について",
+          "pos": "Particle"
+        },
+        {
+          "surface": "確認",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb",
+          "lemma": "する"
+        }
       ],
-      "tags": ["business", "document"]
+      "tags": [
+        "business",
+        "document"
+      ]
     },
     {
       "id": "document_nikanshite",
       "description": "Topic marker: 本件に関して報告する - MeCab互換分割",
       "input": "本件に関して報告する",
       "expected": [
-        {"surface": "本件", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "関して", "pos": "Verb", "lemma": "関する"},
-        {"surface": "報告", "pos": "Noun"},
-        {"surface": "する", "pos": "Verb", "lemma": "する"}
+        {
+          "surface": "本件",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "関し",
+          "pos": "Verb",
+          "lemma": "関す"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "報告",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb",
+          "lemma": "する"
+        }
       ],
-      "tags": ["business", "document"]
+      "tags": [
+        "business",
+        "document"
+      ]
     },
     {
       "id": "document_toshite",
-      "description": "Capacity: 代表者として署名する (suru-verb split)",
+      "description": "Capacity: 代表者として署名する (として compound particle)",
       "input": "代表者として署名する",
       "expected": [
-        {"surface": "代表", "pos": "Noun"},
-        {"surface": "者", "pos": "Suffix"},
-        {"surface": "として", "pos": "Particle"},
-        {"surface": "署名", "pos": "Noun"},
-        {"surface": "する", "pos": "Verb"}
+        {
+          "surface": "代表",
+          "pos": "Noun"
+        },
+        {
+          "surface": "者",
+          "pos": "Suffix"
+        },
+        {
+          "surface": "として",
+          "pos": "Particle"
+        },
+        {
+          "surface": "署名",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb",
+          "lemma": "する"
+        }
       ],
-      "tags": ["business", "document"]
+      "tags": [
+        "business",
+        "document"
+      ]
     },
     {
       "id": "schedule_meeting_time",
       "description": "Meeting time: 明日の10時に会議があります (split: verb stem + polite aux)",
       "input": "明日の10時に会議があります",
       "expected": [
-        {"surface": "明日", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "10時", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "会議", "pos": "Noun"},
-        {"surface": "が", "pos": "Particle"},
-        {"surface": "あり", "pos": "Verb", "lemma": "ある"},
-        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
+        {
+          "surface": "明日",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "10時",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "会議",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "あり",
+          "pos": "Verb",
+          "lemma": "ある"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
       ],
-      "tags": ["business", "schedule"]
+      "tags": [
+        "business",
+        "schedule"
+      ]
     },
     {
       "id": "schedule_next_week",
       "description": "Next week: 来週の月曜日に打ち合わせ",
       "input": "来週の月曜日に打ち合わせ",
       "expected": [
-        {"surface": "来週", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "月曜日", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "打ち合わせ", "pos": "Verb", "lemma": "打ち合わせる"}
+        {
+          "surface": "来週",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "月曜日",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "打ち合わせ",
+          "pos": "Verb",
+          "lemma": "打ち合わせる"
+        }
       ],
-      "tags": ["business", "schedule"]
+      "tags": [
+        "business",
+        "schedule"
+      ]
     },
     {
       "id": "schedule_this_month",
       "description": "This month: 今月の予定を確認する - MeCab互換分割",
       "input": "今月の予定を確認する",
       "expected": [
-        {"surface": "今月", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "予定", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "確認", "pos": "Noun"},
-        {"surface": "する", "pos": "Verb", "lemma": "する"}
+        {
+          "surface": "今月",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "予定",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "確認",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb",
+          "lemma": "する"
+        }
       ],
-      "tags": ["business", "schedule"]
+      "tags": [
+        "business",
+        "schedule"
+      ]
     },
     {
       "id": "schedule_postpone",
       "description": "Postponement: 会議を来週に延期します - MeCab互換分割",
       "input": "会議を来週に延期します",
       "expected": [
-        {"surface": "会議", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "来週", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "延期", "pos": "Noun"},
-        {"surface": "し", "pos": "Verb", "lemma": "する"},
-        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
+        {
+          "surface": "会議",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "来週",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "延期",
+          "pos": "Noun"
+        },
+        {
+          "surface": "し",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
       ],
-      "tags": ["business", "schedule", "suru_verb"]
+      "tags": [
+        "business",
+        "schedule",
+        "suru_verb"
+      ]
     },
     {
       "id": "schedule_time_range",
       "description": "Time range: 14時から16時まで",
       "input": "14時から16時まで",
       "expected": [
-        {"surface": "14時", "pos": "Noun"},
-        {"surface": "から", "pos": "Particle"},
-        {"surface": "16時", "pos": "Noun"},
-        {"surface": "まで", "pos": "Particle"}
+        {
+          "surface": "14時",
+          "pos": "Noun"
+        },
+        {
+          "surface": "から",
+          "pos": "Particle"
+        },
+        {
+          "surface": "16時",
+          "pos": "Noun"
+        },
+        {
+          "surface": "まで",
+          "pos": "Particle"
+        }
       ],
-      "tags": ["business", "schedule"]
+      "tags": [
+        "business",
+        "schedule"
+      ]
     },
     {
       "id": "finance_transaction",
       "description": "Transaction: お振込みは翌営業日に反映されます - MeCab互換分割",
       "input": "お振込みは翌営業日に反映されます",
       "expected": [
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "振込み", "pos": "Noun"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "翌営業日", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "反映", "pos": "Noun"},
-        {"surface": "さ", "pos": "Verb", "lemma": "する"},
-        {"surface": "れます", "pos": "Auxiliary", "lemma": "れる"}
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "振込み",
+          "pos": "Noun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "翌営業日",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "反映",
+          "pos": "Noun"
+        },
+        {
+          "surface": "さ",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "れ",
+          "pos": "Auxiliary",
+          "lemma": "れる"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
       ],
-      "tags": ["business", "finance"]
+      "tags": [
+        "business",
+        "finance"
+      ]
     },
     {
       "id": "finance_interest",
       "description": "Interest rate: 金利は年率0.5%です",
       "input": "金利は年率0.5%です",
       "expected": [
-        {"surface": "金利", "pos": "Noun"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "年率", "pos": "Noun"},
-        {"surface": "0.5%", "pos": "Noun"},
-        {"surface": "です", "pos": "Auxiliary"}
+        {
+          "surface": "金利",
+          "pos": "Noun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "年率",
+          "pos": "Noun"
+        },
+        {
+          "surface": "0.5%",
+          "pos": "Noun"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
       ],
-      "tags": ["business", "finance"]
+      "tags": [
+        "business",
+        "finance"
+      ]
     },
     {
       "id": "finance_budget",
       "description": "Budget: 予算は500万円を予定しています - MeCab互換分割",
       "input": "予算は500万円を予定しています",
       "expected": [
-        {"surface": "予算", "pos": "Noun"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "500万円", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "予定", "pos": "Noun"},
-        {"surface": "し", "pos": "Verb", "lemma": "する"},
-        {"surface": "て", "pos": "Particle"},
-        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"}
+        {
+          "surface": "予算",
+          "pos": "Noun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "500万円",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "予定",
+          "pos": "Noun"
+        },
+        {
+          "surface": "し",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "います",
+          "pos": "Auxiliary",
+          "lemma": "いる"
+        }
       ],
-      "tags": ["business", "finance"]
+      "tags": [
+        "business",
+        "finance"
+      ]
     },
     {
       "id": "finance_invoice",
       "description": "Invoice: 請求書を発行いたします - MeCab互換分割",
       "input": "請求書を発行いたします",
       "expected": [
-        {"surface": "請求書", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "発行", "pos": "Noun"},
-        {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
+        {
+          "surface": "請求書",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "発行",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いたします",
+          "pos": "Verb",
+          "lemma": "いたす"
+        }
       ],
-      "tags": ["business", "finance"]
+      "tags": [
+        "business",
+        "finance"
+      ]
     },
     {
       "id": "finance_payment",
       "description": "Payment: お支払いは月末締め翌月払いです",
       "input": "お支払いは月末締め翌月払いです",
       "expected": [
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "支払い", "pos": "Noun"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "月末締め", "pos": "Noun"},
-        {"surface": "翌月", "pos": "Noun"},
-        {"surface": "払い", "pos": "Noun"},
-        {"surface": "です", "pos": "Auxiliary"}
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "支払い",
+          "pos": "Noun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "月末締め",
+          "pos": "Verb",
+          "lemma": "月末締める"
+        },
+        {
+          "surface": "翌月",
+          "pos": "Noun"
+        },
+        {
+          "surface": "払い",
+          "pos": "Noun"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
       ],
-      "tags": ["business", "finance"]
+      "tags": [
+        "business",
+        "finance"
+      ]
     },
     {
       "id": "legal_terms_of_service",
       "description": "Terms: 本サービスの利用に際して",
       "input": "本サービスの利用に際して",
       "expected": [
-        {"surface": "本", "pos": "Noun"},
-        {"surface": "サービス", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "利用", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "際して", "pos": "Verb", "lemma": "際す"}
+        {
+          "surface": "本",
+          "pos": "Noun"
+        },
+        {
+          "surface": "サービス",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "利用",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "際し",
+          "pos": "Verb",
+          "lemma": "際す"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        }
       ],
-      "tags": ["business", "legal"]
+      "tags": [
+        "business",
+        "legal"
+      ]
     },
     {
       "id": "legal_prohibition",
       "description": "Prohibition: 以下の行為を禁止します - MeCab互換分割",
       "input": "以下の行為を禁止します",
       "expected": [
-        {"surface": "以下", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "行為", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "禁止", "pos": "Noun"},
-        {"surface": "し", "pos": "Verb", "lemma": "する"},
-        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
+        {
+          "surface": "以下",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "行為",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "禁止",
+          "pos": "Noun"
+        },
+        {
+          "surface": "し",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
       ],
-      "tags": ["business", "legal", "suru_verb"]
+      "tags": [
+        "business",
+        "legal",
+        "suru_verb"
+      ]
     },
     {
       "id": "legal_contract",
       "description": "Contract: 甲は乙に対して責任を負う",
       "input": "甲は乙に対して責任を負う",
       "expected": [
-        {"surface": "甲", "pos": "Noun"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "乙", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "対して", "pos": "Verb", "lemma": "対する"},
-        {"surface": "責任", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "負う", "pos": "Verb"}
+        {
+          "surface": "甲",
+          "pos": "Noun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "乙",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "対し",
+          "pos": "Verb",
+          "lemma": "対す"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "責任",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "負う",
+          "pos": "Verb"
+        }
       ],
-      "tags": ["business", "legal"]
+      "tags": [
+        "business",
+        "legal"
+      ]
     },
     {
       "id": "legal_niyotte",
       "description": "Cause: 法律によって定められた - MeCab互換分割",
       "input": "法律によって定められた",
       "expected": [
-        {"surface": "法律", "pos": "Noun"},
-        {"surface": "によって", "pos": "Particle"},
-        {"surface": "定め", "pos": "Verb", "lemma": "定める"},
-        {"surface": "られた", "pos": "Auxiliary", "lemma": "られる"}
+        {
+          "surface": "法律",
+          "pos": "Noun"
+        },
+        {
+          "surface": "によって",
+          "pos": "Particle"
+        },
+        {
+          "surface": "定め",
+          "pos": "Verb",
+          "lemma": "定める"
+        },
+        {
+          "surface": "られ",
+          "pos": "Auxiliary",
+          "lemma": "られる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
+        }
       ],
-      "tags": ["business", "legal"]
+      "tags": [
+        "business",
+        "legal"
+      ]
     },
     {
       "id": "legal_nioite",
       "description": "Place: 本契約において定める",
       "input": "本契約において定める",
       "expected": [
-        {"surface": "本契約", "pos": "Noun"},
-        {"surface": "において", "pos": "Particle"},
-        {"surface": "定める", "pos": "Verb", "lemma": "定める"}
+        {
+          "surface": "本契約",
+          "pos": "Noun"
+        },
+        {
+          "surface": "において",
+          "pos": "Particle"
+        },
+        {
+          "surface": "定める",
+          "pos": "Verb",
+          "lemma": "定める"
+        }
       ],
-      "tags": ["business", "legal"]
+      "tags": [
+        "business",
+        "legal"
+      ]
     },
     {
       "id": "legal_nimotoduite",
       "description": "Basis: 規約に基づいて処理する - MeCab互換分割",
       "input": "規約に基づいて処理する",
       "expected": [
-        {"surface": "規約", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "基づいて", "pos": "Verb", "lemma": "基づく"},
-        {"surface": "処理", "pos": "Noun"},
-        {"surface": "する", "pos": "Verb", "lemma": "する"}
+        {
+          "surface": "規約",
+          "pos": "Noun"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "基づい",
+          "pos": "Verb",
+          "lemma": "基づう"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "処理",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb",
+          "lemma": "する"
+        }
       ],
-      "tags": ["business", "legal"]
+      "tags": [
+        "business",
+        "legal"
+      ]
     },
     {
       "id": "customer_inquiry",
       "description": "Inquiry: 商品がまだ届いていないのですが",
       "input": "商品がまだ届いていないのですが",
       "expected": [
-        {"surface": "商品", "pos": "Noun"},
-        {"surface": "が", "pos": "Particle"},
-        {"surface": "まだ", "pos": "Adverb"},
-        {"surface": "届いて", "pos": "Verb", "lemma": "届く"},
-        {"surface": "いない", "pos": "Auxiliary", "lemma": "いる"},
-        {"surface": "のです", "pos": "Auxiliary", "lemma": "のだ"},
-        {"surface": "が", "pos": "Particle"}
+        {
+          "surface": "商品",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "まだ",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "届い",
+          "pos": "Verb",
+          "lemma": "届く"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "いない",
+          "pos": "Verb",
+          "lemma": "いる"
+        },
+        {
+          "surface": "のです",
+          "pos": "Auxiliary",
+          "lemma": "のだ"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        }
       ],
-      "tags": ["business", "customer"]
+      "tags": [
+        "business",
+        "customer"
+      ]
     },
     {
       "id": "customer_apology",
       "description": "Apology: 大変申し訳ございませんでした",
       "input": "大変申し訳ございませんでした",
       "expected": [
-        {"surface": "大変", "pos": "Adverb"},
-        {"surface": "申し訳", "pos": "Noun"},
-        {"surface": "ございません", "pos": "Auxiliary", "lemma": "ございます"},
-        {"surface": "でした", "pos": "Auxiliary", "lemma": "でした"}
+        {
+          "surface": "大変",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "申し訳",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ござい",
+          "pos": "Adjective",
+          "lemma": "ござい"
+        },
+        {
+          "surface": "ませ",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        },
+        {
+          "surface": "ん",
+          "pos": "Auxiliary",
+          "lemma": "ん"
+        },
+        {
+          "surface": "でし",
+          "pos": "Auxiliary",
+          "lemma": "です"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
+        }
       ],
-      "tags": ["business", "customer"]
+      "tags": [
+        "business",
+        "customer"
+      ]
     },
     {
       "id": "customer_return",
       "description": "Return: 返品の手続きについて教えてください",
       "input": "返品の手続きについて教えてください",
       "expected": [
-        {"surface": "返品", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "手続き", "pos": "Noun"},
-        {"surface": "について", "pos": "Particle"},
-        {"surface": "教えて", "pos": "Verb", "lemma": "教える"},
-        {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
+        {
+          "surface": "返品",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "手続き",
+          "pos": "Verb",
+          "lemma": "手続きる"
+        },
+        {
+          "surface": "について",
+          "pos": "Particle"
+        },
+        {
+          "surface": "教え",
+          "pos": "Verb",
+          "lemma": "教える"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ください",
+          "pos": "Verb",
+          "lemma": "くださる"
+        }
       ],
-      "tags": ["business", "customer"]
+      "tags": [
+        "business",
+        "customer"
+      ]
     },
     {
       "id": "customer_confirmation",
       "description": "Confirmation: ご注文内容を確認させていただきます - MeCab互換分割",
       "input": "ご注文内容を確認させていただきます",
       "expected": [
-        {"surface": "ご", "pos": "Prefix"},
-        {"surface": "注文内容", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "確認", "pos": "Noun"},
-        {"surface": "させ", "pos": "Auxiliary", "lemma": "させる"},
-        {"surface": "て", "pos": "Particle"},
-        {"surface": "いただきます", "pos": "Verb", "lemma": "いただく"}
+        {
+          "surface": "ご",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "注文内容",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "確認",
+          "pos": "Noun"
+        },
+        {
+          "surface": "させ",
+          "pos": "Auxiliary",
+          "lemma": "させる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "いただきます",
+          "pos": "Verb",
+          "lemma": "いただく"
+        }
       ],
-      "tags": ["business", "customer"]
+      "tags": [
+        "business",
+        "customer"
+      ]
     },
     {
       "id": "customer_contact",
       "description": "Contact: お問い合わせありがとうございます",
       "input": "お問い合わせありがとうございます",
       "expected": [
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "問い合わせ", "pos": "Noun"},
-        {"surface": "ありがとう", "pos": "Other"},
-        {"surface": "ございます", "pos": "Auxiliary", "lemma": "ございます"}
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "問い合わせ",
+          "pos": "Noun"
+        },
+        {
+          "surface": "ありがとう",
+          "pos": "Other"
+        },
+        {
+          "surface": "ございます",
+          "pos": "Auxiliary",
+          "lemma": "ございます"
+        }
       ],
-      "tags": ["business", "customer"]
+      "tags": [
+        "business",
+        "customer"
+      ]
     },
     {
       "id": "announcement_notice",
       "description": "Notice: 下記の通りお知らせいたします - MeCab互換分割",
       "input": "下記の通りお知らせいたします",
       "expected": [
-        {"surface": "下記", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "通り", "pos": "Noun"},
-        {"surface": "お", "pos": "Prefix"},
-        {"surface": "知らせ", "pos": "Noun"},
-        {"surface": "いたします", "pos": "Verb", "lemma": "いたす"}
+        {
+          "surface": "下記",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "通り",
+          "pos": "Noun"
+        },
+        {
+          "surface": "お",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "知らせ",
+          "pos": "Noun"
+        },
+        {
+          "surface": "いたします",
+          "pos": "Verb",
+          "lemma": "いたす"
+        }
       ],
-      "tags": ["business", "announcement"]
+      "tags": [
+        "business",
+        "announcement"
+      ]
     },
     {
       "id": "announcement_decision",
       "description": "Decision: 以下の事項を決定しました - MeCab互換分割",
       "input": "以下の事項を決定しました",
       "expected": [
-        {"surface": "以下", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "事項", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "決定", "pos": "Noun"},
-        {"surface": "しました", "pos": "Verb", "lemma": "する"}
+        {
+          "surface": "以下",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "事項",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "決定",
+          "pos": "Noun"
+        },
+        {
+          "surface": "し",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "まし",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
+        }
       ],
-      "tags": ["business", "announcement", "suru_verb"]
+      "tags": [
+        "business",
+        "announcement",
+        "suru_verb"
+      ]
     },
     {
       "id": "announcement_niyoruto",
       "description": "Citation: 報告によると問題はない",
       "input": "報告によると問題はない",
       "expected": [
-        {"surface": "報告", "pos": "Noun"},
-        {"surface": "によると", "pos": "Particle"},
-        {"surface": "問題", "pos": "Noun"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "ない", "pos": "Auxiliary"}
+        {
+          "surface": "報告",
+          "pos": "Noun"
+        },
+        {
+          "surface": "によると",
+          "pos": "Particle"
+        },
+        {
+          "surface": "問題",
+          "pos": "Noun"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary"
+        }
       ],
-      "tags": ["business", "announcement"]
+      "tags": [
+        "business",
+        "announcement"
+      ]
     },
     {
       "id": "announcement_nitotte",
       "description": "Viewpoint: 会社にとって重要な決定",
       "input": "会社にとって重要な決定",
       "expected": [
-        {"surface": "会社", "pos": "Noun"},
-        {"surface": "にとって", "pos": "Particle"},
-        {"surface": "重要な", "pos": "Adjective", "lemma": "重要"},
-        {"surface": "決定", "pos": "Noun"}
+        {
+          "surface": "会社",
+          "pos": "Noun"
+        },
+        {
+          "surface": "にとって",
+          "pos": "Particle"
+        },
+        {
+          "surface": "重要な",
+          "pos": "Adjective",
+          "lemma": "重要"
+        },
+        {
+          "surface": "決定",
+          "pos": "Noun"
+        }
       ],
-      "tags": ["business", "announcement"]
+      "tags": [
+        "business",
+        "announcement"
+      ]
     },
     {
       "id": "counter_people",
       "description": "People counter: 3人で行く",
       "input": "3人で行く",
       "expected": [
-        {"surface": "3人", "pos": "Noun"},
-        {"surface": "で", "pos": "Particle"},
-        {"surface": "行く", "pos": "Verb"}
+        {
+          "surface": "3人",
+          "pos": "Noun"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
+        },
+        {
+          "surface": "行く",
+          "pos": "Verb"
+        }
       ],
-      "tags": ["business", "counter"]
+      "tags": [
+        "business",
+        "counter"
+      ]
     },
     {
       "id": "counter_times",
       "description": "Times counter: 5回目の挑戦",
       "input": "5回目の挑戦",
       "expected": [
-        {"surface": "5回目", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "挑戦", "pos": "Noun"}
+        {
+          "surface": "5回目",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "挑戦",
+          "pos": "Noun"
+        }
       ],
-      "tags": ["business", "counter"]
+      "tags": [
+        "business",
+        "counter"
+      ]
     },
     {
       "id": "counter_items",
       "description": "Item counter: 10個の商品を",
       "input": "10個の商品を",
       "expected": [
-        {"surface": "10個", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "商品", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"}
+        {
+          "surface": "10個",
+          "pos": "Noun"
+        },
+        {
+          "surface": "の",
+          "pos": "Particle"
+        },
+        {
+          "surface": "商品",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        }
       ],
-      "tags": ["business", "counter"]
+      "tags": [
+        "business",
+        "counter"
+      ]
     },
     {
       "id": "counter_percent",
       "description": "Percentage: 売上が20%増加した - MeCab互換分割",
       "input": "売上が20%増加した",
       "expected": [
-        {"surface": "売上", "pos": "Noun"},
-        {"surface": "が", "pos": "Particle"},
-        {"surface": "20%", "pos": "Noun"},
-        {"surface": "増加", "pos": "Noun"},
-        {"surface": "した", "pos": "Auxiliary", "lemma": "する"}
+        {
+          "surface": "売上",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "20%",
+          "pos": "Noun"
+        },
+        {
+          "surface": "増加",
+          "pos": "Noun"
+        },
+        {
+          "surface": "し",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
+        }
       ],
-      "tags": ["business", "counter"]
+      "tags": [
+        "business",
+        "counter"
+      ]
     },
     {
       "id": "compound_particle_nitsuiteha",
       "description": "Compound particle: この件については後日",
       "input": "この件については後日",
       "expected": [
-        {"surface": "この", "pos": "Determiner"},
-        {"surface": "件", "pos": "Noun"},
-        {"surface": "について", "pos": "Particle"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "後日", "pos": "Noun"}
+        {
+          "surface": "この",
+          "pos": "Determiner"
+        },
+        {
+          "surface": "件",
+          "pos": "Noun"
+        },
+        {
+          "surface": "について",
+          "pos": "Particle"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "後日",
+          "pos": "Noun"
+        }
       ],
-      "tags": ["business", "compound_particle"]
+      "tags": [
+        "business",
+        "compound_particle"
+      ]
     },
     {
       "id": "compound_particle_toshite",
-      "description": "Compound particle として: 代表者として署名する (suru-verb split)",
+      "description": "Compound particle として: 代表者として署名する",
       "input": "代表者として署名する",
       "expected": [
-        {"surface": "代表", "pos": "Noun"},
-        {"surface": "者", "pos": "Suffix"},
-        {"surface": "として", "pos": "Particle"},
-        {"surface": "署名", "pos": "Noun"},
-        {"surface": "する", "pos": "Verb"}
+        {
+          "surface": "代表",
+          "pos": "Noun"
+        },
+        {
+          "surface": "者",
+          "pos": "Suffix"
+        },
+        {
+          "surface": "として",
+          "pos": "Particle"
+        },
+        {
+          "surface": "署名",
+          "pos": "Noun"
+        },
+        {
+          "surface": "する",
+          "pos": "Verb",
+          "lemma": "する"
+        }
       ],
-      "tags": ["business", "compound_particle"]
+      "tags": [
+        "business",
+        "compound_particle"
+      ]
     },
     {
       "id": "compound_particle_womotte",
       "description": "Compound particle をもって: 本日をもって終了",
       "input": "本日をもって終了",
       "expected": [
-        {"surface": "本日", "pos": "Noun"},
-        {"surface": "をもって", "pos": "Particle"},
-        {"surface": "終了", "pos": "Noun"}
+        {
+          "surface": "本日",
+          "pos": "Noun"
+        },
+        {
+          "surface": "をもって",
+          "pos": "Particle"
+        },
+        {
+          "surface": "終了",
+          "pos": "Noun"
+        }
       ],
-      "tags": ["business", "compound_particle"]
+      "tags": [
+        "business",
+        "compound_particle"
+      ]
     }
   ]
 }

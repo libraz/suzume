@@ -95,18 +95,21 @@
     },
     {
       "id": "tottoto_adv",
-      "description": "B40: とっとと should be ADV, not OTHER+PARTICLE+PARTICLE split",
+      "description": "B40: とっとと should be ADV, not OTHER+PARTICLE+PARTICLE split (MeCab-compatible)",
       "input": "とっとと滅びればいい",
       "expected": [
         {
           "surface": "とっとと",
-          "pos": "Adverb",
-          "lemma": "とっとと"
+          "pos": "Adverb"
         },
         {
-          "surface": "滅びれば",
+          "surface": "滅びれ",
           "pos": "Verb",
           "lemma": "滅びる"
+        },
+        {
+          "surface": "ば",
+          "pos": "Particle"
         },
         {
           "surface": "いい",
@@ -887,20 +890,43 @@
       "description": "ニャーニャー - cat onomatopoeia, not AUX よ (W-007)",
       "input": "ニャーニャーと",
       "expected": [
-        {"surface": "ニャーニャー", "pos": "Adverb"},
-        {"surface": "と", "pos": "Particle"}
+        {
+          "surface": "ニャーニャー",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "と",
+          "pos": "Particle"
+        }
       ],
-      "tags": ["katakana", "animal", "wagahai", "W-007"]
+      "tags": [
+        "katakana",
+        "animal",
+        "wagahai",
+        "W-007"
+      ]
     },
     {
       "id": "nya_hiragana_aux",
       "description": "にゃー - dialectal AUX should still work",
       "input": "行くにゃー",
       "expected": [
-        {"surface": "行く", "pos": "Verb", "lemma": "行く"},
-        {"surface": "にゃー", "pos": "Auxiliary", "lemma": "よ"}
+        {
+          "surface": "行く",
+          "pos": "Verb",
+          "lemma": "行く"
+        },
+        {
+          "surface": "にゃー",
+          "pos": "Auxiliary",
+          "lemma": "よ"
+        }
       ],
-      "tags": ["dialectal", "cat_speech", "W-007"]
+      "tags": [
+        "dialectal",
+        "cat_speech",
+        "W-007"
+      ]
     }
   ]
 }

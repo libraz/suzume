@@ -26,13 +26,17 @@
     },
     {
       "id": "pattern_te_form",
-      "description": "食べて寝る - te-form unified",
+      "description": "食べて寝る - MeCab-compatible te-form split",
       "input": "食べて寝る",
       "expected": [
         {
-          "surface": "食べて",
+          "surface": "食べ",
           "pos": "Verb",
           "lemma": "食べる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "寝る",
@@ -48,18 +52,27 @@
     },
     {
       "id": "te_ku_not_adj_matte",
-      "description": "待ってくれない should be 待って + くれない, not adjective",
+      "description": "待ってくれない - MeCab-compatible: 待っ + て + くれ + ない",
       "input": "待ってくれない",
       "expected": [
         {
-          "surface": "待って",
+          "surface": "待っ",
           "pos": "Verb",
           "lemma": "待つ"
         },
         {
-          "surface": "くれない",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "くれ",
           "pos": "Verb",
           "lemma": "くれる"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -174,18 +187,27 @@
     },
     {
       "id": "godan_te_agenai_split",
-      "description": "書いてあげない - te-form unified + auxiliary verb",
+      "description": "書いてあげない - MeCab-compatible: 書い + て + あげ + ない",
       "input": "書いてあげない",
       "expected": [
         {
-          "surface": "書いて",
+          "surface": "書い",
           "pos": "Verb",
           "lemma": "書く"
         },
         {
-          "surface": "あげない",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "あげ",
           "pos": "Verb",
           "lemma": "あげる"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -341,13 +363,17 @@
     },
     {
       "id": "te_form_yonde",
-      "description": "読んで - de-form should be verb",
+      "description": "読んで - MeCab-compatible: 読ん + で",
       "input": "読んで",
       "expected": [
         {
-          "surface": "読んで",
+          "surface": "読ん",
           "pos": "Verb",
           "lemma": "読む"
+        },
+        {
+          "surface": "で",
+          "pos": "Particle"
         }
       ],
       "tags": [
@@ -356,38 +382,41 @@
     },
     {
       "id": "particle_te_form",
-      "description": "につけて standalone - NOUN つけ wins over unknown VERB - MeCab-compatible lemma",
+      "description": "につけて - MeCab-compatible: に + つけ + て",
       "input": "につけて",
       "expected": [
         {"surface": "に", "pos": "Particle"},
-        {"surface": "つけ", "pos": "Noun", "lemma": "つけ"},
-        {"surface": "て", "pos": "Auxiliary"}
+        {"surface": "つけ", "pos": "Verb", "lemma": "つける"},
+        {"surface": "て", "pos": "Particle"}
       ],
-      "tags": ["known_limitation", "te_form", "particle"]
+      "tags": ["te_form", "particle"]
     },
     {
       "id": "particle_te_iru",
-      "description": "S1 fix: につけている - progressive after particle should not be penalized",
+      "description": "につけている - MeCab-compatible: に + つけ + て + いる",
       "input": "につけている",
       "expected": [
         {"surface": "に", "pos": "Particle"},
-        {"surface": "つけて", "pos": "Verb", "lemma": "つける"},
+        {"surface": "つけ", "pos": "Verb", "lemma": "つける"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
       ],
-      "tags": ["particle_fix", "te_form", "progressive", "particle", "regression"]
+      "tags": ["te_form", "progressive", "particle"]
     },
     {
       "id": "particle_ranking_sentence",
-      "description": "S1 fix: 現在3位につけている - ranking context",
+      "description": "現在3位につけている - MeCab-compatible: 現在 + 3 + 位 + に + つけ + て + いる",
       "input": "現在3位につけている",
       "expected": [
         {"surface": "現在", "pos": "Noun"},
-        {"surface": "3位", "pos": "Noun"},
+        {"surface": "3", "pos": "Noun"},
+        {"surface": "位", "pos": "Suffix"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "つけて", "pos": "Verb", "lemma": "つける"},
+        {"surface": "つけ", "pos": "Verb", "lemma": "つける"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
       ],
-      "tags": ["particle_fix", "te_form", "progressive", "regression"]
+      "tags": ["te_form", "progressive"]
     }
   ]
 }

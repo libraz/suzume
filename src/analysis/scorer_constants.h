@@ -1,6 +1,8 @@
 #ifndef SUZUME_ANALYSIS_SCORER_CONSTANTS_H_
 #define SUZUME_ANALYSIS_SCORER_CONSTANTS_H_
 
+#include <cstddef>
+
 // =============================================================================
 // Scorer Constants
 // =============================================================================
@@ -73,6 +75,12 @@ constexpr float kVeryStrongBonus = -1.5F;
 // Unknown adjective ending with そう but invalid lemma
 // Valid: おいしそう (lemma おいしい), Invalid: 食べそう (lemma 食べい)
 constexpr float kPenaltyInvalidAdjSou = scale::kStrong;
+
+// Bonus for unknown i-adjective in くない form (negative conjugation)
+// E.g., しんどくない, エモくない - these are strong indicators of i-adjective
+// くない pattern is highly reliable for adjective detection
+// Needs to compete with fragmented paths containing dictionary verbs
+constexpr float kBonusIAdjKunai = scale::kStrongBonus;  // -1.0
 
 // Unknown adjective with たい pattern where stem is invalid
 // E.g., りたかった is invalid (り is not a valid verb stem)
@@ -244,6 +252,39 @@ constexpr float kPenaltyPrefixBeforeVerb = scale::kStrong + scale::kMinor;  // 2
 // Verb auxiliaries (ます/ましょう/たい/ない) require verb stem, not nouns
 // E.g., 行き(NOUN) + ましょう is invalid - should be 行き(VERB) + ましょう
 constexpr float kPenaltyNounBeforeVerbAux = scale::kStrong + scale::kMinor;  // 2.0
+
+// =============================================================================
+// Verb Connection Rules (Phase 5 normalization)
+// =============================================================================
+
+// しれる verb + ます/ない pattern bonus
+// E.g., かもしれません → かも + しれ + ませ + ん
+// Strong bonus to compensate for し+れ path getting passive-aux bonuses
+constexpr float kBonusShireruToMasuNai = scale::kProhibitive;  // 3.5F
+
+// Verb renyokei + contracted verb (てる/とく/etc.) bonus
+// E.g., し + てる should beat し(PARTICLE) + てる
+constexpr float kBonusRenyokeiToContractedVerb = scale::kSevere;  // 2.5
+
+// Verb renyokei/onbinkei + て/で particle (MeCab-compatible te-form split)
+// E.g., 食べ + て, 書い + て - strong bonus to prefer this split
+constexpr float kBonusRenyokeiToTeParticle = scale::kSevere;  // 2.5
+
+// て/で particle + auxiliary verb bonus
+// E.g., て + いる, て + しまう - supports MeCab-compatible patterns
+constexpr float kBonusTeParticleToAuxVerb = scale::kStrong + scale::kMinor;  // 2.0
+
+// てる renyokei + た (contracted progressive past)
+// E.g., て(VERB, lemma=てる) + た → 見てた (MeCab-compatible)
+constexpr float kBonusTeruRenyokeiToTa = scale::kStrong;  // 1.5
+
+// Adjective く form + て particle bonus
+// E.g., 美しく + て - very common pattern
+constexpr float kBonusAdjKuToTeParticle = scale::kSevere;  // 2.5
+
+// そう auxiliary small bonus after renyokei (fine-tuning)
+// Slight bonus to help AUX interpretation in borderline cases
+constexpr float kBonusSouAfterRenyokeiSmall = 0.25F;
 
 // =============================================================================
 // Auxiliary Connection Rules (extracted from inline literals)
@@ -464,6 +505,57 @@ constexpr const char* kPatternDeOru = "でおる";    // で+おる (voiced)
 // Specific surfaces that are verb forms, not adjectives
 constexpr const char* kSurfaceShimai = "しまい";   // しまう renyokei
 constexpr const char* kSurfaceJimai = "じまい";    // じまう renyokei (voiced)
+
+// =============================================================================
+// Pattern Arrays for Auxiliary Verb Detection
+// =============================================================================
+// These arrays group patterns for efficient checking in scorer.cpp
+
+// Te-form + auxiliary patterns used to detect invalid adjectives (10 patterns)
+// Used in: adjective surface containing verb+auxiliary → penalize
+constexpr const char* kTeFormAuxPatternsForAdj[] = {
+    kPatternTeShima,  // てしま
+    kPatternDeShima,  // でしま
+    kPatternTeIru,    // ている
+    kPatternDeIru,    // でいる
+    kPatternTeMiru,   // てみる
+    kPatternDeMiru,   // でみる
+    kPatternTeIku,    // ていく
+    kPatternDeIku,    // でいく
+    kPatternTeKuru,   // てくる
+    kPatternDeKuru,   // でくる
+};
+constexpr size_t kTeFormAuxPatternsForAdjSize =
+    sizeof(kTeFormAuxPatternsForAdj) / sizeof(kTeFormAuxPatternsForAdj[0]);
+
+// Te-form + auxiliary patterns used to detect unified verb forms (22 patterns)
+// Used in: verb surface containing te-form+auxiliary → bonus for unified form
+constexpr const char* kTeFormAuxPatternsForVerb[] = {
+    kPatternTeShima,  // てしま
+    kPatternDeShima,  // でしま
+    kPatternTeIru,    // ている
+    kPatternDeIru,    // でいる
+    kPatternTeMora,   // てもら
+    kPatternDeMora,   // でもら
+    kPatternTeOku,    // ておく
+    kPatternDeOku,    // でおく
+    kPatternTeAge,    // てあげ
+    kPatternDeAge,    // であげ
+    kPatternTeKure,   // てくれ
+    kPatternDeKure,   // でくれ
+    kPatternTeMiru,   // てみる
+    kPatternDeMiru,   // でみる
+    kPatternTeIku,    // ていく
+    kPatternDeIku,    // でいく
+    kPatternTeKuru,   // てくる
+    kPatternDeKuru,   // でくる
+    kPatternTeAru,    // てある
+    kPatternDeAru,    // である
+    kPatternTeOru,    // ておる
+    kPatternDeOru,    // でおる
+};
+constexpr size_t kTeFormAuxPatternsForVerbSize =
+    sizeof(kTeFormAuxPatternsForVerb) / sizeof(kTeFormAuxPatternsForVerb[0]);
 
 // I-adjective conjugation suffixes (standalone, not verb candidates)
 // These patterns are conjugation endings for i-adjectives:

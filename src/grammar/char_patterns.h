@@ -77,6 +77,15 @@ bool containsKatakana(std::string_view stem);
  */
 bool isPureHiragana(std::string_view stem);
 
+/**
+ * @brief Check if stem consists entirely of katakana characters
+ * @param stem The stem to check
+ * @return True if all characters are katakana (カタカナ)
+ *
+ * Used to identify pure katakana words which may be slang or loanwords.
+ */
+bool isPureKatakana(std::string_view stem);
+
 // Onbin endings: い, っ, ん
 extern const char* kOnbinEndings[];
 extern const size_t kOnbinCount;

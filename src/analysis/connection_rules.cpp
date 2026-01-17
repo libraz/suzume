@@ -106,6 +106,7 @@ void evaluateVerbRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkTaAfterRenyokei(prev, next, opts));
   accumulateRule(accumulated, checkNaiAfterVerbMizenkei(prev, next, opts));
   accumulateRule(accumulated, checkPassiveAfterVerbMizenkei(prev, next, opts));
+  accumulateRule(accumulated, checkShireruToMasuNai(prev, next, opts));
   accumulateRule(accumulated, checkVerbToOkuChauContraction(prev, next, opts));
 
   // VERB → VERB rules
@@ -113,6 +114,7 @@ void evaluateVerbRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkConditionalVerbToVerb(prev, next, opts));
   accumulateRule(accumulated, checkVerbRenyokeiCompoundAux(prev, next, opts));
   accumulateRule(accumulated, checkTeFormVerbToVerb(prev, next, opts));
+  accumulateRule(accumulated, checkRenyokeiToContractedVerb(prev, next, opts));
 
   // VERB → PARTICLE rules
   accumulateRule(accumulated, checkTeFormSplit(prev, next, opts));
@@ -121,6 +123,7 @@ void evaluateVerbRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkTokuContractionSplit(prev, next, opts));
   accumulateRule(accumulated, checkVerbToCaseParticle(prev, next, opts));
   accumulateRule(accumulated, checkShiParticleConnection(prev, next, opts));
+  accumulateRule(accumulated, checkRenyokeiToTeParticle(prev, next, opts));
 
   // VERB → ADJ rules
   accumulateRule(accumulated, checkTaiAfterRenyokei(prev, next, opts));
@@ -141,6 +144,8 @@ void evaluateNounRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkNounBeforeVerbAux(prev, next, opts));
   accumulateRule(accumulated, checkMaiAfterNoun(prev, next, opts));
   accumulateRule(accumulated, checkNounIRowToVerbAux(prev, next, opts));
+  accumulateRule(accumulated, checkNaAdjToCopulaDe(prev, next, opts));
+  accumulateRule(accumulated, checkNaAdjToDekinaiVerb(prev, next, opts));
 
   // NOUN → VERB rules
   accumulateRule(accumulated, checkCompoundAuxAfterRenyokei(prev, next, opts));
@@ -175,9 +180,16 @@ void evaluateAdjRules(const core::LatticeEdge& prev,
   // ADJ → VERB rules
   accumulateRule(accumulated, checkAdjKuNaru(prev, next, opts));
 
+  // ADJ → AUX rules (na-adjective copula pattern)
+  accumulateRule(accumulated, checkNaAdjToCopulaDe(prev, next, opts));
+
+  // ADJ → VERB rules (na-adjective copula penalty)
+  accumulateRule(accumulated, checkNaAdjToDekinaiVerb(prev, next, opts));
+
   // ADJ → PARTICLE rules
   accumulateRule(accumulated, checkTakuTeSplit(prev, next, opts));
   accumulateRule(accumulated, checkShiParticleConnection(prev, next, opts));
+  accumulateRule(accumulated, checkAdjKuToTeParticle(prev, next, opts));
 
   // ADJ → ADJ rules
   accumulateRule(accumulated, checkRashiiAfterPredicate(prev, next, opts));
@@ -190,7 +202,13 @@ void evaluateAuxRules(const core::LatticeEdge& prev,
   // AUX → AUX rules
   accumulateRule(accumulated, checkCharacterSpeechSplit(prev, next, opts));
   accumulateRule(accumulated, checkMasuRenyokeiToTa(prev, next, opts));
+  accumulateRule(accumulated, checkNaiRenyokeiToTa(prev, next, opts));
+  accumulateRule(accumulated, checkTaiRenyokeiToTa(prev, next, opts));
+  accumulateRule(accumulated, checkDesuRenyokeiToTa(prev, next, opts));
+  accumulateRule(accumulated, checkInvalidTaToI(prev, next, opts));
   accumulateRule(accumulated, checkPassiveAuxToNaiTa(prev, next, opts));
+  accumulateRule(accumulated, checkCopulaDeToKuruAux(prev, next, opts));
+  accumulateRule(accumulated, checkCopulaDeToNai(prev, next, opts));
 
   // AUX → PARTICLE rules
   accumulateRule(accumulated, checkMasenDeSplit(prev, next, opts));
@@ -206,6 +224,7 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
                            ConnectionRuleResult& accumulated) {
   // PARTICLE → AUX rules
   accumulateRule(accumulated, checkAuxAfterParticle(prev, next, opts));
+  accumulateRule(accumulated, checkParticleDeToKuruAux(prev, next, opts));
 
   // PARTICLE → NOUN rules
   accumulateRule(accumulated, checkYoruNightAfterNi(prev, next, opts));
@@ -219,6 +238,7 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
 
   // PARTICLE → VERB rules
   accumulateRule(accumulated, checkParticleBeforeHiraganaVerb(prev, next, opts));
+  accumulateRule(accumulated, checkTeParticleToAuxVerb(prev, next, opts));
 
   // PARTICLE → ADJ rules
   accumulateRule(accumulated, checkParticleBeforeHiraganaAdj(prev, next, opts));

@@ -145,16 +145,22 @@
       "expected": [
         {
           "surface": "行く",
-          "pos": "Verb"
+          "pos": "Verb",
+          "lemma": "行く"
         },
         {
           "surface": "って",
           "pos": "Particle"
         },
         {
-          "surface": "言った",
+          "surface": "言っ",
           "pos": "Verb",
           "lemma": "言う"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -405,7 +411,10 @@
           "lemma": "ですっ"
         }
       ],
-      "tags": ["emphatic", "sokuon"]
+      "tags": [
+        "emphatic",
+        "sokuon"
+      ]
     },
     {
       "id": "emphatic_sokuon_verb",
@@ -418,7 +427,10 @@
           "lemma": "行く"
         }
       ],
-      "tags": ["emphatic", "sokuon"]
+      "tags": [
+        "emphatic",
+        "sokuon"
+      ]
     },
     {
       "id": "emphatic_sokuon_multiple",
@@ -431,7 +443,10 @@
           "lemma": "ます"
         }
       ],
-      "tags": ["emphatic", "sokuon"]
+      "tags": [
+        "emphatic",
+        "sokuon"
+      ]
     },
     {
       "id": "emphatic_sokuon_past",
@@ -439,12 +454,20 @@
       "input": "来たっ",
       "expected": [
         {
-          "surface": "来たっ",
+          "surface": "来",
           "pos": "Verb",
-          "lemma": "来たっ"
+          "lemma": "来る"
+        },
+        {
+          "surface": "たっ",
+          "pos": "Verb",
+          "lemma": "たつ"
         }
       ],
-      "tags": ["emphatic", "sokuon"]
+      "tags": [
+        "emphatic",
+        "sokuon"
+      ]
     },
     {
       "id": "vowel_repeat_kita",
@@ -457,7 +480,10 @@
           "lemma": "くる"
         }
       ],
-      "tags": ["emphatic", "vowel_repeat"]
+      "tags": [
+        "emphatic",
+        "vowel_repeat"
+      ]
     },
     {
       "id": "vowel_repeat_sugoi",
@@ -470,7 +496,10 @@
           "lemma": "すごい"
         }
       ],
-      "tags": ["emphatic", "vowel_repeat"]
+      "tags": [
+        "emphatic",
+        "vowel_repeat"
+      ]
     },
     {
       "id": "vowel_repeat_iku",
@@ -483,7 +512,10 @@
           "lemma": "いく"
         }
       ],
-      "tags": ["emphatic", "vowel_repeat"]
+      "tags": [
+        "emphatic",
+        "vowel_repeat"
+      ]
     },
     {
       "id": "vowel_repeat_yabai",
@@ -496,7 +528,10 @@
           "lemma": "やばい"
         }
       ],
-      "tags": ["emphatic", "vowel_repeat"]
+      "tags": [
+        "emphatic",
+        "vowel_repeat"
+      ]
     }
   ]
 }

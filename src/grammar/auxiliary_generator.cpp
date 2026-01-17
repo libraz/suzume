@@ -33,6 +33,8 @@ struct ConjSuffix {
 
 // Full forms with negative (9 suffixes)
 // Pattern: base, ta, tara, te, masu, mashita, nai, nakatta, nakute
+// Note: Te-form entries are kept for inflection analysis but skipped during generation
+// (MeCab-compatible te-form split: VERB renyokei + て(PARTICLE))
 constexpr ConjSuffix kIchidanFull[] = {
     {"る", conn::kAuxOutBase},   {"た", conn::kAuxOutTa},
     {"たら", conn::kAuxOutBase}, {"て", conn::kAuxOutTe},
@@ -120,6 +122,9 @@ constexpr ConjSuffix kMasu[] = {
 // =============================================================================
 
 // Generate forms using stem + suffix pattern
+// Note: All entries including te-form are generated for inflection analysis.
+// For MeCab-compatible te-form split, the scoring (connection rules) makes
+// the split path VERB(renyokei/onbinkei) + て(PARTICLE) win over unified te-form.
 template <size_t N>
 std::vector<AuxiliaryEntry> generateWithStem(
     const AuxiliaryBase& base, const ConjSuffix (&suffixes)[N]) {
@@ -177,6 +182,9 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"だら", "だら", "たら", kAuxTa, kAuxOutBase, kVerbOnbinkei});
 
   // === Te-form (voiced variants) ===
+  // These entries are needed for inflection analysis (matching て/で after onbin stems).
+  // For tokenization, the PARTICLE て/で in entries.cpp competes with these AUXILIARY entries.
+  // Connection rules give bonus to the PARTICLE path for MeCab-compatible te-form split.
   entries.push_back({"て", "て", "て", kAuxTe, kAuxOutTe, kVerbOnbinkei});
   entries.push_back({"で", "で", "て", kAuxTe, kAuxOutTe, kVerbOnbinkei});
 

@@ -323,6 +323,10 @@ ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
                                     const core::LatticeEdge& next,
                                     const ConnectionOptions& opts);
 
+ConnectionRuleResult checkAdjKuToTeParticle(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next,
+                                            const ConnectionOptions& opts);
+
 ConnectionRuleResult checkPrefixToHiraganaAdj(const core::LatticeEdge& prev,
                                               const core::LatticeEdge& next,
                                               const ConnectionOptions& opts);
@@ -399,6 +403,23 @@ ConnectionRuleResult checkMasuRenyokeiToTa(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts);
 
+ConnectionRuleResult checkNaiRenyokeiToTa(const core::LatticeEdge& prev,
+                                          const core::LatticeEdge& next,
+                                          const ConnectionOptions& opts);
+
+ConnectionRuleResult checkTaiRenyokeiToTa(const core::LatticeEdge& prev,
+                                          const core::LatticeEdge& next,
+                                          const ConnectionOptions& opts);
+
+ConnectionRuleResult checkDesuRenyokeiToTa(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next,
+                                           const ConnectionOptions& opts);
+
+// Penalty for AUX(た) → AUX(い) which should be たい instead
+ConnectionRuleResult checkInvalidTaToI(const core::LatticeEdge& prev,
+                                       const core::LatticeEdge& next,
+                                       const ConnectionOptions& opts);
+
 ConnectionRuleResult checkNaiAfterVerbMizenkei(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts);
@@ -407,6 +428,22 @@ ConnectionRuleResult checkPassiveAfterVerbMizenkei(const core::LatticeEdge& prev
                                                     const core::LatticeEdge& next,
                                                     const ConnectionOptions& opts);
 
+ConnectionRuleResult checkShireruToMasuNai(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next,
+                                           const ConnectionOptions& opts);
+
+ConnectionRuleResult checkRenyokeiToContractedVerb(const core::LatticeEdge& prev,
+                                                   const core::LatticeEdge& next,
+                                                   const ConnectionOptions& opts);
+
+ConnectionRuleResult checkRenyokeiToTeParticle(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next,
+                                               const ConnectionOptions& opts);
+
+ConnectionRuleResult checkTeParticleToAuxVerb(const core::LatticeEdge& prev,
+                                              const core::LatticeEdge& next,
+                                              const ConnectionOptions& opts);
+
 ConnectionRuleResult checkPassiveAuxToNaiTa(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts);
@@ -414,6 +451,31 @@ ConnectionRuleResult checkPassiveAuxToNaiTa(const core::LatticeEdge& prev,
 ConnectionRuleResult checkVerbToOkuChauContraction(const core::LatticeEdge& prev,
                                                    const core::LatticeEdge& next,
                                                    const ConnectionOptions& opts);
+
+// Penalty for で(PARTICLE) → くる活用形 (きます, きた etc.) which is usually できる misparse
+ConnectionRuleResult checkParticleDeToKuruAux(const core::LatticeEdge& prev,
+                                              const core::LatticeEdge& next,
+                                              const ConnectionOptions& opts);
+
+// Penalty for で(AUX, lemma=だ) → くる活用形 to prevent できます misparse
+ConnectionRuleResult checkCopulaDeToKuruAux(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next,
+                                            const ConnectionOptions& opts);
+
+// Bonus for NOUN/ADJ → で(AUX, lemma=だ) for na-adjective copula pattern (嫌でない)
+ConnectionRuleResult checkNaAdjToCopulaDe(const core::LatticeEdge& prev,
+                                          const core::LatticeEdge& next,
+                                          const ConnectionOptions& opts);
+
+// Penalty for NOUN/ADJ → でない(VERB, lemma=できる) to prevent misparse of na-adj copula pattern
+ConnectionRuleResult checkNaAdjToDekinaiVerb(const core::LatticeEdge& prev,
+                                             const core::LatticeEdge& next,
+                                             const ConnectionOptions& opts);
+
+// Bonus for で(AUX, lemma=だ) → ない(AUX) for na-adjective copula negation pattern
+ConnectionRuleResult checkCopulaDeToNai(const core::LatticeEdge& prev,
+                                        const core::LatticeEdge& next,
+                                        const ConnectionOptions& opts);
 
 // =============================================================================
 // POS-based Dispatch Helpers

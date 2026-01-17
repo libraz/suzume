@@ -64,9 +64,13 @@
       "input": "教えてくださる",
       "expected": [
         {
-          "surface": "教えて",
+          "surface": "教え",
           "pos": "Verb",
           "lemma": "教える"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "くださる",

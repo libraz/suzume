@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "core/utf8_constants.h"
+#include "grammar/conjugation.h"
 #include "dictionary/entries/adverbs.h"
 #include "dictionary/entries/auxiliaries.h"
 #include "dictionary/entries/common_vocabulary.h"
@@ -27,264 +28,73 @@ namespace suzume::dictionary {
 
 namespace {
 
-// =============================================================================
-// Verb Conjugation Expansion
-// =============================================================================
-// Generates common conjugated forms from a base verb entry.
-// Only applies to verbs with ConjugationType != None.
-
-struct ConjugatedForm {
-  std::string suffix;       // Suffix to add to stem
-  std::string base_suffix;  // Base form suffix to remove
-};
-
-// Get conjugated forms for Ichidan verbs (食べる → 食べ + suffix)
-// Note: Polite forms (ます, ました, ません) are NOT included - they should be
-//       analyzed as renyokei + auxiliary per CLAUDE.md design
-std::vector<ConjugatedForm> getIchidanForms() {
-  return {
-      {"る", ""},        // Base: 食べる
-      {"た", ""},        // Past: 食べた
-      {"て", ""},        // Te-form: 食べて
-      {"ない", ""},      // Negative: 食べない
-      {"ん", ""},        // Contracted negative: 食べん (colloquial)
-      {"なかった", ""},  // Past negative: 食べなかった
-      {"れば", ""},      // Conditional: 食べれば
-      {"たら", ""},      // Conditional: 食べたら
-      {"よう", ""},      // Volitional: 食べよう
-      {"ろ", ""},        // Imperative: 食べろ
-  };
+// Conjugation engine for generating dictionary entries (singleton)
+const grammar::Conjugation& getConjugation() {
+  static grammar::Conjugation conj;
+  return conj;
 }
 
-// Get conjugated forms for Godan-Ra verbs (わかる → わか + suffix)
-// Note: Polite forms (ります, りました, りません) are NOT included - they should be
-//       analyzed as renyokei + auxiliary per CLAUDE.md design
-std::vector<ConjugatedForm> getGodanRaForms() {
-  return {
-      {"る", ""},        // Base: わかる
-      {"り", ""},        // Renyokei: わかり (used in compounds or as noun)
-      {"った", ""},      // Past: わかった
-      {"って", ""},      // Te-form: わかって
-      {"らない", ""},    // Negative: わからない
-      {"らん", ""},      // Contracted negative: わからん (colloquial)
-      {"らぬ", ""},      // Classical negative: わからぬ (archaic/literary)
-      {"らなかった", ""},// Past negative: わからなかった
-      {"れば", ""},      // Conditional: わかれば
-      {"ったら", ""},    // Conditional: わかったら
-      {"ろう", ""},      // Volitional: わかろう
-      {"れ", ""},        // Imperative: わかれ
-  };
-}
-
-// Get conjugated forms for Godan-Wa verbs (もらう → もら + suffix)
-// Note: Polite forms (います, いました, いません) are NOT included - they should be
-//       analyzed as renyokei + auxiliary per CLAUDE.md design
-std::vector<ConjugatedForm> getGodanWaForms() {
-  return {
-      {"う", ""},        // Base: もらう
-      {"い", ""},        // Renyokei: もらい (used in compounds or as noun)
-      {"った", ""},      // Past: もらった
-      {"って", ""},      // Te-form: もらって
-      {"わない", ""},    // Negative: もらわない
-      {"わん", ""},      // Contracted negative: もらわん (colloquial)
-      {"わなかった", ""},// Past negative: もらわなかった
-      {"えば", ""},      // Conditional: もらえば
-      {"ったら", ""},    // Conditional: もらったら
-      {"おう", ""},      // Volitional: もらおう
-      {"え", ""},        // Imperative: もらえ
-      {"える", ""},      // Potential: もらえる
-      {"えない", ""},    // Potential negative: もらえない
-  };
-}
-
-// Get conjugated forms for Godan-Ka verbs (いく → い + suffix)
-// Note: Godan-Ka verbs use イ音便 for past/te-form (いった, いって)
-// Note: Polite forms (きます, きました) are NOT included - they should be
-//       analyzed as renyokei + ます auxiliary per CLAUDE.md design
-std::vector<ConjugatedForm> getGodanKaForms() {
-  return {
-      {"く", ""},          // Base: いく
-      {"き", ""},          // Renyokei: いき (used in compounds)
-      {"いた", ""},        // Past: いった (イ音便)
-      {"いて", ""},        // Te-form: いって (イ音便)
-      {"かない", ""},      // Negative: いかない
-      {"かん", ""},        // Contracted negative: いかん (colloquial)
-      {"かなかった", ""},  // Past negative: いかなかった
-      {"けば", ""},        // Conditional: いけば
-      {"いたら", ""},      // Conditional: いったら
-      {"こう", ""},        // Volitional: いこう
-      // Imperative (け) intentionally omitted - conflicts with potential stems
-      // (e.g., 焼け imperative vs 焼ける Ichidan stem)
-      {"ける", ""},        // Potential: いける
-      {"けない", ""},      // Potential negative: いけない
-      {"けなかった", ""},  // Potential negative past: いけなかった
-  };
-}
-
-// Get conjugated forms for Godan-Ga verbs (しのぐ → しの + suffix)
-// Note: Godan-Ga verbs use イ音便 for past/te-form (しのいだ, しのいで)
-std::vector<ConjugatedForm> getGodanGaForms() {
-  return {
-      {"ぐ", ""},          // Base: しのぐ
-      {"ぎ", ""},          // Renyokei: しのぎ (used in compounds)
-      {"いだ", ""},        // Past: しのいだ (イ音便)
-      {"いで", ""},        // Te-form: しのいで (イ音便)
-      {"がない", ""},      // Negative: しのがない
-      {"がん", ""},        // Contracted negative: しのがん (colloquial)
-      {"がなかった", ""},  // Past negative: しのがなかった
-      {"げば", ""},        // Conditional: しのげば
-      {"いだら", ""},      // Conditional: しのいだら
-      {"ごう", ""},        // Volitional: しのごう
-      // Imperative (げ) intentionally omitted - conflicts with potential stems
-      {"げる", ""},        // Potential: しのげる
-      {"げない", ""},      // Potential negative: しのげない
-  };
-}
-
-// Get conjugated forms for Godan-Sa verbs (いたす → いた + suffix)
-// Note: Polite forms (します, しました, しません) are NOT included - they should be
-//       analyzed as renyokei + auxiliary per CLAUDE.md design
-std::vector<ConjugatedForm> getGodanSaForms() {
-  return {
-      {"す", ""},        // Base: いたす
-      {"し", ""},        // Renyokei: いたし (used in compounds)
-      {"した", ""},      // Past: いたした
-      {"して", ""},      // Te-form: いたして
-      {"さない", ""},    // Negative: いたさない
-      {"さん", ""},      // Contracted negative: いたさん (colloquial)
-  };
-}
-
-// Generate Suru forms (irregular)
-// Note: For MeCab compatibility, only generate forms that should NOT be split.
-// Forms like した, して, しない, している should be analyzed as split forms:
-//   - した → し(VERB) + た(AUX)
-//   - して → し(VERB) + て(PARTICLE)
-//   - しない → し(VERB) + ない(AUX)
-//   - している → し(VERB) + て(PARTICLE) + いる(AUX)
-std::vector<std::pair<std::string, std::string>> getSuruConjugations(
-    const std::string& stem) {
-  // stem is empty for する itself
-  return {
-      {stem + "する", stem + "する"},      // Base form (終止形)
-      // Forms that can't be easily split - keep as compound
-      {stem + "すれば", stem + "する"},    // Conditional (仮定形)
-      {stem + "しろ", stem + "する"},      // Imperative (命令形)
-      {stem + "せよ", stem + "する"},      // Imperative classical (命令形・古語)
-      // Note: しよう should be しよ+う but keep compound for now
-      {stem + "しよう", stem + "する"},    // Volitional (意志形)
-      // Contracted negative (colloquial) - keep as compound
-      {stem + "せん", stem + "する"},      // Contracted negative (口語否定)
-      // Conditional past - split would be し+たら, keep compound for simplicity
-      {stem + "したら", stem + "する"},    // Conditional (条件形)
-      // Removed for MeCab compatibility (should be split):
-      // - した → し + た
-      // - して → し + て
-      // - しない → し + ない
-      // - しなかった → し + なかった
-      // - している → し + て + いる
-      // - していた → し + て + いた
-  };
-}
-
-// Get verb stem by removing the base suffix
-std::string getVerbStem(const std::string& base_form, ConjugationType type) {
-  if (base_form.empty()) return "";
-
-  switch (type) {
-    case ConjugationType::Ichidan:
-      // Remove る (3 bytes in UTF-8)
-      if (base_form.size() >= core::kJapaneseCharBytes) {
-        return base_form.substr(0, base_form.size() - core::kJapaneseCharBytes);
-      }
-      break;
-    case ConjugationType::GodanRa:
-    case ConjugationType::GodanWa:
-    case ConjugationType::GodanSa:
-    case ConjugationType::GodanKa:
-    case ConjugationType::GodanGa:
-    case ConjugationType::GodanTa:
-    case ConjugationType::GodanMa:
-    case ConjugationType::GodanBa:
-    case ConjugationType::GodanNa:
-      // Remove last hiragana (3 bytes in UTF-8)
-      if (base_form.size() >= core::kJapaneseCharBytes) {
-        return base_form.substr(0, base_form.size() - core::kJapaneseCharBytes);
-      }
-      break;
-    case ConjugationType::Suru:
-      // Remove する (6 bytes) or just return as-is for standalone する
-      if (base_form == "する") {
-        return "";
-      }
-      if (base_form.size() >= core::kTwoJapaneseCharBytes &&
-          base_form.substr(base_form.size() - core::kTwoJapaneseCharBytes) == "する") {
-        return base_form.substr(0, base_form.size() - core::kTwoJapaneseCharBytes);
-      }
-      break;
-    default:
-      break;
-  }
-  return base_form;
-}
-
-// Expand a verb entry into conjugated forms
+// Expand a verb entry into conjugated forms using Conjugation engine
 std::vector<DictionaryEntry> expandVerbEntry(const DictionaryEntry& entry) {
   std::vector<DictionaryEntry> result;
 
   if (entry.conj_type == ConjugationType::None) {
-    // No expansion needed
     result.push_back(entry);
     return result;
   }
 
-  std::string stem = getVerbStem(entry.surface, entry.conj_type);
-  std::string lemma = entry.lemma.empty() ? entry.surface : entry.lemma;
-
-  std::vector<ConjugatedForm> forms;
-  switch (entry.conj_type) {
-    case ConjugationType::Ichidan:
-      forms = getIchidanForms();
-      break;
-    case ConjugationType::GodanRa:
-      forms = getGodanRaForms();
-      break;
-    case ConjugationType::GodanWa:
-      forms = getGodanWaForms();
-      break;
-    case ConjugationType::GodanSa:
-      forms = getGodanSaForms();
-      break;
-    case ConjugationType::GodanKa:
-      forms = getGodanKaForms();
-      break;
-    case ConjugationType::GodanGa:
-      forms = getGodanGaForms();
-      break;
-    case ConjugationType::Suru: {
-      // Special handling for suru
-      auto suru_forms = getSuruConjugations(stem);
-      for (const auto& [surface, base] : suru_forms) {
-        DictionaryEntry new_entry = entry;
-        new_entry.surface = surface;
-        new_entry.lemma = lemma;
-        // Preserve conj_type for ChaSen output
-        result.push_back(new_entry);
-      }
-      return result;
-    }
-    default:
-      // For unsupported types, just add the base entry
-      result.push_back(entry);
-      return result;
+  grammar::VerbType verb_type = grammar::conjTypeToVerbType(entry.conj_type);
+  if (verb_type == grammar::VerbType::Unknown) {
+    result.push_back(entry);
+    return result;
   }
 
-  // Generate conjugated forms
-  for (const auto& form : forms) {
+  std::string stem = grammar::Conjugation::getStem(entry.surface, verb_type);
+  std::string lemma = entry.lemma.empty() ? entry.surface : entry.lemma;
+
+  // Special handling for Kuru (kanji vs hiragana)
+  if (verb_type == grammar::VerbType::Kuru) {
+    bool is_kanji = (entry.surface.find("来") != std::string::npos);
+    auto suffixes = getConjugation().getDictionarySuffixes(verb_type);
+    for (const auto& suf : suffixes) {
+      DictionaryEntry new_entry = entry;
+      if (is_kanji) {
+        // Replace hiragana stem changes with kanji 来
+        std::string surface = suf.suffix;
+        // く→来, き→来, こ→来
+        if (surface.substr(0, 3) == "く" || surface.substr(0, 3) == "き" ||
+            surface.substr(0, 3) == "こ") {
+          new_entry.surface = "来" + surface.substr(3);
+        } else {
+          new_entry.surface = stem + surface;
+        }
+      } else {
+        new_entry.surface = suf.suffix;  // Hiragana: suffix is complete form
+      }
+      new_entry.lemma = lemma;
+      result.push_back(new_entry);
+    }
+    return result;
+  }
+
+  // Special handling for Suru (stem + suffix)
+  if (verb_type == grammar::VerbType::Suru) {
+    auto suffixes = getConjugation().getDictionarySuffixes(verb_type);
+    for (const auto& suf : suffixes) {
+      DictionaryEntry new_entry = entry;
+      new_entry.surface = stem + suf.suffix;
+      new_entry.lemma = lemma;
+      result.push_back(new_entry);
+    }
+    return result;
+  }
+
+  // Standard handling for Ichidan and Godan verbs
+  auto suffixes = getConjugation().getDictionarySuffixes(verb_type);
+  for (const auto& suf : suffixes) {
     DictionaryEntry new_entry = entry;
-    new_entry.surface = stem + form.suffix;
+    new_entry.surface = stem + suf.suffix;
     new_entry.lemma = lemma;
-    // Preserve conj_type for ChaSen output
     result.push_back(new_entry);
   }
 

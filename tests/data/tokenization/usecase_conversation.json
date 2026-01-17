@@ -68,7 +68,8 @@
       "input": "すみませんでした",
       "expected": [
         {"surface": "すみません", "pos": "Other"},
-        {"surface": "でした", "pos": "Auxiliary"}
+        {"surface": "でし", "pos": "Auxiliary", "lemma": "です"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["conversation"]
     },
@@ -173,8 +174,10 @@
         {"surface": "約束", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "確認", "pos": "Noun"},
-        {"surface": "したい", "pos": "Auxiliary", "lemma": "する"},
-        {"surface": "のです", "pos": "Auxiliary", "lemma": "のだ"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "たい", "pos": "Auxiliary", "lemma": "たい"},
+        {"surface": "の", "pos": "Noun"},
+        {"surface": "です", "pos": "Auxiliary"},
         {"surface": "が", "pos": "Particle"}
       ],
       "tags": ["schedule"]
@@ -187,9 +190,10 @@
         {"surface": "予定", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "キャンセル", "pos": "Noun"},
-        {"surface": "して", "pos": "Auxiliary", "lemma": "する"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "も", "pos": "Particle"},
-        {"surface": "いい", "pos": "Adjective", "lemma": "よい"},
+        {"surface": "いい", "pos": "Adjective"},
         {"surface": "です", "pos": "Auxiliary"},
         {"surface": "か", "pos": "Particle"}
       ],
@@ -305,11 +309,14 @@
         {"surface": "の", "pos": "Particle"},
         {"surface": "金曜日", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "二名", "pos": "Noun"},
+        {"surface": "二", "pos": "Noun"},
+        {"surface": "名", "pos": "Suffix"},
         {"surface": "で", "pos": "Particle"},
         {"surface": "予約", "pos": "Noun"},
-        {"surface": "したい", "pos": "Auxiliary", "lemma": "する"},
-        {"surface": "のです", "pos": "Auxiliary", "lemma": "のだ"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "たい", "pos": "Auxiliary", "lemma": "たい"},
+        {"surface": "の", "pos": "Noun"},
+        {"surface": "です", "pos": "Auxiliary"},
         {"surface": "が", "pos": "Particle"}
       ],
       "tags": ["travel"]
@@ -333,9 +340,11 @@
       "expected": [
         {"surface": "電車", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "10分", "pos": "Noun"},
+        {"surface": "10", "pos": "Noun"},
+        {"surface": "分", "pos": "Suffix"},
         {"surface": "ほど", "pos": "Particle"},
-        {"surface": "遅れて", "pos": "Verb", "lemma": "遅れる"},
+        {"surface": "遅れ", "pos": "Verb", "lemma": "遅れる"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "おり", "pos": "Verb", "lemma": "おる"},
         {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
@@ -374,7 +383,7 @@
       "input": "今夜泊まれる部屋はありますか",
       "expected": [
         {"surface": "今夜", "pos": "Noun"},
-        {"surface": "泊まれる", "pos": "Verb"},
+        {"surface": "泊まれる", "pos": "Verb", "lemma": "泊まれる"},
         {"surface": "部屋", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "あり", "pos": "Verb", "lemma": "ある"},
@@ -404,7 +413,8 @@
       "expected": [
         {"surface": "メニュー", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "見せて", "pos": "Verb", "lemma": "見せる"},
+        {"surface": "見せ", "pos": "Verb", "lemma": "見せる"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["restaurant"]

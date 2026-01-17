@@ -67,9 +67,26 @@
       "input": "でありんしたか",
       "expected": [
         {
-          "surface": "でありんした",
+          "surface": "で",
+          "pos": "Conjunction"
+        },
+        {
+          "surface": "あ",
+          "pos": "Interjection"
+        },
+        {
+          "surface": "りん",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "し",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "た",
           "pos": "Auxiliary",
-          "lemma": "だ"
+          "lemma": "た"
         },
         {
           "surface": "か",
@@ -99,9 +116,12 @@
           "pos": "Noun"
         },
         {
-          "surface": "でゲソ",
-          "pos": "Auxiliary",
-          "lemma": "だ"
+          "surface": "で",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ゲソ",
+          "pos": "Noun"
         }
       ],
       "tags": [
@@ -800,9 +820,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "なくした",
+          "surface": "なくし",
           "pos": "Verb",
           "lemma": "なくす"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -820,9 +845,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "なくして",
+          "surface": "なくし",
           "pos": "Verb",
           "lemma": "なくす"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         }
       ],
       "tags": [
@@ -840,9 +869,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "買った",
+          "surface": "買っ",
           "pos": "Verb",
           "lemma": "買う"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         },
         {
           "surface": "ばかり",
@@ -861,14 +895,23 @@
           "pos": "Particle"
         },
         {
-          "surface": "なくして",
+          "surface": "なくし",
           "pos": "Verb",
           "lemma": "なくす"
         },
         {
-          "surface": "しまった",
-          "pos": "Auxiliary",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "しまっ",
+          "pos": "Verb",
           "lemma": "しまう"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -984,11 +1027,20 @@
       "input": "もうってば",
       "expected": [
         {
-          "surface": "もう",
-          "pos": "Adverb"
+          "surface": "も",
+          "pos": "Particle"
         },
         {
-          "surface": "ってば",
+          "surface": "うっ",
+          "pos": "Verb",
+          "lemma": "うつ"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ば",
           "pos": "Particle"
         }
       ],

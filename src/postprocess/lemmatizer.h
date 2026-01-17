@@ -51,11 +51,13 @@ class Lemmatizer {
    * @param surface Surface form (conjugated)
    * @param lemma Base form
    * @param pos Part of speech
+   * @param next_lemma Optional: lemma of the next morpheme (for context-dependent forms)
    * @return Detected conjugation form
    */
   static grammar::ConjForm detectConjForm(std::string_view surface,
                                           std::string_view lemma,
-                                          core::PartOfSpeech pos);
+                                          core::PartOfSpeech pos,
+                                          std::string_view next_lemma = "");
 
  private:
   grammar::Inflection inflection_;

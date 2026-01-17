@@ -32,6 +32,29 @@ ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
           "adj-ku + naru pattern"};
 }
 
+// Rule: ADJ(く形) → て(PARTICLE) bonus
+// MeCab-compatible kute split: 美しくて → 美しく + て, しんどくて → しんどく + て
+ConnectionRuleResult checkAdjKuToTeParticle(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next,
+                                            const ConnectionOptions& opts) {
+  // Check if prev is adjective
+  if (prev.pos != core::PartOfSpeech::Adjective) return {};
+
+  // Check if prev ends with く (adverbial form)
+  if (!endsWithKuForm(prev.surface)) {
+    return {};
+  }
+
+  // Check if next is て particle
+  if (next.pos != core::PartOfSpeech::Particle) return {};
+  if (next.surface != scorer::kFormTe) return {};
+
+  // Strong bonus to prefer this split over unified くて form
+  (void)opts;  // Using fixed value for now
+  return {ConnectionPattern::AdjKuToTeParticle, -scorer::kBonusAdjKuToTeParticle,
+          "adj-ku + te particle (MeCab-compatible kute split)"};
+}
+
 // Rule: PREFIX → pure hiragana adjective (unknown)
 // E.g., お + いしい is likely misanalysis (should be おいしい)
 // E.g., お + こがましい is likely misanalysis (should be おこがましい)
@@ -254,6 +277,13 @@ ConnectionRuleResult checkHiraganaNounStartsWithParticle(
 
   // Next surface must start with hiragana
   if (!grammar::startsWithHiragana(next.surface)) return {};
+
+  // Exception: known nouns that legitimately start with particle characters
+  // のち (後): temporal noun "after/later", common in weather forecasts
+  // E.g., 晴れのち曇り = sunny, later cloudy
+  if (next.surface == "のち" || next.surface == "のちほど") {
+    return {};
+  }
 
   // Check if first character is a common particle
   // も、の、が、を、に、は、で、と、へ、か、や

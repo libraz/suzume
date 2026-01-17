@@ -150,14 +150,17 @@ TEST_F(ConnectionRuleTest, CopulaAfterVerb_SouException) {
   EXPECT_FLOAT_EQ(result.adjustment, 0.0F);
 }
 
-TEST_F(ConnectionRuleTest, IchidanRenyokeiTe_Penalty) {
-  // Ichidan renyokei + て (particle) should be penalized
+TEST_F(ConnectionRuleTest, IchidanRenyokeiTe_NetBonus) {
+  // Ichidan renyokei + て (particle) - penalty from IchidanRenyokeiTe and
+  // bonus from RenyokeiToTeParticle combine for net MeCab-compatible split
   auto prev = makeEdge("食べ", core::PartOfSpeech::Verb);
   auto next = makeEdge("て", core::PartOfSpeech::Particle);
 
   auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
-  EXPECT_EQ(result.pattern, ConnectionPattern::IchidanRenyokeiTe);
-  EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyIchidanRenyokeiTe);
+  // Multiple rules match: IchidanRenyokeiTe penalty + RenyokeiToTeParticle bonus
+  EXPECT_EQ(result.pattern, ConnectionPattern::Accumulated);
+  // Net effect: 1.5 (penalty) + (-2.5) (bonus) = -1.0 (encourages split)
+  EXPECT_FLOAT_EQ(result.adjustment, -1.0F);
 }
 
 TEST_F(ConnectionRuleTest, IchidanRenyokeiTe_VerbCompound) {

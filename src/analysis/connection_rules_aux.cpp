@@ -1,62 +1,87 @@
 #include "analysis/connection_rules_internal.h"
 
+#include <algorithm>
+
 namespace suzume::analysis {
 namespace connection_rules {
+
+// =============================================================================
+// Anonymous Namespace: Form Lists and Helper
+// =============================================================================
+
+namespace {
+
+/**
+ * @brief Check if surface matches any form in the given array
+ * @param surface Surface string to check
+ * @param forms Array of form strings
+ * @param count Number of elements in forms array
+ * @return true if surface matches any form
+ */
+template <std::size_t N>
+bool isInFormList(std::string_view surface,
+                  const std::string_view (&forms)[N]) {
+  return std::any_of(std::begin(forms), std::end(forms),
+                     [surface](std::string_view form) {
+                       return surface == form;
+                     });
+}
+
+// いる auxiliary forms (progressive aspect)
+// Full forms: いる, います, いました, いません, いない, いなかった, いれば
+// Contracted forms: てる/でる = ている contraction
+constexpr std::string_view kIruForms[] = {
+    // Full forms
+    "いる", "います", "いました", "いません", "いない", "いなかった", "いれば",
+    // Contracted forms (てる/でる = ている contraction)
+    "てる", "てた", "てて", "てない", "てなかった",
+    "でる", "でた", "でて", "でない", "でなかった"
+};
+
+// しまう auxiliary forms (completive/regretful aspect)
+// Full forms: 五段ワ行活用
+// Contracted forms: ちゃう/じゃう = てしまう/でしまう
+constexpr std::string_view kShimauForms[] = {
+    // Full forms (五段ワ行活用)
+    "しまう", "しまった", "しまって", "しまいます", "しまいました",
+    "しまいません", "しまわない", "しまわなかった", "しまえば",
+    // Contracted forms: ちゃう/じゃう = てしまう/でしまう
+    "ちゃう", "ちゃった", "ちゃって", "ちゃいます", "ちゃいました",
+    "じゃう", "じゃった", "じゃって", "じゃいます", "じゃいました"
+};
+
+// おく auxiliary forms (preparatory aspect)
+// Full forms: 五段カ行活用
+// Contracted forms: とく/どく = ておく/でおく
+constexpr std::string_view kOkuForms[] = {
+    // Full forms (五段カ行活用)
+    "おく", "おいた", "おいて", "おきます", "おきました",
+    "おかない", "おかなかった", "おけば",
+    // Contracted forms: とく/どく = ておく/でおく
+    "とく", "といた", "といて", "ときます", "ときました",
+    "どく", "どいた", "どいて", "どきます", "どきました"
+};
+
+/**
+ * @brief Check if surface is おく auxiliary form (internal use only)
+ * Includes full forms (おく, おいた) and contracted forms (とく, どく)
+ */
+bool isOkuAuxiliary(std::string_view surface) {
+  return isInFormList(surface, kOkuForms);
+}
+
+}  // namespace
 
 // =============================================================================
 // Helper Functions
 // =============================================================================
 
 bool isIruAuxiliary(std::string_view surface) {
-  // Full forms
-  if (surface == "いる" || surface == "います" || surface == "いました" ||
-      surface == "いません" || surface == "いない" ||
-      surface == "いなかった" || surface == "いれば") {
-    return true;
-  }
-  // Contracted forms (てる/でる = ている contraction)
-  if (surface == "てる" || surface == "てた" || surface == "てて" ||
-      surface == "てない" || surface == "てなかった" ||
-      surface == "でる" || surface == "でた" || surface == "でて" ||
-      surface == "でない" || surface == "でなかった") {
-    return true;
-  }
-  return false;
+  return isInFormList(surface, kIruForms);
 }
 
 bool isShimauAuxiliary(std::string_view surface) {
-  // Full forms (五段ワ行活用)
-  if (surface == "しまう" || surface == "しまった" || surface == "しまって" ||
-      surface == "しまいます" || surface == "しまいました" ||
-      surface == "しまいません" || surface == "しまわない" ||
-      surface == "しまわなかった" || surface == "しまえば") {
-    return true;
-  }
-  // Contracted forms: ちゃう/じゃう = てしまう/でしまう
-  if (surface == "ちゃう" || surface == "ちゃった" || surface == "ちゃって" ||
-      surface == "ちゃいます" || surface == "ちゃいました" ||
-      surface == "じゃう" || surface == "じゃった" || surface == "じゃって" ||
-      surface == "じゃいます" || surface == "じゃいました") {
-    return true;
-  }
-  return false;
-}
-
-bool isOkuAuxiliary(std::string_view surface) {
-  // Full forms (五段カ行活用)
-  if (surface == "おく" || surface == "おいた" || surface == "おいて" ||
-      surface == "おきます" || surface == "おきました" ||
-      surface == "おかない" || surface == "おかなかった" || surface == "おけば") {
-    return true;
-  }
-  // Contracted forms: とく/どく = ておく/でおく
-  if (surface == "とく" || surface == "といた" || surface == "といて" ||
-      surface == "ときます" || surface == "ときました" ||
-      surface == "どく" || surface == "どいた" || surface == "どいて" ||
-      surface == "どきます" || surface == "どきました") {
-    return true;
-  }
-  return false;
+  return isInFormList(surface, kShimauForms);
 }
 
 bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma) {
@@ -104,6 +129,7 @@ ConnectionRuleResult checkIruAuxAfterNoun(const core::LatticeEdge& prev,
 
 // Rule 16: Te-form VERB + いる/います (AUX) bonus
 // Progressive aspect pattern: 食べている, 走っています
+// Exception: Bare suru te-form "して" should NOT get bonus - MeCab splits as し+て
 ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts) {
@@ -113,6 +139,12 @@ ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
 
   if (!endsWithTeForm(prev.surface)) return {};
 
+  // Don't give bonus for bare suru te-form "して" - should be split as し+て
+  // MeCab: している → し + て + いる (3 tokens)
+  if (prev.surface == "して" && prev.lemma == scorer::kLemmaSuru) {
+    return {};  // No bonus for bare suru te-form
+  }
+
   // Bonus (negative value) for te-form + iru pattern
   return {ConnectionPattern::IruAuxAfterTeForm, -opts.bonus_iru_aux_after_te_form,
           "te-form verb + iru aux (progressive)"};
@@ -120,6 +152,7 @@ ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
 
 // Rule: Te-form VERB + しまう/しまった (AUX) bonus
 // Completive/Regretful aspect pattern: 食べてしまった, 忘れてしまった
+// Exception: Bare suru te-form "して" should NOT get bonus - MeCab splits as し+て
 ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts) {
@@ -128,6 +161,14 @@ ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
   if (!isShimauAuxiliary(next.surface)) return {};
 
   if (!endsWithTeForm(prev.surface)) return {};
+
+  // Don't give bonus for bare suru te-form "して" - should be split as し+て
+  // MeCab: してしまう → し + て + しまう (3 tokens)
+  // This also applies to して forms from 漢字+する compound verbs (勉強して, etc.)
+  // since those should split as 勉強 + し + て for MeCab compatibility
+  if (prev.surface == "して" && prev.lemma == scorer::kLemmaSuru) {
+    return {};  // No bonus for bare suru te-form
+  }
 
   // Bonus (negative value) for te-form + shimau pattern
   return {ConnectionPattern::ShimauAuxAfterTeForm,
@@ -163,7 +204,7 @@ ConnectionRuleResult checkSouAuxAfterVerbRenyokei(const core::LatticeEdge& prev,
     // Balance: AUX must beat ADV (-0.044), but ADJ (-0.165) must beat AUX
     // With bonus=0.25: AUX=0.156-0.25=-0.094 beats ADV (-0.044 > -0.094)
     // And ADJ beats AUX: -0.165 < -0.094
-    return {ConnectionPattern::SouAfterRenyokei, -0.25F,
+    return {ConnectionPattern::SouAfterRenyokei, -scorer::kBonusSouAfterRenyokeiSmall,
             "verb renyokei + sou aux (unverified shi-verb, reduced)"};
   }
 
@@ -193,10 +234,22 @@ ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
               opts.penalty_invalid_single_char_aux,
               "invalid single-char aux after te-form"};
     }
-    // た after te-form is likely contracted -ていた form (買ってた, 見てた)
-    // Add penalty to prefer unified てた analysis over split て + た
-    // This handles the colloquial contraction ている → てる, ていた → てた
+    // た after te-form: depends on context
+    // Case 1: prev is standalone て/で (VERB from てる/でる) → MeCab splits as て + た
+    //         E.g., 見てた → 見 + て + た (MeCab compatible)
+    //         Give BONUS to make this path competitive
+    // Case 2: prev is full te-form like 食べて → should be unified as 食べてた
+    //         Add PENALTY to prefer unified analysis
     if (next.surface == scorer::kFormTa) {
+      // Check if prev is standalone て/で from てる/でる
+      bool is_teru_renyokei = (prev.surface == scorer::kFormTe && prev.lemma == "てる") ||
+                              (prev.surface == scorer::kFormDe && prev.lemma == "でる");
+      if (is_teru_renyokei) {
+        // Give strong bonus to make 見 + て + た path win over 見 + てた
+        return {ConnectionPattern::TeruRenyokeiToTa, -scorer::kBonusTeruRenyokeiToTa,
+                "teru renyokei + ta (MeCab-compatible split)"};
+      }
+      // Regular te-form + た: penalize to prefer unified form
       return {ConnectionPattern::InvalidTeFormAux,
               opts.penalty_te_form_ta_contraction,
               "te-form + ta (likely contracted teita)"};
@@ -253,6 +306,88 @@ ConnectionRuleResult checkMasuRenyokeiToTa(const core::LatticeEdge& prev,
           "masu-renyokei + ta/n (MeCab-compatible split)"};
 }
 
+// Rule: AUX(なかっ) → AUX(た) bonus
+// MeCab-compatible split: なかった → なかっ + た
+// This bonus helps the split path beat the combined なかった path
+// MeCab treats this as: なかっ(助動詞,連用タ接続) + た(助動詞)
+ConnectionRuleResult checkNaiRenyokeiToTa(const core::LatticeEdge& prev,
+                                          const core::LatticeEdge& next,
+                                          const ConnectionOptions& opts) {
+  if (!isAuxToAux(prev, next)) return {};
+
+  // Check if prev is なかっ (連用タ接続 form of ない)
+  if (prev.surface != "なかっ") return {};
+  if (prev.lemma != "ない") return {};
+
+  // Check if next is た (past auxiliary)
+  if (next.surface != scorer::kFormTa) return {};
+
+  // Give bonus (negative value) to prefer this MeCab-compatible split
+  return {ConnectionPattern::NaiRenyokeiToTa, -opts.bonus_masu_renyokei_to_ta,
+          "nai-renyokei + ta (MeCab-compatible split)"};
+}
+
+// Rule: AUX(たかっ) → AUX(た) bonus
+// MeCab-compatible split: たかった → たかっ + た
+// This bonus helps the split path beat the combined たかった path
+// MeCab treats this as: たかっ(助動詞,連用タ接続) + た(助動詞)
+ConnectionRuleResult checkTaiRenyokeiToTa(const core::LatticeEdge& prev,
+                                          const core::LatticeEdge& next,
+                                          const ConnectionOptions& opts) {
+  if (!isAuxToAux(prev, next)) return {};
+
+  // Check if prev is たかっ (連用タ接続 form of たい)
+  if (prev.surface != "たかっ") return {};
+  if (prev.lemma != "たい") return {};
+
+  // Check if next is た (past auxiliary)
+  if (next.surface != scorer::kFormTa) return {};
+
+  // Give bonus (negative value) to prefer this MeCab-compatible split
+  return {ConnectionPattern::TaiRenyokeiToTa, -opts.bonus_masu_renyokei_to_ta,
+          "tai-renyokei + ta (MeCab-compatible split)"};
+}
+
+// Rule: AUX(でし) → AUX(た) bonus
+// MeCab-compatible split: でした → でし + た
+// This bonus helps the correct path beat で(PARTICLE) + し(VERB) + た
+// MeCab treats this as: でし(助動詞,連用タ接続) + た(助動詞)
+ConnectionRuleResult checkDesuRenyokeiToTa(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next,
+                                           const ConnectionOptions& opts) {
+  if (!isAuxToAux(prev, next)) return {};
+
+  // Check if prev is でし (連用タ接続 form of です)
+  if (prev.surface != "でし") return {};
+  if (prev.lemma != "です") return {};
+
+  // Check if next is た (past auxiliary)
+  if (next.surface != scorer::kFormTa) return {};
+
+  // Give bonus (negative value) to prefer this MeCab-compatible split
+  return {ConnectionPattern::DesuRenyokeiToTa, -opts.bonus_masu_renyokei_to_ta,
+          "desu-renyokei + ta (MeCab-compatible split)"};
+}
+
+// Rule: AUX(た) → AUX(い) penalty
+// Prevents でたい → で+た+い, should be で+たい
+// This penalty makes the たい path win over the た+い path
+ConnectionRuleResult checkInvalidTaToI(const core::LatticeEdge& prev,
+                                       const core::LatticeEdge& next,
+                                       const ConnectionOptions& /* opts */) {
+  if (!isAuxToAux(prev, next)) return {};
+
+  // Check if prev is た (past auxiliary)
+  if (prev.surface != scorer::kFormTa) return {};
+
+  // Check if next is い (surface only - may be unknown word with empty lemma)
+  if (next.surface != "い") return {};
+
+  // Apply strong penalty to prevent this invalid split
+  return {ConnectionPattern::InvalidTaToI, scorer::scale::kProhibitive,
+          "invalid ta + i (should be tai)"};
+}
+
 // Rule: AUX(れ/られ) → AUX(ない/た) bonus
 // MeCab-compatible split: 言われない → 言わ + れ + ない
 // This bonus helps the 3-token path beat 2-token paths like 言われ(VERB) + ない
@@ -282,6 +417,7 @@ ConnectionRuleResult checkPassiveAuxToNaiTa(const core::LatticeEdge& prev,
 // MeCab-compatible split: 見とく → 見 + とく, 読んどく → 読ん + どく
 // This bonus helps the split path beat the integrated contraction form
 // MeCab treats these as: VERB + 動詞,非自立
+// Exception: Bare suru te-form "して" should NOT get bonus - MeCab splits as し+て
 ConnectionRuleResult checkVerbToOkuChauContraction(const core::LatticeEdge& prev,
                                                    const core::LatticeEdge& next,
                                                    const ConnectionOptions& opts) {
@@ -290,6 +426,12 @@ ConnectionRuleResult checkVerbToOkuChauContraction(const core::LatticeEdge& prev
   // Check if next is おく/とく/どく contraction or しまう/ちゃう/じゃう contraction
   if (!isOkuAuxiliary(next.surface) && !isShimauAuxiliary(next.surface)) {
     return {};
+  }
+
+  // Don't give bonus for bare suru te-form "して" - should be split as し+て
+  // MeCab: してしまう → し + て + しまう (3 tokens)
+  if (prev.surface == "して" && prev.lemma == scorer::kLemmaSuru) {
+    return {};  // No bonus for bare suru te-form
   }
 
   // Verify prev is verb renyokei/onbin form:
@@ -428,6 +570,157 @@ ConnectionRuleResult checkMitaiAfterNounOrVerb(const core::LatticeEdge& prev,
   }
 
   return {};
+}
+
+// Check for で(PARTICLE) → くる活用形 (きます, きた, きて etc.)
+// This is usually a misparse of できる (can do).
+// Example: できます → で(PARTICLE) + きます(AUX,くる) is wrong
+//          Should be: でき(VERB,できる) + ます(AUX)
+// We add a penalty to prefer the できる analysis.
+ConnectionRuleResult checkParticleDeToKuruAux(const core::LatticeEdge& prev,
+                                              const core::LatticeEdge& next,
+                                              const ConnectionOptions& opts) {
+  // Only check PARTICLE → AUX or PARTICLE → VERB pattern
+  if (prev.pos != core::PartOfSpeech::Particle) {
+    return {};
+  }
+  if (next.pos != core::PartOfSpeech::Auxiliary &&
+      next.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  // Check if prev is で(PARTICLE)
+  if (prev.surface != "で") {
+    return {};
+  }
+
+  // Check if next is a くる conjugation form (lemma = くる)
+  if (next.lemma != "くる") {
+    return {};
+  }
+
+  // Apply strong penalty to disfavor this pattern
+  // This helps できる to be recognized correctly
+  return {ConnectionPattern::ParticleDeToKuruAux, 3.5F,
+          "de(particle) + kuru-aux penalty (likely dekiru misparse)"};
+}
+
+// =============================================================================
+// Copula で(AUX) → くる活用形 penalty
+// =============================================================================
+// Prevents できます from being misparsed as で(AUX,だ) + きます(AUX,くる)
+// when で(AUX, lemma=だ) is added to support na-adjective patterns.
+ConnectionRuleResult checkCopulaDeToKuruAux(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next,
+                                            const ConnectionOptions& /*opts*/) {
+  // Only check AUX → AUX or AUX → VERB pattern
+  if (prev.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+  if (next.pos != core::PartOfSpeech::Auxiliary &&
+      next.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  // Check if prev is で(AUX, lemma=だ)
+  if (prev.surface != "で" || prev.lemma != "だ") {
+    return {};
+  }
+
+  // Check if next is a くる conjugation form (lemma = くる)
+  if (next.lemma != "くる") {
+    return {};
+  }
+
+  // Apply strong penalty to disfavor this pattern
+  return {ConnectionPattern::CopulaDeToKuruAux, 3.5F,
+          "de(aux,da) + kuru-aux penalty (likely dekiru misparse)"};
+}
+
+// =============================================================================
+// NOUN/ADJ → で(AUX, lemma=だ) bonus
+// =============================================================================
+// Supports na-adjective copula negation pattern (嫌でない, 好きでない, etc.)
+// MeCab: 嫌 + で(AUX,だ) + ない(AUX)
+ConnectionRuleResult checkNaAdjToCopulaDe(const core::LatticeEdge& prev,
+                                          const core::LatticeEdge& next,
+                                          const ConnectionOptions& /*opts*/) {
+  // Only check NOUN/ADJ → AUX pattern
+  if (prev.pos != core::PartOfSpeech::Noun &&
+      prev.pos != core::PartOfSpeech::Adjective) {
+    return {};
+  }
+  if (next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  // Check if next is で(AUX, lemma=だ)
+  if (next.surface != "で" || next.lemma != "だ") {
+    return {};
+  }
+
+  // Apply bonus to favor this pattern for na-adjective copula
+  return {ConnectionPattern::NaAdjToCopulaDe, -1.5F,
+          "noun/adj + de(aux,da) bonus (na-adj copula pattern)"};
+}
+
+// =============================================================================
+// NOUN/ADJ → でない(VERB, lemma=できる) penalty
+// =============================================================================
+// Prevents na-adjective copula pattern from being misparsed as できる negation.
+// Example: 嫌でない → should be 嫌 + で(AUX) + ない(AUX), NOT 嫌 + でない(VERB,できる)
+ConnectionRuleResult checkNaAdjToDekinaiVerb(const core::LatticeEdge& prev,
+                                             const core::LatticeEdge& next,
+                                             const ConnectionOptions& /*opts*/) {
+  // Only check NOUN/ADJ → VERB pattern
+  if (prev.pos != core::PartOfSpeech::Noun &&
+      prev.pos != core::PartOfSpeech::Adjective) {
+    return {};
+  }
+  if (next.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+
+  // Check if next is でない(VERB, lemma=できる)
+  if (next.surface != "でない" || next.lemma != "できる") {
+    return {};
+  }
+
+  // Apply strong penalty to prevent this misparse
+  // The dictionary entry has cost -2.0, so we need a strong penalty to overcome it
+  return {ConnectionPattern::NaAdjToDekinaiVerb, 3.5F,
+          "noun/adj + denai(dekiru) penalty (should be copula pattern)"};
+}
+
+// =============================================================================
+// で(AUX, lemma=だ) → ない(AUX) bonus
+// =============================================================================
+// Supports na-adjective copula negation pattern (嫌でない, 好きでない, etc.)
+// MeCab: 嫌 + で(AUX,だ) + ない(AUX)
+ConnectionRuleResult checkCopulaDeToNai(const core::LatticeEdge& prev,
+                                        const core::LatticeEdge& next,
+                                        const ConnectionOptions& /*opts*/) {
+  // Only check AUX → AUX pattern
+  if (prev.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+  if (next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  // Check if prev is で(AUX, lemma=だ)
+  if (prev.surface != "で" || prev.lemma != "だ") {
+    return {};
+  }
+
+  // Check if next is ない(AUX)
+  if (next.surface != "ない" || next.lemma != "ない") {
+    return {};
+  }
+
+  // Apply bonus to favor this pattern for na-adjective copula negation
+  return {ConnectionPattern::CopulaDeToNai, -2.5F,
+          "de(aux,da) + nai(aux) bonus (na-adj copula negation)"};
 }
 
 }  // namespace connection_rules

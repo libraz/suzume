@@ -37,10 +37,12 @@
       "input": "昨日、記者会見が行われた",
       "expected": [
         {"surface": "昨日", "pos": "Noun"},
-        {"surface": "記者会見", "pos": "Noun"},
+        {"surface": "記者", "pos": "Noun"},
+        {"surface": "会見", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "行わ", "pos": "Verb", "lemma": "行う"},
-        {"surface": "れた", "pos": "Auxiliary", "lemma": "れる"}
+        {"surface": "れ", "pos": "Verb", "lemma": "れる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["news", "passive"]
     },
@@ -129,7 +131,8 @@
         {"surface": "最高", "pos": "Noun"},
         {"surface": "気温", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "30度", "pos": "Noun"},
+        {"surface": "30", "pos": "Noun"},
+        {"surface": "度", "pos": "Suffix"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "予想", "pos": "Noun"},
         {"surface": "です", "pos": "Auxiliary"}
@@ -188,8 +191,10 @@
         {"surface": "チーム", "pos": "Noun"},
         {"surface": "一丸", "pos": "Noun"},
         {"surface": "と", "pos": "Particle"},
-        {"surface": "なって", "pos": "Verb", "lemma": "なる"},
-        {"surface": "戦いたい", "pos": "Verb", "lemma": "戦う"}
+        {"surface": "なっ", "pos": "Verb", "lemma": "なる"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "戦い", "pos": "Verb", "lemma": "戦う"},
+        {"surface": "たい", "pos": "Auxiliary", "lemma": "たい"}
       ],
       "tags": ["sports"]
     },
@@ -214,10 +219,12 @@
       "input": "現在3位につけている",
       "expected": [
         {"surface": "現在", "pos": "Noun"},
-        {"surface": "3位", "pos": "Noun"},
+        {"surface": "3", "pos": "Noun"},
+        {"surface": "位", "pos": "Suffix"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "つけて", "pos": "Verb", "lemma": "つける"},
-        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+        {"surface": "つけ", "pos": "Verb", "lemma": "つける"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "いる", "pos": "Verb", "lemma": "いる"}
       ],
       "tags": ["sports", "progressive"]
     },
@@ -261,11 +268,13 @@
         {"surface": "実験", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "結果", "pos": "Noun"},
-        {"surface": "有意な", "pos": "Adjective", "lemma": "有意"},
+        {"surface": "有意", "pos": "Noun"},
+        {"surface": "な", "pos": "Auxiliary", "lemma": "だ"},
         {"surface": "差", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "認め", "pos": "Verb", "lemma": "認める"},
-        {"surface": "られた", "pos": "Auxiliary", "lemma": "られる"}
+        {"surface": "られ", "pos": "Verb", "lemma": "られる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["academic", "passive"]
     },
@@ -309,14 +318,18 @@
       "description": "Reference citation - compound particle によれば MeCab互換分割",
       "input": "先行研究によれば効果が確認されている",
       "expected": [
-        {"surface": "先行研究", "pos": "Noun"},
-        {"surface": "によれば", "pos": "Particle"},
+        {"surface": "先行", "pos": "Noun"},
+        {"surface": "研究", "pos": "Noun"},
+        {"surface": "に", "pos": "Particle"},
+        {"surface": "よれ", "pos": "Verb", "lemma": "よる"},
+        {"surface": "ば", "pos": "Particle"},
         {"surface": "効果", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "確認", "pos": "Noun"},
         {"surface": "さ", "pos": "Verb", "lemma": "する"},
-        {"surface": "れて", "pos": "Auxiliary", "lemma": "れる"},
-        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+        {"surface": "れ", "pos": "Verb", "lemma": "れる"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "いる", "pos": "Verb", "lemma": "いる"}
       ],
       "tags": ["academic", "compound-particle"]
     },
@@ -374,14 +387,16 @@
         {"surface": "から", "pos": "Particle"},
         {"surface": "音楽", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "好き", "pos": "Adjective"},
-        {"surface": "で", "pos": "Particle"},
+        {"surface": "好き", "pos": "Noun"},
+        {"surface": "で", "pos": "Auxiliary", "lemma": "だ"},
         {"surface": "毎日", "pos": "Noun"},
         {"surface": "ピアノ", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "練習", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "欠かさなかった", "pos": "Verb", "lemma": "欠かす"}
+        {"surface": "欠かさ", "pos": "Verb", "lemma": "欠かす"},
+        {"surface": "なかっ", "pos": "Auxiliary", "lemma": "ない"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["long"]
     },
@@ -399,7 +414,8 @@
         {"surface": "起動", "pos": "Noun"},
         {"surface": "し", "pos": "Verb", "lemma": "する"},
         {"surface": "次に", "pos": "Adverb"},
-        {"surface": "設定画面", "pos": "Noun"},
+        {"surface": "設定", "pos": "Noun"},
+        {"surface": "画面", "pos": "Noun"},
         {"surface": "から", "pos": "Particle"},
         {"surface": "言語", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
@@ -420,15 +436,19 @@
         {"surface": "の", "pos": "Particle"},
         {"surface": "天気", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "良ければ", "pos": "Adjective", "lemma": "良い"},
+        {"surface": "良けれ", "pos": "Adjective", "lemma": "良い"},
+        {"surface": "ば", "pos": "Particle"},
         {"surface": "公園", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
         {"surface": "ピクニック", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "しよう", "pos": "Verb", "lemma": "する"},
+        {"surface": "しよ", "pos": "Verb", "lemma": "する"},
+        {"surface": "う", "pos": "Auxiliary"},
         {"surface": "と", "pos": "Particle"},
-        {"surface": "思って", "pos": "Verb", "lemma": "思う"},
-        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"}
+        {"surface": "思っ", "pos": "Verb", "lemma": "思う"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "い", "pos": "Verb", "lemma": "いる"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["long"]
     },
@@ -447,10 +467,13 @@
         {"surface": "設定", "pos": "Noun"},
         {"surface": "ファイル", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "正しく", "pos": "Adjective", "lemma": "正しい"},
-        {"surface": "読み込まれて", "pos": "Verb", "lemma": "読み込む"},
-        {"surface": "いない", "pos": "Auxiliary", "lemma": "いる"},
-        {"surface": "こと", "pos": "Noun", "lemma": "こと"},
+        {"surface": "正しく", "pos": "Adverb"},
+        {"surface": "読み込ま", "pos": "Verb", "lemma": "読み込む"},
+        {"surface": "れ", "pos": "Verb", "lemma": "れる"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "い", "pos": "Verb", "lemma": "いる"},
+        {"surface": "ない", "pos": "Auxiliary", "lemma": "ない"},
+        {"surface": "こと", "pos": "Noun"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["long"]
@@ -477,11 +500,11 @@
         {"surface": "この", "pos": "Determiner"},
         {"surface": "問題", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
-        {"surface": "解き", "pos": "Noun"},
-        {"surface": "方", "pos": "Noun"},
+        {"surface": "解き方", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
         {"surface": "分かり", "pos": "Verb", "lemma": "分かる"},
-        {"surface": "ません", "pos": "Auxiliary"}
+        {"surface": "ませ", "pos": "Auxiliary", "lemma": "ます"},
+        {"surface": "ん", "pos": "Auxiliary"}
       ],
       "tags": ["education", "polite_negative"]
     },

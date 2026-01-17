@@ -59,7 +59,11 @@
           "lemma": "わかる"
         }
       ],
-      "tags": ["contraction", "colloquial", "regression"]
+      "tags": [
+        "contraction",
+        "colloquial",
+        "regression"
+      ]
     },
     {
       "id": "contracted_neg_nainda",
@@ -75,7 +79,11 @@
           "pos": "Auxiliary"
         }
       ],
-      "tags": ["contraction", "auxiliary", "regression"]
+      "tags": [
+        "contraction",
+        "auxiliary",
+        "regression"
+      ]
     },
     {
       "id": "honorific_tanaka_san",
@@ -91,7 +99,11 @@
           "pos": "Suffix"
         }
       ],
-      "tags": ["honorific", "suffix", "regression"]
+      "tags": [
+        "honorific",
+        "suffix",
+        "regression"
+      ]
     },
     {
       "id": "honorific_oneesan",
@@ -107,7 +119,10 @@
           "pos": "Noun"
         }
       ],
-      "tags": ["honorific", "regression"]
+      "tags": [
+        "honorific",
+        "regression"
+      ]
     },
     {
       "id": "honorific_onesan_kanji",
@@ -127,7 +142,11 @@
           "pos": "Suffix"
         }
       ],
-      "tags": ["honorific", "suffix", "regression"]
+      "tags": [
+        "honorific",
+        "suffix",
+        "regression"
+      ]
     },
     {
       "id": "honorific_gibosan",
@@ -143,7 +162,11 @@
           "pos": "Suffix"
         }
       ],
-      "tags": ["honorific", "suffix", "regression"]
+      "tags": [
+        "honorific",
+        "suffix",
+        "regression"
+      ]
     }
   ]
 }

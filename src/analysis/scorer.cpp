@@ -73,6 +73,27 @@ constexpr float kBigramCostTable[13][13] = {
 
 namespace suzume::analysis {
 
+namespace {
+
+/**
+ * @brief Check if surface contains any of the given patterns
+ * @param surface UTF-8 string view to search in
+ * @param patterns Array of pattern strings to search for
+ * @param count Number of patterns in the array
+ * @return true if any pattern is found in surface
+ */
+bool containsAnyPattern(std::string_view surface, const char* const* patterns,
+                        size_t count) {
+  for (size_t idx = 0; idx < count; ++idx) {
+    if (surface.find(patterns[idx]) != std::string_view::npos) {
+      return true;
+    }
+  }
+  return false;
+}
+
+}  // namespace
+
 // static
 void Scorer::logAdjustment(float amount, const char* reason) {
   if (amount != 0.0F) {
@@ -261,6 +282,16 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     logAdjustment(options_.optimal_length_bonus, "optimal_length");
   }
 
+  // Bonus for unknown i-adjective in くない form
+  // E.g., しんどくない, エモくない - strong indicators of i-adjective
+  // This helps unknown slang adjectives compete with fragmented paths containing dictionary verbs
+  if (edge.pos == core::PartOfSpeech::Adjective &&
+      !edge.fromDictionary() &&
+      utf8::endsWith(edge.surface, scorer::kIAdjNegKunai)) {
+    cost += scorer::kBonusIAdjKunai;
+    logAdjustment(scorer::kBonusIAdjKunai, "i_adj_kunai");
+  }
+
   // Note: kPenaltyVerbSou was removed to unify verb+そう as single token
   // Previously: 走りそう → 走り + そう (2 tokens)
   // Now: 走りそう → 走る (1 token), matching 食べそう → 食べる (1 token)
@@ -279,26 +310,15 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // if stem + く exists as a verb (e.g., 書く exists → 書きい invalid)
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary() &&
-      edge.surface.size() >= core::kTwoJapaneseCharBytes) {
-    std::string_view surface = edge.surface;
-    if (surface.size() >= core::kTwoJapaneseCharBytes &&
-        surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == scorer::kSuffixSou) {
-      // Check if lemma ends with valid i-adjective pattern
-      bool valid_adj_lemma = false;
-      if (edge.lemma.size() >= core::kTwoJapaneseCharBytes) {
-        std::string_view ending = edge.lemma.substr(edge.lemma.size() - core::kTwoJapaneseCharBytes);
-        // Accept しい, さい, きい as valid i-adjective endings
-        // Note: きい is validated at candidate generation (verb stem check)
-        if (ending == scorer::kAdjEndingShii ||
-            ending == scorer::kAdjEndingSai ||
-            ending == scorer::kAdjEndingKii) {
-          valid_adj_lemma = true;
-        }
-      }
-      if (!valid_adj_lemma) {
-        cost += edgeOpts().penalty_invalid_adj_sou;
-        logAdjustment(edgeOpts().penalty_invalid_adj_sou, "invalid_adj_sou");
-      }
+      utf8::endsWith(edge.surface, scorer::kSuffixSou)) {
+    // Check if lemma ends with valid i-adjective pattern
+    bool valid_adj_lemma =
+        utf8::endsWith(edge.lemma, scorer::kAdjEndingShii) ||
+        utf8::endsWith(edge.lemma, scorer::kAdjEndingSai) ||
+        utf8::endsWith(edge.lemma, scorer::kAdjEndingKii);
+    if (!valid_adj_lemma) {
+      cost += edgeOpts().penalty_invalid_adj_sou;
+      logAdjustment(edgeOpts().penalty_invalid_adj_sou, "invalid_adj_sou");
     }
   }
 
@@ -310,26 +330,21 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Valid: 来たかった with lemma 来たい (来 is kuru stem)
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary() &&
-      edge.lemma.size() >= core::kTwoJapaneseCharBytes) {
-    std::string_view lemma = edge.lemma;
-    // Check if lemma ends with たい
-    if (lemma.size() >= core::kTwoJapaneseCharBytes &&
-        lemma.substr(lemma.size() - core::kTwoJapaneseCharBytes) == scorer::kSuffixTai) {
-      // Get the stem before たい
-      std::string_view stem = lemma.substr(0, lemma.size() - core::kTwoJapaneseCharBytes);
-      // Decode stem to count codepoints
-      auto stem_str = std::string(stem);
-      auto codepoints = normalize::utf8::decode(stem_str);
+      utf8::endsWith(edge.lemma, scorer::kSuffixTai)) {
+    // Get the stem before たい
+    std::string_view stem = utf8::dropLast2Chars(edge.lemma);
+    // Decode stem to count codepoints
+    auto stem_str = std::string(stem);
+    auto codepoints = normalize::utf8::decode(stem_str);
 
-      // Very short stems (1 char) are usually invalid unless they're known verb stems
-      // Known single-char verb stems: し(する), 見(見る), 来(来る), い(いる), 出(出る), etc.
-      if (codepoints.size() == 1) {
-        char32_t ch = codepoints[0];
-        // Allow known single-character verb stems
-        if (!normalize::isValidSingleCharVerbStem(ch)) {
-          cost += edgeOpts().penalty_invalid_tai_pattern;
-          logAdjustment(edgeOpts().penalty_invalid_tai_pattern, "invalid_tai_pattern");
-        }
+    // Very short stems (1 char) are usually invalid unless they're known verb stems
+    // Known single-char verb stems: し(する), 見(見る), 来(来る), い(いる), 出(出る), etc.
+    if (codepoints.size() == 1) {
+      char32_t ch = codepoints[0];
+      // Allow known single-character verb stems
+      if (!normalize::isValidSingleCharVerbStem(ch)) {
+        cost += edgeOpts().penalty_invalid_tai_pattern;
+        logAdjustment(edgeOpts().penalty_invalid_tai_pattern, "invalid_tai_pattern");
       }
     }
   }
@@ -337,22 +352,34 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Penalize adjectives with lemma containing verb contraction patterns
   // E.g., 読んどい (yondoi), 飲んどい (nondoi), 見とい (mitoi) - invalid adjectives
   // These suggest verb + とく/どく contraction misanalyzed as adjective
+  // Exception: しんどい is a legitimate adjective (colloquial for "tired/tough")
+  // For verb contractions, the char before んどい/んとい is usually kanji (verb stem)
+  // For しんどい, the char before んどい is し (hiragana) - not a verb stem
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary() &&
       edge.lemma.size() >= core::kTwoJapaneseCharBytes) {
     // Check for patterns that look like verb contractions
     // んどい/んとい: verb onbin + contraction (読んどい, 飲んどい)
     // 〜とい: verb renyokei + contraction (見とい, 食べとい)
-    bool is_ndoi_pattern = (edge.lemma.find(scorer::kPatternNdoi) != std::string::npos ||
-                            edge.lemma.find(scorer::kPatternNtoi) != std::string::npos);
-    bool is_toi_pattern = false;
-    // Check if lemma ends with とい and stem doesn't look natural for adjective
-    if (edge.lemma.size() >= core::kTwoJapaneseCharBytes &&
-        edge.lemma.substr(edge.lemma.size() - core::kTwoJapaneseCharBytes) == scorer::kPatternToi) {
-      // 〜とい pattern: likely verb renyokei + といて contraction
-      // Exception: dictionary adjectives (none known with とい ending)
-      is_toi_pattern = true;
+    bool is_ndoi_pattern = false;
+    auto ndoi_pos = edge.lemma.find(scorer::kPatternNdoi);
+    auto ntoi_pos = edge.lemma.find(scorer::kPatternNtoi);
+    if (ndoi_pos != std::string::npos || ntoi_pos != std::string::npos) {
+      // Check if preceded by kanji (suggests verb stem like 読んどい)
+      // Skip penalty if preceded by hiragana (suggests real adjective like しんどい)
+      auto pos = (ndoi_pos != std::string::npos) ? ndoi_pos : ntoi_pos;
+      if (pos >= core::kJapaneseCharBytes) {
+        std::string_view before = edge.lemma.substr(pos - core::kJapaneseCharBytes, core::kJapaneseCharBytes);
+        auto codepoints = normalize::utf8::decode(std::string(before));
+        if (!codepoints.empty() && normalize::classifyChar(codepoints[0]) == normalize::CharType::Kanji) {
+          is_ndoi_pattern = true;
+        }
+      }
     }
+    // Check if lemma ends with とい and stem doesn't look natural for adjective
+    // 〜とい pattern: likely verb renyokei + といて contraction
+    // Exception: dictionary adjectives (none known with とい ending)
+    bool is_toi_pattern = utf8::endsWith(edge.lemma, scorer::kPatternToi);
     if (is_ndoi_pattern || is_toi_pattern) {
       cost += edgeOpts().penalty_verb_onbin_as_adj;
       logAdjustment(edgeOpts().penalty_verb_onbin_as_adj, "verb_contraction_as_adj");
@@ -369,16 +396,8 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     std::string_view surface = edge.surface;
     // Check for auxiliary patterns: てしま, でしま, ている, etc.
     // P4-6: Expanded with additional patterns (てみる, ていく, てくる, etc.)
-    if (surface.find(scorer::kPatternTeShima) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeShima) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeIru) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeIru) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeMiru) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeMiru) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeIku) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeIku) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeKuru) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeKuru) != std::string_view::npos) {
+    if (containsAnyPattern(surface, scorer::kTeFormAuxPatternsForAdj,
+                           scorer::kTeFormAuxPatternsForAdjSize)) {
       cost += edgeOpts().penalty_verb_aux_in_adj;
       logAdjustment(edgeOpts().penalty_verb_aux_in_adj, "verb_aux_in_adj");
     }
@@ -416,28 +435,8 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       edge.surface.size() >= core::kFiveJapaneseCharBytes) {
     std::string_view surface = edge.surface;
     // P4-6: Expanded auxiliary verb pattern list
-    if (surface.find(scorer::kPatternTeShima) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeShima) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeIru) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeIru) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeMora) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeMora) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeOku) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeOku) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeAge) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeAge) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeKure) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeKure) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeMiru) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeMiru) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeIku) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeIku) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeKuru) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeKuru) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeAru) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeAru) != std::string_view::npos ||
-        surface.find(scorer::kPatternTeOru) != std::string_view::npos ||
-        surface.find(scorer::kPatternDeOru) != std::string_view::npos) {
+    if (containsAnyPattern(surface, scorer::kTeFormAuxPatternsForVerb,
+                           scorer::kTeFormAuxPatternsForVerbSize)) {
       cost -= edgeOpts().bonus_unified_verb_aux;
       logAdjustment(-edgeOpts().bonus_unified_verb_aux, "unified_verb_aux");
     }

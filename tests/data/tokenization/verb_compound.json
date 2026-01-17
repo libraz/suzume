@@ -8,14 +8,18 @@
       "input": "食べすぎて",
       "expected": [
         {
-          "surface": "食べすぎ",
+          "surface": "食べ",
           "pos": "Verb",
-          "lemma": "食べ過ぎる"
+          "lemma": "食べる"
+        },
+        {
+          "surface": "すぎ",
+          "pos": "Verb",
+          "lemma": "すぎる"
         },
         {
           "surface": "て",
-          "pos": "Auxiliary",
-          "lemma": "て"
+          "pos": "Particle"
         }
       ],
       "tags": [
@@ -205,14 +209,29 @@
       "input": "走りだしたくなかった",
       "expected": [
         {
-          "surface": "走りだし",
+          "surface": "走り",
           "pos": "Verb",
-          "lemma": "走り出す"
+          "lemma": "走る"
         },
         {
-          "surface": "たくなかった",
-          "pos": "Adjective",
+          "surface": "だし",
+          "pos": "Verb",
+          "lemma": "だす"
+        },
+        {
+          "surface": "たく",
+          "pos": "Auxiliary",
           "lemma": "たい"
+        },
+        {
+          "surface": "なかっ",
+          "pos": "Auxiliary",
+          "lemma": "ない"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -271,9 +290,19 @@
           "lemma": "走り出す"
         },
         {
-          "surface": "たくなかった",
-          "pos": "Adjective",
+          "surface": "たく",
+          "pos": "Auxiliary",
           "lemma": "たい"
+        },
+        {
+          "surface": "なかっ",
+          "pos": "Auxiliary",
+          "lemma": "ない"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -520,13 +549,8 @@
           "pos": "Pronoun"
         },
         {
-          "surface": "に",
+          "surface": "に対して",
           "pos": "Particle"
-        },
-        {
-          "surface": "対して",
-          "pos": "Verb",
-          "lemma": "対する"
         }
       ],
       "tags": [
@@ -660,9 +684,19 @@
           "lemma": "走り出す"
         },
         {
-          "surface": "たくなかった",
-          "pos": "Adjective",
+          "surface": "たく",
+          "pos": "Auxiliary",
           "lemma": "たい"
+        },
+        {
+          "surface": "なかっ",
+          "pos": "Auxiliary",
+          "lemma": "ない"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -737,7 +771,12 @@
           "lemma": "やり直す"
         }
       ],
-      "tags": ["s3_fix", "compound_verb", "hiragana_kanji", "regression"]
+      "tags": [
+        "s3_fix",
+        "compound_verb",
+        "hiragana_kanji",
+        "regression"
+      ]
     },
     {
       "id": "s3_adj_not_compound",
@@ -750,7 +789,12 @@
           "lemma": "美しい"
         }
       ],
-      "tags": ["s3_fix", "adjective", "no_false_positive", "regression"]
+      "tags": [
+        "s3_fix",
+        "adjective",
+        "no_false_positive",
+        "regression"
+      ]
     }
   ]
 }

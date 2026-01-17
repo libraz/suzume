@@ -44,6 +44,7 @@
 # =============================================================================
 
 # --- I-adjectives: General ---
+# しんどい - colloquial adjective
 しんどい	ADJECTIVE	しんどい	0.8	I_ADJ
 上手い	ADJECTIVE	うまい	0.8	I_ADJ
 美味しい	ADJECTIVE	おいしい	1.0	I_ADJ
@@ -298,6 +299,12 @@
 # --- Time nouns: Other ---
 # 今: Removed to allow 今日中 etc. as single tokens (handled by scoring)
 今後	NOUN	こんご	0.5
+
+# --- Weather vocabulary ---
+# 晴れ: noun form (fair weather), cost 0.8 to beat verb renyokei (0.07)
+晴れ	NOUN	はれ	0.8
+# 晴れる: verb form (to clear up), cost 0.5 to beat noun + unknown aux path
+晴れる	VERB	はれる	0.5	ICHIDAN
 現在	NOUN	げんざい	0.5
 最近	NOUN	さいきん	0.5
 将来	NOUN	しょうらい	0.5
@@ -334,8 +341,11 @@
 取り組み	NOUN	とりくみ	0.3
 
 # --- Compound nouns ---
+# Verb-stem compound nouns (moved from L1)
+支払い	NOUN	しはらい	0.3
+見舞い	NOUN	みまい	0.3
 引きこもり	NOUN	ひきこもり	0.5
-何でもあり	NOUN	なんでもあり	-3.0
+何でもあり	NOUN	なんでもあり	0.5
 でっち上げ	NOUN	でっちあげ	0.5
 でっちあげ	NOUN	でっちあげ	0.5
 きっかけ	NOUN	きっかけ	0
@@ -361,6 +371,20 @@
 盛りだくさん	NOUN	もりだくさん	0.3
 盛り沢山	NOUN	もりだくさん	0.5
 
+# --- Reduplication (畳語) - moved from L1 ---
+人々	NOUN	ひとびと	0.3
+日々	NOUN	ひび	0.3
+国々	NOUN	くにぐに	0.3
+色々	NOUN	いろいろ	0.3
+時々	NOUN	ときどき	0.3
+
+# --- Hiragana nouns - moved from L1 ---
+おかげ	NOUN	おかげ	0.3
+
+# --- Nouns ending with verb-like patterns ---
+# These are misanalyzed as verbs without dictionary entries
+気持ち	NOUN	きもち	0.3
+
 # --- Foreign/Loanword nouns ---
 Wi-Fi	NOUN		0.5
 
@@ -377,12 +401,13 @@ Wi-Fi	NOUN		0.5
 レアチーズケーキ	NOUN	れあちーずけーき	0.5
 
 # --- Tongue twisters (早口言葉) ---
+# COMMENTED OUT: These are too domain-specific for core dictionary
 # Cost balanced: higher than formal noun もの (0.3) to prefer particle も between
-もも	NOUN	もも	1.0
-すもも	NOUN	すもも	1.0
-なまむぎ	NOUN	なまむぎ	0.3
-なまごめ	NOUN	なまごめ	0.3
-なまたまご	NOUN	なまたまご	0.3
+# もも	NOUN	もも	1.0
+# すもも	NOUN	すもも	1.0
+# なまむぎ	NOUN	なまむぎ	0.3
+# なまごめ	NOUN	なまごめ	0.3
+# なまたまご	NOUN	なまたまご	0.3
 
 # --- Idioms (ことわざ) ---
 柳の下にいつも泥鰌はいない	NOUN	やなぎのしたにいつもどじょうはいない	0.5
@@ -573,8 +598,9 @@ Wi-Fi	NOUN		0.5
 # Note: せんだって is already added in W-004
 
 # --- W-009: 古語助動詞 ---
-ごとく	AUX	ごとく	-2.0
-ごとき	AUX	ごとき	-2.0
+# MOVED TO L1 (entries.cpp): These are closed-class auxiliaries
+# ごとく	AUX	ごとく	-2.0
+# ごとき	AUX	ごとき	-2.0
 
 # --- W-016: 感動詞・その他 ---
 はてな	OTHER	はてな	0.5
