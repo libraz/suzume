@@ -1277,4 +1277,158 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
   return candidates;
 }
 
+std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const grammar::Inflection& inflection,
+    const dictionary::DictionaryManager* dict_manager) {
+  std::vector<UnknownCandidate> candidates;
+
+  // Must start with kanji
+  if (start_pos >= char_types.size() ||
+      char_types[start_pos] != normalize::CharType::Kanji) {
+    return candidates;
+  }
+
+  // Find kanji portion (1-3 characters for adjective stem)
+  size_t kanji_end = start_pos;
+  while (kanji_end < char_types.size() &&
+         kanji_end - start_pos < 3 &&
+         char_types[kanji_end] == normalize::CharType::Kanji) {
+    ++kanji_end;
+  }
+
+  if (kanji_end == start_pos) {
+    return candidates;
+  }
+
+  // Look for hiragana after kanji
+  if (kanji_end >= char_types.size() ||
+      char_types[kanji_end] != normalize::CharType::Hiragana) {
+    return candidates;
+  }
+
+  // Find hiragana ending with し + auxiliary pattern (そう, すぎ, etc.)
+  size_t hiragana_end = kanji_end;
+  while (hiragana_end < char_types.size() &&
+         hiragana_end - kanji_end < 8 &&
+         char_types[hiragana_end] == normalize::CharType::Hiragana) {
+    ++hiragana_end;
+  }
+
+  if (hiragana_end <= kanji_end) {
+    return candidates;
+  }
+
+  std::string hiragana_part = extractSubstring(codepoints, kanji_end, hiragana_end);
+
+  // Check for しそう, しすぎ patterns (adjective stem + auxiliary)
+  // The stem ends with し, and is followed by そう/すぎる/etc.
+  // E.g., 難しそう → 難し (stem) + そう
+  // E.g., 美しすぎる → 美し (stem) + すぎる
+  static const std::vector<std::string_view> kAdjStemAuxPatterns = {
+      "しそう",     // appearance: 難しそう
+      "しそうだ",   // appearance + copula
+      "しそうな",   // attributive
+      "しそうに",   // adverbial
+      "しすぎ",     // excessive: 難しすぎ
+      "しすぎる",   // excessive + dictionary form
+      "しすぎた",   // excessive + past
+  };
+
+  for (const auto& pattern : kAdjStemAuxPatterns) {
+    if (hiragana_part.size() >= pattern.size() &&
+        hiragana_part.substr(0, pattern.size()) == pattern) {
+      // Found adjective stem + auxiliary pattern
+      // The stem is: kanji + し
+      size_t stem_end = kanji_end + 1;  // kanji + し (one hiragana)
+
+      std::string stem = extractSubstring(codepoints, start_pos, stem_end);
+      std::string base_form = stem + "い";  // e.g., 難し → 難しい
+
+      // Validate that this looks like a real adjective
+      auto adj_results = inflection.analyze(base_form);
+      bool is_valid_adjective = false;
+      float adj_confidence = 0.0F;
+      for (const auto& result : adj_results) {
+        if (result.verb_type == grammar::VerbType::IAdjective &&
+            result.confidence >= 0.5F) {
+          is_valid_adjective = true;
+          adj_confidence = result.confidence;
+          break;
+        }
+      }
+
+      if (!is_valid_adjective) {
+        continue;
+      }
+
+      // Also check that this is NOT a verb renyokei (話し from 話す)
+      // by comparing adjective vs verb confidence
+      // The verb form would be: kanji_stem + す (e.g., 話 + す = 話す)
+      std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+      std::string verb_form = kanji_stem + "す";  // e.g., 話す (not 話しす)
+      auto verb_results = inflection.analyze(verb_form);
+      float verb_confidence = 0.0F;
+      for (const auto& result : verb_results) {
+        if ((result.verb_type == grammar::VerbType::GodanSa ||
+             result.verb_type == grammar::VerbType::Suru) &&
+            result.confidence > verb_confidence) {
+          verb_confidence = result.confidence;
+        }
+      }
+
+      // Check if the verb form (kanji + す) is in the dictionary
+      // If it is, this is likely a verb renyokei, not an adjective stem
+      // E.g., 話す is in dictionary → 話し is verb renyokei, not adjective
+      // E.g., 難す is NOT in dictionary → 難し could be adjective stem
+      if (dict_manager != nullptr) {
+        auto verb_results = dict_manager->lookup(verb_form, 0);
+        bool is_dict_verb = false;
+        for (const auto& result : verb_results) {
+          // Check for exact match verb
+          if (result.entry != nullptr &&
+              result.entry->pos == core::PartOfSpeech::Verb &&
+              result.entry->surface == verb_form) {
+            is_dict_verb = true;
+            break;
+          }
+        }
+        if (is_dict_verb) {
+          continue;  // Skip - this is a dictionary verb renyokei
+        }
+      }
+
+      // Confidence-based fallback when no dictionary available
+      // Only generate adjective stem if adjective confidence is SIGNIFICANTLY higher
+      // than verb confidence. This prevents generating stems for verb renyokei
+      // patterns like 話し (from 話す) where both get similar confidence.
+      constexpr float kConfidenceThreshold = 0.15F;
+      if (adj_confidence - verb_confidence < kConfidenceThreshold) {
+        continue;
+      }
+
+      UnknownCandidate candidate;
+      candidate.surface = stem;
+      candidate.start = start_pos;
+      candidate.end = stem_end;
+      candidate.pos = core::PartOfSpeech::Adjective;
+      candidate.lemma = base_form;
+      // Low cost to compete with VERB path
+      candidate.cost = 0.1F + (1.0F - adj_confidence) * 0.2F;
+      candidate.has_suffix = true;  // This is a stem, expects suffix
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::AdjectiveI;
+      candidate.confidence = adj_confidence;
+      candidate.pattern = "adj_stem_shii";
+#endif
+      candidates.push_back(candidate);
+      break;  // Only one stem candidate per pattern
+    }
+  }
+
+  return candidates;
+}
+
 }  // namespace suzume::analysis

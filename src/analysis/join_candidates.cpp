@@ -31,7 +31,8 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     // Base forms (終止形)
     {"込む", "こむ", "む", "込む"},          // 読み込む, 飛び込む, 飛びこむ
     {"出す", "だす", "す", "出す"},          // 呼び出す, 書き出す, 走りだす
-    {"始める", "はじめる", "める", "始める"}, // 読み始める, 読みはじめる
+    // Note: 始める is NOT included because it's a grammatical/aspectual auxiliary
+    // that should be tokenized separately for MeCab compatibility (読み + 始める)
     {"続ける", "つづける", "ける", "続ける"}, // 読み続ける, 読みつづける
     {"続く", "つづく", "く", "続く"},        // 引き続く
     {"返す", "かえす", "す", "返す"},        // 繰り返す, 繰りかえす
@@ -43,7 +44,8 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"合う", "あう", "う", "合う"},          // 話し合う, 話しあう
     {"合わせる", "あわせる", "せる", "合わせる"}, // 組み合わせる
     {"消す", "けす", "す", "消す"},          // 取り消す
-    {"過ぎる", "すぎる", "る", "過ぎる"},    // 読み過ぎる, 読みすぎる
+    // Note: 過ぎる is NOT included because it's a grammatical/aspectual auxiliary
+    // that should be tokenized separately for MeCab compatibility (読み + 過ぎる)
     {"直す", "なおす", "す", "直す"},        // やり直す, やりなおす
     // Note: 終わる/終える are NOT included because they are grammatical/aspectual
     // auxiliaries that should be tokenized separately (読み + 終わったら, not 読み終わったら)
@@ -79,7 +81,7 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     // Renyokei forms (連用形) for たい/たくなかった/etc. attachment
     {"込み", "こみ", "む", "込む"},          // 読み込みたい, 飛びこみたい
     {"出し", "だし", "す", "出す"},          // 走り出したい, 走りだしたい
-    {"始め", "はじめ", "める", "始める"},    // 読み始めたい
+    // Note: 始め renyokei not included (see note above for base form)
     {"続け", "つづけ", "ける", "続ける"},    // 読み続けたい
     {"続き", "つづき", "く", "続く"},        // 引き続きたい
     {"返し", "かえし", "す", "返す"},        // 繰り返したい
@@ -91,7 +93,7 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"合い", "あい", "う", "合う"},          // 話し合いたい
     {"合わせ", "あわせ", "せる", "合わせる"}, // 組み合わせたい
     {"消し", "けし", "す", "消す"},          // 取り消したい
-    {"過ぎ", "すぎ", "る", "過ぎる"},        // 読み過ぎたい, 読みすぎたい
+    // Note: 過ぎ renyokei not included (see note above for base form)
     {"直し", "なおし", "す", "直す"},        // やり直したい
     // Note: 終わり/終え renyokei not included (see note above for base forms)
     {"切り", "きり", "る", "切る"},          // 締め切りたい

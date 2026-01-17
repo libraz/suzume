@@ -178,6 +178,13 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Past/Completion (過去・完了)
       // Cost balanced for MeCab-compatible split while avoiding ichidan verb regression
       {"た", POS::Auxiliary, 0.6F, "た", false, false, false, CT::None, ""},
+      // Hypothetical form of た (仮定形): 食べたら → 食べ + たら
+      // MeCab treats たら as a single auxiliary (た仮定形), not た + ら
+      // Negative cost to beat た+ら(SUFFIX) path
+      {"たら", POS::Auxiliary, -0.8F, "た", false, false, false, CT::None, ""},
+      // Hypothetical form of だ (仮定形): だったら → だっ + たら (but usually だ + ったら)
+      // Note: だら as standalone is rare, だったら is more common
+      {"だら", POS::Auxiliary, -0.8F, "だ", false, false, false, CT::None, ""},
 
       // Conjecture (推量)
       {"う", POS::Auxiliary, 1.0F, "", false, false, false, CT::None, ""},
@@ -210,10 +217,14 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: 勉強される → 勉強 + さ(VERB) + れる(AUX)
 
       // Suru verb stem forms (サ変動詞語幹活用形)
-      // MeCab treats し/さ as VERB (動詞), not auxiliary
+      // MeCab treats し/さ/す as VERB (動詞), not auxiliary
       // MeCab-compatible: 勉強した → 勉強 + し(VERB) + た(AUX)
       //                   勉強される → 勉強 + さ(VERB) + れる(AUX)
+      //                   すべきだ → す(VERB) + べき(AUX) + だ(AUX)
       {"し", POS::Verb, -0.7F, "する", false, false, false, CT::Suru, ""},
+      // す: Classical form (文語基本形) of する, connects to べき
+      // MeCab: すべき → す(動詞,サ変・スル,文語基本形) + べき(助動詞)
+      {"す", POS::Verb, -0.3F, "する", false, false, false, CT::Suru, ""},
       // さ needs very low cost to beat i-adjective nominalization false positives
       // e.g., 勉強される should split as 勉強+さ+れる, not 勉強さ(ADJ)+れる
       {"さ", POS::Verb, -1.0F, "する", false, false, false, CT::Suru, ""},
@@ -1049,11 +1060,10 @@ std::vector<DictionaryEntry> getAdverbEntries() {
 
       // Demonstrative adverbs (指示副詞)
       {"そう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
-      // Appearance auxiliary そう (様態助動詞) - VERB連用形 + そう
-      // E.g., 降りそう (looks like it will fall), 切れそう (looks like it will break)
-      // Cost balanced so that:
-      // - VERB→そう(AUX) wins (VERB→AUX conn=0, total lower than VERB→ADV conn=0.3)
-      // - PARTICLE→そう(ADV) wins (PARTICLE→ADV conn=0.3 + ADV cost 0.5 < PARTICLE→AUX conn=0.5 + AUX cost 0.6)
+      // Appearance auxiliary そう (様態助動詞) - VERB連用形/ADJ語幹 + そう
+      // E.g., 降りそう (looks like it will fall), 難しそう (looks difficult)
+      // Cost higher than ADV (0.3F) so standalone "そうだ" prefers ADV path
+      // Connection rule gives bonus for VERB→そう, so base cost can be high
       {"そう", POS::Auxiliary, 1.0F, "そう", false, false, false, CT::None, ""},
       {"こう", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
       {"ああ", POS::Adverb, 0.3F, "", false, false, false, CT::None, ""},
@@ -1791,6 +1801,12 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"落ちる", POS::Verb, 0.3F, "落ちる", false, false, false, CT::Ichidan, "おちる"},
       {"生きる", POS::Verb, 0.3F, "生きる", false, false, false, CT::Ichidan, "いきる"},
       {"過ぎる", POS::Verb, 0.3F, "過ぎる", false, false, false, CT::Ichidan, "すぎる"},
+      // Hiragana forms of grammatical auxiliaries (for MeCab-compatible splitting)
+      // E.g., 食べすぎた → 食べ + すぎ + た (not 食べ + すぎた)
+      {"すぎる", POS::Verb, 0.3F, "すぎる", false, false, false, CT::Ichidan, ""},
+      {"はじめる", POS::Verb, 0.3F, "はじめる", false, false, false, CT::Ichidan, ""},
+      {"おわる", POS::Verb, 0.3F, "おわる", false, false, false, CT::GodanRa, ""},
+      {"つづける", POS::Verb, 0.3F, "つづける", false, false, false, CT::Ichidan, ""},
       {"尽きる", POS::Verb, 0.3F, "尽きる", false, false, false, CT::Ichidan, "つきる"},
       {"浴びる", POS::Verb, 0.3F, "浴びる", false, false, false, CT::Ichidan, "あびる"},
 

@@ -74,6 +74,35 @@ class Conjugation {
   Conjugation();
 
   /**
+   * @brief Godan conjugation row data (五段活用の行パターン)
+   *
+   * Each row contains all vowel variants for a Godan verb type.
+   * Used for reverse inflection analysis and verb ending generation.
+   */
+  struct GodanRow {
+    char32_t base_vowel;    // 終止形母音: く, ぐ, す, etc.
+    char32_t a_row;         // あ段 (未然形): か, が, さ, etc.
+    char32_t i_row;         // い段 (連用形): き, ぎ, し, etc.
+    char32_t e_row;         // え段 (仮定/命令形): け, げ, せ, etc.
+    char32_t o_row;         // お段 (意志形): こ, ご, そ, etc.
+    std::string onbin;      // 音便形: い, っ, ん, "" (empty for サ行)
+    bool voiced_ta;         // た→だ: true for が/な/ば/ま行
+  };
+
+  /**
+   * @brief Get Godan row data for a specific verb type
+   * @param type Verb type (must be GodanKa through GodanWa)
+   * @return Pointer to GodanRow, or nullptr if not a Godan type
+   */
+  static const GodanRow* getGodanRow(VerbType type);
+
+  /**
+   * @brief Get all Godan rows as a map
+   * @return Const reference to VerbType -> GodanRow map
+   */
+  static const std::unordered_map<VerbType, GodanRow>& getGodanRows();
+
+  /**
    * @brief Generate all conjugated forms for a verb
    * @param base_form Base form (終止形): 書く
    * @param type Verb type: GodanKa
@@ -114,20 +143,6 @@ class Conjugation {
   static VerbType detectType(const std::string& base_form);
 
  private:
-  // 五段活用の行ごとのパターン
-  struct GodanRow {
-    char32_t base_vowel;    // 終止形母音: く
-    char32_t a_row;         // あ段: か
-    char32_t i_row;         // い段: き
-    char32_t e_row;         // え段: け
-    char32_t o_row;         // お段: こ
-    std::string onbin;      // 音便形: い, っ, ん
-    bool voiced_ta;         // た→だ: true for が/な/ば/ま行
-  };
-
-  std::unordered_map<VerbType, GodanRow> godan_rows_;
-
-  void initGodanRows();
   std::vector<ConjugatedForm> generateGodan(const std::string& stem,
                                             const std::string& base_form,
                                             VerbType type) const;

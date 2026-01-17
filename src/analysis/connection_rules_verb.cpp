@@ -537,16 +537,33 @@ ConnectionRuleResult checkConditionalVerbToVerb(const core::LatticeEdge& prev,
 
 // Rule 16: Verb renyokei + compound auxiliary verb (bonus)
 // E.g., 読み + 終わる, 書き + 始める, 走り + 続ける
+// Also handles hiragana: 食べ + すぎる, 食べ + はじめる
 // This gives bonus for proper VERB→VERB compound verb patterns
 ConnectionRuleResult checkVerbRenyokeiCompoundAux(const core::LatticeEdge& prev,
                                                   const core::LatticeEdge& next,
                                                   const ConnectionOptions& opts) {
   if (!isVerbToVerb(prev, next)) return {};
 
-  // Check if next starts with compound verb auxiliary kanji
-  if (next.surface.size() < core::kJapaneseCharBytes) return {};
-  std::string_view first_char = next.surface.substr(0, core::kJapaneseCharBytes);
-  if (!normalize::isCompoundVerbAuxStart(first_char)) {
+  // Check if next is a compound verb auxiliary
+  bool is_compound_aux = false;
+
+  // Check kanji pattern: first char is compound verb auxiliary kanji
+  if (next.surface.size() >= core::kJapaneseCharBytes) {
+    std::string_view first_char = next.surface.substr(0, core::kJapaneseCharBytes);
+    if (normalize::isCompoundVerbAuxStart(first_char)) {
+      is_compound_aux = true;
+    }
+  }
+
+  // Check hiragana pattern: surface matches or starts with hiragana compound aux
+  if (!is_compound_aux) {
+    if (normalize::isHiraganaCompoundVerbAux(next.surface) ||
+        normalize::startsWithHiraganaCompoundVerbAux(next.surface)) {
+      is_compound_aux = true;
+    }
+  }
+
+  if (!is_compound_aux) {
     return {};
   }
 

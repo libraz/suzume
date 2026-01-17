@@ -13,6 +13,7 @@
 
 #include <string_view>
 #include <unordered_set>
+#include <vector>
 
 namespace suzume::normalize {
 
@@ -46,6 +47,14 @@ extern const std::unordered_set<char32_t> kValidSingleCharVerbStems;
 // Format: UTF-8 string of the first character (3 bytes for kanji)
 extern const std::unordered_set<std::string_view> kCompoundVerbAuxFirstChars;
 
+// Hiragana compound verb auxiliary surfaces
+// For MeCab-compatible splitting: 食べすぎる → 食べ + すぎる
+extern const std::unordered_set<std::string_view> kHiraganaCompoundVerbAux;
+
+// Hiragana compound verb auxiliary prefixes (for conjugated forms)
+// For MeCab-compatible splitting: 食べすぎた → 食べ + すぎ + た
+extern const std::vector<std::string_view> kHiraganaCompoundVerbAuxPrefixes;
+
 // =============================================================================
 // Lookup Functions
 // =============================================================================
@@ -70,6 +79,23 @@ inline bool isValidSingleCharVerbStem(char32_t ch) {
 inline bool isCompoundVerbAuxStart(std::string_view first_char) {
   return kCompoundVerbAuxFirstChars.find(first_char) !=
          kCompoundVerbAuxFirstChars.end();
+}
+
+// Check if surface is a hiragana compound verb auxiliary
+inline bool isHiraganaCompoundVerbAux(std::string_view surface) {
+  return kHiraganaCompoundVerbAux.find(surface) !=
+         kHiraganaCompoundVerbAux.end();
+}
+
+// Check if surface starts with a hiragana compound verb auxiliary prefix
+inline bool startsWithHiraganaCompoundVerbAux(std::string_view surface) {
+  for (const auto& prefix : kHiraganaCompoundVerbAuxPrefixes) {
+    if (surface.size() >= prefix.size() &&
+        surface.substr(0, prefix.size()) == prefix) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // =============================================================================

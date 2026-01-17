@@ -283,7 +283,8 @@ constexpr float kBonusTeruRenyokeiToTa = scale::kStrong;  // 1.5
 constexpr float kBonusAdjKuToTeParticle = scale::kSevere;  // 2.5
 
 // そう auxiliary small bonus after renyokei (fine-tuning)
-// Slight bonus to help AUX interpretation in borderline cases
+// Balanced to allow ADJ一体 (難しそう→難しい) while boosting VERB+そう slightly
+// Note: Perfect MeCab compat (VERB/ADJ語幹+そう split) needs ADJ stem generation
 constexpr float kBonusSouAfterRenyokeiSmall = 0.25F;
 
 // =============================================================================

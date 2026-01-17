@@ -189,34 +189,34 @@
 見出す	VERB	みいだす	0.5	GODAN_SA
 
 # --- GodanSa verbs: Common (し+そう adjective pattern disambiguation) ---
-# COMMENTED OUT for Phase 0: Test if inflection analysis can handle these without dictionary
-# These verbs compete with fake しい adjectives (e.g., 話しそう → 話す, not 話しい)
-# 話す	VERB	はなす	0.3	GODAN_SA
-# 出す	VERB	だす	0.3	GODAN_SA
-# 消す	VERB	けす	0.3	GODAN_SA
-# 返す	VERB	かえす	0.3	GODAN_SA
-# 探す	VERB	さがす	0.3	GODAN_SA
-# 渡す	VERB	わたす	0.3	GODAN_SA
-# 外す	VERB	はずす	0.3	GODAN_SA
-# 試す	VERB	ためす	0.3	GODAN_SA
-# 直す	VERB	なおす	0.3	GODAN_SA
-# 落とす	VERB	おとす	0.3	GODAN_SA
-# 残す	VERB	のこす	0.3	GODAN_SA
-# 増す	VERB	ます	0.3	GODAN_SA
-# 貸す	VERB	かす	0.3	GODAN_SA
-# 指す	VERB	さす	0.3	GODAN_SA
-# 足す	VERB	たす	0.3	GODAN_SA
-# 隠す	VERB	かくす	0.3	GODAN_SA
-# 壊す	VERB	こわす	0.3	GODAN_SA
-# 刺す	VERB	さす	0.3	GODAN_SA
-# 差す	VERB	さす	0.3	GODAN_SA
-# 挿す	VERB	さす	0.3	GODAN_SA
-# 越す	VERB	こす	0.3	GODAN_SA
-# 通す	VERB	とおす	0.3	GODAN_SA
-# 示す	VERB	しめす	0.3	GODAN_SA
-# 倒す	VERB	たおす	0.3	GODAN_SA
-# 起こす	VERB	おこす	0.3	GODAN_SA
-# 戻す	VERB	もどす	0.3	GODAN_SA
+# These verbs are needed for adjective stem generation logic to distinguish
+# verb renyokei (話し from 話す) from adjective stems (難し from 難しい)
+話す	VERB	はなす	0.3	GODAN_SA
+出す	VERB	だす	0.3	GODAN_SA
+消す	VERB	けす	0.3	GODAN_SA
+返す	VERB	かえす	0.3	GODAN_SA
+探す	VERB	さがす	0.3	GODAN_SA
+渡す	VERB	わたす	0.3	GODAN_SA
+外す	VERB	はずす	0.3	GODAN_SA
+試す	VERB	ためす	0.3	GODAN_SA
+直す	VERB	なおす	0.3	GODAN_SA
+落とす	VERB	おとす	0.3	GODAN_SA
+残す	VERB	のこす	0.3	GODAN_SA
+増す	VERB	ます	0.3	GODAN_SA
+貸す	VERB	かす	0.3	GODAN_SA
+指す	VERB	さす	0.3	GODAN_SA
+足す	VERB	たす	0.3	GODAN_SA
+隠す	VERB	かくす	0.3	GODAN_SA
+壊す	VERB	こわす	0.3	GODAN_SA
+刺す	VERB	さす	0.3	GODAN_SA
+差す	VERB	さす	0.3	GODAN_SA
+挿す	VERB	さす	0.3	GODAN_SA
+越す	VERB	こす	0.3	GODAN_SA
+通す	VERB	とおす	0.3	GODAN_SA
+示す	VERB	しめす	0.3	GODAN_SA
+倒す	VERB	たおす	0.3	GODAN_SA
+起こす	VERB	おこす	0.3	GODAN_SA
+戻す	VERB	もどす	0.3	GODAN_SA
 # 伸ばす	VERB	のばす	0.3	GODAN_SA
 # 濡らす	VERB	ぬらす	0.3	GODAN_SA
 # 揺らす	VERB	ゆらす	0.3	GODAN_SA

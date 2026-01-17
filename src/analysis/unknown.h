@@ -135,6 +135,14 @@ class UnknownWordGenerator {
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
+   * @brief Generate i-adjective STEM candidates (難し, 美し for MeCab-compatible split)
+   */
+  std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
+      std::string_view text, const std::vector<char32_t>& codepoints,
+      size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
    * @brief Generate hiragana i-adjective candidates (pure hiragana like まずい)
    */
   std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(

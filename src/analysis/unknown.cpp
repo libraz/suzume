@@ -161,6 +161,12 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
         generateAdjectiveCandidates(text, codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), adjs.begin(), adjs.end());
 
+    // Generate i-adjective STEM candidates (難し, 美し for 難しそう, 美しすぎる)
+    // This enables MeCab-compatible split: 難しそう → 難し(ADJ) + そう(AUX)
+    auto adj_stems =
+        generateAdjectiveStemCandidates(text, codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), adj_stems.begin(), adj_stems.end());
+
     // Generate na-adjective candidates (〜的 patterns)
     auto na_adjs =
         generateNaAdjectiveCandidates(text, codepoints, start_pos, char_types);
@@ -577,6 +583,15 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAdjectiveCandidates(
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
   return analysis::generateAdjectiveCandidates(
+      codepoints, start_pos, char_types, inflection_, dict_manager_);
+}
+
+std::vector<UnknownCandidate> UnknownWordGenerator::generateAdjectiveStemCandidates(
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) const {
+  // Delegate to the standalone function
+  return analysis::generateAdjectiveStemCandidates(
       codepoints, start_pos, char_types, inflection_, dict_manager_);
 }
 

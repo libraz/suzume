@@ -93,6 +93,32 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
     const std::vector<normalize::CharType>& char_types,
     const grammar::Inflection& inflection);
 
+/**
+ * @brief Generate i-adjective STEM candidates (e.g., 難し, 美し, 楽し)
+ *
+ * Detects i-adjective stems when followed by auxiliary patterns like そう, すぎる.
+ * MeCab splits these as: 難しそう → 難し(ADJ) + そう(SUFFIX)
+ * This function generates the stem (難し) as an ADJ candidate so the lattice
+ * can prefer ADJ+AUX split over ADJ一体.
+ *
+ * Patterns detected:
+ * - 〜しそう (難しそう → 難し + そう)
+ * - 〜しすぎる (難しすぎる → 難し + すぎる)
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param char_types Character types for each position
+ * @param inflection Inflection analyzer for stem validation
+ * @param dict_manager Dictionary manager for verb lookup (to filter verb renyokei)
+ * @return Vector of candidates (adjective stems only)
+ */
+std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const grammar::Inflection& inflection,
+    const dictionary::DictionaryManager* dict_manager = nullptr);
+
 }  // namespace suzume::analysis
 
 #endif  // SUZUME_ANALYSIS_ADJECTIVE_CANDIDATES_H_

@@ -39,9 +39,11 @@ ConjugatedForm makeForm(const std::string& surface,
 
 }  // namespace
 
-Conjugation::Conjugation() { initGodanRows(); }
+Conjugation::Conjugation() = default;
 
-void Conjugation::initGodanRows() {
+const std::unordered_map<VerbType, Conjugation::GodanRow>&
+Conjugation::getGodanRows() {
+  // Static initialization: thread-safe in C++11+
   // 五段動詞の各行の活用パターン
   // base_vowel: 終止形語尾 (く, ぐ, す...)
   // a_row: 未然形 (か, が, さ...)
@@ -50,8 +52,7 @@ void Conjugation::initGodanRows() {
   // o_row: 意志形 (こ, ご, そ...)
   // onbin: 音便形 (い, っ, ん, "" for さ行)
   // voiced_ta: 連用形+た が だ になるか
-
-  godan_rows_ = {
+  static const std::unordered_map<VerbType, GodanRow> kGodanRows = {
       {VerbType::GodanKa, {U'く', U'か', U'き', U'け', U'こ', "い", false}},
       {VerbType::GodanGa, {U'ぐ', U'が', U'ぎ', U'げ', U'ご', "い", true}},
       {VerbType::GodanSa, {U'す', U'さ', U'し', U'せ', U'そ', "", false}},
@@ -62,6 +63,13 @@ void Conjugation::initGodanRows() {
       {VerbType::GodanRa, {U'る', U'ら', U'り', U'れ', U'ろ', "っ", false}},
       {VerbType::GodanWa, {U'う', U'わ', U'い', U'え', U'お', "っ", false}},
   };
+  return kGodanRows;
+}
+
+const Conjugation::GodanRow* Conjugation::getGodanRow(VerbType type) {
+  const auto& rows = getGodanRows();
+  auto it = rows.find(type);
+  return it != rows.end() ? &it->second : nullptr;
 }
 
 std::string Conjugation::getStem(const std::string& base_form, VerbType type) {
@@ -223,12 +231,12 @@ std::vector<ConjugatedForm> Conjugation::generateGodan(
     const std::string& stem, const std::string& base_form,
     VerbType type) const {
   std::vector<ConjugatedForm> forms;
-  auto it = godan_rows_.find(type);
-  if (it == godan_rows_.end()) {
+  const GodanRow* row_ptr = getGodanRow(type);
+  if (row_ptr == nullptr) {
     return forms;
   }
 
-  const auto& row = it->second;
+  const auto& row = *row_ptr;
   std::string ta = row.voiced_ta ? "だ" : "た";
   std::string te = row.voiced_ta ? "で" : "て";
 
@@ -424,11 +432,11 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
     case VerbType::GodanMa:
     case VerbType::GodanRa:
     case VerbType::GodanWa: {
-      auto it = godan_rows_.find(type);
-      if (it == godan_rows_.end()) {
+      const GodanRow* row_ptr = getGodanRow(type);
+      if (row_ptr == nullptr) {
         return suffixes;
       }
-      const auto& row = it->second;
+      const auto& row = *row_ptr;
 
       std::string base = encodeUtf8(row.base_vowel);
       std::string a = encodeUtf8(row.a_row);

@@ -108,6 +108,24 @@ const std::unordered_set<std::string_view> kCompoundVerbAuxFirstChars = {
     "詰",  // 詰める (tsumeru) - 張り詰める, 追い詰める
 };
 
+// Hiragana compound verb auxiliary surfaces (base forms)
+// For MeCab-compatible splitting: 食べすぎる → 食べ + すぎる
+const std::unordered_set<std::string_view> kHiraganaCompoundVerbAux = {
+    "おわる",    // 終わる - to finish
+    "はじめる",  // 始める - to begin
+    "すぎる",    // 過ぎる - too much
+    "つづける",  // 続ける - to continue
+};
+
+// Hiragana compound verb auxiliary prefixes (for conjugated forms)
+// For MeCab-compatible splitting: 食べすぎた → 食べ + すぎ + た
+const std::vector<std::string_view> kHiraganaCompoundVerbAuxPrefixes = {
+    "おわ",    // 終わる - 終わった, 終わり
+    "はじめ",  // 始める - 始めた, 始め
+    "すぎ",    // 過ぎる - すぎた, すぎ
+    "つづけ",  // 続ける - 続けた, 続け
+};
+
 // =============================================================================
 // Particle Strings
 // =============================================================================

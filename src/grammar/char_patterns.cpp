@@ -5,6 +5,7 @@
 
 #include "char_patterns.h"
 
+#include <unordered_map>
 #include <unordered_set>
 
 #include "core/kana_constants.h"
@@ -12,11 +13,13 @@
 
 namespace suzume::grammar {
 
-// Onbin endings: い, っ, ん
+// Onbin endings: unique onbin values from Conjugation::getGodanRows()
+// Derived from: GodanKa/GodanGa.onbin="い", GodanTa/Ra/Wa.onbin="っ", GodanNa/Ba/Ma.onbin="ん"
 const char* kOnbinEndings[] = {"い", "っ", "ん"};
 const size_t kOnbinCount = 3;
 
-// Mizenkei (a-row) endings: か, が, さ, た, な, ば, ま, ら, わ
+// Mizenkei (a-row) endings: a_row values from Conjugation::getGodanRows()
+// Derived from each Godan verb type's a_row codepoint
 const char* kMizenkeiEndings[] = {"か", "が", "さ", "た",  "な",
                                    "ば", "ま", "ら", "わ"};
 const size_t kMizenkeiCount = 9;
@@ -250,34 +253,66 @@ char32_t getVowelForChar(char32_t ch) {
   return ch;
 }
 
-std::string_view godanBaseSuffixFromARow(char32_t a_row_cp) {
-  switch (a_row_cp) {
-    case U'か': return "く";  // GodanKa: 書く
-    case U'が': return "ぐ";  // GodanGa: 泳ぐ
-    case U'さ': return "す";  // GodanSa: 話す
-    case U'た': return "つ";  // GodanTa: 持つ
-    case U'な': return "ぬ";  // GodanNa: 死ぬ
-    case U'ば': return "ぶ";  // GodanBa: 遊ぶ
-    case U'ま': return "む";  // GodanMa: 読む
-    case U'ら': return "る";  // GodanRa: 取る
-    case U'わ': return "う";  // GodanWa: 買う
-    default: return "";
+namespace {
+// Helper to encode a codepoint to UTF-8 string
+std::string encodeUtf8(char32_t cp) {
+  std::string result;
+  if (cp < 0x80) {
+    result.push_back(static_cast<char>(cp));
+  } else if (cp < 0x800) {
+    result.push_back(static_cast<char>(0xC0 | (cp >> 6)));
+    result.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+  } else if (cp < 0x10000) {
+    result.push_back(static_cast<char>(0xE0 | (cp >> 12)));
+    result.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+    result.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
   }
+  return result;
+}
+
+// Lookup GodanRow by a_row codepoint (cached for efficiency)
+const std::pair<VerbType, const Conjugation::GodanRow*>*
+lookupByARow(char32_t a_row_cp) {
+  // Build lookup table on first access
+  static const auto kARowLookup = []() {
+    std::unordered_map<char32_t, std::pair<VerbType, const Conjugation::GodanRow*>> lookup;
+    for (const auto& [type, row] : Conjugation::getGodanRows()) {
+      lookup[row.a_row] = {type, &row};
+    }
+    return lookup;
+  }();
+
+  auto it = kARowLookup.find(a_row_cp);
+  return it != kARowLookup.end() ? &it->second : nullptr;
+}
+
+// Cache for base suffix strings (避免毎回生成)
+const std::string& getBaseSuffixCached(char32_t base_vowel) {
+  static const auto kBaseSuffixCache = []() {
+    std::unordered_map<char32_t, std::string> cache;
+    for (const auto& [type, row] : Conjugation::getGodanRows()) {
+      cache[row.a_row] = encodeUtf8(row.base_vowel);
+    }
+    return cache;
+  }();
+  static const std::string kEmpty;
+
+  // Note: We look up by a_row, not base_vowel
+  // This function is called with a_row codepoint
+  auto it = kBaseSuffixCache.find(base_vowel);
+  return it != kBaseSuffixCache.end() ? it->second : kEmpty;
+}
+}  // namespace
+
+std::string_view godanBaseSuffixFromARow(char32_t a_row_cp) {
+  // Use cached lookup derived from Conjugation::getGodanRows()
+  return getBaseSuffixCached(a_row_cp);
 }
 
 VerbType verbTypeFromARowCodepoint(char32_t a_row_cp) {
-  switch (a_row_cp) {
-    case U'か': return VerbType::GodanKa;
-    case U'が': return VerbType::GodanGa;
-    case U'さ': return VerbType::GodanSa;
-    case U'た': return VerbType::GodanTa;
-    case U'な': return VerbType::GodanNa;
-    case U'ば': return VerbType::GodanBa;
-    case U'ま': return VerbType::GodanMa;
-    case U'ら': return VerbType::GodanRa;
-    case U'わ': return VerbType::GodanWa;
-    default: return VerbType::Unknown;
-  }
+  // Use cached lookup derived from Conjugation::getGodanRows()
+  auto* result = lookupByARow(a_row_cp);
+  return result != nullptr ? result->first : VerbType::Unknown;
 }
 
 }  // namespace suzume::grammar
