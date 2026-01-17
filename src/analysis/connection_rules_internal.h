@@ -403,6 +403,18 @@ ConnectionRuleResult checkNaiAfterVerbMizenkei(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts);
 
+ConnectionRuleResult checkPassiveAfterVerbMizenkei(const core::LatticeEdge& prev,
+                                                    const core::LatticeEdge& next,
+                                                    const ConnectionOptions& opts);
+
+ConnectionRuleResult checkPassiveAuxToNaiTa(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next,
+                                            const ConnectionOptions& opts);
+
+ConnectionRuleResult checkVerbToOkuChauContraction(const core::LatticeEdge& prev,
+                                                   const core::LatticeEdge& next,
+                                                   const ConnectionOptions& opts);
+
 // =============================================================================
 // POS-based Dispatch Helpers
 // =============================================================================

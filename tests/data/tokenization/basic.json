@@ -134,13 +134,12 @@
     },
     {
       "id": "conj_aruiha",
-      "description": "あるいは should be CONJ, not ADJ+は split",
+      "description": "あるいは should be CONJ, not ADJ+は split - MeCab uses かも as single particle",
       "input": "あるいは違うかも",
       "expected": [
         {"surface": "あるいは", "pos": "Conjunction", "lemma": "或いは"},
         {"surface": "違う", "pos": "Verb"},
-        {"surface": "か", "pos": "Particle"},
-        {"surface": "も", "pos": "Particle"}
+        {"surface": "かも", "pos": "Particle"}
       ],
       "tags": ["conjunction", "split_prevention"]
     },

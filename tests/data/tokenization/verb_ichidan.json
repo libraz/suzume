@@ -94,13 +94,18 @@
     },
     {
       "id": "ichidan_tabenai",
-      "description": "食べない - ichidan negative",
+      "description": "食べない - MeCab splits 食べ + ない",
       "input": "食べない",
       "expected": [
         {
-          "surface": "食べない",
+          "surface": "食べ",
           "pos": "Verb",
           "lemma": "食べる"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -661,13 +666,18 @@
     },
     {
       "id": "hiragana_shiteru_contraction",
-      "description": "してる - する+ている contraction as auxiliary (not しる)",
+      "description": "してる - MeCab splits as し+てる",
       "input": "してる",
       "expected": [
         {
-          "surface": "してる",
-          "pos": "Auxiliary",
+          "surface": "し",
+          "pos": "Verb",
           "lemma": "する"
+        },
+        {
+          "surface": "てる",
+          "pos": "Verb",
+          "lemma": "てる"
         }
       ],
       "tags": ["hiragana_verb", "contraction"]
@@ -720,13 +730,18 @@
     },
     {
       "id": "passive_desiderative_aisaretai",
-      "description": "S1: 愛されたい (want to be loved) passive+desiderative - MeCab互換分割",
+      "description": "S1: 愛されたい (want to be loved) passive+desiderative - MeCab splits 愛さ+れ+たい",
       "input": "愛されたい",
       "expected": [
         {
-          "surface": "愛され",
+          "surface": "愛さ",
           "pos": "Verb",
           "lemma": "愛す"
+        },
+        {
+          "surface": "れ",
+          "pos": "Auxiliary",
+          "lemma": "れる"
         },
         {
           "surface": "たい",

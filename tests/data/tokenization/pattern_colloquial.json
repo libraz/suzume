@@ -180,13 +180,18 @@
     },
     {
       "id": "colloquial_toku",
-      "description": "やっとく (will do it in advance) - contraction of やって+おく",
+      "description": "やっとく (will do it in advance) - contraction of やって+おく, MeCab splits as やっ+とく",
       "input": "やっとく",
       "expected": [
         {
-          "surface": "やっとく",
+          "surface": "やっ",
           "pos": "Verb",
           "lemma": "やる"
+        },
+        {
+          "surface": "とく",
+          "pos": "Verb",
+          "lemma": "とく"
         }
       ],
       "tags": [

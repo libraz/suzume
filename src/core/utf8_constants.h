@@ -68,6 +68,8 @@ constexpr char32_t kTe = U'て';  // て (0x3066)
 constexpr char32_t kTa = U'た';  // た (0x305F)
 constexpr char32_t kDe = U'で';  // で (0x3067)
 constexpr char32_t kDa = U'だ';  // だ (0x3060)
+constexpr char32_t kTo = U'と';  // と (0x3068)
+constexpr char32_t kChi = U'ち';  // ち (0x3061)
 
 // Sokuon (促音)
 constexpr char32_t kSmallTsu = U'っ';  // っ (0x3063)

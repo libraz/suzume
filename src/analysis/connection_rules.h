@@ -146,7 +146,10 @@ enum class ConnectionPattern {
   SuruRenyokeiToTeVerb,       // NOUN(し ending) → VERB(て始まり) (should be suru-verb te-form)
   TekuReMissegmentation,      // てく/ってく → れ* (should be て + くれる, not ていく + れる)
   MasuRenyokeiToTa,           // AUX(まし/ませ) → AUX(た/ん) (MeCab-compatible masu split)
-  NaiAfterVerbMizenkei        // 動詞未然形 → ない (MeCab-compatible negative split)
+  NaiAfterVerbMizenkei,       // 動詞未然形 → ない (MeCab-compatible negative split)
+  PassiveAfterVerbMizenkei,   // 動詞未然形 → れる/られる (MeCab-compatible passive split)
+  PassiveAuxToNaiTa,          // AUX(れ/られ) → AUX(ない/た) (MeCab-compatible passive aux split)
+  VerbToOkuChauContraction    // VERB → AUX(とく/どく/ちゃう) (MeCab-compatible contraction split)
 };
 
 /**

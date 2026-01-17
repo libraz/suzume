@@ -913,19 +913,27 @@
     },
     {
       "id": "suru_passive_neg_past",
-      "description": "開催されなかった - suru passive negative past - TODO: 分割できていない",
+      "description": "開催されなかった - suru passive negative past - MeCab splits なかっ+た",
       "input": "開催されなかった",
       "expected": [
-        {"surface": "開催されなかった", "pos": "Verb", "lemma": "開催る"}
+        {"surface": "開催", "pos": "Noun"},
+        {"surface": "さ", "pos": "Verb", "lemma": "する"},
+        {"surface": "れ", "pos": "Verb", "lemma": "れる"},
+        {"surface": "なかっ", "pos": "Auxiliary", "lemma": "ない"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["suru", "passive", "negative"]
     },
     {
       "id": "suru_passive_neg_past_2",
-      "description": "勉強されなかった - suru passive negative past - TODO: 分割できていない",
+      "description": "勉強されなかった - suru passive negative past - MeCab splits なかっ+た",
       "input": "勉強されなかった",
       "expected": [
-        {"surface": "勉強されなかった", "pos": "Verb", "lemma": "勉強る"}
+        {"surface": "勉強", "pos": "Noun"},
+        {"surface": "さ", "pos": "Verb", "lemma": "する"},
+        {"surface": "れ", "pos": "Verb", "lemma": "れる"},
+        {"surface": "なかっ", "pos": "Auxiliary", "lemma": "ない"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["suru", "passive", "negative"]
     },
@@ -1143,63 +1151,36 @@
     },
     {
       "id": "suru_colloquial_shichau",
-      "description": "勉強しちゃった - colloquial contraction of してしまった",
+      "description": "勉強しちゃった - MeCab-compatible split: し + ちゃった",
       "input": "勉強しちゃった",
       "expected": [
-        {
-          "surface": "勉強",
-          "pos": "Noun"
-        },
-        {
-          "surface": "しちゃった",
-          "pos": "Auxiliary",
-          "lemma": "する"
-        }
+        {"surface": "勉強", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "ちゃった", "pos": "Auxiliary", "lemma": "しまう"}
       ],
-      "tags": [
-        "suru",
-        "colloquial"
-      ]
+      "tags": ["suru", "colloquial"]
     },
     {
       "id": "suru_colloquial_shitoku",
-      "description": "予約しとく - colloquial contraction of しておく",
+      "description": "予約しとく - MeCab-compatible split: し + とく",
       "input": "予約しとく",
       "expected": [
-        {
-          "surface": "予約",
-          "pos": "Noun"
-        },
-        {
-          "surface": "しとく",
-          "pos": "Auxiliary",
-          "lemma": "する"
-        }
+        {"surface": "予約", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "とく", "pos": "Auxiliary", "lemma": "おく"}
       ],
-      "tags": [
-        "suru",
-        "colloquial"
-      ]
+      "tags": ["suru", "colloquial"]
     },
     {
       "id": "suru_colloquial_shiteru",
-      "description": "勉強してる - colloquial contraction of している",
+      "description": "勉強してる - MeCab-compatible split: し + てる",
       "input": "勉強してる",
       "expected": [
-        {
-          "surface": "勉強",
-          "pos": "Noun"
-        },
-        {
-          "surface": "してる",
-          "pos": "Auxiliary",
-          "lemma": "する"
-        }
+        {"surface": "勉強", "pos": "Noun"},
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "てる", "pos": "Auxiliary", "lemma": "いる"}
       ],
-      "tags": [
-        "suru",
-        "colloquial"
-      ]
+      "tags": ["suru", "colloquial"]
     },
     {
       "id": "suru_negative_te_shinakute",

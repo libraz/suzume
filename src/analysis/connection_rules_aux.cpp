@@ -42,6 +42,23 @@ bool isShimauAuxiliary(std::string_view surface) {
   return false;
 }
 
+bool isOkuAuxiliary(std::string_view surface) {
+  // Full forms (五段カ行活用)
+  if (surface == "おく" || surface == "おいた" || surface == "おいて" ||
+      surface == "おきます" || surface == "おきました" ||
+      surface == "おかない" || surface == "おかなかった" || surface == "おけば") {
+    return true;
+  }
+  // Contracted forms: とく/どく = ておく/でおく
+  if (surface == "とく" || surface == "といた" || surface == "といて" ||
+      surface == "ときます" || surface == "ときました" ||
+      surface == "どく" || surface == "どいた" || surface == "どいて" ||
+      surface == "どきます" || surface == "どきました") {
+    return true;
+  }
+  return false;
+}
+
 bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma) {
   // ます form auxiliaries (require masu-stem)
   if (surface.size() >= core::kTwoJapaneseCharBytes) {
@@ -234,6 +251,63 @@ ConnectionRuleResult checkMasuRenyokeiToTa(const core::LatticeEdge& prev,
   // Give bonus (negative value) to prefer this MeCab-compatible split
   return {ConnectionPattern::MasuRenyokeiToTa, -opts.bonus_masu_renyokei_to_ta,
           "masu-renyokei + ta/n (MeCab-compatible split)"};
+}
+
+// Rule: AUX(れ/られ) → AUX(ない/た) bonus
+// MeCab-compatible split: 言われない → 言わ + れ + ない
+// This bonus helps the 3-token path beat 2-token paths like 言われ(VERB) + ない
+// Without this, the VERB→ない bonus makes 言われ+ない win over 言わ+れ+ない
+ConnectionRuleResult checkPassiveAuxToNaiTa(const core::LatticeEdge& prev,
+                                            const core::LatticeEdge& next,
+                                            const ConnectionOptions& opts) {
+  if (!isAuxToAux(prev, next)) return {};
+
+  // Check if prev is passive auxiliary stem (れ/られ with lemma れる/られる)
+  if (prev.lemma != "れる" && prev.lemma != "られる") return {};
+
+  // Check if prev is stem form (れ/られ, not conjugated forms)
+  if (prev.surface != "れ" && prev.surface != "られ") return {};
+
+  // Check if next is ない/た/ます (negative/past/polite)
+  if (next.surface != "ない" && next.surface != scorer::kFormTa &&
+      next.surface != "ます" && next.lemma != scorer::kLemmaMasu) return {};
+
+  // Give bonus (negative value) to prefer this MeCab-compatible split
+  // Use same bonus as masu conjugation split
+  return {ConnectionPattern::PassiveAuxToNaiTa, -opts.bonus_masu_renyokei_to_ta,
+          "passive-aux + nai/ta (MeCab-compatible split)"};
+}
+
+// Rule: VERB → AUX(とく/どく/ちゃう/じゃう) bonus
+// MeCab-compatible split: 見とく → 見 + とく, 読んどく → 読ん + どく
+// This bonus helps the split path beat the integrated contraction form
+// MeCab treats these as: VERB + 動詞,非自立
+ConnectionRuleResult checkVerbToOkuChauContraction(const core::LatticeEdge& prev,
+                                                   const core::LatticeEdge& next,
+                                                   const ConnectionOptions& opts) {
+  if (!isVerbToAux(prev, next)) return {};
+
+  // Check if next is おく/とく/どく contraction or しまう/ちゃう/じゃう contraction
+  if (!isOkuAuxiliary(next.surface) && !isShimauAuxiliary(next.surface)) {
+    return {};
+  }
+
+  // Verify prev is verb renyokei/onbin form:
+  // - Ichidan renyokei: ends with e-row (べ, て, め, etc.) for 2+ char verbs
+  // - Ichidan single kanji: 見, 出, etc.
+  // - Godan onbin: ends with ん (撥音便), っ (促音便), い (イ音便)
+  bool is_ichidan_renyokei = grammar::endsWithERow(prev.surface);
+  bool is_single_kanji = (prev.surface.size() == core::kJapaneseCharBytes);
+  bool is_onbin = grammar::endsWithOnbin(prev.surface);
+
+  if (!is_ichidan_renyokei && !is_single_kanji && !is_onbin) {
+    return {};
+  }
+
+  // Give strong bonus to prefer split over integrated form
+  return {ConnectionPattern::VerbToOkuChauContraction,
+          -opts.bonus_verb_to_contraction_aux,
+          "verb + toku/chau (MeCab-compatible split)"};
 }
 
 // Rule: NOUN + verb-specific AUX penalty

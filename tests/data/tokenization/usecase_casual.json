@@ -58,11 +58,12 @@
     },
     {
       "id": "casual_contraction_teru",
-      "description": "Contraction てる - している → してる as auxiliary",
+      "description": "Contraction てる - MeCab splits 何+し+てる",
       "input": "何してる",
       "expected": [
         {"surface": "何", "pos": "Pronoun"},
-        {"surface": "してる", "pos": "Auxiliary", "lemma": "する"}
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "てる", "pos": "Verb", "lemma": "てる"}
       ],
       "tags": ["casual", "contraction"]
     },
@@ -293,23 +294,25 @@
     },
     {
       "id": "colloquial_shiteru",
-      "description": "Colloquial している → してる as auxiliary",
+      "description": "Colloquial している → してる - MeCab splits し+てる",
       "input": "今何してる",
       "expected": [
         {"surface": "今", "pos": "Noun"},
         {"surface": "何", "pos": "Pronoun"},
-        {"surface": "してる", "pos": "Auxiliary", "lemma": "する"}
+        {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "てる", "pos": "Verb", "lemma": "てる"}
       ],
       "tags": ["colloquial"]
     },
     {
       "id": "colloquial_miteta",
-      "description": "Colloquial 見ていた → 見てた - MeCab互換分割",
+      "description": "Colloquial 見ていた → 見てた - MeCab splits 見+て+た",
       "input": "テレビ見てた",
       "expected": [
         {"surface": "テレビ", "pos": "Noun"},
-        {"surface": "見て", "pos": "Verb", "lemma": "見る"},
-        {"surface": "た", "pos": "Auxiliary"}
+        {"surface": "見", "pos": "Verb", "lemma": "見る"},
+        {"surface": "て", "pos": "Verb", "lemma": "てる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["colloquial"]
     },

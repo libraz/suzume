@@ -4,13 +4,18 @@
   "cases": [
     {
       "id": "contraction_shiteru",
-      "description": "してる as contracted auxiliary (している → してる)",
+      "description": "してる - MeCab splits as し+てる (している → してる)",
       "input": "してる",
       "expected": [
         {
-          "surface": "してる",
-          "pos": "Auxiliary",
+          "surface": "し",
+          "pos": "Verb",
           "lemma": "する"
+        },
+        {
+          "surface": "てる",
+          "pos": "Verb",
+          "lemma": "てる"
         }
       ],
       "tags": [
@@ -19,13 +24,23 @@
     },
     {
       "id": "contraction_miteta",
-      "description": "見てた - unified contracted form of 見ていた",
+      "description": "見てた - MeCab splits as 見+て+た (見ていた → 見てた)",
       "input": "見てた",
       "expected": [
         {
-          "surface": "見てた",
+          "surface": "見",
           "pos": "Verb",
           "lemma": "見る"
+        },
+        {
+          "surface": "て",
+          "pos": "Verb",
+          "lemma": "てる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [

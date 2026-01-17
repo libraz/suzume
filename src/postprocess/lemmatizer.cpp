@@ -667,6 +667,52 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     if (grammar_result == "なさい" && morpheme.surface.find("なさそう") != std::string::npos) {
       return "ない";
     }
+
+    // Fix for Godan onbin forms incorrectly lemmatized
+    // Grammar returns wrong base: 読ん → 読る, 書い → 書う
+    // Should be: 読ん → 読む, 書い → 書く
+    if (morpheme.pos == core::PartOfSpeech::Verb) {
+      std::string_view sfc = morpheme.surface;
+      // 撥音便: surface ends with ん, result ends with る → む
+      // This is the most common pattern (五段マ行: 読む, 飲む, 住む, etc.)
+      if (endsWith(sfc, "ん") && endsWith(grammar_result, "る") &&
+          grammar_result.size() >= core::kTwoJapaneseCharBytes) {
+        std::string stem = grammar_result.substr(0, grammar_result.size() - core::kJapaneseCharBytes);
+        std::string godan_form = stem + "む";
+        // Verify with dictionary if available, otherwise assume む is correct
+        if (dict_manager_ != nullptr) {
+          auto results = dict_manager_->lookup(godan_form, 0);
+          for (const auto& r : results) {
+            if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb) {
+              return godan_form;
+            }
+          }
+        }
+        // Fallback: if stem is kanji, assume む (most common 撥音便 pattern)
+        if (!stem.empty() && grammar::isAllKanji(stem)) {
+          return godan_form;
+        }
+      }
+      // イ音便: surface ends with い, result ends with う → く
+      if (endsWith(sfc, "い") && endsWith(grammar_result, "う") &&
+          grammar_result.size() >= core::kTwoJapaneseCharBytes) {
+        std::string stem = grammar_result.substr(0, grammar_result.size() - core::kJapaneseCharBytes);
+        std::string godan_form = stem + "く";
+        if (dict_manager_ != nullptr) {
+          auto results = dict_manager_->lookup(godan_form, 0);
+          for (const auto& r : results) {
+            if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb) {
+              return godan_form;
+            }
+          }
+        }
+        // Fallback: if stem is kanji, assume く (most common イ音便 pattern)
+        if (!stem.empty() && grammar::isAllKanji(stem)) {
+          return godan_form;
+        }
+      }
+    }
+
     return grammar_result;
   }
 

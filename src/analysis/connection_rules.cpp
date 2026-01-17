@@ -105,6 +105,8 @@ void evaluateVerbRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkTekuReMissegmentation(prev, next, opts));
   accumulateRule(accumulated, checkTaAfterRenyokei(prev, next, opts));
   accumulateRule(accumulated, checkNaiAfterVerbMizenkei(prev, next, opts));
+  accumulateRule(accumulated, checkPassiveAfterVerbMizenkei(prev, next, opts));
+  accumulateRule(accumulated, checkVerbToOkuChauContraction(prev, next, opts));
 
   // VERB → VERB rules
   accumulateRule(accumulated, checkIchidanRenyokeiTe(prev, next, opts));
@@ -188,6 +190,7 @@ void evaluateAuxRules(const core::LatticeEdge& prev,
   // AUX → AUX rules
   accumulateRule(accumulated, checkCharacterSpeechSplit(prev, next, opts));
   accumulateRule(accumulated, checkMasuRenyokeiToTa(prev, next, opts));
+  accumulateRule(accumulated, checkPassiveAuxToNaiTa(prev, next, opts));
 
   // AUX → PARTICLE rules
   accumulateRule(accumulated, checkMasenDeSplit(prev, next, opts));

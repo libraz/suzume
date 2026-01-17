@@ -78,6 +78,14 @@ struct ConnectionOptions {
   // This bonus helps 食べない → 食べ + ない beat 食べない (unified)
   float bonus_nai_after_verb_mizenkei = 2.5F;
 
+  // 動詞未然形 → れる/られる (MeCab-compatible passive split)
+  // This bonus helps 言われる → 言わ + れる beat 言われる (unified)
+  float bonus_passive_after_verb_mizenkei = 2.5F;
+
+  // VERB → AUX(とく/どく/ちゃう) (MeCab-compatible contraction split)
+  // This bonus helps 見とく → 見 + とく beat 見とく (unified)
+  float bonus_verb_to_contraction_aux = 2.5F;
+
   // やすい (cheap) after renyokei-like noun
   float penalty_yasui_after_renyokei = scorer::kPenaltyYasuiAfterRenyokei;
 

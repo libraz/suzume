@@ -22,46 +22,33 @@
     },
     {
       "id": "godan_passive_polite",
-      "description": "言われます - Godan verb passive polite (MeCab-style split)",
+      "description": "言われます - Godan verb passive polite (MeCab-style 3-way split)",
       "input": "言われます",
       "expected": [
-        {
-          "surface": "言わ",
-          "pos": "Verb",
-          "lemma": "言う"
-        },
-        {
-          "surface": "れます",
-          "pos": "Auxiliary",
-          "lemma": "れる"
-        }
+        {"surface": "言わ", "pos": "Verb", "lemma": "言う"},
+        {"surface": "れ", "pos": "Auxiliary", "lemma": "れる"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"}
       ],
       "tags": ["passive", "godan", "polite"]
     },
     {
       "id": "godan_passive_negative",
-      "description": "言われない - Godan verb passive negative (MeCab-style split)",
+      "description": "言われない - Godan verb passive negative (MeCab-style 3-way split)",
       "input": "言われない",
       "expected": [
-        {
-          "surface": "言わ",
-          "pos": "Verb",
-          "lemma": "言う"
-        },
-        {
-          "surface": "れない",
-          "pos": "Auxiliary",
-          "lemma": "れる"
-        }
+        {"surface": "言わ", "pos": "Verb", "lemma": "言う"},
+        {"surface": "れ", "pos": "Auxiliary", "lemma": "れる"},
+        {"surface": "ない", "pos": "Auxiliary", "lemma": "ない"}
       ],
       "tags": ["passive", "godan", "negative"]
     },
     {
       "id": "godan_passive_polite_negative",
-      "description": "言われません - Godan verb passive polite negative (MeCab-style: 言われ + ませ + ん)",
+      "description": "言われません - Godan verb passive polite negative (MeCab-style 4-way split)",
       "input": "言われません",
       "expected": [
-        {"surface": "言われ", "pos": "Verb", "lemma": "言う"},
+        {"surface": "言わ", "pos": "Verb", "lemma": "言う"},
+        {"surface": "れ", "pos": "Auxiliary", "lemma": "れる"},
         {"surface": "ませ", "pos": "Auxiliary", "lemma": "ます"},
         {"surface": "ん", "pos": "Auxiliary", "lemma": "ん"}
       ],
@@ -69,29 +56,23 @@
     },
     {
       "id": "godan_passive_past",
-      "description": "言われた - Godan verb passive past",
+      "description": "言われた - Godan verb passive past (MeCab-style 3-way split)",
       "input": "言われた",
       "expected": [
-        {"surface": "言われ", "pos": "Verb", "lemma": "言う"},
+        {"surface": "言わ", "pos": "Verb", "lemma": "言う"},
+        {"surface": "れ", "pos": "Auxiliary", "lemma": "れる"},
         {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["passive", "godan", "past"]
     },
     {
       "id": "godan_passive_te",
-      "description": "言われて - Godan verb passive te-form (MeCab-style split)",
+      "description": "言われて - Godan verb passive te-form (MeCab-style 3-way split)",
       "input": "言われて",
       "expected": [
-        {
-          "surface": "言わ",
-          "pos": "Verb",
-          "lemma": "言う"
-        },
-        {
-          "surface": "れて",
-          "pos": "Auxiliary",
-          "lemma": "れる"
-        }
+        {"surface": "言わ", "pos": "Verb", "lemma": "言う"},
+        {"surface": "れ", "pos": "Auxiliary", "lemma": "れる"},
+        {"surface": "て", "pos": "Particle"}
       ],
       "tags": ["passive", "godan", "te-form"]
     },
@@ -115,19 +96,13 @@
     },
     {
       "id": "godan_passive_hiragana_polite_negative",
-      "description": "いわれません - Godan verb passive polite negative in hiragana (MeCab-style split)",
+      "description": "いわれません - Godan verb passive polite negative in hiragana (MeCab-style 4-way split)",
       "input": "いわれません",
       "expected": [
-        {
-          "surface": "いわれ",
-          "pos": "Verb",
-          "lemma": "いう"
-        },
-        {
-          "surface": "ません",
-          "pos": "Auxiliary",
-          "lemma": "ます"
-        }
+        {"surface": "いわ", "pos": "Verb", "lemma": "いう"},
+        {"surface": "れ", "pos": "Auxiliary", "lemma": "れる"},
+        {"surface": "ませ", "pos": "Auxiliary", "lemma": "ます"},
+        {"surface": "ん", "pos": "Auxiliary", "lemma": "ん"}
       ],
       "tags": ["passive", "godan", "hiragana", "polite", "negative"]
     },
@@ -223,24 +198,13 @@
     },
     {
       "id": "ichidan_passive_polite_negative",
-      "description": "食べられません - Ichidan verb passive polite negative (MeCab-style 3-way split)",
+      "description": "食べられません - Ichidan verb passive polite negative (MeCab-style 4-way split)",
       "input": "食べられません",
       "expected": [
-        {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
-        },
-        {
-          "surface": "られ",
-          "pos": "Auxiliary",
-          "lemma": "られる"
-        },
-        {
-          "surface": "ません",
-          "pos": "Auxiliary",
-          "lemma": "ます"
-        }
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "られ", "pos": "Auxiliary", "lemma": "られる"},
+        {"surface": "ませ", "pos": "Auxiliary", "lemma": "ます"},
+        {"surface": "ん", "pos": "Auxiliary", "lemma": "ん"}
       ],
       "tags": ["passive", "ichidan", "polite", "negative"]
     },
@@ -249,16 +213,8 @@
       "description": "見られる - Ichidan verb passive (miru) (MeCab-style split)",
       "input": "見られる",
       "expected": [
-        {
-          "surface": "見",
-          "pos": "Verb",
-          "lemma": "見る"
-        },
-        {
-          "surface": "られる",
-          "pos": "Auxiliary",
-          "lemma": "られる"
-        }
+        {"surface": "見", "pos": "Verb", "lemma": "見る"},
+        {"surface": "られる", "pos": "Auxiliary", "lemma": "られる"}
       ],
       "tags": ["passive", "ichidan"]
     },
@@ -274,11 +230,12 @@
     },
     {
       "id": "suru_passive_past",
-      "description": "された - Suru verb passive past - MeCab互換分割",
+      "description": "された - Suru verb passive past (MeCab-style 3-way split)",
       "input": "された",
       "expected": [
         {"surface": "さ", "pos": "Verb", "lemma": "する"},
-        {"surface": "れた", "pos": "Auxiliary", "lemma": "れる"}
+        {"surface": "れ", "pos": "Auxiliary", "lemma": "れる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["passive", "suru", "past"]
     },
@@ -297,12 +254,13 @@
     },
     {
       "id": "passive_in_sentence",
-      "description": "彼に言われた - Passive in sentence context",
+      "description": "彼に言われた - Passive in sentence context (MeCab-style split)",
       "input": "彼に言われた",
       "expected": [
         {"surface": "彼", "pos": "Pronoun"},
         {"surface": "に", "pos": "Particle"},
-        {"surface": "言われ", "pos": "Verb", "lemma": "言う"},
+        {"surface": "言わ", "pos": "Verb", "lemma": "言う"},
+        {"surface": "れ", "pos": "Auxiliary", "lemma": "れる"},
         {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["passive", "sentence"]

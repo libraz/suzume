@@ -301,7 +301,7 @@
     },
     {
       "id": "classical_beki_suru_passive",
-      "description": "Classical べき with Suru passive: 装飾されべき (should be decorated)",
+      "description": "Classical べき with Suru passive: 装飾されべき - MeCab splits さ+れ+べき",
       "input": "装飾されべき",
       "expected": [
         {
@@ -309,9 +309,19 @@
           "pos": "Noun"
         },
         {
-          "surface": "されべき",
+          "surface": "さ",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "れ",
+          "pos": "Verb",
+          "lemma": "れる"
+        },
+        {
+          "surface": "べき",
           "pos": "Auxiliary",
-          "lemma": "される"
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -440,7 +450,7 @@
     },
     {
       "id": "beki_classical_suru_passive_shori",
-      "description": "Classical べき with Suru passive: 処理されべき (should be processed)",
+      "description": "Classical べき with Suru passive: 処理されべき - MeCab splits さ+れ+べき",
       "input": "処理されべき",
       "expected": [
         {
@@ -449,9 +459,19 @@
           "lemma": "処理"
         },
         {
-          "surface": "されべき",
+          "surface": "さ",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "れ",
+          "pos": "Verb",
+          "lemma": "れる"
+        },
+        {
+          "surface": "べき",
           "pos": "Auxiliary",
-          "lemma": "される"
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -463,7 +483,7 @@
     },
     {
       "id": "beki_classical_causative_passive",
-      "description": "Classical べき with causative-passive: 食べさせられべき (should be made to eat)",
+      "description": "Classical べき with causative-passive: 食べさせられべき - MeCab splits させ+られ+べき",
       "input": "食べさせられべき",
       "expected": [
         {
@@ -473,13 +493,18 @@
         },
         {
           "surface": "させ",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "させる"
         },
         {
-          "surface": "られべき",
-          "pos": "Auxiliary",
+          "surface": "られ",
+          "pos": "Verb",
           "lemma": "られる"
+        },
+        {
+          "surface": "べき",
+          "pos": "Auxiliary",
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -537,31 +562,34 @@
     },
     {
       "id": "ichidan_causative_passive_shiraseru",
-      "description": "Causative passive: 知らせられた (was informed)",
+      "description": "Causative passive: 知らせられた (was informed) - MeCab splits られ+た",
       "input": "知らせられた",
       "expected": [
         {"surface": "知らせ", "pos": "Verb", "lemma": "知らせる"},
-        {"surface": "られた", "pos": "Auxiliary", "lemma": "られる"}
+        {"surface": "られ", "pos": "Auxiliary", "lemma": "られる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["passive", "causative", "ichidan"]
     },
     {
       "id": "ichidan_causative_passive_kikaseru",
-      "description": "Causative passive: 聞かせられた (was made to listen)",
+      "description": "Causative passive: 聞かせられた (was made to listen) - MeCab splits られ+た",
       "input": "聞かせられた",
       "expected": [
         {"surface": "聞かせ", "pos": "Verb", "lemma": "聞かせる"},
-        {"surface": "られた", "pos": "Auxiliary", "lemma": "られる"}
+        {"surface": "られ", "pos": "Auxiliary", "lemma": "られる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["passive", "causative", "ichidan"]
     },
     {
       "id": "ichidan_irow_passive_obiru",
-      "description": "I-row ichidan passive: 帯びられた",
+      "description": "I-row ichidan passive: 帯びられた - MeCab splits られ+た",
       "input": "帯びられた",
       "expected": [
         {"surface": "帯び", "pos": "Verb", "lemma": "帯びる"},
-        {"surface": "られた", "pos": "Auxiliary", "lemma": "られる"}
+        {"surface": "られ", "pos": "Auxiliary", "lemma": "られる"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["passive", "ichidan"]
     },
@@ -620,139 +648,83 @@
     },
     {
       "id": "aux_toku_ichidan",
-      "description": "Colloquial ておく contraction とく with ichidan verb (見とく = 見ておく)",
+      "description": "Colloquial ておく contraction とく with ichidan verb (見とく = 見ておく) - MeCab-compatible split",
       "input": "見とく",
       "expected": [
-        {
-          "surface": "見とく",
-          "pos": "Verb",
-          "lemma": "見る"
-        }
+        {"surface": "見", "pos": "Verb", "lemma": "見る"},
+        {"surface": "とく", "pos": "Auxiliary", "lemma": "おく"}
       ],
-      "tags": [
-        "auxiliary",
-        "colloquial",
-        "contraction"
-      ]
+      "tags": ["auxiliary", "colloquial", "contraction"]
     },
     {
       "id": "aux_toku_ichidan_past",
-      "description": "Colloquial ておく contraction といた with ichidan verb (見といた = 見ておいた)",
+      "description": "Colloquial ておく contraction といた with ichidan verb (見といた = 見ておいた) - MeCab-compatible split",
       "input": "見といた",
       "expected": [
-        {
-          "surface": "見といた",
-          "pos": "Verb",
-          "lemma": "見る"
-        }
+        {"surface": "見", "pos": "Verb", "lemma": "見る"},
+        {"surface": "といた", "pos": "Auxiliary", "lemma": "おく"}
       ],
-      "tags": [
-        "auxiliary",
-        "colloquial",
-        "contraction"
-      ]
+      "tags": ["auxiliary", "colloquial", "contraction"]
     },
     {
       "id": "aux_toku_ichidan_te",
-      "description": "Colloquial ておく contraction といて with ichidan verb (見といて = 見ておいて)",
+      "description": "Colloquial ておく contraction といて with ichidan verb (見といて = 見ておいて) - MeCab-compatible split",
       "input": "見といて",
       "expected": [
-        {
-          "surface": "見といて",
-          "pos": "Verb",
-          "lemma": "見る"
-        }
+        {"surface": "見", "pos": "Verb", "lemma": "見る"},
+        {"surface": "といて", "pos": "Auxiliary", "lemma": "おく"}
       ],
-      "tags": [
-        "auxiliary",
-        "colloquial",
-        "contraction"
-      ]
+      "tags": ["auxiliary", "colloquial", "contraction"]
     },
     {
       "id": "aux_toku_ichidan_long",
-      "description": "Colloquial ておく contraction with 2-char ichidan verb (食べとく = 食べておく)",
+      "description": "Colloquial ておく contraction with 2-char ichidan verb (食べとく = 食べておく) - MeCab-compatible split",
       "input": "食べとく",
       "expected": [
-        {
-          "surface": "食べとく",
-          "pos": "Verb",
-          "lemma": "食べる"
-        }
+        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
+        {"surface": "とく", "pos": "Auxiliary", "lemma": "おく"}
       ],
-      "tags": [
-        "auxiliary",
-        "colloquial",
-        "contraction"
-      ]
+      "tags": ["auxiliary", "colloquial", "contraction"]
     },
     {
       "id": "aux_doku_godan",
-      "description": "Colloquial ておく contraction どく with godan onbin (読んどく = 読んでおく)",
+      "description": "Colloquial ておく contraction どく with godan onbin (読んどく = 読んでおく) - MeCab-compatible split",
       "input": "読んどく",
       "expected": [
-        {
-          "surface": "読んどく",
-          "pos": "Verb",
-          "lemma": "読む"
-        }
+        {"surface": "読ん", "pos": "Verb", "lemma": "読む"},
+        {"surface": "どく", "pos": "Auxiliary", "lemma": "おく"}
       ],
-      "tags": [
-        "auxiliary",
-        "colloquial",
-        "contraction"
-      ]
+      "tags": ["auxiliary", "colloquial", "contraction"]
     },
     {
       "id": "aux_doku_godan_past",
-      "description": "Colloquial ておく contraction どいた with godan onbin (読んどいた = 読んでおいた)",
+      "description": "Colloquial ておく contraction どいた with godan onbin (読んどいた = 読んでおいた) - MeCab-compatible split",
       "input": "読んどいた",
       "expected": [
-        {
-          "surface": "読んどいた",
-          "pos": "Verb",
-          "lemma": "読む"
-        }
+        {"surface": "読ん", "pos": "Verb", "lemma": "読む"},
+        {"surface": "どいた", "pos": "Auxiliary", "lemma": "おく"}
       ],
-      "tags": [
-        "auxiliary",
-        "colloquial",
-        "contraction"
-      ]
+      "tags": ["auxiliary", "colloquial", "contraction"]
     },
     {
       "id": "aux_toku_godan_sokuon",
-      "description": "Colloquial ておく contraction with godan sokuonbin (やっとく = やっておく)",
+      "description": "Colloquial ておく contraction with godan sokuonbin (やっとく = やっておく) - MeCab-compatible split",
       "input": "やっとく",
       "expected": [
-        {
-          "surface": "やっとく",
-          "pos": "Verb",
-          "lemma": "やる"
-        }
+        {"surface": "やっ", "pos": "Verb", "lemma": "やる"},
+        {"surface": "とく", "pos": "Verb", "lemma": "とく"}
       ],
-      "tags": [
-        "auxiliary",
-        "colloquial",
-        "contraction"
-      ]
+      "tags": ["auxiliary", "colloquial", "contraction"]
     },
     {
       "id": "aux_toku_godan_irow",
-      "description": "Colloquial ておく contraction with godan i-onbin (書いとく = 書いておく)",
+      "description": "Colloquial ておく contraction with godan i-onbin (書いとく = 書いておく) - MeCab-compatible split",
       "input": "書いとく",
       "expected": [
-        {
-          "surface": "書いとく",
-          "pos": "Verb",
-          "lemma": "書く"
-        }
+        {"surface": "書い", "pos": "Verb", "lemma": "書く"},
+        {"surface": "とく", "pos": "Auxiliary", "lemma": "おく"}
       ],
-      "tags": [
-        "auxiliary",
-        "colloquial",
-        "contraction"
-      ]
+      "tags": ["auxiliary", "colloquial", "contraction"]
     },
     {
       "id": "hiragana_verb_netai",
@@ -828,7 +800,7 @@
     },
     {
       "id": "tai_pattern_hashiridashi",
-      "description": "走り出したくなってきた - たい pattern follows verb renyokei, なって+きた pattern",
+      "description": "走り出したくなってきた - たい pattern follows verb renyokei, MeCab: なっ+て+き+た",
       "input": "走り出したくなってきた",
       "expected": [
         {
@@ -842,14 +814,23 @@
           "lemma": "たい"
         },
         {
-          "surface": "なって",
+          "surface": "なっ",
           "pos": "Verb",
           "lemma": "なる"
         },
         {
-          "surface": "きた",
-          "pos": "Auxiliary",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "き",
+          "pos": "Verb",
           "lemma": "くる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [

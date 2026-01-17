@@ -270,6 +270,74 @@ ConnectionRuleResult checkNaiAfterVerbMizenkei(const core::LatticeEdge& prev,
           "nai-aux after verb mizenkei (MeCab compatible split)"};
 }
 
+// Rule 4d: Verb mizenkei + れる/られる auxiliary handling (MeCab compatibility)
+// Give bonus to split pattern: verb mizenkei + passive auxiliary
+// This enables 言われる → 言わ + れる, 食べられる → 食べ + られる, etc.
+// Passive patterns:
+// - 五段: stem + あ段 + れる (書か+れる, 言わ+れる)
+// - 一段: stem + られる (食べ+られる)
+// - サ変: stem + される (処理+される)
+ConnectionRuleResult checkPassiveAfterVerbMizenkei(const core::LatticeEdge& prev,
+                                                    const core::LatticeEdge& next,
+                                                    const ConnectionOptions& opts) {
+  // Only process VERB → AUX patterns
+  if (prev.pos != core::PartOfSpeech::Verb) {
+    return {};
+  }
+  if (next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  // Check if next is passive auxiliary (れる, られる, or conjugated forms)
+  // れる patterns: れる, れた, れて, れない, れます, れべき, etc.
+  // られる patterns: られる, られた, られて, られない, られます, られべき, etc.
+  bool is_passive_aux = false;
+  if (next.lemma == "れる" || next.lemma == "られる") {
+    is_passive_aux = true;
+  }
+  // Check specific surface patterns for passive auxiliary conjugations
+  // Godan passive (れる conjugations)
+  if (next.surface == "れる" || next.surface == "れた" || next.surface == "れて" ||
+      next.surface == "れない" || next.surface == "れます" || next.surface == "れません" ||
+      next.surface == "れべき") {
+    is_passive_aux = true;
+  }
+  // Ichidan passive (られる conjugations)
+  if (next.surface == "られる" || next.surface == "られた" || next.surface == "られて" ||
+      next.surface == "られない" || next.surface == "られます" || next.surface == "られません" ||
+      next.surface == "られべき") {
+    is_passive_aux = true;
+  }
+
+  if (!is_passive_aux) {
+    return {};
+  }
+
+  // Check if prev is a valid verb mizenkei (未然形)
+  // Valid patterns:
+  // - 五段: ends with a-row hiragana (書か, 言わ, 読ま)
+  // - 一段: ends with e-row hiragana (食べ, 見) or single kanji + られる
+  // - サ変: さ (処理+さ+れる)
+  bool is_valid_mizenkei = (endsWithARow(prev.surface) ||
+                            endsWithRenyokeiMarker(prev.surface) ||
+                            prev.surface == "さ");
+  // Also accept single-kanji ichidan verbs followed by られる
+  // E.g., 見 + られる, 寝 + られる, 着 + られる
+  // For these, the verb surface is just kanji (no hiragana ending)
+  if (!is_valid_mizenkei &&
+      prev.conj_type == dictionary::ConjugationType::Ichidan &&
+      (next.surface == "られる" || next.lemma == "られる")) {
+    is_valid_mizenkei = true;
+  }
+  if (!is_valid_mizenkei) {
+    return {};
+  }
+
+  // Give bonus (negative value) to prefer this split
+  return {ConnectionPattern::PassiveAfterVerbMizenkei, -opts.bonus_passive_after_verb_mizenkei,
+          "passive-aux after verb mizenkei (MeCab compatible split)"};
+}
+
 // Rule 5: Renyokei-like noun + やすい (安い) penalty
 ConnectionRuleResult checkYasuiAfterRenyokei(const core::LatticeEdge& prev,
                                              const core::LatticeEdge& next,

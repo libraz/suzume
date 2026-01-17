@@ -196,21 +196,24 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // === Individual auxiliary forms for auxiliary separation (Phase 3) ===
       // Passive/Potential (受身・可能) - attaches to mizenkei (未然形)
       // れ: Godan passive stem (書か+れ+る → 書かれる)
+      // MeCab-compatible: keep only stems and basic forms, remove merged forms
       {"れ", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
       {"れる", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
-      {"れた", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
-      {"れて", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
-      {"れない", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
-      {"れます", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
-      {"れべき", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      // Merged forms removed for MeCab-compatible split: れ+た, れ+ない, etc.
+      // {"れた", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      // {"れて", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      // {"れない", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      // {"れます", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
+      {"れべき", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},  // Classical form, keep for べき patterns
       // られ: Ichidan passive/potential stem (食べ+られ+る → 食べられる)
       {"られ", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
       {"られる", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
-      {"られた", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
-      {"られて", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
-      {"られない", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
-      {"られます", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
-      {"られべき", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+      // Merged forms removed for MeCab-compatible split: られ+た, られ+ない, etc.
+      // {"られた", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+      // {"られて", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+      // {"られない", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+      // {"られます", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
+      {"られべき", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},  // Classical form, keep for べき patterns
 
       // Suru passive (サ変受身) - disabled for MeCab-compatible split
       // MeCab: 勉強される → 勉強 + さ(VERB) + れる(AUX)
@@ -263,39 +266,41 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // {"しなくて", POS::Auxiliary, 0.2F, "する", false, false, false, CT::Suru, ""},
       // {"しないで", POS::Auxiliary, 0.2F, "する", false, false, false, CT::Suru, ""},
       // {"しなく", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      // Colloquial contractions (口語縮約形)
-      // してしまう → しちゃう/しちまう
-      {"しちゃう", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      {"しちゃった", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      {"しちゃって", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      {"しちゃいます", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      {"しちまう", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      {"しちまった", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      {"しちまって", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      // しておく → しとく
-      {"しとく", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      {"しといた", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      {"しといて", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      {"しときます", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
-      // している → してる
-      {"してる", POS::Auxiliary, -0.3F, "する", false, false, false, CT::Suru, ""},
-      {"してた", POS::Auxiliary, -0.3F, "する", false, false, false, CT::Suru, ""},
-      {"してます", POS::Auxiliary, -0.3F, "する", false, false, false, CT::Suru, ""},
-      // COMMENTED OUT for MeCab-compatible split: し + て + まし + た
+      // Colloquial contractions (口語縮約形) - DISABLED for MeCab-compatible split
+      // MeCab splits these as し + ちゃう, し + とく, し + てる etc.
+      // The component forms (ちゃう, とく, てる) are registered separately
+      // してしまう → しちゃう/しちまう → MeCab: し + ちゃう/ちまう
+      // {"しちゃう", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
+      // {"しちゃった", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
+      // {"しちゃって", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
+      // {"しちゃいます", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
+      // {"しちまう", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
+      // {"しちまった", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
+      // {"しちまって", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
+      // しておく → しとく → MeCab: し + とく
+      // {"しとく", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
+      // {"しといた", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
+      // {"しといて", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
+      // {"しときます", POS::Auxiliary, 0.3F, "する", false, false, false, CT::Suru, ""},
+      // している → してる → MeCab: し + てる
+      // {"してる", POS::Auxiliary, -0.3F, "する", false, false, false, CT::Suru, ""},
+      // {"してた", POS::Auxiliary, -0.3F, "する", false, false, false, CT::Suru, ""},
+      // {"してます", POS::Auxiliary, -0.3F, "する", false, false, false, CT::Suru, ""},
       // {"してました", POS::Auxiliary, -0.3F, "する", false, false, false, CT::Suru, ""},
-      // Subsidiary verb progressive forms (補助動詞進行形)
-      {"してもらっている", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
-      {"してもらっていた", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
-      {"してもらっています", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
-      {"してあげている", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
-      {"してあげていた", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
-      {"してあげています", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
-      {"してくれている", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
-      {"してくれていた", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
-      {"してくれています", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
-      {"してきている", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
-      {"してきていた", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
-      {"してきています", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // Subsidiary verb progressive forms (補助動詞進行形) - DISABLED for MeCab-compatible split
+      // MeCab: し + て + もらっ + て + いる etc.
+      // {"してもらっている", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // {"してもらっていた", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // {"してもらっています", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // {"してあげている", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // {"してあげていた", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // {"してあげています", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // {"してくれている", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // {"してくれていた", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // {"してくれています", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // {"してきている", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // {"してきていた", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
+      // {"してきています", POS::Auxiliary, -0.5F, "する", false, false, false, CT::Suru, ""},
 
       // Causative (使役) - attaches to mizenkei (未然形)
       // せ: Godan causative stem (書か+せ+る → 書かせる)
@@ -408,6 +413,17 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"じゃいます", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
       // COMMENTED OUT for MeCab-compatible split: じゃい + まし + た
       // {"じゃいました", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      // Contracted forms: てる = ている, とく = ておく (MeCab: 動詞,非自立)
+      {"てる", POS::Auxiliary, -0.3F, "いる", false, false, false, CT::Ichidan, ""},
+      {"てた", POS::Auxiliary, -0.3F, "いる", false, false, false, CT::Ichidan, ""},
+      {"でる", POS::Auxiliary, 0.5F, "いる", false, false, false, CT::Ichidan, ""},  // higher cost to not beat 出る
+      {"でた", POS::Auxiliary, 0.5F, "いる", false, false, false, CT::Ichidan, ""},
+      {"とく", POS::Auxiliary, -0.3F, "おく", false, false, false, CT::GodanKa, ""},
+      {"といた", POS::Auxiliary, -0.3F, "おく", false, false, false, CT::GodanKa, ""},
+      {"といて", POS::Auxiliary, -0.3F, "おく", false, false, false, CT::GodanKa, ""},
+      {"どく", POS::Auxiliary, -0.3F, "おく", false, false, false, CT::GodanKa, ""},
+      {"どいた", POS::Auxiliary, -0.3F, "おく", false, false, false, CT::GodanKa, ""},
+      {"どいて", POS::Auxiliary, -0.3F, "おく", false, false, false, CT::GodanKa, ""},
 
       // Directional auxiliaries (方向補助動詞)
       // て形 + いく/くる pattern: 見ていく (going), 見てくる (coming back)
