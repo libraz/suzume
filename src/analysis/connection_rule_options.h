@@ -122,6 +122,15 @@ struct ConnectionOptions {
   // Te-form VERB + VERB bonus
   float bonus_te_form_verb_to_verb = scorer::kBonusTeFormVerbToVerb;
 
+  // Onbinkei + だ (voiced past tense) bonus
+  float bonus_onbinkei_to_voiced_ta = scorer::kBonusOnbinkeiToVoicedTa;
+
+  // Onbinkei + たら/だら (conditional past) bonus
+  float bonus_onbinkei_to_tara = scorer::kBonusOnbinkeiToTara;
+
+  // Onbinkei + た (past tense) bonus
+  float bonus_onbinkei_to_ta = scorer::kBonusOnbinkeiToTa;
+
   // らしい after verb/adjective bonus
   float bonus_rashii_after_predicate = scorer::kBonusRashiiAfterPredicate;
 

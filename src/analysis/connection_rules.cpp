@@ -98,6 +98,9 @@ void evaluateVerbRules(const core::LatticeEdge& prev,
                        ConnectionRuleResult& accumulated) {
   // VERB → AUX rules
   accumulateRule(accumulated, checkCopulaAfterVerb(prev, next, opts));
+  accumulateRule(accumulated, checkOnbinkeiToVoicedTa(prev, next, opts));
+  accumulateRule(accumulated, checkOnbinkeiToTara(prev, next, opts));
+  accumulateRule(accumulated, checkOnbinkeiToTa(prev, next, opts));
   accumulateRule(accumulated, checkIruAuxAfterTeForm(prev, next, opts));
   accumulateRule(accumulated, checkShimauAuxAfterTeForm(prev, next, opts));
   accumulateRule(accumulated, checkSouAuxAfterVerbRenyokei(prev, next, opts));
@@ -239,9 +242,6 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
   // PARTICLE → VERB rules
   accumulateRule(accumulated, checkParticleBeforeHiraganaVerb(prev, next, opts));
   accumulateRule(accumulated, checkTeParticleToAuxVerb(prev, next, opts));
-
-  // PARTICLE → ADJ rules
-  accumulateRule(accumulated, checkParticleBeforeHiraganaAdj(prev, next, opts));
 
   // PARTICLE → SUFFIX rules
   accumulateRule(accumulated, checkSuffixAfterNaParticle(prev, next, opts));

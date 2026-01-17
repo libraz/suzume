@@ -1575,6 +1575,7 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       // NOTE: ひらがな いく has irregular past (いった not いいた), so explicit forms are needed.
       // CT::None prevents incorrect expansion from these conjugated forms.
       {"いく", POS::Verb, 1.2F, "いく", false, false, false, CT::None, ""},  // base form only, no expansion
+      {"いっ", POS::Verb, 1.2F, "いく", false, false, false, CT::None, ""},  // sokuonbin form for いったら → いっ + たら
       {"いかない", POS::Verb, 1.2F, "いく", false, false, false, CT::None, ""},
       {"いかなかった", POS::Verb, 1.2F, "いく", false, false, false, CT::None, ""},
       {"いった", POS::Verb, 1.2F, "いく", false, false, false, CT::None, ""},
@@ -1660,6 +1661,26 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"たわむ", POS::Verb, 0.3F, "たわむ", false, false, false, CT::GodanMa, ""},
       {"たたずむ", POS::Verb, 0.3F, "たたずむ", false, false, false, CT::GodanMa, ""},  // to stand still
 
+      // Common GodanMa verbs (五段マ行)
+      // These need explicit entries for correct hatsuonbin lemma (飲んだ → 飲む)
+      {"飲む", POS::Verb, 0.3F, "飲む", false, false, false, CT::GodanMa, "のむ"},
+      {"読む", POS::Verb, 0.3F, "読む", false, false, false, CT::GodanMa, "よむ"},
+      {"進む", POS::Verb, 0.3F, "進む", false, false, false, CT::GodanMa, "すすむ"},
+      {"住む", POS::Verb, 0.3F, "住む", false, false, false, CT::GodanMa, "すむ"},
+      {"組む", POS::Verb, 0.3F, "組む", false, false, false, CT::GodanMa, "くむ"},
+      {"込む", POS::Verb, 0.3F, "込む", false, false, false, CT::GodanMa, "こむ"},
+      {"包む", POS::Verb, 0.3F, "包む", false, false, false, CT::GodanMa, "つつむ"},
+      {"踏む", POS::Verb, 0.3F, "踏む", false, false, false, CT::GodanMa, "ふむ"},
+      {"頼む", POS::Verb, 0.3F, "頼む", false, false, false, CT::GodanMa, "たのむ"},
+      {"楽しむ", POS::Verb, 0.3F, "楽しむ", false, false, false, CT::GodanMa, "たのしむ"},
+      {"休む", POS::Verb, 0.3F, "休む", false, false, false, CT::GodanMa, "やすむ"},
+      {"噛む", POS::Verb, 0.3F, "噛む", false, false, false, CT::GodanMa, "かむ"},
+      {"産む", POS::Verb, 0.3F, "産む", false, false, false, CT::GodanMa, "うむ"},
+      {"沈む", POS::Verb, 0.3F, "沈む", false, false, false, CT::GodanMa, "しずむ"},
+      {"掴む", POS::Verb, 0.3F, "掴む", false, false, false, CT::GodanMa, "つかむ"},
+      {"望む", POS::Verb, 0.3F, "望む", false, false, false, CT::GodanMa, "のぞむ"},
+      {"悩む", POS::Verb, 0.3F, "悩む", false, false, false, CT::GodanMa, "なやむ"},
+
       // Godan-Sa verbs (五段サ行)
       {"いたす", POS::Verb, 0.3F, "いたす", false, false, false, CT::GodanSa, ""},
       {"いたしております", POS::Verb, -0.5F, "いたす", false, false, false, CT::GodanSa, ""},  // humble progressive
@@ -1674,6 +1695,12 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"しのぐ", POS::Verb, 0.3F, "しのぐ", false, false, false, CT::GodanGa, ""},
       // Kanji compound verbs (漢字複合動詞) - common GodanGa patterns
       {"相次ぐ", POS::Verb, 0.3F, "相次ぐ", false, false, false, CT::GodanGa, ""},  // to follow one after another
+      // Common GodanGa verbs (for イ音便 lemma resolution: 泳い → 泳ぐ)
+      {"泳ぐ", POS::Verb, 0.3F, "泳ぐ", false, false, false, CT::GodanGa, "およぐ"},
+      {"漕ぐ", POS::Verb, 0.3F, "漕ぐ", false, false, false, CT::GodanGa, "こぐ"},
+      {"防ぐ", POS::Verb, 0.3F, "防ぐ", false, false, false, CT::GodanGa, "ふせぐ"},
+      {"注ぐ", POS::Verb, 0.3F, "注ぐ", false, false, false, CT::GodanGa, "そそぐ"},
+      {"騒ぐ", POS::Verb, 0.3F, "騒ぐ", false, false, false, CT::GodanGa, "さわぐ"},
 
       // Suru verb (サ変動詞)
       {"する", POS::Verb, 0.5F, "する", false, false, false, CT::Suru, ""},
@@ -1804,9 +1831,13 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       // Hiragana forms of grammatical auxiliaries (for MeCab-compatible splitting)
       // E.g., 食べすぎた → 食べ + すぎ + た (not 食べ + すぎた)
       {"すぎる", POS::Verb, 0.3F, "すぎる", false, false, false, CT::Ichidan, ""},
+      {"すぎ", POS::Verb, 0.3F, "すぎる", false, false, false, CT::None, ""},  // renyokei
       {"はじめる", POS::Verb, 0.3F, "はじめる", false, false, false, CT::Ichidan, ""},
+      {"はじめ", POS::Verb, 0.3F, "はじめる", false, false, false, CT::None, ""},  // renyokei
       {"おわる", POS::Verb, 0.3F, "おわる", false, false, false, CT::GodanRa, ""},
+      {"おわり", POS::Verb, 0.3F, "おわる", false, false, false, CT::None, ""},  // renyokei
       {"つづける", POS::Verb, 0.3F, "つづける", false, false, false, CT::Ichidan, ""},
+      {"つづけ", POS::Verb, 0.3F, "つづける", false, false, false, CT::None, ""},  // renyokei
       {"尽きる", POS::Verb, 0.3F, "尽きる", false, false, false, CT::Ichidan, "つきる"},
       {"浴びる", POS::Verb, 0.3F, "浴びる", false, false, false, CT::Ichidan, "あびる"},
 
@@ -1851,7 +1882,9 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       // Special Godan verbs with irregular euphonic changes
       // 行く has irregular ta/te forms (行った/行って instead of 行いた/行いて)
       // Base form uses GodanKa expansion, explicit forms use CT::None to prevent re-expansion
+      // 行っ (sokuonbin form) is needed for MeCab-compatible split: 行ったら → 行っ + たら
       {"行く", POS::Verb, 0.3F, "行く", false, false, false, CT::GodanKa, "いく"},
+      {"行っ", POS::Verb, -0.5F, "行く", false, false, false, CT::None, "いっ"},
       {"行った", POS::Verb, 0.1F, "行く", false, false, false, CT::None, "いった"},
       {"行って", POS::Verb, 0.1F, "行く", false, false, false, CT::None, "いって"},
 

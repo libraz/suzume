@@ -693,22 +693,32 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
           return godan_form;
         }
       }
-      // イ音便: surface ends with い, result ends with う → く
+      // イ音便: surface ends with い, result ends with う → く or ぐ
+      // GodanKa (書い → 書く) and GodanGa (泳い → 泳ぐ) both have イ音便
       if (endsWith(sfc, "い") && endsWith(grammar_result, "う") &&
           grammar_result.size() >= core::kTwoJapaneseCharBytes) {
         std::string stem = grammar_result.substr(0, grammar_result.size() - core::kJapaneseCharBytes);
-        std::string godan_form = stem + "く";
+        // Check GodanGa first (ぐ), then GodanKa (く)
+        // Order matters: if both exist, prefer the dictionary-verified one
         if (dict_manager_ != nullptr) {
-          auto results = dict_manager_->lookup(godan_form, 0);
-          for (const auto& r : results) {
+          std::string godan_ga_form = stem + "ぐ";
+          auto results_ga = dict_manager_->lookup(godan_ga_form, 0);
+          for (const auto& r : results_ga) {
             if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb) {
-              return godan_form;
+              return godan_ga_form;
+            }
+          }
+          std::string godan_ka_form = stem + "く";
+          auto results_ka = dict_manager_->lookup(godan_ka_form, 0);
+          for (const auto& r : results_ka) {
+            if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb) {
+              return godan_ka_form;
             }
           }
         }
         // Fallback: if stem is kanji, assume く (most common イ音便 pattern)
         if (!stem.empty() && grammar::isAllKanji(stem)) {
-          return godan_form;
+          return stem + "く";
         }
       }
     }

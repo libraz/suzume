@@ -409,15 +409,16 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
     case VerbType::Ichidan:
       // 一段動詞: 食べる → 食べ + suffix
       // Note: ます系 excluded (should split as 食べ + ます)
+      // Note: た/て excluded (should split as 食べ + た/て, MeCab-compatible)
       suffixes = {
           {"る", false},        // Base: 食べる
-          {"た", false},        // Past: 食べた
-          {"て", false},        // Te-form: 食べて
+          // {"た", false},     // Past: Excluded - split as 食べ + た
+          // {"て", false},     // Te-form: Excluded - split as 食べ + て
           {"ない", false},      // Negative: 食べない
           {"ん", false},        // Contracted negative: 食べん (colloquial)
           {"なかった", false},  // Past negative: 食べなかった
           {"れば", false},      // Conditional: 食べれば
-          {"たら", false},      // Conditional: 食べたら
+          // {"たら", false},   // Conditional: Excluded - split as 食べ + たら
           {"よう", false},      // Volitional: 食べよう
           {"ろ", false},        // Imperative: 食べろ
       };
@@ -451,16 +452,13 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       // Renyokei (for compound usage)
       suffixes.push_back({i, false});
 
-      // 音便形 + ta/te (サ行以外)
+      // 音便形 (サ行以外) - standalone onbin form for MeCab-compatible split
+      // E.g., 書いた → 書い + た, 飲んだ → 飲ん + だ
+      // The onbin form needs to be a separate candidate to enable the split
       if (!row.onbin.empty()) {
-        suffixes.push_back({row.onbin + ta, false});           // Past: 書いた
-        suffixes.push_back({row.onbin + te, false});           // Te-form: 書いて
-        suffixes.push_back({row.onbin + ta + "ら", false});    // Conditional: 書いたら
-      } else {
-        // サ行 (no onbin)
-        suffixes.push_back({i + "た", false});   // Past: 話した
-        suffixes.push_back({i + "て", false});   // Te-form: 話して
+        suffixes.push_back({row.onbin, false});  // Onbin: 書い, 飲ん, etc.
       }
+      // Note: onbin + た/て/たら is handled by split path (connection rules)
 
       // Negative forms
       suffixes.push_back({a + "ない", false});        // Negative: 書かない

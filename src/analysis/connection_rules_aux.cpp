@@ -70,6 +70,52 @@ bool isOkuAuxiliary(std::string_view surface) {
   return isInFormList(surface, kOkuForms);
 }
 
+// =============================================================================
+// AUX連用形 + た/ん チェック用設定と汎用関数
+// =============================================================================
+
+/**
+ * @brief Configuration for AUX renyokei + た pattern checking
+ */
+struct RenyokeiToTaConfig {
+  std::string_view surface1;        // Primary surface (まし, なかっ, etc.)
+  std::string_view surface2;        // Secondary surface (ませ for ます, empty for others)
+  std::string_view lemma;           // Required lemma (ます, ない, etc.)
+  bool allow_n;                     // Allow next surface "ん" in addition to "た"
+  ConnectionPattern pattern;
+  const char* description;
+};
+
+/**
+ * @brief Generic check for AUX renyokei + た/ん patterns
+ * Used by checkMasuRenyokeiToTa, checkNaiRenyokeiToTa, checkTaiRenyokeiToTa, checkDesuRenyokeiToTa
+ */
+ConnectionRuleResult checkAuxRenyokeiToTaGeneric(
+    const core::LatticeEdge& prev,
+    const core::LatticeEdge& next,
+    const ConnectionOptions& opts,
+    const RenyokeiToTaConfig& config) {
+  if (!isAuxToAux(prev, next)) return {};
+
+  // Check lemma
+  if (prev.lemma != config.lemma) return {};
+
+  // Check surface (primary or secondary)
+  if (prev.surface != config.surface1 &&
+      (config.surface2.empty() || prev.surface != config.surface2)) {
+    return {};
+  }
+
+  // Check next is た (past) or optionally ん (negative)
+  if (next.surface != scorer::kFormTa &&
+      (!config.allow_n || next.surface != "ん")) {
+    return {};
+  }
+
+  // Give bonus (negative value) to prefer this MeCab-compatible split
+  return {config.pattern, -opts.bonus_masu_renyokei_to_ta, config.description};
+}
+
 }  // namespace
 
 // =============================================================================
@@ -141,8 +187,8 @@ ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
 
   // Don't give bonus for bare suru te-form "して" - should be split as し+て
   // MeCab: している → し + て + いる (3 tokens)
-  if (prev.surface == "して" && prev.lemma == scorer::kLemmaSuru) {
-    return {};  // No bonus for bare suru te-form
+  if (isBareSuruTeForm(prev)) {
+    return {};
   }
 
   // Bonus (negative value) for te-form + iru pattern
@@ -166,8 +212,8 @@ ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
   // MeCab: してしまう → し + て + しまう (3 tokens)
   // This also applies to して forms from 漢字+する compound verbs (勉強して, etc.)
   // since those should split as 勉強 + し + て for MeCab compatibility
-  if (prev.surface == "して" && prev.lemma == scorer::kLemmaSuru) {
-    return {};  // No bonus for bare suru te-form
+  if (isBareSuruTeForm(prev)) {
+    return {};
   }
 
   // Bonus (negative value) for te-form + shimau pattern
@@ -285,88 +331,46 @@ ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
 
 // Rule: AUX(まし/ませ) → AUX(た/ん) bonus
 // MeCab-compatible split: しました → し + まし + た
-// This bonus helps the correct path beat incorrect paths like しまし(VERB) + た
-// Without this, the ta_after_renyokei bonus (-2.5) makes VERB + た win
 ConnectionRuleResult checkMasuRenyokeiToTa(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts) {
-  if (!isAuxToAux(prev, next)) return {};
-
-  // Check if prev is ます conjugation (まし/ませ with lemma ます)
-  if (prev.lemma != scorer::kLemmaMasu) return {};
-
-  // まし (ます連用形) or ませ (ます未然形)
-  if (prev.surface != "まし" && prev.surface != "ませ") return {};
-
-  // Check if next is た/ん (past/negative)
-  if (next.surface != scorer::kFormTa && next.surface != "ん") return {};
-
-  // Give bonus (negative value) to prefer this MeCab-compatible split
-  return {ConnectionPattern::MasuRenyokeiToTa, -opts.bonus_masu_renyokei_to_ta,
-          "masu-renyokei + ta/n (MeCab-compatible split)"};
+  static constexpr RenyokeiToTaConfig config{
+      "まし", "ませ", scorer::kLemmaMasu, true,
+      ConnectionPattern::MasuRenyokeiToTa, "masu-renyokei + ta/n (MeCab-compatible split)"};
+  return checkAuxRenyokeiToTaGeneric(prev, next, opts, config);
 }
 
 // Rule: AUX(なかっ) → AUX(た) bonus
 // MeCab-compatible split: なかった → なかっ + た
-// This bonus helps the split path beat the combined なかった path
-// MeCab treats this as: なかっ(助動詞,連用タ接続) + た(助動詞)
 ConnectionRuleResult checkNaiRenyokeiToTa(const core::LatticeEdge& prev,
                                           const core::LatticeEdge& next,
                                           const ConnectionOptions& opts) {
-  if (!isAuxToAux(prev, next)) return {};
-
-  // Check if prev is なかっ (連用タ接続 form of ない)
-  if (prev.surface != "なかっ") return {};
-  if (prev.lemma != "ない") return {};
-
-  // Check if next is た (past auxiliary)
-  if (next.surface != scorer::kFormTa) return {};
-
-  // Give bonus (negative value) to prefer this MeCab-compatible split
-  return {ConnectionPattern::NaiRenyokeiToTa, -opts.bonus_masu_renyokei_to_ta,
-          "nai-renyokei + ta (MeCab-compatible split)"};
+  static constexpr RenyokeiToTaConfig config{
+      "なかっ", "", "ない", false,
+      ConnectionPattern::NaiRenyokeiToTa, "nai-renyokei + ta (MeCab-compatible split)"};
+  return checkAuxRenyokeiToTaGeneric(prev, next, opts, config);
 }
 
 // Rule: AUX(たかっ) → AUX(た) bonus
 // MeCab-compatible split: たかった → たかっ + た
-// This bonus helps the split path beat the combined たかった path
-// MeCab treats this as: たかっ(助動詞,連用タ接続) + た(助動詞)
 ConnectionRuleResult checkTaiRenyokeiToTa(const core::LatticeEdge& prev,
                                           const core::LatticeEdge& next,
                                           const ConnectionOptions& opts) {
-  if (!isAuxToAux(prev, next)) return {};
-
-  // Check if prev is たかっ (連用タ接続 form of たい)
-  if (prev.surface != "たかっ") return {};
-  if (prev.lemma != "たい") return {};
-
-  // Check if next is た (past auxiliary)
-  if (next.surface != scorer::kFormTa) return {};
-
-  // Give bonus (negative value) to prefer this MeCab-compatible split
-  return {ConnectionPattern::TaiRenyokeiToTa, -opts.bonus_masu_renyokei_to_ta,
-          "tai-renyokei + ta (MeCab-compatible split)"};
+  static constexpr RenyokeiToTaConfig config{
+      "たかっ", "", "たい", false,
+      ConnectionPattern::TaiRenyokeiToTa, "tai-renyokei + ta (MeCab-compatible split)"};
+  return checkAuxRenyokeiToTaGeneric(prev, next, opts, config);
 }
 
 // Rule: AUX(でし) → AUX(た) bonus
 // MeCab-compatible split: でした → でし + た
-// This bonus helps the correct path beat で(PARTICLE) + し(VERB) + た
-// MeCab treats this as: でし(助動詞,連用タ接続) + た(助動詞)
 ConnectionRuleResult checkDesuRenyokeiToTa(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts) {
-  if (!isAuxToAux(prev, next)) return {};
-
-  // Check if prev is でし (連用タ接続 form of です)
-  if (prev.surface != "でし") return {};
-  if (prev.lemma != "です") return {};
-
-  // Check if next is た (past auxiliary)
-  if (next.surface != scorer::kFormTa) return {};
-
-  // Give bonus (negative value) to prefer this MeCab-compatible split
-  return {ConnectionPattern::DesuRenyokeiToTa, -opts.bonus_masu_renyokei_to_ta,
-          "desu-renyokei + ta (MeCab-compatible split)"};
+  static constexpr RenyokeiToTaConfig config{
+      "でし", "", "です", false,
+      ConnectionPattern::DesuRenyokeiToTa, "desu-renyokei + ta (MeCab-compatible split)"};
+  return checkAuxRenyokeiToTaGeneric(prev, next, opts, config);
 }
 
 // Rule: AUX(た) → AUX(い) penalty
@@ -430,8 +434,8 @@ ConnectionRuleResult checkVerbToOkuChauContraction(const core::LatticeEdge& prev
 
   // Don't give bonus for bare suru te-form "して" - should be split as し+て
   // MeCab: してしまう → し + て + しまう (3 tokens)
-  if (prev.surface == "して" && prev.lemma == scorer::kLemmaSuru) {
-    return {};  // No bonus for bare suru te-form
+  if (isBareSuruTeForm(prev)) {
+    return {};
   }
 
   // Verify prev is verb renyokei/onbin form:
@@ -579,7 +583,7 @@ ConnectionRuleResult checkMitaiAfterNounOrVerb(const core::LatticeEdge& prev,
 // We add a penalty to prefer the できる analysis.
 ConnectionRuleResult checkParticleDeToKuruAux(const core::LatticeEdge& prev,
                                               const core::LatticeEdge& next,
-                                              const ConnectionOptions& opts) {
+                                              const ConnectionOptions& /* opts */) {
   // Only check PARTICLE → AUX or PARTICLE → VERB pattern
   if (prev.pos != core::PartOfSpeech::Particle) {
     return {};
@@ -601,7 +605,7 @@ ConnectionRuleResult checkParticleDeToKuruAux(const core::LatticeEdge& prev,
 
   // Apply strong penalty to disfavor this pattern
   // This helps できる to be recognized correctly
-  return {ConnectionPattern::ParticleDeToKuruAux, 3.5F,
+  return {ConnectionPattern::ParticleDeToKuruAux, scorer::kPenaltyDeToKuruAux,
           "de(particle) + kuru-aux penalty (likely dekiru misparse)"};
 }
 
@@ -633,7 +637,7 @@ ConnectionRuleResult checkCopulaDeToKuruAux(const core::LatticeEdge& prev,
   }
 
   // Apply strong penalty to disfavor this pattern
-  return {ConnectionPattern::CopulaDeToKuruAux, 3.5F,
+  return {ConnectionPattern::CopulaDeToKuruAux, scorer::kPenaltyDeToKuruAux,
           "de(aux,da) + kuru-aux penalty (likely dekiru misparse)"};
 }
 
@@ -660,7 +664,7 @@ ConnectionRuleResult checkNaAdjToCopulaDe(const core::LatticeEdge& prev,
   }
 
   // Apply bonus to favor this pattern for na-adjective copula
-  return {ConnectionPattern::NaAdjToCopulaDe, -1.5F,
+  return {ConnectionPattern::NaAdjToCopulaDe, scorer::kBonusNaAdjToCopulaDe,
           "noun/adj + de(aux,da) bonus (na-adj copula pattern)"};
 }
 
@@ -688,7 +692,7 @@ ConnectionRuleResult checkNaAdjToDekinaiVerb(const core::LatticeEdge& prev,
 
   // Apply strong penalty to prevent this misparse
   // The dictionary entry has cost -2.0, so we need a strong penalty to overcome it
-  return {ConnectionPattern::NaAdjToDekinaiVerb, 3.5F,
+  return {ConnectionPattern::NaAdjToDekinaiVerb, scorer::kPenaltyNaAdjToDekinaiVerb,
           "noun/adj + denai(dekiru) penalty (should be copula pattern)"};
 }
 
@@ -719,7 +723,7 @@ ConnectionRuleResult checkCopulaDeToNai(const core::LatticeEdge& prev,
   }
 
   // Apply bonus to favor this pattern for na-adjective copula negation
-  return {ConnectionPattern::CopulaDeToNai, -2.5F,
+  return {ConnectionPattern::CopulaDeToNai, -scorer::kBonusCopulaDeToNai,
           "de(aux,da) + nai(aux) bonus (na-adj copula negation)"};
 }
 

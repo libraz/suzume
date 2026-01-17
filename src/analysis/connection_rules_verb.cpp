@@ -77,6 +77,15 @@ ConnectionRuleResult checkCopulaAfterVerb(const core::LatticeEdge& prev,
     return {};
   }
 
+  // Exception 4: Onbin + だ is voiced past tense (た → だ), not copula
+  // E.g., 泳いだ = 泳い(GodanGa onbin) + だ(voiced た)
+  //       遊んだ = 遊ん(GodanBa onbin) + だ(voiced た)
+  //       買った = 買っ(GodanWa onbin) + た (unvoiced, not affected)
+  // Only applies to だ, not です
+  if (next.surface == scorer::kCopulaDa && endsWithOnbinMarker(prev.surface)) {
+    return {};
+  }
+
   return {ConnectionPattern::CopulaAfterVerb, opts.penalty_copula_after_verb,
           "copula after verb"};
 }
@@ -288,28 +297,9 @@ ConnectionRuleResult checkPassiveAfterVerbMizenkei(const core::LatticeEdge& prev
     return {};
   }
 
-  // Check if next is passive auxiliary (れる, られる, or conjugated forms)
-  // れる patterns: れる, れた, れて, れない, れます, れべき, etc.
-  // られる patterns: られる, られた, られて, られない, られます, られべき, etc.
-  bool is_passive_aux = false;
-  if (next.lemma == "れる" || next.lemma == "られる") {
-    is_passive_aux = true;
-  }
-  // Check specific surface patterns for passive auxiliary conjugations
-  // Godan passive (れる conjugations)
-  if (next.surface == "れる" || next.surface == "れた" || next.surface == "れて" ||
-      next.surface == "れない" || next.surface == "れます" || next.surface == "れません" ||
-      next.surface == "れべき") {
-    is_passive_aux = true;
-  }
-  // Ichidan passive (られる conjugations)
-  if (next.surface == "られる" || next.surface == "られた" || next.surface == "られて" ||
-      next.surface == "られない" || next.surface == "られます" || next.surface == "られません" ||
-      next.surface == "られべき") {
-    is_passive_aux = true;
-  }
-
-  if (!is_passive_aux) {
+  // Check if next is passive auxiliary (れる, られる) by lemma
+  // All conjugated forms (れた, られて, etc.) should have lemma set
+  if (next.lemma != "れる" && next.lemma != "られる") {
     return {};
   }
 
@@ -357,7 +347,7 @@ ConnectionRuleResult checkPassiveAfterVerbMizenkei(const core::LatticeEdge& prev
 // The し+れ path gets passive-aux bonuses, so we need to compensate with a strong bonus
 ConnectionRuleResult checkShireruToMasuNai(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts) {
+                                           const ConnectionOptions& /* opts */) {
   if (!isVerbToAux(prev, next)) return {};
 
   // Check if prev is しれる verb (lemma = しれる)
@@ -373,7 +363,6 @@ ConnectionRuleResult checkShireruToMasuNai(const core::LatticeEdge& prev,
 
   // Give strong bonus to compensate for し+れ path getting multiple bonuses
   // This ensures しれ + ませ beats し + れ + ませ in かもしれません
-  (void)opts;  // Unused - using fixed bonus value
   return {ConnectionPattern::ShireruToMasuNai, -scorer::kBonusShireruToMasuNai,
           "shireru verb + masu/nai (prefer over suru+reru split)"};
 }
@@ -598,8 +587,8 @@ ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
 
   // Don't give bonus for bare suru te-form "して" - should be split as し+て
   // MeCab: してみる → し + て + みる (3 tokens)
-  if (prev.surface == "して" && prev.lemma == scorer::kLemmaSuru) {
-    return {};  // No bonus for bare suru te-form
+  if (isBareSuruTeForm(prev)) {
+    return {};
   }
 
   // Bonus (negative value) for te-form + verb pattern
@@ -612,7 +601,7 @@ ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
 // These are now VERB (MeCab compatible) but need a connection bonus
 ConnectionRuleResult checkRenyokeiToContractedVerb(const core::LatticeEdge& prev,
                                                    const core::LatticeEdge& next,
-                                                   const ConnectionOptions& opts) {
+                                                   const ConnectionOptions& /* opts */) {
   if (!isVerbToVerb(prev, next)) return {};
 
   // Check if next is contracted progressive/preparative verb (てる/でる/とく/どく etc.)
@@ -634,7 +623,6 @@ ConnectionRuleResult checkRenyokeiToContractedVerb(const core::LatticeEdge& prev
   if (!is_renyokei) return {};
 
   // Strong bonus to prefer し + てる over し(PARTICLE) + てる
-  (void)opts;
   return {ConnectionPattern::RenyokeiToContractedVerb, -scorer::kBonusRenyokeiToContractedVerb,
           "verb renyokei + contracted progressive/preparative verb"};
 }
@@ -724,11 +712,8 @@ ConnectionRuleResult checkRashiiAfterPredicate(const core::LatticeEdge& prev,
     return {};
   }
 
-  // Check if next is らしい or its conjugated forms
-  if (next.surface != "らしい" && next.surface != "らしかった" &&
-      next.surface != "らしく" && next.surface != "らしくて" &&
-      next.surface != "らしければ" && next.surface != "らしくない" &&
-      next.surface != "らしくなかった") {
+  // Check if next is らしい or its conjugated forms (lemma-based)
+  if (next.lemma != "らしい") {
     return {};
   }
 
@@ -816,7 +801,7 @@ ConnectionRuleResult checkSuruRenyokeiToTeVerb(const core::LatticeEdge& prev,
 // - 五段renyokei: prev ends with i-row (話し, 書き) → て (for さ行 etc.)
 ConnectionRuleResult checkRenyokeiToTeParticle(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts) {
+                                               const ConnectionOptions& /* opts */) {
   if (!isVerbToParticle(prev, next)) return {};
 
   // Check if next is て/で particle
@@ -864,7 +849,6 @@ ConnectionRuleResult checkRenyokeiToTeParticle(const core::LatticeEdge& prev,
 
   // Strong bonus to prefer this split over unified te-form
   // This needs to offset the penalty from checkTeFormSplit
-  (void)opts;  // Using fixed value for now
   return {ConnectionPattern::RenyokeiToTeParticle, -scorer::kBonusRenyokeiToTeParticle,
           "verb renyokei/onbinkei + te/de particle (MeCab-compatible te-form split)"};
 }
@@ -874,7 +858,7 @@ ConnectionRuleResult checkRenyokeiToTeParticle(const core::LatticeEdge& prev,
 // This supports patterns like: 食べ + て + いる → 食べている
 ConnectionRuleResult checkTeParticleToAuxVerb(const core::LatticeEdge& prev,
                                               const core::LatticeEdge& next,
-                                              const ConnectionOptions& opts) {
+                                              const ConnectionOptions& /* opts */) {
   // Check if prev is て/で particle
   if (prev.pos != core::PartOfSpeech::Particle) return {};
   if (prev.surface != scorer::kFormTe && prev.surface != scorer::kFormDe) {
@@ -918,9 +902,81 @@ ConnectionRuleResult checkTeParticleToAuxVerb(const core::LatticeEdge& prev,
   }
 
   // Bonus for valid te-form + auxiliary pattern
-  (void)opts;
   return {ConnectionPattern::TeParticleToAuxVerb, -scorer::kBonusTeParticleToAuxVerb,
           "te/de particle + auxiliary verb"};
+}
+
+// Rule: VERB(onbinkei) + だ(AUX) bonus for voiced past tense
+// E.g., 泳い(GodanGa onbin) + だ → 泳いだ (voiced た)
+//       遊ん(GodanBa onbin) + だ → 遊んだ (voiced た)
+// Without this, the split path (泳い NOUN + だ AUX copula) wins due to dictionary bonus
+// P13: Added to fix GodanGa/Na/Ba/Ma + だ voiced past tense recognition
+ConnectionRuleResult checkOnbinkeiToVoicedTa(const core::LatticeEdge& prev,
+                                             const core::LatticeEdge& next,
+                                             const ConnectionOptions& opts) {
+  // Check VERB → AUX pattern
+  if (prev.pos != core::PartOfSpeech::Verb) return {};
+  if (next.pos != core::PartOfSpeech::Auxiliary) return {};
+
+  // Check if next is voiced た (だ)
+  if (next.surface != scorer::kCopulaDa) return {};
+
+  // Check if prev ends with onbin marker (い, っ, ん)
+  // These are the onbin forms that can precede voiced た
+  if (!endsWithOnbinMarker(prev.surface)) return {};
+
+  // Give bonus to encourage VERB + だ(voiced た) interpretation
+  return {ConnectionPattern::OnbinkeiToVoicedTa, -opts.bonus_onbinkei_to_voiced_ta,
+          "verb onbinkei + voiced ta"};
+}
+
+// Rule: VERB(onbinkei) + たら/だら(AUX) bonus for conditional past
+// E.g., 書い(GodanKa onbin) + たら → 書いたら (conditional)
+//       読ん(GodanMa onbin) + だら → 読んだら (conditional)
+// Without this, the unified verb path (書いたら VERB) wins over the split path
+// P14: Added to fix Godan verb onbin + conditional aux recognition
+ConnectionRuleResult checkOnbinkeiToTara(const core::LatticeEdge& prev,
+                                         const core::LatticeEdge& next,
+                                         const ConnectionOptions& opts) {
+  // Check VERB → AUX pattern
+  if (prev.pos != core::PartOfSpeech::Verb) return {};
+  if (next.pos != core::PartOfSpeech::Auxiliary) return {};
+
+  // Check if next is conditional aux (たら or だら)
+  if (next.surface != "たら" && next.surface != "だら") return {};
+
+  // Check if prev ends with onbin marker (い, っ, ん)
+  // These are the onbin forms that can precede conditional aux
+  if (!endsWithOnbinMarker(prev.surface)) return {};
+
+  // Give bonus to encourage VERB + たら/だら(conditional) interpretation
+  return {ConnectionPattern::OnbinkeiToTara, -opts.bonus_onbinkei_to_tara,
+          "verb onbinkei + conditional tara"};
+}
+
+// Rule: VERB(onbinkei) + た(AUX) bonus for past tense
+// E.g., 書い(GodanKa onbin) + た → 書いた (past)
+//       読ん(GodanMa onbin) + だ → 読んだ (past, voiced)
+// Without this, the unified verb path (書いた VERB unk) wins over the split path
+// P14: Added to fix Godan verb onbin + past aux recognition
+ConnectionRuleResult checkOnbinkeiToTa(const core::LatticeEdge& prev,
+                                       const core::LatticeEdge& next,
+                                       const ConnectionOptions& opts) {
+  // Check VERB → AUX pattern
+  if (prev.pos != core::PartOfSpeech::Verb) return {};
+  if (next.pos != core::PartOfSpeech::Auxiliary) return {};
+
+  // Check if next is past tense aux (た)
+  // Note: だ is handled by checkOnbinkeiToVoicedTa
+  if (next.surface != "た") return {};
+
+  // Check if prev ends with onbin marker (い, っ, ん)
+  // These are the onbin forms that can precede past aux
+  if (!endsWithOnbinMarker(prev.surface)) return {};
+
+  // Give bonus to encourage VERB + た(past) interpretation
+  return {ConnectionPattern::OnbinkeiToTa, -opts.bonus_onbinkei_to_ta,
+          "verb onbinkei + past ta"};
 }
 
 }  // namespace connection_rules

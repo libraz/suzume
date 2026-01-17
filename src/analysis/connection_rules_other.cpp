@@ -36,7 +36,7 @@ ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
 // MeCab-compatible kute split: 美しくて → 美しく + て, しんどくて → しんどく + て
 ConnectionRuleResult checkAdjKuToTeParticle(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
-                                            const ConnectionOptions& opts) {
+                                            const ConnectionOptions& /* opts */) {
   // Check if prev is adjective
   if (prev.pos != core::PartOfSpeech::Adjective) return {};
 
@@ -50,7 +50,6 @@ ConnectionRuleResult checkAdjKuToTeParticle(const core::LatticeEdge& prev,
   if (next.surface != scorer::kFormTe) return {};
 
   // Strong bonus to prefer this split over unified くて form
-  (void)opts;  // Using fixed value for now
   return {ConnectionPattern::AdjKuToTeParticle, -scorer::kBonusAdjKuToTeParticle,
           "adj-ku + te particle (MeCab-compatible kute split)"};
 }
@@ -80,19 +79,6 @@ ConnectionRuleResult checkPrefixToHiraganaAdj(const core::LatticeEdge& prev,
 
   return {ConnectionPattern::PrefixToHiraganaAdj,
           opts.penalty_prefix_hiragana_adj, "prefix to hiragana adj"};
-}
-
-// Note: PARTICLE → ADJ penalty was removed because:
-// 1. Particles like が, を, に before adjectives are grammatically valid
-// 2. The penalty for は + なはだしい at start causes worse fragmentation
-// 3. The proper fix is in adjective candidate generation (C2 task) to not break
-//    at particle characters within hiragana adjectives like はなはだしい
-// The PREFIX → ADJ rule (checkPrefixToHiraganaAdj) is kept since お/ご prefixes
-// before unknown hiragana adjectives are almost always misanalysis.
-ConnectionRuleResult checkParticleBeforeHiraganaAdj(
-    const core::LatticeEdge& /*prev*/, const core::LatticeEdge& /*next*/,
-    const ConnectionOptions& /*opts*/) {
-  return {};  // Disabled - see comment above
 }
 
 // Rule 8: だ/です + character speech suffix split penalty
@@ -153,12 +139,8 @@ ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
     return {};
   }
 
-  // Check if next starts with kanji (0xE4-0xE9 range in UTF-8)
-  if (next.surface.empty()) {
-    return {};
-  }
-  auto first_byte = static_cast<unsigned char>(next.surface[0]);
-  if (first_byte < 0xE4 || first_byte > 0xE9) {
+  // Check if next starts with kanji
+  if (!startsWithKanji(next.surface)) {
     return {};
   }
 
@@ -477,9 +459,8 @@ ConnectionRuleResult checkNaParticleAfterKanjiNoun(
   // At least 2 characters for typical na-adjective stems
   if (prev.surface.size() < core::kTwoJapaneseCharBytes) return {};
 
-  // Check if prev starts with kanji (0xE4-0xE9 range in UTF-8)
-  auto first_byte = static_cast<unsigned char>(prev.surface[0]);
-  if (first_byte < 0xE4 || first_byte > 0xE9) return {};
+  // Check if prev starts with kanji
+  if (!startsWithKanji(prev.surface)) return {};
 
   // Apply penalty to shift preference to na-adjective pattern
   return {ConnectionPattern::NaParticleAfterKanjiNoun,

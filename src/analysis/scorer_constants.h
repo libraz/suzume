@@ -278,6 +278,22 @@ constexpr float kBonusTeParticleToAuxVerb = scale::kStrong + scale::kMinor;  // 
 // E.g., て(VERB, lemma=てる) + た → 見てた (MeCab-compatible)
 constexpr float kBonusTeruRenyokeiToTa = scale::kStrong;  // 1.5
 
+// Verb onbinkei + だ (voiced past tense)
+// E.g., 泳い(onbin) + だ → 泳いだ (encourages verb + voiced た interpretation)
+// Without this, the split path (泳い NOUN + だ AUX) wins due to dictionary bonus on だ
+constexpr float kBonusOnbinkeiToVoicedTa = scale::kMinor;  // 0.5
+
+// Verb onbinkei + たら/だら (conditional past)
+// E.g., 書い(onbin) + たら → 書いたら (encourages verb + conditional interpretation)
+// Without this, 書いたら(VERB dict) wins over 書い + たら split
+constexpr float kBonusOnbinkeiToTara = scale::kMinor;  // 0.5
+
+// Verb onbinkei + た (past tense)
+// E.g., 書い(onbin) + た → 書いた (encourages verb + past aux interpretation)
+// Without this, 書いた(VERB unk) wins over 書い + た split
+// Note: Larger bonus needed because onbin VERB candidates have higher base cost
+constexpr float kBonusOnbinkeiToTa = scale::kModerate;  // 1.5
+
 // Adjective く form + て particle bonus
 // E.g., 美しく + て - very common pattern
 constexpr float kBonusAdjKuToTeParticle = scale::kSevere;  // 2.5
@@ -317,6 +333,24 @@ constexpr float kBonusNounMitai = scale::kSevere + scale::kMinor;  // 3.0
 // VERB + みたい (hearsay/appearance) bonus
 // E.g., 食べるみたい (seems like eating)
 constexpr float kBonusVerbMitai = scale::kModerate;
+
+// で(PARTICLE/AUX) + くる活用形 penalty (できる misparse prevention)
+// E.g., できます → で + きます is wrong; should be でき + ます
+// Applied to both PARTICLE→AUX and AUX(だ)→AUX patterns
+constexpr float kPenaltyDeToKuruAux = scale::kProhibitive;  // 3.5
+
+// NOUN/ADJ + で(AUX, lemma=だ) bonus for na-adjective copula pattern
+// E.g., 嫌でない → 嫌 + で(AUX) + ない (copula negation)
+constexpr float kBonusNaAdjToCopulaDe = scale::kVeryStrongBonus;  // -1.5
+
+// NOUN/ADJ + でない(VERB, lemma=できる) penalty
+// Prevents na-adj copula from being misparsed as できる negation
+// E.g., 嫌でない should be copula pattern, not できる negative form
+constexpr float kPenaltyNaAdjToDekinaiVerb = scale::kProhibitive;  // 3.5
+
+// で(AUX, lemma=だ) + ない(AUX) bonus for na-adjective copula negation
+// E.g., 嫌でない → 嫌 + で + ない (copula negation pattern)
+constexpr float kBonusCopulaDeToNai = scale::kSevere;  // 2.5 (used as negative bonus: -2.5)
 
 // =============================================================================
 // Other Connection Rules (extracted from inline literals)

@@ -191,6 +191,27 @@ bool isAuxiliaryVerbPattern(std::string_view surface, std::string_view lemma);
  */
 bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma);
 
+/**
+ * @brief Check if edge is bare suru te-form "して"
+ * MeCab splits suru te-form: している → し + て + いる
+ * This helper identifies the bare "して" pattern that should not get
+ * te-form connection bonuses.
+ */
+inline bool isBareSuruTeForm(const core::LatticeEdge& edge) {
+  return edge.surface == "して" && edge.lemma == scorer::kLemmaSuru;
+}
+
+/**
+ * @brief Check if surface starts with a CJK kanji character
+ * Checks UTF-8 first byte range 0xE4-0xE9 which covers most CJK Unified
+ * Ideographs used in Japanese (U+4E00-U+9FFF).
+ */
+inline bool startsWithKanji(std::string_view surface) {
+  if (surface.empty()) return false;
+  auto first_byte = static_cast<unsigned char>(surface[0]);
+  return first_byte >= 0xE4 && first_byte <= 0xE9;
+}
+
 // =============================================================================
 // Verb Conjugation Rules (connection_rules_verb.cpp)
 // =============================================================================
@@ -198,6 +219,18 @@ bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma);
 ConnectionRuleResult checkCopulaAfterVerb(const core::LatticeEdge& prev,
                                           const core::LatticeEdge& next,
                                           const ConnectionOptions& opts);
+
+ConnectionRuleResult checkOnbinkeiToVoicedTa(const core::LatticeEdge& prev,
+                                             const core::LatticeEdge& next,
+                                             const ConnectionOptions& opts);
+
+ConnectionRuleResult checkOnbinkeiToTara(const core::LatticeEdge& prev,
+                                         const core::LatticeEdge& next,
+                                         const ConnectionOptions& opts);
+
+ConnectionRuleResult checkOnbinkeiToTa(const core::LatticeEdge& prev,
+                                       const core::LatticeEdge& next,
+                                       const ConnectionOptions& opts);
 
 ConnectionRuleResult checkIchidanRenyokeiTe(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
@@ -330,10 +363,6 @@ ConnectionRuleResult checkAdjKuToTeParticle(const core::LatticeEdge& prev,
 ConnectionRuleResult checkPrefixToHiraganaAdj(const core::LatticeEdge& prev,
                                               const core::LatticeEdge& next,
                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkParticleBeforeHiraganaAdj(
-    const core::LatticeEdge& prev, const core::LatticeEdge& next,
-    const ConnectionOptions& opts);
 
 ConnectionRuleResult checkCharacterSpeechSplit(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
