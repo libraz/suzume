@@ -129,23 +129,13 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
             grammar::conjTypeToVerbType(result.entry->conj_type);
         if (dict_verb_type == infl_cand.verb_type) {
           // Found a match! Generate candidate
-          UnknownCandidate cand;
-          cand.surface = surface;
-          cand.start = start_pos;
-          cand.end = end_pos;
-          cand.pos = core::PartOfSpeech::Verb;
-          // Low cost to prefer dictionary-verified compound verbs
-          cand.cost = verb_opts.base_cost_low;
-          cand.has_suffix = false;
           // Note: Don't set lemma here - let lemmatizer derive it more accurately
           // Only set conj_type for conjugation pattern info
-          cand.conj_type = grammar::verbTypeToConjType(infl_cand.verb_type);
-#ifdef SUZUME_DEBUG_INFO
-          cand.origin = CandidateOrigin::VerbCompound;
-          cand.confidence = infl_cand.confidence;
-          cand.pattern = grammar::verbTypeToString(infl_cand.verb_type);
-#endif
-          candidates.push_back(cand);
+          candidates.push_back(makeVerbCandidate(
+              surface, start_pos, end_pos, verb_opts.base_cost_low, "",
+              grammar::verbTypeToConjType(infl_cand.verb_type),
+              false, CandidateOrigin::VerbCompound, infl_cand.confidence,
+              grammar::verbTypeToString(infl_cand.verb_type).data()));
           return candidates;  // Return first valid match
         }
       }
@@ -235,23 +225,14 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     // Only accept verb types (not IAdjective) and require reasonable confidence
     if (best.confidence > verb_opts.confidence_katakana &&
         best.verb_type != grammar::VerbType::IAdjective) {
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = end_pos;
-      candidate.pos = core::PartOfSpeech::Verb;
       // Lower cost than pure katakana noun to prefer verb reading
       // Cost: 0.4-0.55 based on confidence (lower = better)
-      candidate.cost = verb_opts.base_cost_standard + (1.0F - best.confidence) * verb_opts.confidence_cost_scale;
-      candidate.has_suffix = false;
-      candidate.lemma = best.base_form;  // Set lemma from inflection analysis
-      candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
-#ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::VerbKatakana;
-      candidate.confidence = best.confidence;
-      candidate.pattern = grammar::verbTypeToString(best.verb_type);
-#endif
-      candidates.push_back(candidate);
+      float cost = verb_opts.base_cost_standard + (1.0F - best.confidence) * verb_opts.confidence_cost_scale;
+      candidates.push_back(makeVerbCandidate(
+          surface, start_pos, end_pos, cost, best.base_form,
+          grammar::verbTypeToConjType(best.verb_type),
+          false, CandidateOrigin::VerbKatakana, best.confidence,
+          grammar::verbTypeToString(best.verb_type).data()));
     }
   }
 

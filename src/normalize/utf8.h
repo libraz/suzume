@@ -29,6 +29,17 @@ char32_t decodeUtf8(std::string_view str, size_t& pos);
 void encodeUtf8(char32_t codepoint, std::string& out);
 
 /**
+ * @brief Encode one codepoint to UTF-8
+ * @param codepoint Unicode codepoint
+ * @return UTF-8 encoded string
+ */
+inline std::string encodeUtf8(char32_t codepoint) {
+  std::string result;
+  encodeUtf8(codepoint, result);
+  return result;
+}
+
+/**
  * @brief Get UTF-8 string length in characters
  * @param str UTF-8 string
  * @return Number of Unicode codepoints

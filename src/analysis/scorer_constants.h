@@ -120,9 +120,11 @@ constexpr float kPenaltyCopulaAfterVerb = scale::kSevere + scale::kMinor;  // 3.
 // E.g., 教え + て should be 教えて
 constexpr float kPenaltyIchidanRenyokeiTe = scale::kStrong;
 
-// たい adjective after verb renyokei - this is valid
+// たい adjective/auxiliary after verb renyokei - this is valid
 // E.g., 食べたい, 読みたい (positive value subtracted as bonus)
-constexpr float kBonusTaiAfterRenyokei = 0.8F;
+// Must be stronger than kBonusTaAfterRenyokei (2.5) to prevent た+い split
+// when たい auxiliary is the correct parse
+constexpr float kBonusTaiAfterRenyokei = scale::kSevere + 0.1F;  // 2.6
 
 // 安い (やすい) interpreted as cheap after renyokei-like noun
 // Should be verb + やすい (easy to do)
@@ -314,6 +316,11 @@ constexpr float kBonusIAdjToDesu = scale::kSevere;  // 2.5
 // This bonus helps the particle + verb path beat the incorrect にぐ analysis
 // Strong bonus needed because にいた (verb) has very low cost while いた has high cost
 constexpr float kBonusNiParticleToIruVerb = scale::kProhibitive;  // 3.5
+
+// 終助詞連続 (sentence-final particle sequence) bonus
+// E.g., よ + ね, よ + わ are extremely common final particle combinations
+// Strong bonus to prefer ね(PARTICLE) over ね(VERB, lemma=ねる)
+constexpr float kBonusSentenceFinalParticleSeq = scale::kStrong;  // 2.5
 
 // そう auxiliary small bonus after renyokei (fine-tuning)
 // Balanced to allow ADJ一体 (難しそう→難しい) while boosting VERB+そう slightly
@@ -510,6 +517,7 @@ constexpr const char* kLemmaIku = "いく";        // continuing/going
 constexpr const char* kLemmaKuru = "くる";       // coming/becoming
 constexpr const char* kLemmaAgeru = "あげる";    // giving (up)
 constexpr const char* kLemmaMorau = "もらう";    // receiving
+constexpr const char* kLemmaItadaku = "いただく"; // receiving (humble)
 constexpr const char* kLemmaKureru = "くれる";   // receiving (favor)
 constexpr const char* kLemmaAru = "ある";        // existence/state
 constexpr const char* kLemmaNaru = "なる";       // become

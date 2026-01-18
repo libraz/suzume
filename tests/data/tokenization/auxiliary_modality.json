@@ -1376,7 +1376,8 @@
         },
         {
           "surface": "そう",
-          "pos": "Noun"
+          "pos": "Auxiliary",
+          "lemma": "そう"
         },
         {
           "surface": "です",

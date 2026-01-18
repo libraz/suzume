@@ -98,7 +98,7 @@ ConnectionRuleResult checkAuxRenyokeiToTaGeneric(
     const core::LatticeEdge& next,
     const ConnectionOptions& opts,
     const RenyokeiToTaConfig& config) {
-  if (!isAuxToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Aux, POS::Aux>(prev, next)) return {};
 
   // Check lemma
   if (prev.lemma != config.lemma) return {};
@@ -168,7 +168,7 @@ bool isVerbSpecificAuxiliary(std::string_view surface, std::string_view lemma) {
 ConnectionRuleResult checkIruAuxAfterNoun(const core::LatticeEdge& prev,
                                           const core::LatticeEdge& next,
                                           const ConnectionOptions& opts) {
-  if (!isNounToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Noun, POS::Aux>(prev, next)) return {};
 
   if (!isIruAuxiliary(next.surface)) return {};
 
@@ -182,7 +182,7 @@ ConnectionRuleResult checkIruAuxAfterNoun(const core::LatticeEdge& prev,
 ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts) {
-  if (!isVerbToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Aux>(prev, next)) return {};
 
   if (!isIruAuxiliary(next.surface)) return {};
 
@@ -206,7 +206,7 @@ ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
 ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts) {
-  if (!isVerbToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Aux>(prev, next)) return {};
 
   if (!isShimauAuxiliary(next.surface)) return {};
 
@@ -240,7 +240,7 @@ ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
 ConnectionRuleResult checkSouAuxAfterVerbRenyokei(const core::LatticeEdge& prev,
                                                    const core::LatticeEdge& next,
                                                    const ConnectionOptions& opts) {
-  if (!isVerbToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Aux>(prev, next)) return {};
 
   if (next.surface != scorer::kSuffixSou || next.lemma != scorer::kSuffixSou) return {};
 
@@ -278,7 +278,7 @@ ConnectionRuleResult checkSouAuxAfterVerbRenyokei(const core::LatticeEdge& prev,
 ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts) {
-  if (!isVerbToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Aux>(prev, next)) return {};
 
   if (!endsWithTeForm(prev.surface)) return {};
 
@@ -323,17 +323,12 @@ ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
 ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
                                        const core::LatticeEdge& next,
                                        const ConnectionOptions& opts) {
-  if (!isAuxToParticle(prev, next)) return {};
+  if (!isPosMatch<POS::Aux, POS::Particle>(prev, next)) return {};
 
   if (next.surface != scorer::kFormDe) return {};
 
   // Check if prev ends with ません (negative polite form)
-  // UTF-8: ません = 9 bytes (3 hiragana chars)
-  if (prev.surface.size() < core::kThreeJapaneseCharBytes) {
-    return {};
-  }
-  std::string_view last9 = prev.surface.substr(prev.surface.size() - core::kThreeJapaneseCharBytes);
-  if (last9 != scorer::kSuffixMasen) {
+  if (!utf8::endsWith(prev.surface, scorer::kSuffixMasen)) {
     return {};
   }
 
@@ -391,7 +386,7 @@ ConnectionRuleResult checkDesuRenyokeiToTa(const core::LatticeEdge& prev,
 ConnectionRuleResult checkInvalidTaToI(const core::LatticeEdge& prev,
                                        const core::LatticeEdge& next,
                                        const ConnectionOptions& /* opts */) {
-  if (!isAuxToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Aux, POS::Aux>(prev, next)) return {};
 
   // Check if prev is た (past auxiliary)
   if (prev.surface != scorer::kFormTa) return {};
@@ -411,7 +406,7 @@ ConnectionRuleResult checkInvalidTaToI(const core::LatticeEdge& prev,
 ConnectionRuleResult checkPassiveAuxToNaiTa(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts) {
-  if (!isAuxToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Aux, POS::Aux>(prev, next)) return {};
 
   // Check if prev is passive auxiliary stem (れ/られ with lemma れる/られる)
   if (prev.lemma != "れる" && prev.lemma != "られる") return {};
@@ -438,7 +433,7 @@ ConnectionRuleResult checkPassiveAuxToNaiTa(const core::LatticeEdge& prev,
 ConnectionRuleResult checkVerbToOkuChauContraction(const core::LatticeEdge& prev,
                                                    const core::LatticeEdge& next,
                                                    const ConnectionOptions& opts) {
-  if (!isVerbToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Aux>(prev, next)) return {};
 
   // Check if next is おく/とく/どく contraction or しまう/ちゃう/じゃう contraction
   if (!isOkuAuxiliary(next.surface) && !isShimauAuxiliary(next.surface)) {
@@ -483,7 +478,7 @@ ConnectionRuleResult checkVerbToOkuChauContraction(const core::LatticeEdge& prev
 ConnectionRuleResult checkNounBeforeVerbAux(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts) {
-  if (!isNounToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Noun, POS::Aux>(prev, next)) return {};
 
   if (!isVerbSpecificAuxiliary(next.surface, next.lemma)) return {};
 
@@ -499,7 +494,7 @@ ConnectionRuleResult checkNounBeforeVerbAux(const core::LatticeEdge& prev,
 ConnectionRuleResult checkMaiAfterNoun(const core::LatticeEdge& prev,
                                        const core::LatticeEdge& next,
                                        const ConnectionOptions& opts) {
-  if (!isNounToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Noun, POS::Aux>(prev, next)) return {};
 
   if (next.surface != scorer::kLemmaMai) return {};
 
@@ -516,7 +511,7 @@ ConnectionRuleResult checkMaiAfterNoun(const core::LatticeEdge& prev,
 ConnectionRuleResult checkNounIRowToVerbAux(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts) {
-  if (!isNounToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Noun, POS::Aux>(prev, next)) return {};
 
   // Target verb conjugation markers: る (terminal), て (te-form), た (past)
   // These are verb suffixes that nouns cannot take
@@ -546,7 +541,7 @@ ConnectionRuleResult checkNounIRowToVerbAux(const core::LatticeEdge& prev,
 ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts) {
-  if (!isParticleToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Particle, POS::Aux>(prev, next)) return {};
 
   // Verb-specific auxiliaries (たい, ます, etc.) require verb 連用形
   // These are ALWAYS invalid after particles, even if from dictionary
@@ -768,7 +763,7 @@ ConnectionRuleResult checkCopulaDeToGozaru(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& /*opts*/) {
   // Only check AUX → AUX pattern
-  if (!isAuxToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Aux, POS::Aux>(prev, next)) return {};
 
   // Check で(AUX, lemma=だ)
   if (prev.surface != "で" || prev.lemma != "だ") {
@@ -786,6 +781,39 @@ ConnectionRuleResult checkCopulaDeToGozaru(const core::LatticeEdge& prev,
   // Need ~1.6+ bonus to overcome total difference of 1.5
   return {ConnectionPattern::CopulaDeToGozaru, -1.8F,
           "de(aux,da) + gozaru(aux) bonus (classical copula pattern)"};
+}
+
+// =============================================================================
+// checkCopulaDeToAru - で(AUX,だ) + ある/あり(VERB) pattern
+// =============================================================================
+// Supports formal copula pattern (である, であります, であった, etc.)
+// MeCab: で(助動詞,特殊・ダ,連用形) + ある/あり(助動詞,五段・ラ行アル)
+ConnectionRuleResult checkCopulaDeToAru(const core::LatticeEdge& prev,
+                                        const core::LatticeEdge& next,
+                                        const ConnectionOptions& /*opts*/) {
+  // Check で(AUX, lemma=だ)
+  if (prev.pos != POS::Aux) return {};
+  if (prev.surface != "で" || prev.lemma != "だ") return {};
+
+  // Check for ある/あり(VERB, lemma=ある)
+  // Note: MeCab treats this as AUX, but suzume treats it as VERB
+  if (next.pos != POS::Verb) return {};
+  if (next.lemma != "ある") return {};
+
+  // Must start with あ (covers ある, あり, あった, あって, あります, etc.)
+  if (next.surface.empty() ||
+      next.surface.substr(0, core::kJapaneseCharBytes) != "あ") {
+    return {};
+  }
+
+  // Apply strong bonus to favor copula pattern
+  // Debug shows: で(PARTICLE) → あり(VERB) gets bonus -1.8 from te/de rule
+  // で(AUX) → あり(VERB) gets 0.5 base
+  // で(PARTICLE) word cost: -0.8
+  // で(AUX) word cost: 0.2
+  // To overcome: need bonus > 1.0 (word diff) + 2.3 (conn diff) = 3.3
+  return {ConnectionPattern::CopulaDeToAru, -3.5F,
+          "de(aux,da) + aru(verb) bonus (formal copula: である)"};
 }
 
 }  // namespace connection_rules

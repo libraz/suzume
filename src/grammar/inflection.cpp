@@ -106,7 +106,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // Japanese verb stems never start with て - it's always a te-form particle
       // This prevents てあげる from being parsed as a verb (should be て + あげる)
       // Real verbs with te-sound use kanji: 照る (teru), 出る (deru)
-      if (stem.size() >= core::kJapaneseCharBytes && stem.substr(0, core::kJapaneseCharBytes) == "て") {
+      if (utf8::startsWith(stem, "て")) {
         continue;
       }
 
@@ -124,12 +124,12 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // When analyzing with te-form auxiliary, check voicing compatibility
       if (ending.suffix == "い" && ending.is_onbin && !aux_chain.empty()) {
         const std::string& first_aux = aux_chain.back();  // First matched aux
-        bool is_voiced_aux = (first_aux == "で" || first_aux == "だ" ||
-                              first_aux.rfind("で", 0) == 0 ||  // starts with で
-                              first_aux.rfind("だ", 0) == 0);   // starts with だ
-        bool is_unvoiced_aux = (first_aux == "て" || first_aux == "た" ||
-                                first_aux.rfind("て", 0) == 0 ||  // starts with て
-                                first_aux.rfind("た", 0) == 0);   // starts with た
+        bool is_voiced_aux = (utf8::equalsAny(first_aux, {"で", "だ"}) ||
+                              utf8::startsWith(first_aux, "で") ||
+                              utf8::startsWith(first_aux, "だ"));
+        bool is_unvoiced_aux = (utf8::equalsAny(first_aux, {"て", "た"}) ||
+                                utf8::startsWith(first_aux, "て") ||
+                                utf8::startsWith(first_aux, "た"));
         if (is_unvoiced_aux && ending.verb_type == VerbType::GodanGa) {
           continue;  // GodanGa requires voiced aux (で/だ), skip unvoiced
         }
@@ -145,7 +145,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // This prevents くなかった from being parsed as Ichidan く + なかった = くる
       // Note: 来 (kanji) is handled separately - 来なかった should become 来る (Kuru)
       if (ending.verb_type == VerbType::Ichidan && stem.size() == core::kJapaneseCharBytes) {
-        if (stem == "く" || stem == "す" || stem == "こ") {
+        if (utf8::equalsAny(stem, {"く", "す", "こ"})) {
           continue;  // Skip - these are irregular verbs (hiragana), not Ichidan
         }
       }
@@ -154,12 +154,8 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // Ichidan verbs do NOT have onbin (音便) forms, so stems never end with っ
       // Stems ending with っ are always from Godan verbs (知る→知っ, 買う→買っ, 持つ→持っ)
       // This prevents 買っ from being parsed as Ichidan 買っる
-      if (ending.verb_type == VerbType::Ichidan &&
-          stem.size() >= core::kJapaneseCharBytes) {
-        std::string_view last_char = std::string_view(stem).substr(stem.size() - core::kJapaneseCharBytes);
-        if (last_char == "っ") {
-          continue;  // Skip - Ichidan stems never end with っ
-        }
+      if (ending.verb_type == VerbType::Ichidan && utf8::endsWith(stem, "っ")) {
+        continue;  // Skip - Ichidan stems never end with っ
       }
 
       // Special handling for kanji 来: should be Kuru, not Ichidan
@@ -179,20 +175,18 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         // Check if stem ends with common particles/hiragana that shouldn't be in suru stems
         bool invalid_stem = false;
         if (stem.size() >= core::kJapaneseCharBytes) {
-          std::string_view last_char = std::string_view(stem).substr(stem.size() - core::kJapaneseCharBytes);
+          std::string_view last_char = utf8::lastChar(stem);
           // These hiragana at the end of stem indicate a particle or non-suru pattern
-          if (last_char == "で" || last_char == "に" || last_char == "を" ||
-              last_char == "が" || last_char == "は" || last_char == "も" ||
-              last_char == "と" || last_char == "へ" || last_char == "か" ||
-              last_char == "や" || last_char == "の") {
+          if (utf8::equalsAny(last_char, {
+              "で", "に", "を", "が", "は", "も", "と", "へ", "か", "や", "の"
+          })) {
             invalid_stem = true;
           }
           // Reject suru stems containing て/で (te-form markers) anywhere in longer stems
           // E.g., "基づいて処理" should be 基づいて(verb) + 処理する, not a single suru verb
           // This check applies to stems >= 9 bytes (3+ characters) to avoid false positives
           if (stem.size() >= core::kThreeJapaneseCharBytes &&
-              (stem.find("て") != std::string::npos ||
-               stem.find("で") != std::string::npos)) {
+              utf8::containsAny(stem, {"て", "で"})) {
             invalid_stem = true;
           }
           // For empty suffix suru patterns (e.g., 開催+された), the stem must
@@ -203,18 +197,15 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
             // Check if last character is hiragana (verb conjugation suffix)
             // A-row: あ か が さ た な は ば ま ら わ
             // These are common mizenkei endings for godan verbs
-            if (last_char == "あ" || last_char == "か" || last_char == "が" ||
-                last_char == "さ" || last_char == "た" || last_char == "な" ||
-                last_char == "ば" || last_char == "ま" || last_char == "ら" ||
-                last_char == "わ") {
+            if (utf8::equalsAny(last_char,
+                {"あ", "か", "が", "さ", "た", "な", "ば", "ま", "ら", "わ"})) {
               invalid_stem = true;
             }
             // E-row: け げ せ て ね べ め れ え
             // These are common potential stems or Ichidan stem endings
             // This prevents 話せ + なくなった → 話せする (wrong)
-            if (last_char == "け" || last_char == "げ" || last_char == "せ" ||
-                last_char == "て" || last_char == "ね" || last_char == "べ" ||
-                last_char == "め" || last_char == "れ" || last_char == "え") {
+            if (utf8::equalsAny(last_char,
+                {"け", "げ", "せ", "て", "ね", "べ", "め", "れ", "え"})) {
               invalid_stem = true;
             }
             // Single-kanji stems are NOT valid for empty suffix suru patterns
@@ -260,7 +251,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       if (actual_verb_type == VerbType::Ichidan &&
           suffix_str.size() >= core::kJapaneseCharBytes) {
         std::string_view first_char = suffix_str.substr(0, core::kJapaneseCharBytes);
-        if (first_char == "で" || first_char == "だ") {
+        if (utf8::equalsAny(first_char, {"で", "だ"})) {
           candidate.confidence -= 0.6F;  // Strong penalty
           SUZUME_DEBUG_LOG("  ichidan_voiced_te_ta_invalid: -0.6\n");
         }
@@ -287,7 +278,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         // Check last character of stem (use std::string_view on stem directly)
         std::string_view stem_view(stem);
         std::string_view stem_end = stem_view.substr(stem_view.size() - core::kJapaneseCharBytes);
-        if (stem_end == "て" || stem_end == "で") {
+        if (utf8::equalsAny(stem_end, {"て", "で"})) {
           // Check if this is analyzing as 〜てる/〜でる form
           // These stems (見て, 食べて) are te-forms, not contracted progressive stems
           candidate.confidence -= inflection::kPenaltyIchidanContractedProgressivePast;

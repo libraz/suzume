@@ -299,7 +299,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               // This occurs with ichidan verb stem + passive auxiliary
               bool is_passive_pattern =
                   (best.verb_type == grammar::VerbType::GodanRa &&
-                   surface.find("られ") != std::string::npos);
+                   utf8::contains(surface, "られ"));
               if (!is_passive_pattern) {
                 continue;  // Skip - e-row stem is typically ichidan, not godan
               }
@@ -346,11 +346,6 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             continue;  // Skip - let the split (noun + suru-aux) win
           }
 
-          UnknownCandidate candidate;
-          candidate.surface = surface;
-          candidate.start = start_pos;
-          candidate.end = end_pos;
-          candidate.pos = core::PartOfSpeech::Verb;
           // Lower cost for higher confidence matches
           float base_cost = verb_opts.base_cost_standard + (1.0F - best.confidence) * verb_opts.confidence_cost_scale;
           // MeCab compatibility: Suru verbs should split as noun + する
@@ -386,10 +381,9 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Penalty for verb candidates containing みたい suffix
           // みたい is a na-adjective (like ~, seems ~), not a verb suffix
           // E.g., 猫みたい should be 猫 + みたい, not VERB 猫む
-          if (surface.find("みたい") != std::string::npos) {
+          if (utf8::contains(surface, "みたい")) {
             base_cost += verb_opts.penalty_single_char;
           }
-          candidate.cost = base_cost;
           // Set has_suffix to skip exceeds_dict_length penalty in tokenizer.cpp
           // This applies when:
           // 1. Base form exists in dictionary as verb (in_dict)
@@ -416,23 +410,21 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           }
           bool recognized_ichidan = is_ichidan && has_valid_ichidan_stem &&
                                     best.confidence > verb_opts.confidence_ichidan_dict;
-          candidate.has_suffix = in_dict || recognized_ichidan;
+          bool has_suffix = in_dict || recognized_ichidan;
           SUZUME_DEBUG_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                 << " base=" << best.base_form
                                 << " cost=" << base_cost
                                 << " in_dict=" << in_dict
-                                << " has_suffix=" << candidate.has_suffix << "\n";
+                                << " has_suffix=" << has_suffix << "\n";
           }
           // Don't set lemma here - let lemmatizer derive it with dictionary verification
           // The lemmatizer will use stem-matching logic to pick the correct base form
-          candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
-#ifdef SUZUME_DEBUG_INFO
-          candidate.origin = CandidateOrigin::VerbKanji;
-          candidate.confidence = best.confidence;
-          candidate.pattern = grammar::verbTypeToString(best.verb_type);
-#endif
-          candidates.push_back(candidate);
+          candidates.push_back(makeVerbCandidate(
+              surface, start_pos, end_pos, base_cost, "",
+              grammar::verbTypeToConjType(best.verb_type),
+              has_suffix, CandidateOrigin::VerbKanji, best.confidence,
+              grammar::verbTypeToString(best.verb_type).data()));
           // Don't break - try other stem lengths too
         }
     }
@@ -499,29 +491,18 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         bool is_i_row = grammar::isIRowCodepoint(first_hira);
         float conf_threshold = is_i_row ? verb_opts.confidence_ichidan_dict : verb_opts.confidence_ichidan_dict;
         if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold) {
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = renyokei_end;
-        candidate.pos = core::PartOfSpeech::Verb;
-        // Negative cost to strongly favor split over combined analysis
-        // Combined forms get optimal_length bonus (-0.5), so we need to be lower
-        float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_cand.confidence) * verb_opts.confidence_cost_scale_small;
-        candidate.cost = base_cost;
-        // Set has_suffix=true to skip exceeds_dict_length penalty for MeCab compatibility
-        // Ichidan renyokei stems are valid morphological units (論じ, 信じ, etc.)
-        candidate.has_suffix = true;
-        candidate.conj_type = grammar::verbTypeToConjType(ichidan_cand.verb_type);
-        // Set lemma to the base form (e.g., 入れ → 入れる, 論じ → 論じる)
-        // This is critical for correct lemmatization when the surface is ambiguous
-        // (e.g., 入れ could be godan 入る imperative or ichidan 入れる renyoukei)
-        candidate.lemma = ichidan_cand.base_form;
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::VerbKanji;
-        candidate.confidence = ichidan_cand.confidence;
-        candidate.pattern = "ichidan_renyokei";
-#endif
-        candidates.push_back(candidate);
+          // Negative cost to strongly favor split over combined analysis
+          // Combined forms get optimal_length bonus (-0.5), so we need to be lower
+          float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_cand.confidence) * verb_opts.confidence_cost_scale_small;
+          // Set has_suffix=true to skip exceeds_dict_length penalty for MeCab compatibility
+          // Ichidan renyokei stems are valid morphological units (論じ, 信じ, etc.)
+          // Set lemma to the base form (e.g., 入れ → 入れる, 論じ → 論じる)
+          // This is critical for correct lemmatization when the surface is ambiguous
+          // (e.g., 入れ could be godan 入る imperative or ichidan 入れる renyoukei)
+          candidates.push_back(makeVerbCandidate(
+              surface, start_pos, renyokei_end, base_cost, ichidan_cand.base_form,
+              grammar::verbTypeToConjType(ichidan_cand.verb_type),
+              true, CandidateOrigin::VerbKanji, ichidan_cand.confidence, "ichidan_renyokei"));
         }
       }
     }
@@ -593,21 +574,10 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
         // Skip renyokei candidate for べき patterns
         if (!is_beki_pattern) {
-          UnknownCandidate candidate;
-          candidate.surface = surface;
-          candidate.start = start_pos;
-          candidate.end = renyokei_end;
-          candidate.pos = core::PartOfSpeech::Verb;
-          candidate.cost = base_cost;
-          candidate.has_suffix = false;
-          candidate.lemma = base_lemma;  // 言われ → lemma is 言う
-          candidate.conj_type = dictionary::ConjugationType::Ichidan;
-#ifdef SUZUME_DEBUG_INFO
-          candidate.origin = CandidateOrigin::VerbKanji;
-          candidate.confidence = ichidan_confidence;
-          candidate.pattern = "godan_passive_renyokei";
-#endif
-          candidates.push_back(candidate);
+          candidates.push_back(makeVerbCandidate(
+              surface, start_pos, renyokei_end, base_cost, base_lemma,
+              dictionary::ConjugationType::Ichidan,
+              false, CandidateOrigin::VerbKanji, ichidan_confidence, "godan_passive_renyokei"));
         }
 
         // Also generate conjugated forms of the passive verb:
@@ -625,24 +595,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           if (conj_end <= hiragana_end) {
             std::string conj_surface = extractSubstring(codepoints, start_pos, conj_end);
             // Verify the suffix matches
-            if (conj_surface.size() >= suffix.size() &&
-                conj_surface.substr(conj_surface.size() - suffix.size()) == suffix) {
-              UnknownCandidate conj_candidate;
-              conj_candidate.surface = conj_surface;
-              conj_candidate.start = start_pos;
-              conj_candidate.end = conj_end;
-              conj_candidate.pos = core::PartOfSpeech::Verb;
+            if (utf8::endsWith(conj_surface, suffix)) {
               // Lower cost than renyokei to prefer complete forms
-              conj_candidate.cost = base_cost - 0.1F;
-              conj_candidate.has_suffix = true;
-              conj_candidate.lemma = base_lemma;  // 言われた → lemma is 言う
-              conj_candidate.conj_type = dictionary::ConjugationType::Ichidan;
-#ifdef SUZUME_DEBUG_INFO
-              conj_candidate.origin = CandidateOrigin::VerbKanji;
-              conj_candidate.confidence = ichidan_confidence;
-              conj_candidate.pattern = pattern_name;
-#endif
-              candidates.push_back(conj_candidate);
+              candidates.push_back(makeVerbCandidate(
+                  conj_surface, start_pos, conj_end, base_cost - 0.1F, base_lemma,
+                  dictionary::ConjugationType::Ichidan,
+                  true, CandidateOrigin::VerbKanji, ichidan_confidence, pattern_name.c_str()));
             }
           }
         }
@@ -714,30 +672,17 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       }
 
       if (is_valid_verb) {
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = stem_end;
-        candidate.pos = core::PartOfSpeech::Verb;
         // Negative cost to beat single-verb inflection path (which gets optimal_length -0.5 bonus)
-        // For complex aux chains like られ+なくて, need more aggressive bonus
-        // Split path: stem(-0.5) + pos(0.2) + aux_chain ≈ -0.5
-        // Single path: base(~0.1) + pos(0.2) + optimal_length(-0.5) ≈ -0.2
-        candidate.cost = -0.5F;
-        candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
-        candidate.lemma = base_form;
-        candidate.conj_type = grammar::verbTypeToConjType(grammar::VerbType::Ichidan);
+        constexpr float kCost = -0.5F;
         SUZUME_DEBUG_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " ichidan_stem_rare lemma=" << base_form
-                              << " cost=" << candidate.cost << "\n";
+                              << " cost=" << kCost << "\n";
         }
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::VerbKanji;
-        candidate.confidence = 0.9F;
-        candidate.pattern = "ichidan_stem_rare";
-#endif
-        candidates.push_back(candidate);
+        candidates.push_back(makeVerbCandidate(
+            surface, start_pos, stem_end, kCost, base_form,
+            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
+            true, CandidateOrigin::VerbKanji, 0.9F, "ichidan_stem_rare"));
       }
     }
   }
@@ -759,28 +704,16 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_polite_aux || is_negative_aux) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
-
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = kanji_end;
-        candidate.pos = core::PartOfSpeech::Verb;
-        // Strong bonus to beat NOUN candidate from unknown word generator
-        candidate.cost = -0.5F;
-        candidate.has_suffix = true;
-        candidate.lemma = base_form;
-        candidate.conj_type = grammar::verbTypeToConjType(grammar::VerbType::Ichidan);
+        constexpr float kCost = -0.5F;  // Strong bonus to beat NOUN candidate
         SUZUME_DEBUG_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_polite lemma=" << base_form
-                              << " cost=" << candidate.cost << "\n";
+                              << " cost=" << kCost << "\n";
         }
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::VerbKanji;
-        candidate.confidence = 0.9F;
-        candidate.pattern = "single_kanji_ichidan_polite";
-#endif
-        candidates.push_back(candidate);
+        candidates.push_back(makeVerbCandidate(
+            surface, start_pos, kanji_end, kCost, base_form,
+            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
+            true, CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_polite"));
       }
 
       // Also handle た and て patterns for single-kanji Ichidan verbs
@@ -791,28 +724,16 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_ta_aux || is_te_particle) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
-
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = kanji_end;
-        candidate.pos = core::PartOfSpeech::Verb;
-        // Strong bonus to beat unified dictionary entry (寝た gets -0.5)
-        candidate.cost = -0.8F;
-        candidate.has_suffix = true;
-        candidate.lemma = base_form;
-        candidate.conj_type = grammar::verbTypeToConjType(grammar::VerbType::Ichidan);
+        constexpr float kCost = -0.8F;  // Strong bonus to beat unified dictionary entry
         SUZUME_DEBUG_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_ta_te lemma=" << base_form
-                              << " cost=" << candidate.cost << "\n";
+                              << " cost=" << kCost << "\n";
         }
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::VerbKanji;
-        candidate.confidence = 0.9F;
-        candidate.pattern = "single_kanji_ichidan_ta_te";
-#endif
-        candidates.push_back(candidate);
+        candidates.push_back(makeVerbCandidate(
+            surface, start_pos, kanji_end, kCost, base_form,
+            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
+            true, CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_ta_te"));
       }
 
       // Handle colloquial contraction patterns for single-kanji Ichidan verbs
@@ -825,28 +746,16 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_toku_aux || is_chau_aux) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
-
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = kanji_end;
-        candidate.pos = core::PartOfSpeech::Verb;
-        // Strong bonus to beat unified contraction entry (見とく gets -0.146)
-        candidate.cost = -0.8F;
-        candidate.has_suffix = true;
-        candidate.lemma = base_form;
-        candidate.conj_type = grammar::verbTypeToConjType(grammar::VerbType::Ichidan);
+        constexpr float kCost = -0.8F;  // Strong bonus to beat unified contraction entry
         SUZUME_DEBUG_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_colloquial lemma=" << base_form
-                              << " cost=" << candidate.cost << "\n";
+                              << " cost=" << kCost << "\n";
         }
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::VerbKanji;
-        candidate.confidence = 0.9F;
-        candidate.pattern = "single_kanji_ichidan_colloquial";
-#endif
-        candidates.push_back(candidate);
+        candidates.push_back(makeVerbCandidate(
+            surface, start_pos, kanji_end, kCost, base_form,
+            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
+            true, CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_colloquial"));
       }
 
       // Handle られる pattern for single-kanji Ichidan verbs
@@ -857,28 +766,16 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_rareru_aux) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
-
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = kanji_end;
-        candidate.pos = core::PartOfSpeech::Verb;
-        // Strong bonus to beat godan mizenkei interpretation (見ら + れる)
-        candidate.cost = -0.8F;
-        candidate.has_suffix = true;
-        candidate.lemma = base_form;
-        candidate.conj_type = grammar::verbTypeToConjType(grammar::VerbType::Ichidan);
+        constexpr float kCost = -0.8F;  // Strong bonus to beat godan mizenkei interpretation
         SUZUME_DEBUG_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_rareru lemma=" << base_form
-                              << " cost=" << candidate.cost << "\n";
+                              << " cost=" << kCost << "\n";
         }
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::VerbKanji;
-        candidate.confidence = 0.9F;
-        candidate.pattern = "single_kanji_ichidan_rareru";
-#endif
-        candidates.push_back(candidate);
+        candidates.push_back(makeVerbCandidate(
+            surface, start_pos, kanji_end, kCost, base_form,
+            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
+            true, CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_rareru"));
       }
     }
   }
@@ -973,11 +870,6 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
               if (is_valid_verb) {
                 std::string surface = extractSubstring(codepoints, start_pos, mizenkei_end);
-                UnknownCandidate candidate;
-                candidate.surface = surface;
-                candidate.start = start_pos;
-                candidate.end = mizenkei_end;
-                candidate.pos = core::PartOfSpeech::Verb;
                 // Cost varies by pattern:
                 // - ぬ pattern: negative cost (-0.5F) to beat combined verb form
                 //   揃わぬ(VERB) gets ~-0.1 total, so split needs lower cost
@@ -990,27 +882,22 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                 } else if (is_passive_pattern) {
                   cost = -0.5F;
                 }
-                candidate.cost = cost;
-                candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
-                candidate.lemma = base_form;  // Set lemma to base form
-                candidate.conj_type = grammar::verbTypeToConjType(verb_type);
-                const char* pattern_name = is_nu_pattern ? "nu" :
-                                           is_passive_pattern ? "passive" : "beki";
+                const char* debug_pattern = is_nu_pattern ? "nu" :
+                                            is_passive_pattern ? "passive" : "beki";
                 SUZUME_DEBUG_BLOCK {
                   SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                       << " godan_mizenkei lemma=" << base_form
-                                      << " cost=" << candidate.cost
-                                      << " pattern=" << pattern_name
+                                      << " cost=" << cost
+                                      << " pattern=" << debug_pattern
                                       << "\n";
                 }
-#ifdef SUZUME_DEBUG_INFO
-                candidate.origin = CandidateOrigin::VerbKanji;
-                candidate.confidence = 0.9F;  // High confidence for verified mizenkei
-                candidate.pattern = is_nu_pattern ? "godan_mizenkei_nu" :
-                                    is_passive_pattern ? "godan_mizenkei_passive" :
-                                    "godan_mizenkei";
-#endif
-                candidates.push_back(candidate);
+                const char* info_pattern = is_nu_pattern ? "godan_mizenkei_nu" :
+                                           is_passive_pattern ? "godan_mizenkei_passive" :
+                                           "godan_mizenkei";
+                candidates.push_back(makeVerbCandidate(
+                    surface, start_pos, mizenkei_end, cost, base_form,
+                    grammar::verbTypeToConjType(verb_type),
+                    true, CandidateOrigin::VerbKanji, 0.9F, info_pattern));
               }
             }
             }  // else (not Suru verb pattern)
@@ -1097,26 +984,17 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         } else {
           // Found valid verb - generate onbin stem candidate
           std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
-          UnknownCandidate candidate;
-          candidate.surface = onbin_surface;
-          candidate.start = start_pos;
-          candidate.end = kanji_end + 1;
-          candidate.pos = core::PartOfSpeech::Verb;
-          candidate.cost = -0.5F;  // Negative cost to beat unsplit forms
-          candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
-          candidate.lemma = matched_base_form;
-          candidate.conj_type = grammar::verbTypeToConjType(matched_verb_type);
+          constexpr float kOnbinCost = -0.5F;  // Negative cost to beat unsplit forms
           SUZUME_DEBUG_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                                 << " kanji_onbin_contraction lemma=" << matched_base_form
-                                << " cost=" << candidate.cost << "\n";
+                                << " cost=" << kOnbinCost << "\n";
           }
-#ifdef SUZUME_DEBUG_INFO
-          candidate.origin = CandidateOrigin::VerbKanji;
-          candidate.confidence = 0.9F;
-          candidate.pattern = is_hatsuonbin ? "kanji_hatsuonbin" : "kanji_ikuon";
-#endif
-          candidates.push_back(candidate);
+          const char* pattern = is_hatsuonbin ? "kanji_hatsuonbin" : "kanji_ikuon";
+          candidates.push_back(makeVerbCandidate(
+              onbin_surface, start_pos, kanji_end + 1, kOnbinCost, matched_base_form,
+              grammar::verbTypeToConjType(matched_verb_type),
+              true, CandidateOrigin::VerbKanji, 0.9F, pattern));
         }
       }
     }

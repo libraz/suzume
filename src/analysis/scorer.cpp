@@ -420,13 +420,9 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // This pattern indicates verb+たい+らしい compound that should be tokenized
   if (edge.pos == core::PartOfSpeech::Verb &&
       !edge.fromDictionary() &&
-      edge.surface.size() >= core::kFiveJapaneseCharBytes) {
-    std::string_view surface = edge.surface;
-    std::string_view last15 = surface.substr(surface.size() - core::kFiveJapaneseCharBytes);
-    if (last15 == scorer::kSuffixTaiRashii) {
-      cost += edgeOpts().penalty_verb_tai_rashii;
-      logAdjustment(edgeOpts().penalty_verb_tai_rashii, "verb_tai_rashii_split");
-    }
+      utf8::endsWith(edge.surface, scorer::kSuffixTaiRashii)) {
+    cost += edgeOpts().penalty_verb_tai_rashii;
+    logAdjustment(edgeOpts().penalty_verb_tai_rashii, "verb_tai_rashii_split");
   }
 
   // Bonus for unified verb forms containing te-form + auxiliary verb patterns
@@ -453,20 +449,16 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Verb+ない patterns: 走らない, 書かない, 読まない (stem ends in あ段 = verb mizenkei)
   if (edge.pos == core::PartOfSpeech::Adjective &&
       !edge.fromDictionary() &&
+      utf8::endsWith(edge.lemma, scorer::kSuffixNai) &&
       edge.lemma.size() >= core::kThreeJapaneseCharBytes) {  // ない + at least 1 char before
-    std::string_view lemma = edge.lemma;
-    // Check if lemma ends with ない
-    if (lemma.size() >= core::kThreeJapaneseCharBytes &&
-        lemma.substr(lemma.size() - core::kTwoJapaneseCharBytes) == scorer::kSuffixNai) {
-      // Get the stem before ない
-      std::string_view stem = lemma.substr(0, lemma.size() - core::kTwoJapaneseCharBytes);
-      // Check if stem ends with verb mizenkei marker (あ段) or ichidan renyokei marker (え段)
-      // あ段: Godan verb mizenkei (走らない, 書かない)
-      // え段: Ichidan verb mizenkei (食べない, 見ない - rare, but still verb pattern)
-      if (grammar::endsWithARow(stem) || grammar::endsWithERow(stem)) {
-        cost += edgeOpts().penalty_verb_nai_pattern;
-        logAdjustment(edgeOpts().penalty_verb_nai_pattern, "verb_nai_pattern");
-      }
+    // Get the stem before ない
+    std::string_view stem = utf8::dropLast2Chars(edge.lemma);
+    // Check if stem ends with verb mizenkei marker (あ段) or ichidan renyokei marker (え段)
+    // あ段: Godan verb mizenkei (走らない, 書かない)
+    // え段: Ichidan verb mizenkei (食べない, 見ない - rare, but still verb pattern)
+    if (grammar::endsWithARow(stem) || grammar::endsWithERow(stem)) {
+      cost += edgeOpts().penalty_verb_nai_pattern;
+      logAdjustment(edgeOpts().penalty_verb_nai_pattern, "verb_nai_pattern");
     }
   }
 
@@ -474,31 +466,22 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // E.g., 田中さん should be NOUN + SUFFIX, not VERB (田中する contracted negative)
   // This targets Suru verbs (田中する→田中さん) and GodanSa verbs with nominal stems
   if (edge.pos == core::PartOfSpeech::Verb &&
-      edge.surface.size() >= core::kTwoJapaneseCharBytes) {
-    std::string_view surface = edge.surface;
+      utf8::endsWith(edge.surface, scorer::kSuffixSan)) {
+    // Get the stem before さん
+    std::string_view stem = utf8::dropLast2Chars(edge.surface);
     std::string_view lemma = edge.lemma;
-    // Check if surface ends with さん (6 bytes = 2 Japanese chars)
-    if (surface.size() >= core::kTwoJapaneseCharBytes &&
-        surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == scorer::kSuffixSan) {
-      // Get the stem before さん
-      std::string_view stem = surface.substr(0, surface.size() - core::kTwoJapaneseCharBytes);
-      // Penalize if:
-      // 1. Lemma ends with する (Suru verb like 田中する) - almost always noun + honorific
-      // 2. Stem ends with kanji (nominal stem)
-      // 3. Lemma ends with す (GodanSa) AND stem is pure hiragana (おねえさん→おねえす)
-      //    Pure hiragana GodanSa verbs ending in さん are rare; usually noun + さん
-      bool is_suru_verb = (lemma.size() >= core::kTwoJapaneseCharBytes &&
-                           lemma.substr(lemma.size() - core::kTwoJapaneseCharBytes) ==
-                               scorer::kLemmaSuru);
-      bool stem_ends_kanji = (!stem.empty() && grammar::endsWithKanji(stem));
-      bool is_godan_sa_hiragana =
-          (lemma.size() >= core::kJapaneseCharBytes &&
-           lemma.substr(lemma.size() - core::kJapaneseCharBytes) == "す" &&
-           !stem.empty() && grammar::isPureHiragana(stem));
-      if (is_suru_verb || stem_ends_kanji || is_godan_sa_hiragana) {
-        cost += edgeOpts().penalty_verb_san_honorific;
-        logAdjustment(edgeOpts().penalty_verb_san_honorific, "verb_san_honorific");
-      }
+    // Penalize if:
+    // 1. Lemma ends with する (Suru verb like 田中する) - almost always noun + honorific
+    // 2. Stem ends with kanji (nominal stem)
+    // 3. Lemma ends with す (GodanSa) AND stem is pure hiragana (おねえさん→おねえす)
+    //    Pure hiragana GodanSa verbs ending in さん are rare; usually noun + さん
+    bool is_suru_verb = utf8::endsWith(lemma, scorer::kLemmaSuru);
+    bool stem_ends_kanji = (!stem.empty() && grammar::endsWithKanji(stem));
+    bool is_godan_sa_hiragana =
+        utf8::endsWith(lemma, "す") && !stem.empty() && grammar::isPureHiragana(stem);
+    if (is_suru_verb || stem_ends_kanji || is_godan_sa_hiragana) {
+      cost += edgeOpts().penalty_verb_san_honorific;
+      logAdjustment(edgeOpts().penalty_verb_san_honorific, "verb_san_honorific");
     }
   }
 
@@ -506,19 +489,15 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // E.g., いん (from いる) is rare and often misanalysis in patterns like ないんだ
   // Valid forms like わからん (4 chars) or くだらん (4 chars) are not penalized
   if (edge.pos == core::PartOfSpeech::Verb &&
-      edge.surface.size() == core::kTwoJapaneseCharBytes) {  // Exactly 2 Japanese chars
-    std::string_view surface = edge.surface;
-    // Check if surface ends with ん
-    if (surface.size() >= core::kJapaneseCharBytes &&
-        surface.substr(surface.size() - core::kJapaneseCharBytes) == scorer::kSuffixN) {
-      // 2-char verb ending with ん: stem is only 1 char (e.g., いん from いる)
-      // Also verify it's hiragana (not kanji verbs like 見ん which are rare but exist)
-      std::string_view stem = surface.substr(0, surface.size() - core::kJapaneseCharBytes);
-      if (grammar::isPureHiragana(stem)) {
-        cost += edgeOpts().penalty_verb_contracted_neg_short_stem;
-        logAdjustment(edgeOpts().penalty_verb_contracted_neg_short_stem,
-                      "verb_contracted_neg_short_stem");
-      }
+      edge.surface.size() == core::kTwoJapaneseCharBytes &&  // Exactly 2 Japanese chars
+      utf8::endsWith(edge.surface, scorer::kSuffixN)) {
+    // 2-char verb ending with ん: stem is only 1 char (e.g., いん from いる)
+    // Also verify it's hiragana (not kanji verbs like 見ん which are rare but exist)
+    std::string_view stem = utf8::dropLastChar(edge.surface);
+    if (grammar::isPureHiragana(stem)) {
+      cost += edgeOpts().penalty_verb_contracted_neg_short_stem;
+      logAdjustment(edgeOpts().penalty_verb_contracted_neg_short_stem,
+                    "verb_contracted_neg_short_stem");
     }
   }
 

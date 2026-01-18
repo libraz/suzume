@@ -569,9 +569,9 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     std::string_view lemma = morpheme.lemma;
     if (surface.size() >= core::kThreeJapaneseCharBytes &&
         lemma.size() >= core::kJapaneseCharBytes) {
-      std::string_view surface_ending = surface.substr(surface.size() - core::kThreeJapaneseCharBytes);
-      bool has_sugiru_aux = (surface_ending == "すぎる" || surface_ending == "すぎた" || surface_ending == "すぎて");
-      std::string_view lemma_ending = lemma.substr(lemma.size() - core::kJapaneseCharBytes);
+      std::string_view surface_ending = utf8::last3Chars(surface);
+      bool has_sugiru_aux = utf8::equalsAny(surface_ending, {"すぎる", "すぎた", "すぎて"});
+      std::string_view lemma_ending = utf8::lastChar(lemma);
       // Check if lemma ends with just る but surface ends with すぎる
       // E.g., surface=ワンパターンすぎる, lemma=ワンパターンる (incorrect)
       if (has_sugiru_aux && lemma_ending == "る" && lemma.size() < surface.size()) {
@@ -772,15 +772,8 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
       if (morpheme.pos == core::PartOfSpeech::Verb) {
         // Check if surface looks like a dictionary form verb
         // Dictionary form verbs end with: る, う, く, ぐ, す, つ, ぬ, ぶ, む
-        bool is_dict_form = endsWith(morpheme.surface, "る") ||
-                            endsWith(morpheme.surface, "う") ||
-                            endsWith(morpheme.surface, "く") ||
-                            endsWith(morpheme.surface, "ぐ") ||
-                            endsWith(morpheme.surface, "す") ||
-                            endsWith(morpheme.surface, "つ") ||
-                            endsWith(morpheme.surface, "ぬ") ||
-                            endsWith(morpheme.surface, "ぶ") ||
-                            endsWith(morpheme.surface, "む");
+        bool is_dict_form = utf8::endsWithAny(morpheme.surface,
+            {"る", "う", "く", "ぐ", "す", "つ", "ぬ", "ぶ", "む"});
         // If it's a dictionary form, lemma == surface is correct
         // If it's a conjugated form (て, た, ない, etc.), recalculate
         if (!is_dict_form) {
@@ -788,53 +781,33 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
         }
         // But passive verbs ending in 〜れる need lemmatization even though they end with る
         // E.g., いわれる → いう, かかれる → かく
-        if (is_dict_form && (endsWith(morpheme.surface, "われる") ||
-                             endsWith(morpheme.surface, "かれる") ||
-                             endsWith(morpheme.surface, "がれる") ||
-                             endsWith(morpheme.surface, "される") ||  // す verb passive
-                             endsWith(morpheme.surface, "たれる") ||
-                             endsWith(morpheme.surface, "なれる") ||
-                             endsWith(morpheme.surface, "まれる") ||
-                             endsWith(morpheme.surface, "ばれる") ||
-                             endsWith(morpheme.surface, "られる"))) {
+        if (is_dict_form && utf8::endsWithAny(morpheme.surface,
+            {"われる", "かれる", "がれる", "される", "たれる",
+             "なれる", "まれる", "ばれる", "られる"})) {
           needs_lemmatization = true;
         }
         // Causative forms need lemmatization
         // E.g., 勉強させる → 勉強する, 書かせる → 書く
-        if (is_dict_form && (endsWith(morpheme.surface, "させる") ||
-                             endsWith(morpheme.surface, "わせる") ||
-                             endsWith(morpheme.surface, "かせる") ||
-                             endsWith(morpheme.surface, "がせる") ||
-                             endsWith(morpheme.surface, "たせる") ||
-                             endsWith(morpheme.surface, "なせる") ||
-                             endsWith(morpheme.surface, "ばせる") ||
-                             endsWith(morpheme.surface, "ませる") ||
-                             endsWith(morpheme.surface, "らせる"))) {
+        if (is_dict_form && utf8::endsWithAny(morpheme.surface,
+            {"させる", "わせる", "かせる", "がせる", "たせる",
+             "なせる", "ばせる", "ませる", "らせる"})) {
           needs_lemmatization = true;
         }
         // Suru-verb te-form + subsidiary verb patterns need lemmatization
         // E.g., 説明してもらう → 説明する, 勉強してくる → 勉強する
-        if (is_dict_form && (endsWith(morpheme.surface, "してもらう") ||
-                             endsWith(morpheme.surface, "してあげる") ||
-                             endsWith(morpheme.surface, "してみる") ||
-                             endsWith(morpheme.surface, "してくれる") ||
-                             endsWith(morpheme.surface, "していく") ||
-                             endsWith(morpheme.surface, "してくる") ||
-                             endsWith(morpheme.surface, "しておく") ||
-                             endsWith(morpheme.surface, "してしまう"))) {
+        if (is_dict_form && utf8::endsWithAny(morpheme.surface,
+            {"してもらう", "してあげる", "してみる", "してくれる",
+             "していく", "してくる", "しておく", "してしまう"})) {
           needs_lemmatization = true;
         }
         // Colloquial とく/どく contractions need lemmatization
         // E.g., 見とく → 見る, 読んどく → 読む, 書いとく → 書く
-        if (is_dict_form && (endsWith(morpheme.surface, "とく") ||
-                             endsWith(morpheme.surface, "んどく"))) {
+        if (is_dict_form && utf8::endsWithAny(morpheme.surface, {"とく", "んどく"})) {
           needs_lemmatization = true;
         }
         // Colloquial てる/でる contractions need lemmatization
         // E.g., 見てる → 見る, 読んでる → 読む, 買ってる → 買う
-        if (is_dict_form && (endsWith(morpheme.surface, "てる") ||
-                             endsWith(morpheme.surface, "でる") ||
-                             endsWith(morpheme.surface, "ってる"))) {
+        if (is_dict_form && utf8::endsWithAny(morpheme.surface, {"てる", "でる", "ってる"})) {
           needs_lemmatization = true;
         }
         // Volitional form needs lemmatization
@@ -888,10 +861,11 @@ grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface,
       std::string_view lemma_stem(lemma.data(), lemma.size() - 3);  // Remove る (3 bytes)
       if (surface == lemma_stem && !next_lemma.empty()) {
         // This is an ichidan verb stem - check what follows
-        if (next_lemma == "ない" || next_lemma == "ぬ" || next_lemma == "ず" ||
-            next_lemma == "よう" || next_lemma == "まい" ||
-            next_lemma == "れる" || next_lemma == "られる" ||  // passive
-            next_lemma == "せる" || next_lemma == "させる") {  // causative
+        if (utf8::equalsAny(next_lemma, {
+            "ない", "ぬ", "ず", "よう", "まい",  // negative/volitional
+            "れる", "られる",  // passive
+            "せる", "させる"   // causative
+        })) {
           return grammar::ConjForm::Mizenkei;
         }
         // て/た/ます → Renyokei (will be caught by default below)
@@ -900,26 +874,21 @@ grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface,
   }
 
   // Check for negative forms (mizenkei)
-  if (endsWith(surface, "ない") || endsWith(surface, "なかった") ||
-      endsWith(surface, "ぬ") || endsWith(surface, "ず") ||
-      endsWith(surface, "ません") || endsWith(surface, "なく") ||
-      endsWith(surface, "なくて") || endsWith(surface, "なければ") ||
-      endsWith(surface, "なきゃ") || endsWith(surface, "なくても")) {
+  if (utf8::endsWithAny(surface,
+      {"ない", "なかった", "ぬ", "ず", "ません", "なく",
+       "なくて", "なければ", "なきゃ", "なくても"})) {
     return grammar::ConjForm::Mizenkei;
   }
 
   // Check for passive/causative (mizenkei)
-  if (endsWith(surface, "れる") || endsWith(surface, "られる") ||
-      endsWith(surface, "せる") || endsWith(surface, "させる") ||
-      endsWith(surface, "れた") || endsWith(surface, "られた") ||
-      endsWith(surface, "せた") || endsWith(surface, "させた") ||
-      endsWith(surface, "される") || endsWith(surface, "された")) {
+  if (utf8::endsWithAny(surface,
+      {"れる", "られる", "せる", "させる", "れた", "られた",
+       "せた", "させた", "される", "された"})) {
     return grammar::ConjForm::Mizenkei;
   }
 
   // Check for volitional form (ishikei)
-  if (endsWith(surface, "う") || endsWith(surface, "よう") ||
-      endsWith(surface, "まい")) {
+  if (utf8::endsWithAny(surface, {"う", "よう", "まい"})) {
     // Distinguish from godan base form ending in う
     if (surface != lemma) {
       return grammar::ConjForm::Ishikei;
@@ -927,13 +896,12 @@ grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface,
   }
 
   // Check for conditional form (kateikei)
-  if (endsWith(surface, "ば") || endsWith(surface, "れば")) {
+  if (utf8::endsWithAny(surface, {"ば", "れば"})) {
     return grammar::ConjForm::Kateikei;
   }
 
   // Check for imperative form (meireikei)
-  if (endsWith(surface, "ろ") || endsWith(surface, "よ") ||
-      endsWith(surface, "なさい")) {
+  if (utf8::endsWithAny(surface, {"ろ", "よ", "なさい"})) {
     // Check if it's likely an imperative
     if (surface.size() > core::kJapaneseCharBytes && surface != lemma) {
       return grammar::ConjForm::Meireikei;
@@ -941,35 +909,23 @@ grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface,
   }
 
   // Check for te-form onbin patterns (onbinkei)
-  if (endsWith(surface, "って") || endsWith(surface, "いて") ||
-      endsWith(surface, "いで") || endsWith(surface, "んで") ||
-      endsWith(surface, "った") || endsWith(surface, "いた") ||
-      endsWith(surface, "いだ") || endsWith(surface, "んだ")) {
+  if (utf8::endsWithAny(surface,
+      {"って", "いて", "いで", "んで", "った", "いた", "いだ", "んだ"})) {
     return grammar::ConjForm::Onbinkei;
   }
 
   // Check for renyokei (te-form, ta-form, masu-form, etc.)
-  if (endsWith(surface, "て") || endsWith(surface, "で") ||
-      endsWith(surface, "た") || endsWith(surface, "だ") ||
-      endsWith(surface, "ます") || endsWith(surface, "ました") ||
-      endsWith(surface, "まして") || endsWith(surface, "ている") ||
-      endsWith(surface, "ていた") || endsWith(surface, "ておく") ||
-      endsWith(surface, "てある") || endsWith(surface, "てみる") ||
-      endsWith(surface, "てくる") || endsWith(surface, "ていく") ||
-      endsWith(surface, "てしまう") || endsWith(surface, "ちゃう") ||
-      endsWith(surface, "たい") || endsWith(surface, "たかった") ||
-      endsWith(surface, "たら") || endsWith(surface, "たり") ||
-      endsWith(surface, "きた") || endsWith(surface, "してる") ||
-      endsWith(surface, "してた") || endsWith(surface, "しています") ||
-      endsWith(surface, "していた") || endsWith(surface, "しました")) {
+  if (utf8::endsWithAny(surface,
+      {"て", "で", "た", "だ", "ます", "ました", "まして",
+       "ている", "ていた", "ておく", "てある", "てみる", "てくる", "ていく",
+       "てしまう", "ちゃう", "たい", "たかった", "たら", "たり",
+       "きた", "してる", "してた", "しています", "していた", "しました"})) {
     return grammar::ConjForm::Renyokei;
   }
 
   // For i-adjectives
   if (pos == core::PartOfSpeech::Adjective) {
-    if (endsWith(surface, "く") || endsWith(surface, "くて") ||
-        endsWith(surface, "かった") || endsWith(surface, "ければ") ||
-        endsWith(surface, "さ") || endsWith(surface, "そう")) {
+    if (utf8::endsWithAny(surface, {"く", "くて", "かった", "ければ", "さ", "そう"})) {
       return grammar::ConjForm::Renyokei;
     }
   }

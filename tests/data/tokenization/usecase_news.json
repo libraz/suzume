@@ -224,7 +224,7 @@
         {"surface": "に", "pos": "Particle"},
         {"surface": "つけ", "pos": "Verb", "lemma": "つける"},
         {"surface": "て", "pos": "Particle"},
-        {"surface": "いる", "pos": "Verb", "lemma": "いる"}
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["sports", "progressive"]
     },
@@ -332,7 +332,7 @@
         {"surface": "さ", "pos": "Verb", "lemma": "する"},
         {"surface": "れ", "pos": "Verb", "lemma": "れる"},
         {"surface": "て", "pos": "Particle"},
-        {"surface": "いる", "pos": "Verb", "lemma": "いる"}
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["academic", "compound-particle"]
     },

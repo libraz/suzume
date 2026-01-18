@@ -2,6 +2,7 @@
 #define SUZUME_CORE_UTF8_CONSTANTS_H_
 
 #include <cstddef>
+#include <initializer_list>
 
 namespace suzume::core {
 
@@ -106,6 +107,85 @@ using suzume::core::kThreeJapaneseCharBytes;
                                               std::string_view suffix) noexcept {
   return s.size() >= suffix.size() &&
          s.substr(s.size() - suffix.size()) == suffix;
+}
+
+/// Check if string starts with the given prefix
+/// @param s The string to check
+/// @param prefix The prefix to look for
+/// @return true if s starts with prefix
+[[nodiscard]] inline constexpr bool startsWith(std::string_view s,
+                                                std::string_view prefix) noexcept {
+  return s.size() >= prefix.size() && s.substr(0, prefix.size()) == prefix;
+}
+
+/// Check if string contains the given substring
+/// @param s The string to check
+/// @param substr The substring to look for
+/// @return true if s contains substr
+[[nodiscard]] inline constexpr bool contains(std::string_view s,
+                                              std::string_view substr) noexcept {
+  return s.find(substr) != std::string_view::npos;
+}
+
+/// Check if string contains any of the given patterns
+/// @param s The string to check
+/// @param patterns List of patterns to search for
+/// @return true if s contains any of the patterns
+[[nodiscard]] inline bool containsAny(
+    std::string_view s,
+    std::initializer_list<std::string_view> patterns) noexcept {
+  for (const auto& pattern : patterns) {
+    if (s.find(pattern) != std::string_view::npos) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/// Check if string equals any of the given values
+/// @param s The string to check
+/// @param values List of values to compare against
+/// @return true if s equals any of the values
+[[nodiscard]] inline bool equalsAny(
+    std::string_view s,
+    std::initializer_list<std::string_view> values) noexcept {
+  for (const auto& value : values) {
+    if (s == value) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/// Check if string ends with any of the given suffixes
+/// @param s The string to check
+/// @param suffixes List of suffixes to check
+/// @return true if s ends with any of the suffixes
+[[nodiscard]] inline bool endsWithAny(
+    std::string_view s,
+    std::initializer_list<std::string_view> suffixes) noexcept {
+  for (const auto& suffix : suffixes) {
+    if (s.size() >= suffix.size() &&
+        s.substr(s.size() - suffix.size()) == suffix) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/// Check if string starts with any of the given prefixes
+/// @param s The string to check
+/// @param prefixes List of prefixes to check
+/// @return true if s starts with any of the prefixes
+[[nodiscard]] inline bool startsWithAny(
+    std::string_view s,
+    std::initializer_list<std::string_view> prefixes) noexcept {
+  for (const auto& prefix : prefixes) {
+    if (s.size() >= prefix.size() && s.substr(0, prefix.size()) == prefix) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /// Get the last N bytes of a string as a string_view

@@ -39,10 +39,31 @@ bool isSingleKanjiIchidan(char32_t c);
 // =============================================================================
 
 /**
+ * @brief Generic dictionary entry lookup by part of speech
+ * @param dict_manager Dictionary manager (may be null)
+ * @param surface Surface form to lookup
+ * @param pos Part of speech to match
+ * @return true if an exact-match entry with the specified POS exists
+ */
+bool hasDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
+                        std::string_view surface,
+                        core::PartOfSpeech pos);
+
+/**
  * @brief Check if a base form exists in dictionary as a verb
  */
-bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager,
-                        std::string_view base_form);
+inline bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager,
+                               std::string_view base_form) {
+  return hasDictionaryEntry(dict_manager, base_form, core::PartOfSpeech::Verb);
+}
+
+/**
+ * @brief Check if a base form exists in dictionary as an adjective
+ */
+inline bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager,
+                                    std::string_view base_form) {
+  return hasDictionaryEntry(dict_manager, base_form, core::PartOfSpeech::Adjective);
+}
 
 /**
  * @brief Check if a verb is in dictionary with matching conjugation type
@@ -76,11 +97,6 @@ void sortCandidatesByCost(std::vector<UnknownCandidate>& candidates);
  * Emphatic characters: っ, ッ, ー, ぁぃぅぇぉ, ァィゥェォ
  */
 bool isEmphaticChar(char32_t c);
-
-/**
- * @brief Convert codepoint to UTF-8 string
- */
-std::string codepointToUtf8(char32_t c);
 
 /**
  * @brief Get the vowel character (あいうえお) for a hiragana's ending vowel

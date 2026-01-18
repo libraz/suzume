@@ -11,32 +11,27 @@ bool isAuxiliaryVerbPattern(std::string_view surface, std::string_view lemma) {
   // Check lemma for auxiliary verb patterns
   // いる/おる (progressive/state), しまう (completion), みる (try),
   // おく (preparation), いく/くる (direction), あげる/もらう/くれる (giving)
-  if (lemma == scorer::kLemmaIru || lemma == scorer::kLemmaOru ||
-      lemma == scorer::kLemmaShimau || lemma == scorer::kLemmaMiru ||
-      lemma == scorer::kLemmaOku || lemma == scorer::kLemmaIku ||
-      lemma == scorer::kLemmaKuru || lemma == scorer::kLemmaAgeru ||
-      lemma == scorer::kLemmaMorau || lemma == scorer::kLemmaKureru ||
-      lemma == scorer::kLemmaAru) {
+  if (utf8::equalsAny(lemma, {
+          scorer::kLemmaIru, scorer::kLemmaOru, scorer::kLemmaShimau,
+          scorer::kLemmaMiru, scorer::kLemmaOku, scorer::kLemmaIku,
+          scorer::kLemmaKuru, scorer::kLemmaAgeru, scorer::kLemmaMorau,
+          scorer::kLemmaKureru, scorer::kLemmaAru})) {
     return true;
   }
 
   // Check surface for polite forms (conjugated forms not covered by lemma constants)
-  if (surface == "います" || surface == "おります" ||
-      surface == "しまいます" || surface == "みます" ||
-      surface == "おきます" || surface == "いきます" ||
-      surface == "きます" || surface == "あります" ||
-      surface == "ございます") {
+  if (utf8::equalsAny(surface, {
+          "います", "おります", "しまいます", "みます",
+          "おきます", "いきます", "きます", "あります", "ございます"})) {
     return true;
   }
 
   // Check surface for negative/past forms of auxiliary verbs
   // This handles cases where lemma is empty (unknown word analysis)
-  if (surface == "くれない" || surface == "くれなかった" ||
-      surface == "あげない" || surface == "あげなかった" ||
-      surface == "もらわない" || surface == "もらわなかった" ||
-      surface == "しまわない" || surface == "しまわなかった" ||
-      surface == "いない" || surface == "いなかった" ||
-      surface == "おらない" || surface == "おらなかった") {
+  if (utf8::equalsAny(surface, {
+          "くれない", "くれなかった", "あげない", "あげなかった",
+          "もらわない", "もらわなかった", "しまわない", "しまわなかった",
+          "いない", "いなかった", "おらない", "おらなかった"})) {
     return true;
   }
 
@@ -53,7 +48,7 @@ bool isAuxiliaryVerbPattern(std::string_view surface, std::string_view lemma) {
 ConnectionRuleResult checkCopulaAfterVerb(const core::LatticeEdge& prev,
                                           const core::LatticeEdge& next,
                                           const ConnectionOptions& opts) {
-  if (!isVerbToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Aux>(prev, next)) return {};
 
   if (next.surface != scorer::kCopulaDa && next.surface != scorer::kCopulaDesu) {
     return {};
@@ -187,10 +182,17 @@ ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
 //
 // Penalty case (AUX):
 // - AUX + たい patterns (e.g., なり(だ) + たかった): Penalize as unnatural
+// Bonus case (VERB + たい):
+// - VERB renyokei + たい patterns: Give bonus to prevent た+い split
 ConnectionRuleResult checkTaiAfterRenyokei(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts) {
-  if (next.pos != core::PartOfSpeech::Adjective || next.lemma != scorer::kSuffixTai) {
+  // Check for たい/たく/たかっ etc. (can be Adjective or Auxiliary)
+  // たい is registered as Auxiliary in L1 dictionary
+  bool is_tai_form = (next.lemma == scorer::kSuffixTai &&
+                      (next.pos == core::PartOfSpeech::Adjective ||
+                       next.pos == core::PartOfSpeech::Auxiliary));
+  if (!is_tai_form) {
     return {};
   }
 
@@ -205,22 +207,14 @@ ConnectionRuleResult checkTaiAfterRenyokei(const core::LatticeEdge& prev,
     return {};
   }
 
-  // Short たい forms (たくて, たくない, たかった, たければ, etc.)
-  // These are <= 12 bytes (4 hiragana chars) and should be unified with verb
-  // Don't give bonus - let inflection analyzer handle as single token
-  if (next.surface.size() <= 12) {
-    return {};
+  // Give bonus to たい after verb renyokei to prevent た+い(verb) split
+  // This is critical for MeCab compatibility: 食べたい → 食べ + たい (not 食べ + た + い)
+  if (endsWithRenyokeiMarker(prev.surface)) {
+    return {ConnectionPattern::TaiAfterRenyokei, -opts.bonus_tai_after_renyokei,
+            "tai-pattern after verb renyokei"};
   }
 
-  // Long たい forms (たくなってきた, たくてたまらない, etc.)
-  // These are complex compound patterns that benefit from bonus
-  if (!endsWithRenyokeiMarker(prev.surface)) {
-    return {};
-  }
-
-  // Bonus (negative value) for long compound patterns
-  return {ConnectionPattern::TaiAfterRenyokei, -opts.bonus_tai_after_renyokei,
-          "tai-pattern after verb renyokei"};
+  return {};
 }
 
 // Rule 4b: Verb renyokei + た auxiliary handling (MeCab compatibility)
@@ -241,11 +235,13 @@ ConnectionRuleResult checkTaAfterRenyokei(const core::LatticeEdge& prev,
   // Check if prev is a valid verb renyokei (連用形)
   // Valid patterns:
   // - Ends with i-row hiragana (五段連用形: 書き, 読み, 話し) or e-row (一段連用形: 食べ, 入れ)
+  // - Special case: 来 (kanji Kuru renyokei) with lemma=来る
   // EXCLUDE 音便形 (い, っ, ん) - these should stay unified with た
   // 書いた should NOT split (イ音便)
   // 買った should NOT split (促音便)
   // 飛んだ should NOT split (撥音便)
-  if (!endsWithRenyokeiMarker(prev.surface)) {
+  bool is_kuru_renyokei = (prev.surface == "来" && prev.lemma == "来る");
+  if (!endsWithRenyokeiMarker(prev.surface) && !is_kuru_renyokei) {
     return {};
   }
   if (endsWithOnbinMarker(prev.surface)) {
@@ -285,8 +281,7 @@ ConnectionRuleResult checkNaiAfterVerbMizenkei(const core::LatticeEdge& prev,
   // Exclude contracted ておく forms (てい, とい, etc.) - these are NOT valid mizenkei
   // てい(lemma=てく) + ない is invalid; correct split is て + い + ない
   // 見ていない → 見 + て + い + ない, not 見 + てい + ない
-  if (prev.lemma == "てく" || prev.lemma == "とく" ||
-      prev.lemma == "どく" || prev.lemma == "でく") {
+  if (utf8::equalsAny(prev.lemma, {"てく", "とく", "どく", "でく"})) {
     return {};
   }
 
@@ -355,7 +350,7 @@ ConnectionRuleResult checkPassiveAfterVerbMizenkei(const core::LatticeEdge& prev
   if (prev.surface.size() >= 9 &&  // 2+ katakana (6+ bytes) + け (3 bytes)
       utf8::endsWith(prev.surface, "け")) {
     // Check if the part before け is short katakana (1-2 chars = 3-6 bytes)
-    std::string_view before_ke = prev.surface.substr(0, prev.surface.size() - 3);
+    std::string_view before_ke = utf8::dropLastChar(prev.surface);
     if (before_ke.size() <= 6 &&  // 1-2 katakana characters
         grammar::isPureKatakana(before_ke)) {
       return {};
@@ -373,7 +368,7 @@ ConnectionRuleResult checkPassiveAfterVerbMizenkei(const core::LatticeEdge& prev
 ConnectionRuleResult checkShireruToMasuNai(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& /* opts */) {
-  if (!isVerbToAux(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Aux>(prev, next)) return {};
 
   // Check if prev is しれる verb (lemma = しれる)
   if (prev.lemma != "しれる") return {};
@@ -396,7 +391,7 @@ ConnectionRuleResult checkShireruToMasuNai(const core::LatticeEdge& prev,
 ConnectionRuleResult checkYasuiAfterRenyokei(const core::LatticeEdge& prev,
                                              const core::LatticeEdge& next,
                                              const ConnectionOptions& opts) {
-  if (!isNounToAdj(prev, next)) return {};
+  if (!isPosMatch<POS::Noun, POS::Adj>(prev, next)) return {};
 
   if (next.surface != "やすい" || next.lemma != "安い") return {};
 
@@ -412,7 +407,7 @@ ConnectionRuleResult checkYasuiAfterRenyokei(const core::LatticeEdge& prev,
 ConnectionRuleResult checkNagaraSplit(const core::LatticeEdge& prev,
                                       const core::LatticeEdge& next,
                                       const ConnectionOptions& opts) {
-  if (!isVerbToParticle(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Particle>(prev, next)) return {};
 
   if (next.surface != "ながら") return {};
 
@@ -429,7 +424,7 @@ ConnectionRuleResult checkNagaraSplit(const core::LatticeEdge& prev,
 ConnectionRuleResult checkKataAfterRenyokei(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts) {
-  if (!isVerbToNoun(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Noun>(prev, next)) return {};
 
   if (next.surface != "方") return {};
 
@@ -445,7 +440,7 @@ ConnectionRuleResult checkKataAfterRenyokei(const core::LatticeEdge& prev,
 ConnectionRuleResult checkSouAfterRenyokei(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts) {
-  if (!isNounToAdv(prev, next)) return {};
+  if (!isPosMatch<POS::Noun, POS::Adv>(prev, next)) return {};
 
   if (next.surface != scorer::kSuffixSou) return {};
 
@@ -461,7 +456,7 @@ ConnectionRuleResult checkSouAfterRenyokei(const core::LatticeEdge& prev,
 ConnectionRuleResult checkCompoundAuxAfterRenyokei(
     const core::LatticeEdge& prev, const core::LatticeEdge& next,
     const ConnectionOptions& opts) {
-  if (!isNounToVerb(prev, next)) return {};
+  if (!isPosMatch<POS::Noun, POS::Verb>(prev, next)) return {};
 
   if (next.surface.size() < core::kJapaneseCharBytes) return {};
 
@@ -485,7 +480,7 @@ ConnectionRuleResult checkCompoundAuxAfterRenyokei(
 ConnectionRuleResult checkTakuteAfterRenyokei(const core::LatticeEdge& prev,
                                               const core::LatticeEdge& next,
                                               const ConnectionOptions& opts) {
-  if (!isVerbToAdj(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Adj>(prev, next)) return {};
 
   // Check if next is たくて form (ADJ with lemma たい)
   if (next.lemma != scorer::kSuffixTai || next.surface != "たくて") return {};
@@ -516,11 +511,7 @@ ConnectionRuleResult checkTakuTeSplit(const core::LatticeEdge& prev,
   if (next.surface != scorer::kFormTe) return {};
 
   // Check if prev ends with たく (desire adverbial form)
-  if (prev.surface.size() < core::kTwoJapaneseCharBytes) {
-    return {};
-  }
-  std::string_view last6 = prev.surface.substr(prev.surface.size() - core::kTwoJapaneseCharBytes);
-  if (last6 != "たく") {  // desire adverbial form - not a common constant
+  if (!utf8::endsWith(prev.surface, "たく")) {
     return {};
   }
 
@@ -534,12 +525,10 @@ ConnectionRuleResult checkTakuTeSplit(const core::LatticeEdge& prev,
 ConnectionRuleResult checkConditionalVerbToVerb(const core::LatticeEdge& prev,
                                                 const core::LatticeEdge& next,
                                                 const ConnectionOptions& opts) {
-  if (!isVerbToVerb(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Verb>(prev, next)) return {};
 
   // Check if prev verb ends with ば (conditional form)
-  if (prev.surface.size() < core::kJapaneseCharBytes) return {};
-  std::string_view last3 = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
-  if (last3 != "ば") {
+  if (!utf8::endsWith(prev.surface, "ば")) {
     return {};
   }
 
@@ -556,7 +545,7 @@ ConnectionRuleResult checkConditionalVerbToVerb(const core::LatticeEdge& prev,
 ConnectionRuleResult checkVerbRenyokeiCompoundAux(const core::LatticeEdge& prev,
                                                   const core::LatticeEdge& next,
                                                   const ConnectionOptions& opts) {
-  if (!isVerbToVerb(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Verb>(prev, next)) return {};
 
   // Check if next is a compound verb auxiliary
   bool is_compound_aux = false;
@@ -600,7 +589,7 @@ ConnectionRuleResult checkVerbRenyokeiCompoundAux(const core::LatticeEdge& prev,
 ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts) {
-  if (!isVerbToVerb(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Verb>(prev, next)) return {};
 
   if (!endsWithTeForm(prev.surface)) return {};
 
@@ -627,12 +616,12 @@ ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
 ConnectionRuleResult checkRenyokeiToContractedVerb(const core::LatticeEdge& prev,
                                                    const core::LatticeEdge& next,
                                                    const ConnectionOptions& /* opts */) {
-  if (!isVerbToVerb(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Verb>(prev, next)) return {};
 
   // Check if next is contracted progressive/preparative verb (てる/でる/とく/どく etc.)
-  bool is_contracted = (next.lemma == "てる" || next.lemma == "でる" ||
-                        next.lemma == "とく" || next.lemma == "どく");
-  if (!is_contracted) return {};
+  if (!utf8::equalsAny(next.lemma, {"てる", "でる", "とく", "どく"})) {
+    return {};
+  }
 
   // Check if prev ends with renyokei marker (し, き, り, etc.), e-row (ichidan),
   // or onbin marker (ん for hatsuon-bin, っ for sokuon-bin, い for i-onbin)
@@ -684,7 +673,7 @@ ConnectionRuleResult checkPrefixBeforeVerb(const core::LatticeEdge& prev,
 ConnectionRuleResult checkTokuContractionSplit(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts) {
-  if (!isVerbToParticle(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Particle>(prev, next)) return {};
 
   // Check if next is と particle
   if (next.surface != scorer::kParticleTo) return {};
@@ -764,7 +753,7 @@ ConnectionRuleResult checkRashiiAfterPredicate(const core::LatticeEdge& prev,
 ConnectionRuleResult checkVerbToCaseParticle(const core::LatticeEdge& prev,
                                              const core::LatticeEdge& next,
                                              const ConnectionOptions& opts) {
-  if (!isVerbToParticle(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Particle>(prev, next)) return {};
 
   // Only apply to true case particles (格助詞): を/が/で/へ
   // に is excluded: 連用形+に+移動動詞 is valid (買いに行く, 見に来る)
@@ -777,21 +766,19 @@ ConnectionRuleResult checkVerbToCaseParticle(const core::LatticeEdge& prev,
   }
 
   // Exclude te-form verbs (て/で ending) - they have different connection patterns
-  if (prev.surface.size() >= core::kJapaneseCharBytes) {
-    std::string_view last = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
-    if (last == scorer::kFormTe || last == scorer::kFormDe) {
-      return {};
-    }
-    // Exclude classical negative ぬ + で (知らぬで = 知らないで)
-    // で after ぬ-form is te-form connection, not case particle
-    if (last == "ぬ" && surf == scorer::kFormDe) {  // ぬ is not a common constant
-      return {};
-    }
-    // Exclude onbin patterns + で (読んで, 遊んで, 泳いで)
-    // These are te-form patterns, not case particle patterns
-    if (surf == scorer::kFormDe && endsWithOnbinMarker(prev.surface)) {
-      return {};
-    }
+  if (utf8::endsWith(prev.surface, scorer::kFormTe) ||
+      utf8::endsWith(prev.surface, scorer::kFormDe)) {
+    return {};
+  }
+  // Exclude classical negative ぬ + で (知らぬで = 知らないで)
+  // で after ぬ-form is te-form connection, not case particle
+  if (utf8::endsWith(prev.surface, "ぬ") && surf == scorer::kFormDe) {
+    return {};
+  }
+  // Exclude onbin patterns + で (読んで, 遊んで, 泳いで)
+  // These are te-form patterns, not case particle patterns
+  if (surf == scorer::kFormDe && endsWithOnbinMarker(prev.surface)) {
+    return {};
   }
 
   return {ConnectionPattern::VerbToCaseParticle, opts.penalty_verb_to_case_particle,
@@ -806,12 +793,10 @@ ConnectionRuleResult checkVerbToCaseParticle(const core::LatticeEdge& prev,
 ConnectionRuleResult checkSuruRenyokeiToTeVerb(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts) {
-  if (!isNounToVerb(prev, next)) return {};
+  if (!isPosMatch<POS::Noun, POS::Verb>(prev, next)) return {};
 
   // Check if prev (NOUN) ends with し (suru-verb renyokei pattern)
-  if (prev.surface.size() < core::kJapaneseCharBytes) return {};
-  std::string_view last = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
-  if (last != scorer::kSuffixShi) return {};
+  if (!utf8::endsWith(prev.surface, scorer::kSuffixShi)) return {};
 
   // Check if prev has 2+ kanji before し (typical suru-verb pattern)
   // e.g., 説明し, 確認し, 対応し, 検討し
@@ -838,7 +823,7 @@ ConnectionRuleResult checkSuruRenyokeiToTeVerb(const core::LatticeEdge& prev,
 ConnectionRuleResult checkRenyokeiToTeParticle(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& /* opts */) {
-  if (!isVerbToParticle(prev, next)) return {};
+  if (!isPosMatch<POS::Verb, POS::Particle>(prev, next)) return {};
 
   // Check if next is て/で particle
   if (next.surface != scorer::kFormTe && next.surface != scorer::kFormDe) {
@@ -859,12 +844,11 @@ ConnectionRuleResult checkRenyokeiToTeParticle(const core::LatticeEdge& prev,
   // イ音便(い) can be て (GodanKa: 書いて) or で (GodanGa: 泳いで)
   // 促音便(っ) uses て
   if (is_onbin) {
-    std::string_view last = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
-    if (last == scorer::kSuffixN) {  // 撥音便: 読ん, 遊ん → で
+    if (utf8::endsWith(prev.surface, scorer::kSuffixN)) {  // 撥音便: 読ん, 遊ん → で
       if (next.surface != scorer::kFormDe) {
         return {};  // 撥音便 + て is invalid
       }
-    } else if (last == "っ") {  // 促音便: 走っ, 待っ → て
+    } else if (utf8::endsWith(prev.surface, "っ")) {  // 促音便: 走っ, 待っ → て
       if (next.surface != scorer::kFormTe) {
         return {};  // 促音便 + で is invalid
       }
@@ -929,19 +913,17 @@ ConnectionRuleResult checkTeParticleToAuxVerb(const core::LatticeEdge& prev,
   // くる, きた, きて, きます etc. (direction)
   // みる, みた, みて, みます etc. (attemptive)
   // もらう, もらった, もらって etc. (benefactive-receive)
+  // いただく, いただきます, いただいて etc. (benefactive-receive-humble)
   // くれる, くれた, くれて etc. (benefactive-give)
   // あげる, あげた, あげて etc. (benefactive-give-up)
   // ある, あった, あります etc. (resultative)
   // た (past tense for contracted form: 読んでた = 読ん + で + た)
-  bool is_te_aux = false;
-  if (next.lemma == scorer::kLemmaIru || next.lemma == scorer::kLemmaOru ||
-      next.lemma == scorer::kLemmaShimau || next.lemma == scorer::kLemmaOku ||
-      next.lemma == scorer::kLemmaKuru || next.lemma == scorer::kLemmaMiru ||
-      next.lemma == scorer::kLemmaMorau || next.lemma == scorer::kLemmaKureru ||
-      next.lemma == scorer::kLemmaAgeru || next.lemma == scorer::kLemmaAru ||
-      next.lemma == scorer::kLemmaIku || next.lemma == scorer::kFormTa) {
-    is_te_aux = true;
-  }
+  bool is_te_aux = utf8::equalsAny(next.lemma, {
+      scorer::kLemmaIru, scorer::kLemmaOru, scorer::kLemmaShimau,
+      scorer::kLemmaOku, scorer::kLemmaKuru, scorer::kLemmaMiru,
+      scorer::kLemmaMorau, scorer::kLemmaItadaku, scorer::kLemmaKureru,
+      scorer::kLemmaAgeru, scorer::kLemmaAru, scorer::kLemmaIku, scorer::kFormTa
+  });
 
   // Also check surface for specific patterns
   if (isAuxiliaryVerbPattern(next.surface, next.lemma)) {

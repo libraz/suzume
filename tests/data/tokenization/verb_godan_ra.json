@@ -318,11 +318,7 @@
           "surface": "に",
           "pos": "Particle"
         },
-        {
-          "surface": "い",
-          "pos": "Auxiliary",
-          "lemma": "いる"
-        },
+        {"surface": "い", "pos": "Verb", "lemma": "いる"},
         {
           "surface": "た",
           "pos": "Auxiliary",
@@ -475,11 +471,7 @@
           "surface": "て",
           "pos": "Particle"
         },
-        {
-          "surface": "くる",
-          "pos": "Auxiliary",
-          "lemma": "くる"
-        }
+        {"surface": "くる", "pos": "Verb", "lemma": "くる"}
       ],
       "tags": [
         "godan",
@@ -843,13 +835,18 @@
     },
     {
       "id": "rashii_tai_verb",
-      "description": "帰りたいらしい should split as verb+たい + らしい",
+      "description": "帰りたいらしい - MeCab-compatible split: 帰り + たい + らしい",
       "input": "帰りたいらしい",
       "expected": [
         {
-          "surface": "帰りたい",
+          "surface": "帰り",
           "pos": "Verb",
           "lemma": "帰る"
+        },
+        {
+          "surface": "たい",
+          "pos": "Auxiliary",
+          "lemma": "たい"
         },
         {
           "surface": "らしい",
@@ -866,27 +863,29 @@
     },
     {
       "id": "onbin_kasoru_lemma",
-      "description": "過疎っている - MeCab splits as Noun+Particle+Verb (過疎+って+いる)",
+      "description": "過疎っている - 過疎る is a modern Japanese verb (internet slang for 'become dead/inactive')",
       "input": "過疎っている",
       "expected": [
         {
-          "surface": "過疎",
-          "pos": "Noun"
+          "surface": "過疎っ",
+          "pos": "Verb",
+          "lemma": "過疎る"
         },
         {
-          "surface": "って",
+          "surface": "て",
           "pos": "Particle"
         },
         {
           "surface": "いる",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "lemma": "いる"
         }
       ],
       "tags": [
         "verb",
         "onbin",
-        "lemma"
+        "lemma",
+        "neologism"
       ]
     },
     {

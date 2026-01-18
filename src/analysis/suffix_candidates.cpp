@@ -14,6 +14,45 @@
 
 namespace suzume::analysis {
 
+// =============================================================================
+// Suffix Candidate Factory Helpers
+// =============================================================================
+
+/**
+ * @brief Create a suffix pattern candidate with lemma
+ */
+inline UnknownCandidate makeSuffixCandidate(
+    const std::string& surface, size_t start, size_t end,
+    core::PartOfSpeech pos, float cost, const std::string& lemma,
+    [[maybe_unused]] float confidence,
+    [[maybe_unused]] const char* pattern,
+    dictionary::ConjugationType conj_type = dictionary::ConjugationType::None) {
+  auto cand = makeCandidate(surface, start, end, pos, cost, true, CandidateOrigin::SuffixPattern);
+  cand.lemma = lemma;
+  cand.conj_type = conj_type;
+#ifdef SUZUME_DEBUG_INFO
+  cand.confidence = confidence;
+  cand.pattern = pattern;
+#endif
+  return cand;
+}
+
+/**
+ * @brief Create a suffix pattern candidate without lemma
+ */
+inline UnknownCandidate makeSuffixCandidateNoLemma(
+    const std::string& surface, size_t start, size_t end,
+    core::PartOfSpeech pos, float cost,
+    [[maybe_unused]] float confidence,
+    [[maybe_unused]] const char* pattern) {
+  auto cand = makeCandidate(surface, start, end, pos, cost, true, CandidateOrigin::SuffixPattern);
+#ifdef SUZUME_DEBUG_INFO
+  cand.confidence = confidence;
+  cand.pattern = pattern;
+#endif
+  return cand;
+}
+
 std::string extractSubstring(const std::vector<char32_t>& codepoints,
                              size_t start, size_t end) {
   // Use encodeRange directly to avoid intermediate vector allocation
@@ -83,19 +122,15 @@ bool looksLikeVerbRenyokei(std::string_view stem) {
   }
 
   // Get the last character (Japanese = 3 bytes)
-  std::string_view last_char = stem.substr(stem.size() - 3);
+  std::string_view last_char = utf8::lastChar(stem);
 
   // Common verb renyokei endings (i-row for godan, e-row for ichidan)
   // Godan: し、み、き、ぎ、ち、り、い、び、に、ひ
   // Ichidan: べ、め、け、げ、せ、ぜ、て、で、ね、へ、ぺ、え、れ
-  return last_char == "し" || last_char == "み" || last_char == "き" ||
-         last_char == "ぎ" || last_char == "ち" || last_char == "り" ||
-         last_char == "い" || last_char == "び" || last_char == "に" ||
-         last_char == "ひ" || last_char == "べ" || last_char == "め" ||
-         last_char == "け" || last_char == "げ" || last_char == "せ" ||
-         last_char == "ぜ" || last_char == "て" || last_char == "で" ||
-         last_char == "ね" || last_char == "へ" || last_char == "え" ||
-         last_char == "れ";
+  return utf8::equalsAny(last_char, {
+      "し", "み", "き", "ぎ", "ち", "り", "い", "び", "に", "ひ",  // Godan i-row
+      "べ", "め", "け", "げ", "せ", "ぜ", "て", "で", "ね", "へ", "え", "れ"  // Ichidan e-row
+  });
 }
 
 }  // namespace
@@ -138,50 +173,25 @@ std::vector<UnknownCandidate> generateProductiveSuffixCandidates(
 
     // Pattern 1: V連用形 + がち (tendency suffix)
     // Examples: ありがち、なりがち
-    if (surface.size() >= kGachiLen + 3 &&
-        surface.substr(surface.size() - kGachiLen) == "がち") {
+    if (surface.size() >= kGachiLen + 3 && utf8::endsWith(surface, "がち")) {
       std::string_view stem = std::string_view(surface).substr(0, surface.size() - kGachiLen);
       if (looksLikeVerbRenyokei(stem)) {
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = candidate_end;
-        candidate.pos = core::PartOfSpeech::Noun;  // na-adjective stem
-        candidate.cost = -0.5F;  // Bonus to strongly prefer over particle split
-        candidate.has_suffix = true;
-        candidate.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::SuffixPattern;
-        candidate.confidence = 0.9F;
-        candidate.pattern = "verb_renyokei_gachi";
-#endif
-        candidates.push_back(candidate);
+        candidates.push_back(makeSuffixCandidate(
+            surface, start_pos, candidate_end, core::PartOfSpeech::Noun, -0.5F,
+            surface, 0.9F, "verb_renyokei_gachi"));
         return candidates;  // Found valid がち candidate
       }
     }
 
     // Pattern 2: V連用形 + っぽい (resemblance suffix)
     // Examples: 子供っぽい、安っぽい、忘れっぽい
-    if (surface.size() >= kPpoiLen + 3 &&
-        surface.substr(surface.size() - kPpoiLen) == "っぽい") {
+    if (surface.size() >= kPpoiLen + 3 && utf8::endsWith(surface, "っぽい")) {
       std::string_view stem = std::string_view(surface).substr(0, surface.size() - kPpoiLen);
       // っぽい attaches to nouns and verb stems, less strict check
       if (stem.size() >= 3) {  // At least 1 character stem
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = candidate_end;
-        candidate.pos = core::PartOfSpeech::Adjective;  // i-adjective
-        candidate.cost = 0.4F;
-        candidate.has_suffix = true;
-        candidate.lemma = surface;
-        candidate.conj_type = dictionary::ConjugationType::IAdjective;
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::SuffixPattern;
-        candidate.confidence = 0.85F;
-        candidate.pattern = "stem_ppoi";
-#endif
-        candidates.push_back(candidate);
+        candidates.push_back(makeSuffixCandidate(
+            surface, start_pos, candidate_end, core::PartOfSpeech::Adjective, 0.4F,
+            surface, 0.85F, "stem_ppoi", dictionary::ConjugationType::IAdjective));
         return candidates;  // Found valid っぽい candidate
       }
     }
@@ -248,8 +258,7 @@ std::vector<UnknownCandidate> generateGachiSuffixCandidates(
     std::string surface = extractSubstring(codepoints, start_pos, candidate_end);
 
     // Check if ends with がち
-    if (surface.size() >= kGachiLen + 3 &&
-        surface.substr(surface.size() - kGachiLen) == "がち") {
+    if (surface.size() >= kGachiLen + 3 && utf8::endsWith(surface, "がち")) {
 
       // Check if hiragana before がち is a valid renyokei ending
       std::string hiragana_part = extractSubstring(codepoints, kanji_end, candidate_end);
@@ -261,20 +270,9 @@ std::vector<UnknownCandidate> generateGachiSuffixCandidates(
       // For ichidan verbs, renyokei is just one hiragana (れ for 忘れる, れ for 遅れる)
       // Empty or valid renyokei ending is acceptable
       if (renyokei_ending.empty() || looksLikeVerbRenyokei(renyokei_ending)) {
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = candidate_end;
-        candidate.pos = core::PartOfSpeech::Noun;  // na-adjective stem
-        candidate.cost = -0.5F;  // Bonus to strongly prefer over split
-        candidate.has_suffix = true;
-        candidate.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::SuffixPattern;
-        candidate.confidence = 0.9F;
-        candidate.pattern = "kanji_verb_renyokei_gachi";
-#endif
-        candidates.push_back(candidate);
+        candidates.push_back(makeSuffixCandidate(
+            surface, start_pos, candidate_end, core::PartOfSpeech::Noun, -0.5F,
+            surface, 0.9F, "kanji_verb_renyokei_gachi"));
         break;  // Found one valid candidate, no need to check longer patterns
       }
     }
@@ -318,21 +316,9 @@ std::vector<UnknownCandidate> generateAdminBoundaryCandidates(
       // Generate candidate from start_pos to pos+1 (including the suffix)
       size_t end_with_suffix = pos + 1;
       std::string surface = extractSubstring(codepoints, start_pos, end_with_suffix);
-
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = end_with_suffix;
-      candidate.pos = core::PartOfSpeech::Noun;
-      // Give bonus to proper administrative boundaries
-      candidate.cost = 0.3F;
-      candidate.has_suffix = true;
-#ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::SuffixPattern;
-      candidate.confidence = 0.95F;
-      candidate.pattern = "admin_boundary";
-#endif
-      candidates.push_back(candidate);
+      candidates.push_back(makeSuffixCandidateNoLemma(
+          surface, start_pos, end_with_suffix, core::PartOfSpeech::Noun, 0.3F,
+          0.95F, "admin_boundary"));
     }
   }
 
@@ -512,19 +498,12 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
       // Generate 2-hiragana candidate
       std::string surface = extractSubstring(codepoints, start_pos, hiragana_end + 1);
       if (!surface.empty()) {
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = hiragana_end + 1;
-        candidate.pos = core::PartOfSpeech::Noun;
-        candidate.cost = 0.8F;
-        candidate.has_suffix = false;
+        auto cand = makeCandidate(surface, start_pos, hiragana_end + 1, core::PartOfSpeech::Noun, 0.8F, false, CandidateOrigin::NominalizedNoun);
 #ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::NominalizedNoun;
-        candidate.confidence = 0.8F;
-        candidate.pattern = "nominalized_2hira";
+        cand.confidence = 0.8F;
+        cand.pattern = "nominalized_2hira";
 #endif
-        candidates.push_back(candidate);
+        candidates.push_back(cand);
       }
     }
   }
@@ -542,19 +521,12 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
   if (!skip_single_char) {
     std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
     if (!surface.empty()) {
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = kanji_end + 1;
-      candidate.pos = core::PartOfSpeech::Noun;
-      candidate.cost = 1.2F;
-      candidate.has_suffix = false;
+      auto cand = makeCandidate(surface, start_pos, kanji_end + 1, core::PartOfSpeech::Noun, 1.2F, false, CandidateOrigin::NominalizedNoun);
 #ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::NominalizedNoun;
-      candidate.confidence = 0.6F;
-      candidate.pattern = "nominalized_1hira";
+      cand.confidence = 0.6F;
+      cand.pattern = "nominalized_1hira";
 #endif
-      candidates.push_back(candidate);
+      candidates.push_back(cand);
     }
   }
 
@@ -628,19 +600,12 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
         for (size_t end_pos = sokuon_pos + 2; end_pos <= kanji2_end; ++end_pos) {
           std::string surface = extractSubstring(codepoints, start_pos, end_pos);
           if (!surface.empty()) {
-            UnknownCandidate candidate;
-            candidate.surface = surface;
-            candidate.start = start_pos;
-            candidate.end = end_pos;
-            candidate.pos = core::PartOfSpeech::Noun;
-            candidate.cost = 0.5F;  // Bonus for sokuon compounds
-            candidate.has_suffix = false;
+            auto cand = makeCandidate(surface, start_pos, end_pos, core::PartOfSpeech::Noun, 0.5F, false, CandidateOrigin::KanjiHiraganaCompound);
 #ifdef SUZUME_DEBUG_INFO
-            candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
-            candidate.confidence = 0.9F;
-            candidate.pattern = "kanji_sokuon_kanji";
+            cand.confidence = 0.9F;
+            cand.pattern = "kanji_sokuon_kanji";
 #endif
-            candidates.push_back(candidate);
+            candidates.push_back(cand);
           }
         }
       } else if (next_type == normalize::CharType::Hiragana) {
@@ -665,19 +630,12 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
         if (hira2_end > sokuon_pos + 1) {
           std::string surface = extractSubstring(codepoints, start_pos, hira2_end);
           if (!surface.empty()) {
-            UnknownCandidate candidate;
-            candidate.surface = surface;
-            candidate.start = start_pos;
-            candidate.end = hira2_end;
-            candidate.pos = core::PartOfSpeech::Noun;
-            candidate.cost = 1.0F;
-            candidate.has_suffix = false;
+            auto cand = makeCandidate(surface, start_pos, hira2_end, core::PartOfSpeech::Noun, 1.0F, false, CandidateOrigin::KanjiHiraganaCompound);
 #ifdef SUZUME_DEBUG_INFO
-            candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
-            candidate.confidence = 0.7F;
-            candidate.pattern = "kanji_sokuon_hira";
+            cand.confidence = 0.7F;
+            cand.pattern = "kanji_sokuon_hira";
 #endif
-            candidates.push_back(candidate);
+            candidates.push_back(cand);
           }
         }
       }
@@ -725,20 +683,12 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
       for (size_t end_pos = sokuon_pos + 2; end_pos <= kanji2_end; ++end_pos) {
         std::string surface = extractSubstring(codepoints, start_pos, end_pos);
         if (!surface.empty()) {
-          UnknownCandidate candidate;
-          candidate.surface = surface;
-          candidate.start = start_pos;
-          candidate.end = end_pos;
-          candidate.pos = core::PartOfSpeech::Noun;
-          // Give bonus to sokuon compounds - they are real words
-          candidate.cost = 0.5F;
-          candidate.has_suffix = false;
+          auto cand = makeCandidate(surface, start_pos, end_pos, core::PartOfSpeech::Noun, 0.5F, false, CandidateOrigin::KanjiHiraganaCompound);
 #ifdef SUZUME_DEBUG_INFO
-          candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
-          candidate.confidence = 0.9F;
-          candidate.pattern = "kanji_sokuon_kanji";
+          cand.confidence = 0.9F;
+          cand.pattern = "kanji_sokuon_kanji";
 #endif
-          candidates.push_back(candidate);
+          candidates.push_back(cand);
         }
       }
 
@@ -760,19 +710,12 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
         if (hira_end > kanji2_end) {
           std::string surface = extractSubstring(codepoints, start_pos, hira_end);
           if (!surface.empty()) {
-            UnknownCandidate candidate;
-            candidate.surface = surface;
-            candidate.start = start_pos;
-            candidate.end = hira_end;
-            candidate.pos = core::PartOfSpeech::Noun;
-            candidate.cost = 0.8F;  // Slightly higher cost for longer compounds
-            candidate.has_suffix = false;
+            auto cand = makeCandidate(surface, start_pos, hira_end, core::PartOfSpeech::Noun, 0.8F, false, CandidateOrigin::KanjiHiraganaCompound);
 #ifdef SUZUME_DEBUG_INFO
-            candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
-            candidate.confidence = 0.8F;
-            candidate.pattern = "kanji_sokuon_kanji_hira";
+            cand.confidence = 0.8F;
+            cand.pattern = "kanji_sokuon_kanji_hira";
 #endif
-            candidates.push_back(candidate);
+            candidates.push_back(cand);
           }
         }
       }
@@ -794,20 +737,12 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
       if (hira2_end > sokuon_pos + 1) {
         std::string surface = extractSubstring(codepoints, start_pos, hira2_end);
         if (!surface.empty()) {
-          UnknownCandidate candidate;
-          candidate.surface = surface;
-          candidate.start = start_pos;
-          candidate.end = hira2_end;
-          candidate.pos = core::PartOfSpeech::Noun;
-          // These could be verb stems (引っ込), give moderate cost
-          candidate.cost = 1.0F;
-          candidate.has_suffix = false;
+          auto cand = makeCandidate(surface, start_pos, hira2_end, core::PartOfSpeech::Noun, 1.0F, false, CandidateOrigin::KanjiHiraganaCompound);
 #ifdef SUZUME_DEBUG_INFO
-          candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
-          candidate.confidence = 0.7F;
-          candidate.pattern = "kanji_sokuon_hira";
+          cand.confidence = 0.7F;
+          cand.pattern = "kanji_sokuon_hira";
 #endif
-          candidates.push_back(candidate);
+          candidates.push_back(cand);
         }
       }
     }
@@ -933,19 +868,13 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
   // Generate candidate with cost based on pattern
   std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
   if (!surface.empty()) {
-    UnknownCandidate candidate;
-    candidate.surface = surface;
-    candidate.start = start_pos;
-    candidate.end = hiragana_end;
-    candidate.pos = core::PartOfSpeech::Noun;
-    candidate.cost = looks_like_aux ? 3.5F : 1.0F;
-    candidate.has_suffix = false;
+    float cost = looks_like_aux ? 3.5F : 1.0F;
+    auto cand = makeCandidate(surface, start_pos, hiragana_end, core::PartOfSpeech::Noun, cost, false, CandidateOrigin::KanjiHiraganaCompound);
 #ifdef SUZUME_DEBUG_INFO
-    candidate.origin = CandidateOrigin::KanjiHiraganaCompound;
-    candidate.confidence = looks_like_aux ? 0.3F : 0.8F;
-    candidate.pattern = looks_like_aux ? "aux_like" : "compound";
+    cand.confidence = looks_like_aux ? 0.3F : 0.8F;
+    cand.pattern = looks_like_aux ? "aux_like" : "compound";
 #endif
-    candidates.push_back(candidate);
+    candidates.push_back(cand);
   }
 
   return candidates;
@@ -1003,19 +932,12 @@ std::vector<UnknownCandidate> generateCounterCandidates(
     std::string surface =
         extractSubstring(codepoints, start_pos, numeral_end + 1);
     if (!surface.empty()) {
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = numeral_end + 1;
-      candidate.pos = core::PartOfSpeech::Noun;
-      candidate.cost = -0.5F;  // Strong bonus to beat verb candidates
-      candidate.has_suffix = false;
+      auto cand = makeCandidate(surface, start_pos, numeral_end + 1, core::PartOfSpeech::Noun, -0.5F, false, CandidateOrigin::Counter);
 #ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::Counter;
-      candidate.confidence = 0.95F;
-      candidate.pattern = "counter_tsu";
+      cand.confidence = 0.95F;
+      cand.pattern = "counter_tsu";
 #endif
-      candidates.push_back(candidate);
+      candidates.push_back(cand);
     }
   }
 
@@ -1036,32 +958,24 @@ std::vector<UnknownCandidate> generateCounterCandidates(
     if (unit_len >= 1 && unit_len <= 8) {  // Reasonable unit length 1-8 chars
       std::string surface = extractSubstring(codepoints, start_pos, unit_end);
       if (!surface.empty()) {
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = unit_end;
-        candidate.pos = core::PartOfSpeech::Noun;
-
         // Penalize numbers starting with 0 (e.g., "00ポイント" is unnatural)
         // "0ドル" is fine, but "00ドル", "000キロ" are not typical Japanese patterns
         bool starts_with_zero_prefix = false;
         if (numeral_end - start_pos >= 2 && codepoints[start_pos] == U'0') {
           starts_with_zero_prefix = true;
         }
-
         // Give bonus to prefer combined token over split
         // Longer units get slightly more bonus (キロ, ドル vs キログラム, パーセント)
         // Strong bonus (-0.5) to beat optimal_length bonuses on split candidates
-        candidate.cost = starts_with_zero_prefix
-                             ? 2.0F  // Penalize unnatural zero-prefix numbers
-                             : -0.5F - (static_cast<float>(unit_len) * 0.05F);
-        candidate.has_suffix = false;
+        float cost = starts_with_zero_prefix
+                         ? 2.0F  // Penalize unnatural zero-prefix numbers
+                         : -0.5F - (static_cast<float>(unit_len) * 0.05F);
+        auto cand = makeCandidate(surface, start_pos, unit_end, core::PartOfSpeech::Noun, cost, false, CandidateOrigin::Counter);
 #ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::Counter;
-        candidate.confidence = starts_with_zero_prefix ? 0.3F : 0.9F;
-        candidate.pattern = "numeric_unit_katakana";
+        cand.confidence = starts_with_zero_prefix ? 0.3F : 0.9F;
+        cand.pattern = "numeric_unit_katakana";
 #endif
-        candidates.push_back(candidate);
+        candidates.push_back(cand);
       }
     }
   }
@@ -1160,22 +1074,15 @@ std::vector<UnknownCandidate> generatePrefixCompoundCandidates(
   if (!followed_by_kanji || followed_by_chuu) {
     std::string surface = extractSubstring(codepoints, start_pos, start_pos + 2);
     if (!surface.empty()) {
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = start_pos + 2;
-      candidate.pos = core::PartOfSpeech::Noun;
       // Strong bonus to prefer compound over split
       // Must beat: single_kanji(1.4+2) + single_kanji(1.4+2) = 6.8
       // And compete with dictionary entries
-      candidate.cost = -1.0F;
-      candidate.has_suffix = false;
+      auto cand = makeCandidate(surface, start_pos, start_pos + 2, core::PartOfSpeech::Noun, -1.0F, false, CandidateOrigin::PrefixCompound);
 #ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::PrefixCompound;
-      candidate.confidence = 0.9F;
-      candidate.pattern = "prefix_single_kanji";
+      cand.confidence = 0.9F;
+      cand.pattern = "prefix_single_kanji";
 #endif
-      candidates.push_back(candidate);
+      candidates.push_back(cand);
     }
   }
 
@@ -1187,20 +1094,13 @@ std::vector<UnknownCandidate> generatePrefixCompoundCandidates(
       codepoints[start_pos + 2] == U'中') {
     std::string surface3 = extractSubstring(codepoints, start_pos, start_pos + 3);
     if (!surface3.empty()) {
-      UnknownCandidate candidate;
-      candidate.surface = surface3;
-      candidate.start = start_pos;
-      candidate.end = start_pos + 3;
-      candidate.pos = core::PartOfSpeech::Noun;
       // Even stronger bonus for N中 compounds
-      candidate.cost = -1.5F;
-      candidate.has_suffix = false;
+      auto cand = makeCandidate(surface3, start_pos, start_pos + 3, core::PartOfSpeech::Noun, -1.5F, false, CandidateOrigin::PrefixCompound);
 #ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::PrefixCompound;
-      candidate.confidence = 0.95F;
-      candidate.pattern = "prefix_kanji_chuu";
+      cand.confidence = 0.95F;
+      cand.pattern = "prefix_kanji_chuu";
 #endif
-      candidates.push_back(candidate);
+      candidates.push_back(cand);
     }
   }
 

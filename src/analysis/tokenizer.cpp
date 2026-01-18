@@ -14,59 +14,14 @@
 #include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "join_candidates.h"
+#include "normalize/utf8.h"
 #include "split_candidates.h"
 #include "tokenizer_utils.h"
+#include "verb_candidates_helpers.h"
 
 namespace suzume::analysis {
 
-namespace {
-
-/**
- * @brief Get the vowel character (あいうえお) for a hiragana's ending vowel
- *
- * Maps any hiragana to its vowel row character.
- * E.g., た→あ, き→い, す→う, て→え, の→お
- * Returns 0 for characters without vowels (ん, っ) or non-hiragana.
- */
-inline char32_t getHiraganaVowel(char32_t c) {
-  // あ-row (a-vowel)
-  if (c == U'あ' || c == U'ぁ' || c == U'か' || c == U'が' || c == U'さ' ||
-      c == U'ざ' || c == U'た' || c == U'だ' || c == U'な' || c == U'は' ||
-      c == U'ば' || c == U'ぱ' || c == U'ま' || c == U'や' || c == U'ゃ' ||
-      c == U'ら' || c == U'わ') {
-    return U'あ';
-  }
-  // い-row (i-vowel)
-  if (c == U'い' || c == U'ぃ' || c == U'き' || c == U'ぎ' || c == U'し' ||
-      c == U'じ' || c == U'ち' || c == U'ぢ' || c == U'に' || c == U'ひ' ||
-      c == U'び' || c == U'ぴ' || c == U'み' || c == U'り') {
-    return U'い';
-  }
-  // う-row (u-vowel)
-  if (c == U'う' || c == U'ぅ' || c == U'く' || c == U'ぐ' || c == U'す' ||
-      c == U'ず' || c == U'つ' || c == U'づ' || c == U'ぬ' || c == U'ふ' ||
-      c == U'ぶ' || c == U'ぷ' || c == U'む' || c == U'ゆ' || c == U'ゅ' ||
-      c == U'る') {
-    return U'う';
-  }
-  // え-row (e-vowel)
-  if (c == U'え' || c == U'ぇ' || c == U'け' || c == U'げ' || c == U'せ' ||
-      c == U'ぜ' || c == U'て' || c == U'で' || c == U'ね' || c == U'へ' ||
-      c == U'べ' || c == U'ぺ' || c == U'め' || c == U'れ') {
-    return U'え';
-  }
-  // お-row (o-vowel)
-  if (c == U'お' || c == U'ぉ' || c == U'こ' || c == U'ご' || c == U'そ' ||
-      c == U'ぞ' || c == U'と' || c == U'ど' || c == U'の' || c == U'ほ' ||
-      c == U'ぼ' || c == U'ぽ' || c == U'も' || c == U'よ' || c == U'ょ' ||
-      c == U'ろ' || c == U'を') {
-    return U'お';
-  }
-  // No vowel: ん, っ, punctuation, non-hiragana
-  return 0;
-}
-
-}  // namespace
+using verb_helpers::getHiraganaVowel;
 
 Tokenizer::Tokenizer(const dictionary::DictionaryManager& dict_manager,
                      const Scorer& scorer,
@@ -224,7 +179,7 @@ void Tokenizer::addDictionaryCandidates(
       }
 
       // Track standard emphatic chars separately for cost calculation
-      size_t standard_emphatic_chars = emphatic_suffix.size() / 3;
+      size_t standard_emphatic_chars = emphatic_suffix.size() / core::kJapaneseCharBytes;
 
       // Also check for repeated vowels matching the final character's vowel
       // E.g., きた + ああああ → きたああああ (た ends in あ-vowel)
@@ -248,10 +203,7 @@ void Tokenizer::addDictionaryCandidates(
           // Require at least 2 repeated vowels for emphatic pattern
           if (vowel_repeat_count >= 2) {
             for (size_t i = 0; i < vowel_repeat_count; ++i) {
-              // Convert codepoint to UTF-8
-              emphatic_suffix += static_cast<char>(0xE0 | ((expected_vowel >> 12) & 0x0F));
-              emphatic_suffix += static_cast<char>(0x80 | ((expected_vowel >> 6) & 0x3F));
-              emphatic_suffix += static_cast<char>(0x80 | (expected_vowel & 0x3F));
+              emphatic_suffix += normalize::encodeUtf8(expected_vowel);
             }
           } else {
             // Not enough repetition, reset position
@@ -269,7 +221,7 @@ void Tokenizer::addDictionaryCandidates(
         if (vowel_repeat_count >= 2) {
           // Give a BONUS for vowel repetition to compete with split alternatives
           // E.g., きたああああ should beat きた + ああああ
-          float char_count = static_cast<float>(emphatic_suffix.size() / 3);
+          float char_count = static_cast<float>(emphatic_suffix.size() / core::kJapaneseCharBytes);
           cost_adjustment = -0.5F + 0.05F * char_count;
         } else {
           // Standard emphatic chars (sokuon/chouon/small vowels) use penalty
@@ -395,7 +347,7 @@ void Tokenizer::addUnknownCandidates(
         if (all_hiragana) {
           // Check if ends with て or で (te-form markers)
           std::string_view last_char = utf8::lastChar(surface);
-          if (last_char == "て" || last_char == "で") {
+          if (utf8::equalsAny(last_char, {"て", "で"})) {
             skip_penalty = true;
             skip_reason = "short_te_form";
           }
@@ -538,11 +490,8 @@ void Tokenizer::addUnknownCandidates(
         // Don't penalize verb conjugation endings
         // - te-form: て/で/って/んで/いて/いで
         // - renyoukei し: extremely common for suru/godan verbs (分割し, 話し)
-        bool is_verb_ending =
-            (hiragana_suffix == "て" || hiragana_suffix == "で" ||
-             hiragana_suffix == "って" || hiragana_suffix == "んで" ||
-             hiragana_suffix == "いて" || hiragana_suffix == "いで" ||
-             hiragana_suffix == "し");
+        bool is_verb_ending = utf8::equalsAny(hiragana_suffix,
+            {"て", "で", "って", "んで", "いて", "いで", "し"});
 
         // Skip penalty if:
         // - Known verb conjugation ending (te-form, renyoukei)

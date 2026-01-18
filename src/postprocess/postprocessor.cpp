@@ -144,8 +144,7 @@ std::vector<core::Morpheme> Postprocessor::convertPrefixVerbToNoun(
     if (i > 0 && morphemes[i - 1].pos == core::PartOfSpeech::Prefix) {
       const std::string& prefix_surface = morphemes[i - 1].surface;
       // Only for honorific prefixes お and ご
-      if (prefix_surface == "お" || prefix_surface == "ご" ||
-          prefix_surface == "御") {
+      if (utf8::equalsAny(prefix_surface, {"お", "ご", "御"})) {
         // Convert VERB to NOUN (renyoukei nominalization)
         // e.g., 願い(VERB) → 願い(NOUN) after お
         if (m.pos == core::PartOfSpeech::Verb) {
@@ -362,9 +361,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(
       const auto& next = morphemes[idx + 1];
       // Check for common time/counter suffixes that get split
       if (next.pos == core::PartOfSpeech::Noun &&
-          (next.surface == "間" || next.surface == "半" ||
-           next.surface == "前" || next.surface == "後" ||
-           next.surface == "目")) {
+          utf8::equalsAny(next.surface, {"間", "半", "前", "後", "目"})) {
         core::Morpheme merged = current;
         merged.surface += next.surface;
         merged.lemma = merged.surface;
@@ -413,9 +410,8 @@ std::vector<core::Morpheme> Postprocessor::mergeNaAdjectiveNa(
       if (check_str.size() >= core::kJapaneseCharBytes) {
         std::string_view last_char = check_str.substr(check_str.size() - core::kJapaneseCharBytes);
         // i-adjectives end with い (exceptions: きれい, きらい, 嫌い, みたい)
-        if (last_char == "い" && check_str != "きれい" &&
-            check_str != "きらい" && check_str != "嫌い" &&
-            check_str != "みたい") {
+        if (last_char == "い" &&
+            !utf8::equalsAny(check_str, {"きれい", "きらい", "嫌い", "みたい"})) {
           is_na_adj = false;
           SUZUME_DEBUG_LOG("[POSTPROC] Detected i-adjective: \"" << check_str
                            << "\", not merging with な\n");

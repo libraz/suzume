@@ -185,11 +185,7 @@
           "surface": "て",
           "pos": "Particle"
         },
-        {
-          "surface": "しまう",
-          "pos": "Auxiliary",
-          "lemma": "しまう"
-        }
+        {"surface": "しまう", "pos": "Verb", "lemma": "しまう"}
       ],
       "tags": [
         "verb",

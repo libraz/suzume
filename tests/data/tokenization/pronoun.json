@@ -149,11 +149,7 @@
           "pos": "Auxiliary",
           "lemma": "だ"
         },
-        {
-          "surface": "ある",
-          "pos": "Auxiliary",
-          "lemma": "ある"
-        }
+        {"surface": "ある", "pos": "Verb", "lemma": "ある"}
       ],
       "tags": [
         "character_speech",

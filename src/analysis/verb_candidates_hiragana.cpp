@@ -290,11 +290,10 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     bool looks_like_te_form = false;
     if ((pre_check_len == 3 || pre_check_len == 4) &&
         surface.size() >= core::kJapaneseCharBytes) {
-      std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes,
-                                  core::kJapaneseCharBytes);
-      if (last_char == "た" || last_char == "だ") {
+      std::string_view last_char = utf8::lastChar(surface);
+      if (utf8::equalsAny(last_char, {"た", "だ"})) {
         looks_like_past_form = true;
-      } else if (last_char == "て" || last_char == "で") {
+      } else if (utf8::equalsAny(last_char, {"て", "で"})) {
         // Te-form verbs (あらって, しまって, かって) need lower threshold too
         looks_like_te_form = true;
       }
@@ -309,8 +308,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     // e.g., してる should be する+ている, not しる (ichidan)
     bool looks_like_ichidan_dict_form = false;
     if (pre_check_len >= 3 && surface.size() >= core::kTwoJapaneseCharBytes) {
-      std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes,
-                                  core::kJapaneseCharBytes);
+      std::string_view last_char = utf8::lastChar(surface);
       if (last_char == "る" && end_pos >= 2) {
         // Check if second-to-last char is e-row or i-row hiragana (ichidan stem ending)
         // E-row: 食べる, 見える, 調べる
@@ -393,12 +391,10 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       // Exception: Conditional forms (ending with ば) are unambiguous and should
       // get the bonus even if short (e.g., あれば = ある conditional)
       size_t candidate_len = end_pos - start_pos;
-      bool is_conditional = (surface.size() >= core::kJapaneseCharBytes &&
-                             surface.substr(surface.size() - core::kJapaneseCharBytes) == "ば");
+      bool is_conditional = utf8::endsWith(surface, "ば");
       // Check for っとく pattern (ておく contraction: やっとく, 見っとく)
       // This is a common colloquial pattern that should get bonus treatment
-      bool is_teoku_contraction = (surface.size() >= core::kThreeJapaneseCharBytes &&
-                                   surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "っとく");
+      bool is_teoku_contraction = utf8::endsWith(surface, "っとく");
       // Check for short te/de-form (e.g., ねて, でて, みて)
       // These are 2-char hiragana verbs that need a bonus to beat particle splits
       bool is_short_te_form = false;
@@ -422,9 +418,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       // reduces confidence significantly for pure hiragana verbs
       bool is_medium_past_form = false;
       if ((candidate_len == 3 || candidate_len == 4) && best.confidence >= verb_opts.confidence_past_te) {
-        std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes,
-                                    core::kJapaneseCharBytes);
-        if (last_char == "た" || last_char == "だ") {
+        if (utf8::equalsAny(utf8::lastChar(surface), {"た", "だ"})) {
           is_medium_past_form = true;
         }
       }
@@ -493,24 +487,14 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
         }
       }
 
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = end_pos;
-      candidate.pos = core::PartOfSpeech::Verb;
-      candidate.cost = base_cost;
-      candidate.has_suffix = false;
       // Set lemma from inflection analysis for pure hiragana verbs
       // This is essential for P4 (ひらがな動詞活用展開) to work without dictionary
       // The lemmatizer can't derive lemma accurately for unknown verbs
-      candidate.lemma = best.base_form;
-      candidate.conj_type = grammar::verbTypeToConjType(best.verb_type);
-#ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::VerbHiragana;
-      candidate.confidence = best.confidence;
-      candidate.pattern = grammar::verbTypeToString(best.verb_type);
-#endif
-      candidates.push_back(candidate);
+      candidates.push_back(makeVerbCandidate(
+          surface, start_pos, end_pos, base_cost, best.base_form,
+          grammar::verbTypeToConjType(best.verb_type),
+          false, CandidateOrigin::VerbHiragana, best.confidence,
+          grammar::verbTypeToString(best.verb_type).data()));
     }
   }
 
@@ -615,26 +599,16 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     std::string surface = extractSubstring(codepoints, start_pos, split_end);
     const char* pattern_name = "passive_mizenkei";
 
-    UnknownCandidate candidate;
-    candidate.surface = surface;
-    candidate.start = start_pos;
-    candidate.end = split_end;
-    candidate.pos = core::PartOfSpeech::Verb;
-    candidate.cost = -0.5F;  // Negative cost to beat OTHER + AUX split
-    candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
-    candidate.lemma = lemma;  // Use lemma from dictionary if available
-    candidate.conj_type = grammar::verbTypeToConjType(verb_type);
+    constexpr float kCost = -0.5F;  // Negative cost to beat OTHER + AUX split
     SUZUME_DEBUG_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                           << " hiragana_" << pattern_name << " lemma=" << lemma
-                          << " cost=" << candidate.cost << "\n";
+                          << " cost=" << kCost << "\n";
     }
-#ifdef SUZUME_DEBUG_INFO
-    candidate.origin = CandidateOrigin::VerbHiragana;
-    candidate.confidence = 0.9F;  // High confidence for dictionary-verified
-    candidate.pattern = std::string("hiragana_") + pattern_name;
-#endif
-    candidates.push_back(candidate);
+    candidates.push_back(makeVerbCandidate(
+        surface, start_pos, split_end, kCost, lemma,
+        grammar::verbTypeToConjType(verb_type),
+        true, CandidateOrigin::VerbHiragana, 0.9F, "hiragana_passive_mizenkei"));
     break;  // Only generate one passive candidate per length
   }
 
@@ -709,27 +683,17 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
       // Found a valid verb - generate onbin stem candidate
       std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_pos + 1);
-
-      UnknownCandidate candidate;
-      candidate.surface = onbin_surface;
-      candidate.start = start_pos;
-      candidate.end = onbin_pos + 1;
-      candidate.pos = core::PartOfSpeech::Verb;
-      candidate.cost = -0.5F;  // Negative cost to beat unsplit forms
-      candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
-      candidate.lemma = base_form;
-      candidate.conj_type = grammar::verbTypeToConjType(verb_type);
+      constexpr float kCost = -0.5F;  // Negative cost to beat unsplit forms
       SUZUME_DEBUG_BLOCK {
         SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                             << " hiragana_onbin_contraction lemma=" << base_form
-                            << " cost=" << candidate.cost << "\n";
+                            << " cost=" << kCost << "\n";
       }
-#ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::VerbHiragana;
-      candidate.confidence = 0.9F;
-      candidate.pattern = is_sokuonbin ? "hiragana_sokuonbin" : "hiragana_hatsuonbin";
-#endif
-      candidates.push_back(candidate);
+      const char* pattern = is_sokuonbin ? "hiragana_sokuonbin" : "hiragana_hatsuonbin";
+      candidates.push_back(makeVerbCandidate(
+          onbin_surface, start_pos, onbin_pos + 1, kCost, base_form,
+          grammar::verbTypeToConjType(verb_type),
+          true, CandidateOrigin::VerbHiragana, 0.9F, pattern));
       break;  // Found valid candidate for this position
     }
   }
@@ -757,29 +721,18 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
           // Only generate if base form is a known verb in dictionary
           // This prevents false positives like め+て, け+て
           if (vh::isVerbInDictionary(dict_manager, base_form)) {
-            // Generate candidate for the 1-char stem
-            UnknownCandidate candidate;
-            candidate.surface = stem_surface;
-            candidate.start = start_pos;
-            candidate.end = start_pos + 1;
-            candidate.pos = core::PartOfSpeech::Verb;
             // Strong negative cost to beat particle split
             // Particle path can be as low as -0.2, so we need lower
-            candidate.cost = -0.5F;
-            candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
-            candidate.lemma = base_form;
-            candidate.conj_type = dictionary::ConjugationType::Ichidan;
+            constexpr float kCost = -0.5F;
             SUZUME_DEBUG_BLOCK {
               SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface
                                   << " hiragana_ichidan_renyokei_1char lemma=" << base_form
-                                  << " cost=" << candidate.cost << "\n";
+                                  << " cost=" << kCost << "\n";
             }
-#ifdef SUZUME_DEBUG_INFO
-            candidate.origin = CandidateOrigin::VerbHiragana;
-            candidate.confidence = 0.8F;  // High confidence for this pattern
-            candidate.pattern = "hiragana_ichidan_renyokei_1char";
-#endif
-            candidates.push_back(candidate);
+            candidates.push_back(makeVerbCandidate(
+                stem_surface, start_pos, start_pos + 1, kCost, base_form,
+                dictionary::ConjugationType::Ichidan,
+                true, CandidateOrigin::VerbHiragana, 0.8F, "hiragana_ichidan_renyokei_1char"));
           }
         }
       }
@@ -839,32 +792,20 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
     // Check if base form is in dictionary (gives confidence boost)
     bool is_dict_verb = vh::isVerbInDictionary(dict_manager, base_form);
-
-    // Generate candidate for the ichidan stem
-    UnknownCandidate candidate;
-    candidate.surface = stem_surface;
-    candidate.start = start_pos;
-    candidate.end = end_pos;
-    candidate.pos = core::PartOfSpeech::Verb;
     // Strong negative cost to beat NOUN + て(VERB from てる) split
     // Dictionary-verified verbs get stronger bonus
-    candidate.cost = is_dict_verb ? -0.8F : -0.6F;
-    candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
-    candidate.lemma = base_form;
-    candidate.conj_type = dictionary::ConjugationType::Ichidan;
+    float cost = is_dict_verb ? -0.8F : -0.6F;
     SUZUME_DEBUG_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface
                           << " hiragana_ichidan_renyokei lemma=" << base_form
                           << " conf=" << ichidan_confidence
                           << (is_dict_verb ? " [dict]" : "")
-                          << " cost=" << candidate.cost << "\n";
+                          << " cost=" << cost << "\n";
     }
-#ifdef SUZUME_DEBUG_INFO
-    candidate.origin = CandidateOrigin::VerbHiragana;
-    candidate.confidence = ichidan_confidence;
-    candidate.pattern = "hiragana_ichidan_renyokei";
-#endif
-    candidates.push_back(candidate);
+    candidates.push_back(makeVerbCandidate(
+        stem_surface, start_pos, end_pos, cost, base_form,
+        dictionary::ConjugationType::Ichidan,
+        true, CandidateOrigin::VerbHiragana, ichidan_confidence, "hiragana_ichidan_renyokei"));
   }
 
   // Add emphatic variants (いくっ, するっ, etc.)

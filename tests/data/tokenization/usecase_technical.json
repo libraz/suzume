@@ -197,11 +197,11 @@
         {"surface": "が", "pos": "Particle"},
         {"surface": "遅れ", "pos": "Verb", "lemma": "遅れる"},
         {"surface": "て", "pos": "Particle"},
-        {"surface": "いる", "pos": "Verb", "lemma": "いる"},
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"},
         {"surface": "ので", "pos": "Particle"},
         {"surface": "遅刻", "pos": "Noun"},
         {"surface": "し", "pos": "Verb", "lemma": "する"},
-        {"surface": "そう", "pos": "Noun"},
+        {"surface": "そう", "pos": "Auxiliary", "lemma": "そう"},
         {"surface": "です", "pos": "Auxiliary"}
       ],
       "tags": ["complex", "suru"]
@@ -387,7 +387,7 @@
         {"surface": "運動", "pos": "Noun"},
         {"surface": "し", "pos": "Verb", "lemma": "する"},
         {"surface": "て", "pos": "Particle"},
-        {"surface": "いる", "pos": "Verb", "lemma": "いる"}
+        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
       ],
       "tags": ["multi-clause"]
     },

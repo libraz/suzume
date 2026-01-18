@@ -274,7 +274,8 @@ TEST_F(DefaultValuesTest, ConnectionRulesEdgeDefaults) {
 TEST_F(DefaultValuesTest, ConnectionRulesConnectionDefaults) {
   ConnectionOptions opts;
   EXPECT_FLOAT_EQ(opts.penalty_copula_after_verb, 3.0F);
-  EXPECT_FLOAT_EQ(opts.bonus_tai_after_renyokei, 0.8F);
+  // kBonusTaiAfterRenyokei = scale::kSevere + 0.1F = 2.6F (to beat た bonus of 2.5F)
+  EXPECT_FLOAT_EQ(opts.bonus_tai_after_renyokei, scorer::kBonusTaiAfterRenyokei);
 }
 
 TEST_F(DefaultValuesTest, JoinOptionsDefaults) {

@@ -398,22 +398,18 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
     std::string surface = extractSubstring(codepoints, start_pos, candidate_end);
 
     if (!surface.empty()) {
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = candidate_end;
       // Particle-start hiragana sequences are potential nouns (はし, はな, にく)
       // Use NOUN POS instead of OTHER to avoid exceeds_dict_length penalty
-      candidate.pos = started_with_particle ? core::PartOfSpeech::Noun
-                                            : getPosForType(start_type);
-      candidate.cost = getCostForType(start_type, len);
+      core::PartOfSpeech pos = started_with_particle ? core::PartOfSpeech::Noun
+                                                     : getPosForType(start_type);
+      float cost = getCostForType(start_type, len);
 
       // Penalize kanji sequences ending with honorific suffixes (様, 氏)
       // to encourage NOUN + SUFFIX separation (e.g., 客様 → 客 + 様)
       if (start_type == normalize::CharType::Kanji && len >= 2) {
         char32_t last_char = codepoints[candidate_end - 1];
         if (last_char == U'様' || last_char == U'氏') {
-          candidate.cost += 4.0F;  // Strong penalty to prefer NOUN + SUFFIX path
+          cost += 4.0F;  // Strong penalty to prefer NOUN + SUFFIX path
         }
       }
 
@@ -424,7 +420,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
         for (size_t i = start_pos + 1; i < candidate_end - 1; ++i) {
           if (normalize::isIterationMark(codepoints[i])) {
             // Found 々 in the middle - penalize extending past it
-            candidate.cost += 5.0F;
+            cost += 5.0F;
             break;
           }
         }
@@ -436,6 +432,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       // Constraints:
       // - Only len=2 is allowed (typical pattern: は+し, に+く, の+り)
       // - Longer sequences are too risky (e.g., によれ should be に+よれ, not a noun)
+      bool has_suffix = false;
       if (started_with_particle) {
         if (len != 2) {
           continue;  // Only generate 2-char candidates
@@ -446,32 +443,30 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
         if (is_reduplicated) {
           // Small bonus for reduplicated patterns - they're often real words
           // This helps はは (母) beat は+は (particle sequence)
-          candidate.cost -= 0.5F;
+          cost -= 0.5F;
         } else {
           // Add moderate penalty - let connection rules decide which path is better
-          candidate.cost += 1.0F;
+          cost += 1.0F;
         }
         // Mark as has_suffix to skip exceeds_dict_length penalty in tokenizer
         // These are morphologically recognized patterns (potential nouns)
-        candidate.has_suffix = true;
-      } else {
-        candidate.has_suffix = false;
+        has_suffix = true;
       }
+      auto cand = makeCandidate(surface, start_pos, candidate_end, pos, cost, has_suffix, CandidateOrigin::SameType);
 #ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::SameType;
-      candidate.confidence = started_with_particle ? 0.7F : 1.0F;
+      cand.confidence = started_with_particle ? 0.7F : 1.0F;
       switch (start_type) {
-        case normalize::CharType::Kanji: candidate.pattern = "kanji_seq"; break;
-        case normalize::CharType::Katakana: candidate.pattern = "kata_seq"; break;
+        case normalize::CharType::Kanji: cand.pattern = "kanji_seq"; break;
+        case normalize::CharType::Katakana: cand.pattern = "kata_seq"; break;
         case normalize::CharType::Hiragana:
-          candidate.pattern = started_with_particle ? "hira_noun_seq" : "hira_seq";
+          cand.pattern = started_with_particle ? "hira_noun_seq" : "hira_seq";
           break;
-        case normalize::CharType::Alphabet: candidate.pattern = "alpha_seq"; break;
-        case normalize::CharType::Digit: candidate.pattern = "digit_seq"; break;
-        default: candidate.pattern = "other_seq"; break;
+        case normalize::CharType::Alphabet: cand.pattern = "alpha_seq"; break;
+        case normalize::CharType::Digit: cand.pattern = "digit_seq"; break;
+        default: cand.pattern = "other_seq"; break;
       }
 #endif
-      candidates.push_back(candidate);
+      candidates.push_back(cand);
     }
   }
 
@@ -518,21 +513,13 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAlphanumeric(
   // Only add if mixed (pure sequences handled by generateBySameType)
   if (has_alpha && has_digit && end_pos > start_pos + 1) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-
     if (!surface.empty()) {
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = end_pos;
-      candidate.pos = core::PartOfSpeech::Noun;
-      candidate.cost = 0.8F;
-      candidate.has_suffix = false;
+      auto cand = makeCandidate(surface, start_pos, end_pos, core::PartOfSpeech::Noun, 0.8F, false, CandidateOrigin::Alphanumeric);
 #ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::Alphanumeric;
-      candidate.confidence = 1.0F;
-      candidate.pattern = "alphanum_mixed";
+      cand.confidence = 1.0F;
+      cand.pattern = "alphanum_mixed";
 #endif
-      candidates.push_back(candidate);
+      candidates.push_back(cand);
     }
   }
 
@@ -722,8 +709,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
     if (!surface.empty()) {
       // Skip patterns ending with そう - these are aspectual auxiliary patterns
       // that should be handled by verb/adjective + そう analysis, not as character speech
-      if (surface.size() >= core::kTwoJapaneseCharBytes &&
-          surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == scorer::kSuffixSou) {
+      if (utf8::endsWith(surface, scorer::kSuffixSou)) {
         continue;
       }
 
@@ -745,22 +731,16 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
         length_penalty += 1.0F;  // Prefer katakana NOUN over char_speech AUX
       }
 
-      UnknownCandidate candidate;
-      candidate.surface = surface;
-      candidate.start = start_pos;
-      candidate.end = candidate_end;
       // Mark as Auxiliary so it connects properly after verbs/adjectives
-      candidate.pos = core::PartOfSpeech::Auxiliary;
-      candidate.cost = options_.character_speech_cost + length_penalty;
-      candidate.has_suffix = false;
+      float cost = options_.character_speech_cost + length_penalty;
+      auto cand = makeCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Auxiliary, cost, false, CandidateOrigin::CharacterSpeech);
 #ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::CharacterSpeech;
-      candidate.confidence = 0.5F;
-      candidate.pattern = (start_type == normalize::CharType::Hiragana)
-                              ? "char_speech_hira"
-                              : "char_speech_kata";
+      cand.confidence = 0.5F;
+      cand.pattern = (start_type == normalize::CharType::Hiragana)
+                         ? "char_speech_hira"
+                         : "char_speech_kata";
 #endif
-      candidates.push_back(candidate);
+      candidates.push_back(cand);
     }
   }
 
@@ -825,21 +805,13 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
       // (small kana should be part of previous mora, not start a unit)
       if (!isSmallKanaAt(start_pos) && !isSmallKanaAt(start_pos + half_len)) {
         std::string surface = extractSubstring(codepoints, start_pos, seq_end);
-
         if (!surface.empty()) {
-          UnknownCandidate candidate;
-          candidate.surface = surface;
-          candidate.start = start_pos;
-          candidate.end = seq_end;
-          candidate.pos = core::PartOfSpeech::Adverb;
-          candidate.cost = -1.0F;  // Very strong preference for doubled patterns
-          candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
+          auto cand = makeCandidate(surface, start_pos, seq_end, core::PartOfSpeech::Adverb, -1.0F, true, CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
-          candidate.origin = CandidateOrigin::Onomatopoeia;
-          candidate.confidence = 1.0F;
-          candidate.pattern = "aa_doubled";
+          cand.confidence = 1.0F;
+          cand.pattern = "aa_doubled";
 #endif
-          candidates.push_back(candidate);
+          candidates.push_back(cand);
           return candidates;  // Found a match, return early
         }
       }
@@ -866,21 +838,13 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
       if (ch0 == ch2 && ch1 == ch3 && !isSmallKanaAt(start_pos)) {
         // ABAB pattern detected (e.g., わくわく, きらきら, どきどき)
         std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
-
         if (!surface.empty()) {
-          UnknownCandidate candidate;
-          candidate.surface = surface;
-          candidate.start = start_pos;
-          candidate.end = start_pos + 4;
-          candidate.pos = core::PartOfSpeech::Adverb;
-          candidate.cost = 0.1F;  // Very low cost to prefer over particle + adj splits
-          candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
+          auto cand = makeCandidate(surface, start_pos, start_pos + 4, core::PartOfSpeech::Adverb, 0.1F, true, CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
-          candidate.origin = CandidateOrigin::Onomatopoeia;
-          candidate.confidence = 1.0F;
-          candidate.pattern = "abab_pattern";
+          cand.confidence = 1.0F;
+          cand.pattern = "abab_pattern";
 #endif
-          candidates.push_back(candidate);
+          candidates.push_back(cand);
         }
       }
     }
@@ -896,38 +860,24 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
       if (seq_len == 3) {
         std::string surface = extractSubstring(codepoints, start_pos, start_pos + 3);
         if (!surface.empty()) {
-          UnknownCandidate candidate;
-          candidate.surface = surface;
-          candidate.start = start_pos;
-          candidate.end = start_pos + 3;
-          candidate.pos = core::PartOfSpeech::Adverb;
-          candidate.cost = 0.3F;  // Lower than verb to prefer adverb interpretation
-          candidate.has_suffix = true;
+          auto cand = makeCandidate(surface, start_pos, start_pos + 3, core::PartOfSpeech::Adverb, 0.3F, true, CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
-          candidate.origin = CandidateOrigin::Onomatopoeia;
-          candidate.confidence = 0.7F;
-          candidate.pattern = "ab_ri_pattern";
+          cand.confidence = 0.7F;
+          cand.pattern = "ab_ri_pattern";
 #endif
-          candidates.push_back(candidate);
+          candidates.push_back(cand);
         }
       }
       // For 4-char patterns like ぐったり, じっくり (small tsu + CV + り)
       else if (seq_len == 4 && isSmallKanaAt(start_pos + 1)) {
         std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
         if (!surface.empty()) {
-          UnknownCandidate candidate;
-          candidate.surface = surface;
-          candidate.start = start_pos;
-          candidate.end = start_pos + 4;
-          candidate.pos = core::PartOfSpeech::Adverb;
-          candidate.cost = 0.2F;  // Low cost for doubled consonant patterns
-          candidate.has_suffix = true;
+          auto cand = makeCandidate(surface, start_pos, start_pos + 4, core::PartOfSpeech::Adverb, 0.2F, true, CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
-          candidate.origin = CandidateOrigin::Onomatopoeia;
-          candidate.confidence = 0.8F;
-          candidate.pattern = "xtu_cv_ri_pattern";
+          cand.confidence = 0.8F;
+          cand.pattern = "xtu_cv_ri_pattern";
 #endif
-          candidates.push_back(candidate);
+          candidates.push_back(cand);
         }
       }
     }

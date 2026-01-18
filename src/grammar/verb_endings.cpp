@@ -8,25 +8,13 @@
 
 #include "verb_endings.h"
 
+#include "normalize/utf8.h"
+
 namespace suzume::grammar {
 
-namespace {
+using normalize::encodeUtf8;
 
-// UTF-8 encode a single codepoint
-std::string encodeUtf8(char32_t cp) {
-  std::string result;
-  if (cp < 0x80) {
-    result.push_back(static_cast<char>(cp));
-  } else if (cp < 0x800) {
-    result.push_back(static_cast<char>(0xC0 | (cp >> 6)));
-    result.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
-  } else if (cp < 0x10000) {
-    result.push_back(static_cast<char>(0xE0 | (cp >> 12)));
-    result.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
-    result.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
-  }
-  return result;
-}
+namespace {
 
 // Generate all Godan verb endings from Conjugation::getGodanRows()
 std::vector<VerbEnding> generateGodanEndings() {

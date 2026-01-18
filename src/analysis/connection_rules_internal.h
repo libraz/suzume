@@ -15,154 +15,44 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "normalize/exceptions.h"
+#include "normalize/utf8.h"
 
 namespace suzume::analysis {
 namespace connection_rules {
 
 // =============================================================================
-// POS Pair Matchers (Step 0-0: Code reduction helpers)
+// POS Pair Matcher Template
 // =============================================================================
-// These inline functions reduce repetitive POS condition checks across
-// connection rule files. Each replaces a 3-line condition block with 1 line.
+// Single template replacing 23 individual inline functions.
+// Usage: isPosMatch<POS::Verb, POS::Aux>(prev, next)
 
-// Verb connection patterns
-inline bool isVerbToAux(const core::LatticeEdge& prev,
-                        const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Verb &&
-         next.pos == core::PartOfSpeech::Auxiliary;
-}
+namespace POS {
+using core::PartOfSpeech;
+constexpr auto Verb = PartOfSpeech::Verb;
+constexpr auto Noun = PartOfSpeech::Noun;
+constexpr auto Adj = PartOfSpeech::Adjective;
+constexpr auto Adv = PartOfSpeech::Adverb;
+constexpr auto Aux = PartOfSpeech::Auxiliary;
+constexpr auto Particle = PartOfSpeech::Particle;
+constexpr auto Prefix = PartOfSpeech::Prefix;
+constexpr auto Suffix = PartOfSpeech::Suffix;
+constexpr auto Symbol = PartOfSpeech::Symbol;
+constexpr auto Other = PartOfSpeech::Other;
+}  // namespace POS
 
-inline bool isVerbToVerb(const core::LatticeEdge& prev,
-                         const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Verb &&
-         next.pos == core::PartOfSpeech::Verb;
-}
-
-inline bool isVerbToParticle(const core::LatticeEdge& prev,
-                             const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Verb &&
-         next.pos == core::PartOfSpeech::Particle;
-}
-
-inline bool isVerbToAdj(const core::LatticeEdge& prev,
-                        const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Verb &&
-         next.pos == core::PartOfSpeech::Adjective;
-}
-
-inline bool isVerbToNoun(const core::LatticeEdge& prev,
-                         const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Verb &&
-         next.pos == core::PartOfSpeech::Noun;
-}
-
-// Noun connection patterns
-inline bool isNounToAux(const core::LatticeEdge& prev,
-                        const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Noun &&
-         next.pos == core::PartOfSpeech::Auxiliary;
-}
-
-inline bool isNounToVerb(const core::LatticeEdge& prev,
-                         const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Noun &&
-         next.pos == core::PartOfSpeech::Verb;
-}
-
-inline bool isNounToAdj(const core::LatticeEdge& prev,
-                        const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Noun &&
-         next.pos == core::PartOfSpeech::Adjective;
-}
-
-inline bool isNounToAdv(const core::LatticeEdge& prev,
-                        const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Noun &&
-         next.pos == core::PartOfSpeech::Adverb;
-}
-
-inline bool isNounToNoun(const core::LatticeEdge& prev,
-                         const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Noun &&
-         next.pos == core::PartOfSpeech::Noun;
-}
-
-// Adjective connection patterns
-inline bool isAdjToVerb(const core::LatticeEdge& prev,
-                        const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Adjective &&
-         next.pos == core::PartOfSpeech::Verb;
-}
-
-// Auxiliary connection patterns
-inline bool isAuxToAux(const core::LatticeEdge& prev,
-                       const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Auxiliary &&
-         next.pos == core::PartOfSpeech::Auxiliary;
-}
-
-inline bool isAuxToParticle(const core::LatticeEdge& prev,
-                            const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Auxiliary &&
-         next.pos == core::PartOfSpeech::Particle;
-}
-
-// Particle connection patterns
-inline bool isParticleToAux(const core::LatticeEdge& prev,
-                            const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Particle &&
-         next.pos == core::PartOfSpeech::Auxiliary;
-}
-
-inline bool isParticleToNoun(const core::LatticeEdge& prev,
-                             const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Particle &&
-         next.pos == core::PartOfSpeech::Noun;
-}
-
-inline bool isParticleToOther(const core::LatticeEdge& prev,
-                              const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Particle &&
-         next.pos == core::PartOfSpeech::Other;
-}
-
-inline bool isParticleToParticle(const core::LatticeEdge& prev,
+template <core::PartOfSpeech P1, core::PartOfSpeech P2>
+inline constexpr bool isPosMatch(const core::LatticeEdge& prev,
                                  const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Particle &&
-         next.pos == core::PartOfSpeech::Particle;
+  return prev.pos == P1 && next.pos == P2;
 }
 
-inline bool isParticleToVerb(const core::LatticeEdge& prev,
-                             const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Particle &&
-         next.pos == core::PartOfSpeech::Verb;
-}
-
-inline bool isParticleToAdj(const core::LatticeEdge& prev,
-                            const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Particle &&
-         next.pos == core::PartOfSpeech::Adjective;
-}
-
-// Prefix connection patterns
-inline bool isPrefixToVerb(const core::LatticeEdge& prev,
-                           const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Prefix &&
-         next.pos == core::PartOfSpeech::Verb;
-}
-
-inline bool isPrefixToAdj(const core::LatticeEdge& prev,
-                          const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Prefix &&
-         next.pos == core::PartOfSpeech::Adjective;
-}
-
-// Symbol connection patterns
-inline bool isSymbolToSuffix(const core::LatticeEdge& prev,
-                             const core::LatticeEdge& next) {
-  return prev.pos == core::PartOfSpeech::Symbol &&
-         next.pos == core::PartOfSpeech::Suffix;
-}
+// =============================================================================
+// Connection Rule Function Type
+// =============================================================================
+// All connection rule functions share this signature.
+using RuleFunc = ConnectionRuleResult(const core::LatticeEdge& prev,
+                                      const core::LatticeEdge& next,
+                                      const ConnectionOptions& opts);
 
 // =============================================================================
 // Helper Functions (shared across rule files)
@@ -215,326 +105,96 @@ inline bool startsWithKanji(std::string_view surface) {
 // =============================================================================
 // Verb Conjugation Rules (connection_rules_verb.cpp)
 // =============================================================================
-
-ConnectionRuleResult checkCopulaAfterVerb(const core::LatticeEdge& prev,
-                                          const core::LatticeEdge& next,
-                                          const ConnectionOptions& opts);
-
-ConnectionRuleResult checkOnbinkeiToVoicedTa(const core::LatticeEdge& prev,
-                                             const core::LatticeEdge& next,
-                                             const ConnectionOptions& opts);
-
-ConnectionRuleResult checkOnbinkeiToTara(const core::LatticeEdge& prev,
-                                         const core::LatticeEdge& next,
-                                         const ConnectionOptions& opts);
-
-ConnectionRuleResult checkOnbinkeiToTa(const core::LatticeEdge& prev,
-                                       const core::LatticeEdge& next,
-                                       const ConnectionOptions& opts);
-
-ConnectionRuleResult checkIchidanRenyokeiTe(const core::LatticeEdge& prev,
-                                            const core::LatticeEdge& next,
-                                            const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTeFormSplit(const core::LatticeEdge& prev,
-                                      const core::LatticeEdge& next,
-                                      const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTaiAfterRenyokei(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTaAfterRenyokei(const core::LatticeEdge& prev,
-                                          const core::LatticeEdge& next,
-                                          const ConnectionOptions& opts);
-
-ConnectionRuleResult checkYasuiAfterRenyokei(const core::LatticeEdge& prev,
-                                             const core::LatticeEdge& next,
-                                             const ConnectionOptions& opts);
-
-ConnectionRuleResult checkNagaraSplit(const core::LatticeEdge& prev,
-                                      const core::LatticeEdge& next,
-                                      const ConnectionOptions& opts);
-
-ConnectionRuleResult checkKataAfterRenyokei(const core::LatticeEdge& prev,
-                                            const core::LatticeEdge& next,
-                                            const ConnectionOptions& opts);
-
-ConnectionRuleResult checkSouAfterRenyokei(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts);
-
-ConnectionRuleResult checkCompoundAuxAfterRenyokei(const core::LatticeEdge& prev,
-                                                   const core::LatticeEdge& next,
-                                                   const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTakuteAfterRenyokei(const core::LatticeEdge& prev,
-                                              const core::LatticeEdge& next,
-                                              const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTakuTeSplit(const core::LatticeEdge& prev,
-                                      const core::LatticeEdge& next,
-                                      const ConnectionOptions& opts);
-
-ConnectionRuleResult checkConditionalVerbToVerb(const core::LatticeEdge& prev,
-                                                const core::LatticeEdge& next,
-                                                const ConnectionOptions& opts);
-
-ConnectionRuleResult checkVerbRenyokeiCompoundAux(const core::LatticeEdge& prev,
-                                                  const core::LatticeEdge& next,
-                                                  const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTeFormVerbToVerb(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts);
-
-ConnectionRuleResult checkPrefixBeforeVerb(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTokuContractionSplit(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTekuReMissegmentation(const core::LatticeEdge& prev,
-                                                const core::LatticeEdge& next,
-                                                const ConnectionOptions& opts);
+RuleFunc checkCopulaAfterVerb;
+RuleFunc checkOnbinkeiToVoicedTa;
+RuleFunc checkOnbinkeiToTara;
+RuleFunc checkOnbinkeiToTa;
+RuleFunc checkIchidanRenyokeiTe;
+RuleFunc checkTeFormSplit;
+RuleFunc checkTaiAfterRenyokei;
+RuleFunc checkTaAfterRenyokei;
+RuleFunc checkYasuiAfterRenyokei;
+RuleFunc checkNagaraSplit;
+RuleFunc checkKataAfterRenyokei;
+RuleFunc checkSouAfterRenyokei;
+RuleFunc checkCompoundAuxAfterRenyokei;
+RuleFunc checkTakuteAfterRenyokei;
+RuleFunc checkTakuTeSplit;
+RuleFunc checkConditionalVerbToVerb;
+RuleFunc checkVerbRenyokeiCompoundAux;
+RuleFunc checkTeFormVerbToVerb;
+RuleFunc checkPrefixBeforeVerb;
+RuleFunc checkTokuContractionSplit;
+RuleFunc checkTekuReMissegmentation;
 
 // =============================================================================
 // Auxiliary Connection Rules (connection_rules_aux.cpp)
 // =============================================================================
-
-ConnectionRuleResult checkIruAuxAfterNoun(const core::LatticeEdge& prev,
-                                          const core::LatticeEdge& next,
-                                          const ConnectionOptions& opts);
-
-ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
-                                            const core::LatticeEdge& next,
-                                            const ConnectionOptions& opts);
-
-ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkSouAuxAfterVerbRenyokei(const core::LatticeEdge& prev,
-                                                   const core::LatticeEdge& next,
-                                                   const ConnectionOptions& opts);
-
-ConnectionRuleResult checkMasenDeSplit(const core::LatticeEdge& prev,
-                                       const core::LatticeEdge& next,
-                                       const ConnectionOptions& opts);
-
-ConnectionRuleResult checkNounBeforeVerbAux(const core::LatticeEdge& prev,
-                                            const core::LatticeEdge& next,
-                                            const ConnectionOptions& opts);
-
-ConnectionRuleResult checkMaiAfterNoun(const core::LatticeEdge& prev,
-                                       const core::LatticeEdge& next,
-                                       const ConnectionOptions& opts);
-
-ConnectionRuleResult checkNounIRowToVerbAux(const core::LatticeEdge& prev,
-                                            const core::LatticeEdge& next,
-                                            const ConnectionOptions& opts);
-
-ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts);
-
-ConnectionRuleResult checkMitaiAfterNounOrVerb(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkInvalidTeFormAux(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts);
+RuleFunc checkIruAuxAfterNoun;
+RuleFunc checkIruAuxAfterTeForm;
+RuleFunc checkShimauAuxAfterTeForm;
+RuleFunc checkSouAuxAfterVerbRenyokei;
+RuleFunc checkMasenDeSplit;
+RuleFunc checkNounBeforeVerbAux;
+RuleFunc checkMaiAfterNoun;
+RuleFunc checkNounIRowToVerbAux;
+RuleFunc checkAuxAfterParticle;
+RuleFunc checkMitaiAfterNounOrVerb;
+RuleFunc checkInvalidTeFormAux;
 
 // =============================================================================
 // Other Connection Rules (connection_rules_other.cpp)
 // =============================================================================
-
-ConnectionRuleResult checkAdjKuNaru(const core::LatticeEdge& prev,
-                                    const core::LatticeEdge& next,
-                                    const ConnectionOptions& opts);
-
-ConnectionRuleResult checkAdjKuToTeParticle(const core::LatticeEdge& prev,
-                                            const core::LatticeEdge& next,
-                                            const ConnectionOptions& opts);
-
-ConnectionRuleResult checkAdjKuToNai(const core::LatticeEdge& prev,
-                                     const core::LatticeEdge& next,
-                                     const ConnectionOptions& opts);
-
-ConnectionRuleResult checkIAdjToDesu(const core::LatticeEdge& prev,
-                                     const core::LatticeEdge& next,
-                                     const ConnectionOptions& opts);
-
-ConnectionRuleResult checkAdjStemToSugiruVerb(const core::LatticeEdge& prev,
-                                              const core::LatticeEdge& next,
-                                              const ConnectionOptions& opts);
-
-ConnectionRuleResult checkPrefixToHiraganaAdj(const core::LatticeEdge& prev,
-                                              const core::LatticeEdge& next,
-                                              const ConnectionOptions& opts);
-
-ConnectionRuleResult checkCharacterSpeechSplit(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkYoruNightAfterNi(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts);
-
-ConnectionRuleResult checkFormalNounBeforeKanji(const core::LatticeEdge& prev,
-                                                const core::LatticeEdge& next,
-                                                const ConnectionOptions& opts);
-
-ConnectionRuleResult checkSameParticleRepeated(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkSuspiciousParticleSequence(const core::LatticeEdge& prev,
-                                                     const core::LatticeEdge& next,
-                                                     const ConnectionOptions& opts);
-
-ConnectionRuleResult checkHiraganaNounStartsWithParticle(
-    const core::LatticeEdge& prev, const core::LatticeEdge& next,
-    const ConnectionOptions& opts);
-
-ConnectionRuleResult checkSuffixAfterSymbol(const core::LatticeEdge& prev,
-                                            const core::LatticeEdge& next,
-                                            const ConnectionOptions& opts);
-
-ConnectionRuleResult checkSuffixAfterNaParticle(const core::LatticeEdge& prev,
-                                                const core::LatticeEdge& next,
-                                                const ConnectionOptions& opts);
-
-ConnectionRuleResult checkParticleBeforeHiraganaOther(
-    const core::LatticeEdge& prev, const core::LatticeEdge& next,
-    const ConnectionOptions& opts);
-
-ConnectionRuleResult checkParticleBeforeHiraganaVerb(
-    const core::LatticeEdge& prev, const core::LatticeEdge& next,
-    const ConnectionOptions& opts);
-
-ConnectionRuleResult checkShiParticleConnection(const core::LatticeEdge& prev,
-                                                const core::LatticeEdge& next,
-                                                const ConnectionOptions& opts);
-
-ConnectionRuleResult checkRashiiAfterPredicate(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkVerbToCaseParticle(const core::LatticeEdge& prev,
-                                             const core::LatticeEdge& next,
-                                             const ConnectionOptions& opts);
-
-ConnectionRuleResult checkSuruRenyokeiToTeVerb(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkNaParticleAfterKanjiNoun(
-    const core::LatticeEdge& prev, const core::LatticeEdge& next,
-    const ConnectionOptions& opts);
-
-ConnectionRuleResult checkKuraiAdjectiveAfterPredicate(
-    const core::LatticeEdge& prev, const core::LatticeEdge& next,
-    const ConnectionOptions& opts);
-
-ConnectionRuleResult checkParticleNiToIruVerb(const core::LatticeEdge& prev,
-                                              const core::LatticeEdge& next,
-                                              const ConnectionOptions& opts);
-
-ConnectionRuleResult checkMasuRenyokeiToTa(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts);
-
-ConnectionRuleResult checkNaiRenyokeiToTa(const core::LatticeEdge& prev,
-                                          const core::LatticeEdge& next,
-                                          const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTaiRenyokeiToTa(const core::LatticeEdge& prev,
-                                          const core::LatticeEdge& next,
-                                          const ConnectionOptions& opts);
-
-ConnectionRuleResult checkDesuRenyokeiToTa(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts);
-
-// Penalty for AUX(た) → AUX(い) which should be たい instead
-ConnectionRuleResult checkInvalidTaToI(const core::LatticeEdge& prev,
-                                       const core::LatticeEdge& next,
-                                       const ConnectionOptions& opts);
-
-ConnectionRuleResult checkNaiAfterVerbMizenkei(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkPassiveAfterVerbMizenkei(const core::LatticeEdge& prev,
-                                                    const core::LatticeEdge& next,
-                                                    const ConnectionOptions& opts);
-
-ConnectionRuleResult checkShireruToMasuNai(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts);
-
-ConnectionRuleResult checkRenyokeiToContractedVerb(const core::LatticeEdge& prev,
-                                                   const core::LatticeEdge& next,
-                                                   const ConnectionOptions& opts);
-
-ConnectionRuleResult checkRenyokeiToTeParticle(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTeParticleToAuxVerb(const core::LatticeEdge& prev,
-                                              const core::LatticeEdge& next,
-                                              const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTeParticleToInaiVerb(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkTeVerbToAuxNegative(const core::LatticeEdge& prev,
-                                               const core::LatticeEdge& next,
-                                               const ConnectionOptions& opts);
-
-ConnectionRuleResult checkPassiveAuxToNaiTa(const core::LatticeEdge& prev,
-                                            const core::LatticeEdge& next,
-                                            const ConnectionOptions& opts);
-
-ConnectionRuleResult checkVerbToOkuChauContraction(const core::LatticeEdge& prev,
-                                                   const core::LatticeEdge& next,
-                                                   const ConnectionOptions& opts);
-
-// Penalty for で(PARTICLE) → くる活用形 (きます, きた etc.) which is usually できる misparse
-ConnectionRuleResult checkParticleDeToKuruAux(const core::LatticeEdge& prev,
-                                              const core::LatticeEdge& next,
-                                              const ConnectionOptions& opts);
-
-// Penalty for で(AUX, lemma=だ) → くる活用形 to prevent できます misparse
-ConnectionRuleResult checkCopulaDeToKuruAux(const core::LatticeEdge& prev,
-                                            const core::LatticeEdge& next,
-                                            const ConnectionOptions& opts);
-
-// Bonus for ADJ → で(AUX, lemma=だ) for na-adjective copula pattern (嫌でない, 静かで)
-// Note: Only applies to ADJ, not NOUN. Regular nouns use particle で (秒速で).
-ConnectionRuleResult checkNaAdjToCopulaDe(const core::LatticeEdge& prev,
-                                          const core::LatticeEdge& next,
-                                          const ConnectionOptions& opts);
-
-// Penalty for NOUN/ADJ → でない(VERB, lemma=できる) to prevent misparse of na-adj copula pattern
-ConnectionRuleResult checkNaAdjToDekinaiVerb(const core::LatticeEdge& prev,
-                                             const core::LatticeEdge& next,
-                                             const ConnectionOptions& opts);
-
-// Bonus for で(AUX, lemma=だ) → ない(AUX) for na-adjective copula negation pattern
-ConnectionRuleResult checkCopulaDeToNai(const core::LatticeEdge& prev,
-                                        const core::LatticeEdge& next,
-                                        const ConnectionOptions& opts);
-
-// Bonus for で(AUX, lemma=だ) → ござる(AUX) for classical copula pattern
-ConnectionRuleResult checkCopulaDeToGozaru(const core::LatticeEdge& prev,
-                                           const core::LatticeEdge& next,
-                                           const ConnectionOptions& opts);
+RuleFunc checkAdjKuNaru;
+RuleFunc checkAdjKuToTeParticle;
+RuleFunc checkAdjKuToNai;
+RuleFunc checkIAdjToDesu;
+RuleFunc checkAdjStemToSugiruVerb;
+RuleFunc checkAdjStemToSouAux;
+RuleFunc checkVerbRenyokeiToSouAux;
+RuleFunc checkPrefixToHiraganaAdj;
+RuleFunc checkCharacterSpeechSplit;
+RuleFunc checkYoruNightAfterNi;
+RuleFunc checkFormalNounBeforeKanji;
+RuleFunc checkSameParticleRepeated;
+RuleFunc checkSuspiciousParticleSequence;
+RuleFunc checkHiraganaNounStartsWithParticle;
+RuleFunc checkSuffixAfterSymbol;
+RuleFunc checkSuffixAfterNaParticle;
+RuleFunc checkParticleBeforeHiraganaOther;
+RuleFunc checkParticleBeforeHiraganaVerb;
+RuleFunc checkShiParticleConnection;
+RuleFunc checkRashiiAfterPredicate;
+RuleFunc checkVerbToCaseParticle;
+RuleFunc checkSuruRenyokeiToTeVerb;
+RuleFunc checkNaParticleAfterKanjiNoun;
+RuleFunc checkKuraiAdjectiveAfterPredicate;
+RuleFunc checkParticleNiToIruVerb;
+RuleFunc checkMasuRenyokeiToTa;
+RuleFunc checkNaiRenyokeiToTa;
+RuleFunc checkTaiRenyokeiToTa;
+RuleFunc checkDesuRenyokeiToTa;
+RuleFunc checkInvalidTaToI;             // Penalty for AUX(た) → AUX(い)
+RuleFunc checkNaiAfterVerbMizenkei;
+RuleFunc checkPassiveAfterVerbMizenkei;
+RuleFunc checkShireruToMasuNai;
+RuleFunc checkRenyokeiToContractedVerb;
+RuleFunc checkRenyokeiToTeParticle;
+RuleFunc checkTeParticleToAuxVerb;
+RuleFunc checkTeParticleToInaiVerb;
+RuleFunc checkTeVerbToAuxNegative;
+RuleFunc checkPassiveAuxToNaiTa;
+RuleFunc checkVerbToOkuChauContraction;
+RuleFunc checkParticleDeToKuruAux;      // Penalty: で(PARTICLE) → くる活用形
+RuleFunc checkCopulaDeToKuruAux;        // Penalty: で(AUX,だ) → くる活用形
+RuleFunc checkNaAdjToCopulaDe;          // Bonus: ADJ → で(AUX,だ)
+RuleFunc checkNaAdjToDekinaiVerb;       // Penalty: NOUN/ADJ → でない(VERB)
+RuleFunc checkCopulaDeToNai;            // Bonus: で(AUX,だ) → ない(AUX)
+RuleFunc checkCopulaDeToGozaru;         // Bonus: で(AUX,だ) → ござる(AUX)
+RuleFunc checkCopulaDeToAru;            // Bonus: で(AUX,だ) → ある/あり(VERB)
+RuleFunc checkQuotativeAdvToIu;         // Bonus: ADV(そう/こう/etc) → いっ(VERB, lemma=いう)
+RuleFunc checkNiParticleToIku;          // Bonus: に(PARTICLE) → いって/いった(VERB, lemma=いく)
+RuleFunc checkSentenceFinalParticleSeq; // Bonus: 終助詞 → 終助詞 (よ+ね, よ+わ, etc.)
 
 // =============================================================================
 // POS-based Dispatch Helpers

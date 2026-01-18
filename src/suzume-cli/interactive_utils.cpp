@@ -2,6 +2,8 @@
 
 #include <cctype>
 
+#include "core/utf8_constants.h"
+
 namespace suzume::cli {
 
 std::string trim(std::string_view str) {
@@ -116,11 +118,9 @@ std::optional<core::PartOfSpeech> parsePos(const std::string& str) {
   // if the input was actually "OTHER" or just invalid
   if (pos == core::PartOfSpeech::Other && str != "OTHER") {
     // Check if it's a known POS
-    if (str == "NOUN" || str == "PROPN" || str == "VERB" ||
-        str == "ADJECTIVE" || str == "ADJ" || str == "ADVERB" ||
-        str == "ADV" || str == "PARTICLE" || str == "AUXILIARY" ||
-        str == "AUX" || str == "CONJUNCTION" || str == "CONJ" ||
-        str == "SYMBOL" || str == "SYM") {
+    if (utf8::equalsAny(str, {"NOUN", "PROPN", "VERB", "ADJECTIVE", "ADJ",
+                               "ADVERB", "ADV", "PARTICLE", "AUXILIARY", "AUX",
+                               "CONJUNCTION", "CONJ", "SYMBOL", "SYM"})) {
       return pos;
     }
     return std::nullopt;

@@ -44,7 +44,7 @@
     },
     {
       "id": "verb_sou_nomisou",
-      "description": "飲みそう - verb renyokei + そう (動詞+助動詞 → 分割)",
+      "description": "飲みそう - VERB renyokei + そう (appearance auxiliary)",
       "input": "飲みそう",
       "expected": [
         {

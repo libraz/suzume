@@ -8,26 +8,13 @@
 #include <algorithm>
 
 #include "core/utf8_constants.h"
+#include "normalize/utf8.h"
 
 namespace suzume::grammar {
 
-namespace {
+using normalize::encodeUtf8;
 
-// UTF-8 encode a single codepoint
-std::string encodeUtf8(char32_t cp) {
-  std::string result;
-  if (cp < 0x80) {
-    result.push_back(static_cast<char>(cp));
-  } else if (cp < 0x800) {
-    result.push_back(static_cast<char>(0xC0 | (cp >> 6)));
-    result.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
-  } else if (cp < 0x10000) {
-    result.push_back(static_cast<char>(0xE0 | (cp >> 12)));
-    result.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
-    result.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
-  }
-  return result;
-}
+namespace {
 
 // Helper to create ConjugatedForm
 ConjugatedForm makeForm(const std::string& surface,
@@ -122,19 +109,18 @@ VerbType Conjugation::detectType(const std::string& base_form) {
   }
 
   // Check last character
-  std::string last = base_form.substr(base_form.size() - core::kJapaneseCharBytes);
+  std::string last(utf8::lastChar(base_form));
 
   // Special verbs
   if (base_form == "する") {
     return VerbType::Suru;
   }
-  if (base_form == "来る" || base_form == "くる") {
+  if (utf8::equalsAny(base_form, {"来る", "くる"})) {
     return VerbType::Kuru;
   }
 
   // サ変複合動詞
-  if (base_form.size() >= core::kTwoJapaneseCharBytes &&
-      base_form.substr(base_form.size() - core::kTwoJapaneseCharBytes) == "する") {
+  if (utf8::endsWith(base_form, "する")) {
     return VerbType::Suru;
   }
 
@@ -153,12 +139,9 @@ VerbType Conjugation::detectType(const std::string& base_form) {
       std::string prev = base_form.substr(base_form.size() - core::kTwoJapaneseCharBytes, core::kJapaneseCharBytes);
       // え段: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
       // い段: い, き, し, ち, に, ひ, み, り, ぎ, じ, ぢ, び, ぴ
-      if (prev == "べ" || prev == "め" || prev == "せ" || prev == "て" ||
-          prev == "け" || prev == "れ" || prev == "え" || prev == "ね" ||
-          prev == "げ" || prev == "ぜ" || prev == "で" || prev == "へ" ||
-          prev == "み" || prev == "き" || prev == "し" || prev == "ち" ||
-          prev == "に" || prev == "り" || prev == "い" || prev == "ひ" ||
-          prev == "び" || prev == "ぎ" || prev == "じ") {
+      if (utf8::equalsAny(prev,
+          {"べ", "め", "せ", "て", "け", "れ", "え", "ね", "げ", "ぜ", "で", "へ",
+           "み", "き", "し", "ち", "に", "り", "い", "ひ", "び", "ぎ", "じ"})) {
         return VerbType::Ichidan;
       }
     }
@@ -412,6 +395,7 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       // Note: た/て excluded (should split as 食べ + た/て, MeCab-compatible)
       suffixes = {
           {"る", false},        // Base: 食べる
+          {"", false},          // Renyokei: 食べ (for 降り+て → lemma=降りる)
           // {"た", false},     // Past: Excluded - split as 食べ + た
           // {"て", false},     // Te-form: Excluded - split as 食べ + て
           {"ない", false},      // Negative: 食べない
@@ -501,14 +485,16 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
     case VerbType::Kuru:
       // カ変: 来る (irregular - stem changes: く/き/こ)
       // For hiragana くる, prefix with appropriate stem change
+      // Note: た/て/たら excluded for MeCab-compatible splits (来+た, 来+て, 来+たら)
       suffixes = {
           {"くる", false},        // Base form
-          {"きた", false},        // Past
-          {"きて", false},        // Te-form
+          {"き", false},          // Renyokei: 来ます, 来ている
+          // {"きた", false},     // Past: Excluded - split as 来 + た
+          // {"きて", false},     // Te-form: Excluded - split as 来 + て
           {"こない", false},      // Negative
           {"こなかった", false},  // Past negative
-          {"くれば", false},      // Conditional
-          {"きたら", false},      // Conditional
+          {"くれば", false},      // Conditional (ば form kept)
+          // {"きたら", false},   // Conditional: Excluded - split as 来 + たら
           {"こよう", false},      // Volitional
           {"こい", false},        // Imperative
           {"こられる", false},    // Potential (formal)

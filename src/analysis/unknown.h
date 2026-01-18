@@ -62,6 +62,103 @@ struct UnknownCandidate {
 #endif
 };
 
+// =============================================================================
+// Candidate Factory Functions
+// =============================================================================
+
+/**
+ * @brief Create a verb candidate
+ * @param surface Surface form
+ * @param start Start position (character index)
+ * @param end End position (character index)
+ * @param cost Candidate cost
+ * @param lemma Base form (dictionary form)
+ * @param conj_type Conjugation type
+ * @param has_suffix Whether candidate expects suffix
+ * @param origin Candidate origin (debug only)
+ * @param confidence Inflection confidence (debug only)
+ * @param pattern Pattern name (debug only)
+ */
+inline UnknownCandidate makeVerbCandidate(
+    const std::string& surface, size_t start, size_t end,
+    float cost, const std::string& lemma,
+    dictionary::ConjugationType conj_type,
+    bool has_suffix = false,
+    [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
+    [[maybe_unused]] float confidence = 0.0F,
+    [[maybe_unused]] const char* pattern = nullptr) {
+  UnknownCandidate cand;
+  cand.surface = surface;
+  cand.start = start;
+  cand.end = end;
+  cand.pos = core::PartOfSpeech::Verb;
+  cand.cost = cost;
+  cand.lemma = lemma;
+  cand.conj_type = conj_type;
+  cand.has_suffix = has_suffix;
+#ifdef SUZUME_DEBUG_INFO
+  cand.origin = origin;
+  cand.confidence = confidence;
+  if (pattern != nullptr) {
+    cand.pattern = pattern;
+  }
+#endif
+  return cand;
+}
+
+/**
+ * @brief Create a noun candidate
+ * @param surface Surface form
+ * @param start Start position (character index)
+ * @param end End position (character index)
+ * @param cost Candidate cost
+ * @param has_suffix Whether candidate expects suffix
+ * @param origin Candidate origin (debug only)
+ */
+inline UnknownCandidate makeNounCandidate(
+    const std::string& surface, size_t start, size_t end,
+    float cost, bool has_suffix = false,
+    [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown) {
+  UnknownCandidate cand;
+  cand.surface = surface;
+  cand.start = start;
+  cand.end = end;
+  cand.pos = core::PartOfSpeech::Noun;
+  cand.cost = cost;
+  cand.has_suffix = has_suffix;
+#ifdef SUZUME_DEBUG_INFO
+  cand.origin = origin;
+#endif
+  return cand;
+}
+
+/**
+ * @brief Create a candidate with specified POS
+ * @param surface Surface form
+ * @param start Start position (character index)
+ * @param end End position (character index)
+ * @param pos Part of speech
+ * @param cost Candidate cost
+ * @param has_suffix Whether candidate expects suffix
+ * @param origin Candidate origin (debug only)
+ */
+inline UnknownCandidate makeCandidate(
+    const std::string& surface, size_t start, size_t end,
+    core::PartOfSpeech pos, float cost, bool has_suffix = false,
+    [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown) {
+  UnknownCandidate cand;
+  cand.surface = surface;
+  cand.start = start;
+  cand.end = end;
+  cand.pos = pos;
+  cand.cost = cost;
+  cand.has_suffix = has_suffix;
+#ifdef SUZUME_DEBUG_INFO
+  cand.origin = origin;
+#endif
+  return cand;
+}
+
 /**
  * @brief Unknown word generator
  *

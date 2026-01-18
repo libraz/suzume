@@ -39,11 +39,8 @@ bool startsWithTe(std::string_view surface) {
 }
 
 bool endsWithTeForm(std::string_view surface) {
-  if (surface.size() < core::kJapaneseCharBytes) {
-    return false;
-  }
-  std::string_view last = surface.substr(surface.size() - core::kJapaneseCharBytes);
-  return last == scorer::kFormTe || last == scorer::kFormDe;
+  return utf8::endsWith(surface, scorer::kFormTe) ||
+         utf8::endsWith(surface, scorer::kFormDe);
 }
 
 bool endsWithSou(std::string_view surface) {
@@ -137,6 +134,10 @@ void evaluateVerbRules(const core::LatticeEdge& prev,
 
   // VERB → NOUN rules
   accumulateRule(accumulated, checkKataAfterRenyokei(prev, next, opts));
+
+  // VERB → AUX rules (appearance auxiliary)
+  // VERB renyokei → そう(AUX) bonus for appearance auxiliary
+  accumulateRule(accumulated, checkVerbRenyokeiToSouAux(prev, next, opts));
 }
 
 void evaluateNounRules(const core::LatticeEdge& prev,
@@ -185,6 +186,8 @@ void evaluateAdjRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkAdjKuNaru(prev, next, opts));
   // ADJ stem (ガル接続) → すぎる/がる(VERB) bonus for MeCab-compatible garu-connection split
   accumulateRule(accumulated, checkAdjStemToSugiruVerb(prev, next, opts));
+  // ADJ stem (ガル接続) → そう(AUX) bonus for appearance auxiliary
+  accumulateRule(accumulated, checkAdjStemToSouAux(prev, next, opts));
 
   // ADJ → AUX rules (na-adjective copula pattern)
   accumulateRule(accumulated, checkNaAdjToCopulaDe(prev, next, opts));
@@ -221,6 +224,9 @@ void evaluateAuxRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkCopulaDeToNai(prev, next, opts));
   accumulateRule(accumulated, checkCopulaDeToGozaru(prev, next, opts));
 
+  // AUX → VERB rules
+  accumulateRule(accumulated, checkCopulaDeToAru(prev, next, opts));
+
   // AUX → PARTICLE rules
   accumulateRule(accumulated, checkMasenDeSplit(prev, next, opts));
   accumulateRule(accumulated, checkShiParticleConnection(prev, next, opts));
@@ -243,6 +249,7 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
   // PARTICLE → PARTICLE rules
   accumulateRule(accumulated, checkSameParticleRepeated(prev, next, opts));
   accumulateRule(accumulated, checkSuspiciousParticleSequence(prev, next, opts));
+  accumulateRule(accumulated, checkSentenceFinalParticleSeq(prev, next, opts));
 
   // PARTICLE → OTHER rules
   accumulateRule(accumulated, checkParticleBeforeHiraganaOther(prev, next, opts));
@@ -252,6 +259,7 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkTeParticleToAuxVerb(prev, next, opts));
   accumulateRule(accumulated, checkTeParticleToInaiVerb(prev, next, opts));
   accumulateRule(accumulated, checkParticleNiToIruVerb(prev, next, opts));
+  accumulateRule(accumulated, checkNiParticleToIku(prev, next, opts));
 
   // PARTICLE → SUFFIX rules
   accumulateRule(accumulated, checkSuffixAfterNaParticle(prev, next, opts));
@@ -316,8 +324,13 @@ ConnectionRuleResult evaluateConnectionRules(const core::LatticeEdge& prev,
       evaluateSymbolRules(prev, next, opts, accumulated);
       break;
 
+    case core::PartOfSpeech::Adverb:
+      // ADV → VERB rules (quotative pattern)
+      accumulateRule(accumulated, checkQuotativeAdvToIu(prev, next, opts));
+      break;
+
     default:
-      // No connection rules for: Adverb, Suffix, Pronoun, Conjunction, Other
+      // No connection rules for: Suffix, Pronoun, Conjunction, Other
       break;
   }
 

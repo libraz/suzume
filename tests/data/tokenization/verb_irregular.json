@@ -653,7 +653,7 @@
     },
     {
       "id": "suru_verb_sou_chikoku",
-      "description": "遅刻しそう - MeCab互換分割 (名詞 + し-そう)",
+      "description": "遅刻しそう - MeCab互換分割 (名詞 + し + そう)",
       "input": "遅刻しそう",
       "expected": [
         {
@@ -661,9 +661,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "しそう",
-          "pos": "Auxiliary",
+          "surface": "し",
+          "pos": "Verb",
           "lemma": "する"
+        },
+        {
+          "surface": "そう",
+          "pos": "Auxiliary",
+          "lemma": "そう"
         }
       ],
       "tags": [
@@ -877,7 +882,7 @@
     },
     {
       "id": "sou_with_desu",
-      "description": "遅刻しそうです - MeCab互換分割 (名詞 + し-そう + です)",
+      "description": "遅刻しそうです - MeCab互換分割 (名詞 + し + そう + です)",
       "input": "遅刻しそうです",
       "expected": [
         {
@@ -885,9 +890,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "しそう",
-          "pos": "Auxiliary",
+          "surface": "し",
+          "pos": "Verb",
           "lemma": "する"
+        },
+        {
+          "surface": "そう",
+          "pos": "Auxiliary",
+          "lemma": "そう"
         },
         {
           "surface": "です",

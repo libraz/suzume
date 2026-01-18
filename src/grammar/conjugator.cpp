@@ -6,26 +6,13 @@
 #include "conjugator.h"
 
 #include "core/utf8_constants.h"
+#include "normalize/utf8.h"
 
 namespace suzume::grammar {
 
-namespace {
+using normalize::encodeUtf8;
 
-// UTF-8 encode a single codepoint
-std::string encodeUtf8(char32_t codepoint) {
-  std::string result;
-  if (codepoint < 0x80) {
-    result.push_back(static_cast<char>(codepoint));
-  } else if (codepoint < 0x800) {
-    result.push_back(static_cast<char>(0xC0 | (codepoint >> 6)));
-    result.push_back(static_cast<char>(0x80 | (codepoint & 0x3F)));
-  } else if (codepoint < 0x10000) {
-    result.push_back(static_cast<char>(0xE0 | (codepoint >> 12)));
-    result.push_back(static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F)));
-    result.push_back(static_cast<char>(0x80 | (codepoint & 0x3F)));
-  }
-  return result;
-}
+namespace {
 
 // Godan row data
 struct GodanRow {
@@ -76,7 +63,7 @@ std::vector<StemForm> Conjugator::generateStems(const std::string& base_form,
   // Get base suffix (e.g., く for GodanKa)
   std::string base_suffix;
   if (base_form.size() >= core::kJapaneseCharBytes) {
-    base_suffix = base_form.substr(base_form.size() - core::kJapaneseCharBytes);
+    base_suffix = std::string(utf8::lastChar(base_form));
   }
 
   switch (type) {

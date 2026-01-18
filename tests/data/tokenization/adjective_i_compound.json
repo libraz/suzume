@@ -4,13 +4,17 @@
   "cases": [
     {
       "id": "yosa_nominalization",
-      "description": "よさ (nominalization) - NOUN derived from よい, MeCab-compatible lemma",
+      "description": "よさ (nominalization) - MeCab-compatible split: よ(ADJ stem) + さ(suffix)",
       "input": "よさ",
       "expected": [
         {
-          "surface": "よさ",
-          "pos": "Noun",
+          "surface": "よ",
+          "pos": "Adjective",
           "lemma": "よい"
+        },
+        {
+          "surface": "さ",
+          "pos": "Suffix"
         }
       ],
       "tags": [
@@ -22,13 +26,18 @@
     },
     {
       "id": "i_adj_sou_oishisou",
-      "description": "美味しそう - i-adjective + そう pattern",
+      "description": "美味しそう - MeCab-compatible split (ADJ stem + AUX)",
       "input": "美味しそう",
       "expected": [
         {
-          "surface": "美味しそう",
+          "surface": "美味し",
           "pos": "Adjective",
           "lemma": "美味しい"
+        },
+        {
+          "surface": "そう",
+          "pos": "Auxiliary",
+          "lemma": "そう"
         }
       ],
       "tags": [
@@ -48,7 +57,7 @@
         },
         {
           "surface": "そう",
-          "pos": "Noun"
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -68,7 +77,7 @@
         },
         {
           "surface": "そう",
-          "pos": "Noun"
+          "pos": "Auxiliary"
         },
         {
           "surface": "に",
@@ -85,7 +94,7 @@
         },
         {
           "surface": "いる",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "lemma": "いる"
         }
       ],
@@ -106,7 +115,7 @@
         },
         {
           "surface": "そう",
-          "pos": "Noun"
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -126,7 +135,7 @@
         },
         {
           "surface": "そう",
-          "pos": "Noun"
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -146,7 +155,7 @@
         },
         {
           "surface": "そう",
-          "pos": "Noun"
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -185,7 +194,7 @@
     },
     {
       "id": "adj_kimoi_sou",
-      "description": "Katakana adjective キモい with そう",
+      "description": "Katakana adjective キモい + さそう (nominalization + appearance)",
       "input": "キモさそう",
       "expected": [
         {
@@ -195,7 +204,8 @@
         },
         {
           "surface": "そう",
-          "pos": "Adverb"
+          "pos": "Auxiliary",
+          "lemma": "そう"
         }
       ],
       "tags": [

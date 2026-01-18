@@ -15,8 +15,16 @@
 #include "normalize/utf8.h"
 #include "suffix_candidates.h"
 #include "unknown.h"
+#include "verb_candidates_helpers.h"
 
 namespace suzume::analysis {
+
+using verb_helpers::addEmphaticVariants;
+using verb_helpers::getHiraganaVowel;
+using verb_helpers::isAdjectiveInDictionary;
+using verb_helpers::isEmphaticChar;
+using verb_helpers::isTeTaFormSokuon;
+using verb_helpers::isVerbInDictionary;
 
 namespace {
 
@@ -24,6 +32,62 @@ namespace {
 const std::vector<std::string_view> kNaAdjSuffixes = {
     "的",  // 理性的, 論理的, etc.
 };
+
+// =============================================================================
+// UnknownCandidate Factory Helpers
+// =============================================================================
+
+/**
+ * @brief Create an i-adjective candidate with common settings
+ */
+inline UnknownCandidate makeIAdjCandidate(
+    const std::string& surface, size_t start, size_t end,
+    const std::string& lemma, float cost,
+    [[maybe_unused]] CandidateOrigin origin,
+    [[maybe_unused]] float confidence,
+    [[maybe_unused]] const char* pattern) {
+  auto cand = makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, false, origin);
+  cand.lemma = lemma;
+#ifdef SUZUME_DEBUG_INFO
+  cand.confidence = confidence;
+  cand.pattern = pattern;
+#endif
+  return cand;
+}
+
+/**
+ * @brief Create an i-adjective stem candidate (expects suffix)
+ */
+inline UnknownCandidate makeIAdjStemCandidate(
+    const std::string& surface, size_t start, size_t end,
+    const std::string& lemma, float cost,
+    [[maybe_unused]] CandidateOrigin origin,
+    [[maybe_unused]] float confidence,
+    [[maybe_unused]] const char* pattern) {
+  auto cand = makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, true, origin);
+  cand.lemma = lemma;
+#ifdef SUZUME_DEBUG_INFO
+  cand.confidence = confidence;
+  cand.pattern = pattern;
+#endif
+  return cand;
+}
+
+/**
+ * @brief Create a na-adjective candidate
+ */
+inline UnknownCandidate makeNaAdjCandidate(
+    const std::string& surface, size_t start, size_t end,
+    float cost, bool has_suffix,
+    [[maybe_unused]] float confidence,
+    [[maybe_unused]] const char* pattern) {
+  auto cand = makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, has_suffix, CandidateOrigin::AdjectiveNa);
+#ifdef SUZUME_DEBUG_INFO
+  cand.confidence = confidence;
+  cand.pattern = pattern;
+#endif
+  return cand;
+}
 
 // Normalize prolonged sound marks (ー) to vowels based on preceding character
 // e.g., すごーい → すごおい, やばーい → やばあい
@@ -64,6 +128,95 @@ bool containsProlongedSoundMark(const std::vector<char32_t>& codepoints,
       return true;
     }
   }
+  return false;
+}
+
+// =============================================================================
+// Pattern Skip Helpers for I-Adjective Candidate Generation
+// =============================================================================
+
+/**
+ * @brief Check if a pattern should be skipped based on simple pattern matching
+ *
+ * Checks for patterns that are clearly NOT i-adjectives:
+ * - Empty surface
+ * - Single kanji + single hiragana い (godan verb renyokei like 伴い, 用い)
+ * - Patterns starting with っ (te-form contractions like 待ってく)
+ * - Patterns ending with んでい/でい (te-form + auxiliary like 学んでい)
+ * - Passive/causative negative renyokei (られなく, させなく)
+ * - Negative become patterns (れなくなった)
+ * - なく followed by なった/なる (verb negative + become)
+ * - Causative stem patterns (べさ, べさせ)
+ * - Godan verb renyokei + そう (飲みそう, 降りそう)
+ *
+ * @param surface Full surface string (kanji + hiragana)
+ * @param hiragana_part Hiragana portion only
+ * @param codepoints Full text codepoints
+ * @param start_pos Start position in codepoints
+ * @param kanji_end End of kanji portion
+ * @param end_pos Current end position being checked
+ * @return true if the pattern should be skipped
+ */
+bool shouldSkipSimplePatterns(
+    const std::string& surface,
+    const std::string& hiragana_part,
+    const std::vector<char32_t>& codepoints,
+    size_t start_pos, size_t kanji_end, size_t end_pos) {
+  // Empty surface
+  if (surface.empty()) {
+    return true;
+  }
+
+  // Single-kanji + single hiragana い patterns - likely godan verb renyokei
+  // Real single-kanji i-adjectives (怖い, 酸い) should be in dictionary
+  if (kanji_end == start_pos + 1 && end_pos == kanji_end + 1) {
+    return true;
+  }
+
+  // Patterns starting with っ (te-form contractions like 待ってく = 待っていく)
+  if (utf8::startsWith(hiragana_part, "っ")) {
+    return true;
+  }
+
+  // Patterns ending with んでい or でい (te-form + auxiliary like 学んでいく)
+  if (utf8::endsWith(hiragana_part, "んでい") ||
+      utf8::endsWith(hiragana_part, "でい")) {
+    return true;
+  }
+
+  // Passive/potential/causative negative renyokei (られなく, させなく, etc.)
+  if (grammar::endsWithPassiveCausativeNegativeRenyokei(hiragana_part)) {
+    return true;
+  }
+
+  // Negative become pattern (れなくなった)
+  if (grammar::endsWithNegativeBecomePattern(hiragana_part)) {
+    return true;
+  }
+
+  // なく followed by なった/なる/なって (verb negative + become)
+  if (utf8::endsWith(hiragana_part, "なく") && end_pos < codepoints.size()) {
+    if (codepoints[end_pos] == U'な') {
+      return true;
+    }
+  }
+
+  // Causative stem patterns (べさ, べさせ, etc.) - ichidan causative
+  if (utf8::equalsAny(hiragana_part, {"べさ", "べさせ", "べさせら", "べさせられ"})) {
+    return true;
+  }
+
+  // Godan verb renyokei + そう patterns (飲みそう, 降りそう, etc.)
+  // Single kanji + renyokei suffix (i-row: み/ぎ/ち/び/り/に) + そう
+  // Note: し and き are handled separately with dictionary validation
+  if (kanji_end == start_pos + 1 && hiragana_part.size() >= core::kThreeJapaneseCharBytes) {
+    std::string_view renyokei_char = std::string_view(hiragana_part).substr(0, core::kJapaneseCharBytes);
+    if (utf8::equalsAny(renyokei_char, {"み", "ぎ", "ち", "び", "り", "に"}) &&
+        hiragana_part.substr(core::kJapaneseCharBytes, core::kTwoJapaneseCharBytes) == scorer::kSuffixSou) {
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -155,207 +308,6 @@ std::string normalizeBaseForm(const std::string& base_form,
   return base_form;
 }
 
-// =============================================================================
-// Emphatic Pattern Helpers (口語強調パターン)
-// =============================================================================
-
-/**
- * @brief Check if character is an emphatic suffix character
- *
- * Emphatic characters used in colloquial speech:
- * - Sokuon: っ, ッ
- * - Chouon: ー
- * - Small vowels: ぁぃぅぇぉ, ァィゥェォ
- */
-inline bool isEmphaticChar(char32_t c) {
-  return c == core::hiragana::kSmallTsu ||  // っ
-         c == U'ッ' ||                       // katakana sokuon
-         c == U'ー' ||                       // chouon
-         // Small hiragana vowels
-         c == U'ぁ' || c == U'ぃ' || c == U'ぅ' || c == U'ぇ' || c == U'ぉ' ||
-         // Small katakana vowels
-         c == U'ァ' || c == U'ィ' || c == U'ゥ' || c == U'ェ' || c == U'ォ';
-}
-
-/**
- * @brief Convert codepoint to UTF-8 string (3-byte Japanese chars)
- */
-inline std::string codepointToUtf8(char32_t c) {
-  std::string result;
-  result += static_cast<char>(0xE0 | ((c >> 12) & 0x0F));
-  result += static_cast<char>(0x80 | ((c >> 6) & 0x3F));
-  result += static_cast<char>(0x80 | (c & 0x3F));
-  return result;
-}
-
-/**
- * @brief Get the vowel character (あいうえお) for a hiragana's ending vowel
- *
- * Maps any hiragana to its vowel row character.
- * E.g., た→あ, き→い, す→う, て→え, の→お
- * Returns 0 for characters without vowels (ん, っ) or non-hiragana.
- */
-inline char32_t getHiraganaVowel(char32_t c) {
-  // あ-row (a-vowel)
-  if (c == U'あ' || c == U'ぁ' || c == U'か' || c == U'が' || c == U'さ' ||
-      c == U'ざ' || c == U'た' || c == U'だ' || c == U'な' || c == U'は' ||
-      c == U'ば' || c == U'ぱ' || c == U'ま' || c == U'や' || c == U'ゃ' ||
-      c == U'ら' || c == U'わ') {
-    return U'あ';
-  }
-  // い-row (i-vowel)
-  if (c == U'い' || c == U'ぃ' || c == U'き' || c == U'ぎ' || c == U'し' ||
-      c == U'じ' || c == U'ち' || c == U'ぢ' || c == U'に' || c == U'ひ' ||
-      c == U'び' || c == U'ぴ' || c == U'み' || c == U'り') {
-    return U'い';
-  }
-  // う-row (u-vowel)
-  if (c == U'う' || c == U'ぅ' || c == U'く' || c == U'ぐ' || c == U'す' ||
-      c == U'ず' || c == U'つ' || c == U'づ' || c == U'ぬ' || c == U'ふ' ||
-      c == U'ぶ' || c == U'ぷ' || c == U'む' || c == U'ゆ' || c == U'ゅ' ||
-      c == U'る') {
-    return U'う';
-  }
-  // え-row (e-vowel)
-  if (c == U'え' || c == U'ぇ' || c == U'け' || c == U'げ' || c == U'せ' ||
-      c == U'ぜ' || c == U'て' || c == U'で' || c == U'ね' || c == U'へ' ||
-      c == U'べ' || c == U'ぺ' || c == U'め' || c == U'れ') {
-    return U'え';
-  }
-  // お-row (o-vowel)
-  if (c == U'お' || c == U'ぉ' || c == U'こ' || c == U'ご' || c == U'そ' ||
-      c == U'ぞ' || c == U'と' || c == U'ど' || c == U'の' || c == U'ほ' ||
-      c == U'ぼ' || c == U'ぽ' || c == U'も' || c == U'よ' || c == U'ょ' ||
-      c == U'ろ' || c == U'を') {
-    return U'お';
-  }
-  // No vowel: ん, っ, punctuation, non-hiragana
-  return 0;
-}
-
-/**
- * @brief Check if position is likely part of a verb te/ta-form, not emphatic
- *
- * っ followed by て/た is almost always part of the verb te-form (e.g., いって, 行った)
- * rather than an emphatic sokuon. We should not treat this as emphatic.
- */
-inline bool isTeTaFormSokuon(const std::vector<char32_t>& codepoints,
-                             size_t sokuon_pos) {
-  if (sokuon_pos + 1 >= codepoints.size()) {
-    return false;  // Sokuon at end - could be emphatic
-  }
-  char32_t next = codepoints[sokuon_pos + 1];
-  // っ+て, っ+た patterns are te/ta forms, not emphatic
-  return next == core::hiragana::kTe || next == core::hiragana::kTa;
-}
-
-/**
- * @brief Extend candidates with emphatic suffix variants
- *
- * For each adjective candidate, checks if input continues with emphatic
- * characters (っ/ッ/ー/small vowels) and creates an extended variant.
- * E.g., すごい → すごいっっ, やばい → やばいー
- *
- * Special handling for っ (sokuon):
- * - っ followed by て/た is part of verb te/ta-form, not emphatic
- * - っ at end of input or followed by other emphatic chars is emphatic
- *
- * @param candidates Candidates to extend (modified in place)
- * @param codepoints Input text codepoints
- */
-inline void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
-                                const std::vector<char32_t>& codepoints) {
-  std::vector<UnknownCandidate> emphatic_variants;
-
-  for (const auto& cand : candidates) {
-    // Only extend adjective candidates
-    if (cand.pos != core::PartOfSpeech::Adjective) {
-      continue;
-    }
-
-    // Check if there are emphatic characters after the candidate
-    size_t emphatic_end = cand.end;
-    std::string emphatic_suffix;
-
-    while (emphatic_end < codepoints.size()) {
-      char32_t c = codepoints[emphatic_end];
-      if (isEmphaticChar(c)) {
-        // Special case: っ followed by て/た is verb te-form, not emphatic
-        if ((c == core::hiragana::kSmallTsu || c == U'ッ') &&
-            isTeTaFormSokuon(codepoints, emphatic_end)) {
-          break;  // Stop - this is part of a verb, not emphatic
-        }
-        emphatic_suffix += codepointToUtf8(c);
-        ++emphatic_end;
-      } else {
-        break;
-      }
-    }
-
-    // Track standard emphatic chars separately for cost calculation
-    size_t standard_emphatic_chars = emphatic_suffix.size() / core::kJapaneseCharBytes;
-
-    // Also check for repeated vowels matching the final character's vowel
-    // E.g., すごい + いいい → すごいいいい (い ends in い-vowel)
-    // Requires at least 2 consecutive vowels to be considered emphatic
-    size_t vowel_repeat_count = 0;
-    if (cand.end > 0 && emphatic_end < codepoints.size()) {
-      char32_t final_char = codepoints[cand.end - 1];
-      char32_t expected_vowel = getHiraganaVowel(final_char);
-
-      if (expected_vowel != 0) {
-        size_t vowel_start = emphatic_end;
-
-        // Count consecutive occurrences of the expected vowel
-        while (emphatic_end < codepoints.size() &&
-               codepoints[emphatic_end] == expected_vowel) {
-          ++vowel_repeat_count;
-          ++emphatic_end;
-        }
-
-        // Require at least 2 repeated vowels for emphatic pattern
-        if (vowel_repeat_count >= 2) {
-          for (size_t i = 0; i < vowel_repeat_count; ++i) {
-            emphatic_suffix += codepointToUtf8(expected_vowel);
-          }
-        } else {
-          // Not enough repetition, reset position
-          emphatic_end = vowel_start;
-          vowel_repeat_count = 0;
-        }
-      }
-    }
-
-    // Add emphatic variant if we found any emphatic characters
-    if (!emphatic_suffix.empty()) {
-      UnknownCandidate emphatic_cand = cand;
-      emphatic_cand.surface += emphatic_suffix;
-      emphatic_cand.end = emphatic_end;
-      float cost_adjustment;
-
-      if (vowel_repeat_count >= 2) {
-        // Give a BONUS for vowel repetition to compete with split alternatives
-        float char_count =
-            static_cast<float>(emphatic_suffix.size() / core::kJapaneseCharBytes);
-        cost_adjustment = -0.5F + 0.05F * char_count;
-      } else {
-        // Standard emphatic chars (sokuon/chouon/small vowels) use penalty
-        cost_adjustment = 0.3F * static_cast<float>(standard_emphatic_chars);
-      }
-      emphatic_cand.cost += cost_adjustment;
-#ifdef SUZUME_DEBUG_INFO
-      emphatic_cand.pattern += "_emphatic";
-#endif
-      emphatic_variants.push_back(std::move(emphatic_cand));
-    }
-  }
-
-  // Add all emphatic variants
-  for (auto& var : emphatic_variants) {
-    candidates.push_back(std::move(var));
-  }
-}
-
 }  // namespace
 
 std::vector<UnknownCandidate> generateAdjectiveCandidates(
@@ -413,94 +365,12 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
   // Try different ending lengths
   for (size_t end_pos = hiragana_end; end_pos > kanji_end; --end_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-
-    if (surface.empty()) {
-      continue;
-    }
-
-    // Skip single-kanji + single hiragana "い" patterns
-    // These are typically godan verb renyokei (伴い, 用い, 買い, 追い)
-    // not i-adjectives. Real single-kanji i-adjectives (怖い, 酸い)
-    // should be in the dictionary, not generated as unknown words.
-    if (kanji_end == start_pos + 1 && end_pos == kanji_end + 1) {
-      continue;  // Skip - likely godan verb renyokei, not i-adjective
-    }
-
-    // Skip patterns ending with っ + hiragana (〜てく, 〜てない, etc.)
-    // These are te-form contractions (〜ていく→〜てく), not i-adjectives.
-    // E.g., 待ってく (matte-ku) = 待っていく, not an adjective
     std::string hiragana_part = extractSubstring(codepoints, kanji_end, end_pos);
-    if (hiragana_part.size() >= core::kTwoJapaneseCharBytes &&
-        hiragana_part.substr(0, core::kJapaneseCharBytes) == "っ") {  // Starts with っ
-      continue;  // Skip - likely te-form contraction, not i-adjective
-    }
 
-    // Skip patterns ending with 〜んでい or 〜でい
-    // These are te-form + auxiliary verb patterns (〜んでいく, 〜ている, etc.)
-    // not i-adjectives. E.g., 学んでい (manande-i) = 学んでいく, not adj
-    if (hiragana_part.size() >= core::kThreeJapaneseCharBytes &&
-        hiragana_part.substr(hiragana_part.size() - core::kThreeJapaneseCharBytes) == "んでい") {
-      continue;  // Skip - likely te-form + aux pattern
-    }
-    if (hiragana_part.size() >= core::kTwoJapaneseCharBytes &&
-        hiragana_part.substr(hiragana_part.size() - core::kTwoJapaneseCharBytes) == "でい") {
-      continue;  // Skip - likely te-form + aux pattern
-    }
-
-    // Skip patterns ending with verb passive/potential/causative negative renyokei
-    // 〜られなく, 〜れなく, 〜させなく, 〜せなく, 〜されなく are all verb forms,
-    // not i-adjectives. E.g., 食べられなく = 食べられる + ない (negative renyokei)
-    if (grammar::endsWithPassiveCausativeNegativeRenyokei(hiragana_part)) {
-      continue;  // Skip - passive/potential/causative negative renyokei
-    }
-
-    // Skip patterns ending with 〜れなくなった (passive negative + become + past)
-    // E.g., 読まれなくなった = 読む + れる + なくなる + た
-    if (grammar::endsWithNegativeBecomePattern(hiragana_part)) {
-      continue;  // Skip - passive/causative negative + become pattern
-    }
-
-    // Skip patterns ending with 〜なく when followed by なった/なる
-    // E.g., 食べなく + なった is actually 食べなくなった (verb form)
-    // Check if the text continues with なった/なる/なって
-    if (hiragana_part.size() >= core::kTwoJapaneseCharBytes &&
-        hiragana_part.substr(hiragana_part.size() - core::kTwoJapaneseCharBytes) == "なく" &&
-        end_pos < codepoints.size()) {
-      // Check following characters for なった/なる/なって
-      char32_t next_char = codepoints[end_pos];
-      if (next_char == U'な') {
-        continue;  // Skip - likely verb negative + なる pattern
-      }
-    }
-
-    // Skip patterns that are causative stems (〜べさ, 〜ませ, etc.)
-    // E.g., 食べさ is the start of 食べさせる (causative)
-    // These end in さ but are followed by せ in the full form
-    if (hiragana_part == "べさ" || hiragana_part == "べさせ" ||
-        hiragana_part == "べさせら" || hiragana_part == "べさせられ") {
-      continue;  // Skip - ichidan causative stem patterns
-    }
-    // Note: causative-passive 〜させられなくなった patterns are already covered
-    // by endsWithNegativeBecomePattern above
-
-    // Skip Godan verb renyokei + そう patterns (飲みそう, 降りそうだ, etc.)
-    // These are verb + そう auxiliary patterns, not i-adjectives.
-    // Pattern: single kanji + renyokei suffix (i-row) + そう/そうだ/そうです...
-    // Renyokei suffixes: み, ぎ, ち, び, り, に (6 patterns, き handled below)
-    // Note: し is handled specially below with dictionary validation
-    // Note: き is also handled specially because 大きい exists as an adjective
-    if (kanji_end == start_pos + 1 && hiragana_part.size() >= core::kThreeJapaneseCharBytes) {
-      // Check if pattern starts with: renyokei suffix + そう
-      std::string_view renyokei_char = std::string_view(hiragana_part).substr(0, core::kJapaneseCharBytes);
-      if ((renyokei_char == "み" ||
-           renyokei_char == "ぎ" || renyokei_char == "ち" ||
-           renyokei_char == "び" || renyokei_char == "り" ||
-           renyokei_char == "に") &&
-          hiragana_part.size() >= core::kThreeJapaneseCharBytes &&
-          hiragana_part.substr(core::kJapaneseCharBytes, core::kTwoJapaneseCharBytes) == scorer::kSuffixSou) {
-        // This is verb renyokei + そう pattern (with optional だ/です/etc.)
-        continue;  // Skip - likely verb renyokei + そう, not i-adjective
-      }
+    // Skip patterns that are clearly not i-adjectives
+    if (shouldSkipSimplePatterns(surface, hiragana_part, codepoints,
+                                  start_pos, kanji_end, end_pos)) {
+      continue;
     }
 
     // For し + そう patterns (話しそう, 難しそう, 美味しそう, etc.), use inflection
@@ -542,19 +412,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       }
 
       // Use dictionary to check for real verbs like 話す, 出す
-      bool is_dict_verb = false;
-      if (dict_manager != nullptr) {
-        auto lookup = dict_manager->lookup(verb_form, 0);
-        for (const auto& result : lookup) {
-          if (result.entry != nullptr &&
-              result.entry->pos == core::PartOfSpeech::Verb) {
-            is_dict_verb = true;
-            break;
-          }
-        }
-      }
-
-      if (is_dict_verb) {
+      if (isVerbInDictionary(dict_manager, verb_form)) {
         continue;  // Real verb exists in dictionary, prefer verb interpretation
       }
 
@@ -566,18 +424,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       if (kanji_char_count >= 2) {
         // Check if this is a known adjective in dictionary (e.g., 美味しい)
         std::string adj_full = kanji_stem + "しい";
-        bool is_known_adj = false;
-        if (dict_manager != nullptr) {
-          auto lookup = dict_manager->lookup(adj_full, 0);
-          for (const auto& result : lookup) {
-            if (result.entry != nullptr &&
-                result.entry->pos == core::PartOfSpeech::Adjective) {
-              is_known_adj = true;
-              break;
-            }
-          }
-        }
-        if (!is_known_adj) {
+        if (!isAdjectiveInDictionary(dict_manager, adj_full)) {
           // Multi-kanji + し + そう without known adjective is suru-verb + auxiliary
           // (遅刻しそう, 勉強しそう, 検討しそう, etc.)
           continue;
@@ -605,35 +452,13 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     if (hiragana_part.size() >= core::kThreeJapaneseCharBytes &&
         hiragana_part.substr(0, core::kJapaneseCharBytes) == "き" &&
         hiragana_part.substr(core::kJapaneseCharBytes, core::kTwoJapaneseCharBytes) == "そう") {
-      if (dict_manager != nullptr) {
-        // Construct potential verb form: kanji + く
-        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-        std::string verb_form = kanji_stem + "く";
-        auto lookup = dict_manager->lookup(verb_form, 0);
-        // Check if any entry is a verb with exact match
-        size_t verb_form_chars = 0;
-        for (size_t i = 0; i < verb_form.size(); ) {
-          auto byte = static_cast<uint8_t>(verb_form[i]);
-          if ((byte & 0x80) == 0) { i += 1; }
-          else if ((byte & 0xE0) == 0xC0) { i += 2; }
-          else if ((byte & 0xF0) == 0xE0) { i += 3; }
-          else { i += 4; }
-          ++verb_form_chars;
-        }
-        bool is_godan_ku_verb = false;
-        for (const auto& result : lookup) {
-          if (result.length == verb_form_chars &&
-              result.entry != nullptr &&
-              result.entry->pos == core::PartOfSpeech::Verb) {
-            is_godan_ku_verb = true;
-            break;
-          }
-        }
-        if (is_godan_ku_verb) {
-          continue;  // Verb exists, so this is verb renyoukei + そう, skip adjective
-        }
-        // No verb found, allow adjective candidate (e.g., 大きそう → 大きい)
+      // Construct potential verb form: kanji + く
+      std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+      std::string verb_form = kanji_stem + "く";
+      if (isVerbInDictionary(dict_manager, verb_form)) {
+        continue;  // Verb exists, so this is verb renyoukei + そう, skip adjective
       }
+      // No verb found, allow adjective candidate (e.g., 大きそう → 大きい)
     }
 
     // B57: For single kanji + ければ patterns (叩ければ, 引ければ, etc.),
@@ -642,24 +467,10 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // 叩ければ → 叩く (verb exists) → skip adjective (叩い is not a real adjective)
     // 寒ければ → 寒い (adjective) - handled separately as hiragana_part starts with け
     if (kanji_end == start_pos + 1 && hiragana_part == "ければ") {
-      if (dict_manager != nullptr) {
-        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-        std::string verb_form = kanji_stem + "く";
-        auto lookup = dict_manager->lookup(verb_form, 0);
-        // Count characters in verb_form (kanji + く = 2 chars)
-        size_t verb_form_chars = 2;  // Single kanji + く
-        bool is_godan_ku_verb = false;
-        for (const auto& result : lookup) {
-          if (result.length == verb_form_chars &&
-              result.entry != nullptr &&
-              result.entry->pos == core::PartOfSpeech::Verb) {
-            is_godan_ku_verb = true;
-            break;
-          }
-        }
-        if (is_godan_ku_verb) {
-          continue;  // Verb exists, this is verb potential-conditional (叩ける + ば)
-        }
+      std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+      std::string verb_form = kanji_stem + "く";
+      if (isVerbInDictionary(dict_manager, verb_form)) {
+        continue;  // Verb exists, this is verb potential-conditional (叩ける + ば)
       }
     }
 
@@ -696,11 +507,6 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
           }
         }
 
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = end_pos;
-        candidate.pos = core::PartOfSpeech::Adjective;
         // Lower base cost (0.2F) to beat verb candidates after POS prior adjustment
         // ADJ prior (0.3) is higher than VERB prior (0.2), so we need lower edge cost
         float cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
@@ -713,19 +519,13 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         // This prevents false positives like 勉強さ (from non-existent 勉強い)
         // from beating suru-verb split path (勉強 + さ + れる)
         if (!is_dict_adjective && surface.size() >= 3 &&
-            surface.substr(surface.size() - 3) == "さ") {
+            utf8::endsWith(surface, "さ")) {
           cost += 1.5F;  // Strong penalty for unconfirmed さ nominalization
         }
-        candidate.cost = cost;
-        candidate.has_suffix = false;
         // Set lemma to base form from inflection analysis (e.g., 使いやすく → 使いやすい)
-        candidate.lemma = cand.base_form;
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::AdjectiveI;
-        candidate.confidence = cand.confidence;
-        candidate.pattern = "i_adjective";
-#endif
-        candidates.push_back(candidate);
+        candidates.push_back(makeIAdjCandidate(
+            surface, start_pos, end_pos, cand.base_form, cost,
+            CandidateOrigin::AdjectiveI, cand.confidence, "i_adjective"));
         break;  // Only add one adjective candidate per surface
       }
     }
@@ -791,27 +591,16 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
       bool is_yaka_pattern = false;
       if (stem_hira_len >= 2) {
         std::string stem_suffix = extractSubstring(codepoints, kanji_end, hira_end - 1);
-        is_yaka_pattern = (stem_suffix == "やか" || stem_suffix == "らか" ||
-                          stem_suffix == "か");
+        is_yaka_pattern = utf8::equalsAny(stem_suffix, {"やか", "らか", "か"});
       } else if (stem_hira_len == 1) {
         // Single か (e.g., 豊か, 静か)
         is_yaka_pattern = (codepoints[kanji_end] == U'か');
       }
 
       if (is_yaka_pattern) {
-        UnknownCandidate candidate;
-        candidate.surface = stem;  // Stem without な
-        candidate.start = start_pos;
-        candidate.end = hira_end - 1;  // Exclude な
-        candidate.pos = core::PartOfSpeech::Adjective;
-        candidate.cost = 0.2F;  // Low cost for common pattern
-        candidate.has_suffix = true;
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::AdjectiveNa;
-        candidate.confidence = 0.9F;
-        candidate.pattern = "na_adj_yaka_raka";
-#endif
-        candidates.push_back(candidate);
+        // Stem without な, low cost for common pattern
+        candidates.push_back(makeNaAdjCandidate(
+            stem, start_pos, hira_end - 1, 0.2F, true, 0.9F, "na_adj_yaka_raka"));
         return candidates;  // Return early for clear pattern match
       }
     }
@@ -832,20 +621,9 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
                                      suffix.size());
       if (kanji_suffix == suffix) {
         // Found a na-adjective pattern like 理性的, 論理的
-        UnknownCandidate candidate;
-        candidate.surface = kanji_seq;
-        candidate.start = start_pos;
-        candidate.end = kanji_end;
-        candidate.pos = core::PartOfSpeech::Adjective;
         // Low cost to prefer this over noun interpretation
-        candidate.cost = 0.3F;
-        candidate.has_suffix = true;
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::AdjectiveNa;
-        candidate.confidence = 1.0F;
-        candidate.pattern = "na_adjective_teki";
-#endif
-        candidates.push_back(candidate);
+        candidates.push_back(makeNaAdjCandidate(
+            kanji_seq, start_pos, kanji_end, 0.3F, true, 1.0F, "na_adjective_teki"));
         break;  // Use first matching suffix
       }
     }
@@ -865,21 +643,9 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
     }
 
     // Found kanji compound + な - potential na-adjective stem
-    UnknownCandidate candidate;
-    candidate.surface = kanji_seq;
-    candidate.start = start_pos;
-    candidate.end = kanji_end;
-    candidate.pos = core::PartOfSpeech::Adjective;
     // Cost similar to dictionary na-adjectives but with small penalty for unknown
-    // Dictionary na-adj stems have cost 0.5, so use similar value
-    candidate.cost = 0.5F;
-    candidate.has_suffix = true;  // Has な suffix following
-#ifdef SUZUME_DEBUG_INFO
-    candidate.origin = CandidateOrigin::AdjectiveNa;
-    candidate.confidence = 0.8F;  // Lower confidence for unknown pattern
-    candidate.pattern = "na_adjective_stem";
-#endif
-    candidates.push_back(candidate);
+    candidates.push_back(makeNaAdjCandidate(
+        kanji_seq, start_pos, kanji_end, 0.5F, true, 0.8F, "na_adjective_stem"));
   }
 
   return candidates;
@@ -952,25 +718,15 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
 
       // Skip patterns ending with just く (adverbial form)
       // This prevents よろしく, わくわく from being validated as adjectives
-      if (test_surface.size() >= core::kJapaneseCharBytes &&
-          test_surface.substr(test_surface.size() - core::kJapaneseCharBytes) == "く") {
-        // Allow くない (negative form), but skip just く
-        if (test_surface.size() < core::kThreeJapaneseCharBytes ||
-            test_surface.substr(test_surface.size() - core::kThreeJapaneseCharBytes) != "くない") {
-          continue;  // Skip - adverbial form, not adjective
-        }
+      if (utf8::endsWith(test_surface, "く") && !utf8::endsWith(test_surface, "くない")) {
+        continue;  // Skip - adverbial form, not adjective (くない is valid negative)
       }
 
       // Skip patterns ending with just ない (negative auxiliary misidentified as adjective)
       // This prevents でもない from being validated as an adjective
       // Valid patterns: くない (adjective negative), but ない alone after particles is auxiliary
-      if (test_surface.size() >= core::kTwoJapaneseCharBytes &&
-          test_surface.substr(test_surface.size() - core::kTwoJapaneseCharBytes) == "ない") {
-        // Allow くない (adjective negative form)
-        if (test_surface.size() < core::kThreeJapaneseCharBytes ||
-            test_surface.substr(test_surface.size() - core::kThreeJapaneseCharBytes) != "くない") {
-          continue;  // Skip - likely negative auxiliary, not adjective
-        }
+      if (utf8::endsWith(test_surface, "ない") && !utf8::endsWith(test_surface, "くない")) {
+        continue;  // Skip - likely negative auxiliary, not adjective
       }
 
       auto test_candidates = inflection.analyze(test_surface);
@@ -980,16 +736,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
           // For particle-starting sequences, require stem length >= 2 characters
           // This prevents に+そうな from being recognized as にい (invalid)
           // Real adjectives have stems of at least 2 chars: あつい, かわいい, etc.
-          size_t stem_chars = 0;
-          for (size_t i = 0; i < cand.stem.size(); ) {
-            auto byte = static_cast<uint8_t>(cand.stem[i]);
-            if ((byte & 0x80) == 0) { i += 1; }
-            else if ((byte & 0xE0) == 0xC0) { i += 2; }
-            else if ((byte & 0xF0) == 0xE0) { i += 3; }
-            else { i += 4; }
-            ++stem_chars;
-          }
-          if (stem_chars < 2) {
+          if (normalize::utf8Length(cand.stem) < 2) {
             continue;  // Stem too short for a valid adjective
           }
           valid_adj_min_end = end;
@@ -1057,26 +804,16 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     // This prevents よろしく, わくわく from being recognized as adjectives.
     // Valid i-adjective endings: い, かった, くない, ければ, さ, そう, etc.
     // Note: くない is valid (negative), but just く is adverbial (not adjective POS)
-    if (surface.size() >= core::kJapaneseCharBytes &&
-        surface.substr(surface.size() - core::kJapaneseCharBytes) == "く") {
-      // Check if it's くない (negative form) - that's valid
-      if (surface.size() < core::kThreeJapaneseCharBytes ||
-          surface.substr(surface.size() - core::kThreeJapaneseCharBytes) != "くない") {
-        continue;  // Skip - just く ending (adverbial form)
-      }
+    if (utf8::endsWith(surface, "く") && !utf8::endsWith(surface, "くない")) {
+      continue;  // Skip - just く ending (adverbial form)
     }
 
     // Skip patterns ending with just ない (negative auxiliary misidentified as adjective)
     // This prevents でもない from being recognized as an adjective when starting with particle
     // Valid patterns: くない (adjective negative), but ない alone after particles is auxiliary
     if (starts_with_particle &&
-        surface.size() >= core::kTwoJapaneseCharBytes &&
-        surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "ない") {
-      // Allow くない (adjective negative form)
-      if (surface.size() < core::kThreeJapaneseCharBytes ||
-          surface.substr(surface.size() - core::kThreeJapaneseCharBytes) != "くない") {
-        continue;  // Skip - likely negative auxiliary, not adjective
-      }
+        utf8::endsWith(surface, "ない") && !utf8::endsWith(surface, "くない")) {
+      continue;  // Skip - likely negative auxiliary, not adjective
     }
 
     // Normalize prolonged sound marks before analysis
@@ -1104,25 +841,9 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
           cand.verb_type == grammar::VerbType::IAdjective) {
         // For particle-starting sequences, require stem length >= 2 characters
         // This prevents に+そうな from being recognized as にい (invalid)
-        if (starts_with_particle) {
-          size_t stem_chars = 0;
-          for (size_t i = 0; i < cand.stem.size(); ) {
-            auto byte = static_cast<uint8_t>(cand.stem[i]);
-            if ((byte & 0x80) == 0) { i += 1; }
-            else if ((byte & 0xE0) == 0xC0) { i += 2; }
-            else if ((byte & 0xF0) == 0xE0) { i += 3; }
-            else { i += 4; }
-            ++stem_chars;
-          }
-          if (stem_chars < 2) {
-            continue;  // Stem too short for a valid adjective
-          }
+        if (starts_with_particle && normalize::utf8Length(cand.stem) < 2) {
+          continue;  // Stem too short for a valid adjective
         }
-        UnknownCandidate candidate;
-        candidate.surface = surface;  // Keep original surface with ー
-        candidate.start = start_pos;
-        candidate.end = end_pos;
-        candidate.pos = core::PartOfSpeech::Adjective;
         // Base cost for hiragana i-adjective candidates
         // Use neutral base (0.0F) to avoid false positives like につい
         // which should be parsed as に(PARTICLE)+ついて(VERB)
@@ -1142,22 +863,16 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
           }
           // No bonus for 3-char sequences (につい) - let dictionary entries win
         }
-        candidate.cost = cost;
-        candidate.has_suffix = false;
         // Set lemma to base form from inflection analysis
         // For prolonged sound mark patterns, normalize the base form
         // e.g., すごおい → すごい, やばあい → やばい
-        if (has_prolonged) {
-          candidate.lemma = normalizeBaseForm(cand.base_form, codepoints, start_pos, end_pos);
-        } else {
-          candidate.lemma = cand.base_form;
-        }
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::AdjectiveIHiragana;
-        candidate.confidence = cand.confidence;
-        candidate.pattern = has_prolonged ? "i_adjective_hira_choon" : "i_adjective_hira";
-#endif
-        candidates.push_back(candidate);
+        std::string lemma = has_prolonged
+            ? normalizeBaseForm(cand.base_form, codepoints, start_pos, end_pos)
+            : cand.base_form;
+        const char* pattern = has_prolonged ? "i_adjective_hira_choon" : "i_adjective_hira";
+        candidates.push_back(makeIAdjCandidate(
+            surface, start_pos, end_pos, lemma, cost,
+            CandidateOrigin::AdjectiveIHiragana, cand.confidence, pattern));
         break;  // Only add one adjective candidate per surface
       }
     }
@@ -1172,8 +887,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
   std::vector<UnknownCandidate> ku_form_candidates;
   for (const auto& cand : candidates) {
     // Check if surface ends with くない
-    if (cand.surface.size() >= core::kThreeJapaneseCharBytes &&
-        cand.surface.substr(cand.surface.size() - core::kThreeJapaneseCharBytes) == "くない") {
+    if (utf8::endsWith(cand.surface, "くない")) {
       // Generate ku-form variant: しんどくない → しんどく
       UnknownCandidate ku_cand;
       ku_cand.surface = cand.surface.substr(0, cand.surface.size() - core::kTwoJapaneseCharBytes);  // Remove ない
@@ -1275,22 +989,12 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
       // Require confidence >= 0.5 for i-adjectives
       if (cand.confidence >= 0.5F &&
           cand.verb_type == grammar::VerbType::IAdjective) {
-        UnknownCandidate candidate;
-        candidate.surface = surface;
-        candidate.start = start_pos;
-        candidate.end = end_pos;
-        candidate.pos = core::PartOfSpeech::Adjective;
         // Lower cost than pure katakana noun to prefer adjective reading
         // Cost: 0.2-0.35 based on confidence (lower = better)
-        candidate.cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
-        candidate.has_suffix = false;
-        candidate.lemma = cand.base_form;
-#ifdef SUZUME_DEBUG_INFO
-        candidate.origin = CandidateOrigin::AdjectiveI;  // Katakana i-adj
-        candidate.confidence = cand.confidence;
-        candidate.pattern = "i_adjective_kata";
-#endif
-        candidates.push_back(candidate);
+        float cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
+        candidates.push_back(makeIAdjCandidate(
+            surface, start_pos, end_pos, cand.base_form, cost,
+            CandidateOrigin::AdjectiveI, cand.confidence, "i_adjective_kata"));
         break;  // Only add one adjective candidate per surface
       }
     }
@@ -1421,22 +1125,11 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       // We should prefer the verb renyokei interpretation if kanji+ちる/きる/etc. is a verb
       if (kanji_end - start_pos == 1) {
         // Check if stem + る, stem + す, etc. forms a verb
-        std::string verb_base = stem + "ちる";  // ichidan check
         bool is_likely_verb_stem = false;
-        if (dict_manager != nullptr) {
-          // Check for common verb patterns
-          for (const auto& suffix : {"ちる", "きる", "ぎる", "しる", "びる", "みる", "りる"}) {
-            std::string potential_verb = stem + suffix;
-            auto verb_lookup = dict_manager->lookup(potential_verb, 0);
-            for (const auto& result : verb_lookup) {
-              if (result.entry != nullptr &&
-                  result.entry->pos == core::PartOfSpeech::Verb &&
-                  result.entry->surface == potential_verb) {
-                is_likely_verb_stem = true;
-                break;
-              }
-            }
-            if (is_likely_verb_stem) break;
+        for (const auto& suffix : {"ちる", "きる", "ぎる", "しる", "びる", "みる", "りる"}) {
+          if (isVerbInDictionary(dict_manager, stem + suffix)) {
+            is_likely_verb_stem = true;
+            break;
           }
         }
         if (is_likely_verb_stem) {
@@ -1444,22 +1137,12 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
         }
       }
 
-      UnknownCandidate candidate;
-      candidate.surface = stem;
-      candidate.start = start_pos;
-      candidate.end = kanji_end;
-      candidate.pos = core::PartOfSpeech::Adjective;
-      candidate.lemma = base_form;
       // Low cost to compete with single-token verb path (高すぎる as VERB)
       // Use negative cost to strongly prefer this split
-      candidate.cost = -0.3F + (1.0F - adj_confidence) * 0.2F;
-      candidate.has_suffix = true;  // This is a stem, expects suffix
-#ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::AdjectiveI;
-      candidate.confidence = adj_confidence;
-      candidate.pattern = "adj_stem_garu_conn";
-#endif
-      candidates.push_back(candidate);
+      float cost = -0.3F + (1.0F - adj_confidence) * 0.2F;
+      candidates.push_back(makeIAdjStemCandidate(
+          stem, start_pos, kanji_end, base_form, cost,
+          CandidateOrigin::AdjectiveI, adj_confidence, "adj_stem_garu_conn"));
       // Don't break - allow multiple patterns to generate candidates
     }
   }
@@ -1524,47 +1207,38 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       // If it is, this is likely a verb renyokei, not an adjective stem
       // E.g., 話す is in dictionary → 話し is verb renyokei, not adjective
       // E.g., 難す is NOT in dictionary → 難し could be adjective stem
-      if (dict_manager != nullptr) {
-        auto verb_results = dict_manager->lookup(verb_form, 0);
-        bool is_dict_verb = false;
-        for (const auto& result : verb_results) {
-          // Check for exact match verb
-          if (result.entry != nullptr &&
-              result.entry->pos == core::PartOfSpeech::Verb &&
-              result.entry->surface == verb_form) {
-            is_dict_verb = true;
-            break;
-          }
-        }
-        if (is_dict_verb) {
-          continue;  // Skip - this is a dictionary verb renyokei
-        }
+      if (isVerbInDictionary(dict_manager, verb_form)) {
+        continue;  // Skip - this is a dictionary verb renyokei
       }
 
-      // Confidence-based fallback when no dictionary available
+      // Check if the adjective form (kanji + し + い) is in the dictionary
+      // If it is, we trust the dictionary entry over confidence comparison
+      // E.g., 美味しい is in dictionary → 美味し is adjective stem (skip conf check)
+      // E.g., 難しい is in dictionary → 難し is adjective stem (skip conf check)
+      bool is_dict_adjective = isAdjectiveInDictionary(dict_manager, base_form);
+
+      // Confidence-based fallback when adjective is not in dictionary
       // Only generate adjective stem if adjective confidence is SIGNIFICANTLY higher
       // than verb confidence. This prevents generating stems for verb renyokei
       // patterns like 話し (from 話す) where both get similar confidence.
-      constexpr float kConfidenceThreshold = 0.15F;
-      if (adj_confidence - verb_confidence < kConfidenceThreshold) {
-        continue;
+      if (!is_dict_adjective) {
+        constexpr float kConfidenceThreshold = 0.15F;
+        if (adj_confidence - verb_confidence < kConfidenceThreshold) {
+          continue;
+        }
       }
 
-      UnknownCandidate candidate;
-      candidate.surface = stem;
-      candidate.start = start_pos;
-      candidate.end = stem_end;
-      candidate.pos = core::PartOfSpeech::Adjective;
-      candidate.lemma = base_form;
-      // Low cost to compete with VERB path
-      candidate.cost = 0.1F + (1.0F - adj_confidence) * 0.2F;
-      candidate.has_suffix = true;  // This is a stem, expects suffix
-#ifdef SUZUME_DEBUG_INFO
-      candidate.origin = CandidateOrigin::AdjectiveI;
-      candidate.confidence = adj_confidence;
-      candidate.pattern = "adj_stem_shii";
-#endif
-      candidates.push_back(candidate);
+      // Low cost to compete with VERB path and single-token conjugated forms
+      // Dictionary adjectives get strong bonus to prefer MeCab-compatible split
+      // (美味しそう → 美味し + そう)
+      float cost = 0.1F + (1.0F - adj_confidence) * 0.2F;
+      if (is_dict_adjective) {
+        // Strong bonus for dictionary adjectives to beat single-token path
+        cost -= 0.5F;
+      }
+      candidates.push_back(makeIAdjStemCandidate(
+          stem, start_pos, stem_end, base_form, cost,
+          CandidateOrigin::AdjectiveI, adj_confidence, "adj_stem_shii"));
       break;  // Only one stem candidate per pattern
     }
   }

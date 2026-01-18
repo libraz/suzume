@@ -212,6 +212,16 @@ const TeFormAuxiliary kTeFormAuxiliaries[] = {
 // Cost bonus imported from candidate_constants.h:
 // candidate::kTeFormAuxBonus
 
+/**
+ * @brief Check if inflection suffix contains auxiliary verb patterns
+ * Looks for た/て/ない/れ/ます patterns that indicate complete inflected forms
+ * (as opposed to just renyokei endings like し/み)
+ */
+inline bool hasAuxiliarySuffix(std::string_view suffix) {
+  if (suffix.empty()) return false;
+  return utf8::containsAny(suffix, {"た", "て", "ない", "れ", "ます"});
+}
+
 }  // namespace
 
 void addCompoundVerbJoinCandidates(
@@ -353,12 +363,9 @@ void addCompoundVerbJoinCandidates(
     if (!matched_kanji && !matched_reading && !v2_reading.empty()) {
       std::string_view base_ending(v2_verb.base_ending);
       // Only try inflection for base forms (ending in る/す/く/う/む/つ/ぶ/ぐ/ぬ or ichidan endings)
-      if (base_ending == "る" || base_ending == "す" || base_ending == "く" ||
-          base_ending == "う" || base_ending == "む" || base_ending == "つ" ||
-          base_ending == "ぶ" || base_ending == "ぐ" || base_ending == "ぬ" ||
-          base_ending == "める" || base_ending == "ける" || base_ending == "れる" ||
-          base_ending == "える" || base_ending == "げる" || base_ending == "てる" ||
-          base_ending == "せる" || base_ending == "ちる") {
+      if (utf8::equalsAny(base_ending,
+          {"る", "す", "く", "う", "む", "つ", "ぶ", "ぐ", "ぬ",
+           "める", "ける", "れる", "える", "げる", "てる", "せる", "ちる"})) {
 
         // Case 1: Hiragana V2 inflected forms (e.g., きった from きる, かった from かう)
         // Try different lengths for V2 inflected form (shortest match first)
@@ -377,15 +384,9 @@ void addCompoundVerbJoinCandidates(
             // Use 0.3 threshold for inflected forms since short stems get lower confidence
             // Require the suffix to contain actual auxiliary patterns (た/て/etc.),
             // not just renyokei endings (し/み/etc.) to ensure complete inflected form
-            bool has_aux_suffix = !infl_result.suffix.empty() &&
-                (infl_result.suffix.find("た") != std::string::npos ||
-                 infl_result.suffix.find("て") != std::string::npos ||
-                 infl_result.suffix.find("ない") != std::string::npos ||
-                 infl_result.suffix.find("れ") != std::string::npos ||
-                 infl_result.suffix.find("ます") != std::string::npos);
             if (infl_result.confidence >= 0.3F &&
                 infl_result.base_form == expected_base &&
-                has_aux_suffix) {
+                hasAuxiliarySuffix(infl_result.suffix)) {
               matched_inflected = true;
               matched_len = v2_end_byte - v2_start_byte;
               inflection_includes_aux = true;  // Mark that this match includes aux
@@ -445,15 +446,9 @@ void addCompoundVerbJoinCandidates(
                     for (const auto& infl_result : infl_results) {
                       // Check if base form matches V2 surface (kanji form)
                       // Require the suffix to contain actual auxiliary patterns
-                      bool has_aux_suffix = !infl_result.suffix.empty() &&
-                          (infl_result.suffix.find("た") != std::string::npos ||
-                           infl_result.suffix.find("て") != std::string::npos ||
-                           infl_result.suffix.find("ない") != std::string::npos ||
-                           infl_result.suffix.find("れ") != std::string::npos ||
-                           infl_result.suffix.find("ます") != std::string::npos);
                       if (infl_result.confidence >= 0.35F &&
                           infl_result.base_form == v2_surface &&
-                          has_aux_suffix) {
+                          hasAuxiliarySuffix(infl_result.suffix)) {
                         matched_inflected = true;
                         matched_len = v2_end_byte - v2_start_byte;
                         inflection_includes_aux = true;  // Mark that this match includes aux

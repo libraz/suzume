@@ -183,15 +183,15 @@ TEST_F(ConnectionRuleTest, TeFormSplit_GodanOnbin) {
   EXPECT_FLOAT_EQ(result.adjustment, scorer::kPenaltyTeFormSplit);
 }
 
-TEST_F(ConnectionRuleTest, TaiAfterRenyokei_ShortForm_NoBonus) {
-  // Short たい forms (たくない, たくて, etc.) should NOT get bonus
-  // They should be unified with the verb as single token by inflection analyzer
+TEST_F(ConnectionRuleTest, TaiAfterRenyokei_ShortForm_Bonus) {
+  // All たい forms after verb renyokei get bonus (MeCab-compatible)
+  // MeCab: 食べたくない → 食べ + たく + ない (3 tokens)
   auto prev = makeEdge("読み", core::PartOfSpeech::Verb);
   auto next = makeEdge("たくない", core::PartOfSpeech::Adjective, "たい");
 
   auto result = evaluateConnectionRules(prev, next, kDefaultOpts);
-  EXPECT_EQ(result.pattern, ConnectionPattern::None);
-  EXPECT_FLOAT_EQ(result.adjustment, 0.0F);
+  EXPECT_EQ(result.pattern, ConnectionPattern::TaiAfterRenyokei);
+  EXPECT_FLOAT_EQ(result.adjustment, -scorer::kBonusTaiAfterRenyokei);
 }
 
 TEST_F(ConnectionRuleTest, TaiAfterRenyokei_LongForm_Bonus) {

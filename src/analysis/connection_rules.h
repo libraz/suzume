@@ -172,8 +172,14 @@ enum class ConnectionPattern {
   NaAdjToDekinaiVerb,         // NOUN/ADJ → でない(VERB, lemma=できる) penalty
   CopulaDeToNai,              // で(AUX, lemma=だ) → ない(AUX) bonus (na-adj copula negation)
   CopulaDeToGozaru,           // で(AUX, lemma=だ) → ござる(AUX) bonus (classical copula pattern)
+  CopulaDeToAru,              // で(AUX, lemma=だ) → ある/あり(VERB) bonus (formal copula: である)
   AdjStemToSugiruVerb,        // ADJ(stem) → すぎる/がる(VERB) bonus (MeCab-compatible garu-connection)
-  ParticleNiToIruVerb         // に(PARTICLE) → いる/いた(VERB/AUX) bonus (家にいた pattern)
+  AdjStemToSouAux,            // ADJ(stem) → そう(AUX) bonus (appearance auxiliary)
+  VerbRenyokeiToSouAux,       // VERB(renyokei) → そう(AUX) bonus (appearance auxiliary)
+  ParticleNiToIruVerb,        // に(PARTICLE) → いる/いた(VERB/AUX) bonus (家にいた pattern)
+  QuotativeAdvToIu,           // ADV(そう/こう/etc) → いっ(VERB, lemma=いう) bonus (quotative pattern)
+  NiParticleToIku,            // に(PARTICLE) → いっ(VERB, lemma=いく) bonus (movement pattern)
+  SentenceFinalParticleSeq    // 終助詞 → 終助詞 (よ+ね, よ+わ, etc.) bonus
 };
 
 /**
@@ -190,7 +196,7 @@ struct ConnectionRuleResult {
   int matched_count{0};          // Number of rules that contributed
 
   // Accumulation limits (prevents extreme penalty stacking)
-  static constexpr float kMinAdjustment = -3.0F;  // Maximum bonus
+  static constexpr float kMinAdjustment = -5.0F;  // Maximum bonus (for MeCab-compatible splits)
   static constexpr float kMaxAdjustment = 5.0F;   // Maximum penalty
 };
 

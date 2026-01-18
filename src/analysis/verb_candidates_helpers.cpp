@@ -11,6 +11,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
+#include "normalize/utf8.h"
 
 namespace suzume::analysis::verb_helpers {
 
@@ -35,15 +36,16 @@ bool isSingleKanjiIchidan(char32_t c) {
 // Dictionary Lookup Helpers
 // =============================================================================
 
-bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager,
-                        std::string_view base_form) {
-  if (dict_manager == nullptr || base_form.empty()) {
+bool hasDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
+                        std::string_view surface,
+                        core::PartOfSpeech pos) {
+  if (dict_manager == nullptr || surface.empty()) {
     return false;
   }
-  auto results = dict_manager->lookup(base_form, 0);
+  auto results = dict_manager->lookup(surface, 0);
   for (const auto& result : results) {
-    if (result.entry != nullptr && result.entry->surface == base_form &&
-        result.entry->pos == core::PartOfSpeech::Verb) {
+    if (result.entry != nullptr && result.entry->surface == surface &&
+        result.entry->pos == pos) {
       return true;
     }
   }
@@ -108,50 +110,35 @@ bool isEmphaticChar(char32_t c) {
          c == U'ァ' || c == U'ィ' || c == U'ゥ' || c == U'ェ' || c == U'ォ';
 }
 
-std::string codepointToUtf8(char32_t c) {
-  std::string result;
-  result += static_cast<char>(0xE0 | ((c >> 12) & 0x0F));
-  result += static_cast<char>(0x80 | ((c >> 6) & 0x3F));
-  result += static_cast<char>(0x80 | (c & 0x3F));
-  return result;
-}
-
 char32_t getHiraganaVowel(char32_t c) {
-  // あ-row (a-vowel)
-  if (c == U'あ' || c == U'ぁ' || c == U'か' || c == U'が' || c == U'さ' ||
-      c == U'ざ' || c == U'た' || c == U'だ' || c == U'な' || c == U'は' ||
-      c == U'ば' || c == U'ぱ' || c == U'ま' || c == U'や' || c == U'ゃ' ||
-      c == U'ら' || c == U'わ') {
-    return U'あ';
+  // Hiragana range: U+3041 (ぁ) to U+3096 (ゖ)
+  constexpr char32_t kHiraganaStart = 0x3041;
+  constexpr char32_t kHiraganaEnd = 0x3096;
+
+  if (c < kHiraganaStart || c > kHiraganaEnd) {
+    return 0;  // Not hiragana
   }
-  // い-row (i-vowel)
-  if (c == U'い' || c == U'ぃ' || c == U'き' || c == U'ぎ' || c == U'し' ||
-      c == U'じ' || c == U'ち' || c == U'ぢ' || c == U'に' || c == U'ひ' ||
-      c == U'び' || c == U'ぴ' || c == U'み' || c == U'り') {
-    return U'い';
+
+  // Vowel table: 'a'/'i'/'u'/'e'/'o' or 0 for no-vowel (ん, っ)
+  // Index = codepoint - 0x3041, covers ぁ through ゖ (86 chars)
+  static constexpr char kVowelTable[86] = {
+      'a','a','i','i','u','u','e','e','o','o','a','a','i','i','u',  // ぁ-く
+      'u','e','e','o','o','a','a','i','i','u','u','e','e','o','o',  // ぐ-ぞ
+      'a','a','i','i', 0 ,'u','u','e','e','o','o','a','i','u','e',  // た-ね
+      'o','a','a','a','i','i','i','u','u','u','e','e','e','o','o',  // の-ぼ
+      'o','a','i','u','e','o','a','a','u','u','o','o','a','i','u','e',  // ぽ-れ
+      'o','a','a','i','e','o', 0 ,'u','a','e',  // ろ-ゖ
+  };
+
+  char vowel = kVowelTable[c - kHiraganaStart];
+  switch (vowel) {
+    case 'a': return U'あ';
+    case 'i': return U'い';
+    case 'u': return U'う';
+    case 'e': return U'え';
+    case 'o': return U'お';
+    default:  return 0;
   }
-  // う-row (u-vowel)
-  if (c == U'う' || c == U'ぅ' || c == U'く' || c == U'ぐ' || c == U'す' ||
-      c == U'ず' || c == U'つ' || c == U'づ' || c == U'ぬ' || c == U'ふ' ||
-      c == U'ぶ' || c == U'ぷ' || c == U'む' || c == U'ゆ' || c == U'ゅ' ||
-      c == U'る') {
-    return U'う';
-  }
-  // え-row (e-vowel)
-  if (c == U'え' || c == U'ぇ' || c == U'け' || c == U'げ' || c == U'せ' ||
-      c == U'ぜ' || c == U'て' || c == U'で' || c == U'ね' || c == U'へ' ||
-      c == U'べ' || c == U'ぺ' || c == U'め' || c == U'れ') {
-    return U'え';
-  }
-  // お-row (o-vowel)
-  if (c == U'お' || c == U'ぉ' || c == U'こ' || c == U'ご' || c == U'そ' ||
-      c == U'ぞ' || c == U'と' || c == U'ど' || c == U'の' || c == U'ほ' ||
-      c == U'ぼ' || c == U'ぽ' || c == U'も' || c == U'よ' || c == U'ょ' ||
-      c == U'ろ' || c == U'を') {
-    return U'お';
-  }
-  // No vowel: ん, っ, punctuation, non-hiragana
-  return 0;
 }
 
 bool isTeTaFormSokuon(const std::vector<char32_t>& codepoints, size_t sokuon_pos) {
@@ -186,7 +173,7 @@ void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
             isTeTaFormSokuon(codepoints, emphatic_end)) {
           break;  // Stop - this is part of a verb, not emphatic
         }
-        emphatic_suffix += codepointToUtf8(c);
+        emphatic_suffix += normalize::encodeUtf8(c);
         ++emphatic_end;
       } else {
         break;
@@ -215,7 +202,7 @@ void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
         // Require at least 2 repeated vowels for emphatic pattern
         if (vowel_repeat_count >= 2) {
           for (size_t i = 0; i < vowel_repeat_count; ++i) {
-            emphatic_suffix += codepointToUtf8(expected_vowel);
+            emphatic_suffix += normalize::encodeUtf8(expected_vowel);
           }
         } else {
           // Not enough repetition, reset position
@@ -260,23 +247,11 @@ void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
 // =============================================================================
 
 bool shouldSkipMasuAuxPattern(std::string_view surface, grammar::VerbType verb_type) {
-  if (surface.size() < core::kTwoJapaneseCharBytes) {
-    return false;
-  }
-
   // Check if surface ends with ます/ました/ましょう/ません
-  bool has_masu_aux = false;
-  if (surface.size() >= core::kFourJapaneseCharBytes &&
-      surface.substr(surface.size() - core::kFourJapaneseCharBytes) == "ましょう") {
-    has_masu_aux = true;
-  } else if (surface.size() >= core::kThreeJapaneseCharBytes &&
-             (surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "ました" ||
-              surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == "ません")) {
-    has_masu_aux = true;
-  } else if (surface.size() >= core::kTwoJapaneseCharBytes &&
-             surface.substr(surface.size() - core::kTwoJapaneseCharBytes) == "ます") {
-    has_masu_aux = true;
-  }
+  bool has_masu_aux = utf8::endsWith(surface, "ましょう") ||
+                      utf8::endsWith(surface, "ました") ||
+                      utf8::endsWith(surface, "ません") ||
+                      utf8::endsWith(surface, "ます");
 
   if (!has_masu_aux) {
     return false;
@@ -285,36 +260,16 @@ bool shouldSkipMasuAuxPattern(std::string_view surface, grammar::VerbType verb_t
   // Don't skip suru-verb passive/causative patterns (され, させ)
   bool is_suru_passive_causative =
       (verb_type == grammar::VerbType::Suru &&
-       (surface.find("され") != std::string::npos ||
-        surface.find("させ") != std::string::npos));
+       utf8::containsAny(surface, {"され", "させ"}));
 
   return !is_suru_passive_causative;
 }
 
 bool shouldSkipSouPattern(std::string_view surface, grammar::VerbType verb_type) {
-  if (surface.size() < core::kTwoJapaneseCharBytes) {
-    return false;
-  }
-
-  bool has_sou_pattern = false;
-
-  // Check for そう at end
-  if (surface.substr(surface.size() - core::kTwoJapaneseCharBytes) ==
-      scorer::kSuffixSou) {
-    has_sou_pattern = true;
-  }
-  // Check for そうです at end
-  constexpr const char* kSouDesu = "そうです";
-  if (surface.size() >= core::kFourJapaneseCharBytes &&
-      surface.substr(surface.size() - core::kFourJapaneseCharBytes) == kSouDesu) {
-    has_sou_pattern = true;
-  }
-  // Check for そうだ at end
-  constexpr const char* kSouDa = "そうだ";
-  if (surface.size() >= core::kThreeJapaneseCharBytes &&
-      surface.substr(surface.size() - core::kThreeJapaneseCharBytes) == kSouDa) {
-    has_sou_pattern = true;
-  }
+  // Check for そう/そうです/そうだ at end
+  bool has_sou_pattern = utf8::endsWith(surface, "そうです") ||
+                         utf8::endsWith(surface, "そうだ") ||
+                         utf8::endsWith(surface, scorer::kSuffixSou);
 
   // Don't skip i-adjective patterns
   return has_sou_pattern && verb_type != grammar::VerbType::IAdjective;
@@ -324,14 +279,11 @@ bool isCompoundAdjectivePattern(std::string_view surface) {
   if (surface.size() < core::kFourJapaneseCharBytes) {
     return false;
   }
-  return surface.find("にくい") != std::string::npos ||
-         surface.find("にくく") != std::string::npos ||
-         surface.find("にくか") != std::string::npos ||
-         surface.find("やすい") != std::string::npos ||
-         surface.find("やすく") != std::string::npos ||
-         surface.find("やすか") != std::string::npos ||
-         surface.find("がたい") != std::string::npos ||
-         surface.find("がたく") != std::string::npos;
+  return utf8::containsAny(surface, {
+      "にくい", "にくく", "にくか",  // difficult to do
+      "やすい", "やすく", "やすか",  // easy to do
+      "がたい", "がたく"             // hard to do
+  });
 }
 
 bool isGodanVerbType(grammar::VerbType verb_type) {
@@ -348,12 +300,8 @@ bool isGodanVerbType(grammar::VerbType verb_type) {
 
 bool shouldSkipPassiveAuxPattern(std::string_view surface, grammar::VerbType verb_type) {
   // Skip patterns containing classical passive + べき
-  if (surface.size() >= core::kThreeJapaneseCharBytes) {
-    std::string_view last3 =
-        surface.substr(surface.size() - core::kThreeJapaneseCharBytes);
-    if (last3 == "れべき") {
-      return true;
-    }
+  if (utf8::endsWith(surface, "れべき")) {
+    return true;
   }
 
   // Only apply remaining checks to Godan verbs
@@ -361,30 +309,14 @@ bool shouldSkipPassiveAuxPattern(std::string_view surface, grammar::VerbType ver
     return false;
   }
 
-  // Passive patterns: れる, れた, れて, れない, れべき
-  if (surface.size() >= core::kThreeJapaneseCharBytes) {
-    std::string_view last3 =
-        surface.substr(surface.size() - core::kThreeJapaneseCharBytes);
-    if (last3 == "れる" || last3 == "れた" || last3 == "れて") {
-      return true;
-    }
-  }
-  if (surface.size() >= core::kFourJapaneseCharBytes) {
-    std::string_view last4 =
-        surface.substr(surface.size() - core::kFourJapaneseCharBytes);
-    if (last4 == "れない" || last4 == "れます") {
-      return true;
-    }
-  }
-  // Check for passive + desiderative: れたい, れたく
-  if (surface.size() >= core::kFourJapaneseCharBytes) {
-    std::string_view last4 =
-        surface.substr(surface.size() - core::kFourJapaneseCharBytes);
-    if (last4 == "れたい" || last4 == "れたく") {
-      return true;
-    }
-  }
-  return false;
+  // Passive patterns: れる, れた, れて, れない, れます, れたい, れたく
+  return utf8::endsWith(surface, "れる") ||
+         utf8::endsWith(surface, "れた") ||
+         utf8::endsWith(surface, "れて") ||
+         utf8::endsWith(surface, "れない") ||
+         utf8::endsWith(surface, "れます") ||
+         utf8::endsWith(surface, "れたい") ||
+         utf8::endsWith(surface, "れたく");
 }
 
 bool shouldSkipCausativeAuxPattern(std::string_view surface, grammar::VerbType verb_type) {
@@ -393,15 +325,11 @@ bool shouldSkipCausativeAuxPattern(std::string_view surface, grammar::VerbType v
     return false;
   }
 
-  // Godan causative: せる, せた
-  if (surface.size() >= core::kThreeJapaneseCharBytes) {
-    std::string_view last3 =
-        surface.substr(surface.size() - core::kThreeJapaneseCharBytes);
-    if (last3 == "せる" || last3 == "せた" || last3 == "せて") {
-      if (isGodanVerbType(verb_type)) {
-        return true;
-      }
-    }
+  // Godan causative: せる, せた, せて
+  if (isGodanVerbType(verb_type)) {
+    return utf8::endsWith(surface, "せる") ||
+           utf8::endsWith(surface, "せた") ||
+           utf8::endsWith(surface, "せて");
   }
   return false;
 }
@@ -446,8 +374,7 @@ bool shouldSkipSuruVerbAuxPattern(std::string_view surface, size_t kanji_count) 
   };
 
   for (const auto& suffix : kSuruAuxSuffixes) {
-    if (surface.size() > suffix.size() &&
-        surface.substr(surface.size() - suffix.size()) == suffix) {
+    if (utf8::endsWith(surface, suffix) && surface.size() > suffix.size()) {
       return true;
     }
   }

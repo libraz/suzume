@@ -113,16 +113,18 @@ std::vector<DictionaryEntry> expandAdjectiveEntry(const DictionaryEntry& entry) 
 
   // Get stem by removing final い
   std::string surface = entry.surface;
-  if (surface.size() < core::kJapaneseCharBytes || surface.substr(surface.size() - core::kJapaneseCharBytes) != "い") {
+  if (!utf8::endsWith(surface, "い")) {
     // Doesn't end with い, return as-is
     result.push_back(entry);
     return result;
   }
-  std::string stem = surface.substr(0, surface.size() - core::kJapaneseCharBytes);
+  std::string stem(utf8::dropLastChar(surface));
   std::string lemma = entry.lemma.empty() ? entry.surface : entry.lemma;
 
   // I-adjective conjugation suffixes
   // Format: {suffix, pos_override} - pos_override: '\0' = use ADJ, 'N' = use NOUN
+  // Note: Empty stem removed - causes unwanted splits (おもしろい→おも+しろい)
+  // さ nominalization handled by adjective_candidates.cpp for MeCab-compatible split
   static const std::vector<std::pair<std::string, char>> kIAdjSuffixes = {
       {"い", '\0'},           // Base form
       {"かった", '\0'},       // Past
@@ -131,7 +133,7 @@ std::vector<DictionaryEntry> expandAdjectiveEntry(const DictionaryEntry& entry) 
       {"くて", '\0'},         // Te-form
       {"ければ", '\0'},       // Conditional
       {"く", '\0'},           // Adverbial
-      {"さ", 'N'},            // Nominalization (NOUN: 高さ, 美しさ, etc.)
+      // {"さ", 'N'},         // Nominalization: removed - use split path (高+さ)
       {"かったら", '\0'},     // Conditional past
       {"くなる", '\0'},       // Become ~
       {"くなった", '\0'},     // Became ~
@@ -166,9 +168,8 @@ std::vector<DictionaryEntry> expandAdjectiveEntry(const DictionaryEntry& entry) 
   // Generate contracted forms for adjectives ending in ない (stem ends with な)
   // E.g., くだらない → くだらん, くだらなかった → くだらんかった
   // This handles colloquial contractions: ない→ん, なかった→んかった, etc.
-  if (stem.size() >= core::kJapaneseCharBytes &&
-      stem.substr(stem.size() - core::kJapaneseCharBytes) == "な") {
-    std::string contracted_stem = stem.substr(0, stem.size() - core::kJapaneseCharBytes) + "ん";
+  if (utf8::endsWith(stem, "な")) {
+    std::string contracted_stem = std::string(utf8::dropLastChar(stem)) + "ん";
 
     // Contracted form suffixes (parallel to standard forms with な→ん)
     static const std::vector<std::string> kContractedSuffixes = {

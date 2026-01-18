@@ -10,8 +10,56 @@
 
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
+#include "normalize/utf8.h"
 
 namespace suzume::grammar {
+
+using normalize::encodeUtf8;
+
+namespace {
+
+// =============================================================================
+// Character Iteration Templates
+// =============================================================================
+
+/**
+ * @brief Check if all characters in string match a predicate
+ * Iterates through 3-byte UTF-8 sequences (Japanese characters)
+ */
+template <typename Predicate>
+bool allCharsMatch(std::string_view str, Predicate pred) {
+  if (str.empty()) return false;
+  size_t pos = 0;
+  while (pos < str.size()) {
+    if (!utf8::is3ByteUtf8At(str, pos)) return false;
+    char32_t cp = utf8::decode3ByteUtf8At(str, pos);
+    if (!pred(cp)) return false;
+    pos += core::kJapaneseCharBytes;
+  }
+  return true;
+}
+
+/**
+ * @brief Check if any character in string matches a predicate
+ * Handles mixed-byte strings (skips non-3-byte sequences)
+ */
+template <typename Predicate>
+bool anyCharMatches(std::string_view str, Predicate pred) {
+  if (str.empty()) return false;
+  size_t pos = 0;
+  while (pos + core::kJapaneseCharBytes <= str.size()) {
+    if (utf8::is3ByteUtf8At(str, pos)) {
+      char32_t cp = utf8::decode3ByteUtf8At(str, pos);
+      if (pred(cp)) return true;
+      pos += core::kJapaneseCharBytes;
+    } else {
+      pos += 1;
+    }
+  }
+  return false;
+}
+
+}  // namespace
 
 // Onbin endings: unique onbin values from Conjugation::getGodanRows()
 // Derived from: GodanKa/GodanGa.onbin="い", GodanTa/Ra/Wa.onbin="っ", GodanNa/Ba/Ma.onbin="ん"
@@ -72,7 +120,7 @@ bool endsWithChar(std::string_view stem, const char* chars[], size_t count) {
   if (stem.size() < core::kJapaneseCharBytes) {
     return false;
   }
-  std::string_view last = stem.substr(stem.size() - core::kJapaneseCharBytes);
+  std::string_view last = utf8::lastChar(stem);
   for (size_t idx = 0; idx < count; ++idx) {
     if (last == chars[idx]) {
       return true;
@@ -82,21 +130,7 @@ bool endsWithChar(std::string_view stem, const char* chars[], size_t count) {
 }
 
 bool isAllKanji(std::string_view stem) {
-  if (stem.empty()) {
-    return false;
-  }
-  size_t pos = 0;
-  while (pos < stem.size()) {
-    if (!utf8::is3ByteUtf8At(stem, pos)) {
-      return false;
-    }
-    char32_t codepoint = utf8::decode3ByteUtf8At(stem, pos);
-    if (!kana::isKanjiCodepoint(codepoint)) {
-      return false;
-    }
-    pos += core::kJapaneseCharBytes;
-  }
-  return true;
+  return allCharsMatch(stem, kana::isKanjiCodepoint);
 }
 
 bool endsWithKanji(std::string_view stem) {
@@ -105,77 +139,19 @@ bool endsWithKanji(std::string_view stem) {
 }
 
 bool containsKanji(std::string_view stem) {
-  if (stem.empty()) {
-    return false;
-  }
-  size_t pos = 0;
-  while (pos + core::kJapaneseCharBytes <= stem.size()) {
-    if (utf8::is3ByteUtf8At(stem, pos)) {
-      char32_t codepoint = utf8::decode3ByteUtf8At(stem, pos);
-      if (kana::isKanjiCodepoint(codepoint)) {
-        return true;
-      }
-      pos += core::kJapaneseCharBytes;
-    } else {
-      pos += 1;
-    }
-  }
-  return false;
+  return anyCharMatches(stem, kana::isKanjiCodepoint);
 }
 
 bool containsKatakana(std::string_view stem) {
-  if (stem.empty()) {
-    return false;
-  }
-  size_t pos = 0;
-  while (pos + core::kJapaneseCharBytes <= stem.size()) {
-    if (utf8::is3ByteUtf8At(stem, pos)) {
-      char32_t codepoint = utf8::decode3ByteUtf8At(stem, pos);
-      if (kana::isKatakanaCodepoint(codepoint)) {
-        return true;
-      }
-      pos += core::kJapaneseCharBytes;
-    } else {
-      pos += 1;
-    }
-  }
-  return false;
+  return anyCharMatches(stem, kana::isKatakanaCodepoint);
 }
 
 bool isPureHiragana(std::string_view stem) {
-  if (stem.empty()) {
-    return false;
-  }
-  size_t pos = 0;
-  while (pos < stem.size()) {
-    if (!utf8::is3ByteUtf8At(stem, pos)) {
-      return false;
-    }
-    char32_t codepoint = utf8::decode3ByteUtf8At(stem, pos);
-    if (!kana::isHiraganaCodepoint(codepoint)) {
-      return false;
-    }
-    pos += core::kJapaneseCharBytes;
-  }
-  return true;
+  return allCharsMatch(stem, kana::isHiraganaCodepoint);
 }
 
 bool isPureKatakana(std::string_view stem) {
-  if (stem.empty()) {
-    return false;
-  }
-  size_t pos = 0;
-  while (pos < stem.size()) {
-    if (!utf8::is3ByteUtf8At(stem, pos)) {
-      return false;
-    }
-    char32_t codepoint = utf8::decode3ByteUtf8At(stem, pos);
-    if (!kana::isKatakanaCodepoint(codepoint)) {
-      return false;
-    }
-    pos += core::kJapaneseCharBytes;
-  }
-  return true;
+  return allCharsMatch(stem, kana::isKatakanaCodepoint);
 }
 
 bool isSmallKana(std::string_view ch) {
@@ -254,21 +230,6 @@ char32_t getVowelForChar(char32_t ch) {
 }
 
 namespace {
-// Helper to encode a codepoint to UTF-8 string
-std::string encodeUtf8(char32_t cp) {
-  std::string result;
-  if (cp < 0x80) {
-    result.push_back(static_cast<char>(cp));
-  } else if (cp < 0x800) {
-    result.push_back(static_cast<char>(0xC0 | (cp >> 6)));
-    result.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
-  } else if (cp < 0x10000) {
-    result.push_back(static_cast<char>(0xE0 | (cp >> 12)));
-    result.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
-    result.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
-  }
-  return result;
-}
 
 // Lookup GodanRow by a_row codepoint (cached for efficiency)
 const std::pair<VerbType, const Conjugation::GodanRow*>*

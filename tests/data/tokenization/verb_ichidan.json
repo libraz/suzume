@@ -197,13 +197,18 @@
     },
     {
       "id": "akirameru_verb",
-      "description": "B60: あきらめられた should be VERB, not あきら+められた split",
+      "description": "B60: あきらめられた - verb+auxiliary split (MeCab: あきらめ+られ+た)",
       "input": "あきらめられた",
       "expected": [
         {
-          "surface": "あきらめられた",
+          "surface": "あきらめられ",
           "pos": "Verb",
-          "lemma": "あきらめる"
+          "lemma": "あきらめられる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [

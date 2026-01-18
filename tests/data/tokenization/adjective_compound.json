@@ -108,13 +108,18 @@
     },
     {
       "id": "adj_sugiru_toutoi",
-      "description": "尊すぎる - i-adjective stem + すぎる compound verb",
+      "description": "尊すぎる - MeCab-compatible: ADJ stem (ガル接続) + すぎる (non-independent verb)",
       "input": "尊すぎる",
       "expected": [
         {
-          "surface": "尊すぎる",
+          "surface": "尊",
+          "pos": "Adjective",
+          "lemma": "尊い"
+        },
+        {
+          "surface": "すぎる",
           "pos": "Verb",
-          "lemma": "尊過ぎる"
+          "lemma": "すぎる"
         }
       ],
       "tags": [
@@ -123,13 +128,18 @@
     },
     {
       "id": "adj_sugiru_takai",
-      "description": "高すぎる - i-adjective stem + すぎる compound verb",
+      "description": "高すぎる - MeCab-compatible: ADJ stem (ガル接続) + すぎる (non-independent verb)",
       "input": "高すぎる",
       "expected": [
         {
-          "surface": "高すぎる",
+          "surface": "高",
+          "pos": "Adjective",
+          "lemma": "高い"
+        },
+        {
+          "surface": "すぎる",
           "pos": "Verb",
-          "lemma": "高過ぎる"
+          "lemma": "すぎる"
         }
       ],
       "tags": [
@@ -162,13 +172,18 @@
     },
     {
       "id": "adj_sugiru_inflected_ta",
-      "description": "高すぎた - i-adjective + すぎる past tense splits",
+      "description": "高すぎた - MeCab-compatible: ADJ stem (ガル接続) + すぎ (non-independent verb) + た",
       "input": "高すぎた",
       "expected": [
         {
-          "surface": "高すぎ",
+          "surface": "高",
+          "pos": "Adjective",
+          "lemma": "高い"
+        },
+        {
+          "surface": "すぎ",
           "pos": "Verb",
-          "lemma": "高過ぎる"
+          "lemma": "すぎる"
         },
         {
           "surface": "た",
@@ -181,7 +196,7 @@
     },
     {
       "id": "adj_sugiru_in_sentence",
-      "description": "この値段は高すぎる - adj+sugiru in context",
+      "description": "この値段は高すぎる - MeCab-compatible: ADJ stem (ガル接続) + すぎる in context",
       "input": "この値段は高すぎる",
       "expected": [
         {
@@ -197,9 +212,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "高すぎる",
+          "surface": "高",
+          "pos": "Adjective",
+          "lemma": "高い"
+        },
+        {
+          "surface": "すぎる",
           "pos": "Verb",
-          "lemma": "高過ぎる"
+          "lemma": "すぎる"
         }
       ],
       "tags": [
