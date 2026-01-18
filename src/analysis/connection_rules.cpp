@@ -111,6 +111,7 @@ void evaluateVerbRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkPassiveAfterVerbMizenkei(prev, next, opts));
   accumulateRule(accumulated, checkShireruToMasuNai(prev, next, opts));
   accumulateRule(accumulated, checkVerbToOkuChauContraction(prev, next, opts));
+  // Note: checkTeVerbToAuxNegative removed - causes unified path to win over split path
 
   // VERB → VERB rules
   accumulateRule(accumulated, checkIchidanRenyokeiTe(prev, next, opts));

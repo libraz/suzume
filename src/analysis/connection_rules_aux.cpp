@@ -202,6 +202,7 @@ ConnectionRuleResult checkIruAuxAfterTeForm(const core::LatticeEdge& prev,
 // Rule: Te-form VERB + しまう/しまった (AUX) bonus
 // Completive/Regretful aspect pattern: 食べてしまった, 忘れてしまった
 // Exception: Bare suru te-form "して" should NOT get bonus - MeCab splits as し+て
+// Exception: Negative forms (しまわない, etc.) should NOT get bonus - should split as しまわ+ない
 ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts) {
@@ -216,6 +217,14 @@ ConnectionRuleResult checkShimauAuxAfterTeForm(const core::LatticeEdge& prev,
   // This also applies to して forms from 漢字+する compound verbs (勉強して, etc.)
   // since those should split as 勉強 + し + て for MeCab compatibility
   if (isBareSuruTeForm(prev)) {
+    return {};
+  }
+
+  // Don't give bonus for negative forms - MeCab splits as しまわ + ない
+  // E.g., 忘れてしまわない → 忘れ + て + しまわ + ない (4 tokens)
+  if (utf8::endsWith(next.surface, "ない") ||
+      utf8::endsWith(next.surface, "なかった") ||
+      utf8::endsWith(next.surface, "なくて")) {
     return {};
   }
 
@@ -425,6 +434,7 @@ ConnectionRuleResult checkPassiveAuxToNaiTa(const core::LatticeEdge& prev,
 // This bonus helps the split path beat the integrated contraction form
 // MeCab treats these as: VERB + 動詞,非自立
 // Exception: Bare suru te-form "して" should NOT get bonus - MeCab splits as し+て
+// Exception: Negative forms should NOT get bonus - should split as しまわ+ない, おか+ない
 ConnectionRuleResult checkVerbToOkuChauContraction(const core::LatticeEdge& prev,
                                                    const core::LatticeEdge& next,
                                                    const ConnectionOptions& opts) {
@@ -438,6 +448,14 @@ ConnectionRuleResult checkVerbToOkuChauContraction(const core::LatticeEdge& prev
   // Don't give bonus for bare suru te-form "して" - should be split as し+て
   // MeCab: してしまう → し + て + しまう (3 tokens)
   if (isBareSuruTeForm(prev)) {
+    return {};
+  }
+
+  // Don't give bonus for negative forms - MeCab splits as しまわ+ない, おか+ない
+  // E.g., 忘れてしまわない → 忘れ + て + しまわ + ない (4 tokens)
+  if (utf8::endsWith(next.surface, "ない") ||
+      utf8::endsWith(next.surface, "なかった") ||
+      utf8::endsWith(next.surface, "なくて")) {
     return {};
   }
 
@@ -543,6 +561,14 @@ ConnectionRuleResult checkAuxAfterParticle(const core::LatticeEdge& prev,
   // e.g., は + なかった, で + ある
   if (next.fromDictionary() && next.surface.size() > core::kJapaneseCharBytes) {
     return {};
+  }
+
+  // Exception: て/で + い(AUX, lemma=いる) is valid progressive pattern
+  // MeCab-compatible split: 食べていない → 食べ + て + い + ない
+  // The い(mizenkei of いる) after て/で is grammatically valid
+  if ((prev.surface == "て" || prev.surface == "で") &&
+      next.surface == "い" && next.lemma == "いる") {
+    return {};  // No penalty for this valid pattern
   }
 
   // Penalize short/unknown AUX after particle

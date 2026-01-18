@@ -282,6 +282,14 @@ ConnectionRuleResult checkNaiAfterVerbMizenkei(const core::LatticeEdge& prev,
     return {};
   }
 
+  // Exclude contracted ておく forms (てい, とい, etc.) - these are NOT valid mizenkei
+  // てい(lemma=てく) + ない is invalid; correct split is て + い + ない
+  // 見ていない → 見 + て + い + ない, not 見 + てい + ない
+  if (prev.lemma == "てく" || prev.lemma == "とく" ||
+      prev.lemma == "どく" || prev.lemma == "でく") {
+    return {};
+  }
+
   // Check if prev is a valid verb mizenkei (未然形)
   // Valid patterns:
   // - 一段: ends with e-row hiragana (食べ, しれ, 見)
@@ -904,12 +912,13 @@ ConnectionRuleResult checkTeParticleToAuxVerb(const core::LatticeEdge& prev,
     return {};
   }
 
-  // MeCab-compatible: いない, いなかった should NOT get bonus
-  // They should be split as い(mizenkei) + ない(AUX) instead
+  // MeCab-compatible: negative forms should NOT get bonus
+  // They should be split as X(mizenkei) + ない(AUX) instead
   // E.g., 食べていない → 食べ + て + い + ない (4 tokens)
-  if (next.lemma == scorer::kLemmaIru &&
-      (next.surface == "いない" || next.surface == "いなかった" ||
-       next.surface == "いなくて")) {
+  //       忘れてしまわない → 忘れ + て + しまわ + ない (4 tokens)
+  if (utf8::endsWith(next.surface, "ない") ||
+      utf8::endsWith(next.surface, "なかった") ||
+      utf8::endsWith(next.surface, "なくて")) {
     return {};
   }
 
@@ -948,9 +957,11 @@ ConnectionRuleResult checkTeParticleToAuxVerb(const core::LatticeEdge& prev,
           "te/de particle + auxiliary verb"};
 }
 
-// Rule: て/で(PARTICLE) → いない/いなかった(VERB) penalty
-// MeCab-compatible: should be split as て + い + ない instead
+// Rule: て/で(PARTICLE) → Xない(VERB or AUX) penalty (supplementary verb negative forms)
+// MeCab-compatible: should be split as て + X + ない instead
 // E.g., 食べていない → 食べ + て + い + ない (4 tokens)
+//       忘れてしまわない → 忘れ + て + しまわ + ない (4 tokens)
+//       走っていかない → 走っ + て + いか + ない (4 tokens)
 ConnectionRuleResult checkTeParticleToInaiVerb(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& /* opts */) {
@@ -960,17 +971,78 @@ ConnectionRuleResult checkTeParticleToInaiVerb(const core::LatticeEdge& prev,
     return {};
   }
 
-  // Check if next is いない/いなかった(VERB, lemma=いる)
-  if (next.pos != core::PartOfSpeech::Verb) return {};
-  if (next.lemma != scorer::kLemmaIru) return {};
-  if (next.surface != "いない" && next.surface != "いなかった" &&
-      next.surface != "いなくて") {
+  // Check if next is a supplementary verb in negative form (VERB or AUX)
+  // Both VERB (from verb expansion) and AUX (from dictionary) need penalty
+  if (next.pos != core::PartOfSpeech::Verb &&
+      next.pos != core::PartOfSpeech::Auxiliary) {
     return {};
   }
 
-  // Strong penalty to prefer split path: て + い + ない
-  return {ConnectionPattern::TeParticleToInaiVerb, scorer::scale::kProhibitive,
-          "te/de particle + inai verb (should split as i + nai)"};
+  // Check if surface ends with negative form marker
+  bool ends_with_nai = utf8::endsWith(next.surface, "ない");
+  bool ends_with_nakatta = utf8::endsWith(next.surface, "なかった");
+  bool ends_with_nakute = utf8::endsWith(next.surface, "なくて");
+  if (!ends_with_nai && !ends_with_nakatta && !ends_with_nakute) {
+    return {};
+  }
+
+  // Check if lemma is a known supplementary verb
+  bool is_supplementary_verb =
+      (next.lemma == scorer::kLemmaIru || next.lemma == scorer::kLemmaShimau ||
+       next.lemma == scorer::kLemmaIku || next.lemma == scorer::kLemmaOku ||
+       next.lemma == scorer::kLemmaMiru || next.lemma == scorer::kLemmaKuru ||
+       next.lemma == scorer::kLemmaAgeru || next.lemma == scorer::kLemmaMorau ||
+       next.lemma == scorer::kLemmaKureru);
+  if (!is_supplementary_verb) {
+    return {};
+  }
+
+  // Moderate penalty to prefer split path: て + X + ない
+  // Note: Using kModerate instead of kProhibitive to avoid making split path too expensive
+  return {ConnectionPattern::TeParticleToInaiVerb, scorer::scale::kModerate,
+          "te/de particle + aux verb negative (should split as stem + nai)"};
+}
+
+// Rule: て(VERB, from てる) → supplementary verb negative forms penalty
+// The て from てる should not be followed by supplementary verb negative forms
+// E.g., 忘れて + しまわない should be 忘れ + て(PARTICLE) + しまわ + ない
+// not 忘れ + て(VERB from てる) + しまわない
+ConnectionRuleResult checkTeVerbToAuxNegative(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next,
+                                               const ConnectionOptions& /* opts */) {
+  // Check if prev is て/で (VERB from てる/でる)
+  if (prev.pos != core::PartOfSpeech::Verb) return {};
+  if (prev.surface != scorer::kFormTe && prev.surface != scorer::kFormDe) {
+    return {};
+  }
+
+  // Check if next is supplementary verb negative form (VERB or AUX)
+  if (next.pos != core::PartOfSpeech::Verb &&
+      next.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+
+  // Check if surface ends with negative form marker
+  if (!utf8::endsWith(next.surface, "ない") &&
+      !utf8::endsWith(next.surface, "なかった") &&
+      !utf8::endsWith(next.surface, "なくて")) {
+    return {};
+  }
+
+  // Check if lemma is a known supplementary verb
+  bool is_supplementary_verb =
+      (next.lemma == scorer::kLemmaIru || next.lemma == scorer::kLemmaShimau ||
+       next.lemma == scorer::kLemmaIku || next.lemma == scorer::kLemmaOku ||
+       next.lemma == scorer::kLemmaMiru || next.lemma == scorer::kLemmaKuru ||
+       next.lemma == scorer::kLemmaAgeru || next.lemma == scorer::kLemmaMorau ||
+       next.lemma == scorer::kLemmaKureru);
+  if (!is_supplementary_verb) {
+    return {};
+  }
+
+  // Strong penalty to prefer particle path
+  return {ConnectionPattern::TeVerbToAuxNegative, scorer::scale::kProhibitive,
+          "te verb (from teru) + aux verb negative (prefer particle path)"};
 }
 
 // Rule: VERB(onbinkei) + だ(AUX) bonus for voiced past tense

@@ -323,7 +323,9 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"しまう", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
       {"しまった", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
       {"しまって", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"しまい", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},  // renyokei
       {"しまいます", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      {"しまわ", POS::Verb, 0.0F, "しまう", false, false, false, CT::None, ""},  // mizenkei for +ない, VERB like MeCab
       {"しまわない", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
       {"しまわなかった", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
       {"しまえば", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
@@ -363,7 +365,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // て形 + いく/くる pattern: 見ていく (going), 見てくる (coming back)
       // Cost 1.5F so VERB (1.2F) wins for standalone usage, but AUX wins after て-form
       // due to favorable VERB→AUX bigram connection (typically -0.5F bonus)
-      // Note: いく already gets char_speech AUX candidates, くる needs explicit entries
+      {"いく", POS::Auxiliary, 1.5F, "いく", false, false, false, CT::None, ""},
+      {"いった", POS::Auxiliary, 1.5F, "いく", false, false, false, CT::None, ""},
+      {"いって", POS::Auxiliary, 1.5F, "いく", false, false, false, CT::None, ""},
+      {"いか", POS::Verb, -0.5F, "いく", false, false, false, CT::None, ""},  // mizenkei for +ない, VERB like MeCab, negative cost to beat い(いる)
+      {"いかない", POS::Auxiliary, 1.5F, "いく", false, false, false, CT::None, ""},
       {"くる", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
       {"きます", POS::Auxiliary, 1.5F, "くる", false, false, false, CT::None, ""},
       // Lower cost for きた to beat colloquial ってき split in patterns like なってきた

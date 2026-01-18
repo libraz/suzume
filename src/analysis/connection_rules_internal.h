@@ -493,6 +493,10 @@ ConnectionRuleResult checkTeParticleToInaiVerb(const core::LatticeEdge& prev,
                                                const core::LatticeEdge& next,
                                                const ConnectionOptions& opts);
 
+ConnectionRuleResult checkTeVerbToAuxNegative(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next,
+                                               const ConnectionOptions& opts);
+
 ConnectionRuleResult checkPassiveAuxToNaiTa(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts);

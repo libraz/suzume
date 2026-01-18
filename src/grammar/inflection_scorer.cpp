@@ -477,8 +477,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
   if (required_conn == conn::kVerbOnbinkei && isAllKanji(stem)) {
     // For multi-kanji stems, GodanWa is more common than GodanRa/Ta
     // (手伝う, 買い求う, 争う vs. rare multi-kanji GodanRa/Ta)
-    // For single-kanji stems, disambiguation is done via dictionary lookup
-    // in verb_candidates.cpp (see kBonusDictionaryVerb)
+    // For single-kanji stems, GodanRa verbs are very common (作る, 知る, 取る, 切る, etc.)
+    // So we give a small preference to GodanRa over GodanWa for disambiguation
     if (type == VerbType::GodanWa && stem_len >= core::kTwoJapaneseCharBytes) {
       base += inflection::kBonusGodanWaMultiKanji;
       logConfidenceAdjustment(inflection::kBonusGodanWaMultiKanji, "godan_wa_multi_kanji");
@@ -486,6 +486,32 @@ float calculateConfidence(VerbType type, std::string_view stem,
                stem_len >= core::kTwoJapaneseCharBytes) {
       base -= inflection::kPenaltyGodanRaTaMultiKanji;
       logConfidenceAdjustment(-inflection::kPenaltyGodanRaTaMultiKanji, "godan_ra_ta_multi_kanji");
+    } else if (type == VerbType::GodanRa && stem_len == core::kJapaneseCharBytes) {
+      // Single-kanji GodanRa verbs are very common - give small preference
+      base += inflection::scale::kMinorBonus;
+      logConfidenceAdjustment(inflection::scale::kMinorBonus, "godan_ra_single_kanji");
+    }
+  }
+
+  // GodanWa vs GodanRa disambiguation for っ-onbin with hiragana stems ending in しゃ/さ
+  // Honorific verbs like いらっしゃる, おっしゃる, くださる, なさる are GodanRa
+  // These stems end in しゃ or さ, which is NOT typical for GodanWa verbs
+  // GodanWa verbs like 買う, 舞う, 行う have stems ending in kanji or other hiragana
+  if (required_conn == conn::kVerbOnbinkei && stem_len >= core::kTwoJapaneseCharBytes) {
+    std::string_view last6 = stem.substr(stem_len - core::kTwoJapaneseCharBytes);
+    std::string_view last3 = stem.substr(stem_len - core::kJapaneseCharBytes);
+    bool ends_with_sha = (last6 == "しゃ" || last6 == "しょ" || last6 == "しゅ");
+    bool ends_with_sa = (last3 == "さ");
+    if (ends_with_sha || ends_with_sa) {
+      if (type == VerbType::GodanWa) {
+        // Strong penalty: stems ending in しゃ/さ are not typical GodanWa
+        base -= inflection::scale::kMinor;
+        logConfidenceAdjustment(-inflection::scale::kMinor, "godan_wa_sha_sa_stem");
+      } else if (type == VerbType::GodanRa) {
+        // Boost: honorific verbs are GodanRa
+        base += inflection::scale::kMinor;
+        logConfidenceAdjustment(inflection::scale::kMinor, "godan_ra_sha_sa_stem");
+      }
     }
   }
 

@@ -1381,6 +1381,16 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
   for (const auto& pattern : kIAdjGaruPatterns) {
     if (hiragana_part.size() >= pattern.size() &&
         hiragana_part.substr(0, pattern.size()) == pattern) {
+      // Check for サ変 passive/causative pattern: さ + れ/せ
+      // E.g., 処理される, 勉強させる - these are NOT adjective nominalization
+      if (std::string_view(pattern) == "さ" && hiragana_part.size() > 3) {
+        std::string after_sa = hiragana_part.substr(3);  // Skip さ (3 bytes)
+        if (after_sa.size() >= 3 &&
+            (after_sa.substr(0, 3) == "れ" || after_sa.substr(0, 3) == "せ")) {
+          continue;  // Skip - this is likely サ変 passive/causative, not adjective
+        }
+      }
+
       // Found potential i-adjective stem + garu-connection pattern
       // The stem is just the kanji portion (e.g., 高, 尊, 寒)
       std::string stem = extractSubstring(codepoints, start_pos, kanji_end);

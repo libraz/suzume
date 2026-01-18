@@ -773,13 +773,17 @@
     },
     {
       "id": "verb_shimeta",
-      "description": "しめた should be VERB with lemma しめる (占める/締める)",
+      "description": "しめた should split into しめ (ichidan verb) + た (auxiliary)",
       "input": "しめた",
       "expected": [
         {
-          "surface": "しめた",
+          "surface": "しめ",
           "pos": "Verb",
           "lemma": "しめる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -789,7 +793,7 @@
     },
     {
       "id": "idiom_aji_wo_shimeta",
-      "description": "味をしめた - idiom should split correctly",
+      "description": "味をしめた - idiom should split verb correctly",
       "input": "味をしめた",
       "expected": [
         {
@@ -801,9 +805,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "しめた",
+          "surface": "しめ",
           "pos": "Verb",
           "lemma": "しめる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [

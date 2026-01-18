@@ -118,6 +118,26 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         }
       }
 
+      // Validate GodanKa vs GodanGa: both have い-onbin, but differ in te-form voicing
+      // GodanKa (書く) uses て/た: 書いて, 書いた
+      // GodanGa (泳ぐ) uses で/だ: 泳いで, 泳いだ
+      // When analyzing with te-form auxiliary, check voicing compatibility
+      if (ending.suffix == "い" && ending.is_onbin && !aux_chain.empty()) {
+        const std::string& first_aux = aux_chain.back();  // First matched aux
+        bool is_voiced_aux = (first_aux == "で" || first_aux == "だ" ||
+                              first_aux.rfind("で", 0) == 0 ||  // starts with で
+                              first_aux.rfind("だ", 0) == 0);   // starts with だ
+        bool is_unvoiced_aux = (first_aux == "て" || first_aux == "た" ||
+                                first_aux.rfind("て", 0) == 0 ||  // starts with て
+                                first_aux.rfind("た", 0) == 0);   // starts with た
+        if (is_unvoiced_aux && ending.verb_type == VerbType::GodanGa) {
+          continue;  // GodanGa requires voiced aux (で/だ), skip unvoiced
+        }
+        if (is_voiced_aux && ending.verb_type == VerbType::GodanKa) {
+          continue;  // GodanKa requires unvoiced aux (て/た), skip voiced
+        }
+      }
+
       // Validate Ichidan: reject stems that would create irregular verb base forms
       // くる (来る) is Kuru verb, not Ichidan. Stem く + る = くる is INVALID.
       // する is Suru verb, not Ichidan. Stem す + る = する is INVALID.

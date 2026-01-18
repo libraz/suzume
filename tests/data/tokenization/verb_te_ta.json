@@ -112,7 +112,7 @@
     },
     {
       "id": "te_inai_unified",
-      "description": "食べていない - MeCab-compatible: 食べ + て + い + ない",
+      "description": "食べていない - MeCab-compatible: 食べ + て + い + ない (い is AUX in suzume, VERB-non-independent in MeCab)",
       "input": "食べていない",
       "expected": [
         {
@@ -126,7 +126,7 @@
         },
         {
           "surface": "い",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "lemma": "いる"
         },
         {

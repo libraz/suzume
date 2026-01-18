@@ -162,6 +162,7 @@ enum class ConnectionPattern {
   RenyokeiToTeParticle,       // VERB(renyokei/onbinkei) → て/で(PARTICLE) (MeCab-compatible te-form split)
   TeParticleToAuxVerb,        // て/で(PARTICLE) → いる/しまう/etc. (VERB/AUX) (te-form auxiliary pattern)
   TeParticleToInaiVerb,       // て/で(PARTICLE) → いない/いなかった(VERB) penalty (should split as い + ない)
+  TeVerbToAuxNegative,        // て/で(VERB from てる) → 補助動詞否定形 penalty (prefer particle path)
   AdjKuToTeParticle,          // ADJ(く形) → て(PARTICLE) (MeCab-compatible kute split: 美しくて → 美しく + て)
   AdjKuToNai,                 // ADJ(く形) → ない(AUX) bonus (高くない → 高く + ない)
   IAdjToDesu,                 // I-ADJ(基本形) → です(AUX) bonus (美味しいです → 美味しい + です)

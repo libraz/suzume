@@ -1150,7 +1150,7 @@
     },
     {
       "id": "taio_sasete_itadakimasu",
-      "description": "対応させていただきます - suru causative + itadaku - current output (4 tokens)",
+      "description": "対応させていただきます - suru causative + itadaku (4 tokens)",
       "input": "対応させていただきます",
       "expected": [
         {
@@ -1159,7 +1159,7 @@
         },
         {
           "surface": "させ",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "させる"
         },
         {
@@ -1539,7 +1539,7 @@
     },
     {
       "id": "suru_colloquial_shichau",
-      "description": "勉強しちゃった - MeCab-compatible split: し + ちゃった",
+      "description": "勉強しちゃった - MeCab: 勉強+し+ちゃっ+た (4 tokens)",
       "input": "勉強しちゃった",
       "expected": [
         {
@@ -1552,9 +1552,14 @@
           "lemma": "する"
         },
         {
-          "surface": "ちゃった",
+          "surface": "ちゃっ",
+          "pos": "Verb",
+          "lemma": "ちゃう"
+        },
+        {
+          "surface": "た",
           "pos": "Auxiliary",
-          "lemma": "しまう"
+          "lemma": "た"
         }
       ],
       "tags": [
