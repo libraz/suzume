@@ -822,114 +822,25 @@ void addHiraganaCompoundVerbJoinCandidates(
 }
 
 void addAdjectiveSugiruJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer) {
-  using CharType = normalize::CharType;
-
-  if (start_pos >= char_types.size()) {
-    return;
-  }
-
-  // Must start with kanji (ADJ stem)
-  if (char_types[start_pos] != CharType::Kanji) {
-    return;
-  }
-
-  // Find the kanji portion (ADJ stem) - typically 1-2 kanji
-  size_t kanji_end = start_pos + 1;
-  while (kanji_end < char_types.size() && kanji_end - start_pos < 3 &&
-         char_types[kanji_end] == CharType::Kanji) {
-    ++kanji_end;
-  }
-
-  // Next must be hiragana starting with す (for すぎ)
-  if (kanji_end >= char_types.size() ||
-      char_types[kanji_end] != CharType::Hiragana) {
-    return;
-  }
-
-  // Check if すぎ follows the kanji
-  size_t start_byte = charPosToBytePos(codepoints, start_pos);
-  size_t sugi_start_byte = charPosToBytePos(codepoints, kanji_end);
-
-  std::string_view after_kanji = text.substr(sugi_start_byte);
-  constexpr std::string_view kSugi = "すぎ";
-  if (after_kanji.size() < kSugi.size() ||
-      after_kanji.substr(0, kSugi.size()) != kSugi) {
-    return;
-  }
-
-  // Build the ADJ base form to verify it's a valid i-adjective
-  std::string adj_stem(text.substr(start_byte, sugi_start_byte - start_byte));
-  std::string adj_base = adj_stem + "い";
-
-  // Check if the ADJ base form is in dictionary
-  auto adj_results = dict_manager.lookup(adj_base, 0);
-  bool adj_in_dict = false;
-  for (const auto& result : adj_results) {
-    if (result.entry != nullptr && result.entry->surface == adj_base &&
-        result.entry->pos == core::PartOfSpeech::Adjective) {
-      adj_in_dict = true;
-      break;
-    }
-  }
-
-  // Fallback: use inflection analysis to verify adjective
-  if (!adj_in_dict) {
-    static grammar::Inflection inflection;
-    auto infl_result = inflection.getBest(adj_base);
-
-    // Accept if inflection analysis identifies it as an i-adjective
-    if (infl_result.confidence >= 0.5F && infl_result.base_form == adj_base) {
-      adj_in_dict = true;
-    }
-  }
-
-  if (!adj_in_dict) {
-    return;
-  }
-
-  // Build compound verb base form: ADJ stem + 過ぎる
-  std::string compound_base = adj_stem + "過ぎる";
-
-  // Calculate cost with bonus for verified ADJ
-  float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
-  float final_cost = base_cost + scorer.joinOpts().compound_verb_bonus;
-  uint8_t flags = core::LatticeEdge::kFromDictionary;
-
-  // Generate candidates for different forms of すぎる
-  // Pattern 1: ADJ + すぎ (renyokei) - て/た/ない are separate tokens
-  size_t sugi_renyokei_len = 2;  // すぎ is 2 characters
-  size_t renyokei_end_pos = kanji_end + sugi_renyokei_len;
-
-  if (renyokei_end_pos <= codepoints.size()) {
-    size_t renyokei_end_byte = charPosToBytePos(codepoints, renyokei_end_pos);
-    std::string renyokei_surface(text.substr(start_byte, renyokei_end_byte - start_byte));
-
-    lattice.addEdge(renyokei_surface, static_cast<uint32_t>(start_pos),
-                    static_cast<uint32_t>(renyokei_end_pos), core::PartOfSpeech::Verb,
-                    final_cost, flags, compound_base);
-  }
-
-  // Pattern 2: ADJ + すぎる (base form) - as single token
-  constexpr std::string_view kSugiru = "すぎる";
-  if (after_kanji.size() >= kSugiru.size() &&
-      after_kanji.substr(0, kSugiru.size()) == kSugiru) {
-    size_t sugiru_char_len = 3;  // すぎる is 3 characters
-    size_t sugiru_end_pos = kanji_end + sugiru_char_len;
-
-    if (sugiru_end_pos <= codepoints.size()) {
-      size_t sugiru_end_byte = charPosToBytePos(codepoints, sugiru_end_pos);
-      std::string sugiru_surface(text.substr(start_byte, sugiru_end_byte - start_byte));
-
-      lattice.addEdge(sugiru_surface, static_cast<uint32_t>(start_pos),
-                      static_cast<uint32_t>(sugiru_end_pos), core::PartOfSpeech::Verb,
-                      final_cost, flags, compound_base);
-    }
-  }
+    core::Lattice& /*lattice*/, std::string_view /*text*/,
+    const std::vector<char32_t>& /*codepoints*/, size_t /*start_pos*/,
+    const std::vector<normalize::CharType>& /*char_types*/,
+    const dictionary::DictionaryManager& /*dict_manager*/,
+    const Scorer& /*scorer*/) {
+  // MeCab compatibility: i-adjective + すぎる should be split as separate tokens
+  // MeCab output for 高すぎる:
+  //   高    形容詞,自立,*,*,形容詞・アウオ段,ガル接続,高い,タカ,タカ
+  //   すぎる 動詞,非自立,*,*,一段,基本形,すぎる,スギル,スギル
+  //
+  // Previously this function generated compound verb candidates like 高すぎる (VERB)
+  // with lemma=高過ぎる, which is not MeCab compatible.
+  //
+  // Now we rely on:
+  // 1. generateAdjectiveStemCandidates() to create the adjective stem (高 as ADJ)
+  // 2. Dictionary entries for すぎる/すぎ (VERB) to handle the verb portion
+  //
+  // This function is now a no-op for MeCab compatibility.
+  return;
 }
 
 void addKatakanaSugiruJoinCandidates(

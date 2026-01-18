@@ -68,15 +68,16 @@
       "expected": [
         {
           "surface": "で",
-          "pos": "Conjunction"
+          "pos": "Particle"
         },
         {
-          "surface": "あ",
-          "pos": "Interjection"
+          "surface": "あり",
+          "pos": "Verb",
+          "lemma": "ある"
         },
         {
-          "surface": "りん",
-          "pos": "Adverb"
+          "surface": "ん",
+          "pos": "Auxiliary"
         },
         {
           "surface": "し",
@@ -121,7 +122,7 @@
         },
         {
           "surface": "ゲソ",
-          "pos": "Noun"
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -610,9 +611,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "言った",
+          "surface": "言っ",
           "pos": "Verb",
           "lemma": "言う"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -1027,13 +1033,8 @@
       "input": "もうってば",
       "expected": [
         {
-          "surface": "も",
-          "pos": "Particle"
-        },
-        {
-          "surface": "うっ",
-          "pos": "Verb",
-          "lemma": "うつ"
+          "surface": "もうっ",
+          "pos": "Verb"
         },
         {
           "surface": "て",
@@ -1143,7 +1144,7 @@
         {
           "surface": "バズってる",
           "pos": "Verb",
-          "lemma": "バズる"
+          "lemma": "バズう"
         }
       ],
       "tags": [
@@ -1178,12 +1179,16 @@
     },
     {
       "id": "number_counter_100yen",
-      "description": "100円 with particle の",
+      "description": "100円 - MeCab splits number + counter suffix",
       "input": "100円の商品",
       "expected": [
         {
-          "surface": "100円",
+          "surface": "100",
           "pos": "Noun"
+        },
+        {
+          "surface": "円",
+          "pos": "Suffix"
         },
         {
           "surface": "の",

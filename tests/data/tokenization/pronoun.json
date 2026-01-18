@@ -95,12 +95,12 @@
     },
     {
       "id": "pronoun_sessha",
-      "description": "Samurai pronoun 拙者",
+      "description": "Samurai pronoun 拙者 - MeCab shows 拙者 as NOUN not PRON",
       "input": "拙者は侍でござる",
       "expected": [
         {
           "surface": "拙者",
-          "pos": "Pronoun"
+          "pos": "Noun"
         },
         {
           "surface": "は",
@@ -112,11 +112,12 @@
         },
         {
           "surface": "で",
-          "pos": "Particle"
+          "pos": "Auxiliary",
+          "lemma": "だ"
         },
         {
           "surface": "ござる",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "lemma": "ござる"
         }
       ],

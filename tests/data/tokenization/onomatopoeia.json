@@ -114,7 +114,7 @@
         {
           "surface": "いい",
           "pos": "Adjective",
-          "lemma": "よい"
+          "lemma": "いい"
         }
       ],
       "tags": [
@@ -307,9 +307,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "減った",
+          "surface": "減っ",
           "pos": "Verb",
           "lemma": "減る"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -447,9 +451,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "届いた",
+          "surface": "届い",
           "pos": "Verb",
           "lemma": "届く"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -467,9 +475,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "会った",
+          "surface": "会っ",
           "pos": "Verb",
           "lemma": "会う"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -507,9 +519,13 @@
           "pos": "Adverb"
         },
         {
-          "surface": "詰まった",
+          "surface": "詰まっ",
           "pos": "Verb",
           "lemma": "詰まる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [

@@ -34,9 +34,14 @@
       "input": "食べすぎてしまいそう",
       "expected": [
         {
-          "surface": "食べすぎ",
+          "surface": "食べ",
           "pos": "Verb",
-          "lemma": "食べ過ぎる"
+          "lemma": "食べる"
+        },
+        {
+          "surface": "すぎ",
+          "pos": "Verb",
+          "lemma": "すぎる"
         },
         {
           "surface": "て",
@@ -49,7 +54,7 @@
         },
         {
           "surface": "そう",
-          "pos": "Auxiliary",
+          "pos": "Adverb",
           "lemma": "そう"
         }
       ],
@@ -113,14 +118,23 @@
       "input": "買ってきた",
       "expected": [
         {
-          "surface": "買って",
+          "surface": "買っ",
           "pos": "Verb",
           "lemma": "買う"
         },
         {
-          "surface": "きた",
-          "pos": "Auxiliary",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "き",
+          "pos": "Verb",
           "lemma": "くる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -265,13 +279,19 @@
       "input": "読みすぎた",
       "expected": [
         {
-          "surface": "読みすぎ",
+          "surface": "読み",
           "pos": "Verb",
-          "lemma": "読み過ぎる"
+          "lemma": "読む"
+        },
+        {
+          "surface": "すぎ",
+          "pos": "Verb",
+          "lemma": "すぎる"
         },
         {
           "surface": "た",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -565,9 +585,14 @@
       "input": "食べ始める",
       "expected": [
         {
-          "surface": "食べ始める",
+          "surface": "食べ",
           "pos": "Verb",
-          "lemma": "食べ始める"
+          "lemma": "食べる"
+        },
+        {
+          "surface": "始める",
+          "pos": "Verb",
+          "lemma": "始める"
         }
       ],
       "tags": [
@@ -657,13 +682,19 @@
       "input": "食べすぎた",
       "expected": [
         {
-          "surface": "食べすぎ",
+          "surface": "食べ",
           "pos": "Verb",
-          "lemma": "食べ過ぎる"
+          "lemma": "食べる"
+        },
+        {
+          "surface": "すぎ",
+          "pos": "Verb",
+          "lemma": "すぎる"
         },
         {
           "surface": "た",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [

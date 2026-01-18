@@ -1,0 +1,161 @@
+{
+  "version": "1.0",
+  "description": "I-adjectives past forms (過去形) - katta forms, past negative, past with desu",
+  "cases": [
+    {
+      "id": "yokatta_past",
+      "description": "よかった (past form) - MeCab-compatible lemma is よい",
+      "input": "よかった",
+      "expected": [
+        {
+          "surface": "よかった",
+          "pos": "Adjective",
+          "lemma": "よい"
+        }
+      ],
+      "tags": [
+        "irregular",
+        "i_adjective",
+        "yoi",
+        "past"
+      ]
+    },
+    {
+      "id": "yokatta_desu_polite_past",
+      "description": "よかったです - MeCab-compatible split: よかっ + た + です",
+      "input": "よかったです",
+      "expected": [
+        {
+          "surface": "よかっ",
+          "pos": "Adjective",
+          "lemma": "よい"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
+        }
+      ],
+      "tags": [
+        "irregular",
+        "i_adjective",
+        "yoi",
+        "polite",
+        "past"
+      ]
+    },
+    {
+      "id": "i_adj_utsukushikatta",
+      "description": "美しかった should be Adjective with lemma 美しい",
+      "input": "美しかった",
+      "expected": [
+        {
+          "surface": "美しかった",
+          "pos": "Adjective",
+          "lemma": "美しい"
+        }
+      ],
+      "tags": [
+        "i_adjective",
+        "past"
+      ]
+    },
+    {
+      "id": "hiragana_adj_mazukatta",
+      "description": "まずかった - hiragana adjective conjugation",
+      "input": "まずかった",
+      "expected": [
+        {
+          "surface": "まずかった",
+          "pos": "Adjective",
+          "lemma": "まずい"
+        }
+      ],
+      "tags": [
+        "i_adjective",
+        "hiragana"
+      ]
+    },
+    {
+      "id": "adj_emoi_past",
+      "description": "Katakana adjective エモい past form",
+      "input": "エモかった",
+      "expected": [
+        {
+          "surface": "エモかった",
+          "pos": "Adjective",
+          "lemma": "エモい"
+        }
+      ],
+      "tags": [
+        "slang",
+        "adjective",
+        "katakana"
+      ]
+    },
+    {
+      "id": "adj_kimoi_past",
+      "description": "Katakana adjective キモい past form",
+      "input": "キモかった",
+      "expected": [
+        {
+          "surface": "キモかった",
+          "pos": "Adjective",
+          "lemma": "キモい"
+        }
+      ],
+      "tags": [
+        "slang",
+        "adjective",
+        "katakana"
+      ]
+    },
+    {
+      "id": "classical_samushi",
+      "description": "寒し - classical shuushikei of 寒い (W-014)",
+      "input": "寒さは寒し",
+      "expected": [
+        {
+          "surface": "寒さ",
+          "pos": "Noun",
+          "lemma": "寒い"
+        },
+        {
+          "surface": "は",
+          "pos": "Particle"
+        },
+        {
+          "surface": "寒し",
+          "pos": "Adjective",
+          "lemma": "寒い"
+        }
+      ],
+      "tags": [
+        "classical",
+        "wagahai",
+        "W-014"
+      ]
+    },
+    {
+      "id": "contracted_kudaranai_past",
+      "description": "くだらんかった - contracted past form of くだらなかった",
+      "input": "くだらんかった",
+      "expected": [
+        {
+          "surface": "くだらんかった",
+          "pos": "Adjective",
+          "lemma": "くだらない"
+        }
+      ],
+      "tags": [
+        "contraction",
+        "colloquial",
+        "regression"
+      ]
+    }
+  ]
+}

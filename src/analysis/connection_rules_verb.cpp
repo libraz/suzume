@@ -91,6 +91,8 @@ ConnectionRuleResult checkCopulaAfterVerb(const core::LatticeEdge& prev,
 }
 
 // Rule 2: Ichidan renyokei + て/てV split should be avoided
+// Exception: te(VERB, lemma=teru) is the contracted progressive marker
+// and should NOT be penalized - it gets bonus from checkRenyokeiToContractedVerb
 ConnectionRuleResult checkIchidanRenyokeiTe(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts) {
@@ -105,6 +107,14 @@ ConnectionRuleResult checkIchidanRenyokeiTe(const core::LatticeEdge& prev,
 
   // Check if prev ends with e-row (ichidan renyokei)
   if (!endsWithERow(prev.surface)) {
+    return {};
+  }
+
+  // Exclude て(VERB, lemma=てる) - this is the contracted progressive marker
+  // For MeCab compatibility: 食べてた → 食べ + て(lemma=てる) + た
+  // The bonus for this pattern is handled by checkRenyokeiToContractedVerb
+  if (next.pos == core::PartOfSpeech::Verb &&
+      (next.lemma == "てる" || next.lemma == "でる")) {
     return {};
   }
 
@@ -240,6 +250,13 @@ ConnectionRuleResult checkTaAfterRenyokei(const core::LatticeEdge& prev,
   }
   if (endsWithOnbinMarker(prev.surface)) {
     return {};  // 音便形 - do not split
+  }
+
+  // EXCLUDE て-form verbs (見て, 食べて) - these are already te-forms
+  // 見てた should split as 見 + て + た, not 見て + た
+  // MeCab: 見てた → 見 + て(VERB, lemma=てる) + た
+  if (endsWithTeForm(prev.surface)) {
+    return {};  // て-form - use proper て + た split
   }
 
   // Give bonus (negative value) to prefer this split
@@ -609,18 +626,24 @@ ConnectionRuleResult checkRenyokeiToContractedVerb(const core::LatticeEdge& prev
                         next.lemma == "とく" || next.lemma == "どく");
   if (!is_contracted) return {};
 
-  // Exclude standalone て/で (single-char renyokei of てる/でる)
-  // These should only get bonus when followed by た (handled by TeruRenyokeiToTa rule)
-  // Without this check, 食べ + て would incorrectly get the bonus and beat 食べて (te-form)
-  if (next.surface == scorer::kFormTe || next.surface == scorer::kFormDe) {
-    return {};
-  }
-
-  // Check if prev ends with renyokei marker (し, き, り, etc.) or e-row (ichidan)
+  // Check if prev ends with renyokei marker (し, き, り, etc.), e-row (ichidan),
+  // or onbin marker (ん for hatsuon-bin, っ for sokuon-bin, い for i-onbin)
   bool is_renyokei = (endsWithRenyokeiMarker(prev.surface) ||
                       endsWithERow(prev.surface) ||
+                      endsWithOnbinMarker(prev.surface) ||
                       prev.surface.size() == core::kJapaneseCharBytes);  // single-char verbs (見, 着, etc.)
   if (!is_renyokei) return {};
+
+  // For standalone て/で (single-char renyokei of てる/でる):
+  // Apply a moderate bonus to keep the path competitive with full te-form (e.g., 食べて)
+  // The TeruRenyokeiToTa rule will give additional bonus when followed by た
+  // This enables MeCab-compatible split: 食べてた → 食べ + て + た
+  if (next.surface == scorer::kFormTe || next.surface == scorer::kFormDe) {
+    // Bonus -0.6 makes 食べ+て path (0.677-0.6=0.077) beat 食べて path (0.161)
+    // For 食べている, て(PARTICLE) path (-1.772) still wins over て(VERB) (0.077)
+    return {ConnectionPattern::RenyokeiToContractedVerb, -0.6F,
+            "verb renyokei + standalone te/de (renyokei of teru/deru)"};
+  }
 
   // Strong bonus to prefer し + てる over し(PARTICLE) + てる
   return {ConnectionPattern::RenyokeiToContractedVerb, -scorer::kBonusRenyokeiToContractedVerb,
@@ -756,6 +779,11 @@ ConnectionRuleResult checkVerbToCaseParticle(const core::LatticeEdge& prev,
     if (last == "ぬ" && surf == scorer::kFormDe) {  // ぬ is not a common constant
       return {};
     }
+    // Exclude onbin patterns + で (読んで, 遊んで, 泳いで)
+    // These are te-form patterns, not case particle patterns
+    if (surf == scorer::kFormDe && endsWithOnbinMarker(prev.surface)) {
+      return {};
+    }
   }
 
   return {ConnectionPattern::VerbToCaseParticle, opts.penalty_verb_to_case_particle,
@@ -819,18 +847,22 @@ ConnectionRuleResult checkRenyokeiToTeParticle(const core::LatticeEdge& prev,
   }
 
   // Validate て/で match with onbin type
-  // 撥音便(ん) requires で, others use て
+  // 撥音便(ん) requires で
+  // イ音便(い) can be て (GodanKa: 書いて) or で (GodanGa: 泳いで)
+  // 促音便(っ) uses て
   if (is_onbin) {
     std::string_view last = prev.surface.substr(prev.surface.size() - core::kJapaneseCharBytes);
     if (last == scorer::kSuffixN) {  // 撥音便: 読ん, 遊ん → で
       if (next.surface != scorer::kFormDe) {
         return {};  // 撥音便 + て is invalid
       }
-    } else {  // イ音便/促音便: 書い, 走っ → て
+    } else if (last == "っ") {  // 促音便: 走っ, 待っ → て
       if (next.surface != scorer::kFormTe) {
-        return {};  // イ音便/促音便 + で is invalid
+        return {};  // 促音便 + で is invalid
       }
     }
+    // イ音便(い): allow both て (GodanKa: 書いて) and で (GodanGa: 泳いで)
+    // No validation needed - both are valid
   }
 
   // For e-row and i-row, only て is valid
@@ -872,6 +904,15 @@ ConnectionRuleResult checkTeParticleToAuxVerb(const core::LatticeEdge& prev,
     return {};
   }
 
+  // MeCab-compatible: いない, いなかった should NOT get bonus
+  // They should be split as い(mizenkei) + ない(AUX) instead
+  // E.g., 食べていない → 食べ + て + い + ない (4 tokens)
+  if (next.lemma == scorer::kLemmaIru &&
+      (next.surface == "いない" || next.surface == "いなかった" ||
+       next.surface == "いなくて")) {
+    return {};
+  }
+
   // Check if next is a te-form auxiliary verb
   // いる, いた, いて, います etc. (progressive)
   // しまう, しまった, しまって, しまいます etc. (completive)
@@ -882,13 +923,14 @@ ConnectionRuleResult checkTeParticleToAuxVerb(const core::LatticeEdge& prev,
   // くれる, くれた, くれて etc. (benefactive-give)
   // あげる, あげた, あげて etc. (benefactive-give-up)
   // ある, あった, あります etc. (resultative)
+  // た (past tense for contracted form: 読んでた = 読ん + で + た)
   bool is_te_aux = false;
   if (next.lemma == scorer::kLemmaIru || next.lemma == scorer::kLemmaOru ||
       next.lemma == scorer::kLemmaShimau || next.lemma == scorer::kLemmaOku ||
       next.lemma == scorer::kLemmaKuru || next.lemma == scorer::kLemmaMiru ||
       next.lemma == scorer::kLemmaMorau || next.lemma == scorer::kLemmaKureru ||
       next.lemma == scorer::kLemmaAgeru || next.lemma == scorer::kLemmaAru ||
-      next.lemma == scorer::kLemmaIku) {
+      next.lemma == scorer::kLemmaIku || next.lemma == scorer::kFormTa) {
     is_te_aux = true;
   }
 
@@ -904,6 +946,31 @@ ConnectionRuleResult checkTeParticleToAuxVerb(const core::LatticeEdge& prev,
   // Bonus for valid te-form + auxiliary pattern
   return {ConnectionPattern::TeParticleToAuxVerb, -scorer::kBonusTeParticleToAuxVerb,
           "te/de particle + auxiliary verb"};
+}
+
+// Rule: て/で(PARTICLE) → いない/いなかった(VERB) penalty
+// MeCab-compatible: should be split as て + い + ない instead
+// E.g., 食べていない → 食べ + て + い + ない (4 tokens)
+ConnectionRuleResult checkTeParticleToInaiVerb(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next,
+                                               const ConnectionOptions& /* opts */) {
+  // Check if prev is て/で particle
+  if (prev.pos != core::PartOfSpeech::Particle) return {};
+  if (prev.surface != scorer::kFormTe && prev.surface != scorer::kFormDe) {
+    return {};
+  }
+
+  // Check if next is いない/いなかった(VERB, lemma=いる)
+  if (next.pos != core::PartOfSpeech::Verb) return {};
+  if (next.lemma != scorer::kLemmaIru) return {};
+  if (next.surface != "いない" && next.surface != "いなかった" &&
+      next.surface != "いなくて") {
+    return {};
+  }
+
+  // Strong penalty to prefer split path: て + い + ない
+  return {ConnectionPattern::TeParticleToInaiVerb, scorer::scale::kProhibitive,
+          "te/de particle + inai verb (should split as i + nai)"};
 }
 
 // Rule: VERB(onbinkei) + だ(AUX) bonus for voiced past tense

@@ -87,15 +87,16 @@ std::vector<DictionaryEntry> getCompoundParticleEntries() {
       {"について", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
 
       // Cause/Means (原因・手段)
-      {"によって", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
-      {"により", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
-      {"による", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
-      {"によると", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
-      {"によれば", POS::Particle, 0.0F, "", false, false, false, CT::None, ""},
+      // Lower cost to beat によっ(verb) + て split after allowing に as verb stem start
+      {"によって", POS::Particle, -0.8F, "", false, false, false, CT::None, ""},
+      {"により", POS::Particle, -0.5F, "", false, false, false, CT::None, ""},
+      {"による", POS::Particle, -0.5F, "", false, false, false, CT::None, ""},
+      {"によると", POS::Particle, -0.5F, "", false, false, false, CT::None, ""},
+      {"によれば", POS::Particle, -0.5F, "", false, false, false, CT::None, ""},
 
       // Place/Situation (場所・状況)
-      // Lower cost to prevent split as に + おいて (verb)
-      {"において", POS::Particle, -0.3F, "", false, false, false, CT::None, ""},
+      // Lower cost to prevent split as に + おい(verb) + て
+      {"において", POS::Particle, -1.2F, "", false, false, false, CT::None, ""},
       {"にて", POS::Particle, 0.3F, "", false, false, false, CT::None, ""},
 
       // Capacity/Viewpoint (資格・観点)
@@ -128,6 +129,9 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
   return {
       // Assertion (断定)
       {"だ", POS::Auxiliary, 0.1F, "", false, false, false, CT::None, ""},
+      // だっ (連用タ接続形) - copula form connecting to た
+      // MeCab: だった → だっ + た (lemma=だ for だっ)
+      {"だっ", POS::Auxiliary, 0.3F, "だ", false, false, false, CT::None, ""},
       // で(AUX, lemma=だ) - copula renyokei form (連用形)
       // Used in patterns like: 嫌でない, 好きでない, きれいでない
       // Note: checkCopulaDeToKuruAux() prevents misparse of できます as で(AUX)+きます
@@ -195,11 +199,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Negative conjecture (否定推量)
       {"まい", POS::Auxiliary, 0.3F, "まい", false, false, false, CT::None, ""},
 
-      // Obligation (当為)
-      {"べき", POS::Auxiliary, 0.5F, "べき", false, false, false, CT::None, ""},
-      {"べきだ", POS::Auxiliary, 0.3F, "べき", false, false, false, CT::None, ""},
-      {"べきで", POS::Auxiliary, 0.3F, "べき", false, false, false, CT::None, ""},
-      {"べきでは", POS::Auxiliary, 0.3F, "べき", false, false, false, CT::None, ""},
+      // Obligation (当為) - MeCab: lemma=べし (classical form)
+      {"べき", POS::Auxiliary, 0.5F, "べし", false, false, false, CT::None, ""},
+      {"べきだ", POS::Auxiliary, 0.3F, "べし", false, false, false, CT::None, ""},
+      {"べきで", POS::Auxiliary, 0.3F, "べし", false, false, false, CT::None, ""},
+      {"べきでは", POS::Auxiliary, 0.3F, "べし", false, false, false, CT::None, ""},
 
       // === Individual auxiliary forms for auxiliary separation (Phase 3) ===
       // Passive/Potential (受身・可能) - attaches to mizenkei (未然形)
@@ -207,11 +211,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab-compatible: keep only stems and basic forms, remove merged forms
       {"れ", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
       {"れる", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},
-      {"れべき", POS::Auxiliary, 0.3F, "れる", false, false, false, CT::Ichidan, ""},  // Classical form, keep for べき patterns
       // られ: Ichidan passive/potential stem (食べ+られ+る → 食べられる)
       {"られ", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
       {"られる", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},
-      {"られべき", POS::Auxiliary, 0.3F, "られる", false, false, false, CT::Ichidan, ""},  // Classical form, keep for べき patterns
+      // Note: れべき/られべき entries removed for MeCab-compatible split
+      // MeCab: 装飾されべき → 装飾 + さ + れ + べき (4 tokens)
 
       // Suru passive (サ変受身) - disabled for MeCab-compatible split
       // MeCab: 勉強される → 勉強 + さ(VERB) + れる(AUX)
@@ -307,8 +311,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"います", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
       // Keep as single token for common te+iru negative polite pattern
       {"いません", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
-      {"いない", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
-      {"いなかった", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
+      // MeCab-compatible split: い(mizenkei) + ない(AUX) instead of いない(single token)
+      {"い", POS::Auxiliary, 0.0F, "いる", false, false, false, CT::None, ""},
+      // High cost to prefer い+ない split over いない single token
+      {"いない", POS::Auxiliary, 2.0F, "いる", false, false, false, CT::None, ""},
+      {"いなかった", POS::Auxiliary, 2.0F, "いる", false, false, false, CT::None, ""},
       {"いれば", POS::Auxiliary, 0.3F, "いる", false, false, false, CT::None, ""},
 
       // Completive/Regretful (完了・遺憾) - しまう auxiliary
@@ -320,27 +327,26 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       {"しまわない", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
       {"しまわなかった", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
       {"しまえば", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
-      // Contracted forms: ちゃう/じゃう = てしまう/でしまう
-      {"ちゃう", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
-      {"ちゃった", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
-      {"ちゃって", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
-      {"ちゃいます", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
-      {"じゃう", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
-      {"じゃった", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
-      {"じゃって", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
-      {"じゃいます", POS::Auxiliary, 0.3F, "しまう", false, false, false, CT::None, ""},
+      // Contracted forms: ちゃう/じゃう = てしまう/でしまう (MeCab: 動詞,非自立)
+      // MeCab splits: ちゃった → ちゃっ + た (renyokei + ta)
+      {"ちゃう", POS::Verb, 0.3F, "ちゃう", false, false, false, CT::GodanWa, "ちゃう"},
+      {"ちゃっ", POS::Verb, 0.5F, "ちゃう", false, false, false, CT::GodanWa, "ちゃう"},  // renyokei-ta
+      {"ちゃい", POS::Verb, 0.5F, "ちゃう", false, false, false, CT::GodanWa, "ちゃう"},  // renyokei
+      {"じゃう", POS::Verb, 0.3F, "じゃう", false, false, false, CT::GodanWa, "じゃう"},
+      {"じゃっ", POS::Verb, 0.5F, "じゃう", false, false, false, CT::GodanWa, "じゃう"},  // renyokei-ta
+      {"じゃい", POS::Verb, 0.5F, "じゃう", false, false, false, CT::GodanWa, "じゃう"},  // renyokei
       // Contracted forms: てる = ている, とく = ておく (MeCab: 動詞,非自立)
       // MeCab treats these as VERB with their own lemma, not as AUX with いる/おく lemma
       {"てる", POS::Verb, -0.3F, "てる", false, false, false, CT::Ichidan, "てる"},
       // て is renyokei of てる (contracted progressive auxiliary)
       // MeCab splits: 見てた → 見 + て + た (where て is renyokei of てる)
       // High cost (1.0F) so it only wins when combined with connection bonus for て→た
-      // Cost 1.0F gives word_cost = 1.0 + 0.2 - 1.0 = 0.2
-      // Te-form like 食べて has word_cost ~0.5, so this loses in isolation
-      // But with て→た connection bonus of -1.5, the split path wins for てた patterns
-      {"て", POS::Verb, 1.0F, "てる", false, false, false, CT::Ichidan, "てる"},
+      // Cost 0.65F gives word_cost = 0.65 + 0.2 - 1.0 = -0.15
+      // This makes 見+て (total ~0.05) beat 見て (total ~0.07)
+      // Combined with て→た bonus of -1.5, the 見+て+た path wins over 見てた
+      {"て", POS::Verb, 0.65F, "てる", false, false, false, CT::Ichidan, "てる"},
       // で is renyokei of でる (voiced contracted progressive)
-      {"で", POS::Verb, 1.0F, "でる", false, false, false, CT::Ichidan, "でる"},
+      {"で", POS::Verb, 0.65F, "でる", false, false, false, CT::Ichidan, "でる"},
       {"でる", POS::Verb, 0.5F, "でる", false, false, false, CT::Ichidan, "でる"},  // higher cost to not beat 出る
       {"とく", POS::Verb, -0.3F, "とく", false, false, false, CT::GodanKa, "とく"},
       {"どく", POS::Verb, -0.3F, "どく", false, false, false, CT::GodanKa, "どく"},
@@ -1417,6 +1423,7 @@ std::vector<DictionaryEntry> getNaAdjectiveEntries() {
 
       // Common na-adjectives - emotional/preference
       {"好き", POS::Adjective, 0.3F, "", false, false, false, CT::NaAdjective, "すき"},
+      {"嫌", POS::Adjective, 0.3F, "", false, false, false, CT::NaAdjective, "いや"},
       {"嫌い", POS::Adjective, 0.3F, "", false, false, false, CT::NaAdjective, "きらい"},
       {"大好き", POS::Adjective, 0.3F, "", false, false, false, CT::NaAdjective, "だいすき"},
       {"大嫌い", POS::Adjective, 0.3F, "", false, false, false, CT::NaAdjective, "だいきらい"},
@@ -1531,6 +1538,7 @@ std::vector<DictionaryEntry> getIAdjectiveEntries() {
       // Additional hiragana adjectives (prevent particle/suru misparse)
       {"あぶない", POS::Adjective, 0.3F, "あぶない", false, false, false, CT::IAdjective, ""},  // dangerous
       {"だらしない", POS::Adjective, 0.3F, "だらしない", false, false, false, CT::IAdjective, ""},  // sloppy
+      {"ねたい", POS::Adjective, -0.5F, "ねたい", false, false, false, CT::IAdjective, ""},  // envious/jealous (prevent ね+たい split)
       {"ものたりない", POS::Adjective, 0.3F, "ものたりない", false, false, false, CT::IAdjective, ""},  // unsatisfying
       {"いたたまれない", POS::Adjective, 0.3F, "いたたまれない", false, false, false, CT::IAdjective, ""},  // unbearable
       {"かたじけない", POS::Adjective, 0.3F, "かたじけない", false, false, false, CT::IAdjective, ""},  // grateful (archaic)
@@ -1559,9 +1567,11 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       {"のろける", POS::Verb, 0.3F, "のろける", false, false, false, CT::Ichidan, ""},
       // B46: とりあげる starts with と (particle-like)
       {"とりあげる", POS::Verb, 0.3F, "とりあげる", false, false, false, CT::Ichidan, ""},
-      // Verbs starting with particle-like chars (prevent し+みる, た+ずねる splits)
+      // Verbs starting with particle-like chars (prevent し+みる, た+ずねる, ね+て splits)
       {"しみる", POS::Verb, 0.3F, "しみる", false, false, false, CT::Ichidan, ""},
       {"たずねる", POS::Verb, 0.3F, "たずねる", false, false, false, CT::Ichidan, ""},
+      // B47: ねる starts with ね (終助詞), prevents ねて → ね+て (particle) split
+      {"ねる", POS::Verb, 0.3F, "ねる", false, false, false, CT::Ichidan, ""},
       {"おぼれる", POS::Verb, 0.3F, "おぼれる", false, false, false, CT::Ichidan, ""},
       {"そげる", POS::Verb, 0.3F, "そげる", false, false, false, CT::Ichidan, ""},
       {"あきらめる", POS::Verb, 0.3F, "あきらめる", false, false, false, CT::Ichidan, ""},
@@ -1651,6 +1661,9 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
 
       // Godan-Wa verbs (五段ワ行)
       {"もらう", POS::Verb, 0.3F, "もらう", false, false, false, CT::GodanWa, ""},
+      // MeCab-compatible: もらわない → もらわ(VERB) + ない(AUX)
+      // CT::None to prevent expansion - this is the mizenkei form directly
+      {"もらわ", POS::Verb, -0.5F, "もらう", false, false, true, CT::None, "もらわ"},
       // いわ/いわれ - for hiragana passive patterns like いわれる, いわれません
       // Note: NOT adding いう as it would break quotative patterns (っていう, etc.)
       // Verbs starting with particle-like chars (prevent した+が+う, ため+ら+う splits)
@@ -1724,36 +1737,38 @@ std::vector<DictionaryEntry> getHiraganaVerbEntries() {
       // is more practical than implementing a dedicated ConjugationType::Honorific.
       //
       // くださる系 (kudasaru - to give/do for me)
-      // Lower cost to prefer VERB over AUX in patterns like ご確認ください
+      // MeCab-compatible: くださった → くださっ + た
+      // 促音便 stem enables て/た splitting
       {"くださる", POS::Verb, 0.1F, "くださる", false, false, false, CT::None, ""},
-      {"くださって", POS::Verb, 0.1F, "くださる", false, false, false, CT::None, ""},
-      {"くださった", POS::Verb, 0.1F, "くださる", false, false, false, CT::None, ""},
+      {"くださっ", POS::Verb, 0.1F, "くださる", false, false, false, CT::None, ""},
       {"ください", POS::Verb, 0.1F, "くださる", false, false, false, CT::None, ""},
-      {"くださらない", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
+      {"くださら", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
+      {"くださり", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
       {"くださいます", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
       {"くださいませ", POS::Verb, 0.3F, "くださる", false, false, false, CT::None, ""},
       // おっしゃる系 (ossharu - to say, honorific)
       {"おっしゃる", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
-      {"おっしゃって", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
-      {"おっしゃった", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
+      {"おっしゃっ", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
       {"おっしゃい", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
+      {"おっしゃら", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
+      {"おっしゃり", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
       {"おっしゃいます", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
-      {"おっしゃらない", POS::Verb, 0.3F, "おっしゃる", false, false, false, CT::None, ""},
       // いらっしゃる系 (irassharu - to be/go/come, honorific)
       {"いらっしゃる", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
-      {"いらっしゃって", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
-      {"いらっしゃった", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
+      {"いらっしゃっ", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
       {"いらっしゃい", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
+      {"いらっしゃら", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
+      {"いらっしゃり", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
       {"いらっしゃいます", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
-      {"いらっしゃらない", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
       {"いらっしゃいませ", POS::Verb, 0.3F, "いらっしゃる", false, false, false, CT::None, ""},
       // なさる系 (nasaru - to do, honorific)
+      // Lower cost for なさっ to beat な(PARTICLE) + さっ(する) path
       {"なさる", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
-      {"なさって", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
-      {"なさった", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
+      {"なさっ", POS::Verb, -0.5F, "なさる", false, false, false, CT::None, ""},
       {"なさい", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
+      {"なさら", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
+      {"なさり", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
       {"なさいます", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
-      {"なさらない", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
       {"なさいませ", POS::Verb, 0.3F, "なさる", false, false, false, CT::None, ""},
       // ござる系 (gozaru - old-fashioned/ninja speech)
       {"ござる", POS::Verb, 0.3F, "ござる", false, false, false, CT::None, ""},
@@ -1777,9 +1792,8 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       // Lower cost to prevent split as で(PARTICLE) + きます(くる)
       {"できる", POS::Verb, -0.5F, "できる", false, false, false, CT::Ichidan, "できる"},
       // Renyokei form to prevent で(PARTICLE) + きます(くる) misparse
-      // NOTE: This also generates でない(lemma=できる) as a side effect
-      // Copula denai pattern requires separate handling
-      {"でき", POS::Verb, -2.0F, "できる", false, false, false, CT::Ichidan, "できる"},
+      // CT::None to prevent expansion (でき is already renyokei, not base form)
+      {"でき", POS::Verb, -2.0F, "できる", false, false, false, CT::None, "できる"},
       {"上げる", POS::Verb, 0.3F, "上げる", false, false, false, CT::Ichidan, "あげる"},
       {"下げる", POS::Verb, 0.3F, "下げる", false, false, false, CT::Ichidan, "さげる"},
       {"見つける", POS::Verb, 0.3F, "見つける", false, false, false, CT::Ichidan, "みつける"},
@@ -1931,7 +1945,13 @@ std::vector<DictionaryEntry> getEssentialVerbEntries() {
       {"いられる", POS::Verb, 0.3F, "いる", false, false, true, CT::Ichidan, "いられる"},  // potential/passive of いる
       {"おる", POS::Verb, 0.3F, "おる", false, false, true, CT::GodanRa, "おる"},
       {"くれる", POS::Verb, 0.3F, "くれる", false, false, true, CT::Ichidan, "くれる"},
+      // MeCab-compatible: くれます → くれ(VERB) + ます(AUX)
+      // CT::None to prevent expansion - this is the renyokei form directly
+      {"くれ", POS::Verb, -0.5F, "くれる", false, false, true, CT::None, "くれ"},
       {"あげる", POS::Verb, 0.3F, "あげる", false, false, true, CT::Ichidan, "あげる"},
+      // MeCab-compatible: あげます → あげ(VERB) + ます(AUX)
+      // CT::None to prevent expansion - this is the renyokei form directly
+      {"あげ", POS::Verb, -0.5F, "あげる", false, false, true, CT::None, "あげ"},
       {"みる", POS::Verb, 0.3F, "みる", false, false, true, CT::Ichidan, "みる"},
       {"おく", POS::Verb, 0.3F, "おく", false, false, true, CT::GodanKa, "おく"},
       // Cost 0.25F (slightly lower than しまる 0.3F) because:

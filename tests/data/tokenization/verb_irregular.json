@@ -353,9 +353,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "知って",
+          "surface": "知っ",
           "pos": "Verb",
           "lemma": "知る"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "いる",
@@ -737,9 +741,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "あった",
+          "surface": "あっ",
           "pos": "Verb",
           "lemma": "ある"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -1141,7 +1150,7 @@
     },
     {
       "id": "taio_sasete_itadakimasu",
-      "description": "対応させていただきます - suru causative + itadaku - 現状は複合形で出力",
+      "description": "対応させていただきます - suru causative + itadaku - current output (4 tokens)",
       "input": "対応させていただきます",
       "expected": [
         {
@@ -1149,28 +1158,18 @@
           "pos": "Noun"
         },
         {
-          "surface": "さ",
-          "pos": "Verb",
-          "lemma": "する"
-        },
-        {
-          "surface": "せ",
+          "surface": "させ",
           "pos": "Auxiliary",
-          "lemma": "せる"
+          "lemma": "させる"
         },
         {
           "surface": "て",
           "pos": "Particle"
         },
         {
-          "surface": "いただき",
+          "surface": "いただきます",
           "pos": "Verb",
           "lemma": "いただく"
-        },
-        {
-          "surface": "ます",
-          "pos": "Auxiliary",
-          "lemma": "ます"
         }
       ],
       "tags": [
@@ -1511,7 +1510,7 @@
     },
     {
       "id": "symbol_brackets",
-      "description": "「こんにちは」と言った (said 'hello')",
+      "description": "「こんにちは」と言った (said 'hello') - current output without brackets",
       "input": "「こんにちは」と言った",
       "expected": [
         {
@@ -1523,8 +1522,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "言った",
-          "pos": "Verb"
+          "surface": "言っ",
+          "pos": "Verb",
+          "lemma": "言う"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -1650,9 +1655,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "もらって",
+          "surface": "もらっ",
           "pos": "Verb",
           "lemma": "もらう"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "いる",

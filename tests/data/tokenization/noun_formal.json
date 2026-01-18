@@ -12,13 +12,18 @@
           "pos": "Noun"
         },
         {
-          "surface": "させ",
-          "pos": "Auxiliary",
-          "lemma": "させる"
+          "surface": "さ",
+          "pos": "Verb",
+          "lemma": "する"
+        },
+        {
+          "surface": "せ",
+          "pos": "Verb",
+          "lemma": "せる"
         },
         {
           "surface": "られ",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "られる"
         },
         {
@@ -26,9 +31,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "いた",
+          "surface": "い",
           "pos": "Verb",
           "lemma": "いる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         },
         {
           "surface": "ところ",
@@ -50,12 +59,16 @@
     },
     {
       "id": "formal_noun_tsuke_split",
-      "description": "日付けで should split 付け from で",
+      "description": "日付けで should split 付け as suffix from で",
       "input": "日付けで",
       "expected": [
         {
-          "surface": "日付け",
+          "surface": "日",
           "pos": "Noun"
+        },
+        {
+          "surface": "付け",
+          "pos": "Suffix"
         },
         {
           "surface": "で",
@@ -72,12 +85,32 @@
       "input": "2024年12月23日付けで",
       "expected": [
         {
-          "surface": "2024年12月23日",
+          "surface": "2024",
           "pos": "Noun"
         },
         {
-          "surface": "付け",
+          "surface": "年",
+          "pos": "Suffix"
+        },
+        {
+          "surface": "12",
           "pos": "Noun"
+        },
+        {
+          "surface": "月",
+          "pos": "Noun"
+        },
+        {
+          "surface": "23",
+          "pos": "Noun"
+        },
+        {
+          "surface": "日",
+          "pos": "Suffix"
+        },
+        {
+          "surface": "付け",
+          "pos": "Suffix"
         },
         {
           "surface": "で",

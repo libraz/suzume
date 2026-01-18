@@ -1,0 +1,185 @@
+{
+  "version": "1.0",
+  "description": "Godan Ma-row verbs (五段マ行動詞) - verbs ending in む",
+  "cases": [
+    {
+      "id": "time_noun_full_sentence",
+      "description": "毎朝コーヒーを飲みながら新聞を読む",
+      "input": "毎朝コーヒーを飲みながら新聞を読む",
+      "expected": [
+        {
+          "surface": "毎朝",
+          "pos": "Noun"
+        },
+        {
+          "surface": "コーヒー",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "飲みながら",
+          "pos": "Verb",
+          "lemma": "飲む"
+        },
+        {
+          "surface": "新聞",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "読む",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "time_noun",
+        "complex"
+      ]
+    },
+    {
+      "id": "verb_sou_nomisou",
+      "description": "飲みそう - verb renyokei + そう (動詞+助動詞 → 分割)",
+      "input": "飲みそう",
+      "expected": [
+        {
+          "surface": "飲み",
+          "pos": "Verb",
+          "lemma": "飲む"
+        },
+        {
+          "surface": "そう",
+          "pos": "Auxiliary",
+          "lemma": "そう"
+        }
+      ],
+      "tags": [
+        "sou",
+        "verb"
+      ]
+    },
+    {
+      "id": "nagara_godan",
+      "description": "飲みながら - nagara form godan",
+      "input": "飲みながら",
+      "expected": [
+        {
+          "surface": "飲みながら",
+          "pos": "Verb",
+          "lemma": "飲む"
+        }
+      ],
+      "tags": [
+        "nagara",
+        "godan"
+      ]
+    },
+    {
+      "id": "nagara_in_sentence",
+      "description": "コーヒーを飲みながら読む - nagara in sentence",
+      "input": "コーヒーを飲みながら読む",
+      "expected": [
+        {
+          "surface": "コーヒー",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "飲みながら",
+          "pos": "Verb",
+          "lemma": "飲む"
+        },
+        {
+          "surface": "読む",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "nagara",
+        "sentence"
+      ]
+    },
+    {
+      "id": "godan_passive_yomareru",
+      "description": "読まれる - godan passive (MeCab-style split)",
+      "input": "読まれる",
+      "expected": [
+        {
+          "surface": "読ま",
+          "pos": "Verb",
+          "lemma": "読む"
+        },
+        {
+          "surface": "れる",
+          "pos": "Auxiliary",
+          "lemma": "れる"
+        }
+      ],
+      "tags": [
+        "godan",
+        "passive"
+      ]
+    },
+    {
+      "id": "godan_yomu_base",
+      "description": "Godan verb 読む base form",
+      "input": "読む",
+      "expected": [
+        {
+          "surface": "読む",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "verb",
+        "godan"
+      ]
+    },
+    {
+      "id": "godan_yomu_past",
+      "description": "Godan verb 読む past form - MeCab-compatible split",
+      "input": "読んだ",
+      "expected": [
+        {
+          "surface": "読ん",
+          "pos": "Verb",
+          "lemma": "読む"
+        },
+        {
+          "surface": "だ",
+          "pos": "Auxiliary",
+          "lemma": "だ"
+        }
+      ],
+      "tags": [
+        "verb",
+        "godan"
+      ]
+    },
+    {
+      "id": "s4_tatazumu",
+      "description": "S4: たたずむ should be VERB (not た+た+ずむ)",
+      "input": "たたずむ",
+      "expected": [
+        {
+          "surface": "たたずむ",
+          "pos": "Verb",
+          "lemma": "たたずむ"
+        }
+      ],
+      "tags": [
+        "s4_fix",
+        "hiragana_verb",
+        "regression"
+      ]
+    }
+  ]
+}

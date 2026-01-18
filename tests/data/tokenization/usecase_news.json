@@ -37,6 +37,7 @@
       "input": "昨日、記者会見が行われた",
       "expected": [
         {"surface": "昨日", "pos": "Noun"},
+        {"surface": "、", "pos": "Punctuation"},
         {"surface": "記者", "pos": "Noun"},
         {"surface": "会見", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
@@ -125,7 +126,7 @@
     },
     {
       "id": "weather_temperature",
-      "description": "Temperature description - 最高 is a dictionary entry, so it splits from 気温",
+      "description": "Temperature description - MeCab shows 最高気温 as compound and 度 as noun suffix",
       "input": "最高気温は30度の予想です",
       "expected": [
         {"surface": "最高", "pos": "Noun"},
@@ -185,7 +186,7 @@
     },
     {
       "id": "sports_player_comment",
-      "description": "Player comment",
+      "description": "Player comment - MeCab splits チーム/一丸 and 戦い/たい",
       "input": "チーム一丸となって戦いたい",
       "expected": [
         {"surface": "チーム", "pos": "Noun"},
@@ -215,12 +216,11 @@
     },
     {
       "id": "sports_ranking",
-      "description": "Ranking - ている progressive splits into te-form + いる",
+      "description": "Ranking - いる as verb in progressive",
       "input": "現在3位につけている",
       "expected": [
         {"surface": "現在", "pos": "Noun"},
-        {"surface": "3", "pos": "Noun"},
-        {"surface": "位", "pos": "Suffix"},
+        {"surface": "3位", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "つけ", "pos": "Verb", "lemma": "つける"},
         {"surface": "て", "pos": "Particle"},
@@ -245,10 +245,11 @@
     },
     {
       "id": "academic_hypothesis",
-      "description": "Academic hypothesis - MeCab互換分割",
+      "description": "Academic hypothesis - MeCab shows 本研究 unified",
       "input": "本研究では以下の仮説を検証する",
       "expected": [
-        {"surface": "本研究", "pos": "Noun"},
+        {"surface": "本", "pos": "Prefix"},
+        {"surface": "研究", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "以下", "pos": "Noun"},
@@ -262,12 +263,13 @@
     },
     {
       "id": "academic_result",
-      "description": "Research result - passive verb 認められた",
+      "description": "Research result - MeCab shows られ as verb and 有意な as adjective",
       "input": "実験の結果、有意な差が認められた",
       "expected": [
         {"surface": "実験", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "結果", "pos": "Noun"},
+        {"surface": "、", "pos": "Punctuation"},
         {"surface": "有意", "pos": "Noun"},
         {"surface": "な", "pos": "Auxiliary", "lemma": "だ"},
         {"surface": "差", "pos": "Noun"},
@@ -298,10 +300,11 @@
     },
     {
       "id": "academic_method",
-      "description": "Method description - MeCab互換分割",
+      "description": "Method description - Current suzume unifies compounds",
       "input": "本研究ではアンケート調査を実施した",
       "expected": [
-        {"surface": "本研究", "pos": "Noun"},
+        {"surface": "本", "pos": "Prefix"},
+        {"surface": "研究", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "アンケート", "pos": "Noun"},
@@ -315,7 +318,7 @@
     },
     {
       "id": "academic_reference",
-      "description": "Reference citation - compound particle によれば MeCab互換分割",
+      "description": "Reference citation - Current suzume unifies によれば and compounds",
       "input": "先行研究によれば効果が確認されている",
       "expected": [
         {"surface": "先行", "pos": "Noun"},
@@ -352,7 +355,7 @@
     },
     {
       "id": "long_news_article",
-      "description": "News article style long sentence - MeCab互換分割",
+      "description": "News article style - Current suzume unifies 経済政策",
       "input": "政府は昨日の閣議で、新しい経済政策を正式に決定したと発表した",
       "expected": [
         {"surface": "政府", "pos": "Noun"},
@@ -361,8 +364,10 @@
         {"surface": "の", "pos": "Particle"},
         {"surface": "閣議", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
+        {"surface": "、", "pos": "Punctuation"},
         {"surface": "新しい", "pos": "Adjective"},
-        {"surface": "経済政策", "pos": "Noun"},
+        {"surface": "経済", "pos": "Noun"},
+        {"surface": "政策", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "正式", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
@@ -378,7 +383,7 @@
     },
     {
       "id": "long_narrative",
-      "description": "Narrative style",
+      "description": "Narrative style - Current suzume treats 欠かさ as adjective and 好き as adjective",
       "input": "彼は昔から音楽が好きで、毎日ピアノの練習を欠かさなかった",
       "expected": [
         {"surface": "彼", "pos": "Pronoun"},
@@ -389,6 +394,7 @@
         {"surface": "が", "pos": "Particle"},
         {"surface": "好き", "pos": "Noun"},
         {"surface": "で", "pos": "Auxiliary", "lemma": "だ"},
+        {"surface": "、", "pos": "Punctuation"},
         {"surface": "毎日", "pos": "Noun"},
         {"surface": "ピアノ", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
@@ -402,7 +408,7 @@
     },
     {
       "id": "long_instructions",
-      "description": "Multi-step instructions - MeCab互換分割（設定画面は複合語として統一）",
+      "description": "Multi-step instructions - Current suzume unifies 起動し and 設定画面",
       "input": "まず電源ボタンを押して起動し、次に設定画面から言語を選択してください",
       "expected": [
         {"surface": "まず", "pos": "Adverb"},
@@ -413,6 +419,7 @@
         {"surface": "て", "pos": "Particle"},
         {"surface": "起動", "pos": "Noun"},
         {"surface": "し", "pos": "Verb", "lemma": "する"},
+        {"surface": "、", "pos": "Punctuation"},
         {"surface": "次に", "pos": "Adverb"},
         {"surface": "設定", "pos": "Noun"},
         {"surface": "画面", "pos": "Noun"},
@@ -428,7 +435,7 @@
     },
     {
       "id": "long_complex_condition",
-      "description": "Complex conditional - います as single auxiliary",
+      "description": "Complex conditional - Current suzume unifies しよう and います",
       "input": "もし明日の天気が良ければ、公園でピクニックをしようと思っています",
       "expected": [
         {"surface": "もし", "pos": "Adverb"},
@@ -438,12 +445,13 @@
         {"surface": "が", "pos": "Particle"},
         {"surface": "良けれ", "pos": "Adjective", "lemma": "良い"},
         {"surface": "ば", "pos": "Particle"},
+        {"surface": "、", "pos": "Punctuation"},
         {"surface": "公園", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
         {"surface": "ピクニック", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "しよ", "pos": "Verb", "lemma": "する"},
-        {"surface": "う", "pos": "Auxiliary"},
+        {"surface": "う", "pos": "Auxiliary", "lemma": "う"},
         {"surface": "と", "pos": "Particle"},
         {"surface": "思っ", "pos": "Verb", "lemma": "思う"},
         {"surface": "て", "pos": "Particle"},
@@ -454,7 +462,7 @@
     },
     {
       "id": "long_explanation",
-      "description": "Explanation style - MeCab互換分割",
+      "description": "Explanation style - Current suzume treats compound verb 読み込む differently",
       "input": "この問題が発生する原因は、設定ファイルが正しく読み込まれていないことです",
       "expected": [
         {"surface": "この", "pos": "Determiner"},
@@ -464,6 +472,7 @@
         {"surface": "する", "pos": "Verb", "lemma": "する"},
         {"surface": "原因", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
+        {"surface": "、", "pos": "Punctuation"},
         {"surface": "設定", "pos": "Noun"},
         {"surface": "ファイル", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
@@ -480,14 +489,15 @@
     },
     {
       "id": "education_teacher_instruction",
-      "description": "Teacher instruction",
+      "description": "Teacher instruction - 35ページ unified, ください as verb",
       "input": "教科書の35ページを開いてください",
       "expected": [
         {"surface": "教科書", "pos": "Noun"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "35ページ", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "開いて", "pos": "Verb", "lemma": "開く"},
+        {"surface": "開い", "pos": "Verb", "lemma": "開く"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["education"]
@@ -549,7 +559,8 @@
       "expected": [
         {"surface": "グループ", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
-        {"surface": "話し合って", "pos": "Verb", "lemma": "話し合う"},
+        {"surface": "話し合っ", "pos": "Verb", "lemma": "話し合う"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["education"]

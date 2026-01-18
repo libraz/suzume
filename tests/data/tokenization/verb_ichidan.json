@@ -151,13 +151,17 @@
     },
     {
       "id": "norokeru_verb",
-      "description": "B38: のろける should be VERB, not の+ろけ split (MeCab: 見せた → 見せ+た)",
+      "description": "B38: のろける should be VERB, not の+ろけ split (MeCab: のろけ+て+見せ+た)",
       "input": "のろけて見せた",
       "expected": [
         {
-          "surface": "のろけて",
+          "surface": "のろけ",
           "pos": "Verb",
           "lemma": "のろける"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "見せ",
@@ -260,7 +264,7 @@
         },
         {
           "surface": "もらっ",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "もらう"
         },
         {

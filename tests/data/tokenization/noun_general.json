@@ -180,7 +180,7 @@
     },
     {
       "id": "numeric_mixed",
-      "description": "3時間 (3 hours)",
+      "description": "3時間 - number + counter as single token",
       "input": "3時間",
       "expected": [
         {
@@ -329,7 +329,7 @@
     },
     {
       "id": "numeric_unit_yen",
-      "description": "500円 (500 yen)",
+      "description": "500円 - number + counter as single token",
       "input": "500円",
       "expected": [
         {

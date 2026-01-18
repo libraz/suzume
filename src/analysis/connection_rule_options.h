@@ -255,6 +255,11 @@ struct ConnectionOptions {
   // Penalizes patterns like 説明し(NOUN) + てくれます(VERB)
   // This is likely suru-verb te-form that should be parsed as single VERB
   float penalty_suru_renyokei_to_te_verb = scorer::kPenaltySuruRenyokeiToTeVerb;
+
+  // に(PARTICLE) + いる/いた(VERB/AUX) bonus
+  // E.g., 家にいた → 家 + に + いた (not にいた as verb)
+  // Helps particle + verb path beat incorrect verb analysis like にぐ
+  float bonus_ni_particle_to_iru_verb = scorer::kBonusNiParticleToIruVerb;
 };
 
 /// Combined options for all connection rule scoring

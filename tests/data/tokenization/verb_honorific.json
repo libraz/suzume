@@ -282,6 +282,121 @@
         "verb",
         "honorific"
       ]
+    },
+    {
+      "id": "keigo_irasshatta_split",
+      "description": "いらっしゃった - MeCab互換分割: いらっしゃっ + た",
+      "input": "いらっしゃった",
+      "expected": [
+        {
+          "surface": "いらっしゃっ",
+          "pos": "Verb",
+          "lemma": "いらっしゃる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
+        }
+      ],
+      "tags": [
+        "keigo",
+        "honorific",
+        "mecab_compat"
+      ]
+    },
+    {
+      "id": "keigo_osshatte_split",
+      "description": "おっしゃって - MeCab互換分割: おっしゃっ + て",
+      "input": "おっしゃって",
+      "expected": [
+        {
+          "surface": "おっしゃっ",
+          "pos": "Verb",
+          "lemma": "おっしゃる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle",
+          "lemma": "て"
+        }
+      ],
+      "tags": [
+        "keigo",
+        "honorific",
+        "mecab_compat"
+      ]
+    },
+    {
+      "id": "keigo_kudasatta_split",
+      "description": "くださった - MeCab互換分割: くださっ + た",
+      "input": "くださった",
+      "expected": [
+        {
+          "surface": "くださっ",
+          "pos": "Verb",
+          "lemma": "くださる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
+        }
+      ],
+      "tags": [
+        "keigo",
+        "honorific",
+        "mecab_compat"
+      ]
+    },
+    {
+      "id": "keigo_nasatte_split",
+      "description": "なさって - MeCab互換分割: なさっ + て",
+      "input": "なさって",
+      "expected": [
+        {
+          "surface": "なさっ",
+          "pos": "Verb",
+          "lemma": "なさる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle",
+          "lemma": "て"
+        }
+      ],
+      "tags": [
+        "keigo",
+        "honorific",
+        "mecab_compat"
+      ]
+    },
+    {
+      "id": "keigo_irasshatte_kudasai",
+      "description": "いらっしゃってください - 敬語動詞分割＋ください",
+      "input": "いらっしゃってください",
+      "expected": [
+        {
+          "surface": "いらっしゃっ",
+          "pos": "Verb",
+          "lemma": "いらっしゃる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle",
+          "lemma": "て"
+        },
+        {
+          "surface": "ください",
+          "pos": "Verb",
+          "lemma": "くださる"
+        }
+      ],
+      "tags": [
+        "keigo",
+        "honorific",
+        "mecab_compat"
+      ]
     }
   ]
 }

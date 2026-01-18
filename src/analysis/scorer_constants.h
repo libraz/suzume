@@ -298,6 +298,23 @@ constexpr float kBonusOnbinkeiToTa = scale::kModerate;  // 1.5
 // E.g., 美しく + て - very common pattern
 constexpr float kBonusAdjKuToTeParticle = scale::kSevere;  // 2.5
 
+// Adjective く form + ない (AUX) bonus
+// E.g., 高く + ない - MeCab-compatible split for adjective negation
+// Strong bonus needed to beat unknown adjective single-token candidates (美しくない etc.)
+constexpr float kBonusAdjKuToNai = scale::kSevere;  // 2.5
+
+// I-adjective (basic form) + です (polite copula) bonus
+// E.g., 美味しい + です, いい + です - very common polite pattern
+// Strong bonus needed to beat で(AUX)+す(VERB) split path
+constexpr float kBonusIAdjToDesu = scale::kSevere;  // 2.5
+
+// に(PARTICLE) + いる/いた(VERB/AUX) bonus
+// E.g., 家にいた → 家 + に + いた (not にいた as verb)
+// Session 31 allowed に as verb stem start for verbs like にげる, にる
+// This bonus helps the particle + verb path beat the incorrect にぐ analysis
+// Strong bonus needed because にいた (verb) has very low cost while いた has high cost
+constexpr float kBonusNiParticleToIruVerb = scale::kProhibitive;  // 3.5
+
 // そう auxiliary small bonus after renyokei (fine-tuning)
 // Balanced to allow ADJ一体 (難しそう→難しい) while boosting VERB+そう slightly
 // Note: Perfect MeCab compat (VERB/ADJ語幹+そう split) needs ADJ stem generation
@@ -339,9 +356,12 @@ constexpr float kBonusVerbMitai = scale::kModerate;
 // Applied to both PARTICLE→AUX and AUX(だ)→AUX patterns
 constexpr float kPenaltyDeToKuruAux = scale::kProhibitive;  // 3.5
 
-// NOUN/ADJ + で(AUX, lemma=だ) bonus for na-adjective copula pattern
+// ADJ + で(AUX, lemma=だ) bonus for na-adjective copula pattern
 // E.g., 嫌でない → 嫌 + で(AUX) + ない (copula negation)
-constexpr float kBonusNaAdjToCopulaDe = scale::kVeryStrongBonus;  // -1.5
+// E.g., 静かで美しい → 静か(ADJ) + で(AUX) + 美しい
+// Note: Only applies to ADJ, not NOUN. Regular nouns use particle で.
+// E.g., 秒速で → 秒速(NOUN) + で(PARTICLE)
+constexpr float kBonusAdjToCopulaDe = -scale::kSevere;  // -2.5
 
 // NOUN/ADJ + でない(VERB, lemma=できる) penalty
 // Prevents na-adj copula from being misparsed as できる negation
@@ -474,6 +494,11 @@ constexpr const char* kParticleHe = "へ";        // directional
 constexpr const char* kParticleKa = "か";        // question marker
 constexpr const char* kParticleYa = "や";        // listing marker
 constexpr const char* kParticleNa = "な";        // na-adjective copula/prohibition
+
+// Final particles (終助詞) - sentence-final only, cannot be followed by て
+constexpr const char* kParticleNe = "ね";        // agreement/confirmation
+constexpr const char* kParticleYo = "よ";        // assertion/emphasis
+constexpr const char* kParticleWa = "わ";        // feminine/exclamation
 
 // Auxiliary lemmas
 constexpr const char* kLemmaIru = "いる";        // progressive auxiliary

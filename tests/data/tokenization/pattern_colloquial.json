@@ -174,9 +174,19 @@
       "input": "行っちゃった",
       "expected": [
         {
-          "surface": "行っちゃった",
+          "surface": "行っ",
           "pos": "Verb",
           "lemma": "行く"
+        },
+        {
+          "surface": "ちゃっ",
+          "pos": "Verb",
+          "lemma": "ちゃう"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -231,12 +241,21 @@
       "expected": [
         {
           "surface": "超",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "バズ",
           "pos": "Noun"
         },
         {
-          "surface": "バズった",
+          "surface": "っ",
           "pos": "Verb",
-          "lemma": "バズる"
+          "lemma": "く"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -406,9 +425,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "ですっ",
+          "surface": "で",
           "pos": "Auxiliary",
-          "lemma": "ですっ"
+          "lemma": "だ"
+        },
+        {
+          "surface": "すっ",
+          "pos": "Verb",
+          "lemma": "すう"
         }
       ],
       "tags": [

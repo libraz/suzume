@@ -1166,6 +1166,37 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
   // Add emphatic variants (まずい → まずいっ, etc.)
   addEmphaticVariants(candidates, codepoints);
 
+  // Add ku-form candidates for kunai patterns
+  // This enables MeCab-compatible split: しんどくない → しんどく + ない
+  // For each candidate ending with くない, generate a ku-form variant ending with く
+  std::vector<UnknownCandidate> ku_form_candidates;
+  for (const auto& cand : candidates) {
+    // Check if surface ends with くない
+    if (cand.surface.size() >= core::kThreeJapaneseCharBytes &&
+        cand.surface.substr(cand.surface.size() - core::kThreeJapaneseCharBytes) == "くない") {
+      // Generate ku-form variant: しんどくない → しんどく
+      UnknownCandidate ku_cand;
+      ku_cand.surface = cand.surface.substr(0, cand.surface.size() - core::kTwoJapaneseCharBytes);  // Remove ない
+      ku_cand.start = cand.start;
+      ku_cand.end = cand.end - 2;  // 2 characters (ない)
+      ku_cand.pos = core::PartOfSpeech::Adjective;
+      ku_cand.lemma = cand.lemma;  // Same lemma (しんどい)
+      ku_cand.cost = cand.cost + 0.1F;  // Slightly higher cost than full form
+      ku_cand.has_suffix = true;  // This is a conjugated form
+#ifdef SUZUME_DEBUG_INFO
+      ku_cand.origin = cand.origin;
+      ku_cand.confidence = cand.confidence;
+      ku_cand.pattern = "i_adjective_hira_ku";
+#endif
+      ku_form_candidates.push_back(ku_cand);
+    }
+  }
+
+  // Add all ku-form candidates
+  for (auto& var : ku_form_candidates) {
+    candidates.push_back(std::move(var));
+  }
+
   // Sort by cost
   std::sort(candidates.begin(), candidates.end(),
             [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
@@ -1322,6 +1353,106 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
   }
 
   std::string hiragana_part = extractSubstring(codepoints, kanji_end, hiragana_end);
+
+  // =============================================================================
+  // Pattern 1: Regular i-adjective stem + すぎる/がる/さ/そう (ガル接続)
+  // =============================================================================
+  // MeCab handles regular i-adjectives (高い, 尊い, 寒い) differently from しい-adjectives.
+  // For patterns like 高すぎる, MeCab splits as: 高(ADJ, ガル接続) + すぎる(VERB)
+  // The adjective stem is just the kanji portion (without い).
+  //
+  // Patterns handled:
+  // - 高すぎる → 高 (ADJ stem) + すぎる (VERB)
+  // - 尊すぎて → 尊 (ADJ stem) + すぎ (VERB) + て (PARTICLE)
+  // - 高がる → 高 (ADJ stem) + がる (VERB)
+  // - 高さ → 高 (ADJ stem) + さ (NOUN/SUFFIX)
+  // - 高そう → 高 (ADJ stem) + そう (AUX)
+  static const std::vector<std::string_view> kIAdjGaruPatterns = {
+      "すぎ",    // excessive: 高すぎる, 高すぎ, 高すぎて
+      "がる",    // emotional verb: 高がる, 怖がる
+      "がり",    // nominalized: 怖がり
+      "がっ",    // te/ta form: 怖がって, 怖がった
+      "さ",      // nominalization: 高さ, 重さ (1 char)
+      "そう",    // appearance: 高そう (2 chars)
+      "み",      // nominalization: 痛み, 深み (1 char)
+  };
+
+  // Check if hiragana starts with a garu-connection pattern
+  for (const auto& pattern : kIAdjGaruPatterns) {
+    if (hiragana_part.size() >= pattern.size() &&
+        hiragana_part.substr(0, pattern.size()) == pattern) {
+      // Found potential i-adjective stem + garu-connection pattern
+      // The stem is just the kanji portion (e.g., 高, 尊, 寒)
+      std::string stem = extractSubstring(codepoints, start_pos, kanji_end);
+      std::string base_form = stem + "い";  // e.g., 高 → 高い
+
+      // Validate that stem + い is a real i-adjective
+      // Use lower threshold (0.35) for garu-connection patterns because:
+      // - Single-kanji adjectives like 高い get lower confidence (0.42)
+      // - The presence of すぎる/がる/さ strongly indicates adjective interpretation
+      auto adj_results = inflection.analyze(base_form);
+      bool is_valid_adjective = false;
+      float adj_confidence = 0.0F;
+      for (const auto& result : adj_results) {
+        if (result.verb_type == grammar::VerbType::IAdjective &&
+            result.confidence >= 0.35F) {
+          is_valid_adjective = true;
+          adj_confidence = result.confidence;
+          break;
+        }
+      }
+
+      if (!is_valid_adjective) {
+        continue;
+      }
+
+      // Check for false positives: single-kanji stems that are also verb renyokei
+      // E.g., 落ちすぎ could be 落ち(verb renyokei) + すぎ(verb)
+      // We should prefer the verb renyokei interpretation if kanji+ちる/きる/etc. is a verb
+      if (kanji_end - start_pos == 1) {
+        // Check if stem + る, stem + す, etc. forms a verb
+        std::string verb_base = stem + "ちる";  // ichidan check
+        bool is_likely_verb_stem = false;
+        if (dict_manager != nullptr) {
+          // Check for common verb patterns
+          for (const auto& suffix : {"ちる", "きる", "ぎる", "しる", "びる", "みる", "りる"}) {
+            std::string potential_verb = stem + suffix;
+            auto verb_lookup = dict_manager->lookup(potential_verb, 0);
+            for (const auto& result : verb_lookup) {
+              if (result.entry != nullptr &&
+                  result.entry->pos == core::PartOfSpeech::Verb &&
+                  result.entry->surface == potential_verb) {
+                is_likely_verb_stem = true;
+                break;
+              }
+            }
+            if (is_likely_verb_stem) break;
+          }
+        }
+        if (is_likely_verb_stem) {
+          continue;  // Skip - likely verb renyokei, not adjective stem
+        }
+      }
+
+      UnknownCandidate candidate;
+      candidate.surface = stem;
+      candidate.start = start_pos;
+      candidate.end = kanji_end;
+      candidate.pos = core::PartOfSpeech::Adjective;
+      candidate.lemma = base_form;
+      // Low cost to compete with single-token verb path (高すぎる as VERB)
+      // Use negative cost to strongly prefer this split
+      candidate.cost = -0.3F + (1.0F - adj_confidence) * 0.2F;
+      candidate.has_suffix = true;  // This is a stem, expects suffix
+#ifdef SUZUME_DEBUG_INFO
+      candidate.origin = CandidateOrigin::AdjectiveI;
+      candidate.confidence = adj_confidence;
+      candidate.pattern = "adj_stem_garu_conn";
+#endif
+      candidates.push_back(candidate);
+      // Don't break - allow multiple patterns to generate candidates
+    }
+  }
 
   // Check for しそう, しすぎ patterns (adjective stem + auxiliary)
   // The stem ends with し, and is followed by そう/すぎる/etc.

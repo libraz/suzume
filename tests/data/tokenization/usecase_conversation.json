@@ -20,9 +20,10 @@
         {"surface": "駅", "pos": "Noun"},
         {"surface": "まで", "pos": "Particle"},
         {"surface": "どう", "pos": "Adverb"},
-        {"surface": "やって", "pos": "Verb", "lemma": "やる"},
+        {"surface": "やっ", "pos": "Verb", "lemma": "やる"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "行き", "pos": "Verb", "lemma": "行く"},
-        {"surface": "ます", "pos": "Auxiliary"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"},
         {"surface": "か", "pos": "Particle"}
       ],
       "tags": ["conversation"]
@@ -32,7 +33,8 @@
       "input": "ちょっと待ってください",
       "expected": [
         {"surface": "ちょっと", "pos": "Adverb"},
-        {"surface": "待って", "pos": "Verb", "lemma": "待つ"},
+        {"surface": "待っ", "pos": "Verb", "lemma": "待つ"},
+        {"surface": "て", "pos": "Particle"},
         {"surface": "ください", "pos": "Verb", "lemma": "くださる"}
       ],
       "tags": ["conversation"]
@@ -177,7 +179,7 @@
         {"surface": "し", "pos": "Verb", "lemma": "する"},
         {"surface": "たい", "pos": "Auxiliary", "lemma": "たい"},
         {"surface": "の", "pos": "Noun"},
-        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "です", "pos": "Auxiliary", "lemma": "です"},
         {"surface": "が", "pos": "Particle"}
       ],
       "tags": ["schedule"]
@@ -218,7 +220,7 @@
       "expected": [
         {"surface": "カード", "pos": "Noun"},
         {"surface": "で", "pos": "Particle"},
-        {"surface": "払え", "pos": "Verb"},
+        {"surface": "払え", "pos": "Verb", "lemma": "払える"},
         {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"},
         {"surface": "か", "pos": "Particle"}
       ],
@@ -316,7 +318,7 @@
         {"surface": "し", "pos": "Verb", "lemma": "する"},
         {"surface": "たい", "pos": "Auxiliary", "lemma": "たい"},
         {"surface": "の", "pos": "Noun"},
-        {"surface": "です", "pos": "Auxiliary"},
+        {"surface": "です", "pos": "Auxiliary", "lemma": "です"},
         {"surface": "が", "pos": "Particle"}
       ],
       "tags": ["travel"]
@@ -437,8 +439,10 @@
       "expected": [
         {"surface": "卵", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
-        {"surface": "入って", "pos": "Verb", "lemma": "入る"},
-        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"},
+        {"surface": "入っ", "pos": "Verb", "lemma": "入る"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "い", "pos": "Verb", "lemma": "いる"},
+        {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"},
         {"surface": "か", "pos": "Particle"}
       ],
       "tags": ["restaurant"]

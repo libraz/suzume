@@ -144,21 +144,26 @@
     },
     {
       "id": "deatta_copula",
-      "description": "であった (formal past copula) - で + あった split",
+      "description": "であった (formal past copula) - で + あっ + た split (MeCab-compatible)",
       "input": "重要であった",
       "expected": [
         {
           "surface": "重要",
-          "pos": "Adjective"
+          "pos": "Noun"
         },
         {
           "surface": "で",
-          "pos": "Particle"
+          "pos": "Auxiliary",
+          "lemma": "だ"
         },
         {
-          "surface": "あった",
-          "pos": "Verb",
+          "surface": "あっ",
+          "pos": "Auxiliary",
           "lemma": "ある"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -187,12 +192,12 @@
     },
     {
       "id": "copula_denai_iya",
-      "description": "嫌でない - na-adjective copula negation",
+      "description": "嫌でない - na-adjective copula negation (suzume uses ADJ for na-adjectives)",
       "input": "嫌でない",
       "expected": [
         {
           "surface": "嫌",
-          "pos": "Noun"
+          "pos": "Adjective"
         },
         {
           "surface": "で",

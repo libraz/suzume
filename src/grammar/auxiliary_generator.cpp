@@ -43,8 +43,18 @@ constexpr ConjSuffix kIchidanFull[] = {
     {"なくて", conn::kAuxOutTe},
 };
 
-// Te-attachment limited forms (6 suffixes, no negative)
+// Te-attachment limited forms (4 suffixes, no negative, no masu)
+// Note: ます/ました forms are intentionally excluded for MeCab compatibility
+// MeCab splits: くれます → くれ(VERB) + ます(AUX), not くれます(AUX)
 constexpr ConjSuffix kIchidanTeAttach[] = {
+    {"る", conn::kAuxOutBase},   {"た", conn::kAuxOutTa},
+    {"たら", conn::kAuxOutBase}, {"て", conn::kAuxOutTe},
+};
+
+// Progressive いる forms (6 suffixes, no negative)
+// MeCab-compatible: negative is split as い(mizenkei) + ない(AUX)
+// E.g., 食べていない → 食べ+て+い+ない, not 食べ+て+いない
+constexpr ConjSuffix kIchidanProgressive[] = {
     {"る", conn::kAuxOutBase},   {"た", conn::kAuxOutTa},
     {"たら", conn::kAuxOutBase}, {"て", conn::kAuxOutTe},
     {"ます", conn::kAuxOutMasu}, {"ました", conn::kAuxOutTa},
@@ -59,11 +69,10 @@ constexpr ConjSuffix kGodanWaFull[] = {
     {"わなくて", conn::kAuxOutTe},
 };
 
-// Godan-Wa te-attachment
+// Godan-Wa te-attachment (no masu for MeCab compatibility)
 constexpr ConjSuffix kGodanWaTeAttach[] = {
     {"う", conn::kAuxOutBase},     {"った", conn::kAuxOutTa},
     {"ったら", conn::kAuxOutBase}, {"って", conn::kAuxOutTe},
-    {"います", conn::kAuxOutMasu}, {"いました", conn::kAuxOutTa},
 };
 
 // Godan-Ka (五段か行) - full
@@ -691,16 +700,23 @@ const std::vector<AuxiliaryBase>& getAuxiliaryBases() {
 std::vector<AuxiliaryEntry> expandAuxiliaryBase(const AuxiliaryBase& base) {
   // Benefactive te-attachments (てくれる, てもらう, てあげる) use limited forms
   // to avoid over-matching like 待ってくれない → 待つ (wrong)
-  // Other te-attachments (ている, てしまう, etc.) keep full forms
-  // because they form grammaticalized compound verbs (食べていない = not eating)
   bool is_benefactive = (base.left_id == conn::kAuxTemorau ||
                          base.left_id == conn::kAuxTekureru ||
                          base.left_id == conn::kAuxTeageru);
 
+  // Progressive ている uses forms without negative
+  // MeCab-compatible split: い(mizenkei) + ない(AUX) instead of いない(single)
+  bool is_progressive = (base.left_id == conn::kAuxTeiru);
+
   switch (base.conj_type) {
     case VerbType::Ichidan:
-      return is_benefactive ? generateWithStem(base, kIchidanTeAttach)
-                            : generateWithStem(base, kIchidanFull);
+      if (is_benefactive) {
+        return generateWithStem(base, kIchidanTeAttach);
+      }
+      if (is_progressive) {
+        return generateWithStem(base, kIchidanProgressive);
+      }
+      return generateWithStem(base, kIchidanFull);
     case VerbType::GodanWa:
       return is_benefactive ? generateWithStem(base, kGodanWaTeAttach)
                             : generateWithStem(base, kGodanWaFull);

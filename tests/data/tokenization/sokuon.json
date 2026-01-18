@@ -4,12 +4,13 @@
   "cases": [
     {
       "id": "sokuon_kanji_kanji",
-      "description": "Kanji + っ + Kanji pattern (横っ面) with known GodanRa verb",
+      "description": "Kanji + っ + Kanji pattern (横っ面) with known GodanRa verb - MeCab splits て-form",
       "input": "横っ面を張って",
       "expected": [
         {"surface": "横っ面", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
-        {"surface": "張って", "pos": "Verb", "lemma": "張る"}
+        {"surface": "張っ", "pos": "Verb", "lemma": "張る"},
+        {"surface": "て", "pos": "Particle"}
       ],
       "tags": ["sokuon", "compound"]
     },
@@ -29,7 +30,8 @@
       "description": "Verb ta-form with っ should NOT match sokuon compound pattern",
       "input": "減った",
       "expected": [
-        {"surface": "減った", "pos": "Verb", "lemma": "減る"}
+        {"surface": "減っ", "pos": "Verb", "lemma": "減る"},
+        {"surface": "た", "pos": "Auxiliary"}
       ],
       "tags": ["sokuon", "verb"]
     },
@@ -38,8 +40,10 @@
       "description": "Verb te-form with っ should NOT match sokuon compound pattern",
       "input": "勝って帰った",
       "expected": [
-        {"surface": "勝って", "pos": "Verb", "lemma": "勝つ"},
-        {"surface": "帰った", "pos": "Verb", "lemma": "帰る"}
+        {"surface": "勝っ", "pos": "Verb", "lemma": "勝つ"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "帰っ", "pos": "Verb", "lemma": "帰る"},
+        {"surface": "た", "pos": "Auxiliary"}
       ],
       "tags": ["sokuon", "verb"]
     }

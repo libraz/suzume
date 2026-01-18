@@ -99,14 +99,22 @@
           "lemma": "思わず"
         },
         {
-          "surface": "言って",
+          "surface": "言っ",
           "pos": "Verb",
           "lemma": "言う"
         },
         {
-          "surface": "しまった",
-          "pos": "Auxiliary",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "しまっ",
+          "pos": "Verb",
           "lemma": "しまう"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -188,9 +196,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "降ったら",
+          "surface": "降っ",
           "pos": "Verb",
           "lemma": "降る"
+        },
+        {
+          "surface": "たら",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [
@@ -334,7 +346,7 @@
     },
     {
       "id": "adverb_tatoe",
-      "description": "たとえ should be Adverb (conditional)",
+      "description": "たとえ should be Adverb (conditional) - MeCab splits でも as particle",
       "input": "たとえ雨でも行く",
       "expected": [
         {
@@ -346,11 +358,7 @@
           "pos": "Noun"
         },
         {
-          "surface": "で",
-          "pos": "Particle"
-        },
-        {
-          "surface": "も",
+          "surface": "でも",
           "pos": "Particle"
         },
         {
@@ -597,7 +605,7 @@
     },
     {
       "id": "d2_iza",
-      "description": "D2: いざ should be ADV, not AUX",
+      "description": "D2: いざ should be ADV, not AUX - MeCab splits なっ + たら",
       "input": "いざとなったら",
       "expected": [
         {
@@ -609,9 +617,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "なったら",
+          "surface": "なっ",
           "pos": "Verb",
           "lemma": "なる"
+        },
+        {
+          "surface": "たら",
+          "pos": "Auxiliary"
         }
       ],
       "tags": [

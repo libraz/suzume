@@ -49,8 +49,7 @@
       "expected": [
         {
           "surface": "といった",
-          "pos": "Determiner",
-          "lemma": "という"
+          "pos": "Particle"
         }
       ],
       "tags": [
@@ -214,9 +213,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "行って",
+          "surface": "行っ",
           "pos": "Verb",
           "lemma": "行く"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         }
       ],
       "tags": [

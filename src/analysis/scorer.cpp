@@ -259,9 +259,11 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
         // - Words in kSingleKanjiExceptions (common standalone kanji)
         // - Verb stems with hasSuffix flag (見+られべき, 着+られる)
         // - Dictionary adjectives (na-adj stems like 妙, 楽 are often single kanji)
+        // - Adjective stems with hasSuffix flag (高+すぎる, 尊+すぎて)
         bool skip_penalty = normalize::isSingleKanjiException(edge.surface) ||
                             (edge.pos == core::PartOfSpeech::Verb && edge.hasSuffix()) ||
-                            (edge.pos == core::PartOfSpeech::Adjective && edge.fromDictionary());
+                            (edge.pos == core::PartOfSpeech::Adjective && edge.fromDictionary()) ||
+                            (edge.pos == core::PartOfSpeech::Adjective && edge.hasSuffix());
         if (!skip_penalty) {
           cost += options_.single_kanji_penalty;
           logAdjustment(options_.single_kanji_penalty, "single_kanji");

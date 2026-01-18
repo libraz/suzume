@@ -4,13 +4,17 @@
   "cases": [
     {
       "id": "aux_sugiru_standalone",
-      "description": "Auxiliary verb すぎる standalone te-form (T55)",
+      "description": "Auxiliary verb すぎる standalone te-form (T55) - MeCab-compatible split",
       "input": "すぎて",
       "expected": [
         {
-          "surface": "すぎて",
+          "surface": "すぎ",
           "pos": "Verb",
           "lemma": "すぎる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         }
       ],
       "tags": [
@@ -36,7 +40,7 @@
     },
     {
       "id": "aux_adj_yomiyasui_context",
-      "description": "この本は読みやすい (this book is easy to read)",
+      "description": "この本は読みやすい (this book is easy to read) - MeCab-compatible split",
       "input": "この本は読みやすい",
       "expected": [
         {
@@ -52,9 +56,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "読みやすい",
+          "surface": "読み",
+          "pos": "Verb",
+          "lemma": "読む"
+        },
+        {
+          "surface": "やすい",
           "pos": "Adjective",
-          "lemma": "読みやすい"
+          "lemma": "やすい"
         }
       ],
       "tags": [
@@ -64,13 +73,18 @@
     },
     {
       "id": "compound_adj_yomiyasui",
-      "description": "読みやすい - compound adjective (verb renyokei + やすい)",
+      "description": "読みやすい - compound adjective (verb renyokei + やすい) - MeCab-compatible split",
       "input": "読みやすい",
       "expected": [
         {
-          "surface": "読みやすい",
+          "surface": "読み",
+          "pos": "Verb",
+          "lemma": "読む"
+        },
+        {
+          "surface": "やすい",
           "pos": "Adjective",
-          "lemma": "読みやすい"
+          "lemma": "やすい"
         }
       ],
       "tags": [
@@ -124,7 +138,7 @@
     },
     {
       "id": "adj_sugiru_inflected_te",
-      "description": "尊すぎて - MeCab-compatible: ADJ stem (ガル接続) + すぎ + て",
+      "description": "尊すぎて - MeCab-compatible: ADJ stem (ガル接続) + すぎ (non-independent verb) + て",
       "input": "尊すぎて",
       "expected": [
         {

@@ -228,15 +228,11 @@
     },
     {
       "id": "realworld_business_email",
-      "description": "お世話になっております - humble progressive form (single verb token)",
+      "description": "お世話になっております - humble progressive form - MeCab: なっ + て + おり + ます",
       "input": "お世話になっております",
       "expected": [
         {
-          "surface": "お",
-          "pos": "Prefix"
-        },
-        {
-          "surface": "世話",
+          "surface": "お世話",
           "pos": "Noun"
         },
         {
@@ -244,9 +240,23 @@
           "pos": "Particle"
         },
         {
-          "surface": "なっております",
+          "surface": "なっ",
           "pos": "Verb",
           "lemma": "なる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "おり",
+          "pos": "Verb",
+          "lemma": "おる"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [

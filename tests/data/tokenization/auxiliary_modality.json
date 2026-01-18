@@ -250,7 +250,7 @@
         {
           "surface": "べき",
           "pos": "Auxiliary",
-          "lemma": "べき"
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -270,7 +270,7 @@
         {
           "surface": "べき",
           "pos": "Auxiliary",
-          "lemma": "べき"
+          "lemma": "べし"
         },
         {
           "surface": "だっ",
@@ -298,9 +298,14 @@
           "lemma": "書く"
         },
         {
-          "surface": "れべき",
+          "surface": "れ",
           "pos": "Auxiliary",
           "lemma": "れる"
+        },
+        {
+          "surface": "べき",
+          "pos": "Auxiliary",
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -321,9 +326,14 @@
           "lemma": "泳ぐ"
         },
         {
-          "surface": "れべき",
+          "surface": "れ",
           "pos": "Auxiliary",
           "lemma": "れる"
+        },
+        {
+          "surface": "べき",
+          "pos": "Auxiliary",
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -344,9 +354,14 @@
           "lemma": "読む"
         },
         {
-          "surface": "れべき",
+          "surface": "れ",
           "pos": "Auxiliary",
           "lemma": "れる"
+        },
+        {
+          "surface": "べき",
+          "pos": "Auxiliary",
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -372,7 +387,7 @@
         },
         {
           "surface": "れ",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "れる"
         },
         {
@@ -424,9 +439,14 @@
           "lemma": "食べる"
         },
         {
-          "surface": "られべき",
+          "surface": "られ",
           "pos": "Auxiliary",
           "lemma": "られる"
+        },
+        {
+          "surface": "べき",
+          "pos": "Auxiliary",
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -447,9 +467,14 @@
           "lemma": "考える"
         },
         {
-          "surface": "られべき",
+          "surface": "られ",
           "pos": "Auxiliary",
           "lemma": "られる"
+        },
+        {
+          "surface": "べき",
+          "pos": "Auxiliary",
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -470,9 +495,14 @@
           "lemma": "話す"
         },
         {
-          "surface": "れべき",
+          "surface": "れ",
           "pos": "Auxiliary",
           "lemma": "れる"
+        },
+        {
+          "surface": "べき",
+          "pos": "Auxiliary",
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -493,9 +523,14 @@
           "lemma": "愛す"
         },
         {
-          "surface": "れべき",
+          "surface": "れ",
           "pos": "Auxiliary",
           "lemma": "れる"
+        },
+        {
+          "surface": "べき",
+          "pos": "Auxiliary",
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -521,7 +556,7 @@
         },
         {
           "surface": "れ",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "れる"
         },
         {
@@ -549,12 +584,12 @@
         },
         {
           "surface": "させ",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "させる"
         },
         {
           "surface": "られ",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "られる"
         },
         {
@@ -581,9 +616,14 @@
           "lemma": "信じる"
         },
         {
-          "surface": "られべき",
+          "surface": "られ",
           "pos": "Auxiliary",
           "lemma": "られる"
+        },
+        {
+          "surface": "べき",
+          "pos": "Auxiliary",
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -604,9 +644,14 @@
           "lemma": "見る"
         },
         {
-          "surface": "られべき",
+          "surface": "られ",
           "pos": "Auxiliary",
           "lemma": "られる"
+        },
+        {
+          "surface": "べき",
+          "pos": "Auxiliary",
+          "lemma": "べし"
         }
       ],
       "tags": [
@@ -682,7 +727,7 @@
         },
         {
           "surface": "られ",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "られる"
         },
         {
@@ -804,9 +849,14 @@
           "lemma": "見る"
         },
         {
-          "surface": "といた",
+          "surface": "とい",
           "pos": "Verb",
           "lemma": "とく"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -826,9 +876,13 @@
           "lemma": "見る"
         },
         {
-          "surface": "といて",
+          "surface": "とい",
           "pos": "Verb",
           "lemma": "とく"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         }
       ],
       "tags": [
@@ -948,24 +1002,24 @@
       ]
     },
     {
-      "id": "hiragana_verb_netai",
-      "description": "Hiragana verb 寝たい - not split as particle+aux (T56)",
+      "id": "hiragana_adj_netai",
+      "description": "ねたい as i-adjective (妬い=envious), not verb+たい (MeCab-compatible)",
       "input": "ねたい",
       "expected": [
         {
           "surface": "ねたい",
-          "pos": "Verb",
-          "lemma": "ねる"
+          "pos": "Adjective",
+          "lemma": "ねたい"
         }
       ],
       "tags": [
-        "hiragana_verb",
-        "desiderative"
+        "i_adjective",
+        "hiragana"
       ]
     },
     {
-      "id": "hiragana_verb_netai_sentence",
-      "description": "Hiragana verb 寝たい in sentence context (T56)",
+      "id": "hiragana_adj_netai_sentence",
+      "description": "ねたい (envious) in sentence - MeCab treats as adjective",
       "input": "そろそろねたい",
       "expected": [
         {
@@ -975,13 +1029,13 @@
         },
         {
           "surface": "ねたい",
-          "pos": "Verb",
-          "lemma": "ねる"
+          "pos": "Adjective",
+          "lemma": "ねたい"
         }
       ],
       "tags": [
-        "hiragana_verb",
-        "desiderative"
+        "i_adjective",
+        "hiragana"
       ]
     },
     {
@@ -1304,7 +1358,7 @@
         },
         {
           "surface": "いる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "いる"
         },
         {
@@ -1322,8 +1376,7 @@
         },
         {
           "surface": "そう",
-          "pos": "Auxiliary",
-          "lemma": "そう"
+          "pos": "Noun"
         },
         {
           "surface": "です",

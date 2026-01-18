@@ -28,11 +28,14 @@ bool isInFormList(std::string_view surface,
 }
 
 // いる auxiliary forms (progressive aspect)
-// Full forms: いる, います, いました, いません, いない, いなかった, いれば
+// Full forms: いる, います, いました, いません, いれば
+// Note: いない, いなかった excluded for MeCab-compatible split (い + ない)
 // Contracted forms: てる/でる = ている contraction
 constexpr std::string_view kIruForms[] = {
-    // Full forms
-    "いる", "います", "いました", "いません", "いない", "いなかった", "いれば",
+    // Full forms (excluding negative - should split as い + ない)
+    "いる", "います", "いました", "いません", "いれば",
+    // Mizenkei form for negative split pattern (て + い + ない)
+    "い",
     // Contracted forms (てる/でる = ている contraction)
     "てる", "てた", "てて", "てない", "てなかった",
     "でる", "でた", "でて", "でない", "でなかった"
@@ -642,16 +645,19 @@ ConnectionRuleResult checkCopulaDeToKuruAux(const core::LatticeEdge& prev,
 }
 
 // =============================================================================
-// NOUN/ADJ → で(AUX, lemma=だ) bonus
+// ADJ → で(AUX, lemma=だ) bonus
 // =============================================================================
-// Supports na-adjective copula negation pattern (嫌でない, 好きでない, etc.)
+// Supports na-adjective copula pattern (嫌でない, 静かで美しい, etc.)
 // MeCab: 嫌 + で(AUX,だ) + ない(AUX)
+// MeCab: 静か + で(AUX,だ) + 美しい
+// Note: Only applies to ADJ, not NOUN. Regular nouns use particle で.
+// E.g., 秒速で → 秒速(NOUN) + で(PARTICLE)
 ConnectionRuleResult checkNaAdjToCopulaDe(const core::LatticeEdge& prev,
                                           const core::LatticeEdge& next,
                                           const ConnectionOptions& /*opts*/) {
-  // Only check NOUN/ADJ → AUX pattern
-  if (prev.pos != core::PartOfSpeech::Noun &&
-      prev.pos != core::PartOfSpeech::Adjective) {
+  // Only check ADJ → AUX pattern (not NOUN)
+  // Na-adjectives are marked as ADJ in suzume, regular nouns use particle で
+  if (prev.pos != core::PartOfSpeech::Adjective) {
     return {};
   }
   if (next.pos != core::PartOfSpeech::Auxiliary) {
@@ -664,8 +670,8 @@ ConnectionRuleResult checkNaAdjToCopulaDe(const core::LatticeEdge& prev,
   }
 
   // Apply bonus to favor this pattern for na-adjective copula
-  return {ConnectionPattern::NaAdjToCopulaDe, scorer::kBonusNaAdjToCopulaDe,
-          "noun/adj + de(aux,da) bonus (na-adj copula pattern)"};
+  return {ConnectionPattern::NaAdjToCopulaDe, scorer::kBonusAdjToCopulaDe,
+          "adj + de(aux,da) bonus (na-adj copula pattern)"};
 }
 
 // =============================================================================
@@ -725,6 +731,35 @@ ConnectionRuleResult checkCopulaDeToNai(const core::LatticeEdge& prev,
   // Apply bonus to favor this pattern for na-adjective copula negation
   return {ConnectionPattern::CopulaDeToNai, -scorer::kBonusCopulaDeToNai,
           "de(aux,da) + nai(aux) bonus (na-adj copula negation)"};
+}
+
+// =============================================================================
+// checkCopulaDeToGozaru - NOUN + で(AUX,だ) + ござる(AUX) pattern
+// =============================================================================
+// Supports classical/formal copula pattern (侍でござる, これでござる, etc.)
+// MeCab: 侍 + で(助動詞,特殊・ダ,連用形) + ござる(助動詞)
+ConnectionRuleResult checkCopulaDeToGozaru(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next,
+                                           const ConnectionOptions& /*opts*/) {
+  // Only check AUX → AUX pattern
+  if (!isAuxToAux(prev, next)) return {};
+
+  // Check で(AUX, lemma=だ)
+  if (prev.surface != "で" || prev.lemma != "だ") {
+    return {};
+  }
+
+  // Check for ござる
+  if (next.surface != "ござる" && next.lemma != "ござる") {
+    return {};
+  }
+
+  // Apply strong bonus to favor copula pattern over particle pattern
+  // で(PARTICLE) has cost -0.8, で(AUX) has cost 0.2 → diff 1.0
+  // ござる(VERB) has cost -1.0, ござる(AUX) has cost -0.5 → diff 0.5
+  // Need ~1.6+ bonus to overcome total difference of 1.5
+  return {ConnectionPattern::CopulaDeToGozaru, -1.8F,
+          "de(aux,da) + gozaru(aux) bonus (classical copula pattern)"};
 }
 
 }  // namespace connection_rules

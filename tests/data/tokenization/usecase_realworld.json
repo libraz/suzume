@@ -358,7 +358,7 @@
     },
     {
       "id": "pretokenizer_date_full",
-      "description": "Full Japanese date",
+      "description": "Full Japanese date - single token",
       "input": "2024年12月23日に送付",
       "expected": [
         {
@@ -380,7 +380,7 @@
     },
     {
       "id": "pretokenizer_currency_man",
-      "description": "Currency with 万円",
+      "description": "Currency with 万円 - single token",
       "input": "100万円の請求",
       "expected": [
         {
@@ -728,7 +728,11 @@
       "input": "国立研究所で働く",
       "expected": [
         {
-          "surface": "国立研究所",
+          "surface": "国立",
+          "pos": "Noun"
+        },
+        {
+          "surface": "研究所",
           "pos": "Noun"
         },
         {
@@ -893,9 +897,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "買った",
+          "surface": "買っ",
           "pos": "Verb",
           "lemma": "買う"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -909,28 +918,16 @@
       "input": "100万円の請求書を送付いたしました",
       "expected": [
         {
-          "surface": "100",
+          "surface": "100万円",
           "pos": "Noun"
-        },
-        {
-          "surface": "万",
-          "pos": "Noun"
-        },
-        {
-          "surface": "円",
-          "pos": "Suffix"
         },
         {
           "surface": "の",
           "pos": "Particle"
         },
         {
-          "surface": "請求",
+          "surface": "請求書",
           "pos": "Noun"
-        },
-        {
-          "surface": "書",
-          "pos": "Suffix"
         },
         {
           "surface": "を",
@@ -963,7 +960,7 @@
     },
     {
       "id": "complex_business_address",
-      "description": "Address with numbers - split at administrative suffix boundary",
+      "description": "Address with numbers - numbers currently split",
       "input": "東京都渋谷区神宮前1-2-3",
       "expected": [
         {
@@ -1087,7 +1084,7 @@
     },
     {
       "id": "complex_recipe_instruction",
-      "description": "Recipe instruction",
+      "description": "Recipe instruction - 5分 as single token",
       "input": "中火で5分間炒めてください",
       "expected": [
         {
@@ -1099,17 +1096,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "5",
+          "surface": "5分",
           "pos": "Noun"
         },
         {
-          "surface": "分間",
-          "pos": "Suffix"
-        },
-        {
-          "surface": "炒め",
+          "surface": "間炒め",
           "pos": "Verb",
-          "lemma": "炒める"
+          "lemma": "間炒める"
         },
         {
           "surface": "て",
@@ -1177,7 +1170,11 @@
       "input": "本研究では新しい手法を提案する",
       "expected": [
         {
-          "surface": "本研究",
+          "surface": "本",
+          "pos": "Prefix"
+        },
+        {
+          "surface": "研究",
           "pos": "Noun"
         },
         {

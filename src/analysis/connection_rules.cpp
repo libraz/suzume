@@ -182,9 +182,15 @@ void evaluateAdjRules(const core::LatticeEdge& prev,
                       ConnectionRuleResult& accumulated) {
   // ADJ → VERB rules
   accumulateRule(accumulated, checkAdjKuNaru(prev, next, opts));
+  // ADJ stem (ガル接続) → すぎる/がる(VERB) bonus for MeCab-compatible garu-connection split
+  accumulateRule(accumulated, checkAdjStemToSugiruVerb(prev, next, opts));
 
   // ADJ → AUX rules (na-adjective copula pattern)
   accumulateRule(accumulated, checkNaAdjToCopulaDe(prev, next, opts));
+  // ADJ(く) → ない(AUX) bonus for MeCab-compatible adjective negation split
+  accumulateRule(accumulated, checkAdjKuToNai(prev, next, opts));
+  // I-ADJ(い) → です(AUX) bonus for MeCab-compatible polite form
+  accumulateRule(accumulated, checkIAdjToDesu(prev, next, opts));
 
   // ADJ → VERB rules (na-adjective copula penalty)
   accumulateRule(accumulated, checkNaAdjToDekinaiVerb(prev, next, opts));
@@ -212,6 +218,7 @@ void evaluateAuxRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkPassiveAuxToNaiTa(prev, next, opts));
   accumulateRule(accumulated, checkCopulaDeToKuruAux(prev, next, opts));
   accumulateRule(accumulated, checkCopulaDeToNai(prev, next, opts));
+  accumulateRule(accumulated, checkCopulaDeToGozaru(prev, next, opts));
 
   // AUX → PARTICLE rules
   accumulateRule(accumulated, checkMasenDeSplit(prev, next, opts));
@@ -242,6 +249,8 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
   // PARTICLE → VERB rules
   accumulateRule(accumulated, checkParticleBeforeHiraganaVerb(prev, next, opts));
   accumulateRule(accumulated, checkTeParticleToAuxVerb(prev, next, opts));
+  accumulateRule(accumulated, checkTeParticleToInaiVerb(prev, next, opts));
+  accumulateRule(accumulated, checkParticleNiToIruVerb(prev, next, opts));
 
   // PARTICLE → SUFFIX rules
   accumulateRule(accumulated, checkSuffixAfterNaParticle(prev, next, opts));

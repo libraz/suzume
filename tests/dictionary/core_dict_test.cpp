@@ -64,12 +64,14 @@ TEST_F(CoreDictVerbExpansionTest, Ichidan_BaseForm) {
   EXPECT_TRUE(hasVerbEntry("できる", "できる"));
 }
 
+// MeCab-compatible: できた → でき + た (split at tokenization, not in dictionary)
 TEST_F(CoreDictVerbExpansionTest, Ichidan_PastForm) {
-  EXPECT_TRUE(hasVerbEntry("できた", "できる"));
+  EXPECT_FALSE(hasVerbEntry("できた", "できる"));  // Split as でき + た
 }
 
+// MeCab-compatible: できて → でき + て (split at tokenization, not in dictionary)
 TEST_F(CoreDictVerbExpansionTest, Ichidan_TeForm) {
-  EXPECT_TRUE(hasVerbEntry("できて", "できる"));
+  EXPECT_FALSE(hasVerbEntry("できて", "できる"));  // Split as でき + て
 }
 
 TEST_F(CoreDictVerbExpansionTest, Ichidan_NegativeForm) {
@@ -80,8 +82,9 @@ TEST_F(CoreDictVerbExpansionTest, Ichidan_ConditionalBa) {
   EXPECT_TRUE(hasVerbEntry("できれば", "できる"));
 }
 
+// MeCab-compatible: できたら → でき + たら (split at tokenization)
 TEST_F(CoreDictVerbExpansionTest, Ichidan_ConditionalTara) {
-  EXPECT_TRUE(hasVerbEntry("できたら", "できる"));
+  EXPECT_FALSE(hasVerbEntry("できたら", "できる"));  // Split as でき + たら
 }
 
 // =============================================================================
@@ -96,12 +99,14 @@ TEST_F(CoreDictVerbExpansionTest, GodanRa_Renyokei) {
   EXPECT_TRUE(hasVerbEntry("わかり", "わかる"));
 }
 
+// MeCab-compatible: わかった → わかっ + た (split at tokenization)
 TEST_F(CoreDictVerbExpansionTest, GodanRa_PastForm) {
-  EXPECT_TRUE(hasVerbEntry("わかった", "わかる"));
+  EXPECT_FALSE(hasVerbEntry("わかった", "わかる"));  // Split as わかっ + た
 }
 
+// MeCab-compatible: わかって → わかっ + て (split at tokenization)
 TEST_F(CoreDictVerbExpansionTest, GodanRa_TeForm) {
-  EXPECT_TRUE(hasVerbEntry("わかって", "わかる"));
+  EXPECT_FALSE(hasVerbEntry("わかって", "わかる"));  // Split as わかっ + て
 }
 
 TEST_F(CoreDictVerbExpansionTest, GodanRa_NegativeForm) {
@@ -120,12 +125,14 @@ TEST_F(CoreDictVerbExpansionTest, GodanWa_Renyokei) {
   EXPECT_TRUE(hasVerbEntry("もらい", "もらう"));
 }
 
+// MeCab-compatible: もらった → もらっ + た (split at tokenization)
 TEST_F(CoreDictVerbExpansionTest, GodanWa_PastForm) {
-  EXPECT_TRUE(hasVerbEntry("もらった", "もらう"));
+  EXPECT_FALSE(hasVerbEntry("もらった", "もらう"));  // Split as もらっ + た
 }
 
+// MeCab-compatible: もらって → もらっ + て (split at tokenization)
 TEST_F(CoreDictVerbExpansionTest, GodanWa_TeForm) {
-  EXPECT_TRUE(hasVerbEntry("もらって", "もらう"));
+  EXPECT_FALSE(hasVerbEntry("もらって", "もらう"));  // Split as もらっ + て
 }
 
 TEST_F(CoreDictVerbExpansionTest, GodanWa_NegativeForm) {
@@ -196,8 +203,9 @@ TEST_F(CoreDictVerbExpansionTest, EssentialVerb_Tomonau_Renyokei) {
   EXPECT_TRUE(hasVerbEntry("伴い", "伴う"));
 }
 
+// MeCab-compatible: 伴った → 伴っ + た (split at tokenization)
 TEST_F(CoreDictVerbExpansionTest, EssentialVerb_Tomonau_Past) {
-  EXPECT_TRUE(hasVerbEntry("伴った", "伴う"));
+  EXPECT_FALSE(hasVerbEntry("伴った", "伴う"));  // Split as 伴っ + た
 }
 
 // =============================================================================

@@ -353,6 +353,11 @@ constexpr float kPenaltyIchidanURowStemInvalid = scale::kStrong + scale::kTrivia
 // Single-kanji Ichidan stem with onbinkei context (侍で as Ichidan) is wrong
 constexpr float kPenaltyIchidanSingleKanjiOnbinInvalid = scale::kSevere;
 
+// Contracted progressive past suffix (てた/でた) should be split in MeCab
+// MeCab: 見てた → 見 + て + た (3 tokens), not 見てた (1 token)
+// Apply penalty to prefer split path over unified verb analysis
+constexpr float kPenaltyIchidanContractedProgressivePast = scale::kSevere;  // 0.60F
+
 // Particle + な stem pattern for GodanWa (もな, はな, etc.)
 // These are likely PARTICLE + ない misparse
 constexpr float kPenaltyGodanWaParticleNaStem = scale::kStrong;

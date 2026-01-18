@@ -734,6 +734,139 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     }
   }
 
+  // Generate 1-char ichidan renyokei stem candidates
+  // E.g., ねて → ね (renyokei of ねる) + て (particle)
+  // MeCab splits: ねて → ね(動詞,一段,連用形) + て(助詞,接続助詞)
+  // This handles pure hiragana ichidan verbs that need te/ta form splitting
+  // Pattern: e-row hiragana followed by て or た
+  // IMPORTANT: Only generate if the base form (stem + る) is a known verb in dictionary
+  // to avoid false positives like めて → め + て (め is not a verb)
+  if (start_pos < codepoints.size()) {
+    char32_t first_char = codepoints[start_pos];
+    // Check for e-row hiragana (ichidan renyokei ending)
+    // Exclude て and で which are more commonly particles
+    if (grammar::isERowCodepoint(first_char) && first_char != U'て' && first_char != U'で') {
+      // Check if followed by te/ta particle
+      if (start_pos + 1 < codepoints.size()) {
+        char32_t next_char = codepoints[start_pos + 1];
+        if (next_char == U'て' || next_char == U'た') {
+          // Construct base form (stem + る)
+          std::string stem_surface = extractSubstring(codepoints, start_pos, start_pos + 1);
+          std::string base_form = stem_surface + "る";
+
+          // Only generate if base form is a known verb in dictionary
+          // This prevents false positives like め+て, け+て
+          if (vh::isVerbInDictionary(dict_manager, base_form)) {
+            // Generate candidate for the 1-char stem
+            UnknownCandidate candidate;
+            candidate.surface = stem_surface;
+            candidate.start = start_pos;
+            candidate.end = start_pos + 1;
+            candidate.pos = core::PartOfSpeech::Verb;
+            // Strong negative cost to beat particle split
+            // Particle path can be as low as -0.2, so we need lower
+            candidate.cost = -0.5F;
+            candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
+            candidate.lemma = base_form;
+            candidate.conj_type = dictionary::ConjugationType::Ichidan;
+            SUZUME_DEBUG_BLOCK {
+              SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface
+                                  << " hiragana_ichidan_renyokei_1char lemma=" << base_form
+                                  << " cost=" << candidate.cost << "\n";
+            }
+#ifdef SUZUME_DEBUG_INFO
+            candidate.origin = CandidateOrigin::VerbHiragana;
+            candidate.confidence = 0.8F;  // High confidence for this pattern
+            candidate.pattern = "hiragana_ichidan_renyokei_1char";
+#endif
+            candidates.push_back(candidate);
+          }
+        }
+      }
+    }
+  }
+
+  // Generate 2+ char ichidan renyokei stem candidates
+  // E.g., つけて → つけ (renyokei of つける) + て (particle)
+  //       たべて → たべ (renyokei of たべる) + て (particle)
+  //       あけて → あけ (renyokei of あける) + て (particle)
+  // MeCab splits: つけて → つけ(動詞,一段,連用形) + て(助詞,接続助詞)
+  // Pattern: 2+ char sequence ending with e-row hiragana followed by て or た
+  // Uses inflection analysis confidence to validate (dictionary lookup as bonus)
+  for (size_t end_pos = start_pos + 2; end_pos < hiragana_end; ++end_pos) {
+    // Check if position end_pos-1 is e-row hiragana (ichidan renyokei ending)
+    char32_t stem_end_char = codepoints[end_pos - 1];
+    if (!grammar::isERowCodepoint(stem_end_char)) {
+      continue;
+    }
+
+    // Exclude て and で which are more commonly particles
+    if (stem_end_char == U'て' || stem_end_char == U'で') {
+      continue;
+    }
+
+    // Check if followed by te/ta particle
+    if (end_pos >= codepoints.size()) {
+      continue;
+    }
+    char32_t next_char = codepoints[end_pos];
+    if (next_char != U'て' && next_char != U'た') {
+      continue;
+    }
+
+    // Construct stem and base form
+    std::string stem_surface = extractSubstring(codepoints, start_pos, end_pos);
+    std::string base_form = stem_surface + "る";
+
+    // Use inflection analysis to validate - check if stem is recognized as ichidan
+    auto stem_analysis = inflection.analyze(stem_surface);
+    bool found_ichidan = false;
+    float ichidan_confidence = 0.0F;
+    for (const auto& cand : stem_analysis) {
+      if (cand.verb_type == grammar::VerbType::Ichidan &&
+          cand.base_form == base_form) {
+        found_ichidan = true;
+        ichidan_confidence = cand.confidence;
+        break;
+      }
+    }
+
+    // Skip if not recognized as ichidan stem by inflection analysis
+    // Threshold 0.3 catches most valid cases while filtering noise
+    if (!found_ichidan || ichidan_confidence < 0.3F) {
+      continue;
+    }
+
+    // Check if base form is in dictionary (gives confidence boost)
+    bool is_dict_verb = vh::isVerbInDictionary(dict_manager, base_form);
+
+    // Generate candidate for the ichidan stem
+    UnknownCandidate candidate;
+    candidate.surface = stem_surface;
+    candidate.start = start_pos;
+    candidate.end = end_pos;
+    candidate.pos = core::PartOfSpeech::Verb;
+    // Strong negative cost to beat NOUN + て(VERB from てる) split
+    // Dictionary-verified verbs get stronger bonus
+    candidate.cost = is_dict_verb ? -0.8F : -0.6F;
+    candidate.has_suffix = true;  // Skip exceeds_dict_length penalty
+    candidate.lemma = base_form;
+    candidate.conj_type = dictionary::ConjugationType::Ichidan;
+    SUZUME_DEBUG_BLOCK {
+      SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface
+                          << " hiragana_ichidan_renyokei lemma=" << base_form
+                          << " conf=" << ichidan_confidence
+                          << (is_dict_verb ? " [dict]" : "")
+                          << " cost=" << candidate.cost << "\n";
+    }
+#ifdef SUZUME_DEBUG_INFO
+    candidate.origin = CandidateOrigin::VerbHiragana;
+    candidate.confidence = ichidan_confidence;
+    candidate.pattern = "hiragana_ichidan_renyokei";
+#endif
+    candidates.push_back(candidate);
+  }
+
   // Add emphatic variants (いくっ, するっ, etc.)
   vh::addEmphaticVariants(candidates, codepoints);
 

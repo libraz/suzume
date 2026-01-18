@@ -200,12 +200,16 @@
     },
     {
       "id": "hizuke_de",
-      "description": "日付けで - 付け should not split",
+      "description": "日付けで - MeCab splits as 日 + 付け + で",
       "input": "日付けで",
       "expected": [
         {
-          "surface": "日付け",
+          "surface": "日",
           "pos": "Noun"
+        },
+        {
+          "surface": "付け",
+          "pos": "Suffix"
         },
         {
           "surface": "で",
@@ -388,9 +392,13 @@
       "input": "書いた方がいい",
       "expected": [
         {
-          "surface": "書いた",
+          "surface": "書い",
           "pos": "Verb",
           "lemma": "書く"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary"
         },
         {
           "surface": "方",
@@ -402,7 +410,8 @@
         },
         {
           "surface": "いい",
-          "pos": "Adjective"
+          "pos": "Adjective",
+          "lemma": "いい"
         }
       ],
       "tags": [

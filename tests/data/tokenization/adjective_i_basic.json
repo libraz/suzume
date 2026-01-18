@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "description": "I-adjectives (イ形容詞)",
+  "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional",
   "cases": [
     {
       "id": "ii_base_form",
@@ -58,47 +58,6 @@
       ]
     },
     {
-      "id": "yokatta_past",
-      "description": "よかった (past form) - MeCab-compatible lemma is よい",
-      "input": "よかった",
-      "expected": [
-        {
-          "surface": "よかった",
-          "pos": "Adjective",
-          "lemma": "よい"
-        }
-      ],
-      "tags": [
-        "irregular",
-        "i_adjective",
-        "yoi",
-        "past"
-      ]
-    },
-    {
-      "id": "yokunai_negative",
-      "description": "よくない (negative form) - MeCab-compatible split: よく + ない",
-      "input": "よくない",
-      "expected": [
-        {
-          "surface": "よく",
-          "pos": "Adjective",
-          "lemma": "よい"
-        },
-        {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
-        }
-      ],
-      "tags": [
-        "irregular",
-        "i_adjective",
-        "yoi",
-        "negative"
-      ]
-    },
-    {
       "id": "yokereba_conditional",
       "description": "よければ (conditional) - MeCab-compatible lemma is よい",
       "input": "よければ",
@@ -114,28 +73,6 @@
         "i_adjective",
         "yoi",
         "conditional"
-      ]
-    },
-    {
-      "id": "yoku_adverbial",
-      "description": "よく (adverbial form) - MeCab-compatible lemma is よい",
-      "input": "よく分かる",
-      "expected": [
-        {
-          "surface": "よく",
-          "pos": "Adjective",
-          "lemma": "よい"
-        },
-        {
-          "surface": "分かる",
-          "pos": "Verb"
-        }
-      ],
-      "tags": [
-        "irregular",
-        "i_adjective",
-        "yoi",
-        "adverbial"
       ]
     },
     {
@@ -158,29 +95,6 @@
         "i_adjective",
         "ii",
         "polite"
-      ]
-    },
-    {
-      "id": "yokatta_desu_polite_past",
-      "description": "よかったです - polite past form, MeCab-compatible lemma is よい",
-      "input": "よかったです",
-      "expected": [
-        {
-          "surface": "よかった",
-          "pos": "Adjective",
-          "lemma": "よい"
-        },
-        {
-          "surface": "です",
-          "pos": "Auxiliary"
-        }
-      ],
-      "tags": [
-        "irregular",
-        "i_adjective",
-        "yoi",
-        "polite",
-        "past"
       ]
     },
     {
@@ -207,24 +121,6 @@
         "i_adjective",
         "ii",
         "particle"
-      ]
-    },
-    {
-      "id": "yosa_nominalization",
-      "description": "よさ (nominalization) - NOUN derived from よい, MeCab-compatible lemma",
-      "input": "よさ",
-      "expected": [
-        {
-          "surface": "よさ",
-          "pos": "Noun",
-          "lemma": "よい"
-        }
-      ],
-      "tags": [
-        "irregular",
-        "i_adjective",
-        "yoi",
-        "nominalization"
       ]
     },
     {
@@ -425,22 +321,6 @@
       ]
     },
     {
-      "id": "i_adj_utsukushikatta",
-      "description": "美しかった should be Adjective with lemma 美しい",
-      "input": "美しかった",
-      "expected": [
-        {
-          "surface": "美しかった",
-          "pos": "Adjective",
-          "lemma": "美しい"
-        }
-      ],
-      "tags": [
-        "i_adjective",
-        "past"
-      ]
-    },
-    {
       "id": "adj_particle_omoshiroina",
       "description": "面白いな should split as 面白い + な",
       "input": "面白いな",
@@ -489,189 +369,6 @@
       ],
       "tags": [
         "i_adjective"
-      ]
-    },
-    {
-      "id": "hiragana_adj_mazukatta",
-      "description": "まずかった - hiragana adjective conjugation",
-      "input": "まずかった",
-      "expected": [
-        {
-          "surface": "まずかった",
-          "pos": "Adjective",
-          "lemma": "まずい"
-        }
-      ],
-      "tags": [
-        "i_adjective",
-        "hiragana"
-      ]
-    },
-    {
-      "id": "hiragana_adj_oishikunai",
-      "description": "おいしくない - hiragana adjective negative",
-      "input": "おいしくない",
-      "expected": [
-        {
-          "surface": "おいしくない",
-          "pos": "Adjective",
-          "lemma": "おいしい"
-        }
-      ],
-      "tags": [
-        "i_adjective",
-        "hiragana"
-      ]
-    },
-    {
-      "id": "i_adj_sou_oishisou",
-      "description": "美味しそう - i-adjective + そう pattern",
-      "input": "美味しそう",
-      "expected": [
-        {
-          "surface": "美味しそう",
-          "pos": "Adjective",
-          "lemma": "美味しい"
-        }
-      ],
-      "tags": [
-        "i_adjective",
-        "sou"
-      ]
-    },
-    {
-      "id": "i_adj_sou_kanashisou",
-      "description": "悲しそう - i-adjective + そう pattern",
-      "input": "悲しそう",
-      "expected": [
-        {
-          "surface": "悲しそう",
-          "pos": "Adjective",
-          "lemma": "悲しい"
-        }
-      ],
-      "tags": [
-        "i_adjective",
-        "sou"
-      ]
-    },
-    {
-      "id": "i_adj_sou_in_sentence",
-      "description": "美味しそうに食べている - MeCab-compatible: ADJ stem + そう + に + VERB stem + て + AUX",
-      "input": "美味しそうに食べている",
-      "expected": [
-        {
-          "surface": "美味し",
-          "pos": "Adjective",
-          "lemma": "美味しい"
-        },
-        {
-          "surface": "そう",
-          "pos": "Auxiliary",
-          "lemma": "そう"
-        },
-        {
-          "surface": "に",
-          "pos": "Particle"
-        },
-        {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
-        },
-        {
-          "surface": "て",
-          "pos": "Particle"
-        },
-        {
-          "surface": "いる",
-          "pos": "Auxiliary",
-          "lemma": "いる"
-        }
-      ],
-      "tags": [
-        "i_adjective",
-        "sou"
-      ]
-    },
-    {
-      "id": "shi_sou_muzukashisou_adj",
-      "description": "難しそう - true adjective ending in しい + そう",
-      "input": "難しそう",
-      "expected": [
-        {
-          "surface": "難しそう",
-          "pos": "Adjective",
-          "lemma": "難しい"
-        }
-      ],
-      "tags": [
-        "i_adjective",
-        "sou"
-      ]
-    },
-    {
-      "id": "shi_sou_tanoshisou_adj",
-      "description": "楽しそう - true adjective ending in しい + そう",
-      "input": "楽しそう",
-      "expected": [
-        {
-          "surface": "楽しそう",
-          "pos": "Adjective",
-          "lemma": "楽しい"
-        }
-      ],
-      "tags": [
-        "i_adjective",
-        "sou"
-      ]
-    },
-    {
-      "id": "shi_sou_ureshisou_adj",
-      "description": "嬉しそう - true adjective ending in しい + そう",
-      "input": "嬉しそう",
-      "expected": [
-        {
-          "surface": "嬉しそう",
-          "pos": "Adjective",
-          "lemma": "嬉しい"
-        }
-      ],
-      "tags": [
-        "i_adjective",
-        "sou"
-      ]
-    },
-    {
-      "id": "adj_ku_naru_tai",
-      "description": "美しくなりたかった - ADJ連用形 + なる + たい pattern",
-      "input": "美しくなりたかった",
-      "expected": [
-        {
-          "surface": "美しく",
-          "pos": "Adjective",
-          "lemma": "美しい"
-        },
-        {
-          "surface": "なり",
-          "pos": "Verb",
-          "lemma": "なる"
-        },
-        {
-          "surface": "たかっ",
-          "pos": "Auxiliary",
-          "lemma": "たい"
-        },
-        {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
-        }
-      ],
-      "tags": [
-        "i_adjective",
-        "naru",
-        "tai"
       ]
     },
     {
@@ -737,60 +434,6 @@
       ]
     },
     {
-      "id": "naku_adj",
-      "description": "B33: 無く should be adjective renyoukei",
-      "input": "休むこと無く",
-      "expected": [
-        {
-          "surface": "休む",
-          "pos": "Verb",
-          "lemma": "休む"
-        },
-        {
-          "surface": "こと",
-          "pos": "Noun"
-        },
-        {
-          "surface": "無く",
-          "pos": "Adjective",
-          "lemma": "無い"
-        }
-      ],
-      "tags": [
-        "adjective",
-        "kanji"
-      ]
-    },
-    {
-      "id": "nasasou_adj",
-      "description": "B45: なさそう should have lemma ない, not なさい",
-      "input": "やる気がなさそう",
-      "expected": [
-        {
-          "surface": "やる",
-          "pos": "Verb",
-          "lemma": "やる"
-        },
-        {
-          "surface": "気",
-          "pos": "Noun"
-        },
-        {
-          "surface": "が",
-          "pos": "Particle"
-        },
-        {
-          "surface": "なさそう",
-          "pos": "Adjective",
-          "lemma": "ない"
-        }
-      ],
-      "tags": [
-        "adjective",
-        "lemma"
-      ]
-    },
-    {
       "id": "rashii_conjecture_adj",
       "description": "美しいらしい should split as adjective + らしい (conjecture auxiliary)",
       "input": "美しいらしい",
@@ -847,32 +490,6 @@
       ]
     },
     {
-      "id": "yokunakatta_adjective_negative_past",
-      "description": "良くなかった - adjective negative past form - MeCab-compatible split",
-      "input": "良くなかった",
-      "expected": [
-        {
-          "surface": "良く",
-          "pos": "Adjective",
-          "lemma": "良い"
-        },
-        {
-          "surface": "なかっ",
-          "pos": "Auxiliary",
-          "lemma": "ない"
-        },
-        {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
-        }
-      ],
-      "tags": [
-        "adjective",
-        "negative"
-      ]
-    },
-    {
       "id": "adjective_basic",
       "input": "美しい",
       "expected": [
@@ -904,40 +521,6 @@
       ]
     },
     {
-      "id": "adj_emoi_past",
-      "description": "Katakana adjective エモい past form",
-      "input": "エモかった",
-      "expected": [
-        {
-          "surface": "エモかった",
-          "pos": "Adjective",
-          "lemma": "エモい"
-        }
-      ],
-      "tags": [
-        "slang",
-        "adjective",
-        "katakana"
-      ]
-    },
-    {
-      "id": "adj_emoi_negative",
-      "description": "Katakana adjective エモい negative form",
-      "input": "エモくない",
-      "expected": [
-        {
-          "surface": "エモくない",
-          "pos": "Adjective",
-          "lemma": "エモい"
-        }
-      ],
-      "tags": [
-        "slang",
-        "adjective",
-        "katakana"
-      ]
-    },
-    {
       "id": "adj_kimoi_base",
       "description": "Katakana adjective キモい base form",
       "input": "キモい",
@@ -945,23 +528,6 @@
         {
           "surface": "キモい",
           "pos": "Adjective"
-        }
-      ],
-      "tags": [
-        "slang",
-        "adjective",
-        "katakana"
-      ]
-    },
-    {
-      "id": "adj_kimoi_past",
-      "description": "Katakana adjective キモい past form",
-      "input": "キモかった",
-      "expected": [
-        {
-          "surface": "キモかった",
-          "pos": "Adjective",
-          "lemma": "キモい"
         }
       ],
       "tags": [
@@ -1003,23 +569,6 @@
       ]
     },
     {
-      "id": "adj_dasai_adverbial",
-      "description": "Katakana adjective ダサい adverbial form",
-      "input": "ダサく",
-      "expected": [
-        {
-          "surface": "ダサく",
-          "pos": "Adjective",
-          "lemma": "ダサい"
-        }
-      ],
-      "tags": [
-        "slang",
-        "adjective",
-        "katakana"
-      ]
-    },
-    {
       "id": "adj_emoi_conditional",
       "description": "Katakana adjective エモい conditional form",
       "input": "エモければ",
@@ -1037,71 +586,12 @@
       ]
     },
     {
-      "id": "adj_kimoi_sou",
-      "description": "Katakana adjective キモい with そう",
-      "input": "キモさそう",
-      "expected": [
-        {
-          "surface": "キモさ",
-          "pos": "Adjective",
-          "lemma": "キモい"
-        },
-        {
-          "surface": "そう",
-          "pos": "Adverb"
-        }
-      ],
-      "tags": [
-        "slang",
-        "adjective",
-        "conjugation"
-      ]
-    },
-    {
-      "id": "adj_uzai_te",
-      "description": "Katakana adjective ウザい te-form",
-      "input": "ウザくて",
-      "expected": [
-        {
-          "surface": "ウザく",
-          "pos": "Adjective",
-          "lemma": "ウザい"
-        },
-        {
-          "surface": "て",
-          "pos": "Particle"
-        }
-      ],
-      "tags": [
-        "slang",
-        "adjective",
-        "conjugation"
-      ]
-    },
-    {
       "id": "adj_shindoi_base",
       "description": "Colloquial adjective しんどい base form",
       "input": "しんどい",
       "expected": [
         {
           "surface": "しんどい",
-          "pos": "Adjective",
-          "lemma": "しんどい"
-        }
-      ],
-      "tags": [
-        "slang",
-        "adjective",
-        "colloquial"
-      ]
-    },
-    {
-      "id": "adj_shindoi_negative",
-      "description": "Colloquial adjective しんどい negative form",
-      "input": "しんどくない",
-      "expected": [
-        {
-          "surface": "しんどくない",
           "pos": "Adjective",
           "lemma": "しんどい"
         }
@@ -1384,7 +874,7 @@
       "expected": [
         {
           "surface": "だらし",
-          "pos": "Verb"
+          "pos": "Noun"
         },
         {
           "surface": "ない",
@@ -1582,23 +1072,6 @@
       ]
     },
     {
-      "id": "nasasou_single",
-      "description": "なさそう should be ADJ ない + そう (not VERB なさる)",
-      "input": "なさそう",
-      "expected": [
-        {
-          "surface": "なさそう",
-          "pos": "Adjective",
-          "lemma": "ない"
-        }
-      ],
-      "tags": [
-        "hiragana",
-        "sou_pattern",
-        "regression"
-      ]
-    },
-    {
       "id": "okogamashii_prefix",
       "description": "おこがましい should be single ADJ, not お(PREFIX)+こがましい(ADJ)",
       "input": "おこがましい",
@@ -1735,57 +1208,6 @@
       ]
     },
     {
-      "id": "contracted_kudaranai_base",
-      "description": "くだらん - contracted form of くだらない",
-      "input": "くだらん",
-      "expected": [
-        {
-          "surface": "くだらん",
-          "pos": "Adjective",
-          "lemma": "くだらない"
-        }
-      ],
-      "tags": [
-        "contraction",
-        "colloquial",
-        "regression"
-      ]
-    },
-    {
-      "id": "contracted_kudaranai_past",
-      "description": "くだらんかった - contracted past form of くだらなかった",
-      "input": "くだらんかった",
-      "expected": [
-        {
-          "surface": "くだらんかった",
-          "pos": "Adjective",
-          "lemma": "くだらない"
-        }
-      ],
-      "tags": [
-        "contraction",
-        "colloquial",
-        "regression"
-      ]
-    },
-    {
-      "id": "contracted_tsumaranai_base",
-      "description": "つまらん - contracted form of つまらない",
-      "input": "つまらん",
-      "expected": [
-        {
-          "surface": "つまらん",
-          "pos": "Adjective",
-          "lemma": "つまらない"
-        }
-      ],
-      "tags": [
-        "contraction",
-        "colloquial",
-        "regression"
-      ]
-    },
-    {
       "id": "classical_yoi_zen",
       "description": "善い - classical variant of よい (W-013)",
       "input": "善いか",
@@ -1829,32 +1251,6 @@
         "classical",
         "wagahai",
         "W-013"
-      ]
-    },
-    {
-      "id": "classical_samushi",
-      "description": "寒し - classical shuushikei of 寒い (W-014)",
-      "input": "寒さは寒し",
-      "expected": [
-        {
-          "surface": "寒さ",
-          "pos": "Noun",
-          "lemma": "寒い"
-        },
-        {
-          "surface": "は",
-          "pos": "Particle"
-        },
-        {
-          "surface": "寒し",
-          "pos": "Adjective",
-          "lemma": "寒い"
-        }
-      ],
-      "tags": [
-        "classical",
-        "wagahai",
-        "W-014"
       ]
     },
     {

@@ -246,6 +246,36 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         }
       }
 
+      // Contracted progressive past: 見てた, 食べてた should split as 見+て+た, 食べ+て+た
+      // MeCab splits these, so penalize single-token analysis with suffix starting with てた/でた
+      // This ensures 見 + て(VERB) + た(AUX) path wins over 見てた(VERB)
+      if (actual_verb_type == VerbType::Ichidan &&
+          suffix_str.size() >= core::kTwoJapaneseCharBytes) {
+        // Use starts_with for safer comparison
+        if (suffix_str.rfind("てた", 0) == 0 || suffix_str.rfind("でた", 0) == 0) {
+          candidate.confidence -= inflection::kPenaltyIchidanContractedProgressivePast;
+          SUZUME_DEBUG_LOG("  ichidan_contracted_progressive_past: -"
+                            << inflection::kPenaltyIchidanContractedProgressivePast << "\n");
+        }
+      }
+
+      // Contracted progressive verb stem (〜て/〜で ending as stem of 〜てる/〜でる)
+      // 見て + た → base=見てる is wrong; should be 見 + て + た
+      // Penalize stems ending in て/で that are analyzed as 〜てる/〜でる conjugations
+      if (actual_verb_type == VerbType::Ichidan &&
+          stem.size() >= core::kTwoJapaneseCharBytes) {
+        // Check last character of stem (use std::string_view on stem directly)
+        std::string_view stem_view(stem);
+        std::string_view stem_end = stem_view.substr(stem_view.size() - core::kJapaneseCharBytes);
+        if (stem_end == "て" || stem_end == "で") {
+          // Check if this is analyzing as 〜てる/〜でる form
+          // These stems (見て, 食べて) are te-forms, not contracted progressive stems
+          candidate.confidence -= inflection::kPenaltyIchidanContractedProgressivePast;
+          SUZUME_DEBUG_LOG("  ichidan_contracted_progressive_stem: -"
+                            << inflection::kPenaltyIchidanContractedProgressivePast << "\n");
+        }
+      }
+
       candidate.morphemes = aux_chain;
 
       SUZUME_DEBUG_LOG("  [STEM MATCH] \"" << remaining << "\" → base=\""

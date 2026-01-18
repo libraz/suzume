@@ -82,18 +82,27 @@
     },
     {
       "id": "te_morau_separate",
-      "description": "食べてもらわない - te-form unified + auxiliary verb",
+      "description": "食べてもらわない - MeCab-compatible: 食べ + て + もらわ + ない",
       "input": "食べてもらわない",
       "expected": [
         {
-          "surface": "食べて",
+          "surface": "食べ",
           "pos": "Verb",
           "lemma": "食べる"
         },
         {
-          "surface": "もらわない",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "もらわ",
           "pos": "Verb",
           "lemma": "もらう"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -103,18 +112,27 @@
     },
     {
       "id": "te_inai_unified",
-      "description": "食べていない - te-form unified + auxiliary",
+      "description": "食べていない - MeCab-compatible: 食べ + て + い + ない",
       "input": "食べていない",
       "expected": [
         {
-          "surface": "食べて",
+          "surface": "食べ",
           "pos": "Verb",
           "lemma": "食べる"
         },
         {
-          "surface": "いない",
-          "pos": "Auxiliary",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "い",
+          "pos": "Verb",
           "lemma": "いる"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -124,18 +142,27 @@
     },
     {
       "id": "te_shimawanai_unified",
-      "description": "忘れてしまわない - te-form + しまう auxiliary verb pattern",
+      "description": "忘れてしまわない - MeCab-compatible: 忘れ + て + しまわ + ない",
       "input": "忘れてしまわない",
       "expected": [
         {
-          "surface": "忘れて",
+          "surface": "忘れ",
           "pos": "Verb",
           "lemma": "忘れる"
         },
         {
-          "surface": "しまわない",
-          "pos": "Auxiliary",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "しまわ",
+          "pos": "Verb",
           "lemma": "しまう"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -146,13 +173,27 @@
     },
     {
       "id": "te_ikanai_unified",
-      "description": "走っていかない - aspectual te-form should be single token",
+      "description": "走っていかない - MeCab-compatible: 走っ + て + いか + ない",
       "input": "走っていかない",
       "expected": [
         {
-          "surface": "走っていかない",
+          "surface": "走っ",
           "pos": "Verb",
           "lemma": "走る"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "いか",
+          "pos": "Verb",
+          "lemma": "いく"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -217,18 +258,27 @@
     },
     {
       "id": "tetsudatte_agenai_split",
-      "description": "手伝ってあげない - te-form + benefactive negative should split",
+      "description": "手伝ってあげない - MeCab-compatible: 手伝っ + て + あげ + ない",
       "input": "手伝ってあげない",
       "expected": [
         {
-          "surface": "手伝って",
+          "surface": "手伝っ",
           "pos": "Verb",
           "lemma": "手伝う"
         },
         {
-          "surface": "あげない",
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
+          "surface": "あげ",
           "pos": "Verb",
           "lemma": "あげる"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary",
+          "lemma": "ない"
         }
       ],
       "tags": [
@@ -239,13 +289,17 @@
     },
     {
       "id": "tetsudatte_lemma",
-      "description": "手伝って should have lemma 手伝う (GodanWa)",
+      "description": "手伝って - MeCab-compatible: 手伝っ + て",
       "input": "手伝って",
       "expected": [
         {
-          "surface": "手伝って",
+          "surface": "手伝っ",
           "pos": "Verb",
           "lemma": "手伝う"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         }
       ],
       "tags": [
@@ -255,17 +309,21 @@
     },
     {
       "id": "viterbi_te_form_not_split",
-      "description": "走っている - te-form splits with progressive auxiliary",
+      "description": "走っている - MeCab-compatible: 走っ + て + いる",
       "input": "走っている",
       "expected": [
         {
-          "surface": "走って",
+          "surface": "走っ",
           "pos": "Verb",
           "lemma": "走る"
         },
         {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
           "surface": "いる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "いる"
         }
       ],
@@ -399,7 +457,7 @@
         {"surface": "に", "pos": "Particle"},
         {"surface": "つけ", "pos": "Verb", "lemma": "つける"},
         {"surface": "て", "pos": "Particle"},
-        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+        {"surface": "いる", "pos": "Verb", "lemma": "いる"}
       ],
       "tags": ["te_form", "progressive", "particle"]
     },
@@ -410,11 +468,11 @@
       "expected": [
         {"surface": "現在", "pos": "Noun"},
         {"surface": "3", "pos": "Noun"},
-        {"surface": "位", "pos": "Suffix"},
+        {"surface": "位", "pos": "Noun"},
         {"surface": "に", "pos": "Particle"},
         {"surface": "つけ", "pos": "Verb", "lemma": "つける"},
         {"surface": "て", "pos": "Particle"},
-        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+        {"surface": "いる", "pos": "Verb", "lemma": "いる"}
       ],
       "tags": ["te_form", "progressive"]
     }

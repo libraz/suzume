@@ -156,7 +156,8 @@
       "input": "昨日買ったばかり",
       "expected": [
         {"surface": "昨日", "pos": "Noun"},
-        {"surface": "買った", "pos": "Verb", "lemma": "買う"},
+        {"surface": "買っ", "pos": "Verb", "lemma": "買う"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"},
         {"surface": "ばかり", "pos": "Particle"}
       ],
       "tags": ["complex", "regression"]
@@ -167,7 +168,8 @@
       "input": "今日届いたばかりの荷物",
       "expected": [
         {"surface": "今日", "pos": "Noun"},
-        {"surface": "届いた", "pos": "Verb", "lemma": "届く"},
+        {"surface": "届い", "pos": "Verb", "lemma": "届く"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"},
         {"surface": "ばかり", "pos": "Particle"},
         {"surface": "の", "pos": "Particle"},
         {"surface": "荷物", "pos": "Noun"}
@@ -211,11 +213,13 @@
       "expected": [
         {"surface": "彼女", "pos": "Pronoun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "作った", "pos": "Verb", "lemma": "作る"},
+        {"surface": "作っ", "pos": "Verb", "lemma": "作る"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"},
         {"surface": "料理", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "とても", "pos": "Adverb"},
-        {"surface": "美味しかった", "pos": "Adjective", "lemma": "美味しい"}
+        {"surface": "美味しかっ", "pos": "Adjective", "lemma": "美味しい"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["complex"]
     },
@@ -235,7 +239,7 @@
     },
     {
       "id": "complex_experience",
-      "description": "Past experience - 活用形は1トークン",
+      "description": "Past experience - MeCab互換分割",
       "input": "子供の頃によく遊んだ場所を訪れた",
       "expected": [
         {"surface": "子供", "pos": "Noun"},
@@ -244,7 +248,7 @@
         {"surface": "に", "pos": "Particle"},
         {"surface": "よく", "pos": "Adverb"},
         {"surface": "遊ん", "pos": "Verb", "lemma": "遊ぶ"},
-        {"surface": "だ", "pos": "Auxiliary", "lemma": "た"},
+        {"surface": "だ", "pos": "Auxiliary", "lemma": "だ"},
         {"surface": "場所", "pos": "Noun"},
         {"surface": "を", "pos": "Particle"},
         {"surface": "訪れ", "pos": "Verb", "lemma": "訪れる"},
@@ -269,12 +273,13 @@
     },
     {
       "id": "multi_clause_conditional_tara",
-      "description": "Conditional sentence with tara (split: verb stem + polite aux)",
+      "description": "Conditional sentence with tara - MeCab互換分割",
       "input": "雨が降ったら、試合は中止になります",
       "expected": [
         {"surface": "雨", "pos": "Noun"},
         {"surface": "が", "pos": "Particle"},
-        {"surface": "降ったら", "pos": "Verb", "lemma": "降る"},
+        {"surface": "降っ", "pos": "Verb", "lemma": "降る"},
+        {"surface": "たら", "pos": "Auxiliary", "lemma": "た"},
         {"surface": "試合", "pos": "Noun"},
         {"surface": "は", "pos": "Particle"},
         {"surface": "中止", "pos": "Noun"},
@@ -417,7 +422,7 @@
     },
     {
       "id": "quotation_direct_speech",
-      "description": "Direct speech quotation",
+      "description": "Direct speech quotation - MeCab互換分割",
       "input": "彼は「明日行く」と言った",
       "expected": [
         {"surface": "彼", "pos": "Pronoun"},
@@ -425,7 +430,8 @@
         {"surface": "明日", "pos": "Noun"},
         {"surface": "行く", "pos": "Verb"},
         {"surface": "と", "pos": "Particle"},
-        {"surface": "言った", "pos": "Verb", "lemma": "言う"}
+        {"surface": "言っ", "pos": "Verb", "lemma": "言う"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": ["quotation"]
     },

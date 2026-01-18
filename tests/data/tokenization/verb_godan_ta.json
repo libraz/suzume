@@ -1,0 +1,81 @@
+{
+  "version": "1.0",
+  "description": "Godan Ta-row verbs (五段タ行動詞) - verbs ending in つ",
+  "cases": [
+    {
+      "id": "special_small_tsu",
+      "description": "ちょっと待って - small tsu",
+      "input": "ちょっと待って",
+      "expected": [
+        {
+          "surface": "ちょっと",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "待っ",
+          "pos": "Verb",
+          "lemma": "待つ"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "basic",
+        "special-char"
+      ]
+    },
+    {
+      "id": "onbin_medatsu_lemma",
+      "description": "目立った - MeCab-compatible split with lemma 目立つ",
+      "input": "目立った",
+      "expected": [
+        {
+          "surface": "目立っ",
+          "pos": "Verb",
+          "lemma": "目立つ"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
+        }
+      ],
+      "tags": [
+        "verb",
+        "onbin",
+        "lemma"
+      ]
+    },
+    {
+      "id": "kanji_motte_godanta",
+      "description": "持って - GodanTa te-form - MeCab-compatible split",
+      "input": "荷物を持って",
+      "expected": [
+        {
+          "surface": "荷物",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "持っ",
+          "pos": "Verb",
+          "lemma": "持つ"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
+        }
+      ],
+      "tags": [
+        "godanta",
+        "kanji-verb",
+        "te-form"
+      ]
+    }
+  ]
+}

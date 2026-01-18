@@ -76,7 +76,7 @@
     },
     {
       "id": "casual_surprise",
-      "description": "Surprise expression",
+      "description": "Surprise expression - MeCab-compatible verb+た split",
       "input": "まじで驚いた",
       "expected": [
         {
@@ -84,9 +84,14 @@
           "pos": "Adverb"
         },
         {
-          "surface": "驚いた",
+          "surface": "驚い",
           "pos": "Verb",
           "lemma": "驚く"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -95,7 +100,7 @@
     },
     {
       "id": "casual_omission",
-      "description": "Omitted particle - casual style",
+      "description": "Omitted particle - casual style - MeCab-compatible split",
       "input": "今日学校行った",
       "expected": [
         {
@@ -107,9 +112,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "行った",
+          "surface": "行っ",
           "pos": "Verb",
           "lemma": "行く"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -143,7 +153,7 @@
     },
     {
       "id": "casual_contraction_chau",
-      "description": "Contraction ちゃう - ちゃった is auxiliary form of しまう",
+      "description": "Contraction ちゃう - MeCab-compatible split: ちゃっ+た",
       "input": "食べちゃった",
       "expected": [
         {
@@ -152,9 +162,14 @@
           "lemma": "食べる"
         },
         {
-          "surface": "ちゃった",
+          "surface": "ちゃっ",
+          "pos": "Verb",
+          "lemma": "ちゃう"
+        },
+        {
+          "surface": "た",
           "pos": "Auxiliary",
-          "lemma": "しまう"
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -446,9 +461,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "います",
-          "pos": "Auxiliary",
+          "surface": "い",
+          "pos": "Verb",
           "lemma": "いる"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [
@@ -474,9 +494,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "いた",
+          "surface": "い",
           "pos": "Verb",
           "lemma": "いる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         },
         {
           "surface": "ほど",
@@ -484,7 +509,8 @@
         },
         {
           "surface": "で",
-          "pos": "Particle"
+          "pos": "Auxiliary",
+          "lemma": "だ"
         },
         {
           "surface": "は",
@@ -540,9 +566,14 @@
           "lemma": "良い"
         },
         {
-          "surface": "なった",
+          "surface": "なっ",
           "pos": "Verb",
           "lemma": "なる"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -627,13 +658,17 @@
           "pos": "Noun"
         },
         {
-          "surface": "使って",
+          "surface": "使っ",
           "pos": "Verb",
           "lemma": "使う"
         },
         {
+          "surface": "て",
+          "pos": "Particle"
+        },
+        {
           "surface": "いる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "lemma": "いる"
         },
         {
@@ -669,9 +704,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "思った",
+          "surface": "思っ",
           "pos": "Verb",
           "lemma": "思う"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         },
         {
           "surface": "より",
@@ -717,7 +757,7 @@
     },
     {
       "id": "colloquial_miteta",
-      "description": "Colloquial 見ていた → 見てた - MeCab splits 見+て+た",
+      "description": "Colloquial 見ていた → 見てた - MeCab: 見(V)+て(V,てる)+た(AUX)",
       "input": "テレビ見てた",
       "expected": [
         {
@@ -725,9 +765,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "見て",
+          "surface": "見",
           "pos": "Verb",
           "lemma": "見る"
+        },
+        {
+          "surface": "て",
+          "pos": "Verb",
+          "lemma": "てる"
         },
         {
           "surface": "た",
@@ -753,13 +798,19 @@
           "pos": "Particle"
         },
         {
-          "surface": "行って",
+          "surface": "行っ",
           "pos": "Verb",
           "lemma": "行く"
         },
         {
+          "surface": "て",
+          "pos": "Verb",
+          "lemma": "てる"
+        },
+        {
           "surface": "た",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -912,8 +963,14 @@
       "input": "頑張ったのに負けた",
       "expected": [
         {
-          "surface": "頑張った",
-          "pos": "Verb"
+          "surface": "頑張っ",
+          "pos": "Verb",
+          "lemma": "頑張る"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         },
         {
           "surface": "のに",

@@ -1,0 +1,54 @@
+{
+  "version": "1.0",
+  "description": "Godan Ba-row verbs (五段バ行動詞) - verbs ending in ぶ",
+  "cases": [
+    {
+      "id": "mixed_english_api",
+      "description": "API with を particle",
+      "input": "APIを呼ぶ",
+      "expected": [
+        {
+          "surface": "API",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "呼ぶ",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "strict",
+        "mixed",
+        "english"
+      ]
+    },
+    {
+      "id": "mixed_camelcase",
+      "description": "CamelCase function name preserved with を particle",
+      "input": "getUserDataを呼ぶ",
+      "expected": [
+        {
+          "surface": "getUserData",
+          "pos": "Noun"
+        },
+        {
+          "surface": "を",
+          "pos": "Particle"
+        },
+        {
+          "surface": "呼ぶ",
+          "pos": "Verb"
+        }
+      ],
+      "tags": [
+        "strict",
+        "mixed",
+        "english"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "version": "1.0",
+  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows",
+  "cases": [
+    {
+      "id": "character_nyan",
+      "description": "Cat-like speech にゃん",
+      "input": "食べるにゃん",
+      "expected": [
+        {
+          "surface": "食べる",
+          "pos": "Verb"
+        },
+        {
+          "surface": "にゃん",
+          "pos": "Auxiliary",
+          "lemma": "よ"
+        }
+      ],
+      "tags": [
+        "character_speech",
+        "cat"
+      ]
+    },
+    {
+      "id": "formal_noun_mono",
+      "description": "食べるもの (something to eat)",
+      "input": "食べるもの",
+      "expected": [
+        {
+          "surface": "食べる",
+          "pos": "Verb"
+        },
+        {
+          "surface": "もの",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "formal-noun"
+      ]
+    },
+    {
+      "id": "formal_noun_tokoro",
+      "description": "食べるところ (place to eat)",
+      "input": "食べるところ",
+      "expected": [
+        {
+          "surface": "食べる",
+          "pos": "Verb"
+        },
+        {
+          "surface": "ところ",
+          "pos": "Noun"
+        }
+      ],
+      "tags": [
+        "grammar",
+        "formal-noun"
+      ]
+    },
+    {
+      "id": "hiragana_verb_imasu",
+      "description": "います - polite form of verb いる (single auxiliary token)",
+      "input": "います",
+      "expected": [
+        {
+          "surface": "います",
+          "pos": "Auxiliary",
+          "lemma": "いる"
+        }
+      ],
+      "tags": [
+        "verb"
+      ]
+    },
+    {
+      "id": "hiragana_verb_imasen",
+      "description": "いません - negative polite form of verb いる (single auxiliary token)",
+      "input": "いません",
+      "expected": [
+        {
+          "surface": "いません",
+          "pos": "Auxiliary",
+          "lemma": "いる"
+        }
+      ],
+      "tags": [
+        "verb"
+      ]
+    }
+  ]
+}

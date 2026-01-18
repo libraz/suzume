@@ -471,6 +471,33 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
     return candidates;
   }
 
+  // Skip potential suru-verb patterns: 漢字2字+し followed by suru-auxiliary
+  // e.g., 勉強しちゃった → 勉強 + し + ちゃっ + た (not 勉強し + ちゃった)
+  size_t kanji_count = kanji_end - start_pos;
+  if (first_hiragana == U'し' && kanji_count >= 2) {
+    // Check for suru-auxiliary patterns following し
+    size_t next_pos = kanji_end + 1;
+    if (next_pos < codepoints.size()) {
+      char32_t next_char = codepoints[next_pos];
+      // Common suru-auxiliary starting characters
+      // ちゃ: contracted (しちゃう)
+      // て/た: te/ta form (して, した)
+      // な: negative (しない)
+      // ま: polite (します)
+      // よ: volitional (しよう)
+      // ろ/れ: imperative (しろ/しれ)
+      // ば: conditional (すれば - but follows せ not し)
+      // そ: そう pattern (しそう)
+      if (next_char == U'ち' || next_char == U'て' || next_char == U'た' ||
+          next_char == U'な' || next_char == U'ま' || next_char == U'よ' ||
+          next_char == U'ろ' || next_char == U'そ' || next_char == U'と' ||
+          next_char == U'か' || next_char == U'つ') {
+        // This looks like a suru-verb pattern - skip nominalization
+        return candidates;
+      }
+    }
+  }
+
   // Check for 1 or 2 hiragana (e.g., け or 上げ)
   size_t hiragana_end = kanji_end + 1;
 

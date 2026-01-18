@@ -360,6 +360,18 @@ ConnectionRuleResult checkAdjKuToTeParticle(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts);
 
+ConnectionRuleResult checkAdjKuToNai(const core::LatticeEdge& prev,
+                                     const core::LatticeEdge& next,
+                                     const ConnectionOptions& opts);
+
+ConnectionRuleResult checkIAdjToDesu(const core::LatticeEdge& prev,
+                                     const core::LatticeEdge& next,
+                                     const ConnectionOptions& opts);
+
+ConnectionRuleResult checkAdjStemToSugiruVerb(const core::LatticeEdge& prev,
+                                              const core::LatticeEdge& next,
+                                              const ConnectionOptions& opts);
+
 ConnectionRuleResult checkPrefixToHiraganaAdj(const core::LatticeEdge& prev,
                                               const core::LatticeEdge& next,
                                               const ConnectionOptions& opts);
@@ -428,6 +440,10 @@ ConnectionRuleResult checkKuraiAdjectiveAfterPredicate(
     const core::LatticeEdge& prev, const core::LatticeEdge& next,
     const ConnectionOptions& opts);
 
+ConnectionRuleResult checkParticleNiToIruVerb(const core::LatticeEdge& prev,
+                                              const core::LatticeEdge& next,
+                                              const ConnectionOptions& opts);
+
 ConnectionRuleResult checkMasuRenyokeiToTa(const core::LatticeEdge& prev,
                                            const core::LatticeEdge& next,
                                            const ConnectionOptions& opts);
@@ -473,6 +489,10 @@ ConnectionRuleResult checkTeParticleToAuxVerb(const core::LatticeEdge& prev,
                                               const core::LatticeEdge& next,
                                               const ConnectionOptions& opts);
 
+ConnectionRuleResult checkTeParticleToInaiVerb(const core::LatticeEdge& prev,
+                                               const core::LatticeEdge& next,
+                                               const ConnectionOptions& opts);
+
 ConnectionRuleResult checkPassiveAuxToNaiTa(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts);
@@ -491,7 +511,8 @@ ConnectionRuleResult checkCopulaDeToKuruAux(const core::LatticeEdge& prev,
                                             const core::LatticeEdge& next,
                                             const ConnectionOptions& opts);
 
-// Bonus for NOUN/ADJ → で(AUX, lemma=だ) for na-adjective copula pattern (嫌でない)
+// Bonus for ADJ → で(AUX, lemma=だ) for na-adjective copula pattern (嫌でない, 静かで)
+// Note: Only applies to ADJ, not NOUN. Regular nouns use particle で (秒速で).
 ConnectionRuleResult checkNaAdjToCopulaDe(const core::LatticeEdge& prev,
                                           const core::LatticeEdge& next,
                                           const ConnectionOptions& opts);
@@ -505,6 +526,11 @@ ConnectionRuleResult checkNaAdjToDekinaiVerb(const core::LatticeEdge& prev,
 ConnectionRuleResult checkCopulaDeToNai(const core::LatticeEdge& prev,
                                         const core::LatticeEdge& next,
                                         const ConnectionOptions& opts);
+
+// Bonus for で(AUX, lemma=だ) → ござる(AUX) for classical copula pattern
+ConnectionRuleResult checkCopulaDeToGozaru(const core::LatticeEdge& prev,
+                                           const core::LatticeEdge& next,
+                                           const ConnectionOptions& opts);
 
 // =============================================================================
 // POS-based Dispatch Helpers

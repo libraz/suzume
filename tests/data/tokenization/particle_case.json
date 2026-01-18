@@ -43,9 +43,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "降って",
+          "surface": "降っ",
           "pos": "Verb",
           "lemma": "降る"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "いる",

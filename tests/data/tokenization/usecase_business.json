@@ -910,9 +910,14 @@
           "pos": "Particle"
         },
         {
-          "surface": "います",
-          "pos": "Auxiliary",
+          "surface": "い",
+          "pos": "Verb",
           "lemma": "いる"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
         }
       ],
       "tags": [

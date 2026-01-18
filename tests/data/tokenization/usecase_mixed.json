@@ -43,7 +43,7 @@
     },
     {
       "id": "mixed_script_digit_kanji",
-      "description": "Mixed script: digit + kanji",
+      "description": "Mixed script: digit + kanji - single token",
       "input": "3月の予定",
       "expected": [
         {
@@ -65,7 +65,7 @@
     },
     {
       "id": "mixed_script_multiple_digit_kanji",
-      "description": "Mixed script: multiple digits + kanji",
+      "description": "Mixed script: multiple digits + kanji - single token",
       "input": "100人が参加",
       "expected": [
         {
@@ -206,9 +206,13 @@
           "pos": "Particle"
         },
         {
-          "surface": "使って",
+          "surface": "使っ",
           "pos": "Verb",
           "lemma": "使う"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle"
         },
         {
           "surface": "データ",
@@ -251,9 +255,14 @@
           "lemma": "買う"
         },
         {
-          "surface": "ました",
+          "surface": "まし",
           "pos": "Auxiliary",
-          "lemma": "ました"
+          "lemma": "ます"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -387,7 +396,11 @@
       "input": "国立研究所で働く",
       "expected": [
         {
-          "surface": "国立研究所",
+          "surface": "国立",
+          "pos": "Noun"
+        },
+        {
+          "surface": "研究所",
           "pos": "Noun"
         },
         {
@@ -764,9 +777,14 @@
           "pos": "Noun"
         },
         {
-          "surface": "減った",
+          "surface": "減っ",
           "pos": "Verb",
           "lemma": "減る"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -837,7 +855,7 @@
     },
     {
       "id": "number_counter_kai",
-      "description": "Times counter",
+      "description": "Times counter - single token",
       "input": "5回目の挑戦",
       "expected": [
         {
@@ -1079,17 +1097,30 @@
       "input": "「こんにちは」と言った",
       "expected": [
         {
+          "surface": "「",
+          "pos": "Symbol"
+        },
+        {
           "surface": "こんにちは",
           "pos": "Other"
+        },
+        {
+          "surface": "」",
+          "pos": "Symbol"
         },
         {
           "surface": "と",
           "pos": "Particle"
         },
         {
-          "surface": "言った",
+          "surface": "言っ",
           "pos": "Verb",
           "lemma": "言う"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         }
       ],
       "tags": [
@@ -1124,8 +1155,12 @@
       "input": "横浜市で働く",
       "expected": [
         {
-          "surface": "横浜市",
+          "surface": "横浜",
           "pos": "Noun"
+        },
+        {
+          "surface": "市",
+          "pos": "Suffix"
         },
         {
           "surface": "で",

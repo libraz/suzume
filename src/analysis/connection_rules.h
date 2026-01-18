@@ -161,12 +161,18 @@ enum class ConnectionPattern {
   RenyokeiToContractedVerb,   // VERB(renyokei) → VERB(てる/でる/とく/どく) (contracted auxiliary)
   RenyokeiToTeParticle,       // VERB(renyokei/onbinkei) → て/で(PARTICLE) (MeCab-compatible te-form split)
   TeParticleToAuxVerb,        // て/で(PARTICLE) → いる/しまう/etc. (VERB/AUX) (te-form auxiliary pattern)
+  TeParticleToInaiVerb,       // て/で(PARTICLE) → いない/いなかった(VERB) penalty (should split as い + ない)
   AdjKuToTeParticle,          // ADJ(く形) → て(PARTICLE) (MeCab-compatible kute split: 美しくて → 美しく + て)
+  AdjKuToNai,                 // ADJ(く形) → ない(AUX) bonus (高くない → 高く + ない)
+  IAdjToDesu,                 // I-ADJ(基本形) → です(AUX) bonus (美味しいです → 美味しい + です)
   ParticleDeToKuruAux,        // PARTICLE(で) → AUX(くる活用形) penalty (できます should be でき + ます)
   CopulaDeToKuruAux,          // AUX(で, lemma=だ) → くる活用形 penalty (できます should be でき + ます)
   NaAdjToCopulaDe,            // NOUN/ADJ → で(AUX, lemma=だ) bonus (嫌でない pattern)
   NaAdjToDekinaiVerb,         // NOUN/ADJ → でない(VERB, lemma=できる) penalty
-  CopulaDeToNai               // で(AUX, lemma=だ) → ない(AUX) bonus (na-adj copula negation)
+  CopulaDeToNai,              // で(AUX, lemma=だ) → ない(AUX) bonus (na-adj copula negation)
+  CopulaDeToGozaru,           // で(AUX, lemma=だ) → ござる(AUX) bonus (classical copula pattern)
+  AdjStemToSugiruVerb,        // ADJ(stem) → すぎる/がる(VERB) bonus (MeCab-compatible garu-connection)
+  ParticleNiToIruVerb         // に(PARTICLE) → いる/いた(VERB/AUX) bonus (家にいた pattern)
 };
 
 /**
