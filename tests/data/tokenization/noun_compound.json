@@ -1,397 +1,411 @@
 {
-  "version": "1.0",
-  "description": "Compound nouns",
-  "cases": [
+  "cases" : [
     {
-      "id": "usankusai_adj",
-      "description": "B27: 胡散臭い should be single adjective",
-      "input": "胡散臭い団体",
-      "expected": [
+      "description" : "B27: 胡散臭い should be single adjective",
+      "expected" : [
         {
-          "surface": "胡散臭い",
-          "pos": "Adjective",
-          "lemma": "胡散臭い"
+          "lemma" : "胡散臭い",
+          "pos" : "Adjective",
+          "surface" : "胡散臭い"
         },
         {
-          "surface": "団体",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "団体"
         }
       ],
-      "tags": [
+      "id" : "usankusai_adj",
+      "input" : "胡散臭い団体",
+      "tags" : [
         "adjective",
         "compound"
       ]
     },
     {
-      "id": "hikikomori_noun",
-      "description": "B30: 引きこもり should be single noun",
-      "input": "引きこもり",
-      "expected": [
+      "description" : "B30: 引きこもり should be single noun",
+      "expected" : [
         {
-          "surface": "引きこもり",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "引き"
+        },
+        {
+          "lemma" : "こもる",
+          "pos" : "Verb",
+          "surface" : "こもり"
         }
       ],
-      "tags": [
+      "id" : "hikikomori_noun",
+      "input" : "引きこもり",
+      "tags" : [
         "noun",
         "compound"
       ]
     },
     {
-      "id": "prefix_compound_noun",
-      "description": "お買い物 - prefix + compound noun",
-      "input": "お買い物",
-      "expected": [
+      "description" : "お買い物 - prefix + compound noun",
+      "expected" : [
         {
-          "surface": "お",
-          "pos": "Prefix"
+          "pos" : "Prefix",
+          "surface" : "お"
         },
         {
-          "surface": "買い物",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "買い物"
         }
       ],
-      "tags": [
+      "id" : "prefix_compound_noun",
+      "input" : "お買い物",
+      "tags" : [
         "prefix",
         "compound_noun"
       ]
     },
     {
-      "id": "compound_noun_nomikai",
-      "description": "飲み会 - compound noun",
-      "input": "飲み会",
-      "expected": [
+      "description" : "飲み会 - compound noun",
+      "expected" : [
         {
-          "surface": "飲み会",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "compound_noun"
-      ]
-    },
-    {
-      "id": "compound_noun_tabemono",
-      "description": "食べ物 - compound noun",
-      "input": "食べ物",
-      "expected": [
-        {
-          "surface": "食べ物",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "compound_noun"
-      ]
-    },
-    {
-      "id": "compound_noun_nomimono",
-      "description": "飲み物 - compound noun",
-      "input": "飲み物",
-      "expected": [
-        {
-          "surface": "飲み物",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "compound_noun"
-      ]
-    },
-    {
-      "id": "compound_noun_kaimono",
-      "description": "買い物 - compound noun",
-      "input": "買い物",
-      "expected": [
-        {
-          "surface": "買い物",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "compound_noun"
-      ]
-    },
-    {
-      "id": "compound_noun_kaimono_ni_iku",
-      "description": "買い物に行く - compound noun + particle + verb",
-      "input": "買い物に行く",
-      "expected": [
-        {
-          "surface": "買い物",
-          "pos": "Noun"
+          "lemma" : "飲む",
+          "pos" : "Verb",
+          "surface" : "飲み"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
-        },
-        {
-          "surface": "行く",
-          "pos": "Verb"
+          "pos" : "Noun",
+          "surface" : "会"
         }
       ],
-      "tags": [
+      "id" : "compound_noun_nomikai",
+      "input" : "飲み会",
+      "tags" : [
         "compound_noun"
       ]
     },
     {
-      "id": "kanji_hiragana_compound_tamanegi",
-      "description": "玉ねぎ - single kanji + hiragana compound noun",
-      "input": "玉ねぎ",
-      "expected": [
+      "description" : "食べ物 - compound noun",
+      "expected" : [
         {
-          "surface": "玉ねぎ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "食べ物"
         }
       ],
-      "tags": [
+      "id" : "compound_noun_tabemono",
+      "input" : "食べ物",
+      "tags" : [
+        "compound_noun"
+      ]
+    },
+    {
+      "description" : "飲み物 - compound noun",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "飲み物"
+        }
+      ],
+      "id" : "compound_noun_nomimono",
+      "input" : "飲み物",
+      "tags" : [
+        "compound_noun"
+      ]
+    },
+    {
+      "description" : "買い物 - compound noun",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "買い物"
+        }
+      ],
+      "id" : "compound_noun_kaimono",
+      "input" : "買い物",
+      "tags" : [
+        "compound_noun"
+      ]
+    },
+    {
+      "description" : "買い物に行く - compound noun + particle + verb",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "買い物"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "行く"
+        }
+      ],
+      "id" : "compound_noun_kaimono_ni_iku",
+      "input" : "買い物に行く",
+      "tags" : [
+        "compound_noun"
+      ]
+    },
+    {
+      "description" : "玉ねぎ - single kanji + hiragana compound noun",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "玉ねぎ"
+        }
+      ],
+      "id" : "kanji_hiragana_compound_tamanegi",
+      "input" : "玉ねぎ",
+      "tags" : [
         "compound_noun",
         "kanji_hiragana"
       ]
     },
     {
-      "id": "kanji_hiragana_compound_hidaruma",
-      "description": "火だるま - single kanji + hiragana compound noun",
-      "input": "火だるま",
-      "expected": [
+      "description" : "火だるま - single kanji + hiragana compound noun",
+      "expected" : [
         {
-          "surface": "火だるま",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "火"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "だるま"
         }
       ],
-      "tags": [
+      "id" : "kanji_hiragana_compound_hidaruma",
+      "input" : "火だるま",
+      "tags" : [
         "compound_noun",
         "kanji_hiragana"
       ]
     },
     {
-      "id": "kanji_hiragana_compound_mizutamari",
-      "description": "水たまり - single kanji + hiragana compound noun",
-      "input": "水たまり",
-      "expected": [
+      "description" : "水たまり - single kanji + hiragana compound noun",
+      "expected" : [
         {
-          "surface": "水たまり",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "水たまり"
         }
       ],
-      "tags": [
+      "id" : "kanji_hiragana_compound_mizutamari",
+      "input" : "水たまり",
+      "tags" : [
         "compound_noun",
         "kanji_hiragana"
       ]
     },
     {
-      "id": "kanji_hiragana_sentence",
-      "description": "玉ねぎを切る - compound in sentence",
-      "input": "玉ねぎを切る",
-      "expected": [
+      "description" : "玉ねぎを切る - compound in sentence",
+      "expected" : [
         {
-          "surface": "玉ねぎ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "玉ねぎ"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "切る",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "切る"
         }
       ],
-      "tags": [
+      "id" : "kanji_hiragana_sentence",
+      "input" : "玉ねぎを切る",
+      "tags" : [
         "compound_noun",
         "kanji_hiragana"
       ]
     },
     {
-      "id": "noun_kongo",
-      "description": "今後 is recognized as single compound noun from dictionary",
-      "input": "今後の方針",
-      "expected": [
+      "description" : "今後 is recognized as single compound noun from dictionary",
+      "expected" : [
         {
-          "surface": "今後",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "今後"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "方針",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "方針"
         }
       ],
-      "tags": [
+      "id" : "noun_kongo",
+      "input" : "今後の方針",
+      "tags" : [
         "noun",
         "compound"
       ]
     },
     {
-      "id": "compound_noun_shizengengoshori",
-      "description": "自然言語処理 stays as single compound (6 chars)",
-      "input": "自然言語処理",
-      "expected": [
+      "description" : "自然言語処理 stays as single compound (6 chars)",
+      "expected" : [
         {
-          "surface": "自然言語処理",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "自然言語処理"
         }
       ],
-      "tags": [
+      "id" : "compound_noun_shizengengoshori",
+      "input" : "自然言語処理",
+      "tags" : [
         "strict",
         "compound",
         "noun"
       ]
     },
     {
-      "id": "compound_noun_jinkouchinou",
-      "description": "人工知能 should stay as single compound",
-      "input": "人工知能",
-      "expected": [
+      "description" : "人工知能 should stay as single compound",
+      "expected" : [
         {
-          "surface": "人工知能",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "人工知能"
         }
       ],
-      "tags": [
+      "id" : "compound_noun_jinkouchinou",
+      "input" : "人工知能",
+      "tags" : [
         "strict",
         "compound",
         "noun"
       ]
     },
     {
-      "id": "compound_noun_kikaigakushuu",
-      "description": "機械学習 should stay as single compound",
-      "input": "機械学習",
-      "expected": [
+      "description" : "機械学習 should stay as single compound",
+      "expected" : [
         {
-          "surface": "機械学習",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "機械学習"
         }
       ],
-      "tags": [
+      "id" : "compound_noun_kikaigakushuu",
+      "input" : "機械学習",
+      "tags" : [
         "strict",
         "compound",
         "noun"
       ]
     },
     {
-      "id": "nitsuite_compound",
-      "description": "について should be recognized as compound particle",
-      "input": "日本について",
-      "expected": [
+      "description" : "について should be recognized as compound particle",
+      "expected" : [
         {
-          "surface": "日本",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "日本"
         },
         {
-          "surface": "について",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "について"
         }
       ],
-      "tags": [
+      "id" : "nitsuite_compound",
+      "input" : "日本について",
+      "tags" : [
         "strict",
         "particle",
         "compound"
       ]
     },
     {
-      "id": "niyotte_compound",
-      "description": "によって should be recognized as compound particle",
-      "input": "風によって",
-      "expected": [
+      "description" : "によって should be recognized as compound particle",
+      "expected" : [
         {
-          "surface": "風",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "風"
         },
         {
-          "surface": "によって",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "によって"
         }
       ],
-      "tags": [
+      "id" : "niyotte_compound",
+      "input" : "風によって",
+      "tags" : [
         "strict",
         "particle",
         "compound"
       ]
     },
     {
-      "id": "toshite_compound",
-      "description": "として should be recognized as compound particle",
-      "input": "代表として",
-      "expected": [
+      "description" : "として should be recognized as compound particle",
+      "expected" : [
         {
-          "surface": "代表",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "代表"
         },
         {
-          "surface": "として",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "として"
         }
       ],
-      "tags": [
+      "id" : "toshite_compound",
+      "input" : "代表として",
+      "tags" : [
         "strict",
         "particle",
         "compound"
       ]
     },
     {
-      "id": "ima_kanji_konka",
-      "description": "今夏 (this summer) - 今+kanji compound preserved as single token",
-      "input": "今夏",
-      "expected": [
+      "description" : "今夏 (this summer) - 今+kanji compound preserved as single token",
+      "expected" : [
         {
-          "surface": "今夏",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "今夏"
         }
       ],
-      "tags": [
+      "id" : "ima_kanji_konka",
+      "input" : "今夏",
+      "tags" : [
         "time-noun",
         "compound"
       ]
     },
     {
-      "id": "ima_kanji_konban",
-      "description": "今晩 (tonight) - 今+kanji compound preserved as single token",
-      "input": "今晩",
-      "expected": [
+      "description" : "今晩 (tonight) - 今+kanji compound preserved as single token",
+      "expected" : [
         {
-          "surface": "今晩",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "今晩"
         }
       ],
-      "tags": [
+      "id" : "ima_kanji_konban",
+      "input" : "今晩",
+      "tags" : [
         "time-noun",
         "compound"
       ]
     },
     {
-      "id": "ima_kanji_konki",
-      "description": "今期 (this term) - 今+kanji compound preserved as single token",
-      "input": "今期",
-      "expected": [
+      "description" : "今期 (this term) - 今+kanji compound preserved as single token",
+      "expected" : [
         {
-          "surface": "今期",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "今期"
         }
       ],
-      "tags": [
+      "id" : "ima_kanji_konki",
+      "input" : "今期",
+      "tags" : [
         "time-noun",
         "compound"
       ]
     },
     {
-      "id": "ima_kanji_konkai",
-      "description": "今回 (this time) - 今+kanji compound preserved as single token",
-      "input": "今回",
-      "expected": [
+      "description" : "今回 (this time) - 今+kanji compound preserved as single token",
+      "expected" : [
         {
-          "surface": "今回",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "今回"
         }
       ],
-      "tags": [
+      "id" : "ima_kanji_konkai",
+      "input" : "今回",
+      "tags" : [
         "time-noun",
         "compound"
       ]
     }
-  ]
+  ],
+  "description" : "Compound nouns",
+  "version" : "1.0"
 }

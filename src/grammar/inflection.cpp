@@ -26,7 +26,7 @@ Inflection::matchAuxiliaries(std::string_view surface) const {
       size_t start = surface.size() - aux.surface.size();
       if (surface.substr(start) == aux.surface) {
         matches.emplace_back(&aux, aux.surface.size());
-        SUZUME_DEBUG_LOG("  [AUX MATCH] \"" << surface << "\" ends with \""
+        SUZUME_DEBUG_LOG_VERBOSE("  [AUX MATCH] \"" << surface << "\" ends with \""
                          << aux.surface << "\" (lemma=" << aux.lemma
                          << ", left_id=0x" << std::hex << aux.left_id
                          << ", right_id=0x" << aux.right_id
@@ -253,7 +253,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         std::string_view first_char = suffix_str.substr(0, core::kJapaneseCharBytes);
         if (utf8::equalsAny(first_char, {"で", "だ"})) {
           candidate.confidence -= 0.6F;  // Strong penalty
-          SUZUME_DEBUG_LOG("  ichidan_voiced_te_ta_invalid: -0.6\n");
+          SUZUME_DEBUG_LOG_VERBOSE("  ichidan_voiced_te_ta_invalid: -0.6\n");
         }
       }
 
@@ -265,7 +265,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         // Use starts_with for safer comparison
         if (suffix_str.rfind("てた", 0) == 0 || suffix_str.rfind("でた", 0) == 0) {
           candidate.confidence -= inflection::kPenaltyIchidanContractedProgressivePast;
-          SUZUME_DEBUG_LOG("  ichidan_contracted_progressive_past: -"
+          SUZUME_DEBUG_LOG_VERBOSE("  ichidan_contracted_progressive_past: -"
                             << inflection::kPenaltyIchidanContractedProgressivePast << "\n");
         }
       }
@@ -282,14 +282,14 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
           // Check if this is analyzing as 〜てる/〜でる form
           // These stems (見て, 食べて) are te-forms, not contracted progressive stems
           candidate.confidence -= inflection::kPenaltyIchidanContractedProgressivePast;
-          SUZUME_DEBUG_LOG("  ichidan_contracted_progressive_stem: -"
+          SUZUME_DEBUG_LOG_VERBOSE("  ichidan_contracted_progressive_stem: -"
                             << inflection::kPenaltyIchidanContractedProgressivePast << "\n");
         }
       }
 
       candidate.morphemes = aux_chain;
 
-      SUZUME_DEBUG_LOG("  [STEM MATCH] \"" << remaining << "\" → base=\""
+      SUZUME_DEBUG_LOG_VERBOSE("  [STEM MATCH] \"" << remaining << "\" → base=\""
                         << base_form << "\" stem=\"" << stem
                         << "\" type=" << static_cast<int>(actual_verb_type)
                         << " suffix=\"" << suffix_str
@@ -347,13 +347,13 @@ std::vector<InflectionCandidate> Inflection::analyze(
     std::shared_lock<std::shared_mutex> read_lock(cache_mutex_);
     auto iter = cache_.find(key);
     if (iter != cache_.end()) {
-      SUZUME_DEBUG_LOG("[INFLECTION] \"" << surface << "\" (cached, "
+      SUZUME_DEBUG_LOG_VERBOSE("[INFLECTION] \"" << surface << "\" (cached, "
                         << iter->second.size() << " candidates)\n");
       return iter->second;
     }
   }
 
-  SUZUME_DEBUG_LOG("[INFLECTION] Analyzing \"" << surface << "\"\n");
+  SUZUME_DEBUG_LOG_VERBOSE("[INFLECTION] Analyzing \"" << surface << "\"\n");
 
   std::vector<InflectionCandidate> candidates;
   candidates.reserve(32);  // Typical max candidates
@@ -434,17 +434,25 @@ std::vector<InflectionCandidate> Inflection::analyze(
       });
   candidates.erase(dup_end, candidates.end());
 
-  // Debug: print final candidates
-  SUZUME_DEBUG_IF(!candidates.empty()) {
-    SUZUME_DEBUG_STREAM << "[INFLECTION] Results for \"" << surface << "\":\n";
-    for (size_t i = 0; i < candidates.size() && i < 5; ++i) {
-      const auto& c = candidates[i];
-      SUZUME_DEBUG_STREAM << "  " << (i + 1) << ". base=\"" << c.base_form
-                          << "\" type=" << static_cast<int>(c.verb_type)
-                          << " conf=" << c.confidence << "\n";
-    }
-    if (candidates.size() > 5) {
-      SUZUME_DEBUG_STREAM << "  ... and " << (candidates.size() - 5) << " more\n";
+  // Debug: print final candidates (level 1: top candidate only, level 2: all)
+  SUZUME_DEBUG_IF(!candidates.empty() && candidates[0].confidence >= 0.5F) {
+    SUZUME_DEBUG_STREAM << "[INFLECTION] \"" << surface << "\" → "
+                        << candidates[0].base_form << " (type="
+                        << static_cast<int>(candidates[0].verb_type)
+                        << ", conf=" << candidates[0].confidence << ")\n";
+  }
+  SUZUME_DEBUG_VERBOSE_BLOCK {
+    if (!candidates.empty()) {
+      SUZUME_DEBUG_STREAM << "[INFLECTION] Full results for \"" << surface << "\":\n";
+      for (size_t i = 0; i < candidates.size() && i < 5; ++i) {
+        const auto& c = candidates[i];
+        SUZUME_DEBUG_STREAM << "  " << (i + 1) << ". base=\"" << c.base_form
+                            << "\" type=" << static_cast<int>(c.verb_type)
+                            << " conf=" << c.confidence << "\n";
+      }
+      if (candidates.size() > 5) {
+        SUZUME_DEBUG_STREAM << "  ... and " << (candidates.size() - 5) << " more\n";
+      }
     }
   }
 

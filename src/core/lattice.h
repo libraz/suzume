@@ -43,6 +43,7 @@ struct LatticeEdge {
   uint32_t end{0};                         // End position (character index)
   std::string_view surface;                // Surface string (StringPool reference)
   PartOfSpeech pos{PartOfSpeech::Unknown}; // Part of speech
+  ExtendedPOS extended_pos{ExtendedPOS::Unknown}; // Extended POS for fine-grained bigram
   float cost{0.0F};                        // Cost
   EdgeFlags flags{EdgeFlags::None};        // Flags
   std::string_view lemma;                  // Lemma (optional)
@@ -111,6 +112,7 @@ class Lattice {
    * @param origin Candidate origin for debug (optional)
    * @param origin_confidence Origin confidence for debug (optional)
    * @param origin_detail Origin detail pattern for debug (optional)
+   * @param extended_pos Extended POS for bigram (optional, defaults from pos)
    * @return Edge ID
    */
   size_t addEdge(std::string_view surface, uint32_t start, uint32_t end,
@@ -120,7 +122,8 @@ class Lattice {
                  std::string_view reading = {},
                  CandidateOrigin origin = CandidateOrigin::Unknown,
                  float origin_confidence = 0.0F,
-                 std::string_view origin_detail = {});
+                 std::string_view origin_detail = {},
+                 ExtendedPOS extended_pos = ExtendedPOS::Unknown);
 
   /**
    * @brief Get all edges starting at a position

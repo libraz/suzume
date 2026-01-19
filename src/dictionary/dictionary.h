@@ -35,25 +35,19 @@ enum class ConjugationType : uint8_t {
 };
 
 /**
- * @brief Dictionary entry
+ * @brief Dictionary entry (simplified v0.8)
+ *
+ * Design principles:
+ *   1. No per-entry cost - cost is derived from ExtendedPOS via getCategoryCost()
+ *   2. No flags - use ExtendedPOS categories (e.g., NounFormal) instead
+ *   3. No conjugation type - lemmatizer derives from surface/lemma
+ *   4. No reading - not needed for core functionality
  */
 struct DictionaryEntry {
-  std::string surface;       // Surface string
-  core::PartOfSpeech pos;    // Part of speech
-  float cost{};              // Cost (lower = preferred)
-  std::string lemma;         // Lemma (optional)
-
-  // Flags
-  bool is_prefix = false;       // Prefix match flag
-  bool is_formal_noun = false;  // Formal noun flag
-  bool is_low_info = false;     // Low information word flag
-
-  // Conjugation type
-  ConjugationType conj_type{ConjugationType::None};
-
-  // Reading in hiragana (for auto-expansion of adjectives)
-  // Placed last for backward compatibility with existing aggregate init
-  std::string reading;
+  std::string surface;                // Surface string
+  core::PartOfSpeech pos;             // Part of speech
+  core::ExtendedPOS extended_pos{core::ExtendedPOS::Unknown};  // Extended POS
+  std::string lemma;                  // Lemma (optional)
 };
 
 /**

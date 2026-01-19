@@ -151,7 +151,7 @@ std::vector<core::Morpheme> Postprocessor::convertPrefixVerbToNoun(
           m.pos = core::PartOfSpeech::Noun;
           // Keep surface as lemma for nominalized form
           m.lemma = m.surface;
-          SUZUME_DEBUG_LOG("[POSTPROC] Nominalized: " << m.surface
+          SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Nominalized: " << m.surface
                            << " (VERB → NOUN after " << prefix_surface << ")\n");
         }
       }
@@ -344,7 +344,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(
         merged.end = next.end;
         merged.end_pos = next.end_pos;
 
-        SUZUME_DEBUG_LOG("[POSTPROC] Merged number+unit: \""
+        SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Merged number+unit: \""
                          << current.surface << "\" + \"" << next.surface
                          << "\" → \"" << merged.surface << "\"\n");
 
@@ -368,7 +368,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(
         merged.end = next.end;
         merged.end_pos = next.end_pos;
 
-        SUZUME_DEBUG_LOG("[POSTPROC] Merged numeric+suffix: \""
+        SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Merged numeric+suffix: \""
                          << current.surface << "\" + \"" << next.surface
                          << "\" → \"" << merged.surface << "\"\n");
 
@@ -413,7 +413,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNaAdjectiveNa(
         if (last_char == "い" &&
             !utf8::equalsAny(check_str, {"きれい", "きらい", "嫌い", "みたい"})) {
           is_na_adj = false;
-          SUZUME_DEBUG_LOG("[POSTPROC] Detected i-adjective: \"" << check_str
+          SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Detected i-adjective: \"" << check_str
                            << "\", not merging with な\n");
         }
       }
@@ -426,7 +426,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNaAdjectiveNa(
         merged.end_pos = morphemes[idx + 1].end_pos;
         // Keep lemma as the base form (e.g., 静か)
 
-        SUZUME_DEBUG_LOG("[POSTPROC] Merged na-adj: \""
+        SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Merged na-adj: \""
                          << current.surface << "\" + \"な\" → \""
                          << merged.surface << "\"\n");
 

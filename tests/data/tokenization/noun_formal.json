@@ -1,198 +1,178 @@
 {
-  "version": "1.0",
-  "description": "Formal nouns (こと、もの、ところ)",
-  "cases": [
+  "cases" : [
     {
-      "id": "tokoro_formal_noun",
-      "description": "勉強させられていたところだった - ところ formal noun - MeCab互換分割",
-      "input": "勉強させられていたところだった",
-      "expected": [
+      "description" : "勉強させられていたところだった - ところ formal noun - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "勉強",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "勉強"
         },
         {
-          "surface": "さ",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "さ"
         },
         {
-          "surface": "せ",
-          "pos": "Verb",
-          "lemma": "せる"
+          "lemma" : "せる",
+          "pos" : "Verb",
+          "surface" : "せ"
         },
         {
-          "surface": "られ",
-          "pos": "Verb",
-          "lemma": "られる"
+          "lemma" : "られる",
+          "pos" : "Verb",
+          "surface" : "られ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "い",
-          "pos": "Verb",
-          "lemma": "いる"
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         },
         {
-          "surface": "ところ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "ところ"
         },
         {
-          "surface": "だっ",
-          "pos": "Auxiliary",
-          "lemma": "だ"
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "だっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "tokoro_formal_noun",
+      "input" : "勉強させられていたところだった",
+      "tags" : [
         "formal_noun"
       ]
     },
     {
-      "id": "formal_noun_tsuke_split",
-      "description": "日付けで should split 付け as suffix from で",
-      "input": "日付けで",
-      "expected": [
+      "description" : "日付けで should split 付け as suffix from で",
+      "expected" : [
         {
-          "surface": "日",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "日"
         },
         {
-          "surface": "付け",
-          "pos": "Suffix"
+          "pos" : "Suffix",
+          "surface" : "付け"
         },
         {
-          "surface": "で",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "で"
         }
       ],
-      "tags": [
+      "id" : "formal_noun_tsuke_split",
+      "input" : "日付けで",
+      "tags" : [
         "formal_noun"
       ]
     },
     {
-      "id": "formal_noun_date_with_tsuke",
-      "description": "2024年12月23日付けで",
-      "input": "2024年12月23日付けで",
-      "expected": [
+      "description" : "2024年12月23日付けで",
+      "expected" : [
         {
-          "surface": "2024",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "2024年12月23日"
         },
         {
-          "surface": "年",
-          "pos": "Suffix"
+          "pos" : "Noun",
+          "surface" : "付け"
         },
         {
-          "surface": "12",
-          "pos": "Noun"
-        },
-        {
-          "surface": "月",
-          "pos": "Noun"
-        },
-        {
-          "surface": "23",
-          "pos": "Noun"
-        },
-        {
-          "surface": "日",
-          "pos": "Suffix"
-        },
-        {
-          "surface": "付け",
-          "pos": "Suffix"
-        },
-        {
-          "surface": "で",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "で"
         }
       ],
-      "tags": [
+      "id" : "formal_noun_date_with_tsuke",
+      "input" : "2024年12月23日付けで",
+      "tags" : [
         "formal_noun",
         "date"
       ]
     },
     {
-      "id": "formal_noun_hazu_da",
-      "description": "はずだ - formal noun hazu + copula",
-      "input": "はずだ",
-      "expected": [
+      "description" : "はずだ - formal noun hazu + copula",
+      "expected" : [
         {
-          "surface": "はず",
-          "pos": "Noun",
-          "lemma": "はず"
+          "lemma" : "はず",
+          "pos" : "Noun",
+          "surface" : "はず"
         },
         {
-          "surface": "だ",
-          "pos": "Auxiliary",
-          "lemma": "だ"
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "だ"
         }
       ],
-      "tags": [
+      "id" : "formal_noun_hazu_da",
+      "input" : "はずだ",
+      "tags" : [
         "formal_noun"
       ]
     },
     {
-      "id": "formal_noun_hazu_ganai",
-      "description": "はずがない - formal noun hazu + negative",
-      "input": "はずがない",
-      "expected": [
+      "description" : "はずがない - formal noun hazu + negative",
+      "expected" : [
         {
-          "surface": "はず",
-          "pos": "Noun",
-          "lemma": "はず"
+          "lemma" : "はず",
+          "pos" : "Noun",
+          "surface" : "はず"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "formal_noun_hazu_ganai",
+      "input" : "はずがない",
+      "tags" : [
         "formal_noun"
       ]
     },
     {
-      "id": "noun_hoka",
-      "description": "ほか should be single Noun (not ほ+か)",
-      "input": "思いのほかうまい",
-      "expected": [
+      "description" : "ほか should be single Noun (not ほ+か)",
+      "expected" : [
         {
-          "surface": "思い",
-          "pos": "Verb",
-          "lemma": "思う"
+          "lemma" : "思う",
+          "pos" : "Verb",
+          "surface" : "思い"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "ほか",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "ほか"
         },
         {
-          "surface": "うまい",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "うまい"
         }
       ],
-      "tags": [
+      "id" : "noun_hoka",
+      "input" : "思いのほかうまい",
+      "tags" : [
         "noun",
         "formal_noun"
       ]
     }
-  ]
+  ],
+  "description" : "Formal nouns (こと、もの、ところ)",
+  "version" : "1.0"
 }

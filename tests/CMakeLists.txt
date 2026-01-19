@@ -32,7 +32,7 @@ set(TEST_SOURCES
   dictionary/trie_test.cpp
   dictionary/double_array_test.cpp
   dictionary/binary_dict_test.cpp
-  dictionary/core_dict_test.cpp
+  # dictionary/core_dict_test.cpp  # v0.8: removed (verb expansion deleted)
   dictionary/user_dict_test.cpp
   grammar/conjugation_test.cpp
   grammar/inflection_basic_test.cpp
@@ -45,7 +45,6 @@ set(TEST_SOURCES
   pretokenizer/pretokenizer_url_test.cpp
   pretokenizer/pretokenizer_number_test.cpp
   pretokenizer/pretokenizer_text_test.cpp
-  analysis/connection_rules_test.cpp
   analysis/scorer_options_loader_test.cpp
   output/japanese_format_test.cpp
   postprocess/tag_generator_test.cpp

@@ -11,6 +11,7 @@
 
 #include "analysis/tokenizer.h"
 
+#include "analysis/category_cost.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "join_candidates.h"
@@ -37,6 +38,8 @@ core::Lattice Tokenizer::buildLattice(
 
   // Process each position
   for (size_t pos = 0; pos < codepoints.size(); ++pos) {
+    size_t before_count = lattice.edgesAt(pos).size();
+
     // Add dictionary candidates
     addDictionaryCandidates(lattice, text, codepoints, pos);
 
@@ -69,6 +72,11 @@ core::Lattice Tokenizer::buildLattice(
 
     // Add te-form + auxiliary verb candidates (学んで + いく → 学んで + いきたい)
     addTeFormAuxiliaryCandidates(lattice, text, codepoints, pos, char_types);
+
+    // Log candidate count per position
+    size_t after_count = lattice.edgesAt(pos).size();
+    SUZUME_DEBUG_LOG("[LATTICE] pos=" << pos << " candidates=" << after_count
+                      << " (+" << (after_count - before_count) << ")\n");
   }
 
   // Fallback: ensure every position has at least one edge
@@ -114,19 +122,23 @@ void Tokenizer::addDictionaryCandidates(
     size_t end_pos = start_pos + result.length;
 
     // Create edge
+    // v0.8: flags derived from extended_pos, cost from getCategoryCost()
     uint8_t flags = core::LatticeEdge::kFromDictionary;
-    if (result.entry->is_formal_noun) {
+    if (result.entry->extended_pos == core::ExtendedPOS::NounFormal) {
       flags |= core::LatticeEdge::kIsFormalNoun;
     }
-    if (result.entry->is_low_info) {
-      flags |= core::LatticeEdge::kIsLowInfo;
-    }
+    // Note: is_low_info removed - can be derived from extended_pos if needed
+
+    // Cost is now derived from ExtendedPOS via getCategoryCost()
+    float cost = analysis::getCategoryCost(result.entry->extended_pos);
 
     lattice.addEdge(result.entry->surface,
                     static_cast<uint32_t>(start_pos),
                     static_cast<uint32_t>(end_pos), result.entry->pos,
-                    result.entry->cost, flags, result.entry->lemma,
-                    result.entry->conj_type, result.entry->reading);
+                    cost, flags, result.entry->lemma,
+                    dictionary::ConjugationType::None, {},  // conj_type and reading removed
+                    core::CandidateOrigin::Dictionary, 1.0F, {},
+                    result.entry->extended_pos);
 
     // Emphatic suffix pattern: word + っ/ッ/ー/ぁぃぅぇぉ/ァィゥェォ (colloquial emphasis)
     // E.g., です→ですっ, ます→ますっ, 行く→行くっ, やばいーー, だぁー
@@ -232,11 +244,12 @@ void Tokenizer::addDictionaryCandidates(
                         static_cast<uint32_t>(start_pos),
                         static_cast<uint32_t>(emphatic_end),
                         result.entry->pos,
-                        result.entry->cost + cost_adjustment,
+                        cost + cost_adjustment,  // cost from getCategoryCost()
                         flags,
                         result.entry->lemma,
-                        result.entry->conj_type,
-                        result.entry->reading);
+                        dictionary::ConjugationType::None, {},  // v0.8: removed
+                        core::CandidateOrigin::Dictionary, 1.0F, {},
+                        result.entry->extended_pos);
       }
     }
   }
@@ -445,25 +458,25 @@ void Tokenizer::addUnknownCandidates(
                          candidate.end - candidate.start > max_dict_length);
     if (exceeds_dict) {
       if (skip_penalty) {
-        SUZUME_DEBUG_LOG("[TOK_SKIP] \"" << candidate.surface << "\" ("
+        SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" ("
                           << core::posToString(candidate.pos) << "): "
                           << "skip exceeds_dict_length (" << skip_reason << ")\n");
       } else if (skip_dict_penalty) {
-        SUZUME_DEBUG_LOG("[TOK_SKIP] \"" << candidate.surface << "\" ("
+        SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" ("
                           << core::posToString(candidate.pos) << "): "
                           << "skip exceeds_dict_length (" << skip_dict_reason << ")\n");
       } else if (is_suru_verb) {
-        SUZUME_DEBUG_LOG("[TOK_SKIP] \"" << candidate.surface << "\" ("
+        SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" ("
                           << core::posToString(candidate.pos) << "): "
                           << "skip exceeds_dict_length (suru_verb)\n");
       } else if (candidate.has_suffix) {
-        SUZUME_DEBUG_LOG("[TOK_SKIP] \"" << candidate.surface << "\" ("
+        SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" ("
                           << core::posToString(candidate.pos) << "): "
                           << "skip exceeds_dict_length (has_suffix)\n");
       } else {
         float penalty = reduced_penalty ? 1.0F : 3.5F;
         adjusted_cost += penalty;
-        SUZUME_DEBUG_LOG("[TOK_UNK] \"" << candidate.surface << "\" ("
+        SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface << "\" ("
                           << core::posToString(candidate.pos) << "): +"
                           << penalty << " (exceeds_dict_length"
                           << (reduced_penalty ? ", pure_hiragana" : "")
@@ -506,7 +519,7 @@ void Tokenizer::addUnknownCandidates(
               size_t suffix_len = candidate.end - hiragana_start;
               if (result.length == suffix_len) {
                 adjusted_cost += 1.5F;
-                SUZUME_DEBUG_LOG("[TOK_UNK] \"" << candidate.surface
+                SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface
                                   << "\": +1.5 (particle_suffix=\""
                                   << hiragana_suffix << "\")\n");
                 break;
@@ -529,11 +542,15 @@ void Tokenizer::addUnknownCandidates(
                     static_cast<uint32_t>(candidate.end), candidate.pos,
                     adjusted_cost, flags, candidate.lemma, candidate.conj_type,
                     {},  // reading
-                    candidate.origin, candidate.confidence, candidate.pattern);
+                    candidate.origin, candidate.confidence, candidate.pattern,
+                    candidate.extended_pos);
 #else
     lattice.addEdge(surface_str, static_cast<uint32_t>(candidate.start),
                     static_cast<uint32_t>(candidate.end), candidate.pos,
-                    adjusted_cost, flags, candidate.lemma, candidate.conj_type);
+                    adjusted_cost, flags, candidate.lemma, candidate.conj_type,
+                    {},  // reading
+                    core::CandidateOrigin::Unknown, 0.0F, {},  // debug params
+                    candidate.extended_pos);
 #endif
   }
 }

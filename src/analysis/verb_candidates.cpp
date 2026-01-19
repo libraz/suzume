@@ -108,20 +108,15 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
           continue;
         }
 
-        // Verify conjugation type matches
-        auto dict_verb_type =
-            grammar::conjTypeToVerbType(result.entry->conj_type);
-        if (dict_verb_type == infl_cand.verb_type) {
-          // Found a match! Generate candidate
-          // Note: Don't set lemma here - let lemmatizer derive it more accurately
-          // Only set conj_type for conjugation pattern info
-          candidates.push_back(makeVerbCandidate(
-              surface, start_pos, end_pos, verb_opts.base_cost_low, "",
-              grammar::verbTypeToConjType(infl_cand.verb_type),
-              false, CandidateOrigin::VerbCompound, infl_cand.confidence,
-              grammar::verbTypeToString(infl_cand.verb_type).data()));
-          return candidates;  // Return first valid match
-        }
+        // v0.8: conj_type removed - just verify verb exists in dictionary
+        // Found a match! Generate candidate
+        // Note: Don't set lemma here - let lemmatizer derive it more accurately
+        candidates.push_back(makeVerbCandidate(
+            surface, start_pos, end_pos, verb_opts.base_cost_low, "",
+            dictionary::ConjugationType::None,  // v0.8: conj_type no longer used
+            false, CandidateOrigin::VerbCompound, infl_cand.confidence,
+            grammar::verbTypeToString(infl_cand.verb_type).data()));
+        return candidates;  // Return first valid match
       }
     }
   }

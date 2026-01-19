@@ -8,8 +8,8 @@
 // Provides partial override capability - only specified fields are updated.
 //
 // Environment variable format: SUZUME_SCORER_{SECTION}_{KEY}=value
-//   SECTION: EDGE, CONN, JOIN, SPLIT
-//   KEY: Field name (e.g., penalty_invalid_adj_sou)
+//   SECTION: JOIN, SPLIT, UNARY, BIGRAM, VERB, INFL
+//   KEY: Field name (e.g., compound_verb_bonus)
 //
 // Priority: Default < JSON file < Environment variables
 // =============================================================================
@@ -25,7 +25,6 @@
 #endif
 
 #include "candidate_options.h"
-#include "connection_rule_options.h"
 #include "scorer.h"
 
 namespace suzume::analysis {
@@ -82,12 +81,6 @@ class ScorerOptionsLoader {
 #endif
 
  private:
-  /// Apply edge options from JSON
-  static void applyEdgeOptions(EdgeOptions& opts, const JsonValue& json);
-
-  /// Apply connection options from JSON
-  static void applyConnectionOptions(ConnectionOptions& opts, const JsonValue& json);
-
   /// Apply join options from JSON
   static void applyJoinOptions(JoinOptions& opts, const JsonValue& json);
 
@@ -310,68 +303,6 @@ inline bool ScorerOptionsLoader::Parser::match(char c) {
     if (v && v->isNumber()) opts.field = v->asFloat(); \
   } while (0)
 
-inline void ScorerOptionsLoader::applyEdgeOptions(EdgeOptions& opts, const JsonValue& json) {
-  SET_OPT(opts, penalty_invalid_adj_sou, json, "penalty_invalid_adj_sou");
-  SET_OPT(opts, penalty_invalid_tai_pattern, json, "penalty_invalid_tai_pattern");
-  SET_OPT(opts, penalty_verb_aux_in_adj, json, "penalty_verb_aux_in_adj");
-  SET_OPT(opts, penalty_shimai_as_adj, json, "penalty_shimai_as_adj");
-  SET_OPT(opts, penalty_verb_onbin_as_adj, json, "penalty_verb_onbin_as_adj");
-  SET_OPT(opts, penalty_short_stem_hiragana_adj, json, "penalty_short_stem_hiragana_adj");
-  SET_OPT(opts, penalty_verb_tai_rashii, json, "penalty_verb_tai_rashii");
-  SET_OPT(opts, penalty_verb_nai_pattern, json, "penalty_verb_nai_pattern");
-  SET_OPT(opts, bonus_unified_verb_aux, json, "bonus_unified_verb_aux");
-}
-
-inline void ScorerOptionsLoader::applyConnectionOptions(ConnectionOptions& opts, const JsonValue& json) {
-  SET_OPT(opts, penalty_copula_after_verb, json, "penalty_copula_after_verb");
-  SET_OPT(opts, penalty_ichidan_renyokei_te, json, "penalty_ichidan_renyokei_te");
-  SET_OPT(opts, bonus_tai_after_renyokei, json, "bonus_tai_after_renyokei");
-  SET_OPT(opts, penalty_yasui_after_renyokei, json, "penalty_yasui_after_renyokei");
-  SET_OPT(opts, penalty_nagara_split, json, "penalty_nagara_split");
-  SET_OPT(opts, penalty_sou_after_renyokei, json, "penalty_sou_after_renyokei");
-  SET_OPT(opts, penalty_te_form_split, json, "penalty_te_form_split");
-  SET_OPT(opts, penalty_taku_te_split, json, "penalty_taku_te_split");
-  SET_OPT(opts, penalty_takute_after_renyokei, json, "penalty_takute_after_renyokei");
-  SET_OPT(opts, bonus_conditional_verb_to_verb, json, "bonus_conditional_verb_to_verb");
-  SET_OPT(opts, bonus_verb_renyokei_compound_aux, json, "bonus_verb_renyokei_compound_aux");
-  SET_OPT(opts, penalty_toku_contraction_split, json, "penalty_toku_contraction_split");
-  SET_OPT(opts, penalty_teku_re_missegmentation, json, "penalty_teku_re_missegmentation");
-  SET_OPT(opts, bonus_te_form_verb_to_verb, json, "bonus_te_form_verb_to_verb");
-  SET_OPT(opts, bonus_rashii_after_predicate, json, "bonus_rashii_after_predicate");
-  SET_OPT(opts, penalty_tai_after_aux, json, "penalty_tai_after_aux");
-  SET_OPT(opts, penalty_masen_de_split, json, "penalty_masen_de_split");
-  SET_OPT(opts, penalty_invalid_single_char_aux, json, "penalty_invalid_single_char_aux");
-  SET_OPT(opts, penalty_te_form_ta_contraction, json, "penalty_te_form_ta_contraction");
-  SET_OPT(opts, penalty_noun_mai, json, "penalty_noun_mai");
-  SET_OPT(opts, penalty_short_aux_after_particle, json, "penalty_short_aux_after_particle");
-  SET_OPT(opts, bonus_noun_mitai, json, "bonus_noun_mitai");
-  SET_OPT(opts, bonus_verb_mitai, json, "bonus_verb_mitai");
-  SET_OPT(opts, penalty_iru_aux_after_noun, json, "penalty_iru_aux_after_noun");
-  SET_OPT(opts, bonus_iru_aux_after_te_form, json, "bonus_iru_aux_after_te_form");
-  SET_OPT(opts, bonus_shimau_aux_after_te_form, json, "bonus_shimau_aux_after_te_form");
-  SET_OPT(opts, bonus_sou_aux_after_renyokei, json, "bonus_sou_aux_after_renyokei");
-  SET_OPT(opts, penalty_character_speech_split, json, "penalty_character_speech_split");
-  SET_OPT(opts, bonus_adj_ku_naru, json, "bonus_adj_ku_naru");
-  SET_OPT(opts, penalty_compound_aux_after_renyokei, json, "penalty_compound_aux_after_renyokei");
-  SET_OPT(opts, penalty_yoru_night_after_ni, json, "penalty_yoru_night_after_ni");
-  SET_OPT(opts, penalty_formal_noun_before_kanji, json, "penalty_formal_noun_before_kanji");
-  SET_OPT(opts, penalty_same_particle_repeated, json, "penalty_same_particle_repeated");
-  SET_OPT(opts, penalty_suspicious_particle_sequence, json, "penalty_suspicious_particle_sequence");
-  SET_OPT(opts, penalty_hiragana_noun_starts_with_particle, json, "penalty_hiragana_noun_starts_with_particle");
-  SET_OPT(opts, penalty_particle_before_single_hiragana_other, json, "penalty_particle_before_single_hiragana_other");
-  SET_OPT(opts, penalty_particle_before_multi_hiragana_other, json, "penalty_particle_before_multi_hiragana_other");
-  SET_OPT(opts, bonus_shi_after_i_adj, json, "bonus_shi_after_i_adj");
-  SET_OPT(opts, bonus_shi_after_verb, json, "bonus_shi_after_verb");
-  SET_OPT(opts, bonus_shi_after_aux, json, "bonus_shi_after_aux");
-  SET_OPT(opts, penalty_shi_after_noun, json, "penalty_shi_after_noun");
-  SET_OPT(opts, penalty_na_particle_after_kanji_noun, json,
-          "penalty_na_particle_after_kanji_noun");
-  SET_OPT(opts, penalty_suffix_at_start, json, "penalty_suffix_at_start");
-  SET_OPT(opts, penalty_suffix_after_symbol, json, "penalty_suffix_after_symbol");
-  SET_OPT(opts, penalty_prefix_before_verb, json, "penalty_prefix_before_verb");
-  SET_OPT(opts, penalty_noun_before_verb_aux, json, "penalty_noun_before_verb_aux");
-}
-
 inline void ScorerOptionsLoader::applyJoinOptions(JoinOptions& opts, const JsonValue& json) {
   SET_OPT(opts, compound_verb_bonus, json, "compound_verb_bonus");
   SET_OPT(opts, verified_v1_bonus, json, "verified_v1_bonus");
@@ -556,18 +487,6 @@ inline bool ScorerOptionsLoader::loadFromFile(const std::string& path, ScorerOpt
     return false;
   }
 
-  // Apply connection_rules section
-  if (auto* conn_rules = root.get("connection_rules")) {
-    if (conn_rules->isObject()) {
-      if (auto* edge = conn_rules->get("edge")) {
-        if (edge->isObject()) applyEdgeOptions(options.connection_rules.edge, *edge);
-      }
-      if (auto* conn = conn_rules->get("connection")) {
-        if (conn->isObject()) applyConnectionOptions(options.connection_rules.connection, *conn);
-      }
-    }
-  }
-
   // Apply candidates section
   if (auto* cands = root.get("candidates")) {
     if (cands->isObject()) {
@@ -644,74 +563,6 @@ inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
   using namespace env_override_internal;
   int count = 0;
   float size_helper = 0.0F;  // Helper for size_t conversions
-
-  // Edge options (SUZUME_SCORER_EDGE_*)
-  {
-    auto& opts = options.connection_rules.edge;
-    TRY_ENV("EDGE", penalty_invalid_adj_sou);
-    TRY_ENV("EDGE", penalty_invalid_tai_pattern);
-    TRY_ENV("EDGE", penalty_verb_aux_in_adj);
-    TRY_ENV("EDGE", penalty_shimai_as_adj);
-    TRY_ENV("EDGE", penalty_verb_onbin_as_adj);
-    TRY_ENV("EDGE", penalty_short_stem_hiragana_adj);
-    TRY_ENV("EDGE", penalty_verb_tai_rashii);
-    TRY_ENV("EDGE", penalty_verb_nai_pattern);
-    TRY_ENV("EDGE", bonus_unified_verb_aux);
-  }
-
-  // Connection options (SUZUME_SCORER_CONN_*)
-  {
-    auto& opts = options.connection_rules.connection;
-    TRY_ENV("CONN", penalty_copula_after_verb);
-    TRY_ENV("CONN", penalty_ichidan_renyokei_te);
-    TRY_ENV("CONN", bonus_tai_after_renyokei);
-    TRY_ENV("CONN", penalty_yasui_after_renyokei);
-    TRY_ENV("CONN", penalty_nagara_split);
-    TRY_ENV("CONN", penalty_sou_after_renyokei);
-    TRY_ENV("CONN", penalty_te_form_split);
-    TRY_ENV("CONN", penalty_taku_te_split);
-    TRY_ENV("CONN", penalty_takute_after_renyokei);
-    TRY_ENV("CONN", bonus_conditional_verb_to_verb);
-    TRY_ENV("CONN", bonus_verb_renyokei_compound_aux);
-    TRY_ENV("CONN", penalty_toku_contraction_split);
-    TRY_ENV("CONN", penalty_teku_re_missegmentation);
-    TRY_ENV("CONN", bonus_te_form_verb_to_verb);
-    TRY_ENV("CONN", bonus_rashii_after_predicate);
-    TRY_ENV("CONN", penalty_verb_to_case_particle);
-    TRY_ENV("CONN", penalty_tai_after_aux);
-    TRY_ENV("CONN", penalty_masen_de_split);
-    TRY_ENV("CONN", penalty_invalid_single_char_aux);
-    TRY_ENV("CONN", penalty_te_form_ta_contraction);
-    TRY_ENV("CONN", penalty_noun_mai);
-    TRY_ENV("CONN", penalty_short_aux_after_particle);
-    TRY_ENV("CONN", bonus_noun_mitai);
-    TRY_ENV("CONN", bonus_verb_mitai);
-    TRY_ENV("CONN", penalty_iru_aux_after_noun);
-    TRY_ENV("CONN", bonus_iru_aux_after_te_form);
-    TRY_ENV("CONN", bonus_shimau_aux_after_te_form);
-    TRY_ENV("CONN", bonus_sou_aux_after_renyokei);
-    TRY_ENV("CONN", penalty_character_speech_split);
-    TRY_ENV("CONN", bonus_adj_ku_naru);
-    TRY_ENV("CONN", penalty_compound_aux_after_renyokei);
-    TRY_ENV("CONN", penalty_yoru_night_after_ni);
-    TRY_ENV("CONN", penalty_formal_noun_before_kanji);
-    TRY_ENV("CONN", penalty_same_particle_repeated);
-    TRY_ENV("CONN", penalty_suspicious_particle_sequence);
-    TRY_ENV("CONN", penalty_hiragana_noun_starts_with_particle);
-    TRY_ENV("CONN", penalty_particle_before_single_hiragana_other);
-    TRY_ENV("CONN", penalty_particle_before_multi_hiragana_other);
-    TRY_ENV("CONN", bonus_shi_after_i_adj);
-    TRY_ENV("CONN", bonus_shi_after_verb);
-    TRY_ENV("CONN", bonus_shi_after_aux);
-    TRY_ENV("CONN", penalty_shi_after_noun);
-    TRY_ENV("CONN", penalty_na_particle_after_kanji_noun);
-    TRY_ENV("CONN", penalty_suffix_at_start);
-    TRY_ENV("CONN", penalty_suffix_after_symbol);
-    TRY_ENV("CONN", penalty_prefix_before_verb);
-    TRY_ENV("CONN", penalty_noun_before_verb_aux);
-    TRY_ENV("CONN", penalty_prefix_hiragana_adj);
-    TRY_ENV("CONN", penalty_particle_before_hiragana_adj);
-  }
 
   // Join options (SUZUME_SCORER_JOIN_*)
   {

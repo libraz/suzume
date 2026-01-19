@@ -5,7 +5,6 @@
 #include <limits>
 
 #include "analysis/candidate_options.h"
-#include "analysis/connection_rule_options.h"
 #include "analysis/interfaces.h"
 #include "core/lattice.h"
 #include "core/types.h"
@@ -80,10 +79,6 @@ struct ScorerOptions {
     float aux_to_aux = std::numeric_limits<float>::quiet_NaN();       // default: 0.3
   } bigram;
 
-  // Connection rule options (edge costs and connection costs)
-  // These can be loaded from JSON at runtime for parameter tuning
-  ConnectionRuleOptions connection_rules;
-
   // Candidate generation options (join/split costs)
   // These can be loaded from JSON at runtime for parameter tuning
   CandidateOptions candidates;
@@ -146,25 +141,10 @@ class Scorer : public IScorer {
   ScorerOptions options_;
 
   /**
-   * @brief Get edge options for word cost calculation
-   */
-  const EdgeOptions& edgeOpts() const { return options_.connection_rules.edge; }
-
-  /**
-   * @brief Get connection options for connection cost calculation
-   */
-  const ConnectionOptions& connOpts() const { return options_.connection_rules.connection; }
-
-  /**
    * @brief Calculate bigram connection cost
    * Uses BigramOverrides if set, otherwise falls back to default table
    */
   float bigramCost(core::PartOfSpeech prev, core::PartOfSpeech next) const;
-
-  /**
-   * @brief Check if edge has optimal length
-   */
-  bool isOptimalLength(const core::LatticeEdge& edge) const;
 
   /**
    * @brief Log adjustment for debug output

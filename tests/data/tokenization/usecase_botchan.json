@@ -1,40 +1,109 @@
 {
-  "version": "1.0",
-  "cases": [
+  "cases" : [
     {
-      "id": "botchan_opening",
-      "description": "坊っちゃん冒頭 - 親譲りの無鉄砲で小供の時から損ばかりしている",
-      "input": "親譲りの無鉄砲で小供の時から損ばかりしている",
-      "expected": [
-        {"surface": "親譲り", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "無鉄砲", "pos": "Noun"},
-        {"surface": "で", "pos": "Particle"},
-        {"surface": "小供", "pos": "Noun"},
-        {"surface": "の", "pos": "Particle"},
-        {"surface": "時", "pos": "Noun"},
-        {"surface": "から", "pos": "Particle"},
-        {"surface": "損", "pos": "Noun"},
-        {"surface": "ばかり", "pos": "Particle"},
-        {"surface": "して", "pos": "Verb", "lemma": "する"},
-        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+      "description" : "坊っちゃん冒頭 - 親譲りの無鉄砲で小供の時から損ばかりしている",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "親譲り"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "無鉄砲"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "小供"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "時"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "から"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "損"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ばかり"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "いる"
+        }
       ],
-      "tags": ["literature", "botchan"]
+      "id" : "botchan_opening",
+      "input" : "親譲りの無鉄砲で小供の時から損ばかりしている",
+      "tags" : [
+        "literature",
+        "botchan"
+      ]
     },
     {
-      "id": "botchan_impossible_jump",
-      "description": "そこから飛び降りる事は出来まい - compound verb split + negative presumption unified",
-      "input": "そこから飛び降りる事は出来まい",
-      "expected": [
-        {"surface": "そこ", "pos": "Pronoun"},
-        {"surface": "から", "pos": "Particle"},
-        {"surface": "飛び", "pos": "Noun"},
-        {"surface": "降りる", "pos": "Verb", "lemma": "降りる"},
-        {"surface": "事", "pos": "Noun"},
-        {"surface": "は", "pos": "Particle"},
-        {"surface": "出来まい", "pos": "Verb", "lemma": "出来る"}
+      "description" : "そこから飛び降りる事は出来まい - compound verb split + negative presumption unified",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "そこ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "から"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "飛び降りる"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "事"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "lemma" : "出来る",
+          "pos" : "Verb",
+          "surface" : "出来"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "まい"
+        }
       ],
-      "tags": ["literature", "botchan"]
+      "id" : "botchan_impossible_jump",
+      "input" : "そこから飛び降りる事は出来まい",
+      "tags" : [
+        "literature",
+        "botchan"
+      ]
     }
-  ]
+  ],
+  "version" : "1.0"
 }

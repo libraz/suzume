@@ -1,24 +1,23 @@
 # =============================================================================
-# Suzume Core Dictionary (L2)
+# Suzume Core Dictionary (L2) - v0.8 Format
 # =============================================================================
 #
-# Format: surface	pos	reading	cost	conj_type
+# Format: surface<TAB>pos<TAB>conj_type
+#
+# v0.8 simplification:
+#   - reading field removed (not used)
+#   - cost field removed (derived from ExtendedPOS via getCategoryCost())
 #
 # --- Dictionary Layer Design ---
 #
 # L1 (src/dictionary/entries/*.h):
 #   - Closed-class words (particles, auxiliaries, conjunctions)
-#   - Words requiring automatic conjugation expansion
-#   - expandVerbEntry() / expandAdjectiveEntry() generate all inflected forms
+#   - Hardcoded with ExtendedPOS for cost derivation
 #
 # L2 (this file → core.dic):
 #   - Open-class vocabulary (nouns, verbs, adjectives, adverbs)
-#   - NO automatic conjugation expansion (base forms only)
-#   - conj_type is stored but NOT used for expansion
-#   - Dynamic analysis handles conjugated forms at runtime:
-#     1. Unknown word → verb_candidates / adjective_candidates generates candidates
-#     2. Base form lookup in dictionary provides cost/POS info
-#     3. Lemmatizer maps conjugated form back to base form
+#   - conj_type used for dict_compiler conjugation expansion
+#   - Dynamic analysis handles conjugated forms at runtime
 #
 # L3 (data/user/*.tsv):
 #   - Domain-specific vocabulary
@@ -45,53 +44,50 @@
 
 # --- I-adjectives: General ---
 # しんどい - colloquial adjective
-しんどい	ADJECTIVE	しんどい	0.8	I_ADJ
-上手い	ADJECTIVE	うまい	0.8	I_ADJ
-美味しい	ADJECTIVE	おいしい	1.0	I_ADJ
-気持ちいい	ADJECTIVE	きもちいい	1.0	I_ADJ
-申し訳ない	ADJECTIVE	もうしわけない	1.0	I_ADJ
-晴れ晴れしい	ADJECTIVE	はればれしい	1.0	I_ADJ
+しんどい	ADJECTIVE	I_ADJ
+上手い	ADJECTIVE	I_ADJ
+美味しい	ADJECTIVE	I_ADJ
+気持ちいい	ADJECTIVE	I_ADJ
+晴れ晴れしい	ADJECTIVE	I_ADJ
 
 # --- I-adjectives: 〜しい pattern ---
 # Required to distinguish from verb renyokei + そう patterns
 # e.g., 難しそう (adj) vs 話しそう (verb) - both have kanji + し + そう structure
-難しい	ADJECTIVE	むずかしい	0.8	I_ADJ
-楽しい	ADJECTIVE	たのしい	0.8	I_ADJ
-美しい	ADJECTIVE	うつくしい	0.8	I_ADJ
-悲しい	ADJECTIVE	かなしい	0.8	I_ADJ
-嬉しい	ADJECTIVE	うれしい	0.8	I_ADJ
-悔しい	ADJECTIVE	くやしい	0.8	I_ADJ
-親しい	ADJECTIVE	したしい	0.8	I_ADJ
-怪しい	ADJECTIVE	あやしい	0.8	I_ADJ
-珍しい	ADJECTIVE	めずらしい	0.8	I_ADJ
-涼しい	ADJECTIVE	すずしい	0.8	I_ADJ
-正しい	ADJECTIVE	ただしい	0.8	I_ADJ
-新しい	ADJECTIVE	あたらしい	0.8	I_ADJ
-激しい	ADJECTIVE	はげしい	0.8	I_ADJ
-厳しい	ADJECTIVE	きびしい	0.8	I_ADJ
-寂しい	ADJECTIVE	さびしい	0.8	I_ADJ
-優しい	ADJECTIVE	やさしい	0.8	I_ADJ
-苦しい	ADJECTIVE	くるしい	0.8	I_ADJ
-恥ずかしい	ADJECTIVE	はずかしい	0.8	I_ADJ
-忙しい	ADJECTIVE	いそがしい	0.8	I_ADJ
-欲しい	ADJECTIVE	ほしい	0.8	I_ADJ
-恋しい	ADJECTIVE	こいしい	0.8	I_ADJ
-著しい	ADJECTIVE	いちじるしい	0.8	I_ADJ
-懐かしい	ADJECTIVE	なつかしい	0.8	I_ADJ
-騒がしい	ADJECTIVE	さわがしい	0.8	I_ADJ
-喧しい	ADJECTIVE	やかましい	0.8	I_ADJ
+難しい	ADJECTIVE	I_ADJ
+楽しい	ADJECTIVE	I_ADJ
+美しい	ADJECTIVE	I_ADJ
+悲しい	ADJECTIVE	I_ADJ
+嬉しい	ADJECTIVE	I_ADJ
+悔しい	ADJECTIVE	I_ADJ
+親しい	ADJECTIVE	I_ADJ
+怪しい	ADJECTIVE	I_ADJ
+珍しい	ADJECTIVE	I_ADJ
+涼しい	ADJECTIVE	I_ADJ
+正しい	ADJECTIVE	I_ADJ
+新しい	ADJECTIVE	I_ADJ
+激しい	ADJECTIVE	I_ADJ
+厳しい	ADJECTIVE	I_ADJ
+寂しい	ADJECTIVE	I_ADJ
+優しい	ADJECTIVE	I_ADJ
+苦しい	ADJECTIVE	I_ADJ
+恥ずかしい	ADJECTIVE	I_ADJ
+忙しい	ADJECTIVE	I_ADJ
+欲しい	ADJECTIVE	I_ADJ
+恋しい	ADJECTIVE	I_ADJ
+著しい	ADJECTIVE	I_ADJ
+懐かしい	ADJECTIVE	I_ADJ
+騒がしい	ADJECTIVE	I_ADJ
+喧しい	ADJECTIVE	I_ADJ
 
 # --- I-adjectives: Compound ---
-胡散臭い	ADJECTIVE	うさんくさい	0.8	I_ADJ
+胡散臭い	ADJECTIVE	I_ADJ
 
-# --- I-adjectives: Irregular よい ---
-# よい has irregular conjugation (よ- stem, not よい- stem)
-よい	ADJECTIVE	よい	0.3	I_ADJ
-よく	ADVERB	よく	0.5
-よくない	ADJECTIVE	よくない	0.5	I_ADJ
-よくて	ADJECTIVE	よくて	0.5	I_ADJ
-よかった	ADJECTIVE	よかった	0.5	I_ADJ
-よければ	ADJECTIVE	よければ	0.5	I_ADJ
+# --- I-adjectives: Irregular よい/いい ---
+# よい/いい has irregular conjugation (よ- stem, not よい- stem)
+# いい is colloquial form of よい
+いい	ADJECTIVE	I_ADJ
+よい	ADJECTIVE	I_ADJ
+よく	ADVERB
 
 # =============================================================================
 # ADVERBS (副詞)
@@ -100,75 +96,76 @@
 # Note: な形容詞 + に patterns (非常に, 本当に, etc.) handled by L1 na_adjectives.h
 
 # --- Degree/Extent adverbs ---
-いささか	ADVERB	いささか	1.0
-はなはだ	ADVERB	はなはだ	1.0
-どれほど	ADVERB	どれほど	1.0
-どんなに	ADVERB	どんなに	1.0
-少なくとも	ADVERB	すくなくとも	1.0
-多くとも	ADVERB	おおくとも	1.0
-少しも	ADVERB	すこしも	1.0
-ろくに	ADVERB	ろくに	1.0
+いささか	ADVERB
+はなはだ	ADVERB
+どれほど	ADVERB
+どんなに	ADVERB
+少なくとも	ADVERB
+多くとも	ADVERB
+少しも	ADVERB
+ろくに	ADVERB
 
 # --- Frequency/Time adverbs ---
-しばらく	ADVERB	しばらく	1.0
-いつでも	ADVERB	いつでも	1.0
-何度も	ADVERB	なんども	1.0
-何回も	ADVERB	なんかいも	1.0
-二度と	ADVERB	にどと	1.0
-一度も	ADVERB	いちども	1.0
-早くも	ADVERB	はやくも	1.0
+しばらく	ADVERB
+いつでも	ADVERB
+何度も	ADVERB
+何回も	ADVERB
+二度と	ADVERB
+一度も	ADVERB
+早くも	ADVERB
 
 # --- Manner adverbs ---
-少しずつ	ADVERB	すこしずつ	1.0
-急いで	ADVERB	いそいで	1.0
-さっさと	ADVERB	さっさと	1.0
-思い切って	ADVERB	おもいきって	1.0
-強いて	ADVERB	しいて	1.0
-ゆるゆると	ADVERB	ゆるゆると	1.0
+少しずつ	ADVERB
+急いで	ADVERB
+さっさと	ADVERB
+思い切って	ADVERB
+強いて	ADVERB
+ゆるゆると	ADVERB
 
 # --- Conjunctive adverbs ---
-言うまでもなく	ADVERB	いうまでもなく	1.0
-要するに	ADVERB	ようするに	1.0
-中でも	ADVERB	なかでも	1.0
-続いて	ADVERB	つづいて	1.0
-それから	ADVERB	それから	1.0
-その上	ADVERB	そのうえ	1.0
-しかも	ADVERB	しかも	1.0
-おまけに	ADVERB	おまけに	1.0
-それでも	ADVERB	それでも	1.0
-残念ながら	ADVERB	ざんねんながら	1.0
+言うまでもなく	ADVERB
+要するに	ADVERB
+中でも	ADVERB
+続いて	ADVERB
+それから	ADVERB
+その上	ADVERB
+しかも	ADVERB
+おまけに	ADVERB
+それでも	ADVERB
+残念ながら	ADVERB
 
 # --- Epistemic adverbs (speaker attitude) ---
-もしかすると	ADVERB	もしかすると	1.0
-どうも	ADVERB	どうも	1.0
-はたして	ADVERB	はたして	1.0
-なぜか	ADVERB	なぜか	1.0
-どうしても	ADVERB	どうしても	1.0
-なんだか	ADVERB	なんだか	1.0
+もしかすると	ADVERB
+どうも	ADVERB
+はたして	ADVERB
+なぜか	ADVERB
+どうして	ADVERB
+どうしても	ADVERB
+なんだか	ADVERB
 
 # --- Onomatopoeia/Mimetic adverbs ---
-へとへと	ADVERB	へとへと	1.0
-ガチガチに	ADVERB	がちがちに	1.0
-ヌルッと	ADVERB	ぬるっと	1.0
+へとへと	ADVERB
+ガチガチに	ADVERB
+ヌルッと	ADVERB
 
 # --- Colloquial/Slang adverbs ---
-マジで	ADVERB	まじで	1.0
-ガチで	ADVERB	がちで	1.0
-がちで	ADVERB	がちで	1.0
-死ぬほど	ADVERB	しぬほど	1.0
-びみょーに	ADVERB	びみょーに	1.0
-何気に	ADVERB	なにげに	1.0
-マジかで	ADVERB	まじかで	1.0
-というか	ADVERB	というか	1.0
-マジか	ADVERB	まじか	1.0
-ガチか	ADVERB	がちか	1.0
+マジで	ADVERB
+ガチで	ADVERB
+がちで	ADVERB
+死ぬほど	ADVERB
+びみょーに	ADVERB
+何気に	ADVERB
+マジかで	ADVERB
+というか	ADVERB
+マジか	ADVERB
+ガチか	ADVERB
 
 # --- Business/Formal adverbs ---
-よろしく	ADVERB		0.5
-いかが	ADVERB		0.5
-引き続き	ADVERB	ひきつづき	0.3
-繰り返し	ADVERB	くりかえし	0.3
-俄然	ADVERB	がぜん	0.3
+よろしく	ADVERB
+いかが	ADVERB
+引き続き	ADVERB
+繰り返し	ADVERB
+俄然	ADVERB
 
 # =============================================================================
 # VERBS (動詞)
@@ -177,46 +174,46 @@
 # Only add verbs that cause disambiguation issues
 
 # --- Godan verbs: Special stems ---
-出しゃばる	VERB	でしゃばる	0.8	GODAN_RA
-あがる	VERB	あがる	0.8	GODAN_RA
-相次ぐ	VERB	あいつぐ	0.5	GODAN_GA
-怒鳴る	VERB	どなる	0.5	GODAN_RA
+出しゃばる	VERB	GODAN_RA
+あがる	VERB	GODAN_RA
+相次ぐ	VERB	GODAN_GA
+怒鳴る	VERB	GODAN_RA
 # B65: 詰まる - moved to L1 for conjugation expansion
 
 # --- Godan verbs: Classical/literary (wagahai) ---
 # W-017: Fix incorrect lemma generation
-逢う	VERB	あう	0.5	GODAN_WA
-見出す	VERB	みいだす	0.5	GODAN_SA
+逢う	VERB	GODAN_WA
+見出す	VERB	GODAN_SA
 
 # --- GodanSa verbs: Common (し+そう adjective pattern disambiguation) ---
 # These verbs are needed for adjective stem generation logic to distinguish
 # verb renyokei (話し from 話す) from adjective stems (難し from 難しい)
-話す	VERB	はなす	0.3	GODAN_SA
-出す	VERB	だす	0.3	GODAN_SA
-消す	VERB	けす	0.3	GODAN_SA
-返す	VERB	かえす	0.3	GODAN_SA
-探す	VERB	さがす	0.3	GODAN_SA
-渡す	VERB	わたす	0.3	GODAN_SA
-外す	VERB	はずす	0.3	GODAN_SA
-試す	VERB	ためす	0.3	GODAN_SA
-直す	VERB	なおす	0.3	GODAN_SA
-落とす	VERB	おとす	0.3	GODAN_SA
-残す	VERB	のこす	0.3	GODAN_SA
-増す	VERB	ます	0.3	GODAN_SA
-貸す	VERB	かす	0.3	GODAN_SA
-指す	VERB	さす	0.3	GODAN_SA
-足す	VERB	たす	0.3	GODAN_SA
-隠す	VERB	かくす	0.3	GODAN_SA
-壊す	VERB	こわす	0.3	GODAN_SA
-刺す	VERB	さす	0.3	GODAN_SA
-差す	VERB	さす	0.3	GODAN_SA
-挿す	VERB	さす	0.3	GODAN_SA
-越す	VERB	こす	0.3	GODAN_SA
-通す	VERB	とおす	0.3	GODAN_SA
-示す	VERB	しめす	0.3	GODAN_SA
-倒す	VERB	たおす	0.3	GODAN_SA
-起こす	VERB	おこす	0.3	GODAN_SA
-戻す	VERB	もどす	0.3	GODAN_SA
+話す	VERB	GODAN_SA
+出す	VERB	GODAN_SA
+消す	VERB	GODAN_SA
+返す	VERB	GODAN_SA
+探す	VERB	GODAN_SA
+渡す	VERB	GODAN_SA
+外す	VERB	GODAN_SA
+試す	VERB	GODAN_SA
+直す	VERB	GODAN_SA
+落とす	VERB	GODAN_SA
+残す	VERB	GODAN_SA
+増す	VERB	GODAN_SA
+貸す	VERB	GODAN_SA
+指す	VERB	GODAN_SA
+足す	VERB	GODAN_SA
+隠す	VERB	GODAN_SA
+壊す	VERB	GODAN_SA
+刺す	VERB	GODAN_SA
+差す	VERB	GODAN_SA
+挿す	VERB	GODAN_SA
+越す	VERB	GODAN_SA
+通す	VERB	GODAN_SA
+示す	VERB	GODAN_SA
+倒す	VERB	GODAN_SA
+起こす	VERB	GODAN_SA
+戻す	VERB	GODAN_SA
 # 伸ばす	VERB	のばす	0.3	GODAN_SA
 # 濡らす	VERB	ぬらす	0.3	GODAN_SA
 # 揺らす	VERB	ゆらす	0.3	GODAN_SA
@@ -232,21 +229,21 @@
 
 # --- Ichidan verbs: Disambiguation needed ---
 # These -げる/-ける verbs are often confused with Godan potential forms
-上げる	VERB	あげる	0.8	ICHIDAN
-下げる	VERB	さげる	0.8	ICHIDAN
-掛ける	VERB	かける	0.8	ICHIDAN
-付ける	VERB	つける	0.8	ICHIDAN
-つける	VERB	つける	0.2	ICHIDAN
-抜ける	VERB	ぬける	0.8	ICHIDAN
-落ちる	VERB	おちる	0.8	ICHIDAN
+上げる	VERB	ICHIDAN
+下げる	VERB	ICHIDAN
+掛ける	VERB	ICHIDAN
+付ける	VERB	ICHIDAN
+つける	VERB	ICHIDAN
+抜ける	VERB	ICHIDAN
+落ちる	VERB	ICHIDAN
 # B38: のろける - split as の+ろける
-のろける	VERB	のろける	0.5	ICHIDAN
+のろける	VERB	ICHIDAN
 # B46: とりあげる - split as と+りあげ
-とりあげる	VERB	とりあげる	0.5	ICHIDAN
-取り上げる	VERB	とりあげる	0.5	ICHIDAN
+とりあげる	VERB	ICHIDAN
+取り上げる	VERB	ICHIDAN
 # B60: あきらめる - split as あきら+める
-あきらめる	VERB	あきらめる	0.5	ICHIDAN
-諦める	VERB	あきらめる	0.5	ICHIDAN
+あきらめる	VERB	ICHIDAN
+諦める	VERB	ICHIDAN
 
 # =============================================================================
 # NOUNS (名詞)
@@ -254,151 +251,151 @@
 
 # --- Formal nouns (形式名詞) - hiragana forms ---
 # Note: もの/こと are in L1 with appropriate costs
-うち	NOUN	うち	0.5
-ところ	NOUN	ところ	0.3
-とき	NOUN	とき	0.3
+うち	NOUN
+ところ	NOUN
+とき	NOUN
 
 # --- Time nouns: Days ---
 # 今日: Removed to allow 今日中 as single token (handled by scoring)
-明日	NOUN	あした	0.5
-昨日	NOUN	きのう	0.5
-明後日	NOUN	あさって	0.5
-一昨日	NOUN	おととい	0.5
-毎日	NOUN	まいにち	0.5
+明日	NOUN
+昨日	NOUN
+明後日	NOUN
+一昨日	NOUN
+毎日	NOUN
 
 # --- Time nouns: Time of day ---
-今朝	NOUN	けさ	0.5
-毎朝	NOUN	まいあさ	0.5
-今晩	NOUN	こんばん	0.5
-今夜	NOUN	こんや	0.5
-昨夜	NOUN	さくや	0.5
-朝	NOUN	あさ	0.6
-昼	NOUN	ひる	0.6
-夜	NOUN	よる	0.6
-夕方	NOUN	ゆうがた	0.6
+今朝	NOUN
+毎朝	NOUN
+今晩	NOUN
+今夜	NOUN
+昨夜	NOUN
+朝	NOUN
+昼	NOUN
+夜	NOUN
+夕方	NOUN
 
 # --- Time nouns: Weeks ---
-今週	NOUN	こんしゅう	0.5
-来週	NOUN	らいしゅう	0.5
-先週	NOUN	せんしゅう	0.5
-毎週	NOUN	まいしゅう	0.5
+今週	NOUN
+来週	NOUN
+先週	NOUN
+毎週	NOUN
 
 # --- Time nouns: Months ---
-今月	NOUN	こんげつ	0.5
-来月	NOUN	らいげつ	0.5
-先月	NOUN	せんげつ	0.5
-毎月	NOUN	まいつき	0.5
+今月	NOUN
+来月	NOUN
+先月	NOUN
+毎月	NOUN
 
 # --- Time nouns: Years ---
-今年	NOUN	ことし	0.5
-来年	NOUN	らいねん	0.5
-去年	NOUN	きょねん	0.5
-昨年	NOUN	さくねん	0.5
-毎年	NOUN	まいとし	0.5
+今年	NOUN
+来年	NOUN
+去年	NOUN
+昨年	NOUN
+毎年	NOUN
 
 # --- Time nouns: Other ---
 # 今: Removed to allow 今日中 etc. as single tokens (handled by scoring)
-今後	NOUN	こんご	0.5
+今後	NOUN
 
 # --- Weather vocabulary ---
 # 晴れ: noun form (fair weather), cost 0.8 to beat verb renyokei (0.07)
-晴れ	NOUN	はれ	0.8
+晴れ	NOUN
 # 晴れる: verb form (to clear up), cost 0.5 to beat noun + unknown aux path
-晴れる	VERB	はれる	0.5	ICHIDAN
-現在	NOUN	げんざい	0.5
-最近	NOUN	さいきん	0.5
-将来	NOUN	しょうらい	0.5
-過去	NOUN	かこ	0.5
-未来	NOUN	みらい	0.5
-時分	NOUN	じぶん	0.5
+晴れる	VERB	ICHIDAN
+現在	NOUN
+最近	NOUN
+将来	NOUN
+過去	NOUN
+未来	NOUN
+時分	NOUN
 
-推し	NOUN	おし	0.3
-呼び出し	NOUN	よびだし	0.3
-打ち合わせ	NOUN	うちあわせ	0.3
-売り上げ	NOUN	うりあげ	0.3
-売上げ	NOUN	うりあげ	0.3
-売上	NOUN	うりあげ	0.3
-引き上げ	NOUN	ひきあげ	0.3
-受け取り	NOUN	うけとり	0.3
-貸し出し	NOUN	かしだし	0.3
-みじん切り	NOUN	みじんぎり	0.3
-思い出	NOUN	おもいで	0.3
-手助け	NOUN	てだすけ	0.3
-書き込み	NOUN	かきこみ	0.3
-読み込み	NOUN	よみこみ	0.3
-申し込み	NOUN	もうしこみ	0.3
-買い物	NOUN	かいもの	0.3
-見積もり	NOUN	みつもり	0.3
-問い合わせ	NOUN	といあわせ	0.3
-切り替え	NOUN	きりかえ	0.3
-振り込み	NOUN	ふりこみ	0.3
-差し支え	NOUN	さしつかえ	0.3
-組み合わせ	NOUN	くみあわせ	0.3
-申し訳	NOUN	もうしわけ	0.5
-日付け	NOUN	ひづけ	0.5
-日付	NOUN	ひづけ	0.5
-取り扱い	NOUN	とりあつかい	0.3
-取り組み	NOUN	とりくみ	0.3
+推し	NOUN
+呼び出し	NOUN
+打ち合わせ	NOUN
+売り上げ	NOUN
+売上げ	NOUN
+売上	NOUN
+引き上げ	NOUN
+受け取り	NOUN
+貸し出し	NOUN
+みじん切り	NOUN
+思い出	NOUN
+手助け	NOUN
+書き込み	NOUN
+読み込み	NOUN
+申し込み	NOUN
+買い物	NOUN
+見積もり	NOUN
+問い合わせ	NOUN
+切り替え	NOUN
+振り込み	NOUN
+差し支え	NOUN
+組み合わせ	NOUN
+申し訳	NOUN
+日付け	NOUN
+日付	NOUN
+取り扱い	NOUN
+取り組み	NOUN
 
 # --- Compound nouns ---
 # Verb-stem compound nouns (moved from L1)
-支払い	NOUN	しはらい	0.3
-見舞い	NOUN	みまい	0.3
-引きこもり	NOUN	ひきこもり	0.5
-何でもあり	NOUN	なんでもあり	0.5
-でっち上げ	NOUN	でっちあげ	0.5
-でっちあげ	NOUN	でっちあげ	0.5
-きっかけ	NOUN	きっかけ	0
-金儲け	NOUN	かねもうけ	0.5
-儲け	NOUN	もうけ	0.5
-あだ名	NOUN	あだな	0.5
-なし崩し	NOUN	なしくずし	0.5
-ご飯	NOUN	ごはん	0.3
-子どもの貧困	NOUN	こどものひんこん	0.5
-食器洗い乾燥機	NOUN	しょっきあらいかんそうき	0.5
-投資ファンド	NOUN	とうしふぁんど	0.5
-オプション取引	NOUN	おぷしょんとりひき	0.5
+支払い	NOUN
+見舞い	NOUN
+引きこもり	NOUN
+何でもあり	NOUN
+でっち上げ	NOUN
+でっちあげ	NOUN
+きっかけ	NOUN
+金儲け	NOUN
+儲け	NOUN
+あだ名	NOUN
+なし崩し	NOUN
+ご飯	NOUN
+子どもの貧困	NOUN
+食器洗い乾燥機	NOUN
+投資ファンド	NOUN
+オプション取引	NOUN
 # B37: しびれ - split as し+びれ
-しびれ	NOUN	しびれ	0.3
-痺れ	NOUN	しびれ	0.5
+しびれ	NOUN
+痺れ	NOUN
 # B41: ひと味 - split as ひ+と+味
-ひと味	NOUN	ひとあじ	0.3
-一味	NOUN	ひとあじ	0.5
+ひと味	NOUN
+一味	NOUN
 # B42: ぬいぐるみ - recognized as OTHER
-ぬいぐるみ	NOUN	ぬいぐるみ	0.3
-縫いぐるみ	NOUN	ぬいぐるみ	0.5
+ぬいぐるみ	NOUN
+縫いぐるみ	NOUN
 # B44: 盛りだくさん - split as 盛りだく+さん
-盛りだくさん	NOUN	もりだくさん	0.3
-盛り沢山	NOUN	もりだくさん	0.5
+盛りだくさん	NOUN
+盛り沢山	NOUN
 
 # --- Reduplication (畳語) - moved from L1 ---
-人々	NOUN	ひとびと	0.3
-日々	NOUN	ひび	0.3
-国々	NOUN	くにぐに	0.3
-色々	NOUN	いろいろ	0.3
-時々	NOUN	ときどき	0.3
+人々	NOUN
+日々	NOUN
+国々	NOUN
+色々	NOUN
+時々	NOUN
 
 # --- Hiragana nouns - moved from L1 ---
-おかげ	NOUN	おかげ	0.3
+おかげ	NOUN
 
 # --- Nouns ending with verb-like patterns ---
 # These are misanalyzed as verbs without dictionary entries
-気持ち	NOUN	きもち	0.3
+気持ち	NOUN
 
 # --- Foreign/Loanword nouns ---
-Wi-Fi	NOUN		0.5
+Wi-Fi	NOUN
 
 # --- Food: Dairy ---
-飲むヨーグルト	NOUN	のむよーぐると	0.5
-とろけるチーズ	NOUN	とろけるちーず	0.5
+飲むヨーグルト	NOUN
+とろけるチーズ	NOUN
 
 # --- Food: Dishes ---
-ひじきの煮物	NOUN	ひじきのにもの	0.5
-ホワイトシチュー	NOUN	ほわいとしちゅー	0.5
-サンドイッチ	NOUN	さんどいっち	0.5
-クラブサンド	NOUN	くらぶさんど	0.5
-タンドリーチキン	NOUN	たんどりーちきん	0.5
-レアチーズケーキ	NOUN	れあちーずけーき	0.5
+ひじきの煮物	NOUN
+ホワイトシチュー	NOUN
+サンドイッチ	NOUN
+クラブサンド	NOUN
+タンドリーチキン	NOUN
+レアチーズケーキ	NOUN
 
 # --- Tongue twisters (早口言葉) ---
 # COMMENTED OUT: These are too domain-specific for core dictionary
@@ -410,61 +407,61 @@ Wi-Fi	NOUN		0.5
 # なまたまご	NOUN	なまたまご	0.3
 
 # --- Idioms (ことわざ) ---
-柳の下にいつも泥鰌はいない	NOUN	やなぎのしたにいつもどじょうはいない	0.5
-失敗は成功の母	NOUN	しっぱいはせいこうのはは	0.5
-最初から最後まで	NOUN	さいしょからさいごまで	0.5
+柳の下にいつも泥鰌はいない	NOUN
+失敗は成功の母	NOUN
+最初から最後まで	NOUN
 
 # --- General nouns ---
-おかし	NOUN	おかし	0.3
-菓子	NOUN	かし	1.0
-猫	NOUN	ねこ	0.5
-うだつ	NOUN	うだつ	0.8
+おかし	NOUN
+菓子	NOUN
+猫	NOUN
+うだつ	NOUN
 
 # --- Net slang (ネットスラング) ---
 # Modern internet slang terms that don't follow regular morphological patterns
-ぱおん	NOUN	ぱおん	0.3
-わかりみ	NOUN	わかりみ	0.3
-つらみ	NOUN	つらみ	0.3
-うれしみ	NOUN	うれしみ	0.3
-やばみ	NOUN	やばみ	0.3
-ぴえん	NOUN	ぴえん	0.3
-草	NOUN	くさ	0.5
-ワロタ	NOUN	わろた	0.5
+ぱおん	NOUN
+わかりみ	NOUN
+つらみ	NOUN
+うれしみ	NOUN
+やばみ	NOUN
+ぴえん	NOUN
+草	NOUN
+ワロタ	NOUN
 
 # --- Suru-verb nouns (サ変名詞) ---
 # These need explicit entries to prevent 漢字+い misinterpretation as i-adjective
 # e.g., 検討いたしております would become 検討い(ADJ)+たしております without this
 # Low cost (-0.5) to beat unknown ADJ candidates with optimal_length bonus
-検討	NOUN	けんとう	-0.5
+検討	NOUN
 
 # =============================================================================
 # SUFFIXES (接尾辞)
 # =============================================================================
 
 # --- Noun-forming suffixes ---
-的	SUFFIX	てき	1.5
-化	SUFFIX	か	1.5
-性	SUFFIX	せい	1.5
-率	SUFFIX	りつ	1.5
-法	SUFFIX	ほう	1.5
-論	SUFFIX	ろん	1.5
-者	SUFFIX	しゃ	1.5
-家	SUFFIX	か	1.5
-員	SUFFIX	いん	1.5
-式	SUFFIX	しき	1.5
-感	SUFFIX	かん	1.5
-力	SUFFIX	りょく	1.5
-度	SUFFIX	ど	1.5
+的	SUFFIX
+化	SUFFIX
+性	SUFFIX
+率	SUFFIX
+法	SUFFIX
+論	SUFFIX
+者	SUFFIX
+家	SUFFIX
+員	SUFFIX
+式	SUFFIX
+感	SUFFIX
+力	SUFFIX
+度	SUFFIX
 
 # --- Plural suffixes ---
-たち	OTHER	たち	0.5
-ら	OTHER	ら	0.5
-ども	OTHER	ども	0.8
-がた	OTHER	がた	0.8
+たち	OTHER
+ら	OTHER
+ども	OTHER
+がた	OTHER
 
 # --- Verb-auxiliary suffixes ---
-がたい	OTHER		1.0
-にくい	OTHER		1.0
+がたい	OTHER
+にくい	OTHER
 
 # =============================================================================
 # INTERJECTIONS/GREETINGS (感動詞・挨拶)
@@ -473,86 +470,85 @@ Wi-Fi	NOUN		0.5
 # Note: さすが is in L1 na_adjectives.h
 
 # --- Casual greetings ---
-またね	OTHER		1.0
-またな	OTHER		1.0
-はじめまして	OTHER		1.0
-初見です	OTHER		1.0
+またね	OTHER
+またな	OTHER
+はじめまして	OTHER
+初見です	OTHER
 
 # --- Response expressions ---
-マジかよ	OTHER		1.0
-ガチかよ	OTHER		1.0
-だよな	OTHER		1.0
-だよね	OTHER		1.0
-激しく同意	OTHER		1.0
-ないわ	OTHER		1.0
-無いわ	OTHER		1.0
-なるほど	OTHER		1.0
-そうだね	OTHER		1.0
+マジかよ	OTHER
+ガチかよ	OTHER
+だよな	OTHER
+だよね	OTHER
+激しく同意	OTHER
+ないわ	OTHER
+無いわ	OTHER
+なるほど	OTHER
+そうだね	OTHER
 
 # --- Fillers/Hesitation (フィラー・間投詞) ---
 # Note: Variable-length prolonged patterns (うわーーー) handled by emphatic pattern in tokenizer
-はぁ	OTHER		1.0
-えー	OTHER		0.8
-えーと	OTHER		0.5
-えーっと	OTHER		0.5
-えっと	OTHER		0.5
-あー	OTHER		0.8
-あーあ	OTHER		0.5
-うわ	OTHER		0.8
-うわー	OTHER		0.5
-うわーー	OTHER		0.5
-おー	OTHER		0.8
-おおー	OTHER		0.5
-へー	OTHER		0.8
-ほー	OTHER		0.8
-ふーん	OTHER		0.5
-うーん	OTHER		0.5
-んー	OTHER		0.8
+はぁ	OTHER
+えー	OTHER
+えーと	OTHER
+えーっと	OTHER
+えっと	OTHER
+あー	OTHER
+あーあ	OTHER
+うわ	OTHER
+うわー	OTHER
+うわーー	OTHER
+おー	OTHER
+おおー	OTHER
+へー	OTHER
+ほー	OTHER
+ふーん	OTHER
+うーん	OTHER
+んー	OTHER
 
 # --- Colloquial expressions ---
-だるい	OTHER		1.0
-さすがです	OTHER		1.0
-がんば	OTHER		1.0
-あいよ	OTHER		1.0
-いくよ	OTHER		1.0
-ごめん	OTHER		1.0
-ありがと	OTHER		1.0
-おすすめ	NOUN	おすすめ	0.4
+だるい	OTHER
+がんば	OTHER
+あいよ	OTHER
+いくよ	OTHER
+ごめん	OTHER
+ありがと	OTHER
+おすすめ	NOUN
 
 # --- Mixed script compounds (カタカナ + 漢字) ---
 # These won't be generated by unknown word handler since it only creates same-type sequences
-ムダ毛	NOUN	むだげ	0.5
-ウソ泣き	NOUN	うそなき	0.5
-カラ元気	NOUN	からげんき	0.5
-インスタ映え	NOUN	いんすたばえ	0.5
-ヤケ酒	NOUN	やけざけ	0.5
-ダメ出し	NOUN	だめだし	0.5
-ウソ発見器	NOUN	うそはっけんき	0.8
-カラ出張	NOUN	からしゅっちょう	0.5
-カラ残業	NOUN	からざんぎょう	0.5
-ヤミ金	NOUN	やみきん	0.5
-ウソ電話	NOUN	うそでんわ	0.5
-デマ情報	NOUN	でまじょうほう	0.5
-ガチ勢	NOUN	がちぜい	0.5
+ムダ毛	NOUN
+ウソ泣き	NOUN
+カラ元気	NOUN
+インスタ映え	NOUN
+ヤケ酒	NOUN
+ダメ出し	NOUN
+ウソ発見器	NOUN
+カラ出張	NOUN
+カラ残業	NOUN
+ヤミ金	NOUN
+ウソ電話	NOUN
+デマ情報	NOUN
+ガチ勢	NOUN
 
 # --- サブカル・スラング複合名詞 ---
 # カタカナ+漢字/ひらがな混合で誤分割されるもののみ
-コロ助	NOUN	ころすけ	0.3
-ドラえもん	NOUN	どらえもん	0.3
-のび太	NOUN	のびた	0.3
-パパ活	NOUN	ぱぱかつ	0.3
-推し活	NOUN	おしかつ	0.3
-陰キャ	NOUN	いんきゃ	0.3
-陽キャ	NOUN	ようきゃ	0.3
-神ゲー	NOUN	かみげー	0.3
-コミュ障	NOUN	こみゅしょう	0.3
-好きピ	NOUN	すきぴ	0.3
-彼ピ	NOUN	かれぴ	0.3
+コロ助	NOUN
+ドラえもん	NOUN
+のび太	NOUN
+パパ活	NOUN
+推し活	NOUN
+陰キャ	NOUN
+陽キャ	NOUN
+神ゲー	NOUN
+コミュ障	NOUN
+好きピ	NOUN
+彼ピ	NOUN
 
 # These are verb renyokei forms commonly used as standalone nouns
 # 感じ needs higher cost to not beat 感じる conjugations
 # 感じがあった should parse as 感じ(NOUN) + が, but 感じた should be 感じ(VERB) + た
-感じ	NOUN	かんじ	0.8
+感じ	NOUN
 
 # =============================================================================
 # 吾輩は猫である (wagahai) 対応 - W-001〜W-009
@@ -560,36 +556,34 @@ Wi-Fi	NOUN		0.5
 
 # --- W-001: 人名 (固有名詞) ---
 # おさん - 削除: テキスト固有の人名。汎用的な解決策が必要
-この間	NOUN	このあいだ	-0.5
+この間	NOUN
 
 # --- W-002: 形容詞 (誤分割防止) ---
-ひもじい	ADJECTIVE	ひもじい	0.5	I_ADJ
-騒々しい	ADJECTIVE	そうぞうしい	0.5	I_ADJ
+ひもじい	ADJECTIVE	I_ADJ
+騒々しい	ADJECTIVE	I_ADJ
 
 # --- W-004: 副詞・慣用句 ---
-せんだって	ADVERB	せんだって	0.3
-あながち	ADVERB	あながち	0.3
-かくして	ADVERB	かくして	0.3
-何となく	ADVERB	なんとなく	-1.0
-無理やり	ADVERB	むりやり	-1.0
-そろり	ADVERB	そろり	0.5
-そろりそろり	ADVERB	そろりそろり	0.3
+せんだって	ADVERB
+あながち	ADVERB
+かくして	ADVERB
+何となく	ADVERB
+無理やり	ADVERB
+そろり	ADVERB
+そろりそろり	ADVERB
 
 # --- W-003: 動詞 (誤分割防止) ---
-掴む	VERB	つかむ	0.3	GODAN_MA
-つかむ	VERB	つかむ	0.3	GODAN_MA
-ぶら下げる	VERB	ぶらさげる	-1.0	ICHIDAN
-ぶら下げ	VERB	ぶらさげる	-1.0	ICHIDAN
+掴む	VERB	GODAN_MA
+つかむ	VERB	GODAN_MA
+ぶら下げる	VERB	ICHIDAN
+ぶら下げ	VERB	ICHIDAN
 
 # --- W-005: 旧仮名遣い動詞 ---
-這入る	VERB	はいる	-0.5	GODAN_RA
-這入	VERB	はいる	-0.5	GODAN_RA
-這入っ	VERB	はいる	-1.0	GODAN_RA
-這入った	VERB	はいる	-1.0	GODAN_RA
-這入って	VERB	はいる	-1.0	GODAN_RA
+這入る	VERB	GODAN_RA
+這入	VERB	GODAN_RA
+這入っ	VERB	GODAN_RA
 
 # --- W-004: 名詞 (誤分割防止) ---
-尻ぺた	NOUN	しりぺた	0.5
+尻ぺた	NOUN
 
 # --- W-007: 擬音語・感動詞 ---
 # ニャー, ニャーニャー - 削除: 特定の擬音語。カタカナ擬音語の汎用認識が必要
@@ -603,16 +597,20 @@ Wi-Fi	NOUN		0.5
 # ごとき	AUX	ごとき	-2.0
 
 # --- W-016: 感動詞・その他 ---
-はてな	OTHER	はてな	0.5
+はてな	OTHER
 
 # =============================================================================
 # COMPOUND PARTICLES (連語) - IMPL-012
 # =============================================================================
 # MeCab treats these as single tokens (格助詞,連語)
-といった	PARTICLE	といった	-1.0
-に対して	PARTICLE	にたいして	-1.0
-いや	OTHER	いや	0.5
-まま	NOUN	まま	0.3
-ひどく	ADVERB	ひどく	0.5
+といった	PARTICLE
+に対して	PARTICLE
+いや	OTHER
+まま	NOUN
+ひどく	ADVERB
 # いう (言う) - cost balanced to not break Xという determiners
-いう	VERB	いう	1.0	GODAN_WA
+いう	VERB	GODAN_WA
+
+大きい	ADJECTIVE	I_ADJ
+
+小さい	ADJECTIVE	I_ADJ

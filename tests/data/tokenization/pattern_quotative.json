@@ -1,226 +1,280 @@
 {
-  "version": "1.0",
-  "description": "Quotative patterns (という, といって, etc.)",
-  "cases": [
+  "cases" : [
     {
-      "id": "toiu_basic",
-      "description": "Basic という determiner",
-      "input": "という",
-      "expected": [
+      "description" : "Basic という determiner",
+      "expected" : [
         {
-          "surface": "という",
-          "pos": "Determiner",
-          "lemma": "という"
+          "lemma" : "という",
+          "pos" : "Determiner",
+          "surface" : "という"
         }
       ],
-      "tags": [
+      "id" : "toiu_basic",
+      "input" : "という",
+      "tags" : [
         "strict",
         "quotative"
       ]
     },
     {
-      "id": "toiu_with_noun",
-      "description": "N+という+N pattern",
-      "input": "太郎という名前",
-      "expected": [
+      "description" : "N+という+N pattern",
+      "expected" : [
         {
-          "surface": "太郎",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "太郎"
         },
         {
-          "surface": "という",
-          "pos": "Determiner",
-          "lemma": "という"
+          "lemma" : "という",
+          "pos" : "Determiner",
+          "surface" : "という"
         },
         {
-          "surface": "名前",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "名前"
         }
       ],
-      "tags": [
+      "id" : "toiu_with_noun",
+      "input" : "太郎という名前",
+      "tags" : [
         "strict",
         "quotative"
       ]
     },
     {
-      "id": "toitta_basic",
-      "description": "といった (past quotative determiner)",
-      "input": "といった",
-      "expected": [
+      "description" : "といった (past quotative determiner)",
+      "expected" : [
         {
-          "surface": "といった",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "といった"
         }
       ],
-      "tags": [
+      "id" : "toitta_basic",
+      "input" : "といった",
+      "tags" : [
         "strict",
         "quotative"
       ]
     },
     {
-      "id": "toitte_basic",
-      "description": "といって (quotative te-form of 言う)",
-      "input": "といって",
-      "expected": [
+      "description" : "といって (quotative te-form of 言う)",
+      "expected" : [
         {
-          "surface": "と",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "と"
         },
         {
-          "surface": "いっ",
-          "pos": "Verb",
-          "lemma": "いう"
+          "lemma" : "いう",
+          "pos" : "Verb",
+          "surface" : "いっ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "toitte_basic",
+      "input" : "といって",
+      "tags" : [
         "strict",
         "quotative"
       ]
     },
     {
-      "id": "toitte_in_sentence",
-      "description": "といって in sentence context (MeCab-compatible split)",
-      "input": "仕事といって出かけた",
-      "expected": [
-        {"surface": "仕事", "pos": "Noun"},
-        {"surface": "と", "pos": "Particle"},
-        {"surface": "いっ", "pos": "Verb", "lemma": "いう"},
-        {"surface": "て", "pos": "Particle"},
-        {"surface": "出かけ", "pos": "Verb"},
-        {"surface": "た", "pos": "Auxiliary"}
-      ],
-      "tags": [
-        "quotative"
-      ]
-    },
-    {
-      "id": "toittemo_basic",
-      "description": "といっても (MeCab-compatible split)",
-      "input": "といっても",
-      "expected": [
-        {"surface": "と", "pos": "Particle"},
-        {"surface": "いっ", "pos": "Verb", "lemma": "いう"},
-        {"surface": "て", "pos": "Particle"},
-        {"surface": "も", "pos": "Particle"}
-      ],
-      "tags": [
-        "quotative"
-      ]
-    },
-    {
-      "id": "toittemo_in_sentence",
-      "description": "といっても in sentence context (MeCab-compatible split)",
-      "input": "仕事といっても簡単だ",
-      "expected": [
-        {"surface": "仕事", "pos": "Noun"},
-        {"surface": "と", "pos": "Particle"},
-        {"surface": "いっ", "pos": "Verb", "lemma": "いう"},
-        {"surface": "て", "pos": "Particle"},
-        {"surface": "も", "pos": "Particle"},
-        {"surface": "簡単", "pos": "Adjective"},
-        {"surface": "だ", "pos": "Auxiliary"}
-      ],
-      "tags": [
-        "quotative"
-      ]
-    },
-    {
-      "id": "souitte_basic",
-      "description": "そういって (ADV + quotative verb)",
-      "input": "そういって",
-      "expected": [
+      "description" : "といって in sentence context (MeCab-compatible split)",
+      "expected" : [
         {
-          "surface": "そう",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "仕事"
         },
         {
-          "surface": "いっ",
-          "pos": "Verb",
-          "lemma": "いう"
+          "pos" : "Particle",
+          "surface" : "と"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "lemma" : "いう",
+          "pos" : "Verb",
+          "surface" : "いっ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "出かけ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "toitte_in_sentence",
+      "input" : "仕事といって出かけた",
+      "tags" : [
+        "quotative"
+      ]
+    },
+    {
+      "description" : "といっても (MeCab-compatible split)",
+      "expected" : [
+        {
+          "pos" : "Particle",
+          "surface" : "と"
+        },
+        {
+          "lemma" : "いう",
+          "pos" : "Verb",
+          "surface" : "いっ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "も"
+        }
+      ],
+      "id" : "toittemo_basic",
+      "input" : "といっても",
+      "tags" : [
+        "quotative"
+      ]
+    },
+    {
+      "description" : "といっても in sentence context (MeCab-compatible split)",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "仕事"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "と"
+        },
+        {
+          "lemma" : "いう",
+          "pos" : "Verb",
+          "surface" : "いっ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "も"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "簡単"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "だ"
+        }
+      ],
+      "id" : "toittemo_in_sentence",
+      "input" : "仕事といっても簡単だ",
+      "tags" : [
+        "quotative"
+      ]
+    },
+    {
+      "description" : "そういって (ADV + quotative verb)",
+      "expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "そう"
+        },
+        {
+          "lemma" : "いう",
+          "pos" : "Verb",
+          "surface" : "いっ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
+      "id" : "souitte_basic",
+      "input" : "そういって",
+      "tags" : [
         "strict",
         "quotative"
       ]
     },
     {
-      "id": "kouitte_basic",
-      "description": "こういって (quotative verb)",
-      "input": "こういって",
-      "expected": [
+      "description" : "こういって (quotative verb)",
+      "expected" : [
         {
-          "surface": "こう",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "こう"
         },
         {
-          "surface": "いっ",
-          "pos": "Verb",
-          "lemma": "いう"
+          "lemma" : "いう",
+          "pos" : "Verb",
+          "surface" : "いっ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "kouitte_basic",
+      "input" : "こういって",
+      "tags" : [
         "strict",
         "quotative"
       ]
     },
     {
-      "id": "itte_as_iku",
-      "description": "行って should remain as 行く (not 言う)",
-      "input": "そこへ行って",
-      "expected": [
+      "description" : "行って should remain as 行く (not 言う)",
+      "expected" : [
         {
-          "surface": "そこ",
-          "pos": "Pronoun"
+          "pos" : "Pronoun",
+          "surface" : "そこ"
         },
         {
-          "surface": "へ",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "へ"
         },
         {
-          "surface": "行っ",
-          "pos": "Verb",
-          "lemma": "行く"
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行っ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "itte_as_iku",
+      "input" : "そこへ行って",
+      "tags" : [
         "strict",
         "quotative",
         "regression"
       ]
     },
     {
-      "id": "tteiu_colloquial",
-      "description": "っていう (colloquial quotative)",
-      "input": "っていう",
-      "expected": [
+      "description" : "っていう (colloquial quotative)",
+      "expected" : [
         {
-          "surface": "っていう",
-          "pos": "Determiner",
-          "lemma": "という"
+          "lemma" : "という",
+          "pos" : "Determiner",
+          "surface" : "っていう"
         }
       ],
-      "tags": [
+      "id" : "tteiu_colloquial",
+      "input" : "っていう",
+      "tags" : [
         "strict",
         "quotative",
         "colloquial"
       ]
     }
-  ]
+  ],
+  "description" : "Quotative patterns (という, といって, etc.)",
+  "version" : "1.0"
 }

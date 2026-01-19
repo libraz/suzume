@@ -1,23 +1,21 @@
 {
-  "version": "1.0",
-  "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",
-  "cases": [
+  "cases" : [
     {
-      "id": "yosa_nominalization",
-      "description": "よさ (nominalization) - MeCab-compatible split: よ(ADJ stem) + さ(suffix)",
-      "input": "よさ",
-      "expected": [
+      "description" : "よさ (nominalization) - MeCab-compatible split: よ(ADJ stem) + さ(suffix)",
+      "expected" : [
         {
-          "surface": "よ",
-          "pos": "Adjective",
-          "lemma": "よい"
+          "lemma" : "よい",
+          "pos" : "Adjective",
+          "surface" : "よ"
         },
         {
-          "surface": "さ",
-          "pos": "Suffix"
+          "pos" : "Suffix",
+          "surface" : "さ"
         }
       ],
-      "tags": [
+      "id" : "yosa_nominalization",
+      "input" : "よさ",
+      "tags" : [
         "irregular",
         "i_adjective",
         "yoi",
@@ -25,245 +23,269 @@
       ]
     },
     {
-      "id": "i_adj_sou_oishisou",
-      "description": "美味しそう - MeCab-compatible split (ADJ stem + AUX)",
-      "input": "美味しそう",
-      "expected": [
+      "description" : "美味しそう - MeCab-compatible split (ADJ stem + AUX)",
+      "expected" : [
         {
-          "surface": "美味し",
-          "pos": "Adjective",
-          "lemma": "美味しい"
+          "lemma" : "美味しい",
+          "pos" : "Adjective",
+          "surface" : "美味し"
         },
         {
-          "surface": "そう",
-          "pos": "Auxiliary",
-          "lemma": "そう"
+          "lemma" : "そう",
+          "pos" : "Auxiliary",
+          "surface" : "そう"
         }
       ],
-      "tags": [
+      "id" : "i_adj_sou_oishisou",
+      "input" : "美味しそう",
+      "tags" : [
         "i_adjective",
         "sou"
       ]
     },
     {
-      "id": "i_adj_sou_kanashisou",
-      "description": "悲しそう - i-adjective + そう pattern - MeCab-compatible split",
-      "input": "悲しそう",
-      "expected": [
+      "description" : "悲しそう - i-adjective + そう pattern - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "悲し",
-          "pos": "Adjective",
-          "lemma": "悲しい"
+          "lemma" : "悲しい",
+          "pos" : "Adjective",
+          "surface" : "悲し"
         },
         {
-          "surface": "そう",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "そう"
         }
       ],
-      "tags": [
+      "id" : "i_adj_sou_kanashisou",
+      "input" : "悲しそう",
+      "tags" : [
         "i_adjective",
         "sou"
       ]
     },
     {
-      "id": "i_adj_sou_in_sentence",
-      "description": "美味しそうに食べている - MeCab-compatible: ADJ stem + そう + に + VERB stem + て + いる",
-      "input": "美味しそうに食べている",
-      "expected": [
+      "description" : "美味しそうに食べている - MeCab-compatible: ADJ stem + そう + に + VERB stem + て + いる",
+      "expected" : [
         {
-          "surface": "美味し",
-          "pos": "Adjective",
-          "lemma": "美味しい"
+          "lemma" : "美味しい",
+          "pos" : "Adjective",
+          "surface" : "美味し"
         },
         {
-          "surface": "そう",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "そう"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "に"
         },
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "いる",
-          "pos": "Auxiliary",
-          "lemma": "いる"
+          "lemma" : "いる",
+          "pos" : "Auxiliary",
+          "surface" : "いる"
         }
       ],
-      "tags": [
+      "id" : "i_adj_sou_in_sentence",
+      "input" : "美味しそうに食べている",
+      "tags" : [
         "i_adjective",
         "sou"
       ]
     },
     {
-      "id": "shi_sou_muzukashisou_adj",
-      "description": "難しそう - true adjective ending in しい + そう - MeCab-compatible split",
-      "input": "難しそう",
-      "expected": [
+      "description" : "難しそう - true adjective ending in しい + そう - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "難し",
-          "pos": "Adjective",
-          "lemma": "難しい"
+          "lemma" : "難しい",
+          "pos" : "Adjective",
+          "surface" : "難し"
         },
         {
-          "surface": "そう",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "そう"
         }
       ],
-      "tags": [
+      "id" : "shi_sou_muzukashisou_adj",
+      "input" : "難しそう",
+      "tags" : [
         "i_adjective",
         "sou"
       ]
     },
     {
-      "id": "shi_sou_tanoshisou_adj",
-      "description": "楽しそう - true adjective ending in しい + そう - MeCab-compatible split",
-      "input": "楽しそう",
-      "expected": [
+      "description" : "楽しそう - true adjective ending in しい + そう - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "楽し",
-          "pos": "Adjective",
-          "lemma": "楽しい"
+          "lemma" : "楽しい",
+          "pos" : "Adjective",
+          "surface" : "楽し"
         },
         {
-          "surface": "そう",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "そう"
         }
       ],
-      "tags": [
+      "id" : "shi_sou_tanoshisou_adj",
+      "input" : "楽しそう",
+      "tags" : [
         "i_adjective",
         "sou"
       ]
     },
     {
-      "id": "shi_sou_ureshisou_adj",
-      "description": "嬉しそう - true adjective ending in しい + そう - MeCab-compatible split",
-      "input": "嬉しそう",
-      "expected": [
+      "description" : "嬉しそう - true adjective ending in しい + そう - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "嬉し",
-          "pos": "Adjective",
-          "lemma": "嬉しい"
+          "lemma" : "嬉しい",
+          "pos" : "Adjective",
+          "surface" : "嬉し"
         },
         {
-          "surface": "そう",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "そう"
         }
       ],
-      "tags": [
+      "id" : "shi_sou_ureshisou_adj",
+      "input" : "嬉しそう",
+      "tags" : [
         "i_adjective",
         "sou"
       ]
     },
     {
-      "id": "nasasou_adj",
-      "description": "B45: なさそう should have lemma ない, not なさい",
-      "input": "やる気がなさそう",
-      "expected": [
+      "description" : "B45: なさそう should have lemma ない, not なさい",
+      "expected" : [
         {
-          "surface": "やる",
-          "pos": "Verb",
-          "lemma": "やる"
+          "pos" : "Noun",
+          "surface" : "やる気"
         },
         {
-          "surface": "気",
-          "pos": "Noun"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "lemma" : "ない",
+          "pos" : "Adjective",
+          "surface" : "な"
         },
         {
-          "surface": "なさそう",
-          "pos": "Adjective",
-          "lemma": "ない"
+          "pos" : "Particle",
+          "surface" : "さ"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "そう"
         }
       ],
-      "tags": [
+      "id" : "nasasou_adj",
+      "input" : "やる気がなさそう",
+      "tags" : [
         "adjective",
         "lemma"
       ]
     },
     {
-      "id": "adj_kimoi_sou",
-      "description": "Katakana adjective キモい + さそう (nominalization + appearance)",
-      "input": "キモさそう",
-      "expected": [
+      "description" : "Katakana adjective キモい + さそう (nominalization + appearance)",
+      "expected" : [
         {
-          "surface": "キモさ",
-          "pos": "Adjective",
-          "lemma": "キモい"
+          "lemma" : "キモい",
+          "pos" : "Adjective",
+          "surface" : "キモ"
         },
         {
-          "surface": "そう",
-          "pos": "Auxiliary",
-          "lemma": "そう"
+          "pos" : "Particle",
+          "surface" : "さ"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "そう"
         }
       ],
-      "tags": [
+      "id" : "adj_kimoi_sou",
+      "input" : "キモさそう",
+      "tags" : [
         "slang",
         "adjective",
         "conjugation"
       ]
     },
     {
-      "id": "nasasou_single",
-      "description": "なさそう should be ADJ ない + そう (not VERB なさる)",
-      "input": "なさそう",
-      "expected": [
+      "description" : "なさそう should be ADJ ない + そう (not VERB なさる)",
+      "expected" : [
         {
-          "surface": "なさそう",
-          "pos": "Adjective",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Adjective",
+          "surface" : "な"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "さ"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "そう"
         }
       ],
-      "tags": [
+      "id" : "nasasou_single",
+      "input" : "なさそう",
+      "tags" : [
         "hiragana",
         "sou_pattern",
         "regression"
       ]
     },
     {
-      "id": "contracted_kudaranai_base",
-      "description": "くだらん - contracted form of くだらない",
-      "input": "くだらん",
-      "expected": [
+      "description" : "くだらん - contracted form of くだらない",
+      "expected" : [
         {
-          "surface": "くだらん",
-          "pos": "Adjective",
-          "lemma": "くだらない"
+          "lemma" : "くだる",
+          "pos" : "Verb",
+          "surface" : "くだら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ん"
         }
       ],
-      "tags": [
+      "id" : "contracted_kudaranai_base",
+      "input" : "くだらん",
+      "tags" : [
         "contraction",
         "colloquial",
         "regression"
       ]
     },
     {
-      "id": "contracted_tsumaranai_base",
-      "description": "つまらん - contracted form of つまらない",
-      "input": "つまらん",
-      "expected": [
+      "description" : "つまらん - contracted form of つまらない",
+      "expected" : [
         {
-          "surface": "つまらん",
-          "pos": "Adjective",
-          "lemma": "つまらない"
+          "lemma" : "つまる",
+          "pos" : "Verb",
+          "surface" : "つまら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ん"
         }
       ],
-      "tags": [
+      "id" : "contracted_tsumaranai_base",
+      "input" : "つまらん",
+      "tags" : [
         "contraction",
         "colloquial",
         "regression"
       ]
     }
-  ]
+  ],
+  "description" : "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",
+  "version" : "1.0"
 }

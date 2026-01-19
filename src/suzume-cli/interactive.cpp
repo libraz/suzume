@@ -205,8 +205,7 @@ bool InteractiveSession::saveEntries() {
 // =============================================================================
 
 void InteractiveSession::printEntry(const TsvEntry& entry) {
-  std::cout << entry.surface << "\t" << core::posToString(entry.pos) << "\t"
-            << entry.reading << "\t" << entry.cost;
+  std::cout << entry.surface << "\t" << core::posToString(entry.pos);
   if (entry.conj_type != dictionary::ConjugationType::None) {
     std::cout << "\t" << conjTypeToString(entry.conj_type);
   }
@@ -242,7 +241,6 @@ void InteractiveSession::loadLayer1Cache() {
       LayeredEntry layered;
       layered.surface = entry->surface;
       layered.pos = entry->pos;
-      layered.cost = entry->cost;
       layered.layer = DictLayer::Layer1;
       layer1_cache_.push_back(layered);
     }
@@ -251,8 +249,7 @@ void InteractiveSession::loadLayer1Cache() {
 
 void InteractiveSession::printLayeredEntry(const LayeredEntry& entry) {
   std::cout << "  Layer " << static_cast<int>(entry.layer) << ": "
-            << entry.surface << " [" << core::posToString(entry.pos) << "] "
-            << "cost=" << entry.cost << "\n";
+            << entry.surface << " [" << core::posToString(entry.pos) << "]\n";
 }
 
 std::vector<LayeredEntry> InteractiveSession::findInAllLayers(
@@ -272,8 +269,6 @@ std::vector<LayeredEntry> InteractiveSession::findInAllLayers(
       LayeredEntry layered;
       layered.surface = entry.surface;
       layered.pos = entry.pos;
-      layered.cost = entry.cost;
-      layered.reading = entry.reading;
       layered.layer = current_layer_;
       results.push_back(layered);
     }

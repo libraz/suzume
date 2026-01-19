@@ -600,7 +600,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     const char* pattern_name = "passive_mizenkei";
 
     constexpr float kCost = -0.5F;  // Negative cost to beat OTHER + AUX split
-    SUZUME_DEBUG_BLOCK {
+    SUZUME_DEBUG_VERBOSE_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                           << " hiragana_" << pattern_name << " lemma=" << lemma
                           << " cost=" << kCost << "\n";
@@ -684,7 +684,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       // Found a valid verb - generate onbin stem candidate
       std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_pos + 1);
       constexpr float kCost = -0.5F;  // Negative cost to beat unsplit forms
-      SUZUME_DEBUG_BLOCK {
+      SUZUME_DEBUG_VERBOSE_BLOCK {
         SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                             << " hiragana_onbin_contraction lemma=" << base_form
                             << " cost=" << kCost << "\n";
@@ -724,7 +724,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
             // Strong negative cost to beat particle split
             // Particle path can be as low as -0.2, so we need lower
             constexpr float kCost = -0.5F;
-            SUZUME_DEBUG_BLOCK {
+            SUZUME_DEBUG_VERBOSE_BLOCK {
               SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface
                                   << " hiragana_ichidan_renyokei_1char lemma=" << base_form
                                   << " cost=" << kCost << "\n";
@@ -795,7 +795,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     // Strong negative cost to beat NOUN + て(VERB from てる) split
     // Dictionary-verified verbs get stronger bonus
     float cost = is_dict_verb ? -0.8F : -0.6F;
-    SUZUME_DEBUG_BLOCK {
+    SUZUME_DEBUG_VERBOSE_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface
                           << " hiragana_ichidan_renyokei lemma=" << base_form
                           << " conf=" << ichidan_confidence

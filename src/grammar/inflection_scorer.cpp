@@ -23,7 +23,7 @@ namespace {
 // Helper to log confidence adjustments
 void logConfidenceAdjustment(float amount, const char* reason) {
   if (amount != 0.0F) {
-    SUZUME_DEBUG_LOG("  " << reason << ": "
+    SUZUME_DEBUG_LOG_VERBOSE("  " << reason << ": "
                             << (amount > 0 ? "+" : "") << amount << "\n");
   }
 }
@@ -47,7 +47,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   float base = GET_OPT(base_confidence, inflection::kBaseConfidence);
   size_t stem_len = stem.size();
 
-  SUZUME_DEBUG_LOG("[INFL_SCORE] stem=\"" << stem << "\" type="
+  SUZUME_DEBUG_LOG_VERBOSE("[INFL_SCORE] stem=\"" << stem << "\" type="
                      << static_cast<int>(type) << " aux_len=" << aux_total_len
                      << " aux_count=" << aux_count << " conn=" << required_conn
                      << " suffix_len=" << suffix_len
@@ -1166,7 +1166,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   float ceiling = GET_OPT(confidence_ceiling, inflection::kConfidenceCeiling);
   float floor = GET_OPT(confidence_floor, inflection::kConfidenceFloor);
   float result = std::min(ceiling, std::max(floor, base));
-  SUZUME_DEBUG_LOG("[INFL_SCORE] → confidence=" << result << "\n");
+  SUZUME_DEBUG_LOG_VERBOSE("[INFL_SCORE] → confidence=" << result << "\n");
   return result;
 }
 

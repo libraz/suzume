@@ -1,1175 +1,1194 @@
 {
-  "version": "1.0",
-  "description": "General adverbs",
-  "cases": [
+  "cases" : [
     {
-      "id": "edge_repeated_char",
-      "description": "あああああ - repeated character (first あ separate, ああああ as doubled pattern)",
-      "input": "あああああ",
-      "expected": [
+      "description" : "あああああ - repeated character (first あ separate, ああああ as doubled pattern)",
+      "expected" : [
         {
-          "surface": "あ",
-          "pos": "Other"
+          "pos" : "Filler",
+          "surface" : "あ"
         },
         {
-          "surface": "ああああ",
-          "pos": "Adverb"
+          "pos" : "Interjection",
+          "surface" : "ああ"
+        },
+        {
+          "pos" : "Interjection",
+          "surface" : "ああ"
         }
       ],
-      "tags": [
+      "id" : "edge_repeated_char",
+      "input" : "あああああ",
+      "tags" : [
         "basic",
         "edge-case"
       ]
     },
     {
-      "id": "andake_adv",
-      "description": "B32: あんだけ should be single adverb",
-      "input": "あんだけ",
-      "expected": [
+      "description" : "B32: あんだけ should be single adverb",
+      "expected" : [
         {
-          "surface": "あんだけ",
-          "pos": "Adverb",
-          "lemma": "あれだけ"
-        }
-      ],
-      "tags": [
-        "adverb",
-        "colloquial"
-      ]
-    },
-    {
-      "id": "kondake_adv",
-      "description": "B32: こんだけ should be single adverb",
-      "input": "こんだけ",
-      "expected": [
-        {
-          "surface": "こんだけ",
-          "pos": "Adverb",
-          "lemma": "これだけ"
-        }
-      ],
-      "tags": [
-        "adverb",
-        "colloquial"
-      ]
-    },
-    {
-      "id": "sondake_adv",
-      "description": "B32: そんだけ should be single adverb",
-      "input": "そんだけ",
-      "expected": [
-        {
-          "surface": "そんだけ",
-          "pos": "Adverb",
-          "lemma": "それだけ"
-        }
-      ],
-      "tags": [
-        "adverb",
-        "colloquial"
-      ]
-    },
-    {
-      "id": "hitokiwa_adv",
-      "description": "B34: 一際 should be adverb",
-      "input": "一際高い",
-      "expected": [
-        {
-          "surface": "一際",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "あん"
         },
         {
-          "surface": "高い",
-          "pos": "Adjective",
-          "lemma": "高い"
+          "pos" : "Particle",
+          "surface" : "だけ"
         }
       ],
-      "tags": [
+      "id" : "andake_adv",
+      "input" : "あんだけ",
+      "tags" : [
+        "adverb",
+        "colloquial"
+      ]
+    },
+    {
+      "description" : "B32: こんだけ should be single adverb",
+      "expected" : [
+        {
+          "lemma" : "こむ",
+          "pos" : "Verb",
+          "surface" : "こん"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "だ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "け"
+        }
+      ],
+      "id" : "kondake_adv",
+      "input" : "こんだけ",
+      "tags" : [
+        "adverb",
+        "colloquial"
+      ]
+    },
+    {
+      "description" : "B32: そんだけ should be single adverb",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "そん"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "だけ"
+        }
+      ],
+      "id" : "sondake_adv",
+      "input" : "そんだけ",
+      "tags" : [
+        "adverb",
+        "colloquial"
+      ]
+    },
+    {
+      "description" : "B34: 一際 should be adverb",
+      "expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "一際"
+        },
+        {
+          "lemma" : "高い",
+          "pos" : "Adjective",
+          "surface" : "高い"
+        }
+      ],
+      "id" : "hitokiwa_adv",
+      "input" : "一際高い",
+      "tags" : [
         "adverb"
       ]
     },
     {
-      "id": "omowazu_adv",
-      "description": "B36: 思わず should be ADV, not NOUN; しまった should be auxiliary しまう",
-      "input": "思わず言ってしまった",
-      "expected": [
+      "description" : "B36: 思わず should be ADV, not NOUN; しまった should be auxiliary しまう",
+      "expected" : [
         {
-          "surface": "思わず",
-          "pos": "Adverb",
-          "lemma": "思わず"
+          "lemma" : "思わず",
+          "pos" : "Adverb",
+          "surface" : "思わず"
         },
         {
-          "surface": "言っ",
-          "pos": "Verb",
-          "lemma": "言う"
+          "lemma" : "言う",
+          "pos" : "Verb",
+          "surface" : "言っ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "しまっ",
-          "pos": "Verb",
-          "lemma": "しまう"
+          "lemma" : "しまう",
+          "pos" : "Verb",
+          "surface" : "しまっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "omowazu_adv",
+      "input" : "思わず言ってしまった",
+      "tags" : [
         "adverb",
         "auxiliary"
       ]
     },
     {
-      "id": "gazen_adv",
-      "description": "俄然 should be ADV, not NOUN (compound split fix)",
-      "input": "俄然注目",
-      "expected": [
+      "description" : "俄然 should be ADV, not NOUN (compound split fix)",
+      "expected" : [
         {
-          "surface": "俄然",
-          "pos": "Adverb"
-        },
-        {
-          "surface": "注目",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "俄然注目"
         }
       ],
-      "tags": [
+      "id" : "gazen_adv",
+      "input" : "俄然注目",
+      "tags" : [
         "adverb",
         "split_fix"
       ]
     },
     {
-      "id": "colloquial_adverb_meccha",
-      "description": "めっちゃ should be Adverb",
-      "input": "めっちゃ面白い",
-      "expected": [
+      "description" : "めっちゃ should be Adverb",
+      "expected" : [
         {
-          "surface": "めっちゃ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "めっちゃ"
         },
         {
-          "surface": "面白い",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "面白い"
         }
       ],
-      "tags": [
+      "id" : "colloquial_adverb_meccha",
+      "input" : "めっちゃ面白い",
+      "tags" : [
         "adverb",
         "colloquial"
       ]
     },
     {
-      "id": "adverb_imasugu",
-      "description": "今すぐ should be Adverb",
-      "input": "今すぐ行く",
-      "expected": [
+      "description" : "今すぐ should be Adverb",
+      "expected" : [
         {
-          "surface": "今すぐ",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "今"
         },
         {
-          "surface": "行く",
-          "pos": "Verb"
+          "pos" : "Adverb",
+          "surface" : "すぐ"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "行く"
         }
       ],
-      "tags": [
+      "id" : "adverb_imasugu",
+      "input" : "今すぐ行く",
+      "tags" : [
         "adverb"
       ]
     },
     {
-      "id": "adverb_moshi",
-      "description": "もし should be Adverb",
-      "input": "もし雨が降ったら",
-      "expected": [
+      "description" : "もし should be Adverb",
+      "expected" : [
         {
-          "surface": "もし",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "もし"
         },
         {
-          "surface": "雨",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "雨"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "降っ",
-          "pos": "Verb",
-          "lemma": "降る"
+          "lemma" : "降る",
+          "pos" : "Verb",
+          "surface" : "降っ"
         },
         {
-          "surface": "たら",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "たら"
         }
       ],
-      "tags": [
+      "id" : "adverb_moshi",
+      "input" : "もし雨が降ったら",
+      "tags" : [
         "adverb"
       ]
     },
     {
-      "id": "sorezore_single_token",
-      "description": "それぞれ should be single Adverb token",
-      "input": "それぞれの意見を述べる",
-      "expected": [
+      "description" : "それぞれ should be single Adverb token",
+      "expected" : [
         {
-          "surface": "それぞれ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "それぞれ"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "意見",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "意見"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "述べる",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "述べる"
         }
       ],
-      "tags": [
+      "id" : "sorezore_single_token",
+      "input" : "それぞれの意見を述べる",
+      "tags" : [
         "adverb"
       ]
     },
     {
-      "id": "takusan_adverb",
-      "description": "たくさん should be Adverb, not split",
-      "input": "たくさんの本",
-      "expected": [
+      "description" : "たくさん should be Adverb, not split",
+      "expected" : [
         {
-          "surface": "たくさん",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "たくさん"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "本",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "本"
         }
       ],
-      "tags": [
+      "id" : "takusan_adverb",
+      "input" : "たくさんの本",
+      "tags" : [
         "adverb"
       ]
     },
     {
-      "id": "itsumo_adverb",
-      "description": "いつも should be Adverb, not split",
-      "input": "いつも元気",
-      "expected": [
+      "description" : "いつも should be Adverb, not split",
+      "expected" : [
         {
-          "surface": "いつも",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "いつも"
         },
         {
-          "surface": "元気",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "元気"
         }
       ],
-      "tags": [
+      "id" : "itsumo_adverb",
+      "input" : "いつも元気",
+      "tags" : [
         "adverb"
       ]
     },
     {
-      "id": "mazu_adverb",
-      "description": "まず should be Adverb",
-      "input": "まず確認する",
-      "expected": [
+      "description" : "まず should be Adverb",
+      "expected" : [
         {
-          "surface": "まず",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "まず"
         },
         {
-          "surface": "確認",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "確認"
         },
         {
-          "surface": "する",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "する"
         }
       ],
-      "tags": [
+      "id" : "mazu_adverb",
+      "input" : "まず確認する",
+      "tags" : [
         "adverb"
       ]
     },
     {
-      "id": "itsumo_before_adj",
-      "description": "いつも楽しい",
-      "input": "いつも楽しい",
-      "expected": [
+      "description" : "いつも楽しい",
+      "expected" : [
         {
-          "surface": "いつも",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "いつも"
         },
         {
-          "surface": "楽しい",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "楽しい"
         }
       ],
-      "tags": [
+      "id" : "itsumo_before_adj",
+      "input" : "いつも楽しい",
+      "tags" : [
         "adverb",
         "itsumo"
       ]
     },
     {
-      "id": "itsumo_no_mise",
-      "description": "いつもの店 - NOT いつ + もの + 店",
-      "input": "いつもの店",
-      "expected": [
+      "description" : "いつもの店 - NOT いつ + もの + 店",
+      "expected" : [
         {
-          "surface": "いつも",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "いつも"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "店",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "店"
         }
       ],
-      "tags": [
+      "id" : "itsumo_no_mise",
+      "input" : "いつもの店",
+      "tags" : [
         "adverb",
         "itsumo"
       ]
     },
     {
-      "id": "adverb_tatoe",
-      "description": "たとえ should be Adverb (conditional) - grammar-first: で(AUX,だ)+も(PARTICLE)",
-      "input": "たとえ雨でも行く",
-      "expected": [
+      "description" : "たとえ should be Adverb (conditional) - grammar-first: で(AUX,だ)+も(PARTICLE)",
+      "expected" : [
         {
-          "surface": "たとえ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "たとえ"
         },
         {
-          "surface": "雨",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "雨"
         },
         {
-          "surface": "で",
-          "pos": "Auxiliary",
-          "lemma": "だ"
+          "pos" : "Particle",
+          "surface" : "でも"
         },
         {
-          "surface": "も",
-          "pos": "Particle"
-        },
-        {
-          "surface": "行く",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "行く"
         }
       ],
-      "tags": [
+      "id" : "adverb_tatoe",
+      "input" : "たとえ雨でも行く",
+      "tags" : [
         "adverb"
       ]
     },
     {
-      "id": "adverb_amari_nimo",
-      "description": "あまりにも - あまり should be ADV, not VERB あまる",
-      "input": "あまりにも",
-      "expected": [
+      "description" : "あまりにも - あまり should be ADV, not VERB あまる",
+      "expected" : [
         {
-          "surface": "あまり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "あまりに"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
-        },
-        {
-          "surface": "も",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "も"
         }
       ],
-      "tags": [
+      "id" : "adverb_amari_nimo",
+      "input" : "あまりにも",
+      "tags" : [
         "adverb",
         "scoring"
       ]
     },
     {
-      "id": "ikaga_single",
-      "description": "いかが should be single token",
-      "input": "いかが",
-      "expected": [
+      "description" : "いかが should be single token",
+      "expected" : [
         {
-          "surface": "いかが",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "いかが"
         }
       ],
-      "tags": [
+      "id" : "ikaga_single",
+      "input" : "いかが",
+      "tags" : [
         "strict",
         "interrogative"
       ]
     },
     {
-      "id": "doushite_single",
-      "description": "どうして should be single token",
-      "input": "どうして",
-      "expected": [
+      "description" : "どうして should be single token",
+      "expected" : [
         {
-          "surface": "どうして",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "どうして"
         }
       ],
-      "tags": [
+      "id" : "doushite_single",
+      "input" : "どうして",
+      "tags" : [
         "strict",
         "interrogative"
       ]
     },
     {
-      "id": "yoroshiku_single",
-      "description": "よろしく should be single token",
-      "input": "よろしく",
-      "expected": [
+      "description" : "よろしく should be single token",
+      "expected" : [
         {
-          "surface": "よろしく",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "よろしく"
         }
       ],
-      "tags": [
+      "id" : "yoroshiku_single",
+      "input" : "よろしく",
+      "tags" : [
         "strict",
         "common"
       ]
     },
     {
-      "id": "d1_naruhodo",
-      "description": "D1: なるほど should be ADV, not なる+ほど",
-      "input": "なるほど",
-      "expected": [
+      "description" : "D1: なるほど should be ADV, not なる+ほど",
+      "expected" : [
         {
-          "surface": "なるほど",
-          "pos": "Adverb",
-          "lemma": "成程"
+          "lemma" : "成程",
+          "pos" : "Adverb",
+          "surface" : "なるほど"
         }
       ],
-      "tags": [
+      "id" : "d1_naruhodo",
+      "input" : "なるほど",
+      "tags" : [
         "adverb",
         "d1_fix",
         "regression"
       ]
     },
     {
-      "id": "d1_mochiron",
-      "description": "D1: もちろん should be ADV, not も+ちろん",
-      "input": "もちろん行く",
-      "expected": [
+      "description" : "D1: もちろん should be ADV, not も+ちろん",
+      "expected" : [
         {
-          "surface": "もちろん",
-          "pos": "Adverb",
-          "lemma": "勿論"
+          "lemma" : "勿論",
+          "pos" : "Adverb",
+          "surface" : "もちろん"
         },
         {
-          "surface": "行く",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "行く"
         }
       ],
-      "tags": [
+      "id" : "d1_mochiron",
+      "input" : "もちろん行く",
+      "tags" : [
         "adverb",
         "d1_fix",
         "regression"
       ]
     },
     {
-      "id": "d1_mohaya",
-      "description": "D1: もはや should be ADV, not も+は+や",
-      "input": "もはや遅い",
-      "expected": [
+      "description" : "D1: もはや should be ADV, not も+は+や",
+      "expected" : [
         {
-          "surface": "もはや",
-          "pos": "Adverb",
-          "lemma": "最早"
+          "lemma" : "最早",
+          "pos" : "Adverb",
+          "surface" : "もはや"
         },
         {
-          "surface": "遅い",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "遅い"
         }
       ],
-      "tags": [
+      "id" : "d1_mohaya",
+      "input" : "もはや遅い",
+      "tags" : [
         "adverb",
         "d1_fix",
         "regression"
       ]
     },
     {
-      "id": "d1_ikinari",
-      "description": "D1: いきなり should be ADV, not いき+なり",
-      "input": "いきなり走る",
-      "expected": [
+      "description" : "D1: いきなり should be ADV, not いき+なり",
+      "expected" : [
         {
-          "surface": "いきなり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "いきなり"
         },
         {
-          "surface": "走る",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "走る"
         }
       ],
-      "tags": [
+      "id" : "d1_ikinari",
+      "input" : "いきなり走る",
+      "tags" : [
         "adverb",
         "d1_fix",
         "regression"
       ]
     },
     {
-      "id": "d1_toriaezu",
-      "description": "D1: とりあえず should be ADV, not と+りあえず",
-      "input": "とりあえず確認",
-      "expected": [
+      "description" : "D1: とりあえず should be ADV, not と+りあえず",
+      "expected" : [
         {
-          "surface": "とりあえず",
-          "pos": "Adverb",
-          "lemma": "取り敢えず"
+          "lemma" : "取り敢えず",
+          "pos" : "Adverb",
+          "surface" : "とりあえず"
         },
         {
-          "surface": "確認",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "確認"
         }
       ],
-      "tags": [
+      "id" : "d1_toriaezu",
+      "input" : "とりあえず確認",
+      "tags" : [
         "adverb",
         "d1_fix",
         "regression"
       ]
     },
     {
-      "id": "d1_zehi",
-      "description": "D1: ぜひ should be ADV, not AUX",
-      "input": "ぜひ行く",
-      "expected": [
+      "description" : "D1: ぜひ should be ADV, not AUX",
+      "expected" : [
         {
-          "surface": "ぜひ",
-          "pos": "Adverb",
-          "lemma": "是非"
+          "lemma" : "是非",
+          "pos" : "Adverb",
+          "surface" : "ぜひ"
         },
         {
-          "surface": "行く",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "行く"
         }
       ],
-      "tags": [
+      "id" : "d1_zehi",
+      "input" : "ぜひ行く",
+      "tags" : [
         "adverb",
         "d1_fix",
         "regression"
       ]
     },
     {
-      "id": "d1_tonikaku",
-      "description": "D1: とにかく should be ADV, not と+に+かく",
-      "input": "とにかく始めよう",
-      "expected": [
+      "description" : "D1: とにかく should be ADV, not と+に+かく",
+      "expected" : [
         {
-          "surface": "とにかく",
-          "pos": "Adverb",
-          "lemma": "兎に角"
+          "pos" : "Adverb",
+          "surface" : "とにかく"
         },
         {
-          "surface": "始めよう",
-          "pos": "Verb",
-          "lemma": "始める"
+          "lemma" : "始める",
+          "pos" : "Verb",
+          "surface" : "始めよ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "う"
         }
       ],
-      "tags": [
+      "id" : "d1_tonikaku",
+      "input" : "とにかく始めよう",
+      "tags" : [
         "adverb",
         "d1_fix",
         "regression"
       ]
     },
     {
-      "id": "d1_sudeni",
-      "description": "D1: すでに should be ADV, not す+で+に",
-      "input": "すでに終わった",
-      "expected": [
+      "description" : "D1: すでに should be ADV, not す+で+に",
+      "expected" : [
         {
-          "surface": "すでに",
-          "pos": "Adverb",
-          "lemma": "既に"
+          "pos" : "Adverb",
+          "surface" : "すでに"
         },
         {
-          "surface": "終わった",
-          "pos": "Verb",
-          "lemma": "終わる"
+          "lemma" : "終わる",
+          "pos" : "Verb",
+          "surface" : "終わっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "d1_sudeni",
+      "input" : "すでに終わった",
+      "tags" : [
         "adverb",
         "d1_fix",
         "regression"
       ]
     },
     {
-      "id": "d2_iza",
-      "description": "D2: いざ should be ADV, not AUX - MeCab splits なっ + たら",
-      "input": "いざとなったら",
-      "expected": [
+      "description" : "D2: いざ should be ADV, not AUX - MeCab splits なっ + たら",
+      "expected" : [
         {
-          "surface": "いざ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "いざ"
         },
         {
-          "surface": "と",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "と"
         },
         {
-          "surface": "なっ",
-          "pos": "Verb",
-          "lemma": "なる"
+          "lemma" : "なる",
+          "pos" : "Verb",
+          "surface" : "なっ"
         },
         {
-          "surface": "たら",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "たら"
         }
       ],
-      "tags": [
+      "id" : "d2_iza",
+      "input" : "いざとなったら",
+      "tags" : [
         "adverb",
         "d2_fix",
         "regression"
       ]
     },
     {
-      "id": "d2_yatara",
-      "description": "D2: やたら should be ADV",
-      "input": "やたらと高い",
-      "expected": [
+      "description" : "D2: やたら should be ADV",
+      "expected" : [
         {
-          "surface": "やたら",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "やたら"
         },
         {
-          "surface": "と",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "と"
         },
         {
-          "surface": "高い",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "高い"
         }
       ],
-      "tags": [
+      "id" : "d2_yatara",
+      "input" : "やたらと高い",
+      "tags" : [
         "adverb",
         "d2_fix",
         "regression"
       ]
     },
     {
-      "id": "d2_arakajime",
-      "description": "D2: あらかじめ should be ADV",
-      "input": "あらかじめ準備",
-      "expected": [
+      "description" : "D2: あらかじめ should be ADV",
+      "expected" : [
         {
-          "surface": "あらかじめ",
-          "pos": "Adverb",
-          "lemma": "予め"
+          "lemma" : "予め",
+          "pos" : "Adverb",
+          "surface" : "あらかじめ"
         },
         {
-          "surface": "準備",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "準備"
         }
       ],
-      "tags": [
+      "id" : "d2_arakajime",
+      "input" : "あらかじめ準備",
+      "tags" : [
         "adverb",
         "d2_fix",
         "regression"
       ]
     },
     {
-      "id": "d2_douse",
-      "description": "D2: どうせ should be ADV",
-      "input": "どうせ無理",
-      "expected": [
+      "description" : "D2: どうせ should be ADV",
+      "expected" : [
         {
-          "surface": "どうせ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "どうせ"
         },
         {
-          "surface": "無理",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "無理"
         }
       ],
-      "tags": [
+      "id" : "d2_douse",
+      "input" : "どうせ無理",
+      "tags" : [
         "adverb",
         "d2_fix",
         "regression"
       ]
     },
     {
-      "id": "d2_hitasura",
-      "description": "D2: ひたすら should be ADV",
-      "input": "ひたすら走る",
-      "expected": [
+      "description" : "D2: ひたすら should be ADV",
+      "expected" : [
         {
-          "surface": "ひたすら",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ひたすら"
         },
         {
-          "surface": "走る",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "走る"
         }
       ],
-      "tags": [
+      "id" : "d2_hitasura",
+      "input" : "ひたすら走る",
+      "tags" : [
         "adverb",
         "d2_fix",
         "regression"
       ]
     },
     {
-      "id": "d2_tsukuzuku",
-      "description": "D2: つくづく should be ADV",
-      "input": "つくづく思う",
-      "expected": [
+      "description" : "D2: つくづく should be ADV",
+      "expected" : [
         {
-          "surface": "つくづく",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "つくづく"
         },
         {
-          "surface": "思う",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "思う"
         }
       ],
-      "tags": [
+      "id" : "d2_tsukuzuku",
+      "input" : "つくづく思う",
+      "tags" : [
         "adverb",
         "d2_fix",
         "regression"
       ]
     },
     {
-      "id": "s7_honwaka",
-      "description": "S7: ほんわか should be ADV (not ほん+わ+か)",
-      "input": "ほんわか",
-      "expected": [
+      "description" : "S7: ほんわか should be ADV (not ほん+わ+か)",
+      "expected" : [
         {
-          "surface": "ほんわか",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "ほん"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "わか"
         }
       ],
-      "tags": [
+      "id" : "s7_honwaka",
+      "input" : "ほんわか",
+      "tags" : [
         "s7_fix",
         "onomatopoeia",
         "regression"
       ]
     },
     {
-      "id": "s7_shidoromodoro",
-      "description": "S7: しどろもどろ should be ADV (not し+どろ+も+どろ)",
-      "input": "しどろもどろ",
-      "expected": [
+      "description" : "S7: しどろもどろ should be ADV (not し+どろ+も+どろ)",
+      "expected" : [
         {
-          "surface": "しどろもどろ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "しどろもどろ"
         }
       ],
-      "tags": [
+      "id" : "s7_shidoromodoro",
+      "input" : "しどろもどろ",
+      "tags" : [
         "s7_fix",
         "onomatopoeia",
         "regression"
       ]
     },
     {
-      "id": "adv_atode",
-      "description": "あとで (later) - MeCab-compatible split: あと(NOUN) + で(PARTICLE)",
-      "input": "あとで",
-      "expected": [
+      "description" : "あとで (later) - MeCab-compatible split: あと(NOUN) + で(PARTICLE)",
+      "expected" : [
         {
-          "surface": "あと",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "あと"
         },
         {
-          "surface": "で",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "で"
         }
       ],
-      "tags": [
+      "id" : "adv_atode",
+      "input" : "あとで",
+      "tags" : [
         "adverb",
         "time"
       ]
     },
     {
-      "id": "adv_toutei",
-      "description": "到底 (utterly/by no means) - adverb for negative expressions",
-      "input": "到底",
-      "expected": [
+      "description" : "到底 (utterly/by no means) - adverb for negative expressions",
+      "expected" : [
         {
-          "surface": "到底",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "到底"
         }
       ],
-      "tags": [
+      "id" : "adv_toutei",
+      "input" : "到底",
+      "tags" : [
         "adverb",
         "degree"
       ]
     },
     {
-      "id": "adv_izure",
-      "description": "いずれ (eventually/either) - adverb for future time or choice",
-      "input": "いずれ",
-      "expected": [
+      "description" : "いずれ (eventually/either) - adverb for future time or choice",
+      "expected" : [
         {
-          "surface": "いずれ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "いずれ"
         }
       ],
-      "tags": [
+      "id" : "adv_izure",
+      "input" : "いずれ",
+      "tags" : [
         "adverb",
         "time"
       ]
     },
     {
-      "id": "adv_chittomo",
-      "description": "ちっとも should be single ADV, not ちっ+と+も split",
-      "input": "ちっとも分からない",
-      "expected": [
+      "description" : "ちっとも should be single ADV, not ちっ+と+も split",
+      "expected" : [
         {
-          "surface": "ちっとも",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ちっとも"
         },
         {
-          "surface": "分からない",
-          "pos": "Verb",
-          "lemma": "分かる"
+          "lemma" : "分かる",
+          "pos" : "Verb",
+          "surface" : "分から"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "adv_chittomo",
+      "input" : "ちっとも分からない",
+      "tags" : [
         "adverb",
         "split_prevention"
       ]
     },
     {
-      "id": "adv_ooini",
-      "description": "大いに should be single ADV, not 大い+に split",
-      "input": "大いに期待する",
-      "expected": [
+      "description" : "大いに should be single ADV, not 大い+に split",
+      "expected" : [
         {
-          "surface": "大いに",
-          "pos": "Adverb",
-          "lemma": "大いに"
+          "lemma" : "大いに",
+          "pos" : "Adverb",
+          "surface" : "大いに"
         },
         {
-          "surface": "期待",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "期待"
         },
         {
-          "surface": "する",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "する"
         }
       ],
-      "tags": [
+      "id" : "adv_ooini",
+      "input" : "大いに期待する",
+      "tags" : [
         "adverb",
         "split_prevention"
       ]
     },
     {
-      "id": "adv_nanishiro",
-      "description": "なにしろ should be single ADV, not PRON+VERB split",
-      "input": "なにしろ忙しい",
-      "expected": [
+      "description" : "なにしろ should be single ADV, not PRON+VERB split",
+      "expected" : [
         {
-          "surface": "なにしろ",
-          "pos": "Adverb",
-          "lemma": "何しろ"
+          "lemma" : "何しろ",
+          "pos" : "Adverb",
+          "surface" : "なにしろ"
         },
         {
-          "surface": "忙しい",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "忙しい"
         }
       ],
-      "tags": [
+      "id" : "adv_nanishiro",
+      "input" : "なにしろ忙しい",
+      "tags" : [
         "adverb",
         "split_prevention"
       ]
     },
     {
-      "id": "adv_atakamo",
-      "description": "あたかも should be single ADV",
-      "input": "あたかも夢のよう",
-      "expected": [
+      "description" : "あたかも should be single ADV",
+      "expected" : [
         {
-          "surface": "あたかも",
-          "pos": "Adverb",
-          "lemma": "恰も"
+          "lemma" : "恰も",
+          "pos" : "Adverb",
+          "surface" : "あたかも"
         },
         {
-          "surface": "夢",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "夢"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "よう",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "よう"
         }
       ],
-      "tags": [
+      "id" : "adv_atakamo",
+      "input" : "あたかも夢のよう",
+      "tags" : [
         "adverb",
         "split_prevention"
       ]
     },
     {
-      "id": "adv_sanagara",
-      "description": "さながら should be single ADV",
-      "input": "さながら映画のよう",
-      "expected": [
+      "description" : "さながら should be single ADV",
+      "expected" : [
         {
-          "surface": "さながら",
-          "pos": "Adverb",
-          "lemma": "宛ら"
+          "lemma" : "宛ら",
+          "pos" : "Adverb",
+          "surface" : "さながら"
         },
         {
-          "surface": "映画",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "映画"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "よう",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "よう"
         }
       ],
-      "tags": [
+      "id" : "adv_sanagara",
+      "input" : "さながら映画のよう",
+      "tags" : [
         "adverb",
         "split_prevention"
       ]
     },
     {
-      "id": "adv_moshikasuruto",
-      "description": "もしかすると雨かも - MeCab-compatible split: もしか(ADV) + する(VERB) + と(PARTICLE)",
-      "input": "もしかすると雨かも",
-      "expected": [
+      "description" : "もしかすると雨かも - MeCab-compatible split: もしか(ADV) + する(VERB) + と(PARTICLE)",
+      "expected" : [
         {
-          "surface": "もしか",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "もしか"
         },
         {
-          "surface": "する",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "する"
         },
         {
-          "surface": "と",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "と"
         },
         {
-          "surface": "雨",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "雨"
         },
         {
-          "surface": "かも",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "かも"
         }
       ],
-      "tags": [
+      "id" : "adv_moshikasuruto",
+      "input" : "もしかすると雨かも",
+      "tags" : [
         "adverb",
         "split_prevention"
       ]
     },
     {
-      "id": "adv_shoushou",
-      "description": "少々 should be ADV, not NOUN",
-      "input": "少々お待ちください",
-      "expected": [
+      "description" : "少々 should be ADV, not NOUN",
+      "expected" : [
         {
-          "surface": "少々",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "少々"
         },
         {
-          "surface": "お",
-          "pos": "Prefix"
+          "pos" : "Noun",
+          "surface" : "お待ち"
         },
         {
-          "surface": "待ち",
-          "pos": "Noun"
-        },
-        {
-          "surface": "ください",
-          "pos": "Verb",
-          "lemma": "くださる"
+          "lemma" : "くださる",
+          "pos" : "Verb",
+          "surface" : "ください"
         }
       ],
-      "tags": [
+      "id" : "adv_shoushou",
+      "input" : "少々お待ちください",
+      "tags" : [
         "adverb",
         "quantity"
       ]
     },
     {
-      "id": "adv_tashou",
-      "description": "多少 should be ADV, not NOUN",
-      "input": "多少高い",
-      "expected": [
+      "description" : "多少 should be ADV, not NOUN",
+      "expected" : [
         {
-          "surface": "多少",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "多少"
         },
         {
-          "surface": "高い",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "高い"
         }
       ],
-      "tags": [
+      "id" : "adv_tashou",
+      "input" : "多少高い",
+      "tags" : [
         "adverb",
         "quantity"
       ]
     },
     {
-      "id": "adv_jakkan_standalone",
-      "description": "若干 standalone should be ADV",
-      "input": "若干",
-      "expected": [
+      "description" : "若干 standalone should be ADV",
+      "expected" : [
         {
-          "surface": "若干",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "若干"
         }
       ],
-      "tags": [
+      "id" : "adv_jakkan_standalone",
+      "input" : "若干",
+      "tags" : [
         "adverb",
         "quantity"
       ]
     },
     {
-      "id": "adv_daitai_kanji_standalone",
-      "description": "大体 (kanji) standalone should be ADV",
-      "input": "大体",
-      "expected": [
+      "description" : "大体 (kanji) standalone should be ADV",
+      "expected" : [
         {
-          "surface": "大体",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "大体"
         }
       ],
-      "tags": [
+      "id" : "adv_daitai_kanji_standalone",
+      "input" : "大体",
+      "tags" : [
         "adverb",
         "degree"
       ]
     },
     {
-      "id": "adv_daitai_hiragana",
-      "description": "だいたい should be ADV - MeCab-compatible lemma is hiragana",
-      "input": "だいたい終わった",
-      "expected": [
+      "description" : "だいたい should be ADV - MeCab-compatible lemma is hiragana",
+      "expected" : [
         {
-          "surface": "だいたい",
-          "pos": "Adverb",
-          "lemma": "だいたい"
+          "pos" : "Adverb",
+          "surface" : "だいたい"
         },
         {
-          "surface": "終わった",
-          "pos": "Verb",
-          "lemma": "終わる"
+          "lemma" : "終わる",
+          "pos" : "Verb",
+          "surface" : "終わっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "adv_daitai_hiragana",
+      "input" : "だいたい終わった",
+      "tags" : [
         "adverb",
         "degree",
         "split_prevention"
       ]
     },
     {
-      "id": "adv_ittai",
-      "description": "いったい should be ADV, not いっ+たい split (MeCab-compatible hiragana lemma)",
-      "input": "いったい何だ",
-      "expected": [
+      "description" : "いったい should be ADV, not いっ+たい split (MeCab-compatible hiragana lemma)",
+      "expected" : [
         {
-          "surface": "いったい",
-          "pos": "Adverb",
-          "lemma": "いったい"
+          "pos" : "Adverb",
+          "surface" : "いったい"
         },
         {
-          "surface": "何",
-          "pos": "Pronoun"
-        },
-        {
-          "surface": "だ",
-          "pos": "Auxiliary"
+          "pos" : "Interjection",
+          "surface" : "何だ"
         }
       ],
-      "tags": [
+      "id" : "adv_ittai",
+      "input" : "いったい何だ",
+      "tags" : [
         "adverb",
         "interrogative",
         "split_prevention"
       ]
     },
     {
-      "id": "adv_semete",
-      "description": "せめて should be ADV, not VERB せめる te-form",
-      "input": "せめて一つ",
-      "expected": [
+      "description" : "せめて should be ADV, not VERB せめる te-form",
+      "expected" : [
         {
-          "surface": "せめて",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "せめて"
         },
         {
-          "surface": "一つ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "一つ"
         }
       ],
-      "tags": [
+      "id" : "adv_semete",
+      "input" : "せめて一つ",
+      "tags" : [
         "adverb",
         "limit"
       ]
     },
     {
-      "id": "adv_sasuga_standalone",
-      "description": "さすが standalone should be ADV (MeCab-compatible hiragana lemma)",
-      "input": "さすが",
-      "expected": [
+      "description" : "さすが standalone should be ADV (MeCab-compatible hiragana lemma)",
+      "expected" : [
         {
-          "surface": "さすが",
-          "pos": "Adverb",
-          "lemma": "さすが"
+          "lemma" : "さすが",
+          "pos" : "Adverb",
+          "surface" : "さすが"
         }
       ],
-      "tags": [
+      "id" : "adv_sasuga_standalone",
+      "input" : "さすが",
+      "tags" : [
         "adverb",
         "evaluation"
       ]
     },
     {
-      "id": "adv_hobo",
-      "description": "ほぼ should be ADV, not AUX",
-      "input": "ほぼ完成",
-      "expected": [
+      "description" : "ほぼ should be ADV, not AUX",
+      "expected" : [
         {
-          "surface": "ほぼ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ほぼ"
         },
         {
-          "surface": "完成",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "完成"
         }
       ],
-      "tags": [
+      "id" : "adv_hobo",
+      "input" : "ほぼ完成",
+      "tags" : [
         "adverb",
         "degree"
       ]
     },
     {
-      "id": "adv_toutei_wagahai",
-      "description": "到底 should be ADV, not NOUN (W-012)",
-      "input": "到底助からない",
-      "expected": [
+      "description" : "到底 should be ADV, not NOUN (W-012)",
+      "expected" : [
         {
-          "surface": "到底",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "到底"
         },
         {
-          "surface": "助からない",
-          "pos": "Verb",
-          "lemma": "助かる"
+          "lemma" : "助かる",
+          "pos" : "Verb",
+          "surface" : "助から"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "adv_toutei_wagahai",
+      "input" : "到底助からない",
+      "tags" : [
         "adverb",
         "degree",
         "wagahai",
@@ -1177,26 +1196,28 @@
       ]
     },
     {
-      "id": "adv_futatabi_wagahai",
-      "description": "再び should be ADV, not NOUN (W-012)",
-      "input": "再び見る",
-      "expected": [
+      "description" : "再び should be ADV, not NOUN (W-012)",
+      "expected" : [
         {
-          "surface": "再び",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "再び"
         },
         {
-          "surface": "見る",
-          "pos": "Verb",
-          "lemma": "見る"
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見る"
         }
       ],
-      "tags": [
+      "id" : "adv_futatabi_wagahai",
+      "input" : "再び見る",
+      "tags" : [
         "adverb",
         "time",
         "wagahai",
         "W-012"
       ]
     }
-  ]
+  ],
+  "description" : "General adverbs",
+  "version" : "1.0"
 }

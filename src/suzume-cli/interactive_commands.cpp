@@ -13,7 +13,7 @@ namespace suzume::cli {
 
 bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
   if (args.size() < 2) {
-    printError("Usage: add <surface> <pos> [reading] [cost] [conj_type]");
+    printError("Usage: add <surface> <pos> [conj_type]");
     return true;
   }
 
@@ -31,29 +31,12 @@ bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
   }
   entry.pos = pos_opt.value();
 
-  // Parse optional reading
-  if (args.size() >= 3) {
-    entry.reading = args[2];
-  }
-
-  // Parse optional cost
-  if (args.size() >= 4) {
-    try {
-      entry.cost = std::stof(args[3]);
-    } catch (...) {
-      printError("Invalid cost: " + args[3]);
-      return true;
-    }
-  } else {
-    entry.cost = 0.5F;
-  }
-
   // Parse optional conjugation type
-  if (args.size() >= 5) {
-    std::string conj_str = toUpper(args[4]);
+  if (args.size() >= 3) {
+    std::string conj_str = toUpper(args[2]);
     auto conj_opt = parseConjType(conj_str);
     if (!conj_opt.has_value()) {
-      printError("Invalid conjugation type: " + args[4]);
+      printError("Invalid conjugation type: " + args[2]);
       std::cout << "Valid: ICHIDAN, GODAN_KA, GODAN_GA, GODAN_SA, GODAN_TA, "
                    "GODAN_NA, GODAN_BA, GODAN_MA, GODAN_RA, GODAN_WA, SURU, "
                    "KURU, I_ADJ, NA_ADJ\n";
@@ -176,7 +159,7 @@ bool InteractiveSession::cmdRemove(const std::vector<std::string>& args) {
 
 bool InteractiveSession::cmdUpdate(const std::vector<std::string>& args) {
   if (args.size() < 2) {
-    printError("Usage: update <surface> <pos> [reading] [cost]");
+    printError("Usage: update <surface> <pos> [conj_type]");
     return true;
   }
 
@@ -203,17 +186,15 @@ bool InteractiveSession::cmdUpdate(const std::vector<std::string>& args) {
     return true;
   }
 
-  // Update fields
+  // Update conjugation type if provided
   if (args.size() >= 3) {
-    found->reading = args[2];
-  }
-  if (args.size() >= 4) {
-    try {
-      found->cost = std::stof(args[3]);
-    } catch (...) {
-      printError("Invalid cost: " + args[3]);
+    std::string conj_str = toUpper(args[2]);
+    auto conj_opt = parseConjType(conj_str);
+    if (!conj_opt.has_value()) {
+      printError("Invalid conjugation type: " + args[2]);
       return true;
     }
+    found->conj_type = conj_opt.value();
   }
 
   modified_ = true;
@@ -421,7 +402,7 @@ bool InteractiveSession::cmdSave(const std::vector<std::string>& /* args */) {
 
 bool InteractiveSession::cmdHelp(const std::vector<std::string>& /* args */) {
   std::cout << R"(Commands:
-  add <surface> <pos> [reading] [cost] [conj_type]
+  add <surface> <pos> [conj_type]
       Add a new dictionary entry
       POS: NOUN, PROPN, VERB, ADJECTIVE, ADVERB, PARTICLE, AUXILIARY, SYMBOL, OTHER
       Conj: ICHIDAN, GODAN_KA, GODAN_GA, GODAN_SA, GODAN_TA, GODAN_NA,
@@ -430,7 +411,7 @@ bool InteractiveSession::cmdHelp(const std::vector<std::string>& /* args */) {
   remove <surface> [pos]
       Remove entry (all with surface, or specific POS)
 
-  update <surface> <pos> [reading] [cost]
+  update <surface> <pos> [conj_type]
       Update existing entry
 
   list [--pos=POS] [--pattern=PATTERN] [--limit=N]

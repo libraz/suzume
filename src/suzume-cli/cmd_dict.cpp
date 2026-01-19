@@ -258,7 +258,7 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
       }
 
       std::cout << entry->surface << "\t" << core::posToString(entry->pos)
-                << "\t" << entry->lemma << "\t" << entry->cost << "\n";
+                << "\t" << entry->lemma << "\t" << 0.0F /* v0.8: cost removed */ << "\n";
 
       ++count;
       if (limit > 0 && count >= limit) {
@@ -283,8 +283,7 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
         continue;
       }
 
-      std::cout << entry.surface << "\t" << core::posToString(entry.pos)
-                << "\t" << entry.reading << "\t" << entry.cost << "\n";
+      std::cout << entry.surface << "\t" << core::posToString(entry.pos) << "\n";
 
       ++count;
       if (limit > 0 && count >= limit) {
@@ -337,8 +336,7 @@ int cmdDictSearch(const std::vector<std::string>& args, bool /* verbose */) {
   size_t count = 0;
   for (const auto& entry : result.value()) {
     if (std::regex_match(entry.surface, regex_pattern)) {
-      std::cout << entry.surface << "\t" << core::posToString(entry.pos)
-                << "\t" << entry.reading << "\t" << entry.cost << "\n";
+      std::cout << entry.surface << "\t" << core::posToString(entry.pos) << "\n";
       ++count;
     }
   }

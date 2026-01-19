@@ -120,14 +120,15 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // Only skip if kanji is 2+ characters, as single kanji + suffix
       // could be a valid verb stem (立ち → 立つ)
       // Note: Only skip for OTHER (suffixes), not VERB (する is a verb, not suffix)
+      // v0.8: is_low_info removed - check for Suffix extended_pos or Other POS
       bool is_suffix_pattern = false;
       if (kanji_end - start_pos >= 2 && dict_manager != nullptr) {
         auto suffix_results = dict_manager->lookup(hiragana_part, 0);
         for (const auto& result : suffix_results) {
           if (result.entry != nullptr &&
               result.entry->surface == hiragana_part &&
-              result.entry->is_low_info &&
-              result.entry->pos == core::PartOfSpeech::Other) {
+              (result.entry->extended_pos == core::ExtendedPOS::Suffix ||
+               result.entry->pos == core::PartOfSpeech::Other)) {
             // This hiragana part is a registered suffix - skip verb candidate
             is_suffix_pattern = true;
             break;
@@ -404,7 +405,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           bool recognized_ichidan = is_ichidan && has_valid_ichidan_stem &&
                                     best.confidence > verb_opts.confidence_ichidan_dict;
           bool has_suffix = in_dict || recognized_ichidan;
-          SUZUME_DEBUG_BLOCK {
+          SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                 << " base=" << best.base_form
                                 << " cost=" << base_cost
@@ -667,7 +668,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_valid_verb) {
         // Negative cost to beat single-verb inflection path (which gets optimal_length -0.5 bonus)
         constexpr float kCost = -0.5F;
-        SUZUME_DEBUG_BLOCK {
+        SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " ichidan_stem_rare lemma=" << base_form
                               << " cost=" << kCost << "\n";
@@ -698,7 +699,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
         constexpr float kCost = -0.5F;  // Strong bonus to beat NOUN candidate
-        SUZUME_DEBUG_BLOCK {
+        SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_polite lemma=" << base_form
                               << " cost=" << kCost << "\n";
@@ -718,7 +719,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
         constexpr float kCost = -0.8F;  // Strong bonus to beat unified dictionary entry
-        SUZUME_DEBUG_BLOCK {
+        SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_ta_te lemma=" << base_form
                               << " cost=" << kCost << "\n";
@@ -740,7 +741,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
         constexpr float kCost = -0.8F;  // Strong bonus to beat unified contraction entry
-        SUZUME_DEBUG_BLOCK {
+        SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_colloquial lemma=" << base_form
                               << " cost=" << kCost << "\n";
@@ -760,7 +761,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
         constexpr float kCost = -0.8F;  // Strong bonus to beat godan mizenkei interpretation
-        SUZUME_DEBUG_BLOCK {
+        SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_rareru lemma=" << base_form
                               << " cost=" << kCost << "\n";
@@ -877,7 +878,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                 }
                 const char* debug_pattern = is_nu_pattern ? "nu" :
                                             is_passive_pattern ? "passive" : "beki";
-                SUZUME_DEBUG_BLOCK {
+                SUZUME_DEBUG_VERBOSE_BLOCK {
                   SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                       << " godan_mizenkei lemma=" << base_form
                                       << " cost=" << cost
@@ -923,19 +924,9 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       }
       if (is_contraction_pattern) {
         // Determine candidate verb types based on onbin type
-        std::vector<std::pair<grammar::VerbType, std::string_view>> candidates_to_try;
-        if (is_hatsuonbin) {
-          candidates_to_try = {
-            {grammar::VerbType::GodanMa, "む"},
-            {grammar::VerbType::GodanBa, "ぶ"},
-            {grammar::VerbType::GodanNa, "ぬ"},
-          };
-        } else {
-          candidates_to_try = {
-            {grammar::VerbType::GodanKa, "く"},
-            {grammar::VerbType::GodanGa, "ぐ"},
-          };
-        }
+        // Uses centralized GodanRow data instead of manual enumeration
+        std::string_view onbin_str = is_hatsuonbin ? "ん" : "い";
+        auto candidates_to_try = vh::getGodanTypesByOnbin(onbin_str);
         // Get the kanji stem
         std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
         // First, check dictionary for ALL verb types before falling back to inflection
@@ -978,7 +969,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Found valid verb - generate onbin stem candidate
           std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
           constexpr float kOnbinCost = -0.5F;  // Negative cost to beat unsplit forms
-          SUZUME_DEBUG_BLOCK {
+          SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                                 << " kanji_onbin_contraction lemma=" << matched_base_form
                                 << " cost=" << kOnbinCost << "\n";

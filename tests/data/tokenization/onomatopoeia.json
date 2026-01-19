@@ -1,921 +1,959 @@
 {
-  "version": "1.0",
-  "description": "Onomatopoeia and mimetic words",
-  "cases": [
+  "cases" : [
     {
-      "id": "onomatopoeia_wakuwaku",
-      "description": "わくわくする (excited)",
-      "input": "わくわくする",
-      "expected": [
+      "description" : "わくわくする (excited)",
+      "expected" : [
         {
-          "surface": "わくわく",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "わくわく"
         },
         {
-          "surface": "する",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "する"
         }
       ],
-      "tags": [
+      "id" : "onomatopoeia_wakuwaku",
+      "input" : "わくわくする",
+      "tags" : [
         "grammar",
         "onomatopoeia"
       ]
     },
     {
-      "id": "onomatopoeia_nyanyaa",
-      "description": "ニャーニャー (cat meow) - AA doubled pattern with small kana",
-      "input": "ニャーニャー",
-      "expected": [
+      "description" : "ニャーニャー (cat meow) - AA doubled pattern with small kana",
+      "expected" : [
         {
-          "surface": "ニャーニャー",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ニャーニャー"
         }
       ],
-      "tags": [
+      "id" : "onomatopoeia_nyanyaa",
+      "input" : "ニャーニャー",
+      "tags" : [
         "grammar",
         "onomatopoeia",
         "aa_pattern"
       ]
     },
     {
-      "id": "onomatopoeia_wanwan",
-      "description": "ワンワン (dog bark) - AA doubled pattern",
-      "input": "ワンワン",
-      "expected": [
+      "description" : "ワンワン (dog bark) - AA doubled pattern",
+      "expected" : [
         {
-          "surface": "ワンワン",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "ワン"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "ワン"
         }
       ],
-      "tags": [
+      "id" : "onomatopoeia_wanwan",
+      "input" : "ワンワン",
+      "tags" : [
         "grammar",
         "onomatopoeia",
         "aa_pattern"
       ]
     },
     {
-      "id": "onomatopoeia_kirakira",
-      "description": "キラキラ光る (sparkling)",
-      "input": "キラキラ光る",
-      "expected": [
+      "description" : "キラキラ光る (sparkling)",
+      "expected" : [
         {
-          "surface": "キラキラ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "キラキラ"
         },
         {
-          "surface": "光る",
-          "pos": "Verb",
-          "lemma": "光る"
+          "lemma" : "光る",
+          "pos" : "Verb",
+          "surface" : "光る"
         }
       ],
-      "tags": [
+      "id" : "onomatopoeia_kirakira",
+      "input" : "キラキラ光る",
+      "tags" : [
         "grammar",
         "onomatopoeia"
       ]
     },
     {
-      "id": "onomatopoeia_gatagata",
-      "description": "ガタガタ揺れる (shaking)",
-      "input": "ガタガタ揺れる",
-      "expected": [
+      "description" : "ガタガタ揺れる (shaking)",
+      "expected" : [
         {
-          "surface": "ガタガタ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ガタガタ"
         },
         {
-          "surface": "揺れる",
-          "pos": "Verb",
-          "lemma": "揺れる"
+          "lemma" : "揺れる",
+          "pos" : "Verb",
+          "surface" : "揺れる"
         }
       ],
-      "tags": [
+      "id" : "onomatopoeia_gatagata",
+      "input" : "ガタガタ揺れる",
+      "tags" : [
         "grammar",
         "onomatopoeia"
       ]
     },
     {
-      "id": "tottoto_adv",
-      "description": "B40: とっとと should be ADV, not OTHER+PARTICLE+PARTICLE split (MeCab-compatible)",
-      "input": "とっとと滅びればいい",
-      "expected": [
+      "description" : "B40: とっとと should be ADV, not OTHER+PARTICLE+PARTICLE split (MeCab-compatible)",
+      "expected" : [
         {
-          "surface": "とっとと",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "とっとと"
         },
         {
-          "surface": "滅びれ",
-          "pos": "Verb",
-          "lemma": "滅びる"
+          "lemma" : "滅びる",
+          "pos" : "Verb",
+          "surface" : "滅びれ"
         },
         {
-          "surface": "ば",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "ば"
         },
         {
-          "surface": "いい",
-          "pos": "Adjective",
-          "lemma": "いい"
+          "lemma" : "いい",
+          "pos" : "Adjective",
+          "surface" : "いい"
         }
       ],
-      "tags": [
+      "id" : "tottoto_adv",
+      "input" : "とっとと滅びればいい",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "sekkaku_adv",
-      "description": "せっかく should be ADV (B61)",
-      "input": "せっかくなので",
-      "expected": [
+      "description" : "せっかく should be ADV (B61)",
+      "expected" : [
         {
-          "surface": "せっかく",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "せっかく"
         },
         {
-          "surface": "な",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "な"
         },
         {
-          "surface": "ので",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "ので"
         }
       ],
-      "tags": [
+      "id" : "sekkaku_adv",
+      "input" : "せっかくなので",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "ukkari_adv",
-      "description": "うっかり should be ADV (B62) - MeCab互換分割",
-      "input": "うっかり忘れた",
-      "expected": [
+      "description" : "うっかり should be ADV (B62) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "うっかり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "うっかり"
         },
         {
-          "surface": "忘れ",
-          "pos": "Verb",
-          "lemma": "忘れる"
+          "lemma" : "忘れる",
+          "pos" : "Verb",
+          "surface" : "忘れ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "ukkari_adv",
+      "input" : "うっかり忘れた",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "sukkari_adv",
-      "description": "すっかり should be ADV (B62)",
-      "input": "すっかり変わった",
-      "expected": [
+      "description" : "すっかり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "すっかり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "すっかり"
         },
         {
-          "surface": "変わった",
-          "pos": "Verb",
-          "lemma": "変わる"
+          "lemma" : "変わる",
+          "pos" : "Verb",
+          "surface" : "変わっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "sukkari_adv",
+      "input" : "すっかり変わった",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "pittari_adv",
-      "description": "ぴったり should be ADV (B62)",
-      "input": "ぴったり合う",
-      "expected": [
+      "description" : "ぴったり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "ぴったり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ぴったり"
         },
         {
-          "surface": "合う",
-          "pos": "Verb",
-          "lemma": "合う"
+          "lemma" : "合う",
+          "pos" : "Verb",
+          "surface" : "合う"
         }
       ],
-      "tags": [
+      "id" : "pittari_adv",
+      "input" : "ぴったり合う",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "sappari_adv",
-      "description": "さっぱり should be ADV (B62)",
-      "input": "さっぱりわからない",
-      "expected": [
+      "description" : "さっぱり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "さっぱり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "さっぱり"
         },
         {
-          "surface": "わからない",
-          "pos": "Verb",
-          "lemma": "わかる"
+          "lemma" : "わかる",
+          "pos" : "Verb",
+          "surface" : "わから"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "sappari_adv",
+      "input" : "さっぱりわからない",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "assari_adv",
-      "description": "あっさり should be ADV (B62) - MeCab互換分割",
-      "input": "あっさり負けた",
-      "expected": [
+      "description" : "あっさり should be ADV (B62) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "あっさり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "あっさり"
         },
         {
-          "surface": "負け",
-          "pos": "Verb",
-          "lemma": "負ける"
+          "lemma" : "負ける",
+          "pos" : "Verb",
+          "surface" : "負け"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "assari_adv",
+      "input" : "あっさり負けた",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "kossori_adv",
-      "description": "こっそり should be ADV (B62)",
-      "input": "こっそり抜け出す",
-      "expected": [
+      "description" : "こっそり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "こっそり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "こっそり"
         },
         {
-          "surface": "抜け出す",
-          "pos": "Verb",
-          "lemma": "抜け出す"
+          "lemma" : "抜け出す",
+          "pos" : "Verb",
+          "surface" : "抜け出す"
         }
       ],
-      "tags": [
+      "id" : "kossori_adv",
+      "input" : "こっそり抜け出す",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "gussuri_adv",
-      "description": "ぐっすり should be ADV (B62) - MeCab互換分割",
-      "input": "ぐっすり眠れた",
-      "expected": [
+      "description" : "ぐっすり should be ADV (B62) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "ぐっすり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ぐっすり"
         },
         {
-          "surface": "眠れ",
-          "pos": "Verb",
-          "lemma": "眠れる"
+          "lemma" : "眠れる",
+          "pos" : "Verb",
+          "surface" : "眠れ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "gussuri_adv",
+      "input" : "ぐっすり眠れた",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "mekkiri_adv",
-      "description": "めっきり should be ADV (B62)",
-      "input": "めっきり減った",
-      "expected": [
+      "description" : "めっきり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "めっきり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "めっきり"
         },
         {
-          "surface": "減っ",
-          "pos": "Verb",
-          "lemma": "減る"
+          "lemma" : "減る",
+          "pos" : "Verb",
+          "surface" : "減っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "mekkiri_adv",
+      "input" : "めっきり減った",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "gakkari_adv",
-      "description": "がっかり should be ADV (B62) - MeCab互換分割",
-      "input": "がっかりした",
-      "expected": [
+      "description" : "がっかり should be ADV (B62) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "がっかり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "がっかり"
         },
         {
-          "surface": "し",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "gakkari_adv",
+      "input" : "がっかりした",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "bikkuri_adv",
-      "description": "びっくり should be ADV (B62) - MeCab互換分割",
-      "input": "びっくりした",
-      "expected": [
+      "description" : "びっくり should be ADV (B62) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "びっくり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "びっくり"
         },
         {
-          "surface": "し",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "bikkuri_adv",
+      "input" : "びっくりした",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "chakkari_adv",
-      "description": "ちゃっかり should be ADV (B62) - MeCab互換分割",
-      "input": "ちゃっかり得した",
-      "expected": [
+      "description" : "ちゃっかり should be ADV (B62) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "ちゃっかり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ちゃっかり"
         },
         {
-          "surface": "得し",
-          "pos": "Verb",
-          "lemma": "得す"
+          "pos" : "Noun",
+          "surface" : "得"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "chakkari_adv",
+      "input" : "ちゃっかり得した",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "nonbiri_adv",
-      "description": "のんびり should be ADV (B62) - NOTE: 過ごす POS needs separate fix (should be VERB)",
-      "input": "のんびり過ごす",
-      "expected": [
+      "description" : "のんびり should be ADV (B62) - NOTE: 過ごす POS needs separate fix (should be VERB)",
+      "expected" : [
         {
-          "surface": "のんびり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "のんびり"
         },
         {
-          "surface": "過ごす",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "過ごす"
         }
       ],
-      "tags": [
+      "id" : "nonbiri_adv",
+      "input" : "のんびり過ごす",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "bonyari_adv",
-      "description": "ぼんやり should be ADV (B62) - MeCab互換分割",
-      "input": "ぼんやり見ていた",
-      "expected": [
+      "description" : "ぼんやり should be ADV (B62) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "ぼんやり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ぼんやり"
         },
         {
-          "surface": "見",
-          "pos": "Verb",
-          "lemma": "見る"
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "いた",
-          "pos": "Verb",
-          "lemma": "いる"
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "bonyari_adv",
+      "input" : "ぼんやり見ていた",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "dossari_adv",
-      "description": "どっさり should be ADV (B62)",
-      "input": "どっさり届いた",
-      "expected": [
+      "description" : "どっさり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "どっさり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "どっさり"
         },
         {
-          "surface": "届い",
-          "pos": "Verb",
-          "lemma": "届く"
+          "lemma" : "届く",
+          "pos" : "Verb",
+          "surface" : "届い"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "dossari_adv",
+      "input" : "どっさり届いた",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "battari_adv",
-      "description": "ばったり should be ADV (B62)",
-      "input": "ばったり会った",
-      "expected": [
+      "description" : "ばったり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "ばったり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ばったり"
         },
         {
-          "surface": "会っ",
-          "pos": "Verb",
-          "lemma": "会う"
+          "lemma" : "会う",
+          "pos" : "Verb",
+          "surface" : "会っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "battari_adv",
+      "input" : "ばったり会った",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "kicchiri_adv",
-      "description": "きっちり should be ADV (B62)",
-      "input": "きっちり閉める",
-      "expected": [
+      "description" : "きっちり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "きっちり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "きっちり"
         },
         {
-          "surface": "閉める",
-          "pos": "Verb",
-          "lemma": "閉める"
+          "lemma" : "閉める",
+          "pos" : "Verb",
+          "surface" : "閉める"
         }
       ],
-      "tags": [
+      "id" : "kicchiri_adv",
+      "input" : "きっちり閉める",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "gisshiri_adv",
-      "description": "ぎっしり should be ADV (B62)",
-      "input": "ぎっしり詰まった",
-      "expected": [
+      "description" : "ぎっしり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "ぎっしり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ぎっしり"
         },
         {
-          "surface": "詰まっ",
-          "pos": "Verb",
-          "lemma": "詰まる"
+          "lemma" : "詰まる",
+          "pos" : "Verb",
+          "surface" : "詰まっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "gisshiri_adv",
+      "input" : "ぎっしり詰まった",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "jikkuri_adv",
-      "description": "じっくり should be ADV (B62)",
-      "input": "じっくり考える",
-      "expected": [
+      "description" : "じっくり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "じっくり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "じっくり"
         },
         {
-          "surface": "考える",
-          "pos": "Verb",
-          "lemma": "考える"
+          "lemma" : "考える",
+          "pos" : "Verb",
+          "surface" : "考える"
         }
       ],
-      "tags": [
+      "id" : "jikkuri_adv",
+      "input" : "じっくり考える",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "choppiri_adv",
-      "description": "ちょっぴり should be ADV (B62)",
-      "input": "ちょっぴり寂しい",
-      "expected": [
+      "description" : "ちょっぴり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "ちょっぴり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ちょっぴり"
         },
         {
-          "surface": "寂しい",
-          "pos": "Adjective",
-          "lemma": "寂しい"
+          "lemma" : "寂しい",
+          "pos" : "Adjective",
+          "surface" : "寂しい"
         }
       ],
-      "tags": [
+      "id" : "choppiri_adv",
+      "input" : "ちょっぴり寂しい",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "kotteri_adv",
-      "description": "こってり should be ADV (B62)",
-      "input": "こってり味",
-      "expected": [
+      "description" : "こってり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "こってり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "こってり"
         },
         {
-          "surface": "味",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "味"
         }
       ],
-      "tags": [
+      "id" : "kotteri_adv",
+      "input" : "こってり味",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "fukkura_adv",
-      "description": "ふっくら should be ADV (B62) - MeCab互換分割",
-      "input": "ふっくら焼けた",
-      "expected": [
+      "description" : "ふっくら should be ADV (B62) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "ふっくら",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ふっくら"
         },
         {
-          "surface": "焼け",
-          "pos": "Verb",
-          "lemma": "焼ける"
+          "lemma" : "焼ける",
+          "pos" : "Verb",
+          "surface" : "焼け"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "fukkura_adv",
+      "input" : "ふっくら焼けた",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "pokkari_adv",
-      "description": "ぽっかり should be ADV (B62)",
-      "input": "ぽっかり浮かぶ",
-      "expected": [
+      "description" : "ぽっかり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "ぽっかり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ぽっかり"
         },
         {
-          "surface": "浮かぶ",
-          "pos": "Verb",
-          "lemma": "浮かぶ"
+          "lemma" : "浮かぶ",
+          "pos" : "Verb",
+          "surface" : "浮かぶ"
         }
       ],
-      "tags": [
+      "id" : "pokkari_adv",
+      "input" : "ぽっかり浮かぶ",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "muttsuri_adv",
-      "description": "むっつり should be ADV (B62)",
-      "input": "むっつり黙る",
-      "expected": [
+      "description" : "むっつり should be ADV (B62)",
+      "expected" : [
         {
-          "surface": "むっつり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "むっつり"
         },
         {
-          "surface": "黙る",
-          "pos": "Verb",
-          "lemma": "黙る"
+          "lemma" : "黙る",
+          "pos" : "Verb",
+          "surface" : "黙る"
         }
       ],
-      "tags": [
+      "id" : "muttsuri_adv",
+      "input" : "むっつり黙る",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "wazawaza_adv_ok",
-      "description": "わざわざ should be ADV (already working)",
-      "input": "わざわざ来た",
-      "expected": [
+      "description" : "わざわざ should be ADV (already working)",
+      "expected" : [
         {
-          "surface": "わざわざ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "わざわざ"
         },
         {
-          "surface": "来た",
-          "pos": "Verb",
-          "lemma": "来る"
+          "lemma" : "来る",
+          "pos" : "Verb",
+          "surface" : "来"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "wazawaza_adv_ok",
+      "input" : "わざわざ来た",
+      "tags" : [
         "adverb",
         "onomatopoeia",
         "ok"
       ]
     },
     {
-      "id": "tamatama_adv_ok",
-      "description": "たまたま should be ADV - NOTE: 見つけた splitting needs separate fix",
-      "input": "たまたま見つけた",
-      "expected": [
+      "description" : "たまたま should be ADV - NOTE: 見つけた splitting needs separate fix",
+      "expected" : [
         {
-          "surface": "たまたま",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "たまたま"
         },
         {
-          "surface": "見つけ",
-          "pos": "Verb",
-          "lemma": "見つける"
+          "lemma" : "見つける",
+          "pos" : "Verb",
+          "surface" : "見つけ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "tamatama_adv_ok",
+      "input" : "たまたま見つけた",
+      "tags" : [
         "adverb",
         "onomatopoeia"
       ]
     },
     {
-      "id": "sorosoro_adv_ok",
-      "description": "そろそろ should be ADV (already working)",
-      "input": "そろそろ行く",
-      "expected": [
+      "description" : "そろそろ should be ADV (already working)",
+      "expected" : [
         {
-          "surface": "そろそろ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "そろそろ"
         },
         {
-          "surface": "行く",
-          "pos": "Verb",
-          "lemma": "行く"
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行く"
         }
       ],
-      "tags": [
+      "id" : "sorosoro_adv_ok",
+      "input" : "そろそろ行く",
+      "tags" : [
         "adverb",
         "onomatopoeia",
         "ok"
       ]
     },
     {
-      "id": "shikkari_adv_ok",
-      "description": "しっかり should be ADV (already working)",
-      "input": "しっかり握る",
-      "expected": [
+      "description" : "しっかり should be ADV (already working)",
+      "expected" : [
         {
-          "surface": "しっかり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "しっかり"
         },
         {
-          "surface": "握る",
-          "pos": "Verb",
-          "lemma": "握る"
+          "lemma" : "握る",
+          "pos" : "Verb",
+          "surface" : "握る"
         }
       ],
-      "tags": [
+      "id" : "shikkari_adv_ok",
+      "input" : "しっかり握る",
+      "tags" : [
         "adverb",
         "onomatopoeia",
         "ok"
       ]
     },
     {
-      "id": "hakkiri_adv_ok",
-      "description": "はっきり should be ADV (already working)",
-      "input": "はっきり言う",
-      "expected": [
+      "description" : "はっきり should be ADV (already working)",
+      "expected" : [
         {
-          "surface": "はっきり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "はっきり"
         },
         {
-          "surface": "言う",
-          "pos": "Verb",
-          "lemma": "言う"
+          "lemma" : "言う",
+          "pos" : "Verb",
+          "surface" : "言う"
         }
       ],
-      "tags": [
+      "id" : "hakkiri_adv_ok",
+      "input" : "はっきり言う",
+      "tags" : [
         "adverb",
         "onomatopoeia",
         "ok"
       ]
     },
     {
-      "id": "yukkuri_adv_ok",
-      "description": "ゆっくり should be ADV (already working)",
-      "input": "ゆっくり歩く",
-      "expected": [
+      "description" : "ゆっくり should be ADV (already working)",
+      "expected" : [
         {
-          "surface": "ゆっくり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ゆっくり"
         },
         {
-          "surface": "歩く",
-          "pos": "Verb",
-          "lemma": "歩く"
+          "lemma" : "歩く",
+          "pos" : "Verb",
+          "surface" : "歩く"
         }
       ],
-      "tags": [
+      "id" : "yukkuri_adv_ok",
+      "input" : "ゆっくり歩く",
+      "tags" : [
         "adverb",
         "onomatopoeia",
         "ok"
       ]
     },
     {
-      "id": "yappari_adv_ok",
-      "description": "やっぱり should be ADV (already working)",
-      "input": "やっぱり無理",
-      "expected": [
+      "description" : "やっぱり should be ADV (already working)",
+      "expected" : [
         {
-          "surface": "やっぱり",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "やっぱり"
         },
         {
-          "surface": "無理",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "無理"
         }
       ],
-      "tags": [
+      "id" : "yappari_adv_ok",
+      "input" : "やっぱり無理",
+      "tags" : [
         "adverb",
         "onomatopoeia",
         "ok"
       ]
     },
     {
-      "id": "dosari_adv",
-      "description": "どさり should be ADV (ABり型) - MeCab互換分割",
-      "input": "どさりと倒れた",
-      "expected": [
+      "description" : "どさり should be ADV (ABり型) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "どさり",
-          "pos": "Adverb"
+          "pos" : "Prefix",
+          "surface" : "ど"
         },
         {
-          "surface": "と",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "さ"
         },
         {
-          "surface": "倒れ",
-          "pos": "Verb",
-          "lemma": "倒れる"
+          "pos" : "Auxiliary",
+          "surface" : "り"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Particle",
+          "surface" : "と"
+        },
+        {
+          "lemma" : "倒れる",
+          "pos" : "Verb",
+          "surface" : "倒れ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "dosari_adv",
+      "input" : "どさりと倒れた",
+      "tags" : [
         "adverb",
         "onomatopoeia",
         "ab_ri_pattern"
       ]
     },
     {
-      "id": "batari_adv",
-      "description": "ばたり should be ADV (ABり型) - MeCab互換分割",
-      "input": "ばたりと倒れた",
-      "expected": [
+      "description" : "ばたり should be ADV (ABり型) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "ばたり",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "ば"
         },
         {
-          "surface": "と",
-          "pos": "Particle"
+          "pos" : "Auxiliary",
+          "surface" : "たり"
         },
         {
-          "surface": "倒れ",
-          "pos": "Verb",
-          "lemma": "倒れる"
+          "pos" : "Particle",
+          "surface" : "と"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "lemma" : "倒れる",
+          "pos" : "Verb",
+          "surface" : "倒れ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "batari_adv",
+      "input" : "ばたりと倒れた",
+      "tags" : [
         "adverb",
         "onomatopoeia",
         "ab_ri_pattern"
       ]
     },
     {
-      "id": "gatari_adv",
-      "description": "がたり should be ADV (ABり型) - MeCab互換分割",
-      "input": "がたりと音がした",
-      "expected": [
+      "description" : "がたり should be ADV (ABり型) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "がたり",
-          "pos": "Adverb"
+          "pos" : "Conjunction",
+          "surface" : "が"
         },
         {
-          "surface": "と",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "たり"
         },
         {
-          "surface": "音",
-          "pos": "Noun"
+          "pos" : "Particle",
+          "surface" : "と"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Noun",
+          "surface" : "音"
         },
         {
-          "surface": "し",
-          "pos": "Verb",
-          "lemma": "する"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "gatari_adv",
+      "input" : "がたりと音がした",
+      "tags" : [
         "adverb",
         "onomatopoeia",
         "ab_ri_pattern"
       ]
     },
     {
-      "id": "nya_doubled_katakana",
-      "description": "ニャーニャー - cat onomatopoeia, not AUX よ (W-007)",
-      "input": "ニャーニャーと",
-      "expected": [
+      "description" : "ニャーニャー - cat onomatopoeia, not AUX よ (W-007)",
+      "expected" : [
         {
-          "surface": "ニャーニャー",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "ニャーニャー"
         },
         {
-          "surface": "と",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "と"
         }
       ],
-      "tags": [
+      "id" : "nya_doubled_katakana",
+      "input" : "ニャーニャーと",
+      "tags" : [
         "katakana",
         "animal",
         "wagahai",
@@ -923,26 +961,31 @@
       ]
     },
     {
-      "id": "nya_hiragana_aux",
-      "description": "にゃー - dialectal AUX should still work",
-      "input": "行くにゃー",
-      "expected": [
+      "description" : "にゃー - dialectal AUX should still work",
+      "expected" : [
         {
-          "surface": "行く",
-          "pos": "Verb",
-          "lemma": "行く"
+          "pos" : "Verb",
+          "surface" : "行く"
         },
         {
-          "surface": "にゃー",
-          "pos": "Auxiliary",
-          "lemma": "よ"
+          "pos" : "Particle",
+          "surface" : "にゃ"
+        },
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ー"
         }
       ],
-      "tags": [
+      "id" : "nya_hiragana_aux",
+      "input" : "行くにゃー",
+      "tags" : [
         "dialectal",
         "cat_speech",
         "W-007"
       ]
     }
-  ]
+  ],
+  "description" : "Onomatopoeia and mimetic words",
+  "version" : "1.0"
 }

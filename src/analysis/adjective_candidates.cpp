@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "analysis/scorer_constants.h"
+#include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/patterns.h"
@@ -65,7 +66,8 @@ inline UnknownCandidate makeIAdjStemCandidate(
     [[maybe_unused]] CandidateOrigin origin,
     [[maybe_unused]] float confidence,
     [[maybe_unused]] const char* pattern) {
-  auto cand = makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, true, origin);
+  auto cand = makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, true, origin,
+                            core::ExtendedPOS::AdjStem);  // For bigram: AdjStem→AuxAppearanceSou
   cand.lemma = lemma;
 #ifdef SUZUME_DEBUG_INFO
   cand.confidence = confidence;
@@ -543,6 +545,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       katt_cand.lemma = cand.lemma;  // Same lemma (美しい, etc.)
       katt_cand.cost = cand.cost + 0.2F;  // Slightly higher cost than full form
       katt_cand.has_suffix = true;  // This is a conjugated form (連用タ接続)
+      katt_cand.extended_pos = core::ExtendedPOS::AdjKatt;  // For bigram: AdjKatt→AuxTenseTa
 #ifdef SUZUME_DEBUG_INFO
       katt_cand.origin = cand.origin;
       katt_cand.confidence = cand.confidence;
@@ -943,6 +946,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       katt_cand.lemma = cand.lemma;  // Same lemma (よい, 寒い, etc.)
       katt_cand.cost = cand.cost + 0.2F;  // Higher cost than full form (match dictionary expansion)
       katt_cand.has_suffix = true;  // This is a conjugated form (連用タ接続)
+      katt_cand.extended_pos = core::ExtendedPOS::AdjKatt;  // For bigram: AdjKatt→AuxTenseTa
 #ifdef SUZUME_DEBUG_INFO
       katt_cand.origin = cand.origin;
       katt_cand.confidence = cand.confidence;
@@ -1087,6 +1091,9 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
   }
 
   std::string hiragana_part = extractSubstring(codepoints, kanji_end, hiragana_end);
+  std::string kanji_part = extractSubstring(codepoints, start_pos, kanji_end);
+  SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM] pos=" << start_pos << " kanji=\"" << kanji_part
+                   << "\" hiragana=\"" << hiragana_part << "\"\n");
 
   // =============================================================================
   // Pattern 1: Regular i-adjective stem + すぎる/がる/さ/そう (ガル接続)
@@ -1115,12 +1122,15 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
   for (const auto& pattern : kIAdjGaruPatterns) {
     if (hiragana_part.size() >= pattern.size() &&
         hiragana_part.substr(0, pattern.size()) == pattern) {
+      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   pattern=\"" << pattern << "\" matched\n");
+
       // Check for サ変 passive/causative pattern: さ + れ/せ
       // E.g., 処理される, 勉強させる - these are NOT adjective nominalization
       if (std::string_view(pattern) == "さ" && hiragana_part.size() > 3) {
         std::string after_sa = hiragana_part.substr(3);  // Skip さ (3 bytes)
         if (after_sa.size() >= 3 &&
             (after_sa.substr(0, 3) == "れ" || after_sa.substr(0, 3) == "せ")) {
+          SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   skip: サ変 passive/causative pattern\n");
           continue;  // Skip - this is likely サ変 passive/causative, not adjective
         }
       }
@@ -1146,6 +1156,9 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
         }
       }
 
+      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   base=\"" << base_form << "\" is_valid="
+                       << is_valid_adjective << " conf=" << adj_confidence << "\n");
+
       if (!is_valid_adjective) {
         continue;
       }
@@ -1158,6 +1171,7 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
         bool is_likely_verb_stem = false;
         for (const auto& suffix : {"ちる", "きる", "ぎる", "しる", "びる", "みる", "りる"}) {
           if (isVerbInDictionary(dict_manager, stem + suffix)) {
+            SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   skip: verb \"" << stem << suffix << "\" exists\n");
             is_likely_verb_stem = true;
             break;
           }
@@ -1167,9 +1181,12 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
         }
       }
 
-      // Low cost to compete with single-token verb path (高すぎる as VERB)
-      // Use negative cost to strongly prefer this split
-      float cost = -0.3F + (1.0F - adj_confidence) * 0.2F;
+      // Low cost to compete with single-token verb path (高すぎる as VERB/ADJ)
+      // Use strong negative cost to prefer ADJ_stem + すぎる split over compound
+      // Need: stem + connection(0.5) + すぎる(0.4) < compound(0.35)
+      // Required: stem < 0.35 - 0.5 - 0.4 = -0.55
+      float cost = -0.8F + (1.0F - adj_confidence) * 0.2F;
+      SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ candidate stem=\"" << stem << "\" cost=" << cost << "\n");
       candidates.push_back(makeIAdjStemCandidate(
           stem, start_pos, kanji_end, base_form, cost,
           CandidateOrigin::AdjectiveI, adj_confidence, "adj_stem_garu_conn"));
@@ -1182,18 +1199,27 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
   // E.g., 難しそう → 難し (stem) + そう
   // E.g., 美しすぎる → 美し (stem) + すぎる
   static const std::vector<std::string_view> kAdjStemAuxPatterns = {
-      "しそう",     // appearance: 難しそう
+      "しそう",     // appearance: 難しそう, 美しそう
       "しそうだ",   // appearance + copula
       "しそうな",   // attributive
       "しそうに",   // adverbial
-      "しすぎ",     // excessive: 難しすぎ
+      "しすぎ",     // excessive: 難しすぎ, 美しすぎ
       "しすぎる",   // excessive + dictionary form
       "しすぎた",   // excessive + past
+      "きそう",     // appearance: 大きそう
+      "きそうだ",   // appearance + copula
+      "きそうな",   // attributive
+      "きそうに",   // adverbial
+      "きすぎ",     // excessive: 大きすぎ
+      "きすぎる",   // excessive + dictionary form
+      "きすぎた",   // excessive + past
   };
 
   for (const auto& pattern : kAdjStemAuxPatterns) {
     if (hiragana_part.size() >= pattern.size() &&
         hiragana_part.substr(0, pattern.size()) == pattern) {
+      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   shii pattern=\"" << pattern << "\" matched\n");
+
       // Found adjective stem + auxiliary pattern
       // The stem is: kanji + し
       size_t stem_end = kanji_end + 1;  // kanji + し (one hiragana)
@@ -1213,6 +1239,9 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
           break;
         }
       }
+
+      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   base=\"" << base_form << "\" is_valid="
+                       << is_valid_adjective << " conf=" << adj_confidence << "\n");
 
       if (!is_valid_adjective) {
         continue;
@@ -1237,7 +1266,10 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       // If it is, this is likely a verb renyokei, not an adjective stem
       // E.g., 話す is in dictionary → 話し is verb renyokei, not adjective
       // E.g., 難す is NOT in dictionary → 難し could be adjective stem
-      if (isVerbInDictionary(dict_manager, verb_form)) {
+      bool is_dict_verb = isVerbInDictionary(dict_manager, verb_form);
+      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   verb_form=\"" << verb_form << "\" is_dict_verb=" << is_dict_verb << "\n");
+      if (is_dict_verb) {
+        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   skip: verb in dictionary\n");
         continue;  // Skip - this is a dictionary verb renyokei
       }
 
@@ -1246,6 +1278,7 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       // E.g., 美味しい is in dictionary → 美味し is adjective stem (skip conf check)
       // E.g., 難しい is in dictionary → 難し is adjective stem (skip conf check)
       bool is_dict_adjective = isAdjectiveInDictionary(dict_manager, base_form);
+      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   is_dict_adj=" << is_dict_adjective << "\n");
 
       // Confidence-based fallback when adjective is not in dictionary
       // Only generate adjective stem if adjective confidence is SIGNIFICANTLY higher
@@ -1253,7 +1286,11 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       // patterns like 話し (from 話す) where both get similar confidence.
       if (!is_dict_adjective) {
         constexpr float kConfidenceThreshold = 0.15F;
-        if (adj_confidence - verb_confidence < kConfidenceThreshold) {
+        float diff = adj_confidence - verb_confidence;
+        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   conf_diff=" << diff << " (adj=" << adj_confidence
+                         << " verb=" << verb_confidence << " threshold=" << kConfidenceThreshold << ")\n");
+        if (diff < kConfidenceThreshold) {
+          SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   skip: conf_diff < threshold\n");
           continue;
         }
       }
@@ -1261,11 +1298,9 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       // Low cost to compete with VERB path and single-token conjugated forms
       // Dictionary adjectives get strong bonus to prefer MeCab-compatible split
       // (美味しそう → 美味し + そう)
-      float cost = 0.1F + (1.0F - adj_confidence) * 0.2F;
-      if (is_dict_adjective) {
-        // Strong bonus for dictionary adjectives to beat single-token path
-        cost -= 0.5F;
-      }
+      // Need stronger negative cost like garu-connection pattern
+      float cost = -0.8F + (1.0F - adj_confidence) * 0.2F;
+      SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ candidate stem=\"" << stem << "\" cost=" << cost << "\n");
       candidates.push_back(makeIAdjStemCandidate(
           stem, start_pos, stem_end, base_form, cost,
           CandidateOrigin::AdjectiveI, adj_confidence, "adj_stem_shii"));

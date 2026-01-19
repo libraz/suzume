@@ -5,9 +5,105 @@
 #include <tuple>
 
 #include "cli_common.h"
+#include "core/utf8_constants.h"
 #include "dictionary/binary_dict.h"
+#include "grammar/conjugation.h"
 
 namespace suzume::cli {
+
+namespace {
+
+// I-adjective conjugation suffixes for dictionary expansion
+// These are the forms that should be stored in dictionary (MeCab-compatible)
+// Excludes compound forms that should be split (e.g., くなる → く + なる)
+const std::vector<std::string> kIAdjSuffixes = {
+    "い",         // Base form: 美しい
+    "かった",     // Past: 美しかった
+    "かっ",       // Ta-connection (連用タ接続): 美しかっ+た
+    "くない",     // Negative: 美しくない
+    "くなかった", // Negative past: 美しくなかった
+    "くて",       // Te-form: 美しくて
+    "ければ",     // Conditional: 美しければ
+    "く",         // Adverbial: 美しく
+    "かったら",   // Conditional past: 美しかったら
+    "そう",       // Looks like: 美しそう
+};
+
+// Expand i-adjective entry into all conjugated forms
+std::vector<dictionary::DictionaryEntry> expandIAdjective(
+    const dictionary::DictionaryEntry& entry) {
+  std::vector<dictionary::DictionaryEntry> result;
+
+  // Check if it ends with い
+  if (!utf8::endsWith(entry.surface, "い")) {
+    result.push_back(entry);
+    return result;
+  }
+
+  // Get stem by removing final い
+  std::string stem(utf8::dropLastChar(entry.surface));
+  std::string lemma = entry.lemma.empty() ? entry.surface : entry.lemma;
+
+  for (const auto& suffix : kIAdjSuffixes) {
+    dictionary::DictionaryEntry new_entry;
+    new_entry.surface = stem + suffix;
+    new_entry.pos = core::PartOfSpeech::Adjective;
+    new_entry.extended_pos = core::ExtendedPOS::AdjBasic;
+    new_entry.lemma = lemma;
+    result.push_back(new_entry);
+  }
+
+  // Contracted forms for ない-ending adjectives (e.g., くだらない → くだらん)
+  if (utf8::endsWith(stem, "な")) {
+    std::string contracted_stem = std::string(utf8::dropLastChar(stem)) + "ん";
+    static const std::vector<std::string> kContractedSuffixes = {
+        "",           // くだらん
+        "かった",     // くだらんかった
+        "ければ",     // くだらんければ
+        "かったら",   // くだらんかったら
+    };
+    for (const auto& suffix : kContractedSuffixes) {
+      dictionary::DictionaryEntry new_entry;
+      new_entry.surface = contracted_stem + suffix;
+      new_entry.pos = core::PartOfSpeech::Adjective;
+      new_entry.extended_pos = core::ExtendedPOS::AdjBasic;
+      new_entry.lemma = lemma;
+      result.push_back(new_entry);
+    }
+  }
+
+  return result;
+}
+
+// Expand verb entry into conjugated forms using Conjugation engine
+std::vector<dictionary::DictionaryEntry> expandVerb(
+    const dictionary::DictionaryEntry& entry,
+    grammar::VerbType verb_type) {
+  std::vector<dictionary::DictionaryEntry> result;
+
+  if (verb_type == grammar::VerbType::Unknown) {
+    result.push_back(entry);
+    return result;
+  }
+
+  static grammar::Conjugation conj;
+  auto suffixes = conj.getDictionarySuffixes(verb_type);
+  std::string stem = grammar::Conjugation::getStem(entry.surface, verb_type);
+  std::string lemma = entry.lemma.empty() ? entry.surface : entry.lemma;
+
+  for (const auto& suf : suffixes) {
+    dictionary::DictionaryEntry new_entry;
+    new_entry.surface = stem + suf.suffix;
+    new_entry.pos = core::PartOfSpeech::Verb;
+    new_entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
+    new_entry.lemma = lemma;
+    result.push_back(new_entry);
+  }
+
+  return result;
+}
+
+}  // namespace
 
 DictCompiler::DictCompiler() = default;
 
@@ -54,71 +150,99 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
   conj_expanded_ = 0;
   size_t duplicates_skipped = 0;
 
-  // Deduplication: track (surface, pos, cost) tuples
-  std::set<std::tuple<std::string, core::PartOfSpeech, float>> seen;
-
-  size_t reading_entries_added = 0;
+  // Deduplication: track surfaces only (trie requires unique keys)
+  std::set<std::string> seen_surfaces;
 
   for (const auto& tsv_entry : entries) {
-    // Create key for deduplication
-    auto key = std::make_tuple(tsv_entry.surface, tsv_entry.pos, tsv_entry.cost);
+    // Create base entry
+    dictionary::DictionaryEntry base_entry;
+    base_entry.surface = tsv_entry.surface;
+    base_entry.pos = tsv_entry.pos;
+    base_entry.extended_pos = core::ExtendedPOS::Unknown;  // Will be set during expansion
+    base_entry.lemma = tsv_entry.surface;
 
-    // Skip if already seen (same surface, POS, and cost)
-    if (seen.count(key) > 0) {
-      ++duplicates_skipped;
-      continue;
-    }
-    seen.insert(key);
+    // Determine if we should expand this entry
+    std::vector<dictionary::DictionaryEntry> expanded_entries;
 
-    dictionary::DictionaryEntry entry;
-    entry.surface = tsv_entry.surface;
-    entry.pos = tsv_entry.pos;
-    entry.cost = tsv_entry.cost;
-    entry.lemma = tsv_entry.surface;
+    if (tsv_entry.pos == core::PartOfSpeech::Adjective &&
+        tsv_entry.conj_type == dictionary::ConjugationType::IAdjective) {
+      // I-adjective: expand to all conjugated forms
+      base_entry.extended_pos = core::ExtendedPOS::AdjBasic;
+      expanded_entries = expandIAdjective(base_entry);
+    } else if (tsv_entry.pos == core::PartOfSpeech::Verb) {
+      // Verb: detect type and expand
+      grammar::VerbType verb_type = grammar::VerbType::Unknown;
 
-    writer.addEntry(entry, tsv_entry.conj_type);
-    ++entries_compiled_;
-
-    // Auto-generate reading-based entry for safe POS types
-    // Only closed class / function words are safe for hiragana expansion
-    // Regular nouns are excluded because of many homophones
-    // (e.g., 橋/箸/端 all read はし)
-    if (!tsv_entry.reading.empty() && tsv_entry.reading != tsv_entry.surface) {
-      bool should_expand = false;
-      switch (tsv_entry.pos) {
-        case core::PartOfSpeech::Adjective:   // 形容詞
-        case core::PartOfSpeech::Adverb:      // 副詞
-        case core::PartOfSpeech::Conjunction: // 接続詞
-        case core::PartOfSpeech::Pronoun:     // 代名詞
-          should_expand = true;
+      // Use conj_type hint if available, otherwise detect
+      switch (tsv_entry.conj_type) {
+        case dictionary::ConjugationType::Ichidan:
+          verb_type = grammar::VerbType::Ichidan;
+          break;
+        case dictionary::ConjugationType::GodanKa:
+          verb_type = grammar::VerbType::GodanKa;
+          break;
+        case dictionary::ConjugationType::GodanGa:
+          verb_type = grammar::VerbType::GodanGa;
+          break;
+        case dictionary::ConjugationType::GodanSa:
+          verb_type = grammar::VerbType::GodanSa;
+          break;
+        case dictionary::ConjugationType::GodanTa:
+          verb_type = grammar::VerbType::GodanTa;
+          break;
+        case dictionary::ConjugationType::GodanNa:
+          verb_type = grammar::VerbType::GodanNa;
+          break;
+        case dictionary::ConjugationType::GodanBa:
+          verb_type = grammar::VerbType::GodanBa;
+          break;
+        case dictionary::ConjugationType::GodanMa:
+          verb_type = grammar::VerbType::GodanMa;
+          break;
+        case dictionary::ConjugationType::GodanRa:
+          verb_type = grammar::VerbType::GodanRa;
+          break;
+        case dictionary::ConjugationType::GodanWa:
+          verb_type = grammar::VerbType::GodanWa;
+          break;
+        case dictionary::ConjugationType::Suru:
+          verb_type = grammar::VerbType::Suru;
+          break;
+        case dictionary::ConjugationType::Kuru:
+          verb_type = grammar::VerbType::Kuru;
           break;
         default:
+          // Auto-detect if not specified
+          verb_type = grammar::Conjugation::detectType(tsv_entry.surface);
           break;
       }
 
-      if (should_expand) {
-        auto reading_key =
-            std::make_tuple(tsv_entry.reading, tsv_entry.pos, tsv_entry.cost);
-        if (seen.count(reading_key) == 0) {
-          seen.insert(reading_key);
+      base_entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
+      expanded_entries = expandVerb(base_entry, verb_type);
+    } else {
+      // No expansion needed
+      expanded_entries.push_back(base_entry);
+    }
 
-          dictionary::DictionaryEntry reading_entry;
-          reading_entry.surface = tsv_entry.reading;
-          reading_entry.pos = tsv_entry.pos;
-          reading_entry.cost = tsv_entry.cost;
-          reading_entry.lemma = tsv_entry.reading;  // Lemma is the reading itself (MeCab-compatible)
+    // Add expanded entries with deduplication (by surface only)
+    for (const auto& exp_entry : expanded_entries) {
+      if (seen_surfaces.count(exp_entry.surface) > 0) {
+        ++duplicates_skipped;
+        continue;
+      }
+      seen_surfaces.insert(exp_entry.surface);
 
-          writer.addEntry(reading_entry, tsv_entry.conj_type);
-          ++entries_compiled_;
-          ++reading_entries_added;
-        }
+      writer.addEntry(exp_entry);
+      ++entries_compiled_;
+      if (expanded_entries.size() > 1) {
+        ++conj_expanded_;
       }
     }
   }
 
-  if (verbose_ && reading_entries_added > 0) {
-    printInfo("Added " + std::to_string(reading_entries_added) +
-              " reading-based entries");
+  if (verbose_ && conj_expanded_ > 0) {
+    printInfo("Expanded " + std::to_string(conj_expanded_) +
+              " conjugated forms");
   }
 
   if (verbose_ && duplicates_skipped > 0) {
@@ -227,8 +351,6 @@ core::Expected<size_t, core::Error> DictCompiler::decompile(const std::string& d
       TsvEntry tsv_entry;
       tsv_entry.surface = entry->surface;
       tsv_entry.pos = entry->pos;
-      tsv_entry.cost = entry->cost;
-      tsv_entry.reading = "";  // Binary format doesn't store reading
       tsv_entry.conj_type = dictionary::ConjugationType::None;
       entries.push_back(std::move(tsv_entry));
     }

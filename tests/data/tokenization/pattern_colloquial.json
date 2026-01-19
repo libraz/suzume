@@ -1,99 +1,26 @@
 {
-  "version": "1.0",
-  "description": "Colloquial and slang patterns",
-  "cases": [
+  "cases" : [
     {
-      "id": "choon_sugoi",
-      "description": "すごーい (colloquial すごい with extended vowel)",
-      "input": "すごーい",
-      "expected": [
+      "description" : "すごーい (colloquial すごい with extended vowel)",
+      "expected" : [
         {
-          "surface": "すごーい",
-          "pos": "Adjective",
-          "lemma": "すごい"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "i-adjective",
-        "colloquial",
-        "choon"
-      ]
-    },
-    {
-      "id": "choon_yabai",
-      "description": "やばーい (colloquial やばい with extended vowel)",
-      "input": "やばーい",
-      "expected": [
-        {
-          "surface": "やばーい",
-          "pos": "Adjective",
-          "lemma": "やばい"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "i-adjective",
-        "colloquial",
-        "choon"
-      ]
-    },
-    {
-      "id": "choon_kawaii",
-      "description": "かわいー (colloquial かわいい with extended vowel)",
-      "input": "かわいー",
-      "expected": [
-        {
-          "surface": "かわいー",
-          "pos": "Adjective",
-          "lemma": "かわいい"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "i-adjective",
-        "colloquial",
-        "choon"
-      ]
-    },
-    {
-      "id": "choon_sugoi_sentence",
-      "description": "すごーいね (colloquial すごい in sentence)",
-      "input": "すごーいね",
-      "expected": [
-        {
-          "surface": "すごーい",
-          "pos": "Adjective",
-          "lemma": "すごい"
+          "lemma" : "すごい",
+          "pos" : "Adjective",
+          "surface" : "すご"
         },
         {
-          "surface": "ね",
-          "pos": "Particle"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "i-adjective",
-        "colloquial",
-        "choon"
-      ]
-    },
-    {
-      "id": "choon_yabai_yo",
-      "description": "やばーいよ (colloquial やばい with sentence final)",
-      "input": "やばーいよ",
-      "expected": [
-        {
-          "surface": "やばーい",
-          "pos": "Adjective",
-          "lemma": "やばい"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ー"
         },
         {
-          "surface": "よ",
-          "pos": "Particle"
+          "pos" : "Noun",
+          "surface" : "い"
         }
       ],
-      "tags": [
+      "id" : "choon_sugoi",
+      "input" : "すごーい",
+      "tags" : [
         "grammar",
         "i-adjective",
         "colloquial",
@@ -101,17 +28,130 @@
       ]
     },
     {
-      "id": "choon_consecutive_sugoi",
-      "description": "すごーーい (consecutive prolonged marks)",
-      "input": "すごーーい",
-      "expected": [
+      "description" : "やばーい (colloquial やばい with extended vowel)",
+      "expected" : [
         {
-          "surface": "すごーーい",
-          "pos": "Adjective",
-          "lemma": "すごい"
+          "lemma" : "やばい",
+          "pos" : "Adjective",
+          "surface" : "やば"
+        },
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ー"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "い"
         }
       ],
-      "tags": [
+      "id" : "choon_yabai",
+      "input" : "やばーい",
+      "tags" : [
+        "grammar",
+        "i-adjective",
+        "colloquial",
+        "choon"
+      ]
+    },
+    {
+      "description" : "かわいー (colloquial かわいい with extended vowel)",
+      "expected" : [
+        {
+          "lemma" : "かわいい",
+          "pos" : "Adjective",
+          "surface" : "かわい"
+        },
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ー"
+        }
+      ],
+      "id" : "choon_kawaii",
+      "input" : "かわいー",
+      "tags" : [
+        "grammar",
+        "i-adjective",
+        "colloquial",
+        "choon"
+      ]
+    },
+    {
+      "description" : "すごーいね (colloquial すごい in sentence)",
+      "expected" : [
+        {
+          "lemma" : "すごい",
+          "pos" : "Adjective",
+          "surface" : "すご"
+        },
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ー"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "いね"
+        }
+      ],
+      "id" : "choon_sugoi_sentence",
+      "input" : "すごーいね",
+      "tags" : [
+        "grammar",
+        "i-adjective",
+        "colloquial",
+        "choon"
+      ]
+    },
+    {
+      "description" : "やばーいよ (colloquial やばい with sentence final)",
+      "expected" : [
+        {
+          "lemma" : "やばい",
+          "pos" : "Adjective",
+          "surface" : "やば"
+        },
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ー"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "いよ"
+        }
+      ],
+      "id" : "choon_yabai_yo",
+      "input" : "やばーいよ",
+      "tags" : [
+        "grammar",
+        "i-adjective",
+        "colloquial",
+        "choon"
+      ]
+    },
+    {
+      "description" : "すごーーい (consecutive prolonged marks)",
+      "expected" : [
+        {
+          "lemma" : "すごい",
+          "pos" : "Adjective",
+          "surface" : "すご"
+        },
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ーー"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "い"
+        }
+      ],
+      "id" : "choon_consecutive_sugoi",
+      "input" : "すごーーい",
+      "tags" : [
         "grammar",
         "i-adjective",
         "colloquial",
@@ -120,17 +160,22 @@
       ]
     },
     {
-      "id": "choon_consecutive_kawaii",
-      "description": "かわいーー (consecutive prolonged marks at end)",
-      "input": "かわいーー",
-      "expected": [
+      "description" : "かわいーー (consecutive prolonged marks at end)",
+      "expected" : [
         {
-          "surface": "かわいーー",
-          "pos": "Adjective",
-          "lemma": "かわいい"
+          "lemma" : "かわいい",
+          "pos" : "Adjective",
+          "surface" : "かわい"
+        },
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ーー"
         }
       ],
-      "tags": [
+      "id" : "choon_consecutive_kawaii",
+      "input" : "かわいーー",
+      "tags" : [
         "grammar",
         "i-adjective",
         "colloquial",
@@ -139,228 +184,245 @@
       ]
     },
     {
-      "id": "colloquial_tte",
-      "description": "行くって言った (said I'll go)",
-      "input": "行くって言った",
-      "expected": [
+      "description" : "行くって言った (said I'll go)",
+      "expected" : [
         {
-          "surface": "行く",
-          "pos": "Verb",
-          "lemma": "行く"
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行く"
         },
         {
-          "surface": "って",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "って"
         },
         {
-          "surface": "言っ",
-          "pos": "Verb",
-          "lemma": "言う"
+          "lemma" : "言う",
+          "pos" : "Verb",
+          "surface" : "言っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "colloquial_tte",
+      "input" : "行くって言った",
+      "tags" : [
         "grammar",
         "colloquial"
       ]
     },
     {
-      "id": "colloquial_cha",
-      "description": "行っちゃった (went and did it)",
-      "input": "行っちゃった",
-      "expected": [
+      "description" : "行っちゃった (went and did it)",
+      "expected" : [
         {
-          "surface": "行っ",
-          "pos": "Verb",
-          "lemma": "行く"
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行っ"
         },
         {
-          "surface": "ちゃっ",
-          "pos": "Verb",
-          "lemma": "ちゃう"
+          "lemma" : "ちゃう",
+          "pos" : "Verb",
+          "surface" : "ちゃっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "colloquial_cha",
+      "input" : "行っちゃった",
+      "tags" : [
         "grammar",
         "colloquial"
       ]
     },
     {
-      "id": "colloquial_toku",
-      "description": "やっとく (will do it in advance) - contraction of やって+おく, MeCab splits as やっ+とく",
-      "input": "やっとく",
-      "expected": [
+      "description" : "やっとく (will do it in advance) - contraction of やって+おく, MeCab splits as やっ+とく",
+      "expected" : [
         {
-          "surface": "やっ",
-          "pos": "Verb",
-          "lemma": "やる"
+          "lemma" : "やる",
+          "pos" : "Verb",
+          "surface" : "やっ"
         },
         {
-          "surface": "とく",
-          "pos": "Verb",
-          "lemma": "とく"
+          "lemma" : "とく",
+          "pos" : "Verb",
+          "surface" : "とく"
         }
       ],
-      "tags": [
+      "id" : "colloquial_toku",
+      "input" : "やっとく",
+      "tags" : [
         "grammar",
         "colloquial"
       ]
     },
     {
-      "id": "phrase_meccha_emoi",
-      "description": "Slang phrase めっちゃエモい",
-      "input": "めっちゃエモい",
-      "expected": [
+      "description" : "Slang phrase めっちゃエモい",
+      "expected" : [
         {
-          "surface": "めっちゃ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "めっちゃ"
         },
         {
-          "surface": "エモい",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "エモい"
         }
       ],
-      "tags": [
+      "id" : "phrase_meccha_emoi",
+      "input" : "めっちゃエモい",
+      "tags" : [
         "slang",
         "phrase"
       ]
     },
     {
-      "id": "phrase_cho_bazutta",
-      "description": "Slang phrase 超バズった",
-      "input": "超バズった",
-      "expected": [
+      "description" : "Slang phrase 超バズった",
+      "expected" : [
         {
-          "surface": "超",
-          "pos": "Prefix"
+          "pos" : "Prefix",
+          "surface" : "超"
         },
         {
-          "surface": "バズ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "バズ"
         },
         {
-          "surface": "っ",
-          "pos": "Verb",
-          "lemma": "く"
+          "lemma" : "く",
+          "pos" : "Verb",
+          "surface" : "っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "phrase_cho_bazutta",
+      "input" : "超バズった",
+      "tags" : [
         "slang",
         "phrase"
       ]
     },
     {
-      "id": "phrase_majide_kimoi",
-      "description": "Slang phrase マジでキモい",
-      "input": "マジでキモい",
-      "expected": [
+      "description" : "Slang phrase マジでキモい",
+      "expected" : [
         {
-          "surface": "マジで",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "マジ"
         },
         {
-          "surface": "キモい",
-          "pos": "Adjective"
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "キモい"
         }
       ],
-      "tags": [
+      "id" : "phrase_majide_kimoi",
+      "input" : "マジでキモい",
+      "tags" : [
         "slang",
         "phrase"
       ]
     },
     {
-      "id": "phrase_gachide_saboru",
-      "description": "Slang phrase ガチでサボる (ガチで as adverb 'seriously')",
-      "input": "ガチでサボる",
-      "expected": [
+      "description" : "Slang phrase ガチでサボる (ガチで as adverb 'seriously')",
+      "expected" : [
         {
-          "surface": "ガチで",
-          "pos": "Adverb",
-          "lemma": "ガチで"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ガチ"
         },
         {
-          "surface": "サボる",
-          "pos": "Verb"
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "サボる"
         }
       ],
-      "tags": [
+      "id" : "phrase_gachide_saboru",
+      "input" : "ガチでサボる",
+      "tags" : [
         "slang",
         "phrase"
       ]
     },
     {
-      "id": "phrase_majide_toutoi",
-      "description": "Internet slang phrase マジで尊い",
-      "input": "マジで尊い",
-      "expected": [
+      "description" : "Internet slang phrase マジで尊い",
+      "expected" : [
         {
-          "surface": "マジで",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "マジ"
         },
         {
-          "surface": "尊い",
-          "pos": "Adjective",
-          "lemma": "尊い"
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "尊い"
         }
       ],
-      "tags": [
+      "id" : "phrase_majide_toutoi",
+      "input" : "マジで尊い",
+      "tags" : [
         "slang",
         "phrase",
         "internet"
       ]
     },
     {
-      "id": "phrase_toutoi_shindoi",
-      "description": "Colloquial phrase 尊すぎてしんどい",
-      "input": "尊すぎてしんどい",
-      "expected": [
+      "description" : "Colloquial phrase 尊すぎてしんどい",
+      "expected" : [
         {
-          "surface": "尊すぎ",
-          "pos": "Verb",
-          "lemma": "尊過ぎる"
+          "lemma" : "尊い",
+          "pos" : "Adjective",
+          "surface" : "尊"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "lemma" : "すぎる",
+          "pos" : "Verb",
+          "surface" : "すぎ"
         },
         {
-          "surface": "しんどい",
-          "pos": "Adjective",
-          "lemma": "しんどい"
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "しんどい"
         }
       ],
-      "tags": [
+      "id" : "phrase_toutoi_shindoi",
+      "input" : "尊すぎてしんどい",
+      "tags" : [
         "slang",
         "phrase",
         "internet"
       ]
     },
     {
-      "id": "noun_oshi_standalone",
-      "description": "Nominalized noun 推し standalone (T54)",
-      "input": "推し",
-      "expected": [
+      "description" : "Nominalized noun 推し standalone (T54)",
+      "expected" : [
         {
-          "surface": "推し",
-          "pos": "Noun",
-          "lemma": "推し"
+          "lemma" : "推す",
+          "pos" : "Verb",
+          "surface" : "推し"
         }
       ],
-      "tags": [
+      "id" : "noun_oshi_standalone",
+      "input" : "推し",
+      "tags" : [
         "slang",
         "noun",
         "internet",
@@ -368,21 +430,21 @@
       ]
     },
     {
-      "id": "noun_oshi_particle_no",
-      "description": "Nominalized noun 推し with particle の",
-      "input": "推しの",
-      "expected": [
+      "description" : "Nominalized noun 推し with particle の",
+      "expected" : [
         {
-          "surface": "推し",
-          "pos": "Noun",
-          "lemma": "推し"
+          "lemma" : "推す",
+          "pos" : "Verb",
+          "surface" : "推し"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         }
       ],
-      "tags": [
+      "id" : "noun_oshi_particle_no",
+      "input" : "推しの",
+      "tags" : [
         "slang",
         "noun",
         "internet",
@@ -390,25 +452,25 @@
       ]
     },
     {
-      "id": "phrase_oshi_live",
-      "description": "Internet slang phrase 推しのライブ",
-      "input": "推しのライブ",
-      "expected": [
+      "description" : "Internet slang phrase 推しのライブ",
+      "expected" : [
         {
-          "surface": "推し",
-          "pos": "Noun",
-          "lemma": "推し"
+          "lemma" : "推す",
+          "pos" : "Verb",
+          "surface" : "推し"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "ライブ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "ライブ"
         }
       ],
-      "tags": [
+      "id" : "phrase_oshi_live",
+      "input" : "推しのライブ",
+      "tags" : [
         "slang",
         "phrase",
         "internet",
@@ -416,146 +478,190 @@
       ]
     },
     {
-      "id": "emphatic_sokuon_desu",
-      "description": "ですっ - emphatic sokuon after auxiliary",
-      "input": "大丈夫ですっ",
-      "expected": [
+      "description" : "ですっ - emphatic sokuon after auxiliary",
+      "expected" : [
         {
-          "surface": "大丈夫",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "大丈夫"
         },
         {
-          "surface": "で",
-          "pos": "Auxiliary",
-          "lemma": "だ"
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
         },
         {
-          "surface": "すっ",
-          "pos": "Verb",
-          "lemma": "すう"
+          "lemma" : "すう",
+          "pos" : "Verb",
+          "surface" : "すっ"
         }
       ],
-      "tags": [
+      "id" : "emphatic_sokuon_desu",
+      "input" : "大丈夫ですっ",
+      "tags" : [
         "emphatic",
         "sokuon"
       ]
     },
     {
-      "id": "emphatic_sokuon_verb",
-      "description": "行くっ - emphatic sokuon after verb",
-      "input": "行くっ",
-      "expected": [
+      "description" : "行くっ - emphatic sokuon after verb",
+      "expected" : [
         {
-          "surface": "行くっ",
-          "pos": "Verb",
-          "lemma": "行く"
-        }
-      ],
-      "tags": [
-        "emphatic",
-        "sokuon"
-      ]
-    },
-    {
-      "id": "emphatic_sokuon_multiple",
-      "description": "ますっっ - multiple emphatic sokuon",
-      "input": "ますっっ",
-      "expected": [
-        {
-          "surface": "ますっっ",
-          "pos": "Auxiliary",
-          "lemma": "ます"
-        }
-      ],
-      "tags": [
-        "emphatic",
-        "sokuon"
-      ]
-    },
-    {
-      "id": "emphatic_sokuon_past",
-      "description": "来たっ - emphatic sokuon after past form",
-      "input": "来たっ",
-      "expected": [
-        {
-          "surface": "来",
-          "pos": "Verb",
-          "lemma": "来る"
+          "pos" : "Noun",
+          "surface" : "行"
         },
         {
-          "surface": "たっ",
-          "pos": "Verb",
-          "lemma": "たつ"
+          "lemma" : "くう",
+          "pos" : "Verb",
+          "surface" : "くっ"
         }
       ],
-      "tags": [
+      "id" : "emphatic_sokuon_verb",
+      "input" : "行くっ",
+      "tags" : [
         "emphatic",
         "sokuon"
       ]
     },
     {
-      "id": "vowel_repeat_kita",
-      "description": "きたああああ - vowel repetition for emphasis",
-      "input": "きたああああ",
-      "expected": [
+      "description" : "ますっっ - multiple emphatic sokuon",
+      "expected" : [
         {
-          "surface": "きたああああ",
-          "pos": "Auxiliary",
-          "lemma": "くる"
+          "pos" : "Interjection",
+          "surface" : "ま"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "すっ"
+        },
+        {
+          "lemma" : "く",
+          "pos" : "Verb",
+          "surface" : "っ"
         }
       ],
-      "tags": [
+      "id" : "emphatic_sokuon_multiple",
+      "input" : "ますっっ",
+      "tags" : [
+        "emphatic",
+        "sokuon"
+      ]
+    },
+    {
+      "description" : "来たっ - emphatic sokuon after past form",
+      "expected" : [
+        {
+          "lemma" : "来る",
+          "pos" : "Verb",
+          "surface" : "来"
+        },
+        {
+          "lemma" : "たつ",
+          "pos" : "Verb",
+          "surface" : "たっ"
+        }
+      ],
+      "id" : "emphatic_sokuon_past",
+      "input" : "来たっ",
+      "tags" : [
+        "emphatic",
+        "sokuon"
+      ]
+    },
+    {
+      "description" : "きたああああ - vowel repetition for emphasis",
+      "expected" : [
+        {
+          "lemma" : "くる",
+          "pos" : "Verb",
+          "surface" : "き"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        },
+        {
+          "pos" : "Interjection",
+          "surface" : "ああ"
+        },
+        {
+          "pos" : "Interjection",
+          "surface" : "ああ"
+        }
+      ],
+      "id" : "vowel_repeat_kita",
+      "input" : "きたああああ",
+      "tags" : [
         "emphatic",
         "vowel_repeat"
       ]
     },
     {
-      "id": "vowel_repeat_sugoi",
-      "description": "すごいいいい - vowel repetition for emphasis",
-      "input": "すごいいいい",
-      "expected": [
+      "description" : "すごいいいい - vowel repetition for emphasis",
+      "expected" : [
         {
-          "surface": "すごいいいい",
-          "pos": "Adjective",
-          "lemma": "すごい"
+          "pos" : "Adjective",
+          "surface" : "すごい"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "いい"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "い"
         }
       ],
-      "tags": [
+      "id" : "vowel_repeat_sugoi",
+      "input" : "すごいいいい",
+      "tags" : [
         "emphatic",
         "vowel_repeat"
       ]
     },
     {
-      "id": "vowel_repeat_iku",
-      "description": "いくうう - vowel repetition for emphasis",
-      "input": "いくうう",
-      "expected": [
+      "description" : "いくうう - vowel repetition for emphasis",
+      "expected" : [
         {
-          "surface": "いくうう",
-          "pos": "Verb",
-          "lemma": "いく"
+          "pos" : "Verb",
+          "surface" : "いく"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "う"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "う"
         }
       ],
-      "tags": [
+      "id" : "vowel_repeat_iku",
+      "input" : "いくうう",
+      "tags" : [
         "emphatic",
         "vowel_repeat"
       ]
     },
     {
-      "id": "vowel_repeat_yabai",
-      "description": "やばいいい - vowel repetition for emphasis",
-      "input": "やばいいい",
-      "expected": [
+      "description" : "やばいいい - vowel repetition for emphasis",
+      "expected" : [
         {
-          "surface": "やばいいい",
-          "pos": "Adjective",
-          "lemma": "やばい"
+          "pos" : "Adjective",
+          "surface" : "やばい"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "いい"
         }
       ],
-      "tags": [
+      "id" : "vowel_repeat_yabai",
+      "input" : "やばいいい",
+      "tags" : [
         "emphatic",
         "vowel_repeat"
       ]
     }
-  ]
+  ],
+  "description" : "Colloquial and slang patterns",
+  "version" : "1.0"
 }

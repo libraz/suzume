@@ -1,243 +1,248 @@
 {
-  "version": "1.0",
-  "description": "Compound adjectives (〜やすい、〜にくい、〜すぎる)",
-  "cases": [
+  "cases" : [
     {
-      "id": "aux_sugiru_standalone",
-      "description": "Auxiliary verb すぎる standalone te-form (T55) - MeCab-compatible split",
-      "input": "すぎて",
-      "expected": [
+      "description" : "Auxiliary verb すぎる standalone te-form (T55) - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "すぎ",
-          "pos": "Verb",
-          "lemma": "すぎる"
+          "lemma" : "すぎる",
+          "pos" : "Verb",
+          "surface" : "すぎ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "aux_sugiru_standalone",
+      "input" : "すぎて",
+      "tags" : [
         "auxiliary",
         "sugiru"
       ]
     },
     {
-      "id": "aux_sugiru_dict",
-      "description": "Auxiliary verb すぎる dictionary form",
-      "input": "すぎる",
-      "expected": [
+      "description" : "Auxiliary verb すぎる dictionary form",
+      "expected" : [
         {
-          "surface": "すぎる",
-          "pos": "Verb",
-          "lemma": "すぎる"
+          "lemma" : "すぎる",
+          "pos" : "Verb",
+          "surface" : "すぎる"
         }
       ],
-      "tags": [
+      "id" : "aux_sugiru_dict",
+      "input" : "すぎる",
+      "tags" : [
         "auxiliary",
         "sugiru"
       ]
     },
     {
-      "id": "aux_adj_yomiyasui_context",
-      "description": "この本は読みやすい (this book is easy to read) - MeCab-compatible split",
-      "input": "この本は読みやすい",
-      "expected": [
+      "description" : "この本は読みやすい (this book is easy to read) - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "この",
-          "pos": "Determiner"
+          "pos" : "Determiner",
+          "surface" : "この"
         },
         {
-          "surface": "本",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "本"
         },
         {
-          "surface": "は",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "は"
         },
         {
-          "surface": "読み",
-          "pos": "Verb",
-          "lemma": "読む"
+          "lemma" : "読む",
+          "pos" : "Verb",
+          "surface" : "読み"
         },
         {
-          "surface": "やすい",
-          "pos": "Adjective",
-          "lemma": "やすい"
+          "lemma" : "やすい",
+          "pos" : "Adjective",
+          "surface" : "やすい"
         }
       ],
-      "tags": [
+      "id" : "aux_adj_yomiyasui_context",
+      "input" : "この本は読みやすい",
+      "tags" : [
         "grammar",
         "auxiliary-adjective"
       ]
     },
     {
-      "id": "compound_adj_yomiyasui",
-      "description": "読みやすい - compound adjective (verb renyokei + やすい) - MeCab-compatible split",
-      "input": "読みやすい",
-      "expected": [
+      "description" : "読みやすい - compound adjective (verb renyokei + やすい) - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "読み",
-          "pos": "Verb",
-          "lemma": "読む"
+          "lemma" : "読む",
+          "pos" : "Verb",
+          "surface" : "読み"
         },
         {
-          "surface": "やすい",
-          "pos": "Adjective",
-          "lemma": "やすい"
+          "lemma" : "やすい",
+          "pos" : "Adjective",
+          "surface" : "やすい"
         }
       ],
-      "tags": [
+      "id" : "compound_adj_yomiyasui",
+      "input" : "読みやすい",
+      "tags" : [
         "compound_adjective"
       ]
     },
     {
-      "id": "compound_adj_tsukainikui",
-      "description": "使いにくい - compound adjective (verb renyokei + にくい)",
-      "input": "使いにくい",
-      "expected": [
+      "description" : "使いにくい - compound adjective (verb renyokei + にくい)",
+      "expected" : [
         {
-          "surface": "使いにくい",
-          "pos": "Adjective",
-          "lemma": "使いにくい"
+          "lemma" : "使う",
+          "pos" : "Verb",
+          "surface" : "使い"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "にくい"
         }
       ],
-      "tags": [
+      "id" : "compound_adj_tsukainikui",
+      "input" : "使いにくい",
+      "tags" : [
         "compound_adjective"
       ]
     },
     {
-      "id": "adj_sugiru_toutoi",
-      "description": "尊すぎる - MeCab-compatible: ADJ stem (ガル接続) + すぎる (non-independent verb)",
-      "input": "尊すぎる",
-      "expected": [
+      "description" : "尊すぎる - MeCab-compatible: ADJ stem (ガル接続) + すぎる (non-independent verb)",
+      "expected" : [
         {
-          "surface": "尊",
-          "pos": "Adjective",
-          "lemma": "尊い"
+          "lemma" : "尊い",
+          "pos" : "Adjective",
+          "surface" : "尊"
         },
         {
-          "surface": "すぎる",
-          "pos": "Verb",
-          "lemma": "すぎる"
+          "lemma" : "すぎる",
+          "pos" : "Verb",
+          "surface" : "すぎる"
         }
       ],
-      "tags": [
+      "id" : "adj_sugiru_toutoi",
+      "input" : "尊すぎる",
+      "tags" : [
         "adj_sugiru"
       ]
     },
     {
-      "id": "adj_sugiru_takai",
-      "description": "高すぎる - MeCab-compatible: ADJ stem (ガル接続) + すぎる (non-independent verb)",
-      "input": "高すぎる",
-      "expected": [
+      "description" : "高すぎる - MeCab-compatible: ADJ stem (ガル接続) + すぎる (non-independent verb)",
+      "expected" : [
         {
-          "surface": "高",
-          "pos": "Adjective",
-          "lemma": "高い"
+          "lemma" : "高い",
+          "pos" : "Adjective",
+          "surface" : "高"
         },
         {
-          "surface": "すぎる",
-          "pos": "Verb",
-          "lemma": "すぎる"
+          "lemma" : "すぎる",
+          "pos" : "Verb",
+          "surface" : "すぎる"
         }
       ],
-      "tags": [
+      "id" : "adj_sugiru_takai",
+      "input" : "高すぎる",
+      "tags" : [
         "adj_sugiru"
       ]
     },
     {
-      "id": "adj_sugiru_inflected_te",
-      "description": "尊すぎて - MeCab-compatible: ADJ stem (ガル接続) + すぎ (non-independent verb) + て",
-      "input": "尊すぎて",
-      "expected": [
+      "description" : "尊すぎて - MeCab-compatible: ADJ stem (ガル接続) + すぎ (non-independent verb) + て",
+      "expected" : [
         {
-          "surface": "尊",
-          "pos": "Adjective",
-          "lemma": "尊い"
+          "lemma" : "尊い",
+          "pos" : "Adjective",
+          "surface" : "尊"
         },
         {
-          "surface": "すぎ",
-          "pos": "Verb",
-          "lemma": "すぎる"
+          "lemma" : "すぎる",
+          "pos" : "Verb",
+          "surface" : "すぎ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "adj_sugiru_inflected_te",
+      "input" : "尊すぎて",
+      "tags" : [
         "adj_sugiru"
       ]
     },
     {
-      "id": "adj_sugiru_inflected_ta",
-      "description": "高すぎた - MeCab-compatible: ADJ stem (ガル接続) + すぎ (non-independent verb) + た",
-      "input": "高すぎた",
-      "expected": [
+      "description" : "高すぎた - MeCab-compatible: ADJ stem (ガル接続) + すぎ (non-independent verb) + た",
+      "expected" : [
         {
-          "surface": "高",
-          "pos": "Adjective",
-          "lemma": "高い"
+          "lemma" : "高い",
+          "pos" : "Adjective",
+          "surface" : "高"
         },
         {
-          "surface": "すぎ",
-          "pos": "Verb",
-          "lemma": "すぎる"
+          "lemma" : "すぎる",
+          "pos" : "Verb",
+          "surface" : "すぎ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "adj_sugiru_inflected_ta",
+      "input" : "高すぎた",
+      "tags" : [
         "adj_sugiru"
       ]
     },
     {
-      "id": "adj_sugiru_in_sentence",
-      "description": "この値段は高すぎる - MeCab-compatible: ADJ stem (ガル接続) + すぎる in context",
-      "input": "この値段は高すぎる",
-      "expected": [
+      "description" : "この値段は高すぎる - MeCab-compatible: ADJ stem (ガル接続) + すぎる in context",
+      "expected" : [
         {
-          "surface": "この",
-          "pos": "Determiner"
+          "pos" : "Determiner",
+          "surface" : "この"
         },
         {
-          "surface": "値段",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "値段"
         },
         {
-          "surface": "は",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "は"
         },
         {
-          "surface": "高",
-          "pos": "Adjective",
-          "lemma": "高い"
+          "lemma" : "高い",
+          "pos" : "Adjective",
+          "surface" : "高"
         },
         {
-          "surface": "すぎる",
-          "pos": "Verb",
-          "lemma": "すぎる"
+          "lemma" : "すぎる",
+          "pos" : "Verb",
+          "surface" : "すぎる"
         }
       ],
-      "tags": [
+      "id" : "adj_sugiru_in_sentence",
+      "input" : "この値段は高すぎる",
+      "tags" : [
         "adj_sugiru"
       ]
     },
     {
-      "id": "katakana_sugiru_pattern",
-      "description": "ワンパターンすぎる should have lemma ワンパターンすぎる, not ワンパターンる",
-      "input": "ワンパターンすぎる",
-      "expected": [
+      "description" : "ワンパターンすぎる should have lemma ワンパターンすぎる, not ワンパターンる",
+      "expected" : [
         {
-          "surface": "ワンパターンすぎる",
-          "pos": "Verb",
-          "lemma": "ワンパターンすぎる"
+          "pos" : "Noun",
+          "surface" : "ワンパターン"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "すぎる"
         }
       ],
-      "tags": [
+      "id" : "katakana_sugiru_pattern",
+      "input" : "ワンパターンすぎる",
+      "tags" : [
         "verb",
         "katakana",
         "sugiru",
@@ -245,17 +250,20 @@
       ]
     },
     {
-      "id": "katakana_sugiru_simple",
-      "description": "シンプルすぎる should have lemma シンプルすぎる, not シンプルる",
-      "input": "シンプルすぎる",
-      "expected": [
+      "description" : "シンプルすぎる should have lemma シンプルすぎる, not シンプルる",
+      "expected" : [
         {
-          "surface": "シンプルすぎる",
-          "pos": "Verb",
-          "lemma": "シンプルすぎる"
+          "pos" : "Noun",
+          "surface" : "シンプル"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "すぎる"
         }
       ],
-      "tags": [
+      "id" : "katakana_sugiru_simple",
+      "input" : "シンプルすぎる",
+      "tags" : [
         "verb",
         "katakana",
         "sugiru",
@@ -263,38 +271,45 @@
       ]
     },
     {
-      "id": "katakana_sugiru_hard",
-      "description": "ハードすぎる - different katakana word + sugiru",
-      "input": "ハードすぎる",
-      "expected": [
+      "description" : "ハードすぎる - different katakana word + sugiru",
+      "expected" : [
         {
-          "surface": "ハードすぎる",
-          "pos": "Verb",
-          "lemma": "ハードすぎる"
+          "pos" : "Noun",
+          "surface" : "ハード"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "すぎる"
         }
       ],
-      "tags": [
+      "id" : "katakana_sugiru_hard",
+      "input" : "ハードすぎる",
+      "tags" : [
         "verb",
         "katakana",
         "sugiru"
       ]
     },
     {
-      "id": "katakana_sugiru_negative",
-      "description": "シンプルすぎない - katakana + sugiru negative form",
-      "input": "シンプルすぎない",
-      "expected": [
+      "description" : "シンプルすぎない - katakana + sugiru negative form",
+      "expected" : [
         {
-          "surface": "シンプルすぎ",
-          "pos": "Verb",
-          "lemma": "シンプルすぎる"
+          "pos" : "Noun",
+          "surface" : "シンプル"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary"
+          "lemma" : "すぎる",
+          "pos" : "Verb",
+          "surface" : "すぎ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "katakana_sugiru_negative",
+      "input" : "シンプルすぎない",
+      "tags" : [
         "verb",
         "katakana",
         "sugiru",
@@ -302,34 +317,39 @@
       ]
     },
     {
-      "id": "katakana_sugiru_in_context",
-      "description": "このデザインはシンプルすぎる - katakana + sugiru in sentence",
-      "input": "このデザインはシンプルすぎる",
-      "expected": [
+      "description" : "このデザインはシンプルすぎる - katakana + sugiru in sentence",
+      "expected" : [
         {
-          "surface": "この",
-          "pos": "Determiner"
+          "pos" : "Adnominal",
+          "surface" : "この"
         },
         {
-          "surface": "デザイン",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "デザイン"
         },
         {
-          "surface": "は",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "は"
         },
         {
-          "surface": "シンプルすぎる",
-          "pos": "Verb",
-          "lemma": "シンプルすぎる"
+          "pos" : "Noun",
+          "surface" : "シンプル"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "すぎる"
         }
       ],
-      "tags": [
+      "id" : "katakana_sugiru_in_context",
+      "input" : "このデザインはシンプルすぎる",
+      "tags" : [
         "verb",
         "katakana",
         "sugiru",
         "context"
       ]
     }
-  ]
+  ],
+  "description" : "Compound adjectives (〜やすい、〜にくい、〜すぎる)",
+  "version" : "1.0"
 }

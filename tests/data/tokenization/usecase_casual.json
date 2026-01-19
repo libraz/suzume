@@ -1,994 +1,1022 @@
 {
-  "version": "1.0",
-  "cases": [
+  "cases" : [
     {
-      "id": "casual_fun",
-      "description": "Casual expression of fun",
-      "input": "めっちゃ楽しかった",
-      "expected": [
+      "description" : "Casual expression of fun",
+      "expected" : [
         {
-          "surface": "めっちゃ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "めっちゃ"
         },
         {
-          "surface": "楽しかった",
-          "pos": "Adjective",
-          "lemma": "楽しい"
+          "lemma" : "楽しい",
+          "pos" : "Adjective",
+          "surface" : "楽しかっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "casual_fun",
+      "input" : "めっちゃ楽しかった",
+      "tags" : [
         "casual"
       ]
     },
     {
-      "id": "casual_really",
-      "description": "Casual confirmation",
-      "input": "本当にそうなの",
-      "expected": [
+      "description" : "Casual confirmation",
+      "expected" : [
         {
-          "surface": "本当",
-          "pos": "Adjective"
+          "pos" : "Adverb",
+          "surface" : "本当に"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Adverb",
+          "surface" : "そう"
         },
         {
-          "surface": "そう",
-          "pos": "Adverb"
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "な"
         },
         {
-          "surface": "な",
-          "pos": "Particle"
-        },
-        {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         }
       ],
-      "tags": [
+      "id" : "casual_really",
+      "input" : "本当にそうなの",
+      "tags" : [
         "casual"
       ]
     },
     {
-      "id": "casual_desire",
-      "description": "Desire expression with 食べたい - verb+aux split",
-      "input": "ラーメン食べたい",
-      "expected": [
+      "description" : "Desire expression with 食べたい - verb+aux split",
+      "expected" : [
         {
-          "surface": "ラーメン",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "ラーメン"
         },
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "たい",
-          "pos": "Auxiliary",
-          "lemma": "たい"
+          "lemma" : "たい",
+          "pos" : "Auxiliary",
+          "surface" : "たい"
         }
       ],
-      "tags": [
+      "id" : "casual_desire",
+      "input" : "ラーメン食べたい",
+      "tags" : [
         "casual"
       ]
     },
     {
-      "id": "casual_surprise",
-      "description": "Surprise expression - MeCab-compatible verb+た split",
-      "input": "まじで驚いた",
-      "expected": [
+      "description" : "Surprise expression - MeCab-compatible verb+た split",
+      "expected" : [
         {
-          "surface": "まじで",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "まじ"
         },
         {
-          "surface": "驚い",
-          "pos": "Verb",
-          "lemma": "驚く"
+          "pos" : "Particle",
+          "surface" : "で"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "驚く",
+          "pos" : "Verb",
+          "surface" : "驚い"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "casual_surprise",
+      "input" : "まじで驚いた",
+      "tags" : [
         "casual"
       ]
     },
     {
-      "id": "casual_omission",
-      "description": "Omitted particle - casual style - MeCab-compatible split",
-      "input": "今日学校行った",
-      "expected": [
+      "description" : "Omitted particle - casual style - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "今日",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "今日学校"
         },
         {
-          "surface": "学校",
-          "pos": "Noun"
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行っ"
         },
         {
-          "surface": "行っ",
-          "pos": "Verb",
-          "lemma": "行く"
-        },
-        {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "casual_omission",
+      "input" : "今日学校行った",
+      "tags" : [
         "casual"
       ]
     },
     {
-      "id": "casual_contraction_teru",
-      "description": "Contraction てる - MeCab splits 何+し+てる",
-      "input": "何してる",
-      "expected": [
+      "description" : "Contraction てる - MeCab splits 何+し+てる",
+      "expected" : [
         {
-          "surface": "何",
-          "pos": "Pronoun"
+          "pos" : "Pronoun",
+          "surface" : "何"
         },
         {
-          "surface": "し",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
         },
         {
-          "surface": "てる",
-          "pos": "Verb",
-          "lemma": "てる"
+          "lemma" : "てる",
+          "pos" : "Verb",
+          "surface" : "てる"
         }
       ],
-      "tags": [
+      "id" : "casual_contraction_teru",
+      "input" : "何してる",
+      "tags" : [
         "casual",
         "contraction"
       ]
     },
     {
-      "id": "casual_contraction_chau",
-      "description": "Contraction ちゃう - MeCab-compatible split: ちゃっ+た",
-      "input": "食べちゃった",
-      "expected": [
+      "description" : "Contraction ちゃう - MeCab-compatible split: ちゃっ+た",
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "ちゃっ",
-          "pos": "Verb",
-          "lemma": "ちゃう"
+          "lemma" : "ちゃう",
+          "pos" : "Verb",
+          "surface" : "ちゃっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "casual_contraction_chau",
+      "input" : "食べちゃった",
+      "tags" : [
         "casual",
         "contraction",
         "auxiliary"
       ]
     },
     {
-      "id": "casual_contraction_toku",
-      "description": "Contraction とく (ておく→とく) - 買って+おく contracted to 買っとく",
-      "input": "買っとくね",
-      "expected": [
+      "description" : "Contraction とく (ておく→とく) - 買って+おく contracted to 買っとく",
+      "expected" : [
         {
-          "surface": "買っとく",
-          "pos": "Verb",
-          "lemma": "買う"
+          "lemma" : "買う",
+          "pos" : "Verb",
+          "surface" : "買っ"
         },
         {
-          "surface": "ね",
-          "pos": "Particle"
+          "pos" : "Verb",
+          "surface" : "とく"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ね"
         }
       ],
-      "tags": [
+      "id" : "casual_contraction_toku",
+      "input" : "買っとくね",
+      "tags" : [
         "casual",
         "contraction"
       ]
     },
     {
-      "id": "casual_particle_ne",
-      "description": "Final particle ね",
-      "input": "いい天気だね",
-      "expected": [
+      "description" : "Final particle ね",
+      "expected" : [
         {
-          "surface": "いい",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "いい"
         },
         {
-          "surface": "天気",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "天気"
         },
         {
-          "surface": "だ",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "だ"
         },
         {
-          "surface": "ね",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "ね"
         }
       ],
-      "tags": [
+      "id" : "casual_particle_ne",
+      "input" : "いい天気だね",
+      "tags" : [
         "casual",
         "particle"
       ]
     },
     {
-      "id": "casual_particle_yo",
-      "description": "Final particle よ",
-      "input": "もう帰るよ",
-      "expected": [
+      "description" : "Final particle よ",
+      "expected" : [
         {
-          "surface": "もう",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "もう"
         },
         {
-          "surface": "帰る",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "帰る"
         },
         {
-          "surface": "よ",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "よ"
         }
       ],
-      "tags": [
+      "id" : "casual_particle_yo",
+      "input" : "もう帰るよ",
+      "tags" : [
         "casual",
         "particle"
       ]
     },
     {
-      "id": "casual_particle_na",
-      "description": "Final particle な",
-      "input": "面白いな",
-      "expected": [
+      "description" : "Final particle な",
+      "expected" : [
         {
-          "surface": "面白い",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "面白い"
         },
         {
-          "surface": "な",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "な"
         }
       ],
-      "tags": [
+      "id" : "casual_particle_na",
+      "input" : "面白いな",
+      "tags" : [
         "casual",
         "particle"
       ]
     },
     {
-      "id": "social_lunch",
-      "description": "Social media lunch post",
-      "input": "今日のランチ美味しかった",
-      "expected": [
+      "description" : "Social media lunch post",
+      "expected" : [
         {
-          "surface": "今日",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "今日"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "ランチ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "ランチ"
         },
         {
-          "surface": "美味しかった",
-          "pos": "Adjective",
-          "lemma": "美味しい"
+          "lemma" : "美味しい",
+          "pos" : "Adjective",
+          "surface" : "美味しかっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "social_lunch",
+      "input" : "今日のランチ美味しかった",
+      "tags" : [
         "social"
       ]
     },
     {
-      "id": "social_reaction",
-      "description": "Casual reaction",
-      "input": "まじで嬉しい",
-      "expected": [
+      "description" : "Casual reaction",
+      "expected" : [
         {
-          "surface": "まじで",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "まじ"
         },
         {
-          "surface": "嬉しい",
-          "pos": "Adjective"
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "嬉しい"
         }
       ],
-      "tags": [
+      "id" : "social_reaction",
+      "input" : "まじで嬉しい",
+      "tags" : [
         "social"
       ]
     },
     {
-      "id": "social_question",
-      "description": "Question post with で particle",
-      "input": "これどこで買えるか知ってる人いる？",
-      "expected": [
+      "description" : "Question post with で particle",
+      "expected" : [
         {
-          "surface": "これ",
-          "pos": "Pronoun"
+          "pos" : "Noun",
+          "surface" : "これ"
         },
         {
-          "surface": "どこ",
-          "pos": "Pronoun"
+          "pos" : "Noun",
+          "surface" : "どこ"
         },
         {
-          "surface": "で",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "で"
         },
         {
-          "surface": "買える",
-          "pos": "Verb",
-          "lemma": "買う"
+          "pos" : "Verb",
+          "surface" : "買える"
         },
         {
-          "surface": "か",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "か"
         },
         {
-          "surface": "知ってる",
-          "pos": "Verb",
-          "lemma": "知る"
+          "lemma" : "知る",
+          "pos" : "Verb",
+          "surface" : "知っ"
         },
         {
-          "surface": "人",
-          "pos": "Noun"
+          "pos" : "Verb",
+          "surface" : "てる"
         },
         {
-          "surface": "いる",
-          "pos": "Verb"
+          "pos" : "Noun",
+          "surface" : "人"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "いる"
+        },
+        {
+          "pos" : "Symbol",
+          "surface" : "？"
         }
       ],
-      "tags": [
+      "id" : "social_question",
+      "input" : "これどこで買えるか知ってる人いる？",
+      "tags" : [
         "social"
       ]
     },
     {
-      "id": "social_recommendation",
-      "description": "Recommendation post - マジで is ADV (seriously/really)",
-      "input": "このお店マジでおすすめ",
-      "expected": [
+      "description" : "Recommendation post - マジで is ADV (seriously/really)",
+      "expected" : [
         {
-          "surface": "この",
-          "pos": "Determiner"
+          "pos" : "Adnominal",
+          "surface" : "この"
         },
         {
-          "surface": "お",
-          "pos": "Prefix"
+          "pos" : "Prefix",
+          "surface" : "お"
         },
         {
-          "surface": "店",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "店"
         },
         {
-          "surface": "マジで",
-          "pos": "Adverb"
+          "pos" : "Noun",
+          "surface" : "マジ"
         },
         {
-          "surface": "おすすめ",
-          "pos": "Noun"
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "おすすめ"
         }
       ],
-      "tags": [
+      "id" : "social_recommendation",
+      "input" : "このお店マジでおすすめ",
+      "tags" : [
         "social"
       ]
     },
     {
-      "id": "social_announcement",
-      "description": "Personal announcement (split: verb stem + polite aux)",
-      "input": "引っ越しました",
-      "expected": [
+      "description" : "Personal announcement (split: verb stem + polite aux)",
+      "expected" : [
         {
-          "surface": "引っ越し",
-          "pos": "Verb",
-          "lemma": "引っ越す"
+          "lemma" : "引っ越す",
+          "pos" : "Verb",
+          "surface" : "引っ越し"
         },
         {
-          "surface": "まし",
-          "pos": "Auxiliary",
-          "lemma": "ます"
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "まし"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "social_announcement",
+      "input" : "引っ越しました",
+      "tags" : [
         "social"
       ]
     },
     {
-      "id": "social_gratitude",
-      "description": "Gratitude post",
-      "input": "みんなありがとう",
-      "expected": [
+      "description" : "Gratitude post",
+      "expected" : [
         {
-          "surface": "みんな",
-          "pos": "Pronoun"
+          "pos" : "Pronoun",
+          "surface" : "みんな"
         },
         {
-          "surface": "ありがとう",
-          "pos": "Other"
+          "pos" : "Other",
+          "surface" : "ありがとう"
         }
       ],
-      "tags": [
+      "id" : "social_gratitude",
+      "input" : "みんなありがとう",
+      "tags" : [
         "social"
       ]
     },
     {
-      "id": "review_positive",
-      "description": "Positive review - MeCab互換分割",
-      "input": "とても使いやすくて満足しています",
-      "expected": [
+      "description" : "Positive review - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "とても",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "とても"
         },
         {
-          "surface": "使いやすく",
-          "pos": "Adjective",
-          "lemma": "使いやすい"
+          "lemma" : "使う",
+          "pos" : "Verb",
+          "surface" : "使い"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "lemma" : "やすい",
+          "pos" : "Adjective",
+          "surface" : "やすく"
         },
         {
-          "surface": "満足",
-          "pos": "Noun"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "し",
-          "pos": "Verb",
-          "lemma": "する"
+          "pos" : "Noun",
+          "surface" : "満足"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
         },
         {
-          "surface": "い",
-          "pos": "Verb",
-          "lemma": "いる"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "ます",
-          "pos": "Auxiliary",
-          "lemma": "ます"
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ます"
         }
       ],
-      "tags": [
+      "id" : "review_positive",
+      "input" : "とても使いやすくて満足しています",
+      "tags" : [
         "review"
       ]
     },
     {
-      "id": "review_negative",
-      "description": "Negative review - MeCab互換分割 (なかっ+た split)",
-      "input": "期待していたほどではなかった",
-      "expected": [
+      "description" : "Negative review - MeCab互換分割 (なかっ+た split)",
+      "expected" : [
         {
-          "surface": "期待",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "期待"
         },
         {
-          "surface": "し",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "い",
-          "pos": "Verb",
-          "lemma": "いる"
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         },
         {
-          "surface": "ほど",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "ほど"
         },
         {
-          "surface": "で",
-          "pos": "Auxiliary",
-          "lemma": "だ"
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
         },
         {
-          "surface": "は",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "は"
         },
         {
-          "surface": "なかっ",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なかっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "review_negative",
+      "input" : "期待していたほどではなかった",
+      "tags" : [
         "review"
       ]
     },
     {
-      "id": "review_comparison",
-      "description": "Comparative review with が particle",
-      "input": "前のモデルより性能が良くなった",
-      "expected": [
+      "description" : "Comparative review with が particle",
+      "expected" : [
         {
-          "surface": "前",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "前"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "モデル",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "モデル"
         },
         {
-          "surface": "より",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "より"
         },
         {
-          "surface": "性能",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "性能"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "良く",
-          "pos": "Adjective",
-          "lemma": "良い"
+          "lemma" : "良い",
+          "pos" : "Adjective",
+          "surface" : "良く"
         },
         {
-          "surface": "なっ",
-          "pos": "Verb",
-          "lemma": "なる"
+          "lemma" : "なる",
+          "pos" : "Verb",
+          "surface" : "なっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "review_comparison",
+      "input" : "前のモデルより性能が良くなった",
+      "tags" : [
         "review"
       ]
     },
     {
-      "id": "review_recommendation",
-      "description": "Recommendation with は particle",
-      "input": "この商品はおすすめです",
-      "expected": [
+      "description" : "Recommendation with は particle",
+      "expected" : [
         {
-          "surface": "この",
-          "pos": "Determiner"
+          "pos" : "Determiner",
+          "surface" : "この"
         },
         {
-          "surface": "商品",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "商品"
         },
         {
-          "surface": "は",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "は"
         },
         {
-          "surface": "おすすめ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "おすすめ"
         },
         {
-          "surface": "です",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "です"
         }
       ],
-      "tags": [
+      "id" : "review_recommendation",
+      "input" : "この商品はおすすめです",
+      "tags" : [
         "review"
       ]
     },
     {
-      "id": "review_price",
-      "description": "Price feedback with の and が particles",
-      "input": "値段の割に品質が良い",
-      "expected": [
+      "description" : "Price feedback with の and が particles",
+      "expected" : [
         {
-          "surface": "値段",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "値段"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "割",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "割"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "に"
         },
         {
-          "surface": "品質",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "品質"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "良い",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "良い"
         }
       ],
-      "tags": [
+      "id" : "review_price",
+      "input" : "値段の割に品質が良い",
+      "tags" : [
         "review"
       ]
     },
     {
-      "id": "review_durability",
-      "description": "Durability comment with が particle",
-      "input": "3年使っているが壊れない",
-      "expected": [
+      "description" : "Durability comment with が particle",
+      "expected" : [
         {
-          "surface": "3年",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "3年"
         },
         {
-          "surface": "使っ",
-          "pos": "Verb",
-          "lemma": "使う"
+          "lemma" : "使う",
+          "pos" : "Verb",
+          "surface" : "使っ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "いる",
-          "pos": "Verb",
-          "lemma": "いる"
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "いる"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "壊れ",
-          "pos": "Verb",
-          "lemma": "壊れる"
+          "lemma" : "壊れる",
+          "pos" : "Verb",
+          "surface" : "壊れ"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "review_durability",
+      "input" : "3年使っているが壊れない",
+      "tags" : [
         "review"
       ]
     },
     {
-      "id": "review_issue",
-      "description": "Issue report with が particle",
-      "input": "サイズが思ったより小さかった",
-      "expected": [
+      "description" : "Issue report with が particle",
+      "expected" : [
         {
-          "surface": "サイズ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "サイズ"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "思っ",
-          "pos": "Verb",
-          "lemma": "思う"
+          "lemma" : "思う",
+          "pos" : "Verb",
+          "surface" : "思っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         },
         {
-          "surface": "より",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "より"
         },
         {
-          "surface": "小さかった",
-          "pos": "Adjective",
-          "lemma": "小さい"
+          "lemma" : "小さい",
+          "pos" : "Adjective",
+          "surface" : "小さかっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "review_issue",
+      "input" : "サイズが思ったより小さかった",
+      "tags" : [
         "review"
       ]
     },
     {
-      "id": "colloquial_shiteru",
-      "description": "Colloquial している → してる - MeCab splits し+てる",
-      "input": "今何してる",
-      "expected": [
+      "description" : "Colloquial している → してる - MeCab splits し+てる",
+      "expected" : [
         {
-          "surface": "今",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "今何"
         },
         {
-          "surface": "何",
-          "pos": "Pronoun"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
         },
         {
-          "surface": "し",
-          "pos": "Verb",
-          "lemma": "する"
-        },
-        {
-          "surface": "てる",
-          "pos": "Verb",
-          "lemma": "てる"
+          "pos" : "Verb",
+          "surface" : "てる"
         }
       ],
-      "tags": [
+      "id" : "colloquial_shiteru",
+      "input" : "今何してる",
+      "tags" : [
         "colloquial"
       ]
     },
     {
-      "id": "colloquial_miteta",
-      "description": "Colloquial 見ていた → 見てた - MeCab: 見(V)+て(V,てる)+た(AUX)",
-      "input": "テレビ見てた",
-      "expected": [
+      "description" : "Colloquial 見ていた → 見てた - MeCab: 見(V)+て(V,てる)+た(AUX)",
+      "expected" : [
         {
-          "surface": "テレビ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "テレビ"
         },
         {
-          "surface": "見",
-          "pos": "Verb",
-          "lemma": "見る"
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
         },
         {
-          "surface": "て",
-          "pos": "Verb",
-          "lemma": "てる"
+          "lemma" : "てる",
+          "pos" : "Verb",
+          "surface" : "て"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "colloquial_miteta",
+      "input" : "テレビ見てた",
+      "tags" : [
         "colloquial"
       ]
     },
     {
-      "id": "colloquial_itteta",
-      "description": "Colloquial 行っていた → 行ってた - MeCab互換分割",
-      "input": "学校に行ってた",
-      "expected": [
+      "description" : "Colloquial 行っていた → 行ってた - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "学校",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "学校"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "に"
         },
         {
-          "surface": "行っ",
-          "pos": "Verb",
-          "lemma": "行く"
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行っ"
         },
         {
-          "surface": "て",
-          "pos": "Verb",
-          "lemma": "てる"
+          "lemma" : "てる",
+          "pos" : "Verb",
+          "surface" : "て"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "colloquial_itteta",
+      "input" : "学校に行ってた",
+      "tags" : [
         "colloquial"
       ]
     },
     {
-      "id": "colloquial_tabeteku",
-      "description": "Colloquial 食べていく → 食べてく - te-form + てく aux split",
-      "input": "一緒に食べてく",
-      "expected": [
+      "description" : "Colloquial 食べていく → 食べてく - te-form + てく aux split",
+      "expected" : [
         {
-          "surface": "一緒",
-          "pos": "Adjective"
+          "pos" : "Noun",
+          "surface" : "一緒"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "に"
         },
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "てく",
-          "pos": "Auxiliary",
-          "lemma": "てく"
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "く"
         }
       ],
-      "tags": [
+      "id" : "colloquial_tabeteku",
+      "input" : "一緒に食べてく",
+      "tags" : [
         "colloquial"
       ]
     },
     {
-      "id": "colloquial_meccha",
-      "description": "Colloquial adverb めっちゃ",
-      "input": "めっちゃ面白い",
-      "expected": [
+      "description" : "Colloquial adverb めっちゃ",
+      "expected" : [
         {
-          "surface": "めっちゃ",
-          "pos": "Adverb"
+          "pos" : "Adverb",
+          "surface" : "めっちゃ"
         },
         {
-          "surface": "面白い",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "面白い"
         }
       ],
-      "tags": [
+      "id" : "colloquial_meccha",
+      "input" : "めっちゃ面白い",
+      "tags" : [
         "colloquial"
       ]
     },
     {
-      "id": "colloquial_yabai",
-      "description": "Colloquial adjective やばい",
-      "input": "これまじやばい",
-      "expected": [
+      "description" : "Colloquial adjective やばい",
+      "expected" : [
         {
-          "surface": "これ",
-          "pos": "Pronoun"
+          "pos" : "Pronoun",
+          "surface" : "これ"
         },
         {
-          "surface": "まじ",
-          "pos": "Other"
+          "pos" : "Other",
+          "surface" : "まじ"
         },
         {
-          "surface": "やばい",
-          "pos": "Adjective",
-          "lemma": "やばい"
+          "lemma" : "やばい",
+          "pos" : "Adjective",
+          "surface" : "やばい"
         }
       ],
-      "tags": [
+      "id" : "colloquial_yabai",
+      "input" : "これまじやばい",
+      "tags" : [
         "colloquial"
       ]
     },
     {
-      "id": "colloquial_jan",
-      "description": "Colloquial ending じゃん",
-      "input": "いいじゃん",
-      "expected": [
+      "description" : "Colloquial ending じゃん",
+      "expected" : [
         {
-          "surface": "いい",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "いい"
         },
         {
-          "surface": "じゃん",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "じゃん"
         }
       ],
-      "tags": [
+      "id" : "colloquial_jan",
+      "input" : "いいじゃん",
+      "tags" : [
         "colloquial"
       ]
     },
     {
-      "id": "colloquial_kke",
-      "description": "Colloquial questioning past っけ",
-      "input": "何時だっけ",
-      "expected": [
+      "description" : "Colloquial questioning past っけ",
+      "expected" : [
         {
-          "surface": "何",
-          "pos": "Pronoun"
+          "pos" : "Noun",
+          "surface" : "何時"
         },
         {
-          "surface": "時",
-          "pos": "Noun"
+          "pos" : "Auxiliary",
+          "surface" : "だ"
         },
         {
-          "surface": "だ",
-          "pos": "Auxiliary"
-        },
-        {
-          "surface": "っけ",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "っけ"
         }
       ],
-      "tags": [
+      "id" : "colloquial_kke",
+      "input" : "何時だっけ",
+      "tags" : [
         "colloquial"
       ]
     },
     {
-      "id": "colloquial_kana",
-      "description": "Colloquial wondering かな",
-      "input": "明日晴れるかな",
-      "expected": [
+      "description" : "Colloquial wondering かな",
+      "expected" : [
         {
-          "surface": "明日",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "明日"
         },
         {
-          "surface": "晴れる",
-          "pos": "Verb",
-          "lemma": "晴れる"
+          "lemma" : "晴れる",
+          "pos" : "Verb",
+          "surface" : "晴れる"
         },
         {
-          "surface": "か",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "か"
         },
         {
-          "surface": "な",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "な"
         }
       ],
-      "tags": [
+      "id" : "colloquial_kana",
+      "input" : "明日晴れるかな",
+      "tags" : [
         "colloquial"
       ]
     },
     {
-      "id": "colloquial_noni",
-      "description": "Colloquial despite のに - MeCab互換分割",
-      "input": "頑張ったのに負けた",
-      "expected": [
+      "description" : "Colloquial despite のに - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "頑張っ",
-          "pos": "Verb",
-          "lemma": "頑張る"
+          "lemma" : "頑張る",
+          "pos" : "Verb",
+          "surface" : "頑張っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         },
         {
-          "surface": "のに",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "負け",
-          "pos": "Verb",
-          "lemma": "負ける"
+          "pos" : "Particle",
+          "surface" : "に"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "lemma" : "負ける",
+          "pos" : "Verb",
+          "surface" : "負け"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "colloquial_noni",
+      "input" : "頑張ったのに負けた",
+      "tags" : [
         "colloquial"
       ]
     }
-  ]
+  ],
+  "version" : "1.0"
 }

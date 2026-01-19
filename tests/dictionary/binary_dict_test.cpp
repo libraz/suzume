@@ -41,10 +41,10 @@ TEST_F(BinaryDictTest, WriteAndLoadSingleEntry) {
   entry.surface = "test";
   entry.lemma = "test";
   entry.pos = core::PartOfSpeech::Noun;
-  entry.cost = 1.5f;
-  entry.is_formal_noun = false;
-  entry.is_low_info = false;
-  entry.is_prefix = false;
+  // v0.8: cost removed
+  // v0.8: is_formal_noun removed (use extended_pos)
+  // v0.8: is_low_info removed
+  // v0.8: is_prefix removed
 
   writer.addEntry(entry);
 
@@ -69,7 +69,7 @@ TEST_F(BinaryDictTest, WriteAndLoadSingleEntry) {
   EXPECT_EQ(results[0].length, 4u);
   EXPECT_EQ(results[0].entry->surface, "test");
   EXPECT_EQ(results[0].entry->pos, core::PartOfSpeech::Noun);
-  EXPECT_NEAR(results[0].entry->cost, 1.5f, 0.01f);
+  // v0.8: cost check removed - cost is now derived from extended_pos
 }
 
 TEST_F(BinaryDictTest, WriteAndLoadMultipleEntries) {
@@ -87,7 +87,7 @@ TEST_F(BinaryDictTest, WriteAndLoadMultipleEntries) {
     entry.surface = pair.first;
     entry.lemma = pair.first;
     entry.pos = pair.second;
-    entry.cost = 1.0f;
+    // v0.8: cost removed
     writer.addEntry(entry);
   }
 
@@ -131,7 +131,7 @@ TEST_F(BinaryDictTest, WriteAndLoadJapanese) {
     entry.surface = pair.first;
     entry.lemma = pair.first;
     entry.pos = pair.second;
-    entry.cost = 1.0f;
+    // v0.8: cost removed
     writer.addEntry(entry);
   }
 
@@ -155,7 +155,7 @@ TEST_F(BinaryDictTest, WriteToFileAndLoad) {
   entry.surface = "file";
   entry.lemma = "file";
   entry.pos = core::PartOfSpeech::Noun;
-  entry.cost = 2.0f;
+  // v0.8: cost removed
   writer.addEntry(entry);
 
   // Write to file
@@ -206,7 +206,7 @@ TEST_F(BinaryDictTest, LemmaHandling) {
   entry1.surface = "running";
   entry1.lemma = "run";
   entry1.pos = core::PartOfSpeech::Verb;
-  entry1.cost = 1.0f;
+  // v0.8: cost removed
   writer.addEntry(entry1);
 
   // Entry with same lemma as surface
@@ -214,7 +214,7 @@ TEST_F(BinaryDictTest, LemmaHandling) {
   entry2.surface = "walk";
   entry2.lemma = "walk";
   entry2.pos = core::PartOfSpeech::Verb;
-  entry2.cost = 1.0f;
+  // v0.8: cost removed
   writer.addEntry(entry2);
 
   auto build_result = writer.build();
@@ -240,10 +240,7 @@ TEST_F(BinaryDictTest, FlagsHandling) {
   entry.surface = "flags";
   entry.lemma = "flags";
   entry.pos = core::PartOfSpeech::Noun;
-  entry.cost = 1.0f;
-  entry.is_formal_noun = true;
-  entry.is_low_info = true;
-  entry.is_prefix = true;
+  entry.extended_pos = core::ExtendedPOS::NounFormal;  // v0.8: use extended_pos
   writer.addEntry(entry);
 
   auto build_result = writer.build();
@@ -254,9 +251,8 @@ TEST_F(BinaryDictTest, FlagsHandling) {
 
   auto results = dict.lookup("flags", 0);
   ASSERT_EQ(results.size(), 1u);
-  EXPECT_TRUE(results[0].entry->is_formal_noun);
-  EXPECT_TRUE(results[0].entry->is_low_info);
-  EXPECT_TRUE(results[0].entry->is_prefix);
+  // v0.8: is_formal_noun/is_low_info/is_prefix replaced by extended_pos
+  EXPECT_EQ(results[0].entry->extended_pos, core::ExtendedPOS::NounFormal);
 }
 
 TEST_F(BinaryDictTest, ConjugationType) {
@@ -266,8 +262,8 @@ TEST_F(BinaryDictTest, ConjugationType) {
   entry.surface = "verb";
   entry.lemma = "verb";
   entry.pos = core::PartOfSpeech::Verb;
-  entry.cost = 1.0f;
-  writer.addEntry(entry, ConjugationType::Ichidan);
+  // v0.8: cost and conj_type removed
+  writer.addEntry(entry);
 
   auto build_result = writer.build();
   ASSERT_TRUE(build_result.hasValue());
@@ -284,7 +280,7 @@ TEST_F(BinaryDictTest, GetEntry) {
   entry.surface = "getentry";
   entry.lemma = "getentry";
   entry.pos = core::PartOfSpeech::Noun;
-  entry.cost = 1.0f;
+  // v0.8: cost removed
   writer.addEntry(entry);
 
   auto build_result = writer.build();
@@ -318,7 +314,7 @@ TEST_F(BinaryDictTest, LookupOutOfBounds) {
   entry.surface = "test";
   entry.lemma = "test";
   entry.pos = core::PartOfSpeech::Noun;
-  entry.cost = 1.0f;
+  // v0.8: cost removed
   writer.addEntry(entry);
 
   auto build_result = writer.build();

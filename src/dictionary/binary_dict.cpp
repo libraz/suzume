@@ -144,7 +144,8 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
     entry.surface = std::string(string_pool + rec.surface_offset,
                                 rec.surface_length);
     entry.pos = uint8ToPos(rec.pos);
-    entry.cost = costToFloat(rec.cost);
+    // v0.8: cost removed - now derived from ExtendedPOS
+    // entry.cost = costToFloat(rec.cost);
 
     if (rec.lemma_length > 0) {
       entry.lemma = std::string(string_pool + rec.lemma_offset,
@@ -153,10 +154,12 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
       entry.lemma = entry.surface;
     }
 
-    entry.is_formal_noun = (rec.flags & kFlagFormalNoun) != 0;
-    entry.is_low_info = (rec.flags & kFlagLowInfo) != 0;
-    entry.is_prefix = (rec.flags & kFlagPrefix) != 0;
-    entry.conj_type = static_cast<ConjugationType>(rec.conj_type);
+    // v0.8: flags and conj_type removed from DictionaryEntry
+    // Determine extended_pos from flags for backwards compatibility
+    if ((rec.flags & kFlagFormalNoun) != 0) {
+      entry.extended_pos = core::ExtendedPOS::NounFormal;
+    }
+    // is_low_info, is_prefix, conj_type are no longer stored
 
     entries_.push_back(std::move(entry));
   }
@@ -199,9 +202,8 @@ const DictionaryEntry* BinaryDictionary::getEntry(uint32_t idx) const {
 
 BinaryDictWriter::BinaryDictWriter() = default;
 
-void BinaryDictWriter::addEntry(const DictionaryEntry& entry,
-                                 ConjugationType conj_type) {
-  entries_.push_back({entry, conj_type});
+void BinaryDictWriter::addEntry(const DictionaryEntry& entry) {
+  entries_.push_back(entry);
 }
 
 core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
@@ -213,8 +215,8 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
 
   // Sort entries by surface for trie building
   std::sort(entries_.begin(), entries_.end(),
-            [](const EntryData& lhs, const EntryData& rhs) {
-              return lhs.entry.surface < rhs.entry.surface;
+            [](const DictionaryEntry& lhs, const DictionaryEntry& rhs) {
+              return lhs.surface < rhs.surface;
             });
 
   // Build string pool
@@ -227,34 +229,30 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
 
     // Add surface to string pool
     rec.surface_offset = static_cast<uint32_t>(string_pool.size());
-    rec.surface_length = static_cast<uint16_t>(ent.entry.surface.size());
+    rec.surface_length = static_cast<uint16_t>(ent.surface.size());
     string_pool.insert(string_pool.end(),
-                       ent.entry.surface.begin(), ent.entry.surface.end());
+                       ent.surface.begin(), ent.surface.end());
 
     // Add lemma if different from surface
-    if (!ent.entry.lemma.empty() && ent.entry.lemma != ent.entry.surface) {
+    if (!ent.lemma.empty() && ent.lemma != ent.surface) {
       rec.lemma_offset = static_cast<uint32_t>(string_pool.size());
-      rec.lemma_length = static_cast<uint16_t>(ent.entry.lemma.size());
+      rec.lemma_length = static_cast<uint16_t>(ent.lemma.size());
       string_pool.insert(string_pool.end(),
-                         ent.entry.lemma.begin(), ent.entry.lemma.end());
+                         ent.lemma.begin(), ent.lemma.end());
     } else {
       rec.lemma_offset = 0;
       rec.lemma_length = 0;
     }
 
-    rec.pos = posToUint8(ent.entry.pos);
-    rec.conj_type = static_cast<uint8_t>(ent.conj_type);
-    rec.cost = floatToCost(ent.entry.cost);
+    rec.pos = posToUint8(ent.pos);
+    // v0.8: conj_type, cost, flags removed from DictionaryEntry
+    rec.conj_type = 0;  // Unused, kept for binary format compatibility
+    rec.cost = 0;       // Unused, kept for binary format compatibility
 
+    // Set flags based on extended_pos
     uint8_t flags = 0;
-    if (ent.entry.is_formal_noun) {
+    if (ent.extended_pos == core::ExtendedPOS::NounFormal) {
       flags |= kFlagFormalNoun;
-    }
-    if (ent.entry.is_low_info) {
-      flags |= kFlagLowInfo;
-    }
-    if (ent.entry.is_prefix) {
-      flags |= kFlagPrefix;
     }
     rec.flags = flags;
 
@@ -268,7 +266,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   values.reserve(entries_.size());
 
   for (size_t idx = 0; idx < entries_.size(); ++idx) {
-    keys.push_back(entries_[idx].entry.surface);
+    keys.push_back(entries_[idx].surface);
     values.push_back(static_cast<int32_t>(idx));
   }
 

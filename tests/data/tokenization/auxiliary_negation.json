@@ -1,100 +1,104 @@
 {
-  "version": "1.0",
-  "description": "Negation auxiliaries (ない、ぬ)",
-  "cases": [
+  "cases" : [
     {
-      "id": "aux_nai",
-      "description": "Negative auxiliary ない",
-      "input": "行かない",
-      "expected": [
+      "description" : "Negative auxiliary ない",
+      "expected" : [
         {
-          "surface": "行かない",
-          "pos": "Verb",
-          "lemma": "行く"
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行か"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "aux_nai",
+      "input" : "行かない",
+      "tags" : [
         "auxiliary",
         "negative"
       ]
     },
     {
-      "id": "aux_nu_kienu",
-      "description": "消えぬ - classical negation ぬ, should be VERB+AUX not NOUN",
-      "input": "消えぬ炎",
-      "expected": [
+      "description" : "消えぬ - classical negation ぬ, should be VERB+AUX not NOUN",
+      "expected" : [
         {
-          "surface": "消え",
-          "pos": "Verb",
-          "lemma": "消える"
+          "lemma" : "消える",
+          "pos" : "Verb",
+          "surface" : "消え"
         },
         {
-          "surface": "ぬ",
-          "pos": "Auxiliary",
-          "lemma": "ぬ"
+          "lemma" : "ぬ",
+          "pos" : "Auxiliary",
+          "surface" : "ぬ"
         },
         {
-          "surface": "炎",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "炎"
         }
       ],
-      "tags": [
+      "id" : "aux_nu_kienu",
+      "input" : "消えぬ炎",
+      "tags" : [
         "auxiliary",
         "negative",
         "classical"
       ]
     },
     {
-      "id": "aux_nu_sorowanu",
-      "description": "揃わぬ - classical negation ぬ with godan verb",
-      "input": "揃わぬ意見",
-      "expected": [
+      "description" : "揃わぬ - classical negation ぬ with godan verb",
+      "expected" : [
         {
-          "surface": "揃わ",
-          "pos": "Verb",
-          "lemma": "揃う"
+          "lemma" : "揃う",
+          "pos" : "Verb",
+          "surface" : "揃わ"
         },
         {
-          "surface": "ぬ",
-          "pos": "Auxiliary",
-          "lemma": "ぬ"
+          "lemma" : "ぬ",
+          "pos" : "Auxiliary",
+          "surface" : "ぬ"
         },
         {
-          "surface": "意見",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "意見"
         }
       ],
-      "tags": [
+      "id" : "aux_nu_sorowanu",
+      "input" : "揃わぬ意見",
+      "tags" : [
         "auxiliary",
         "negative",
         "classical"
       ]
     },
     {
-      "id": "aux_nu_shirenu",
-      "description": "知れぬ - classical negation ぬ with potential verb",
-      "input": "知れぬ心",
-      "expected": [
+      "description" : "知れぬ - classical negation ぬ with potential verb",
+      "expected" : [
         {
-          "surface": "知れ",
-          "pos": "Verb",
-          "lemma": "知れる"
+          "lemma" : "知れる",
+          "pos" : "Verb",
+          "surface" : "知れ"
         },
         {
-          "surface": "ぬ",
-          "pos": "Auxiliary",
-          "lemma": "ぬ"
+          "lemma" : "ぬ",
+          "pos" : "Auxiliary",
+          "surface" : "ぬ"
         },
         {
-          "surface": "心",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "心"
         }
       ],
-      "tags": [
+      "id" : "aux_nu_shirenu",
+      "input" : "知れぬ心",
+      "tags" : [
         "auxiliary",
         "negative",
         "classical"
       ]
     }
-  ]
+  ],
+  "description" : "Negation auxiliaries (ない、ぬ)",
+  "version" : "1.0"
 }

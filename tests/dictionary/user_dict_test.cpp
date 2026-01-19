@@ -17,7 +17,7 @@ TEST(UserDictTest, AddEntry) {
   DictionaryEntry entry;
   entry.surface = "東京";
   entry.pos = core::PartOfSpeech::Noun;
-  entry.cost = 0.5F;
+  // v0.8: cost removed
 
   dict.addEntry(entry);
   EXPECT_EQ(dict.size(), 1);
@@ -29,7 +29,7 @@ TEST(UserDictTest, GetEntry) {
   DictionaryEntry entry;
   entry.surface = "東京";
   entry.pos = core::PartOfSpeech::Noun;
-  entry.cost = 0.5F;
+  // v0.8: cost removed
 
   dict.addEntry(entry);
 
@@ -172,11 +172,11 @@ TEST(UserDictTest, LoadFromMemoryVerbWithConjType) {
 
   const DictionaryEntry* entry1 = dict.getEntry(0);
   ASSERT_NE(entry1, nullptr);
-  EXPECT_EQ(entry1->conj_type, ConjugationType::Ichidan);
+  // v0.8: conj_type removed from DictionaryEntry
 
   const DictionaryEntry* entry2 = dict.getEntry(1);
   ASSERT_NE(entry2, nullptr);
-  EXPECT_EQ(entry2->conj_type, ConjugationType::GodanKa);
+  // v0.8: conj_type removed from DictionaryEntry
 }
 
 TEST(UserDictTest, LoadFromMemoryAllConjTypes) {
@@ -201,20 +201,10 @@ TEST(UserDictTest, LoadFromMemoryAllConjTypes) {
   ASSERT_TRUE(result.hasValue());
   EXPECT_EQ(result.value(), 13);
 
-  // Verify specific conjugation types
-  EXPECT_EQ(dict.getEntry(0)->conj_type, ConjugationType::GodanSa);
-  EXPECT_EQ(dict.getEntry(1)->conj_type, ConjugationType::GodanTa);
-  EXPECT_EQ(dict.getEntry(2)->conj_type, ConjugationType::GodanNa);
-  EXPECT_EQ(dict.getEntry(3)->conj_type, ConjugationType::GodanBa);
-  EXPECT_EQ(dict.getEntry(4)->conj_type, ConjugationType::GodanMa);
-  EXPECT_EQ(dict.getEntry(5)->conj_type, ConjugationType::GodanRa);
-  EXPECT_EQ(dict.getEntry(6)->conj_type, ConjugationType::GodanWa);
-  EXPECT_EQ(dict.getEntry(7)->conj_type, ConjugationType::GodanGa);
-  EXPECT_EQ(dict.getEntry(8)->conj_type, ConjugationType::Suru);
-  EXPECT_EQ(dict.getEntry(9)->conj_type, ConjugationType::Kuru);
-  EXPECT_EQ(dict.getEntry(10)->conj_type, ConjugationType::IAdjective);
-  EXPECT_EQ(dict.getEntry(11)->conj_type, ConjugationType::NaAdjective);
-  EXPECT_EQ(dict.getEntry(12)->conj_type, ConjugationType::None);
+  // v0.8: conj_type removed from DictionaryEntry
+  // Just verify entries were loaded
+  ASSERT_NE(dict.getEntry(0), nullptr);
+  ASSERT_NE(dict.getEntry(12), nullptr);
 }
 
 TEST(UserDictTest, LoadFromMemoryWithLemma) {
@@ -231,19 +221,7 @@ TEST(UserDictTest, LoadFromMemoryWithLemma) {
   EXPECT_EQ(entry->lemma, "食べる");
 }
 
-TEST(UserDictTest, LoadFromMemoryInvalidCost) {
-  UserDictionary dict;
-
-  const char* csv_data = "東京,NOUN,invalid_cost\n";
-
-  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
-  ASSERT_TRUE(result.hasValue());
-  EXPECT_EQ(result.value(), 1);
-
-  const DictionaryEntry* entry = dict.getEntry(0);
-  ASSERT_NE(entry, nullptr);
-  EXPECT_EQ(entry->cost, 1.0F);  // Default fallback
-}
+// v0.8: LoadFromMemoryInvalidCost test removed (cost field no longer exists)
 
 TEST(UserDictTest, LookupAtDifferentPositions) {
   UserDictionary dict;
@@ -271,7 +249,7 @@ TEST(UserDictTest, MultipleEntriesSameSurface) {
   DictionaryEntry entry2;
   entry2.surface = "東京";
   entry2.pos = core::PartOfSpeech::Noun;
-  entry2.cost = 0.3F;
+  // v0.8: cost removed
   dict.addEntry(entry2);
 
   auto results = dict.lookup("東京", 0);

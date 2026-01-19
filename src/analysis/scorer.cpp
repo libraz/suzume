@@ -2,14 +2,9 @@
 
 #include <cmath>
 
-#include "analysis/connection_rules.h"
-#include "analysis/scorer_constants.h"
+#include "analysis/bigram_table.h"
+#include "analysis/category_cost.h"
 #include "core/debug.h"
-#include "core/utf8_constants.h"
-#include "grammar/char_patterns.h"
-#include "normalize/char_type.h"
-#include "normalize/exceptions.h"
-#include "normalize/utf8.h"
 
 namespace {
 
@@ -73,31 +68,10 @@ constexpr float kBigramCostTable[13][13] = {
 
 namespace suzume::analysis {
 
-namespace {
-
-/**
- * @brief Check if surface contains any of the given patterns
- * @param surface UTF-8 string view to search in
- * @param patterns Array of pattern strings to search for
- * @param count Number of patterns in the array
- * @return true if any pattern is found in surface
- */
-bool containsAnyPattern(std::string_view surface, const char* const* patterns,
-                        size_t count) {
-  for (size_t idx = 0; idx < count; ++idx) {
-    if (surface.find(patterns[idx]) != std::string_view::npos) {
-      return true;
-    }
-  }
-  return false;
-}
-
-}  // namespace
-
 // static
 void Scorer::logAdjustment(float amount, const char* reason) {
   if (amount != 0.0F) {
-    SUZUME_DEBUG_LOG("  " << reason << ": "
+    SUZUME_DEBUG_LOG_VERBOSE("  " << reason << ": "
                             << (amount > 0 ? "+" : "") << amount << "\n");
   }
 }
@@ -167,356 +141,32 @@ float Scorer::bigramCost(core::PartOfSpeech prev, core::PartOfSpeech next) const
   return kBigramCostTable[posToIndex(prev)][posToIndex(next)];
 }
 
-bool Scorer::isOptimalLength(const core::LatticeEdge& edge) const {
-  size_t length = edge.end - edge.start;
-  const auto& opt = options_.optimal_length;
-
-  switch (edge.pos) {
-    case core::PartOfSpeech::Noun: {
-      // Use katakana limits for katakana sequences (longer foreign words)
-      auto codepoints = normalize::utf8::decode(edge.surface);
-      if (!codepoints.empty() &&
-          normalize::classifyChar(codepoints[0]) == normalize::CharType::Katakana) {
-        return length >= opt.katakana_min && length <= opt.katakana_max;
-      }
-      return length >= opt.noun_min && length <= opt.noun_max;
-    }
-    case core::PartOfSpeech::Verb:
-      return length >= opt.verb_min && length <= opt.verb_max;
-    case core::PartOfSpeech::Adjective:
-      return length >= opt.adj_min && length <= opt.adj_max;
-    default:
-      return false;
-  }
-}
-
 float Scorer::wordCost(const core::LatticeEdge& edge) const {
-  float base_cost = edge.cost;
-  float pos_prior = posPrior(edge.pos);
-  float cost = base_cost + pos_prior;
+  // v0.8: Base cost from ExtendedPOS category
+  float category_cost = getCategoryCost(edge.extended_pos);
 
-  // Debug output with origin info
-  SUZUME_DEBUG_BLOCK {
-    SUZUME_DEBUG_STREAM << "[WORD] \"" << edge.surface << "\" ("
-                        << core::posToString(edge.pos) << ") lemma=\""
-                        << edge.lemma << "\" ";
-    if (edge.fromDictionary()) {
-      SUZUME_DEBUG_STREAM << "[dict]";
-    } else if (edge.isUnknown()) {
-#ifdef SUZUME_DEBUG_INFO
-      SUZUME_DEBUG_STREAM << "[unk:" << core::originToString(edge.origin);
-      if (!edge.origin_detail.empty()) {
-        SUZUME_DEBUG_STREAM << " " << edge.origin_detail;
-      }
-      if (edge.origin_confidence > 0.0F) {
-        SUZUME_DEBUG_STREAM << " conf=" << edge.origin_confidence;
-      }
-      SUZUME_DEBUG_STREAM << "]";
-#else
-      SUZUME_DEBUG_STREAM << "[unk]";
-#endif
-    } else {
-      SUZUME_DEBUG_STREAM << "[infl]";
-    }
-    SUZUME_DEBUG_STREAM << ": base=" << base_cost << " pos=" << pos_prior << "\n";
-  }
+  // Use edge.cost if explicitly set (non-zero), otherwise use category cost
+  // This allows candidates (e.g., adjective stem + すぎる) to have custom costs
+  float cost = (edge.cost != 0.0F) ? edge.cost : category_cost;
 
-  // Dictionary bonus
-  if (edge.fromDictionary()) {
-    cost += options_.dictionary_bonus;
-    logAdjustment(options_.dictionary_bonus, "dictionary");
-  }
+  // User dictionary bonus (still needed for user customization)
   if (edge.fromUserDict()) {
     cost += options_.user_dict_bonus;
-    logAdjustment(options_.user_dict_bonus, "user_dict");
   }
 
-  // Conjunction position-based bonus/penalty
-  // Conjunctions like でも, ところで typically appear at sentence start
-  // Penalty for non-start position to prefer particle splits (雨でも→雨+で+も)
-  if (edge.pos == core::PartOfSpeech::Conjunction) {
-    if (edge.start == 0) {
-      // Bonus for CONJ at sentence start (でも大丈夫 → でも(CONJ)+大丈夫)
-      cost -= scorer::scale::kModerate;  // -1.5
-      logAdjustment(-scorer::scale::kModerate, "conj_at_start");
-    } else {
-      // Penalty for CONJ not at start (雨でも → 雨+で+も)
-      cost += scorer::scale::kStrong;  // +2.5
-      logAdjustment(scorer::scale::kStrong, "conj_not_at_start");
+  // Debug output - show which cost was used (verbose level)
+  SUZUME_DEBUG_VERBOSE_BLOCK {
+    const char* source = edge.fromDictionary() ? "dict" :
+                         edge.isUnknown() ? "unk" : "infl";
+    const char* cost_from = (edge.cost != 0.0F) ? "edge" : "category";
+    SUZUME_DEBUG_STREAM << "[WORD] \"" << edge.surface << "\" (" << source << ") cost="
+                        << cost << " (from " << cost_from << ")";
+    SUZUME_DEBUG_STREAM << " [cat=" << category_cost;
+    if (edge.cost != 0.0F) {
+      SUZUME_DEBUG_STREAM << " edge=" << edge.cost;
     }
+    SUZUME_DEBUG_STREAM << "]\n";
   }
-
-  // Formal noun / low info penalty
-  if (edge.isFormalNoun()) {
-    cost += options_.formal_noun_penalty;
-    logAdjustment(options_.formal_noun_penalty, "formal_noun");
-  }
-  if (edge.isLowInfo()) {
-    cost += options_.low_info_penalty;
-    logAdjustment(options_.low_info_penalty, "low_info");
-  }
-
-  // Single character penalty
-  // Note: SUFFIX and PREFIX are exempt from single-character penalties
-  // because they are grammatically expected to be single characters
-  // (e.g., 様, 氏 as suffix; お, ご as prefix)
-  size_t char_len = edge.end - edge.start;
-  if (char_len == 1 && !edge.surface.empty() &&
-      edge.pos != core::PartOfSpeech::Suffix &&
-      edge.pos != core::PartOfSpeech::Prefix) {
-    // Decode first character to check type
-    auto codepoints = normalize::utf8::decode(edge.surface);
-    if (!codepoints.empty()) {
-      normalize::CharType ctype = normalize::classifyChar(codepoints[0]);
-      if (ctype == normalize::CharType::Kanji) {
-        // Check if single kanji exception
-        // Skip penalty for:
-        // - Words in kSingleKanjiExceptions (common standalone kanji)
-        // - Verb stems with hasSuffix flag (見+られべき, 着+られる)
-        // - Dictionary adjectives (na-adj stems like 妙, 楽 are often single kanji)
-        // - Adjective stems with hasSuffix flag (高+すぎる, 尊+すぎて)
-        bool skip_penalty = normalize::isSingleKanjiException(edge.surface) ||
-                            (edge.pos == core::PartOfSpeech::Verb && edge.hasSuffix()) ||
-                            (edge.pos == core::PartOfSpeech::Adjective && edge.fromDictionary()) ||
-                            (edge.pos == core::PartOfSpeech::Adjective && edge.hasSuffix());
-        if (!skip_penalty) {
-          cost += options_.single_kanji_penalty;
-          logAdjustment(options_.single_kanji_penalty, "single_kanji");
-        }
-      } else if (ctype == normalize::CharType::Hiragana) {
-        // Check if single hiragana exception (functional words)
-        if (!normalize::isSingleHiraganaException(edge.surface)) {
-          cost += options_.single_hiragana_penalty;
-          logAdjustment(options_.single_hiragana_penalty, "single_hiragana");
-        }
-      }
-    }
-  }
-
-  // Optimal length bonus
-  if (isOptimalLength(edge)) {
-    cost += options_.optimal_length_bonus;
-    logAdjustment(options_.optimal_length_bonus, "optimal_length");
-  }
-
-  // Bonus for unknown i-adjective in くない form
-  // E.g., しんどくない, エモくない - strong indicators of i-adjective
-  // This helps unknown slang adjectives compete with fragmented paths containing dictionary verbs
-  if (edge.pos == core::PartOfSpeech::Adjective &&
-      !edge.fromDictionary() &&
-      utf8::endsWith(edge.surface, scorer::kIAdjNegKunai)) {
-    cost += scorer::kBonusIAdjKunai;
-    logAdjustment(scorer::kBonusIAdjKunai, "i_adj_kunai");
-  }
-
-  // Note: kPenaltyVerbSou was removed to unify verb+そう as single token
-  // Previously: 走りそう → 走り + そう (2 tokens)
-  // Now: 走りそう → 走る (1 token), matching 食べそう → 食べる (1 token)
-  // サ変+そう (遅刻しそう) remains 2 tokens because 遅刻 is a dictionary noun
-  // See: backup/technical_debt_action_plan.md section 3.3
-
-  // Penalize unknown adjectives ending with そう with invalid lemma
-  // E.g., 食べそう should not be ADJ with lemma 食べい (invalid)
-  // Valid patterns (common i-adjective endings):
-  //   しい: おいしい, 難しい, 美しい, 楽しい, etc. (productive pattern)
-  //   さい: 小さい (small - common adjective)
-  //   きい: 大きい (validated at candidate generation via verb lookup)
-  // Invalid patterns (verb renyoukei + い):
-  //   べい: 食べい (食べる), みい: 読みい (読む), etc.
-  // Note: きい patterns are validated in adjective_candidates.cpp by checking
-  // if stem + く exists as a verb (e.g., 書く exists → 書きい invalid)
-  if (edge.pos == core::PartOfSpeech::Adjective &&
-      !edge.fromDictionary() &&
-      utf8::endsWith(edge.surface, scorer::kSuffixSou)) {
-    // Check if lemma ends with valid i-adjective pattern
-    bool valid_adj_lemma =
-        utf8::endsWith(edge.lemma, scorer::kAdjEndingShii) ||
-        utf8::endsWith(edge.lemma, scorer::kAdjEndingSai) ||
-        utf8::endsWith(edge.lemma, scorer::kAdjEndingKii);
-    if (!valid_adj_lemma) {
-      cost += edgeOpts().penalty_invalid_adj_sou;
-      logAdjustment(edgeOpts().penalty_invalid_adj_sou, "invalid_adj_sou");
-    }
-  }
-
-  // Penalize unknown adjectives with lemma ending in たい where stem is invalid
-  // E.g., りたかった with lemma りたい is invalid (り is not a valid verb stem)
-  // Valid: 食べたかった with lemma 食べたい (食べ is valid verb stem)
-  // Valid: したかった with lemma したい (し is suru stem)
-  // Valid: 見たかった with lemma 見たい (見 is miru stem)
-  // Valid: 来たかった with lemma 来たい (来 is kuru stem)
-  if (edge.pos == core::PartOfSpeech::Adjective &&
-      !edge.fromDictionary() &&
-      utf8::endsWith(edge.lemma, scorer::kSuffixTai)) {
-    // Get the stem before たい
-    std::string_view stem = utf8::dropLast2Chars(edge.lemma);
-    // Decode stem to count codepoints
-    auto stem_str = std::string(stem);
-    auto codepoints = normalize::utf8::decode(stem_str);
-
-    // Very short stems (1 char) are usually invalid unless they're known verb stems
-    // Known single-char verb stems: し(する), 見(見る), 来(来る), い(いる), 出(出る), etc.
-    if (codepoints.size() == 1) {
-      char32_t ch = codepoints[0];
-      // Allow known single-character verb stems
-      if (!normalize::isValidSingleCharVerbStem(ch)) {
-        cost += edgeOpts().penalty_invalid_tai_pattern;
-        logAdjustment(edgeOpts().penalty_invalid_tai_pattern, "invalid_tai_pattern");
-      }
-    }
-  }
-
-  // Penalize adjectives with lemma containing verb contraction patterns
-  // E.g., 読んどい (yondoi), 飲んどい (nondoi), 見とい (mitoi) - invalid adjectives
-  // These suggest verb + とく/どく contraction misanalyzed as adjective
-  // Exception: しんどい is a legitimate adjective (colloquial for "tired/tough")
-  // For verb contractions, the char before んどい/んとい is usually kanji (verb stem)
-  // For しんどい, the char before んどい is し (hiragana) - not a verb stem
-  if (edge.pos == core::PartOfSpeech::Adjective &&
-      !edge.fromDictionary() &&
-      edge.lemma.size() >= core::kTwoJapaneseCharBytes) {
-    // Check for patterns that look like verb contractions
-    // んどい/んとい: verb onbin + contraction (読んどい, 飲んどい)
-    // 〜とい: verb renyokei + contraction (見とい, 食べとい)
-    bool is_ndoi_pattern = false;
-    auto ndoi_pos = edge.lemma.find(scorer::kPatternNdoi);
-    auto ntoi_pos = edge.lemma.find(scorer::kPatternNtoi);
-    if (ndoi_pos != std::string::npos || ntoi_pos != std::string::npos) {
-      // Check if preceded by kanji (suggests verb stem like 読んどい)
-      // Skip penalty if preceded by hiragana (suggests real adjective like しんどい)
-      auto pos = (ndoi_pos != std::string::npos) ? ndoi_pos : ntoi_pos;
-      if (pos >= core::kJapaneseCharBytes) {
-        std::string_view before = edge.lemma.substr(pos - core::kJapaneseCharBytes, core::kJapaneseCharBytes);
-        auto codepoints = normalize::utf8::decode(std::string(before));
-        if (!codepoints.empty() && normalize::classifyChar(codepoints[0]) == normalize::CharType::Kanji) {
-          is_ndoi_pattern = true;
-        }
-      }
-    }
-    // Check if lemma ends with とい and stem doesn't look natural for adjective
-    // 〜とい pattern: likely verb renyokei + といて contraction
-    // Exception: dictionary adjectives (none known with とい ending)
-    bool is_toi_pattern = utf8::endsWith(edge.lemma, scorer::kPatternToi);
-    if (is_ndoi_pattern || is_toi_pattern) {
-      cost += edgeOpts().penalty_verb_onbin_as_adj;
-      logAdjustment(edgeOpts().penalty_verb_onbin_as_adj, "verb_contraction_as_adj");
-    }
-  }
-
-  // Penalize unknown adjectives containing verb+auxiliary patterns in surface
-  // E.g., 食べすぎてしまい should be verb+しまう, not adjective
-  // These patterns are also checked in inflection_scorer.cpp but the confidence floor
-  // (0.5) limits the penalty effect. This scorer penalty ensures lattice cost is affected.
-  if (edge.pos == core::PartOfSpeech::Adjective &&
-      !edge.fromDictionary() &&
-      edge.surface.size() >= core::kFourJapaneseCharBytes) {
-    std::string_view surface = edge.surface;
-    // Check for auxiliary patterns: てしま, でしま, ている, etc.
-    // P4-6: Expanded with additional patterns (てみる, ていく, てくる, etc.)
-    if (containsAnyPattern(surface, scorer::kTeFormAuxPatternsForAdj,
-                           scorer::kTeFormAuxPatternsForAdjSize)) {
-      cost += edgeOpts().penalty_verb_aux_in_adj;
-      logAdjustment(edgeOpts().penalty_verb_aux_in_adj, "verb_aux_in_adj");
-    }
-  }
-
-  // Penalize しまい/じまい as adjective - these are verb しまう renyokei
-  // E.g., 食べてしまい should not have しまい parsed as adjective
-  if (edge.pos == core::PartOfSpeech::Adjective &&
-      !edge.fromDictionary()) {
-    if (edge.surface == scorer::kSurfaceShimai || edge.surface == scorer::kSurfaceJimai) {
-      cost += edgeOpts().penalty_shimai_as_adj;
-      logAdjustment(edgeOpts().penalty_shimai_as_adj, "shimai_as_adj");
-    }
-  }
-
-  // Penalize unknown verbs ending with たいらしい - these should be split
-  // E.g., 帰りたいらしい should be 帰りたい + らしい, not a single verb
-  // This pattern indicates verb+たい+らしい compound that should be tokenized
-  if (edge.pos == core::PartOfSpeech::Verb &&
-      !edge.fromDictionary() &&
-      utf8::endsWith(edge.surface, scorer::kSuffixTaiRashii)) {
-    cost += edgeOpts().penalty_verb_tai_rashii;
-    logAdjustment(edgeOpts().penalty_verb_tai_rashii, "verb_tai_rashii_split");
-  }
-
-  // Bonus for unified verb forms containing te-form + auxiliary verb patterns
-  // E.g., 言ってしまった, 教えてもらった, 食べている - these should stay unified
-  // This bonus helps unified forms beat split paths where the te-form has a dictionary entry
-  if (edge.pos == core::PartOfSpeech::Verb &&
-      !edge.fromDictionary() &&
-      edge.surface.size() >= core::kFiveJapaneseCharBytes) {
-    std::string_view surface = edge.surface;
-    // P4-6: Expanded auxiliary verb pattern list
-    if (containsAnyPattern(surface, scorer::kTeFormAuxPatternsForVerb,
-                           scorer::kTeFormAuxPatternsForVerbSize)) {
-      cost -= edgeOpts().bonus_unified_verb_aux;
-      logAdjustment(-edgeOpts().bonus_unified_verb_aux, "unified_verb_aux");
-    }
-  }
-
-  // Note: Short-stem hiragana adjective penalty moved to connectionCost
-  // It only applies after PREFIX (e.g., お+いしい) not standalone (e.g., まずい)
-
-  // Penalize unknown adjectives with lemma ending in ない where stem looks like verb mizenkei
-  // E.g., 走らなければ with lemma 走らない is likely verb+aux, not true adjective
-  // True adjectives ending in ない: 少ない, 危ない, つまらない (stem doesn't end in あ段)
-  // Verb+ない patterns: 走らない, 書かない, 読まない (stem ends in あ段 = verb mizenkei)
-  if (edge.pos == core::PartOfSpeech::Adjective &&
-      !edge.fromDictionary() &&
-      utf8::endsWith(edge.lemma, scorer::kSuffixNai) &&
-      edge.lemma.size() >= core::kThreeJapaneseCharBytes) {  // ない + at least 1 char before
-    // Get the stem before ない
-    std::string_view stem = utf8::dropLast2Chars(edge.lemma);
-    // Check if stem ends with verb mizenkei marker (あ段) or ichidan renyokei marker (え段)
-    // あ段: Godan verb mizenkei (走らない, 書かない)
-    // え段: Ichidan verb mizenkei (食べない, 見ない - rare, but still verb pattern)
-    if (grammar::endsWithARow(stem) || grammar::endsWithERow(stem)) {
-      cost += edgeOpts().penalty_verb_nai_pattern;
-      logAdjustment(edgeOpts().penalty_verb_nai_pattern, "verb_nai_pattern");
-    }
-  }
-
-  // Penalize verbs ending with さん (contracted negative さ+ん) where stem looks nominal
-  // E.g., 田中さん should be NOUN + SUFFIX, not VERB (田中する contracted negative)
-  // This targets Suru verbs (田中する→田中さん) and GodanSa verbs with nominal stems
-  if (edge.pos == core::PartOfSpeech::Verb &&
-      utf8::endsWith(edge.surface, scorer::kSuffixSan)) {
-    // Get the stem before さん
-    std::string_view stem = utf8::dropLast2Chars(edge.surface);
-    std::string_view lemma = edge.lemma;
-    // Penalize if:
-    // 1. Lemma ends with する (Suru verb like 田中する) - almost always noun + honorific
-    // 2. Stem ends with kanji (nominal stem)
-    // 3. Lemma ends with す (GodanSa) AND stem is pure hiragana (おねえさん→おねえす)
-    //    Pure hiragana GodanSa verbs ending in さん are rare; usually noun + さん
-    bool is_suru_verb = utf8::endsWith(lemma, scorer::kLemmaSuru);
-    bool stem_ends_kanji = (!stem.empty() && grammar::endsWithKanji(stem));
-    bool is_godan_sa_hiragana =
-        utf8::endsWith(lemma, "す") && !stem.empty() && grammar::isPureHiragana(stem);
-    if (is_suru_verb || stem_ends_kanji || is_godan_sa_hiragana) {
-      cost += edgeOpts().penalty_verb_san_honorific;
-      logAdjustment(edgeOpts().penalty_verb_san_honorific, "verb_san_honorific");
-    }
-  }
-
-  // Penalize verbs ending with ん (contracted negative) with very short stem
-  // E.g., いん (from いる) is rare and often misanalysis in patterns like ないんだ
-  // Valid forms like わからん (4 chars) or くだらん (4 chars) are not penalized
-  if (edge.pos == core::PartOfSpeech::Verb &&
-      edge.surface.size() == core::kTwoJapaneseCharBytes &&  // Exactly 2 Japanese chars
-      utf8::endsWith(edge.surface, scorer::kSuffixN)) {
-    // 2-char verb ending with ん: stem is only 1 char (e.g., いん from いる)
-    // Also verify it's hiragana (not kanji verbs like 見ん which are rare but exist)
-    std::string_view stem = utf8::dropLastChar(edge.surface);
-    if (grammar::isPureHiragana(stem)) {
-      cost += edgeOpts().penalty_verb_contracted_neg_short_stem;
-      logAdjustment(edgeOpts().penalty_verb_contracted_neg_short_stem,
-                    "verb_contracted_neg_short_stem");
-    }
-  }
-
-  SUZUME_DEBUG_LOG("[WORD] → total=" << cost << "\n");
   return cost;
 }
 
@@ -524,26 +174,17 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
                              const core::LatticeEdge& next) const {
   float base_cost = bigramCost(prev.pos, next.pos);
 
-  // Evaluate connection rules
-  ConnectionRuleResult rule_result = evaluateConnectionRules(prev, next, connOpts());
-  float penalty = rule_result.adjustment;
-  const char* penalty_reason = rule_result.description;
+  // ExtendedPOS bigram cost (replaces all check functions)
+  float extended_cost = BigramTable::getCost(prev.extended_pos, next.extended_pos);
 
-  float total = base_cost + penalty;
+  float total = base_cost + extended_cost;
 
-  SUZUME_DEBUG_LOG("[CONN] \"" << prev.surface << "\" ("
+  SUZUME_DEBUG_LOG_VERBOSE("[CONN] \"" << prev.surface << "\" ("
                     << core::posToString(prev.pos) << ") → \""
                     << next.surface << "\" ("
                     << core::posToString(next.pos) << "): "
-                    << "base=" << base_cost);
-  if (penalty != 0.0F && penalty_reason != nullptr) {
-    if (penalty > 0.0F) {
-      SUZUME_DEBUG_LOG(" + penalty=" << penalty << " (" << penalty_reason << ")");
-    } else {
-      SUZUME_DEBUG_LOG(" + bonus=" << -penalty << " (" << penalty_reason << ")");
-    }
-  }
-  SUZUME_DEBUG_LOG(" = " << total << "\n");
+                    << "base=" << base_cost << " epos=" << extended_cost
+                    << " = " << total << "\n");
 
   return total;
 }

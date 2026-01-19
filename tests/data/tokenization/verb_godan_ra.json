@@ -1,375 +1,396 @@
 {
-  "version": "1.0",
-  "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る",
-  "cases": [
+  "cases" : [
     {
-      "id": "special_kurikaeshi",
-      "description": "人々が集まる - iteration mark should be grouped with kanji",
-      "input": "人々が集まる",
-      "expected": [
+      "description" : "人々が集まる - iteration mark should be grouped with kanji",
+      "expected" : [
         {
-          "surface": "人々",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "人々"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "集まる",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "集まる"
         }
       ],
-      "tags": [
+      "id" : "special_kurikaeshi",
+      "input" : "人々が集まる",
+      "tags" : [
         "basic",
         "special-char"
       ]
     },
     {
-      "id": "bug_kamoshirenai",
-      "description": "雨が降るかもしれない - MeCab-compatible split: かも + しれ + ない",
-      "input": "雨が降るかもしれない",
-      "expected": [
+      "description" : "雨が降るかもしれない - MeCab-compatible split: かも + しれ + ない",
+      "expected" : [
         {
-          "surface": "雨",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "雨"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "降る",
-          "pos": "Verb",
-          "lemma": "降る"
+          "lemma" : "降る",
+          "pos" : "Verb",
+          "surface" : "降る"
         },
         {
-          "surface": "かも",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "かも"
         },
         {
-          "surface": "しれ",
-          "pos": "Verb",
-          "lemma": "しれる"
+          "lemma" : "しれる",
+          "pos" : "Verb",
+          "surface" : "しれ"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "bug_kamoshirenai",
+      "input" : "雨が降るかもしれない",
+      "tags" : [
         "basic"
       ]
     },
     {
-      "id": "bug_ryoushuusho",
-      "description": "領収書をください - particle should not be absorbed",
-      "input": "領収書をください",
-      "expected": [
+      "description" : "領収書をください - particle should not be absorbed",
+      "expected" : [
         {
-          "surface": "領収書",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "領収書"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "ください",
-          "pos": "Verb",
-          "lemma": "くださる"
+          "lemma" : "くださる",
+          "pos" : "Verb",
+          "surface" : "ください"
         }
       ],
-      "tags": [
+      "id" : "bug_ryoushuusho",
+      "input" : "領収書をください",
+      "tags" : [
         "basic"
       ]
     },
     {
-      "id": "bug_wakaru",
-      "description": "わからない - should not split",
-      "input": "わからない",
-      "expected": [
+      "description" : "わからない - should not split",
+      "expected" : [
         {
-          "surface": "わからない",
-          "pos": "Verb",
-          "lemma": "わかる"
+          "lemma" : "わかる",
+          "pos" : "Verb",
+          "surface" : "わから"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "bug_wakaru",
+      "input" : "わからない",
+      "tags" : [
         "basic"
       ]
     },
     {
-      "id": "hiragana_verb_yaru",
-      "description": "やる - hiragana verb",
-      "input": "やる",
-      "expected": [
+      "description" : "やる - hiragana verb",
+      "expected" : [
         {
-          "surface": "やる",
-          "pos": "Verb",
-          "lemma": "やる"
+          "lemma" : "やる",
+          "pos" : "Verb",
+          "surface" : "やる"
         }
       ],
-      "tags": [
+      "id" : "hiragana_verb_yaru",
+      "input" : "やる",
+      "tags" : [
         "basic",
         "hiragana-verb"
       ]
     },
     {
-      "id": "hiragana_verb_yatta",
-      "description": "やった - hiragana verb past - MeCab-compatible split",
-      "input": "やった",
-      "expected": [
+      "description" : "やった - hiragana verb past - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "やっ",
-          "pos": "Verb",
-          "lemma": "やる"
+          "lemma" : "やる",
+          "pos" : "Verb",
+          "surface" : "やっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "hiragana_verb_yatta",
+      "input" : "やった",
+      "tags" : [
         "basic",
         "hiragana-verb"
       ]
     },
     {
-      "id": "hiragana_verb_yatte",
-      "description": "やって - hiragana verb te-form - MeCab-compatible split",
-      "input": "やって",
-      "expected": [
+      "description" : "やって - hiragana verb te-form - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "やっ",
-          "pos": "Verb",
-          "lemma": "やる"
+          "lemma" : "やる",
+          "pos" : "Verb",
+          "surface" : "やっ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "hiragana_verb_yatte",
+      "input" : "やって",
+      "tags" : [
         "basic",
         "hiragana-verb"
       ]
     },
     {
-      "id": "character_gozaru",
-      "description": "Ninja/Old-fashioned ござる",
-      "input": "これでござる",
-      "expected": [
+      "description" : "Ninja/Old-fashioned ござる",
+      "expected" : [
         {
-          "surface": "これ",
-          "pos": "Pronoun"
+          "pos" : "Pronoun",
+          "surface" : "これ"
         },
         {
-          "surface": "で",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "で"
         },
         {
-          "surface": "ござる",
-          "pos": "Verb",
-          "lemma": "ござる"
+          "lemma" : "ござる",
+          "pos" : "Verb",
+          "surface" : "ござる"
         }
       ],
-      "tags": [
+      "id" : "character_gozaru",
+      "input" : "これでござる",
+      "tags" : [
         "character_speech",
         "ninja"
       ]
     },
     {
-      "id": "character_gozaranu",
-      "description": "Samurai speech ござらぬ - classical negative ぬ splits per design",
-      "input": "知らぬでござらぬ",
-      "expected": [
+      "description" : "Samurai speech ござらぬ - classical negative ぬ splits per design",
+      "expected" : [
         {
-          "surface": "知ら",
-          "pos": "Verb",
-          "lemma": "知る"
+          "lemma" : "知る",
+          "pos" : "Verb",
+          "surface" : "知ら"
         },
         {
-          "surface": "ぬ",
-          "pos": "Auxiliary",
-          "lemma": "ぬ"
+          "pos" : "Auxiliary",
+          "surface" : "ぬ"
         },
         {
-          "surface": "で",
-          "pos": "Particle"
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
         },
         {
-          "surface": "ござらぬ",
-          "pos": "Auxiliary",
-          "lemma": "ではない"
+          "lemma" : "ござる",
+          "pos" : "Verb",
+          "surface" : "ござら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ぬ"
         }
       ],
-      "tags": [
+      "id" : "character_gozaranu",
+      "input" : "知らぬでござらぬ",
+      "tags" : [
         "character_speech",
         "samurai"
       ]
     },
     {
-      "id": "hiragana_verb_neru",
-      "description": "Hiragana verb 寝る dictionary form (T56)",
-      "input": "ねる",
-      "expected": [
+      "description" : "Hiragana verb 寝る dictionary form (T56)",
+      "expected" : [
         {
-          "surface": "ねる",
-          "pos": "Verb",
-          "lemma": "ねる"
+          "lemma" : "ねる",
+          "pos" : "Verb",
+          "surface" : "ねる"
         }
       ],
-      "tags": [
+      "id" : "hiragana_verb_neru",
+      "input" : "ねる",
+      "tags" : [
         "hiragana_verb"
       ]
     },
     {
-      "id": "conjunction_shikashi",
-      "description": "しかし問題がある (however, there is a problem)",
-      "input": "しかし問題がある",
-      "expected": [
+      "description" : "しかし問題がある (however, there is a problem)",
+      "expected" : [
         {
-          "surface": "しかし",
-          "pos": "Conjunction"
+          "pos" : "Conjunction",
+          "surface" : "しかし"
         },
         {
-          "surface": "問題",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "問題"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "ある",
-          "pos": "Verb",
-          "lemma": "ある"
+          "lemma" : "ある",
+          "pos" : "Verb",
+          "surface" : "ある"
         }
       ],
-      "tags": [
+      "id" : "conjunction_shikashi",
+      "input" : "しかし問題がある",
+      "tags" : [
         "grammar",
         "conjunction"
       ]
     },
     {
-      "id": "conjunction_sorede",
-      "description": "それで帰った (so went home) - MeCab-compatible split",
-      "input": "それで帰った",
-      "expected": [
+      "description" : "それで帰った (so went home) - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "それ",
-          "pos": "Pronoun"
+          "pos" : "Pronoun",
+          "surface" : "それ"
         },
         {
-          "surface": "で",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "で"
         },
         {
-          "surface": "帰っ",
-          "pos": "Verb",
-          "lemma": "帰る"
+          "lemma" : "帰る",
+          "pos" : "Verb",
+          "surface" : "帰っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "conjunction_sorede",
+      "input" : "それで帰った",
+      "tags" : [
         "grammar",
         "conjunction"
       ]
     },
     {
-      "id": "complex_multiple_clauses",
-      "description": "雨が降ったので、家にいた (stayed home because it rained) - MeCab-compatible split",
-      "input": "雨が降ったので、家にいた",
-      "expected": [
+      "description" : "雨が降ったので、家にいた (stayed home because it rained) - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "雨",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "雨"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "降っ",
-          "pos": "Verb",
-          "lemma": "降る"
+          "lemma" : "降る",
+          "pos" : "Verb",
+          "surface" : "降っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         },
         {
-          "surface": "ので",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "ので"
         },
         {
-          "surface": "家",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "、家"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "に"
         },
-        {"surface": "い", "pos": "Verb", "lemma": "いる"},
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "complex_multiple_clauses",
+      "input" : "雨が降ったので、家にいた",
+      "tags" : [
         "grammar",
         "complex"
       ]
     },
     {
-      "id": "loanword_with_particle",
-      "description": "メールを送る (send email)",
-      "input": "メールを送る",
-      "expected": [
+      "description" : "メールを送る (send email)",
+      "expected" : [
         {
-          "surface": "メール",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "メール"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "送る",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "送る"
         }
       ],
-      "tags": [
+      "id" : "loanword_with_particle",
+      "input" : "メールを送る",
+      "tags" : [
         "grammar",
         "loanword"
       ]
     },
     {
-      "id": "nakereba_shi",
-      "description": "しなければならない (must do)",
-      "input": "しなければならない",
-      "expected": [
+      "description" : "しなければならない (must do)",
+      "expected" : [
         {
-          "surface": "しなければ",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
         },
         {
-          "surface": "ならない",
-          "pos": "Verb",
-          "lemma": "なる"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
+        },
+        {
+          "lemma" : "なる",
+          "pos" : "Verb",
+          "surface" : "なら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "nakereba_shi",
+      "input" : "しなければならない",
+      "tags" : [
         "grammar",
         "conditional",
         "nakereba",
@@ -377,494 +398,537 @@
       ]
     },
     {
-      "id": "nakereba_ko",
-      "description": "来なければ (if not come)",
-      "input": "来なければ",
-      "expected": [
+      "description" : "来なければ (if not come)",
+      "expected" : [
         {
-          "surface": "来なければ",
-          "pos": "Verb",
-          "lemma": "来る"
+          "lemma" : "来る",
+          "pos" : "Verb",
+          "surface" : "来"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
         }
       ],
-      "tags": [
+      "id" : "nakereba_ko",
+      "input" : "来なければ",
+      "tags" : [
         "grammar",
         "conditional",
         "nakereba"
       ]
     },
     {
-      "id": "nari_takatta_not_particle",
-      "description": "MeCab-compatible: なり + たかっ + た (not な + りたかった)",
-      "input": "なりたかった",
-      "expected": [
+      "description" : "MeCab-compatible: なり + たかっ + た (not な + りたかった)",
+      "expected" : [
         {
-          "surface": "なり",
-          "pos": "Verb",
-          "lemma": "なる"
+          "lemma" : "なる",
+          "pos" : "Verb",
+          "surface" : "なり"
         },
         {
-          "surface": "たかっ",
-          "pos": "Auxiliary",
-          "lemma": "たい"
+          "lemma" : "たい",
+          "pos" : "Auxiliary",
+          "surface" : "たかっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "nari_takatta_not_particle",
+      "input" : "なりたかった",
+      "tags" : [
         "verb",
         "tai",
         "mecab_compatible"
       ]
     },
     {
-      "id": "verb_nai_conditional_hashiranakereba",
-      "description": "走らなければならない - verb+ない conditional, not adjective",
-      "input": "走らなければならない",
-      "expected": [
+      "description" : "走らなければならない - verb+ない conditional, not adjective",
+      "expected" : [
         {
-          "surface": "走らなければ",
-          "pos": "Verb",
-          "lemma": "走る"
+          "lemma" : "走る",
+          "pos" : "Verb",
+          "surface" : "走ら"
         },
         {
-          "surface": "ならない",
-          "pos": "Verb",
-          "lemma": "なる"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
+        },
+        {
+          "lemma" : "なる",
+          "pos" : "Verb",
+          "surface" : "なら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "verb_nai_conditional_hashiranakereba",
+      "input" : "走らなければならない",
+      "tags" : [
         "verb",
         "conditional"
       ]
     },
     {
-      "id": "verb_neg_cond_minakereba",
-      "description": "見なければ - verb negative conditional",
-      "input": "見なければ",
-      "expected": [
+      "description" : "見なければ - verb negative conditional",
+      "expected" : [
         {
-          "surface": "見なければ",
-          "pos": "Verb",
-          "lemma": "見る"
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
         }
       ],
-      "tags": [
+      "id" : "verb_neg_cond_minakereba",
+      "input" : "見なければ",
+      "tags" : [
         "verb",
         "conditional"
       ]
     },
     {
-      "id": "deshabaru_verb",
-      "description": "B26: 出しゃばる te-form - MeCab-compatible split",
-      "input": "出しゃばってくる",
-      "expected": [
+      "description" : "B26: 出しゃばる te-form - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "出しゃばっ",
-          "pos": "Verb",
-          "lemma": "出しゃばる"
+          "lemma" : "出しゃばる",
+          "pos" : "Verb",
+          "surface" : "出しゃばっ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
-        {"surface": "くる", "pos": "Verb", "lemma": "くる"}
+        {
+          "lemma" : "くる",
+          "pos" : "Verb",
+          "surface" : "くる"
+        }
       ],
-      "tags": [
+      "id" : "deshabaru_verb",
+      "input" : "出しゃばってくる",
+      "tags" : [
         "godan",
         "te_form"
       ]
     },
     {
-      "id": "agaranai_verb",
-      "description": "B35: あがらない should be single verb",
-      "input": "うだつがあがらない",
-      "expected": [
+      "description" : "B35: あがらない should be single verb",
+      "expected" : [
         {
-          "surface": "うだつ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "うだつ"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "あがらない",
-          "pos": "Verb",
-          "lemma": "あがる"
+          "lemma" : "あがる",
+          "pos" : "Verb",
+          "surface" : "あがら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "agaranai_verb",
+      "input" : "うだつがあがらない",
+      "tags" : [
         "verb",
         "hiragana"
       ]
     },
     {
-      "id": "tsumatta_verb",
-      "description": "B65: 詰まった - MeCab-compatible split",
-      "input": "息の詰まった",
-      "expected": [
+      "description" : "B65: 詰まった - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "息",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "息"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "詰まっ",
-          "pos": "Verb",
-          "lemma": "詰まる"
+          "lemma" : "詰まる",
+          "pos" : "Verb",
+          "surface" : "詰まっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "tsumatta_verb",
+      "input" : "息の詰まった",
+      "tags" : [
         "verb",
         "godan"
       ]
     },
     {
-      "id": "kakatte_verb",
-      "description": "B48: かかっている - MeCab-compatible split",
-      "input": "かかっている",
-      "expected": [
+      "description" : "B48: かかっている - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "かかっ",
-          "pos": "Verb",
-          "lemma": "かかる"
+          "lemma" : "かかる",
+          "pos" : "Verb",
+          "surface" : "かかっ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "いる",
-          "pos": "Auxiliary",
-          "lemma": "いる"
+          "lemma" : "いる",
+          "pos" : "Auxiliary",
+          "surface" : "いる"
         }
       ],
-      "tags": [
+      "id" : "kakatte_verb",
+      "input" : "かかっている",
+      "tags" : [
         "verb",
         "godan"
       ]
     },
     {
-      "id": "hanatteru_verb",
-      "description": "B54: 放ってる - MeCab splits as 放っ+てる (lemma 放る)",
-      "input": "放ってる",
-      "expected": [
+      "description" : "B54: 放ってる - MeCab splits as 放っ+てる (lemma 放る)",
+      "expected" : [
         {
-          "surface": "放っ",
-          "pos": "Verb",
-          "lemma": "放る"
+          "lemma" : "放る",
+          "pos" : "Verb",
+          "surface" : "放っ"
         },
         {
-          "surface": "てる",
-          "pos": "Verb",
-          "lemma": "てる"
+          "lemma" : "てる",
+          "pos" : "Verb",
+          "surface" : "てる"
         }
       ],
-      "tags": [
+      "id" : "hanatteru_verb",
+      "input" : "放ってる",
+      "tags" : [
         "verb",
         "lemma"
       ]
     },
     {
-      "id": "tatakereba_verb",
-      "description": "B57: 叩ければ - grammar-first: 叩け+れ+ば, で(AUX,だ)+も(PARTICLE), いい(ADJ)",
-      "input": "叩ければ何でもいい",
-      "expected": [
+      "description" : "B57: 叩ければ - grammar-first: 叩け+れ+ば, で(AUX,だ)+も(PARTICLE), いい(ADJ)",
+      "expected" : [
         {
-          "surface": "叩け",
-          "pos": "Verb",
-          "lemma": "叩ける"
+          "lemma" : "叩ける",
+          "pos" : "Verb",
+          "surface" : "叩けれ"
         },
         {
-          "surface": "れ",
-          "pos": "Auxiliary",
-          "lemma": "れる"
+          "pos" : "Particle",
+          "surface" : "ば"
         },
         {
-          "surface": "ば",
-          "pos": "Particle"
+          "pos" : "Noun",
+          "surface" : "何"
         },
         {
-          "surface": "何",
-          "pos": "Pronoun"
+          "pos" : "Particle",
+          "surface" : "でも"
         },
         {
-          "surface": "で",
-          "pos": "Auxiliary",
-          "lemma": "だ"
-        },
-        {
-          "surface": "も",
-          "pos": "Particle"
-        },
-        {
-          "surface": "いい",
-          "pos": "Adjective",
-          "lemma": "よい"
+          "lemma" : "いう",
+          "pos" : "Verb",
+          "surface" : "いい"
         }
       ],
-      "tags": [
+      "id" : "tatakereba_verb",
+      "input" : "叩ければ何でもいい",
+      "tags" : [
         "verb",
         "potential",
         "conditional"
       ]
     },
     {
-      "id": "tsukeru_verb",
-      "description": "つける hiragana should be VERB (not NOUN+AUX split)",
-      "input": "つける",
-      "expected": [
+      "description" : "つける hiragana should be VERB (not NOUN+AUX split)",
+      "expected" : [
         {
-          "surface": "つける",
-          "pos": "Verb",
-          "lemma": "つける"
+          "lemma" : "つける",
+          "pos" : "Verb",
+          "surface" : "つける"
         }
       ],
-      "tags": [
+      "id" : "tsukeru_verb",
+      "input" : "つける",
+      "tags" : [
         "verb",
         "hiragana",
         "L2"
       ]
     },
     {
-      "id": "sou_auxiliary_pattern",
-      "description": "食べそう - verb renyokei + そう (動詞+助動詞 → 分割)",
-      "input": "食べそう",
-      "expected": [
+      "description" : "食べそう - verb renyokei + そう (動詞+助動詞 → 分割)",
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "そう",
-          "pos": "Auxiliary",
-          "lemma": "そう"
+          "lemma" : "そう",
+          "pos" : "Auxiliary",
+          "surface" : "そう"
         }
       ],
-      "tags": [
+      "id" : "sou_auxiliary_pattern",
+      "input" : "食べそう",
+      "tags" : [
         "sou",
         "verb"
       ]
     },
     {
-      "id": "verb_sou_hashirisou",
-      "description": "走りそう - verb renyokei + そう (動詞+助動詞 → 分割)",
-      "input": "走りそう",
-      "expected": [
+      "description" : "走りそう - verb renyokei + そう (動詞+助動詞 → 分割)",
+      "expected" : [
         {
-          "surface": "走り",
-          "pos": "Verb",
-          "lemma": "走る"
+          "lemma" : "走る",
+          "pos" : "Verb",
+          "surface" : "走り"
         },
         {
-          "surface": "そう",
-          "pos": "Auxiliary",
-          "lemma": "そう"
+          "lemma" : "そう",
+          "pos" : "Auxiliary",
+          "surface" : "そう"
         }
       ],
-      "tags": [
+      "id" : "verb_sou_hashirisou",
+      "input" : "走りそう",
+      "tags" : [
         "sou",
         "verb"
       ]
     },
     {
-      "id": "verb_sou_desu",
-      "description": "食べそうです - verb renyokei + そう + です (動詞+助動詞 → 分割)",
-      "input": "食べそうです",
-      "expected": [
+      "description" : "食べそうです - verb renyokei + そう + です (動詞+助動詞 → 分割)",
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "そう",
-          "pos": "Auxiliary",
-          "lemma": "そう"
+          "lemma" : "そう",
+          "pos" : "Auxiliary",
+          "surface" : "そう"
         },
         {
-          "surface": "です",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "です"
         }
       ],
-      "tags": [
+      "id" : "verb_sou_desu",
+      "input" : "食べそうです",
+      "tags" : [
         "sou",
         "verb"
       ]
     },
     {
-      "id": "causative_passive_yoserareru",
-      "description": "寄せられた - MeCab互換分割 (寄せ+られ+た)",
-      "input": "寄せられた",
-      "expected": [
+      "description" : "寄せられた - MeCab互換分割 (寄せ+られ+た)",
+      "expected" : [
         {
-          "surface": "寄せ",
-          "pos": "Verb",
-          "lemma": "寄せる"
+          "lemma" : "寄せる",
+          "pos" : "Verb",
+          "surface" : "寄せ"
         },
         {
-          "surface": "られ",
-          "pos": "Auxiliary",
-          "lemma": "られる"
+          "lemma" : "られる",
+          "pos" : "Auxiliary",
+          "surface" : "られ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "causative_passive_yoserareru",
+      "input" : "寄せられた",
+      "tags" : [
         "passive",
         "ichidan"
       ]
     },
     {
-      "id": "causative_passive_miserareru",
-      "description": "見せられた - MeCab互換分割 (見せ+られ+た)",
-      "input": "見せられた",
-      "expected": [
+      "description" : "見せられた - MeCab互換分割 (見せ+られ+た)",
+      "expected" : [
         {
-          "surface": "見せ",
-          "pos": "Verb",
-          "lemma": "見せる"
+          "lemma" : "見せる",
+          "pos" : "Verb",
+          "surface" : "見せ"
         },
         {
-          "surface": "られ",
-          "pos": "Auxiliary",
-          "lemma": "られる"
+          "lemma" : "られる",
+          "pos" : "Auxiliary",
+          "surface" : "られ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "causative_passive_miserareru",
+      "input" : "見せられた",
+      "tags" : [
         "causative_passive",
         "lemma"
       ]
     },
     {
-      "id": "true_causative_passive",
-      "description": "見させられた should have lemma 見る (true causative-passive)",
-      "input": "見させられた",
-      "expected": [
+      "description" : "見させられた should have lemma 見る (true causative-passive)",
+      "expected" : [
         {
-          "surface": "見させられた",
-          "pos": "Verb",
-          "lemma": "見る"
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
+        },
+        {
+          "lemma" : "させる",
+          "pos" : "Verb",
+          "surface" : "させ"
+        },
+        {
+          "lemma" : "られる",
+          "pos" : "Verb",
+          "surface" : "られ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "true_causative_passive",
+      "input" : "見させられた",
+      "tags" : [
         "causative_passive",
         "lemma"
       ]
     },
     {
-      "id": "verb_shimeta",
-      "description": "しめた should split into しめ (ichidan verb) + た (auxiliary)",
-      "input": "しめた",
-      "expected": [
+      "description" : "しめた should split into しめ (ichidan verb) + た (auxiliary)",
+      "expected" : [
         {
-          "surface": "しめ",
-          "pos": "Verb",
-          "lemma": "しめる"
+          "lemma" : "しめる",
+          "pos" : "Verb",
+          "surface" : "しめ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "verb_shimeta",
+      "input" : "しめた",
+      "tags" : [
         "verb",
         "hiragana"
       ]
     },
     {
-      "id": "idiom_aji_wo_shimeta",
-      "description": "味をしめた - idiom should split verb correctly",
-      "input": "味をしめた",
-      "expected": [
+      "description" : "味をしめた - idiom should split verb correctly",
+      "expected" : [
         {
-          "surface": "味",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "味"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "しめ",
-          "pos": "Verb",
-          "lemma": "しめる"
+          "lemma" : "しめる",
+          "pos" : "Verb",
+          "surface" : "しめ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "idiom_aji_wo_shimeta",
+      "input" : "味をしめた",
+      "tags" : [
         "verb",
         "idiom"
       ]
     },
     {
-      "id": "rashii_conjecture_verb",
-      "description": "帰るらしい should split as verb + らしい (conjecture auxiliary)",
-      "input": "帰るらしい",
-      "expected": [
+      "description" : "帰るらしい should split as verb + らしい (conjecture auxiliary)",
+      "expected" : [
         {
-          "surface": "帰る",
-          "pos": "Verb",
-          "lemma": "帰る"
+          "lemma" : "帰る",
+          "pos" : "Verb",
+          "surface" : "帰る"
         },
         {
-          "surface": "らしい",
-          "pos": "Adjective",
-          "lemma": "らしい"
+          "lemma" : "らしい",
+          "pos" : "Adjective",
+          "surface" : "らしい"
         }
       ],
-      "tags": [
+      "id" : "rashii_conjecture_verb",
+      "input" : "帰るらしい",
+      "tags" : [
         "verb",
         "rashii",
         "conjecture"
       ]
     },
     {
-      "id": "rashii_tai_verb",
-      "description": "帰りたいらしい - MeCab-compatible split: 帰り + たい + らしい",
-      "input": "帰りたいらしい",
-      "expected": [
+      "description" : "帰りたいらしい - MeCab-compatible split: 帰り + たい + らしい",
+      "expected" : [
         {
-          "surface": "帰り",
-          "pos": "Verb",
-          "lemma": "帰る"
+          "lemma" : "帰る",
+          "pos" : "Verb",
+          "surface" : "帰り"
         },
         {
-          "surface": "たい",
-          "pos": "Auxiliary",
-          "lemma": "たい"
+          "lemma" : "たい",
+          "pos" : "Auxiliary",
+          "surface" : "たい"
         },
         {
-          "surface": "らしい",
-          "pos": "Adjective",
-          "lemma": "らしい"
+          "lemma" : "らしい",
+          "pos" : "Adjective",
+          "surface" : "らしい"
         }
       ],
-      "tags": [
+      "id" : "rashii_tai_verb",
+      "input" : "帰りたいらしい",
+      "tags" : [
         "verb",
         "rashii",
         "tai",
@@ -872,26 +936,24 @@
       ]
     },
     {
-      "id": "onbin_kasoru_lemma",
-      "description": "過疎っている - 過疎る is a modern Japanese verb (internet slang for 'become dead/inactive')",
-      "input": "過疎っている",
-      "expected": [
+      "description" : "過疎っている - 過疎る is a modern Japanese verb (internet slang for 'become dead/inactive')",
+      "expected" : [
         {
-          "surface": "過疎っ",
-          "pos": "Verb",
-          "lemma": "過疎る"
+          "pos" : "Noun",
+          "surface" : "過疎"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "って"
         },
         {
-          "surface": "いる",
-          "pos": "Auxiliary",
-          "lemma": "いる"
+          "pos" : "Verb",
+          "surface" : "いる"
         }
       ],
-      "tags": [
+      "id" : "onbin_kasoru_lemma",
+      "input" : "過疎っている",
+      "tags" : [
         "verb",
         "onbin",
         "lemma",
@@ -899,522 +961,577 @@
       ]
     },
     {
-      "id": "verb_agaru_kanji_variant",
-      "description": "挙がっている - MeCab-compatible split with lemma 挙がる",
-      "input": "批判が挙がっている",
-      "expected": [
+      "description" : "挙がっている - MeCab-compatible split with lemma 挙がる",
+      "expected" : [
         {
-          "surface": "批判",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "批判"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "挙がっ",
-          "pos": "Verb",
-          "lemma": "挙がる"
+          "lemma" : "挙がる",
+          "pos" : "Verb",
+          "surface" : "挙がっ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "いる",
-          "pos": "Auxiliary",
-          "lemma": "いる"
+          "lemma" : "いる",
+          "pos" : "Auxiliary",
+          "surface" : "いる"
         }
       ],
-      "tags": [
+      "id" : "verb_agaru_kanji_variant",
+      "input" : "批判が挙がっている",
+      "tags" : [
         "verb",
         "kanji_variant"
       ]
     },
     {
-      "id": "mashou_tabemashou",
-      "description": "食べましょう - volitional form ichidan (split: verb + aux)",
-      "input": "食べましょう",
-      "expected": [
+      "description" : "食べましょう - volitional form ichidan (split: verb + aux)",
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "ましょう",
-          "pos": "Auxiliary",
-          "lemma": "ます"
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "ましょ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "う"
         }
       ],
-      "tags": [
+      "id" : "mashou_tabemashou",
+      "input" : "食べましょう",
+      "tags" : [
         "mashou",
         "volitional"
       ]
     },
     {
-      "id": "verb_starting_with_ga",
-      "description": "上がらない - verb starting with が",
-      "input": "上がらない",
-      "expected": [
+      "description" : "上がらない - verb starting with が",
+      "expected" : [
         {
-          "surface": "上がらない",
-          "pos": "Verb",
-          "lemma": "上がる"
+          "lemma" : "上がる",
+          "pos" : "Verb",
+          "surface" : "上がら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "verb_starting_with_ga",
+      "input" : "上がらない",
+      "tags" : [
         "verb",
         "negative"
       ]
     },
     {
-      "id": "conditional_ichidan",
-      "description": "食べれば - conditional form ichidan - MeCab-compatible split",
-      "input": "食べれば",
-      "expected": [
+      "description" : "食べれば - conditional form ichidan - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "食べれ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べれ"
         },
         {
-          "surface": "ば",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "ば"
         }
       ],
-      "tags": [
+      "id" : "conditional_ichidan",
+      "input" : "食べれば",
+      "tags" : [
         "conditional"
       ]
     },
     {
-      "id": "conditional_ichidan_okiru",
-      "description": "起きれば - conditional form 起きる",
-      "input": "起きれば",
-      "expected": [
+      "description" : "起きれば - conditional form 起きる",
+      "expected" : [
         {
-          "surface": "起きれば",
-          "pos": "Verb",
-          "lemma": "起きる"
+          "lemma" : "起きる",
+          "pos" : "Verb",
+          "surface" : "起きれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
         }
       ],
-      "tags": [
+      "id" : "conditional_ichidan_okiru",
+      "input" : "起きれば",
+      "tags" : [
         "conditional"
       ]
     },
     {
-      "id": "conditional_complex",
-      "description": "起きればよかった - conditional + よかった - MeCab-compatible split",
-      "input": "起きればよかった",
-      "expected": [
+      "description" : "起きればよかった - conditional + よかった - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "起きれ",
-          "pos": "Verb",
-          "lemma": "起きる"
+          "lemma" : "起きる",
+          "pos" : "Verb",
+          "surface" : "起きれ"
         },
         {
-          "surface": "ば",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "ば"
         },
         {
-          "surface": "よかっ",
-          "pos": "Adjective",
-          "lemma": "よい"
+          "lemma" : "よい",
+          "pos" : "Adjective",
+          "surface" : "よかっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "conditional_complex",
+      "input" : "起きればよかった",
+      "tags" : [
         "conditional"
       ]
     },
     {
-      "id": "naru_verb",
-      "description": "なりました - verb stem + polite past aux",
-      "input": "なりました",
-      "expected": [
+      "description" : "なりました - verb stem + polite past aux",
+      "expected" : [
         {
-          "surface": "なり",
-          "pos": "Verb",
-          "lemma": "なる"
+          "lemma" : "なる",
+          "pos" : "Verb",
+          "surface" : "なり"
         },
         {
-          "surface": "まし",
-          "pos": "Auxiliary",
-          "lemma": "ます"
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "まし"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "naru_verb",
+      "input" : "なりました",
+      "tags" : [
         "hiragana_verb"
       ]
     },
     {
-      "id": "yoi_ni_naru",
-      "description": "容易になりました - na-adj + ni + naru (split: verb stem + polite aux)",
-      "input": "容易になりました",
-      "expected": [
+      "description" : "容易になりました - na-adj + ni + naru (split: verb stem + polite aux)",
+      "expected" : [
         {
-          "surface": "容易",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "容易"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "に"
         },
         {
-          "surface": "なり",
-          "pos": "Verb",
-          "lemma": "なる"
+          "lemma" : "なる",
+          "pos" : "Verb",
+          "surface" : "なり"
         },
         {
-          "surface": "まし",
-          "pos": "Auxiliary",
-          "lemma": "ます"
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "まし"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "yoi_ni_naru",
+      "input" : "容易になりました",
+      "tags" : [
         "hiragana_verb"
       ]
     },
     {
-      "id": "basic_verb_masu",
-      "input": "食べます",
-      "expected": [
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "ます",
-          "pos": "Auxiliary",
-          "lemma": "ます"
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "ます"
         }
       ],
-      "tags": [
+      "id" : "basic_verb_masu",
+      "input" : "食べます",
+      "tags" : [
         "basic",
         "verb",
         "polite"
       ]
     },
     {
-      "id": "verb_bazuru_base",
-      "description": "Katakana verb バズる base form",
-      "input": "バズる",
-      "expected": [
+      "description" : "Katakana verb バズる base form",
+      "expected" : [
         {
-          "surface": "バズる",
-          "pos": "Verb"
-        }
-      ],
-      "tags": [
-        "slang",
-        "verb",
-        "katakana"
-      ]
-    },
-    {
-      "id": "verb_bazuru_potential",
-      "description": "Katakana verb バズる potential form",
-      "input": "バズれる",
-      "expected": [
-        {
-          "surface": "バズれる",
-          "pos": "Verb",
-          "lemma": "バズる"
-        }
-      ],
-      "tags": [
-        "slang",
-        "verb",
-        "katakana"
-      ]
-    },
-    {
-      "id": "verb_saboru_base",
-      "description": "Katakana verb サボる base form",
-      "input": "サボる",
-      "expected": [
-        {
-          "surface": "サボる",
-          "pos": "Verb"
-        }
-      ],
-      "tags": [
-        "slang",
-        "verb",
-        "katakana"
-      ]
-    },
-    {
-      "id": "verb_saboru_te",
-      "description": "Katakana verb サボる te-form - MeCab-compatible split",
-      "input": "サボって",
-      "expected": [
-        {
-          "surface": "サボっ",
-          "pos": "Verb",
-          "lemma": "サボる"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "バズ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Auxiliary",
+          "surface" : "る"
         }
       ],
-      "tags": [
+      "id" : "verb_bazuru_base",
+      "input" : "バズる",
+      "tags" : [
         "slang",
         "verb",
         "katakana"
       ]
     },
     {
-      "id": "verb_guguru_base",
-      "description": "Katakana verb ググる base form",
-      "input": "ググる",
-      "expected": [
+      "description" : "Katakana verb バズる potential form",
+      "expected" : [
         {
-          "surface": "ググる",
-          "pos": "Verb"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "バズ"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "れる"
         }
       ],
-      "tags": [
+      "id" : "verb_bazuru_potential",
+      "input" : "バズれる",
+      "tags" : [
         "slang",
         "verb",
         "katakana"
       ]
     },
     {
-      "id": "verb_guguru_negative",
-      "description": "Katakana verb ググる negative form",
-      "input": "ググらない",
-      "expected": [
+      "description" : "Katakana verb サボる base form",
+      "expected" : [
         {
-          "surface": "ググらない",
-          "pos": "Verb",
-          "lemma": "ググる"
+          "pos" : "Verb",
+          "surface" : "サボる"
         }
       ],
-      "tags": [
+      "id" : "verb_saboru_base",
+      "input" : "サボる",
+      "tags" : [
         "slang",
         "verb",
         "katakana"
       ]
     },
     {
-      "id": "verb_pakuru_base",
-      "description": "Katakana verb パクる base form",
-      "input": "パクる",
-      "expected": [
+      "description" : "Katakana verb サボる te-form - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "パクる",
-          "pos": "Verb"
+          "lemma" : "サボる",
+          "pos" : "Verb",
+          "surface" : "サボっ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "verb_saboru_te",
+      "input" : "サボって",
+      "tags" : [
         "slang",
         "verb",
         "katakana"
       ]
     },
     {
-      "id": "verb_neguru_base",
-      "description": "Katakana verb ネグる base form",
-      "input": "ネグる",
-      "expected": [
+      "description" : "Katakana verb ググる base form",
+      "expected" : [
         {
-          "surface": "ネグる",
-          "pos": "Verb"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ググ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "る"
         }
       ],
-      "tags": [
+      "id" : "verb_guguru_base",
+      "input" : "ググる",
+      "tags" : [
         "slang",
         "verb",
         "katakana"
       ]
     },
     {
-      "id": "verb_bazuru_causative",
-      "description": "Katakana verb バズる causative form",
-      "input": "バズらせる",
-      "expected": [
+      "description" : "Katakana verb ググる negative form",
+      "expected" : [
         {
-          "surface": "バズらせる",
-          "pos": "Verb",
-          "lemma": "バズる"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ググ"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "ら"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "verb_guguru_negative",
+      "input" : "ググらない",
+      "tags" : [
+        "slang",
+        "verb",
+        "katakana"
+      ]
+    },
+    {
+      "description" : "Katakana verb パクる base form",
+      "expected" : [
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "パク"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "る"
+        }
+      ],
+      "id" : "verb_pakuru_base",
+      "input" : "パクる",
+      "tags" : [
+        "slang",
+        "verb",
+        "katakana"
+      ]
+    },
+    {
+      "description" : "Katakana verb ネグる base form",
+      "expected" : [
+        {
+          "pos" : "Verb",
+          "surface" : "ネグる"
+        }
+      ],
+      "id" : "verb_neguru_base",
+      "input" : "ネグる",
+      "tags" : [
+        "slang",
+        "verb",
+        "katakana"
+      ]
+    },
+    {
+      "description" : "Katakana verb バズる causative form",
+      "expected" : [
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "バズ"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "ら"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "せる"
+        }
+      ],
+      "id" : "verb_bazuru_causative",
+      "input" : "バズらせる",
+      "tags" : [
         "slang",
         "verb",
         "conjugation"
       ]
     },
     {
-      "id": "verb_saboru_passive",
-      "description": "Katakana verb サボる passive form",
-      "input": "サボられる",
-      "expected": [
+      "description" : "Katakana verb サボる passive form",
+      "expected" : [
         {
-          "surface": "サボられる",
-          "pos": "Verb",
-          "lemma": "サボる"
+          "lemma" : "サボる",
+          "pos" : "Verb",
+          "surface" : "サボら"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "れる"
         }
       ],
-      "tags": [
+      "id" : "verb_saboru_passive",
+      "input" : "サボられる",
+      "tags" : [
         "slang",
         "verb",
         "conjugation"
       ]
     },
     {
-      "id": "verb_guguru_volitional",
-      "description": "Katakana verb ググる volitional form",
-      "input": "ググろう",
-      "expected": [
+      "description" : "Katakana verb ググる volitional form",
+      "expected" : [
         {
-          "surface": "ググろう",
-          "pos": "Verb",
-          "lemma": "ググる"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ググ"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "ろう"
         }
       ],
-      "tags": [
+      "id" : "verb_guguru_volitional",
+      "input" : "ググろう",
+      "tags" : [
         "slang",
         "verb",
         "conjugation"
       ]
     },
     {
-      "id": "complex_technical",
-      "description": "Python technical sentence with particles - MeCab互換分割",
-      "input": "Pythonで機械学習を実装する",
-      "expected": [
+      "description" : "Python technical sentence with particles - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "Python",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "Python"
         },
         {
-          "surface": "で",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "で"
         },
         {
-          "surface": "機械学習",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "機械学習"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "実装",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "実装"
         },
         {
-          "surface": "する",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "する"
         }
       ],
-      "tags": [
+      "id" : "complex_technical",
+      "input" : "Pythonで機械学習を実装する",
+      "tags" : [
         "strict",
         "complex",
         "technical"
       ]
     },
     {
-      "id": "realworld_technical",
-      "description": "ファイルが見つかりませんでした - should recognize が particle",
-      "input": "ファイルが見つかりませんでした",
-      "expected": [
+      "description" : "ファイルが見つかりませんでした - should recognize が particle",
+      "expected" : [
         {
-          "surface": "ファイル",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "ファイル"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "見つかり",
-          "pos": "Verb",
-          "lemma": "見つかる"
+          "lemma" : "見つかる",
+          "pos" : "Verb",
+          "surface" : "見つかり"
         },
         {
-          "surface": "ませ",
-          "pos": "Auxiliary",
-          "lemma": "ます"
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "ませ"
         },
         {
-          "surface": "ん",
-          "pos": "Auxiliary",
-          "lemma": "ん"
+          "lemma" : "ん",
+          "pos" : "Auxiliary",
+          "surface" : "ん"
         },
         {
-          "surface": "でし",
-          "pos": "Auxiliary",
-          "lemma": "です"
+          "lemma" : "です",
+          "pos" : "Auxiliary",
+          "surface" : "でし"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "realworld_technical",
+      "input" : "ファイルが見つかりませんでした",
+      "tags" : [
         "strict",
         "realworld",
         "technical"
       ]
     },
     {
-      "id": "taberu_lemma",
-      "description": "食べる lemma should be 食べる",
-      "input": "食べる",
-      "expected": [
+      "description" : "食べる lemma should be 食べる",
+      "expected" : [
         {
-          "surface": "食べる",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べる"
         }
       ],
-      "tags": [
+      "id" : "taberu_lemma",
+      "input" : "食べる",
+      "tags" : [
         "strict",
         "verb",
         "lemma"
       ]
     },
     {
-      "id": "gohan_wo_taberu",
-      "description": "ご飯を食べる - ご飯 is L2 dictionary word",
-      "input": "ご飯を食べる",
-      "expected": [
+      "description" : "ご飯を食べる - ご飯 is L2 dictionary word",
+      "expected" : [
         {
-          "surface": "ご飯",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "ご飯"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "食べる",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べる"
         }
       ],
-      "tags": [
+      "id" : "gohan_wo_taberu",
+      "input" : "ご飯を食べる",
+      "tags" : [
         "strict",
         "verb",
         "lemma",
@@ -1422,375 +1539,375 @@
       ]
     },
     {
-      "id": "godan_hashiru_base",
-      "description": "Godan verb 走る base form",
-      "input": "走る",
-      "expected": [
+      "description" : "Godan verb 走る base form",
+      "expected" : [
         {
-          "surface": "走る",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "走る"
         }
       ],
-      "tags": [
+      "id" : "godan_hashiru_base",
+      "input" : "走る",
+      "tags" : [
         "verb",
         "godan"
       ]
     },
     {
-      "id": "godan_hashiru_past",
-      "description": "Godan verb 走る past form - MeCab-compatible split",
-      "input": "走った",
-      "expected": [
+      "description" : "Godan verb 走る past form - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "走っ",
-          "pos": "Verb",
-          "lemma": "走る"
+          "lemma" : "走る",
+          "pos" : "Verb",
+          "surface" : "走っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "godan_hashiru_past",
+      "input" : "走った",
+      "tags" : [
         "verb",
         "godan"
       ]
     },
     {
-      "id": "potential_expression",
-      "description": "Potential expression 話せるようになりたい",
-      "input": "日本語が話せるようになりたい",
-      "expected": [
+      "description" : "Potential expression 話せるようになりたい",
+      "expected" : [
         {
-          "surface": "日本語",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "日本語"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "話せる",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "話せる"
         },
         {
-          "surface": "よう",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "よう"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "に"
         },
         {
-          "surface": "なり",
-          "pos": "Verb",
-          "lemma": "なる"
+          "lemma" : "なる",
+          "pos" : "Verb",
+          "surface" : "なり"
         },
         {
-          "surface": "たい",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "たい"
         }
       ],
-      "tags": [
+      "id" : "potential_expression",
+      "input" : "日本語が話せるようになりたい",
+      "tags" : [
         "verb",
         "potential"
       ]
     },
     {
-      "id": "potential_negative",
-      "description": "Potential negative できない - MeCab-compatible split",
-      "input": "今は外出できない状況です",
-      "expected": [
+      "description" : "Potential negative できない - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "今",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "今"
         },
         {
-          "surface": "は",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "は"
         },
         {
-          "surface": "外出",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "外出"
         },
         {
-          "surface": "でき",
-          "pos": "Verb",
-          "lemma": "できる"
+          "lemma" : "できる",
+          "pos" : "Verb",
+          "surface" : "でき"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         },
         {
-          "surface": "状況",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "状況"
         },
         {
-          "surface": "です",
-          "pos": "Auxiliary",
-          "lemma": "です"
+          "lemma" : "です",
+          "pos" : "Auxiliary",
+          "surface" : "です"
         }
       ],
-      "tags": [
+      "id" : "potential_negative",
+      "input" : "今は外出できない状況です",
+      "tags" : [
         "verb",
         "potential"
       ]
     },
     {
-      "id": "multi_verb_sequential",
-      "description": "Sequential verb actions - MeCab-compatible split",
-      "input": "起きて朝ご飯を食べた",
-      "expected": [
+      "description" : "Sequential verb actions - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "起き",
-          "pos": "Verb",
-          "lemma": "起きる"
+          "lemma" : "起きる",
+          "pos" : "Verb",
+          "surface" : "起き"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "朝",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "朝"
         },
         {
-          "surface": "ご飯",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "ご飯"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "multi_verb_sequential",
+      "input" : "起きて朝ご飯を食べた",
+      "tags" : [
         "verb",
         "sequential"
       ]
     },
     {
-      "id": "polite_moushiageru",
-      "description": "Polite verb 申し上げる - verb+auxiliary should be split per tokenization rules",
-      "input": "ご報告申し上げます",
-      "expected": [
+      "description" : "Polite verb 申し上げる - verb+auxiliary should be split per tokenization rules",
+      "expected" : [
         {
-          "surface": "ご",
-          "pos": "Prefix"
+          "pos" : "Prefix",
+          "surface" : "ご"
         },
         {
-          "surface": "報告",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "報告"
         },
         {
-          "surface": "申し上げ",
-          "pos": "Verb",
-          "lemma": "申し上げる"
+          "lemma" : "申し上げる",
+          "pos" : "Verb",
+          "surface" : "申し上げ"
         },
         {
-          "surface": "ます",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "ます"
         }
       ],
-      "tags": [
+      "id" : "polite_moushiageru",
+      "input" : "ご報告申し上げます",
+      "tags" : [
         "verb",
         "polite"
       ]
     },
     {
-      "id": "dict_stem_kotaerarenakute",
-      "description": "Dictionary stem 答え with conjugation - MeCab splits られ as Verb not Auxiliary",
-      "input": "答えられなくて",
-      "expected": [
+      "description" : "Dictionary stem 答え with conjugation - MeCab splits られ as Verb not Auxiliary",
+      "expected" : [
         {
-          "surface": "答え",
-          "pos": "Verb",
-          "lemma": "答える"
+          "lemma" : "答える",
+          "pos" : "Verb",
+          "surface" : "答え"
         },
         {
-          "surface": "られ",
-          "pos": "Verb",
-          "lemma": "られる"
+          "lemma" : "られる",
+          "pos" : "Verb",
+          "surface" : "られ"
         },
         {
-          "surface": "なく",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なく"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "dict_stem_kotaerarenakute",
+      "input" : "答えられなくて",
+      "tags" : [
         "verb",
         "conjugation"
       ]
     },
     {
-      "id": "dict_stem_kotaerarenakatta",
-      "description": "Dictionary stem 答え with past conjugation - MeCab互換分割 (なかっ+た)",
-      "input": "答えられなかった",
-      "expected": [
+      "description" : "Dictionary stem 答え with past conjugation - MeCab互換分割 (なかっ+た)",
+      "expected" : [
         {
-          "surface": "答え",
-          "pos": "Verb",
-          "lemma": "答える"
+          "lemma" : "答える",
+          "pos" : "Verb",
+          "surface" : "答え"
         },
         {
-          "surface": "られ",
-          "pos": "Auxiliary",
-          "lemma": "られる"
+          "lemma" : "られる",
+          "pos" : "Auxiliary",
+          "surface" : "られ"
         },
         {
-          "surface": "なかっ",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なかっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "dict_stem_kotaerarenakatta",
+      "input" : "答えられなかった",
+      "tags" : [
         "verb",
         "conjugation"
       ]
     },
     {
-      "id": "dict_stem_kangaerarenakatta",
-      "description": "Dictionary stem 考え with past conjugation - MeCab互換分割 (なかっ+た)",
-      "input": "考えられなかった",
-      "expected": [
+      "description" : "Dictionary stem 考え with past conjugation - MeCab互換分割 (なかっ+た)",
+      "expected" : [
         {
-          "surface": "考え",
-          "pos": "Verb",
-          "lemma": "考える"
+          "lemma" : "考える",
+          "pos" : "Verb",
+          "surface" : "考え"
         },
         {
-          "surface": "られ",
-          "pos": "Auxiliary",
-          "lemma": "られる"
+          "lemma" : "られる",
+          "pos" : "Auxiliary",
+          "surface" : "られ"
         },
         {
-          "surface": "なかっ",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なかっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "dict_stem_kangaerarenakatta",
+      "input" : "考えられなかった",
+      "tags" : [
         "verb",
         "conjugation"
       ]
     },
     {
-      "id": "dict_stem_mirarenakute",
-      "description": "見られなくて - MeCab splits られ as Verb not Auxiliary",
-      "input": "見られなくて",
-      "expected": [
+      "description" : "見られなくて - MeCab splits られ as Verb not Auxiliary",
+      "expected" : [
         {
-          "surface": "見",
-          "pos": "Verb",
-          "lemma": "見る"
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
         },
         {
-          "surface": "られ",
-          "pos": "Verb",
-          "lemma": "られる"
+          "lemma" : "られる",
+          "pos" : "Verb",
+          "surface" : "られ"
         },
         {
-          "surface": "なく",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なく"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "dict_stem_mirarenakute",
+      "input" : "見られなくて",
+      "tags" : [
         "passive",
         "ichidan"
       ]
     },
     {
-      "id": "dict_stem_kakenakatta",
-      "description": "Dictionary stem 書 with potential past - MeCab互換分割",
-      "input": "書けなかった",
-      "expected": [
+      "description" : "Dictionary stem 書 with potential past - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "書け",
-          "pos": "Verb",
-          "lemma": "書ける"
+          "lemma" : "書ける",
+          "pos" : "Verb",
+          "surface" : "書け"
         },
         {
-          "surface": "なかっ",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なかっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "dict_stem_kakenakatta",
+      "input" : "書けなかった",
+      "tags" : [
         "verb",
         "conjugation"
       ]
     },
     {
-      "id": "s4_anadoru",
-      "description": "S4: あなどる should be VERB (not あ+な+どる)",
-      "input": "あなどる",
-      "expected": [
+      "description" : "S4: あなどる should be VERB (not あ+な+どる)",
+      "expected" : [
         {
-          "surface": "あなどる",
-          "pos": "Verb",
-          "lemma": "あなどる"
+          "lemma" : "あなどる",
+          "pos" : "Verb",
+          "surface" : "あなどる"
         }
       ],
-      "tags": [
+      "id" : "s4_anadoru",
+      "input" : "あなどる",
+      "tags" : [
         "s4_fix",
         "hiragana_verb",
         "regression"
       ]
     },
     {
-      "id": "p4_shimatta_past",
-      "description": "しまった - MeCab shows lemma しまる (not しまう) in isolation",
-      "input": "しまった",
-      "expected": [
+      "description" : "しまった - MeCab shows lemma しまる (not しまう) in isolation",
+      "expected" : [
         {
-          "surface": "しまっ",
-          "pos": "Verb",
-          "lemma": "しまる"
+          "lemma" : "しまる",
+          "pos" : "Verb",
+          "surface" : "しまっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "p4_shimatta_past",
+      "input" : "しまった",
+      "tags" : [
         "p4",
         "godanwa",
         "hiragana-verb",
@@ -1798,64 +1915,66 @@
       ]
     },
     {
-      "id": "kanji_totta_godanra",
-      "description": "取った - GodanRa past form - MeCab-compatible split",
-      "input": "本を取った",
-      "expected": [
+      "description" : "取った - GodanRa past form - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "本",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "本"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "取っ",
-          "pos": "Verb",
-          "lemma": "取る"
+          "lemma" : "取る",
+          "pos" : "Verb",
+          "surface" : "取っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "kanji_totta_godanra",
+      "input" : "本を取った",
+      "tags" : [
         "godanra",
         "kanji-verb",
         "past-form"
       ]
     },
     {
-      "id": "kanji_suwatta_godanra",
-      "description": "座った - GodanRa past form - MeCab-compatible split",
-      "input": "椅子に座った",
-      "expected": [
+      "description" : "座った - GodanRa past form - MeCab-compatible split",
+      "expected" : [
         {
-          "surface": "椅子",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "椅子"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "に"
         },
         {
-          "surface": "座っ",
-          "pos": "Verb",
-          "lemma": "座る"
+          "lemma" : "座る",
+          "pos" : "Verb",
+          "surface" : "座っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "kanji_suwatta_godanra",
+      "input" : "椅子に座った",
+      "tags" : [
         "godanra",
         "kanji-verb",
         "past-form"
       ]
     }
-  ]
+  ],
+  "description" : "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る",
+  "version" : "1.0"
 }

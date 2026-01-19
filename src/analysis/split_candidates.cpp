@@ -5,6 +5,7 @@
 
 #include "split_candidates.h"
 
+#include "analysis/category_cost.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
 #include "grammar/inflection.h"
@@ -121,7 +122,7 @@ void addMixedScriptCandidates(
       }
 
       float final_cost = base_cost + length_adjustment;
-      SUZUME_DEBUG_LOG("[SPLIT_MIX] \"" << surface << "\": digit+kanji"
+      SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_MIX] \"" << surface << "\": digit+kanji"
                         << kanji_len << " adj=" << length_adjustment << "\n");
       lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
                       static_cast<uint32_t>(candidate_end),
@@ -132,7 +133,7 @@ void addMixedScriptCandidates(
     size_t end_byte = charPosToBytePos(codepoints, max_end);
     std::string surface(text.substr(start_byte, end_byte - start_byte));
     float final_cost = base_cost + base_bonus;
-    SUZUME_DEBUG_LOG("[SPLIT_MIX] \"" << surface << "\": alpha+"
+    SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_MIX] \"" << surface << "\": alpha+"
                       << (second_type == CharType::Kanji ? "kanji" : "katakana")
                       << " bonus=" << base_bonus << "\n");
     lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
@@ -191,8 +192,9 @@ void addCompoundSplitCandidates(
         // Allow NOUN and ADJ (na-adjectives can function as nominal in compounds)
         // This prevents ADV/VERB from being incorrectly reregistered as NOUN
         first_in_dict = true;
-        first_cost = result.entry->cost + opts.dict_split_bonus;
-        first_is_formal_noun = result.entry->is_formal_noun;
+        // v0.8: cost from extended_pos
+        first_cost = getCategoryCost(result.entry->extended_pos) + opts.dict_split_bonus;
+        first_is_formal_noun = (result.entry->extended_pos == core::ExtendedPOS::NounFormal);
         break;
       }
     }
@@ -298,8 +300,9 @@ void addNounVerbSplitCandidates(
       if (result.entry != nullptr && result.length == noun_len &&
           result.entry->pos == core::PartOfSpeech::Noun) {
         noun_in_dict = true;
-        noun_cost = result.entry->cost;
-        is_formal_noun = result.entry->is_formal_noun;
+        // v0.8: cost from extended_pos
+        noun_cost = getCategoryCost(result.entry->extended_pos);
+        is_formal_noun = (result.entry->extended_pos == core::ExtendedPOS::NounFormal);
         break;
       }
     }
@@ -383,7 +386,7 @@ void addNounVerbSplitCandidates(
           final_noun_cost -= 0.2F;
         }
 
-        SUZUME_DEBUG_LOG("[SPLIT_NV] \"" << noun_surface << "\" + \"" << verb_part
+        SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] \"" << noun_surface << "\" + \"" << verb_part
                           << "\": noun_dict=" << noun_in_dict
                           << " verb_dict=" << base_in_dict
                           << " cost=" << final_noun_cost << "\n");

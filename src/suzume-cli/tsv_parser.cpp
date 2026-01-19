@@ -1,7 +1,6 @@
 #include "tsv_parser.h"
 
 #include <algorithm>
-#include <cstdlib>
 #include <fstream>
 #include <set>
 #include <sstream>
@@ -127,31 +126,14 @@ core::Expected<TsvEntry, core::Error> TsvParser::parseLine(
   }
   entry.pos = pos_result.value();
 
-  // Field 2: reading (optional)
+  // Field 2: conj_type (optional, default None)
+  // v0.8: simplified format - reading and cost removed
   if (fields.size() > 2 && !fields[2].empty()) {
-    entry.reading = std::string(fields[2]);
-  }
-
-  // Field 3: cost (optional, default 0.5)
-  if (fields.size() > 3 && !fields[3].empty()) {
-    auto cost_result = parseCost(fields[3], line_number);
-    if (!cost_result.hasValue()) {
-      return core::makeUnexpected(cost_result.error());
-    }
-    entry.cost = cost_result.value();
-  } else {
-    entry.cost = 0.5F;
-  }
-
-  // Field 4: conj_type (optional, default None)
-  if (fields.size() > 4 && !fields[4].empty()) {
-    auto conj_result = parseConjType(fields[4], line_number);
+    auto conj_result = parseConjType(fields[2], line_number);
     if (!conj_result.hasValue()) {
       return core::makeUnexpected(conj_result.error());
     }
     entry.conj_type = conj_result.value();
-  } else {
-    entry.conj_type = dictionary::ConjugationType::None;
   }
 
   return entry;
@@ -283,36 +265,6 @@ TsvParser::parseConjType(std::string_view str, size_t line) {
                       ": Invalid conjugation type: " + std::string(str)));
 }
 
-core::Expected<float, core::Error> TsvParser::parseCost(std::string_view str,
-                                                         size_t line) {
-  // Trim whitespace
-  size_t start = str.find_first_not_of(" \t");
-  size_t end = str.find_last_not_of(" \t");
-  if (start == std::string_view::npos) {
-    return 0.5F;
-  }
-  std::string cost_str(str.substr(start, end - start + 1));
-
-  char* endptr = nullptr;
-  float cost = std::strtof(cost_str.c_str(), &endptr);
-
-  if (endptr == cost_str.c_str() || *endptr != '\0') {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::ParseError,
-                    "Line " + std::to_string(line) +
-                        ": Invalid cost: " + cost_str));
-  }
-
-  if (cost < -10.0F || cost > 10.0F) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::ParseError,
-                    "Line " + std::to_string(line) +
-                        ": Cost out of range (-10 to 10): " + cost_str));
-  }
-
-  return cost;
-}
-
 size_t TsvParser::validate(const std::vector<TsvEntry>& entries,
                            std::vector<std::string>* issues) {
   std::set<std::pair<std::string, core::PartOfSpeech>> seen;
@@ -357,13 +309,12 @@ core::Expected<size_t, core::Error> writeTsvFile(
   }
 
   // Write header comment
-  file << "# suzume dictionary source file\n";
-  file << "# Format: surface<TAB>pos<TAB>reading<TAB>cost<TAB>conj_type\n";
+  file << "# suzume dictionary source file (v0.8 format)\n";
+  file << "# Format: surface<TAB>pos<TAB>conj_type\n";
   file << "\n";
 
   for (const auto& entry : entries) {
-    file << entry.surface << "\t" << core::posToString(entry.pos) << "\t"
-         << entry.reading << "\t" << entry.cost;
+    file << entry.surface << "\t" << core::posToString(entry.pos);
 
     if (entry.conj_type != dictionary::ConjugationType::None) {
       file << "\t";
@@ -425,9 +376,9 @@ dictionary::DictionaryEntry tsvToDictEntry(const TsvEntry& tsv_entry) {
   dictionary::DictionaryEntry entry;
   entry.surface = tsv_entry.surface;
   entry.pos = tsv_entry.pos;
-  entry.cost = tsv_entry.cost;
+  // v0.8: cost removed
   entry.lemma = tsv_entry.surface;  // Default lemma to surface
-  entry.conj_type = tsv_entry.conj_type;
+  // v0.8: conj_type removed
   return entry;
 }
 

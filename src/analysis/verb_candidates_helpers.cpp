@@ -6,8 +6,10 @@
 #include "verb_candidates_helpers.h"
 
 #include <algorithm>
+#include <unordered_map>
 
 #include "analysis/scorer_constants.h"
+#include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
@@ -46,9 +48,13 @@ bool hasDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
   for (const auto& result : results) {
     if (result.entry != nullptr && result.entry->surface == surface &&
         result.entry->pos == pos) {
+      SUZUME_DEBUG_LOG_TRACE("[DICT] \"" << surface << "\" ("
+                             << core::posToString(pos) << ") = true\n");
       return true;
     }
   }
+  SUZUME_DEBUG_LOG_TRACE("[DICT] \"" << surface << "\" ("
+                          << core::posToString(pos) << ") = false\n");
   return false;
 }
 
@@ -58,12 +64,12 @@ bool isVerbInDictionaryWithType(const dictionary::DictionaryManager* dict_manage
   if (dict_manager == nullptr || base_form.empty()) {
     return false;
   }
-  auto expected_conj = grammar::verbTypeToConjType(verb_type);
+  // v0.8: conj_type removed - just check if verb exists with matching surface
+  (void)verb_type;  // No longer used for exact match
   auto results = dict_manager->lookup(base_form, 0);
   for (const auto& result : results) {
     if (result.entry != nullptr && result.entry->surface == base_form &&
-        result.entry->pos == core::PartOfSpeech::Verb &&
-        result.entry->conj_type == expected_conj) {
+        result.entry->pos == core::PartOfSpeech::Verb) {
       return true;
     }
   }
@@ -287,15 +293,34 @@ bool isCompoundAdjectivePattern(std::string_view surface) {
 }
 
 bool isGodanVerbType(grammar::VerbType verb_type) {
-  return verb_type == grammar::VerbType::GodanKa ||
-         verb_type == grammar::VerbType::GodanGa ||
-         verb_type == grammar::VerbType::GodanSa ||
-         verb_type == grammar::VerbType::GodanTa ||
-         verb_type == grammar::VerbType::GodanNa ||
-         verb_type == grammar::VerbType::GodanMa ||
-         verb_type == grammar::VerbType::GodanBa ||
-         verb_type == grammar::VerbType::GodanRa ||
-         verb_type == grammar::VerbType::GodanWa;
+  // Use centralized GodanRow lookup instead of manual enumeration
+  return grammar::Conjugation::getGodanRow(verb_type) != nullptr;
+}
+
+std::vector<std::pair<grammar::VerbType, std::string_view>>
+getGodanTypesByOnbin(std::string_view onbin) {
+  // Build lookup table on first access (thread-safe in C++11+)
+  // Maps onbin pattern → vector of (VerbType, base_suffix) pairs
+  static const auto kOnbinLookup = []() {
+    std::unordered_map<std::string, std::vector<std::pair<grammar::VerbType, std::string>>> lookup;
+    for (const auto& [type, row] : grammar::Conjugation::getGodanRows()) {
+      std::string base_suffix = normalize::encodeUtf8(row.base_vowel);
+      lookup[row.onbin].push_back({type, std::move(base_suffix)});
+    }
+    return lookup;
+  }();
+
+  // Return cached results (converted to string_view for efficiency)
+  auto it = kOnbinLookup.find(std::string(onbin));
+  if (it == kOnbinLookup.end()) {
+    return {};
+  }
+
+  std::vector<std::pair<grammar::VerbType, std::string_view>> result;
+  for (const auto& [type, suffix] : it->second) {
+    result.emplace_back(type, suffix);
+  }
+  return result;
 }
 
 bool shouldSkipPassiveAuxPattern(std::string_view surface, grammar::VerbType verb_type) {

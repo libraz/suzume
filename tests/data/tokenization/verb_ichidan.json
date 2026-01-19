@@ -1,849 +1,1037 @@
 {
-  "version": "1.0",
-  "description": "Ichidan verbs (一段動詞)",
-  "cases": [
+  "cases" : [
     {
-      "id": "ichidan_taberu",
-      "description": "食べる - ichidan verb",
-      "input": "食べる",
-      "expected": [
+      "description" : "食べる - ichidan verb",
+      "expected" : [
         {
-          "surface": "食べる",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べる"
         }
       ],
-      "tags": [
+      "id" : "ichidan_taberu",
+      "input" : "食べる",
+      "tags" : [
         "basic",
         "ichidan"
       ]
     },
     {
-      "id": "ichidan_mieru",
-      "description": "見える - ichidan verb",
-      "input": "見える",
-      "expected": [
+      "description" : "見える - ichidan verb",
+      "expected" : [
         {
-          "surface": "見える",
-          "pos": "Verb",
-          "lemma": "見える"
+          "lemma" : "見える",
+          "pos" : "Verb",
+          "surface" : "見える"
         }
       ],
-      "tags": [
+      "id" : "ichidan_mieru",
+      "input" : "見える",
+      "tags" : [
         "basic",
         "ichidan"
       ]
     },
     {
-      "id": "ichidan_tsutaeru",
-      "description": "伝える - ichidan verb",
-      "input": "伝える",
-      "expected": [
+      "description" : "伝える - ichidan verb",
+      "expected" : [
         {
-          "surface": "伝える",
-          "pos": "Verb",
-          "lemma": "伝える"
+          "lemma" : "伝える",
+          "pos" : "Verb",
+          "surface" : "伝える"
         }
       ],
-      "tags": [
+      "id" : "ichidan_tsutaeru",
+      "input" : "伝える",
+      "tags" : [
         "basic",
         "ichidan"
       ]
     },
     {
-      "id": "ichidan_oshieru",
-      "description": "教える - ichidan verb",
-      "input": "教える",
-      "expected": [
+      "description" : "教える - ichidan verb",
+      "expected" : [
         {
-          "surface": "教える",
-          "pos": "Verb",
-          "lemma": "教える"
+          "lemma" : "教える",
+          "pos" : "Verb",
+          "surface" : "教える"
         }
       ],
-      "tags": [
+      "id" : "ichidan_oshieru",
+      "input" : "教える",
+      "tags" : [
         "basic",
         "ichidan"
       ]
     },
     {
-      "id": "ichidan_tabete",
-      "description": "食べて - MeCab互換分割 (食べ+て)",
-      "input": "食べて",
-      "expected": [
+      "description" : "食べて - MeCab互換分割 (食べ+て)",
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "ichidan_tabete",
+      "input" : "食べて",
+      "tags" : [
         "basic",
         "ichidan"
       ]
     },
     {
-      "id": "ichidan_tabeta",
-      "description": "食べた - ichidan past (MeCab: 食べ + た split)",
-      "input": "食べた",
-      "expected": [
-        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
-        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
-      ],
-      "tags": ["basic", "ichidan"]
-    },
-    {
-      "id": "ichidan_tabenai",
-      "description": "食べない - MeCab splits 食べ + ない",
-      "input": "食べない",
-      "expected": [
+      "description" : "食べた - ichidan past (MeCab: 食べ + た split)",
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "ichidan_tabeta",
+      "input" : "食べた",
+      "tags" : [
         "basic",
         "ichidan"
       ]
     },
     {
-      "id": "ireru_lemma",
-      "description": "B23: 入れた - MeCab splits 入れ + た",
-      "input": "ツッコミを入れた",
-      "expected": [
-        {"surface": "ツッコミ", "pos": "Noun"},
-        {"surface": "を", "pos": "Particle"},
-        {"surface": "入れ", "pos": "Verb", "lemma": "入れる"},
-        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
-      ],
-      "tags": ["ichidan", "lemma"]
-    },
-    {
-      "id": "shinjiru_lemma",
-      "description": "B24: 信じた - MeCab splits 信じ + た",
-      "input": "信じた",
-      "expected": [
-        {"surface": "信じ", "pos": "Verb", "lemma": "信じる"},
-        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
-      ],
-      "tags": ["ichidan", "lemma"]
-    },
-    {
-      "id": "ronjiru_lemma",
-      "description": "B24: 論じた - MeCab splits 論じ + た",
-      "input": "論じた",
-      "expected": [
-        {"surface": "論じ", "pos": "Verb", "lemma": "論じる"},
-        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
-      ],
-      "tags": ["ichidan", "lemma"]
-    },
-    {
-      "id": "norokeru_verb",
-      "description": "B38: のろける should be VERB, not の+ろけ split (MeCab: のろけ+て+見せ+た)",
-      "input": "のろけて見せた",
-      "expected": [
+      "description" : "食べない - MeCab splits 食べ + ない",
+      "expected" : [
         {
-          "surface": "のろけ",
-          "pos": "Verb",
-          "lemma": "のろける"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
-        },
-        {
-          "surface": "見せ",
-          "pos": "Verb",
-          "lemma": "見せる"
-        },
-        {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "ichidan_tabenai",
+      "input" : "食べない",
+      "tags" : [
+        "basic",
+        "ichidan"
+      ]
+    },
+    {
+      "description" : "B23: 入れた - MeCab splits 入れ + た",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "ツッコミ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "を"
+        },
+        {
+          "lemma" : "入れる",
+          "pos" : "Verb",
+          "surface" : "入れ"
+        },
+        {
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
+      "id" : "ireru_lemma",
+      "input" : "ツッコミを入れた",
+      "tags" : [
+        "ichidan",
+        "lemma"
+      ]
+    },
+    {
+      "description" : "B24: 信じた - MeCab splits 信じ + た",
+      "expected" : [
+        {
+          "lemma" : "信じる",
+          "pos" : "Verb",
+          "surface" : "信じ"
+        },
+        {
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
+      "id" : "shinjiru_lemma",
+      "input" : "信じた",
+      "tags" : [
+        "ichidan",
+        "lemma"
+      ]
+    },
+    {
+      "description" : "B24: 論じた - MeCab splits 論じ + た",
+      "expected" : [
+        {
+          "lemma" : "論じる",
+          "pos" : "Verb",
+          "surface" : "論じ"
+        },
+        {
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
+      "id" : "ronjiru_lemma",
+      "input" : "論じた",
+      "tags" : [
+        "ichidan",
+        "lemma"
+      ]
+    },
+    {
+      "description" : "B38: のろける should be VERB, not の+ろけ split (MeCab: のろけ+て+見せ+た)",
+      "expected" : [
+        {
+          "lemma" : "のろける",
+          "pos" : "Verb",
+          "surface" : "のろけ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "見せる",
+          "pos" : "Verb",
+          "surface" : "見せ"
+        },
+        {
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
+      "id" : "norokeru_verb",
+      "input" : "のろけて見せた",
+      "tags" : [
         "verb",
         "ichidan"
       ]
     },
     {
-      "id": "toriageru_verb",
-      "description": "B46: とりあげない should be VERB, not と+りあげ split",
-      "input": "とりあげない",
-      "expected": [
+      "description" : "B46: とりあげない should be VERB, not と+りあげ split",
+      "expected" : [
         {
-          "surface": "とりあげない",
-          "pos": "Verb",
-          "lemma": "とりあげる"
+          "lemma" : "とりあげる",
+          "pos" : "Verb",
+          "surface" : "とりあげ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "toriageru_verb",
+      "input" : "とりあげない",
+      "tags" : [
         "verb",
         "ichidan"
       ]
     },
     {
-      "id": "akirameru_verb",
-      "description": "B60: あきらめられた - verb+auxiliary split (MeCab: あきらめ+られ+た)",
-      "input": "あきらめられた",
-      "expected": [
+      "description" : "B60: あきらめられた - verb+auxiliary split (MeCab: あきらめ+られ+た)",
+      "expected" : [
         {
-          "surface": "あきらめられ",
-          "pos": "Verb",
-          "lemma": "あきらめられる"
+          "lemma" : "あきらめる",
+          "pos" : "Verb",
+          "surface" : "あきらめ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "られる",
+          "pos" : "Verb",
+          "surface" : "られ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "akirameru_verb",
+      "input" : "あきらめられた",
+      "tags" : [
         "verb",
         "ichidan",
         "passive"
       ]
     },
     {
-      "id": "ichidan_mochiite",
-      "description": "用いて - MeCab互換分割 (用い+て)",
-      "input": "用いて",
-      "expected": [
+      "description" : "用いて - MeCab互換分割 (用い+て)",
+      "expected" : [
         {
-          "surface": "用い",
-          "pos": "Verb",
-          "lemma": "用いる"
+          "lemma" : "用いる",
+          "pos" : "Verb",
+          "surface" : "用い"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "ichidan_mochiite",
+      "input" : "用いて",
+      "tags" : [
         "ichidan",
         "te_form"
       ]
     },
     {
-      "id": "nagara_ichidan",
-      "description": "食べながら - nagara form ichidan",
-      "input": "食べながら",
-      "expected": [
+      "description" : "食べながら - nagara form ichidan",
+      "expected" : [
         {
-          "surface": "食べながら",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ながら"
         }
       ],
-      "tags": [
+      "id" : "nagara_ichidan",
+      "input" : "食べながら",
+      "tags" : [
         "nagara",
         "ichidan"
       ]
     },
     {
-      "id": "ichidan_oshiete_moratta",
-      "description": "教えてもらった - MeCab互換分割 (教え+て+もらっ+た)",
-      "input": "教えてもらった",
-      "expected": [
+      "description" : "教えてもらった - MeCab互換分割 (教え+て+もらっ+た)",
+      "expected" : [
         {
-          "surface": "教え",
-          "pos": "Verb",
-          "lemma": "教える"
+          "lemma" : "教える",
+          "pos" : "Verb",
+          "surface" : "教え"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "もらっ",
-          "pos": "Verb",
-          "lemma": "もらう"
+          "lemma" : "もらう",
+          "pos" : "Verb",
+          "surface" : "もらっ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "ichidan_oshiete_moratta",
+      "input" : "教えてもらった",
+      "tags" : [
         "ichidan",
         "benefactive"
       ]
     },
     {
-      "id": "ichidan_miru_negative",
-      "description": "見ない - single-kanji ichidan verb negative",
-      "input": "見ない",
-      "expected": [
+      "description" : "見ない - single-kanji ichidan verb negative",
+      "expected" : [
         {
-          "surface": "見ない",
-          "pos": "Verb",
-          "lemma": "見る"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "negative"
-      ]
-    },
-    {
-      "id": "ichidan_neru_negative",
-      "description": "寝ない - single-kanji ichidan verb negative",
-      "input": "寝ない",
-      "expected": [
-        {
-          "surface": "寝ない",
-          "pos": "Verb",
-          "lemma": "寝る"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "negative"
-      ]
-    },
-    {
-      "id": "ichidan_kiru_negative",
-      "description": "着ない - single-kanji ichidan verb negative",
-      "input": "着ない",
-      "expected": [
-        {
-          "surface": "着ない",
-          "pos": "Verb",
-          "lemma": "着る"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "negative"
-      ]
-    },
-    {
-      "id": "ichidan_eru_negative",
-      "description": "得ない - single-kanji ichidan verb negative",
-      "input": "得ない",
-      "expected": [
-        {
-          "surface": "得ない",
-          "pos": "Verb",
-          "lemma": "得る"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "negative"
-      ]
-    },
-    {
-      "id": "ichidan_deru_negative",
-      "description": "出ない - single-kanji ichidan verb negative",
-      "input": "出ない",
-      "expected": [
-        {
-          "surface": "出ない",
-          "pos": "Verb",
-          "lemma": "出る"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "negative"
-      ]
-    },
-    {
-      "id": "ichidan_shirenai",
-      "description": "しれない - MeCab splits しれ + ない",
-      "input": "しれない",
-      "expected": [
-        {"surface": "しれ", "pos": "Verb", "lemma": "しれる"},
-        {"surface": "ない", "pos": "Auxiliary", "lemma": "ない"}
-      ],
-      "tags": [
-        "ichidan",
-        "negative"
-      ]
-    },
-    {
-      "id": "imperative_tabero",
-      "description": "食べろ - ichidan verb imperative form",
-      "input": "食べろ",
-      "expected": [
-        {
-          "surface": "食べろ",
-          "pos": "Verb",
-          "lemma": "食べる"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "imperative"
-      ]
-    },
-    {
-      "id": "imperative_okiro",
-      "description": "起きろ - ichidan verb imperative form",
-      "input": "起きろ",
-      "expected": [
-        {
-          "surface": "起きろ",
-          "pos": "Verb",
-          "lemma": "起きる"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "imperative"
-      ]
-    },
-    {
-      "id": "imperative_ochiro",
-      "description": "落ちろ - ichidan verb imperative form",
-      "input": "落ちろ",
-      "expected": [
-        {
-          "surface": "落ちろ",
-          "pos": "Verb",
-          "lemma": "落ちる"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "imperative"
-      ]
-    },
-    {
-      "id": "imperative_ikiro",
-      "description": "生きろ - ichidan verb imperative form",
-      "input": "生きろ",
-      "expected": [
-        {
-          "surface": "生きろ",
-          "pos": "Verb",
-          "lemma": "生きる"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "imperative"
-      ]
-    },
-    {
-      "id": "imperative_miro",
-      "description": "見ろ - single-kanji ichidan verb imperative",
-      "input": "見ろ",
-      "expected": [
-        {
-          "surface": "見ろ",
-          "pos": "Verb",
-          "lemma": "見る"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "imperative"
-      ]
-    },
-    {
-      "id": "imperative_nero",
-      "description": "寝ろ - single-kanji ichidan verb imperative",
-      "input": "寝ろ",
-      "expected": [
-        {
-          "surface": "寝ろ",
-          "pos": "Verb",
-          "lemma": "寝る"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "imperative"
-      ]
-    },
-    {
-      "id": "ichidan_yudenai",
-      "description": "茹でない - ichidan verb ending in で negative",
-      "input": "茹でない",
-      "expected": [
-        {
-          "surface": "茹でない",
-          "pos": "Verb",
-          "lemma": "茹でる"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "negative"
-      ]
-    },
-    {
-      "id": "ichidan_nadenai",
-      "description": "撫でない - ichidan verb ending in で negative",
-      "input": "撫でない",
-      "expected": [
-        {
-          "surface": "撫でない",
-          "pos": "Verb",
-          "lemma": "撫でる"
-        }
-      ],
-      "tags": [
-        "ichidan",
-        "negative"
-      ]
-    },
-    {
-      "id": "hiragana_nete",
-      "description": "ねて - MeCab互換分割 (ね+て)",
-      "input": "ねて",
-      "expected": [
-        {
-          "surface": "ね",
-          "pos": "Verb",
-          "lemma": "ねる"
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "ichidan_miru_negative",
+      "input" : "見ない",
+      "tags" : [
+        "ichidan",
+        "negative"
+      ]
+    },
+    {
+      "description" : "寝ない - single-kanji ichidan verb negative",
+      "expected" : [
+        {
+          "lemma" : "寝る",
+          "pos" : "Verb",
+          "surface" : "寝"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "ichidan_neru_negative",
+      "input" : "寝ない",
+      "tags" : [
+        "ichidan",
+        "negative"
+      ]
+    },
+    {
+      "description" : "着ない - single-kanji ichidan verb negative",
+      "expected" : [
+        {
+          "lemma" : "着る",
+          "pos" : "Verb",
+          "surface" : "着"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "ichidan_kiru_negative",
+      "input" : "着ない",
+      "tags" : [
+        "ichidan",
+        "negative"
+      ]
+    },
+    {
+      "description" : "得ない - single-kanji ichidan verb negative",
+      "expected" : [
+        {
+          "lemma" : "得る",
+          "pos" : "Verb",
+          "surface" : "得"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "ichidan_eru_negative",
+      "input" : "得ない",
+      "tags" : [
+        "ichidan",
+        "negative"
+      ]
+    },
+    {
+      "description" : "出ない - single-kanji ichidan verb negative",
+      "expected" : [
+        {
+          "lemma" : "出る",
+          "pos" : "Verb",
+          "surface" : "出"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "ichidan_deru_negative",
+      "input" : "出ない",
+      "tags" : [
+        "ichidan",
+        "negative"
+      ]
+    },
+    {
+      "description" : "しれない - MeCab splits しれ + ない",
+      "expected" : [
+        {
+          "lemma" : "しれる",
+          "pos" : "Verb",
+          "surface" : "しれ"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "ichidan_shirenai",
+      "input" : "しれない",
+      "tags" : [
+        "ichidan",
+        "negative"
+      ]
+    },
+    {
+      "description" : "食べろ - ichidan verb imperative form",
+      "expected" : [
+        {
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べろ"
+        }
+      ],
+      "id" : "imperative_tabero",
+      "input" : "食べろ",
+      "tags" : [
+        "ichidan",
+        "imperative"
+      ]
+    },
+    {
+      "description" : "起きろ - ichidan verb imperative form",
+      "expected" : [
+        {
+          "lemma" : "起きる",
+          "pos" : "Verb",
+          "surface" : "起きろ"
+        }
+      ],
+      "id" : "imperative_okiro",
+      "input" : "起きろ",
+      "tags" : [
+        "ichidan",
+        "imperative"
+      ]
+    },
+    {
+      "description" : "落ちろ - ichidan verb imperative form",
+      "expected" : [
+        {
+          "lemma" : "落ちる",
+          "pos" : "Verb",
+          "surface" : "落ちろ"
+        }
+      ],
+      "id" : "imperative_ochiro",
+      "input" : "落ちろ",
+      "tags" : [
+        "ichidan",
+        "imperative"
+      ]
+    },
+    {
+      "description" : "生きろ - ichidan verb imperative form",
+      "expected" : [
+        {
+          "lemma" : "生きる",
+          "pos" : "Verb",
+          "surface" : "生きろ"
+        }
+      ],
+      "id" : "imperative_ikiro",
+      "input" : "生きろ",
+      "tags" : [
+        "ichidan",
+        "imperative"
+      ]
+    },
+    {
+      "description" : "見ろ - single-kanji ichidan verb imperative",
+      "expected" : [
+        {
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見ろ"
+        }
+      ],
+      "id" : "imperative_miro",
+      "input" : "見ろ",
+      "tags" : [
+        "ichidan",
+        "imperative"
+      ]
+    },
+    {
+      "description" : "寝ろ - single-kanji ichidan verb imperative",
+      "expected" : [
+        {
+          "lemma" : "寝る",
+          "pos" : "Verb",
+          "surface" : "寝ろ"
+        }
+      ],
+      "id" : "imperative_nero",
+      "input" : "寝ろ",
+      "tags" : [
+        "ichidan",
+        "imperative"
+      ]
+    },
+    {
+      "description" : "茹でない - ichidan verb ending in で negative",
+      "expected" : [
+        {
+          "lemma" : "茹でる",
+          "pos" : "Verb",
+          "surface" : "茹で"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "ichidan_yudenai",
+      "input" : "茹でない",
+      "tags" : [
+        "ichidan",
+        "negative"
+      ]
+    },
+    {
+      "description" : "撫でない - ichidan verb ending in で negative",
+      "expected" : [
+        {
+          "lemma" : "撫でる",
+          "pos" : "Verb",
+          "surface" : "撫で"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "ichidan_nadenai",
+      "input" : "撫でない",
+      "tags" : [
+        "ichidan",
+        "negative"
+      ]
+    },
+    {
+      "description" : "ねて - MeCab互換分割 (ね+て)",
+      "expected" : [
+        {
+          "lemma" : "ねる",
+          "pos" : "Verb",
+          "surface" : "ね"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
+      "id" : "hiragana_nete",
+      "input" : "ねて",
+      "tags" : [
         "ichidan",
         "te_form",
         "hiragana"
       ]
     },
     {
-      "id": "hiragana_dete",
-      "description": "でて - MeCab互換分割 (で+て)",
-      "input": "でて",
-      "expected": [
+      "description" : "でて - MeCab互換分割 (で+て)",
+      "expected" : [
         {
-          "surface": "で",
-          "pos": "Verb",
-          "lemma": "でる"
+          "lemma" : "でる",
+          "pos" : "Verb",
+          "surface" : "で"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "hiragana_dete",
+      "input" : "でて",
+      "tags" : [
         "ichidan",
         "te_form",
         "hiragana"
       ]
     },
     {
-      "id": "ichidan_taberu_tai",
-      "description": "Ichidan verb 食べる desiderative form (split: verb + aux)",
-      "input": "食べたい",
-      "expected": [
+      "description" : "Ichidan verb 食べる desiderative form (split: verb + aux)",
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "たい",
-          "pos": "Auxiliary",
-          "lemma": "たい"
+          "lemma" : "たい",
+          "pos" : "Auxiliary",
+          "surface" : "たい"
         }
       ],
-      "tags": [
+      "id" : "ichidan_taberu_tai",
+      "input" : "食べたい",
+      "tags" : [
         "verb",
         "ichidan"
       ]
     },
     {
-      "id": "ichidan_taberu_nakereba",
-      "description": "Ichidan verb 食べる conditional negative",
-      "input": "食べなければ",
-      "expected": [
+      "description" : "Ichidan verb 食べる conditional negative",
+      "expected" : [
         {
-          "surface": "食べなければ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
         }
       ],
-      "tags": [
+      "id" : "ichidan_taberu_nakereba",
+      "input" : "食べなければ",
+      "tags" : [
         "verb",
         "ichidan"
       ]
     },
     {
-      "id": "s2_obiru_lemma",
-      "description": "S2: 帯び should have lemma 帯びる (MeCab: 帯びた → 帯び+た)",
-      "input": "熱を帯びた",
-      "expected": [
+      "description" : "S2: 帯び should have lemma 帯びる (MeCab: 帯びた → 帯び+た)",
+      "expected" : [
         {
-          "surface": "熱",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "熱"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "帯び",
-          "pos": "Verb",
-          "lemma": "帯びる"
+          "lemma" : "帯びる",
+          "pos" : "Verb",
+          "surface" : "帯び"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "s2_obiru_lemma",
+      "input" : "熱を帯びた",
+      "tags" : [
         "s2_fix",
         "lemma",
         "regression"
       ]
     },
     {
-      "id": "s2_bareru_lemma",
-      "description": "S2: バレた should have lemma バレる, not バレする (Katakana ichidan)",
-      "input": "バレた",
-      "expected": [
+      "description" : "S2: バレた should have lemma バレる, not バレする (Katakana ichidan)",
+      "expected" : [
         {
-          "surface": "バレた",
-          "pos": "Verb",
-          "lemma": "バレる"
+          "lemma" : "バレる",
+          "pos" : "Verb",
+          "surface" : "バレ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "s2_bareru_lemma",
+      "input" : "バレた",
+      "tags" : [
         "s2_fix",
         "lemma",
         "regression"
       ]
     },
     {
-      "id": "s4_tabaneru",
-      "description": "S4: たばねる should be VERB (not た+ば+ねる)",
-      "input": "たばねる",
-      "expected": [
+      "description" : "S4: たばねる should be VERB (not た+ば+ねる)",
+      "expected" : [
         {
-          "surface": "たばねる",
-          "pos": "Verb",
-          "lemma": "たばねる"
+          "lemma" : "たばねる",
+          "pos" : "Verb",
+          "surface" : "たばねる"
         }
       ],
-      "tags": ["s4_fix", "hiragana_verb", "regression"]
+      "id" : "s4_tabaneru",
+      "input" : "たばねる",
+      "tags" : [
+        "s4_fix",
+        "hiragana_verb",
+        "regression"
+      ]
     },
     {
-      "id": "hiragana_taberu_dict",
-      "description": "たべる hiragana ichidan dictionary form (not た+べる split)",
-      "input": "たべる",
-      "expected": [
+      "description" : "たべる hiragana ichidan dictionary form (not た+べる split)",
+      "expected" : [
         {
-          "surface": "たべる",
-          "pos": "Verb",
-          "lemma": "たべる"
+          "lemma" : "たべる",
+          "pos" : "Verb",
+          "surface" : "たべる"
         }
       ],
-      "tags": ["hiragana_verb", "ichidan"]
+      "id" : "hiragana_taberu_dict",
+      "input" : "たべる",
+      "tags" : [
+        "hiragana_verb",
+        "ichidan"
+      ]
     },
     {
-      "id": "hiragana_shiraberu_dict",
-      "description": "しらべる hiragana ichidan dictionary form",
-      "input": "しらべる",
-      "expected": [
+      "description" : "しらべる hiragana ichidan dictionary form",
+      "expected" : [
         {
-          "surface": "しらべる",
-          "pos": "Verb",
-          "lemma": "しらべる"
+          "lemma" : "しらべる",
+          "pos" : "Verb",
+          "surface" : "しらべる"
         }
       ],
-      "tags": ["hiragana_verb", "ichidan"]
+      "id" : "hiragana_shiraberu_dict",
+      "input" : "しらべる",
+      "tags" : [
+        "hiragana_verb",
+        "ichidan"
+      ]
     },
     {
-      "id": "hiragana_tsukareru_dict",
-      "description": "つかれる hiragana ichidan dictionary form",
-      "input": "つかれる",
-      "expected": [
+      "description" : "つかれる hiragana ichidan dictionary form",
+      "expected" : [
         {
-          "surface": "つかれる",
-          "pos": "Verb",
-          "lemma": "つかれる"
-        }
-      ],
-      "tags": ["hiragana_verb", "ichidan"]
-    },
-    {
-      "id": "hiragana_taoreru_dict",
-      "description": "たおれる hiragana ichidan dictionary form",
-      "input": "たおれる",
-      "expected": [
-        {
-          "surface": "たおれる",
-          "pos": "Verb",
-          "lemma": "たおれる"
-        }
-      ],
-      "tags": ["hiragana_verb", "ichidan"]
-    },
-    {
-      "id": "hiragana_shiteru_contraction",
-      "description": "してる - MeCab splits as し+てる",
-      "input": "してる",
-      "expected": [
-        {
-          "surface": "し",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "つく",
+          "pos" : "Verb",
+          "surface" : "つか"
         },
         {
-          "surface": "てる",
-          "pos": "Verb",
-          "lemma": "てる"
+          "pos" : "Verb",
+          "surface" : "れる"
         }
       ],
-      "tags": ["hiragana_verb", "contraction"]
+      "id" : "hiragana_tsukareru_dict",
+      "input" : "つかれる",
+      "tags" : [
+        "hiragana_verb",
+        "ichidan"
+      ]
     },
     {
-      "id": "passive_desiderative_miraretai",
-      "description": "S1: 見られたい (want to be seen) - MeCab互換分割",
-      "input": "見られたい",
-      "expected": [
+      "description" : "たおれる hiragana ichidan dictionary form",
+      "expected" : [
         {
-          "surface": "見",
-          "pos": "Verb",
-          "lemma": "見る"
-        },
-        {
-          "surface": "られ",
-          "pos": "Auxiliary",
-          "lemma": "られる"
-        },
-        {
-          "surface": "たい",
-          "pos": "Auxiliary",
-          "lemma": "たい"
+          "lemma" : "たおれる",
+          "pos" : "Verb",
+          "surface" : "たおれる"
         }
       ],
-      "tags": ["passive", "desiderative", "ichidan"]
+      "id" : "hiragana_taoreru_dict",
+      "input" : "たおれる",
+      "tags" : [
+        "hiragana_verb",
+        "ichidan"
+      ]
     },
     {
-      "id": "passive_desiderative_taberaretai",
-      "description": "S1: 食べられたい (want to be eaten/able to eat) passive+desiderative - MeCab互換分割",
-      "input": "食べられたい",
-      "expected": [
+      "description" : "してる - MeCab splits as し+てる",
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
         },
         {
-          "surface": "られ",
-          "pos": "Auxiliary",
-          "lemma": "られる"
-        },
-        {
-          "surface": "たい",
-          "pos": "Auxiliary",
-          "lemma": "たい"
+          "lemma" : "てる",
+          "pos" : "Verb",
+          "surface" : "てる"
         }
       ],
-      "tags": ["particle_fix", "passive", "desiderative", "regression"]
+      "id" : "hiragana_shiteru_contraction",
+      "input" : "してる",
+      "tags" : [
+        "hiragana_verb",
+        "contraction"
+      ]
     },
     {
-      "id": "passive_desiderative_aisaretai",
-      "description": "S1: 愛されたい (want to be loved) passive+desiderative - MeCab splits 愛さ+れ+たい",
-      "input": "愛されたい",
-      "expected": [
+      "description" : "S1: 見られたい (want to be seen) - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "愛さ",
-          "pos": "Verb",
-          "lemma": "愛す"
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
         },
         {
-          "surface": "れ",
-          "pos": "Auxiliary",
-          "lemma": "れる"
+          "lemma" : "られる",
+          "pos" : "Auxiliary",
+          "surface" : "られ"
         },
         {
-          "surface": "たい",
-          "pos": "Auxiliary",
-          "lemma": "たい"
+          "lemma" : "たい",
+          "pos" : "Auxiliary",
+          "surface" : "たい"
         }
       ],
-      "tags": ["particle_fix", "passive", "desiderative", "regression"]
+      "id" : "passive_desiderative_miraretai",
+      "input" : "見られたい",
+      "tags" : [
+        "passive",
+        "desiderative",
+        "ichidan"
+      ]
     },
     {
-      "id": "single_kanji_ichidan_neru_masu",
-      "description": "寝ます - single-kanji ichidan 寝る with polite auxiliary",
-      "input": "寝ます",
-      "expected": [
+      "description" : "S1: 食べられたい (want to be eaten/able to eat) passive+desiderative - MeCab互換分割",
+      "expected" : [
         {
-          "surface": "寝",
-          "pos": "Verb",
-          "lemma": "寝る"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "ます",
-          "pos": "Auxiliary",
-          "lemma": "ます"
-        }
-      ],
-      "tags": ["ichidan", "polite", "single_kanji"]
-    },
-    {
-      "id": "single_kanji_ichidan_miru_masu",
-      "description": "見ます - single-kanji ichidan 見る with polite auxiliary",
-      "input": "見ます",
-      "expected": [
-        {
-          "surface": "見",
-          "pos": "Verb",
-          "lemma": "見る"
+          "lemma" : "られる",
+          "pos" : "Verb",
+          "surface" : "られ"
         },
         {
-          "surface": "ます",
-          "pos": "Auxiliary",
-          "lemma": "ます"
+          "pos" : "Auxiliary",
+          "surface" : "たい"
         }
       ],
-      "tags": ["ichidan", "polite", "single_kanji"]
+      "id" : "passive_desiderative_taberaretai",
+      "input" : "食べられたい",
+      "tags" : [
+        "particle_fix",
+        "passive",
+        "desiderative",
+        "regression"
+      ]
     },
     {
-      "id": "single_kanji_ichidan_deru_masu",
-      "description": "出ます - single-kanji ichidan 出る with polite auxiliary",
-      "input": "出ます",
-      "expected": [
+      "description" : "S1: 愛されたい (want to be loved) passive+desiderative - MeCab splits 愛さ+れ+たい",
+      "expected" : [
         {
-          "surface": "出",
-          "pos": "Verb",
-          "lemma": "出る"
+          "lemma" : "愛す",
+          "pos" : "Verb",
+          "surface" : "愛さ"
         },
         {
-          "surface": "ます",
-          "pos": "Auxiliary",
-          "lemma": "ます"
+          "lemma" : "れる",
+          "pos" : "Auxiliary",
+          "surface" : "れ"
+        },
+        {
+          "lemma" : "たい",
+          "pos" : "Auxiliary",
+          "surface" : "たい"
         }
       ],
-      "tags": ["ichidan", "polite", "single_kanji"]
+      "id" : "passive_desiderative_aisaretai",
+      "input" : "愛されたい",
+      "tags" : [
+        "particle_fix",
+        "passive",
+        "desiderative",
+        "regression"
+      ]
     },
     {
-      "id": "irareru_potential",
-      "description": "いられる - potential/passive of いる (W-014)",
-      "input": "いられる",
-      "expected": [
-        {"surface": "いられる", "pos": "Verb", "lemma": "いる"}
+      "description" : "寝ます - single-kanji ichidan 寝る with polite auxiliary",
+      "expected" : [
+        {
+          "lemma" : "寝る",
+          "pos" : "Verb",
+          "surface" : "寝"
+        },
+        {
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "ます"
+        }
       ],
-      "tags": ["ichidan", "potential", "wagahai", "W-014"]
+      "id" : "single_kanji_ichidan_neru_masu",
+      "input" : "寝ます",
+      "tags" : [
+        "ichidan",
+        "polite",
+        "single_kanji"
+      ]
+    },
+    {
+      "description" : "見ます - single-kanji ichidan 見る with polite auxiliary",
+      "expected" : [
+        {
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
+        },
+        {
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "ます"
+        }
+      ],
+      "id" : "single_kanji_ichidan_miru_masu",
+      "input" : "見ます",
+      "tags" : [
+        "ichidan",
+        "polite",
+        "single_kanji"
+      ]
+    },
+    {
+      "description" : "出ます - single-kanji ichidan 出る with polite auxiliary",
+      "expected" : [
+        {
+          "lemma" : "出る",
+          "pos" : "Verb",
+          "surface" : "出"
+        },
+        {
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "ます"
+        }
+      ],
+      "id" : "single_kanji_ichidan_deru_masu",
+      "input" : "出ます",
+      "tags" : [
+        "ichidan",
+        "polite",
+        "single_kanji"
+      ]
+    },
+    {
+      "description" : "いられる - potential/passive of いる (W-014)",
+      "expected" : [
+        {
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "られる"
+        }
+      ],
+      "id" : "irareru_potential",
+      "input" : "いられる",
+      "tags" : [
+        "ichidan",
+        "potential",
+        "wagahai",
+        "W-014"
+      ]
+    },
+    {
+      "description" : "降りて - regression test",
+      "expected" : [
+        {
+          "lemma" : "降りる",
+          "pos" : "Verb",
+          "surface" : "降り"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
+      "id" : "k964drite",
+      "input" : "降りて"
     }
-  ]
+  ],
+  "description" : "Ichidan verbs (一段動詞)",
+  "version" : "1.0"
 }

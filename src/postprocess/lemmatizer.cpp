@@ -398,12 +398,11 @@ bool Lemmatizer::verifyCandidateWithDictionary(
     // Found a verb/adjective with matching surface
     found_verb_or_adj = true;
 
-    // Verify conjugation type matches
-    auto dict_verb_type = grammar::conjTypeToVerbType(result.entry->conj_type);
-    if (dict_verb_type == candidate.verb_type) {
-      type_matches = true;
-      break;  // Exact match found
-    }
+    // v0.8: conj_type removed from DictionaryEntry
+    // Type verification is no longer possible, but dictionary presence
+    // validates the base_form
+    type_matches = true;
+    break;
   }
 
   // Accept if base_form exists as verb/adjective in dictionary

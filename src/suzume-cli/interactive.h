@@ -30,8 +30,6 @@ enum class DictLayer {
 struct LayeredEntry {
   std::string surface;
   core::PartOfSpeech pos;
-  float cost;
-  std::string reading;
   DictLayer layer;
 };
 

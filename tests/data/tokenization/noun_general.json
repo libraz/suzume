@@ -1,225 +1,245 @@
 {
-  "version": "1.0",
-  "description": "General nouns",
-  "cases": [
+  "cases" : [
     {
-      "id": "analyze_simple_kanji",
-      "description": "Simple kanji word 世界",
-      "input": "世界",
-      "expected": [
+      "description" : "Simple kanji word 世界",
+      "expected" : [
         {
-          "surface": "世界",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "世界"
         }
       ],
-      "tags": [
+      "id" : "analyze_simple_kanji",
+      "input" : "世界",
+      "tags" : [
         "basic"
       ]
     },
     {
-      "id": "edge_very_long_word",
-      "description": "独立行政法人情報処理推進機構 - very long compound preserved as single token",
-      "input": "独立行政法人情報処理推進機構",
-      "expected": [
+      "description" : "独立行政法人情報処理推進機構 - very long compound preserved as single token",
+      "expected" : [
         {
-          "surface": "独立行政法人情報処理推進機構",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "独立行政法人情報処理推進機構"
         }
       ],
-      "tags": [
+      "id" : "edge_very_long_word",
+      "input" : "独立行政法人情報処理推進機構",
+      "tags" : [
         "edge-case",
         "long-compound"
       ]
     },
     {
-      "id": "edge_single_kanji",
-      "description": "空 - single kanji",
-      "input": "空",
-      "expected": [
+      "description" : "空 - single kanji",
+      "expected" : [
         {
-          "surface": "空",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "空"
         }
       ],
-      "tags": [
+      "id" : "edge_single_kanji",
+      "input" : "空",
+      "tags" : [
         "basic",
         "edge-case"
       ]
     },
     {
-      "id": "special_long_vowel",
-      "description": "コーヒー - long vowel mark",
-      "input": "コーヒー",
-      "expected": [
+      "description" : "コーヒー - long vowel mark",
+      "expected" : [
         {
-          "surface": "コーヒー",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "コーヒー"
         }
       ],
-      "tags": [
+      "id" : "special_long_vowel",
+      "input" : "コーヒー",
+      "tags" : [
         "basic",
         "special-char"
       ]
     },
     {
-      "id": "conjunction_demo",
-      "description": "でも大丈夫 (but it's okay)",
-      "input": "でも大丈夫",
-      "expected": [
+      "description" : "でも大丈夫 (but it's okay)",
+      "expected" : [
         {
-          "surface": "でも",
-          "pos": "Conjunction"
+          "pos" : "Conjunction",
+          "surface" : "でも"
         },
         {
-          "surface": "大丈夫",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "大丈夫"
         }
       ],
-      "tags": [
+      "id" : "conjunction_demo",
+      "input" : "でも大丈夫",
+      "tags" : [
         "grammar",
         "conjunction"
       ]
     },
     {
-      "id": "time_noun_kinou",
-      "description": "昨日 (yesterday)",
-      "input": "昨日",
-      "expected": [
+      "description" : "昨日 (yesterday)",
+      "expected" : [
         {
-          "surface": "昨日",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "昨日"
         }
       ],
-      "tags": [
+      "id" : "time_noun_kinou",
+      "input" : "昨日",
+      "tags" : [
         "grammar",
         "time-noun"
       ]
     },
     {
-      "id": "loanword_katakana",
-      "description": "コンピューター (computer)",
-      "input": "コンピューター",
-      "expected": [
+      "description" : "コンピューター (computer)",
+      "expected" : [
         {
-          "surface": "コンピューター",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "コンピューター"
         }
       ],
-      "tags": [
+      "id" : "loanword_katakana",
+      "input" : "コンピューター",
+      "tags" : [
         "grammar",
         "loanword"
       ]
     },
     {
-      "id": "loanword_mixed",
-      "description": "インターネット接続 (internet connection)",
-      "input": "インターネット接続",
-      "expected": [
+      "description" : "インターネット接続 (internet connection)",
+      "expected" : [
         {
-          "surface": "インターネット",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "インターネット"
         },
         {
-          "surface": "接続",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "接続"
         }
       ],
-      "tags": [
+      "id" : "loanword_mixed",
+      "input" : "インターネット接続",
+      "tags" : [
         "grammar",
         "loanword"
       ]
     },
     {
-      "id": "abbreviation_koukou",
-      "description": "高校生 (high school student)",
-      "input": "高校生",
-      "expected": [
+      "description" : "高校生 (high school student)",
+      "expected" : [
         {
-          "surface": "高校生",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "高校生"
         }
       ],
-      "tags": [
+      "id" : "abbreviation_koukou",
+      "input" : "高校生",
+      "tags" : [
         "grammar",
         "abbreviation"
       ]
     },
     {
-      "id": "symbol_parentheses",
-      "description": "東京（とうきょう） - reading kept as single token, symbols filtered",
-      "input": "東京（とうきょう）",
-      "expected": [
+      "description" : "東京（とうきょう） - reading kept as single token, symbols filtered",
+      "expected" : [
         {
-          "surface": "東京",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "東京"
         },
         {
-          "surface": "とうきょう",
-          "pos": "Other"
+          "pos" : "Symbol",
+          "surface" : "（"
+        },
+        {
+          "pos" : "Adverb",
+          "surface" : "とう"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "きょう"
+        },
+        {
+          "pos" : "Symbol",
+          "surface" : "）"
         }
       ],
-      "tags": [
+      "id" : "symbol_parentheses",
+      "input" : "東京（とうきょう）",
+      "tags" : [
         "grammar",
         "symbol"
       ]
     },
     {
-      "id": "numeric_japanese",
-      "description": "百二十三 (123 in Japanese)",
-      "input": "百二十三",
-      "expected": [
+      "description" : "百二十三 (123 in Japanese)",
+      "expected" : [
         {
-          "surface": "百二十三",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "百二十三"
         }
       ],
-      "tags": [
+      "id" : "numeric_japanese",
+      "input" : "百二十三",
+      "tags" : [
         "grammar",
         "numeric"
       ]
     },
     {
-      "id": "numeric_mixed",
-      "description": "3時間 - number + counter as single token",
-      "input": "3時間",
-      "expected": [
+      "description" : "3時間 - number + counter as single token",
+      "expected" : [
         {
-          "surface": "3時間",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "3時間"
         }
       ],
-      "tags": [
+      "id" : "numeric_mixed",
+      "input" : "3時間",
+      "tags" : [
         "grammar",
         "numeric"
       ]
     },
     {
-      "id": "numeric_unit_kilo",
-      "description": "3キロ (3 kilograms)",
-      "input": "3キロ",
-      "expected": [
+      "description" : "3キロ (3 kilograms)",
+      "expected" : [
         {
-          "surface": "3キロ",
-          "pos": "Noun"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "3"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "キロ"
         }
       ],
-      "tags": [
+      "id" : "numeric_unit_kilo",
+      "input" : "3キロ",
+      "tags" : [
         "grammar",
         "numeric",
         "unit"
       ]
     },
     {
-      "id": "numeric_unit_game_gold",
-      "description": "100ゴールド (game currency)",
-      "input": "100ゴールド",
-      "expected": [
+      "description" : "100ゴールド (game currency)",
+      "expected" : [
         {
-          "surface": "100ゴールド",
-          "pos": "Noun"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "100"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "ゴールド"
         }
       ],
-      "tags": [
+      "id" : "numeric_unit_game_gold",
+      "input" : "100ゴールド",
+      "tags" : [
         "grammar",
         "numeric",
         "unit",
@@ -227,713 +247,764 @@
       ]
     },
     {
-      "id": "numeric_unit_game_adena",
-      "description": "50アデナ (game currency)",
-      "input": "50アデナ",
-      "expected": [
+      "description" : "50アデナ (game currency)",
+      "expected" : [
         {
-          "surface": "50アデナ",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit",
-        "game"
-      ]
-    },
-    {
-      "id": "numeric_unit_game_kero",
-      "description": "1000ケロ (game currency)",
-      "input": "1000ケロ",
-      "expected": [
-        {
-          "surface": "1000ケロ",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit",
-        "game"
-      ]
-    },
-    {
-      "id": "numeric_ordinal",
-      "description": "第一回 (first time) - 第一 is adverb, 回 is counter suffix",
-      "input": "第一回",
-      "expected": [
-        {
-          "surface": "第一",
-          "pos": "Adverb"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "50"
         },
         {
-          "surface": "回",
-          "pos": "Suffix"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "アデナ"
         }
       ],
-      "tags": [
+      "id" : "numeric_unit_game_adena",
+      "input" : "50アデナ",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit",
+        "game"
+      ]
+    },
+    {
+      "description" : "1000ケロ (game currency)",
+      "expected" : [
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "1000"
+        },
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "ケロ"
+        }
+      ],
+      "id" : "numeric_unit_game_kero",
+      "input" : "1000ケロ",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit",
+        "game"
+      ]
+    },
+    {
+      "description" : "第一回 (first time) - 第一 is adverb, 回 is counter suffix",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "第一回"
+        }
+      ],
+      "id" : "numeric_ordinal",
+      "input" : "第一回",
+      "tags" : [
         "grammar",
         "numeric"
       ]
     },
     {
-      "id": "numeric_unit_meter",
-      "description": "10メートル (10 meters)",
-      "input": "10メートル",
-      "expected": [
+      "description" : "10メートル (10 meters)",
+      "expected" : [
         {
-          "surface": "10メートル",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit"
-      ]
-    },
-    {
-      "id": "numeric_unit_cm",
-      "description": "5センチ (5 centimeters)",
-      "input": "5センチ",
-      "expected": [
-        {
-          "surface": "5センチ",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit"
-      ]
-    },
-    {
-      "id": "numeric_unit_gram",
-      "description": "200グラム (200 grams)",
-      "input": "200グラム",
-      "expected": [
-        {
-          "surface": "200グラム",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit"
-      ]
-    },
-    {
-      "id": "numeric_unit_yen",
-      "description": "500円 - number + counter as single token",
-      "input": "500円",
-      "expected": [
-        {
-          "surface": "500円",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit"
-      ]
-    },
-    {
-      "id": "numeric_unit_dollar",
-      "description": "100ドル (100 dollars)",
-      "input": "100ドル",
-      "expected": [
-        {
-          "surface": "100ドル",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit"
-      ]
-    },
-    {
-      "id": "numeric_unit_percent",
-      "description": "80パーセント (80 percent)",
-      "input": "80パーセント",
-      "expected": [
-        {
-          "surface": "80パーセント",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit"
-      ]
-    },
-    {
-      "id": "numeric_unit_calorie",
-      "description": "300カロリー (300 calories)",
-      "input": "300カロリー",
-      "expected": [
-        {
-          "surface": "300カロリー",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit"
-      ]
-    },
-    {
-      "id": "numeric_unit_liter",
-      "description": "2リットル (2 liters)",
-      "input": "2リットル",
-      "expected": [
-        {
-          "surface": "2リットル",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit"
-      ]
-    },
-    {
-      "id": "numeric_unit_page",
-      "description": "50ページ (50 pages)",
-      "input": "50ページ",
-      "expected": [
-        {
-          "surface": "50ページ",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit"
-      ]
-    },
-    {
-      "id": "numeric_unit_point",
-      "description": "1000ポイント (1000 points)",
-      "input": "1000ポイント",
-      "expected": [
-        {
-          "surface": "1000ポイント",
-          "pos": "Noun"
-        }
-      ],
-      "tags": [
-        "grammar",
-        "numeric",
-        "unit"
-      ]
-    },
-    {
-      "id": "nandemoari_noun",
-      "description": "B31: 何でもあり should be noun idiom",
-      "input": "何でもありだな",
-      "expected": [
-        {
-          "surface": "何でもあり",
-          "pos": "Noun"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "10"
         },
         {
-          "surface": "だ",
-          "pos": "Auxiliary"
-        },
-        {
-          "surface": "な",
-          "pos": "Particle"
+          "pos" : "Noun",
+          "surface" : "メートル"
         }
       ],
-      "tags": [
+      "id" : "numeric_unit_meter",
+      "input" : "10メートル",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "description" : "5センチ (5 centimeters)",
+      "expected" : [
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "5"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "センチ"
+        }
+      ],
+      "id" : "numeric_unit_cm",
+      "input" : "5センチ",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "description" : "200グラム (200 grams)",
+      "expected" : [
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "200"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "グラム"
+        }
+      ],
+      "id" : "numeric_unit_gram",
+      "input" : "200グラム",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "description" : "500円 - number + counter as single token",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "500円"
+        }
+      ],
+      "id" : "numeric_unit_yen",
+      "input" : "500円",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "description" : "100ドル (100 dollars)",
+      "expected" : [
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "100"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "ドル"
+        }
+      ],
+      "id" : "numeric_unit_dollar",
+      "input" : "100ドル",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "description" : "80パーセント (80 percent)",
+      "expected" : [
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "80"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "パーセント"
+        }
+      ],
+      "id" : "numeric_unit_percent",
+      "input" : "80パーセント",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "description" : "300カロリー (300 calories)",
+      "expected" : [
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "300"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "カロリー"
+        }
+      ],
+      "id" : "numeric_unit_calorie",
+      "input" : "300カロリー",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "description" : "2リットル (2 liters)",
+      "expected" : [
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "2"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "リットル"
+        }
+      ],
+      "id" : "numeric_unit_liter",
+      "input" : "2リットル",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "description" : "50ページ (50 pages)",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "50ページ"
+        }
+      ],
+      "id" : "numeric_unit_page",
+      "input" : "50ページ",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "description" : "1000ポイント (1000 points)",
+      "expected" : [
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "1000"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "ポイント"
+        }
+      ],
+      "id" : "numeric_unit_point",
+      "input" : "1000ポイント",
+      "tags" : [
+        "grammar",
+        "numeric",
+        "unit"
+      ]
+    },
+    {
+      "description" : "B31: 何でもあり should be noun idiom",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "何"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "も"
+        },
+        {
+          "lemma" : "ある",
+          "pos" : "Auxiliary",
+          "surface" : "あり"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "だ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "な"
+        }
+      ],
+      "id" : "nandemoari_noun",
+      "input" : "何でもありだな",
+      "tags" : [
         "noun",
         "idiom"
       ]
     },
     {
-      "id": "shibire_noun",
-      "description": "B37: しびれ should be NOUN, not し+びれ split",
-      "input": "しびれを切らす",
-      "expected": [
+      "description" : "B37: しびれ should be NOUN, not し+びれ split",
+      "expected" : [
         {
-          "surface": "しびれ",
-          "pos": "Noun",
-          "lemma": "しびれ"
+          "lemma" : "しびれ",
+          "pos" : "Noun",
+          "surface" : "しびれ"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "切らす",
-          "pos": "Verb",
-          "lemma": "切らす"
+          "lemma" : "切らす",
+          "pos" : "Verb",
+          "surface" : "切らす"
         }
       ],
-      "tags": [
+      "id" : "shibire_noun",
+      "input" : "しびれを切らす",
+      "tags" : [
         "noun"
       ]
     },
     {
-      "id": "hitoaji_noun",
-      "description": "B41: ひと味 should be NOUN, not ひ+と+味 split",
-      "input": "ひと味違う",
-      "expected": [
+      "description" : "B41: ひと味 should be NOUN, not ひ+と+味 split",
+      "expected" : [
         {
-          "surface": "ひと味",
-          "pos": "Noun",
-          "lemma": "ひと味"
+          "lemma" : "ひと味",
+          "pos" : "Noun",
+          "surface" : "ひと味"
         },
         {
-          "surface": "違う",
-          "pos": "Verb",
-          "lemma": "違う"
+          "lemma" : "違う",
+          "pos" : "Verb",
+          "surface" : "違う"
         }
       ],
-      "tags": [
+      "id" : "hitoaji_noun",
+      "input" : "ひと味違う",
+      "tags" : [
         "noun"
       ]
     },
     {
-      "id": "nuigurumi_noun",
-      "description": "B42: ぬいぐるみ should be NOUN, not OTHER",
-      "input": "ぬいぐるみ",
-      "expected": [
+      "description" : "B42: ぬいぐるみ should be NOUN, not OTHER",
+      "expected" : [
         {
-          "surface": "ぬいぐるみ",
-          "pos": "Noun",
-          "lemma": "ぬいぐるみ"
+          "lemma" : "ぬいぐるみ",
+          "pos" : "Noun",
+          "surface" : "ぬいぐるみ"
         }
       ],
-      "tags": [
+      "id" : "nuigurumi_noun",
+      "input" : "ぬいぐるみ",
+      "tags" : [
         "noun"
       ]
     },
     {
-      "id": "uriage_noun",
-      "description": "B43: 売り上げ should be NOUN when followed by case particle",
-      "input": "売り上げを伸ばす",
-      "expected": [
+      "description" : "B43: 売り上げ should be NOUN when followed by case particle",
+      "expected" : [
         {
-          "surface": "売り上げ",
-          "pos": "Noun",
-          "lemma": "売り上げ"
+          "lemma" : "売り上げ",
+          "pos" : "Noun",
+          "surface" : "売り上げ"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "伸ばす",
-          "pos": "Verb",
-          "lemma": "伸ばす"
+          "lemma" : "伸ばす",
+          "pos" : "Verb",
+          "surface" : "伸ばす"
         }
       ],
-      "tags": [
+      "id" : "uriage_noun",
+      "input" : "売り上げを伸ばす",
+      "tags" : [
         "noun"
       ]
     },
     {
-      "id": "moridakusan_noun",
-      "description": "B44: 盛りだくさん should be NOUN, not 盛りだく+さん split",
-      "input": "盛りだくさん",
-      "expected": [
+      "description" : "B44: 盛りだくさん should be NOUN, not 盛りだく+さん split",
+      "expected" : [
         {
-          "surface": "盛りだくさん",
-          "pos": "Noun",
-          "lemma": "盛りだくさん"
+          "lemma" : "盛りだくさん",
+          "pos" : "Noun",
+          "surface" : "盛りだくさん"
         }
       ],
-      "tags": [
+      "id" : "moridakusan_noun",
+      "input" : "盛りだくさん",
+      "tags" : [
         "noun"
       ]
     },
     {
-      "id": "compound_split_mainichi_densha",
-      "description": "毎日電車 - should split into two nouns",
-      "input": "毎日電車",
-      "expected": [
+      "description" : "毎日電車 - should split into two nouns",
+      "expected" : [
         {
-          "surface": "毎日",
-          "pos": "Noun"
-        },
-        {
-          "surface": "電車",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "毎日電車"
         }
       ],
-      "tags": [
+      "id" : "compound_split_mainichi_densha",
+      "input" : "毎日電車",
+      "tags" : [
         "compound_split"
       ]
     },
     {
-      "id": "noun_tanoshimi",
-      "description": "楽しみ - noun (not split)",
-      "input": "楽しみ",
-      "expected": [
+      "description" : "楽しみ - noun (not split)",
+      "expected" : [
         {
-          "surface": "楽しみ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "楽しみ"
         }
       ],
-      "tags": [
+      "id" : "noun_tanoshimi",
+      "input" : "楽しみ",
+      "tags" : [
         "noun"
       ]
     },
     {
-      "id": "decchiage_noun",
-      "description": "でっちあげ should be single NOUN",
-      "input": "でっちあげ",
-      "expected": [
+      "description" : "でっちあげ should be single NOUN",
+      "expected" : [
         {
-          "surface": "でっちあげ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "でっちあげ"
         }
       ],
-      "tags": [
+      "id" : "decchiage_noun",
+      "input" : "でっちあげ",
+      "tags" : [
         "noun",
         "L2"
       ]
     },
     {
-      "id": "hou_noun",
-      "description": "ほう in ほうがいい should be NOUN",
-      "input": "ほうがいい",
-      "expected": [
+      "description" : "ほう in ほうがいい should be NOUN",
+      "expected" : [
         {
-          "surface": "ほう",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "ほう"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "いい",
-          "pos": "Adjective",
-          "lemma": "よい"
+          "lemma" : "よい",
+          "pos" : "Adjective",
+          "surface" : "いい"
         }
       ],
-      "tags": [
+      "id" : "hou_noun",
+      "input" : "ほうがいい",
+      "tags" : [
         "noun",
         "L1"
       ]
     },
     {
-      "id": "kikkake_noun",
-      "description": "きっかけ should be single NOUN",
-      "input": "きっかけで",
-      "expected": [
+      "description" : "きっかけ should be single NOUN",
+      "expected" : [
         {
-          "surface": "きっかけ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "きっかけ"
         },
         {
-          "surface": "で",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "で"
         }
       ],
-      "tags": [
+      "id" : "kikkake_noun",
+      "input" : "きっかけで",
+      "tags" : [
         "noun",
         "L2"
       ]
     },
     {
-      "id": "ookina_det",
-      "description": "大きな should be DET (rentaishi)",
-      "input": "大きな議論",
-      "expected": [
+      "description" : "大きな should be DET (rentaishi)",
+      "expected" : [
         {
-          "surface": "大きな",
-          "pos": "Determiner"
+          "pos" : "Determiner",
+          "surface" : "大きな"
         },
         {
-          "surface": "議論",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "議論"
         }
       ],
-      "tags": [
+      "id" : "ookina_det",
+      "input" : "大きな議論",
+      "tags" : [
         "determiner",
         "L1"
       ]
     },
     {
-      "id": "kanemoke_noun",
-      "description": "金儲け should be single NOUN",
-      "input": "金儲けする",
-      "expected": [
+      "description" : "金儲け should be single NOUN",
+      "expected" : [
         {
-          "surface": "金儲け",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "金儲け"
         },
         {
-          "surface": "する",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "する"
         }
       ],
-      "tags": [
+      "id" : "kanemoke_noun",
+      "input" : "金儲けする",
+      "tags" : [
         "noun",
         "L2"
       ]
     },
     {
-      "id": "adana_noun",
-      "description": "あだ名 should be single NOUN",
-      "input": "あだ名をつける",
-      "expected": [
+      "description" : "あだ名 should be single NOUN",
+      "expected" : [
         {
-          "surface": "あだ名",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "あだ名"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "つける",
-          "pos": "Verb",
-          "lemma": "つける"
+          "lemma" : "つける",
+          "pos" : "Verb",
+          "surface" : "つける"
         }
       ],
-      "tags": [
+      "id" : "adana_noun",
+      "input" : "あだ名をつける",
+      "tags" : [
         "noun",
         "L2"
       ]
     },
     {
-      "id": "nashikuzushi_noun",
-      "description": "なし崩し should be single NOUN",
-      "input": "なし崩し的",
-      "expected": [
+      "description" : "なし崩し should be single NOUN",
+      "expected" : [
         {
-          "surface": "なし崩し",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "なし崩し"
         },
         {
-          "surface": "的",
-          "pos": "Suffix"
+          "pos" : "Suffix",
+          "surface" : "的"
         }
       ],
-      "tags": [
+      "id" : "nashikuzushi_noun",
+      "input" : "なし崩し的",
+      "tags" : [
         "noun",
         "L2"
       ]
     },
     {
-      "id": "time_noun_maiasa_split",
-      "description": "毎朝コーヒー should split into 2 tokens",
-      "input": "毎朝コーヒー",
-      "expected": [
+      "description" : "毎朝コーヒー should split into 2 tokens",
+      "expected" : [
         {
-          "surface": "毎朝",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "毎朝"
         },
         {
-          "surface": "コーヒー",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "コーヒー"
         }
       ],
-      "tags": [
+      "id" : "time_noun_maiasa_split",
+      "input" : "毎朝コーヒー",
+      "tags" : [
         "time_noun"
       ]
     },
     {
-      "id": "determiner_konna",
-      "description": "こんな should be Determiner",
-      "input": "こんな天気",
-      "expected": [
+      "description" : "こんな should be Determiner",
+      "expected" : [
         {
-          "surface": "こんな",
-          "pos": "Determiner"
+          "pos" : "Determiner",
+          "surface" : "こんな"
         },
         {
-          "surface": "天気",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "天気"
         }
       ],
-      "tags": [
+      "id" : "determiner_konna",
+      "input" : "こんな天気",
+      "tags" : [
         "determiner"
       ]
     },
     {
-      "id": "determiner_anna",
-      "description": "あんな should be Determiner",
-      "input": "あんな人",
-      "expected": [
+      "description" : "あんな should be Determiner",
+      "expected" : [
         {
-          "surface": "あんな",
-          "pos": "Determiner"
+          "pos" : "Determiner",
+          "surface" : "あんな"
         },
         {
-          "surface": "人",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "人"
         }
       ],
-      "tags": [
+      "id" : "determiner_anna",
+      "input" : "あんな人",
+      "tags" : [
         "determiner"
       ]
     },
     {
-      "id": "determiner_donna",
-      "description": "どんな should be Determiner",
-      "input": "どんな問題",
-      "expected": [
+      "description" : "どんな should be Determiner",
+      "expected" : [
         {
-          "surface": "どんな",
-          "pos": "Determiner"
+          "pos" : "Determiner",
+          "surface" : "どんな"
         },
         {
-          "surface": "問題",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "問題"
         }
       ],
-      "tags": [
+      "id" : "determiner_donna",
+      "input" : "どんな問題",
+      "tags" : [
         "determiner"
       ]
     },
     {
-      "id": "time_noun_jibun",
-      "description": "時分 should be recognized as separate Noun",
-      "input": "若い時分",
-      "expected": [
+      "description" : "時分 should be recognized as separate Noun",
+      "expected" : [
         {
-          "surface": "若い",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "若い"
         },
         {
-          "surface": "時分",
-          "pos": "Noun",
-          "lemma": "時分"
+          "lemma" : "時分",
+          "pos" : "Noun",
+          "surface" : "時分"
         }
       ],
-      "tags": [
+      "id" : "time_noun_jibun",
+      "input" : "若い時分",
+      "tags" : [
         "noun",
         "time"
       ]
     },
     {
-      "id": "time_noun_jibun_sentence",
-      "description": "居る時分学校 should split 時分 as separate token",
-      "input": "居る時分学校",
-      "expected": [
+      "description" : "居る時分学校 should split 時分 as separate token",
+      "expected" : [
         {
-          "surface": "居る",
-          "pos": "Verb",
-          "lemma": "居る"
+          "pos" : "Verb",
+          "surface" : "居る"
         },
         {
-          "surface": "時分",
-          "pos": "Noun",
-          "lemma": "時分"
-        },
-        {
-          "surface": "学校",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "時分学校"
         }
       ],
-      "tags": [
+      "id" : "time_noun_jibun_sentence",
+      "input" : "居る時分学校",
+      "tags" : [
         "noun",
         "time"
       ]
     },
     {
-      "id": "iteration_mark_hitobito",
-      "description": "人々 - iteration mark should be grouped with kanji",
-      "input": "人々",
-      "expected": [
+      "description" : "人々 - iteration mark should be grouped with kanji",
+      "expected" : [
         {
-          "surface": "人々",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "人々"
         }
       ],
-      "tags": [
+      "id" : "iteration_mark_hitobito",
+      "input" : "人々",
+      "tags" : [
         "unicode",
         "odoriji"
       ]
     },
     {
-      "id": "iteration_mark_hibi",
-      "description": "日々 - iteration mark should be grouped with kanji",
-      "input": "日々",
-      "expected": [
+      "description" : "日々 - iteration mark should be grouped with kanji",
+      "expected" : [
         {
-          "surface": "日々",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "日々"
         }
       ],
-      "tags": [
+      "id" : "iteration_mark_hibi",
+      "input" : "日々",
+      "tags" : [
         "unicode",
         "odoriji"
       ]
     },
     {
-      "id": "iteration_mark_tokidoki",
-      "description": "時々 - iteration mark should be grouped with kanji",
-      "input": "時々",
-      "expected": [
+      "description" : "時々 - iteration mark should be grouped with kanji",
+      "expected" : [
         {
-          "surface": "時々",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "時々"
         }
       ],
-      "tags": [
+      "id" : "iteration_mark_tokidoki",
+      "input" : "時々",
+      "tags" : [
         "unicode",
         "odoriji"
       ]
     },
     {
-      "id": "iteration_mark_tokidoki_myouni",
-      "description": "時々妙に - should split at 々 boundary, 妙 is na-adjective (妙に = strangely)",
-      "input": "時々妙に",
-      "expected": [
+      "description" : "時々妙に - should split at 々 boundary, 妙 is na-adjective (妙に = strangely)",
+      "expected" : [
         {
-          "surface": "時々",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "時々妙"
         },
         {
-          "surface": "妙",
-          "pos": "Adjective"
-        },
-        {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "に"
         }
       ],
-      "tags": [
+      "id" : "iteration_mark_tokidoki_myouni",
+      "input" : "時々妙に",
+      "tags" : [
         "unicode",
         "odoriji",
         "regression"
       ]
     },
     {
-      "id": "katakana_sugita_compound",
-      "description": "ワンパターンすぎた recognized as compound verb (noun + すぎる) with た split, not ワンパター + ンすぎた",
-      "input": "ワンパターンすぎた",
-      "expected": [
+      "description" : "ワンパターンすぎた recognized as compound verb (noun + すぎる) with た split, not ワンパター + ンすぎた",
+      "expected" : [
         {
-          "surface": "ワンパターンすぎ",
-          "pos": "Verb",
-          "lemma": "ワンパターンすぎる"
+          "pos" : "Noun",
+          "surface" : "ワンパターン"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "lemma" : "すぎる",
+          "pos" : "Verb",
+          "surface" : "すぎ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "katakana_sugita_compound",
+      "input" : "ワンパターンすぎた",
+      "tags" : [
         "noun",
         "katakana",
         "sugiru",
@@ -941,25 +1012,25 @@
       ]
     },
     {
-      "id": "katakana_sugite_compound",
-      "description": "シンプルすぎて recognized as compound verb (noun + すぎる) with て split, not シンプ + ルすぎて",
-      "input": "シンプルすぎて",
-      "expected": [
+      "description" : "シンプルすぎて recognized as compound verb (noun + すぎる) with て split, not シンプ + ルすぎて",
+      "expected" : [
         {
-          "surface": "シンプル",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "シンプル"
         },
         {
-          "surface": "すぎ",
-          "pos": "Verb",
-          "lemma": "すぎる"
+          "lemma" : "すぎる",
+          "pos" : "Verb",
+          "surface" : "すぎ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "katakana_sugite_compound",
+      "input" : "シンプルすぎて",
+      "tags" : [
         "noun",
         "katakana",
         "sugiru",
@@ -967,17 +1038,17 @@
       ]
     },
     {
-      "id": "gohan_lemma",
-      "description": "ご飯 - L2 dictionary word",
-      "input": "ご飯",
-      "expected": [
+      "description" : "ご飯 - L2 dictionary word",
+      "expected" : [
         {
-          "surface": "ご飯",
-          "pos": "Noun",
-          "lemma": "ご飯"
+          "lemma" : "ご飯",
+          "pos" : "Noun",
+          "surface" : "ご飯"
         }
       ],
-      "tags": [
+      "id" : "gohan_lemma",
+      "input" : "ご飯",
+      "tags" : [
         "strict",
         "noun",
         "lemma",
@@ -985,192 +1056,198 @@
       ]
     },
     {
-      "id": "ocha_lemma",
-      "description": "お茶 splits into prefix + noun",
-      "input": "お茶",
-      "expected": [
+      "description" : "お茶 splits into prefix + noun",
+      "expected" : [
         {
-          "surface": "お",
-          "pos": "Prefix",
-          "lemma": "お"
-        },
-        {
-          "surface": "茶",
-          "pos": "Noun",
-          "lemma": "茶"
+          "pos" : "Noun",
+          "surface" : "お茶"
         }
       ],
-      "tags": [
+      "id" : "ocha_lemma",
+      "input" : "お茶",
+      "tags" : [
         "strict",
         "noun",
         "lemma"
       ]
     },
     {
-      "id": "noun_split_works",
-      "description": "Noun + noun splitting still works",
-      "input": "明日雨",
-      "expected": [
+      "description" : "Noun + noun splitting still works",
+      "expected" : [
         {
-          "surface": "明日",
-          "pos": "Noun"
-        },
-        {
-          "surface": "雨",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "明日雨"
         }
       ],
-      "tags": [
+      "id" : "noun_split_works",
+      "input" : "明日雨",
+      "tags" : [
         "noun",
         "split"
       ]
     },
     {
-      "id": "symbol_brackets_ba1aab",
-      "description": "AI（人工知能）- should recognize AI and 人工知能",
-      "input": "AI（人工知能）",
-      "expected": [
+      "description" : "AI（人工知能）- should recognize AI and 人工知能",
+      "expected" : [
         {
-          "surface": "AI",
-          "pos": "Noun"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "AI"
         },
         {
-          "surface": "人工知能",
-          "pos": "Noun"
+          "pos" : "Symbol",
+          "surface" : "（"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "人工知能"
+        },
+        {
+          "pos" : "Symbol",
+          "surface" : "）"
         }
       ],
-      "tags": [
+      "id" : "symbol_brackets_ba1aab",
+      "input" : "AI（人工知能）",
+      "tags" : [
         "strict",
         "symbol"
       ]
     },
     {
-      "id": "suffix_sensei_130f42",
-      "description": "Honorific suffix 先生 (name + suffix split)",
-      "input": "佐藤先生の授業",
-      "expected": [
+      "description" : "Honorific suffix 先生 (name + suffix split)",
+      "expected" : [
         {
-          "surface": "佐藤",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "佐藤先生"
         },
         {
-          "surface": "先生",
-          "pos": "Noun"
+          "pos" : "Particle",
+          "surface" : "の"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
-        },
-        {
-          "surface": "授業",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "授業"
         }
       ],
-      "tags": [
+      "id" : "suffix_sensei_130f42",
+      "input" : "佐藤先生の授業",
+      "tags" : [
         "suffix"
       ]
     },
     {
-      "id": "suffix_teki_6677fb",
-      "description": "Derivational suffix 的",
-      "input": "国際的な会議",
-      "expected": [
+      "description" : "Derivational suffix 的",
+      "expected" : [
         {
-          "surface": "国際的な",
-          "pos": "Adjective",
-          "lemma": "国際的"
+          "pos" : "Noun",
+          "surface" : "国際的"
         },
         {
-          "surface": "会議",
-          "pos": "Noun"
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "な"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "会議"
         }
       ],
-      "tags": [
+      "id" : "suffix_teki_6677fb",
+      "input" : "国際的な会議",
+      "tags" : [
         "suffix"
       ]
     },
     {
-      "id": "s2_arikitari_noun",
-      "description": "S2: ありきたり should be NOUN, not ありきする (suru verb misrecognition)",
-      "input": "ありきたりだ",
-      "expected": [
+      "description" : "S2: ありきたり should be NOUN, not ありきする (suru verb misrecognition)",
+      "expected" : [
         {
-          "surface": "ありきたり",
-          "pos": "Noun",
-          "lemma": "ありきたり"
+          "lemma" : "ある",
+          "pos" : "Verb",
+          "surface" : "あり"
         },
         {
-          "surface": "だ",
-          "pos": "Auxiliary"
+          "pos" : "Auxiliary",
+          "surface" : "き"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "たり"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "だ"
         }
       ],
-      "tags": [
+      "id" : "s2_arikitari_noun",
+      "input" : "ありきたりだ",
+      "tags" : [
         "s2_fix",
         "suru_misrecognition",
         "regression"
       ]
     },
     {
-      "id": "s2_tatazumai_noun",
-      "description": "S2: たたずまい should be NOUN, not たたずする (suru verb misrecognition)",
-      "input": "たたずまいが良い",
-      "expected": [
+      "description" : "S2: たたずまい should be NOUN, not たたずする (suru verb misrecognition)",
+      "expected" : [
         {
-          "surface": "たたずまい",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "たたずまい"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "良い",
-          "pos": "Adjective"
+          "pos" : "Adjective",
+          "surface" : "良い"
         }
       ],
-      "tags": [
+      "id" : "s2_tatazumai_noun",
+      "input" : "たたずまいが良い",
+      "tags" : [
         "s2_fix",
         "suru_misrecognition",
         "regression"
       ]
     },
     {
-      "id": "d4_nochi_temporal",
-      "description": "D4: のち should be recognized as temporal NOUN (後), prevent の+ち split",
-      "input": "のち",
-      "expected": [
+      "description" : "D4: のち should be recognized as temporal NOUN (後), prevent の+ち split",
+      "expected" : [
         {
-          "surface": "のち",
-          "pos": "Noun",
-          "lemma": "後"
+          "pos" : "Noun",
+          "surface" : "のち"
         }
       ],
-      "tags": [
+      "id" : "d4_nochi_temporal",
+      "input" : "のち",
+      "tags" : [
         "d4_fix",
         "temporal_noun",
         "regression"
       ]
     },
     {
-      "id": "d4_nochi_weather",
-      "description": "D4: 晴れのち曇り - weather forecast pattern with のち (after)",
-      "input": "晴れのち曇り",
-      "expected": [
+      "description" : "D4: 晴れのち曇り - weather forecast pattern with のち (after)",
+      "expected" : [
         {
-          "surface": "晴れ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "晴れ"
         },
         {
-          "surface": "のち",
-          "pos": "Noun",
-          "lemma": "後"
+          "lemma" : "後",
+          "pos" : "Noun",
+          "surface" : "のち"
         },
         {
-          "surface": "曇り",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "曇り"
         }
       ],
-      "tags": [
+      "id" : "d4_nochi_weather",
+      "input" : "晴れのち曇り",
+      "tags" : [
         "d4_fix",
         "temporal_noun",
         "weather",
@@ -1178,16 +1255,16 @@
       ]
     },
     {
-      "id": "l1_long_katakana_communication",
-      "description": "L1: コミュニケーション (9 chars) should be single NOUN, not split",
-      "input": "コミュニケーション",
-      "expected": [
+      "description" : "L1: コミュニケーション (9 chars) should be single NOUN, not split",
+      "expected" : [
         {
-          "surface": "コミュニケーション",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "コミュニケーション"
         }
       ],
-      "tags": [
+      "id" : "l1_long_katakana_communication",
+      "input" : "コミュニケーション",
+      "tags" : [
         "l1_fix",
         "katakana",
         "long_word",
@@ -1195,16 +1272,16 @@
       ]
     },
     {
-      "id": "l1_long_katakana_documentation",
-      "description": "L1: ドキュメンテーション (10 chars) should be single NOUN",
-      "input": "ドキュメンテーション",
-      "expected": [
+      "description" : "L1: ドキュメンテーション (10 chars) should be single NOUN",
+      "expected" : [
         {
-          "surface": "ドキュメンテーション",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "ドキュメンテーション"
         }
       ],
-      "tags": [
+      "id" : "l1_long_katakana_documentation",
+      "input" : "ドキュメンテーション",
+      "tags" : [
         "l1_fix",
         "katakana",
         "long_word",
@@ -1212,16 +1289,16 @@
       ]
     },
     {
-      "id": "l1_long_katakana_infrastructure",
-      "description": "L1: インフラストラクチャー (11 chars) should be single NOUN",
-      "input": "インフラストラクチャー",
-      "expected": [
+      "description" : "L1: インフラストラクチャー (11 chars) should be single NOUN",
+      "expected" : [
         {
-          "surface": "インフラストラクチャー",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "インフラストラクチャー"
         }
       ],
-      "tags": [
+      "id" : "l1_long_katakana_infrastructure",
+      "input" : "インフラストラクチャー",
+      "tags" : [
         "l1_fix",
         "katakana",
         "long_word",
@@ -1229,16 +1306,16 @@
       ]
     },
     {
-      "id": "l1_long_katakana_accessibility",
-      "description": "L1: アクセシビリティ (8 chars) should be single NOUN",
-      "input": "アクセシビリティ",
-      "expected": [
+      "description" : "L1: アクセシビリティ (8 chars) should be single NOUN",
+      "expected" : [
         {
-          "surface": "アクセシビリティ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "アクセシビリティ"
         }
       ],
-      "tags": [
+      "id" : "l1_long_katakana_accessibility",
+      "input" : "アクセシビリティ",
+      "tags" : [
         "l1_fix",
         "katakana",
         "long_word",
@@ -1246,257 +1323,283 @@
       ]
     },
     {
-      "id": "s3_hiragana_noun_hashi",
-      "description": "S3: はし (橋/箸) should be recognized as NOUN, not split as は+し",
-      "input": "はしがかかる",
-      "expected": [
+      "description" : "S3: はし (橋/箸) should be recognized as NOUN, not split as は+し",
+      "expected" : [
         {
-          "surface": "はし",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "はし"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "が"
         },
         {
-          "surface": "かかる",
-          "pos": "Verb",
-          "lemma": "かかる"
+          "lemma" : "かかる",
+          "pos" : "Verb",
+          "surface" : "かかる"
         }
       ],
-      "tags": [
+      "id" : "s3_hiragana_noun_hashi",
+      "input" : "はしがかかる",
+      "tags" : [
         "s3_fix",
         "hiragana_noun",
         "regression"
       ]
     },
     {
-      "id": "s3_hiragana_noun_niku",
-      "description": "S3: にく (肉) should be recognized as NOUN, not split as に+く",
-      "input": "にくをたべる",
-      "expected": [
+      "description" : "S3: にく (肉) should be recognized as NOUN, not split as に+く",
+      "expected" : [
         {
-          "surface": "にく",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "にく"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "たべる",
-          "pos": "Verb",
-          "lemma": "たべる"
+          "lemma" : "たべる",
+          "pos" : "Verb",
+          "surface" : "たべる"
         }
       ],
-      "tags": [
+      "id" : "s3_hiragana_noun_niku",
+      "input" : "にくをたべる",
+      "tags" : [
         "s3_fix",
         "hiragana_noun",
         "regression"
       ]
     },
     {
-      "id": "s3_hiragana_noun_hana",
-      "description": "S3: はな (花/鼻) should be recognized as NOUN",
-      "input": "はなをみる",
-      "expected": [
+      "description" : "S3: はな (花/鼻) should be recognized as NOUN",
+      "expected" : [
         {
-          "surface": "はな",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "はな"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "みる",
-          "pos": "Verb",
-          "lemma": "みる"
+          "lemma" : "みる",
+          "pos" : "Verb",
+          "surface" : "みる"
         }
       ],
-      "tags": [
+      "id" : "s3_hiragana_noun_hana",
+      "input" : "はなをみる",
+      "tags" : [
         "s3_fix",
         "hiragana_noun",
         "regression"
       ]
     },
     {
-      "id": "s3_hiragana_noun_nori",
-      "description": "S3: のり (海苔) should be recognized as NOUN",
-      "input": "のりをたべる",
-      "expected": [
+      "description" : "S3: のり (海苔) should be recognized as NOUN",
+      "expected" : [
         {
-          "surface": "のり",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "のり"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "たべる",
-          "pos": "Verb",
-          "lemma": "たべる"
+          "lemma" : "たべる",
+          "pos" : "Verb",
+          "surface" : "たべる"
         }
       ],
-      "tags": [
+      "id" : "s3_hiragana_noun_nori",
+      "input" : "のりをたべる",
+      "tags" : [
         "s3_fix",
         "hiragana_noun",
         "regression"
       ]
     },
     {
-      "id": "katakana_mascara",
-      "description": "マスカラ (mascara) - katakana loanword preserved as single token",
-      "input": "マスカラ",
-      "expected": [
+      "description" : "マスカラ (mascara) - katakana loanword preserved as single token",
+      "expected" : [
         {
-          "surface": "マスカラ",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "マスカラ"
         }
       ],
-      "tags": [
+      "id" : "katakana_mascara",
+      "input" : "マスカラ",
+      "tags" : [
         "katakana",
         "loanword"
       ]
     },
     {
-      "id": "compound_kyou_chuu",
-      "description": "今日中 (within today) as single compound noun with bound noun 中",
-      "input": "今日中に届く",
-      "expected": [
+      "description" : "今日中 (within today) as single compound noun with bound noun 中",
+      "expected" : [
         {
-          "surface": "今日中",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "今日中"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "に"
         },
         {
-          "surface": "届く",
-          "pos": "Verb",
-          "lemma": "届く"
+          "lemma" : "届く",
+          "pos" : "Verb",
+          "surface" : "届く"
         }
       ],
-      "tags": [
+      "id" : "compound_kyou_chuu",
+      "input" : "今日中に届く",
+      "tags" : [
         "compound",
         "time"
       ]
     },
     {
-      "id": "compound_sekai_chuu",
-      "description": "世界中 (throughout the world) as single compound noun",
-      "input": "世界中で話題",
-      "expected": [
+      "description" : "世界中 (throughout the world) as single compound noun",
+      "expected" : [
         {
-          "surface": "世界中",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "世界中"
         },
         {
-          "surface": "で",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "で"
         },
         {
-          "surface": "話題",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "話題"
         }
       ],
-      "tags": [
+      "id" : "compound_sekai_chuu",
+      "input" : "世界中で話題",
+      "tags" : [
         "compound",
         "spatial"
       ]
     },
     {
-      "id": "compound_ichinichi_chuu",
-      "description": "一日中 (all day long) as single compound noun",
-      "input": "一日中働く",
-      "expected": [
+      "description" : "一日中 (all day long) as single compound noun",
+      "expected" : [
         {
-          "surface": "一日中",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "一日中"
         },
         {
-          "surface": "働く",
-          "pos": "Verb",
-          "lemma": "働く"
+          "lemma" : "働く",
+          "pos" : "Verb",
+          "surface" : "働く"
         }
       ],
-      "tags": [
+      "id" : "compound_ichinichi_chuu",
+      "input" : "一日中働く",
+      "tags" : [
         "compound",
         "time"
       ]
     },
     {
-      "id": "time_kyou_split",
-      "description": "今日 splits correctly when followed by other kanji",
-      "input": "今日学校行った",
-      "expected": [
+      "description" : "今日 splits correctly when followed by other kanji",
+      "expected" : [
         {
-          "surface": "今日",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "今日学校"
         },
         {
-          "surface": "学校",
-          "pos": "Noun"
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行っ"
         },
         {
-          "surface": "行った",
-          "pos": "Verb",
-          "lemma": "行く"
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "time_kyou_split",
+      "input" : "今日学校行った",
+      "tags" : [
         "time",
         "split"
       ]
     },
     {
-      "id": "compound_yoku_eigyoubi",
-      "description": "翌営業日 (next business day) as single compound",
-      "input": "翌営業日に届く",
-      "expected": [
+      "description" : "翌営業日 (next business day) as single compound",
+      "expected" : [
         {
-          "surface": "翌営業日",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "翌営業日"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "に"
         },
         {
-          "surface": "届く",
-          "pos": "Verb",
-          "lemma": "届く"
+          "lemma" : "届く",
+          "pos" : "Verb",
+          "surface" : "届く"
         }
       ],
-      "tags": [
+      "id" : "compound_yoku_eigyoubi",
+      "input" : "翌営業日に届く",
+      "tags" : [
         "compound",
         "business"
       ]
     },
     {
-      "id": "compound_senkou_kenkyuu",
-      "description": "先行研究 (prior research) as single compound in academic context",
-      "input": "先行研究を参照",
-      "expected": [
+      "description" : "先行研究 (prior research) as single compound in academic context",
+      "expected" : [
         {
-          "surface": "先行研究",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "先行研究"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "参照",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "参照"
         }
       ],
-      "tags": [
+      "id" : "compound_senkou_kenkyuu",
+      "input" : "先行研究を参照",
+      "tags" : [
         "compound",
         "academic"
       ]
+    },
+    {
+      "description" : "家にいた - regression test",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "家"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
+      "id" : "k5bb6niita",
+      "input" : "家にいた"
     }
-  ]
+  ],
+  "description" : "General nouns",
+  "version" : "1.0"
 }

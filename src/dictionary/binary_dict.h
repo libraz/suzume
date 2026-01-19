@@ -119,9 +119,9 @@ class BinaryDictWriter {
 
   /**
    * @brief Add an entry
+   * v0.8: conj_type parameter removed
    */
-  void addEntry(const DictionaryEntry& entry,
-                ConjugationType conj_type = ConjugationType::None);
+  void addEntry(const DictionaryEntry& entry);
 
   /**
    * @brief Build and write to file
@@ -142,12 +142,7 @@ class BinaryDictWriter {
   size_t size() const { return entries_.size(); }
 
  private:
-  struct EntryData {
-    DictionaryEntry entry;
-    ConjugationType conj_type;
-  };
-
-  std::vector<EntryData> entries_;
+  std::vector<DictionaryEntry> entries_;
 };
 
 }  // namespace suzume::dictionary

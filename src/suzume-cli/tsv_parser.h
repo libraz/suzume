@@ -14,25 +14,22 @@ namespace suzume::cli {
 
 /**
  * @brief TSV dictionary entry (parsed from TSV file)
+ *
+ * v0.8 simplified format: surface<TAB>pos<TAB>conj_type
+ * - reading and cost fields removed (not used)
  */
 struct TsvEntry {
   std::string surface;
   core::PartOfSpeech pos{core::PartOfSpeech::Noun};
-  std::string reading;
-  float cost{0.5F};
   dictionary::ConjugationType conj_type{dictionary::ConjugationType::None};
   size_t line_number{0};
-
-  TsvEntry()
-
-  {}
 };
 
 /**
  * @brief TSV dictionary parser
  *
- * Parses TSV format:
- * surface<TAB>pos<TAB>reading<TAB>cost<TAB>conj_type
+ * Parses TSV format (v0.8):
+ * surface<TAB>pos<TAB>conj_type
  *
  * Comments start with #, empty lines are ignored.
  */
@@ -87,7 +84,6 @@ class TsvParser {
 
   static core::Expected<core::PartOfSpeech, core::Error> parsePos(std::string_view str, size_t line);
   static core::Expected<dictionary::ConjugationType, core::Error> parseConjType(std::string_view str, size_t line);
-  static core::Expected<float, core::Error> parseCost(std::string_view str, size_t line);
 };
 
 /**

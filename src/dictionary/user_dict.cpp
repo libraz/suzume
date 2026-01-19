@@ -183,33 +183,15 @@ core::Expected<size_t, core::Error> UserDictionary::parseCSV(
     // CSV format: surface, pos, cost, lemma
     bool is_tsv = (delimiter == '\t');
 
+    // v0.8: Simplified - cost and conj_type removed from DictionaryEntry
+    // Cost is now derived from ExtendedPOS via getCategoryCost()
     if (is_tsv) {
       // TSV format: surface, pos, reading, cost, conj_type
-      // Field 2 is reading (ignored for now)
-      if (fields.size() > 3 && !fields[3].empty()) {
-        try {
-          entry.cost = std::stof(fields[3]);
-        } catch (...) {
-          entry.cost = 1.0F;
-        }
-      } else {
-        entry.cost = 0.5F;
-      }
-      // Field 4 is conj_type
-      if (fields.size() > 4 && !fields[4].empty()) {
-        entry.conj_type = parseConjType(fields[4]);
-      }
+      // Fields 2-4 (reading, cost, conj_type) are ignored
+      (void)fields;  // suppress unused warning
     } else {
       // CSV format: surface, pos, cost, lemma
-      if (fields.size() > 2 && !fields[2].empty()) {
-        try {
-          entry.cost = std::stof(fields[2]);
-        } catch (...) {
-          entry.cost = 1.0F;
-        }
-      } else {
-        entry.cost = 0.5F;
-      }
+      // Field 2 (cost) is ignored
       if (fields.size() > 3) {
         entry.lemma = fields[3];
       }

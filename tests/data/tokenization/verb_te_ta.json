@@ -1,23 +1,21 @@
 {
-  "version": "1.0",
-  "description": "Te-form and ta-form patterns",
-  "cases": [
+  "cases" : [
     {
-      "id": "yokute_te_form",
-      "description": "よくて splits into よく + て - MeCab-compatible lemma",
-      "input": "よくて",
-      "expected": [
+      "description" : "よくて splits into よく + て - MeCab-compatible lemma",
+      "expected" : [
         {
-          "surface": "よく",
-          "pos": "Adjective",
-          "lemma": "よい"
+          "lemma" : "よい",
+          "pos" : "Adjective",
+          "surface" : "よく"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "yokute_te_form",
+      "input" : "よくて",
+      "tags" : [
         "irregular",
         "i_adjective",
         "yoi",
@@ -25,421 +23,617 @@
       ]
     },
     {
-      "id": "pattern_te_form",
-      "description": "食べて寝る - MeCab-compatible te-form split",
-      "input": "食べて寝る",
-      "expected": [
+      "description" : "食べて寝る - MeCab-compatible te-form split",
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "寝る",
-          "pos": "Verb",
-          "lemma": "寝る"
+          "lemma" : "寝る",
+          "pos" : "Verb",
+          "surface" : "寝る"
         }
       ],
-      "tags": [
+      "id" : "pattern_te_form",
+      "input" : "食べて寝る",
+      "tags" : [
         "grammar",
         "pattern",
         "te_form"
       ]
     },
     {
-      "id": "te_ku_not_adj_matte",
-      "description": "待ってくれない - MeCab-compatible: 待っ + て + くれ + ない",
-      "input": "待ってくれない",
-      "expected": [
+      "description" : "待ってくれない - MeCab-compatible: 待っ + て + くれ + ない",
+      "expected" : [
         {
-          "surface": "待っ",
-          "pos": "Verb",
-          "lemma": "待つ"
+          "lemma" : "待つ",
+          "pos" : "Verb",
+          "surface" : "待っ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "くれ",
-          "pos": "Verb",
-          "lemma": "くれる"
+          "lemma" : "くれる",
+          "pos" : "Verb",
+          "surface" : "くれ"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "te_ku_not_adj_matte",
+      "input" : "待ってくれない",
+      "tags" : [
         "te_form",
         "benefactive"
       ]
     },
     {
-      "id": "te_morau_separate",
-      "description": "食べてもらわない - MeCab-compatible: 食べ + て + もらわ + ない",
-      "input": "食べてもらわない",
-      "expected": [
+      "description" : "食べてもらわない - MeCab-compatible: 食べ + て + もらわ + ない",
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "もらわ",
-          "pos": "Verb",
-          "lemma": "もらう"
+          "lemma" : "もらう",
+          "pos" : "Verb",
+          "surface" : "もらわ"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "te_morau_separate",
+      "input" : "食べてもらわない",
+      "tags" : [
         "te_form",
         "benefactive"
       ]
     },
     {
-      "id": "te_inai_unified",
-      "description": "食べていない - MeCab-compatible: 食べ + て + い + ない (い is VERB in suzume, VERB-non-independent in MeCab)",
-      "input": "食べていない",
-      "expected": [
+      "description" : "食べていない - MeCab-compatible: 食べ + て + い + ない (い is VERB in suzume, VERB-non-independent in MeCab)",
+      "expected" : [
         {
-          "surface": "食べ",
-          "pos": "Verb",
-          "lemma": "食べる"
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "い",
-          "pos": "Verb",
-          "lemma": "いる"
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "te_inai_unified",
+      "input" : "食べていない",
+      "tags" : [
         "te_form",
         "progressive"
       ]
     },
     {
-      "id": "te_shimawanai_unified",
-      "description": "忘れてしまわない - MeCab-compatible: 忘れ + て + しまわ + ない",
-      "input": "忘れてしまわない",
-      "expected": [
+      "description" : "忘れてしまわない - MeCab-compatible: 忘れ + て + しまわ + ない",
+      "expected" : [
         {
-          "surface": "忘れ",
-          "pos": "Verb",
-          "lemma": "忘れる"
+          "lemma" : "忘れる",
+          "pos" : "Verb",
+          "surface" : "忘れ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "しまわ",
-          "pos": "Verb",
-          "lemma": "しまう"
+          "lemma" : "しまう",
+          "pos" : "Verb",
+          "surface" : "しまわ"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "te_shimawanai_unified",
+      "input" : "忘れてしまわない",
+      "tags" : [
         "te_form",
         "aspectual",
         "auxiliary"
       ]
     },
     {
-      "id": "te_ikanai_unified",
-      "description": "走っていかない - MeCab-compatible: 走っ + て + いか + ない",
-      "input": "走っていかない",
-      "expected": [
+      "description" : "走っていかない - MeCab-compatible: 走っ + て + いか + ない",
+      "expected" : [
         {
-          "surface": "走っ",
-          "pos": "Verb",
-          "lemma": "走る"
+          "lemma" : "走る",
+          "pos" : "Verb",
+          "surface" : "走っ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "いか",
-          "pos": "Verb",
-          "lemma": "いく"
+          "lemma" : "いく",
+          "pos" : "Verb",
+          "surface" : "いか"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "te_ikanai_unified",
+      "input" : "走っていかない",
+      "tags" : [
         "te_form",
         "aspectual"
       ]
     },
     {
-      "id": "te_ageru_unified",
-      "description": "見てあげる - MeCab互換分割 (見 + て + あげる)",
-      "input": "見てあげる",
-      "expected": [
+      "description" : "見てあげる - MeCab互換分割 (見 + て + あげる)",
+      "expected" : [
         {
-          "surface": "見",
-          "pos": "Verb",
-          "lemma": "見る"
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "あげる",
-          "pos": "Verb",
-          "lemma": "あげる"
+          "lemma" : "あげる",
+          "pos" : "Verb",
+          "surface" : "あげる"
         }
       ],
-      "tags": [
+      "id" : "te_ageru_unified",
+      "input" : "見てあげる",
+      "tags" : [
         "te_form",
         "benefactive"
       ]
     },
     {
-      "id": "godan_te_agenai_split",
-      "description": "書いてあげない - MeCab-compatible: 書い + て + あげ + ない",
-      "input": "書いてあげない",
-      "expected": [
+      "description" : "書いてあげない - MeCab-compatible: 書い + て + あげ + ない",
+      "expected" : [
         {
-          "surface": "書い",
-          "pos": "Verb",
-          "lemma": "書く"
+          "lemma" : "書く",
+          "pos" : "Verb",
+          "surface" : "書い"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "あげ",
-          "pos": "Verb",
-          "lemma": "あげる"
+          "lemma" : "あげる",
+          "pos" : "Verb",
+          "surface" : "あげ"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "godan_te_agenai_split",
+      "input" : "書いてあげない",
+      "tags" : [
         "te_form",
         "benefactive"
       ]
     },
     {
-      "id": "tetsudatte_agenai_split",
-      "description": "手伝ってあげない - MeCab-compatible: 手伝っ + て + あげ + ない",
-      "input": "手伝ってあげない",
-      "expected": [
+      "description" : "手伝ってあげない - MeCab-compatible: 手伝っ + て + あげ + ない",
+      "expected" : [
         {
-          "surface": "手伝っ",
-          "pos": "Verb",
-          "lemma": "手伝う"
+          "lemma" : "手伝う",
+          "pos" : "Verb",
+          "surface" : "手伝っ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "あげ",
-          "pos": "Verb",
-          "lemma": "あげる"
+          "lemma" : "あげる",
+          "pos" : "Verb",
+          "surface" : "あげ"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "ない"
         }
       ],
-      "tags": [
+      "id" : "tetsudatte_agenai_split",
+      "input" : "手伝ってあげない",
+      "tags" : [
         "te_form",
         "benefactive",
         "lemma"
       ]
     },
     {
-      "id": "tetsudatte_lemma",
-      "description": "手伝って - MeCab-compatible: 手伝っ + て",
-      "input": "手伝って",
-      "expected": [
+      "description" : "手伝って - MeCab-compatible: 手伝っ + て",
+      "expected" : [
         {
-          "surface": "手伝っ",
-          "pos": "Verb",
-          "lemma": "手伝う"
+          "lemma" : "手伝う",
+          "pos" : "Verb",
+          "surface" : "手伝っ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         }
       ],
-      "tags": [
+      "id" : "tetsudatte_lemma",
+      "input" : "手伝って",
+      "tags" : [
         "te_form",
         "lemma"
       ]
     },
     {
-      "id": "viterbi_te_form_not_split",
-      "description": "走っている - MeCab-compatible: 走っ + て + いる (いる is AUX in suzume)",
-      "input": "走っている",
-      "expected": [
+      "description" : "走っている - MeCab-compatible: 走っ + て + いる (いる is AUX in suzume)",
+      "expected" : [
         {
-          "surface": "走っ",
-          "pos": "Verb",
-          "lemma": "走る"
+          "lemma" : "走る",
+          "pos" : "Verb",
+          "surface" : "走っ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
         },
         {
-          "surface": "いる",
-          "pos": "Auxiliary",
-          "lemma": "いる"
+          "lemma" : "いる",
+          "pos" : "Auxiliary",
+          "surface" : "いる"
         }
       ],
-      "tags": [
+      "id" : "viterbi_te_form_not_split",
+      "input" : "走っている",
+      "tags" : [
         "viterbi",
         "te_form"
       ]
     },
     {
-      "id": "te_iru_kiteimasen",
-      "description": "来ていません - MeCab-compatible: 来 + て + い + ませ + ん",
-      "input": "来ていません",
-      "expected": [
-        {"surface": "来", "pos": "Verb", "lemma": "来る"},
-        {"surface": "て", "pos": "Particle"},
-        {"surface": "い", "pos": "Auxiliary", "lemma": "いる"},
-        {"surface": "ませ", "pos": "Auxiliary", "lemma": "ます"},
-        {"surface": "ん", "pos": "Auxiliary", "lemma": "ん"}
-      ],
-      "tags": ["te_form", "iru"]
-    },
-    {
-      "id": "te_iru_kiteimasu",
-      "description": "来ています - MeCab-compatible: 来 + て + います",
-      "input": "来ています",
-      "expected": [
-        {"surface": "来", "pos": "Verb", "lemma": "来る"},
-        {"surface": "て", "pos": "Particle"},
-        {"surface": "います", "pos": "Auxiliary", "lemma": "いる"}
-      ],
-      "tags": ["te_form", "iru"]
-    },
-    {
-      "id": "te_itadakimasu",
-      "description": "食べさせていただきます - causative + itadaku: 食べ + させ + て + いただきます",
-      "input": "食べさせていただきます",
-      "expected": [
-        {"surface": "食べ", "pos": "Verb", "lemma": "食べる"},
-        {"surface": "させ", "pos": "Verb", "lemma": "させる"},
-        {"surface": "て", "pos": "Particle"},
-        {"surface": "いただきます", "pos": "Verb", "lemma": "いただく"}
-      ],
-      "tags": ["te_form", "itadaku"]
-    },
-    {
-      "id": "te_form_kite",
-      "description": "来て - MeCab-compatible: 来 + て",
-      "input": "来て",
-      "expected": [
+      "description" : "来ていません - MeCab-compatible: 来 + て + い + ませ + ん",
+      "expected" : [
         {
-          "surface": "来",
-          "pos": "Verb",
-          "lemma": "来る"
+          "lemma" : "来る",
+          "pos" : "Verb",
+          "surface" : "来"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "いる",
+          "pos" : "Auxiliary",
+          "surface" : "い"
+        },
+        {
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "ませ"
+        },
+        {
+          "lemma" : "ん",
+          "pos" : "Auxiliary",
+          "surface" : "ん"
         }
       ],
-      "tags": [
+      "id" : "te_iru_kiteimasen",
+      "input" : "来ていません",
+      "tags" : [
+        "te_form",
+        "iru"
+      ]
+    },
+    {
+      "description" : "来ています - MeCab-compatible: 来 + て + います",
+      "expected" : [
+        {
+          "lemma" : "来る",
+          "pos" : "Verb",
+          "surface" : "来"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ます"
+        }
+      ],
+      "id" : "te_iru_kiteimasu",
+      "input" : "来ています",
+      "tags" : [
+        "te_form",
+        "iru"
+      ]
+    },
+    {
+      "description" : "食べさせていただきます - causative + itadaku: 食べ + させ + て + いただきます",
+      "expected" : [
+        {
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
+        },
+        {
+          "lemma" : "させる",
+          "pos" : "Verb",
+          "surface" : "させ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "いただく",
+          "pos" : "Verb",
+          "surface" : "いただき"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ます"
+        }
+      ],
+      "id" : "te_itadakimasu",
+      "input" : "食べさせていただきます",
+      "tags" : [
+        "te_form",
+        "itadaku"
+      ]
+    },
+    {
+      "description" : "来て - MeCab-compatible: 来 + て",
+      "expected" : [
+        {
+          "lemma" : "来る",
+          "pos" : "Verb",
+          "surface" : "来"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
+      "id" : "te_form_kite",
+      "input" : "来て",
+      "tags" : [
         "te_form"
       ]
     },
     {
-      "id": "te_form_yonde",
-      "description": "読んで - MeCab-compatible: 読ん + で",
-      "input": "読んで",
-      "expected": [
+      "description" : "読んで - MeCab-compatible: 読ん + で",
+      "expected" : [
         {
-          "surface": "読ん",
-          "pos": "Verb",
-          "lemma": "読む"
+          "lemma" : "読む",
+          "pos" : "Verb",
+          "surface" : "読ん"
         },
         {
-          "surface": "で",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "で"
         }
       ],
-      "tags": [
+      "id" : "te_form_yonde",
+      "input" : "読んで",
+      "tags" : [
         "te_form"
       ]
     },
     {
-      "id": "particle_te_form",
-      "description": "につけて - suzume: につけ + て (context-dependent: に is absorbed without preceding noun)",
-      "input": "につけて",
-      "expected": [
-        {"surface": "につけ", "pos": "Verb", "lemma": "につける"},
-        {"surface": "て", "pos": "Particle"}
+      "description" : "につけて - suzume: につけ + て (context-dependent: に is absorbed without preceding noun)",
+      "expected" : [
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "lemma" : "つける",
+          "pos" : "Verb",
+          "surface" : "つけ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
       ],
-      "tags": ["te_form", "particle"]
+      "id" : "particle_te_form",
+      "input" : "につけて",
+      "tags" : [
+        "te_form",
+        "particle"
+      ]
     },
     {
-      "id": "particle_te_iru",
-      "description": "につけている - suzume: につけ + て + いる (context-dependent)",
-      "input": "につけている",
-      "expected": [
-        {"surface": "につけ", "pos": "Verb", "lemma": "につける"},
-        {"surface": "て", "pos": "Particle"},
-        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+      "description" : "につけている - suzume: につけ + て + いる (context-dependent)",
+      "expected" : [
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "lemma" : "つける",
+          "pos" : "Verb",
+          "surface" : "つけ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "いる"
+        }
       ],
-      "tags": ["te_form", "progressive", "particle"]
+      "id" : "particle_te_iru",
+      "input" : "につけている",
+      "tags" : [
+        "te_form",
+        "progressive",
+        "particle"
+      ]
     },
     {
-      "id": "particle_ranking_sentence",
-      "description": "現在3位につけている - suzume: 現在 + 3位 + に + つけ + て + いる",
-      "input": "現在3位につけている",
-      "expected": [
-        {"surface": "現在", "pos": "Noun"},
-        {"surface": "3位", "pos": "Noun"},
-        {"surface": "に", "pos": "Particle"},
-        {"surface": "つけ", "pos": "Verb", "lemma": "つける"},
-        {"surface": "て", "pos": "Particle"},
-        {"surface": "いる", "pos": "Auxiliary", "lemma": "いる"}
+      "description" : "現在3位につけている - suzume: 現在 + 3位 + に + つけ + て + いる",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "現在"
+        },
+        {
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "3"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "位"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "lemma" : "つける",
+          "pos" : "Verb",
+          "surface" : "つけ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "いる"
+        }
       ],
-      "tags": ["te_form", "progressive"]
+      "id" : "particle_ranking_sentence",
+      "input" : "現在3位につけている",
+      "tags" : [
+        "te_form",
+        "progressive"
+      ]
+    },
+    {
+      "description" : "つけて - regression test",
+      "expected" : [
+        {
+          "lemma" : "つける",
+          "pos" : "Verb",
+          "surface" : "つけ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
+      "id" : "ichidan_tsukete",
+      "input" : "つけて"
+    },
+    {
+      "description" : "あけて - regression test",
+      "expected" : [
+        {
+          "lemma" : "あける",
+          "pos" : "Verb",
+          "surface" : "あけ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
+      "id" : "ichidan_akete",
+      "input" : "あけて"
+    },
+    {
+      "description" : "にげて - regression test",
+      "expected" : [
+        {
+          "lemma" : "にげる",
+          "pos" : "Verb",
+          "surface" : "にげ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
+      "id" : "ichidan_nigete",
+      "input" : "にげて"
+    },
+    {
+      "description" : "食べていただきます - regression test",
+      "expected" : [
+        {
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "いただく",
+          "pos" : "Verb",
+          "surface" : "いただき"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ます"
+        }
+      ],
+      "id" : "k98dfbeteitadakimasu",
+      "input" : "食べていただきます"
     }
-  ]
+  ],
+  "description" : "Te-form and ta-form patterns",
+  "version" : "1.0"
 }

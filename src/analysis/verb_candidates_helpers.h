@@ -149,6 +149,21 @@ bool isCompoundAdjectivePattern(std::string_view surface);
 bool isGodanVerbType(grammar::VerbType verb_type);
 
 /**
+ * @brief Get Godan VerbTypes that use a specific onbin pattern
+ *
+ * Onbin patterns:
+ * - "い" (ikuon) → GodanKa, GodanGa
+ * - "っ" (sokuon) → GodanTa, GodanRa, GodanWa
+ * - "ん" (hatsuonbin) → GodanNa, GodanBa, GodanMa
+ * - "" (none) → GodanSa
+ *
+ * @param onbin Onbin pattern to match ("い", "っ", "ん", or "")
+ * @return Vector of (VerbType, base_suffix) pairs
+ */
+std::vector<std::pair<grammar::VerbType, std::string_view>>
+getGodanTypesByOnbin(std::string_view onbin);
+
+/**
  * @brief Check if surface contains passive/potential auxiliary patterns
  */
 bool shouldSkipPassiveAuxPattern(std::string_view surface, grammar::VerbType verb_type);

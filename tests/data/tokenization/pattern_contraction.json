@@ -1,172 +1,176 @@
 {
-  "version": "1.0",
-  "description": "Contraction patterns (てる、ちゃう)",
-  "cases": [
+  "cases" : [
     {
-      "id": "contraction_shiteru",
-      "description": "してる - MeCab splits as し+てる (している → してる)",
-      "input": "してる",
-      "expected": [
+      "description" : "してる - MeCab splits as し+てる (している → してる)",
+      "expected" : [
         {
-          "surface": "し",
-          "pos": "Verb",
-          "lemma": "する"
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
         },
         {
-          "surface": "てる",
-          "pos": "Verb",
-          "lemma": "てる"
+          "lemma" : "てる",
+          "pos" : "Verb",
+          "surface" : "てる"
         }
       ],
-      "tags": [
+      "id" : "contraction_shiteru",
+      "input" : "してる",
+      "tags" : [
         "contraction"
       ]
     },
     {
-      "id": "contraction_miteta",
-      "description": "見てた - MeCab splits as 見+て+た (見ていた → 見てた)",
-      "input": "見てた",
-      "expected": [
+      "description" : "見てた - MeCab splits as 見+て+た (見ていた → 見てた)",
+      "expected" : [
         {
-          "surface": "見",
-          "pos": "Verb",
-          "lemma": "見る"
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
         },
         {
-          "surface": "て",
-          "pos": "Verb",
-          "lemma": "てる"
+          "lemma" : "てる",
+          "pos" : "Verb",
+          "surface" : "て"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary",
-          "lemma": "た"
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
         }
       ],
-      "tags": [
+      "id" : "contraction_miteta",
+      "input" : "見てた",
+      "tags" : [
         "strict",
         "contraction"
       ]
     },
     {
-      "id": "contracted_neg_wakaran",
-      "description": "わからん - contracted negative of わかる (わからない→わからん)",
-      "input": "わからん",
-      "expected": [
+      "description" : "わからん - contracted negative of わかる (わからない→わからん)",
+      "expected" : [
         {
-          "surface": "わからん",
-          "pos": "Verb",
-          "lemma": "わかる"
+          "lemma" : "わかる",
+          "pos" : "Verb",
+          "surface" : "わから"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ん"
         }
       ],
-      "tags": [
+      "id" : "contracted_neg_wakaran",
+      "input" : "わからん",
+      "tags" : [
         "contraction",
         "colloquial",
         "regression"
       ]
     },
     {
-      "id": "contracted_neg_nainda",
-      "description": "ないんだ - ない + んだ should not split as な + いん + だ",
-      "input": "ないんだ",
-      "expected": [
+      "description" : "ないんだ - ない + んだ should not split as な + いん + だ",
+      "expected" : [
         {
-          "surface": "ない",
-          "pos": "Auxiliary"
+          "pos" : "Adjective",
+          "surface" : "ない"
         },
         {
-          "surface": "んだ",
-          "pos": "Auxiliary"
+          "pos" : "Noun",
+          "surface" : "ん"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "だ"
         }
       ],
-      "tags": [
+      "id" : "contracted_neg_nainda",
+      "input" : "ないんだ",
+      "tags" : [
         "contraction",
         "auxiliary",
         "regression"
       ]
     },
     {
-      "id": "honorific_tanaka_san",
-      "description": "田中さん - should split as NOUN + SUFFIX, not VERB",
-      "input": "田中さん",
-      "expected": [
+      "description" : "田中さん - should split as NOUN + SUFFIX, not VERB",
+      "expected" : [
         {
-          "surface": "田中",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "田中"
         },
         {
-          "surface": "さん",
-          "pos": "Suffix"
+          "pos" : "Suffix",
+          "surface" : "さん"
         }
       ],
-      "tags": [
+      "id" : "honorific_tanaka_san",
+      "input" : "田中さん",
+      "tags" : [
         "honorific",
         "suffix",
         "regression"
       ]
     },
     {
-      "id": "honorific_oneesan",
-      "description": "おねえさん - should not be parsed as verb おねえす",
-      "input": "おねえさん",
-      "expected": [
+      "description" : "おねえさん - should not be parsed as verb おねえす",
+      "expected" : [
         {
-          "surface": "お",
-          "pos": "Prefix"
+          "pos" : "Prefix",
+          "surface" : "お"
         },
         {
-          "surface": "ねえさん",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "ねえさん"
         }
       ],
-      "tags": [
+      "id" : "honorific_oneesan",
+      "input" : "おねえさん",
+      "tags" : [
         "honorific",
         "regression"
       ]
     },
     {
-      "id": "honorific_onesan_kanji",
-      "description": "お姉さん - prefix + kanji noun + suffix",
-      "input": "お姉さん",
-      "expected": [
+      "description" : "お姉さん - prefix + kanji noun + suffix",
+      "expected" : [
         {
-          "surface": "お",
-          "pos": "Prefix"
+          "pos" : "Prefix",
+          "surface" : "お"
         },
         {
-          "surface": "姉",
-          "pos": "Noun"
-        },
-        {
-          "surface": "さん",
-          "pos": "Suffix"
+          "pos" : "Noun",
+          "surface" : "姉さん"
         }
       ],
-      "tags": [
+      "id" : "honorific_onesan_kanji",
+      "input" : "お姉さん",
+      "tags" : [
         "honorific",
         "suffix",
         "regression"
       ]
     },
     {
-      "id": "honorific_gibosan",
-      "description": "義母さん - compound noun + suffix",
-      "input": "義母さん",
-      "expected": [
+      "description" : "義母さん - compound noun + suffix",
+      "expected" : [
         {
-          "surface": "義母",
-          "pos": "Noun"
+          "pos" : "Noun",
+          "surface" : "義母"
         },
         {
-          "surface": "さん",
-          "pos": "Suffix"
+          "pos" : "Suffix",
+          "surface" : "さん"
         }
       ],
-      "tags": [
+      "id" : "honorific_gibosan",
+      "input" : "義母さん",
+      "tags" : [
         "honorific",
         "suffix",
         "regression"
       ]
     }
-  ]
+  ],
+  "description" : "Contraction patterns (てる、ちゃう)",
+  "version" : "1.0"
 }

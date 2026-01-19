@@ -49,6 +49,7 @@ struct UnknownCandidate {
   size_t start{0};
   size_t end{0};
   core::PartOfSpeech pos{core::PartOfSpeech::Noun};
+  core::ExtendedPOS extended_pos{core::ExtendedPOS::Unknown};  // Fine-grained POS for bigram
   float cost{0.0F};
   bool has_suffix{false};
   std::string lemma;  // Base form (for verbs/adjectives)
@@ -78,6 +79,7 @@ struct UnknownCandidate {
  * @param origin Candidate origin (debug only)
  * @param confidence Inflection confidence (debug only)
  * @param pattern Pattern name (debug only)
+ * @param extended_pos Extended POS for bigram (optional)
  */
 inline UnknownCandidate makeVerbCandidate(
     const std::string& surface, size_t start, size_t end,
@@ -86,12 +88,17 @@ inline UnknownCandidate makeVerbCandidate(
     bool has_suffix = false,
     [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
     [[maybe_unused]] float confidence = 0.0F,
-    [[maybe_unused]] const char* pattern = nullptr) {
+    [[maybe_unused]] const char* pattern = nullptr,
+    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown) {
   UnknownCandidate cand;
   cand.surface = surface;
   cand.start = start;
   cand.end = end;
   cand.pos = core::PartOfSpeech::Verb;
+  // Auto-detect verb form from surface if not specified
+  cand.extended_pos = (extended_pos != core::ExtendedPOS::Unknown)
+                          ? extended_pos
+                          : core::detectVerbForm(surface, {});
   cand.cost = cost;
   cand.lemma = lemma;
   cand.conj_type = conj_type;
@@ -114,16 +121,22 @@ inline UnknownCandidate makeVerbCandidate(
  * @param cost Candidate cost
  * @param has_suffix Whether candidate expects suffix
  * @param origin Candidate origin (debug only)
+ * @param extended_pos Extended POS for bigram (optional)
  */
 inline UnknownCandidate makeNounCandidate(
     const std::string& surface, size_t start, size_t end,
     float cost, bool has_suffix = false,
-    [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown) {
+    [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
+    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown) {
   UnknownCandidate cand;
   cand.surface = surface;
   cand.start = start;
   cand.end = end;
   cand.pos = core::PartOfSpeech::Noun;
+  // Default to Noun if not specified
+  cand.extended_pos = (extended_pos != core::ExtendedPOS::Unknown)
+                          ? extended_pos
+                          : core::ExtendedPOS::Noun;
   cand.cost = cost;
   cand.has_suffix = has_suffix;
 #ifdef SUZUME_DEBUG_INFO
@@ -141,16 +154,22 @@ inline UnknownCandidate makeNounCandidate(
  * @param cost Candidate cost
  * @param has_suffix Whether candidate expects suffix
  * @param origin Candidate origin (debug only)
+ * @param extended_pos Extended POS for bigram (optional)
  */
 inline UnknownCandidate makeCandidate(
     const std::string& surface, size_t start, size_t end,
     core::PartOfSpeech pos, float cost, bool has_suffix = false,
-    [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown) {
+    [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
+    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown) {
   UnknownCandidate cand;
   cand.surface = surface;
   cand.start = start;
   cand.end = end;
   cand.pos = pos;
+  // Use posToExtendedPos if not specified
+  cand.extended_pos = (extended_pos != core::ExtendedPOS::Unknown)
+                          ? extended_pos
+                          : core::posToExtendedPos(pos);
   cand.cost = cost;
   cand.has_suffix = has_suffix;
 #ifdef SUZUME_DEBUG_INFO

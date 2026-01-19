@@ -131,7 +131,7 @@ class Viterbi {
           float total = state_info.cost + word_cost + conn_cost + kTransitionCost;
           size_t next_pos_idx = static_cast<size_t>(edge.pos);
 
-          SUZUME_DEBUG_LOG("[VITERBI] pos=" << pos << " \"" << edge.surface
+          SUZUME_DEBUG_LOG_VERBOSE("[VITERBI] pos=" << pos << " \"" << edge.surface
                       << "\" (from " << posToString(static_cast<PartOfSpeech>(pos_idx)) << ")"
                       << " word=" << word_cost << " conn=" << conn_cost
                       << " total=" << total << "\n");
@@ -148,15 +148,24 @@ class Viterbi {
       }
     }
 
-    // Find best state at final position
+    // Find best and second-best states at final position
     size_t best_final_pos_idx = 0;
+    size_t second_final_pos_idx = 0;
     float best_cost = std::numeric_limits<float>::max();
+    float second_cost = std::numeric_limits<float>::max();
 
     const auto& final_states = states_by_pos[text_len];
     for (size_t i = 0; i < kNumPosTypes; ++i) {
-      if (final_states[i].valid && final_states[i].cost < best_cost) {
-        best_cost = final_states[i].cost;
-        best_final_pos_idx = i;
+      if (final_states[i].valid) {
+        if (final_states[i].cost < best_cost) {
+          second_cost = best_cost;
+          second_final_pos_idx = best_final_pos_idx;
+          best_cost = final_states[i].cost;
+          best_final_pos_idx = i;
+        } else if (final_states[i].cost < second_cost) {
+          second_cost = final_states[i].cost;
+          second_final_pos_idx = i;
+        }
       }
     }
 
@@ -180,13 +189,17 @@ class Viterbi {
       std::reverse(result.path.begin(), result.path.end());
     }
 
-    // Debug: print final path
+    // Debug: print final path and runner-up comparison
     SUZUME_DEBUG_IF(!result.path.empty()) {
       SUZUME_DEBUG_STREAM << "[VITERBI] Best path (cost=" << result.total_cost << "): ";
       for (size_t i = 0; i < result.path.size(); ++i) {
         const auto& edge = lattice.getEdge(result.path[i]);
         if (i > 0) SUZUME_DEBUG_STREAM << " → ";
         SUZUME_DEBUG_STREAM << "\"" << edge.surface << "\"(" << posToString(edge.pos) << ")";
+      }
+      // Show margin over second-best if available
+      if (second_cost < std::numeric_limits<float>::max() && second_cost != best_cost) {
+        SUZUME_DEBUG_STREAM << " [margin=" << (second_cost - best_cost) << "]";
       }
       SUZUME_DEBUG_STREAM << "\n";
     }
