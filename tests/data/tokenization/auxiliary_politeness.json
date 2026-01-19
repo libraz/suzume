@@ -53,13 +53,18 @@
     },
     {
       "id": "bug_nagakatta",
-      "description": "長かったです - adjective past form",
+      "description": "長かったです - MeCab-compatible split: 長かっ + た + です",
       "input": "長かったです",
       "expected": [
         {
-          "surface": "長かった",
+          "surface": "長かっ",
           "pos": "Adjective",
           "lemma": "長い"
+        },
+        {
+          "surface": "た",
+          "pos": "Auxiliary",
+          "lemma": "た"
         },
         {
           "surface": "です",

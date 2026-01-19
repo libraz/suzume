@@ -23,6 +23,47 @@ struct VerbEnding {
   std::string_view base;
 };
 
+// =============================================================================
+// Godan verb conjugation base mapping
+// Each entry maps a consonant row (未然形語尾) to its dictionary form ending
+// =============================================================================
+// clang-format off
+
+// Godan consonant → dictionary form mapping
+// Format: {consonant, base} where consonant is 未然形 and base is 終止形
+#define GODAN_ROWS \
+  X("わ", "う") X("か", "く") X("が", "ぐ") X("さ", "す") X("た", "つ") \
+  X("な", "ぬ") X("ま", "む") X("ば", "ぶ") X("ら", "る")
+
+// Generate passive forms for all godan rows: C + suffix → base
+// Passive: 未然形 + れる (e.g., 買わ + れる → 買う)
+#define PASSIVE(suffix) \
+  X("わ" suffix, "う") X("か" suffix, "く") X("が" suffix, "ぐ") \
+  X("さ" suffix, "す") X("た" suffix, "つ") X("な" suffix, "ぬ") \
+  X("ま" suffix, "む") X("ば" suffix, "ぶ") X("ら" suffix, "る")
+
+// Generate causative forms for all godan rows: C + suffix → base
+// Causative: 未然形 + せる (e.g., 書か + せる → 書く)
+#define CAUSATIVE(suffix) \
+  X("わ" suffix, "う") X("か" suffix, "く") X("が" suffix, "ぐ") \
+  X("さ" suffix, "す") X("た" suffix, "つ") X("な" suffix, "ぬ") \
+  X("ま" suffix, "む") X("ば" suffix, "ぶ") X("ら" suffix, "る")
+
+// Generate causative-passive forms (no さ row - される is ambiguous with passive)
+#define CAUSATIVE_PASSIVE(suffix) \
+  X("わ" suffix, "う") X("か" suffix, "く") X("が" suffix, "ぐ") \
+  X("た" suffix, "つ") X("な" suffix, "ぬ") \
+  X("ま" suffix, "む") X("ば" suffix, "ぶ") X("ら" suffix, "る")
+
+// Generate negative forms: C + ない → base
+#define NEGATIVE(suffix) \
+  X("わ" suffix, "う") X("か" suffix, "く") X("が" suffix, "ぐ") \
+  X("さ" suffix, "す") X("た" suffix, "つ") X("な" suffix, "ぬ") \
+  X("ま" suffix, "む") X("ば" suffix, "ぶ") X("ら" suffix, "る")
+
+// X macro helper for VerbEnding generation
+#define X(suffix, base) {suffix, base},
+
 // Common verb conjugation endings (simplified)
 // NOTE: Order matters - longer patterns should come first
 const VerbEnding kVerbEndings[] = {
@@ -181,127 +222,33 @@ const VerbEnding kVerbEndings[] = {
     {"していった", "す"},
     {"ていった", "る"},
 
-    // Passive forms (dictionary)
-    {"われる", "う"},
-    {"かれる", "く"},
-    {"がれる", "ぐ"},
-    {"される", "す"},
-    {"たれる", "つ"},
-    {"なれる", "ぬ"},
-    {"まれる", "む"},
-    {"ばれる", "ぶ"},
-    {"られる", "る"},
+    // =========================================================================
+    // Passive forms (受身形) - generated via PASSIVE macro
+    // Pattern: 未然形 + れる/れた/れて/れない/れます/れました/れている
+    // =========================================================================
+    PASSIVE("れている")   // Progressive (longest first)
+    PASSIVE("れました")   // Polite past
+    PASSIVE("れない")     // Negative
+    PASSIVE("れます")     // Polite
+    PASSIVE("れる")       // Dictionary
+    PASSIVE("れた")       // Past
+    PASSIVE("れて")       // Te-form
 
-    // Passive forms (past)
-    {"われた", "う"},
-    {"かれた", "く"},
-    {"がれた", "ぐ"},
-    {"された", "す"},
-    {"たれた", "つ"},
-    {"なれた", "ぬ"},
-    {"まれた", "む"},
-    {"ばれた", "ぶ"},
-    {"られた", "る"},
+    // =========================================================================
+    // Causative forms (使役形) - generated via CAUSATIVE macro
+    // Pattern: 未然形 + せる/せた/せて
+    // =========================================================================
+    CAUSATIVE("せる")     // Dictionary
+    CAUSATIVE("せた")     // Past
+    CAUSATIVE("せて")     // Te-form
 
-    // Passive forms (te-form)
-    {"われて", "う"},
-    {"かれて", "く"},
-    {"がれて", "ぐ"},
-    {"されて", "す"},
-    {"たれて", "つ"},
-    {"なれて", "ぬ"},
-    {"まれて", "む"},
-    {"ばれて", "ぶ"},
-    {"られて", "る"},
+    // =========================================================================
+    // Causative-passive forms (使役受身形)
+    // Pattern: 未然形 + される (note: さ row excluded - ambiguous with passive)
+    // =========================================================================
+    CAUSATIVE_PASSIVE("された")
 
-    // Passive forms (negative)
-    {"われない", "う"},
-    {"かれない", "く"},
-    {"がれない", "ぐ"},
-    {"されない", "す"},
-    {"たれない", "つ"},
-    {"なれない", "ぬ"},
-    {"まれない", "む"},
-    {"ばれない", "ぶ"},
-    {"られない", "る"},
-
-    // Passive forms (polite)
-    {"われます", "う"},
-    {"かれます", "く"},
-    {"がれます", "ぐ"},
-    {"されます", "す"},
-    {"たれます", "つ"},
-    {"なれます", "ぬ"},
-    {"まれます", "む"},
-    {"ばれます", "ぶ"},
-    {"られます", "る"},
-
-    // Passive forms (polite past)
-    {"われました", "う"},
-    {"かれました", "く"},
-    {"がれました", "ぐ"},
-    {"されました", "す"},
-    {"たれました", "つ"},
-    {"なれました", "ぬ"},
-    {"まれました", "む"},
-    {"ばれました", "ぶ"},
-    {"られました", "る"},
-
-    // Passive forms (progressive)
-    {"われている", "う"},
-    {"かれている", "く"},
-    {"がれている", "ぐ"},
-    {"されている", "す"},
-    {"たれている", "つ"},
-    {"なれている", "ぬ"},
-    {"まれている", "む"},
-    {"ばれている", "ぶ"},
-    {"られている", "る"},
-
-    // Causative forms (dictionary)
-    {"わせる", "う"},
-    {"かせる", "く"},
-    {"がせる", "ぐ"},
-    {"させる", "す"},
-    {"たせる", "つ"},
-    {"なせる", "ぬ"},
-    {"ませる", "む"},
-    {"ばせる", "ぶ"},
-    {"らせる", "る"},
-
-    // Causative forms (past)
-    {"わせた", "う"},
-    {"かせた", "く"},
-    {"がせた", "ぐ"},
-    {"させた", "す"},
-    {"たせた", "つ"},
-    {"なせた", "ぬ"},
-    {"ませた", "む"},
-    {"ばせた", "ぶ"},
-    {"らせた", "る"},
-
-    // Causative forms (te-form)
-    {"わせて", "う"},
-    {"かせて", "く"},
-    {"がせて", "ぐ"},
-    {"させて", "す"},
-    {"たせて", "つ"},
-    {"なせて", "ぬ"},
-    {"ませて", "む"},
-    {"ばせて", "ぶ"},
-    {"らせて", "る"},
-
-    // Causative-passive forms
-    {"わされた", "う"},
-    {"かされた", "く"},
-    {"がされた", "ぐ"},
-    {"たされた", "つ"},
-    {"なされた", "ぬ"},
-    {"まされた", "む"},
-    {"ばされた", "ぶ"},
-    {"らされた", "る"},
-
-    // Godan verbs
+    // Godan verbs (onbin forms)
     {"った", "う"},
     {"った", "つ"},
     {"った", "る"},
@@ -331,17 +278,9 @@ const VerbEnding kVerbEndings[] = {
     {"します", "する"},
     {"ます", "る"},
 
-    // Nai-form
-    {"わない", "う"},
-    {"かない", "く"},
-    {"さない", "す"},
-    {"たない", "つ"},
-    {"なない", "ぬ"},
-    {"ばない", "ぶ"},
-    {"まない", "む"},
-    {"らない", "る"},
-    {"がない", "ぐ"},
-    {"ない", "る"},
+    // Nai-form - generated via NEGATIVE macro
+    NEGATIVE("ない")
+    {"ない", "る"},  // Ichidan fallback
 
     // Potential
     {"える", "う"},
@@ -354,10 +293,19 @@ const VerbEnding kVerbEndings[] = {
     {"れる", "る"},
     {"げる", "ぐ"},
 
-    // Passive/Causative
+    // Passive/Causative (ichidan)
     {"られる", "る"},
     {"させる", "する"},
 };
+
+// Cleanup macros
+#undef X
+#undef GODAN_ROWS
+#undef PASSIVE
+#undef CAUSATIVE
+#undef CAUSATIVE_PASSIVE
+#undef NEGATIVE
+// clang-format on
 
 // Adjective endings
 const VerbEnding kAdjectiveEndings[] = {

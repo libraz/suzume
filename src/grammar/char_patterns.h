@@ -9,8 +9,18 @@
 #include <string_view>
 
 #include "conjugation.h"  // VerbType
+#include "core/kana_constants.h"
 
 namespace suzume::grammar {
+
+// Import kana constants for backward compatibility
+// These are now defined in core/kana_constants.h
+using kana::kOnbinEndings;
+using kana::kOnbinCount;
+using kana::kMizenkeiEndings;
+using kana::kMizenkeiCount;
+using kana::kRenyokeiEndings;
+using kana::kRenyokeiCount;
 
 /**
  * @brief Check if stem ends with e-row hiragana (common Ichidan endings)
@@ -28,7 +38,7 @@ bool endsWithERow(std::string_view stem);
  * @param count Number of characters in the array
  * @return True if the stem ends with any of the characters
  */
-bool endsWithChar(std::string_view stem, const char* chars[], size_t count);
+bool endsWithChar(std::string_view stem, const char* const chars[], size_t count);
 
 /**
  * @brief Check if entire stem consists only of kanji (no hiragana/katakana)
@@ -86,17 +96,8 @@ bool isPureHiragana(std::string_view stem);
  */
 bool isPureKatakana(std::string_view stem);
 
-// Onbin endings: い, っ, ん
-extern const char* kOnbinEndings[];
-extern const size_t kOnbinCount;
-
-// Mizenkei (a-row) endings: か, が, さ, た, な, ば, ま, ら, わ
-extern const char* kMizenkeiEndings[];
-extern const size_t kMizenkeiCount;
-
-// Renyokei (i-row) endings: き, ぎ, し, ち, に, び, み, り
-extern const char* kRenyokeiEndings[];
-extern const size_t kRenyokeiCount;
+// Note: kOnbinEndings, kMizenkeiEndings, kRenyokeiEndings are now
+// imported from kana_constants.h via using declarations at the top of this file.
 
 // Full i-row hiragana: み, き, ぎ, し, じ, ち, ぢ, に, び, り, い
 // Includes い for u-verbs (会う→会い), じ/ぢ for ichidan verbs (感じる, etc.)

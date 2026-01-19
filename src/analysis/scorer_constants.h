@@ -268,6 +268,12 @@ constexpr float kBonusShireruToMasuNai = scale::kProhibitive;  // 3.5F
 // E.g., し + てる should beat し(PARTICLE) + てる
 constexpr float kBonusRenyokeiToContractedVerb = scale::kSevere;  // 2.5
 
+// Verb renyokei + standalone て/で (renyokei of てる/でる) bonus
+// E.g., 食べ + て(VERB, lemma=てる) for contracted progressive 食べてた
+// Moderate bonus to keep path competitive while allowing て(PARTICLE) to win
+// for full progressive forms like 食べている
+constexpr float kBonusStandaloneTeDeRenyokei = 0.6F;
+
 // Verb renyokei/onbinkei + て/で particle (MeCab-compatible te-form split)
 // E.g., 食べ + て, 書い + て - strong bonus to prefer this split
 constexpr float kBonusRenyokeiToTeParticle = scale::kSevere;  // 2.5
@@ -310,6 +316,16 @@ constexpr float kBonusAdjKuToNai = scale::kSevere;  // 2.5
 // Strong bonus needed to beat で(AUX)+す(VERB) split path
 constexpr float kBonusIAdjToDesu = scale::kSevere;  // 2.5
 
+// ADJ(かっ形) → た(AUX) bonus for MeCab-compatible split (BUG-036)
+// E.g., よかったです → よかっ + た + です
+// Small bonus to make the path viable (main bonus is at た→です)
+constexpr float kBonusIAdjKattToTa = 0.3F;
+
+// た(AUX) → です(AUX) bonus for MeCab-compatible split (BUG-036)
+// Helps split paths like よかっ+た+です beat full form paths like よかった+です
+// Also helps verb past + です patterns (食べたです)
+constexpr float kBonusTaAuxToDesu = scale::kSevere;  // 2.5
+
 // に(PARTICLE) + いる/いた(VERB/AUX) bonus
 // E.g., 家にいた → 家 + に + いた (not にいた as verb)
 // Session 31 allowed に as verb stem start for verbs like にげる, にる
@@ -326,6 +342,19 @@ constexpr float kBonusSentenceFinalParticleSeq = scale::kStrong;  // 2.5
 // Balanced to allow ADJ一体 (難しそう→難しい) while boosting VERB+そう slightly
 // Note: Perfect MeCab compat (VERB/ADJ語幹+そう split) needs ADJ stem generation
 constexpr float kBonusSouAfterRenyokeiSmall = 0.25F;
+
+// ADJ stem + そう (appearance auxiliary) bonus
+// E.g., 美味し + そう - MeCab-compatible adjective stem split
+// Very large bonus needed because dictionary forms (美味しそう) have low cost
+constexpr float kBonusAdjStemToSouAux = 4.0F;
+
+// Quotative + いう (to say) bonus
+// E.g., そう + いっ, と + いっ - prefer いう over いく after quotative contexts
+constexpr float kBonusQuotativeToIu = scale::kSevere + scale::kMinor;  // 3.0
+
+// に(PARTICLE) + いく(to go) onbinkei bonus
+// E.g., 旅行にいった → に + いっ (prefer いく over いう after に)
+constexpr float kBonusNiParticleToIku = scale::kStrong + scale::kMinor;  // 2.0
 
 // =============================================================================
 // Auxiliary Connection Rules (extracted from inline literals)
@@ -376,8 +405,21 @@ constexpr float kBonusAdjToCopulaDe = -scale::kSevere;  // -2.5
 constexpr float kPenaltyNaAdjToDekinaiVerb = scale::kProhibitive;  // 3.5
 
 // で(AUX, lemma=だ) + ない(AUX) bonus for na-adjective copula negation
-// E.g., 嫌でない → 嫌 + で + ない (copula negation pattern)
-constexpr float kBonusCopulaDeToNai = scale::kSevere;  // 2.5 (used as negative bonus: -2.5)
+// E.g., 嫌でない → 嫌 + で + ない, でない → で + ない (copula negation pattern)
+// Strong bonus (kProhibitive) to beat で(VERB,でる)+ない path
+constexpr float kBonusCopulaDeToNai = scale::kProhibitive;  // 3.5 (used as negative bonus: -3.5)
+
+// で(AUX, lemma=だ) + ござる(AUX) bonus for classical copula pattern
+// E.g., 侍でござる, これでござる - need to beat で(PARTICLE) + ござる(VERB) path
+// で(PARTICLE) has cost -0.8, で(AUX) has cost 0.2 → diff 1.0
+// Need ~1.6+ bonus to overcome total difference
+constexpr float kBonusCopulaDeToGozaru = 1.8F;
+
+// で(AUX, lemma=だ) + は/も(PARTICLE) bonus for copula negation patterns
+// E.g., ではない, でもない - prefer copula interpretation over particle
+// で(PARTICLE) has cost 0.1, で(AUX) has cost 1.0 → diff 0.9
+// Need bonus > 0.9 to overcome word cost difference
+constexpr float kBonusCopulaDeToHaMo = scale::kStrong;  // 1.5
 
 // =============================================================================
 // Other Connection Rules (extracted from inline literals)

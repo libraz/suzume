@@ -77,14 +77,12 @@
     },
     {
       "id": "hiragana_verb_imasen",
-      "description": "いません - negative polite form of verb いる (single auxiliary token)",
+      "description": "いません - negative polite form of verb いる (MeCab-compatible split)",
       "input": "いません",
       "expected": [
-        {
-          "surface": "いません",
-          "pos": "Auxiliary",
-          "lemma": "いる"
-        }
+        {"surface": "い", "pos": "Auxiliary", "lemma": "いる"},
+        {"surface": "ませ", "pos": "Auxiliary", "lemma": "ます"},
+        {"surface": "ん", "pos": "Auxiliary"}
       ],
       "tags": [
         "verb"

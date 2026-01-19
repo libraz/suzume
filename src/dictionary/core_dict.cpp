@@ -128,6 +128,7 @@ std::vector<DictionaryEntry> expandAdjectiveEntry(const DictionaryEntry& entry) 
   static const std::vector<std::pair<std::string, char>> kIAdjSuffixes = {
       {"い", '\0'},           // Base form
       {"かった", '\0'},       // Past
+      {"かっ", '\0'},         // Ta-connection (連用タ接続) for MeCab-compatible split: よかったです→よかっ+た+です
       {"くない", '\0'},       // Negative
       {"くなかった", '\0'},   // Negative past
       {"くて", '\0'},         // Te-form
@@ -160,6 +161,11 @@ std::vector<DictionaryEntry> expandAdjectiveEntry(const DictionaryEntry& entry) 
     // Lower cost for さそう to beat split (よさ+そう) analysis
     if (suffix == "さそう") {
       new_entry.cost = -0.5F;
+    }
+    // Higher cost for かっ (ta-connection) so full form かった is preferred when alone
+    // But split path (よかっ+た+です) can win with connection bonuses
+    if (suffix == "かっ") {
+      new_entry.cost += 0.2F;
     }
     // Preserve conj_type for ChaSen output
     result.push_back(new_entry);

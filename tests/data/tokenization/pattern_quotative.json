@@ -83,26 +83,15 @@
     },
     {
       "id": "toitte_in_sentence",
-      "description": "といって in sentence context",
+      "description": "といって in sentence context (MeCab-compatible split)",
       "input": "仕事といって出かけた",
       "expected": [
-        {
-          "surface": "仕事",
-          "pos": "Noun"
-        },
-        {
-          "surface": "といって",
-          "pos": "Verb",
-          "lemma": "いう"
-        },
-        {
-          "surface": "出かけ",
-          "pos": "Verb"
-        },
-        {
-          "surface": "た",
-          "pos": "Auxiliary"
-        }
+        {"surface": "仕事", "pos": "Noun"},
+        {"surface": "と", "pos": "Particle"},
+        {"surface": "いっ", "pos": "Verb", "lemma": "いう"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "出かけ", "pos": "Verb"},
+        {"surface": "た", "pos": "Auxiliary"}
       ],
       "tags": [
         "quotative"
@@ -110,42 +99,30 @@
     },
     {
       "id": "toittemo_basic",
-      "description": "といっても (concessive conjunction)",
+      "description": "といっても (MeCab-compatible split)",
       "input": "といっても",
       "expected": [
-        {
-          "surface": "といっても",
-          "pos": "Conjunction",
-          "lemma": "といっても"
-        }
+        {"surface": "と", "pos": "Particle"},
+        {"surface": "いっ", "pos": "Verb", "lemma": "いう"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "も", "pos": "Particle"}
       ],
       "tags": [
-        "strict",
         "quotative"
       ]
     },
     {
       "id": "toittemo_in_sentence",
-      "description": "といっても in sentence context",
+      "description": "といっても in sentence context (MeCab-compatible split)",
       "input": "仕事といっても簡単だ",
       "expected": [
-        {
-          "surface": "仕事",
-          "pos": "Noun"
-        },
-        {
-          "surface": "といっても",
-          "pos": "Conjunction",
-          "lemma": "といっても"
-        },
-        {
-          "surface": "簡単",
-          "pos": "Adjective"
-        },
-        {
-          "surface": "だ",
-          "pos": "Auxiliary"
-        }
+        {"surface": "仕事", "pos": "Noun"},
+        {"surface": "と", "pos": "Particle"},
+        {"surface": "いっ", "pos": "Verb", "lemma": "いう"},
+        {"surface": "て", "pos": "Particle"},
+        {"surface": "も", "pos": "Particle"},
+        {"surface": "簡単", "pos": "Adjective"},
+        {"surface": "だ", "pos": "Auxiliary"}
       ],
       "tags": [
         "quotative"

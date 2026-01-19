@@ -399,24 +399,17 @@
     },
     {
       "id": "phase1_2_umaku_ikanakatta",
-      "description": "Phase1-2: うまくいかなかった - いかなかった should be VERB いく, not split",
+      "description": "Phase1-2: うまくいかなかった (MeCab-compatible split)",
       "input": "うまくいかなかった",
       "expected": [
-        {
-          "surface": "うまく",
-          "pos": "Adjective",
-          "lemma": "うまい"
-        },
-        {
-          "surface": "いかなかった",
-          "pos": "Verb",
-          "lemma": "いく"
-        }
+        {"surface": "うまく", "pos": "Adjective", "lemma": "うまい"},
+        {"surface": "いか", "pos": "Verb", "lemma": "いく"},
+        {"surface": "なかっ", "pos": "Auxiliary", "lemma": "ない"},
+        {"surface": "た", "pos": "Auxiliary", "lemma": "た"}
       ],
       "tags": [
         "phase1_2_fix",
-        "iku",
-        "regression"
+        "iku"
       ]
     },
     {

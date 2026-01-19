@@ -195,6 +195,8 @@ void evaluateAdjRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkAdjKuToNai(prev, next, opts));
   // I-ADJ(い) → です(AUX) bonus for MeCab-compatible polite form
   accumulateRule(accumulated, checkIAdjToDesu(prev, next, opts));
+  // I-ADJ(かっ) → た(AUX) bonus for MeCab-compatible split (よかったです → よかっ + た + です)
+  accumulateRule(accumulated, checkIAdjKattToTa(prev, next, opts));
 
   // ADJ → VERB rules (na-adjective copula penalty)
   accumulateRule(accumulated, checkNaAdjToDekinaiVerb(prev, next, opts));
@@ -203,6 +205,7 @@ void evaluateAdjRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkTakuTeSplit(prev, next, opts));
   accumulateRule(accumulated, checkShiParticleConnection(prev, next, opts));
   accumulateRule(accumulated, checkAdjKuToTeParticle(prev, next, opts));
+  accumulateRule(accumulated, checkAdjToSentenceFinalParticle(prev, next, opts));
 
   // ADJ → ADJ rules
   accumulateRule(accumulated, checkRashiiAfterPredicate(prev, next, opts));
@@ -223,6 +226,8 @@ void evaluateAuxRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkCopulaDeToKuruAux(prev, next, opts));
   accumulateRule(accumulated, checkCopulaDeToNai(prev, next, opts));
   accumulateRule(accumulated, checkCopulaDeToGozaru(prev, next, opts));
+  // た(AUX) → です(AUX) bonus for MeCab-compatible split (よかっ+た+です, 食べた+です)
+  accumulateRule(accumulated, checkTaAuxToDesu(prev, next, opts));
 
   // AUX → VERB rules
   accumulateRule(accumulated, checkCopulaDeToAru(prev, next, opts));
@@ -230,6 +235,9 @@ void evaluateAuxRules(const core::LatticeEdge& prev,
   // AUX → PARTICLE rules
   accumulateRule(accumulated, checkMasenDeSplit(prev, next, opts));
   accumulateRule(accumulated, checkShiParticleConnection(prev, next, opts));
+  accumulateRule(accumulated, checkAuxToSentenceFinalParticle(prev, next, opts));
+  accumulateRule(accumulated, checkCopulaDeToHaParticle(prev, next, opts));
+  accumulateRule(accumulated, checkCopulaDeToMoParticle(prev, next, opts));
 
   // AUX → ADJ rules (TaiAfterRenyokei handles AUX → たい penalty)
   accumulateRule(accumulated, checkTaiAfterRenyokei(prev, next, opts));
@@ -260,6 +268,7 @@ void evaluateParticleRules(const core::LatticeEdge& prev,
   accumulateRule(accumulated, checkTeParticleToInaiVerb(prev, next, opts));
   accumulateRule(accumulated, checkParticleNiToIruVerb(prev, next, opts));
   accumulateRule(accumulated, checkNiParticleToIku(prev, next, opts));
+  accumulateRule(accumulated, checkQuotativeToParticleToIu(prev, next, opts));
 
   // PARTICLE → SUFFIX rules
   accumulateRule(accumulated, checkSuffixAfterNaParticle(prev, next, opts));

@@ -20,6 +20,7 @@
 namespace suzume::analysis {
 
 using verb_helpers::addEmphaticVariants;
+using verb_helpers::findCharRegionEnd;
 using verb_helpers::getHiraganaVowel;
 using verb_helpers::isAdjectiveInDictionary;
 using verb_helpers::isEmphaticChar;
@@ -324,12 +325,8 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
   }
 
   // Find kanji portion (typically 1-2 characters for i-adjectives)
-  size_t kanji_end = start_pos;
-  while (kanji_end < char_types.size() &&
-         kanji_end - start_pos < 3 &&  // Max 3 kanji for adjective stem
-         char_types[kanji_end] == normalize::CharType::Kanji) {
-    ++kanji_end;
-  }
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 3,
+                                        normalize::CharType::Kanji);
 
   if (kanji_end == start_pos) {
     return candidates;
@@ -351,12 +348,8 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     return candidates;  // These particles follow nouns/verbs, not adjective stems
   }
 
-  size_t hiragana_end = kanji_end;
-  while (hiragana_end < char_types.size() &&
-         hiragana_end - kanji_end < 8 &&
-         char_types[hiragana_end] == normalize::CharType::Hiragana) {
-    ++hiragana_end;
-  }
+  size_t hiragana_end = findCharRegionEnd(char_types, kanji_end, 8,
+                                           normalize::CharType::Hiragana);
 
   if (hiragana_end <= kanji_end) {
     return candidates;
@@ -534,6 +527,36 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
   // Add emphatic variants (すごい → すごいっっ, etc.)
   addEmphaticVariants(candidates, codepoints);
 
+  // Add katt-form candidates for katta patterns (BUG-036)
+  // This enables MeCab-compatible split: 美しかったです → 美しかっ + た + です
+  // For each candidate ending with かった, generate a katt-form variant ending with かっ
+  std::vector<UnknownCandidate> katt_form_candidates;
+  for (const auto& cand : candidates) {
+    // Check if surface ends with かった (i-adjective past form)
+    if (utf8::endsWith(cand.surface, "かった")) {
+      // Generate katt-form variant: 美しかった → 美しかっ
+      UnknownCandidate katt_cand;
+      katt_cand.surface = cand.surface.substr(0, cand.surface.size() - core::kJapaneseCharBytes);  // Remove た
+      katt_cand.start = cand.start;
+      katt_cand.end = cand.end - 1;  // 1 character (た)
+      katt_cand.pos = core::PartOfSpeech::Adjective;
+      katt_cand.lemma = cand.lemma;  // Same lemma (美しい, etc.)
+      katt_cand.cost = cand.cost + 0.2F;  // Slightly higher cost than full form
+      katt_cand.has_suffix = true;  // This is a conjugated form (連用タ接続)
+#ifdef SUZUME_DEBUG_INFO
+      katt_cand.origin = cand.origin;
+      katt_cand.confidence = cand.confidence;
+      katt_cand.pattern = "i_adjective_katt";
+#endif
+      katt_form_candidates.push_back(katt_cand);
+    }
+  }
+
+  // Add all katt-form candidates
+  for (auto& var : katt_form_candidates) {
+    candidates.push_back(std::move(var));
+  }
+
   std::sort(candidates.begin(), candidates.end(),
             [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
               return lhs.cost < rhs.cost;
@@ -555,12 +578,9 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
   }
 
   // Find kanji sequence
-  size_t kanji_end = start_pos;
-  while (kanji_end < char_types.size() &&
-         kanji_end - start_pos < options.max_kanji_length &&
-         char_types[kanji_end] == normalize::CharType::Kanji) {
-    ++kanji_end;
-  }
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos,
+                                        options.max_kanji_length,
+                                        normalize::CharType::Kanji);
 
   size_t kanji_len = kanji_end - start_pos;
 
@@ -569,12 +589,8 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
   if (kanji_len == 1 && kanji_end < char_types.size() &&
       char_types[kanji_end] == normalize::CharType::Hiragana) {
     // Check for やか/らか/か patterns
-    size_t hira_end = kanji_end;
-    while (hira_end < char_types.size() &&
-           hira_end - kanji_end < 4 &&
-           char_types[hira_end] == normalize::CharType::Hiragana) {
-      ++hira_end;
-    }
+    size_t hira_end = findCharRegionEnd(char_types, kanji_end, 4,
+                                         normalize::CharType::Hiragana);
 
     std::string full_surface = extractSubstring(codepoints, start_pos, hira_end);
     size_t hira_len = hira_end - kanji_end;
@@ -911,6 +927,36 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     candidates.push_back(std::move(var));
   }
 
+  // Add katt-form candidates for katta patterns (BUG-036)
+  // This enables MeCab-compatible split: よかったです → よかっ + た + です
+  // For each candidate ending with かった, generate a katt-form variant ending with かっ
+  std::vector<UnknownCandidate> katt_form_candidates;
+  for (const auto& cand : candidates) {
+    // Check if surface ends with かった (i-adjective past form)
+    if (utf8::endsWith(cand.surface, "かった")) {
+      // Generate katt-form variant: よかった → よかっ
+      UnknownCandidate katt_cand;
+      katt_cand.surface = cand.surface.substr(0, cand.surface.size() - core::kJapaneseCharBytes);  // Remove た
+      katt_cand.start = cand.start;
+      katt_cand.end = cand.end - 1;  // 1 character (た)
+      katt_cand.pos = core::PartOfSpeech::Adjective;
+      katt_cand.lemma = cand.lemma;  // Same lemma (よい, 寒い, etc.)
+      katt_cand.cost = cand.cost + 0.2F;  // Higher cost than full form (match dictionary expansion)
+      katt_cand.has_suffix = true;  // This is a conjugated form (連用タ接続)
+#ifdef SUZUME_DEBUG_INFO
+      katt_cand.origin = cand.origin;
+      katt_cand.confidence = cand.confidence;
+      katt_cand.pattern = "i_adjective_hira_katt";
+#endif
+      katt_form_candidates.push_back(katt_cand);
+    }
+  }
+
+  // Add all katt-form candidates
+  for (auto& var : katt_form_candidates) {
+    candidates.push_back(std::move(var));
+  }
+
   // Sort by cost
   std::sort(candidates.begin(), candidates.end(),
             [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
@@ -935,12 +981,8 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
 
   // Find katakana portion (1-6 characters for slang adjective stems)
   // e.g., エモ, キモ, ウザ, ダサ, etc.
-  size_t kata_end = start_pos;
-  while (kata_end < char_types.size() &&
-         kata_end - start_pos < 6 &&
-         char_types[kata_end] == normalize::CharType::Katakana) {
-    ++kata_end;
-  }
+  size_t kata_end = findCharRegionEnd(char_types, start_pos, 6,
+                                       normalize::CharType::Katakana);
 
   // Need at least 1 katakana character
   if (kata_end == start_pos) {
@@ -963,12 +1005,8 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
   }
 
   // Find hiragana portion (up to 8 chars for conjugation endings)
-  size_t hira_end = kata_end;
-  while (hira_end < char_types.size() &&
-         hira_end - kata_end < 8 &&
-         char_types[hira_end] == normalize::CharType::Hiragana) {
-    ++hira_end;
-  }
+  size_t hira_end = findCharRegionEnd(char_types, kata_end, 8,
+                                       normalize::CharType::Hiragana);
 
   // Need at least 1 hiragana for the い ending
   if (hira_end <= kata_end) {
@@ -1027,12 +1065,8 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
   }
 
   // Find kanji portion (1-3 characters for adjective stem)
-  size_t kanji_end = start_pos;
-  while (kanji_end < char_types.size() &&
-         kanji_end - start_pos < 3 &&
-         char_types[kanji_end] == normalize::CharType::Kanji) {
-    ++kanji_end;
-  }
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 3,
+                                        normalize::CharType::Kanji);
 
   if (kanji_end == start_pos) {
     return candidates;
@@ -1045,12 +1079,8 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
   }
 
   // Find hiragana ending with し + auxiliary pattern (そう, すぎ, etc.)
-  size_t hiragana_end = kanji_end;
-  while (hiragana_end < char_types.size() &&
-         hiragana_end - kanji_end < 8 &&
-         char_types[hiragana_end] == normalize::CharType::Hiragana) {
-    ++hiragana_end;
-  }
+  size_t hiragana_end = findCharRegionEnd(char_types, kanji_end, 8,
+                                           normalize::CharType::Hiragana);
 
   if (hiragana_end <= kanji_end) {
     return candidates;

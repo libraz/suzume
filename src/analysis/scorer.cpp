@@ -231,6 +231,21 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     logAdjustment(options_.user_dict_bonus, "user_dict");
   }
 
+  // Conjunction position-based bonus/penalty
+  // Conjunctions like でも, ところで typically appear at sentence start
+  // Penalty for non-start position to prefer particle splits (雨でも→雨+で+も)
+  if (edge.pos == core::PartOfSpeech::Conjunction) {
+    if (edge.start == 0) {
+      // Bonus for CONJ at sentence start (でも大丈夫 → でも(CONJ)+大丈夫)
+      cost -= scorer::scale::kModerate;  // -1.5
+      logAdjustment(-scorer::scale::kModerate, "conj_at_start");
+    } else {
+      // Penalty for CONJ not at start (雨でも → 雨+で+も)
+      cost += scorer::scale::kStrong;  // +2.5
+      logAdjustment(scorer::scale::kStrong, "conj_not_at_start");
+    }
+  }
+
   // Formal noun / low info penalty
   if (edge.isFormalNoun()) {
     cost += options_.formal_noun_penalty;

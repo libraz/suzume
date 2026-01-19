@@ -17,6 +17,8 @@
 #include "core/types.h"
 #include "dictionary/dictionary.h"
 #include "grammar/conjugation.h"
+#include "normalize/char_type.h"
+#include "tokenizer_utils.h"
 #include "unknown.h"
 
 namespace suzume::analysis::verb_helpers {
@@ -160,6 +162,13 @@ bool shouldSkipCausativeAuxPattern(std::string_view surface, grammar::VerbType v
  * @brief Check if surface matches suru-verb auxiliary patterns
  */
 bool shouldSkipSuruVerbAuxPattern(std::string_view surface, size_t kanji_count);
+
+// =============================================================================
+// Character Region Detection
+// =============================================================================
+
+// Delegate to shared implementation in tokenizer_utils.h
+using ::suzume::analysis::findCharRegionEnd;
 
 }  // namespace suzume::analysis::verb_helpers
 

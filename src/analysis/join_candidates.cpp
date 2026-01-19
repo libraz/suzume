@@ -17,116 +17,139 @@ namespace suzume::analysis {
 namespace {
 
 // V2 Subsidiary verbs for compound verb joining
+// Verb type determines how to generate renyokei from base form
+enum class V2VerbType : uint8_t {
+  Godan,   // 五段: 込む→込み, 返す→返し (replace ending with i-row)
+  Ichidan, // 一段: 続ける→続け, 上げる→上げ (drop る)
+};
+
 struct SubsidiaryVerb {
   const char* surface;      // Kanji form (or hiragana if no kanji)
   const char* reading;      // Hiragana reading (nullptr if same as surface)
   const char* base_ending;  // Base form ending for verb type detection
-  const char* base_form;    // Base form for lemma generation
+  V2VerbType verb_type;     // Determines renyokei generation
 };
 
 // List of V2 verbs that can form compound verbs
-// Includes both base forms and renyokei forms for auxiliary attachment
-// Reading field enables matching both kanji and hiragana patterns
+// Renyokei forms are generated automatically from base forms
+// NOTE: 始める, 過ぎる, 終わる/終える are NOT included because they are
+// grammatical/aspectual auxiliaries that should be tokenized separately
+// for MeCab compatibility (e.g., 読み + 始める, not 読み始める)
 const SubsidiaryVerb kSubsidiaryVerbs[] = {
-    // Base forms (終止形)
-    {"込む", "こむ", "む", "込む"},          // 読み込む, 飛び込む, 飛びこむ
-    {"出す", "だす", "す", "出す"},          // 呼び出す, 書き出す, 走りだす
-    // Note: 始める is NOT included because it's a grammatical/aspectual auxiliary
-    // that should be tokenized separately for MeCab compatibility (読み + 始める)
-    {"続ける", "つづける", "ける", "続ける"}, // 読み続ける, 読みつづける
-    {"続く", "つづく", "く", "続く"},        // 引き続く
-    {"返す", "かえす", "す", "返す"},        // 繰り返す, 繰りかえす
-    {"返る", "かえる", "る", "返る"},        // 振り返る, 振りかえる
-    {"つける", nullptr, "ける", "つける"},  // 見つける (already hiragana)
-    {"つかる", nullptr, "る", "つかる"},    // 見つかる (already hiragana)
-    {"替える", "かえる", "える", "替える"}, // 切り替える
-    {"換える", "かえる", "える", "換える"}, // 入れ換える
-    {"合う", "あう", "う", "合う"},          // 話し合う, 話しあう
-    {"合わせる", "あわせる", "せる", "合わせる"}, // 組み合わせる
-    {"消す", "けす", "す", "消す"},          // 取り消す
-    // Note: 過ぎる is NOT included because it's a grammatical/aspectual auxiliary
-    // that should be tokenized separately for MeCab compatibility (読み + 過ぎる)
-    {"直す", "なおす", "す", "直す"},        // やり直す, やりなおす
-    // Note: 終わる/終える are NOT included because they are grammatical/aspectual
-    // auxiliaries that should be tokenized separately (読み + 終わったら, not 読み終わったら)
-    {"切る", "きる", "る", "切る"},          // 締め切る, 締めきる
-    {"切れる", "きれる", "れる", "切れる"},  // 使い切れる (ichidan)
-    {"出る", "でる", "る", "出る"},          // 飛び出る (ichidan)
-    {"上げる", "あげる", "げる", "上げる"},  // 売り上げる, 取り上げる, 持ち上げる (ichidan)
-    {"上がる", "あがる", "る", "上がる"},    // 立ち上がる, 盛り上がる (godan)
-    {"下げる", "さげる", "げる", "下げる"},  // 引き下げる, 値下げる (ichidan)
-    {"下がる", "さがる", "る", "下がる"},    // 立ち下がる (godan)
-    {"回す", "まわす", "す", "回す"},        // 振り回す, 持ち回す
-    {"回る", "まわる", "る", "回る"},        // 持ち回る, 振り回る
-    {"抜く", "ぬく", "く", "抜く"},          // 追い抜く, 突き抜く
-    {"抜ける", "ぬける", "ける", "抜ける"},  // 突き抜ける (ichidan)
-    {"落とす", "おとす", "す", "落とす"},    // 切り落とす, 打ち落とす
-    {"落ちる", "おちる", "ちる", "落ちる"},  // 転げ落ちる (ichidan)
-    {"掛ける", "かける", "ける", "掛ける"},  // 呼び掛ける, 働き掛ける (ichidan)
-    {"掛かる", "かかる", "る", "掛かる"},    // 取り掛かる (godan)
-    {"付ける", "つける", "ける", "付ける"},  // 押し付ける, 決め付ける (ichidan)
-    {"付く", "つく", "く", "付く"},          // 思い付く, 気付く (godan)
-    // Additional compound verb V2s (S3 bug fixes)
-    {"巡る", "めぐる", "る", "巡る"},        // 駆け巡る, 飛び巡る (godan)
-    {"飛ばす", "とばす", "す", "飛ばす"},    // 吹き飛ばす, 弾き飛ばす (godan)
-    {"入れる", "いれる", "れる", "入れる"},  // 取り入れる, 持ち入れる (ichidan)
-    {"交う", "かう", "う", "交う"},          // 飛び交う, 行き交う (godan)
-    {"潰す", "つぶす", "す", "潰す"},        // 押し潰す, 叩き潰す (godan)
-    {"崩す", "くずす", "す", "崩す"},        // 切り崩す, 打ち崩す (godan)
-    {"倒す", "たおす", "す", "倒す"},        // 打ち倒す, 蹴り倒す (godan)
-    {"分ける", "わける", "ける", "分ける"},  // 切り分ける, 振り分ける (ichidan)
-    {"立てる", "たてる", "てる", "立てる"},  // 組み立てる, 打ち立てる (ichidan)
-    {"広げる", "ひろげる", "げる", "広げる"},  // 繰り広げる, 押し広げる (ichidan)
-    {"起こす", "おこす", "す", "起こす"},      // 引き起こす, 呼び起こす (godan)
-    // Renyokei forms (連用形) for たい/たくなかった/etc. attachment
-    {"込み", "こみ", "む", "込む"},          // 読み込みたい, 飛びこみたい
-    {"出し", "だし", "す", "出す"},          // 走り出したい, 走りだしたい
-    // Note: 始め renyokei not included (see note above for base form)
-    {"続け", "つづけ", "ける", "続ける"},    // 読み続けたい
-    {"続き", "つづき", "く", "続く"},        // 引き続きたい
-    {"返し", "かえし", "す", "返す"},        // 繰り返したい
-    {"返り", "かえり", "る", "返る"},        // 振り返りたい
-    {"つけ", nullptr, "ける", "つける"},    // 見つけたい
-    {"つかり", nullptr, "る", "つかる"},    // 見つかりたい
-    {"替え", "かえ", "える", "替える"},      // 切り替えたい
-    {"換え", "かえ", "える", "換える"},      // 入れ換えたい
-    {"合い", "あい", "う", "合う"},          // 話し合いたい
-    {"合わせ", "あわせ", "せる", "合わせる"}, // 組み合わせたい
-    {"消し", "けし", "す", "消す"},          // 取り消したい
-    // Note: 過ぎ renyokei not included (see note above for base form)
-    {"直し", "なおし", "す", "直す"},        // やり直したい
-    // Note: 終わり/終え renyokei not included (see note above for base forms)
-    {"切り", "きり", "る", "切る"},          // 締め切りたい
-    {"切れ", "きれ", "れる", "切れる"},      // 使い切れたい (ichidan renyokei)
-    {"上げ", "あげ", "げる", "上げる"},      // 売り上げたい (ichidan renyokei)
-    {"上がり", "あがり", "る", "上がる"},    // 立ち上がりたい
-    {"下げ", "さげ", "げる", "下げる"},      // 引き下げたい (ichidan renyokei)
-    {"下がり", "さがり", "る", "下がる"},    // 立ち下がりたい
-    {"回し", "まわし", "す", "回す"},        // 振り回したい
-    {"回り", "まわり", "る", "回る"},        // 持ち回りたい
-    {"抜き", "ぬき", "く", "抜く"},          // 追い抜きたい
-    {"抜け", "ぬけ", "ける", "抜ける"},      // 突き抜けたい (ichidan renyokei)
-    {"落とし", "おとし", "す", "落とす"},    // 切り落としたい
-    {"落ち", "おち", "ちる", "落ちる"},      // 転げ落ちたい (ichidan renyokei)
-    {"掛け", "かけ", "ける", "掛ける"},      // 呼び掛けたい (ichidan renyokei)
-    {"掛かり", "かかり", "る", "掛かる"},    // 取り掛かりたい
-    {"付け", "つけ", "ける", "付ける"},      // 押し付けたい (ichidan renyokei)
-    {"付き", "つき", "く", "付く"},          // 思い付きたい
-    // Additional renyokei forms (S3 bug fixes)
-    {"巡り", "めぐり", "る", "巡る"},        // 駆け巡りたい
-    {"飛ばし", "とばし", "す", "飛ばす"},    // 吹き飛ばしたい
-    {"入れ", "いれ", "れる", "入れる"},      // 取り入れたい (ichidan renyokei)
-    {"交い", "かい", "う", "交う"},          // 飛び交いたい
-    {"潰し", "つぶし", "す", "潰す"},        // 押し潰したい
-    {"崩し", "くずし", "す", "崩す"},        // 切り崩したい
-    {"倒し", "たおし", "す", "倒す"},        // 打ち倒したい
-    {"分け", "わけ", "ける", "分ける"},      // 切り分けたい (ichidan renyokei)
-    {"立て", "たて", "てる", "立てる"},      // 組み立てたい (ichidan renyokei)
-    {"広げ", "ひろげ", "げる", "広げる"},    // 繰り広げたい (ichidan renyokei)
-    {"起こし", "おこし", "す", "起こす"},    // 引き起こしたい (godan renyokei)
-    // Note: "出" (で) renyokei is NOT added because it conflicts with particle で
-    // 飛び出る forms like 飛び出たい are handled by the base form "出る" entry
+    // Godan verbs (五段)
+    {"込む", "こむ", "む", V2VerbType::Godan},      // 読み込む, 飛びこむ
+    {"出す", "だす", "す", V2VerbType::Godan},      // 呼び出す, 走りだす
+    {"続く", "つづく", "く", V2VerbType::Godan},    // 引き続く
+    {"返す", "かえす", "す", V2VerbType::Godan},    // 繰り返す, 繰りかえす
+    {"返る", "かえる", "る", V2VerbType::Godan},    // 振り返る, 振りかえる
+    {"つかる", nullptr, "る", V2VerbType::Godan},   // 見つかる
+    {"合う", "あう", "う", V2VerbType::Godan},      // 話し合う, 話しあう
+    {"消す", "けす", "す", V2VerbType::Godan},      // 取り消す
+    {"直す", "なおす", "す", V2VerbType::Godan},    // やり直す, やりなおす
+    {"切る", "きる", "る", V2VerbType::Godan},      // 締め切る, 締めきる
+    {"上がる", "あがる", "る", V2VerbType::Godan},  // 立ち上がる, 盛り上がる
+    {"下がる", "さがる", "る", V2VerbType::Godan},  // 立ち下がる
+    {"回す", "まわす", "す", V2VerbType::Godan},    // 振り回す, 持ち回す
+    {"回る", "まわる", "る", V2VerbType::Godan},    // 持ち回る, 振り回る
+    {"抜く", "ぬく", "く", V2VerbType::Godan},      // 追い抜く, 突き抜く
+    {"掛かる", "かかる", "る", V2VerbType::Godan},  // 取り掛かる
+    {"付く", "つく", "く", V2VerbType::Godan},      // 思い付く, 気付く
+    {"巡る", "めぐる", "る", V2VerbType::Godan},    // 駆け巡る, 飛び巡る
+    {"飛ばす", "とばす", "す", V2VerbType::Godan},  // 吹き飛ばす, 弾き飛ばす
+    {"交う", "かう", "う", V2VerbType::Godan},      // 飛び交う, 行き交う
+    {"潰す", "つぶす", "す", V2VerbType::Godan},    // 押し潰す, 叩き潰す
+    {"崩す", "くずす", "す", V2VerbType::Godan},    // 切り崩す, 打ち崩す
+    {"倒す", "たおす", "す", V2VerbType::Godan},    // 打ち倒す, 蹴り倒す
+    {"起こす", "おこす", "す", V2VerbType::Godan},  // 引き起こす, 呼び起こす
+    // Ichidan verbs (一段)
+    {"続ける", "つづける", "ける", V2VerbType::Ichidan}, // 読み続ける, 読みつづける
+    {"つける", nullptr, "ける", V2VerbType::Ichidan},    // 見つける
+    {"替える", "かえる", "える", V2VerbType::Ichidan},   // 切り替える
+    {"換える", "かえる", "える", V2VerbType::Ichidan},   // 入れ換える
+    {"合わせる", "あわせる", "せる", V2VerbType::Ichidan}, // 組み合わせる
+    {"切れる", "きれる", "れる", V2VerbType::Ichidan},   // 使い切れる
+    {"出る", "でる", "る", V2VerbType::Ichidan},         // 飛び出る
+    {"上げる", "あげる", "げる", V2VerbType::Ichidan},   // 売り上げる, 取り上げる
+    {"下げる", "さげる", "げる", V2VerbType::Ichidan},   // 引き下げる
+    {"抜ける", "ぬける", "ける", V2VerbType::Ichidan},   // 突き抜ける
+    {"落とす", "おとす", "す", V2VerbType::Godan},       // 切り落とす, 打ち落とす
+    {"落ちる", "おちる", "ちる", V2VerbType::Ichidan},   // 転げ落ちる
+    {"掛ける", "かける", "ける", V2VerbType::Ichidan},   // 呼び掛ける, 働き掛ける
+    {"付ける", "つける", "ける", V2VerbType::Ichidan},   // 押し付ける, 決め付ける
+    {"入れる", "いれる", "れる", V2VerbType::Ichidan},   // 取り入れる, 持ち入れる
+    {"分ける", "わける", "ける", V2VerbType::Ichidan},   // 切り分ける, 振り分ける
+    {"立てる", "たてる", "てる", V2VerbType::Ichidan},   // 組み立てる, 打ち立てる
+    {"広げる", "ひろげる", "げる", V2VerbType::Ichidan}, // 繰り広げる, 押し広げる
 };
+
+// Generate renyokei surface from base form
+// Godan: replace ending with i-row (込む→込み, 返す→返し)
+// Ichidan: drop る (続ける→続け)
+inline std::string generateRenyokei(std::string_view surface,
+                                    std::string_view reading,
+                                    V2VerbType verb_type) {
+  std::string_view base = reading.empty() ? surface : reading;
+  if (base.empty()) return "";
+
+  if (verb_type == V2VerbType::Ichidan) {
+    // Drop final る (3 bytes in UTF-8)
+    if (base.size() >= 3) {
+      return std::string(base.substr(0, base.size() - 3));
+    }
+    return "";
+  }
+
+  // Godan: replace last hiragana with i-row equivalent
+  // む→み, す→し, く→き, ぐ→ぎ, う→い, る→り, つ→ち, ぬ→に, ぶ→び
+  if (base.size() < 3) return "";
+  std::string result(base.substr(0, base.size() - 3));
+  std::string_view last = base.substr(base.size() - 3);
+  if (last == "む") result += "み";
+  else if (last == "す") result += "し";
+  else if (last == "く") result += "き";
+  else if (last == "ぐ") result += "ぎ";
+  else if (last == "う") result += "い";
+  else if (last == "る") result += "り";
+  else if (last == "つ") result += "ち";
+  else if (last == "ぬ") result += "に";
+  else if (last == "ぶ") result += "び";
+  else return "";  // Unknown ending
+  return result;
+}
+
+// Generate kanji renyokei from kanji surface
+inline std::string generateKanjiRenyokei(std::string_view kanji_surface,
+                                         std::string_view reading,
+                                         V2VerbType verb_type) {
+  if (reading.empty()) {
+    return generateRenyokei(kanji_surface, "", verb_type);
+  }
+  // For kanji+okurigana, need to replace okurigana with renyokei
+  // E.g., 込む(こむ) → 込み, 続ける(つづける) → 続け
+  std::string hiragana_renyokei = generateRenyokei(reading, "", verb_type);
+  if (hiragana_renyokei.empty()) return "";
+
+  // Find where kanji ends and okurigana begins
+  // Kanji surface should have same kanji prefix as reading suffix is okurigana
+  size_t kanji_bytes = 0;
+  for (size_t i = 0; i < kanji_surface.size(); i += 3) {
+    auto byte = static_cast<unsigned char>(kanji_surface[i]);
+    if (byte >= 0xE4 && byte <= 0xE9) {  // CJK kanji range
+      kanji_bytes = i + 3;
+    } else {
+      break;
+    }
+  }
+  if (kanji_bytes == 0) return "";
+
+  // Kanji prefix + hiragana renyokei suffix
+  std::string result(kanji_surface.substr(0, kanji_bytes));
+  size_t reading_kanji_len = reading.size() - (kanji_surface.size() - kanji_bytes);
+  if (reading_kanji_len < hiragana_renyokei.size()) {
+    result += hiragana_renyokei.substr(reading_kanji_len);
+  }
+  return result;
+}
 
 // 連用形 (continuative form) endings for Godan verbs
 struct RenyokeiPattern {
@@ -242,11 +265,8 @@ void addCompoundVerbJoinCandidates(
   }
 
   // Find the kanji portion (V1 stem)
-  size_t kanji_end = start_pos + 1;
-  while (kanji_end < char_types.size() && kanji_end - start_pos < 4 &&
-         char_types[kanji_end] == CharType::Kanji) {
-    ++kanji_end;
-  }
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 4,
+                                        CharType::Kanji);
 
   // Next must be hiragana (連用形 ending)
   if (kanji_end >= char_types.size() ||
@@ -304,12 +324,8 @@ void addCompoundVerbJoinCandidates(
   static grammar::Inflection inflection;
 
   // Find extent of hiragana after v2_start for inflection analysis
-  size_t v2_hiragana_end = v2_start;
-  while (v2_hiragana_end < codepoints.size() &&
-         v2_hiragana_end - v2_start < 8 &&
-         char_types[v2_hiragana_end] == CharType::Hiragana) {
-    ++v2_hiragana_end;
-  }
+  size_t v2_hiragana_end = findCharRegionEnd(char_types, v2_start, 8,
+                                              CharType::Hiragana);
 
   // Look for V2 (subsidiary verb)
   // We collect the best match rather than returning immediately.
@@ -330,7 +346,7 @@ void addCompoundVerbJoinCandidates(
 
     // Determine if this is a renyokei entry by checking if base_form != surface
     // Renyokei entries: 過ぎ (base 過ぎる), 出し (base 出す), etc.
-    bool is_renyokei_entry = (std::string(v2_verb.surface) != std::string(v2_verb.base_form));
+    bool is_renyokei_entry = (std::string(v2_verb.surface) != std::string(v2_verb.surface));
 
     // Check if text at v2_start matches this V2 verb (kanji or reading)
     bool matched_kanji = false;
@@ -429,12 +445,8 @@ void addCompoundVerbJoinCandidates(
                 size_t hira_start = v2_start + kanji_prefix_len;
                 if (hira_start < codepoints.size() &&
                     char_types[hira_start] == CharType::Hiragana) {
-                  size_t hira_end = hira_start;
-                  while (hira_end < codepoints.size() &&
-                         hira_end - hira_start < 6 &&
-                         char_types[hira_end] == CharType::Hiragana) {
-                    ++hira_end;
-                  }
+                  size_t hira_end = findCharRegionEnd(char_types, hira_start, 6,
+                                                       CharType::Hiragana);
 
                   // Try inflection on kanji+hiragana portion (shortest match first)
                   for (size_t v2_end = hira_start + 1; v2_end <= hira_end; ++v2_end) {
@@ -582,7 +594,7 @@ void addCompoundVerbJoinCandidates(
     size_t v1_renyokei_end = is_ichidan ? v2_start_byte : charPosToBytePos(codepoints, kanji_end + 1);
     compound_base = std::string(text.substr(start_byte, v1_renyokei_end - start_byte));
     // Use the pre-defined base_form for V2 (always in kanji form for consistency)
-    compound_base += v2_verb.base_form;
+    compound_base += v2_verb.surface;
 
     // Compare with best match and update if this is better
     // Priority: renyokei exact match > inflection match without aux > inflection with aux
@@ -798,7 +810,7 @@ void addHiraganaCompoundVerbJoinCandidates(
       std::string compound_surface(text.substr(start_byte, compound_end_byte - start_byte));
 
       // Compound base = V1 renyokei + V2 base form (in kanji)
-      std::string compound_base = std::string(v1_surface) + v2_verb.base_form;
+      std::string compound_base = std::string(v1_surface) + v2_verb.surface;
 
       // Calculate cost
       float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
@@ -855,11 +867,9 @@ void addKatakanaSugiruJoinCandidates(
   }
 
   // Find the katakana portion (minimum 2 characters for meaningful words)
-  size_t katakana_end = start_pos + 1;
-  while (katakana_end < char_types.size() &&
-         char_types[katakana_end] == CharType::Katakana) {
-    ++katakana_end;
-  }
+  // Use large max to find all consecutive katakana
+  size_t katakana_end = findCharRegionEnd(char_types, start_pos, 20,
+                                           CharType::Katakana);
 
   // Need at least 2 katakana characters
   if (katakana_end - start_pos < 2) {
@@ -971,13 +981,8 @@ void addPrefixNounJoinCandidates(
 
   // Find the end of the noun part
   CharType noun_type = char_types[noun_start];
-  size_t noun_end = noun_start + 1;
-
-  while (noun_end < codepoints.size() &&
-         noun_end - noun_start < kMaxNounLenForPrefix &&
-         char_types[noun_end] == noun_type) {
-    ++noun_end;
-  }
+  size_t noun_end = findCharRegionEnd(char_types, noun_start,
+                                       kMaxNounLenForPrefix, noun_type);
 
   if (noun_end <= noun_start) {
     return;
@@ -1093,12 +1098,8 @@ void addTeFormAuxiliaryCandidates(
   size_t aux_start_byte = charPosToBytePos(codepoints, aux_start);
 
   // Find the extent of hiragana following て/で
-  size_t hiragana_end = aux_start;
-  while (hiragana_end < codepoints.size() &&
-         hiragana_end - aux_start < 10 &&
-         char_types[hiragana_end] == CharType::Hiragana) {
-    ++hiragana_end;
-  }
+  size_t hiragana_end = findCharRegionEnd(char_types, aux_start, 10,
+                                           CharType::Hiragana);
 
   // Use inflection analysis
   static grammar::Inflection inflection;

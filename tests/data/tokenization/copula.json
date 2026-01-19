@@ -297,7 +297,7 @@
       "expected": [
         {
           "surface": "彼女",
-          "pos": "Noun"
+          "pos": "Pronoun"
         },
         {
           "surface": "で",
@@ -321,7 +321,7 @@
     },
     {
       "id": "copula_demonai_sore",
-      "description": "それでもない - particle も + ない pattern",
+      "description": "それでもない - grammar-first: で is copula (だ連用形), not particle",
       "input": "それでもない",
       "expected": [
         {
@@ -330,7 +330,8 @@
         },
         {
           "surface": "で",
-          "pos": "Particle"
+          "pos": "Auxiliary",
+          "lemma": "だ"
         },
         {
           "surface": "も",
@@ -354,7 +355,7 @@
       "expected": [
         {
           "surface": "彼女",
-          "pos": "Noun"
+          "pos": "Pronoun"
         },
         {
           "surface": "で",

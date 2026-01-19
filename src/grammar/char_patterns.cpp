@@ -61,21 +61,8 @@ bool anyCharMatches(std::string_view str, Predicate pred) {
 
 }  // namespace
 
-// Onbin endings: unique onbin values from Conjugation::getGodanRows()
-// Derived from: GodanKa/GodanGa.onbin="い", GodanTa/Ra/Wa.onbin="っ", GodanNa/Ba/Ma.onbin="ん"
-const char* kOnbinEndings[] = {"い", "っ", "ん"};
-const size_t kOnbinCount = 3;
-
-// Mizenkei (a-row) endings: a_row values from Conjugation::getGodanRows()
-// Derived from each Godan verb type's a_row codepoint
-const char* kMizenkeiEndings[] = {"か", "が", "さ", "た",  "な",
-                                   "ば", "ま", "ら", "わ"};
-const size_t kMizenkeiCount = 9;
-
-// Renyokei (i-row) endings: き, ぎ, し, ち, に, び, み, り
-const char* kRenyokeiEndings[] = {"き", "ぎ", "し", "ち",
-                                   "に", "び", "み", "り"};
-const size_t kRenyokeiCount = 8;
+// Onbin, Mizenkei, Renyokei endings are now defined in kana_constants.h
+// Use kana:: namespace versions via the aliases in char_patterns.h
 
 // Full i-row hiragana including い for u-verb stems
 // Includes voiced variants じ (from し) and ぢ (from ち) for ichidan verbs
@@ -116,7 +103,7 @@ bool isARowCodepoint(char32_t cp) {
   return kana::isARowCodepoint(cp);
 }
 
-bool endsWithChar(std::string_view stem, const char* chars[], size_t count) {
+bool endsWithChar(std::string_view stem, const char* const chars[], size_t count) {
   if (stem.size() < core::kJapaneseCharBytes) {
     return false;
   }

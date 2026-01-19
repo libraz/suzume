@@ -10,6 +10,7 @@
 #include "core/utf8_constants.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
+#include "tokenizer_utils.h"
 #include "unknown.h"
 
 namespace suzume::analysis {
@@ -215,12 +216,8 @@ std::vector<UnknownCandidate> generateGachiSuffixCandidates(
   }
 
   // Find kanji portion (1-3 chars)
-  size_t kanji_end = start_pos;
-  while (kanji_end < char_types.size() &&
-         kanji_end - start_pos < 4 &&
-         char_types[kanji_end] == normalize::CharType::Kanji) {
-    ++kanji_end;
-  }
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 4,
+                                        normalize::CharType::Kanji);
 
   if (kanji_end == start_pos) {
     return candidates;
@@ -418,12 +415,8 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
   }
 
   // Find kanji portion (typically 1-3 characters for nominalized nouns)
-  size_t kanji_end = start_pos;
-  while (kanji_end < char_types.size() &&
-         kanji_end - start_pos < 4 &&  // Max 4 kanji
-         char_types[kanji_end] == normalize::CharType::Kanji) {
-    ++kanji_end;
-  }
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 4,
+                                        normalize::CharType::Kanji);
 
   // Need at least 1 kanji
   if (kanji_end == start_pos) {
@@ -545,12 +538,8 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
   }
 
   // Find kanji portion (1 character only for compound nouns)
-  size_t kanji_end = start_pos;
-  while (kanji_end < char_types.size() &&
-         kanji_end - start_pos < 1 &&
-         char_types[kanji_end] == normalize::CharType::Kanji) {
-    ++kanji_end;
-  }
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 1,
+                                        normalize::CharType::Kanji);
 
   size_t kanji_len = kanji_end - start_pos;
   if (kanji_len == 0) {
@@ -589,12 +578,8 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
 
       if (next_type == normalize::CharType::Kanji) {
         // Pattern: 漢字 + っ + 漢字 (e.g., 横っ面, 取っ手)
-        size_t kanji2_end = sokuon_pos + 1;
-        while (kanji2_end < char_types.size() &&
-               kanji2_end - (sokuon_pos + 1) < 3 &&
-               char_types[kanji2_end] == normalize::CharType::Kanji) {
-          ++kanji2_end;
-        }
+        size_t kanji2_end = findCharRegionEnd(char_types, sokuon_pos + 1, 3,
+                                               normalize::CharType::Kanji);
 
         // Generate candidates for each length
         for (size_t end_pos = sokuon_pos + 2; end_pos <= kanji2_end; ++end_pos) {
@@ -672,12 +657,8 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     if (next_type == normalize::CharType::Kanji) {
       // Pattern: 漢字 + っ + 漢字 (e.g., 横っ面, 取っ手)
       // Find end of kanji sequence after っ
-      size_t kanji2_end = sokuon_pos + 1;
-      while (kanji2_end < char_types.size() &&
-             kanji2_end - (sokuon_pos + 1) < 3 &&  // Max 3 kanji after っ
-             char_types[kanji2_end] == normalize::CharType::Kanji) {
-        ++kanji2_end;
-      }
+      size_t kanji2_end = findCharRegionEnd(char_types, sokuon_pos + 1, 3,
+                                            normalize::CharType::Kanji);
 
       // Generate candidate(s) for kanji + っ + kanji pattern
       for (size_t end_pos = sokuon_pos + 2; end_pos <= kanji2_end; ++end_pos) {
@@ -945,17 +926,13 @@ std::vector<UnknownCandidate> generateCounterCandidates(
   // Generate digit + katakana unit candidates like 3キロ, 100ドル, 80パーセント
   if (numeral_end < char_types.size() &&
       char_types[numeral_end] == normalize::CharType::Katakana) {
-    // Find end of katakana sequence
-    size_t unit_end = numeral_end;
-    while (unit_end < codepoints.size() &&
-           unit_end < char_types.size() &&
-           char_types[unit_end] == normalize::CharType::Katakana) {
-      ++unit_end;
-    }
+    // Find end of katakana sequence (max 8 chars for reasonable unit length)
+    size_t unit_end = findCharRegionEnd(char_types, numeral_end, 8,
+                                         normalize::CharType::Katakana);
 
     // Generate candidate for digit + katakana unit
     size_t unit_len = unit_end - numeral_end;
-    if (unit_len >= 1 && unit_len <= 8) {  // Reasonable unit length 1-8 chars
+    if (unit_len >= 1) {  // unit_len <= 8 guaranteed by findCharRegionEnd
       std::string surface = extractSubstring(codepoints, start_pos, unit_end);
       if (!surface.empty()) {
         // Penalize numbers starting with 0 (e.g., "00ポイント" is unnatural)

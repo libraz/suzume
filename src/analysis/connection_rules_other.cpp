@@ -101,6 +101,31 @@ ConnectionRuleResult checkIAdjToDesu(const core::LatticeEdge& prev,
           "i-adj + desu (MeCab-compatible polite form)"};
 }
 
+// Rule: ADJ(かっ形) → た(AUX) bonus for MeCab-compatible split (BUG-036)
+// MeCab-compatible: よかったです → よかっ + た + です
+// Small bonus just to make the path viable; main bonus is at た→です
+ConnectionRuleResult checkIAdjKattToTa(const core::LatticeEdge& prev,
+                                       const core::LatticeEdge& next,
+                                       const ConnectionOptions& /* opts */) {
+  // Check if prev is adjective
+  if (prev.pos != core::PartOfSpeech::Adjective) return {};
+
+  // Check if prev ends with っ (ta-connection form: かっ from かった)
+  if (prev.surface.size() < core::kJapaneseCharBytes) return {};
+  std::string_view last_char = prev.surface.substr(
+      prev.surface.size() - core::kJapaneseCharBytes);
+  if (last_char != "っ") return {};
+
+  // Check if next is た (past auxiliary)
+  if (next.pos != core::PartOfSpeech::Auxiliary) return {};
+  if (next.surface != "た") return {};
+
+  // Bonus to offset the higher cost of かっ form
+  // Combined with た→です bonus, this makes the split path win over full form path
+  return {ConnectionPattern::IAdjKattToTa, -0.5F,
+          "i-adj(katt) + ta (MeCab-compatible split)"};
+}
+
 // Rule: ADJ stem (ガル接続) → すぎる/すぎ/がる (VERB) bonus
 // MeCab-compatible splitting for i-adjective stems followed by すぎる/がる
 // MeCab output for 高すぎる:
@@ -139,7 +164,7 @@ ConnectionRuleResult checkAdjStemToSugiruVerb(const core::LatticeEdge& prev,
   if (lemma_last != "い") return {};
 
   // Strong bonus to prefer this split over single-token adjective
-  return {ConnectionPattern::AdjStemToSugiruVerb, -1.5F,
+  return {ConnectionPattern::AdjStemToSugiruVerb, -scorer::scale::kStrong,
           "adj-stem + sugiru/garu (MeCab-compatible garu-connection split)"};
 }
 
@@ -174,8 +199,39 @@ ConnectionRuleResult checkAdjStemToSouAux(const core::LatticeEdge& prev,
   // Strong bonus to prefer ADJ-stem + そう(AUX) over single-token dictionary path
   // Need large bonus because dictionary conjugated forms (美味しそう) have very low cost
   // and we want MeCab-compatible split (美味し + そう)
-  return {ConnectionPattern::AdjStemToSouAux, -4.0F,
+  return {ConnectionPattern::AdjStemToSouAux, -scorer::kBonusAdjStemToSouAux,
           "adj-stem + sou (appearance auxiliary)"};
+}
+
+// Sentence-final particle bonus after adjective
+// Prevents ね from being parsed as verb (ねる) after adjective forms
+// MeCab: 暑かった(ADJ) + ね(終助詞)
+ConnectionRuleResult checkAdjToSentenceFinalParticle(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& /* opts */) {
+  // Check if prev is an adjective
+  if (prev.pos != core::PartOfSpeech::Adjective) return {};
+
+  // Check if next is a particle
+  if (next.pos != core::PartOfSpeech::Particle) return {};
+
+  // Check if next is sentence-final particle (終助詞)
+  static constexpr std::string_view kSentenceFinalParticles[] = {
+      scorer::kParticleNe, scorer::kParticleYo, "わ", "な", "か"
+  };
+  bool is_final_particle = false;
+  for (const auto& p : kSentenceFinalParticles) {
+    if (next.surface == p) {
+      is_final_particle = true;
+      break;
+    }
+  }
+  if (!is_final_particle) return {};
+
+  // Bonus to prefer ね(PARTICLE) over ね(VERB)
+  return {ConnectionPattern::AdjToSentenceFinalParticle,
+          -scorer::kBonusSentenceFinalParticleSeq,
+          "adj + sentence-final particle (暑かったね, etc.)"};
 }
 
 // Appearance auxiliary そう (様態助動詞) splitting for verb renyokei
@@ -207,7 +263,7 @@ ConnectionRuleResult checkVerbRenyokeiToSouAux(const core::LatticeEdge& prev,
 
   // Strong bonus to prefer VERB-renyokei + そう(AUX) over VERB + そう(ADV)
   // AUX entry cost is 2.5F, so we need at least -2.0F bonus to beat ADV path
-  return {ConnectionPattern::VerbRenyokeiToSouAux, -2.5F,
+  return {ConnectionPattern::VerbRenyokeiToSouAux, -scorer::scale::kSevere,
           "verb-renyokei + sou (appearance auxiliary)"};
 }
 
@@ -732,8 +788,28 @@ ConnectionRuleResult checkQuotativeAdvToIu(const core::LatticeEdge& prev,
   if (next.lemma != "いう") return {};
 
   // Strong bonus (negative value) to prefer いう over いく after quotative ADV
-  return {ConnectionPattern::QuotativeAdvToIu, -3.0F,
+  return {ConnectionPattern::QuotativeAdvToIu, -scorer::kBonusQuotativeToIu,
           "quotative adv + iu verb (to say)"};
+}
+
+// Rule: PARTICLE(と) + いっ(VERB, lemma=いう) bonus
+// MeCab: といって → と + いっ(lemma=いう) + て
+// Quotative particle と + いっ should use いう (to say), NOT いく (to go)
+ConnectionRuleResult checkQuotativeToParticleToIu(const core::LatticeEdge& prev,
+                                                   const core::LatticeEdge& next,
+                                                   const ConnectionOptions& /* opts */) {
+  // Check if prev is PARTICLE と
+  if (prev.pos != core::PartOfSpeech::Particle) return {};
+  if (prev.surface != "と") return {};
+
+  // Check if next is VERB with surface いっ and lemma いう
+  if (next.pos != core::PartOfSpeech::Verb) return {};
+  if (next.surface != "いっ") return {};
+  if (next.lemma != "いう") return {};
+
+  // Strong bonus to prefer いう over いく after quotative と
+  return {ConnectionPattern::QuotativeToParticleToIu, -scorer::kBonusQuotativeToIu,
+          "quotative to particle + iu verb (to say)"};
 }
 
 // Rule: PARTICLE(に) + いって(VERB, lemma=いく) bonus
@@ -752,7 +828,7 @@ ConnectionRuleResult checkNiParticleToIku(const core::LatticeEdge& prev,
   if (next.lemma != "いく") return {};
 
   // Strong bonus to prefer いく after に particle
-  return {ConnectionPattern::NiParticleToIku, -2.0F,
+  return {ConnectionPattern::NiParticleToIku, -scorer::kBonusNiParticleToIku,
           "ni particle + iku onbinkei (to go)"};
 }
 

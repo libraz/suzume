@@ -779,7 +779,7 @@ ConnectionRuleResult checkCopulaDeToGozaru(const core::LatticeEdge& prev,
   // で(PARTICLE) has cost -0.8, で(AUX) has cost 0.2 → diff 1.0
   // ござる(VERB) has cost -1.0, ござる(AUX) has cost -0.5 → diff 0.5
   // Need ~1.6+ bonus to overcome total difference of 1.5
-  return {ConnectionPattern::CopulaDeToGozaru, -1.8F,
+  return {ConnectionPattern::CopulaDeToGozaru, -scorer::kBonusCopulaDeToGozaru,
           "de(aux,da) + gozaru(aux) bonus (classical copula pattern)"};
 }
 
@@ -812,8 +812,136 @@ ConnectionRuleResult checkCopulaDeToAru(const core::LatticeEdge& prev,
   // で(PARTICLE) word cost: -0.8
   // で(AUX) word cost: 0.2
   // To overcome: need bonus > 1.0 (word diff) + 2.3 (conn diff) = 3.3
-  return {ConnectionPattern::CopulaDeToAru, -3.5F,
+  return {ConnectionPattern::CopulaDeToAru, -scorer::scale::kProhibitive,
           "de(aux,da) + aru(verb) bonus (formal copula: である)"};
+}
+
+// =============================================================================
+// で(AUX, lemma=だ) → は(PARTICLE) bonus
+// =============================================================================
+// Supports negative copula pattern with は (〜ではない, 〜ではなかった, etc.)
+// MeCab: で(助動詞,だ) + は(係助詞) + ない/なかった
+// Note: MeCab sometimes treats で as 格助詞, but grammatically it's copula
+ConnectionRuleResult checkCopulaDeToHaParticle(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& /*opts*/) {
+  if (!isPosMatch<POS::Aux, POS::Particle>(prev, next)) return {};
+
+  // Check で(AUX, lemma=だ)
+  if (prev.surface != "で" || prev.lemma != "だ") return {};
+
+  // Check は(PARTICLE)
+  if (next.surface != "は") return {};
+
+  // Strong bonus to prefer copula interpretation over particle interpretation
+  // で(PARTICLE) has cost 0.1, で(AUX) has cost 1.0 → diff 0.9
+  // Need bonus > 0.9 to overcome word cost difference
+  return {ConnectionPattern::CopulaDeToNai, -scorer::kBonusCopulaDeToHaMo,
+          "de(aux,da) + ha(particle) bonus (copula negation: ではない)"};
+}
+
+// =============================================================================
+// で(AUX, lemma=だ) → も(PARTICLE) bonus
+// =============================================================================
+// Supports copula negation with も: 彼女でもない → 彼女 + で(AUX) + も + ない
+// Grammar: で is the conjunctive form (連用形) of copula だ
+// MeCab treats で as case particle here, but grammatically it's the copula.
+// Following grammar-first policy (similar to BUG-040 ではない pattern).
+ConnectionRuleResult checkCopulaDeToMoParticle(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& /*opts*/) {
+  if (!isPosMatch<POS::Aux, POS::Particle>(prev, next)) return {};
+
+  // Check で(AUX, lemma=だ)
+  if (prev.surface != "で" || prev.lemma != "だ") return {};
+
+  // Check も(PARTICLE)
+  if (next.surface != "も") return {};
+
+  // Skip if で is at sentence start - likely でも(CONJ)
+  // Examples:
+  // - "でも大丈夫" → でも(CONJ) + 大丈夫 (sentence start)
+  // - "彼女でもない" → 彼女 + で(AUX) + も + ない (not at start)
+  if (prev.start == 0) return {};
+
+  // Strong bonus to prefer copula interpretation over particle interpretation
+  // Same reasoning as checkCopulaDeToHaParticle
+  return {ConnectionPattern::CopulaDeToNai, -scorer::kBonusCopulaDeToHaMo,
+          "de(aux,da) + mo(particle) bonus (copula negation: でもない)"};
+}
+
+// =============================================================================
+// た(AUX) → です(AUX) bonus for MeCab-compatible split (BUG-036)
+// =============================================================================
+// Helps split paths like よかっ+た+です beat full form paths like よかった+です
+// Also helps verb past + です patterns (食べたです → 食べ + た + です)
+ConnectionRuleResult checkTaAuxToDesu(const core::LatticeEdge& prev,
+                                      const core::LatticeEdge& next,
+                                      const ConnectionOptions& /* opts */) {
+  // Check if prev is た (AUX)
+  if (prev.pos != core::PartOfSpeech::Auxiliary) return {};
+  if (prev.surface != "た") return {};
+
+  // Check if next is です (AUX)
+  if (next.pos != core::PartOfSpeech::Auxiliary) return {};
+  if (next.surface != "です") return {};
+
+  // Strong bonus to make split path competitive with full form path
+  return {ConnectionPattern::TaAuxToDesu, -scorer::kBonusTaAuxToDesu,
+          "ta(aux) + desu(aux) (MeCab-compatible split)"};
+}
+
+// =============================================================================
+// AUX(です/ます/だ/た) → 終助詞(ね/よ) bonus
+// =============================================================================
+// Supports sentence-ending patterns (そうですね, 食べますよ, だね, etc.)
+// This prevents ね from being parsed as verb (ねる) after auxiliary endings.
+// MeCab: そう + です(AUX) + ね(終助詞)
+ConnectionRuleResult checkAuxToSentenceFinalParticle(
+    const core::LatticeEdge& prev, const core::LatticeEdge& next,
+    const ConnectionOptions& /* opts */) {
+  if (!isPosMatch<POS::Aux, POS::Particle>(prev, next)) return {};
+
+  // Check if prev is sentence-ending auxiliary form
+  // Common endings: です, ます, だ, た, ない, etc.
+  static constexpr std::string_view kSentenceEndingAuxForms[] = {
+      "です", "ます", "だ", "た", "ない", "よう", "らしい", "だろう", "でしょう",
+      "まし", "ませ"  // also conjugated forms before ね
+  };
+  bool is_sentence_ending_aux = false;
+  for (const auto& form : kSentenceEndingAuxForms) {
+    if (prev.surface == form || utf8::endsWith(prev.surface, form)) {
+      is_sentence_ending_aux = true;
+      break;
+    }
+  }
+  if (!is_sentence_ending_aux) return {};
+
+  // Check if next is sentence-final particle (終助詞)
+  static constexpr std::string_view kSentenceFinalParticles[] = {
+      scorer::kParticleNe, scorer::kParticleYo, "わ", "な", "か"
+  };
+  bool is_final_particle = false;
+  for (const auto& p : kSentenceFinalParticles) {
+    if (next.surface == p) {
+      is_final_particle = true;
+      break;
+    }
+  }
+  if (!is_final_particle) return {};
+
+  // Exclude patterns where combined form is registered as single dictionary entry:
+  // - だ+わ → だわ (feminine sentence-ending auxiliary)
+  // - です+わ → ですわ (ojou-sama speech)
+  // These should not be split by this bonus
+  if (next.surface == "わ" && (prev.surface == "だ" || prev.surface == "です")) {
+    return {};
+  }
+
+  // Strong bonus to prefer ね(PARTICLE) over ね(VERB, lemma=ねる)
+  return {ConnectionPattern::AuxToSentenceFinalParticle,
+          -scorer::kBonusSentenceFinalParticleSeq,
+          "aux + sentence-final particle (ですね, etc.)"};
 }
 
 }  // namespace connection_rules

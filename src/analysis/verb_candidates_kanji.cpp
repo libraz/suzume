@@ -43,12 +43,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   }
 
   // Find kanji portion (typically 1-2 characters for verbs)
-  size_t kanji_end = start_pos;
-  while (kanji_end < char_types.size() &&
-         kanji_end - start_pos < 3 &&  // Max 3 kanji for verb stem
-         char_types[kanji_end] == normalize::CharType::Kanji) {
-    ++kanji_end;
-  }
+  size_t kanji_end = vh::findCharRegionEnd(char_types, start_pos, 3,
+                                            normalize::CharType::Kanji);
 
   if (kanji_end == start_pos) {
     return candidates;
@@ -88,16 +84,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     }
   }
 
-  size_t hiragana_end = kanji_end;
-  while (hiragana_end < char_types.size() &&
-         hiragana_end - kanji_end < 12 &&  // Max 12 hiragana for conjugation + aux
-         char_types[hiragana_end] == normalize::CharType::Hiragana) {
-    // Note: We no longer break at particle-like characters here.
-    // The inflection module will determine if the full string is a valid
-    // conjugated verb. This allows patterns like "飲みながら" (nomi-nagara)
-    // where "が" is part of the auxiliary "ながら", not a standalone particle.
-    ++hiragana_end;
-  }
+  // Find hiragana portion (max 12 for conjugation + aux)
+  // Note: We no longer break at particle-like characters here.
+  // The inflection module will determine if the full string is a valid
+  // conjugated verb. This allows patterns like "飲みながら" (nomi-nagara)
+  // where "が" is part of the auxiliary "ながら", not a standalone particle.
+  size_t hiragana_end = vh::findCharRegionEnd(char_types, kanji_end, 12,
+                                               normalize::CharType::Hiragana);
 
   // Need at least some hiragana for a conjugated verb
   if (hiragana_end <= kanji_end) {

@@ -149,8 +149,11 @@ RuleFunc checkAdjKuNaru;
 RuleFunc checkAdjKuToTeParticle;
 RuleFunc checkAdjKuToNai;
 RuleFunc checkIAdjToDesu;
+RuleFunc checkIAdjKattToTa;  // Bonus: ADJ(かっ形) → た(AUX)
+RuleFunc checkTaAuxToDesu;   // Bonus: た(AUX) → です(AUX)
 RuleFunc checkAdjStemToSugiruVerb;
 RuleFunc checkAdjStemToSouAux;
+RuleFunc checkAdjToSentenceFinalParticle; // Bonus: ADJ → 終助詞(ね/よ)
 RuleFunc checkVerbRenyokeiToSouAux;
 RuleFunc checkPrefixToHiraganaAdj;
 RuleFunc checkCharacterSpeechSplit;
@@ -192,9 +195,13 @@ RuleFunc checkNaAdjToDekinaiVerb;       // Penalty: NOUN/ADJ → でない(VERB)
 RuleFunc checkCopulaDeToNai;            // Bonus: で(AUX,だ) → ない(AUX)
 RuleFunc checkCopulaDeToGozaru;         // Bonus: で(AUX,だ) → ござる(AUX)
 RuleFunc checkCopulaDeToAru;            // Bonus: で(AUX,だ) → ある/あり(VERB)
+RuleFunc checkCopulaDeToHaParticle;     // Bonus: で(AUX,だ) → は(PARTICLE) (ではない pattern)
+RuleFunc checkCopulaDeToMoParticle;     // Bonus: で(AUX,だ) → も(PARTICLE) (でもない pattern)
 RuleFunc checkQuotativeAdvToIu;         // Bonus: ADV(そう/こう/etc) → いっ(VERB, lemma=いう)
-RuleFunc checkNiParticleToIku;          // Bonus: に(PARTICLE) → いって/いった(VERB, lemma=いく)
+RuleFunc checkQuotativeToParticleToIu;  // Bonus: と(PARTICLE) → いっ(VERB, lemma=いう)
+RuleFunc checkNiParticleToIku;          // Bonus: に(PARTICLE) → いっ(VERB, lemma=いく)
 RuleFunc checkSentenceFinalParticleSeq; // Bonus: 終助詞 → 終助詞 (よ+ね, よ+わ, etc.)
+RuleFunc checkAuxToSentenceFinalParticle;  // Bonus: AUX(です/ます/だ) → 終助詞(ね/よ)
 
 // =============================================================================
 // POS-based Dispatch Helpers

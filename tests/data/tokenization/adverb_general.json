@@ -346,7 +346,7 @@
     },
     {
       "id": "adverb_tatoe",
-      "description": "たとえ should be Adverb (conditional) - MeCab splits でも as particle",
+      "description": "たとえ should be Adverb (conditional) - grammar-first: で(AUX,だ)+も(PARTICLE)",
       "input": "たとえ雨でも行く",
       "expected": [
         {
@@ -358,7 +358,12 @@
           "pos": "Noun"
         },
         {
-          "surface": "でも",
+          "surface": "で",
+          "pos": "Auxiliary",
+          "lemma": "だ"
+        },
+        {
+          "surface": "も",
           "pos": "Particle"
         },
         {

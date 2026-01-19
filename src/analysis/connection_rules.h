@@ -166,6 +166,8 @@ enum class ConnectionPattern {
   AdjKuToTeParticle,          // ADJ(く形) → て(PARTICLE) (MeCab-compatible kute split: 美しくて → 美しく + て)
   AdjKuToNai,                 // ADJ(く形) → ない(AUX) bonus (高くない → 高く + ない)
   IAdjToDesu,                 // I-ADJ(基本形) → です(AUX) bonus (美味しいです → 美味しい + です)
+  IAdjKattToTa,               // I-ADJ(かっ形) → た(AUX) bonus for MeCab-compatible split (よかったです → よかっ + た + です)
+  TaAuxToDesu,                // た(AUX) → です(AUX) bonus for MeCab-compatible split (よかっ+た+です, 食べた+です)
   ParticleDeToKuruAux,        // PARTICLE(で) → AUX(くる活用形) penalty (できます should be でき + ます)
   CopulaDeToKuruAux,          // AUX(で, lemma=だ) → くる活用形 penalty (できます should be でき + ます)
   NaAdjToCopulaDe,            // NOUN/ADJ → で(AUX, lemma=だ) bonus (嫌でない pattern)
@@ -178,8 +180,11 @@ enum class ConnectionPattern {
   VerbRenyokeiToSouAux,       // VERB(renyokei) → そう(AUX) bonus (appearance auxiliary)
   ParticleNiToIruVerb,        // に(PARTICLE) → いる/いた(VERB/AUX) bonus (家にいた pattern)
   QuotativeAdvToIu,           // ADV(そう/こう/etc) → いっ(VERB, lemma=いう) bonus (quotative pattern)
+  QuotativeToParticleToIu,    // と(PARTICLE) → いっ(VERB, lemma=いう) bonus (quotative pattern)
   NiParticleToIku,            // に(PARTICLE) → いっ(VERB, lemma=いく) bonus (movement pattern)
-  SentenceFinalParticleSeq    // 終助詞 → 終助詞 (よ+ね, よ+わ, etc.) bonus
+  SentenceFinalParticleSeq,   // 終助詞 → 終助詞 (よ+ね, よ+わ, etc.) bonus
+  AuxToSentenceFinalParticle, // AUX(です/ます/だ) → 終助詞(ね/よ) bonus
+  AdjToSentenceFinalParticle  // ADJ → 終助詞(ね/よ) bonus (暑かったね, etc.)
 };
 
 /**

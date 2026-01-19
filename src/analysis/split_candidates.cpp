@@ -59,15 +59,10 @@ void addMixedScriptCandidates(
   }
 
   // Find the end of the first segment (continuous same type)
-  size_t first_end = start_pos + 1;
   size_t max_first_len =
       (first_type == CharType::Alphabet) ? kMaxAlphaLen : kMaxDigitLen;
-
-  while (first_end < char_types.size() &&
-         first_end - start_pos < max_first_len &&
-         char_types[first_end] == first_type) {
-    ++first_end;
-  }
+  size_t first_end = findCharRegionEnd(char_types, start_pos, max_first_len,
+                                        first_type);
 
   // Check if there's a second segment to join with
   if (first_end >= char_types.size()) {
@@ -100,12 +95,8 @@ void addMixedScriptCandidates(
   }
 
   // Find the maximum extent of the second segment
-  size_t max_end = first_end + 1;
-  while (max_end < char_types.size() &&
-         max_end - first_end < max_second_len &&
-         char_types[max_end] == second_type) {
-    ++max_end;
-  }
+  size_t max_end = findCharRegionEnd(char_types, first_end, max_second_len,
+                                      second_type);
 
   size_t start_byte = charPosToBytePos(codepoints, start_pos);
   float base_cost = scorer.posPrior(core::PartOfSpeech::Noun);
@@ -168,12 +159,8 @@ void addCompoundSplitCandidates(
   }
 
   // Find the end of the kanji sequence
-  size_t kanji_end = start_pos + 1;
-  while (kanji_end < char_types.size() &&
-         kanji_end - start_pos < kMaxCompoundLen &&
-         char_types[kanji_end] == CharType::Kanji) {
-    ++kanji_end;
-  }
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, kMaxCompoundLen,
+                                        CharType::Kanji);
 
   size_t kanji_len = kanji_end - start_pos;
 
@@ -266,12 +253,8 @@ void addNounVerbSplitCandidates(
   }
 
   // Find the extent of kanji sequence
-  size_t kanji_end = start_pos + 1;
-  while (kanji_end < char_types.size() &&
-         kanji_end - start_pos < kMaxNounLen + 3 &&
-         char_types[kanji_end] == CharType::Kanji) {
-    ++kanji_end;
-  }
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, kMaxNounLen + 3,
+                                        CharType::Kanji);
 
   // Need at least 2 kanji to consider noun+verb split
   if (kanji_end - start_pos < 2) {
@@ -285,12 +268,8 @@ void addNounVerbSplitCandidates(
   }
 
   // Find the maximum extent of hiragana sequence
-  size_t max_hiragana_end = kanji_end;
-  while (max_hiragana_end < char_types.size() &&
-         max_hiragana_end - kanji_end < 10 &&
-         char_types[max_hiragana_end] == CharType::Hiragana) {
-    ++max_hiragana_end;
-  }
+  size_t max_hiragana_end = findCharRegionEnd(char_types, kanji_end, 10,
+                                               CharType::Hiragana);
 
   // Need at least 1 hiragana for verb ending
   if (max_hiragana_end <= kanji_end) {

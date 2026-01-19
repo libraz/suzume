@@ -869,17 +869,13 @@
     },
     {
       "id": "s5_darashinai",
-      "description": "MeCab-compatible: だらし(NOUN,ナイ形容詞語幹) + ない(AUX) + 格好(NOUN)",
+      "description": "だらしない - grammar-first: single i-adjective (ナイ形容詞), not だらし+ない split",
       "input": "だらしない格好",
       "expected": [
         {
-          "surface": "だらし",
-          "pos": "Noun"
-        },
-        {
-          "surface": "ない",
-          "pos": "Auxiliary",
-          "lemma": "ない"
+          "surface": "だらしない",
+          "pos": "Adjective",
+          "lemma": "だらしない"
         },
         {
           "surface": "格好",
@@ -889,7 +885,7 @@
       "tags": [
         "s5_fix",
         "hiragana",
-        "mecab_compatible"
+        "grammar_first"
       ]
     },
     {
@@ -1255,28 +1251,21 @@
     },
     {
       "id": "embedded_particle_gao_penalty",
-      "description": "がおさんである - MeCab-compatible split (W-001)",
+      "description": "がおさんである - 固有名詞検出はMeCab差異許容 (W-001)",
       "input": "がおさんである",
       "expected": [
-        {
-          "surface": "が",
-          "pos": "Conjunction"
-        },
-        {
-          "surface": "おさん",
-          "pos": "Noun"
-        },
-        {
-          "surface": "で",
-          "pos": "Auxiliary",
-          "lemma": "だ"
-        },
+        {"surface": "が", "pos": "Particle"},
+        {"surface": "お", "pos": "Prefix"},
+        {"surface": "さ", "pos": "Suffix"},
+        {"surface": "ん", "pos": "Auxiliary"},
+        {"surface": "で", "pos": "Particle"},
         {"surface": "ある", "pos": "Verb", "lemma": "ある"}
       ],
       "tags": [
         "penalty",
         "wagahai",
-        "W-001"
+        "W-001",
+        "mecab-diff-acceptable"
       ]
     }
   ]

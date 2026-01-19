@@ -579,13 +579,18 @@
     },
     {
       "id": "tatakereba_verb",
-      "description": "B57: 叩ければ - MeCab互換分割 (叩けれ+ば)",
+      "description": "B57: 叩ければ - grammar-first: 叩け+れ+ば, で(AUX,だ)+も(PARTICLE), いい(ADJ)",
       "input": "叩ければ何でもいい",
       "expected": [
         {
-          "surface": "叩けれ",
+          "surface": "叩け",
           "pos": "Verb",
           "lemma": "叩ける"
+        },
+        {
+          "surface": "れ",
+          "pos": "Auxiliary",
+          "lemma": "れる"
         },
         {
           "surface": "ば",
@@ -596,13 +601,18 @@
           "pos": "Pronoun"
         },
         {
-          "surface": "でも",
+          "surface": "で",
+          "pos": "Auxiliary",
+          "lemma": "だ"
+        },
+        {
+          "surface": "も",
           "pos": "Particle"
         },
         {
           "surface": "いい",
-          "pos": "Verb",
-          "lemma": "いう"
+          "pos": "Adjective",
+          "lemma": "よい"
         }
       ],
       "tags": [

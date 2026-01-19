@@ -196,8 +196,17 @@ ConnectionRuleResult checkTaiAfterRenyokei(const core::LatticeEdge& prev,
     return {};
   }
 
-  // Penalize AUX + たい pattern (e.g., なり(だ) + たかった)
+  // Handle AUX + たい pattern
   if (prev.pos == core::PartOfSpeech::Auxiliary) {
+    // Exception: passive/causative + たい is grammatically valid
+    // E.g., 見られたい (want to be seen), 食べさせたい (want to make eat)
+    if (prev.lemma == "られる" || prev.lemma == "させる" ||
+        prev.lemma == "れる") {
+      // Give bonus for passive/causative + たい pattern
+      return {ConnectionPattern::TaiAfterRenyokei, -opts.bonus_tai_after_renyokei,
+              "tai-pattern after passive/causative aux"};
+    }
+    // Penalize other AUX + たい patterns (e.g., なり(だ) + たかった)
     return {ConnectionPattern::TaiAfterRenyokei, opts.penalty_tai_after_aux,
             "tai-pattern after auxiliary (unnatural)"};
   }
@@ -636,9 +645,9 @@ ConnectionRuleResult checkRenyokeiToContractedVerb(const core::LatticeEdge& prev
   // The TeruRenyokeiToTa rule will give additional bonus when followed by た
   // This enables MeCab-compatible split: 食べてた → 食べ + て + た
   if (next.surface == scorer::kFormTe || next.surface == scorer::kFormDe) {
-    // Bonus -0.6 makes 食べ+て path (0.677-0.6=0.077) beat 食べて path (0.161)
+    // Bonus makes 食べ+て path (0.677-0.6=0.077) beat 食べて path (0.161)
     // For 食べている, て(PARTICLE) path (-1.772) still wins over て(VERB) (0.077)
-    return {ConnectionPattern::RenyokeiToContractedVerb, -0.6F,
+    return {ConnectionPattern::RenyokeiToContractedVerb, -scorer::kBonusStandaloneTeDeRenyokei,
             "verb renyokei + standalone te/de (renyokei of teru/deru)"};
   }
 
