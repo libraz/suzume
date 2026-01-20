@@ -164,7 +164,9 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Prevents misanalysis as verb+たい (e.g., つめたい → つめ+たい)
   // or as adverb+verb+aux (e.g., はなはだしい → はなはだ+し+い)
   // Longer adjectives get stronger bonus to beat split paths
+  // Exclude AdjStem (語幹) as it's not a complete i-adjective
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adjective &&
+      edge.extended_pos != core::ExtendedPOS::AdjStem &&
       grammar::isPureHiragana(edge.surface)) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     // Base bonus -2.5, plus 0.5 per character beyond 3

@@ -171,6 +171,10 @@ BigramTable::initTable() {
   // AdjStem → AuxAppearanceSou (美し+そう) - strong bonus
   setCell(t, EPOS::AdjStem, EPOS::AuxAppearanceSou, cost::kStrongBonus);
 
+  // Suffix → AuxAppearanceSou (さ+そう in なさそう) - moderate bonus
+  // This completes the な+さ+そう chain for ない nominalization + appearance
+  setCell(t, EPOS::Suffix, EPOS::AuxAppearanceSou, cost::kModerateBonus);
+
   // =========================================================================
   // Auxiliary → Auxiliary Chains
   // =========================================================================
@@ -358,6 +362,17 @@ BigramTable::initTable() {
 
   // AdjStem → AuxConjectureRashii: unnatural (美し+らしい should be 美しい+らしい)
   setCell(t, EPOS::AdjStem, EPOS::AuxConjectureRashii, cost::kProhibitive);
+
+  // AdjStem → Verb/Aux: prohibit (な+い should not split ない as な(AdjStem)+い)
+  // な(AdjStem of ない) should only connect to さ(nominalization) or そう(appearance)
+  setCell(t, EPOS::AdjStem, EPOS::VerbRenyokei, cost::kProhibitive);
+  setCell(t, EPOS::AdjStem, EPOS::VerbShuushikei, cost::kProhibitive);
+  setCell(t, EPOS::AdjStem, EPOS::VerbMizenkei, cost::kProhibitive);
+  setCell(t, EPOS::AdjStem, EPOS::AuxAspectIru, cost::kProhibitive);  // な+い(いる)
+  setCell(t, EPOS::AdjStem, EPOS::AuxNegativeNai, cost::kProhibitive);   // な+ない
+  setCell(t, EPOS::AdjStem, EPOS::Other, cost::kProhibitive);           // な+い(OTHER)
+
+  // Note: Particle → AdjStem is allowed for patterns like やる気がなさそう (が+な+さ+そう)
 
   // =========================================================================
   // Particle → Other penalties (prevents over-segmentation of hiragana words)

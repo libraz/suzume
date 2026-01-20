@@ -1018,6 +1018,18 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         if (starts_with_particle && normalize::utf8Length(cand.stem) < 2) {
           continue;  // Stem too short for a valid adjective
         }
+        // Skip なさそう pattern - should be split as な(ADJ stem) + さ(Suffix) + そう(AUX)
+        // This pattern is the nominalization of ない + そう (appearance auxiliary)
+        // The inflection analyzer incorrectly treats なさ as stem of なさい (honorific)
+        // Check: surface ends with さそう AND (stem ends with さ OR surface is exactly なさそう)
+        if (utf8::endsWith(surface, "さそう")) {
+          // Check if this is the な+さ+そう pattern (ない nominalization)
+          // Pattern: 1 char before さそう (like なさそう where な is the ない stem)
+          size_t surface_len = normalize::utf8Length(surface);
+          if (surface_len == 4 && utf8::endsWith(cand.stem, "さ")) {
+            continue;  // Skip - should be split as な+さ+そう
+          }
+        }
         // Base cost for hiragana i-adjective candidates
         // Use neutral base (0.0F) to avoid false positives like につい
         // which should be parsed as に(PARTICLE)+ついて(VERB)
