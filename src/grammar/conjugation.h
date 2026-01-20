@@ -16,6 +16,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "core/types.h"
 #include "dictionary/dictionary.h"
 
 namespace suzume::grammar {
@@ -115,8 +116,9 @@ class Conjugation {
    * @brief Suffix info for dictionary expansion (MeCab-compatible)
    */
   struct DictionarySuffix {
-    std::string suffix;      // Suffix to add to stem: った
-    bool is_potential;       // True if this is a potential form
+    std::string suffix;                // Suffix to add to stem: った
+    bool is_potential;                 // True if this is a potential form
+    core::ExtendedPOS extended_pos;    // ExtendedPOS for this form
   };
 
   /**

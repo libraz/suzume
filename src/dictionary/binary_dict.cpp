@@ -193,9 +193,34 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
           }
           break;
         }
-        case core::PartOfSpeech::Verb:
-          entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
+        case core::PartOfSpeech::Verb: {
+          // Distinguish verb forms based on ending
+          // 音便形: ends with っ/ん (onbin for ta/te form)
+          using namespace std::string_view_literals;
+          if (utf8::endsWithAny(entry.surface, {"っ"sv, "ん"sv})) {
+            // Sokuonbin (っ) or hatsuonbin (ん): あっ, 飲ん, etc.
+            entry.extended_pos = core::ExtendedPOS::VerbOnbinkei;
+          } else if (utf8::endsWithAny(entry.surface, {"れば"sv, "けば"sv, "せば"sv,
+                     "てば"sv, "ねば"sv, "べば"sv, "めば"sv, "えば"sv})) {
+            // Conditional form
+            entry.extended_pos = core::ExtendedPOS::VerbKateikei;
+          } else if (entry.surface.size() == core::kJapaneseCharBytes) {
+            // Single hiragana character verb forms are renyokei (連用形)
+            // e.g., い from いる expansion, not shuushikei
+            // This prevents incorrect VERB_終止→AUX_意志 connections like と→い→う
+            entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
+          } else if (!utf8::endsWith(entry.surface, "る") &&
+                     entry.surface.size() <= core::kTwoJapaneseCharBytes) {
+            // Short verb forms (1-2 chars) not ending in る are likely renyokei
+            // e.g., すぎ from すぎる expansion → すぎ + ない should work
+            // Forms ending in る (する, いる, etc.) are shuushikei
+            entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
+          } else {
+            // Default: shuushikei (dictionary form or other forms)
+            entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
+          }
           break;
+        }
         case core::PartOfSpeech::Noun:
           entry.extended_pos = core::ExtendedPOS::Noun;
           break;

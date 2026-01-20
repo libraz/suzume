@@ -155,10 +155,13 @@ Usage: test_tool.pl <command> [options] [input]
 
 Commands:
   expected <input>       Output expected tokens (MeCab+SuzumeRules) in MeCab format
+                         Use -c to compare with Suzume output
   show <input>           Show what MeCab outputs (dry-run)
   update <input>         Find and update test case matching input
   update -t <test_id>    Update specific test by ID
   add -f <file> <input>  Add new test case to file
+  needs-suzume-update    Find tests where expected != MeCab+SuzumeRules
+                         Use --apply to auto-update all tests
   diff-suzume            Analyze failures: categorize by type (read-only)
   diff-mecab             Find tests not MeCab-compatible (intentional or errors)
   check-coverage <file>  Check which inputs in file have tests
@@ -166,6 +169,7 @@ Commands:
   suggest-file <input>   Suggest which test file for input
   replace-pos OLD NEW    Replace POS in all test files
   map-pos SURFACE OLD NEW Replace POS only for specific surface
+  validate-ids           Detect/fix non-ASCII or duplicate IDs (--apply to fix)
   list                   List all test files
   list-pos               List all POS values used in tests
 
@@ -181,20 +185,17 @@ Options:
   -h, --help             Show this help
 
 Examples:
-  ./scripts/test_tool.pl expected "だらしない"  # MeCab+Suzumeルール適用済み出力
+  ./scripts/test_tool.pl expected "だらしない"       # MeCab+Suzumeルール適用済み出力
+  ./scripts/test_tool.pl expected -c "食べている"   # Suzumeと比較
   ./scripts/test_tool.pl show "食べています"
   ./scripts/test_tool.pl update "食べています"
-  ./scripts/test_tool.pl update -t "verb_ichidan/5"
   ./scripts/test_tool.pl add -f verb_ichidan "食べています"
-  ./scripts/test_tool.pl add -f verb_ichidan --id eating_progressive "食べています"
-  ./scripts/test_tool.pl diff-suzume        # analyze failures by category
-  ./scripts/test_tool.pl check-coverage /tmp/inputs.txt  # check coverage
-  ./scripts/test_tool.pl batch-add -f basic /tmp/inputs.txt  # dry-run batch add
-  ./scripts/test_tool.pl batch-add -f basic /tmp/inputs.txt --apply  # add tests
-  ./scripts/test_tool.pl suggest-file "食べたい"  # suggest test file
-  ./scripts/test_tool.pl replace-pos Auxiliary Auxiliary_Tense_Ta --apply
-  ./scripts/test_tool.pl map-pos た Auxiliary Auxiliary_Tense_Ta --apply
-  ./scripts/test_tool.pl list-pos           # show all POS values used
+  ./scripts/test_tool.pl needs-suzume-update        # 更新が必要なテスト一覧
+  ./scripts/test_tool.pl needs-suzume-update --apply  # 全テスト更新
+  ./scripts/test_tool.pl diff-suzume                # 失敗カテゴリ分析
+  ./scripts/test_tool.pl batch-add -f basic /tmp/inputs.txt --apply
+  ./scripts/test_tool.pl replace-pos Auxiliary Aux_Tense --apply
+  ./scripts/test_tool.pl list-pos                   # 全POS値一覧
 HELP
 }
 
@@ -373,6 +374,12 @@ if ($command eq 'expected') {
         die "suzume-cli not found (run cmake build first)\n" unless -x $suzume_cli;
         my $suzume = get_suzume_tokens($suzume_cli, $input);
 
+        # ANSI color codes
+        my $RED = "\e[31m";
+        my $YELLOW = "\e[33m";
+        my $GRAY = "\e[90m";
+        my $RESET = "\e[0m";
+
         # Helper to format token with optional lemma
         my $fmt = sub {
             my ($t) = @_;
@@ -386,11 +393,21 @@ if ($command eq 'expected') {
         my $exp_str = join(' ', map { $fmt->($_) } @$tokens);
         my $suz_str = join(' ', map { $fmt->($_) } @$suzume);
 
+        # Check segmentation match (same surfaces)
+        my @exp_surfaces = map { $_->{surface} } @$tokens;
+        my @suz_surfaces = map { $_->{surface} } @$suzume;
+        my $seg_match = join('|', @exp_surfaces) eq join('|', @suz_surfaces);
+
         if (tokens_match($tokens, $suzume)) {
             print "✓ Match\n";
             print "  $exp_str\n";
         } else {
-            print "✗ Mismatch\n";
+            # Determine mismatch type
+            if ($seg_match) {
+                print "${YELLOW}△ 分割OK、POS/lemma差異${RESET}\n";
+            } else {
+                print "${RED}✗ 分割不一致${RESET}\n";
+            }
             print "  Expected: $exp_str\n";
             print "  Suzume:   $suz_str\n";
 
@@ -401,14 +418,21 @@ if ($command eq 'expected') {
                 my $e = $tokens->[$i];
                 my $s = $suzume->[$i];
                 if (!$e || !$s) {
-                    push @diffs, "[$i] " . ($e ? "extra expected: $e->{surface}" : "extra suzume: $s->{surface}");
+                    my $msg = $e ? "extra expected: $e->{surface}" : "extra suzume: $s->{surface}";
+                    push @diffs, "${RED}[$i] $msg${RESET}";
                 } else {
                     my @fields;
-                    push @fields, "surface" if ($e->{surface} // '') ne ($s->{surface} // '');
-                    push @fields, "pos" if normalize_pos($e->{pos} // '') ne normalize_pos($s->{pos} // '');
+                    if (($e->{surface} // '') ne ($s->{surface} // '')) {
+                        push @fields, "${RED}surface${RESET}";
+                    }
+                    if (normalize_pos($e->{pos} // '') ne normalize_pos($s->{pos} // '')) {
+                        push @fields, "${YELLOW}pos($e->{pos}≠$s->{pos})${RESET}";
+                    }
                     my $e_lemma = $e->{lemma} // $e->{surface};
                     my $s_lemma = $s->{lemma} // $s->{surface};
-                    push @fields, "lemma($e_lemma≠$s_lemma)" if $e_lemma ne $s_lemma;
+                    if ($e_lemma ne $s_lemma) {
+                        push @fields, "${GRAY}lemma($e_lemma≠$s_lemma)${RESET}";
+                    }
                     if (@fields) {
                         push @diffs, "[$i] $e->{surface}: " . join(', ', @fields);
                     }
@@ -1027,10 +1051,9 @@ if ($command eq 'needs-suzume-update') {
             # Get current expected
             my $expected = $case->{expected} // [];
 
-            # Get correct expected: MeCab + Suzume rules
-            my $mecab = get_mecab_tokens($inp);
-            my $rule = get_suzume_rule($inp);
-            my $correct = $rule ? apply_suzume_merge($mecab, $inp) : $mecab;
+            # Get correct expected: MeCab + Suzume rules (using new MeCab POS-based detection)
+            my ($correct, $source, $rule) = get_expected_tokens($inp);
+            $rule //= '';
 
             my @exp_surfaces = map { $_->{surface} } @$expected;
             my @cor_surfaces = map { $_->{surface} } @$correct;

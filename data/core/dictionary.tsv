@@ -85,8 +85,29 @@
 # --- I-adjectives: Irregular よい/いい ---
 # よい/いい has irregular conjugation (よ- stem, not よい- stem)
 # いい is colloquial form of よい
-いい	ADJECTIVE	I_ADJ
+やわらかい	ADJECTIVE	I_ADJ
+かわいい	ADJECTIVE	I_ADJ
+だらしない	ADJECTIVE	I_ADJ
+いたたまれない	ADJECTIVE	I_ADJ
+おびただしい	ADJECTIVE	I_ADJ
+はなはだしい	ADJECTIVE	I_ADJ
+男らしい	ADJECTIVE	I_ADJ
+あぶない	ADJECTIVE	I_ADJ
+めでたい	ADJECTIVE	I_ADJ
+ありがたい	ADJECTIVE	I_ADJ
+おもしろい	ADJECTIVE	I_ADJ
+あたたかい	ADJECTIVE	I_ADJ
+おかしい	ADJECTIVE	I_ADJ
+ものたりない	ADJECTIVE	I_ADJ
+うやうやしい	ADJECTIVE	I_ADJ
+こころもとない	ADJECTIVE	I_ADJ
+ていねい	ADJECTIVE	NA_ADJ
+しんちょう	ADJECTIVE	NA_ADJ
+静か	ADJECTIVE	NA_ADJ
+しずか	ADJECTIVE	NA_ADJ
 よい	ADJECTIVE	I_ADJ
+いい	ADJECTIVE	I_ADJ
+つめたい	ADJECTIVE	I_ADJ
 よく	ADVERB
 
 # =============================================================================
@@ -167,6 +188,35 @@
 繰り返し	ADVERB
 ちっとも	ADVERB
 なにしろ	ADVERB
+もちろん	ADVERB
+とにかく	ADVERB
+いきなり	ADVERB
+とりあえず	ADVERB
+どうせ	ADVERB
+いずれ	ADVERB
+たくさん	ADVERB
+もはや	ADVERB
+あらかじめ	ADVERB
+ひたすら	ADVERB
+いざ	ADVERB
+あたかも	ADVERB
+さながら	ADVERB
+いったい	ADVERB
+せめて	ADVERB
+しどろもどろ	ADVERB
+さすが	ADVERB
+すでに	ADVERB
+もし	ADVERB
+本当に	ADVERB
+滅多に	ADVERB
+たとえ	ADVERB
+大いに	ADVERB
+あまりに	ADVERB
+とても	ADVERB
+いつも	ADVERB
+だいたい	ADVERB
+颯爽と	ADVERB
+少々	ADVERB
 俄然	ADVERB
 
 # =============================================================================
@@ -179,11 +229,16 @@
 出しゃばる	VERB	GODAN_RA
 あがる	VERB	GODAN_RA
 相次ぐ	VERB	GODAN_GA
+なる	VERB	GODAN_RA
+ある	VERB	GODAN_RA
+終わる	VERB	GODAN_RA
 怒鳴る	VERB	GODAN_RA
 # B65: 詰まる - moved to L1 for conjugation expansion
 
 # --- Godan verbs: Classical/literary (wagahai) ---
 # W-017: Fix incorrect lemma generation
+言う	VERB	GODAN_WA
+しまう	VERB	GODAN_WA
 逢う	VERB	GODAN_WA
 見出す	VERB	GODAN_SA
 
@@ -245,6 +300,10 @@
 取り上げる	VERB	ICHIDAN
 # B60: あきらめる - split as あきら+める
 あきらめる	VERB	ICHIDAN
+いる	VERB	ICHIDAN
+する	VERB	SURU
+しれる	VERB	ICHIDAN
+すぎる	VERB	ICHIDAN
 諦める	VERB	ICHIDAN
 
 # =============================================================================
@@ -435,6 +494,9 @@ Wi-Fi	NOUN
 # e.g., 検討いたしております would become 検討い(ADJ)+たしております without this
 # Low cost (-0.5) to beat unknown ADJ candidates with optimal_length bonus
 あと	NOUN
+間違い	NOUN
+それぞれ	NOUN
+新た	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -486,7 +548,7 @@ Wi-Fi	NOUN
 激しく同意	OTHER
 ないわ	OTHER
 無いわ	OTHER
-なるほど	OTHER
+なるほど	ADVERB
 そうだね	OTHER
 
 # --- Fillers/Hesitation (フィラー・間投詞) ---
@@ -617,3 +679,5 @@ Wi-Fi	NOUN
 大きい	ADJECTIVE	I_ADJ
 
 小さい	ADJECTIVE	I_ADJ
+
+でも	CONJUNCTION

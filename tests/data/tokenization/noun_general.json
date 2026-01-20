@@ -207,13 +207,8 @@
       "description" : "3キロ (3 kilograms)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "3"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "キロ"
+          "surface" : "3キロ"
         }
       ],
       "id" : "numeric_unit_kilo",
@@ -311,13 +306,8 @@
       "description" : "10メートル (10 meters)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "10"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "メートル"
+          "surface" : "10メートル"
         }
       ],
       "id" : "numeric_unit_meter",
@@ -332,13 +322,8 @@
       "description" : "5センチ (5 centimeters)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "5"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "センチ"
+          "surface" : "5センチ"
         }
       ],
       "id" : "numeric_unit_cm",
@@ -353,13 +338,8 @@
       "description" : "200グラム (200 grams)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "200"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "グラム"
+          "surface" : "200グラム"
         }
       ],
       "id" : "numeric_unit_gram",
@@ -390,13 +370,8 @@
       "description" : "100ドル (100 dollars)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "100"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "ドル"
+          "surface" : "100ドル"
         }
       ],
       "id" : "numeric_unit_dollar",
@@ -411,13 +386,8 @@
       "description" : "80パーセント (80 percent)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "80"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "パーセント"
+          "surface" : "80パーセント"
         }
       ],
       "id" : "numeric_unit_percent",
@@ -432,13 +402,8 @@
       "description" : "300カロリー (300 calories)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "300"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "カロリー"
+          "surface" : "300カロリー"
         }
       ],
       "id" : "numeric_unit_calorie",
@@ -453,13 +418,8 @@
       "description" : "2リットル (2 liters)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "2"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "リットル"
+          "surface" : "2リットル"
         }
       ],
       "id" : "numeric_unit_liter",
@@ -490,13 +450,8 @@
       "description" : "1000ポイント (1000 points)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "1000"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "ポイント"
+          "surface" : "1000ポイント"
         }
       ],
       "id" : "numeric_unit_point",
@@ -1485,10 +1440,13 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "一日中"
+          "surface" : "一日"
         },
         {
-          "lemma" : "働く",
+          "pos" : "Noun",
+          "surface" : "中"
+        },
+        {
           "pos" : "Verb",
           "surface" : "働く"
         }

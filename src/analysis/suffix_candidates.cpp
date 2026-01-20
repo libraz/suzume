@@ -801,6 +801,25 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
                         second_hira == U'ま')) {
       looks_like_aux = true;
     }
+    // Renyokei + なさい (polite imperative)
+    // e.g., 書きなさい, 起きなさい - these should split as verb + なさい
+    if ((is_renyokei || is_ichidan_stem) && hiragana_len >= 4) {
+      // Check if hiragana portion ends with "さい" (last 2 chars of なさい)
+      char32_t h_minus2 = codepoints[hiragana_end - 2];
+      char32_t h_minus1 = codepoints[hiragana_end - 1];
+      if (h_minus2 == U'さ' && h_minus1 == U'い') {
+        looks_like_aux = true;
+      }
+    }
+    // Renyokei + べき (classical auxiliary)
+    // e.g., 読むべき, 食べるべき - these should split as verb + べき
+    if (hiragana_len >= 3) {
+      char32_t h_minus2 = codepoints[hiragana_end - 2];
+      char32_t h_minus1 = codepoints[hiragana_end - 1];
+      if (h_minus2 == U'べ' && h_minus1 == U'き') {
+        looks_like_aux = true;
+      }
+    }
   }
 
   // Ichidan verb pattern (e-row + る)

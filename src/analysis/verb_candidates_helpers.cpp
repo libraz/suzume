@@ -365,6 +365,16 @@ bool shouldSkipCausativeAuxPattern(std::string_view surface, grammar::VerbType v
            utf8::endsWith(surface, "せた") ||
            utf8::endsWith(surface, "せて");
   }
+
+  // Causative-passive patterns for all verb types (including Ichidan)
+  // E.g., 聞かせられた → 聞か + せ + られ + た (MeCab-compatible split)
+  // These look like Ichidan verbs but contain causative+passive auxiliary chain
+  if (utf8::endsWith(surface, "せられる") ||
+      utf8::endsWith(surface, "せられた") ||
+      utf8::endsWith(surface, "せられて") ||
+      utf8::endsWith(surface, "せられない")) {
+    return true;
+  }
   return false;
 }
 

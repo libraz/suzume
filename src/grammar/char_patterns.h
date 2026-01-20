@@ -235,6 +235,31 @@ std::string_view godanBaseSuffixFromARow(char32_t a_row_cp);
  */
 VerbType verbTypeFromARowCodepoint(char32_t a_row_cp);
 
+/**
+ * @brief Get Godan verb base suffix from I-row renyokei ending
+ * @param i_row_cp I-row codepoint (き, し, ち, etc.)
+ * @return Corresponding u-row ending (く, す, つ, etc.), or empty if invalid
+ *
+ * Mapping:
+ * - き → く (GodanKa: 書く)
+ * - ぎ → ぐ (GodanGa: 泳ぐ)
+ * - し → す (GodanSa: 話す)
+ * - ち → つ (GodanTa: 持つ)
+ * - に → ぬ (GodanNa: 死ぬ)
+ * - び → ぶ (GodanBa: 遊ぶ)
+ * - み → む (GodanMa: 読む)
+ * - り → る (GodanRa: 取る)
+ * - い → う (GodanWa: 買う)
+ */
+std::string_view godanBaseSuffixFromIRow(char32_t i_row_cp);
+
+/**
+ * @brief Get VerbType from I-row renyokei ending
+ * @param i_row_cp I-row codepoint (き, し, ち, etc.)
+ * @return Corresponding VerbType, or Unknown if invalid
+ */
+VerbType verbTypeFromIRowCodepoint(char32_t i_row_cp);
+
 }  // namespace suzume::grammar
 
 #endif  // SUZUME_GRAMMAR_CHAR_PATTERNS_H_

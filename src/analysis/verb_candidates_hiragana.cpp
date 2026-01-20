@@ -918,6 +918,14 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
     // Check if base form is in dictionary (gives confidence boost)
     bool is_dict_verb = vh::isVerbInDictionary(dict_manager, base_form);
+
+    // Skip causative+passive auxiliary chain patterns
+    // E.g., "せられ" should be split as せ(causative) + られ(passive), not single verb
+    // MeCab-compatible split: 聞かせられた → 聞か + せ + られ + た
+    if (utf8::endsWith(stem_surface, "せられ")) {
+      continue;
+    }
+
     // Strong negative cost to beat NOUN + て(VERB from てる) split
     // Dictionary-verified verbs get stronger bonus
     float cost = is_dict_verb ? -0.8F : -0.6F;
@@ -932,6 +940,64 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
         stem_surface, start_pos, end_pos, cost, base_form,
         dictionary::ConjugationType::Ichidan,
         true, CandidateOrigin::VerbHiragana, ichidan_confidence, "hiragana_ichidan_renyokei"));
+  }
+
+  // Generate Godan sokuonbin (っ) candidates for hiragana verbs
+  // E.g., しまった → しまっ (onbin of しまう) + た (auxiliary)
+  //       なくなった → なくなっ (onbin of なくなる) + た (auxiliary)
+  // This allows MeCab-compatible splitting: しまった → しまっ + た
+  {
+    // Find hiragana extent (all consecutive hiragana from start_pos)
+    size_t hira_extent_end = start_pos;
+    while (hira_extent_end < char_types.size() &&
+           char_types[hira_extent_end] == normalize::CharType::Hiragana) {
+      ++hira_extent_end;
+    }
+    size_t hira_len = hira_extent_end - start_pos;
+
+    // Need at least 3 chars: stem(1+) + っ + た/て
+    if (hira_len >= 3) {
+      char32_t second_last = codepoints[hira_extent_end - 2];
+      char32_t last_char = codepoints[hira_extent_end - 1];
+      bool is_sokuonbin_te_ta = (second_last == U'っ' &&
+                                 (last_char == U'た' || last_char == U'て'));
+      if (is_sokuonbin_te_ta) {
+        // Generate candidate for stem + っ (without the た/て)
+        size_t onbin_end = hira_extent_end - 1;  // Position after っ
+        std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_end);
+        std::string stem = extractSubstring(codepoints, start_pos, onbin_end - 1);
+
+        // Try different base form patterns for っ-onbin
+        // Godan-wa: しま + う → しまう, なくな + る → なくなる
+        static const std::vector<std::pair<grammar::VerbType, std::string_view>>
+            sokuonbin_types = {
+                {grammar::VerbType::GodanWa, "う"},
+                {grammar::VerbType::GodanRa, "る"},
+                {grammar::VerbType::GodanTa, "つ"},
+            };
+
+        for (const auto& [verb_type, base_suffix] : sokuonbin_types) {
+          std::string potential_base = stem + std::string(base_suffix);
+          bool in_dict = vh::isVerbInDictionaryWithType(dict_manager, potential_base, verb_type) ||
+                         vh::isVerbInDictionary(dict_manager, potential_base);
+          if (in_dict) {
+            constexpr float kHiraganaSokuonbinCost = -0.5F;
+            SUZUME_DEBUG_VERBOSE_BLOCK {
+              SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
+                                  << " hiragana_sokuonbin lemma=" << potential_base
+                                  << " type=" << grammar::verbTypeToString(verb_type)
+                                  << " cost=" << kHiraganaSokuonbinCost << "\n";
+            }
+            candidates.push_back(makeVerbCandidate(
+                onbin_surface, start_pos, onbin_end, kHiraganaSokuonbinCost, potential_base,
+                grammar::verbTypeToConjType(verb_type),
+                true, CandidateOrigin::VerbHiragana, 0.9F, "hiragana_sokuonbin",
+                core::ExtendedPOS::VerbOnbinkei));
+            break;  // Found valid base, stop trying other types
+          }
+        }
+      }
+    }
   }
 
   // Add emphatic variants (いくっ, するっ, etc.)

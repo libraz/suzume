@@ -265,20 +265,21 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("らしかっ", "らしい", EPOS::AuxConjectureRashii),
 
       // Conjecture - みたい (様態推定)
+      // MeCab splits みたいな as みたい+な - register base forms only
       aux("みたい", "みたい", EPOS::AuxConjectureMitai),
       aux("みたいだ", "みたい", EPOS::AuxConjectureMitai),
       aux("みたいに", "みたい", EPOS::AuxConjectureMitai),
-      aux("みたいな", "みたい", EPOS::AuxConjectureMitai),
 
       // Appearance - そう (様態)
       aux("そう", "そう", EPOS::AuxAppearanceSou),
       aux("そうだ", "そう", EPOS::AuxAppearanceSou),
       aux("そうに", "そう", EPOS::AuxAppearanceSou),
-      aux("さそう", "そう", EPOS::AuxAppearanceSou),  // なさそう split
+      // Note: さそう removed - MeCab splits as な+さ+そう (3 tokens)
 
       // Obligation (当為)
-      aux("べき", "べし", EPOS::Unknown),
-      aux("べきだ", "べし", EPOS::Unknown), aux("べきで", "べし", EPOS::Unknown), aux("べきでは", "べし", EPOS::Unknown),
+      // Classical obligation auxiliary べし - connects after verb shuushikei
+      aux("べき", "べし", EPOS::AuxVolitional),  // 連体形: 食べるべき
+      aux("べきだ", "べし", EPOS::AuxVolitional), aux("べきで", "べし", EPOS::AuxVolitional), aux("べきでは", "べし", EPOS::AuxVolitional),
 
       // Passive/Potential (受身・可能)
       aux("れ", "れる", EPOS::AuxPassive),
@@ -315,16 +316,24 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       adj("よかっ", "よい", EPOS::AdjKatt),
       adj("よく", "よい", EPOS::AdjRenyokei),
 
-      // Polite imperative
-      aux("なさい", "なさい", EPOS::Unknown),
+      // Irregular i-adjective ない (形容詞・アウオ段)
+      // MeCab: なさそう → な(語幹/ガル接続) + さ(名詞化接尾辞) + そう(様態)
+      adj("な", "ない", EPOS::AdjStem),
 
-      // Possibility/Uncertainty
-      aux("かもしれない", "かもしれない", EPOS::AuxConjectureMitai),
+      // Nominalization suffix さ (高さ, 美しさ, なさ)
+      // MeCab: 高さ → 高(語幹) + さ(名詞), なさそう → な + さ + そう
+      suffix("さ", "さ"),
 
-      // Certainty - with reading
-      aux("間違いない", "間違いない", EPOS::AuxNegativeNai),
-      aux("違いない", "違いない", EPOS::AuxNegativeNai),
-      aux("に違いない", "違いない", EPOS::AuxNegativeNai),
+      // Polite imperative - connect after verb renyokei
+      aux("なさい", "なさる", EPOS::AuxHonorific),
+
+      // Possibility/Uncertainty - split form for MeCab compatibility
+      // かもしれない → かも + しれ + ない (not かもしれない as single token)
+      // かも particle is already defined above (line 157)
+
+      // Certainty - split form for MeCab compatibility
+      // 間違いない → 間違い + ない (not 間違いない as single token)
+      // These are handled by noun + ない connection
 
       // Potential/Passive/Causative (generic)
       aux("れる", "れる", EPOS::AuxPassive),
@@ -349,15 +358,9 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("いれば", "いる", EPOS::AuxAspectIru),
 
       // Completive/Regretful - しまう (完了・遺憾)
-      aux("しまう", "しまう", EPOS::AuxAspectShimau),
-      aux("しまった", "しまう", EPOS::AuxAspectShimau),
-      aux("しまって", "しまう", EPOS::AuxAspectShimau),
-      aux("しまい", "しまう", EPOS::AuxAspectShimau),
-      aux("しまいます", "しまう", EPOS::AuxAspectShimau),
-      verb("しまわ", "しまう", EPOS::VerbShuushikei),  // mizenkei
-      aux("しまわない", "しまう", EPOS::AuxAspectShimau),
-      aux("しまわなかった", "しまう", EPOS::AuxAspectShimau),
-      aux("しまえば", "しまう", EPOS::AuxAspectShimau),
+      // MeCab treats しまう as a regular verb, not auxiliary
+      // Complete forms removed - let inflection system handle conjugations
+      // This allows しまった → しまっ + た splitting (MeCab compatible)
 
       // Contracted forms: ちゃう/じゃう (completion)
       verb("ちゃう", "ちゃう", EPOS::AuxAspectShimau),

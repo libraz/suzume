@@ -762,12 +762,9 @@
       "description" : "堂々と - iteration mark + particle",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "堂々"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "と"
+          "lemma" : "堂々",
+          "pos" : "Adverb",
+          "surface" : "堂々と"
         }
       ],
       "id" : "iteration_mark_doudou",

@@ -142,12 +142,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "数"
-        },
-        {
-          "lemma" : "ヶ月",
-          "pos" : "Suffix",
-          "surface" : "ヶ月"
+          "surface" : "数ヶ月"
         }
       ],
       "id" : "counter_kagetsu",
@@ -162,12 +157,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "数"
-        },
-        {
-          "lemma" : "ヶ所",
-          "pos" : "Suffix",
-          "surface" : "ヶ所"
+          "surface" : "数ヶ所"
         }
       ],
       "id" : "counter_kasho",

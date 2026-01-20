@@ -774,13 +774,8 @@
           "surface" : "が"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "3"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "キロ"
+          "surface" : "3キロ"
         },
         {
           "lemma" : "減る",
@@ -872,7 +867,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "5回目"
+          "surface" : "5回"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "目"
         },
         {
           "pos" : "Particle",

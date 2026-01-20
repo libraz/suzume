@@ -1890,26 +1890,32 @@
       ]
     },
     {
-      "description" : "しまった - MeCab shows lemma しまる (not しまう) in isolation",
+      "description" : "ドアが閉まった - 閉まる(しまる)の過去形",
       "expected" : [
         {
-          "lemma" : "しまる",
-          "pos" : "Verb",
-          "surface" : "しまっ"
+          "pos" : "Noun",
+          "surface" : "ドア"
         },
         {
-          "lemma" : "た",
+          "pos" : "Particle",
+          "surface" : "が"
+        },
+        {
+          "lemma" : "閉まる",
+          "pos" : "Verb",
+          "surface" : "閉まっ"
+        },
+        {
           "pos" : "Auxiliary",
           "surface" : "た"
         }
       ],
-      "id" : "p4_shimatta_past",
-      "input" : "しまった",
+      "id" : "shimaru_door_closed",
+      "input" : "ドアが閉まった",
       "tags" : [
-        "p4",
-        "godanwa",
-        "hiragana-verb",
-        "past-form"
+        "godan-ra",
+        "past-form",
+        "context"
       ]
     },
     {

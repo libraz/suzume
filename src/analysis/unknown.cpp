@@ -654,8 +654,14 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
   // These are not character speech patterns
   if (start_type == normalize::CharType::Hiragana) {
     char32_t first_char = codepoints[start_pos];
+    // た: handled as tense auxiliary
+    // さ,ら,く,あ,け: common verb/adj endings
+    // い: handled as verb ending or copula
+    // す: handled as verb ending (です contraction)
+    // る: handled as verb ending
     if (first_char == U'た' || first_char == U'さ' || first_char == U'ら' ||
-        first_char == U'く' || first_char == U'あ' || first_char == U'け') {
+        first_char == U'く' || first_char == U'あ' || first_char == U'け' ||
+        first_char == U'い' || first_char == U'す' || first_char == U'る') {
       return candidates;
     }
   }

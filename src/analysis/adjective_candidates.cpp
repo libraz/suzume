@@ -358,6 +358,15 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     return candidates;
   }
 
+  // Skip kanji + verb renyokei + すぎ pattern for MeCab compatibility
+  // MeCab splits: 書きすぎる → 書き + すぎる, not as single adjective
+  // Pattern: kanji + (き/ぎ/し/ち/に/び/み/り/い) + すぎ...
+  std::string hira_part = extractSubstring(codepoints, kanji_end, hiragana_end);
+  // C++17 compatible: check if hiragana contains "すぎ" (6 bytes)
+  if (hira_part.find("すぎ") != std::string::npos) {
+    return candidates;  // Skip this candidate - force split path
+  }
+
   // Try different ending lengths
   for (size_t end_pos = hiragana_end; end_pos > kanji_end; --end_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);
@@ -1063,8 +1072,9 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       ku_cand.end = cand.end - 2;  // 2 characters (ない)
       ku_cand.pos = core::PartOfSpeech::Adjective;
       ku_cand.lemma = cand.lemma;  // Same lemma (しんどい)
-      ku_cand.cost = cand.cost + 0.1F;  // Slightly higher cost than full form
+      ku_cand.cost = cand.cost - 0.3F;  // Lower cost to prefer split (MeCab-compatible)
       ku_cand.has_suffix = true;  // This is a conjugated form
+      ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→AuxNegativeNai
 #ifdef SUZUME_DEBUG_INFO
       ku_cand.origin = cand.origin;
       ku_cand.confidence = cand.confidence;
@@ -1314,6 +1324,32 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
     }
   }
   for (auto& var : ku_te_candidates) {
+    candidates.push_back(std::move(var));
+  }
+
+  // Add ku-form candidates for kunai patterns (negative form split)
+  // This enables MeCab-compatible split: エモくない → エモく + ない
+  std::vector<UnknownCandidate> ku_nai_candidates;
+  for (const auto& cand : candidates) {
+    if (utf8::endsWith(cand.surface, "くない")) {
+      UnknownCandidate ku_cand;
+      ku_cand.surface = cand.surface.substr(0, cand.surface.size() - core::kTwoJapaneseCharBytes);  // Remove ない
+      ku_cand.start = cand.start;
+      ku_cand.end = cand.end - 2;  // 2 characters (ない)
+      ku_cand.pos = core::PartOfSpeech::Adjective;
+      ku_cand.lemma = cand.lemma;
+      ku_cand.cost = cand.cost - 0.3F;  // Lower cost to prefer split
+      ku_cand.has_suffix = true;
+      ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→AuxNegativeNai
+#ifdef SUZUME_DEBUG_INFO
+      ku_cand.origin = cand.origin;
+      ku_cand.confidence = cand.confidence;
+      ku_cand.pattern = "i_adjective_kata_ku_nai";
+#endif
+      ku_nai_candidates.push_back(ku_cand);
+    }
+  }
+  for (auto& var : ku_nai_candidates) {
     candidates.push_back(std::move(var));
   }
 

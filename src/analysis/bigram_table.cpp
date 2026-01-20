@@ -82,6 +82,9 @@ BigramTable::initTable() {
   // VerbRenyokei → AuxDesireTai (食べ+たい) - strong bonus
   setCell(t, EPOS::VerbRenyokei, EPOS::AuxDesireTai, cost::kStrongBonus);
 
+  // VerbRenyokei → AuxHonorific (書き+なさい) - strong bonus for polite imperative
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxHonorific, cost::kStrongBonus);
+
   // VerbMizenkei → AuxNegativeNai (食べ+ない for ichidan) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxNegativeNai, cost::kModerateBonus);
 
@@ -118,6 +121,10 @@ BigramTable::initTable() {
   // VerbTeForm → AuxAspectKuru (食べて+くる) - moderate bonus
   setCell(t, EPOS::VerbTeForm, EPOS::AuxAspectKuru, cost::kModerateBonus);
 
+  // VerbRenyokei → AuxAspectOku (食べ+とく contraction of 食べておく) - strong bonus
+  // This handles contracted forms where ておく → とく
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxAspectOku, cost::kStrongBonus);
+
   // =========================================================================
   // Verb Forms → Particles
   // =========================================================================
@@ -142,8 +149,9 @@ BigramTable::initTable() {
   // Adjective Forms → Auxiliaries
   // =========================================================================
 
-  // AdjRenyokei → AuxNegativeNai (美しく+ない) - strong bonus
-  setCell(t, EPOS::AdjRenyokei, EPOS::AuxNegativeNai, cost::kStrongBonus);
+  // AdjRenyokei → AuxNegativeNai (美しく+ない) - very strong bonus for MeCab-compatible split
+  // This needs to beat the full-form hiragana adjective bonus (e.g., しんどくない as single token)
+  setCell(t, EPOS::AdjRenyokei, EPOS::AuxNegativeNai, -2.0F);
 
   // AdjRenyokei → ParticleConj (美しく+て, ウザく+て) - strong bonus for te-form split
   setCell(t, EPOS::AdjRenyokei, EPOS::ParticleConj, cost::kStrongBonus);
@@ -182,6 +190,10 @@ BigramTable::initTable() {
   // AuxCopulaDa → AuxTenseTa (だっ+た) - strong bonus
   setCell(t, EPOS::AuxCopulaDa, EPOS::AuxTenseTa, cost::kStrongBonus);
 
+  // AuxTenseTa → AuxCopulaDesu (た+です) - moderate bonus for polite past
+  // e.g., 長かっ+た+です, 美しかっ+た+です (adjective past polite)
+  setCell(t, EPOS::AuxTenseTa, EPOS::AuxCopulaDesu, cost::kModerateBonus);
+
   // =========================================================================
   // Auxiliary → Particle
   // =========================================================================
@@ -212,7 +224,7 @@ BigramTable::initTable() {
   setCell(t, EPOS::NounFormal, EPOS::ParticleCase, cost::kNeutral);
 
   // =========================================================================
-  // Noun → Copula
+  // Noun → Copula/Negative
   // =========================================================================
 
   // Noun → AuxCopulaDa (学生+だ) - moderate bonus
@@ -221,15 +233,31 @@ BigramTable::initTable() {
   // Noun → AuxCopulaDesu (学生+です) - moderate bonus
   setCell(t, EPOS::Noun, EPOS::AuxCopulaDesu, cost::kModerateBonus);
 
+  // Noun → AuxNegativeNai (間違い+ない, 違い+ない) - moderate bonus
+  // For idiomatic patterns meaning "certain" or "no doubt"
+  setCell(t, EPOS::Noun, EPOS::AuxNegativeNai, cost::kModerateBonus);
+
   // NaAdj → AuxCopulaDa (静か+だ) - strong bonus
   setCell(t, EPOS::AdjNaAdj, EPOS::AuxCopulaDa, cost::kStrongBonus);
 
   // NaAdj → AuxCopulaDesu (静か+です) - strong bonus
   setCell(t, EPOS::AdjNaAdj, EPOS::AuxCopulaDesu, cost::kStrongBonus);
 
+  // AdjStem → Suffix (な+さ in なさそう) - strong bonus for nominalization
+  // This favors な(ADJ stem of ない) + さ(nominalization suffix) over さ(する mizenkei)
+  setCell(t, EPOS::AdjStem, EPOS::Suffix, cost::kStrongBonus);
+
   // =========================================================================
   // Particle → Various (Particles can connect to many things)
   // =========================================================================
+
+  // ParticleAdverbial → VerbRenyokei (かも+しれ in かもしれない) - strong bonus
+  // This favors かも+しれ+ない over か+もし+れない
+  setCell(t, EPOS::ParticleAdverbial, EPOS::VerbRenyokei, cost::kStrongBonus);
+
+  // ParticleCase → Adverb (か+もし) - moderate penalty
+  // This discourages splitting かもしれない as か+もし+れない
+  setCell(t, EPOS::ParticleCase, EPOS::Adverb, cost::kModeratePenalty);
 
   // ParticleCase → Noun (が+学生) - neutral
   setCell(t, EPOS::ParticleCase, EPOS::Noun, cost::kNeutral);
@@ -300,6 +328,9 @@ BigramTable::initTable() {
   // VerbShuushikei → AuxConjectureMitai (食べる+みたい) - strong bonus
   setCell(t, EPOS::VerbShuushikei, EPOS::AuxConjectureMitai, cost::kStrongBonus);
 
+  // VerbShuushikei → AuxVolitional (食べる+べき) - strong bonus for obligation
+  setCell(t, EPOS::VerbShuushikei, EPOS::AuxVolitional, cost::kStrongBonus);
+
   // AdjBasic → AuxConjectureMitai (美しい+みたい) - moderate bonus
   setCell(t, EPOS::AdjBasic, EPOS::AuxConjectureMitai, cost::kModerateBonus);
 
@@ -308,6 +339,10 @@ BigramTable::initTable() {
 
   // Noun → AuxConjectureRashii (春+らしい) - strong bonus
   setCell(t, EPOS::Noun, EPOS::AuxConjectureRashii, cost::kStrongBonus);
+
+  // AuxConjectureMitai → AuxCopulaDa (みたい+な) - strong bonus for MeCab-compatible split
+  // MeCab splits みたいな as みたい + な(連体形 of だ)
+  setCell(t, EPOS::AuxConjectureMitai, EPOS::AuxCopulaDa, cost::kStrongBonus);
 
   // =========================================================================
   // Prohibited/Penalized Connections (Grammatically Invalid or Unlikely)
@@ -323,6 +358,25 @@ BigramTable::initTable() {
 
   // AdjStem → AuxConjectureRashii: unnatural (美し+らしい should be 美しい+らしい)
   setCell(t, EPOS::AdjStem, EPOS::AuxConjectureRashii, cost::kProhibitive);
+
+  // =========================================================================
+  // Particle → Other penalties (prevents over-segmentation of hiragana words)
+  // =========================================================================
+  // Patterns like も+ちろん, と+にかく are not valid Japanese morphology
+  // Single-char particles followed by unknown hiragana are usually misanalyses
+
+  // ParticleTopic → Other: penalty (も+ちろん is invalid)
+  setCell(t, EPOS::ParticleTopic, EPOS::Other, cost::kModeratePenalty);
+
+  // ParticleCase → Other: penalty (と+にかく, に+かく are invalid)
+  setCell(t, EPOS::ParticleCase, EPOS::Other, cost::kModeratePenalty);
+
+  // ParticleFinal → Other: penalty (ね+random, よ+random are invalid)
+  setCell(t, EPOS::ParticleFinal, EPOS::Other, cost::kModeratePenalty);
+
+  // ParticleConj → Other: minor penalty (て+random at sentence start is unlikely)
+  // Less penalty than others because て+noun/verb is valid in some contexts
+  setCell(t, EPOS::ParticleConj, EPOS::Other, cost::kMinorPenalty);
 
   return t;
 }

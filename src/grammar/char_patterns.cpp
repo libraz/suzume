@@ -263,4 +263,50 @@ VerbType verbTypeFromARowCodepoint(char32_t a_row_cp) {
   return result != nullptr ? result->first : VerbType::Unknown;
 }
 
+namespace {
+
+// Lookup GodanRow by i_row codepoint (cached for efficiency)
+const std::pair<VerbType, const Conjugation::GodanRow*>*
+lookupByIRow(char32_t i_row_cp) {
+  // Build lookup table on first access
+  static const auto kIRowLookup = []() {
+    std::unordered_map<char32_t, std::pair<VerbType, const Conjugation::GodanRow*>> lookup;
+    for (const auto& [type, row] : Conjugation::getGodanRows()) {
+      lookup[row.i_row] = {type, &row};
+    }
+    return lookup;
+  }();
+
+  auto it = kIRowLookup.find(i_row_cp);
+  return it != kIRowLookup.end() ? &it->second : nullptr;
+}
+
+// Cache for base suffix strings from I-row
+const std::string& getBaseSuffixFromIRowCached(char32_t i_row_cp) {
+  static const auto kBaseSuffixCache = []() {
+    std::unordered_map<char32_t, std::string> cache;
+    for (const auto& [type, row] : Conjugation::getGodanRows()) {
+      cache[row.i_row] = encodeUtf8(row.base_vowel);
+    }
+    return cache;
+  }();
+  static const std::string kEmpty;
+
+  auto it = kBaseSuffixCache.find(i_row_cp);
+  return it != kBaseSuffixCache.end() ? it->second : kEmpty;
+}
+
+}  // namespace
+
+std::string_view godanBaseSuffixFromIRow(char32_t i_row_cp) {
+  // Use cached lookup derived from Conjugation::getGodanRows()
+  return getBaseSuffixFromIRowCached(i_row_cp);
+}
+
+VerbType verbTypeFromIRowCodepoint(char32_t i_row_cp) {
+  // Use cached lookup derived from Conjugation::getGodanRows()
+  auto* result = lookupByIRow(i_row_cp);
+  return result != nullptr ? result->first : VerbType::Unknown;
+}
+
 }  // namespace suzume::grammar

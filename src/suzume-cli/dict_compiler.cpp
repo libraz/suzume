@@ -23,10 +23,11 @@ struct IAdjSuffix {
 
 const std::vector<IAdjSuffix> kIAdjSuffixes = {
     {"い", core::ExtendedPOS::AdjBasic},            // Base form: 美しい
-    {"かった", core::ExtendedPOS::AdjBasic},        // Past: 美しかった
+    // MeCab compatibility: かった/くなかった are NOT stored as single tokens
+    // They should be split: かった → かっ + た, くなかった → く + なかっ + た
     {"かっ", core::ExtendedPOS::AdjKatt},           // Ta-connection (連用タ接続): 美しかっ+た
     {"くない", core::ExtendedPOS::AdjBasic},        // Negative: 美しくない
-    {"くなかった", core::ExtendedPOS::AdjBasic},    // Negative past: 美しくなかった
+    {"くなかっ", core::ExtendedPOS::AdjBasic},      // Negative past before た: 美しくなかっ+た
     {"くて", core::ExtendedPOS::AdjRenyokei},       // Te-form: 美しくて
     {"ければ", core::ExtendedPOS::AdjKeForm},       // Conditional: 美しければ
     {"く", core::ExtendedPOS::AdjRenyokei},         // Adverbial/Renyokei: 美しく
@@ -100,7 +101,7 @@ std::vector<dictionary::DictionaryEntry> expandVerb(
     dictionary::DictionaryEntry new_entry;
     new_entry.surface = stem + suf.suffix;
     new_entry.pos = core::PartOfSpeech::Verb;
-    new_entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
+    new_entry.extended_pos = suf.extended_pos;  // Use ExtendedPOS from suffix
     new_entry.lemma = lemma;
     result.push_back(new_entry);
   }

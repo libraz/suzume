@@ -1633,7 +1633,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "5回目"
+          "surface" : "5回"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "目"
         },
         {
           "pos" : "Particle",

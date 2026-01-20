@@ -394,17 +394,17 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       // Note: ます系 excluded (should split as 食べ + ます)
       // Note: た/て excluded (should split as 食べ + た/て, MeCab-compatible)
       suffixes = {
-          {"る", false},        // Base: 食べる
-          {"", false},          // Renyokei: 食べ (for 降り+て → lemma=降りる)
+          {"る", false, core::ExtendedPOS::VerbShuushikei},        // Base: 食べる
+          {"", false, core::ExtendedPOS::VerbRenyokei},            // Renyokei: 食べ (for 降り+て → lemma=降りる)
           // {"た", false},     // Past: Excluded - split as 食べ + た
           // {"て", false},     // Te-form: Excluded - split as 食べ + て
-          {"ない", false},      // Negative: 食べない
-          {"ん", false},        // Contracted negative: 食べん (colloquial)
-          {"なかった", false},  // Past negative: 食べなかった
-          {"れば", false},      // Conditional: 食べれば
+          {"ない", false, core::ExtendedPOS::VerbShuushikei},      // Negative: 食べない (full form)
+          {"ん", false, core::ExtendedPOS::VerbMizenkei},          // Contracted negative: 食べん (mizenkei + ん)
+          // {"なかった", ...}  // Excluded for MeCab compat: split as 食べ+なかっ+た
+          {"れば", false, core::ExtendedPOS::VerbKateikei},        // Conditional: 食べれば
           // {"たら", false},   // Conditional: Excluded - split as 食べ + たら
-          {"よう", false},      // Volitional: 食べよう
-          {"ろ", false},        // Imperative: 食べろ
+          {"よう", false, core::ExtendedPOS::VerbShuushikei},      // Volitional: 食べよう (full form)
+          {"ろ", false, core::ExtendedPOS::VerbMeireikei},         // Imperative: 食べろ
       };
       break;
 
@@ -432,39 +432,39 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       std::string te = row.voiced_ta ? "で" : "て";
 
       // Base form
-      suffixes.push_back({base, false});
+      suffixes.push_back({base, false, core::ExtendedPOS::VerbShuushikei});
       // Renyokei (for compound usage)
-      suffixes.push_back({i, false});
+      suffixes.push_back({i, false, core::ExtendedPOS::VerbRenyokei});
 
       // 音便形 (サ行以外) - standalone onbin form for MeCab-compatible split
       // E.g., 書いた → 書い + た, 飲んだ → 飲ん + だ
       // The onbin form needs to be a separate candidate to enable the split
       if (!row.onbin.empty()) {
-        suffixes.push_back({row.onbin, false});  // Onbin: 書い, 飲ん, etc.
+        suffixes.push_back({row.onbin, false, core::ExtendedPOS::VerbOnbinkei});  // Onbin: 書い, 飲ん, あっ, etc.
       }
       // Note: onbin + た/て/たら is handled by split path (connection rules)
 
-      // Negative forms
-      suffixes.push_back({a + "ない", false});        // Negative: 書かない
-      suffixes.push_back({a + "ん", false});          // Contracted: 書かん
-      suffixes.push_back({a + "ぬ", false});          // Classical: 書かぬ
-      suffixes.push_back({a + "なかった", false});    // Past negative: 書かなかった
+      // Negative forms (mizenkei + ない)
+      suffixes.push_back({a + "ない", false, core::ExtendedPOS::VerbShuushikei});      // Negative: 書かない (full form)
+      suffixes.push_back({a + "ん", false, core::ExtendedPOS::VerbMizenkei});          // Contracted: 書かん (mizenkei + ん)
+      suffixes.push_back({a + "ぬ", false, core::ExtendedPOS::VerbMizenkei});          // Classical: 書かぬ (mizenkei + ぬ)
+      // 書かなかった excluded for MeCab compat: split as 書か+なかっ+た
 
       // Conditional
-      suffixes.push_back({e + "ば", false});          // Conditional: 書けば
+      suffixes.push_back({e + "ば", false, core::ExtendedPOS::VerbKateikei});          // Conditional: 書けば
 
       // Volitional
-      suffixes.push_back({o + "う", false});          // Volitional: 書こう
+      suffixes.push_back({o + "う", false, core::ExtendedPOS::VerbShuushikei});        // Volitional: 書こう (full form)
 
       // Imperative (exclude for Ka/Ga to avoid conflict with potential)
       if (type != VerbType::GodanKa && type != VerbType::GodanGa) {
-        suffixes.push_back({e, false});              // Imperative: 待て
+        suffixes.push_back({e, false, core::ExtendedPOS::VerbMeireikei});              // Imperative: 待て
       }
 
       // Potential forms (五段 → え段 + る)
-      suffixes.push_back({e + "る", true});           // Potential: 書ける
-      suffixes.push_back({e + "ない", true});         // Potential neg: 書けない
-      suffixes.push_back({e + "なかった", true});     // Potential neg past: 書けなかった
+      suffixes.push_back({e + "る", true, core::ExtendedPOS::VerbShuushikei});         // Potential: 書ける
+      suffixes.push_back({e + "ない", true, core::ExtendedPOS::VerbShuushikei});       // Potential neg: 書けない (full form)
+      // 書けなかった excluded for MeCab compat: split as 書け+なかっ+た
       break;
     }
 
@@ -472,13 +472,13 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       // サ変: する (MeCab-compatible: exclude split forms)
       // した → し + た, so exclude. But keep conditional/imperative.
       suffixes = {
-          {"する", false},      // Base form
-          {"すれば", false},    // Conditional
-          {"しろ", false},      // Imperative
-          {"せよ", false},      // Imperative (classical)
-          {"しよう", false},    // Volitional
-          {"せん", false},      // Contracted negative (colloquial)
-          {"したら", false},    // Conditional past
+          {"する", false, core::ExtendedPOS::VerbShuushikei},      // Base form
+          {"すれば", false, core::ExtendedPOS::VerbKateikei},      // Conditional
+          {"しろ", false, core::ExtendedPOS::VerbMeireikei},       // Imperative
+          {"せよ", false, core::ExtendedPOS::VerbMeireikei},       // Imperative (classical)
+          {"しよう", false, core::ExtendedPOS::VerbShuushikei},    // Volitional (full form)
+          {"せん", false, core::ExtendedPOS::VerbMizenkei},        // Contracted negative (mizenkei + ん)
+          {"したら", false, core::ExtendedPOS::VerbTaraForm},      // Conditional past
       };
       break;
 
@@ -487,18 +487,18 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       // For hiragana くる, prefix with appropriate stem change
       // Note: た/て/たら excluded for MeCab-compatible splits (来+た, 来+て, 来+たら)
       suffixes = {
-          {"くる", false},        // Base form
-          {"き", false},          // Renyokei: 来ます, 来ている
+          {"くる", false, core::ExtendedPOS::VerbShuushikei},        // Base form
+          {"き", false, core::ExtendedPOS::VerbRenyokei},            // Renyokei: 来ます, 来ている
           // {"きた", false},     // Past: Excluded - split as 来 + た
           // {"きて", false},     // Te-form: Excluded - split as 来 + て
-          {"こない", false},      // Negative
-          {"こなかった", false},  // Past negative
-          {"くれば", false},      // Conditional (ば form kept)
+          {"こない", false, core::ExtendedPOS::VerbShuushikei},      // Negative (full form)
+          // こなかった excluded for MeCab compat: split as こ+なかっ+た
+          {"くれば", false, core::ExtendedPOS::VerbKateikei},        // Conditional
           // {"きたら", false},   // Conditional: Excluded - split as 来 + たら
-          {"こよう", false},      // Volitional
-          {"こい", false},        // Imperative
-          {"こられる", false},    // Potential (formal)
-          {"これる", false},      // Potential (colloquial)
+          {"こよう", false, core::ExtendedPOS::VerbShuushikei},      // Volitional (full form)
+          {"こい", false, core::ExtendedPOS::VerbMeireikei},         // Imperative
+          {"こられる", false, core::ExtendedPOS::VerbShuushikei},    // Potential (formal)
+          {"これる", false, core::ExtendedPOS::VerbShuushikei},      // Potential (colloquial)
       };
       break;
 

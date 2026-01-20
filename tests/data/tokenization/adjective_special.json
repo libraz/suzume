@@ -49,12 +49,9 @@
       "description" : "颯爽と (gallantly)",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "颯爽"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "と"
+          "lemma" : "颯爽",
+          "pos" : "Adverb",
+          "surface" : "颯爽と"
         }
       ],
       "id" : "taru_adj_sassouto",

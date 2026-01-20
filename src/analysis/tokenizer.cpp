@@ -233,6 +233,19 @@ void Tokenizer::addDictionaryCandidates(
 
       // Add emphatic variant if we found any emphatic characters
       if (!emphatic_suffix.empty()) {
+        // Skip emphatic form if it looks like the sokuon is part of a polite auxiliary
+        // E.g., いいっす should be いい+っす, not いいっ+す
+        // Check: if emphatic_suffix is just っ and followed by す/さ/せ
+        if (emphatic_suffix == "っ" && emphatic_end < codepoints.size()) {
+          char32_t after_sokuon = codepoints[emphatic_end];
+          // Skip if followed by す/さ/せ (common polite auxiliary patterns)
+          if (after_sokuon == U'す' || after_sokuon == U'さ' || after_sokuon == U'せ') {
+            // Don't create emphatic form - let っす/っさ/っせ be parsed separately
+            emphatic_suffix.clear();
+          }
+        }
+      }
+      if (!emphatic_suffix.empty()) {
         std::string emphatic_surface = result.entry->surface + emphatic_suffix;
         float cost_adjustment;
 

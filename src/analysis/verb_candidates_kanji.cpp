@@ -97,6 +97,114 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     return candidates;
   }
 
+  // Check for kanji verb + verb renyokei + すぎ pattern for MeCab compatibility
+  // MeCab splits: 書きすぎる → 書き + すぎる, not 書きすぎる as single verb
+  // Pattern: kanji + (き/ぎ/し/ち/に/び/み/り/い) + すぎ...
+  std::string hira_part = extractSubstring(codepoints, kanji_end, hiragana_end);
+  // C++17 compatible: check if hiragana contains "すぎ" (6 bytes)
+  bool is_sugi_pattern = (hira_part.find("すぎ") != std::string::npos);
+
+  // Generate verb renyokei candidates when followed by すぎ
+  // E.g., 書きすぎた → 書き (renyokei of 書く) + すぎ + た (Godan)
+  //       食べすぎた → 食べ (renyokei of 食べる) + すぎ + た (Ichidan)
+  if (is_sugi_pattern && kanji_end < hiragana_end) {
+    char32_t first_hira = codepoints[kanji_end];
+
+    // Pattern 1: Godan verb renyokei (kanji + I-row hiragana + すぎ)
+    // き→GodanKa, ぎ→GodanGa, し→GodanSa, ち→GodanTa, に→GodanNa,
+    // び→GodanBa, み→GodanMa, り→GodanRa
+    if (grammar::isIRowCodepoint(first_hira)) {
+      // Verify this is followed by すぎ
+      if (kanji_end + 1 < codepoints.size() &&
+          codepoints[kanji_end + 1] == U'す' &&
+          kanji_end + 2 < codepoints.size() &&
+          codepoints[kanji_end + 2] == U'ぎ') {
+        // Determine verb type from I-row ending
+        grammar::VerbType verb_type = grammar::verbTypeFromIRowCodepoint(first_hira);
+        if (verb_type != grammar::VerbType::Unknown) {
+          // Get base suffix (e.g., き → く for GodanKa)
+          std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(first_hira);
+          if (!base_suffix.empty()) {
+            // Construct base form: kanji + base_suffix (e.g., 書 + く = 書く)
+            std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+            std::string base_form = kanji_stem + std::string(base_suffix);
+
+            // Verify the base form is a valid verb
+            bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
+            if (!is_valid_verb) {
+              auto infl_result = inflection.getBest(base_form);
+              is_valid_verb = infl_result.confidence > 0.5F &&
+                              vh::isGodanVerbType(infl_result.verb_type);
+            }
+
+            if (is_valid_verb) {
+              size_t renyokei_end = kanji_end + 1;
+              std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
+              // Negative cost to beat compound NOUN path
+              // Compound NOUNs like 書きすぎた get cost ~1.0, so we need much lower
+              constexpr float kCost = -0.8F;
+              SUZUME_DEBUG_VERBOSE_BLOCK {
+                SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
+                                    << " godan_renyokei_sugi lemma=" << base_form
+                                    << " cost=" << kCost << "\n";
+              }
+              candidates.push_back(makeVerbCandidate(
+                  surface, start_pos, renyokei_end, kCost, base_form,
+                  grammar::verbTypeToConjType(verb_type),
+                  true, CandidateOrigin::VerbKanji, 0.9F, "godan_renyokei_sugi",
+                  core::ExtendedPOS::VerbRenyokei));
+            }
+          }
+        }
+      }
+    }
+
+    // Pattern 2: Ichidan verb renyokei (kanji + E-row hiragana + すぎ)
+    // E.g., 食べすぎた → 食べ (renyokei of 食べる) + すぎ + た
+    //       見せすぎる → 見せ (renyokei of 見せる) + すぎる
+    if (grammar::isERowCodepoint(first_hira)) {
+      // Verify this is followed by すぎ
+      if (kanji_end + 1 < codepoints.size() &&
+          codepoints[kanji_end + 1] == U'す' &&
+          kanji_end + 2 < codepoints.size() &&
+          codepoints[kanji_end + 2] == U'ぎ') {
+        // Construct base form: kanji + first_hira + る (e.g., 食 + べ + る = 食べる)
+        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+        std::string ichidan_stem = kanji_stem + normalize::encodeUtf8(first_hira);
+        std::string base_form = ichidan_stem + "る";
+
+        // Verify the base form is a valid ichidan verb
+        bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
+        if (!is_valid_verb) {
+          auto infl_result = inflection.getBest(base_form);
+          is_valid_verb = infl_result.confidence > 0.5F &&
+                          infl_result.verb_type == grammar::VerbType::Ichidan;
+        }
+
+        if (is_valid_verb) {
+          size_t renyokei_end = kanji_end + 1;
+          std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
+          // Negative cost to beat compound NOUN path
+          constexpr float kCost = -0.8F;
+          SUZUME_DEBUG_VERBOSE_BLOCK {
+            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
+                                << " ichidan_renyokei_sugi lemma=" << base_form
+                                << " cost=" << kCost << "\n";
+          }
+          candidates.push_back(makeVerbCandidate(
+              surface, start_pos, renyokei_end, kCost, base_form,
+              dictionary::ConjugationType::Ichidan,
+              true, CandidateOrigin::VerbKanji, 0.9F, "ichidan_renyokei_sugi",
+              core::ExtendedPOS::VerbRenyokei));
+        }
+      }
+    }
+
+    // Early return to skip generating full verb forms containing すぎ
+    // The split path (renyokei + すぎ + aux) is preferred for MeCab compatibility
+    return candidates;
+  }
+
   // Try different stem lengths (kanji only, or kanji + 1 hiragana for ichidan)
   // This handles both godan (kanji stem) and ichidan (kanji + hiragana stem)
   for (size_t stem_end = kanji_end; stem_end <= kanji_end + 1 && stem_end < hiragana_end; ++stem_end) {
@@ -510,6 +618,55 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     }
   }
 
+  // Try Causative verb renyokei pattern: kanji + ら + せ
+  // Causative verbs from Godan verbs follow this pattern:
+  //   知る → 知らせる (causative, Ichidan verb)
+  //   乗る → 乗らせる (causative, Ichidan verb)
+  //   終わる → 終わらせる (causative, Ichidan verb)
+  // The renyokei of these causative verbs ends with せ (e-row):
+  //   知らせ (renyokei of 知らせる), connects to ます, られる, て, た, etc.
+  // Pattern: kanji + ら + せ (followed by られ for causative-passive)
+  if (kanji_end + 2 <= hiragana_end) {
+    char32_t first_hira = codepoints[kanji_end];
+    char32_t second_hira = codepoints[kanji_end + 1];
+    // ら + せ pattern (causative renyokei)
+    if (first_hira == U'ら' && second_hira == U'せ') {
+      // Only generate if followed by られ (causative-passive pattern)
+      // This prevents false positives on random ら+せ sequences
+      bool followed_by_passive = (kanji_end + 3 < hiragana_end &&
+                                   codepoints[kanji_end + 2] == U'ら' &&
+                                   codepoints[kanji_end + 3] == U'れ');
+      if (followed_by_passive) {
+        size_t renyokei_end = kanji_end + 2;  // kanji + ら + せ
+        std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
+
+        // The causative base form is surface + る (e.g., 知らせ → 知らせる)
+        std::string causative_base = surface + "る";
+
+        // Verify this is a valid ichidan verb
+        auto all_candidates = inflection.analyze(causative_base);
+        float ichidan_confidence = 0.0F;
+        for (const auto& cand : all_candidates) {
+          if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence >= 0.4F) {
+            ichidan_confidence = std::max(ichidan_confidence, cand.confidence);
+          }
+        }
+
+        if (ichidan_confidence >= 0.4F) {
+          float base_cost = verb_opts.bonus_ichidan +
+                            (1.0F - ichidan_confidence) * verb_opts.confidence_cost_scale_small;
+          SUZUME_DEBUG_LOG_VERBOSE(
+              "[VERB_CAND] " << surface << " causative_renyokei lemma=" << causative_base
+                             << " conf=" << ichidan_confidence << " cost=" << base_cost << "\n");
+          candidates.push_back(makeVerbCandidate(
+              surface, start_pos, renyokei_end, base_cost, causative_base,
+              grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
+              true, CandidateOrigin::VerbKanji, ichidan_confidence, "causative_renyokei"));
+        }
+      }
+    }
+  }
+
   // Try Godan passive renyokei pattern: kanji + a-row + れ
   // Godan passive verbs (受身形) follow this pattern:
   //   言う → 言われる (passive, Ichidan verb)
@@ -668,9 +825,14 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (!is_valid_verb) {
         // Check if inflection analyzer recognizes this as Ichidan verb
         // Use >= threshold to include edge cases like 信じる (conf=0.3)
-        auto infl_result = inflection.getBest(base_form);
-        is_valid_verb = infl_result.confidence >= 0.3F &&
-                        infl_result.verb_type == grammar::VerbType::Ichidan;
+        // Check ALL candidates, not just best, because godan/ichidan may have same confidence
+        auto all_cands = inflection.analyze(base_form);
+        for (const auto& cand : all_cands) {
+          if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence >= 0.3F) {
+            is_valid_verb = true;
+            break;
+          }
+        }
       }
 
       if (is_valid_verb) {
@@ -849,7 +1011,39 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             codepoints[mizenkei_end + 1] == U'い') {
           is_nai_pattern = true;
         }
-        if (is_beki_pattern || is_nu_pattern || is_n_pattern || is_nai_pattern || is_passive_pattern) {
+        // Check for past negative なかっ pattern (MeCab-compatible split)
+        // E.g., 書かなかった → 書か (mizenkei) + なかっ (negative past AUX) + た
+        //       行かなかった → 行か (mizenkei) + なかっ + た
+        bool is_nakatt_pattern = false;
+        if (next_char == U'な' && mizenkei_end + 3 < codepoints.size() &&
+            codepoints[mizenkei_end + 1] == U'か' &&
+            codepoints[mizenkei_end + 2] == U'っ') {
+          is_nakatt_pattern = true;
+        }
+        // Check for causative auxiliary せ pattern (MeCab-compatible split)
+        // E.g., 聞かせられた → 聞か (mizenkei) + せ (causative AUX) + られ + た
+        //       書かせる → 書か (mizenkei) + せる (causative AUX)
+        bool is_causative_pattern = false;
+        if (next_char == U'せ') {
+          // せ followed by られ, る, た, て, etc.
+          if (mizenkei_end + 1 < codepoints.size()) {
+            char32_t after_se = codepoints[mizenkei_end + 1];
+            // せら (せられる, せられた)
+            if (after_se == U'ら') {
+              is_causative_pattern = true;
+            }
+            // せる, せた, せて
+            else if (after_se == U'る' || after_se == U'た' || after_se == U'て') {
+              is_causative_pattern = true;
+            }
+            // せな (せない)
+            else if (after_se == U'な' && mizenkei_end + 2 < codepoints.size() &&
+                     codepoints[mizenkei_end + 2] == U'い') {
+              is_causative_pattern = true;
+            }
+          }
+        }
+        if (is_beki_pattern || is_nu_pattern || is_n_pattern || is_nai_pattern || is_nakatt_pattern || is_passive_pattern || is_causative_pattern) {
           // Derive VerbType from the A-row ending (e.g., か → GodanKa)
           grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(first_hira);
           if (verb_type != grammar::VerbType::Unknown) {
@@ -917,10 +1111,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                 const char* info_pattern = is_nu_pattern ? "godan_mizenkei_nu" :
                                            is_n_pattern ? "godan_mizenkei_n" :
                                            is_nai_pattern ? "godan_mizenkei_nai" :
+                                           is_nakatt_pattern ? "godan_mizenkei_nakatt" :
                                            is_passive_pattern ? "godan_mizenkei_passive" :
                                            "godan_mizenkei";
                 // Use explicit VerbMizenkei EPOS for negative patterns to enable bigram connection
-                core::ExtendedPOS epos = (is_nu_pattern || is_n_pattern || is_nai_pattern)
+                core::ExtendedPOS epos = (is_nu_pattern || is_n_pattern || is_nai_pattern || is_nakatt_pattern)
                     ? core::ExtendedPOS::VerbMizenkei
                     : core::ExtendedPOS::Unknown;
                 candidates.push_back(makeVerbCandidate(
@@ -936,19 +1131,24 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     }
   }
 
-  // Generate mizenkei candidates for verbs with multiple okurigana + ない
+  // Generate mizenkei candidates for verbs with multiple okurigana + negative patterns
   // E.g., 分からない → 分から (mizenkei of 分かる) + ない
+  //       分からなかった → 分から (mizenkei of 分かる) + なかっ + た
   //       始まらない → 始まら (mizenkei of 始まる) + ない
   // These are Godan verbs where the okurigana includes 2+ hiragana before the A-row ending
   if (kanji_end < hiragana_end && hiragana_end >= kanji_end + 3) {
-    // Look for A-row hiragana + ない pattern
+    // Look for A-row hiragana + negative patterns (ない or なかっ)
     for (size_t scan_pos = kanji_end + 1; scan_pos < hiragana_end - 1; ++scan_pos) {
       char32_t cur_char = codepoints[scan_pos];
       char32_t next_char = codepoints[scan_pos + 1];
-      // Check if cur_char is A-row and next two chars are ない
-      if (grammar::isARowCodepoint(cur_char) && next_char == U'な' &&
-          scan_pos + 2 < codepoints.size() && codepoints[scan_pos + 2] == U'い') {
-        // Found A-row + ない pattern at scan_pos
+      // Check if cur_char is A-row and followed by negative pattern
+      bool is_nai_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'な' &&
+          scan_pos + 2 < codepoints.size() && codepoints[scan_pos + 2] == U'い';
+      bool is_nakatt_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'な' &&
+          scan_pos + 3 < codepoints.size() && codepoints[scan_pos + 2] == U'か' &&
+          codepoints[scan_pos + 3] == U'っ';
+      if (is_nai_pattern || is_nakatt_pattern) {
+        // Found A-row + negative pattern at scan_pos
         // The mizenkei would be from start_pos to scan_pos + 1
         size_t multi_miz_end = scan_pos + 1;
         grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(cur_char);
@@ -969,15 +1169,16 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             if (is_valid_verb) {
               std::string surface = extractSubstring(codepoints, start_pos, multi_miz_end);
               constexpr float kCost = -0.5F;  // Same as other negative patterns
+              const char* pattern = is_nakatt_pattern ? "multi_mizenkei_nakatt" : "multi_mizenkei_nai";
               SUZUME_DEBUG_VERBOSE_BLOCK {
                 SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                                    << " multi_okurigana_mizenkei_nai lemma=" << base_form
+                                    << " " << pattern << " lemma=" << base_form
                                     << " cost=" << kCost << "\n";
               }
               candidates.push_back(makeVerbCandidate(
                   surface, start_pos, multi_miz_end, kCost, base_form,
                   grammar::verbTypeToConjType(verb_type),
-                  true, CandidateOrigin::VerbKanji, 0.9F, "multi_mizenkei_nai",
+                  true, CandidateOrigin::VerbKanji, 0.9F, pattern,
                   core::ExtendedPOS::VerbMizenkei));
             }
           }
@@ -1179,6 +1380,76 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               true, CandidateOrigin::VerbKanji, 0.9F, "kanji_sokuonbin",
               core::ExtendedPOS::VerbOnbinkei));
         }
+      }
+    }
+  }
+
+  // Generate Godan sokuonbin (っ) candidates for extended patterns
+  // E.g., 閉まった → 閉まっ (onbin of 閉まる) + た (auxiliary)
+  //       始まった → 始まっ (onbin of 始まる) + た (auxiliary)
+  //       決まった → 決まっ (onbin of 決まる) + た (auxiliary)
+  // Key patterns:
+  // - kanji + hiragana + っ + た/て: GodanRa verbs with multi-char stem
+  // Constraints:
+  // - Hiragana portion (before っ) should be 1-2 chars (まった, まりった)
+  // - Base form must exist in dictionary (prevents false positives)
+  // - Require at least kanji + 2 hiragana (e.g., 閉まっ = 閉 + ま + っ)
+  if (hiragana_end - kanji_end >= 2) {
+    // Check for pattern ending in っ + た/て
+    // Look for っ at position hiragana_end - 2 (second to last)
+    char32_t second_last = codepoints[hiragana_end - 2];
+    char32_t last_char = codepoints[hiragana_end - 1];
+    bool is_sokuonbin_te_ta = (second_last == U'っ' &&
+                               (last_char == U'た' || last_char == U'て'));
+    // Hiragana between kanji and っ should be 1-2 chars
+    // hiragana_end - kanji_end = total hiragana chars (including っ and た/て)
+    // So hiragana before っ = (hiragana_end - kanji_end) - 2
+    size_t hiragana_before_onbin = (hiragana_end - kanji_end) - 2;
+    bool reasonable_length = (hiragana_before_onbin >= 1 && hiragana_before_onbin <= 2);
+    if (is_sokuonbin_te_ta && reasonable_length && hiragana_end - kanji_end >= 3) {
+      // We have kanji + 1-2 hiragana + っ + た/て
+      // Generate candidate for kanji + hiragana + っ (without the た/て)
+      size_t onbin_end = hiragana_end - 1;  // Position after っ
+      std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_end);
+
+      // Build potential base form and verify it exists in dictionary or inflection
+      // This prevents false positives like 食べてしまる
+      std::string stem = extractSubstring(codepoints, start_pos, onbin_end - 1);
+      std::string potential_base = stem + "る";
+
+      // Check dictionary first
+      bool in_dict = vh::isVerbInDictionaryWithType(dict_manager, potential_base,
+                                                     grammar::VerbType::GodanRa) ||
+                     vh::isVerbInDictionary(dict_manager, potential_base);
+
+      // Fallback: inflection analysis for common patterns like 閉まる
+      bool infl_verified = false;
+      if (!in_dict) {
+        auto infl_results = inflection.analyze(onbin_surface + "た");
+        for (const auto& result : infl_results) {
+          if (result.verb_type == grammar::VerbType::GodanRa &&
+              result.base_form == potential_base &&
+              result.confidence >= 0.3F) {
+            infl_verified = true;
+            break;
+          }
+        }
+      }
+
+      if (in_dict || infl_verified) {
+        // Verified - generate candidate
+        constexpr float kExtendedSokuonbinCost = -0.3F;
+        SUZUME_DEBUG_VERBOSE_BLOCK {
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
+                              << " extended_sokuonbin lemma=" << potential_base
+                              << (in_dict ? " [dict]" : " [infl]")
+                              << " cost=" << kExtendedSokuonbinCost << "\n";
+        }
+        candidates.push_back(makeVerbCandidate(
+            onbin_surface, start_pos, onbin_end, kExtendedSokuonbinCost, potential_base,
+            grammar::verbTypeToConjType(grammar::VerbType::GodanRa),
+            true, CandidateOrigin::VerbKanji, 0.9F, "extended_sokuonbin",
+            core::ExtendedPOS::VerbOnbinkei));
       }
     }
   }

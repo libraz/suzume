@@ -162,23 +162,30 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
 
   // Bonus for hiragana i-adjectives from dictionary
   // Prevents misanalysis as verb+たい (e.g., つめたい → つめ+たい)
-  // These are ambiguous with desiderative form (会いたい) without context,
-  // so explicit dictionary registration takes precedence.
+  // or as adverb+verb+aux (e.g., はなはだしい → はなはだ+し+い)
+  // Longer adjectives get stronger bonus to beat split paths
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adjective &&
       grammar::isPureHiragana(edge.surface)) {
-    constexpr float kHiraganaAdjDictBonus = -2.5F;
-    cost += kHiraganaAdjDictBonus;
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    // Base bonus -2.5, plus 0.5 per character beyond 3
+    float bonus = (char_len <= 3) ? -2.5F
+                                  : -2.5F - static_cast<float>(char_len - 3) * 0.5F;
+    cost += bonus;
   }
 
   // Bonus for hiragana adverbs from dictionary
   // Prevents misanalysis as verb+ん (e.g., たくさん → たくさ+ん)
   // and compound splits (e.g., どうして → どう+し+て)
   // Longer adverbs get stronger bonus to beat split paths
+  // Short adverbs (2 chars) get weaker bonus to avoid false matches in patterns
+  // like かもしれない (should not be か+もし+れない)
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adverb &&
       grammar::isPureHiragana(edge.surface)) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
-    // Base bonus plus length-based bonus (0.5 per character beyond 2)
-    float bonus = -2.5F - static_cast<float>(char_len > 2 ? char_len - 2 : 0) * 0.5F;
+    // Short adverbs (2 chars) get weaker bonus
+    // Longer adverbs get stronger bonus (0.5 per character beyond 2)
+    float bonus = (char_len <= 2) ? -1.0F
+                                  : -2.5F - static_cast<float>(char_len - 2) * 0.5F;
     cost += bonus;
   }
 
@@ -289,7 +296,18 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // ExtendedPOS bigram cost (replaces all check functions)
   float extended_cost = BigramTable::getCost(prev.extended_pos, next.extended_pos);
 
-  float total = base_cost + extended_cost;
+  // Surface-based bonus for VerbRenyokei → すぎ pattern
+  // E.g., 読み+すぎる, 書き+すぎた, 食べ+すぎ (MeCab-compatible split)
+  // The default VERB→VERB penalty (0.8) should not apply to auxiliary verbs
+  float surface_bonus = 0.0F;
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface.size() >= 6 &&  // "すぎ" is 6 bytes
+      next.surface.compare(0, 6, "すぎ") == 0) {
+    // Strong bonus to overcome VERB→VERB penalty
+    surface_bonus = -0.5F;
+  }
+
+  float total = base_cost + extended_cost + surface_bonus;
 
   SUZUME_DEBUG_VERBOSE_BLOCK {
     SUZUME_DEBUG_STREAM << "[CONN] \"" << prev.surface << "\" ("
@@ -299,11 +317,14 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
                     << core::posToString(next.pos) << "/"
                     << core::extendedPosToString(next.extended_pos) << "): "
                     << "bigram=" << base_cost << " epos_adj=" << extended_cost;
+    if (surface_bonus != 0.0F) {
+      SUZUME_DEBUG_STREAM << " surface_bonus=" << surface_bonus;
+    }
     if (extended_cost != 0.0F) {
       // Show rule name: PrevEPOS→NextEPOS
       SUZUME_DEBUG_STREAM << " (rule=" << core::extendedPosToString(prev.extended_pos)
                           << "→" << core::extendedPosToString(next.extended_pos) << ")";
-    } else {
+    } else if (surface_bonus == 0.0F) {
       SUZUME_DEBUG_STREAM << " (default)";
     }
     SUZUME_DEBUG_STREAM << " total=" << total << "\n";

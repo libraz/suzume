@@ -58,7 +58,7 @@ our @NAI_ADJECTIVES = qw(
     ものたりない こころもとない
 );
 
-# Counter/unit patterns that should be merged with preceding numbers
+# Counter/unit patterns (for legacy apply_suzume_merge, now mostly detected via MeCab POS)
 our @COUNTER_UNITS = qw(
     人 個 本 枚 台 回 件 円 年 月 日 時 分 秒 階 番 号 歳 才 目
     ページ 頁 時間 分間 秒間 年間 日間 週間 か月 ヶ月 カ月
@@ -166,8 +166,9 @@ sub get_suzume_rule {
         return 'nai-adjective' if $text =~ /\Q$adj\E/;
     }
 
-    # 2. Number + counter/unit: "3人", "100円"
-    return 'number+unit' if $text =~ /\d+[人個本枚台回件円年月日時分秒ページ頁階番号歳才個所箇所]/;
+    # 2. Number + counter/unit: detected via MeCab POS (名詞,数 + 名詞,接尾,助数詞)
+    # This heuristic just checks for number followed by non-digit for reporting
+    return 'number+unit' if $text =~ /\d+[^\d\s]/;
 
     # 3. Date patterns: "2024年12月23日"
     return 'date' if $text =~ /\d+年\d+月\d+日/;
@@ -321,6 +322,159 @@ sub apply_suzume_merge {
     return \@result;
 }
 
+# Apply Suzume merge rules using raw MeCab tokens (with pos_sub1, pos_sub2)
+# Returns: (merged tokens, applied rule name or undef)
+sub apply_suzume_merge_raw {
+    my ($tokens, $text) = @_;
+    my @result;
+    my $i = 0;
+    my $applied_rule;
+
+    while ($i < @$tokens) {
+        my $t = $tokens->[$i];
+        my $merged = 0;
+
+        # Calculate position in text
+        my $pos_in_text = 0;
+        for my $k (0 .. $i - 1) { $pos_in_text += length($tokens->[$k]{surface}); }
+        my $remaining = substr($text, $pos_in_text);
+
+        # 1. Full date pattern: 2024年12月23日 → single token
+        if (!$merged && $remaining =~ /^(\d+年\d+月\d+日)/) {
+            my $date = $1;
+            my $len = 0;
+            my $j = $i;
+            while ($j < @$tokens && $len < length($date)) {
+                $len += length($tokens->[$j]{surface});
+                $j++;
+            }
+            if ($len == length($date)) {
+                push @result, { surface => $date, pos => 'Noun', lemma => $date };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'date';
+            }
+        }
+
+        # 2. Number + counter: 名詞,数 + 名詞,接尾,助数詞 (MeCab POS-based detection)
+        #    Also handles special cases: calendar months (1-12月) where MeCab misclassifies 月
+        if (!$merged && $t->{pos} eq '名詞' && ($t->{pos_sub1} // '') eq '数') {
+            my $j = $i + 1;
+            my $combined = $t->{surface};
+            while ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                # Check for counter suffix: 名詞,接尾,助数詞
+                my $is_counter = ($next->{pos} // '') eq '名詞'
+                    && ($next->{pos_sub1} // '') eq '接尾'
+                    && ($next->{pos_sub2} // '') eq '助数詞';
+                # Special case: calendar month (1-12月) - MeCab classifies 月 as 名詞,一般
+                my $is_calendar_month = ($next->{surface} // '') eq '月'
+                    && $combined =~ /^(?:1[0-2]|[1-9])$/;
+                if ($is_counter || $is_calendar_month) {
+                    $combined .= $next->{surface};
+                    $j++;
+                } else {
+                    last;
+                }
+            }
+            if ($j > $i + 1) {
+                push @result, { surface => $combined, pos => 'Noun', lemma => $combined };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'number+unit';
+            }
+        }
+
+        # 3. Nai-adjective: merge だらし+ない → だらしない
+        if (!$merged) {
+            for my $adj (@NAI_ADJECTIVES) {
+                if ($remaining =~ /^\Q$adj\E/) {
+                    my $len = 0;
+                    my $j = $i;
+                    while ($j < @$tokens && $len < length($adj)) {
+                        $len += length($tokens->[$j]{surface});
+                        $j++;
+                    }
+                    if ($len == length($adj)) {
+                        push @result, { surface => $adj, pos => 'Adjective', lemma => $adj };
+                        $i = $j;
+                        $merged = 1;
+                        $applied_rule //= 'nai-adjective';
+                        last;
+                    }
+                }
+            }
+        }
+
+        # 4. タリ活用副詞: merge 泰然 + と → 泰然と (Adverb)
+        if (!$merged) {
+            for my $stem (@TARI_ADVERB_STEMS) {
+                my $adverb = $stem . 'と';
+                if ($remaining =~ /^\Q$adverb\E/) {
+                    my $len = 0;
+                    my $j = $i;
+                    while ($j < @$tokens && $len < length($adverb)) {
+                        $len += length($tokens->[$j]{surface});
+                        $j++;
+                    }
+                    if ($len == length($adverb)) {
+                        push @result, { surface => $adverb, pos => 'Adverb', lemma => $stem };
+                        $i = $j;
+                        $merged = 1;
+                        $applied_rule //= 'tari-adverb';
+                        last;
+                    }
+                }
+            }
+        }
+
+        # 5. Kanji compound: merge consecutive kanji-only tokens
+        if (!$merged && $t->{surface} =~ /^\p{Han}+$/) {
+            my $j = $i + 1;
+            my $combined = $t->{surface};
+            while ($j < @$tokens && $tokens->[$j]{surface} =~ /^\p{Han}+$/) {
+                $combined .= $tokens->[$j]{surface};
+                $j++;
+            }
+            if ($j > $i + 1) {
+                push @result, { surface => $combined, pos => 'Noun', lemma => $combined };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'kanji-compound';
+            }
+        }
+
+        if (!$merged) {
+            push @result, {
+                surface => $t->{surface},
+                pos     => $t->{pos},  # Keep raw POS for later mapping
+                pos_sub1 => $t->{pos_sub1},
+                pos_sub2 => $t->{pos_sub2},
+                lemma   => $t->{lemma} // $t->{surface}
+            };
+            $i++;
+        }
+    }
+
+    # Post-process: fix epenthetic さ in adjective+さ+そう pattern (なさそう, よさそう, etc.)
+    # MeCab incorrectly classifies this さ as 名詞,接尾,特殊 but it should be Suffix
+    for my $j (1 .. $#result - 1) {
+        my $prev = $result[$j - 1];
+        my $curr = $result[$j];
+        my $next = $result[$j + 1];
+        if (($prev->{pos} // '') eq '形容詞'
+            && ($curr->{surface} // '') eq 'さ'
+            && ($curr->{pos_sub1} // '') eq '接尾'
+            && ($next->{surface} // '') eq 'そう') {
+            $curr->{pos} = 'Suffix';  # Override to correct POS
+            delete $curr->{pos_sub1};
+            delete $curr->{pos_sub2};
+        }
+    }
+
+    return (\@result, $applied_rule);
+}
+
 # =============================================================================
 # POS Mapping and Correction
 # =============================================================================
@@ -338,7 +492,13 @@ sub map_mecab_pos {
 
     # Special handling for MeCab subcategories
     if (ref($token) eq 'HASH') {
+        my $pos_sub1 = $token->{pos_sub1} // '';
         my $pos_sub2 = $token->{pos_sub2} // '';
+
+        # 名詞,接尾,特殊 → Suffix (e.g., さ in 美しさ, 高さ)
+        if ($pos eq '名詞' && $pos_sub1 eq '接尾' && $pos_sub2 eq '特殊') {
+            return 'Suffix';
+        }
 
         # 名詞+形容動詞語幹/助動詞語幹 → Auxiliary (e.g., みたい, そう, よう)
         if ($pos eq '名詞' && ($pos_sub2 eq '形容動詞語幹' || $pos_sub2 eq '助動詞語幹')) {
@@ -498,25 +658,34 @@ sub get_mecab_tokens {
 sub get_expected_tokens {
     my ($text, $suzume_tokens) = @_;
 
-    my $tokens = get_mecab_tokens($text);
-    my $rule = get_suzume_rule($text);
+    # Get raw MeCab tokens (with pos_sub1, pos_sub2 for counter detection)
+    my ($processed_text, $replacements) = _preprocess_for_mecab($text);
+    my $raw_tokens = mecab_analyze($processed_text);
+    _postprocess_mecab_tokens($raw_tokens, $text, $replacements);
 
-    if ($rule && $rule =~ /^(number\+unit|date|nai-adjective|tari-adverb|kanji-compound)$/) {
-        my $merged = apply_suzume_merge($tokens, $text);
-        # Only report rule if merge actually changed something
-        if (@$merged != @$tokens) {
-            return ($merged, 'MeCab+SuzumeRules', $rule);
-        }
-        # Rule detected but no actual merge happened
-        $tokens = $merged;
+    # Apply Suzume merge rules using raw MeCab info
+    my ($merged, $applied_rule) = apply_suzume_merge_raw($raw_tokens, $text);
+
+    # Map POS to Suzume format
+    my @tokens;
+    for my $t (@$merged) {
+        push @tokens, {
+            surface => $t->{surface},
+            pos     => map_mecab_pos($t),
+            lemma   => $t->{lemma} // $t->{surface},
+        };
+    }
+
+    if ($applied_rule) {
+        return (\@tokens, 'MeCab+SuzumeRules', $applied_rule);
     }
 
     # Check for slang adjective rule
     if ($text =~ /(?:エモ|キモ|ウザ|ダサ|イタ)[いかくけさ]/) {
-        return ($tokens, 'MeCab', 'slang-adjective');
+        return (\@tokens, 'MeCab', 'slang-adjective');
     }
 
-    return ($tokens, 'MeCab', '');
+    return (\@tokens, 'MeCab', '');
 }
 
 # =============================================================================

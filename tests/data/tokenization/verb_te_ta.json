@@ -527,13 +527,8 @@
           "surface" : "現在"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "3"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "位"
+          "surface" : "3位"
         },
         {
           "pos" : "Particle",
