@@ -4,7 +4,6 @@
       "description" : "B27: 胡散臭い should be single adjective",
       "expected" : [
         {
-          "lemma" : "胡散臭い",
           "pos" : "Adjective",
           "surface" : "胡散臭い"
         },

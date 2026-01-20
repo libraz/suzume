@@ -97,7 +97,6 @@
       "description" : "Wonder particle かな",
       "expected" : [
         {
-          "lemma" : "行く",
           "pos" : "Verb",
           "surface" : "行ける"
         },

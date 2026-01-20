@@ -165,6 +165,8 @@
 いかが	ADVERB
 引き続き	ADVERB
 繰り返し	ADVERB
+ちっとも	ADVERB
+なにしろ	ADVERB
 俄然	ADVERB
 
 # =============================================================================
@@ -432,6 +434,7 @@ Wi-Fi	NOUN
 # These need explicit entries to prevent 漢字+い misinterpretation as i-adjective
 # e.g., 検討いたしております would become 検討い(ADJ)+たしております without this
 # Low cost (-0.5) to beat unknown ADJ candidates with optimal_length bonus
+あと	NOUN
 検討	NOUN
 
 # =============================================================================

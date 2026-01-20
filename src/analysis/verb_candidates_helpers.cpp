@@ -49,12 +49,14 @@ bool hasDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
     if (result.entry != nullptr && result.entry->surface == surface &&
         result.entry->pos == pos) {
       SUZUME_DEBUG_LOG_TRACE("[DICT] \"" << surface << "\" ("
-                             << core::posToString(pos) << ") = true\n");
+                             << core::posToString(pos) << "/"
+                             << core::extendedPosToString(result.entry->extended_pos)
+                             << ") = FOUND\n");
       return true;
     }
   }
   SUZUME_DEBUG_LOG_TRACE("[DICT] \"" << surface << "\" ("
-                          << core::posToString(pos) << ") = false\n");
+                          << core::posToString(pos) << ") = NOT_FOUND\n");
   return false;
 }
 
@@ -285,11 +287,18 @@ bool isCompoundAdjectivePattern(std::string_view surface) {
   if (surface.size() < core::kFourJapaneseCharBytes) {
     return false;
   }
-  return utf8::containsAny(surface, {
-      "にくい", "にくく", "にくか",  // difficult to do
-      "やすい", "やすく", "やすか",  // easy to do
-      "がたい", "がたく"             // hard to do
-  });
+  // Check for auxiliary adjective patterns in various conjugation forms
+  if (utf8::containsAny(surface, {
+      "にくい", "にくく", "にくか", "にくけ", "にくさ",  // difficult to do
+      "やすい", "やすく", "やすか", "やすけ", "やすさ",  // easy to do
+      "がたい", "がたく", "がたか", "がたけ", "がたさ"   // hard to do
+  })) {
+    return true;
+  }
+  // Also check stem forms at end of surface (e.g., 使いにく for 使いにく+い split)
+  return utf8::endsWith(surface, "にく") ||
+         utf8::endsWith(surface, "やす") ||
+         utf8::endsWith(surface, "がた");
 }
 
 bool isGodanVerbType(grammar::VerbType verb_type) {

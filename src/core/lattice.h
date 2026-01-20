@@ -55,6 +55,7 @@ struct LatticeEdge {
   CandidateOrigin origin{CandidateOrigin::Unknown};
   float origin_confidence{0.0F};           // Inflection confidence (for debug)
   std::string_view origin_detail;          // Pattern detail (e.g., "ichidan_te_form")
+  std::string_view epos_source;            // Where ExtendedPOS was set (e.g., "binary_dict", "l1_dict")
 #endif
 
   // Flag constants for compatibility
@@ -113,6 +114,7 @@ class Lattice {
    * @param origin_confidence Origin confidence for debug (optional)
    * @param origin_detail Origin detail pattern for debug (optional)
    * @param extended_pos Extended POS for bigram (optional, defaults from pos)
+   * @param epos_source Where ExtendedPOS was determined (optional, for debug)
    * @return Edge ID
    */
   size_t addEdge(std::string_view surface, uint32_t start, uint32_t end,
@@ -123,7 +125,8 @@ class Lattice {
                  CandidateOrigin origin = CandidateOrigin::Unknown,
                  float origin_confidence = 0.0F,
                  std::string_view origin_detail = {},
-                 ExtendedPOS extended_pos = ExtendedPOS::Unknown);
+                 ExtendedPOS extended_pos = ExtendedPOS::Unknown,
+                 std::string_view epos_source = {});
 
   /**
    * @brief Get all edges starting at a position
@@ -170,6 +173,7 @@ class Lattice {
   std::deque<std::string> reading_storage_;  // Storage for reading strings (deque for stable pointers)
 #ifdef SUZUME_DEBUG_INFO
   std::deque<std::string> origin_detail_storage_;  // Storage for origin detail strings (deque for stable pointers)
+  std::deque<std::string> epos_source_storage_;    // Storage for epos_source strings (deque for stable pointers)
 #endif
 };
 

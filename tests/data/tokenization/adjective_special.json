@@ -31,15 +31,11 @@
       ]
     },
     {
-      "description" : "泰然と (composedly)",
+      "description" : "泰然と (composedly) - X然と pattern treated as single adverb",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "泰然"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos" : "Adverb",
+          "surface" : "泰然と"
         }
       ],
       "id" : "taru_adj_taizento",

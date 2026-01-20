@@ -60,6 +60,7 @@ struct UnknownCandidate {
   CandidateOrigin origin{CandidateOrigin::Unknown};
   float confidence{0.0F};  // Inflection analysis confidence (for verbs/adj)
   std::string pattern;     // Pattern detail (e.g., "ichidan_te_form")
+  std::string epos_source; // Where ExtendedPOS was set (e.g., "verb_cand_kanji")
 #endif
 };
 
@@ -89,7 +90,8 @@ inline UnknownCandidate makeVerbCandidate(
     [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
     [[maybe_unused]] float confidence = 0.0F,
     [[maybe_unused]] const char* pattern = nullptr,
-    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown) {
+    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
+    [[maybe_unused]] const char* epos_source = nullptr) {
   UnknownCandidate cand;
   cand.surface = surface;
   cand.start = start;
@@ -109,6 +111,13 @@ inline UnknownCandidate makeVerbCandidate(
   if (pattern != nullptr) {
     cand.pattern = pattern;
   }
+  if (epos_source != nullptr) {
+    cand.epos_source = epos_source;
+  } else if (extended_pos != core::ExtendedPOS::Unknown) {
+    cand.epos_source = "verb_cand_explicit";
+  } else {
+    cand.epos_source = "verb_cand_auto";
+  }
 #endif
   return cand;
 }
@@ -127,7 +136,8 @@ inline UnknownCandidate makeNounCandidate(
     const std::string& surface, size_t start, size_t end,
     float cost, bool has_suffix = false,
     [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
-    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown) {
+    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
+    [[maybe_unused]] const char* epos_source = nullptr) {
   UnknownCandidate cand;
   cand.surface = surface;
   cand.start = start;
@@ -141,6 +151,13 @@ inline UnknownCandidate makeNounCandidate(
   cand.has_suffix = has_suffix;
 #ifdef SUZUME_DEBUG_INFO
   cand.origin = origin;
+  if (epos_source != nullptr) {
+    cand.epos_source = epos_source;
+  } else if (extended_pos != core::ExtendedPOS::Unknown) {
+    cand.epos_source = "noun_cand_explicit";
+  } else {
+    cand.epos_source = "noun_cand_default";
+  }
 #endif
   return cand;
 }
@@ -160,7 +177,8 @@ inline UnknownCandidate makeCandidate(
     const std::string& surface, size_t start, size_t end,
     core::PartOfSpeech pos, float cost, bool has_suffix = false,
     [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
-    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown) {
+    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
+    [[maybe_unused]] const char* epos_source = nullptr) {
   UnknownCandidate cand;
   cand.surface = surface;
   cand.start = start;
@@ -174,6 +192,13 @@ inline UnknownCandidate makeCandidate(
   cand.has_suffix = has_suffix;
 #ifdef SUZUME_DEBUG_INFO
   cand.origin = origin;
+  if (epos_source != nullptr) {
+    cand.epos_source = epos_source;
+  } else if (extended_pos != core::ExtendedPOS::Unknown) {
+    cand.epos_source = "make_cand_explicit";
+  } else {
+    cand.epos_source = "make_cand_default";
+  }
 #endif
   return cand;
 }

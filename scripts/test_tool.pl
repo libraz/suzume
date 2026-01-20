@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # Manage tokenization test cases
-# Usage: ./scripts/test_case.pl <command> [options]
+# Usage: ./scripts/test_tool.pl <command> [options]
 #
 # Commands:
 #   show <input>             Show MeCab output, JSON expected, and check if test exists
@@ -10,7 +10,6 @@
 #                            Shows source (MeCab/MeCab+SuzumeRules) and auto-rule
 #   add -f <file> <input>    Add new test case to file (rejects duplicates)
 #                            Use --id to specify ID, or auto-generates snake_case ASCII ID
-#   sync                     Sync tests where Suzume=MeCab (dry-run by default)
 #   diff-suzume              Analyze failures by category (read-only)
 #   diff-mecab               Find tests where expected differs from MeCab
 #                            (detects intentional Suzume rules vs potential errors)
@@ -33,7 +32,7 @@
 #   -d, --description  Description for new test
 #   --tags TAG,TAG     Comma-separated tags
 #   -n, --dry-run      Show changes without applying
-#   --apply            Actually apply changes (sync/batch-add/replace-pos/map-pos/
+#   --apply            Actually apply changes (batch-add/replace-pos/map-pos/
 #                      needs-suzume-update/validate-ids)
 #   --use-suzume       Force Suzume output for expected (update/add/batch-add)
 #   --limit N          Limit output per category (diff-suzume/diff-mecab)
@@ -56,25 +55,24 @@
 #   3. Suzume output (when --use-suzume is specified)
 #
 # Examples:
-#   ./scripts/test_case.pl show "食べています"
-#   ./scripts/test_case.pl update "食べています"
-#   ./scripts/test_case.pl add -f noun_general "3人"     # auto: Suzume (number+unit)
-#   ./scripts/test_case.pl add -f adjective_i_basic "だらしない"  # auto: Suzume
+#   ./scripts/test_tool.pl show "食べています"
+#   ./scripts/test_tool.pl update "食べています"
+#   ./scripts/test_tool.pl add -f noun_general "3人"     # auto: Suzume (number+unit)
+#   ./scripts/test_tool.pl add -f adjective_i_basic "だらしない"  # auto: Suzume
 #
 #   # Coverage check and batch add (auto-detect enabled)
-#   ./scripts/test_case.pl check-coverage /tmp/inputs.txt
-#   ./scripts/test_case.pl batch-add -f basic /tmp/inputs.txt --apply
+#   ./scripts/test_tool.pl check-coverage /tmp/inputs.txt
+#   ./scripts/test_tool.pl batch-add -f basic /tmp/inputs.txt --apply
 #
 #   # Force Suzume output for all inputs
-#   ./scripts/test_case.pl batch-add -f basic /tmp/inputs.txt --use-suzume --apply
+#   ./scripts/test_tool.pl batch-add -f basic /tmp/inputs.txt --use-suzume --apply
 #
-#   # Sync and analysis
-#   ./scripts/test_case.pl sync --apply       # sync where Suzume=MeCab
-#   ./scripts/test_case.pl diff-suzume        # analyze failures
+#   # Analysis
+#   ./scripts/test_tool.pl diff-suzume        # analyze failures
 #
 #   # POS replacement (all files)
-#   ./scripts/test_case.pl replace-pos Auxiliary Aux_Tense -f all --apply
-#   ./scripts/test_case.pl map-pos た Auxiliary Aux_Tense --apply
+#   ./scripts/test_tool.pl replace-pos Auxiliary Aux_Tense -f all --apply
+#   ./scripts/test_tool.pl map-pos た Auxiliary Aux_Tense --apply
 
 use strict;
 use warnings;
@@ -82,6 +80,27 @@ use utf8;
 use Getopt::Long;
 use JSON::PP;
 use File::Basename;
+use FindBin qw($RealBin);
+use lib "$RealBin/lib";
+use SuzumeUtils qw(
+    get_mecab_tokens
+    get_expected_tokens
+    get_suzume_rule
+    apply_suzume_merge
+    normalize_pos
+    tokens_match
+    format_expected
+    print_tokens
+    load_json
+    save_json
+    %POS_MAP
+);
+use TestFileUtils qw(
+    find_test_by_input
+    find_test_by_id
+    generate_id
+    get_test_data_dir
+);
 
 binmode(STDOUT, ':utf8');
 binmode(STDERR, ':utf8');
@@ -96,6 +115,7 @@ my $help = 0;
 my $use_suzume = 0;
 my $case_id = '';
 my $limit = 0;  # 0 = no limit
+my $compare = 0;
 
 GetOptions(
     'f|file=s'        => \$test_file,
@@ -107,6 +127,7 @@ GetOptions(
     'apply'           => \$apply,
     'use-suzume'      => \$use_suzume,
     'limit=i'         => \$limit,
+    'c|compare'       => \$compare,
     'h|help'          => \$help,
 ) or die "Error in command line arguments\n";
 
@@ -126,35 +147,18 @@ if ($help || !$command) {
 # Find project root
 my $script_dir = dirname($0);
 my $project_root = "$script_dir/..";
-my $test_data_dir = "$project_root/tests/data/tokenization";
-
-# MeCab POS to Suzume POS mapping
-my %pos_map = (
-    '名詞'     => 'Noun',
-    '動詞'     => 'Verb',
-    '形容詞'   => 'Adjective',
-    '副詞'     => 'Adverb',
-    '助詞'     => 'Particle',
-    '助動詞'   => 'Auxiliary',
-    '接続詞'   => 'Conjunction',
-    '感動詞'   => 'Interjection',
-    '連体詞'   => 'Adnominal',
-    '接頭詞'   => 'Prefix',
-    '記号'     => 'Symbol',
-    'フィラー' => 'Filler',
-    'その他'   => 'Other',
-);
+my $test_data_dir = get_test_data_dir();
 
 sub print_help {
     print <<'HELP';
-Usage: test_case.pl <command> [options] [input]
+Usage: test_tool.pl <command> [options] [input]
 
 Commands:
+  expected <input>       Output expected tokens (MeCab+SuzumeRules) in MeCab format
   show <input>           Show what MeCab outputs (dry-run)
   update <input>         Find and update test case matching input
   update -t <test_id>    Update specific test by ID
   add -f <file> <input>  Add new test case to file
-  sync                   Sync all tests where Suzume=MeCab (dry-run by default)
   diff-suzume            Analyze failures: categorize by type (read-only)
   diff-mecab             Find tests not MeCab-compatible (intentional or errors)
   check-coverage <file>  Check which inputs in file have tests
@@ -172,541 +176,37 @@ Options:
   -d, --description STR  Description for new test
   --tags TAG,TAG         Comma-separated tags
   -n, --dry-run          Show changes without applying
-  --apply                Actually apply changes (required for sync/batch-add/replace-pos/map-pos)
+  --apply                Actually apply changes (required for batch-add/replace-pos/map-pos)
   --use-suzume           Use Suzume output as expected (for grammar-first cases)
   -h, --help             Show this help
 
 Examples:
-  ./scripts/test_case.pl show "食べています"
-  ./scripts/test_case.pl update "食べています"
-  ./scripts/test_case.pl update -t "verb_ichidan/5"
-  ./scripts/test_case.pl add -f verb_ichidan "食べています"
-  ./scripts/test_case.pl add -f verb_ichidan --id eating_progressive "食べています"
-  ./scripts/test_case.pl sync               # dry-run: Suzume=MeCab cases
-  ./scripts/test_case.pl sync --apply       # actually sync
-  ./scripts/test_case.pl diff-suzume        # analyze failures by category
-  ./scripts/test_case.pl check-coverage /tmp/inputs.txt  # check coverage
-  ./scripts/test_case.pl batch-add -f basic /tmp/inputs.txt  # dry-run batch add
-  ./scripts/test_case.pl batch-add -f basic /tmp/inputs.txt --apply  # add tests
-  ./scripts/test_case.pl suggest-file "食べたい"  # suggest test file
-  ./scripts/test_case.pl replace-pos Auxiliary Auxiliary_Tense_Ta --apply
-  ./scripts/test_case.pl map-pos た Auxiliary Auxiliary_Tense_Ta --apply
-  ./scripts/test_case.pl list-pos           # show all POS values used
+  ./scripts/test_tool.pl expected "だらしない"  # MeCab+Suzumeルール適用済み出力
+  ./scripts/test_tool.pl show "食べています"
+  ./scripts/test_tool.pl update "食べています"
+  ./scripts/test_tool.pl update -t "verb_ichidan/5"
+  ./scripts/test_tool.pl add -f verb_ichidan "食べています"
+  ./scripts/test_tool.pl add -f verb_ichidan --id eating_progressive "食べています"
+  ./scripts/test_tool.pl diff-suzume        # analyze failures by category
+  ./scripts/test_tool.pl check-coverage /tmp/inputs.txt  # check coverage
+  ./scripts/test_tool.pl batch-add -f basic /tmp/inputs.txt  # dry-run batch add
+  ./scripts/test_tool.pl batch-add -f basic /tmp/inputs.txt --apply  # add tests
+  ./scripts/test_tool.pl suggest-file "食べたい"  # suggest test file
+  ./scripts/test_tool.pl replace-pos Auxiliary Auxiliary_Tense_Ta --apply
+  ./scripts/test_tool.pl map-pos た Auxiliary Auxiliary_Tense_Ta --apply
+  ./scripts/test_tool.pl list-pos           # show all POS values used
 HELP
 }
 
-# Patterns where Suzume intentionally diverges from MeCab
-# These should use Suzume output as expected value
-# AGREED RULES ONLY - everything else follows MeCab
-sub should_use_suzume_rule {
-    my ($text) = @_;
-
-    # 1. Number + counter/unit (数字+助数詞): "3人", "35ページ", "100円"
-    #    Suzume keeps as single token, MeCab splits
-    return 'number+unit' if $text =~ /\d+[人個本枚台回件円年月日時分秒ページ頁階番号歳才個所箇所]/;
-
-    # 2. Date patterns: "2024年12月23日"
-    return 'date' if $text =~ /\d+年\d+月\d+日/;
-
-    # 3. ナイ形容詞 (adjectives ending in ない that are single words)
-    #    e.g., だらしない, つまらない, しょうがない, もったいない
-    my @nai_adjectives = qw(
-        だらしない つまらない しょうがない もったいない くだらない
-        せわしない やるせない いたたまれない あどけない おぼつかない
-        はしたない みっともない ろくでもない どうしようもない
-    );
-    for my $adj (@nai_adjectives) {
-        return 'nai-adjective' if $text =~ /\Q$adj\E/;
-    }
-
-    # 4. New/slang adjectives and their inflections
-    #    e.g., エモい, エモかった, エモくない, キモい, ウザい, やばい
-    #    MeCab doesn't recognize these as adjectives
-    my @slang_adj_stems = qw(エモ キモ ウザ ダサ イタ);
-    for my $stem (@slang_adj_stems) {
-        return 'slang-adjective' if $text =~ /\Q$stem\E[いかくけさ]/;
-    }
-    return 'slang-adjective' if $text =~ /やばい|やばかっ|やばく/;
-
-    # 5. Kanji compound: consecutive kanji stay together
-    #    Suzume doesn't have dictionary to split compound nouns
-    #    e.g., 開始予定, 経済成長, 形態素解析
-    return 'kanji-compound' if $text =~ /\p{Han}{2,}/;
-
-    return '';  # Use MeCab
-}
-
-# Correct MeCab POS misclassifications
-# MeCab sometimes labels particles (助詞) as nouns (名詞)
-sub correct_mecab_pos {
-    my ($tokens) = @_;
-
-    # Known particles that MeCab may misclassify as Noun
-    my %particle_corrections = (
-        'の' => 'Particle',
-        'が' => 'Particle',
-        'を' => 'Particle',
-        'に' => 'Particle',
-        'へ' => 'Particle',
-        'と' => 'Particle',
-        'で' => 'Particle',
-        'から' => 'Particle',
-        'まで' => 'Particle',
-        'より' => 'Particle',
-        'は' => 'Particle',
-        'も' => 'Particle',
-        'か' => 'Particle',
-        'な' => 'Particle',
-        'ね' => 'Particle',
-        'よ' => 'Particle',
-        'わ' => 'Particle',
-        'ぞ' => 'Particle',
-        'さ' => 'Particle',
-        'けど' => 'Particle',
-        'けれど' => 'Particle',
-        'し' => 'Particle',
-        'のに' => 'Particle',
-        'ので' => 'Particle',
-        'ながら' => 'Particle',
-        'ばかり' => 'Particle',
-        'だけ' => 'Particle',
-        'しか' => 'Particle',
-        'ほど' => 'Particle',
-        'くらい' => 'Particle',
-        'ぐらい' => 'Particle',
-        'など' => 'Particle',
-        'なんか' => 'Particle',
-        'なんて' => 'Particle',
-        'って' => 'Particle',
-    );
-
-    for my $t (@$tokens) {
-        my $surface = $t->{surface} // '';
-        if (exists $particle_corrections{$surface} && $t->{pos} eq 'Noun') {
-            $t->{pos} = $particle_corrections{$surface};
-        }
-    }
-
-    return $tokens;
-}
-
-# Slang adjective stems and their standard replacement for MeCab
-# MeCab doesn't know エモい etc., so we replace with 赤い (standard i-adjective)
-my %slang_adj_stems = (
-    'エモ' => '赤',
-    'キモ' => '赤',
-    'ウザ' => '赤',
-    'ダサ' => '赤',
-    'イタ' => '赤',
-);
-
-# Replace slang adjective stems with standard ones before MeCab
-sub preprocess_for_mecab {
-    my ($text) = @_;
-    my %replacements;  # Track what we replaced for restoration
-
-    for my $slang (keys %slang_adj_stems) {
-        my $standard = $slang_adj_stems{$slang};
-        # Replace slang stem followed by i-adjective endings
-        # エモい, エモかった, エモくない, エモければ, etc.
-        while ($text =~ /\Q$slang\E([いかくけさ])/g) {
-            my $match_start = $-[0];
-            my $match_end = $+[0];
-            $replacements{$match_start} = {
-                original => $slang,
-                replacement => $standard,
-                length => length($slang),
-            };
-        }
-    }
-
-    # Apply replacements (reverse order to preserve positions)
-    for my $pos (sort { $b <=> $a } keys %replacements) {
-        my $r = $replacements{$pos};
-        substr($text, $pos, $r->{length}) = $r->{replacement};
-    }
-
-    return ($text, \%replacements);
-}
-
-# Restore slang adjectives in tokens after MeCab processing
-sub postprocess_mecab_tokens {
-    my ($tokens, $original_text, $replacements) = @_;
-
-    return $tokens unless %$replacements;
-
-    # Rebuild token surfaces based on original text positions
-    my $pos = 0;
-    for my $t (@$tokens) {
-        my $surface = $t->{surface};
-
-        # Check if this token's position had a replacement
-        for my $repl_pos (keys %$replacements) {
-            my $r = $replacements->{$repl_pos};
-            # If token starts at or contains replacement position
-            if ($pos <= $repl_pos && $repl_pos < $pos + length($surface)) {
-                # Calculate offset within token
-                my $offset = $repl_pos - $pos;
-                # Replace the standard stem with original slang stem
-                my $new_surface = $surface;
-                substr($new_surface, $offset, length($r->{replacement})) = $r->{original};
-                $t->{surface} = $new_surface;
-                # Update lemma if it contains the replacement
-                if (defined $t->{lemma} && $t->{lemma} =~ /\Q$r->{replacement}\E/) {
-                    $t->{lemma} =~ s/\Q$r->{replacement}\E/$r->{original}/;
-                }
-            }
-        }
-        $pos += length($surface);
-    }
-
-    return $tokens;
-}
-
-# Counter/unit patterns that should be merged with preceding numbers
-my @counter_units = qw(
-    人 個 本 枚 台 回 件 円 年 月 日 時 分 秒 階 番 号 歳 才 目
-    ページ 頁 時間 分間 秒間 年間 日間 週間 か月 ヶ月 カ月
-);
-
-# Post-process MeCab tokens to apply Suzume rules (number+unit, date, nai-adjective merging)
-sub apply_suzume_merge_rules {
-    my ($tokens, $text) = @_;
-    my @result;
-    my $i = 0;
-
-    while ($i < @$tokens) {
-        my $t = $tokens->[$i];
-        my $merged = 0;
-
-        # 1. Full date pattern: 2024年12月23日 → single token
-        if (!$merged && $t->{surface} =~ /^\d+$/) {
-            # Check if this starts a date pattern
-            my $pos_in_text = 0;
-            for my $k (0 .. $i - 1) { $pos_in_text += length($tokens->[$k]{surface}); }
-            my $remaining = substr($text, $pos_in_text);
-
-            if ($remaining =~ /^(\d+年\d+月\d+日)/) {
-                my $date = $1;
-                # Count tokens to merge
-                my $len = 0;
-                my $j = $i;
-                while ($j < @$tokens && $len < length($date)) {
-                    $len += length($tokens->[$j]{surface});
-                    $j++;
-                }
-                if ($len == length($date)) {
-                    push @result, { surface => $date, pos => 'Noun', lemma => $date };
-                    $i = $j;
-                    $merged = 1;
-                }
-            }
-        }
-
-        # 2. Number + unit: merge 数字 + 助数詞
-        if (!$merged && $t->{surface} =~ /^\d+$/) {
-            my $j = $i + 1;
-            my $combined = $t->{surface};
-            while ($j < @$tokens) {
-                my $next_surface = $tokens->[$j]{surface};
-                # Check if next token is a counter/unit
-                my $is_counter = 0;
-                for my $unit (@counter_units) {
-                    if ($next_surface eq $unit) {
-                        $is_counter = 1;
-                        last;
-                    }
-                }
-                if ($is_counter) {
-                    $combined .= $next_surface;
-                    $j++;
-                } else {
-                    last;
-                }
-            }
-            if ($j > $i + 1) {
-                push @result, { surface => $combined, pos => 'Noun', lemma => $combined };
-                $i = $j;
-                $merged = 1;
-            }
-        }
-
-        # 3. Nai-adjective: merge だらし+ない → だらしない
-        if (!$merged) {
-            my @nai_adjs = qw(だらしない つまらない しょうがない もったいない くだらない
-                             せわしない やるせない いたたまれない あどけない おぼつかない
-                             はしたない みっともない ろくでもない どうしようもない);
-            my $pos_in_text = 0;
-            for my $k (0 .. $i - 1) { $pos_in_text += length($tokens->[$k]{surface}); }
-            my $remaining = substr($text, $pos_in_text);
-
-            for my $adj (@nai_adjs) {
-                if ($remaining =~ /^\Q$adj\E/) {
-                    my $len = 0;
-                    my $j = $i;
-                    while ($j < @$tokens && $len < length($adj)) {
-                        $len += length($tokens->[$j]{surface});
-                        $j++;
-                    }
-                    if ($len == length($adj)) {
-                        push @result, { surface => $adj, pos => 'Adjective', lemma => $adj };
-                        $i = $j;
-                        $merged = 1;
-                        last;
-                    }
-                }
-            }
-        }
-
-        # 4. Kanji compound: merge consecutive kanji-only tokens
-        #    開始 + 予定 → 開始予定
-        if (!$merged && $t->{surface} =~ /^\p{Han}+$/) {
-            my $j = $i + 1;
-            my $combined = $t->{surface};
-            while ($j < @$tokens && $tokens->[$j]{surface} =~ /^\p{Han}+$/) {
-                $combined .= $tokens->[$j]{surface};
-                $j++;
-            }
-            if ($j > $i + 1) {
-                push @result, { surface => $combined, pos => 'Noun', lemma => $combined };
-                $i = $j;
-                $merged = 1;
-            }
-        }
-
-        if (!$merged) {
-            push @result, $t;
-            $i++;
-        }
-    }
-    return \@result;
-}
-
-# Get expected tokens: MeCab + Suzume rule corrections
-sub get_expected_tokens {
+# Wrapper for get_expected_tokens with force_suzume support
+sub get_expected_tokens_with_cli {
     my ($text, $force_suzume, $suzume_cli) = @_;
 
     if ($force_suzume && -x $suzume_cli) {
         return (get_suzume_tokens_full($suzume_cli, $text), 'Suzume', 'forced');
     }
 
-    # Get MeCab tokens (slang adjectives already handled via pre/post-processing)
-    my $tokens = get_mecab_tokens($text);
-
-    # Apply Suzume merge rules (number+unit, date, nai-adjective, kanji-compound)
-    my $rule = should_use_suzume_rule($text);
-    if ($rule && $rule =~ /^(number\+unit|date|nai-adjective|kanji-compound)$/) {
-        $tokens = apply_suzume_merge_rules($tokens, $text);
-        return ($tokens, 'MeCab+SuzumeRules', $rule);
-    }
-
-    return ($tokens, 'MeCab', $rule || '');
-}
-
-sub get_mecab_tokens {
-    my ($text) = @_;
-
-    # Preprocess: replace slang adjectives with standard ones
-    my ($processed_text, $replacements) = preprocess_for_mecab($text);
-
-    my $escaped = $processed_text;
-    $escaped =~ s/'/'\\''/g;
-    my $output = `echo '$escaped' | mecab 2>/dev/null`;
-    utf8::decode($output);
-
-    my @tokens;
-    for my $line (split /\n/, $output) {
-        last if $line eq 'EOS' || $line eq '';
-        my ($surface, $features) = split /\t/, $line;
-        next unless defined $surface && $surface ne '';
-
-        my @feats = split /,/, ($features // '');
-        my $pos_ja = $feats[0] // 'その他';
-        my $pos = $pos_map{$pos_ja} // 'Other';
-        my $lemma = $feats[6] // $surface;
-
-        push @tokens, {
-            surface => $surface,
-            pos => $pos,
-            lemma => $lemma,
-        };
-    }
-
-    # Postprocess: restore slang adjectives
-    postprocess_mecab_tokens(\@tokens, $text, $replacements);
-
-    # Apply POS corrections (e.g., MeCab's particle→noun misclassification)
-    correct_mecab_pos(\@tokens);
-
-    return \@tokens;
-}
-
-sub format_expected {
-    my ($tokens) = @_;
-    my @result;
-    for my $t (@$tokens) {
-        my %entry = (surface => $t->{surface}, pos => $t->{pos});
-        my $lemma = $t->{lemma} // '';
-        $entry{lemma} = $lemma if $lemma ne '' && $lemma ne $t->{surface};
-        push @result, \%entry;
-    }
-    return \@result;
-}
-
-sub load_json {
-    my ($file) = @_;
-    open my $fh, '<:raw', $file or die "Cannot open $file: $!\n";
-    my $content = do { local $/; <$fh> };
-    close $fh;
-    return decode_json($content);
-}
-
-sub save_json {
-    my ($file, $data) = @_;
-    my $json = JSON::PP->new->utf8(0)->pretty->canonical->indent_length(2);
-    # Ensure proper sorting for readability
-    open my $fh, '>:utf8', $file or die "Cannot write $file: $!\n";
-    print $fh $json->encode($data);
-    close $fh;
-}
-
-sub find_test_by_input {
-    my ($input_text) = @_;
-
-    opendir my $dh, $test_data_dir or die "Cannot open $test_data_dir: $!\n";
-    my @files = grep { /\.json$/ } readdir $dh;
-    closedir $dh;
-
-    for my $file (sort @files) {
-        my $path = "$test_data_dir/$file";
-        my $data = eval { load_json($path) };
-        next if $@;
-
-        my $cases = $data->{cases} // $data->{test_cases} // [];
-        for my $i (0 .. $#$cases) {
-            if ($cases->[$i]{input} eq $input_text) {
-                my $basename = $file;
-                $basename =~ s/\.json$//;
-                return {
-                    file => $path,
-                    basename => $basename,
-                    index => $i,
-                    case => $cases->[$i],
-                    data => $data,
-                };
-            }
-        }
-    }
-    return undef;
-}
-
-sub find_test_by_id {
-    my ($id) = @_;
-    my ($basename, $idx) = split /\//, $id;
-    return undef unless defined $basename && defined $idx;
-
-    # Normalize basename to lowercase (test output uses CamelCase)
-    my $basename_lc = lc($basename);
-
-    my $path = "$test_data_dir/$basename_lc.json";
-    return undef unless -f $path;
-
-    my $data = eval { load_json($path) };
-    return undef if $@;
-
-    my $cases = $data->{cases} // $data->{test_cases} // [];
-
-    # Try numeric index first
-    if ($idx =~ /^\d+$/) {
-        my $i = int($idx);
-        if ($i < scalar @$cases) {
-            return {
-                file => $path,
-                basename => $basename,
-                index => $i,
-                case => $cases->[$i],
-                data => $data,
-            };
-        }
-    }
-
-    # Try matching by case id
-    for my $i (0 .. $#$cases) {
-        if (($cases->[$i]{id} // '') eq $idx) {
-            return {
-                file => $path,
-                basename => $basename,
-                index => $i,
-                case => $cases->[$i],
-                data => $data,
-            };
-        }
-    }
-
-    return undef;
-}
-
-sub print_tokens {
-    my ($tokens, $label) = @_;
-    print "$label:\n";
-    for my $t (@$tokens) {
-        my $lemma_str = $t->{lemma} ne $t->{surface} ? " ($t->{lemma})" : "";
-        print "  $t->{surface}\t$t->{pos}$lemma_str\n";
-    }
-}
-
-sub generate_id {
-    my ($input) = @_;
-    # Generate ASCII-only ID from input
-    # Japanese characters are converted to romaji-like representation
-    my $id = $input;
-
-    # Simple hiragana to romaji mapping (common characters)
-    my %hira_to_roma = (
-        'あ'=>'a','い'=>'i','う'=>'u','え'=>'e','お'=>'o',
-        'か'=>'ka','き'=>'ki','く'=>'ku','け'=>'ke','こ'=>'ko',
-        'さ'=>'sa','し'=>'shi','す'=>'su','せ'=>'se','そ'=>'so',
-        'た'=>'ta','ち'=>'chi','つ'=>'tsu','て'=>'te','と'=>'to',
-        'な'=>'na','に'=>'ni','ぬ'=>'nu','ね'=>'ne','の'=>'no',
-        'は'=>'ha','ひ'=>'hi','ふ'=>'fu','へ'=>'he','ほ'=>'ho',
-        'ま'=>'ma','み'=>'mi','む'=>'mu','め'=>'me','も'=>'mo',
-        'や'=>'ya','ゆ'=>'yu','よ'=>'yo',
-        'ら'=>'ra','り'=>'ri','る'=>'ru','れ'=>'re','ろ'=>'ro',
-        'わ'=>'wa','を'=>'wo','ん'=>'n',
-        'が'=>'ga','ぎ'=>'gi','ぐ'=>'gu','げ'=>'ge','ご'=>'go',
-        'ざ'=>'za','じ'=>'ji','ず'=>'zu','ぜ'=>'ze','ぞ'=>'zo',
-        'だ'=>'da','ぢ'=>'di','づ'=>'du','で'=>'de','ど'=>'do',
-        'ば'=>'ba','び'=>'bi','ぶ'=>'bu','べ'=>'be','ぼ'=>'bo',
-        'ぱ'=>'pa','ぴ'=>'pi','ぷ'=>'pu','ぺ'=>'pe','ぽ'=>'po',
-        'っ'=>'tt','ゃ'=>'ya','ゅ'=>'yu','ょ'=>'yo',
-    );
-
-    # Convert hiragana to romaji
-    for my $hira (keys %hira_to_roma) {
-        $id =~ s/$hira/$hira_to_roma{$hira}/g;
-    }
-
-    # Convert katakana to hiragana first, then to romaji
-    $id =~ tr/ァ-ン/ぁ-ん/;
-    for my $hira (keys %hira_to_roma) {
-        $id =~ s/$hira/$hira_to_roma{$hira}/g;
-    }
-
-    # Replace kanji with 'k' + codepoint (to make unique)
-    $id =~ s/(\p{Han})/'k'.sprintf('%x',ord($1))/ge;
-
-    # Replace any remaining non-ASCII with underscore
-    $id =~ s/[^a-zA-Z0-9_]/_/g;
-
-    # Collapse multiple underscores
-    $id =~ s/_+/_/g;
-    $id =~ s/^_|_$//g;
-
-    # Ensure non-empty and reasonable length
-    $id = 'test_' . time() if $id eq '' || $id =~ /^_*$/;
-    $id = substr($id, 0, 40) if length($id) > 40;
-
-    return $id;
+    return get_expected_tokens($text);
 }
 
 sub get_failures_from_test_output {
@@ -742,6 +242,64 @@ sub get_failures_from_test_output {
     return \@failures;
 }
 
+# Detect segmentation failure pattern by comparing correct vs suzume tokenization
+sub detect_segmentation_pattern {
+    my ($correct_str, $suzume_str, $input) = @_;
+
+    my @correct = split /\|/, $correct_str;
+    my @suzume = split /\|/, $suzume_str;
+
+    # Find what's merged in suzume but split in correct
+    # Build position map for correct tokens
+    my $pos = 0;
+    my @correct_spans;
+    for my $tok (@correct) {
+        my $len = length($tok);
+        push @correct_spans, { token => $tok, start => $pos, end => $pos + $len };
+        $pos += $len;
+    }
+
+    $pos = 0;
+    for my $suz_tok (@suzume) {
+        my $suz_len = length($suz_tok);
+        my $suz_end = $pos + $suz_len;
+
+        # Find correct tokens that fall within this suzume token
+        my @covered = grep {
+            $_->{start} >= $pos && $_->{end} <= $suz_end
+        } @correct_spans;
+
+        # If suzume covers multiple correct tokens, it's a merge
+        if (@covered > 1) {
+            my $merged = join('', map { $_->{token} } @covered);
+
+            # Pattern detection based on what should have been split
+            return 'くない未分割' if $merged =~ /く[|]?ない$/;
+            return 'ん未分割' if $merged =~ /[|]?ん$/ && @covered >= 2;
+            return 'て形未分割' if grep { $_->{token} eq 'て' } @covered;
+            return 'ている未分割' if $merged =~ /て[|]?(?:い|いる|いた)$/;
+            return 'たい未分割' if grep { $_->{token} eq 'たい' } @covered;
+            return 'ます未分割' if grep { $_->{token} =~ /^ま[すせし]/ } @covered;
+            return 'た/だ未分割' if grep { $_->{token} =~ /^[たっだ]$/ } @covered;
+            return 'ない未分割' if grep { $_->{token} eq 'ない' || $_->{token} eq 'なかっ' } @covered;
+            return 'れる/られる未分割' if grep { $_->{token} =~ /^[らりれろ]れ/ || $_->{token} =~ /^れ[るた]/ } @covered;
+            return 'せる/させる未分割' if grep { $_->{token} =~ /^さ?せ/ } @covered;
+
+            # Generic: show what was merged
+            my $pattern = join('+', map { $_->{token} } @covered);
+            return "未分割($pattern)";
+        }
+        $pos = $suz_end;
+    }
+
+    # Reverse case: suzume over-splits (less common)
+    if (@suzume > @correct) {
+        return '過分割';
+    }
+
+    return 'その他';
+}
+
 sub get_suzume_tokens {
     my ($cli, $text) = @_;
     my $escaped = $text;
@@ -754,75 +312,18 @@ sub get_suzume_tokens {
         next if $line eq '' || $line eq 'EOS';
         my ($surface, $pos, $lemma) = split /\t/, $line;
         next unless defined $surface && $surface ne '';
-        # Normalize POS (Suzume uses ADJ, PARTICLE, etc.)
-        my $norm_pos = normalize_pos($pos // '');
-        push @tokens, { surface => $surface, pos => $norm_pos, lemma => $lemma // $surface };
-    }
-    return \@tokens;
-}
-
-sub normalize_pos {
-    my ($pos) = @_;
-    # Map Suzume POS to standard form
-    my %suzume_pos_map = (
-        'NOUN'        => 'Noun',
-        'VERB'        => 'Verb',
-        'ADJ'         => 'Adjective',
-        'ADVERB'      => 'Adverb',
-        'PARTICLE'    => 'Particle',
-        'AUX'         => 'Auxiliary',
-        'CONJ'        => 'Conjunction',
-        'INTJ'        => 'Interjection',
-        'PRON'        => 'Pronoun',
-        'DET'         => 'Determiner',
-        'PREFIX'      => 'Prefix',
-        'SUFFIX'      => 'Suffix',
-        'PUNCT'       => 'Punctuation',
-        'SYM'         => 'Symbol',
-        'OTHER'       => 'Other',
-    );
-    return $suzume_pos_map{uc($pos)} // $pos;
-}
-
-sub tokens_match {
-    my ($a, $b) = @_;
-    return 0 unless @$a == @$b;
-    for my $i (0 .. $#$a) {
-        return 0 if $a->[$i]{surface} ne $b->[$i]{surface};
-        # Also compare POS (both should be normalized)
-        my $pos_a = $a->[$i]{pos} // '';
-        my $pos_b = $b->[$i]{pos} // '';
-        return 0 if $pos_a ne $pos_b;
-        # Also compare lemma
-        my $lemma_a = $a->[$i]{lemma} // $a->[$i]{surface};
-        my $lemma_b = $b->[$i]{lemma} // $b->[$i]{surface};
-        return 0 if $lemma_a ne $lemma_b;
-    }
-    return 1;
-}
-
-sub get_suzume_tokens_full {
-    # Get full token info (surface, pos, lemma) from suzume-cli
-    my ($cli, $text) = @_;
-    my $escaped = $text;
-    $escaped =~ s/'/'\\''/g;
-    my $output = `'$cli' '$escaped' 2>/dev/null`;
-    utf8::decode($output);
-
-    my @tokens;
-    for my $line (split /\n/, $output) {
-        next if $line eq '' || $line eq 'EOS';
-        my ($surface, $pos, $lemma) = split /\t/, $line;
-        next unless defined $surface && $surface ne '';
-
-        # Normalize Suzume POS to test format
         my $norm_pos = normalize_pos($pos // 'Other');
-        my %token = (surface => $surface, pos => $norm_pos);
-        $token{lemma} = $lemma if defined $lemma && $lemma ne $surface;
-        push @tokens, \%token;
+        push @tokens, {
+            surface => $surface,
+            pos => $norm_pos,
+            lemma => $lemma // $surface,
+        };
     }
     return \@tokens;
 }
+
+# Alias for backward compatibility
+sub get_suzume_tokens_full { goto &get_suzume_tokens; }
 
 sub get_test_files {
     my ($file_filter) = @_;
@@ -861,14 +362,104 @@ if ($command eq 'list') {
     exit 0;
 }
 
+if ($command eq 'expected') {
+    die "Usage: $0 expected [-c|--compare] <input>\n" unless $input;
+
+    my ($tokens, $source, $rule) = get_expected_tokens($input);
+
+    if ($compare) {
+        # Compare with Suzume output
+        my $suzume_cli = "$project_root/build/bin/suzume-cli";
+        die "suzume-cli not found (run cmake build first)\n" unless -x $suzume_cli;
+        my $suzume = get_suzume_tokens($suzume_cli, $input);
+
+        # Helper to format token with optional lemma
+        my $fmt = sub {
+            my ($t) = @_;
+            my $lemma = $t->{lemma} // $t->{surface};
+            if ($lemma ne $t->{surface}) {
+                return "$t->{surface}/$t->{pos}($lemma)";
+            }
+            return "$t->{surface}/$t->{pos}";
+        };
+
+        my $exp_str = join(' ', map { $fmt->($_) } @$tokens);
+        my $suz_str = join(' ', map { $fmt->($_) } @$suzume);
+
+        if (tokens_match($tokens, $suzume)) {
+            print "✓ Match\n";
+            print "  $exp_str\n";
+        } else {
+            print "✗ Mismatch\n";
+            print "  Expected: $exp_str\n";
+            print "  Suzume:   $suz_str\n";
+
+            # Show detailed diff for each token
+            my $max_len = @$tokens > @$suzume ? @$tokens : @$suzume;
+            my @diffs;
+            for my $i (0 .. $max_len - 1) {
+                my $e = $tokens->[$i];
+                my $s = $suzume->[$i];
+                if (!$e || !$s) {
+                    push @diffs, "[$i] " . ($e ? "extra expected: $e->{surface}" : "extra suzume: $s->{surface}");
+                } else {
+                    my @fields;
+                    push @fields, "surface" if ($e->{surface} // '') ne ($s->{surface} // '');
+                    push @fields, "pos" if normalize_pos($e->{pos} // '') ne normalize_pos($s->{pos} // '');
+                    my $e_lemma = $e->{lemma} // $e->{surface};
+                    my $s_lemma = $s->{lemma} // $s->{surface};
+                    push @fields, "lemma($e_lemma≠$s_lemma)" if $e_lemma ne $s_lemma;
+                    if (@fields) {
+                        push @diffs, "[$i] $e->{surface}: " . join(', ', @fields);
+                    }
+                }
+            }
+            if (@diffs) {
+                print "  Diff:\n";
+                for my $d (@diffs) {
+                    print "    $d\n";
+                }
+            }
+        }
+        if ($rule) {
+            print "  Rule: $rule\n";
+        }
+    } else {
+        for my $t (@$tokens) {
+            my $lemma = $t->{lemma} // '';
+            if ($lemma ne '' && $lemma ne $t->{surface}) {
+                print "$t->{surface}\t$t->{pos}\t$lemma\n";
+            } else {
+                print "$t->{surface}\t$t->{pos}\n";
+            }
+        }
+
+        # Show rule info on stderr if applied
+        if ($rule) {
+            print STDERR "# Rule: $rule\n";
+        }
+    }
+    exit 0;
+}
+
 if ($command eq 'show') {
     die "Usage: $0 show <input>\n" unless $input;
 
-    my $tokens = get_mecab_tokens($input);
-    print "Input: $input\n\n";
-    print_tokens($tokens, "MeCab");
+    my $suzume_cli = "$project_root/build/bin/suzume-cli";
 
-    my $expected = format_expected($tokens);
+    # Get raw MeCab tokens
+    my $mecab_tokens = get_mecab_tokens($input);
+    print "Input: $input\n\n";
+    print_tokens($mecab_tokens, "MeCab (raw)");
+
+    # Get corrected expected (MeCab + Suzume rules)
+    my ($correct_tokens, $source, $rule) = get_expected_tokens($input);
+    if ($rule) {
+        print "\n";
+        print_tokens($correct_tokens, "Correct ($source:$rule)");
+    }
+
+    my $expected = format_expected($correct_tokens);
     print "\nJSON expected:\n";
     my $json = JSON::PP->new->utf8(0)->pretty->canonical;
     print $json->encode($expected);
@@ -901,7 +492,7 @@ if ($command eq 'update') {
         die "Usage: $0 update <input> or $0 update -t <test_id>\n";
     }
 
-    my ($tokens, $source, $rule) = get_expected_tokens($input, $use_suzume, $suzume_cli);
+    my ($tokens, $source, $rule) = get_expected_tokens_with_cli($input, $use_suzume, $suzume_cli);
     my $expected = format_expected($tokens);
 
     print "Updating: $found->{basename}/$found->{index}\n";
@@ -945,7 +536,7 @@ if ($command eq 'add') {
         exit 1;
     }
 
-    my ($tokens, $source, $rule) = get_expected_tokens($input, $use_suzume, $suzume_cli);
+    my ($tokens, $source, $rule) = get_expected_tokens_with_cli($input, $use_suzume, $suzume_cli);
     my $expected = format_expected($tokens);
 
     my @tags = $tags_str ? split(/,/, $tags_str) : ();
@@ -995,70 +586,74 @@ if ($command eq 'add') {
     exit 0;
 }
 
-if ($command eq 'sync') {
-    # Sync all cases where Suzume matches MeCab but test expected differs
-    my $failures = get_failures_from_test_output();
-    die "No failures found in /tmp/test.txt\n" unless @$failures;
-
-    my $suzume_cli = "$project_root/build/bin/suzume-cli";
-    die "suzume-cli not found\n" unless -x $suzume_cli;
-
-    my @to_sync;
-    print STDERR "Analyzing ", scalar(@$failures), " failures...\n";
-
-    for my $f (@$failures) {
-        my $input = $f->{input};
-        my $id = $f->{id};
-
-        # Get MeCab and Suzume outputs
-        my $mecab = get_mecab_tokens($input);
-        my $suzume = get_suzume_tokens($suzume_cli, $input);
-
-        # Check if they match
-        if (tokens_match($mecab, $suzume)) {
-            push @to_sync, {
-                id => $id,
-                input => $input,
-                mecab => $mecab,
-            };
-        }
-    }
-
-    if (!@to_sync) {
-        print "No cases to sync (no failures where Suzume matches MeCab)\n";
-        exit 0;
-    }
-
-    print "Found ", scalar(@to_sync), " cases where Suzume=MeCab but test fails:\n\n";
-
-    for my $case (@to_sync) {
-        print "  [$case->{id}] $case->{input}\n";
-    }
-
-    if (!$apply) {
-        print "\n[DRY-RUN] Use --apply to make changes.\n";
-        exit 0;
-    }
-
-    print "\nSyncing...\n";
-
-    my $synced = 0;
-    for my $case (@to_sync) {
-        my $found = find_test_by_id($case->{id});
-        next unless $found;
-
-        my $expected = format_expected($case->{mecab});
-        my $cases_key = exists $found->{data}{cases} ? 'cases' : 'test_cases';
-        $found->{data}{$cases_key}[$found->{index}]{expected} = $expected;
-
-        save_json($found->{file}, $found->{data});
-        $synced++;
-        print "  ✓ $case->{id}\n";
-    }
-
-    print "\n✓ Synced $synced cases\n";
-    exit 0;
-}
+# DISABLED: sync command is redundant if needs-suzume-update is used to normalize all expected values
+# if ($command eq 'sync') {
+#     # Sync all cases where Suzume matches corrected expected (MeCab + Suzume rules)
+#     my $failures = get_failures_from_test_output();
+#     die "No failures found in /tmp/test.txt\n" unless @$failures;
+#
+#     my $suzume_cli = "$project_root/build/bin/suzume-cli";
+#     die "suzume-cli not found\n" unless -x $suzume_cli;
+#
+#     my @to_sync;
+#     print STDERR "Analyzing ", scalar(@$failures), " failures...\n";
+#
+#     for my $f (@$failures) {
+#         my $input = $f->{input};
+#         my $id = $f->{id};
+#
+#         # Get corrected expected (MeCab + Suzume rules) and Suzume outputs
+#         my ($correct_tokens, $source, $rule) = get_expected_tokens($input);
+#         my $suzume = get_suzume_tokens($suzume_cli, $input);
+#
+#         # Check if Suzume matches corrected expected
+#         if (tokens_match($correct_tokens, $suzume)) {
+#             push @to_sync, {
+#                 id => $id,
+#                 input => $input,
+#                 correct => $correct_tokens,
+#                 source => $source,
+#                 rule => $rule,
+#             };
+#         }
+#     }
+#
+#     if (!@to_sync) {
+#         print "No cases to sync (no failures where Suzume matches expected)\n";
+#         exit 0;
+#     }
+#
+#     print "Found ", scalar(@to_sync), " cases where Suzume=Expected but test fails:\n\n";
+#
+#     for my $case (@to_sync) {
+#         my $suffix = $case->{rule} ? " [$case->{source}:$case->{rule}]" : "";
+#         print "  [$case->{id}] $case->{input}$suffix\n";
+#     }
+#
+#     if (!$apply) {
+#         print "\n[DRY-RUN] Use --apply to make changes.\n";
+#         exit 0;
+#     }
+#
+#     print "\nSyncing...\n";
+#
+#     my $synced = 0;
+#     for my $case (@to_sync) {
+#         my $found = find_test_by_id($case->{id});
+#         next unless $found;
+#
+#         my $expected = format_expected($case->{correct});
+#         my $cases_key = exists $found->{data}{cases} ? 'cases' : 'test_cases';
+#         $found->{data}{$cases_key}[$found->{index}]{expected} = $expected;
+#
+#         save_json($found->{file}, $found->{data});
+#         $synced++;
+#         print "  ✓ $case->{id}\n";
+#     }
+#
+#     print "\n✓ Synced $synced cases\n";
+#     exit 0;
+# }
 
 if ($command eq 'diff-suzume') {
     # Show differences between test expectations and suzume output (read-only)
@@ -1068,61 +663,80 @@ if ($command eq 'diff-suzume') {
     my $suzume_cli = "$project_root/build/bin/suzume-cli";
     die "suzume-cli not found\n" unless -x $suzume_cli;
 
-    print STDERR "Analyzing ", scalar(@$failures), " failures...\n\n";
+    my $total_failures = scalar(@$failures);
+    my $early_stop = $limit > 0;
+    # With --limit N, process at most N*5 items to get representative samples
+    my $max_process = $early_stop ? $limit * 5 : 0;
+
+    print STDERR "Analyzing ", ($early_stop ? "up to $max_process of " : ""), "$total_failures failures...\n\n";
 
     my %categories = (
         segmentation => [],  # Different token count
         pos_only => [],      # Same tokens, different POS
-        matches_mecab => [], # Suzume matches MeCab but not expected
+        matches_correct => [], # Suzume matches corrected expected but not test expected
     );
 
+    my $processed = 0;
+
     for my $f (@$failures) {
+        # Early termination: stop after processing enough items
+        last if $early_stop && $processed >= $max_process;
+
         my $found = find_test_by_id($f->{id});
         next unless $found;
 
-        my $expected = $found->{case}{expected} // [];
-        my $suzume = get_suzume_tokens_full($suzume_cli, $f->{input});
-        my $mecab = get_mecab_tokens($f->{input});
+        my $test_expected = $found->{case}{expected} // [];
+        # Get corrected expected (MeCab + Suzume rules)
+        my ($correct_tokens, $source, $rule) = get_expected_tokens($f->{input});
+        my $suzume = get_suzume_tokens($suzume_cli, $f->{input});
+        $processed++;
 
-        my @exp_surfaces = map { $_->{surface} } @$expected;
+        my @test_surfaces = map { $_->{surface} } @$test_expected;
         my @suz_surfaces = map { $_->{surface} } @$suzume;
-        my @mec_surfaces = map { $_->{surface} } @$mecab;
+        my @cor_surfaces = map { $_->{surface} } @$correct_tokens;
 
-        my $exp_str = join('|', @exp_surfaces);
+        my $test_str = join('|', @test_surfaces);
         my $suz_str = join('|', @suz_surfaces);
-        my $mec_str = join('|', @mec_surfaces);
+        my $cor_str = join('|', @cor_surfaces);
 
         my $entry = {
             id => $f->{id},
             input => $f->{input},
-            expected => $exp_str,
+            test_expected => $test_str,
             suzume => $suz_str,
-            mecab => $mec_str,
+            correct => $cor_str,
+            source => $source,
+            rule => $rule,
         };
 
-        if ($suz_str eq $mec_str && $suz_str ne $exp_str) {
-            push @{$categories{matches_mecab}}, $entry;
-        } elsif ($exp_str ne $suz_str && @exp_surfaces != @suz_surfaces) {
+        # Check if Suzume matches corrected expected
+        if (tokens_match($correct_tokens, $suzume)) {
+            push @{$categories{matches_correct}}, $entry;
+        } elsif ($cor_str ne $suz_str && @cor_surfaces != @suz_surfaces) {
             push @{$categories{segmentation}}, $entry;
         } else {
             push @{$categories{pos_only}}, $entry;
         }
     }
 
+    print STDERR "Processed $processed of $total_failures failures\n\n" if $early_stop && $processed < $total_failures;
+
     # Helper to limit display count per category
     my $per_cat_limit = $limit > 0 ? $limit : 0;
 
     # Print categorized results
-    if (@{$categories{matches_mecab}}) {
-        my $total = scalar(@{$categories{matches_mecab}});
-        print "=== Suzume=MeCab but Expected differs ($total) ===\n";
-        print "These can be safely synced with 'sync' command:\n\n";
+    if (@{$categories{matches_correct}}) {
+        my $total = scalar(@{$categories{matches_correct}});
+        print "=== Suzume=Correct ($total) ===\n";
+        print "Suzume output matches corrected expected (MeCab + Suzume rules):\n\n";
         my $shown = 0;
-        for my $e (@{$categories{matches_mecab}}) {
+        for my $e (@{$categories{matches_correct}}) {
             last if $per_cat_limit && $shown >= $per_cat_limit;
-            print "  [$e->{id}] $e->{input}\n";
-            print "    Expected: $e->{expected}\n";
-            print "    Suzume:   $e->{suzume} ✓\n\n";
+            my $rule_info = $e->{rule} ? " [$e->{source}:$e->{rule}]" : "";
+            print "  [$e->{id}] $e->{input}$rule_info\n";
+            print "    Test:    $e->{test_expected}\n";
+            print "    Suzume:  $e->{suzume} ✓\n";
+            print "    Correct: $e->{correct}\n\n" if $e->{test_expected} ne $e->{correct};
             $shown++;
         }
         print "  ... and ", ($total - $shown), " more\n\n" if $per_cat_limit && $shown < $total;
@@ -1132,16 +746,73 @@ if ($command eq 'diff-suzume') {
         my $total = scalar(@{$categories{segmentation}});
         print "=== Segmentation differs ($total) ===\n";
         print "These need implementation fixes:\n\n";
-        my $shown = 0;
+
+        # Group by failure pattern
+        my %patterns;
         for my $e (@{$categories{segmentation}}) {
-            last if $per_cat_limit && $shown >= $per_cat_limit;
-            print "  [$e->{id}] $e->{input}\n";
-            print "    Expected: $e->{expected}\n";
-            print "    Suzume:   $e->{suzume}\n";
-            print "    MeCab:    $e->{mecab}\n\n";
-            $shown++;
+            my $pattern = detect_segmentation_pattern($e->{correct}, $e->{suzume}, $e->{input});
+            push @{$patterns{$pattern}}, $e;
         }
-        print "  ... and ", ($total - $shown), " more\n\n" if $per_cat_limit && $shown < $total;
+
+        # Sort patterns by count (descending)
+        my @sorted_patterns = sort { @{$patterns{$b}} <=> @{$patterns{$a}} } keys %patterns;
+
+        # Aggregate small patterns (count <= 2) into "その他(詳細)"
+        my @major_patterns;
+        my @minor_entries;
+        for my $pattern (@sorted_patterns) {
+            my @entries = @{$patterns{$pattern}};
+            if (@entries > 2) {
+                push @major_patterns, $pattern;
+            } else {
+                push @minor_entries, @entries;
+            }
+        }
+
+        for my $pattern (@major_patterns) {
+            my @entries = @{$patterns{$pattern}};
+            my $count = scalar(@entries);
+            my @examples = map { $_->{input} } @entries[0 .. ($count > 3 ? 2 : $#entries)];
+            my $example_str = join(', ', @examples);
+            $example_str .= ', ...' if $count > 3;
+            print "  $pattern: ${count}件 ($example_str)\n";
+
+            # Show details if requested via limit
+            if ($per_cat_limit) {
+                my $shown = 0;
+                for my $e (@entries) {
+                    last if $shown >= $per_cat_limit;
+                    print "    [$e->{id}] $e->{input}\n";
+                    print "      Correct: $e->{correct}\n";
+                    print "      Suzume:  $e->{suzume}\n";
+                    $shown++;
+                }
+                print "\n";
+            }
+        }
+
+        # Show aggregated minor patterns
+        if (@minor_entries) {
+            my $count = scalar(@minor_entries);
+            my @examples = map { $_->{input} } @minor_entries[0 .. ($count > 3 ? 2 : $#minor_entries)];
+            my $example_str = join(', ', @examples);
+            $example_str .= ', ...' if $count > 3;
+            print "  その他(詳細): ${count}件 ($example_str)\n";
+
+            if ($per_cat_limit) {
+                my $shown = 0;
+                for my $e (@minor_entries) {
+                    last if $shown >= $per_cat_limit;
+                    print "    [$e->{id}] $e->{input}\n";
+                    print "      Correct: $e->{correct}\n";
+                    print "      Suzume:  $e->{suzume}\n";
+                    $shown++;
+                }
+                print "\n";
+            }
+        }
+
+        print "\n" unless $per_cat_limit;
     }
 
     if (@{$categories{pos_only}}) {
@@ -1152,8 +823,8 @@ if ($command eq 'diff-suzume') {
         for my $e (@{$categories{pos_only}}) {
             last if $per_cat_limit && $shown >= $per_cat_limit;
             print "  [$e->{id}] $e->{input}\n";
-            print "    Expected: $e->{expected}\n";
-            print "    Suzume:   $e->{suzume}\n\n";
+            print "    Correct: $e->{correct}\n";
+            print "    Suzume:  $e->{suzume}\n\n";
             $shown++;
         }
         print "  ... and ", ($total - $shown), " more\n\n" if $per_cat_limit && $shown < $total;
@@ -1161,9 +832,15 @@ if ($command eq 'diff-suzume') {
 
     # Summary
     print "=== Summary ===\n";
-    printf "  Suzume=MeCab (safe to sync): %d\n", scalar(@{$categories{matches_mecab}});
-    printf "  Segmentation issues:         %d\n", scalar(@{$categories{segmentation}});
-    printf "  POS-only differences:        %d\n", scalar(@{$categories{pos_only}});
+    if ($early_stop && $processed < $total_failures) {
+        print "(Based on $processed of $total_failures failures sampled)\n";
+    }
+    printf "  Suzume=Correct:                %d\n", scalar(@{$categories{matches_correct}});
+    printf "  Segmentation issues:           %d\n", scalar(@{$categories{segmentation}});
+    printf "  POS-only differences:          %d\n", scalar(@{$categories{pos_only}});
+    if ($early_stop && $processed < $total_failures) {
+        print "\nNote: Use --limit 0 to analyze all failures.\n";
+    }
     exit 0;
 }
 
@@ -1176,7 +853,7 @@ if ($command eq 'diff-mecab') {
     print STDERR "Scanning ", scalar(@files), " test files...\n\n";
 
     my %categories = (
-        intentional => [],   # Matches should_use_suzume_rule
+        intentional => [],   # Matches get_suzume_rule
         segmentation => [],  # Different segmentation
         pos_only => [],      # Same segmentation, different POS
         lemma_only => [],    # Same segmentation & POS, different lemma
@@ -1217,7 +894,7 @@ if ($command eq 'diff-mecab') {
                 next;
             }
 
-            my $rule = should_use_suzume_rule($inp);
+            my $rule = get_suzume_rule($inp);
             my $case_id = $case->{id} // $i;
 
             my $entry = {
@@ -1352,8 +1029,8 @@ if ($command eq 'needs-suzume-update') {
 
             # Get correct expected: MeCab + Suzume rules
             my $mecab = get_mecab_tokens($inp);
-            my $rule = should_use_suzume_rule($inp);
-            my $correct = $rule ? apply_suzume_merge_rules($mecab, $inp) : $mecab;
+            my $rule = get_suzume_rule($inp);
+            my $correct = $rule ? apply_suzume_merge($mecab, $inp) : $mecab;
 
             my @exp_surfaces = map { $_->{surface} } @$expected;
             my @cor_surfaces = map { $_->{surface} } @$correct;
@@ -1762,7 +1439,7 @@ if ($command eq 'batch-add') {
             next;
         }
 
-        my ($tokens, $source, $rule) = get_expected_tokens($inp, $use_suzume, $suzume_cli);
+        my ($tokens, $source, $rule) = get_expected_tokens_with_cli($inp, $use_suzume, $suzume_cli);
         my $expected = format_expected($tokens);
         my $id = generate_id($inp);
 

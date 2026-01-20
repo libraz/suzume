@@ -73,6 +73,12 @@ core::Lattice Tokenizer::buildLattice(
     // Add te-form + auxiliary verb candidates (学んで + いく → 学んで + いきたい)
     addTeFormAuxiliaryCandidates(lattice, text, codepoints, pos, char_types);
 
+    // Add taru-adjective adverb candidates (毅然 + と → 毅然と)
+    addTaruAdjectiveJoinCandidates(lattice, text, codepoints, pos, char_types);
+
+    // Add verb+suffix noun candidates (食べ + 物 → 食べ物)
+    addVerbSuffixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
+
     // Log candidate count per position
     size_t after_count = lattice.edgesAt(pos).size();
     SUZUME_DEBUG_LOG("[LATTICE] pos=" << pos << " candidates=" << after_count
@@ -138,7 +144,7 @@ void Tokenizer::addDictionaryCandidates(
                     cost, flags, result.entry->lemma,
                     dictionary::ConjugationType::None, {},  // conj_type and reading removed
                     core::CandidateOrigin::Dictionary, 1.0F, {},
-                    result.entry->extended_pos);
+                    result.entry->extended_pos, "dict");
 
     // Emphatic suffix pattern: word + っ/ッ/ー/ぁぃぅぇぉ/ァィゥェォ (colloquial emphasis)
     // E.g., です→ですっ, ます→ますっ, 行く→行くっ, やばいーー, だぁー
@@ -249,7 +255,7 @@ void Tokenizer::addDictionaryCandidates(
                         result.entry->lemma,
                         dictionary::ConjugationType::None, {},  // v0.8: removed
                         core::CandidateOrigin::Dictionary, 1.0F, {},
-                        result.entry->extended_pos);
+                        result.entry->extended_pos, "dict_emphatic");
       }
     }
   }
@@ -543,7 +549,7 @@ void Tokenizer::addUnknownCandidates(
                     adjusted_cost, flags, candidate.lemma, candidate.conj_type,
                     {},  // reading
                     candidate.origin, candidate.confidence, candidate.pattern,
-                    candidate.extended_pos);
+                    candidate.extended_pos, candidate.epos_source);
 #else
     lattice.addEdge(surface_str, static_cast<uint32_t>(candidate.start),
                     static_cast<uint32_t>(candidate.end), candidate.pos,
@@ -625,6 +631,22 @@ void Tokenizer::addTeFormAuxiliaryCandidates(
     const std::vector<normalize::CharType>& char_types) const {
   analysis::addTeFormAuxiliaryCandidates(lattice, text, codepoints, start_pos,
                                           char_types, scorer_);
+}
+
+void Tokenizer::addTaruAdjectiveJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) const {
+  analysis::addTaruAdjectiveJoinCandidates(lattice, text, codepoints, start_pos,
+                                            char_types, scorer_);
+}
+
+void Tokenizer::addVerbSuffixNounJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types) const {
+  analysis::addVerbSuffixNounJoinCandidates(lattice, text, codepoints, start_pos,
+                                             char_types, dict_manager_, scorer_);
 }
 
 }  // namespace suzume::analysis

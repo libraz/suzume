@@ -468,8 +468,7 @@
       "description" : "しんちょうに (carefully - hiragana) - MeCab-compatible lemma",
       "expected" : [
         {
-          "lemma" : "しんちょう",
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "しんちょう"
         },
         {

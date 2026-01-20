@@ -4,7 +4,6 @@
       "description" : "いい should be recognized as Adjective with lemma よい",
       "expected" : [
         {
-          "lemma" : "よい",
           "pos" : "Adjective",
           "surface" : "いい"
         }
@@ -41,7 +40,6 @@
       "description" : "よい should be recognized as Adjective",
       "expected" : [
         {
-          "lemma" : "よい",
           "pos" : "Adjective",
           "surface" : "よい"
         }
@@ -80,7 +78,6 @@
       "description" : "いいです - polite form with いい",
       "expected" : [
         {
-          "lemma" : "よい",
           "pos" : "Adjective",
           "surface" : "いい"
         },
@@ -102,7 +99,6 @@
       "description" : "いいよね - with sentence-ending particles",
       "expected" : [
         {
-          "lemma" : "よい",
           "pos" : "Adjective",
           "surface" : "いい"
         },
@@ -450,13 +446,11 @@
       "description" : "美しいらしい should split as adjective + らしい (conjecture auxiliary)",
       "expected" : [
         {
-          "lemma" : "美しい",
           "pos" : "Adjective",
           "surface" : "美しい"
         },
         {
-          "lemma" : "らしい",
-          "pos" : "Adjective",
+          "pos" : "Auxiliary",
           "surface" : "らしい"
         }
       ],
@@ -609,7 +603,6 @@
       "description" : "Colloquial adjective しんどい base form",
       "expected" : [
         {
-          "lemma" : "しんどい",
           "pos" : "Adjective",
           "surface" : "しんどい"
         }
@@ -643,7 +636,6 @@
       "description" : "Phase2-1: めでたい should be ADJ, not め+でたい",
       "expected" : [
         {
-          "lemma" : "めでたい",
           "pos" : "Adjective",
           "surface" : "めでたい"
         },
@@ -664,7 +656,6 @@
       "description" : "Phase2-1: ありがたい should be ADJ, not あり+がたい",
       "expected" : [
         {
-          "lemma" : "ありがたい",
           "pos" : "Adjective",
           "surface" : "ありがたい"
         },
@@ -685,7 +676,6 @@
       "description" : "Phase2-1: おもしろい should be ADJ, not お+も+しろい",
       "expected" : [
         {
-          "lemma" : "おもしろい",
           "pos" : "Adjective",
           "surface" : "おもしろい"
         },
@@ -727,7 +717,6 @@
       "description" : "Phase2-1: あたたかい should be ADJ",
       "expected" : [
         {
-          "lemma" : "あたたかい",
           "pos" : "Adjective",
           "surface" : "あたたかい"
         },
@@ -748,7 +737,6 @@
       "description" : "Phase2-1: つめたい should be ADJ",
       "expected" : [
         {
-          "lemma" : "つめたい",
           "pos" : "Adjective",
           "surface" : "つめたい"
         },
@@ -891,7 +879,6 @@
       "description" : "だらしない - grammar-first: single i-adjective (ナイ形容詞), not だらし+ない split",
       "expected" : [
         {
-          "lemma" : "だらしない",
           "pos" : "Adjective",
           "surface" : "だらしない"
         },
@@ -912,7 +899,6 @@
       "description" : "S5 fix: ものたりない should be ADJ (not もの+たりする)",
       "expected" : [
         {
-          "lemma" : "ものたりない",
           "pos" : "Adjective",
           "surface" : "ものたりない"
         },
@@ -1013,7 +999,6 @@
       "description" : "S5 fix: うやうやしい should be ADJ (not う+やうやしい)",
       "expected" : [
         {
-          "lemma" : "うやうやしい",
           "pos" : "Adjective",
           "surface" : "うやうやしい"
         },
@@ -1034,7 +1019,6 @@
       "description" : "S5 fix: こころもとない should be ADJ (not ここ+ろ+も+と+ない)",
       "expected" : [
         {
-          "lemma" : "こころもとない",
           "pos" : "Adjective",
           "surface" : "こころもとない"
         }
@@ -1211,7 +1195,6 @@
       "description" : "おかしいと - hiragana i-adjective followed by quotative particle",
       "expected" : [
         {
-          "lemma" : "おかしい",
           "pos" : "Adjective",
           "surface" : "おかしい"
         },

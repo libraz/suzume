@@ -26,7 +26,7 @@ Inflection::matchAuxiliaries(std::string_view surface) const {
       size_t start = surface.size() - aux.surface.size();
       if (surface.substr(start) == aux.surface) {
         matches.emplace_back(&aux, aux.surface.size());
-        SUZUME_DEBUG_LOG_VERBOSE("  [AUX MATCH] \"" << surface << "\" ends with \""
+        SUZUME_DEBUG_LOG_TRACE("  [AUX MATCH] \"" << surface << "\" ends with \""
                          << aux.surface << "\" (lemma=" << aux.lemma
                          << ", left_id=0x" << std::hex << aux.left_id
                          << ", right_id=0x" << aux.right_id
@@ -289,7 +289,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
 
       candidate.morphemes = aux_chain;
 
-      SUZUME_DEBUG_LOG_VERBOSE("  [STEM MATCH] \"" << remaining << "\" → base=\""
+      SUZUME_DEBUG_LOG_TRACE("  [STEM MATCH] \"" << remaining << "\" → base=\""
                         << base_form << "\" stem=\"" << stem
                         << "\" type=" << static_cast<int>(actual_verb_type)
                         << " suffix=\"" << suffix_str
@@ -347,7 +347,7 @@ std::vector<InflectionCandidate> Inflection::analyze(
     std::shared_lock<std::shared_mutex> read_lock(cache_mutex_);
     auto iter = cache_.find(key);
     if (iter != cache_.end()) {
-      SUZUME_DEBUG_LOG_VERBOSE("[INFLECTION] \"" << surface << "\" (cached, "
+      SUZUME_DEBUG_LOG_TRACE("[INFLECTION] \"" << surface << "\" (cached, "
                         << iter->second.size() << " candidates)\n");
       return iter->second;
     }
@@ -437,17 +437,17 @@ std::vector<InflectionCandidate> Inflection::analyze(
   // Debug: print final candidates (level 1: top candidate only, level 2: all)
   SUZUME_DEBUG_IF(!candidates.empty() && candidates[0].confidence >= 0.5F) {
     SUZUME_DEBUG_STREAM << "[INFLECTION] \"" << surface << "\" → "
-                        << candidates[0].base_form << " (type="
-                        << static_cast<int>(candidates[0].verb_type)
+                        << candidates[0].base_form << " ("
+                        << verbTypeToString(candidates[0].verb_type)
                         << ", conf=" << candidates[0].confidence << ")\n";
   }
-  SUZUME_DEBUG_VERBOSE_BLOCK {
+  SUZUME_DEBUG_TRACE_BLOCK {
     if (!candidates.empty()) {
       SUZUME_DEBUG_STREAM << "[INFLECTION] Full results for \"" << surface << "\":\n";
       for (size_t i = 0; i < candidates.size() && i < 5; ++i) {
         const auto& c = candidates[i];
         SUZUME_DEBUG_STREAM << "  " << (i + 1) << ". base=\"" << c.base_form
-                            << "\" type=" << static_cast<int>(c.verb_type)
+                            << "\" " << verbTypeToString(c.verb_type)
                             << " conf=" << c.confidence << "\n";
       }
       if (candidates.size() > 5) {

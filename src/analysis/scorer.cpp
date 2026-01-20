@@ -5,6 +5,12 @@
 #include "analysis/bigram_table.h"
 #include "analysis/category_cost.h"
 #include "core/debug.h"
+#include "core/types.h"
+#include "core/utf8_constants.h"
+#include "normalize/utf8.h"
+#include "grammar/char_patterns.h"
+
+using suzume::core::CandidateOrigin;
 
 namespace {
 
@@ -154,18 +160,124 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += options_.user_dict_bonus;
   }
 
-  // Debug output - show which cost was used (verbose level)
+  // Bonus for hiragana i-adjectives from dictionary
+  // Prevents misanalysis as verb+たい (e.g., つめたい → つめ+たい)
+  // These are ambiguous with desiderative form (会いたい) without context,
+  // so explicit dictionary registration takes precedence.
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adjective &&
+      grammar::isPureHiragana(edge.surface)) {
+    constexpr float kHiraganaAdjDictBonus = -2.5F;
+    cost += kHiraganaAdjDictBonus;
+  }
+
+  // Bonus for hiragana adverbs from dictionary
+  // Prevents misanalysis as verb+ん (e.g., たくさん → たくさ+ん)
+  // and compound splits (e.g., どうして → どう+し+て)
+  // Longer adverbs get stronger bonus to beat split paths
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adverb &&
+      grammar::isPureHiragana(edge.surface)) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    // Base bonus plus length-based bonus (0.5 per character beyond 2)
+    float bonus = -2.5F - static_cast<float>(char_len > 2 ? char_len - 2 : 0) * 0.5F;
+    cost += bonus;
+  }
+
+  // Bonus for みたい (conjecture auxiliary) from dictionary
+  // Works together with bigram bonuses and spurious verb penalty
+  if (edge.fromDictionary() && edge.extended_pos == core::ExtendedPOS::AuxConjectureMitai) {
+    constexpr float kMitaiDictBonus = -1.0F;
+    cost += kMitaiDictBonus;
+  }
+
+  // Bonus for short hiragana verbs from dictionary (e.g., なる, ある, いる, する)
+  // These compete with L1 function word entries (DET, AUX) which have lower category costs.
+  // Dictionary registration indicates standalone verb usage should take precedence.
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      grammar::isPureHiragana(edge.surface) && edge.surface.length() <= 6) {  // ≤2 chars
+    constexpr float kShortHiraganaVerbBonus = -0.3F;
+    cost += kShortHiraganaVerbBonus;
+  }
+
+  // Penalty for spurious kanji+hiragana verb renyokei not in dictionary
+  // These are often false positives like 学生み (学生みる doesn't exist)
+  // Prevents misanalysis like 学生みたい → 学生み+たい
+  // Only apply to surfaces with 2+ kanji (e.g., 学生み) to avoid penalizing
+  // legitimate verb renyokei like 行き, 読み, 書き
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      edge.surface.length() >= 9) {  // ≥3 chars (at least 2 kanji + 1 hiragana)
+    // Count kanji characters
+    size_t kanji_count = 0;
+    for (char32_t cp : suzume::normalize::utf8::decode(edge.surface)) {
+      if (suzume::normalize::isKanjiCodepoint(cp)) {
+        ++kanji_count;
+      }
+    }
+    if (kanji_count >= 2) {
+      constexpr float kSpuriousVerbRenyokeiPenalty = 1.5F;
+      cost += kSpuriousVerbRenyokeiPenalty;
+    }
+  }
+
+  // Bonus for compound adjectives from dictionary (e.g., 男らしい, 女らしい)
+  // These compete with noun+らしい split which has -1.5 connection bonus.
+  // Dictionary registration indicates compound adjective should take precedence.
+  // Pattern: kanji stem + hiragana suffix forming an i-adjective
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adjective &&
+      edge.surface.length() >= 12) {  // ≥4 chars (kanji + ひらがな suffix)
+    // Check if surface contains kanji and ends with い (compound adjective pattern)
+    if (grammar::containsKanji(edge.surface) && utf8::endsWith(edge.surface, "い")) {
+      constexpr float kCompoundAdjDictBonus = -0.5F;
+      cost += kCompoundAdjDictBonus;
+    }
+  }
+
+  // Debug output - show which cost was used and candidate origin (verbose level)
   SUZUME_DEBUG_VERBOSE_BLOCK {
+    // Base source type
     const char* source = edge.fromDictionary() ? "dict" :
                          edge.isUnknown() ? "unk" : "infl";
     const char* cost_from = (edge.cost != 0.0F) ? "edge" : "category";
-    SUZUME_DEBUG_STREAM << "[WORD] \"" << edge.surface << "\" (" << source << ") cost="
-                        << cost << " (from " << cost_from << ")";
+
+    SUZUME_DEBUG_STREAM << "[WORD] \"" << edge.surface << "\" (" << source;
+#ifdef SUZUME_DEBUG_INFO
+    // Show detailed origin if available (e.g., "dict:adj_i", "unk:verb_kanji")
+    if (edge.origin != CandidateOrigin::Unknown) {
+      SUZUME_DEBUG_STREAM << ":" << core::originToString(edge.origin);
+    }
+    if (!edge.origin_detail.empty()) {
+      SUZUME_DEBUG_STREAM << "/" << edge.origin_detail;
+    }
+#endif
+    SUZUME_DEBUG_STREAM << ") cost=" << cost << " (from " << cost_from << ")";
     SUZUME_DEBUG_STREAM << " [cat=" << category_cost;
     if (edge.cost != 0.0F) {
       SUZUME_DEBUG_STREAM << " edge=" << edge.cost;
     }
-    SUZUME_DEBUG_STREAM << "]\n";
+    // Show epos with source indicator
+    SUZUME_DEBUG_STREAM << " epos=" << core::extendedPosToString(edge.extended_pos);
+    // Check if epos matches default for this POS (indicates derived vs explicit)
+    core::ExtendedPOS default_epos = core::posToExtendedPos(edge.pos);
+    if (edge.extended_pos == core::ExtendedPOS::Unknown) {
+      SUZUME_DEBUG_STREAM << "(!UNKNOWN)";  // Warning: missing mapping
+    } else if (edge.extended_pos != default_epos) {
+#ifdef SUZUME_DEBUG_INFO
+      // Show where the ExtendedPOS was set (e.g., "binary_dict", "l1_dict", "candidate_gen")
+      if (!edge.epos_source.empty()) {
+        SUZUME_DEBUG_STREAM << "(from:" << edge.epos_source << ")";
+      } else {
+        SUZUME_DEBUG_STREAM << "(explicit)";
+      }
+#else
+      SUZUME_DEBUG_STREAM << "(explicit)";  // Explicitly set, different from default
+#endif
+    }
+    SUZUME_DEBUG_STREAM << "]";
+    // Highlight non-dictionary candidates (potential spurious entries)
+    if (!edge.fromDictionary()) {
+      SUZUME_DEBUG_STREAM << " [non-dict]";
+    }
+    SUZUME_DEBUG_STREAM << "\n";
   }
   return cost;
 }
@@ -179,12 +291,23 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
 
   float total = base_cost + extended_cost;
 
-  SUZUME_DEBUG_LOG_VERBOSE("[CONN] \"" << prev.surface << "\" ("
-                    << core::posToString(prev.pos) << ") → \""
+  SUZUME_DEBUG_VERBOSE_BLOCK {
+    SUZUME_DEBUG_STREAM << "[CONN] \"" << prev.surface << "\" ("
+                    << core::posToString(prev.pos) << "/"
+                    << core::extendedPosToString(prev.extended_pos) << ") → \""
                     << next.surface << "\" ("
-                    << core::posToString(next.pos) << "): "
-                    << "base=" << base_cost << " epos=" << extended_cost
-                    << " = " << total << "\n");
+                    << core::posToString(next.pos) << "/"
+                    << core::extendedPosToString(next.extended_pos) << "): "
+                    << "bigram=" << base_cost << " epos_adj=" << extended_cost;
+    if (extended_cost != 0.0F) {
+      // Show rule name: PrevEPOS→NextEPOS
+      SUZUME_DEBUG_STREAM << " (rule=" << core::extendedPosToString(prev.extended_pos)
+                          << "→" << core::extendedPosToString(next.extended_pos) << ")";
+    } else {
+      SUZUME_DEBUG_STREAM << " (default)";
+    }
+    SUZUME_DEBUG_STREAM << " total=" << total << "\n";
+  }
 
   return total;
 }

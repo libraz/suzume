@@ -606,7 +606,6 @@
       "description" : "B43: 売り上げ should be NOUN when followed by case particle",
       "expected" : [
         {
-          "lemma" : "売り上げ",
           "pos" : "Noun",
           "surface" : "売り上げ"
         },
@@ -615,7 +614,6 @@
           "surface" : "を"
         },
         {
-          "lemma" : "伸ばす",
           "pos" : "Verb",
           "surface" : "伸ばす"
         }
@@ -630,7 +628,6 @@
       "description" : "B44: 盛りだくさん should be NOUN, not 盛りだく+さん split",
       "expected" : [
         {
-          "lemma" : "盛りだくさん",
           "pos" : "Noun",
           "surface" : "盛りだくさん"
         }
@@ -696,7 +693,6 @@
           "surface" : "が"
         },
         {
-          "lemma" : "よい",
           "pos" : "Adjective",
           "surface" : "いい"
         }

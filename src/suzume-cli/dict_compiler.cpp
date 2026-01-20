@@ -16,17 +16,22 @@ namespace {
 // I-adjective conjugation suffixes for dictionary expansion
 // These are the forms that should be stored in dictionary (MeCab-compatible)
 // Excludes compound forms that should be split (e.g., くなる → く + なる)
-const std::vector<std::string> kIAdjSuffixes = {
-    "い",         // Base form: 美しい
-    "かった",     // Past: 美しかった
-    "かっ",       // Ta-connection (連用タ接続): 美しかっ+た
-    "くない",     // Negative: 美しくない
-    "くなかった", // Negative past: 美しくなかった
-    "くて",       // Te-form: 美しくて
-    "ければ",     // Conditional: 美しければ
-    "く",         // Adverbial: 美しく
-    "かったら",   // Conditional past: 美しかったら
-    "そう",       // Looks like: 美しそう
+struct IAdjSuffix {
+  const char* suffix;
+  core::ExtendedPOS extended_pos;
+};
+
+const std::vector<IAdjSuffix> kIAdjSuffixes = {
+    {"い", core::ExtendedPOS::AdjBasic},            // Base form: 美しい
+    {"かった", core::ExtendedPOS::AdjBasic},        // Past: 美しかった
+    {"かっ", core::ExtendedPOS::AdjKatt},           // Ta-connection (連用タ接続): 美しかっ+た
+    {"くない", core::ExtendedPOS::AdjBasic},        // Negative: 美しくない
+    {"くなかった", core::ExtendedPOS::AdjBasic},    // Negative past: 美しくなかった
+    {"くて", core::ExtendedPOS::AdjRenyokei},       // Te-form: 美しくて
+    {"ければ", core::ExtendedPOS::AdjKeForm},       // Conditional: 美しければ
+    {"く", core::ExtendedPOS::AdjRenyokei},         // Adverbial/Renyokei: 美しく
+    {"かったら", core::ExtendedPOS::AdjKeForm},     // Conditional past: 美しかったら
+    {"そう", core::ExtendedPOS::AdjStem},           // Looks like: 美しそう
 };
 
 // Expand i-adjective entry into all conjugated forms
@@ -44,11 +49,11 @@ std::vector<dictionary::DictionaryEntry> expandIAdjective(
   std::string stem(utf8::dropLastChar(entry.surface));
   std::string lemma = entry.lemma.empty() ? entry.surface : entry.lemma;
 
-  for (const auto& suffix : kIAdjSuffixes) {
+  for (const auto& entry_info : kIAdjSuffixes) {
     dictionary::DictionaryEntry new_entry;
-    new_entry.surface = stem + suffix;
+    new_entry.surface = stem + entry_info.suffix;
     new_entry.pos = core::PartOfSpeech::Adjective;
-    new_entry.extended_pos = core::ExtendedPOS::AdjBasic;
+    new_entry.extended_pos = entry_info.extended_pos;
     new_entry.lemma = lemma;
     result.push_back(new_entry);
   }

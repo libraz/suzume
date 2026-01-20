@@ -173,6 +173,57 @@ void addTeFormAuxiliaryCandidates(
     const std::vector<normalize::CharType>& char_types,
     const Scorer& scorer);
 
+/**
+ * @brief Add taru-adjective adverb join candidates
+ *
+ * Detects X然と patterns (taru-adjectives in adverbial form) and generates
+ * single adverb candidates. These are words like 毅然と, 平然と, 悠然と that
+ * should be treated as single adverbs rather than split as noun + particle.
+ *
+ * Examples:
+ *   "毅然と" → single adverb (not 毅然 + と)
+ *   "平然と" → single adverb (not 平然 + と)
+ *   "悠然と" → single adverb (not 悠然 + と)
+ *
+ * @param lattice Lattice to add candidates to
+ * @param text Original text
+ * @param codepoints Unicode codepoints
+ * @param start_pos Starting position in codepoints
+ * @param char_types Character types for each position
+ * @param scorer Scorer for POS priors
+ */
+void addTaruAdjectiveJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const Scorer& scorer);
+
+/**
+ * @brief Add verb renyokei + suffix noun join candidates
+ *
+ * Detects V連用形 + suffix patterns and generates compound noun candidates.
+ * Suffixes include: 物 (mono), 方 (kata/hou), 所 (tokoro), etc.
+ *
+ * Examples:
+ *   "食べ物" → compound noun (食べ + 物)
+ *   "飲み物" → compound noun (飲む + 物)
+ *   "読み方" → compound noun (読む + 方)
+ *
+ * @param lattice Lattice to add candidates to
+ * @param text Original text
+ * @param codepoints Unicode codepoints
+ * @param start_pos Starting position in codepoints
+ * @param char_types Character types for each position
+ * @param dict_manager Dictionary manager for lookups
+ * @param scorer Scorer for POS priors
+ */
+void addVerbSuffixNounJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const dictionary::DictionaryManager& dict_manager,
+    const Scorer& scorer);
+
 }  // namespace suzume::analysis
 
 #endif  // SUZUME_ANALYSIS_JOIN_CANDIDATES_H_

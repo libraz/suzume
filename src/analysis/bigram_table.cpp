@@ -85,6 +85,9 @@ BigramTable::initTable() {
   // VerbMizenkei → AuxNegativeNai (食べ+ない for ichidan) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxNegativeNai, cost::kModerateBonus);
 
+  // VerbMizenkei → AuxNegativeNu (くだら+ん contracted negative) - moderate bonus
+  setCell(t, EPOS::VerbMizenkei, EPOS::AuxNegativeNu, cost::kModerateBonus);
+
   // VerbMizenkei → AuxPassive (食べ+られる) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxPassive, cost::kModerateBonus);
 
@@ -142,8 +145,14 @@ BigramTable::initTable() {
   // AdjRenyokei → AuxNegativeNai (美しく+ない) - strong bonus
   setCell(t, EPOS::AdjRenyokei, EPOS::AuxNegativeNai, cost::kStrongBonus);
 
+  // AdjRenyokei → ParticleConj (美しく+て, ウザく+て) - strong bonus for te-form split
+  setCell(t, EPOS::AdjRenyokei, EPOS::ParticleConj, cost::kStrongBonus);
+
   // AdjKatt → AuxTenseTa (美しかっ+た) - strong bonus
   setCell(t, EPOS::AdjKatt, EPOS::AuxTenseTa, cost::kStrongBonus);
+
+  // AdjKeForm → ParticleConj (美しけれ+ば) - strong bonus for conditional splitting
+  setCell(t, EPOS::AdjKeForm, EPOS::ParticleConj, cost::kStrongBonus);
 
   // AdjBasic → AuxCopulaDesu (美しい+です) - moderate bonus
   setCell(t, EPOS::AdjBasic, EPOS::AuxCopulaDesu, cost::kModerateBonus);
@@ -282,14 +291,38 @@ BigramTable::initTable() {
   // VerbRenyokei → AuxAppearanceSou (食べ+そう) - strong bonus
   setCell(t, EPOS::VerbRenyokei, EPOS::AuxAppearanceSou, cost::kStrongBonus);
 
-  // AdjBasic → AuxConjectureRashii (美しい+らしい) - moderate bonus
-  setCell(t, EPOS::AdjBasic, EPOS::AuxConjectureRashii, cost::kModerateBonus);
+  // AdjBasic → AuxConjectureRashii (美しい+らしい) - strong bonus
+  setCell(t, EPOS::AdjBasic, EPOS::AuxConjectureRashii, cost::kStrongBonus);
 
   // VerbShuushikei → AuxConjectureRashii (食べる+らしい) - moderate bonus
   setCell(t, EPOS::VerbShuushikei, EPOS::AuxConjectureRashii, cost::kModerateBonus);
 
+  // VerbShuushikei → AuxConjectureMitai (食べる+みたい) - strong bonus
+  setCell(t, EPOS::VerbShuushikei, EPOS::AuxConjectureMitai, cost::kStrongBonus);
+
+  // AdjBasic → AuxConjectureMitai (美しい+みたい) - moderate bonus
+  setCell(t, EPOS::AdjBasic, EPOS::AuxConjectureMitai, cost::kModerateBonus);
+
   // Noun → AuxConjectureMitai (学生+みたい) - moderate bonus
   setCell(t, EPOS::Noun, EPOS::AuxConjectureMitai, cost::kModerateBonus);
+
+  // Noun → AuxConjectureRashii (春+らしい) - strong bonus
+  setCell(t, EPOS::Noun, EPOS::AuxConjectureRashii, cost::kStrongBonus);
+
+  // =========================================================================
+  // Prohibited/Penalized Connections (Grammatically Invalid or Unlikely)
+  // =========================================================================
+
+  // Note: VerbRenyokei → VerbRenyokei is NOT prohibited because:
+  // - Legitimate: 食べ+すぎる (auxiliary verb compound)
+  // - Spurious cases like 食べ→るみ are handled by scorer penalty for
+  //   non-dictionary kanji+hiragana verb renyokei candidates
+
+  // AdjStem → AuxConjectureMitai: unnatural (美し+みたい should be 美しい+みたい)
+  setCell(t, EPOS::AdjStem, EPOS::AuxConjectureMitai, cost::kProhibitive);
+
+  // AdjStem → AuxConjectureRashii: unnatural (美し+らしい should be 美しい+らしい)
+  setCell(t, EPOS::AdjStem, EPOS::AuxConjectureRashii, cost::kProhibitive);
 
   return t;
 }

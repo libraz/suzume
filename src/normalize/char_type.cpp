@@ -163,15 +163,17 @@ bool isNeverVerbStemAfterKanji(char32_t ch) {
 }
 
 bool isNeverVerbStemAtStart(char32_t ch) {
-  // Particles that never start verbs + よ, わ (sentence-final particles)
+  // Particles that never start verbs + よ (sentence-final particle)
   // Note: も, や are excluded - can start verbs (もらう, やる)
   // Note: ね is excluded - 寝る (neru, to sleep) is a common ichidan verb
   //       Connection rules will handle invalid ね(particle) + AUX patterns
   // Note: に is excluded - にげる (逃げる), にる (煮る), にぎる (握る) etc. are common verbs
   //       The particle use of に will be handled by scoring/dictionary
+  // Note: わ is excluded - わかる, わたる, わける etc. are common verbs
+  //       The sentence-final particle use of わ will be handled by scoring
   // を, が, は, へ, の are particles that never start verbs
   return ch == U'を' || ch == U'が' || ch == U'は' ||
-         ch == U'へ' || ch == U'の' || ch == U'よ' || ch == U'わ';
+         ch == U'へ' || ch == U'の' || ch == U'よ';
 }
 
 bool isDemonstrativeStart(char32_t first, char32_t second) {

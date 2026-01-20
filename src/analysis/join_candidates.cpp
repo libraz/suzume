@@ -855,6 +855,24 @@ void addKatakanaSugiruJoinCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const Scorer& scorer) {
+  // DISABLED: MeCab splits KATAKANA + すぎる into separate tokens:
+  //   シンプル 名詞,一般,*,*,*,*,*
+  //   すぎる   動詞,非自立,*,*,一段,基本形,すぎる,スギル,スギル
+  //
+  // Previously this function generated compound verb candidates like
+  // シンプルすぎる (VERB) which is not MeCab compatible.
+  //
+  // Now we rely on:
+  // 1. KATAKANA portions recognized as NOUN
+  // 2. Dictionary entries for すぎる/すぎ (VERB) to handle the verb portion
+  (void)lattice;
+  (void)text;
+  (void)codepoints;
+  (void)start_pos;
+  (void)char_types;
+  (void)scorer;
+  return;
+
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -1158,6 +1176,153 @@ void addTeFormAuxiliaryCandidates(
       }
     }
   }
+}
+
+void addVerbSuffixNounJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    [[maybe_unused]] const dictionary::DictionaryManager& dict_manager,
+    const Scorer& scorer) {
+  using CharType = normalize::CharType;
+
+  if (start_pos >= codepoints.size()) {
+    return;
+  }
+
+  // Must start with kanji (verb stem)
+  if (char_types[start_pos] != CharType::Kanji) {
+    return;
+  }
+
+  // Look for patterns: Kanji + Hiragana + Suffix(物/方/所)
+  // Examples: 食べ物, 飲み物, 読み方, 居場所
+  size_t pos = start_pos;
+
+  // Find kanji portion (verb stem)
+  size_t kanji_end = pos;
+  while (kanji_end < codepoints.size() && char_types[kanji_end] == CharType::Kanji) {
+    ++kanji_end;
+  }
+
+  if (kanji_end == pos) {
+    return;  // No kanji found
+  }
+
+  // Look for optional hiragana (verb renyokei suffix like べ, み, き)
+  size_t hiragana_end = kanji_end;
+  while (hiragana_end < codepoints.size() && char_types[hiragana_end] == CharType::Hiragana) {
+    // Only allow 1-2 hiragana characters for renyokei
+    if (hiragana_end - kanji_end >= 2) {
+      break;
+    }
+    ++hiragana_end;
+  }
+
+  // Check for suffix kanji: 物, 方, 所
+  if (hiragana_end >= codepoints.size()) {
+    return;
+  }
+
+  char32_t suffix_char = codepoints[hiragana_end];
+  bool is_mono_suffix = (suffix_char == U'物');
+  bool is_kata_suffix = (suffix_char == U'方');
+  bool is_tokoro_suffix = (suffix_char == U'所');
+
+  if (!is_mono_suffix && !is_kata_suffix && !is_tokoro_suffix) {
+    return;
+  }
+
+  // We need at least some hiragana between kanji and suffix (verb renyokei ending)
+  // Exception: single kanji + suffix is allowed for some patterns
+  if (hiragana_end == kanji_end && kanji_end - start_pos < 2) {
+    return;  // Too short without hiragana
+  }
+
+  // Build the compound noun surface
+  size_t end_pos = hiragana_end + 1;  // Include suffix
+  size_t start_byte = charPosToBytePos(codepoints, start_pos);
+  size_t end_byte = charPosToBytePos(codepoints, end_pos);
+
+  std::string surface(text.substr(start_byte, end_byte - start_byte));
+
+  // Calculate cost with bonus for compound noun pattern
+  float base_cost = scorer.posPrior(core::PartOfSpeech::Noun);
+  constexpr float kCompoundNounBonus = -1.0F;  // Moderate bonus
+  float final_cost = base_cost + kCompoundNounBonus;
+
+  uint8_t flags = core::LatticeEdge::kFromDictionary;
+
+  lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
+                  static_cast<uint32_t>(end_pos), core::PartOfSpeech::Noun,
+                  final_cost, flags, surface);  // lemma = surface for compound nouns
+}
+
+void addTaruAdjectiveJoinCandidates(
+    core::Lattice& lattice, std::string_view text,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
+    const std::vector<normalize::CharType>& char_types,
+    const Scorer& scorer) {
+  using CharType = normalize::CharType;
+
+  if (start_pos >= codepoints.size()) {
+    return;
+  }
+
+  // Must start with kanji
+  if (char_types[start_pos] != CharType::Kanji) {
+    return;
+  }
+
+  // Look for X然と pattern where X is 1+ kanji
+  // Need at least 3 characters: X + 然 + と
+  if (start_pos + 2 >= codepoints.size()) {
+    return;
+  }
+
+  // Find the kanji portion (including 然)
+  size_t kanji_end = start_pos + 1;
+  while (kanji_end < codepoints.size() && char_types[kanji_end] == CharType::Kanji) {
+    ++kanji_end;
+  }
+
+  // Need at least 2 kanji, and the last one must be 然
+  if (kanji_end - start_pos < 2) {
+    return;
+  }
+
+  // Check if the last kanji is 然
+  char32_t last_kanji = codepoints[kanji_end - 1];
+  if (last_kanji != U'然') {
+    return;
+  }
+
+  // Next character must be と (hiragana)
+  if (kanji_end >= codepoints.size() || codepoints[kanji_end] != U'と') {
+    return;
+  }
+
+  // Build the surface: X然と
+  size_t start_byte = charPosToBytePos(codepoints, start_pos);
+  size_t end_pos = kanji_end + 1;  // Include と
+  size_t end_byte = charPosToBytePos(codepoints, end_pos);
+
+  std::string surface(text.substr(start_byte, end_byte - start_byte));
+
+  // X然 without と is the lemma
+  size_t zen_end_byte = charPosToBytePos(codepoints, kanji_end);
+  std::string lemma(text.substr(start_byte, zen_end_byte - start_byte));
+
+  // Calculate cost with bonus for this pattern
+  float base_cost = scorer.posPrior(core::PartOfSpeech::Adverb);
+  constexpr float kTaruAdverbBonus = -1.5F;  // Strong bonus to beat Noun + Particle
+  float final_cost = base_cost + kTaruAdverbBonus;
+
+  uint8_t flags = core::LatticeEdge::kFromDictionary;
+
+  lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
+                  static_cast<uint32_t>(end_pos), core::PartOfSpeech::Adverb,
+                  final_cost, flags, lemma);
 }
 
 }  // namespace suzume::analysis

@@ -190,6 +190,32 @@ class Tokenizer {
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
+   * @brief Add taru-adjective adverb join candidates (X然と pattern)
+   *
+   * Detects X然と patterns and generates single adverb candidates.
+   *
+   * Examples:
+   *   "毅然と" → single adverb (not 毅然 + と)
+   *   "平然と" → single adverb (not 平然 + と)
+   */
+  void addTaruAdjectiveJoinCandidates(
+      core::Lattice& lattice, std::string_view text,
+      const std::vector<char32_t>& codepoints, size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
+   * @brief Add verb renyokei + suffix noun join candidates (V連用形 + 物/方/所)
+   *
+   * Examples:
+   *   "食べ物" → compound noun (食べ + 物)
+   *   "読み方" → compound noun (読む + 方)
+   */
+  void addVerbSuffixNounJoinCandidates(
+      core::Lattice& lattice, std::string_view text,
+      const std::vector<char32_t>& codepoints, size_t start_pos,
+      const std::vector<normalize::CharType>& char_types) const;
+
+  /**
    * @brief Convert character position to byte position
    */
   static size_t charPosToBytePos(const std::vector<char32_t>& codepoints, size_t char_pos);

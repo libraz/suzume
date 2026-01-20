@@ -306,7 +306,9 @@ Subcommands:
   remove <surface> [pos] Remove entry from selected dictionary
   list [--pos=POS] [--pattern=PATTERN] [--limit=N]
                          List entries in selected dictionary
-  search <pattern>       Search entries by pattern
+  search <file> <pattern>
+                         Search entries by pattern in file
+  lookup <word>          Look up word in all dictionaries (L1 + L2)
   new <file.tsv>         Create new dictionary file
   info [file]            Show dictionary information
   validate [file]        Validate dictionary
@@ -327,6 +329,7 @@ Conjugation Types (for VERB/ADJECTIVE):
   SURU, KURU, I_ADJ, NA_ADJ
 
 Examples:
+  suzume-cli dict lookup すぎる
   suzume-cli dict new user.tsv
   suzume-cli dict select user.tsv
   suzume-cli dict add "Tokyo" PROPN "Tokyo" 0.3

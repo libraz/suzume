@@ -36,7 +36,8 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
                         [[maybe_unused]] CandidateOrigin origin,
                         [[maybe_unused]] float origin_confidence,
                         [[maybe_unused]] std::string_view origin_detail,
-                        ExtendedPOS extended_pos) {
+                        ExtendedPOS extended_pos,
+                        [[maybe_unused]] std::string_view epos_source) {
   if (start > text_length_ || all_edges_.size() >= kMaxEdges) {
     return static_cast<size_t>(-1);
   }
@@ -66,6 +67,12 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
     origin_detail_storage_.emplace_back(origin_detail);
     stored_origin_detail = origin_detail_storage_.back();
   }
+  // Store epos_source if provided (debug only)
+  std::string_view stored_epos_source;
+  if (!epos_source.empty()) {
+    epos_source_storage_.emplace_back(epos_source);
+    stored_epos_source = epos_source_storage_.back();
+  }
 #endif
 
   LatticeEdge edge;
@@ -75,16 +82,29 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
   edge.surface = stored_surface;
   edge.pos = pos;
   // Set extended_pos: use provided value if not Unknown, otherwise auto-detect
+  // Track source for debug builds
+#ifdef SUZUME_DEBUG_INFO
+  const char* auto_epos_source = nullptr;
+#endif
   if (extended_pos != ExtendedPOS::Unknown) {
     edge.extended_pos = extended_pos;
   } else if (pos == PartOfSpeech::Verb) {
     // Auto-detect verb form from surface
     edge.extended_pos = detectVerbForm(stored_surface, {});
+#ifdef SUZUME_DEBUG_INFO
+    auto_epos_source = "lattice_auto_verb";
+#endif
   } else if (pos == PartOfSpeech::Adjective) {
     // Auto-detect adjective form from surface
     edge.extended_pos = detectAdjForm(stored_surface, conj_type == dictionary::ConjugationType::NaAdjective);
+#ifdef SUZUME_DEBUG_INFO
+    auto_epos_source = "lattice_auto_adj";
+#endif
   } else {
     edge.extended_pos = posToExtendedPos(pos);
+#ifdef SUZUME_DEBUG_INFO
+    auto_epos_source = "lattice_default";
+#endif
   }
   edge.cost = cost;
   edge.flags = static_cast<EdgeFlags>(flags);
@@ -95,6 +115,9 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
   edge.origin = origin;
   edge.origin_confidence = origin_confidence;
   edge.origin_detail = stored_origin_detail;
+  // Use provided epos_source if available, otherwise use auto-detected source
+  edge.epos_source = !stored_epos_source.empty() ? stored_epos_source :
+                     (auto_epos_source ? std::string_view(auto_epos_source) : std::string_view{});
 #endif
 
   all_edges_.push_back(edge);
@@ -162,6 +185,7 @@ void Lattice::clear() {
   reading_storage_.clear();
 #ifdef SUZUME_DEBUG_INFO
   origin_detail_storage_.clear();
+  epos_source_storage_.clear();
 #endif
   edge_count_ = 0;
 }

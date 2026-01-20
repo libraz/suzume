@@ -31,6 +31,7 @@ my $test_file = '';
 my $test_id = '';
 my $analyze_all = 0;
 my $json_output = 0;
+my $show_debug = 0;
 my $help = 0;
 
 GetOptions(
@@ -39,6 +40,7 @@ GetOptions(
     't|test-id=s' => \$test_id,
     'a|all'       => \$analyze_all,
     'j|json'      => \$json_output,
+    'd|debug'     => \$show_debug,
     'h|help'      => \$help,
 ) or die "Error in command line arguments\n";
 
@@ -53,11 +55,13 @@ Options:
   -f, --file FILE    Analyze test cases from JSON file
   -t, --test-id ID   Analyze specific test ID from /tmp/test.txt
   -a, --all          Analyze all failures from /tmp/test.txt
+  -d, --debug        Show Suzume scoring details (costs, connections)
   -j, --json         Output as JSON (for Claude)
   -h, --help         Show this help
 
 Examples:
   ./scripts/diff_analysis.pl -i "食べています"
+  ./scripts/diff_analysis.pl -i "食べています" -d   # with cost breakdown
   ./scripts/diff_analysis.pl -t "basic/0042"
   ./scripts/diff_analysis.pl -a
   ./scripts/diff_analysis.pl -a -j
@@ -104,6 +108,74 @@ sub get_suzume_tokens {
         push @tokens, $surface if defined $surface && $surface ne '';
     }
     return \@tokens;
+}
+
+sub get_suzume_debug_info {
+    my ($text) = @_;
+    return {} unless -x $suzume_cli;
+
+    my $escaped = $text;
+    $escaped =~ s/'/'\\''/g;
+    my $output = `SUZUME_DEBUG=2 '$suzume_cli' '$escaped' 2>&1`;
+    utf8::decode($output);
+
+    my %info = (
+        best_path => '',
+        total_cost => 0,
+        margin => 0,
+        tokens => [],
+        connections => [],
+    );
+
+    # Parse best path line
+    if ($output =~ /\[VITERBI\] Best path \(cost=([-\d.]+)\): (.+?) \[margin=([-\d.]+)\]/) {
+        $info{total_cost} = $1;
+        $info{best_path} = $2;
+        $info{margin} = $3;
+    }
+
+    # Parse token costs from best path
+    # Format: "surface"(POS/EPOS) → ...
+    my @path_parts = split / → /, $info{best_path};
+    for my $part (@path_parts) {
+        if ($part =~ /"(.+?)"\((\w+)\/(\w+)\)/) {
+            push @{$info{tokens}}, {
+                surface => $1,
+                pos => $2,
+                epos => $3,
+            };
+        }
+    }
+
+    # Parse CONN lines for connection costs
+    while ($output =~ /\[CONN\] "(.+?)" \((\w+)\/\w+\) → "(.+?)" \((\w+)\/\w+\): bigram=([-\d.]+) epos_adj=([-\d.]+) \(([^)]+)\) total=([-\d.]+)/g) {
+        push @{$info{connections}}, {
+            from_surface => $1,
+            from_pos => $2,
+            to_surface => $3,
+            to_pos => $4,
+            bigram => $5,
+            epos_adj => $6,
+            reason => $7,
+            total => $8,
+        };
+    }
+
+    # Parse WORD lines for word costs
+    my @word_costs;
+    while ($output =~ /\[WORD\] "(.+?)" \(([^)]+)\) cost=([-\d.]+) \(from edge\) \[cat=([-\d.]+) edge=([-\d.]+) epos=([^\]]+)\]/g) {
+        push @word_costs, {
+            surface => $1,
+            source => $2,
+            cost => $3,
+            cat_cost => $4,
+            edge_cost => $5,
+            epos => $6,
+        };
+    }
+    $info{word_costs} = \@word_costs;
+
+    return \%info;
 }
 
 sub get_expected_tokens {
@@ -204,7 +276,7 @@ sub format_tokens {
 }
 
 sub analyze_input {
-    my ($input, $test_id, $expected) = @_;
+    my ($input, $test_id, $expected, $with_debug) = @_;
 
     $expected //= [];
     my $mecab = get_mecab_tokens($input);
@@ -222,7 +294,7 @@ sub analyze_input {
     my $mecab_diff = find_diff_indices($mecab, $suzume);
     my $exp_diff = find_diff_indices($expected, $mecab) if @$expected;
 
-    return {
+    my $result = {
         input => $input,
         test_id => $test_id,
         expected => $expected,
@@ -238,6 +310,13 @@ sub analyze_input {
             expected_vs_mecab => $exp_diff // [],
         },
     };
+
+    # Add debug info if requested
+    if ($with_debug) {
+        $result->{debug} = get_suzume_debug_info($input);
+    }
+
+    return $result;
 }
 
 sub print_analysis {
@@ -279,6 +358,47 @@ sub print_analysis {
             print "  [$i] MeCab='$m' vs Suzume='$s'\n";
         }
     }
+
+    # Show debug info if available
+    if ($result->{debug} && $result->{debug}{best_path}) {
+        my $debug = $result->{debug};
+        print "─" x 60, "\n";
+        print "Suzume Scoring Details:\n";
+        printf "  Total cost: %.3f  Margin: %.3f\n", $debug->{total_cost}, $debug->{margin};
+        print "  Path: $debug->{best_path}\n";
+
+        # Show word costs for tokens in best path
+        if (@{$debug->{tokens}}) {
+            print "\n  Token costs:\n";
+            for my $tok (@{$debug->{tokens}}) {
+                # Find matching word cost
+                my ($wc) = grep { $_->{surface} eq $tok->{surface} } @{$debug->{word_costs}};
+                if ($wc) {
+                    printf "    \"%s\" (%s): cost=%.2f [cat=%.2f edge=%.2f src=%s]\n",
+                        $tok->{surface}, $tok->{epos}, $wc->{cost}, $wc->{cat_cost}, $wc->{edge_cost}, $wc->{source};
+                } else {
+                    printf "    \"%s\" (%s/%s)\n", $tok->{surface}, $tok->{pos}, $tok->{epos};
+                }
+            }
+        }
+
+        # Show relevant connections
+        if (@{$debug->{connections}}) {
+            print "\n  Connections:\n";
+            my %seen;
+            for my $conn (@{$debug->{connections}}) {
+                # Only show connections for tokens in best path
+                my $key = "$conn->{from_surface}→$conn->{to_surface}";
+                next if $seen{$key}++;
+                my $in_path = grep { $_->{surface} eq $conn->{from_surface} || $_->{surface} eq $conn->{to_surface} } @{$debug->{tokens}};
+                next unless $in_path;
+                printf "    \"%s\"→\"%s\": bigram=%.2f epos=%.2f (%s)\n",
+                    $conn->{from_surface}, $conn->{to_surface},
+                    $conn->{bigram}, $conn->{epos_adj}, $conn->{reason};
+            }
+        }
+    }
+
     print "\n";
 }
 
@@ -312,13 +432,13 @@ sub get_failures_from_test_output {
 my @results;
 
 if ($input_str) {
-    my $result = analyze_input($input_str, '', []);
+    my $result = analyze_input($input_str, '', [], $show_debug);
     push @results, $result;
 }
 elsif ($test_id) {
     my $input = find_input_for_test($test_id);
     if ($input) {
-        my $result = analyze_input($input, $test_id, []);
+        my $result = analyze_input($input, $test_id, [], $show_debug);
         push @results, $result;
     } else {
         die "Could not find test case: $test_id\n";
@@ -334,7 +454,9 @@ elsif ($analyze_all) {
     print STDERR "Analyzing ", scalar(@$failures), " failures...\n\n";
 
     for my $f (@$failures) {
-        my $result = analyze_input($f->{input}, $f->{id}, []);
+        # Only show debug for first few when analyzing all (expensive)
+        my $with_debug = $show_debug && @results < 5;
+        my $result = analyze_input($f->{input}, $f->{id}, [], $with_debug);
         push @results, $result;
     }
 }

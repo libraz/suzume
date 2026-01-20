@@ -16,30 +16,44 @@ Postprocessor::Postprocessor(const dictionary::DictionaryManager* dict_manager,
 std::vector<core::Morpheme> Postprocessor::process(
     const std::vector<core::Morpheme>& morphemes) const {
   std::vector<core::Morpheme> result = morphemes;
+  [[maybe_unused]] size_t before_count = 0;
 
   // Note: NOUN + SUFFIX merging is intentionally disabled.
   // We keep tokens separate: PREFIX + NOUN + SUFFIX
   // e.g., お姉さん → お(PREFIX) + 姉(NOUN) + さん(SUFFIX)
   // result = mergeNounSuffix(result);
+  SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] mergeNounSuffix: disabled\n");
 
   // Convert PREFIX + VERB to PREFIX + NOUN (renyoukei nominalization)
   // e.g., お願い → お(PREFIX) + 願い(NOUN), not 願い(VERB)
+  before_count = result.size();
   result = convertPrefixVerbToNoun(result);
+  // Note: this function logs individual changes, so no summary needed
 
   // Merge consecutive numeric expressions (always applied)
+  before_count = result.size();
   result = mergeNumericExpressions(result);
+  if (result.size() != before_count) {
+    SUZUME_DEBUG_LOG("[POSTPROC] mergeNumericExpressions: " << before_count << " → " << result.size() << "\n");
+  }
 
-  // Merge na-adjective + な into attributive form (always applied)
-  result = mergeNaAdjectiveNa(result);
+  // Disabled for MeCab compatibility (MeCab keeps na-adjective + な separate)
+  // result = mergeNaAdjectiveNa(result);
+  SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] mergeNaAdjectiveNa: disabled (MeCab compat)\n");
 
   // Apply lemmatization
   if (options_.lemmatize) {
     lemmatizer_.lemmatizeAll(result);
+    SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] lemmatize: applied\n");
   }
 
   // Merge noun compounds
   if (options_.merge_noun_compounds) {
+    before_count = result.size();
     result = mergeNounCompounds(result);
+    if (result.size() != before_count) {
+      SUZUME_DEBUG_LOG("[POSTPROC] mergeNounCompounds: " << before_count << " → " << result.size() << "\n");
+    }
   }
 
   // Filter unwanted morphemes

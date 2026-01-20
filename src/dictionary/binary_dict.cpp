@@ -4,6 +4,10 @@
 #include <cstring>
 #include <fstream>
 
+#include "analysis/category_cost.h"
+#include "core/debug.h"
+#include "core/utf8_constants.h"
+
 namespace suzume::dictionary {
 
 namespace {
@@ -158,8 +162,66 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
     // Determine extended_pos from flags for backwards compatibility
     if ((rec.flags & kFlagFormalNoun) != 0) {
       entry.extended_pos = core::ExtendedPOS::NounFormal;
+    } else {
+      // Derive default extended_pos from POS for proper cost calculation
+      switch (entry.pos) {
+        case core::PartOfSpeech::Adjective: {
+          // Distinguish I-adjective forms from NA-adjective based on ending
+          // I-adjective forms: い, く, くて, かった, かっ, ければ, そう, etc.
+          // NA-adjectives: don't end in these patterns
+          // Exceptions: きれい, きらい are na-adjectives ending in い
+          using namespace std::string_view_literals;
+          if (utf8::endsWithAny(entry.surface, {"きれい"sv, "きらい"sv, "嫌い"sv, "綺麗"sv})) {
+            entry.extended_pos = core::ExtendedPOS::AdjNaAdj;
+          } else if (utf8::endsWith(entry.surface, "い")) {
+            entry.extended_pos = core::ExtendedPOS::AdjBasic;
+          } else if (utf8::endsWithAny(entry.surface, {"く"sv, "くて"sv})) {
+            // く-form (adverbial/te-form): 美しく, 美しくて
+            entry.extended_pos = core::ExtendedPOS::AdjRenyokei;
+          } else if (utf8::endsWithAny(entry.surface, {"かっ"sv})) {
+            // かっ-form (past stem): 美しかっ
+            entry.extended_pos = core::ExtendedPOS::AdjKatt;
+          } else if (utf8::endsWithAny(entry.surface, {"ければ"sv, "かったら"sv})) {
+            // Conditional forms: 美しければ, 美しかったら
+            entry.extended_pos = core::ExtendedPOS::AdjKeForm;
+          } else if (utf8::endsWithAny(entry.surface, {"そう"sv})) {
+            // Stem+そう: 美しそう
+            entry.extended_pos = core::ExtendedPOS::AdjStem;
+          } else {
+            // Doesn't match I-adjective patterns → NA-adjective
+            entry.extended_pos = core::ExtendedPOS::AdjNaAdj;
+          }
+          break;
+        }
+        case core::PartOfSpeech::Verb:
+          entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
+          break;
+        case core::PartOfSpeech::Noun:
+          entry.extended_pos = core::ExtendedPOS::Noun;
+          break;
+        case core::PartOfSpeech::Adverb:
+          entry.extended_pos = core::ExtendedPOS::Adverb;
+          break;
+        case core::PartOfSpeech::Particle:
+          entry.extended_pos = core::ExtendedPOS::ParticleCase;
+          break;
+        case core::PartOfSpeech::Auxiliary:
+          entry.extended_pos = core::ExtendedPOS::AuxTenseTa;  // Default aux
+          break;
+        default:
+          entry.extended_pos = core::ExtendedPOS::Unknown;
+          break;
+      }
     }
     // is_low_info, is_prefix, conj_type are no longer stored
+
+    // Debug: log entries with Unknown extended_pos (indicates missing category mapping)
+    // These entries get high cost (2.0) which may cause unexpected tokenization
+    // At trace level (SUZUME_DEBUG=3) to avoid flooding output at lower levels
+    if (entry.extended_pos == core::ExtendedPOS::Unknown) {
+      SUZUME_DEBUG_LOG_TRACE("[DICT_LOAD] WARNING: \"" << entry.surface << "\" pos="
+          << core::posToString(entry.pos) << " has epos=UNKNOWN (cost=2.0)\n");
+    }
 
     entries_.push_back(std::move(entry));
   }

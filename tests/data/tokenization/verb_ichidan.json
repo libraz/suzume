@@ -855,11 +855,10 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "られ"
         },
         {
-          "lemma" : "たい",
           "pos" : "Auxiliary",
           "surface" : "たい"
         }

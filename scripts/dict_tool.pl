@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # L2 Dictionary helper for adding entries safely
-# Usage: ./scripts/dict_add.pl <command> [options]
+# Usage: ./scripts/dict_tool.pl <command> [options]
 #
 # Commands:
 #   check <word>             Check if word can be added (MeCab analysis + duplicates)
@@ -18,11 +18,11 @@
 # Conjugation types: I_ADJ, NA_ADJ, GODAN_KA/GA/SA/TA/NA/BA/MA/RA/WA, ICHIDAN, IRREGULAR
 #
 # Examples:
-#   ./scripts/dict_add.pl check "Wi-Fi"           # Check if Wi-Fi can be added
-#   ./scripts/dict_add.pl suggest "食べる"         # Get POS/conj suggestion
-#   ./scripts/dict_add.pl add "Wi-Fi" NOUN        # Add Wi-Fi as noun
-#   ./scripts/dict_add.pl add "美味しい" ADJECTIVE I_ADJ  # Add i-adjective
-#   ./scripts/dict_add.pl validate                # Check dictionary for issues
+#   ./scripts/dict_tool.pl check "Wi-Fi"           # Check if Wi-Fi can be added
+#   ./scripts/dict_tool.pl suggest "食べる"         # Get POS/conj suggestion
+#   ./scripts/dict_tool.pl add "Wi-Fi" NOUN        # Add Wi-Fi as noun
+#   ./scripts/dict_tool.pl add "美味しい" ADJECTIVE I_ADJ  # Add i-adjective
+#   ./scripts/dict_tool.pl validate                # Check dictionary for issues
 #
 # Safety checks:
 #   - Rejects words that MeCab splits (unless --force)
@@ -36,6 +36,9 @@ use utf8;
 use Getopt::Long;
 use File::Basename;
 use Encode qw(decode encode);
+use FindBin qw($RealBin);
+use lib "$RealBin/lib";
+use SuzumeUtils qw(mecab_analyze get_suzume_rule apply_suzume_merge @NAI_ADJECTIVES);
 
 binmode(STDOUT, ':utf8');
 binmode(STDERR, ':utf8');
@@ -63,10 +66,19 @@ if ($help || @ARGV == 0) {
 
 my $command = shift @ARGV;
 
+# Decode UTF-8 command line arguments
+utf8::decode($_) for @ARGV;
+
 if ($command eq 'check') {
     cmd_check(@ARGV);
 } elsif ($command eq 'add') {
     cmd_add(@ARGV);
+} elsif ($command eq 'remove') {
+    cmd_remove(@ARGV);
+} elsif ($command eq 'disable') {
+    cmd_disable(@ARGV);
+} elsif ($command eq 'enable') {
+    cmd_enable(@ARGV);
 } elsif ($command eq 'validate') {
     cmd_validate(@ARGV);
 } elsif ($command eq 'suggest') {
@@ -79,11 +91,14 @@ sub print_help {
     print <<'HELP';
 L2 Dictionary helper for adding entries safely
 
-Usage: ./scripts/dict_add.pl <command> [options]
+Usage: ./scripts/dict_tool.pl <command> [options]
 
 Commands:
   check <word>             Check if word can be added (MeCab analysis + duplicates)
   add <word> <pos> [conj]  Add word to dictionary (with safety checks)
+  remove <word>            Remove word from dictionary
+  disable <word>           Comment out word (keeps in file, but inactive)
+  enable <word>            Uncomment disabled word
   validate                 Validate entire dictionary for issues
   suggest <word>           Suggest POS and conj_type based on MeCab
 
@@ -96,52 +111,20 @@ POS values: ADJECTIVE, ADVERB, VERB, NOUN, PRONOUN, PREFIX, SUFFIX, INTERJECTION
 Conjugation types: I_ADJ, NA_ADJ, GODAN_KA/GA/SA/TA/NA/BA/MA/RA/WA, ICHIDAN, IRREGULAR
 
 Examples:
-  ./scripts/dict_add.pl check "Wi-Fi"
-  ./scripts/dict_add.pl suggest "食べる"
-  ./scripts/dict_add.pl add "Wi-Fi" NOUN
-  ./scripts/dict_add.pl add "美味しい" ADJECTIVE I_ADJ
-  ./scripts/dict_add.pl validate
+  ./scripts/dict_tool.pl check "Wi-Fi"
+  ./scripts/dict_tool.pl suggest "食べる"
+  ./scripts/dict_tool.pl add "Wi-Fi" NOUN
+  ./scripts/dict_tool.pl add "美味しい" ADJECTIVE I_ADJ
+  ./scripts/dict_tool.pl remove "不要な単語"
+  ./scripts/dict_tool.pl disable "一時無効"
+  ./scripts/dict_tool.pl enable "一時無効"
+  ./scripts/dict_tool.pl validate
 HELP
 }
 
 # =============================================================================
-# MeCab interface
+# Local utilities (not in shared module)
 # =============================================================================
-
-sub mecab_analyze {
-    my ($word) = @_;
-    # Use pipe to avoid shell escaping issues
-    open my $mecab, '|-', 'mecab 2>/dev/null > /tmp/mecab_out.txt' or die "Cannot run mecab: $!";
-    binmode($mecab, ':utf8');
-    print $mecab $word, "\n";
-    close $mecab;
-
-    open my $fh, '<:utf8', '/tmp/mecab_out.txt' or die "Cannot read mecab output: $!";
-    my $output = do { local $/; <$fh> };
-    close $fh;
-
-    my @tokens;
-    for my $line (split /\n/, $output) {
-        last if $line eq 'EOS';
-        next unless $line =~ /\t/;
-
-        my ($surface, $features) = split /\t/, $line, 2;
-        my @f = split /,/, $features;
-
-        push @tokens, {
-            surface  => $surface,
-            pos      => $f[0] // '',
-            pos_sub1 => $f[1] // '',
-            pos_sub2 => $f[2] // '',
-            pos_sub3 => $f[3] // '',
-            conj_type=> $f[4] // '',
-            conj_form=> $f[5] // '',
-            lemma    => $f[6] // $surface,
-            reading  => $f[7] // '',
-        };
-    }
-    return @tokens;
-}
 
 sub is_base_form {
     my ($token) = @_;
@@ -333,15 +316,22 @@ sub find_section_for_pos {
 
 sub cmd_check {
     my ($word) = @_;
-    die "Usage: dict_add.pl check <word>\n" unless $word;
+    die "Usage: dict_tool.pl check <word>\n" unless $word;
 
     print "=" x 60, "\n";
     print "Checking: $word\n";
     print "=" x 60, "\n\n";
 
+    # 0. Check Suzume normalization rules first
+    my $suzume_rule = get_suzume_rule($word);
+    if ($suzume_rule) {
+        print "ℹ️  Suzume rule detected: $suzume_rule\n";
+        print "   Suzume treats '$word' as 1 token (MeCab may split it)\n\n";
+    }
+
     # 1. MeCab analysis
     print "MeCab analysis:\n";
-    my @tokens = mecab_analyze($word);
+    my @tokens = @{mecab_analyze($word)};
 
     my $is_single_token = (@tokens == 1);
     my $is_base = $is_single_token && is_base_form($tokens[0]);
@@ -358,18 +348,22 @@ sub cmd_check {
 
     # 2. Token count warning
     if (!$is_single_token) {
-        print "⚠️  WARNING: MeCab splits this word into ", scalar(@tokens), " tokens\n";
-        print "   This is typically fine for compound words (Wi-Fi, 経済成長)\n";
-        print "   but NOT for conjugated forms (よくない = よい + ない)\n\n";
+        if ($suzume_rule) {
+            print "✓  MeCab splits, but Suzume rule ($suzume_rule) keeps as 1 token\n\n";
+        } else {
+            print "⚠️  WARNING: MeCab splits this word into ", scalar(@tokens), " tokens\n";
+            print "   This is typically fine for compound words (Wi-Fi, 経済成長)\n";
+            print "   but NOT for conjugated forms (よくない = よい + ない)\n\n";
 
-        # Check if it looks like a conjugated form
-        if (@tokens == 2) {
-            my $t2 = $tokens[1];
-            if ($t2->{pos} eq '助動詞' || $t2->{pos} eq '助詞') {
-                print "⚠️  CAUTION: Looks like a conjugated form\n";
-                print "   '$word' = '$tokens[0]{surface}' + '$t2->{surface}' ($t2->{pos})\n";
-                print "   If this is a proper noun (title, name), use PROPER_NOUN\n";
-                print "   Otherwise, register the base form '$tokens[0]{lemma}' instead\n\n";
+            # Check if it looks like a conjugated form
+            if (@tokens == 2) {
+                my $t2 = $tokens[1];
+                if ($t2->{pos} eq '助動詞' || $t2->{pos} eq '助詞') {
+                    print "⚠️  CAUTION: Looks like a conjugated form\n";
+                    print "   '$word' = '$tokens[0]{surface}' + '$t2->{surface}' ($t2->{pos})\n";
+                    print "   If this is a proper noun (title, name), use PROPER_NOUN\n";
+                    print "   Otherwise, register the base form '$tokens[0]{lemma}' instead\n\n";
+                }
             }
         }
     } else {
@@ -410,15 +404,15 @@ sub cmd_check {
             print "  $entry\n\n";
 
             print "To add:\n";
-            print "  ./scripts/dict_add.pl add \"$word\" $suggested_pos";
+            print "  ./scripts/dict_tool.pl add \"$word\" $suggested_pos";
             print " $suggested_conj" if $suggested_conj;
             print "\n";
         }
     } elsif (@tokens > 1) {
         print "For compound words:\n";
-        print "  ./scripts/dict_add.pl add \"$word\" NOUN --force\n\n";
+        print "  ./scripts/dict_tool.pl add \"$word\" NOUN --force\n\n";
         print "For proper nouns (titles, names):\n";
-        print "  ./scripts/dict_add.pl add \"$word\" PROPER_NOUN\n";
+        print "  ./scripts/dict_tool.pl add \"$word\" PROPER_NOUN\n";
     }
 
     return 1;
@@ -426,9 +420,9 @@ sub cmd_check {
 
 sub cmd_suggest {
     my ($word) = @_;
-    die "Usage: dict_add.pl suggest <word>\n" unless $word;
+    die "Usage: dict_tool.pl suggest <word>\n" unless $word;
 
-    my @tokens = mecab_analyze($word);
+    my @tokens = @{mecab_analyze($word)};
 
     if (@tokens == 0) {
         print "Unknown word (not in MeCab dictionary)\n";
@@ -441,7 +435,7 @@ sub cmd_suggest {
             print "  $t->{surface}\t$t->{pos},$t->{pos_sub1}\n";
         }
         print "\nIf this is a compound word, use:\n";
-        print "  ./scripts/dict_add.pl add \"$word\" NOUN\n";
+        print "  ./scripts/dict_tool.pl add \"$word\" NOUN\n";
         return;
     }
 
@@ -459,7 +453,7 @@ sub cmd_suggest {
         print "  POS: $pos\n";
         print "  Conj: $conj\n" if $conj;
         print "\nCommand:\n";
-        print "  ./scripts/dict_add.pl add \"$word\" $pos";
+        print "  ./scripts/dict_tool.pl add \"$word\" $pos";
         print " $conj" if $conj;
         print "\n";
     } else {
@@ -470,7 +464,7 @@ sub cmd_suggest {
 
 sub cmd_add {
     my ($word, $pos, $conj_type) = @_;
-    die "Usage: dict_add.pl add <word> <pos> [conj_type]\n" unless $word && $pos;
+    die "Usage: dict_tool.pl add <word> <pos> [conj_type]\n" unless $word && $pos;
 
     # Validate POS
     my @valid_pos = qw(ADJECTIVE ADVERB VERB NOUN PROPER_NOUN PRONOUN PREFIX SUFFIX INTERJECTION ADNOMINAL CONJUNCTION);
@@ -493,23 +487,29 @@ sub cmd_add {
     }
 
     # MeCab check (skip for proper nouns - titles, names can look like conjugated forms)
-    my @tokens = mecab_analyze($word);
+    my @tokens = @{mecab_analyze($word)};
     my $skip_conj_check = ($pos eq 'PROPER_NOUN');
+    my $suzume_rule = get_suzume_rule($word);
 
     if (@tokens > 1 && !$force && !$skip_conj_check) {
-        print "⚠️  MeCab splits '$word' into ", scalar(@tokens), " tokens:\n";
-        for my $t (@tokens) {
-            print "    $t->{surface}\t$t->{pos}\n";
-        }
+        # Allow if Suzume rule keeps it as 1 token
+        if ($suzume_rule) {
+            print "ℹ️  MeCab splits but Suzume rule ($suzume_rule) keeps as 1 token - OK\n";
+        } else {
+            print "⚠️  MeCab splits '$word' into ", scalar(@tokens), " tokens:\n";
+            for my $t (@tokens) {
+                print "    $t->{surface}\t$t->{pos}\n";
+            }
 
-        # Check for conjugated forms
-        if (@tokens == 2 && ($tokens[1]{pos} eq '助動詞' || $tokens[1]{pos} eq '助詞')) {
-            die "\n❌ REJECT: This appears to be a conjugated form.\n" .
-                "   Register '$tokens[0]{lemma}' instead, or use PROPER_NOUN for titles/names.\n";
-        }
+            # Check for conjugated forms
+            if (@tokens == 2 && ($tokens[1]{pos} eq '助動詞' || $tokens[1]{pos} eq '助詞')) {
+                die "\n❌ REJECT: This appears to be a conjugated form.\n" .
+                    "   Register '$tokens[0]{lemma}' instead, or use PROPER_NOUN for titles/names.\n";
+            }
 
-        print "\nTo add anyway, use --force\n";
-        return 0;
+            print "\nTo add anyway, use --force\n";
+            return 0;
+        }
     } elsif (@tokens > 1 && $skip_conj_check) {
         print "ℹ️  Note: MeCab splits '$word' but allowing as PROPER_NOUN\n";
     }
@@ -518,29 +518,35 @@ sub cmd_add {
     my $entry_line = "$word\t$pos";
     $entry_line .= "\t$conj_type" if $conj_type;
 
+    # Find insertion point (grouped by POS and conj_type)
+    my ($insert_after, $placement) = find_insertion_point($pos, $conj_type);
+
     if ($dry_run) {
         print "Would add to $dict_path:\n";
         print "  $entry_line\n";
+        print "  Placement: $placement (line $insert_after)\n" if $insert_after >= 0;
         return 1;
     }
-
-    # Find insertion point (at end of appropriate section)
-    my $section = find_section_for_pos($pos);
-    my $insert_after = find_section_end($section);
 
     if ($insert_after < 0) {
         # No section found, append to end
         open my $fh, '>>:utf8', $dict_path or die "Cannot open $dict_path: $!\n";
         print $fh "\n$entry_line\n";
         close $fh;
+        print "✓ Added: $entry_line (appended to end)\n";
     } else {
-        # Insert after section end
+        # Insert after the found line
         insert_line_at($dict_path, $insert_after, $entry_line);
+        my $placement_msg = {
+            same_group    => "grouped with same $pos/$conj_type",
+            same_pos      => "added to $pos section",
+            section_end   => "added at end of section",
+            section_start => "added at start of section",
+        }->{$placement} // $placement;
+        print "✓ Added: $entry_line ($placement_msg)\n";
     }
 
-    print "✓ Added: $entry_line\n";
-    print "\nRemember to recompile the dictionary:\n";
-    print "  ./build/bin/suzume-cli dict compile data/core/dictionary.tsv data/core.dic\n";
+    print "  Recompile: ./build/bin/suzume-cli dict compile $dict_path data/core.dic\n";
 
     return 1;
 }
@@ -578,6 +584,79 @@ sub find_section_end {
     return $last_entry_line;
 }
 
+# Find insertion point for entry, grouping by POS and conj_type
+sub find_insertion_point {
+    my ($target_pos, $target_conj) = @_;
+    $target_conj //= '';
+
+    open my $fh, '<:utf8', $dict_path or die "Cannot open $dict_path: $!\n";
+    my @lines = <$fh>;
+    close $fh;
+
+    my $section = find_section_for_pos($target_pos);
+    my $in_section = 0;
+    my $section_start = -1;
+    my $section_end = -1;
+    my $last_matching_line = -1;
+    my $last_same_pos_line = -1;
+
+    for my $i (0 .. $#lines) {
+        my $line = $lines[$i];
+        chomp $line;
+
+        # Track section boundaries
+        if ($line =~ /^# $section\b/) {
+            $in_section = 1;
+            $section_start = $i;
+            next;
+        }
+
+        # Handle section header's closing === line (skip it)
+        if ($in_section && $section_start == $i - 1 && $line =~ /^# =+$/) {
+            next;  # Skip closing === of section header
+        }
+
+        # End of section (next major section)
+        if ($in_section && $line =~ /^# =+$/) {
+            $section_end = $i;
+            last;
+        }
+
+        next unless $in_section;
+        next if $line =~ /^#/ || $line =~ /^\s*$/;
+
+        # Parse entry
+        my @fields = split /\t/, $line;
+        next unless @fields >= 2;
+
+        my ($surface, $pos, $conj) = @fields;
+        $conj //= '';
+
+        # Track entries with same POS
+        if ($pos eq $target_pos) {
+            $last_same_pos_line = $i;
+
+            # Track entries with matching conj_type
+            if ($conj eq $target_conj) {
+                $last_matching_line = $i;
+            }
+        }
+    }
+
+    # Priority: 1) After matching conj_type, 2) After same POS, 3) Section end
+    if ($last_matching_line >= 0) {
+        return ($last_matching_line, 'same_group');
+    } elsif ($last_same_pos_line >= 0) {
+        return ($last_same_pos_line, 'same_pos');
+    } elsif ($section_end >= 0) {
+        return ($section_end - 1, 'section_end');
+    } elsif ($section_start >= 0) {
+        return ($section_start, 'section_start');
+    }
+
+    return (-1, 'not_found');
+}
+
 sub insert_line_at {
     my ($file, $after_line, $new_line) = @_;
 
@@ -590,6 +669,115 @@ sub insert_line_at {
     open my $out, '>:utf8', $file or die "Cannot write $file: $!\n";
     print $out @lines;
     close $out;
+}
+
+sub cmd_remove {
+    my ($word) = @_;
+    die "Usage: dict_tool.pl remove <word>\n" unless $word;
+
+    open my $fh, '<:utf8', $dict_path or die "Cannot open $dict_path: $!\n";
+    my @lines = <$fh>;
+    close $fh;
+
+    my $found = 0;
+    my @new_lines;
+    for my $line (@lines) {
+        if ($line =~ /^([^\t#]+)\t/ && $1 eq $word) {
+            $found = 1;
+            print "Removing: $line";
+            next;  # Skip this line
+        }
+        push @new_lines, $line;
+    }
+
+    if (!$found) {
+        die "Word not found in dictionary: $word\n";
+    }
+
+    if ($dry_run) {
+        print "\n[dry-run] Would remove '$word' from dictionary\n";
+        return;
+    }
+
+    open my $out, '>:utf8', $dict_path or die "Cannot write $dict_path: $!\n";
+    print $out @new_lines;
+    close $out;
+
+    print "\n✓ Removed '$word' from dictionary\n";
+    print "  Recompile: ./build/bin/suzume-cli dict compile $dict_path data/core.dic\n";
+}
+
+sub cmd_disable {
+    my ($word) = @_;
+    die "Usage: dict_tool.pl disable <word>\n" unless $word;
+
+    open my $fh, '<:utf8', $dict_path or die "Cannot open $dict_path: $!\n";
+    my @lines = <$fh>;
+    close $fh;
+
+    my $found = 0;
+    for my $line (@lines) {
+        if ($line =~ /^([^\t#]+)\t/ && $1 eq $word) {
+            $found = 1;
+            my $old = $line;
+            $line = "#DISABLED# $line";
+            print "Disabling: $old";
+            print "       --> $line";
+        }
+    }
+
+    if (!$found) {
+        die "Word not found in dictionary: $word\n";
+    }
+
+    if ($dry_run) {
+        print "\n[dry-run] Would disable '$word'\n";
+        return;
+    }
+
+    open my $out, '>:utf8', $dict_path or die "Cannot write $dict_path: $!\n";
+    print $out @lines;
+    close $out;
+
+    print "\n✓ Disabled '$word' in dictionary\n";
+    print "  Use 'enable' to re-activate, or 'remove' to delete permanently\n";
+    print "  Recompile: ./build/bin/suzume-cli dict compile $dict_path data/core.dic\n";
+}
+
+sub cmd_enable {
+    my ($word) = @_;
+    die "Usage: dict_tool.pl enable <word>\n" unless $word;
+
+    open my $fh, '<:utf8', $dict_path or die "Cannot open $dict_path: $!\n";
+    my @lines = <$fh>;
+    close $fh;
+
+    my $found = 0;
+    for my $line (@lines) {
+        if ($line =~ /^#DISABLED#\s+([^\t]+)\t/ && $1 eq $word) {
+            $found = 1;
+            my $old = $line;
+            $line =~ s/^#DISABLED#\s+//;
+            print "Enabling: $old";
+            print "      --> $line";
+        }
+    }
+
+    if (!$found) {
+        die "Disabled word not found: $word (looking for '#DISABLED# $word')\n";
+    }
+
+    if ($dry_run) {
+        print "\n[dry-run] Would enable '$word'\n";
+        return;
+    }
+
+    open my $out, '>:utf8', $dict_path or die "Cannot write $dict_path: $!\n";
+    print $out @lines;
+    close $out;
+
+    print "\n✓ Enabled '$word' in dictionary\n";
+    print "  Recompile: ./build/bin/suzume-cli dict compile $dict_path data/core.dic\n";
 }
 
 sub cmd_validate {
@@ -608,7 +796,7 @@ sub cmd_validate {
     # Check each entry
     for my $entry (@$entries) {
         my $word = $entry->{surface};
-        my @tokens = mecab_analyze($word);
+        my @tokens = @{mecab_analyze($word)};
 
         # Check for MeCab splits
         if (@tokens > 1) {
@@ -714,7 +902,7 @@ sub cmd_validate {
             print "  ./build/bin/suzume-cli dict compile data/core/dictionary.tsv data/core.dic\n";
         } else {
             print "\nTo apply fixes, run:\n";
-            print "  ./scripts/dict_add.pl validate --fix\n";
+            print "  ./scripts/dict_tool.pl validate --fix\n";
             print "\nThis will remove ", scalar(@lines_to_remove), " lines:\n";
             for my $ln (@lines_to_remove) {
                 print "  Line $ln\n";

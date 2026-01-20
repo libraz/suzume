@@ -1,18 +1,75 @@
 #include "cmd_dict.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <regex>
 
 #include "dict_compiler.h"
 #include "dictionary/binary_dict.h"
+#include "dictionary/core_dict.h"
+#include "grammar/conjugation.h"
+#include "grammar/conjugator.h"
+#include "grammar/connection.h"
 #include "interactive.h"
+#include "interactive_utils.h"
 #include "tsv_parser.h"
 
 namespace suzume::cli {
 
 namespace {
+
+// Helper to convert connection ID to form name
+std::string formNameFromConnId(uint16_t conn_id) {
+  using namespace grammar::conn;
+  switch (conn_id) {
+    case kVerbBase:
+      return "終止形";
+    case kVerbMizenkei:
+      return "未然形";
+    case kVerbRenyokei:
+      return "連用形";
+    case kVerbOnbinkei:
+      return "音便形";
+    case kVerbPotential:
+      return "可能形";
+    case kVerbVolitional:
+      return "意志形";
+    case kVerbKatei:
+      return "仮定形";
+    case kVerbMeireikei:
+      return "命令形";
+    default:
+      return "";
+  }
+}
+
+// Helper to print conjugation stems for a verb/adjective
+void printConjugationStems(const std::string& base_form,
+                           dictionary::ConjugationType conj_type) {
+  auto verb_type = grammar::conjTypeToVerbType(conj_type);
+  if (verb_type == grammar::VerbType::Unknown) {
+    return;  // Not a conjugatable type
+  }
+
+  grammar::Conjugator conjugator;
+  auto stems = conjugator.generateStems(base_form, verb_type);
+
+  if (stems.empty()) {
+    return;
+  }
+
+  std::cout << "  Conjugation stems:\n";
+  for (const auto& stem : stems) {
+    auto form_name = formNameFromConnId(stem.right_id);
+    if (!form_name.empty()) {
+      std::cout << "    " << stem.surface << "- (" << form_name << ")\n";
+    } else {
+      std::cout << "    " << stem.surface << "-\n";
+    }
+  }
+}
 
 int cmdDictNew(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.empty()) {
@@ -345,6 +402,88 @@ int cmdDictSearch(const std::vector<std::string>& args, bool /* verbose */) {
   return 0;
 }
 
+int cmdDictLookup(const std::vector<std::string>& args, bool /* verbose */) {
+  if (args.empty()) {
+    printError("Usage: suzume-cli dict lookup <word>");
+    return 1;
+  }
+
+  const std::string& word = args[0];
+  bool found = false;
+
+  // Search L1 (hardcoded entries)
+  std::cout << "=== L1 (Core Dictionary) ===\n";
+  dictionary::CoreDictionary core_dict;
+  size_t l1_count = 0;
+
+  // The lookup method requires text and start position - search from start
+  auto results = core_dict.lookup(word, 0);
+  for (const auto& result : results) {
+    // Only show exact matches (same length as input)
+    if (result.entry != nullptr && result.entry->surface == word) {
+      std::cout << result.entry->surface << "\t"
+                << core::posToString(result.entry->pos);
+      if (!result.entry->lemma.empty() &&
+          result.entry->lemma != result.entry->surface) {
+        std::cout << "\t(lemma: " << result.entry->lemma << ")";
+      }
+      std::cout << "\n";
+      ++l1_count;
+      found = true;
+    }
+  }
+
+  if (l1_count == 0) {
+    std::cout << "(not found)\n";
+  } else {
+    std::cout << "(" << l1_count << " entries)\n";
+  }
+
+  // Search L2 (TSV dictionary)
+  std::cout << "\n=== L2 (data/core/dictionary.tsv) ===\n";
+
+  // Find the L2 dictionary path
+  std::string tsv_path;
+  const char* data_dir = std::getenv("SUZUME_DATA_DIR");
+  if (data_dir != nullptr) {
+    tsv_path = std::string(data_dir) + "/dictionary.tsv";
+  } else {
+    tsv_path = "data/core/dictionary.tsv";
+  }
+
+  TsvParser parser;
+  auto result = parser.parseFile(tsv_path);
+  size_t l2_count = 0;
+
+  if (result.hasValue()) {
+    for (const auto& entry : result.value()) {
+      if (entry.surface == word) {
+        std::cout << entry.surface << "\t" << core::posToString(entry.pos);
+        if (entry.conj_type != dictionary::ConjugationType::None) {
+          std::cout << "\t(" << conjTypeToString(entry.conj_type) << ")";
+        }
+        std::cout << "\n";
+        // Show conjugation stems for verbs/adjectives
+        if (entry.conj_type != dictionary::ConjugationType::None) {
+          printConjugationStems(entry.surface, entry.conj_type);
+        }
+        ++l2_count;
+        found = true;
+      }
+    }
+  } else {
+    printWarning("L2 dictionary not found at: " + tsv_path);
+  }
+
+  if (l2_count == 0 && result.hasValue()) {
+    std::cout << "(not found)\n";
+  } else if (l2_count > 0) {
+    std::cout << "(" << l2_count << " entries)\n";
+  }
+
+  return found ? 0 : 1;
+}
+
 }  // namespace
 
 int cmdDictInteractive(const std::vector<std::string>& args, bool verbose) {
@@ -396,6 +535,9 @@ int cmdDict(const CommandArgs& args) {
   }
   if (subcommand == "search") {
     return cmdDictSearch(subargs, args.verbose);
+  }
+  if (subcommand == "lookup") {
+    return cmdDictLookup(subargs, args.verbose);
   }
 
   printError("Unknown dict subcommand: " + subcommand);

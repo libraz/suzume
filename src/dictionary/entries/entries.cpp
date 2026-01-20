@@ -215,6 +215,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("だっ", "だ", EPOS::AuxCopulaDa),  // 連用タ接続形
       aux("で", "だ", EPOS::AuxCopulaDa),    // copula renyokei
       aux("だったら", "だ", EPOS::AuxCopulaDa),
+      aux("な", "だ", EPOS::AuxCopulaDa),    // attributive form (連体形)
 
       // Copula/Assertion - です (丁寧断定)
       aux("です", "です", EPOS::AuxCopulaDesu),
@@ -258,6 +259,23 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Negative conjecture (否定推量)
       aux("まい", "まい", EPOS::AuxNegativeNu),
 
+      // Conjecture - らしい (推定)
+      aux("らしい", "らしい", EPOS::AuxConjectureRashii),
+      aux("らしく", "らしい", EPOS::AuxConjectureRashii),
+      aux("らしかっ", "らしい", EPOS::AuxConjectureRashii),
+
+      // Conjecture - みたい (様態推定)
+      aux("みたい", "みたい", EPOS::AuxConjectureMitai),
+      aux("みたいだ", "みたい", EPOS::AuxConjectureMitai),
+      aux("みたいに", "みたい", EPOS::AuxConjectureMitai),
+      aux("みたいな", "みたい", EPOS::AuxConjectureMitai),
+
+      // Appearance - そう (様態)
+      aux("そう", "そう", EPOS::AuxAppearanceSou),
+      aux("そうだ", "そう", EPOS::AuxAppearanceSou),
+      aux("そうに", "そう", EPOS::AuxAppearanceSou),
+      aux("さそう", "そう", EPOS::AuxAppearanceSou),  // なさそう split
+
       // Obligation (当為)
       aux("べき", "べし", EPOS::Unknown),
       aux("べきだ", "べし", EPOS::Unknown), aux("べきで", "べし", EPOS::Unknown), aux("べきでは", "べし", EPOS::Unknown),
@@ -290,6 +308,12 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("たかっ", "たい", EPOS::AuxDesireTai),
       adj("たければ", "たい", EPOS::AuxDesireTai),
       aux("たがる", "たがる", EPOS::AuxDesireTai),
+
+      // Irregular i-adjective よい/いい (形容詞・アウオ段)
+      // MeCab: よければ → よけれ(仮定形) + ば, よかった → よかっ(連用タ接続) + た
+      adj("よけれ", "よい", EPOS::AdjKeForm),
+      adj("よかっ", "よい", EPOS::AdjKatt),
+      adj("よく", "よい", EPOS::AdjRenyokei),
 
       // Polite imperative
       aux("なさい", "なさい", EPOS::Unknown),
