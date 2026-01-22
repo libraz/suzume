@@ -85,8 +85,20 @@ BigramTable::initTable() {
   // VerbMizenkei → AuxNegativeNai (食べ+ない for ichidan) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxNegativeNai, cost::kModerateBonus);
 
+  // VerbRenyokei → AuxNegativeNai (すぎ+ない for ichidan renyokei)
+  // For ichidan verbs, renyokei and mizenkei are the same form (e.g., 食べ, すぎ)
+  // The dictionary stores these as VerbRenyokei, so we need a bonus for this path too
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxNegativeNai, cost::kModerateBonus);
+
   // VerbMizenkei → AuxPassive (食べ+られる) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxPassive, cost::kModerateBonus);
+
+  // VerbRenyokei → AuxPassive (知らせ+られ) - moderate bonus
+  // For ichidan verbs, renyokei = mizenkei, so both forms need bonus
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxPassive, cost::kModerateBonus);
+
+  // AuxPassive → AuxTenseTa (られ+た) - MeCab compatibility
+  setCell(t, EPOS::AuxPassive, EPOS::AuxTenseTa, cost::kStrongBonus);
 
   // VerbMizenkei → AuxCausative (食べ+させる) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxCausative, cost::kModerateBonus);
@@ -97,14 +109,42 @@ BigramTable::initTable() {
   // VerbOnbinkei → AuxTenseTa (書い+た, 泳い+だ) - strong bonus
   setCell(t, EPOS::VerbOnbinkei, EPOS::AuxTenseTa, cost::kStrongBonus);
 
+  // AuxNegativeNu → VerbOnbinkei (ん+かっ) - strong bonus
+  // MeCab compatibility: くだらんかった → くだら|ん|かっ|た
+  // MeCab analyzes かっ as verb かる (五段ラ行連用タ接続)
+  setCell(t, EPOS::AuxNegativeNu, EPOS::VerbOnbinkei, cost::kStrongBonus);
+
+  // VerbRenyokei → AuxTenseTa (食べ+た, すぎ+た for ichidan) - moderate bonus
+  // Ichidan verb renyokei connects directly to た without onbin
+  // Note: Using moderate bonus to allow dictionary adverbs (どうして) to win
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxTenseTa, cost::kModerateBonus);
+
   // VerbTeForm → AuxAspectIru (食べて+いる) - strong bonus
   setCell(t, EPOS::VerbTeForm, EPOS::AuxAspectIru, cost::kStrongBonus);
+
+  // ParticleConj → AuxAspectIru (て+いる) - MeCab compatibility: 食べ+て+いる
+  // Strong bonus to beat VerbTeForm→AuxAspectIru path (食べて+いる)
+  setCell(t, EPOS::ParticleConj, EPOS::AuxAspectIru, cost::kStrongBonus);
 
   // VerbTeForm → AuxAspectShimau (食べて+しまう) - moderate bonus
   setCell(t, EPOS::VerbTeForm, EPOS::AuxAspectShimau, cost::kModerateBonus);
 
   // VerbTeForm → AuxAspectOku (食べて+おく) - moderate bonus
   setCell(t, EPOS::VerbTeForm, EPOS::AuxAspectOku, cost::kModerateBonus);
+
+  // VerbRenyokei → AuxAspectOku (見+とく, 食べ+とく colloquial) - strong bonus
+  // MeCab compatibility: 見とく → 見|とく
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxAspectOku, cost::kStrongBonus);
+
+  // VerbOnbinkei → AuxAspectOku (書い+とく godan verbs) - strong bonus
+  // MeCab compatibility: 書いとく → 書い|とく
+  setCell(t, EPOS::VerbOnbinkei, EPOS::AuxAspectOku, cost::kStrongBonus);
+
+  // AuxAspectOku → AuxTenseTa (とい+た) - MeCab compatibility
+  setCell(t, EPOS::AuxAspectOku, EPOS::AuxTenseTa, cost::kStrongBonus);
+
+  // AuxAspectOku → ParticleConj (とい+て) - MeCab compatibility
+  setCell(t, EPOS::AuxAspectOku, EPOS::ParticleConj, cost::kStrongBonus);
 
   // VerbTeForm → AuxAspectMiru (食べて+みる) - moderate bonus
   setCell(t, EPOS::VerbTeForm, EPOS::AuxAspectMiru, cost::kModerateBonus);
@@ -136,8 +176,12 @@ BigramTable::initTable() {
   setCell(t, EPOS::VerbRenyokei, EPOS::ParticleConj, cost::kModerateBonus);
 
   // =========================================================================
-  // Adjective Forms → Auxiliaries
+  // Adjective Forms → Auxiliaries/Particles
   // =========================================================================
+
+  // AdjRenyokei → ParticleConj (ウザく+て, 美しく+て) - strong bonus
+  // MeCab compatibility: ウザくて → ウザく|て
+  setCell(t, EPOS::AdjRenyokei, EPOS::ParticleConj, cost::kStrongBonus);
 
   // AdjRenyokei → AuxNegativeNai (美しく+ない) - strong bonus
   setCell(t, EPOS::AdjRenyokei, EPOS::AuxNegativeNai, cost::kStrongBonus);
@@ -151,8 +195,21 @@ BigramTable::initTable() {
   // AdjBasic → ParticleFinal (美しい+ね) - minor bonus
   setCell(t, EPOS::AdjBasic, EPOS::ParticleFinal, cost::kMinorBonus);
 
+  // AdjBasic → NounFormal (高い+ん in 高いんだ) - strong bonus for MeCab split
+  setCell(t, EPOS::AdjBasic, EPOS::NounFormal, cost::kStrongBonus);
+
+  // AdjBasic → ParticleConj (よけれ+ば) - strong bonus for hypothetical split
+  setCell(t, EPOS::AdjBasic, EPOS::ParticleConj, cost::kStrongBonus);
+
   // AdjStem → AuxAppearanceSou (美し+そう) - strong bonus
   setCell(t, EPOS::AdjStem, EPOS::AuxAppearanceSou, cost::kStrongBonus);
+
+  // AdjStem → Suffix (な+さ nominalization) - strong bonus for なさそう
+  setCell(t, EPOS::AdjStem, EPOS::Suffix, cost::kStrongBonus);
+  setCell(t, EPOS::AdjRenyokei, EPOS::Suffix, cost::kStrongBonus);
+
+  // Suffix → AuxAppearanceSou (さ+そう) - strong bonus for なさそう/よさそう
+  setCell(t, EPOS::Suffix, EPOS::AuxAppearanceSou, cost::kStrongBonus);
 
   // =========================================================================
   // Auxiliary → Auxiliary Chains
@@ -163,6 +220,9 @@ BigramTable::initTable() {
 
   // AuxNegativeNai → AuxTenseTa (なかっ+た) - strong bonus
   setCell(t, EPOS::AuxNegativeNai, EPOS::AuxTenseTa, cost::kStrongBonus);
+
+  // AuxNegativeNai → NounFormal (ない+ん in ないんだ) - strong bonus for MeCab split
+  setCell(t, EPOS::AuxNegativeNai, EPOS::NounFormal, cost::kStrongBonus);
 
   // AuxDesireTai → AuxTenseTa (たかっ+た) - strong bonus
   setCell(t, EPOS::AuxDesireTai, EPOS::AuxTenseTa, cost::kStrongBonus);
@@ -199,8 +259,19 @@ BigramTable::initTable() {
   // Noun → ParticleTopic (机+は/も) - neutral (very common)
   setCell(t, EPOS::Noun, EPOS::ParticleTopic, cost::kNeutral);
 
+  // Noun → ParticleAdverbial (雨+でも/ばかり/だけ) - strong bonus
+  // to prevent で+も split in 雨でも (needs to beat Noun→AuxCopulaDa→ParticleTopic)
+  setCell(t, EPOS::Noun, EPOS::ParticleAdverbial, cost::kStrongBonus);
+
+  // Adverb → ParticleConj (どう+し) - penalty to prevent oversplitting
+  // Adverbs like どうして should not be split as どう+し(particle)+て
+  setCell(t, EPOS::Adverb, EPOS::ParticleConj, cost::kModeratePenalty);
+
   // NounFormal → ParticleConj (こと+が) - neutral
   setCell(t, EPOS::NounFormal, EPOS::ParticleCase, cost::kNeutral);
+
+  // NounFormal → AuxCopulaDa (ん+だ) - strong bonus for MeCab-compatible split
+  setCell(t, EPOS::NounFormal, EPOS::AuxCopulaDa, cost::kStrongBonus);
 
   // =========================================================================
   // Noun → Copula
@@ -288,8 +359,37 @@ BigramTable::initTable() {
   // VerbShuushikei → AuxConjectureRashii (食べる+らしい) - moderate bonus
   setCell(t, EPOS::VerbShuushikei, EPOS::AuxConjectureRashii, cost::kModerateBonus);
 
+  // VerbShuushikei → AuxObligation (食べる+べき) - strong bonus for classical obligation
+  setCell(t, EPOS::VerbShuushikei, EPOS::AuxObligation, cost::kStrongBonus);
+
+  // AuxObligation → AuxCopulaDa (べき+だ, べき+だっ) - MeCab compatibility
+  setCell(t, EPOS::AuxObligation, EPOS::AuxCopulaDa, cost::kStrongBonus);
+
   // Noun → AuxConjectureMitai (学生+みたい) - moderate bonus
   setCell(t, EPOS::Noun, EPOS::AuxConjectureMitai, cost::kModerateBonus);
+
+  // VerbShuushikei → AuxConjectureMitai (食べる+みたい, 行く+みたい) - strong bonus
+  // MeCab compatibility: V+みたい should be split
+  // Must be strong to beat VerbRenyokei+AuxDesireTai path (行くみ+たい)
+  setCell(t, EPOS::VerbShuushikei, EPOS::AuxConjectureMitai, cost::kStrongBonus);
+
+  // Noun → AuxConjectureRashii (春+らしい, 学生+らしい) - moderate bonus
+  // MeCab compatibility: N+らしい should be split (except lexicalized forms like 男らしい)
+  // Use moderate (not strong) to let dictionary entries (男らしい) win over split path
+  setCell(t, EPOS::Noun, EPOS::AuxConjectureRashii, cost::kModerateBonus);
+
+  // =========================================================================
+  // Compound auxiliary adjectives (やすい/にくい patterns)
+  // =========================================================================
+
+  // VerbRenyokei → AdjBasic (使い+にくい, 読み+やすい) - strong bonus
+  // MeCab compatibility: compound verb+auxiliary adjective should be split
+  setCell(t, EPOS::VerbRenyokei, EPOS::AdjBasic, cost::kStrongBonus);
+
+  // VerbOnbinkei → AdjBasic (also covers 使い+にくい patterns)
+  // Note: い-ending godan renyokei (使い) may be detected as VerbOnbinkei
+  // because detectVerbForm can't distinguish 使い (renyokei) from 書い (onbin)
+  setCell(t, EPOS::VerbOnbinkei, EPOS::AdjBasic, cost::kStrongBonus);
 
   return t;
 }

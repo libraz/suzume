@@ -66,13 +66,15 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
  * @param start_pos Start position (character index)
  * @param char_types Character types for each position
  * @param inflection Inflection analyzer for conjugation detection
+ * @param dict_manager Dictionary manager for verb lookup
  * @return Vector of candidates
  */
 std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     const std::vector<char32_t>& codepoints,
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection);
+    const grammar::Inflection& inflection,
+    const dictionary::DictionaryManager& dict_manager);
 
 /**
  * @brief Generate katakana i-adjective candidates (e.g., エモい, キモい, ウザい)

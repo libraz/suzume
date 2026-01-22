@@ -778,7 +778,6 @@
           "surface" : "を"
         },
         {
-          "lemma" : "つける",
           "pos" : "Verb",
           "surface" : "つける"
         }
@@ -1119,7 +1118,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "佐藤先生"
+          "surface" : "佐藤"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "先生"
         },
         {
           "pos" : "Particle",

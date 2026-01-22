@@ -611,7 +611,6 @@
           "surface" : "食べ"
         },
         {
-          "lemma" : "始める",
           "pos" : "Verb",
           "surface" : "始める"
         }
@@ -731,7 +730,6 @@
           "surface" : "すぎ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }

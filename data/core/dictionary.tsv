@@ -483,7 +483,7 @@ Wi-Fi	NOUN
 激しく同意	OTHER
 ないわ	OTHER
 無いわ	OTHER
-なるほど	OTHER
+なるほど	ADVERB
 そうだね	OTHER
 
 # --- Fillers/Hesitation (フィラー・間投詞) ---
@@ -614,3 +614,113 @@ Wi-Fi	NOUN
 大きい	ADJECTIVE	I_ADJ
 
 小さい	ADJECTIVE	I_ADJ
+
+すぎる	VERB	ICHIDAN
+
+とても	ADVERB
+
+しずか	NOUN
+
+さすが	ADVERB
+
+ていねい	NOUN
+
+しんちょう	NOUN
+
+本当に	ADVERB
+
+滅多に	ADVERB
+
+毅然と	ADVERB
+
+平然と	ADVERB
+
+悠然と	ADVERB
+
+男らしい	ADJECTIVE	I_ADJ
+
+女らしい	ADJECTIVE	I_ADJ
+
+いつも	ADVERB
+
+もし	ADVERB
+
+もちろん	ADVERB
+
+たとえ	ADVERB
+
+それぞれ	ADVERB
+
+あまりに	ADVERB
+
+一際	ADVERB
+
+くだる	VERB	GODAN_RA
+
+つまる	VERB	GODAN_RA
+
+まじ	NOUN
+
+やばい	ADJECTIVE	I_ADJ
+
+もはや	ADVERB
+
+とりあえず	ADVERB
+
+とにかく	ADVERB
+
+すでに	ADVERB
+
+あらかじめ	ADVERB
+
+どうせ	ADVERB
+
+ひたすら	ADVERB
+
+しどろもどろ	ADVERB
+
+ちっとも	ADVERB
+
+なにしろ	ADVERB
+
+あたかも	ADVERB
+
+さながら	ADVERB
+
+せめて	ADVERB
+
+到底	ADVERB
+
+少々	ADVERB
+
+多少	ADVERB
+
+だいたい	ADVERB
+
+いったい	ADVERB
+
+大いに	ADVERB
+
+新た	NOUN
+
+あと	NOUN
+
+あん	NOUN
+
+そん	NOUN
+
+# かも: removed - L1 particle entry preferred for かもしれない pattern
+
+終わる	VERB	GODAN_RA
+
+言う	VERB	GODAN_WA
+
+分かる	VERB	GODAN_RA
+
+助かる	VERB	GODAN_RA
+
+待つ	VERB	GODAN_TA
+
+しまう	VERB	GODAN_WA
+わかる	VERB	GODAN_RA
+いただける	VERB	ICHIDAN

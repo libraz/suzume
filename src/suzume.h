@@ -23,6 +23,7 @@ struct SuzumeOptions {
   core::AnalysisMode mode = core::AnalysisMode::Normal;
   bool lemmatize = true;
   bool merge_compounds = false;
+  bool merge_na_adjectives = false;  // Merge na-adjective + な (MeCab keeps separate)
   bool remove_symbols = true;  // Remove symbol-only morphemes (default: true)
   postprocess::TagGeneratorOptions tag_options;
   normalize::NormalizeOptions normalize_options;

@@ -158,6 +158,78 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
     // Determine extended_pos from flags for backwards compatibility
     if ((rec.flags & kFlagFormalNoun) != 0) {
       entry.extended_pos = core::ExtendedPOS::NounFormal;
+    } else {
+      // Infer extended_pos from POS when not explicitly stored
+      switch (entry.pos) {
+        case core::PartOfSpeech::Adjective:
+          // Infer adjective form from surface ending for MeCab-compatible splitting
+          // かっ → AdjKatt (連用タ接続): よかっ+た, 美しかっ+た
+          // く → AdjRenyokei: 美しく+ない
+          if (entry.surface.size() >= 6 &&
+              entry.surface.compare(entry.surface.size() - 6, 6, "かっ") == 0) {
+            entry.extended_pos = core::ExtendedPOS::AdjKatt;
+          } else if (entry.surface.size() >= 3 &&
+                     entry.surface.compare(entry.surface.size() - 3, 3, "く") == 0) {
+            entry.extended_pos = core::ExtendedPOS::AdjRenyokei;
+          } else {
+            entry.extended_pos = core::ExtendedPOS::AdjBasic;
+          }
+          break;
+        case core::PartOfSpeech::Verb: {
+          // Infer verb form from surface ending
+          // For ichidan verbs: stem (すぎ) = renyokei, stem+る (すぎる) = shuushikei
+          // For godan verbs: base form ends in u-row (書く, 書す, etc.) = shuushikei
+          // Short forms without u-row ending are likely renyokei (連用形)
+          // U-row hiragana endings (終止形): う, く, す, つ, ぬ, ふ, む, る, ぐ, ず, づ, ぶ
+          static const char* kURowEndings[] = {
+              "う", "く", "す", "つ", "ぬ", "ふ", "む", "る",
+              "ぐ", "ず", "づ", "ぶ"
+          };
+          bool is_shuushikei = false;
+          for (const char* ending : kURowEndings) {
+            size_t elen = std::strlen(ending);
+            if (entry.surface.size() >= elen &&
+                entry.surface.compare(entry.surface.size() - elen, elen, ending) == 0) {
+              is_shuushikei = true;
+              break;
+            }
+          }
+          entry.extended_pos = is_shuushikei
+              ? core::ExtendedPOS::VerbShuushikei
+              : core::ExtendedPOS::VerbRenyokei;
+          break;
+        }
+        case core::PartOfSpeech::Noun:
+          entry.extended_pos = core::ExtendedPOS::Noun;
+          break;
+        case core::PartOfSpeech::Adverb:
+          entry.extended_pos = core::ExtendedPOS::Adverb;
+          break;
+        case core::PartOfSpeech::Particle:
+          entry.extended_pos = core::ExtendedPOS::ParticleCase;
+          break;
+        case core::PartOfSpeech::Auxiliary:
+          entry.extended_pos = core::ExtendedPOS::AuxTenseTa;
+          break;
+        case core::PartOfSpeech::Conjunction:
+          entry.extended_pos = core::ExtendedPOS::Conjunction;
+          break;
+        case core::PartOfSpeech::Determiner:
+          entry.extended_pos = core::ExtendedPOS::Determiner;
+          break;
+        case core::PartOfSpeech::Pronoun:
+          entry.extended_pos = core::ExtendedPOS::Pronoun;
+          break;
+        case core::PartOfSpeech::Prefix:
+          entry.extended_pos = core::ExtendedPOS::Prefix;
+          break;
+        case core::PartOfSpeech::Suffix:
+          entry.extended_pos = core::ExtendedPOS::Suffix;
+          break;
+        default:
+          entry.extended_pos = core::ExtendedPOS::Unknown;
+          break;
+      }
     }
     // is_low_info, is_prefix, conj_type are no longer stored
 

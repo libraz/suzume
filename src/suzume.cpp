@@ -107,9 +107,10 @@ struct Suzume::Impl {
         analyzer(analysis::AnalyzerOptions{opts.mode, loadScorerConfig(opts), {}, opts.normalize_options}),
         postprocessor(&analyzer.dictionaryManager(),
                       postprocess::PostprocessOptions{
-                          opts.merge_compounds,
-                          opts.lemmatize,
-                          opts.remove_symbols}),
+                          .merge_noun_compounds = opts.merge_compounds,
+                          .merge_na_adjectives = opts.merge_na_adjectives,
+                          .lemmatize = opts.lemmatize,
+                          .remove_symbols = opts.remove_symbols}),
         tag_generator(opts.tag_options) {
     // Auto-load core.dic if found (binary format)
     std::string core_path = findDictionary("core.dic");

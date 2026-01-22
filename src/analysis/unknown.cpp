@@ -588,7 +588,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateHiraganaAdjectiveCan
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
   return analysis::generateHiraganaAdjectiveCandidates(
-      codepoints, start_pos, char_types, inflection_);
+      codepoints, start_pos, char_types, inflection_, *dict_manager_);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateNaAdjectiveCandidates(
@@ -654,8 +654,14 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
   // These are not character speech patterns
   if (start_type == normalize::CharType::Hiragana) {
     char32_t first_char = codepoints[start_pos];
-    if (first_char == U'た' || first_char == U'さ' || first_char == U'ら' ||
-        first_char == U'く' || first_char == U'あ' || first_char == U'け') {
+    // Skip verb endings (る/た), copula/particles (さ/ら/く/あ/け/す), and い
+    // These cause false AUX candidates that compete with dictionary verbs/adjectives
+    // い: Part of i-adjectives (悲しい, 美しい) and いる auxiliary (食べている)
+    //     Not used as standalone character speech ending
+    // す: Part of copula です - prevents です→で|す splitting
+    if (first_char == U'る' || first_char == U'た' || first_char == U'さ' ||
+        first_char == U'ら' || first_char == U'く' || first_char == U'あ' ||
+        first_char == U'け' || first_char == U'い' || first_char == U'す') {
       return candidates;
     }
   }

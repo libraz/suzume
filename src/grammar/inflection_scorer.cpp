@@ -638,6 +638,19 @@ float calculateConfidence(VerbType type, std::string_view stem,
     }
   }
 
+  // GodanMa with stem ending in う-dan hiragana (く, す, つ, etc.) is invalid
+  // The う-dan ending indicates a complete verb form, not a GodanMa stem
+  // E.g., 行くみ → 行くむ is wrong; 行く is a complete GodanKa verb, not a GodanMa stem
+  // Pattern: 行く + みたい being misparsed as 行くむ (GodanMa) + たい (wrong)
+  // Real GodanMa stems: 読 (読む), 飲 (飲む) - stems never end in う-dan
+  if (type == VerbType::GodanMa && stem_len >= core::kTwoJapaneseCharBytes) {
+    std::string_view last_char = utf8::lastChar(stem);
+    if (utf8::equalsAny(last_char, {"う", "く", "す", "つ", "ぬ", "む", "る", "ぐ", "ず", "ぶ"})) {
+      base -= inflection::kPenaltyGodanTeStem;  // Reuse existing penalty constant
+      logConfidenceAdjustment(-inflection::kPenaltyGodanTeStem, "godan_ma_u_row_stem_invalid");
+    }
+  }
+
   // Suru with 1 or 2 hiragana stem is invalid
   // E.g., えする, あする, みくする - pure hiragana are not valid Suru noun stems
   // Valid Suru stems: 勉強, ダウンロード (kanji or katakana)
@@ -809,17 +822,25 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // E.g., 食べ + な → 食べな (ichidan verb pattern)
       //       行 + か + な → 行かな (godan verb mizenkei + な)
       // vs. 危 + な → あぶな (real adjective stem)
+      // Exception: Pure hiragana stems 3+ chars are likely real adjectives
+      // E.g., めでた (めでたい), ありがた (ありがたい), つめた (つめたい)
       else if (stem_len >= core::kThreeJapaneseCharBytes) {
-        std::string_view prev = stem.substr(stem_len - core::kTwoJapaneseCharBytes, core::kJapaneseCharBytes);
-        // If previous char is hiragana, this looks like verb mizenkei
-        // Include all rows: a-row (godan mizenkei), e-row (ichidan), i-row, etc.
-        // e-row, i-row, a-row hiragana (ichidan, godan renyokei, mizenkei)
-        if (utf8::equalsAny(prev,
-            {"べ", "め", "せ", "け", "て", "ね", "れ", "え", "げ", "ぜ", "で", "ぺ",
-             "み", "き", "し", "ち", "に", "ひ", "り", "い", "ぎ", "じ", "ぢ", "び", "ぴ",
-             "か", "が", "さ", "ざ", "た", "だ", "な", "ば", "ぱ", "ま", "ら", "わ", "あ", "は"})) {
-          base -= inflection::kPenaltyIAdjMizenkeiPattern;
-          logConfidenceAdjustment(-inflection::kPenaltyIAdjMizenkeiPattern, "i_adj_mizenkei_pattern");
+        // Skip penalty for pure hiragana stems with 3+ chars - these are likely
+        // real adjectives, not verb mizenkei patterns which typically have kanji
+        if (isPureHiragana(stem) && stem_len >= core::kThreeJapaneseCharBytes) {
+          // No penalty for pure hiragana 3+ char stems
+        } else {
+          std::string_view prev = stem.substr(stem_len - core::kTwoJapaneseCharBytes, core::kJapaneseCharBytes);
+          // If previous char is hiragana, this looks like verb mizenkei
+          // Include all rows: a-row (godan mizenkei), e-row (ichidan), i-row, etc.
+          // e-row, i-row, a-row hiragana (ichidan, godan renyokei, mizenkei)
+          if (utf8::equalsAny(prev,
+              {"べ", "め", "せ", "け", "て", "ね", "れ", "え", "げ", "ぜ", "で", "ぺ",
+               "み", "き", "し", "ち", "に", "ひ", "り", "い", "ぎ", "じ", "ぢ", "び", "ぴ",
+               "か", "が", "さ", "ざ", "た", "だ", "な", "ば", "ぱ", "ま", "ら", "わ", "あ", "は"})) {
+            base -= inflection::kPenaltyIAdjMizenkeiPattern;
+            logConfidenceAdjustment(-inflection::kPenaltyIAdjMizenkeiPattern, "i_adj_mizenkei_pattern");
+          }
         }
       }
     }
@@ -1101,6 +1122,18 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // 勉強する (not 勉強す), 準備する (not 準備す)
       base -= inflection::kPenaltyGodanSaTwoKanji;  // Reuse existing constant
       logConfidenceAdjustment(-inflection::kPenaltyGodanSaTwoKanji, "suru_short_suffix_base");
+    }
+
+    // In kVerbBase context, GodanSa with two-kanji stem is very rare
+    // 勉強す is NOT a valid GodanSa verb - it's a partial suru-verb construction
+    // Real GodanSa verbs typically have single-kanji stems (出す, 消す) or
+    // kanji+hiragana+kanji stems (目指す, 見逃す where 指 and 逃 are single-kanji)
+    // Pure two-kanji stems + す pattern strongly suggests suru-verb (勉強+する)
+    if (type == VerbType::GodanSa && required_conn == conn::kVerbBase &&
+        stem_len == core::kTwoJapaneseCharBytes) {
+      // Strong penalty: two-kanji GodanSa verbs in base form are very rare
+      base -= inflection::kPenaltyGodanSaTwoKanji;
+      logConfidenceAdjustment(-inflection::kPenaltyGodanSaTwoKanji, "godan_sa_two_kanji_base");
     }
 
     bool is_shi_context = (required_conn == conn::kVerbRenyokei ||

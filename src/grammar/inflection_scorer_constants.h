@@ -175,7 +175,9 @@ constexpr float kPenaltyIAdjVerbAuxPattern = 0.45F;
 constexpr float kBonusIAdjShiiStem = 0.15F;
 
 // Verb renyokei + やすい/にくい compound pattern
-constexpr float kBonusIAdjCompoundYasuiNikui = 0.35F;
+// MeCab compatibility: 使いにくい should split as 使い + にくい
+// A negative value penalizes compound adjective recognition to favor split path
+constexpr float kBonusIAdjCompoundYasuiNikui = -0.4F;
 
 // 3+ kanji stem - likely サ変名詞 misanalysis
 constexpr float kPenaltyIAdjAllKanji = 0.40F;

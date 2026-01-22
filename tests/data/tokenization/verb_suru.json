@@ -221,7 +221,6 @@
           "surface" : "て"
         },
         {
-          "lemma" : "あげる",
           "pos" : "Verb",
           "surface" : "あげる"
         }
@@ -311,7 +310,6 @@
           "surface" : "て"
         },
         {
-          "lemma" : "ほしい",
           "pos" : "Adjective",
           "surface" : "ほしい"
         }
@@ -341,7 +339,6 @@
           "surface" : "て"
         },
         {
-          "lemma" : "くれる",
           "pos" : "Verb",
           "surface" : "くれる"
         }

@@ -113,6 +113,7 @@ enum class ExtendedPOS : uint8_t {
   // Other auxiliaries
   AuxHonorific,     // 尊敬: れる、られる (honorific use)
   AuxGozaru,        // 丁重: ござる、ございます
+  AuxObligation,    // 義務/当然: べき、べし (classical obligation)
 
   // =========================================================================
   // Particles (41-50) - by grammatical role

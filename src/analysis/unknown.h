@@ -166,10 +166,16 @@ inline UnknownCandidate makeCandidate(
   cand.start = start;
   cand.end = end;
   cand.pos = pos;
-  // Use posToExtendedPos if not specified
-  cand.extended_pos = (extended_pos != core::ExtendedPOS::Unknown)
-                          ? extended_pos
-                          : core::posToExtendedPos(pos);
+  // For Verbs and Adjectives, leave extended_pos as Unknown to trigger
+  // auto-detection in Lattice based on surface ending (renyokei, katt, etc.)
+  // For other POS types, use posToExtendedPos as default
+  if (extended_pos != core::ExtendedPOS::Unknown) {
+    cand.extended_pos = extended_pos;
+  } else if (pos == core::PartOfSpeech::Verb || pos == core::PartOfSpeech::Adjective) {
+    cand.extended_pos = core::ExtendedPOS::Unknown;  // Lattice will auto-detect
+  } else {
+    cand.extended_pos = core::posToExtendedPos(pos);
+  }
   cand.cost = cost;
   cand.has_suffix = has_suffix;
 #ifdef SUZUME_DEBUG_INFO

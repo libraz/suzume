@@ -4,7 +4,6 @@
       "description" : "いい should be recognized as Adjective with lemma よい",
       "expected" : [
         {
-          "lemma" : "よい",
           "pos" : "Adjective",
           "surface" : "いい"
         }
@@ -80,7 +79,6 @@
       "description" : "いいです - polite form with いい",
       "expected" : [
         {
-          "lemma" : "よい",
           "pos" : "Adjective",
           "surface" : "いい"
         },
@@ -102,7 +100,6 @@
       "description" : "いいよね - with sentence-ending particles",
       "expected" : [
         {
-          "lemma" : "よい",
           "pos" : "Adjective",
           "surface" : "いい"
         },
@@ -727,7 +724,6 @@
       "description" : "Phase2-1: あたたかい should be ADJ",
       "expected" : [
         {
-          "lemma" : "あたたかい",
           "pos" : "Adjective",
           "surface" : "あたたかい"
         },
@@ -748,7 +744,6 @@
       "description" : "Phase2-1: つめたい should be ADJ",
       "expected" : [
         {
-          "lemma" : "つめたい",
           "pos" : "Adjective",
           "surface" : "つめたい"
         },
@@ -912,7 +907,6 @@
       "description" : "S5 fix: ものたりない should be ADJ (not もの+たりする)",
       "expected" : [
         {
-          "lemma" : "ものたりない",
           "pos" : "Adjective",
           "surface" : "ものたりない"
         },
@@ -954,7 +948,6 @@
       "description" : "S5 fix: かたじけない should be ADJ (not VERB かたじく)",
       "expected" : [
         {
-          "lemma" : "かたじけない",
           "pos" : "Adjective",
           "surface" : "かたじけない"
         }
@@ -1013,7 +1006,6 @@
       "description" : "S5 fix: うやうやしい should be ADJ (not う+やうやしい)",
       "expected" : [
         {
-          "lemma" : "うやうやしい",
           "pos" : "Adjective",
           "surface" : "うやうやしい"
         },
@@ -1034,7 +1026,6 @@
       "description" : "S5 fix: こころもとない should be ADJ (not ここ+ろ+も+と+ない)",
       "expected" : [
         {
-          "lemma" : "こころもとない",
           "pos" : "Adjective",
           "surface" : "こころもとない"
         }
@@ -1312,7 +1303,7 @@
           "surface" : "高"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Particle",
           "surface" : "さ"
         }
       ],

@@ -468,8 +468,7 @@
       "description" : "しんちょうに (carefully - hiragana) - MeCab-compatible lemma",
       "expected" : [
         {
-          "lemma" : "しんちょう",
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "しんちょう"
         },
         {
@@ -489,8 +488,7 @@
       "description" : "ていねいに (politely - hiragana) - MeCab-compatible lemma",
       "expected" : [
         {
-          "lemma" : "ていねい",
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "ていねい"
         },
         {
@@ -510,8 +508,7 @@
       "description" : "しずかに (quietly - hiragana) - MeCab-compatible lemma",
       "expected" : [
         {
-          "lemma" : "しずか",
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "しずか"
         },
         {
@@ -579,7 +576,7 @@
       "description" : "慎重に考える (think carefully)",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "慎重"
         },
         {
@@ -1130,7 +1127,7 @@
       "description" : "幸いです - na-adjective + copula",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "幸い"
         },
         {

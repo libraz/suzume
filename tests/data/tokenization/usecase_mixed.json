@@ -718,7 +718,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "山田先生"
+          "surface" : "山田"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "先生"
         },
         {
           "pos" : "Particle",

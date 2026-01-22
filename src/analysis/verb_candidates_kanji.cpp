@@ -610,6 +610,55 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   // and the られる auxiliary is matched from entries.cpp.
   // We do NOT generate single-token passive candidates here to ensure split wins.
 
+  // Generate Godan causative renyokei candidates: kanji + A行 + せ
+  // E.g., 知らせ (知る→知らせる renyokei), 書かせ, 読ませ, 聞かせ
+  // Pattern: kanji + a-row hiragana + せ, followed by られ (passive suffix)
+  // This enables MeCab-compatible splitting: 知らせられた → 知らせ + られ + た
+  if (kanji_end + 1 < hiragana_end) {
+    char32_t first_hira = codepoints[kanji_end];
+    char32_t second_hira = codepoints[kanji_end + 1];
+    // A-row + せ pattern (godan causative renyokei)
+    if (grammar::isARowCodepoint(first_hira) && second_hira == U'せ') {
+      // Check if followed by られ (passive auxiliary)
+      size_t causative_end = kanji_end + 2;  // kanji + A行 + せ
+      if (causative_end + 1 < codepoints.size() &&
+          codepoints[causative_end] == U'ら' &&
+          codepoints[causative_end + 1] == U'れ') {
+        std::string surface = extractSubstring(codepoints, start_pos, causative_end);
+        // Causative base form: surface + る (e.g., 知らせ → 知らせる)
+        std::string causative_base = surface + "る";
+        // Original verb base: kanji + U行 (e.g., 知らせる → 知る)
+        std::string kanji_part = extractSubstring(codepoints, start_pos, kanji_end);
+        std::string_view u_row_suffix = grammar::godanBaseSuffixFromARow(first_hira);
+        std::string original_base = kanji_part + std::string(u_row_suffix);
+
+        // Verify the original verb has good confidence via inflection analysis
+        auto infl_result = inflection.analyze(original_base);
+        bool valid_base = false;
+        for (const auto& cand : infl_result) {
+          if (vh::isGodanVerbType(cand.verb_type) && cand.confidence >= 0.4F) {
+            valid_base = true;
+            break;
+          }
+        }
+
+        if (valid_base) {
+          constexpr float kCausativeCost = -0.6F;  // Strong bonus for causative renyokei
+          SUZUME_DEBUG_VERBOSE_BLOCK {
+            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
+                                << " godan_causative_renyokei lemma=" << causative_base
+                                << " original=" << original_base
+                                << " cost=" << kCausativeCost << "\n";
+          }
+          candidates.push_back(makeVerbCandidate(
+              surface, start_pos, causative_end, kCausativeCost, causative_base,
+              dictionary::ConjugationType::Ichidan,  // Causative verbs conjugate as Ichidan
+              true, CandidateOrigin::VerbKanji, 0.75F, "godan_causative_renyokei"));
+        }
+      }
+    }
+  }
+
   // Generate Ichidan stem candidates for passive/potential auxiliary patterns
   // E.g., 信じられべき (信じ + られべき), 認められた (認め + られた)
   // These connect to られ+X (passive/potential auxiliary forms)
@@ -826,7 +875,14 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         if (next_char == U'ぬ') {
           is_nu_pattern = true;
         }
-        if (is_beki_pattern || is_nu_pattern || is_passive_pattern) {
+        // Check for negative ない pattern (MeCab-compatible split)
+        // E.g., 行かない → 行か (mizenkei) + ない (AUX)
+        bool is_nai_pattern = false;
+        if (next_char == U'な' && mizenkei_end + 1 < codepoints.size() &&
+            codepoints[mizenkei_end + 1] == U'い') {
+          is_nai_pattern = true;
+        }
+        if (is_beki_pattern || is_nu_pattern || is_passive_pattern || is_nai_pattern) {
           // Derive VerbType from the A-row ending (e.g., か → GodanKa)
           grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(first_hira);
           if (verb_type != grammar::VerbType::Unknown) {
@@ -869,15 +925,20 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                 //   揃わぬ(VERB) gets ~-0.1 total, so split needs lower cost
                 // - passive pattern: negative cost (-0.5F) for MeCab-compatible split
                 //   言われる(VERB) gets ~0.15, so split (言わ+れる) needs lower cost
+                // - ない pattern: negative cost (-0.5F) for MeCab-compatible split
+                //   行かない(VERB) gets ~0.48, so split (行か+ない) needs lower cost
                 // - べき pattern: moderate cost (0.2F) for classical obligation
                 float cost = 0.2F;  // default for beki
                 if (is_nu_pattern) {
                   cost = -0.5F;
                 } else if (is_passive_pattern) {
                   cost = -0.5F;
+                } else if (is_nai_pattern) {
+                  cost = -0.5F;
                 }
                 const char* debug_pattern = is_nu_pattern ? "nu" :
-                                            is_passive_pattern ? "passive" : "beki";
+                                            is_passive_pattern ? "passive" :
+                                            is_nai_pattern ? "nai" : "beki";
                 SUZUME_DEBUG_VERBOSE_BLOCK {
                   SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                       << " godan_mizenkei lemma=" << base_form
@@ -887,6 +948,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                 }
                 const char* info_pattern = is_nu_pattern ? "godan_mizenkei_nu" :
                                            is_passive_pattern ? "godan_mizenkei_passive" :
+                                           is_nai_pattern ? "godan_mizenkei_nai" :
                                            "godan_mizenkei";
                 candidates.push_back(makeVerbCandidate(
                     surface, start_pos, mizenkei_end, cost, base_form,
@@ -895,6 +957,59 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               }
             }
             }  // else (not Suru verb pattern)
+          }
+        }
+      }
+    }
+  }
+
+  // Generate Godan mizenkei candidates for ない patterns with longer hiragana stems
+  // E.g., 分からない → 分から (mizenkei) + ない, where stem is 分か not 分
+  //       助からない → 助から (mizenkei) + ない, where stem is 助か not 助
+  // This handles verbs where the okrigana includes multiple hiragana characters
+  if (kanji_end + 2 < hiragana_end) {  // Need at least X+ない (X is A-row, ない is 2 chars)
+    // Check if hiragana ends with ない
+    if (codepoints[hiragana_end - 2] == U'な' && codepoints[hiragana_end - 1] == U'い') {
+      // Find the A-row character immediately before な
+      size_t na_pos = hiragana_end - 2;
+      if (na_pos > kanji_end && grammar::isARowCodepoint(codepoints[na_pos - 1])) {
+        size_t mizenkei_end = na_pos;  // Position after the A-row character
+        char32_t a_row_char = codepoints[na_pos - 1];
+
+        // Skip if already handled by the simple pattern (single A-row after kanji)
+        if (mizenkei_end != kanji_end + 1) {
+          grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(a_row_char);
+          if (verb_type != grammar::VerbType::Unknown) {
+            std::string_view base_suffix = grammar::godanBaseSuffixFromARow(a_row_char);
+            if (!base_suffix.empty()) {
+              // Construct base form: stem (up to but not including A-row) + base_suffix
+              // E.g., for 分からない: stem=分か, A-row=ら, base_suffix=る → base=分かる
+              std::string stem = extractSubstring(codepoints, start_pos, na_pos - 1);
+              std::string base_form = stem + std::string(base_suffix);
+
+              // Verify the base form is a valid verb
+              bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
+              if (!is_valid_verb) {
+                auto infl_result = inflection.getBest(base_form);
+                is_valid_verb = infl_result.confidence > 0.5F &&
+                                vh::isGodanVerbType(infl_result.verb_type);
+              }
+
+              if (is_valid_verb) {
+                std::string surface = extractSubstring(codepoints, start_pos, mizenkei_end);
+                float cost = -0.5F;  // Strong bonus to beat combined verb form
+                SUZUME_DEBUG_VERBOSE_BLOCK {
+                  SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
+                                      << " godan_mizenkei_long lemma=" << base_form
+                                      << " cost=" << cost
+                                      << " pattern=nai_long\n";
+                }
+                candidates.push_back(makeVerbCandidate(
+                    surface, start_pos, mizenkei_end, cost, base_form,
+                    grammar::verbTypeToConjType(verb_type),
+                    true, CandidateOrigin::VerbKanji, 0.9F, "godan_mizenkei_nai_long"));
+              }
+            }
           }
         }
       }
@@ -979,6 +1094,77 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               onbin_surface, start_pos, kanji_end + 1, kOnbinCost, matched_base_form,
               grammar::verbTypeToConjType(matched_verb_type),
               true, CandidateOrigin::VerbKanji, 0.9F, pattern));
+        }
+      }
+    }
+  }
+
+  // Generate Godan sokuonbin (っ) stem candidates for te/ta/to auxiliary patterns
+  // E.g., 言って → 言っ (sokuonbin of 言う) + て (PARTICLE)
+  //       言った → 言っ (sokuonbin of 言う) + た (AUX)
+  //       買っている → 買っ (sokuonbin of 買う) + て + いる
+  //       買っとく → 買っ (sokuonbin of 買う) + とく (AuxAspectOku)
+  // Key patterns: kanji + っ + て/た/と
+  // GodanTa (持つ→持っ), GodanRa (取る→取っ), GodanWa (買う→買っ) share っ-onbin
+  if (kanji_end < hiragana_end) {
+    char32_t first_hira = codepoints[kanji_end];
+    if (first_hira == U'っ' && kanji_end + 1 < hiragana_end) {
+      char32_t next_char = codepoints[kanji_end + 1];
+      // Check for て/た (standard auxiliary) or と (とく contraction)
+      if (next_char == U'て' || next_char == U'た' || next_char == U'と') {
+        // Use centralized GodanRow data to get verb types with っ-onbin
+        std::string_view onbin_str = "っ";
+        auto candidates_to_try = vh::getGodanTypesByOnbin(onbin_str);
+
+        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+
+        // Dictionary check for all verb types
+        grammar::VerbType matched_verb_type = grammar::VerbType::Unknown;
+        std::string matched_base_form;
+
+        for (const auto& [verb_type, base_suffix] : candidates_to_try) {
+          std::string base_form = kanji_stem + std::string(base_suffix);
+          if (vh::isVerbInDictionaryWithType(dict_manager, base_form, verb_type) ||
+              vh::isVerbInDictionary(dict_manager, base_form)) {
+            matched_verb_type = verb_type;
+            matched_base_form = base_form;
+            break;
+          }
+        }
+
+        // Inflection fallback when not in dictionary
+        if (matched_verb_type == grammar::VerbType::Unknown && kanji_end > start_pos) {
+          std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
+          auto infl_results = inflection.analyze(full_surface);
+          float best_conf = 0.0F;
+          for (const auto& result : infl_results) {
+            if (result.confidence >= 0.5F && result.confidence > best_conf) {
+              // Check if this result matches one of our candidate verb types
+              for (const auto& [verb_type, base_suffix] : candidates_to_try) {
+                std::string base_form = kanji_stem + std::string(base_suffix);
+                if (result.base_form == base_form && result.verb_type == verb_type) {
+                  matched_verb_type = verb_type;
+                  matched_base_form = base_form;
+                  best_conf = result.confidence;
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+        if (matched_verb_type != grammar::VerbType::Unknown) {
+          std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
+          constexpr float kCost = -0.6F;  // Strong bonus to beat unsplit forms
+          SUZUME_DEBUG_VERBOSE_BLOCK {
+            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
+                                << " kanji_sokuonbin_te_ta lemma=" << matched_base_form
+                                << " cost=" << kCost << "\n";
+          }
+          candidates.push_back(makeVerbCandidate(
+              onbin_surface, start_pos, kanji_end + 1, kCost, matched_base_form,
+              grammar::verbTypeToConjType(matched_verb_type),
+              true, CandidateOrigin::VerbKanji, 0.9F, "kanji_sokuonbin_te_ta"));
         }
       }
     }

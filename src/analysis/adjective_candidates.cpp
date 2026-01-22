@@ -220,6 +220,28 @@ bool shouldSkipSimplePatterns(
     }
   }
 
+  // 〜らしい patterns (春らしい, 学生らしい, etc.)
+  // MeCab splits N+らしい while keeping lexicalized ones (男らしい, 女らしい) as single tokens.
+  // Skip candidate generation for らしい patterns - use dictionary for lexicalized forms.
+  if (utf8::endsWith(hiragana_part, "らしい") || utf8::endsWith(hiragana_part, "らしく") ||
+      utf8::endsWith(hiragana_part, "らしかっ")) {
+    return true;
+  }
+
+  // 〜んかっ patterns (くだらんかった = くだら + ん + かっ + た)
+  // These are verb mizenkei + contracted negative (ん) + adjective conjugation
+  // MeCab splits these, so skip adjective candidate generation
+  if (utf8::contains(hiragana_part, "んかっ")) {
+    return true;
+  }
+
+  // 〜みたい patterns (るみたい, なみたい, etc.)
+  // みたい is an auxiliary (比況助動詞), not an adjective ending
+  // MeCab splits V/N + みたい, so skip adjective candidate generation
+  if (utf8::endsWith(hiragana_part, "みたい")) {
+    return true;
+  }
+
   return false;
 }
 
@@ -560,6 +582,37 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     candidates.push_back(std::move(var));
   }
 
+  // Add kere-form candidates for kereba patterns (MeCab-compatible split)
+  // This enables: 美しければ → 美しけれ + ば
+  // For each candidate ending with ければ, generate a kere-form variant ending with けれ
+  std::vector<UnknownCandidate> kere_form_candidates;
+  for (const auto& cand : candidates) {
+    // Check if surface ends with ければ (i-adjective conditional form)
+    if (utf8::endsWith(cand.surface, "ければ")) {
+      // Generate kere-form variant: 美しければ → 美しけれ
+      UnknownCandidate kere_cand;
+      kere_cand.surface = cand.surface.substr(0, cand.surface.size() - core::kJapaneseCharBytes);  // Remove ば
+      kere_cand.start = cand.start;
+      kere_cand.end = cand.end - 1;  // 1 character (ば)
+      kere_cand.pos = core::PartOfSpeech::Adjective;
+      kere_cand.lemma = cand.lemma;  // Same lemma (美しい, etc.)
+      kere_cand.cost = cand.cost + 0.1F;  // Slightly higher cost than full form
+      kere_cand.has_suffix = true;  // This is a conjugated form (仮定形)
+      kere_cand.extended_pos = core::ExtendedPOS::AdjBasic;  // For bigram: AdjBasic→ParticleConj
+#ifdef SUZUME_DEBUG_INFO
+      kere_cand.origin = cand.origin;
+      kere_cand.confidence = cand.confidence;
+      kere_cand.pattern = "i_adjective_kere";
+#endif
+      kere_form_candidates.push_back(kere_cand);
+    }
+  }
+
+  // Add all kere-form candidates
+  for (auto& var : kere_form_candidates) {
+    candidates.push_back(std::move(var));
+  }
+
   std::sort(candidates.begin(), candidates.end(),
             [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
               return lhs.cost < rhs.cost;
@@ -598,10 +651,11 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
     std::string full_surface = extractSubstring(codepoints, start_pos, hira_end);
     size_t hira_len = hira_end - kanji_end;
 
-    // Check if ends with な (na-adjective conjugation)
-    bool ends_with_na = (hira_end > kanji_end && codepoints[hira_end - 1] == U'な');
+    // Check if ends with な or に (na-adjective conjugation/adverb form)
+    bool ends_with_na_or_ni = (hira_end > kanji_end &&
+        (codepoints[hira_end - 1] == U'な' || codepoints[hira_end - 1] == U'に'));
 
-    if (ends_with_na && hira_len >= 2) {
+    if (ends_with_na_or_ni && hira_len >= 2) {
       // Extract stem (without な)
       std::string stem = extractSubstring(codepoints, start_pos, hira_end - 1);
       size_t stem_hira_len = hira_len - 1;
@@ -674,7 +728,8 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     const std::vector<char32_t>& codepoints,
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection) {
+    const grammar::Inflection& inflection,
+    const dictionary::DictionaryManager& dict_manager) {
   std::vector<UnknownCandidate> candidates;
 
   if (start_pos >= char_types.size() ||
@@ -741,17 +796,25 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         continue;  // Skip - adverbial form, not adjective (くない is valid negative)
       }
 
-      // Skip patterns ending with just ない (negative auxiliary misidentified as adjective)
-      // This prevents でもない from being validated as an adjective
-      // Valid patterns: くない (adjective negative), but ない alone after particles is auxiliary
-      if (utf8::endsWith(test_surface, "ない") && !utf8::endsWith(test_surface, "くない")) {
+      // Skip SHORT patterns ending with just ない (negative auxiliary misidentified as adjective)
+      // This prevents でもない (4 chars) from being validated as an adjective
+      // But allow long patterns (5+ chars) like ものたりない, 情けない which are real adjectives
+      // Valid patterns: くない (adjective negative), or ない after 3+ char stem
+      size_t test_char_len = end - start_pos;
+      if (utf8::endsWith(test_surface, "ない") &&
+          !utf8::endsWith(test_surface, "くない") &&
+          test_char_len < 5) {  // Only skip short sequences
         continue;  // Skip - likely negative auxiliary, not adjective
       }
 
       auto test_candidates = inflection.analyze(test_surface);
       for (const auto& cand : test_candidates) {
+        // Use length-dependent threshold: long adjectives (5+ chars) can have lower confidence
+        // This allows ものたりない (conf=0.41), こころもとない to be recognized
+        float conf_threshold = test_char_len >= 6 ? 0.35F :
+                               test_char_len >= 5 ? 0.40F : 0.50F;
         if (cand.verb_type == grammar::VerbType::IAdjective &&
-            cand.confidence >= 0.50F) {
+            cand.confidence >= conf_threshold) {
           // For particle-starting sequences, require stem length >= 2 characters
           // This prevents に+そうな from being recognized as にい (invalid)
           // Real adjectives have stems of at least 2 chars: あつい, かわいい, etc.
@@ -774,23 +837,46 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     // Use the valid adjective length as hiragana_end
     hiragana_end = valid_adj_min_end;
   } else if (!starts_with_particle) {
-    // For non-particle-starting sequences, apply particle boundary breaking
-    // This handles cases like おいしい where we don't want to extend past particles
-    hiragana_end = start_pos;
-    while (hiragana_end < max_hiragana_end) {
-      char32_t curr_char = codepoints[hiragana_end];
-
-      // Only break at strong particle boundaries after minimum stem length
-      if (hiragana_end - start_pos >= 3 && !normalize::isProlongedSoundMark(curr_char)) {
-        bool next_is_prolonged = (hiragana_end + 1 < char_types.size() &&
-                                   normalize::isProlongedSoundMark(codepoints[hiragana_end + 1]));
-        if (!next_is_prolonged) {
-          if (normalize::isExtendedParticle(curr_char) || curr_char == U'や') {
-            break;  // Stop before the particle
+    // For non-particle-starting sequences, first try the full sequence
+    // This handles long hiragana adjectives like やわらかい, あたたかい, つめたい
+    // that contain particle characters (か, た) in the middle
+    bool found_valid_full_adj = false;
+    if (max_hiragana_end > start_pos + 2) {
+      std::string full_surface = extractSubstring(codepoints, start_pos, max_hiragana_end);
+      // Skip patterns ending with く (adverbial) but allow くない (negative)
+      if (!(utf8::endsWith(full_surface, "く") && !utf8::endsWith(full_surface, "くない"))) {
+        auto full_candidates = inflection.analyze(full_surface);
+        for (const auto& cand : full_candidates) {
+          // For long hiragana adjectives (5+ chars), use lower threshold (0.40)
+          size_t adj_len = max_hiragana_end - start_pos;
+          float threshold = adj_len >= 5 ? 0.40F : adj_len >= 4 ? 0.50F : 0.55F;
+          if (cand.verb_type == grammar::VerbType::IAdjective &&
+              cand.confidence >= threshold) {
+            hiragana_end = max_hiragana_end;
+            found_valid_full_adj = true;
+            break;
           }
         }
       }
-      ++hiragana_end;
+    }
+    // If full sequence isn't a valid adjective, apply particle boundary breaking
+    if (!found_valid_full_adj) {
+      hiragana_end = start_pos;
+      while (hiragana_end < max_hiragana_end) {
+        char32_t curr_char = codepoints[hiragana_end];
+
+        // Only break at strong particle boundaries after minimum stem length
+        if (hiragana_end - start_pos >= 3 && !normalize::isProlongedSoundMark(curr_char)) {
+          bool next_is_prolonged = (hiragana_end + 1 < char_types.size() &&
+                                     normalize::isProlongedSoundMark(codepoints[hiragana_end + 1]));
+          if (!next_is_prolonged) {
+            if (normalize::isExtendedParticle(curr_char) || curr_char == U'や') {
+              break;  // Stop before the particle
+            }
+          }
+        }
+        ++hiragana_end;
+      }
     }
   }
 
@@ -813,6 +899,21 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     if (grammar::endsWithPassiveCausativeNegativeRenyokei(surface)) {
       continue;  // Skip - passive/potential/causative negative renyokei
     }
+
+    // Skip patterns containing んかっ (contracted negative past)
+    // E.g., くだらんかっ is NOT an i-adjective, but verb + ん + かっ(た)
+    // MeCab: くだら (verb mizenkei) + ん (contracted negative) + かっ (verb かる) + た
+    if (utf8::contains(surface, "んかっ")) {
+      continue;  // Skip - contracted negative past pattern
+    }
+
+    // Skip patterns ending with みたい (similative auxiliary)
+    // E.g., るみたい, なみたい are NOT i-adjectives, but verb/noun + みたい(AUX)
+    // MeCab: 食べる + みたい, 猫 + みたい
+    if (utf8::endsWith(surface, "みたい")) {
+      continue;  // Skip - similative auxiliary pattern
+    }
+
     // Skip patterns ending with 〜かなく (verb negative renyokei of godan verbs)
     // E.g., いかなく = いく + ない
     if (grammar::endsWithGodanNegativeRenyokei(surface)) {
@@ -827,12 +928,32 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       continue;  // Skip - just く ending (adverbial form)
     }
 
-    // Skip patterns ending with just ない (negative auxiliary misidentified as adjective)
+    // Skip SHORT patterns ending with just ない (negative auxiliary misidentified as adjective)
     // This prevents でもない from being recognized as an adjective when starting with particle
-    // Valid patterns: くない (adjective negative), but ない alone after particles is auxiliary
+    // But allow long patterns (5+ chars) like ものたりない, はなはだしくない
+    // Valid patterns: くない (adjective negative), or long ない-ending adjectives
+    size_t surface_char_len = end_pos - start_pos;
     if (starts_with_particle &&
-        utf8::endsWith(surface, "ない") && !utf8::endsWith(surface, "くない")) {
+        utf8::endsWith(surface, "ない") && !utf8::endsWith(surface, "くない") &&
+        surface_char_len < 5) {  // Only skip short sequences
       continue;  // Skip - likely negative auxiliary, not adjective
+    }
+
+    // Skip patterns ending with ない when the stem is a verb in the dictionary
+    // This prevents すぎない (verb negative) from being recognized as an i-adjective
+    // E.g., すぎない should be すぎる(verb) + ない(aux), not an adjective
+    if (utf8::endsWith(surface, "ない") && !utf8::endsWith(surface, "くない")) {
+      // Extract potential verb stem (surface without ない)
+      // "ない" is 6 bytes in UTF-8
+      constexpr size_t kNaiByteLen = 6;
+      if (surface.size() > kNaiByteLen) {
+        std::string potential_stem = surface.substr(0, surface.size() - kNaiByteLen);
+        // Check if stem + る is a verb in dictionary (ichidan pattern)
+        std::string ichidan_base = potential_stem + "る";
+        if (isVerbInDictionary(&dict_manager, ichidan_base)) {
+          continue;  // Skip - stem is a dictionary verb, so this is verb+ない
+        }
+      }
     }
 
     // Normalize prolonged sound marks before analysis
@@ -852,16 +973,74 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       // For patterns with prolonged sound marks, lower threshold (0.40) since these
       // are intentional colloquial expressions (すごーい, やばーい)
       // Multiple consecutive marks (すごーーい) result in even lower confidence
-      // For particle-starting sequences, lower threshold (0.50) since these have
-      // already been validated as forming valid adjectives (はなはだしい, かわいい)
-      float confidence_threshold = has_prolonged ? 0.40F :
-                                   starts_with_particle ? 0.50F : 0.55F;
+      // For long hiragana adjectives use length-dependent thresholds
+      // (ものたりない=0.41 needs lower threshold than 0.50)
+      size_t adj_len = end_pos - start_pos;
+      float confidence_threshold;
+      if (has_prolonged) {
+        confidence_threshold = 0.40F;
+      } else if (starts_with_particle) {
+        // Use same length-dependent thresholds as validation loop
+        confidence_threshold = adj_len >= 6 ? 0.35F :
+                               adj_len >= 5 ? 0.40F : 0.50F;
+      } else {
+        confidence_threshold = adj_len >= 5 ? 0.40F :
+                               adj_len >= 4 ? 0.50F : 0.55F;
+      }
       if (cand.confidence >= confidence_threshold &&
           cand.verb_type == grammar::VerbType::IAdjective) {
-        // For particle-starting sequences, require stem length >= 2 characters
-        // This prevents に+そうな from being recognized as にい (invalid)
-        if (starts_with_particle && normalize::utf8Length(cand.stem) < 2) {
+        // Require stem length >= 2 characters for all hiragana adjectives
+        // This prevents しい, にい, etc. from being recognized as valid adjectives
+        // Valid hiragana i-adjectives have stems of at least 2 chars: あつい, かわいい, etc.
+        if (normalize::utf8Length(cand.stem) < 2) {
           continue;  // Stem too short for a valid adjective
+        }
+        // Skip sequences that contain particles like で which indicate
+        // the sequence should split (e.g., まじでやばい → まじ + で + やばい)
+        // Check if the sequence contains common copula/particle patterns
+        bool contains_particle = false;
+        for (size_t i = start_pos + 1; i < end_pos - 2; ++i) {
+          char32_t cp = codepoints[i];
+          // で after non-particle hiragana indicates copula (まじで, きれいで)
+          if (cp == U'で' || cp == U'に') {
+            // Check if preceded by valid adjective-like stem and followed by adjective
+            // If so, this is likely a split pattern
+            contains_particle = true;
+            break;
+          }
+        }
+        if (contains_particle && end_pos - start_pos >= 5) {
+          continue;  // Skip - likely a multi-word sequence
+        }
+        // Skip sequences starting with で/に followed by what looks like an adjective
+        // e.g., でやばい → で + やばい, not a single adjective
+        bool should_skip_for_particle_prefix = false;
+        if ((codepoints[start_pos] == U'で' || codepoints[start_pos] == U'に') &&
+            end_pos - start_pos >= 4) {
+          // Check if the remainder (without で/に) looks like a valid i-adjective
+          std::string remainder = extractSubstring(codepoints, start_pos + 1, end_pos);
+          auto remainder_results = inflection.analyze(remainder);
+          for (const auto& rem_cand : remainder_results) {
+            if (rem_cand.verb_type == grammar::VerbType::IAdjective &&
+                rem_cand.confidence >= 0.5F) {
+              // The remainder is a valid adjective, so skip the combined form
+              should_skip_for_particle_prefix = true;
+              break;
+            }
+          }
+        }
+        if (should_skip_for_particle_prefix) {
+          continue;
+        }
+        // Skip patterns ending with しれない (かもしれない grammatical form)
+        // These are not adjectives but grammatical constructions: かも+しれ+ない
+        if (surface.size() >= 12 && surface.rfind("しれない") == surface.size() - 12) {
+          continue;
+        }
+        // Skip patterns ending with さそう (なさそう/よさそう grammatical form)
+        // These are adj-stem + さ (nominalization) + そう (appearance)
+        if (surface.size() >= 9 && surface.rfind("さそう") == surface.size() - 9) {
+          continue;
         }
         // Base cost for hiragana i-adjective candidates
         // Use neutral base (0.0F) to avoid false positives like につい
@@ -870,17 +1049,29 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         if (has_prolonged) {
           cost -= 0.1F;  // Bonus for colloquial patterns like すごーい
         }
-        // Length-based bonus for adjectives starting with particle characters
-        // Short sequences (3 chars like につい) are likely verb te-forms
-        // Longer sequences (4+ chars like かわいい, はなはだしい) are real adjectives
+        // Length-based bonus for adjectives
+        // Short sequences (3 chars) might be verb te-forms
+        // Longer sequences (4+ chars like かわいい, つめたい, はなはだしい) are real adjectives
+        size_t char_count = end_pos - start_pos;
         if (starts_with_particle) {
-          size_t char_count = end_pos - start_pos;
-          if (char_count >= 5) {
-            cost -= 0.5F;  // Strong bonus for long adjectives (はなはだしい)
+          // Strong bonus for particle-starting adjectives to compete with
+          // dictionary splits like もの + たりない vs ものたりない
+          if (char_count >= 6) {
+            cost -= 2.5F;  // Very strong bonus for very long adjectives (ものたりない)
+          } else if (char_count >= 5) {
+            cost -= 2.0F;  // Strong bonus for long adjectives (はなはだしい)
           } else if (char_count >= 4) {
-            cost -= 0.35F;  // Moderate bonus for medium adjectives (かわいい)
+            cost -= 1.5F;  // Moderate bonus for medium adjectives (かわいい)
           }
           // No bonus for 3-char sequences (につい) - let dictionary entries win
+        } else {
+          // Bonus for non-particle-starting long hiragana adjectives
+          // to compete with verb + auxiliary patterns (つめ + たい vs つめたい)
+          if (char_count >= 5) {
+            cost -= 2.5F;  // Very strong bonus for long adjectives (やわらかい)
+          } else if (char_count >= 4) {
+            cost -= 2.2F;  // Strong bonus for 4-char adjectives (つめたい)
+          }
         }
         // Set lemma to base form from inflection analysis
         // For prolonged sound mark patterns, normalize the base form
@@ -916,6 +1107,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       ku_cand.lemma = cand.lemma;  // Same lemma (しんどい)
       ku_cand.cost = cand.cost + 0.1F;  // Slightly higher cost than full form
       ku_cand.has_suffix = true;  // This is a conjugated form
+      ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→AuxNegativeNai
 #ifdef SUZUME_DEBUG_INFO
       ku_cand.origin = cand.origin;
       ku_cand.confidence = cand.confidence;
@@ -958,6 +1150,37 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
 
   // Add all katt-form candidates
   for (auto& var : katt_form_candidates) {
+    candidates.push_back(std::move(var));
+  }
+
+  // Add kere-form candidates for kereba patterns (MeCab-compatible split)
+  // This enables: よければ → よけれ + ば
+  // For each candidate ending with ければ, generate a kere-form variant ending with けれ
+  std::vector<UnknownCandidate> kere_form_candidates;
+  for (const auto& cand : candidates) {
+    // Check if surface ends with ければ (i-adjective conditional form)
+    if (utf8::endsWith(cand.surface, "ければ")) {
+      // Generate kere-form variant: よければ → よけれ
+      UnknownCandidate kere_cand;
+      kere_cand.surface = cand.surface.substr(0, cand.surface.size() - core::kJapaneseCharBytes);  // Remove ば
+      kere_cand.start = cand.start;
+      kere_cand.end = cand.end - 1;  // 1 character (ば)
+      kere_cand.pos = core::PartOfSpeech::Adjective;
+      kere_cand.lemma = cand.lemma;  // Same lemma (よい, etc.)
+      kere_cand.cost = cand.cost + 0.1F;  // Slightly higher cost than full form
+      kere_cand.has_suffix = true;  // This is a conjugated form (仮定形)
+      kere_cand.extended_pos = core::ExtendedPOS::AdjBasic;  // For bigram: AdjBasic→ParticleConj
+#ifdef SUZUME_DEBUG_INFO
+      kere_cand.origin = cand.origin;
+      kere_cand.confidence = cand.confidence;
+      kere_cand.pattern = "i_adjective_hira_kere";
+#endif
+      kere_form_candidates.push_back(kere_cand);
+    }
+  }
+
+  // Add all kere-form candidates
+  for (auto& var : kere_form_candidates) {
     candidates.push_back(std::move(var));
   }
 
@@ -1044,6 +1267,90 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
 
   // Add emphatic variants (エグい → エグいっ, etc.)
   addEmphaticVariants(candidates, codepoints);
+
+  // Add ku-form candidates for kunai patterns (MeCab-compatible split)
+  // E.g., エモくない → エモく + ない
+  std::vector<UnknownCandidate> ku_form_candidates;
+  for (const auto& cand : candidates) {
+    // Check if surface ends with くない
+    if (utf8::endsWith(cand.surface, "くない")) {
+      // Generate ku-form variant: エモくない → エモく
+      UnknownCandidate ku_cand;
+      ku_cand.surface = cand.surface.substr(0, cand.surface.size() - core::kTwoJapaneseCharBytes);  // Remove ない
+      ku_cand.start = cand.start;
+      ku_cand.end = cand.end - 2;  // 2 characters (ない)
+      ku_cand.pos = core::PartOfSpeech::Adjective;
+      ku_cand.lemma = cand.lemma;
+      ku_cand.cost = cand.cost + 0.1F;  // Slightly higher cost than full form
+      ku_cand.has_suffix = true;
+      ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→AuxNegativeNai
+#ifdef SUZUME_DEBUG_INFO
+      ku_cand.origin = cand.origin;
+      ku_cand.confidence = cand.confidence;
+      ku_cand.pattern = "i_adjective_kata_ku";
+#endif
+      ku_form_candidates.push_back(ku_cand);
+    }
+  }
+  for (auto& var : ku_form_candidates) {
+    candidates.push_back(std::move(var));
+  }
+
+  // Add katt-form candidates for katta patterns (MeCab-compatible split)
+  // E.g., エモかった → エモかっ + た
+  std::vector<UnknownCandidate> katt_form_candidates;
+  for (const auto& cand : candidates) {
+    // Check if surface ends with かった
+    if (utf8::endsWith(cand.surface, "かった")) {
+      // Generate katt-form variant: エモかった → エモかっ
+      UnknownCandidate katt_cand;
+      katt_cand.surface = cand.surface.substr(0, cand.surface.size() - core::kJapaneseCharBytes);  // Remove た
+      katt_cand.start = cand.start;
+      katt_cand.end = cand.end - 1;  // 1 character (た)
+      katt_cand.pos = core::PartOfSpeech::Adjective;
+      katt_cand.lemma = cand.lemma;
+      katt_cand.cost = cand.cost + 0.2F;  // Slightly higher cost than full form
+      katt_cand.has_suffix = true;
+      katt_cand.extended_pos = core::ExtendedPOS::AdjKatt;  // For bigram: AdjKatt→AuxTenseTa
+#ifdef SUZUME_DEBUG_INFO
+      katt_cand.origin = cand.origin;
+      katt_cand.confidence = cand.confidence;
+      katt_cand.pattern = "i_adjective_kata_katt";
+#endif
+      katt_form_candidates.push_back(katt_cand);
+    }
+  }
+  for (auto& var : katt_form_candidates) {
+    candidates.push_back(std::move(var));
+  }
+
+  // Add kere-form candidates for kereba patterns (MeCab-compatible split)
+  // E.g., エモければ → エモけれ + ば
+  std::vector<UnknownCandidate> kere_form_candidates;
+  for (const auto& cand : candidates) {
+    // Check if surface ends with ければ
+    if (utf8::endsWith(cand.surface, "ければ")) {
+      // Generate kere-form variant: エモければ → エモけれ
+      UnknownCandidate kere_cand;
+      kere_cand.surface = cand.surface.substr(0, cand.surface.size() - core::kJapaneseCharBytes);  // Remove ば
+      kere_cand.start = cand.start;
+      kere_cand.end = cand.end - 1;  // 1 character (ば)
+      kere_cand.pos = core::PartOfSpeech::Adjective;
+      kere_cand.lemma = cand.lemma;
+      kere_cand.cost = cand.cost + 0.1F;  // Slightly higher cost than full form
+      kere_cand.has_suffix = true;
+      kere_cand.extended_pos = core::ExtendedPOS::AdjBasic;  // For bigram: AdjBasic→ParticleConj
+#ifdef SUZUME_DEBUG_INFO
+      kere_cand.origin = cand.origin;
+      kere_cand.confidence = cand.confidence;
+      kere_cand.pattern = "i_adjective_kata_kere";
+#endif
+      kere_form_candidates.push_back(kere_cand);
+    }
+  }
+  for (auto& var : kere_form_candidates) {
+    candidates.push_back(std::move(var));
+  }
 
   // Sort by cost
   std::sort(candidates.begin(), candidates.end(),

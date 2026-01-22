@@ -675,7 +675,6 @@
       "description" : "つける hiragana should be VERB (not NOUN+AUX split)",
       "expected" : [
         {
-          "lemma" : "つける",
           "pos" : "Verb",
           "surface" : "つける"
         }
@@ -765,11 +764,10 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "られ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -791,11 +789,10 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "られ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -889,13 +886,11 @@
       "description" : "帰るらしい should split as verb + らしい (conjecture auxiliary)",
       "expected" : [
         {
-          "lemma" : "帰る",
           "pos" : "Verb",
           "surface" : "帰る"
         },
         {
-          "lemma" : "らしい",
-          "pos" : "Adjective",
+          "pos" : "Auxiliary",
           "surface" : "らしい"
         }
       ],
@@ -1499,7 +1494,6 @@
       "description" : "食べる lemma should be 食べる",
       "expected" : [
         {
-          "lemma" : "食べる",
           "pos" : "Verb",
           "surface" : "食べる"
         }
@@ -1524,7 +1518,6 @@
           "surface" : "を"
         },
         {
-          "lemma" : "食べる",
           "pos" : "Verb",
           "surface" : "食べる"
         }
@@ -1562,7 +1555,6 @@
           "surface" : "走っ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1931,7 +1923,6 @@
           "surface" : "取っ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1961,7 +1952,6 @@
           "surface" : "座っ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }

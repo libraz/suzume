@@ -139,7 +139,7 @@ constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)>
   // ===========================================================================
   // Others (0.4-0.8)
   // ===========================================================================
-  table[static_cast<size_t>(ExtendedPOS::Adverb)] = 0.5F;           // 副詞
+  table[static_cast<size_t>(ExtendedPOS::Adverb)] = 0.1F;           // 副詞 (low cost for common adverbs)
   table[static_cast<size_t>(ExtendedPOS::AdverbQuotative)] = 0.4F;  // 引用副詞
   table[static_cast<size_t>(ExtendedPOS::Conjunction)] = 0.4F;      // 接続詞
   table[static_cast<size_t>(ExtendedPOS::Determiner)] = 0.4F;       // 連体詞

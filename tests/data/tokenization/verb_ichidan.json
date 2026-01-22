@@ -4,7 +4,6 @@
       "description" : "食べる - ichidan verb",
       "expected" : [
         {
-          "lemma" : "食べる",
           "pos" : "Verb",
           "surface" : "食べる"
         }
@@ -20,7 +19,6 @@
       "description" : "見える - ichidan verb",
       "expected" : [
         {
-          "lemma" : "見える",
           "pos" : "Verb",
           "surface" : "見える"
         }
@@ -36,7 +34,6 @@
       "description" : "伝える - ichidan verb",
       "expected" : [
         {
-          "lemma" : "伝える",
           "pos" : "Verb",
           "surface" : "伝える"
         }
@@ -52,7 +49,6 @@
       "description" : "教える - ichidan verb",
       "expected" : [
         {
-          "lemma" : "教える",
           "pos" : "Verb",
           "surface" : "教える"
         }
@@ -855,11 +851,10 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "られ"
         },
         {
-          "lemma" : "たい",
           "pos" : "Auxiliary",
           "surface" : "たい"
         }

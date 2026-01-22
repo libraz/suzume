@@ -456,8 +456,10 @@ ExtendedPOS detectVerbForm(std::string_view surface, std::string_view suffix) {
     return ExtendedPOS::VerbMeireikei;
   }
 
-  // る ending - likely shuushi (dictionary form) for ichidan
-  if (endsWithAny(surface, {"る"})) {
+  // う段 ending - likely shuushi (dictionary form) for godan/ichidan verbs
+  // Godan: う, く, す, つ, ぬ, む, ぶ, ぐ (includes voiced)
+  // Ichidan: る
+  if (endsWithAny(surface, {"う", "く", "す", "つ", "ぬ", "む", "る", "ぶ", "ぐ"})) {
     return ExtendedPOS::VerbShuushikei;
   }
 

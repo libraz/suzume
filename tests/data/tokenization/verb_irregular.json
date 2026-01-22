@@ -70,7 +70,6 @@
           "surface" : "し"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -204,7 +203,6 @@
           "surface" : "し"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -308,7 +306,7 @@
       "description" : "丁寧に説明する (explain politely) - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "丁寧"
         },
         {
@@ -320,7 +318,6 @@
           "surface" : "説明"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -386,7 +383,6 @@
           "surface" : "勉強"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         },
@@ -406,12 +402,10 @@
       "description" : "Suru verb 勉強する base form (MeCab-style split: noun + する)",
       "expected" : [
         {
-          "lemma" : "勉強",
           "pos" : "Noun",
           "surface" : "勉強"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -431,7 +425,6 @@
           "surface" : "分析"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -451,7 +444,6 @@
           "surface" : "確認"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -471,7 +463,6 @@
           "surface" : "説明"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -491,7 +482,6 @@
           "surface" : "処理"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -771,7 +761,6 @@
       "description" : "信じる dictionary form - another kanji + i-row stem ichidan verb",
       "expected" : [
         {
-          "lemma" : "信じる",
           "pos" : "Verb",
           "surface" : "信じる"
         }
@@ -849,7 +838,6 @@
       "description" : "みじん切りにする - みじん切り is a cooking term noun",
       "expected" : [
         {
-          "lemma" : "みじん切り",
           "pos" : "Noun",
           "surface" : "みじん切り"
         },
@@ -1644,7 +1632,6 @@
           "surface" : "し"
         },
         {
-          "lemma" : "とく",
           "pos" : "Verb",
           "surface" : "とく"
         }

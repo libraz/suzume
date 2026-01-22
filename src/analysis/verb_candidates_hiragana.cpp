@@ -101,6 +101,8 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
         // か: OK if preceded by な (なかった = negative past)
         //    Also OK if followed by れ (かれ = ichidan stem like つかれる, ふざける)
         //    Also OK if followed by んで/んだ (onbin te/ta-form: つかんで, 歩かんで)
+        //    Also OK if followed by ら+ん (GodanRa mizenkei + contracted negative)
+        //    e.g., わからん (わかる → わから + ん)
         if (curr == U'か') {
           if (prev == U'な') {
             ++hiragana_end;
@@ -118,6 +120,14 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
               codepoints[hiragana_end + 1] == U'ん' &&
               (codepoints[hiragana_end + 2] == U'で' ||
                codepoints[hiragana_end + 2] == U'だ')) {
+            ++hiragana_end;
+            continue;
+          }
+          // Check if followed by ら+ん (GodanRa mizenkei + contracted negative)
+          // e.g., わからん (わかる → わから + ん), わからんかった
+          if (hiragana_end + 2 < codepoints.size() &&
+              codepoints[hiragana_end + 1] == U'ら' &&
+              codepoints[hiragana_end + 2] == U'ん') {
             ++hiragana_end;
             continue;
           }
@@ -610,6 +620,89 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
         grammar::verbTypeToConjType(verb_type),
         true, CandidateOrigin::VerbHiragana, 0.9F, "hiragana_passive_mizenkei"));
     break;  // Only generate one passive candidate per length
+  }
+
+  // Generate Godan mizenkei stem candidates for contracted negative patterns
+  // E.g., くだらん → くだら (mizenkei of くだる) + ん (contracted negative AUX)
+  //       わからん → わから (mizenkei of わかる) + ん
+  // Key pattern: A-row hiragana (わ,か,さ,た,な,ま,ら,etc.) + ん
+  for (size_t end_pos = hiragana_end; end_pos > start_pos + 2; --end_pos) {
+    // Check if position end_pos-1 is A-row hiragana (mizenkei ending)
+    // and position end_pos is ん (contracted negative)
+    size_t mizenkei_end = end_pos - 1;
+    if (mizenkei_end <= start_pos) continue;
+
+    char32_t a_row_char = codepoints[mizenkei_end - 1];  // The A-row character
+    char32_t next_char = codepoints[mizenkei_end];       // Should be ん
+
+    // Check for A-row followed by ん
+    if (!grammar::isARowCodepoint(a_row_char) || next_char != U'ん') {
+      continue;
+    }
+
+    // Only generate if ん is at the end or followed by common patterns
+    // like んかった (past), んければ (conditional)
+    bool is_negative_pattern = false;
+    if (mizenkei_end + 1 == codepoints.size()) {
+      // ん at end of string: くだらん
+      is_negative_pattern = true;
+    } else if (mizenkei_end + 1 < codepoints.size()) {
+      char32_t after_n = codepoints[mizenkei_end + 1];
+      // んか (んかった)
+      if (after_n == U'か') {
+        is_negative_pattern = true;
+      }
+    }
+
+    if (!is_negative_pattern) {
+      continue;
+    }
+
+    // Derive VerbType from the A-row ending (e.g., ら → GodanRa)
+    grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(a_row_char);
+    if (verb_type == grammar::VerbType::Unknown) {
+      continue;
+    }
+
+    // Get base suffix (e.g., ら → る for GodanRa)
+    std::string_view base_suffix = grammar::godanBaseSuffixFromARow(a_row_char);
+    if (base_suffix.empty()) {
+      continue;
+    }
+
+    // Construct base form and mizenkei surface
+    std::string mizenkei_surface = extractSubstring(codepoints, start_pos, mizenkei_end);
+    std::string stem = extractSubstring(codepoints, start_pos, mizenkei_end - 1);
+    std::string base_form = stem + std::string(base_suffix);
+
+    // Check if base form exists in dictionary as a verb
+    bool is_valid_verb = vh::isVerbInDictionaryWithType(dict_manager, base_form, verb_type);
+    if (!is_valid_verb) {
+      is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
+    }
+
+    if (!is_valid_verb) {
+      continue;
+    }
+
+    // Use base form as lemma
+    std::string lemma = base_form;
+
+    // Generate mizenkei candidate (くだら) to enable split with ん
+    std::string surface = mizenkei_surface;
+    const char* pattern_name = "contracted_neg_mizenkei";
+
+    constexpr float kCost = -0.3F;  // Negative cost to beat single-token analysis
+    SUZUME_DEBUG_VERBOSE_BLOCK {
+      SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
+                          << " hiragana_" << pattern_name << " lemma=" << lemma
+                          << " cost=" << kCost << "\n";
+    }
+    candidates.push_back(makeVerbCandidate(
+        surface, start_pos, mizenkei_end, kCost, lemma,
+        grammar::verbTypeToConjType(verb_type),
+        true, CandidateOrigin::VerbHiragana, 0.8F, "hiragana_contracted_neg_mizenkei"));
+    break;  // Only generate one contracted negative candidate per length
   }
 
   // Generate Godan onbin stem candidates for contraction auxiliary patterns

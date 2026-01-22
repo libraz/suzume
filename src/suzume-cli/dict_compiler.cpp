@@ -48,7 +48,14 @@ std::vector<dictionary::DictionaryEntry> expandIAdjective(
     dictionary::DictionaryEntry new_entry;
     new_entry.surface = stem + suffix;
     new_entry.pos = core::PartOfSpeech::Adjective;
-    new_entry.extended_pos = core::ExtendedPOS::AdjBasic;
+    // Assign appropriate ExtendedPOS based on suffix
+    if (suffix == "かっ") {
+      new_entry.extended_pos = core::ExtendedPOS::AdjKatt;  // For AdjKatt→AuxTenseTa bigram
+    } else if (suffix == "く") {
+      new_entry.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For AdjRenyokei→AuxNegativeNai bigram
+    } else {
+      new_entry.extended_pos = core::ExtendedPOS::AdjBasic;
+    }
     new_entry.lemma = lemma;
     result.push_back(new_entry);
   }

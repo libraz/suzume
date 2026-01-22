@@ -851,87 +851,23 @@ void addAdjectiveSugiruJoinCandidates(
 }
 
 void addKatakanaSugiruJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer) {
-  using CharType = normalize::CharType;
-
-  if (start_pos >= char_types.size()) {
-    return;
-  }
-
-  // Must start with katakana
-  if (char_types[start_pos] != CharType::Katakana) {
-    return;
-  }
-
-  // Find the katakana portion (minimum 2 characters for meaningful words)
-  // Use large max to find all consecutive katakana
-  size_t katakana_end = findCharRegionEnd(char_types, start_pos, 20,
-                                           CharType::Katakana);
-
-  // Need at least 2 katakana characters
-  if (katakana_end - start_pos < 2) {
-    return;
-  }
-
-  // Next must be hiragana starting with す (for すぎ)
-  if (katakana_end >= char_types.size() ||
-      char_types[katakana_end] != CharType::Hiragana) {
-    return;
-  }
-
-  // Check if すぎ follows the katakana
-  size_t start_byte = charPosToBytePos(codepoints, start_pos);
-  size_t sugi_start_byte = charPosToBytePos(codepoints, katakana_end);
-
-  std::string_view after_katakana = text.substr(sugi_start_byte);
-  constexpr std::string_view kSugi = "すぎ";
-  if (after_katakana.size() < kSugi.size() ||
-      after_katakana.substr(0, kSugi.size()) != kSugi) {
-    return;
-  }
-
-  // Build compound verb base form: KATAKANA + すぎる
-  std::string katakana_part(text.substr(start_byte, sugi_start_byte - start_byte));
-  std::string compound_base = katakana_part + "すぎる";
-
-  // Calculate cost with bonus for katakana+sugiru pattern
-  float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
-  float final_cost = base_cost + scorer.joinOpts().compound_verb_bonus;
-  uint8_t flags = core::LatticeEdge::kFromDictionary;
-
-  // Generate candidates for different forms of すぎる
-  // Pattern 1: KATAKANA + すぎ (renyokei) - て/た/ない are separate tokens
-  size_t sugi_renyokei_len = 2;  // すぎ is 2 characters
-  size_t renyokei_end_pos = katakana_end + sugi_renyokei_len;
-
-  if (renyokei_end_pos <= codepoints.size()) {
-    size_t renyokei_end_byte = charPosToBytePos(codepoints, renyokei_end_pos);
-    std::string renyokei_surface(text.substr(start_byte, renyokei_end_byte - start_byte));
-
-    lattice.addEdge(renyokei_surface, static_cast<uint32_t>(start_pos),
-                    static_cast<uint32_t>(renyokei_end_pos), core::PartOfSpeech::Verb,
-                    final_cost, flags, compound_base);
-  }
-
-  // Pattern 2: KATAKANA + すぎる (base form) - as single token
-  constexpr std::string_view kSugiru = "すぎる";
-  if (after_katakana.size() >= kSugiru.size() &&
-      after_katakana.substr(0, kSugiru.size()) == kSugiru) {
-    size_t sugiru_char_len = 3;  // すぎる is 3 characters
-    size_t sugiru_end_pos = katakana_end + sugiru_char_len;
-
-    if (sugiru_end_pos <= codepoints.size()) {
-      size_t sugiru_end_byte = charPosToBytePos(codepoints, sugiru_end_pos);
-      std::string sugiru_surface(text.substr(start_byte, sugiru_end_byte - start_byte));
-
-      lattice.addEdge(sugiru_surface, static_cast<uint32_t>(start_pos),
-                      static_cast<uint32_t>(sugiru_end_pos), core::PartOfSpeech::Verb,
-                      final_cost, flags, compound_base);
-    }
-  }
+    core::Lattice& /*lattice*/, std::string_view /*text*/,
+    const std::vector<char32_t>& /*codepoints*/, size_t /*start_pos*/,
+    const std::vector<normalize::CharType>& /*char_types*/,
+    const Scorer& /*scorer*/) {
+  // MeCab compatibility: katakana + すぎる should be split as separate tokens
+  // MeCab output for シンプルすぎる:
+  //   シンプル   名詞,一般,*,*,*,*,シンプル,シンプル,シンプル
+  //   すぎる     動詞,非自立,*,*,一段,基本形,すぎる,スギル,スギル
+  //
+  // Previously this function generated compound verb candidates like シンプルすぎる (VERB)
+  // which beat the split path due to compound_verb_bonus.
+  //
+  // Now we rely on:
+  // 1. Unknown word generation for katakana (シンプル as NOUN)
+  // 2. Dictionary entries for すぎる/すぎ (VERB) to handle the verb portion
+  //
+  // This function is now a no-op for MeCab compatibility.
 }
 
 void addPrefixNounJoinCandidates(

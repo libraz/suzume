@@ -148,10 +148,14 @@ std::vector<DictionaryEntry> getParticleEntries() {
       particle("よ", EPOS::ParticleFinal),
       particle("わ", EPOS::ParticleFinal),
       particle("の", EPOS::ParticleNo),  // nominalizer
-      {"ん", POS::Particle, EPOS::ParticleNo, "の"},  // colloquial の
+      formal_noun("ん", "の"),  // colloquial の (nominalizer), MeCab treats as Noun
       particle("じゃん", EPOS::ParticleFinal),
       particle("っけ", EPOS::ParticleFinal),
       particle("かしら", EPOS::ParticleFinal),
+
+      // Nominalization suffix (名詞化接尾辞)
+      // MeCab treats さ as 名詞,接尾 for nominalization: 高さ, なさそう, よさそう
+      particle("さ", EPOS::Suffix),  // nominalization suffix for adj: 高さ, なさそう
 
       // Adverbial particles (副助詞)
       particle("かも", EPOS::ParticleAdverbial),  // prevent か+も split in かもしれない
@@ -214,6 +218,8 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("だ", "だ", EPOS::AuxCopulaDa),
       aux("だっ", "だ", EPOS::AuxCopulaDa),  // 連用タ接続形
       aux("で", "だ", EPOS::AuxCopulaDa),    // copula renyokei
+      aux("な", "だ", EPOS::AuxCopulaDa),    // copula rentaikei (na-adj attribute)
+      aux("なら", "だ", EPOS::AuxCopulaDa),  // copula hypothetical
       aux("だったら", "だ", EPOS::AuxCopulaDa),
 
       // Copula/Assertion - です (丁寧断定)
@@ -233,6 +239,8 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("ない", "ない", EPOS::AuxNegativeNai),
       aux("なかっ", "ない", EPOS::AuxNegativeNai),  // 連用タ接続
       aux("なければ", "ない", EPOS::AuxNegativeNai),
+      // な (ガル接続) - MeCab: 形容詞・アウオ段,ガル接続,ない for なさそう
+      adj("な", "ない", EPOS::AdjStem),
 
       // Negation - ぬ/ず (文語否定)
       aux("ぬ", "ぬ", EPOS::AuxNegativeNu),
@@ -255,12 +263,27 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("だろう", "だろう", EPOS::AuxVolitional),
       aux("でしょう", "でしょう", EPOS::AuxVolitional),
 
+      // Appearance - そう (様態)
+      // MeCab互換: 美味し+そう, 食べ+そう の分割
+      aux("そう", "そう", EPOS::AuxAppearanceSou),
+
+      // Conjecture - らしい (推定)
+      // MeCab互換: 春+らしい, 彼+らしい の分割
+      aux("らしい", "らしい", EPOS::AuxConjectureRashii),
+      aux("らしく", "らしい", EPOS::AuxConjectureRashii),  // 連用形
+      aux("らしかっ", "らしい", EPOS::AuxConjectureRashii),  // 連用形+た接続
+
+      // Similative - みたい (比況)
+      // MeCab互換: 食べる+みたい, 猫+みたい の分割
+      aux("みたい", "みたい", EPOS::AuxConjectureMitai),
+      aux("みたいだ", "みたい", EPOS::AuxConjectureMitai),  // 終止形+だ
+      aux("みたいな", "みたい", EPOS::AuxConjectureMitai),  // 連体形
+
       // Negative conjecture (否定推量)
       aux("まい", "まい", EPOS::AuxNegativeNu),
 
-      // Obligation (当為)
-      aux("べき", "べし", EPOS::Unknown),
-      aux("べきだ", "べし", EPOS::Unknown), aux("べきで", "べし", EPOS::Unknown), aux("べきでは", "べし", EPOS::Unknown),
+      // Obligation (当為) - MeCab互換: べき|だ 分割のため、べきのみ登録
+      aux("べき", "べし", EPOS::AuxObligation),
 
       // Passive/Potential (受身・可能)
       aux("れ", "れる", EPOS::AuxPassive),
@@ -271,6 +294,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Suru verb stem forms (サ変動詞語幹活用形) - VERB, not AUX
       verb("し", "する", EPOS::VerbRenyokei),
       verb("す", "する", EPOS::VerbShuushikei),
+      verb("する", "する", EPOS::VerbShuushikei),  // MeCab互換: 勉強+する
       verb("さ", "する", EPOS::VerbMizenkei),
       aux("しよう", "する", EPOS::AuxVolitional),
       aux("しろ", "する", EPOS::VerbMeireikei),
@@ -289,13 +313,22 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("たく", "たい", EPOS::AuxDesireTai),
       aux("たかっ", "たい", EPOS::AuxDesireTai),
       adj("たければ", "たい", EPOS::AuxDesireTai),
+
+      // よい/いい adjective hypothetical forms (to prevent よける verb interpretation)
+      adj("よけれ", "よい", EPOS::AdjBasic),
       aux("たがる", "たがる", EPOS::AuxDesireTai),
 
       // Polite imperative
       aux("なさい", "なさい", EPOS::Unknown),
 
-      // Possibility/Uncertainty
-      aux("かもしれない", "かもしれない", EPOS::AuxConjectureMitai),
+      // Possibility/Uncertainty - しれる verb for かも+しれ+ない pattern
+      verb("しれる", "しれる", EPOS::VerbShuushikei),
+      verb("しれ", "しれる", EPOS::VerbRenyokei),
+
+      // Contracted negative past pattern: 〜ん+かっ+た (MeCab compatibility)
+      // MeCab analyzes かっ as 動詞,五段・ラ行,連用タ接続,かる
+      // E.g., くだらんかった → くだら|ん|かっ|た
+      verb("かっ", "かる", EPOS::VerbOnbinkei),
 
       // Certainty - with reading
       aux("間違いない", "間違いない", EPOS::AuxNegativeNai),
@@ -316,10 +349,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("くださいませ", "ください", EPOS::Unknown),
 
       // Progressive/Continuous - いる (進行・継続)
+      // Note: 「い」single char removed - causes いい→い+い split
+      // VerbTeForm + い pattern handled by connection rules
       aux("いる", "いる", EPOS::AuxAspectIru),
       aux("います", "いる", EPOS::AuxAspectIru),
       aux("いません", "いる", EPOS::AuxAspectIru),
-      aux("い", "いる", EPOS::AuxAspectIru),
       aux("いない", "いる", EPOS::AuxAspectIru),
       aux("いなかった", "いる", EPOS::AuxAspectIru),
       aux("いれば", "いる", EPOS::AuxAspectIru),
@@ -350,10 +384,9 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("でる", "でる", EPOS::AuxAspectIru),
       verb("とく", "とく", EPOS::AuxAspectOku),
       verb("どく", "どく", EPOS::AuxAspectOku),
-      verb("といた", "とく", EPOS::AuxAspectOku),
-      verb("といて", "とく", EPOS::AuxAspectOku),
-      verb("どいた", "どく", EPOS::AuxAspectOku),
-      verb("どいて", "どく", EPOS::AuxAspectOku),
+      // MeCab互換: とい+た, とい+て 分割のため連用形のみ登録
+      verb("とい", "とく", EPOS::AuxAspectOku),
+      verb("どい", "どく", EPOS::AuxAspectOku),
 
       // Directional auxiliaries - いく/くる (方向補助動詞)
       aux("いく", "いく", EPOS::AuxAspectIku),
@@ -394,7 +427,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("ますの", "ます", EPOS::Unknown), aux("だわ", "だ", EPOS::Unknown),
 
       // Youth slang (若者言葉)
-      aux("っす", "です", EPOS::Unknown), aux("っした", "でした", EPOS::Unknown), aux("っすか", "ですか", EPOS::Unknown),
+      aux("っす", "です", EPOS::AuxCopulaDesu), aux("っした", "でした", EPOS::AuxCopulaDesu), aux("っすか", "ですか", EPOS::AuxCopulaDesu),
 
       // Rabbit-like (兎系)
       aux("ぴょん", "だ", EPOS::Unknown), aux("ピョン", "だ", EPOS::Unknown),

@@ -154,6 +154,21 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += options_.user_dict_bonus;
   }
 
+  // Dictionary adverb bonus
+  // Adverbs like どうして, いつも are often oversplit due to aggressive verb analysis
+  // Give dictionary adverbs a bonus to compete with split paths
+  // Longer adverbs (3+ chars) get stronger bonus to beat VerbRenyokei→ParticleConj
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adverb) {
+    float adv_bonus = -0.5F;  // Base bonus for dictionary adverbs
+    // Extra bonus for 3+ character adverbs (せめて, どうして, etc.)
+    // These need to beat verb renyokei + て split paths
+    // Japanese chars are 3 bytes each, so 3 chars = 9 bytes
+    if (edge.surface.size() >= 9) {
+      adv_bonus = -1.5F;  // Strong bonus for longer adverbs to beat split paths
+    }
+    cost += adv_bonus;
+  }
+
   // Debug output - show which cost was used (verbose level)
   SUZUME_DEBUG_VERBOSE_BLOCK {
     const char* source = edge.fromDictionary() ? "dict" :
@@ -178,6 +193,26 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   float extended_cost = BigramTable::getCost(prev.extended_pos, next.extended_pos);
 
   float total = base_cost + extended_cost;
+
+  // Surface-specific bonus: NOUN → する/し/さ (VERB) for suru-verb pattern
+  // MeCab compatibility: suru-verbs should split as Noun + する/し/さ(Verb)
+  // The POS-based NOUN→VERB cost is 0.5, while NOUN→AUX/PARTICLE is 0.0
+  // Apply strong bonus to compensate and prefer the Verb interpretation
+  // Suru-verb forms: する (shuushikei), し (renyokei), さ (mizenkei)
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      next.pos == core::PartOfSpeech::Verb &&
+      (next.surface == "する" || next.surface == "し" || next.surface == "さ")) {
+    total += bigram_cost::kStrongBonus;  // Negative value = bonus
+  }
+
+  // Surface-specific bonus: しれ (VERB) → ない (AUX) for かもしれない pattern
+  // MeCab compatibility: かもしれない → かも|しれ|ない
+  // The path かも|し|れ|ない incorrectly wins due to VerbRenyokei→AuxPassive bonus
+  // Give strong bonus to しれ→ない to ensure correct parse
+  if (prev.surface == "しれ" && prev.pos == core::PartOfSpeech::Verb &&
+      next.surface.compare(0, 6, "ない") == 0) {
+    total += bigram_cost::kStrongBonus;  // Negative value = bonus
+  }
 
   SUZUME_DEBUG_LOG_VERBOSE("[CONN] \"" << prev.surface << "\" ("
                     << core::posToString(prev.pos) << ") → \""

@@ -67,7 +67,6 @@
           "surface" : "代入"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -1312,7 +1311,6 @@
           "surface" : "を"
         },
         {
-          "lemma" : "みじん切り",
           "pos" : "Noun",
           "surface" : "みじん切り"
         },

@@ -393,14 +393,15 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       // 一段動詞: 食べる → 食べ + suffix
       // Note: ます系 excluded (should split as 食べ + ます)
       // Note: た/て excluded (should split as 食べ + た/て, MeCab-compatible)
+      // Note: ない excluded (should split as 食べ + ない, MeCab-compatible)
       suffixes = {
           {"る", false},        // Base: 食べる
           {"", false},          // Renyokei: 食べ (for 降り+て → lemma=降りる)
           // {"た", false},     // Past: Excluded - split as 食べ + た
           // {"て", false},     // Te-form: Excluded - split as 食べ + て
-          {"ない", false},      // Negative: 食べない
-          {"ん", false},        // Contracted negative: 食べん (colloquial)
-          {"なかった", false},  // Past negative: 食べなかった
+          // {"ない", false},   // Negative: Excluded - split as 食べ + ない
+          // {"ん", false},     // Contracted negative: Excluded - split as 食べ + ん (MeCab-compatible)
+          // {"なかった", false},  // Past negative: Excluded - split as 食べ + なかった
           {"れば", false},      // Conditional: 食べれば
           // {"たら", false},   // Conditional: Excluded - split as 食べ + たら
           {"よう", false},      // Volitional: 食べよう
@@ -445,10 +446,12 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       // Note: onbin + た/て/たら is handled by split path (connection rules)
 
       // Negative forms
-      suffixes.push_back({a + "ない", false});        // Negative: 書かない
-      suffixes.push_back({a + "ん", false});          // Contracted: 書かん
-      suffixes.push_back({a + "ぬ", false});          // Classical: 書かぬ
-      suffixes.push_back({a + "なかった", false});    // Past negative: 書かなかった
+      // Note: MeCab splits 書かない → 書か + ない, 書かん → 書か + ん
+      // So we exclude these to enable MeCab-compatible splits
+      // suffixes.push_back({a + "ない", false});        // Excluded: split as 書か + ない
+      // suffixes.push_back({a + "ん", false});          // Excluded: split as 書か + ん
+      // suffixes.push_back({a + "ぬ", false});          // Excluded: split as 書か + ぬ
+      // suffixes.push_back({a + "なかった", false});    // Excluded: split as 書か + なかっ + た
 
       // Conditional
       suffixes.push_back({e + "ば", false});          // Conditional: 書けば

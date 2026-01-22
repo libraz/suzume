@@ -29,8 +29,10 @@ std::vector<core::Morpheme> Postprocessor::process(
   // Merge consecutive numeric expressions (always applied)
   result = mergeNumericExpressions(result);
 
-  // Merge na-adjective + な into attributive form (always applied)
-  result = mergeNaAdjectiveNa(result);
+  // Merge na-adjective + な into attributive form (optional for MeCab compat)
+  if (options_.merge_na_adjectives) {
+    result = mergeNaAdjectiveNa(result);
+  }
 
   // Apply lemmatization
   if (options_.lemmatize) {

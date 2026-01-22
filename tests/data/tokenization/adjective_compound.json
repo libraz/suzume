@@ -24,7 +24,6 @@
       "description" : "Auxiliary verb すぎる dictionary form",
       "expected" : [
         {
-          "lemma" : "すぎる",
           "pos" : "Verb",
           "surface" : "すぎる"
         }
@@ -117,7 +116,6 @@
           "surface" : "尊"
         },
         {
-          "lemma" : "すぎる",
           "pos" : "Verb",
           "surface" : "すぎる"
         }
@@ -137,7 +135,6 @@
           "surface" : "高"
         },
         {
-          "lemma" : "すぎる",
           "pos" : "Verb",
           "surface" : "すぎる"
         }
