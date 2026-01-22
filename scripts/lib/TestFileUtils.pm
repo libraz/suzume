@@ -5,8 +5,8 @@ use strict;
 use warnings;
 use utf8;
 use Exporter 'import';
-use FindBin qw($RealBin);
 use File::Basename qw(dirname);
+use Cwd qw(abs_path);
 use lib dirname(__FILE__);
 use SuzumeUtils qw(load_json);
 
@@ -28,7 +28,9 @@ my $test_data_dir;
 
 sub _init_paths {
     return if defined $project_root;
-    $project_root = "$RealBin/..";
+    # Use __FILE__ to get module's location (scripts/lib), then go up two levels
+    my $module_dir = dirname(abs_path(__FILE__));
+    $project_root = "$module_dir/../..";
     $test_data_dir = "$project_root/tests/data/tokenization";
 }
 
@@ -128,17 +130,33 @@ sub find_test_by_id {
 sub get_failures_from_test_output {
     my ($test_output_file) = @_;
     $test_output_file //= '/tmp/test.txt';
+    return [] unless -f $test_output_file;
 
-    open my $fh, '<:utf8', $test_output_file
-        or die "Cannot open $test_output_file (run ctest first)\n";
+    open my $fh, '<:utf8', $test_output_file or return [];
 
     my @failures;
+    my $input = '';
+
     while (<$fh>) {
-        # Match lines like: FAILED: Verb_ichidan/5 "食べている"
-        if (/FAILED:\s+(\S+)\s+"(.+)"/) {
-            push @failures, { id => $1, input => $2 };
+        if (/Input:\s*(.+)/) {
+            $input = $1;
+        }
+        elsif (/FAILED.*GetParam\(\)\s*=\s*(\S+)\/(\S+)/) {
+            # Extract file/case_id from GetParam() = Adjective_i_katta/yokatta_desu_polite_past
+            my $file_part = $1;
+            my $case_id = $2;
+            if ($input ne '') {
+                push @failures, {
+                    id => "$file_part/$case_id",
+                    file => $file_part,
+                    case_id => $case_id,
+                    input => $input,
+                };
+                $input = '';
+            }
         }
     }
+
     close $fh;
     return \@failures;
 }

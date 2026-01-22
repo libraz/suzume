@@ -10,8 +10,12 @@ use JSON::PP qw(decode_json);
 our @EXPORT_OK = qw(
     mecab_analyze
     get_mecab_tokens
+    get_mecab_surfaces
     get_expected_tokens
     get_suzume_rule
+    get_suzume_surfaces
+    get_suzume_debug_info
+    get_char_types
     apply_suzume_merge
     map_mecab_pos
     normalize_pos
@@ -58,7 +62,7 @@ our @NAI_ADJECTIVES = qw(
     ものたりない こころもとない
 );
 
-# Counter/unit patterns (for legacy apply_suzume_merge, now mostly detected via MeCab POS)
+# Counter/unit patterns (unused - kept for reference, detection uses MeCab POS)
 our @COUNTER_UNITS = qw(
     人 個 本 枚 台 回 件 円 年 月 日 時 分 秒 階 番 号 歳 才 目
     ページ 頁 時間 分間 秒間 年間 日間 週間 か月 ヶ月 カ月
@@ -174,8 +178,7 @@ sub get_suzume_rule {
     return 'date' if $text =~ /\d+年\d+月\d+日/;
 
     # 4. Slang/new adjectives: エモい, キモい, ウザい, やばい
-    my @slang_adj_stems = qw(エモ キモ ウザ ダサ イタ);
-    for my $stem (@slang_adj_stems) {
+    for my $stem (keys %SLANG_ADJ_STEMS) {
         return 'slang-adjective' if $text =~ /\Q$stem\E[いかくけさ]/;
     }
     return 'slang-adjective' if $text =~ /やばい|やばかっ|やばく/;
@@ -195,136 +198,9 @@ sub get_suzume_rule {
 # Token Merging (Apply Suzume Rules to MeCab Output)
 # =============================================================================
 
-# Apply Suzume merge rules to MeCab tokens (position-aware)
-# Returns: merged token arrayref
-sub apply_suzume_merge {
-    my ($tokens, $text) = @_;
-    my @result;
-    my $i = 0;
-
-    while ($i < @$tokens) {
-        my $t = $tokens->[$i];
-        my $merged = 0;
-
-        # Calculate position in text
-        my $pos_in_text = 0;
-        for my $k (0 .. $i - 1) { $pos_in_text += length($tokens->[$k]{surface}); }
-        my $remaining = substr($text, $pos_in_text);
-
-        # 1. Full date pattern: 2024年12月23日 → single token
-        if (!$merged && $remaining =~ /^(\d+年\d+月\d+日)/) {
-            my $date = $1;
-            my $len = 0;
-            my $j = $i;
-            while ($j < @$tokens && $len < length($date)) {
-                $len += length($tokens->[$j]{surface});
-                $j++;
-            }
-            if ($len == length($date)) {
-                push @result, { surface => $date, pos => 'Noun', lemma => $date };
-                $i = $j;
-                $merged = 1;
-            }
-        }
-
-        # 2. Number + unit: merge 数字 + 助数詞
-        if (!$merged && $t->{surface} =~ /^\d+$/) {
-            my $j = $i + 1;
-            my $combined = $t->{surface};
-            while ($j < @$tokens) {
-                my $next_surface = $tokens->[$j]{surface};
-                my $is_counter = 0;
-                for my $unit (@COUNTER_UNITS) {
-                    if ($next_surface eq $unit) {
-                        $is_counter = 1;
-                        last;
-                    }
-                }
-                if ($is_counter) {
-                    $combined .= $next_surface;
-                    $j++;
-                } else {
-                    last;
-                }
-            }
-            if ($j > $i + 1) {
-                push @result, { surface => $combined, pos => 'Noun', lemma => $combined };
-                $i = $j;
-                $merged = 1;
-            }
-        }
-
-        # 3. Nai-adjective: merge だらし+ない → だらしない
-        if (!$merged) {
-            for my $adj (@NAI_ADJECTIVES) {
-                if ($remaining =~ /^\Q$adj\E/) {
-                    my $len = 0;
-                    my $j = $i;
-                    while ($j < @$tokens && $len < length($adj)) {
-                        $len += length($tokens->[$j]{surface});
-                        $j++;
-                    }
-                    if ($len == length($adj)) {
-                        push @result, { surface => $adj, pos => 'Adjective', lemma => $adj };
-                        $i = $j;
-                        $merged = 1;
-                        last;
-                    }
-                }
-            }
-        }
-
-        # 4. タリ活用副詞: merge 泰然 + と → 泰然と (Adverb)
-        if (!$merged) {
-            for my $stem (@TARI_ADVERB_STEMS) {
-                my $adverb = $stem . 'と';
-                if ($remaining =~ /^\Q$adverb\E/) {
-                    my $len = 0;
-                    my $j = $i;
-                    while ($j < @$tokens && $len < length($adverb)) {
-                        $len += length($tokens->[$j]{surface});
-                        $j++;
-                    }
-                    if ($len == length($adverb)) {
-                        push @result, { surface => $adverb, pos => 'Adverb', lemma => $stem };
-                        $i = $j;
-                        $merged = 1;
-                        last;
-                    }
-                }
-            }
-        }
-
-        # 5. Kanji compound: merge consecutive kanji-only tokens
-        if (!$merged && $t->{surface} =~ /^\p{Han}+$/) {
-            my $j = $i + 1;
-            my $combined = $t->{surface};
-            while ($j < @$tokens && $tokens->[$j]{surface} =~ /^\p{Han}+$/) {
-                $combined .= $tokens->[$j]{surface};
-                $j++;
-            }
-            if ($j > $i + 1) {
-                push @result, { surface => $combined, pos => 'Noun', lemma => $combined };
-                $i = $j;
-                $merged = 1;
-            }
-        }
-
-        if (!$merged) {
-            push @result, {
-                surface => $t->{surface},
-                pos     => map_mecab_pos($t),
-                lemma   => $t->{lemma} // $t->{surface}
-            };
-            $i++;
-        }
-    }
-    return \@result;
-}
-
-# Apply Suzume merge rules using raw MeCab tokens (with pos_sub1, pos_sub2)
+# Apply Suzume merge rules to MeCab tokens (using MeCab POS for detection)
 # Returns: (merged tokens, applied rule name or undef)
-sub apply_suzume_merge_raw {
+sub apply_suzume_merge {
     my ($tokens, $text) = @_;
     my @result;
     my $i = 0;
@@ -349,7 +225,7 @@ sub apply_suzume_merge_raw {
                 $j++;
             }
             if ($len == length($date)) {
-                push @result, { surface => $date, pos => 'Noun', lemma => $date };
+                push @result, { surface => $date, pos => '名詞', lemma => $date };
                 $i = $j;
                 $merged = 1;
                 $applied_rule //= 'date';
@@ -378,7 +254,7 @@ sub apply_suzume_merge_raw {
                 }
             }
             if ($j > $i + 1) {
-                push @result, { surface => $combined, pos => 'Noun', lemma => $combined };
+                push @result, { surface => $combined, pos => '名詞', lemma => $combined };
                 $i = $j;
                 $merged = 1;
                 $applied_rule //= 'number+unit';
@@ -386,6 +262,7 @@ sub apply_suzume_merge_raw {
         }
 
         # 3. Nai-adjective: merge だらし+ない → だらしない
+        #    Exception: MeCab splits these as Noun+Adjective, but merged form is Adjective
         if (!$merged) {
             for my $adj (@NAI_ADJECTIVES) {
                 if ($remaining =~ /^\Q$adj\E/) {
@@ -396,7 +273,8 @@ sub apply_suzume_merge_raw {
                         $j++;
                     }
                     if ($len == length($adj)) {
-                        push @result, { surface => $adj, pos => 'Adjective', lemma => $adj };
+                        # Explicitly set as 形容詞 (MeCab would classify stem as 名詞)
+                        push @result, { surface => $adj, pos => '形容詞', lemma => $adj };
                         $i = $j;
                         $merged = 1;
                         $applied_rule //= 'nai-adjective';
@@ -407,6 +285,7 @@ sub apply_suzume_merge_raw {
         }
 
         # 4. タリ活用副詞: merge 泰然 + と → 泰然と (Adverb)
+        #    Exception: MeCab splits these as Noun+Particle, but merged form is Adverb
         if (!$merged) {
             for my $stem (@TARI_ADVERB_STEMS) {
                 my $adverb = $stem . 'と';
@@ -418,7 +297,8 @@ sub apply_suzume_merge_raw {
                         $j++;
                     }
                     if ($len == length($adverb)) {
-                        push @result, { surface => $adverb, pos => 'Adverb', lemma => $stem };
+                        # Explicitly set as 副詞 (MeCab would classify stem as 名詞)
+                        push @result, { surface => $adverb, pos => '副詞', lemma => $stem };
                         $i = $j;
                         $merged = 1;
                         $applied_rule //= 'tari-adverb';
@@ -437,7 +317,7 @@ sub apply_suzume_merge_raw {
                 $j++;
             }
             if ($j > $i + 1) {
-                push @result, { surface => $combined, pos => 'Noun', lemma => $combined };
+                push @result, { surface => $combined, pos => '名詞', lemma => $combined };
                 $i = $j;
                 $merged = 1;
                 $applied_rule //= 'kanji-compound';
@@ -663,8 +543,8 @@ sub get_expected_tokens {
     my $raw_tokens = mecab_analyze($processed_text);
     _postprocess_mecab_tokens($raw_tokens, $text, $replacements);
 
-    # Apply Suzume merge rules using raw MeCab info
-    my ($merged, $applied_rule) = apply_suzume_merge_raw($raw_tokens, $text);
+    # Apply Suzume merge rules using MeCab POS info
+    my ($merged, $applied_rule) = apply_suzume_merge($raw_tokens, $text);
 
     # Map POS to Suzume format
     my @tokens;
@@ -733,6 +613,97 @@ sub save_json {
     open my $fh, '>:utf8', $file or die "Cannot write $file: $!\n";
     print $fh $json->encode($data);
     close $fh;
+}
+
+# =============================================================================
+# Suzume CLI Interface
+# =============================================================================
+
+# Get surfaces only from Suzume CLI output
+sub get_suzume_surfaces {
+    my ($cli, $text) = @_;
+    return [] unless defined $cli && -x $cli;
+    my $escaped = $text;
+    $escaped =~ s/'/'\\''/g;
+    my $output = `'$cli' '$escaped' 2>/dev/null`;
+    utf8::decode($output);
+    my @surfaces;
+    for my $line (split /\n/, $output) {
+        next if $line eq '' || $line eq 'EOS';
+        my ($surface) = split /\t/, $line;
+        push @surfaces, $surface if defined $surface && $surface ne '';
+    }
+    return \@surfaces;
+}
+
+# Get surfaces only from MeCab output
+sub get_mecab_surfaces {
+    my ($text) = @_;
+    my $escaped = $text;
+    $escaped =~ s/'/'\\''/g;
+    my $output = `echo '$escaped' | mecab 2>/dev/null`;
+    utf8::decode($output);
+    my @surfaces;
+    for my $line (split /\n/, $output) {
+        last if $line eq 'EOS' || $line eq '';
+        my ($surface) = split /\t/, $line;
+        push @surfaces, $surface if defined $surface && $surface ne '';
+    }
+    return \@surfaces;
+}
+
+# Get debug info from Suzume CLI (SUZUME_DEBUG=2)
+sub get_suzume_debug_info {
+    my ($cli, $text) = @_;
+    return {} unless defined $cli && -x $cli;
+    my $escaped = $text;
+    $escaped =~ s/'/'\\''/g;
+    my $output = `SUZUME_DEBUG=2 '$cli' '$escaped' 2>&1`;
+    utf8::decode($output);
+
+    my %info = (best_path => '', total_cost => 0, margin => 0, tokens => [], connections => []);
+    if ($output =~ /\[VITERBI\] Best path \(cost=([-\d.]+)\): (.+?) \[margin=([-\d.]+)\]/) {
+        $info{total_cost} = $1;
+        $info{best_path} = $2;
+        $info{margin} = $3;
+    }
+    my @path_parts = split / → /, $info{best_path};
+    for my $part (@path_parts) {
+        if ($part =~ /"(.+?)"\((\w+)\/(\w+)\)/) {
+            push @{$info{tokens}}, { surface => $1, pos => $2, epos => $3 };
+        }
+    }
+    while ($output =~ /\[CONN\] "(.+?)" \((\w+)\/\w+\) → "(.+?)" \((\w+)\/\w+\): bigram=([-\d.]+) epos_adj=([-\d.]+) \(([^)]+)\) total=([-\d.]+)/g) {
+        push @{$info{connections}}, {
+            from_surface => $1, from_pos => $2, to_surface => $3, to_pos => $4,
+            bigram => $5, epos_adj => $6, reason => $7, total => $8,
+        };
+    }
+    my @word_costs;
+    while ($output =~ /\[WORD\] "(.+?)" \(([^)]+)\) cost=([-\d.]+) \(from edge\) \[cat=([-\d.]+) edge=([-\d.]+) epos=([^\]]+)\]/g) {
+        push @word_costs, { surface => $1, source => $2, cost => $3, cat_cost => $4, edge_cost => $5, epos => $6 };
+    }
+    $info{word_costs} = \@word_costs;
+    return \%info;
+}
+
+# =============================================================================
+# Character Type Analysis
+# =============================================================================
+
+# Get character types present in a string
+sub get_char_types {
+    my ($str) = @_;
+    my %types;
+    for my $char (split //, $str) {
+        my $ord = ord($char);
+        if ($ord >= 0x3040 && $ord <= 0x309F) { $types{hiragana}++; }
+        elsif ($ord >= 0x30A0 && $ord <= 0x30FF) { $types{katakana}++; }
+        elsif ($ord >= 0x4E00 && $ord <= 0x9FFF) { $types{kanji}++; }
+        elsif ($ord >= 0x0041 && $ord <= 0x007A) { $types{alpha}++; }
+        elsif ($ord >= 0x0030 && $ord <= 0x0039) { $types{digit}++; }
+    }
+    return keys %types;
 }
 
 1;  # Module must return true

@@ -5,8 +5,12 @@
 # Commands:
 #   check <word>             Check if word can be added (MeCab analysis + duplicates)
 #   add <word> <pos> [conj]  Add word to dictionary (with safety checks)
+#   remove <word>            Remove word from dictionary
+#   disable <word>           Comment out word (keeps in file, but inactive)
+#   enable <word>            Uncomment disabled word
 #   validate                 Validate entire dictionary for issues
 #   suggest <word>           Suggest POS and conj_type based on MeCab
+#   cleanup <input.tsv>      Analyze dictionary, separate needed/unneeded entries
 #
 # Options:
 #   -f, --force              Add even if MeCab splits the word (requires confirmation)
@@ -23,6 +27,7 @@
 #   ./scripts/dict_tool.pl add "Wi-Fi" NOUN        # Add Wi-Fi as noun
 #   ./scripts/dict_tool.pl add "美味しい" ADJECTIVE I_ADJ  # Add i-adjective
 #   ./scripts/dict_tool.pl validate                # Check dictionary for issues
+#   ./scripts/dict_tool.pl cleanup data/dict.tsv  # Analyze dictionary entries
 #
 # Safety checks:
 #   - Rejects words that MeCab splits (unless --force)
@@ -38,7 +43,7 @@ use File::Basename;
 use Encode qw(decode encode);
 use FindBin qw($RealBin);
 use lib "$RealBin/lib";
-use SuzumeUtils qw(mecab_analyze get_suzume_rule apply_suzume_merge @NAI_ADJECTIVES);
+use SuzumeUtils qw(mecab_analyze get_suzume_rule apply_suzume_merge get_char_types map_mecab_pos @NAI_ADJECTIVES);
 
 binmode(STDOUT, ':utf8');
 binmode(STDERR, ':utf8');
@@ -83,6 +88,8 @@ if ($command eq 'check') {
     cmd_validate(@ARGV);
 } elsif ($command eq 'suggest') {
     cmd_suggest(@ARGV);
+} elsif ($command eq 'cleanup') {
+    cmd_cleanup(@ARGV);
 } else {
     die "Unknown command: $command\n";
 }
@@ -101,10 +108,12 @@ Commands:
   enable <word>            Uncomment disabled word
   validate                 Validate entire dictionary for issues
   suggest <word>           Suggest POS and conj_type based on MeCab
+  cleanup <input.tsv>      Analyze dictionary, separate needed/unneeded entries
 
 Options:
   -f, --force              Add even if MeCab splits the word (requires confirmation)
   --dry-run                Show what would be added without modifying
+  --fix                    Apply fixes (for validate command)
   -h, --help               Show this help
 
 POS values: ADJECTIVE, ADVERB, VERB, NOUN, PRONOUN, PREFIX, SUFFIX, INTERJECTION
@@ -119,6 +128,7 @@ Examples:
   ./scripts/dict_tool.pl disable "一時無効"
   ./scripts/dict_tool.pl enable "一時無効"
   ./scripts/dict_tool.pl validate
+  ./scripts/dict_tool.pl cleanup data/dict.tsv
 HELP
 }
 
@@ -192,34 +202,30 @@ sub is_conjugated_form {
     return undef;
 }
 
-sub map_mecab_pos {
-    my ($token) = @_;
-    my $pos = $token->{pos};
-    my $sub1 = $token->{pos_sub1};
+# Convert SuzumeUtils POS to dictionary format (uppercase)
+sub to_dict_pos {
+    my ($pos) = @_;
+    return undef unless $pos;
 
-    if ($pos eq '名詞') {
-        return 'NOUN';
-    } elsif ($pos eq '動詞') {
-        return 'VERB';
-    } elsif ($pos eq '形容詞') {
-        return 'ADJECTIVE';
-    } elsif ($pos eq '副詞') {
-        return 'ADVERB';
-    } elsif ($pos eq '接頭詞') {
-        return 'PREFIX';
-    } elsif ($pos eq '接尾辞') {
-        return 'SUFFIX';
-    } elsif ($pos eq '代名詞') {
-        return 'PRONOUN';
-    } elsif ($pos eq '感動詞') {
-        return 'INTERJECTION';
-    } elsif ($pos eq '連体詞') {
-        return 'ADNOMINAL';
-    } elsif ($pos eq '接続詞') {
-        return 'CONJUNCTION';
-    } else {
-        return undef;
-    }
+    my %dict_pos_map = (
+        'Noun'        => 'NOUN',
+        'Verb'        => 'VERB',
+        'Adjective'   => 'ADJECTIVE',
+        'Adverb'      => 'ADVERB',
+        'Prefix'      => 'PREFIX',
+        'Suffix'      => 'SUFFIX',
+        'Pronoun'     => 'PRONOUN',
+        'Interjection'=> 'INTERJECTION',
+        'Adnominal'   => 'ADNOMINAL',
+        'Conjunction' => 'CONJUNCTION',
+        'Particle'    => 'PARTICLE',
+        'Auxiliary'   => 'AUXILIARY',
+        'Symbol'      => 'SYMBOL',
+        'Filler'      => 'FILLER',
+        'Other'       => 'OTHER',
+    );
+
+    return $dict_pos_map{$pos} // uc($pos);
 }
 
 sub map_conj_type {
@@ -394,7 +400,7 @@ sub cmd_check {
 
     # 4. Suggestion
     if ($is_single_token) {
-        my $suggested_pos = map_mecab_pos($tokens[0]);
+        my $suggested_pos = to_dict_pos(map_mecab_pos($tokens[0]));
         my $suggested_conj = map_conj_type($tokens[0]);
 
         if ($suggested_pos) {
@@ -440,7 +446,7 @@ sub cmd_suggest {
     }
 
     my $t = $tokens[0];
-    my $pos = map_mecab_pos($t);
+    my $pos = to_dict_pos(map_mecab_pos($t));
     my $conj = map_conj_type($t);
 
     print "Word: $word\n";
@@ -928,4 +934,108 @@ sub remove_lines {
         print $out $line unless $to_remove{$line_num};
     }
     close $out;
+}
+
+sub cmd_cleanup {
+    # Analyze dictionary and separate needed/unneeded entries (merged from cleanup_dict.pl)
+    my ($input_file) = @_;
+    die "Usage: dict_tool.pl cleanup <input.tsv>\n" unless $input_file && -f $input_file;
+
+    my $SUZUME = './build/bin/suzume-cli';
+    die "suzume not found: $SUZUME (build first)\n" unless -x $SUZUME;
+
+    # Output files
+    my ($base) = $input_file =~ /(.+)\.tsv$/;
+    $base //= $input_file;
+    my $keep_file  = "${base}_keep.tsv";
+    my $noise_file = "${base}_noise.tsv";
+
+    my $is_fixed_expression = sub {
+        my ($str) = @_;
+        return $str =~ /[一-龯ァ-ヶ][のをがはにへとで][一-龯ぁ-んァ-ヶ]/;
+    };
+
+    my $is_split_by_suzume = sub {
+        my ($surface) = @_;
+        my $cmd = qq{$SUZUME analyze "$surface" 2>/dev/null};
+        my $output = `$cmd`;
+        my @lines = grep { /\S/ } split /\n/, $output;
+        return scalar(@lines) > 1;
+    };
+
+    my $should_keep = sub {
+        my ($surface, $pos) = @_;
+        my $len = length($surface);
+        my @types = get_char_types($surface);
+
+        return (0, "too_short") if $len <= 2;
+
+        my $is_split = $is_split_by_suzume->($surface);
+        return (0, "handled_by_suzume") unless $is_split;
+
+        return (1, "fixed_expression") if $is_fixed_expression->($surface);
+        return (1, "mixed_chartype_compound") if @types > 1;
+
+        if (@types && $types[0] eq 'kanji' && $len >= 4) {
+            return (1, "kanji_compound");
+        }
+
+        return (1, "split_other");
+    };
+
+    open my $in, '<:utf8', $input_file or die "Cannot open $input_file: $!\n";
+    my @keep;
+    my @noise;
+    my $line_num = 0;
+    my $total = 0;
+    my $kept = 0;
+
+    print STDERR "Processing: $input_file\n";
+
+    while (my $line = <$in>) {
+        $line_num++;
+        chomp $line;
+
+        if ($line =~ /^\s*#/ || $line =~ /^\s*$/) {
+            push @keep, $line;
+            next;
+        }
+
+        my @fields = split /\t/, $line;
+        next unless @fields >= 3;
+
+        my ($surface, $pos, $reading) = @fields[0, 1, 2];
+        $total++;
+
+        my ($keep_entry, $reason) = $should_keep->($surface, $pos);
+
+        if ($keep_entry) {
+            push @keep, $line;
+            $kept++;
+            print STDERR "  KEEP: $surface ($reason)\n" if $dry_run;
+        } else {
+            push @noise, "$line\t# $reason";
+            print STDERR "  DROP: $surface ($reason)\n" if $dry_run;
+        }
+
+        print STDERR "  ... processed $line_num lines\r" if $line_num % 100 == 0;
+    }
+    close $in;
+
+    print STDERR "\n";
+    print STDERR "Results: $kept / $total entries kept\n";
+
+    unless ($dry_run) {
+        open my $out_keep, '>:utf8', $keep_file or die "Cannot write $keep_file: $!\n";
+        print $out_keep "$_\n" for @keep;
+        close $out_keep;
+        print STDERR "Written: $keep_file\n";
+
+        open my $out_noise, '>:utf8', $noise_file or die "Cannot write $noise_file: $!\n";
+        print $out_noise "$_\n" for @noise;
+        close $out_noise;
+        print STDERR "Written: $noise_file\n";
+    }
+
+    print STDERR "Done.\n";
 }

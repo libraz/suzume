@@ -3,39 +3,41 @@
 # Usage: ./scripts/test_tool.pl <command> [options]
 #
 # Commands:
-#   show <input>             Show MeCab output, JSON expected, and check if test exists
-#                            Also shows current expected if test exists
+#   show <input>             Compare MeCab vs Suzume with diff classification
+#                            Default output shows colored diff and test info
 #   update <input>           Update test case to match MeCab/Suzume output
 #   update -t <test_id>      Update specific test by ID (e.g., verb_ichidan/5)
-#                            Shows source (MeCab/MeCab+SuzumeRules) and auto-rule
 #   add -f <file> <input>    Add new test case to file (rejects duplicates)
-#                            Use --id to specify ID, or auto-generates snake_case ASCII ID
+#   search <pattern>         Search test cases by regex pattern
+#   failed                   List failed test inputs from /tmp/test.txt
+#   compare <before> <after> Compare two test outputs (improved/regressed)
 #   diff-suzume              Analyze failures by category (read-only)
 #   diff-mecab               Find tests where expected differs from MeCab
-#                            (detects intentional Suzume rules vs potential errors)
 #   needs-suzume-update      Find tests where expected != MeCab+SuzumeRules
-#                            Use --apply to auto-update to correct expected values
+#   batch-add -f <tgt> <file> Batch add tests from input file
 #   check-coverage <file>    Check which inputs in file have tests
-#   batch-add -f <tgt> <file> Batch add tests from input file (skips duplicates)
-#                            Shows source/rule for each added test
 #   suggest-file <input>     Suggest which test file for input
 #   replace-pos OLD NEW      Replace POS in all test files (dry-run by default)
-#   map-pos SURFACE OLD NEW  Replace POS only for specific surface (dry-run by default)
+#   map-pos SURFACE OLD NEW  Replace POS only for specific surface
 #   list                     List all test files with case counts
-#   list-pos                 List all POS values used in tests with counts and examples
-#   validate-ids             Detect/fix non-ASCII or duplicate IDs (--apply to fix)
+#   list-pos                 List all POS values used in tests
+#   validate-ids             Detect/fix non-ASCII or duplicate IDs
 #
-# Options:
+# Show command options:
+#   -b, --brief        One-line compact output
+#   --tsv              TSV output (surface/pos/lemma)
+#   --debug            Show Suzume scoring details
+#   -j, --json         Include JSON expected output
+#
+# General options:
 #   -f, --file FILE    Target test file (without .json), or 'all' for all files
 #   -t, --test-id ID   Test ID (format: file/index or file/id_string)
-#   --id ID            Case ID for add command (snake_case recommended)
-#   -d, --description  Description for new test
-#   --tags TAG,TAG     Comma-separated tags
+#   --id ID            Case ID for add command
 #   -n, --dry-run      Show changes without applying
-#   --apply            Actually apply changes (batch-add/replace-pos/map-pos/
-#                      needs-suzume-update/validate-ids)
-#   --use-suzume       Force Suzume output for expected (update/add/batch-add)
-#   --limit N          Limit output per category (diff-suzume/diff-mecab)
+#   --apply            Apply changes (batch-add/replace-pos/needs-suzume-update)
+#   --use-suzume       Force Suzume output for expected
+#   --limit N          Limit output count
+#   -v, --verbose      Verbose output
 #   -h, --help         Show this help
 #
 # Suzume rules (design differences from MeCab):
@@ -73,6 +75,18 @@
 #   # POS replacement (all files)
 #   ./scripts/test_tool.pl replace-pos Auxiliary Aux_Tense -f all --apply
 #   ./scripts/test_tool.pl map-pos た Auxiliary Aux_Tense --apply
+#
+#   # Analysis (merged from diff_analysis.pl)
+#   ./scripts/test_tool.pl analyze "食べています"       # MeCab vs Suzume diff
+#   ./scripts/test_tool.pl analyze "食べています" -d    # with scoring details
+#   ./scripts/test_tool.pl analyze -a                  # all failures
+#
+#   # Test comparison (merged from compare_tests.pl)
+#   ./scripts/test_tool.pl compare /tmp/before.txt /tmp/after.txt
+#
+#   # Failed inputs (merged from failed_inputs.sh)
+#   ./scripts/test_tool.pl failed                      # list failed inputs
+#   ./scripts/test_tool.pl failed -v                   # with test IDs
 
 use strict;
 use warnings;
@@ -84,8 +98,11 @@ use FindBin qw($RealBin);
 use lib "$RealBin/lib";
 use SuzumeUtils qw(
     get_mecab_tokens
+    get_mecab_surfaces
     get_expected_tokens
     get_suzume_rule
+    get_suzume_surfaces
+    get_suzume_debug_info
     apply_suzume_merge
     normalize_pos
     tokens_match
@@ -98,12 +115,23 @@ use SuzumeUtils qw(
 use TestFileUtils qw(
     find_test_by_input
     find_test_by_id
+    get_test_files
+    get_failures_from_test_output
     generate_id
     get_test_data_dir
 );
 
 binmode(STDOUT, ':utf8');
 binmode(STDERR, ':utf8');
+
+# ANSI color codes (auto-disable if not a terminal)
+my $USE_COLOR = -t STDOUT;
+my $RED    = $USE_COLOR ? "\e[31m" : '';
+my $GREEN  = $USE_COLOR ? "\e[32m" : '';
+my $YELLOW = $USE_COLOR ? "\e[33m" : '';
+my $CYAN   = $USE_COLOR ? "\e[36m" : '';
+my $BOLD   = $USE_COLOR ? "\e[1m"  : '';
+my $RESET  = $USE_COLOR ? "\e[0m"  : '';
 
 my $test_file = '';
 my $test_id = '';
@@ -116,6 +144,16 @@ my $use_suzume = 0;
 my $case_id = '';
 my $limit = 0;  # 0 = no limit
 my $compare = 0;
+my $analyze_all = 0;
+my $show_debug = 0;
+my $json_output = 0;
+my $verbose = 0;
+my $run_mecab = 0;
+my $run_cli = 0;
+my $brief = 0;
+my $stats_only = 0;
+my $grep_pattern = '';
+my $tsv_output = 0;
 
 GetOptions(
     'f|file=s'        => \$test_file,
@@ -128,6 +166,16 @@ GetOptions(
     'use-suzume'      => \$use_suzume,
     'limit=i'         => \$limit,
     'c|compare'       => \$compare,
+    'a|all'           => \$analyze_all,
+    'debug'           => \$show_debug,
+    'j|json'          => \$json_output,
+    'v|verbose'       => \$verbose,
+    'm|mecab'         => \$run_mecab,
+    'cli'             => \$run_cli,
+    'b|brief'         => \$brief,
+    'stats'           => \$stats_only,
+    'grep=s'          => \$grep_pattern,
+    'tsv'             => \$tsv_output,
     'h|help'          => \$help,
 ) or die "Error in command line arguments\n";
 
@@ -154,48 +202,51 @@ sub print_help {
 Usage: test_tool.pl <command> [options] [input]
 
 Commands:
-  expected <input>       Output expected tokens (MeCab+SuzumeRules) in MeCab format
-                         Use -c to compare with Suzume output
-  show <input>           Show what MeCab outputs (dry-run)
+  show <input>           Compare MeCab vs Suzume with diff classification
+                         Default: colored diff + test info
   update <input>         Find and update test case matching input
   update -t <test_id>    Update specific test by ID
   add -f <file> <input>  Add new test case to file
+  search <pattern>       Search test cases by regex pattern
+  failed                 List failed test inputs from /tmp/test.txt
+  compare <before> <after>  Compare two test outputs (improved/regressed)
+  diff-suzume            Analyze failures by category (read-only)
+  diff-mecab             Find tests not MeCab-compatible
   needs-suzume-update    Find tests where expected != MeCab+SuzumeRules
-                         Use --apply to auto-update all tests
-  diff-suzume            Analyze failures: categorize by type (read-only)
-  diff-mecab             Find tests not MeCab-compatible (intentional or errors)
+  batch-add -f <tgt> <file>  Batch add tests from file
   check-coverage <file>  Check which inputs in file have tests
-  batch-add -f <target> <file>  Batch add tests from file
   suggest-file <input>   Suggest which test file for input
   replace-pos OLD NEW    Replace POS in all test files
-  map-pos SURFACE OLD NEW Replace POS only for specific surface
-  validate-ids           Detect/fix non-ASCII or duplicate IDs (--apply to fix)
-  list                   List all test files
+  map-pos SURFACE OLD NEW Replace POS for specific surface only
+  list                   List all test files with case counts
   list-pos               List all POS values used in tests
+  validate-ids           Detect/fix non-ASCII or duplicate IDs
 
-Options:
-  -f, --file FILE        Target test file (without .json), or 'all' for all files
-  -t, --test-id ID       Test ID (format: file/index)
-  --id ID                Case ID for add command (snake_case recommended)
-  -d, --description STR  Description for new test
-  --tags TAG,TAG         Comma-separated tags
+Show options:
+  -b, --brief            One-line compact output
+  --tsv                  TSV output (surface/pos/lemma)
+  --debug                Show Suzume scoring details
+  -j, --json             Include JSON expected output
+
+General options:
+  -f, --file FILE        Target test file (without .json), or 'all'
+  -t, --test-id ID       Test ID (format: file/index or file/id_string)
+  --id ID                Case ID for add command
   -n, --dry-run          Show changes without applying
-  --apply                Actually apply changes (required for batch-add/replace-pos/map-pos)
-  --use-suzume           Use Suzume output as expected (for grammar-first cases)
+  --apply                Apply changes (batch-add/replace-pos/map-pos)
+  --use-suzume           Force Suzume output for expected
+  --limit N              Limit output count
+  -v, --verbose          Verbose output
   -h, --help             Show this help
 
 Examples:
-  ./scripts/test_tool.pl expected "だらしない"       # MeCab+Suzumeルール適用済み出力
-  ./scripts/test_tool.pl expected -c "食べている"   # Suzumeと比較
-  ./scripts/test_tool.pl show "食べています"
+  ./scripts/test_tool.pl show "食べています"        # MeCab/Suzume比較
+  ./scripts/test_tool.pl show "3人" --tsv           # TSV出力
+  ./scripts/test_tool.pl show "食べたい" --debug    # スコアリング情報
+  ./scripts/test_tool.pl search "食べ"              # テスト検索
   ./scripts/test_tool.pl update "食べています"
-  ./scripts/test_tool.pl add -f verb_ichidan "食べています"
-  ./scripts/test_tool.pl needs-suzume-update        # 更新が必要なテスト一覧
-  ./scripts/test_tool.pl needs-suzume-update --apply  # 全テスト更新
-  ./scripts/test_tool.pl diff-suzume                # 失敗カテゴリ分析
-  ./scripts/test_tool.pl batch-add -f basic /tmp/inputs.txt --apply
-  ./scripts/test_tool.pl replace-pos Auxiliary Aux_Tense --apply
-  ./scripts/test_tool.pl list-pos                   # 全POS値一覧
+  ./scripts/test_tool.pl add -f verb_ichidan "食べる"
+  ./scripts/test_tool.pl failed                     # 失敗リスト
 HELP
 }
 
@@ -208,39 +259,6 @@ sub get_expected_tokens_with_cli {
     }
 
     return get_expected_tokens($text);
-}
-
-sub get_failures_from_test_output {
-    my $file = '/tmp/test.txt';
-    return [] unless -f $file;
-
-    open my $fh, '<:utf8', $file or return [];
-
-    my @failures;
-    my $input = '';
-
-    while (<$fh>) {
-        if (/Input:\s*(.+)/) {
-            $input = $1;
-        }
-        elsif (/FAILED.*GetParam\(\)\s*=\s*(\S+)\/(\S+)/) {
-            # Extract file/case_id from GetParam() = Adjective_i_katta/yokatta_desu_polite_past
-            my $file_part = $1;
-            my $case_id = $2;
-            if ($input ne '') {
-                push @failures, {
-                    id => "$file_part/$case_id",
-                    file => $file_part,
-                    case_id => $case_id,
-                    input => $input,
-                };
-                $input = '';
-            }
-        }
-    }
-
-    close $fh;
-    return \@failures;
 }
 
 # Detect segmentation failure pattern by comparing correct vs suzume tokenization
@@ -326,20 +344,14 @@ sub get_suzume_tokens {
 # Alias for backward compatibility
 sub get_suzume_tokens_full { goto &get_suzume_tokens; }
 
-sub get_test_files {
+# Local wrapper for get_test_files with filter support
+sub get_test_files_filtered {
     my ($file_filter) = @_;
-    my @files;
-
     if ($file_filter && $file_filter ne 'all') {
         my $path = "$test_data_dir/$file_filter.json";
-        push @files, $path if -f $path;
-    } else {
-        opendir my $dh, $test_data_dir or die "Cannot open $test_data_dir: $!\n";
-        @files = map { "$test_data_dir/$_" } grep { /\.json$/ } readdir $dh;
-        closedir $dh;
+        return (-f $path) ? ($path) : ();
     }
-
-    return sort @files;
+    return get_test_files();
 }
 
 # Command handlers
@@ -363,141 +375,131 @@ if ($command eq 'list') {
     exit 0;
 }
 
-if ($command eq 'expected') {
-    die "Usage: $0 expected [-c|--compare] <input>\n" unless $input;
-
-    my ($tokens, $source, $rule) = get_expected_tokens($input);
-
-    if ($compare) {
-        # Compare with Suzume output
-        my $suzume_cli = "$project_root/build/bin/suzume-cli";
-        die "suzume-cli not found (run cmake build first)\n" unless -x $suzume_cli;
-        my $suzume = get_suzume_tokens($suzume_cli, $input);
-
-        # ANSI color codes
-        my $RED = "\e[31m";
-        my $YELLOW = "\e[33m";
-        my $GRAY = "\e[90m";
-        my $RESET = "\e[0m";
-
-        # Helper to format token with optional lemma
-        my $fmt = sub {
-            my ($t) = @_;
-            my $lemma = $t->{lemma} // $t->{surface};
-            if ($lemma ne $t->{surface}) {
-                return "$t->{surface}/$t->{pos}($lemma)";
-            }
-            return "$t->{surface}/$t->{pos}";
-        };
-
-        my $exp_str = join(' ', map { $fmt->($_) } @$tokens);
-        my $suz_str = join(' ', map { $fmt->($_) } @$suzume);
-
-        # Check segmentation match (same surfaces)
-        my @exp_surfaces = map { $_->{surface} } @$tokens;
-        my @suz_surfaces = map { $_->{surface} } @$suzume;
-        my $seg_match = join('|', @exp_surfaces) eq join('|', @suz_surfaces);
-
-        if (tokens_match($tokens, $suzume)) {
-            print "✓ Match\n";
-            print "  $exp_str\n";
-        } else {
-            # Determine mismatch type
-            if ($seg_match) {
-                print "${YELLOW}△ 分割OK、POS/lemma差異${RESET}\n";
-            } else {
-                print "${RED}✗ 分割不一致${RESET}\n";
-            }
-            print "  Expected: $exp_str\n";
-            print "  Suzume:   $suz_str\n";
-
-            # Show detailed diff for each token
-            my $max_len = @$tokens > @$suzume ? @$tokens : @$suzume;
-            my @diffs;
-            for my $i (0 .. $max_len - 1) {
-                my $e = $tokens->[$i];
-                my $s = $suzume->[$i];
-                if (!$e || !$s) {
-                    my $msg = $e ? "extra expected: $e->{surface}" : "extra suzume: $s->{surface}";
-                    push @diffs, "${RED}[$i] $msg${RESET}";
-                } else {
-                    my @fields;
-                    if (($e->{surface} // '') ne ($s->{surface} // '')) {
-                        push @fields, "${RED}surface${RESET}";
-                    }
-                    if (normalize_pos($e->{pos} // '') ne normalize_pos($s->{pos} // '')) {
-                        push @fields, "${YELLOW}pos($e->{pos}≠$s->{pos})${RESET}";
-                    }
-                    my $e_lemma = $e->{lemma} // $e->{surface};
-                    my $s_lemma = $s->{lemma} // $s->{surface};
-                    if ($e_lemma ne $s_lemma) {
-                        push @fields, "${GRAY}lemma($e_lemma≠$s_lemma)${RESET}";
-                    }
-                    if (@fields) {
-                        push @diffs, "[$i] $e->{surface}: " . join(', ', @fields);
-                    }
-                }
-            }
-            if (@diffs) {
-                print "  Diff:\n";
-                for my $d (@diffs) {
-                    print "    $d\n";
-                }
-            }
-        }
-        if ($rule) {
-            print "  Rule: $rule\n";
-        }
-    } else {
-        for my $t (@$tokens) {
-            my $lemma = $t->{lemma} // '';
-            if ($lemma ne '' && $lemma ne $t->{surface}) {
-                print "$t->{surface}\t$t->{pos}\t$lemma\n";
-            } else {
-                print "$t->{surface}\t$t->{pos}\n";
-            }
-        }
-
-        # Show rule info on stderr if applied
-        if ($rule) {
-            print STDERR "# Rule: $rule\n";
-        }
-    }
-    exit 0;
-}
-
 if ($command eq 'show') {
     die "Usage: $0 show <input>\n" unless $input;
 
     my $suzume_cli = "$project_root/build/bin/suzume-cli";
 
-    # Get raw MeCab tokens
+    # Get MeCab and Suzume outputs
     my $mecab_tokens = get_mecab_tokens($input);
-    print "Input: $input\n\n";
-    print_tokens($mecab_tokens, "MeCab (raw)");
+    my @mecab_surfaces = map { $_->{surface} } @$mecab_tokens;
+    my $suzume_surfaces = -x $suzume_cli ? get_suzume_surfaces($suzume_cli, $input) : [];
 
-    # Get corrected expected (MeCab + Suzume rules)
-    my ($correct_tokens, $source, $rule) = get_expected_tokens($input);
-    if ($rule) {
-        print "\n";
-        print_tokens($correct_tokens, "Correct ($source:$rule)");
-    }
+    # Get expected tokens (MeCab + Suzume rules)
+    my ($expected_tokens, $source, $rule) = get_expected_tokens($input);
 
-    my $expected = format_expected($correct_tokens);
-    print "\nJSON expected:\n";
-    my $json = JSON::PP->new->utf8(0)->pretty->canonical;
-    print $json->encode($expected);
-
-    # Check if test already exists
+    # Check if test exists
     my $found = find_test_by_input($input);
-    if ($found) {
-        print "\n✓ Test exists: $found->{basename}/$found->{index}\n";
-        my $current = $found->{case}{expected} // [];
-        print "\nCurrent expected:\n";
-        print $json->encode($current);
-    } else {
-        print "\n✗ No existing test for this input\n";
+
+    # Compute diff classification
+    my $match = (join('|', @mecab_surfaces) eq join('|', @$suzume_surfaces));
+    my $diff_type = 'match';
+    my @diff_indices;
+    if (!$match && @$suzume_surfaces) {
+        my $m_count = scalar @mecab_surfaces;
+        my $s_count = scalar @$suzume_surfaces;
+        if ($s_count < $m_count) {
+            $diff_type = 'under-split';
+        } elsif ($s_count > $m_count) {
+            $diff_type = 'over-split';
+        } else {
+            $diff_type = 'boundary';
+        }
+        my $max = $m_count > $s_count ? $m_count : $s_count;
+        for my $i (0 .. $max - 1) {
+            push @diff_indices, $i if (($mecab_surfaces[$i] // '') ne ($suzume_surfaces->[$i] // ''));
+        }
     }
+
+    # TSV output mode (replaces 'expected' command)
+    if ($tsv_output) {
+        for my $t (@$expected_tokens) {
+            my $line = "$t->{surface}\t$t->{pos}";
+            $line .= "\t$t->{lemma}" if $t->{lemma} && $t->{lemma} ne $t->{surface};
+            print "$line\n";
+        }
+        exit 0;
+    }
+
+    # Brief mode: compact one-line format
+    if ($brief) {
+        print "MeCab:  ", join(' ', @mecab_surfaces), "\n";
+        print "Suzume: ", join(' ', @$suzume_surfaces), "\n" if @$suzume_surfaces;
+        if ($match) {
+            print "${GREEN}✓ Match${RESET}";
+        } elsif (@$suzume_surfaces) {
+            print "${RED}✗ \U$diff_type${RESET}";
+        }
+        print "  [${CYAN}$found->{basename}/$found->{case}{id}${RESET}]" if $found;
+        print "  ${YELLOW}(rule: $rule)${RESET}" if $rule;
+        print "\n";
+        exit 0;
+    }
+
+    # Normal mode
+    print "═" x 60, "\n";
+    print "${BOLD}Input:${RESET} $input\n";
+    print "─" x 60, "\n";
+
+    # Build colored output
+    my %diff_set = map { $_ => 1 } @diff_indices;
+    my @mec_parts = map { $diff_set{$_} ? "${YELLOW}$mecab_surfaces[$_]${RESET}" : $mecab_surfaces[$_] } 0 .. $#mecab_surfaces;
+    my @suz_parts = map { $diff_set{$_} ? "${RED}$suzume_surfaces->[$_]${RESET}" : $suzume_surfaces->[$_] } 0 .. $#$suzume_surfaces;
+
+    print "MeCab:  ", join(' ', @mec_parts), "\n";
+    print "Suzume: ", (@$suzume_surfaces ? join(' ', @suz_parts) : "${YELLOW}(not available)${RESET}"), "\n";
+    print "─" x 60, "\n";
+
+    # Diff classification
+    if ($match) {
+        print "${GREEN}✓ Suzume matches MeCab${RESET}\n";
+    } elsif (@$suzume_surfaces) {
+        my %type_labels = (
+            'under-split' => "${CYAN}[UNDER-SPLIT]${RESET} Suzume merged too much",
+            'over-split'  => "${CYAN}[OVER-SPLIT]${RESET} Suzume split too much",
+            'boundary'    => "${CYAN}[BOUNDARY]${RESET} Different token boundaries",
+        );
+        print "${RED}✗ $type_labels{$diff_type}${RESET}\n";
+        for my $i (@diff_indices) {
+            my $m = $mecab_surfaces[$i] // '(none)';
+            my $s = $suzume_surfaces->[$i] // '(none)';
+            print "  [$i] ${YELLOW}MeCab='$m'${RESET} vs ${RED}Suzume='$s'${RESET}\n";
+        }
+    }
+
+    # Show applied rule if any
+    if ($rule) {
+        print "\n${CYAN}Rule applied:${RESET} $rule\n";
+    }
+
+    # Test info
+    print "─" x 60, "\n";
+    if ($found) {
+        print "${GREEN}✓ Test exists:${RESET} $found->{basename}/$found->{case}{id}\n";
+    } else {
+        print "${YELLOW}✗ No existing test${RESET}\n";
+    }
+
+    # Debug info
+    if ($show_debug && -x $suzume_cli) {
+        my $debug = get_suzume_debug_info($suzume_cli, $input);
+        if ($debug && $debug->{best_path}) {
+            print "─" x 60, "\n";
+            print "${CYAN}Suzume Scoring:${RESET}\n";
+            printf "  Total cost: %.3f  Margin: %.3f\n", $debug->{total_cost}, $debug->{margin};
+            print "  Path: $debug->{best_path}\n";
+        }
+    }
+
+    # JSON output
+    if ($json_output) {
+        print "─" x 60, "\n";
+        my $json = JSON::PP->new->utf8(0)->pretty->canonical;
+        print "${BOLD}Expected JSON:${RESET}\n";
+        print $json->encode(format_expected($expected_tokens));
+    }
+
+    print "\n";
     exit 0;
 }
 
@@ -692,7 +694,9 @@ if ($command eq 'diff-suzume') {
     # With --limit N, process at most N*5 items to get representative samples
     my $max_process = $early_stop ? $limit * 5 : 0;
 
-    print STDERR "Analyzing ", ($early_stop ? "up to $max_process of " : ""), "$total_failures failures...\n\n";
+    # Suppress progress output in brief/stats/json mode
+    my $quiet_mode = $brief || $stats_only || $json_output;
+    print STDERR "Analyzing ", ($early_stop ? "up to $max_process of " : ""), "$total_failures failures...\n\n" unless $quiet_mode;
 
     my %categories = (
         segmentation => [],  # Different token count
@@ -743,7 +747,51 @@ if ($command eq 'diff-suzume') {
         }
     }
 
-    print STDERR "Processed $processed of $total_failures failures\n\n" if $early_stop && $processed < $total_failures;
+    print STDERR "Processed $processed of $total_failures failures\n\n" if $early_stop && $processed < $total_failures && !$quiet_mode;
+
+    # Build summary data for early exit modes
+    my %summary = (
+        total => $total_failures,
+        processed => $processed,
+        matches_correct => scalar(@{$categories{matches_correct}}),
+        segmentation => scalar(@{$categories{segmentation}}),
+        pos_only => scalar(@{$categories{pos_only}}),
+    );
+
+    # JSON output mode - early exit
+    if ($json_output) {
+        my $result = {
+            summary => \%summary,
+            categories => {
+                matches_correct => $categories{matches_correct},
+                segmentation => $categories{segmentation},
+                pos_only => $categories{pos_only},
+            },
+        };
+        my $json = JSON::PP->new->utf8(0)->pretty->canonical;
+        print $json->encode($result);
+        exit 0;
+    }
+
+    # Stats-only mode - early exit
+    if ($stats_only) {
+        print "total=$summary{total}\n";
+        print "processed=$summary{processed}\n";
+        print "matches_correct=$summary{matches_correct}\n";
+        print "segmentation=$summary{segmentation}\n";
+        print "pos_only=$summary{pos_only}\n";
+        exit 0;
+    }
+
+    # Brief mode - early exit with TSV
+    if ($brief) {
+        for my $cat (qw(segmentation pos_only matches_correct)) {
+            for my $e (@{$categories{$cat}}) {
+                print "$cat\t$e->{id}\t$e->{input}\t$e->{correct}\t$e->{suzume}\n";
+            }
+        }
+        exit 0;
+    }
 
     # Helper to limit display count per category
     my $per_cat_limit = $limit > 0 ? $limit : 0;
@@ -871,7 +919,7 @@ if ($command eq 'diff-suzume') {
 if ($command eq 'diff-mecab') {
     # Find all test cases where expected differs from MeCab output
     # Categorize: intentional (Suzume rules) vs potential errors
-    my @files = get_test_files($test_file);
+    my @files = get_test_files_filtered($test_file);
     die "No test files found\n" unless @files;
 
     print STDERR "Scanning ", scalar(@files), " test files...\n\n";
@@ -1024,7 +1072,7 @@ if ($command eq 'diff-mecab') {
 if ($command eq 'needs-suzume-update') {
     # Find tests where expected doesn't match "MeCab + Suzume rules" (hybrid)
     # Correct expected = MeCab output with Suzume rule patterns merged
-    my @files = get_test_files($test_file);
+    my @files = get_test_files_filtered($test_file);
     die "No test files found\n" unless @files;
 
     print STDERR "Scanning ", scalar(@files), " test files...\n";
@@ -1126,7 +1174,7 @@ if ($command eq 'needs-suzume-update') {
 
 if ($command eq 'validate-ids') {
     # Detect and fix non-ASCII or duplicate IDs
-    my @files = get_test_files($test_file);
+    my @files = get_test_files_filtered($test_file);
     die "No test files found\n" unless @files;
 
     print "Validating test IDs in ", scalar(@files), " files...\n\n";
@@ -1239,7 +1287,7 @@ if ($command eq 'replace-pos') {
     my $new_pos = shift @ARGV;
     die "Usage: $0 replace-pos OLD_POS NEW_POS [--apply]\n" unless $old_pos && $new_pos;
 
-    my @files = get_test_files($test_file);
+    my @files = get_test_files_filtered($test_file);
     die "No test files found\n" unless @files;
 
     print "Replacing POS: $old_pos -> $new_pos\n";
@@ -1301,7 +1349,7 @@ if ($command eq 'map-pos') {
     my $new_pos = shift @ARGV;
     die "Usage: $0 map-pos SURFACE OLD_POS NEW_POS [--apply]\n" unless $surface && $old_pos && $new_pos;
 
-    my @files = get_test_files($test_file);
+    my @files = get_test_files_filtered($test_file);
     die "No test files found\n" unless @files;
 
     print "Mapping POS for surface '$surface': $old_pos -> $new_pos\n";
@@ -1359,7 +1407,7 @@ if ($command eq 'map-pos') {
 
 if ($command eq 'list-pos') {
     # List all POS values used in tests
-    my @files = get_test_files($test_file);
+    my @files = get_test_files_filtered($test_file);
     die "No test files found\n" unless @files;
 
     my %pos_counts;
@@ -1633,6 +1681,202 @@ if ($command eq 'suggest-file') {
     for my $s (@suggestions) {
         next if $seen{$s}++;
         print "  - $s\n";
+    }
+    exit 0;
+}
+
+if ($command eq 'compare') {
+    # Compare two test outputs (merged from compare_tests.pl)
+    my $before_file = $input;
+    my $after_file = shift @ARGV // '';
+
+    die "Usage: test_tool.pl compare <before.txt> <after.txt>\n" unless $before_file && $after_file;
+    die "File not found: $before_file\n" unless -f $before_file;
+    die "File not found: $after_file\n" unless -f $after_file;
+
+    sub extract_failures_from_file {
+        my ($file) = @_;
+        my %failures;
+        open my $fh, '<:utf8', $file or die "Cannot open $file: $!\n";
+        my $inp = '';
+        while (<$fh>) {
+            if (/Input:\s*(.+)/) { $inp = $1; }
+            elsif (/FAILED.*Tokenize\/([^,]+)/) {
+                $failures{$1} = $inp if $inp ne '';
+                $inp = '';
+            }
+        }
+        close $fh;
+        return \%failures;
+    }
+
+    my $before = extract_failures_from_file($before_file);
+    my $after = extract_failures_from_file($after_file);
+    my $before_count = scalar keys %$before;
+    my $after_count = scalar keys %$after;
+
+    my (@improved, @regressed);
+    for my $id (keys %$before) {
+        push @improved, { id => $id, input => $before->{$id} } unless exists $after->{$id};
+    }
+    for my $id (keys %$after) {
+        push @regressed, { id => $id, input => $after->{$id} } unless exists $before->{$id};
+    }
+    @improved = sort { $a->{id} cmp $b->{id} } @improved;
+    @regressed = sort { $a->{id} cmp $b->{id} } @regressed;
+
+    my $delta = $before_count - $after_count;
+    print STDERR "=== Test Comparison Summary ===\n";
+    print STDERR "Before: $before_count failures\n";
+    print STDERR "After:  $after_count failures\n";
+    print STDERR "---\n";
+    print STDERR "Improved:  ", scalar(@improved), " (was failing, now passing)\n";
+    print STDERR "Regressed: ", scalar(@regressed), " (was passing, now failing)\n";
+    if ($delta > 0) { print STDERR "Net change: -$delta failures (improvement)\n"; }
+    elsif ($delta < 0) { print STDERR "Net change: +", (-$delta), " failures (regression)\n"; }
+    else { print STDERR "Net change: 0\n"; }
+    print STDERR "\n";
+
+    my $suzume_cli = "$project_root/build/bin/suzume-cli";
+    for my $item (@improved) {
+        print "  [IMPROVED] [$item->{id}] $item->{input}\n";
+        if ($run_cli && -x $suzume_cli) {
+            my $out = `'$suzume_cli' '$item->{input}' 2>/dev/null`;
+            utf8::decode($out); $out =~ s/\n/ /g; $out =~ s/\s+$//;
+            print "    suzume: $out\n";
+        }
+    }
+    for my $item (@regressed) {
+        print "  [REGRESSED] [$item->{id}] $item->{input}\n";
+        if ($run_cli && -x $suzume_cli) {
+            my $out = `'$suzume_cli' '$item->{input}' 2>/dev/null`;
+            utf8::decode($out); $out =~ s/\n/ /g; $out =~ s/\s+$//;
+            print "    suzume: $out\n";
+        }
+    }
+    exit 0;
+}
+
+if ($command eq 'failed') {
+    # List failed test inputs (merged from failed_inputs.sh)
+    my $test_output_file = $input || '/tmp/test.txt';
+    die "File not found: $test_output_file\nRun: ctest --test-dir build --output-on-failure > /tmp/test.txt 2>&1\n"
+        unless -f $test_output_file;
+
+    open my $fh, '<:utf8', $test_output_file or die "Cannot open $test_output_file: $!\n";
+    my @failures;
+    my $inp = '';
+    while (<$fh>) {
+        if (/Input:\s*(.+)/) { $inp = $1; }
+        elsif (/FAILED.*Tokenize\/([^,]+)/) {
+            push @failures, { id => $1, input => $inp } if $inp ne '';
+            $inp = '';
+        }
+    }
+    close $fh;
+
+    if (!@failures) {
+        print "No tokenization test failures found.\n";
+        exit 0;
+    }
+
+    # Apply grep filter if specified
+    if ($grep_pattern) {
+        @failures = grep { $_->{input} =~ /$grep_pattern/ || $_->{id} =~ /$grep_pattern/ } @failures;
+    }
+
+    # Stats-only mode
+    if ($stats_only) {
+        print scalar(@failures), "\n";
+        exit 0;
+    }
+
+    # JSON output
+    if ($json_output) {
+        my $json = JSON::PP->new->utf8(0)->pretty->canonical;
+        print $json->encode({ count => scalar(@failures), failures => \@failures });
+        exit 0;
+    }
+
+    print STDERR "# ", scalar(@failures), " failed tokenization tests\n";
+
+    my $suzume_cli = "$project_root/build/bin/suzume-cli";
+    my $count = 0;
+    for my $f (@failures) {
+        last if $limit > 0 && $count >= $limit;
+        if ($verbose) {
+            print "[$f->{id}] $f->{input}\n";
+        } else {
+            print "$f->{input}\n";
+        }
+        if ($run_cli && -x $suzume_cli) {
+            print "  suzume: ";
+            my $out = `'$suzume_cli' '$f->{input}' 2>/dev/null`;
+            utf8::decode($out); $out =~ s/\n/ /g; $out =~ s/\s+$//;
+            print "$out\n";
+        }
+        if ($run_mecab) {
+            print "  MeCab:  ";
+            my $out = `echo '$f->{input}' | mecab | grep -v EOS | cut -f1 | tr '\\n' ' '`;
+            utf8::decode($out); $out =~ s/\s+$//;
+            print "$out\n";
+        }
+        $count++;
+    }
+    exit 0;
+}
+
+if ($command eq 'search') {
+    # Search test cases by regex pattern
+    my $pattern = $input;
+    die "Usage: test_tool.pl search <pattern>\n" unless $pattern;
+
+    my $regex = eval { qr/$pattern/i };
+    die "Invalid regex: $pattern\n$@" if $@;
+
+    my @matches;
+    for my $path (get_test_files()) {
+        my $data = eval { load_json($path) };
+        next if $@;
+
+        my $basename = $path;
+        $basename =~ s/.*\///;
+        $basename =~ s/\.json$//;
+
+        my $cases = $data->{cases} // $data->{test_cases} // [];
+        for my $i (0 .. $#$cases) {
+            my $c = $cases->[$i];
+            my $id = $c->{id} // $i;
+            my $input_text = $c->{input} // '';
+            my @surfaces = map { $_->{surface} // '' } @{$c->{expected} // []};
+            my $surfaces_str = join(' ', @surfaces);
+
+            # Search in input, surfaces, and ID
+            if ($input_text =~ $regex || $surfaces_str =~ $regex || $id =~ $regex) {
+                push @matches, {
+                    file => $basename,
+                    index => $i,
+                    id => $id,
+                    input => $input_text,
+                    expected => $surfaces_str,
+                };
+            }
+        }
+    }
+
+    if (@matches == 0) {
+        print "No matches found for: $pattern\n";
+        exit 0;
+    }
+
+    print "Found ", scalar(@matches), " matches for: $pattern\n\n";
+    my $count = 0;
+    for my $m (@matches) {
+        last if $limit > 0 && $count >= $limit;
+        print "${BOLD}[$m->{file}/$m->{id}]${RESET}\n";
+        print "  Input:    $m->{input}\n";
+        print "  Expected: $m->{expected}\n\n";
+        $count++;
     }
     exit 0;
 }
