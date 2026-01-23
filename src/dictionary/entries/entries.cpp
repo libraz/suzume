@@ -330,6 +330,21 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: 論理的な → 論理 + 的 + な (suffix + copula rentaikei)
       suffix("的", "的"),
 
+      // Adjective suffixes - connect after verb renyokei (V連用形接続)
+      // MeCab: 使いにくい → 使い + にくい, 読みやすい → 読み + やすい
+      adj("にくい", "にくい", EPOS::AdjBasic),
+      adj("にくく", "にくい", EPOS::AdjRenyokei),
+      adj("にくかっ", "にくい", EPOS::AdjKatt),
+      adj("やすい", "やすい", EPOS::AdjBasic),
+      adj("やすく", "やすい", EPOS::AdjRenyokei),
+      adj("やすかっ", "やすい", EPOS::AdjKatt),
+
+      // Adjective suffix っぽい (～っぽい: 子供っぽい, 忘れっぽい)
+      // MeCab: 子供っぽい → 子供 + っぽい
+      adj("っぽい", "っぽい", EPOS::AdjBasic),
+      adj("っぽく", "っぽい", EPOS::AdjRenyokei),
+      adj("っぽかっ", "っぽい", EPOS::AdjKatt),
+
       // Polite imperative - connect after verb renyokei
       aux("なさい", "なさる", EPOS::AuxHonorific),
 
