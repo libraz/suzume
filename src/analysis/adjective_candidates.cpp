@@ -1048,6 +1048,12 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
             continue;  // Skip - should be split as な+さ+そう
           }
         }
+        // Skip んかった pattern - this is contracted negative (ん) + past (かった)
+        // e.g., らんかった would create らんい which is invalid
+        // くだらんかった should be くだら+ん+かっ+た, not くだ+らんかっ+た
+        if (utf8::endsWith(surface, "んかった")) {
+          continue;  // Skip - should be split as ん+かっ+た
+        }
         // Base cost for hiragana i-adjective candidates
         // Use neutral base (0.0F) to avoid false positives like につい
         // which should be parsed as に(PARTICLE)+ついて(VERB)
@@ -1166,6 +1172,11 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
   for (const auto& cand : candidates) {
     // Check if surface ends with かった (i-adjective past form)
     if (utf8::endsWith(cand.surface, "かった")) {
+      // Skip んかった pattern - this is contracted negative (ん) + past (かった)
+      // e.g., くだらんかった = くだら+ん+かっ+た, NOT くだ+らんかっ+た
+      if (utf8::endsWith(cand.surface, "んかった")) {
+        continue;
+      }
       // Generate katt-form variant: よかった → よかっ
       UnknownCandidate katt_cand;
       katt_cand.surface = cand.surface.substr(0, cand.surface.size() - core::kJapaneseCharBytes);  // Remove た

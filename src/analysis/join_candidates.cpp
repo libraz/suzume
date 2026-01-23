@@ -1219,6 +1219,12 @@ void addVerbSuffixNounJoinCandidates(
     ++hiragana_end;
   }
 
+  // Reject if hiragana ends with な (na-adjective 連体形, not verb renyokei)
+  // e.g., 効率的な方 should NOT become a compound noun (it's 効率+的+な+方)
+  if (hiragana_end > kanji_end && codepoints[hiragana_end - 1] == U'な') {
+    return;
+  }
+
   // Check for suffix kanji: 物, 方, 所
   if (hiragana_end >= codepoints.size()) {
     return;

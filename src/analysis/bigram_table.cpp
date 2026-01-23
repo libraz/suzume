@@ -88,6 +88,11 @@ BigramTable::initTable() {
   // VerbMizenkei → AuxNegativeNai (食べ+ない for ichidan) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxNegativeNai, cost::kModerateBonus);
 
+  // VerbRenyokei → AuxNegativeNai (しれ+ない for ichidan same-form mizen/renyokei)
+  // Ichidan verbs have same form for mizen and renyokei (e.g., しれ from しれる)
+  // This helps かもしれない → かも+しれ+ない over かも+し+れ+ない
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxNegativeNai, cost::kStrongBonus);
+
   // VerbMizenkei → AuxNegativeNu (くだら+ん contracted negative) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxNegativeNu, cost::kModerateBonus);
 
@@ -203,6 +208,10 @@ BigramTable::initTable() {
 
   // AuxNegativeNai → AuxTenseTa (なかっ+た) - strong bonus
   setCell(t, EPOS::AuxNegativeNai, EPOS::AuxTenseTa, cost::kStrongBonus);
+
+  // AuxNegativeNu → AuxTenseTa (んかっ+た for contracted negative past)
+  // Ensures くだらんかった → くだら+ん+かっ+た over くだ+らんかっ+た
+  setCell(t, EPOS::AuxNegativeNu, EPOS::AuxTenseTa, cost::kStrongBonus);
 
   // AuxNegativeNai → ParticleNo (ない+ん for のだ/んだ) - strong bonus
   // Ensures ないんだ → ない+ん+だ over な+いん+だ
@@ -383,8 +392,9 @@ BigramTable::initTable() {
   // Copula → Negation (ではない pattern)
   // =========================================================================
 
-  // AuxCopulaDa (で form) → ParticleTopic (では) - minor bonus
-  setCell(t, EPOS::AuxCopulaDa, EPOS::ParticleTopic, cost::kMinorBonus);
+  // AuxCopulaDa (で form) → ParticleTopic (で+は/も in ではない/でもない)
+  // Moderate bonus to promote 彼女|で|も|ない over 彼女|でも|ない
+  setCell(t, EPOS::AuxCopulaDa, EPOS::ParticleTopic, cost::kModerateBonus);
 
   // AuxCopulaDa (で form) → AuxNegativeNai (で+ない in ではない) - minor bonus
   setCell(t, EPOS::AuxCopulaDa, EPOS::AuxNegativeNai, cost::kMinorBonus);
@@ -471,6 +481,19 @@ BigramTable::initTable() {
   // ParticleConj → Other: minor penalty (て+random at sentence start is unlikely)
   // Less penalty than others because て+noun/verb is valid in some contexts
   setCell(t, EPOS::ParticleConj, EPOS::Other, cost::kMinorPenalty);
+
+  // =========================================================================
+  // Conjunction → Auxiliary penalties
+  // =========================================================================
+  // Conjunctions like でも/だって typically don't directly precede auxiliaries
+  // 彼女でもない should be 彼女|で|も|ない (copula+particle) not 彼女|でも(CONJ)|ない
+
+  // Conjunction → AuxNegativeNai: strong penalty (でも+ない is invalid as CONJ+AUX)
+  setCell(t, EPOS::Conjunction, EPOS::AuxNegativeNai, cost::kStrongPenalty);
+
+  // Conjunction → ParticleFinal: moderate penalty (でも+な is invalid)
+  // Conjunctions don't typically connect to final particles mid-sentence
+  setCell(t, EPOS::Conjunction, EPOS::ParticleFinal, cost::kModeratePenalty);
 
   // =========================================================================
   // Interjection connections

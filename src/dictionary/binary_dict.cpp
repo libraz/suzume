@@ -224,7 +224,14 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
             // e.g., いただき from いただく → いただき + ます should work
             // Note: い excluded because godan-wa renyokei (思い) would need
             // disambiguation from noun/adj uses. Short forms are handled above.
-            // Note: E-row excluded to avoid te-form confusion (食べて vs 捨て)
+            entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
+          } else if (utf8::endsWithAny(entry.surface, {"け"sv, "せ"sv, "ね"sv,
+                     "べ"sv, "め"sv, "れ"sv}) &&
+                     entry.surface.size() > core::kTwoJapaneseCharBytes) {
+            // Ichidan verb renyokei endings (E-row hiragana)
+            // e.g., いただけ from いただける → いただけ + ます should work
+            // Only for 3+ char forms to avoid te-form fragments (食べ+て, 捨て)
+            // Short E-row forms are handled by the 1-2 char rule above
             entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
           } else {
             // Default: shuushikei (dictionary form or other forms)
