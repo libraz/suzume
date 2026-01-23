@@ -1434,6 +1434,9 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       std::string hiragana_part = extractSubstring(codepoints, kanji_end, onbin_end);
       if (hiragana_part == "なかっ") {
         // This is negative past, not extended sokuonbin - skip
+      } else if (hiragana_part == "であっ") {
+        // This is copula である pattern (重要であった = 重要 + で + あっ + た)
+        // Skip candidate generation to allow proper copula splitting
       } else {
       // Build potential base form and verify it exists in dictionary or inflection
       // This prevents false positives like 食べてしまる

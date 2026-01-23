@@ -96,6 +96,11 @@ BigramTable::initTable() {
   // VerbMizenkei → AuxNegativeNu (くだら+ん contracted negative) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxNegativeNu, cost::kModerateBonus);
 
+  // VerbRenyokei → AuxNegativeNu (消え+ぬ classical negative)
+  // Ichidan verbs have same form for mizen and renyokei (e.g., 消え from 消える)
+  // This helps 消えぬ炎 → 消え+ぬ+炎 over 消えぬ+炎
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxNegativeNu, cost::kModerateBonus);
+
   // VerbMizenkei → AuxPassive (食べ+られる) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxPassive, cost::kModerateBonus);
 

@@ -1008,6 +1008,21 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       continue;  // Skip - likely negative auxiliary, not adjective
     }
 
+    // Skip short patterns starting with common case particles (で, に, を, と)
+    // These are likely particle + adjective splits (でやばい = で + やばい)
+    // Longer sequences (5+ chars) are less likely to be splits
+    if (starts_with_particle) {
+      size_t char_count = end_pos - start_pos;
+      char32_t first_char = codepoints[start_pos];
+      // Common case particles that frequently precede adjectives
+      bool starts_with_case_particle =
+          (first_char == U'で' || first_char == U'に' ||
+           first_char == U'を' || first_char == U'と');
+      if (starts_with_case_particle && char_count <= 4) {
+        continue;  // Skip - likely particle + adjective split
+      }
+    }
+
     // Normalize prolonged sound marks before analysis
     // e.g., すごーい → すごおい, やばーい → やばあい
     std::string analysis_surface = surface;
@@ -1063,18 +1078,15 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
           SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" -0.1 (prolonged_sound_bonus)\n");
         }
         // Length-based bonus for adjectives starting with particle characters
-        // Short sequences (3 chars like につい) are likely verb te-forms
-        // Longer sequences (4+ chars like かわいい, はなはだしい) are real adjectives
+        // Short sequences (3-4 chars like につい, でやばい) are likely splits
+        // Longer sequences (5+ chars like かわいい, はなはだしい) are real adjectives
         if (starts_with_particle) {
           size_t char_count = end_pos - start_pos;
           if (char_count >= 5) {
             cost -= 0.5F;  // Strong bonus for long adjectives (はなはだしい)
             SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" -0.5 (long_particle_adj_bonus)\n");
-          } else if (char_count >= 4) {
-            cost -= 0.35F;  // Moderate bonus for medium adjectives (かわいい)
-            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" -0.35 (medium_particle_adj_bonus)\n");
           }
-          // No bonus for 3-char sequences (につい) - let dictionary entries win
+          // No bonus for 3-4 char sequences (につい, でやばい) - likely particle + adjective split
         }
         // Set lemma to base form from inflection analysis
         // For prolonged sound mark patterns, normalize the base form

@@ -931,7 +931,7 @@
       "description" : "Personal pronoun 彼",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "彼"
         },
         {

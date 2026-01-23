@@ -1344,7 +1344,7 @@
       "description" : "に違いない certainty expression - に is particle, 違いない is auxiliary",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "彼"
         },
         {

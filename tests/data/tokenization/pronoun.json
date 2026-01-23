@@ -20,11 +20,11 @@
       "description" : "私たち - plural pronoun",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "私"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "たち"
         }
       ],
@@ -39,11 +39,11 @@
       "description" : "僕たち - plural pronoun",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "僕"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "たち"
         }
       ],
@@ -58,11 +58,11 @@
       "description" : "俺たち - plural pronoun",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "俺"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "たち"
         }
       ],

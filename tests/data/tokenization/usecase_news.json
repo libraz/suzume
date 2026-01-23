@@ -1038,7 +1038,7 @@
       "description" : "Narrative style - Current suzume treats 欠かさ as adjective and 好き as adjective",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "彼"
         },
         {

@@ -108,6 +108,28 @@
 しずか	ADJECTIVE	NA_ADJ
 よい	ADJECTIVE	I_ADJ
 いい	ADJECTIVE	I_ADJ
+高い	ADJECTIVE	I_ADJ
+安い	ADJECTIVE	I_ADJ
+長い	ADJECTIVE	I_ADJ
+短い	ADJECTIVE	I_ADJ
+寒い	ADJECTIVE	I_ADJ
+暑い	ADJECTIVE	I_ADJ
+熱い	ADJECTIVE	I_ADJ
+多い	ADJECTIVE	I_ADJ
+少ない	ADJECTIVE	I_ADJ
+広い	ADJECTIVE	I_ADJ
+狭い	ADJECTIVE	I_ADJ
+深い	ADJECTIVE	I_ADJ
+浅い	ADJECTIVE	I_ADJ
+早い	ADJECTIVE	I_ADJ
+遅い	ADJECTIVE	I_ADJ
+強い	ADJECTIVE	I_ADJ
+弱い	ADJECTIVE	I_ADJ
+硬い	ADJECTIVE	I_ADJ
+柔らかい	ADJECTIVE	I_ADJ
+にくい	ADJECTIVE	I_ADJ
+やすい	ADJECTIVE	I_ADJ
+っぽい	ADJECTIVE	I_ADJ
 つめたい	ADJECTIVE	I_ADJ
 よく	ADVERB
 
@@ -171,7 +193,6 @@
 ヌルッと	ADVERB
 
 # --- Colloquial/Slang adverbs ---
-マジで	ADVERB
 ガチで	ADVERB
 がちで	ADVERB
 死ぬほど	ADVERB
@@ -230,6 +251,9 @@
 ぼんやり	ADVERB
 同時に	ADVERB
 ひときわ	ADVERB
+多少	ADVERB
+一際	ADVERB
+すぐ	ADVERB
 俄然	ADVERB
 
 # =============================================================================
@@ -524,6 +548,7 @@ Wi-Fi	NOUN
 あん	NOUN
 玉ねぎ	NOUN
 なん	NOUN
+マジ	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -553,7 +578,6 @@ Wi-Fi	NOUN
 
 # --- Verb-auxiliary suffixes ---
 がたい	OTHER
-にくい	OTHER
 
 # =============================================================================
 # INTERJECTIONS/GREETINGS (感動詞・挨拶)
@@ -718,3 +742,7 @@ Wi-Fi	NOUN
 でも	CONJUNCTION
 
 たとえば	CONJUNCTION
+
+らしい	AUX	I_ADJ
+
+

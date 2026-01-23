@@ -182,7 +182,7 @@
           "surface" : "さ"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Auxiliary",
           "surface" : "そう"
         }
       ],
@@ -194,7 +194,7 @@
       ]
     },
     {
-      "description" : "Katakana adjective キモい + さそう (nominalization + appearance)",
+      "description" : "Katakana adjective キモい + そう (appearance)",
       "expected" : [
         {
           "lemma" : "キモい",
@@ -202,16 +202,12 @@
           "surface" : "キモ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "さ"
-        },
-        {
-          "pos" : "Noun",
+          "pos" : "Auxiliary",
           "surface" : "そう"
         }
       ],
       "id" : "adj_kimoi_sou",
-      "input" : "キモさそう",
+      "input" : "キモそう",
       "tags" : [
         "slang",
         "adjective",
@@ -231,7 +227,7 @@
           "surface" : "さ"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Auxiliary",
           "surface" : "そう"
         }
       ],
