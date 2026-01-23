@@ -80,6 +80,14 @@ bool isVerbInDictionaryWithType(const dictionary::DictionaryManager* dict_manage
 bool hasNonVerbDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
                                std::string_view surface);
 
+/**
+ * @brief Check if a surface has a particle entry in dictionary
+ *
+ * Used to detect compound particles (について, によって, として, etc.)
+ */
+bool hasParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
+                                std::string_view surface);
+
 // =============================================================================
 // Candidate Sorting
 // =============================================================================

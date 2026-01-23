@@ -188,7 +188,8 @@ inline VerbType conjTypeToVerbType(dictionary::ConjugationType conj_type) {
     case dictionary::ConjugationType::IAdjective:
       return VerbType::IAdjective;
     case dictionary::ConjugationType::NaAdjective:
-      return VerbType::Unknown;  // VerbType doesn't have NaAdjective
+    case dictionary::ConjugationType::Interjection:
+      return VerbType::Unknown;  // VerbType doesn't have NaAdjective/Interjection
   }
   return VerbType::Unknown;
 }

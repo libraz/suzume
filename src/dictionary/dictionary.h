@@ -32,6 +32,7 @@ enum class ConjugationType : uint8_t {
   Kuru = 12,        // Kuru verb (来る)
   IAdjective = 13,  // I-adjective (美しい, 高い)
   NaAdjective = 14, // Na-adjective (静かだ)
+  Interjection = 15, // 感動詞 (何だ, ああ, おい)
 };
 
 /**

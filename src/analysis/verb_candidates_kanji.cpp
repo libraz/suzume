@@ -419,6 +419,20 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
           }
 
+          // Skip GodanSa renyokei (漢字+し) - this is likely サ変動詞 (名詞+する)
+          // e.g., "得し" misrecognized as GodanSa "得す" renyokei, but actually "得+し"
+          // MeCab splits as: 得(名詞) + し(する連用形) + た(過去)
+          // Exception: Real GodanSa verbs like "愛す" should not be skipped
+          if (best.verb_type == grammar::VerbType::GodanSa &&
+              hiragana_part == "し" && kanji_end - start_pos <= 3) {
+            // Check if the base form (漢字+す) is a registered GodanSa verb
+            std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "す";
+            if (!vh::isVerbInDictionary(dict_manager, base_form)) {
+              // Not a registered verb - likely サ変 pattern, skip to prefer noun+し split
+              continue;
+            }
+          }
+
           // Skip verb + ます auxiliary patterns
           if (vh::shouldSkipMasuAuxPattern(surface, best.verb_type)) {
             continue;  // Skip - let the split (verb + dictionary aux) win
@@ -1283,13 +1297,15 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     // Check for sokuonbin (っ) pattern
     if (first_hira == U'っ' && kanji_end + 1 < hiragana_end) {
       char32_t next_char = codepoints[kanji_end + 1];
-      // Basic te/ta form patterns (て, た, たら, たり)
-      bool is_te_ta_pattern = (next_char == U'て' || next_char == U'た');
+      // Basic te/ta form patterns (て, た, たら, たり) and ちゃう contraction (ち)
+      bool is_te_ta_pattern =
+          (next_char == U'て' || next_char == U'た' || next_char == U'ち');
       if (is_te_ta_pattern) {
         // Determine candidate verb types based on sokuonbin
-        // っ-onbin: GodanRa, GodanTa, GodanWa
+        // っ-onbin: GodanRa, GodanTa, GodanWa, GodanKa (行く is irregular)
         static const std::vector<std::pair<grammar::VerbType, std::string_view>>
             sokuonbin_types = {
+                {grammar::VerbType::GodanKa, "く"},  // 行く (irregular)
                 {grammar::VerbType::GodanRa, "る"},
                 {grammar::VerbType::GodanTa, "つ"},
                 {grammar::VerbType::GodanWa, "う"},
@@ -1412,11 +1428,26 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       size_t onbin_end = hiragana_end - 1;  // Position after っ
       std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_end);
 
+      // Skip if hiragana portion is なかっ (negative past pattern: なかっ+た)
+      // This prevents false positives like 来なかった → 来なかっ+た (来なかる doesn't exist)
+      // The correct split is 来 + なかっ + た (kuru + negative aux + past)
+      std::string hiragana_part = extractSubstring(codepoints, kanji_end, onbin_end);
+      if (hiragana_part == "なかっ") {
+        // This is negative past, not extended sokuonbin - skip
+      } else {
       // Build potential base form and verify it exists in dictionary or inflection
       // This prevents false positives like 食べてしまる
       std::string stem = extractSubstring(codepoints, start_pos, onbin_end - 1);
       std::string potential_base = stem + "る";
 
+      // Skip if hiragana before っ is だ (copula pattern)
+      // E.g., 本だった = 本 + だっ + た (noun + copula), not 本だる (verb)
+      // But 閉まった = 閉まっ + た (verb 閉まる) is valid
+      char32_t char_before_sokuon = codepoints[hiragana_end - 3];
+      if (char_before_sokuon == U'だ') {
+        // This is a copula pattern (NOUN + だった), not a verb
+        // Skip candidate generation
+      } else {
       // Check dictionary first
       bool in_dict = vh::isVerbInDictionaryWithType(dict_manager, potential_base,
                                                      grammar::VerbType::GodanRa) ||
@@ -1450,6 +1481,85 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             grammar::verbTypeToConjType(grammar::VerbType::GodanRa),
             true, CandidateOrigin::VerbKanji, 0.9F, "extended_sokuonbin",
             core::ExtendedPOS::VerbOnbinkei));
+      }
+      }  // end else (not copula だ pattern)
+      }  // end else (not なかっ pattern)
+    }
+  }
+
+  // Generate Godan hatsuonbin (ん) candidates for basic te/ta-form splitting
+  // E.g., 読んだ → 読ん (onbin of 読む) + だ (auxiliary)
+  //       読んで → 読ん (onbin of 読む) + で (particle)
+  //       飛んだ → 飛ん (onbin of 飛ぶ) + だ (auxiliary)
+  //       死んだ → 死ん (onbin of 死ぬ) + だ (auxiliary)
+  // Key patterns:
+  // - kanji + ん + で/だ: GodanMa/GodanBa/GodanNa verbs
+  if (kanji_end < hiragana_end) {
+    char32_t first_hira = codepoints[kanji_end];
+    // Check for hatsuonbin (ん) pattern
+    if (first_hira == U'ん' && kanji_end + 1 < hiragana_end) {
+      char32_t next_char = codepoints[kanji_end + 1];
+      // Basic te/ta form patterns (で, だ)
+      bool is_de_da_pattern = (next_char == U'で' || next_char == U'だ');
+      if (is_de_da_pattern) {
+        // Determine candidate verb types based on hatsuonbin
+        // ん-onbin: GodanMa, GodanBa, GodanNa
+        static const std::vector<std::pair<grammar::VerbType, std::string_view>>
+            hatsuonbin_types = {
+                {grammar::VerbType::GodanMa, "む"},
+                {grammar::VerbType::GodanBa, "ぶ"},
+                {grammar::VerbType::GodanNa, "ぬ"},
+            };
+        // Get the kanji stem
+        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+
+        // First, check dictionary for ALL verb types
+        grammar::VerbType matched_verb_type = grammar::VerbType::Unknown;
+        std::string matched_base_form;
+        for (const auto& [verb_type, base_suffix] : hatsuonbin_types) {
+          std::string base_form = kanji_stem + std::string(base_suffix);
+          bool dict_match = vh::isVerbInDictionaryWithType(dict_manager, base_form, verb_type) ||
+                            vh::isVerbInDictionary(dict_manager, base_form);
+          if (dict_match && matched_verb_type == grammar::VerbType::Unknown) {
+            matched_verb_type = verb_type;
+            matched_base_form = base_form;
+          }
+        }
+        // Phase 2: Inflection analysis fallback
+        if (matched_verb_type == grammar::VerbType::Unknown) {
+          std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
+          auto infl_results = inflection.analyze(full_surface);
+          float best_conf = 0.0F;
+          for (const auto& result : infl_results) {
+            if (result.confidence >= 0.5F && result.confidence > best_conf) {
+              for (const auto& [verb_type, base_suffix] : hatsuonbin_types) {
+                std::string base_form = kanji_stem + std::string(base_suffix);
+                if (result.base_form == base_form && result.verb_type == verb_type) {
+                  matched_verb_type = verb_type;
+                  matched_base_form = base_form;
+                  best_conf = result.confidence;
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+        if (matched_verb_type != grammar::VerbType::Unknown) {
+          // Found valid verb - generate hatsuonbin stem candidate
+          std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
+          constexpr float kHatsuonbinCost = -0.5F;  // Negative cost to beat unsplit forms
+          SUZUME_DEBUG_VERBOSE_BLOCK {
+            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
+                                << " kanji_hatsuonbin lemma=" << matched_base_form
+                                << " cost=" << kHatsuonbinCost << "\n";
+          }
+          candidates.push_back(makeVerbCandidate(
+              onbin_surface, start_pos, kanji_end + 1, kHatsuonbinCost, matched_base_form,
+              grammar::verbTypeToConjType(matched_verb_type),
+              true, CandidateOrigin::VerbKanji, 0.9F, "kanji_hatsuonbin",
+              core::ExtendedPOS::VerbOnbinkei));
+        }
       }
     }
   }

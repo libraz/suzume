@@ -146,6 +146,7 @@ constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)>
   table[static_cast<size_t>(ExtendedPOS::Prefix)] = 0.5F;           // 接頭辞
   table[static_cast<size_t>(ExtendedPOS::Suffix)] = 0.5F;           // 接尾辞
   table[static_cast<size_t>(ExtendedPOS::Symbol)] = 0.3F;           // 記号
+  table[static_cast<size_t>(ExtendedPOS::Interjection)] = 0.5F;     // 感動詞
   table[static_cast<size_t>(ExtendedPOS::Other)] = 0.8F;            // その他
 
   return table;

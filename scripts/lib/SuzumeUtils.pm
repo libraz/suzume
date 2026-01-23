@@ -309,10 +309,12 @@ sub apply_suzume_merge {
         }
 
         # 5. Kanji compound: merge consecutive kanji-only tokens
-        if (!$merged && $t->{surface} =~ /^\p{Han}+$/) {
+        #    Skip suffix tokens (的, 性, 化, etc.) - they should remain separate
+        if (!$merged && $t->{surface} =~ /^\p{Han}+$/ && ($t->{pos_sub1} // '') ne '接尾') {
             my $j = $i + 1;
             my $combined = $t->{surface};
-            while ($j < @$tokens && $tokens->[$j]{surface} =~ /^\p{Han}+$/) {
+            while ($j < @$tokens && $tokens->[$j]{surface} =~ /^\p{Han}+$/
+                   && ($tokens->[$j]{pos_sub1} // '') ne '接尾') {
                 $combined .= $tokens->[$j]{surface};
                 $j++;
             }

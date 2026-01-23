@@ -128,7 +128,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
       particle("ば", EPOS::ParticleConj),
       particle("たら", EPOS::ParticleConj),
       particle("なら", EPOS::ParticleConj),
-      particle("ら", EPOS::ParticleConj),
+      // Note: ら removed - たら handles conditional, ら suffix is in L2 as SUFFIX
       particle("ながら", EPOS::ParticleConj),
       particle("のに", EPOS::ParticleConj),
       particle("ので", EPOS::ParticleConj),
@@ -143,6 +143,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
 
       // Final particles (終助詞)
       particle("か", EPOS::ParticleFinal),
+      particle("け", EPOS::ParticleFinal),  // colloquial variant (こんだけ → こん+だ+け)
       particle("な", EPOS::ParticleFinal),
       particle("ね", EPOS::ParticleFinal),
       particle("よ", EPOS::ParticleFinal),
@@ -265,21 +266,18 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("らしかっ", "らしい", EPOS::AuxConjectureRashii),
 
       // Conjecture - みたい (様態推定)
-      // MeCab splits みたいな as みたい+な - register base forms only
+      // Note: みたいだ/みたいに removed - MeCab splits as みたい+だ/に
       aux("みたい", "みたい", EPOS::AuxConjectureMitai),
-      aux("みたいだ", "みたい", EPOS::AuxConjectureMitai),
-      aux("みたいに", "みたい", EPOS::AuxConjectureMitai),
 
       // Appearance - そう (様態)
+      // Note: そうだ/そうに removed - MeCab splits as そう+だ/に
       aux("そう", "そう", EPOS::AuxAppearanceSou),
-      aux("そうだ", "そう", EPOS::AuxAppearanceSou),
-      aux("そうに", "そう", EPOS::AuxAppearanceSou),
       // Note: さそう removed - MeCab splits as な+さ+そう (3 tokens)
 
       // Obligation (当為)
       // Classical obligation auxiliary べし - connects after verb shuushikei
+      // Note: べきだ/べきで/べきでは removed - MeCab splits as べき+だ/で/では
       aux("べき", "べし", EPOS::AuxVolitional),  // 連体形: 食べるべき
-      aux("べきだ", "べし", EPOS::AuxVolitional), aux("べきで", "べし", EPOS::AuxVolitional), aux("べきでは", "べし", EPOS::AuxVolitional),
 
       // Passive/Potential (受身・可能)
       aux("れ", "れる", EPOS::AuxPassive),
@@ -291,6 +289,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("し", "する", EPOS::VerbRenyokei),
       verb("す", "する", EPOS::VerbShuushikei),
       verb("さ", "する", EPOS::VerbMizenkei),
+
+      // Kuru verb stem form (カ変動詞語幹活用形) - VERB, not AUX
+      // MeCab: 来た → 来(連用形) + た(過去)
+      verb("来", "来る", EPOS::VerbRenyokei),
       aux("しよう", "する", EPOS::AuxVolitional),
       aux("しろ", "する", EPOS::VerbMeireikei),
       aux("せよ", "する", EPOS::VerbMeireikei),
@@ -324,6 +326,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: 高さ → 高(語幹) + さ(名詞), なさそう → な + さ + そう
       suffix("さ", "さ"),
 
+      // Na-adjective forming suffix 的 (論理的, 科学的, 経済的)
+      // MeCab: 論理的な → 論理 + 的 + な (suffix + copula rentaikei)
+      suffix("的", "的"),
+
       // Polite imperative - connect after verb renyokei
       aux("なさい", "なさる", EPOS::AuxHonorific),
 
@@ -342,7 +348,8 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("させる", "させる", EPOS::AuxCausative),
 
       // Polite existence - ございます (丁重)
-      aux("ございます", "ございます", EPOS::AuxGozaru),
+      // MeCab splits: ござい + ます (renyokei + polite)
+      aux("ござい", "ござる", EPOS::AuxGozaru),
 
       // Request
       aux("ください", "ください", EPOS::Unknown),
@@ -377,10 +384,9 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("でる", "でる", EPOS::AuxAspectIru),
       verb("とく", "とく", EPOS::AuxAspectOku),
       verb("どく", "どく", EPOS::AuxAspectOku),
-      verb("といた", "とく", EPOS::AuxAspectOku),
-      verb("といて", "とく", EPOS::AuxAspectOku),
-      verb("どいた", "どく", EPOS::AuxAspectOku),
-      verb("どいて", "どく", EPOS::AuxAspectOku),
+      // MeCab compat: とい/どい (renyokei) + た/て instead of といた/どいた
+      verb("とい", "とく", EPOS::AuxAspectOku),
+      verb("どい", "どく", EPOS::AuxAspectOku),
 
       // Directional auxiliaries - いく/くる (方向補助動詞)
       aux("いく", "いく", EPOS::AuxAspectIku),
@@ -393,13 +399,8 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("きた", "くる", EPOS::AuxAspectKuru),
       aux("こない", "くる", EPOS::AuxAspectKuru),
 
-      // Explanatory (説明)
-      aux("のだ", "のだ", EPOS::AuxCopulaDa),
-      aux("のです", "のだ", EPOS::AuxCopulaDesu),
-      aux("のでした", "のだ", EPOS::AuxCopulaDesu),
-      aux("んだ", "のだ", EPOS::AuxCopulaDa),
-      aux("んです", "のだ", EPOS::AuxCopulaDesu),
-      aux("んでした", "のだ", EPOS::AuxCopulaDesu),
+      // Explanatory (説明) - MeCab compat: split as の/ん + だ/です/でした
+      // Removed のだ/のです/のでした/んだ/んです/んでした to allow split
 
       // Kuruwa-kotoba (廓言葉)
       aux("ありんす", "ある", EPOS::Unknown), aux("ありんした", "ある", EPOS::Unknown), aux("ありんせん", "ある", EPOS::Unknown),
@@ -485,7 +486,9 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
 
       // Topic change (転換)
       conj("さて", ""), conj("ところで", ""),
-      conj("では", ""), conj("それでは", ""),
+      // Note: では removed to allow で+は splitting in ではない patterns
+      // MeCab splits 彼女ではない as 彼女+で+は+ない, not 彼女+では+ない
+      conj("それでは", ""),
 
       // Addition/Emphasis
       conj("のみならず", ""),
@@ -560,7 +563,7 @@ std::vector<DictionaryEntry> getPronounEntries() {
       pronoun("僕たち", ""),
       pronoun("僕ら", ""),
       pronoun("俺たち", ""),
-      pronoun("俺ら", ""),
+      // Note: 俺ら removed for MeCab compat (MeCab splits 俺+ら, unlike 僕ら)
       pronoun("我々", ""),
 
       // Second person (二人称) - kanji with reading

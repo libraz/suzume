@@ -93,6 +93,21 @@ bool hasNonVerbDictionaryEntry(const dictionary::DictionaryManager* dict_manager
   return false;
 }
 
+bool hasParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
+                                std::string_view surface) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  auto results = dict_manager->lookup(surface, 0);
+  for (const auto& result : results) {
+    if (result.entry != nullptr && result.entry->surface == surface &&
+        result.entry->pos == core::PartOfSpeech::Particle) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // =============================================================================
 // Candidate Sorting
 // =============================================================================

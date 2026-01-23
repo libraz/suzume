@@ -310,6 +310,22 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       continue;  // Skip - dictionary has non-verb entry for this surface
     }
 
+    // Filter out verb stems that would form compound particles with て/で
+    // e.g., によっ + て = によって (particle), とし + て = として (particle)
+    // These compound particles exist as dictionary entries and should not be
+    // split into spurious verb + て patterns
+    {
+      std::string_view last_char = utf8::lastChar(surface);
+      if (utf8::equalsAny(last_char, {"っ", "し", "つ", "い"})) {
+        std::string te_form = std::string(surface) + "て";
+        std::string de_form = std::string(surface) + "で";
+        if (vh::hasParticleDictionaryEntry(dict_manager, te_form) ||
+            vh::hasParticleDictionaryEntry(dict_manager, de_form)) {
+          continue;  // Skip - would split a compound particle
+        }
+      }
+    }
+
     // Check for 3-4 char hiragana verb ending with た/だ (past form) BEFORE threshold check
     // e.g., つかれた (疲れた), ねむった (眠った), おきた (起きた)
     // These need lower threshold because ichidan_pure_hiragana_stem penalty reduces confidence
@@ -444,10 +460,16 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       // These medium-length verbs need a bonus to beat particle splits like つ+か+れた
       // Note: Lower confidence threshold (0.25) because ichidan_pure_hiragana_stem penalty
       // reduces confidence significantly for pure hiragana verbs
+      // Skip if stem (without た/だ) is a known auxiliary (e.g., そうだ → そう is AUX)
       bool is_medium_past_form = false;
       if ((candidate_len == 3 || candidate_len == 4) && best.confidence >= verb_opts.confidence_past_te) {
         if (utf8::equalsAny(utf8::lastChar(surface), {"た", "だ"})) {
-          is_medium_past_form = true;
+          // Extract stem (surface without last た/だ)
+          std::string_view stem(surface.data(), surface.size() - core::kJapaneseCharBytes);
+          // Skip if stem is a known auxiliary (e.g., そう+だ should not be verb candidate)
+          if (!vh::hasDictionaryEntry(dict_manager, stem, core::PartOfSpeech::Auxiliary)) {
+            is_medium_past_form = true;
+          }
         }
       }
 
@@ -928,7 +950,10 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
     // Strong negative cost to beat NOUN + て(VERB from てる) split
     // Dictionary-verified verbs get stronger bonus
-    float cost = is_dict_verb ? -0.8F : -0.6F;
+    // Non-dictionary verbs get moderate positive cost to avoid spurious candidates
+    // competing with dictionary compound particles like について
+    // But not too high to break valid patterns like してほしい
+    float cost = is_dict_verb ? -0.8F : 0.5F;
     SUZUME_DEBUG_VERBOSE_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface
                           << " hiragana_ichidan_renyokei lemma=" << base_form
@@ -992,6 +1017,67 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
                 onbin_surface, start_pos, onbin_end, kHiraganaSokuonbinCost, potential_base,
                 grammar::verbTypeToConjType(verb_type),
                 true, CandidateOrigin::VerbHiragana, 0.9F, "hiragana_sokuonbin",
+                core::ExtendedPOS::VerbOnbinkei));
+            break;  // Found valid base, stop trying other types
+          }
+        }
+      }
+    }
+  }
+
+  // Generate Godan hatsuonbin (ん) candidates for hiragana verbs
+  // E.g., こんだ → こん (onbin of こむ) + だ (auxiliary)
+  //       こんで → こん (onbin of こむ) + で (particle)
+  //       よんだ → よん (onbin of よむ) + だ (auxiliary)
+  // This allows MeCab-compatible splitting for godan-ma/ba/na verbs
+  {
+    // Find hiragana extent (all consecutive hiragana from start_pos)
+    size_t hira_extent_end = start_pos;
+    while (hira_extent_end < char_types.size() &&
+           char_types[hira_extent_end] == normalize::CharType::Hiragana) {
+      ++hira_extent_end;
+    }
+    size_t hira_len = hira_extent_end - start_pos;
+
+    // Need at least 3 chars: stem(1+) + ん + だ/で
+    if (hira_len >= 3) {
+      char32_t second_last = codepoints[hira_extent_end - 2];
+      char32_t last_char = codepoints[hira_extent_end - 1];
+      bool is_hatsuonbin_de_da = (second_last == U'ん' &&
+                                   (last_char == U'だ' || last_char == U'で'));
+      if (is_hatsuonbin_de_da) {
+        // Generate candidate for stem + ん (without the だ/で)
+        size_t onbin_end = hira_extent_end - 1;  // Position after ん
+        std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_end);
+        std::string stem = extractSubstring(codepoints, start_pos, onbin_end - 1);
+
+        // Try different base form patterns for ん-onbin
+        // Godan-ma: こ + む → こむ, よ + む → よむ
+        // Godan-ba: と + ぶ → とぶ
+        // Godan-na: し + ぬ → しぬ
+        static const std::vector<std::pair<grammar::VerbType, std::string_view>>
+            hatsuonbin_types = {
+                {grammar::VerbType::GodanMa, "む"},
+                {grammar::VerbType::GodanBa, "ぶ"},
+                {grammar::VerbType::GodanNa, "ぬ"},
+            };
+
+        for (const auto& [verb_type, base_suffix] : hatsuonbin_types) {
+          std::string potential_base = stem + std::string(base_suffix);
+          bool in_dict = vh::isVerbInDictionaryWithType(dict_manager, potential_base, verb_type) ||
+                         vh::isVerbInDictionary(dict_manager, potential_base);
+          if (in_dict) {
+            constexpr float kHiraganaHatsuonbinCost = -0.5F;
+            SUZUME_DEBUG_VERBOSE_BLOCK {
+              SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
+                                  << " hiragana_hatsuonbin lemma=" << potential_base
+                                  << " type=" << grammar::verbTypeToString(verb_type)
+                                  << " cost=" << kHiraganaHatsuonbinCost << "\n";
+            }
+            candidates.push_back(makeVerbCandidate(
+                onbin_surface, start_pos, onbin_end, kHiraganaHatsuonbinCost, potential_base,
+                grammar::verbTypeToConjType(verb_type),
+                true, CandidateOrigin::VerbHiragana, 0.9F, "hiragana_hatsuonbin",
                 core::ExtendedPOS::VerbOnbinkei));
             break;  // Found valid base, stop trying other types
           }

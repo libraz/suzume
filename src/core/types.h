@@ -151,6 +151,7 @@ enum class ExtendedPOS : uint8_t {
   Prefix,           // 接頭辞: お、ご、不、未
   Suffix,           // 接尾辞: さん、様、的、化
   Symbol,           // 記号: punctuation and symbols
+  Interjection,     // 感動詞: 何だ、ああ、おい
   Other,            // その他
 
   // Count marker (for array sizing)

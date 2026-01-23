@@ -16,6 +16,7 @@ namespace {
 constexpr uint8_t kFlagFormalNoun = 0x01;
 constexpr uint8_t kFlagLowInfo = 0x02;
 constexpr uint8_t kFlagPrefix = 0x04;
+constexpr uint8_t kFlagInterjection = 0x08;
 
 /**
  * @brief Count UTF-8 characters in a byte range
@@ -162,6 +163,8 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
     // Determine extended_pos from flags for backwards compatibility
     if ((rec.flags & kFlagFormalNoun) != 0) {
       entry.extended_pos = core::ExtendedPOS::NounFormal;
+    } else if ((rec.flags & kFlagInterjection) != 0) {
+      entry.extended_pos = core::ExtendedPOS::Interjection;
     } else {
       // Derive default extended_pos from POS for proper cost calculation
       switch (entry.pos) {
@@ -215,6 +218,14 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
             // e.g., すぎ from すぎる expansion → すぎ + ない should work
             // Forms ending in る (する, いる, etc.) are shuushikei
             entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
+          } else if (utf8::endsWithAny(entry.surface, {"き"sv, "ぎ"sv, "し"sv,
+                     "ち"sv, "に"sv, "び"sv, "み"sv, "り"sv})) {
+            // Godan verb renyokei endings (I-row hiragana except い)
+            // e.g., いただき from いただく → いただき + ます should work
+            // Note: い excluded because godan-wa renyokei (思い) would need
+            // disambiguation from noun/adj uses. Short forms are handled above.
+            // Note: E-row excluded to avoid te-form confusion (食べて vs 捨て)
+            entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
           } else {
             // Default: shuushikei (dictionary form or other forms)
             entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
@@ -232,6 +243,9 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
           break;
         case core::PartOfSpeech::Auxiliary:
           entry.extended_pos = core::ExtendedPOS::AuxTenseTa;  // Default aux
+          break;
+        case core::PartOfSpeech::Other:
+          entry.extended_pos = core::ExtendedPOS::Other;
           break;
         default:
           entry.extended_pos = core::ExtendedPOS::Unknown;
@@ -340,6 +354,9 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
     uint8_t flags = 0;
     if (ent.extended_pos == core::ExtendedPOS::NounFormal) {
       flags |= kFlagFormalNoun;
+    }
+    if (ent.extended_pos == core::ExtendedPOS::Interjection) {
+      flags |= kFlagInterjection;
     }
     rec.flags = flags;
 

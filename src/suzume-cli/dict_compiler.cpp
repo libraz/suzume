@@ -46,6 +46,14 @@ std::vector<dictionary::DictionaryEntry> expandIAdjective(
     return result;
   }
 
+  // Skip irregular adjective いい - its conjugations (よく, よければ, etc.) are
+  // already in L1 dictionary as よい forms. Expanding いい would incorrectly
+  // generate いく instead of よく.
+  if (entry.surface == "いい") {
+    result.push_back(entry);  // Just add the base form
+    return result;
+  }
+
   // Get stem by removing final い
   std::string stem(utf8::dropLastChar(entry.surface));
   std::string lemma = entry.lemma.empty() ? entry.surface : entry.lemma;
@@ -225,6 +233,10 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
 
       base_entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
       expanded_entries = expandVerb(base_entry, verb_type);
+    } else if (tsv_entry.conj_type == dictionary::ConjugationType::Interjection) {
+      // Interjection: set specific ExtendedPOS
+      base_entry.extended_pos = core::ExtendedPOS::Interjection;
+      expanded_entries.push_back(base_entry);
     } else {
       // No expansion needed
       expanded_entries.push_back(base_entry);

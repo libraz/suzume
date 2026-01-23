@@ -485,7 +485,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "成功率"
+          "surface" : "成功"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "率"
         },
         {
           "pos" : "Particle",
@@ -742,7 +746,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "山田様"
+          "surface" : "山田"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "様"
         },
         {
           "pos" : "Particle",
@@ -882,7 +890,11 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "担当者"
+          "surface" : "担当"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "者"
         }
       ],
       "id" : "compound_kabushiki_kaisha",
@@ -1105,7 +1117,11 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "請求書"
+          "surface" : "請求"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "書"
         },
         {
           "pos" : "Particle",

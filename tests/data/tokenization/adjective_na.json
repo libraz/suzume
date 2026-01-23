@@ -82,8 +82,12 @@
       "description" : "理性的に (rationally) - 〜的 pattern",
       "expected" : [
         {
-          "pos" : "Adjective",
-          "surface" : "理性的"
+          "pos" : "Noun",
+          "surface" : "理性"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "pos" : "Particle",
@@ -102,8 +106,12 @@
       "description" : "論理的に (logically) - 〜的 pattern",
       "expected" : [
         {
-          "pos" : "Adjective",
-          "surface" : "論理的"
+          "pos" : "Noun",
+          "surface" : "論理"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "pos" : "Particle",
@@ -122,8 +130,12 @@
       "description" : "効率的に (efficiently) - 〜的 pattern",
       "expected" : [
         {
-          "pos" : "Adjective",
-          "surface" : "効率的"
+          "pos" : "Noun",
+          "surface" : "効率"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "pos" : "Particle",
@@ -143,7 +155,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "論理的"
+          "surface" : "論理"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "lemma" : "だ",
@@ -169,7 +185,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "効率的"
+          "surface" : "効率"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "lemma" : "だ",
@@ -194,8 +214,12 @@
       "description" : "理性的に考える (think rationally)",
       "expected" : [
         {
-          "pos" : "Adjective",
-          "surface" : "理性的"
+          "pos" : "Noun",
+          "surface" : "理性"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "pos" : "Particle",
@@ -219,8 +243,12 @@
       "description" : "感情的になる (become emotional)",
       "expected" : [
         {
-          "pos" : "Adjective",
-          "surface" : "感情的"
+          "pos" : "Noun",
+          "surface" : "感情"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "pos" : "Particle",
@@ -245,7 +273,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "科学的"
+          "surface" : "科学"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "lemma" : "だ",

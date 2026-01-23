@@ -404,11 +404,11 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
                                                      : getPosForType(start_type);
       float cost = getCostForType(start_type, len);
 
-      // Penalize kanji sequences ending with honorific suffixes (様, 氏)
-      // to encourage NOUN + SUFFIX separation (e.g., 客様 → 客 + 様)
+      // Penalize kanji sequences ending with common suffixes (様, 氏, 的)
+      // to encourage NOUN + SUFFIX separation (e.g., 客様 → 客 + 様, 論理的 → 論理 + 的)
       if (start_type == normalize::CharType::Kanji && len >= 2) {
         char32_t last_char = codepoints[candidate_end - 1];
-        if (last_char == U'様' || last_char == U'氏') {
+        if (last_char == U'様' || last_char == U'氏' || last_char == U'的') {
           cost += 4.0F;  // Strong penalty to prefer NOUN + SUFFIX path
         }
       }
@@ -719,8 +719,45 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
         continue;
       }
 
+      // Skip generating AUX for common particle surfaces
+      // These should be handled by the particle dictionary entries, not as auxiliaries
+      // This prevents だけ from being generated as AUX (which gets VerbOnbinkei → AuxTenseTa bonus)
+      static const std::vector<std::string_view> kParticleSurfaces = {
+          "だけ", "ばかり", "ほど", "くらい", "ぐらい", "など", "なんて",
+          "しか", "まで", "より", "から", "かも", "でも",
+      };
+      bool is_particle_surface = false;
+      for (const auto& p : kParticleSurfaces) {
+        if (surface == p) {
+          is_particle_surface = true;
+          break;
+        }
+      }
+      if (is_particle_surface) {
+        continue;  // Skip - let dictionary entry handle it
+      }
+
       // Calculate character count (not byte count)
       size_t char_count = surface.size() / core::kJapaneseCharBytes;
+
+      // For single-character hiragana, only allow valid auxiliary forms
+      // This prevents spurious splits like 玉ね+ぎ where ぎ is misanalyzed as た
+      if (char_count == 1 && start_type == normalize::CharType::Hiragana) {
+        // Valid single-char auxiliaries: た て ぬ む ん い せ れ ず よ ろ
+        static const std::string_view kValidSingleCharAux[] = {
+            "た", "て", "ぬ", "む", "ん", "い", "せ", "れ", "ず", "よ", "ろ",
+        };
+        bool is_valid_aux = false;
+        for (const auto& valid : kValidSingleCharAux) {
+          if (surface == valid) {
+            is_valid_aux = true;
+            break;
+          }
+        }
+        if (!is_valid_aux) {
+          continue;  // Skip invalid single-char auxiliary candidates
+        }
+      }
 
       // Apply length-based penalty for character speech
       // Short patterns (1-2 chars) like ぜ, のだ are common

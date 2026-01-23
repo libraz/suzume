@@ -370,7 +370,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "情報処理技術者"
+          "surface" : "情報処理技術"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "者"
         },
         {
           "pos" : "Particle",
@@ -624,7 +628,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "国際的"
+          "surface" : "国際"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "lemma" : "だ",
@@ -647,7 +655,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "自動化"
+          "surface" : "自動"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "化"
         },
         {
           "pos" : "Verb",
@@ -665,7 +677,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "可能性"
+          "surface" : "可能"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "性"
         },
         {
           "pos" : "Particle",

@@ -1,5 +1,8 @@
 #include "types.h"
 
+#include "normalize/char_type.h"
+#include "normalize/utf8.h"
+
 namespace suzume::core {
 
 std::string_view posToString(PartOfSpeech pos) {
@@ -262,6 +265,7 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
     case ExtendedPOS::Prefix: return "PREFIX";
     case ExtendedPOS::Suffix: return "SUFFIX";
     case ExtendedPOS::Symbol: return "SYMBOL";
+    case ExtendedPOS::Interjection: return "INTJ";
     case ExtendedPOS::Other: return "OTHER";
 
     case ExtendedPOS::Unknown:
@@ -312,6 +316,7 @@ PartOfSpeech extendedPosToPos(ExtendedPOS epos) {
       return PartOfSpeech::Suffix;
     case ExtendedPOS::Symbol:
       return PartOfSpeech::Symbol;
+    case ExtendedPOS::Interjection:
     case ExtendedPOS::Other:
     case ExtendedPOS::Unknown:
     case ExtendedPOS::Count_:
@@ -424,10 +429,22 @@ ExtendedPOS detectVerbForm(std::string_view surface, std::string_view suffix) {
   }
   // Also check for い-onbin (書い from 書く)
   // Need to distinguish from renyokei ending in い
+  // い-onbin is specifically kanji + い (書い, 泳い) for godan verbs
+  // All-hiragana surfaces ending in い are ichidan renyokei (食べ, につい, etc.)
   if (surface.size() >= 3 && endsWithAny(surface, {"い"})) {
-    // い-onbin is typically single kanji + い (書い, 泳い)
-    // vs renyokei would be kanji + い (食べ + い... but ichidan don't end in い)
-    return ExtendedPOS::VerbOnbinkei;
+    // Check if surface contains kanji - only then classify as onbinkei
+    bool has_kanji = false;
+    for (char32_t cp : suzume::normalize::utf8::decode(surface)) {
+      if (suzume::normalize::isKanjiCodepoint(cp)) {
+        has_kanji = true;
+        break;
+      }
+    }
+    if (has_kanji) {
+      return ExtendedPOS::VerbOnbinkei;
+    }
+    // All-hiragana い-ending verbs are renyokei (ichidan stems)
+    return ExtendedPOS::VerbRenyokei;
   }
 
   // て/で form

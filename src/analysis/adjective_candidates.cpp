@@ -486,6 +486,14 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       continue;  // Skip - verb negative pattern, not adjective
     }
 
+    // Skip patterns that are サ変動詞 + て + auxiliary
+    // E.g., 説明してほしい = 説明(noun) + し(suru renyokei) + て + ほしい
+    // These should split, not be treated as single adjectives
+    if (surface.size() >= 15 &&  // At least 5 chars (kanji + してほしい)
+        surface.find("してほしい") != std::string::npos) {
+      continue;  // Skip - suru verb + te + hoshii pattern
+    }
+
     // Check all candidates for IAdjective, not just the best one
     // This handles cases like 美味しそう where Suru (美味する) may have higher
     // confidence than IAdjective (美味しい), but we still want to generate
@@ -788,6 +796,9 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
   std::string kanji_seq = extractSubstring(codepoints, start_pos, kanji_end);
 
   // Pattern 1: Check for na-adjective suffixes (的)
+  // NOTE: MeCab splits 論理的な as 論理+的+な, not 論理的+な
+  // So we generate this candidate with higher cost to allow NOUN+SUFFIX path to win
+  // The candidate is still useful for cases where no split path exists
   for (const auto& suffix : kNaAdjSuffixes) {
     // Check if kanji_seq ends with suffix
     if (kanji_seq.size() >= suffix.size()) {
@@ -795,9 +806,9 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
                                      suffix.size());
       if (kanji_suffix == suffix) {
         // Found a na-adjective pattern like 理性的, 論理的
-        // Low cost to prefer this over noun interpretation
+        // Higher cost to prefer NOUN + 的(SUFFIX) + な path for MeCab compatibility
         candidates.push_back(makeNaAdjCandidate(
-            kanji_seq, start_pos, kanji_end, 0.3F, true, 1.0F, "na_adjective_teki"));
+            kanji_seq, start_pos, kanji_end, 1.5F, true, 1.0F, "na_adjective_teki"));
         break;  // Use first matching suffix
       }
     }
@@ -813,6 +824,13 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
     normalize::encodeUtf8(codepoints[start_pos], first_char_str);
     if (normalize::isFormalNounSurface(first_char_str)) {
       // Don't generate na-adjective candidate for formal noun + kanji patterns
+      return candidates;
+    }
+
+    // Skip if kanji ends with 的 - MeCab splits as NOUN + 的(SUFFIX) + な
+    // e.g., 論理的な should be 論理+的+な, not 論理的+な
+    char32_t last_kanji = codepoints[kanji_end - 1];
+    if (last_kanji == U'的') {
       return candidates;
     }
 

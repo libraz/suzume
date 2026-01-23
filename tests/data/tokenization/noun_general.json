@@ -292,7 +292,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "第一回"
+          "surface" : "第一"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "回"
         }
       ],
       "id" : "numeric_ordinal",
@@ -1092,7 +1096,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "国際的"
+          "surface" : "国際"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "lemma" : "だ",
@@ -1393,14 +1401,17 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "今日中"
+          "surface" : "今日"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "中"
         },
         {
           "pos" : "Particle",
           "surface" : "に"
         },
         {
-          "lemma" : "届く",
           "pos" : "Verb",
           "surface" : "届く"
         }
@@ -1487,14 +1498,17 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "翌営業日"
+          "surface" : "翌営業"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "日"
         },
         {
           "pos" : "Particle",
           "surface" : "に"
         },
         {
-          "lemma" : "届く",
           "pos" : "Verb",
           "surface" : "届く"
         }

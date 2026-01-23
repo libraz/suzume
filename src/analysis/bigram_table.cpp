@@ -94,14 +94,26 @@ BigramTable::initTable() {
   // VerbMizenkei → AuxPassive (食べ+られる) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxPassive, cost::kModerateBonus);
 
+  // VerbRenyokei → AuxPassive (知らせ+られ) - strong bonus
+  // Ensures 知らせられた → 知らせ+られ+た over 知ら+せ+られ+た
+  // The ichidan causative verb (知らせる) renyokei should connect to passive
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxPassive, cost::kStrongBonus);
+
   // VerbMizenkei → AuxCausative (食べ+させる) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxCausative, cost::kModerateBonus);
 
   // VerbMizenkei → AuxVolitional (食べ+よう) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxVolitional, cost::kModerateBonus);
 
+  // Note: VerbRenyokei → AuxTenseTa is NOT set here because it would incorrectly
+  // favor て as AUX over Particle. Ichidan た-form split (食べ+た) needs surface-based
+  // handling in scorer.cpp to distinguish た from て.
+
   // VerbOnbinkei → AuxTenseTa (書い+た, 泳い+だ) - strong bonus
   setCell(t, EPOS::VerbOnbinkei, EPOS::AuxTenseTa, cost::kStrongBonus);
+
+  // VerbOnbinkei → AuxAspectOku (読ん+どい) - moderate bonus for contracted ~ておく split
+  setCell(t, EPOS::VerbOnbinkei, EPOS::AuxAspectOku, cost::kModerateBonus);
 
   // VerbTeForm → AuxAspectIru (食べて+いる) - strong bonus
   setCell(t, EPOS::VerbTeForm, EPOS::AuxAspectIru, cost::kStrongBonus);
@@ -131,6 +143,9 @@ BigramTable::initTable() {
 
   // VerbShuushikei → ParticleFinal (食べる+ね) - minor bonus
   setCell(t, EPOS::VerbShuushikei, EPOS::ParticleFinal, cost::kMinorBonus);
+
+  // VerbShuushikei → ParticleNo (食べる+の+だ for のだ/んだ) - strong bonus
+  setCell(t, EPOS::VerbShuushikei, EPOS::ParticleNo, cost::kStrongBonus);
 
   // VerbShuushikei → ParticleQuote (食べる+と言う) - neutral
   setCell(t, EPOS::VerbShuushikei, EPOS::ParticleQuote, cost::kNeutral);
@@ -182,8 +197,16 @@ BigramTable::initTable() {
   // AuxTenseMasu → AuxTenseTa (まし+た) - strong bonus
   setCell(t, EPOS::AuxTenseMasu, EPOS::AuxTenseTa, cost::kStrongBonus);
 
+  // AuxCausative → AuxPassive (せ+られ in causative-passive) - strong bonus
+  // Ensures 聞かせられた → 聞か+せ+られ+た over 聞か+せられた
+  setCell(t, EPOS::AuxCausative, EPOS::AuxPassive, cost::kStrongBonus);
+
   // AuxNegativeNai → AuxTenseTa (なかっ+た) - strong bonus
   setCell(t, EPOS::AuxNegativeNai, EPOS::AuxTenseTa, cost::kStrongBonus);
+
+  // AuxNegativeNai → ParticleNo (ない+ん for のだ/んだ) - strong bonus
+  // Ensures ないんだ → ない+ん+だ over な+いん+だ
+  setCell(t, EPOS::AuxNegativeNai, EPOS::ParticleNo, cost::kStrongBonus);
 
   // AuxDesireTai → AuxTenseTa (たかっ+た) - strong bonus
   setCell(t, EPOS::AuxDesireTai, EPOS::AuxTenseTa, cost::kStrongBonus);
@@ -224,8 +247,20 @@ BigramTable::initTable() {
   // Noun → ParticleTopic (机+は/も) - neutral (very common)
   setCell(t, EPOS::Noun, EPOS::ParticleTopic, cost::kNeutral);
 
+  // Noun → ParticleAdverbial (そん+だけ, あん+だけ) - strong bonus
+  // Ensures そんだけ → そん+だけ over そん+だ+け
+  setCell(t, EPOS::Noun, EPOS::ParticleAdverbial, cost::kStrongBonus);
+
   // NounFormal → ParticleConj (こと+が) - neutral
   setCell(t, EPOS::NounFormal, EPOS::ParticleCase, cost::kNeutral);
+
+  // =========================================================================
+  // Noun → Verb (サ変動詞パターン)
+  // =========================================================================
+
+  // Noun → VerbRenyokei (得+し for サ変動詞 得する) - moderate bonus
+  // This favors 名詞+し split over 名詞し as single token
+  setCell(t, EPOS::Noun, EPOS::VerbRenyokei, cost::kModerateBonus);
 
   // =========================================================================
   // Noun → Copula/Negative
@@ -276,6 +311,25 @@ BigramTable::initTable() {
   // (te-form usually followed by auxiliary, not new verb)
   setCell(t, EPOS::ParticleConj, EPOS::VerbShuushikei, cost::kMinorPenalty);
 
+  // ParticleConj → AuxAspectIru (て+いる) - strong bonus for MeCab-compatible split
+  // Allows 食べ+て+いる to beat unified 食べて+いる path
+  setCell(t, EPOS::ParticleConj, EPOS::AuxAspectIru, cost::kStrongBonus);
+
+  // ParticleConj → AuxAspectShimau (て+しまう) - strong bonus
+  setCell(t, EPOS::ParticleConj, EPOS::AuxAspectShimau, cost::kStrongBonus);
+
+  // ParticleConj → AuxAspectOku (て+おく) - strong bonus
+  setCell(t, EPOS::ParticleConj, EPOS::AuxAspectOku, cost::kStrongBonus);
+
+  // ParticleConj → AuxAspectMiru (て+みる) - strong bonus
+  setCell(t, EPOS::ParticleConj, EPOS::AuxAspectMiru, cost::kStrongBonus);
+
+  // ParticleConj → AuxAspectIku (て+いく) - strong bonus
+  setCell(t, EPOS::ParticleConj, EPOS::AuxAspectIku, cost::kStrongBonus);
+
+  // ParticleConj → AuxAspectKuru (て+くる) - strong bonus
+  setCell(t, EPOS::ParticleConj, EPOS::AuxAspectKuru, cost::kStrongBonus);
+
   // =========================================================================
   // Penalties: Invalid or Rare Connections
   // =========================================================================
@@ -299,6 +353,14 @@ BigramTable::initTable() {
   // ParticleFinal → VerbShuushikei (ね+食べる) - strong penalty
   // (sentence-final particles rarely continue to verbs)
   setCell(t, EPOS::ParticleFinal, EPOS::VerbShuushikei, cost::kStrongPenalty);
+
+  // ParticleFinal → VerbOnbinkei (な+いん) - prohibit
+  // (prevents ないんだ → な+いん+だ over ない+ん+だ)
+  setCell(t, EPOS::ParticleFinal, EPOS::VerbOnbinkei, cost::kProhibitive);
+
+  // AuxCopulaDa → VerbOnbinkei (な+いん) - prohibit
+  // (prevents ないんだ → な+いん+だ over ない+ん+だ)
+  setCell(t, EPOS::AuxCopulaDa, EPOS::VerbOnbinkei, cost::kProhibitive);
 
   // ParticleFinal → ParticleFinal (よ+ね) - minor bonus (common pattern)
   setCell(t, EPOS::ParticleFinal, EPOS::ParticleFinal, cost::kMinorBonus);
@@ -365,9 +427,12 @@ BigramTable::initTable() {
 
   // AdjStem → Verb/Aux: prohibit (な+い should not split ない as な(AdjStem)+い)
   // な(AdjStem of ない) should only connect to さ(nominalization) or そう(appearance)
+  // Also prevents 高+すぎた winning over 高+すぎ+た
   setCell(t, EPOS::AdjStem, EPOS::VerbRenyokei, cost::kProhibitive);
   setCell(t, EPOS::AdjStem, EPOS::VerbShuushikei, cost::kProhibitive);
   setCell(t, EPOS::AdjStem, EPOS::VerbMizenkei, cost::kProhibitive);
+  setCell(t, EPOS::AdjStem, EPOS::VerbTaForm, cost::kProhibitive);
+  setCell(t, EPOS::AdjStem, EPOS::VerbTaraForm, cost::kProhibitive);
   setCell(t, EPOS::AdjStem, EPOS::AuxAspectIru, cost::kProhibitive);  // な+い(いる)
   setCell(t, EPOS::AdjStem, EPOS::AuxNegativeNai, cost::kProhibitive);   // な+ない
   setCell(t, EPOS::AdjStem, EPOS::Other, cost::kProhibitive);           // な+い(OTHER)
@@ -392,6 +457,14 @@ BigramTable::initTable() {
   // ParticleConj → Other: minor penalty (て+random at sentence start is unlikely)
   // Less penalty than others because て+noun/verb is valid in some contexts
   setCell(t, EPOS::ParticleConj, EPOS::Other, cost::kMinorPenalty);
+
+  // =========================================================================
+  // Interjection connections
+  // =========================================================================
+
+  // Adverb → Interjection (いったい+何だ) - strong bonus
+  // いったい何だ should tokenize as いったい + 何だ, not いったい + 何 + だ
+  setCell(t, EPOS::Adverb, EPOS::Interjection, cost::kStrongBonus);
 
   return t;
 }

@@ -104,6 +104,7 @@
 ていねい	ADJECTIVE	NA_ADJ
 しんちょう	ADJECTIVE	NA_ADJ
 静か	ADJECTIVE	NA_ADJ
+好き	ADJECTIVE	NA_ADJ
 しずか	ADJECTIVE	NA_ADJ
 よい	ADJECTIVE	I_ADJ
 いい	ADJECTIVE	I_ADJ
@@ -217,6 +218,18 @@
 だいたい	ADVERB
 颯爽と	ADVERB
 少々	ADVERB
+まして	ADVERB
+がっかり	ADVERB
+びっくり	ADVERB
+のんびり	ADVERB
+せっかく	ADVERB
+さっぱり	ADVERB
+ちょっぴり	ADVERB
+ちゃっかり	ADVERB
+とっとと	ADVERB
+ぼんやり	ADVERB
+同時に	ADVERB
+ひときわ	ADVERB
 俄然	ADVERB
 
 # =============================================================================
@@ -270,6 +283,7 @@
 示す	VERB	GODAN_SA
 倒す	VERB	GODAN_SA
 起こす	VERB	GODAN_SA
+愛す	VERB	GODAN_SA
 戻す	VERB	GODAN_SA
 # 伸ばす	VERB	のばす	0.3	GODAN_SA
 # 濡らす	VERB	ぬらす	0.3	GODAN_SA
@@ -301,9 +315,14 @@
 # B60: あきらめる - split as あきら+める
 あきらめる	VERB	ICHIDAN
 いる	VERB	ICHIDAN
+得する	VERB	SURU
 する	VERB	SURU
 しれる	VERB	ICHIDAN
 すぎる	VERB	ICHIDAN
+行く	VERB	GODAN_KA
+いただく	VERB	GODAN_KA
+こむ	VERB	GODAN_MA
+見つける	VERB	ICHIDAN
 諦める	VERB	ICHIDAN
 
 # =============================================================================
@@ -498,6 +517,10 @@ Wi-Fi	NOUN
 それぞれ	NOUN
 新た	NOUN
 やる気	NOUN
+いくら	NOUN
+そん	NOUN
+あん	NOUN
+玉ねぎ	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -517,11 +540,11 @@ Wi-Fi	NOUN
 式	SUFFIX
 感	SUFFIX
 力	SUFFIX
+ら	SUFFIX
 度	SUFFIX
 
 # --- Plural suffixes ---
 たち	OTHER
-ら	OTHER
 ども	OTHER
 がた	OTHER
 
@@ -615,6 +638,14 @@ Wi-Fi	NOUN
 # 感じ needs higher cost to not beat 感じる conjugations
 # 感じがあった should parse as 感じ(NOUN) + が, but 感じた should be 感じ(VERB) + た
 感じ	NOUN
+おはよう	INTERJECTION
+ありがとう	INTERJECTION
+すみません	INTERJECTION
+ごめんなさい	INTERJECTION
+さようなら	INTERJECTION
+こんばんは	INTERJECTION
+何だ	INTERJECTION
+こんにちは	INTERJECTION
 
 # =============================================================================
 # 吾輩は猫である (wagahai) 対応 - W-001〜W-009
@@ -682,3 +713,5 @@ Wi-Fi	NOUN
 小さい	ADJECTIVE	I_ADJ
 
 でも	CONJUNCTION
+
+たとえば	CONJUNCTION

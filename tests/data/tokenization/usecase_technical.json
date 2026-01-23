@@ -136,7 +136,8 @@
       "description" : "Documentation specification style",
       "expected" : [
         {
-          "pos" : "Noun",
+          "lemma" : "戻る",
+          "pos" : "Verb",
           "surface" : "戻り"
         },
         {
@@ -149,13 +150,18 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "成功時"
+          "surface" : "成功"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "時"
         },
         {
           "pos" : "Particle",
           "surface" : "に"
         },
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "0"
         },

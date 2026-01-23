@@ -191,6 +191,47 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += bonus;
   }
 
+  // Bonus for hiragana interjections/greetings from dictionary
+  // Prevents misanalysis like さようなら → さ+よう+なら (volitional pattern)
+  // These are fixed expressions that should remain as single tokens
+  // Longer interjections get stronger bonus to beat common split patterns
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Other &&
+      grammar::isPureHiragana(edge.surface)) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    // Stronger bonus for longer interjections (common greetings are 4-5 chars)
+    float bonus = (char_len <= 3) ? -1.5F
+                                  : -2.0F - static_cast<float>(char_len - 3) * 0.5F;
+    cost += bonus;
+  }
+
+  // Bonus for hiragana conjunctions from dictionary (たとえば, それから, etc.)
+  // Prevents misanalysis like たとえば → たとえ+ば (adverb + particle)
+  // These are fixed expressions that should remain as single tokens
+  // Needs to beat adverb bonus path, so use stronger bonus
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Conjunction &&
+      grammar::isPureHiragana(edge.surface)) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    // Stronger bonus for conjunctions to beat adverb+particle splits
+    // Adverb 3-char gets -3.0, plus particle gets bonus, so we need > -3.5
+    float bonus = (char_len <= 3) ? -2.0F
+                                  : -3.5F - static_cast<float>(char_len - 3) * 0.5F;
+    cost += bonus;
+  }
+
+  // Bonus for compound particles from dictionary (について, によって, として, etc.)
+  // These are multi-character particles that should not be split into verb+て patterns
+  // Helps compound particles compete with high-bonus splits like し+て (-1 connection bonus)
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Particle &&
+      grammar::isPureHiragana(edge.surface)) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    // Compound particles are 3+ chars (について, によって, として)
+    // Give strong bonus to beat verb+て split paths
+    if (char_len >= 3) {
+      constexpr float kCompoundParticleBonus = -1.0F;
+      cost += kCompoundParticleBonus;
+    }
+  }
+
   // Bonus for みたい (conjecture auxiliary) from dictionary
   // Works together with bigram bonuses and spurious verb penalty
   if (edge.fromDictionary() && edge.extended_pos == core::ExtendedPOS::AuxConjectureMitai) {
@@ -307,6 +348,28 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.surface.compare(0, 6, "すぎ") == 0) {
     // Strong bonus to overcome VERB→VERB penalty
     surface_bonus = -0.5F;
+  }
+
+  // Bonus for longer causative forms (させ over さ+せ, させられ over さ+せ+られ)
+  // MeCab treats させる as a single causative auxiliary for ichidan verbs
+  // E.g., 食べ+させ+られ+た (not 食べ+さ+せ+られ+た)
+  // Apply bonus when connecting to AuxCausative with surface starting with させ
+  if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei ||
+       prev.extended_pos == core::ExtendedPOS::VerbMizenkei) &&
+      next.extended_pos == core::ExtendedPOS::AuxCausative &&
+      next.surface.size() >= 6 &&  // "させ" is 6 bytes
+      next.surface.compare(0, 6, "させ") == 0) {
+    // Bonus to prefer させ over さ+せ split
+    surface_bonus += -1.0F;
+  }
+
+  // Surface-based bonus for VerbRenyokei → た (ichidan/irregular た-form)
+  // E.g., 食べ+た, 来+た (MeCab-compatible split)
+  // Must be surface == "た" to distinguish from て (particle)
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface == "た" &&
+      next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
+    surface_bonus += -1.5F;  // Strong bonus for た-form split
   }
 
   float total = base_cost + extended_cost + surface_bonus;

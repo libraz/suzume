@@ -18,7 +18,7 @@
 #   --fix                    Apply fixes (for validate command)
 #   -h, --help               Show this help
 #
-# POS values: ADJECTIVE, ADVERB, VERB, NOUN, PROPER_NOUN, PRONOUN, PREFIX, SUFFIX, INTERJECTION
+# POS values: ADJECTIVE, ADVERB, VERB, NOUN, PROPER_NOUN, PRONOUN, PREFIX, SUFFIX, INTERJECTION, PARTICLE, AUX, OTHER
 # Conjugation types: I_ADJ, NA_ADJ, GODAN_KA/GA/SA/TA/NA/BA/MA/RA/WA, ICHIDAN, IRREGULAR
 #
 # Examples:
@@ -116,7 +116,7 @@ Options:
   --fix                    Apply fixes (for validate command)
   -h, --help               Show this help
 
-POS values: ADJECTIVE, ADVERB, VERB, NOUN, PRONOUN, PREFIX, SUFFIX, INTERJECTION
+POS values: ADJECTIVE, ADVERB, VERB, NOUN, PROPER_NOUN, PRONOUN, PREFIX, SUFFIX, INTERJECTION, PARTICLE, AUX, OTHER
 Conjugation types: I_ADJ, NA_ADJ, GODAN_KA/GA/SA/TA/NA/BA/MA/RA/WA, ICHIDAN, IRREGULAR
 
 Examples:
@@ -473,7 +473,7 @@ sub cmd_add {
     die "Usage: dict_tool.pl add <word> <pos> [conj_type]\n" unless $word && $pos;
 
     # Validate POS
-    my @valid_pos = qw(ADJECTIVE ADVERB VERB NOUN PROPER_NOUN PRONOUN PREFIX SUFFIX INTERJECTION ADNOMINAL CONJUNCTION);
+    my @valid_pos = qw(ADJECTIVE ADVERB VERB NOUN PROPER_NOUN PRONOUN PREFIX SUFFIX INTERJECTION ADNOMINAL CONJUNCTION PARTICLE AUX OTHER);
     unless (grep { $_ eq $pos } @valid_pos) {
         die "Invalid POS: $pos\nValid values: @valid_pos\n";
     }

@@ -120,11 +120,26 @@ core::Expected<TsvEntry, core::Error> TsvParser::parseLine(
         core::ErrorCode::ParseError,
         "Line " + std::to_string(line_number) + ": Missing POS field"));
   }
+
+  // Check for INTERJECTION before parsing POS (to set conj_type marker)
+  std::string_view pos_str = fields[1];
+  size_t pos_start = pos_str.find_first_not_of(" \t");
+  size_t pos_end = pos_str.find_last_not_of(" \t");
+  if (pos_start != std::string_view::npos) {
+    pos_str = pos_str.substr(pos_start, pos_end - pos_start + 1);
+  }
+  bool is_interjection = (pos_str == "INTJ" || pos_str == "INTERJECTION");
+
   auto pos_result = parsePos(fields[1], line_number);
   if (!pos_result.hasValue()) {
     return core::makeUnexpected(pos_result.error());
   }
   entry.pos = pos_result.value();
+
+  // Set conj_type for interjections (used to assign ExtendedPOS::Interjection)
+  if (is_interjection) {
+    entry.conj_type = dictionary::ConjugationType::Interjection;
+  }
 
   // Field 2: conj_type (optional, default None)
   // v0.8: simplified format - reading and cost removed
@@ -185,8 +200,8 @@ core::Expected<core::PartOfSpeech, core::Error> TsvParser::parsePos(
   if (str == "PHRASE") {
     return core::PartOfSpeech::Other;  // Map PHRASE to Other
   }
-  if (str == "INTJ") {
-    return core::PartOfSpeech::Other;  // Map INTJ (interjection) to Other
+  if (str == "INTJ" || str == "INTERJECTION") {
+    return core::PartOfSpeech::Other;  // Map interjection to Other
   }
   if (str == "PRONOUN" || str == "PRON") {
     return core::PartOfSpeech::Pronoun;

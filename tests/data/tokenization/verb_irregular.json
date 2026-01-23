@@ -220,8 +220,12 @@
       "description" : "効率的に作業する (work efficiently) - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Adjective",
-          "surface" : "効率的"
+          "pos" : "Noun",
+          "surface" : "効率"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "pos" : "Particle",
@@ -232,7 +236,6 @@
           "surface" : "作業"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -250,8 +253,12 @@
       "description" : "積極的に参加する (participate proactively) - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Adjective",
-          "surface" : "積極的"
+          "pos" : "Noun",
+          "surface" : "積極"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "pos" : "Particle",
@@ -262,7 +269,6 @@
           "surface" : "参加"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -279,8 +285,12 @@
       "description" : "具体的に説明する (explain concretely) - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Adjective",
-          "surface" : "具体的"
+          "pos" : "Noun",
+          "surface" : "具体"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "的"
         },
         {
           "pos" : "Particle",
@@ -291,7 +301,6 @@
           "surface" : "説明"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }

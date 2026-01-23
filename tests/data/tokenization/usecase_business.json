@@ -385,7 +385,11 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "請求書"
+          "surface" : "請求"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "書"
         }
       ],
       "id" : "document_currency_million",
@@ -450,7 +454,11 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "田中様"
+          "surface" : "田中"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "様"
         }
       ],
       "id" : "document_company",
@@ -492,7 +500,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "今月末"
+          "surface" : "今月"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "末"
         },
         {
           "pos" : "Particle",
@@ -588,7 +600,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "代表者"
+          "surface" : "代表"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "者"
         },
         {
           "pos" : "Particle",
@@ -805,7 +821,8 @@
           "surface" : "お"
         },
         {
-          "pos" : "Noun",
+          "lemma" : "振込む",
+          "pos" : "Verb",
           "surface" : "振込み"
         },
         {
@@ -814,7 +831,11 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "翌営業日"
+          "surface" : "翌営業"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "日"
         },
         {
           "pos" : "Particle",
@@ -831,11 +852,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "ます",
           "pos" : "Auxiliary",
           "surface" : "ます"
         }
@@ -953,7 +973,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "請求書"
+          "surface" : "請求"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "書"
         },
         {
           "pos" : "Particle",
@@ -1760,7 +1784,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "代表者"
+          "surface" : "代表"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "者"
         },
         {
           "pos" : "Particle",

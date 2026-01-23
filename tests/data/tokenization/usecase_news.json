@@ -49,7 +49,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "関係者"
+          "surface" : "関係"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "者"
         },
         {
           "pos" : "Particle",
