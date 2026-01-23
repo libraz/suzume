@@ -380,8 +380,8 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Contracted forms: てる/とく (progressive/preparation)
       verb("てる", "てる", EPOS::AuxAspectIru),
       verb("て", "てる", EPOS::AuxAspectIru),
-      verb("で", "でる", EPOS::AuxAspectIru),
-      verb("でる", "でる", EPOS::AuxAspectIru),
+      // Note: で/でる removed from AuxAspectIru - they conflict with 出る renyokei
+      // 「出たい」should be で(出る連用形)+たい, not で(補助動詞)+たい
       verb("とく", "とく", EPOS::AuxAspectOku),
       verb("どく", "どく", EPOS::AuxAspectOku),
       // MeCab compat: とい/どい (renyokei) + た/て instead of といた/どいた

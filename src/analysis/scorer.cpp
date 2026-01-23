@@ -372,6 +372,17 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += -1.5F;  // Strong bonus for た-form split
   }
 
+  // Surface-based penalty for Noun → VerbRenyokei when surface is not サ変 form
+  // Bigram table gives -1.0 bonus for Noun→VerbRenyokei (for サ変動詞: 得+し, 損+し)
+  // But this should NOT apply to "い" (いる連用形) after noun
+  // E.g., 勘違い should be single token, not 勘違+い
+  if (prev.extended_pos == core::ExtendedPOS::Noun &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface != "し" && next.surface != "せ" &&
+      next.surface.size() <= 3) {  // Single hiragana character
+    surface_bonus += 1.0F;  // Cancel the bigram bonus
+  }
+
   float total = base_cost + extended_cost + surface_bonus;
 
   SUZUME_DEBUG_VERBOSE_BLOCK {

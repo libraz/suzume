@@ -217,6 +217,10 @@ BigramTable::initTable() {
   // AuxCopulaDa → AuxTenseTa (だっ+た) - strong bonus
   setCell(t, EPOS::AuxCopulaDa, EPOS::AuxTenseTa, cost::kStrongBonus);
 
+  // AuxCopulaDesu → AuxTenseTa (でし+た) - strong bonus for polite past copula
+  // Ensures 本でした → 本+でし+た over 本+で+し+た
+  setCell(t, EPOS::AuxCopulaDesu, EPOS::AuxTenseTa, cost::kStrongBonus);
+
   // AuxTenseTa → AuxCopulaDesu (た+です) - moderate bonus for polite past
   // e.g., 長かっ+た+です, 美しかっ+た+です (adjective past polite)
   setCell(t, EPOS::AuxTenseTa, EPOS::AuxCopulaDesu, cost::kModerateBonus);
@@ -253,6 +257,16 @@ BigramTable::initTable() {
 
   // NounFormal → ParticleConj (こと+が) - neutral
   setCell(t, EPOS::NounFormal, EPOS::ParticleCase, cost::kNeutral);
+
+  // =========================================================================
+  // Determiner → Noun (連体詞は名詞を修飾)
+  // =========================================================================
+
+  // Determiner → Noun (そんな+こと, こんな+話) - strong bonus
+  // Ensures そんなことない → そんな+こと+ない over そん+な+こと+ない
+  setCell(t, EPOS::Determiner, EPOS::Noun, cost::kStrongBonus);
+  setCell(t, EPOS::Determiner, EPOS::NounFormal, cost::kStrongBonus);
+  setCell(t, EPOS::Determiner, EPOS::NounProper, cost::kStrongBonus);
 
   // =========================================================================
   // Noun → Verb (サ変動詞パターン)
