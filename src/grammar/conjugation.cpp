@@ -398,7 +398,7 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
           {"", false, core::ExtendedPOS::VerbRenyokei},            // Renyokei: 食べ (for 降り+て → lemma=降りる)
           // {"た", false},     // Past: Excluded - split as 食べ + た
           // {"て", false},     // Te-form: Excluded - split as 食べ + て
-          {"ない", false, core::ExtendedPOS::VerbShuushikei},      // Negative: 食べない (full form)
+          // {"ない", false},   // Negative: Excluded - split as 食べ + ない (MeCab compat)
           {"ん", false, core::ExtendedPOS::VerbMizenkei},          // Contracted negative: 食べん (mizenkei + ん)
           // {"なかった", ...}  // Excluded for MeCab compat: split as 食べ+なかっ+た
           {"れば", false, core::ExtendedPOS::VerbKateikei},        // Conditional: 食べれば
@@ -435,6 +435,8 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       suffixes.push_back({base, false, core::ExtendedPOS::VerbShuushikei});
       // Renyokei (for compound usage)
       suffixes.push_back({i, false, core::ExtendedPOS::VerbRenyokei});
+      // Mizenkei (for ない split: 書か + ない → 書く)
+      suffixes.push_back({a, false, core::ExtendedPOS::VerbMizenkei});
 
       // 音便形 (サ行以外) - standalone onbin form for MeCab-compatible split
       // E.g., 書いた → 書い + た, 飲んだ → 飲ん + だ
@@ -445,7 +447,7 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       // Note: onbin + た/て/たら is handled by split path (connection rules)
 
       // Negative forms (mizenkei + ない)
-      suffixes.push_back({a + "ない", false, core::ExtendedPOS::VerbShuushikei});      // Negative: 書かない (full form)
+      // 書かない excluded for MeCab compat: split as 書か + ない
       suffixes.push_back({a + "ん", false, core::ExtendedPOS::VerbMizenkei});          // Contracted: 書かん (mizenkei + ん)
       suffixes.push_back({a + "ぬ", false, core::ExtendedPOS::VerbMizenkei});          // Classical: 書かぬ (mizenkei + ぬ)
       // 書かなかった excluded for MeCab compat: split as 書か+なかっ+た
@@ -463,7 +465,7 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
 
       // Potential forms (五段 → え段 + る)
       suffixes.push_back({e + "る", true, core::ExtendedPOS::VerbShuushikei});         // Potential: 書ける
-      suffixes.push_back({e + "ない", true, core::ExtendedPOS::VerbShuushikei});       // Potential neg: 書けない (full form)
+      // 書けない excluded for MeCab compat: split as 書け + ない
       // 書けなかった excluded for MeCab compat: split as 書け+なかっ+た
       break;
     }
@@ -489,9 +491,10 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       suffixes = {
           {"くる", false, core::ExtendedPOS::VerbShuushikei},        // Base form
           {"き", false, core::ExtendedPOS::VerbRenyokei},            // Renyokei: 来ます, 来ている
+          {"こ", false, core::ExtendedPOS::VerbMizenkei},            // Mizenkei: こ + ない
           // {"きた", false},     // Past: Excluded - split as 来 + た
           // {"きて", false},     // Te-form: Excluded - split as 来 + て
-          {"こない", false, core::ExtendedPOS::VerbShuushikei},      // Negative (full form)
+          // {"こない", false},   // Negative: Excluded - split as こ + ない (MeCab compat)
           // こなかった excluded for MeCab compat: split as こ+なかっ+た
           {"くれば", false, core::ExtendedPOS::VerbKateikei},        // Conditional
           // {"きたら", false},   // Conditional: Excluded - split as 来 + たら

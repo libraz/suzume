@@ -376,10 +376,11 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Bigram table gives -1.0 bonus for Noun→VerbRenyokei (for サ変動詞: 得+し, 損+し)
   // But this should NOT apply to "い" (いる連用形) after noun
   // E.g., 勘違い should be single token, not 勘違+い
+  // Also applies to 2-char verbs like つけ (見+つけ→見つけ should be single)
   if (prev.extended_pos == core::ExtendedPOS::Noun &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface != "し" && next.surface != "せ" &&
-      next.surface.size() <= 3) {  // Single hiragana character
+      next.surface.size() <= 6) {  // Up to 2 hiragana characters
     surface_bonus += 1.0F;  // Cancel the bigram bonus
   }
 
@@ -392,6 +393,19 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::AuxPassive &&
       prev.surface.size() <= 3 && next.surface.size() <= 3) {  // Both single hiragana
     surface_bonus += 2.5F;  // Cancel the kStrongBonus
+  }
+
+  // Surface-based bonus for AdjStem → すぎ pattern
+  // E.g., 高+すぎる, 美味し+すぎた (MeCab-compatible split)
+  // AdjStem→Verb has prohibitive penalty (3.5) to prevent な+い splits
+  // But AdjStem+すぎ is valid grammar (i-adjective stem + すぎる)
+  // Exclude VerbTeForm (すぎて) - should split as すぎ+て
+  if (prev.extended_pos == core::ExtendedPOS::AdjStem &&
+      next.extended_pos != core::ExtendedPOS::VerbTeForm &&
+      next.surface.size() >= 6 &&  // "すぎ" is 6 bytes
+      next.surface.compare(0, 6, "すぎ") == 0) {
+    // Strong bonus to overcome AdjStem→Verb prohibitive penalty (3.5)
+    surface_bonus += -4.0F;
   }
 
   float total = base_cost + extended_cost + surface_bonus;

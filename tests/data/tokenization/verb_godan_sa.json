@@ -30,11 +30,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -64,11 +63,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -170,11 +168,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -205,11 +202,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }

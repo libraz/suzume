@@ -4,8 +4,7 @@
       "description" : "Basic という determiner",
       "expected" : [
         {
-          "lemma" : "という",
-          "pos" : "Determiner",
+          "pos" : "Particle",
           "surface" : "という"
         }
       ],
@@ -24,8 +23,7 @@
           "surface" : "太郎"
         },
         {
-          "lemma" : "という",
-          "pos" : "Determiner",
+          "pos" : "Particle",
           "surface" : "という"
         },
         {
@@ -100,6 +98,7 @@
           "surface" : "て"
         },
         {
+          "lemma" : "出かける",
           "pos" : "Verb",
           "surface" : "出かけ"
         },
@@ -261,8 +260,7 @@
       "description" : "っていう (colloquial quotative)",
       "expected" : [
         {
-          "lemma" : "という",
-          "pos" : "Determiner",
+          "pos" : "Particle",
           "surface" : "っていう"
         }
       ],

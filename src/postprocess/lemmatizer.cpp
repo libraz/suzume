@@ -642,8 +642,22 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
       }
       // イ音便: surface ends with い, result ends with う → く or ぐ
       // GodanKa (書い → 書く) and GodanGa (泳い → 泳ぐ) both have イ音便
+      // BUT: Godan-wa renyokei also ends with い and gives 〜う (使い → 使う)
+      // Only apply onbin fix if grammar_result (〜う) is NOT in dictionary
       if (endsWith(sfc, "い") && endsWith(grammar_result, "う") &&
           grammar_result.size() >= core::kTwoJapaneseCharBytes) {
+        // First check if grammar_result is a valid verb in dictionary
+        // If so, it's likely a godan-wa verb (使う, 買う, etc.), not onbin
+        if (dict_manager_ != nullptr) {
+          auto results_u = dict_manager_->lookup(grammar_result, 0);
+          for (const auto& r : results_u) {
+            if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb) {
+              // grammar_result (e.g., 使う) is valid - use it directly
+              return grammar_result;
+            }
+          }
+        }
+        // grammar_result not found in dictionary - try onbin correction
         std::string stem = grammar_result.substr(0, grammar_result.size() - core::kJapaneseCharBytes);
         // Check GodanGa first (ぐ), then GodanKa (く)
         // Order matters: if both exist, prefer the dictionary-verified one
@@ -663,10 +677,9 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
             }
           }
         }
-        // Fallback: if stem is kanji, assume く (most common イ音便 pattern)
-        if (!stem.empty() && grammar::isAllKanji(stem)) {
-          return stem + "く";
-        }
+        // No dictionary verification available - return grammar_result as-is
+        // The lemmatizeAll() will fix onbin patterns using next morpheme context
+        // This allows godan-wa renyokei (使い → 使う) to work correctly
       }
     }
 
@@ -773,10 +786,30 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
     if (needs_lemmatization) {
       morpheme.lemma = lemmatize(morpheme);
     }
-    // Get next morpheme's lemma for context-dependent conj_form detection
+    // Get next morpheme for context-dependent fixes
+    std::string_view next_surface;
     std::string_view next_lemma;
     if (i + 1 < morphemes.size()) {
+      next_surface = morphemes[i + 1].surface;
       next_lemma = morphemes[i + 1].lemma;
+    }
+    // Fix onbin lemma using next morpheme context
+    // イ音便: 書い+た/て → lemma should be 書く (not 書う)
+    // 連用形: 使い+ます/にくい → lemma should be 使う (correct)
+    // Pattern: surface ends with い, lemma ends with う, next is た/て/だ/で
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        endsWith(morpheme.surface, "い") &&
+        endsWith(morpheme.lemma, "う") &&
+        morpheme.lemma.size() >= core::kTwoJapaneseCharBytes &&
+        utf8::equalsAny(next_surface, {"た", "て", "だ", "で"})) {
+      // This is onbin form - fix lemma from 〜う to 〜く or 〜ぐ
+      std::string stem = morpheme.lemma.substr(0, morpheme.lemma.size() - core::kJapaneseCharBytes);
+      // Check if next is voiced (だ/で) → 〜ぐ, otherwise → 〜く
+      if (utf8::equalsAny(next_surface, {"だ", "で"})) {
+        morpheme.lemma = stem + "ぐ";  // GodanGa: 泳い+だ → 泳ぐ
+      } else {
+        morpheme.lemma = stem + "く";  // GodanKa: 書い+た → 書く
+      }
     }
     morpheme.conj_form = detectConjForm(morpheme.surface, morpheme.lemma, morpheme.pos, next_lemma);
   }

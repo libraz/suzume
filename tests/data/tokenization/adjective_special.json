@@ -4,6 +4,7 @@
       "description" : "毅然と (resolutely)",
       "expected" : [
         {
+          "lemma" : "毅然",
           "pos" : "Adverb",
           "surface" : "毅然と"
         }
@@ -34,6 +35,7 @@
       "description" : "泰然と (composedly) - X然と pattern treated as single adverb",
       "expected" : [
         {
+          "lemma" : "泰然",
           "pos" : "Adverb",
           "surface" : "泰然と"
         }
@@ -103,7 +105,6 @@
           "surface" : "同じ"
         },
         {
-          "lemma" : "こと",
           "pos" : "Noun",
           "surface" : "事"
         },

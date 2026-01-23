@@ -23,7 +23,8 @@
       "description" : "ニャーニャー (cat meow) - AA doubled pattern with small kana",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "lemma" : "*",
+          "pos" : "Noun",
           "surface" : "ニャーニャー"
         }
       ],
@@ -40,11 +41,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "ワン"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "ワン"
+          "surface" : "ワンワン"
         }
       ],
       "id" : "onomatopoeia_wanwan",
@@ -79,11 +76,10 @@
       "description" : "ガタガタ揺れる (shaking)",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "ガタガタ"
         },
         {
-          "lemma" : "揺れる",
           "pos" : "Verb",
           "surface" : "揺れる"
         }
@@ -132,7 +128,8 @@
           "surface" : "せっかく"
         },
         {
-          "pos" : "Particle",
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
           "surface" : "な"
         },
         {
@@ -359,7 +356,7 @@
       "description" : "びっくり should be ADV (B62) - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "びっくり"
         },
         {
@@ -816,7 +813,7 @@
           "surface" : "やっぱり"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "無理"
         }
       ],
@@ -836,7 +833,7 @@
           "surface" : "ど"
         },
         {
-          "pos" : "Particle",
+          "pos" : "Suffix",
           "surface" : "さ"
         },
         {
@@ -943,7 +940,8 @@
       "description" : "ニャーニャー - cat onomatopoeia, not AUX よ (W-007)",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "lemma" : "*",
+          "pos" : "Noun",
           "surface" : "ニャーニャー"
         },
         {

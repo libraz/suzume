@@ -229,7 +229,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("ます", "ます", EPOS::AuxTenseMasu),
       aux("まし", "ます", EPOS::AuxTenseMasu),  // renyoukei
       aux("ませ", "ます", EPOS::AuxTenseMasu),  // mizenkei
-      aux("ましょう", "ます", EPOS::AuxVolitional),
+      aux("ましょ", "ます", EPOS::AuxTenseMasu),  // mizenkei, connects to う
 
       // Negation - ない (否定)
       aux("ない", "ない", EPOS::AuxNegativeNai),
@@ -254,8 +254,8 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Conjecture/Volitional (推量・意志) - う/よう
       aux("う", "う", EPOS::AuxVolitional),
       aux("よう", "よう", EPOS::AuxVolitional),
-      aux("だろう", "だろう", EPOS::AuxVolitional),
-      aux("でしょう", "でしょう", EPOS::AuxVolitional),
+      aux("だろ", "だ", EPOS::AuxCopulaDa),  // mizenkei, connects to う
+      aux("でしょ", "です", EPOS::AuxCopulaDesu),  // mizenkei, connects to う
 
       // Negative conjecture (否定推量)
       aux("まい", "まい", EPOS::AuxNegativeNu),
@@ -376,13 +376,29 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("くださいませ", "くださる", EPOS::VerbShuushikei),
 
       // Progressive/Continuous - いる (進行・継続)
+      // Note: Standalone "い" competes with words like いただく, so it's handled
+      // via いた/いて forms instead
       aux("いる", "いる", EPOS::AuxAspectIru),
       aux("います", "いる", EPOS::AuxAspectIru),
       aux("いません", "いる", EPOS::AuxAspectIru),
-      aux("い", "いる", EPOS::AuxAspectIru),
+      aux("いた", "いる", EPOS::AuxAspectIru),  // て+いた pattern
+      aux("いて", "いる", EPOS::AuxAspectIru),  // て+いて pattern
       aux("いない", "いる", EPOS::AuxAspectIru),
       aux("いなかった", "いる", EPOS::AuxAspectIru),
       aux("いれば", "いる", EPOS::AuxAspectIru),
+
+      // Progressive/Continuous - おる (humble/dialectal form of いる)
+      // Used in formal polite speech: ております, おります
+      // Note: Only add renyokei forms, not combined forms like おります
+      // to allow MeCab-compatible split: おり+ます
+      aux("おる", "おる", EPOS::AuxAspectIru),
+      aux("おり", "おる", EPOS::AuxAspectIru),  // renyokei for おり+ます
+
+      // Benefactive auxiliary - くれる (giving, receiving benefit)
+      // Used in subsidiary verb patterns: してくれる, 買ってくれた
+      // Note: MeCab treats くれる as 動詞,非自立 (dependent verb)
+      aux("くれる", "くれる", EPOS::AuxAspectKuru),
+      aux("くれ", "くれる", EPOS::AuxAspectKuru),  // renyokei for くれ+ます
 
       // Completive/Regretful - しまう (完了・遺憾)
       // MeCab treats しまう as a regular verb, not auxiliary
@@ -415,8 +431,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("いか", "いく", EPOS::VerbShuushikei),
       aux("いかない", "いく", EPOS::AuxAspectIku),
       aux("くる", "くる", EPOS::AuxAspectKuru),
-      aux("きます", "くる", EPOS::AuxAspectKuru),
+      // きた/きて are kept as single entries for AuxAspectKuru
+      // き alone competes with words like いただき, so it's not registered separately
       aux("きた", "くる", EPOS::AuxAspectKuru),
+      aux("きて", "くる", EPOS::AuxAspectKuru),
+      aux("きます", "くる", EPOS::AuxAspectKuru),
       aux("こない", "くる", EPOS::AuxAspectKuru),
 
       // Explanatory (説明) - MeCab compat: split as の/ん + だ/です/でした
@@ -484,7 +503,7 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       // Adversative (逆接)
       conj("しかし", ""), conj("だが", ""), conj("けれども", ""),
       conj("ところが", ""), conj("それでも", ""),
-      conj("でも", ""), conj("だって", ""), conj("にもかかわらず", ""),
+      conj("でも", ""), conj("だって", ""),  // にもかかわらず removed for MeCab compat
       conj("ものの", ""),
 
       // Parallel/Addition (並列・添加)
@@ -552,7 +571,7 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
       // These compete with と(PARTICLE) + いって(行く, cost 1.2F) paths
       verb("といって", "いう", EPOS::VerbShuushikei),
       verb("といっては", "いう", EPOS::VerbShuushikei),
-      conj("といっても", "といっても"),
+      // Note: といっても removed - MeCab splits as と+いっ+て+も
       verb("そういって", "いう", EPOS::VerbShuushikei),
       verb("こういって", "いう", EPOS::VerbShuushikei),
       verb("ああいって", "いう", EPOS::VerbShuushikei),

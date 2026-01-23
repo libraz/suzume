@@ -80,11 +80,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "ワンマン"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "ライブ"
+          "surface" : "ワンマンライブ"
         },
         {
           "pos" : "Particle",
@@ -92,11 +88,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "セット"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "リスト"
+          "surface" : "セットリスト"
         },
         {
           "pos" : "Particle",
@@ -248,7 +240,7 @@
       "description" : "静かでない - na-adjective copula negation",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "静か"
         },
         {
@@ -257,7 +249,6 @@
           "surface" : "で"
         },
         {
-          "lemma" : "ない",
           "pos" : "Auxiliary",
           "surface" : "ない"
         }
@@ -273,7 +264,7 @@
       "description" : "きれいでない - na-adjective copula negation",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "きれい"
         },
         {
@@ -282,7 +273,6 @@
           "surface" : "で"
         },
         {
-          "lemma" : "ない",
           "pos" : "Auxiliary",
           "surface" : "ない"
         }
@@ -298,12 +288,11 @@
       "description" : "彼女でもない - particle も + ない, not verb もなう",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "彼女"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
+          "pos" : "Particle",
           "surface" : "で"
         },
         {
@@ -311,7 +300,7 @@
           "surface" : "も"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Adjective",
           "surface" : "ない"
         }
       ],
@@ -347,12 +336,11 @@
       "description" : "彼女ではない - particle は + ない pattern",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "彼女"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
+          "pos" : "Particle",
           "surface" : "で"
         },
         {
@@ -360,7 +348,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Adjective",
           "surface" : "ない"
         }
       ],

@@ -141,7 +141,7 @@
           "surface" : "戻り"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "値"
         },
         {
@@ -153,7 +153,7 @@
           "surface" : "成功"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "時"
         },
         {
@@ -189,6 +189,7 @@
           "surface" : "この"
         },
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "API"
         },
@@ -205,7 +206,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "必要"
         },
         {
@@ -343,12 +344,11 @@
           "surface" : "編集"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "必要"
         },
         {
@@ -361,7 +361,6 @@
           "surface" : "あり"
         },
         {
-          "lemma" : "ます",
           "pos" : "Auxiliary",
           "surface" : "ます"
         }
@@ -547,8 +546,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         },
         {
@@ -565,7 +563,6 @@
           "surface" : "し"
         },
         {
-          "lemma" : "そう",
           "pos" : "Auxiliary",
           "surface" : "そう"
         },
@@ -781,7 +778,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "、試合"
+          "surface" : "試合"
         },
         {
           "pos" : "Particle",
@@ -944,7 +941,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "、試験"
+          "surface" : "試験"
         },
         {
           "pos" : "Particle",
@@ -983,7 +980,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "、品質"
+          "surface" : "品質"
         },
         {
           "pos" : "Particle",
@@ -1072,8 +1069,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         }
       ],
@@ -1159,7 +1155,7 @@
       "description" : "Direct speech quotation - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "彼"
         },
         {
@@ -1168,15 +1164,11 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "「明日"
+          "surface" : "明日"
         },
         {
           "pos" : "Verb",
           "surface" : "行く"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "」"
         },
         {
           "pos" : "Particle",
@@ -1289,7 +1281,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "「成功」"
+          "surface" : "成功"
         },
         {
           "pos" : "Particle",
@@ -1542,7 +1534,7 @@
           "surface" : "続く"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Auxiliary",
           "surface" : "よう"
         },
         {

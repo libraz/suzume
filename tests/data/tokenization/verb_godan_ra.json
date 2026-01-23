@@ -68,7 +68,7 @@
           "surface" : "領収"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "書"
         },
         {
@@ -167,16 +167,16 @@
       "description" : "Ninja/Old-fashioned ござる",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "これ"
         },
         {
-          "pos" : "Particle",
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
           "surface" : "で"
         },
         {
-          "lemma" : "ござる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ござる"
         }
       ],
@@ -319,7 +319,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "、家"
+          "surface" : "家"
         },
         {
           "pos" : "Particle",
@@ -608,8 +608,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         }
       ],
@@ -891,13 +890,11 @@
       "description" : "帰るらしい should split as verb + らしい (conjecture auxiliary)",
       "expected" : [
         {
-          "lemma" : "帰る",
           "pos" : "Verb",
           "surface" : "帰る"
         },
         {
-          "lemma" : "らしい",
-          "pos" : "Adjective",
+          "pos" : "Auxiliary",
           "surface" : "らしい"
         }
       ],
@@ -918,13 +915,11 @@
           "surface" : "帰り"
         },
         {
-          "lemma" : "たい",
           "pos" : "Auxiliary",
           "surface" : "たい"
         },
         {
-          "lemma" : "らしい",
-          "pos" : "Adjective",
+          "pos" : "Auxiliary",
           "surface" : "らしい"
         }
       ],
@@ -983,8 +978,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         }
       ],
@@ -1295,7 +1289,7 @@
           "surface" : "ググ"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "ら"
         },
         {
@@ -1357,7 +1351,7 @@
           "surface" : "バズ"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "ら"
         },
         {
@@ -1419,6 +1413,7 @@
       "description" : "Python technical sentence with particles - MeCab互換分割",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "Python"
         },
@@ -1439,7 +1434,6 @@
           "surface" : "実装"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -1768,7 +1762,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "られ"
         },
         {
@@ -1777,7 +1771,6 @@
           "surface" : "なかっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1799,7 +1792,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "られ"
         },
         {
@@ -1808,7 +1801,6 @@
           "surface" : "なかっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }

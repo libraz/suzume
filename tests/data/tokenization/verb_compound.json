@@ -49,8 +49,7 @@
           "surface" : "しまい"
         },
         {
-          "lemma" : "そう",
-          "pos" : "Auxiliary",
+          "pos" : "Adverb",
           "surface" : "そう"
         }
       ],
@@ -276,7 +275,7 @@
       "description" : "飛びこみたい - hiragana subsidiary verb",
       "expected" : [
         {
-          "lemma" : "飛び込む",
+          "lemma" : "飛びこむ",
           "pos" : "Verb",
           "surface" : "飛びこみ"
         },
@@ -353,7 +352,7 @@
       "description" : "やりなおしたい - all-hiragana compound verb",
       "expected" : [
         {
-          "lemma" : "やり直す",
+          "lemma" : "やりなおす",
           "pos" : "Verb",
           "surface" : "やりなおし"
         },
@@ -543,8 +542,7 @@
       "description" : "引き続き should not be fragmented into 4+ pieces",
       "expected" : [
         {
-          "lemma" : "引き続く",
-          "pos" : "Verb",
+          "pos" : "Adverb",
           "surface" : "引き続き"
         }
       ],

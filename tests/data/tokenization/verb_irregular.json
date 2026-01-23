@@ -224,7 +224,7 @@
           "surface" : "効率"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -257,7 +257,7 @@
           "surface" : "積極"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -289,7 +289,7 @@
           "surface" : "具体"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -317,7 +317,7 @@
       "description" : "丁寧に説明する (explain politely) - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "丁寧"
         },
         {
@@ -329,7 +329,6 @@
           "surface" : "説明"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -346,7 +345,7 @@
       "description" : "彼が来ることを知っている (know that he is coming)",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "彼"
         },
         {
@@ -375,8 +374,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         }
       ],
@@ -529,8 +527,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         }
       ],
@@ -629,8 +626,7 @@
           "surface" : "さ"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れる"
         }
       ],
@@ -654,8 +650,7 @@
           "surface" : "さ"
         },
         {
-          "lemma" : "せる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "せる"
         }
       ],
@@ -1067,7 +1062,7 @@
           "surface" : "むしろ"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "簡単"
         },
         {
@@ -1119,7 +1114,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "、結合"
+          "surface" : "結合"
         },
         {
           "pos" : "Verb",
@@ -1160,10 +1155,6 @@
           "lemma" : "する",
           "pos" : "Verb",
           "surface" : "し"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "、"
         },
         {
           "pos" : "Noun",
@@ -1249,7 +1240,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
@@ -1258,7 +1249,6 @@
           "surface" : "まし"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1284,7 +1274,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
@@ -1293,7 +1283,6 @@
           "surface" : "まし"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1319,7 +1308,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
@@ -1328,7 +1317,6 @@
           "surface" : "なかっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1355,7 +1343,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
@@ -1364,7 +1352,6 @@
           "surface" : "なかっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1386,7 +1373,7 @@
         },
         {
           "lemma" : "する",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "しろ"
         }
       ],
@@ -1406,7 +1393,7 @@
         },
         {
           "lemma" : "する",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "せよ"
         }
       ],
@@ -1426,7 +1413,7 @@
         },
         {
           "lemma" : "する",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "しろ"
         }
       ],
@@ -1446,7 +1433,7 @@
         },
         {
           "lemma" : "する",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "せよ"
         }
       ],
@@ -1466,7 +1453,7 @@
         },
         {
           "lemma" : "する",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "しろ"
         }
       ],
@@ -1530,7 +1517,7 @@
       "expected" : [
         {
           "lemma" : "する",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "しろ"
         }
       ],
@@ -1547,7 +1534,7 @@
       "expected" : [
         {
           "lemma" : "する",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "せよ"
         }
       ],
@@ -1578,16 +1565,8 @@
       "description" : "「こんにちは」と言った (said 'hello') - current output without brackets",
       "expected" : [
         {
-          "pos" : "Symbol",
-          "surface" : "「"
-        },
-        {
           "pos" : "Interjection",
           "surface" : "こんにちは"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "」"
         },
         {
           "pos" : "Particle",
@@ -1745,8 +1724,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         }
       ],

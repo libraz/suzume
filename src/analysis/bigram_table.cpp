@@ -207,6 +207,15 @@ BigramTable::initTable() {
   // AuxTenseMasu → AuxTenseTa (まし+た) - strong bonus
   setCell(t, EPOS::AuxTenseMasu, EPOS::AuxTenseTa, cost::kStrongBonus);
 
+  // AuxTenseMasu → AuxVolitional (ましょ+う) - strong bonus for MeCab-compatible split
+  setCell(t, EPOS::AuxTenseMasu, EPOS::AuxVolitional, cost::kStrongBonus);
+
+  // AuxCopulaDesu → AuxVolitional (でしょ+う) - strong bonus for MeCab-compatible split
+  setCell(t, EPOS::AuxCopulaDesu, EPOS::AuxVolitional, cost::kStrongBonus);
+
+  // AuxCopulaDa → AuxVolitional (だろ+う) - strong bonus for MeCab-compatible split
+  setCell(t, EPOS::AuxCopulaDa, EPOS::AuxVolitional, cost::kStrongBonus);
+
   // AuxCausative → AuxPassive (せ+られ in causative-passive) - strong bonus
   // Ensures 聞かせられた → 聞か+せ+られ+た over 聞か+せられた
   setCell(t, EPOS::AuxCausative, EPOS::AuxPassive, cost::kStrongBonus);
@@ -274,8 +283,9 @@ BigramTable::initTable() {
   // Noun → ParticleCase (机+が/を/に) - neutral (very common)
   setCell(t, EPOS::Noun, EPOS::ParticleCase, cost::kNeutral);
 
-  // Noun → ParticleTopic (机+は/も) - neutral (very common)
-  setCell(t, EPOS::Noun, EPOS::ParticleTopic, cost::kNeutral);
+  // Noun → ParticleTopic (机+は/も) - minor bonus
+  // Helps サイズ+は+あり win over サイズ+はあり (particle-starting verb)
+  setCell(t, EPOS::Noun, EPOS::ParticleTopic, cost::kMinorBonus);
 
   // Noun → ParticleAdverbial (そん+だけ, あん+だけ) - strong bonus
   // Ensures そんだけ → そん+だけ over そん+だ+け
@@ -283,6 +293,14 @@ BigramTable::initTable() {
 
   // NounFormal → ParticleConj (こと+が) - neutral
   setCell(t, EPOS::NounFormal, EPOS::ParticleCase, cost::kNeutral);
+
+  // NounFormal → AuxCopulaDa (はず+だ, つもり+だ, ところ+だ) - moderate bonus
+  // Ensures formal noun + だ split over verb candidate (e.g., はずだ as VERB)
+  setCell(t, EPOS::NounFormal, EPOS::AuxCopulaDa, cost::kModerateBonus);
+
+  // NounFormal → AuxNegativeNai (こと+ない) - moderate bonus
+  // Ensures こと+ない over こと+な+い (な=AuxCopulaDa連用形)
+  setCell(t, EPOS::NounFormal, EPOS::AuxNegativeNai, cost::kModerateBonus);
 
   // =========================================================================
   // Determiner → Noun (連体詞は名詞を修飾)

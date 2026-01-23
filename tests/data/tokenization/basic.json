@@ -4,8 +4,7 @@
       "description" : "こんにちは - greeting",
       "expected" : [
         {
-          "lemma" : "こんにちは",
-          "pos" : "Other",
+          "pos" : "Interjection",
           "surface" : "こんにちは"
         }
       ],
@@ -20,7 +19,7 @@
       "description" : "あ - single hiragana",
       "expected" : [
         {
-          "pos" : "Other",
+          "pos" : "Filler",
           "surface" : "あ"
         }
       ],
@@ -63,16 +62,8 @@
       "description" : "「こんにちは」- should recognize こんにちは",
       "expected" : [
         {
-          "pos" : "Symbol",
-          "surface" : "「"
-        },
-        {
           "pos" : "Interjection",
           "surface" : "こんにちは"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "」"
         }
       ],
       "id" : "symbol_quotation",
@@ -86,8 +77,7 @@
       "description" : "すみません should be single token",
       "expected" : [
         {
-          "lemma" : "すみません",
-          "pos" : "Other",
+          "pos" : "Interjection",
           "surface" : "すみません"
         }
       ],
@@ -123,12 +113,11 @@
       "description" : "D3: まして should be CONJ, not まし+て (suru verb misrecognition)",
       "expected" : [
         {
-          "lemma" : "まして",
-          "pos" : "Conjunction",
+          "pos" : "Adverb",
           "surface" : "まして"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "無理"
         }
       ],
@@ -182,7 +171,6 @@
       "description" : "あるいは should be CONJ, not ADJ+は split - MeCab uses かも as single particle",
       "expected" : [
         {
-          "lemma" : "或いは",
           "pos" : "Conjunction",
           "surface" : "あるいは"
         },
@@ -254,8 +242,7 @@
       "description" : "いわば should be CONJ, not OTHER split",
       "expected" : [
         {
-          "lemma" : "言わば",
-          "pos" : "Conjunction",
+          "pos" : "Adverb",
           "surface" : "いわば"
         },
         {

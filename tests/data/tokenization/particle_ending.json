@@ -143,7 +143,7 @@
           "surface" : "行く"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Particle",
           "surface" : "ぞ"
         }
       ],
@@ -162,7 +162,7 @@
           "surface" : "やる"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Particle",
           "surface" : "ぜ"
         }
       ],

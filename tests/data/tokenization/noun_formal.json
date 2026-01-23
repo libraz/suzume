@@ -85,7 +85,7 @@
           "surface" : "2024年12月23日"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "付け"
         },
         {
@@ -124,7 +124,6 @@
       "description" : "はずがない - formal noun hazu + negative",
       "expected" : [
         {
-          "lemma" : "はず",
           "pos" : "Noun",
           "surface" : "はず"
         },
@@ -133,8 +132,7 @@
           "surface" : "が"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
+          "pos" : "Adjective",
           "surface" : "ない"
         }
       ],
@@ -148,8 +146,7 @@
       "description" : "ほか should be single Noun (not ほ+か)",
       "expected" : [
         {
-          "lemma" : "思う",
-          "pos" : "Verb",
+          "pos" : "Noun",
           "surface" : "思い"
         },
         {

@@ -78,6 +78,21 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
           << " nai_pattern (ない is auxiliary/adjective)\n");
       return candidates;
     }
+
+    // Skip if starting with 「く」+ な行 (くな, くに, くぬ, くね, くの)
+    // These are i-adjective ku-form + なる/ない patterns, not verbs
+    // E.g., 「たくなる」→「たく」+「なる」, not a verb「くなる」
+    //       「くなってきた」→「く」+「なっ」+「て」+...
+    // Note: くる (来る) is a valid verb but has kanji and is handled by dictionary
+    if (first_char == U'く') {
+      // く + な行 hiragana = i-adjective pattern
+      if (second_char == U'な' || second_char == U'に' || second_char == U'ぬ' ||
+          second_char == U'ね' || second_char == U'の') {
+        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] pos=" << start_pos
+            << " ku_naru_pattern (i-adjective ku-form + なる/ない)\n");
+        return candidates;
+      }
+    }
   }
 
   // Find hiragana sequence, breaking at particle boundaries
@@ -326,6 +341,23 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       }
     }
 
+    // Filter out te-form compound verb patterns that should be split
+    // e.g., なっております → なっ+て+おり+ます, してます → し+て+ます
+    // These contain て+auxiliary patterns that should be analyzed separately
+    // Only skip for longer forms (5+ chars) to avoid blocking short verbs
+    if (end_pos - start_pos >= 5) {
+      // Check for ており/ていま/てい/てお patterns (te-form + auxiliary)
+      if (surface.find("ており") != std::string::npos ||
+          surface.find("ていま") != std::string::npos ||
+          surface.find("ている") != std::string::npos ||
+          surface.find("ていた") != std::string::npos ||
+          surface.find("てお") != std::string::npos) {
+        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface
+            << "\" skip te_compound_pattern\n");
+        continue;  // Skip - let te-form split win
+      }
+    }
+
     // Check for 3-4 char hiragana verb ending with た/だ (past form) BEFORE threshold check
     // e.g., つかれた (疲れた), ねむった (眠った), おきた (起きた)
     // These need lower threshold because ichidan_pure_hiragana_stem penalty reduces confidence
@@ -425,6 +457,31 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     }
     if (best.confidence > conf_threshold &&
         best.verb_type != grammar::VerbType::IAdjective) {
+      // Skip long particle-starting verb candidates when remainder is a valid verb form
+      // e.g., "になっております" should be "に" + "なっております", not a single verb
+      // This prevents false verbs like "になる" + conjugation from being recognized
+      // Only apply to 5+ char forms to preserve short verbs (にる, にげる, etc.)
+      size_t len_check = end_pos - start_pos;
+      if (len_check >= 5 && normalize::isCommonParticle(first_char)) {
+        // Extract remainder (surface without first character)
+        std::string remainder = surface.substr(core::kJapaneseCharBytes);
+        auto remainder_cands = inflection.analyze(remainder);
+        for (const auto& rem_cand : remainder_cands) {
+          if (rem_cand.verb_type != grammar::VerbType::IAdjective &&
+              rem_cand.verb_type != grammar::VerbType::Unknown &&
+              rem_cand.confidence >= 0.5F) {
+            // Remainder looks like a valid verb form - skip this candidate
+            // to let particle + verb split win
+            SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface
+                << "\" skip particle_start_verb (particle=U+"
+                << std::hex << static_cast<uint32_t>(first_char) << std::dec
+                << ", remainder=" << remainder
+                << ", conf=" << rem_cand.confidence << ")\n");
+            goto next_length;  // Continue to next end_pos
+          }
+        }
+      }
+
       // Lower cost for higher confidence matches
       float base_cost = verb_opts.base_cost_high + (1.0F - best.confidence) * verb_opts.confidence_cost_scale;
 
@@ -546,6 +603,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
           false, CandidateOrigin::VerbHiragana, best.confidence,
           grammar::verbTypeToString(best.verb_type).data()));
     }
+next_length:;  // Label for goto from particle-starting verb skip
   }
 
   // Generate Godan mizenkei stem candidates for hiragana passive patterns

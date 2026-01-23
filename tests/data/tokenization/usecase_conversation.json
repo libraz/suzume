@@ -147,7 +147,7 @@
     {
       "expected" : [
         {
-          "pos" : "Other",
+          "pos" : "Interjection",
           "surface" : "こんにちは"
         }
       ],
@@ -160,7 +160,7 @@
     {
       "expected" : [
         {
-          "pos" : "Other",
+          "pos" : "Interjection",
           "surface" : "すみません"
         },
         {
@@ -169,7 +169,6 @@
           "surface" : "でし"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -212,7 +211,7 @@
     {
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "これ"
         },
         {
@@ -220,7 +219,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "何"
         },
         {
@@ -249,7 +248,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "欲しい"
         },
         {
@@ -325,7 +324,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "いかが"
         },
         {
@@ -656,7 +655,7 @@
           "surface" : "領収"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "書"
         },
         {
@@ -821,7 +820,7 @@
           "surface" : "たい"
         },
         {
-          "pos" : "Particle",
+          "pos" : "Noun",
           "surface" : "の"
         },
         {
@@ -851,7 +850,11 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "新宿、新宿"
+          "surface" : "新宿"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "新宿"
         },
         {
           "pos" : "Auxiliary",
@@ -913,11 +916,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "東京"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "行き"
+          "surface" : "東京行き"
         },
         {
           "pos" : "Particle",

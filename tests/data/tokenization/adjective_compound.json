@@ -319,7 +319,7 @@
       "description" : "このデザインはシンプルすぎる - katakana + sugiru in sentence",
       "expected" : [
         {
-          "pos" : "Adnominal",
+          "pos" : "Determiner",
           "surface" : "この"
         },
         {

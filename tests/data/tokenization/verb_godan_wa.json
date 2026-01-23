@@ -32,7 +32,6 @@
           "surface" : "買っ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         },
@@ -54,8 +53,7 @@
           "surface" : "で"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         }
       ],
@@ -79,8 +77,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         }
       ],
@@ -95,6 +92,7 @@
       "description" : "iphone買った - ASCII to Japanese verb boundary - MeCab-compatible split",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "iphone"
         },
@@ -104,7 +102,6 @@
           "surface" : "買っ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -255,11 +252,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }

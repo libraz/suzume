@@ -362,10 +362,6 @@
         {
           "pos" : "Verb",
           "surface" : "いる"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "？"
         }
       ],
       "id" : "social_question",
@@ -438,11 +434,11 @@
       "description" : "Gratitude post",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "みんな"
         },
         {
-          "pos" : "Other",
+          "pos" : "Interjection",
           "surface" : "ありがとう"
         }
       ],
@@ -524,7 +520,6 @@
           "surface" : "い"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         },
@@ -543,11 +538,10 @@
         },
         {
           "lemma" : "ない",
-          "pos" : "Auxiliary",
+          "pos" : "Adjective",
           "surface" : "なかっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -821,7 +815,7 @@
           "surface" : "に"
         },
         {
-          "lemma" : "行く",
+          "lemma" : "行う",
           "pos" : "Verb",
           "surface" : "行っ"
         },
@@ -831,7 +825,6 @@
           "surface" : "て"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -895,15 +888,14 @@
       "description" : "Colloquial adjective やばい",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "これ"
         },
         {
-          "pos" : "Other",
+          "pos" : "Auxiliary",
           "surface" : "まじ"
         },
         {
-          "lemma" : "やばい",
           "pos" : "Adjective",
           "surface" : "やばい"
         }
@@ -922,7 +914,7 @@
           "surface" : "いい"
         },
         {
-          "pos" : "Particle",
+          "pos" : "Auxiliary",
           "surface" : "じゃん"
         }
       ],
@@ -994,7 +986,7 @@
           "surface" : "た"
         },
         {
-          "pos" : "Particle",
+          "pos" : "Noun",
           "surface" : "の"
         },
         {

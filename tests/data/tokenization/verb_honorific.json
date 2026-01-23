@@ -77,7 +77,6 @@
           "surface" : "て"
         },
         {
-          "lemma" : "くださる",
           "pos" : "Verb",
           "surface" : "くださる"
         }
@@ -322,7 +321,6 @@
           "surface" : "くださっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }

@@ -768,10 +768,11 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
         length_penalty = static_cast<float>(char_count - 2) * 2.0F;
       }
 
-      // Katakana character speech is very rare (most katakana are loanword nouns)
-      // Apply penalty to prefer NOUN interpretation for katakana words like パン, キロ
+      // Skip katakana character speech candidates entirely
+      // Katakana words are almost always loanword nouns (パン, キロ), not auxiliaries
+      // Character speech (擬態語/擬声語) is almost exclusively written in hiragana
       if (start_type == normalize::CharType::Katakana) {
-        length_penalty += 1.0F;  // Prefer katakana NOUN over char_speech AUX
+        continue;  // Skip - let same_type kata_seq handle katakana as NOUN
       }
 
       // Mark as Auxiliary so it connects properly after verbs/adjectives

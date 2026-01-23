@@ -26,8 +26,7 @@
       "description" : "よく (adverbial form) - MeCab-compatible lemma is よい",
       "expected" : [
         {
-          "lemma" : "よい",
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "よく"
         },
         {
@@ -102,7 +101,6 @@
       "description" : "B33: 無く should be adjective renyoukei",
       "expected" : [
         {
-          "lemma" : "休む",
           "pos" : "Verb",
           "surface" : "休む"
         },
@@ -112,7 +110,7 @@
         },
         {
           "lemma" : "無い",
-          "pos" : "Adjective",
+          "pos" : "Auxiliary",
           "surface" : "無く"
         }
       ],

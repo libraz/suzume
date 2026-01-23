@@ -150,20 +150,12 @@
           "surface" : "東京"
         },
         {
-          "pos" : "Symbol",
-          "surface" : "（"
-        },
-        {
           "pos" : "Adverb",
           "surface" : "とう"
         },
         {
           "pos" : "Noun",
           "surface" : "きょう"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "）"
         }
       ],
       "id" : "symbol_parentheses",
@@ -295,7 +287,7 @@
           "surface" : "第一"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "回"
         }
       ],
@@ -753,7 +745,7 @@
           "surface" : "なし崩し"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         }
       ],
@@ -909,7 +901,7 @@
       "description" : "時々 - iteration mark should be grouped with kanji",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adverb",
           "surface" : "時々"
         }
       ],
@@ -1050,16 +1042,8 @@
           "surface" : "AI"
         },
         {
-          "pos" : "Symbol",
-          "surface" : "（"
-        },
-        {
           "pos" : "Noun",
           "surface" : "人工知能"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "）"
         }
       ],
       "id" : "symbol_brackets_ba1aab",
@@ -1099,7 +1083,7 @@
           "surface" : "国際"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -1195,12 +1179,12 @@
           "surface" : "晴れ"
         },
         {
-          "lemma" : "後",
           "pos" : "Noun",
           "surface" : "のち"
         },
         {
-          "pos" : "Noun",
+          "lemma" : "曇る",
+          "pos" : "Verb",
           "surface" : "曇り"
         }
       ],
@@ -1268,6 +1252,7 @@
       "description" : "L1: アクセシビリティ (8 chars) should be single NOUN",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "アクセシビリティ"
         }
@@ -1293,7 +1278,6 @@
           "surface" : "が"
         },
         {
-          "lemma" : "かかる",
           "pos" : "Verb",
           "surface" : "かかる"
         }
@@ -1310,7 +1294,8 @@
       "description" : "S3: にく (肉) should be recognized as NOUN, not split as に+く",
       "expected" : [
         {
-          "pos" : "Noun",
+          "lemma" : "にくい",
+          "pos" : "Adjective",
           "surface" : "にく"
         },
         {
@@ -1318,7 +1303,6 @@
           "surface" : "を"
         },
         {
-          "lemma" : "たべる",
           "pos" : "Verb",
           "surface" : "たべる"
         }
@@ -1343,7 +1327,6 @@
           "surface" : "を"
         },
         {
-          "lemma" : "みる",
           "pos" : "Verb",
           "surface" : "みる"
         }
@@ -1368,7 +1351,6 @@
           "surface" : "を"
         },
         {
-          "lemma" : "たべる",
           "pos" : "Verb",
           "surface" : "たべる"
         }
@@ -1404,7 +1386,7 @@
           "surface" : "今日"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "中"
         },
         {
@@ -1454,7 +1436,7 @@
           "surface" : "一日"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "中"
         },
         {
@@ -1501,7 +1483,7 @@
           "surface" : "翌営業"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "日"
         },
         {

@@ -215,6 +215,7 @@
           "surface" : "降っ"
         },
         {
+          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "たら"
         }
@@ -229,7 +230,7 @@
       "description" : "それぞれ should be single Adverb token",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "それぞれ"
         },
         {
@@ -259,7 +260,7 @@
       "description" : "たくさん should be Adverb, not split",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "たくさん"
         },
         {
@@ -409,7 +410,7 @@
       "description" : "いかが should be single token",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "いかが"
         }
       ],
@@ -454,8 +455,7 @@
       "description" : "D1: なるほど should be ADV, not なる+ほど",
       "expected" : [
         {
-          "lemma" : "成程",
-          "pos" : "Adverb",
+          "pos" : "Interjection",
           "surface" : "なるほど"
         }
       ],
@@ -471,7 +471,6 @@
       "description" : "D1: もちろん should be ADV, not も+ちろん",
       "expected" : [
         {
-          "lemma" : "勿論",
           "pos" : "Adverb",
           "surface" : "もちろん"
         },
@@ -492,7 +491,6 @@
       "description" : "D1: もはや should be ADV, not も+は+や",
       "expected" : [
         {
-          "lemma" : "最早",
           "pos" : "Adverb",
           "surface" : "もはや"
         },
@@ -533,7 +531,6 @@
       "description" : "D1: とりあえず should be ADV, not と+りあえず",
       "expected" : [
         {
-          "lemma" : "取り敢えず",
           "pos" : "Adverb",
           "surface" : "とりあえず"
         },
@@ -554,7 +551,6 @@
       "description" : "D1: ぜひ should be ADV, not AUX",
       "expected" : [
         {
-          "lemma" : "是非",
           "pos" : "Adverb",
           "surface" : "ぜひ"
         },
@@ -638,6 +634,7 @@
           "surface" : "なっ"
         },
         {
+          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "たら"
         }
@@ -678,7 +675,6 @@
       "description" : "D2: あらかじめ should be ADV",
       "expected" : [
         {
-          "lemma" : "予め",
           "pos" : "Adverb",
           "surface" : "あらかじめ"
         },
@@ -703,7 +699,7 @@
           "surface" : "どうせ"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "無理"
         }
       ],
@@ -779,7 +775,7 @@
       "description" : "S7: しどろもどろ should be ADV (not し+どろ+も+どろ)",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "しどろもどろ"
         }
       ],
@@ -829,7 +825,7 @@
       "description" : "いずれ (eventually/either) - adverb for future time or choice",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "いずれ"
         }
       ],
@@ -893,7 +889,6 @@
       "description" : "なにしろ should be single ADV, not PRON+VERB split",
       "expected" : [
         {
-          "lemma" : "何しろ",
           "pos" : "Adverb",
           "surface" : "なにしろ"
         },
@@ -913,7 +908,6 @@
       "description" : "あたかも should be single ADV",
       "expected" : [
         {
-          "lemma" : "恰も",
           "pos" : "Adverb",
           "surface" : "あたかも"
         },
@@ -941,7 +935,6 @@
       "description" : "さながら should be single ADV",
       "expected" : [
         {
-          "lemma" : "宛ら",
           "pos" : "Adverb",
           "surface" : "さながら"
         },

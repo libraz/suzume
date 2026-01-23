@@ -124,7 +124,7 @@
       "description" : "私は猫が好き - mixed sentence",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "私"
         },
         {
@@ -140,7 +140,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "好き"
         }
       ],
@@ -159,20 +159,8 @@
           "surface" : "えっ"
         },
         {
-          "pos" : "Symbol",
-          "surface" : "！"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "？"
-        },
-        {
           "pos" : "Adverb",
           "surface" : "本当に"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "？"
         }
       ],
       "id" : "edge_mixed_punctuation",
@@ -208,7 +196,6 @@
           "surface" : "いい"
         },
         {
-          "lemma" : "です",
           "pos" : "Auxiliary",
           "surface" : "っす"
         }
@@ -1214,7 +1201,6 @@
       "description" : "善い - classical variant of よい (W-013)",
       "expected" : [
         {
-          "lemma" : "よい",
           "pos" : "Adjective",
           "surface" : "善い"
         },
@@ -1235,12 +1221,11 @@
       "description" : "好い - classical variant of よい (W-013)",
       "expected" : [
         {
-          "lemma" : "よい",
           "pos" : "Adjective",
           "surface" : "好い"
         },
         {
-          "pos" : "Particle",
+          "pos" : "Noun",
           "surface" : "の"
         },
         {

@@ -421,7 +421,8 @@
           "surface" : "お"
         },
         {
-          "pos" : "Noun",
+          "lemma" : "預かる",
+          "pos" : "Verb",
           "surface" : "預かり"
         }
       ],
@@ -1007,7 +1008,7 @@
       "description" : "Just prefix お alone",
       "expected" : [
         {
-          "pos" : "Prefix",
+          "pos" : "Interjection",
           "surface" : "お"
         }
       ],

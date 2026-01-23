@@ -157,7 +157,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "以上、"
+          "surface" : "以上"
         },
         {
           "pos" : "Adverb",
@@ -216,10 +216,6 @@
         {
           "pos" : "Particle",
           "surface" : "ので"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "、"
         },
         {
           "pos" : "Prefix",
@@ -290,8 +286,8 @@
           "surface" : "申し訳"
         },
         {
-          "lemma" : "ござい",
-          "pos" : "Adjective",
+          "lemma" : "ござる",
+          "pos" : "Auxiliary",
           "surface" : "ござい"
         },
         {
@@ -300,7 +296,6 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "ん",
           "pos" : "Auxiliary",
           "surface" : "ん"
         },
@@ -352,7 +347,7 @@
           "surface" : "2024年12月23日"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "付け"
         },
         {
@@ -388,7 +383,7 @@
           "surface" : "請求"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "書"
         }
       ],
@@ -457,7 +452,7 @@
           "surface" : "田中"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "様"
         }
       ],
@@ -503,7 +498,7 @@
           "surface" : "今月"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "末"
         },
         {
@@ -603,7 +598,7 @@
           "surface" : "代表"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "者"
         },
         {
@@ -834,7 +829,7 @@
           "surface" : "翌営業"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "日"
         },
         {
@@ -976,7 +971,7 @@
           "surface" : "請求"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "書"
         },
         {
@@ -1177,11 +1172,10 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "られ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1229,7 +1223,7 @@
           "surface" : "に"
         },
         {
-          "lemma" : "基づう",
+          "lemma" : "基づく",
           "pos" : "Verb",
           "surface" : "基づい"
         },
@@ -1242,7 +1236,6 @@
           "surface" : "処理"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -1288,7 +1281,7 @@
           "surface" : "ない"
         },
         {
-          "pos" : "Particle",
+          "pos" : "Noun",
           "surface" : "の"
         },
         {
@@ -1311,7 +1304,7 @@
       "description" : "Apology: 大変申し訳ございませんでした",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "大変"
         },
         {
@@ -1319,8 +1312,8 @@
           "surface" : "申し訳"
         },
         {
-          "lemma" : "ござい",
-          "pos" : "Adjective",
+          "lemma" : "ござる",
+          "pos" : "Auxiliary",
           "surface" : "ござい"
         },
         {
@@ -1329,7 +1322,6 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "ん",
           "pos" : "Auxiliary",
           "surface" : "ん"
         },
@@ -1339,7 +1331,6 @@
           "surface" : "でし"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1363,8 +1354,7 @@
           "surface" : "の"
         },
         {
-          "lemma" : "手続きる",
-          "pos" : "Verb",
+          "pos" : "Noun",
           "surface" : "手続き"
         },
         {
@@ -1660,7 +1650,7 @@
           "surface" : "5回"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "目"
         },
         {
@@ -1787,7 +1777,7 @@
           "surface" : "代表"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "者"
         },
         {

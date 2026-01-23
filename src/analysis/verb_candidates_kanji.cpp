@@ -694,12 +694,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     char32_t second_hira = codepoints[kanji_end + 1];
     // A-row + れ pattern (godan passive renyokei)
     if (grammar::isARowCodepoint(first_hira) && second_hira == U'れ') {
-      // Skip suru-verb passive pattern: 2+ kanji + さ + れ
+      // Skip suru-verb passive pattern: kanji + さ + れ
       // e.g., 処理される should be 処理(noun) + される(aux), not godan passive
-      // This check applies when: kanji_part is 2+ kanji AND first_hira is さ
+      // Also skip single kanji + さ + れ as these are typically not real verbs
+      // e.g., 強される is not a verb (強い is adjective, 強 is noun)
       std::string kanji_check = extractSubstring(codepoints, start_pos, kanji_end);
       bool is_suru_passive_pattern = (first_hira == U'さ' &&
-                                      kanji_check.size() >= core::kTwoJapaneseCharBytes &&
                                       grammar::isAllKanji(kanji_check));
       if (is_suru_passive_pattern) {
         // Skip - this should be handled as noun + される auxiliary

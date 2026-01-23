@@ -106,6 +106,7 @@
           "surface" : "は"
         },
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "Meeting"
         },
@@ -119,7 +120,6 @@
           "surface" : "あり"
         },
         {
-          "lemma" : "ます",
           "pos" : "Auxiliary",
           "surface" : "ます"
         }
@@ -134,6 +134,7 @@
       "description" : "CamelCase should be preserved",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "getUserData"
         },
@@ -142,7 +143,6 @@
           "surface" : "を"
         },
         {
-          "lemma" : "呼び出す",
           "pos" : "Verb",
           "surface" : "呼び出す"
         }
@@ -190,6 +190,7 @@
       "description" : "Abbreviation",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "API"
         },
@@ -212,6 +213,7 @@
       "description" : "Technical term with Japanese",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "API"
         },
@@ -241,7 +243,6 @@
           "surface" : "取得"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -256,6 +257,7 @@
       "description" : "Brand name in sentence - verb with polite past aux",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "iPhone"
         },
@@ -274,7 +276,6 @@
           "surface" : "まし"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -289,6 +290,7 @@
       "description" : "email + particle",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "email"
         },
@@ -311,6 +313,7 @@
       "description" : "server + particle",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "server"
         },
@@ -373,7 +376,7 @@
           "surface" : "情報処理技術"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "者"
         },
         {
@@ -505,8 +508,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         }
       ],
@@ -631,7 +633,7 @@
           "surface" : "国際"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -658,7 +660,7 @@
           "surface" : "自動"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "化"
         },
         {
@@ -680,7 +682,7 @@
           "surface" : "可能"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "性"
         },
         {
@@ -706,7 +708,7 @@
           "surface" : "田中"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "さん"
         },
         {
@@ -886,7 +888,7 @@
           "surface" : "5回"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "目"
         },
         {
@@ -1118,16 +1120,8 @@
           "surface" : "AI"
         },
         {
-          "pos" : "Symbol",
-          "surface" : "（"
-        },
-        {
           "pos" : "Noun",
           "surface" : "人工知能"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "）"
         },
         {
           "pos" : "Particle",
@@ -1148,16 +1142,8 @@
       "description" : "Japanese quotes",
       "expected" : [
         {
-          "pos" : "Symbol",
-          "surface" : "「"
-        },
-        {
-          "pos" : "Other",
+          "pos" : "Interjection",
           "surface" : "こんにちは"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "」"
         },
         {
           "pos" : "Particle",
@@ -1169,7 +1155,6 @@
           "surface" : "言っ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }

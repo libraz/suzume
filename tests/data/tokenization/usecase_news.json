@@ -52,7 +52,7 @@
           "surface" : "関係"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "者"
         },
         {
@@ -91,7 +91,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "昨日、記者会見"
+          "surface" : "昨日"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "記者会見"
         },
         {
           "pos" : "Particle",
@@ -192,8 +196,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         }
       ],
@@ -313,7 +316,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
@@ -322,7 +325,6 @@
           "surface" : "まし"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -627,7 +629,6 @@
           "surface" : "の"
         },
         {
-          "lemma" : "為",
           "pos" : "Noun",
           "surface" : "ため"
         },
@@ -636,7 +637,6 @@
           "surface" : "欠場"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         }
@@ -706,7 +706,11 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "結果、有意"
+          "surface" : "結果"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "有意"
         },
         {
           "lemma" : "だ",
@@ -771,7 +775,7 @@
           "surface" : "の"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Auxiliary",
           "surface" : "よう"
         },
         {
@@ -974,10 +978,6 @@
           "surface" : "で"
         },
         {
-          "pos" : "Symbol",
-          "surface" : "、"
-        },
-        {
           "pos" : "Adjective",
           "surface" : "新しい"
         },
@@ -1038,7 +1038,7 @@
       "description" : "Narrative style - Current suzume treats 欠かさ as adjective and 好き as adjective",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "彼"
         },
         {
@@ -1072,7 +1072,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "、毎日"
+          "surface" : "毎日"
         },
         {
           "pos" : "Noun",
@@ -1147,10 +1147,6 @@
           "lemma" : "する",
           "pos" : "Verb",
           "surface" : "し"
-        },
-        {
-          "pos" : "Symbol",
-          "surface" : "、"
         },
         {
           "pos" : "Adverb",
@@ -1231,7 +1227,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "、公園"
+          "surface" : "公園"
         },
         {
           "pos" : "Particle",
@@ -1287,7 +1283,7 @@
       "description" : "Explanation style - Current suzume treats compound verb 読み込む differently",
       "expected" : [
         {
-          "pos" : "Adnominal",
+          "pos" : "Determiner",
           "surface" : "この"
         },
         {
@@ -1316,7 +1312,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "、設定"
+          "surface" : "設定"
         },
         {
           "pos" : "Noun",

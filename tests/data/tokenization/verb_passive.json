@@ -9,8 +9,7 @@
           "surface" : "言わ"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れる"
         }
       ],
@@ -32,11 +31,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "ます",
           "pos" : "Auxiliary",
           "surface" : "ます"
         }
@@ -59,11 +57,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "ない",
           "pos" : "Auxiliary",
           "surface" : "ない"
         }
@@ -86,7 +83,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
@@ -95,7 +92,6 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "ん",
           "pos" : "Auxiliary",
           "surface" : "ん"
         }
@@ -119,11 +115,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -146,7 +141,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
@@ -171,8 +166,7 @@
           "surface" : "いわ"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れる"
         }
       ],
@@ -194,7 +188,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
@@ -203,7 +197,6 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "ん",
           "pos" : "Auxiliary",
           "surface" : "ん"
         }
@@ -227,8 +220,7 @@
           "surface" : "書か"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れる"
         }
       ],
@@ -249,8 +241,7 @@
           "surface" : "読ま"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れる"
         }
       ],
@@ -271,8 +262,7 @@
           "surface" : "聞か"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れる"
         }
       ],
@@ -293,8 +283,7 @@
           "surface" : "飲ま"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れる"
         }
       ],
@@ -315,8 +304,7 @@
           "surface" : "食べ"
         },
         {
-          "lemma" : "られる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "られる"
         }
       ],
@@ -337,7 +325,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "られ"
         },
         {
@@ -346,7 +334,6 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "ん",
           "pos" : "Auxiliary",
           "surface" : "ん"
         }
@@ -369,8 +356,7 @@
           "surface" : "見"
         },
         {
-          "lemma" : "られる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "られる"
         }
       ],
@@ -390,8 +376,7 @@
           "surface" : "さ"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れる"
         }
       ],
@@ -412,11 +397,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -438,8 +422,7 @@
           "surface" : "来ら"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れる"
         }
       ],
@@ -454,7 +437,7 @@
       "description" : "彼に言われた - Passive in sentence context (MeCab-style split)",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "彼"
         },
         {
@@ -468,11 +451,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }

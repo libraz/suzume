@@ -318,8 +318,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いる"
         }
       ],
@@ -344,7 +343,7 @@
         },
         {
           "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "い"
         },
         {
@@ -353,7 +352,6 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "ん",
           "pos" : "Auxiliary",
           "surface" : "ん"
         }

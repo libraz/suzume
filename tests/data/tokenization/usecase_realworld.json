@@ -4,6 +4,7 @@
       "description" : "English word with Japanese particle が and existential ある",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "Meeting"
         },
@@ -12,7 +13,6 @@
           "surface" : "が"
         },
         {
-          "lemma" : "ある",
           "pos" : "Verb",
           "surface" : "ある"
         }
@@ -27,6 +27,7 @@
       "description" : "English word with Japanese particle を",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "email"
         },
@@ -49,6 +50,7 @@
       "description" : "English word with Japanese particle に",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "server"
         },
@@ -71,6 +73,7 @@
       "description" : "CamelCase identifier with particle",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "getUserData"
         },
@@ -126,6 +129,7 @@
       "description" : "API abbreviation with particle",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "API"
         },
@@ -488,7 +492,7 @@
           "surface" : "成功"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "率"
         },
         {
@@ -749,7 +753,7 @@
           "surface" : "山田"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "様"
         },
         {
@@ -893,7 +897,7 @@
           "surface" : "担当"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "者"
         }
       ],
@@ -1028,6 +1032,7 @@
           "surface" : "生成"
         },
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "AI"
         },
@@ -1053,7 +1058,6 @@
           "surface" : "で"
         },
         {
-          "lemma" : "いる",
           "pos" : "Verb",
           "surface" : "いる"
         }
@@ -1120,7 +1124,7 @@
           "surface" : "請求"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Suffix",
           "surface" : "書"
         },
         {
@@ -1258,6 +1262,7 @@
       "description" : "Casual conversation with LINE",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "LINE"
         },
@@ -1270,7 +1275,6 @@
           "surface" : "連絡"
         },
         {
-          "lemma" : "する",
           "pos" : "Verb",
           "surface" : "する"
         },

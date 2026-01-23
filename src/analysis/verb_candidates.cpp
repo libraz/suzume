@@ -181,6 +181,16 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     return candidates;  // Skip this candidate - force split path
   }
 
+  // Reject katakana stem + そう pattern (appearance auxiliary)
+  // MeCab splits カタカナ + そう into separate tokens:
+  //   キモ 名詞,一般,*,*,*,*,*  (or adjective stem)
+  //   そう 名詞,接尾,助動詞語幹,*,*,*,そう,ソウ,ソー
+  // So we skip verb candidates like キモそう to force split path
+  // C++17 compatible: check if starts with "そう" (6 bytes)
+  if (hira_part.size() >= 6 && hira_part.compare(0, 6, "そう") == 0) {
+    return candidates;  // Skip this candidate - force split path
+  }
+
   // Try different ending lengths, starting from longest
   for (size_t end_pos = hira_end; end_pos > kata_end; --end_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);

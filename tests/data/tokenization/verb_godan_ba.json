@@ -1,54 +1,56 @@
 {
-  "version": "1.0",
-  "description": "Godan Ba-row verbs (五段バ行動詞) - verbs ending in ぶ",
-  "cases": [
+  "cases" : [
     {
-      "id": "mixed_english_api",
-      "description": "API with を particle",
-      "input": "APIを呼ぶ",
-      "expected": [
+      "description" : "API with を particle",
+      "expected" : [
         {
-          "surface": "API",
-          "pos": "Noun"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "API"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "呼ぶ",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "呼ぶ"
         }
       ],
-      "tags": [
+      "id" : "mixed_english_api",
+      "input" : "APIを呼ぶ",
+      "tags" : [
         "strict",
         "mixed",
         "english"
       ]
     },
     {
-      "id": "mixed_camelcase",
-      "description": "CamelCase function name preserved with を particle",
-      "input": "getUserDataを呼ぶ",
-      "expected": [
+      "description" : "CamelCase function name preserved with を particle",
+      "expected" : [
         {
-          "surface": "getUserData",
-          "pos": "Noun"
+          "lemma" : "*",
+          "pos" : "Noun",
+          "surface" : "getUserData"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos" : "Particle",
+          "surface" : "を"
         },
         {
-          "surface": "呼ぶ",
-          "pos": "Verb"
+          "pos" : "Verb",
+          "surface" : "呼ぶ"
         }
       ],
-      "tags": [
+      "id" : "mixed_camelcase",
+      "input" : "getUserDataを呼ぶ",
+      "tags" : [
         "strict",
         "mixed",
         "english"
       ]
     }
-  ]
+  ],
+  "description" : "Godan Ba-row verbs (五段バ行動詞) - verbs ending in ぶ",
+  "version" : "1.0"
 }

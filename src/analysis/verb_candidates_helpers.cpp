@@ -429,7 +429,17 @@ bool shouldSkipSuruVerbAuxPattern(std::string_view surface, size_t kanji_count) 
       "してあげている", "してあげていた", "してあげています",
       "してくれている", "してくれていた", "してくれています",
       "していっている", "していっていた",
-      "してきている", "してきていた", "してきています"
+      "してきている", "してきていた", "してきています",
+      // Passive forms (される conjugations)
+      "される", "された", "されない", "されます", "されました",
+      "されている", "されていた", "されています", "されていました",
+      "されて", "されれば", "されたら",
+      // Causative forms (させる conjugations)
+      "させる", "させた", "させない", "させます", "させました",
+      "させている", "させていた", "させています",
+      "させて", "させれば", "させたら",
+      // Causative-passive forms
+      "させられる", "させられた", "させられて", "させられます"
   };
 
   for (const auto& suffix : kSuruAuxSuffixes) {

@@ -1,97 +1,111 @@
 {
-  "version": "1.0",
-  "description": "Interjections and greetings (感動詞・挨拶)",
-  "cases": [
+  "cases" : [
     {
-      "id": "gomennasai_unified",
-      "description": "ごめんなさい - apology as single token",
-      "input": "ごめんなさい",
-      "expected": [
+      "description" : "ごめんなさい - apology as single token",
+      "expected" : [
         {
-          "surface": "ごめんなさい",
-          "pos": "Other",
-          "lemma": "ごめんなさい"
+          "pos" : "Interjection",
+          "surface" : "ごめんなさい"
         }
       ],
-      "tags": ["interjection", "apology"]
+      "id" : "gomennasai_unified",
+      "input" : "ごめんなさい",
+      "tags" : [
+        "interjection",
+        "apology"
+      ]
     },
     {
-      "id": "ohayou",
-      "description": "おはよう - morning greeting",
-      "input": "おはよう",
-      "expected": [
+      "description" : "おはよう - morning greeting",
+      "expected" : [
         {
-          "surface": "おはよう",
-          "pos": "Other",
-          "lemma": "おはよう"
+          "pos" : "Interjection",
+          "surface" : "おはよう"
         }
       ],
-      "tags": ["interjection", "greeting"]
+      "id" : "ohayou",
+      "input" : "おはよう",
+      "tags" : [
+        "interjection",
+        "greeting"
+      ]
     },
     {
-      "id": "arigatou",
-      "description": "ありがとう - thanks",
-      "input": "ありがとう",
-      "expected": [
+      "description" : "ありがとう - thanks",
+      "expected" : [
         {
-          "surface": "ありがとう",
-          "pos": "Other",
-          "lemma": "ありがとう"
+          "pos" : "Interjection",
+          "surface" : "ありがとう"
         }
       ],
-      "tags": ["interjection", "thanks"]
+      "id" : "arigatou",
+      "input" : "ありがとう",
+      "tags" : [
+        "interjection",
+        "thanks"
+      ]
     },
     {
-      "id": "sumimasen",
-      "description": "すみません - excuse me/sorry",
-      "input": "すみません",
-      "expected": [
+      "description" : "すみません - excuse me/sorry",
+      "expected" : [
         {
-          "surface": "すみません",
-          "pos": "Other",
-          "lemma": "すみません"
+          "pos" : "Interjection",
+          "surface" : "すみません"
         }
       ],
-      "tags": ["interjection", "apology"]
+      "id" : "sumimasen",
+      "input" : "すみません",
+      "tags" : [
+        "interjection",
+        "apology"
+      ]
     },
     {
-      "id": "konnichiwa",
-      "description": "こんにちは - hello (daytime greeting)",
-      "input": "こんにちは",
-      "expected": [
+      "description" : "こんにちは - hello (daytime greeting)",
+      "expected" : [
         {
-          "surface": "こんにちは",
-          "pos": "Other",
-          "lemma": "こんにちは"
+          "pos" : "Interjection",
+          "surface" : "こんにちは"
         }
       ],
-      "tags": ["interjection", "greeting"]
+      "id" : "konnichiwa",
+      "input" : "こんにちは",
+      "tags" : [
+        "interjection",
+        "greeting"
+      ]
     },
     {
-      "id": "konbanwa",
-      "description": "こんばんは - good evening",
-      "input": "こんばんは",
-      "expected": [
+      "description" : "こんばんは - good evening",
+      "expected" : [
         {
-          "surface": "こんばんは",
-          "pos": "Other",
-          "lemma": "こんばんは"
+          "pos" : "Interjection",
+          "surface" : "こんばんは"
         }
       ],
-      "tags": ["interjection", "greeting"]
+      "id" : "konbanwa",
+      "input" : "こんばんは",
+      "tags" : [
+        "interjection",
+        "greeting"
+      ]
     },
     {
-      "id": "sayonara",
-      "description": "さようなら - goodbye",
-      "input": "さようなら",
-      "expected": [
+      "description" : "さようなら - goodbye",
+      "expected" : [
         {
-          "surface": "さようなら",
-          "pos": "Other",
-          "lemma": "さようなら"
+          "pos" : "Interjection",
+          "surface" : "さようなら"
         }
       ],
-      "tags": ["interjection", "greeting"]
+      "id" : "sayonara",
+      "input" : "さようなら",
+      "tags" : [
+        "interjection",
+        "greeting"
+      ]
     }
-  ]
+  ],
+  "description" : "Interjections and greetings (感動詞・挨拶)",
+  "version" : "1.0"
 }

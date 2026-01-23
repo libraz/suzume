@@ -85,7 +85,7 @@
       "expected" : [
         {
           "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "い"
         },
         {

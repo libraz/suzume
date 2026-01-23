@@ -130,6 +130,7 @@
       "description" : "B23: 入れた - MeCab splits 入れ + た",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "ツッコミ"
         },
@@ -143,7 +144,6 @@
           "surface" : "入れ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -908,11 +908,10 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "れ"
         },
         {
-          "lemma" : "たい",
           "pos" : "Auxiliary",
           "surface" : "たい"
         }

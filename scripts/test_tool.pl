@@ -46,6 +46,7 @@
 #   3. nai-adjective: "だらしない", "もったいない" (lexical adjectives)
 #   4. slang-adjective: "エモい", "キモい" (pre-processed for MeCab)
 #   5. kanji-compound: "開始予定", "経済成長" (consecutive kanji merged)
+#   6. katakana-compound: "セットリスト", "データベース" (consecutive katakana merged)
 #
 # MeCab corrections (automatically applied):
 #   - Slang adjectives: replaced with standard adjective for parsing, then restored
@@ -380,34 +381,33 @@ if ($command eq 'show') {
 
     my $suzume_cli = "$project_root/build/bin/suzume-cli";
 
-    # Get MeCab and Suzume outputs
-    my $mecab_tokens = get_mecab_tokens($input);
-    my @mecab_surfaces = map { $_->{surface} } @$mecab_tokens;
-    my $suzume_surfaces = -x $suzume_cli ? get_suzume_surfaces($suzume_cli, $input) : [];
-
-    # Get expected tokens (MeCab + Suzume rules)
+    # Get expected tokens (MeCab + Suzume rules: symbol skip, compound merge, etc.)
     my ($expected_tokens, $source, $rule) = get_expected_tokens($input);
+    my @expected_surfaces = map { $_->{surface} } @$expected_tokens;
+
+    # Get Suzume output
+    my $suzume_surfaces = -x $suzume_cli ? get_suzume_surfaces($suzume_cli, $input) : [];
 
     # Check if test exists
     my $found = find_test_by_input($input);
 
-    # Compute diff classification
-    my $match = (join('|', @mecab_surfaces) eq join('|', @$suzume_surfaces));
+    # Compute diff classification (compare expected vs suzume)
+    my $match = (join('|', @expected_surfaces) eq join('|', @$suzume_surfaces));
     my $diff_type = 'match';
     my @diff_indices;
     if (!$match && @$suzume_surfaces) {
-        my $m_count = scalar @mecab_surfaces;
+        my $e_count = scalar @expected_surfaces;
         my $s_count = scalar @$suzume_surfaces;
-        if ($s_count < $m_count) {
+        if ($s_count < $e_count) {
             $diff_type = 'under-split';
-        } elsif ($s_count > $m_count) {
+        } elsif ($s_count > $e_count) {
             $diff_type = 'over-split';
         } else {
             $diff_type = 'boundary';
         }
-        my $max = $m_count > $s_count ? $m_count : $s_count;
+        my $max = $e_count > $s_count ? $e_count : $s_count;
         for my $i (0 .. $max - 1) {
-            push @diff_indices, $i if (($mecab_surfaces[$i] // '') ne ($suzume_surfaces->[$i] // ''));
+            push @diff_indices, $i if (($expected_surfaces[$i] // '') ne ($suzume_surfaces->[$i] // ''));
         }
     }
 
@@ -423,8 +423,8 @@ if ($command eq 'show') {
 
     # Brief mode: compact one-line format
     if ($brief) {
-        print "MeCab:  ", join(' ', @mecab_surfaces), "\n";
-        print "Suzume: ", join(' ', @$suzume_surfaces), "\n" if @$suzume_surfaces;
+        print "Expected: ", join(' ', @expected_surfaces), "\n";
+        print "Suzume:   ", join(' ', @$suzume_surfaces), "\n" if @$suzume_surfaces;
         if ($match) {
             print "${GREEN}✓ Match${RESET}";
         } elsif (@$suzume_surfaces) {
@@ -443,16 +443,16 @@ if ($command eq 'show') {
 
     # Build colored output
     my %diff_set = map { $_ => 1 } @diff_indices;
-    my @mec_parts = map { $diff_set{$_} ? "${YELLOW}$mecab_surfaces[$_]${RESET}" : $mecab_surfaces[$_] } 0 .. $#mecab_surfaces;
+    my @exp_parts = map { $diff_set{$_} ? "${YELLOW}$expected_surfaces[$_]${RESET}" : $expected_surfaces[$_] } 0 .. $#expected_surfaces;
     my @suz_parts = map { $diff_set{$_} ? "${RED}$suzume_surfaces->[$_]${RESET}" : $suzume_surfaces->[$_] } 0 .. $#$suzume_surfaces;
 
-    print "MeCab:  ", join(' ', @mec_parts), "\n";
-    print "Suzume: ", (@$suzume_surfaces ? join(' ', @suz_parts) : "${YELLOW}(not available)${RESET}"), "\n";
+    print "Expected: ", join(' ', @exp_parts), "\n";
+    print "Suzume:   ", (@$suzume_surfaces ? join(' ', @suz_parts) : "${YELLOW}(not available)${RESET}"), "\n";
     print "─" x 60, "\n";
 
     # Diff classification
     if ($match) {
-        print "${GREEN}✓ Suzume matches MeCab${RESET}\n";
+        print "${GREEN}✓ Suzume matches Expected${RESET}\n";
     } elsif (@$suzume_surfaces) {
         my %type_labels = (
             'under-split' => "${CYAN}[UNDER-SPLIT]${RESET} Suzume merged too much",
@@ -461,9 +461,9 @@ if ($command eq 'show') {
         );
         print "${RED}✗ $type_labels{$diff_type}${RESET}\n";
         for my $i (@diff_indices) {
-            my $m = $mecab_surfaces[$i] // '(none)';
+            my $e = $expected_surfaces[$i] // '(none)';
             my $s = $suzume_surfaces->[$i] // '(none)';
-            print "  [$i] ${YELLOW}MeCab='$m'${RESET} vs ${RED}Suzume='$s'${RESET}\n";
+            print "  [$i] ${YELLOW}Expected='$e'${RESET} vs ${RED}Suzume='$s'${RESET}\n";
         }
     }
 
@@ -1103,15 +1103,24 @@ if ($command eq 'needs-suzume-update') {
             my ($correct, $source, $rule) = get_expected_tokens($inp);
             $rule //= '';
 
+            # Compare surface, POS, and lemma (not just surface)
+            my $matches = tokens_match($expected, $correct);
+
             my @exp_surfaces = map { $_->{surface} } @$expected;
             my @cor_surfaces = map { $_->{surface} } @$correct;
+            my @exp_pos = map { $_->{pos} // '' } @$expected;
+            my @cor_pos = map { $_->{pos} // '' } @$correct;
 
             my $exp_str = join('|', @exp_surfaces);
             my $cor_str = join('|', @cor_surfaces);
+            my $exp_pos_str = join('|', @exp_pos);
+            my $cor_pos_str = join('|', @cor_pos);
 
-            # If expected doesn't match correct, it needs update
-            if ($exp_str ne $cor_str) {
+            # If expected doesn't match correct (surface, POS, or lemma), it needs update
+            if (!$matches) {
                 my $case_id = $case->{id} // $i;
+                my $diff_type = ($exp_str ne $cor_str) ? 'surface' :
+                                ($exp_pos_str ne $cor_pos_str) ? 'pos' : 'lemma';
                 my $entry = {
                     id => "$basename/$case_id",
                     file => $path,
@@ -1121,6 +1130,9 @@ if ($command eq 'needs-suzume-update') {
                     rule => $rule || 'mecab-only',
                     expected => $exp_str,
                     correct => $cor_str,
+                    expected_pos => $exp_pos_str,
+                    correct_pos => $cor_pos_str,
+                    diff_type => $diff_type,
                     correct_tokens => $correct,
                     data => $data,
                     cases_key => $cases_key,
@@ -1142,9 +1154,16 @@ if ($command eq 'needs-suzume-update') {
     for my $rule (sort keys %by_rule) {
         print "--- $rule (", scalar(@{$by_rule{$rule}}), ") ---\n";
         for my $e (@{$by_rule{$rule}}) {
-            print "  [$e->{id}] $e->{input}\n";
-            print "    Current:  $e->{expected}\n";
-            print "    Correct:  $e->{correct}\n\n";
+            print "  [$e->{id}] $e->{input} [$e->{diff_type}]\n";
+            if ($e->{diff_type} eq 'surface') {
+                print "    Surface: $e->{expected} → $e->{correct}\n";
+            } elsif ($e->{diff_type} eq 'pos') {
+                print "    POS: $e->{expected_pos} → $e->{correct_pos}\n";
+            } else {
+                print "    Current:  $e->{expected}\n";
+                print "    Correct:  $e->{correct}\n";
+            }
+            print "\n";
         }
     }
 

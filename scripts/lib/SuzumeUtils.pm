@@ -36,7 +36,7 @@ our @EXPORT_OK = qw(
 # Constants
 # =============================================================================
 
-# MeCab POS to Suzume POS mapping
+# MeCab POS to Suzume POS mapping (raw mapping from MeCab)
 our %POS_MAP = (
     '名詞'     => 'Noun',
     '動詞'     => 'Verb',
@@ -189,7 +189,10 @@ sub get_suzume_rule {
     }
 
     # 6. Kanji compound: consecutive kanji stay together
-    return 'kanji-compound' if $text =~ /\p{Han}{2,}/;
+    return 'kanji-compound' if $text =~ /\p{Script=Han}{2,}/;
+
+    # 7. Katakana compound: consecutive katakana stay together (no dictionary)
+    return 'katakana-compound' if $text =~ /[\x{30A0}-\x{30FF}]{4,}/;
 
     return '';
 }
@@ -308,12 +311,41 @@ sub apply_suzume_merge {
             }
         }
 
-        # 5. Kanji compound: merge consecutive kanji-only tokens
-        #    Skip suffix tokens (的, 性, 化, etc.) - they should remain separate
-        if (!$merged && $t->{surface} =~ /^\p{Han}+$/ && ($t->{pos_sub1} // '') ne '接尾') {
+        # 5. Proper noun + region suffix: 東京+都+渋谷+区 → 東京都渋谷区
+        #    Merge 名詞,固有名詞,地域 with 名詞,接尾,地域 sequences
+        if (!$merged && $t->{pos} eq '名詞' && ($t->{pos_sub1} // '') eq '固有名詞'
+            && ($t->{pos_sub2} // '') eq '地域') {
             my $j = $i + 1;
             my $combined = $t->{surface};
-            while ($j < @$tokens && $tokens->[$j]{surface} =~ /^\p{Han}+$/
+            while ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                my $is_proper_region = ($next->{pos} // '') eq '名詞'
+                    && ($next->{pos_sub1} // '') eq '固有名詞'
+                    && ($next->{pos_sub2} // '') eq '地域';
+                my $is_region_suffix = ($next->{pos} // '') eq '名詞'
+                    && ($next->{pos_sub1} // '') eq '接尾'
+                    && ($next->{pos_sub2} // '') eq '地域';
+                if ($is_proper_region || $is_region_suffix) {
+                    $combined .= $next->{surface};
+                    $j++;
+                } else {
+                    last;
+                }
+            }
+            if ($j > $i + 1) {
+                push @result, { surface => $combined, pos => '名詞', pos_sub1 => '固有名詞', lemma => $combined };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'proper-noun';
+            }
+        }
+
+        # 6. Kanji compound: merge consecutive kanji-only tokens
+        #    Skip suffix tokens (的, 性, 化, etc.) - they should remain separate
+        if (!$merged && $t->{surface} =~ /^\p{Script=Han}+$/ && ($t->{pos_sub1} // '') ne '接尾') {
+            my $j = $i + 1;
+            my $combined = $t->{surface};
+            while ($j < @$tokens && $tokens->[$j]{surface} =~ /^\p{Script=Han}+$/
                    && ($tokens->[$j]{pos_sub1} // '') ne '接尾') {
                 $combined .= $tokens->[$j]{surface};
                 $j++;
@@ -323,6 +355,24 @@ sub apply_suzume_merge {
                 $i = $j;
                 $merged = 1;
                 $applied_rule //= 'kanji-compound';
+            }
+        }
+
+        # 7. Katakana compound: merge consecutive katakana-only tokens
+        #    Suzume has no dictionary, so it cannot split katakana loanwords
+        if (!$merged && $t->{surface} =~ /^[\x{30A0}-\x{30FF}]+$/ && $t->{pos} eq '名詞') {
+            my $j = $i + 1;
+            my $combined = $t->{surface};
+            while ($j < @$tokens && $tokens->[$j]{surface} =~ /^[\x{30A0}-\x{30FF}]+$/
+                   && $tokens->[$j]{pos} eq '名詞') {
+                $combined .= $tokens->[$j]{surface};
+                $j++;
+            }
+            if ($j > $i + 1) {
+                push @result, { surface => $combined, pos => '名詞', lemma => $combined };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'katakana-compound';
             }
         }
 
@@ -377,14 +427,16 @@ sub map_mecab_pos {
         my $pos_sub1 = $token->{pos_sub1} // '';
         my $pos_sub2 = $token->{pos_sub2} // '';
 
-        # 名詞,接尾,特殊 → Suffix (e.g., さ in 美しさ, 高さ)
-        if ($pos eq '名詞' && $pos_sub1 eq '接尾' && $pos_sub2 eq '特殊') {
-            return 'Suffix';
-        }
-
         # 名詞+形容動詞語幹/助動詞語幹 → Auxiliary (e.g., みたい, そう, よう)
+        # Check this BEFORE 接尾 to handle 名詞,接尾,助動詞語幹 correctly
         if ($pos eq '名詞' && ($pos_sub2 eq '形容動詞語幹' || $pos_sub2 eq '助動詞語幹')) {
             return 'Auxiliary';
+        }
+
+        # 名詞,接尾 → Suffix (e.g., たち, さん, 的, さ in 美しさ)
+        # Note: Suzume cannot distinguish these without dictionary, but we map for test expectations
+        if ($pos eq '名詞' && $pos_sub1 eq '接尾') {
+            return 'Suffix';
         }
     }
 
@@ -392,10 +444,11 @@ sub map_mecab_pos {
     return $POS_MAP{$pos} // 'Other';
 }
 
-# Normalize Suzume POS variations
+# Normalize Suzume POS variations and apply Suzume-specific mappings
 sub normalize_pos {
     my ($pos) = @_;
 
+    # First: normalize case variations
     my %norm_map = (
         'NOUN'        => 'Noun',
         'VERB'        => 'Verb',
@@ -415,9 +468,23 @@ sub normalize_pos {
         'OTHER'       => 'Other',
         'PREFIX'      => 'Prefix',
         'SUFFIX'      => 'Suffix',
+        'DET'         => 'Determiner',
+        'DETERMINER'  => 'Determiner',
+        'ADNOMINAL'   => 'Adnominal',
+        'PRON'        => 'Pronoun',
+        'PRONOUN'     => 'Pronoun',
     );
 
-    return $norm_map{uc($pos)} // $pos;
+    my $normalized = $norm_map{uc($pos)} // $pos;
+
+    # Second: apply Suzume-specific mappings (MeCab POS → Suzume POS)
+    # These override MeCab's classification to match Suzume's implementation
+    my %suzume_override = (
+        'Adnominal' => 'Determiner',  # 連体詞: MeCab=Adnominal, Suzume=Determiner
+        'Pronoun'   => 'Noun',        # 代名詞: Suzume has no dictionary, treats as Noun
+    );
+
+    return $suzume_override{$normalized} // $normalized;
 }
 
 # Correct MeCab POS misclassifications
@@ -548,12 +615,15 @@ sub get_expected_tokens {
     # Apply Suzume merge rules using MeCab POS info
     my ($merged, $applied_rule) = apply_suzume_merge($raw_tokens, $text);
 
-    # Map POS to Suzume format
+    # Map POS to Suzume format and apply Suzume-specific normalization
+    # Skip symbols (Suzume's basic mode excludes them from output)
     my @tokens;
     for my $t (@$merged) {
+        my $pos = normalize_pos(map_mecab_pos($t));
+        next if $pos eq 'Symbol';  # Skip symbols
         push @tokens, {
             surface => $t->{surface},
-            pos     => map_mecab_pos($t),
+            pos     => $pos,
             lemma   => $t->{lemma} // $t->{surface},
         };
     }

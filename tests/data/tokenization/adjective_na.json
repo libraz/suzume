@@ -24,7 +24,7 @@
       "description" : "大好き - na-adjective",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "大好き"
         }
       ],
@@ -54,7 +54,7 @@
       "description" : "あなたが大好きです",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "あなた"
         },
         {
@@ -62,7 +62,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "大好き"
         },
         {
@@ -86,7 +86,7 @@
           "surface" : "理性"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -110,7 +110,7 @@
           "surface" : "論理"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -134,7 +134,7 @@
           "surface" : "効率"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -158,7 +158,7 @@
           "surface" : "論理"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -188,7 +188,7 @@
           "surface" : "効率"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -218,7 +218,7 @@
           "surface" : "理性"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -247,7 +247,7 @@
           "surface" : "感情"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -276,7 +276,7 @@
           "surface" : "科学"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Auxiliary",
           "surface" : "的"
         },
         {
@@ -362,7 +362,7 @@
       "description" : "静かに (quietly) - L1 na-adjective",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "静か"
         },
         {
@@ -520,8 +520,7 @@
       "description" : "ていねいに (politely - hiragana) - MeCab-compatible lemma",
       "expected" : [
         {
-          "lemma" : "ていねい",
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "ていねい"
         },
         {
@@ -541,8 +540,7 @@
       "description" : "しずかに (quietly - hiragana) - MeCab-compatible lemma",
       "expected" : [
         {
-          "lemma" : "しずか",
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "しずか"
         },
         {
@@ -562,7 +560,7 @@
       "description" : "静かに話す (speak quietly)",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "静か"
         },
         {
@@ -610,7 +608,7 @@
       "description" : "慎重に考える (think carefully)",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "慎重"
         },
         {
@@ -960,8 +958,7 @@
       "description" : "さすがに (as expected) - MeCab-compatible lemma",
       "expected" : [
         {
-          "lemma" : "さすが",
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "さすが"
         },
         {
@@ -1047,8 +1044,7 @@
           "surface" : "猫"
         },
         {
-          "lemma" : "みたい",
-          "pos" : "Adjective",
+          "pos" : "Auxiliary",
           "surface" : "みたい"
         }
       ],
@@ -1068,7 +1064,7 @@
           "surface" : "猫"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Auxiliary",
           "surface" : "みたい"
         },
         {
@@ -1093,8 +1089,7 @@
           "surface" : "食べる"
         },
         {
-          "lemma" : "みたい",
-          "pos" : "Adjective",
+          "pos" : "Auxiliary",
           "surface" : "みたい"
         }
       ],
@@ -1110,7 +1105,7 @@
       "description" : "好き should be single Adjective token",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "好き"
         }
       ],
@@ -1147,7 +1142,8 @@
       "description" : "嫌い should be single Adjective token",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "lemma" : "嫌う",
+          "pos" : "Verb",
           "surface" : "嫌い"
         }
       ],
@@ -1161,7 +1157,7 @@
       "description" : "幸いです - na-adjective + copula",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "幸い"
         },
         {

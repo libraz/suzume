@@ -218,7 +218,7 @@
           "surface" : "あり"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Auxiliary",
           "surface" : "がち"
         },
         {
@@ -247,7 +247,7 @@
           "surface" : "なり"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Auxiliary",
           "surface" : "がち"
         }
       ],
@@ -268,7 +268,7 @@
           "surface" : "忘れ"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Auxiliary",
           "surface" : "がち"
         },
         {
@@ -292,7 +292,7 @@
           "surface" : "遅れ"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Auxiliary",
           "surface" : "がち"
         },
         {
