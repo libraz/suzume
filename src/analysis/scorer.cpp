@@ -383,6 +383,17 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += 1.0F;  // Cancel the bigram bonus
   }
 
+  // Penalty for single-char VerbRenyokei → single-char AuxPassive
+  // Bigram table gives -2.5 bonus for VerbRenyokei→AuxPassive (for 知らせ+られ)
+  // But し+れ in かもしれない should not get this bonus
+  // (れ is part of しれる, not passive auxiliary)
+  // Valid patterns like 知らせ+られ have longer surfaces
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.extended_pos == core::ExtendedPOS::AuxPassive &&
+      prev.surface.size() <= 3 && next.surface.size() <= 3) {  // Both single hiragana
+    surface_bonus += 2.5F;  // Cancel the kStrongBonus
+  }
+
   float total = base_cost + extended_cost + surface_bonus;
 
   SUZUME_DEBUG_VERBOSE_BLOCK {

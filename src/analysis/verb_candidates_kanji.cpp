@@ -1128,8 +1128,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                                            is_nakatt_pattern ? "godan_mizenkei_nakatt" :
                                            is_passive_pattern ? "godan_mizenkei_passive" :
                                            "godan_mizenkei";
-                // Use explicit VerbMizenkei EPOS for negative patterns to enable bigram connection
-                core::ExtendedPOS epos = (is_nu_pattern || is_n_pattern || is_nai_pattern || is_nakatt_pattern)
+                // Use explicit VerbMizenkei EPOS for negative/passive patterns to enable bigram connection
+                core::ExtendedPOS epos = (is_nu_pattern || is_n_pattern || is_nai_pattern || is_nakatt_pattern || is_passive_pattern)
                     ? core::ExtendedPOS::VerbMizenkei
                     : core::ExtendedPOS::Unknown;
                 candidates.push_back(makeVerbCandidate(

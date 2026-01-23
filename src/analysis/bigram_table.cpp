@@ -211,6 +211,18 @@ BigramTable::initTable() {
   // Ensures 聞かせられた → 聞か+せ+られ+た over 聞か+せられた
   setCell(t, EPOS::AuxCausative, EPOS::AuxPassive, cost::kStrongBonus);
 
+  // AuxPassive → AuxTenseMasu (れ+ます in passive polite) - strong bonus
+  // Ensures 言われます → 言わ+れ+ます over 言われ+ます
+  setCell(t, EPOS::AuxPassive, EPOS::AuxTenseMasu, cost::kStrongBonus);
+
+  // AuxPassive → AuxNegativeNai (れ+ない in passive negative) - strong bonus
+  // Ensures 言われない → 言わ+れ+ない over 言われ+ない
+  setCell(t, EPOS::AuxPassive, EPOS::AuxNegativeNai, cost::kStrongBonus);
+
+  // AuxPassive → AuxTenseTa (れ+た in passive past) - strong bonus
+  // Ensures 言われた → 言わ+れ+た over 言われ+た
+  setCell(t, EPOS::AuxPassive, EPOS::AuxTenseTa, cost::kStrongBonus);
+
   // AuxNegativeNai → AuxTenseTa (なかっ+た) - strong bonus
   setCell(t, EPOS::AuxNegativeNai, EPOS::AuxTenseTa, cost::kStrongBonus);
 
@@ -321,6 +333,10 @@ BigramTable::initTable() {
   // ParticleAdverbial → VerbRenyokei (かも+しれ in かもしれない) - strong bonus
   // This favors かも+しれ+ない over か+もし+れない
   setCell(t, EPOS::ParticleAdverbial, EPOS::VerbRenyokei, cost::kStrongBonus);
+
+  // ParticleAdverbial → VerbShuushikei (でも+行く) - strong bonus
+  // This favors でも+行く over で+も+行く
+  setCell(t, EPOS::ParticleAdverbial, EPOS::VerbShuushikei, cost::kStrongBonus);
 
   // ParticleCase → Adverb (か+もし) - moderate penalty
   // This discourages splitting かもしれない as か+もし+れない
@@ -504,6 +520,13 @@ BigramTable::initTable() {
   // Conjunction → ParticleFinal: moderate penalty (でも+な is invalid)
   // Conjunctions don't typically connect to final particles mid-sentence
   setCell(t, EPOS::Conjunction, EPOS::ParticleFinal, cost::kModeratePenalty);
+
+  // Conjunction → VerbShuushikei/VerbRenyokei: strong bonus (でも+行く)
+  // This favors でも+行く as single CONJ+VERB over で+も+行く
+  // Note: PART_副 path is preferred but Viterbi may prune it,
+  // so CONJ path serves as fallback for demo+verb patterns
+  setCell(t, EPOS::Conjunction, EPOS::VerbShuushikei, cost::kStrongBonus);
+  setCell(t, EPOS::Conjunction, EPOS::VerbRenyokei, cost::kStrongBonus);
 
   // =========================================================================
   // Interjection connections

@@ -171,8 +171,10 @@ bool isNeverVerbStemAtStart(char32_t ch) {
   //       The particle use of に will be handled by scoring/dictionary
   // Note: わ is excluded - わかる, わたる, わける etc. are common verbs
   //       The sentence-final particle use of わ will be handled by scoring
-  // を, が, は, へ, の are particles that never start verbs
-  return ch == U'を' || ch == U'が' || ch == U'は' ||
+  // Note: は is excluded - はじまる, はたらく, はなす, はしる, etc. are common verbs
+  //       The particle use of は will be handled by scoring
+  // を, が, へ, の are particles that never start verbs
+  return ch == U'を' || ch == U'が' ||
          ch == U'へ' || ch == U'の' || ch == U'よ';
 }
 

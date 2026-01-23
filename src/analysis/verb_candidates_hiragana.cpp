@@ -779,15 +779,22 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     char32_t next_char = codepoints[onbin_pos + 1];
 
     bool is_contraction_pattern = false;
+    bool is_tense_pattern = false;  // っ+た/て (past/te-form)
     if (is_sokuonbin) {
       // っ + と (とく/といた/といて) or ち (ちゃう/ちゃった/ちゃって)
       is_contraction_pattern = (next_char == U'と' || next_char == U'ち');
+      // っ + た/て (past/te-form for GodanWa/Ra/Ta)
+      // E.g., かった → かっ + た (from かう), やった → やっ + た (from やる)
+      is_tense_pattern = (next_char == U'た' || next_char == U'て');
     } else {
       // ん + ど (どく/どいた/どいて) or じ (じゃう/じゃった/じゃって) or で (でる/でた/でて)
       is_contraction_pattern = (next_char == U'ど' || next_char == U'じ' || next_char == U'で');
+      // ん + だ/で (past/te-form for GodanMa/Ba/Na)
+      // E.g., 読んだ → 読ん + だ (from 読む), 飛んだ → 飛ん + だ (from 飛ぶ)
+      is_tense_pattern = (next_char == U'だ' || next_char == U'で');
     }
 
-    if (!is_contraction_pattern) {
+    if (!is_contraction_pattern && !is_tense_pattern) {
       continue;
     }
 
@@ -795,6 +802,20 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
     std::string stem = extractSubstring(codepoints, start_pos, onbin_pos);
     if (stem.empty()) {
       continue;
+    }
+
+    // Check if stem starts with common case particles (と、を、に、で、が、は、へ)
+    // Used later to skip short particle+verb patterns unless dictionary-verified
+    // E.g., となっ (stem=とな, 2 chars) → skip, particle + なる is more likely
+    //       はじまっ (stem=はじま, 3 chars) → allow, longer stems are more likely verbs
+    bool starts_with_short_particle_stem = false;
+    size_t stem_char_count = suzume::normalize::utf8Length(stem);
+    if (stem_char_count == 2) {  // Only skip 2-char stems
+      char32_t first_char = codepoints[start_pos];
+      starts_with_short_particle_stem = (first_char == U'と' || first_char == U'を' ||
+                                         first_char == U'に' || first_char == U'で' ||
+                                         first_char == U'が' || first_char == U'は' ||
+                                         first_char == U'へ');
     }
 
     // Try different verb types based on onbin type
@@ -815,29 +836,55 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       };
     }
 
-    // Try each verb type and check dictionary
+    // Try each verb type and check dictionary or inflection analysis
     for (const auto& [verb_type, base_suffix] : candidates_to_try) {
       std::string base_form = stem + std::string(base_suffix);
 
       // Check if base form exists in dictionary as this verb type
       bool is_valid_verb = vh::isVerbInDictionaryWithType(dict_manager, base_form, verb_type);
+
+      // For tense patterns (っ+た/て, ん+だ/で), also use inflection analysis
+      // This handles common verbs like かう, やる that may not be in dictionary
+      // but can be validated via inflection analysis of the full pattern
+      // Exception: skip short particle-starting stems (となっ should be と+なっ)
+      // Longer stems like はじまっ (3+ chars) are allowed
+      if (!is_valid_verb && is_tense_pattern && !starts_with_short_particle_stem) {
+        // Construct full form: onbin + tense suffix (e.g., かった, やった)
+        std::string_view tense_char = (next_char == U'た' || next_char == U'だ') ? "た" : "て";
+        std::string full_form = stem + (is_sokuonbin ? "っ" : "ん") + std::string(tense_char);
+        auto analysis = inflection.analyze(full_form);
+        for (const auto& cand : analysis) {
+          // Lower threshold (0.25) for short stems like かっ, やっ
+          // since godan_single_hiragana_stem penalty reduces confidence
+          if (cand.verb_type == verb_type && cand.base_form == base_form &&
+              cand.confidence >= 0.25F) {
+            is_valid_verb = true;
+            break;
+          }
+        }
+      }
+
       if (!is_valid_verb) {
         continue;
       }
 
       // Found a valid verb - generate onbin stem candidate
       std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_pos + 1);
-      constexpr float kCost = -0.5F;  // Negative cost to beat unsplit forms
+      // For tense patterns, use higher cost to avoid false positives for short stems
+      // Contraction patterns (っとく, っちゃう) are more reliable, use lower cost
+      float cost = is_contraction_pattern ? -0.5F : 0.2F;
       SUZUME_DEBUG_VERBOSE_BLOCK {
         SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
-                            << " hiragana_onbin_contraction lemma=" << base_form
-                            << " cost=" << kCost << "\n";
+                            << (is_tense_pattern ? " hiragana_onbin_tense" : " hiragana_onbin_contraction")
+                            << " lemma=" << base_form
+                            << " cost=" << cost << "\n";
       }
       const char* pattern = is_sokuonbin ? "hiragana_sokuonbin" : "hiragana_hatsuonbin";
       candidates.push_back(makeVerbCandidate(
-          onbin_surface, start_pos, onbin_pos + 1, kCost, base_form,
+          onbin_surface, start_pos, onbin_pos + 1, cost, base_form,
           grammar::verbTypeToConjType(verb_type),
-          true, CandidateOrigin::VerbHiragana, 0.9F, pattern));
+          true, CandidateOrigin::VerbHiragana, 0.9F, pattern,
+          core::ExtendedPOS::VerbOnbinkei));
       break;  // Found valid candidate for this position
     }
   }
