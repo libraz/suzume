@@ -266,6 +266,9 @@
 なる	VERB	GODAN_RA
 ある	VERB	GODAN_RA
 終わる	VERB	GODAN_RA
+くださる	VERB	GODAN_RA
+ください	VERB	GODAN_RA
+かかる	VERB	GODAN_RA
 怒鳴る	VERB	GODAN_RA
 # B65: 詰まる - moved to L1 for conjugation expansion
 
@@ -305,6 +308,7 @@
 倒す	VERB	GODAN_SA
 起こす	VERB	GODAN_SA
 愛す	VERB	GODAN_SA
+いたす	VERB	GODAN_SA
 戻す	VERB	GODAN_SA
 # 伸ばす	VERB	のばす	0.3	GODAN_SA
 # 濡らす	VERB	ぬらす	0.3	GODAN_SA
@@ -346,6 +350,7 @@
 見つける	VERB	ICHIDAN
 でる	VERB	ICHIDAN
 いただける	VERB	ICHIDAN
+たべる	VERB	ICHIDAN
 諦める	VERB	ICHIDAN
 
 # =============================================================================
@@ -546,6 +551,16 @@ Wi-Fi	NOUN
 玉ねぎ	NOUN
 なん	NOUN
 マジ	NOUN
+お茶	NOUN
+お嬢様	NOUN
+お待ち	NOUN
+お願い	NOUN
+お世話	NOUN
+のち	NOUN
+お金	NOUN
+はし	NOUN
+はな	NOUN
+のり	NOUN
 検討	NOUN
 
 # =============================================================================

@@ -326,6 +326,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: 高さ → 高(語幹) + さ(名詞), なさそう → な + さ + そう
       suffix("さ", "さ"),
 
+      // Honorific suffix さん (田中さん, お姉さん)
+      // MeCab: 田中さん → 田中 + さん
+      suffix("さん", "さん"),
+
       // Na-adjective forming suffix 的 (論理的, 科学的, 経済的)
       // MeCab: 論理的な → 論理 + 的 + な (suffix + copula rentaikei)
       suffix("的", "的"),
@@ -366,9 +370,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab splits: ござい + ます (renyokei + polite)
       aux("ござい", "ござる", EPOS::AuxGozaru),
 
-      // Request
-      aux("ください", "ください", EPOS::Unknown),
-      aux("くださいませ", "ください", EPOS::Unknown),
+      // Request - ください is VERB (くださる) in MeCab
+      // くださる is special ra-row godan with irregular imperative form ください
+      verb("ください", "くださる", EPOS::VerbShuushikei),
+      verb("くださいませ", "くださる", EPOS::VerbShuushikei),
 
       // Progressive/Continuous - いる (進行・継続)
       aux("いる", "いる", EPOS::AuxAspectIru),

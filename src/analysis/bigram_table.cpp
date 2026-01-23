@@ -362,6 +362,11 @@ BigramTable::initTable() {
   // Penalties: Invalid or Rare Connections
   // =========================================================================
 
+  // AuxAspectOku → AuxVolitional (とい+う) - strong penalty
+  // Prevents とい+う from beating という (quotative determiner)
+  // とい (contracted ておく form) + う (volitional) is grammatically invalid
+  setCell(t, EPOS::AuxAspectOku, EPOS::AuxVolitional, cost::kStrongPenalty);
+
   // VerbShuushikei → AuxTenseMasu (食べる+ます) - prohibitive
   // (ます attaches to renyokei, not shuushikei)
   setCell(t, EPOS::VerbShuushikei, EPOS::AuxTenseMasu, cost::kProhibitive);
