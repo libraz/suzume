@@ -83,7 +83,7 @@
       "description" : "Code review comment - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Adnominal",
+          "pos" : "Determiner",
           "surface" : "この"
         },
         {
@@ -95,7 +95,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "複雑"
         },
         {
@@ -121,7 +121,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -206,7 +206,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "必要"
         },
         {
@@ -255,7 +255,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -299,8 +299,12 @@
           "surface" : "は"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "再"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "再起動"
+          "surface" : "起動"
         },
         {
           "lemma" : "する",
@@ -313,7 +317,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -348,7 +352,7 @@
           "surface" : "する"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "必要"
         },
         {
@@ -385,7 +389,6 @@
           "surface" : "買っ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         },
@@ -416,11 +419,10 @@
         },
         {
           "lemma" : "しまう",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "しまっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -546,7 +548,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         },
         {
@@ -683,7 +685,8 @@
           "surface" : "に"
         },
         {
-          "pos" : "Adverb",
+          "lemma" : "よい",
+          "pos" : "Adjective",
           "surface" : "よく"
         },
         {
@@ -692,7 +695,6 @@
           "surface" : "遊ん"
         },
         {
-          "lemma" : "だ",
           "pos" : "Auxiliary",
           "surface" : "だ"
         },
@@ -710,7 +712,6 @@
           "surface" : "訪れ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -741,7 +742,7 @@
           "surface" : "する"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Noun",
           "surface" : "そう"
         },
         {
@@ -1040,7 +1041,7 @@
       "description" : "Purpose clause with tame",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "健康"
         },
         {
@@ -1069,7 +1070,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         }
       ],
@@ -1155,7 +1156,7 @@
       "description" : "Direct speech quotation - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "彼"
         },
         {
@@ -1194,7 +1195,7 @@
       "description" : "Indirect speech",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "彼女"
         },
         {
@@ -1272,7 +1273,7 @@
       "description" : "Naming expression",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "これ"
         },
         {
@@ -1508,7 +1509,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -1534,7 +1535,7 @@
           "surface" : "続く"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Noun",
           "surface" : "よう"
         },
         {
@@ -1570,7 +1571,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],

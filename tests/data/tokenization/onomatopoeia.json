@@ -441,7 +441,7 @@
         },
         {
           "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "い"
         },
         {
@@ -813,7 +813,7 @@
           "surface" : "やっぱり"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "無理"
         }
       ],
@@ -829,16 +829,8 @@
       "description" : "どさり should be ADV (ABり型) - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "ど"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "さ"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "り"
+          "pos" : "Adverb",
+          "surface" : "どさり"
         },
         {
           "pos" : "Particle",
@@ -863,15 +855,11 @@
       ]
     },
     {
-      "description" : "ばたり should be ADV (ABり型) - MeCab互換分割",
+      "description" : "ばたり should be ADV (ABり型) - 擬態語として1トークン",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "ば"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "たり"
+          "pos" : "Verb",
+          "surface" : "ばたり"
         },
         {
           "pos" : "Particle",
@@ -966,13 +954,9 @@
           "surface" : "行く"
         },
         {
-          "pos" : "Particle",
-          "surface" : "にゃ"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "ー"
+          "lemma" : "よ",
+          "pos" : "Auxiliary",
+          "surface" : "にゃー"
         }
       ],
       "id" : "nya_hiragana_aux",

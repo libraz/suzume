@@ -235,6 +235,7 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
     // Auxiliaries - Other
     case ExtendedPOS::AuxHonorific: return "AUX_尊敬";
     case ExtendedPOS::AuxGozaru: return "AUX_丁重";
+    case ExtendedPOS::AuxExcessive: return "AUX_過度";
 
     // Particles
     case ExtendedPOS::ParticleCase: return "PART_格";
@@ -283,6 +284,11 @@ PartOfSpeech extendedPosToPos(ExtendedPOS epos) {
   // Adjective forms -> Adjective
   if (epos >= ExtendedPOS::AdjBasic && epos <= ExtendedPOS::AdjNaAdj) {
     return PartOfSpeech::Adjective;
+  }
+  // AuxExcessive (すぎる) -> Verb (MeCab: 動詞,非自立 = subsidiary verb)
+  // すぎる is grammatically a 補助動詞 (subsidiary verb), not 助動詞 (auxiliary)
+  if (epos == ExtendedPOS::AuxExcessive) {
+    return PartOfSpeech::Verb;
   }
   // Auxiliary types -> Auxiliary
   if (epos >= ExtendedPOS::AuxTenseTa && epos <= ExtendedPOS::AuxGozaru) {

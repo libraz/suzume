@@ -13,6 +13,10 @@
 #include "core/types.h"
 #include "normalize/char_type.h"
 
+namespace suzume::dictionary {
+class DictionaryManager;
+}
+
 namespace suzume::analysis {
 
 struct UnknownCandidate;
@@ -101,7 +105,8 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
 std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     const std::vector<char32_t>& codepoints,
     size_t start_pos,
-    const std::vector<normalize::CharType>& char_types);
+    const std::vector<normalize::CharType>& char_types,
+    const dictionary::DictionaryManager* dict_manager = nullptr);
 
 /**
  * @brief Generate productive suffix candidates for hiragana sequences

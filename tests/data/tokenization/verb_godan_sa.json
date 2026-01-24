@@ -30,7 +30,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -63,7 +63,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -137,12 +137,16 @@
           "surface" : "を"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お願い"
+          "surface" : "願い"
         },
         {
           "lemma" : "いたす",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いたし"
         },
         {
@@ -168,7 +172,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -202,7 +206,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {

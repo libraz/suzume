@@ -221,10 +221,10 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Bonus for compound particles from dictionary (について, によって, として, etc.)
   // These are multi-character particles that should not be split into verb+て patterns
   // Helps compound particles compete with high-bonus splits like し+て (-1 connection bonus)
-  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Particle &&
-      grammar::isPureHiragana(edge.surface)) {
+  // Also applies to kanji-containing particles (において, に関して, に際して, に対して)
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Particle) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
-    // Compound particles are 3+ chars (について, によって, として)
+    // Compound particles are 3+ chars (について, によって, として, において, etc.)
     // Give strong bonus to beat verb+て split paths
     if (char_len >= 3) {
       constexpr float kCompoundParticleBonus = -1.0F;
@@ -269,6 +269,31 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     }
   }
 
+  // Penalty for pure-hiragana hatsuonbin (撥音便) verb forms not in dictionary
+  // E.g., "おさん" as 撥音便 of "おさむ" is rare and likely mis-segmentation
+  // Valid hatsuonbin usually has kanji stem (読ん, 飲ん, 呼ん)
+  // This helps prevent が+おさん misanalysis (should be がお+さん)
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      edge.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
+      grammar::isPureHiragana(edge.surface) &&
+      edge.surface.size() >= 6) {  // 2+ chars (avoid single-char like ん)
+    constexpr float kPureHiraganaOnbinPenalty = 2.5F;
+    cost += kPureHiraganaOnbinPenalty;
+  }
+
+  // Penalty for pure-hiragana ichidan verb renyokei starting with に
+  // E.g., "につけ" as renyokei of "につける" is spurious
+  // Should be に|つけ (particle + verb), not につけ (verb)
+  // Valid verbs like "につける" don't exist; this is a mis-analysis
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      grammar::isPureHiragana(edge.surface) &&
+      utf8::startsWith(edge.surface, "に") &&
+      edge.surface.size() >= 6 && edge.surface.size() <= 12) {  // 2-4 chars
+    constexpr float kNiPrefixVerbPenalty = 2.0F;
+    cost += kNiPrefixVerbPenalty;
+  }
+
   // Bonus for compound adjectives from dictionary (e.g., 男らしい, 女らしい)
   // These compete with noun+らしい split which has -1.5 connection bonus.
   // Dictionary registration indicates compound adjective should take precedence.
@@ -280,6 +305,18 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       constexpr float kCompoundAdjDictBonus = -0.5F;
       cost += kCompoundAdjDictBonus;
     }
+  }
+
+  // Penalty for kanji compound NOUN ending with 中 (chuu/juu suffix)
+  // E.g., "一日中" should be split as 一日|中 (noun + suffix)
+  // Registered compounds like "世界中" will also split (accepted difference from MeCab)
+  // This helps Suffix 中 candidates win over NOUN compounds
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Noun &&
+      utf8::endsWith(edge.surface, "中") &&
+      grammar::isAllKanji(edge.surface) &&
+      edge.surface.size() >= 6) {  // 2+ kanji (at least N中)
+    constexpr float kKanjiChuuCompoundPenalty = 0.5F;
+    cost += kKanjiChuuCompoundPenalty;
   }
 
   // Debug output - show which cost was used and candidate origin (verbose level)
@@ -350,6 +387,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus = -0.5F;
   }
 
+  // Bonus for て → い (Auxiliary) pattern
+  // E.g., して+い+ます, 食べて+い+た (MeCab-compatible: い is auxiliary, not verb)
+  // The auxiliary い (from いる) should win over verb renyokei い
+  if (prev.surface == "て" &&
+      prev.extended_pos == core::ExtendedPOS::ParticleConj &&
+      next.surface == "い" &&
+      next.extended_pos == core::ExtendedPOS::AuxAspectIru) {
+    surface_bonus += -0.5F;  // Bonus to prefer Auxiliary over Verb
+  }
+
   // Bonus for longer causative forms (させ over さ+せ, させられ over さ+せ+られ)
   // MeCab treats させる as a single causative auxiliary for ichidan verbs
   // E.g., 食べ+させ+られ+た (not 食べ+さ+せ+られ+た)
@@ -372,17 +419,163 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += -1.5F;  // Strong bonus for た-form split
   }
 
-  // Surface-based penalty for Noun → VerbRenyokei when surface is not サ変 form
+  // Surface-based penalty for Noun → short VerbRenyokei (compound verb protection)
   // Bigram table gives -1.0 bonus for Noun→VerbRenyokei (for サ変動詞: 得+し, 損+し)
-  // But this should NOT apply to "い" (いる連用形) after noun
+  // But this should NOT apply to compound verbs like 見+つけ→見つけ
   // E.g., 勘違い should be single token, not 勘違+い
-  // Also applies to 2-char verbs like つけ (見+つけ→見つけ should be single)
+  // E.g., 見つけた should be 見つけ+た, not 見+つけ+た
+  // Exception: multi-kanji noun + でき should split (外出+でき+ない)
+  // Single kanji NOUN often forms compound verbs with following verb stems
+  bool is_single_kanji_noun = (prev.surface.size() == 3);  // UTF-8: 1 kanji = 3 bytes
   if (prev.extended_pos == core::ExtendedPOS::Noun &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface != "し" && next.surface != "せ" &&
-      next.surface.size() <= 6) {  // Up to 2 hiragana characters
+      next.surface.size() <= 6 && is_single_kanji_noun) {
     surface_bonus += 1.0F;  // Cancel the bigram bonus
   }
+
+  // Penalty for Noun/ナ形容詞 → い (VerbRenyokei)
+  // 漢字名詞やナ形容詞語幹の後に「い」(いる連用形)が来ることは稀
+  // E.g., 上手いし should be 上手い+し, not 上手+い+し
+  // Exception: This should NOT block patterns like サ変動詞+でき (外出+でき)
+  if ((prev.extended_pos == core::ExtendedPOS::AdjNaAdj ||
+       prev.extended_pos == core::ExtendedPOS::Noun) &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface == "い") {
+    surface_bonus += 2.0F;  // Strong penalty to prevent over-split
+  }
+
+  // Partial cancel for single-kanji NOUN + し pattern
+  // E.g., 寒し (archaic adjective) should not split as 寒+し
+  // But 得+し (suru-verb renyokei) should still split
+  // Single kanji = 3 bytes in UTF-8
+  if (prev.extended_pos == core::ExtendedPOS::Noun &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface == "し" && prev.surface.size() == 3) {
+    surface_bonus += 0.5F;  // Partial cancel: -1.0 + 0.5 = -0.5 effective bonus
+  }
+
+  // Penalty for single-char case particle → very short pure-hiragana verb pattern
+  // E.g., が+おさ is likely mis-segmentation (should be がお+さん)
+  // Valid patterns usually have longer verbs (3+ chars) or kanji stems
+  // Single-char particles: が, を, に, へ, と, で, から, etc.
+  // Only penalize very short verbs (2 chars or less) to avoid affecting なくし, etc.
+  if (prev.extended_pos == core::ExtendedPOS::ParticleCase &&
+      prev.surface.size() <= 3 &&  // Single hiragana char (3 bytes in UTF-8)
+      next.pos == core::PartOfSpeech::Verb &&
+      !next.fromDictionary() &&
+      grammar::isPureHiragana(next.surface) &&
+      next.surface.size() <= 6) {  // 2 chars or less (6 bytes in UTF-8)
+    surface_bonus += 2.5F;  // Strong penalty for this unlikely pattern
+  }
+
+  // Penalty for case particle → final particle pattern
+  // E.g., を+な in をなくした should not split as を+な+くし+た
+  // Final particles (な, ね, よ) don't follow case particles directly
+  if (prev.extended_pos == core::ExtendedPOS::ParticleCase &&
+      next.extended_pos == core::ExtendedPOS::ParticleFinal) {
+    surface_bonus += 3.0F;  // Strong penalty for this unlikely pattern
+  }
+
+  // Penalty for PREFIX → short pure-hiragana verb pattern
+  // E.g., お+い in において should not happen (お is prefix, い is not a verb here)
+  // Valid お+verb patterns: お待ち, お願い (longer, often with kanji)
+  // Note: 「い」 is in L1 dictionary as verb renyokei, so don't check fromDictionary
+  if (prev.pos == core::PartOfSpeech::Prefix &&
+      next.pos == core::PartOfSpeech::Verb &&
+      grammar::isPureHiragana(next.surface) &&
+      next.surface.size() <= 6) {  // 2 chars or less
+    surface_bonus += 2.5F;  // Strong penalty
+  }
+
+  // Penalty for ADV → short pure-hiragana verb renyokei pattern
+  // E.g., はなはだ+し should not happen (はなはだしい is an adjective)
+  // Valid ADV+verb patterns: ゆっくり+歩く (verb is longer/has kanji)
+  // This prevents split like はなはだ+し+い when はなはだしい exists in dict
+  if (prev.pos == core::PartOfSpeech::Adverb &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      grammar::isPureHiragana(next.surface) &&
+      next.surface.size() <= 3) {  // 1 char only (し, み, etc.)
+    surface_bonus += 1.5F;  // Moderate penalty
+  }
+
+  // Penalty for SYMBOL → PARTICLE pattern (furigana in parentheses)
+  // E.g., 東京（とうきょう） should not split と+う+きょう
+  // Particles don't normally follow opening parentheses directly
+  if (prev.pos == core::PartOfSpeech::Symbol &&
+      next.pos == core::PartOfSpeech::Particle) {
+    surface_bonus += 3.0F;  // Strong penalty
+  }
+
+  // Bonus for SYMBOL → long pure-hiragana OTHER (furigana pattern)
+  // E.g., 東京（とうきょう） - the hiragana in parentheses is reading/furigana
+  // Long hiragana sequences after symbols should stay as single tokens
+  if (prev.pos == core::PartOfSpeech::Symbol &&
+      next.pos == core::PartOfSpeech::Other &&
+      grammar::isPureHiragana(next.surface) &&
+      next.surface.size() >= 12) {  // 4+ chars (12 bytes in UTF-8)
+    surface_bonus += -3.0F;  // Strong bonus for furigana pattern
+  }
+
+  // Penalty for SYMBOL → short hiragana → AUX pattern
+  // E.g., （+と+う should not happen (furigana shouldn't split into particles/aux)
+  if (prev.pos == core::PartOfSpeech::Symbol &&
+      next.pos == core::PartOfSpeech::Auxiliary) {
+    surface_bonus += 2.0F;  // Penalty
+  }
+
+  // Penalty for AuxCopulaDa(で) + ParticleTopic(も) pattern
+  // This prevents 雨+で+も split when 雨+でも (副助詞) is correct
+  // But allows 何+で+も split (で=copula連用形, も=係助詞)
+  // The difference: 何(Pronoun) vs 雨(Noun) - Pronoun should split
+  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+      prev.surface == "で" &&
+      next.extended_pos == core::ExtendedPOS::ParticleTopic &&
+      next.surface == "も") {
+    surface_bonus += 1.5F;  // Penalty to prefer でも as single token
+  }
+
+  // Penalty for specific Pronoun + でも patterns
+  // MeCab splits "何でもあり" as 何+で+も+あり, "彼女でもない" as 彼女+で+も+ない
+  // But MeCab keeps "誰でも" "どこでも" as single でも token
+  // Only apply to 何 and 彼女 (limited pronoun list)
+  if (prev.pos == core::PartOfSpeech::Pronoun &&
+      next.surface == "でも" &&
+      (prev.surface == "何" || prev.surface == "彼女")) {
+    surface_bonus += 3.5F;  // Strong penalty to force で+も split
+  }
+
+  // Penalty for pronoun-like NOUN + でも pattern (limited)
+  // When 何/彼女 etc. are recognized as NOUN (unknown candidate),
+  // NOUN→PART_副(でも) gets -1.5 bonus from bigram table.
+  // NOUN→CONJ(でも) has negative cost (-1.6) making it preferred.
+  // This penalty forces で+も split for specific pronoun-like surfaces.
+  // Note: 誰/どこ/いつ are excluded - "誰でも知っている" keeps でも as one token
+  // Only 何 and 彼女 need splitting (何でもあり, 彼女でもない patterns)
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      next.surface == "でも" &&
+      (next.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+       next.extended_pos == core::ExtendedPOS::Conjunction) &&
+      (prev.surface == "何" || prev.surface == "彼女")) {
+    surface_bonus += 2.5F;  // Moderate penalty to prefer で+も split
+  }
+
+  // Penalty for でも (PART_副 or CONJ) → ない/な pattern
+  // MeCab splits "彼女でもない" as 彼女+で+も+ない, not 彼女+でも+ない
+  // MeCab splits "雨でもない" as 雨+で+も+ない, not 雨+でも+ない
+  // The pattern: NOUN+でも+ない should split でも to で+も
+  // Note: Sentence-initial "でも、ない" (CONJ with punctuation) is different
+  // Penalize both でも+ない and でも+な (to prevent な+い split)
+  if (prev.surface == "でも" &&
+      (prev.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+       prev.extended_pos == core::ExtendedPOS::Conjunction) &&
+      (next.surface == "ない" || next.surface == "な")) {
+    surface_bonus += 3.5F;  // Strong penalty to force で+も+ない split
+  }
+
+  // Note: Removed penalty for PARTICLE と → VERB_音便 いっ pattern
+  // The dictionary entry "といった" (determiner) handles that case
+  // For といって pattern, we want と+いっ+て split (MeCab compatible)
 
   // Penalty for single-char VerbRenyokei → single-char AuxPassive
   // Bigram table gives -2.5 bonus for VerbRenyokei→AuxPassive (for 知らせ+られ)
@@ -393,6 +586,72 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::AuxPassive &&
       prev.surface.size() <= 3 && next.surface.size() <= 3) {  // Both single hiragana
     surface_bonus += 2.5F;  // Cancel the kStrongBonus
+  }
+
+  // Penalty for VerbOnbinkei ending in いい → AuxTenseTa pattern
+  // E.g., 願いい+た should be 願い+いたし+ます, not 願いい (願いく) + た
+  // Valid onbin forms are: 書い, 泳い, etc. (single い after kanji)
+  // Invalid: 願いい (連用形い + さらにい) - this suggests wrong verb base
+  if (prev.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
+      next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
+      prev.surface.size() >= 6 &&  // At least 2 hiragana (6 bytes)
+      prev.surface.compare(prev.surface.size() - 6, 6, "いい") == 0) {
+    surface_bonus += 3.0F;  // Strong penalty to prevent this split
+  }
+
+  // Bonus for VerbRenyokei/VerbOnbinkei → VerbRenyokei (honorific verb patterns)
+  // E.g., 願い+いたし (お願いいたします), 報告+いたし (ご報告いたします)
+  // Common honorific verb renyokei: いたし, おり, くださ, いただき, もらい, あげ
+  // Include VerbOnbinkei since 願い is often recognized as onbin form of 願う
+  if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei ||
+       prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      (next.surface == "いたし" || next.surface == "おり" ||
+       next.surface == "くださ" || next.surface == "いただき" ||
+       next.surface == "もらい" || next.surface == "あげ")) {
+    surface_bonus += -2.5F;  // Strong bonus for honorific verb patterns
+  }
+
+  // Bonus for honorific verb renyokei → AuxTenseMasu (ます)
+  // E.g., いただき+ます (いただきます), いたし+ます (いたします)
+  // This helps いただき beat い+た+だき pattern
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.extended_pos == core::ExtendedPOS::AuxTenseMasu &&
+      (prev.surface == "いただき" || prev.surface == "いたし" ||
+       prev.surface == "おり" || prev.surface == "くださ")) {
+    surface_bonus += -2.0F;  // Strong bonus for honorific → ます pattern
+  }
+
+  // Penalty for single い → AuxTenseTa pattern (いただきます problem)
+  // い+た+だき should lose to いただき+ます
+  // But て+い+た is valid (食べていた)
+  // We penalize い→た only when prev is OTHER (sentence start) or NOUN
+  // NOT when prev comes from て-form (VerbTeForm)
+  if (prev.surface == "い" &&
+      prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
+    surface_bonus += 2.0F;  // Penalty for い+た at sentence start
+  }
+
+  // Penalty for PARTICLE て → VerbTaForm いた pattern
+  // MeCab splits て+い+た, not て+いた
+  // いた as verb た-form should not follow て directly
+  if (prev.extended_pos == core::ExtendedPOS::ParticleConj &&
+      prev.surface == "て" &&
+      next.extended_pos == core::ExtendedPOS::VerbTaForm &&
+      next.surface == "いた") {
+    surface_bonus += 2.5F;  // Strong penalty to force い+た split
+  }
+
+  // Penalty for PREFIX ご → VerbRenyokei ざい pattern
+  // E.g., ございます should be ござい+ます, not ご+ざい+ます
+  // The prefix ご is for nouns (ご報告), not for splitting ござる
+  if (prev.extended_pos == core::ExtendedPOS::Prefix &&
+      prev.surface == "ご" &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface.size() >= 6 &&
+      next.surface.compare(0, 6, "ざい") == 0) {
+    surface_bonus += 3.5F;  // Strong penalty to prevent ご+ざい split
   }
 
   // Surface-based bonus for AdjStem → すぎ pattern
@@ -406,6 +665,82 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.surface.compare(0, 6, "すぎ") == 0) {
     // Strong bonus to overcome AdjStem→Verb prohibitive penalty (3.5)
     surface_bonus += -4.0F;
+  }
+
+  // Penalty for AuxAppearanceSou (そう) → かも to favor か+も split
+  // MeCab splits "そうかもしれない" as そう+か+も+しれ+ない
+  // But keeps "雨かも" as 雨+かも (noun + かも)
+  // The pattern: AUX_様態 (そう) → かも should be penalized
+  if (prev.extended_pos == core::ExtendedPOS::AuxAppearanceSou &&
+      next.surface == "かも") {
+    surface_bonus += 1.5F;  // Penalty to prefer か+も split
+  }
+
+  // Penalty for ParticleFinal(か) → ADV(もし) in かもしれない pattern
+  // "もし" is a valid adverb, but not in "かもしれない" context
+  // This prevents か+もし+れ split, favoring か+も+しれ
+  if (prev.extended_pos == core::ExtendedPOS::ParticleFinal &&
+      prev.surface == "か" &&
+      next.pos == core::PartOfSpeech::Adverb &&
+      next.surface == "もし") {
+    surface_bonus += 2.0F;  // Strong penalty to avoid this path
+  }
+
+  // Penalty for short hiragana verb mizenkei + ん pattern
+  // E.g., が+おさ+ん should be がお+さん (name + honorific suffix)
+  // Short hiragana verbs followed by ん are often mis-segmented names
+  // Valid patterns like 押さ+ん (kanji verb) have non-hiragana stems
+  // ん can be AUX_否定古 or PART_準体, both should be penalized
+  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei &&
+      grammar::isPureHiragana(prev.surface) &&
+      prev.surface.size() <= 6 &&  // 2 chars or less (6 bytes in UTF-8)
+      next.surface == "ん") {
+    surface_bonus += 3.0F;  // Strong penalty to avoid this path
+  }
+
+  // Penalty for single-kanji NOUN → verbal auxiliary patterns
+  // E.g., 合+う should be 合う (verb), not 合 (noun) + う (volitional)
+  // E.g., 揺+れる should be 揺れる (verb), not 揺 (noun) + れる (passive)
+  // Single-kanji nouns rarely take verbal auxiliaries directly
+  if (prev.extended_pos == core::ExtendedPOS::Noun &&
+      prev.surface.size() == 3 &&  // Single kanji (3 bytes in UTF-8)
+      (next.extended_pos == core::ExtendedPOS::AuxVolitional ||
+       next.extended_pos == core::ExtendedPOS::AuxPassive ||
+       next.extended_pos == core::ExtendedPOS::AuxPotential ||
+       next.extended_pos == core::ExtendedPOS::AuxCausative)) {
+    surface_bonus += 1.5F;  // Moderate penalty
+  }
+
+  // Penalty for PARTICLE → もあり/もありだ verb candidates
+  // "もあり" is mis-recognized as godan verb (もある) or suru verb (もありする)
+  // In "何でもありだな", "もありだ" should be も+あり+だ, not もありする+た
+  // This pattern only appears after particles (で in でもあり)
+  if (prev.pos == core::PartOfSpeech::Particle &&
+      next.pos == core::PartOfSpeech::Verb &&
+      (next.surface == "もあり" || next.surface == "もありだ" ||
+       next.surface == "もある" || next.surface == "もあっ")) {
+    surface_bonus += 3.5F;  // Strong penalty to prefer も+あり split
+  }
+
+  // Bonus for PART_格 → い (VerbRenyokei of いる)
+  // E.g., 家にいた → 家+に+い+た (not 家+にいた)
+  // "にいた" is mis-recognized as godan verb (にく) past tense
+  // い is the renyokei of いる (to exist/be), very common after particles
+  if (prev.extended_pos == core::ExtendedPOS::ParticleCase &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface == "い") {
+    surface_bonus += -0.5F;  // Bonus to prefer に+い split
+  }
+
+  // Bonus for VerbRenyokei → し (サ変 する renyokei)
+  // E.g., お願いします → お+願い+し+ます (not お+願いし+ます)
+  // "願いし" is mis-recognized as godan-sa verb (願いす)
+  // This pattern is common for サ変複合動詞: 願い+する, 案内+する
+  // Exclude single-char "い" which is いる renyokei (interferes with 上手い+し)
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface == "し" && prev.fromDictionary() && prev.surface != "い") {
+    surface_bonus += -2.0F;  // Strong bonus to prefer 願い+し split
   }
 
   float total = base_cost + extended_cost + surface_bonus;

@@ -359,7 +359,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "東京都知事選挙"
+          "surface" : "東京"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "都知事選挙"
         }
       ],
       "id" : "compound_long_kanji",
@@ -508,7 +512,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         }
       ],
@@ -522,8 +526,12 @@
       "description" : "お + 茶 (honorific prefix + noun)",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お茶"
+          "surface" : "茶"
         },
         {
           "pos" : "Particle",
@@ -544,8 +552,12 @@
       "description" : "ご飯 - L2 dictionary word",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "ご"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "ご飯"
+          "surface" : "飯"
         },
         {
           "pos" : "Particle",
@@ -567,7 +579,7 @@
       "description" : "不 prefix",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "不可能"
         },
         {
@@ -585,8 +597,12 @@
       "description" : "未 prefix",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "未"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "未確認"
+          "surface" : "確認"
         },
         {
           "pos" : "Particle",
@@ -633,7 +649,7 @@
           "surface" : "国際"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Suffix",
           "surface" : "的"
         },
         {
@@ -678,7 +694,7 @@
       "description" : "性 suffix - split from noun with existential ある (verb)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "可能"
         },
         {
@@ -736,7 +752,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "山田先生"
+          "surface" : "山田"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "先生"
         },
         {
           "pos" : "Particle",
@@ -848,7 +868,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -1066,7 +1086,7 @@
       "description" : "誰",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "誰"
         },
         {

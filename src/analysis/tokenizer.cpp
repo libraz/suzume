@@ -259,6 +259,15 @@ void Tokenizer::addDictionaryCandidates(
           cost_adjustment = 0.3F * static_cast<float>(standard_emphatic_chars);
         }
 
+        // Determine extended_pos for emphatic form
+        // Sokuon-ending verb forms should be VerbOnbinkei (音便形)
+        core::ExtendedPOS emphatic_epos = result.entry->extended_pos;
+        if (result.entry->pos == core::PartOfSpeech::Verb &&
+            emphatic_suffix == "っ") {
+          // E.g., い(連用形) + っ → いっ(音便形) for と+いっ+て pattern
+          emphatic_epos = core::ExtendedPOS::VerbOnbinkei;
+        }
+
         lattice.addEdge(emphatic_surface,
                         static_cast<uint32_t>(start_pos),
                         static_cast<uint32_t>(emphatic_end),
@@ -268,7 +277,7 @@ void Tokenizer::addDictionaryCandidates(
                         result.entry->lemma,
                         dictionary::ConjugationType::None, {},  // v0.8: removed
                         core::CandidateOrigin::Dictionary, 1.0F, {},
-                        result.entry->extended_pos, "dict_emphatic");
+                        emphatic_epos, "dict_emphatic");
       }
     }
   }

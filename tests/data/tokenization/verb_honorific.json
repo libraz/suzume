@@ -77,7 +77,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "くださる"
         }
       ],
@@ -92,8 +92,12 @@
       "description" : "Honorific prefix お with adjective",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お忙しい"
+          "surface" : "忙しい"
         },
         {
           "pos" : "Noun",
@@ -120,7 +124,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -145,7 +149,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いたし"
         },
         {
@@ -164,8 +168,12 @@
       "description" : "お茶 splits into prefix and noun",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お茶"
+          "surface" : "茶"
         }
       ],
       "id" : "ocha_split",
@@ -179,8 +187,12 @@
       "description" : "ご飯 - L2 dictionary word as single noun",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "ご"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "ご飯"
+          "surface" : "飯"
         }
       ],
       "id" : "gohan_split",
@@ -195,8 +207,12 @@
       "description" : "お願い splits into prefix and noun",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お願い"
+          "surface" : "願い"
         }
       ],
       "id" : "onegai_split",
@@ -364,13 +380,12 @@
           "surface" : "いらっしゃっ"
         },
         {
-          "lemma" : "て",
           "pos" : "Particle",
           "surface" : "て"
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],

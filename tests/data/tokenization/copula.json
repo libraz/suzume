@@ -144,7 +144,7 @@
       "description" : "であった (formal past copula) - で + あっ + た split (MeCab-compatible)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "重要"
         },
         {
@@ -192,7 +192,7 @@
       "description" : "嫌でない - na-adjective copula negation (suzume uses ADJ for na-adjectives)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "嫌"
         },
         {
@@ -216,7 +216,7 @@
       "description" : "好きでない - na-adjective copula negation",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "好き"
         },
         {
@@ -240,7 +240,7 @@
       "description" : "静かでない - na-adjective copula negation",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "静か"
         },
         {
@@ -264,7 +264,7 @@
       "description" : "きれいでない - na-adjective copula negation",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "きれい"
         },
         {
@@ -288,7 +288,7 @@
       "description" : "彼女でもない - particle も + ない, not verb もなう",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "彼女"
         },
         {
@@ -336,7 +336,7 @@
       "description" : "彼女ではない - particle は + ない pattern",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "彼女"
         },
         {

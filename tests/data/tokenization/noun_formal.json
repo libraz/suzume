@@ -14,12 +14,12 @@
         },
         {
           "lemma" : "せる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "せ"
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -28,7 +28,7 @@
         },
         {
           "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "い"
         },
         {

@@ -245,8 +245,9 @@ std::vector<ConjugatedForm> Conjugation::generateGodan(
   // 仮定形
   forms.push_back(makeForm(stem + e + "ば", base_form, stem, type, "ば"));
 
-  // 意志形
-  forms.push_back(makeForm(stem + o + "う", base_form, stem, type, "う"));
+  // 意志形用未然形 (stem + o) - MeCab splits as mizenkei + う (e.g., 行こ + う)
+  // Generate only mizenkei, let う connect via VerbMizenkei → AuxVolitional bonus
+  forms.push_back(makeForm(stem + o, base_form, stem, type, ""));
 
   // 命令形
   forms.push_back(makeForm(stem + e, base_form, stem, type, ""));
@@ -308,7 +309,7 @@ std::vector<ConjugatedForm> Conjugation::generateIchidan(const std::string& stem
   forms.push_back(makeForm(stem + "ておく", base_form, stem, type, "ておく"));
   forms.push_back(makeForm(stem + "てある", base_form, stem, type, "てある"));
   forms.push_back(makeForm(stem + "れば", base_form, stem, type, "れば"));
-  forms.push_back(makeForm(stem + "よう", base_form, stem, type, "よう"));
+  forms.push_back(makeForm(stem + "よ", base_form, stem, type, "よ"));  // Volitional mizenkei: 食べよ (splits as 食べよ + う)
   forms.push_back(makeForm(stem + "ろ", base_form, stem, type, "ろ"));
   forms.push_back(makeForm(stem + "られる", base_form, stem, type, "られる"));
   forms.push_back(makeForm(stem + "させる", base_form, stem, type, "させる"));
@@ -333,7 +334,7 @@ std::vector<ConjugatedForm> Conjugation::generateSuru(const std::string& stem, c
   forms.push_back(makeForm(stem + "しています", base_form, stem, type, "しています"));
   forms.push_back(makeForm(stem + "していました", base_form, stem, type, "していました"));
   forms.push_back(makeForm(stem + "すれば", base_form, stem, type, "すれば"));
-  forms.push_back(makeForm(stem + "しよう", base_form, stem, type, "しよう"));
+  forms.push_back(makeForm(stem + "しよ", base_form, stem, type, "しよ"));  // Volitional mizenkei: しよ (splits as しよ + う)
   forms.push_back(makeForm(stem + "しろ", base_form, stem, type, "しろ"));
   forms.push_back(makeForm(stem + "せよ", base_form, stem, type, "せよ"));
   forms.push_back(makeForm(stem + "される", base_form, stem, type, "される"));
@@ -359,7 +360,7 @@ std::vector<ConjugatedForm> Conjugation::generateKuru(const std::string& stem, c
   forms.push_back(makeForm(stem + "きている", base_form, stem, type, "きている"));
   forms.push_back(makeForm(stem + "きています", base_form, stem, type, "きています"));
   forms.push_back(makeForm(stem + "くれば", base_form, stem, type, "くれば"));
-  forms.push_back(makeForm(stem + "こよう", base_form, stem, type, "こよう"));
+  forms.push_back(makeForm(stem + "こよ", base_form, stem, type, "こよ"));  // Volitional mizenkei: 来よ (splits as 来よ + う)
   forms.push_back(makeForm(stem + "こい", base_form, stem, type, "こい"));
   forms.push_back(makeForm(stem + "こられる", base_form, stem, type, "こられる"));
   forms.push_back(makeForm(stem + "こさせる", base_form, stem, type, "こさせる"));
@@ -403,7 +404,7 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
           // {"なかった", ...}  // Excluded for MeCab compat: split as 食べ+なかっ+た
           {"れば", false, core::ExtendedPOS::VerbKateikei},        // Conditional: 食べれば
           // {"たら", false},   // Conditional: Excluded - split as 食べ + たら
-          {"よう", false, core::ExtendedPOS::VerbShuushikei},      // Volitional: 食べよう (full form)
+          {"よ", false, core::ExtendedPOS::VerbMizenkei},           // Volitional mizenkei: 食べよ (splits as 食べよ + う)
           {"ろ", false, core::ExtendedPOS::VerbMeireikei},         // Imperative: 食べろ
       };
       break;
@@ -455,8 +456,8 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
       // Conditional
       suffixes.push_back({e + "ば", false, core::ExtendedPOS::VerbKateikei});          // Conditional: 書けば
 
-      // Volitional
-      suffixes.push_back({o + "う", false, core::ExtendedPOS::VerbShuushikei});        // Volitional: 書こう (full form)
+      // Volitional mizenkei (for MeCab-compatible split: 書こ + う)
+      suffixes.push_back({o, false, core::ExtendedPOS::VerbMizenkei});                 // Volitional mizenkei: 書こ
 
       // Imperative (exclude for Ka/Ga to avoid conflict with potential)
       if (type != VerbType::GodanKa && type != VerbType::GodanGa) {
@@ -478,7 +479,7 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
           {"すれば", false, core::ExtendedPOS::VerbKateikei},      // Conditional
           {"しろ", false, core::ExtendedPOS::VerbMeireikei},       // Imperative
           {"せよ", false, core::ExtendedPOS::VerbMeireikei},       // Imperative (classical)
-          {"しよう", false, core::ExtendedPOS::VerbShuushikei},    // Volitional (full form)
+          {"しよ", false, core::ExtendedPOS::VerbMizenkei},         // Volitional mizenkei: しよ (splits as しよ + う)
           {"せん", false, core::ExtendedPOS::VerbMizenkei},        // Contracted negative (mizenkei + ん)
           {"したら", false, core::ExtendedPOS::VerbTaraForm},      // Conditional past
       };
@@ -498,7 +499,7 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(
           // こなかった excluded for MeCab compat: split as こ+なかっ+た
           {"くれば", false, core::ExtendedPOS::VerbKateikei},        // Conditional
           // {"きたら", false},   // Conditional: Excluded - split as 来 + たら
-          {"こよう", false, core::ExtendedPOS::VerbShuushikei},      // Volitional (full form)
+          {"こよ", false, core::ExtendedPOS::VerbMizenkei},           // Volitional mizenkei: 来よ (splits as 来よ + う)
           {"こい", false, core::ExtendedPOS::VerbMeireikei},         // Imperative
           {"こられる", false, core::ExtendedPOS::VerbShuushikei},    // Potential (formal)
           {"これる", false, core::ExtendedPOS::VerbShuushikei},      // Potential (colloquial)

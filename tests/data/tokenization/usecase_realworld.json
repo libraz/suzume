@@ -446,7 +446,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "必要"
         }
       ],
@@ -642,8 +642,12 @@
       "description" : "Honorific prefix お茶",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お茶"
+          "surface" : "茶"
         },
         {
           "pos" : "Particle",
@@ -664,8 +668,12 @@
       "description" : "ご飯 - L2 dictionary word in sentence",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "ご"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "ご飯"
+          "surface" : "飯"
         },
         {
           "pos" : "Particle",
@@ -687,7 +695,7 @@
       "description" : "Negation prefix 不可能",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "不可能"
         },
         {
@@ -705,8 +713,12 @@
       "description" : "Negation prefix 未確認",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "未"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "未確認"
+          "surface" : "確認"
         },
         {
           "pos" : "Particle",
@@ -1058,7 +1070,7 @@
           "surface" : "で"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         }
       ],
@@ -1137,7 +1149,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いたし"
         },
         {
@@ -1237,7 +1249,7 @@
       "description" : "SNS slang reaction",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "まじ"
         },
         {
@@ -1316,7 +1328,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -1376,8 +1388,12 @@
       "description" : "Academic paper style",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "本"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "本研究"
+          "surface" : "研究"
         },
         {
           "pos" : "Particle",

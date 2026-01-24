@@ -124,7 +124,7 @@
       "description" : "私は猫が好き - mixed sentence",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "私"
         },
         {
@@ -140,7 +140,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "好き"
         }
       ],
@@ -211,7 +211,7 @@
       "description" : "静かな部屋 (quiet room)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "静か"
         },
         {
@@ -1040,7 +1040,7 @@
       "description" : "まじでやばい - slang adjective in context",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "まじ"
         },
         {
@@ -1245,12 +1245,12 @@
       "description" : "がおさんである - 固有名詞検出はMeCab差異許容 (W-001)",
       "expected" : [
         {
-          "pos" : "Conjunction",
-          "surface" : "が"
+          "pos" : "Noun",
+          "surface" : "がお"
         },
         {
-          "pos" : "Noun",
-          "surface" : "おさん"
+          "pos" : "Suffix",
+          "surface" : "さん"
         },
         {
           "lemma" : "だ",

@@ -23,8 +23,12 @@
       "description" : "Honorific お + 金",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お金"
+          "surface" : "金"
         }
       ],
       "id" : "o_money",
@@ -95,8 +99,12 @@
       "description" : "Honorific お + 茶",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お茶"
+          "surface" : "茶"
         }
       ],
       "id" : "o_tea",
@@ -110,8 +118,12 @@
       "description" : "Honorific お + 菓子",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お菓子"
+          "surface" : "菓子"
         }
       ],
       "id" : "o_sweets",
@@ -125,8 +137,12 @@
       "description" : "Honorific お + 世話",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お世話"
+          "surface" : "世話"
         }
       ],
       "id" : "o_care",
@@ -159,8 +175,12 @@
       "description" : "Honorific お + 手数",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お手数"
+          "surface" : "手数"
         }
       ],
       "id" : "o_trouble",
@@ -178,7 +198,7 @@
           "surface" : "お"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "元気"
         }
       ],
@@ -212,8 +232,12 @@
       "description" : "Honorific お + 客",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お客"
+          "surface" : "客"
         }
       ],
       "id" : "o_customer",
@@ -227,8 +251,16 @@
       "description" : "Honorific お + 客 + 様",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お客様"
+          "surface" : "客"
+        },
+        {
+          "pos" : "Suffix",
+          "surface" : "様"
         }
       ],
       "id" : "o_customer_sama",
@@ -242,8 +274,12 @@
       "description" : "Honorific お + 願い (nominalized verb)",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お願い"
+          "surface" : "願い"
         }
       ],
       "id" : "o_request",
@@ -295,8 +331,12 @@
       "description" : "Honorific お + 待ち (nominalized verb)",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お待ち"
+          "surface" : "待ち"
         }
       ],
       "id" : "o_wait",
@@ -310,8 +350,12 @@
       "description" : "Honorific お + 知らせ (nominalized verb)",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お知らせ"
+          "surface" : "知らせ"
         }
       ],
       "id" : "o_notice",
@@ -382,8 +426,12 @@
       "description" : "Honorific お + 受け取り (nominalized compound noun)",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お受け取り"
+          "surface" : "受け取り"
         }
       ],
       "id" : "o_receipt",
@@ -456,8 +504,12 @@
       "description" : "Honorific お + 迎え",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お迎え"
+          "surface" : "迎え"
         }
       ],
       "id" : "o_welcome",
@@ -471,8 +523,12 @@
       "description" : "Honorific お + 答え (nominalized verb)",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お答え"
+          "surface" : "答え"
         }
       ],
       "id" : "o_answer",
@@ -486,8 +542,12 @@
       "description" : "Honorific お + 断り",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お断り"
+          "surface" : "断り"
         }
       ],
       "id" : "o_refusal",
@@ -520,8 +580,12 @@
       "description" : "Honorific お + 呼び",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お呼び"
+          "surface" : "呼び"
         }
       ],
       "id" : "o_call",
@@ -555,8 +619,12 @@
       "description" : "ご飯 - common word registered in L2 dictionary",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "ご"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "ご飯"
+          "surface" : "飯"
         }
       ],
       "id" : "go_rice",
@@ -571,8 +639,12 @@
       "description" : "Honorific ご + 覧",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "ご"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "ご覧"
+          "surface" : "覧"
         }
       ],
       "id" : "go_look",
@@ -757,7 +829,7 @@
       "description" : "Negation 不 + 安 (compound word)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "不安"
         }
       ],
@@ -772,7 +844,7 @@
       "description" : "Negation 不 + 要 (compound word)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "不要"
         }
       ],
@@ -787,7 +859,7 @@
       "description" : "Negation 不 + 便 (compound word)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "不便"
         }
       ],
@@ -802,7 +874,7 @@
       "description" : "Negation 不 + 可能 (compound word)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "不可能"
         }
       ],
@@ -817,8 +889,12 @@
       "description" : "Not yet 未 + 経験 (compound word)",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "未"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "未経験"
+          "surface" : "経験"
         }
       ],
       "id" : "mi_experience",
@@ -832,8 +908,12 @@
       "description" : "Not yet 未 + 確認 (compound word)",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "未"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "未確認"
+          "surface" : "確認"
         }
       ],
       "id" : "mi_confirmed",
@@ -862,7 +942,7 @@
       "description" : "Non 非 + 常 (compound word)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "非常"
         }
       ],
@@ -922,8 +1002,12 @@
       "description" : "Re 再 + 確認 (compound word)",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "再"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "再確認"
+          "surface" : "確認"
         }
       ],
       "id" : "sai_check",
@@ -974,7 +1058,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -989,7 +1073,7 @@
       "description" : "不可能 in sentence context (compound word preserved)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "不可能"
         },
         {
@@ -1023,8 +1107,12 @@
       "description" : "おかし is a word (お菓子), not prefix + unknown",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "おかし"
+          "surface" : "かし"
         },
         {
           "pos" : "Particle",

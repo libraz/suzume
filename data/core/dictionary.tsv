@@ -105,6 +105,27 @@
 しんちょう	ADJECTIVE	NA_ADJ
 静か	ADJECTIVE	NA_ADJ
 好き	ADJECTIVE	NA_ADJ
+新た	ADJECTIVE	NA_ADJ
+シンプル	ADJECTIVE	NA_ADJ
+ハード	ADJECTIVE	NA_ADJ
+大好き	ADJECTIVE	NA_ADJ
+丁寧	ADJECTIVE	NA_ADJ
+慎重	ADJECTIVE	NA_ADJ
+上手	ADJECTIVE	NA_ADJ
+綺麗	ADJECTIVE	NA_ADJ
+簡単	ADJECTIVE	NA_ADJ
+特別	ADJECTIVE	NA_ADJ
+自然	ADJECTIVE	NA_ADJ
+非常	ADJECTIVE	NA_ADJ
+微妙	ADJECTIVE	NA_ADJ
+頻繁	ADJECTIVE	NA_ADJ
+確実	ADJECTIVE	NA_ADJ
+無理	ADJECTIVE	NA_ADJ
+必要	ADJECTIVE	NA_ADJ
+有名	ADJECTIVE	NA_ADJ
+複雑	ADJECTIVE	NA_ADJ
+重要	ADJECTIVE	NA_ADJ
+流石	ADJECTIVE	NA_ADJ
 しずか	ADJECTIVE	NA_ADJ
 よい	ADJECTIVE	I_ADJ
 いい	ADJECTIVE	I_ADJ
@@ -130,6 +151,10 @@
 つまらない	ADJECTIVE	I_ADJ
 くだらない	ADJECTIVE	I_ADJ
 たまらない	ADJECTIVE	I_ADJ
+おとなしい	ADJECTIVE	I_ADJ
+かたじけない	ADJECTIVE	I_ADJ
+善い	ADJECTIVE	I_ADJ
+好い	ADJECTIVE	I_ADJ
 つめたい	ADJECTIVE	I_ADJ
 よく	ADVERB
 
@@ -151,7 +176,6 @@
 
 # --- Frequency/Time adverbs ---
 しばらく	ADVERB
-いつでも	ADVERB
 何度も	ADVERB
 何回も	ADVERB
 二度と	ADVERB
@@ -254,6 +278,12 @@
 一際	ADVERB
 すぐ	ADVERB
 もしか	ADVERB
+やたら	ADVERB
+一般に	ADVERB
+次第に	ADVERB
+一気に	ADVERB
+堂々と	ADVERB
+幸い	ADVERB
 俄然	ADVERB
 
 # =============================================================================
@@ -272,6 +302,8 @@
 くださる	VERB	GODAN_RA
 ください	VERB	GODAN_RA
 かかる	VERB	GODAN_RA
+こもり	VERB	GODAN_RA
+サボる	VERB	GODAN_RA
 怒鳴る	VERB	GODAN_RA
 # B65: 詰まる - moved to L1 for conjugation expansion
 
@@ -279,6 +311,8 @@
 # W-017: Fix incorrect lemma generation
 言う	VERB	GODAN_WA
 しまう	VERB	GODAN_WA
+願い	VERB	GODAN_WA
+やる	VERB	GODAN_WA
 逢う	VERB	GODAN_WA
 見出す	VERB	GODAN_SA
 
@@ -348,6 +382,7 @@
 しれる	VERB	ICHIDAN
 すぎる	VERB	ICHIDAN
 行く	VERB	GODAN_KA
+おく	VERB	GODAN_KA
 いただく	VERB	GODAN_KA
 こむ	VERB	GODAN_MA
 見つける	VERB	ICHIDAN
@@ -443,7 +478,6 @@
 差し支え	NOUN
 組み合わせ	NOUN
 申し訳	NOUN
-日付け	NOUN
 日付	NOUN
 取り扱い	NOUN
 取り組み	NOUN
@@ -452,8 +486,6 @@
 # Verb-stem compound nouns (moved from L1)
 支払い	NOUN
 見舞い	NOUN
-引きこもり	NOUN
-何でもあり	NOUN
 でっち上げ	NOUN
 でっちあげ	NOUN
 きっかけ	NOUN
@@ -546,7 +578,6 @@ Wi-Fi	NOUN
 あと	NOUN
 間違い	NOUN
 それぞれ	NOUN
-新た	NOUN
 やる気	NOUN
 いくら	NOUN
 そん	NOUN
@@ -555,15 +586,15 @@ Wi-Fi	NOUN
 なん	NOUN
 マジ	NOUN
 お茶	NOUN
-お嬢様	NOUN
-お待ち	NOUN
-お願い	NOUN
-お世話	NOUN
 のち	NOUN
 お金	NOUN
 はし	NOUN
 はな	NOUN
 のり	NOUN
+提出	NOUN
+だるま	NOUN
+すもも	NOUN
+もも	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -754,9 +785,10 @@ Wi-Fi	NOUN
 
 小さい	ADJECTIVE	I_ADJ
 
-でも	CONJUNCTION
 
 たとえば	CONJUNCTION
 
 
 
+
+でも	CONJUNCTION

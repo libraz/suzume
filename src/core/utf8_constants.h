@@ -78,6 +78,10 @@ constexpr char32_t kSmallTsu = U'っ';  // っ (0x3063)
 // Common particles
 constexpr char32_t kO = U'お';  // お (0x304A) - prefix marker
 
+// Volitional auxiliary よう/う
+constexpr char32_t kYo = U'よ';  // よ (0x3088)
+constexpr char32_t kU = U'う';   // う (0x3046)
+
 }  // namespace hiragana
 
 }  // namespace suzume::core

@@ -279,7 +279,7 @@
           "surface" : "書か"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れる"
         }
       ],
@@ -294,14 +294,9 @@
       "description" : "Katakana verb バズる past form - MeCab splits as Noun+Verb+Auxiliary",
       "expected" : [
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "バズ"
-        },
-        {
-          "lemma" : "く",
+          "lemma" : "バズる",
           "pos" : "Verb",
-          "surface" : "っ"
+          "surface" : "バズっ"
         },
         {
           "pos" : "Auxiliary",

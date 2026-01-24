@@ -54,11 +54,10 @@
         },
         {
           "lemma" : "行く",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "行き"
         },
         {
-          "lemma" : "ます",
           "pos" : "Auxiliary",
           "surface" : "ます"
         },
@@ -90,7 +89,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -211,7 +210,7 @@
     {
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "これ"
         },
         {
@@ -324,7 +323,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "いかが"
         },
         {
@@ -587,7 +586,7 @@
       "description" : "Counter expression 3つ + ください - ください as aux",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "これ"
         },
         {
@@ -606,7 +605,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -629,8 +628,12 @@
           "surface" : "を"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お願い"
+          "surface" : "願い"
         },
         {
           "lemma" : "する",
@@ -897,7 +900,7 @@
         },
         {
           "lemma" : "おる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "おり"
         },
         {
@@ -969,7 +972,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -1035,8 +1038,12 @@
           "surface" : "一つ"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お願い"
+          "surface" : "願い"
         },
         {
           "lemma" : "する",
@@ -1075,7 +1082,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -1135,11 +1142,10 @@
         },
         {
           "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "い"
         },
         {
-          "lemma" : "ます",
           "pos" : "Auxiliary",
           "surface" : "ます"
         },
@@ -1170,8 +1176,12 @@
           "surface" : "を"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お願い"
+          "surface" : "願い"
         },
         {
           "lemma" : "する",

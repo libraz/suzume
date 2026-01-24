@@ -6,16 +6,7 @@
         {
           "lemma" : "すごい",
           "pos" : "Adjective",
-          "surface" : "すご"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "ー"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "い"
+          "surface" : "すごーい"
         }
       ],
       "id" : "choon_sugoi",
@@ -223,11 +214,10 @@
         },
         {
           "lemma" : "ちゃう",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ちゃっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -248,8 +238,7 @@
           "surface" : "やっ"
         },
         {
-          "lemma" : "とく",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "とく"
         }
       ],
@@ -287,14 +276,9 @@
           "surface" : "超"
         },
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "バズ"
-        },
-        {
-          "lemma" : "く",
+          "lemma" : "バズる",
           "pos" : "Verb",
-          "surface" : "っ"
+          "surface" : "バズっ"
         },
         {
           "pos" : "Auxiliary",
@@ -312,7 +296,7 @@
       "description" : "Slang phrase マジでキモい",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "マジ"
         },
         {
@@ -360,7 +344,7 @@
       "description" : "Internet slang phrase マジで尊い",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "マジ"
         },
         {
@@ -481,7 +465,7 @@
       "description" : "ですっ - emphatic sokuon after auxiliary",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "大丈夫"
         },
         {
@@ -536,7 +520,7 @@
         },
         {
           "lemma" : "く",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "っ"
         }
       ],

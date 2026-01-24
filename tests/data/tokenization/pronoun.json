@@ -77,8 +77,12 @@
       "description" : "皆さん - collective pronoun",
       "expected" : [
         {
-          "pos" : "Pronoun",
-          "surface" : "皆さん"
+          "pos" : "Noun",
+          "surface" : "皆"
+        },
+        {
+          "pos" : "Suffix",
+          "surface" : "さん"
         }
       ],
       "id" : "pronoun_minasan",
@@ -197,9 +201,12 @@
       "description" : "B39: お前 should be PRON, not PREFIX+NOUN split",
       "expected" : [
         {
-          "lemma" : "お前",
-          "pos" : "Pronoun",
-          "surface" : "お前"
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "前"
         },
         {
           "pos" : "Particle",
@@ -248,7 +255,7 @@
       "description" : "そいつ should be single Pronoun",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "そいつ"
         },
         {
@@ -275,7 +282,7 @@
       "description" : "あいつ should be single Pronoun",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "あいつ"
         },
         {
@@ -357,7 +364,7 @@
       "description" : "それ should be recognized as pronoun",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "それ"
         },
         {

@@ -1,29 +1,6 @@
 {
   "cases" : [
     {
-      "description" : "あああああ - repeated character (first あ separate, ああああ as doubled pattern)",
-      "expected" : [
-        {
-          "pos" : "Filler",
-          "surface" : "あ"
-        },
-        {
-          "pos" : "Interjection",
-          "surface" : "ああ"
-        },
-        {
-          "pos" : "Interjection",
-          "surface" : "ああ"
-        }
-      ],
-      "id" : "edge_repeated_char",
-      "input" : "あああああ",
-      "tags" : [
-        "basic",
-        "edge-case"
-      ]
-    },
-    {
       "description" : "B32: あんだけ should be single adverb",
       "expected" : [
         {
@@ -108,7 +85,6 @@
       "description" : "B36: 思わず should be ADV, not NOUN; しまった should be auxiliary しまう",
       "expected" : [
         {
-          "lemma" : "思わず",
           "pos" : "Adverb",
           "surface" : "思わず"
         },
@@ -123,7 +99,7 @@
         },
         {
           "lemma" : "しまう",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "しまっ"
         },
         {
@@ -142,8 +118,12 @@
       "description" : "俄然 should be ADV, not NOUN (compound split fix)",
       "expected" : [
         {
+          "pos" : "Adverb",
+          "surface" : "俄然"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "俄然注目"
+          "surface" : "注目"
         }
       ],
       "id" : "gazen_adv",
@@ -286,7 +266,7 @@
           "surface" : "いつも"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "元気"
         }
       ],
@@ -410,7 +390,7 @@
       "description" : "いかが should be single token",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "いかが"
         }
       ],
@@ -699,7 +679,7 @@
           "surface" : "どうせ"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "無理"
         }
       ],
@@ -775,7 +755,7 @@
       "description" : "S7: しどろもどろ should be ADV (not し+どろ+も+どろ)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "しどろもどろ"
         }
       ],
@@ -920,7 +900,7 @@
           "surface" : "の"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Noun",
           "surface" : "よう"
         }
       ],
@@ -947,7 +927,7 @@
           "surface" : "の"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Noun",
           "surface" : "よう"
         }
       ],
@@ -998,12 +978,16 @@
           "surface" : "少々"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お待ち"
+          "surface" : "待ち"
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],

@@ -367,6 +367,22 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     return candidates;  // Skip this candidate - force split path
   }
 
+  // Special handling for single-kanji + い patterns (高い, 辛い, 尊い, etc.)
+  // These are common i-adjectives that may not be recognized by inflection analysis
+  // due to penalty_i_adj_single_kanji reducing confidence below threshold.
+  // Generate candidate directly without relying on inflection analysis.
+  if (kanji_end == start_pos + 1 && hiragana_end == kanji_end + 1 &&
+      codepoints[kanji_end] == U'い') {
+    std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
+    // Use moderate cost to compete with verb candidates (尊う has cost ~0.5)
+    // Lower cost wins, so 0.35 should beat verb candidates
+    constexpr float kSingleKanjiICost = 0.35F;
+    SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SINGLE] \"" << surface << "\" cost=" << kSingleKanjiICost << "\n");
+    candidates.push_back(makeIAdjCandidate(
+        surface, start_pos, hiragana_end, surface, kSingleKanjiICost,
+        CandidateOrigin::AdjectiveI, 0.5F, "single_kanji_i"));
+  }
+
   // Try different ending lengths
   for (size_t end_pos = hiragana_end; end_pos > kanji_end; --end_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);
@@ -1069,6 +1085,13 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         if (utf8::endsWith(surface, "んかった")) {
           continue;  // Skip - should be split as ん+かっ+た
         }
+        // Skip surfaces that are honorific verb renyokei (ending with さ)
+        // e.g., くださ + い = ください is VERB (くださる renyokei), not i-adjective
+        // These are typically honorific verb conjugations ending with さ
+        if (surface == "くださ" || surface == "なさ" || surface == "いらっしゃ" ||
+            surface == "おっしゃ" || surface == "ござ") {
+          continue;  // Skip - honorific verb renyokei, not i-adjective
+        }
         // Base cost for hiragana i-adjective candidates
         // Use neutral base (0.0F) to avoid false positives like につい
         // which should be parsed as に(PARTICLE)+ついて(VERB)
@@ -1522,6 +1545,15 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
         }
       }
 
+      // Check if hiragana_part is a suffix in dictionary (さん, さま, etc.)
+      // E.g., 姉さん = 姉 + さん (NOUN + SUFFIX), not 姉 + さ (ADJ stem + nominalization)
+      // EXCEPT: "さ" alone is valid for adjective nominalization (高さ, 明るさ, 優しさ)
+      if (hiragana_part != "さ" &&
+          verb_helpers::hasDictionaryEntry(dict_manager, hiragana_part, core::PartOfSpeech::Suffix)) {
+        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   skip: suffix \"" << hiragana_part << "\" in dict\n");
+        continue;  // Skip - hiragana_part is a dictionary suffix
+      }
+
       // Check for compound adjective pattern: み + やすい/にくい/がたい
       // E.g., 読みやすい, 使いにくい - these are verb renyokei + auxiliary adjective
       // NOT kanji stem + み nominalization
@@ -1714,6 +1746,53 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
           stem, start_pos, stem_end, base_form, cost,
           CandidateOrigin::AdjectiveI, adj_confidence, "adj_stem_shii"));
       break;  // Only one stem candidate per pattern
+    }
+  }
+
+  // =============================================================================
+  // Pattern 3: Extended stem (kanji + hiragana) + さ nominalization
+  // =============================================================================
+  // For adjectives like 明るい, 優しい, 暗い where stem is kanji + hiragana.
+  // E.g., 明るさ → 明る (stem) + さ (nominalization suffix)
+  // E.g., 優しさ → 優し (stem) + さ (nominalization suffix)
+  // E.g., 暖かさ → 暖か (stem) + さ (nominalization suffix)
+  //
+  // Check if hiragana_part ends with "さ" and the prefix forms a valid adjective
+  if (hiragana_part.size() >= 6 && hiragana_part.substr(hiragana_part.size() - 3) == "さ") {
+    // hiragana_part without final "さ" becomes part of the stem
+    std::string stem_suffix = hiragana_part.substr(0, hiragana_part.size() - 3);
+    std::string stem = kanji_part + stem_suffix;  // e.g., "明" + "る" = "明る"
+    std::string base_form = stem + "い";  // e.g., "明るい"
+
+    SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   ext_stem pattern: stem=\"" << stem
+                     << "\" base=\"" << base_form << "\"\n");
+
+    // Validate that stem + い is a real i-adjective
+    auto adj_results = inflection.analyze(base_form);
+    bool is_valid_adjective = false;
+    float adj_confidence = 0.0F;
+    for (const auto& result : adj_results) {
+      if (result.verb_type == grammar::VerbType::IAdjective &&
+          result.confidence >= 0.5F) {
+        is_valid_adjective = true;
+        adj_confidence = result.confidence;
+        break;
+      }
+    }
+
+    SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   ext_stem: is_valid=" << is_valid_adjective
+                     << " conf=" << adj_confidence << "\n");
+
+    if (is_valid_adjective) {
+      // Calculate stem end position
+      // hiragana_end includes "さ" (1 char), so stem_end is hiragana_end - 1
+      size_t stem_end = hiragana_end - 1;
+
+      float cost = -0.8F + (1.0F - adj_confidence) * 0.2F;
+      SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ ext_stem candidate stem=\"" << stem << "\" cost=" << cost << "\n");
+      candidates.push_back(makeIAdjStemCandidate(
+          stem, start_pos, stem_end, base_form, cost,
+          CandidateOrigin::AdjectiveI, adj_confidence, "adj_stem_ext_sa"));
     }
   }
 

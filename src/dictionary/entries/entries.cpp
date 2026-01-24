@@ -93,6 +93,12 @@ inline DictionaryEntry suffix(const char* s, const char* lemma = "") {
   return {s, POS::Suffix, EPOS::Suffix, lemma};
 }
 
+// Prefix helper: creates PREFIX entry
+// Usage: prefix("お"), prefix("ご")
+inline DictionaryEntry prefix(const char* s, const char* lemma = "") {
+  return {s, POS::Prefix, EPOS::Prefix, lemma};
+}
+
 // Pronoun helper: creates PRONOUN entry
 // Usage: pronoun("私")
 inline DictionaryEntry pronoun(const char* s, const char* lemma = "") {
@@ -191,7 +197,9 @@ std::vector<DictionaryEntry> getCompoundParticleEntries() {
       particle("として", EPOS::ParticleConj),  // prevent と+し(VERB)+て split
       particle("にとって", EPOS::ParticleConj),
       particle("にとっても", EPOS::ParticleAdverbial),  // prevent に+とっても(ADV) misparse
-      // Note: 漢字を含む複合助詞（に対して、に関して等）は分割する方針
+      particle("に関して", EPOS::ParticleConj),  // MeCab compatible
+      particle("に際して", EPOS::ParticleConj),  // MeCab compatible
+      particle("に対して", EPOS::ParticleConj),
 
       // Duration/Scope (範囲・期間)
       particle("にわたって", EPOS::ParticleConj),
@@ -222,8 +230,9 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("です", "です", EPOS::AuxCopulaDesu),
       aux("でし", "です", EPOS::AuxCopulaDesu),  // renyoukei of です
       aux("でしたら", "です", EPOS::AuxCopulaDesu),
-      aux("である", "である", EPOS::AuxCopulaDa),
-      aux("であれば", "である", EPOS::AuxCopulaDa),
+      // で+ある pattern - ある is a separate auxiliary (MeCab compatible)
+      aux("ある", "ある", EPOS::AuxCopulaDa),   // で+ある (assertion)
+      aux("あれ", "ある", EPOS::AuxCopulaDa),   // で+あれ+ば (conditional)
 
       // Polite (丁寧) - ます
       aux("ます", "ます", EPOS::AuxTenseMasu),
@@ -234,7 +243,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Negation - ない (否定)
       aux("ない", "ない", EPOS::AuxNegativeNai),
       aux("なかっ", "ない", EPOS::AuxNegativeNai),  // 連用タ接続
-      aux("なければ", "ない", EPOS::AuxNegativeNai),
+      aux("なけれ", "ない", EPOS::AuxNegativeNai),  // 仮定形 (なけれ+ば)
 
       // Negation - ぬ/ず (文語否定)
       aux("ぬ", "ぬ", EPOS::AuxNegativeNu),
@@ -322,6 +331,14 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: なさそう → な(語幹/ガル接続) + さ(名詞化接尾辞) + そう(様態)
       adj("な", "ない", EPOS::AdjStem),
 
+      // Honorific prefix お (お待ち, お世話, お嬢様)
+      // MeCab: お待ち → お(接頭辞) + 待ち(名詞)
+      prefix("お", "お"),
+
+      // Honorific prefix ご (ご確認, ご報告, ご連絡)
+      // MeCab: ご確認 → ご(接頭辞) + 確認(名詞)
+      prefix("ご", "ご"),
+
       // Nominalization suffix さ (高さ, 美しさ, なさ)
       // MeCab: 高さ → 高(語幹) + さ(名詞), なさそう → な + さ + そう
       suffix("さ", "さ"),
@@ -333,6 +350,14 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Na-adjective forming suffix 的 (論理的, 科学的, 経済的)
       // MeCab: 論理的な → 論理 + 的 + な (suffix + copula rentaikei)
       suffix("的", "的"),
+
+      // Temporal/extent suffix 中 (一日中, 今日中, 世界中)
+      // MeCab: 一日中 → 一日 + 中 (noun + suffix)
+      suffix("中", "中"),
+
+      // Inclusive suffix ごと (皮ごと, 頭ごと)
+      // MeCab: 皮ごと → 皮 + ごと (noun + suffix)
+      suffix("ごと", "ごと"),
 
       // Adjective suffixes - connect after verb renyokei (V連用形接続)
       // MeCab: 使いにくい → 使い + にくい, 読みやすい → 読み + やすい
@@ -369,6 +394,19 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Polite existence - ございます (丁重)
       // MeCab splits: ござい + ます (renyokei + polite)
       aux("ござい", "ござる", EPOS::AuxGozaru),
+      // ござっ is onbinkei (促音便形) for ござった
+      // MeCab splits: ござっ + た (onbinkei + ta)
+      verb("ござっ", "ござる", EPOS::VerbOnbinkei),
+
+      // Humble verb - いたす (謙譲語)
+      // MeCab treats いたし as 動詞,非自立 (dependent verb)
+      // Used in: お願いいたします, ご連絡いたします
+      verb("いたし", "いたす", EPOS::VerbRenyokei),
+
+      // Receiving verb - いただく (謙譲語)
+      // Used in: いただきます, 食べていただく
+      // Must be registered to prevent い+た+だき split
+      verb("いただき", "いただく", EPOS::VerbRenyokei),
 
       // Request - ください is VERB (くださる) in MeCab
       // くださる is special ra-row godan with irregular imperative form ください
@@ -376,13 +414,12 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("くださいませ", "くださる", EPOS::VerbShuushikei),
 
       // Progressive/Continuous - いる (進行・継続)
-      // Note: Standalone "い" competes with words like いただく, so it's handled
-      // via いた/いて forms instead
+      // MeCab splits て+い+た, て+い+て (not て+いた/て+いて)
+      // い is registered separately for MeCab-compatible splits
+      aux("い", "いる", EPOS::AuxAspectIru),  // renyokei for い+た, い+ます
       aux("いる", "いる", EPOS::AuxAspectIru),
       aux("います", "いる", EPOS::AuxAspectIru),
       aux("いません", "いる", EPOS::AuxAspectIru),
-      aux("いた", "いる", EPOS::AuxAspectIru),  // て+いた pattern
-      aux("いて", "いる", EPOS::AuxAspectIru),  // て+いて pattern
       aux("いない", "いる", EPOS::AuxAspectIru),
       aux("いなかった", "いる", EPOS::AuxAspectIru),
       aux("いれば", "いる", EPOS::AuxAspectIru),
@@ -399,6 +436,14 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Note: MeCab treats くれる as 動詞,非自立 (dependent verb)
       aux("くれる", "くれる", EPOS::AuxAspectKuru),
       aux("くれ", "くれる", EPOS::AuxAspectKuru),  // renyokei for くれ+ます
+
+      // Excessive degree subsidiary verb - すぎる (過度)
+      // Used after adjective/verb stems: 高すぎる, 食べすぎる
+      // MeCab: 動詞,非自立 (subsidiary verb, not auxiliary 助動詞)
+      // MeCab splits: 高 + すぎる (終止形), 高 + すぎ + た (連用形 + た)
+      // Use verb() to get POS::Verb, but keep AuxExcessive EPOS for bigram rules
+      verb("すぎる", "すぎる", EPOS::AuxExcessive),
+      verb("すぎ", "すぎる", EPOS::AuxExcessive),  // renyokei for すぎ+た, すぎ+て
 
       // Completive/Regretful - しまう (完了・遺憾)
       // MeCab treats しまう as a regular verb, not auxiliary
@@ -431,11 +476,8 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("いか", "いく", EPOS::VerbShuushikei),
       aux("いかない", "いく", EPOS::AuxAspectIku),
       aux("くる", "くる", EPOS::AuxAspectKuru),
-      // きた/きて are kept as single entries for AuxAspectKuru
-      // き alone competes with words like いただき, so it's not registered separately
-      aux("きた", "くる", EPOS::AuxAspectKuru),
-      aux("きて", "くる", EPOS::AuxAspectKuru),
-      aux("きます", "くる", EPOS::AuxAspectKuru),
+      // MeCab compat: split き+た/て/ます separately
+      aux("き", "くる", EPOS::AuxAspectKuru),
       aux("こない", "くる", EPOS::AuxAspectKuru),
 
       // Explanatory (説明) - MeCab compat: split as の/ん + だ/です/でした
@@ -476,11 +518,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
 
       // Elderly/Archaic (老人・古風)
       aux("じゃ", "だ", EPOS::Unknown), aux("じゃな", "だ", EPOS::Unknown),
-      aux("のじゃ", "のだ", EPOS::Unknown), aux("じゃろう", "だろう", EPOS::Unknown),
+      aux("のじゃ", "のだ", EPOS::Unknown), aux("じゃろ", "だろ", EPOS::AuxCopulaDa),
 
       // Regional dialects (方言系)
       aux("ぜよ", "だ", EPOS::Unknown), aux("だべ", "だ", EPOS::Unknown), aux("やんけ", "だ", EPOS::Unknown),
-      aux("やで", "だ", EPOS::Unknown), aux("やねん", "だ", EPOS::Unknown),
+      aux("や", "だ", EPOS::Unknown), aux("やねん", "だ", EPOS::Unknown),
       aux("だっちゃ", "だ", EPOS::Unknown), aux("ばい", "だ", EPOS::Unknown),
 
       // Robot/Mechanical (ロボット・機械)
@@ -496,7 +538,7 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
   return {
       // Sequential (順接)
       conj("従って", ""), conj("故に", ""),
-      conj("そして", ""), conj("それから", ""), conj("すると", ""),
+      conj("そして", ""), conj("それから", ""), conj("それで", ""),
       conj("だから", ""), conj("そのため", ""),
       conj("したがって", "従って"),
 
@@ -535,7 +577,7 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       // Additional conjunctions
       conj("いわば", "言わば"), conj("言わば", ""),
       conj("さもないと", ""), conj("さもなければ", ""),
-      conj("そんなら", "其んなら"),
+      // そんなら removed: MeCab splits as そん+なら
       conj("それにしても", ""),
       adv("ともかく", ""),
       conj("いずれにしても", ""), conj("いずれにせよ", ""),
@@ -567,15 +609,8 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
       det("といった", ""),
       det("っていう", ""),  // colloquial
 
-      // Quotative verb forms (引用動詞活用形) - to + 言う conjugations
-      // These compete with と(PARTICLE) + いって(行く, cost 1.2F) paths
-      verb("といって", "いう", EPOS::VerbShuushikei),
-      verb("といっては", "いう", EPOS::VerbShuushikei),
-      // Note: といっても removed - MeCab splits as と+いっ+て+も
-      verb("そういって", "いう", EPOS::VerbShuushikei),
-      verb("こういって", "いう", EPOS::VerbShuushikei),
-      verb("ああいって", "いう", EPOS::VerbShuushikei),
-      verb("どういって", "いう", EPOS::VerbShuushikei),
+      // Note: Quotative verb forms (といって, こういって, etc.) removed for MeCab compatibility
+      // MeCab splits as と+いっ+て, こう+いっ+て, etc.
 
       // Determiners with kanji - B51: lowered cost to prioritize over NOUN unknown
       det("大きな", ""), det("小さな", ""),

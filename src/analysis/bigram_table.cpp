@@ -125,6 +125,9 @@ BigramTable::initTable() {
   // VerbOnbinkei → AuxAspectOku (読ん+どい) - moderate bonus for contracted ~ておく split
   setCell(t, EPOS::VerbOnbinkei, EPOS::AuxAspectOku, cost::kModerateBonus);
 
+  // VerbOnbinkei → AuxAspectShimau (行っ+ちゃっ) - strong bonus for contracted ~てしまう split
+  setCell(t, EPOS::VerbOnbinkei, EPOS::AuxAspectShimau, cost::kStrongBonus);
+
   // VerbTeForm → AuxAspectIru (食べて+いる) - strong bonus
   setCell(t, EPOS::VerbTeForm, EPOS::AuxAspectIru, cost::kStrongBonus);
 
@@ -147,6 +150,10 @@ BigramTable::initTable() {
   // This handles contracted forms where ておく → とく
   setCell(t, EPOS::VerbRenyokei, EPOS::AuxAspectOku, cost::kStrongBonus);
 
+  // VerbRenyokei → AuxAspectShimau (食べ+ちゃっ contraction of 食べてしまう) - strong bonus
+  // This handles contracted forms where てしまう → ちゃう
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxAspectShimau, cost::kStrongBonus);
+
   // =========================================================================
   // Verb Forms → Particles
   // =========================================================================
@@ -162,6 +169,10 @@ BigramTable::initTable() {
 
   // VerbKateikei → ParticleConj (食べれ+ば) - strong bonus
   setCell(t, EPOS::VerbKateikei, EPOS::ParticleConj, cost::kStrongBonus);
+
+  // VerbKateikei → AdjBasic (滅びれば+いい) - strong bonus for 〜ればいい pattern
+  // This helps beat the split path 滅び+れ+ば+いい where れ is misanalyzed as passive
+  setCell(t, EPOS::VerbKateikei, EPOS::AdjBasic, cost::kStrongBonus);
 
   // VerbOnbinkei → ParticleConj (書い+て, 読ん+で) - strong bonus for te-form split
   setCell(t, EPOS::VerbOnbinkei, EPOS::ParticleConj, cost::kStrongBonus);
@@ -193,12 +204,34 @@ BigramTable::initTable() {
   // AdjBasic → ParticleFinal (美しい+ね) - minor bonus
   setCell(t, EPOS::AdjBasic, EPOS::ParticleFinal, cost::kMinorBonus);
 
+  // AdjBasic → ParticleConj (美しい+し, 高い+けど) - minor bonus
+  // Helps i-adjective+conjunctive particle beat ADJ_NA+い(verb)+し path
+  setCell(t, EPOS::AdjBasic, EPOS::ParticleConj, cost::kMinorBonus);
+
   // AdjStem → AuxAppearanceSou (美し+そう) - strong bonus
   setCell(t, EPOS::AdjStem, EPOS::AuxAppearanceSou, cost::kStrongBonus);
+
+  // AdjStem/AdjNaAdj → AuxExcessive (高+すぎる, シンプル+すぎる) - moderate bonus
+  // Helps AUX_過度 beat VERB interpretation when both have same cost
+  setCell(t, EPOS::AdjStem, EPOS::AuxExcessive, cost::kModerateBonus);
+  setCell(t, EPOS::AdjNaAdj, EPOS::AuxExcessive, cost::kModerateBonus);
 
   // Suffix → AuxAppearanceSou (さ+そう in なさそう) - moderate bonus
   // This completes the な+さ+そう chain for ない nominalization + appearance
   setCell(t, EPOS::Suffix, EPOS::AuxAppearanceSou, cost::kModerateBonus);
+
+  // Suffix → AuxCopulaDa (的+な in 論理的な) - strong bonus
+  // 的 suffix followed by な (copula attributive) is very common
+  setCell(t, EPOS::Suffix, EPOS::AuxCopulaDa, cost::kStrongBonus);
+
+  // Suffix → ParticleCase (的+に in 感情的になる) - moderate bonus
+  // Helps split 的+に+なる instead of 的+になる (as single verb)
+  setCell(t, EPOS::Suffix, EPOS::ParticleCase, cost::kModerateBonus);
+
+  // Suffix → Verb (中+働く in 一日中働く) - moderate bonus
+  // Temporal suffix 中 followed by verb is natural
+  setCell(t, EPOS::Suffix, EPOS::VerbRenyokei, cost::kModerateBonus);
+  setCell(t, EPOS::Suffix, EPOS::VerbShuushikei, cost::kModerateBonus);
 
   // =========================================================================
   // Auxiliary → Auxiliary Chains
@@ -401,6 +434,11 @@ BigramTable::initTable() {
   // とい (contracted ておく form) + う (volitional) is grammatically invalid
   setCell(t, EPOS::AuxAspectOku, EPOS::AuxVolitional, cost::kStrongPenalty);
 
+  // AuxAspectOku → ParticleQuote (とい+って) - strong penalty
+  // Prevents とい+って from beating と+いっ+て (と言って)
+  // とい (contracted ておく form) + って (quote particle) is unlikely in this context
+  setCell(t, EPOS::AuxAspectOku, EPOS::ParticleQuote, cost::kStrongPenalty);
+
   // VerbShuushikei → AuxTenseMasu (食べる+ます) - prohibitive
   // (ます attaches to renyokei, not shuushikei)
   setCell(t, EPOS::VerbShuushikei, EPOS::AuxTenseMasu, cost::kProhibitive);
@@ -417,6 +455,14 @@ BigramTable::initTable() {
   // AuxTenseTa → AuxTenseMasu (た+ます) - prohibitive
   setCell(t, EPOS::AuxTenseTa, EPOS::AuxTenseMasu, cost::kProhibitive);
 
+  // AuxTenseTa → AuxAspectKuru (た+き) - prohibitive
+  // Prevents いただき → い+た+だ+き (きた split creates standalone き entry)
+  setCell(t, EPOS::AuxTenseTa, EPOS::AuxAspectKuru, cost::kProhibitive);
+
+  // AuxCopulaDa → AuxAspectKuru (だ+き) - prohibitive
+  // Prevents いただき → い+た+だ+き
+  setCell(t, EPOS::AuxCopulaDa, EPOS::AuxAspectKuru, cost::kProhibitive);
+
   // ParticleFinal → VerbShuushikei (ね+食べる) - strong penalty
   // (sentence-final particles rarely continue to verbs)
   setCell(t, EPOS::ParticleFinal, EPOS::VerbShuushikei, cost::kStrongPenalty);
@@ -428,6 +474,11 @@ BigramTable::initTable() {
   // AuxCopulaDa → VerbOnbinkei (な+いん) - prohibit
   // (prevents ないんだ → な+いん+だ over ない+ん+だ)
   setCell(t, EPOS::AuxCopulaDa, EPOS::VerbOnbinkei, cost::kProhibitive);
+
+  // AuxCopulaDa → VerbMizenkei (だ+くさ) - strong penalty
+  // Copula followed by verb mizenkei is grammatically unusual
+  // Prevents 盛りだくさん → 盛り+だ+くさ+ん over dictionary entry
+  setCell(t, EPOS::AuxCopulaDa, EPOS::VerbMizenkei, cost::kStrongPenalty);
 
   // ParticleFinal → ParticleFinal (よ+ね) - minor bonus (common pattern)
   setCell(t, EPOS::ParticleFinal, EPOS::ParticleFinal, cost::kMinorBonus);
@@ -486,6 +537,21 @@ BigramTable::initTable() {
   // - Legitimate: 食べ+すぎる (auxiliary verb compound)
   // - Spurious cases like 食べ→るみ are handled by scorer penalty for
   //   non-dictionary kanji+hiragana verb renyokei candidates
+
+  // VerbTaForm → VerbMizenkei (盛りだ+くさ) - strong penalty
+  // Two verbs in sequence without auxiliary/particle is grammatically unusual
+  // Prevents 盛りだくさん → 盛りだ+くさ+ん over dictionary entry
+  setCell(t, EPOS::VerbTaForm, EPOS::VerbMizenkei, cost::kStrongPenalty);
+
+  // VerbRenyokei → VerbMizenkei (盛り+だくさ) - strong penalty
+  // Renyokei followed by mizenkei is grammatically unusual
+  // Legitimate patterns like 食べ+すぎ use Renyokei→Renyokei (すぎ is renyokei)
+  setCell(t, EPOS::VerbRenyokei, EPOS::VerbMizenkei, cost::kStrongPenalty);
+
+  // AdjBasic → VerbMizenkei (盛りだく+さ) - strong penalty
+  // Adjective 終止形 followed by verb 未然形 is grammatically unusual
+  // Prevents 盛りだくさん → 盛りだく+さ+ん over dictionary entry
+  setCell(t, EPOS::AdjBasic, EPOS::VerbMizenkei, cost::kStrongPenalty);
 
   // AdjStem → AuxConjectureMitai: unnatural (美し+みたい should be 美しい+みたい)
   setCell(t, EPOS::AdjStem, EPOS::AuxConjectureMitai, cost::kProhibitive);
@@ -553,6 +619,30 @@ BigramTable::initTable() {
   // Adverb → Interjection (いったい+何だ) - strong bonus
   // いったい何だ should tokenize as いったい + 何だ, not いったい + 何 + だ
   setCell(t, EPOS::Adverb, EPOS::Interjection, cost::kStrongBonus);
+
+  // Adverb → Noun (俄然+注目) - moderate bonus
+  // Adverb modifying noun is natural and should beat kanji compound analysis
+  setCell(t, EPOS::Adverb, EPOS::Noun, cost::kModerateBonus);
+
+  // Adverb → Adjective (とても+面白い, 非常に+難しい) - strong bonus
+  // Adverbs very commonly modify adjectives; should prefer ADJ over NOUN
+  setCell(t, EPOS::Adverb, EPOS::AdjBasic, cost::kStrongBonus);
+  setCell(t, EPOS::Adverb, EPOS::AdjRenyokei, cost::kStrongBonus);
+  setCell(t, EPOS::Adverb, EPOS::AdjNaAdj, cost::kStrongBonus);
+
+  // Adverb → Verb (たまたま+見つけ, すぐ+食べ) - moderate bonus
+  // Adverb modifying verb is natural; prefer dictionary compound over split
+  setCell(t, EPOS::Adverb, EPOS::VerbRenyokei, cost::kModerateBonus);
+  setCell(t, EPOS::Adverb, EPOS::VerbShuushikei, cost::kModerateBonus);
+  setCell(t, EPOS::Adverb, EPOS::VerbTaForm, cost::kModerateBonus);
+
+  // Prefix → Noun (お+待ち, ご+確認) - strong bonus
+  // Honorific prefix + noun is very common and should beat combined forms
+  setCell(t, EPOS::Prefix, EPOS::Noun, cost::kStrongBonus);
+
+  // Prefix → VerbRenyokei (お+待ち as verb renyokei) - strong bonus
+  // お待ち can be verb renyokei (待つ) as well as noun
+  setCell(t, EPOS::Prefix, EPOS::VerbRenyokei, cost::kStrongBonus);
 
   return t;
 }

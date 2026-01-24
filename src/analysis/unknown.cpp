@@ -180,8 +180,9 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
 
     // Generate kanji + hiragana compound noun candidates
     // e.g., 玉ねぎ, 水たまり
+    // Pass dict_manager to skip compounds when hiragana portion is a known word
     auto compound_nouns =
-        generateKanjiHiraganaCompoundCandidates(codepoints, start_pos, char_types);
+        generateKanjiHiraganaCompoundCandidates(codepoints, start_pos, char_types, dict_manager_);
     candidates.insert(candidates.end(), compound_nouns.begin(),
                       compound_nouns.end());
 
@@ -879,8 +880,9 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
       char32_t ch2 = codepoints[start_pos + 2];
       char32_t ch3 = codepoints[start_pos + 3];
 
-      if (ch0 == ch2 && ch1 == ch3 && !isSmallKanaAt(start_pos)) {
+      if (ch0 == ch2 && ch1 == ch3 && ch0 != ch1 && !isSmallKanaAt(start_pos)) {
         // ABAB pattern detected (e.g., わくわく, きらきら, どきどき)
+        // Excludes AAAA pattern (e.g., もももも) where all chars are the same
         std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
         if (!surface.empty()) {
           auto cand = makeCandidate(surface, start_pos, start_pos + 4, core::PartOfSpeech::Adverb, 0.1F, true, CandidateOrigin::Onomatopoeia);

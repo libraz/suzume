@@ -87,11 +87,10 @@
         },
         {
           "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "い"
         },
         {
-          "lemma" : "ます",
           "pos" : "Auxiliary",
           "surface" : "ます"
         }
@@ -147,8 +146,16 @@
       "description" : "Ojou-sama speech ですわ",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お嬢様"
+          "surface" : "嬢"
+        },
+        {
+          "pos" : "Suffix",
+          "surface" : "様"
         },
         {
           "pos" : "Auxiliary",
@@ -170,7 +177,7 @@
       "description" : "ですわ ojou-sama speech",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "綺麗"
         },
         {
@@ -239,8 +246,12 @@
       "description" : "お世話になっております - humble progressive form - MeCab: なっ + て + おり + ます",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お世話"
+          "surface" : "世話"
         },
         {
           "pos" : "Particle",
@@ -257,11 +268,10 @@
         },
         {
           "lemma" : "おる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "おり"
         },
         {
-          "lemma" : "ます",
           "pos" : "Auxiliary",
           "surface" : "ます"
         }
@@ -278,7 +288,7 @@
       "description" : "これはいくらですか - should have particles",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "これ"
         },
         {
@@ -394,12 +404,16 @@
           "surface" : "よろしく"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お願い"
+          "surface" : "願い"
         },
         {
           "lemma" : "いたす",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いたし"
         },
         {
@@ -438,8 +452,12 @@
       "description" : "おいでなんし - kuruwa-kotoba polite invitation",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "おい"
+          "surface" : "い"
         },
         {
           "pos" : "Particle",

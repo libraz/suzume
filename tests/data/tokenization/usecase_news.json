@@ -108,7 +108,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -196,7 +196,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         }
       ],
@@ -316,7 +316,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -450,7 +450,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "日本代表"
+          "surface" : "日本"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "代表"
         },
         {
           "pos" : "Particle",
@@ -598,7 +602,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         }
       ],
@@ -651,8 +655,12 @@
       "description" : "Academic hypothesis - MeCab shows 本研究 unified",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "本"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "本研究"
+          "surface" : "研究"
         },
         {
           "pos" : "Particle",
@@ -709,7 +717,7 @@
           "surface" : "結果"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "有意"
         },
         {
@@ -732,7 +740,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -775,7 +783,7 @@
           "surface" : "の"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Noun",
           "surface" : "よう"
         },
         {
@@ -788,7 +796,7 @@
           "surface" : "結論づけ"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られる"
         }
       ],
@@ -802,8 +810,12 @@
       "description" : "Method description - Current suzume unifies compounds",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "本"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "本研究"
+          "surface" : "研究"
         },
         {
           "pos" : "Particle",
@@ -884,7 +896,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -892,7 +904,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         }
       ],
@@ -907,8 +919,12 @@
       "description" : "Limitation statement",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "本"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "本研究"
+          "surface" : "研究"
         },
         {
           "pos" : "Particle",
@@ -919,7 +935,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "いくつ"
         },
         {
@@ -939,7 +955,6 @@
           "surface" : "が"
         },
         {
-          "lemma" : "ある",
           "pos" : "Verb",
           "surface" : "ある"
         }
@@ -990,7 +1005,7 @@
           "surface" : "を"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "正式"
         },
         {
@@ -1038,7 +1053,7 @@
       "description" : "Narrative style - Current suzume treats 欠かさ as adjective and 好き as adjective",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "彼"
         },
         {
@@ -1062,7 +1077,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "好き"
         },
         {
@@ -1183,7 +1198,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -1265,7 +1280,7 @@
         },
         {
           "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "い"
         },
         {
@@ -1333,7 +1348,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -1342,7 +1357,7 @@
         },
         {
           "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "い"
         },
         {
@@ -1394,7 +1409,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -1487,7 +1502,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -1505,7 +1520,7 @@
           "surface" : "この"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "公式"
         },
         {
@@ -1521,7 +1536,7 @@
           "surface" : "の"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Noun",
           "surface" : "よう"
         },
         {
@@ -1534,7 +1549,6 @@
           "surface" : "使い"
         },
         {
-          "lemma" : "ます",
           "pos" : "Auxiliary",
           "surface" : "ます"
         }
@@ -1567,7 +1581,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],

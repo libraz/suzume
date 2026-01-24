@@ -8,6 +8,7 @@
 #include <unordered_set>
 
 #include "core/utf8_constants.h"
+#include "dictionary/dictionary.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
@@ -76,7 +77,7 @@ const std::vector<SuffixEntry>& getSuffixEntries() {
       {"力", core::PartOfSpeech::Suffix},
       {"度", core::PartOfSpeech::Suffix},
       {"方", core::PartOfSpeech::Suffix},  // 歩き方, やり方 (V連用形+方)
-      // Note: 中 removed - it's a bound noun (形式名詞), not a suffix
+      {"中", core::PartOfSpeech::Suffix},  // 一日中, 今日中 (N+中) - MeCab treats as suffix
       // N中 compounds (今日中, 世界中, 一日中) are handled as compound nouns
       // Administrative suffixes (行政接尾辞)
       {"県", core::PartOfSpeech::Suffix},
@@ -529,7 +530,8 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
 std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     const std::vector<char32_t>& codepoints,
     size_t start_pos,
-    const std::vector<normalize::CharType>& char_types) {
+    const std::vector<normalize::CharType>& char_types,
+    const dictionary::DictionaryManager* dict_manager) {
   std::vector<UnknownCandidate> candidates;
 
   if (start_pos >= char_types.size() ||
@@ -820,6 +822,16 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
         looks_like_aux = true;
       }
     }
+    // Patterns containing くださ (part of ください auxiliary)
+    // e.g., 待ちくださ, 行きくださ - these should be verb + ください
+    // Check if hiragana portion contains くださ
+    if (hiragana_len >= 3) {
+      std::string hira_portion = extractSubstring(codepoints, kanji_end, hiragana_end);
+      if (hira_portion.find("くださ") != std::string::npos ||
+          hira_portion.find("ください") != std::string::npos) {
+        looks_like_aux = true;
+      }
+    }
   }
 
   // Ichidan verb pattern (e-row + る)
@@ -862,6 +874,23 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     // ます, ない - pure polite/negative auxiliaries
     if ((h1 == kMa && h2 == kSu) || (h1 == kNa && h2 == kI)) {
       return candidates;  // Skip NOUN generation entirely
+    }
+  }
+
+  // Check if the hiragana portion is a known dictionary word (exact match)
+  // If so, skip compound generation to let the split path win
+  // E.g., 火だるま: if だるま is in dictionary, don't generate compound
+  // Only skip for exact matches - partial matches (like た in たまり) don't count
+  std::string hiragana_portion = extractSubstring(codepoints, kanji_end, hiragana_end);
+  if (dict_manager != nullptr && !hiragana_portion.empty()) {
+    auto entries = dict_manager->lookup(hiragana_portion, 0);
+    for (const auto& entry : entries) {
+      // Check for exact match: entry length must equal the hiragana portion length
+      if (entry.length == hiragana_len) {
+        // Exact match found - skip compound candidate
+        // This allows split like 火+だるま to win
+        return candidates;
+      }
     }
   }
 
@@ -1082,23 +1111,9 @@ std::vector<UnknownCandidate> generatePrefixCompoundCandidates(
     }
   }
 
-  // Also generate 3-character compound if followed by 中 (bound noun)
-  // e.g., 今日中, 一日中, 世界中
-  if (start_pos + 2 < codepoints.size() &&
-      start_pos + 2 < char_types.size() &&
-      char_types[start_pos + 2] == normalize::CharType::Kanji &&
-      codepoints[start_pos + 2] == U'中') {
-    std::string surface3 = extractSubstring(codepoints, start_pos, start_pos + 3);
-    if (!surface3.empty()) {
-      // Even stronger bonus for N中 compounds
-      auto cand = makeCandidate(surface3, start_pos, start_pos + 3, core::PartOfSpeech::Noun, -1.5F, false, CandidateOrigin::PrefixCompound);
-#ifdef SUZUME_DEBUG_INFO
-      cand.confidence = 0.95F;
-      cand.pattern = "prefix_kanji_chuu";
-#endif
-      candidates.push_back(cand);
-    }
-  }
+  // Note: N中 compounds (今日中, 一日中, 世界中) are now split per MeCab:
+  // 今日中 → 今日 + 中 (noun + suffix)
+  // The 中 suffix is registered in L1 dictionary (entries.cpp)
 
   return candidates;
 }

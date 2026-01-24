@@ -120,7 +120,7 @@
       "description" : "Feminine wonder particle かしら (unified)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "大丈夫"
         },
         {

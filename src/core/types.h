@@ -113,6 +113,7 @@ enum class ExtendedPOS : uint8_t {
   // Other auxiliaries
   AuxHonorific,     // 尊敬: れる、られる (honorific use)
   AuxGozaru,        // 丁重: ござる、ございます
+  AuxExcessive,     // 過度: すぎる (excessive degree)
 
   // =========================================================================
   // Particles (41-50) - by grammatical role
@@ -267,6 +268,7 @@ inline bool isAdjectiveForm(ExtendedPOS epos) {
 
 /**
  * @brief Check if ExtendedPOS is an auxiliary
+ * Note: AuxExcessive (すぎる) is excluded as it maps to Verb (補助動詞)
  */
 inline bool isAuxiliaryType(ExtendedPOS epos) {
   return epos >= ExtendedPOS::AuxTenseTa && epos <= ExtendedPOS::AuxGozaru;

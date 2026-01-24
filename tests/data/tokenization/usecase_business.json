@@ -4,8 +4,12 @@
       "description" : "Business email opening: お世話になっております - compound auxiliary form",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お世話"
+          "surface" : "世話"
         },
         {
           "pos" : "Particle",
@@ -22,7 +26,7 @@
         },
         {
           "lemma" : "おる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "おり"
         },
         {
@@ -69,7 +73,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -104,12 +108,16 @@
           "surface" : "よろしく"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お願い"
+          "surface" : "願い"
         },
         {
           "lemma" : "いたす",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いたし"
         },
         {
@@ -132,12 +140,16 @@
           "surface" : "よろしく"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お願い"
+          "surface" : "願い"
         },
         {
           "lemma" : "いたす",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いたし"
         },
         {
@@ -164,8 +176,12 @@
           "surface" : "よろしく"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お願い"
+          "surface" : "願い"
         },
         {
           "lemma" : "する",
@@ -201,7 +217,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いたし"
         },
         {
@@ -227,7 +243,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -263,7 +279,7 @@
           "surface" : "と"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "幸い"
         },
         {
@@ -315,7 +331,7 @@
       "description" : "Inquiry: いかがでしょうか",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "いかが"
         },
         {
@@ -524,7 +540,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -692,7 +708,7 @@
         },
         {
           "lemma" : "せる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "せ"
         }
       ],
@@ -825,8 +841,12 @@
           "surface" : "は"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "翌"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "翌営業"
+          "surface" : "営業"
         },
         {
           "pos" : "Suffix",
@@ -847,7 +867,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -948,7 +968,7 @@
         },
         {
           "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "い"
         },
         {
@@ -984,7 +1004,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いたし"
         },
         {
@@ -1127,7 +1147,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "乙"
         },
         {
@@ -1172,7 +1192,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -1191,15 +1211,18 @@
       "description" : "Place: 本契約において定める",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "本"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "本契約"
+          "surface" : "契約"
         },
         {
           "pos" : "Particle",
           "surface" : "において"
         },
         {
-          "lemma" : "定める",
           "pos" : "Verb",
           "surface" : "定める"
         }
@@ -1273,7 +1296,7 @@
         },
         {
           "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "い"
         },
         {
@@ -1304,7 +1327,7 @@
       "description" : "Apology: 大変申し訳ございませんでした",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "大変"
         },
         {
@@ -1372,7 +1395,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ください"
         }
       ],
@@ -1409,7 +1432,7 @@
         },
         {
           "lemma" : "せる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "せ"
         },
         {
@@ -1418,7 +1441,7 @@
         },
         {
           "lemma" : "いただく",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いただき"
         },
         {
@@ -1481,12 +1504,16 @@
           "surface" : "通り"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お知らせ"
+          "surface" : "知らせ"
         },
         {
           "lemma" : "いたす",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いたし"
         },
         {
@@ -1599,7 +1626,7 @@
           "surface" : "にとって"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "重要"
         },
         {

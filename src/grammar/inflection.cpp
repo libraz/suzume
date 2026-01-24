@@ -138,6 +138,21 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         }
       }
 
+      // Validate Ichidan: reject voiced te-form (で/だ)
+      // Ichidan verb te-form is ALWAYS 連用形+て, never 連用形+で
+      // で/だ te-form only occurs with Godan verbs after onbin (読んで, 泳いだ)
+      // Pattern: 付けで → should be 付け(NOUN)+で(PARTICLE), not 付ける+で
+      // Pattern: 食べだ is INVALID, 食べた is correct
+      if (ending.verb_type == VerbType::Ichidan && !aux_chain.empty()) {
+        const std::string& first_aux = aux_chain.back();  // First matched aux
+        bool is_voiced_aux = (utf8::equalsAny(first_aux, {"で", "だ"}) ||
+                              utf8::startsWith(first_aux, "で") ||
+                              utf8::startsWith(first_aux, "だ"));
+        if (is_voiced_aux) {
+          continue;  // Ichidan requires unvoiced aux (て/た), skip voiced で/だ
+        }
+      }
+
       // Validate Ichidan: reject stems that would create irregular verb base forms
       // くる (来る) is Kuru verb, not Ichidan. Stem く + る = くる is INVALID.
       // する is Suru verb, not Ichidan. Stem す + る = する is INVALID.

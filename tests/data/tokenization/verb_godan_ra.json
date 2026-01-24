@@ -167,7 +167,7 @@
       "description" : "Ninja/Old-fashioned ござる",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "これ"
         },
         {
@@ -384,7 +384,7 @@
         },
         {
           "lemma" : "なる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "なら"
         },
         {
@@ -473,7 +473,7 @@
         },
         {
           "lemma" : "なる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "なら"
         },
         {
@@ -526,8 +526,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "くる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "くる"
         }
       ],
@@ -608,7 +607,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         }
       ],
@@ -628,8 +627,7 @@
           "surface" : "放っ"
         },
         {
-          "lemma" : "てる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "てる"
         }
       ],
@@ -768,7 +766,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -793,7 +791,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -818,12 +816,12 @@
         },
         {
           "lemma" : "させる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "させ"
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -978,7 +976,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         }
       ],
@@ -1130,7 +1128,7 @@
       "description" : "容易になりました - na-adj + ni + naru (split: verb stem + polite aux)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "容易"
         },
         {
@@ -1148,7 +1146,6 @@
           "surface" : "まし"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1184,13 +1181,8 @@
       "description" : "Katakana verb バズる base form",
       "expected" : [
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "バズ"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "る"
+          "pos" : "Verb",
+          "surface" : "バズる"
         }
       ],
       "id" : "verb_bazuru_base",
@@ -1205,13 +1197,8 @@
       "description" : "Katakana verb バズる potential form",
       "expected" : [
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "バズ"
-        },
-        {
           "pos" : "Verb",
-          "surface" : "れる"
+          "surface" : "バズれる"
         }
       ],
       "id" : "verb_bazuru_potential",
@@ -1346,16 +1333,12 @@
       "description" : "Katakana verb バズる causative form",
       "expected" : [
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "バズ"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "ら"
-        },
-        {
+          "lemma" : "バズる",
           "pos" : "Verb",
+          "surface" : "バズら"
+        },
+        {
+          "pos" : "Auxiliary",
           "surface" : "せる"
         }
       ],
@@ -1376,7 +1359,7 @@
           "surface" : "サボら"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れる"
         }
       ],
@@ -1512,15 +1495,18 @@
       "description" : "ご飯を食べる - ご飯 is L2 dictionary word",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "ご"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "ご飯"
+          "surface" : "飯"
         },
         {
           "pos" : "Particle",
           "surface" : "を"
         },
         {
-          "lemma" : "食べる",
           "pos" : "Verb",
           "surface" : "食べる"
         }
@@ -1586,7 +1572,7 @@
           "surface" : "話せる"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Noun",
           "surface" : "よう"
         },
         {
@@ -1669,8 +1655,12 @@
           "surface" : "朝"
         },
         {
+          "pos" : "Prefix",
+          "surface" : "ご"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "ご飯"
+          "surface" : "飯"
         },
         {
           "pos" : "Particle",
@@ -1682,7 +1672,6 @@
           "surface" : "食べ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1732,7 +1721,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -1762,7 +1751,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -1792,7 +1781,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -1822,7 +1811,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {

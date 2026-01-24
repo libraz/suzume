@@ -233,6 +233,13 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
             // Only for 3+ char forms to avoid te-form fragments (食べ+て, 捨て)
             // Short E-row forms are handled by the 1-2 char rule above
             entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
+          } else if (utf8::endsWithAny(entry.surface, {"か"sv, "が"sv, "さ"sv,
+                     "た"sv, "な"sv, "ば"sv, "ま"sv, "ら"sv, "わ"sv}) &&
+                     entry.surface.size() > core::kTwoJapaneseCharBytes) {
+            // Godan verb mizenkei endings (A-row hiragana)
+            // e.g., サボら from サボる → サボら + れる (passive) should work
+            // Only for 3+ char forms to avoid conflicts with short words
+            entry.extended_pos = core::ExtendedPOS::VerbMizenkei;
           } else {
             // Default: shuushikei (dictionary form or other forms)
             entry.extended_pos = core::ExtendedPOS::VerbShuushikei;

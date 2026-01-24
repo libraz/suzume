@@ -87,6 +87,15 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
       continue;
     }
 
+    // Skip verb + ます auxiliary patterns for MeCab-compatible split
+    // e.g., 申し上げます → 申し上げ + ます
+    if (utf8::endsWith(surface, "ます") ||
+        utf8::endsWith(surface, "ました") ||
+        utf8::endsWith(surface, "ません") ||
+        utf8::endsWith(surface, "ましょう")) {
+      continue;
+    }
+
     // Use inflection analyzer to get potential base forms
     auto inflection_candidates = inflection.analyze(surface);
 
@@ -218,6 +227,39 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
 
   // Add emphatic variants (パニくるっ, etc.)
   vh::addEmphaticVariants(candidates, codepoints);
+
+  // Generate katakana sokuonbin (っ) candidates for ta/te-form splitting
+  // E.g., バズった → バズっ (onbin of バズる) + た (auxiliary)
+  //       ググった → ググっ (onbin of ググる) + た (auxiliary)
+  // This allows MeCab-compatible splitting for katakana slang verbs
+  {
+    // Check if hiragana part starts with っ followed by た/て/だ/で
+    if (hira_part.size() >= 6 &&  // っ(3 bytes) + た/て/だ/で(3 bytes) = 6 bytes min
+        hira_part.compare(0, 3, "っ") == 0) {
+      std::string_view second_char(hira_part.data() + 3, 3);
+      if (second_char == "た" || second_char == "て" ||
+          second_char == "だ" || second_char == "で") {
+        // Found katakana + っ + た/て pattern
+        // Generate sokuonbin stem candidate: カタカナ + っ
+        std::string onbin_surface = extractSubstring(codepoints, start_pos, kata_end + 1);
+        std::string kata_part = extractSubstring(codepoints, start_pos, kata_end);
+        std::string base_form = kata_part + "る";  // Assume godan-ra (most common for slang)
+
+        // Negative cost to beat unsplit forms (same as kanji sokuonbin)
+        constexpr float kSokuonbinCost = -0.5F;
+        SUZUME_DEBUG_VERBOSE_BLOCK {
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
+                              << " katakana_sokuonbin lemma=" << base_form
+                              << " cost=" << kSokuonbinCost << "\n";
+        }
+        candidates.push_back(makeVerbCandidate(
+            onbin_surface, start_pos, kata_end + 1, kSokuonbinCost, base_form,
+            dictionary::ConjugationType::GodanRa,
+            true, CandidateOrigin::VerbKatakana, 0.9F, "katakana_sokuonbin",
+            core::ExtendedPOS::VerbOnbinkei));
+      }
+    }
+  }
 
   // Sort by cost
   vh::sortCandidatesByCost(candidates);

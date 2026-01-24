@@ -53,7 +53,7 @@
           "surface" : "で"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         }
       ],
@@ -77,7 +77,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         }
       ],
@@ -183,8 +183,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "しまう",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "しまう"
         }
       ],
@@ -252,7 +251,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {

@@ -45,7 +45,7 @@
         },
         {
           "lemma" : "しまう",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "しまい"
         },
         {
@@ -86,7 +86,7 @@
           "surface" : "食べ"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "込む"
         }
       ],
@@ -127,11 +127,10 @@
         },
         {
           "lemma" : "くる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "き"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -153,7 +152,7 @@
         },
         {
           "lemma" : "終わる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "終わっ"
         },
         {
@@ -177,7 +176,7 @@
           "surface" : "読み"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "続ける"
         }
       ],
@@ -245,7 +244,7 @@
         },
         {
           "lemma" : "だす",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "だし"
         },
         {
@@ -259,7 +258,6 @@
           "surface" : "なかっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -305,7 +303,6 @@
           "surface" : "すぎ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -377,7 +374,7 @@
           "surface" : "わかり"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "あう"
         }
       ],
@@ -609,8 +606,7 @@
           "surface" : "食べ"
         },
         {
-          "lemma" : "始める",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "始める"
         }
       ],
@@ -699,7 +695,7 @@
         },
         {
           "lemma" : "きる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "きっ"
         },
         {

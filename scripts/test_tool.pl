@@ -8,6 +8,8 @@
 #   update <input>           Update test case to match MeCab/Suzume output
 #   update -t <test_id>      Update specific test by ID (e.g., verb_ichidan/5)
 #   add -f <file> <input>    Add new test case to file (rejects duplicates)
+#   delete <input>           Delete test case by input text
+#   delete -t <test_id>      Delete specific test by ID (e.g., verb_ichidan/5)
 #   search <pattern>         Search test cases by regex pattern
 #   failed                   List failed test inputs from /tmp/test.txt
 #   compare <before> <after> Compare two test outputs (improved/regressed)
@@ -208,6 +210,8 @@ Commands:
   update <input>         Find and update test case matching input
   update -t <test_id>    Update specific test by ID
   add -f <file> <input>  Add new test case to file
+  delete <input>         Delete test case by input text
+  delete -t <test_id>    Delete specific test by ID
   search <pattern>       Search test cases by regex pattern
   failed                 List failed test inputs from /tmp/test.txt
   compare <before> <after>  Compare two test outputs (improved/regressed)
@@ -385,19 +389,24 @@ if ($command eq 'show') {
     my ($expected_tokens, $source, $rule) = get_expected_tokens($input);
     my @expected_surfaces = map { $_->{surface} } @$expected_tokens;
 
-    # Get Suzume output
-    my $suzume_surfaces = -x $suzume_cli ? get_suzume_surfaces($suzume_cli, $input) : [];
+    # Get Suzume output (full tokens with POS/lemma)
+    my $suzume_tokens = -x $suzume_cli ? get_suzume_tokens($suzume_cli, $input) : [];
+    my @suzume_surfaces = map { $_->{surface} } @$suzume_tokens;
 
     # Check if test exists
     my $found = find_test_by_input($input);
 
     # Compute diff classification (compare expected vs suzume)
-    my $match = (join('|', @expected_surfaces) eq join('|', @$suzume_surfaces));
+    my $surface_match = (join('|', @expected_surfaces) eq join('|', @suzume_surfaces));
+    my $full_match = $surface_match && tokens_match($expected_tokens, $suzume_tokens);
     my $diff_type = 'match';
     my @diff_indices;
-    if (!$match && @$suzume_surfaces) {
+    my @pos_diffs;
+    my @lemma_diffs;
+
+    if (!$surface_match && @suzume_surfaces) {
         my $e_count = scalar @expected_surfaces;
-        my $s_count = scalar @$suzume_surfaces;
+        my $s_count = scalar @suzume_surfaces;
         if ($s_count < $e_count) {
             $diff_type = 'under-split';
         } elsif ($s_count > $e_count) {
@@ -407,7 +416,24 @@ if ($command eq 'show') {
         }
         my $max = $e_count > $s_count ? $e_count : $s_count;
         for my $i (0 .. $max - 1) {
-            push @diff_indices, $i if (($expected_surfaces[$i] // '') ne ($suzume_surfaces->[$i] // ''));
+            push @diff_indices, $i if (($expected_surfaces[$i] // '') ne ($suzume_surfaces[$i] // ''));
+        }
+    } elsif ($surface_match && !$full_match) {
+        # Surface matches but POS/lemma differs
+        $diff_type = 'pos-lemma';
+        for my $i (0 .. $#$expected_tokens) {
+            my $e = $expected_tokens->[$i];
+            my $s = $suzume_tokens->[$i];
+            my $e_pos = normalize_pos($e->{pos} // '');
+            my $s_pos = normalize_pos($s->{pos} // '');
+            my $e_lemma = $e->{lemma} // $e->{surface};
+            my $s_lemma = $s->{lemma} // $s->{surface};
+            if ($e_pos ne $s_pos) {
+                push @pos_diffs, { idx => $i, surface => $e->{surface}, expected => $e_pos, suzume => $s_pos };
+            }
+            if ($e_lemma ne $s_lemma) {
+                push @lemma_diffs, { idx => $i, surface => $e->{surface}, expected => $e_lemma, suzume => $s_lemma };
+            }
         }
     }
 
@@ -424,10 +450,10 @@ if ($command eq 'show') {
     # Brief mode: compact one-line format
     if ($brief) {
         print "Expected: ", join(' ', @expected_surfaces), "\n";
-        print "Suzume:   ", join(' ', @$suzume_surfaces), "\n" if @$suzume_surfaces;
-        if ($match) {
+        print "Suzume:   ", join(' ', @suzume_surfaces), "\n" if @suzume_surfaces;
+        if ($full_match) {
             print "${GREEN}✓ Match${RESET}";
-        } elsif (@$suzume_surfaces) {
+        } elsif (@suzume_surfaces) {
             print "${RED}✗ \U$diff_type${RESET}";
         }
         print "  [${CYAN}$found->{basename}/$found->{case}{id}${RESET}]" if $found;
@@ -444,26 +470,33 @@ if ($command eq 'show') {
     # Build colored output
     my %diff_set = map { $_ => 1 } @diff_indices;
     my @exp_parts = map { $diff_set{$_} ? "${YELLOW}$expected_surfaces[$_]${RESET}" : $expected_surfaces[$_] } 0 .. $#expected_surfaces;
-    my @suz_parts = map { $diff_set{$_} ? "${RED}$suzume_surfaces->[$_]${RESET}" : $suzume_surfaces->[$_] } 0 .. $#$suzume_surfaces;
+    my @suz_parts = map { $diff_set{$_} ? "${RED}$suzume_surfaces[$_]${RESET}" : $suzume_surfaces[$_] } 0 .. $#suzume_surfaces;
 
     print "Expected: ", join(' ', @exp_parts), "\n";
-    print "Suzume:   ", (@$suzume_surfaces ? join(' ', @suz_parts) : "${YELLOW}(not available)${RESET}"), "\n";
+    print "Suzume:   ", (@suzume_surfaces ? join(' ', @suz_parts) : "${YELLOW}(not available)${RESET}"), "\n";
     print "─" x 60, "\n";
 
     # Diff classification
-    if ($match) {
+    if ($full_match) {
         print "${GREEN}✓ Suzume matches Expected${RESET}\n";
-    } elsif (@$suzume_surfaces) {
+    } elsif (@suzume_surfaces) {
         my %type_labels = (
             'under-split' => "${CYAN}[UNDER-SPLIT]${RESET} Suzume merged too much",
             'over-split'  => "${CYAN}[OVER-SPLIT]${RESET} Suzume split too much",
             'boundary'    => "${CYAN}[BOUNDARY]${RESET} Different token boundaries",
+            'pos-lemma'   => "${CYAN}[POS/LEMMA]${RESET} Surface matches, POS or lemma differs",
         );
         print "${RED}✗ $type_labels{$diff_type}${RESET}\n";
         for my $i (@diff_indices) {
             my $e = $expected_surfaces[$i] // '(none)';
-            my $s = $suzume_surfaces->[$i] // '(none)';
+            my $s = $suzume_surfaces[$i] // '(none)';
             print "  [$i] ${YELLOW}Expected='$e'${RESET} vs ${RED}Suzume='$s'${RESET}\n";
+        }
+        for my $d (@pos_diffs) {
+            print "  [$d->{idx}] '$d->{surface}' POS: ${YELLOW}$d->{expected}${RESET} vs ${RED}$d->{suzume}${RESET}\n";
+        }
+        for my $d (@lemma_diffs) {
+            print "  [$d->{idx}] '$d->{surface}' lemma: ${YELLOW}$d->{expected}${RESET} vs ${RED}$d->{suzume}${RESET}\n";
         }
     }
 
@@ -609,6 +642,40 @@ if ($command eq 'add') {
     save_json($path, $data);
     my $idx = scalar(@{$data->{$cases_key}}) - 1;
     print "\n✓ Added as $test_file/$idx\n";
+    exit 0;
+}
+
+if ($command eq 'delete') {
+    my $found;
+
+    if ($test_id) {
+        $found = find_test_by_id($test_id);
+        die "Test not found: $test_id\n" unless $found;
+    } elsif ($input) {
+        $found = find_test_by_input($input);
+        die "No test found for input: $input\n" unless $found;
+    } else {
+        die "Usage: $0 delete <input> or $0 delete -t <test_id>\n";
+    }
+
+    my $case = $found->{case};
+    my $case_id = $case->{id} // $found->{index};
+
+    print "Deleting: $found->{basename}/$case_id\n";
+    print "Input: $case->{input}\n";
+    print "Expected: ", join(' ', map { $_->{surface} } @{$case->{expected} // []}), "\n";
+
+    if ($dry_run) {
+        print "\n[DRY-RUN] No changes made.\n";
+        exit 0;
+    }
+
+    # Remove the case
+    my $cases_key = exists $found->{data}{cases} ? 'cases' : 'test_cases';
+    splice @{$found->{data}{$cases_key}}, $found->{index}, 1;
+
+    save_json($found->{file}, $found->{data});
+    print "\n✓ Deleted $found->{basename}/$case_id\n";
     exit 0;
 }
 

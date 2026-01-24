@@ -88,7 +88,6 @@
           "surface" : "皮"
         },
         {
-          "lemma" : "ごと",
           "pos" : "Suffix",
           "surface" : "ごと"
         },
@@ -112,7 +111,6 @@
           "surface" : "日"
         },
         {
-          "lemma" : "ごと",
           "pos" : "Suffix",
           "surface" : "ごと"
         },
@@ -218,7 +216,7 @@
           "surface" : "あり"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Suffix",
           "surface" : "がち"
         },
         {
@@ -247,7 +245,7 @@
           "surface" : "なり"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Suffix",
           "surface" : "がち"
         }
       ],
@@ -268,7 +266,7 @@
           "surface" : "忘れ"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Suffix",
           "surface" : "がち"
         },
         {
@@ -292,7 +290,7 @@
           "surface" : "遅れ"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Suffix",
           "surface" : "がち"
         },
         {

@@ -116,7 +116,6 @@
           "surface" : "尊"
         },
         {
-          "lemma" : "すぎる",
           "pos" : "Verb",
           "surface" : "すぎる"
         }
@@ -136,7 +135,6 @@
           "surface" : "高"
         },
         {
-          "lemma" : "すぎる",
           "pos" : "Verb",
           "surface" : "すぎる"
         }
@@ -216,7 +214,6 @@
           "surface" : "高"
         },
         {
-          "lemma" : "すぎる",
           "pos" : "Verb",
           "surface" : "すぎる"
         }
@@ -252,7 +249,7 @@
       "description" : "シンプルすぎる should have lemma シンプルすぎる, not シンプルる",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "シンプル"
         },
         {
@@ -273,7 +270,7 @@
       "description" : "ハードすぎる - different katakana word + sugiru",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "ハード"
         },
         {
@@ -293,7 +290,7 @@
       "description" : "シンプルすぎない - katakana + sugiru negative form",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "シンプル"
         },
         {
@@ -331,7 +328,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "シンプル"
         },
         {

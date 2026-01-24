@@ -9,8 +9,7 @@
           "surface" : "し"
         },
         {
-          "lemma" : "てる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "てる"
         }
       ],
@@ -30,11 +29,10 @@
         },
         {
           "lemma" : "てる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "て"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -139,7 +137,11 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "姉さん"
+          "surface" : "姉"
+        },
+        {
+          "pos" : "Suffix",
+          "surface" : "さん"
         }
       ],
       "id" : "honorific_onesan_kanji",

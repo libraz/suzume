@@ -308,7 +308,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -336,7 +336,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -364,7 +364,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -396,7 +396,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -448,7 +448,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -476,7 +476,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -504,7 +504,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -532,7 +532,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -564,7 +564,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -592,12 +592,12 @@
         },
         {
           "lemma" : "させる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "させ"
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -625,7 +625,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -653,7 +653,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -681,7 +681,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -707,12 +707,12 @@
         },
         {
           "lemma" : "せる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "せ"
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -738,11 +738,10 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -764,7 +763,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -796,7 +795,7 @@
         },
         {
           "lemma" : "なさる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "なさい"
         }
       ],
@@ -817,7 +816,7 @@
         },
         {
           "lemma" : "なさる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "なさい"
         }
       ],
@@ -838,8 +837,7 @@
           "surface" : "見"
         },
         {
-          "lemma" : "とく",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "とく"
         }
       ],
@@ -861,11 +859,10 @@
         },
         {
           "lemma" : "とく",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "とい"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -888,7 +885,7 @@
         },
         {
           "lemma" : "とく",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "とい"
         },
         {
@@ -913,8 +910,7 @@
           "surface" : "食べ"
         },
         {
-          "lemma" : "とく",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "とく"
         }
       ],
@@ -935,8 +931,7 @@
           "surface" : "読ん"
         },
         {
-          "lemma" : "どく",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "どく"
         }
       ],
@@ -958,7 +953,7 @@
         },
         {
           "lemma" : "どく",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "どい"
         },
         {
@@ -983,8 +978,7 @@
           "surface" : "やっ"
         },
         {
-          "lemma" : "とく",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "とく"
         }
       ],
@@ -1005,8 +999,7 @@
           "surface" : "書い"
         },
         {
-          "lemma" : "とく",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "とく"
         }
       ],
@@ -1119,11 +1112,10 @@
         },
         {
           "lemma" : "くる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "き"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1229,8 +1221,16 @@
       "description" : "そう should be Adverb, not Verb",
       "expected" : [
         {
-          "pos" : "Filler",
-          "surface" : "そうですね"
+          "pos" : "Adjective",
+          "surface" : "そう"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "です"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ね"
         }
       ],
       "id" : "adverb_sou",
@@ -1385,8 +1385,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         },
         {
@@ -1403,12 +1402,10 @@
           "surface" : "し"
         },
         {
-          "lemma" : "そう",
           "pos" : "Auxiliary",
           "surface" : "そう"
         },
         {
-          "lemma" : "です",
           "pos" : "Auxiliary",
           "surface" : "です"
         }

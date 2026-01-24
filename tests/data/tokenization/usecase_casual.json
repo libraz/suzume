@@ -78,7 +78,7 @@
       "description" : "Surprise expression - MeCab-compatible verb+た split",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "まじ"
         },
         {
@@ -128,7 +128,7 @@
       "description" : "Contraction てる - MeCab splits 何+し+てる",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "何"
         },
         {
@@ -137,8 +137,7 @@
           "surface" : "し"
         },
         {
-          "lemma" : "てる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "てる"
         }
       ],
@@ -159,11 +158,10 @@
         },
         {
           "lemma" : "ちゃう",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "ちゃっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -185,7 +183,7 @@
           "surface" : "買っ"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "とく"
         },
         {
@@ -304,7 +302,7 @@
       "description" : "Casual reaction",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "まじ"
         },
         {
@@ -327,7 +325,7 @@
       "description" : "Question post with で particle",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "これ"
         },
         {
@@ -352,7 +350,7 @@
           "surface" : "知っ"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "てる"
         },
         {
@@ -374,7 +372,7 @@
       "description" : "Recommendation post - マジで is ADV (seriously/really)",
       "expected" : [
         {
-          "pos" : "Adnominal",
+          "pos" : "Determiner",
           "surface" : "この"
         },
         {
@@ -484,7 +482,7 @@
         },
         {
           "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "い"
         },
         {
@@ -516,7 +514,7 @@
         },
         {
           "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "い"
         },
         {
@@ -686,8 +684,7 @@
           "surface" : "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "いる"
         },
         {
@@ -700,7 +697,6 @@
           "surface" : "壊れ"
         },
         {
-          "lemma" : "ない",
           "pos" : "Auxiliary",
           "surface" : "ない"
         }
@@ -764,7 +760,7 @@
           "surface" : "し"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "てる"
         }
       ],
@@ -788,11 +784,10 @@
         },
         {
           "lemma" : "てる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "て"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -821,7 +816,7 @@
         },
         {
           "lemma" : "てる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "て"
         },
         {
@@ -856,7 +851,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "く"
         }
       ],
@@ -888,7 +883,7 @@
       "description" : "Colloquial adjective やばい",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "これ"
         },
         {

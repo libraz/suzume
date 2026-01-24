@@ -257,7 +257,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -327,11 +327,10 @@
         },
         {
           "lemma" : "もらう",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "もらっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -797,7 +796,7 @@
           "surface" : "つか"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れる"
         }
       ],
@@ -833,8 +832,7 @@
           "surface" : "し"
         },
         {
-          "lemma" : "てる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "てる"
         }
       ],
@@ -855,7 +853,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -881,7 +879,7 @@
         },
         {
           "lemma" : "られる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られ"
         },
         {
@@ -908,7 +906,7 @@
         },
         {
           "lemma" : "れる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "れ"
         },
         {
@@ -1000,7 +998,7 @@
           "surface" : "い"
         },
         {
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "られる"
         }
       ],

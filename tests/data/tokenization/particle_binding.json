@@ -287,7 +287,7 @@
           "surface" : "なら"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "大丈夫"
         }
       ],
@@ -574,7 +574,7 @@
       "description" : "無意識に (unconsciously)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "無意識"
         },
         {
@@ -677,10 +677,15 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "毎日電車"
+          "surface" : "毎日"
         },
         {
-          "pos" : "Particle",
+          "pos" : "Noun",
+          "surface" : "電車"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
           "surface" : "で"
         },
         {
@@ -863,7 +868,6 @@
           "surface" : "買っ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         },
@@ -894,11 +898,10 @@
         },
         {
           "lemma" : "しまう",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "しまっ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -1020,17 +1023,12 @@
           "surface" : "も"
         },
         {
-          "lemma" : "うつ",
-          "pos" : "Verb",
-          "surface" : "うっ"
+          "pos" : "Auxiliary",
+          "surface" : "う"
         },
         {
           "pos" : "Particle",
-          "surface" : "て"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "ば"
+          "surface" : "ってば"
         }
       ],
       "id" : "tteba_emphatic_particle",
@@ -1044,18 +1042,12 @@
       "description" : "ったら topic/exclamation particle",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "あな"
+          "pos" : "Pronoun",
+          "surface" : "あなた"
         },
         {
-          "lemma" : "たつ",
-          "pos" : "Verb",
-          "surface" : "たっ"
-        },
-        {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "たら"
+          "pos" : "Particle",
+          "surface" : "ったら"
         }
       ],
       "id" : "ttara_topic_particle",
@@ -1136,17 +1128,13 @@
           "surface" : "し"
         },
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "バズ"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "って"
+          "lemma" : "バズる",
+          "pos" : "Verb",
+          "surface" : "バズっ"
         },
         {
           "pos" : "Auxiliary",
-          "surface" : "る"
+          "surface" : "てる"
         }
       ],
       "id" : "particle_shi_phrase",
@@ -1162,7 +1150,7 @@
       "description" : "いかがでしょうか should contain いかが as single token",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "いかが"
         },
         {

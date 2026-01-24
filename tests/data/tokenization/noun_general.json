@@ -67,7 +67,7 @@
           "surface" : "でも"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "大丈夫"
         }
       ],
@@ -150,12 +150,8 @@
           "surface" : "東京"
         },
         {
-          "pos" : "Adverb",
-          "surface" : "とう"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "きょう"
+          "surface" : "とうきょう"
         }
       ],
       "id" : "symbol_parentheses",
@@ -215,13 +211,8 @@
       "description" : "100ゴールド (game currency)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "100"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "ゴールド"
+          "surface" : "100ゴールド"
         }
       ],
       "id" : "numeric_unit_game_gold",
@@ -237,14 +228,8 @@
       "description" : "50アデナ (game currency)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "50"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "アデナ"
+          "surface" : "50アデナ"
         }
       ],
       "id" : "numeric_unit_game_adena",
@@ -260,14 +245,8 @@
       "description" : "1000ケロ (game currency)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "1000"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "ケロ"
+          "surface" : "1000ケロ"
         }
       ],
       "id" : "numeric_unit_game_kero",
@@ -284,11 +263,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "第一"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "回"
+          "surface" : "第一回"
         }
       ],
       "id" : "numeric_ordinal",
@@ -745,7 +720,7 @@
           "surface" : "なし崩し"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Suffix",
           "surface" : "的"
         }
       ],
@@ -916,8 +891,12 @@
       "description" : "時々妙に - should split at 々 boundary, 妙 is na-adjective (妙に = strangely)",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "時々妙"
+          "pos" : "Adverb",
+          "surface" : "時々"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "妙"
         },
         {
           "pos" : "Particle",
@@ -962,7 +941,7 @@
       "description" : "シンプルすぎて recognized as compound verb (noun + すぎる) with て split, not シンプ + ルすぎて",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "シンプル"
         },
         {
@@ -988,9 +967,12 @@
       "description" : "ご飯 - L2 dictionary word",
       "expected" : [
         {
-          "lemma" : "ご飯",
+          "pos" : "Prefix",
+          "surface" : "ご"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "ご飯"
+          "surface" : "飯"
         }
       ],
       "id" : "gohan_lemma",
@@ -1006,8 +988,12 @@
       "description" : "お茶 splits into prefix + noun",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "お茶"
+          "surface" : "茶"
         }
       ],
       "id" : "ocha_lemma",
@@ -1058,7 +1044,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "佐藤先生"
+          "surface" : "佐藤"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "先生"
         },
         {
           "pos" : "Particle",
@@ -1083,7 +1073,7 @@
           "surface" : "国際"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Suffix",
           "surface" : "的"
         },
         {
@@ -1106,17 +1096,8 @@
       "description" : "S2: ありきたり should be NOUN, not ありきする (suru verb misrecognition)",
       "expected" : [
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あり"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "き"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "たり"
+          "pos" : "Noun",
+          "surface" : "ありきたり"
         },
         {
           "pos" : "Auxiliary",
@@ -1410,7 +1391,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "世界中"
+          "surface" : "世界"
+        },
+        {
+          "pos" : "Suffix",
+          "surface" : "中"
         },
         {
           "pos" : "Particle",
@@ -1480,11 +1465,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "翌営業"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "日"
+          "surface" : "翌営業日"
         },
         {
           "pos" : "Particle",

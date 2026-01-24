@@ -26,7 +26,8 @@
       "description" : "よく (adverbial form) - MeCab-compatible lemma is よい",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "lemma" : "よい",
+          "pos" : "Adjective",
           "surface" : "よく"
         },
         {
@@ -110,7 +111,7 @@
         },
         {
           "lemma" : "無い",
-          "pos" : "Auxiliary",
+          "pos" : "Adjective",
           "surface" : "無く"
         }
       ],
