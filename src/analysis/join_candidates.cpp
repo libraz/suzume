@@ -242,7 +242,8 @@ const TeFormAuxiliary kTeFormAuxiliaries[] = {
  */
 inline bool hasAuxiliarySuffix(std::string_view suffix) {
   if (suffix.empty()) return false;
-  return utf8::containsAny(suffix, {"た", "て", "ない", "れ", "ます"});
+  // Note: "ます" excluded for MeCab-compatible split (e.g., 申し上げます → 申し上げ + ます)
+  return utf8::containsAny(suffix, {"た", "て", "ない", "れ"});
 }
 
 }  // namespace
@@ -374,9 +375,48 @@ void addCompoundVerbJoinCandidates(
       }
     }
 
+    // Try V2 renyokei (連用形) match for MeCab-compatible split
+    // e.g., 申し上げます → 申し上げ + ます (match V2 renyokei "上げ", not full "上げます")
+    bool matched_renyokei = false;
+    if (!matched_kanji && !matched_reading) {
+      // Generate V2 renyokei
+      std::string kanji_renyokei = generateKanjiRenyokei(v2_surface, v2_reading, v2_verb.verb_type);
+      std::string hira_renyokei = generateRenyokei(v2_reading, "", v2_verb.verb_type);
+
+      // Try kanji renyokei match
+      if (!kanji_renyokei.empty() &&
+          v2_start_byte + kanji_renyokei.size() <= text.size()) {
+        std::string_view text_at_v2 = text.substr(v2_start_byte, kanji_renyokei.size());
+        if (text_at_v2 == kanji_renyokei) {
+          matched_renyokei = true;
+          matched_len = kanji_renyokei.size();
+          is_renyokei_entry = true;  // Mark as renyokei match
+        }
+      }
+
+      // Try hiragana renyokei match if kanji didn't match
+      if (!matched_renyokei && !hira_renyokei.empty() &&
+          v2_start_byte + hira_renyokei.size() <= text.size()) {
+        std::string_view text_at_v2 = text.substr(v2_start_byte, hira_renyokei.size());
+        if (text_at_v2 == hira_renyokei) {
+          // Skip Ichidan V1 + V2「出る」renyokei (で) match
+          // Ichidan verbs use て for te-form, never で.
+          // E.g., 付けで should be 付け(VERB)+で(PARTICLE), not 付け出る (compound)
+          // But Godan+出る is valid: 飛び出る (飛ぶ→飛び+出る)
+          if (is_ichidan && hira_renyokei == "で") {
+            continue;  // Skip V2「出る」for Ichidan V1
+          }
+          matched_renyokei = true;
+          matched_len = hira_renyokei.size();
+          is_renyokei_entry = true;  // Mark as renyokei match
+        }
+      }
+    }
+
     // Try inflection analysis for inflected V2 forms (e.g., きった, 込んだ, 巡った)
     // Only for base forms (not renyokei entries) to avoid double-matching
-    if (!matched_kanji && !matched_reading && !v2_reading.empty()) {
+    // Skip if already matched via renyokei to prevent aux detection overriding renyokei match
+    if (!matched_kanji && !matched_reading && !matched_renyokei && !v2_reading.empty()) {
       std::string_view base_ending(v2_verb.base_ending);
       // Only try inflection for base forms (ending in る/す/く/う/む/つ/ぶ/ぐ/ぬ or ichidan endings)
       if (utf8::equalsAny(base_ending,
@@ -477,7 +517,7 @@ void addCompoundVerbJoinCandidates(
       }
     }
 
-    if (!matched_kanji && !matched_reading && !matched_inflected) {
+    if (!matched_kanji && !matched_reading && !matched_renyokei && !matched_inflected) {
       continue;
     }
 
@@ -597,10 +637,18 @@ void addCompoundVerbJoinCandidates(
     compound_base += v2_verb.surface;
 
     // Compare with best match and update if this is better
-    // Priority: renyokei exact match > inflection match without aux > inflection with aux
+    // Priority:
+    // 1. Longer renyokei match beats shorter (出し > 出)
+    // 2. Renyokei exact match beats inflection match with aux
+    // 3. Match without aux beats match with aux
     bool should_update = false;
     if (best_match.matched_len == 0) {
       // First valid match
+      should_update = true;
+    } else if (matched_renyokei && best_match.is_renyokei &&
+               matched_len > best_match.matched_len) {
+      // Longer renyokei match beats shorter renyokei match
+      // This makes 出し (6 bytes) beat 出 (3 bytes) for V1+V2 compounds
       should_update = true;
     } else if (is_renyokei_entry && (matched_kanji || matched_reading) &&
                best_match.includes_aux && !best_match.is_renyokei) {
