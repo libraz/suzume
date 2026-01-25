@@ -265,6 +265,10 @@ BigramTable::initTable() {
   // Ensures 言われた → 言わ+れ+た over 言われ+た
   setCell(t, EPOS::AuxPassive, EPOS::AuxTenseTa, cost::kStrongBonus);
 
+  // AuxPassive → AuxDesireTai (れ+たい in passive desiderative) - strong bonus
+  // Ensures 見られたい → 見+られ+たい over 見+られ+た+い
+  setCell(t, EPOS::AuxPassive, EPOS::AuxDesireTai, cost::kStrongBonus);
+
   // AuxNegativeNai → AuxTenseTa (なかっ+た) - strong bonus
   setCell(t, EPOS::AuxNegativeNai, EPOS::AuxTenseTa, cost::kStrongBonus);
 
@@ -343,6 +347,10 @@ BigramTable::initTable() {
   // NounFormal → AuxCopulaDa (はず+だ, つもり+だ, ところ+だ) - moderate bonus
   // Ensures formal noun + だ split over verb candidate (e.g., はずだ as VERB)
   setCell(t, EPOS::NounFormal, EPOS::AuxCopulaDa, cost::kModerateBonus);
+
+  // NounFormal → AuxCopulaDesu (はず+です, つもり+です) - strong bonus
+  // Ensures はずです → はず+です over はず+で+す
+  setCell(t, EPOS::NounFormal, EPOS::AuxCopulaDesu, cost::kStrongBonus);
 
   // NounFormal → AuxNegativeNai (こと+ない) - moderate bonus
   // Ensures こと+ない over こと+な+い (な=AuxCopulaDa連用形)

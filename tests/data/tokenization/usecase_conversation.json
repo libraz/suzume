@@ -919,7 +919,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "東京行き"
+          "surface" : "東京"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "行き"
         },
         {
           "pos" : "Particle",

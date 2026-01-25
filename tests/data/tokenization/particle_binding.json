@@ -574,8 +574,12 @@
       "description" : "無意識に (unconsciously)",
       "expected" : [
         {
-          "pos" : "Adjective",
-          "surface" : "無意識"
+          "pos" : "Prefix",
+          "surface" : "無"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "意識"
         },
         {
           "pos" : "Particle",
@@ -1019,12 +1023,8 @@
       "description" : "ってば emphatic final particle",
       "expected" : [
         {
-          "pos" : "Particle",
-          "surface" : "も"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "う"
+          "pos" : "Adverb",
+          "surface" : "もう"
         },
         {
           "pos" : "Particle",

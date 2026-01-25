@@ -117,6 +117,61 @@ inline std::string generateRenyokei(std::string_view surface,
   return result;
 }
 
+// Te-form euphonic form type for Godan verbs
+enum class TeFormType : uint8_t {
+  Ionbin,      // イ音便 (書く→書い, 泳ぐ→泳い) + て/で
+  Sokuonbin,   // 促音便 (待つ→待っ, 買う→買っ, 帰る→帰っ) + て
+  Hatsuonbin,  // 撥音便 (読む→読ん, 飛ぶ→飛ん, 死ぬ→死ん) + で
+  Renyokei,    // 連用形 (話す→話し) + て
+  Ichidan,     // 一段 (食べる→食べ) + て
+};
+
+// Determine te-form type and suffix from verb ending
+inline TeFormType getTeFormType(std::string_view base_ending) {
+  if (base_ending == "く" || base_ending == "ぐ") return TeFormType::Ionbin;
+  if (base_ending == "つ" || base_ending == "う" || base_ending == "る") return TeFormType::Sokuonbin;
+  if (base_ending == "む" || base_ending == "ぶ" || base_ending == "ぬ") return TeFormType::Hatsuonbin;
+  if (base_ending == "す") return TeFormType::Renyokei;
+  // Default for ichidan
+  return TeFormType::Ichidan;
+}
+
+// Generate te-form euphonic stem (before て/で)
+// Returns: stem and whether it uses で (vs て)
+inline std::pair<std::string, bool> generateTeFormStem(std::string_view surface,
+                                                        std::string_view reading,
+                                                        V2VerbType verb_type,
+                                                        std::string_view base_ending) {
+  std::string_view base = reading.empty() ? surface : reading;
+  if (base.empty() || base.size() < 3) return {"", false};
+
+  if (verb_type == V2VerbType::Ichidan) {
+    // Drop final る (3 bytes in UTF-8)
+    return {std::string(base.substr(0, base.size() - 3)), false};
+  }
+
+  // Godan: generate euphonic form based on verb ending
+  std::string result(base.substr(0, base.size() - 3));
+  TeFormType te_type = getTeFormType(base_ending);
+
+  switch (te_type) {
+    case TeFormType::Ionbin:
+      result += "い";
+      return {result, base_ending == "ぐ"};  // ぐ→いで, く→いて
+    case TeFormType::Sokuonbin:
+      result += "っ";
+      return {result, false};  // っ+て
+    case TeFormType::Hatsuonbin:
+      result += "ん";
+      return {result, true};   // ん+で
+    case TeFormType::Renyokei:
+      result += "し";
+      return {result, false};  // し+て
+    default:
+      return {"", false};
+  }
+}
+
 // Generate kanji renyokei from kanji surface
 inline std::string generateKanjiRenyokei(std::string_view kanji_surface,
                                          std::string_view reading,
@@ -237,13 +292,14 @@ const TeFormAuxiliary kTeFormAuxiliaries[] = {
 
 /**
  * @brief Check if inflection suffix contains auxiliary verb patterns
- * Looks for た/て/ない/れ/ます patterns that indicate complete inflected forms
+ * Looks for た/て/で/ない/れ patterns that indicate complete inflected forms
  * (as opposed to just renyokei endings like し/み)
+ * Note: で is for hatsuonbin te-form (読ん+で, 飛ん+で)
  */
 inline bool hasAuxiliarySuffix(std::string_view suffix) {
   if (suffix.empty()) return false;
   // Note: "ます" excluded for MeCab-compatible split (e.g., 申し上げます → 申し上げ + ます)
-  return utf8::containsAny(suffix, {"た", "て", "ない", "れ"});
+  return utf8::containsAny(suffix, {"た", "て", "で", "ない", "れ"});
 }
 
 }  // namespace
@@ -338,6 +394,8 @@ void addCompoundVerbJoinCandidates(
     bool is_renyokei = false;      // true if matched via renyokei entry
     bool includes_aux = false;     // true if inflection match includes aux suffix
     float confidence = 0.0F;
+    V2VerbType v2_verb_type = V2VerbType::Godan;  // V2 verb type
+    std::string_view v2_base_ending;              // V2 base form ending (む, す, etc.)
   };
   V2Match best_match;
 
@@ -665,6 +723,8 @@ void addCompoundVerbJoinCandidates(
       best_match.compound_base = compound_base;
       best_match.is_renyokei = is_renyokei_entry && (matched_kanji || matched_reading);
       best_match.includes_aux = inflection_includes_aux;
+      best_match.v2_verb_type = v2_verb.verb_type;
+      best_match.v2_base_ending = v2_verb.base_ending;
     }
   }
 
@@ -703,6 +763,40 @@ void addCompoundVerbJoinCandidates(
     lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos),
                     static_cast<uint32_t>(compound_end_pos), core::PartOfSpeech::Verb,
                     final_cost, flags, best_match.compound_base);
+
+    // MeCab compatibility: Generate te-form euphonic stem candidate
+    // This enables MeCab-compatible te-form splitting: 話し合って → 話し合っ|て
+    // Without this, the compound verb te-form (話し合って) would be a single token.
+    auto [te_stem, uses_de] = generateTeFormStem(
+        best_match.compound_base, "", best_match.v2_verb_type, best_match.v2_base_ending);
+    if (!te_stem.empty() && te_stem.size() < compound_surface.size()) {
+      // Check if text actually starts with te_stem
+      std::string_view text_prefix = text.substr(start_byte, te_stem.size());
+      if (text_prefix == te_stem) {
+        // Calculate character position for te-form stem end
+        auto te_stem_decoded = normalize::utf8::decode(te_stem);
+        size_t te_stem_end_pos = start_pos + te_stem_decoded.size();
+
+        if (te_stem_end_pos <= codepoints.size()) {
+          // Determine ExtendedPOS based on te-form type
+          // Note: イ音便/促音便/撥音便 all use VerbOnbinkei
+          auto te_type = getTeFormType(best_match.v2_base_ending);
+          core::ExtendedPOS epos;
+          if (te_type == TeFormType::Renyokei) {
+            epos = core::ExtendedPOS::VerbRenyokei;   // 話し (サ行)
+          } else {
+            epos = core::ExtendedPOS::VerbOnbinkei;   // 書い, 買っ, 読ん, etc.
+          }
+
+          lattice.addEdge(te_stem, static_cast<uint32_t>(start_pos),
+                          static_cast<uint32_t>(te_stem_end_pos), core::PartOfSpeech::Verb,
+                          final_cost, flags, best_match.compound_base,
+                          dictionary::ConjugationType::None, {},
+                          core::CandidateOrigin::Unknown, 0.0F, "compound_te_stem",
+                          epos, "compound_te_stem");
+        }
+      }
+    }
   }
 }
 
@@ -1270,6 +1364,27 @@ void addVerbSuffixNounJoinCandidates(
   // Reject if hiragana ends with な (na-adjective 連体形, not verb renyokei)
   // e.g., 効率的な方 should NOT become a compound noun (it's 効率+的+な+方)
   if (hiragana_end > kanji_end && codepoints[hiragana_end - 1] == U'な') {
+    return;
+  }
+
+  // Reject if hiragana ends with た (past form, not verb renyokei)
+  // e.g., 書いた方 should NOT become a compound noun (it's 書い+た+方)
+  // Correct patterns: 歩き方, 食べ方 (V連用形+方)
+  if (hiragana_end > kanji_end && codepoints[hiragana_end - 1] == U'た') {
+    return;
+  }
+
+  // Reject if hiragana ends with の (genitive particle, not verb renyokei)
+  // e.g., 今後の方針 should NOT become 今後の方 + 針 (it's 今後+の+方針)
+  // の is a case particle, not a verb renyokei ending
+  if (hiragana_end > kanji_end && codepoints[hiragana_end - 1] == U'の') {
+    return;
+  }
+
+  // Reject if hiragana ends with い (i-adjective basic form, not verb renyokei)
+  // e.g., 美しい方 should NOT become a compound noun (it's 美しい + 方[person])
+  // Valid patterns: 読み方, 書き方 (verb renyokei + 方[method])
+  if (hiragana_end > kanji_end && codepoints[hiragana_end - 1] == U'い') {
     return;
   }
 

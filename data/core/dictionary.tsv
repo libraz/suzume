@@ -155,6 +155,13 @@
 かたじけない	ADJECTIVE	I_ADJ
 善い	ADJECTIVE	I_ADJ
 好い	ADJECTIVE	I_ADJ
+無限	ADJECTIVE	NA_ADJ
+無鉄砲	ADJECTIVE	NA_ADJ
+不可能	ADJECTIVE	NA_ADJ
+まじ	ADJECTIVE	NA_ADJ
+幸い	ADJECTIVE	NA_ADJ
+やばい	ADJECTIVE	I_ADJ
+すごい	ADJECTIVE	I_ADJ
 つめたい	ADJECTIVE	I_ADJ
 よく	ADVERB
 
@@ -216,7 +223,6 @@
 ヌルッと	ADVERB
 
 # --- Colloquial/Slang adverbs ---
-ガチで	ADVERB
 がちで	ADVERB
 死ぬほど	ADVERB
 びみょーに	ADVERB
@@ -283,9 +289,14 @@
 次第に	ADVERB
 一気に	ADVERB
 堂々と	ADVERB
-幸い	ADVERB
 大変	ADVERB
 おいで	ADVERB
+こう	ADVERB
+どう	ADVERB
+もう	ADVERB
+ちょっと	ADVERB
+もう少し	ADVERB
+後で	ADVERB
 俄然	ADVERB
 
 # =============================================================================
@@ -307,6 +318,26 @@
 こもり	VERB	GODAN_RA
 サボる	VERB	GODAN_RA
 見つかる	VERB	GODAN_RA
+よる	VERB	GODAN_RA
+いらっしゃる	VERB	GODAN_RA
+なさる	VERB	GODAN_RA
+おっしゃる	VERB	GODAN_RA
+あなどる	VERB	GODAN_RA
+狩る	VERB	GODAN_RA
+走る	VERB	GODAN_RA
+知る	VERB	GODAN_RA
+切る	VERB	GODAN_RA
+取る	VERB	GODAN_RA
+乗る	VERB	GODAN_RA
+入る	VERB	GODAN_RA
+作る	VERB	GODAN_RA
+売る	VERB	GODAN_RA
+帰る	VERB	GODAN_RA
+送る	VERB	GODAN_RA
+怒る	VERB	GODAN_RA
+困る	VERB	GODAN_RA
+座る	VERB	GODAN_RA
+始まる	VERB	GODAN_RA
 怒鳴る	VERB	GODAN_RA
 # B65: 詰まる - moved to L1 for conjugation expansion
 
@@ -316,6 +347,23 @@
 しまう	VERB	GODAN_WA
 願い	VERB	GODAN_WA
 やる	VERB	GODAN_WA
+うかがう	VERB	GODAN_WA
+買う	VERB	GODAN_WA
+飼う	VERB	GODAN_WA
+行う	VERB	GODAN_WA
+思う	VERB	GODAN_WA
+使う	VERB	GODAN_WA
+会う	VERB	GODAN_WA
+合う	VERB	GODAN_WA
+違う	VERB	GODAN_WA
+払う	VERB	GODAN_WA
+笑う	VERB	GODAN_WA
+歌う	VERB	GODAN_WA
+追う	VERB	GODAN_WA
+誘う	VERB	GODAN_WA
+救う	VERB	GODAN_WA
+吸う	VERB	GODAN_WA
+問う	VERB	GODAN_WA
 逢う	VERB	GODAN_WA
 見出す	VERB	GODAN_SA
 
@@ -349,6 +397,7 @@
 起こす	VERB	GODAN_SA
 愛す	VERB	GODAN_SA
 いたす	VERB	GODAN_SA
+引っ越す	VERB	GODAN_SA
 戻す	VERB	GODAN_SA
 # 伸ばす	VERB	のばす	0.3	GODAN_SA
 # 濡らす	VERB	ぬらす	0.3	GODAN_SA
@@ -386,7 +435,9 @@
 すぎる	VERB	ICHIDAN
 行く	VERB	GODAN_KA
 おく	VERB	GODAN_KA
+もがく	VERB	GODAN_KA
 いただく	VERB	GODAN_KA
+たたずむ	VERB	GODAN_MA
 こむ	VERB	GODAN_MA
 見つける	VERB	ICHIDAN
 でる	VERB	ICHIDAN
@@ -394,6 +445,14 @@
 たべる	VERB	ICHIDAN
 出かける	VERB	ICHIDAN
 バレる	VERB	ICHIDAN
+待つ	VERB	GODAN_TA
+立つ	VERB	GODAN_TA
+勝つ	VERB	GODAN_TA
+打つ	VERB	GODAN_TA
+育つ	VERB	GODAN_TA
+経つ	VERB	GODAN_TA
+建つ	VERB	GODAN_TA
+持つ	VERB	GODAN_TA
 諦める	VERB	ICHIDAN
 
 # =============================================================================
@@ -601,6 +660,10 @@ Wi-Fi	NOUN
 すもも	NOUN
 もも	NOUN
 がお	NOUN
+非公開	NOUN
+ガチ	NOUN
+何時	NOUN
+ため	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -622,6 +685,7 @@ Wi-Fi	NOUN
 力	SUFFIX
 ら	SUFFIX
 がち	SUFFIX
+ごろ	SUFFIX
 度	SUFFIX
 
 # --- Plural suffixes ---
@@ -725,6 +789,7 @@ Wi-Fi	NOUN
 さようなら	INTERJECTION
 こんばんは	INTERJECTION
 何だ	INTERJECTION
+ああ	INTERJECTION
 こんにちは	INTERJECTION
 
 # =============================================================================

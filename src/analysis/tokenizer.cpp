@@ -319,11 +319,17 @@ void Tokenizer::addUnknownCandidates(
     if (!skip_penalty &&
         (candidate.pos == core::PartOfSpeech::Verb ||
          candidate.pos == core::PartOfSpeech::Adjective)) {
+      // Exception: Don't skip verb candidates ending with ず (adverbialized negatives)
+      // e.g., 思わず, 絶えず - these are lexicalized adverbs from verb + ず
+      bool ends_with_zu = (candidate.surface.size() >= 3 &&
+                           candidate.surface.substr(candidate.surface.size() - 3) == "ず");
       for (const auto& result : dict_results) {
         if (result.entry != nullptr) {
           // Case 1: Dictionary entry is also a verb/adjective
-          if (result.entry->pos == core::PartOfSpeech::Verb ||
-              result.entry->pos == core::PartOfSpeech::Adjective) {
+          // But allow ず-ending candidates (adverbialized forms)
+          if ((result.entry->pos == core::PartOfSpeech::Verb ||
+               result.entry->pos == core::PartOfSpeech::Adjective) &&
+              !ends_with_zu) {
             skip_penalty = true;
             skip_reason = "dict_has_verb_adj";
             break;

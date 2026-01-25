@@ -500,7 +500,7 @@
       "description" : "しんちょうに (carefully - hiragana) - MeCab-compatible lemma",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "しんちょう"
         },
         {
@@ -540,7 +540,7 @@
       "description" : "しずかに (quietly - hiragana) - MeCab-compatible lemma",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "しずか"
         },
         {
@@ -922,7 +922,7 @@
       "description" : "無限に (infinitely)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "無限"
         },
         {

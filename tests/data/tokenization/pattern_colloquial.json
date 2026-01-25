@@ -24,16 +24,7 @@
         {
           "lemma" : "やばい",
           "pos" : "Adjective",
-          "surface" : "やば"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "ー"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "い"
+          "surface" : "やばーい"
         }
       ],
       "id" : "choon_yabai",
@@ -51,12 +42,7 @@
         {
           "lemma" : "かわいい",
           "pos" : "Adjective",
-          "surface" : "かわい"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "ー"
+          "surface" : "かわいー"
         }
       ],
       "id" : "choon_kawaii",
@@ -74,16 +60,11 @@
         {
           "lemma" : "すごい",
           "pos" : "Adjective",
-          "surface" : "すご"
+          "surface" : "すごーい"
         },
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "ー"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "いね"
+          "pos" : "Particle",
+          "surface" : "ね"
         }
       ],
       "id" : "choon_sugoi_sentence",
@@ -101,16 +82,11 @@
         {
           "lemma" : "やばい",
           "pos" : "Adjective",
-          "surface" : "やば"
+          "surface" : "やばーい"
         },
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "ー"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "いよ"
+          "pos" : "Particle",
+          "surface" : "よ"
         }
       ],
       "id" : "choon_yabai_yo",
@@ -128,16 +104,7 @@
         {
           "lemma" : "すごい",
           "pos" : "Adjective",
-          "surface" : "すご"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "ーー"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "い"
+          "surface" : "すごーーい"
         }
       ],
       "id" : "choon_consecutive_sugoi",
@@ -156,12 +123,7 @@
         {
           "lemma" : "かわいい",
           "pos" : "Adjective",
-          "surface" : "かわい"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "ーー"
+          "surface" : "かわいーー"
         }
       ],
       "id" : "choon_consecutive_kawaii",
@@ -320,12 +282,12 @@
       "description" : "Slang phrase ガチでサボる (ガチで as adverb 'seriously')",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "ガチ"
         },
         {
-          "pos" : "Particle",
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
           "surface" : "で"
         },
         {
@@ -465,18 +427,13 @@
       "description" : "ですっ - emphatic sokuon after auxiliary",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "大丈夫"
         },
         {
-          "lemma" : "だ",
+          "lemma" : "です",
           "pos" : "Auxiliary",
-          "surface" : "で"
-        },
-        {
-          "lemma" : "すう",
-          "pos" : "Verb",
-          "surface" : "すっ"
+          "surface" : "ですっ"
         }
       ],
       "id" : "emphatic_sokuon_desu",
@@ -490,13 +447,8 @@
       "description" : "行くっ - emphatic sokuon after verb",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "行"
-        },
-        {
-          "lemma" : "くう",
           "pos" : "Verb",
-          "surface" : "くっ"
+          "surface" : "行くっ"
         }
       ],
       "id" : "emphatic_sokuon_verb",
@@ -510,18 +462,9 @@
       "description" : "ますっっ - multiple emphatic sokuon",
       "expected" : [
         {
-          "pos" : "Interjection",
-          "surface" : "ま"
-        },
-        {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "すっ"
-        },
-        {
-          "lemma" : "く",
+          "lemma" : "ます",
           "pos" : "Auxiliary",
-          "surface" : "っ"
+          "surface" : "ますっっ"
         }
       ],
       "id" : "emphatic_sokuon_multiple",
@@ -584,16 +527,9 @@
       "description" : "すごいいいい - vowel repetition for emphasis",
       "expected" : [
         {
+          "lemma" : "すごい",
           "pos" : "Adjective",
-          "surface" : "すごい"
-        },
-        {
-          "pos" : "Adjective",
-          "surface" : "いい"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "い"
+          "surface" : "すごいいいい"
         }
       ],
       "id" : "vowel_repeat_sugoi",

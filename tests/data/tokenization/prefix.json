@@ -603,9 +603,13 @@
           "surface" : "お"
         },
         {
-          "lemma" : "引き取る",
+          "pos" : "Noun",
+          "surface" : "引き"
+        },
+        {
+          "lemma" : "取る",
           "pos" : "Verb",
-          "surface" : "引き取り"
+          "surface" : "取り"
         }
       ],
       "id" : "o_pickup",
@@ -957,8 +961,12 @@
       "description" : "Non 非 + 公開 (compound word)",
       "expected" : [
         {
+          "pos" : "Prefix",
+          "surface" : "非"
+        },
+        {
           "pos" : "Noun",
-          "surface" : "非公開"
+          "surface" : "公開"
         }
       ],
       "id" : "hi_public",

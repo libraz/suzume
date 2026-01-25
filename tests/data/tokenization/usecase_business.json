@@ -45,8 +45,16 @@
       "description" : "Internal greeting: お疲れ様です",
       "expected" : [
         {
-          "pos" : "Interjection",
-          "surface" : "お疲れ様"
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "疲れ"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "様"
         },
         {
           "pos" : "Auxiliary",
@@ -611,11 +619,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "代表"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "者"
+          "surface" : "代表者"
         },
         {
           "pos" : "Particle",

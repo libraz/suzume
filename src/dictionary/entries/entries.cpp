@@ -131,6 +131,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
 
       // Conjunctive particles (接続助詞)
       particle("て", EPOS::ParticleConj),  // low cost for te-form split
+      particle("で", EPOS::ParticleConj),  // te-form for hatsuonbin verbs (読んで, 飛んで)
       particle("ば", EPOS::ParticleConj),
       particle("たら", EPOS::ParticleConj),
       particle("なら", EPOS::ParticleConj),
@@ -185,9 +186,10 @@ std::vector<DictionaryEntry> getCompoundParticleEntries() {
       // Cause/Means (原因・手段)
       particle("によって", EPOS::ParticleConj),  // beat によっ(verb)+て split
       particle("により", EPOS::ParticleConj),
-      particle("による", EPOS::ParticleConj),
-      particle("によると", EPOS::ParticleConj),
-      particle("によれば", EPOS::ParticleConj),
+      // Note: による removed - grammatically に+よる (格助詞+動詞連体形)
+      // Note: によると removed - MeCab splits as に+よる+と (引用表現)
+      // Note: によれば removed - grammatically に+よれ+ば
+      // These compound particles are better split for grammatical accuracy
 
       // Place/Situation (場所・状況)
       particle("において", EPOS::ParticleConj),  // prevent に+おい(verb)+て split
@@ -331,6 +333,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: なさそう → な(語幹/ガル接続) + さ(名詞化接尾辞) + そう(様態)
       adj("な", "ない", EPOS::AdjStem),
 
+      // Kanji form of ない (無い) - used in formal writing
+      // MeCab: 休むこと無く → 休む + こと + 無く (形容詞連用形)
+      adj("無", "無い", EPOS::AdjStem),
+      adj("無く", "無い", EPOS::AdjRenyokei),
+
       // Honorific prefix お (お待ち, お世話, お嬢様)
       // MeCab: お待ち → お(接頭辞) + 待ち(名詞)
       prefix("お", "お"),
@@ -338,6 +345,22 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Honorific prefix ご (ご確認, ご報告, ご連絡)
       // MeCab: ご確認 → ご(接頭辞) + 確認(名詞)
       prefix("ご", "ご"),
+
+      // Negation prefix 未 (未確認, 未完成, 未解決)
+      // MeCab: 未確認 → 未(接頭辞) + 確認(名詞)
+      prefix("未", "未"),
+
+      // Negation prefix 非 (非公開, 非常識, 非対称)
+      // MeCab: 非公開 → 非(接頭辞) + 公開(名詞)
+      prefix("非", "非"),
+
+      // Negation prefix 不 (不安, 不明, 不可能)
+      // MeCab: 不可能 → 不(接頭辞) + 可能(名詞)
+      prefix("不", "不"),
+
+      // Negation prefix 無 (無料, 無関係, 無意味)
+      // MeCab: 無料 → 無(接頭辞) + 料(名詞)
+      prefix("無", "無"),
 
       // Nominalization suffix さ (高さ, 美しさ, なさ)
       // MeCab: 高さ → 高(語幹) + さ(名詞), なさそう → な + さ + そう

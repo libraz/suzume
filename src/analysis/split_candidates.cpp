@@ -386,6 +386,13 @@ void addNounVerbSplitCandidates(
           final_noun_cost -= 0.2F;
         }
 
+        // Penalty for single-kanji noun + verb split
+        // E.g., 勘+違い should prefer 勘違い (compound noun)
+        // Single-kanji nouns rarely form valid noun+verb compounds
+        if (noun_surface.size() == 3) {  // Single kanji (3 bytes UTF-8)
+          final_noun_cost += 1.5F;
+        }
+
         SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] \"" << noun_surface << "\" + \"" << verb_part
                           << "\": noun_dict=" << noun_in_dict
                           << " verb_dict=" << base_in_dict

@@ -5,6 +5,7 @@
 #include "analysis/bigram_table.h"
 #include "analysis/category_cost.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/types.h"
 #include "core/utf8_constants.h"
 #include "normalize/utf8.h"
@@ -237,6 +238,46 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   if (edge.fromDictionary() && edge.extended_pos == core::ExtendedPOS::AuxConjectureMitai) {
     constexpr float kMitaiDictBonus = -1.0F;
     cost += kMitaiDictBonus;
+  }
+
+  // Bonus for dictionary entries starting with negation prefixes (非/不/無/未)
+  // E.g., 不可能, 非常, 無理, 無限, 無鉄砲 - these are single lexical items
+  // Without this bonus, PREFIX+NOUN split path wins due to strong connection bonus (-2)
+  // Dictionary entries should take precedence over compositional analysis
+  if (edge.fromDictionary() &&
+      (edge.pos == core::PartOfSpeech::Adjective || edge.pos == core::PartOfSpeech::Noun) &&
+      edge.surface.size() >= 6 &&  // At least 2 chars (prefix + something)
+      (edge.surface.compare(0, 3, "非") == 0 ||
+       edge.surface.compare(0, 3, "不") == 0 ||
+       edge.surface.compare(0, 3, "無") == 0 ||
+       edge.surface.compare(0, 3, "未") == 0)) {
+    constexpr float kNegationPrefixDictBonus = -3.0F;
+    cost += kNegationPrefixDictBonus;
+  }
+
+  // Bonus for hiragana+kanji mixed nouns from dictionary (e.g., なし崩し, みじん切り, お茶)
+  // These are idiomatic expressions that should not be split
+  // E.g., なし崩し should not be split as な+し+崩し (AUX+PARTICLE+NOUN)
+  // Requires 3+ chars with both hiragana and kanji
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Noun) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    if (char_len >= 3) {
+      bool has_hiragana = false;
+      bool has_kanji = false;
+      for (char32_t cp : suzume::normalize::utf8::decode(edge.surface)) {
+        if (suzume::kana::isHiraganaCodepoint(cp)) {
+          has_hiragana = true;
+        } else if (suzume::kana::isKanjiCodepoint(cp)) {
+          has_kanji = true;
+        }
+        if (has_hiragana && has_kanji) break;
+      }
+      if (has_hiragana && has_kanji) {
+        // Base bonus -0.5, stronger for longer words
+        constexpr float kMixedNounBonus = -0.5F;
+        cost += kMixedNounBonus;
+      }
+    }
   }
 
   // Bonus for short hiragana verbs from dictionary (e.g., なる, ある, いる, する)
@@ -698,6 +739,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += -4.0F;
   }
 
+  // Surface-based bonus for AdjNaAdj → すぎ pattern
+  // E.g., シンプル+すぎない, 静か+すぎる (na-adjective + sugiru)
+  // NOUN→VERB_連用 has -1 bonus from bigram table, which can beat ADJ_NA path
+  // This helps dictionary ADJ_NA entries beat unknown NOUN candidates
+  if (prev.extended_pos == core::ExtendedPOS::AdjNaAdj &&
+      next.surface.size() >= 6 &&
+      next.surface.compare(0, 6, "すぎ") == 0) {
+    surface_bonus += -1.5F;  // Extra bonus for na-adjective + sugiru
+  }
+
   // Penalty for AuxAppearanceSou (そう) → かも to favor か+も split
   // MeCab splits "そうかもしれない" as そう+か+も+しれ+ない
   // But keeps "雨かも" as 雨+かも (noun + かも)
@@ -727,6 +778,27 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.surface.size() <= 6 &&  // 2 chars or less (6 bytes in UTF-8)
       next.surface == "ん") {
     surface_bonus += 3.0F;  // Strong penalty to avoid this path
+  }
+
+  // Penalty for dictionary verb inflection + ず (classical negative)
+  // E.g., 思わ+ず should be 思わず (lexicalized adverb), not 思わ (dict) + ず (aux)
+  // Dictionary-generated verb forms + ず rarely occur; 〜ず forms are lexicalized
+  if (prev.pos == core::PartOfSpeech::Verb &&
+      prev.fromDictionary() &&
+      next.extended_pos == core::ExtendedPOS::AuxNegativeNu) {
+    surface_bonus += 2.5F;  // Strong penalty to prefer lexicalized form
+  }
+
+  // Penalty for single-kanji noun + dictionary verb renyokei/onbinkei
+  // E.g., 勘+違い should be 勘違い (compound noun), not 勘 (noun) + 違い (dict verb)
+  // Single-kanji nouns rarely form valid noun+verb compounds
+  // Check both dict and non-dict verb candidates that follow dictionary verbs
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      prev.surface.size() == 3 &&  // Single kanji (3 bytes UTF-8)
+      next.pos == core::PartOfSpeech::Verb &&
+      (next.extended_pos == core::ExtendedPOS::VerbRenyokei ||
+       next.extended_pos == core::ExtendedPOS::VerbOnbinkei)) {
+    surface_bonus += 2.0F;  // Strong penalty
   }
 
   // Penalty for single-kanji NOUN → verbal auxiliary patterns
@@ -774,6 +846,59 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.surface == "し" && prev.fromDictionary() &&
       prev.surface != "い" && prev.surface != "で") {
     surface_bonus += -2.0F;  // Strong bonus to prefer 願い+し split
+  }
+
+  // Penalty for kanji+sokuon+kanji NOUN → し(VerbRenyokei) pattern
+  // E.g., 引っ越+し should be 引っ越し (compound verb), not NOUN + suru renyokei
+  // These patterns are usually compound verbs registered in dictionary
+  // The pattern: 漢字+っ+漢字 (kanji + sokuon + kanji) as NOUN → し(する連用形)
+  if (prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface == "し" &&
+      prev.surface.size() >= 9 &&  // At least 3 chars (2 kanji + っ)
+      utf8::contains(prev.surface, "っ")) {
+    // Check if it's kanji+っ+kanji pattern
+    bool has_sokuon_between_kanji = false;
+    std::vector<char32_t> codepoints;
+    for (char32_t cp : suzume::normalize::utf8::decode(prev.surface)) {
+      codepoints.push_back(cp);
+    }
+    for (size_t i = 1; i + 1 < codepoints.size(); ++i) {
+      if (codepoints[i] == U'っ' &&
+          suzume::normalize::isKanjiCodepoint(codepoints[i - 1]) &&
+          suzume::normalize::isKanjiCodepoint(codepoints[i + 1])) {
+        has_sokuon_between_kanji = true;
+        break;
+      }
+    }
+    if (has_sokuon_between_kanji) {
+      surface_bonus += 2.0F;  // Penalty to prefer dictionary compound verb
+    }
+  }
+
+  // Penalty for PART_準体(の) → AUX_断定(で) pattern
+  // This prevents 遅れているので → 遅れ|て|いる|の|で (over-split)
+  // "ので" is a conjunction particle in L1 dictionary and should be 1 token
+  // But "のだ" → の|だ is correct (の+copula だ for emphasis)
+  // Only penalize when next.surface == "で" to preserve の|だ split
+  if (prev.extended_pos == core::ExtendedPOS::ParticleNo &&
+      prev.surface == "の" &&
+      next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+      next.surface == "で") {
+    surface_bonus += 2.0F;  // Penalty to prefer ので as single token
+  }
+
+  // Penalty for negation PREFIX (非/不/無/未) → single-kanji NOUN
+  // E.g., 非常 → 非|常 is wrong (非常 is a single word, not prefix+noun)
+  // E.g., 不可能 → 不|可能 is wrong (不可能 is a single word)
+  // But お|茶, ご|報告 are valid (honorific prefix + noun)
+  // Only penalize negation prefixes followed by single kanji
+  if (prev.extended_pos == core::ExtendedPOS::Prefix &&
+      (prev.surface == "非" || prev.surface == "不" ||
+       prev.surface == "無" || prev.surface == "未") &&
+      next.extended_pos == core::ExtendedPOS::Noun &&
+      next.surface.size() == 3) {  // Single kanji (3 bytes in UTF-8)
+    surface_bonus += 2.5F;  // Strong penalty to prevent this split
   }
 
   float total = base_cost + extended_cost + surface_bonus;

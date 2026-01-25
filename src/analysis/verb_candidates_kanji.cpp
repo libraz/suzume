@@ -529,6 +529,37 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
           }
 
+          // Skip sokuonbin + auxiliary verb patterns (買っとく, 行っちゃう)
+          // For MeCab-compatible split: 買っとく → 買っ + とく
+          // Check if suffix after っ is a registered auxiliary verb (とく, ちゃう, ちまう)
+          bool skip_sokuonbin_aux = false;
+          if (dict_manager && surface.size() >= 9) {  // っ(3) + 2char auxiliary minimum
+            // Find っ position and check if suffix is auxiliary verb in dictionary
+            auto surface_cps = normalize::utf8::decode(surface);
+            for (size_t i = 1; i < surface_cps.size() && !skip_sokuonbin_aux; ++i) {
+              if (surface_cps[i] == U'っ' && i + 1 < surface_cps.size()) {
+                // Get suffix after っ
+                std::vector<char32_t> suffix_cps(surface_cps.begin() + i + 1, surface_cps.end());
+                std::string suffix = normalize::utf8::encode(suffix_cps);
+                // Check if suffix is an auxiliary verb (AuxAspectOku: とく, AuxAspectShimau: ちゃう/ちまう)
+                auto results = dict_manager->lookup(suffix, 0);
+                for (const auto& r : results) {
+                  if (r.entry && r.entry->surface == suffix &&
+                      (r.entry->extended_pos == core::ExtendedPOS::AuxAspectOku ||
+                       r.entry->extended_pos == core::ExtendedPOS::AuxAspectShimau)) {
+                    SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface
+                        << "\" sokuonbin+aux (" << suffix << ")\n");
+                    skip_sokuonbin_aux = true;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+          if (skip_sokuonbin_aux) {
+            continue;  // Skip - let the split (verb sokuonbin + auxiliary) win
+          }
+
           // Lower cost for higher confidence matches
           float base_cost = verb_opts.base_cost_standard + (1.0F - best.confidence) * verb_opts.confidence_cost_scale;
           // MeCab compatibility: Suru verbs should split as noun + する
@@ -1483,9 +1514,9 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     // Check for sokuonbin (っ) pattern
     if (first_hira == U'っ' && kanji_end + 1 < hiragana_end) {
       char32_t next_char = codepoints[kanji_end + 1];
-      // Basic te/ta form patterns (て, た, たら, たり) and ちゃう contraction (ち)
+      // Basic te/ta form patterns (て, た, たら, たり), ちゃう (ち), and とく (と) contractions
       bool is_te_ta_pattern =
-          (next_char == U'て' || next_char == U'た' || next_char == U'ち');
+          (next_char == U'て' || next_char == U'た' || next_char == U'ち' || next_char == U'と');
       if (is_te_ta_pattern) {
         // Determine candidate verb types based on sokuonbin
         // っ-onbin: GodanRa, GodanTa, GodanWa, GodanKa (行く is irregular)
