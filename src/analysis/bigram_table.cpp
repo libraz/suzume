@@ -543,6 +543,10 @@ BigramTable::initTable() {
   // AuxCopulaDa → AuxGozaru (で+ございます) - moderate bonus
   setCell(t, EPOS::AuxCopulaDa, EPOS::AuxGozaru, cost::kModerateBonus);
 
+  // AuxCopulaDa → AuxCopulaDa (で+ある/あれ) - strong bonus for である pattern
+  // MeCab splits である as で(だ連用形) + ある(助動詞), not で(出る連用形) + ある
+  setCell(t, EPOS::AuxCopulaDa, EPOS::AuxCopulaDa, cost::kStrongBonus);
+
   // =========================================================================
   // Appearance/Conjecture connections
   // =========================================================================

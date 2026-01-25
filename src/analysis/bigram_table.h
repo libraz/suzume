@@ -66,18 +66,21 @@ class BigramTable {
 namespace bigram_cost {
 
 // Bonuses (negative values - encourage connection)
-constexpr float kStrongBonus = -1.5F;    // Very strong grammatical connection
-constexpr float kModerateBonus = -1.0F;  // Normal grammatical connection
-constexpr float kMinorBonus = -0.5F;     // Slight preference
+// Design principle: Bonuses should help valid grammatical patterns win over
+// single-token alternatives, but not be so strong that they overwhelm
+// dictionary entries or create false positives.
+constexpr float kStrongBonus = -0.8F;    // Strong grammatical connection
+constexpr float kModerateBonus = -0.5F;  // Normal grammatical connection
+constexpr float kMinorBonus = -0.25F;    // Slight preference
 
 // Neutral
 constexpr float kNeutral = 0.0F;         // No preference
 
 // Penalties (positive values - discourage connection)
-constexpr float kMinorPenalty = 0.5F;    // Slight discouragement
-constexpr float kModeratePenalty = 1.5F; // Moderate discouragement
-constexpr float kStrongPenalty = 2.5F;   // Strong discouragement
-constexpr float kProhibitive = 3.5F;     // Effectively blocked
+constexpr float kMinorPenalty = 0.4F;    // Slight discouragement
+constexpr float kModeratePenalty = 1.0F; // Moderate discouragement
+constexpr float kStrongPenalty = 1.8F;   // Strong discouragement
+constexpr float kProhibitive = 3.0F;     // Effectively blocked
 
 }  // namespace bigram_cost
 

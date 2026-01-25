@@ -586,6 +586,17 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
             SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (toiu_pattern)\n");
           }
         }
+        // Penalty for らしい endings (adj + conjecture auxiliary patterns)
+        // E.g., 美しいらしい → 美しい + らしい, not 美しいらし(adj) + い
+        // 春らしい → 春 + らしい, not 春らし(adj) + い
+        // Must have at least 2 chars before らしい to avoid penalizing standalone らしい
+        if (!is_dict_adjective && surface.size() >= 3 * core::kJapaneseCharBytes) {
+          if (utf8::endsWith(surface, "らしい") || utf8::endsWith(surface, "らしく") ||
+              utf8::endsWith(surface, "らしかっ")) {
+            cost += 1.5F;  // Penalty to promote adj/noun + らしい split
+            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +1.5 (rashii_conjecture)\n");
+          }
+        }
         // Set lemma to base form from inflection analysis (e.g., 使いやすく → 使いやすい)
         candidates.push_back(makeIAdjCandidate(
             surface, start_pos, end_pos, cand.base_form, cost,
@@ -715,7 +726,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       katt_cand.end = cand.end - 1;  // 1 character (た)
       katt_cand.pos = core::PartOfSpeech::Adjective;
       katt_cand.lemma = cand.lemma;  // Same lemma (美しい, etc.)
-      katt_cand.cost = cand.cost + 0.2F;  // Slightly higher cost than full form
+      katt_cand.cost = cand.cost - 0.1F;  // Lower cost to prefer split (MeCab compat)
       katt_cand.has_suffix = true;  // This is a conjugated form (連用タ接続)
       katt_cand.extended_pos = core::ExtendedPOS::AdjKatt;  // For bigram: AdjKatt→AuxTenseTa
 #ifdef SUZUME_DEBUG_INFO

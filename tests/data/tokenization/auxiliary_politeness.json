@@ -288,7 +288,7 @@
       "description" : "これはいくらですか - should have particles",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "これ"
         },
         {
