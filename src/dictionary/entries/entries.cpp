@@ -374,9 +374,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: 論理的な → 論理 + 的 + な (suffix + copula rentaikei)
       suffix("的", "的"),
 
-      // Temporal/extent suffix 中 (一日中, 今日中, 世界中)
-      // MeCab: 一日中 → 一日 + 中 (noun + suffix)
-      suffix("中", "中"),
+      // NOTE: 中 suffix removed - MeCab treats 世界中/一日中 as single NOUN
 
       // Inclusive suffix ごと (皮ごと, 頭ごと)
       // MeCab: 皮ごと → 皮 + ごと (noun + suffix)
@@ -469,9 +467,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("すぎ", "すぎる", EPOS::AuxExcessive),  // renyokei for すぎ+た, すぎ+て
 
       // Completive/Regretful - しまう (完了・遺憾)
-      // MeCab treats しまう as a regular verb, not auxiliary
-      // Complete forms removed - let inflection system handle conjugations
-      // This allows しまった → しまっ + た splitting (MeCab compatible)
+      // MeCab treats しまう as 動詞,非自立 (non-independent verb) → maps to Auxiliary
+      // Use aux() to get POS::Auxiliary for MeCab compatibility
+      aux("しまう", "しまう", EPOS::AuxAspectShimau),
+      aux("しまっ", "しまう", EPOS::AuxAspectShimau),  // te-form/ta-form stem
+      aux("しまい", "しまう", EPOS::AuxAspectShimau),  // negative stem
 
       // Contracted forms: ちゃう/じゃう (completion)
       verb("ちゃう", "ちゃう", EPOS::AuxAspectShimau),
@@ -691,8 +691,8 @@ std::vector<DictionaryEntry> getPronounEntries() {
       pronoun("吾輩", ""),
 
       // Collective pronouns (集合代名詞)
+      // Note: 皆さん is split as 皆+さん for MeCab compatibility
       pronoun("皆", ""),
-      pronoun("皆さん", ""),
       pronoun("みんな", ""),
 
       // Demonstrative - proximal (近称)

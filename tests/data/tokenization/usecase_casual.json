@@ -106,7 +106,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "今日学校"
+          "surface" : "今日"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "学校"
         },
         {
           "lemma" : "行く",
@@ -384,7 +388,7 @@
           "surface" : "店"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "マジ"
         },
         {
@@ -752,7 +756,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "今何"
+          "surface" : "今"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "何"
         },
         {
           "lemma" : "する",

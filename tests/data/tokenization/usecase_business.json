@@ -45,16 +45,8 @@
       "description" : "Internal greeting: お疲れ様です",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "疲れ"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "様"
+          "pos" : "Interjection",
+          "surface" : "お疲れ様"
         },
         {
           "pos" : "Auxiliary",
@@ -339,7 +331,7 @@
       "description" : "Inquiry: いかがでしょうか",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "いかが"
         },
         {
@@ -372,7 +364,7 @@
         },
         {
           "pos" : "Suffix",
-          "surface" : "付け"
+          "surface" : "付"
         },
         {
           "pos" : "Particle",
@@ -706,14 +698,8 @@
           "surface" : "に"
         },
         {
-          "lemma" : "打ち合う",
-          "pos" : "Verb",
-          "surface" : "打ち合わ"
-        },
-        {
-          "lemma" : "せる",
-          "pos" : "Auxiliary",
-          "surface" : "せ"
+          "pos" : "Noun",
+          "surface" : "打ち合わせ"
         }
       ],
       "id" : "schedule_next_week",
@@ -845,16 +831,8 @@
           "surface" : "は"
         },
         {
-          "pos" : "Prefix",
-          "surface" : "翌"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "営業"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "日"
+          "surface" : "翌営業日"
         },
         {
           "pos" : "Particle",
@@ -1805,11 +1783,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "代表"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "者"
+          "surface" : "代表者"
         },
         {
           "pos" : "Particle",

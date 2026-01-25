@@ -569,7 +569,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "毎日電車"
+          "surface" : "毎日"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "電車"
         }
       ],
       "id" : "compound_split_mainichi_densha",
@@ -1009,7 +1013,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "明日雨"
+          "surface" : "明日"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "雨"
         }
       ],
       "id" : "noun_split_works",
@@ -1093,10 +1101,10 @@
       ]
     },
     {
-      "description" : "S2: ありきたり should be NOUN, not ありきする (suru verb misrecognition)",
+      "description" : "ありきたり is a na-adjective",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "ありきたり"
         },
         {
@@ -1391,11 +1399,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "世界"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "中"
+          "surface" : "世界中"
         },
         {
           "pos" : "Particle",
@@ -1418,11 +1422,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "一日"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "中"
+          "surface" : "一日中"
         },
         {
           "pos" : "Verb",
@@ -1441,7 +1441,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "今日学校"
+          "surface" : "今日"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "学校"
         },
         {
           "lemma" : "行く",

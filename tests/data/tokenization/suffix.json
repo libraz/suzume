@@ -136,19 +136,11 @@
       ]
     },
     {
-      "description" : "数ヶ月 should split as number + ヶ月 counter suffix",
+      "description" : "数ヶ月 should stay as one token",
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "数"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "ヶ"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "月"
+          "surface" : "数ヶ月"
         }
       ],
       "id" : "counter_kagetsu",
@@ -159,19 +151,11 @@
       ]
     },
     {
-      "description" : "数ヶ所 should split as number + ヶ所 counter suffix",
+      "description" : "数ヶ所 should stay as one token",
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "数"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "ヶ"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "所"
+          "surface" : "数ヶ所"
         }
       ],
       "id" : "counter_kasho",
@@ -205,11 +189,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "日"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "付け"
+          "surface" : "日付け"
         },
         {
           "pos" : "Particle",

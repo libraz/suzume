@@ -1,1618 +1,1622 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "Error message in technical context",
-      "expected" : [
+      "description": "Error message in technical context",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "ファイル"
+          "pos": "Noun",
+          "surface": "ファイル"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "見つかる",
-          "pos" : "Verb",
-          "surface" : "見つかり"
+          "lemma": "見つかる",
+          "pos": "Verb",
+          "surface": "見つかり"
         },
         {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "ませ"
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ん"
+          "pos": "Auxiliary",
+          "surface": "ん"
         },
         {
-          "lemma" : "です",
-          "pos" : "Auxiliary",
-          "surface" : "でし"
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "tech_doc_error_message",
-      "input" : "ファイルが見つかりませんでした",
-      "tags" : [
+      "id": "tech_doc_error_message",
+      "input": "ファイルが見つかりませんでした",
+      "tags": [
         "technical",
         "documentation"
       ]
     },
     {
-      "description" : "Programming terminology - MeCab互換分割",
-      "expected" : [
+      "description": "Programming terminology - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "変数"
+          "pos": "Noun",
+          "surface": "変数"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Noun",
-          "surface" : "値"
+          "pos": "Noun",
+          "surface": "値"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "代入"
+          "pos": "Noun",
+          "surface": "代入"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "する"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
         }
       ],
-      "id" : "tech_doc_programming_term",
-      "input" : "変数に値を代入する",
-      "tags" : [
+      "id": "tech_doc_programming_term",
+      "input": "変数に値を代入する",
+      "tags": [
         "technical",
         "documentation"
       ]
     },
     {
-      "description" : "Code review comment - MeCab互換分割",
-      "expected" : [
+      "description": "Code review comment - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Determiner",
-          "surface" : "この"
+          "pos": "Determiner",
+          "surface": "この"
         },
         {
-          "pos" : "Noun",
-          "surface" : "関数"
+          "pos": "Noun",
+          "surface": "関数"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "複雑"
+          "pos": "Adjective",
+          "surface": "複雑"
         },
         {
-          "pos" : "Verb",
-          "surface" : "すぎる"
+          "pos": "Verb",
+          "surface": "すぎる"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ので"
+          "pos": "Particle",
+          "surface": "ので"
         },
         {
-          "pos" : "Noun",
-          "surface" : "分割"
+          "pos": "Noun",
+          "surface": "分割"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Auxiliary",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Auxiliary",
+          "surface": "ください"
         }
       ],
-      "id" : "tech_doc_code_review",
-      "input" : "この関数は複雑すぎるので分割してください",
-      "tags" : [
+      "id": "tech_doc_code_review",
+      "input": "この関数は複雑すぎるので分割してください",
+      "tags": [
         "technical",
         "documentation"
       ]
     },
     {
-      "description" : "Documentation specification style",
-      "expected" : [
+      "description": "Documentation specification style",
+      "expected": [
         {
-          "lemma" : "戻る",
-          "pos" : "Verb",
-          "surface" : "戻り"
+          "lemma": "戻る",
+          "pos": "Verb",
+          "surface": "戻り"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "値"
+          "pos": "Suffix",
+          "surface": "値"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "成功"
+          "pos": "Noun",
+          "surface": "成功"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "時"
+          "pos": "Suffix",
+          "surface": "時"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "0"
+          "lemma": "*",
+          "pos": "Noun",
+          "surface": "0"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Verb",
-          "surface" : "返す"
+          "pos": "Verb",
+          "surface": "返す"
         }
       ],
-      "id" : "tech_doc_documentation_spec",
-      "input" : "戻り値は成功時に0を返す",
-      "tags" : [
+      "id": "tech_doc_documentation_spec",
+      "input": "戻り値は成功時に0を返す",
+      "tags": [
         "technical",
         "documentation"
       ]
     },
     {
-      "description" : "API description",
-      "expected" : [
+      "description": "API description",
+      "expected": [
         {
-          "pos" : "Determiner",
-          "surface" : "この"
+          "pos": "Determiner",
+          "surface": "この"
         },
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "API"
+          "lemma": "*",
+          "pos": "Noun",
+          "surface": "API"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "認証"
+          "pos": "Noun",
+          "surface": "認証"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "必要"
+          "pos": "Adjective",
+          "surface": "必要"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "tech_doc_api_description",
-      "input" : "このAPIは認証が必要です",
-      "tags" : [
+      "id": "tech_doc_api_description",
+      "input": "このAPIは認証が必要です",
+      "tags": [
         "technical",
         "documentation"
       ]
     },
     {
-      "description" : "Installation guide - MeCab互換分割",
-      "expected" : [
+      "description": "Installation guide - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "以下"
+          "pos": "Noun",
+          "surface": "以下"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "コマンド"
+          "pos": "Noun",
+          "surface": "コマンド"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "実行"
+          "pos": "Noun",
+          "surface": "実行"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Auxiliary",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Auxiliary",
+          "surface": "ください"
         }
       ],
-      "id" : "tech_doc_install_guide",
-      "input" : "以下のコマンドを実行してください",
-      "tags" : [
+      "id": "tech_doc_install_guide",
+      "input": "以下のコマンドを実行してください",
+      "tags": [
         "technical",
         "documentation"
       ]
     },
     {
-      "description" : "Troubleshooting - MeCab互換分割",
-      "expected" : [
+      "description": "Troubleshooting - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "問題"
+          "pos": "Noun",
+          "surface": "問題"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Noun",
-          "surface" : "解決"
+          "pos": "Noun",
+          "surface": "解決"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         },
         {
-          "pos" : "Noun",
-          "surface" : "場合"
+          "pos": "Noun",
+          "surface": "場合"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Prefix",
-          "surface" : "再"
+          "pos": "Prefix",
+          "surface": "再"
         },
         {
-          "pos" : "Noun",
-          "surface" : "起動"
+          "pos": "Noun",
+          "surface": "起動"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Auxiliary",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Auxiliary",
+          "surface": "ください"
         }
       ],
-      "id" : "tech_doc_troubleshooting",
-      "input" : "問題が解決しない場合は再起動してください",
-      "tags" : [
+      "id": "tech_doc_troubleshooting",
+      "input": "問題が解決しない場合は再起動してください",
+      "tags": [
         "technical",
         "documentation"
       ]
     },
     {
-      "description" : "Configuration instruction - MeCab互換分割",
-      "expected" : [
+      "description": "Configuration instruction - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "設定"
+          "pos": "Noun",
+          "surface": "設定"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ファイル"
+          "pos": "Noun",
+          "surface": "ファイル"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "編集"
+          "pos": "Noun",
+          "surface": "編集"
         },
         {
-          "pos" : "Verb",
-          "surface" : "する"
+          "pos": "Verb",
+          "surface": "する"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "必要"
+          "pos": "Adjective",
+          "surface": "必要"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あり"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "tech_doc_configuration",
-      "input" : "設定ファイルを編集する必要があります",
-      "tags" : [
+      "id": "tech_doc_configuration",
+      "input": "設定ファイルを編集する必要があります",
+      "tags": [
         "technical",
         "documentation"
       ]
     },
     {
-      "description" : "Lost item description; しまった should be auxiliary しまう",
-      "expected" : [
+      "description": "Lost item description; しまった should be auxiliary しまう",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "昨日"
+          "pos": "Noun",
+          "surface": "昨日"
         },
         {
-          "lemma" : "買う",
-          "pos" : "Verb",
-          "surface" : "買っ"
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ばかり"
+          "pos": "Particle",
+          "surface": "ばかり"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "なくす",
-          "pos" : "Verb",
-          "surface" : "なくし"
+          "lemma": "なくす",
+          "pos": "Verb",
+          "surface": "なくし"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "しまう",
-          "pos" : "Auxiliary",
-          "surface" : "しまっ"
+          "lemma": "しまう",
+          "pos": "Auxiliary",
+          "surface": "しまっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "complex_lost_item",
-      "input" : "昨日買ったばかりの本をなくしてしまった",
-      "tags" : [
+      "id": "complex_lost_item",
+      "input": "昨日買ったばかりの本をなくしてしまった",
+      "tags": [
         "complex",
         "auxiliary"
       ]
     },
     {
-      "description" : "Time noun split - yesterday",
-      "expected" : [
+      "description": "Time noun split - yesterday",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "昨日"
+          "pos": "Noun",
+          "surface": "昨日"
         },
         {
-          "lemma" : "買う",
-          "pos" : "Verb",
-          "surface" : "買っ"
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ばかり"
+          "pos": "Particle",
+          "surface": "ばかり"
         }
       ],
-      "id" : "complex_time_noun_verb_split_yesterday",
-      "input" : "昨日買ったばかり",
-      "tags" : [
+      "id": "complex_time_noun_verb_split_yesterday",
+      "input": "昨日買ったばかり",
+      "tags": [
         "complex",
         "regression"
       ]
     },
     {
-      "description" : "Time noun split - today",
-      "expected" : [
+      "description": "Time noun split - today",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "今日"
+          "pos": "Noun",
+          "surface": "今日"
         },
         {
-          "lemma" : "届く",
-          "pos" : "Verb",
-          "surface" : "届い"
+          "lemma": "届く",
+          "pos": "Verb",
+          "surface": "届い"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ばかり"
+          "pos": "Particle",
+          "surface": "ばかり"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "荷物"
+          "pos": "Noun",
+          "surface": "荷物"
         }
       ],
-      "id" : "complex_time_noun_verb_split_today",
-      "input" : "今日届いたばかりの荷物",
-      "tags" : [
+      "id": "complex_time_noun_verb_split_today",
+      "input": "今日届いたばかりの荷物",
+      "tags": [
         "complex",
         "regression"
       ]
     },
     {
-      "description" : "Time noun split - tomorrow (はず is formal noun)",
-      "expected" : [
+      "description": "Time noun split - tomorrow (はず is formal noun)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "明日"
+          "pos": "Noun",
+          "surface": "明日"
         },
         {
-          "pos" : "Verb",
-          "surface" : "届く"
+          "pos": "Verb",
+          "surface": "届く"
         },
         {
-          "pos" : "Noun",
-          "surface" : "はず"
+          "pos": "Noun",
+          "surface": "はず"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "complex_time_noun_verb_split_tomorrow",
-      "input" : "明日届くはずです",
-      "tags" : [
+      "id": "complex_time_noun_verb_split_tomorrow",
+      "input": "明日届くはずです",
+      "tags": [
         "complex",
         "regression"
       ]
     },
     {
-      "description" : "Excuse for being late - MeCab互換分割",
-      "expected" : [
+      "description": "Excuse for being late - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "電車"
+          "pos": "Noun",
+          "surface": "電車"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "遅れる",
-          "pos" : "Verb",
-          "surface" : "遅れ"
+          "lemma": "遅れる",
+          "pos": "Verb",
+          "surface": "遅れ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いる"
+          "pos": "Auxiliary",
+          "surface": "いる"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ので"
+          "pos": "Particle",
+          "surface": "ので"
         },
         {
-          "pos" : "Noun",
-          "surface" : "遅刻"
+          "pos": "Noun",
+          "surface": "遅刻"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "そう"
+          "pos": "Auxiliary",
+          "surface": "そう"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "complex_late_for_work",
-      "input" : "電車が遅れているので遅刻しそうです",
-      "tags" : [
+      "id": "complex_late_for_work",
+      "input": "電車が遅れているので遅刻しそうです",
+      "tags": [
         "complex",
         "suru"
       ]
     },
     {
-      "description" : "Comment about cooking",
-      "expected" : [
+      "description": "Comment about cooking",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼女"
+          "pos": "Pronoun",
+          "surface": "彼女"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "作る",
-          "pos" : "Verb",
-          "surface" : "作っ"
+          "lemma": "作る",
+          "pos": "Verb",
+          "surface": "作っ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Noun",
-          "surface" : "料理"
+          "pos": "Noun",
+          "surface": "料理"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Adverb",
-          "surface" : "とても"
+          "pos": "Adverb",
+          "surface": "とても"
         },
         {
-          "lemma" : "美味しい",
-          "pos" : "Adjective",
-          "surface" : "美味しかっ"
+          "lemma": "美味しい",
+          "pos": "Adjective",
+          "surface": "美味しかっ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "complex_cooking",
-      "input" : "彼女が作った料理はとても美味しかった",
-      "tags" : [
+      "id": "complex_cooking",
+      "input": "彼女が作った料理はとても美味しかった",
+      "tags": [
         "complex"
       ]
     },
     {
-      "description" : "Study abroad plan - MeCab互換分割",
-      "expected" : [
+      "description": "Study abroad plan - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "来年"
+          "pos": "Noun",
+          "surface": "来年"
         },
         {
-          "pos" : "Particle",
-          "surface" : "から"
+          "pos": "Particle",
+          "surface": "から"
         },
         {
-          "pos" : "Noun",
-          "surface" : "留学"
+          "pos": "Noun",
+          "surface": "留学"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "する"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
         },
         {
-          "pos" : "Noun",
-          "surface" : "つもり"
+          "pos": "Noun",
+          "surface": "つもり"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "complex_study_abroad",
-      "input" : "来年から留学するつもりです",
-      "tags" : [
+      "id": "complex_study_abroad",
+      "input": "来年から留学するつもりです",
+      "tags": [
         "complex"
       ]
     },
     {
-      "description" : "Past experience - MeCab互換分割",
-      "expected" : [
+      "description": "Past experience - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "子供"
+          "pos": "Noun",
+          "surface": "子供"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "頃"
+          "pos": "Noun",
+          "surface": "頃"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "よい",
-          "pos" : "Adjective",
-          "surface" : "よく"
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よく"
         },
         {
-          "lemma" : "遊ぶ",
-          "pos" : "Verb",
-          "surface" : "遊ん"
+          "lemma": "遊ぶ",
+          "pos": "Verb",
+          "surface": "遊ん"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "だ"
+          "pos": "Auxiliary",
+          "surface": "だ"
         },
         {
-          "pos" : "Noun",
-          "surface" : "場所"
+          "pos": "Noun",
+          "surface": "場所"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "訪れる",
-          "pos" : "Verb",
-          "surface" : "訪れ"
+          "lemma": "訪れる",
+          "pos": "Verb",
+          "surface": "訪れ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "complex_experience",
-      "input" : "子供の頃によく遊んだ場所を訪れた",
-      "tags" : [
+      "id": "complex_experience",
+      "input": "子供の頃によく遊んだ場所を訪れた",
+      "tags": [
         "complex"
       ]
     },
     {
-      "description" : "Hearsay expression - MeCab互換分割",
-      "expected" : [
+      "description": "Hearsay expression - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼"
+          "surface": "彼",
+          "pos": "Noun"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "surface": "は",
+          "pos": "Particle"
         },
         {
-          "pos" : "Noun",
-          "surface" : "来月結婚"
+          "surface": "来月",
+          "pos": "Noun"
         },
         {
-          "pos" : "Verb",
-          "surface" : "する"
+          "surface": "結婚",
+          "pos": "Noun"
         },
         {
-          "pos" : "Noun",
-          "surface" : "そう"
+          "surface": "する",
+          "pos": "Verb"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "surface": "そう",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "です",
+          "pos": "Auxiliary"
         }
       ],
-      "id" : "complex_hearsay",
-      "input" : "彼は来月結婚するそうです",
-      "tags" : [
+      "id": "complex_hearsay",
+      "input": "彼は来月結婚するそうです",
+      "tags": [
         "complex"
       ]
     },
     {
-      "description" : "Conditional sentence with tara - MeCab互換分割",
-      "expected" : [
+      "description": "Conditional sentence with tara - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "雨"
+          "pos": "Noun",
+          "surface": "雨"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "降る",
-          "pos" : "Verb",
-          "surface" : "降っ"
+          "lemma": "降る",
+          "pos": "Verb",
+          "surface": "降っ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "たら"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
         },
         {
-          "pos" : "Noun",
-          "surface" : "試合"
+          "pos": "Noun",
+          "surface": "試合"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "中止"
+          "pos": "Noun",
+          "surface": "中止"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "なる",
-          "pos" : "Verb",
-          "surface" : "なり"
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なり"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "multi_clause_conditional_tara",
-      "input" : "雨が降ったら、試合は中止になります",
-      "tags" : [
+      "id": "multi_clause_conditional_tara",
+      "input": "雨が降ったら、試合は中止になります",
+      "tags": [
         "multi-clause"
       ]
     },
     {
-      "description" : "Conditional sentence with ba (split: verb stem + polite aux)",
-      "expected" : [
+      "description": "Conditional sentence with ba (split: verb stem + polite aux)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "時間"
+          "pos": "Noun",
+          "surface": "時間"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あれ"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あれ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ば"
+          "pos": "Particle",
+          "surface": "ば"
         },
         {
-          "lemma" : "手伝う",
-          "pos" : "Verb",
-          "surface" : "手伝い"
+          "lemma": "手伝う",
+          "pos": "Verb",
+          "surface": "手伝い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "multi_clause_conditional_ba",
-      "input" : "時間があれば手伝います",
-      "tags" : [
+      "id": "multi_clause_conditional_ba",
+      "input": "時間があれば手伝います",
+      "tags": [
         "multi-clause"
       ]
     },
     {
-      "description" : "Reason clause with kara - single-kanji Ichidan verb + polite auxiliary",
-      "expected" : [
+      "description": "Reason clause with kara - single-kanji Ichidan verb + polite auxiliary",
+      "expected": [
         {
-          "lemma" : "疲れる",
-          "pos" : "Verb",
-          "surface" : "疲れ"
+          "lemma": "疲れる",
+          "pos": "Verb",
+          "surface": "疲れ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Particle",
-          "surface" : "から"
+          "pos": "Particle",
+          "surface": "から"
         },
         {
-          "lemma" : "早い",
-          "pos" : "Adjective",
-          "surface" : "早く"
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
         },
         {
-          "lemma" : "寝る",
-          "pos" : "Verb",
-          "surface" : "寝"
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
         },
         {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "multi_clause_reason_kara",
-      "input" : "疲れたから早く寝ます",
-      "tags" : [
+      "id": "multi_clause_reason_kara",
+      "input": "疲れたから早く寝ます",
+      "tags": [
         "multi-clause"
       ]
     },
     {
-      "description" : "Reason clause with node - suru compound verb with polite aux",
-      "expected" : [
+      "description": "Reason clause with node - suru compound verb with polite aux",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "忙しい"
+          "pos": "Adjective",
+          "surface": "忙しい"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ので"
+          "pos": "Particle",
+          "surface": "ので"
         },
         {
-          "pos" : "Adverb",
-          "surface" : "後で"
+          "pos": "Adverb",
+          "surface": "後で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "連絡"
+          "pos": "Noun",
+          "surface": "連絡"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "multi_clause_reason_node",
-      "input" : "忙しいので後で連絡します",
-      "tags" : [
+      "id": "multi_clause_reason_node",
+      "input": "忙しいので後で連絡します",
+      "tags": [
         "multi-clause",
         "suru_verb"
       ]
     },
     {
-      "description" : "Contrastive clause with kedo",
-      "expected" : [
+      "description": "Contrastive clause with kedo",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "勉強"
+          "pos": "Noun",
+          "surface": "勉強"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Particle",
-          "surface" : "けど"
+          "pos": "Particle",
+          "surface": "けど"
         },
         {
-          "pos" : "Noun",
-          "surface" : "試験"
+          "pos": "Noun",
+          "surface": "試験"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "落ちる",
-          "pos" : "Verb",
-          "surface" : "落ち"
+          "lemma": "落ちる",
+          "pos": "Verb",
+          "surface": "落ち"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "multi_clause_contrast_kedo",
-      "input" : "勉強したけど、試験に落ちた",
-      "tags" : [
+      "id": "multi_clause_contrast_kedo",
+      "input": "勉強したけど、試験に落ちた",
+      "tags": [
         "multi-clause"
       ]
     },
     {
-      "description" : "Contrastive clause with ga",
-      "expected" : [
+      "description": "Contrastive clause with ga",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "高い"
+          "pos": "Adjective",
+          "surface": "高い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Noun",
-          "surface" : "品質"
+          "pos": "Noun",
+          "surface": "品質"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "良い"
+          "pos": "Adjective",
+          "surface": "良い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "multi_clause_contrast_ga",
-      "input" : "高いですが、品質は良いです",
-      "tags" : [
+      "id": "multi_clause_contrast_ga",
+      "input": "高いですが、品質は良いです",
+      "tags": [
         "multi-clause"
       ]
     },
     {
-      "description" : "Simultaneous action with nagara",
-      "expected" : [
+      "description": "Simultaneous action with nagara",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "音楽"
+          "pos": "Noun",
+          "surface": "音楽"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "聴く",
-          "pos" : "Verb",
-          "surface" : "聴き"
+          "lemma": "聴く",
+          "pos": "Verb",
+          "surface": "聴き"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ながら"
+          "pos": "Particle",
+          "surface": "ながら"
         },
         {
-          "pos" : "Noun",
-          "surface" : "勉強"
+          "pos": "Noun",
+          "surface": "勉強"
         },
         {
-          "pos" : "Verb",
-          "surface" : "する"
+          "pos": "Verb",
+          "surface": "する"
         }
       ],
-      "id" : "multi_clause_while_nagara",
-      "input" : "音楽を聴きながら勉強する",
-      "tags" : [
+      "id": "multi_clause_while_nagara",
+      "input": "音楽を聴きながら勉強する",
+      "tags": [
         "multi-clause"
       ]
     },
     {
-      "description" : "Purpose clause with tame",
-      "expected" : [
+      "description": "Purpose clause with tame",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "健康"
+          "pos": "Adjective",
+          "surface": "健康"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ため"
+          "pos": "Noun",
+          "surface": "ため"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Noun",
-          "surface" : "運動"
+          "pos": "Noun",
+          "surface": "運動"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いる"
+          "pos": "Auxiliary",
+          "surface": "いる"
         }
       ],
-      "id" : "multi_clause_purpose_tame",
-      "input" : "健康のために運動している",
-      "tags" : [
+      "id": "multi_clause_purpose_tame",
+      "input": "健康のために運動している",
+      "tags": [
         "multi-clause"
       ]
     },
     {
-      "description" : "Before clause",
-      "expected" : [
+      "description": "Before clause",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "寝る"
+          "pos": "Verb",
+          "surface": "寝る"
         },
         {
-          "pos" : "Noun",
-          "surface" : "前"
+          "pos": "Noun",
+          "surface": "前"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Noun",
-          "surface" : "歯"
+          "pos": "Noun",
+          "surface": "歯"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Verb",
-          "surface" : "磨く"
+          "pos": "Verb",
+          "surface": "磨く"
         }
       ],
-      "id" : "multi_clause_before_mae",
-      "input" : "寝る前に歯を磨く",
-      "tags" : [
+      "id": "multi_clause_before_mae",
+      "input": "寝る前に歯を磨く",
+      "tags": [
         "multi-clause"
       ]
     },
     {
-      "description" : "After clause",
-      "expected" : [
+      "description": "After clause",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "食事"
+          "pos": "Noun",
+          "surface": "食事"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "後"
+          "pos": "Noun",
+          "surface": "後"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "コーヒー"
+          "pos": "Noun",
+          "surface": "コーヒー"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Verb",
-          "surface" : "飲む"
+          "pos": "Verb",
+          "surface": "飲む"
         }
       ],
-      "id" : "multi_clause_after_ato",
-      "input" : "食事の後でコーヒーを飲む",
-      "tags" : [
+      "id": "multi_clause_after_ato",
+      "input": "食事の後でコーヒーを飲む",
+      "tags": [
         "multi-clause"
       ]
     },
     {
-      "description" : "Direct speech quotation - MeCab互換分割",
-      "expected" : [
+      "description": "Direct speech quotation - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼"
+          "pos": "Pronoun",
+          "surface": "彼"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "明日"
+          "pos": "Noun",
+          "surface": "明日"
         },
         {
-          "pos" : "Verb",
-          "surface" : "行く"
+          "pos": "Verb",
+          "surface": "行く"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "lemma" : "言う",
-          "pos" : "Verb",
-          "surface" : "言っ"
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "quotation_direct_speech",
-      "input" : "彼は「明日行く」と言った",
-      "tags" : [
+      "id": "quotation_direct_speech",
+      "input": "彼は「明日行く」と言った",
+      "tags": [
         "quotation"
       ]
     },
     {
-      "description" : "Indirect speech",
-      "expected" : [
+      "description": "Indirect speech",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼女"
+          "pos": "Pronoun",
+          "surface": "彼女"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "来る",
-          "pos" : "Verb",
-          "surface" : "来"
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "pos" : "Verb",
-          "surface" : "思う"
+          "pos": "Verb",
+          "surface": "思う"
         }
       ],
-      "id" : "quotation_indirect_speech",
-      "input" : "彼女が来ないと思う",
-      "tags" : [
+      "id": "quotation_indirect_speech",
+      "input": "彼女が来ないと思う",
+      "tags": [
         "quotation"
       ]
     },
     {
-      "description" : "Embedded question",
-      "expected" : [
+      "description": "Embedded question",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼"
+          "pos": "Pronoun",
+          "surface": "彼"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Verb",
-          "surface" : "来る"
+          "pos": "Verb",
+          "surface": "来る"
         },
         {
-          "pos" : "Particle",
-          "surface" : "か"
+          "pos": "Particle",
+          "surface": "か"
         },
         {
-          "pos" : "Adverb",
-          "surface" : "どう"
+          "pos": "Adverb",
+          "surface": "どう"
         },
         {
-          "pos" : "Particle",
-          "surface" : "か"
+          "pos": "Particle",
+          "surface": "か"
         },
         {
-          "lemma" : "分かる",
-          "pos" : "Verb",
-          "surface" : "分から"
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分から"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "quotation_question_kadouka",
-      "input" : "彼が来るかどうか分からない",
-      "tags" : [
+      "id": "quotation_question_kadouka",
+      "input": "彼が来るかどうか分からない",
+      "tags": [
         "quotation"
       ]
     },
     {
-      "description" : "Naming expression",
-      "expected" : [
+      "description": "Naming expression",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "これ"
+          "pos": "Pronoun",
+          "surface": "これ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "成功"
+          "pos": "Noun",
+          "surface": "成功"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "pos" : "Verb",
-          "surface" : "呼ぶ"
+          "pos": "Verb",
+          "surface": "呼ぶ"
         }
       ],
-      "id" : "quotation_naming",
-      "input" : "これを「成功」と呼ぶ",
-      "tags" : [
+      "id": "quotation_naming",
+      "input": "これを「成功」と呼ぶ",
+      "tags": [
         "quotation"
       ]
     },
     {
-      "description" : "Cooking instruction (みじん切り is a cooking term noun)",
-      "expected" : [
+      "description": "Cooking instruction (みじん切り is a cooking term noun)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "玉ねぎ"
+          "pos": "Noun",
+          "surface": "玉ねぎ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "みじん切り",
-          "pos" : "Noun",
-          "surface" : "みじん切り"
+          "lemma": "みじん切り",
+          "pos": "Noun",
+          "surface": "みじん切り"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Verb",
-          "surface" : "する"
+          "pos": "Verb",
+          "surface": "する"
         }
       ],
-      "id" : "recipe_cooking_instruction",
-      "input" : "玉ねぎをみじん切りにする",
-      "tags" : [
+      "id": "recipe_cooking_instruction",
+      "input": "玉ねぎをみじん切りにする",
+      "tags": [
         "recipe"
       ]
     },
     {
-      "description" : "Cooking time instruction",
-      "expected" : [
+      "description": "Cooking time instruction",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "中火"
+          "pos": "Noun",
+          "surface": "中火"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "5分間"
+          "pos": "Noun",
+          "surface": "5分間"
         },
         {
-          "pos" : "Verb",
-          "surface" : "炒める"
+          "pos": "Verb",
+          "surface": "炒める"
         }
       ],
-      "id" : "recipe_cooking_time",
-      "input" : "中火で5分間炒める",
-      "tags" : [
+      "id": "recipe_cooking_time",
+      "input": "中火で5分間炒める",
+      "tags": [
         "recipe"
       ]
     },
     {
-      "description" : "Seasoning instruction",
-      "expected" : [
+      "description": "Seasoning instruction",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "塩"
+          "pos": "Noun",
+          "surface": "塩"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "pos" : "Noun",
-          "surface" : "胡椒"
+          "pos": "Noun",
+          "surface": "胡椒"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "味"
+          "pos": "Noun",
+          "surface": "味"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Verb",
-          "surface" : "調える"
+          "pos": "Verb",
+          "surface": "調える"
         }
       ],
-      "id" : "recipe_seasoning",
-      "input" : "塩と胡椒で味を調える",
-      "tags" : [
+      "id": "recipe_seasoning",
+      "input": "塩と胡椒で味を調える",
+      "tags": [
         "recipe"
       ]
     },
     {
-      "description" : "Ingredient list",
-      "expected" : [
+      "description": "Ingredient list",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "材料"
+          "pos": "Noun",
+          "surface": "材料"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "卵"
+          "pos": "Noun",
+          "surface": "卵"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "pos" : "Noun",
-          "surface" : "牛乳"
+          "pos": "Noun",
+          "surface": "牛乳"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "pos" : "Noun",
-          "surface" : "砂糖"
+          "pos": "Noun",
+          "surface": "砂糖"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "recipe_ingredient",
-      "input" : "材料は卵と牛乳と砂糖です",
-      "tags" : [
+      "id": "recipe_ingredient",
+      "input": "材料は卵と牛乳と砂糖です",
+      "tags": [
         "recipe"
       ]
     },
     {
-      "description" : "Symptom description",
-      "expected" : [
+      "description": "Symptom description",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "頭"
+          "pos": "Noun",
+          "surface": "頭"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "痛い",
-          "pos" : "Adjective",
-          "surface" : "痛く"
+          "lemma": "痛い",
+          "pos": "Adjective",
+          "surface": "痛く"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Noun",
-          "surface" : "熱"
+          "pos": "Noun",
+          "surface": "熱"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Verb",
-          "surface" : "ある"
+          "pos": "Verb",
+          "surface": "ある"
         }
       ],
-      "id" : "medical_symptom",
-      "input" : "頭が痛くて熱がある",
-      "tags" : [
+      "id": "medical_symptom",
+      "input": "頭が痛くて熱がある",
+      "tags": [
         "medical"
       ]
     },
     {
-      "description" : "Prescription instruction",
-      "expected" : [
+      "description": "Prescription instruction",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "食後"
+          "pos": "Noun",
+          "surface": "食後"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Noun",
-          "surface" : "一錠"
+          "pos": "Noun",
+          "surface": "一錠"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "服用"
+          "pos": "Noun",
+          "surface": "服用"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Auxiliary",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Auxiliary",
+          "surface": "ください"
         }
       ],
-      "id" : "medical_prescription",
-      "input" : "食後に一錠を服用してください",
-      "tags" : [
+      "id": "medical_prescription",
+      "input": "食後に一錠を服用してください",
+      "tags": [
         "medical"
       ]
     },
     {
-      "description" : "Medical consultation",
-      "expected" : [
+      "description": "Medical consultation",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "症状"
+          "pos": "Noun",
+          "surface": "症状"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Verb",
-          "surface" : "続く"
+          "pos": "Verb",
+          "surface": "続く"
         },
         {
-          "pos" : "Noun",
-          "surface" : "よう"
+          "pos": "Noun",
+          "surface": "よう"
         },
         {
-          "lemma" : "です",
-          "pos" : "Auxiliary",
-          "surface" : "でし"
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "たら"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
         },
         {
-          "pos" : "Noun",
-          "surface" : "医師"
+          "pos": "Noun",
+          "surface": "医師"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Noun",
-          "surface" : "相談"
+          "pos": "Noun",
+          "surface": "相談"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Auxiliary",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Auxiliary",
+          "surface": "ください"
         }
       ],
-      "id" : "medical_consultation",
-      "input" : "症状が続くようでしたら医師に相談してください",
-      "tags" : [
+      "id": "medical_consultation",
+      "input": "症状が続くようでしたら医師に相談してください",
+      "tags": [
         "medical"
       ]
     },
     {
-      "description" : "Allergy question (split: verb stem + polite aux)",
-      "expected" : [
+      "description": "Allergy question (split: verb stem + polite aux)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "アレルギー"
+          "pos": "Noun",
+          "surface": "アレルギー"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あり"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
         },
         {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
         },
         {
-          "pos" : "Particle",
-          "surface" : "か"
+          "pos": "Particle",
+          "surface": "か"
         }
       ],
-      "id" : "medical_allergy",
-      "input" : "アレルギーはありますか",
-      "tags" : [
+      "id": "medical_allergy",
+      "input": "アレルギーはありますか",
+      "tags": [
         "medical"
       ]
     }
   ],
-  "version" : "1.0"
+  "version": "1.0"
 }

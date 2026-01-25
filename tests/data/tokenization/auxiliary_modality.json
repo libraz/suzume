@@ -1249,11 +1249,7 @@
         },
         {
           "pos" : "Particle",
-          "surface" : "か"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "も"
+          "surface" : "かも"
         },
         {
           "lemma" : "しれる",

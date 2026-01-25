@@ -388,11 +388,20 @@ BigramTable::initTable() {
   // For idiomatic patterns meaning "certain" or "no doubt"
   setCell(t, EPOS::Noun, EPOS::AuxNegativeNai, cost::kModerateBonus);
 
+  // Noun → AuxAspectIru (驚+い) - moderate penalty
+  // Nouns don't directly connect to いる auxiliary; need particle (彼が+いる)
+  // Prevents 驚+い+た from beating 驚い+た for verb onbin form
+  setCell(t, EPOS::Noun, EPOS::AuxAspectIru, cost::kModeratePenalty);
+
   // NaAdj → AuxCopulaDa (静か+だ) - strong bonus
   setCell(t, EPOS::AdjNaAdj, EPOS::AuxCopulaDa, cost::kStrongBonus);
 
   // NaAdj → AuxCopulaDesu (静か+です) - strong bonus
   setCell(t, EPOS::AdjNaAdj, EPOS::AuxCopulaDesu, cost::kStrongBonus);
+
+  // AuxCopulaDa → Noun (さすがな+人, 静かな+部屋) - strong bonus
+  // Copula な(連体形 of だ) + Noun is the na-adjective attributive pattern
+  setCell(t, EPOS::AuxCopulaDa, EPOS::Noun, cost::kStrongBonus);
 
   // AdjStem → Suffix (な+さ in なさそう) - strong bonus for nominalization
   // This favors な(ADJ stem of ない) + さ(nominalization suffix) over さ(する mizenkei)
@@ -654,6 +663,11 @@ BigramTable::initTable() {
   setCell(t, EPOS::Adverb, EPOS::AdjBasic, cost::kStrongBonus);
   setCell(t, EPOS::Adverb, EPOS::AdjRenyokei, cost::kStrongBonus);
   setCell(t, EPOS::Adverb, EPOS::AdjNaAdj, cost::kStrongBonus);
+  setCell(t, EPOS::Adverb, EPOS::AdjKatt, cost::kStrongBonus);
+
+  // Adverb → AdjStem (さすが+な) - strong penalty
+  // Prevents さすが(ADV)+な(AdjStem of ない); should be ADV+な(AuxCopulaDa連体形)
+  setCell(t, EPOS::Adverb, EPOS::AdjStem, cost::kStrongPenalty);
 
   // Adverb → Verb (たまたま+見つけ, すぐ+食べ) - moderate bonus
   // Adverb modifying verb is natural; prefer dictionary compound over split

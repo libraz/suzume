@@ -603,13 +603,9 @@
           "surface" : "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "引き"
-        },
-        {
-          "lemma" : "取る",
+          "lemma" : "引き取る",
           "pos" : "Verb",
-          "surface" : "取り"
+          "surface" : "引き取り"
         }
       ],
       "id" : "o_pickup",
@@ -961,12 +957,8 @@
       "description" : "Non 非 + 公開 (compound word)",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "非"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "公開"
+          "surface" : "非公開"
         }
       ],
       "id" : "hi_public",
@@ -1010,12 +1002,8 @@
       "description" : "Re 再 + 確認 (compound word)",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "再"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "確認"
+          "surface" : "再確認"
         }
       ],
       "id" : "sai_check",

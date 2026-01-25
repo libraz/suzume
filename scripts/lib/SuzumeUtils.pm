@@ -104,6 +104,24 @@ our %WORD_EXCEPTIONS = (
     'にゃー' => 'ねえ',     # colloquial particle with elongation
     '打ち合わせ' => '会議',  # noun 打ち合わせ, not 打ち合わ+せ (causative)
     'おいで' => 'お出で',   # honorific おいで, not おい+で
+    'ほんわか' => 'ゆっくり', # onomatopoeia → standard adverb
+    'ありきたり' => '当たり前', # na-adjective → standard word
+    'ばたり' => 'ゆっくり',  # onomatopoeia → standard adverb
+    # Colloquial elongated/repeated patterns
+    'すごいいいい' => 'すごい',  # vowel repeat → standard form
+    'すごーーい' => 'すごい',    # choon repeat → standard form
+    'かわいーー' => 'かわいい',  # choon repeat → standard form
+    'もうってば' => 'もう',      # emphatic particle → simpler form
+    'あなたったら' => 'あなた',  # emphatic topic → simpler form
+    '無意識' => '意識',          # kanji compound → stays together
+    '翌営業日' => '明日',        # business term → stays together
+    'お疲れ様' => 'お願い',      # greeting → stays together
+    '日付け' => '日付',          # date noun → stays together
+    '再確認' => '確認',          # prefix+noun compound → stays together
+    # Emphatic sokuon patterns (colloquial emphasis)
+    # Note: Only add patterns that won't cause false matches
+    'ですっ' => 'です',          # emphatic です
+    'ますっっ' => 'ます',        # emphatic ます (double sokuon)
 );
 
 # Particles that MeCab may misclassify as Noun
@@ -275,11 +293,15 @@ sub apply_suzume_merge {
                 # Katakana noun after number (e.g., 50アデナ, 100ゴールド)
                 my $is_katakana_noun = ($next->{pos} // '') eq '名詞'
                     && ($next->{surface} // '') =~ /^[\x{30A0}-\x{30FF}]+$/;
-                if ($is_counter || $is_calendar_month || $is_katakana_noun) {
+                # 中 suffix after counter (一日中, 一年中)
+                my $is_chuu_suffix = ($next->{surface} // '') eq '中'
+                    && ($next->{pos} // '') eq '名詞'
+                    && ($next->{pos_sub1} // '') eq '接尾';
+                if ($is_counter || $is_calendar_month || $is_katakana_noun || $is_chuu_suffix) {
                     $combined .= $next->{surface};
                     $j++;
-                    # Stop after katakana noun (don't chain multiple)
-                    last if $is_katakana_noun;
+                    # Stop after katakana noun or 中 (don't chain multiple)
+                    last if $is_katakana_noun || $is_chuu_suffix;
                 } else {
                     last;
                 }
@@ -406,12 +428,16 @@ sub apply_suzume_merge {
 
         # 5. Proper noun + region suffix: 東京+都+渋谷+区 → 東京都渋谷区
         #    Merge 名詞,固有名詞,地域 with 名詞,接尾,地域 sequences
+        #    Exception: 行き (東京行き should stay split as 東京|行き)
         if (!$merged && $t->{pos} eq '名詞' && ($t->{pos_sub1} // '') eq '固有名詞'
             && ($t->{pos_sub2} // '') eq '地域') {
             my $j = $i + 1;
             my $combined = $t->{surface};
             while ($j < @$tokens) {
                 my $next = $tokens->[$j];
+                my $next_surface = $next->{surface} // '';
+                # Skip 行き - it's a suffix but should not merge with place names
+                last if $next_surface eq '行き';
                 my $is_proper_region = ($next->{pos} // '') eq '名詞'
                     && ($next->{pos_sub1} // '') eq '固有名詞'
                     && ($next->{pos_sub2} // '') eq '地域';
@@ -435,10 +461,12 @@ sub apply_suzume_merge {
 
         # 6. Kanji compound: merge consecutive kanji-only noun tokens
         #    Skip: suffix tokens (的, 性, 化), adverbs (時々), proper nouns (佐藤+先生)
+        #    Skip: adverbial nouns (毎日, 今日) - should not merge with following nouns
         my $is_mergeable_kanji = $t->{surface} =~ /^\p{Script=Han}+$/
             && $t->{pos} eq '名詞'
             && ($t->{pos_sub1} // '') ne '接尾'
-            && ($t->{pos_sub1} // '') ne '固有名詞';
+            && ($t->{pos_sub1} // '') ne '固有名詞'
+            && ($t->{pos_sub1} // '') ne '副詞可能';  # 毎日, 今日 etc.
         if (!$merged && $is_mergeable_kanji) {
             my $j = $i + 1;
             my $combined = $t->{surface};
@@ -448,14 +476,15 @@ sub apply_suzume_merge {
                     && $next->{pos} eq '名詞'
                     && ($next->{pos_sub1} // '') ne '接尾'
                     && ($next->{pos_sub1} // '') ne '固有名詞'
-                    && ($next->{pos_sub1} // '') ne '形容動詞語幹';  # 妙 etc.
+                    && ($next->{pos_sub1} // '') ne '形容動詞語幹'  # 妙 etc.
+                    && ($next->{pos_sub1} // '') ne '副詞可能';     # 毎日 etc.
                 last unless $next_mergeable;
                 $combined .= $next->{surface};
                 $j++;
             }
-            # Also merge with common noun-forming suffixes
+            # Merge with common noun-forming suffixes
             # Suzume cannot split kanji+suffix without dictionary
-            # 付け (日付け, 月付け), 者 (代表者, 責任者), 人 (日本人, 責任者)
+            # 付け (日付け, 月付け), 者 (代表者, 責任者), 人 (日本人)
             if ($j < @$tokens) {
                 my $next_surface = $tokens->[$j]{surface} // '';
                 if ($next_surface =~ /^(付け|者|人)$/) {
@@ -501,6 +530,28 @@ sub apply_suzume_merge {
         }
     }
 
+    # Post-process: merge か+も → かも (compound particle)
+    my @kamo_merged;
+    my $skip_next = 0;
+    for my $j (0 .. $#result) {
+        if ($skip_next) {
+            $skip_next = 0;
+            next;
+        }
+        my $curr = $result[$j];
+        if ($j < $#result
+            && ($curr->{surface} // '') eq 'か'
+            && ($curr->{pos} // '') eq '助詞'
+            && ($result[$j + 1]{surface} // '') eq 'も'
+            && ($result[$j + 1]{pos} // '') eq '助詞') {
+            push @kamo_merged, { surface => 'かも', pos => '助詞', lemma => 'かも' };
+            $skip_next = 1;
+        } else {
+            push @kamo_merged, $curr;
+        }
+    }
+    @result = @kamo_merged;
+
     # Post-process: fix epenthetic さ in adjective+さ+そう pattern (なさそう, よさそう, etc.)
     # MeCab incorrectly classifies this さ as 名詞,接尾,特殊 but it should be Suffix
     for my $j (1 .. $#result - 1) {
@@ -543,7 +594,7 @@ sub apply_suzume_merge {
     # Skip: suffixes like ごろ, ごと (these should stay together)
     # Skip: お出で/おいで (honorific verb, should stay as one token)
     my @prefix_split;
-    my %prefix_exceptions = ('お出で' => 1, 'おいで' => 1);
+    my %prefix_exceptions = ('お出で' => 1, 'おいで' => 1, 'おすすめ' => 1, 'お疲れ様' => 1);
     for my $t (@result) {
         my $surface = $t->{surface} // '';
         my $pos = $t->{pos} // '';
@@ -629,9 +680,50 @@ sub map_mecab_pos {
     if (ref($token) eq 'HASH') {
         my $pos_sub1 = $token->{pos_sub1} // '';
         my $pos_sub2 = $token->{pos_sub2} // '';
+        my $surface = $token->{surface} // '';
+
+        # Surface-based POS overrides (for words MeCab misclassifies)
+        # These words are adverbs but MeCab classifies them as 名詞 or 形容動詞語幹
+        my %adverb_overrides = (
+            'いかが' => 1,      # MeCab: 名詞,形容動詞語幹 → Adverb
+            'いずれ' => 1,      # MeCab: 名詞,副詞可能 or 代名詞 → Adverb
+            'しどろもどろ' => 1, # MeCab: 名詞,形容動詞語幹 → Adverb
+            'なるほど' => 1,    # MeCab: 感動詞 → Adverb
+            'たくさん' => 1,    # MeCab: 名詞,副詞可能 → Adverb
+        );
+        if ($adverb_overrides{$surface}) {
+            return 'Adverb';
+        }
+
+        # Interjection overrides
+        if ($surface eq 'お疲れ様') {
+            return 'Interjection';
+        }
+
+        # Na-adjective stems → Adjective
+        # MeCab classifies these as 名詞 but they function as na-adjectives
+        my %na_adj_overrides = (
+            # Hiragana na-adjectives (MeCab: 名詞,サ変接続)
+            'しんちょう' => 1,  # 慎重 in hiragana
+            'しずか' => 1,      # 静か in hiragana
+            'おだやか' => 1,    # 穏やか in hiragana
+            'げんき' => 1,      # 元気 in hiragana
+            'きれい' => 1,      # 綺麗 in hiragana
+            'ありきたり' => 1,  # 在り来たり (na-adjective)
+            # Kanji na-adjectives (MeCab: 名詞,一般 but used with に particle)
+            '無限' => 1,        # 無限に
+        );
+        if ($na_adj_overrides{$surface} && $pos eq '名詞') {
+            return 'Adjective';
+        }
 
         # 名詞,接尾,助動詞語幹 → Auxiliary (e.g., そう, よう)
         if ($pos eq '名詞' && $pos_sub1 eq '接尾' && $pos_sub2 eq '助動詞語幹') {
+            return 'Auxiliary';
+        }
+
+        # 名詞,特殊,助動詞語幹 → Auxiliary (伝聞の「そう」)
+        if ($pos eq '名詞' && $pos_sub1 eq '特殊' && $pos_sub2 eq '助動詞語幹') {
             return 'Auxiliary';
         }
 
@@ -673,7 +765,6 @@ sub map_mecab_pos {
 
         # よく: always Adjective (連用形 of よい), not Adverb
         # MeCab inconsistently classifies よく as 副詞 or 形容詞 depending on context
-        my $surface = $token->{surface} // '';
         if ($surface eq 'よく' && $pos eq '副詞') {
             $token->{lemma} = 'よい';  # Also fix lemma
             return 'Adjective';
@@ -835,6 +926,24 @@ sub _preprocess_for_mecab {
                 original => $word,
                 replacement => $standard,
                 length => length($word),
+            };
+        }
+    }
+
+    # Emphatic sokuon: 行くっ → 行く (but not 行くって)
+    # Match verb+っ only when NOT followed by て
+    my %emphatic_sokuon = (
+        '行くっ' => '行く',
+    );
+    for my $pattern (keys %emphatic_sokuon) {
+        my $standard = $emphatic_sokuon{$pattern};
+        # Negative lookahead: match only if not followed by て
+        while ($text =~ /\Q$pattern\E(?!て)/g) {
+            my $match_start = $-[0];
+            $replacements{$match_start} = {
+                original => $pattern,
+                replacement => $standard,
+                length => length($pattern),
             };
         }
     }

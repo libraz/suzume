@@ -793,11 +793,13 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // E.g., 勘+違い should be 勘違い (compound noun), not 勘 (noun) + 違い (dict verb)
   // Single-kanji nouns rarely form valid noun+verb compounds
   // Check both dict and non-dict verb candidates that follow dictionary verbs
+  // Exception: し (suru renyokei) is valid for サ変 pattern (得+し, 得する)
   if (prev.pos == core::PartOfSpeech::Noun &&
       prev.surface.size() == 3 &&  // Single kanji (3 bytes UTF-8)
       next.pos == core::PartOfSpeech::Verb &&
       (next.extended_pos == core::ExtendedPOS::VerbRenyokei ||
-       next.extended_pos == core::ExtendedPOS::VerbOnbinkei)) {
+       next.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
+      next.surface != "し") {  // Exclude suru renyokei (サ変動詞パターン)
     surface_bonus += 2.0F;  // Strong penalty
   }
 

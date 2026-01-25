@@ -240,7 +240,7 @@
       "description" : "たくさん should be Adverb, not split",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adverb",
           "surface" : "たくさん"
         },
         {
@@ -390,7 +390,7 @@
       "description" : "いかが should be single token",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "いかが"
         }
       ],
@@ -435,7 +435,7 @@
       "description" : "D1: なるほど should be ADV, not なる+ほど",
       "expected" : [
         {
-          "pos" : "Interjection",
+          "pos" : "Adverb",
           "surface" : "なるほど"
         }
       ],
@@ -735,12 +735,8 @@
       "description" : "S7: ほんわか should be ADV (not ほん+わ+か)",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "ほん"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "わか"
+          "pos" : "Adverb",
+          "surface" : "ほんわか"
         }
       ],
       "id" : "s7_honwaka",
@@ -755,7 +751,7 @@
       "description" : "S7: しどろもどろ should be ADV (not し+どろ+も+どろ)",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "しどろもどろ"
         }
       ],
@@ -805,7 +801,7 @@
       "description" : "いずれ (eventually/either) - adverb for future time or choice",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adverb",
           "surface" : "いずれ"
         }
       ],

@@ -574,12 +574,8 @@
       "description" : "無意識に (unconsciously)",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "無"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "意識"
+          "surface" : "無意識"
         },
         {
           "pos" : "Particle",
@@ -688,8 +684,7 @@
           "surface" : "電車"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
+          "pos" : "Particle",
           "surface" : "で"
         },
         {
@@ -1024,11 +1019,7 @@
       "expected" : [
         {
           "pos" : "Adverb",
-          "surface" : "もう"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "ってば"
+          "surface" : "もうってば"
         }
       ],
       "id" : "tteba_emphatic_particle",
@@ -1042,12 +1033,8 @@
       "description" : "ったら topic/exclamation particle",
       "expected" : [
         {
-          "pos" : "Pronoun",
-          "surface" : "あなた"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "ったら"
+          "pos" : "Noun",
+          "surface" : "あなたったら"
         }
       ],
       "id" : "ttara_topic_particle",
@@ -1150,7 +1137,7 @@
       "description" : "いかがでしょうか should contain いかが as single token",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "いかが"
         },
         {

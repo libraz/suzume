@@ -60,11 +60,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "日"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "付け"
+          "surface" : "日付け"
         },
         {
           "pos" : "Particle",
@@ -86,7 +82,7 @@
         },
         {
           "pos" : "Suffix",
-          "surface" : "付け"
+          "surface" : "付"
         },
         {
           "pos" : "Particle",

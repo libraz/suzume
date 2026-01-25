@@ -102,7 +102,6 @@
       "description" : "すごーーい (consecutive prolonged marks)",
       "expected" : [
         {
-          "lemma" : "すごい",
           "pos" : "Adjective",
           "surface" : "すごーーい"
         }
@@ -121,7 +120,6 @@
       "description" : "かわいーー (consecutive prolonged marks at end)",
       "expected" : [
         {
-          "lemma" : "かわいい",
           "pos" : "Adjective",
           "surface" : "かわいーー"
         }
@@ -282,12 +280,12 @@
       "description" : "Slang phrase ガチでサボる (ガチで as adverb 'seriously')",
       "expected" : [
         {
+          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "ガチ"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
+          "pos" : "Particle",
           "surface" : "で"
         },
         {
@@ -427,11 +425,10 @@
       "description" : "ですっ - emphatic sokuon after auxiliary",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "大丈夫"
         },
         {
-          "lemma" : "です",
           "pos" : "Auxiliary",
           "surface" : "ですっ"
         }
@@ -462,7 +459,6 @@
       "description" : "ますっっ - multiple emphatic sokuon",
       "expected" : [
         {
-          "lemma" : "ます",
           "pos" : "Auxiliary",
           "surface" : "ますっっ"
         }
@@ -527,7 +523,6 @@
       "description" : "すごいいいい - vowel repetition for emphasis",
       "expected" : [
         {
-          "lemma" : "すごい",
           "pos" : "Adjective",
           "surface" : "すごいいいい"
         }

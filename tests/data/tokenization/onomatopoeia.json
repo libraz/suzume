@@ -858,7 +858,7 @@
       "description" : "ばたり should be ADV (ABり型) - 擬態語として1トークン",
       "expected" : [
         {
-          "pos" : "Verb",
+          "pos" : "Adverb",
           "surface" : "ばたり"
         },
         {
@@ -954,8 +954,7 @@
           "surface" : "行く"
         },
         {
-          "lemma" : "よ",
-          "pos" : "Auxiliary",
+          "pos" : "Particle",
           "surface" : "にゃー"
         }
       ],

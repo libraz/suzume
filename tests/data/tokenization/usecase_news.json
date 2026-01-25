@@ -1,1596 +1,1592 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "News announcement pattern - MeCab互換分割",
-      "expected" : [
+      "description": "News announcement pattern - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "政府"
+          "pos": "Noun",
+          "surface": "政府"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "新しい"
+          "pos": "Adjective",
+          "surface": "新しい"
         },
         {
-          "pos" : "Noun",
-          "surface" : "政策"
+          "pos": "Noun",
+          "surface": "政策"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "発表"
+          "pos": "Noun",
+          "surface": "発表"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "news_announcement",
-      "input" : "政府は新しい政策を発表した",
-      "tags" : [
+      "id": "news_announcement",
+      "input": "政府は新しい政策を発表した",
+      "tags": [
         "news"
       ]
     },
     {
-      "description" : "Citation pattern",
-      "expected" : [
+      "description": "Citation pattern",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "関係"
+          "surface": "関係者",
+          "pos": "Noun"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "者"
+          "surface": "に",
+          "pos": "Particle"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "surface": "よる",
+          "pos": "Verb"
         },
         {
-          "pos" : "Verb",
-          "surface" : "よる"
+          "surface": "と",
+          "pos": "Particle"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "surface": "問題",
+          "pos": "Noun"
         },
         {
-          "pos" : "Noun",
-          "surface" : "問題"
+          "surface": "は",
+          "pos": "Particle"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
-        },
-        {
-          "pos" : "Adjective",
-          "surface" : "ない"
+          "surface": "ない",
+          "pos": "Adjective"
         }
       ],
-      "id" : "news_citation",
-      "input" : "関係者によると問題はない",
-      "tags" : [
+      "id": "news_citation",
+      "input": "関係者によると問題はない",
+      "tags": [
         "news"
       ]
     },
     {
-      "description" : "Event description - passive verb 行われた MeCab互換分割",
-      "expected" : [
+      "description": "Event description - passive verb 行われた MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "昨日"
+          "pos": "Noun",
+          "surface": "昨日"
         },
         {
-          "pos" : "Noun",
-          "surface" : "記者会見"
+          "pos": "Noun",
+          "surface": "記者会見"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "行う",
-          "pos" : "Verb",
-          "surface" : "行わ"
+          "lemma": "行う",
+          "pos": "Verb",
+          "surface": "行わ"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
-          "surface" : "れ"
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "news_event",
-      "input" : "昨日、記者会見が行われた",
-      "tags" : [
+      "id": "news_event",
+      "input": "昨日、記者会見が行われた",
+      "tags": [
         "news",
         "passive"
       ]
     },
     {
-      "description" : "Incident report - MeCab互換分割",
-      "expected" : [
+      "description": "Incident report - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "事故"
+          "pos": "Noun",
+          "surface": "事故"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "3人"
+          "pos": "Noun",
+          "surface": "3人"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Noun",
-          "surface" : "負傷"
+          "pos": "Noun",
+          "surface": "負傷"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "news_incident",
-      "input" : "事故で3人が負傷した",
-      "tags" : [
+      "id": "news_incident",
+      "input": "事故で3人が負傷した",
+      "tags": [
         "news"
       ]
     },
     {
-      "description" : "Investigation report - MeCab互換分割",
-      "expected" : [
+      "description": "Investigation report - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "警察"
+          "pos": "Noun",
+          "surface": "警察"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "原因"
+          "pos": "Noun",
+          "surface": "原因"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "調査"
+          "pos": "Noun",
+          "surface": "調査"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いる"
+          "pos": "Auxiliary",
+          "surface": "いる"
         }
       ],
-      "id" : "news_investigation",
-      "input" : "警察は原因を調査している",
-      "tags" : [
+      "id": "news_investigation",
+      "input": "警察は原因を調査している",
+      "tags": [
         "news"
       ]
     },
     {
-      "description" : "Election news - MeCab互換分割",
-      "expected" : [
+      "description": "Election news - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "選挙"
+          "pos": "Noun",
+          "surface": "選挙"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "与党"
+          "pos": "Noun",
+          "surface": "与党"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Noun",
-          "surface" : "過半数"
+          "pos": "Noun",
+          "surface": "過半数"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "獲得"
+          "pos": "Noun",
+          "surface": "獲得"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "news_election",
-      "input" : "選挙で与党が過半数を獲得した",
-      "tags" : [
+      "id": "news_election",
+      "input": "選挙で与党が過半数を獲得した",
+      "tags": [
         "news"
       ]
     },
     {
-      "description" : "Weather forecast with のち (after) as temporal noun",
-      "expected" : [
+      "description": "Weather forecast with のち (after) as temporal noun",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "明日"
+          "pos": "Noun",
+          "surface": "明日"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "晴れ"
+          "pos": "Noun",
+          "surface": "晴れ"
         },
         {
-          "pos" : "Noun",
-          "surface" : "のち"
+          "pos": "Noun",
+          "surface": "のち"
         },
         {
-          "lemma" : "曇る",
-          "pos" : "Verb",
-          "surface" : "曇り"
+          "lemma": "曇る",
+          "pos": "Verb",
+          "surface": "曇り"
         },
         {
-          "lemma" : "です",
-          "pos" : "Auxiliary",
-          "surface" : "でしょ"
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "う"
+          "pos": "Auxiliary",
+          "surface": "う"
         }
       ],
-      "id" : "weather_forecast",
-      "input" : "明日は晴れのち曇りでしょう",
-      "tags" : [
+      "id": "weather_forecast",
+      "input": "明日は晴れのち曇りでしょう",
+      "tags": [
         "weather"
       ]
     },
     {
-      "description" : "Weather warning - MeCab互換分割（大雨警報は複合語として統一）",
-      "expected" : [
+      "description": "Weather warning - MeCab互換分割（大雨警報は複合語として統一）",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "大雨警報"
+          "pos": "Noun",
+          "surface": "大雨警報"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Noun",
-          "surface" : "発令"
+          "pos": "Noun",
+          "surface": "発令"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "さ"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
-          "surface" : "れ"
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
         },
         {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "まし"
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "weather_warning",
-      "input" : "大雨警報が発令されました",
-      "tags" : [
+      "id": "weather_warning",
+      "input": "大雨警報が発令されました",
+      "tags": [
         "weather"
       ]
     },
     {
-      "description" : "Temperature description - MeCab shows 最高気温 as compound and 度 as noun suffix",
-      "expected" : [
+      "description": "Temperature description - MeCab shows 最高気温 as compound and 度 as noun suffix",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "最高気温"
+          "pos": "Noun",
+          "surface": "最高気温"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "30度"
+          "pos": "Noun",
+          "surface": "30度"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "予想"
+          "pos": "Noun",
+          "surface": "予想"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "weather_temperature",
-      "input" : "最高気温は30度の予想です",
-      "tags" : [
+      "id": "weather_temperature",
+      "input": "最高気温は30度の予想です",
+      "tags": [
         "weather"
       ]
     },
     {
-      "description" : "Rain probability",
-      "expected" : [
+      "description": "Rain probability",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "降水確率"
+          "pos": "Noun",
+          "surface": "降水確率"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "60"
+          "lemma": "*",
+          "pos": "Noun",
+          "surface": "60"
         },
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "%"
+          "lemma": "*",
+          "pos": "Noun",
+          "surface": "%"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "weather_rain",
-      "input" : "降水確率は60%です",
-      "tags" : [
+      "id": "weather_rain",
+      "input": "降水確率は60%です",
+      "tags": [
         "weather"
       ]
     },
     {
-      "description" : "Wind information",
-      "expected" : [
+      "description": "Wind information",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "北西"
+          "pos": "Noun",
+          "surface": "北西"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "風"
+          "pos": "Noun",
+          "surface": "風"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "強い",
-          "pos" : "Adjective",
-          "surface" : "強く"
+          "lemma": "強い",
+          "pos": "Adjective",
+          "surface": "強く"
         },
         {
-          "pos" : "Verb",
-          "surface" : "吹く"
+          "pos": "Verb",
+          "surface": "吹く"
         },
         {
-          "lemma" : "です",
-          "pos" : "Auxiliary",
-          "surface" : "でしょ"
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "う"
+          "pos": "Auxiliary",
+          "surface": "う"
         }
       ],
-      "id" : "weather_wind",
-      "input" : "北西の風が強く吹くでしょう",
-      "tags" : [
+      "id": "weather_wind",
+      "input": "北西の風が強く吹くでしょう",
+      "tags": [
         "weather"
       ]
     },
     {
-      "description" : "Game result - MeCab互換分割",
-      "expected" : [
+      "description": "Game result - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "日本"
+          "pos": "Noun",
+          "surface": "日本"
         },
         {
-          "pos" : "Noun",
-          "surface" : "代表"
+          "pos": "Noun",
+          "surface": "代表"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "2"
+          "lemma": "*",
+          "pos": "Noun",
+          "surface": "2"
         },
         {
-          "pos" : "Noun",
-          "surface" : "対"
+          "pos": "Noun",
+          "surface": "対"
         },
         {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "1"
+          "lemma": "*",
+          "pos": "Noun",
+          "surface": "1"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "勝利"
+          "pos": "Noun",
+          "surface": "勝利"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "sports_game_result",
-      "input" : "日本代表が2対1で勝利した",
-      "tags" : [
+      "id": "sports_game_result",
+      "input": "日本代表が2対1で勝利した",
+      "tags": [
         "sports"
       ]
     },
     {
-      "description" : "Player comment - MeCab splits チーム/一丸 and 戦い/たい",
-      "expected" : [
+      "description": "Player comment - MeCab splits チーム/一丸 and 戦い/たい",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "チーム"
+          "pos": "Noun",
+          "surface": "チーム"
         },
         {
-          "pos" : "Noun",
-          "surface" : "一丸"
+          "pos": "Noun",
+          "surface": "一丸"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "lemma" : "なる",
-          "pos" : "Verb",
-          "surface" : "なっ"
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "戦う",
-          "pos" : "Verb",
-          "surface" : "戦い"
+          "lemma": "戦う",
+          "pos": "Verb",
+          "surface": "戦い"
         },
         {
-          "lemma" : "たい",
-          "pos" : "Auxiliary",
-          "surface" : "たい"
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
         }
       ],
-      "id" : "sports_player_comment",
-      "input" : "チーム一丸となって戦いたい",
-      "tags" : [
+      "id": "sports_player_comment",
+      "input": "チーム一丸となって戦いたい",
+      "tags": [
         "sports"
       ]
     },
     {
-      "description" : "Game schedule",
-      "expected" : [
+      "description": "Game schedule",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "試合"
+          "pos": "Noun",
+          "surface": "試合"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "午後"
+          "pos": "Noun",
+          "surface": "午後"
         },
         {
-          "pos" : "Noun",
-          "surface" : "7時"
+          "pos": "Noun",
+          "surface": "7時"
         },
         {
-          "pos" : "Particle",
-          "surface" : "から"
+          "pos": "Particle",
+          "surface": "から"
         },
         {
-          "pos" : "Noun",
-          "surface" : "開始予定"
+          "pos": "Noun",
+          "surface": "開始予定"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "sports_schedule",
-      "input" : "試合は午後7時から開始予定です",
-      "tags" : [
+      "id": "sports_schedule",
+      "input": "試合は午後7時から開始予定です",
+      "tags": [
         "sports"
       ]
     },
     {
-      "description" : "Ranking - いる as verb in progressive",
-      "expected" : [
+      "description": "Ranking - いる as verb in progressive",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "現在"
+          "pos": "Noun",
+          "surface": "現在"
         },
         {
-          "pos" : "Noun",
-          "surface" : "3位"
+          "pos": "Noun",
+          "surface": "3位"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "つける",
-          "pos" : "Verb",
-          "surface" : "つけ"
+          "lemma": "つける",
+          "pos": "Verb",
+          "surface": "つけ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いる"
+          "pos": "Auxiliary",
+          "surface": "いる"
         }
       ],
-      "id" : "sports_ranking",
-      "input" : "現在3位につけている",
-      "tags" : [
+      "id": "sports_ranking",
+      "input": "現在3位につけている",
+      "tags": [
         "sports",
         "progressive"
       ]
     },
     {
-      "description" : "Injury report - MeCab互換分割",
-      "expected" : [
+      "description": "Injury report - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "選手"
+          "pos": "Noun",
+          "surface": "選手"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "怪我"
+          "pos": "Noun",
+          "surface": "怪我"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ため"
+          "pos": "Noun",
+          "surface": "ため"
         },
         {
-          "pos" : "Noun",
-          "surface" : "欠場"
+          "pos": "Noun",
+          "surface": "欠場"
         },
         {
-          "pos" : "Verb",
-          "surface" : "する"
+          "pos": "Verb",
+          "surface": "する"
         }
       ],
-      "id" : "sports_injury",
-      "input" : "選手は怪我のため欠場する",
-      "tags" : [
+      "id": "sports_injury",
+      "input": "選手は怪我のため欠場する",
+      "tags": [
         "sports"
       ]
     },
     {
-      "description" : "Academic hypothesis - MeCab shows 本研究 unified",
-      "expected" : [
+      "description": "Academic hypothesis - MeCab shows 本研究 unified",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "本"
+          "pos": "Prefix",
+          "surface": "本"
         },
         {
-          "pos" : "Noun",
-          "surface" : "研究"
+          "pos": "Noun",
+          "surface": "研究"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "以下"
+          "pos": "Noun",
+          "surface": "以下"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "仮説"
+          "pos": "Noun",
+          "surface": "仮説"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "検証"
+          "pos": "Noun",
+          "surface": "検証"
         },
         {
-          "pos" : "Verb",
-          "surface" : "する"
+          "pos": "Verb",
+          "surface": "する"
         }
       ],
-      "id" : "academic_hypothesis",
-      "input" : "本研究では以下の仮説を検証する",
-      "tags" : [
+      "id": "academic_hypothesis",
+      "input": "本研究では以下の仮説を検証する",
+      "tags": [
         "academic"
       ]
     },
     {
-      "description" : "Research result - MeCab shows られ as verb and 有意な as adjective",
-      "expected" : [
+      "description": "Research result - MeCab shows られ as verb and 有意な as adjective",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "実験"
+          "pos": "Noun",
+          "surface": "実験"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "結果"
+          "pos": "Noun",
+          "surface": "結果"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "有意"
+          "pos": "Adjective",
+          "surface": "有意"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "な"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
         },
         {
-          "pos" : "Noun",
-          "surface" : "差"
+          "pos": "Noun",
+          "surface": "差"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "認める",
-          "pos" : "Verb",
-          "surface" : "認め"
+          "lemma": "認める",
+          "pos": "Verb",
+          "surface": "認め"
         },
         {
-          "lemma" : "られる",
-          "pos" : "Auxiliary",
-          "surface" : "られ"
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "academic_result",
-      "input" : "実験の結果、有意な差が認められた",
-      "tags" : [
+      "id": "academic_result",
+      "input": "実験の結果、有意な差が認められた",
+      "tags": [
         "academic",
         "passive"
       ]
     },
     {
-      "description" : "Conclusion statement",
-      "expected" : [
+      "description": "Conclusion statement",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "以上"
+          "pos": "Noun",
+          "surface": "以上"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "結果"
+          "pos": "Noun",
+          "surface": "結果"
         },
         {
-          "pos" : "Particle",
-          "surface" : "から"
+          "pos": "Particle",
+          "surface": "から"
         },
         {
-          "pos" : "Noun",
-          "surface" : "次"
+          "pos": "Noun",
+          "surface": "次"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "よう"
+          "pos": "Noun",
+          "surface": "よう"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "結論づける",
-          "pos" : "Verb",
-          "surface" : "結論づけ"
+          "lemma": "結論づける",
+          "pos": "Verb",
+          "surface": "結論づけ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "られる"
+          "pos": "Auxiliary",
+          "surface": "られる"
         }
       ],
-      "id" : "academic_conclusion",
-      "input" : "以上の結果から次のように結論づけられる",
-      "tags" : [
+      "id": "academic_conclusion",
+      "input": "以上の結果から次のように結論づけられる",
+      "tags": [
         "academic"
       ]
     },
     {
-      "description" : "Method description - Current suzume unifies compounds",
-      "expected" : [
+      "description": "Method description - Current suzume unifies compounds",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "本"
+          "pos": "Prefix",
+          "surface": "本"
         },
         {
-          "pos" : "Noun",
-          "surface" : "研究"
+          "pos": "Noun",
+          "surface": "研究"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "アンケート"
+          "pos": "Noun",
+          "surface": "アンケート"
         },
         {
-          "pos" : "Noun",
-          "surface" : "調査"
+          "pos": "Noun",
+          "surface": "調査"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "実施"
+          "pos": "Noun",
+          "surface": "実施"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "academic_method",
-      "input" : "本研究ではアンケート調査を実施した",
-      "tags" : [
+      "id": "academic_method",
+      "input": "本研究ではアンケート調査を実施した",
+      "tags": [
         "academic"
       ]
     },
     {
-      "description" : "Reference citation - Current suzume unifies によれば and compounds",
-      "expected" : [
+      "description": "Reference citation - Current suzume unifies によれば and compounds",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "先行研究"
+          "pos": "Noun",
+          "surface": "先行研究"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "よる",
-          "pos" : "Verb",
-          "surface" : "よれ"
+          "lemma": "よる",
+          "pos": "Verb",
+          "surface": "よれ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ば"
+          "pos": "Particle",
+          "surface": "ば"
         },
         {
-          "pos" : "Noun",
-          "surface" : "効果"
+          "pos": "Noun",
+          "surface": "効果"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Noun",
-          "surface" : "確認"
+          "pos": "Noun",
+          "surface": "確認"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "さ"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
-          "surface" : "れ"
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いる"
+          "pos": "Auxiliary",
+          "surface": "いる"
         }
       ],
-      "id" : "academic_reference",
-      "input" : "先行研究によれば効果が確認されている",
-      "tags" : [
+      "id": "academic_reference",
+      "input": "先行研究によれば効果が確認されている",
+      "tags": [
         "academic",
         "compound-particle"
       ]
     },
     {
-      "description" : "Limitation statement",
-      "expected" : [
+      "description": "Limitation statement",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "本"
+          "pos": "Prefix",
+          "surface": "本"
         },
         {
-          "pos" : "Noun",
-          "surface" : "研究"
+          "pos": "Noun",
+          "surface": "研究"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "いくつ"
+          "pos": "Noun",
+          "surface": "いくつ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "か"
+          "pos": "Particle",
+          "surface": "か"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "限界"
+          "pos": "Noun",
+          "surface": "限界"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Verb",
-          "surface" : "ある"
+          "pos": "Verb",
+          "surface": "ある"
         }
       ],
-      "id" : "academic_limitation",
-      "input" : "本研究にはいくつかの限界がある",
-      "tags" : [
+      "id": "academic_limitation",
+      "input": "本研究にはいくつかの限界がある",
+      "tags": [
         "academic"
       ]
     },
     {
-      "description" : "News article style - Current suzume unifies 経済政策",
-      "expected" : [
+      "description": "News article style - Current suzume unifies 経済政策",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "政府"
+          "pos": "Noun",
+          "surface": "政府"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "昨日"
+          "pos": "Noun",
+          "surface": "昨日"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "閣議"
+          "pos": "Noun",
+          "surface": "閣議"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "新しい"
+          "pos": "Adjective",
+          "surface": "新しい"
         },
         {
-          "pos" : "Noun",
-          "surface" : "経済政策"
+          "pos": "Noun",
+          "surface": "経済政策"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "正式"
+          "pos": "Adjective",
+          "surface": "正式"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Noun",
-          "surface" : "決定"
+          "pos": "Noun",
+          "surface": "決定"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "pos" : "Noun",
-          "surface" : "発表"
+          "pos": "Noun",
+          "surface": "発表"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "long_news_article",
-      "input" : "政府は昨日の閣議で、新しい経済政策を正式に決定したと発表した",
-      "tags" : [
+      "id": "long_news_article",
+      "input": "政府は昨日の閣議で、新しい経済政策を正式に決定したと発表した",
+      "tags": [
         "long"
       ]
     },
     {
-      "description" : "Narrative style - Current suzume treats 欠かさ as adjective and 好き as adjective",
-      "expected" : [
+      "description": "Narrative style - Current suzume treats 欠かさ as adjective and 好き as adjective",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼"
+          "pos": "Pronoun",
+          "surface": "彼"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "昔"
+          "pos": "Noun",
+          "surface": "昔"
         },
         {
-          "pos" : "Particle",
-          "surface" : "から"
+          "pos": "Particle",
+          "surface": "から"
         },
         {
-          "pos" : "Noun",
-          "surface" : "音楽"
+          "pos": "Noun",
+          "surface": "音楽"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "好き"
+          "pos": "Adjective",
+          "surface": "好き"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "毎日"
+          "pos": "Noun",
+          "surface": "毎日"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ピアノ"
+          "pos": "Noun",
+          "surface": "ピアノ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "練習"
+          "pos": "Noun",
+          "surface": "練習"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "欠かす",
-          "pos" : "Verb",
-          "surface" : "欠かさ"
+          "lemma": "欠かす",
+          "pos": "Verb",
+          "surface": "欠かさ"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "なかっ"
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "long_narrative",
-      "input" : "彼は昔から音楽が好きで、毎日ピアノの練習を欠かさなかった",
-      "tags" : [
+      "id": "long_narrative",
+      "input": "彼は昔から音楽が好きで、毎日ピアノの練習を欠かさなかった",
+      "tags": [
         "long"
       ]
     },
     {
-      "description" : "Multi-step instructions - Current suzume unifies 起動し and 設定画面",
-      "expected" : [
+      "description": "Multi-step instructions - Current suzume unifies 起動し and 設定画面",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "まず"
+          "pos": "Adverb",
+          "surface": "まず"
         },
         {
-          "pos" : "Noun",
-          "surface" : "電源"
+          "pos": "Noun",
+          "surface": "電源"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ボタン"
+          "pos": "Noun",
+          "surface": "ボタン"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "押す",
-          "pos" : "Verb",
-          "surface" : "押し"
+          "lemma": "押す",
+          "pos": "Verb",
+          "surface": "押し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Noun",
-          "surface" : "起動"
+          "pos": "Noun",
+          "surface": "起動"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Adverb",
-          "surface" : "次に"
+          "pos": "Adverb",
+          "surface": "次に"
         },
         {
-          "pos" : "Noun",
-          "surface" : "設定画面"
+          "pos": "Noun",
+          "surface": "設定画面"
         },
         {
-          "pos" : "Particle",
-          "surface" : "から"
+          "pos": "Particle",
+          "surface": "から"
         },
         {
-          "pos" : "Noun",
-          "surface" : "言語"
+          "pos": "Noun",
+          "surface": "言語"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "選択"
+          "pos": "Noun",
+          "surface": "選択"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Auxiliary",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Auxiliary",
+          "surface": "ください"
         }
       ],
-      "id" : "long_instructions",
-      "input" : "まず電源ボタンを押して起動し、次に設定画面から言語を選択してください",
-      "tags" : [
+      "id": "long_instructions",
+      "input": "まず電源ボタンを押して起動し、次に設定画面から言語を選択してください",
+      "tags": [
         "long"
       ]
     },
     {
-      "description" : "Complex conditional - Current suzume unifies しよう and います",
-      "expected" : [
+      "description": "Complex conditional - Current suzume unifies しよう and います",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "もし"
+          "pos": "Adverb",
+          "surface": "もし"
         },
         {
-          "pos" : "Noun",
-          "surface" : "明日"
+          "pos": "Noun",
+          "surface": "明日"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "天気"
+          "pos": "Noun",
+          "surface": "天気"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "良い",
-          "pos" : "Adjective",
-          "surface" : "良けれ"
+          "lemma": "良い",
+          "pos": "Adjective",
+          "surface": "良けれ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ば"
+          "pos": "Particle",
+          "surface": "ば"
         },
         {
-          "pos" : "Noun",
-          "surface" : "公園"
+          "pos": "Noun",
+          "surface": "公園"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ピクニック"
+          "pos": "Noun",
+          "surface": "ピクニック"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "しよ"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "しよ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "う"
+          "pos": "Auxiliary",
+          "surface": "う"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "lemma" : "思う",
-          "pos" : "Verb",
-          "surface" : "思っ"
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思っ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
-          "surface" : "い"
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "long_complex_condition",
-      "input" : "もし明日の天気が良ければ、公園でピクニックをしようと思っています",
-      "tags" : [
+      "id": "long_complex_condition",
+      "input": "もし明日の天気が良ければ、公園でピクニックをしようと思っています",
+      "tags": [
         "long"
       ]
     },
     {
-      "description" : "Explanation style - Current suzume treats compound verb 読み込む differently",
-      "expected" : [
+      "description": "Explanation style - Current suzume treats compound verb 読み込む differently",
+      "expected": [
         {
-          "pos" : "Determiner",
-          "surface" : "この"
+          "pos": "Determiner",
+          "surface": "この"
         },
         {
-          "pos" : "Noun",
-          "surface" : "問題"
+          "pos": "Noun",
+          "surface": "問題"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Noun",
-          "surface" : "発生"
+          "pos": "Noun",
+          "surface": "発生"
         },
         {
-          "pos" : "Verb",
-          "surface" : "する"
+          "pos": "Verb",
+          "surface": "する"
         },
         {
-          "pos" : "Noun",
-          "surface" : "原因"
+          "pos": "Noun",
+          "surface": "原因"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "設定"
+          "pos": "Noun",
+          "surface": "設定"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ファイル"
+          "pos": "Noun",
+          "surface": "ファイル"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Adverb",
-          "surface" : "正しく"
+          "pos": "Adverb",
+          "surface": "正しく"
         },
         {
-          "lemma" : "読み込む",
-          "pos" : "Verb",
-          "surface" : "読み込ま"
+          "lemma": "読み込む",
+          "pos": "Verb",
+          "surface": "読み込ま"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
-          "surface" : "れ"
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
-          "surface" : "い"
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         },
         {
-          "pos" : "Noun",
-          "surface" : "こと"
+          "pos": "Noun",
+          "surface": "こと"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "long_explanation",
-      "input" : "この問題が発生する原因は、設定ファイルが正しく読み込まれていないことです",
-      "tags" : [
+      "id": "long_explanation",
+      "input": "この問題が発生する原因は、設定ファイルが正しく読み込まれていないことです",
+      "tags": [
         "long"
       ]
     },
     {
-      "description" : "Teacher instruction - 35ページ unified, ください as verb",
-      "expected" : [
+      "description": "Teacher instruction - 35ページ unified, ください as verb",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "教科書"
+          "pos": "Noun",
+          "surface": "教科書"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "35ページ"
+          "pos": "Noun",
+          "surface": "35ページ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "開く",
-          "pos" : "Verb",
-          "surface" : "開い"
+          "lemma": "開く",
+          "pos": "Verb",
+          "surface": "開い"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Auxiliary",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Auxiliary",
+          "surface": "ください"
         }
       ],
-      "id" : "education_teacher_instruction",
-      "input" : "教科書の35ページを開いてください",
-      "tags" : [
+      "id": "education_teacher_instruction",
+      "input": "教科書の35ページを開いてください",
+      "tags": [
         "education"
       ]
     },
     {
-      "description" : "Student question - verb stem + ません splits",
-      "expected" : [
+      "description": "Student question - verb stem + ません splits",
+      "expected": [
         {
-          "pos" : "Determiner",
-          "surface" : "この"
+          "pos": "Determiner",
+          "surface": "この"
         },
         {
-          "pos" : "Noun",
-          "surface" : "問題"
+          "pos": "Noun",
+          "surface": "問題"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "解き方"
+          "pos": "Noun",
+          "surface": "解き方"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "分かる",
-          "pos" : "Verb",
-          "surface" : "分かり"
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分かり"
         },
         {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "ませ"
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ん"
+          "pos": "Auxiliary",
+          "surface": "ん"
         }
       ],
-      "id" : "education_student_question",
-      "input" : "この問題の解き方が分かりません",
-      "tags" : [
+      "id": "education_student_question",
+      "input": "この問題の解き方が分かりません",
+      "tags": [
         "education",
         "polite_negative"
       ]
     },
     {
-      "description" : "Homework assignment - MeCab互換分割",
-      "expected" : [
+      "description": "Homework assignment - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "明日"
+          "pos": "Noun",
+          "surface": "明日"
         },
         {
-          "pos" : "Particle",
-          "surface" : "まで"
+          "pos": "Particle",
+          "surface": "まで"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Noun",
-          "surface" : "宿題"
+          "pos": "Noun",
+          "surface": "宿題"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "提出"
+          "pos": "Noun",
+          "surface": "提出"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Auxiliary",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Auxiliary",
+          "surface": "ください"
         }
       ],
-      "id" : "education_assignment",
-      "input" : "明日までに宿題を提出してください",
-      "tags" : [
+      "id": "education_assignment",
+      "input": "明日までに宿題を提出してください",
+      "tags": [
         "education"
       ]
     },
     {
-      "description" : "Teacher explanation (split: verb stem + polite aux)",
-      "expected" : [
+      "description": "Teacher explanation (split: verb stem + polite aux)",
+      "expected": [
         {
-          "pos" : "Determiner",
-          "surface" : "この"
+          "pos": "Determiner",
+          "surface": "この"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "公式"
+          "pos": "Adjective",
+          "surface": "公式"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "次"
+          "pos": "Noun",
+          "surface": "次"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "よう"
+          "pos": "Noun",
+          "surface": "よう"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "使う",
-          "pos" : "Verb",
-          "surface" : "使い"
+          "lemma": "使う",
+          "pos": "Verb",
+          "surface": "使い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "education_explanation",
-      "input" : "この公式は次のように使います",
-      "tags" : [
+      "id": "education_explanation",
+      "input": "この公式は次のように使います",
+      "tags": [
         "education"
       ]
     },
     {
-      "description" : "Group work instruction - compound verb 話し合う unified with split ください",
-      "expected" : [
+      "description": "Group work instruction - compound verb 話し合う unified with split ください",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "グループ"
+          "pos": "Noun",
+          "surface": "グループ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "lemma" : "話し合う",
-          "pos" : "Verb",
-          "surface" : "話し合っ"
+          "lemma": "話し合う",
+          "pos": "Verb",
+          "surface": "話し合っ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Auxiliary",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Auxiliary",
+          "surface": "ください"
         }
       ],
-      "id" : "education_group_work",
-      "input" : "グループで話し合ってください",
-      "tags" : [
+      "id": "education_group_work",
+      "input": "グループで話し合ってください",
+      "tags": [
         "education"
       ]
     }
   ],
-  "version" : "1.0"
+  "version": "1.0"
 }

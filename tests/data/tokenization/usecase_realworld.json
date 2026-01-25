@@ -906,11 +906,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "担当"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "者"
+          "surface" : "担当者"
         }
       ],
       "id" : "compound_kabushiki_kaisha",

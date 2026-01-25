@@ -297,6 +297,17 @@
 ちょっと	ADVERB
 もう少し	ADVERB
 後で	ADVERB
+まず	ADVERB
+めっちゃ	ADVERB
+ぜひ	ADVERB
+つくづく	ADVERB
+ほぼ	ADVERB
+再び	ADVERB
+到底	ADVERB
+そう	ADVERB
+思わず	ADVERB
+ほんわか	ADVERB
+なるほど	ADVERB
 俄然	ADVERB
 
 # =============================================================================
@@ -344,7 +355,6 @@
 # --- Godan verbs: Classical/literary (wagahai) ---
 # W-017: Fix incorrect lemma generation
 言う	VERB	GODAN_WA
-しまう	VERB	GODAN_WA
 願い	VERB	GODAN_WA
 やる	VERB	GODAN_WA
 うかがう	VERB	GODAN_WA
@@ -645,7 +655,6 @@ Wi-Fi	NOUN
 やる気	NOUN
 いくら	NOUN
 そん	NOUN
-あん	NOUN
 玉ねぎ	NOUN
 なん	NOUN
 マジ	NOUN
@@ -664,6 +673,10 @@ Wi-Fi	NOUN
 ガチ	NOUN
 何時	NOUN
 ため	NOUN
+知らせ	NOUN
+引き取り	NOUN
+取っ手	NOUN
+使い方	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -716,7 +729,6 @@ Wi-Fi	NOUN
 激しく同意	OTHER
 ないわ	OTHER
 無いわ	OTHER
-なるほど	ADVERB
 そうだね	OTHER
 
 # --- Fillers/Hesitation (フィラー・間投詞) ---
