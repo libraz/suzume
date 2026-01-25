@@ -14,19 +14,8 @@
 using suzume::core::CandidateOrigin;
 namespace cost = suzume::analysis::bigram_cost;
 
-// Surface-based adjustment constants
-// These follow the same scale as bigram_cost but are used for
-// context-specific adjustments in connectionCost()
-namespace surface_adj {
-// Bonuses (negative = encourage)
-constexpr float kBonus = cost::kStrongBonus;            // -0.5
-constexpr float kBonusStrong = cost::kStrongBonus * 2;  // -1.0
-// Penalties (positive = discourage)
-constexpr float kPenaltyMinor = cost::kMinorPenalty;    // 0.3
-constexpr float kPenalty = cost::kModeratePenalty;      // 0.8
-constexpr float kPenaltyStrong = cost::kStrongPenalty;  // 1.5
-constexpr float kProhibit = cost::kProhibitive;         // 2.5
-}  // namespace surface_adj
+// Surface-based adjustments use cost:: namespace directly from bigram_cost.
+// See bigram_table.h for constant values.
 
 namespace {
 
@@ -181,9 +170,11 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // or as adverb+verb+aux (e.g., はなはだしい → はなはだ+し+い)
   // Longer adjectives get stronger bonus to beat split paths
   // Exclude AdjStem (語幹) as it's not a complete i-adjective
+  // Exclude conditional forms ending in ければ (should split: よければ → よけれ + ば)
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adjective &&
       edge.extended_pos != core::ExtendedPOS::AdjStem &&
-      grammar::isPureHiragana(edge.surface)) {
+      grammar::isPureHiragana(edge.surface) &&
+      !utf8::endsWith(edge.surface, "ければ")) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     // Base bonus -2.5, plus 0.5 per character beyond 3
     float bonus = (char_len <= 3) ? -2.5F
@@ -221,6 +212,19 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     // Stronger bonus for longer interjections (common greetings are 4-5 chars)
     float bonus = (char_len <= 3) ? -1.5F
                                   : -2.0F - static_cast<float>(char_len - 3) * 0.5F;
+    cost += bonus;
+  }
+
+  // Bonus for non-hiragana interjections from dictionary (お疲れ様, etc.)
+  // Mixed script interjections also need bonus to beat split paths
+  // E.g., お疲れ様 should not split as お+疲れ+様
+  if (edge.fromDictionary() &&
+      edge.pos == core::PartOfSpeech::Interjection &&
+      !grammar::isPureHiragana(edge.surface)) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    // Moderate bonus for mixed interjections
+    float bonus = (char_len <= 3) ? -0.5F
+                                  : -0.5F - static_cast<float>(char_len - 3) * 0.3F;
     cost += bonus;
   }
 
@@ -385,6 +389,48 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += kVeryLongPureHiraganaVerbPenalty;
   }
 
+  // Penalty for pure-hiragana verb candidates ending with そう
+  // E.g., "なさそう" should be な + さ + そう, not なさそう (verb)
+  // The そう ending is typically from そう (様態 auxiliary), not a verb stem
+  // Valid verbs ending in そう are rare and usually have kanji stems
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      grammar::isPureHiragana(edge.surface) &&
+      utf8::endsWith(edge.surface, "そう") &&
+      edge.surface.size() >= 9) {  // 3+ chars (at least xそう)
+    cost += cost::kRare;
+  }
+
+  // Penalty for pure-hiragana verb candidates ending with てき
+  // E.g., "なってき" should be なっ + て + き (来る), not なってき (verb)
+  // The てき ending is almost always て (particle) + き/こ (来る auxiliary)
+  // Exception: できる is valid but is in dictionary
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      grammar::isPureHiragana(edge.surface) &&
+      utf8::endsWith(edge.surface, "てき") &&
+      edge.surface.size() >= 9) {  // 3+ chars (at least xてき)
+    cost += cost::kVeryRare;
+  }
+
+  // Penalty for pure-hiragana verb candidates ending with まし
+  // E.g., "しまし" should be し + まし (masu renyokei), not しまし (verb)
+  // The まし ending is almost always ます (polite aux) renyokei form
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      grammar::isPureHiragana(edge.surface) &&
+      utf8::endsWith(edge.surface, "まし") &&
+      edge.surface.size() >= 9) {  // 3+ chars (at least xまし)
+    cost += cost::kVeryRare;
+  }
+
+  // Penalty for pure-hiragana verb candidates ending with てい
+  // E.g., "させてい" should be させ + て + い (progressive), not させてい (verb)
+  // The てい ending is almost always て (particle) + い (いる renyokei)
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      grammar::isPureHiragana(edge.surface) &&
+      utf8::endsWith(edge.surface, "てい") &&
+      edge.surface.size() >= 9) {  // 3+ chars (at least xてい)
+    cost += cost::kVeryRare;
+  }
+
   // Bonus for compound adjectives from dictionary (e.g., 男らしい, 女らしい)
   // These compete with noun+らしい split which has -1.5 connection bonus.
   // Dictionary registration indicates compound adjective should take precedence.
@@ -474,7 +520,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface.size() >= 6 &&  // "すぎ" is 6 bytes
       next.surface.compare(0, 6, "すぎ") == 0) {
-    surface_bonus = surface_adj::kBonus;
+    surface_bonus = cost::kStrongBonus;
   }
 
   // Bonus for て → い (Auxiliary) pattern
@@ -484,7 +530,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.extended_pos == core::ExtendedPOS::ParticleConj &&
       next.surface == "い" &&
       next.extended_pos == core::ExtendedPOS::AuxAspectIru) {
-    surface_bonus += surface_adj::kBonus;
+    surface_bonus += cost::kStrongBonus;
   }
 
   // Penalty for VerbRenyokei ending in らし → い (AuxAspectIru) pattern
@@ -496,7 +542,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.surface.size() >= 6 &&  // At least 2 chars (kanji + らし)
       utf8::endsWith(prev.surface, "らし") &&
       next.extended_pos == core::ExtendedPOS::AuxAspectIru) {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Bonus for longer causative forms (させ over さ+せ, させられ over さ+せ+られ)
@@ -508,7 +554,18 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::AuxCausative &&
       next.surface.size() >= 6 &&  // "させ" is 6 bytes
       next.surface.compare(0, 6, "させ") == 0) {
-    surface_bonus += surface_adj::kBonusStrong;
+    surface_bonus += cost::kVeryStrongBonus;
+  }
+
+  // Penalty for Noun → AuxCausative starting with させ (サ変動詞は さ+せ に分割)
+  // E.g., 勉強させる should be 勉強+さ+せる, not 勉強+させる
+  // MeCab treats サ変動詞 causative as Noun + さ(suru_mizen) + せる(causative)
+  // This does NOT affect ichidan verb causatives like 食べ+させる
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      next.extended_pos == core::ExtendedPOS::AuxCausative &&
+      next.surface.size() >= 6 &&
+      next.surface.compare(0, 6, "させ") == 0) {
+    surface_bonus += cost::kVeryRare;
   }
 
   // Surface-based bonus for VerbRenyokei → た (ichidan/irregular た-form)
@@ -517,7 +574,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface == "た" &&
       next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
-    surface_bonus += surface_adj::kBonusStrong;
+    surface_bonus += cost::kVeryStrongBonus;
   }
 
   // Surface-based bonus for でし → た (polite past copula)
@@ -528,7 +585,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.extended_pos == core::ExtendedPOS::AuxCopulaDesu &&
       next.surface == "た" &&
       next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
-    surface_bonus += surface_adj::kBonusStrong;  // Additional bonus to beat で+し+た
+    surface_bonus += cost::kVeryStrongBonus;  // Additional bonus to beat で+し+た
   }
 
   // Surface-based penalty for Noun → short VerbRenyokei (compound verb protection)
@@ -543,7 +600,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface != "し" && next.surface != "せ" &&
       next.surface.size() <= 6 && is_single_kanji_noun) {
-    surface_bonus += surface_adj::kPenalty;  // Cancel the bigram bonus
+    surface_bonus += cost::kRare;  // Cancel the bigram bonus
   }
 
   // Penalty for Noun/ナ形容詞 → い (VerbRenyokei)
@@ -554,7 +611,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
        prev.extended_pos == core::ExtendedPOS::Noun) &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface == "い") {
-    surface_bonus += surface_adj::kPenaltyStrong;
+    surface_bonus += cost::kVeryRare;
   }
 
   // Partial cancel for single-kanji NOUN + し pattern
@@ -564,7 +621,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.extended_pos == core::ExtendedPOS::Noun &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface == "し" && prev.surface.size() == 3) {
-    surface_bonus += surface_adj::kPenaltyMinor;
+    surface_bonus += cost::kUncommon;
   }
 
   // Penalty for single-char case particle → very short pure-hiragana verb pattern
@@ -578,7 +635,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       !next.fromDictionary() &&
       grammar::isPureHiragana(next.surface) &&
       next.surface.size() <= 6) {  // 2 chars or less (6 bytes in UTF-8)
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Penalty for topic particle → short pure-hiragana verb pattern
@@ -589,7 +646,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.pos == core::PartOfSpeech::Verb &&
       grammar::isPureHiragana(next.surface) &&
       next.surface.size() <= 3) {  // 1 char only (3 bytes in UTF-8)
-    surface_bonus += surface_adj::kPenaltyStrong;
+    surface_bonus += cost::kVeryRare;
   }
 
   // Penalty for case particle → final particle pattern
@@ -597,7 +654,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Final particles (な, ね, よ) don't follow case particles directly
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase &&
       next.extended_pos == core::ExtendedPOS::ParticleFinal) {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Penalty for PREFIX → short pure-hiragana verb pattern
@@ -608,7 +665,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.pos == core::PartOfSpeech::Verb &&
       grammar::isPureHiragana(next.surface) &&
       next.surface.size() <= 6) {  // 2 chars or less
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Penalty for PREFIX → non-dictionary pure-hiragana verb pattern (3 chars)
@@ -619,7 +676,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       !next.fromDictionary() &&
       grammar::isPureHiragana(next.surface) &&
       next.surface.size() == 9) {  // Exactly 3 chars (9 bytes)
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Penalty for ADV → short pure-hiragana verb renyokei pattern
@@ -630,7 +687,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       grammar::isPureHiragana(next.surface) &&
       next.surface.size() <= 3) {  // 1 char only (し, み, etc.)
-    surface_bonus += surface_adj::kPenaltyStrong;
+    surface_bonus += cost::kVeryRare;
   }
 
   // Penalty for SYMBOL → PARTICLE pattern (furigana in parentheses)
@@ -638,7 +695,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Particles don't normally follow opening parentheses directly
   if (prev.pos == core::PartOfSpeech::Symbol &&
       next.pos == core::PartOfSpeech::Particle) {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Bonus for SYMBOL → long pure-hiragana OTHER (furigana pattern)
@@ -648,14 +705,14 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.pos == core::PartOfSpeech::Other &&
       grammar::isPureHiragana(next.surface) &&
       next.surface.size() >= 12) {  // 4+ chars (12 bytes in UTF-8)
-    surface_bonus += surface_adj::kBonusStrong;
+    surface_bonus += cost::kVeryStrongBonus;
   }
 
   // Penalty for SYMBOL → short hiragana → AUX pattern
   // E.g., （+と+う should not happen (furigana shouldn't split into particles/aux)
   if (prev.pos == core::PartOfSpeech::Symbol &&
       next.pos == core::PartOfSpeech::Auxiliary) {
-    surface_bonus += surface_adj::kPenaltyStrong;
+    surface_bonus += cost::kVeryRare;
   }
 
   // Penalty for AuxCopulaDa(で) + ParticleTopic(も) pattern
@@ -666,7 +723,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.surface == "で" &&
       next.extended_pos == core::ExtendedPOS::ParticleTopic &&
       next.surface == "も") {
-    surface_bonus += surface_adj::kPenaltyStrong;
+    surface_bonus += cost::kVeryRare;
   }
 
   // Penalty for specific Pronoun + でも patterns
@@ -676,7 +733,17 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.pos == core::PartOfSpeech::Pronoun &&
       next.surface == "でも" &&
       (prev.surface == "何" || prev.surface == "彼女")) {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
+  }
+
+  // Penalty for SUFFIX(さ) + VERB starting with せ/させ pattern
+  // E.g., 勉強 + さ(SUFFIX) + せられてい is wrong; should be 勉強 + さ(VERB_未然) + せ(AUX_使役)
+  // This pattern indicates suru-verb causative form where さ is the verb stem, not suffix
+  if (prev.pos == core::PartOfSpeech::Suffix &&
+      prev.surface == "さ" &&
+      next.pos == core::PartOfSpeech::Verb &&
+      (utf8::startsWith(next.surface, "せ") || utf8::startsWith(next.surface, "させ"))) {
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Penalty for pronoun-like NOUN + でも pattern (limited)
@@ -691,7 +758,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       (next.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
        next.extended_pos == core::ExtendedPOS::Conjunction) &&
       (prev.surface == "何" || prev.surface == "彼女")) {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Penalty for でも (PART_副 or CONJ) → ない/な pattern
@@ -704,7 +771,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       (prev.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
        prev.extended_pos == core::ExtendedPOS::Conjunction) &&
       (next.surface == "ない" || next.surface == "な")) {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Note: Removed penalty for PARTICLE と → VERB_音便 いっ pattern
@@ -719,7 +786,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.extended_pos == core::ExtendedPOS::AuxPassive &&
       prev.surface.size() <= 3 && next.surface.size() <= 3) {  // Both single hiragana
-    surface_bonus += surface_adj::kProhibit;  // Cancel the bonus
+    surface_bonus += cost::kAlmostNever;  // Cancel the bonus
   }
 
   // Penalty for VerbOnbinkei ending in いい → AuxTenseTa pattern
@@ -730,7 +797,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
       prev.surface.size() >= 6 &&  // At least 2 hiragana (6 bytes)
       prev.surface.compare(prev.surface.size() - 6, 6, "いい") == 0) {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Bonus for VerbRenyokei/VerbOnbinkei → VerbRenyokei (honorific verb patterns)
@@ -743,7 +810,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       (next.surface == "いたし" || next.surface == "おり" ||
        next.surface == "くださ" || next.surface == "いただき" ||
        next.surface == "もらい" || next.surface == "あげ")) {
-    surface_bonus += surface_adj::kBonusStrong;
+    surface_bonus += cost::kVeryStrongBonus;
   }
 
   // Bonus for honorific verb renyokei → AuxTenseMasu (ます)
@@ -753,7 +820,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::AuxTenseMasu &&
       (prev.surface == "いただき" || prev.surface == "いたし" ||
        prev.surface == "おり" || prev.surface == "くださ")) {
-    surface_bonus += surface_adj::kBonusStrong;
+    surface_bonus += cost::kVeryStrongBonus;
   }
 
   // Penalty for single い → AuxTenseTa pattern (いただきます problem)
@@ -764,7 +831,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.surface == "い" &&
       prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
-    surface_bonus += surface_adj::kPenaltyStrong;
+    surface_bonus += cost::kVeryRare;
   }
 
   // Penalty for AuxTenseTa → い pattern (たい over-split prevention)
@@ -773,7 +840,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // This fixes the issue where VerbRenyokei→た bonus (-1.6) beats たい (-0.8)
   if (prev.extended_pos == core::ExtendedPOS::AuxTenseTa &&
       next.surface == "い") {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Penalty for PARTICLE て → VerbTaForm いた pattern
@@ -783,7 +850,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.surface == "て" &&
       next.extended_pos == core::ExtendedPOS::VerbTaForm &&
       next.surface == "いた") {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Penalty for PREFIX ご → VerbRenyokei ざい pattern
@@ -794,7 +861,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface.size() >= 6 &&
       next.surface.compare(0, 6, "ざい") == 0) {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Surface-based bonus for AdjStem → すぎ pattern
@@ -807,7 +874,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.surface.size() >= 6 &&  // "すぎ" is 6 bytes
       next.surface.compare(0, 6, "すぎ") == 0) {
     // Strong bonus to overcome AdjStem→Verb prohibitive penalty
-    surface_bonus += surface_adj::kBonusStrong * 2;
+    surface_bonus += cost::kVeryStrongBonus * 2;
   }
 
   // Surface-based bonus for AdjNaAdj → すぎ pattern
@@ -817,17 +884,11 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.extended_pos == core::ExtendedPOS::AdjNaAdj &&
       next.surface.size() >= 6 &&
       next.surface.compare(0, 6, "すぎ") == 0) {
-    surface_bonus += surface_adj::kBonus;
+    surface_bonus += cost::kStrongBonus;
   }
 
-  // Penalty for AuxAppearanceSou (そう) → かも to favor か+も split
-  // MeCab splits "そうかもしれない" as そう+か+も+しれ+ない
-  // But keeps "雨かも" as 雨+かも (noun + かも)
-  // The pattern: AUX_様態 (そう) → かも should be penalized
-  if (prev.extended_pos == core::ExtendedPOS::AuxAppearanceSou &&
-      next.surface == "かも") {
-    surface_bonus += surface_adj::kPenaltyStrong;
-  }
+  // Note: "かも" is kept as single token per SuzumeUtils.pm normalization
+  // (か+も → かも merge rule). No penalty for AUX → かも.
 
   // Penalty for ParticleFinal(か) → ADV(もし) in かもしれない pattern
   // "もし" is a valid adverb, but not in "かもしれない" context
@@ -836,7 +897,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.surface == "か" &&
       next.pos == core::PartOfSpeech::Adverb &&
       next.surface == "もし") {
-    surface_bonus += surface_adj::kPenaltyStrong;
+    surface_bonus += cost::kVeryRare;
   }
 
   // Penalty for short hiragana verb mizenkei + ん pattern
@@ -848,7 +909,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       grammar::isPureHiragana(prev.surface) &&
       prev.surface.size() <= 6 &&  // 2 chars or less (6 bytes in UTF-8)
       next.surface == "ん") {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Penalty for dictionary verb inflection + ず (classical negative)
@@ -857,7 +918,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.pos == core::PartOfSpeech::Verb &&
       prev.fromDictionary() &&
       next.extended_pos == core::ExtendedPOS::AuxNegativeNu) {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Penalty for single-kanji noun + dictionary verb renyokei/onbinkei
@@ -871,7 +932,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       (next.extended_pos == core::ExtendedPOS::VerbRenyokei ||
        next.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
       next.surface != "し") {  // Exclude suru renyokei (サ変動詞パターン)
-    surface_bonus += surface_adj::kPenaltyStrong;
+    surface_bonus += cost::kVeryRare;
   }
 
   // Penalty for single-kanji NOUN → verbal auxiliary patterns
@@ -884,7 +945,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
        next.extended_pos == core::ExtendedPOS::AuxPassive ||
        next.extended_pos == core::ExtendedPOS::AuxPotential ||
        next.extended_pos == core::ExtendedPOS::AuxCausative)) {
-    surface_bonus += surface_adj::kPenaltyStrong;
+    surface_bonus += cost::kVeryRare;
   }
 
   // Penalty for PARTICLE → もあり/もありだ verb candidates
@@ -895,7 +956,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.pos == core::PartOfSpeech::Verb &&
       (next.surface == "もあり" || next.surface == "もありだ" ||
        next.surface == "もある" || next.surface == "もあっ")) {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Bonus for PART_格 → い (VerbRenyokei of いる)
@@ -907,7 +968,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface == "い" &&
       prev.surface != "と") {  // Exclude と to protect という determiner
-    surface_bonus += surface_adj::kBonus;
+    surface_bonus += cost::kStrongBonus;
   }
 
   // Penalty for と → いう pattern to protect という determiner
@@ -917,7 +978,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.surface == "と" &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       (next.surface == "いう" || next.surface == "いっ")) {
-    surface_bonus += surface_adj::kPenaltyMinor;
+    surface_bonus += cost::kUncommon;
   }
 
   // Bonus for VerbRenyokei → し (サ変 する renyokei)
@@ -930,7 +991,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface == "し" && prev.fromDictionary() &&
       prev.surface != "い" && prev.surface != "で") {
-    surface_bonus += surface_adj::kBonusStrong;
+    surface_bonus += cost::kVeryStrongBonus;
   }
 
   // Penalty for kanji+sokuon+kanji NOUN → し(VerbRenyokei) pattern
@@ -957,7 +1018,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       }
     }
     if (has_sokuon_between_kanji) {
-      surface_bonus += surface_adj::kPenaltyStrong;
+      surface_bonus += cost::kVeryRare;
     }
   }
 
@@ -970,7 +1031,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.surface == "の" &&
       next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
       next.surface == "で") {
-    surface_bonus += surface_adj::kPenaltyStrong;
+    surface_bonus += cost::kVeryRare;
   }
 
   // Penalty for AuxCopulaDa(で) → し pattern (VerbRenyokei or ParticleConj)
@@ -984,7 +1045,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.surface == "し" &&
       (next.extended_pos == core::ExtendedPOS::VerbRenyokei ||
        next.extended_pos == core::ExtendedPOS::ParticleConj)) {
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Penalty for negation PREFIX (非/不/無/未) → single-kanji NOUN
@@ -997,7 +1058,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
        prev.surface == "無" || prev.surface == "未") &&
       next.extended_pos == core::ExtendedPOS::Noun &&
       next.surface.size() == 3) {  // Single kanji (3 bytes in UTF-8)
-    surface_bonus += surface_adj::kProhibit;
+    surface_bonus += cost::kAlmostNever;
   }
 
   // Bonus for dictionary NOUN → dictionary NOUN connection
@@ -1016,7 +1077,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.pos == core::PartOfSpeech::Noun &&
       prev.surface == next.surface &&
       grammar::isPureHiragana(prev.surface)) {
-    surface_bonus += surface_adj::kPenaltyStrong;
+    surface_bonus += cost::kVeryRare;
   }
 
   float total = base_cost + extended_cost + surface_bonus;

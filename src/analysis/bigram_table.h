@@ -69,18 +69,28 @@ namespace bigram_cost {
 // Design principle: Bonuses should help valid grammatical patterns win over
 // single-token alternatives, but not be so strong that they overwhelm
 // dictionary entries or create false positives.
-constexpr float kStrongBonus = -0.8F;    // Strong grammatical connection
-constexpr float kModerateBonus = -0.5F;  // Normal grammatical connection
-constexpr float kMinorBonus = -0.25F;    // Slight preference
+constexpr float kVeryStrongBonus = -1.6F;   // Very strong grammatical connection
+constexpr float kExtraVeryStrongBonus = -1.5F;  // Extra very strong (scale compat)
+constexpr float kExtraStrongBonus = -1.0F;  // Extra strong (scale compat)
+constexpr float kStrongBonus = -0.8F;       // Strong grammatical connection
+constexpr float kModerateBonus = -0.5F;     // Normal grammatical connection
+constexpr float kMinorBonus = -0.25F;       // Slight preference
+constexpr float kSlightBonus = -0.2F;       // Slight boost
 
 // Neutral
 constexpr float kNeutral = 0.0F;         // No preference
 
 // Penalties (positive values - discourage connection)
-constexpr float kMinorPenalty = 0.4F;    // Slight discouragement
-constexpr float kModeratePenalty = 1.0F; // Moderate discouragement
-constexpr float kStrongPenalty = 1.8F;   // Strong discouragement
-constexpr float kProhibitive = 3.0F;     // Effectively blocked
+// Named by likelihood: use when connection has this probability level
+constexpr float kNegligible = 0.2F;     // Negligible impact
+constexpr float kUncommon = 0.4F;       // Uncommon but possible
+constexpr float kMinor = 0.5F;          // Minor penalty
+constexpr float kRare = 1.0F;           // Rare
+constexpr float kStrong = 1.5F;         // Strong grammatical violation
+constexpr float kVeryRare = 1.8F;       // Very rare
+constexpr float kSevere = 2.5F;         // Severe violation
+constexpr float kAlmostNever = 3.0F;    // Almost never happens
+constexpr float kNever = 3.5F;          // Near prohibition
 
 }  // namespace bigram_cost
 

@@ -23,12 +23,8 @@
       "description" : "Honorific お + 金",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "金"
+          "surface" : "お金"
         }
       ],
       "id" : "o_money",

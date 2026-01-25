@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include "analysis/bigram_table.h"
+
 // =============================================================================
 // Scorer Constants
 // =============================================================================
@@ -27,13 +29,13 @@
 //   [1.5,  2.0]  Moderate penalties for questionable patterns
 //   [2.0,  3.0]  Strong penalties for grammatically invalid patterns
 //
-// Penalty/Bonus magnitudes (see scale:: namespace for formal constants):
-//   scale::kTrivial (0.2F)     - Almost no impact
-//   scale::kMinor (0.5F)       - Small adjustment, tips the scale
-//   scale::kModerate (1.0F)    - Standard penalty/bonus
-//   scale::kStrong (1.5F)      - Strong preference/discouragement
-//   scale::kSevere (2.5F)      - Severe violation
-//   scale::kProhibitive (3.5F) - Near-prohibition of pattern
+// Penalty/Bonus magnitudes (see bigram_cost namespace in bigram_table.h):
+//   kNegligible (0.2F) - Almost no impact
+//   kMinor (0.5F)      - Small adjustment, tips the scale
+//   kRare (1.0F)       - Rare occurrence
+//   kStrong (1.5F)     - Strong preference/discouragement
+//   kSevere (2.5F)     - Severe violation
+//   kNever (3.5F)      - Near-prohibition of pattern
 //
 // Base connection costs (from scorer.cpp):
 //   NOUN→NOUN: 0.0, VERB→VERB: 0.8, NOUN→VERB: 0.2, etc.
@@ -41,28 +43,8 @@
 
 namespace suzume::analysis::scorer {
 
-// =============================================================================
-// Score Scale Constants
-// =============================================================================
-// Formal scale definitions for consistent penalty/bonus magnitude.
-// All penalty/bonus constants should reference these scale values.
-namespace scale {
-
-// Penalty scale (positive values - higher discourages pattern)
-constexpr float kTrivial = 0.2F;      // Almost no impact
-constexpr float kMinor = 0.5F;        // Slight unnaturalness
-constexpr float kModerate = 1.0F;     // Moderate penalty
-constexpr float kStrong = 1.5F;       // Strong grammatical violation
-constexpr float kSevere = 2.5F;       // Severe violation
-constexpr float kProhibitive = 3.5F;  // Near prohibition
-
-// Bonus scale (negative values - lower encourages pattern)
-constexpr float kSlightBonus = -0.2F;
-constexpr float kModerateBonus = -0.5F;
-constexpr float kStrongBonus = -1.0F;
-constexpr float kVeryStrongBonus = -1.5F;
-
-}  // namespace scale
+// Use bigram_cost constants via this alias
+namespace scale = bigram_cost;
 
 // =============================================================================
 // Edge Costs (Unigram penalties for invalid patterns)
@@ -80,7 +62,7 @@ constexpr float kPenaltyInvalidAdjSou = scale::kStrong;
 // E.g., しんどくない, エモくない - these are strong indicators of i-adjective
 // くない pattern is highly reliable for adjective detection
 // Needs to compete with fragmented paths containing dictionary verbs
-constexpr float kBonusIAdjKunai = scale::kStrongBonus;  // -1.0
+constexpr float kBonusIAdjKunai = scale::kExtraStrongBonus;  // -1.0
 
 // Unknown adjective with たい pattern where stem is invalid
 // E.g., りたかった is invalid (り is not a valid verb stem)
@@ -146,7 +128,7 @@ constexpr float kPenaltySouAfterRenyokei = scale::kMinor;
 
 // AUX だ/です + character speech suffix split
 // E.g., だ + にゃ should be だにゃ (single token)
-constexpr float kPenaltyCharacterSpeechSplit = scale::kModerate;
+constexpr float kPenaltyCharacterSpeechSplit = scale::kRare;
 
 // ADJ(連用形・く) + VERB(なる) pattern
 // E.g., 美しく + なる - very common grammatical pattern (positive value subtracted)
@@ -180,7 +162,7 @@ constexpr float kPenaltyTakuteAfterRenyokei = scale::kStrong;
 // AUX + たい adjective pattern
 // E.g., なり(AUX, だ) + たかった is unnatural
 // Should be なり(VERB, なる) + たかった
-constexpr float kPenaltyTaiAfterAux = scale::kModerate;
+constexpr float kPenaltyTaiAfterAux = scale::kRare;
 
 // AUX(ません形) + で(PARTICLE) split
 // E.g., ございません + で + した should be ございません + でした
@@ -201,7 +183,7 @@ constexpr float kBonusConditionalVerbToVerb = 0.7F;
 // E.g., 読み + 終わる, 書き + 始める, 走り + 続ける
 // Offsets the VERB→VERB base cost (0.8) for compound verb patterns
 // Must be >= 0.8 to make VERB→VERB cheaper than NOUN→NOUN (0.0)
-constexpr float kBonusVerbRenyokeiCompoundAux = scale::kModerate;
+constexpr float kBonusVerbRenyokeiCompoundAux = scale::kRare;
 
 // Verb renyokei + と (PARTICLE) pattern
 // E.g., 食べ + と is likely part of 食べといた/食べとく contraction
@@ -212,7 +194,7 @@ constexpr float kPenaltyTokuContractionSplit = scale::kStrong;
 // When てく (colloquial ていく) is followed by れ-starting AUX, it's almost
 // always a mis-segmentation of てくれる pattern.
 // E.g., つけてくれない → つけ + てく + れない is wrong; should be つけて + くれない
-constexpr float kPenaltyTekuReMissegmentation = scale::kProhibitive;
+constexpr float kPenaltyTekuReMissegmentation = scale::kNever;
 
 // NOUN + いる/います/いません (AUX) penalty
 // いる auxiliary should only follow te-form verbs (食べている), not nouns
@@ -225,7 +207,7 @@ constexpr float kBonusIruAuxAfterTeForm = scale::kMinor;
 
 // Te-form VERB + しまう/しまった (AUX) bonus
 // E.g., 食べて + しまった, 忘れて + しまう - completive/regretful aspect pattern
-constexpr float kBonusShimauAuxAfterTeForm = scale::kModerate;  // 1.5F
+constexpr float kBonusShimauAuxAfterTeForm = scale::kRare;  // 1.5F
 
 // Verb renyokei + そう (AUX) bonus
 // E.g., 降り + そう, 切れ + そう - appearance auxiliary pattern
@@ -244,7 +226,7 @@ constexpr float kPenaltySuffixAtStart = scale::kSevere + scale::kMinor;  // 3.0
 
 // Suffix after punctuation/symbol penalty
 // After 、。etc., a word is unlikely to be a suffix (e.g., 、家 should be NOUN)
-constexpr float kPenaltySuffixAfterSymbol = scale::kModerate;
+constexpr float kPenaltySuffixAfterSymbol = scale::kRare;
 
 // Prefix before verb/auxiliary penalty
 // Prefixes should attach to nouns/suffixes, not verbs (e.g., 何してる - 何 is PRON)
@@ -262,7 +244,7 @@ constexpr float kPenaltyNounBeforeVerbAux = scale::kStrong + scale::kMinor;  // 
 // しれる verb + ます/ない pattern bonus
 // E.g., かもしれません → かも + しれ + ませ + ん
 // Strong bonus to compensate for し+れ path getting passive-aux bonuses
-constexpr float kBonusShireruToMasuNai = scale::kProhibitive;  // 3.5F
+constexpr float kBonusShireruToMasuNai = scale::kNever;  // 3.5F
 
 // Verb renyokei + contracted verb (てる/とく/etc.) bonus
 // E.g., し + てる should beat し(PARTICLE) + てる
@@ -300,7 +282,7 @@ constexpr float kBonusOnbinkeiToTara = scale::kMinor;  // 0.5
 // E.g., 書い(onbin) + た → 書いた (encourages verb + past aux interpretation)
 // Without this, 書いた(VERB unk) wins over 書い + た split
 // Note: Larger bonus needed because onbin VERB candidates have higher base cost
-constexpr float kBonusOnbinkeiToTa = scale::kModerate;  // 1.5
+constexpr float kBonusOnbinkeiToTa = scale::kRare;  // 1.5
 
 // Adjective く form + て particle bonus
 // E.g., 美しく + て - very common pattern
@@ -331,7 +313,7 @@ constexpr float kBonusTaAuxToDesu = scale::kSevere;  // 2.5
 // Session 31 allowed に as verb stem start for verbs like にげる, にる
 // This bonus helps the particle + verb path beat the incorrect にぐ analysis
 // Strong bonus needed because にいた (verb) has very low cost while いた has high cost
-constexpr float kBonusNiParticleToIruVerb = scale::kProhibitive;  // 3.5
+constexpr float kBonusNiParticleToIruVerb = scale::kNever;  // 3.5
 
 // 終助詞連続 (sentence-final particle sequence) bonus
 // E.g., よ + ね, よ + わ are extremely common final particle combinations
@@ -362,8 +344,8 @@ constexpr float kBonusNiParticleToIku = scale::kStrong + scale::kMinor;  // 2.0
 
 // Invalid single-char aux (る) after te-form
 // E.g., して + る should be してる (contraction), not split
-// P7-1: Normalized to scale::kProhibitive (was 5.0F)
-constexpr float kPenaltyInvalidSingleCharAux = scale::kProhibitive;
+// P7-1: Normalized to scale::kNever (was 5.0F)
+constexpr float kPenaltyInvalidSingleCharAux = scale::kNever;
 
 // Te-form + た (likely contracted -ていた form)
 // E.g., 見て + た should be 見てた (見ていた contraction)
@@ -385,12 +367,12 @@ constexpr float kBonusNounMitai = scale::kSevere + scale::kMinor;  // 3.0
 
 // VERB + みたい (hearsay/appearance) bonus
 // E.g., 食べるみたい (seems like eating)
-constexpr float kBonusVerbMitai = scale::kModerate;
+constexpr float kBonusVerbMitai = scale::kRare;
 
 // で(PARTICLE/AUX) + くる活用形 penalty (できる misparse prevention)
 // E.g., できます → で + きます is wrong; should be でき + ます
 // Applied to both PARTICLE→AUX and AUX(だ)→AUX patterns
-constexpr float kPenaltyDeToKuruAux = scale::kProhibitive;  // 3.5
+constexpr float kPenaltyDeToKuruAux = scale::kNever;  // 3.5
 
 // ADJ + で(AUX, lemma=だ) bonus for na-adjective copula pattern
 // E.g., 嫌でない → 嫌 + で(AUX) + ない (copula negation)
@@ -402,12 +384,12 @@ constexpr float kBonusAdjToCopulaDe = -scale::kSevere;  // -2.5
 // NOUN/ADJ + でない(VERB, lemma=できる) penalty
 // Prevents na-adj copula from being misparsed as できる negation
 // E.g., 嫌でない should be copula pattern, not できる negative form
-constexpr float kPenaltyNaAdjToDekinaiVerb = scale::kProhibitive;  // 3.5
+constexpr float kPenaltyNaAdjToDekinaiVerb = scale::kNever;  // 3.5
 
 // で(AUX, lemma=だ) + ない(AUX) bonus for na-adjective copula negation
 // E.g., 嫌でない → 嫌 + で + ない, でない → で + ない (copula negation pattern)
 // Strong bonus (kProhibitive) to beat で(VERB,でる)+ない path
-constexpr float kBonusCopulaDeToNai = scale::kProhibitive;  // 3.5 (used as negative bonus: -3.5)
+constexpr float kBonusCopulaDeToNai = scale::kNever;  // 3.5 (used as negative bonus: -3.5)
 
 // で(AUX, lemma=だ) + ござる(AUX) bonus for classical copula pattern
 // E.g., 侍でござる, これでござる - need to beat で(PARTICLE) + ござる(VERB) path
@@ -447,13 +429,13 @@ constexpr float kPenaltyHiraganaNounStartsWithParticle = scale::kStrong;
 constexpr float kPenaltyParticleBeforeSingleHiraganaOther = scale::kSevere;
 
 // Particle before hiragana OTHER penalty (multi char)
-constexpr float kPenaltyParticleBeforeMultiHiraganaOther = scale::kModerate;
+constexpr float kPenaltyParticleBeforeMultiHiraganaOther = scale::kRare;
 
 // Particle before hiragana VERB penalty
 // E.g., し + まる in しまる split - likely an erroneous split of a hiragana verb
 // This prevents splits like し(PARTICLE) + まる(VERB) when しまる should be single VERB
 // Also handles は + ちみつ in はちみつ - particle bonus (-0.4) requires strong penalty
-constexpr float kPenaltyParticleBeforeHiraganaVerb = scale::kProhibitive;
+constexpr float kPenaltyParticleBeforeHiraganaVerb = scale::kNever;
 
 // し particle after i-adjective (valid pattern)
 // E.g., 上手いし, 高いし (positive value subtracted)
@@ -482,7 +464,7 @@ constexpr float kPenaltyNaParticleAfterKanjiNoun = scale::kSevere;  // 2.5
 // NOUN(し ending) + VERB(て starting) penalty
 // Penalizes patterns like 説明し(NOUN) + てくれます(VERB)
 // This suggests suru-verb te-form that should be single VERB
-constexpr float kPenaltySuruRenyokeiToTeVerb = scale::kModerate;  // 1.5
+constexpr float kPenaltySuruRenyokeiToTeVerb = scale::kRare;  // 1.5
 
 // らしい (conjecture) after verb/adjective (valid pattern)
 // E.g., 帰るらしい, 美しいらしい

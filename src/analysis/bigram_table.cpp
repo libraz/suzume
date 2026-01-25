@@ -397,7 +397,7 @@ BigramTable::initTable() {
   // Noun → AuxAspectIru (驚+い) - moderate penalty
   // Nouns don't directly connect to いる auxiliary; need particle (彼が+いる)
   // Prevents 驚+い+た from beating 驚い+た for verb onbin form
-  setCell(t, EPOS::Noun, EPOS::AuxAspectIru, cost::kModeratePenalty);
+  setCell(t, EPOS::Noun, EPOS::AuxAspectIru, cost::kRare);
 
   // NaAdj → AuxCopulaDa (静か+だ) - strong bonus
   setCell(t, EPOS::AdjNaAdj, EPOS::AuxCopulaDa, cost::kStrongBonus);
@@ -431,7 +431,7 @@ BigramTable::initTable() {
 
   // ParticleCase → Adverb (か+もし) - moderate penalty
   // This discourages splitting かもしれない as か+もし+れない
-  setCell(t, EPOS::ParticleCase, EPOS::Adverb, cost::kModeratePenalty);
+  setCell(t, EPOS::ParticleCase, EPOS::Adverb, cost::kRare);
 
   // ParticleCase → Noun (が+学生) - neutral
   setCell(t, EPOS::ParticleCase, EPOS::Noun, cost::kNeutral);
@@ -450,7 +450,7 @@ BigramTable::initTable() {
 
   // ParticleConj → VerbShuushikei (て+食べる for compound verbs) - minor penalty
   // (te-form usually followed by auxiliary, not new verb)
-  setCell(t, EPOS::ParticleConj, EPOS::VerbShuushikei, cost::kMinorPenalty);
+  setCell(t, EPOS::ParticleConj, EPOS::VerbShuushikei, cost::kUncommon);
 
   // ParticleConj → AuxAspectIru (て+いる) - strong bonus for MeCab-compatible split
   // Allows 食べ+て+いる to beat unified 食べて+いる path
@@ -475,56 +475,65 @@ BigramTable::initTable() {
   // Penalties: Invalid or Rare Connections
   // =========================================================================
 
+  // Suffix → Adverb (さ+そう) - strong penalty
+  // Prevents なさそう → な + さ(SUFFIX) + そう(ADV) over correct な + さ + そう(AUX)
+  // Suffix + Adverb is grammatically unusual; そう after さ is AuxAppearance
+  setCell(t, EPOS::Suffix, EPOS::Adverb, cost::kVeryRare);
+
   // AuxAspectOku → AuxVolitional (とい+う) - strong penalty
   // Prevents とい+う from beating という (quotative determiner)
   // とい (contracted ておく form) + う (volitional) is grammatically invalid
-  setCell(t, EPOS::AuxAspectOku, EPOS::AuxVolitional, cost::kStrongPenalty);
+  setCell(t, EPOS::AuxAspectOku, EPOS::AuxVolitional, cost::kVeryRare);
 
   // AuxAspectOku → ParticleQuote (とい+って) - strong penalty
   // Prevents とい+って from beating と+いっ+て (と言って)
   // とい (contracted ておく form) + って (quote particle) is unlikely in this context
-  setCell(t, EPOS::AuxAspectOku, EPOS::ParticleQuote, cost::kStrongPenalty);
+  setCell(t, EPOS::AuxAspectOku, EPOS::ParticleQuote, cost::kVeryRare);
 
   // VerbShuushikei → AuxTenseMasu (食べる+ます) - prohibitive
   // (ます attaches to renyokei, not shuushikei)
-  setCell(t, EPOS::VerbShuushikei, EPOS::AuxTenseMasu, cost::kProhibitive);
+  setCell(t, EPOS::VerbShuushikei, EPOS::AuxTenseMasu, cost::kAlmostNever);
 
   // VerbShuushikei → AuxDesireTai (食べる+たい) - prohibitive
-  setCell(t, EPOS::VerbShuushikei, EPOS::AuxDesireTai, cost::kProhibitive);
+  setCell(t, EPOS::VerbShuushikei, EPOS::AuxDesireTai, cost::kAlmostNever);
 
   // VerbShuushikei → AuxTenseTa (食べる+た) - prohibitive
-  setCell(t, EPOS::VerbShuushikei, EPOS::AuxTenseTa, cost::kProhibitive);
+  setCell(t, EPOS::VerbShuushikei, EPOS::AuxTenseTa, cost::kAlmostNever);
 
   // AuxTenseTa → AuxTenseTa (た+た) - prohibitive
-  setCell(t, EPOS::AuxTenseTa, EPOS::AuxTenseTa, cost::kProhibitive);
+  setCell(t, EPOS::AuxTenseTa, EPOS::AuxTenseTa, cost::kAlmostNever);
 
   // AuxTenseTa → AuxTenseMasu (た+ます) - prohibitive
-  setCell(t, EPOS::AuxTenseTa, EPOS::AuxTenseMasu, cost::kProhibitive);
+  setCell(t, EPOS::AuxTenseTa, EPOS::AuxTenseMasu, cost::kAlmostNever);
 
   // AuxTenseTa → AuxAspectKuru (た+き) - prohibitive
   // Prevents いただき → い+た+だ+き (きた split creates standalone き entry)
-  setCell(t, EPOS::AuxTenseTa, EPOS::AuxAspectKuru, cost::kProhibitive);
+  setCell(t, EPOS::AuxTenseTa, EPOS::AuxAspectKuru, cost::kAlmostNever);
 
   // AuxCopulaDa → AuxAspectKuru (だ+き) - prohibitive
   // Prevents いただき → い+た+だ+き
-  setCell(t, EPOS::AuxCopulaDa, EPOS::AuxAspectKuru, cost::kProhibitive);
+  setCell(t, EPOS::AuxCopulaDa, EPOS::AuxAspectKuru, cost::kAlmostNever);
 
   // ParticleFinal → VerbShuushikei (ね+食べる) - strong penalty
   // (sentence-final particles rarely continue to verbs)
-  setCell(t, EPOS::ParticleFinal, EPOS::VerbShuushikei, cost::kStrongPenalty);
+  setCell(t, EPOS::ParticleFinal, EPOS::VerbShuushikei, cost::kVeryRare);
 
   // ParticleFinal → VerbOnbinkei (な+いん) - prohibit
   // (prevents ないんだ → な+いん+だ over ない+ん+だ)
-  setCell(t, EPOS::ParticleFinal, EPOS::VerbOnbinkei, cost::kProhibitive);
+  setCell(t, EPOS::ParticleFinal, EPOS::VerbOnbinkei, cost::kAlmostNever);
+
+  // ParticleFinal → VerbMizenkei (な+さ) - strong penalty
+  // (prevents なさそう → な(終助詞)+さ(未然)+そう over な(形容詞)+さ(接尾辞)+そう)
+  setCell(t, EPOS::ParticleFinal, EPOS::VerbMizenkei, cost::kVeryRare);
 
   // AuxCopulaDa → VerbOnbinkei (な+いん) - prohibit
   // (prevents ないんだ → な+いん+だ over ない+ん+だ)
-  setCell(t, EPOS::AuxCopulaDa, EPOS::VerbOnbinkei, cost::kProhibitive);
+  setCell(t, EPOS::AuxCopulaDa, EPOS::VerbOnbinkei, cost::kAlmostNever);
 
   // AuxCopulaDa → VerbMizenkei (だ+くさ) - strong penalty
   // Copula followed by verb mizenkei is grammatically unusual
   // Prevents 盛りだくさん → 盛り+だ+くさ+ん over dictionary entry
-  setCell(t, EPOS::AuxCopulaDa, EPOS::VerbMizenkei, cost::kStrongPenalty);
+  setCell(t, EPOS::AuxCopulaDa, EPOS::VerbMizenkei, cost::kVeryRare);
 
   // ParticleFinal → ParticleFinal (よ+ね) - minor bonus (common pattern)
   setCell(t, EPOS::ParticleFinal, EPOS::ParticleFinal, cost::kMinorBonus);
@@ -542,6 +551,10 @@ BigramTable::initTable() {
 
   // AuxCopulaDa → AuxGozaru (で+ございます) - moderate bonus
   setCell(t, EPOS::AuxCopulaDa, EPOS::AuxGozaru, cost::kModerateBonus);
+
+  // AuxGozaru → AuxTenseMasu (ござい+ます) - strong bonus to prevent verb candidate win
+  // Without this, verb_candidates generates "ございる" which beats dictionary "ござる"
+  setCell(t, EPOS::AuxGozaru, EPOS::AuxTenseMasu, cost::kStrongBonus);
 
   // AuxCopulaDa → AuxCopulaDa (で+ある/あれ) - strong bonus for である pattern
   // MeCab splits である as で(だ連用形) + ある(助動詞), not で(出る連用形) + ある
@@ -591,35 +604,35 @@ BigramTable::initTable() {
   // VerbTaForm → VerbMizenkei (盛りだ+くさ) - strong penalty
   // Two verbs in sequence without auxiliary/particle is grammatically unusual
   // Prevents 盛りだくさん → 盛りだ+くさ+ん over dictionary entry
-  setCell(t, EPOS::VerbTaForm, EPOS::VerbMizenkei, cost::kStrongPenalty);
+  setCell(t, EPOS::VerbTaForm, EPOS::VerbMizenkei, cost::kVeryRare);
 
   // VerbRenyokei → VerbMizenkei (盛り+だくさ) - strong penalty
   // Renyokei followed by mizenkei is grammatically unusual
   // Legitimate patterns like 食べ+すぎ use Renyokei→Renyokei (すぎ is renyokei)
-  setCell(t, EPOS::VerbRenyokei, EPOS::VerbMizenkei, cost::kStrongPenalty);
+  setCell(t, EPOS::VerbRenyokei, EPOS::VerbMizenkei, cost::kVeryRare);
 
   // AdjBasic → VerbMizenkei (盛りだく+さ) - strong penalty
   // Adjective 終止形 followed by verb 未然形 is grammatically unusual
   // Prevents 盛りだくさん → 盛りだく+さ+ん over dictionary entry
-  setCell(t, EPOS::AdjBasic, EPOS::VerbMizenkei, cost::kStrongPenalty);
+  setCell(t, EPOS::AdjBasic, EPOS::VerbMizenkei, cost::kVeryRare);
 
   // AdjStem → AuxConjectureMitai: unnatural (美し+みたい should be 美しい+みたい)
-  setCell(t, EPOS::AdjStem, EPOS::AuxConjectureMitai, cost::kProhibitive);
+  setCell(t, EPOS::AdjStem, EPOS::AuxConjectureMitai, cost::kAlmostNever);
 
   // AdjStem → AuxConjectureRashii: unnatural (美し+らしい should be 美しい+らしい)
-  setCell(t, EPOS::AdjStem, EPOS::AuxConjectureRashii, cost::kProhibitive);
+  setCell(t, EPOS::AdjStem, EPOS::AuxConjectureRashii, cost::kAlmostNever);
 
   // AdjStem → Verb/Aux: prohibit (な+い should not split ない as な(AdjStem)+い)
   // な(AdjStem of ない) should only connect to さ(nominalization) or そう(appearance)
   // Also prevents 高+すぎた winning over 高+すぎ+た
-  setCell(t, EPOS::AdjStem, EPOS::VerbRenyokei, cost::kProhibitive);
-  setCell(t, EPOS::AdjStem, EPOS::VerbShuushikei, cost::kProhibitive);
-  setCell(t, EPOS::AdjStem, EPOS::VerbMizenkei, cost::kProhibitive);
-  setCell(t, EPOS::AdjStem, EPOS::VerbTaForm, cost::kProhibitive);
-  setCell(t, EPOS::AdjStem, EPOS::VerbTaraForm, cost::kProhibitive);
-  setCell(t, EPOS::AdjStem, EPOS::AuxAspectIru, cost::kProhibitive);  // な+い(いる)
-  setCell(t, EPOS::AdjStem, EPOS::AuxNegativeNai, cost::kProhibitive);   // な+ない
-  setCell(t, EPOS::AdjStem, EPOS::Other, cost::kProhibitive);           // な+い(OTHER)
+  setCell(t, EPOS::AdjStem, EPOS::VerbRenyokei, cost::kAlmostNever);
+  setCell(t, EPOS::AdjStem, EPOS::VerbShuushikei, cost::kAlmostNever);
+  setCell(t, EPOS::AdjStem, EPOS::VerbMizenkei, cost::kAlmostNever);
+  setCell(t, EPOS::AdjStem, EPOS::VerbTaForm, cost::kAlmostNever);
+  setCell(t, EPOS::AdjStem, EPOS::VerbTaraForm, cost::kAlmostNever);
+  setCell(t, EPOS::AdjStem, EPOS::AuxAspectIru, cost::kAlmostNever);  // な+い(いる)
+  setCell(t, EPOS::AdjStem, EPOS::AuxNegativeNai, cost::kAlmostNever);   // な+ない
+  setCell(t, EPOS::AdjStem, EPOS::Other, cost::kAlmostNever);           // な+い(OTHER)
 
   // Note: Particle → AdjStem is allowed for patterns like やる気がなさそう (が+な+さ+そう)
 
@@ -630,17 +643,17 @@ BigramTable::initTable() {
   // Single-char particles followed by unknown hiragana are usually misanalyses
 
   // ParticleTopic → Other: penalty (も+ちろん is invalid)
-  setCell(t, EPOS::ParticleTopic, EPOS::Other, cost::kModeratePenalty);
+  setCell(t, EPOS::ParticleTopic, EPOS::Other, cost::kRare);
 
   // ParticleCase → Other: penalty (と+にかく, に+かく are invalid)
-  setCell(t, EPOS::ParticleCase, EPOS::Other, cost::kModeratePenalty);
+  setCell(t, EPOS::ParticleCase, EPOS::Other, cost::kRare);
 
   // ParticleFinal → Other: penalty (ね+random, よ+random are invalid)
-  setCell(t, EPOS::ParticleFinal, EPOS::Other, cost::kModeratePenalty);
+  setCell(t, EPOS::ParticleFinal, EPOS::Other, cost::kRare);
 
   // ParticleConj → Other: minor penalty (て+random at sentence start is unlikely)
   // Less penalty than others because て+noun/verb is valid in some contexts
-  setCell(t, EPOS::ParticleConj, EPOS::Other, cost::kMinorPenalty);
+  setCell(t, EPOS::ParticleConj, EPOS::Other, cost::kUncommon);
 
   // =========================================================================
   // Conjunction → Auxiliary penalties
@@ -649,11 +662,11 @@ BigramTable::initTable() {
   // 彼女でもない should be 彼女|で|も|ない (copula+particle) not 彼女|でも(CONJ)|ない
 
   // Conjunction → AuxNegativeNai: strong penalty (でも+ない is invalid as CONJ+AUX)
-  setCell(t, EPOS::Conjunction, EPOS::AuxNegativeNai, cost::kStrongPenalty);
+  setCell(t, EPOS::Conjunction, EPOS::AuxNegativeNai, cost::kVeryRare);
 
   // Conjunction → ParticleFinal: moderate penalty (でも+な is invalid)
   // Conjunctions don't typically connect to final particles mid-sentence
-  setCell(t, EPOS::Conjunction, EPOS::ParticleFinal, cost::kModeratePenalty);
+  setCell(t, EPOS::Conjunction, EPOS::ParticleFinal, cost::kRare);
 
   // Conjunction → VerbShuushikei/VerbRenyokei: strong bonus (でも+行く)
   // This favors でも+行く as single CONJ+VERB over で+も+行く
@@ -670,6 +683,10 @@ BigramTable::initTable() {
   // いったい何だ should tokenize as いったい + 何だ, not いったい + 何 + だ
   setCell(t, EPOS::Adverb, EPOS::Interjection, cost::kStrongBonus);
 
+  // Interjection → AuxGozaru (おはよう+ござい+ます) - strong bonus
+  // Greetings like おはようございます need this to prefer dict AuxGozaru over verb candidate
+  setCell(t, EPOS::Interjection, EPOS::AuxGozaru, cost::kStrongBonus);
+
   // Adverb → Noun (俄然+注目) - moderate bonus
   // Adverb modifying noun is natural and should beat kanji compound analysis
   setCell(t, EPOS::Adverb, EPOS::Noun, cost::kModerateBonus);
@@ -683,7 +700,7 @@ BigramTable::initTable() {
 
   // Adverb → AdjStem (さすが+な) - strong penalty
   // Prevents さすが(ADV)+な(AdjStem of ない); should be ADV+な(AuxCopulaDa連体形)
-  setCell(t, EPOS::Adverb, EPOS::AdjStem, cost::kStrongPenalty);
+  setCell(t, EPOS::Adverb, EPOS::AdjStem, cost::kVeryRare);
 
   // Adverb → Verb (たまたま+見つけ, すぐ+食べ) - moderate bonus
   // Adverb modifying verb is natural; prefer dictionary compound over split

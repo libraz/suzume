@@ -392,6 +392,29 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(
       }
     }
 
+    // Pattern 4: Merge indefinite numeral + counter suffix (数 + ヶ月 → 数ヶ月)
+    // Indefinite numerals: 数 (suu = some/several), 幾 (iku = how many)
+    if (current.pos == core::PartOfSpeech::Noun &&
+        utf8::equalsAny(current.surface, {"数", "幾"}) &&
+        idx + 1 < morphemes.size()) {
+      const auto& next = morphemes[idx + 1];
+      if (next.pos == core::PartOfSpeech::Suffix) {
+        core::Morpheme merged = current;
+        merged.surface += next.surface;
+        merged.lemma = merged.surface;
+        merged.end = next.end;
+        merged.end_pos = next.end_pos;
+
+        SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Merged indefinite+suffix: \""
+                         << current.surface << "\" + \"" << next.surface
+                         << "\" → \"" << merged.surface << "\"\n");
+
+        result.push_back(merged);
+        idx += 2;
+        continue;
+      }
+    }
+
     result.push_back(current);
     ++idx;
   }

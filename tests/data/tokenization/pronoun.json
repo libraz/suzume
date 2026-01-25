@@ -201,12 +201,8 @@
       "description" : "B39: お前 should be PRON, not PREFIX+NOUN split",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "前"
+          "surface" : "お前"
         },
         {
           "pos" : "Particle",

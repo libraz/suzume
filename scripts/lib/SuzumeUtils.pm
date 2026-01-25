@@ -645,7 +645,15 @@ sub apply_suzume_merge {
     # Skip: suffixes like ごろ, ごと (these should stay together)
     # Skip: お出で/おいで (honorific verb, should stay as one token)
     my @prefix_split;
-    my %prefix_exceptions = ('お出で' => 1, 'おいで' => 1, 'おすすめ' => 1, 'お疲れ様' => 1);
+    # Exceptions: words where お/ご is part of the lexeme, not a separable prefix
+    # - お金/お前: MeCab treats as single token (not prefix+noun)
+    # - お出で/おいで: honorific verb form
+    # - おすすめ: recommendation (lexicalized)
+    # - お疲れ様: greeting/interjection
+    my %prefix_exceptions = (
+        'お出で' => 1, 'おいで' => 1, 'おすすめ' => 1, 'お疲れ様' => 1,
+        'お金' => 1, 'お前' => 1,
+    );
     for my $t (@result) {
         my $surface = $t->{surface} // '';
         my $pos = $t->{pos} // '';

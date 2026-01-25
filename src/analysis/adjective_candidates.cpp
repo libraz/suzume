@@ -1254,7 +1254,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       katt_cand.end = cand.end - 1;  // 1 character (た)
       katt_cand.pos = core::PartOfSpeech::Adjective;
       katt_cand.lemma = cand.lemma;  // Same lemma (よい, 寒い, etc.)
-      katt_cand.cost = cand.cost + 0.2F;  // Higher cost than full form (match dictionary expansion)
+      katt_cand.cost = cand.cost - 0.1F;  // Lower cost to prefer split (MeCab compat)
       katt_cand.has_suffix = true;  // This is a conjugated form (連用タ接続)
       katt_cand.extended_pos = core::ExtendedPOS::AdjKatt;  // For bigram: AdjKatt→AuxTenseTa
 #ifdef SUZUME_DEBUG_INFO

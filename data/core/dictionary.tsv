@@ -307,7 +307,6 @@
 ほぼ	ADVERB
 再び	ADVERB
 到底	ADVERB
-そう	ADVERB
 思わず	ADVERB
 ほんわか	ADVERB
 なるほど	ADVERB
@@ -559,7 +558,6 @@
 差し支え	NOUN
 組み合わせ	NOUN
 申し訳	NOUN
-日付	NOUN
 取り扱い	NOUN
 取り組み	NOUN
 
@@ -574,7 +572,6 @@
 儲け	NOUN
 あだ名	NOUN
 なし崩し	NOUN
-ご飯	NOUN
 子どもの貧困	NOUN
 食器洗い乾燥機	NOUN
 投資ファンド	NOUN
@@ -665,7 +662,6 @@ Wi-Fi	NOUN
 玉ねぎ	NOUN
 なん	NOUN
 マジ	NOUN
-お茶	NOUN
 のち	NOUN
 お金	NOUN
 はし	NOUN
@@ -690,6 +686,7 @@ Wi-Fi	NOUN
 電車	NOUN
 学校	NOUN
 あん	NOUN
+注目	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -712,6 +709,8 @@ Wi-Fi	NOUN
 ら	SUFFIX
 がち	SUFFIX
 ごろ	SUFFIX
+ヶ所	SUFFIX
+ヶ月	SUFFIX
 度	SUFFIX
 
 # --- Plural suffixes ---
@@ -814,6 +813,7 @@ Wi-Fi	NOUN
 こんばんは	INTERJECTION
 何だ	INTERJECTION
 ああ	INTERJECTION
+お疲れ様	INTERJECTION
 こんにちは	INTERJECTION
 
 # =============================================================================
