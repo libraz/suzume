@@ -174,16 +174,18 @@ std::vector<UnknownCandidate> generateProductiveSuffixCandidates(
     std::string surface = extractSubstring(codepoints, start_pos, candidate_end);
 
     // Pattern 1: V連用形 + がち (tendency suffix)
-    // Examples: ありがち、なりがち
-    if (surface.size() >= kGachiLen + 3 && utf8::endsWith(surface, "がち")) {
-      std::string_view stem = std::string_view(surface).substr(0, surface.size() - kGachiLen);
-      if (looksLikeVerbRenyokei(stem)) {
-        candidates.push_back(makeSuffixCandidate(
-            surface, start_pos, candidate_end, core::PartOfSpeech::Noun, -0.5F,
-            surface, 0.9F, "verb_renyokei_gachi"));
-        return candidates;  // Found valid がち candidate
-      }
-    }
+    // MeCab compatibility: Don't generate merged V+がち candidates
+    // MeCab splits as あり|がち, なり|がち (verb renyokei + suffix)
+    // Disabled to let the split path win
+    // if (surface.size() >= kGachiLen + 3 && utf8::endsWith(surface, "がち")) {
+    //   std::string_view stem = std::string_view(surface).substr(0, surface.size() - kGachiLen);
+    //   if (looksLikeVerbRenyokei(stem)) {
+    //     candidates.push_back(makeSuffixCandidate(
+    //         surface, start_pos, candidate_end, core::PartOfSpeech::Noun, -0.5F,
+    //         surface, 0.9F, "verb_renyokei_gachi"));
+    //     return candidates;  // Found valid がち candidate
+    //   }
+    // }
 
     // Pattern 2: V連用形 + っぽい (resemblance suffix)
     // Examples: 子供っぽい、安っぽい、忘れっぽい
@@ -207,6 +209,11 @@ std::vector<UnknownCandidate> generateGachiSuffixCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types) {
   std::vector<UnknownCandidate> candidates;
+
+  // MeCab compatibility: Don't generate merged V+がち candidates
+  // MeCab splits as 遅れ|がち, 忘れ|がち (verb renyokei + suffix)
+  // Return empty to let the split path win
+  return candidates;
 
   // For kanji-starting sequences ending with がち
   // Pattern: Kanji+ Hiragana(renyokei) + がち

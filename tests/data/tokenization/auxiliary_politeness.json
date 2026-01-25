@@ -452,25 +452,16 @@
       "description" : "おいでなんし - kuruwa-kotoba polite invitation",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos" : "Adverb",
+          "surface" : "おいで"
         },
         {
           "pos" : "Noun",
-          "surface" : "い"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "で"
-        },
-        {
-          "lemma" : "なる",
-          "pos" : "Verb",
           "surface" : "なん"
         },
         {
-          "lemma" : "き",
-          "pos" : "Auxiliary",
+          "lemma" : "する",
+          "pos" : "Verb",
           "surface" : "し"
         }
       ],

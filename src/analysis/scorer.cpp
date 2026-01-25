@@ -281,6 +281,26 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += kPureHiraganaOnbinPenalty;
   }
 
+  // Penalty for pure-hiragana verb forms containing "さん" pattern
+  // E.g., "おさんで" as te-form of "おさむ" is likely name+さん+で misanalysis
+  // E.g., "さんで" as te-form of "さむ" is likely さん+で misanalysis
+  // Patterns: xさん, xさんで, さんで where x is short hiragana (likely name)
+  // This complements the hatsuonbin penalty above for other verb forms
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      grammar::isPureHiragana(edge.surface) &&
+      (utf8::contains(edge.surface, "さん"))) {
+    size_t san_pos = edge.surface.find("さん");
+    if (san_pos != std::string::npos) {
+      // Penalize if:
+      // 1. さん appears after 0-2 hiragana chars (likely name+さん or just さん)
+      // 2. The verb form is short enough to be a misanalysis
+      if (san_pos <= 6 && edge.surface.size() <= 15) {  // 0-2 chars before, up to 5 total
+        constexpr float kSanPatternVerbPenalty = 2.5F;
+        cost += kSanPatternVerbPenalty;
+      }
+    }
+  }
+
   // Penalty for pure-hiragana ichidan verb renyokei starting with に
   // E.g., "につけ" as renyokei of "につける" is spurious
   // Should be に|つけ (particle + verb), not につけ (verb)
@@ -292,6 +312,17 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       edge.surface.size() >= 6 && edge.surface.size() <= 12) {  // 2-4 chars
     constexpr float kNiPrefixVerbPenalty = 2.0F;
     cost += kNiPrefixVerbPenalty;
+  }
+
+  // Penalty for very long pure-hiragana verb candidates not in dictionary
+  // E.g., "ございませんでし" as verb renyokei is spurious
+  // Should be ござい|ませ|ん|でし (aux chain), not ございませんでし (verb)
+  // Valid long verbs typically have kanji stems
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      grammar::isPureHiragana(edge.surface) &&
+      edge.surface.size() >= 18) {  // 6+ hiragana chars (6*3=18 bytes)
+    constexpr float kVeryLongPureHiraganaVerbPenalty = 3.5F;
+    cost += kVeryLongPureHiraganaVerbPenalty;
   }
 
   // Bonus for compound adjectives from dictionary (e.g., 男らしい, 女らしい)
@@ -737,9 +768,11 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // "願いし" is mis-recognized as godan-sa verb (願いす)
   // This pattern is common for サ変複合動詞: 願い+する, 案内+する
   // Exclude single-char "い" which is いる renyokei (interferes with 上手い+し)
+  // Exclude "で" which is でる renyokei (interferes with んでした → ん+でし+た)
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      next.surface == "し" && prev.fromDictionary() && prev.surface != "い") {
+      next.surface == "し" && prev.fromDictionary() &&
+      prev.surface != "い" && prev.surface != "で") {
     surface_bonus += -2.0F;  // Strong bonus to prefer 願い+し split
   }
 

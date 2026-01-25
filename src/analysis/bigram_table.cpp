@@ -276,6 +276,14 @@ BigramTable::initTable() {
   // Ensures ないんだ → ない+ん+だ over な+いん+だ
   setCell(t, EPOS::AuxNegativeNai, EPOS::ParticleNo, cost::kStrongBonus);
 
+  // ParticleNo → AuxCopulaDesu (ん+です/でし for んです/んでした) - strong bonus
+  // Ensures んでした → ん+でし+た over ん+で+し+た
+  setCell(t, EPOS::ParticleNo, EPOS::AuxCopulaDesu, cost::kStrongBonus);
+
+  // ParticleNo → AuxCopulaDa (ん+だ for んだ) - strong bonus
+  // Ensures んだ → ん+だ over ん+だ(VERB)
+  setCell(t, EPOS::ParticleNo, EPOS::AuxCopulaDa, cost::kStrongBonus);
+
   // AuxDesireTai → AuxTenseTa (たかっ+た) - strong bonus
   setCell(t, EPOS::AuxDesireTai, EPOS::AuxTenseTa, cost::kStrongBonus);
 
@@ -296,6 +304,11 @@ BigramTable::initTable() {
   // =========================================================================
   // Auxiliary → Particle
   // =========================================================================
+
+  // AuxCopulaDa → ParticleConj (な+ので, な+のに) - strong bonus
+  // Ensures なので → な+ので over な+の+で
+  // Without this, PART_準体→AUX_断定 bonus makes の+で(AUX) path win
+  setCell(t, EPOS::AuxCopulaDa, EPOS::ParticleConj, cost::kStrongBonus);
 
   // AuxTenseTa → ParticleFinal (た+ね/よ) - minor bonus
   setCell(t, EPOS::AuxTenseTa, EPOS::ParticleFinal, cost::kMinorBonus);
@@ -376,6 +389,10 @@ BigramTable::initTable() {
   // AdjStem → Suffix (な+さ in なさそう) - strong bonus for nominalization
   // This favors な(ADJ stem of ない) + さ(nominalization suffix) over さ(する mizenkei)
   setCell(t, EPOS::AdjStem, EPOS::Suffix, cost::kStrongBonus);
+
+  // VerbRenyokei → Suffix (遅れ+がち, 忘れ+がち) - strong bonus
+  // This favors verb renyokei + suffix pattern over merged tokens
+  setCell(t, EPOS::VerbRenyokei, EPOS::Suffix, cost::kStrongBonus);
 
   // =========================================================================
   // Particle → Various (Particles can connect to many things)

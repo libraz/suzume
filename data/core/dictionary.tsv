@@ -284,6 +284,8 @@
 一気に	ADVERB
 堂々と	ADVERB
 幸い	ADVERB
+大変	ADVERB
+おいで	ADVERB
 俄然	ADVERB
 
 # =============================================================================
@@ -304,6 +306,7 @@
 かかる	VERB	GODAN_RA
 こもり	VERB	GODAN_RA
 サボる	VERB	GODAN_RA
+見つかる	VERB	GODAN_RA
 怒鳴る	VERB	GODAN_RA
 # B65: 詰まる - moved to L1 for conjugation expansion
 
@@ -389,6 +392,8 @@
 でる	VERB	ICHIDAN
 いただける	VERB	ICHIDAN
 たべる	VERB	ICHIDAN
+出かける	VERB	ICHIDAN
+バレる	VERB	ICHIDAN
 諦める	VERB	ICHIDAN
 
 # =============================================================================
@@ -595,6 +600,7 @@ Wi-Fi	NOUN
 だるま	NOUN
 すもも	NOUN
 もも	NOUN
+がお	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -615,6 +621,7 @@ Wi-Fi	NOUN
 感	SUFFIX
 力	SUFFIX
 ら	SUFFIX
+がち	SUFFIX
 度	SUFFIX
 
 # --- Plural suffixes ---

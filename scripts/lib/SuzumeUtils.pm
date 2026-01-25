@@ -102,7 +102,8 @@ our %WORD_EXCEPTIONS = (
     'とうきょう' => '瑠璃',  # hiragana Tokyo → rare word that stays together
     'どさり' => 'ゆっくり',  # onomatopoeia → standard adverb
     'にゃー' => 'ねえ',     # colloquial particle with elongation
-    'すごーい' => 'すごい',  # elongated adjective
+    '打ち合わせ' => '会議',  # noun 打ち合わせ, not 打ち合わ+せ (causative)
+    'おいで' => 'お出で',   # honorific おいで, not おい+で
 );
 
 # Particles that MeCab may misclassify as Noun
@@ -341,7 +342,45 @@ sub apply_suzume_merge {
             }
         }
 
-        # 4. タリ活用副詞: merge 泰然 + と → 泰然と (Adverb)
+        # 4. Elongated adjective: やば+ー+い → やばーい, かわい+ー → かわいー
+        #    MeCab splits colloquial elongated adjectives, Suzume keeps them together
+        #    Patterns: stem+ー+い, stem+ー+いparticle, stem+ー (no い)
+        #    Lemma uses standard form (すごい, not すごーい)
+        if (!$merged && $t->{pos} eq '形容詞' && ($t->{conj_form} // '') eq 'ガル接続') {
+            my $j = $i + 1;
+            if ($j < @$tokens && ($tokens->[$j]{surface} // '') eq 'ー') {
+                my $combined = $t->{surface} . 'ー';
+                my $lemma = $t->{lemma} // ($t->{surface} . 'い');  # standard form
+                $j++;
+                # Check what follows ー
+                if ($j < @$tokens) {
+                    my $next_surface = $tokens->[$j]{surface} // '';
+                    if ($next_surface eq 'い') {
+                        # stem+ー+い → stem+ーい
+                        $combined .= 'い';
+                        $j++;
+                    } elsif ($next_surface =~ /^い(ね|よ|な|わ|ぞ|さ|か|の|けど)$/) {
+                        # stem+ー+い+particle → stem+ーい + particle
+                        my $particle = substr($next_surface, 1);
+                        $combined .= 'い';
+                        push @result, { surface => $combined, pos => '形容詞', lemma => $lemma };
+                        push @result, { surface => $particle, pos => '助詞', lemma => $particle };
+                        $i = $j + 1;
+                        $merged = 1;
+                        $applied_rule //= 'elongated-adjective';
+                    }
+                }
+                # If not handled above, just merge stem+ー (e.g., かわいー)
+                if (!$merged) {
+                    push @result, { surface => $combined, pos => '形容詞', lemma => $lemma };
+                    $i = $j;
+                    $merged = 1;
+                    $applied_rule //= 'elongated-adjective';
+                }
+            }
+        }
+
+        # 5. タリ活用副詞: merge 泰然 + と → 泰然と (Adverb)
         #    Exception: MeCab splits these as Noun+Particle, but merged form is Adverb
         if (!$merged) {
             for my $stem (@TARI_ADVERB_STEMS) {
@@ -414,11 +453,15 @@ sub apply_suzume_merge {
                 $combined .= $next->{surface};
                 $j++;
             }
-            # Also merge with 付け suffix (日付け, 月付け, etc.)
-            # Suzume cannot split kanji+hiragana suffix without dictionary
-            if ($j < @$tokens && ($tokens->[$j]{surface} // '') eq '付け') {
-                $combined .= $tokens->[$j]{surface};
-                $j++;
+            # Also merge with common noun-forming suffixes
+            # Suzume cannot split kanji+suffix without dictionary
+            # 付け (日付け, 月付け), 者 (代表者, 責任者), 人 (日本人, 責任者)
+            if ($j < @$tokens) {
+                my $next_surface = $tokens->[$j]{surface} // '';
+                if ($next_surface =~ /^(付け|者|人)$/) {
+                    $combined .= $next_surface;
+                    $j++;
+                }
             }
             if ($j > $i + 1) {
                 push @result, { surface => $combined, pos => '名詞', lemma => $combined };
@@ -498,13 +541,16 @@ sub apply_suzume_merge {
     # Post-process: split お/ご+noun patterns (Suzume has no dictionary, splits prefix)
     # お菓子 → お+菓子, ご飯 → ご+飯
     # Skip: suffixes like ごろ, ごと (these should stay together)
+    # Skip: お出で/おいで (honorific verb, should stay as one token)
     my @prefix_split;
+    my %prefix_exceptions = ('お出で' => 1, 'おいで' => 1);
     for my $t (@result) {
         my $surface = $t->{surface} // '';
         my $pos = $t->{pos} // '';
         my $pos_sub1 = $t->{pos_sub1} // '';
-        # Pattern: お/ご + noun (kanji or hiragana), but not suffixes
+        # Pattern: お/ご + noun (kanji or hiragana), but not suffixes or exceptions
         if ($pos eq '名詞' && $pos_sub1 ne '接尾'
+            && !$prefix_exceptions{$surface}
             && $surface =~ /^(お|ご)([\p{Script=Han}\p{Script=Hiragana}]+)$/) {
             my ($prefix, $noun) = ($1, $2);
             push @prefix_split, { surface => $prefix, pos => '接頭詞', lemma => $prefix };
@@ -536,6 +582,30 @@ sub apply_suzume_merge {
         }
     }
     @result = @filler_split;
+
+    # Post-process: fix POS/lemmas for dialectal/special patterns
+    # おいでなんし: おいで=Adverb, なん=Noun (dialectal), し=Verb (する連用形)
+    for my $j (0 .. $#result) {
+        my $curr = $result[$j];
+        my $surface = $curr->{surface} // '';
+
+        # おいで: Adverb (honorific imperative)
+        if ($surface eq 'おいで' || $surface eq 'お出で') {
+            $curr->{pos} = '副詞';
+            $curr->{lemma} = 'おいで';
+        }
+
+        # なん + し pattern (dialectal)
+        if ($j < $#result) {
+            my $next = $result[$j + 1];
+            if ($surface eq 'なん' && ($next->{surface} // '') eq 'し') {
+                $curr->{pos} = '名詞';
+                $curr->{lemma} = 'なん';
+                $next->{pos} = '動詞';
+                $next->{lemma} = 'する';
+            }
+        }
+    }
 
     return (\@result, $applied_rule);
 }
