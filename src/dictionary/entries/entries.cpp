@@ -105,6 +105,12 @@ inline DictionaryEntry pronoun(const char* s, const char* lemma = "") {
   return {s, POS::Pronoun, EPOS::Pronoun, lemma};
 }
 
+// Interjection helper: creates INTERJECTION entry
+// Usage: intj("えっ")
+inline DictionaryEntry intj(const char* s, const char* lemma = "") {
+  return {s, POS::Interjection, EPOS::Interjection, lemma};
+}
+
 // =============================================================================
 // Particles (助詞)
 // =============================================================================
@@ -328,6 +334,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       adj("よけれ", "よい", EPOS::AdjKeForm),
       adj("よかっ", "よい", EPOS::AdjKatt),
       adj("よく", "よい", EPOS::AdjRenyokei),
+      adj("よ", "よい", EPOS::AdjStem),  // MeCab: よさ → よ(語幹/ガル接続) + さ(接尾辞)
 
       // Irregular i-adjective ない (形容詞・アウオ段)
       // MeCab: なさそう → な(語幹/ガル接続) + さ(名詞化接尾辞) + そう(様態)
@@ -482,15 +489,16 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("じゃい", "じゃう", EPOS::AuxAspectShimau),
 
       // Contracted forms: てる/とく (progressive/preparation)
-      verb("てる", "てる", EPOS::AuxAspectIru),
-      verb("て", "てる", EPOS::AuxAspectIru),
+      // MeCab: 動詞,非自立 → Auxiliary (subsidiary verbs)
+      aux("てる", "てる", EPOS::AuxAspectIru),
+      aux("て", "てる", EPOS::AuxAspectIru),
       // Note: で/でる removed from AuxAspectIru - they conflict with 出る renyokei
       // 「出たい」should be で(出る連用形)+たい, not で(補助動詞)+たい
-      verb("とく", "とく", EPOS::AuxAspectOku),
-      verb("どく", "どく", EPOS::AuxAspectOku),
+      aux("とく", "とく", EPOS::AuxAspectOku),
+      aux("どく", "どく", EPOS::AuxAspectOku),
       // MeCab compat: とい/どい (renyokei) + た/て instead of といた/どいた
-      verb("とい", "とく", EPOS::AuxAspectOku),
-      verb("どい", "どく", EPOS::AuxAspectOku),
+      aux("とい", "とく", EPOS::AuxAspectOku),
+      aux("どい", "どく", EPOS::AuxAspectOku),
 
       // Directional auxiliaries - いく/くる (方向補助動詞)
       aux("いく", "いく", EPOS::AuxAspectIku),
@@ -769,6 +777,43 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
       // NOTE: 〜がち forms are now handled by generateGachiSuffixCandidates() in suffix_candidates.cpp
       // B35: Idiom component (eaves bracket - used in うだつが上がらない)
       formal_noun("うだつ", "うだつ"),
+  };
+}
+
+// =============================================================================
+// Interjections (感動詞)
+// =============================================================================
+std::vector<DictionaryEntry> getInterjectionEntries() {
+  return {
+      // Common interjections (exclamations)
+      intj("えっ"),      // Surprise
+      intj("ええ"),      // Affirmation/Surprise
+      intj("あっ"),      // Realization
+      intj("ああ"),      // Agreement/Sigh
+      intj("おお"),      // Amazement
+      intj("うわ"),      // Surprise
+      intj("うわっ"),    // Surprise (emphatic)
+      intj("わあ"),      // Amazement
+      intj("へえ"),      // Interest
+      intj("ふーん"),    // Understanding/Disinterest
+      intj("ふうん"),    // Understanding
+      intj("ほう"),      // Interest
+      intj("おい"),      // Calling attention
+      intj("おーい"),    // Calling from afar
+      intj("あれ"),      // Confusion
+      intj("あれっ"),    // Confusion (emphatic)
+      intj("まあ"),      // Surprise/Moderation
+      intj("ねえ"),      // Attention-getting (also particle, but standalone usage)
+      // Responses
+      intj("はい"),      // Yes
+      intj("いいえ"),    // No
+      intj("うん"),      // Casual yes
+      intj("ううん"),    // Casual no
+      // Hesitation/Filler
+      intj("えーと"),    // Hesitation
+      intj("えっと"),    // Hesitation
+      intj("あの"),      // Hesitation (also determiner)
+      intj("その"),      // Hesitation (rare, also determiner)
   };
 }
 

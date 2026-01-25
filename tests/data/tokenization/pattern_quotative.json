@@ -4,7 +4,7 @@
       "description" : "Basic という determiner",
       "expected" : [
         {
-          "pos" : "Particle",
+          "pos" : "Determiner",
           "surface" : "という"
         }
       ],
@@ -23,7 +23,7 @@
           "surface" : "太郎"
         },
         {
-          "pos" : "Particle",
+          "pos" : "Determiner",
           "surface" : "という"
         },
         {

@@ -159,9 +159,12 @@
 無鉄砲	ADJECTIVE	NA_ADJ
 不可能	ADJECTIVE	NA_ADJ
 まじ	ADJECTIVE	NA_ADJ
+元気	ADJECTIVE	NA_ADJ
+大嫌い	ADJECTIVE	NA_ADJ
 幸い	ADJECTIVE	NA_ADJ
 やばい	ADJECTIVE	I_ADJ
 すごい	ADJECTIVE	I_ADJ
+可愛い	ADJECTIVE	I_ADJ
 つめたい	ADJECTIVE	I_ADJ
 よく	ADVERB
 
@@ -308,6 +311,9 @@
 思わず	ADVERB
 ほんわか	ADVERB
 なるほど	ADVERB
+がたり	ADVERB
+どさり	ADVERB
+ばたり	ADVERB
 俄然	ADVERB
 
 # =============================================================================
@@ -463,6 +469,7 @@
 経つ	VERB	GODAN_TA
 建つ	VERB	GODAN_TA
 持つ	VERB	GODAN_TA
+起きる	VERB	ICHIDAN
 諦める	VERB	ICHIDAN
 
 # =============================================================================
@@ -677,6 +684,12 @@ Wi-Fi	NOUN
 引き取り	NOUN
 取っ手	NOUN
 使い方	NOUN
+無意識	NOUN
+今日	NOUN
+雨	NOUN
+電車	NOUN
+学校	NOUN
+あん	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -757,7 +770,6 @@ Wi-Fi	NOUN
 あいよ	OTHER
 いくよ	OTHER
 ごめん	OTHER
-ありがと	OTHER
 おすすめ	NOUN
 
 # --- Mixed script compounds (カタカナ + 漢字) ---

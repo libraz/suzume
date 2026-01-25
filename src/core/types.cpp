@@ -29,6 +29,8 @@ std::string_view posToString(PartOfSpeech pos) {
       return "PREFIX";
     case PartOfSpeech::Suffix:
       return "SUFFIX";
+    case PartOfSpeech::Interjection:
+      return "INTJ";
     case PartOfSpeech::Symbol:
       return "SYMBOL";
     case PartOfSpeech::Other:
@@ -62,6 +64,8 @@ std::string_view posToJapanese(PartOfSpeech pos) {
       return "接頭辞";
     case PartOfSpeech::Suffix:
       return "接尾辞";
+    case PartOfSpeech::Interjection:
+      return "感動詞";
     case PartOfSpeech::Symbol:
       return "記号";
     case PartOfSpeech::Other:
@@ -105,6 +109,9 @@ PartOfSpeech stringToPos(std::string_view str) {
   }
   if (str == "SUFFIX" || str == "接尾辞") {
     return PartOfSpeech::Suffix;
+  }
+  if (str == "INTJ" || str == "感動詞") {
+    return PartOfSpeech::Interjection;
   }
   if (str == "SYMBOL" || str == "記号") {
     return PartOfSpeech::Symbol;
@@ -323,6 +330,7 @@ PartOfSpeech extendedPosToPos(ExtendedPOS epos) {
     case ExtendedPOS::Symbol:
       return PartOfSpeech::Symbol;
     case ExtendedPOS::Interjection:
+      return PartOfSpeech::Interjection;
     case ExtendedPOS::Other:
     case ExtendedPOS::Unknown:
     case ExtendedPOS::Count_:
@@ -355,6 +363,8 @@ ExtendedPOS posToExtendedPos(PartOfSpeech pos) {
       return ExtendedPOS::Prefix;
     case PartOfSpeech::Suffix:
       return ExtendedPOS::Suffix;
+    case PartOfSpeech::Interjection:
+      return ExtendedPOS::Interjection;
     case PartOfSpeech::Symbol:
       return ExtendedPOS::Symbol;
     case PartOfSpeech::Other:

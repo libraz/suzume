@@ -265,7 +265,9 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // Penalize Ichidan + で/だ combinations heavily
       if (actual_verb_type == VerbType::Ichidan &&
           suffix_str.size() >= core::kJapaneseCharBytes) {
-        std::string_view first_char = suffix_str.substr(0, core::kJapaneseCharBytes);
+        // Use string_view::substr to avoid creating temporary std::string
+        std::string_view suffix_view(suffix_str);
+        std::string_view first_char = suffix_view.substr(0, core::kJapaneseCharBytes);
         if (utf8::equalsAny(first_char, {"で", "だ"})) {
           candidate.confidence -= 0.6F;  // Strong penalty
           SUZUME_DEBUG_LOG_VERBOSE("  ichidan_voiced_te_ta_invalid: -0.6\n");

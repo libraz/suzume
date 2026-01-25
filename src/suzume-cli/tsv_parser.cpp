@@ -201,7 +201,7 @@ core::Expected<core::PartOfSpeech, core::Error> TsvParser::parsePos(
     return core::PartOfSpeech::Other;  // Map PHRASE to Other
   }
   if (str == "INTJ" || str == "INTERJECTION") {
-    return core::PartOfSpeech::Other;  // Map interjection to Other
+    return core::PartOfSpeech::Interjection;
   }
   if (str == "PRONOUN" || str == "PRON") {
     return core::PartOfSpeech::Pronoun;

@@ -1019,7 +1019,11 @@
       "expected" : [
         {
           "pos" : "Adverb",
-          "surface" : "もうってば"
+          "surface" : "もう"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ってば"
         }
       ],
       "id" : "tteba_emphatic_particle",
@@ -1034,7 +1038,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "あなたったら"
+          "surface" : "あなた"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ったら"
         }
       ],
       "id" : "ttara_topic_particle",

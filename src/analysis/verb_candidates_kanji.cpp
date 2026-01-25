@@ -1686,6 +1686,10 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       } else if (utf8::startsWith(hiragana_part, "といっ")) {
         // Skip と+いっ pattern - this is particle と + verb いう
         // E.g., 友人といった = 友人 + と + いっ + た, not 友人といる
+      } else if (hiragana_part == "くなっ") {
+        // Skip く+なっ pattern - this is i-adjective adverbial + なる verb
+        // E.g., 良くなった = 良く + なっ + た, not 良くなる as single verb
+        // MeCab splits: 高くなった → 高く + なっ + た
       } else {
       // Build potential base form and verify it exists in dictionary or inflection
       // This prevents false positives like 食べてしまる

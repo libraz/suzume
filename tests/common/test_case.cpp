@@ -18,7 +18,7 @@ core::PartOfSpeech ExpectedMorpheme::posEnum() const {
   if (pos == "Suffix") return core::PartOfSpeech::Suffix;
   if (pos == "Symbol") return core::PartOfSpeech::Symbol;
   if (pos == "Other") return core::PartOfSpeech::Other;
-  if (pos == "Interjection") return core::PartOfSpeech::Other;  // Interjection maps to Other
+  if (pos == "Interjection") return core::PartOfSpeech::Interjection;
   return core::PartOfSpeech::Unknown;
 }
 

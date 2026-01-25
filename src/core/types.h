@@ -11,20 +11,21 @@ namespace suzume::core {
  * @brief Part of speech types (minimal set for tag generation)
  */
 enum class PartOfSpeech : uint8_t {
-  Unknown,     // 不明
-  Noun,        // 名詞
-  Verb,        // 動詞
-  Adjective,   // 形容詞
-  Adverb,      // 副詞
-  Particle,    // 助詞
-  Auxiliary,   // 助動詞
-  Conjunction, // 接続詞
-  Determiner,  // 連体詞
-  Pronoun,     // 代名詞
-  Prefix,      // 接頭辞
-  Suffix,      // 接尾辞
-  Symbol,      // 記号
-  Other        // その他
+  Unknown,      // 不明
+  Noun,         // 名詞
+  Verb,         // 動詞
+  Adjective,    // 形容詞
+  Adverb,       // 副詞
+  Particle,     // 助詞
+  Auxiliary,    // 助動詞
+  Conjunction,  // 接続詞
+  Determiner,   // 連体詞
+  Pronoun,      // 代名詞
+  Prefix,       // 接頭辞
+  Suffix,       // 接尾辞
+  Interjection, // 感動詞
+  Symbol,       // 記号
+  Other         // その他
 };
 
 /**

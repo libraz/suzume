@@ -58,6 +58,8 @@ std::string conjTypeToString(dictionary::ConjugationType conj_type) {
       return "I_ADJ";
     case dictionary::ConjugationType::NaAdjective:
       return "NA_ADJ";
+    case dictionary::ConjugationType::Interjection:
+      return "INTJ";
   }
   return "";
 }

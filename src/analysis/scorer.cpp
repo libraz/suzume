@@ -194,9 +194,13 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
 
   // Bonus for hiragana interjections/greetings from dictionary
   // Prevents misanalysis like さようなら → さ+よう+なら (volitional pattern)
+  // or ありがとう → あり+が+とう (verb + particle + noun pattern)
   // These are fixed expressions that should remain as single tokens
   // Longer interjections get stronger bonus to beat common split patterns
-  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Other &&
+  // Note: applies to both Interjection (L1/L2) and Other (legacy)
+  if (edge.fromDictionary() &&
+      (edge.pos == core::PartOfSpeech::Interjection ||
+       edge.pos == core::PartOfSpeech::Other) &&
       grammar::isPureHiragana(edge.surface)) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     // Stronger bonus for longer interjections (common greetings are 4-5 chars)
@@ -560,6 +564,17 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += 2.5F;  // Strong penalty
   }
 
+  // Penalty for PREFIX → non-dictionary pure-hiragana verb pattern (3 chars)
+  // E.g., お+はよう in おはよう - はよう is not a real verb
+  // Valid patterns like お+待ち have kanji, お+召し would be in dictionary
+  if (prev.pos == core::PartOfSpeech::Prefix &&
+      next.pos == core::PartOfSpeech::Verb &&
+      !next.fromDictionary() &&
+      grammar::isPureHiragana(next.surface) &&
+      next.surface.size() == 9) {  // Exactly 3 chars (9 bytes)
+    surface_bonus += 2.5F;  // Strong penalty
+  }
+
   // Penalty for ADV → short pure-hiragana verb renyokei pattern
   // E.g., はなはだ+し should not happen (はなはだしい is an adjective)
   // Valid ADV+verb patterns: ゆっくり+歩く (verb is longer/has kanji)
@@ -831,10 +846,22 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // E.g., 家にいた → 家+に+い+た (not 家+にいた)
   // "にいた" is mis-recognized as godan verb (にく) past tense
   // い is the renyokei of いる (to exist/be), very common after particles
+  // Exclude と→い because という is a common determiner that should stay as one token
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      next.surface == "い") {
+      next.surface == "い" &&
+      prev.surface != "と") {  // Exclude と to protect という determiner
     surface_bonus += -0.5F;  // Bonus to prefer に+い split
+  }
+
+  // Penalty for と → いう pattern to protect という determiner
+  // E.g., という名前 → という+名前 (not と+いう+名前)
+  // という is a common quotative determiner that should stay as one token
+  if (prev.extended_pos == core::ExtendedPOS::ParticleCase &&
+      prev.surface == "と" &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      (next.surface == "いう" || next.surface == "いっ")) {
+    surface_bonus += 0.5F;  // Penalty to protect という/といっ determiners
   }
 
   // Bonus for VerbRenyokei → し (サ変 する renyokei)
@@ -901,6 +928,25 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::Noun &&
       next.surface.size() == 3) {  // Single kanji (3 bytes in UTF-8)
     surface_bonus += 2.5F;  // Strong penalty to prevent this split
+  }
+
+  // Bonus for dictionary NOUN → dictionary NOUN connection
+  // E.g., 明日+雨, 毎日+電車 should beat 明日雨, 毎日電車 (kanji_seq)
+  // When both nouns are in dictionary, the split path is more accurate
+  // This helps time nouns (明日, 今日, 毎日) + common nouns (雨, 電車)
+  if (prev.pos == core::PartOfSpeech::Noun && prev.fromDictionary() &&
+      next.pos == core::PartOfSpeech::Noun && next.fromDictionary()) {
+    surface_bonus += -0.2F;  // Small bonus to prefer dict+dict split
+  }
+
+  // Penalty for identical hiragana NOUN → NOUN sequence
+  // E.g., もも|もも is less likely than もも|も|もも (particle between)
+  // This prevents すもももも... from being split as もも|もも|もの
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      next.pos == core::PartOfSpeech::Noun &&
+      prev.surface == next.surface &&
+      grammar::isPureHiragana(prev.surface)) {
+    surface_bonus += 1.5F;  // Moderate penalty for identical hiragana nouns
   }
 
   float total = base_cost + extended_cost + surface_bonus;

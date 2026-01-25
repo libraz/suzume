@@ -20,7 +20,7 @@ class IScorer;
 namespace suzume::core {
 
 // Number of PartOfSpeech types (Unknown=0 to Other=13)
-inline constexpr size_t kNumPosTypes = 14;
+inline constexpr size_t kNumPosTypes = 15;  // Must match PartOfSpeech enum count
 
 /**
  * @brief Viterbi result with path and cost
@@ -149,6 +149,10 @@ class Viterbi {
                       << " total=" << total << "\n";
           }
 
+          // Bounds check - skip edges that go beyond text length
+          if (edge.end > text_len) {
+            continue;
+          }
           auto& next_state = states_by_pos[edge.end][next_pos_idx];
           if (!next_state.valid || total < next_state.cost) {
             next_state.cost = total;

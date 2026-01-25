@@ -562,6 +562,30 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
           cost += 2.0F;  // Strong penalty to force split
           SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (compound_adj_penalty)\n");
         }
+        // Penalty for く + なる patterns (i-adjective adverbial + なる verb)
+        // MeCab splits these: 良くなる → 良く + なる, 高くなった → 高く + なっ + た
+        // Must have at least 2 chars before くなる to avoid penalizing standalone patterns
+        if (!is_dict_adjective && surface.size() >= 3 * core::kJapaneseCharBytes) {
+          // Check for くなる/くなっ/くなり/くなれ/くなら/くなった patterns
+          if (utf8::endsWith(surface, "くなる") ||
+              utf8::endsWith(surface, "くなっ") ||
+              utf8::endsWith(surface, "くなり") ||
+              utf8::endsWith(surface, "くなれ") ||
+              utf8::endsWith(surface, "くなら") ||
+              utf8::endsWith(surface, "くなった") ||
+              utf8::endsWith(surface, "くなって")) {
+            cost += 2.0F;  // Strong penalty to force adj く-form + なる split
+            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (ku_naru_split)\n");
+          }
+        }
+        // Penalty for とい/という endings (noun + quotative patterns, not adjectives)
+        // E.g., 友人という → 友人 + という (determiner), not 友人とい(adj) + う
+        if (!is_dict_adjective && surface.size() >= 3 * core::kJapaneseCharBytes) {
+          if (utf8::endsWith(surface, "とい") || utf8::endsWith(surface, "という")) {
+            cost += 2.0F;  // Strong penalty to protect NOUN + という pattern
+            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (toiu_pattern)\n");
+          }
+        }
         // Set lemma to base form from inflection analysis (e.g., 使いやすく → 使いやすい)
         candidates.push_back(makeIAdjCandidate(
             surface, start_pos, end_pos, cand.base_form, cost,

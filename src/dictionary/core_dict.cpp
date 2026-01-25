@@ -14,6 +14,7 @@
 #include "dictionary/entries/conjunctions.h"
 #include "dictionary/entries/determiners.h"
 #include "dictionary/entries/formal_nouns.h"
+#include "dictionary/entries/interjections.h"
 #include "dictionary/entries/particles.h"
 #include "dictionary/entries/pronouns.h"
 
@@ -50,11 +51,13 @@ void CoreDictionary::initializeEntries() {
   auto determiners = entries::getDeterminerEntries();
   auto pronouns = entries::getPronounEntries();
   auto formal_nouns = entries::getFormalNounEntries();
+  auto interjections = entries::getInterjectionEntries();
 
   // Reserve space
   entries_.reserve(particles.size() + compound_particles.size() +
                    auxiliaries.size() + conjunctions.size() +
-                   determiners.size() + pronouns.size() + formal_nouns.size());
+                   determiners.size() + pronouns.size() + formal_nouns.size() +
+                   interjections.size());
 
   // Collect entries (trie built after sorting)
   auto addEntries = [this](const std::vector<DictionaryEntry>& source) {
@@ -70,6 +73,7 @@ void CoreDictionary::initializeEntries() {
   addEntries(determiners);
   addEntries(pronouns);
   addEntries(formal_nouns);
+  addEntries(interjections);
 
   // Sort entries by surface for Double-Array compatibility
   // Use stable_sort to preserve relative order of entries with same surface

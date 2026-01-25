@@ -310,13 +310,8 @@
       "description" : "どいつ should be single Pronoun",
       "expected" : [
         {
-          "lemma" : "どく",
-          "pos" : "Verb",
-          "surface" : "どい"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "つ"
+          "pos" : "Noun",
+          "surface" : "どいつ"
         },
         {
           "pos" : "Particle",

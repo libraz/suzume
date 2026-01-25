@@ -742,12 +742,23 @@ float calculateConfidence(VerbType type, std::string_view stem,
     }
   }
 
+  // I-adjective 2-kanji stems are rare - most are misanalyzed nouns
+  // Words like 勘違い, 間違い end with い but are nouns from verb nominalization
+  // Valid 2-kanji adjective stems: 面白 (おもしろい)
+  // This prevents "勘違い" from being parsed as adjective
+  if (type == VerbType::IAdjective && stem_len == core::kTwoJapaneseCharBytes && isAllKanji(stem)) {
+    // Check if in valid exceptions list
+    bool is_valid_two_kanji = isInArray(stem, inflection::kValidTwoKanjiIAdjStems);
+    if (!is_valid_two_kanji) {
+      base -= inflection::kPenaltyIAdjTwoKanjiStem;
+      logConfidenceAdjustment(-inflection::kPenaltyIAdjTwoKanjiStem, "i_adj_two_kanji_stem");
+    }
+  }
+
   // I-adjective stems consisting only of 3+ kanji are extremely rare
   // Such stems are usually サ変名詞 (検討, 勉強, 準備) being misanalyzed
   // Real i-adjectives have patterns like: 美しい, 楽しい (kanji + hiragana)
   // This prevents "検討いたす" from being parsed as "検討い" + "たす"
-  // Exception: 2-kanji stems (6 bytes) can be valid adjectives:
-  //   面白い (おもしろい), 可愛い (かわいい), 美味い (うまい)
   if (type == VerbType::IAdjective && stem_len >= core::kThreeJapaneseCharBytes && isAllKanji(stem)) {
     base -= inflection::kPenaltyIAdjAllKanji;
     logConfidenceAdjustment(-inflection::kPenaltyIAdjAllKanji, "i_adj_all_kanji");

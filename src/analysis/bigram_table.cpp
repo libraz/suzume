@@ -269,6 +269,10 @@ BigramTable::initTable() {
   // Ensures 見られたい → 見+られ+たい over 見+られ+た+い
   setCell(t, EPOS::AuxPassive, EPOS::AuxDesireTai, cost::kStrongBonus);
 
+  // AuxPassive → AuxVolitional (れる+べき in passive obligation) - strong bonus
+  // Ensures 書かれるべき → 書か+れる+べき(dict) over char_speech べき(AUX_過去) path
+  setCell(t, EPOS::AuxPassive, EPOS::AuxVolitional, cost::kStrongBonus);
+
   // AuxNegativeNai → AuxTenseTa (なかっ+た) - strong bonus
   setCell(t, EPOS::AuxNegativeNai, EPOS::AuxTenseTa, cost::kStrongBonus);
 
@@ -360,11 +364,13 @@ BigramTable::initTable() {
   // Determiner → Noun (連体詞は名詞を修飾)
   // =========================================================================
 
-  // Determiner → Noun (そんな+こと, こんな+話) - strong bonus
+  // Determiner → Noun (そんな+こと, こんな+話) - very strong bonus
   // Ensures そんなことない → そんな+こと+ない over そん+な+こと+ない
-  setCell(t, EPOS::Determiner, EPOS::Noun, cost::kStrongBonus);
-  setCell(t, EPOS::Determiner, EPOS::NounFormal, cost::kStrongBonus);
-  setCell(t, EPOS::Determiner, EPOS::NounProper, cost::kStrongBonus);
+  // Ensures あんな+人 over あん+な+人 (NOUN→AUX_断定→NOUN chain has -2.5 total)
+  constexpr float kDeterminerNounBonus = -2.5F;
+  setCell(t, EPOS::Determiner, EPOS::Noun, kDeterminerNounBonus);
+  setCell(t, EPOS::Determiner, EPOS::NounFormal, kDeterminerNounBonus);
+  setCell(t, EPOS::Determiner, EPOS::NounProper, kDeterminerNounBonus);
 
   // =========================================================================
   // Noun → Verb (サ変動詞パターン)
@@ -435,6 +441,12 @@ BigramTable::initTable() {
 
   // ParticleTopic → VerbShuushikei (は+食べる) - neutral
   setCell(t, EPOS::ParticleTopic, EPOS::VerbShuushikei, cost::kNeutral);
+
+  // ParticleTopic → VerbRenyokei (は+あり in はありますか) - minor bonus
+  // Helps は+あり+ます beat はあり+ます (particle-starting verb)
+  // Note: ParticleCase → VerbRenyokei is intentionally not added to avoid
+  // breaking という patterns (と is ParticleCase, いう is VerbRenyokei)
+  setCell(t, EPOS::ParticleTopic, EPOS::VerbRenyokei, cost::kMinorBonus);
 
   // ParticleConj → VerbShuushikei (て+食べる for compound verbs) - minor penalty
   // (te-form usually followed by auxiliary, not new verb)

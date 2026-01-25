@@ -887,12 +887,8 @@
       "description" : "がたり should be ADV (ABり型) - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Conjunction",
-          "surface" : "が"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "たり"
+          "pos" : "Adverb",
+          "surface" : "がたり"
         },
         {
           "pos" : "Particle",

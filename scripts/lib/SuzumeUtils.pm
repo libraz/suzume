@@ -49,6 +49,7 @@ our %POS_MAP = (
     '連体詞'   => 'Adnominal',
     '接頭詞'   => 'Prefix',
     '接尾辞'   => 'Suffix',
+    '代名詞'   => 'Pronoun',
     '記号'     => 'Symbol',
     'フィラー' => 'Filler',
     'その他'   => 'Other',
@@ -107,6 +108,7 @@ our %WORD_EXCEPTIONS = (
     'ほんわか' => 'ゆっくり', # onomatopoeia → standard adverb
     'ありきたり' => '当たり前', # na-adjective → standard word
     'ばたり' => 'ゆっくり',  # onomatopoeia → standard adverb
+    'がたり' => 'ゆっくり',  # onomatopoeia → standard adverb
     # Colloquial elongated/repeated patterns
     'すごいいいい' => 'すごい',  # vowel repeat → standard form
     'すごーーい' => 'すごい',    # choon repeat → standard form
@@ -518,6 +520,29 @@ sub apply_suzume_merge {
             }
         }
 
+        # 8. Colloquial pronouns: merge どい+つ → どいつ, こい+つ → こいつ, etc.
+        #    MeCab incorrectly splits these as verb+auxiliary (どく連用形+つ)
+        #    These are single pronouns meaning "which/this/that/which one (person)"
+        if (!$merged) {
+            for my $pronoun (qw(どいつ こいつ そいつ あいつ)) {
+                if ($remaining =~ /^\Q$pronoun\E/) {
+                    my $len = 0;
+                    my $j = $i;
+                    while ($j < @$tokens && $len < length($pronoun)) {
+                        $len += length($tokens->[$j]{surface});
+                        $j++;
+                    }
+                    if ($len == length($pronoun)) {
+                        push @result, { surface => $pronoun, pos => '代名詞', lemma => $pronoun };
+                        $i = $j;
+                        $merged = 1;
+                        $applied_rule //= 'colloquial-pronoun';
+                        last;
+                    }
+                }
+            }
+        }
+
         if (!$merged) {
             push @result, {
                 surface => $t->{surface},
@@ -551,6 +576,32 @@ sub apply_suzume_merge {
         }
     }
     @result = @kamo_merged;
+
+    # Post-process: merge の+に → のに (conjunctive particle after た/だ)
+    # MeCab splits のに in context as 名詞,非自立 + 格助詞, but grammatically
+    # のに after past tense is the conjunctive particle meaning "even though/despite"
+    my @noni_merged;
+    $skip_next = 0;
+    for my $j (0 .. $#result) {
+        if ($skip_next) {
+            $skip_next = 0;
+            next;
+        }
+        my $curr = $result[$j];
+        # Check for の + に pattern after た/だ (past tense)
+        if ($j >= 1 && $j < $#result
+            && ($curr->{surface} // '') eq 'の'
+            && ($result[$j + 1]{surface} // '') eq 'に'
+            && (($result[$j - 1]{surface} // '') =~ /^[たっだ]$/ ||
+                ($result[$j - 1]{pos} // '') eq '助動詞')) {
+            push @noni_merged, { surface => 'のに', pos => '助詞', lemma => 'のに' };
+            $skip_next = 1;
+            $applied_rule //= 'noni-merge';
+        } else {
+            push @noni_merged, $curr;
+        }
+    }
+    @result = @noni_merged;
 
     # Post-process: fix epenthetic さ in adjective+さ+そう pattern (なさそう, よさそう, etc.)
     # MeCab incorrectly classifies this さ as 名詞,接尾,特殊 but it should be Suffix
@@ -656,6 +707,56 @@ sub apply_suzume_merge {
                 $next->{lemma} = 'する';
             }
         }
+    }
+
+    return (\@result, $applied_rule);
+}
+
+# Apply Suzume split rules: split MeCab's single tokens into multiple
+# This handles cases where MeCab merges tokens that Suzume (correctly) splits
+sub apply_suzume_split {
+    my ($tokens) = @_;
+    my @result;
+    my $applied_rule;
+
+    for my $t (@$tokens) {
+        my $surface = $t->{surface};
+
+        # 1. ったら topic particle: あなたったら → あなた|ったら
+        # MeCab treats this as a single noun, but it's pronoun + particle
+        if ($surface =~ /^(.+)(ったら)$/ && length($1) >= 3) {
+            my ($stem, $particle) = ($1, $2);
+            # Only split if stem is a pronoun-like word
+            if ($stem =~ /^(あなた|おまえ|きみ|君|彼|彼女|あいつ|こいつ|誰|何|これ|それ|あれ)$/) {
+                push @result, { surface => $stem, pos => '名詞', lemma => $stem };
+                push @result, { surface => $particle, pos => '助詞', lemma => $particle };
+                $applied_rule //= 'ttara-split';
+                next;
+            }
+        }
+
+        # 2. ってば emphatic particle: もうってば → もう|ってば
+        if ($surface =~ /^(.+)(ってば)$/ && length($1) >= 2) {
+            my ($stem, $particle) = ($1, $2);
+            if ($stem =~ /^(もう|いい|だめ|ダメ|嫌|やだ)$/) {
+                push @result, { surface => $stem, pos => '副詞', lemma => $stem };
+                push @result, { surface => $particle, pos => '助詞', lemma => $particle };
+                $applied_rule //= 'tteba-split';
+                next;
+            }
+        }
+
+        # 3. Unnatural kanji compounds: 時分学校 → 時分|学校
+        # MeCab sometimes merges unrelated kanji sequences
+        if ($surface =~ /^(時分)(学校)$/) {
+            push @result, { surface => $1, pos => '名詞', lemma => $1 };
+            push @result, { surface => $2, pos => '名詞', lemma => $2 };
+            $applied_rule //= 'compound-split';
+            next;
+        }
+
+        # No split needed
+        push @result, $t;
     }
 
     return (\@result, $applied_rule);
@@ -775,6 +876,13 @@ sub map_mecab_pos {
         if ($surface =~ /^無[いく]$/ && $pos eq '助動詞') {
             $token->{lemma} = '無い';
             return 'Adjective';
+        }
+
+        # という: Determiner (連体詞), not Particle
+        # MeCab classifies as 助詞,格助詞,連語 but grammatically this is an adnominal
+        # Note: といった stays as Particle (Suzume outputs PARTICLE)
+        if ($surface eq 'という' && $pos eq '助詞') {
+            return 'Determiner';
         }
     }
 
@@ -1011,12 +1119,21 @@ sub get_expected_tokens {
     _postprocess_mecab_tokens($raw_tokens, $text, $replacements);
 
     # Apply Suzume merge rules using MeCab POS info
-    my ($merged, $applied_rule) = apply_suzume_merge($raw_tokens, $text);
+    my ($merged, $merge_rule) = apply_suzume_merge($raw_tokens, $text);
+
+    # Apply Suzume split rules (split MeCab's merged tokens)
+    my ($split, $split_rule) = apply_suzume_split($merged);
+
+    # Combine rule names
+    my $applied_rule = $merge_rule // $split_rule;
+    if ($merge_rule && $split_rule) {
+        $applied_rule = "$merge_rule+$split_rule";
+    }
 
     # Map POS to Suzume format and apply Suzume-specific normalization
     # Skip symbols (Suzume's basic mode excludes them from output)
     my @tokens;
-    for my $t (@$merged) {
+    for my $t (@$split) {
         my $pos = normalize_pos(map_mecab_pos($t));
         next if $pos eq 'Symbol';  # Skip symbols
         push @tokens, {

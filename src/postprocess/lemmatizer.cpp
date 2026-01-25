@@ -416,13 +416,16 @@ bool Lemmatizer::verifyCandidateWithDictionary(
 std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
                                             core::PartOfSpeech pos,
                                             dictionary::ConjugationType conj_type) const {
-  // First, check if surface itself is a base form in dictionary
+  // First, check if surface itself is a base form (not conjugated form) in dictionary
   // (e.g., 差し上げる should return 差し上げる, not 差し上ぐ)
+  // We check that lemma == surface, meaning it's the dictionary form, not a conjugated form
+  // Conjugated forms like 使い (from 使う) have lemma != surface (lemma = 使う)
   if (dict_manager_ != nullptr) {
     auto results = dict_manager_->lookup(surface, 0);
     for (const auto& result : results) {
       if (result.entry != nullptr &&
           result.entry->surface == surface &&
+          result.entry->lemma == surface &&  // Must be base form, not conjugated
           (result.entry->pos == core::PartOfSpeech::Verb ||
            result.entry->pos == core::PartOfSpeech::Adjective)) {
         // Surface is a valid base form in dictionary
@@ -491,9 +494,11 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
 }
 
 std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
-  // If morpheme is from dictionary and has lemma set, trust it
-  // (even if lemma == surface, which is correct for base forms)
-  if (morpheme.is_from_dictionary && !morpheme.lemma.empty()) {
+  // If morpheme is from dictionary and has distinct lemma set, trust it
+  // (lemma != surface means it was explicitly set, not defaulted)
+  // When lemma == surface, we need to re-derive for conjugated forms
+  if (morpheme.is_from_dictionary && !morpheme.lemma.empty() &&
+      morpheme.lemma != morpheme.surface) {
     return morpheme.lemma;
   }
 

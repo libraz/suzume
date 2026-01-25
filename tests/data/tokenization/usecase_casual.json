@@ -989,12 +989,8 @@
           "surface" : "た"
         },
         {
-          "pos" : "Noun",
-          "surface" : "の"
-        },
-        {
           "pos" : "Particle",
-          "surface" : "に"
+          "surface" : "のに"
         },
         {
           "lemma" : "負ける",

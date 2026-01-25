@@ -836,7 +836,11 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "時分学校"
+          "surface" : "時分"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "学校"
         }
       ],
       "id" : "time_noun_jibun_sentence",

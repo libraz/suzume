@@ -177,6 +177,17 @@ constexpr float kBonusIAdjShiiStem = 0.15F;
 // Verb renyokei + やすい/にくい compound pattern
 constexpr float kBonusIAdjCompoundYasuiNikui = 0.35F;
 
+// 2 kanji stem that's not in the valid list (勘違い, etc.)
+// Most 2-kanji words ending with い are nouns (勘違い, 間違い, 見通し→い)
+// Valid 2-kanji adjective stems are rare: 面白 (おもしろい)
+constexpr float kPenaltyIAdjTwoKanjiStem = 0.35F;
+
+// List of valid 2-kanji i-adjective stems
+// These are real adjectives, not misanalyzed nouns
+constexpr const char* kValidTwoKanjiIAdjStems[] = {
+    "面白",  // おもしろい (interesting)
+};
+
 // 3+ kanji stem - likely サ変名詞 misanalysis
 constexpr float kPenaltyIAdjAllKanji = 0.40F;
 
