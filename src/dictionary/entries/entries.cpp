@@ -359,21 +359,9 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: ご確認 → ご(接頭辞) + 確認(名詞)
       prefix("ご", "ご"),
 
-      // Negation prefix 未 (未確認, 未完成, 未解決)
-      // MeCab: 未確認 → 未(接頭辞) + 確認(名詞)
-      prefix("未", "未"),
-
-      // Negation prefix 非 (非公開, 非常識, 非対称)
-      // MeCab: 非公開 → 非(接頭辞) + 公開(名詞)
-      prefix("非", "非"),
-
-      // Negation prefix 不 (不安, 不明, 不可能)
-      // MeCab: 不可能 → 不(接頭辞) + 可能(名詞)
-      prefix("不", "不"),
-
-      // Negation prefix 無 (無料, 無関係, 無意味)
-      // MeCab: 無料 → 無(接頭辞) + 料(名詞)
-      prefix("無", "無"),
+      // Note: Negation prefixes (未, 非, 不, 無) are NOT registered
+      // MeCab splits them but Suzume keeps them unified for practical tokenization
+      // e.g., 未確認 → 未確認 (not 未+確認)
 
       // Nominalization suffix さ (高さ, 美しさ, なさ)
       // MeCab: 高さ → 高(語幹) + さ(名詞), なさそう → な + さ + そう
