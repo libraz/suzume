@@ -299,6 +299,10 @@ BigramTable::initTable() {
   // AuxAspectIru → AuxTenseTa (い+た) - moderate bonus
   setCell(t, EPOS::AuxAspectIru, EPOS::AuxTenseTa, cost::kModerateBonus);
 
+  // AuxAspectOku → AuxTenseTa (とい+た, どい+た) - strong bonus
+  // Contracted ~ておく form + past tense: 見とい+た, 読んどい+た
+  setCell(t, EPOS::AuxAspectOku, EPOS::AuxTenseTa, cost::kStrongBonus);
+
   // AuxAspectIru → AuxTenseMasu (い+ます) - strong bonus for MeCab-compatible split
   // Ensures 学んで+い+ます uses AuxAspectIru (auxiliary) not VerbRenyokei
   setCell(t, EPOS::AuxAspectIru, EPOS::AuxTenseMasu, cost::kStrongBonus);
@@ -539,6 +543,13 @@ BigramTable::initTable() {
   // Copula followed by verb mizenkei is grammatically unusual
   // Prevents 盛りだくさん → 盛り+だ+くさ+ん over dictionary entry
   setCell(t, EPOS::AuxCopulaDa, EPOS::VerbMizenkei, cost::kVeryRare);
+
+  // AuxCopulaDa → VerbRenyokei/VerbShuushikei - penalty for copula + general verb
+  // E.g., 公園で遊ぶ should be NOUN+PART_格+VERB, not NOUN+AUX_断定+VERB
+  // Copula 「で」 rarely followed by general verbs (usually followed by ある/ない/ございます)
+  // This helps PART_格(で)+VERB win over AUX_断定(で)+VERB
+  setCell(t, EPOS::AuxCopulaDa, EPOS::VerbRenyokei, cost::kMinor);
+  setCell(t, EPOS::AuxCopulaDa, EPOS::VerbShuushikei, cost::kMinor);
 
   // ParticleFinal → ParticleFinal (よ+ね) - minor bonus (common pattern)
   setCell(t, EPOS::ParticleFinal, EPOS::ParticleFinal, cost::kMinorBonus);

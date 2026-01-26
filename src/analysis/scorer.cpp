@@ -176,8 +176,9 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       grammar::isPureHiragana(edge.surface) &&
       !utf8::endsWith(edge.surface, "ければ") &&
       // Exclude ない/なく/なかっ - has auxiliary counterpart, context-dependent
+      // Exclude そう - has auxiliary counterpart (様態), context-dependent
       edge.surface != "ない" && edge.surface != "なく" &&
-      edge.surface != "なかっ") {
+      edge.surface != "なかっ" && edge.surface != "そう") {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     // Base bonus -2.5, plus 0.5 per character beyond 3
     float bonus = (char_len <= 3) ? -2.5F
@@ -1114,6 +1115,20 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kAlmostNever;
   }
 
+  // Penalty for PART_接続(し) → て pattern (PART_接続 or AUX_継続)
+  // E.g., をなくして should be を+なくし+て, not を+なく+し+て
+  // "し" as conjunctive particle (reason-listing) rarely followed by "て" directly
+  // This prevents adjective renyokei (なく) + し (particle) + て from winning
+  // over verb renyokei (なくし) + て pattern
+  // Note: "て" can be either ParticleConj or AuxAspectIru (ている/てる aspect)
+  if (prev.extended_pos == core::ExtendedPOS::ParticleConj &&
+      prev.surface == "し" &&
+      next.surface == "て" &&
+      (next.extended_pos == core::ExtendedPOS::ParticleConj ||
+       next.extended_pos == core::ExtendedPOS::AuxAspectIru)) {
+    surface_bonus += cost::kStrong;
+  }
+
   // Penalty for negation PREFIX (非/不/無/未) → single-kanji NOUN
   // E.g., 非常 → 非|常 is wrong (非常 is a single word, not prefix+noun)
   // E.g., 不可能 → 不|可能 is wrong (不可能 is a single word)
@@ -1125,6 +1140,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::Noun &&
       next.surface.size() == 3) {  // Single kanji (3 bytes in UTF-8)
     surface_bonus += cost::kAlmostNever;
+  }
+
+  // Penalty for AuxCopulaDa(で) → Symbol/EOS pattern
+  // E.g., あとで。 should be NOUN+PART_格+。, not NOUN+AUX_断定+。
+  // Copula 「で」 at sentence end is unusual; 格助詞「で」 is more natural
+  // Note: 「だ」+Symbol is valid (学生だ。), so only penalize 「で」
+  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+      prev.surface == "で" &&
+      next.extended_pos == core::ExtendedPOS::Symbol) {
+    surface_bonus += cost::kStrong;
   }
 
   // Bonus for dictionary NOUN → dictionary NOUN connection
@@ -1143,6 +1168,32 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.pos == core::PartOfSpeech::Noun &&
       prev.surface == next.surface &&
       grammar::isPureHiragana(prev.surface)) {
+    surface_bonus += cost::kVeryRare;
+  }
+
+  // Bonus for dictionary hiragana NOUN → single-char particle も/の pattern
+  // E.g., すもも|も|もも should beat すもも|もも (particle interpretation)
+  // E.g., もも|の|うち should beat もの|うち (particle interpretation)
+  // This helps famous test sentence: すもももももももものうち
+  if (prev.pos == core::PartOfSpeech::Noun && prev.fromDictionary() &&
+      grammar::isPureHiragana(prev.surface) &&
+      next.pos == core::PartOfSpeech::Particle &&
+      (next.surface == "も" || next.surface == "の")) {
+    surface_bonus += cost::kModerateBonus;
+  }
+
+  // Penalty for NOUN/PRON → pure-hiragana VERB_た形 (non-dict) pattern
+  // E.g., 家にいた should be 家+に+い+た, not 家+にいた
+  // E.g., ここにいた should be ここ+に+い+た, not ここ+にいた
+  // "にいた" is mis-recognized as godan verb (にく) past tense
+  // Pure-hiragana た-form verbs after NOUN/PRON are typically particle+aux sequences
+  // Valid kanji+hiragana た-forms like 食べた are not affected (not pure hiragana)
+  if ((prev.pos == core::PartOfSpeech::Noun ||
+       prev.pos == core::PartOfSpeech::Pronoun) &&
+      next.extended_pos == core::ExtendedPOS::VerbTaForm &&
+      !next.fromDictionary() &&
+      grammar::isPureHiragana(next.surface) &&
+      next.surface.size() <= 12) {  // 4 chars or less (12 bytes in UTF-8)
     surface_bonus += cost::kVeryRare;
   }
 
