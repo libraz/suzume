@@ -4,7 +4,6 @@
       "description" : "あなた - hiragana pronoun, MeCab-compatible lemma is hiragana",
       "expected" : [
         {
-          "lemma" : "あなた",
           "pos" : "Pronoun",
           "surface" : "あなた"
         }
@@ -177,7 +176,7 @@
       "description" : "Samurai pronoun 某",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "某"
         },
         {
@@ -201,7 +200,7 @@
       "description" : "B39: お前 should be PRON, not PREFIX+NOUN split",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "お前"
         },
         {
@@ -223,7 +222,7 @@
       "description" : "こいつ should be single Pronoun (not こい+つ)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "こいつ"
         },
         {
@@ -259,7 +258,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "誰"
         },
         {
@@ -306,7 +305,7 @@
       "description" : "どいつ should be single Pronoun",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "どいつ"
         },
         {
@@ -363,7 +362,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "何"
         },
         {

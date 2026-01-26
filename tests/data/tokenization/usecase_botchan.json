@@ -68,7 +68,7 @@
       "description" : "そこから飛び降りる事は出来まい - compound verb split + negative presumption unified",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "そこ"
         },
         {

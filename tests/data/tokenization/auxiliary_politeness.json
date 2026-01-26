@@ -288,7 +288,7 @@
       "description" : "これはいくらですか - should have particles",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "これ"
         },
         {
@@ -432,7 +432,7 @@
       "description" : "なんし - kuruwa-kotoba polite auxiliary (archaic courtesan speech)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "なん"
         },
         {

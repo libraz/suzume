@@ -437,7 +437,7 @@
       "description" : "B31: 何でもあり should be noun idiom",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "何"
         },
         {

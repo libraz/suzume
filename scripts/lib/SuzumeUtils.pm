@@ -854,6 +854,12 @@ sub map_mecab_pos {
             return 'Auxiliary';
         }
 
+        # 名詞,代名詞 → Pronoun (e.g., これ, それ, 私, 彼)
+        # MeCab classifies pronouns as 名詞,代名詞 but Suzume treats them as Pronoun
+        if ($pos eq '名詞' && $pos_sub1 eq '代名詞') {
+            return 'Pronoun';
+        }
+
         # 名詞,形容動詞語幹 → Adjective (e.g., 好き, 静か, 綺麗)
         # Suzume treats na-adjective stems as Adjective, not Noun
         if ($pos eq '名詞' && $pos_sub1 eq '形容動詞語幹') {
@@ -935,7 +941,7 @@ sub normalize_pos {
     # These override MeCab's classification to match Suzume's implementation
     my %suzume_override = (
         'Adnominal' => 'Determiner',  # 連体詞: MeCab=Adnominal, Suzume=Determiner
-        'Pronoun'   => 'Noun',        # 代名詞: Suzume has no dictionary, treats as Noun
+        # Pronoun is kept as-is (Suzume now supports pronouns)
     );
 
     return $suzume_override{$normalized} // $normalized;

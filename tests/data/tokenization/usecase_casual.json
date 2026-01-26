@@ -132,7 +132,7 @@
       "description" : "Contraction てる - MeCab splits 何+し+てる",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "何"
         },
         {
@@ -333,7 +333,7 @@
           "surface" : "これ"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "どこ"
         },
         {
@@ -436,7 +436,7 @@
       "description" : "Gratitude post",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "みんな"
         },
         {
@@ -759,7 +759,7 @@
           "surface" : "今"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "何"
         },
         {
@@ -931,7 +931,7 @@
       "description" : "Colloquial questioning past っけ",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "何時"
         },
         {

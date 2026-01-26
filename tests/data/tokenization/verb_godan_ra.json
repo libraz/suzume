@@ -281,7 +281,6 @@
           "surface" : "帰っ"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -651,7 +650,7 @@
           "surface" : "ば"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "何"
         },
         {

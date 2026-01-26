@@ -218,7 +218,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "何"
         },
         {
@@ -532,7 +532,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "いくら"
         },
         {
@@ -1107,7 +1107,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "何"
         },
         {

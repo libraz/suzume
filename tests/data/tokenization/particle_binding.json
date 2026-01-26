@@ -39,7 +39,7 @@
       "description" : "Kuruwa-kotoba ありんす",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "ここ"
         },
         {
@@ -107,7 +107,7 @@
       "description" : "Squid character でゲソ",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "吾輩"
         },
         {
@@ -278,7 +278,7 @@
       "description" : "君なら大丈夫 (if it's you, it's okay)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "君"
         },
         {
