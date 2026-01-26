@@ -577,6 +577,20 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kVeryStrongBonus;
   }
 
+  // Penalty for godan passive/causative-passive renyokei (～われ/～られ/～され) → た
+  // MeCab splits these as 言わ+れ+た, not 言われ+た
+  // E.g., 言われた → 言わ+れ+た, 売られた → 売ら+れ+た, やらされた → やらさ+れ+た
+  // This cancels the VerbRenyokei→た bonus for godan passive forms
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      prev.surface.size() >= 6 &&  // At least 2 chars (kanji+Xれ)
+      (utf8::endsWith(prev.surface, "われ") ||
+       utf8::endsWith(prev.surface, "られ") ||
+       utf8::endsWith(prev.surface, "され")) &&
+      next.surface == "た" &&
+      next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
+    surface_bonus += cost::kSevere;  // Cancel VerbRenyokei→た bonus
+  }
+
   // Surface-based bonus for でし → た (polite past copula)
   // 本でした should be 本+でし+た, not 本+で+し+た
   // The competing path is Noun→で(PARTICLE)→し(VERB)→た with VerbRenyokei→た bonus
