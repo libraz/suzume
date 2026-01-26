@@ -174,7 +174,10 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adjective &&
       edge.extended_pos != core::ExtendedPOS::AdjStem &&
       grammar::isPureHiragana(edge.surface) &&
-      !utf8::endsWith(edge.surface, "ければ")) {
+      !utf8::endsWith(edge.surface, "ければ") &&
+      // Exclude ない/なく/なかっ - has auxiliary counterpart, context-dependent
+      edge.surface != "ない" && edge.surface != "なく" &&
+      edge.surface != "なかっ") {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     // Base bonus -2.5, plus 0.5 per character beyond 3
     float bonus = (char_len <= 3) ? -2.5F
@@ -431,6 +434,31 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += cost::kVeryRare;
   }
 
+  // Penalty for pure-hiragana verb te-form candidates not in dictionary
+  // E.g., "もらって" should be もらっ + て, not もらって (verb te-form)
+  // E.g., "ねて" should be ね + て, not ねて (verb te-form)
+  // MeCab splits pure-hiragana verb te-forms into verb + て particle
+  // Exception: keep short forms (2 chars like して, きて) as they're common L1 entries
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      edge.extended_pos == core::ExtendedPOS::VerbTeForm &&
+      grammar::isPureHiragana(edge.surface) &&
+      edge.surface.size() >= 9) {  // 3+ chars (9 bytes) - allows して, きて
+    cost += cost::kVeryRare;
+  }
+
+  // Penalty for kanji+hiragana verb te-form candidates (e.g., 押して, 泳いで)
+  // MeCab splits these as 押し + て, 泳い + で
+  // Single kanji + て/で pattern is most common: 押して, 待って, 書いて, etc.
+  // This penalty encourages verb_stem + て particle split
+  // Apply to both dict and non-dict candidates as some come from auto-generation
+  if (edge.pos == core::PartOfSpeech::Verb &&
+      edge.extended_pos == core::ExtendedPOS::VerbTeForm &&
+      grammar::containsKanji(edge.surface) &&
+      (utf8::endsWith(edge.surface, "て") || utf8::endsWith(edge.surface, "で")) &&
+      edge.surface.size() <= 12) {  // Short te-forms (1-2 kanji + て/で)
+    cost += cost::kSevere;  // Very strong penalty to overcome negative costs
+  }
+
   // Bonus for compound adjectives from dictionary (e.g., 男らしい, 女らしい)
   // These compete with noun+らしい split which has -1.5 connection bonus.
   // Dictionary registration indicates compound adjective should take precedence.
@@ -531,6 +559,18 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.surface == "い" &&
       next.extended_pos == core::ExtendedPOS::AuxAspectIru) {
     surface_bonus += cost::kStrongBonus;
+  }
+
+  // Bonus for て → いただき (humble auxiliary verb) pattern
+  // E.g., 食べて+いただき+ます, して+いただけ+ます (MeCab-compatible split)
+  // The て→い(AUX)→ただき path incorrectly splits いただき
+  // いただく is a humble auxiliary verb that should not be split after て
+  if (prev.surface == "て" &&
+      prev.extended_pos == core::ExtendedPOS::ParticleConj &&
+      next.surface.size() >= 9 &&  // "いただ" is 9 bytes (3 hiragana × 3 bytes)
+      next.surface.compare(0, 9, "いただ") == 0 &&
+      next.pos == core::PartOfSpeech::Verb) {
+    surface_bonus += cost::kVeryStrongBonus;
   }
 
   // Penalty for VerbRenyokei ending in らし → い (AuxAspectIru) pattern

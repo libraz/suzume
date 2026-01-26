@@ -299,6 +299,10 @@ BigramTable::initTable() {
   // AuxAspectIru → AuxTenseTa (い+た) - moderate bonus
   setCell(t, EPOS::AuxAspectIru, EPOS::AuxTenseTa, cost::kModerateBonus);
 
+  // AuxAspectIru → AuxTenseMasu (い+ます) - strong bonus for MeCab-compatible split
+  // Ensures 学んで+い+ます uses AuxAspectIru (auxiliary) not VerbRenyokei
+  setCell(t, EPOS::AuxAspectIru, EPOS::AuxTenseMasu, cost::kStrongBonus);
+
   // AuxCopulaDa → AuxTenseTa (だっ+た) - strong bonus
   setCell(t, EPOS::AuxCopulaDa, EPOS::AuxTenseTa, cost::kStrongBonus);
 

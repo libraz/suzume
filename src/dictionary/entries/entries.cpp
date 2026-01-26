@@ -339,6 +339,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
 
       // Irregular i-adjective ない (形容詞・アウオ段)
       // MeCab: なさそう → な(語幹/ガル接続) + さ(名詞化接尾辞) + そう(様態)
+      // 金がない → 金 + が + ない (existential negative adjective)
+      // vs 食べない → 食べ + ない (negation auxiliary)
+      adj("ない", "ない", EPOS::AdjBasic),
+      adj("なく", "ない", EPOS::AdjRenyokei),
+      adj("なかっ", "ない", EPOS::AdjKatt),
       adj("な", "ない", EPOS::AdjStem),
 
       // Kanji form of ない (無い) - used in formal writing
