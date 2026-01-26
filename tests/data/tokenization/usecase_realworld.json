@@ -546,13 +546,8 @@
       "description" : "Currency with 万円 - single token",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "100"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "万円"
+          "surface" : "100万円"
         },
         {
           "pos" : "Particle",
@@ -713,12 +708,8 @@
       "description" : "Negation prefix 未確認",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "未"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "確認"
+          "surface" : "未確認"
         },
         {
           "pos" : "Particle",
@@ -1115,13 +1106,8 @@
       "description" : "Business invoice style",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "100"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "万円"
+          "surface" : "100万円"
         },
         {
           "pos" : "Particle",
@@ -1129,11 +1115,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "請求"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "書"
+          "surface" : "請求書"
         },
         {
           "pos" : "Particle",
@@ -1324,7 +1306,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -1384,12 +1366,8 @@
       "description" : "Academic paper style",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "本"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "研究"
+          "surface" : "本研究"
         },
         {
           "pos" : "Particle",

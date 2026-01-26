@@ -505,6 +505,19 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   // If lemma is already set and different from surface, use it
   // (lemma == surface means it's a default that may need re-derivation)
   if (!morpheme.lemma.empty() && morpheme.lemma != morpheme.surface) {
+    // Fix potential verb (可能動詞) lemma FIRST: 泊まれる should have lemma=泊まれる, not 泊む
+    // Potential verbs are single tokens ending in 〜れる (e.g., 書ける, 泊まれる, 読める)
+    // The inflection analyzer incorrectly derives lemma as godan base (泊む from 泊まれる)
+    // but potential verbs are ichidan verbs - their lemma should be surface itself
+    // Passive forms are split (読ま+れる), so single token 〜れる is likely potential
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        utf8::endsWithAny(morpheme.surface,
+            {"われる", "かれる", "がれる", "される", "たれる",
+             "なれる", "まれる", "ばれる", "られる"})) {
+      // Single token 〜れる verb: treat as potential verb, lemma = surface
+      return morpheme.surface;
+    }
+
     // B45: Special fix for ない adjective + さ + そう pattern
     // なさそう = ない + さ + そう (looks like there isn't)
     // The inflection analyzer incorrectly derives lemma なさい (from なさ + そう)
@@ -550,6 +563,47 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
       if (stem.size() >= core::kTwoJapaneseCharBytes && grammar::isAllKanji(stem)) {
         return stem + "する";
       }
+    }
+
+    // Fix 撥音便 lemma: if lemma ends with む but dictionary has ぶ or ぬ, use that
+    // E.g., 学ん → lemma=学む (wrong) → should be 学ぶ (correct)
+    // The candidate generator may produce wrong lemma when dictionary lookup fails
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        endsWith(morpheme.surface, "ん") &&
+        endsWith(morpheme.lemma, "む") &&
+        morpheme.lemma.size() >= core::kTwoJapaneseCharBytes &&
+        dict_manager_ != nullptr) {
+      std::string stem = morpheme.lemma.substr(0, morpheme.lemma.size() - core::kJapaneseCharBytes);
+      // Try ぶ (学ぶ, 遊ぶ, 飛ぶ, etc.)
+      std::string bu_form = stem + "ぶ";
+      auto results_bu = dict_manager_->lookup(bu_form, 0);
+      for (const auto& r : results_bu) {
+        if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb) {
+          return bu_form;
+        }
+      }
+      // Try ぬ (死ぬ)
+      std::string nu_form = stem + "ぬ";
+      auto results_nu = dict_manager_->lookup(nu_form, 0);
+      for (const auto& r : results_nu) {
+        if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb) {
+          return nu_form;
+        }
+      }
+      // Original む form - keep it
+    }
+
+    // Fix potential verb (可能動詞) lemma: 泊まれる should have lemma=泊まれる, not 泊む
+    // Potential verbs are single tokens ending in 〜れる (e.g., 書ける, 泊まれる, 読める)
+    // The inflection analyzer incorrectly derives lemma as godan base (泊む from 泊まれる)
+    // but potential verbs are ichidan verbs - their lemma should be surface itself
+    // Passive forms are split (読ま+れる), so single token 〜れる is likely potential
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        utf8::endsWithAny(morpheme.surface,
+            {"われる", "かれる", "がれる", "される", "たれる",
+             "なれる", "まれる", "ばれる", "られる"})) {
+      // Single token 〜れる verb: treat as potential verb, lemma = surface
+      return morpheme.surface;
     }
 
     return morpheme.lemma;
@@ -607,7 +661,25 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     // For passive verbs, grammar-based returns the passive form as base (e.g., いわれる)
     // but we want the original base verb (e.g., いう). Use rule-based lemmatization instead.
     // Pattern: 〜れる endings are passive forms of godan verbs
+    // EXCEPTION: Potential verbs (可能動詞) like 書ける, 泊まれる should keep lemma=surface
+    // Potential verbs are ichidan verbs derived from godan verbs (e.g., 泊まる→泊まれる)
+    // They are single tokens, not split like passive (読ま+れる)
+    // NOTE: When a 〜れる verb is recognized as a single token (not split), it's likely
+    // a potential verb. Passive forms are usually split (e.g., 読ま+れる).
     if (morpheme.pos == core::PartOfSpeech::Verb && grammar_result == morpheme.surface) {
+      // Check if this is a potential verb (可能動詞)
+      // Potential verbs have pattern: godan_stem + e-row + る
+      // E.g., 書ける (kak+e+ru), 泊まれる (tomar+e+ru), 読める (yom+e+ru)
+      // vs Passive: godan_mizen + れる → split as 読ま+れる
+      // Since this morpheme is a single token ending in 〜れる, it's likely a potential verb.
+      // (Passive forms would be split into 未然形 + れる by the tokenizer)
+      if (utf8::endsWithAny(morpheme.surface,
+          {"われる", "かれる", "がれる", "される", "たれる",
+           "なれる", "まれる", "ばれる", "られる"})) {
+        // Single token 〜れる verb: treat as potential verb, lemma = surface
+        return morpheme.surface;
+      }
+
       std::string rule_result = lemmatizeVerb(morpheme.surface);
       if (rule_result != morpheme.surface) {
         return rule_result;
@@ -625,22 +697,43 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     // Should be: 読ん → 読む, 書い → 書く
     if (morpheme.pos == core::PartOfSpeech::Verb) {
       std::string_view sfc = morpheme.surface;
-      // 撥音便: surface ends with ん, result ends with る → む
-      // This is the most common pattern (五段マ行: 読む, 飲む, 住む, etc.)
+      // 撥音便: surface ends with ん, result ends with る → む/ぶ/ぬ
+      // Godan verbs with 撥音便:
+      // - GodanMa (む): 読む, 飲む, 住む, etc.
+      // - GodanBa (ぶ): 学ぶ, 遊ぶ, 飛ぶ, etc.
+      // - GodanNa (ぬ): 死ぬ
       if (endsWith(sfc, "ん") && endsWith(grammar_result, "る") &&
           grammar_result.size() >= core::kTwoJapaneseCharBytes) {
         std::string stem = grammar_result.substr(0, grammar_result.size() - core::kJapaneseCharBytes);
-        std::string godan_form = stem + "む";
-        // Verify with dictionary if available, otherwise assume む is correct
+        // Try all three 撥音便 endings with dictionary verification
         if (dict_manager_ != nullptr) {
-          auto results = dict_manager_->lookup(godan_form, 0);
-          for (const auto& r : results) {
+          // Try む first (most common: 読む, 飲む, etc.)
+          std::string godan_mu_form = stem + "む";
+          auto results_mu = dict_manager_->lookup(godan_mu_form, 0);
+          for (const auto& r : results_mu) {
             if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb) {
-              return godan_form;
+              return godan_mu_form;
+            }
+          }
+          // Try ぶ (学ぶ, 遊ぶ, 飛ぶ, etc.)
+          std::string godan_bu_form = stem + "ぶ";
+          auto results_bu = dict_manager_->lookup(godan_bu_form, 0);
+          for (const auto& r : results_bu) {
+            if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb) {
+              return godan_bu_form;
+            }
+          }
+          // Try ぬ (死ぬ)
+          std::string godan_nu_form = stem + "ぬ";
+          auto results_nu = dict_manager_->lookup(godan_nu_form, 0);
+          for (const auto& r : results_nu) {
+            if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb) {
+              return godan_nu_form;
             }
           }
         }
         // Fallback: if stem is kanji, assume む (most common 撥音便 pattern)
+        std::string godan_form = stem + "む";
         if (!stem.empty() && grammar::isAllKanji(stem)) {
           return godan_form;
         }
@@ -727,6 +820,20 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
       }
     }
 
+    // Fix potential verb (可能動詞) lemma: 泊まれる should have lemma=泊まれる, not 泊む
+    // Potential verbs are single tokens ending in 〜れる (e.g., 書ける, 泊まれる, 読める)
+    // The inflection analyzer incorrectly derives lemma as godan base (泊む from 泊まれる)
+    // but potential verbs are ichidan verbs - their lemma should be surface itself
+    // Passive forms are split (読ま+れる), so single token 〜れる is likely potential
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        morpheme.lemma != morpheme.surface &&
+        utf8::endsWithAny(morpheme.surface,
+            {"われる", "かれる", "がれる", "される", "たれる",
+             "なれる", "まれる", "ばれる", "られる"})) {
+      // Single token 〜れる verb: treat as potential verb, lemma = surface
+      morpheme.lemma = morpheme.surface;
+    }
+
     // Preserve lemma if intentionally set (e.g., from verb_candidates for passive verbs)
     // Recalculate if:
     // 1. Lemma is empty, OR
@@ -744,13 +851,12 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
         if (!is_dict_form) {
           needs_lemmatization = true;
         }
-        // But passive verbs ending in 〜れる need lemmatization even though they end with る
-        // E.g., いわれる → いう, かかれる → かく
-        if (is_dict_form && utf8::endsWithAny(morpheme.surface,
-            {"われる", "かれる", "がれる", "される", "たれる",
-             "なれる", "まれる", "ばれる", "られる"})) {
-          needs_lemmatization = true;
-        }
+        // NOTE: Passive verbs ending in 〜れる (e.g., いわれる → いう, かかれる → かく)
+        // are usually SPLIT by the tokenizer (読ま+れる), not kept as single tokens.
+        // Single token 〜れる verbs are typically potential verbs (可能動詞) like:
+        // 書ける, 泊まれる, 読める - these should keep lemma = surface.
+        // So we DON'T mark 〜れる verbs for re-lemmatization here.
+        // The earlier fix already sets lemma = surface for these patterns.
         // Causative forms need lemmatization
         // E.g., 勉強させる → 勉強する, 書かせる → 書く
         if (is_dict_form && utf8::endsWithAny(morpheme.surface,

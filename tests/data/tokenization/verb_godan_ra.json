@@ -65,11 +65,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "領収"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "書"
+          "surface" : "領収書"
         },
         {
           "pos" : "Particle",

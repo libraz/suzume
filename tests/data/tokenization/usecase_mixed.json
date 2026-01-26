@@ -593,12 +593,8 @@
       "description" : "未 prefix",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "未"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "確認"
+          "surface" : "未確認"
         },
         {
           "pos" : "Particle",
@@ -864,7 +860,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -901,11 +897,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "5回"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "目"
+          "surface" : "5回目"
         },
         {
           "pos" : "Particle",
@@ -926,13 +918,8 @@
       "description" : "Currency",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "100"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "万円"
+          "surface" : "100万円"
         },
         {
           "pos" : "Particle",

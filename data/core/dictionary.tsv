@@ -242,7 +242,6 @@
 
 # --- Business/Formal adverbs ---
 よろしく	ADVERB
-いかが	ADVERB
 引き続き	ADVERB
 繰り返し	ADVERB
 ちっとも	ADVERB
@@ -359,6 +358,7 @@
 困る	VERB	GODAN_RA
 座る	VERB	GODAN_RA
 始まる	VERB	GODAN_RA
+かかわる	VERB	GODAN_RA
 怒鳴る	VERB	GODAN_RA
 # B65: 詰まる - moved to L1 for conjugation expansion
 
@@ -456,11 +456,12 @@
 行く	VERB	GODAN_KA
 おく	VERB	GODAN_KA
 もがく	VERB	GODAN_KA
+書く	VERB	GODAN_KA
 いただく	VERB	GODAN_KA
 たたずむ	VERB	GODAN_MA
+読む	VERB	GODAN_MA
 こむ	VERB	GODAN_MA
 見つける	VERB	ICHIDAN
-でる	VERB	ICHIDAN
 いただける	VERB	ICHIDAN
 たべる	VERB	ICHIDAN
 出かける	VERB	ICHIDAN
@@ -474,6 +475,11 @@
 建つ	VERB	GODAN_TA
 持つ	VERB	GODAN_TA
 起きる	VERB	ICHIDAN
+学ぶ	VERB	GODAN_BA
+遊ぶ	VERB	GODAN_BA
+呼ぶ	VERB	GODAN_BA
+飛ぶ	VERB	GODAN_BA
+降りる	VERB	ICHIDAN
 諦める	VERB	ICHIDAN
 
 # =============================================================================
@@ -692,6 +698,7 @@ Wi-Fi	NOUN
 学校	NOUN
 あん	NOUN
 注目	NOUN
+飲み会	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -705,7 +712,6 @@ Wi-Fi	NOUN
 率	SUFFIX
 法	SUFFIX
 論	SUFFIX
-者	SUFFIX
 家	SUFFIX
 員	SUFFIX
 式	SUFFIX
@@ -719,7 +725,6 @@ Wi-Fi	NOUN
 度	SUFFIX
 
 # --- Plural suffixes ---
-たち	OTHER
 ども	OTHER
 がた	OTHER
 

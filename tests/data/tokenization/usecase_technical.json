@@ -121,7 +121,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -255,7 +255,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -299,12 +299,8 @@
           "surface" : "は"
         },
         {
-          "pos" : "Prefix",
-          "surface" : "再"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "起動"
+          "surface" : "再起動"
         },
         {
           "lemma" : "する",
@@ -317,7 +313,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -1511,7 +1507,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -1573,7 +1569,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],

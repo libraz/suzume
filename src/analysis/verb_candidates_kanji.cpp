@@ -582,6 +582,17 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (prefix_kanji_penalty)\n");
             }
           }
+          // Penalize verb candidates starting with interrogative kanji (何, 誰, 幾)
+          // e.g., 何してる should split as 何|し|てる, not be single verb
+          // Interrogatives are standalone words, not verb stems
+          {
+            auto stem_codepoints = normalize::utf8::decode(best.stem);
+            if (!stem_codepoints.empty() && isInterrogativeKanji(stem_codepoints[0])) {
+              // Heavy penalty to force split
+              base_cost += 3.0F;
+              SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (interrogative_kanji_penalty)\n");
+            }
+          }
           // Check if base form exists in dictionary - significant bonus for known verbs
           // This helps 行われた (base=行う) beat 行(suffix)+われた split
           // Skip compound adjective patterns (verb renyoukei + にくい/やすい/がたい)
@@ -1302,9 +1313,14 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
               // Verify the base form is a valid verb
               // First check dictionary, then fall back to inflection analysis
+              // IMPORTANT: For passive pattern, require dictionary check only.
+              // The inflection analyzer is too permissive for passive patterns -
+              // it will accept patterns like 泊む (from 泊まれる) which don't exist.
+              // This causes potential verbs (泊まれる = potential of 泊まる) to be
+              // incorrectly split as passive (泊ま + れる, as if from 泊む).
               bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
-              if (!is_valid_verb) {
-                // Check if inflection analyzer recognizes this as a valid verb
+              if (!is_valid_verb && !is_passive_pattern) {
+                // For non-passive patterns (ない, ぬ, etc.), allow inflection fallback
                 auto infl_result = inflection.getBest(base_form);
                 is_valid_verb = infl_result.confidence > 0.5F &&
                                 vh::isGodanVerbType(infl_result.verb_type);

@@ -651,12 +651,8 @@
       "description" : "Academic hypothesis - MeCab shows 本研究 unified",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "本"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "研究"
+          "surface" : "本研究"
         },
         {
           "pos" : "Particle",
@@ -806,12 +802,8 @@
       "description" : "Method description - Current suzume unifies compounds",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "本"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "研究"
+          "surface" : "本研究"
         },
         {
           "pos" : "Particle",
@@ -915,12 +907,8 @@
       "description" : "Limitation statement",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "本"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "研究"
+          "surface" : "本研究"
         },
         {
           "pos" : "Particle",
@@ -1194,7 +1182,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -1405,7 +1393,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -1498,7 +1486,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -1577,7 +1565,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],

@@ -240,6 +240,8 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("でしたら", "です", EPOS::AuxCopulaDesu),
       // で+ある pattern - ある is a separate auxiliary (MeCab compatible)
       aux("ある", "ある", EPOS::AuxCopulaDa),   // で+ある (assertion)
+      aux("あっ", "ある", EPOS::AuxCopulaDa),   // で+あっ+た (sokuonbin before た)
+      aux("あり", "ある", EPOS::AuxCopulaDa),   // で+あり+ます
       aux("あれ", "ある", EPOS::AuxCopulaDa),   // で+あれ+ば (conditional)
 
       // Polite (丁寧) - ます
@@ -290,6 +292,14 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Appearance - そう (様態)
       // Note: そうだ/そうに removed - MeCab splits as そう+だ/に
       aux("そう", "そう", EPOS::AuxAppearanceSou),
+
+      // Demonstrative そう (指示詞/副詞的用法) - sentence-initial そうですね, etc.
+      // MeCab treats "そうですね" as フィラー, but normalizes to そう(形容動詞語幹)+です+ね
+      // This competes with AuxAppearanceSou; bigram rules select based on context
+      na_adj("そう", "そう"),
+      // MeCab: そうかもしれない → そう(副詞,助詞類接続) + かも + しれ...
+      // When followed by particles (not だ/な), MeCab treats そう as adverb
+      adv("そう"),
       // Note: さそう removed - MeCab splits as な+さ+そう (3 tokens)
 
       // Obligation (当為)
@@ -311,6 +321,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Kuru verb stem form (カ変動詞語幹活用形) - VERB, not AUX
       // MeCab: 来た → 来(連用形) + た(過去)
       verb("来", "来る", EPOS::VerbRenyokei),
+
+      // Deru verb stem form (一段動詞「出る」) - VERB
+      // で+たい/ます needs this to split correctly (外にでたい → 外|に|で|たい)
+      verb("で", "出る", EPOS::VerbRenyokei),
       aux("しよう", "する", EPOS::AuxVolitional),
       aux("しろ", "する", EPOS::VerbMeireikei),
       aux("せよ", "する", EPOS::VerbMeireikei),
@@ -370,6 +384,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Honorific suffix さん (田中さん, お姉さん)
       // MeCab: 田中さん → 田中 + さん
       suffix("さん", "さん"),
+
+      // Plural suffix たち (学生たち, 私たち, 子供たち)
+      // MeCab: 学生たち → 学生 + たち
+      suffix("たち", "たち"),
 
       // Na-adjective forming suffix 的 (論理的, 科学的, 経済的)
       // MeCab: 論理的な → 論理 + 的 + な (suffix + copula rentaikei)
@@ -657,11 +675,7 @@ std::vector<DictionaryEntry> getPronounEntries() {
       pronoun("わたくし", ""),
 
       // First person plural (一人称複数)
-      // Lower cost to beat single pronoun + suffix split
-      pronoun("私たち", ""),
-      pronoun("僕たち", ""),
       pronoun("僕ら", ""),
-      pronoun("俺たち", ""),
       // Note: 俺ら removed for MeCab compat (MeCab splits 俺+ら, unlike 僕ら)
       pronoun("我々", ""),
 
@@ -674,16 +688,13 @@ std::vector<DictionaryEntry> getPronounEntries() {
       // PREFIX→NOUN path has cost ~-1.2, so お前 needs cost < -1.2 to win
       pronoun("お前", ""),
 
-      // Second person plural (二人称複数)
-      pronoun("あなたたち", ""),
-      pronoun("君たち", ""),
+      // Second person plural removed - use pronoun + たち suffix
 
       // Third person (三人称) - kanji with reading
       pronoun("彼", ""),
       pronoun("彼女", ""),
       pronoun("彼ら", ""),
       pronoun("彼女ら", ""),
-      pronoun("彼女たち", ""),
 
       // Archaic/Samurai (武家・古風)
       pronoun("拙者", ""),
@@ -725,11 +736,16 @@ std::vector<DictionaryEntry> getPronounEntries() {
 
       // Interrogatives (疑問詞)
       pronoun("いつ", ""), pronoun("いくつ", ""), pronoun("いくら", ""),
+      // どう/いかが can take だ/です (どうですか, いかがですか)
+      // Register as both adverb and na-adjective for correct copula connection
       adv("どう", ""),
+      na_adj("どう", "どう"),
+      adv("いかが", ""),
+      na_adj("いかが", "いかが"),
       // Note: どうして needs very low cost to prevent split when followed by verb
       // The te-form bonus makes どう+して+VERB cheaper than どうして+VERB
       adv("どうして", ""),
-      adv("なぜ", ""), adv("どんな", ""),
+      adv("なぜ", ""),
   };
 }
 

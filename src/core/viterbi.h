@@ -123,6 +123,12 @@ class Viterbi {
             if (edge.pos == PartOfSpeech::Conjunction) {
               conn_cost = -0.5F;  // Bonus for conjunction at BOS
             }
+            // AuxAppearanceSou (様態そう) should not appear at sentence start
+            // At BOS, そう should be demonstrative na-adjective, not appearance aux
+            // E.g., "そうかもしれません" - そう is demonstrative
+            if (edge.extended_pos == ExtendedPOS::AuxAppearanceSou) {
+              conn_cost += 0.5F;  // Penalty for appearance aux at BOS
+            }
           }
 
           // Small per-transition cost to prefer fewer morphemes (longer tokens)

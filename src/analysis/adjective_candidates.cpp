@@ -40,6 +40,28 @@ const std::vector<std::string_view> kNaAdjSuffixes = {
 // =============================================================================
 
 /**
+ * @brief Detect i-adjective EPOS based on surface ending
+ */
+inline core::ExtendedPOS detectIAdjEpos(const std::string& surface) {
+  // Check surface ending to determine conjugation form
+  // Note: Longer patterns must be checked first
+  if (utf8::endsWith(surface, "かっ")) {
+    return core::ExtendedPOS::AdjKatt;     // 美しかっ（た）
+  }
+  if (utf8::endsWith(surface, "けれ")) {
+    return core::ExtendedPOS::AdjKeForm;   // 美しけれ（ば）
+  }
+  if (utf8::endsWith(surface, "く")) {
+    return core::ExtendedPOS::AdjRenyokei; // 美しく
+  }
+  if (utf8::endsWith(surface, "い")) {
+    return core::ExtendedPOS::AdjBasic;    // 美しい
+  }
+  // Default to basic form
+  return core::ExtendedPOS::AdjBasic;
+}
+
+/**
  * @brief Create an i-adjective candidate with common settings
  */
 inline UnknownCandidate makeIAdjCandidate(
@@ -48,7 +70,9 @@ inline UnknownCandidate makeIAdjCandidate(
     [[maybe_unused]] CandidateOrigin origin,
     [[maybe_unused]] float confidence,
     [[maybe_unused]] const char* pattern) {
-  auto cand = makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, false, origin);
+  // Detect correct EPOS based on surface ending
+  core::ExtendedPOS epos = detectIAdjEpos(surface);
+  auto cand = makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, false, origin, epos);
   cand.lemma = lemma;
 #ifdef SUZUME_DEBUG_INFO
   cand.confidence = confidence;
@@ -1302,6 +1326,95 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
     candidates.push_back(std::move(var));
   }
 
+  // Add stem candidates for pure hiragana adjective + auxiliary patterns
+  // This handles patterns like おいしそう → おいし (stem) + そう (aux)
+  // Similar to the kanji adjective stem logic at lines 1673-1785
+  // Check for しそう, しすぎ patterns (adjective stem + auxiliary)
+  static const std::vector<std::string_view> kHiraStemAuxPatterns = {
+      "しそう",     // appearance: おいしそう
+      "しそうだ",   // appearance + copula
+      "しそうな",   // attributive
+      "しそうに",   // adverbial
+      "しすぎ",     // excessive: おいしすぎ
+      "しすぎる",   // excessive + dictionary form
+  };
+
+  // Start from maximum hiragana sequence
+  std::string full_surface = extractSubstring(codepoints, start_pos, max_hiragana_end);
+  for (const auto& aux_pattern : kHiraStemAuxPatterns) {
+    if (full_surface.size() >= aux_pattern.size() + core::kTwoJapaneseCharBytes &&  // Need at least 2 chars before pattern
+        full_surface.find(aux_pattern) != std::string::npos) {
+      // Find where the pattern starts
+      size_t pattern_pos = full_surface.find(aux_pattern);
+      if (pattern_pos < core::kTwoJapaneseCharBytes) {
+        continue;  // Stem too short (need at least 2 chars like おいし, うれし)
+      }
+
+      // The stem is everything before the auxiliary pattern, including the し
+      std::string stem = full_surface.substr(0, pattern_pos + 3);  // +3 for し
+      std::string base_form = stem + "い";  // e.g., おいし → おいしい
+
+      // Validate that this forms a valid i-adjective
+      auto adj_results = inflection.analyze(base_form);
+      bool is_valid_adjective = false;
+      float adj_confidence = 0.0F;
+      for (const auto& result : adj_results) {
+        if (result.verb_type == grammar::VerbType::IAdjective &&
+            result.confidence >= 0.5F) {
+          is_valid_adjective = true;
+          adj_confidence = result.confidence;
+          break;
+        }
+      }
+
+      if (!is_valid_adjective) {
+        continue;
+      }
+
+      // Check that this is NOT a verb renyokei (e.g., 話し from 話す)
+      // For pure hiragana, check if stem + す would be a valid verb
+      // We compare adjective vs verb confidence - if adjective is significantly higher, prefer it
+      std::string verb_stem = stem.substr(0, stem.size() - 3);  // Remove し
+      std::string verb_form = verb_stem + "す";  // e.g., おい + す = おいす (not real)
+
+      // Check verb confidence from inflection analyzer
+      float verb_confidence = 0.0F;
+      auto verb_results = inflection.analyze(verb_form);
+      for (const auto& result : verb_results) {
+        if ((result.verb_type == grammar::VerbType::GodanSa ||
+             result.verb_type == grammar::VerbType::Suru) &&
+            result.confidence > verb_confidence) {
+          verb_confidence = result.confidence;
+        }
+      }
+
+      // Require adjective confidence to be higher than verb confidence
+      // This filters out false positives like 話しそう (話す renyokei + そう)
+      // but keeps valid adjectives like おいしそう (おいしい stem + そう)
+      // Note: Both おいしい (0.66) and おいす (0.62) have similar confidence,
+      // so we just need adj >= verb for pure hiragana patterns.
+      if (verb_confidence > 0.0F && adj_confidence < verb_confidence) {
+        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM_HIRA] skip: adj_conf=" << adj_confidence
+                                 << " verb_conf=" << verb_confidence << "\n");
+        continue;  // Verb confidence higher, likely verb renyokei
+      }
+
+      // Calculate position
+      size_t stem_char_count = normalize::utf8Length(stem);
+      size_t stem_end = start_pos + stem_char_count;
+
+      // Generate stem candidate with strong bonus
+      // おい (INTJ) has cost -1, so stem needs very low cost to win
+      float cost = -1.2F + (1.0F - adj_confidence) * 0.2F;
+      SUZUME_DEBUG_LOG("[ADJ_STEM_HIRA] ✓ candidate stem=\"" << stem << "\" base=\"" << base_form
+                       << "\" cost=" << cost << "\n");
+      candidates.push_back(makeIAdjStemCandidate(
+          stem, start_pos, stem_end, base_form, cost,
+          CandidateOrigin::AdjectiveIHiragana, adj_confidence, "adj_stem_hira_sou"));
+      break;  // Only one stem candidate per pattern
+    }
+  }
+
   // Sort by cost
   std::sort(candidates.begin(), candidates.end(),
             [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
@@ -1341,11 +1454,11 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
   }
 
   // Check if first hiragana is a valid i-adjective ending start
-  // I-adjective endings: い, か(った), く(ない/て), け(れば), さ(そう), etc.
+  // I-adjective endings: い, か(った), く(ない/て), け(れば), さ(そう), そ(う) etc.
   char32_t first_hira = codepoints[kata_end];
   if (first_hira != U'い' && first_hira != U'か' &&
       first_hira != U'く' && first_hira != U'け' &&
-      first_hira != U'さ') {
+      first_hira != U'さ' && first_hira != U'そ') {
     return candidates;
   }
 
@@ -1487,6 +1600,37 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
     }
   }
   for (auto& var : ke_form_candidates) {
+    candidates.push_back(std::move(var));
+  }
+
+  // Add stem candidates for sou patterns (appearance auxiliary)
+  // This enables MeCab-compatible split: キモそう → キモ + そう
+  std::vector<UnknownCandidate> stem_sou_candidates;
+  for (const auto& cand : candidates) {
+    if (utf8::endsWith(cand.surface, "そう")) {
+      // Extract stem (remove そう)
+      std::string stem_surface = cand.surface.substr(0, cand.surface.size() - core::kTwoJapaneseCharBytes);
+      if (stem_surface.empty()) {
+        continue;
+      }
+      UnknownCandidate stem_cand;
+      stem_cand.surface = stem_surface;
+      stem_cand.start = cand.start;
+      stem_cand.end = cand.end - 2;  // 2 characters (そう)
+      stem_cand.pos = core::PartOfSpeech::Adjective;
+      stem_cand.lemma = cand.lemma;
+      stem_cand.cost = cand.cost - 0.5F;  // Lower cost to prefer split
+      stem_cand.has_suffix = true;
+      stem_cand.extended_pos = core::ExtendedPOS::AdjStem;  // For bigram: AdjStem→AuxAppearanceSou
+#ifdef SUZUME_DEBUG_INFO
+      stem_cand.origin = cand.origin;
+      stem_cand.confidence = cand.confidence;
+      stem_cand.pattern = "i_adjective_kata_stem_sou";
+#endif
+      stem_sou_candidates.push_back(stem_cand);
+    }
+  }
+  for (auto& var : stem_sou_candidates) {
     candidates.push_back(std::move(var));
   }
 

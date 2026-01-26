@@ -278,8 +278,9 @@ sub apply_suzume_merge {
             }
         }
 
-        # 2. Number + counter/katakana: 名詞,数 + (助数詞 or カタカナ名詞)
+        # 2. Number + counter/katakana: 名詞,数 + (助数詞 or カタカナ名詞 or 万億兆)
         #    Suzume has no dictionary, so it cannot split number+katakana (e.g., 50アデナ)
+        #    Also combines number+万/億/兆+円 patterns (e.g., 100万円, 3億5000万円)
         if (!$merged && $t->{pos} eq '名詞' && ($t->{pos_sub1} // '') eq '数') {
             my $j = $i + 1;
             my $combined = $t->{surface};
@@ -299,11 +300,23 @@ sub apply_suzume_merge {
                 my $is_chuu_suffix = ($next->{surface} // '') eq '中'
                     && ($next->{pos} // '') eq '名詞'
                     && ($next->{pos_sub1} // '') eq '接尾';
-                if ($is_counter || $is_calendar_month || $is_katakana_noun || $is_chuu_suffix) {
+                # 目 suffix after counter (5回目, 3番目, 1人目)
+                my $is_me_suffix = ($next->{surface} // '') eq '目'
+                    && ($next->{pos} // '') eq '名詞'
+                    && ($next->{pos_sub1} // '') eq '接尾';
+                # Large number units: 万/億/兆 (名詞,数) to combine 100万円, 3億5000万円
+                my $is_large_unit = ($next->{pos} // '') eq '名詞'
+                    && ($next->{pos_sub1} // '') eq '数'
+                    && ($next->{surface} // '') =~ /^[万億兆]$/;
+                # Number after large unit (億/万/兆): continue 3億+5000+万+円 → 3億5000万円
+                my $is_number_after_large = $combined =~ /[万億兆]$/
+                    && ($next->{pos} // '') eq '名詞'
+                    && ($next->{pos_sub1} // '') eq '数';
+                if ($is_counter || $is_calendar_month || $is_katakana_noun || $is_chuu_suffix || $is_me_suffix || $is_large_unit || $is_number_after_large) {
                     $combined .= $next->{surface};
                     $j++;
-                    # Stop after katakana noun or 中 (don't chain multiple)
-                    last if $is_katakana_noun || $is_chuu_suffix;
+                    # Stop after katakana noun, 中, or 目 (don't chain multiple)
+                    last if $is_katakana_noun || $is_chuu_suffix || $is_me_suffix;
                 } else {
                     last;
                 }
@@ -340,6 +353,39 @@ sub apply_suzume_merge {
                 $i = $j;
                 $merged = 1;
                 $applied_rule //= 'number+unit';
+            }
+        }
+
+        # 2c. Noun + 書 suffix: 名詞 + 書(名詞,接尾,一般)
+        #     e.g., 請求書, 申請書, 報告書, 契約書
+        if (!$merged && $t->{pos} eq '名詞' && $i + 1 < @$tokens) {
+            my $next = $tokens->[$i + 1];
+            if (($next->{surface} // '') eq '書'
+                && ($next->{pos} // '') eq '名詞'
+                && ($next->{pos_sub1} // '') eq '接尾') {
+                my $combined = $t->{surface} . '書';
+                push @result, { surface => $combined, pos => '名詞', lemma => $combined };
+                $i += 2;
+                $merged = 1;
+                $applied_rule //= 'noun+sho';
+            }
+        }
+
+        # 2d. Prefix + Noun: 接頭詞,名詞接続 + 名詞 (kanji only)
+        #     e.g., 本研究, 本論文, 各部門, 全社員, 未確認, 再起動
+        #     Only merge when both prefix and noun are kanji (Suzume keeps these as 1 token)
+        #     Mixed script like 本+サービス stays split
+        if (!$merged && $t->{pos} eq '接頭詞' && ($t->{pos_sub1} // '') eq '名詞接続' && $i + 1 < @$tokens) {
+            my $next = $tokens->[$i + 1];
+            if (($next->{pos} // '') eq '名詞') {
+                my $combined = $t->{surface} . $next->{surface};
+                # Only merge if combined is all kanji (no katakana/hiragana mix)
+                if ($combined =~ /^[\p{Han}]+$/) {
+                    push @result, { surface => $combined, pos => '名詞', lemma => $combined };
+                    $i += 2;
+                    $merged = 1;
+                    $applied_rule //= 'prefix+noun';
+                }
             }
         }
 
@@ -424,6 +470,24 @@ sub apply_suzume_merge {
                         $applied_rule //= 'tari-adverb';
                         last;
                     }
+                }
+            }
+        }
+
+        # 5a. Verb renyokei + 会: 飲み+会 → 飲み会 (compound noun)
+        #     These are common compound nouns where verb renyokei + 会 forms a single word
+        if (!$merged && $t->{pos} eq '動詞' && ($t->{conj_form} // '') eq '連用形') {
+            my $j = $i + 1;
+            if ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                if (($next->{surface} // '') eq '会'
+                    && ($next->{pos} // '') eq '名詞'
+                    && ($next->{pos_sub1} // '') eq '接尾') {
+                    my $combined = $t->{surface} . $next->{surface};
+                    push @result, { surface => $combined, pos => '名詞', lemma => $combined };
+                    $i = $j + 1;
+                    $merged = 1;
+                    $applied_rule //= 'verb-renyokei+kai';
                 }
             }
         }
@@ -842,10 +906,12 @@ sub map_mecab_pos {
         }
 
         # 動詞,非自立 → Auxiliary (subsidiary verbs: いる, ある, くる, いく, etc.)
-        # Exception: すぎる/すぎ stays as Verb (補助動詞 is grammatically a verb)
+        # Exception: すぎる stays as Verb (補助動詞 is grammatically a verb)
+        # Exception: くださる stays as Verb (polite request verb, Suzume treats as VERB)
         if ($pos eq '動詞' && $pos_sub1 eq '非自立') {
             my $lemma = $token->{lemma} // '';
-            return 'Verb' if $lemma eq 'すぎる';  # すぎる is subsidiary verb, not auxiliary
+            return 'Verb' if $lemma eq 'すぎる';   # すぎる is subsidiary verb, not auxiliary
+            return 'Verb' if $lemma eq 'くださる'; # ください is polite request verb
             return 'Auxiliary';
         }
 
@@ -873,8 +939,16 @@ sub map_mecab_pos {
             return 'Adjective';
         }
 
-        # 名詞,接尾 → Suffix (e.g., たち, さん, 的, さ in 美しさ)
+        # 名詞,非自立,一般 の → Particle (準体助詞)
+        # MeCab classifies nominalizer の as 名詞,非自立 but Suzume treats it as Particle
+        if ($surface eq 'の' && $pos eq '名詞' && $pos_sub1 eq '非自立') {
+            return 'Particle';
+        }
+
+        # 名詞,接尾 → Suffix (e.g., たち, さん, 的, さ)
+        # Exception: 中 → Noun (多義的: 今日中, 中学校, 箱の中)
         if ($pos eq '名詞' && $pos_sub1 eq '接尾') {
+            return 'Noun' if $surface eq '中';
             return 'Suffix';
         }
 
@@ -964,6 +1038,12 @@ sub correct_mecab_pos {
         # Fix particles misclassified as Noun
         if (exists $PARTICLE_CORRECTIONS{$surface} && $pos eq 'Noun') {
             $t->{pos} = $PARTICLE_CORRECTIONS{$surface};
+        }
+
+        # Fix 「の」(名詞,非自立) as Particle (準体助詞)
+        # MeCab classifies nominalizer の as 名詞,非自立 but Suzume treats it as Particle
+        if ($surface eq 'の' && $pos eq '名詞' && ($t->{pos_sub1} // '') eq '非自立') {
+            $t->{pos} = 'Particle';
         }
     }
 }

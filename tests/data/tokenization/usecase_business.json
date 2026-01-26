@@ -73,7 +73,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -243,7 +243,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -382,13 +382,8 @@
       "description" : "Currency: 100万円の請求書",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "100"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "万円"
+          "surface" : "100万円"
         },
         {
           "pos" : "Particle",
@@ -396,11 +391,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "請求"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "書"
+          "surface" : "請求書"
         }
       ],
       "id" : "document_currency_million",
@@ -414,22 +405,8 @@
       "description" : "Large currency: 3億5000万円の売上",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "3"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "億"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "5000"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "万円"
+          "surface" : "3億5000万円"
         },
         {
           "pos" : "Particle",
@@ -540,7 +517,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -923,13 +900,8 @@
           "surface" : "は"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "500"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "万円"
+          "surface" : "500万円"
         },
         {
           "pos" : "Particle",
@@ -970,11 +942,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "請求"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "書"
+          "surface" : "請求書"
         },
         {
           "pos" : "Particle",
@@ -1193,12 +1161,8 @@
       "description" : "Place: 本契約において定める",
       "expected" : [
         {
-          "pos" : "Prefix",
-          "surface" : "本"
-        },
-        {
           "pos" : "Noun",
-          "surface" : "契約"
+          "surface" : "本契約"
         },
         {
           "pos" : "Particle",
@@ -1286,7 +1250,7 @@
           "surface" : "ない"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Particle",
           "surface" : "の"
         },
         {
@@ -1377,7 +1341,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -1656,11 +1620,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "5回"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "目"
+          "surface" : "5回目"
         },
         {
           "pos" : "Particle",

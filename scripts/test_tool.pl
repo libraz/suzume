@@ -114,6 +114,7 @@ use SuzumeUtils qw(
     load_json
     save_json
     %POS_MAP
+    @TARI_ADVERB_STEMS
 );
 use TestFileUtils qw(
     find_test_by_input
@@ -337,10 +338,18 @@ sub get_suzume_tokens {
         my ($surface, $pos, $lemma) = split /\t/, $line;
         next unless defined $surface && $surface ne '';
         my $norm_pos = normalize_pos($pos // 'Other');
+        my $norm_lemma = $lemma // $surface;
+        # タリ活用副詞: lemma should be stem only (颯爽と → 颯爽)
+        for my $stem (@TARI_ADVERB_STEMS) {
+            if ($surface eq "${stem}と" && $norm_lemma eq "${stem}と") {
+                $norm_lemma = $stem;
+                last;
+            }
+        }
         push @tokens, {
             surface => $surface,
             pos => $norm_pos,
-            lemma => $lemma // $surface,
+            lemma => $norm_lemma,
         };
     }
     return \@tokens;

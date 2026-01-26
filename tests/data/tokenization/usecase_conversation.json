@@ -89,7 +89,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -450,16 +450,14 @@
           "surface" : "し"
         },
         {
-          "lemma" : "たい",
           "pos" : "Auxiliary",
           "surface" : "たい"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Particle",
           "surface" : "の"
         },
         {
-          "lemma" : "です",
           "pos" : "Auxiliary",
           "surface" : "です"
         },
@@ -605,7 +603,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -655,11 +653,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "領収"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "書"
+          "surface" : "領収書"
         },
         {
           "pos" : "Particle",
@@ -823,7 +817,7 @@
           "surface" : "たい"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Particle",
           "surface" : "の"
         },
         {
@@ -976,7 +970,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -1086,7 +1080,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],

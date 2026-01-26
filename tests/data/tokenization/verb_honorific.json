@@ -77,7 +77,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "くださる"
         }
       ],
@@ -124,7 +124,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],
@@ -385,7 +385,7 @@
         },
         {
           "lemma" : "くださる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ください"
         }
       ],

@@ -193,6 +193,10 @@ BigramTable::initTable() {
   // AdjRenyokei → ParticleConj (美しく+て, ウザく+て) - strong bonus for te-form split
   setCell(t, EPOS::AdjRenyokei, EPOS::ParticleConj, cost::kStrongBonus);
 
+  // AdjRenyokei → VerbRenyokei (美しく+なり) - strong bonus for adjective + become pattern
+  // This is a very common Japanese pattern (美しくなる, 大きくなる, etc.)
+  setCell(t, EPOS::AdjRenyokei, EPOS::VerbRenyokei, cost::kStrongBonus);
+
   // AdjKatt → AuxTenseTa (美しかっ+た) - strong bonus
   setCell(t, EPOS::AdjKatt, EPOS::AuxTenseTa, cost::kStrongBonus);
 
@@ -209,8 +213,9 @@ BigramTable::initTable() {
   // Helps i-adjective+conjunctive particle beat ADJ_NA+い(verb)+し path
   setCell(t, EPOS::AdjBasic, EPOS::ParticleConj, cost::kMinorBonus);
 
-  // AdjStem → AuxAppearanceSou (美し+そう) - strong bonus
-  setCell(t, EPOS::AdjStem, EPOS::AuxAppearanceSou, cost::kStrongBonus);
+  // AdjStem → AuxAppearanceSou (美し+そう) - very strong bonus
+  // Must beat adverb bonus (-1.0 for 2-char hiragana) to prefer auxiliary
+  setCell(t, EPOS::AdjStem, EPOS::AuxAppearanceSou, cost::kVeryStrongBonus);
 
   // AdjStem/AdjNaAdj → AuxExcessive (高+すぎる, シンプル+すぎる) - moderate bonus
   // Helps AUX_過度 beat VERB interpretation when both have same cost
@@ -310,6 +315,10 @@ BigramTable::initTable() {
   // AuxCopulaDa → AuxTenseTa (だっ+た) - strong bonus
   setCell(t, EPOS::AuxCopulaDa, EPOS::AuxTenseTa, cost::kStrongBonus);
 
+  // AuxCopulaDa → AuxTenseMasu (あり+ます in であります) - strong bonus
+  // Ensures で+あり+ます uses AuxCopulaDa for both で and あり
+  setCell(t, EPOS::AuxCopulaDa, EPOS::AuxTenseMasu, cost::kStrongBonus);
+
   // AuxCopulaDesu → AuxTenseTa (でし+た) - strong bonus for polite past copula
   // Ensures 本でした → 本+でし+た over 本+で+し+た
   setCell(t, EPOS::AuxCopulaDesu, EPOS::AuxTenseTa, cost::kStrongBonus);
@@ -369,6 +378,13 @@ BigramTable::initTable() {
   // Ensures こと+ない over こと+な+い (な=AuxCopulaDa連用形)
   setCell(t, EPOS::NounFormal, EPOS::AuxNegativeNai, cost::kModerateBonus);
 
+  // NounFormal → AdjBasic (こと+ない adjective) - very strong bonus
+  // Ensures そんなこと+ない(ADJ) wins over そんなこと+ない(AUX)
+  // When ない follows a formal noun, it's the existence-negation adjective
+  // Needs to overcome: AUX word cost (0.3) + AuxNegativeNai bonus (-0.5) = -0.2
+  // vs ADJ word cost (0.5) + this bonus = must be < -0.2
+  setCell(t, EPOS::NounFormal, EPOS::AdjBasic, cost::kVeryStrongBonus);
+
   // =========================================================================
   // Determiner → Noun (連体詞は名詞を修飾)
   // =========================================================================
@@ -413,6 +429,12 @@ BigramTable::initTable() {
 
   // NaAdj → AuxCopulaDesu (静か+です) - strong bonus
   setCell(t, EPOS::AdjNaAdj, EPOS::AuxCopulaDesu, cost::kStrongBonus);
+
+  // Adverb → AuxCopulaDa/Desu - penalty (adverbs don't directly take copula)
+  // E.g., そうです: そう should be na-adjective, not adverb
+  // Adverbs modify verbs/adjectives, not replace them before copula
+  setCell(t, EPOS::Adverb, EPOS::AuxCopulaDa, cost::kRare);
+  setCell(t, EPOS::Adverb, EPOS::AuxCopulaDesu, cost::kRare);
 
   // AuxCopulaDa → Noun (さすがな+人, 静かな+部屋) - strong bonus
   // Copula な(連体形 of だ) + Noun is the na-adjective attributive pattern
@@ -580,8 +602,20 @@ BigramTable::initTable() {
   // Appearance/Conjecture connections
   // =========================================================================
 
-  // VerbRenyokei → AuxAppearanceSou (食べ+そう) - strong bonus
-  setCell(t, EPOS::VerbRenyokei, EPOS::AuxAppearanceSou, cost::kStrongBonus);
+  // VerbRenyokei → AuxAppearanceSou (食べ+そう) - very strong bonus
+  // Must beat adverb bonus (-1.0 for 2-char hiragana) to prefer auxiliary
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxAppearanceSou, cost::kVeryStrongBonus);
+
+  // Other → AuxAppearanceSou - penalty (様態そう shouldn't appear at BOS)
+  // At sentence start, そう should be demonstrative na-adjective, not appearance aux
+  setCell(t, EPOS::Other, EPOS::AuxAppearanceSou, cost::kMinor);
+
+  // Particle → AuxAppearanceSou - penalty (様態そう shouldn't follow particles)
+  // E.g., そうかもしれません: そう is demonstrative, not appearance auxiliary
+  setCell(t, EPOS::ParticleCase, EPOS::AuxAppearanceSou, cost::kMinor);
+  setCell(t, EPOS::ParticleTopic, EPOS::AuxAppearanceSou, cost::kMinor);
+  setCell(t, EPOS::ParticleAdverbial, EPOS::AuxAppearanceSou, cost::kMinor);
+  setCell(t, EPOS::ParticleQuote, EPOS::AuxAppearanceSou, cost::kMinor);
 
   // AdjBasic → AuxConjectureRashii (美しい+らしい) - strong bonus
   setCell(t, EPOS::AdjBasic, EPOS::AuxConjectureRashii, cost::kStrongBonus);

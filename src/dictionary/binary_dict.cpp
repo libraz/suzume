@@ -258,6 +258,24 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
         case core::PartOfSpeech::Auxiliary:
           entry.extended_pos = core::ExtendedPOS::AuxTenseTa;  // Default aux
           break;
+        case core::PartOfSpeech::Suffix:
+          entry.extended_pos = core::ExtendedPOS::Suffix;
+          break;
+        case core::PartOfSpeech::Prefix:
+          entry.extended_pos = core::ExtendedPOS::Prefix;
+          break;
+        case core::PartOfSpeech::Conjunction:
+          entry.extended_pos = core::ExtendedPOS::Conjunction;
+          break;
+        case core::PartOfSpeech::Determiner:
+          entry.extended_pos = core::ExtendedPOS::Determiner;
+          break;
+        case core::PartOfSpeech::Pronoun:
+          entry.extended_pos = core::ExtendedPOS::Pronoun;
+          break;
+        case core::PartOfSpeech::Symbol:
+          entry.extended_pos = core::ExtendedPOS::Symbol;
+          break;
         case core::PartOfSpeech::Other:
           entry.extended_pos = core::ExtendedPOS::Other;
           break;

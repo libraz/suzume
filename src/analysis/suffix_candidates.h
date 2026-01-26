@@ -194,6 +194,18 @@ std::vector<UnknownCandidate> generatePrefixCompoundCandidates(
  */
 bool isPrefixLikeKanji(char32_t cp);
 
+/**
+ * @brief Check if a codepoint is an interrogative kanji
+ *
+ * Returns true for kanji that are interrogative words:
+ * 何, 誰, 幾
+ * These should not form verb compounds (e.g., 何してる should split as 何|し|てる)
+ *
+ * @param cp Unicode codepoint to check
+ * @return true if interrogative kanji
+ */
+bool isInterrogativeKanji(char32_t cp);
+
 }  // namespace suzume::analysis
 
 #endif  // SUZUME_ANALYSIS_SUFFIX_CANDIDATES_H_

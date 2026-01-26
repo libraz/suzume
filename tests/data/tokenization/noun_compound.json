@@ -62,13 +62,8 @@
       "description" : "飲み会 - compound noun",
       "expected" : [
         {
-          "lemma" : "飲む",
-          "pos" : "Verb",
-          "surface" : "飲み"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "会"
+          "pos" : "Noun",
+          "surface" : "飲み会"
         }
       ],
       "id" : "compound_noun_nomikai",

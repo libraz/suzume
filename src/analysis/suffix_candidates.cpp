@@ -69,7 +69,7 @@ const std::vector<SuffixEntry>& getSuffixEntries() {
       {"率", core::PartOfSpeech::Suffix},
       {"法", core::PartOfSpeech::Suffix},
       {"論", core::PartOfSpeech::Suffix},
-      {"者", core::PartOfSpeech::Suffix},
+      // {"者", core::PartOfSpeech::Suffix},  // Removed: causes over-segmentation (代表者→代表+者)
       {"家", core::PartOfSpeech::Suffix},
       {"員", core::PartOfSpeech::Suffix},
       {"式", core::PartOfSpeech::Suffix},
@@ -1053,6 +1053,11 @@ const std::unordered_set<char32_t>& getInterrogativeKanji() {
 bool isPrefixLikeKanji(char32_t cp) {
   const auto& prefix_kanji = getPrefixLikeKanji();
   return prefix_kanji.find(cp) != prefix_kanji.end();
+}
+
+bool isInterrogativeKanji(char32_t cp) {
+  const auto& interrogatives = getInterrogativeKanji();
+  return interrogatives.find(cp) != interrogatives.end();
 }
 
 std::vector<UnknownCandidate> generatePrefixCompoundCandidates(

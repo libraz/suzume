@@ -61,7 +61,7 @@ constexpr float kBigramCostTable[13][13] = {
     //        Noun  Verb  Adj   Adv   Part  Aux   Conj  Det   Pron  Pref  Suff  Sym   Other
     /* Noun */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 0.0F, 0.5F, 0.5F, 0.5F, 1.0F,-0.8F, 0.5F, 0.5F},
     /* Verb */ {0.2F, 0.8F, 0.8F, 0.5F, 0.0F, 0.0F, 0.5F, 0.5F, 0.2F, 1.0F, 1.5F, 0.5F, 0.5F},  // Suff: 0.8→1.5 (知ってる人: NOUN優先)
-    /* Adj  */ {0.2F, 0.5F, 0.8F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.2F, 1.0F, 0.8F, 0.5F, 0.5F},  // Keep 0.5 (P3-2 causes side effects)
+    /* Adj  */ {0.2F, 0.5F, 0.8F, 0.3F, 0.0F, 0.0F, 0.5F, 0.5F, 0.2F, 1.0F, 0.8F, 0.5F, 0.5F},  // Aux: 0.5→0.0 for おいしそう (ADJ_STEM+AUX)
     /* Adv  */ {0.0F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 1.0F, 0.8F, 0.5F, 0.5F},
     /* Part */ {0.0F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.5F, 0.3F, 0.0F, 0.3F, 1.0F, 0.5F, 0.5F},  // Pref: 1.0→0.3 (何番線: は→何PREFIX)
     /* Aux  */ {0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.3F, 0.5F, 0.5F, 0.5F, 1.0F, 0.8F, 0.5F, 0.5F},
@@ -562,6 +562,17 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kStrongBonus;
   }
 
+  // Penalty for し (PART_接続) → てる (AuxAspectIru) pattern
+  // E.g., 何してる should be 何+し(VERB)+てる, not 何+し(PART)+てる
+  // The reasoning conjunction し should not be directly followed by progressive てる
+  // This cancels the ParticleConj→AuxAspectIru bonus (-0.8) for this specific case
+  if (prev.surface == "し" &&
+      prev.extended_pos == core::ExtendedPOS::ParticleConj &&
+      next.surface == "てる" &&
+      next.extended_pos == core::ExtendedPOS::AuxAspectIru) {
+    surface_bonus += cost::kRare;  // Cancel the -0.8 bonus
+  }
+
   // Bonus for て → いただき (humble auxiliary verb) pattern
   // E.g., 食べて+いただき+ます, して+いただけ+ます (MeCab-compatible split)
   // The て→い(AUX)→ただき path incorrectly splits いただき
@@ -628,15 +639,24 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kVeryStrongBonus;
   }
 
-  // Penalty for godan passive/causative-passive renyokei (～われ/～られ/～され) → た
+  // Penalty for godan passive/causative-passive renyokei (～Aれ for A-row) → た
   // MeCab splits these as 言わ+れ+た, not 言われ+た
   // E.g., 言われた → 言わ+れ+た, 売られた → 売ら+れ+た, やらされた → やらさ+れ+た
+  //       書かれた → 書か+れ+た, 読まれた → 読ま+れ+た, 叩かれた → 叩か+れ+た
   // This cancels the VerbRenyokei→た bonus for godan passive forms
+  // Patterns: われ (wa-row), かれ (ka-row), され (sa-row), たれ (ta-row),
+  //           なれ (na-row), まれ (ma-row), られ (ra-row), ばれ (ba-row), がれ (ga-row)
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       prev.surface.size() >= 6 &&  // At least 2 chars (kanji+Xれ)
       (utf8::endsWith(prev.surface, "われ") ||
+       utf8::endsWith(prev.surface, "かれ") ||
+       utf8::endsWith(prev.surface, "され") ||
+       utf8::endsWith(prev.surface, "たれ") ||
+       utf8::endsWith(prev.surface, "なれ") ||
+       utf8::endsWith(prev.surface, "まれ") ||
        utf8::endsWith(prev.surface, "られ") ||
-       utf8::endsWith(prev.surface, "され")) &&
+       utf8::endsWith(prev.surface, "ばれ") ||
+       utf8::endsWith(prev.surface, "がれ")) &&
       next.surface == "た" &&
       next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
     surface_bonus += cost::kSevere;  // Cancel VerbRenyokei→た bonus
@@ -872,7 +892,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei ||
        prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      (next.surface == "いたし" || next.surface == "おり" ||
+      (next.surface == "いたし" ||
        next.surface == "くださ" || next.surface == "いただき" ||
        next.surface == "もらい" || next.surface == "あげ")) {
     surface_bonus += cost::kVeryStrongBonus;
@@ -884,7 +904,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.extended_pos == core::ExtendedPOS::AuxTenseMasu &&
       (prev.surface == "いただき" || prev.surface == "いたし" ||
-       prev.surface == "おり" || prev.surface == "くださ")) {
+       prev.surface == "くださ")) {
     surface_bonus += cost::kVeryStrongBonus;
   }
 
@@ -1129,6 +1149,19 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kStrong;
   }
 
+  // Penalty for ADJ_連用(なく) → VERB_連用(し) pattern
+  // E.g., なくした should be なくし+た, not なく+し+た
+  // "なくす" (to lose) is a distinct verb from "なく+する" (to make not exist)
+  // The AdjRenyokei→VerbRenyokei bonus (-0.8) for 美しく+なり pattern
+  // incorrectly applies to なく+し, causing over-split of なくす verb
+  // This penalty cancels the bonus specifically for ない形容詞 + する pattern
+  if (prev.extended_pos == core::ExtendedPOS::AdjRenyokei &&
+      prev.surface == "なく" &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface == "し") {
+    surface_bonus += cost::kRare;  // Cancel the -0.8 bonus
+  }
+
   // Penalty for negation PREFIX (非/不/無/未) → single-kanji NOUN
   // E.g., 非常 → 非|常 is wrong (非常 is a single word, not prefix+noun)
   // E.g., 不可能 → 不|可能 is wrong (不可能 is a single word)
@@ -1149,6 +1182,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
       prev.surface == "で" &&
       next.extended_pos == core::ExtendedPOS::Symbol) {
+    surface_bonus += cost::kStrong;
+  }
+
+  // Penalty for で(VerbRenyokei of 出る) → Particle
+  // で as 出る renyokei should only be followed by auxiliaries (たい, ます)
+  // 彼女でも → 彼女+で(PART)+も, not 彼女+で(VERB 出る)+も
+  // The verb interpretation is only valid before auxiliaries like たい/ます
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      prev.surface == "で" &&
+      next.pos == core::PartOfSpeech::Particle) {
     surface_bonus += cost::kStrong;
   }
 
