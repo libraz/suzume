@@ -128,8 +128,9 @@ BigramTable::initTable() {
   // VerbOnbinkei → AuxAspectShimau (行っ+ちゃっ) - strong bonus for contracted ~てしまう split
   setCell(t, EPOS::VerbOnbinkei, EPOS::AuxAspectShimau, cost::kStrongBonus);
 
-  // VerbTeForm → AuxAspectIru (食べて+いる) - strong bonus
-  setCell(t, EPOS::VerbTeForm, EPOS::AuxAspectIru, cost::kStrongBonus);
+  // VerbTeForm → AuxAspectIru (食べて+いる) - penalty to prefer 食べ+て+いる split
+  // MeCab splits as 食べ+て+いる, not 食べて+いる
+  setCell(t, EPOS::VerbTeForm, EPOS::AuxAspectIru, cost::kUncommon);
 
   // VerbTeForm → AuxAspectShimau (食べて+しまう) - moderate bonus
   setCell(t, EPOS::VerbTeForm, EPOS::AuxAspectShimau, cost::kModerateBonus);

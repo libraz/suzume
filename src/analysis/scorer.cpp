@@ -568,6 +568,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kVeryRare;
   }
 
+  // Bonus for Noun → VerbMizenkei "さ" (サ変動詞の未然形)
+  // E.g., 反映される should be 反映+さ+れる (not 反映+される)
+  // MeCab treats サ変動詞 passive as Noun + さ(suru_mizen) + れる(passive)
+  // This enables the split: 反映+さ+れ+ます
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      next.extended_pos == core::ExtendedPOS::VerbMizenkei &&
+      next.surface == "さ") {
+    surface_bonus += cost::kStrongBonus;
+  }
+
   // Surface-based bonus for VerbRenyokei → た (ichidan/irregular た-form)
   // E.g., 食べ+た, 来+た (MeCab-compatible split)
   // Must be surface == "た" to distinguish from て (particle)
@@ -940,12 +950,14 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Single-kanji nouns rarely form valid noun+verb compounds
   // Check both dict and non-dict verb candidates that follow dictionary verbs
   // Exception: し (suru renyokei) is valid for サ変 pattern (得+し, 得する)
+  // Exception: Katakana verbs (バズっ, ググっ) are valid after nouns (超バズった)
   if (prev.pos == core::PartOfSpeech::Noun &&
       prev.surface.size() == 3 &&  // Single kanji (3 bytes UTF-8)
       next.pos == core::PartOfSpeech::Verb &&
       (next.extended_pos == core::ExtendedPOS::VerbRenyokei ||
        next.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
-      next.surface != "し") {  // Exclude suru renyokei (サ変動詞パターン)
+      next.surface != "し" &&  // Exclude suru renyokei (サ変動詞パターン)
+      !kana::isKatakanaCodepoint(utf8::decodeFirstChar(next.surface))) {  // Exclude katakana verbs
     surface_bonus += cost::kVeryRare;
   }
 

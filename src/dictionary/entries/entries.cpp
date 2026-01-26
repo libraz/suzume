@@ -266,6 +266,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Past/Completion - た (過去・完了)
       aux("た", "た", EPOS::AuxTenseTa),
       aux("たら", "た", EPOS::AuxTenseTa),  // 仮定形
+      aux("だ", "だ", EPOS::AuxTenseTa),    // 連濁形 (泳いだ, 死んだ, 飛んだ, 読んだ)
       aux("だら", "だ", EPOS::AuxTenseTa),
 
       // Conjecture/Volitional (推量・意志) - う/よう
