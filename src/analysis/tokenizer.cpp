@@ -243,6 +243,20 @@ void Tokenizer::addDictionaryCandidates(
             // Don't create emphatic form - let っす/っさ/っせ be parsed separately
             emphatic_suffix.clear();
           }
+          // Skip emphatic for verbs + っ + て/と (quotative って pattern)
+          // E.g., 行くって should be 行く+って, not 行くっ+て
+          // Godan verbs in 終止形 (ending く/す/つ/う/ぐ/ぶ/む/ぬ) + っ + て = quotative
+          else if (after_sokuon == U'て' || after_sokuon == U'と') {
+            if (result.entry->pos == core::PartOfSpeech::Verb && end_pos > start_pos) {
+              char32_t verb_final = codepoints[end_pos - 1];
+              // Godan 終止形 endings that shouldn't have emphatic っ before quotative て
+              if (verb_final == U'く' || verb_final == U'す' || verb_final == U'つ' ||
+                  verb_final == U'う' || verb_final == U'ぐ' || verb_final == U'ぶ' ||
+                  verb_final == U'む' || verb_final == U'ぬ' || verb_final == U'る') {
+                emphatic_suffix.clear();
+              }
+            }
+          }
         }
       }
       if (!emphatic_suffix.empty()) {
@@ -488,6 +502,27 @@ void Tokenizer::addUnknownCandidates(
     // Also skip for Suru verb candidates (所在する, 延期する) - these are productive
     bool is_suru_verb = (candidate.pos == core::PartOfSpeech::Verb &&
                          candidate.conj_type == dictionary::ConjugationType::Suru);
+
+    // Check for pure hiragana verb (e.g., ねる, もらう, あげる)
+    // These should not be penalized heavily - they are legitimate verb forms
+    bool is_pure_hiragana_verb = false;
+    if (candidate.pos == core::PartOfSpeech::Verb &&
+        candidate.end - candidate.start >= 2) {
+      bool all_hiragana = true;
+      for (size_t idx = candidate.start;
+           idx < candidate.end && idx < char_types.size(); ++idx) {
+        if (char_types[idx] != normalize::CharType::Hiragana) {
+          all_hiragana = false;
+          break;
+        }
+      }
+      // Only skip penalty for short pure hiragana verbs (2-4 chars)
+      // Longer ones might be suspicious (e.g., いただきます could be wrong split)
+      if (all_hiragana && candidate.end - candidate.start <= 4) {
+        is_pure_hiragana_verb = true;
+      }
+    }
+
     bool exceeds_dict = (max_dict_length > 0 &&
                          candidate.end - candidate.start > max_dict_length);
     if (exceeds_dict) {
@@ -507,6 +542,10 @@ void Tokenizer::addUnknownCandidates(
         SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" ("
                           << core::posToString(candidate.pos) << "): "
                           << "skip exceeds_dict_length (has_suffix)\n");
+      } else if (is_pure_hiragana_verb) {
+        SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" ("
+                          << core::posToString(candidate.pos) << "): "
+                          << "skip exceeds_dict_length (pure_hiragana_verb)\n");
       } else {
         float penalty = reduced_penalty ? 1.0F : 3.5F;
         adjusted_cost += penalty;

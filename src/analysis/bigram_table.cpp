@@ -246,6 +246,10 @@ BigramTable::initTable() {
   // AuxTenseMasu → AuxTenseTa (まし+た) - strong bonus
   setCell(t, EPOS::AuxTenseMasu, EPOS::AuxTenseTa, cost::kStrongBonus);
 
+  // AuxTenseMasu → AuxNegativeNu (ませ+ん for polite negative) - strong bonus
+  // Ensures ません → ませ+ん (aux) over ませ+ん (particle の)
+  setCell(t, EPOS::AuxTenseMasu, EPOS::AuxNegativeNu, cost::kStrongBonus);
+
   // AuxTenseMasu → AuxVolitional (ましょ+う) - strong bonus for MeCab-compatible split
   setCell(t, EPOS::AuxTenseMasu, EPOS::AuxVolitional, cost::kStrongBonus);
 
@@ -293,6 +297,10 @@ BigramTable::initTable() {
   // ParticleNo → AuxCopulaDesu (ん+です/でし for んです/んでした) - strong bonus
   // Ensures んでした → ん+でし+た over ん+で+し+た
   setCell(t, EPOS::ParticleNo, EPOS::AuxCopulaDesu, cost::kStrongBonus);
+
+  // AuxNegativeNu → AuxCopulaDesu (ん+でし for ませんでした) - strong bonus
+  // Ensures ませんでした → ませ+ん+でし+た (negative aux ん)
+  setCell(t, EPOS::AuxNegativeNu, EPOS::AuxCopulaDesu, cost::kStrongBonus);
 
   // ParticleNo → AuxCopulaDa (ん+だ for んだ) - strong bonus
   // Ensures んだ → ん+だ over ん+だ(VERB)
@@ -622,6 +630,11 @@ BigramTable::initTable() {
 
   // VerbShuushikei → AuxConjectureRashii (食べる+らしい) - moderate bonus
   setCell(t, EPOS::VerbShuushikei, EPOS::AuxConjectureRashii, cost::kModerateBonus);
+
+  // VerbShuushikei → AuxAppearanceSou (食べる+そう hearsay) - strong bonus
+  // Hearsay そう (伝聞) attaches to 終止形: 食べる+そうだ, する+そうです
+  // Different from appearance そう (様態) which attaches to 連用形: 食べ+そう, し+そう
+  setCell(t, EPOS::VerbShuushikei, EPOS::AuxAppearanceSou, cost::kStrongBonus);
 
   // VerbShuushikei → AuxConjectureMitai (食べる+みたい) - strong bonus
   setCell(t, EPOS::VerbShuushikei, EPOS::AuxConjectureMitai, cost::kStrongBonus);

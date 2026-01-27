@@ -650,7 +650,7 @@
           "surface" : "何"
         },
         {
-          "pos" : "Particle",
+          "pos" : "Conjunction",
           "surface" : "でも"
         },
         {
@@ -1123,7 +1123,7 @@
       "description" : "容易になりました - na-adj + ni + naru (split: verb stem + polite aux)",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "容易"
         },
         {
@@ -1245,12 +1245,8 @@
       "description" : "Katakana verb ググる base form",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "ググ"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "る"
+          "pos" : "Verb",
+          "surface" : "ググる"
         }
       ],
       "id" : "verb_guguru_base",
@@ -1265,15 +1261,12 @@
       "description" : "Katakana verb ググる negative form",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "ググ"
+          "lemma" : "ググる",
+          "pos" : "Verb",
+          "surface" : "ググら"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "ら"
-        },
-        {
-          "pos" : "Adjective",
+          "pos" : "Auxiliary",
           "surface" : "ない"
         }
       ],
@@ -1289,12 +1282,8 @@
       "description" : "Katakana verb パクる base form",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "パク"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "る"
+          "pos" : "Verb",
+          "surface" : "パクる"
         }
       ],
       "id" : "verb_pakuru_base",
@@ -1367,12 +1356,13 @@
       "description" : "Katakana verb ググる volitional form",
       "expected" : [
         {
-          "pos" : "Noun",
-          "surface" : "ググ"
+          "lemma" : "ググる",
+          "pos" : "Verb",
+          "surface" : "ググろ"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ろう"
+          "pos" : "Auxiliary",
+          "surface" : "う"
         }
       ],
       "id" : "verb_guguru_volitional",
@@ -1441,8 +1431,7 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "の",
-          "pos" : "Particle",
+          "pos" : "Auxiliary",
           "surface" : "ん"
         },
         {

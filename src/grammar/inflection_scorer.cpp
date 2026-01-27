@@ -773,6 +773,20 @@ float calculateConfidence(VerbType type, std::string_view stem,
     logConfidenceAdjustment(-pen, "i_adj_e_row_stem");
   }
 
+  // I-adjective stems ending with る are invalid - verb dictionary form pattern
+  // E.g., するそう → するい (invalid), 食べるそう → 食べるい (invalid)
+  //       降るそう → 降るい (invalid)
+  // These are verb終止形 + そう(hearsay), not i-adjectives
+  // Real i-adjectives never have stems ending in る
+  if (type == VerbType::IAdjective && stem_len >= core::kTwoJapaneseCharBytes) {
+    std::string_view last = stem.substr(stem_len - core::kJapaneseCharBytes);
+    if (last == "る") {
+      float pen = GET_OPT(penalty_i_adj_ru_stem_invalid, inflection::kPenaltyIAdjRuStemInvalid);
+      base -= pen;
+      logConfidenceAdjustment(-pen, "i_adj_ru_stem_invalid");
+    }
+  }
+
   // I-adjective stems ending with "るらし" or "いらし" are likely verb/adj + rashii pattern
   // E.g., 帰るらし + い → should be 帰る + らしい (conjecture auxiliary)
   // E.g., 帰りたいらし + い → should be 帰りたい + らしい

@@ -145,7 +145,7 @@ bool PreTokenizer::tryMatchUrl(std::string_view text, size_t pos,
     token.start = start;
     token.end = idx;
     token.type = PreTokenType::Url;
-    token.pos = core::PartOfSpeech::Symbol;
+    token.pos = core::PartOfSpeech::Noun;  // Treat URLs as nouns (not symbols)
     return true;
   }
 
@@ -374,6 +374,52 @@ bool PreTokenizer::tryMatchPercentage(std::string_view text, size_t pos,
   return true;
 }
 
+bool PreTokenizer::tryMatchAddressNumber(std::string_view text, size_t pos,
+                                          PreToken& token) const {
+  // Match address number patterns: 1-2-3, 1-2-3-4 etc.
+  // Pattern: digit(s) + (hyphen + digit(s))+
+  std::string num_str;
+  size_t idx = parseInteger(text, pos, num_str);
+
+  if (num_str.empty()) {
+    return false;
+  }
+
+  // Must have at least one hyphen-number sequence
+  bool has_hyphen = false;
+  std::string surface = num_str;
+
+  while (idx < text.size() && text[idx] == '-') {
+    size_t hyphen_pos = idx;
+    ++idx;
+
+    // Parse the next number
+    std::string next_num;
+    size_t next_end = parseInteger(text, idx, next_num);
+    if (next_num.empty()) {
+      // No number after hyphen, revert
+      idx = hyphen_pos;
+      break;
+    }
+
+    surface += '-';
+    surface += next_num;
+    idx = next_end;
+    has_hyphen = true;
+  }
+
+  if (!has_hyphen) {
+    return false;
+  }
+
+  token.surface = surface;
+  token.start = pos;
+  token.end = idx;
+  token.type = PreTokenType::Number;
+  token.pos = core::PartOfSpeech::Noun;
+  return true;
+}
+
 bool PreTokenizer::tryMatchEmail(std::string_view text, size_t pos,
                                   PreToken& token) const {
   // Match email: local-part@domain
@@ -531,7 +577,9 @@ bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos,
 }
 
 // Check if codepoint is valid for hashtag content
-// Allows: Japanese characters, alphanumeric, underscore
+// Allows: Katakana, Kanji, alphanumeric, underscore
+// Note: Hiragana is excluded to avoid including particles like を, は, が
+//       This means #ありがとう style hashtags won't work, but they are rare
 bool isHashtagChar(char32_t codepoint) {
   // ASCII alphanumeric and underscore
   if ((codepoint >= 'a' && codepoint <= 'z') ||
@@ -539,15 +587,11 @@ bool isHashtagChar(char32_t codepoint) {
       (codepoint >= '0' && codepoint <= '9') || codepoint == '_') {
     return true;
   }
-  // Hiragana (U+3040-U+309F)
-  if (codepoint >= 0x3040 && codepoint <= 0x309F) {
-    return true;
-  }
-  // Katakana (U+30A0-U+30FF)
+  // Katakana (U+30A0-U+30FF) - allowed for hashtags
   if (codepoint >= 0x30A0 && codepoint <= 0x30FF) {
     return true;
   }
-  // CJK Unified Ideographs (U+4E00-U+9FFF)
+  // CJK Unified Ideographs (U+4E00-U+9FFF) - allowed for hashtags
   if (codepoint >= 0x4E00 && codepoint <= 0x9FFF) {
     return true;
   }
@@ -555,6 +599,7 @@ bool isHashtagChar(char32_t codepoint) {
   if (codepoint >= 0xFF00 && codepoint <= 0xFF5E) {
     return true;
   }
+  // Hiragana is NOT allowed - to avoid particles being included
   return false;
 }
 
@@ -671,6 +716,48 @@ bool PreTokenizer::tryMatchMention(std::string_view text, size_t pos,
   return true;
 }
 
+bool PreTokenizer::tryMatchAsciiWithDots(std::string_view text, size_t pos,
+                                          PreToken& token) const {
+  // Match ASCII alphanumeric sequences with embedded dots
+  // Pattern: alnum+ (. alnum+)+
+  // e.g., example.com, foo.bar.baz
+  // Must have at least one dot to distinguish from regular ASCII sequences
+
+  if (pos >= text.size() || !isAsciiAlnum(text[pos])) {
+    return false;
+  }
+
+  size_t start = pos;
+  size_t idx = pos;
+  bool has_dot = false;
+
+  while (idx < text.size()) {
+    char chr = text[idx];
+    if (isAsciiAlnum(chr)) {
+      ++idx;
+    } else if (chr == '.' && idx + 1 < text.size() &&
+               isAsciiAlnum(text[idx + 1])) {
+      // Dot followed by alphanumeric
+      has_dot = true;
+      ++idx;
+    } else {
+      break;
+    }
+  }
+
+  // Must have at least one dot and not end with dot
+  if (!has_dot || idx <= start + 2) {
+    return false;
+  }
+
+  token.surface = std::string(text.substr(start, idx - start));
+  token.start = start;
+  token.end = idx;
+  token.type = PreTokenType::AsciiSeq;
+  token.pos = core::PartOfSpeech::Noun;
+  return true;
+}
+
 bool PreTokenizer::isSentenceBoundary(char32_t codepoint) const {
   return codepoint == U'。' || codepoint == U'！' || codepoint == U'？' ||
          codepoint == U'!' || codepoint == U'?' || codepoint == U'\n';
@@ -700,7 +787,9 @@ PreTokenResult PreTokenizer::process(std::string_view text) const {
         tryMatchCurrency(text, pos, token) ||
         tryMatchStorage(text, pos, token) ||
         tryMatchPercentage(text, pos, token) ||
-        tryMatchVersion(text, pos, token)) {
+        tryMatchAddressNumber(text, pos, token) ||
+        tryMatchVersion(text, pos, token) ||
+        tryMatchAsciiWithDots(text, pos, token)) {
       // Add span before this token if any
       if (pos > span_start) {
         result.spans.push_back({span_start, pos});

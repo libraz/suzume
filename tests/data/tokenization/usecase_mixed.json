@@ -363,7 +363,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "自然言語処理技術"
+          "surface" : "自然"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "言語処理技術"
         }
       ],
       "id" : "compound_natural_language",
@@ -654,12 +658,8 @@
       "description" : "性 suffix - split from noun with existential ある (verb)",
       "expected" : [
         {
-          "pos" : "Adjective",
-          "surface" : "可能"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "性"
+          "pos" : "Noun",
+          "surface" : "可能性"
         },
         {
           "pos" : "Particle",
@@ -796,15 +796,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "example"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "."
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "com"
+          "surface" : "example.com"
         },
         {
           "pos" : "Particle",

@@ -370,16 +370,21 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
     // Filter out te-form compound verb patterns that should be split
     // e.g., なっております → なっ+て+おり+ます, してます → し+て+ます
-    //       してください → し+て+ください
+    //       してください → し+て+ください, してほしい → し+て+ほしい
+    //       してくれます → し+て+くれ+ます
     // These contain て+auxiliary patterns that should be analyzed separately
     // Only skip for longer forms (5+ chars) to avoid blocking short verbs
     if (end_pos - start_pos >= 5) {
-      // Check for ており/ていま/てい/てお/てくださ patterns (te-form + auxiliary)
+      // Check for ており/ていま/てい/てお/てくださ/てほしい/てくれ/てもら patterns
+      // (te-form + auxiliary verb patterns)
       if (surface.find("ており") != std::string::npos ||
           surface.find("ていま") != std::string::npos ||
           surface.find("ている") != std::string::npos ||
           surface.find("ていた") != std::string::npos ||
           surface.find("てくださ") != std::string::npos ||
+          surface.find("てほしい") != std::string::npos ||
+          surface.find("てくれ") != std::string::npos ||
+          surface.find("てもら") != std::string::npos ||
           surface.find("てお") != std::string::npos) {
         SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface
             << "\" skip te_compound_pattern\n");
@@ -595,11 +600,21 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
         // When the first char is a common particle (で, に, etc.), these particles
         // have very low cost (e.g., で: -0.4), making particle+て path even cheaper
         // (total around -0.5). Need extra strong bonus for these cases.
+        // EXCEPTION: If the 1-char stem is a known verb (e.g., でる, ねる in dictionary),
+        // we want to prefer split path (で+て, ね+て), so use weaker bonus
         bool starts_with_common_particle =
             (first_char == U'で' || first_char == U'に' || first_char == U'が' ||
              first_char == U'を' || first_char == U'は' || first_char == U'の' ||
              first_char == U'へ');
-        if (starts_with_common_particle) {
+        // Check if 1-char stem + る is a known verb (e.g., でる, ねる)
+        std::string one_char_stem = extractSubstring(codepoints, start_pos, start_pos + 1);
+        std::string potential_verb = one_char_stem + "る";
+        bool has_1char_verb_in_dict = vh::isVerbInDictionary(dict_manager, potential_verb);
+        if (has_1char_verb_in_dict) {
+          // Prefer split path (で+て) over combined (でて) when verb is in dictionary
+          // Use moderate cost that can be beaten by 1-char renyokei candidate
+          base_cost = verb_opts.base_cost_low + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_small;
+        } else if (starts_with_common_particle) {
           // Extra strong bonus: need to beat particle paths around -0.5
           base_cost = verb_opts.bonus_long_verified + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_small;
         } else {
@@ -732,6 +747,14 @@ next_length:;  // Label for goto from particle-starting verb skip
       } else {
         is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
       }
+    }
+    // Fallback for GodanSa: use inflection analysis for causative verb patterns
+    // E.g., やらされた = やらさ (mizenkei of やらす) + れ + た
+    // やらす is the causative form of やる but not in dictionary
+    if (!is_valid_verb && verb_type == grammar::VerbType::GodanSa) {
+      auto infl_result = inflection.getBest(base_form);
+      is_valid_verb = infl_result.confidence > 0.5F &&
+                      vh::isGodanVerbType(infl_result.verb_type);
     }
 
     if (!is_valid_verb) {
@@ -1192,8 +1215,7 @@ next_length:;  // Label for goto from particle-starting verb skip
   if (start_pos < codepoints.size()) {
     char32_t first_char = codepoints[start_pos];
     // Check for e-row hiragana (ichidan renyokei ending)
-    // Exclude て and で which are more commonly particles
-    if (grammar::isERowCodepoint(first_char) && first_char != U'て' && first_char != U'で') {
+    if (grammar::isERowCodepoint(first_char)) {
       // Check if followed by te/ta particle
       if (start_pos + 1 < codepoints.size()) {
         char32_t next_char = codepoints[start_pos + 1];
@@ -1204,6 +1226,8 @@ next_length:;  // Label for goto from particle-starting verb skip
 
           // Only generate if base form is a known verb in dictionary
           // This prevents false positives like め+て, け+て
+          // Also handles て/で which are commonly particles but may be verb renyokei
+          // if the base form (てる/でる) is in dictionary
           if (vh::isVerbInDictionary(dict_manager, base_form)) {
             // Strong negative cost to beat particle split
             // Particle path can be as low as -0.2, so we need lower
@@ -1216,7 +1240,8 @@ next_length:;  // Label for goto from particle-starting verb skip
             candidates.push_back(makeVerbCandidate(
                 stem_surface, start_pos, start_pos + 1, kCost, base_form,
                 dictionary::ConjugationType::Ichidan,
-                true, CandidateOrigin::VerbHiragana, 0.8F, "hiragana_ichidan_renyokei_1char"));
+                true, CandidateOrigin::VerbHiragana, 0.8F, "hiragana_ichidan_renyokei_1char",
+                core::ExtendedPOS::VerbRenyokei));  // Explicit VerbRenyokei for て/た connection
           }
         }
       }
@@ -1309,6 +1334,16 @@ next_length:;  // Label for goto from particle-starting verb skip
       continue;
     }
 
+    // Skip て+subsidiary verb patterns that should be split
+    // E.g., "してくれ" should be し + て + くれ, not single verb
+    //       "してもら" should be し + て + もら, not single verb
+    // These patterns contain て-form (して) followed by subsidiary verb stem
+    if (stem_surface.find("てくれ") != std::string::npos ||
+        stem_surface.find("てもら") != std::string::npos ||
+        stem_surface.find("てあげ") != std::string::npos) {
+      continue;
+    }
+
     // Strong negative cost to beat NOUN + て(VERB from てる) split
     // Dictionary-verified verbs get stronger bonus
     // Non-dictionary verbs get moderate positive cost to avoid spurious candidates
@@ -1330,7 +1365,13 @@ next_length:;  // Label for goto from particle-starting verb skip
     // Also generate kateikei stem if followed by れば
     // E.g., できれば → できれ (kateikei of できる) + ば
     // MeCab splits: できれば → できれ(動詞,仮定形) + ば(接続助詞)
-    if (is_followed_by_reba) {
+    // Skip suru-verb negative patterns: しなけれ should be し + なけれ, not single verb
+    // Pattern: し + な (negative stem prefix)
+    // stem_surface = しなけ → base_form = しなける (false ichidan)
+    bool is_suru_negative_pattern = (stem_surface.size() >= 6 &&  // しな = 6 bytes
+                                     stem_surface.substr(0, 3) == "し" &&
+                                     stem_surface.substr(3, 3) == "な");
+    if (is_followed_by_reba && !is_suru_negative_pattern) {
       std::string kateikei_surface = stem_surface + "れ";  // 連用形 + れ = 仮定形
       size_t kateikei_end = end_pos + 1;  // renyokei + れ
       constexpr float kKateikeiCost = -0.8F;

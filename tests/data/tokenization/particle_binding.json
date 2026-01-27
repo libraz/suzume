@@ -47,12 +47,13 @@
           "surface" : "に"
         },
         {
-          "pos" : "Filler",
-          "surface" : "あ"
+          "lemma" : "ある",
+          "pos" : "Verb",
+          "surface" : "あり"
         },
         {
-          "pos" : "Adverb",
-          "surface" : "りん"
+          "pos" : "Auxiliary",
+          "surface" : "ん"
         },
         {
           "lemma" : "する",
@@ -75,12 +76,13 @@
           "surface" : "で"
         },
         {
-          "pos" : "Filler",
-          "surface" : "あ"
+          "lemma" : "ある",
+          "pos" : "Verb",
+          "surface" : "あり"
         },
         {
-          "pos" : "Adverb",
-          "surface" : "りん"
+          "pos" : "Auxiliary",
+          "surface" : "ん"
         },
         {
           "lemma" : "する",
@@ -281,8 +283,7 @@
           "surface" : "君"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
+          "pos" : "Particle",
           "surface" : "なら"
         },
         {
@@ -783,7 +784,7 @@
       "description" : "刻々と - iteration mark + particle",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "刻々"
         },
         {
@@ -1142,7 +1143,7 @@
       "description" : "いかがでしょうか should contain いかが as single token",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "いかが"
         },
         {

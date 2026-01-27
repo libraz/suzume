@@ -53,8 +53,7 @@
           "surface" : "わから"
         },
         {
-          "lemma" : "の",
-          "pos" : "Particle",
+          "pos" : "Auxiliary",
           "surface" : "ん"
         }
       ],

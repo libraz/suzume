@@ -55,9 +55,12 @@ namespace hiragana {
 constexpr char32_t kMa = U'ま';  // ま (0x307E)
 constexpr char32_t kSu = U'す';  // す (0x3059)
 
-// Negative auxiliary ない
+// Negative auxiliary ない and its conjugations (なく、なかっ、なけれ)
 constexpr char32_t kNa = U'な';  // な (0x306A)
 constexpr char32_t kI = U'い';   // い (0x3044)
+constexpr char32_t kKu = U'く';  // く (0x304F) - for なく (adverbial)
+constexpr char32_t kKa = U'か';  // か (0x304B) - for なかっ (ta-connection)
+constexpr char32_t kKe = U'け';  // け (0x3051) - for なけれ (conditional)
 
 // Passive/potential られる
 constexpr char32_t kRa = U'ら';  // ら (0x3089)
@@ -81,6 +84,10 @@ constexpr char32_t kO = U'お';  // お (0x304A) - prefix marker
 // Volitional auxiliary よう/う
 constexpr char32_t kYo = U'よ';  // よ (0x3088)
 constexpr char32_t kU = U'う';   // う (0x3046)
+
+// Causative auxiliary させる
+constexpr char32_t kSa = U'さ';  // さ (0x3055)
+constexpr char32_t kSe = U'せ';  // せ (0x305B)
 
 }  // namespace hiragana
 

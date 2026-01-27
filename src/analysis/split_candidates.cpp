@@ -113,7 +113,12 @@ void addMixedScriptCandidates(
 
       // Apply length-based bonus/penalty
       float length_adjustment;
-      if (kanji_len == 1) {
+      // Exception: 対 (versus) should not merge with preceding digit
+      // e.g., 2対1 should be 2|対|1, not 2対|1
+      bool is_exception = (kanji_len == 1 && codepoints[first_end] == U'対');
+      if (is_exception) {
+        length_adjustment = 1.5F;  // Strong penalty to favor split
+      } else if (kanji_len == 1) {
         length_adjustment = opts.digit_kanji_1_bonus;  // Best: 5分, 3月
       } else if (kanji_len == 2) {
         length_adjustment = opts.digit_kanji_2_bonus;  // Good: 5分間, 3時間

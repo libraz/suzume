@@ -312,8 +312,7 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "の",
-          "pos" : "Particle",
+          "pos" : "Auxiliary",
           "surface" : "ん"
         },
         {
@@ -332,7 +331,7 @@
       "description" : "Inquiry: いかがでしょうか",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "いかが"
         },
         {
@@ -1257,7 +1256,7 @@
       "description" : "Apology: 大変申し訳ございませんでした",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "大変"
         },
         {
@@ -1275,8 +1274,7 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "の",
-          "pos" : "Particle",
+          "pos" : "Auxiliary",
           "surface" : "ん"
         },
         {

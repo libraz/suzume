@@ -49,7 +49,7 @@
           "surface" : "しまい"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "そう"
         }
       ],
@@ -81,13 +81,8 @@
       "description" : "B63: 食べ込む should be single compound verb (ichidan + V2)",
       "expected" : [
         {
-          "lemma" : "食べる",
           "pos" : "Verb",
-          "surface" : "食べ"
-        },
-        {
-          "pos" : "Verb",
-          "surface" : "込む"
+          "surface" : "食べ込む"
         }
       ],
       "id" : "tabekomeru_compound",
@@ -171,13 +166,8 @@
       "description" : "読み続ける - compound verb",
       "expected" : [
         {
-          "lemma" : "読む",
           "pos" : "Verb",
-          "surface" : "読み"
-        },
-        {
-          "pos" : "Verb",
-          "surface" : "続ける"
+          "surface" : "読み続ける"
         }
       ],
       "id" : "compound_verb_yomi_tsuzukeru",
@@ -238,14 +228,9 @@
       "description" : "走りだしたくなかった - hiragana subsidiary verb",
       "expected" : [
         {
-          "lemma" : "走る",
+          "lemma" : "走りだす",
           "pos" : "Verb",
-          "surface" : "走り"
-        },
-        {
-          "lemma" : "だす",
-          "pos" : "Auxiliary",
-          "surface" : "だし"
+          "surface" : "走りだし"
         },
         {
           "lemma" : "たい",
@@ -369,13 +354,8 @@
       "description" : "わかりあう - all-hiragana compound verb",
       "expected" : [
         {
-          "lemma" : "わかる",
           "pos" : "Verb",
-          "surface" : "わかり"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "あう"
+          "surface" : "わかりあう"
         }
       ],
       "id" : "hiragana_compound_verb_wakari_au",
@@ -630,14 +610,9 @@
           "surface" : "を"
         },
         {
-          "lemma" : "駆ける",
+          "lemma" : "駆け巡る",
           "pos" : "Verb",
-          "surface" : "駆け"
-        },
-        {
-          "lemma" : "巡る",
-          "pos" : "Verb",
-          "surface" : "巡っ"
+          "surface" : "駆け巡っ"
         },
         {
           "pos" : "Auxiliary",
@@ -689,14 +664,9 @@
           "surface" : "を"
         },
         {
-          "lemma" : "演じる",
+          "lemma" : "演じきる",
           "pos" : "Verb",
-          "surface" : "演じ"
-        },
-        {
-          "lemma" : "きる",
-          "pos" : "Auxiliary",
-          "surface" : "きっ"
+          "surface" : "演じきっ"
         },
         {
           "pos" : "Auxiliary",

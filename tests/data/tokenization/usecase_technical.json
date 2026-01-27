@@ -22,8 +22,7 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "の",
-          "pos" : "Particle",
+          "pos" : "Auxiliary",
           "surface" : "ん"
         },
         {
@@ -150,11 +149,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "成功"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "時"
+          "surface" : "成功時"
         },
         {
           "pos" : "Particle",
@@ -204,7 +199,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "必要"
         },
         {
@@ -346,7 +341,7 @@
           "surface" : "する"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "必要"
         },
         {
@@ -892,8 +887,12 @@
           "surface" : "ので"
         },
         {
-          "pos" : "Adverb",
-          "surface" : "後で"
+          "pos" : "Noun",
+          "surface" : "後"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
         },
         {
           "pos" : "Noun",
@@ -1037,7 +1036,7 @@
       "description" : "Purpose clause with tame",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "健康"
         },
         {
@@ -1242,7 +1241,7 @@
           "surface" : "か"
         },
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "どう"
         },
         {

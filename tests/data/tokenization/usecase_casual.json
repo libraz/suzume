@@ -31,7 +31,7 @@
           "surface" : "本当に"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "そう"
         },
         {
@@ -162,7 +162,7 @@
         },
         {
           "lemma" : "ちゃう",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ちゃっ"
         },
         {
@@ -895,7 +895,7 @@
           "surface" : "これ"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Adjective",
           "surface" : "まじ"
         },
         {
@@ -917,7 +917,7 @@
           "surface" : "いい"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Particle",
           "surface" : "じゃん"
         }
       ],

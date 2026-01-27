@@ -857,6 +857,26 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     looks_like_aux = true;
   }
 
+  // Patterns ending with るそう (verb dictionary form + hearsay そう)
+  // e.g., 食べるそう, 降るそう - these are verb終止形 + そう(hearsay), not compound nouns
+  // Valid i-adj+そう like 美味しそう are handled separately (don't have る before そう)
+  if (hiragana_len >= 3 && last_hira == U'う') {
+    char32_t h_minus2 = codepoints[hiragana_end - 2];
+    char32_t h_minus3 = (hiragana_end >= 3) ? codepoints[hiragana_end - 3] : U'\0';
+    // Check for るそう pattern (verb終止形 + hearsay)
+    if (h_minus2 == U'そ' && h_minus3 == U'る') {
+      looks_like_aux = true;
+    }
+    // Check for くそう pattern (godan-ku終止形 + hearsay: 行くそう)
+    if (h_minus2 == U'そ' && h_minus3 == U'く') {
+      looks_like_aux = true;
+    }
+    // Check for すそう pattern (godan-sa終止形 + hearsay: 話すそう, するそう)
+    if (h_minus2 == U'そ' && h_minus3 == U'す') {
+      looks_like_aux = true;
+    }
+  }
+
   // Patterns ending with て/で (verb te-form)
   // e.g., 基づいて, 考えて - these are verb conjugations, not compound nouns
   if ((last_hira == U'て' || last_hira == U'で') && hiragana_len >= 2) {

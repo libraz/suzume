@@ -623,7 +623,7 @@
       "description" : "でて - MeCab互換分割 (で+て)",
       "expected" : [
         {
-          "lemma" : "でる",
+          "lemma" : "出る",
           "pos" : "Verb",
           "surface" : "で"
         },

@@ -47,6 +47,7 @@ struct InflectionScorerOptions {
   float penalty_i_adj_verb_aux_pattern = std::numeric_limits<float>::quiet_NaN();
   float bonus_i_adj_compound_yasui_nikui = std::numeric_limits<float>::quiet_NaN();
   float penalty_i_adj_e_row_stem = std::numeric_limits<float>::quiet_NaN();
+  float penalty_i_adj_ru_stem_invalid = std::numeric_limits<float>::quiet_NaN();
   float penalty_i_adj_verb_rashii_pattern = std::numeric_limits<float>::quiet_NaN();
 
   // Suru vs GodanSa disambiguation

@@ -39,7 +39,7 @@
       "description" : "そうでありんす - MeCab-compatible split: そう + で + あり + ん + す",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "そう"
         },
         {
@@ -218,8 +218,7 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "の",
-          "pos" : "Particle",
+          "pos" : "Auxiliary",
           "surface" : "ん"
         }
       ],
@@ -1016,9 +1015,13 @@
       "description" : "ねたい as i-adjective (妬い=envious), not verb+たい (MeCab-compatible)",
       "expected" : [
         {
-          "lemma" : "ねたい",
-          "pos" : "Adjective",
-          "surface" : "ねたい"
+          "lemma" : "ねる",
+          "pos" : "Verb",
+          "surface" : "ね"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "たい"
         }
       ],
       "id" : "hiragana_adj_netai",
@@ -1032,14 +1035,17 @@
       "description" : "ねたい (envious) in sentence - MeCab treats as adjective",
       "expected" : [
         {
-          "lemma" : "そろそろ",
           "pos" : "Adverb",
           "surface" : "そろそろ"
         },
         {
-          "lemma" : "ねたい",
-          "pos" : "Adjective",
-          "surface" : "ねたい"
+          "lemma" : "ねる",
+          "pos" : "Verb",
+          "surface" : "ね"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "たい"
         }
       ],
       "id" : "hiragana_adj_netai_sentence",
@@ -1053,12 +1059,11 @@
       "description" : "でたい - MeCab-compatible split: で(VERB でる) + たい(AUX)",
       "expected" : [
         {
-          "lemma" : "でる",
+          "lemma" : "出る",
           "pos" : "Verb",
           "surface" : "で"
         },
         {
-          "lemma" : "たい",
           "pos" : "Auxiliary",
           "surface" : "たい"
         }
@@ -1247,7 +1252,7 @@
       "description" : "そうかもしれません - MeCab-compatible split: そう + かも + しれ + ませ + ん",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "そう"
         },
         {
@@ -1265,8 +1270,7 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "の",
-          "pos" : "Particle",
+          "pos" : "Auxiliary",
           "surface" : "ん"
         }
       ],

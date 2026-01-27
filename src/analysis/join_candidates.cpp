@@ -393,6 +393,8 @@ void addCompoundVerbJoinCandidates(
     std::string compound_base;
     bool is_renyokei = false;      // true if matched via renyokei entry
     bool includes_aux = false;     // true if inflection match includes aux suffix
+    bool matched_via_reading = false;  // true if V2 was matched via hiragana reading
+    std::string v2_reading;        // V2 hiragana reading (for hiragana te-stem generation)
     float confidence = 0.0F;
     V2VerbType v2_verb_type = V2VerbType::Godan;  // V2 verb type
     std::string_view v2_base_ending;              // V2 base form ending (む, す, etc.)
@@ -723,6 +725,8 @@ void addCompoundVerbJoinCandidates(
       best_match.compound_base = compound_base;
       best_match.is_renyokei = is_renyokei_entry && (matched_kanji || matched_reading);
       best_match.includes_aux = inflection_includes_aux;
+      best_match.matched_via_reading = matched_reading || matched_inflected;
+      best_match.v2_reading = std::string(v2_reading);
       best_match.v2_verb_type = v2_verb.verb_type;
       best_match.v2_base_ending = v2_verb.base_ending;
     }
@@ -769,31 +773,60 @@ void addCompoundVerbJoinCandidates(
     // Without this, the compound verb te-form (話し合って) would be a single token.
     auto [te_stem, uses_de] = generateTeFormStem(
         best_match.compound_base, "", best_match.v2_verb_type, best_match.v2_base_ending);
-    if (!te_stem.empty() && te_stem.size() < compound_surface.size()) {
-      // Check if text actually starts with te_stem
-      std::string_view text_prefix = text.substr(start_byte, te_stem.size());
-      if (text_prefix == te_stem) {
-        // Calculate character position for te-form stem end
-        auto te_stem_decoded = normalize::utf8::decode(te_stem);
-        size_t te_stem_end_pos = start_pos + te_stem_decoded.size();
 
-        if (te_stem_end_pos <= codepoints.size()) {
-          // Determine ExtendedPOS based on te-form type
-          // Note: イ音便/促音便/撥音便 all use VerbOnbinkei
-          auto te_type = getTeFormType(best_match.v2_base_ending);
-          core::ExtendedPOS epos;
-          if (te_type == TeFormType::Renyokei) {
-            epos = core::ExtendedPOS::VerbRenyokei;   // 話し (サ行)
-          } else {
-            epos = core::ExtendedPOS::VerbOnbinkei;   // 書い, 買っ, 読ん, etc.
-          }
+    // Helper lambda to add te-stem edge
+    auto addTeStemEdge = [&](const std::string& stem) {
+      if (stem.empty() || stem.size() >= compound_surface.size()) return false;
+      std::string_view text_prefix = text.substr(start_byte, stem.size());
+      if (text_prefix != stem) return false;
 
-          lattice.addEdge(te_stem, static_cast<uint32_t>(start_pos),
-                          static_cast<uint32_t>(te_stem_end_pos), core::PartOfSpeech::Verb,
-                          final_cost, flags, best_match.compound_base,
-                          dictionary::ConjugationType::None, {},
-                          core::CandidateOrigin::Unknown, 0.0F, "compound_te_stem",
-                          epos, "compound_te_stem");
+      auto stem_decoded = normalize::utf8::decode(stem);
+      size_t stem_end_pos = start_pos + stem_decoded.size();
+      if (stem_end_pos > codepoints.size()) return false;
+
+      // Determine ExtendedPOS based on te-form type
+      auto te_type = getTeFormType(best_match.v2_base_ending);
+      core::ExtendedPOS epos;
+      if (te_type == TeFormType::Renyokei) {
+        epos = core::ExtendedPOS::VerbRenyokei;   // 話し (サ行)
+      } else {
+        epos = core::ExtendedPOS::VerbOnbinkei;   // 書い, 買っ, 読ん, etc.
+      }
+
+      lattice.addEdge(stem, static_cast<uint32_t>(start_pos),
+                      static_cast<uint32_t>(stem_end_pos), core::PartOfSpeech::Verb,
+                      final_cost, flags, best_match.compound_base,
+                      dictionary::ConjugationType::None, {},
+                      core::CandidateOrigin::Unknown, 0.0F, "compound_te_stem",
+                      epos, "compound_te_stem");
+      return true;
+    };
+
+    // Try kanji te-stem first
+    bool added_te_stem = addTeStemEdge(te_stem);
+
+    // If kanji te-stem didn't match and V2 was matched via hiragana reading,
+    // also try a hiragana te-stem. This handles cases like:
+    // 演じきった (input uses hiragana き, not kanji 切)
+    if (!added_te_stem && best_match.matched_via_reading &&
+        !best_match.v2_reading.empty()) {
+      // Build hiragana compound base: V1 renyokei + V2 hiragana reading
+      // compound_base is V1 renyokei + V2 kanji surface
+      // We need to replace V2 kanji with V2 hiragana
+      // Find which V2 verb was matched to get its surface length
+      for (const auto& v2_verb : kSubsidiaryVerbs) {
+        std::string_view v2_surface(v2_verb.surface);
+        if (best_match.compound_base.size() >= v2_surface.size() &&
+            best_match.compound_base.compare(
+                best_match.compound_base.size() - v2_surface.size(),
+                v2_surface.size(), v2_surface) == 0) {
+          size_t v1_len = best_match.compound_base.size() - v2_surface.size();
+          std::string v1_part = best_match.compound_base.substr(0, v1_len);
+          std::string hira_compound_base = v1_part + best_match.v2_reading;
+          auto [hira_te_stem, hira_uses_de] = generateTeFormStem(
+              hira_compound_base, "", best_match.v2_verb_type, best_match.v2_base_ending);
+          addTeStemEdge(hira_te_stem);
+          break;
         }
       }
     }
@@ -1239,11 +1272,26 @@ void addTeFormAuxiliaryCandidates(
     return;
   }
 
-  // Skip if preceded by suru renyokei "し" - MeCab splits し+て+auxiliary
-  // E.g., してみる → し + て + みる, してしまう → し + て + しまう
-  // This prevents generating combined "てみる" candidate when it should be split
-  if (start_pos > 0 && codepoints[start_pos - 1] == U'し') {
-    return;
+  // Skip if preceded by verb renyokei - MeCab splits verb+て+auxiliary
+  // E.g., してみる → し + て + みる, 助けてもらう → 助け + て + もらう
+  // This prevents generating combined "てもらう" candidate when it should be split
+  // Check for: kanji (verb stem), い-row (ichidan renyokei), え-row (ichidan renyokei),
+  // っ (sokuonbin)
+  if (start_pos > 0) {
+    // Kanji: verb stems (見て → 見 + て, 食て → 食 + て, etc.)
+    if (char_types[start_pos - 1] == CharType::Kanji) {
+      return;
+    }
+    char32_t prev = codepoints[start_pos - 1];
+    // Sokuonbin (っ): godan verbs (買って, 行って, 持って)
+    if (prev == U'っ') {
+      return;
+    }
+    // い-row: suru renyokei (し), godan renyokei (き, ぎ, etc.), kami-ichidan (起き, etc.)
+    // え-row: shimo-ichidan renyokei (食べ, 助け, 見え, etc.)
+    if (grammar::isIRowCodepoint(prev) || grammar::isERowCodepoint(prev)) {
+      return;
+    }
   }
 
   // Check if there's hiragana following

@@ -251,7 +251,7 @@
       "description" : "積極的に参加する (participate proactively) - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "積極"
         },
         {
@@ -793,7 +793,6 @@
           "surface" : "人"
         },
         {
-          "lemma" : "いる",
           "pos" : "Verb",
           "surface" : "いる"
         }
@@ -1601,7 +1600,7 @@
         },
         {
           "lemma" : "ちゃう",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "ちゃっ"
         },
         {

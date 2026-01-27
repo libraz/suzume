@@ -346,12 +346,14 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(
     }
 
     // Pattern 2: Merge number + unit (3 + 時間, 100 + ゴールド, 3時 + 間)
+    // Exception: 対 (versus) should not merge - 2対1 should be 2|対|1
     if (current.pos == core::PartOfSpeech::Noun &&
         isNumericExpression(current.surface) &&
         endsWithDigit(current.surface) &&
         idx + 1 < morphemes.size()) {
       const auto& next = morphemes[idx + 1];
-      if (next.pos == core::PartOfSpeech::Noun && looksLikeUnit(next.surface)) {
+      bool is_versus = (next.surface == "対");
+      if (next.pos == core::PartOfSpeech::Noun && looksLikeUnit(next.surface) && !is_versus) {
         core::Morpheme merged = current;
         merged.surface += next.surface;
         merged.lemma = merged.surface;

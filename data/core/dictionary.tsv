@@ -170,6 +170,7 @@
 すごい	ADJECTIVE	I_ADJ
 可愛い	ADJECTIVE	I_ADJ
 ものすごい	ADJECTIVE	I_ADJ
+うまい	ADJECTIVE	I_ADJ
 つめたい	ADJECTIVE	I_ADJ
 よく	ADVERB
 
@@ -303,7 +304,6 @@
 もう	ADVERB
 ちょっと	ADVERB
 もう少し	ADVERB
-後で	ADVERB
 まず	ADVERB
 めっちゃ	ADVERB
 ぜひ	ADVERB
@@ -363,6 +363,8 @@
 巡る	VERB	GODAN_RA
 頑張る	VERB	GODAN_RA
 ござる	VERB	GODAN_RA
+分かる	VERB	GODAN_RA
+恐れ入る	VERB	GODAN_RA
 怒鳴る	VERB	GODAN_RA
 # B65: 詰まる - moved to L1 for conjugation expansion
 
@@ -390,6 +392,8 @@
 問う	VERB	GODAN_WA
 洗う	VERB	GODAN_WA
 交う	VERB	GODAN_WA
+間違う	VERB	GODAN_WA
+もらう	VERB	GODAN_WA
 逢う	VERB	GODAN_WA
 見出す	VERB	GODAN_SA
 
@@ -425,6 +429,7 @@
 いたす	VERB	GODAN_SA
 引っ越す	VERB	GODAN_SA
 なくす	VERB	GODAN_SA
+やり直す	VERB	GODAN_SA
 戻す	VERB	GODAN_SA
 # 伸ばす	VERB	のばす	0.3	GODAN_SA
 # 濡らす	VERB	ぬらす	0.3	GODAN_SA
@@ -497,6 +502,13 @@
 駆ける	VERB	ICHIDAN
 用いる	VERB	ICHIDAN
 帯びる	VERB	ICHIDAN
+にげる	VERB	ICHIDAN
+茹でる	VERB	ICHIDAN
+撫でる	VERB	ICHIDAN
+ねる	VERB	ICHIDAN
+でる	VERB	ICHIDAN
+感じる	VERB	ICHIDAN
+飛び降りる	VERB	ICHIDAN
 諦める	VERB	ICHIDAN
 
 # =============================================================================
@@ -717,6 +729,8 @@ Wi-Fi	NOUN
 注目	NOUN
 飲み会	NOUN
 文化	NOUN
+対	NOUN
+発行	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -726,7 +740,6 @@ Wi-Fi	NOUN
 # --- Noun-forming suffixes ---
 的	SUFFIX
 化	SUFFIX
-性	SUFFIX
 法	SUFFIX
 論	SUFFIX
 家	SUFFIX

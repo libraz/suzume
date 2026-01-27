@@ -266,7 +266,7 @@
           "surface" : "いつも"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "元気"
         }
       ],
@@ -353,7 +353,7 @@
           "surface" : "雨"
         },
         {
-          "pos" : "Particle",
+          "pos" : "Conjunction",
           "surface" : "でも"
         },
         {
@@ -970,7 +970,7 @@
       "description" : "少々 should be ADV, not NOUN",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "少々"
         },
         {

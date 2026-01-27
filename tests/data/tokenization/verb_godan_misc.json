@@ -9,11 +9,7 @@
         },
         {
           "pos" : "Particle",
-          "surface" : "にゃ"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "ん"
+          "surface" : "にゃん"
         }
       ],
       "id" : "character_nyan",
@@ -94,8 +90,7 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "の",
-          "pos" : "Particle",
+          "pos" : "Auxiliary",
           "surface" : "ん"
         }
       ],

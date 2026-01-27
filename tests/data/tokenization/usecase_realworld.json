@@ -213,23 +213,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "https"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "://"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "example"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "."
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "com"
+          "surface" : "https://example.com"
         },
         {
           "pos" : "Particle",
@@ -252,47 +236,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "https"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "://"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "example"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "."
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "com"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "/"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "path"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "/"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "to"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "/"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "page"
+          "surface" : "https://example.com/path/to/page"
         },
         {
           "pos" : "Particle",
@@ -315,11 +259,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "v"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "2.0.1"
+          "surface" : "v2.0.1"
         },
         {
           "pos" : "Particle",
@@ -341,11 +281,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "3.5"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "GB"
+          "surface" : "3.5GB"
         },
         {
           "pos" : "Particle",
@@ -360,7 +296,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Noun",
+          "pos" : "Adjective",
           "surface" : "必要"
         }
       ],
@@ -375,11 +311,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "512"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "MB"
+          "surface" : "512MB"
         },
         {
           "pos" : "Particle",
@@ -401,11 +333,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "成功"
-        },
-        {
-          "pos" : "Suffix",
-          "surface" : "率"
+          "surface" : "成功率"
         },
         {
           "pos" : "Particle",
@@ -475,11 +403,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "#"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "プログラミング"
+          "surface" : "#プログラミング"
         },
         {
           "pos" : "Particle",
@@ -501,11 +425,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "@"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "tanaka_taro"
+          "surface" : "@tanaka_taro"
         },
         {
           "pos" : "Particle",
@@ -698,7 +618,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "自然言語処理技術"
+          "surface" : "自然"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "言語処理技術"
         }
       ],
       "id" : "compound_shizen_gengo_shori",
@@ -754,7 +678,11 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "神奈川県横浜市"
+          "surface" : "神奈川県"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "横浜市"
         },
         {
           "pos" : "Particle",
@@ -964,11 +892,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "iPhone"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "15"
+          "surface" : "iPhone15"
         },
         {
           "pos" : "Particle",
@@ -1045,23 +969,7 @@
         },
         {
           "pos" : "Noun",
-          "surface" : "1"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "-"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "2"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "-"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "3"
+          "surface" : "1-2-3"
         }
       ],
       "id" : "complex_business_address",

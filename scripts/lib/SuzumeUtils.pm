@@ -79,15 +79,40 @@ our %SLANG_ADJ_STEMS = (
 );
 
 # Slang verb stems → standard replacement for MeCab preprocessing
-# バズる (godan ラ行) → 走る for correct conjugation parsing
+# カタカナ動詞 (godan ラ行) → 走る for correct conjugation parsing
 our %SLANG_VERB_STEMS = (
     'バズ' => '走',  # バズった → 走った → 走っ+た → バズっ+た
+    'ググ' => '走',  # ググった → 走った → 走っ+た → ググっ+た
+    'パク' => '走',  # パクった → 走った → 走っ+た → パクっ+た
 );
 
 # タリ活用副詞: stem + と → Adverb (MeCab splits as Noun + Particle)
 our @TARI_ADVERB_STEMS = qw(
     泰然 堂々 悠々 淡々 粛々 颯爽 毅然 漫然 茫然 呆然 唖然 愕然
     断然 俄然 歴然 整然 雑然 騒然 憮然 黙然 昂然 凛然 厳然
+);
+
+# 複合動詞の後項動詞 (Subsidiary verbs for compound verb merging)
+# MeCab辞書に登録がない複合動詞を分割するが、Suzumeは文法的に正しく結合する
+# これらの動詞が動詞連用形の後に来る場合、複合動詞として結合する
+# 漢字とひらがな両方を含める（MeCabは文脈によってどちらで出力するか変わる）
+our @COMPOUND_VERB_V2_GODAN = qw(
+    込む こむ 出す だす 続く つづく 返す かえす 返る かえる
+    合う あう 消す けす 直す なおす 切る きる
+    上がる あがる 下がる さがる 回す まわす 回る まわる
+    抜く ぬく 掛かる かかる 付く つく 巡る めぐる
+    飛ばす とばす 交う かう 潰す つぶす 崩す くずす
+    倒す たおす 起こす おこす つかる
+    入る いる
+);
+our @COMPOUND_VERB_V2_ICHIDAN = qw(
+    続ける つづける つける 替える かえる 換える
+    合わせる あわせる 切れる きれる 出る でる
+    上げる あげる 下げる さげる 抜ける ぬける
+    落とす おとす 落ちる おちる 掛ける かける
+    付ける つける 入れる いれる 分ける わける
+    立てる たてる 広げる ひろげる
+    降りる おりる
 );
 
 # Fictional/unusual proper nouns → standard name for MeCab preprocessing
@@ -295,6 +320,46 @@ sub apply_suzume_merge {
             }
         }
 
+        # 1.5. URL pattern: https://example.com → single token
+        # MeCab splits URLs into components, but Suzume treats them as single tokens
+        # URL characters: ASCII alphanumeric + -._~:/?#[]@!$&'()*+,;=%
+        if (!$merged && $remaining =~ /^(https?:\/\/[a-zA-Z0-9\-._~:\/?#\[\]@!\$\&'()*+,;=%]+)/) {
+            my $url = $1;
+            # Remove trailing punctuation that's not part of URL
+            $url =~ s/[.,)\]']+$//;
+            my $len = 0;
+            my $j = $i;
+            while ($j < @$tokens && $len < length($url)) {
+                $len += length($tokens->[$j]{surface});
+                $j++;
+            }
+            if ($len == length($url)) {
+                push @result, { surface => $url, pos => '名詞', lemma => $url };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'url';
+            }
+        }
+
+        # 1.6. ASCII with dots pattern: example.com → single token
+        # MeCab splits ASCII with dots, but Suzume treats them as single tokens
+        # Must start with letter (not number) to avoid matching 0.5, 3.14, etc.
+        if (!$merged && $remaining =~ /^([a-zA-Z][a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)+)/) {
+            my $ascii_seq = $1;
+            my $len = 0;
+            my $j = $i;
+            while ($j < @$tokens && $len < length($ascii_seq)) {
+                $len += length($tokens->[$j]{surface});
+                $j++;
+            }
+            if ($len == length($ascii_seq)) {
+                push @result, { surface => $ascii_seq, pos => '名詞', lemma => $ascii_seq };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'ascii-dots';
+            }
+        }
+
         # 2. Number + counter/katakana: 名詞,数 + (助数詞 or カタカナ名詞 or 万億兆)
         #    Suzume has no dictionary, so it cannot split number+katakana (e.g., 50アデナ)
         #    Also combines number+万/億/兆+円 patterns (e.g., 100万円, 3億5000万円)
@@ -346,11 +411,15 @@ sub apply_suzume_merge {
                 # Decimal point: 0.5 etc.
                 # MeCab classifies . as 名詞,サ変接続, followed by more numbers
                 my $is_decimal = ($next->{surface} // '') eq '.';
-                if ($is_counter || $is_calendar_month || $is_katakana_noun || $is_chuu_suffix || $is_me_suffix || $is_large_unit || $is_number_after_large || $is_number_after_decimal || $is_counter_aux || $is_percent || $is_decimal) {
+                # Alphabet units: MB, GB, KB, TB etc.
+                # Suzume keeps number+unit together (512MB, 3.5GB)
+                my $is_alpha_unit = ($next->{surface} // '') =~ /^[A-Za-z]+$/
+                    && ($next->{pos} // '') eq '名詞';
+                if ($is_counter || $is_calendar_month || $is_katakana_noun || $is_chuu_suffix || $is_me_suffix || $is_large_unit || $is_number_after_large || $is_number_after_decimal || $is_counter_aux || $is_percent || $is_decimal || $is_alpha_unit) {
                     $combined .= $next->{surface};
                     $j++;
-                    # Stop after katakana noun, 中, 目, つ, or % (don't chain multiple)
-                    last if $is_katakana_noun || $is_chuu_suffix || $is_me_suffix || $is_counter_aux || $is_percent;
+                    # Stop after katakana noun, 中, 目, つ, %, or alpha unit (don't chain multiple)
+                    last if $is_katakana_noun || $is_chuu_suffix || $is_me_suffix || $is_counter_aux || $is_percent || $is_alpha_unit;
                 } else {
                     last;
                 }
@@ -360,6 +429,34 @@ sub apply_suzume_merge {
                 $i = $j;
                 $merged = 1;
                 $applied_rule //= 'number+unit';
+            }
+        }
+
+        # 2a2. Address number pattern: 1-2-3, 1-2-3-4 etc.
+        #      Merge number + hyphen + number sequences (Japanese addresses)
+        if (!$merged && ($t->{pos} // '') eq '名詞' && ($t->{pos_sub1} // '') eq '数') {
+            my $j = $i + 1;
+            my $combined = $t->{surface};
+            my $has_hyphen = 0;
+            while ($j + 1 < @$tokens) {
+                my $hyphen = $tokens->[$j];
+                my $next_num = $tokens->[$j + 1];
+                # Check for hyphen followed by number
+                if (($hyphen->{surface} // '') eq '-'
+                    && ($next_num->{pos} // '') eq '名詞'
+                    && ($next_num->{pos_sub1} // '') eq '数') {
+                    $combined .= '-' . $next_num->{surface};
+                    $j += 2;
+                    $has_hyphen = 1;
+                } else {
+                    last;
+                }
+            }
+            if ($has_hyphen) {
+                push @result, { surface => $combined, pos => '名詞', lemma => $combined };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'address-number';
             }
         }
 
@@ -402,6 +499,68 @@ sub apply_suzume_merge {
                 $i += 2;
                 $merged = 1;
                 $applied_rule //= 'noun+sho';
+            }
+        }
+
+        # 2c2. Noun + 時/率/性 suffix: 名詞 + 接尾(時/率/性)
+        #      e.g., 成功時, 成功率, 可能性
+        #      Suzume keeps these as single tokens (more practical for tokenization)
+        if (!$merged && $t->{pos} eq '名詞' && $i + 1 < @$tokens) {
+            my $next = $tokens->[$i + 1];
+            if (($next->{surface} // '') =~ /^[時率性]$/
+                && ($next->{pos} // '') eq '名詞'
+                && ($next->{pos_sub1} // '') eq '接尾') {
+                my $combined = $t->{surface} . $next->{surface};
+                push @result, { surface => $combined, pos => '名詞', lemma => $combined };
+                $i += 2;
+                $merged = 1;
+                $applied_rule //= 'noun+suffix';
+            }
+        }
+
+        # 2c3. Version number: v + number pattern
+        #      e.g., v2.0.1, v1.0
+        #      MeCab splits as: v + 2 + . + 0 + . + 1
+        #      Suzume keeps version numbers as single tokens
+        if (!$merged && ($t->{surface} // '') =~ /^[vV]$/ && $i + 1 < @$tokens) {
+            my $j = $i + 1;
+            my $combined = $t->{surface};
+            # Continue merging numbers and dots
+            while ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                my $next_surface = $next->{surface} // '';
+                # Merge digits or dots that are part of version number
+                if ($next_surface =~ /^[\d]+$/ || $next_surface eq '.') {
+                    $combined .= $next_surface;
+                    $j++;
+                } else {
+                    last;
+                }
+            }
+            if ($j > $i + 1) {
+                push @result, { surface => $combined, pos => '名詞', lemma => $combined };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'version';
+            }
+        }
+
+        # 2c4. Brand + number: Alphabet brand + number pattern
+        #      e.g., iPhone + 15 → iPhone15, PS + 5 → PS5
+        #      Suzume keeps brand+number as single tokens
+        if (!$merged && ($t->{surface} // '') =~ /^[A-Za-z]+$/ && ($t->{pos} // '') eq '名詞') {
+            my $j = $i + 1;
+            if ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                my $next_surface = $next->{surface} // '';
+                # Merge with following number
+                if ($next_surface =~ /^\d+$/ && ($next->{pos} // '') eq '名詞') {
+                    my $combined = $t->{surface} . $next_surface;
+                    push @result, { surface => $combined, pos => '名詞', lemma => $combined };
+                    $i += 2;
+                    $merged = 1;
+                    $applied_rule //= 'brand+number';
+                }
             }
         }
 
@@ -756,6 +915,58 @@ sub apply_suzume_merge {
             }
         }
 
+        # 7b. Mention pattern: @+xxx_yyy → @xxx_yyy (SNS mention)
+        #     Suzume treats @mention as single token (pretokenizer)
+        #     MeCab splits @|tanaka|_|taro, so we merge all of them
+        if (!$merged && $t->{surface} eq '@') {
+            my $j = $i + 1;
+            my $combined = '@';
+            my $found_mention = 0;
+            while ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                my $next_surface = $next->{surface} // '';
+                if ($next_surface =~ /^[A-Za-z0-9]+$/) {
+                    $combined .= $next_surface;
+                    $j++;
+                    $found_mention = 1;
+                } elsif ($next_surface eq '_' && $found_mention) {
+                    # アンダースコアの次もASCIIなら結合を続ける
+                    if ($j + 1 < @$tokens && $tokens->[$j + 1]{surface} =~ /^[A-Za-z0-9]+$/) {
+                        $combined .= '_';
+                        $j++;
+                    } else {
+                        last;
+                    }
+                } else {
+                    last;
+                }
+            }
+            if ($found_mention) {
+                push @result, { surface => $combined, pos => '名詞', lemma => $combined };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'mention';
+            }
+        }
+
+        # 7c. Hashtag pattern: #+xxx → #xxx (SNS hashtag)
+        #     Suzume treats #hashtag as single token (pretokenizer)
+        #     MeCab splits #|プログラミング, so we merge them here
+        #     Hashtag content: Katakana, Kanji, ASCII alphanumeric (no hiragana to avoid particles)
+        if (!$merged && ($t->{surface} eq '#' || $t->{surface} eq '＃')) {
+            if ($i + 1 < @$tokens) {
+                my $next = $tokens->[$i + 1];
+                my $next_surface = $next->{surface} // '';
+                # カタカナ・漢字・英数字のみ（ひらがなは助詞を避けるため除外）
+                if ($next_surface =~ /^[\p{Katakana}\p{Han}A-Za-z0-9_]+$/) {
+                    push @result, { surface => $t->{surface} . $next_surface, pos => '名詞', lemma => $t->{surface} . $next_surface };
+                    $i += 2;
+                    $merged = 1;
+                    $applied_rule //= 'hashtag';
+                }
+            }
+        }
+
         # 8. Colloquial pronouns: merge どい+つ → どいつ, こい+つ → こいつ, etc.
         #    MeCab incorrectly splits these as verb+auxiliary (どく連用形+つ)
         #    These are single pronouns meaning "which/this/that/which one (person)"
@@ -775,6 +986,58 @@ sub apply_suzume_merge {
                         $applied_rule //= 'colloquial-pronoun';
                         last;
                     }
+                }
+            }
+        }
+
+        # 8b. Character speech endings: merge にゃ+ん → にゃん, etc.
+        #     MeCab splits these cat/character speech endings, but they are single units
+        #     にゃん is a cat character speech ending (猫語尾)
+        if (!$merged && $t->{surface} eq 'にゃ') {
+            if ($i + 1 < @$tokens && $tokens->[$i + 1]{surface} eq 'ん') {
+                push @result, { surface => 'にゃん', pos => '助詞', lemma => 'にゃん' };
+                $i += 2;
+                $merged = 1;
+                $applied_rule //= 'character-speech';
+            }
+        }
+
+        # 9. Compound verbs: merge verb renyokei + subsidiary verb
+        #    MeCab辞書にない複合動詞を分割するが、Suzumeは文法的に一貫して結合
+        #    e.g., 読み+続ける → 読み続ける, 食べ+込む → 食べ込む, わかり+あう → わかりあう
+        #    Also handles: 駆け+巡っ+た → 駆け巡った (with onbin forms and auxiliaries)
+        if (!$merged && $t->{pos} eq '動詞' && ($t->{conj_form} // '') =~ /連用/) {
+            my $j = $i + 1;
+            if ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                my $next_surface = $next->{surface} // '';
+                my $next_pos = $next->{pos} // '';
+                # Check if next token is a subsidiary verb (動詞,自立 or 動詞,非自立)
+                my $is_v2_verb = 0;
+                my $v2_base = '';
+                if ($next_pos eq '動詞') {
+                    # Get the base form (lemma) of the next verb
+                    my $next_lemma = $next->{lemma} // $next_surface;
+                    # Check against subsidiary verb lists
+                    for my $v2 (@COMPOUND_VERB_V2_GODAN, @COMPOUND_VERB_V2_ICHIDAN) {
+                        if ($next_lemma eq $v2) {
+                            $is_v2_verb = 1;
+                            $v2_base = $v2;
+                            last;
+                        }
+                    }
+                }
+                if ($is_v2_verb) {
+                    # Merge verb renyokei + subsidiary verb
+                    # Note: Do NOT merge た/て auxiliaries - Suzume splits them for MeCab compatibility
+                    my $combined = $t->{surface} . $next_surface;
+                    # For compound verb lemma, use first verb stem + v2 base
+                    # e.g., 読み + 続ける → 読み続ける (lemma)
+                    my $compound_lemma = $t->{surface} . $v2_base;
+                    push @result, { surface => $combined, pos => '動詞', lemma => $compound_lemma };
+                    $i = $j + 1;
+                    $merged = 1;
+                    $applied_rule //= 'compound-verb';
                 }
             }
         }
@@ -838,6 +1101,21 @@ sub apply_suzume_merge {
         }
     }
     @result = @noni_merged;
+
+    # Post-process: split 後で(副詞) → 後(名詞)+で(助詞)
+    # MeCab treats standalone 後で as adverb, but grammatically it's 後(noun)+で(particle)
+    # Suzume always splits (no dictionary entry), so normalize MeCab output to match
+    my @atode_split;
+    for my $t (@result) {
+        if (($t->{surface} // '') eq '後で' && ($t->{pos} // '') eq '副詞') {
+            push @atode_split, { surface => '後', pos => '名詞', lemma => '後' };
+            push @atode_split, { surface => 'で', pos => '助詞', lemma => 'で' };
+            $applied_rule //= 'atode-split';
+        } else {
+            push @atode_split, $t;
+        }
+    }
+    @result = @atode_split;
 
     # Post-process: fix epenthetic さ in adjective+さ+そう pattern (なさそう, よさそう, etc.)
     # MeCab incorrectly classifies this さ as 名詞,接尾,特殊 but it should be Suffix
@@ -929,6 +1207,33 @@ sub apply_suzume_merge {
     }
     @result = @filler_split;
 
+    # Post-process: fix kuruwa kotoba (courtesan speech) segmentation
+    # MeCab incorrectly splits ありんす as あ|りん|す, but grammatically it's あり|ん|す
+    # (あり verb stem + ん euphonic + す auxiliary)
+    my @kuruwa_fixed;
+    my $skip_next = 0;
+    for my $j (0 .. $#result) {
+        if ($skip_next) {
+            $skip_next = 0;
+            next;
+        }
+        my $curr = $result[$j];
+        my $surface = $curr->{surface} // '';
+        # Pattern: あ + りん → あり + ん
+        if ($surface eq 'あ' && $j + 1 <= $#result) {
+            my $next = $result[$j + 1];
+            if (($next->{surface} // '') eq 'りん') {
+                push @kuruwa_fixed, { surface => 'あり', pos => '動詞', lemma => 'ある' };
+                push @kuruwa_fixed, { surface => 'ん', pos => '助動詞', lemma => 'ん' };
+                $skip_next = 1;
+                $applied_rule //= 'kuruwa-fix';
+                next;
+            }
+        }
+        push @kuruwa_fixed, $curr;
+    }
+    @result = @kuruwa_fixed;
+
     # Post-process: fix POS/lemmas for dialectal/special patterns
     # おいでなんし: おいで=Adverb, なん=Noun (dialectal), し=Verb (する連用形)
     for my $j (0 .. $#result) {
@@ -999,6 +1304,35 @@ sub apply_suzume_split {
             next;
         }
 
+        # 4. ねたい adjective → ね|たい (verb renyokei + auxiliary)
+        # MeCab treats ねたい as the rare adjective 妬い, but 寝たい is far more common
+        if ($surface eq 'ねたい' && ($t->{pos} // '') eq '形容詞') {
+            push @result, { surface => 'ね', pos => '動詞', lemma => 'ねる' };
+            push @result, { surface => 'たい', pos => '助動詞', lemma => 'たい' };
+            $applied_rule //= 'netai-split';
+            next;
+        }
+
+        # 5. Compound nouns with dictionary words at the start
+        # Suzume splits when the first part is in the dictionary
+        # 自然言語処理技術 → 自然|言語処理技術 (自然 is in dictionary)
+        # Note: 自然言語処理 alone stays as one token (言語処理.+ requires suffix)
+        if ($surface =~ /^(自然)(言語処理.+)$/) {
+            push @result, { surface => $1, pos => '名詞', lemma => $1 };
+            push @result, { surface => $2, pos => '名詞', lemma => $2 };
+            $applied_rule //= 'compound-dict-split';
+            next;
+        }
+
+        # 6. Prefecture + city compounds
+        # 神奈川県横浜市 → 神奈川県|横浜市 (both are administrative units)
+        if ($surface =~ /^(.+県)(.+市)$/) {
+            push @result, { surface => $1, pos => '名詞', lemma => $1 };
+            push @result, { surface => $2, pos => '名詞', lemma => $2 };
+            $applied_rule //= 'prefecture-city-split';
+            next;
+        }
+
         # No split needed
         push @result, $t;
     }
@@ -1030,21 +1364,27 @@ sub map_mecab_pos {
         # Surface-based POS overrides (for words MeCab misclassifies)
         # These words are adverbs but MeCab classifies them as 名詞 or 形容動詞語幹
         my %adverb_overrides = (
-            'いかが' => 1,      # MeCab: 名詞,形容動詞語幹 → Adverb
             'いずれ' => 1,      # MeCab: 名詞,副詞可能 or 代名詞 → Adverb
             'しどろもどろ' => 1, # MeCab: 名詞,形容動詞語幹 → Adverb
             'なるほど' => 1,    # MeCab: 感動詞 → Adverb
             'たくさん' => 1,    # MeCab: 名詞,副詞可能 → Adverb
+            # Note: 'いかが' is handled in _postprocess_ikaga() due to context-dependent POS
         );
         if ($adverb_overrides{$surface}) {
             return 'Adverb';
         }
 
-        # そう (指示詞): MeCab classifies as 副詞 but Suzume treats as ナ形容詞
-        # そうだ, そうです, そうじゃ etc. → Adjective (na-adjective stem)
-        if ($surface eq 'そう' && $pos eq '副詞') {
+        # どう: Suzume treats as ナ形容詞 (どうですか pattern)
+        # MeCab classifies as 副詞 → map to Adjective
+        if ($surface eq 'どう' && $pos eq '副詞') {
             return 'Adjective';
         }
+
+        # そう (指示詞/副詞): Context-dependent POS
+        # Before copula (だ/です/じゃ) → Adjective (na-adjective stem)
+        # Otherwise → Adverb (default 副詞 mapping)
+        # NOTE: context-dependent normalization handled in _postprocess_sou() below
+        # Here we keep default Adverb mapping for 副詞
 
         # 皆/みんな/某/あなた/あんた/拙者/我輩: MeCab classifies as 名詞 but Suzume treats as Pronoun
         if (($surface eq '皆' || $surface eq 'みんな' || $surface eq 'みな' || $surface eq '某'
@@ -1064,12 +1404,24 @@ sub map_mecab_pos {
             return 'Noun';
         }
 
-        # ん: Suzume treats all ん as contraction of の (Particle, lemma=の)
-        # MeCab distinguishes: Noun (explanatory んだ), Auxiliary (negative ません)
-        # Normalize to match Suzume's analysis (valid simplification)
-        if ($surface eq 'ん' && ($pos eq '名詞' || $pos eq '助動詞')) {
+        # なら: MeCab classifies as 助動詞 (conditional form of だ)
+        # Suzume treats as Particle (conditional particle)
+        if ($surface eq 'なら' && $pos eq '助動詞') {
+            $token->{lemma} = 'なら';
+            return 'Particle';
+        }
+
+        # ん: Suzume distinguishes two types:
+        #   1. Explanatory の contraction (ないんだ): MeCab 名詞 → Particle, lemma=の
+        #   2. Negative ぬ contraction (ません, くだらん): MeCab 助動詞 → Auxiliary, lemma=ん
+        # Only normalize 名詞 ん to Particle; keep 助動詞 ん as Auxiliary
+        if ($surface eq 'ん' && $pos eq '名詞') {
             $token->{lemma} = 'の';
             return 'Particle';
+        }
+        if ($surface eq 'ん' && $pos eq '助動詞') {
+            $token->{lemma} = 'ん';
+            return 'Auxiliary';
         }
 
         # Katakana onomatopoeia → Adverb
@@ -1118,6 +1470,40 @@ sub map_mecab_pos {
             return 'Particle';
         }
 
+        # 大変: Suzume treats as Adverb, not Adjective
+        # MeCab: 名詞,形容動詞語幹 → would map to Adjective, but Suzume outputs ADV
+        if ($surface eq '大変' && ($pos eq '名詞' || $pos eq '副詞')) {
+            return 'Adverb';
+        }
+
+        # でも (mid-sentence concessive): Suzume treats as Conjunction
+        # MeCab: 助詞,副助詞 → Particle, but Suzume outputs CONJ
+        if ($surface eq 'でも' && $pos eq '助詞') {
+            return 'Conjunction';
+        }
+
+        # っていう: Suzume treats as Determiner (similar to という)
+        if ($surface eq 'っていう' && $pos eq '助詞') {
+            return 'Determiner';
+        }
+
+        # じゃん: Suzume treats as Particle (sentence-final), not Auxiliary
+        if ($surface eq 'じゃん' && $pos eq '助動詞') {
+            $token->{lemma} = 'じゃん';
+            return 'Particle';
+        }
+
+        # まじ (colloquial): Suzume treats as Adjective (na-adjective)
+        # MeCab: 助動詞 → Auxiliary, but Suzume outputs ADJ
+        if ($surface eq 'まじ' && $pos eq '助動詞') {
+            return 'Adjective';
+        }
+
+        # で (verb): MeCab lemma=でる → Suzume lemma=出る
+        if ($surface eq 'で' && $pos eq '動詞' && ($token->{lemma} // '') eq 'でる') {
+            $token->{lemma} = '出る';
+        }
+
         # いわば: Suzume treats as Conjunction, not Adverb
         if ($surface eq 'いわば' && $pos eq '副詞') {
             $token->{lemma} = '言わば';
@@ -1130,7 +1516,8 @@ sub map_mecab_pos {
         }
 
         # 刻々/堂々等の畳語副詞: Suzume treats as Noun
-        if ($surface =~ /^(.)\1$/ && $pos eq '副詞') {
+        # Handles both repeated chars (アア) and iteration mark 々 (刻々)
+        if (($surface =~ /^(.)\1$/ || $surface =~ /^.\x{3005}$/) && $pos eq '副詞') {
             return 'Noun';
         }
 
@@ -1208,6 +1595,8 @@ sub map_mecab_pos {
             return 'Verb' if $lemma eq 'ほしい';   # てほしい desire (VERB in Suzume)
             return 'Verb' if $lemma eq 'いただく'; # ていただく humble receive (VERB in Suzume)
             # しまう: Suzume treats as Auxiliary (not Verb override)
+            return 'Verb' if $lemma eq 'ちゃう';   # てしまう contraction (VERB in Suzume)
+            return 'Verb' if $lemma eq 'ちまう';   # てしまう contraction (VERB in Suzume)
             return 'Verb' if $lemma eq 'いらっしゃる'; # honorific verb (VERB in Suzume)
             return 'Auxiliary';
         }
@@ -1226,7 +1615,7 @@ sub map_mecab_pos {
         # 名詞,形容動詞語幹 → Adjective (e.g., 好き, 静か, 綺麗)
         # Suzume treats na-adjective stems as Adjective, not Noun
         # Exception: some words Suzume keeps as Noun despite 形容動詞語幹 classification
-        my %keep_as_noun_not_adj = ('マジ' => 1, '妙' => 1, '必要' => 1, '不安' => 1, '不要' => 1, '乙' => 1, '元気' => 1, '不便' => 1, '公式' => 1, '無鉄砲' => 1);
+        my %keep_as_noun_not_adj = ('マジ' => 1, '妙' => 1, '不安' => 1, '不要' => 1, '乙' => 1, '不便' => 1, '公式' => 1, '可能' => 1, '容易' => 1, '積極' => 1, '健康' => 1);
         if ($pos eq '名詞' && $pos_sub1 eq '形容動詞語幹') {
             return 'Noun' if $keep_as_noun_not_adj{$surface};
             return 'Adjective';
@@ -1466,6 +1855,75 @@ sub _preprocess_for_mecab {
 }
 
 # Restore slang terms in tokens after MeCab processing
+# Context-dependent そう normalization
+# そう before copula (だ/です/じゃ) → Adjective (na-adjective stem)
+# そう in other positions → Adverb (default)
+sub _postprocess_sou {
+    my ($tokens) = @_;
+    for my $i (0 .. $#$tokens) {
+        my $t = $tokens->[$i];
+        next unless ($t->{surface} // '') eq 'そう';
+
+        # Context-dependent そう normalization (only for Adverb)
+        if (($t->{pos} // '') eq 'Adverb') {
+            # Check if next token is a copula form
+            if ($i < $#$tokens) {
+                my $next = $tokens->[$i + 1]{surface} // '';
+                # Copula forms: だ/です/でし/じゃ/じゃろ/や(関西) and derivatives
+                if ($next =~ /^(?:だ|です|でし|じゃ|じゃろ|や)/) {
+                    $t->{pos} = 'Adjective';
+                }
+            }
+        }
+
+        # Katakana adjective stem + そう pattern: Noun → Adjective
+        # MeCab classifies katakana adjective stems as 名詞, but Suzume analyzes
+        # them as adjective stems (more grammatically correct for the pattern)
+        # E.g., キモそう → キモ(ADJ stem) + そう(AUX), not キモ(Noun) + そう
+        # Works for both Auxiliary and Adverb そう
+        if ($i > 0) {
+            my $prev = $tokens->[$i - 1];
+            my $prev_surface = $prev->{surface} // '';
+            if (($prev->{pos} // '') eq 'Noun' &&
+                $prev_surface =~ /^[\x{30A0}-\x{30FF}]+$/ &&
+                !_is_katakana_onomatopoeia($prev_surface)) {
+                # Convert previous token to Adjective with lemma = surface + い
+                $prev->{pos} = 'Adjective';
+                $prev->{lemma} = $prev_surface . 'い';
+            }
+        }
+    }
+}
+
+# Context-dependent いかが normalization
+# Suzume treats いかが as:
+#   - Adjective when followed by copula (いかがですか, いかがでしょうか)
+#   - Adverb when standalone or in other contexts
+# MeCab always treats it as 名詞,形容動詞語幹 → Adjective
+sub _postprocess_ikaga {
+    my ($tokens) = @_;
+    for my $i (0 .. $#$tokens) {
+        my $t = $tokens->[$i];
+        next unless ($t->{surface} // '') eq 'いかが';
+
+        # Check if next token is a copula form
+        my $has_copula = 0;
+        if ($i < $#$tokens) {
+            my $next = $tokens->[$i + 1]{surface} // '';
+            # Copula forms: です/でし/だ/だっ/でしょ
+            if ($next =~ /^(?:です|でし|だ|だっ|でしょ)/) {
+                $has_copula = 1;
+            }
+        }
+
+        # Standalone or no copula → Adverb
+        if (!$has_copula) {
+            $t->{pos} = 'Adverb';
+        }
+        # With copula → keep as Adjective (MeCab's classification)
+    }
+}
+
 sub _postprocess_mecab_tokens {
     my ($tokens, $original_text, $replacements) = @_;
     return $tokens unless %$replacements;
@@ -1543,6 +2001,10 @@ sub get_expected_tokens {
             lemma   => ($t->{lemma} && $t->{lemma} ne '*') ? $t->{lemma} : $t->{surface},
         };
     }
+
+    # Post-processing: context-dependent POS normalization
+    _postprocess_sou(\@tokens);
+    _postprocess_ikaga(\@tokens);
 
     if ($applied_rule) {
         return (\@tokens, 'MeCab+SuzumeRules', $applied_rule);

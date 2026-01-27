@@ -71,6 +71,18 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
   size_t kanji2_end = vh::findCharRegionEnd(char_types, hira1_end, 3,
                                              normalize::CharType::Kanji);
 
+  // Skip compound verb candidates when second verb is aspectual/grammatical
+  // These should be tokenized separately for MeCab compatibility:
+  // 終わる/終える, 始める, 続く/続ける, 過ぎる
+  // e.g., 読み終わる → 読み + 終わる (not single token)
+  if (hira1_end < codepoints.size()) {
+    char32_t second_kanji = codepoints[hira1_end];
+    if (second_kanji == U'終' || second_kanji == U'始' ||
+        second_kanji == U'続' || second_kanji == U'過') {
+      return candidates;
+    }
+  }
+
   // Find second hiragana portion (conjugation ending)
   if (kanji2_end >= char_types.size() ||
       char_types[kanji2_end] != normalize::CharType::Hiragana) {
@@ -258,6 +270,68 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
             true, CandidateOrigin::VerbKatakana, 0.9F, "katakana_sokuonbin",
             core::ExtendedPOS::VerbOnbinkei));
       }
+    }
+  }
+
+  // Generate katakana mizenkei (未然形) candidates for negative splitting
+  // E.g., ググらない → ググら (mizenkei of ググる) + ない (auxiliary)
+  //       バズらせる → バズら (mizenkei of バズる) + せる (auxiliary)
+  // This allows MeCab-compatible splitting for katakana slang verbs
+  {
+    // Check if hiragana part starts with ら followed by ない/なく/なかっ/なけれ/せ/され
+    if (hira_part.size() >= 6 &&  // ら(3 bytes) + な/せ(3 bytes) = 6 bytes min
+        hira_part.compare(0, 3, "ら") == 0) {
+      std::string_view second_char(hira_part.data() + 3, 3);
+      bool is_negative = (second_char == "な");  // なx patterns
+      bool is_causative = (second_char == "せ"); // せる pattern
+      if (is_negative || is_causative) {
+        // Found katakana + ら + な/せ pattern
+        // Generate mizenkei stem candidate: カタカナ + ら
+        std::string mizenkei_surface = extractSubstring(codepoints, start_pos, kata_end + 1);
+        std::string kata_part = extractSubstring(codepoints, start_pos, kata_end);
+        std::string base_form = kata_part + "る";  // Assume godan-ra (most common for slang)
+
+        // Negative cost to beat unsplit forms (same as sokuonbin)
+        constexpr float kMizenkeiCost = -0.5F;
+        SUZUME_DEBUG_VERBOSE_BLOCK {
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << mizenkei_surface
+                              << " katakana_mizenkei lemma=" << base_form
+                              << " cost=" << kMizenkeiCost << "\n";
+        }
+        candidates.push_back(makeVerbCandidate(
+            mizenkei_surface, start_pos, kata_end + 1, kMizenkeiCost, base_form,
+            dictionary::ConjugationType::GodanRa,
+            true, CandidateOrigin::VerbKatakana, 0.9F, "katakana_mizenkei",
+            core::ExtendedPOS::VerbMizenkei));
+      }
+    }
+  }
+
+  // Generate katakana volitional (意志形) candidates for splitting
+  // E.g., ググろう → ググろ (volitional stem of ググる) + う (auxiliary)
+  // MeCab splits these as: ググろ + う
+  {
+    // Check if hiragana part starts with ろう
+    if (hira_part.size() >= 6 &&  // ろ(3 bytes) + う(3 bytes) = 6 bytes
+        hira_part.compare(0, 6, "ろう") == 0) {
+      // Found katakana + ろう pattern
+      // Generate volitional stem candidate: カタカナ + ろ
+      std::string volitional_surface = extractSubstring(codepoints, start_pos, kata_end + 1);
+      std::string kata_part = extractSubstring(codepoints, start_pos, kata_end);
+      std::string base_form = kata_part + "る";  // Assume godan-ra
+
+      // Negative cost to beat unsplit forms
+      constexpr float kVolitionalCost = -0.5F;
+      SUZUME_DEBUG_VERBOSE_BLOCK {
+        SUZUME_DEBUG_STREAM << "[VERB_CAND] " << volitional_surface
+                            << " katakana_volitional lemma=" << base_form
+                            << " cost=" << kVolitionalCost << "\n";
+      }
+      candidates.push_back(makeVerbCandidate(
+          volitional_surface, start_pos, kata_end + 1, kVolitionalCost, base_form,
+          dictionary::ConjugationType::GodanRa,
+          true, CandidateOrigin::VerbKatakana, 0.9F, "katakana_volitional",
+          core::ExtendedPOS::VerbMizenkei));
     }
   }
 

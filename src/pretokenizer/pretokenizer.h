@@ -24,6 +24,7 @@ enum class PreTokenType : uint8_t {
   Hashtag,    // Hashtag (#プログラミング)
   Mention,    // Mention (@user)
   Number,     // Plain number
+  AsciiSeq,   // ASCII sequence with dots (example.com)
   Boundary,   // Sentence boundary (。！？)
 };
 
@@ -137,6 +138,15 @@ class PreTokenizer {
   bool tryMatchPercentage(std::string_view text, size_t pos, PreToken& token) const;
 
   /**
+   * @brief Try to match address number pattern at position
+   * @param text Input text
+   * @param pos Current position
+   * @param token Output token if matched
+   * @return true if address number matched (e.g., 1-2-3)
+   */
+  bool tryMatchAddressNumber(std::string_view text, size_t pos, PreToken& token) const;
+
+  /**
    * @brief Try to match email at position
    * @param text Input text
    * @param pos Current position
@@ -171,6 +181,16 @@ class PreTokenizer {
    * @return true if mention matched
    */
   bool tryMatchMention(std::string_view text, size_t pos, PreToken& token) const;
+
+  /**
+   * @brief Match ASCII sequence with embedded dots (e.g., example.com)
+   * @param text Input text
+   * @param pos Current position
+   * @param token Output token if matched
+   * @return true if matched
+   */
+  bool tryMatchAsciiWithDots(std::string_view text, size_t pos,
+                              PreToken& token) const;
 
   /**
    * @brief Check if character is sentence boundary

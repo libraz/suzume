@@ -327,10 +327,12 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Deru verb stem form (一段動詞「出る」) - VERB
       // で+たい/ます needs this to split correctly (外にでたい → 外|に|で|たい)
       verb("で", "出る", EPOS::VerbRenyokei),
-      aux("しよう", "する", EPOS::AuxVolitional),
+      // Suru verb conjugation forms - split for MeCab compatibility
+      // MeCab: 勉強しよう → 勉強|しよ|う, 勉強すれば → 勉強|すれ|ば
+      verb("しよ", "する", EPOS::VerbMizenkei),  // volitional base: しよ+う
+      verb("すれ", "する", EPOS::VerbKateikei),  // conditional base: すれ+ば
       aux("しろ", "する", EPOS::VerbMeireikei),
       aux("せよ", "する", EPOS::VerbMeireikei),
-      aux("すれば", "する", EPOS::VerbKateikei),
       aux("しそう", "する", EPOS::AuxAppearanceSou),
 
       // Causative (使役)
@@ -458,6 +460,17 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("ください", "くださる", EPOS::VerbShuushikei),
       verb("くださいませ", "くださる", EPOS::VerbShuushikei),
 
+      // Special ra-row godan verbs (五段ラ行特殊) with い-form renyokei
+      // These honorific/humble verbs use い instead of り for renyokei:
+      // いらっしゃる → いらっしゃい+ます (not いらっしゃり)
+      // ござる → ござい+ます (not ござり)
+      // なさる → なさい+ます (not なさり)
+      // おっしゃる → おっしゃい+ます (not おっしゃり)
+      verb("いらっしゃい", "いらっしゃる", EPOS::VerbRenyokei),
+      verb("ござい", "ござる", EPOS::VerbRenyokei),
+      verb("なさい", "なさる", EPOS::VerbRenyokei),
+      verb("おっしゃい", "おっしゃる", EPOS::VerbRenyokei),
+
       // Progressive/Continuous - いる (進行・継続)
       // MeCab splits て+い+た, て+い+て (not て+いた/て+いて)
       // い is registered separately for MeCab-compatible splits
@@ -537,14 +550,14 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("でありんす", "だ", EPOS::Unknown), aux("でありんした", "だ", EPOS::Unknown),
       aux("なんし", "ます", EPOS::Unknown), aux("なんした", "ます", EPOS::Unknown),
 
-      // Cat-like (猫系)
-      aux("にゃ", "よ", EPOS::Unknown), aux("にゃん", "よ", EPOS::Unknown), aux("にゃー", "よ", EPOS::Unknown),
+      // Cat-like (猫系) - sentence-final particles (な/ね/よ variants)
+      particle("にゃ", EPOS::ParticleFinal), particle("にゃん", EPOS::ParticleFinal), particle("にゃー", EPOS::ParticleFinal),
       aux("だにゃ", "だよ", EPOS::Unknown), aux("だにゃん", "だよ", EPOS::Unknown),
       aux("ですにゃ", "ですよ", EPOS::Unknown), aux("ですにゃん", "ですよ", EPOS::Unknown),
 
-      // Squid character (イカ娘)
-      aux("ゲソ", "だ", EPOS::Unknown), aux("げそ", "だ", EPOS::Unknown),
-      aux("でゲソ", "だ", EPOS::Unknown), aux("でげそ", "だ", EPOS::Unknown),
+      // Squid character (イカ娘) - sentence-final particle (MeCab: Noun)
+      // Note: で+ゲソ should split as で(Particle)+ゲソ(Noun)
+      particle("ゲソ", EPOS::ParticleFinal), particle("げそ", EPOS::ParticleFinal),
 
       // Ojou-sama/Lady speech (お嬢様言葉)
       aux("ですわ", "です", EPOS::Unknown), aux("ですの", "です", EPOS::Unknown),
@@ -592,6 +605,7 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
 
       // Adversative (逆接)
       conj("しかし", ""), conj("だが", ""), conj("けれども", ""),
+      conj("だけど", ""),  // colloquial variant
       conj("ところが", ""), conj("それでも", ""),
       conj("でも", ""), conj("だって", ""),  // にもかかわらず removed for MeCab compat
       conj("ものの", ""),
@@ -599,7 +613,7 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       // Parallel/Addition (並列・添加)
       conj("又", ""), conj("及び", ""),
       conj("並びに", ""), conj("且つ", ""),
-      conj("更に", ""),
+      conj("更に", ""), conj("次に", ""),
       conj("しかも", ""), conj("そのうえ", ""),
 
       // Alternative (選択)
@@ -763,6 +777,8 @@ std::vector<DictionaryEntry> getPronounEntries() {
       adv("やっと", ""),
       adv("きっと", ""),
       adv("ちょうど", ""),
+      // Temporal adverbs - common, prevent misclassification
+      adv("まだ", ""),
   };
 }
 

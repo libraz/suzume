@@ -194,6 +194,11 @@ constexpr float kPenaltyIAdjAllKanji = 0.40F;
 // E-row ending - typical of Ichidan verb, not I-adjective
 constexpr float kPenaltyIAdjERowStem = 0.35F;
 
+// Stems ending with る - verb dictionary form pattern
+// Invalid i-adj: するそう→するい, 食べるそう→食べるい, 降るそう→降るい
+// Real i-adjectives never have stems ending in る
+constexpr float kPenaltyIAdjRuStemInvalid = 0.40F;
+
 // Verb mizenkei + a-row pattern (食べな, 読ま)
 constexpr float kPenaltyIAdjMizenkeiPattern = 0.30F;
 

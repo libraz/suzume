@@ -621,6 +621,15 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
             SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +1.5 (rashii_conjecture)\n");
           }
         }
+        // Penalty for まい endings (verb + negative volitional auxiliary)
+        // E.g., 知るまい → 知る + まい, 出来まい → 出来 + まい
+        // まい is an auxiliary attached to verb dictionary form, not an i-adjective suffix
+        if (!is_dict_adjective && surface.size() >= 2 * core::kJapaneseCharBytes) {
+          if (utf8::endsWith(surface, "まい")) {
+            cost += 2.0F;  // Strong penalty to promote verb + まい split
+            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (mai_auxiliary)\n");
+          }
+        }
         // Set lemma to base form from inflection analysis (e.g., 使いやすく → 使いやすい)
         candidates.push_back(makeIAdjCandidate(
             surface, start_pos, end_pos, cand.base_form, cost,
@@ -1150,6 +1159,14 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         if (surface == "くださ" || surface == "なさ" || surface == "いらっしゃ" ||
             surface == "おっしゃ" || surface == "ござ") {
           continue;  // Skip - honorific verb renyokei, not i-adjective
+        }
+        // Skip hiragana patterns ending with たい - these are verb renyokei + tai (desire)
+        // e.g., ねたい should be ね + たい (寝たい), not i-adjective
+        //       みたい context-dependent: auxiliary (見たい/似たい) vs mimetic (みたいな)
+        //       したい should be し + たい, not i-adjective
+        // Note: 痛い (itai) has kanji, so not affected
+        if (utf8::endsWith(surface, "たい") && surface != "たい") {
+          continue;  // Skip - should be split as verb renyokei + たい
         }
         // Base cost for hiragana i-adjective candidates
         // Use neutral base (0.0F) to avoid false positives like につい

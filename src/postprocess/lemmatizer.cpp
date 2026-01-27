@@ -571,6 +571,27 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
       }
     }
 
+    // Fix special ra-row (ラ行特殊活用) verb lemma: ~いる → ~る
+    // Verbs like ござる, いらっしゃる have renyokei ending in い (not り)
+    // The inflection analyzer incorrectly reconstructs ~いる as base form
+    // E.g., ござい → ございる (wrong) → ござる (correct)
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        endsWith(morpheme.lemma, "いる") &&
+        morpheme.lemma.size() >= core::kThreeJapaneseCharBytes &&
+        dict_manager_ != nullptr) {
+      // Try replacing いる with る to find the special conjugation base form
+      std::string stem = morpheme.lemma.substr(
+          0, morpheme.lemma.size() - core::kTwoJapaneseCharBytes);
+      std::string ru_form = stem + "る";
+      auto results = dict_manager_->lookup(ru_form, 0);
+      for (const auto& r : results) {
+        if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb &&
+            r.entry->surface == ru_form) {
+          return ru_form;
+        }
+      }
+    }
+
     // Check for サ変動詞 classical form: 漢字2文字以上+す → 漢字+する
     // e.g., 確認す → 確認する, 運動す → 運動する
     // Single kanji + す (出す, 消す) are GodanSa, not Suru
@@ -679,17 +700,21 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
         return stem + "する";
       }
     }
-    // Check for compound verbs that conjugate like サ変: [kanji]しる → [kanji]する
-    // e.g., 対しる → 対する, 関しる → 関する, 反しる → 反する
-    // These verbs are incorrectly analyzed as ichidan (stem + る) but should be サ変-like
-    // Note: 応じる, 存じる are actual ichidan verbs (not サ変)
+    // Check for compound verbs that conjugate like サ変: [stem]しる → [stem]する
+    // e.g., 対しる → 対する, 関しる → 関する, やりなおしる → やりなおす
+    // These verbs are incorrectly analyzed as ichidan (stem + る) but should be サ変/godan-sa
+    // Note: 応じる, 存じる, 信じる, 感じる are actual ichidan verbs (じる, not しる)
     if (morpheme.pos == core::PartOfSpeech::Verb &&
         endsWith(grammar_result, "しる")) {
       std::string stem = grammar_result.substr(0, grammar_result.size() - core::kTwoJapaneseCharBytes);
-      // Check if stem is a single kanji that forms a compound verb with する
-      // Common patterns: 対する, 関する, 反する, 接する, 属する, 達する, etc.
-      if (stem.size() == core::kJapaneseCharBytes && grammar::isAllKanji(stem)) {
-        return stem + "する";
+      if (stem.size() >= core::kJapaneseCharBytes) {
+        // Single kanji stem: compound する-verb (対する, 関する, etc.)
+        if (stem.size() == core::kJapaneseCharBytes && grammar::isAllKanji(stem)) {
+          return stem + "する";
+        }
+        // Multi-character stem: compound godan-sa verb (やりなおす, etc.)
+        // Convert しる → す (godan-sa base form)
+        return stem + "す";
       }
     }
     // For passive verbs, grammar-based returns the passive form as base (e.g., いわれる)
@@ -891,6 +916,43 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
       morpheme.lemma = morpheme.surface;
     }
 
+    // Fix compound verbs analyzed as ichidan but actually godan-sa
+    // E.g., lemma=やりなおしる → やりなおす, lemma=たのしる → たのす (if non-kanji stem)
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        endsWith(morpheme.lemma, "しる") &&
+        morpheme.lemma.size() > core::kTwoJapaneseCharBytes) {
+      std::string stem = morpheme.lemma.substr(
+          0, morpheme.lemma.size() - core::kTwoJapaneseCharBytes);
+      if (stem.size() == core::kJapaneseCharBytes && grammar::isAllKanji(stem)) {
+        // Single kanji + しる → する (サ変: 対する, 関する)
+        morpheme.lemma = stem + "する";
+      } else if (stem.size() > core::kJapaneseCharBytes) {
+        // Multi-char stem + しる → す (godan-sa: やりなおす)
+        morpheme.lemma = stem + "す";
+      }
+    }
+
+    // Fix special ra-row (ラ行特殊活用) verb lemma: ~いる → ~る
+    // Verbs like ござる, いらっしゃる have renyokei ending in い (not り)
+    // The inflection analyzer incorrectly reconstructs ~いる as base form
+    // E.g., ござい → ございる (wrong) → ござる (correct)
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        endsWith(morpheme.lemma, "いる") &&
+        morpheme.lemma.size() >= core::kThreeJapaneseCharBytes &&
+        dict_manager_ != nullptr) {
+      std::string stem = morpheme.lemma.substr(
+          0, morpheme.lemma.size() - core::kTwoJapaneseCharBytes);
+      std::string ru_form = stem + "る";
+      auto results = dict_manager_->lookup(ru_form, 0);
+      for (const auto& r : results) {
+        if (r.entry != nullptr && r.entry->pos == core::PartOfSpeech::Verb &&
+            r.entry->surface == ru_form) {
+          morpheme.lemma = ru_form;
+          break;
+        }
+      }
+    }
+
     // Preserve lemma if intentionally set (e.g., from verb_candidates for passive verbs)
     // Recalculate if:
     // 1. Lemma is empty, OR
@@ -1024,7 +1086,18 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
           else if (surface_tail == "ね") godan_base = "ぬ";
           else if (surface_tail == "べ") godan_base = "ぶ";
           else if (surface_tail == "め") godan_base = "む";
-          else if (surface_tail == "れ") godan_base = "る";
+          else if (surface_tail == "れ") {
+            // Check if this is ichidan conditional (食べれ+ば → 食べる)
+            // rather than godan-ra conditional (取れ+ば → 取る)
+            // For ichidan: surface_stem + る == original lemma
+            std::string surface_stem = morpheme.surface.substr(
+                0, morpheme.surface.size() - core::kJapaneseCharBytes);
+            if (surface_stem + "る" == morpheme.lemma) {
+              // Ichidan conditional - lemma is already correct, don't convert
+            } else {
+              godan_base = "る";
+            }
+          }
           if (!godan_base.empty()) {
             morpheme.lemma = stem + godan_base;
           }

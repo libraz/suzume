@@ -183,7 +183,7 @@
       "description" : "そういって (ADV + quotative verb)",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Adverb",
           "surface" : "そう"
         },
         {
@@ -260,7 +260,7 @@
       "description" : "っていう (colloquial quotative)",
       "expected" : [
         {
-          "pos" : "Particle",
+          "pos" : "Determiner",
           "surface" : "っていう"
         }
       ],
