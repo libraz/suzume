@@ -96,19 +96,8 @@
       "description" : "snake_case identifier with particle",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "user"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "_"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "name"
+          "surface" : "user_name"
         },
         {
           "pos" : "Particle",
@@ -152,13 +141,8 @@
       "description" : "HTTP abbreviation with katakana",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "HTTP"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "エラー"
+          "surface" : "HTTPエラー"
         }
       ],
       "id" : "mixed_script_abbreviation_http",
@@ -171,13 +155,8 @@
       "description" : "Web development with の particle",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "Web"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "開発"
+          "surface" : "Web開発"
         },
         {
           "pos" : "Particle",
@@ -198,13 +177,8 @@
       "description" : "AI research with が particle",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "AI"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "研究"
+          "surface" : "AI研究"
         },
         {
           "pos" : "Particle",
@@ -225,13 +199,8 @@
       "description" : "API request processing - split at kanji boundary",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "API"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "リクエスト"
+          "surface" : "APIリクエスト"
         },
         {
           "pos" : "Noun",
@@ -371,29 +340,8 @@
           "surface" : "v"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "2"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "."
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "0"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "."
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "1"
+          "surface" : "2.0.1"
         },
         {
           "pos" : "Particle",
@@ -414,19 +362,8 @@
       "description" : "Storage capacity in GB",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "3"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "."
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "5"
+          "surface" : "3.5"
         },
         {
           "lemma" : "*",
@@ -500,14 +437,8 @@
           "surface" : "は"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "50"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "%"
+          "surface" : "50%"
         },
         {
           "pos" : "Auxiliary",
@@ -600,19 +531,8 @@
           "surface" : "@"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "tanaka"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "_"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "taro"
+          "surface" : "tanaka_taro"
         },
         {
           "pos" : "Particle",

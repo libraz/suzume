@@ -427,6 +427,20 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
         }
       }
 
+      // Penalize kanji sequences with interrogative kanji (何, 誰, 幾) at NON-initial position
+      // e.g., 今何 should be split as 今 + 何, not kept as one compound
+      // But 何日, 何人 (interrogative + counter) should stay together
+      // Interrogatives are standalone words unless they're at the start (counter pattern)
+      if (start_type == normalize::CharType::Kanji && len >= 2) {
+        for (size_t i = start_pos + 1; i < candidate_end; ++i) {  // Skip first char
+          if (isInterrogativeKanji(codepoints[i])) {
+            // Heavy penalty to force split
+            cost += 3.0F;
+            break;
+          }
+        }
+      }
+
       // Penalize hiragana sequences starting with particle characters
       // These could be nouns (はし, はな, にく) but are less likely than
       // the particle interpretation, unless the particle path has connection penalties
@@ -492,33 +506,54 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAlphanumeric(
     return candidates;
   }
 
-  // Find mixed alphanumeric sequence
+  // Find mixed alphanumeric sequence (including underscores for identifiers)
+  // Supports snake_case identifiers like user_name, first_name, etc.
   size_t end_pos = start_pos;
   bool has_alpha = false;
   bool has_digit = false;
+  bool has_underscore = false;
 
   while (end_pos < char_types.size() &&
          end_pos - start_pos < options_.max_alphanumeric_length) {
     normalize::CharType ctype = char_types[end_pos];
+    char32_t ch = codepoints[end_pos];
     if (ctype == normalize::CharType::Alphabet) {
       has_alpha = true;
       ++end_pos;
     } else if (ctype == normalize::CharType::Digit) {
       has_digit = true;
       ++end_pos;
+    } else if (ch == U'_') {
+      // Include underscore in identifier patterns
+      // Only if followed by alphanumeric (avoid trailing underscore)
+      if (end_pos + 1 < char_types.size()) {
+        normalize::CharType next_type = char_types[end_pos + 1];
+        if (next_type == normalize::CharType::Alphabet ||
+            next_type == normalize::CharType::Digit) {
+          has_underscore = true;
+          ++end_pos;
+          continue;
+        }
+      }
+      break;
     } else {
       break;
     }
   }
 
-  // Only add if mixed (pure sequences handled by generateBySameType)
-  if (has_alpha && has_digit && end_pos > start_pos + 1) {
+  // Generate candidate if mixed alphanumeric OR identifier with underscore
+  // Pure alpha/digit sequences are handled by generateBySameType
+  bool is_mixed = has_alpha && has_digit;
+  bool is_identifier = has_alpha && has_underscore;
+  if ((is_mixed || is_identifier) && end_pos > start_pos + 1) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);
     if (!surface.empty()) {
-      auto cand = makeCandidate(surface, start_pos, end_pos, core::PartOfSpeech::Noun, 0.8F, false, CandidateOrigin::Alphanumeric);
+      // Give identifiers with underscores a bonus to prefer them over splits
+      float cost = is_identifier ? 0.5F : 0.8F;
+      auto cand = makeCandidate(surface, start_pos, end_pos, core::PartOfSpeech::Noun, cost, false, CandidateOrigin::Alphanumeric);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = 1.0F;
-      cand.pattern = "alphanum_mixed";
+      cand.pattern = is_identifier ? "identifier" : "alphanum_mixed";
 #endif
       candidates.push_back(cand);
     }

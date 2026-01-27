@@ -304,6 +304,21 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         }
       }
 
+      // Contracted progressive for ALL verb types: suffix ending in てる/てた/でる/でた
+      // 知ってる, 食べてる, してる should all split as 音便/連用形 + てる
+      // MeCab always splits these, so penalize single-token analysis
+      // E.g., 知ってる → 知っ + てる, 食べてる → 食べ + てる
+      if (suffix_str.size() >= core::kTwoJapaneseCharBytes) {
+        std::string_view suffix_view(suffix_str);
+        // Check if suffix ends with てる, てた, でる, でた
+        std::string_view suffix_end = suffix_view.substr(
+            suffix_view.size() - core::kTwoJapaneseCharBytes);
+        if (utf8::equalsAny(suffix_end, {"てる", "てた", "でる", "でた"})) {
+          candidate.confidence -= 0.8F;  // Strong penalty to prefer split
+          SUZUME_DEBUG_LOG_VERBOSE("  contracted_progressive_ending: -0.8\n");
+        }
+      }
+
       candidate.morphemes = aux_chain;
 
       SUZUME_DEBUG_LOG_TRACE("  [STEM MATCH] \"" << remaining << "\" → base=\""

@@ -476,12 +476,7 @@
         {
           "lemma" : "来る",
           "pos" : "Verb",
-          "surface" : "来"
-        },
-        {
-          "lemma" : "たつ",
-          "pos" : "Verb",
-          "surface" : "たっ"
+          "surface" : "来たっ"
         }
       ],
       "id" : "emphatic_sokuon_past",
@@ -538,16 +533,9 @@
       "description" : "いくうう - vowel repetition for emphasis",
       "expected" : [
         {
+          "lemma" : "いく",
           "pos" : "Verb",
-          "surface" : "いく"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "う"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "う"
+          "surface" : "いくうう"
         }
       ],
       "id" : "vowel_repeat_iku",
@@ -561,12 +549,9 @@
       "description" : "やばいいい - vowel repetition for emphasis",
       "expected" : [
         {
+          "lemma" : "やばい",
           "pos" : "Adjective",
-          "surface" : "やばい"
-        },
-        {
-          "pos" : "Adjective",
-          "surface" : "いい"
+          "surface" : "やばいいい"
         }
       ],
       "id" : "vowel_repeat_yabai",

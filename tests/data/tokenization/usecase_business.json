@@ -857,24 +857,8 @@
           "surface" : "年率"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "0"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "."
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "5"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "%"
+          "surface" : "0.5%"
         },
         {
           "pos" : "Auxiliary",
@@ -1677,14 +1661,8 @@
           "surface" : "が"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "20"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "%"
+          "surface" : "20%"
         },
         {
           "pos" : "Noun",

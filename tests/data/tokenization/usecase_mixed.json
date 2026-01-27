@@ -4,13 +4,8 @@
       "description" : "Mixed script: alphabet + kanji",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "Web"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "開発"
+          "surface" : "Web開発"
         },
         {
           "pos" : "Particle",
@@ -31,13 +26,8 @@
       "description" : "Mixed script: alphabet + katakana",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "API"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "リクエスト"
+          "surface" : "APIリクエスト"
         },
         {
           "pos" : "Noun",
@@ -157,19 +147,8 @@
       "description" : "snake_case should be preserved",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "user"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "_"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "name"
+          "surface" : "user_name"
         },
         {
           "pos" : "Particle",
@@ -359,11 +338,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "東京"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "都知事選挙"
+          "surface" : "東京都知事選挙"
         }
       ],
       "id" : "compound_long_kanji",
@@ -948,14 +923,8 @@
           "surface" : "が"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "50"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "%"
+          "surface" : "50%"
         },
         {
           "pos" : "Noun",

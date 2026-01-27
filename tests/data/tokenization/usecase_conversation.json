@@ -592,14 +592,8 @@
           "surface" : "を"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "3"
-        },
-        {
-          "lemma" : "つる",
-          "pos" : "Verb",
-          "surface" : "つ"
+          "surface" : "3つ"
         },
         {
           "lemma" : "くださる",

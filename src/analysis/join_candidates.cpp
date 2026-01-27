@@ -1388,6 +1388,20 @@ void addVerbSuffixNounJoinCandidates(
     return;
   }
 
+  // Reject if hiragana is a single case particle (not verb renyokei)
+  // e.g., 東京都渋谷区に所在 should NOT become 東京都渋谷区に所 + ... (it's ...+に+所在+...)
+  // Case particles: に, で, と, を, が, は, へ, も, か, や
+  // These cannot be verb renyokei endings
+  if (hiragana_end - kanji_end == 1) {
+    char32_t hira_char = codepoints[kanji_end];
+    if (hira_char == U'に' || hira_char == U'で' || hira_char == U'と' ||
+        hira_char == U'を' || hira_char == U'が' || hira_char == U'は' ||
+        hira_char == U'へ' || hira_char == U'も' || hira_char == U'か' ||
+        hira_char == U'や') {
+      return;
+    }
+  }
+
   // Check for suffix kanji: 物, 方, 所
   if (hiragana_end >= codepoints.size()) {
     return;

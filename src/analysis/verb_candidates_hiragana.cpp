@@ -423,7 +423,16 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
           // Exclude てる pattern (ている contraction) - this should be suru/godan + ている
           // not ichidan dictionary form
           bool is_te_iru_contraction = (stem_end == U'て' || stem_end == U'で');
-          if (!is_te_iru_contraction) {
+          // Exclude particle + いる pattern (にいる, でいる, etc.)
+          // These should be split as particle + いる (existence verb), not a single verb
+          // Valid hiragana verbs starting with particle chars: にる (煮る), にげる (逃げる)
+          // But にいる, であるいる, etc. are not valid verbs
+          bool is_particle_iru = false;
+          if (pre_check_len == 3 && stem_end == U'い' && normalize::isCommonParticle(first_char)) {
+            // 3-char pattern: particle + いる
+            is_particle_iru = true;
+          }
+          if (!is_te_iru_contraction && !is_particle_iru) {
             // Find ichidan candidate to use for verb type and base form
             // For dictionary forms (e-row stem + る), prefer longer valid stems
             // Valid: つかれる (e-row ending), Invalid: つかれるる (るる pattern)
@@ -508,6 +517,20 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
                 << ", conf=" << rem_cand.confidence << ")\n");
             goto next_length;  // Continue to next end_pos
           }
+        }
+      }
+
+      // Skip 3-char particle + いる/ある patterns (にいる, にある, でいる, といる, etc.)
+      // These should be particle + existence verb, not a single hiragana verb
+      // Valid 3-char verbs: にる(煮る), にげる(逃げる) have different patterns
+      // Include extended particles: で, と, も (in addition to common particles)
+      if (len_check == 3 && normalize::isExtendedParticle(first_char)) {
+        std::string remainder = surface.substr(core::kJapaneseCharBytes);
+        if (remainder == "いる" || remainder == "ある") {
+          SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface
+              << "\" skip particle_iru_aru (particle=U+"
+              << std::hex << static_cast<uint32_t>(first_char) << std::dec << ")\n");
+          goto next_length;
         }
       }
 

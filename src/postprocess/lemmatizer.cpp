@@ -502,6 +502,24 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     return morpheme.lemma;
   }
 
+  // Tari-adjective adverbs: remove trailing と from lemma
+  // e.g., 颯爽と → 颯爽, 堂々と → 堂々
+  // Pattern: 漢字2文字 + と (6 bytes kanji + 3 bytes と = 9 bytes)
+  // This check runs even for dictionary entries where lemma == surface
+  if (morpheme.pos == core::PartOfSpeech::Adverb) {
+    constexpr size_t kTariAdverbLen = core::kTwoJapaneseCharBytes + core::kJapaneseCharBytes;
+    if (morpheme.surface.size() == kTariAdverbLen &&
+        endsWith(morpheme.surface, "と")) {
+      std::string stem = morpheme.surface.substr(0, core::kTwoJapaneseCharBytes);
+      // Verify stem is 2 kanji characters (or iteration mark pattern like 堂々)
+      if (grammar::isAllKanji(stem) ||
+          (stem.size() == core::kTwoJapaneseCharBytes &&
+           stem.substr(core::kJapaneseCharBytes) == "々")) {
+        return stem;
+      }
+    }
+  }
+
   // If lemma is already set and different from surface, use it
   // (lemma == surface means it's a default that may need re-derivation)
   if (!morpheme.lemma.empty() && morpheme.lemma != morpheme.surface) {
@@ -617,7 +635,23 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     case core::PartOfSpeech::Particle:
     case core::PartOfSpeech::Auxiliary:
     case core::PartOfSpeech::Conjunction:
-    case core::PartOfSpeech::Adverb:
+    case core::PartOfSpeech::Adverb: {
+      // Tari-adjective adverbs: remove trailing と from lemma
+      // e.g., 颯爽と → 颯爽, 堂々と → 堂々
+      // Pattern: 漢字2文字 + と (6 bytes kanji + 3 bytes と = 9 bytes)
+      constexpr size_t kTariAdverbLen = core::kTwoJapaneseCharBytes + core::kJapaneseCharBytes;
+      if (morpheme.surface.size() == kTariAdverbLen &&
+          endsWith(morpheme.surface, "と")) {
+        std::string stem = morpheme.surface.substr(0, core::kTwoJapaneseCharBytes);
+        // Verify stem is 2 kanji characters (or iteration mark pattern like 堂々)
+        if (grammar::isAllKanji(stem) ||
+            (stem.size() == core::kTwoJapaneseCharBytes &&
+             stem.substr(core::kJapaneseCharBytes) == "々")) {
+          return stem;
+        }
+      }
+      return morpheme.surface;
+    }
     case core::PartOfSpeech::Suffix:
     case core::PartOfSpeech::Symbol:
     case core::PartOfSpeech::Other:
@@ -817,6 +851,29 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
       // Check if stem is 2+ kanji characters (6+ bytes)
       if (stem.size() >= core::kTwoJapaneseCharBytes && grammar::isAllKanji(stem)) {
         morpheme.lemma = stem + "する";
+      }
+    }
+
+    // Fix classical negative auxiliary lemma: ず → ぬ (MeCab compatibility)
+    // The auxiliary ず (classical negative) has lemma ぬ in MeCab
+    if (morpheme.pos == core::PartOfSpeech::Auxiliary &&
+        morpheme.surface == "ず" && morpheme.lemma == "ず") {
+      morpheme.lemma = "ぬ";
+    }
+
+    // Fix tari-adjective adverb lemma: 颯爽と → 颯爽, 堂々と → 堂々
+    // Pattern: 漢字2文字 + と (6 bytes kanji + 3 bytes と = 9 bytes)
+    // MeCab uses stem only as lemma for tari-adverbs
+    constexpr size_t kTariAdverbLen = core::kTwoJapaneseCharBytes + core::kJapaneseCharBytes;
+    if (morpheme.pos == core::PartOfSpeech::Adverb &&
+        morpheme.surface.size() == kTariAdverbLen &&
+        endsWith(morpheme.surface, "と")) {
+      std::string stem = morpheme.surface.substr(0, core::kTwoJapaneseCharBytes);
+      // Verify stem is 2 kanji characters (or iteration mark pattern like 堂々)
+      if (grammar::isAllKanji(stem) ||
+          (stem.size() == core::kTwoJapaneseCharBytes &&
+           stem.substr(core::kJapaneseCharBytes) == "々")) {
+        morpheme.lemma = stem;
       }
     }
 

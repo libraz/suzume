@@ -257,9 +257,9 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
 
       // Negation - ぬ/ず (文語否定)
       aux("ぬ", "ぬ", EPOS::AuxNegativeNu),
-      aux("ず", "ず", EPOS::AuxNegativeNu),
-      aux("ずに", "ず", EPOS::AuxNegativeNu),
-      aux("ずとも", "ず", EPOS::AuxNegativeNu),
+      aux("ず", "ぬ", EPOS::AuxNegativeNu),   // lemma is ぬ per MeCab
+      aux("ずに", "ぬ", EPOS::AuxNegativeNu),
+      aux("ずとも", "ぬ", EPOS::AuxNegativeNu),
       aux("ごとく", "ごとく", EPOS::Unknown),
       aux("ごとき", "ごとき", EPOS::Unknown),
       aux("じゃない", "ではない", EPOS::AuxNegativeNai),
@@ -346,6 +346,9 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
 
       // Irregular i-adjective よい/いい (形容詞・アウオ段)
       // MeCab: よければ → よけれ(仮定形) + ば, よかった → よかっ(連用タ接続) + た
+      // いい is colloquial form of よい, shares conjugated forms (よかった, よければ, etc.)
+      adj("いい", "いい", EPOS::AdjBasic),  // いい天気, いいです
+      adj("よい", "よい", EPOS::AdjBasic),  // よい天気, よいです
       adj("よけれ", "よい", EPOS::AdjKeForm),
       adj("よかっ", "よい", EPOS::AdjKatt),
       adj("よく", "よい", EPOS::AdjRenyokei),
@@ -746,6 +749,18 @@ std::vector<DictionaryEntry> getPronounEntries() {
       // The te-form bonus makes どう+して+VERB cheaper than どうして+VERB
       adv("どうして", ""),
       adv("なぜ", ""),
+
+      // Degree adverbs (程度副詞) - very common, prevent misparse
+      // とても could be split as と+て+も without this entry
+      adv("とても", ""),
+      adv("かなり", ""),
+      adv("すごく", ""),
+      adv("ちょっと", ""),
+      adv("もっと", ""),
+      adv("ずっと", ""),
+      adv("やっと", ""),
+      adv("きっと", ""),
+      adv("ちょうど", ""),
   };
 }
 
@@ -761,7 +776,8 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
       formal_noun("物", "もの"),
       formal_noun("もの", ""),
       formal_noun("為", ""),
-      formal_noun("所", ""),
+      // Note: 漢字「所」は削除 - 複合語（所在、場所）の一部として分割を妨げるため
+      // ひらがな「ところ」のみ残す
       formal_noun("ところ", ""),
       formal_noun("時", ""),
       formal_noun("内", ""),
@@ -807,7 +823,7 @@ std::vector<DictionaryEntry> getInterjectionEntries() {
       intj("へえ"),      // Interest
       intj("ふーん"),    // Understanding/Disinterest
       intj("ふうん"),    // Understanding
-      intj("ほう"),      // Interest
+      // Note: ほう removed - formal noun usage (ほうがいい) is more common
       intj("おい"),      // Calling attention
       intj("おーい"),    // Calling from afar
       intj("あれ"),      // Confusion

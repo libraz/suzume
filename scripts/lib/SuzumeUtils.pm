@@ -312,11 +312,28 @@ sub apply_suzume_merge {
                 my $is_number_after_large = $combined =~ /[万億兆]$/
                     && ($next->{pos} // '') eq '名詞'
                     && ($next->{pos_sub1} // '') eq '数';
-                if ($is_counter || $is_calendar_month || $is_katakana_noun || $is_chuu_suffix || $is_me_suffix || $is_large_unit || $is_number_after_large) {
+                # Number after decimal point: 0.5 → 0+.+5
+                my $is_number_after_decimal = $combined =~ /\.$/
+                    && ($next->{pos} // '') eq '名詞'
+                    && ($next->{pos_sub1} // '') eq '数';
+                # Counter auxiliary: つ for 3つ, 5つ etc.
+                # MeCab classifies つ differently depending on context:
+                # - 助動詞 (standalone: 3つ)
+                # - 動詞,自立 (in sentence: これを3つください - as つる conjugation)
+                # Either way, number+つ should merge
+                my $is_counter_aux = ($next->{surface} // '') eq 'つ'
+                    && (($next->{pos} // '') eq '助動詞' || ($next->{pos} // '') eq '動詞');
+                # Percent sign: 20%, 0.5% etc.
+                # MeCab classifies % as 名詞,サ変接続
+                my $is_percent = ($next->{surface} // '') eq '%';
+                # Decimal point: 0.5 etc.
+                # MeCab classifies . as 名詞,サ変接続, followed by more numbers
+                my $is_decimal = ($next->{surface} // '') eq '.';
+                if ($is_counter || $is_calendar_month || $is_katakana_noun || $is_chuu_suffix || $is_me_suffix || $is_large_unit || $is_number_after_large || $is_number_after_decimal || $is_counter_aux || $is_percent || $is_decimal) {
                     $combined .= $next->{surface};
                     $j++;
-                    # Stop after katakana noun, 中, or 目 (don't chain multiple)
-                    last if $is_katakana_noun || $is_chuu_suffix || $is_me_suffix;
+                    # Stop after katakana noun, 中, 目, つ, or % (don't chain multiple)
+                    last if $is_katakana_noun || $is_chuu_suffix || $is_me_suffix || $is_counter_aux || $is_percent;
                 } else {
                     last;
                 }
@@ -450,6 +467,73 @@ sub apply_suzume_merge {
             }
         }
 
+        # 4b. Vowel repetition: verb + repeated う (2+ times)
+        #     いくうう → いく (verb) + う + う → いくうう (lemma=いく)
+        #     Colloquial emphasis pattern, Suzume keeps together
+        #     Note: Must be 2+ う's to distinguish from volitional form (行こう = 行こ+う)
+        if (!$merged && $t->{pos} eq '動詞') {
+            my $j = $i + 1;
+            my $combined = $t->{surface};
+            my $lemma = $t->{lemma} // $t->{surface};
+            my $u_count = 0;
+            # Check for repeated う (volitional auxiliary)
+            while ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                if (($next->{surface} // '') eq 'う' && ($next->{pos} // '') eq '助動詞') {
+                    $combined .= 'う';
+                    $u_count++;
+                    $j++;
+                } else {
+                    last;
+                }
+            }
+            # Only merge if 2+ う's (colloquial repetition, not just volitional)
+            if ($u_count >= 2) {
+                push @result, { surface => $combined, pos => '動詞', lemma => $lemma };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'vowel-repeat';
+            }
+        }
+
+        # 4c. Emphatic sokuon in past tense: verb + たっ (emphatic past)
+        #     来たっ → 来 (verb renyokei) + たっ → 来たっ (lemma=来る)
+        #     Colloquial emphasis with sokuon after past tense
+        if (!$merged && $t->{pos} eq '動詞' && ($t->{conj_form} // '') =~ /連用/) {
+            my $j = $i + 1;
+            if ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                # たっ is often misanalyzed as verb たつ by MeCab
+                if (($next->{surface} // '') eq 'たっ') {
+                    my $combined = $t->{surface} . 'たっ';
+                    my $lemma = $t->{lemma} // $t->{surface};
+                    push @result, { surface => $combined, pos => '動詞', lemma => $lemma };
+                    $i = $j + 1;
+                    $merged = 1;
+                    $applied_rule //= 'emphatic-sokuon';
+                }
+            }
+        }
+
+        # 4d. Adjective vowel repetition: adjective ending in い + いい
+        #     やばいいい → やばい + いい → やばいいい (lemma=やばい)
+        #     Colloquial emphasis by repeating final vowel sound
+        if (!$merged && $t->{pos} eq '形容詞' && ($t->{surface} // '') =~ /い$/) {
+            my $j = $i + 1;
+            if ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                # Check for いい (adjective) following an い-ending adjective
+                if (($next->{surface} // '') eq 'いい' && ($next->{pos} // '') eq '形容詞') {
+                    my $combined = $t->{surface} . 'いい';
+                    my $lemma = $t->{lemma} // $t->{surface};
+                    push @result, { surface => $combined, pos => '形容詞', lemma => $lemma };
+                    $i = $j + 1;
+                    $merged = 1;
+                    $applied_rule //= 'vowel-repeat';
+                }
+            }
+        }
+
         # 5. タリ活用副詞: merge 泰然 + と → 泰然と (Adverb)
         #    Exception: MeCab splits these as Noun+Particle, but merged form is Adverb
         if (!$merged) {
@@ -494,6 +578,7 @@ sub apply_suzume_merge {
 
         # 5. Proper noun + region suffix: 東京+都+渋谷+区 → 東京都渋谷区
         #    Merge 名詞,固有名詞,地域 with 名詞,接尾,地域 sequences
+        #    Also merge with following kanji compound (東京都知事選挙 → 1 token)
         #    Exception: 行き (東京行き should stay split as 東京|行き)
         if (!$merged && $t->{pos} eq '名詞' && ($t->{pos_sub1} // '') eq '固有名詞'
             && ($t->{pos_sub2} // '') eq '地域') {
@@ -510,7 +595,11 @@ sub apply_suzume_merge {
                 my $is_region_suffix = ($next->{pos} // '') eq '名詞'
                     && ($next->{pos_sub1} // '') eq '接尾'
                     && ($next->{pos_sub2} // '') eq '地域';
-                if ($is_proper_region || $is_region_suffix) {
+                # Also merge with following kanji compound nouns (東京都知事選挙)
+                my $is_kanji_noun = ($next->{pos} // '') eq '名詞'
+                    && $next_surface =~ /^\p{Script=Han}+$/
+                    && ($next->{pos_sub1} // '') ne '接尾';
+                if ($is_proper_region || $is_region_suffix || $is_kanji_noun) {
                     $combined .= $next->{surface};
                     $j++;
                 } else {
@@ -581,6 +670,72 @@ sub apply_suzume_merge {
                 $i = $j;
                 $merged = 1;
                 $applied_rule //= 'katakana-compound';
+            }
+        }
+
+        # 7b. Alphabet + Katakana compound: merge alphabet noun + katakana noun
+        #     Suzume has no dictionary, keeps mixed script sequences together
+        #     e.g., API+リクエスト → APIリクエスト, Web+開発 → Web開発
+        if (!$merged && $t->{surface} =~ /^[A-Za-z]+$/ && $t->{pos} eq '名詞') {
+            my $j = $i + 1;
+            my $combined = $t->{surface};
+            while ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                my $next_surface = $next->{surface} // '';
+                my $next_pos = $next->{pos} // '';
+                # Katakana noun after alphabet
+                my $is_katakana = $next_surface =~ /^[\x{30A0}-\x{30FF}]+$/ && $next_pos eq '名詞';
+                # Kanji noun after alphabet (e.g., Web開発)
+                my $is_kanji = $next_surface =~ /^[\p{Han}]+$/ && $next_pos eq '名詞';
+                if ($is_katakana || $is_kanji) {
+                    $combined .= $next_surface;
+                    $j++;
+                    # Only merge one following token (API+リクエスト, not API+リクエスト+処理)
+                    last;
+                } else {
+                    last;
+                }
+            }
+            if ($j > $i + 1) {
+                push @result, { surface => $combined, pos => '名詞', lemma => $combined };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'alphabet-compound';
+            }
+        }
+
+        # 7c. Snake_case identifier: merge alphabet + _ + alphabet patterns
+        #     e.g., user+_+name → user_name, first+_+name → first_name
+        #     Programming identifiers should be kept as single tokens
+        if (!$merged && $t->{surface} =~ /^[A-Za-z0-9]+$/ && $t->{pos} eq '名詞') {
+            my $j = $i + 1;
+            my $combined = $t->{surface};
+            my $found_underscore = 0;
+            while ($j < @$tokens) {
+                my $next = $tokens->[$j];
+                my $next_surface = $next->{surface} // '';
+                # Check for underscore followed by alphanumeric
+                if ($next_surface eq '_') {
+                    if ($j + 1 < @$tokens) {
+                        my $after_underscore = $tokens->[$j + 1];
+                        my $after_surface = $after_underscore->{surface} // '';
+                        if ($after_surface =~ /^[A-Za-z0-9]+$/) {
+                            $combined .= '_' . $after_surface;
+                            $j += 2;
+                            $found_underscore = 1;
+                            next;
+                        }
+                    }
+                    last;
+                } else {
+                    last;
+                }
+            }
+            if ($found_underscore) {
+                push @result, { surface => $combined, pos => '名詞', lemma => $combined };
+                $i = $j;
+                $merged = 1;
+                $applied_rule //= 'snake-case';
             }
         }
 

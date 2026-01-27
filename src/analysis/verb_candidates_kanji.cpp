@@ -593,6 +593,22 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (interrogative_kanji_penalty)\n");
             }
           }
+          // Penalize single-kanji + いる verb candidates (both godan-ra and ichidan)
+          // e.g., 人いる should split as 人 + いる (noun + verb), not be verb
+          // Most single kanji + いる patterns are NOUN + existence verb いる
+          // Valid single-kanji verbs: 入る, 走る, 居る (いる), 見る, etc.
+          // These should be in dictionary, so dictionary bonus will override
+          {
+            auto surface_cps = normalize::utf8::decode(surface);
+            // Check if pattern is: 1 kanji + いる
+            if (surface_cps.size() == 3 &&
+                normalize::isKanjiCodepoint(surface_cps[0]) &&
+                surface_cps[1] == U'い' && surface_cps[2] == U'る') {
+              // Single kanji + いる pattern - penalize to prefer NOUN + いる split
+              base_cost += 2.5F;
+              SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.5 (single_kanji_iru_penalty)\n");
+            }
+          }
           // Check if base form exists in dictionary - significant bonus for known verbs
           // This helps 行われた (base=行う) beat 行(suffix)+われた split
           // Skip compound adjective patterns (verb renyoukei + にくい/やすい/がたい)

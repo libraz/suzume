@@ -377,14 +377,8 @@
           "surface" : "は"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
-          "surface" : "60"
-        },
-        {
-          "lemma" : "*",
-          "pos" : "Noun",
-          "surface" : "%"
+          "surface" : "60%"
         },
         {
           "pos" : "Auxiliary",
@@ -446,11 +440,7 @@
       "expected" : [
         {
           "pos" : "Noun",
-          "surface" : "日本"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "代表"
+          "surface" : "日本代表"
         },
         {
           "pos" : "Particle",
