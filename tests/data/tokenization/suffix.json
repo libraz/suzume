@@ -232,7 +232,7 @@
       "description" : "S6: なりがち should be NOUN, not なり+が+ち",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "そう"
         },
         {

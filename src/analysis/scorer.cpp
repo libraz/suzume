@@ -714,12 +714,14 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Valid patterns usually have longer verbs (3+ chars) or kanji stems
   // Single-char particles: が, を, に, へ, と, で, から, etc.
   // Only penalize very short verbs (2 chars or less) to avoid affecting なくし, etc.
+  // Exception: "い" (いる renyokei) has specific bonus rule below for PART_格→い pattern
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase &&
       prev.surface.size() <= 3 &&  // Single hiragana char (3 bytes in UTF-8)
       next.pos == core::PartOfSpeech::Verb &&
       !next.fromDictionary() &&
       grammar::isPureHiragana(next.surface) &&
-      next.surface.size() <= 6) {  // 2 chars or less (6 bytes in UTF-8)
+      next.surface.size() <= 6 &&  // 2 chars or less (6 bytes in UTF-8)
+      next.surface != "い") {  // Exclude い - has specific rule
     surface_bonus += cost::kAlmostNever;
   }
 
@@ -1183,6 +1185,28 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.surface == "で" &&
       next.extended_pos == core::ExtendedPOS::Symbol) {
     surface_bonus += cost::kStrong;
+  }
+
+  // Penalty for NOUN → で(AUX_断定): copula で after noun is uncommon
+  // Most NOUN+copula uses だ directly; で is mainly in で+ある/で+は/で+も
+  // This counteracts the Noun→AuxCopulaDa bigram bonus (-0.5) for で
+  // E.g., あとで, 爆速で, きっかけで, 電車で → NOUN+PART_格 preferred
+  // Note: NOUN→だ(AUX_断定) is NOT affected (学生だ is correct)
+  if ((prev.pos == core::PartOfSpeech::Noun ||
+       prev.pos == core::PartOfSpeech::Pronoun) &&
+      next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+      next.surface == "で") {
+    surface_bonus += cost::kRare;  // 1.0: must exceed kModerateBonus (-0.5)
+  }
+
+  // Penalty for NOUN/PRON → で(VERB_連用 of 出る): verb で after noun is rare
+  // Most NOUN+で patterns use particle or copula, not verb 出る
+  // E.g., あとで, 爆速で → NOUN+PART_格, not NOUN+VERB(出る)
+  if ((prev.pos == core::PartOfSpeech::Noun ||
+       prev.pos == core::PartOfSpeech::Pronoun) &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface == "で") {
+    surface_bonus += cost::kRare;  // 1.0: must exceed NOUN→VERB_連用 bonus
   }
 
   // Penalty for で(VerbRenyokei of 出る) → Particle

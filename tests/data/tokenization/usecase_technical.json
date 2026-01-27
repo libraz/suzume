@@ -22,7 +22,8 @@
           "surface" : "ませ"
         },
         {
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         },
         {
@@ -31,7 +32,6 @@
           "surface" : "でし"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }
@@ -161,7 +161,6 @@
           "surface" : "に"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "0"
         },
@@ -189,7 +188,6 @@
           "surface" : "この"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "API"
         },
@@ -206,7 +204,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "必要"
         },
         {
@@ -348,7 +346,7 @@
           "surface" : "する"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "必要"
         },
         {

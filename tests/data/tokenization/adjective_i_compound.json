@@ -246,7 +246,8 @@
           "surface" : "くだら"
         },
         {
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         }
       ],
@@ -267,7 +268,8 @@
           "surface" : "つまら"
         },
         {
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         }
       ],

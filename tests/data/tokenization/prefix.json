@@ -194,7 +194,7 @@
           "surface" : "お"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "元気"
         }
       ],
@@ -255,7 +255,7 @@
           "surface" : "客"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Noun",
           "surface" : "様"
         }
       ],
@@ -825,7 +825,7 @@
       "description" : "Negation 不 + 安 (compound word)",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "不安"
         }
       ],
@@ -840,7 +840,7 @@
       "description" : "Negation 不 + 要 (compound word)",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "不要"
         }
       ],
@@ -855,7 +855,7 @@
       "description" : "Negation 不 + 便 (compound word)",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "不便"
         }
       ],

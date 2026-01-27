@@ -94,7 +94,8 @@
           "surface" : "ませ"
         },
         {
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         }
       ],

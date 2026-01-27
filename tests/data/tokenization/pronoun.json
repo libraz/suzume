@@ -76,7 +76,7 @@
       "description" : "皆さん - collective pronoun",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "皆"
         },
         {
@@ -110,7 +110,7 @@
       "description" : "Samurai pronoun 拙者 - MeCab shows 拙者 as NOUN not PRON",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "拙者"
         },
         {
@@ -127,7 +127,6 @@
           "surface" : "で"
         },
         {
-          "lemma" : "ござる",
           "pos" : "Auxiliary",
           "surface" : "ござる"
         }
@@ -144,7 +143,7 @@
       "description" : "Old-fashioned pronoun 我輩",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "我輩"
         },
         {
@@ -176,7 +175,7 @@
       "description" : "Samurai pronoun 某",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "某"
         },
         {

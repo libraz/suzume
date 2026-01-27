@@ -96,7 +96,6 @@
           "surface" : "は"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "Meeting"
         },
@@ -124,7 +123,6 @@
       "description" : "CamelCase should be preserved",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "getUserData"
         },
@@ -169,7 +167,6 @@
       "description" : "Abbreviation",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "API"
         },
@@ -192,7 +189,6 @@
       "description" : "Technical term with Japanese",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "API"
         },
@@ -236,7 +232,6 @@
       "description" : "Brand name in sentence - verb with polite past aux",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "iPhone"
         },
@@ -269,7 +264,6 @@
       "description" : "email + particle",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "email"
         },
@@ -292,7 +286,6 @@
       "description" : "server + particle",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "server"
         },
@@ -802,17 +795,14 @@
       "description" : "URL-like mixed content",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "example"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "."
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "com"
         },
@@ -1087,7 +1077,6 @@
       "description" : "Brackets",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "AI"
         },

@@ -632,7 +632,7 @@
       "description" : "必要な情報 (necessary information)",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "必要"
         },
         {

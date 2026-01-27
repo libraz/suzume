@@ -62,7 +62,7 @@
         },
         {
           "lemma" : "くれる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "くれ"
         },
         {
@@ -91,7 +91,7 @@
         },
         {
           "lemma" : "もらう",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "もらわ"
         },
         {
@@ -179,7 +179,7 @@
         },
         {
           "lemma" : "いく",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いか"
         },
         {
@@ -207,7 +207,7 @@
           "surface" : "て"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "あげる"
         }
       ],
@@ -232,7 +232,7 @@
         },
         {
           "lemma" : "あげる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "あげ"
         },
         {
@@ -261,7 +261,7 @@
         },
         {
           "lemma" : "あげる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "あげ"
         },
         {
@@ -344,7 +344,8 @@
           "surface" : "ませ"
         },
         {
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         }
       ],
@@ -403,7 +404,7 @@
         },
         {
           "lemma" : "いただく",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いただき"
         },
         {
@@ -607,7 +608,7 @@
         },
         {
           "lemma" : "いただく",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いただき"
         },
         {

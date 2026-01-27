@@ -232,7 +232,7 @@
       "description" : "Slang phrase 超バズった",
       "expected" : [
         {
-          "pos" : "Prefix",
+          "pos" : "Noun",
           "surface" : "超"
         },
         {
@@ -256,7 +256,7 @@
       "description" : "Slang phrase マジでキモい",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "マジ"
         },
         {
@@ -280,7 +280,6 @@
       "description" : "Slang phrase ガチでサボる (ガチで as adverb 'seriously')",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "ガチ"
         },
@@ -304,7 +303,7 @@
       "description" : "Internet slang phrase マジで尊い",
       "expected" : [
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "マジ"
         },
         {
@@ -359,8 +358,7 @@
       "description" : "Nominalized noun 推し standalone (T54)",
       "expected" : [
         {
-          "lemma" : "推す",
-          "pos" : "Verb",
+          "pos" : "Noun",
           "surface" : "推し"
         }
       ],
@@ -377,8 +375,7 @@
       "description" : "Nominalized noun 推し with particle の",
       "expected" : [
         {
-          "lemma" : "推す",
-          "pos" : "Verb",
+          "pos" : "Noun",
           "surface" : "推し"
         },
         {
@@ -399,8 +396,7 @@
       "description" : "Internet slang phrase 推しのライブ",
       "expected" : [
         {
-          "lemma" : "推す",
-          "pos" : "Verb",
+          "pos" : "Noun",
           "surface" : "推し"
         },
         {

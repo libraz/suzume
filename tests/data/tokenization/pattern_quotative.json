@@ -183,7 +183,7 @@
       "description" : "そういって (ADV + quotative verb)",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "そう"
         },
         {

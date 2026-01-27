@@ -979,6 +979,85 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
         morpheme.lemma = stem + "く";  // GodanKa: 書い+た → 書く
       }
     }
+    // Fix irregular sokuonbin: いっ+た/て → いく (not いう)
+    // いく is the only godan-ka verb that uses 促音便 instead of イ音便
+    // Only apply when preceded by motion particle (に, へ) to disambiguate from 言う
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        endsWith(morpheme.surface, "いっ") &&
+        morpheme.lemma.size() >= core::kTwoJapaneseCharBytes &&
+        endsWith(morpheme.lemma, "いう") &&
+        utf8::equalsAny(next_surface, {"た", "て", "たら", "ちゃ"}) &&
+        i > 0 &&
+        utf8::equalsAny(morphemes[i - 1].surface, {"に", "へ"})) {
+      std::string stem = morpheme.lemma.substr(
+          0, morpheme.lemma.size() - core::kTwoJapaneseCharBytes);
+      morpheme.lemma = stem + "いく";
+    }
+    // Fix 仮定形 lemma: verb + ば → godan conditional, not ichidan potential
+    // E.g., 書け+ば → lemma=書く (not 書ける), 行け+ば → lemma=行く (not 行ける)
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        utf8::equalsAny(next_surface, {"ば"}) &&
+        morpheme.lemma.size() >= core::kTwoJapaneseCharBytes) {
+      // Special case: なけれ+ば → lemma=ない
+      if (morpheme.surface == "なけれ") {
+        morpheme.lemma = "ない";
+      } else if (utf8::endsWithAny(morpheme.surface,
+                     {"え", "け", "げ", "せ", "て", "ね", "べ", "め", "れ"})) {
+        // Check if lemma looks like ichidan potential (ends with e-row + る)
+        if (utf8::endsWithAny(morpheme.lemma,
+                {"える", "ける", "げる", "せる", "てる",
+                 "ねる", "べる", "める", "れる"})) {
+          // Convert ichidan potential lemma to godan base
+          // Remove trailing える/ける/... (6 bytes) and get the stem
+          std::string stem = morpheme.lemma.substr(
+              0, morpheme.lemma.size() - core::kTwoJapaneseCharBytes);
+          // Map e-row ending to godan base: え→う, け→く, げ→ぐ, etc.
+          std::string_view surface_tail(
+              morpheme.surface.data() + morpheme.surface.size() - core::kJapaneseCharBytes,
+              core::kJapaneseCharBytes);
+          std::string godan_base;
+          if (surface_tail == "え") godan_base = "う";
+          else if (surface_tail == "け") godan_base = "く";
+          else if (surface_tail == "げ") godan_base = "ぐ";
+          else if (surface_tail == "せ") godan_base = "す";
+          else if (surface_tail == "て") godan_base = "つ";
+          else if (surface_tail == "ね") godan_base = "ぬ";
+          else if (surface_tail == "べ") godan_base = "ぶ";
+          else if (surface_tail == "め") godan_base = "む";
+          else if (surface_tail == "れ") godan_base = "る";
+          if (!godan_base.empty()) {
+            morpheme.lemma = stem + godan_base;
+          }
+        } else if (endsWith(morpheme.surface, "れ") &&
+                   endsWith(morpheme.lemma, "る") &&
+                   morpheme.surface.size() >= core::kTwoJapaneseCharBytes) {
+          // Ichidan conditional: 食べれ+ば → lemma=食べる
+          // Surface = stem + れ, correct lemma = stem + る
+          std::string stem = morpheme.surface.substr(
+              0, morpheme.surface.size() - core::kJapaneseCharBytes);
+          morpheme.lemma = stem + "る";
+        }
+      }
+    }
+    // Fix 命令形 ろ ending lemma: ichidan imperative
+    // E.g., 見ろ → lemma=見る (not 見ろる), 寝ろ → lemma=寝る (not 寝ろる)
+    if (morpheme.pos == core::PartOfSpeech::Verb &&
+        endsWith(morpheme.surface, "ろ")) {
+      if (endsWith(morpheme.lemma, "ろる")) {
+        // Lemma incorrectly derived as 〜ろる → fix to 〜る
+        morpheme.lemma = morpheme.lemma.substr(
+            0, morpheme.lemma.size() - core::kTwoJapaneseCharBytes) + "る";
+      } else if (morpheme.lemma == morpheme.surface &&
+                 morpheme.surface.size() >= core::kTwoJapaneseCharBytes) {
+        // Lemma equals surface (e.g., 起きろ→起きろ) → fix to stem + る
+        morpheme.lemma = morpheme.surface.substr(
+            0, morpheme.surface.size() - core::kJapaneseCharBytes) + "る";
+      }
+    }
+    // Fix たら lemma: should be た (not たら)
+    if (morpheme.surface == "たら" && morpheme.lemma == "たら") {
+      morpheme.lemma = "た";
+    }
     morpheme.conj_form = detectConjForm(morpheme.surface, morpheme.lemma, morpheme.pos, next_lemma);
   }
 }

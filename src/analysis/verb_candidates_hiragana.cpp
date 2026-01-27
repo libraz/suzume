@@ -772,6 +772,96 @@ next_length:;  // Label for goto from particle-starting verb skip
     break;  // Only generate one passive candidate per length
   }
 
+  // Generate Ichidan verb stem candidates for hiragana られる pattern
+  // E.g., いられる → い (renyokei of いる) + られる (potential/passive AUX)
+  //       おきられる → おき (renyokei of おきる) + られる
+  // MeCab splits: いられる → い(動詞,一段,連用形) + られる(助動詞)
+  // Pattern: ichidan stem (E-row ending or い/え) + られ + る/た/て
+  // Search for られ starting at positions from start_pos+1 to hiragana_end-2
+  for (size_t ra_pos = start_pos + 1; ra_pos + 2 < hiragana_end; ++ra_pos) {
+    // Check for られ pattern at this position
+    if (codepoints[ra_pos] != U'ら' || codepoints[ra_pos + 1] != U'れ') {
+      continue;
+    }
+
+    // Check for られる, られた, られて, られな, られま patterns
+    bool is_potential_passive_pattern = false;
+    if (ra_pos + 2 < codepoints.size()) {
+      char32_t third_aux = codepoints[ra_pos + 2];
+      // られる, られた, られて
+      if (third_aux == U'る' || third_aux == U'た' || third_aux == U'て') {
+        is_potential_passive_pattern = true;
+      }
+      // られな (られない, られなかった)
+      else if (third_aux == U'な' && ra_pos + 3 < codepoints.size() &&
+               codepoints[ra_pos + 3] == U'い') {
+        is_potential_passive_pattern = true;
+      }
+      // られま (られます, られました)
+      else if (third_aux == U'ま') {
+        is_potential_passive_pattern = true;
+      }
+    }
+
+    if (!is_potential_passive_pattern) {
+      continue;
+    }
+
+    // The stem is everything before ら
+    size_t stem_end = ra_pos;  // Exclusive end of stem
+    if (stem_end <= start_pos) continue;
+
+    std::string stem = extractSubstring(codepoints, start_pos, stem_end);
+    std::string base_form = stem + "る";  // Ichidan base form = stem + る
+
+    // Validate: check if base form is a known ichidan verb
+    // For pure hiragana like いる, check the dictionary
+    bool is_valid_ichidan = vh::isVerbInDictionaryWithType(
+        dict_manager, base_form, grammar::VerbType::Ichidan);
+
+    // Special case: common hiragana ichidan verbs (いる, おきる, みる, etc.)
+    // These may not always be in the L2 dictionary but are valid
+    if (!is_valid_ichidan) {
+      // Check if inflection analysis recognizes base_form as ichidan
+      auto analysis = inflection.analyze(base_form);
+      if (!analysis.empty() && analysis[0].verb_type == grammar::VerbType::Ichidan &&
+          analysis[0].confidence >= 0.5F) {
+        is_valid_ichidan = true;
+      }
+    }
+
+    if (!is_valid_ichidan) {
+      continue;
+    }
+
+    // Get lemma from dictionary if available
+    std::string lemma = base_form;
+    if (dict_manager != nullptr) {
+      auto results = dict_manager->lookup(stem, 0);
+      for (const auto& result : results) {
+        if (result.entry != nullptr && result.entry->surface == stem &&
+            result.entry->pos == core::PartOfSpeech::Verb && !result.entry->lemma.empty()) {
+          lemma = result.entry->lemma;
+          break;
+        }
+      }
+    }
+
+    // Generate the ichidan renyokei candidate
+    // Negative cost to beat the single-word verb candidate
+    constexpr float kCost = -0.5F;
+    SUZUME_DEBUG_VERBOSE_BLOCK {
+      SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem
+                          << " hiragana_ichidan_rareru lemma=" << lemma
+                          << " cost=" << kCost << "\n";
+    }
+    candidates.push_back(makeVerbCandidate(
+        stem, start_pos, stem_end, kCost, lemma,
+        dictionary::ConjugationType::Ichidan,
+        true, CandidateOrigin::VerbHiragana, 0.9F, "hiragana_ichidan_rareru"));
+    break;  // Only generate one ichidan rareru candidate per starting position
+  }
+
   // Generate Godan mizenkei stem candidates for contracted negative ん pattern
   // E.g., くだらん → くだら (mizenkei of くだる) + ん (contracted negative)
   //       つまらん → つまら (mizenkei of つまる) + ん (contracted negative)
@@ -1284,12 +1374,14 @@ next_length:;  // Label for goto from particle-starting verb skip
         std::string stem = extractSubstring(codepoints, start_pos, onbin_end - 1);
 
         // Try different base form patterns for っ-onbin
-        // Godan-wa: しま + う → しまう, なくな + る → なくなる
+        // GodanWa: しま + う → しまう, GodanRa: なくな + る → なくなる
+        // GodanKa: い + く → いく (irregular: いく uses 促音便 instead of イ音便)
         static const std::vector<std::pair<grammar::VerbType, std::string_view>>
             sokuonbin_types = {
-                {grammar::VerbType::GodanWa, "う"},
+                {grammar::VerbType::GodanKa, "く"},  // いく (irregular sokuonbin)
                 {grammar::VerbType::GodanRa, "る"},
                 {grammar::VerbType::GodanTa, "つ"},
+                {grammar::VerbType::GodanWa, "う"},
             };
 
         bool found_dict_match = false;

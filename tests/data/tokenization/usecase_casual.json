@@ -31,7 +31,7 @@
           "surface" : "本当に"
         },
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "そう"
         },
         {
@@ -388,7 +388,7 @@
           "surface" : "店"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "マジ"
         },
         {
@@ -931,7 +931,7 @@
       "description" : "Colloquial questioning past っけ",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "何時"
         },
         {

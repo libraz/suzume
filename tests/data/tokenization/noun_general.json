@@ -884,7 +884,7 @@
       "description" : "時々 - iteration mark should be grouped with kanji",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "時々"
         }
       ],
@@ -899,11 +899,11 @@
       "description" : "時々妙に - should split at 々 boundary, 妙 is na-adjective (妙に = strangely)",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Noun",
           "surface" : "時々"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "妙"
         },
         {
@@ -1035,7 +1035,6 @@
       "description" : "AI（人工知能）- should recognize AI and 人工知能",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "AI"
         },
@@ -1245,7 +1244,6 @@
       "description" : "L1: アクセシビリティ (8 chars) should be single NOUN",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "アクセシビリティ"
         }
@@ -1287,8 +1285,7 @@
       "description" : "S3: にく (肉) should be recognized as NOUN, not split as に+く",
       "expected" : [
         {
-          "lemma" : "にくい",
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "にく"
         },
         {

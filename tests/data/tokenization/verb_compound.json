@@ -49,7 +49,7 @@
           "surface" : "しまい"
         },
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "そう"
         }
       ],
@@ -86,7 +86,7 @@
           "surface" : "食べ"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "込む"
         }
       ],
@@ -152,7 +152,7 @@
         },
         {
           "lemma" : "終わる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "終わっ"
         },
         {
@@ -176,7 +176,7 @@
           "surface" : "読み"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "続ける"
         }
       ],
@@ -539,7 +539,7 @@
       "description" : "引き続き should not be fragmented into 4+ pieces",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Verb",
           "surface" : "引き続き"
         }
       ],
@@ -606,7 +606,7 @@
           "surface" : "食べ"
         },
         {
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "始める"
         }
       ],

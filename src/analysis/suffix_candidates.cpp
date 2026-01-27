@@ -66,7 +66,7 @@ const std::vector<SuffixEntry>& getSuffixEntries() {
       {"化する", core::PartOfSpeech::Verb},
       {"化", core::PartOfSpeech::Suffix},
       {"性", core::PartOfSpeech::Suffix},
-      {"率", core::PartOfSpeech::Suffix},
+      // {"率", core::PartOfSpeech::Suffix},  // Removed: causes over-segmentation (降水確率→降水確+率)
       {"法", core::PartOfSpeech::Suffix},
       {"論", core::PartOfSpeech::Suffix},
       // {"者", core::PartOfSpeech::Suffix},  // Removed: causes over-segmentation (代表者→代表+者)

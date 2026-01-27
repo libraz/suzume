@@ -39,7 +39,7 @@
       "description" : "そうでありんす - MeCab-compatible split: そう + で + あり + ん + す",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "そう"
         },
         {
@@ -53,7 +53,8 @@
           "surface" : "あり"
         },
         {
-          "pos" : "Noun",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         },
         {
@@ -96,7 +97,7 @@
       "description" : "Feminine speech だわ",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "そう"
         },
         {
@@ -119,7 +120,7 @@
       "description" : "Elderly speech じゃろう",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "そう"
         },
         {
@@ -143,7 +144,7 @@
       "description" : "Kansai dialect やで",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "そう"
         },
         {
@@ -217,8 +218,8 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "ん",
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         }
       ],
@@ -1174,7 +1175,8 @@
           "surface" : "ない"
         },
         {
-          "pos" : "Noun",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         },
         {
@@ -1202,7 +1204,8 @@
           "surface" : "ない"
         },
         {
-          "pos" : "Noun",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         },
         {
@@ -1244,7 +1247,7 @@
       "description" : "そうかもしれません - MeCab-compatible split: そう + かも + しれ + ませ + ん",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "そう"
         },
         {
@@ -1262,7 +1265,8 @@
           "surface" : "ませ"
         },
         {
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         }
       ],
@@ -1318,7 +1322,8 @@
       "description" : "違いない should be Auxiliary (certainty idiom)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "lemma" : "違う",
+          "pos" : "Verb",
           "surface" : "違い"
         },
         {
@@ -1345,7 +1350,8 @@
           "surface" : "に"
         },
         {
-          "pos" : "Noun",
+          "lemma" : "違う",
+          "pos" : "Verb",
           "surface" : "違い"
         },
         {

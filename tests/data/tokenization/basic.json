@@ -241,7 +241,8 @@
       "description" : "いわば should be CONJ, not OTHER split",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "lemma" : "言わば",
+          "pos" : "Conjunction",
           "surface" : "いわば"
         },
         {

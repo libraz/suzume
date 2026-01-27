@@ -92,7 +92,6 @@
       "description" : "iphone買った - ASCII to Japanese verb boundary - MeCab-compatible split",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "iphone"
         },

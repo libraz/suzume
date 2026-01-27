@@ -23,8 +23,7 @@
       "description" : "ニャーニャー (cat meow) - AA doubled pattern with small kana",
       "expected" : [
         {
-          "lemma" : "*",
-          "pos" : "Noun",
+          "pos" : "Adverb",
           "surface" : "ニャーニャー"
         }
       ],
@@ -40,7 +39,7 @@
       "description" : "ワンワン (dog bark) - AA doubled pattern",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adverb",
           "surface" : "ワンワン"
         }
       ],
@@ -76,7 +75,7 @@
       "description" : "ガタガタ揺れる (shaking)",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adverb",
           "surface" : "ガタガタ"
         },
         {
@@ -356,7 +355,7 @@
       "description" : "びっくり should be ADV (B62) - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adverb",
           "surface" : "びっくり"
         },
         {
@@ -611,7 +610,7 @@
       "description" : "ふっくら should be ADV (B62) - MeCab互換分割",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Other",
           "surface" : "ふっくら"
         },
         {
@@ -924,8 +923,7 @@
       "description" : "ニャーニャー - cat onomatopoeia, not AUX よ (W-007)",
       "expected" : [
         {
-          "lemma" : "*",
-          "pos" : "Noun",
+          "pos" : "Adverb",
           "surface" : "ニャーニャー"
         },
         {

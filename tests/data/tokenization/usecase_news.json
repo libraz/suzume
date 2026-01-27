@@ -447,7 +447,6 @@
           "surface" : "が"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "2"
         },
@@ -456,7 +455,6 @@
           "surface" : "対"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "1"
         },
@@ -1427,7 +1425,8 @@
           "surface" : "ませ"
         },
         {
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         }
       ],
@@ -1494,7 +1493,7 @@
           "surface" : "この"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "公式"
         },
         {

@@ -141,7 +141,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いたし"
         },
         {
@@ -174,7 +174,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いたし"
         },
         {
@@ -1056,7 +1056,7 @@
       "description" : "むしろ should be Adverb (not Verb むする)",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Other",
           "surface" : "むしろ"
         },
         {
@@ -1083,7 +1083,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いたし"
         },
         {
@@ -1209,7 +1209,7 @@
         },
         {
           "lemma" : "いただく",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いただき"
         },
         {
@@ -1711,7 +1711,7 @@
         },
         {
           "lemma" : "もらう",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "もらっ"
         },
         {

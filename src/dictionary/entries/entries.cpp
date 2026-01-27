@@ -161,6 +161,8 @@ std::vector<DictionaryEntry> getParticleEntries() {
       particle("ね", EPOS::ParticleFinal),
       particle("よ", EPOS::ParticleFinal),
       particle("わ", EPOS::ParticleFinal),
+      particle("ぞ", EPOS::ParticleFinal),
+      particle("ぜ", EPOS::ParticleFinal),
       particle("の", EPOS::ParticleNo),  // nominalizer
       {"ん", POS::Particle, EPOS::ParticleNo, "の"},  // colloquial の
       particle("じゃん", EPOS::ParticleFinal),

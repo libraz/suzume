@@ -123,7 +123,6 @@
           "surface" : "で"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "ゲソ"
         }
@@ -341,7 +340,6 @@
       "description" : "爆速で (at explosive speed)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "爆速"
         },
@@ -399,7 +397,6 @@
       "description" : "ソッコーで (immediately - katakana)",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "ソッコー"
         },
@@ -995,7 +992,7 @@
       "description" : "なんて belittling/surprise particle",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Particle",
           "surface" : "なんて"
         },
         {
@@ -1037,7 +1034,7 @@
       "description" : "ったら topic/exclamation particle",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "あなた"
         },
         {

@@ -70,7 +70,7 @@
       "description" : "Feminine sentence ending わね",
       "expected" : [
         {
-          "pos" : "Adverb",
+          "pos" : "Adjective",
           "surface" : "そう"
         },
         {

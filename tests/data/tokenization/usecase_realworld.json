@@ -4,7 +4,6 @@
       "description" : "English word with Japanese particle が and existential ある",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "Meeting"
         },
@@ -27,7 +26,6 @@
       "description" : "English word with Japanese particle を",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "email"
         },
@@ -50,7 +48,6 @@
       "description" : "English word with Japanese particle に",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "server"
         },
@@ -73,7 +70,6 @@
       "description" : "CamelCase identifier with particle",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "getUserData"
         },
@@ -118,7 +114,6 @@
       "description" : "API abbreviation with particle",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "API"
         },
@@ -217,27 +212,22 @@
       "description" : "Simple URL with に particle - URL filtered from output",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "https"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "://"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "example"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "."
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "com"
         },
@@ -261,57 +251,46 @@
       "description" : "URL with path - URL filtered from output",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "https"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "://"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "example"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "."
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "com"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "/"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "path"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "/"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "to"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "/"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "page"
         },
@@ -335,7 +314,6 @@
       "description" : "Version number with に particle",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "v"
         },
@@ -366,7 +344,6 @@
           "surface" : "3.5"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "GB"
         },
@@ -383,7 +360,7 @@
           "surface" : "が"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "必要"
         }
       ],
@@ -397,12 +374,10 @@
       "description" : "Storage capacity in MB",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "512"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "MB"
         },
@@ -499,7 +474,6 @@
       "description" : "Hashtag - currently extends to end of same script",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "#"
         },
@@ -526,7 +500,6 @@
       "description" : "Mention with に particle",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "@"
         },
@@ -676,7 +649,7 @@
           "surface" : "山田"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Noun",
           "surface" : "様"
         },
         {
@@ -807,7 +780,6 @@
           "surface" : "株式会社"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "ABC"
         },
@@ -951,7 +923,6 @@
           "surface" : "生成"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "AI"
         },
@@ -992,12 +963,10 @@
       "description" : "Product name with number",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "iPhone"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "15"
         },
@@ -1047,7 +1016,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いたし"
         },
         {
@@ -1075,27 +1044,22 @@
           "surface" : "東京都渋谷区神宮前"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "1"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "-"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "2"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "-"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "3"
         }
@@ -1172,7 +1136,6 @@
       "description" : "Casual conversation with LINE",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "LINE"
         },

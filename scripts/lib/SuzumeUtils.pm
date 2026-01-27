@@ -165,6 +165,23 @@ my %PARTICLE_CORRECTIONS = (
     'って' => 'Particle',
 );
 
+# Helper: check if a katakana string is an onomatopoeia
+# Patterns: reduplicated (ワンワン), elongated (ニャーニャー), mora-repetition
+sub _is_katakana_onomatopoeia {
+    my ($surface) = @_;
+    # Simple reduplication: first half == second half (ワンワン, ガタガタ)
+    my $len = length($surface);
+    if ($len >= 4 && $len % 2 == 0) {
+        my $half = $len / 2;
+        return 1 if substr($surface, 0, $half) eq substr($surface, $half);
+    }
+    # Reduplication with elongation (ニャーニャー): first half with ー == second half with ー
+    if ($surface =~ /^(.+ー)\1$/) {
+        return 1;
+    }
+    return 0;
+}
+
 # =============================================================================
 # MeCab Interface
 # =============================================================================
@@ -1023,6 +1040,115 @@ sub map_mecab_pos {
             return 'Adverb';
         }
 
+        # そう (指示詞): MeCab classifies as 副詞 but Suzume treats as ナ形容詞
+        # そうだ, そうです, そうじゃ etc. → Adjective (na-adjective stem)
+        if ($surface eq 'そう' && $pos eq '副詞') {
+            return 'Adjective';
+        }
+
+        # 皆/みんな/某/あなた/あんた/拙者/我輩: MeCab classifies as 名詞 but Suzume treats as Pronoun
+        if (($surface eq '皆' || $surface eq 'みんな' || $surface eq 'みな' || $surface eq '某'
+             || $surface eq 'あなた' || $surface eq 'あんた' || $surface eq '拙者' || $surface eq '我輩') && $pos eq '名詞') {
+            return 'Pronoun';
+        }
+
+        # なん: MeCab classifies as 代名詞 but Suzume treats as Noun
+        if ($surface eq 'なん' && $pos eq '名詞' && $pos_sub1 eq '代名詞') {
+            return 'Noun';
+        }
+
+        # にく (standalone hiragana): MeCab wrongly classifies as 形容詞 (stem of にくい)
+        # but standalone にく before particles is 肉 (meat) = Noun
+        if ($surface eq 'にく' && $pos eq '形容詞') {
+            $token->{lemma} = 'にく';
+            return 'Noun';
+        }
+
+        # ん: Suzume treats all ん as contraction of の (Particle, lemma=の)
+        # MeCab distinguishes: Noun (explanatory んだ), Auxiliary (negative ません)
+        # Normalize to match Suzume's analysis (valid simplification)
+        if ($surface eq 'ん' && ($pos eq '名詞' || $pos eq '助動詞')) {
+            $token->{lemma} = 'の';
+            return 'Particle';
+        }
+
+        # Katakana onomatopoeia → Adverb
+        # MeCab classifies as 名詞 but Suzume treats as Adverb
+        # Pattern: katakana reduplication (ワンワン, ニャーニャー, ガタガタ etc.)
+        if ($pos eq '名詞' && $surface =~ /^[\x{30A0}-\x{30FF}]{2,}$/ &&
+            _is_katakana_onomatopoeia($surface)) {
+            return 'Adverb';
+        }
+
+        # 違い: Suzume treats as Verb (連用形 of 違う), not Noun
+        if ($surface eq '違い' && $pos eq '名詞') {
+            $token->{lemma} = '違う';
+            return 'Verb';
+        }
+
+        # 時々: Suzume treats as Noun, not Adverb
+        if ($surface eq '時々' && $pos eq '副詞') {
+            return 'Noun';
+        }
+
+        # 推し: Suzume treats as Noun (modern usage), not Verb
+        if ($surface eq '推し' && $pos eq '動詞') {
+            $token->{lemma} = '推し';
+            return 'Noun';
+        }
+
+        # 寒し: Suzume treats as Noun (classical form), not Adjective
+        if ($surface eq '寒し' && $pos eq '形容詞') {
+            $token->{lemma} = '寒し';
+            return 'Noun';
+        }
+
+        # 超: Suzume treats as Noun (colloquial prefix), not Prefix
+        if ($surface eq '超' && $pos eq '接頭詞') {
+            return 'Noun';
+        }
+
+        # びっくり: Suzume treats as Adverb, not Noun
+        if ($surface eq 'びっくり' && $pos eq '名詞') {
+            return 'Adverb';
+        }
+
+        # なんて: Suzume treats as Particle, not Adverb
+        if ($surface eq 'なんて' && $pos eq '副詞') {
+            return 'Particle';
+        }
+
+        # いわば: Suzume treats as Conjunction, not Adverb
+        if ($surface eq 'いわば' && $pos eq '副詞') {
+            $token->{lemma} = '言わば';
+            return 'Conjunction';
+        }
+
+        # ふっくら: Suzume treats as Other (unknown), not Adverb
+        if ($surface eq 'ふっくら' && $pos eq '副詞') {
+            return 'Other';
+        }
+
+        # 刻々/堂々等の畳語副詞: Suzume treats as Noun
+        if ($surface =~ /^(.)\1$/ && $pos eq '副詞') {
+            return 'Noun';
+        }
+
+        # 引き続き: Suzume treats as Verb, not Adverb
+        if ($surface eq '引き続き' && $pos eq '副詞') {
+            return 'Verb';
+        }
+
+        # むしろ: Suzume treats as Other (unknown), not Adverb
+        if ($surface eq 'むしろ' && $pos eq '副詞') {
+            return 'Other';
+        }
+
+        # 何時: Suzume treats as Noun, not Pronoun
+        if ($surface eq '何時' && $pos eq '名詞' && $pos_sub1 eq '代名詞') {
+            return 'Noun';
+        }
+
         # Interjection overrides
         if ($surface eq 'お疲れ様') {
             return 'Interjection';
@@ -1061,12 +1187,28 @@ sub map_mecab_pos {
         }
 
         # 動詞,非自立 → Auxiliary (subsidiary verbs: いる, ある, くる, いく, etc.)
-        # Exception: すぎる stays as Verb (補助動詞 is grammatically a verb)
-        # Exception: くださる stays as Verb (polite request verb, Suzume treats as VERB)
+        # Exceptions: verbs that Suzume correctly classifies as VERB
         if ($pos eq '動詞' && $pos_sub1 eq '非自立') {
             my $lemma = $token->{lemma} // '';
             return 'Verb' if $lemma eq 'すぎる';   # すぎる is subsidiary verb, not auxiliary
             return 'Verb' if $lemma eq 'くださる'; # ください is polite request verb
+            return 'Verb' if $lemma eq 'いたす';   # いたす is humble verb (VERB in Suzume)
+            return 'Verb' if $lemma eq 'あげる';   # てあげる benefit verb (VERB in Suzume)
+            return 'Verb' if $lemma eq 'くれる';   # てくれる benefit verb (VERB in Suzume)
+            return 'Verb' if $lemma eq 'もらう';   # てもらう benefit verb (VERB in Suzume)
+            return 'Verb' if $lemma eq '始める';   # compound verb suffix (VERB in Suzume)
+            return 'Verb' if $lemma eq '続ける';   # compound verb suffix (VERB in Suzume)
+            return 'Verb' if $lemma eq '終わる';   # compound verb suffix (VERB in Suzume)
+            return 'Verb' if $lemma eq '出す';     # compound verb suffix (VERB in Suzume)
+            return 'Verb' if $lemma eq '直す';     # compound verb suffix (VERB in Suzume)
+            return 'Verb' if $lemma eq '合う';     # compound verb suffix (VERB in Suzume)
+            return 'Verb' if $lemma eq '込む';     # compound verb suffix (VERB in Suzume)
+            return 'Verb' if $lemma eq 'いく';     # ていく aspect (VERB in Suzume)
+            # くる/おく/みる: Suzume treats as Auxiliary after て-form
+            return 'Verb' if $lemma eq 'ほしい';   # てほしい desire (VERB in Suzume)
+            return 'Verb' if $lemma eq 'いただく'; # ていただく humble receive (VERB in Suzume)
+            # しまう: Suzume treats as Auxiliary (not Verb override)
+            return 'Verb' if $lemma eq 'いらっしゃる'; # honorific verb (VERB in Suzume)
             return 'Auxiliary';
         }
 
@@ -1083,7 +1225,10 @@ sub map_mecab_pos {
 
         # 名詞,形容動詞語幹 → Adjective (e.g., 好き, 静か, 綺麗)
         # Suzume treats na-adjective stems as Adjective, not Noun
+        # Exception: some words Suzume keeps as Noun despite 形容動詞語幹 classification
+        my %keep_as_noun_not_adj = ('マジ' => 1, '妙' => 1, '必要' => 1, '不安' => 1, '不要' => 1, '乙' => 1, '元気' => 1, '不便' => 1, '公式' => 1, '無鉄砲' => 1);
         if ($pos eq '名詞' && $pos_sub1 eq '形容動詞語幹') {
+            return 'Noun' if $keep_as_noun_not_adj{$surface};
             return 'Adjective';
         }
 
@@ -1098,6 +1243,12 @@ sub map_mecab_pos {
         # MeCab classifies nominalizer の as 名詞,非自立 but Suzume treats it as Particle
         if ($surface eq 'の' && $pos eq '名詞' && $pos_sub1 eq '非自立') {
             return 'Particle';
+        }
+
+        # 名詞,接尾 exceptions: 様/末/ごろ → Noun (Suzume treats as plain Noun, not Suffix)
+        my %suffix_as_noun = ('様' => 1, '末' => 1, 'ごろ' => 1, '行き' => 1);
+        if ($pos eq '名詞' && $pos_sub1 eq '接尾' && $suffix_as_noun{$surface}) {
+            return 'Noun';
         }
 
         # 名詞,接尾 → Suffix (e.g., たち, さん, 的, さ)
@@ -1170,6 +1321,7 @@ sub normalize_pos {
     # These override MeCab's classification to match Suzume's implementation
     my %suzume_override = (
         'Adnominal' => 'Determiner',  # 連体詞: MeCab=Adnominal, Suzume=Determiner
+        'Filler'    => 'Other',        # フィラー: Suzume has no Filler POS
         # Pronoun is kept as-is (Suzume now supports pronouns)
     );
 
@@ -1350,7 +1502,7 @@ sub get_mecab_tokens {
         push @tokens, {
             surface => $t->{surface},
             pos     => map_mecab_pos($t),
-            lemma   => $t->{lemma} // $t->{surface},
+            lemma   => ($t->{lemma} && $t->{lemma} ne '*') ? $t->{lemma} : $t->{surface},
         };
     }
 
@@ -1388,7 +1540,7 @@ sub get_expected_tokens {
         push @tokens, {
             surface => $t->{surface},
             pos     => $pos,
-            lemma   => $t->{lemma} // $t->{surface},
+            lemma   => ($t->{lemma} && $t->{lemma} ne '*') ? $t->{lemma} : $t->{surface},
         };
     }
 

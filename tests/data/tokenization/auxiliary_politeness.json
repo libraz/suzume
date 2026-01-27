@@ -154,7 +154,7 @@
           "surface" : "嬢"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Noun",
           "surface" : "様"
         },
         {
@@ -413,7 +413,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いたし"
         },
         {
@@ -432,7 +432,7 @@
       "description" : "なんし - kuruwa-kotoba polite auxiliary (archaic courtesan speech)",
       "expected" : [
         {
-          "pos" : "Pronoun",
+          "pos" : "Noun",
           "surface" : "なん"
         },
         {

@@ -149,8 +149,7 @@
           "surface" : "は"
         },
         {
-          "lemma" : "寒い",
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "寒し"
         }
       ],
@@ -171,7 +170,8 @@
           "surface" : "くだら"
         },
         {
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         },
         {

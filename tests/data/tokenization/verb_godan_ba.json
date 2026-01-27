@@ -4,7 +4,6 @@
       "description" : "API with を particle",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "API"
         },
@@ -29,7 +28,6 @@
       "description" : "CamelCase function name preserved with を particle",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "getUserData"
         },

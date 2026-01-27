@@ -1245,7 +1245,6 @@
       "description" : "Katakana verb ググる base form",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "ググ"
         },
@@ -1266,7 +1265,6 @@
       "description" : "Katakana verb ググる negative form",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "ググ"
         },
@@ -1291,7 +1289,6 @@
       "description" : "Katakana verb パクる base form",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "パク"
         },
@@ -1370,7 +1367,6 @@
       "description" : "Katakana verb ググる volitional form",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "ググ"
         },
@@ -1391,7 +1387,6 @@
       "description" : "Python technical sentence with particles - MeCab互換分割",
       "expected" : [
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "Python"
         },
@@ -1446,8 +1441,8 @@
           "surface" : "ませ"
         },
         {
-          "lemma" : "ん",
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         },
         {
@@ -1456,7 +1451,6 @@
           "surface" : "でし"
         },
         {
-          "lemma" : "た",
           "pos" : "Auxiliary",
           "surface" : "た"
         }

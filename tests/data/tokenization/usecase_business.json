@@ -117,7 +117,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いたし"
         },
         {
@@ -149,7 +149,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いたし"
         },
         {
@@ -217,7 +217,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いたし"
         },
         {
@@ -312,7 +312,8 @@
           "surface" : "ませ"
         },
         {
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         },
         {
@@ -432,7 +433,6 @@
           "surface" : "株式会社"
         },
         {
-          "lemma" : "*",
           "pos" : "Noun",
           "surface" : "ABC"
         },
@@ -445,7 +445,7 @@
           "surface" : "田中"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Noun",
           "surface" : "様"
         }
       ],
@@ -491,7 +491,7 @@
           "surface" : "今月"
         },
         {
-          "pos" : "Suffix",
+          "pos" : "Noun",
           "surface" : "末"
         },
         {
@@ -938,7 +938,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いたし"
         },
         {
@@ -1081,7 +1081,7 @@
           "surface" : "は"
         },
         {
-          "pos" : "Adjective",
+          "pos" : "Noun",
           "surface" : "乙"
         },
         {
@@ -1275,7 +1275,8 @@
           "surface" : "ませ"
         },
         {
-          "pos" : "Auxiliary",
+          "lemma" : "の",
+          "pos" : "Particle",
           "surface" : "ん"
         },
         {
@@ -1371,7 +1372,7 @@
         },
         {
           "lemma" : "いただく",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いただき"
         },
         {
@@ -1443,7 +1444,7 @@
         },
         {
           "lemma" : "いたす",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "いたし"
         },
         {
