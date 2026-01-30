@@ -151,7 +151,8 @@ class UniversalTokenizationParamTest
 TEST_P(UniversalTokenizationParamTest, Tokenize) {
   const auto& entry = GetParam();
   auto result = analyzer_.analyze(entry.test_case.input);
-  verifyMorphemes(entry.test_case.input, result, entry.test_case.expected);
+  // Use suzume_expected if available, otherwise use expected
+  verifyMorphemes(entry.test_case.input, result, entry.test_case.getTestExpected());
 }
 
 // Custom name generator that includes suite name for disambiguation

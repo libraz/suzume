@@ -584,6 +584,10 @@ BigramTable::initTable() {
   // ParticleFinal → ParticleFinal (よ+ね) - minor bonus (common pattern)
   setCell(t, EPOS::ParticleFinal, EPOS::ParticleFinal, cost::kMinorBonus);
 
+  // ParticleFinal → ParticleNo (か+の) - moderate bonus (indefinite pronoun pattern)
+  // いくつかの, 何かの, 誰かの, どれかの - か functions as indefinite marker, not sentence-ender
+  setCell(t, EPOS::ParticleFinal, EPOS::ParticleNo, cost::kModerateBonus);
+
   // =========================================================================
   // Copula → Negation (ではない pattern)
   // =========================================================================
@@ -617,6 +621,11 @@ BigramTable::initTable() {
   // Other → AuxAppearanceSou - penalty (様態そう shouldn't appear at BOS)
   // At sentence start, そう should be demonstrative na-adjective, not appearance aux
   setCell(t, EPOS::Other, EPOS::AuxAppearanceSou, cost::kMinor);
+
+  // Other → AuxAspectIku - penalty (いく as aspect aux shouldn't appear at BOS)
+  // At sentence start, いく should be verb (行く) or part of pronoun (いくつ)
+  // AuxAspectIku is only valid after て-form (食べていく, 走っていく)
+  setCell(t, EPOS::Other, EPOS::AuxAspectIku, cost::kRare);
 
   // Particle → AuxAppearanceSou - penalty (様態そう shouldn't follow particles)
   // E.g., そうかもしれません: そう is demonstrative, not appearance auxiliary
@@ -737,6 +746,12 @@ BigramTable::initTable() {
   // so CONJ path serves as fallback for demo+verb patterns
   setCell(t, EPOS::Conjunction, EPOS::VerbShuushikei, cost::kStrongBonus);
   setCell(t, EPOS::Conjunction, EPOS::VerbRenyokei, cost::kStrongBonus);
+
+  // Conjunction → Adjective: strong bonus (でも高い, それでも安い)
+  // Adjectives after conjunctions are natural; without this, VERB candidates win
+  setCell(t, EPOS::Conjunction, EPOS::AdjBasic, cost::kStrongBonus);
+  setCell(t, EPOS::Conjunction, EPOS::AdjStem, cost::kStrongBonus);
+  setCell(t, EPOS::Conjunction, EPOS::AdjRenyokei, cost::kStrongBonus);
 
   // =========================================================================
   // Interjection connections

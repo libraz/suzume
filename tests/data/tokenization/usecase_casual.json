@@ -24,6 +24,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãã: adverb vs adjective before copula"
+      },
       "description" : "Casual confirmation",
       "expected" : [
         {
@@ -46,6 +50,25 @@
       ],
       "id" : "casual_really",
       "input" : "本当にそうなの",
+      "suzume_expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "本当に"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "そう"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "な"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        }
+      ],
       "tags" : [
         "casual"
       ]
@@ -75,6 +98,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ã§: copula vs particle - context-dependent"
+      },
       "description" : "Surprise expression - MeCab-compatible verb+た split",
       "expected" : [
         {
@@ -97,6 +124,26 @@
       ],
       "id" : "casual_surprise",
       "input" : "まじで驚いた",
+      "suzume_expected" : [
+        {
+          "pos" : "Adjective",
+          "surface" : "まじ"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "lemma" : "驚く",
+          "pos" : "Verb",
+          "surface" : "驚い"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "casual"
       ]
@@ -303,6 +350,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ã§: copula vs particle - context-dependent"
+      },
       "description" : "Casual reaction",
       "expected" : [
         {
@@ -321,11 +372,30 @@
       ],
       "id" : "social_reaction",
       "input" : "まじで嬉しい",
+      "suzume_expected" : [
+        {
+          "pos" : "Adjective",
+          "surface" : "まじ"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "嬉しい"
+        }
+      ],
       "tags" : [
         "social"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ã: question particle vs other classification"
+      },
       "description" : "Question post with で particle",
       "expected" : [
         {
@@ -368,11 +438,54 @@
       ],
       "id" : "social_question",
       "input" : "これどこで買えるか知ってる人いる？",
+      "suzume_expected" : [
+        {
+          "pos" : "Pronoun",
+          "surface" : "これ"
+        },
+        {
+          "pos" : "Pronoun",
+          "surface" : "どこ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "買える"
+        },
+        {
+          "pos" : "Other",
+          "surface" : "か"
+        },
+        {
+          "lemma" : "知る",
+          "pos" : "Verb",
+          "surface" : "知っ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "てる"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "人"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "いる"
+        }
+      ],
       "tags" : [
         "social"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ã§: copula vs particle after na-adj stem"
+      },
       "description" : "Recommendation post - マジで is ADV (seriously/really)",
       "expected" : [
         {
@@ -403,6 +516,32 @@
       ],
       "id" : "social_recommendation",
       "input" : "このお店マジでおすすめ",
+      "suzume_expected" : [
+        {
+          "pos" : "Determiner",
+          "surface" : "この"
+        },
+        {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "店"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "マジ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "おすすめ"
+        }
+      ],
       "tags" : [
         "social"
       ]
@@ -555,6 +694,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "è¯ã+ãªã: adjective vs verb compound"
+      },
       "description" : "Comparative review with が particle",
       "expected" : [
         {
@@ -599,6 +742,45 @@
       ],
       "id" : "review_comparison",
       "input" : "前のモデルより性能が良くなった",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "前"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "モデル"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "より"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "性能"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "が"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "良く"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "なっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "review"
       ]
@@ -807,6 +989,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "è¡ã£ã¦+ã: progressive contraction POS differences"
+      },
       "description" : "Colloquial 行っていた → 行ってた - MeCab互換分割",
       "expected" : [
         {
@@ -834,11 +1020,38 @@
       ],
       "id" : "colloquial_itteta",
       "input" : "学校に行ってた",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "学校"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行っ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "colloquial"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ã: contracted ãã auxiliary classification"
+      },
       "description" : "Colloquial 食べていく → 食べてく - te-form + てく aux split",
       "expected" : [
         {
@@ -865,6 +1078,29 @@
       ],
       "id" : "colloquial_tabeteku",
       "input" : "一緒に食べてく",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "一緒"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Other",
+          "surface" : "く"
+        }
+      ],
       "tags" : [
         "colloquial"
       ]

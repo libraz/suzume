@@ -720,6 +720,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               utf8::endsWith(surface, "らしかっ")) {
             base_cost += 1.5F;  // Penalize to favor split path
           }
+          // Penalty for verb candidates ending with passive+te form (〜まれて/〜られて)
+          // MeCab splits compound verb passive+te: 読み込まれて → 読み込ま|れ|て
+          // E.g., 読み込まれていない = 読み込ま + れ + て + い + ない
+          if (utf8::endsWith(surface, "まれて") || utf8::endsWith(surface, "まれた") ||
+              utf8::endsWith(surface, "られて") || utf8::endsWith(surface, "られた")) {
+            base_cost += 2.0F;  // Penalize to favor split path
+          }
           // Set has_suffix to skip exceeds_dict_length penalty in tokenizer.cpp
           // This applies when:
           // 1. Base form exists in dictionary as verb (in_dict)
@@ -758,6 +765,45 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                        best.verb_type == grammar::VerbType::GodanGa) {
               verb_epos = core::ExtendedPOS::VerbOnbinkei;
             }
+          }
+          // Skip if surface is registered as NOUN in dictionary
+          // This prevents nominalized verb forms (思い, 間違い, 戦い, 願い) from
+          // being tokenized as VERB when they are explicitly registered as nouns
+          // This check applies to godan-wa renyokei forms (ending in い)
+          bool skip_godan_wa_renyokei = false;
+          if (verb_epos == core::ExtendedPOS::VerbRenyokei && dict_manager != nullptr) {
+            auto results = dict_manager->lookup(surface, 0);
+            for (const auto& result : results) {
+              if (result.entry != nullptr &&
+                  result.entry->pos == core::PartOfSpeech::Noun) {
+                skip_godan_wa_renyokei = true;
+                SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict NOUN, skipping godan-wa renyokei\n");
+                break;
+              }
+            }
+          }
+          if (skip_godan_wa_renyokei) {
+            continue;  // Skip this candidate, use dictionary NOUN instead
+          }
+          // Skip ichidan ta-form if stem is registered as NOUN in dictionary
+          // e.g., 感じた → stem 感じ is dict NOUN, so skip (prefer 感じ(NOUN) + た(AUX))
+          // This prevents nominalized verb renyokei forms from appearing as conjugated verbs
+          bool skip_ichidan_ta = false;
+          if (best.verb_type == grammar::VerbType::Ichidan && dict_manager != nullptr &&
+              !best.stem.empty()) {
+            // The stem for ichidan ta-form is the renyokei (e.g., 感じ for 感じた)
+            auto stem_results = dict_manager->lookup(best.stem, 0);
+            for (const auto& result : stem_results) {
+              if (result.entry != nullptr &&
+                  result.entry->pos == core::PartOfSpeech::Noun) {
+                skip_ichidan_ta = true;
+                SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" stem \"" << best.stem << "\" is dict NOUN, skipping ichidan ta-form\n");
+                break;
+              }
+            }
+          }
+          if (skip_ichidan_ta) {
+            continue;  // Skip this candidate, prefer NOUN + た split
           }
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
@@ -839,7 +885,22 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         //   while avoiding too many false positives
         bool is_i_row = grammar::isIRowCodepoint(first_hira);
         float conf_threshold = is_i_row ? verb_opts.confidence_ichidan_dict : verb_opts.confidence_ichidan_dict;
-        if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold) {
+        // Skip if surface is registered as NOUN in dictionary
+        // This prevents nominalized verb forms (売り上げ, 楽しみ, 晴れ) from being tokenized as VERB
+        // when they are explicitly registered as nouns
+        bool surface_is_dict_noun = false;
+        if (dict_manager != nullptr) {
+          auto results = dict_manager->lookup(surface, 0);
+          for (const auto& result : results) {
+            if (result.entry != nullptr &&
+                result.entry->pos == core::PartOfSpeech::Noun) {
+              surface_is_dict_noun = true;
+              SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict NOUN, skipping ichidan_renyokei\n");
+              break;
+            }
+          }
+        }
+        if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold && !surface_is_dict_noun) {
           // Negative cost to strongly favor split over combined analysis
           // Combined forms get optimal_length bonus (-0.5), so we need to be lower
           float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_cand.confidence) * verb_opts.confidence_cost_scale_small;
@@ -1538,7 +1599,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   //       始まらない → 始まら (mizenkei of 始まる) + ない
   // These are Godan verbs where the okurigana includes 2+ hiragana before the A-row ending
   if (kanji_end < hiragana_end && hiragana_end >= kanji_end + 3) {
-    // Look for A-row hiragana + negative patterns (ない or なかっ)
+    // Look for A-row hiragana + negative patterns (ない, なかっ, or ん)
     for (size_t scan_pos = kanji_end + 1; scan_pos < hiragana_end - 1; ++scan_pos) {
       char32_t cur_char = codepoints[scan_pos];
       char32_t next_char = codepoints[scan_pos + 1];
@@ -1548,7 +1609,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       bool is_nakatt_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'な' &&
           scan_pos + 3 < codepoints.size() && codepoints[scan_pos + 2] == U'か' &&
           codepoints[scan_pos + 3] == U'っ';
-      if (is_nai_pattern || is_nakatt_pattern) {
+      // Check for contracted negative ん pattern (分からん, 始まらん)
+      // ん must be at the end of the string (hiragana_end == scan_pos + 2)
+      bool is_n_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'ん' &&
+          scan_pos + 2 == hiragana_end;
+      if (is_nai_pattern || is_nakatt_pattern || is_n_pattern) {
         // Found A-row + negative pattern at scan_pos
         // The mizenkei would be from start_pos to scan_pos + 1
         size_t multi_miz_end = scan_pos + 1;
@@ -1570,7 +1635,9 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             if (is_valid_verb) {
               std::string surface = extractSubstring(codepoints, start_pos, multi_miz_end);
               constexpr float kCost = -0.5F;  // Same as other negative patterns
-              const char* pattern = is_nakatt_pattern ? "multi_mizenkei_nakatt" : "multi_mizenkei_nai";
+              const char* pattern = is_nakatt_pattern ? "multi_mizenkei_nakatt" :
+                                    is_n_pattern ? "multi_mizenkei_n" :
+                                    "multi_mizenkei_nai";
               SUZUME_DEBUG_VERBOSE_BLOCK {
                 SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                     << " " << pattern << " lemma=" << base_form

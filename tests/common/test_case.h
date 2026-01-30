@@ -20,16 +20,35 @@ struct ExpectedMorpheme {
   core::PartOfSpeech posEnum() const;
 };
 
+// Accepted difference metadata for cases where Suzume differs from MeCab
+struct AcceptedDiff {
+  std::string reason;    // Why this difference is accepted
+  std::string category;  // Category of difference (e.g., "pos-limitation", "lemma-diff")
+};
+
 // A single test case
 struct TestCase {
   std::string id;                           // Unique identifier
   std::string input;                        // Input text to analyze
-  std::vector<ExpectedMorpheme> expected;   // Expected morphemes
+  std::vector<ExpectedMorpheme> expected;   // Expected morphemes (MeCab-compatible)
+  std::vector<ExpectedMorpheme> suzume_expected;  // Suzume's expected output (if different)
+  AcceptedDiff accepted_diff;               // Reason for accepted difference
   std::vector<std::string> tags;            // Tags for filtering (e.g., "verb", "basic")
   std::string description;                  // Optional description
 
   // Check if this test case has a specific tag
   bool hasTag(const std::string& tag) const;
+
+  // Get the expected morphemes to use for testing
+  // Returns suzume_expected if non-empty, otherwise expected
+  const std::vector<ExpectedMorpheme>& getTestExpected() const {
+    return suzume_expected.empty() ? expected : suzume_expected;
+  }
+
+  // Check if this test case has an accepted difference
+  bool hasAcceptedDiff() const {
+    return !suzume_expected.empty();
+  }
 };
 
 // Collection of test cases

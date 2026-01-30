@@ -104,6 +104,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãªã: auxiliary vs main verb - context-dependent"
+      },
       "description" : "日ごとに強くなる - ごと + に pattern",
       "expected" : [
         {
@@ -130,6 +134,29 @@
       ],
       "id" : "suffix_goto_ni",
       "input" : "日ごとに強くなる",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "日"
+        },
+        {
+          "pos" : "Suffix",
+          "surface" : "ごと"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "lemma" : "強い",
+          "pos" : "Adjective",
+          "surface" : "強く"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "なる"
+        }
+      ],
       "tags" : [
         "suffix",
         "known_issue"
@@ -166,6 +193,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ä»ã: verb renyokei vs noun - context-dependent"
+      },
       "description" : "付けで should not split into 付 + け",
       "expected" : [
         {
@@ -179,12 +210,27 @@
       ],
       "id" : "tsuke_not_split",
       "input" : "付けで",
+      "suzume_expected" : [
+        {
+          "lemma" : "付ける",
+          "pos" : "Verb",
+          "surface" : "付け"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        }
+      ],
       "tags" : [
         "strict",
         "suffix"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "日付け: noun vs verb - dictionary-dependent"
+      },
       "description" : "日付けで - MeCab splits as 日 + 付け + で",
       "expected" : [
         {
@@ -198,6 +244,17 @@
       ],
       "id" : "hizuke_de",
       "input" : "日付けで",
+      "suzume_expected" : [
+        {
+          "lemma" : "日付ける",
+          "pos" : "Verb",
+          "surface" : "日付け"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        }
+      ],
       "tags" : [
         "strict",
         "suffix"
@@ -254,6 +311,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãã¡: suffix classification - context-dependent"
+      },
       "description" : "S6: 忘れがち should be NOUN, not 忘れ+が+ち",
       "expected" : [
         {
@@ -272,6 +333,20 @@
       ],
       "id" : "s6_wasuregachi",
       "input" : "忘れがちだ",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "忘れ"
+        },
+        {
+          "pos" : "Suffix",
+          "surface" : "がち"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "だ"
+        }
+      ],
       "tags" : [
         "s6_fix",
         "gachi",

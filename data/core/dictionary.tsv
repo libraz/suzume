@@ -263,7 +263,6 @@
 いったい	ADVERB
 せめて	ADVERB
 しどろもどろ	ADVERB
-さすが	ADVERB
 すでに	ADVERB
 もし	ADVERB
 本当に	ADVERB
@@ -317,6 +316,7 @@
 がたり	ADVERB
 どさり	ADVERB
 ばたり	ADVERB
+さすが	ADVERB
 俄然	ADVERB
 
 # =============================================================================
@@ -392,8 +392,8 @@
 問う	VERB	GODAN_WA
 洗う	VERB	GODAN_WA
 交う	VERB	GODAN_WA
-間違う	VERB	GODAN_WA
 もらう	VERB	GODAN_WA
+間違う	VERB	GODAN_WA
 逢う	VERB	GODAN_WA
 見出す	VERB	GODAN_SA
 
@@ -460,7 +460,6 @@
 取り上げる	VERB	ICHIDAN
 # B60: あきらめる - split as あきら+める
 あきらめる	VERB	ICHIDAN
-得する	VERB	SURU
 する	VERB	SURU
 しれる	VERB	ICHIDAN
 すぎる	VERB	ICHIDAN
@@ -507,8 +506,9 @@
 撫でる	VERB	ICHIDAN
 ねる	VERB	ICHIDAN
 でる	VERB	ICHIDAN
-感じる	VERB	ICHIDAN
 飛び降りる	VERB	ICHIDAN
+感じる	VERB	ICHIDAN
+いる	VERB	ICHIDAN
 諦める	VERB	ICHIDAN
 
 # =============================================================================
@@ -731,6 +731,17 @@ Wi-Fi	NOUN
 文化	NOUN
 対	NOUN
 発行	NOUN
+ねえさん	NOUN
+かあさん	NOUN
+にいさん	NOUN
+とうさん	NOUN
+ばあさん	NOUN
+じいさん	NOUN
+おじさん	NOUN
+おばさん	NOUN
+楽しみ	NOUN
+思い	NOUN
+かし	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -752,6 +763,8 @@ Wi-Fi	NOUN
 ごろ	SUFFIX
 ヶ所	SUFFIX
 ヶ月	SUFFIX
+さん	SUFFIX
+さま	SUFFIX
 度	SUFFIX
 
 # --- Plural suffixes ---
@@ -928,3 +941,6 @@ Wi-Fi	NOUN
 
 
 でも	CONJUNCTION
+
+
+みんな	PRONOUN

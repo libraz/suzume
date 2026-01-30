@@ -158,6 +158,8 @@ my $brief = 0;
 my $stats_only = 0;
 my $grep_pattern = '';
 my $tsv_output = 0;
+my $diff_reason = '';
+my $diff_category = '';
 
 GetOptions(
     'f|file=s'        => \$test_file,
@@ -180,6 +182,8 @@ GetOptions(
     'stats'           => \$stats_only,
     'grep=s'          => \$grep_pattern,
     'tsv'             => \$tsv_output,
+    'reason=s'        => \$diff_reason,
+    'category=s'      => \$diff_category,
     'h|help'          => \$help,
 ) or die "Error in command line arguments\n";
 
@@ -224,9 +228,15 @@ Commands:
   suggest-file <input>   Suggest which test file for input
   replace-pos OLD NEW    Replace POS in all test files
   map-pos SURFACE OLD NEW Replace POS for specific surface only
+  accept-diff <input>    Accept Suzume output as valid (add suzume_expected)
+  accept-diff --all      Accept all failed tests (batch mode)
   list                   List all test files with case counts
   list-pos               List all POS values used in tests
   validate-ids           Detect/fix non-ASCII or duplicate IDs
+
+Accept-diff options:
+  --reason REASON        Reason for accepting the difference (required)
+  --category CATEGORY    Category: pos-limitation, lemma-diff, segmentation-diff
 
 Show options:
   -b, --brief            One-line compact output
@@ -265,6 +275,27 @@ sub get_expected_tokens_with_cli {
     }
 
     return get_expected_tokens($text);
+}
+
+# Get list of failed test inputs from test result file
+sub get_failed_inputs {
+    my ($test_output_file) = @_;
+
+    open my $fh, '<:utf8', $test_output_file or die "Cannot open $test_output_file: $!\n";
+    my @failures;
+    my $inp = '';
+    while (<$fh>) {
+        if (/Input:\s*(.+)/) { $inp = $1; }
+        elsif (/FAILED.*Tokenize\/([^,]+)/) {
+            push @failures, $inp if $inp ne '';
+            $inp = '';
+        }
+    }
+    close $fh;
+
+    # Remove duplicates while preserving order
+    my %seen;
+    return grep { !$seen{$_}++ } @failures;
 }
 
 # Detect segmentation failure pattern by comparing correct vs suzume tokenization
@@ -1264,6 +1295,98 @@ if ($command eq 'needs-suzume-update') {
     }
 
     print "\n✓ Updated ", scalar(@needs_update), " test cases\n";
+    exit 0;
+}
+
+if ($command eq 'accept-diff') {
+    # Accept Suzume's output as valid by adding suzume_expected field
+    # This keeps MeCab-compatible expected for reference
+    die "Usage: $0 accept-diff <input> --reason <reason> [--category <category>]\n" .
+        "   or: $0 accept-diff --all --reason <reason> [--category <category>]\n"
+        unless ($input || $analyze_all) && $diff_reason;
+
+    $diff_category ||= 'pos-limitation';  # Default category
+
+    my $suzume_cli = "$project_root/build/bin/suzume-cli";
+    die "Suzume CLI not found: $suzume_cli\n" unless -x $suzume_cli;
+
+    my @to_update;
+
+    if ($analyze_all) {
+        # Process all failed tests
+        my $test_result_file = '/tmp/test.txt';
+        die "Test result file not found: $test_result_file\n" unless -f $test_result_file;
+
+        my @failed_inputs = get_failed_inputs($test_result_file);
+        print "Processing ", scalar(@failed_inputs), " failed tests...\n\n";
+
+        for my $inp (@failed_inputs) {
+            my $found = find_test_by_input($inp);
+            next unless $found;
+
+            # Skip if already has suzume_expected
+            next if $found->{case}{suzume_expected};
+
+            push @to_update, { input => $inp, found => $found };
+        }
+    } else {
+        my $found = find_test_by_input($input);
+        die "No test found for input: $input\n" unless $found;
+
+        # Skip if already has suzume_expected
+        if ($found->{case}{suzume_expected}) {
+            print "Test already has suzume_expected: $found->{basename}/$found->{index}\n";
+            exit 0;
+        }
+
+        push @to_update, { input => $input, found => $found };
+    }
+
+    if (!@to_update) {
+        print "No tests to update.\n";
+        exit 0;
+    }
+
+    print "Will add suzume_expected to ", scalar(@to_update), " test(s)\n";
+    print "Reason: $diff_reason\n";
+    print "Category: $diff_category\n\n";
+
+    my $json = JSON::PP->new->utf8(0)->pretty->canonical;
+
+    for my $item (@to_update) {
+        my $inp = $item->{input};
+        my $found = $item->{found};
+
+        # Get Suzume's output
+        my $suzume_tokens = get_suzume_tokens_full($suzume_cli, $inp);
+        my $suzume_expected = format_expected($suzume_tokens);
+
+        print "[$found->{basename}/$found->{index}] $inp\n";
+        print "  MeCab expected: ", join("|", map { $_->{surface} } @{$found->{case}{expected}}), "\n";
+        print "  Suzume expected: ", join("|", map { $_->{surface} } @$suzume_expected), "\n";
+
+        if ($dry_run) {
+            print "  [DRY-RUN] Would add suzume_expected\n\n";
+            next;
+        }
+
+        # Update the case
+        my $cases_key = exists $found->{data}{cases} ? 'cases' : 'test_cases';
+        $found->{data}{$cases_key}[$found->{index}]{suzume_expected} = $suzume_expected;
+        $found->{data}{$cases_key}[$found->{index}]{accepted_diff} = {
+            reason => $diff_reason,
+            category => $diff_category,
+        };
+
+        save_json($found->{file}, $found->{data});
+        print "  ✓ Updated\n\n";
+    }
+
+    if ($dry_run) {
+        print "[DRY-RUN] Use without --dry-run to apply changes.\n";
+    } else {
+        print "✓ Updated ", scalar(@to_update), " test cases\n";
+    }
     exit 0;
 }
 

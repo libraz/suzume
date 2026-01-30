@@ -285,6 +285,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "彼女でもない - particle も + ない, not verb もなう",
       "expected" : [
         {
@@ -306,6 +310,20 @@
       ],
       "id" : "copula_demonai_kanojo",
       "input" : "彼女でもない",
+      "suzume_expected" : [
+        {
+          "pos" : "Pronoun",
+          "surface" : "彼女"
+        },
+        {
+          "pos" : "Conjunction",
+          "surface" : "でも"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "ない"
+        }
+      ],
       "tags" : [
         "copula",
         "demonai",

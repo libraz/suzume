@@ -992,6 +992,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "Na-adjective rentaikei requires dictionary"
+      },
       "description" : "さすがな人 (attributive form) - MeCab-compatible lemma",
       "expected" : [
         {
@@ -1010,6 +1014,20 @@
       ],
       "id" : "na_sasugana_hito",
       "input" : "さすがな人",
+      "suzume_expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "さすが"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "な"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "人"
+        }
+      ],
       "tags" : [
         "grammar",
         "na-adjective",

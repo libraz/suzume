@@ -1168,6 +1168,12 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         if (utf8::endsWith(surface, "たい") && surface != "たい") {
           continue;  // Skip - should be split as verb renyokei + たい
         }
+        // Skip pure hiragana patterns ending with さ - these are almost always part of
+        // honorific suffix さん/さま, not i-adjective forms
+        // e.g., おじさ, おばさ, おねえさ should not be recognized as i-adjectives
+        if (utf8::endsWith(surface, "さ") && surface.size() >= 9) {  // 3+ chars ending with さ
+          continue;  // Skip - likely part of honorific suffix さん/さま
+        }
         // Base cost for hiragana i-adjective candidates
         // Use neutral base (0.0F) to avoid false positives like につい
         // which should be parsed as に(PARTICLE)+ついて(VERB)

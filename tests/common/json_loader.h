@@ -26,7 +26,9 @@ class JsonLoader {
   TestSuite parse();
   TestCase parseTestCase();
   ExpectedMorpheme parseMorpheme();
+  AcceptedDiff parseAcceptedDiff();
   std::vector<std::string> parseStringArray();
+  std::vector<ExpectedMorpheme> parseMorphemeArray();
   std::string parseString();
   void skipWhitespace();
   char peek();
@@ -124,16 +126,13 @@ inline TestCase JsonLoader::parseTestCase() {
       tc.tags = parseStringArray();
     } else if (tryKey("expected")) {
       expect(':');
-      skipWhitespace();
-      expect('[');
-      skipWhitespace();
-      while (peek() != ']') {
-        tc.expected.push_back(parseMorpheme());
-        skipWhitespace();
-        if (peek() == ',') consume();
-        skipWhitespace();
-      }
-      expect(']');
+      tc.expected = parseMorphemeArray();
+    } else if (tryKey("suzume_expected")) {
+      expect(':');
+      tc.suzume_expected = parseMorphemeArray();
+    } else if (tryKey("accepted_diff")) {
+      expect(':');
+      tc.accepted_diff = parseAcceptedDiff();
     } else {
       // Skip unknown key-value pair
       parseString();
@@ -145,6 +144,14 @@ inline TestCase JsonLoader::parseTestCase() {
         while (depth > 0 && pos_ < json_.size()) {
           if (peek() == '[') depth++;
           else if (peek() == ']') depth--;
+          consume();
+        }
+      } else if (peek() == '{') {
+        int depth = 1;
+        consume();
+        while (depth > 0 && pos_ < json_.size()) {
+          if (peek() == '{') depth++;
+          else if (peek() == '}') depth--;
           consume();
         }
       }
@@ -185,6 +192,48 @@ inline ExpectedMorpheme JsonLoader::parseMorpheme() {
   }
   expect('}');
   return mor;
+}
+
+inline std::vector<ExpectedMorpheme> JsonLoader::parseMorphemeArray() {
+  std::vector<ExpectedMorpheme> result;
+  skipWhitespace();
+  expect('[');
+  skipWhitespace();
+  while (peek() != ']') {
+    result.push_back(parseMorpheme());
+    skipWhitespace();
+    if (peek() == ',') consume();
+    skipWhitespace();
+  }
+  expect(']');
+  return result;
+}
+
+inline AcceptedDiff JsonLoader::parseAcceptedDiff() {
+  AcceptedDiff diff;
+  skipWhitespace();
+  expect('{');
+
+  while (peek() != '}') {
+    skipWhitespace();
+    if (tryKey("reason")) {
+      expect(':');
+      diff.reason = parseString();
+    } else if (tryKey("category")) {
+      expect(':');
+      diff.category = parseString();
+    } else {
+      // Skip unknown key-value
+      parseString();
+      expect(':');
+      parseString();
+    }
+    skipWhitespace();
+    if (peek() == ',') consume();
+    skipWhitespace();
+  }
+  expect('}');
+  return diff;
 }
 
 inline std::vector<std::string> JsonLoader::parseStringArray() {

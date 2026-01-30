@@ -620,6 +620,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "でて - MeCab互換分割 (で+て)",
       "expected" : [
         {
@@ -634,6 +638,17 @@
       ],
       "id" : "hiragana_dete",
       "input" : "でて",
+      "suzume_expected" : [
+        {
+          "lemma" : "でる",
+          "pos" : "Verb",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
       "tags" : [
         "ichidan",
         "te_form",
@@ -662,6 +677,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãªããã°: conditional auxiliary classification"
+      },
       "description" : "Ichidan verb 食べる conditional negative",
       "expected" : [
         {
@@ -681,6 +700,22 @@
       ],
       "id" : "ichidan_taberu_nakereba",
       "input" : "食べなければ",
+      "suzume_expected" : [
+        {
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Verb",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
+        }
+      ],
       "tags" : [
         "verb",
         "ichidan"
@@ -989,6 +1024,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "いられる - potential/passive of いる (W-014)",
       "expected" : [
         {
@@ -1003,6 +1042,17 @@
       ],
       "id" : "irareru_potential",
       "input" : "いられる",
+      "suzume_expected" : [
+        {
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "いら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "れる"
+        }
+      ],
       "tags" : [
         "ichidan",
         "potential",

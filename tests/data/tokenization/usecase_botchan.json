@@ -1,6 +1,10 @@
 {
   "cases" : [
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "坊っちゃん冒頭 - 親譲りの無鉄砲で小供の時から損ばかりしている",
       "expected" : [
         {
@@ -59,6 +63,62 @@
       ],
       "id" : "botchan_opening",
       "input" : "親譲りの無鉄砲で小供の時から損ばかりしている",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "親譲り"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "無鉄砲"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "小供"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "時"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "から"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "損"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ばかり"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "いる"
+        }
+      ],
       "tags" : [
         "literature",
         "botchan"

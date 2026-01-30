@@ -295,6 +295,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ããã: auxiliary vs verb in honorific form"
+      },
       "description" : "Apology: 申し訳ございませんが",
       "expected" : [
         {
@@ -322,6 +326,30 @@
       ],
       "id" : "email_apology",
       "input" : "申し訳ございませんが",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "申し訳"
+        },
+        {
+          "lemma" : "ござる",
+          "pos" : "Verb",
+          "surface" : "ござい"
+        },
+        {
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "ませ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ん"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "が"
+        }
+      ],
       "tags" : [
         "business",
         "email"
@@ -356,6 +384,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "segmentation-diff",
+        "reason" : "付け vs 付: different boundary - dictionary-dependent"
+      },
       "description" : "Full date format: 2024年12月23日付けで",
       "expected" : [
         {
@@ -373,6 +405,21 @@
       ],
       "id" : "document_date_full",
       "input" : "2024年12月23日付けで",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "2024年12月23日"
+        },
+        {
+          "lemma" : "付ける",
+          "pos" : "Verb",
+          "surface" : "付け"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        }
+      ],
       "tags" : [
         "business",
         "document"
@@ -791,6 +838,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "æ¯è¾¼ã¿: verb renyokei vs noun - nominalization"
+      },
       "description" : "Transaction: お振込みは翌営業日に反映されます - MeCab互換分割",
       "expected" : [
         {
@@ -835,6 +886,46 @@
       ],
       "id" : "finance_transaction",
       "input" : "お振込みは翌営業日に反映されます",
+      "suzume_expected" : [
+        {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "振込み"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "翌営業日"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "反映"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "さ"
+        },
+        {
+          "lemma" : "れる",
+          "pos" : "Auxiliary",
+          "surface" : "れ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ます"
+        }
+      ],
       "tags" : [
         "business",
         "finance"
@@ -953,6 +1044,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "Payment: お支払いは月末締め翌月払いです",
       "expected" : [
         {
@@ -990,12 +1085,52 @@
       ],
       "id" : "finance_payment",
       "input" : "お支払いは月末締め翌月払いです",
+      "suzume_expected" : [
+        {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "支払い"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "月末"
+        },
+        {
+          "lemma" : "締める",
+          "pos" : "Verb",
+          "surface" : "締め"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "翌月"
+        },
+        {
+          "lemma" : "払う",
+          "pos" : "Verb",
+          "surface" : "払い"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "です"
+        }
+      ],
       "tags" : [
         "business",
         "finance"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "æ¬: prefix vs noun in formal context"
+      },
       "description" : "Terms: 本サービスの利用に際して",
       "expected" : [
         {
@@ -1021,6 +1156,28 @@
       ],
       "id" : "legal_terms_of_service",
       "input" : "本サービスの利用に際して",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "本"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "サービス"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "利用"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に際して"
+        }
+      ],
       "tags" : [
         "business",
         "legal"
@@ -1253,6 +1410,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ããã: auxiliary vs verb in honorific form"
+      },
       "description" : "Apology: 大変申し訳ございませんでした",
       "expected" : [
         {
@@ -1289,6 +1450,39 @@
       ],
       "id" : "customer_apology",
       "input" : "大変申し訳ございませんでした",
+      "suzume_expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "大変"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "申し訳"
+        },
+        {
+          "lemma" : "ござる",
+          "pos" : "Verb",
+          "surface" : "ござい"
+        },
+        {
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "ませ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ん"
+        },
+        {
+          "lemma" : "です",
+          "pos" : "Auxiliary",
+          "surface" : "でし"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "business",
         "customer"

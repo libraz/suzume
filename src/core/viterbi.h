@@ -129,6 +129,12 @@ class Viterbi {
             if (edge.extended_pos == ExtendedPOS::AuxAppearanceSou) {
               conn_cost += 0.5F;  // Penalty for appearance aux at BOS
             }
+            // AuxAspectIku (いく aspect) should not appear at sentence start
+            // At BOS, いく should be verb (行く) or part of pronoun (いくつ)
+            // AuxAspectIku is only valid after て-form (食べていく, 走っていく)
+            if (edge.extended_pos == ExtendedPOS::AuxAspectIku) {
+              conn_cost += 1.0F;  // Penalty for aspect aux at BOS
+            }
           }
 
           // Small per-transition cost to prefer fewer morphemes (longer tokens)

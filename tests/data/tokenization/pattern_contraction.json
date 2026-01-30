@@ -66,6 +66,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ない: adjective vs auxiliary - context-dependent"
+      },
       "description" : "ないんだ - ない + んだ should not split as な + いん + だ",
       "expected" : [
         {
@@ -84,6 +88,21 @@
       ],
       "id" : "contracted_neg_nainda",
       "input" : "ないんだ",
+      "suzume_expected" : [
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        },
+        {
+          "lemma" : "の",
+          "pos" : "Particle",
+          "surface" : "ん"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "だ"
+        }
+      ],
       "tags" : [
         "contraction",
         "auxiliary",

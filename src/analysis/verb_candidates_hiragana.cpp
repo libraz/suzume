@@ -891,6 +891,7 @@ next_length:;  // Label for goto from particle-starting verb skip
   //       行かん → 行か (mizenkei of 行く) + ん (contracted negative)
   // MeCab splits: くだらん → くだら(動詞,五段,未然形) + ん(助動詞)
   // Pattern: A-row hiragana (mizenkei ending) + ん
+  // NOTE: Skip さ+ん pattern - さん/さま are honorific suffixes, not verb 未然形+ん
   for (size_t end_pos = hiragana_end; end_pos > start_pos + 1; --end_pos) {
     // Check if the string ends with ん at this position
     if (end_pos >= codepoints.size() || codepoints[end_pos] != U'ん') {
@@ -906,6 +907,12 @@ next_length:;  // Label for goto from particle-starting verb skip
       continue;
     }
 
+    // Skip さ+ん pattern - さん is almost always an honorific suffix, not verb 未然形+ん
+    // E.g., おねえさん, おかあさん, おじさん should not be parsed as verb + contracted negative
+    if (a_row_char == U'さ') {
+      continue;
+    }
+
     // Determine verb type from A-row character
     grammar::VerbType verb_type = grammar::VerbType::Unknown;
     std::string_view base_suffix;
@@ -913,7 +920,7 @@ next_length:;  // Label for goto from particle-starting verb skip
       case U'わ': verb_type = grammar::VerbType::GodanWa; base_suffix = "う"; break;
       case U'か': verb_type = grammar::VerbType::GodanKa; base_suffix = "く"; break;
       case U'が': verb_type = grammar::VerbType::GodanGa; base_suffix = "ぐ"; break;
-      case U'さ': verb_type = grammar::VerbType::GodanSa; base_suffix = "す"; break;
+      // case U'さ': skipped above - さん is honorific suffix
       case U'た': verb_type = grammar::VerbType::GodanTa; base_suffix = "つ"; break;
       case U'な': verb_type = grammar::VerbType::GodanNa; base_suffix = "ぬ"; break;
       case U'ば': verb_type = grammar::VerbType::GodanBa; base_suffix = "ぶ"; break;
@@ -927,23 +934,11 @@ next_length:;  // Label for goto from particle-starting verb skip
     std::string stem = extractSubstring(codepoints, start_pos, mizenkei_end - 1);
     std::string base_form = stem + std::string(base_suffix);
 
-    // Validate: analyze the full form (including ん) to check if it's a valid verb
-    // Since mizenkei alone may not be recognized, we check if (stem + ん) is recognized
-    // as a verb with the expected type
-    std::string full_form = mizenkei_surface + "ん";
-    auto analysis = inflection.analyze(full_form);
-    bool is_valid_verb = false;
-    for (const auto& cand : analysis) {
-      if (cand.verb_type == verb_type && cand.base_form == base_form) {
-        is_valid_verb = true;
-        break;
-      }
-    }
-
-    // Also check if base form exists in dictionary
-    if (!is_valid_verb) {
-      is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
-    }
+    // Validate: check if base form exists in dictionary
+    // The inflection analysis is too permissive and will match almost any input,
+    // so we require dictionary confirmation to avoid false positives
+    // like おねえさん → おねえさ + ん (おねえす is not a real verb)
+    bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
 
     // Minimum stem length check: need at least 2 chars in mizenkei to be meaningful
     // This prevents false positives like "かん" → "か" + "ん"
@@ -965,14 +960,17 @@ next_length:;  // Label for goto from particle-starting verb skip
     }
 
     // Generate mizenkei candidate with explicit VerbMizenkei EPOS for bigram connection
-    constexpr float kCost = -0.5F;  // Negative cost to beat unsplit form
+    // Use negative cost for valid verbs (to beat unsplit form)
+    // Use positive cost for unconfirmed verbs (long hiragana that might be verbs)
+    // This prevents false positives like おねえさん → おねえさ + ん
+    float cost = is_valid_verb ? -0.5F : 1.0F;
     SUZUME_DEBUG_VERBOSE_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << mizenkei_surface
                           << " hiragana_mizenkei_n lemma=" << lemma
-                          << " cost=" << kCost << "\n";
+                          << " cost=" << cost << "\n";
     }
     candidates.push_back(makeVerbCandidate(
-        mizenkei_surface, start_pos, mizenkei_end, kCost, lemma,
+        mizenkei_surface, start_pos, mizenkei_end, cost, lemma,
         grammar::verbTypeToConjType(verb_type),
         true, CandidateOrigin::VerbHiragana, 0.9F, "hiragana_mizenkei_n",
         core::ExtendedPOS::VerbMizenkei));

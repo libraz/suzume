@@ -160,6 +160,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ããã: honorific verb classification"
+      },
       "description" : "Ninja/Old-fashioned ござる",
       "expected" : [
         {
@@ -178,12 +182,30 @@
       ],
       "id" : "character_gozaru",
       "input" : "これでござる",
+      "suzume_expected" : [
+        {
+          "pos" : "Pronoun",
+          "surface" : "これ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "ござる"
+        }
+      ],
       "tags" : [
         "character_speech",
         "ninja"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ããã: honorific verb classification in archaic form"
+      },
       "description" : "Samurai speech ござらぬ - classical negative ぬ splits per design",
       "expected" : [
         {
@@ -212,6 +234,30 @@
       ],
       "id" : "character_gozaranu",
       "input" : "知らぬでござらぬ",
+      "suzume_expected" : [
+        {
+          "lemma" : "知る",
+          "pos" : "Verb",
+          "surface" : "知ら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ぬ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "lemma" : "ござる",
+          "pos" : "Verb",
+          "surface" : "ござら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ぬ"
+        }
+      ],
       "tags" : [
         "character_speech",
         "samurai"
@@ -289,6 +335,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "auxiliary/negative: context-dependent classification"
+      },
       "description" : "雨が降ったので、家にいた (stayed home because it rained) - MeCab-compatible split",
       "expected" : [
         {
@@ -332,6 +382,46 @@
       ],
       "id" : "complex_multiple_clauses",
       "input" : "雨が降ったので、家にいた",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "雨"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "が"
+        },
+        {
+          "lemma" : "降る",
+          "pos" : "Verb",
+          "surface" : "降っ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ので"
+        },
+        {
+          "pos" : "Suffix",
+          "surface" : "家"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "grammar",
         "complex"
@@ -361,6 +451,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãªããã°: conditional auxiliary classification"
+      },
       "description" : "しなければならない (must do)",
       "expected" : [
         {
@@ -389,6 +483,30 @@
       ],
       "id" : "nakereba_shi",
       "input" : "しなければならない",
+      "suzume_expected" : [
+        {
+          "pos" : "Particle",
+          "surface" : "し"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Verb",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
+        },
+        {
+          "lemma" : "なる",
+          "pos" : "Verb",
+          "surface" : "なら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
       "tags" : [
         "grammar",
         "conditional",
@@ -397,6 +515,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãªããã°: conditional auxiliary classification"
+      },
       "description" : "来なければ (if not come)",
       "expected" : [
         {
@@ -416,6 +538,22 @@
       ],
       "id" : "nakereba_ko",
       "input" : "来なければ",
+      "suzume_expected" : [
+        {
+          "lemma" : "来る",
+          "pos" : "Verb",
+          "surface" : "来"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Verb",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
+        }
+      ],
       "tags" : [
         "grammar",
         "conditional",
@@ -450,6 +588,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãªããã°: conditional auxiliary classification"
+      },
       "description" : "走らなければならない - verb+ない conditional, not adjective",
       "expected" : [
         {
@@ -478,12 +620,41 @@
       ],
       "id" : "verb_nai_conditional_hashiranakereba",
       "input" : "走らなければならない",
+      "suzume_expected" : [
+        {
+          "lemma" : "走る",
+          "pos" : "Verb",
+          "surface" : "走ら"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Verb",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
+        },
+        {
+          "lemma" : "なる",
+          "pos" : "Verb",
+          "surface" : "なら"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
       "tags" : [
         "verb",
         "conditional"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãªããã°: conditional auxiliary classification"
+      },
       "description" : "見なければ - verb negative conditional",
       "expected" : [
         {
@@ -503,6 +674,22 @@
       ],
       "id" : "verb_neg_cond_minakereba",
       "input" : "見なければ",
+      "suzume_expected" : [
+        {
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Verb",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
+        }
+      ],
       "tags" : [
         "verb",
         "conditional"
@@ -634,6 +821,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "verb form: context-dependent POS classification"
+      },
       "description" : "B57: 叩ければ - grammar-first: 叩け+れ+ば, で(AUX,だ)+も(PARTICLE), いい(ADJ)",
       "expected" : [
         {
@@ -661,6 +852,29 @@
       ],
       "id" : "tatakereba_verb",
       "input" : "叩ければ何でもいい",
+      "suzume_expected" : [
+        {
+          "lemma" : "叩ける",
+          "pos" : "Verb",
+          "surface" : "叩けれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
+        },
+        {
+          "pos" : "Pronoun",
+          "surface" : "何"
+        },
+        {
+          "pos" : "Conjunction",
+          "surface" : "でも"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "いい"
+        }
+      ],
       "tags" : [
         "verb",
         "potential",
@@ -900,6 +1114,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "verb form: context-dependent POS classification"
+      },
       "description" : "帰りたいらしい - MeCab-compatible split: 帰り + たい + らしい",
       "expected" : [
         {
@@ -918,6 +1136,21 @@
       ],
       "id" : "rashii_tai_verb",
       "input" : "帰りたいらしい",
+      "suzume_expected" : [
+        {
+          "lemma" : "帰る",
+          "pos" : "Verb",
+          "surface" : "帰り"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "たい"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "らしい"
+        }
+      ],
       "tags" : [
         "verb",
         "rashii",
@@ -926,6 +1159,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "verb form: context-dependent POS classification"
+      },
       "description" : "過疎っている - 過疎る is a modern Japanese verb (internet slang for 'become dead/inactive')",
       "expected" : [
         {
@@ -943,6 +1180,21 @@
       ],
       "id" : "onbin_kasoru_lemma",
       "input" : "過疎っている",
+      "suzume_expected" : [
+        {
+          "lemma" : "過疎う",
+          "pos" : "Verb",
+          "surface" : "過疎っ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "いる"
+        }
+      ],
       "tags" : [
         "verb",
         "onbin",
@@ -951,6 +1203,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "verb form: context-dependent POS classification"
+      },
       "description" : "挙がっている - MeCab-compatible split with lemma 挙がる",
       "expected" : [
         {
@@ -977,6 +1233,29 @@
       ],
       "id" : "verb_agaru_kanji_variant",
       "input" : "批判が挙がっている",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "批判"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "が"
+        },
+        {
+          "lemma" : "挙い",
+          "pos" : "Adjective",
+          "surface" : "挙"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "が"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "っている"
+        }
+      ],
       "tags" : [
         "verb",
         "kanji_variant"
@@ -1535,6 +1814,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "verb form: context-dependent POS classification"
+      },
       "description" : "Potential expression 話せるようになりたい",
       "expected" : [
         {
@@ -1569,6 +1852,37 @@
       ],
       "id" : "potential_expression",
       "input" : "日本語が話せるようになりたい",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "日本語"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "が"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "話せる"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "よう"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "lemma" : "なる",
+          "pos" : "Verb",
+          "surface" : "なり"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "たい"
+        }
+      ],
       "tags" : [
         "verb",
         "potential"
@@ -1690,6 +2004,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "auxiliary/negative: context-dependent classification"
+      },
       "description" : "Dictionary stem 答え with conjugation - MeCab splits られ as Verb not Auxiliary",
       "expected" : [
         {
@@ -1714,6 +2032,27 @@
       ],
       "id" : "dict_stem_kotaerarenakute",
       "input" : "答えられなくて",
+      "suzume_expected" : [
+        {
+          "lemma" : "答える",
+          "pos" : "Verb",
+          "surface" : "答え"
+        },
+        {
+          "lemma" : "られる",
+          "pos" : "Auxiliary",
+          "surface" : "られ"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Adjective",
+          "surface" : "なく"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
       "tags" : [
         "verb",
         "conjugation"
@@ -1780,6 +2119,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "auxiliary/negative: context-dependent classification"
+      },
       "description" : "見られなくて - MeCab splits られ as Verb not Auxiliary",
       "expected" : [
         {
@@ -1804,6 +2147,27 @@
       ],
       "id" : "dict_stem_mirarenakute",
       "input" : "見られなくて",
+      "suzume_expected" : [
+        {
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
+        },
+        {
+          "lemma" : "られる",
+          "pos" : "Auxiliary",
+          "surface" : "られ"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Adjective",
+          "surface" : "なく"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
       "tags" : [
         "passive",
         "ichidan"

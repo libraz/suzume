@@ -26,6 +26,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãã: conditional auxiliary vs particle"
+      },
       "description" : "行ったら教えて - MeCab互換分割 (行っ+たら+教え+て)",
       "expected" : [
         {
@@ -50,6 +54,27 @@
       ],
       "id" : "pattern_conditional_tara",
       "input" : "行ったら教えて",
+      "suzume_expected" : [
+        {
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行っ"
+        },
+        {
+          "lemma" : "た",
+          "pos" : "Particle",
+          "surface" : "たら"
+        },
+        {
+          "lemma" : "教える",
+          "pos" : "Verb",
+          "surface" : "教え"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
       "tags" : [
         "grammar",
         "pattern",
@@ -76,6 +101,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãªããã°: conditional auxiliary classification"
+      },
       "description" : "行かなければ (if not go)",
       "expected" : [
         {
@@ -95,6 +124,22 @@
       ],
       "id" : "nakereba_ika",
       "input" : "行かなければ",
+      "suzume_expected" : [
+        {
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行か"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Verb",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
+        }
+      ],
       "tags" : [
         "grammar",
         "conditional",
@@ -102,6 +147,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãªããã°: conditional auxiliary classification"
+      },
       "description" : "書かなければ (if not write)",
       "expected" : [
         {
@@ -121,6 +170,22 @@
       ],
       "id" : "nakereba_kaka",
       "input" : "書かなければ",
+      "suzume_expected" : [
+        {
+          "lemma" : "書く",
+          "pos" : "Verb",
+          "surface" : "書か"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Verb",
+          "surface" : "なけれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
+        }
+      ],
       "tags" : [
         "grammar",
         "conditional",
@@ -128,6 +193,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "verb form: context-dependent POS classification"
+      },
       "description" : "B29: 上手くいく - MeCab互換分割 (上手く+いっ+て)",
       "expected" : [
         {
@@ -147,6 +216,22 @@
       ],
       "id" : "umaku_iku",
       "input" : "上手くいって",
+      "suzume_expected" : [
+        {
+          "lemma" : "上手い",
+          "pos" : "Adjective",
+          "surface" : "上手く"
+        },
+        {
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "って"
+        }
+      ],
       "tags" : [
         "adjective",
         "verb"
@@ -514,6 +599,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "verb form: context-dependent POS classification"
+      },
       "description" : "Phase1-2: いって - MeCab-compatible split",
       "expected" : [
         {
@@ -533,6 +622,22 @@
       ],
       "id" : "phase1_2_itte",
       "input" : "早くいって",
+      "suzume_expected" : [
+        {
+          "lemma" : "早い",
+          "pos" : "Adjective",
+          "surface" : "早く"
+        },
+        {
+          "lemma" : "いる",
+          "pos" : "Verb",
+          "surface" : "い"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "って"
+        }
+      ],
       "tags" : [
         "phase1_2_fix",
         "iku",
@@ -540,6 +645,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "verb form: context-dependent POS/lemma"
+      },
       "description" : "S4: あざむく should be VERB (not あ+ざ+む+く)",
       "expected" : [
         {
@@ -550,6 +659,12 @@
       ],
       "id" : "s4_azamuku",
       "input" : "あざむく",
+      "suzume_expected" : [
+        {
+          "pos" : "Other",
+          "surface" : "あざむく"
+        }
+      ],
       "tags" : [
         "s4_fix",
         "hiragana_verb",

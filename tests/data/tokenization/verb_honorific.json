@@ -136,6 +136,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ä¼ã: verb renyokei vs noun - nominalization"
+      },
       "description" : "お伝えいたします - honorific verb pattern",
       "expected" : [
         {
@@ -159,6 +163,25 @@
       ],
       "id" : "honorific_verb_otsutae",
       "input" : "お伝えいたします",
+      "suzume_expected" : [
+        {
+          "pos" : "Prefix",
+          "surface" : "お"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "伝え"
+        },
+        {
+          "lemma" : "いたす",
+          "pos" : "Verb",
+          "surface" : "いたし"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ます"
+        }
+      ],
       "tags" : [
         "honorific",
         "verb"

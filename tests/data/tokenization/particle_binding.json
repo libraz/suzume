@@ -69,6 +69,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "kuruwa kotoba: multiple POS differences in dialect form"
+      },
       "description" : "Kuruwa-kotoba でありんした",
       "expected" : [
         {
@@ -100,12 +104,46 @@
       ],
       "id" : "kuruwa_arinshita",
       "input" : "でありんしたか",
+      "suzume_expected" : [
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "lemma" : "ある",
+          "pos" : "Auxiliary",
+          "surface" : "あり"
+        },
+        {
+          "lemma" : "の",
+          "pos" : "Particle",
+          "surface" : "ん"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "か"
+        }
+      ],
       "tags" : [
         "character_speech",
         "kuruwa"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "character speech: ã§ copula and ã²ã½ ending classification"
+      },
       "description" : "Squid character でゲソ",
       "expected" : [
         {
@@ -131,6 +169,29 @@
       ],
       "id" : "character_geso",
       "input" : "吾輩は猫でゲソ",
+      "suzume_expected" : [
+        {
+          "pos" : "Pronoun",
+          "surface" : "吾輩"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "猫"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ゲソ"
+        }
+      ],
       "tags" : [
         "character_speech",
         "squid"

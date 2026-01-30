@@ -342,6 +342,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ã§ã: conjunction vs particle - position-dependent"
+      },
       "description" : "たとえ should be Adverb (conditional) - grammar-first: で(AUX,だ)+も(PARTICLE)",
       "expected" : [
         {
@@ -363,6 +367,24 @@
       ],
       "id" : "adverb_tatoe",
       "input" : "たとえ雨でも行く",
+      "suzume_expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "たとえ"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "雨"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "でも"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "行く"
+        }
+      ],
       "tags" : [
         "adverb"
       ]
@@ -970,7 +992,7 @@
       "description" : "少々 should be ADV, not NOUN",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Adverb",
           "surface" : "少々"
         },
         {

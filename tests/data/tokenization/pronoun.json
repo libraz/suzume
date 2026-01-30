@@ -107,6 +107,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "character speech: ã§ copula and ããã classification"
+      },
       "description" : "Samurai pronoun 拙者 - MeCab shows 拙者 as NOUN not PRON",
       "expected" : [
         {
@@ -133,6 +137,28 @@
       ],
       "id" : "pronoun_sessha",
       "input" : "拙者は侍でござる",
+      "suzume_expected" : [
+        {
+          "pos" : "Pronoun",
+          "surface" : "拙者"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "侍"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "ござる"
+        }
+      ],
       "tags" : [
         "character_speech",
         "samurai",

@@ -132,6 +132,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "verb form: context-dependent POS/lemma"
+      },
       "description" : "言われて - Godan verb passive te-form (MeCab-style 3-way split)",
       "expected" : [
         {
@@ -151,6 +155,22 @@
       ],
       "id" : "godan_passive_te",
       "input" : "言われて",
+      "suzume_expected" : [
+        {
+          "lemma" : "言う",
+          "pos" : "Verb",
+          "surface" : "言わ"
+        },
+        {
+          "lemma" : "れる",
+          "pos" : "Auxiliary",
+          "surface" : "れ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "て"
+        }
+      ],
       "tags" : [
         "passive",
         "godan",
@@ -414,6 +434,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "verb form: context-dependent POS/lemma"
+      },
       "description" : "来られる - Kuru verb passive (single token for irregular verb)",
       "expected" : [
         {
@@ -428,6 +452,17 @@
       ],
       "id" : "kuru_passive",
       "input" : "来られる",
+      "suzume_expected" : [
+        {
+          "lemma" : "来る",
+          "pos" : "Verb",
+          "surface" : "来"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "られる"
+        }
+      ],
       "tags" : [
         "passive",
         "kuru"

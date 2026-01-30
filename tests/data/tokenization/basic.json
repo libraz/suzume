@@ -16,6 +16,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "lemma-diff",
+        "reason" : "lemma/POS normalization differences"
+      },
       "description" : "あ - single hiragana",
       "expected" : [
         {
@@ -25,6 +29,12 @@
       ],
       "id" : "edge_single_hiragana",
       "input" : "あ",
+      "suzume_expected" : [
+        {
+          "pos" : "Other",
+          "surface" : "あ"
+        }
+      ],
       "tags" : [
         "basic",
         "edge-case"

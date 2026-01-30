@@ -136,6 +136,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "auxiliary/negative: context-dependent classification"
+      },
       "description" : "忘れてしまわない - MeCab-compatible: 忘れ + て + しまわ + ない",
       "expected" : [
         {
@@ -159,6 +163,26 @@
       ],
       "id" : "te_shimawanai_unified",
       "input" : "忘れてしまわない",
+      "suzume_expected" : [
+        {
+          "lemma" : "忘れる",
+          "pos" : "Verb",
+          "surface" : "忘れ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "しまう",
+          "pos" : "Verb",
+          "surface" : "しまわ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
       "tags" : [
         "te_form",
         "aspectual",

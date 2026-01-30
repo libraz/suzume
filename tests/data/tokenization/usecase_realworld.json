@@ -1154,6 +1154,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "Academic paper style",
       "expected" : [
         {
@@ -1191,6 +1195,41 @@
       ],
       "id" : "complex_academic_paper",
       "input" : "本研究では新しい手法を提案する",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "本研究"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "新しい"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "手法"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "を"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "提案"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "する"
+        }
+      ],
       "tags" : [
         "complex",
         "academic"

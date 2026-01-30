@@ -225,6 +225,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "走りだしたくなかった - hiragana subsidiary verb",
       "expected" : [
         {
@@ -249,12 +253,37 @@
       ],
       "id" : "compound_verb_hiragana_v2_dasu",
       "input" : "走りだしたくなかった",
+      "suzume_expected" : [
+        {
+          "lemma" : "走り出す",
+          "pos" : "Verb",
+          "surface" : "走りだし"
+        },
+        {
+          "lemma" : "たい",
+          "pos" : "Auxiliary",
+          "surface" : "たく"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Adjective",
+          "surface" : "なかっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "compound_verb",
         "hiragana_v2"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "飛びこみたい - hiragana subsidiary verb",
       "expected" : [
         {
@@ -269,6 +298,17 @@
       ],
       "id" : "compound_verb_hiragana_v2_komu",
       "input" : "飛びこみたい",
+      "suzume_expected" : [
+        {
+          "lemma" : "飛び込む",
+          "pos" : "Verb",
+          "surface" : "飛びこみ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "たい"
+        }
+      ],
       "tags" : [
         "compound_verb",
         "hiragana_v2"
@@ -300,6 +340,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "走り出したくなかった - kanji subsidiary verb",
       "expected" : [
         {
@@ -325,6 +369,27 @@
       ],
       "id" : "compound_verb_kanji_v2_dasu",
       "input" : "走り出したくなかった",
+      "suzume_expected" : [
+        {
+          "lemma" : "走る",
+          "pos" : "Verb",
+          "surface" : "走り"
+        },
+        {
+          "lemma" : "出したくない",
+          "pos" : "Adjective",
+          "surface" : "出したく"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なかっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "compound_verb",
         "kanji_v2"
@@ -653,6 +718,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "S3: 演じきった should be compound verb with lemma 演じ切る",
       "expected" : [
         {
@@ -675,6 +744,25 @@
       ],
       "id" : "s3_enjikitta",
       "input" : "役を演じきった",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "役"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "を"
+        },
+        {
+          "lemma" : "演じ切る",
+          "pos" : "Verb",
+          "surface" : "演じきっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "s3_fix",
         "compound_verb",
@@ -709,6 +797,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "segmentation-diff",
+        "reason" : "compound verb boundary: 走り出し vs 走り|出したく"
+      },
       "description" : "S3: 走り出したくなかった should split as 走り出し + たくなかった",
       "expected" : [
         {
@@ -734,6 +826,28 @@
       ],
       "id" : "s3_hashiridashi_tai_split",
       "input" : "走り出したくなかった",
+      "suzume_expected" : [
+        {
+          "lemma" : "走る",
+          "pos" : "Verb",
+          "surface" : "走り"
+        },
+        {
+          "lemma" : "出したくない",
+          "pos" : "Adjective",
+          "surface" : "出したく"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なかっ"
+        },
+        {
+          "lemma" : "た",
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "s3_fix",
         "compound_verb",

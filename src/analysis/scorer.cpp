@@ -955,12 +955,15 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   }
 
   // Penalty for pronoun-like NOUN + でも pattern (limited)
-  // When 何/彼女 etc. are recognized as NOUN (unknown candidate),
-  // NOUN→PART_副(でも) gets bonus from bigram table.
-  // NOUN→CONJ(でも) has low cost making it preferred.
-  // This penalty forces で+も split for specific pronoun-like surfaces.
-  // Note: 誰/どこ/いつ are excluded - "誰でも知っている" keeps でも as one token
-  // Only 何 and 彼女 need splitting (何でもあり, 彼女でもない patterns)
+  // NOTE: This is a known limitation. MeCab's behavior is context-dependent:
+  //   - 何でもあり → でも keeps together
+  //   - 何でもありだな → で|も splits
+  //   - 彼女でもない → で|も splits
+  //   - 彼女でもいい → でも keeps together
+  // Viterbi prunes the で|も path before we can evaluate context.
+  // The でも→ない/な penalty (below) helps some cases but not all.
+  // For now, we only penalize NOUN path; PRON path bypasses this.
+  // See session 66/68 notes for detailed analysis.
   if (prev.pos == core::PartOfSpeech::Noun &&
       next.surface == "でも" &&
       (next.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
@@ -1010,15 +1013,27 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kUncommon;
   }
 
-  // Penalty for single-char VerbRenyokei → single-char AuxPassive
+  // Penalty for single-char hiragana VerbRenyokei → AuxPassive/AuxCausative
   // Bigram table gives bonus for VerbRenyokei→AuxPassive (for 知らせ+られ)
-  // But し+れ in かもしれない should not get this bonus
-  // (れ is part of しれる, not passive auxiliary)
-  // Valid patterns like 知らせ+られ have longer surfaces
+  // But single-char hiragana like せ+られ should prefer AuxCausative+AuxPassive path
+  // Valid patterns like 知らせ+られ have longer surfaces (2+ chars)
+  // This prevents せ(VERB連用) from being selected over せ(AuxCausative)
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      next.extended_pos == core::ExtendedPOS::AuxPassive &&
-      prev.surface.size() <= 3 && next.surface.size() <= 3) {  // Both single hiragana
-    surface_bonus += cost::kAlmostNever;  // Cancel the bonus
+      (next.extended_pos == core::ExtendedPOS::AuxPassive ||
+       next.extended_pos == core::ExtendedPOS::AuxCausative) &&
+      prev.surface.size() <= 3 &&  // Single hiragana (3 bytes)
+      grammar::isPureHiragana(prev.surface)) {  // Pure hiragana
+    surface_bonus += cost::kAlmostNever;  // Strongly discourage
+  }
+
+  // Penalty for て/で (ParticleConj) → single-char VerbRenyokei (い)
+  // Progressive pattern: 食べて+い+ます should use い(AuxAspectIru), not い(VerbRenyokei)
+  // This ensures て+いる patterns use the auxiliary form
+  if (prev.extended_pos == core::ExtendedPOS::ParticleConj &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface.size() <= 3 &&  // Single hiragana (3 bytes)
+      grammar::isPureHiragana(next.surface)) {
+    surface_bonus += cost::kAlmostNever;  // Strongly discourage
   }
 
   // Penalty for VerbOnbinkei/VerbRenyokei ending in いい → AuxTenseTa pattern
@@ -1352,6 +1367,29 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kRare;  // Cancel the -0.8 bonus
   }
 
+  // Penalty for short hiragana VERB_連用 → し/き (single-char verb renyokei)
+  // E.g., おかしを → おかし+を, not おか+し+を
+  // Short verb renyokei (2-3 chars) followed by し or き often indicates
+  // over-segmentation of a noun or longer verb
+  // Exclude ば (valid conditional: よれ+ば), て (te-form), etc.
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      prev.surface.size() >= 6 && prev.surface.size() <= 9 &&  // 2-3 hiragana
+      (next.surface == "し" || next.surface == "き")) {
+    // Check prev is all hiragana
+    bool prev_is_hira = true;
+    for (char32_t cp : normalize::utf8::decode(prev.surface)) {
+      if (!kana::isHiraganaCodepoint(cp)) {
+        prev_is_hira = false;
+        break;
+      }
+    }
+    if (prev_is_hira &&
+        (next.extended_pos == core::ExtendedPOS::VerbRenyokei ||
+         next.extended_pos == core::ExtendedPOS::ParticleConj)) {
+      surface_bonus += cost::kStrong;
+    }
+  }
+
   // Penalty for negation PREFIX (非/不/無/未) → single-kanji NOUN
   // E.g., 非常 → 非|常 is wrong (非常 is a single word, not prefix+noun)
   // E.g., 不可能 → 不|可能 is wrong (不可能 is a single word)
@@ -1405,6 +1443,23 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface == "で") {
     surface_bonus += cost::kRare;  // 1.0: must exceed NOUN→VERB_連用 bonus
+  }
+
+  // Penalty for single-hiragana VERB_連用 → を(PART_格)
+  // E.g., おかしを → おかし+を, not おか+し+を
+  // Single hiragana verb renyokei (し, き, み, etc.) rarely takes を directly
+  // Nominalized verb renyokei like 読み, 書き take を (読みを深める) but those
+  // are multi-char and should be recognized as NOUN, not single-char VERB_連用
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      prev.surface.size() == 3 &&  // Single char (3 bytes = hiragana/katakana)
+      next.extended_pos == core::ExtendedPOS::ParticleCase &&
+      next.surface == "を") {
+    // Check if single char is hiragana
+    auto it = normalize::utf8::decode(prev.surface).begin();
+    if (it != normalize::utf8::decode(prev.surface).end() &&
+        kana::isHiraganaCodepoint(*it)) {
+      surface_bonus += cost::kStrong;
+    }
   }
 
   // Penalty for で(VerbRenyokei of 出る) → Particle (except て)

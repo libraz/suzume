@@ -20,6 +20,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "lemma-diff",
+        "reason" : "lemma/POS normalization differences"
+      },
       "description" : "B30: 引きこもり should be single noun",
       "expected" : [
         {
@@ -34,6 +38,16 @@
       ],
       "id" : "hikikomori_noun",
       "input" : "引きこもり",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "引き"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "こもり"
+        }
+      ],
       "tags" : [
         "noun",
         "compound"

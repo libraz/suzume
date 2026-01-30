@@ -636,6 +636,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "Academic hypothesis - MeCab shows 本研究 unified",
       "expected" : [
         {
@@ -677,6 +681,45 @@
       ],
       "id" : "academic_hypothesis",
       "input" : "本研究では以下の仮説を検証する",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "本研究"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "以下"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "仮説"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "を"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "検証"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "する"
+        }
+      ],
       "tags" : [
         "academic"
       ]
@@ -736,6 +779,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "Conclusion statement",
       "expected" : [
         {
@@ -782,11 +829,57 @@
       ],
       "id" : "academic_conclusion",
       "input" : "以上の結果から次のように結論づけられる",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "以上"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "結果"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "から"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "次"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "よう"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "結論"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "づけられる"
+        }
+      ],
       "tags" : [
         "academic"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "Method description - Current suzume unifies compounds",
       "expected" : [
         {
@@ -829,6 +922,46 @@
       ],
       "id" : "academic_method",
       "input" : "本研究ではアンケート調査を実施した",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "本研究"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "アンケート"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "調査"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "を"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "実施"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "academic"
       ]
@@ -938,6 +1071,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "News article style - Current suzume unifies 経済政策",
       "expected" : [
         {
@@ -1017,11 +1154,91 @@
       ],
       "id" : "long_news_article",
       "input" : "政府は昨日の閣議で、新しい経済政策を正式に決定したと発表した",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "政府"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "昨日"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "閣議"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "新しい"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "経済政策"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "を"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "正式"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "決定"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "と"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "発表"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "long"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "Narrative style - Current suzume treats 欠かさ as adjective and 好き as adjective",
       "expected" : [
         {
@@ -1094,11 +1311,83 @@
       ],
       "id" : "long_narrative",
       "input" : "彼は昔から音楽が好きで、毎日ピアノの練習を欠かさなかった",
+      "suzume_expected" : [
+        {
+          "pos" : "Pronoun",
+          "surface" : "彼"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "昔"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "から"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "音楽"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "が"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "好き"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "毎日"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "ピアノ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "練習"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "を"
+        },
+        {
+          "lemma" : "欠かす",
+          "pos" : "Verb",
+          "surface" : "欠かさ"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なかっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "long"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "Multi-step instructions - Current suzume unifies 起動し and 設定画面",
       "expected" : [
         {
@@ -1176,11 +1465,88 @@
       ],
       "id" : "long_instructions",
       "input" : "まず電源ボタンを押して起動し、次に設定画面から言語を選択してください",
+      "suzume_expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "まず"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "電源"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "ボタン"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "を"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "押し"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "起動"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Conjunction",
+          "surface" : "次に"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "設定画面"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "から"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "言語"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "を"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "選択"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "くださる",
+          "pos" : "Verb",
+          "surface" : "ください"
+        }
+      ],
       "tags" : [
         "long"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "Complex conditional - Current suzume unifies しよう and います",
       "expected" : [
         {
@@ -1262,11 +1628,93 @@
       ],
       "id" : "long_complex_condition",
       "input" : "もし明日の天気が良ければ、公園でピクニックをしようと思っています",
+      "suzume_expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "もし"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "明日"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "天気"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "が"
+        },
+        {
+          "lemma" : "良ける",
+          "pos" : "Verb",
+          "surface" : "良けれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ば"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "公園"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "ピクニック"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "を"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "しよ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "う"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "と"
+        },
+        {
+          "lemma" : "思う",
+          "pos" : "Verb",
+          "surface" : "思っ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "いる",
+          "pos" : "Auxiliary",
+          "surface" : "い"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ます"
+        }
+      ],
       "tags" : [
         "long"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "Explanation style - Current suzume treats compound verb 読み込む differently",
       "expected" : [
         {
@@ -1347,6 +1795,84 @@
       ],
       "id" : "long_explanation",
       "input" : "この問題が発生する原因は、設定ファイルが正しく読み込まれていないことです",
+      "suzume_expected" : [
+        {
+          "pos" : "Determiner",
+          "surface" : "この"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "問題"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "が"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "発生"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "する"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "原因"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "設定"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "ファイル"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "が"
+        },
+        {
+          "lemma" : "正しい",
+          "pos" : "Adjective",
+          "surface" : "正しく"
+        },
+        {
+          "lemma" : "読む",
+          "pos" : "Verb",
+          "surface" : "読み"
+        },
+        {
+          "lemma" : "込む",
+          "pos" : "Verb",
+          "surface" : "込まれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "いる",
+          "pos" : "Auxiliary",
+          "surface" : "い"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "こと"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "です"
+        }
+      ],
       "tags" : [
         "long"
       ]

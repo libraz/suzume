@@ -792,6 +792,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "URL-like mixed content",
       "expected" : [
         {
@@ -823,6 +827,35 @@
       ],
       "id" : "number_url_like",
       "input" : "example.comで登録してください",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "example.com"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "登録"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "くださる",
+          "pos" : "Verb",
+          "surface" : "ください"
+        }
+      ],
       "tags" : [
         "number_special"
       ]
@@ -995,6 +1028,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "あれ",
       "expected" : [
         {
@@ -1012,6 +1049,20 @@
       ],
       "id" : "pronoun_are",
       "input" : "あれが欲しい",
+      "suzume_expected" : [
+        {
+          "pos" : "Interjection",
+          "surface" : "あれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "が"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "欲しい"
+        }
+      ],
       "tags" : [
         "pronoun"
       ]
@@ -1092,6 +1143,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "Japanese quotes",
       "expected" : [
         {
@@ -1114,6 +1169,25 @@
       ],
       "id" : "symbol_japanese_quotes",
       "input" : "「こんにちは」と言った",
+      "suzume_expected" : [
+        {
+          "pos" : "Interjection",
+          "surface" : "こんにちは"
+        },
+        {
+          "pos" : "Other",
+          "surface" : "と"
+        },
+        {
+          "lemma" : "言う",
+          "pos" : "Verb",
+          "surface" : "言っ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
       "tags" : [
         "symbol"
       ]

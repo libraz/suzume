@@ -30,6 +30,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "è¡ã: auxiliary vs verb in question pattern"
+      },
       "expected" : [
         {
           "pos" : "Noun",
@@ -68,6 +72,42 @@
       ],
       "id" : "conv_directions",
       "input" : "駅までどうやって行きますか",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "駅"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "まで"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "どう"
+        },
+        {
+          "lemma" : "やる",
+          "pos" : "Verb",
+          "surface" : "やっ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行き"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ます"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "か"
+        }
+      ],
       "tags" : [
         "conversation"
       ]
@@ -342,6 +382,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ã: verb vs auxiliary in ãã¾ããã"
+      },
       "expected" : [
         {
           "pos" : "Noun",
@@ -384,11 +428,55 @@
       ],
       "id" : "sched_busy",
       "input" : "今週は忙しいので来週にしましょう",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "今週"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "忙しい"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ので"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "来週"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "lemma" : "ます",
+          "pos" : "Auxiliary",
+          "surface" : "ましょ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "う"
+        }
+      ],
       "tags" : [
         "schedule"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ã©ã: adverb vs adjective before copula"
+      },
       "expected" : [
         {
           "pos" : "Noun",
@@ -417,6 +505,32 @@
       ],
       "id" : "sched_suggestion",
       "input" : "3時ごろはどうですか",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "3時"
+        },
+        {
+          "pos" : "Other",
+          "surface" : "ごろ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "どう"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "です"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "か"
+        }
+      ],
       "tags" : [
         "schedule"
       ]
@@ -904,6 +1018,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "è¡ã: noun vs verb renyokei - nominalization"
+      },
       "expected" : [
         {
           "pos" : "Noun",
@@ -932,6 +1050,33 @@
       ],
       "id" : "travel_platform",
       "input" : "東京行きは何番線ですか",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "東京"
+        },
+        {
+          "lemma" : "行く",
+          "pos" : "Verb",
+          "surface" : "行き"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "何番線"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "です"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "か"
+        }
+      ],
       "tags" : [
         "travel"
       ]

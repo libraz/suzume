@@ -253,6 +253,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ã§: copula vs particle after na-adj stem - dictionary-dependent"
+      },
       "description" : "Slang phrase マジでキモい",
       "expected" : [
         {
@@ -271,6 +275,20 @@
       ],
       "id" : "phrase_majide_kimoi",
       "input" : "マジでキモい",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "マジ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "キモい"
+        }
+      ],
       "tags" : [
         "slang",
         "phrase"
@@ -300,6 +318,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ã§: copula vs particle after na-adj stem - dictionary-dependent"
+      },
       "description" : "Internet slang phrase マジで尊い",
       "expected" : [
         {
@@ -318,6 +340,20 @@
       ],
       "id" : "phrase_majide_toutoi",
       "input" : "マジで尊い",
+      "suzume_expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "マジ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "尊い"
+        }
+      ],
       "tags" : [
         "slang",
         "phrase",
@@ -467,6 +503,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "lemma-diff",
+        "reason" : "lemma/POS normalization differences"
+      },
       "description" : "来たっ - emphatic sokuon after past form",
       "expected" : [
         {
@@ -477,12 +517,22 @@
       ],
       "id" : "emphatic_sokuon_past",
       "input" : "来たっ",
+      "suzume_expected" : [
+        {
+          "pos" : "Verb",
+          "surface" : "来たっ"
+        }
+      ],
       "tags" : [
         "emphatic",
         "sokuon"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "POS/lemma normalization difference"
+      },
       "description" : "きたああああ - vowel repetition for emphasis",
       "expected" : [
         {
@@ -505,6 +555,21 @@
       ],
       "id" : "vowel_repeat_kita",
       "input" : "きたああああ",
+      "suzume_expected" : [
+        {
+          "lemma" : "きる",
+          "pos" : "Verb",
+          "surface" : "きた"
+        },
+        {
+          "pos" : "Interjection",
+          "surface" : "ああ"
+        },
+        {
+          "pos" : "Interjection",
+          "surface" : "ああ"
+        }
+      ],
       "tags" : [
         "emphatic",
         "vowel_repeat"

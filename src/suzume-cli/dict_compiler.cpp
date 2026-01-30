@@ -169,15 +169,57 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
   // Deduplication: track surfaces only (trie requires unique keys)
   std::set<std::string> seen_surfaces;
 
+  // Two-pass processing:
+  // Pass 1: Process non-conjugating entries (nouns, adverbs, etc.) first
+  //         This ensures noun entries like 思い take priority over verb renyokei
+  // Pass 2: Process conjugating entries (verbs, adjectives) with expansion
+
+  // Helper lambda to check if entry needs conjugation expansion
+  auto needsExpansion = [](const TsvEntry& entry) {
+    return (entry.pos == core::PartOfSpeech::Adjective &&
+            entry.conj_type == dictionary::ConjugationType::IAdjective) ||
+           entry.pos == core::PartOfSpeech::Verb;
+  };
+
+  // Pass 1: Non-conjugating entries
   for (const auto& tsv_entry : entries) {
+    if (needsExpansion(tsv_entry)) {
+      continue;  // Skip conjugating entries in pass 1
+    }
+
+    dictionary::DictionaryEntry base_entry;
+    base_entry.surface = tsv_entry.surface;
+    base_entry.pos = tsv_entry.pos;
+    base_entry.lemma = tsv_entry.surface;
+
+    if (tsv_entry.conj_type == dictionary::ConjugationType::Interjection) {
+      base_entry.extended_pos = core::ExtendedPOS::Interjection;
+    } else {
+      base_entry.extended_pos = core::ExtendedPOS::Unknown;
+    }
+
+    if (seen_surfaces.count(base_entry.surface) > 0) {
+      ++duplicates_skipped;
+      continue;
+    }
+    seen_surfaces.insert(base_entry.surface);
+    writer.addEntry(base_entry);
+    ++entries_compiled_;
+  }
+
+  // Pass 2: Conjugating entries (verbs and i-adjectives with expansion)
+  for (const auto& tsv_entry : entries) {
+    if (!needsExpansion(tsv_entry)) {
+      continue;  // Skip non-conjugating entries in pass 2
+    }
+
     // Create base entry
     dictionary::DictionaryEntry base_entry;
     base_entry.surface = tsv_entry.surface;
     base_entry.pos = tsv_entry.pos;
-    base_entry.extended_pos = core::ExtendedPOS::Unknown;  // Will be set during expansion
+    base_entry.extended_pos = core::ExtendedPOS::Unknown;
     base_entry.lemma = tsv_entry.surface;
 
-    // Determine if we should expand this entry
     std::vector<dictionary::DictionaryEntry> expanded_entries;
 
     if (tsv_entry.pos == core::PartOfSpeech::Adjective &&
@@ -235,13 +277,6 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
 
       base_entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
       expanded_entries = expandVerb(base_entry, verb_type);
-    } else if (tsv_entry.conj_type == dictionary::ConjugationType::Interjection) {
-      // Interjection: set specific ExtendedPOS
-      base_entry.extended_pos = core::ExtendedPOS::Interjection;
-      expanded_entries.push_back(base_entry);
-    } else {
-      // No expansion needed
-      expanded_entries.push_back(base_entry);
     }
 
     // Add expanded entries with deduplication (by surface only)

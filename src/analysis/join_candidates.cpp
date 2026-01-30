@@ -6,6 +6,7 @@
 #include "join_candidates.h"
 
 #include "candidate_constants.h"
+#include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/inflection.h"
@@ -757,10 +758,32 @@ void addCompoundVerbJoinCandidates(
     // Build the compound verb surface
     std::string compound_surface(text.substr(start_byte, compound_end_byte - start_byte));
 
+    // Skip if compound surface is registered as NOUN in dictionary
+    // This prevents nominalized compound verbs (売り上げ, 打ち合わせ) from being tokenized as VERB
+    // when they are explicitly registered as nouns in the dictionary
+    auto noun_check_results = dict_manager.lookup(compound_surface, 0);
+    for (const auto& result : noun_check_results) {
+      if (result.entry != nullptr &&
+          result.entry->pos == core::PartOfSpeech::Noun) {
+        SUZUME_DEBUG_LOG("[COMPOUND_SKIP] \"" << compound_surface << "\" is dict NOUN, skipping compound verb\n");
+        return;  // Skip compound verb generation for dictionary NOUNs
+      }
+    }
+
     // Calculate cost
     float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
     const auto& opts = scorer.joinOpts();
     float final_cost = base_cost + opts.compound_verb_bonus + opts.verified_v1_bonus;
+
+    // Penalty for passive+te form (〜まれて/〜られて)
+    // MeCab splits compound verb passive+te: 読み込まれて → 読み込ま|れ|て
+    // This helps the split path win over the combined form
+    if (utf8::endsWith(compound_surface, "まれて") ||
+        utf8::endsWith(compound_surface, "まれた") ||
+        utf8::endsWith(compound_surface, "られて") ||
+        utf8::endsWith(compound_surface, "られた")) {
+      final_cost += 2.5F;  // Strong penalty to favor split path
+    }
 
     uint8_t flags = core::LatticeEdge::kFromDictionary;
 
