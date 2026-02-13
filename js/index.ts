@@ -136,15 +136,13 @@ export class Suzume {
       const optionsPtr = module._malloc(OPTIONS_SIZE);
 
       try {
-        const HEAP32 = new Int32Array(
-          (module as unknown as { HEAP32: { buffer: ArrayBuffer } }).HEAP32.buffer,
-        );
+        const heap = (module as unknown as { HEAPU32: Uint32Array }).HEAPU32;
         // preserve_vu: default true
-        HEAP32[optionsPtr >> 2] = options.preserveVu !== false ? 1 : 0;
+        heap[optionsPtr >> 2] = options.preserveVu !== false ? 1 : 0;
         // preserve_case: default true
-        HEAP32[(optionsPtr >> 2) + 1] = options.preserveCase !== false ? 1 : 0;
+        heap[(optionsPtr >> 2) + 1] = options.preserveCase !== false ? 1 : 0;
         // preserve_symbols: default false
-        HEAP32[(optionsPtr >> 2) + 2] = options.preserveSymbols === true ? 1 : 0;
+        heap[(optionsPtr >> 2) + 2] = options.preserveSymbols === true ? 1 : 0;
 
         const createWithOptions = module.cwrap('suzume_create_with_options', 'number', [
           'number',
@@ -266,9 +264,7 @@ export class Suzume {
     // suzume_result_t layout:
     // - morphemes: pointer (4 bytes on wasm32)
     // - count: size_t (4 bytes on wasm32)
-    const HEAPU32 = new Uint32Array(
-      (this.module as unknown as { HEAPU32: { buffer: ArrayBuffer } }).HEAPU32.buffer,
-    );
+    const HEAPU32 = (this.module as unknown as { HEAPU32: Uint32Array }).HEAPU32;
 
     const morphemesPtr = HEAPU32[resultPtr >> 2];
     const count = HEAPU32[(resultPtr >> 2) + 1];
@@ -314,9 +310,7 @@ export class Suzume {
     // suzume_tags_t layout:
     // - tags: pointer to char** (4 bytes on wasm32)
     // - count: size_t (4 bytes on wasm32)
-    const HEAPU32 = new Uint32Array(
-      (this.module as unknown as { HEAPU32: { buffer: ArrayBuffer } }).HEAPU32.buffer,
-    );
+    const HEAPU32 = (this.module as unknown as { HEAPU32: Uint32Array }).HEAPU32;
 
     const tagsArrayPtr = HEAPU32[tagsPtr >> 2];
     const count = HEAPU32[(tagsPtr >> 2) + 1];

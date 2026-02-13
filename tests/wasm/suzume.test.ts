@@ -319,12 +319,9 @@ describe('Suzume WASM', () => {
 
       // Allocate options struct (3 ints = 12 bytes)
       const optionsPtr = module._malloc(12);
-      const HEAP32 = new Int32Array(
-        (module as unknown as { HEAP32: { buffer: ArrayBuffer } }).HEAP32.buffer,
-      );
-      HEAP32[optionsPtr >> 2] = 1; // preserve_vu = true
-      HEAP32[(optionsPtr >> 2) + 1] = 1; // preserve_case = true
-      HEAP32[(optionsPtr >> 2) + 2] = 1; // preserve_symbols = true
+      module.HEAPU32[optionsPtr >> 2] = 1; // preserve_vu = true
+      module.HEAPU32[(optionsPtr >> 2) + 1] = 1; // preserve_case = true
+      module.HEAPU32[(optionsPtr >> 2) + 2] = 1; // preserve_symbols = true
 
       handleWithSymbols = createWithOptions(optionsPtr);
       module._free(optionsPtr);

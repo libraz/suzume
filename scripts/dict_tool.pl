@@ -544,7 +544,7 @@ sub cmd_add {
         # Insert after the found line
         insert_line_at($dict_path, $insert_after, $entry_line);
         my $placement_msg = {
-            same_group    => "grouped with same $pos/$conj_type",
+            same_group    => "grouped with same $pos" . ($conj_type ? "/$conj_type" : ""),
             same_pos      => "added to $pos section",
             section_end   => "added at end of section",
             section_start => "added at start of section",
