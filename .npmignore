@@ -1,0 +1,33 @@
+# Source
+src/
+js/
+tests/
+scripts/
+data/
+backup/
+
+# Build
+build/
+build-*/
+cmake-build-*/
+CMakeLists.txt
+
+# Config
+biome.json
+tsconfig.json
+vitest.config.ts
+.yarnrc.yml
+CLAUDE.md
+
+# CI/CD
+.github/
+.vscode/
+
+# Git
+.git/
+.gitignore
+
+# Misc
+*.log
+*.tgz
+*.tsbuildinfo

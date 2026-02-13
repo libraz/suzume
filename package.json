@@ -1,37 +1,35 @@
 {
   "name": "@libraz/suzume",
-  "version": "1.0.0",
+  "version": "0.9.0",
   "type": "module",
   "packageManager": "yarn@4.12.0",
   "description": "Lightweight Japanese morphological analyzer for browser and Node.js",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   },
+  "sideEffects": false,
   "files": [
     "dist"
   ],
   "scripts": {
-    "preinstall": "npx only-allow yarn",
-    "postinstall": "simple-git-hooks",
-    "prepare": "simple-git-hooks",
+    "prepare": "simple-git-hooks || true",
     "build": "yarn build:wasm && yarn build:js",
     "build:wasm": "emcmake cmake -B build-wasm -DBUILD_WASM=ON -DENABLE_DEBUG_INFO=OFF && cmake --build build-wasm",
     "build:js": "tsc",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist build-wasm",
     "lint": "biome check js/ tests/wasm/",
     "lint:fix": "biome check --write js/ tests/wasm/",
     "format": "biome format --write js/ tests/wasm/",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "prepublishOnly": "yarn lint && yarn test && yarn build"
+    "prepublishOnly": "yarn clean && yarn build && yarn lint && yarn test"
   },
   "keywords": [
     "japanese",
@@ -52,7 +50,7 @@
   },
   "homepage": "https://github.com/libraz/suzume#readme",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",
