@@ -469,6 +469,10 @@ BigramTable::initTable() {
   // breaking という patterns (と is ParticleCase, いう is VerbRenyokei)
   setCell(t, EPOS::ParticleTopic, EPOS::VerbRenyokei, cost::kMinorBonus);
 
+  // ParticleTopic → AdjBasic (は+良い, も+美しい) - minor bonus
+  // Common pattern: 係助詞 followed by i-adjective
+  setCell(t, EPOS::ParticleTopic, EPOS::AdjBasic, cost::kMinorBonus);
+
   // ParticleConj → VerbShuushikei (て+食べる for compound verbs) - minor penalty
   // (te-form usually followed by auxiliary, not new verb)
   setCell(t, EPOS::ParticleConj, EPOS::VerbShuushikei, cost::kUncommon);
