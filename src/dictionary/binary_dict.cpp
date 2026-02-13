@@ -14,8 +14,6 @@ namespace {
 
 // Flag bits
 constexpr uint8_t kFlagFormalNoun = 0x01;
-constexpr uint8_t kFlagLowInfo = 0x02;
-constexpr uint8_t kFlagPrefix = 0x04;
 constexpr uint8_t kFlagInterjection = 0x08;
 
 /**
@@ -40,14 +38,6 @@ size_t countUtf8Chars(std::string_view text, size_t start_byte,
   }
 
   return char_count;
-}
-
-int16_t floatToCost(float cost) {
-  return static_cast<int16_t>(cost * 100.0F);
-}
-
-float costToFloat(int16_t cost) {
-  return static_cast<float>(cost) / 100.0F;
 }
 
 uint8_t posToUint8(core::PartOfSpeech pos) {
@@ -150,7 +140,6 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
                                 rec.surface_length);
     entry.pos = uint8ToPos(rec.pos);
     // v0.8: cost removed - now derived from ExtendedPOS
-    // entry.cost = costToFloat(rec.cost);
 
     if (rec.lemma_length > 0) {
       entry.lemma = std::string(string_pool + rec.lemma_offset,

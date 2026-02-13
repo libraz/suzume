@@ -377,7 +377,6 @@ bool Lemmatizer::verifyCandidateWithDictionary(
   auto results = dict_manager_->lookup(candidate.base_form, 0);
 
   bool found_verb_or_adj = false;
-  bool type_matches = false;
 
   for (const auto& result : results) {
     if (result.entry == nullptr) {
@@ -398,10 +397,6 @@ bool Lemmatizer::verifyCandidateWithDictionary(
     // Found a verb/adjective with matching surface
     found_verb_or_adj = true;
 
-    // v0.8: conj_type removed from DictionaryEntry
-    // Type verification is no longer possible, but dictionary presence
-    // validates the base_form
-    type_matches = true;
     break;
   }
 

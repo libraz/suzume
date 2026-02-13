@@ -47,6 +47,7 @@ constexpr size_t posToIndex(suzume::core::PartOfSpeech pos) {
       return 10;
     case suzume::core::PartOfSpeech::Symbol:
       return 11;
+    case suzume::core::PartOfSpeech::Interjection:
     case suzume::core::PartOfSpeech::Other:
     case suzume::core::PartOfSpeech::Unknown:
       return 12;
@@ -1455,8 +1456,9 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::ParticleCase &&
       next.surface == "を") {
     // Check if single char is hiragana
-    auto it = normalize::utf8::decode(prev.surface).begin();
-    if (it != normalize::utf8::decode(prev.surface).end() &&
+    auto decoded = normalize::utf8::decode(prev.surface);
+    auto it = decoded.begin();
+    if (it != decoded.end() &&
         kana::isHiraganaCodepoint(*it)) {
       surface_bonus += cost::kStrong;
     }

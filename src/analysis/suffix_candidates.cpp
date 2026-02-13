@@ -149,7 +149,6 @@ std::vector<UnknownCandidate> generateProductiveSuffixCandidates(
     return candidates;
   }
 
-  constexpr size_t kGachiLen = 6;  // "がち" = 2 chars * 3 bytes
   constexpr size_t kPpoiLen = 9;   // "っぽい" = 3 chars * 3 bytes
 
   // Try different lengths of hiragana (3 to 6 chars for stem + がち/っぽい)

@@ -10,7 +10,6 @@ namespace {
 
 constexpr size_t kInitialSize = 8192;
 constexpr size_t kBlockSize = 256;
-constexpr size_t kMaxSize = 1 << 24;
 
 inline uint8_t toByte(char chr) {
   return static_cast<uint8_t>(chr);

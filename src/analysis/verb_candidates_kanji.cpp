@@ -1339,7 +1339,6 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // Handle volitional pattern for single-kanji Ichidan verbs
       // E.g., 見よう → 見よ (volitional stem) + う (aux)
       // MeCab splits as: 見よ (動詞,未然ウ接続) + う (助動詞)
-      char32_t h3 = (kanji_end + 2 < codepoints.size()) ? codepoints[kanji_end + 2] : 0;
       bool is_volitional_aux = (h1 == kYo && h2 == kU);
       if (is_volitional_aux) {
         // Generate 漢字+よ as volitional stem

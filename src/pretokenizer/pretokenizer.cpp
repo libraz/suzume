@@ -687,8 +687,6 @@ bool PreTokenizer::tryMatchMention(std::string_view text, size_t pos,
   // Check this is NOT an email (no @ followed by domain with dot)
   // If followed by @, it's invalid
   // If the content contains a dot followed by more chars, check if it's email-like
-  std::string_view username = text.substr(content_start, idx - content_start);
-
   // Simple check: mentions don't have dots in username typically
   // Also check if there's more content that looks like a domain
   if (idx < text.size() && text[idx] == '.') {

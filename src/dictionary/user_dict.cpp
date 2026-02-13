@@ -71,72 +71,15 @@ void UserDictionary::clear() {
   trie_.clear();
 }
 
-namespace {
-
-// Parse conjugation type string to enum
-ConjugationType parseConjType(const std::string& type_str) {
-  if (type_str.empty() || type_str == "NONE") {
-    return ConjugationType::None;
-  }
-  if (type_str == "ICHIDAN") {
-    return ConjugationType::Ichidan;
-  }
-  if (type_str == "GODAN_KA") {
-    return ConjugationType::GodanKa;
-  }
-  if (type_str == "GODAN_GA") {
-    return ConjugationType::GodanGa;
-  }
-  if (type_str == "GODAN_SA") {
-    return ConjugationType::GodanSa;
-  }
-  if (type_str == "GODAN_TA") {
-    return ConjugationType::GodanTa;
-  }
-  if (type_str == "GODAN_NA") {
-    return ConjugationType::GodanNa;
-  }
-  if (type_str == "GODAN_BA") {
-    return ConjugationType::GodanBa;
-  }
-  if (type_str == "GODAN_MA") {
-    return ConjugationType::GodanMa;
-  }
-  if (type_str == "GODAN_RA") {
-    return ConjugationType::GodanRa;
-  }
-  if (type_str == "GODAN_WA") {
-    return ConjugationType::GodanWa;
-  }
-  if (type_str == "SURU") {
-    return ConjugationType::Suru;
-  }
-  if (type_str == "KURU") {
-    return ConjugationType::Kuru;
-  }
-  if (type_str == "I_ADJ") {
-    return ConjugationType::IAdjective;
-  }
-  if (type_str == "NA_ADJ") {
-    return ConjugationType::NaAdjective;
-  }
-  return ConjugationType::None;
-}
-
-}  // namespace
-
 core::Expected<size_t, core::Error> UserDictionary::parseCSV(
     std::string_view csv_data) {
   size_t count = 0;
-  size_t line_num = 0;
 
   std::string line;
   std::string csv_str(csv_data);
   std::istringstream stream(csv_str);
 
   while (std::getline(stream, line)) {
-    ++line_num;
-
     // Skip empty lines and comments
     if (line.empty() || line[0] == '#') {
       continue;

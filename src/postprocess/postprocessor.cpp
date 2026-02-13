@@ -238,15 +238,6 @@ bool isDigitChar(char32_t ch) {
   return (ch >= U'0' && ch <= U'9') || (ch >= U'０' && ch <= U'９');
 }
 
-// Check if a character is a numeric unit (億, 万, 千, 百, 円, %, etc.)
-bool isNumericUnit(char32_t ch) {
-  return ch == U'億' || ch == U'万' || ch == U'千' || ch == U'百' ||
-         ch == U'兆' || ch == U'円' || ch == U'％' || ch == U'%' ||
-         ch == U'個' || ch == U'人' || ch == U'回' || ch == U'時' ||
-         ch == U'分' || ch == U'秒' || ch == U'日' || ch == U'月' ||
-         ch == U'年' || ch == U'週' || ch == U'度' || ch == U'倍';
-}
-
 // Check if surface is a numeric expression (starts with digit or contains units)
 bool isNumericExpression(const std::string& surface) {
   if (surface.empty()) return false;

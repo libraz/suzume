@@ -43,24 +43,6 @@ inline void setCell(std::array<std::array<float, BigramTable::kSize>,
   table[static_cast<size_t>(prev)][static_cast<size_t>(next)] = value;
 }
 
-// Helper to set a row (all connections FROM a specific EPOS)
-inline void setRow(std::array<std::array<float, BigramTable::kSize>,
-                              BigramTable::kSize>& table,
-                   EPOS prev, float value) {
-  for (size_t i = 0; i < BigramTable::kSize; ++i) {
-    table[static_cast<size_t>(prev)][i] = value;
-  }
-}
-
-// Helper to set a column (all connections TO a specific EPOS)
-inline void setCol(std::array<std::array<float, BigramTable::kSize>,
-                              BigramTable::kSize>& table,
-                   EPOS next, float value) {
-  for (size_t i = 0; i < BigramTable::kSize; ++i) {
-    table[i][static_cast<size_t>(next)] = value;
-  }
-}
-
 }  // namespace
 
 std::array<std::array<float, BigramTable::kSize>, BigramTable::kSize>
