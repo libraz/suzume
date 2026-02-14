@@ -530,8 +530,8 @@
     },
     {
       "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+        "category" : "segmentation-diff",
+        "reason" : "Vowel repeat merged as single adverb token"
       },
       "description" : "きたああああ - vowel repetition for emphasis",
       "expected" : [
@@ -562,12 +562,8 @@
           "surface" : "きた"
         },
         {
-          "pos" : "Interjection",
-          "surface" : "ああ"
-        },
-        {
-          "pos" : "Interjection",
-          "surface" : "ああ"
+          "pos" : "Adverb",
+          "surface" : "ああああ"
         }
       ],
       "tags" : [

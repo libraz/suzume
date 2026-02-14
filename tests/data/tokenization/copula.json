@@ -286,8 +286,8 @@
     },
     {
       "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+        "category" : "segmentation-diff",
+        "reason" : "Viterbi per-POS pruning: ã§ã(PARTICLE) prunes ã(PARTICLE) before ãªã is evaluated"
       },
       "description" : "彼女でもない - particle も + ない, not verb もなう",
       "expected" : [
@@ -316,7 +316,7 @@
           "surface" : "彼女"
         },
         {
-          "pos" : "Conjunction",
+          "pos" : "Particle",
           "surface" : "でも"
         },
         {

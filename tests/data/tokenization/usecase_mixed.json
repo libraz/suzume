@@ -1028,10 +1028,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
-      },
       "description" : "あれ",
       "expected" : [
         {
@@ -1049,20 +1045,6 @@
       ],
       "id" : "pronoun_are",
       "input" : "あれが欲しい",
-      "suzume_expected" : [
-        {
-          "pos" : "Interjection",
-          "surface" : "あれ"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "が"
-        },
-        {
-          "pos" : "Adjective",
-          "surface" : "欲しい"
-        }
-      ],
       "tags" : [
         "pronoun"
       ]

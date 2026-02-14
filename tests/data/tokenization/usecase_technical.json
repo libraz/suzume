@@ -938,7 +938,7 @@
     {
       "accepted_diff" : {
         "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+        "reason" : "Dict NOUN æä¼ã blocks ichidan verb candidate generation"
       },
       "description" : "Conditional sentence with ba (split: verb stem + polite aux)",
       "expected" : [
@@ -981,7 +981,8 @@
           "surface" : "が"
         },
         {
-          "pos" : "Interjection",
+          "lemma" : "ある",
+          "pos" : "Verb",
           "surface" : "あれ"
         },
         {

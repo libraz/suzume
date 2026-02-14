@@ -385,8 +385,19 @@ BigramTable::initTable() {
   setCell(t, EPOS::NounFormal, EPOS::ParticleAdverbial, cost::kStrongBonus);
 
   // =========================================================================
-  // Pronoun → ParticleAdverbial (あれ+だけ, それ+だけ)
+  // Pronoun → Particles
   // =========================================================================
+
+  // Pronoun → ParticleCase (あれ+が, これ+を, それ+に) - moderate bonus
+  // Pronouns naturally take case particles; beats VERB_連用 interpretation
+  // E.g., あれが欲しい → あれ(PRON)+が, not あれ(VERB ある)+が
+  setCell(t, EPOS::Pronoun, EPOS::ParticleCase, cost::kModerateBonus);
+
+  // Pronoun → AuxCopulaDesu (何+です, これ+です) - moderate bonus
+  // Pronouns naturally take polite copula; matches Noun→AuxCopulaDesu bonus
+  setCell(t, EPOS::Pronoun, EPOS::AuxCopulaDesu, cost::kModerateBonus);
+
+  // Pronoun → ParticleAdverbial (あれ+だけ, それ+だけ)
   setCell(t, EPOS::Pronoun, EPOS::ParticleAdverbial, cost::kStrongBonus);
 
   // =========================================================================

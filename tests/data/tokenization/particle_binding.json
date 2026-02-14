@@ -36,6 +36,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "Archaic kuruwa-kotoba: ã treated as particle ã® instead of auxiliary"
+      },
       "description" : "Kuruwa-kotoba ありんす",
       "expected" : [
         {
@@ -63,6 +67,31 @@
       ],
       "id" : "kuruwa_arinsu",
       "input" : "ここにありんす",
+      "suzume_expected" : [
+        {
+          "pos" : "Pronoun",
+          "surface" : "ここ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "に"
+        },
+        {
+          "lemma" : "ある",
+          "pos" : "Verb",
+          "surface" : "あり"
+        },
+        {
+          "lemma" : "の",
+          "pos" : "Particle",
+          "surface" : "ん"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "す"
+        }
+      ],
       "tags" : [
         "character_speech",
         "kuruwa"

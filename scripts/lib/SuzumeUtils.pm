@@ -1044,11 +1044,13 @@ sub apply_suzume_merge {
 
         if (!$merged) {
             push @result, {
-                surface => $t->{surface},
-                pos     => $t->{pos},  # Keep raw POS for later mapping
-                pos_sub1 => $t->{pos_sub1},
-                pos_sub2 => $t->{pos_sub2},
-                lemma   => $t->{lemma} // $t->{surface}
+                surface   => $t->{surface},
+                pos       => $t->{pos},  # Keep raw POS for later mapping
+                pos_sub1  => $t->{pos_sub1},
+                pos_sub2  => $t->{pos_sub2},
+                conj_type => $t->{conj_type},
+                conj_form => $t->{conj_form},
+                lemma     => $t->{lemma} // $t->{surface}
             };
             $i++;
         }
@@ -1437,6 +1439,7 @@ sub map_mecab_pos {
             $token->{lemma} = '違う';
             return 'Verb';
         }
+
 
         # 時々: Suzume treats as Noun, not Adverb
         if ($surface eq '時々' && $pos eq '副詞') {
