@@ -821,10 +821,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "verb form: context-dependent POS classification"
-      },
       "description" : "B57: 叩ければ - grammar-first: 叩け+れ+ば, で(AUX,だ)+も(PARTICLE), いい(ADJ)",
       "expected" : [
         {
@@ -841,33 +837,7 @@
           "surface" : "何"
         },
         {
-          "pos" : "Conjunction",
-          "surface" : "でも"
-        },
-        {
-          "lemma" : "いう",
-          "pos" : "Verb",
-          "surface" : "いい"
-        }
-      ],
-      "id" : "tatakereba_verb",
-      "input" : "叩ければ何でもいい",
-      "suzume_expected" : [
-        {
-          "lemma" : "叩ける",
-          "pos" : "Verb",
-          "surface" : "叩けれ"
-        },
-        {
           "pos" : "Particle",
-          "surface" : "ば"
-        },
-        {
-          "pos" : "Pronoun",
-          "surface" : "何"
-        },
-        {
-          "pos" : "Conjunction",
           "surface" : "でも"
         },
         {
@@ -875,6 +845,8 @@
           "surface" : "いい"
         }
       ],
+      "id" : "tatakereba_verb",
+      "input" : "叩ければ何でもいい",
       "tags" : [
         "verb",
         "potential",
@@ -1114,10 +1086,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "verb form: context-dependent POS classification"
-      },
       "description" : "帰りたいらしい - MeCab-compatible split: 帰り + たい + らしい",
       "expected" : [
         {
@@ -1136,21 +1104,6 @@
       ],
       "id" : "rashii_tai_verb",
       "input" : "帰りたいらしい",
-      "suzume_expected" : [
-        {
-          "lemma" : "帰る",
-          "pos" : "Verb",
-          "surface" : "帰り"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "たい"
-        },
-        {
-          "pos" : "Adjective",
-          "surface" : "らしい"
-        }
-      ],
       "tags" : [
         "verb",
         "rashii",

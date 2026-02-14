@@ -1476,11 +1476,10 @@ sub map_mecab_pos {
             return 'Adverb';
         }
 
-        # でも (mid-sentence concessive): Suzume treats as Conjunction
-        # MeCab: 助詞,副助詞 → Particle, but Suzume outputs CONJ
-        if ($surface eq 'でも' && $pos eq '助詞') {
-            return 'Conjunction';
-        }
+        # でも: context-dependent, handled in _postprocess_demo()
+        # After interrogative (何でも, 誰でも) → Particle (副助詞)
+        # Otherwise (でも始めよう) → Conjunction
+        # MeCab correctly classifies as 助詞 → let default Particle mapping apply
 
         # っていう: Suzume treats as Determiner (similar to という)
         if ($surface eq 'っていう' && $pos eq '助詞') {
@@ -1927,6 +1926,50 @@ sub _postprocess_ikaga {
     }
 }
 
+# でも: context-dependent POS
+# After interrogative (何でも, 誰でも, どこでも, いつでも) → keep as Particle
+# Otherwise (でも始めよう, 彼女でもない) → Conjunction
+sub _postprocess_demo {
+    my ($tokens) = @_;
+    my %interrogatives = map { $_ => 1 } qw(何 誰 どこ いつ どれ いくら どんな);
+    for my $i (0 .. $#$tokens) {
+        my $t = $tokens->[$i];
+        next unless ($t->{surface} // '') eq 'でも' && ($t->{pos} // '') eq 'Particle';
+
+        # Check if preceded by interrogative
+        if ($i > 0 && $interrogatives{$tokens->[$i - 1]{surface} // ''}) {
+            # Keep as Particle (何でも = anything)
+            next;
+        }
+
+        # Otherwise → Conjunction (でも = but/however)
+        $t->{pos} = 'Conjunction';
+    }
+}
+
+# いい: MeCab sometimes classifies as 動詞(いう) instead of 形容詞(いい)
+# At sentence end or before non-verb tokens, いい is the adjective "good"
+# In compound verb patterns (言い出す), いい is the verb 連用形 — but MeCab splits those
+sub _postprocess_ii {
+    my ($tokens) = @_;
+    for my $i (0 .. $#$tokens) {
+        my $t = $tokens->[$i];
+        next unless ($t->{surface} // '') eq 'いい';
+        next unless ($t->{pos} // '') eq 'Verb' && ($t->{lemma} // '') eq 'いう';
+
+        # If sentence-final or followed by non-verb → Adjective
+        my $next_is_verb = 0;
+        if ($i < $#$tokens) {
+            $next_is_verb = 1 if ($tokens->[$i + 1]{pos} // '') eq 'Verb';
+        }
+
+        unless ($next_is_verb) {
+            $t->{pos} = 'Adjective';
+            $t->{lemma} = 'いい';
+        }
+    }
+}
+
 sub _postprocess_mecab_tokens {
     my ($tokens, $original_text, $replacements) = @_;
     return $tokens unless %$replacements;
@@ -2011,6 +2054,8 @@ sub get_expected_tokens {
     # Post-processing: context-dependent POS normalization
     _postprocess_sou(\@tokens);
     _postprocess_ikaga(\@tokens);
+    _postprocess_demo(\@tokens);
+    _postprocess_ii(\@tokens);
 
     if ($applied_rule) {
         return (\@tokens, 'MeCab+SuzumeRules', $applied_rule);

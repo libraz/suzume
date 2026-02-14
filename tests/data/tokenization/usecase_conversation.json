@@ -382,10 +382,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ã: verb vs auxiliary in ãã¾ããã"
-      },
       "expected" : [
         {
           "pos" : "Noun",
@@ -428,46 +424,6 @@
       ],
       "id" : "sched_busy",
       "input" : "今週は忙しいので来週にしましょう",
-      "suzume_expected" : [
-        {
-          "pos" : "Noun",
-          "surface" : "今週"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "は"
-        },
-        {
-          "pos" : "Verb",
-          "surface" : "忙しい"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "ので"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "来週"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "に"
-        },
-        {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
-        },
-        {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "ましょ"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "う"
-        }
-      ],
       "tags" : [
         "schedule"
       ]

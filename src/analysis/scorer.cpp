@@ -229,7 +229,8 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       grammar::isPureHiragana(edge.surface)) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     // Stronger bonus for longer interjections (common greetings are 4-5 chars)
-    float bonus = (char_len <= 3) ? -1.5F
+    float bonus = (char_len <= 2) ? -0.5F
+                : (char_len <= 3) ? -1.5F
                                   : -2.0F - static_cast<float>(char_len - 3) * 0.5F;
     cost += bonus;
   }

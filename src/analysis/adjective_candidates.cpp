@@ -351,8 +351,8 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     return candidates;
   }
 
-  // Find kanji portion (typically 1-2 characters for i-adjectives)
-  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 3,
+  // Find kanji portion (1-2 characters for i-adjectives; no 3-char kanji stems exist)
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 2,
                                         normalize::CharType::Kanji);
 
   if (kanji_end == start_pos) {
@@ -819,7 +819,7 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
     const std::vector<char32_t>& codepoints,
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const UnknownOptions& options) {
+    const UnknownOptions& /*options*/) {
   std::vector<UnknownCandidate> candidates;
 
   if (start_pos >= char_types.size() ||
@@ -827,9 +827,10 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
     return candidates;
   }
 
-  // Find kanji sequence
+  // Find kanji sequence (max 3 chars for na-adjectives: 獰猛, 不器用)
+  constexpr size_t kMaxNaAdjKanjiLength = 3;
   size_t kanji_end = findCharRegionEnd(char_types, start_pos,
-                                        options.max_kanji_length,
+                                        kMaxNaAdjKanjiLength,
                                         normalize::CharType::Kanji);
 
   size_t kanji_len = kanji_end - start_pos;
@@ -1175,9 +1176,9 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
           continue;  // Skip - likely part of honorific suffix さん/さま
         }
         // Base cost for hiragana i-adjective candidates
-        // Use neutral base (0.0F) to avoid false positives like につい
-        // which should be parsed as に(PARTICLE)+ついて(VERB)
-        float cost = 0.0F + (1.0F - cand.confidence) * 0.5F;
+        // Use slightly elevated base to avoid fragments like ろしい beating
+        // kanji adjectives like 恐ろしい (kanji adj base=0.2F)
+        float cost = 0.25F + (1.0F - cand.confidence) * 0.5F;
         if (has_prolonged) {
           cost -= 0.1F;  // Bonus for colloquial patterns like すごーい
           SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" -0.1 (prolonged_sound_bonus)\n");
@@ -1680,8 +1681,8 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
     return candidates;
   }
 
-  // Find kanji portion (1-3 characters for adjective stem)
-  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 3,
+  // Find kanji portion (1-2 characters for adjective stem)
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 2,
                                         normalize::CharType::Kanji);
 
   if (kanji_end == start_pos) {

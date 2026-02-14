@@ -685,10 +685,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "verb form: context-dependent POS/lemma"
-      },
       "description" : "B24: 感じる verbs should have correct lemma, not 感じする",
       "expected" : [
         {
@@ -703,16 +699,6 @@
       ],
       "id" : "kanjiru_lemma",
       "input" : "感じて",
-      "suzume_expected" : [
-        {
-          "pos" : "Noun",
-          "surface" : "感じ"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "て"
-        }
-      ],
       "tags" : [
         "ichidan",
         "lemma"
@@ -735,10 +721,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "verb form: context-dependent POS/lemma"
-      },
       "description" : "感じた past form - MeCab-compatible split",
       "expected" : [
         {
@@ -753,16 +735,6 @@
       ],
       "id" : "kanjiru_past",
       "input" : "感じた",
-      "suzume_expected" : [
-        {
-          "pos" : "Noun",
-          "surface" : "感じ"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "た"
-        }
-      ],
       "tags" : [
         "ichidan",
         "past"

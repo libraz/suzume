@@ -353,6 +353,11 @@ BigramTable::initTable() {
   // Ensures そんだけ → そん+だけ over そん+だ+け
   setCell(t, EPOS::Noun, EPOS::ParticleAdverbial, cost::kStrongBonus);
 
+  // Noun → AdjNaAdj (一番+獰猛, とても+大切) - strong bonus
+  // Prevents long kanji noun from absorbing na-adjective stem
+  // (e.g., 一番獰猛+な → 一番+獰猛+な)
+  setCell(t, EPOS::Noun, EPOS::AdjNaAdj, cost::kStrongBonus);
+
   // NounFormal → ParticleConj (こと+が) - neutral
   setCell(t, EPOS::NounFormal, EPOS::ParticleCase, cost::kNeutral);
 
@@ -374,6 +379,15 @@ BigramTable::initTable() {
   // Needs to overcome: AUX word cost (0.3) + AuxNegativeNai bonus (-0.5) = -0.2
   // vs ADJ word cost (0.5) + this bonus = must be < -0.2
   setCell(t, EPOS::NounFormal, EPOS::AdjBasic, cost::kVeryStrongBonus);
+
+  // NounFormal → ParticleAdverbial (こと+だけ, はず+だけ) - strong bonus
+  // Prevents ことだけ → こと+だ+け split
+  setCell(t, EPOS::NounFormal, EPOS::ParticleAdverbial, cost::kStrongBonus);
+
+  // =========================================================================
+  // Pronoun → ParticleAdverbial (あれ+だけ, それ+だけ)
+  // =========================================================================
+  setCell(t, EPOS::Pronoun, EPOS::ParticleAdverbial, cost::kStrongBonus);
 
   // =========================================================================
   // Determiner → Noun (連体詞は名詞を修飾)

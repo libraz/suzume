@@ -230,6 +230,8 @@ Commands:
   map-pos SURFACE OLD NEW Replace POS for specific surface only
   accept-diff <input>    Accept Suzume output as valid (add suzume_expected)
   accept-diff --all      Accept all failed tests (batch mode)
+  reset-suzume <input>   Remove stale suzume_expected (fallback to expected)
+  reset-suzume --all     Remove all suzume_expected where Suzume matches expected
   list                   List all test files with case counts
   list-pos               List all POS values used in tests
   validate-ids           Detect/fix non-ASCII or duplicate IDs
@@ -1386,6 +1388,84 @@ if ($command eq 'accept-diff') {
         print "[DRY-RUN] Use without --dry-run to apply changes.\n";
     } else {
         print "✓ Updated ", scalar(@to_update), " test cases\n";
+    }
+    exit 0;
+}
+
+if ($command eq 'reset-suzume') {
+    # Remove stale suzume_expected field from test cases
+    # Use when Suzume now matches expected (no override needed)
+    my $suzume_cli = "$project_root/build/bin/suzume-cli";
+    die "Suzume CLI not found: $suzume_cli\n" unless -x $suzume_cli;
+
+    my @to_reset;
+
+    if ($analyze_all) {
+        # Find all tests with suzume_expected where Suzume now matches expected
+        my @files = get_test_files_filtered($test_file);
+        for my $path (@files) {
+            my $data = load_json($path);
+            my $cases_key = exists $data->{cases} ? 'cases' : 'test_cases';
+            my $cases = $data->{$cases_key} || [];
+            my $basename = $path;
+            $basename =~ s{.*/}{};
+            $basename =~ s{\.json$}{};
+
+            for my $idx (0 .. $#$cases) {
+                my $c = $cases->[$idx];
+                next unless $c->{suzume_expected};
+
+                push @to_reset, {
+                    input    => $c->{input},
+                    found    => { file => $path, data => $data, case => $c,
+                                  index => $idx, basename => $basename },
+                };
+            }
+        }
+    } elsif ($input) {
+        my $found = find_test_by_input($input);
+        die "No test found for input: $input\n" unless $found;
+        unless ($found->{case}{suzume_expected}) {
+            print "Test has no suzume_expected: $found->{basename}/$found->{index}\n";
+            exit 0;
+        }
+        push @to_reset, { input => $input, found => $found };
+    } else {
+        die "Usage: $0 reset-suzume <input>\n" .
+            "   or: $0 reset-suzume --all\n";
+    }
+
+    if (!@to_reset) {
+        print "No tests with suzume_expected found.\n";
+        exit 0;
+    }
+
+    print "Found ", scalar(@to_reset), " test(s) with suzume_expected\n\n";
+
+    my $removed = 0;
+    for my $item (@to_reset) {
+        my $inp = $item->{input};
+        my $found = $item->{found};
+        my $cases_key = exists $found->{data}{cases} ? 'cases' : 'test_cases';
+
+        print "[$found->{basename}/$found->{index}] $inp\n";
+
+        if ($dry_run) {
+            print "  [DRY-RUN] Would remove suzume_expected\n\n";
+            next;
+        }
+
+        delete $found->{data}{$cases_key}[$found->{index}]{suzume_expected};
+        delete $found->{data}{$cases_key}[$found->{index}]{accepted_diff};
+        save_json($found->{file}, $found->{data});
+        print "  ✓ Removed suzume_expected\n\n";
+        $removed++;
+    }
+
+    if ($dry_run) {
+        print "[DRY-RUN] Use without --dry-run to apply changes.\n";
+    } else {
+        print "✓ Removed suzume_expected from $removed test case(s)\n";
     }
     exit 0;
 }
