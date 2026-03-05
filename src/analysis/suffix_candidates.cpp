@@ -920,6 +920,22 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     }
   }
 
+  // Skip compound generation if the full surface is a known verb in dictionary
+  // E.g., 下さい is dict verb (くださる), not compound noun
+  {
+    std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
+    if (dict_manager != nullptr && !full_surface.empty()) {
+      auto entries = dict_manager->lookup(full_surface, 0);
+      for (const auto& entry : entries) {
+        if (entry.entry != nullptr &&
+            entry.entry->surface == full_surface &&
+            entry.entry->pos == core::PartOfSpeech::Verb) {
+          return candidates;  // Skip - dict verb should win
+        }
+      }
+    }
+  }
+
   // Generate candidate with cost based on pattern
   std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
   if (!surface.empty()) {

@@ -1,0 +1,98 @@
+{
+  "cases" : [
+    {
+      "description" : "めっちゃかわいい - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "めっちゃ"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "かわいい"
+        }
+      ],
+      "id" : "mettchi_kawaii",
+      "input" : "めっちゃかわいい",
+      "tags" : [
+        "informal",
+        "slang"
+      ]
+    },
+    {
+      "description" : "めっちゃすごい - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "めっちゃ"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "すごい"
+        }
+      ],
+      "id" : "mettchi_sugoi",
+      "input" : "めっちゃすごい",
+      "tags" : [
+        "informal",
+        "slang"
+      ]
+    },
+    {
+      "description" : "壊されちゃうよ - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "壊す",
+          "pos" : "Verb",
+          "surface" : "壊さ"
+        },
+        {
+          "lemma" : "れる",
+          "pos" : "Auxiliary",
+          "surface" : "れ"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "ちゃう"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "よ"
+        }
+      ],
+      "id" : "sarechi_uyo",
+      "input" : "壊されちゃうよ",
+      "tags" : [
+        "informal",
+        "passive",
+        "contraction"
+      ]
+    },
+    {
+      "description" : "取っちゃうぞ - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "取る",
+          "pos" : "Verb",
+          "surface" : "取っ"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "ちゃう"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "ぞ"
+        }
+      ],
+      "id" : "ttchi_uzo",
+      "input" : "取っちゃうぞ",
+      "tags" : [
+        "informal",
+        "contraction"
+      ]
+    }
+  ],
+  "description" : "usecase_informal tests",
+  "version" : "1.0"
+}

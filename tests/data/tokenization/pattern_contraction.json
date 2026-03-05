@@ -191,6 +191,103 @@
         "suffix",
         "regression"
       ]
+    },
+    {
+      "description" : "壊されちゃう - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "壊す",
+          "pos" : "Verb",
+          "surface" : "壊さ"
+        },
+        {
+          "lemma" : "れる",
+          "pos" : "Auxiliary",
+          "surface" : "れ"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "ちゃう"
+        }
+      ],
+      "id" : "sarechi_u",
+      "input" : "壊されちゃう",
+      "tags" : [
+        "contraction",
+        "passive",
+        "regression"
+      ]
+    },
+    {
+      "description" : "食べられちゃう - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
+        },
+        {
+          "lemma" : "られる",
+          "pos" : "Auxiliary",
+          "surface" : "られ"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "ちゃう"
+        }
+      ],
+      "id" : "berarechi_u",
+      "input" : "食べられちゃう",
+      "tags" : [
+        "contraction",
+        "passive",
+        "regression"
+      ]
+    },
+    {
+      "description" : "買っちゃった - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "買う",
+          "pos" : "Verb",
+          "surface" : "買っ"
+        },
+        {
+          "lemma" : "ちゃう",
+          "pos" : "Verb",
+          "surface" : "ちゃっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
+      "id" : "ttchi_ttta",
+      "input" : "買っちゃった",
+      "tags" : [
+        "contraction",
+        "regression"
+      ]
+    },
+    {
+      "description" : "言っちゃう - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "言う",
+          "pos" : "Verb",
+          "surface" : "言っ"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "ちゃう"
+        }
+      ],
+      "id" : "ttchi_u",
+      "input" : "言っちゃう",
+      "tags" : [
+        "contraction",
+        "regression"
+      ]
     }
   ],
   "description" : "Contraction patterns (てる、ちゃう)",

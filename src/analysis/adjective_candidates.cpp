@@ -534,6 +534,12 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       continue;  // Skip - suru verb + te + hoshii pattern
     }
 
+    // Skip surfaces that are known dictionary verbs
+    // E.g., 下さい(=ください) is a verb (くださる), not an i-adjective
+    if (isVerbInDictionary(dict_manager, surface)) {
+      continue;
+    }
+
     // Check all candidates for IAdjective, not just the best one
     // This handles cases like 美味しそう where Suru (美味する) may have higher
     // confidence than IAdjective (美味しい), but we still want to generate
@@ -1823,6 +1829,14 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
         if (is_likely_verb_stem) {
           continue;  // Skip - likely verb renyokei, not adjective stem
         }
+      }
+
+      // Skip adjective stem when the full kanji+hiragana surface is a known verb
+      // E.g., 下さい(=ください) is a verb, not adjective stem 下 + nominalization さ + い
+      std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
+      if (isVerbInDictionary(dict_manager, full_surface)) {
+        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   skip: full surface \"" << full_surface << "\" is dict verb\n");
+        continue;
       }
 
       // Low cost to compete with single-token verb path (高すぎる as VERB/ADJ)

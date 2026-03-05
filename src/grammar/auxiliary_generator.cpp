@@ -452,6 +452,7 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"くださった", "くださった", "くださる", kAuxTekureru, kAuxOutTa, kAuxOutTe});
   entries.push_back({"くださって", "くださって", "くださる", kAuxTekureru, kAuxOutTe, kAuxOutTe});
   entries.push_back({"ください", "ください", "くださる", kAuxTekureru, kAuxOutBase, kAuxOutTe});
+  entries.push_back({"下さい", "下さい", "下さる", kAuxTekureru, kAuxOutBase, kAuxOutTe});
   entries.push_back({"くださいます", "くださいます", "くださる", kAuxTekureru, kAuxOutMasu, kAuxOutTe});
 
   // === てほしい ===

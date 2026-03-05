@@ -458,6 +458,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Request - ください is VERB (くださる) in MeCab
       // くださる is special ra-row godan with irregular imperative form ください
       verb("ください", "くださる", EPOS::VerbShuushikei),
+      verb("下さい", "下さる", EPOS::VerbShuushikei),
       verb("くださいませ", "くださる", EPOS::VerbShuushikei),
 
       // Special ra-row godan verbs (五段ラ行特殊) with い-form renyokei

@@ -218,6 +218,51 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     return candidates;
   }
 
+  // Godan-sa mizenkei pattern: single-kanji + さ + れ/せ (passive/causative)
+  // E.g., 騙される → 騙さ (mizenkei of 騙す) + れる (passive)
+  //       晒される → 晒さ (mizenkei of 晒す) + れる (passive)
+  //       潰される → 潰さ (mizenkei of 潰す) + れる (passive)
+  // Only for single-kanji stems: multi-kanji + さ + れ is suru-verb (処理される)
+  // The inflection module doesn't recognize kanji+さ as godan-sa mizenkei,
+  // so we generate this candidate explicitly.
+  if (kanji_end - start_pos == 1 &&
+      kanji_end < hiragana_end && codepoints[kanji_end] == U'さ') {
+    size_t sa_pos = kanji_end + 1;  // position after さ
+    if (sa_pos < codepoints.size()) {
+      char32_t after_sa = codepoints[sa_pos];
+      // さ + れ (passive) or さ + せ (causative)
+      if (after_sa == U'れ' || after_sa == U'せ') {
+        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+        std::string base_form = kanji_stem + "す";  // e.g., 騙 + す = 騙す
+        std::string surface = kanji_stem + "さ";    // e.g., 騙 + さ = 騙さ
+
+        // Verify this could be a valid godan-sa verb via inflection analysis
+        auto sa_results = inflection.analyze(base_form);
+        bool is_valid_godan_sa = false;
+        for (const auto& cand : sa_results) {
+          if (cand.verb_type == grammar::VerbType::GodanSa &&
+              cand.confidence >= 0.4F) {
+            is_valid_godan_sa = true;
+            break;
+          }
+        }
+
+        if (is_valid_godan_sa) {
+          // Generate mizenkei candidate with favorable cost
+          constexpr float kCost = 0.1F;
+          SUZUME_DEBUG_LOG("[VERB_CAND] " << surface
+                          << " godan_sa_mizenkei lemma=" << base_form
+                          << " cost=" << kCost << "\n");
+          candidates.push_back(makeVerbCandidate(
+              surface, start_pos, kanji_end + 1, kCost, base_form,
+              grammar::verbTypeToConjType(grammar::VerbType::GodanSa),
+              false, CandidateOrigin::VerbKanji, 0.8F, "godan_sa_mizenkei",
+              core::ExtendedPOS::VerbMizenkei));
+        }
+      }
+    }
+  }
+
   // Try different stem lengths (kanji only, or kanji + 1 hiragana for ichidan)
   // This handles both godan (kanji stem) and ichidan (kanji + hiragana stem)
   for (size_t stem_end = kanji_end; stem_end <= kanji_end + 1 && stem_end < hiragana_end; ++stem_end) {
@@ -242,6 +287,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // For single-kanji stems, only skip Suffix POS entries (さん, 様, etc.)
       // This allows verb renyokei like 立ち (立つ) while blocking 姉さん
       // Note: Only skip for OTHER (suffixes), not VERB (する is a verb, not suffix)
+      // Exception: さ followed by れ/せ is godan-sa mizenkei + passive/causative,
+      // not nominalization suffix (騙される, 話される, 殺させる)
       bool is_suffix_pattern = false;
       if (dict_manager != nullptr) {
         auto suffix_results = dict_manager->lookup(hiragana_part, 0);
@@ -255,6 +302,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             if (is_suffix_pos ||
                 (is_multi_kanji && (result.entry->extended_pos == core::ExtendedPOS::Suffix ||
                                     result.entry->pos == core::PartOfSpeech::Other))) {
+              // Exception: さ + れ/せ is godan-sa mizenkei + passive/causative
+              if (hiragana_part == "さ" && end_pos < codepoints.size()) {
+                char32_t next_char = codepoints[end_pos];
+                if (next_char == U'れ' || next_char == U'せ') {
+                  break;  // Not a suffix - godan-sa verb pattern
+                }
+              }
               // This hiragana part is a registered suffix - skip verb candidate
               is_suffix_pattern = true;
               break;
@@ -804,6 +858,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           }
           if (skip_ichidan_ta) {
             continue;  // Skip this candidate, prefer NOUN + た split
+          }
+          // Skip if surface is already a registered VERB in dictionary
+          // The dict entry has correct lemma; this unknown candidate would have wrong lemma
+          // E.g., 下さい is dict verb (lemma=下さる), skip godan-wa candidate (lemma=下さう)
+          if (!in_dict && vh::isVerbInDictionary(dict_manager, surface)) {
+            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict VERB, skipping unknown candidate\n");
+            continue;
           }
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface

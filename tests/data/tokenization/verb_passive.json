@@ -534,6 +534,78 @@
         "sentence",
         "ichidan"
       ]
+    },
+    {
+      "description" : "騙されちゃう - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "騙す",
+          "pos" : "Verb",
+          "surface" : "騙さ"
+        },
+        {
+          "lemma" : "れる",
+          "pos" : "Auxiliary",
+          "surface" : "れ"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "ちゃう"
+        }
+      ],
+      "id" : "damasarechi_u",
+      "input" : "騙されちゃう",
+      "tags" : [
+        "passive",
+        "contraction",
+        "informal"
+      ]
+    },
+    {
+      "description" : "潰されちゃう - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "潰す",
+          "pos" : "Verb",
+          "surface" : "潰さ"
+        },
+        {
+          "lemma" : "れる",
+          "pos" : "Auxiliary",
+          "surface" : "れ"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "ちゃう"
+        }
+      ],
+      "id" : "tsubusarechi_u",
+      "input" : "潰されちゃう",
+      "tags" : [
+        "passive",
+        "contraction",
+        "informal"
+      ]
+    },
+    {
+      "description" : "晒される - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "晒す",
+          "pos" : "Verb",
+          "surface" : "晒さ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "れる"
+        }
+      ],
+      "id" : "sareru",
+      "input" : "晒される",
+      "tags" : [
+        "passive",
+        "informal"
+      ]
     }
   ],
   "description" : "Passive voice verbs (受身形) - MeCab-compatible split format",

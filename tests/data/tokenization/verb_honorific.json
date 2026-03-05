@@ -419,6 +419,48 @@
         "honorific",
         "mecab_compat"
       ]
+    },
+    {
+      "description" : "下さい - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "下さる",
+          "pos" : "Verb",
+          "surface" : "下さい"
+        }
+      ],
+      "id" : "sai",
+      "input" : "下さい",
+      "tags" : [
+        "honorific",
+        "kanji"
+      ]
+    },
+    {
+      "description" : "教えて下さい - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "教える",
+          "pos" : "Verb",
+          "surface" : "教え"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "lemma" : "下さる",
+          "pos" : "Verb",
+          "surface" : "下さい"
+        }
+      ],
+      "id" : "ete_sai",
+      "input" : "教えて下さい",
+      "tags" : [
+        "honorific",
+        "kanji",
+        "te_form"
+      ]
     }
   ],
   "description" : "Honorific verbs (敬語動詞)",

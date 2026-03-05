@@ -1211,6 +1211,63 @@
         "wagahai",
         "W-012"
       ]
+    },
+    {
+      "description" : "こっそり見る - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "こっそり"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "見る"
+        }
+      ],
+      "id" : "kottsori_ru",
+      "input" : "こっそり見る",
+      "tags" : [
+        "adverb",
+        "regression"
+      ]
+    },
+    {
+      "description" : "こっそり食べる - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "こっそり"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "食べる"
+        }
+      ],
+      "id" : "kottsori_beru",
+      "input" : "こっそり食べる",
+      "tags" : [
+        "adverb",
+        "regression"
+      ]
+    },
+    {
+      "description" : "ぐっすり眠る - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "ぐっすり"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "眠る"
+        }
+      ],
+      "id" : "guttsuri_ru",
+      "input" : "ぐっすり眠る",
+      "tags" : [
+        "adverb",
+        "regression"
+      ]
     }
   ],
   "description" : "General adverbs",

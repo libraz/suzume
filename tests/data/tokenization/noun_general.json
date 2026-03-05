@@ -1594,6 +1594,66 @@
       ],
       "id" : "k5bb6niita",
       "input" : "家にいた"
+    },
+    {
+      "description" : "おかず - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "おかず"
+        }
+      ],
+      "id" : "okazu",
+      "input" : "おかず",
+      "tags" : [
+        "hiragana",
+        "noun"
+      ]
+    },
+    {
+      "description" : "ふともも - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "ふともも"
+        }
+      ],
+      "id" : "futomomo",
+      "input" : "ふともも",
+      "tags" : [
+        "hiragana",
+        "noun"
+      ]
+    },
+    {
+      "description" : "おでん - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "おでん"
+        }
+      ],
+      "id" : "oden",
+      "input" : "おでん",
+      "tags" : [
+        "hiragana",
+        "noun"
+      ]
+    },
+    {
+      "description" : "おもち - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "おもち"
+        }
+      ],
+      "id" : "omochi",
+      "input" : "おもち",
+      "tags" : [
+        "hiragana",
+        "noun"
+      ]
     }
   ],
   "description" : "General nouns",

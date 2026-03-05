@@ -1042,6 +1042,34 @@ sub apply_suzume_merge {
             }
         }
 
+        # 10. Lexicalized hiragana words: merge tokens that MeCab splits
+        #     but are single lexical units in Suzume's L2 dictionary
+        #     e.g., ふと+もも → ふともも (thigh), えっ+ち → えっち
+        if (!$merged) {
+            my %HIRAGANA_COMPOUNDS = (
+                'ふともも' => '名詞',
+                'えっち'   => '名詞',
+                'おもち'   => '名詞',
+            );
+            for my $word (sort { length($b) <=> length($a) } keys %HIRAGANA_COMPOUNDS) {
+                if ($remaining =~ /^\Q$word\E/) {
+                    my $len = 0;
+                    my $j = $i;
+                    while ($j < @$tokens && $len < length($word)) {
+                        $len += length($tokens->[$j]{surface});
+                        $j++;
+                    }
+                    if ($len == length($word)) {
+                        push @result, { surface => $word, pos => $HIRAGANA_COMPOUNDS{$word}, lemma => $word };
+                        $i = $j;
+                        $merged = 1;
+                        $applied_rule //= 'hiragana-compound';
+                        last;
+                    }
+                }
+            }
+        }
+
         if (!$merged) {
             push @result, {
                 surface   => $t->{surface},
@@ -1169,6 +1197,7 @@ sub apply_suzume_merge {
     my %prefix_exceptions = (
         'お出で' => 1, 'おいで' => 1, 'おすすめ' => 1, 'お疲れ様' => 1,
         'お金' => 1, 'お前' => 1,
+        'おかず' => 1, 'おでん' => 1, 'おもち' => 1,
     );
     for my $t (@result) {
         my $surface = $t->{surface} // '';
@@ -1581,7 +1610,7 @@ sub map_mecab_pos {
         if ($pos eq '動詞' && $pos_sub1 eq '非自立') {
             my $lemma = $token->{lemma} // '';
             return 'Verb' if $lemma eq 'すぎる';   # すぎる is subsidiary verb, not auxiliary
-            return 'Verb' if $lemma eq 'くださる'; # ください is polite request verb
+            return 'Verb' if $lemma eq 'くださる' || $lemma eq '下さる'; # ください/下さい is polite request verb
             return 'Verb' if $lemma eq 'いたす';   # いたす is humble verb (VERB in Suzume)
             return 'Verb' if $lemma eq 'あげる';   # てあげる benefit verb (VERB in Suzume)
             return 'Verb' if $lemma eq 'くれる';   # てくれる benefit verb (VERB in Suzume)
