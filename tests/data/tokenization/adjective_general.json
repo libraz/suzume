@@ -99,6 +99,50 @@
         "adjective",
         "context"
       ]
+    },
+    {
+      "description" : "甘くて美味しい - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "甘い",
+          "pos" : "Adjective",
+          "surface" : "甘く"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "美味しい"
+        }
+      ],
+      "id" : "kute_shii",
+      "input" : "甘くて美味しい",
+      "tags" : [
+        "adjective",
+        "renyokei"
+      ]
+    },
+    {
+      "description" : "辛くない - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "辛い",
+          "pos" : "Adjective",
+          "surface" : "辛く"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "kunai",
+      "input" : "辛くない",
+      "tags" : [
+        "adjective",
+        "renyokei"
+      ]
     }
   ],
   "description" : "adjective_general tests",
