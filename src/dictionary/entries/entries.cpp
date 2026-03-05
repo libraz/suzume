@@ -396,6 +396,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: 学生たち → 学生 + たち
       suffix("たち", "たち"),
 
+      // Plural suffix ら (彼ら, 彼女ら, 僕ら, あいつら)
+      // MeCab treats these as single tokens, but grammatically ら is a suffix
+      suffix("ら", "ら"),
+
       // Na-adjective forming suffix 的 (論理的, 科学的, 経済的)
       // MeCab: 論理的な → 論理 + 的 + な (suffix + copula rentaikei)
       suffix("的", "的"),
@@ -691,12 +695,15 @@ std::vector<DictionaryEntry> getPronounEntries() {
       pronoun("私", ""),
       pronoun("僕", ""),
       pronoun("俺", ""),
-      // First person - hiragana only
+      // First person - hiragana/colloquial
       pronoun("わたくし", ""),
+      pronoun("あたし", ""),
+      pronoun("あたい", ""),
+      pronoun("あちき", ""),
+      pronoun("わし", ""),
+      pronoun("おいら", ""),
 
-      // First person plural (一人称複数)
-      pronoun("僕ら", ""),
-      // Note: 俺ら removed for MeCab compat (MeCab splits 俺+ら, unlike 僕ら)
+      // First person plural: 僕ら/俺ら handled as pronoun + ら suffix
       pronoun("我々", ""),
 
       // Second person (二人称) - kanji with reading
@@ -713,10 +720,12 @@ std::vector<DictionaryEntry> getPronounEntries() {
       // Third person (三人称) - kanji with reading
       pronoun("彼", ""),
       pronoun("彼女", ""),
-      pronoun("彼ら", ""),
-      pronoun("彼女ら", ""),
+      pronoun("彼氏", ""),
+      pronoun("奴", ""),
+      // 彼ら/彼女ら removed - handled as pronoun + ら suffix
 
       // Archaic/Samurai (武家・古風)
+      pronoun("我", ""),
       pronoun("拙者", ""),
       pronoun("貴殿", ""),
       pronoun("某", ""),

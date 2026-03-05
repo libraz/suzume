@@ -1682,7 +1682,7 @@
       "description" : "彼氏は優しい - auto-generated",
       "expected" : [
         {
-          "pos" : "Noun",
+          "pos" : "Pronoun",
           "surface" : "彼氏"
         },
         {

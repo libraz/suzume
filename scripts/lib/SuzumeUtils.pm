@@ -1197,7 +1197,7 @@ sub apply_suzume_merge {
     my %prefix_exceptions = (
         'お出で' => 1, 'おいで' => 1, 'おすすめ' => 1, 'お疲れ様' => 1,
         'お金' => 1, 'お前' => 1,
-        'おかず' => 1, 'おでん' => 1, 'おもち' => 1,
+        'おかず' => 1, 'おでん' => 1, 'おもち' => 1, 'おいら' => 1,
     );
     for my $t (@result) {
         my $surface = $t->{surface} // '';
@@ -1301,6 +1301,15 @@ sub apply_suzume_split {
 
     for my $t (@$tokens) {
         my $surface = $t->{surface};
+
+        # 0. Plural suffix ら: 彼ら → 彼|ら, 僕ら → 僕|ら
+        # MeCab joins some pronoun+ら but grammatically ら is a suffix
+        if ($surface =~ /^(彼女|彼|僕|奴|我)ら$/) {
+            push @result, { surface => $1, pos => '名詞', pos_sub1 => '代名詞', lemma => $1 };
+            push @result, { surface => 'ら', pos => '名詞', pos_sub1 => '接尾', lemma => 'ら' };
+            $applied_rule //= 'ra-suffix-split';
+            next;
+        }
 
         # 1. ったら topic particle: あなたったら → あなた|ったら
         # MeCab treats this as a single noun, but it's pronoun + particle
@@ -1641,6 +1650,12 @@ sub map_mecab_pos {
         # 名詞,代名詞 → Pronoun (e.g., これ, それ, 私, 彼)
         # MeCab classifies pronouns as 名詞,代名詞 but Suzume treats them as Pronoun
         if ($pos eq '名詞' && $pos_sub1 eq '代名詞') {
+            return 'Pronoun';
+        }
+
+        # Pronouns MeCab classifies as 名詞,一般 but Suzume treats as Pronoun
+        my %noun_as_pronoun = ('彼氏' => 1, '彼女' => 1, '奴' => 1, '我' => 1, 'わし' => 1);
+        if ($pos eq '名詞' && $noun_as_pronoun{$surface}) {
             return 'Pronoun';
         }
 

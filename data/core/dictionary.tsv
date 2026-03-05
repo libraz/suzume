@@ -174,7 +174,6 @@
 ものすごい	ADJECTIVE	I_ADJ
 うまい	ADJECTIVE	I_ADJ
 おっかない	ADJECTIVE	I_ADJ
-すっごい	ADJECTIVE	I_ADJ
 つめたい	ADJECTIVE	I_ADJ
 よく	ADVERB
 
@@ -482,7 +481,6 @@
 つく	VERB	GODAN_KA
 いく	VERB	GODAN_KA
 たどり着く	VERB	GODAN_KA
-歩く	VERB	GODAN_KA
 いただく	VERB	GODAN_KA
 たたずむ	VERB	GODAN_MA
 読む	VERB	GODAN_MA
@@ -761,9 +759,8 @@ Wi-Fi	NOUN
 えっち	NOUN
 おでん	NOUN
 おもち	NOUN
-たそがれ	NOUN
-彼氏	NOUN
 勢い	NOUN
+たそがれ	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -966,5 +963,6 @@ Wi-Fi	NOUN
 
 
 みんな	PRONOUN
+
 
 あちこち	PRONOUN

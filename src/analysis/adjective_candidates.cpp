@@ -436,37 +436,24 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
   }
 
   // Special handling for single-kanji + く patterns (甘く, 辛く, 暗く, etc.)
-  // These are i-adjective renyokei forms that compete with godan-ka verb candidates.
-  // Generate ADJ candidate so 甘くて/甘くない are correctly recognized as adjective forms.
-  // Skip if the kanji+く form exists as a dict VERB (e.g., 行く, 書く, 歩く) to avoid
-  // false ADJ classification for common godan-ka verbs.
+  // Only generate ADJ renyokei candidate when followed by adjective-renyokei
+  // continuations (て/ない/なっ/なる/も), which disambiguate from godan-ka verbs.
+  // Without this context check, 歩く/叩く etc. would get false ADJ candidates.
   if (kanji_end == start_pos + 1 && codepoints[kanji_end] == U'く') {
     size_t adj_end = kanji_end + 1;
-    std::string surface = extractSubstring(codepoints, start_pos, adj_end);
-    bool is_dict_verb = false;
-    if (dict_manager != nullptr) {
-      auto results = dict_manager->lookup(surface, 0);
-      for (const auto& r : results) {
-        if (r.entry != nullptr &&
-            r.entry->surface == surface &&
-            r.entry->pos == core::PartOfSpeech::Verb) {
-          is_dict_verb = true;
-          break;
-        }
-      }
+    bool is_adj_context = false;
+    if (adj_end < codepoints.size()) {
+      char32_t next = codepoints[adj_end];
+      is_adj_context = (next == U'て' || next == U'な' || next == U'も');
     }
-    if (!is_dict_verb) {
+    if (is_adj_context) {
+      std::string surface = extractSubstring(codepoints, start_pos, adj_end);
       std::string lemma = extractSubstring(codepoints, start_pos, kanji_end) + "い";
-      // Cost matches godan-ka verb candidate (~0.52) so connection bonuses decide:
-      // ADJ_renyokei→PART_接続 (-0.8) beats VERB_renyokei→PART_接続 (-0.5) for ku+te
-      // At sentence end (叩く), no connection advantage, so verb candidate wins
       constexpr float kSingleKanjiKuCost = 0.52F;
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SINGLE_KU] \"" << surface << "\" cost=" << kSingleKanjiKuCost << "\n");
       candidates.push_back(makeIAdjCandidate(
           surface, start_pos, adj_end, lemma, kSingleKanjiKuCost,
           CandidateOrigin::AdjectiveI, 0.5F, "single_kanji_ku"));
-    } else {
-      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SINGLE_KU] \"" << surface << "\" is dict VERB, skipping ADJ candidate\n");
     }
   }
 
