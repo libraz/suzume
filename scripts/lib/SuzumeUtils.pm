@@ -411,11 +411,15 @@ sub apply_suzume_merge {
                 # Decimal point: 0.5 etc.
                 # MeCab classifies . as 名詞,サ変接続, followed by more numbers
                 my $is_decimal = ($next->{surface} // '') eq '.';
+                # Consecutive number digits: merge １+４ → 14 (full-width digits split by MeCab)
+                my $is_consecutive_number = ($next->{pos} // '') eq '名詞'
+                    && ($next->{pos_sub1} // '') eq '数'
+                    && ($next->{surface} // '') =~ /^[0-9０-９]+$/;
                 # Alphabet units: MB, GB, KB, TB etc.
                 # Suzume keeps number+unit together (512MB, 3.5GB)
                 my $is_alpha_unit = ($next->{surface} // '') =~ /^[A-Za-z]+$/
                     && ($next->{pos} // '') eq '名詞';
-                if ($is_counter || $is_calendar_month || $is_katakana_noun || $is_chuu_suffix || $is_me_suffix || $is_large_unit || $is_number_after_large || $is_number_after_decimal || $is_counter_aux || $is_percent || $is_decimal || $is_alpha_unit) {
+                if ($is_counter || $is_calendar_month || $is_katakana_noun || $is_chuu_suffix || $is_me_suffix || $is_large_unit || $is_number_after_large || $is_number_after_decimal || $is_counter_aux || $is_percent || $is_decimal || $is_alpha_unit || $is_consecutive_number) {
                     $combined .= $next->{surface};
                     $j++;
                     # Stop after katakana noun, 中, 目, つ, %, or alpha unit (don't chain multiple)
@@ -2103,6 +2107,20 @@ sub get_expected_tokens {
     _postprocess_ikaga(\@tokens);
     _postprocess_demo(\@tokens);
     _postprocess_ii(\@tokens);
+
+    # Normalize full-width alphanumeric to half-width in surfaces/lemmas
+    # Suzume's pretokenizer converts full-width to half-width, so MeCab output must match
+    for my $t (@tokens) {
+        for my $key (qw(surface lemma)) {
+            next unless defined $t->{$key};
+            my $orig = $t->{$key};
+            $t->{$key} =~ tr/０-９Ａ-Ｚａ-ｚ/0-9A-Za-z/;
+            # Also convert full-width symbols: ＿→_, ・ stays as-is (CJK punctuation)
+            if ($orig ne $t->{$key}) {
+                $applied_rule //= 'fullwidth-normalize';
+            }
+        }
+    }
 
     if ($applied_rule) {
         return (\@tokens, 'MeCab+SuzumeRules', $applied_rule);

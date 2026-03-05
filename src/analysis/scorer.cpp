@@ -635,6 +635,15 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kVeryStrongBonus;
   }
 
+  // Penalty for non-pronoun → ら(SUFFIX)
+  // Plural suffix ら only naturally follows pronouns (彼ら, 僕ら)
+  // Without this, NOUN→SUFFIX bonus (-0.8) causes false splits (かし+ら, 自+ら)
+  if (prev.pos != core::PartOfSpeech::Pronoun &&
+      next.pos == core::PartOfSpeech::Suffix &&
+      next.surface == "ら") {
+    surface_bonus += cost::kStrong;
+  }
+
   // Penalty for VerbRenyokei ending in らし → い (AuxAspectIru) pattern
   // 春らしい should be 春 + らしい, not 春らし (verb) + い (auxiliary)
   // The らし ending is typically from らしい (conjecture aux), not a verb renyokei

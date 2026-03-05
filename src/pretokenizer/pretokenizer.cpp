@@ -758,7 +758,8 @@ bool PreTokenizer::tryMatchAsciiWithDots(std::string_view text, size_t pos,
 
 bool PreTokenizer::isSentenceBoundary(char32_t codepoint) const {
   return codepoint == U'。' || codepoint == U'！' || codepoint == U'？' ||
-         codepoint == U'!' || codepoint == U'?' || codepoint == U'\n';
+         codepoint == U'!' || codepoint == U'?' || codepoint == U'\n' ||
+         codepoint == U'・';  // Nakaguro: token boundary (splits カタカナ・カタカナ)
 }
 
 PreTokenResult PreTokenizer::process(std::string_view text) const {
