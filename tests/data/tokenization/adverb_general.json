@@ -1268,6 +1268,44 @@
         "adverb",
         "regression"
       ]
+    },
+    {
+      "description" : "いっぱいある - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "いっぱい"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "ある"
+        }
+      ],
+      "id" : "ittpaiaru",
+      "input" : "いっぱいある",
+      "tags" : [
+        "adverb",
+        "hiragana"
+      ]
+    },
+    {
+      "description" : "ほんとに好き - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "ほんとに"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "好き"
+        }
+      ],
+      "id" : "hontoni_ki",
+      "input" : "ほんとに好き",
+      "tags" : [
+        "adverb",
+        "colloquial"
+      ]
     }
   ],
   "description" : "General adverbs",

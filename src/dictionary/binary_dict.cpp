@@ -192,6 +192,12 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
           if (utf8::endsWithAny(entry.surface, {"っ"sv, "ん"sv})) {
             // Sokuonbin (っ) or hatsuonbin (ん): あっ, 飲ん, etc.
             entry.extended_pos = core::ExtendedPOS::VerbOnbinkei;
+          } else if (utf8::endsWith(entry.surface, "い") &&
+                     entry.surface.size() > core::kTwoJapaneseCharBytes) {
+            // Godan-ka/ga i-onbin (い音便) for 3+ char compound verbs
+            // e.g., たどり着い from たどり着く, 引っかい from 引っかく
+            // Short forms (1-2 chars) are handled by the short-verb rules below
+            entry.extended_pos = core::ExtendedPOS::VerbOnbinkei;
           } else if (utf8::endsWithAny(entry.surface, {"れば"sv, "けば"sv, "せば"sv,
                      "てば"sv, "ねば"sv, "べば"sv, "めば"sv, "えば"sv})) {
             // Conditional form

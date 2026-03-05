@@ -1654,6 +1654,52 @@
         "hiragana",
         "noun"
       ]
+    },
+    {
+      "description" : "たそがれの空 - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "たそがれ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "の"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "空"
+        }
+      ],
+      "id" : "tasogareno",
+      "input" : "たそがれの空",
+      "tags" : [
+        "noun",
+        "hiragana"
+      ]
+    },
+    {
+      "description" : "彼氏は優しい - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "彼氏"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "は"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "優しい"
+        }
+      ],
+      "id" : "ha_shii",
+      "input" : "彼氏は優しい",
+      "tags" : [
+        "noun",
+        "kanji"
+      ]
     }
   ],
   "description" : "General nouns",

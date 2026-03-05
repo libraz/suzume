@@ -1126,10 +1126,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
-      },
       "description" : "Contrastive clause with ga",
       "expected" : [
         {
@@ -1163,37 +1159,6 @@
       ],
       "id" : "multi_clause_contrast_ga",
       "input" : "高いですが、品質は良いです",
-      "suzume_expected" : [
-        {
-          "pos" : "Adjective",
-          "surface" : "高い"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "です"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "が"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "品質"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "は"
-        },
-        {
-          "lemma" : "良う",
-          "pos" : "Verb",
-          "surface" : "良い"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "です"
-        }
-      ],
       "tags" : [
         "multi-clause"
       ]

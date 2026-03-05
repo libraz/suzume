@@ -948,6 +948,86 @@
         "no_false_positive",
         "regression"
       ]
+    },
+    {
+      "description" : "付き合って - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "付き合う",
+          "pos" : "Verb",
+          "surface" : "付き合っ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
+      "id" : "ki_ttte",
+      "input" : "付き合って",
+      "tags" : [
+        "compound",
+        "godan"
+      ]
+    },
+    {
+      "description" : "抱きしめて - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "抱きしめる",
+          "pos" : "Verb",
+          "surface" : "抱きしめ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
+      "id" : "kishimete",
+      "input" : "抱きしめて",
+      "tags" : [
+        "compound",
+        "ichidan"
+      ]
+    },
+    {
+      "description" : "引っ張って - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "引っ張る",
+          "pos" : "Verb",
+          "surface" : "引っ張っ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
+      "id" : "tt_ttte",
+      "input" : "引っ張って",
+      "tags" : [
+        "compound",
+        "sokuon"
+      ]
+    },
+    {
+      "description" : "思い出して - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "思い出す",
+          "pos" : "Verb",
+          "surface" : "思い出し"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "て"
+        }
+      ],
+      "id" : "i_shite",
+      "input" : "思い出して",
+      "tags" : [
+        "compound",
+        "godan"
+      ]
     }
   ],
   "description" : "Compound verbs",

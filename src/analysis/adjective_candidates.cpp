@@ -391,20 +391,48 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     return candidates;  // Skip this candidate - force split path
   }
 
-  // Special handling for single-kanji + い patterns (高い, 辛い, 尊い, etc.)
+  // Special handling for single-kanji + い patterns (高い, 辛い, 甘い, etc.)
   // These are common i-adjectives that may not be recognized by inflection analysis
   // due to penalty_i_adj_single_kanji reducing confidence below threshold.
   // Generate candidate directly without relying on inflection analysis.
-  if (kanji_end == start_pos + 1 && hiragana_end == kanji_end + 1 &&
-      codepoints[kanji_end] == U'い') {
-    std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
-    // Use moderate cost to compete with verb candidates (尊う has cost ~0.5)
-    // Lower cost wins, so 0.35 should beat verb candidates
-    constexpr float kSingleKanjiICost = 0.35F;
-    SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SINGLE] \"" << surface << "\" cost=" << kSingleKanjiICost << "\n");
-    candidates.push_back(makeIAdjCandidate(
-        surface, start_pos, hiragana_end, surface, kSingleKanjiICost,
-        CandidateOrigin::AdjectiveI, 0.5F, "single_kanji_i"));
+  // Also handles in-context cases like 甘いもの where hiragana_end extends past い.
+  // Skip if already registered as NOUN in dictionary (e.g. 勢い) to avoid POS conflict.
+  if (kanji_end == start_pos + 1 && codepoints[kanji_end] == U'い') {
+    size_t adj_end = kanji_end + 1;
+    // Skip if い is followed by て/た/だ/やす (verb onbin context, not adjective)
+    // e.g., 届いて(verb te-form), 泳いだ(verb ta-form), 使いやすい(verb renyokei)
+    bool is_verb_context = false;
+    if (adj_end < codepoints.size()) {
+      char32_t next = codepoints[adj_end];
+      is_verb_context = (next == U'て' || next == U'た' || next == U'だ' ||
+                         next == U'や');
+    }
+    if (!is_verb_context) {
+      std::string surface = extractSubstring(codepoints, start_pos, adj_end);
+      bool is_dict_noun = false;
+      if (dict_manager != nullptr) {
+        auto results = dict_manager->lookup(surface, 0);
+        for (const auto& r : results) {
+          if (r.entry != nullptr &&
+              r.entry->surface == surface &&
+              r.entry->pos == core::PartOfSpeech::Noun) {
+            is_dict_noun = true;
+            break;
+          }
+        }
+      }
+      if (is_dict_noun) {
+        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SINGLE] \"" << surface << "\" is dict NOUN, skipping ADJ candidate\n");
+      } else {
+        // Use moderate cost to compete with verb candidates (尊う has cost ~0.5)
+        // Lower cost wins, so 0.35 should beat verb candidates
+        constexpr float kSingleKanjiICost = 0.35F;
+        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SINGLE] \"" << surface << "\" cost=" << kSingleKanjiICost << "\n");
+        candidates.push_back(makeIAdjCandidate(
+            surface, start_pos, adj_end, surface, kSingleKanjiICost,
+            CandidateOrigin::AdjectiveI, 0.5F, "single_kanji_i"));
+      }
+    }
   }
 
   // Try different ending lengths

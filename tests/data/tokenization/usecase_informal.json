@@ -91,6 +91,72 @@
         "informal",
         "contraction"
       ]
+    },
+    {
+      "description" : "あちこちで遊ぶ - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Pronoun",
+          "surface" : "あちこち"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "遊ぶ"
+        }
+      ],
+      "id" : "achikochide_bu",
+      "input" : "あちこちで遊ぶ",
+      "tags" : [
+        "pronoun",
+        "colloquial"
+      ]
+    },
+    {
+      "description" : "勢いで押す - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "勢い"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "押す"
+        }
+      ],
+      "id" : "ide_su",
+      "input" : "勢いで押す",
+      "tags" : [
+        "noun",
+        "context"
+      ]
+    },
+    {
+      "description" : "たまんない - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "たまる",
+          "pos" : "Verb",
+          "surface" : "たまん"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "tamannai",
+      "input" : "たまんない",
+      "tags" : [
+        "contraction",
+        "colloquial"
+      ]
     }
   ],
   "description" : "usecase_informal tests",

@@ -764,7 +764,8 @@ void addCompoundVerbJoinCandidates(
     auto noun_check_results = dict_manager.lookup(compound_surface, 0);
     for (const auto& result : noun_check_results) {
       if (result.entry != nullptr &&
-          result.entry->pos == core::PartOfSpeech::Noun) {
+          result.entry->pos == core::PartOfSpeech::Noun &&
+          result.entry->surface == compound_surface) {
         SUZUME_DEBUG_LOG("[COMPOUND_SKIP] \"" << compound_surface << "\" is dict NOUN, skipping compound verb\n");
         return;  // Skip compound verb generation for dictionary NOUNs
       }

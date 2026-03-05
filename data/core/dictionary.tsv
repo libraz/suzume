@@ -165,12 +165,16 @@
 きれい	ADJECTIVE	NA_ADJ
 大丈夫	ADJECTIVE	NA_ADJ
 ありきたり	ADJECTIVE	NA_ADJ
+めちゃくちゃ	ADJECTIVE	NA_ADJ
+むちゃくちゃ	ADJECTIVE	NA_ADJ
 幸い	ADJECTIVE	NA_ADJ
 やばい	ADJECTIVE	I_ADJ
 すごい	ADJECTIVE	I_ADJ
 可愛い	ADJECTIVE	I_ADJ
 ものすごい	ADJECTIVE	I_ADJ
 うまい	ADJECTIVE	I_ADJ
+おっかない	ADJECTIVE	I_ADJ
+すっごい	ADJECTIVE	I_ADJ
 つめたい	ADJECTIVE	I_ADJ
 よく	ADVERB
 
@@ -318,6 +322,9 @@
 ばたり	ADVERB
 さすが	ADVERB
 とんと	ADVERB
+いっぱい	ADVERB
+すこし	ADVERB
+ほんとに	ADVERB
 俄然	ADVERB
 
 # =============================================================================
@@ -366,6 +373,9 @@
 ござる	VERB	GODAN_RA
 分かる	VERB	GODAN_RA
 恐れ入る	VERB	GODAN_RA
+引っ張る	VERB	GODAN_RA
+引っかかる	VERB	GODAN_RA
+乗っかる	VERB	GODAN_RA
 怒鳴る	VERB	GODAN_RA
 # B65: 詰まる - moved to L1 for conjugation expansion
 
@@ -471,6 +481,7 @@
 聞く	VERB	GODAN_KA
 つく	VERB	GODAN_KA
 いく	VERB	GODAN_KA
+たどり着く	VERB	GODAN_KA
 いただく	VERB	GODAN_KA
 たたずむ	VERB	GODAN_MA
 読む	VERB	GODAN_MA
@@ -510,6 +521,7 @@
 飛び降りる	VERB	ICHIDAN
 感じる	VERB	ICHIDAN
 いる	VERB	ICHIDAN
+抱きしめる	VERB	ICHIDAN
 諦める	VERB	ICHIDAN
 
 # =============================================================================
@@ -748,6 +760,9 @@ Wi-Fi	NOUN
 えっち	NOUN
 おでん	NOUN
 おもち	NOUN
+たそがれ	NOUN
+彼氏	NOUN
+勢い	NOUN
 検討	NOUN
 
 # =============================================================================
@@ -950,3 +965,5 @@ Wi-Fi	NOUN
 
 
 みんな	PRONOUN
+
+あちこち	PRONOUN

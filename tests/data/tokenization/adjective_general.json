@@ -1,0 +1,106 @@
+{
+  "cases" : [
+    {
+      "description" : "めちゃくちゃな話 - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adjective",
+          "surface" : "めちゃくちゃ"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "な"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "話"
+        }
+      ],
+      "id" : "mechi_kuchi_na",
+      "input" : "めちゃくちゃな話",
+      "tags" : [
+        "adjective",
+        "colloquial"
+      ]
+    },
+    {
+      "description" : "おっかない顔 - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adjective",
+          "surface" : "おっかない"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "顔"
+        }
+      ],
+      "id" : "ottkanai",
+      "input" : "おっかない顔",
+      "tags" : [
+        "adjective",
+        "colloquial"
+      ]
+    },
+    {
+      "description" : "甘いもの - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adjective",
+          "surface" : "甘い"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "もの"
+        }
+      ],
+      "id" : "imono",
+      "input" : "甘いもの",
+      "tags" : [
+        "adjective",
+        "context"
+      ]
+    },
+    {
+      "description" : "辛いもの - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adjective",
+          "surface" : "辛い"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "もの"
+        }
+      ],
+      "id" : "karai_mono",
+      "input" : "辛いもの",
+      "tags" : [
+        "adjective",
+        "context"
+      ]
+    },
+    {
+      "description" : "暗い部屋 - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adjective",
+          "surface" : "暗い"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "部屋"
+        }
+      ],
+      "id" : "kurai_heya",
+      "input" : "暗い部屋",
+      "tags" : [
+        "adjective",
+        "context"
+      ]
+    }
+  ],
+  "description" : "adjective_general tests",
+  "version" : "1.0"
+}
