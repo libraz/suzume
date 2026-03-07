@@ -1149,6 +1149,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kAlmostNever;
   }
 
+  // Penalty for だ(AuxTenseTa) after non-ん words
+  // だ as past tense only follows ん-onbin: 読んだ, 飲んだ, 死んだ
+  // Without this, てる+だ(past) beats てる+だけ(adverbial particle)
+  // because AuxAspectIru→AuxTenseTa bonus applies to both た and だ
+  if (next.surface == "だ" &&
+      next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
+      !utf8::endsWith(prev.surface, "ん")) {
+    surface_bonus += cost::kAlmostNever;
+  }
+
   // Bonus for AuxNegativeNu(ん) → VerbOnbinkei(かっ) pattern
   // くだらん+かっ+た = contracted negative past (くだらなかった)
   // Without this, the adjective path (分からんかっ+た) beats the verb path
@@ -1158,6 +1168,27 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
       next.surface == "かっ") {
     surface_bonus += cost::kVeryStrongBonus * 2 + cost::kMinorBonus;  // -3.45
+  }
+
+  // Penalty for VerbOnbinkei(ん) → Verb(でる) pattern
+  // After ん音便, でる is almost always the contracted ている, not the verb 出る
+  // E.g., 並んでる = 並んでいる (progressive), やんでる = 病んでいる
+  // Force the で(PART_接続) + る path instead
+  if (prev.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
+      utf8::endsWith(prev.surface, "ん") &&
+      next.pos == core::PartOfSpeech::Verb &&
+      next.surface == "でる") {
+    surface_bonus += cost::kStrong;
+  }
+
+  // Bonus for NOUN → できる(VERB) pattern
+  // 堪能できる, 表現できる, 想像できる etc.
+  // できる (potential of する) commonly follows サ変 nouns
+  // Without this, で(PART)+きる(VERB) path narrowly beats できる(VERB) path
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      next.pos == core::PartOfSpeech::Verb &&
+      next.surface == "できる") {
+    surface_bonus += cost::kMinorBonus;
   }
 
   // Penalty for PARTICLE て → VerbTaForm いた pattern

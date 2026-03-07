@@ -226,6 +226,17 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     return candidates;  // Skip this candidate - force split path
   }
 
+  // Reject katakana stem + たい/たく (desiderative auxiliary)
+  // MeCab splits KATAKANA + たい/たく into separate tokens:
+  //   ハメ + たい      (desiderative)
+  //   ハメ + たく + なる (desiderative renyokei + naru)
+  // Note: たXX with 2+ hiragana after た triggers skip; ハメた (past) is OK
+  if (hira_part.size() >= 6 &&
+      (hira_part.compare(0, 6, "たい") == 0 ||   // たい (desiderative)
+       hira_part.compare(0, 6, "たく") == 0)) {   // たく (desiderative renyokei)
+    return candidates;  // Skip this candidate - force split path
+  }
+
   // Try different ending lengths, starting from longest
   for (size_t end_pos = hira_end; end_pos > kata_end; --end_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);

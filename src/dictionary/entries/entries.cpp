@@ -616,6 +616,7 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       conj("だけど", ""),  // colloquial variant
       conj("ところが", ""), conj("それでも", ""),
       conj("でも", ""), conj("だって", ""),  // にもかかわらず removed for MeCab compat
+      conj("どころか", ""),
       conj("ものの", ""),
 
       // Parallel/Addition (並列・添加)
@@ -627,7 +628,7 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       // Alternative (選択)
       conj("或いは", ""), conj("若しくは", ""),
       conj("または", ""), conj("それとも", ""),
-      conj("あるいは", "或いは"),
+      conj("あるいは", "或いは"), conj("もしくは", "若しくは"),
 
       // Explanation/Supplement (説明・補足)
       conj("即ち", ""), conj("例えば", ""),

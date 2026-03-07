@@ -147,6 +147,10 @@ BigramTable::initTable() {
   // VerbShuushikei → ParticleNo (食べる+の+だ for のだ/んだ) - strong bonus
   setCell(t, EPOS::VerbShuushikei, EPOS::ParticleNo, cost::kStrongBonus);
 
+  // Verb → ParticleAdverbial (できる+だけ, 食べる+だけ, 行く+だけ) - minor bonus
+  setCell(t, EPOS::VerbShuushikei, EPOS::ParticleAdverbial, cost::kMinorBonus);
+  setCell(t, EPOS::VerbRenyokei, EPOS::ParticleAdverbial, cost::kMinorBonus);
+
   // VerbShuushikei → ParticleQuote (食べる+と言う) - neutral
   setCell(t, EPOS::VerbShuushikei, EPOS::ParticleQuote, cost::kNeutral);
 
@@ -194,6 +198,11 @@ BigramTable::initTable() {
   // AdjBasic → ParticleConj (美しい+し, 高い+けど) - minor bonus
   // Helps i-adjective+conjunctive particle beat ADJ_NA+い(verb)+し path
   setCell(t, EPOS::AdjBasic, EPOS::ParticleConj, cost::kMinorBonus);
+
+  // AdjBasic → ParticleNo (少ない+の, 美味しい+の) - minor bonus
+  // Without this, NOUN+ない(AUX)+の path beats adjective+の path
+  // because AuxNeg→ParticleNo has a strong bonus (-0.8)
+  setCell(t, EPOS::AdjBasic, EPOS::ParticleNo, cost::kMinorBonus);
 
   // AdjStem → AuxAppearanceSou (美し+そう) - very strong bonus
   // Must beat adverb bonus (-1.0 for 2-char hiragana) to prefer auxiliary
@@ -466,6 +475,11 @@ BigramTable::initTable() {
   // =========================================================================
   // Particle → Various (Particles can connect to many things)
   // =========================================================================
+
+  // ParticleAdverbial → ParticleCase (だけ+で, ばかり+に, ほど+に) - very strong bonus
+  // Without this, PART_副→VERB_連用 bonus makes で(出る) beat で(格助詞) after だけ
+  // Needs to overcome: base bigram diff (0.5-0.2=0.3) + VERB_連用 bonus (-0.8)
+  setCell(t, EPOS::ParticleAdverbial, EPOS::ParticleCase, cost::kVeryStrongBonus);
 
   // ParticleAdverbial → VerbRenyokei (かも+しれ in かもしれない) - strong bonus
   // This favors かも+しれ+ない over か+もし+れない

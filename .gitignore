@@ -83,3 +83,8 @@ __pycache__/
 *.py[oc]
 *.egg-info
 .venv/
+
+# Thread check (development tool)
+.thread_check_progress
+scripts/thread_check.pl
+data/user/adult.tsv

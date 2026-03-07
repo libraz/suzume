@@ -380,12 +380,24 @@ void addCompoundVerbJoinCandidates(
     }
   }
 
+  // Check for sokuonbin (っ) compound pattern: 突っ込む, 引っ張る, ぶっ壊す
+  // Sokuonbin verbs: godan-ka(く), godan-ta(つ), godan-wa(う), godan-ra(る)
+  bool is_sokuonbin = (base_ending == 0 && renyokei_char == U'っ');
+  SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] pos=" << start_pos
+      << " kanji_end=" << kanji_end
+      << " renyokei=" << normalize::utf8::encode({renyokei_char})
+      << " base_ending=" << (base_ending ? normalize::utf8::encode({base_ending}) : "0")
+      << " sokuonbin=" << is_sokuonbin << "\n");
+
   // If not a 連用形 ending, this might be an Ichidan verb
-  bool is_ichidan = (base_ending == 0);
+  bool is_ichidan = (base_ending == 0 && !is_sokuonbin);
 
   // Position after 連用形 (for Godan) or after stem (for Ichidan)
   size_t v2_start;
-  if (is_ichidan) {
+  if (is_sokuonbin) {
+    // For sokuonbin: V2 starts after っ
+    v2_start = kanji_end + 1;
+  } else if (is_ichidan) {
     // For ichidan verbs, the stem includes the final hiragana character:
     // - Shimo-ichidan (下一段): え-row (抜け from 抜ける, 食べ from 食べる)
     // - Kami-ichidan (上一段): い-row (落ち from 落ちる, 起き from 起きる)
@@ -618,27 +630,59 @@ void addCompoundVerbJoinCandidates(
       continue;
     }
 
+    SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] V2 matched: " << v2_verb.surface
+        << " kanji=" << matched_kanji << " reading=" << matched_reading
+        << " renyokei=" << matched_renyokei << " inflected=" << matched_inflected
+        << " len=" << matched_len << "\n");
+
     // Build the V1 base form for verification
     std::string v1_base;
     size_t v1_end_byte = is_ichidan ? v2_start_byte : charPosToBytePos(codepoints, kanji_end);
     v1_base = std::string(text.substr(start_byte, v1_end_byte - start_byte));
 
-    if (!is_ichidan) {
+    if (is_sokuonbin) {
+      // Sokuonbin: try く/つ/う/る endings to find dictionary match
+      // E.g., 突 + く = 突く, 打 + つ = 打つ
+      // Leave base_ending = 0 for now, will be set if match found
+    } else if (!is_ichidan) {
       v1_base += normalize::utf8::encode({base_ending});
     } else {
       v1_base += "る";
     }
 
     // Check if V1 base form is in dictionary
-    auto v1_results = dict_manager.lookup(v1_base, 0);
     bool v1_verified = false;
-    for (const auto& result : v1_results) {
-      if (result.entry != nullptr && result.entry->surface == v1_base &&
-          result.entry->pos == core::PartOfSpeech::Verb) {
-        v1_verified = true;
-        break;
+    if (is_sokuonbin) {
+      // Try all sokuonbin-compatible godan endings
+      static const char32_t kSokuonbinEndings[] = {U'く', U'つ', U'う', U'る'};
+      for (char32_t ending : kSokuonbinEndings) {
+        std::string candidate = v1_base + normalize::utf8::encode({ending});
+        auto v1_results = dict_manager.lookup(candidate, 0);
+        for (const auto& result : v1_results) {
+          if (result.entry != nullptr && result.entry->surface == candidate &&
+              result.entry->pos == core::PartOfSpeech::Verb) {
+            v1_verified = true;
+            v1_base = candidate;
+            base_ending = ending;
+            break;
+          }
+        }
+        if (v1_verified) break;
+      }
+    } else {
+      auto v1_results = dict_manager.lookup(v1_base, 0);
+      for (const auto& result : v1_results) {
+        if (result.entry != nullptr && result.entry->surface == v1_base &&
+            result.entry->pos == core::PartOfSpeech::Verb) {
+          v1_verified = true;
+          break;
+        }
       }
     }
+
+    SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] V1 base=" << v1_base
+        << " verified=" << v1_verified
+        << " sokuonbin=" << is_sokuonbin << "\n");
 
     // Fallback: use inflection analysis for unknown V1 verbs
     // This allows compound verbs like 読み込む where 読む is not in dictionary
@@ -768,6 +812,9 @@ void addCompoundVerbJoinCandidates(
       best_match.v2_base_ending = v2_verb.base_ending;
     }
   }
+
+  SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] best_match.len=" << best_match.matched_len
+      << " base=" << best_match.compound_base << "\n");
 
   // After checking all V2 entries, use the best match if found
   if (best_match.matched_len > 0) {

@@ -1222,6 +1222,26 @@ sub apply_suzume_merge {
     }
     @result = @prefix_split;
 
+    # Post-process: split contracted ん音便+でる verb forms
+    # MeCab treats 並んでる/飲んでる/やんでる as single verbs,
+    # but Suzume correctly splits as: 並ん + で + る (onbin + te-form + contracted いる)
+    # Pattern: verb ending in んでる → stem+ん + で + る
+    my @nde_split;
+    for my $t (@result) {
+        my $surface = $t->{surface} // '';
+        my $pos = $t->{pos} // '';
+        if ($pos eq '動詞' && $surface =~ /^(.+ん)(で)(る)$/) {
+            my ($stem, $de, $ru) = ($1, $2, $3);
+            push @nde_split, { surface => $stem, pos => '動詞', lemma => $t->{lemma} // $stem };
+            push @nde_split, { surface => $de, pos => '助詞', lemma => $de };
+            push @nde_split, { surface => $ru, pos => '動詞', lemma => 'いる' };
+            $applied_rule //= 'nde-contract-split';
+        } else {
+            push @nde_split, $t;
+        }
+    }
+    @result = @nde_split;
+
     # Post-process: split filler tokens that can be grammatically analyzed
     # MeCab treats そうですね as フィラー, but Suzume analyzes grammatically
     my @filler_split;

@@ -2039,6 +2039,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         // First, check dictionary for ALL verb types
         grammar::VerbType matched_verb_type = grammar::VerbType::Unknown;
         std::string matched_base_form;
+        bool matched_via_dict = false;
         for (const auto& [verb_type, base_suffix] : sokuonbin_types) {
           std::string base_form = kanji_stem + std::string(base_suffix);
           bool dict_match = vh::isVerbInDictionaryWithType(dict_manager, base_form, verb_type) ||
@@ -2049,6 +2050,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           if (dict_match && matched_verb_type == grammar::VerbType::Unknown) {
             matched_verb_type = verb_type;
             matched_base_form = base_form;
+            matched_via_dict = true;
           }
         }
         // Phase 2: Inflection analysis fallback
@@ -2093,11 +2095,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         }
         if (matched_verb_type == grammar::VerbType::Unknown &&
             !starts_with_dict_noun && !remainder_is_dict_verb) {
-          // Skip inflection fallback for long kanji stems (3+ kanji chars)
-          // Real verbs rarely have 3+ pure kanji characters without dictionary entry
-          // E.g., 画像貼っ (3 kanji) is likely 画像+貼っ, not verb 画像貼る
+          // Skip inflection fallback for multi-kanji stems (2+ kanji chars)
+          // without dictionary entry. Godan verbs with 2+ pure kanji chars
+          // are rare and should be in the dictionary if they exist.
+          // E.g., 画像っ+て → NOT verb 画像う (画像 is a noun)
+          //       画像貼っ (3 kanji) → NOT verb 画像貼る
           size_t kanji_char_count = kanji_end - start_pos;
-          if (kanji_char_count >= 3) {
+          if (kanji_char_count >= 2) {
             SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem
                                       << "\" too many kanji chars (" << kanji_char_count
                                       << ") for non-dict sokuonbin\n");
@@ -2152,15 +2156,19 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
         if (matched_verb_type != grammar::VerbType::Unknown) {
           // Found valid verb - generate sokuonbin stem candidate
+          // Dict-matched verbs get bonus (-0.5) to beat unsplit forms
+          // Inflection-only matches get neutral cost (0) to avoid false positives
+          // like 像っ (from 像る which is not a real verb)
           std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
-          constexpr float kSokuonbinCost = -0.5F;  // Negative cost to beat unsplit forms
+          const float sokuonbin_cost = matched_via_dict ? -0.5F : 0.0F;
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                                 << " kanji_sokuonbin lemma=" << matched_base_form
-                                << " cost=" << kSokuonbinCost << "\n";
+                                << " cost=" << sokuonbin_cost
+                                << (matched_via_dict ? " (dict)" : " (infl)") << "\n";
           }
           candidates.push_back(makeVerbCandidate(
-              onbin_surface, start_pos, kanji_end + 1, kSokuonbinCost, matched_base_form,
+              onbin_surface, start_pos, kanji_end + 1, sokuonbin_cost, matched_base_form,
               grammar::verbTypeToConjType(matched_verb_type),
               true, CandidateOrigin::VerbKanji, 0.9F, "kanji_sokuonbin",
               core::ExtendedPOS::VerbOnbinkei));

@@ -1012,7 +1012,7 @@ std::vector<UnknownCandidate> generateCounterCandidates(
     std::string surface =
         extractSubstring(codepoints, start_pos, numeral_end + 1);
     if (!surface.empty()) {
-      auto cand = makeCandidate(surface, start_pos, numeral_end + 1, core::PartOfSpeech::Noun, -0.5F, false, CandidateOrigin::Counter);
+      auto cand = makeCandidate(surface, start_pos, numeral_end + 1, core::PartOfSpeech::Noun, 0.0F, false, CandidateOrigin::Counter);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = 0.95F;
       cand.pattern = "counter_tsu";

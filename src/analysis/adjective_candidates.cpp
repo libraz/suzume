@@ -1597,9 +1597,12 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
         // Lower cost than pure katakana noun to prefer adjective reading
         // Cost: 0.2-0.35 based on confidence (lower = better)
         float cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
-        candidates.push_back(makeIAdjCandidate(
+        auto adj_cand = makeIAdjCandidate(
             surface, start_pos, end_pos, cand.base_form, cost,
-            CandidateOrigin::AdjectiveI, cand.confidence, "i_adjective_kata"));
+            CandidateOrigin::AdjectiveI, cand.confidence, "i_adjective_kata");
+        // Skip exceeds_dict_length penalty - this is a morphologically recognized pattern
+        adj_cand.has_suffix = true;
+        candidates.push_back(std::move(adj_cand));
         break;  // Only add one adjective candidate per surface
       }
     }
