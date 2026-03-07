@@ -713,6 +713,18 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kVeryStrongBonus;
   }
 
+  // Bonus for VerbRenyokei/VerbOnbinkei → たり/だり (parallel listing particle)
+  // E.g., 食べ+たり+する, 飲ん+だり+食べ+たり+する
+  // Without this, た(AuxTenseTa) wins over たり(ParticleConj) due to strong た bonus
+  // Exclude pure hiragana onbin forms (ぴっ, ばっ) which are onomatopoeia, not verbs
+  if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei ||
+       prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
+      (next.surface == "たり" || next.surface == "だり") &&
+      next.extended_pos == core::ExtendedPOS::ParticleConj &&
+      grammar::containsKanji(prev.surface)) {
+    surface_bonus += cost::kVeryStrongBonus;
+  }
+
   // Penalty for godan passive/causative-passive renyokei (～Aれ for A-row) → た
   // MeCab splits these as 言わ+れ+た, not 言われ+た
   // E.g., 言われた → 言わ+れ+た, 売られた → 売ら+れ+た, やらされた → やらさ+れ+た
@@ -1040,10 +1052,12 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Penalty for て/で (ParticleConj) → single-char VerbRenyokei (い)
   // Progressive pattern: 食べて+い+ます should use い(AuxAspectIru), not い(VerbRenyokei)
   // This ensures て+いる patterns use the auxiliary form
+  // Exception: たり/だり → し is valid (食べたり+し+てる)
   if (prev.extended_pos == core::ExtendedPOS::ParticleConj &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface.size() <= 3 &&  // Single hiragana (3 bytes)
-      grammar::isPureHiragana(next.surface)) {
+      grammar::isPureHiragana(next.surface) &&
+      prev.surface != "たり" && prev.surface != "だり") {
     surface_bonus += cost::kAlmostNever;  // Strongly discourage
   }
 

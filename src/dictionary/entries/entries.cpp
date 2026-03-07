@@ -150,6 +150,8 @@ std::vector<DictionaryEntry> getParticleEntries() {
       particle("けども", EPOS::ParticleConj),
       particle("けれども", EPOS::ParticleConj),
       particle("し", EPOS::ParticleConj),  // 列挙・理由 (接続助詞)
+      particle("たり", EPOS::ParticleConj),  // 並立助詞 (食べたり飲んだり)
+      particle("だり", EPOS::ParticleConj),  // 並立助詞 (voiced: 飲んだり)
 
       // Quotation particles (引用助詞)
       particle("って", EPOS::ParticleQuote),

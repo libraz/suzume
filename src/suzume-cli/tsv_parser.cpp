@@ -206,7 +206,7 @@ core::Expected<core::PartOfSpeech, core::Error> TsvParser::parsePos(
   if (str == "PRONOUN" || str == "PRON") {
     return core::PartOfSpeech::Pronoun;
   }
-  if (str == "DETERMINER" || str == "DET") {
+  if (str == "DETERMINER" || str == "DET" || str == "ADNOMINAL") {
     return core::PartOfSpeech::Determiner;
   }
   if (str == "SUFFIX") {

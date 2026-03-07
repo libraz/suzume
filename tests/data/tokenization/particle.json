@@ -1,0 +1,80 @@
+{
+  "cases" : [
+    {
+      "description" : "食べたりする - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "たり"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "する"
+        }
+      ],
+      "id" : "betarisuru",
+      "input" : "食べたりする"
+    },
+    {
+      "description" : "飲んだり食べたりする - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "飲む",
+          "pos" : "Verb",
+          "surface" : "飲ん"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "だり"
+        },
+        {
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "たり"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "する"
+        }
+      ],
+      "id" : "ndari_betarisuru",
+      "input" : "飲んだり食べたりする"
+    },
+    {
+      "description" : "見えたりしてる - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "見える",
+          "pos" : "Verb",
+          "surface" : "見え"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "たり"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "てる"
+        }
+      ],
+      "id" : "etarishiteru",
+      "input" : "見えたりしてる"
+    }
+  ],
+  "description" : "particle tests",
+  "version" : "1.0"
+}
