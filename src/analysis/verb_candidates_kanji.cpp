@@ -219,25 +219,93 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     return candidates;
   }
 
-  // Godan-sa mizenkei pattern: single-kanji + さ + れ/せ (passive/causative)
+  // Godan mizenkei pattern: single-kanji + A-row + れ/せ (passive/causative)
   // E.g., 騙される → 騙さ (mizenkei of 騙す) + れる (passive)
-  //       晒される → 晒さ (mizenkei of 晒す) + れる (passive)
-  //       潰される → 潰さ (mizenkei of 潰す) + れる (passive)
-  // Only for single-kanji stems: multi-kanji + さ + れ is suru-verb (処理される)
-  // The inflection module doesn't recognize kanji+さ as godan-sa mizenkei,
+  //       囲まれる → 囲ま (mizenkei of 囲む) + れる (passive)
+  //       書かせる → 書か (mizenkei of 書く) + せる (causative)
+  // Only single-kanji stems: multi-kanji + さ + れ is suru-verb (処理される)
+  // The inflection module doesn't recognize kanji+A-row as godan mizenkei,
   // so we generate this candidate explicitly.
   if (kanji_end - start_pos == 1 &&
-      kanji_end < hiragana_end && codepoints[kanji_end] == U'さ') {
-    size_t sa_pos = kanji_end + 1;  // position after さ
-    if (sa_pos < codepoints.size()) {
-      char32_t after_sa = codepoints[sa_pos];
-      // さ + れ (passive) or さ + せ (causative)
-      if (after_sa == U'れ' || after_sa == U'せ') {
-        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-        std::string base_form = kanji_stem + "す";  // e.g., 騙 + す = 騙す
-        std::string surface = kanji_stem + "さ";    // e.g., 騙 + さ = 騙さ
+      kanji_end < hiragana_end &&
+      grammar::isARowCodepoint(codepoints[kanji_end])) {
+    char32_t a_row = codepoints[kanji_end];
+    size_t after_a_pos = kanji_end + 1;
+    if (after_a_pos < codepoints.size()) {
+      char32_t after_a = codepoints[after_a_pos];
+      // A-row + れ (passive) or A-row + せ (causative)
+      if (after_a == U'れ' || after_a == U'せ') {
+        grammar::VerbType verb_type =
+            grammar::verbTypeFromARowCodepoint(a_row);
+        std::string_view base_suffix =
+            grammar::godanBaseSuffixFromARow(a_row);
+        if (verb_type != grammar::VerbType::Unknown && !base_suffix.empty()) {
+          std::string kanji_stem =
+              extractSubstring(codepoints, start_pos, kanji_end);
+          std::string base_form = kanji_stem + std::string(base_suffix);
+          std::string surface =
+              extractSubstring(codepoints, start_pos, kanji_end + 1);
 
-        // Verify this could be a valid godan-sa verb via inflection analysis
+          // Verify via inflection analysis of base form
+          auto results = inflection.analyze(base_form);
+          bool is_valid = false;
+          for (const auto& cand : results) {
+            if (cand.verb_type == verb_type && cand.confidence >= 0.4F) {
+              is_valid = true;
+              break;
+            }
+          }
+
+          if (is_valid) {
+            // Skip if kanji+A-row+る is a known godan-ra verb in dictionary
+            // (potential form conflict). E.g., 泊まれる = potential of
+            // 泊まる (godan-ra), not passive of 泊む (godan-ma).
+            // 囲まれる = passive of 囲む is OK because 囲まる is not
+            // in the dictionary.
+            bool has_competing_ra_verb = false;
+            if (after_a == U'れ') {
+              std::string ra_form = surface + "る";
+              has_competing_ra_verb =
+                  vh::isVerbInDictionary(dict_manager, ra_form);
+            }
+
+            if (!has_competing_ra_verb) {
+              constexpr float kCost = 0.1F;
+              SUZUME_DEBUG_LOG("[VERB_CAND] " << surface
+                              << " godan_mizenkei_passive lemma=" << base_form
+                              << " cost=" << kCost << "\n");
+              candidates.push_back(makeVerbCandidate(
+                  surface, start_pos, kanji_end + 1, kCost, base_form,
+                  grammar::verbTypeToConjType(verb_type), true,
+                  CandidateOrigin::VerbKanji, 0.8F, "godan_mizenkei_passive",
+                  core::ExtendedPOS::VerbMizenkei));
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Contracted sa-row mizenkei: kanji + しゃ + れ/せ/し
+  // Colloquial contraction さ→しゃ in passive/causative/emphatic negation
+  // E.g., 殺しゃれる → 殺しゃ (contracted mizenkei of 殺す) + れる (passive)
+  //       話しゃれる → 話しゃ (contracted mizenkei of 話す) + れる (passive)
+  //       出しゃしない → 出しゃ (contracted) + し + ない (emphatic neg)
+  // Only single-kanji stems (same constraint as godan-sa mizenkei above)
+  if (kanji_end - start_pos == 1 &&
+      kanji_end + 1 < hiragana_end &&
+      codepoints[kanji_end] == U'し' &&
+      codepoints[kanji_end + 1] == U'ゃ') {
+    size_t after_sha = kanji_end + 2;
+    if (after_sha < codepoints.size()) {
+      char32_t after = codepoints[after_sha];
+      // しゃ + れ (passive) or しゃ + せ (causative) or しゃ + し (emphatic)
+      if (after == U'れ' || after == U'せ' || after == U'し') {
+        std::string kanji_stem =
+            extractSubstring(codepoints, start_pos, kanji_end);
+        std::string base_form = kanji_stem + "す";
+        std::string surface = kanji_stem + "しゃ";
+
         auto sa_results = inflection.analyze(base_form);
         bool is_valid_godan_sa = false;
         for (const auto& cand : sa_results) {
@@ -249,15 +317,15 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         }
 
         if (is_valid_godan_sa) {
-          // Generate mizenkei candidate with favorable cost
           constexpr float kCost = 0.1F;
-          SUZUME_DEBUG_LOG("[VERB_CAND] " << surface
-                          << " godan_sa_mizenkei lemma=" << base_form
+          SUZUME_DEBUG_LOG("[VERB_CAND] "
+                          << surface
+                          << " godan_sa_contracted_mizenkei lemma=" << base_form
                           << " cost=" << kCost << "\n");
           candidates.push_back(makeVerbCandidate(
-              surface, start_pos, kanji_end + 1, kCost, base_form,
-              grammar::verbTypeToConjType(grammar::VerbType::GodanSa),
-              false, CandidateOrigin::VerbKanji, 0.8F, "godan_sa_mizenkei",
+              surface, start_pos, kanji_end + 2, kCost, base_form,
+              grammar::verbTypeToConjType(grammar::VerbType::GodanSa), false,
+              CandidateOrigin::VerbKanji, 0.8F, "godan_sa_contracted_mizenkei",
               core::ExtendedPOS::VerbMizenkei));
         }
       }

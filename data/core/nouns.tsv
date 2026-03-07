@@ -49,7 +49,6 @@
 # 晴れ: noun form (fair weather) - without dict, recognized as VERB
 晴れ	NOUN
 晴れる	VERB	ICHIDAN
-時分	NOUN
 
 # --- Verb-stem compound nouns (need dict to avoid verb interpretation) ---
 推し	NOUN
@@ -93,10 +92,6 @@
 # --- Compound nouns ---
 あだ名	NOUN
 なし崩し	NOUN
-子どもの貧困	NOUN
-食器洗い乾燥機	NOUN
-投資ファンド	NOUN
-オプション取引	NOUN
 # B37: しびれ - split as し+びれ
 しびれ	NOUN
 痺れ	NOUN
@@ -160,21 +155,6 @@
 # --- Foreign/Loanword nouns ---
 Wi-Fi	NOUN
 
-# --- Food ---
-飲むヨーグルト	NOUN
-とろけるチーズ	NOUN
-ひじきの煮物	NOUN
-ホワイトシチュー	NOUN
-サンドイッチ	NOUN
-クラブサンド	NOUN
-タンドリーチキン	NOUN
-レアチーズケーキ	NOUN
-
-# --- Idioms (ことわざ) ---
-柳の下にいつも泥鰌はいない	NOUN
-失敗は成功の母	NOUN
-最初から最後まで	NOUN
-
 # --- Net slang (ネットスラング) ---
 ぱおん	NOUN
 わかりみ	NOUN
@@ -198,27 +178,8 @@ Wi-Fi	NOUN
 マジ	NOUN
 ガチ	NOUN
 何時	NOUN
-猫	NOUN
-雨	NOUN
-電車	NOUN
-学校	NOUN
 草	NOUN
 間違い	NOUN
-売上	NOUN
-現在	NOUN
-最近	NOUN
-将来	NOUN
-過去	NOUN
-未来	NOUN
-非公開	NOUN
-無意識	NOUN
-検討	NOUN
-提出	NOUN
-注目	NOUN
-発行	NOUN
-文化	NOUN
-対	NOUN
-菓子	NOUN
 
 # --- Mixed script compounds (カタカナ + 漢字) ---
 ムダ毛	NOUN
@@ -267,5 +228,6 @@ Wi-Fi	NOUN
 だらけ	NOUN
 四つん這い	NOUN
 ふたなり	NOUN
-添付	NOUN
-送付	NOUN
+エロ	NOUN
+目隠し	NOUN
+月明かり	NOUN

@@ -1031,6 +1031,17 @@ std::vector<UnknownCandidate> generateCounterCandidates(
 
     // Generate candidate for digit + katakana unit
     size_t unit_len = unit_end - numeral_end;
+    // ヶ/ケ alone is not a counter — extend to include following kanji
+    // (ヶ月, ヶ所, ヶ国, ヶ年 etc.)
+    if (unit_len == 1 &&
+        (codepoints[numeral_end] == U'ヶ' || codepoints[numeral_end] == U'ケ') &&
+        unit_end < codepoints.size() &&
+        unit_end < char_types.size() &&
+        char_types[unit_end] == normalize::CharType::Kanji) {
+      // Extend unit_end to include the kanji after ヶ/ケ
+      unit_end += 1;
+      unit_len = unit_end - numeral_end;
+    }
     if (unit_len >= 1) {  // unit_len <= 8 guaranteed by findCharRegionEnd
       std::string surface = extractSubstring(codepoints, start_pos, unit_end);
       if (!surface.empty()) {

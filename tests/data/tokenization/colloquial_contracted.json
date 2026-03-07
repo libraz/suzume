@@ -1,0 +1,59 @@
+{
+  "cases" : [
+    {
+      "description" : "殺しゃれる - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "殺す",
+          "pos" : "Verb",
+          "surface" : "殺しゃ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "れる"
+        }
+      ],
+      "id" : "shi_reru",
+      "input" : "殺しゃれる"
+    },
+    {
+      "description" : "出しゃしない - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "出す",
+          "pos" : "Verb",
+          "surface" : "出しゃ"
+        },
+        {
+          "lemma" : "する",
+          "pos" : "Verb",
+          "surface" : "し"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "shi_shinai",
+      "input" : "出しゃしない"
+    },
+    {
+      "description" : "話しゃれる - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "話す",
+          "pos" : "Verb",
+          "surface" : "話しゃ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "れる"
+        }
+      ],
+      "id" : "hanashi_reru",
+      "input" : "話しゃれる"
+    }
+  ],
+  "description" : "colloquial_contracted tests",
+  "version" : "1.0"
+}
