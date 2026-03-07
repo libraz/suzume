@@ -557,8 +557,9 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Pattern: kanji stem + hiragana suffix forming an i-adjective
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adjective &&
       edge.surface.length() >= 12) {  // ≥4 chars (kanji + ひらがな suffix)
-    // Check if surface contains kanji and ends with い (compound adjective pattern)
-    if (grammar::containsKanji(edge.surface) && utf8::endsWith(edge.surface, "い")) {
+    // Check if surface contains kanji — compound adjective from dictionary
+    // Covers both base form (い) and inflected forms (く, かっ, けれ, etc.)
+    if (grammar::containsKanji(edge.surface)) {
       // Longer compounds need stronger bonus to beat noun+adj split paths
       size_t char_len = suzume::normalize::utf8Length(edge.surface);
       float bonus = -0.5F - static_cast<float>(char_len > 4 ? char_len - 4 : 0) * 0.3F;

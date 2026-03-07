@@ -1074,7 +1074,30 @@ sub apply_suzume_merge {
             }
         }
 
-        # 11. Copula negation: merge じゃ+ない → じゃない
+        # 11. Colloquial intensifier めちゃ: merge め+ちゃ → めちゃ
+        #     MeCab splits as め(名詞) + ちゃ(接続助詞) but めちゃ is a colloquial prefix
+        #     Suzume keeps it as a single token
+        if (!$merged && ($t->{surface} // '') eq 'め' && ($t->{pos} // '') eq '名詞') {
+            if ($i + 1 < @$tokens && ($tokens->[$i + 1]{surface} // '') eq 'ちゃ') {
+                push @result, { surface => 'めちゃ', pos => 'その他', lemma => 'めちゃ' };
+                $i += 2;
+                $merged = 1;
+                $applied_rule //= 'mecha-merge';
+            }
+        }
+
+        # 11b. Negative ず+に → ずに (Suzume treats as single auxiliary)
+        #     MeCab splits as ず(助動詞) + に(助詞)
+        if (!$merged && ($t->{surface} // '') eq 'ず' && ($t->{pos} // '') eq '助動詞') {
+            if ($i + 1 < @$tokens && ($tokens->[$i + 1]{surface} // '') eq 'に') {
+                push @result, { surface => 'ずに', pos => '助動詞', lemma => 'ず' };
+                $i += 2;
+                $merged = 1;
+                $applied_rule //= 'zu-ni-merge';
+            }
+        }
+
+        # 12. Copula negation: merge じゃ+ない → じゃない
         #     Suzume treats じゃない as a single auxiliary token (AUX_否定)
         #     MeCab splits as じゃ(副助詞) + ない(助動詞)
         if (!$merged && ($t->{surface} // '') eq 'じゃ' && ($t->{pos} // '') eq '助詞') {
