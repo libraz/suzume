@@ -359,10 +359,11 @@ sub detect_segmentation_pattern {
 }
 
 sub get_suzume_tokens {
-    my ($cli, $text) = @_;
+    my ($cli, $text, %opts) = @_;
     my $escaped = $text;
     $escaped =~ s/'/'\\''/g;
-    my $output = `'$cli' '$escaped' 2>/dev/null`;
+    my $no_user_dict = $opts{no_user_dict} ? ' --no-user-dict' : '';
+    my $output = `'$cli'$no_user_dict '$escaped' 2>/dev/null`;
     utf8::decode($output);
 
     my @tokens;
@@ -644,6 +645,33 @@ if ($command eq 'add') {
     my $desc = $description || "$input - auto-generated";
     my $id = $case_id || generate_id($input);
 
+    # Load or create file (needed for ID dedup check)
+    my $data;
+    if (-f $path) {
+        $data = load_json($path);
+    } else {
+        $data = {
+            version => "1.0",
+            description => "$test_file tests",
+            cases => [],
+        };
+    }
+
+    my $cases_key = exists $data->{cases} ? 'cases' : 'test_cases';
+    $data->{$cases_key} //= [];
+
+    # Deduplicate ID within the same file
+    unless ($case_id) {
+        my %existing_ids = map { $_->{id} => 1 } @{$data->{$cases_key}};
+        if ($existing_ids{$id}) {
+            my $suffix = 2;
+            $suffix++ while $existing_ids{"${id}_${suffix}"};
+            my $new_id = "${id}_${suffix}";
+            print STDERR "WARNING: ID '$id' already exists in $test_file, using '$new_id'\n";
+            $id = $new_id;
+        }
+    }
+
     my $new_case = {
         id => $id,
         description => $desc,
@@ -665,20 +693,6 @@ if ($command eq 'add') {
         exit 0;
     }
 
-    # Load or create file
-    my $data;
-    if (-f $path) {
-        $data = load_json($path);
-    } else {
-        $data = {
-            version => "1.0",
-            description => "$test_file tests",
-            cases => [],
-        };
-    }
-
-    my $cases_key = exists $data->{cases} ? 'cases' : 'test_cases';
-    $data->{$cases_key} //= [];
     push @{$data->{$cases_key}}, $new_case;
 
     save_json($path, $data);
@@ -1360,7 +1374,7 @@ if ($command eq 'accept-diff') {
         my $found = $item->{found};
 
         # Get Suzume's output
-        my $suzume_tokens = get_suzume_tokens_full($suzume_cli, $inp);
+        my $suzume_tokens = get_suzume_tokens_full($suzume_cli, $inp, no_user_dict => 1);
         my $suzume_expected = format_expected($suzume_tokens);
 
         print "[$found->{basename}/$found->{index}] $inp\n";

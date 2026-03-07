@@ -667,6 +667,18 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kVeryStrongBonus;
   }
 
+  // Penalty for splitting unknown words after youon (拗音: ょ, ゃ, ゅ)
+  // Youon are always part of the preceding mora (きょ, しゃ, ちゅ)
+  // Splitting after them produces invalid word boundaries
+  // E.g., くしょん should stay as one token, not くしょ+ん
+  // Only apply to non-dictionary tokens (dict entries like でしょ are valid boundaries)
+  if (!prev.fromDictionary() && prev.pos == core::PartOfSpeech::Other) {
+    std::string_view last_char = utf8::lastChar(prev.surface);
+    if (grammar::isSmallKana(last_char)) {
+      surface_bonus += cost::kStrong;
+    }
+  }
+
   // Penalty for non-pronoun → ら(SUFFIX)
   // Plural suffix ら only naturally follows pronouns (彼ら, 僕ら)
   // Without this, NOUN→SUFFIX bonus (-0.8) causes false splits (かし+ら, 自+ら)

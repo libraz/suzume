@@ -258,8 +258,20 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "Vanilla splits ã prefix; user dict merges"
+      },
       "description" : "Honorific お + 客 + 様",
       "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "お客様"
+        }
+      ],
+      "id" : "o_customer_sama",
+      "input" : "お客様",
+      "suzume_expected" : [
         {
           "pos" : "Prefix",
           "surface" : "お"
@@ -273,8 +285,6 @@
           "surface" : "様"
         }
       ],
-      "id" : "o_customer_sama",
-      "input" : "お客様",
       "tags" : [
         "prefix",
         "o"

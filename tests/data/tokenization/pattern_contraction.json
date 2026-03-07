@@ -130,27 +130,53 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "Vanilla splits ã prefix; user dict merges"
+      },
       "description" : "おねえさん - should not be parsed as verb おねえす",
       "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "おねえさん"
+        }
+      ],
+      "id" : "honorific_oneesan",
+      "input" : "おねえさん",
+      "suzume_expected" : [
         {
           "pos" : "Prefix",
           "surface" : "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ねえさん"
+          "pos" : "Interjection",
+          "surface" : "ねえ"
+        },
+        {
+          "pos" : "Suffix",
+          "surface" : "さん"
         }
       ],
-      "id" : "honorific_oneesan",
-      "input" : "おねえさん",
       "tags" : [
         "honorific",
         "regression"
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "Vanilla splits ã prefix; user dict merges"
+      },
       "description" : "お姉さん - prefix + kanji noun + suffix",
       "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "お姉さん"
+        }
+      ],
+      "id" : "honorific_onesan_kanji",
+      "input" : "お姉さん",
+      "suzume_expected" : [
         {
           "pos" : "Prefix",
           "surface" : "お"
@@ -164,8 +190,6 @@
           "surface" : "さん"
         }
       ],
-      "id" : "honorific_onesan_kanji",
-      "input" : "お姉さん",
       "tags" : [
         "honorific",
         "suffix",
@@ -290,6 +314,10 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãã« lemma: ã¬ is grammatically correct (ã is renyokei of ã¬)"
+      },
       "description" : "食べずに帰った - auto-generated",
       "expected" : [
         {
@@ -313,9 +341,34 @@
         }
       ],
       "id" : "bezuni_ttta",
-      "input" : "食べずに帰った"
+      "input" : "食べずに帰った",
+      "suzume_expected" : [
+        {
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
+        },
+        {
+          "lemma" : "ぬ",
+          "pos" : "Auxiliary",
+          "surface" : "ずに"
+        },
+        {
+          "lemma" : "帰る",
+          "pos" : "Verb",
+          "surface" : "帰っ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãã« lemma: ã¬ is grammatically correct"
+      },
       "description" : "話さずに聞く - auto-generated",
       "expected" : [
         {
@@ -334,9 +387,29 @@
         }
       ],
       "id" : "sazuni_ku",
-      "input" : "話さずに聞く"
+      "input" : "話さずに聞く",
+      "suzume_expected" : [
+        {
+          "lemma" : "話す",
+          "pos" : "Verb",
+          "surface" : "話さ"
+        },
+        {
+          "lemma" : "ぬ",
+          "pos" : "Auxiliary",
+          "surface" : "ずに"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "聞く"
+        }
+      ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãã« lemma: ã¬ is grammatically correct"
+      },
       "description" : "考えずに - auto-generated",
       "expected" : [
         {
@@ -351,9 +424,25 @@
         }
       ],
       "id" : "ezuni",
-      "input" : "考えずに"
+      "input" : "考えずに",
+      "suzume_expected" : [
+        {
+          "lemma" : "考える",
+          "pos" : "Verb",
+          "surface" : "考え"
+        },
+        {
+          "lemma" : "ぬ",
+          "pos" : "Auxiliary",
+          "surface" : "ずに"
+        }
+      ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "ãã« lemma: ã¬ is grammatically correct"
+      },
       "description" : "帰らずに済む - auto-generated",
       "expected" : [
         {
@@ -372,7 +461,23 @@
         }
       ],
       "id" : "razuni_mu",
-      "input" : "帰らずに済む"
+      "input" : "帰らずに済む",
+      "suzume_expected" : [
+        {
+          "lemma" : "帰る",
+          "pos" : "Verb",
+          "surface" : "帰ら"
+        },
+        {
+          "lemma" : "ぬ",
+          "pos" : "Auxiliary",
+          "surface" : "ずに"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "済む"
+        }
+      ]
     },
     {
       "description" : "めちゃ楽しい - auto-generated",

@@ -165,6 +165,7 @@ int cmdAnalyze(const CommandArgs& args) {
   options.normalize_options.preserve_case = !args.lowercase;
   // Default is remove symbols (true), flag inverts to preserve
   options.remove_symbols = !args.preserve_symbols;
+  options.skip_user_dictionary = args.no_user_dict;
 
   Suzume analyzer(options);
 

@@ -1307,7 +1307,17 @@ next_length:;  // Label for goto from particle-starting verb skip
   if (start_pos < codepoints.size()) {
     char32_t first_char = codepoints[start_pos];
     // Check for e-row hiragana (ichidan renyokei ending)
-    if (grammar::isERowCodepoint(first_char)) {
+    // e-row: ね(ねる), め(める), け(ける), etc.
+    // Special: み(みる) after て/で (common auxiliary "try" verb)
+    // Note: き after て is くる(irregular), not きる - only み is safe here
+    bool is_mi_after_te = false;
+    if (first_char == U'み' && start_pos > 0) {
+      char32_t prev_char = codepoints[start_pos - 1];
+      if (prev_char == U'て' || prev_char == U'で') {
+        is_mi_after_te = true;
+      }
+    }
+    if (grammar::isERowCodepoint(first_char) || is_mi_after_te) {
       // Check if followed by te/ta particle
       if (start_pos + 1 < codepoints.size()) {
         char32_t next_char = codepoints[start_pos + 1];
@@ -1316,11 +1326,9 @@ next_length:;  // Label for goto from particle-starting verb skip
           std::string stem_surface = extractSubstring(codepoints, start_pos, start_pos + 1);
           std::string base_form = stem_surface + "る";
 
-          // Only generate if base form is a known verb in dictionary
-          // This prevents false positives like め+て, け+て
-          // Also handles て/で which are commonly particles but may be verb renyokei
-          // if the base form (てる/でる) is in dictionary
-          if (vh::isVerbInDictionary(dict_manager, base_form)) {
+          // For e-row: require dict check to prevent false positives (め+て, け+て)
+          // For み after て/で: skip dict check (auxiliary みる is common but not in dict)
+          if (is_mi_after_te || vh::isVerbInDictionary(dict_manager, base_form)) {
             // Strong negative cost to beat particle split
             // Particle path can be as low as -0.2, so we need lower
             constexpr float kCost = -0.5F;

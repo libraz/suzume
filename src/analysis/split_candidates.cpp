@@ -11,6 +11,7 @@
 #include "core/debug.h"
 #include "grammar/inflection.h"
 #include "normalize/char_type.h"
+#include "normalize/utf8.h"
 #include "tokenizer_utils.h"
 
 namespace suzume::analysis {
@@ -397,6 +398,28 @@ void addNounVerbSplitCandidates(
             continue;  // Skip this split, prefer compound word
           }
         }
+        // Skip split if last kanji of noun + verb part forms a known dictionary word
+        // e.g., 大掃除+する → skip because 掃除 is a dict word (prefer 大+掃除+する)
+        // This prevents kanji compound absorption of dictionary entries
+        if (noun_surface.size() >= 6) {  // Noun has at least 2 kanji (6 bytes UTF-8)
+          // Extract last kanji of noun + verb part
+          auto noun_cps = normalize::toCodepoints(noun_surface);
+          if (!noun_cps.empty()) {
+            std::string last_kanji = normalize::encodeUtf8(noun_cps.back());
+            std::string alt_word = last_kanji + std::string(verb_part);
+            auto alt_results = dict_manager.lookup(alt_word, 0);
+            for (const auto& result : alt_results) {
+              if (result.entry != nullptr && result.entry->surface == alt_word) {
+                SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] skip \"" << noun_surface
+                    << "\" + \"" << verb_part
+                    << "\": alt dict word \"" << alt_word << "\" exists\n");
+                goto next_split;
+              }
+            }
+          }
+        }
+
+        {
         const auto& opts = scorer.splitOpts();
         float final_noun_cost = noun_cost + opts.noun_verb_split_bonus;
 
@@ -428,6 +451,8 @@ void addNounVerbSplitCandidates(
                         final_noun_cost, noun_flags, "");
 
         break;
+        }  // end alt-dict-word check scope
+        next_split:;
       }
     }
   }

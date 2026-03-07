@@ -143,8 +143,28 @@
       ]
     },
     {
+      "accepted_diff" : {
+        "category" : "pos-limitation",
+        "reason" : "Vanilla splits ã prefix; user dict merges"
+      },
       "description" : "Ojou-sama speech ですわ",
       "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "お嬢様"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "です"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "わ"
+        }
+      ],
+      "id" : "character_desuwa",
+      "input" : "お嬢様ですわ",
+      "suzume_expected" : [
         {
           "pos" : "Prefix",
           "surface" : "お"
@@ -166,8 +186,6 @@
           "surface" : "わ"
         }
       ],
-      "id" : "character_desuwa",
-      "input" : "お嬢様ですわ",
       "tags" : [
         "character_speech",
         "ojousama"

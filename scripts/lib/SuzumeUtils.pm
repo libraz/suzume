@@ -76,6 +76,7 @@ our %SLANG_ADJ_STEMS = (
     'ウザ' => '赤',
     'ダサ' => '赤',
     'イタ' => '赤',
+    'エロ' => '赤',
 );
 
 # Slang verb stems → standard replacement for MeCab preprocessing
@@ -317,6 +318,27 @@ sub apply_suzume_merge {
                 $i = $j;
                 $merged = 1;
                 $applied_rule //= 'date';
+            }
+        }
+
+        # 1.3. お + family/honorific terms → single token
+        # MeCab splits お+兄ちゃん, but Suzume has these as dict entries
+        if (!$merged && ($t->{surface} // '') eq 'お'
+            && ($t->{pos} // '') =~ /接頭詞/
+            && $i + 1 < @$tokens) {
+            my %family_terms = map { $_ => 1 } qw(
+                兄ちゃん 姉ちゃん 兄さん 姉さん 嬢さん 嬢様
+                父さん 母さん 爺さん 婆さん 嫁さん
+                じさん ばさん じいさん ばあさん にいさん ねえさん
+                とうさん かあさん もちゃ っさん
+                客様 客さん
+            );
+            my $next_surface = $tokens->[$i + 1]{surface} // '';
+            if ($family_terms{$next_surface}) {
+                push @result, { surface => 'お' . $next_surface, pos => '名詞', lemma => 'お' . $next_surface };
+                $i += 2;
+                $merged = 1;
+                $applied_rule //= 'family-merge';
             }
         }
 
@@ -1198,10 +1220,23 @@ sub apply_suzume_merge {
     # Suzume splits: お客様 → お+客+様, 姉さん → 姉+さん, 皆様 → 皆+様
     my @split_result;
     my $honorific_re = qr/さん|ちゃん|様|君|殿|さま/;
+    # Exceptions: words where honorific is part of the lexeme
+    my %honorific_exceptions = (
+        'お兄ちゃん' => 1, 'お姉ちゃん' => 1, 'お兄さん' => 1, 'お姉さん' => 1,
+        'お嬢さん' => 1, 'お嬢様' => 1, 'お父さん' => 1, 'お母さん' => 1,
+        'お爺さん' => 1, 'お婆さん' => 1, 'お嫁さん' => 1,
+        'お客様' => 1, 'お客さん' => 1,
+        # Without お prefix (MeCab splits お+ separately)
+        '兄ちゃん' => 1, '姉ちゃん' => 1, '兄さん' => 1, '姉さん' => 1,
+        '嬢さん' => 1, '嬢様' => 1, '父さん' => 1, '母さん' => 1,
+        '爺さん' => 1, '婆さん' => 1, '嫁さん' => 1,
+        '客様' => 1, '客さん' => 1,
+    );
     for my $t (@result) {
         my $surface = $t->{surface} // '';
         # Pattern: (お)? + kanji(s) + honorific
-        if ($surface =~ /^(お)?(\p{Script=Han}+)($honorific_re)$/) {
+        if (!$honorific_exceptions{$surface}
+            && $surface =~ /^(お)?(\p{Script=Han}+)($honorific_re)$/) {
             my ($prefix, $kanji, $suffix) = ($1, $2, $3);
             if (defined $prefix) {
                 push @split_result, { surface => $prefix, pos => '接頭詞', lemma => $prefix };
@@ -1230,6 +1265,12 @@ sub apply_suzume_merge {
         'お金' => 1, 'お前' => 1, 'おまえ' => 1,
         'おかず' => 1, 'おでん' => 1, 'おもち' => 1, 'おいら' => 1,
         'おっぱい' => 1, 'おしっこ' => 1, 'おもらし' => 1,
+        'おじさん' => 1, 'おばさん' => 1, 'おじいさん' => 1, 'おばあさん' => 1,
+        'おにいさん' => 1, 'おねえさん' => 1, 'おとうさん' => 1, 'おかあさん' => 1,
+        'おっさん' => 1, 'おもちゃ' => 1,
+        'お兄ちゃん' => 1, 'お姉ちゃん' => 1, 'お兄さん' => 1, 'お姉さん' => 1,
+        'お嬢さん' => 1, 'お嬢様' => 1, 'お父さん' => 1, 'お母さん' => 1,
+        'お爺さん' => 1, 'お婆さん' => 1, 'お嫁さん' => 1, 'お客様' => 1, 'お客さん' => 1,
     );
     for my $t (@result) {
         my $surface = $t->{surface} // '';
@@ -1321,17 +1362,28 @@ sub apply_suzume_merge {
     # Suzume treats consecutive kanji characters as a single token (no dictionary splitting)
     # MeCab splits 二次+巨乳+画像 but suzume outputs 二次巨乳画像
     # Skip: 的 suffix (Suzume splits kanji+的 as separate tokens)
+    # Skip: 副詞可能 nouns (毎日, 今日, 今月 etc.) — Suzume recognizes these as dict words
+    # Skip: 固有名詞 (佐藤, 田中 etc.) — Suzume splits proper nouns
+    # Skip: 接尾 (先生, 様, 中, 末 etc.) — Suzume splits suffixes
     my @kanji_merged;
     for my $j (0 .. $#result) {
         my $curr = $result[$j];
         my $surface = $curr->{surface} // '';
+        my $prev_pos_sub1 = @kanji_merged ? ($kanji_merged[-1]{pos_sub1} // '') : '';
+        my $curr_pos_sub1 = $curr->{pos_sub1} // '';
         # If previous token and current are both all-kanji, merge
         # Skip 的 — Suzume treats it as a separate suffix token
         # Skip if previous token contains 々 — 々 marks word boundary (時々+妙 should not merge)
+        # Skip if previous is 副詞可能 (毎日, 今日) or 固有名詞 — Suzume splits these
+        # Skip if current is 接尾 (先生, 様, 中, 末) — Suzume splits suffixes
         if (@kanji_merged && $surface =~ /^\p{Script=Han}+$/
             && $surface ne '的'
             && ($kanji_merged[-1]{surface} // '') =~ /^\p{Script=Han}+$/
-            && ($kanji_merged[-1]{surface} // '') !~ /々/) {
+            && ($kanji_merged[-1]{surface} // '') !~ /々/
+            && $prev_pos_sub1 ne '副詞可能'
+            && $prev_pos_sub1 ne '固有名詞'
+            && ($kanji_merged[-1]{pos} // '') ne '副詞'
+            && $curr_pos_sub1 ne '接尾') {
             $kanji_merged[-1]{surface} .= $surface;
             $kanji_merged[-1]{lemma} = $kanji_merged[-1]{surface};
             $kanji_merged[-1]{pos} = '名詞';
@@ -2454,7 +2506,7 @@ sub get_expected_tokens {
     }
 
     # Check for slang adjective rule
-    if ($text =~ /(?:エモ|キモ|ウザ|ダサ|イタ)[いかくけさ]/) {
+    if ($text =~ /(?:エモ|キモ|ウザ|ダサ|イタ|エロ)[いかくけさ]/) {
         return (\@tokens, 'MeCab', 'slang-adjective');
     }
 
