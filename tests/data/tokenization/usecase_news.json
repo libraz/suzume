@@ -1640,7 +1640,7 @@
     {
       "accepted_diff" : {
         "category" : "pos-limitation",
-        "reason" : "ã¦(ParticleâAuxiliary): Suzume treats ã¦ after verb as AUX_ç¶ç¶, MeCab as æ¥ç¶å©è©"
+        "reason" : "æ­£ãã: Suzume outputs Adjective (ku-form), MeCab says Adverb"
       },
       "description" : "Explanation style - Current suzume treats compound verb 読み込む differently",
       "expected" : [
@@ -1779,13 +1779,12 @@
           "surface" : "れ"
         },
         {
-          "lemma" : "てる",
-          "pos" : "Auxiliary",
+          "pos" : "Particle",
           "surface" : "て"
         },
         {
           "lemma" : "いる",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "い"
         },
         {

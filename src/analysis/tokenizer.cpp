@@ -653,7 +653,7 @@ void Tokenizer::addMixedScriptCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   analysis::addMixedScriptCandidates(lattice, text, codepoints, start_pos,
-                                      char_types, scorer_);
+                                      char_types, scorer_, dict_manager_);
 }
 
 void Tokenizer::addCompoundSplitCandidates(

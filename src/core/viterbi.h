@@ -135,6 +135,14 @@ class Viterbi {
             if (edge.extended_pos == ExtendedPOS::AuxAspectIku) {
               conn_cost += 1.0F;  // Penalty for aspect aux at BOS
             }
+            // AuxTenseTa (た/だ past) requires preceding verb/adj stem
+            if (edge.extended_pos == ExtendedPOS::AuxTenseTa) {
+              conn_cost += 2.0F;
+            }
+            // Sentence-ending particles cannot appear at sentence start
+            if (edge.extended_pos == ExtendedPOS::ParticleFinal) {
+              conn_cost += 2.0F;
+            }
           }
 
           // Small per-transition cost to prefer fewer morphemes (longer tokens)

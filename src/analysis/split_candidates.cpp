@@ -50,7 +50,8 @@ void addMixedScriptCandidates(
     core::Lattice& lattice, std::string_view text,
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer) {
+    const Scorer& scorer,
+    const dictionary::DictionaryManager& dict_manager) {
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -116,32 +117,53 @@ void addMixedScriptCandidates(
       size_t end_byte = charPosToBytePos(codepoints, candidate_end);
       std::string surface(text.substr(start_byte, end_byte - start_byte));
 
-      // Check if all kanji in this candidate are counter/unit kanji
-      bool all_counter = true;
+      // Count how many leading kanji are counter/unit kanji
+      size_t counter_prefix_len = 0;
       for (size_t k = 0; k < kanji_len; ++k) {
-        if (!isCounterKanji(codepoints[first_end + k])) {
-          all_counter = false;
+        if (isCounterKanji(codepoints[first_end + k])) {
+          counter_prefix_len = k + 1;
+        } else {
           break;
         }
       }
 
       // Apply length-based bonus/penalty
       float length_adjustment;
-      if (!all_counter) {
-        // Non-counter kanji (学園, 世界, etc.) — don't generate merge candidate
+      if (counter_prefix_len == 0) {
+        // First kanji is not a counter (学園, 世界, etc.) — skip
         continue;
-      } else if (kanji_len == 1) {
-        // Exception: 対 (versus) should not merge with preceding digit
-        // e.g., 2対1 should be 2|対|1, not 2対|1
-        if (codepoints[first_end] == U'対') {
-          length_adjustment = bigram_cost::kStrong;  // Strong penalty to favor split
+      } else if (kanji_len <= counter_prefix_len) {
+        // All kanji are counters
+        if (kanji_len == 1) {
+          if (codepoints[first_end] == U'対') {
+            length_adjustment = bigram_cost::kStrong;  // 2対1 → 2|対|1
+          } else {
+            length_adjustment = opts.digit_kanji_1_bonus;  // 5分, 3月
+          }
+        } else if (kanji_len == 2) {
+          length_adjustment = opts.digit_kanji_2_bonus;  // 5分間, 3時間
         } else {
-          length_adjustment = opts.digit_kanji_1_bonus;  // Best: 5分, 3月
+          length_adjustment = opts.digit_kanji_3_penalty;  // Rare
         }
-      } else if (kanji_len == 2) {
-        length_adjustment = opts.digit_kanji_2_bonus;  // Good: 5分間, 3時間
       } else {
-        length_adjustment = opts.digit_kanji_3_penalty;  // Rare: penalize
+        // Counter prefix + non-counter kanji: only allow when the full kanji
+        // portion exists as a dictionary entry (e.g., 次元 in dict → 2次元 OK)
+        size_t kanji_start_byte = charPosToBytePos(codepoints, first_end);
+        std::string kanji_part(text.substr(kanji_start_byte,
+                                           end_byte - kanji_start_byte));
+        auto lookup = dict_manager.lookup(kanji_part, 0);
+        bool found_exact = false;
+        for (const auto& r : lookup) {
+          if (r.entry->surface == kanji_part) {
+            found_exact = true;
+            break;
+          }
+        }
+        if (!found_exact) {
+          continue;  // Skip: kanji portion not a known word
+        }
+        // Dict-verified extension gets stronger bonus than regular counters
+        length_adjustment = -0.8F;
       }
 
       float final_cost = base_cost + length_adjustment;

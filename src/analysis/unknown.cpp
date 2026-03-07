@@ -451,29 +451,29 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       }
 
       // Penalize hiragana sequences starting with particle characters
-      // These could be nouns (はし, はな, にく) but are less likely than
+      // These could be nouns (はし, はな, にく, にゃんこ) but are less likely than
       // the particle interpretation, unless the particle path has connection penalties
-      // Constraints:
-      // - Only len=2 is allowed (typical pattern: は+し, に+く, の+り)
-      // - Longer sequences are too risky (e.g., によれ should be に+よれ, not a noun)
       bool has_suffix = false;
       if (started_with_particle) {
-        if (len != 2) {
-          continue;  // Only generate 2-char candidates
+        if (len == 1) {
+          continue;  // Single-char particle-start never forms a noun alone
         }
         // Check if this is a reduplicated pattern (same character repeated)
         // Reduplicated hiragana like はは (母), ちち (父) are likely real words
-        bool is_reduplicated = (codepoints[start_pos] == codepoints[start_pos + 1]);
+        bool is_reduplicated = (len == 2 &&
+            codepoints[start_pos] == codepoints[start_pos + 1]);
         if (is_reduplicated) {
           // Small bonus for reduplicated patterns - they're often real words
-          // This helps はは (母) beat は+は (particle sequence)
           cost -= 0.5F;
-        } else {
-          // Add moderate penalty - let connection rules decide which path is better
+        } else if (len == 2) {
+          // 2-char: moderate penalty (にく, はし, のり)
           cost += 1.0F;
+        } else {
+          // 3+ char: heavier penalty scaling with length (によれ, にある)
+          // but still generated so words like にゃんこ have a chance
+          cost += 1.0F + static_cast<float>(len - 2) * 0.5F;
         }
         // Mark as has_suffix to skip exceeds_dict_length penalty in tokenizer
-        // These are morphologically recognized patterns (potential nouns)
         has_suffix = true;
       }
       auto cand = makeCandidate(surface, start_pos, candidate_end, pos, cost, has_suffix, CandidateOrigin::SameType);
@@ -695,18 +695,26 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
     }
   }
 
-  // Skip common suffixes and particles that are handled by dictionary
-  // These are not character speech patterns
+  // Whitelist approach: only allow char speech starting with kana that can
+  // begin valid auxiliary/character-speech patterns
   if (start_type == normalize::CharType::Hiragana) {
     char32_t first_char = codepoints[start_pos];
-    // た: handled as tense auxiliary
-    // さ,ら,く,あ,け: common verb/adj endings
-    // い: handled as verb ending or copula
-    // す: handled as verb ending (です contraction)
-    // る: handled as verb ending
-    if (first_char == U'た' || first_char == U'さ' || first_char == U'ら' ||
-        first_char == U'く' || first_char == U'あ' || first_char == U'け' ||
-        first_char == U'い' || first_char == U'す' || first_char == U'る') {
+    // Valid char speech starters: sentence-ending speech patterns (ぞ,じゃ,のう,etc.)
+    // and colloquial auxiliaries (ちゃ,じゃ,etc.)
+    // Excludes: grammar chars handled by dict (た,さ,ら,く,あ,け,い,す,る)
+    //           and kana that never start auxiliaries (ぱ行,ば行 sound-symbolics, etc.)
+    bool valid_starter =
+        first_char == U'ぞ' || first_char == U'じ' || first_char == U'の' ||
+        first_char == U'な' || first_char == U'ね' || first_char == U'よ' ||
+        first_char == U'わ' || first_char == U'で' || first_char == U'だ' ||
+        first_char == U'ま' || first_char == U'や' || first_char == U'か' ||
+        first_char == U'が' || first_char == U'べ' || first_char == U'ち' ||
+        first_char == U'に' || first_char == U'せ' || first_char == U'ず' ||
+        first_char == U'ど' || first_char == U'て' || first_char == U'も' ||
+        first_char == U'み' || first_char == U'ん' || first_char == U'こ' ||
+        first_char == U'そ' || first_char == U'と' || first_char == U'お' ||
+        first_char == U'は' || first_char == U'へ';
+    if (!valid_starter) {
       return candidates;
     }
   }

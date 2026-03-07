@@ -145,7 +145,7 @@
     {
       "accepted_diff" : {
         "category" : "pos-limitation",
-        "reason" : "Vanilla splits ã prefix; user dict merges"
+        "reason" : "ãå¬¢æ§ split as ã+å¬¢+æ§ without user dict"
       },
       "description" : "Ojou-sama speech ですわ",
       "expected" : [

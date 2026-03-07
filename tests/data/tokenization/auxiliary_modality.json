@@ -3,7 +3,7 @@
     {
       "accepted_diff" : {
         "category" : "pos-limitation",
-        "reason" : "ãã: old kana - verb vs auxiliary classification"
+        "reason" : "BOS penalty changes old kana ã interpretation"
       },
       "description" : "ゐる - old kana",
       "expected" : [
@@ -16,7 +16,7 @@
       "input" : "ゐる",
       "suzume_expected" : [
         {
-          "pos" : "Auxiliary",
+          "pos" : "Other",
           "surface" : "ゐる"
         }
       ],

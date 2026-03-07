@@ -260,7 +260,7 @@
     {
       "accepted_diff" : {
         "category" : "pos-limitation",
-        "reason" : "Vanilla splits ã prefix; user dict merges"
+        "reason" : "ãå®¢æ§ in user dict only, test skips user dict"
       },
       "description" : "Honorific お + 客 + 様",
       "expected" : [

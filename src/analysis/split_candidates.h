@@ -43,7 +43,8 @@ void addMixedScriptCandidates(
     core::Lattice& lattice, std::string_view text,
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer);
+    const Scorer& scorer,
+    const dictionary::DictionaryManager& dict_manager);
 
 /**
  * @brief Add compound noun split candidates

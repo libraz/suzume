@@ -322,6 +322,8 @@ bool isCounterKanji(char32_t cp) {
     case U'敗': case U'勝': case U'戦':
     // Compound second char (時間, 分間, 年間, 世紀, etc.)
     case U'間': case U'紀':
+    // Ordinal/sequential
+    case U'次':
       return true;
     default:
       return false;

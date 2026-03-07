@@ -391,9 +391,14 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: 高さ → 高(語幹) + さ(名詞), なさそう → な + さ + そう
       suffix("さ", "さ"),
 
-      // Honorific suffix さん (田中さん, お姉さん)
-      // MeCab: 田中さん → 田中 + さん
+      // Honorific suffixes
       suffix("さん", "さん"),
+      suffix("ちゃん", "ちゃん"),
+      suffix("くん", "くん"),
+      suffix("さま", "さま"),
+      suffix("たん", "たん"),
+      suffix("にゃん", "にゃん"),
+      suffix("っ娘", "っ娘"),
 
       // Plural suffix たち (学生たち, 私たち, 子供たち)
       // MeCab: 学生たち → 学生 + たち

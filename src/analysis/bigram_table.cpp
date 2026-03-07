@@ -230,6 +230,10 @@ BigramTable::initTable() {
   setCell(t, EPOS::Suffix, EPOS::VerbRenyokei, cost::kModerateBonus);
   setCell(t, EPOS::Suffix, EPOS::VerbShuushikei, cost::kModerateBonus);
 
+  // Suffix → Noun - minor bonus
+  // Suffixes naturally precede nouns (e.g., honorifics before noun phrases)
+  setCell(t, EPOS::Suffix, EPOS::Noun, cost::kModerateBonus);
+
   // =========================================================================
   // Auxiliary → Auxiliary Chains
   // =========================================================================
@@ -273,6 +277,10 @@ BigramTable::initTable() {
   // AuxPassive → AuxVolitional (れる+べき in passive obligation) - strong bonus
   // Ensures 書かれるべき → 書か+れる+べき(dict) over char_speech べき(AUX_過去) path
   setCell(t, EPOS::AuxPassive, EPOS::AuxVolitional, cost::kStrongBonus);
+
+  // AuxPassive → ParticleConj (れ+ながら, れ+ば in passive+conjunctive) - moderate bonus
+  // Ensures 揉まれながら → 揉ま+れ+ながら over 揉まれ+ながら
+  setCell(t, EPOS::AuxPassive, EPOS::ParticleConj, cost::kModerateBonus);
 
   // AuxNegativeNai → AuxTenseTa (なかっ+た) - strong bonus
   setCell(t, EPOS::AuxNegativeNai, EPOS::AuxTenseTa, cost::kStrongBonus);
@@ -570,6 +578,11 @@ BigramTable::initTable() {
   // AuxTenseTa → AuxTenseMasu (た+ます) - prohibitive
   setCell(t, EPOS::AuxTenseTa, EPOS::AuxTenseMasu, cost::kAlmostNever);
 
+  // AuxTenseTa → AuxNegative (た+ない/ん) - prohibitive
+  // Past tense cannot be followed by negation; correct order is negation→past
+  setCell(t, EPOS::AuxTenseTa, EPOS::AuxNegativeNai, cost::kAlmostNever);
+  setCell(t, EPOS::AuxTenseTa, EPOS::AuxNegativeNu, cost::kAlmostNever);
+
   // AuxTenseTa → AuxAspectKuru (た+き) - prohibitive
   // Prevents いただき → い+た+だ+き (きた split creates standalone き entry)
   setCell(t, EPOS::AuxTenseTa, EPOS::AuxAspectKuru, cost::kAlmostNever);
@@ -577,6 +590,10 @@ BigramTable::initTable() {
   // AuxCopulaDa → AuxAspectKuru (だ+き) - prohibitive
   // Prevents いただき → い+た+だ+き
   setCell(t, EPOS::AuxCopulaDa, EPOS::AuxAspectKuru, cost::kAlmostNever);
+
+  // ParticleNo → AuxTenseTa (ん/の+た) - prohibitive
+  // Nominalizer の/ん is followed by copula (のだ/のです), not past tense
+  setCell(t, EPOS::ParticleNo, EPOS::AuxTenseTa, cost::kAlmostNever);
 
   // ParticleFinal → VerbShuushikei (ね+食べる) - strong penalty
   // (sentence-final particles rarely continue to verbs)
