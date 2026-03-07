@@ -1571,6 +1571,13 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kAlmostNever;
   }
 
+  // Bonus for proper name sequence: Family → Given (姓→名)
+  // E.g., 優木(FAMILY) + せつ菜(GIVEN) should strongly prefer staying together
+  if (prev.extended_pos == core::ExtendedPOS::NounProperFamily &&
+      next.extended_pos == core::ExtendedPOS::NounProperGiven) {
+    surface_bonus += cost::kStrongBonus;  // -2.5 bonus
+  }
+
   float total = base_cost + extended_cost + surface_bonus;
 
   SUZUME_DEBUG_VERBOSE_BLOCK {

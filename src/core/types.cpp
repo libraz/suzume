@@ -259,6 +259,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
     case ExtendedPOS::NounFormal: return "NOUN_形式";
     case ExtendedPOS::NounVerbal: return "NOUN_転成";
     case ExtendedPOS::NounProper: return "NOUN_固有";
+    case ExtendedPOS::NounProperFamily: return "NOUN_姓";
+    case ExtendedPOS::NounProperGiven: return "NOUN_名";
     case ExtendedPOS::NounNumber: return "NOUN_数";
 
     // Pronouns

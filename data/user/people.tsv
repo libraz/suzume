@@ -1,0 +1,272 @@
+# =============================================================================
+# Suzume User Dictionary - People (Musicians, Voice Actors, VTubers, etc.)
+# =============================================================================
+#
+# Format: surface<TAB>pos
+#
+# =============================================================================
+
+# --- av_actresses ---
+元SKE48三上	NOUN
+元AKB48グループ	NOUN
+冬月かえで	NOUN
+元S1	NOUN
+元MOODYZ	NOUN
+元SOD	NOUN
+元E-BODY	NOUN
+X（エックス）女優	NOUN
+有名YouTuber	NOUN
+スカパー!アダルト放送大賞	NOUN
+
+# --- characters ---
+MEMちょ	NOUN
+C.C.	NOUN
+不死身の杉本	NOUN
+Pちゃん	NOUN
+かなで	NOUN
+不死身の杉元	NOUN
+フェルディナンド	NOUN
+
+# --- comedians ---
+ブラックマヨネーズ	NOUN
+NON STYLE	NOUN
+ドランクドラゴン	NOUN
+3時のヒロイン	NOUN
+りんたろー。	NOUN
+ゆいP	NOUN
+M-1グランプリ	NOUN
+R-1グランプリ	NOUN
+THE MANZAI	NOUN
+水曜日のダウンタウン	NOUN
+
+# --- game_characters ---
+マヤノトップガン	NOUN
+キタサンブラック	NOUN
+
+# --- idol_groups ---
+Juice=Juice	NOUN
+OCHA NORMA	NOUN
+ももいろクローバーZ	NOUN
+SUPER☆GiRLS	NOUN
+26時のマスカレイド	NOUN
+フィロソフィーのダンス	NOUN
+KinKi Kids	NOUN
+KAT-TUN	NOUN
+Hey! Say! JUMP	NOUN
+Kis-My-Ft2	NOUN
+Sexy Zone	NOUN
+King & Prince	NOUN
+Snow Man	NOUN
+Travis Japan	NOUN
+HiHi Jets	NOUN
+7 MEN 侍	NOUN
+三代目J Soul Brothers	NOUN
+THE RAMPAGE	NOUN
+DA PUMP	NOUN
+BE:FIRST	NOUN
+Stray Kids	NOUN
+LE SSERAFIM	NOUN
+Red Velvet	NOUN
+Wonder Girls	NOUN
+IZ*ONE	NOUN
+Wanna One	NOUN
+MONSTA X	NOUN
+(G)I-DLE	NOUN
+OH MY GIRL	NOUN
+Weki Meki	NOUN
+Wake Up Girls!	NOUN
+Poppin'Party	NOUN
+RAISE A SUILEN	NOUN
+i☆Ris	NOUN
+THE IDOLM@STER	NOUN
+MIGMA SHELTER	NOUN
+Maison book girl	NOUN
+There There Theres	NOUN
+Pimm's	NOUN
+ぜんぶ君のせいだ。	NOUN
+Cheeky Parade	NOUN
+Dorothy Little Happy	NOUN
+La PomPon	NOUN
+Party Rockets GT	NOUN
+OS☆U	NOUN
+Stella Beats	NOUN
+天晴れ!原宿	NOUN
+Devil ANTHEM.	NOUN
+PPP! PiXiON	NOUN
+GO TO THE BEDS	NOUN
+CARRY LOOSE	NOUN
+SAY-LA	NOUN
+マジカル・パンチライン	NOUN
+BANZAI JAPAN	NOUN
+SAKA-SAMA	NOUN
+TOY SMILEY	NOUN
+WHITE JAM	NOUN
+なんキニ!	NOUN
+Chu-Z	NOUN
+Doll☆Elements	NOUN
+Rev. from DVL	NOUN
+CLEAR'S	NOUN
+愛の葉Girls	NOUN
+仙台CLEAR'S	NOUN
+ANNA☆S	NOUN
+HOP CLUB	NOUN
+TEMPURA KIDZ	NOUN
+CANDY GO!GO!	NOUN
+Fullfull☆Pocket	NOUN
+CQC's	NOUN
+Luce Twinkle Wink☆	NOUN
+絶対直球女子!プレイボールズ	NOUN
+虹色の飛行少女	NOUN
+Jewel☆Rouge	NOUN
+Jewel☆Neige	NOUN
+Jewel☆Ciel	NOUN
+Task have Fun	NOUN
+CROWN POP	NOUN
+FES☆TIVE	NOUN
+GANG PARADE	NOUN
+THE BANANA MONKEYS	NOUN
+ゆるめるモ!	NOUN
+Ange☆Reve	NOUN
+愛乙女☆DOLL	NOUN
+じぇるの!	NOUN
+WILL-O'	NOUN
+NEO JAPONISM	NOUN
+FRUITS ZIPPER	NOUN
+SPARK SPEAKER	NOUN
+名古屋CLEAR'S	NOUN
+TOKYO IDOL FESTIVAL	NOUN
+METAMO☆RE FACE	NOUN
+Risky Melody	NOUN
+Someday Somewhere	NOUN
+まいど!ファミリー	NOUN
+The Dance for Philosophy	NOUN
+
+# --- idol_members ---
+最上もが	NOUN
+SU-METAL	NOUN
+
+# --- illustrators ---
+Mika Pikazo	NOUN
+
+# --- musicians ---
+B'z	NOUN
+Mr.Children	NOUN
+L'Arc〜en〜Ciel	NOUN
+X JAPAN	NOUN
+LUNA SEA	NOUN
+BUCK-TICK	NOUN
+THE ALFEE	NOUN
+BOØWY	NOUN
+THE BLUE HEARTS	NOUN
+Hi-STANDARD	NOUN
+Dragon Ash	NOUN
+BUMP OF CHICKEN	NOUN
+ONE OK ROCK	NOUN
+ASIAN KUNG-FU GENERATION	NOUN
+KANA-BOON	NOUN
+MY FIRST STORY	NOUN
+King Gnu	NOUN
+Saucy Dog	NOUN
+Creepy Nuts	NOUN
+DIR EN GREY	NOUN
+the GazettE	NOUN
+Alice Nine	NOUN
+MALICE MIZER	NOUN
+Plastic Tree	NOUN
+Janne Da Arc	NOUN
+SIAM SHADE	NOUN
+DREAMS COME TRUE	NOUN
+Every Little Thing	NOUN
+ずっと真夜中でいいのに。	NOUN
+MYTH&ROID	NOUN
+May'n	NOUN
+JAM Project	NOUN
+きただにひろし	NOUN
+ALI PROJECT	NOUN
+SCREEN mode	NOUN
+SawanoHiroyuki[nZk]	NOUN
+DECO*27	NOUN
+カゲロウプロジェクト	NOUN
+cosMo@暴走P	NOUN
+sasakure.UK	NOUN
+KICK THE CAN CREW	NOUN
+BAD HOP	NOUN
+JP THE WAVY	NOUN
+AK-69	NOUN
+SKY-HI	NOUN
+YUC'e	NOUN
+
+# --- voice_actors ---
+おのD	NOUN
+Y.AOI	NOUN
+Run Girls, Run!	NOUN
+Wake Up, Girls!	NOUN
+i☆Ris	NOUN
+超A&G	NOUN
+
+# --- vtuber ---
+イク・エヴァランド	NOUN
+バーチャルのじゃロリ狐娘YouTuberおじさん	NOUN
+
+# --- vtubers ---
+かなで	NOUN
+Mori Calliope	NOUN
+Takanashi Kiara	NOUN
+Ninomae Ina'nis	NOUN
+Gawr Gura	NOUN
+Watson Amelia	NOUN
+Ceres Fauna	NOUN
+Ouro Kronii	NOUN
+Nanashi Mumei	NOUN
+Hakos Baelz	NOUN
+Shiori Novella	NOUN
+Koseki Bijou	NOUN
+Nerissa Ravencroft	NOUN
+Fuwawa Abyssgard	NOUN
+Mococo Abyssgard	NOUN
+Elizabeth Rose Bloodflame	NOUN
+Gigi Murin	NOUN
+Cecilia Immergreen	NOUN
+Raora Panthera	NOUN
+Ayunda Risu	NOUN
+Moona Hoshinova	NOUN
+Airani Iofifteen	NOUN
+Kureiji Ollie	NOUN
+Anya Melfissa	NOUN
+Pavolia Reine	NOUN
+Vestia Zeta	NOUN
+Kaela Kovalskia	NOUN
+Kobo Kanaeru	NOUN
+Elira Pendora	NOUN
+Pomu Rainpuff	NOUN
+Finana Ryugu	NOUN
+Selen Tatsuki	NOUN
+Rosemi Lovelock	NOUN
+Petra Gurin	NOUN
+Enna Alouette	NOUN
+Millie Parfait	NOUN
+Reimu Endou	NOUN
+Nina Kosaka	NOUN
+Luca Kaneshiro	NOUN
+Shu Yamino	NOUN
+Ike Eveland	NOUN
+Mysta Rias	NOUN
+Vox Akuma	NOUN
+Kizuna AI	NOUN
+バーチャルのじゃロリ狐娘YouTuberおじさん	NOUN
+にじEN	NOUN
+Re:AcT	NOUN
+
+# --- youtubers ---
+Fischer's	NOUN
+シルクロード	NOUN
+ヴァンゆん	NOUN
+EIKO!GO!!	NOUN
+GENKI LABO	NOUN
+ふくらP	NOUN
+THE FIRST TAKE	NOUN
+ずっと真夜中でいいのに。	NOUN
+ACAね	NOUN
+Rachel & Jun	NOUN
+はとむぎ	NOUN
+hatomugi ASMR	NOUN

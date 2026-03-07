@@ -833,8 +833,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
     const std::vector<normalize::CharType>& char_types) const {
   std::vector<UnknownCandidate> candidates;
 
-  // Need at least 4 characters for patterns
-  if (start_pos + 3 >= codepoints.size()) {
+  // Need at least 3 characters for ABり pattern (4 for ABAB/AA patterns)
+  if (start_pos + 2 >= codepoints.size()) {
     return candidates;
   }
 
@@ -938,15 +938,32 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
     char32_t last_char = codepoints[start_pos + seq_len - 1];
     if (last_char == U'り') {
       // For 3-char patterns like どさり, ばたり
+      // Skip if first char is a common particle (の, は, が, を, に, で, も, と, へ, か)
+      // to avoid false matches like のやり, はしり, がわり
       if (seq_len == 3) {
-        std::string surface = extractSubstring(codepoints, start_pos, start_pos + 3);
-        if (!surface.empty()) {
-          auto cand = makeCandidate(surface, start_pos, start_pos + 3, core::PartOfSpeech::Adverb, 0.3F, true, CandidateOrigin::Onomatopoeia);
+        char32_t first = codepoints[start_pos];
+        static constexpr char32_t kParticleChars[] = {
+            U'の', U'は', U'が', U'を', U'に', U'で',
+            U'も', U'と', U'へ', U'か', U'や', U'ら'};
+        bool starts_with_particle = false;
+        for (auto pc : kParticleChars) {
+          if (first == pc) {
+            starts_with_particle = true;
+            break;
+          }
+        }
+        if (starts_with_particle) {
+          // Skip - likely particle + verb stem, not onomatopoeia
+        } else {
+          std::string surface = extractSubstring(codepoints, start_pos, start_pos + 3);
+          if (!surface.empty()) {
+            auto cand = makeCandidate(surface, start_pos, start_pos + 3, core::PartOfSpeech::Adverb, 0.7F, true, CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
-          cand.confidence = 0.7F;
-          cand.pattern = "ab_ri_pattern";
+            cand.confidence = 0.7F;
+            cand.pattern = "ab_ri_pattern";
 #endif
-          candidates.push_back(cand);
+            candidates.push_back(cand);
+          }
         }
       }
       // For 4-char patterns like ぐったり, じっくり (small tsu + CV + り)

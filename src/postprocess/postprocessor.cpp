@@ -257,14 +257,56 @@ bool endsWithDigit(const std::string& surface) {
   return isDigitChar(codepoints.back());
 }
 
-// Check if surface looks like a unit (short noun that can follow numbers)
-// Examples: 時間, 分, キロ, メートル, 円, ゴールド, etc.
+// Check if a kanji codepoint is a counter/unit that naturally follows digits
+bool isCounterKanji(char32_t cp) {
+  switch (cp) {
+    case U'円': case U'銭': case U'万': case U'億': case U'兆':
+    case U'分': case U'秒': case U'時': case U'日': case U'月':
+    case U'年': case U'週': case U'期': case U'世':
+    case U'個': case U'本': case U'人': case U'台': case U'枚':
+    case U'杯': case U'回': case U'歳': case U'才': case U'階':
+    case U'号': case U'番': case U'匹': case U'冊': case U'件':
+    case U'丁': case U'通': case U'発': case U'点': case U'票':
+    case U'頭': case U'羽': case U'着': case U'足': case U'軒':
+    case U'組': case U'曲': case U'巻': case U'畳': case U'割':
+    case U'部': case U'面': case U'問': case U'章': case U'棟':
+    case U'戸': case U'席': case U'食': case U'泊': case U'口':
+    case U'束': case U'両': case U'機': case U'基': case U'隻':
+    case U'度': case U'倍': case U'段': case U'級': case U'位':
+    case U'種': case U'色': case U'名': case U'話': case U'連':
+    case U'敗': case U'勝': case U'戦':
+    case U'間': case U'紀':
+      return true;
+    default:
+      return false;
+  }
+}
+
+// Check if surface looks like a unit (noun that can follow numbers)
+// For kanji: must start with a counter kanji (円, 分, 時間, etc.)
+// For katakana: length-based heuristic (キロ, メートル, etc.)
 bool looksLikeUnit(const std::string& surface) {
   if (surface.empty()) return false;
 
-  // Units are typically 1-5 characters (e.g., キロ, メートル, パーセント)
-  size_t len = suzume::normalize::utf8Length(surface);
-  return len >= 1 && len <= 5;
+  auto codepoints = suzume::normalize::toCodepoints(surface);
+  if (codepoints.empty()) return false;
+
+  char32_t first = codepoints[0];
+
+  // Kanji units: first char must be a counter kanji
+  // CJK Unified Ideographs: U+4E00-U+9FFF
+  if (first >= 0x4E00 && first <= 0x9FFF) {
+    return isCounterKanji(first);
+  }
+
+  // Katakana units (キロ, メートル, パーセント, etc.): length heuristic
+  // Katakana: U+30A0-U+30FF
+  if (first >= 0x30A0 && first <= 0x30FF) {
+    size_t len = codepoints.size();
+    return len >= 1 && len <= 5;
+  }
+
+  return false;
 }
 
 // Check if surface ends with a numeric unit that can be followed by more numbers
@@ -368,7 +410,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(
       const auto& next = morphemes[idx + 1];
       // Check for common time/counter suffixes that get split
       if (next.pos == core::PartOfSpeech::Noun &&
-          utf8::equalsAny(next.surface, {"間", "半", "前", "後", "目"})) {
+          utf8::equalsAny(next.surface, {"間", "半", "目"})) {
         core::Morpheme merged = current;
         merged.surface += next.surface;
         merged.lemma = merged.surface;

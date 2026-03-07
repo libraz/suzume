@@ -33,6 +33,8 @@ enum class ConjugationType : uint8_t {
   IAdjective = 13,  // I-adjective (美しい, 高い)
   NaAdjective = 14, // Na-adjective (静かだ)
   Interjection = 15, // 感動詞 (何だ, ああ, おい)
+  ProperFamily = 16, // 固有名詞(姓): 優木, 田中
+  ProperGiven = 17,  // 固有名詞(名): せつ菜, 太郎
 };
 
 /**

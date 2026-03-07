@@ -1,0 +1,35 @@
+# =============================================================================
+# Suzume L2 Dictionary - Suffixes (接尾辞)
+# =============================================================================
+#
+# Format: surface<TAB>pos<TAB>conj_type
+#
+# Contains: SUFFIX entries and suffix-like OTHER entries
+#
+# =============================================================================
+
+# --- Noun-forming suffixes ---
+的	SUFFIX
+化	SUFFIX
+法	SUFFIX
+論	SUFFIX
+家	SUFFIX
+員	SUFFIX
+式	SUFFIX
+感	SUFFIX
+力	SUFFIX
+ら	SUFFIX
+がち	SUFFIX
+ごろ	SUFFIX
+ヶ所	SUFFIX
+ヶ月	SUFFIX
+さん	SUFFIX
+さま	SUFFIX
+度	SUFFIX
+
+# --- Plural suffixes ---
+ども	OTHER
+がた	OTHER
+
+# --- Verb-auxiliary suffixes ---
+がたい	OTHER

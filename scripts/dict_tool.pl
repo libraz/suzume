@@ -51,7 +51,32 @@ binmode(STDERR, ':utf8');
 # Decode command-line arguments as UTF-8
 @ARGV = map { decode('utf-8', $_) } @ARGV;
 
-my $dict_path = 'data/core/dictionary.tsv';
+# POS → dictionary file mapping (split dictionary)
+my %pos_to_file = (
+    ADJECTIVE   => 'data/core/adjectives.tsv',
+    ADVERB      => 'data/core/adverbs.tsv',
+    VERB        => 'data/core/verbs.tsv',
+    NOUN        => 'data/core/nouns.tsv',
+    PROPER_NOUN => 'data/core/nouns.tsv',
+    PRONOUN     => 'data/core/expressions.tsv',
+    INTERJECTION => 'data/core/expressions.tsv',
+    CONJUNCTION => 'data/core/expressions.tsv',
+    PARTICLE    => 'data/core/expressions.tsv',
+    SUFFIX      => 'data/core/suffixes.tsv',
+    PREFIX      => 'data/core/suffixes.tsv',
+    OTHER       => 'data/core/expressions.tsv',
+    PHRASE      => 'data/core/expressions.tsv',
+    AUX         => 'data/core/expressions.tsv',
+);
+my @all_dict_files = (
+    'data/core/adjectives.tsv',
+    'data/core/adverbs.tsv',
+    'data/core/verbs.tsv',
+    'data/core/nouns.tsv',
+    'data/core/expressions.tsv',
+    'data/core/suffixes.tsv',
+);
+my $dict_path = 'data/core/nouns.tsv';  # default fallback
 my $force = 0;
 my $dry_run = 0;
 my $fix = 0;
@@ -271,30 +296,39 @@ sub map_conj_type {
 # Dictionary operations
 # =============================================================================
 
-sub load_dictionary {
-    open my $fh, '<:utf8', $dict_path or die "Cannot open $dict_path: $!\n";
+sub get_dict_file_for_pos {
+    my ($pos) = @_;
+    return $pos_to_file{$pos} // 'data/core/nouns.tsv';
+}
 
+sub load_dictionary {
     my @entries;
     my %by_surface;
 
-    while (my $line = <$fh>) {
-        chomp $line;
-        next if $line =~ /^#/ || $line =~ /^\s*$/;
+    for my $file (@all_dict_files) {
+        next unless -f $file;
+        open my $fh, '<:utf8', $file or die "Cannot open $file: $!\n";
 
-        my @fields = split /\t/, $line;
-        my $entry = {
-            surface   => $fields[0],
-            pos       => $fields[1] // '',
-            conj_type => $fields[2] // '',
-            line_num  => $.,
-            raw       => $line,
-        };
+        while (my $line = <$fh>) {
+            chomp $line;
+            next if $line =~ /^#/ || $line =~ /^\s*$/;
 
-        push @entries, $entry;
-        push @{$by_surface{$fields[0]}}, $entry;
+            my @fields = split /\t/, $line;
+            my $entry = {
+                surface   => $fields[0],
+                pos       => $fields[1] // '',
+                conj_type => $fields[2] // '',
+                line_num  => $.,
+                raw       => $line,
+                file      => $file,
+            };
+
+            push @entries, $entry;
+            push @{$by_surface{$fields[0]}}, $entry;
+        }
+
+        close $fh;
     }
-
-    close $fh;
     return (\@entries, \%by_surface);
 }
 
@@ -524,11 +558,15 @@ sub cmd_add {
     my $entry_line = "$word\t$pos";
     $entry_line .= "\t$conj_type" if $conj_type;
 
+    # Determine target file based on POS
+    my $target_file = get_dict_file_for_pos($pos);
+    $dict_path = $target_file;
+
     # Find insertion point (grouped by POS and conj_type)
     my ($insert_after, $placement) = find_insertion_point($pos, $conj_type);
 
     if ($dry_run) {
-        print "Would add to $dict_path:\n";
+        print "Would add to $target_file:\n";
         print "  $entry_line\n";
         print "  Placement: $placement (line $insert_after)\n" if $insert_after >= 0;
         return 1;
@@ -536,23 +574,23 @@ sub cmd_add {
 
     if ($insert_after < 0) {
         # No section found, append to end
-        open my $fh, '>>:utf8', $dict_path or die "Cannot open $dict_path: $!\n";
+        open my $fh, '>>:utf8', $target_file or die "Cannot open $target_file: $!\n";
         print $fh "\n$entry_line\n";
         close $fh;
-        print "✓ Added: $entry_line (appended to end)\n";
+        print "✓ Added: $entry_line (appended to end of $target_file)\n";
     } else {
         # Insert after the found line
-        insert_line_at($dict_path, $insert_after, $entry_line);
+        insert_line_at($target_file, $insert_after, $entry_line);
         my $placement_msg = {
             same_group    => "grouped with same $pos" . ($conj_type ? "/$conj_type" : ""),
             same_pos      => "added to $pos section",
             section_end   => "added at end of section",
             section_start => "added at start of section",
         }->{$placement} // $placement;
-        print "✓ Added: $entry_line ($placement_msg)\n";
+        print "✓ Added: $entry_line ($placement_msg in $target_file)\n";
     }
 
-    print "  Recompile: ./build/bin/suzume-cli dict compile $dict_path data/core.dic\n";
+    print "  Recompile: ./build/bin/suzume-cli dict compile data/core/*.tsv data/core.dic\n";
 
     return 1;
 }
@@ -677,11 +715,34 @@ sub insert_line_at {
     close $out;
 }
 
+sub find_word_in_files {
+    my ($word) = @_;
+    for my $file (@all_dict_files) {
+        next unless -f $file;
+        open my $fh, '<:utf8', $file or next;
+        while (<$fh>) {
+            if (/^([^\t#]+)\t/ && $1 eq $word) {
+                close $fh;
+                return $file;
+            }
+            if (/^#DISABLED#\s+([^\t]+)\t/ && $1 eq $word) {
+                close $fh;
+                return $file;
+            }
+        }
+        close $fh;
+    }
+    return undef;
+}
+
 sub cmd_remove {
     my ($word) = @_;
     die "Usage: dict_tool.pl remove <word>\n" unless $word;
 
-    open my $fh, '<:utf8', $dict_path or die "Cannot open $dict_path: $!\n";
+    my $target_file = find_word_in_files($word);
+    die "Word not found in dictionary: $word\n" unless $target_file;
+
+    open my $fh, '<:utf8', $target_file or die "Cannot open $target_file: $!\n";
     my @lines = <$fh>;
     close $fh;
 
@@ -691,33 +752,32 @@ sub cmd_remove {
         if ($line =~ /^([^\t#]+)\t/ && $1 eq $word) {
             $found = 1;
             print "Removing: $line";
-            next;  # Skip this line
+            next;
         }
         push @new_lines, $line;
     }
 
-    if (!$found) {
-        die "Word not found in dictionary: $word\n";
-    }
-
     if ($dry_run) {
-        print "\n[dry-run] Would remove '$word' from dictionary\n";
+        print "\n[dry-run] Would remove '$word' from $target_file\n";
         return;
     }
 
-    open my $out, '>:utf8', $dict_path or die "Cannot write $dict_path: $!\n";
+    open my $out, '>:utf8', $target_file or die "Cannot write $target_file: $!\n";
     print $out @new_lines;
     close $out;
 
-    print "\n✓ Removed '$word' from dictionary\n";
-    print "  Recompile: ./build/bin/suzume-cli dict compile $dict_path data/core.dic\n";
+    print "\n✓ Removed '$word' from $target_file\n";
+    print "  Recompile: ./build/bin/suzume-cli dict compile data/core/*.tsv data/core.dic\n";
 }
 
 sub cmd_disable {
     my ($word) = @_;
     die "Usage: dict_tool.pl disable <word>\n" unless $word;
 
-    open my $fh, '<:utf8', $dict_path or die "Cannot open $dict_path: $!\n";
+    my $target_file = find_word_in_files($word);
+    die "Word not found in dictionary: $word\n" unless $target_file;
+
+    open my $fh, '<:utf8', $target_file or die "Cannot open $target_file: $!\n";
     my @lines = <$fh>;
     close $fh;
 
@@ -732,29 +792,28 @@ sub cmd_disable {
         }
     }
 
-    if (!$found) {
-        die "Word not found in dictionary: $word\n";
-    }
-
     if ($dry_run) {
         print "\n[dry-run] Would disable '$word'\n";
         return;
     }
 
-    open my $out, '>:utf8', $dict_path or die "Cannot write $dict_path: $!\n";
+    open my $out, '>:utf8', $target_file or die "Cannot write $target_file: $!\n";
     print $out @lines;
     close $out;
 
-    print "\n✓ Disabled '$word' in dictionary\n";
+    print "\n✓ Disabled '$word' in $target_file\n";
     print "  Use 'enable' to re-activate, or 'remove' to delete permanently\n";
-    print "  Recompile: ./build/bin/suzume-cli dict compile $dict_path data/core.dic\n";
+    print "  Recompile: ./build/bin/suzume-cli dict compile data/core/*.tsv data/core.dic\n";
 }
 
 sub cmd_enable {
     my ($word) = @_;
     die "Usage: dict_tool.pl enable <word>\n" unless $word;
 
-    open my $fh, '<:utf8', $dict_path or die "Cannot open $dict_path: $!\n";
+    my $target_file = find_word_in_files($word);
+    die "Disabled word not found: $word\n" unless $target_file;
+
+    open my $fh, '<:utf8', $target_file or die "Cannot open $target_file: $!\n";
     my @lines = <$fh>;
     close $fh;
 
@@ -778,17 +837,17 @@ sub cmd_enable {
         return;
     }
 
-    open my $out, '>:utf8', $dict_path or die "Cannot write $dict_path: $!\n";
+    open my $out, '>:utf8', $target_file or die "Cannot write $target_file: $!\n";
     print $out @lines;
     close $out;
 
-    print "\n✓ Enabled '$word' in dictionary\n";
-    print "  Recompile: ./build/bin/suzume-cli dict compile $dict_path data/core.dic\n";
+    print "\n✓ Enabled '$word' in $target_file\n";
+    print "  Recompile: ./build/bin/suzume-cli dict compile data/core/*.tsv data/core.dic\n";
 }
 
 sub cmd_validate {
     print "=" x 60, "\n";
-    print "Validating dictionary: $dict_path\n";
+    print "Validating dictionaries: ", join(', ', map { basename($_) } @all_dict_files), "\n";
     print "=" x 60, "\n\n";
 
     my ($entries, $by_surface) = load_dictionary();
@@ -905,7 +964,7 @@ sub cmd_validate {
             remove_lines($dict_path, \@lines_to_remove);
             print "✓ Removed ", scalar(@lines_to_remove), " lines\n";
             print "\nRemember to recompile the dictionary:\n";
-            print "  ./build/bin/suzume-cli dict compile data/core/dictionary.tsv data/core.dic\n";
+            print "  ./build/bin/suzume-cli dict compile data/core/*.tsv data/core.dic\n";
         } else {
             print "\nTo apply fixes, run:\n";
             print "  ./scripts/dict_tool.pl validate --fix\n";

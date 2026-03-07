@@ -1,0 +1,322 @@
+# =============================================================================
+# Suzume User Dictionary - Entertainment (Anime, Manga, Light Novels, Games)
+# =============================================================================
+#
+# Format: surface<TAB>pos
+#
+# =============================================================================
+
+# --- adult_games_comics ---
+秘密の関係	NOUN
+BAD END	NOUN
+TYPE-MOON	NOUN
+SAGA PLANETS	NOUN
+Lump of Sugar	NOUN
+ASa Project	NOUN
+CLOCK UP	NOUN
+BLACK CYNIC	NOUN
+Atelier Kaguya	NOUN
+Liar-soft	NOUN
+Innocent Grey	NOUN
+Purple software	NOUN
+Visual Art's	NOUN
+COMIC LO	NOUN
+COMIC X-EROS	NOUN
+COMIC UNREAL	NOUN
+COMIC HOT MILK	NOUN
+Ci-en	NOUN
+欲求不満	NOUN
+
+# --- adult_media ---
+元AV女優	NOUN
+バスガイド	NOUN
+E-BODY	NOUN
+V&R	NOUN
+同人AV.com	NOUN
+T-POWERS	NOUN
+ALL PRO	NOUN
+Mine's	NOUN
+AV OPEN	NOUN
+FANZA AWARD	NOUN
+Blu-ray	NOUN
+
+# --- anime ---
+SPY×FAMILY	NOUN
+葬送のフリーレン	NOUN
+薬屋のひとりごと	NOUN
+ぼっち・ざ・ろっく!	NOUN
+機動戦士ガンダム水星の魔女	NOUN
+明日ちゃんのセーラー服	NOUN
+Re:ゼロから始める異世界生活	NOUN
+この素晴らしい世界に祝福を!	NOUN
+盾の勇者の成り上がり	NOUN
+ダンジョンに出会いを求めるのは間違っているだろうか	NOUN
+本好きの下剋上	NOUN
+魔法科高校の劣等生	NOUN
+とある魔術の禁書目録	NOUN
+とある科学の超電磁砲	NOUN
+陰の実力者になりたくて!	NOUN
+回復術士のやり直し	NOUN
+ありふれた職業で世界最強	NOUN
+八男って、それはないでしょう!	NOUN
+デスマーチからはじまる異世界狂想曲	NOUN
+月が導く異世界道中	NOUN
+現実主義勇者の王国再建記	NOUN
+失格紋の最強賢者	NOUN
+聖女の魔力は万能です	NOUN
+転生王女と天才令嬢の魔法革命	NOUN
+最強陰陽師の異世界転生記	NOUN
+勇者パーティーを追放されたビーストテイマー	NOUN
+最弱テイマーはゴミ拾いの旅を始めました。	NOUN
+痛いのは嫌なので防御力に極振りしたいと思います。	NOUN
+異世界はスマートフォンとともに。	NOUN
+蜘蛛ですが、なにか?	NOUN
+Lv2からチートだった元勇者候補のまったり異世界ライフ	NOUN
+ONE PIECE	NOUN
+黒子のバスケ	NOUN
+Dr.STONE	NOUN
+ジョジョの奇妙な冒険	NOUN
+HUNTER×HUNTER	NOUN
+SLAM DUNK	NOUN
+るろうに剣心	NOUN
+こちら葛飾区亀有公園前派出所	NOUN
+DEATH NOTE	NOUN
+ToLOVEる	NOUN
+進撃の巨人	NOUN
+FAIRY TAIL	NOUN
+ダイヤのA	NOUN
+金田一少年の事件簿	NOUN
+ユーリ!!! on ICE	NOUN
+ご注文はうさぎですか?	NOUN
+あずまんが大王	NOUN
+NEW GAME!	NOUN
+やはり俺の青春ラブコメはまちがっている。	NOUN
+Angel Beats!	NOUN
+涼宮ハルヒの憂鬱	NOUN
+響け!ユーフォニアム	NOUN
+中二病でも恋がしたい!	NOUN
+無彩限のファントム・ワールド	NOUN
+ラブライブ!サンシャイン!!	NOUN
+ラブライブ!虹ヶ咲学園スクールアイドル同好会	NOUN
+ラブライブ!スーパースター!!	NOUN
+BanG Dream!	NOUN
+SHOW BY ROCK!!	NOUN
+Fate/stay night	NOUN
+Fate/Zero	NOUN
+Fate/Grand Order	NOUN
+Fate/Apocrypha	NOUN
+魔法使いの夜	NOUN
+逆襲のシャア	NOUN
+機動戦士ガンダムSEED DESTINY	NOUN
+コードギアス反逆のルルーシュ	NOUN
+トップをねらえ!	NOUN
+SSSS.GRIDMAN	NOUN
+SSSS.DYNAZENON	NOUN
+君の名は。	NOUN
+GHOST IN THE SHELL	NOUN
+THE FIRST SLAM DUNK	NOUN
+PSYCHO-PASS	NOUN
+Cowboy Bebop	NOUN
+STEINS;GATE	NOUN
+Ergo Proxy	NOUN
+DARKER THAN BLACK	NOUN
+翠星のガルガンティア	NOUN
+アルドノア・ゼロ	NOUN
+Vivy -Fluorite Eye's Song-	NOUN
+DEVILMAN crybaby	NOUN
+結城友奈は勇者である	NOUN
+がっこうぐらし!	NOUN
+それいけ!アンパンマン	NOUN
+ふたりはプリキュア	NOUN
+トロピカル~ジュ!プリキュア	NOUN
+ひろがるスカイ!プリキュア	NOUN
+CCさくら	NOUN
+リボンの騎士	NOUN
+マジンガーZ	NOUN
+アルプスの少女ハイジ	NOUN
+TIGER & BUNNY	NOUN
+D.Gray-man	NOUN
+古見さんはコミュ症です。	NOUN
+潔癖男子!青山くん	NOUN
+坂本ですが?	NOUN
+未確認で進行形	NOUN
+映像研には手を出すな!	NOUN
+ハクメイとミコチ	NOUN
+ラーメン大好き小泉さん	NOUN
+働く細胞	NOUN
+はたらく細胞BLACK	NOUN
+Dr.スランプ アラレちゃん	NOUN
+色づく世界の明日から	NOUN
+TARI TARI	NOUN
+宇宙よりも遠い場所	NOUN
+NEW GAME!!	NOUN
+城下町のダンデライオン	NOUN
+Do It Yourself!!	NOUN
+サイドM	NOUN
+IS〈インフィニット・ストラトス〉	NOUN
+まよチキ!	NOUN
+ロウきゅーぶ!	NOUN
+輪るピングドラム	NOUN
+咲-Saki-	NOUN
+DOG DAYS	NOUN
+WWW.WORKING!!	NOUN
+ドキドキ!プリキュア	NOUN
+Go!プリンセスプリキュア	NOUN
+魔法つかいプリキュア!	NOUN
+HUGっと!プリキュア	NOUN
+遊戯王5D's	NOUN
+クイーンズブレイド	NOUN
+
+# --- game_titles ---
+NieR:Automata	NOUN
+NieR Replicant	NOUN
+Genshin Impact	NOUN
+Fate/Grand Order	NOUN
+Fate/stay night	NOUN
+Fate/Zero	NOUN
+Fate/EXTRA	NOUN
+バイオハザードRE:4	NOUN
+RE:2	NOUN
+RE:4	NOUN
+ELDEN RING	NOUN
+Cyberpunk 2077	NOUN
+Diablo IV	NOUN
+Ghost of Tsushima	NOUN
+Marvel's Spider-Man	NOUN
+Assassin's Creed	NOUN
+Death Stranding	NOUN
+Apex Legends	NOUN
+Among Us	NOUN
+Stardew Valley	NOUN
+Hollow Knight	NOUN
+SOUND VOLTEX	NOUN
+beatmania IIDX	NOUN
+勝利の女神:NIKKE	NOUN
+Wuthering Waves	NOUN
+STEINS;GATE	NOUN
+CHAOS;HEAD	NOUN
+ROBOTICS;NOTES	NOUN
+WHITE ALBUM	NOUN
+ホワイトアルバム	NOUN
+MELTY BLOOD	NOUN
+R-TYPE	NOUN
+メルルのアトリエ	NOUN
+ソフィーのアトリエ	NOUN
+ライザのアトリエ	NOUN
+機動戦士ガンダムEXTREME VS	NOUN
+メトロイドドレッド	NOUN
+THE IDOLM@STER	NOUN
+SILENT HILL	NOUN
+初音ミク Project DIVA	NOUN
+Project DIVA	NOUN
+戦場のヴァルキュリア	NOUN
+ACE COMBAT	NOUN
+
+# --- light_novels ---
+とある魔術の禁書目録	NOUN
+とある科学の超電磁砲	NOUN
+魔法科高校の劣等生	NOUN
+はたらく魔王さま!	NOUN
+安達としまむら	NOUN
+ブギーポップは笑わない	NOUN
+涼宮ハルヒの憂鬱	NOUN
+この素晴らしい世界に祝福を!	NOUN
+Re:ゼロから始める異世界生活	NOUN
+Re:ゼロ	NOUN
+戦闘員、派遣します!	NOUN
+IS〈インフィニット・ストラトス〉	NOUN
+Re:ステージ!	NOUN
+変態王子と笑わない猫。	NOUN
+ようこそ実力至上主義の教室へ	NOUN
+ハイスクールD×D	NOUN
+通常攻撃が全体攻撃で二回攻撃のお母さんは好きですか?	NOUN
+陰の実力者になりたくて!	NOUN
+異世界はスマートフォンとともに。	NOUN
+やはり俺の青春ラブコメはまちがっている。	NOUN
+ダンジョンに出会いを求めるのは間違っているだろうか	NOUN
+りゅうおうのおしごと!	NOUN
+ロウきゅーぶ!	NOUN
+蜘蛛ですが、なにか?	NOUN
+私、能力は平均値でって言ったよね!	NOUN
+老後に備えて異世界で8万枚の金貨を貯めます	NOUN
+ポーション頼みで生き延びます!	NOUN
+小説家になろう	NOUN
+盾の勇者の成り上がり	NOUN
+ありふれた職業で世界最強	NOUN
+八男って、それはないでしょう!	NOUN
+異世界迷宮でハーレムを	NOUN
+デスマーチからはじまる異世界狂想曲	NOUN
+本好きの下剋上	NOUN
+痛いのは嫌なので防御力に極振りしたいと思います。	NOUN
+異世界魔王と召喚少女の奴隷魔術	NOUN
+月が導く異世界道中	NOUN
+現実主義勇者の王国再建記	NOUN
+回復術士のやり直し	NOUN
+失格紋の最強賢者	NOUN
+転生貴族の異世界冒険録	NOUN
+聖女の魔力は万能です	NOUN
+望まぬ不死の冒険者	NOUN
+転生王女と天才令嬢の魔法革命	NOUN
+最強陰陽師の異世界転生記	NOUN
+異世界でチート能力を手にした俺は、現実世界をも無双する	NOUN
+異世界帰りの勇者が現代最強!	NOUN
+勇者パーティーを追放されたビーストテイマー	NOUN
+最弱テイマーはゴミ拾いの旅を始めました。	NOUN
+異世界迷宮の最深部を目指そう	NOUN
+Lv2からチートだった元勇者候補のまったり異世界ライフ	NOUN
+葬送のフリーレン	NOUN
+薬屋のひとりごと	NOUN
+SPY×FAMILY	NOUN
+このライトノベルがすごい!	NOUN
+Fate/Zero	NOUN
+
+# --- manga ---
+SPY×FAMILY	NOUN
+2.5次元の誘惑	NOUN
+姫様"拷問"の時間です	NOUN
+SAKAMOTO DAYS	NOUN
+会長はメイド様!	NOUN
+ハチミツとクローバー	NOUN
+オオカミ少女と黒王子	NOUN
+好きっていいなよ。	NOUN
+イタズラなKiss	NOUN
+BANANA FISH	NOUN
+Paradise Kiss	NOUN
+PとJK	NOUN
+午前0時、キスしに来てよ	NOUN
+宝石の国	NOUN
+来世は他人がいい	NOUN
+SLAM DUNK	NOUN
+3月のライオン	NOUN
+GIANT KILLING	NOUN
+BE BLUES!	NOUN
+Master キートン	NOUN
+マスターキートン	NOUN
+BILLY BAT	NOUN
+ブラックジャック	NOUN
+LIAR GAME	NOUN
+BUNGO-ブンゴ-	NOUN
+ろくでなしBLUES	NOUN
+クローズ×WORST	NOUN
+今日から俺は!!	NOUN
+抱かれたい男1位に脅されています。	NOUN
+30歳まで童貞だと魔法使いになれるらしい	NOUN
+あずまんが大王	NOUN
+よつばと!	NOUN
+干物妹!うまるちゃん	NOUN
+たくのみ。	NOUN
+スキップとローファー	NOUN
+古見さんはコミュ症です。	NOUN
+無限の住人	NOUN
+シドニアの騎士	NOUN
+今際の国のアリス	NOUN
+Re:ゼロ	NOUN
+蜘蛛ですが、なにか?	NOUN
+デスマーチからはじまる異世界狂想曲	NOUN
+ありふれた職業で世界最強	NOUN
+聖女の魔力は万能です	NOUN
+悪役令嬢なのでラスボスを飼ってみました	NOUN
+薬屋のひとりごと	NOUN
+本好きの下剋上	NOUN
+陰の実力者になりたくて!	NOUN
+グランドジャンプ	NOUN

@@ -1,0 +1,228 @@
+# =============================================================================
+# Suzume L2 Dictionary - Verbs (動詞)
+# =============================================================================
+#
+# Format: surface<TAB>pos<TAB>conj_type
+#
+# Most verbs are handled by dynamic analysis.
+# Only entries here for:
+# - Disambiguation (godan-sa vs adjective stem)
+# - Irregular conjugation (honorific, する, etc.)
+# - Compound verbs with 促音 (break without dict)
+# - Hiragana verbs (over-split without dict)
+#
+# =============================================================================
+
+# --- Irregular/Honorific verbs ---
+する	VERB	SURU
+来る	VERB	KURU
+ある	VERB	GODAN_RA
+くださる	VERB	GODAN_RA
+いらっしゃる	VERB	GODAN_RA
+なさる	VERB	GODAN_RA
+おっしゃる	VERB	GODAN_RA
+ござる	VERB	GODAN_RA
+
+# --- Godan-SA verbs (disambiguation: verb renyokei vs adjective stem) ---
+# e.g., 話しそう (verb) vs 難しそう (adj) - both have kanji + し + そう structure
+話す	VERB	GODAN_SA
+出す	VERB	GODAN_SA
+消す	VERB	GODAN_SA
+返す	VERB	GODAN_SA
+探す	VERB	GODAN_SA
+渡す	VERB	GODAN_SA
+外す	VERB	GODAN_SA
+試す	VERB	GODAN_SA
+直す	VERB	GODAN_SA
+落とす	VERB	GODAN_SA
+残す	VERB	GODAN_SA
+増す	VERB	GODAN_SA
+貸す	VERB	GODAN_SA
+指す	VERB	GODAN_SA
+足す	VERB	GODAN_SA
+隠す	VERB	GODAN_SA
+壊す	VERB	GODAN_SA
+刺す	VERB	GODAN_SA
+差す	VERB	GODAN_SA
+挿す	VERB	GODAN_SA
+越す	VERB	GODAN_SA
+通す	VERB	GODAN_SA
+示す	VERB	GODAN_SA
+倒す	VERB	GODAN_SA
+起こす	VERB	GODAN_SA
+愛す	VERB	GODAN_SA
+見出す	VERB	GODAN_SA
+戻す	VERB	GODAN_SA
+
+# --- Compound verbs with 促音 (break without dict) ---
+引っ張る	VERB	GODAN_RA
+引っかかる	VERB	GODAN_RA
+乗っかる	VERB	GODAN_RA
+引っ越す	VERB	GODAN_SA
+恐れ入る	VERB	GODAN_RA
+飛び降りる	VERB	ICHIDAN
+抱きしめる	VERB	ICHIDAN
+出しゃばる	VERB	GODAN_RA
+たどり着く	VERB	GODAN_KA
+やり直す	VERB	GODAN_SA
+取り上げる	VERB	ICHIDAN
+
+# --- Hiragana verbs (over-split without dict) ---
+いたす	VERB	GODAN_SA
+なくす	VERB	GODAN_SA
+のろける	VERB	ICHIDAN
+とりあげる	VERB	ICHIDAN
+あきらめる	VERB	ICHIDAN
+しれる	VERB	ICHIDAN
+すぎる	VERB	ICHIDAN
+つける	VERB	ICHIDAN
+きる	VERB	GODAN_RA
+もがく	VERB	GODAN_KA
+おく	VERB	GODAN_KA
+いく	VERB	GODAN_KA
+いただく	VERB	GODAN_KA
+こむ	VERB	GODAN_MA
+たたずむ	VERB	GODAN_MA
+いただける	VERB	ICHIDAN
+たべる	VERB	ICHIDAN
+しめる	VERB	ICHIDAN
+にげる	VERB	ICHIDAN
+ねる	VERB	ICHIDAN
+でる	VERB	ICHIDAN
+いる	VERB	ICHIDAN
+よる	VERB	GODAN_RA
+あがる	VERB	GODAN_RA
+かかる	VERB	GODAN_RA
+こもり	VERB	GODAN_RA
+あなどる	VERB	GODAN_RA
+かかわる	VERB	GODAN_RA
+うかがう	VERB	GODAN_WA
+もらう	VERB	GODAN_WA
+やる	VERB	GODAN_WA
+つく	VERB	GODAN_KA
+つかむ	VERB	GODAN_MA
+
+# --- Mixed script verbs ---
+サボる	VERB	GODAN_RA
+バレる	VERB	ICHIDAN
+
+# --- Special verbs ---
+# いう needed for Xという patterns
+いう	VERB	GODAN_WA
+# 願い - irregular stem
+願い	VERB	GODAN_WA
+
+# --- Disambiguation verbs ---
+# 付ける - split as 付+ける without dict
+付ける	VERB	ICHIDAN
+上げる	VERB	ICHIDAN
+下げる	VERB	ICHIDAN
+掛ける	VERB	ICHIDAN
+抜ける	VERB	ICHIDAN
+駆ける	VERB	ICHIDAN
+出かける	VERB	ICHIDAN
+見つかる	VERB	GODAN_RA
+見つける	VERB	ICHIDAN
+出来る	VERB	ICHIDAN
+用いる	VERB	ICHIDAN
+帯びる	VERB	ICHIDAN
+茹でる	VERB	ICHIDAN
+撫でる	VERB	ICHIDAN
+諦める	VERB	ICHIDAN
+
+# --- Common Godan-RA verbs (needed for passive/potential conjugation expansion) ---
+なる	VERB	GODAN_RA
+走る	VERB	GODAN_RA
+知る	VERB	GODAN_RA
+切る	VERB	GODAN_RA
+取る	VERB	GODAN_RA
+乗る	VERB	GODAN_RA
+入る	VERB	GODAN_RA
+作る	VERB	GODAN_RA
+売る	VERB	GODAN_RA
+帰る	VERB	GODAN_RA
+送る	VERB	GODAN_RA
+怒る	VERB	GODAN_RA
+困る	VERB	GODAN_RA
+座る	VERB	GODAN_RA
+始まる	VERB	GODAN_RA
+巡る	VERB	GODAN_RA
+頑張る	VERB	GODAN_RA
+分かる	VERB	GODAN_RA
+怒鳴る	VERB	GODAN_RA
+狩る	VERB	GODAN_RA
+終わる	VERB	GODAN_RA
+相次ぐ	VERB	GODAN_GA
+
+# --- Common Godan-WA verbs ---
+言う	VERB	GODAN_WA
+買う	VERB	GODAN_WA
+飼う	VERB	GODAN_WA
+行う	VERB	GODAN_WA
+思う	VERB	GODAN_WA
+使う	VERB	GODAN_WA
+会う	VERB	GODAN_WA
+合う	VERB	GODAN_WA
+違う	VERB	GODAN_WA
+払う	VERB	GODAN_WA
+笑う	VERB	GODAN_WA
+歌う	VERB	GODAN_WA
+追う	VERB	GODAN_WA
+誘う	VERB	GODAN_WA
+救う	VERB	GODAN_WA
+吸う	VERB	GODAN_WA
+問う	VERB	GODAN_WA
+洗う	VERB	GODAN_WA
+交う	VERB	GODAN_WA
+間違う	VERB	GODAN_WA
+逢う	VERB	GODAN_WA
+
+# --- Common Godan-KA verbs ---
+行く	VERB	GODAN_KA
+書く	VERB	GODAN_KA
+聞く	VERB	GODAN_KA
+
+# --- Common Godan-MA verbs ---
+読む	VERB	GODAN_MA
+飲む	VERB	GODAN_MA
+
+# --- Common Godan-TA verbs ---
+待つ	VERB	GODAN_TA
+立つ	VERB	GODAN_TA
+勝つ	VERB	GODAN_TA
+打つ	VERB	GODAN_TA
+育つ	VERB	GODAN_TA
+経つ	VERB	GODAN_TA
+建つ	VERB	GODAN_TA
+目立つ	VERB	GODAN_TA
+持つ	VERB	GODAN_TA
+
+# --- Common Godan-BA verbs ---
+学ぶ	VERB	GODAN_BA
+遊ぶ	VERB	GODAN_BA
+呼ぶ	VERB	GODAN_BA
+飛ぶ	VERB	GODAN_BA
+
+# --- Common Ichidan verbs ---
+起きる	VERB	ICHIDAN
+落ちる	VERB	ICHIDAN
+降りる	VERB	ICHIDAN
+感じる	VERB	ICHIDAN
+
+# --- Wagahai verbs (W-003, W-005) ---
+掴む	VERB	GODAN_MA
+ぶら下げる	VERB	ICHIDAN
+ぶら下げ	VERB	ICHIDAN
+這入る	VERB	GODAN_RA
+這入	VERB	GODAN_RA
+這入っ	VERB	GODAN_RA
+
+まちがう	VERB	GODAN_WA
+
+はじまる	VERB	GODAN_RA
+
+はたらく	VERB	GODAN_KA
+
+ひろがる	VERB	GODAN_RA
+
+ROMる	VERB	GODAN_RA

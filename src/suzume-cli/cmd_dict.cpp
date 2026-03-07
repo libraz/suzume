@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <regex>
@@ -440,42 +441,53 @@ int cmdDictLookup(const std::vector<std::string>& args, bool /* verbose */) {
   }
 
   // Search L2 (TSV dictionary)
-  std::cout << "\n=== L2 (data/core/dictionary.tsv) ===\n";
+  std::cout << "\n=== L2 (data/core/*.tsv) ===\n";
 
-  // Find the L2 dictionary path
-  std::string tsv_path;
+  // Find L2 dictionary directory
+  std::string tsv_dir;
   const char* data_dir = std::getenv("SUZUME_DATA_DIR");
   if (data_dir != nullptr) {
-    tsv_path = std::string(data_dir) + "/dictionary.tsv";
+    tsv_dir = std::string(data_dir);
   } else {
-    tsv_path = "data/core/dictionary.tsv";
+    tsv_dir = "data/core";
   }
 
   TsvParser parser;
-  auto result = parser.parseFile(tsv_path);
   size_t l2_count = 0;
+  bool tsv_found = false;
 
-  if (result.hasValue()) {
-    for (const auto& entry : result.value()) {
-      if (entry.surface == word) {
-        std::cout << entry.surface << "\t" << core::posToString(entry.pos);
-        if (entry.conj_type != dictionary::ConjugationType::None) {
-          std::cout << "\t(" << conjTypeToString(entry.conj_type) << ")";
+  namespace fs = std::filesystem;
+  if (fs::exists(tsv_dir) && fs::is_directory(tsv_dir)) {
+    for (const auto& entry : fs::directory_iterator(tsv_dir)) {
+      if (entry.path().extension() == ".tsv") {
+        auto result = parser.parseFile(entry.path().string());
+        if (!result.hasValue()) {
+          continue;
         }
-        std::cout << "\n";
-        // Show conjugation stems for verbs/adjectives
-        if (entry.conj_type != dictionary::ConjugationType::None) {
-          printConjugationStems(entry.surface, entry.conj_type);
+        tsv_found = true;
+        for (const auto& e : result.value()) {
+          if (e.surface == word) {
+            std::cout << e.surface << "\t" << core::posToString(e.pos);
+            if (e.conj_type != dictionary::ConjugationType::None) {
+              std::cout << "\t(" << conjTypeToString(e.conj_type) << ")";
+            }
+            std::cout << " [" << entry.path().filename().string() << "]\n";
+            if (e.conj_type != dictionary::ConjugationType::None) {
+              printConjugationStems(e.surface, e.conj_type);
+            }
+            ++l2_count;
+            found = true;
+          }
         }
-        ++l2_count;
-        found = true;
       }
     }
-  } else {
-    printWarning("L2 dictionary not found at: " + tsv_path);
   }
 
-  if (l2_count == 0 && result.hasValue()) {
+  if (!tsv_found) {
+    printWarning("No TSV files found in: " + tsv_dir);
+  }
+
+  if (l2_count == 0 && tsv_found) {
     std::cout << "(not found)\n";
   } else if (l2_count > 0) {
     std::cout << "(" << l2_count << " entries)\n";

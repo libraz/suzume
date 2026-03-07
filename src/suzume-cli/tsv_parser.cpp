@@ -170,8 +170,8 @@ core::Expected<core::PartOfSpeech, core::Error> TsvParser::parsePos(
   if (str == "NOUN") {
     return core::PartOfSpeech::Noun;
   }
-  if (str == "PROPN") {
-    return core::PartOfSpeech::Noun;  // Map PROPN to Noun for now
+  if (str == "PROPN" || str == "PROPER_NOUN") {
+    return core::PartOfSpeech::Noun;  // Proper nouns use Noun POS; FAMILY/GIVEN in conj_type
   }
   if (str == "VERB") {
     return core::PartOfSpeech::Verb;
@@ -272,6 +272,12 @@ TsvParser::parseConjType(std::string_view str, size_t line) {
   }
   if (str == "NA_ADJ") {
     return dictionary::ConjugationType::NaAdjective;
+  }
+  if (str == "FAMILY") {
+    return dictionary::ConjugationType::ProperFamily;
+  }
+  if (str == "GIVEN") {
+    return dictionary::ConjugationType::ProperGiven;
   }
 
   return core::makeUnexpected(

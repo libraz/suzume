@@ -1,0 +1,164 @@
+# =============================================================================
+# Suzume L2 Dictionary - Adjectives (形容詞)
+# =============================================================================
+#
+# Format: surface<TAB>pos<TAB>conj_type
+#
+# I-adjectives (I_ADJ): conjugate with い ending
+# NA-adjectives (NA_ADJ): conjugate with な/だ
+#
+# =============================================================================
+
+# --- I-adjectives: General ---
+# しんどい - colloquial adjective
+しんどい	ADJECTIVE	I_ADJ
+上手い	ADJECTIVE	I_ADJ
+美味しい	ADJECTIVE	I_ADJ
+気持ちいい	ADJECTIVE	I_ADJ
+晴れ晴れしい	ADJECTIVE	I_ADJ
+
+# --- I-adjectives: 〜しい pattern ---
+# Required to distinguish from verb renyokei + そう patterns
+# e.g., 難しそう (adj) vs 話しそう (verb) - both have kanji + し + そう structure
+難しい	ADJECTIVE	I_ADJ
+楽しい	ADJECTIVE	I_ADJ
+美しい	ADJECTIVE	I_ADJ
+悲しい	ADJECTIVE	I_ADJ
+嬉しい	ADJECTIVE	I_ADJ
+悔しい	ADJECTIVE	I_ADJ
+親しい	ADJECTIVE	I_ADJ
+怪しい	ADJECTIVE	I_ADJ
+珍しい	ADJECTIVE	I_ADJ
+涼しい	ADJECTIVE	I_ADJ
+正しい	ADJECTIVE	I_ADJ
+新しい	ADJECTIVE	I_ADJ
+激しい	ADJECTIVE	I_ADJ
+厳しい	ADJECTIVE	I_ADJ
+寂しい	ADJECTIVE	I_ADJ
+優しい	ADJECTIVE	I_ADJ
+苦しい	ADJECTIVE	I_ADJ
+恥ずかしい	ADJECTIVE	I_ADJ
+忙しい	ADJECTIVE	I_ADJ
+欲しい	ADJECTIVE	I_ADJ
+恋しい	ADJECTIVE	I_ADJ
+著しい	ADJECTIVE	I_ADJ
+懐かしい	ADJECTIVE	I_ADJ
+騒がしい	ADJECTIVE	I_ADJ
+喧しい	ADJECTIVE	I_ADJ
+
+# --- I-adjectives: Compound ---
+胡散臭い	ADJECTIVE	I_ADJ
+
+# --- I-adjectives: Irregular よい/いい ---
+# よい/いい has irregular conjugation (よ- stem, not よい- stem)
+# いい is colloquial form of よい
+やわらかい	ADJECTIVE	I_ADJ
+かわいい	ADJECTIVE	I_ADJ
+だらしない	ADJECTIVE	I_ADJ
+いたたまれない	ADJECTIVE	I_ADJ
+おびただしい	ADJECTIVE	I_ADJ
+はなはだしい	ADJECTIVE	I_ADJ
+男らしい	ADJECTIVE	I_ADJ
+あぶない	ADJECTIVE	I_ADJ
+めでたい	ADJECTIVE	I_ADJ
+ありがたい	ADJECTIVE	I_ADJ
+おもしろい	ADJECTIVE	I_ADJ
+あたたかい	ADJECTIVE	I_ADJ
+おかしい	ADJECTIVE	I_ADJ
+ものたりない	ADJECTIVE	I_ADJ
+うやうやしい	ADJECTIVE	I_ADJ
+こころもとない	ADJECTIVE	I_ADJ
+
+# --- NA-adjectives ---
+ていねい	ADJECTIVE	NA_ADJ
+しんちょう	ADJECTIVE	NA_ADJ
+静か	ADJECTIVE	NA_ADJ
+好き	ADJECTIVE	NA_ADJ
+新た	ADJECTIVE	NA_ADJ
+シンプル	ADJECTIVE	NA_ADJ
+ハード	ADJECTIVE	NA_ADJ
+大好き	ADJECTIVE	NA_ADJ
+丁寧	ADJECTIVE	NA_ADJ
+慎重	ADJECTIVE	NA_ADJ
+上手	ADJECTIVE	NA_ADJ
+綺麗	ADJECTIVE	NA_ADJ
+簡単	ADJECTIVE	NA_ADJ
+特別	ADJECTIVE	NA_ADJ
+自然	ADJECTIVE	NA_ADJ
+非常	ADJECTIVE	NA_ADJ
+微妙	ADJECTIVE	NA_ADJ
+頻繁	ADJECTIVE	NA_ADJ
+確実	ADJECTIVE	NA_ADJ
+無理	ADJECTIVE	NA_ADJ
+必要	ADJECTIVE	NA_ADJ
+有名	ADJECTIVE	NA_ADJ
+複雑	ADJECTIVE	NA_ADJ
+重要	ADJECTIVE	NA_ADJ
+流石	ADJECTIVE	NA_ADJ
+しずか	ADJECTIVE	NA_ADJ
+
+# --- I-adjectives: Common ---
+よい	ADJECTIVE	I_ADJ
+いい	ADJECTIVE	I_ADJ
+高い	ADJECTIVE	I_ADJ
+安い	ADJECTIVE	I_ADJ
+長い	ADJECTIVE	I_ADJ
+短い	ADJECTIVE	I_ADJ
+寒い	ADJECTIVE	I_ADJ
+暑い	ADJECTIVE	I_ADJ
+熱い	ADJECTIVE	I_ADJ
+多い	ADJECTIVE	I_ADJ
+少ない	ADJECTIVE	I_ADJ
+広い	ADJECTIVE	I_ADJ
+狭い	ADJECTIVE	I_ADJ
+深い	ADJECTIVE	I_ADJ
+浅い	ADJECTIVE	I_ADJ
+早い	ADJECTIVE	I_ADJ
+遅い	ADJECTIVE	I_ADJ
+強い	ADJECTIVE	I_ADJ
+弱い	ADJECTIVE	I_ADJ
+硬い	ADJECTIVE	I_ADJ
+柔らかい	ADJECTIVE	I_ADJ
+つまらない	ADJECTIVE	I_ADJ
+くだらない	ADJECTIVE	I_ADJ
+たまらない	ADJECTIVE	I_ADJ
+おとなしい	ADJECTIVE	I_ADJ
+かたじけない	ADJECTIVE	I_ADJ
+善い	ADJECTIVE	I_ADJ
+好い	ADJECTIVE	I_ADJ
+
+# --- NA-adjectives: Additional ---
+無限	ADJECTIVE	NA_ADJ
+無鉄砲	ADJECTIVE	NA_ADJ
+不可能	ADJECTIVE	NA_ADJ
+まじ	ADJECTIVE	NA_ADJ
+元気	ADJECTIVE	NA_ADJ
+大嫌い	ADJECTIVE	NA_ADJ
+嫌	ADJECTIVE	NA_ADJ
+きれい	ADJECTIVE	NA_ADJ
+大丈夫	ADJECTIVE	NA_ADJ
+ありきたり	ADJECTIVE	NA_ADJ
+めちゃくちゃ	ADJECTIVE	NA_ADJ
+むちゃくちゃ	ADJECTIVE	NA_ADJ
+幸い	ADJECTIVE	NA_ADJ
+
+# --- I-adjectives: Colloquial ---
+やばい	ADJECTIVE	I_ADJ
+すごい	ADJECTIVE	I_ADJ
+可愛い	ADJECTIVE	I_ADJ
+ものすごい	ADJECTIVE	I_ADJ
+うまい	ADJECTIVE	I_ADJ
+おっかない	ADJECTIVE	I_ADJ
+つめたい	ADJECTIVE	I_ADJ
+
+# --- I-adjectives: Wagahai (W-002) ---
+ひもじい	ADJECTIVE	I_ADJ
+騒々しい	ADJECTIVE	I_ADJ
+
+# --- I-adjectives: Additional ---
+大きい	ADJECTIVE	I_ADJ
+小さい	ADJECTIVE	I_ADJ
+
+素晴らしい	ADJECTIVE	I_ADJ
+
+胸糞悪い	ADJECTIVE	I_ADJ

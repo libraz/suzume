@@ -194,6 +194,10 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
 
     if (tsv_entry.conj_type == dictionary::ConjugationType::Interjection) {
       base_entry.extended_pos = core::ExtendedPOS::Interjection;
+    } else if (tsv_entry.conj_type == dictionary::ConjugationType::ProperFamily) {
+      base_entry.extended_pos = core::ExtendedPOS::NounProperFamily;
+    } else if (tsv_entry.conj_type == dictionary::ConjugationType::ProperGiven) {
+      base_entry.extended_pos = core::ExtendedPOS::NounProperGiven;
     } else {
       base_entry.extended_pos = core::ExtendedPOS::Unknown;
     }

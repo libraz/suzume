@@ -135,6 +135,8 @@ enum class ExtendedPOS : uint8_t {
   NounFormal,       // 形式名詞: こと、もの、ところ、わけ
   NounVerbal,       // 動詞連用形転成名詞: 読み、書き (nominalized verb)
   NounProper,       // 固有名詞: proper nouns
+  NounProperFamily, // 固有名詞(姓): family names (優木, 田中)
+  NounProperGiven,  // 固有名詞(名): given names (せつ菜, 太郎)
   NounNumber,       // 数詞: numbers
 
   // =========================================================================

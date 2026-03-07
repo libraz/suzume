@@ -15,6 +15,8 @@ namespace {
 // Flag bits
 constexpr uint8_t kFlagFormalNoun = 0x01;
 constexpr uint8_t kFlagInterjection = 0x08;
+constexpr uint8_t kFlagProperFamily = 0x10;
+constexpr uint8_t kFlagProperGiven = 0x20;
 
 /**
  * @brief Count UTF-8 characters in a byte range
@@ -154,6 +156,10 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
       entry.extended_pos = core::ExtendedPOS::NounFormal;
     } else if ((rec.flags & kFlagInterjection) != 0) {
       entry.extended_pos = core::ExtendedPOS::Interjection;
+    } else if ((rec.flags & kFlagProperFamily) != 0) {
+      entry.extended_pos = core::ExtendedPOS::NounProperFamily;
+    } else if ((rec.flags & kFlagProperGiven) != 0) {
+      entry.extended_pos = core::ExtendedPOS::NounProperGiven;
     } else {
       // Derive default extended_pos from POS for proper cost calculation
       switch (entry.pos) {
@@ -384,6 +390,12 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
     }
     if (ent.extended_pos == core::ExtendedPOS::Interjection) {
       flags |= kFlagInterjection;
+    }
+    if (ent.extended_pos == core::ExtendedPOS::NounProperFamily) {
+      flags |= kFlagProperFamily;
+    }
+    if (ent.extended_pos == core::ExtendedPOS::NounProperGiven) {
+      flags |= kFlagProperGiven;
     }
     rec.flags = flags;
 

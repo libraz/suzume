@@ -1,0 +1,167 @@
+# =============================================================================
+# Suzume L2 Dictionary - Adverbs (副詞)
+# =============================================================================
+#
+# Format: surface<TAB>pos<TAB>conj_type
+#
+# Note: Basic adverbs (なかなか, いつも, etc.) are in L1 adverbs.h
+# Note: な形容詞 + に patterns (非常に, 本当に, etc.) handled by L1 na_adjectives.h
+#
+# Only add adverbs that:
+# - Are over-split without dict (hiragana adverbs)
+# - Need POS distinction (would be NOUN without dict)
+#
+# =============================================================================
+
+# --- Irregular adverb form ---
+# よく is the adverbial form of よい/いい (irregular conjugation)
+よく	ADVERB
+
+# --- Degree/Extent adverbs ---
+いささか	ADVERB
+はなはだ	ADVERB
+どれほど	ADVERB
+どんなに	ADVERB
+ろくに	ADVERB
+
+# --- Frequency/Time adverbs ---
+しばらく	ADVERB
+二度と	ADVERB
+
+# --- Manner adverbs ---
+少しずつ	ADVERB
+さっさと	ADVERB
+思い切って	ADVERB
+強いて	ADVERB
+ゆるゆると	ADVERB
+
+# --- Conjunctive adverbs ---
+言うまでもなく	ADVERB
+要するに	ADVERB
+中でも	ADVERB
+続いて	ADVERB
+その上	ADVERB
+おまけに	ADVERB
+
+# --- Epistemic adverbs (speaker attitude) ---
+どうも	ADVERB
+はたして	ADVERB
+なぜか	ADVERB
+なんだか	ADVERB
+
+# --- Onomatopoeia/Mimetic adverbs ---
+へとへと	ADVERB
+ヌルッと	ADVERB
+がっかり	ADVERB
+びっくり	ADVERB
+さっぱり	ADVERB
+
+# --- Colloquial/Slang adverbs ---
+めっちゃ	ADVERB
+がちで	ADVERB
+びみょーに	ADVERB
+何気に	ADVERB
+マジかで	ADVERB
+というか	ADVERB
+マジか	ADVERB
+ガチか	ADVERB
+
+# --- Business/Formal adverbs (hiragana, need dict) ---
+よろしく	ADVERB
+引き続き	ADVERB
+繰り返し	ADVERB
+ちっとも	ADVERB
+なにしろ	ADVERB
+もちろん	ADVERB
+とにかく	ADVERB
+いきなり	ADVERB
+とりあえず	ADVERB
+どうせ	ADVERB
+いずれ	ADVERB
+たくさん	ADVERB
+もはや	ADVERB
+あらかじめ	ADVERB
+ひたすら	ADVERB
+いざ	ADVERB
+あたかも	ADVERB
+さながら	ADVERB
+いったい	ADVERB
+せめて	ADVERB
+しどろもどろ	ADVERB
+すでに	ADVERB
+もし	ADVERB
+たとえ	ADVERB
+だいたい	ADVERB
+まして	ADVERB
+のんびり	ADVERB
+せっかく	ADVERB
+ちょっぴり	ADVERB
+ちゃっかり	ADVERB
+とっとと	ADVERB
+ぼんやり	ADVERB
+ひときわ	ADVERB
+すぐ	ADVERB
+もしか	ADVERB
+やたら	ADVERB
+おいで	ADVERB
+こう	ADVERB
+どう	ADVERB
+もう	ADVERB
+もう少し	ADVERB
+まず	ADVERB
+ぜひ	ADVERB
+つくづく	ADVERB
+ほぼ	ADVERB
+思わず	ADVERB
+ほんわか	ADVERB
+なるほど	ADVERB
+がたり	ADVERB
+どさり	ADVERB
+ばたり	ADVERB
+さすが	ADVERB
+とんと	ADVERB
+いっぱい	ADVERB
+すこし	ADVERB
+ほんとに	ADVERB
+
+# --- Correct-split adverbs (kept for POS/compound boundary) ---
+# These are grammatically correct splits but dict entries help with POS
+本当に	ADVERB
+大いに	ADVERB
+あまりに	ADVERB
+同時に	ADVERB
+一般に	ADVERB
+次第に	ADVERB
+一気に	ADVERB
+颯爽と	ADVERB
+堂々と	ADVERB
+少なくとも	ADVERB
+多くとも	ADVERB
+いつも	ADVERB
+
+# --- POS distinction adverbs (would be NOUN/other without dict) ---
+少々	ADVERB
+多少	ADVERB
+再び	ADVERB
+到底	ADVERB
+如何	ADVERB
+俄然	ADVERB
+大変	ADVERB
+一際	ADVERB
+滅多に	ADVERB
+
+# --- Wagahai adverbs (W-004) ---
+せんだって	ADVERB
+あながち	ADVERB
+かくして	ADVERB
+何となく	ADVERB
+無理やり	ADVERB
+そろり	ADVERB
+そろりそろり	ADVERB
+
+# --- Additional adverbs ---
+ひどく	ADVERB
+
+ともに	ADVERB
+
+やはり	ADVERB

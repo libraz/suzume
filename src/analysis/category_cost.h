@@ -128,6 +128,8 @@ constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)>
   table[static_cast<size_t>(ExtendedPOS::NounFormal)] = 0.4F;    // 形式名詞
   table[static_cast<size_t>(ExtendedPOS::NounVerbal)] = 0.5F;    // 連用形転成
   table[static_cast<size_t>(ExtendedPOS::NounProper)] = 0.5F;    // 固有名詞
+  table[static_cast<size_t>(ExtendedPOS::NounProperFamily)] = 0.3F; // 固有名詞(姓)
+  table[static_cast<size_t>(ExtendedPOS::NounProperGiven)] = 0.3F;  // 固有名詞(名)
   table[static_cast<size_t>(ExtendedPOS::NounNumber)] = 0.4F;    // 数詞
 
   // ===========================================================================

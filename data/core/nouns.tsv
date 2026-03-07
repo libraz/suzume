@@ -1,0 +1,265 @@
+# =============================================================================
+# Suzume L2 Dictionary - Nouns (名詞)
+# =============================================================================
+#
+# Format: surface<TAB>pos<TAB>conj_type
+#
+# Note: Simple kanji nouns are handled by the unknown word handler.
+# Only add nouns that cause segmentation or POS issues.
+#
+# =============================================================================
+
+# --- Formal nouns (形式名詞) - hiragana forms ---
+# Note: もの/こと are in L1 with appropriate costs
+うち	NOUN
+ところ	NOUN
+とき	NOUN
+
+# --- Time nouns (needed for compound boundary detection) ---
+明日	NOUN
+昨日	NOUN
+明後日	NOUN
+一昨日	NOUN
+毎日	NOUN
+今朝	NOUN
+毎朝	NOUN
+今晩	NOUN
+今夜	NOUN
+昨夜	NOUN
+朝	NOUN
+昼	NOUN
+夜	NOUN
+夕方	NOUN
+今週	NOUN
+来週	NOUN
+先週	NOUN
+毎週	NOUN
+今月	NOUN
+来月	NOUN
+先月	NOUN
+毎月	NOUN
+今年	NOUN
+来年	NOUN
+去年	NOUN
+昨年	NOUN
+毎年	NOUN
+今後	NOUN
+
+# --- Weather vocabulary ---
+# 晴れ: noun form (fair weather) - without dict, recognized as VERB
+晴れ	NOUN
+晴れる	VERB	ICHIDAN
+時分	NOUN
+
+# --- Verb-stem compound nouns (need dict to avoid verb interpretation) ---
+推し	NOUN
+呼び出し	NOUN
+打ち合わせ	NOUN
+売り上げ	NOUN
+売上げ	NOUN
+引き上げ	NOUN
+受け取り	NOUN
+貸し出し	NOUN
+みじん切り	NOUN
+思い出	NOUN
+手助け	NOUN
+書き込み	NOUN
+読み込み	NOUN
+申し込み	NOUN
+買い物	NOUN
+見積もり	NOUN
+問い合わせ	NOUN
+切り替え	NOUN
+振り込み	NOUN
+差し支え	NOUN
+組み合わせ	NOUN
+申し訳	NOUN
+取り扱い	NOUN
+取り組み	NOUN
+支払い	NOUN
+見舞い	NOUN
+でっち上げ	NOUN
+でっちあげ	NOUN
+きっかけ	NOUN
+金儲け	NOUN
+儲け	NOUN
+引き取り	NOUN
+使い方	NOUN
+知らせ	NOUN
+飲み会	NOUN
+楽しみ	NOUN
+思い	NOUN
+
+# --- Compound nouns ---
+あだ名	NOUN
+なし崩し	NOUN
+子どもの貧困	NOUN
+食器洗い乾燥機	NOUN
+投資ファンド	NOUN
+オプション取引	NOUN
+# B37: しびれ - split as し+びれ
+しびれ	NOUN
+痺れ	NOUN
+# B41: ひと味 - split as ひ+と+味
+ひと味	NOUN
+一味	NOUN
+# B42: ぬいぐるみ - recognized as OTHER
+ぬいぐるみ	NOUN
+縫いぐるみ	NOUN
+# B44: 盛りだくさん - split as 盛りだく+さん
+盛りだくさん	NOUN
+盛り沢山	NOUN
+取っ手	NOUN
+お金	NOUN
+玉ねぎ	NOUN
+やる気	NOUN
+自ら	NOUN
+
+# --- Reduplication (畳語) ---
+人々	NOUN
+日々	NOUN
+国々	NOUN
+色々	NOUN
+時々	NOUN
+
+# --- Hiragana nouns (need dict to prevent over-splitting) ---
+おかげ	NOUN
+おかし	NOUN
+おかず	NOUN
+おでん	NOUN
+おもち	NOUN
+おすすめ	NOUN
+えっち	NOUN
+いくら	NOUN
+うだつ	NOUN
+あと	NOUN
+のち	NOUN
+ため	NOUN
+そん	NOUN
+なん	NOUN
+はし	NOUN
+はな	NOUN
+のり	NOUN
+かし	NOUN
+あん	NOUN
+がお	NOUN
+まま	NOUN
+だるま	NOUN
+すもも	NOUN
+もも	NOUN
+ふともも	NOUN
+たそがれ	NOUN
+それぞれ	NOUN
+
+# --- Nouns needing POS distinction ---
+# Without dict, these are recognized as verb/adjective/other
+勢い	NOUN
+感じ	NOUN
+今日	NOUN
+
+# --- Foreign/Loanword nouns ---
+Wi-Fi	NOUN
+
+# --- Food ---
+飲むヨーグルト	NOUN
+とろけるチーズ	NOUN
+ひじきの煮物	NOUN
+ホワイトシチュー	NOUN
+サンドイッチ	NOUN
+クラブサンド	NOUN
+タンドリーチキン	NOUN
+レアチーズケーキ	NOUN
+
+# --- Idioms (ことわざ) ---
+柳の下にいつも泥鰌はいない	NOUN
+失敗は成功の母	NOUN
+最初から最後まで	NOUN
+
+# --- Net slang (ネットスラング) ---
+ぱおん	NOUN
+わかりみ	NOUN
+つらみ	NOUN
+うれしみ	NOUN
+やばみ	NOUN
+ぴえん	NOUN
+ワロタ	NOUN
+
+# --- Family address terms (ひらがな) ---
+ねえさん	NOUN
+かあさん	NOUN
+にいさん	NOUN
+とうさん	NOUN
+ばあさん	NOUN
+じいさん	NOUN
+おじさん	NOUN
+おばさん	NOUN
+
+# --- POS distinction and compound boundary nouns ---
+マジ	NOUN
+ガチ	NOUN
+何時	NOUN
+猫	NOUN
+雨	NOUN
+電車	NOUN
+学校	NOUN
+草	NOUN
+間違い	NOUN
+売上	NOUN
+現在	NOUN
+最近	NOUN
+将来	NOUN
+過去	NOUN
+未来	NOUN
+非公開	NOUN
+無意識	NOUN
+検討	NOUN
+提出	NOUN
+注目	NOUN
+発行	NOUN
+文化	NOUN
+対	NOUN
+菓子	NOUN
+
+# --- Mixed script compounds (カタカナ + 漢字) ---
+ムダ毛	NOUN
+ウソ泣き	NOUN
+カラ元気	NOUN
+インスタ映え	NOUN
+ヤケ酒	NOUN
+ダメ出し	NOUN
+ウソ発見器	NOUN
+カラ出張	NOUN
+カラ残業	NOUN
+ヤミ金	NOUN
+ウソ電話	NOUN
+デマ情報	NOUN
+ガチ勢	NOUN
+
+# --- サブカル・スラング複合名詞 ---
+コロ助	NOUN
+ドラえもん	NOUN
+のび太	NOUN
+パパ活	NOUN
+推し活	NOUN
+陰キャ	NOUN
+陽キャ	NOUN
+神ゲー	NOUN
+コミュ障	NOUN
+好きピ	NOUN
+彼ピ	NOUN
+
+# --- Wagahai nouns ---
+この間	NOUN
+尻ぺた	NOUN
+
+うさぎ	NOUN
+
+なに	NOUN
+
+ひとりごと	NOUN
+
+ふたり	NOUN
+
+さくら	NOUN
+
+女の子	NOUN
