@@ -6,46 +6,16 @@
 #
 # =============================================================================
 
-# --- adult_games_comics ---
-秘密の関係	NOUN
-BAD END	NOUN
-TYPE-MOON	NOUN
-SAGA PLANETS	NOUN
-Lump of Sugar	NOUN
-ASa Project	NOUN
-CLOCK UP	NOUN
-BLACK CYNIC	NOUN
-Atelier Kaguya	NOUN
-Liar-soft	NOUN
-Innocent Grey	NOUN
-Purple software	NOUN
-Visual Art's	NOUN
-COMIC LO	NOUN
-COMIC X-EROS	NOUN
-COMIC UNREAL	NOUN
-COMIC HOT MILK	NOUN
-Ci-en	NOUN
-欲求不満	NOUN
-
 # --- adult_media ---
-元AV女優	NOUN
-バスガイド	NOUN
-E-BODY	NOUN
-V&R	NOUN
-同人AV.com	NOUN
-T-POWERS	NOUN
-ALL PRO	NOUN
-Mine's	NOUN
-AV OPEN	NOUN
-FANZA AWARD	NOUN
-Blu-ray	NOUN
+AV女優	NOUN
 
 # --- anime ---
 SPY×FAMILY	NOUN
 葬送のフリーレン	NOUN
 薬屋のひとりごと	NOUN
 ぼっち・ざ・ろっく!	NOUN
-機動戦士ガンダム水星の魔女	NOUN
+機動戦士ガンダム	NOUN
+水星の魔女	NOUN
 明日ちゃんのセーラー服	NOUN
 Re:ゼロから始める異世界生活	NOUN
 この素晴らしい世界に祝福を!	NOUN
@@ -291,9 +261,7 @@ SLAM DUNK	NOUN
 GIANT KILLING	NOUN
 BE BLUES!	NOUN
 Master キートン	NOUN
-マスターキートン	NOUN
 BILLY BAT	NOUN
-ブラックジャック	NOUN
 LIAR GAME	NOUN
 BUNGO-ブンゴ-	NOUN
 ろくでなしBLUES	NOUN
@@ -319,4 +287,13 @@ Re:ゼロ	NOUN
 薬屋のひとりごと	NOUN
 本好きの下剋上	NOUN
 陰の実力者になりたくて!	NOUN
-グランドジャンプ	NOUN
+高坂桐乃	NOUN
+スイートプリキュア	NOUN
+閃乱カグラ	NOUN
+すーぱーそに子	NOUN
+魔法少女リリカルなのは	NOUN
+まどマギ	NOUN
+博麗霊夢	NOUN
+シュタインズ・ゲート	NOUN
+ロウきゅーぶ	NOUN
+けいおん	NOUN

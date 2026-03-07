@@ -471,6 +471,30 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         continue;  // Skip - let VERB + ください split win
       }
 
+      // Skip patterns that extend past te-form boundary into auxiliaries
+      // e.g., 履いてない → 履い + て + ない, not a single verb
+      //        着ている → 着 + て + いる, not a single verb
+      //        飲んでいた → 飲ん + で + いた, not a single verb
+      // Detect: onbin ending (い/っ/ん) + て/で + auxiliary content (ない/いる/いた/ある/しまう etc.)
+      {
+        auto te_pos = hiragana_part.find("て");
+        if (te_pos == std::string::npos) {
+          te_pos = hiragana_part.find("で");
+        }
+        if (te_pos != std::string::npos && te_pos >= core::kJapaneseCharBytes) {
+          // Check if there's auxiliary content after て/で
+          std::string after_te = hiragana_part.substr(te_pos + core::kJapaneseCharBytes);
+          if (!after_te.empty()) {
+            // Check if char before て/で is onbin ending (い/っ/ん)
+            std::string_view before_te(hiragana_part.data() + te_pos - core::kJapaneseCharBytes,
+                                       core::kJapaneseCharBytes);
+            if (before_te == "い" || before_te == "っ" || before_te == "ん") {
+              continue;  // Skip - let verb + て + auxiliary split win
+            }
+          }
+        }
+      }
+
       // Skip patterns ending with く when followed by ださ/ださい (part of ください)
       // e.g., 待ちく when followed by ださい → should be 待ち + ください
       {

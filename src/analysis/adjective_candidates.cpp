@@ -686,6 +686,18 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
             SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (mai_auxiliary)\n");
           }
         }
+        // Skip さそう endings (adj nominalization + appearance auxiliary)
+        // E.g., 気持ちよさそうに → 気持ちよ + さ + そう + に
+        //        なさそう → な + さ + そう (handled separately in hiragana adj)
+        // adj-stem + さ(nominalizer) + そう(appearance) should be split
+        if (!is_dict_adjective && surface.size() >= 3 * core::kJapaneseCharBytes) {
+          if (utf8::endsWith(surface, "さそう") ||
+              utf8::endsWith(surface, "さそうに") ||
+              utf8::endsWith(surface, "さそうな") ||
+              utf8::endsWith(surface, "さそうだ")) {
+            continue;  // Skip - force adj + さ + そう split
+          }
+        }
         // Set lemma to base form from inflection analysis (e.g., 使いやすく → 使いやすい)
         candidates.push_back(makeIAdjCandidate(
             surface, start_pos, end_pos, cand.base_form, cost,
@@ -1230,6 +1242,15 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         // e.g., おじさ, おばさ, おねえさ should not be recognized as i-adjectives
         if (utf8::endsWith(surface, "さ") && surface.size() >= 9) {  // 3+ chars ending with さ
           continue;  // Skip - likely part of honorific suffix さん/さま
+        }
+        // Skip さそう patterns (adj nominalization + appearance auxiliary)
+        // e.g., よさそうに → よ + さ + そう + に, not よさい (invalid adj)
+        //       なさそう → な + さ + そう (handled separately)
+        if (utf8::endsWith(surface, "さそう") ||
+            utf8::endsWith(surface, "さそうに") ||
+            utf8::endsWith(surface, "さそうな") ||
+            utf8::endsWith(surface, "さそうだ")) {
+          continue;  // Skip - should be split as adj-stem + さ + そう
         }
         // Base cost for hiragana i-adjective candidates
         // Use slightly elevated base to avoid fragments like ろしい beating

@@ -1200,9 +1200,9 @@ sub apply_suzume_merge {
     # - お疲れ様: greeting/interjection
     my %prefix_exceptions = (
         'お出で' => 1, 'おいで' => 1, 'おすすめ' => 1, 'お疲れ様' => 1,
-        'お金' => 1, 'お前' => 1,
+        'お金' => 1, 'お前' => 1, 'おまえ' => 1,
         'おかず' => 1, 'おでん' => 1, 'おもち' => 1, 'おいら' => 1,
-        'おっぱい' => 1,
+        'おっぱい' => 1, 'おしっこ' => 1, 'おもらし' => 1,
     );
     for my $t (@result) {
         my $surface = $t->{surface} // '';
@@ -1269,6 +1269,52 @@ sub apply_suzume_merge {
         push @kuruwa_fixed, $curr;
     }
     @result = @kuruwa_fixed;
+
+    # Post-process: merge consecutive all-kanji tokens
+    # Suzume treats consecutive kanji characters as a single token (no dictionary splitting)
+    # MeCab splits 二次+巨乳+画像 but suzume outputs 二次巨乳画像
+    my @kanji_merged;
+    for my $j (0 .. $#result) {
+        my $curr = $result[$j];
+        my $surface = $curr->{surface} // '';
+        # If previous token and current are both all-kanji, merge
+        if (@kanji_merged && $surface =~ /^[\p{Han}]+$/
+            && ($kanji_merged[-1]{surface} // '') =~ /^[\p{Han}]+$/) {
+            $kanji_merged[-1]{surface} .= $surface;
+            $kanji_merged[-1]{lemma} = $kanji_merged[-1]{surface};
+            $kanji_merged[-1]{pos} = '名詞';
+            $applied_rule //= 'kanji-merge';
+        } else {
+            push @kanji_merged, $curr;
+        }
+    }
+    @result = @kanji_merged;
+
+    # Post-process: merge ASCII + dot + (ASCII|number) tokens
+    # Suzume keeps "part.3", "Part.FINAL" as single tokens
+    # MeCab may split them when preceded by space: part + . + 3
+    my @dot_merged;
+    for my $j (0 .. $#result) {
+        my $curr = $result[$j];
+        my $surface = $curr->{surface} // '';
+        # Check for: prev=ASCII, curr=., next=ASCII|number
+        if ($surface eq '.' && @dot_merged
+            && ($dot_merged[-1]{surface} // '') =~ /^[a-zA-Z]+$/
+            && $j + 1 <= $#result
+            && ($result[$j + 1]{surface} // '') =~ /^[a-zA-Z0-9]+$/) {
+            # Merge prev + . into prev, next iteration will merge the number/word
+            $dot_merged[-1]{surface} .= '.';
+            $dot_merged[-1]{lemma} = $dot_merged[-1]{surface};
+            $applied_rule //= 'ascii-dot-merge';
+        } elsif (@dot_merged && ($dot_merged[-1]{surface} // '') =~ /\.$/ && $surface =~ /^[a-zA-Z0-9]+$/) {
+            # Continue: prev ends with dot, curr is alphanumeric
+            $dot_merged[-1]{surface} .= $surface;
+            $dot_merged[-1]{lemma} = $dot_merged[-1]{surface};
+        } else {
+            push @dot_merged, $curr;
+        }
+    }
+    @result = @dot_merged;
 
     # Post-process: fix POS/lemmas for dialectal/special patterns
     # おいでなんし: おいで=Adverb, なん=Noun (dialectal), し=Verb (する連用形)
@@ -1378,6 +1424,20 @@ sub apply_suzume_split {
             next;
         }
 
+        # 7. Kanji + Katakana compound nouns: split at script boundary
+        # Suzume splits at character type boundaries (kanji → katakana)
+        # e.g., 二次ロリ → 二次|ロリ, 二次ナース → 二次|ナース
+        # Skip user-dict registered compounds (e.g., 二次エロ)
+        my %user_dict_compounds = ('二次エロ' => 1);
+        if (($t->{pos} // '') eq '名詞'
+            && !$user_dict_compounds{$surface}
+            && $surface =~ /^([\p{Han}]+)([\x{30A0}-\x{30FF}][\x{30A0}-\x{30FF}ー]*)$/) {
+            push @result, { surface => $1, pos => '名詞', lemma => $1 };
+            push @result, { surface => $2, pos => '名詞', lemma => $2 };
+            $applied_rule //= 'kanji-katakana-split';
+            next;
+        }
+
         # No split needed
         push @result, $t;
     }
@@ -1467,6 +1527,12 @@ sub map_mecab_pos {
         if ($surface eq 'ん' && $pos eq '助動詞') {
             $token->{lemma} = 'ん';
             return 'Auxiliary';
+        }
+
+        # Punctuation/brackets: MeCab sometimes classifies as 名詞 but Suzume skips as Symbol
+        # Suzume's basic mode excludes symbols from output, so mark them for filtering
+        if ($surface =~ /^[()（）\[\]【】「」『』｢｣\x{3008}-\x{300F}！？!?…‥・♥♪★☆※]$/) {
+            return 'Symbol';
         }
 
         # Katakana onomatopoeia → Adverb

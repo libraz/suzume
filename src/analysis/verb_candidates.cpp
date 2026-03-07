@@ -212,6 +212,20 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     return candidates;  // Skip this candidate - force split path
   }
 
+  // Reject katakana stem + する conjugation patterns for サ変 splitting
+  // MeCab splits KATAKANA + する into separate tokens:
+  //   エッチ + し + て + いる    (progressive)
+  //   レイプ + さ + れる        (passive)
+  //   セックス + さ + せる      (causative)
+  // So we skip verb candidates where hiragana starts with し/さ/せ
+  // to force noun + する-conjugation split path
+  if (hira_part.size() >= 3 &&
+      (hira_part.compare(0, 3, "し") == 0 ||   // している, した, して, しない
+       hira_part.compare(0, 3, "さ") == 0 ||   // される, させる, さない
+       hira_part.compare(0, 3, "せ") == 0)) {  // せる (causative short form)
+    return candidates;  // Skip this candidate - force split path
+  }
+
   // Try different ending lengths, starting from longest
   for (size_t end_pos = hira_end; end_pos > kata_end; --end_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);
@@ -224,6 +238,20 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     auto best = inflection.getBest(surface);
 
     // Only accept verb types (not IAdjective) and require reasonable confidence
+    // Reject Suru type when hiragana doesn't start with する conjugation (し/さ/せ/す)
+    // e.g., ハメた → inflection says Suru but た is not する conjugation → use ichidan instead
+    if (best.verb_type == grammar::VerbType::Suru) {
+      // Suru inflection was incorrectly matched; try next best candidate
+      auto all_results = inflection.analyze(surface);
+      best.confidence = 0.0F;
+      for (const auto& cand : all_results) {
+        if (cand.verb_type != grammar::VerbType::Suru &&
+            cand.verb_type != grammar::VerbType::IAdjective &&
+            cand.confidence > best.confidence) {
+          best = cand;
+        }
+      }
+    }
     if (best.confidence > verb_opts.confidence_katakana &&
         best.verb_type != grammar::VerbType::IAdjective) {
       // Lower cost than pure katakana noun to prefer verb reading

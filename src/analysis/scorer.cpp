@@ -1537,8 +1537,9 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // When both nouns are in dictionary, the split path is more accurate
   // This helps time nouns (明日, 今日, 毎日) + common nouns (雨, 電車)
   if (prev.pos == core::PartOfSpeech::Noun && prev.fromDictionary() &&
-      next.pos == core::PartOfSpeech::Noun && next.fromDictionary()) {
-    surface_bonus += cost::kMinorBonus;  // Small bonus to prefer dict+dict split
+      next.pos == core::PartOfSpeech::Noun && next.fromDictionary() &&
+      !prev.isFormalNoun() && !next.isFormalNoun()) {
+    surface_bonus += cost::kModerateBonus;  // Prefer dict+dict split over kanji_seq
   }
 
   // Penalty for identical hiragana NOUN → NOUN sequence

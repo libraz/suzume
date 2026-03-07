@@ -14,6 +14,7 @@
 #
 # Options:
 #   -f, --force              Add even if MeCab splits the word (requires confirmation)
+#   --user CATEGORY          Add to user dictionary (data/user/<CATEGORY>.tsv)
 #   --dry-run                Show what would be added without modifying
 #   --fix                    Apply fixes (for validate command)
 #   -h, --help               Show this help
@@ -51,6 +52,21 @@ binmode(STDERR, ':utf8');
 # Decode command-line arguments as UTF-8
 @ARGV = map { decode('utf-8', $_) } @ARGV;
 
+# User dictionary categories (canonical definition)
+# Each maps to data/user/<category>.tsv
+my @USER_CATEGORIES = qw(
+    entertainment
+    music
+    internet
+    names
+    people
+    places
+    brands
+    organizations
+    adult
+);
+my %valid_user_category = map { $_ => 1 } @USER_CATEGORIES;
+
 # POS → dictionary file mapping (split dictionary)
 my %pos_to_file = (
     ADJECTIVE   => 'data/core/adjectives.tsv',
@@ -81,13 +97,19 @@ my $force = 0;
 my $dry_run = 0;
 my $fix = 0;
 my $help = 0;
+my $user_category = '';
 
 GetOptions(
     'f|force'   => \$force,
     'dry-run'   => \$dry_run,
     'fix'       => \$fix,
+    'user=s'    => \$user_category,
     'h|help'    => \$help,
 ) or die "Error in command line arguments\n";
+
+if ($user_category && !$valid_user_category{$user_category}) {
+    die "Invalid user category: $user_category\nValid categories: @USER_CATEGORIES\n";
+}
 
 if ($help || @ARGV == 0) {
     print_help();
@@ -139,6 +161,25 @@ sub recompile_core_dic {
     }
 }
 
+sub recompile_user_dic {
+    my $cli = "./build/bin/suzume-cli";
+    unless (-x $cli) {
+        print "  ⚠️  $cli not found, skipping recompile\n";
+        return 0;
+    }
+    my $tmp = "/tmp/suzume_user_combined_$$.tsv";
+    system("cat data/user/*.tsv > $tmp");
+    my $ret = system("$cli dict compile $tmp data/user.dic 2>/dev/null");
+    unlink $tmp;
+    if ($ret == 0) {
+        print "  ✓ Recompiled data/user.dic\n";
+        return 1;
+    } else {
+        print "  ❌ Failed to recompile data/user.dic\n";
+        return 0;
+    }
+}
+
 sub print_help {
     print <<'HELP';
 L2 Dictionary helper for adding entries safely
@@ -157,21 +198,23 @@ Commands:
 
 Options:
   -f, --force              Add even if MeCab splits the word (requires confirmation)
+  --user CATEGORY          Add to user dictionary (data/user/<CATEGORY>.tsv)
   --dry-run                Show what would be added without modifying
   --fix                    Apply fixes (for validate command)
   -h, --help               Show this help
 
 POS values: ADJECTIVE, ADVERB, VERB, NOUN, PROPER_NOUN, PRONOUN, PREFIX, SUFFIX, INTERJECTION, PARTICLE, AUX, OTHER
 Conjugation types: I_ADJ, NA_ADJ, GODAN_KA/GA/SA/TA/NA/BA/MA/RA/WA, ICHIDAN, IRREGULAR
+User categories: entertainment, music, internet, names, people, places, brands, organizations, adult
 
 Examples:
   ./scripts/dict_tool.pl check "Wi-Fi"
   ./scripts/dict_tool.pl suggest "食べる"
   ./scripts/dict_tool.pl add "Wi-Fi" NOUN
   ./scripts/dict_tool.pl add "美味しい" ADJECTIVE I_ADJ
+  ./scripts/dict_tool.pl --user adult add "巨乳" NOUN
+  ./scripts/dict_tool.pl --user entertainment add "SPY×FAMILY" NOUN
   ./scripts/dict_tool.pl remove "不要な単語"
-  ./scripts/dict_tool.pl disable "一時無効"
-  ./scripts/dict_tool.pl enable "一時無効"
   ./scripts/dict_tool.pl validate
   ./scripts/dict_tool.pl cleanup data/dict.tsv
 HELP
@@ -582,6 +625,32 @@ sub cmd_add {
     my $entry_line = "$word\t$pos";
     $entry_line .= "\t$conj_type" if $conj_type;
 
+    # User dictionary mode
+    if ($user_category) {
+        my $target_file = "data/user/$user_category.tsv";
+
+        # Check for duplicates in user dict files
+        my $dup = find_word_in_user_files($word);
+        if ($dup) {
+            die "❌ DUPLICATE: '$word' already exists in user dictionary ($dup)\n";
+        }
+
+        if ($dry_run) {
+            print "Would add to $target_file:\n";
+            print "  $entry_line\n";
+            return 1;
+        }
+
+        open my $fh, '>>:utf8', $target_file or die "Cannot open $target_file: $!\n";
+        print $fh "$entry_line\n";
+        close $fh;
+        print "✓ Added: $entry_line (appended to $target_file)\n";
+
+        recompile_user_dic();
+        return 1;
+    }
+
+    # Core dictionary mode (default)
     # Determine target file based on POS
     my $target_file = get_dict_file_for_pos($pos);
     $dict_path = $target_file;
@@ -772,6 +841,23 @@ sub find_word_in_files {
                 return $file;
             }
             if (/^#DISABLED#\s+([^\t]+)\t/ && $1 eq $word) {
+                close $fh;
+                return $file;
+            }
+        }
+        close $fh;
+    }
+    return undef;
+}
+
+sub find_word_in_user_files {
+    my ($word) = @_;
+    for my $cat (@USER_CATEGORIES) {
+        my $file = "data/user/$cat.tsv";
+        next unless -f $file;
+        open my $fh, '<:utf8', $file or next;
+        while (<$fh>) {
+            if (/^([^\t#]+)\t/ && $1 eq $word) {
                 close $fh;
                 return $file;
             }
