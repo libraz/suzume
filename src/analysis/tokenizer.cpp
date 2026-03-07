@@ -372,14 +372,12 @@ void Tokenizer::addUnknownCandidates(
       }
     }
 
-    // Case 3: Colloquial verb contractions (ておく→っとく, てしまう→っちゃう/っじゃう)
-    // These are valid verb endings that shouldn't be penalized for length
+    // Case 3: Colloquial verb contraction (ておく→っとく)
+    // っとく is a valid compound verb ending that shouldn't be penalized for length
+    // Note: っちゃう/っじゃう are handled by Case 6 (revoke skip for ちゃう endings)
     if (!skip_penalty && candidate.pos == core::PartOfSpeech::Verb) {
-      // Check if surface ends with colloquial contraction patterns
       std::string_view surface = candidate.surface;
-      if (utf8::endsWith(surface, "っとく") ||
-          utf8::endsWith(surface, "っちゃう") ||
-          utf8::endsWith(surface, "っじゃう")) {
+      if (utf8::endsWith(surface, "っとく")) {
         skip_penalty = true;
         skip_reason = "colloquial_contraction";
       }
@@ -408,6 +406,32 @@ void Tokenizer::addUnknownCandidates(
             skip_penalty = true;
             skip_reason = "short_te_form";
           }
+        }
+      }
+    }
+
+    // Case 6: Revoke skip for long hiragana verbs ending with ちゃう/ちゃっ/ちゃい
+    // These are auxiliary chains (e.g., されちゃう = さ+れ+ちゃう,
+    // なっちゃう = なっ+ちゃう, やっちゃう = やっ+ちゃう) that should split.
+    if (skip_penalty && candidate.pos == core::PartOfSpeech::Verb &&
+        candidate.end - candidate.start >= 4) {
+      std::string_view surface = candidate.surface;
+      bool ends_chau = utf8::endsWith(surface, "ちゃう") ||
+                       utf8::endsWith(surface, "ちゃっ") ||
+                       utf8::endsWith(surface, "ちゃい");
+      if (ends_chau) {
+        // Check if all hiragana
+        bool all_hira = true;
+        for (size_t idx = candidate.start;
+             idx < candidate.end && idx < char_types.size(); ++idx) {
+          if (char_types[idx] != normalize::CharType::Hiragana) {
+            all_hira = false;
+            break;
+          }
+        }
+        if (all_hira) {
+          skip_penalty = false;
+          skip_reason = nullptr;
         }
       }
     }

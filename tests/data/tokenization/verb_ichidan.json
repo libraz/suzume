@@ -1026,7 +1026,7 @@
     {
       "accepted_diff" : {
         "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+        "reason" : "ã as AUX in standalone context"
       },
       "description" : "いられる - potential/passive of いる (W-014)",
       "expected" : [
@@ -1045,12 +1045,12 @@
       "suzume_expected" : [
         {
           "lemma" : "いる",
-          "pos" : "Verb",
-          "surface" : "いら"
+          "pos" : "Auxiliary",
+          "surface" : "い"
         },
         {
           "pos" : "Auxiliary",
-          "surface" : "れる"
+          "surface" : "られる"
         }
       ],
       "tags" : [

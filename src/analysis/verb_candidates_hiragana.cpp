@@ -786,6 +786,26 @@ next_length:;  // Label for goto from particle-starting verb skip
       continue;
     }
 
+    // Skip GodanRa passive for known ichidan verbs (いる, きる, ねる, etc.)
+    // These 2-char verbs ending in る are ichidan, not godan-ra.
+    // The ichidan path (い+られる) is handled separately.
+    // Only skip when stem is 1 hiragana char (3 bytes) = base form is 2 chars (6 bytes)
+    if (verb_type == grammar::VerbType::GodanRa && stem.size() == 3) {
+      // Known ichidan 2-char verbs (stem is 1 char before ら):
+      // いる, きる, みる, ねる, でる, にる, ひる, etc.
+      // Godan-ra 2-char verbs: やる, なる, ある, とる, のる, etc.
+      char32_t stem_char = codepoints[start_pos];
+      // ichidan stems: い,き,み,ね,で,に,ひ,び (E-row or I-row before る)
+      bool is_known_ichidan = (stem_char == U'い' || stem_char == U'き' ||
+                               stem_char == U'み' || stem_char == U'ね' ||
+                               stem_char == U'で' || stem_char == U'に' ||
+                               stem_char == U'ひ' || stem_char == U'び' ||
+                               stem_char == U'え');
+      if (is_known_ichidan) {
+        continue;
+      }
+    }
+
     // Get lemma from dictionary entry if mizenkei is registered
     // Otherwise use constructed base form
     std::string lemma = base_form;

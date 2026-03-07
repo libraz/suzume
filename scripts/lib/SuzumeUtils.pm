@@ -513,18 +513,18 @@ sub apply_suzume_merge {
             }
         }
 
-        # 2c. Noun + 書 suffix: 名詞 + 書(名詞,接尾,一般)
-        #     e.g., 請求書, 申請書, 報告書, 契約書
+        # 2c. Noun + 書/誌 suffix: 名詞 + 書/誌(名詞,接尾)
+        #     e.g., 請求書, 同人誌, 週刊誌, 漫画誌
         if (!$merged && $t->{pos} eq '名詞' && $i + 1 < @$tokens) {
             my $next = $tokens->[$i + 1];
-            if (($next->{surface} // '') eq '書'
+            if (($next->{surface} // '') =~ /^[書誌]$/
                 && ($next->{pos} // '') eq '名詞'
                 && ($next->{pos_sub1} // '') eq '接尾') {
-                my $combined = $t->{surface} . '書';
+                my $combined = $t->{surface} . $next->{surface};
                 push @result, { surface => $combined, pos => '名詞', lemma => $combined };
                 $i += 2;
                 $merged = 1;
-                $applied_rule //= 'noun+sho';
+                $applied_rule //= 'noun+suffix-char';
             }
         }
 

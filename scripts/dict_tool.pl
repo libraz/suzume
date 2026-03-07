@@ -11,6 +11,8 @@
 #   validate                 Validate entire dictionary for issues
 #   suggest <word>           Suggest POS and conj_type based on MeCab
 #   cleanup <input.tsv>      Analyze dictionary, separate needed/unneeded entries
+#   grep <pattern>           Search entries matching regex pattern
+#   remove-matching <pattern> Bulk remove entries matching regex (with confirmation)
 #
 # Options:
 #   -f, --force              Add even if MeCab splits the word (requires confirmation)
@@ -137,6 +139,10 @@ if ($command eq 'check') {
     cmd_suggest(@ARGV);
 } elsif ($command eq 'cleanup') {
     cmd_cleanup(@ARGV);
+} elsif ($command eq 'grep') {
+    cmd_grep(@ARGV);
+} elsif ($command eq 'remove-matching') {
+    cmd_remove_matching(@ARGV);
 } else {
     die "Unknown command: $command\n";
 }
@@ -195,6 +201,8 @@ Commands:
   validate                 Validate entire dictionary for issues
   suggest <word>           Suggest POS and conj_type based on MeCab
   cleanup <input.tsv>      Analyze dictionary, separate needed/unneeded entries
+  grep <pattern>           Search entries matching regex (surface match)
+  remove-matching <pattern> Bulk remove entries matching regex (with confirmation)
 
 Options:
   -f, --force              Add even if MeCab splits the word (requires confirmation)
@@ -217,6 +225,10 @@ Examples:
   ./scripts/dict_tool.pl remove "不要な単語"
   ./scripts/dict_tool.pl validate
   ./scripts/dict_tool.pl cleanup data/dict.tsv
+  ./scripts/dict_tool.pl grep "^巨"                          # Search by prefix
+  ./scripts/dict_tool.pl --user adult grep "^巨"             # Search in user dict
+  ./scripts/dict_tool.pl remove-matching "^巨" --dry-run     # Preview bulk removal
+  ./scripts/dict_tool.pl --user adult remove-matching "^巨"  # Bulk remove from user dict
 HELP
 }
 
@@ -1124,6 +1136,135 @@ sub remove_lines {
         print $out $line unless $to_remove{$line_num};
     }
     close $out;
+}
+
+sub cmd_grep {
+    my ($pattern) = @_;
+    die "Usage: dict_tool.pl grep <pattern>\n" unless $pattern;
+
+    my @files;
+    if ($user_category) {
+        push @files, "data/user/$user_category.tsv";
+    } elsif ($force) {
+        # --force: search all (core + user)
+        @files = (@all_dict_files, map { "data/user/$_.tsv" } @USER_CATEGORIES);
+    } else {
+        @files = @all_dict_files;
+    }
+
+    my $count = 0;
+    for my $file (@files) {
+        next unless -f $file;
+        open my $fh, '<:utf8', $file or next;
+        my $file_label = $file;
+        my $printed_header = 0;
+        while (my $line = <$fh>) {
+            chomp $line;
+            next if $line =~ /^\s*$/ || $line =~ /^#/;
+            my ($surface) = split /\t/, $line;
+            if ($surface =~ /$pattern/) {
+                unless ($printed_header) {
+                    print "--- $file_label ---\n";
+                    $printed_header = 1;
+                }
+                print "  $line\n";
+                $count++;
+            }
+        }
+        close $fh;
+    }
+    print "\n$count entries matched /$pattern/\n";
+}
+
+sub cmd_remove_matching {
+    my ($pattern) = @_;
+    die "Usage: dict_tool.pl remove-matching <pattern>\n" unless $pattern;
+
+    # Collect matching entries
+    my @files;
+    if ($user_category) {
+        push @files, "data/user/$user_category.tsv";
+    } else {
+        @files = @all_dict_files;
+    }
+
+    my @matches;  # { file, surface, line }
+    for my $file (@files) {
+        next unless -f $file;
+        open my $fh, '<:utf8', $file or next;
+        while (my $line = <$fh>) {
+            chomp $line;
+            next if $line =~ /^\s*$/ || $line =~ /^#/;
+            my ($surface) = split /\t/, $line;
+            if ($surface =~ /$pattern/) {
+                push @matches, { file => $file, surface => $surface, line => $line };
+            }
+        }
+        close $fh;
+    }
+
+    if (@matches == 0) {
+        print "No entries matched /$pattern/\n";
+        return;
+    }
+
+    print "Entries matching /$pattern/:\n\n";
+    for my $m (@matches) {
+        print "  $m->{line}  ($m->{file})\n";
+    }
+    print "\n${\scalar @matches} entries will be removed.\n";
+
+    if ($dry_run) {
+        print "[dry-run] No changes made.\n";
+        return;
+    }
+
+    print "Proceed? [y/N] ";
+    my $ans = <STDIN>;
+    chomp $ans;
+    unless ($ans =~ /^[yY]$/) {
+        print "Cancelled.\n";
+        return;
+    }
+
+    # Group by file and remove
+    my %by_file;
+    for my $m (@matches) {
+        push @{$by_file{$m->{file}}}, $m->{surface};
+    }
+
+    for my $file (keys %by_file) {
+        my %to_remove = map { $_ => 1 } @{$by_file{$file}};
+        open my $fh, '<:utf8', $file or die "Cannot open $file: $!\n";
+        my @lines = <$fh>;
+        close $fh;
+
+        my @new_lines;
+        my $removed = 0;
+        for my $line (@lines) {
+            my $check = $line;
+            chomp $check;
+            if ($check !~ /^\s*$/ && $check !~ /^#/) {
+                my ($surface) = split /\t/, $check;
+                if ($to_remove{$surface}) {
+                    $removed++;
+                    next;
+                }
+            }
+            push @new_lines, $line;
+        }
+
+        open my $out, '>:utf8', $file or die "Cannot write $file: $!\n";
+        print $out @new_lines;
+        close $out;
+        print "✓ Removed $removed entries from $file\n";
+    }
+
+    if ($user_category) {
+        recompile_user_dic();
+    } else {
+        recompile_core_dic();
+    }
 }
 
 sub cmd_cleanup {
