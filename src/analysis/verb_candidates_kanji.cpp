@@ -85,10 +85,24 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         } else if (first_hiragana == U'が') {
           // が + る/ら/り/っ pattern: could be godan-ra verb (上がる, 下がる, 受かる)
           // Also handle conjugations: がら(mizenkei), がり(renyokei), がっ(onbin)
+          // が + せ/さ/ず: godan-ga verb mizenkei patterns
+          // E.g., 脱がせる, 脱がさない, 脱がず
+          // が+な: only allow if kanji+ぐ is a known godan-ga verb
+          // E.g., 脱がない (脱ぐ exists) vs 金がない (金ぐ doesn't exist)
           if (next_char == U'る' || next_char == U'ら' ||
               next_char == U'り' || next_char == U'っ' ||
-              next_char == U'れ') {
+              next_char == U'れ' ||
+              next_char == U'せ' ||
+              next_char == U'さ' || next_char == U'ず') {
             is_verb_pattern = true;
+          }
+          // が+な: verify kanji+ぐ exists as godan-ga verb in dictionary
+          if (!is_verb_pattern && next_char == U'な' && dict_manager != nullptr) {
+            std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+            std::string gu_form = kanji_stem + "ぐ";
+            if (vh::isVerbInDictionary(dict_manager, gu_form)) {
+              is_verb_pattern = true;
+            }
           }
         }
       }

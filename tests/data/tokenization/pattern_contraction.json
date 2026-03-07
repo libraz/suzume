@@ -288,6 +288,121 @@
         "contraction",
         "regression"
       ]
+    },
+    {
+      "description" : "食べずに帰った - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "食べる",
+          "pos" : "Verb",
+          "surface" : "食べ"
+        },
+        {
+          "lemma" : "ず",
+          "pos" : "Auxiliary",
+          "surface" : "ずに"
+        },
+        {
+          "lemma" : "帰る",
+          "pos" : "Verb",
+          "surface" : "帰っ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
+      "id" : "bezuni_ttta",
+      "input" : "食べずに帰った"
+    },
+    {
+      "description" : "話さずに聞く - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "話す",
+          "pos" : "Verb",
+          "surface" : "話さ"
+        },
+        {
+          "lemma" : "ず",
+          "pos" : "Auxiliary",
+          "surface" : "ずに"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "聞く"
+        }
+      ],
+      "id" : "sazuni_ku",
+      "input" : "話さずに聞く"
+    },
+    {
+      "description" : "考えずに - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "考える",
+          "pos" : "Verb",
+          "surface" : "考え"
+        },
+        {
+          "lemma" : "ず",
+          "pos" : "Auxiliary",
+          "surface" : "ずに"
+        }
+      ],
+      "id" : "ezuni",
+      "input" : "考えずに"
+    },
+    {
+      "description" : "帰らずに済む - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "帰る",
+          "pos" : "Verb",
+          "surface" : "帰ら"
+        },
+        {
+          "lemma" : "ず",
+          "pos" : "Auxiliary",
+          "surface" : "ずに"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "済む"
+        }
+      ],
+      "id" : "razuni_mu",
+      "input" : "帰らずに済む"
+    },
+    {
+      "description" : "めちゃ楽しい - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Other",
+          "surface" : "めちゃ"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "楽しい"
+        }
+      ],
+      "id" : "mechi_shii",
+      "input" : "めちゃ楽しい"
+    },
+    {
+      "description" : "めちゃ好き - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Other",
+          "surface" : "めちゃ"
+        },
+        {
+          "pos" : "Adjective",
+          "surface" : "好き"
+        }
+      ],
+      "id" : "mechi_ki",
+      "input" : "めちゃ好き"
     }
   ],
   "description" : "Contraction patterns (てる、ちゃう)",

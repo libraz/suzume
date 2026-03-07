@@ -1028,6 +1028,44 @@
         "compound",
         "godan"
       ]
+    },
+    {
+      "description" : "突っ込む - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Verb",
+          "surface" : "突っ込む"
+        }
+      ],
+      "id" : "tt_mu",
+      "input" : "突っ込む"
+    },
+    {
+      "description" : "突っ込んで - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "突っ込む",
+          "pos" : "Verb",
+          "surface" : "突っ込ん"
+        },
+        {
+          "pos" : "Particle",
+          "surface" : "で"
+        }
+      ],
+      "id" : "tt_nde",
+      "input" : "突っ込んで"
+    },
+    {
+      "description" : "打ち込む - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Verb",
+          "surface" : "打ち込む"
+        }
+      ],
+      "id" : "chi_mu",
+      "input" : "打ち込む"
     }
   ],
   "description" : "Compound verbs",

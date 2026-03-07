@@ -1870,6 +1870,36 @@
       ],
       "id" : "k6765ta",
       "input" : "来た"
+    },
+    {
+      "description" : "堪能できる - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "堪能"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "できる"
+        }
+      ],
+      "id" : "dekiru",
+      "input" : "堪能できる"
+    },
+    {
+      "description" : "表現できる - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "表現"
+        },
+        {
+          "pos" : "Verb",
+          "surface" : "できる"
+        }
+      ],
+      "id" : "hyougen_dekiru",
+      "input" : "表現できる"
     }
   ],
   "description" : "Irregular verbs (する、くる)",

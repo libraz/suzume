@@ -1308,6 +1308,45 @@
       ],
       "id" : "darashinai",
       "input" : "だらしない"
+    },
+    {
+      "description" : "気持ちよい - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adjective",
+          "surface" : "気持ちよい"
+        }
+      ],
+      "id" : "chiyoi",
+      "input" : "気持ちよい"
+    },
+    {
+      "description" : "気持ちよかった - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "気持ちよい",
+          "pos" : "Adjective",
+          "surface" : "気持ちよかっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
+      "id" : "chiyokattta",
+      "input" : "気持ちよかった"
+    },
+    {
+      "description" : "気持ちよく - auto-generated",
+      "expected" : [
+        {
+          "lemma" : "気持ちよい",
+          "pos" : "Adjective",
+          "surface" : "気持ちよく"
+        }
+      ],
+      "id" : "chiyoku",
+      "input" : "気持ちよく"
     }
   ],
   "description" : "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional",

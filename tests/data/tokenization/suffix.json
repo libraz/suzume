@@ -451,6 +451,36 @@
         "kata",
         "recommendation"
       ]
+    },
+    {
+      "description" : "泥だらけ - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "泥"
+        },
+        {
+          "pos" : "Suffix",
+          "surface" : "だらけ"
+        }
+      ],
+      "id" : "darake",
+      "input" : "泥だらけ"
+    },
+    {
+      "description" : "傷だらけ - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "傷"
+        },
+        {
+          "pos" : "Suffix",
+          "surface" : "だらけ"
+        }
+      ],
+      "id" : "kizu_darake",
+      "input" : "傷だらけ"
     }
   ],
   "description" : "Suffixes (さん、的、化)",

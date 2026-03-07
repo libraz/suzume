@@ -1306,6 +1306,46 @@
         "adverb",
         "colloquial"
       ]
+    },
+    {
+      "description" : "初めて会った - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "初めて"
+        },
+        {
+          "lemma" : "会う",
+          "pos" : "Verb",
+          "surface" : "会っ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
+      "id" : "mete_ttta",
+      "input" : "初めて会った"
+    },
+    {
+      "description" : "初めて見た - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adverb",
+          "surface" : "初めて"
+        },
+        {
+          "lemma" : "見る",
+          "pos" : "Verb",
+          "surface" : "見"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
+      "id" : "mete_ta",
+      "input" : "初めて見た"
     }
   ],
   "description" : "General adverbs",

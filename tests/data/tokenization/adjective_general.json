@@ -143,6 +143,21 @@
         "adjective",
         "renyokei"
       ]
+    },
+    {
+      "description" : "大きな木 - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Determiner",
+          "surface" : "大きな"
+        },
+        {
+          "pos" : "Noun",
+          "surface" : "木"
+        }
+      ],
+      "id" : "kina",
+      "input" : "大きな木"
     }
   ],
   "description" : "adjective_general tests",

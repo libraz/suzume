@@ -1327,9 +1327,11 @@ sub apply_suzume_merge {
         my $surface = $curr->{surface} // '';
         # If previous token and current are both all-kanji, merge
         # Skip 的 — Suzume treats it as a separate suffix token
+        # Skip if previous token contains 々 — 々 marks word boundary (時々+妙 should not merge)
         if (@kanji_merged && $surface =~ /^\p{Script=Han}+$/
             && $surface ne '的'
-            && ($kanji_merged[-1]{surface} // '') =~ /^\p{Script=Han}+$/) {
+            && ($kanji_merged[-1]{surface} // '') =~ /^\p{Script=Han}+$/
+            && ($kanji_merged[-1]{surface} // '') !~ /々/) {
             $kanji_merged[-1]{surface} .= $surface;
             $kanji_merged[-1]{lemma} = $kanji_merged[-1]{surface};
             $kanji_merged[-1]{pos} = '名詞';
@@ -1921,7 +1923,8 @@ sub correct_mecab_pos {
 
         # Fix じゃ: MeCab classifies as 助詞(副助詞) or 接続詞, but it's copula (助動詞)
         # Suzume treats じゃ as AuxCopulaDa (contraction of では)
-        if ($surface eq 'じゃ' && ($pos eq '助詞' || $pos eq '接続詞')) {
+        # Also fix lemma: MeCab uses じゃ, Suzume uses だ (base form of copula)
+        if ($surface eq 'じゃ' && ($pos eq '助詞' || $pos eq '接続詞' || $pos eq '助動詞')) {
             $t->{pos} = '助動詞';
             $t->{lemma} = 'だ';
         }
@@ -1932,6 +1935,15 @@ sub correct_mecab_pos {
             if ($idx > 0 && ($tokens->[$idx - 1]{surface} // '') eq 'じゃ') {
                 $t->{pos} = '助動詞';
                 $t->{lemma} = 'ない';
+            }
+        }
+
+        # Fix な after じゃ: MeCab says 助詞(終助詞), Suzume treats as copula (助動詞)
+        # 嫌じゃな (elderly speech): な is だ's 連体形/終止形, not sentence-final particle
+        if ($surface eq 'な' && $pos eq '助詞') {
+            if ($idx > 0 && ($tokens->[$idx - 1]{surface} // '') eq 'じゃ') {
+                $t->{pos} = '助動詞';
+                $t->{lemma} = 'だ';
             }
         }
 
@@ -2261,6 +2273,23 @@ sub _postprocess_tsuke_noun {
     }
 }
 
+# なく after じゃ/で: Auxiliary → Adjective
+# MeCab treats なく after copula as 助動詞, Suzume treats as Adjective (形容詞連用形)
+# Suzume L1 dict has なく as ADJ_連用 (ない conjugates like i-adjective)
+sub _postprocess_copula_neg {
+    my ($tokens) = @_;
+    for my $i (1 .. $#$tokens) {
+        my $t = $tokens->[$i];
+        next unless ($t->{surface} // '') eq 'なく';
+        next unless ($t->{pos} // '') eq 'Auxiliary';
+        my $prev = $tokens->[$i - 1]{surface} // '';
+        if ($prev eq 'じゃ' || $prev eq 'で') {
+            $t->{pos} = 'Adjective';
+            $t->{lemma} = 'ない';
+        }
+    }
+}
+
 # て/で after verb renyokei/onbinkei: Particle → Auxiliary
 # MeCab classifies て as 助詞(接続助詞), Suzume treats as 助動詞(継続)
 sub _postprocess_te {
@@ -2404,6 +2433,7 @@ sub get_expected_tokens {
     _postprocess_de_particle(\@tokens);
     _postprocess_na_adj_noun(\@tokens);
     _postprocess_tsuke_noun(\@tokens);
+    _postprocess_copula_neg(\@tokens);
 
     # Normalize full-width alphanumeric to half-width in surfaces/lemmas
     # Suzume's pretokenizer converts full-width to half-width, so MeCab output must match

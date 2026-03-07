@@ -415,6 +415,14 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
         }
       }
 
+      // Skip kanji sequences starting with iteration mark (々)
+      // 々 always attaches to the preceding kanji (人々, 時々)
+      // It can never start a word
+      if (start_type == normalize::CharType::Kanji &&
+          normalize::isIterationMark(codepoints[start_pos])) {
+        continue;
+      }
+
       // Penalize kanji sequences that extend past iteration mark (々)
       // e.g., 時々妙 should be split as 時々 + 妙, not kept as one compound
       // The pattern kanji+々 is a complete reduplication that rarely extends further

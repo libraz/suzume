@@ -1555,6 +1555,71 @@
         "node",
         "complex"
       ]
+    },
+    {
+      "description" : "嫌じゃない - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adjective",
+          "surface" : "嫌"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "じゃ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "ji_nai",
+      "input" : "嫌じゃない"
+    },
+    {
+      "description" : "学生じゃない - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Noun",
+          "surface" : "学生"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "じゃ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "ない"
+        }
+      ],
+      "id" : "gakusei_ji_nai",
+      "input" : "学生じゃない"
+    },
+    {
+      "description" : "元気じゃなかった - auto-generated",
+      "expected" : [
+        {
+          "pos" : "Adjective",
+          "surface" : "元気"
+        },
+        {
+          "lemma" : "だ",
+          "pos" : "Auxiliary",
+          "surface" : "じゃ"
+        },
+        {
+          "lemma" : "ない",
+          "pos" : "Auxiliary",
+          "surface" : "なかっ"
+        },
+        {
+          "pos" : "Auxiliary",
+          "surface" : "た"
+        }
+      ],
+      "id" : "ji_nakattta",
+      "input" : "元気じゃなかった"
     }
   ],
   "description" : "Modality auxiliaries (たい、そう、らしい)",

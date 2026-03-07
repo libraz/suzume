@@ -15,6 +15,13 @@ CharType classifyChar(char32_t codepoint) {
     return CharType::Katakana;
   }
 
+  // Ideographic iteration mark (々) - treat as Kanji
+  // U+3005 repeats preceding kanji: 人々, 日々, 痛々しい
+  // Must check before CJK Symbols range (0x3000-0x303F)
+  if (codepoint == 0x3005) {
+    return CharType::Kanji;
+  }
+
   // CJK Unified Ideographs (kanji)
   if ((codepoint >= 0x4E00 && codepoint <= 0x9FFF) ||    // CJK Unified Ideographs
       (codepoint >= 0x3400 && codepoint <= 0x4DBF) ||    // CJK Extension A
