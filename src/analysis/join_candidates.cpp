@@ -104,18 +104,11 @@ inline std::string generateRenyokei(std::string_view surface,
   // Godan: replace last hiragana with i-row equivalent
   // む→み, す→し, く→き, ぐ→ぎ, う→い, る→り, つ→ち, ぬ→に, ぶ→び
   if (base.size() < 3) return "";
+  char32_t last_cp = utf8::decodeLastChar(base);
+  auto i_row = grammar::godanIRowSuffixFromURow(last_cp);
+  if (i_row.empty()) return "";  // Unknown ending
   std::string result(base.substr(0, base.size() - 3));
-  std::string_view last = base.substr(base.size() - 3);
-  if (last == "む") result += "み";
-  else if (last == "す") result += "し";
-  else if (last == "く") result += "き";
-  else if (last == "ぐ") result += "ぎ";
-  else if (last == "う") result += "い";
-  else if (last == "る") result += "り";
-  else if (last == "つ") result += "ち";
-  else if (last == "ぬ") result += "に";
-  else if (last == "ぶ") result += "び";
-  else return "";  // Unknown ending
+  result += i_row;
   return result;
 }
 
@@ -139,18 +132,11 @@ inline std::string generateMizenkei(std::string_view surface,
   // Godan: replace last hiragana with a-row equivalent
   // む→ま, す→さ, く→か, ぐ→が, う→わ, る→ら, つ→た, ぬ→な, ぶ→ば
   if (base.size() < 3) return "";
+  char32_t last_cp = utf8::decodeLastChar(base);
+  auto a_row = grammar::godanARowSuffixFromURow(last_cp);
+  if (a_row.empty()) return "";  // Unknown ending
   std::string result(base.substr(0, base.size() - 3));
-  std::string_view last = base.substr(base.size() - 3);
-  if (last == "む") result += "ま";
-  else if (last == "す") result += "さ";
-  else if (last == "く") result += "か";
-  else if (last == "ぐ") result += "が";
-  else if (last == "う") result += "わ";
-  else if (last == "る") result += "ら";
-  else if (last == "つ") result += "た";
-  else if (last == "ぬ") result += "な";
-  else if (last == "ぶ") result += "ば";
-  else return "";  // Unknown ending
+  result += a_row;
   return result;
 }
 

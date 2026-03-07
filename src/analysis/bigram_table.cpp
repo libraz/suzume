@@ -621,8 +621,8 @@ BigramTable::initTable() {
   // Moderate bonus to promote 彼女|で|も|ない over 彼女|でも|ない
   setCell(t, EPOS::AuxCopulaDa, EPOS::ParticleTopic, cost::kModerateBonus);
 
-  // AuxCopulaDa (で form) → AuxNegativeNai (で+ない in ではない) - minor bonus
-  setCell(t, EPOS::AuxCopulaDa, EPOS::AuxNegativeNai, cost::kMinorBonus);
+  // AuxCopulaDa → AuxNegativeNai (じゃ+ない, で+ない) - moderate bonus
+  setCell(t, EPOS::AuxCopulaDa, EPOS::AuxNegativeNai, cost::kModerateBonus);
 
   // AuxCopulaDa → AuxGozaru (で+ございます) - moderate bonus
   setCell(t, EPOS::AuxCopulaDa, EPOS::AuxGozaru, cost::kModerateBonus);

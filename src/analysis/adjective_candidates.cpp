@@ -201,6 +201,12 @@ bool shouldSkipSimplePatterns(
     return true;
   }
 
+  // Copula negation patterns (kanji + じゃな...): 嫌じゃない, 嫌じゃなかった
+  // These are na-adjective + じゃ(copula) + ない(negation), not i-adjectives
+  if (utf8::startsWith(hiragana_part, "じゃな")) {
+    return true;
+  }
+
   // Patterns starting with っ (te-form contractions like 待ってく = 待っていく)
   if (utf8::startsWith(hiragana_part, "っ")) {
     return true;

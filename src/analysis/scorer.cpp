@@ -162,6 +162,11 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // This allows candidates (e.g., adjective stem + すぎる) to have custom costs
   float cost = (edge.cost != 0.0F) ? edge.cost : category_cost;
 
+  // Length-scaled bonus helper: base + per_char * (char_len - min_len)
+  auto lengthScaledBonus = [](float base, size_t char_len, size_t min_len, float per_char) {
+    return base - static_cast<float>(char_len > min_len ? char_len - min_len : 0) * per_char;
+  };
+
   // User dictionary bonus (still needed for user customization)
   if (edge.fromUserDict()) {
     cost += options_.user_dict_bonus;
@@ -225,8 +230,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       !grammar::isPureHiragana(edge.surface)) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     if (char_len >= 3) {
-      float bonus = -1.5F - static_cast<float>(char_len - 3) * 0.3F;
-      cost += bonus;
+      cost += lengthScaledBonus(-1.5F, char_len, 3, 0.3F);
     }
   }
 
@@ -239,8 +243,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       grammar::containsKanji(edge.surface)) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     if (char_len >= 3) {
-      float bonus = -1.5F - static_cast<float>(char_len - 3) * 0.3F;
-      cost += bonus;
+      cost += lengthScaledBonus(-1.5F, char_len, 3, 0.3F);
     }
   }
 
@@ -270,9 +273,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       !grammar::isPureHiragana(edge.surface)) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     // Moderate bonus for mixed interjections
-    float bonus = (char_len <= 3) ? -0.5F
-                                  : -0.5F - static_cast<float>(char_len - 3) * 0.3F;
-    cost += bonus;
+    cost += lengthScaledBonus(-0.5F, char_len, 3, 0.3F);
   }
 
   // Bonus for hiragana conjunctions from dictionary (たとえば, それから, etc.)
@@ -328,8 +329,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
        edge.surface.compare(0, 3, "未") == 0)) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     // Base -3.0 for 2-char entries, -0.5 per additional char
-    float bonus = -3.0F - static_cast<float>(char_len > 2 ? char_len - 2 : 0) * 0.5F;
-    cost += bonus;
+    cost += lengthScaledBonus(-3.0F, char_len, 2, 0.5F);
   }
 
   // Bonus for hiragana+kanji mixed nouns from dictionary (e.g., なし崩し, みじん切り, お茶)
@@ -338,22 +338,10 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Requires 3+ chars with both hiragana and kanji
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Noun) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
-    if (char_len >= 3) {
-      bool has_hiragana = false;
-      bool has_kanji = false;
-      for (char32_t cp : suzume::normalize::utf8::decode(edge.surface)) {
-        if (suzume::kana::isHiraganaCodepoint(cp)) {
-          has_hiragana = true;
-        } else if (suzume::kana::isKanjiCodepoint(cp)) {
-          has_kanji = true;
-        }
-        if (has_hiragana && has_kanji) break;
-      }
-      if (has_hiragana && has_kanji) {
-        // Base bonus -0.5, stronger for longer words
-        constexpr float kMixedNounBonus = -0.5F;
-        cost += kMixedNounBonus;
-      }
+    if (char_len >= 3 && grammar::isMixedHiraganaKanji(edge.surface)) {
+      // Base bonus -0.5, stronger for longer words
+      constexpr float kMixedNounBonus = -0.5F;
+      cost += kMixedNounBonus;
     }
   }
 

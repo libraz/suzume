@@ -1097,17 +1097,9 @@ sub apply_suzume_merge {
             }
         }
 
-        # 12. Copula negation: merge じゃ+ない → じゃない
-        #     Suzume treats じゃない as a single auxiliary token (AUX_否定)
-        #     MeCab splits as じゃ(副助詞) + ない(助動詞)
-        if (!$merged && ($t->{surface} // '') eq 'じゃ' && ($t->{pos} // '') eq '助詞') {
-            if ($i + 1 < @$tokens && ($tokens->[$i + 1]{surface} // '') eq 'ない') {
-                push @result, { surface => 'じゃない', pos => '助動詞', lemma => 'ではない' };
-                $i += 2;
-                $merged = 1;
-                $applied_rule //= 'copula-negation';
-            }
-        }
+        # 12. (removed: copula-negation merge)
+        #     Suzume now splits じゃない as じゃ(AuxCopulaDa) + ない(AuxNegativeNai)
+        #     Splitting is handled in apply_suzume_split instead
 
         if (!$merged) {
             push @result, {
@@ -1493,6 +1485,16 @@ sub apply_suzume_split {
             push @result, { surface => $1, pos => '名詞', lemma => $1 };
             push @result, { surface => $2, pos => '名詞', lemma => $2 };
             $applied_rule //= 'kanji-katakana-split';
+            next;
+        }
+
+        # 8. Copula negation: じゃない → じゃ|ない
+        #    MeCab sometimes treats じゃない as single 助動詞, but Suzume always splits
+        #    as じゃ(AuxCopulaDa) + ない(AuxNegativeNai)
+        if ($surface eq 'じゃない' && ($t->{pos} // '') eq '助動詞') {
+            push @result, { surface => 'じゃ', pos => '助動詞', lemma => 'だ' };
+            push @result, { surface => 'ない', pos => '助動詞', lemma => 'ない' };
+            $applied_rule //= 'copula-negation-split';
             next;
         }
 
@@ -1896,7 +1898,8 @@ sub normalize_pos {
 sub correct_mecab_pos {
     my ($tokens) = @_;
 
-    for my $t (@$tokens) {
+    for my $idx (0 .. $#$tokens) {
+        my $t = $tokens->[$idx];
         my $surface = $t->{surface};
         my $pos = $t->{pos};
 
@@ -1913,6 +1916,22 @@ sub correct_mecab_pos {
                     (my $adj_lemma = $surface) =~ s/く$/い/;
                     $t->{lemma} = $adj_lemma;
                 }
+            }
+        }
+
+        # Fix じゃ: MeCab classifies as 助詞(副助詞) or 接続詞, but it's copula (助動詞)
+        # Suzume treats じゃ as AuxCopulaDa (contraction of では)
+        if ($surface eq 'じゃ' && ($pos eq '助詞' || $pos eq '接続詞')) {
+            $t->{pos} = '助動詞';
+            $t->{lemma} = 'だ';
+        }
+
+        # Fix ない/なかっ after じゃ: MeCab sometimes says 形容詞, should be 助動詞
+        # じゃ+ない = copula negation, ない is auxiliary not adjective
+        if (($surface eq 'ない' || $surface eq 'なかっ') && $pos eq '形容詞') {
+            if ($idx > 0 && ($tokens->[$idx - 1]{surface} // '') eq 'じゃ') {
+                $t->{pos} = '助動詞';
+                $t->{lemma} = 'ない';
             }
         }
 

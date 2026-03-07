@@ -250,7 +250,43 @@ const std::string& getBaseSuffixCached(char32_t base_vowel) {
   auto it = kBaseSuffixCache.find(base_vowel);
   return it != kBaseSuffixCache.end() ? it->second : kEmpty;
 }
+// Cache for A-row suffix strings from U-row
+const std::string& getARowSuffixFromURowCached(char32_t u_row_cp) {
+  static const auto kCache = []() {
+    std::unordered_map<char32_t, std::string> cache;
+    for (const auto& [type, row] : Conjugation::getGodanRows()) {
+      cache[row.base_vowel] = encodeUtf8(row.a_row);
+    }
+    return cache;
+  }();
+  static const std::string kEmpty;
+  auto it = kCache.find(u_row_cp);
+  return it != kCache.end() ? it->second : kEmpty;
+}
+
+// Cache for I-row suffix strings from U-row
+const std::string& getIRowSuffixFromURowCached(char32_t u_row_cp) {
+  static const auto kCache = []() {
+    std::unordered_map<char32_t, std::string> cache;
+    for (const auto& [type, row] : Conjugation::getGodanRows()) {
+      cache[row.base_vowel] = encodeUtf8(row.i_row);
+    }
+    return cache;
+  }();
+  static const std::string kEmpty;
+  auto it = kCache.find(u_row_cp);
+  return it != kCache.end() ? it->second : kEmpty;
+}
+
 }  // namespace
+
+std::string_view godanARowSuffixFromURow(char32_t u_row_cp) {
+  return getARowSuffixFromURowCached(u_row_cp);
+}
+
+std::string_view godanIRowSuffixFromURow(char32_t u_row_cp) {
+  return getIRowSuffixFromURowCached(u_row_cp);
+}
 
 std::string_view godanBaseSuffixFromARow(char32_t a_row_cp) {
   // Use cached lookup derived from Conjugation::getGodanRows()
@@ -307,6 +343,27 @@ VerbType verbTypeFromIRowCodepoint(char32_t i_row_cp) {
   // Use cached lookup derived from Conjugation::getGodanRows()
   auto* result = lookupByIRow(i_row_cp);
   return result != nullptr ? result->first : VerbType::Unknown;
+}
+
+bool isMixedHiraganaKanji(std::string_view stem) {
+  bool has_hiragana = false;
+  bool has_kanji = false;
+  size_t pos = 0;
+  while (pos + core::kJapaneseCharBytes <= stem.size()) {
+    if (utf8::is3ByteUtf8At(stem, pos)) {
+      char32_t cp = utf8::decode3ByteUtf8At(stem, pos);
+      if (kana::isHiraganaCodepoint(cp)) {
+        has_hiragana = true;
+      } else if (kana::isKanjiCodepoint(cp)) {
+        has_kanji = true;
+      }
+      if (has_hiragana && has_kanji) return true;
+      pos += core::kJapaneseCharBytes;
+    } else {
+      pos += 1;
+    }
+  }
+  return false;
 }
 
 }  // namespace suzume::grammar

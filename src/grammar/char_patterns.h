@@ -211,6 +211,24 @@ bool endsWithARow(std::string_view stem);
 char32_t getVowelForChar(char32_t ch);
 
 /**
+ * @brief Convert Godan U-row (終止形) ending to A-row (未然形) ending
+ * @param u_row_cp U-row codepoint (く, す, つ, etc.)
+ * @return Corresponding a-row ending (か, さ, た, etc.), or empty if invalid
+ *
+ * Mapping: く→か, ぐ→が, す→さ, つ→た, ぬ→な, ぶ→ば, む→ま, る→ら, う→わ
+ */
+std::string_view godanARowSuffixFromURow(char32_t u_row_cp);
+
+/**
+ * @brief Convert Godan U-row (終止形) ending to I-row (連用形) ending
+ * @param u_row_cp U-row codepoint (く, す, つ, etc.)
+ * @return Corresponding i-row ending (き, し, ち, etc.), or empty if invalid
+ *
+ * Mapping: く→き, ぐ→ぎ, す→し, つ→ち, ぬ→に, ぶ→び, む→み, る→り, う→い
+ */
+std::string_view godanIRowSuffixFromURow(char32_t u_row_cp);
+
+/**
  * @brief Get Godan verb base suffix from A-row mizenkei ending
  * @param a_row_cp A-row codepoint (か, さ, た, etc.)
  * @return Corresponding u-row ending (く, す, つ, etc.), or empty if invalid
@@ -259,6 +277,15 @@ std::string_view godanBaseSuffixFromIRow(char32_t i_row_cp);
  * @return Corresponding VerbType, or Unknown if invalid
  */
 VerbType verbTypeFromIRowCodepoint(char32_t i_row_cp);
+
+/**
+ * @brief Check if stem contains both hiragana and kanji characters
+ * @param stem The stem to check
+ * @return True if at least one hiragana and one kanji character are present
+ *
+ * Used to identify idiomatic mixed-script nouns (なし崩し, みじん切り, お茶).
+ */
+bool isMixedHiraganaKanji(std::string_view stem);
 
 }  // namespace suzume::grammar
 

@@ -267,7 +267,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("ずとも", "ぬ", EPOS::AuxNegativeNu),
       aux("ごとく", "ごとく", EPOS::Unknown),
       aux("ごとき", "ごとき", EPOS::Unknown),
-      aux("じゃない", "ではない", EPOS::AuxNegativeNai),
+      // じゃない: removed - split as じゃ(AuxCopulaDa) + ない(AuxNegativeNai)
       aux("ん", "ん", EPOS::AuxNegativeNu),
 
       // Past/Completion - た (過去・完了)
@@ -594,7 +594,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("でナリ", "だ", EPOS::Unknown), aux("でなり", "だ", EPOS::Unknown),
 
       // Elderly/Archaic (老人・古風)
-      aux("じゃ", "だ", EPOS::Unknown), aux("じゃな", "だ", EPOS::Unknown),
+      aux("じゃ", "だ", EPOS::AuxCopulaDa),
       aux("のじゃ", "のだ", EPOS::Unknown), aux("じゃろ", "だろ", EPOS::AuxCopulaDa),
 
       // Regional dialects (方言系)

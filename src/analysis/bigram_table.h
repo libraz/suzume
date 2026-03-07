@@ -70,12 +70,10 @@ namespace bigram_cost {
 // single-token alternatives, but not be so strong that they overwhelm
 // dictionary entries or create false positives.
 constexpr float kVeryStrongBonus = -1.6F;   // Very strong grammatical connection
-constexpr float kExtraVeryStrongBonus = -1.5F;  // Extra very strong (scale compat)
 constexpr float kExtraStrongBonus = -1.0F;  // Extra strong (scale compat)
 constexpr float kStrongBonus = -0.8F;       // Strong grammatical connection
 constexpr float kModerateBonus = -0.5F;     // Normal grammatical connection
 constexpr float kMinorBonus = -0.25F;       // Slight preference
-constexpr float kSlightBonus = -0.2F;       // Slight boost
 
 // Neutral
 constexpr float kNeutral = 0.0F;         // No preference

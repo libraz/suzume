@@ -17,6 +17,25 @@ Lemmatizer::Lemmatizer(const dictionary::DictionaryManager* dict_manager)
 
 namespace {
 
+// Potential verb (可能動詞) endings: godan stem + れる
+// E.g., 書ける (かける), 泊まれる (とまれる), 読める (よめる)
+// Single token 〜れる verbs are treated as potential (ichidan), not passive.
+// Passive forms are split (読ま+れる), so single token 〜れる is likely potential.
+constexpr std::string_view kPotentialVerbEndings[] = {
+    "われる", "かれる", "がれる", "される", "たれる",
+    "なれる", "まれる", "ばれる", "られる"};
+
+// Check if surface ends with any potential verb ending
+bool endsWithPotentialVerbSuffix(std::string_view surface) {
+  for (const auto& ending : kPotentialVerbEndings) {
+    if (surface.size() >= ending.size() &&
+        surface.substr(surface.size() - ending.size()) == ending) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // Verb endings and their base forms
 struct VerbEnding {
   std::string_view suffix;
@@ -524,9 +543,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     // but potential verbs are ichidan verbs - their lemma should be surface itself
     // Passive forms are split (読ま+れる), so single token 〜れる is likely potential
     if (morpheme.pos == core::PartOfSpeech::Verb &&
-        utf8::endsWithAny(morpheme.surface,
-            {"われる", "かれる", "がれる", "される", "たれる",
-             "なれる", "まれる", "ばれる", "られる"})) {
+        endsWithPotentialVerbSuffix(morpheme.surface)) {
       // Single token 〜れる verb: treat as potential verb, lemma = surface
       return morpheme.surface;
     }
@@ -633,9 +650,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     // but potential verbs are ichidan verbs - their lemma should be surface itself
     // Passive forms are split (読ま+れる), so single token 〜れる is likely potential
     if (morpheme.pos == core::PartOfSpeech::Verb &&
-        utf8::endsWithAny(morpheme.surface,
-            {"われる", "かれる", "がれる", "される", "たれる",
-             "なれる", "まれる", "ばれる", "られる"})) {
+        endsWithPotentialVerbSuffix(morpheme.surface)) {
       // Single token 〜れる verb: treat as potential verb, lemma = surface
       return morpheme.surface;
     }
@@ -727,9 +742,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
       // vs Passive: godan_mizen + れる → split as 読ま+れる
       // Since this morpheme is a single token ending in 〜れる, it's likely a potential verb.
       // (Passive forms would be split into 未然形 + れる by the tokenizer)
-      if (utf8::endsWithAny(morpheme.surface,
-          {"われる", "かれる", "がれる", "される", "たれる",
-           "なれる", "まれる", "ばれる", "られる"})) {
+      if (endsWithPotentialVerbSuffix(morpheme.surface)) {
         // Single token 〜れる verb: treat as potential verb, lemma = surface
         return morpheme.surface;
       }
@@ -904,9 +917,7 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
     // Passive forms are split (読ま+れる), so single token 〜れる is likely potential
     if (morpheme.pos == core::PartOfSpeech::Verb &&
         morpheme.lemma != morpheme.surface &&
-        utf8::endsWithAny(morpheme.surface,
-            {"われる", "かれる", "がれる", "される", "たれる",
-             "なれる", "まれる", "ばれる", "られる"})) {
+        endsWithPotentialVerbSuffix(morpheme.surface)) {
       // Single token 〜れる verb: treat as potential verb, lemma = surface
       morpheme.lemma = morpheme.surface;
     }
