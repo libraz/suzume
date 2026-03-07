@@ -1713,7 +1713,7 @@
     {
       "accepted_diff" : {
         "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+        "reason" : "ã¦(ParticleâAuxiliary): Suzume treats ã¦ after verb as AUX_ç¶ç¶, MeCab as æ¥ç¶å©è©"
       },
       "description" : "Explanation style - Current suzume treats compound verb 読み込む differently",
       "expected" : [
@@ -1842,22 +1842,23 @@
           "surface" : "正しく"
         },
         {
-          "lemma" : "読む",
+          "lemma" : "読み込む",
           "pos" : "Verb",
-          "surface" : "読み"
+          "surface" : "読み込ま"
         },
         {
-          "lemma" : "込む",
-          "pos" : "Verb",
-          "surface" : "込まれ"
+          "lemma" : "れる",
+          "pos" : "Auxiliary",
+          "surface" : "れ"
         },
         {
-          "pos" : "Particle",
+          "lemma" : "てる",
+          "pos" : "Auxiliary",
           "surface" : "て"
         },
         {
           "lemma" : "いる",
-          "pos" : "Auxiliary",
+          "pos" : "Verb",
           "surface" : "い"
         },
         {

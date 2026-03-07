@@ -119,9 +119,11 @@ struct Suzume::Impl {
 
     // Auto-load user.dic if found (binary format)
     // Note: user.dic is also loaded as core binary dictionary for now
-    std::string user_path = findDictionary("user.dic");
-    if (!user_path.empty()) {
-      analyzer.dictionaryManager().loadUserBinaryDictionary(user_path);
+    if (!opts.skip_user_dictionary) {
+      std::string user_path = findDictionary("user.dic");
+      if (!user_path.empty()) {
+        analyzer.dictionaryManager().loadUserBinaryDictionary(user_path);
+      }
     }
   }
 };

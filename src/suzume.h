@@ -24,6 +24,7 @@ struct SuzumeOptions {
   bool lemmatize = true;
   bool merge_compounds = false;
   bool remove_symbols = true;  // Remove symbol-only morphemes (default: true)
+  bool skip_user_dictionary = false;  // Skip auto-loading user.dic (for testing)
   postprocess::TagGeneratorOptions tag_options;
   normalize::NormalizeOptions normalize_options;
   analysis::ScorerOptions scorer_options;  // Scoring parameters (tunable at runtime)

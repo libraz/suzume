@@ -20,3 +20,20 @@
 公式が病気	NOUN
 公式が最大手	NOUN
 ヤバ現場	NOUN
+
+# --- common compound words (tokenizer-friendly single tokens) ---
+お姉さん	NOUN
+お兄さん	NOUN
+お兄ちゃん	NOUN
+お姉ちゃん	NOUN
+お父さん	NOUN
+お母さん	NOUN
+おじさん	NOUN
+おばさん	NOUN
+おっさん	NOUN
+おじいさん	NOUN
+おばあさん	NOUN
+男の子	NOUN
+
+# --- 2ch/5ch thread domain terms ---
+二次エロ	NOUN

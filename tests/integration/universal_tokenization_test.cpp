@@ -49,7 +49,11 @@ class UniversalTokenizationTest : public ::testing::Test {
     }
   }
 
-  Suzume analyzer_;
+  Suzume analyzer_{[] {
+    SuzumeOptions opts;
+    opts.skip_user_dictionary = true;
+    return opts;
+  }()};
 };
 
 // Convert filename to valid test suite name

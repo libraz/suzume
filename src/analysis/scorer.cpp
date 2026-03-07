@@ -821,6 +821,18 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kStrongBonus;
   }
 
+  // Bonus for VERB_未然 → AUX_否定古(ず/ずに) connection
+  // Godan mizenkei + classical negative: 書かず, 抜かず, 行かず
+  // The split path needs help to beat merged verb candidates (書かずに as single VERB)
+  // because AUX_否定古 → next token connections have default (high) cost.
+  // Note: lexicalized forms like 思わず(ADV) are handled by the candidate generator
+  // which skips mizenkei_zu generation when verb+ず is in the dictionary.
+  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei &&
+      next.pos == core::PartOfSpeech::Auxiliary &&
+      (next.surface == "ず" || next.surface == "ずに")) {
+    surface_bonus += cost::kStrongBonus;
+  }
+
   // Surface-based penalty for Noun → short VerbRenyokei (compound verb protection)
   // Bigram table gives bonus for Noun→VerbRenyokei (for サ変動詞: 得+し, 損+し)
   // But this should NOT apply to compound verbs like 見+つけ→見つけ

@@ -118,6 +118,41 @@ inline std::string generateRenyokei(std::string_view surface,
   return result;
 }
 
+// Generate mizenkei surface from base form
+// Godan: replace ending with a-row (込む→込ま, 返す→返さ)
+// Ichidan: drop る (続ける→続け, same as renyokei for ichidan)
+inline std::string generateMizenkei(std::string_view surface,
+                                     std::string_view reading,
+                                     V2VerbType verb_type) {
+  std::string_view base = reading.empty() ? surface : reading;
+  if (base.empty()) return "";
+
+  if (verb_type == V2VerbType::Ichidan) {
+    // Drop final る (3 bytes in UTF-8) — same as renyokei
+    if (base.size() >= 3) {
+      return std::string(base.substr(0, base.size() - 3));
+    }
+    return "";
+  }
+
+  // Godan: replace last hiragana with a-row equivalent
+  // む→ま, す→さ, く→か, ぐ→が, う→わ, る→ら, つ→た, ぬ→な, ぶ→ば
+  if (base.size() < 3) return "";
+  std::string result(base.substr(0, base.size() - 3));
+  std::string_view last = base.substr(base.size() - 3);
+  if (last == "む") result += "ま";
+  else if (last == "す") result += "さ";
+  else if (last == "く") result += "か";
+  else if (last == "ぐ") result += "が";
+  else if (last == "う") result += "わ";
+  else if (last == "る") result += "ら";
+  else if (last == "つ") result += "た";
+  else if (last == "ぬ") result += "な";
+  else if (last == "ぶ") result += "ば";
+  else return "";  // Unknown ending
+  return result;
+}
+
 // Te-form euphonic form type for Godan verbs
 enum class TeFormType : uint8_t {
   Ionbin,      // イ音便 (書く→書い, 泳ぐ→泳い) + て/で
@@ -854,6 +889,64 @@ void addCompoundVerbJoinCandidates(
         }
       }
     }
+
+    // MeCab compatibility: Generate mizenkei stem candidate for passive/causative
+    // This enables MeCab-compatible passive splitting: 読み込まれる → 読み込ま|れる
+    // Without this, the compound verb passive form would be a single token
+    // or split as 読み + 込まれる.
+    {
+      // Generate compound mizenkei: V1 renyokei + V2 mizenkei
+      std::string mizenkei = generateMizenkei(
+          best_match.compound_base, "", best_match.v2_verb_type);
+      // For V2 matched via hiragana reading, also try hiragana mizenkei
+      std::string hira_mizenkei;
+      if (best_match.matched_via_reading && !best_match.v2_reading.empty()) {
+        for (const auto& v2_verb : kSubsidiaryVerbs) {
+          std::string_view v2_surface(v2_verb.surface);
+          if (best_match.compound_base.size() >= v2_surface.size() &&
+              best_match.compound_base.compare(
+                  best_match.compound_base.size() - v2_surface.size(),
+                  v2_surface.size(), v2_surface) == 0) {
+            size_t v1_len = best_match.compound_base.size() - v2_surface.size();
+            std::string v1_part = best_match.compound_base.substr(0, v1_len);
+            std::string hira_base = v1_part + best_match.v2_reading;
+            hira_mizenkei = generateMizenkei(hira_base, "", best_match.v2_verb_type);
+            break;
+          }
+        }
+      }
+
+      auto addMizenkeiEdge = [&](const std::string& stem) {
+        if (stem.empty() || stem.size() >= compound_surface.size()) return false;
+        std::string_view text_prefix = text.substr(start_byte, stem.size());
+        if (text_prefix != stem) return false;
+
+        auto stem_decoded = normalize::utf8::decode(stem);
+        size_t stem_end_pos = start_pos + stem_decoded.size();
+        if (stem_end_pos > codepoints.size()) return false;
+
+        // Check that what follows is a passive/causative marker (れ or せ)
+        if (stem_end_pos < codepoints.size()) {
+          char32_t next_char = codepoints[stem_end_pos];
+          if (next_char != U'れ' && next_char != U'せ') return false;
+        }
+
+        // Use base cost without passive+te penalty
+        float mizenkei_cost = base_cost + opts.compound_verb_bonus + opts.verified_v1_bonus;
+        lattice.addEdge(stem, static_cast<uint32_t>(start_pos),
+                        static_cast<uint32_t>(stem_end_pos), core::PartOfSpeech::Verb,
+                        mizenkei_cost, flags, best_match.compound_base,
+                        dictionary::ConjugationType::None, {},
+                        core::CandidateOrigin::Unknown, 0.0F, "compound_mizenkei",
+                        core::ExtendedPOS::VerbMizenkei, "compound_mizenkei");
+        return true;
+      };
+
+      bool added_mizenkei = addMizenkeiEdge(mizenkei);
+      if (!added_mizenkei && !hira_mizenkei.empty()) {
+        addMizenkeiEdge(hira_mizenkei);
+      }
+    }
   }
 }
 
@@ -1496,8 +1589,9 @@ void addVerbSuffixNounJoinCandidates(
   bool is_mono_suffix = (suffix_char == U'物');
   bool is_kata_suffix = (suffix_char == U'方');
   bool is_tokoro_suffix = (suffix_char == U'所');
+  bool is_me_suffix = (suffix_char == U'目');  // 割れ目, 切れ目, 裂け目
 
-  if (!is_mono_suffix && !is_kata_suffix && !is_tokoro_suffix) {
+  if (!is_mono_suffix && !is_kata_suffix && !is_tokoro_suffix && !is_me_suffix) {
     return;
   }
 

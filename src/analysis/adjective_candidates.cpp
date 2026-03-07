@@ -1536,9 +1536,17 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
   // Check if first hiragana is a valid i-adjective ending start
   // I-adjective endings: い, か(った), く(ない/て), け(れば), さ(そう), そ(う) etc.
   char32_t first_hira = codepoints[kata_end];
+  size_t kata_len = kata_end - start_pos;
   if (first_hira != U'い' && first_hira != U'か' &&
       first_hira != U'く' && first_hira != U'け' &&
       first_hira != U'さ' && first_hira != U'そ') {
+    return candidates;
+  }
+
+  // For さ (nominalization), restrict to short katakana stems (2 chars max)
+  // Valid: エモさ, キモさ, ウザさ, ダサさ (2-char stems)
+  // Invalid: レイプさ (3-char stem, レイプい doesn't exist)
+  if (first_hira == U'さ' && kata_len > 2) {
     return candidates;
   }
 

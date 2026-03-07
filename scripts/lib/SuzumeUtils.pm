@@ -1637,6 +1637,7 @@ sub map_mecab_pos {
             return 'Verb' if $lemma eq '合う';     # compound verb suffix (VERB in Suzume)
             return 'Verb' if $lemma eq '込む';     # compound verb suffix (VERB in Suzume)
             return 'Verb' if $lemma eq 'いく';     # ていく aspect (VERB in Suzume)
+            return 'Verb' if $lemma eq 'いる';     # ている progressive (VERB in Suzume)
             # くる/おく/みる: Suzume treats as Auxiliary after て-form
             return 'Verb' if $lemma eq 'ほしい';   # てほしい desire (VERB in Suzume)
             return 'Verb' if $lemma eq 'いただく'; # ていただく humble receive (VERB in Suzume)
@@ -1777,10 +1778,20 @@ sub correct_mecab_pos {
         my $surface = $t->{surface};
         my $pos = $t->{pos};
 
-        # Fix よく: always 形容詞 (連用形 of よい), not 副詞
-        if ($surface eq 'よく' && $pos eq '副詞') {
-            $t->{pos} = '形容詞';
-            $t->{lemma} = 'よい';
+        # Fix adjective 連用形 (〜く): always 形容詞, not 副詞
+        # MeCab classifies some adjective renyokei as 副詞 (e.g., よく, 正しく, 早く)
+        # Suzume correctly identifies them as Adjective (連用形)
+        if ($surface =~ /く$/ && $pos eq '副詞') {
+            my $lemma = $t->{lemma} // '';
+            # Check if the lemma suggests adjective origin (ends in い or く)
+            if ($lemma =~ /[いく]$/ || $lemma eq $surface) {
+                $t->{pos} = '形容詞';
+                # Fix lemma: 正しく → 正しい, よく → よい
+                if ($lemma eq $surface || $lemma =~ /く$/) {
+                    (my $adj_lemma = $surface) =~ s/く$/い/;
+                    $t->{lemma} = $adj_lemma;
+                }
+            }
         }
 
         # Fix particles misclassified as Noun
@@ -2022,6 +2033,24 @@ sub _postprocess_ii {
     }
 }
 
+# て/で after verb renyokei/onbinkei: Particle → Auxiliary
+# MeCab classifies て as 助詞(接続助詞), Suzume treats as 助動詞(継続)
+sub _postprocess_te {
+    my ($tokens) = @_;
+    for my $i (1 .. $#$tokens) {
+        my $t = $tokens->[$i];
+        my $surface = $t->{surface} // '';
+        next unless ($surface eq 'て' || $surface eq 'で');
+        next unless ($t->{pos} // '') eq 'Particle';
+
+        my $prev_pos = $tokens->[$i - 1]{pos} // '';
+        if ($prev_pos eq 'Verb' || $prev_pos eq 'Auxiliary' || $prev_pos eq 'Adjective') {
+            $t->{pos} = 'Auxiliary';
+            $t->{lemma} = $surface eq 'て' ? 'てる' : 'でる';
+        }
+    }
+}
+
 sub _postprocess_mecab_tokens {
     my ($tokens, $original_text, $replacements) = @_;
     return $tokens unless %$replacements;
@@ -2108,6 +2137,8 @@ sub get_expected_tokens {
     _postprocess_ikaga(\@tokens);
     _postprocess_demo(\@tokens);
     _postprocess_ii(\@tokens);
+    # Note: て/で POS (Particle vs Auxiliary) is a genuine difference between
+    # MeCab and Suzume. Not normalized here — handled via suzume_expected when needed.
 
     # Normalize full-width alphanumeric to half-width in surfaces/lemmas
     # Suzume's pretokenizer converts full-width to half-width, so MeCab output must match

@@ -545,6 +545,15 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
     return candidates;
   }
 
+  // Skip if this kanji is preceded by another kanji - it's likely the tail end
+  // of a longer kanji compound, not the start of a new kanji+hiragana word.
+  // E.g., in 魔法少女まどか, skip generating 女まど at pos=3.
+  // Dictionary entries (玉ねぎ etc.) are handled separately as dict candidates.
+  if (start_pos > 0 &&
+      char_types[start_pos - 1] == normalize::CharType::Kanji) {
+    return candidates;
+  }
+
   // Find kanji portion (1 character only for compound nouns)
   size_t kanji_end = findCharRegionEnd(char_types, start_pos, 1,
                                         normalize::CharType::Kanji);

@@ -264,6 +264,80 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     }
   }
 
+  // Godan mizenkei pattern: kanji + A-row hiragana + ず (classical negative)
+  // E.g., 抜かずに → 抜か (mizenkei of 抜く) + ず + に
+  //       行かずに → 行か (mizenkei of 行く) + ず + に
+  //       書かずに → 書か (mizenkei of 書く) + ず + に
+  // The main loop skips single A-row hiragana as particle (か, etc.)
+  // so we generate mizenkei candidates explicitly when followed by ず.
+  if (kanji_end + 1 < hiragana_end && codepoints[kanji_end + 1] == U'ず') {
+    char32_t first_hira = codepoints[kanji_end];
+    if (grammar::isARowCodepoint(first_hira)) {
+      grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(first_hira);
+      if (verb_type != grammar::VerbType::Unknown) {
+        std::string_view base_suffix = grammar::godanBaseSuffixFromARow(first_hira);
+        if (!base_suffix.empty()) {
+          std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+          std::string base_form = kanji_stem + std::string(base_suffix);
+          std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
+
+          // Verify via dictionary or inflection analysis of conjugated form
+          bool is_valid = vh::isVerbInDictionary(dict_manager, base_form);
+          if (!is_valid) {
+            // Analyze mizenkei+ない form (standard negative) for better confidence
+            // Base form alone (e.g., 躊躇う) may not be recognized
+            std::string neg_form = surface + "ない";
+            auto infl_results = inflection.analyze(neg_form);
+            for (const auto& cand : infl_results) {
+              if (cand.base_form == base_form && cand.verb_type == verb_type &&
+                  cand.confidence >= 0.3F) {
+                is_valid = true;
+                break;
+              }
+            }
+          }
+
+          if (is_valid) {
+            // Skip if verb+ず or verb+ずに is a dictionary entry (e.g., 思わず=ADV)
+            // In that case, the dictionary entry should win over the split path
+            bool dict_has_zu_form = false;
+            if (dict_manager != nullptr) {
+              std::string zu_form = surface + "ず";
+              std::string zuni_form = surface + "ずに";
+              auto zu_results = dict_manager->lookup(zu_form, 0);
+              for (const auto& r : zu_results) {
+                if (r.entry != nullptr && r.entry->surface == zu_form) {
+                  dict_has_zu_form = true;
+                  break;
+                }
+              }
+              if (!dict_has_zu_form) {
+                auto zuni_results = dict_manager->lookup(zuni_form, 0);
+                for (const auto& r : zuni_results) {
+                  if (r.entry != nullptr && r.entry->surface == zuni_form) {
+                    dict_has_zu_form = true;
+                    break;
+                  }
+                }
+              }
+            }
+            if (!dict_has_zu_form) {
+              constexpr float kCost = 0.1F;
+              SUZUME_DEBUG_LOG("[VERB_CAND] " << surface
+                              << " godan_mizenkei_zu lemma=" << base_form
+                              << " cost=" << kCost << "\n");
+              candidates.push_back(makeVerbCandidate(
+                  surface, start_pos, kanji_end + 1, kCost, base_form,
+                  grammar::verbTypeToConjType(verb_type),
+                  true, CandidateOrigin::VerbKanji, 0.8F, "godan_mizenkei_zu",
+                  core::ExtendedPOS::VerbMizenkei));
+            }
+          }
+        }
+      }
+    }
+  }
+
   // Try different stem lengths (kanji only, or kanji + 1 hiragana for ichidan)
   // This handles both godan (kanji stem) and ichidan (kanji + hiragana stem)
   for (size_t stem_end = kanji_end; stem_end <= kanji_end + 1 && stem_end < hiragana_end; ++stem_end) {
@@ -1214,7 +1288,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         }
 
         // Calculate base cost for passive candidates
-        float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_confidence) * verb_opts.confidence_cost_scale_small;
+        // Add penalty so the MeCab-compatible split path (縛ら+れ) can compete
+        // Without this, the merged form (縛られ) has too low a cost (-0.16)
+        // and always beats the split path (縛ら(0.1) + れ(aux))
+        constexpr float kPassivePenalty = 0.5F;
+        float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_confidence) * verb_opts.confidence_cost_scale_small + kPassivePenalty;
 
         // Skip renyokei candidate for べき patterns
         if (!is_beki_pattern) {
@@ -1593,17 +1671,17 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
               // Verify the base form is a valid verb
               // First check dictionary, then fall back to inflection analysis
-              // IMPORTANT: For passive pattern, require dictionary check only.
-              // The inflection analyzer is too permissive for passive patterns -
-              // it will accept patterns like 泊む (from 泊まれる) which don't exist.
-              // This causes potential verbs (泊まれる = potential of 泊まる) to be
-              // incorrectly split as passive (泊ま + れる, as if from 泊む).
-              // EXCEPTION: WA-row verbs (わ行) don't have this issue because
-              // WA-row passive (奪われる = 奪わ + れる) doesn't conflict with
-              // potential form (which uses え段 for WA-row: 買える, not 買われる).
+              // IMPORTANT: For passive pattern, require dictionary check only for
+              // most verb rows. The inflection analyzer is too permissive and will
+              // accept patterns like 泊む (from 泊まれる) which don't exist.
+              // EXCEPTIONS that allow inflection fallback:
+              // - WA-row (わ行): passive (奪われる) doesn't conflict with potential
+              // - RA-row (ら行): Xらる is not a valid modern verb, so Xられる
+              //   is always passive of Xる (e.g., 縛られる = passive of 縛る)
               bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
-              // For passive pattern, allow inflection fallback only for WA-row verbs
-              bool allow_inflection_fallback = !is_passive_pattern || first_hira == U'わ';
+              // For passive pattern, allow inflection fallback for WA-row and RA-row
+              bool allow_inflection_fallback = !is_passive_pattern ||
+                  first_hira == U'わ' || first_hira == U'ら';
               if (!is_valid_verb && allow_inflection_fallback) {
                 // For non-passive patterns (ない, ぬ, etc.), allow inflection fallback
                 // For WA-row passive, also allow with higher confidence threshold
@@ -1611,6 +1689,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                 auto infl_result = inflection.getBest(base_form);
                 is_valid_verb = infl_result.confidence > threshold &&
                                 vh::isGodanVerbType(infl_result.verb_type);
+              }
+
+              // Skip irregular verb 来る for passive — its passive is 来+られる, not 来ら+れる
+              if (is_valid_verb && is_passive_pattern && base_form == "来る") {
+                is_valid_verb = false;
               }
 
               if (is_valid_verb) {
@@ -1907,6 +1990,15 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         }
         if (matched_verb_type == grammar::VerbType::Unknown &&
             !starts_with_dict_noun && !remainder_is_dict_verb) {
+          // Skip inflection fallback for long kanji stems (3+ kanji chars)
+          // Real verbs rarely have 3+ pure kanji characters without dictionary entry
+          // E.g., 画像貼っ (3 kanji) is likely 画像+貼っ, not verb 画像貼る
+          size_t kanji_char_count = kanji_end - start_pos;
+          if (kanji_char_count >= 3) {
+            SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem
+                                      << "\" too many kanji chars (" << kanji_char_count
+                                      << ") for non-dict sokuonbin\n");
+          } else {
           // Minimum length: kanji + っ + て/た = kanji_end + 2 (inclusive)
           float best_conf = 0.0F;
           for (size_t try_end = hiragana_end; try_end >= kanji_end + 2; --try_end) {
@@ -1930,6 +2022,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               break;
             }
           }
+          }  // kanji_char_count < 3
         }
 
 #ifdef SUZUME_DEBUG
