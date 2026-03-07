@@ -17,6 +17,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
+#include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "suffix_candidates.h"
 #include "verb_candidates.h"
@@ -942,17 +943,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
       // to avoid false matches like のやり, はしり, がわり
       if (seq_len == 3) {
         char32_t first = codepoints[start_pos];
-        static constexpr char32_t kParticleChars[] = {
-            U'の', U'は', U'が', U'を', U'に', U'で',
-            U'も', U'と', U'へ', U'か', U'や', U'ら'};
-        bool starts_with_particle = false;
-        for (auto pc : kParticleChars) {
-          if (first == pc) {
-            starts_with_particle = true;
-            break;
-          }
-        }
-        if (starts_with_particle) {
+        if (normalize::isParticleCodepoint(first) || first == U'ら') {
           // Skip - likely particle + verb stem, not onomatopoeia
         } else {
           std::string surface = extractSubstring(codepoints, start_pos, start_pos + 3);

@@ -38,8 +38,6 @@ core::Lattice Tokenizer::buildLattice(
 
   // Process each position
   for (size_t pos = 0; pos < codepoints.size(); ++pos) {
-    size_t before_count = lattice.edgesAt(pos).size();
-
     // Add dictionary candidates
     addDictionaryCandidates(lattice, text, codepoints, pos);
 
@@ -80,9 +78,7 @@ core::Lattice Tokenizer::buildLattice(
     addVerbSuffixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
 
     // Log candidate count per position
-    size_t after_count = lattice.edgesAt(pos).size();
-    SUZUME_DEBUG_LOG("[LATTICE] pos=" << pos << " candidates=" << after_count
-                      << " (+" << (after_count - before_count) << ")\n");
+    SUZUME_DEBUG_LOG("[LATTICE] pos=" << pos << " candidates=" << lattice.edgesAt(pos).size() << "\n");
   }
 
   // Fallback: ensure every position has at least one edge

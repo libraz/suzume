@@ -692,6 +692,18 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
           }
 
+          // Skip GodanMa renyokei (漢字+み) when base form is not in dictionary.
+          // Renyokei み competes with auxiliary みたい — without dict verification,
+          // 猫みたい (noun+aux) cannot be distinguished from 読みたい (verb+aux).
+          // Requires all single-kanji GODAN_MA verbs to be enumerated in L2 dict.
+          if (best.verb_type == grammar::VerbType::GodanMa &&
+              hiragana_part == "み" && kanji_end - start_pos <= 3) {
+            std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "む";
+            if (!vh::isVerbInDictionary(dict_manager, base_form)) {
+              continue;
+            }
+          }
+
           // Skip verb + ます auxiliary patterns
           if (vh::shouldSkipMasuAuxPattern(surface, best.verb_type)) {
             continue;  // Skip - let the split (verb + dictionary aux) win
@@ -1359,8 +1371,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         // Add penalty so the MeCab-compatible split path (縛ら+れ) can compete
         // Without this, the merged form (縛られ) has too low a cost (-0.16)
         // and always beats the split path (縛ら(0.1) + れ(aux))
-        constexpr float kPassivePenalty = 0.5F;
-        float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_confidence) * verb_opts.confidence_cost_scale_small + kPassivePenalty;
+        float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_confidence) * verb_opts.confidence_cost_scale_small + bigram_cost::kMinor;
 
         // Skip renyokei candidate for べき patterns
         if (!is_beki_pattern) {

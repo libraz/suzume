@@ -10,6 +10,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/inflection.h"
+#include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
 
@@ -1031,9 +1032,7 @@ void addHiraganaCompoundVerbJoinCandidates(
       // Skip V1 starting with particles - no verb stem starts with を/が/は/に/で/と/へ
       // E.g., をかきたてる should be を + かきたてる, not をかく + 立てる
       char32_t first_char = codepoints[start_pos];
-      if (first_char == U'を' || first_char == U'が' || first_char == U'は' ||
-          first_char == U'に' || first_char == U'で' || first_char == U'と' ||
-          first_char == U'へ' || first_char == U'も') {
+      if (normalize::isParticleCodepoint(first_char)) {
         continue;
       }
 

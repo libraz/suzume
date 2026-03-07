@@ -228,6 +228,17 @@ bool isORowHiragana(char32_t ch);
  */
 bool isKanjiCodepoint(char32_t ch);
 
+/**
+ * @brief Check if a kanji codepoint is a counter/unit (助数詞・単位)
+ *
+ * Counter kanji that naturally follow digits: 円, 分, 個, 人, etc.
+ * Used to determine if a digit+kanji merge is valid.
+ *
+ * @param cp Unicode codepoint
+ * @return true if codepoint is a counter/unit kanji
+ */
+bool isCounterKanji(char32_t cp);
+
 }  // namespace suzume::normalize
 
 #endif  // SUZUME_NORMALIZE_CHAR_TYPE_H_

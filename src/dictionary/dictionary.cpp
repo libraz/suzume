@@ -11,6 +11,7 @@
 
 namespace suzume::dictionary {
 
+#ifndef __EMSCRIPTEN__
 namespace {
 
 /**
@@ -24,6 +25,7 @@ std::string getHomeDir() {
 }
 
 }  // namespace
+#endif  // __EMSCRIPTEN__
 
 DictionaryManager::DictionaryManager()
     : core_dict_(std::make_unique<CoreDictionary>()) {}

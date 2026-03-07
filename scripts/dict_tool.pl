@@ -119,6 +119,26 @@ if ($command eq 'check') {
     die "Unknown command: $command\n";
 }
 
+sub recompile_core_dic {
+    my $cli = "./build/bin/suzume-cli";
+    unless (-x $cli) {
+        print "  ⚠️  $cli not found, skipping recompile\n";
+        return 0;
+    }
+    # Concatenate all TSV files and compile into core.dic
+    my $tmp = "/tmp/suzume_core_combined_$$.tsv";
+    system("cat data/core/*.tsv > $tmp");
+    my $ret = system("$cli dict compile $tmp data/core.dic 2>/dev/null");
+    unlink $tmp;
+    if ($ret == 0) {
+        print "  ✓ Recompiled data/core.dic\n";
+        return 1;
+    } else {
+        print "  ❌ Failed to recompile data/core.dic\n";
+        return 0;
+    }
+}
+
 sub print_help {
     print <<'HELP';
 L2 Dictionary helper for adding entries safely
@@ -594,7 +614,7 @@ sub cmd_add {
         print "✓ Added: $entry_line ($placement_msg in $target_file)\n";
     }
 
-    print "  Recompile: ./build/bin/suzume-cli dict compile data/core/*.tsv data/core.dic\n";
+    recompile_core_dic();
 
     return 1;
 }
@@ -793,7 +813,7 @@ sub cmd_remove {
     close $out;
 
     print "\n✓ Removed '$word' from $target_file\n";
-    print "  Recompile: ./build/bin/suzume-cli dict compile data/core/*.tsv data/core.dic\n";
+    recompile_core_dic();
 }
 
 sub cmd_disable {
@@ -829,7 +849,7 @@ sub cmd_disable {
 
     print "\n✓ Disabled '$word' in $target_file\n";
     print "  Use 'enable' to re-activate, or 'remove' to delete permanently\n";
-    print "  Recompile: ./build/bin/suzume-cli dict compile data/core/*.tsv data/core.dic\n";
+    recompile_core_dic();
 }
 
 sub cmd_enable {
@@ -868,7 +888,7 @@ sub cmd_enable {
     close $out;
 
     print "\n✓ Enabled '$word' in $target_file\n";
-    print "  Recompile: ./build/bin/suzume-cli dict compile data/core/*.tsv data/core.dic\n";
+    recompile_core_dic();
 }
 
 sub cmd_validate {
@@ -989,8 +1009,7 @@ sub cmd_validate {
             print "\nApplying fixes...\n";
             remove_lines($dict_path, \@lines_to_remove);
             print "✓ Removed ", scalar(@lines_to_remove), " lines\n";
-            print "\nRemember to recompile the dictionary:\n";
-            print "  ./build/bin/suzume-cli dict compile data/core/*.tsv data/core.dic\n";
+            recompile_core_dic();
         } else {
             print "\nTo apply fixes, run:\n";
             print "  ./scripts/dict_tool.pl validate --fix\n";

@@ -576,6 +576,7 @@ constexpr const char* kPatternDeIru = "でいる";    // で+いる (voiced)
 constexpr const char* kPatternTeMora = "てもら";   // て+もらう
 constexpr const char* kPatternDeMora = "でもら";   // で+もらう (voiced)
 constexpr const char* kPatternTeOku = "ておく";    // て+おく
+constexpr const char* kPatternTeOi = "ておい";     // て+おく renyokei
 constexpr const char* kPatternDeOku = "でおく";    // で+おく (voiced)
 constexpr const char* kPatternTeAge = "てあげ";    // て+あげる
 constexpr const char* kPatternDeAge = "であげ";    // で+あげる (voiced)
@@ -667,7 +668,7 @@ constexpr const char* kTeFormAuxPenaltyPatterns[] = {
     kPatternTeAge,    // てあげ
     kPatternTeOku,    // ておく
     kPatternDeOku,    // でおく
-    "ておい",         // ておく renyokei
+    kPatternTeOi,     // ておく renyokei
     kPatternTeMiru,   // てみる
     kPatternDeMiru,   // でみる
 };

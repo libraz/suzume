@@ -21,7 +21,7 @@
 
 namespace {
 // Helper to log confidence adjustments
-void logConfidenceAdjustment(float amount, const char* reason) {
+void logConfidenceAdjustment(float amount, [[maybe_unused]] const char* reason) {
   if (amount != 0.0F) {
     SUZUME_DEBUG_LOG_TRACE("  " << reason << ": "
                             << (amount > 0 ? "+" : "") << amount << "\n");

@@ -188,6 +188,73 @@ int cmdDictValidate(const std::vector<std::string>& args, bool /* verbose */) {
   return 1;
 }
 
+// Expand glob patterns in a path (e.g., "data/core/*.tsv")
+// Returns the path as-is if it contains no glob characters or if expansion
+// yields no matches.
+std::vector<std::string> expandGlob(const std::string& pattern) {
+  // Check if the pattern contains glob characters
+  if (pattern.find('*') == std::string::npos &&
+      pattern.find('?') == std::string::npos) {
+    return {pattern};
+  }
+
+  namespace fs = std::filesystem;
+
+  // Split into directory and filename pattern
+  fs::path p(pattern);
+  fs::path dir = p.parent_path();
+  std::string file_pattern = p.filename().string();
+
+  if (dir.empty()) {
+    dir = ".";
+  }
+
+  if (!fs::exists(dir) || !fs::is_directory(dir)) {
+    return {pattern};
+  }
+
+  // Convert glob pattern to regex
+  std::string regex_str;
+  for (char ch : file_pattern) {
+    if (ch == '*') {
+      regex_str += ".*";
+    } else if (ch == '?') {
+      regex_str += ".";
+    } else if (ch == '.' || ch == '^' || ch == '$' || ch == '+' ||
+               ch == '(' || ch == ')' || ch == '[' || ch == ']' ||
+               ch == '|' || ch == '\\') {
+      regex_str += '\\';
+      regex_str += ch;
+    } else {
+      regex_str += ch;
+    }
+  }
+
+  std::regex re(regex_str);
+  std::vector<std::string> matches;
+
+  for (const auto& entry : fs::directory_iterator(dir)) {
+    if (entry.is_regular_file() &&
+        std::regex_match(entry.path().filename().string(), re)) {
+      matches.push_back(entry.path().string());
+    }
+  }
+
+  std::sort(matches.begin(), matches.end());
+
+  return matches.empty() ? std::vector<std::string>{pattern} : matches;
+}
+
+// Expand all glob patterns in a list of paths
+std::vector<std::string> expandGlobs(const std::vector<std::string>& paths) {
+  std::vector<std::string> result;
+  for (const auto& path : paths) {
+    auto expanded = expandGlob(path);
+    result.insert(result.end(), expanded.begin(), expanded.end());
+  }
+  return result;
+}
+
 int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
   if (args.empty()) {
     printError(
@@ -210,7 +277,29 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
       dic_path = tsv_path + ".dic";
     }
 
-    auto result = compiler.compile(tsv_path, dic_path);
+    // Single arg might be a glob pattern
+    auto expanded = expandGlob(tsv_path);
+    if (expanded.size() == 1 && expanded[0] == tsv_path) {
+      // No glob expansion, single file compile
+      auto result = compiler.compile(tsv_path, dic_path);
+      if (!result.hasValue()) {
+        printError("Compile error: " + result.error().message);
+        return 1;
+      }
+
+      std::cout << "Compiled " << result.value() << " entries to " << dic_path
+                << "\n";
+      return 0;
+    }
+
+    // Glob expanded to multiple files - need an output path
+    // Use the directory name as base: data/core/*.tsv -> data/core.dic
+    namespace fs = std::filesystem;
+    fs::path p(tsv_path);
+    fs::path dir = p.parent_path();
+    dic_path = dir.string() + ".dic";
+
+    auto result = compiler.compileMultiple(expanded, dic_path);
     if (!result.hasValue()) {
       printError("Compile error: " + result.error().message);
       return 1;
@@ -228,7 +317,8 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
     return 1;
   }
 
-  std::vector<std::string> tsv_paths(args.begin(), args.end() - 1);
+  std::vector<std::string> raw_paths(args.begin(), args.end() - 1);
+  auto tsv_paths = expandGlobs(raw_paths);
 
   auto result = compiler.compileMultiple(tsv_paths, dic_path);
   if (!result.hasValue()) {

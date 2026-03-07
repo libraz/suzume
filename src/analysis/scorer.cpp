@@ -82,7 +82,7 @@ constexpr float kBigramCostTable[13][13] = {
 namespace suzume::analysis {
 
 // static
-void Scorer::logAdjustment(float amount, const char* reason) {
+void Scorer::logAdjustment(float amount, [[maybe_unused]] const char* reason) {
   if (amount != 0.0F) {
     SUZUME_DEBUG_LOG_VERBOSE("  " << reason << ": "
                             << (amount > 0 ? "+" : "") << amount << "\n");

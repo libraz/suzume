@@ -292,4 +292,33 @@ bool isKanjiCodepoint(char32_t ch) {
          (ch >= 0x2F00 && ch <= 0x2FDF);      // Kangxi Radicals
 }
 
+bool isCounterKanji(char32_t cp) {
+  switch (cp) {
+    // Currency/value
+    case U'円': case U'銭': case U'万': case U'億': case U'兆':
+    // Time
+    case U'分': case U'秒': case U'時': case U'日': case U'月':
+    case U'年': case U'週': case U'期': case U'世':
+    // General counters
+    case U'個': case U'本': case U'人': case U'台': case U'枚':
+    case U'杯': case U'回': case U'歳': case U'才': case U'階':
+    case U'号': case U'番': case U'匹': case U'冊': case U'件':
+    case U'丁': case U'通': case U'発': case U'点': case U'票':
+    case U'頭': case U'羽': case U'着': case U'足': case U'軒':
+    case U'組': case U'曲': case U'巻': case U'畳': case U'割':
+    case U'部': case U'面': case U'問': case U'章': case U'棟':
+    case U'戸': case U'席': case U'食': case U'泊': case U'口':
+    case U'束': case U'両': case U'機': case U'基': case U'隻':
+    // Units/measures
+    case U'度': case U'倍': case U'段': case U'級': case U'位':
+    case U'種': case U'色': case U'名': case U'話': case U'連':
+    case U'敗': case U'勝': case U'戦':
+    // Compound second char (時間, 分間, 年間, 世紀, etc.)
+    case U'間': case U'紀':
+      return true;
+    default:
+      return false;
+  }
+}
+
 }  // namespace suzume::normalize

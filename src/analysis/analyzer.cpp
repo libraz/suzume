@@ -143,10 +143,12 @@ std::vector<core::Morpheme> Analyzer::analyzeSpan(std::string_view text,
   auto norm_result = normalizer_.normalize(text);
   if (!core::isSuccess(norm_result)) {
     // Log normalization failure (likely invalid UTF-8 input)
-    auto& error = std::get<core::Error>(norm_result);
-    SUZUME_DEBUG_LOG("[ANALYZER] Normalization failed in analyzeSpan: "
-                     << error.message
-                     << " (code=" << static_cast<int>(error.code) << ")\n");
+    SUZUME_DEBUG_BLOCK {
+      auto& error = std::get<core::Error>(norm_result);
+      SUZUME_DEBUG_STREAM << "[ANALYZER] Normalization failed in analyzeSpan: "
+                          << error.message
+                          << " (code=" << static_cast<int>(error.code) << ")\n";
+    }
     return {};  // Return empty vector for invalid input
   }
   std::string normalized = std::get<std::string>(norm_result);
@@ -279,10 +281,12 @@ std::vector<core::Morpheme> Analyzer::analyzeDebug(std::string_view text,
   auto norm_result = normalizer_.normalize(text);
   if (!core::isSuccess(norm_result)) {
     // Log normalization failure (likely invalid UTF-8 input)
-    auto& error = std::get<core::Error>(norm_result);
-    SUZUME_DEBUG_LOG("[ANALYZER] Normalization failed in analyzeDebug: "
-                     << error.message
-                     << " (code=" << static_cast<int>(error.code) << ")\n");
+    SUZUME_DEBUG_BLOCK {
+      auto& error = std::get<core::Error>(norm_result);
+      SUZUME_DEBUG_STREAM << "[ANALYZER] Normalization failed in analyzeDebug: "
+                          << error.message
+                          << " (code=" << static_cast<int>(error.code) << ")\n";
+    }
     return {};  // Return empty vector for invalid input
   }
   std::string normalized = std::get<std::string>(norm_result);

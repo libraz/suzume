@@ -1826,19 +1826,21 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       // NOT kanji stem + み nominalization
       if (std::string_view(pattern) == "み" &&
           verb_helpers::isCompoundAdjectivePattern(hiragana_part)) {
-        // Extract the compound suffix for detailed logging
-        const char* compound_suffix = "compound";
-        if (hiragana_part.find("やすい") != std::string::npos ||
-            hiragana_part.find("やすく") != std::string::npos) {
-          compound_suffix = "やすい";
-        } else if (hiragana_part.find("にくい") != std::string::npos ||
-                   hiragana_part.find("にくく") != std::string::npos) {
-          compound_suffix = "にくい";
-        } else if (hiragana_part.find("がたい") != std::string::npos ||
-                   hiragana_part.find("がたく") != std::string::npos) {
-          compound_suffix = "がたい";
+        SUZUME_DEBUG_VERBOSE_BLOCK {
+          // Extract the compound suffix for detailed logging
+          const char* compound_suffix = "compound";
+          if (hiragana_part.find("やすい") != std::string::npos ||
+              hiragana_part.find("やすく") != std::string::npos) {
+            compound_suffix = "やすい";
+          } else if (hiragana_part.find("にくい") != std::string::npos ||
+                     hiragana_part.find("にくく") != std::string::npos) {
+            compound_suffix = "にくい";
+          } else if (hiragana_part.find("がたい") != std::string::npos ||
+                     hiragana_part.find("がたく") != std::string::npos) {
+            compound_suffix = "がたい";
+          }
+          SUZUME_DEBUG_STREAM << "[ADJ_STEM]   skip: compound adjective (contains \"" << compound_suffix << "\")\n";
         }
-        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   skip: compound adjective (contains \"" << compound_suffix << "\")\n");
         continue;  // Skip - this is likely verb + やすい/にくい, not adjective + み
       }
 
