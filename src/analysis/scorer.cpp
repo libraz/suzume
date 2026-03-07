@@ -876,6 +876,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kStrongBonus;
   }
 
+  // Bonus for AUX_否定古(ずに) → VERB connection
+  // ずに+帰る, ずに+済む etc. are natural patterns
+  // Without this, split path ず+に+帰る wins due to PART_格→VERB having lower default cost
+  if (prev.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
+      prev.surface == "ずに" &&
+      (next.pos == core::PartOfSpeech::Verb ||
+       next.pos == core::PartOfSpeech::Adjective)) {
+    surface_bonus += cost::kModerateBonus;  // -0.5 to match PART_格→VERB cost
+  }
+
   // Surface-based penalty for Noun → short VerbRenyokei (compound verb protection)
   // Bigram table gives bonus for Noun→VerbRenyokei (for サ変動詞: 得+し, 損+し)
   // But this should NOT apply to compound verbs like 見+つけ→見つけ
