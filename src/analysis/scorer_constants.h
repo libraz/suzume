@@ -649,6 +649,41 @@ constexpr const char* kTeFormAuxPatternsForVerb[] = {
 constexpr size_t kTeFormAuxPatternsForVerbSize =
     sizeof(kTeFormAuxPatternsForVerb) / sizeof(kTeFormAuxPatternsForVerb[0]);
 
+// Te-form + auxiliary patterns for verb candidate penalty (16 patterns)
+// Used in: verb_candidates_kanji.cpp and verb_candidates_hiragana.cpp
+// Subset of kTeFormAuxPatternsForVerb + ておい (ておく renyokei)
+// Excludes てある/である/ておる/でおる/ていく/でいく/であげ (rare in compound verbs)
+constexpr const char* kTeFormAuxPenaltyPatterns[] = {
+    kPatternTeKuru,   // てくる
+    kPatternDeKuru,   // でくる
+    kPatternTeKure,   // てくれ
+    kPatternDeKure,   // でくれ
+    kPatternTeIru,    // ている
+    kPatternDeIru,    // でいる
+    kPatternTeShima,  // てしま
+    kPatternDeShima,  // でしま
+    kPatternTeMora,   // てもら
+    kPatternDeMora,   // でもら
+    kPatternTeAge,    // てあげ
+    kPatternTeOku,    // ておく
+    kPatternDeOku,    // でおく
+    "ておい",         // ておく renyokei
+    kPatternTeMiru,   // てみる
+    kPatternDeMiru,   // でみる
+};
+constexpr size_t kTeFormAuxPenaltyPatternsSize =
+    sizeof(kTeFormAuxPenaltyPatterns) / sizeof(kTeFormAuxPenaltyPatterns[0]);
+
+// Causative auxiliary patterns for verb candidate penalty
+// Used in: verb_candidates_kanji.cpp and verb_candidates_hiragana.cpp
+// Pattern: verb mizenkei + せ/させ + auxiliary (ない/て/た/ず/る/ろ/よ/なく)
+constexpr const char* kCausativeAuxPenaltyPatterns[] = {
+    "せない", "せなく", "せなかっ", "せて", "せた", "せず", "せる", "せろ", "せよ",
+    "させない", "させなく", "させて", "させた", "させず", "させる", "させろ", "させよ",
+};
+constexpr size_t kCausativeAuxPenaltyPatternsSize =
+    sizeof(kCausativeAuxPenaltyPatterns) / sizeof(kCausativeAuxPenaltyPatterns[0]);
+
 // I-adjective conjugation suffixes (standalone, not verb candidates)
 // These patterns are conjugation endings for i-adjectives:
 // - か行: past (高かった), conditional past (高かったら)

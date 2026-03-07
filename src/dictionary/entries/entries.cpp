@@ -179,6 +179,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
       particle("くらい", EPOS::ParticleAdverbial),
       particle("ぐらい", EPOS::ParticleAdverbial),
       particle("など", EPOS::ParticleAdverbial),
+      particle("とか", EPOS::ParticleAdverbial),  // 並立 (AとかBとか)
       particle("なんて", EPOS::ParticleAdverbial),
       particle("ってば", EPOS::ParticleFinal),
       particle("ったら", EPOS::ParticleFinal),

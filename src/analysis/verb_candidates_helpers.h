@@ -187,6 +187,23 @@ bool shouldSkipCausativeAuxPattern(std::string_view surface, grammar::VerbType v
 bool shouldSkipSuruVerbAuxPattern(std::string_view surface, size_t kanji_count);
 
 // =============================================================================
+// Auxiliary Pattern Penalty Checks (for verb candidate cost adjustment)
+// =============================================================================
+
+/**
+ * @brief Check if surface contains te-form + auxiliary verb patterns
+ * Uses kTeFormAuxPenaltyPatterns from scorer_constants.h
+ */
+bool containsTeFormAuxPattern(std::string_view surface);
+
+/**
+ * @brief Check if surface contains causative auxiliary patterns (contains-based)
+ * Uses kCausativeAuxPenaltyPatterns from scorer_constants.h
+ * Unlike shouldSkipCausativeAuxPattern, this uses contains() not endsWith()
+ */
+bool containsCausativeAuxPattern(std::string_view surface);
+
+// =============================================================================
 // Character Region Detection
 // =============================================================================
 

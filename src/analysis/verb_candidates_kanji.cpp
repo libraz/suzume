@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "analysis/bigram_table.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "core/debug.h"
@@ -759,27 +760,38 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // E.g., 戦いたい = 戦い + たい, not single VERB
           if (utf8::endsWith(surface, "たい") || utf8::endsWith(surface, "たく") ||
               utf8::endsWith(surface, "たかっ")) {
-            base_cost += 1.0F;  // Penalize to favor split path
+            base_cost += bigram_cost::kRare;  // Penalize to favor split path
+          }
+          // Penalty for verb candidates containing causative auxiliary chains
+          // MeCab splits: 欠かせない → 欠か+せ+ない, 食べさせた → 食べ+させ+た
+          if (vh::containsCausativeAuxPattern(surface)) {
+            base_cost += bigram_cost::kStrong;  // Penalize to favor split path
           }
           // Penalty for verb candidates ending with auxiliary まい (negative volitional)
           // MeCab splits verb + auxiliary まい
           // E.g., 出来まい = 出来 + まい, 行くまい = 行く + まい
           if (utf8::endsWith(surface, "まい")) {
-            base_cost += 1.5F;  // Penalize to favor split path
+            base_cost += bigram_cost::kStrong;  // Penalize to favor split path
           }
           // Penalty for verb candidates ending with らしい (conjecture auxiliary)
           // MeCab splits verb/adj + らしい
           // E.g., 帰りたいらしい = 帰り + たい + らしい
           if (utf8::endsWith(surface, "らしい") || utf8::endsWith(surface, "らしく") ||
               utf8::endsWith(surface, "らしかっ")) {
-            base_cost += 1.5F;  // Penalize to favor split path
+            base_cost += bigram_cost::kStrong;  // Penalize to favor split path
           }
           // Penalty for verb candidates ending with passive+te form (〜まれて/〜られて)
           // MeCab splits compound verb passive+te: 読み込まれて → 読み込ま|れ|て
           // E.g., 読み込まれていない = 読み込ま + れ + て + い + ない
           if (utf8::endsWith(surface, "まれて") || utf8::endsWith(surface, "まれた") ||
               utf8::endsWith(surface, "られて") || utf8::endsWith(surface, "られた")) {
-            base_cost += 2.0F;  // Penalize to favor split path
+            base_cost += bigram_cost::kVeryRare + bigram_cost::kNegligible;  // 2.0F
+          }
+          // Penalty for verb candidates containing て+auxiliary verb chains
+          // MeCab splits: 付いてくる → 付い+て+くる, 集まってくる → 集まっ+て+くる
+          // These are syntactic constructions (V-te + auxiliary), not single verb forms
+          if (vh::containsTeFormAuxPattern(surface)) {
+            base_cost += bigram_cost::kStrong;  // Penalize to favor split path
           }
           // Set has_suffix to skip exceeds_dict_length penalty in tokenizer.cpp
           // This applies when:
@@ -2091,6 +2103,67 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       }  // end else (not copula だ pattern)
       }  // end else (not quotative って pattern)
       }  // end else (not なかっ pattern)
+    }
+  }
+
+  // Generate sokuonbin (っ) candidates from surfaces containing て+auxiliary chains
+  // E.g., 挙がっている → 挙がっ (onbin of 挙がる) + て + いる
+  //       集まってくる → 集まっ (onbin of 集まる) + て + くる
+  // This handles patterns where っ+て/で is followed by auxiliary verbs,
+  // which the basic/extended sokuonbin sections miss (they only handle endings)
+  if (hiragana_end - kanji_end >= 3) {
+    // Scan for っ in hiragana portion (not at the very end - that's handled above)
+    for (size_t pos = kanji_end; pos + 2 < hiragana_end; ++pos) {
+      if (codepoints[pos] != U'っ') continue;
+      char32_t after_sokuon = codepoints[pos + 1];
+      if (after_sokuon != U'て' && after_sokuon != U'で') continue;
+      // Found っ+て/で NOT at end of surface - check if followed by auxiliary
+      size_t hiragana_before_onbin = pos - kanji_end;
+      if (hiragana_before_onbin < 1 || hiragana_before_onbin > 2) continue;
+
+      size_t onbin_end = pos + 1;  // Position after っ
+      std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_end);
+      std::string stem = extractSubstring(codepoints, start_pos, pos);
+      std::string potential_base = stem + "る";
+
+      // Check hiragana part for known false patterns
+      std::string hiragana_part = extractSubstring(codepoints, kanji_end, onbin_end);
+      if (hiragana_part == "なかっ" || hiragana_part == "であっ" ||
+          utf8::startsWith(hiragana_part, "といっ") || hiragana_part == "くなっ") {
+        continue;
+      }
+
+      bool in_dict_check = vh::isVerbInDictionaryWithType(dict_manager, potential_base,
+                                                           grammar::VerbType::GodanRa) ||
+                           vh::isVerbInDictionary(dict_manager, potential_base);
+      bool infl_verified = false;
+      if (!in_dict_check && hiragana_before_onbin == 1) {
+        auto infl_results = inflection.analyze(onbin_surface + "た");
+        for (const auto& result : infl_results) {
+          if (result.verb_type == grammar::VerbType::GodanRa &&
+              result.base_form == potential_base &&
+              result.confidence >= 0.3F) {
+            infl_verified = true;
+            break;
+          }
+        }
+      }
+
+      if (in_dict_check || infl_verified) {
+        constexpr float kTeAuxSokuonbinCost = -0.3F;
+        SUZUME_DEBUG_VERBOSE_BLOCK {
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
+                              << " te_aux_sokuonbin lemma=" << potential_base
+                              << (in_dict_check ? " [dict]" : " [infl]")
+                              << " cost=" << kTeAuxSokuonbinCost << "\n";
+        }
+        candidates.push_back(makeVerbCandidate(
+            onbin_surface, start_pos, onbin_end, kTeAuxSokuonbinCost, potential_base,
+            grammar::verbTypeToConjType(grammar::VerbType::GodanRa),
+            true, CandidateOrigin::VerbKanji, 0.9F, "te_aux_sokuonbin",
+            core::ExtendedPOS::VerbOnbinkei));
+      }
+      break;  // Only process first っ+て/で occurrence
     }
   }
 

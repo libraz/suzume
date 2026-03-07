@@ -451,4 +451,22 @@ bool shouldSkipSuruVerbAuxPattern(std::string_view surface, size_t kanji_count) 
   return false;
 }
 
+bool containsTeFormAuxPattern(std::string_view surface) {
+  for (size_t i = 0; i < scorer::kTeFormAuxPenaltyPatternsSize; ++i) {
+    if (utf8::contains(surface, scorer::kTeFormAuxPenaltyPatterns[i])) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool containsCausativeAuxPattern(std::string_view surface) {
+  for (size_t i = 0; i < scorer::kCausativeAuxPenaltyPatternsSize; ++i) {
+    if (utf8::contains(surface, scorer::kCausativeAuxPenaltyPatterns[i])) {
+      return true;
+    }
+  }
+  return false;
+}
+
 }  // namespace suzume::analysis::verb_helpers

@@ -185,6 +185,10 @@ sub is_conjugated_form {
     );
     return undef if $fixed_expressions{$surface};
 
+    # Skip if Suzume has a rule to keep as single token (e.g., nai-adjectives)
+    my $suzume_rule = get_suzume_rule($surface);
+    return undef if $suzume_rule;
+
     # Skip check for entries intentionally marked as compound or proper nouns
     # (ADVERB often contains fixed expressions that MeCab splits)
     # (PROPER_NOUN for titles/names that may look like conjugated forms)
@@ -575,7 +579,7 @@ sub cmd_add {
     if ($insert_after < 0) {
         # No section found, append to end
         open my $fh, '>>:utf8', $target_file or die "Cannot open $target_file: $!\n";
-        print $fh "\n$entry_line\n";
+        print $fh "$entry_line\n";
         close $fh;
         print "✓ Added: $entry_line (appended to end of $target_file)\n";
     } else {
@@ -687,6 +691,28 @@ sub find_insertion_point {
         }
     }
 
+    # If no section header found (split dict files), scan entire file
+    if ($section_start < 0) {
+        for my $i (0 .. $#lines) {
+            my $line = $lines[$i];
+            chomp $line;
+            next if $line =~ /^#/ || $line =~ /^\s*$/;
+
+            my @fields = split /\t/, $line;
+            next unless @fields >= 2;
+
+            my ($surface, $pos, $conj) = @fields;
+            $conj //= '';
+
+            if ($pos eq $target_pos) {
+                $last_same_pos_line = $i;
+                if ($conj eq $target_conj) {
+                    $last_matching_line = $i;
+                }
+            }
+        }
+    }
+
     # Priority: 1) After matching conj_type, 2) After same POS, 3) Section end
     if ($last_matching_line >= 0) {
         return ($last_matching_line, 'same_group');
@@ -708,7 +734,7 @@ sub insert_line_at {
     my @lines = <$in>;
     close $in;
 
-    splice @lines, $after_line, 0, "$new_line\n";
+    splice @lines, $after_line + 1, 0, "$new_line\n";
 
     open my $out, '>:utf8', $file or die "Cannot write $file: $!\n";
     print $out @lines;

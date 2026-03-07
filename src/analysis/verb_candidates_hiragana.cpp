@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "analysis/bigram_table.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "core/debug.h"
@@ -668,6 +669,21 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
         } else {
           base_cost = verb_opts.confidence_cost_scale_medium + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_medium;
         }
+      }
+
+      // Penalty for hiragana verb candidates containing auxiliary chains
+      // Same as kanji verb penalties - て+auxiliary, causative, etc.
+      // E.g., きなくなる should not win over でき+なく+なる
+      if (vh::containsTeFormAuxPattern(surface)) {
+        base_cost += bigram_cost::kStrong;
+      }
+      if (vh::containsCausativeAuxPattern(surface)) {
+        base_cost += bigram_cost::kStrong;
+      }
+      // Penalty for negative auxiliary chains (なくなる = become unable to)
+      if (utf8::contains(surface, "なくなる") || utf8::contains(surface, "なくなっ") ||
+          utf8::contains(surface, "なくなり")) {
+        base_cost += bigram_cost::kRare;
       }
 
       // Set lemma from inflection analysis for pure hiragana verbs
@@ -1381,6 +1397,12 @@ next_length:;  // Label for goto from particle-starting verb skip
     std::string stem_surface = extractSubstring(codepoints, start_pos, end_pos);
     std::string base_form = stem_surface + "る";
 
+    // Skip stems starting with っ (sokuon) - no Japanese verb stem begins with っ
+    // E.g., しっぱいしている → っぱいし should not be a verb candidate
+    if (codepoints[start_pos] == U'っ') {
+      continue;
+    }
+
     // Use inflection analysis to validate - check if stem is recognized as ichidan
     auto stem_analysis = inflection.analyze(stem_surface);
     bool found_ichidan = false;
@@ -1408,6 +1430,17 @@ next_length:;  // Label for goto from particle-starting verb skip
     // MeCab-compatible split: 聞かせられた → 聞か + せ + られ + た
     if (utf8::endsWith(stem_surface, "せられ")) {
       continue;
+    }
+
+    // Skip stems ending in し where the prefix is a dictionary noun (サ変 pattern)
+    // E.g., しっぱいし → しっぱい(dict NOUN) + し(する連用), not しっぱいしる
+    // This prevents false ichidan candidates from サ変 noun + する patterns
+    if (!is_dict_verb && utf8::endsWith(stem_surface, "し") &&
+        stem_surface.size() > 3) {  // More than just し
+      std::string prefix = stem_surface.substr(0, stem_surface.size() - 3);
+      if (vh::hasNonVerbDictionaryEntry(dict_manager, prefix)) {
+        continue;
+      }
     }
 
     // Skip て+subsidiary verb patterns that should be split

@@ -453,7 +453,7 @@
     {
       "accepted_diff" : {
         "category" : "pos-limitation",
-        "reason" : "ãªããã°: conditional auxiliary classification"
+        "reason" : "ãªã POS: Suzume labels as Verb (ãªã mizenkei), MeCab as Auxiliary"
       },
       "description" : "しなければならない (must do)",
       "expected" : [
@@ -485,12 +485,13 @@
       "input" : "しなければならない",
       "suzume_expected" : [
         {
-          "pos" : "Particle",
+          "lemma" : "する",
+          "pos" : "Verb",
           "surface" : "し"
         },
         {
           "lemma" : "ない",
-          "pos" : "Verb",
+          "pos" : "Auxiliary",
           "surface" : "なけれ"
         },
         {
@@ -515,10 +516,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ãªããã°: conditional auxiliary classification"
-      },
       "description" : "来なければ (if not come)",
       "expected" : [
         {
@@ -538,22 +535,6 @@
       ],
       "id" : "nakereba_ko",
       "input" : "来なければ",
-      "suzume_expected" : [
-        {
-          "lemma" : "来る",
-          "pos" : "Verb",
-          "surface" : "来"
-        },
-        {
-          "lemma" : "ない",
-          "pos" : "Verb",
-          "surface" : "なけれ"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "ば"
-        }
-      ],
       "tags" : [
         "grammar",
         "conditional",
@@ -1156,10 +1137,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "verb form: context-dependent POS classification"
-      },
       "description" : "挙がっている - MeCab-compatible split with lemma 挙がる",
       "expected" : [
         {
@@ -1186,29 +1163,6 @@
       ],
       "id" : "verb_agaru_kanji_variant",
       "input" : "批判が挙がっている",
-      "suzume_expected" : [
-        {
-          "pos" : "Noun",
-          "surface" : "批判"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "が"
-        },
-        {
-          "lemma" : "挙い",
-          "pos" : "Adjective",
-          "surface" : "挙"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "が"
-        },
-        {
-          "pos" : "Verb",
-          "surface" : "っている"
-        }
-      ],
       "tags" : [
         "verb",
         "kanji_variant"

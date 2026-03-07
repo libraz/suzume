@@ -299,10 +299,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
-      },
       "description" : "Troubleshooting - MeCab互換分割",
       "expected" : [
         {
@@ -355,55 +351,6 @@
       ],
       "id" : "tech_doc_troubleshooting",
       "input" : "問題が解決しない場合は再起動してください",
-      "suzume_expected" : [
-        {
-          "pos" : "Noun",
-          "surface" : "問題"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "が"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "解決"
-        },
-        {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
-        },
-        {
-          "pos" : "Adjective",
-          "surface" : "ない"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "場合"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "は"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "再起動"
-        },
-        {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "て"
-        },
-        {
-          "lemma" : "くださる",
-          "pos" : "Verb",
-          "surface" : "ください"
-        }
-      ],
       "tags" : [
         "technical",
         "documentation"

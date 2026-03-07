@@ -935,6 +935,15 @@ void addHiraganaCompoundVerbJoinCandidates(
       // Extract V1 portion and determine its base form
       std::string_view v1_surface = text.substr(start_byte, v2_start_byte - start_byte);
 
+      // Skip V1 starting with particles - no verb stem starts with を/が/は/に/で/と/へ
+      // E.g., をかきたてる should be を + かきたてる, not をかく + 立てる
+      char32_t first_char = codepoints[start_pos];
+      if (first_char == U'を' || first_char == U'が' || first_char == U'は' ||
+          first_char == U'に' || first_char == U'で' || first_char == U'と' ||
+          first_char == U'へ' || first_char == U'も') {
+        continue;
+      }
+
       // Get the last character of V1 to determine verb type
       char32_t last_char = codepoints[v2_start - 1];
 
@@ -1309,6 +1318,10 @@ void addTeFormAuxiliaryCandidates(
     char32_t prev = codepoints[start_pos - 1];
     // Sokuonbin (っ): godan verbs (買って, 行って, 持って)
     if (prev == U'っ') {
+      return;
+    }
+    // Hatsuonbin (ん): godan-ma/ba/na verbs (読んで, 飛んで, 死んで)
+    if (prev == U'ん') {
       return;
     }
     // い-row: suru renyokei (し), godan renyokei (き, ぎ, etc.), kami-ichidan (起き, etc.)

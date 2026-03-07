@@ -291,7 +291,8 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Without this bonus, PREFIX+NOUN split path wins due to strong connection bonus (-2)
   // Dictionary entries should take precedence over compositional analysis
   if (edge.fromDictionary() &&
-      (edge.pos == core::PartOfSpeech::Adjective || edge.pos == core::PartOfSpeech::Noun) &&
+      (edge.pos == core::PartOfSpeech::Adjective || edge.pos == core::PartOfSpeech::Noun ||
+       edge.pos == core::PartOfSpeech::Adverb) &&
       edge.surface.size() >= 6 &&  // At least 2 chars (prefix + something)
       (edge.surface.compare(0, 3, "非") == 0 ||
        edge.surface.compare(0, 3, "不") == 0 ||
@@ -789,16 +790,35 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kVeryStrongBonus;
   }
 
-  // Surface-based bonus for し → なく/ない/なかっ/なけれ (suru verb negative forms)
-  // MeCab: 勉強しなくて → 勉強|し|なく|て (し=suru renyokei, なく=neg adj renyokei)
-  // This bonus ensures the split path (し|なく) beats the merged path (しなく)
-  if (prev.surface == "し" &&
-      prev.pos == core::PartOfSpeech::Verb &&
+  // Bonus for dict VERB_連用 → ない/なく/なかっ/なけれ (negative auxiliary)
+  // VERB→ADJ bigram (0.8) is high, making split path lose to merged candidates
+  // E.g., でき+なく should beat できなく, し+なく should beat しなく
+  // Restrict to dictionary verbs (間違い+ない uses 間違い(NOUN), not 違い(VERB))
+  // Exclude で (ambiguous: 出る VERB vs だ copula AUX → でない misanalysis)
+  // Exclude godan mizenkei (a-dan ending): 走ら, 書か are mislabeled as VERB_連用
+  // but are actually 未然形 — bonus would incorrectly boost 走ら+ない split
+  if (prev.pos == core::PartOfSpeech::Verb &&
       prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      next.pos == core::PartOfSpeech::Adjective &&
+      prev.fromDictionary() &&
+      prev.surface != "で" &&
+      !grammar::endsWithARow(prev.surface) &&
+      (next.pos == core::PartOfSpeech::Adjective ||
+       next.pos == core::PartOfSpeech::Auxiliary) &&
       (next.surface == "なく" || next.surface == "ない" ||
        next.surface == "なかっ" || next.surface == "なけれ")) {
-    surface_bonus += cost::kVeryStrongBonus;
+    surface_bonus += cost::kStrongBonus;
+  }
+
+  // Bonus for ば(PART_接続) → なら/なり/なる/なれ(VERB) in -なければならない pattern
+  // Prevents spurious ばなら verb candidate (ばなる godan-ra) from winning
+  // over correct split ば(conditional) + なら(なる mizenkei)
+  if (prev.extended_pos == core::ExtendedPOS::ParticleConj &&
+      prev.surface == "ば" &&
+      next.pos == core::PartOfSpeech::Verb &&
+      (next.surface == "なら" || next.surface == "なり" ||
+       next.surface == "なる" || next.surface == "なれ" ||
+       next.surface == "なっ")) {
+    surface_bonus += cost::kStrongBonus;
   }
 
   // Surface-based penalty for Noun → short VerbRenyokei (compound verb protection)
