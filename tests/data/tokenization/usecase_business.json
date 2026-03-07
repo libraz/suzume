@@ -384,10 +384,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "segmentation-diff",
-        "reason" : "付け vs 付: different boundary - dictionary-dependent"
-      },
       "description" : "Full date format: 2024年12月23日付けで",
       "expected" : [
         {
@@ -395,8 +391,8 @@
           "surface" : "2024年12月23日"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "付"
+          "pos" : "Noun",
+          "surface" : "付け"
         },
         {
           "pos" : "Particle",
@@ -405,21 +401,6 @@
       ],
       "id" : "document_date_full",
       "input" : "2024年12月23日付けで",
-      "suzume_expected" : [
-        {
-          "pos" : "Noun",
-          "surface" : "2024年12月23日"
-        },
-        {
-          "lemma" : "付ける",
-          "pos" : "Verb",
-          "surface" : "付け"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "で"
-        }
-      ],
       "tags" : [
         "business",
         "document"

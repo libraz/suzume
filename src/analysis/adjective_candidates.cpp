@@ -399,13 +399,22 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
   // Skip if already registered as NOUN in dictionary (e.g. 勢い) to avoid POS conflict.
   if (kanji_end == start_pos + 1 && codepoints[kanji_end] == U'い') {
     size_t adj_end = kanji_end + 1;
-    // Skip if い is followed by て/た/だ/やす (verb onbin context, not adjective)
-    // e.g., 届いて(verb te-form), 泳いだ(verb ta-form), 使いやすい(verb renyokei)
+    // Skip if い is followed by て/た/だ/で/や (verb onbin context, not adjective)
+    // e.g., 届いて(verb te-form), 泳いだ(verb ta-form), 泳いで(godan-ga te-form),
+    //        使いやすい(verb renyokei)
+    // Exception: で followed by す (part of です) is NOT verb context
+    //   良いです = ADJ + AUX, not VERB onbin
     bool is_verb_context = false;
     if (adj_end < codepoints.size()) {
       char32_t next = codepoints[adj_end];
-      is_verb_context = (next == U'て' || next == U'た' || next == U'だ' ||
-                         next == U'や');
+      if (next == U'て' || next == U'た' || next == U'だ' || next == U'や') {
+        is_verb_context = true;
+      } else if (next == U'で') {
+        // で is verb onbin context (泳いで) UNLESS followed by す (です)
+        bool is_desu = (adj_end + 1 < codepoints.size() &&
+                        codepoints[adj_end + 1] == U'す');
+        is_verb_context = !is_desu;
+      }
     }
     if (!is_verb_context) {
       std::string surface = extractSubstring(codepoints, start_pos, adj_end);

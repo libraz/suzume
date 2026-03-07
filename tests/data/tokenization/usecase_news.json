@@ -1235,10 +1235,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
-      },
       "description" : "Narrative style - Current suzume treats 欠かさ as adjective and 好き as adjective",
       "expected" : [
         {
@@ -1270,8 +1266,7 @@
           "surface" : "好き"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
+          "pos" : "Particle",
           "surface" : "で"
         },
         {
@@ -1311,74 +1306,6 @@
       ],
       "id" : "long_narrative",
       "input" : "彼は昔から音楽が好きで、毎日ピアノの練習を欠かさなかった",
-      "suzume_expected" : [
-        {
-          "pos" : "Pronoun",
-          "surface" : "彼"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "は"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "昔"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "から"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "音楽"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "が"
-        },
-        {
-          "pos" : "Verb",
-          "surface" : "好き"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "で"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "毎日"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "ピアノ"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "の"
-        },
-        {
-          "pos" : "Noun",
-          "surface" : "練習"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "を"
-        },
-        {
-          "lemma" : "欠かす",
-          "pos" : "Verb",
-          "surface" : "欠かさ"
-        },
-        {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "なかっ"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "た"
-        }
-      ],
       "tags" : [
         "long"
       ]

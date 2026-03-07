@@ -290,6 +290,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // E.g., 不可能, 非常, 無理, 無限, 無鉄砲 - these are single lexical items
   // Without this bonus, PREFIX+NOUN split path wins due to strong connection bonus (-2)
   // Dictionary entries should take precedence over compositional analysis
+  // Scales with length so longer entries (無理やり) beat shorter ones (無理)
   if (edge.fromDictionary() &&
       (edge.pos == core::PartOfSpeech::Adjective || edge.pos == core::PartOfSpeech::Noun ||
        edge.pos == core::PartOfSpeech::Adverb) &&
@@ -298,8 +299,10 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
        edge.surface.compare(0, 3, "不") == 0 ||
        edge.surface.compare(0, 3, "無") == 0 ||
        edge.surface.compare(0, 3, "未") == 0)) {
-    constexpr float kNegationPrefixDictBonus = -3.0F;
-    cost += kNegationPrefixDictBonus;
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    // Base -3.0 for 2-char entries, -0.5 per additional char
+    float bonus = -3.0F - static_cast<float>(char_len > 2 ? char_len - 2 : 0) * 0.5F;
+    cost += bonus;
   }
 
   // Bonus for hiragana+kanji mixed nouns from dictionary (e.g., なし崩し, みじん切り, お茶)
@@ -325,6 +328,16 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
         cost += kMixedNounBonus;
       }
     }
+  }
+
+  // Bonus for multi-char hiragana suffixes from dictionary (e.g., まみれ, だらけ, ごと)
+  // These are L1 closed-class morphemes that should beat false verb candidates
+  // E.g., 血まみれ should be 血+まみれ(SUFFIX), not 血まみ(VERB)+れ(AUX)
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Suffix &&
+      grammar::isPureHiragana(edge.surface) &&
+      edge.surface.size() >= 9) {  // 3+ chars (9+ bytes)
+    constexpr float kLongSuffixBonus = -1.5F;
+    cost += kLongSuffixBonus;
   }
 
   // Bonus for short hiragana verbs from dictionary (e.g., なる, ある, いる, する)
@@ -1235,6 +1248,19 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kStrongBonus;
   }
 
+  // Surface-based bonus for all-kanji NOUN → すぎ pattern
+  // E.g., 最高+すぎ, 贅沢+すぎ, 美人+すぎ (kanji compound + sugiru "too much")
+  // Without this, multi-kanji nouns get split: 最高→最+高(ADJ_語幹)+すぎ
+  // because ADJ_語幹→すぎ has a very strong surface bonus (-3.2)
+  // Only apply to all-kanji surfaces (not katakana/verb renyokei)
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      prev.surface.size() >= 6 &&  // 2+ chars (6+ bytes)
+      grammar::isAllKanji(std::string(prev.surface)) &&
+      next.surface.size() >= 6 &&
+      next.surface.compare(0, 6, "すぎ") == 0) {
+    surface_bonus += cost::kVeryStrongBonus * 2;
+  }
+
   // Penalty for ParticleFinal → VerbRenyokei pattern
   // E.g., いいよね should be いい+よ+ね(PART), not いい+よ+ね(VERB 寝る)
   // Final particles (よ, な, ね, わ) are rarely followed by verb renyokei
@@ -1402,14 +1428,13 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     }
   }
 
-  // Penalty for PART_準体(の) → AUX_断定(で) pattern
-  // This prevents 遅れているので → 遅れ|て|いる|の|で (over-split)
+  // Penalty for PART_準体(の) → で (any interpretation) pattern
+  // This prevents ので being split into の+で
   // "ので" is a conjunction particle in L1 dictionary and should be 1 token
   // But "のだ" → の|だ is correct (の+copula だ for emphasis)
   // Only penalize when next.surface == "で" to preserve の|だ split
   if (prev.extended_pos == core::ExtendedPOS::ParticleNo &&
       prev.surface == "の" &&
-      next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
       next.surface == "で") {
     surface_bonus += cost::kVeryRare;
   }
@@ -1531,6 +1556,21 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface == "で") {
     surface_bonus += cost::kRare;  // 1.0: must exceed NOUN→VERB_連用 bonus
+  }
+
+  // Penalty for VerbRenyokei → で (any interpretation)
+  // Ichidan te-form only uses て (食べ+て, 見+て), NOT で
+  // Godan te-form with で uses onbinkei (飲ん+で, 読ん+で), not renyokei
+  // AUX_断定(で) only attaches to nouns/na-adj (静かで, 学生で), not verbs
+  // Without this, kanji+り nouns like 夏祭り get falsely parsed as VERB_連用
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface.size() >= 3 &&
+      next.surface.compare(0, 3, "で") == 0) {
+    if (next.extended_pos == core::ExtendedPOS::ParticleConj) {
+      surface_bonus += cost::kMinor;  // +0.5 to cancel the -0.5 bigram bonus
+    } else if (next.extended_pos == core::ExtendedPOS::AuxCopulaDa) {
+      surface_bonus += cost::kMinor;  // Penalize invalid VERB_連用→断定
+    }
   }
 
   // Penalty for single-hiragana VERB_連用 → を(PART_格)

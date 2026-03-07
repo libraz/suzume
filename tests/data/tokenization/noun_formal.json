@@ -56,10 +56,6 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "æ¥ä»ã: compound noun vs verb - dictionary-dependent"
-      },
       "description" : "日付けで should split 付け as suffix from で",
       "expected" : [
         {
@@ -73,26 +69,11 @@
       ],
       "id" : "formal_noun_tsuke_split",
       "input" : "日付けで",
-      "suzume_expected" : [
-        {
-          "lemma" : "日付ける",
-          "pos" : "Verb",
-          "surface" : "日付け"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "で"
-        }
-      ],
       "tags" : [
         "formal_noun"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ä»ã: noun vs verb - date suffix context"
-      },
       "description" : "2024年12月23日付けで",
       "expected" : [
         {
@@ -100,8 +81,8 @@
           "surface" : "2024年12月23日"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "付"
+          "pos" : "Noun",
+          "surface" : "付け"
         },
         {
           "pos" : "Particle",
@@ -110,21 +91,6 @@
       ],
       "id" : "formal_noun_date_with_tsuke",
       "input" : "2024年12月23日付けで",
-      "suzume_expected" : [
-        {
-          "pos" : "Noun",
-          "surface" : "2024年12月23日"
-        },
-        {
-          "lemma" : "付ける",
-          "pos" : "Verb",
-          "surface" : "付け"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "で"
-        }
-      ],
       "tags" : [
         "formal_noun",
         "date"

@@ -413,6 +413,14 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: 皮ごと → 皮 + ごと (noun + suffix)
       suffix("ごと", "ごと"),
 
+      // Coverage suffix まみれ (血まみれ, 泥まみれ, 汗まみれ)
+      // MeCab: 血まみれ → 血 + まみれ (noun + suffix)
+      suffix("まみれ", "まみれ"),
+
+      // Coverage suffix だらけ (傷だらけ, 間違いだらけ)
+      // MeCab: 傷だらけ → 傷 + だらけ (noun + suffix)
+      suffix("だらけ", "だらけ"),
+
       // Adjective suffixes - connect after verb renyokei (V連用形接続)
       // MeCab: 使いにくい → 使い + にくい, 読みやすい → 読み + やすい
       adj("にくい", "にくい", EPOS::AdjBasic),

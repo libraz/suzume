@@ -1293,13 +1293,16 @@ sub apply_suzume_merge {
     # Post-process: merge consecutive all-kanji tokens
     # Suzume treats consecutive kanji characters as a single token (no dictionary splitting)
     # MeCab splits 二次+巨乳+画像 but suzume outputs 二次巨乳画像
+    # Skip: 的 suffix (Suzume splits kanji+的 as separate tokens)
     my @kanji_merged;
     for my $j (0 .. $#result) {
         my $curr = $result[$j];
         my $surface = $curr->{surface} // '';
         # If previous token and current are both all-kanji, merge
-        if (@kanji_merged && $surface =~ /^[\p{Han}]+$/
-            && ($kanji_merged[-1]{surface} // '') =~ /^[\p{Han}]+$/) {
+        # Skip 的 — Suzume treats it as a separate suffix token
+        if (@kanji_merged && $surface =~ /^\p{Script=Han}+$/
+            && $surface ne '的'
+            && ($kanji_merged[-1]{surface} // '') =~ /^\p{Script=Han}+$/) {
             $kanji_merged[-1]{surface} .= $surface;
             $kanji_merged[-1]{lemma} = $kanji_merged[-1]{surface};
             $kanji_merged[-1]{pos} = '名詞';
@@ -2119,6 +2122,93 @@ sub _postprocess_ii {
     }
 }
 
+# い/いる after て: MeCab=Verb(いる) → Auxiliary
+# Suzume treats い/いる in ている pattern as AUX_継続 (aspectual auxiliary)
+# MeCab treats it as Verb(動詞,非自立)
+sub _postprocess_iru_aux {
+    my ($tokens) = @_;
+    for my $i (1 .. $#$tokens) {
+        my $t = $tokens->[$i];
+        my $surface = $t->{surface} // '';
+        next unless ($surface eq 'い' || $surface eq 'いる' || $surface eq 'いれ'
+                     || $surface eq 'いた' || $surface eq 'いない');
+        next unless ($t->{pos} // '') eq 'Verb';
+        # Check if preceded by て/で (particle or auxiliary)
+        my $prev = $tokens->[$i - 1];
+        my $prev_surface = $prev->{surface} // '';
+        if ($prev_surface eq 'て' || $prev_surface eq 'で') {
+            $t->{pos} = 'Auxiliary';
+            $t->{lemma} = 'いる';
+        }
+    }
+}
+
+# で as copula(だ): MeCab=Auxiliary(だ) → Particle
+# Suzume treats で as PART_格 in patterns like ではない, ほどではなかった
+# MeCab treats で as 助動詞(だ) (copula renyokei)
+# Normalize: で(Auxiliary, lemma=だ) followed by は/も → Particle
+# Also: で(Auxiliary) at end of clause (before comma/period) → Particle
+sub _postprocess_de_particle {
+    my ($tokens) = @_;
+    for my $i (0 .. $#$tokens) {
+        my $t = $tokens->[$i];
+        next unless ($t->{surface} // '') eq 'で';
+        next unless ($t->{pos} // '') eq 'Auxiliary';
+        # で followed by は/も (ではない, でもない patterns)
+        if ($i < $#$tokens) {
+            my $next_surface = $tokens->[$i + 1]{surface} // '';
+            if ($next_surface eq 'は' || $next_surface eq 'も') {
+                $t->{pos} = 'Particle';
+                $t->{lemma} = 'で';
+                next;
+            }
+        }
+        # で after Adjective (na-adjective te-form: 好きで, 元気で, 静かで)
+        # MeCab marks as Auxiliary(だ), Suzume treats as Particle
+        if ($i > 0) {
+            my $prev_pos = $tokens->[$i - 1]{pos} // '';
+            if ($prev_pos eq 'Adjective') {
+                $t->{pos} = 'Particle';
+                $t->{lemma} = 'で';
+            }
+        }
+    }
+}
+
+# na-adjective stems: MeCab=Adjective → Noun
+# Suzume treats na-adj stems (複雑, 静か, etc.) as Noun before すぎる/だ/です/etc.
+# MeCab classifies them as 形容詞(形容動詞語幹)
+# Only normalize when followed by すぎる (clear na-adj+suffix pattern)
+sub _postprocess_na_adj_noun {
+    my ($tokens) = @_;
+    for my $i (0 .. $#$tokens) {
+        my $t = $tokens->[$i];
+        next unless ($t->{pos} // '') eq 'Adjective';
+        # Check if followed by すぎる (na-adj stem + すぎる)
+        if ($i < $#$tokens) {
+            my $next = $tokens->[$i + 1];
+            my $next_surface = $next->{surface} // '';
+            if ($next_surface =~ /^すぎ/) {
+                $t->{pos} = 'Noun';
+                $t->{lemma} = $t->{surface};
+            }
+        }
+    }
+}
+
+# 付け(Suffix) → Noun: Suzume treats 付け as Noun, not Suffix
+# MeCab marks 付け as 名詞/接尾 (e.g., 日付け, 2024年12月23日付けで)
+sub _postprocess_tsuke_noun {
+    my ($tokens) = @_;
+    for my $i (0 .. $#$tokens) {
+        my $t = $tokens->[$i];
+        next unless ($t->{surface} // '') eq '付け';
+        next unless ($t->{pos} // '') eq 'Suffix';
+        $t->{pos} = 'Noun';
+        $t->{lemma} = '付け';
+    }
+}
+
 # て/で after verb renyokei/onbinkei: Particle → Auxiliary
 # MeCab classifies て as 助詞(接続助詞), Suzume treats as 助動詞(継続)
 sub _postprocess_te {
@@ -2154,6 +2244,41 @@ sub _postprocess_mecab_tokens {
             }
         }
     }
+
+    # Surface realignment: when WORD_EXCEPTIONS change text length and MeCab splits
+    # across the boundary, pattern matching fails. Realign surfaces to original text.
+    my $total_surface = 0;
+    $total_surface += length($_->{surface}) for @$tokens;
+    if ($total_surface != length($original_text)) {
+        my $pos = 0;
+        for my $idx (0 .. $#$tokens) {
+            my $t = $tokens->[$idx];
+            my $slen = length($t->{surface});
+            # Check if original text at this position starts with the token surface
+            my $orig_at_pos = substr($original_text, $pos);
+            if ($orig_at_pos !~ /^\Q$t->{surface}\E/) {
+                # Mismatch: previous token needs extending
+                # Find how many extra chars the original has
+                if ($idx > 0) {
+                    my $prev = $tokens->[$idx - 1];
+                    my $prev_pos = $pos - length($prev->{surface});
+                    my $orig_from_prev = substr($original_text, $prev_pos);
+                    # Extend previous token until original starts with current token surface
+                    for my $ext (1 .. 5) {
+                        my $try_len = length($prev->{surface}) + $ext;
+                        my $after = substr($original_text, $prev_pos + $try_len);
+                        if ($after =~ /^\Q$t->{surface}\E/) {
+                            $prev->{surface} = substr($original_text, $prev_pos, $try_len);
+                            $pos = $prev_pos + $try_len;
+                            last;
+                        }
+                    }
+                }
+            }
+            $pos += length($t->{surface});
+        }
+    }
+
     return $tokens;
 }
 
@@ -2223,8 +2348,10 @@ sub get_expected_tokens {
     _postprocess_ikaga(\@tokens);
     _postprocess_demo(\@tokens);
     _postprocess_ii(\@tokens);
-    # Note: て/で POS (Particle vs Auxiliary) is a genuine difference between
-    # MeCab and Suzume. Not normalized here — handled via suzume_expected when needed.
+    _postprocess_iru_aux(\@tokens);
+    _postprocess_de_particle(\@tokens);
+    _postprocess_na_adj_noun(\@tokens);
+    _postprocess_tsuke_noun(\@tokens);
 
     # Normalize full-width alphanumeric to half-width in surfaces/lemmas
     # Suzume's pretokenizer converts full-width to half-width, so MeCab output must match

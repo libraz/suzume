@@ -1252,16 +1252,35 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               extractSubstring(codepoints, start_pos, renyokei_end);
           std::string base_form = renyokei_surface + "る";  // 食べ + る = 食べる
 
+          // Check if renyokei looks like an adjective (kanji+い pattern)
+          // E.g., 良い, 高い, 赤い - these are adjectives, not ichidan verb stems
+          // Require higher confidence to avoid false volitional candidates
+          // like 良いよ(う) being parsed as volitional of non-existent 良いる
+          bool could_be_adjective = false;
+          if (renyokei_end > start_pos + 1 &&
+              codepoints[renyokei_end - 1] == U'い') {
+            // Check if chars before い are all kanji
+            bool all_kanji_before_i = true;
+            for (size_t k = start_pos; k < renyokei_end - 1; ++k) {
+              if (!normalize::isKanjiCodepoint(codepoints[k])) {
+                all_kanji_before_i = false;
+                break;
+              }
+            }
+            could_be_adjective = all_kanji_before_i;
+          }
+
           // Verify using inflection analysis
           auto all_candidates = inflection.analyze(renyokei_surface + "よう");
           float ichidan_confidence = 0.0F;
+          float min_confidence = could_be_adjective ? 0.5F : 0.3F;
           for (const auto& cand : all_candidates) {
-            if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence >= 0.3F) {
+            if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence >= min_confidence) {
               ichidan_confidence = std::max(ichidan_confidence, cand.confidence);
             }
           }
 
-          if (ichidan_confidence >= 0.3F) {
+          if (ichidan_confidence >= min_confidence) {
             // Negative cost to beat the split path 語幹+よう
             constexpr float kVolitionalCost = -0.8F;
             SUZUME_DEBUG_VERBOSE_BLOCK {
@@ -2095,13 +2114,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         }
         if (matched_verb_type == grammar::VerbType::Unknown &&
             !starts_with_dict_noun && !remainder_is_dict_verb) {
-          // Skip inflection fallback for multi-kanji stems (2+ kanji chars)
-          // without dictionary entry. Godan verbs with 2+ pure kanji chars
-          // are rare and should be in the dictionary if they exist.
-          // E.g., 画像っ+て → NOT verb 画像う (画像 is a noun)
-          //       画像貼っ (3 kanji) → NOT verb 画像貼る
+          // Skip inflection fallback for 3+ kanji stems
+          // without dictionary entry.
+          // E.g., 画像貼っ (3 kanji) → NOT verb 画像貼る
+          // Allow 2-kanji stems: 手伝う, 見舞う etc. are common verbs
+          // that may not be in dictionary but inflection analysis can verify
           size_t kanji_char_count = kanji_end - start_pos;
-          if (kanji_char_count >= 2) {
+          if (kanji_char_count >= 3) {
             SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem
                                       << "\" too many kanji chars (" << kanji_char_count
                                       << ") for non-dict sokuonbin\n");
@@ -2129,7 +2148,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               break;
             }
           }
-          }  // kanji_char_count < 3
+          }  // kanji_char_count < 3 (allow 2-kanji stems)
         }
 
 #ifdef SUZUME_DEBUG
