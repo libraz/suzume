@@ -1074,6 +1074,18 @@ sub apply_suzume_merge {
             }
         }
 
+        # 11. Copula negation: merge じゃ+ない → じゃない
+        #     Suzume treats じゃない as a single auxiliary token (AUX_否定)
+        #     MeCab splits as じゃ(副助詞) + ない(助動詞)
+        if (!$merged && ($t->{surface} // '') eq 'じゃ' && ($t->{pos} // '') eq '助詞') {
+            if ($i + 1 < @$tokens && ($tokens->[$i + 1]{surface} // '') eq 'ない') {
+                push @result, { surface => 'じゃない', pos => '助動詞', lemma => 'ではない' };
+                $i += 2;
+                $merged = 1;
+                $applied_rule //= 'copula-negation';
+            }
+        }
+
         if (!$merged) {
             push @result, {
                 surface   => $t->{surface},
@@ -1656,10 +1668,8 @@ sub map_mecab_pos {
             return 'Noun' unless $surface eq '少々';
         }
 
-        # 引き続き: Suzume treats as Verb, not Adverb
-        if ($surface eq '引き続き' && $pos eq '副詞') {
-            return 'Verb';
-        }
+        # 引き続き: MeCab says 副詞, Suzume also treats as Adverb (dict entry)
+        # No override needed - default mapping handles it
 
         # むしろ: Suzume treats as Other (unknown), not Adverb
         if ($surface eq 'むしろ' && $pos eq '副詞') {

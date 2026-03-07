@@ -584,7 +584,7 @@
       "description" : "引き続き should not be fragmented into 4+ pieces",
       "expected" : [
         {
-          "pos" : "Verb",
+          "pos" : "Adverb",
           "surface" : "引き続き"
         }
       ],

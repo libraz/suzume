@@ -407,12 +407,14 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(
 
     // Pattern 4: Merge indefinite numeral + counter suffix (数 + ヶ月 → 数ヶ月)
     // Indefinite numerals: 数 (suu = some/several), 幾 (iku = how many)
-    if (current.pos == core::PartOfSpeech::Noun &&
-        utf8::equalsAny(current.surface, {"数", "幾"}) &&
+    if ((current.pos == core::PartOfSpeech::Noun ||
+         current.pos == core::PartOfSpeech::Pronoun) &&
+        utf8::equalsAny(current.surface, {"数", "幾", "何"}) &&
         idx + 1 < morphemes.size()) {
       const auto& next = morphemes[idx + 1];
       if (next.pos == core::PartOfSpeech::Suffix) {
         core::Morpheme merged = current;
+        merged.pos = core::PartOfSpeech::Noun;  // Merged result is always NOUN
         merged.surface += next.surface;
         merged.lemma = merged.surface;
         merged.end = next.end;

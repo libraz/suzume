@@ -217,6 +217,33 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += bonus;
   }
 
+  // Bonus for non-hiragana adverbs from dictionary (初めて, 大して, etc.)
+  // These contain kanji so the pure-hiragana adverb bonus above doesn't apply.
+  // They compete with verb renyokei + て split paths which get connection bonuses.
+  // E.g., 初めて(ADV, cost=0.5) vs 初め(VERB_連用, -0.13) + て(PART, conn=-0.5)
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adverb &&
+      !grammar::isPureHiragana(edge.surface)) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    if (char_len >= 3) {
+      float bonus = -1.5F - static_cast<float>(char_len - 3) * 0.3F;
+      cost += bonus;
+    }
+  }
+
+  // Bonus for dictionary determiners/adnominals containing kanji (小さな, 大きな, etc.)
+  // These compete with ADJ_語幹 + suffix split paths which get connection bonuses.
+  // E.g., 小さな(DET, cost=0.4) vs 小(ADJ_語幹, -0.68) + さ(SUFFIX, 0) + な(AUX)
+  // Only apply to kanji-containing entries to avoid boosting pure hiragana determiners
+  // like といった which should remain as particles
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Determiner &&
+      grammar::containsKanji(edge.surface)) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    if (char_len >= 3) {
+      float bonus = -1.5F - static_cast<float>(char_len - 3) * 0.3F;
+      cost += bonus;
+    }
+  }
+
   // Bonus for hiragana interjections/greetings from dictionary
   // Prevents misanalysis like さようなら → さ+よう+なら (volitional pattern)
   // or ありがとう → あり+が+とう (verb + particle + noun pattern)
@@ -532,8 +559,10 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       edge.surface.length() >= 12) {  // ≥4 chars (kanji + ひらがな suffix)
     // Check if surface contains kanji and ends with い (compound adjective pattern)
     if (grammar::containsKanji(edge.surface) && utf8::endsWith(edge.surface, "い")) {
-      constexpr float kCompoundAdjDictBonus = -0.5F;
-      cost += kCompoundAdjDictBonus;
+      // Longer compounds need stronger bonus to beat noun+adj split paths
+      size_t char_len = suzume::normalize::utf8Length(edge.surface);
+      float bonus = -0.5F - static_cast<float>(char_len > 4 ? char_len - 4 : 0) * 0.3F;
+      cost += bonus;
     }
   }
 
