@@ -287,6 +287,10 @@ HIRAGANA_COMPOUNDS: dict[str, str] = {
     "おもち": "名詞",
 }
 
+# Search-unit compounds: kanji+okurigana words MeCab splits but Suzume keeps as one token
+SEARCH_UNIT_COMPOUNDS: dict[str, str] = {
+}
+
 # Family/honorific terms that merge with お prefix
 FAMILY_TERMS: set[str] = {
     "兄ちゃん",

@@ -111,11 +111,29 @@ constexpr float kAdjStemConfScale = 0.2F;
 namespace verb_cost {
 // Standard bonus for verb candidates (mizenkei, passive, etc.)
 constexpr float kStandardBonus = -0.5F;
+// Moderate bonus for verb candidates (extended/te-aux sokuonbin)
+constexpr float kModerateBonus = -0.3F;
 // Strong bonus for verb candidates (ichidan renyokei, te/ta forms)
 constexpr float kStrongBonus = -0.8F;
 // Weak penalty for uncertain verb patterns (passive, causative, zu-form)
 constexpr float kWeakPenalty = 0.1F;
 }  // namespace verb_cost
+
+// =============================================================================
+// Adjective Cost Adjustment Constants (adjective_candidates.cpp)
+// =============================================================================
+
+// Extended cost for adjective stem candidates (dict and non-dict)
+// Used for stem+そう, stem splits where confidence is high
+constexpr float kAdjStemExtCost = -1.2F;
+
+// Strong penalty to force MeCab-compatible adjective splits
+// Applied to compound adj, く+なる, という, まい patterns
+constexpr float kAdjSplitForcePenalty = 2.0F;
+
+// Moderate penalty for uncertain adjective patterns
+// Applied to unconfirmed さ nominalization and らしい conjecture
+constexpr float kAdjModeratePenalty = 1.5F;
 
 }  // namespace suzume::analysis::candidate
 

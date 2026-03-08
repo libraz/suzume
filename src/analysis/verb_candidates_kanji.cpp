@@ -2012,7 +2012,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         } else {
           // Found valid verb - generate onbin stem candidate
           std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
-          constexpr float kOnbinCost = -0.5F;  // Negative cost to beat unsplit forms
+          constexpr float kOnbinCost = candidate::verb_cost::kStandardBonus;
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                                 << " kanji_onbin_contraction lemma=" << matched_base_form
@@ -2139,7 +2139,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         // TRACE: Log all sokuonbin candidates
         SUZUME_DEBUG_TRACE_BLOCK {
           SUZUME_DEBUG_STREAM << "[SOKUONBIN_CANDIDATES] \"" << onbin_surface_for_log << "\":\n";
-          constexpr float kSokuonbinCost = -0.5F;
+          constexpr float kSokuonbinCost = candidate::verb_cost::kStandardBonus;
           for (const auto& cand : all_sokuonbin_candidates) {
             bool is_selected = (cand.type == matched_verb_type);
             SUZUME_DEBUG_STREAM << "  - " << cand.base_form << " ("
@@ -2296,7 +2296,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
       if (!is_adj_katt_form && (in_dict || infl_verified)) {
         // Verified - generate candidate
-        constexpr float kExtendedSokuonbinCost = -0.3F;
+        constexpr float kExtendedSokuonbinCost = candidate::verb_cost::kModerateBonus;
         SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                               << " extended_sokuonbin lemma=" << potential_base
@@ -2359,7 +2359,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       }
 
       if (in_dict_check || infl_verified) {
-        constexpr float kTeAuxSokuonbinCost = -0.3F;
+        constexpr float kTeAuxSokuonbinCost = candidate::verb_cost::kModerateBonus;
         SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                               << " te_aux_sokuonbin lemma=" << potential_base
@@ -2437,7 +2437,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         if (matched_verb_type != grammar::VerbType::Unknown) {
           // Found valid verb - generate hatsuonbin stem candidate
           std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
-          constexpr float kHatsuonbinCost = -0.5F;  // Negative cost to beat unsplit forms
+          constexpr float kHatsuonbinCost = candidate::verb_cost::kStandardBonus;
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                                 << " kanji_hatsuonbin lemma=" << matched_base_form
@@ -2450,6 +2450,57 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               core::ExtendedPOS::VerbOnbinkei));
         }
       }
+    }
+  }
+
+  // Generate hatsuonbin candidates for multi-hiragana okurigana and standalone ん
+  // Covers cases NOT handled by the de/da handler above:
+  // - Multi-hira okurigana: 汗ばんだ → 汗ばん (onbin of 汗ばむ) + だ
+  // - Standalone single ん: 死ん (end of token, no following で/だ)
+  if (kanji_end < hiragana_end) {
+    for (size_t n_pos = kanji_end; n_pos < hiragana_end; ++n_pos) {
+      if (codepoints[n_pos] != U'ん') continue;
+
+      bool at_end = (n_pos + 1 >= hiragana_end);
+      bool followed_by_de_da =
+          (!at_end) && (codepoints[n_pos + 1] == U'で' || codepoints[n_pos + 1] == U'だ');
+
+      // Skip: n_pos == kanji_end && !at_end is already handled by de/da handler above
+      if (n_pos == kanji_end && !at_end) continue;
+      // Only valid: at end of hiragana region, or followed by で/だ
+      if (!at_end && !followed_by_de_da) continue;
+
+      std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+      std::string hira_stem =
+          (n_pos > kanji_end) ? extractSubstring(codepoints, kanji_end, n_pos) : "";
+
+      static const std::vector<std::pair<grammar::VerbType, std::string_view>>
+          n_onbin_types = {
+              {grammar::VerbType::GodanMa, "む"},
+              {grammar::VerbType::GodanBa, "ぶ"},
+              {grammar::VerbType::GodanNa, "ぬ"},
+          };
+
+      for (const auto& [verb_type, base_suffix] : n_onbin_types) {
+        std::string base_form = kanji_stem + hira_stem + std::string(base_suffix);
+        if (vh::isVerbInDictionaryWithType(dict_manager, base_form, verb_type) ||
+            vh::isVerbInDictionary(dict_manager, base_form)) {
+          std::string onbin_surface = extractSubstring(codepoints, start_pos, n_pos + 1);
+          constexpr float kHatsuonbinCost = candidate::verb_cost::kStandardBonus;
+          SUZUME_DEBUG_VERBOSE_BLOCK {
+            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
+                                << " kanji_hatsuonbin_standalone lemma=" << base_form
+                                << " cost=" << kHatsuonbinCost << "\n";
+          }
+          candidates.push_back(makeVerbCandidate(
+              onbin_surface, start_pos, n_pos + 1, kHatsuonbinCost, base_form,
+              grammar::verbTypeToConjType(verb_type),
+              true, CandidateOrigin::VerbKanji, 0.9F, "kanji_hatsuonbin",
+              core::ExtendedPOS::VerbOnbinkei));
+          break;
+        }
+      }
+      break;  // Only process first ん in the region
     }
   }
 

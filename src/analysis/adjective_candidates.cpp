@@ -646,7 +646,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         // from beating suru-verb split path (勉強 + さ + れる)
         if (!is_dict_adjective && surface.size() >= 3 &&
             utf8::endsWith(surface, "さ")) {
-          cost += 1.5F;  // Strong penalty for unconfirmed さ nominalization
+          cost += candidate::kAdjModeratePenalty;  // Unconfirmed さ nominalization
           SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +1.5 (unconfirmed_sa_nom)\n");
         }
         // Penalty for compound adjective patterns (verb renyokei + やすい/にくい/がたい)
@@ -655,7 +655,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         // standalone やすい/にくい/がたい which are in the dictionary
         if (!is_dict_adjective && surface.size() >= 4 * core::kJapaneseCharBytes &&
             verb_helpers::isCompoundAdjectivePattern(surface)) {
-          cost += 2.0F;  // Strong penalty to force split
+          cost += candidate::kAdjSplitForcePenalty;  // Force split
           SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (compound_adj_penalty)\n");
         }
         // Penalty for く + なる patterns (i-adjective adverbial + なる verb)
@@ -670,7 +670,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
               utf8::endsWith(surface, "くなら") ||
               utf8::endsWith(surface, "くなった") ||
               utf8::endsWith(surface, "くなって")) {
-            cost += 2.0F;  // Strong penalty to force adj く-form + なる split
+            cost += candidate::kAdjSplitForcePenalty;  // Force adj く-form + なる split
             SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (ku_naru_split)\n");
           }
         }
@@ -678,7 +678,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         // E.g., 友人という → 友人 + という (determiner), not 友人とい(adj) + う
         if (!is_dict_adjective && surface.size() >= 3 * core::kJapaneseCharBytes) {
           if (utf8::endsWith(surface, "とい") || utf8::endsWith(surface, "という")) {
-            cost += 2.0F;  // Strong penalty to protect NOUN + という pattern
+            cost += candidate::kAdjSplitForcePenalty;  // Protect NOUN + という pattern
             SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (toiu_pattern)\n");
           }
         }
@@ -689,7 +689,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         if (!is_dict_adjective && surface.size() >= 3 * core::kJapaneseCharBytes) {
           if (utf8::endsWith(surface, "らしい") || utf8::endsWith(surface, "らしく") ||
               utf8::endsWith(surface, "らしかっ")) {
-            cost += 1.5F;  // Penalty to promote adj/noun + らしい split
+            cost += candidate::kAdjModeratePenalty;  // Promote adj/noun + らしい split
             SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +1.5 (rashii_conjecture)\n");
           }
         }
@@ -698,7 +698,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         // まい is an auxiliary attached to verb dictionary form, not an i-adjective suffix
         if (!is_dict_adjective && surface.size() >= 2 * core::kJapaneseCharBytes) {
           if (utf8::endsWith(surface, "まい")) {
-            cost += 2.0F;  // Strong penalty to promote verb + まい split
+            cost += candidate::kAdjSplitForcePenalty;  // Promote verb + まい split
             SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (mai_auxiliary)\n");
           }
         }
@@ -1522,7 +1522,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
 
       // Generate stem candidate with strong bonus
       // おい (INTJ) has cost -1, so stem needs very low cost to win
-      float cost = -1.2F + (1.0F - adj_confidence) * 0.2F;
+      float cost = candidate::kAdjStemExtCost + (1.0F - adj_confidence) * 0.2F;
       SUZUME_DEBUG_LOG("[ADJ_STEM_HIRA] ✓ candidate stem=\"" << stem << "\" base=\"" << base_form
                        << "\" cost=" << cost << "\n");
       candidates.push_back(makeIAdjStemCandidate(
@@ -1992,7 +1992,7 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
             size_t okurigana_chars = byte_pos / 3;
             size_t stem_end = kanji_end + okurigana_chars;
 
-            float cost = -1.2F;
+            float cost = candidate::kAdjStemExtCost;
             SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ ext_garu candidate stem=\"" << stem
                              << "\" base=\"" << base_form << "\" pattern=\"" << pattern
                              << "\" cost=" << cost << "\n");
@@ -2158,7 +2158,7 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
     size_t stem_end = kanji_end + stem_char_count;
 
     // Use strong bonus for dictionary-verified compound adjectives
-    float cost = is_dict_adj ? -1.2F : -0.8F;
+    float cost = is_dict_adj ? candidate::kAdjStemExtCost : candidate::kAdjStemBaseCost;
     SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ ext_stem candidate stem=\"" << stem
                      << "\" cost=" << cost << " dict=" << is_dict_adj << "\n");
     candidates.push_back(makeIAdjStemCandidate(
@@ -2182,7 +2182,7 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
 
     bool is_dict_adj = isAdjectiveInDictionary(dict_manager, base_form);
     if (is_dict_adj) {
-      float cost = -1.2F;
+      float cost = candidate::kAdjStemExtCost;
       SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ ext_adj candidate stem=\"" << stem
                        << "\" base=\"" << base_form << "\" cost=" << cost << "\n");
       candidates.push_back(makeIAdjStemCandidate(

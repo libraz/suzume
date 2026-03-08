@@ -343,6 +343,19 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     }
   }
 
+  // Bonus for long all-kanji nouns from dictionary (4+ chars)
+  // Split path gets dict+dict connection bonus (-0.5) and split_candidates
+  // both-in-dict bonus (-0.2), making it -0.7 cheaper than 1-token path.
+  // Length-scaled bonus ensures registered compounds beat split paths.
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Noun &&
+      grammar::isAllKanji(edge.surface)) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    if (char_len >= 4) {
+      cost += lengthScaledBonus(sc::kBonusLongKanjiNounBase, char_len, 4,
+                                -sc::kBonusLongKanjiNounPerChar);
+    }
+  }
+
   // Bonus for multi-char hiragana suffixes from dictionary (e.g., まみれ, だらけ, ごと)
   // These are L1 closed-class morphemes that should beat false verb candidates
   // E.g., 血まみれ should be 血+まみれ(SUFFIX), not 血まみ(VERB)+れ(AUX)

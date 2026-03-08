@@ -12,6 +12,7 @@ from .constants import (
     HONORIFIC_SUFFIXES,
     NAI_ADJECTIVES,
     PREFIX_EXCEPTIONS,
+    SEARCH_UNIT_COMPOUNDS,
     TARI_ADVERB_STEMS,
 )
 
@@ -663,6 +664,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     result, applied_rule = _postprocess_filler_split(result, applied_rule)
     result, applied_rule = _postprocess_kuruwa(result, applied_rule)
     result, applied_rule = _postprocess_kanji_merge(result, applied_rule)
+    result, applied_rule = _postprocess_search_unit_split(result, applied_rule)
     result, applied_rule = _postprocess_onomatopoeia_tto_merge(result, applied_rule)
     result, applied_rule = _postprocess_ascii_dot_merge(result, applied_rule)
     _postprocess_dialectal(result)
@@ -870,6 +872,49 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
         else:
             merged.append(curr)
     return merged, applied_rule
+
+
+def _postprocess_search_unit_split(
+    result: list[dict], applied_rule: str | None
+) -> tuple[list[dict], str | None]:
+    """Re-split kanji-merged tokens that absorbed part of a search-unit compound.
+
+    Example: kanji-merge produces AB+C, but BC should be one token.
+    This splits AB → A+B, then merges B+C → BC.
+    """
+    new_result: list[dict] = []
+    skip_next = False
+    for j, curr in enumerate(result):
+        if skip_next:
+            skip_next = False
+            continue
+        if j < len(result) - 1:
+            nxt = result[j + 1]
+            curr_surface = curr.get("surface", "")
+            nxt_surface = nxt.get("surface", "")
+            for word, word_pos in SEARCH_UNIT_COMPOUNDS.items():
+                # Check if word spans across curr (ending) + nxt (beginning)
+                for split_pos in range(1, len(word)):
+                    prefix = word[:split_pos]
+                    suffix = word[split_pos:]
+                    if curr_surface.endswith(prefix) and nxt_surface == suffix:
+                        head = curr_surface[: -len(prefix)]
+                        if head:
+                            new_result.append({"surface": head, "pos": curr.get("pos", ""), "lemma": head})
+                        new_result.append({"surface": word, "pos": word_pos, "lemma": word})
+                        skip_next = True
+                        if applied_rule is None:
+                            applied_rule = "search-unit-split"
+                        break
+                if skip_next:
+                    break
+        if not skip_next or j < len(result) - 1:
+            if not skip_next:
+                new_result.append(curr)
+    # Handle last token if not skipped
+    if not skip_next and len(result) > 0:
+        pass  # Already appended in the loop
+    return new_result, applied_rule
 
 
 def _postprocess_ascii_dot_merge(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:

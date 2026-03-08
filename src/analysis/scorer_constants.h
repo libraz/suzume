@@ -504,6 +504,12 @@ constexpr float kBonusMitaiDict = -1.0F;
 // Bonus for hiragana+kanji mixed nouns from dictionary (なし崩し, みじん切り, お茶)
 constexpr float kBonusMixedNoun = -0.5F;
 
+// Bonus for long all-kanji nouns from dictionary (4+ chars)
+// Without this, split path wins due to dict+dict connection bonus (-0.5) and
+// split_candidates both-in-dict bonus (-0.2), totaling -0.7 advantage
+constexpr float kBonusLongKanjiNounBase = -1.0F;
+constexpr float kBonusLongKanjiNounPerChar = -0.3F;
+
 // Bonus for multi-char hiragana suffixes from dictionary (まみれ, だらけ, ごと)
 constexpr float kBonusLongSuffix = -1.5F;
 
@@ -536,191 +542,27 @@ constexpr float kPenaltyKanjiChuuCompound = scale::kMinor;
 // =============================================================================
 // Pattern String Constants
 // =============================================================================
-// These string constants are used for pattern matching in scoring.
-// Centralizing them improves maintainability and makes patterns discoverable.
 
-// Suffix patterns for auxiliary detection
+// Suffix pattern for auxiliary detection
 constexpr const char* kSuffixSou = "そう";       // conjecture/hearsay
-constexpr const char* kSuffixTai = "たい";       // desire
-constexpr const char* kSuffixNai = "ない";       // negation
-constexpr const char* kSuffixTaiRashii = "たいらしい";  // desire + conjecture
-constexpr const char* kSuffixSan = "さん";       // contracted negative (さ+ん) or honorific
-constexpr const char* kSuffixN = "ん";           // contracted negative (〜ない→〜ん)
-constexpr const char* kSuffixShi = "し";         // suru renyokei ending
-constexpr const char* kLemmaSuru = "する";       // suru verb lemma suffix
-
-// Verb conjugation form markers
-constexpr const char* kFormTe = "て";            // te-form (unvoiced)
-constexpr const char* kFormDe = "で";            // te-form (voiced)
-constexpr const char* kFormKu = "く";            // ku-form (adverbial)
-constexpr const char* kFormYou = "よう";         // volitional form
-constexpr const char* kFormTa = "た";            // past tense
-constexpr const char* kFormRu = "る";            // terminal form suffix
-
-// Common particles
-constexpr const char* kParticleNo = "の";        // genitive/nominalizer
-constexpr const char* kParticleGa = "が";        // nominative
-constexpr const char* kParticleWo = "を";        // accusative
-constexpr const char* kParticleNi = "に";        // dative/locative
-constexpr const char* kParticleHa = "は";        // topic marker
-constexpr const char* kParticleMo = "も";        // also/even
-constexpr const char* kParticleTo = "と";        // quotative/comitative
-constexpr const char* kParticleHe = "へ";        // directional
-constexpr const char* kParticleKa = "か";        // question marker
-constexpr const char* kParticleYa = "や";        // listing marker
-constexpr const char* kParticleNa = "な";        // na-adjective copula/prohibition
-
-// Final particles (終助詞) - sentence-final only, cannot be followed by て
-constexpr const char* kParticleNe = "ね";        // agreement/confirmation
-constexpr const char* kParticleYo = "よ";        // assertion/emphasis
-constexpr const char* kParticleWa = "わ";        // feminine/exclamation
-
-// Auxiliary lemmas
-constexpr const char* kLemmaIru = "いる";        // progressive auxiliary
-constexpr const char* kLemmaOru = "おる";        // humble progressive
-constexpr const char* kLemmaShimau = "しまう";   // completive auxiliary
-constexpr const char* kLemmaMiru = "みる";       // try doing
-constexpr const char* kLemmaOku = "おく";        // preparatory
-constexpr const char* kLemmaIku = "いく";        // continuing/going
-constexpr const char* kLemmaKuru = "くる";       // coming/becoming
-constexpr const char* kLemmaAgeru = "あげる";    // giving (up)
-constexpr const char* kLemmaMorau = "もらう";    // receiving
-constexpr const char* kLemmaItadaku = "いただく"; // receiving (humble)
-constexpr const char* kLemmaKureru = "くれる";   // receiving (favor)
-constexpr const char* kLemmaAru = "ある";        // existence/state
-constexpr const char* kLemmaNaru = "なる";       // become
-constexpr const char* kLemmaMasu = "ます";       // polite suffix
-constexpr const char* kLemmaMai = "まい";        // negative volitional
-
-// Copula and sentence-final expressions
-constexpr const char* kCopulaDa = "だ";          // plain copula
-constexpr const char* kCopulaDesu = "です";      // polite copula
-constexpr const char* kSuffixMasen = "ません";   // polite negative
-
-// Valid i-adjective lemma endings (non-verb derived)
-// しい: おいしい, 難しい, 美しい (productive pattern)
-// さい: 小さい
-// きい: 大きい (validated at candidate generation)
-constexpr const char* kAdjEndingShii = "しい";
-constexpr const char* kAdjEndingSai = "さい";
-constexpr const char* kAdjEndingKii = "きい";
-
-// Verb contraction patterns that should not be adjectives
-// んどい/んとい: verb onbin + とく contraction (読んどく→読んどい)
-// とい: verb renyokei + とく contraction (見とく→見とい)
-constexpr const char* kPatternNdoi = "んどい";
-constexpr const char* kPatternNtoi = "んとい";
-constexpr const char* kPatternToi = "とい";
-
-// Verb+auxiliary patterns in surface (should not be adjectives)
-constexpr const char* kPatternTeShima = "てしま";  // て+しまう
-constexpr const char* kPatternDeShima = "でしま";  // で+しまう (voiced)
-constexpr const char* kPatternTeIru = "ている";    // て+いる
-constexpr const char* kPatternDeIru = "でいる";    // で+いる (voiced)
-constexpr const char* kPatternTeMora = "てもら";   // て+もらう
-constexpr const char* kPatternDeMora = "でもら";   // で+もらう (voiced)
-constexpr const char* kPatternTeOku = "ておく";    // て+おく
-constexpr const char* kPatternTeOi = "ておい";     // て+おく renyokei
-constexpr const char* kPatternDeOku = "でおく";    // で+おく (voiced)
-constexpr const char* kPatternTeAge = "てあげ";    // て+あげる
-constexpr const char* kPatternDeAge = "であげ";    // で+あげる (voiced)
-constexpr const char* kPatternTeKure = "てくれ";   // て+くれる
-constexpr const char* kPatternDeKure = "でくれ";   // で+くれる (voiced)
-
-// P4-6: Additional auxiliary verb patterns
-constexpr const char* kPatternTeMiru = "てみる";   // て+みる (試行: try to)
-constexpr const char* kPatternDeMiru = "でみる";   // で+みる (voiced)
-constexpr const char* kPatternTeIku = "ていく";    // て+いく (方向: going)
-constexpr const char* kPatternDeIku = "でいく";    // で+いく (voiced)
-constexpr const char* kPatternTeKuru = "てくる";   // て+くる (方向: coming)
-constexpr const char* kPatternDeKuru = "でくる";   // で+くる (voiced)
-constexpr const char* kPatternTeAru = "てある";    // て+ある (状態: resultative)
-constexpr const char* kPatternDeAru = "である";    // で+ある (voiced)
-constexpr const char* kPatternTeOru = "ておる";    // て+おる (敬語: formal progressive)
-constexpr const char* kPatternDeOru = "でおる";    // で+おる (voiced)
-
-// Specific surfaces that are verb forms, not adjectives
-constexpr const char* kSurfaceShimai = "しまい";   // しまう renyokei
-constexpr const char* kSurfaceJimai = "じまい";    // じまう renyokei (voiced)
 
 // =============================================================================
 // Pattern Arrays for Auxiliary Verb Detection
 // =============================================================================
-// These arrays group patterns for efficient checking in scorer.cpp
-
-// Te-form + auxiliary patterns used to detect invalid adjectives (10 patterns)
-// Used in: adjective surface containing verb+auxiliary → penalize
-constexpr const char* kTeFormAuxPatternsForAdj[] = {
-    kPatternTeShima,  // てしま
-    kPatternDeShima,  // でしま
-    kPatternTeIru,    // ている
-    kPatternDeIru,    // でいる
-    kPatternTeMiru,   // てみる
-    kPatternDeMiru,   // でみる
-    kPatternTeIku,    // ていく
-    kPatternDeIku,    // でいく
-    kPatternTeKuru,   // てくる
-    kPatternDeKuru,   // でくる
-};
-constexpr size_t kTeFormAuxPatternsForAdjSize =
-    sizeof(kTeFormAuxPatternsForAdj) / sizeof(kTeFormAuxPatternsForAdj[0]);
-
-// Te-form + auxiliary patterns used to detect unified verb forms (22 patterns)
-// Used in: verb surface containing te-form+auxiliary → bonus for unified form
-constexpr const char* kTeFormAuxPatternsForVerb[] = {
-    kPatternTeShima,  // てしま
-    kPatternDeShima,  // でしま
-    kPatternTeIru,    // ている
-    kPatternDeIru,    // でいる
-    kPatternTeMora,   // てもら
-    kPatternDeMora,   // でもら
-    kPatternTeOku,    // ておく
-    kPatternDeOku,    // でおく
-    kPatternTeAge,    // てあげ
-    kPatternDeAge,    // であげ
-    kPatternTeKure,   // てくれ
-    kPatternDeKure,   // でくれ
-    kPatternTeMiru,   // てみる
-    kPatternDeMiru,   // でみる
-    kPatternTeIku,    // ていく
-    kPatternDeIku,    // でいく
-    kPatternTeKuru,   // てくる
-    kPatternDeKuru,   // でくる
-    kPatternTeAru,    // てある
-    kPatternDeAru,    // である
-    kPatternTeOru,    // ておる
-    kPatternDeOru,    // でおる
-};
-constexpr size_t kTeFormAuxPatternsForVerbSize =
-    sizeof(kTeFormAuxPatternsForVerb) / sizeof(kTeFormAuxPatternsForVerb[0]);
 
 // Te-form + auxiliary patterns for verb candidate penalty (16 patterns)
-// Used in: verb_candidates_kanji.cpp and verb_candidates_hiragana.cpp
-// Subset of kTeFormAuxPatternsForVerb + ておい (ておく renyokei)
+// Used in: verb_candidates_helpers.cpp (containsTeFormAuxPattern)
 // Excludes てある/である/ておる/でおる/ていく/でいく/であげ (rare in compound verbs)
 constexpr const char* kTeFormAuxPenaltyPatterns[] = {
-    kPatternTeKuru,   // てくる
-    kPatternDeKuru,   // でくる
-    kPatternTeKure,   // てくれ
-    kPatternDeKure,   // でくれ
-    kPatternTeIru,    // ている
-    kPatternDeIru,    // でいる
-    kPatternTeShima,  // てしま
-    kPatternDeShima,  // でしま
-    kPatternTeMora,   // てもら
-    kPatternDeMora,   // でもら
-    kPatternTeAge,    // てあげ
-    kPatternTeOku,    // ておく
-    kPatternDeOku,    // でおく
-    kPatternTeOi,     // ておく renyokei
-    kPatternTeMiru,   // てみる
-    kPatternDeMiru,   // でみる
+    "てくる", "でくる", "てくれ", "でくれ", "ている", "でいる",
+    "てしま", "でしま", "てもら", "でもら", "てあげ",
+    "ておく", "でおく", "ておい", "てみる", "でみる",
 };
 constexpr size_t kTeFormAuxPenaltyPatternsSize =
     sizeof(kTeFormAuxPenaltyPatterns) / sizeof(kTeFormAuxPenaltyPatterns[0]);
 
 // Causative auxiliary patterns for verb candidate penalty
-// Used in: verb_candidates_kanji.cpp and verb_candidates_hiragana.cpp
+// Used in: verb_candidates_helpers.cpp (containsCausativeAuxPattern)
 // Pattern: verb mizenkei + せ/させ + auxiliary (ない/て/た/ず/る/ろ/よ/なく)
 constexpr const char* kCausativeAuxPenaltyPatterns[] = {
     "せない", "せなく", "せなかっ", "せて", "せた", "せず", "せる", "せろ", "せよ",

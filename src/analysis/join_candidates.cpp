@@ -82,6 +82,9 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"分ける", "わける", "ける", V2VerbType::Ichidan},   // 切り分ける, 振り分ける
     {"立てる", "たてる", "てる", V2VerbType::Ichidan},   // 組み立てる, 打ち立てる
     {"広げる", "ひろげる", "げる", V2VerbType::Ichidan}, // 繰り広げる, 押し広げる
+    {"受ける", "うける", "ける", V2VerbType::Ichidan},   // 引き受ける, 請け受ける
+    {"降りる", "おりる", "りる", V2VerbType::Ichidan},   // 乗り降りる
+    {"入る", "いる", "る", V2VerbType::Godan},            // 飛び入る, 立ち入る
 };
 
 // Generate renyokei surface from base form
@@ -322,7 +325,7 @@ const TeFormAuxiliary kTeFormAuxiliaries[] = {
 inline bool hasAuxiliarySuffix(std::string_view suffix) {
   if (suffix.empty()) return false;
   // Note: "ます" excluded for MeCab-compatible split (e.g., 申し上げます → 申し上げ + ます)
-  return utf8::containsAny(suffix, {"た", "て", "で", "ない", "れ"});
+  return utf8::containsAny(suffix, {"た", "て", "で", "だ", "ない", "れ"});
 }
 
 }  // namespace
@@ -827,16 +830,29 @@ void addCompoundVerbJoinCandidates(
     // Build the compound verb surface
     std::string compound_surface(text.substr(start_byte, compound_end_byte - start_byte));
 
-    // Skip if compound surface is registered as NOUN in dictionary
+    // Skip if compound surface is registered as NOUN in dictionary,
+    // UNLESS followed by an auxiliary suffix (た/て/で/ない) which indicates verb usage.
     // This prevents nominalized compound verbs (売り上げ, 打ち合わせ) from being tokenized as VERB
-    // when they are explicitly registered as nouns in the dictionary
+    // when standalone, while allowing 切り替えた, 打ち合わせて to be parsed as compound verbs.
     auto noun_check_results = dict_manager.lookup(compound_surface, 0);
     for (const auto& result : noun_check_results) {
       if (result.entry != nullptr &&
           result.entry->pos == core::PartOfSpeech::Noun &&
           result.entry->surface == compound_surface) {
-        SUZUME_DEBUG_LOG("[COMPOUND_SKIP] \"" << compound_surface << "\" is dict NOUN, skipping compound verb\n");
-        return;  // Skip compound verb generation for dictionary NOUNs
+        // Check if followed by auxiliary suffix
+        bool followed_by_aux = false;
+        if (compound_end_pos < codepoints.size()) {
+          char32_t next_cp = codepoints[compound_end_pos];
+          // た/て/で/な(い)/れ/ら/ま(す) indicate verb conjugation
+          followed_by_aux = (next_cp == U'た' || next_cp == U'て' || next_cp == U'で' ||
+                             next_cp == U'な' || next_cp == U'れ' || next_cp == U'ら' ||
+                             next_cp == U'ま' || next_cp == U'ず');
+        }
+        if (!followed_by_aux) {
+          SUZUME_DEBUG_LOG("[COMPOUND_SKIP] \"" << compound_surface << "\" is dict NOUN, skipping compound verb\n");
+          return;
+        }
+        SUZUME_DEBUG_LOG("[COMPOUND] \"" << compound_surface << "\" is dict NOUN but followed by aux, allowing\n");
       }
     }
 
