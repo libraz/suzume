@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "suzume": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "--project", "scripts/mcp", "suzume-mcp"]
+    }
+  }
+}

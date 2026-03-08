@@ -1,0 +1,133 @@
+"""Split rules ported from SuzumeUtils.pm apply_suzume_split()."""
+
+import regex
+
+from .constants import TTARA_STEMS, TTEBA_STEMS, USER_DICT_COMPOUNDS
+
+
+def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
+    """Apply Suzume split rules to MeCab tokens.
+
+    Returns:
+        Tuple of (split tokens, applied rule name or None).
+    """
+    result: list[dict] = []
+    applied_rule: str | None = None
+
+    for t in tokens:
+        surface = t.get("surface", "")
+
+        # 0. Plural suffix ら
+        m = regex.match(r"^(彼女|彼|僕|奴|我)ら$", surface)
+        if m:
+            result.append({"surface": m.group(1), "pos": "名詞", "pos_sub1": "代名詞", "lemma": m.group(1)})
+            result.append({"surface": "ら", "pos": "名詞", "pos_sub1": "接尾", "lemma": "ら"})
+            if applied_rule is None:
+                applied_rule = "ra-suffix-split"
+            continue
+
+        # 1. ったら topic particle
+        m = regex.match(r"^(.+)(ったら)$", surface)
+        if m and len(m.group(1)) >= 3:
+            stem = m.group(1)
+            if stem in TTARA_STEMS:
+                result.append({"surface": stem, "pos": "名詞", "lemma": stem})
+                result.append({"surface": "ったら", "pos": "助詞", "lemma": "ったら"})
+                if applied_rule is None:
+                    applied_rule = "ttara-split"
+                continue
+
+        # 2. ってば emphatic particle
+        m = regex.match(r"^(.+)(ってば)$", surface)
+        if m and len(m.group(1)) >= 2:
+            stem = m.group(1)
+            if stem in TTEBA_STEMS:
+                result.append({"surface": stem, "pos": "副詞", "lemma": stem})
+                result.append({"surface": "ってば", "pos": "助詞", "lemma": "ってば"})
+                if applied_rule is None:
+                    applied_rule = "tteba-split"
+                continue
+
+        # 3. Unnatural kanji compounds
+        m = regex.match(r"^(時分)(学校)$", surface)
+        if m:
+            result.append({"surface": m.group(1), "pos": "名詞", "lemma": m.group(1)})
+            result.append({"surface": m.group(2), "pos": "名詞", "lemma": m.group(2)})
+            if applied_rule is None:
+                applied_rule = "compound-split"
+            continue
+
+        # 4. ねたい adjective -> ね|たい
+        if surface == "ねたい" and t.get("pos") == "形容詞":
+            result.append({"surface": "ね", "pos": "動詞", "lemma": "ねる"})
+            result.append({"surface": "たい", "pos": "助動詞", "lemma": "たい"})
+            if applied_rule is None:
+                applied_rule = "netai-split"
+            continue
+
+        # 5. Compound nouns with dictionary words at start
+        m = regex.match(r"^(自然)(言語処理.+)$", surface)
+        if m:
+            result.append({"surface": m.group(1), "pos": "名詞", "lemma": m.group(1)})
+            result.append({"surface": m.group(2), "pos": "名詞", "lemma": m.group(2)})
+            if applied_rule is None:
+                applied_rule = "compound-dict-split"
+            continue
+
+        # 6. Prefecture + city compounds
+        m = regex.match(r"^(.+県)(.+市)$", surface)
+        if m:
+            result.append({"surface": m.group(1), "pos": "名詞", "lemma": m.group(1)})
+            result.append({"surface": m.group(2), "pos": "名詞", "lemma": m.group(2)})
+            if applied_rule is None:
+                applied_rule = "prefecture-city-split"
+            continue
+
+        # 7. Kanji + Katakana compound nouns
+        if t.get("pos") == "名詞" and surface not in USER_DICT_COMPOUNDS:
+            m = regex.match(r"^([\p{Han}]+)([\u30A0-\u30FFー]+)$", surface)
+            if m:
+                result.append({"surface": m.group(1), "pos": "名詞", "lemma": m.group(1)})
+                result.append({"surface": m.group(2), "pos": "名詞", "lemma": m.group(2)})
+                if applied_rule is None:
+                    applied_rule = "kanji-katakana-split"
+                continue
+
+        # 8. Copula negation: じゃない -> じゃ|ない
+        if surface == "じゃない" and t.get("pos") == "助動詞":
+            result.append({"surface": "じゃ", "pos": "助動詞", "lemma": "だ"})
+            result.append({"surface": "ない", "pos": "助動詞", "lemma": "ない"})
+            if applied_rule is None:
+                applied_rule = "copula-negation-split"
+            continue
+
+        # 9. Onomatopoeia + っと + する conjugation (single MeCab token)
+        # MeCab may treat ぷるんっとした as one token; Suzume splits as ぷるんっと+し+た
+        m = regex.match(
+            r"^([\p{Hiragana}\p{Katakana}ー]{1,6}っと)(し|した|して|する|すれ|しろ|せ|さ|される|された|させ|させる)$",
+            surface,
+        )
+        if m:
+            adv_part = m.group(1)
+            verb_part = m.group(2)
+            result.append({"surface": adv_part, "pos": "副詞", "lemma": adv_part})
+            # Split する conjugation further: した→し+た, して→し+て, etc.
+            if verb_part in ("した", "して", "しろ"):
+                result.append({"surface": verb_part[:1], "pos": "動詞", "lemma": "する"})
+                result.append(
+                    {"surface": verb_part[1:], "pos": "助動詞" if verb_part[1:] == "た" else "助詞", "lemma": verb_part[1:]}
+                )
+            elif verb_part in ("される", "された", "させ", "させる"):
+                result.append({"surface": "さ", "pos": "動詞", "lemma": "する"})
+                rest = verb_part[1:]
+                result.append({"surface": rest, "pos": "動詞", "lemma": rest + ("る" if not rest.endswith("る") else "")})
+            else:
+                result.append({"surface": verb_part, "pos": "動詞", "lemma": "する"})
+            if applied_rule is None:
+                applied_rule = "onomatopoeia-tto-suru-split"
+            continue
+
+        # No split needed
+        result.append(t)
+
+    return result, applied_rule

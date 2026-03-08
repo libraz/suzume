@@ -988,6 +988,43 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
     }
   }
 
+  // Try Xっと pattern for onomatopoeia adverbs (はっと, ぐっと, どきっと, ぷるんっと)
+  // Pattern: [hiragana]{1,4} + っと where the hiragana sequence is the onomatopoeia stem
+  // These are mimetic/onomatopoeia adverbs that precede する/くる conjugations
+  // E.g., はっとした, ぐっときた, どきっとした, ぷるんっとした
+  if (seq_len >= 3 && start_type == normalize::CharType::Hiragana) {
+    // Look for っと at various positions within the sequence
+    for (size_t tto_pos = start_pos + 1; tto_pos + 1 < seq_end && tto_pos <= start_pos + 4;
+         ++tto_pos) {
+      if (codepoints[tto_pos] == U'\u3063' &&      // っ (small tsu)
+          tto_pos + 1 < seq_end &&
+          codepoints[tto_pos + 1] == U'\u3068') {   // と
+        size_t adv_end = tto_pos + 2;
+        size_t stem_len = tto_pos - start_pos;  // chars before っ
+        // Stem should be 1-4 hiragana chars
+        if (stem_len >= 1 && stem_len <= 4) {
+          // No particle skip needed here — the っと suffix is a strong enough
+          // signal for onomatopoeia (はっと, ぐっと are common patterns)
+          std::string surface = extractSubstring(codepoints, start_pos, adv_end);
+          if (!surface.empty()) {
+            // Strong bonus for short patterns (はっと, ぐっと = very common)
+            // Needs to beat hiragana verb candidates that absorb the っと
+            float cost = (stem_len <= 2) ? -1.5F : -0.5F;
+            auto cand = makeCandidate(surface, start_pos, adv_end,
+                core::PartOfSpeech::Adverb, cost, true,
+                CandidateOrigin::Onomatopoeia);
+#ifdef SUZUME_DEBUG_INFO
+            cand.confidence = 0.9F;
+            cand.pattern = "x_tto_pattern";
+#endif
+            candidates.push_back(cand);
+          }
+        }
+        break;  // Only match the first っと position
+      }
+    }
+  }
+
   return candidates;
 }
 

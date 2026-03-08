@@ -2073,43 +2073,52 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
   // E.g., 優しさ → 優し (stem) + さ (nominalization suffix)
   // E.g., 暖かさ → 暖か (stem) + さ (nominalization suffix)
   //
-  // Check if hiragana_part ends with "さ" and the prefix forms a valid adjective
-  if (hiragana_part.size() >= 6 && hiragana_part.substr(hiragana_part.size() - 3) == "さ") {
-    // hiragana_part without final "さ" becomes part of the stem
-    std::string stem_suffix = hiragana_part.substr(0, hiragana_part.size() - 3);
-    std::string stem = kanji_part + stem_suffix;  // e.g., "明" + "る" = "明る"
-    std::string base_form = stem + "い";  // e.g., "明るい"
+  // Check if hiragana_part contains "さ" and the prefix forms a valid adjective
+  // Handles both final さ (明るさ) and medial さ (気持ちよさそう)
+  // Scan for さ positions in hiragana_part (must be at least 2 chars from start)
+  for (size_t sa_byte = 3; sa_byte < hiragana_part.size(); sa_byte += 3) {
+    if (hiragana_part.substr(sa_byte, 3) != "さ") continue;
+
+    // hiragana before さ becomes part of the stem
+    std::string stem_suffix = hiragana_part.substr(0, sa_byte);
+    std::string stem = kanji_part + stem_suffix;
+    std::string base_form = stem + "い";
 
     SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   ext_stem pattern: stem=\"" << stem
                      << "\" base=\"" << base_form << "\"\n");
 
-    // Validate that stem + い is a real i-adjective
-    auto adj_results = inflection.analyze(base_form);
-    bool is_valid_adjective = false;
-    float adj_confidence = 0.0F;
-    for (const auto& result : adj_results) {
-      if (result.verb_type == grammar::VerbType::IAdjective &&
-          result.confidence >= 0.5F) {
-        is_valid_adjective = true;
-        adj_confidence = result.confidence;
-        break;
+    // Validate: stem+い must be a dictionary i-adjective or a valid inflection
+    bool is_dict_adj = isAdjectiveInDictionary(dict_manager, base_form);
+    if (!is_dict_adj) {
+      // Fallback: check inflection analysis
+      auto adj_results = inflection.analyze(base_form);
+      bool is_valid = false;
+      for (const auto& result : adj_results) {
+        if (result.verb_type == grammar::VerbType::IAdjective &&
+            result.confidence >= 0.5F) {
+          is_valid = true;
+          break;
+        }
+      }
+      if (!is_valid) {
+        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   ext_stem: skip (not valid adj)\n");
+        continue;
       }
     }
 
-    SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   ext_stem: is_valid=" << is_valid_adjective
-                     << " conf=" << adj_confidence << "\n");
+    // Calculate stem end position
+    // sa_byte / 3 = number of hiragana chars before さ
+    size_t stem_char_count = sa_byte / core::kJapaneseCharBytes;
+    size_t stem_end = kanji_end + stem_char_count;
 
-    if (is_valid_adjective) {
-      // Calculate stem end position
-      // hiragana_end includes "さ" (1 char), so stem_end is hiragana_end - 1
-      size_t stem_end = hiragana_end - 1;
-
-      float cost = -0.8F + (1.0F - adj_confidence) * 0.2F;
-      SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ ext_stem candidate stem=\"" << stem << "\" cost=" << cost << "\n");
-      candidates.push_back(makeIAdjStemCandidate(
-          stem, start_pos, stem_end, base_form, cost,
-          CandidateOrigin::AdjectiveI, adj_confidence, "adj_stem_ext_sa"));
-    }
+    // Use strong bonus for dictionary-verified compound adjectives
+    float cost = is_dict_adj ? -1.2F : -0.8F;
+    SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ ext_stem candidate stem=\"" << stem
+                     << "\" cost=" << cost << " dict=" << is_dict_adj << "\n");
+    candidates.push_back(makeIAdjStemCandidate(
+        stem, start_pos, stem_end, base_form, cost,
+        CandidateOrigin::AdjectiveI, is_dict_adj ? 1.0F : 0.7F, "adj_stem_ext_sa"));
+    break;  // Only first valid match
   }
 
   return candidates;

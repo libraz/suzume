@@ -296,8 +296,10 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
         std::string kata_part = extractSubstring(codepoints, start_pos, kata_end);
         std::string base_form = kata_part + "る";  // Assume godan-ra (most common for slang)
 
-        // Negative cost to beat unsplit forms (same as kanji sokuonbin)
-        constexpr float kSokuonbinCost = -0.5F;
+        // Neutral cost — let bigram connections decide between verb+て and noun+って
+        // VerbOnbinkei→AuxTenseTa bonus makes verb path win when followed by た/て+verb
+        // Noun→ParticleQuote path wins when followed by noun/adjective
+        constexpr float kSokuonbinCost = 0.1F;
         SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                               << " katakana_sokuonbin lemma=" << base_form

@@ -319,6 +319,16 @@ BigramTable::initTable() {
   // Ensures 学んで+い+ます uses AuxAspectIru (auxiliary) not VerbRenyokei
   setCell(t, EPOS::AuxAspectIru, EPOS::AuxTenseMasu, cost::kStrongBonus);
 
+  // AuxAspectIru → AuxPassive (い+られ in potential/passive) - moderate bonus
+  // いられる = いる + られる (potential: can stay/be)
+  // E.g., はいられない → は + い + られ + ない
+  setCell(t, EPOS::AuxAspectIru, EPOS::AuxPassive, cost::kModerateBonus);
+
+  // AuxAspectIru → VerbShuushikei (い+ける) - penalty
+  // Progressive auxiliary い cannot be followed by a new verb
+  // Prevents て+い+ける from beating て+いける (potential of いく)
+  setCell(t, EPOS::AuxAspectIru, EPOS::VerbShuushikei, cost::kRare);
+
   // AuxCopulaDa → AuxTenseTa (だっ+た) - strong bonus
   setCell(t, EPOS::AuxCopulaDa, EPOS::AuxTenseTa, cost::kStrongBonus);
 

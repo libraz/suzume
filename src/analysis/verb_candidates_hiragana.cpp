@@ -192,6 +192,25 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
             ++hiragana_end;
             continue;
           }
+          // Check if followed by godan-ra conjugation endings (り、る、れ、ろ、っ)
+          // e.g., わかり (renyokei), わかる (shuushikei), わかれ (kateikei/meireikei)
+          if (hiragana_end + 1 < codepoints.size()) {
+            char32_t next = codepoints[hiragana_end + 1];
+            if (next == U'り' || next == U'る' || next == U'れ' ||
+                next == U'ろ' || next == U'っ') {
+              ++hiragana_end;
+              continue;
+            }
+          }
+          // Check if followed by せ/さ/ず (causative/transitive/classical negative)
+          // e.g., つかせる, つかさどる, いかず
+          if (hiragana_end + 1 < codepoints.size()) {
+            char32_t next = codepoints[hiragana_end + 1];
+            if (next == U'せ' || next == U'さ' || next == U'ず') {
+              ++hiragana_end;
+              continue;
+            }
+          }
         }
 
         // で: OK if preceded by ん (んで = te-form) or き (できる)
@@ -1467,6 +1486,11 @@ next_length:;  // Label for goto from particle-starting verb skip
         stem_surface.size() > 3) {  // More than just し
       std::string prefix = stem_surface.substr(0, stem_surface.size() - 3);
       if (vh::hasNonVerbDictionaryEntry(dict_manager, prefix)) {
+        continue;
+      }
+      // Pure hiragana stems with sokuon ending in し are almost always
+      // false サ変 patterns (noun+する where noun contains っ)
+      if (stem_surface.find("っ") != std::string::npos) {
         continue;
       }
     }

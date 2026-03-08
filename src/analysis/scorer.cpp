@@ -1301,6 +1301,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kVeryStrongBonus * 2;
   }
 
+  // Penalty for AuxCopulaDa(な) → ParticleFinal(ったら) pattern
+  // な is attributive form of copula — cannot be followed by ったら particle
+  // Valid: だ+ね, だ+よ. Invalid: な+ったら (should be なっ+たら from なる)
+  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+      prev.surface == "な" &&
+      next.extended_pos == core::ExtendedPOS::ParticleFinal &&
+      utf8::startsWith(next.surface, "った")) {
+    surface_bonus += cost::kRare;
+  }
+
   // Penalty for ParticleFinal → VerbRenyokei pattern
   // E.g., いいよね should be いい+よ+ね(PART), not いい+よ+ね(VERB 寝る)
   // Final particles (よ, な, ね, わ) are rarely followed by verb renyokei

@@ -716,16 +716,20 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
           }
 
-          // Skip GodanSa renyokei (漢字+し) - this is likely サ変動詞 (名詞+する)
+          // Skip GodanSa renyokei (漢字+し/漢字+とし etc.) when not in dictionary
           // e.g., "得し" misrecognized as GodanSa "得す" renyokei, but actually "得+し"
+          // e.g., "証とし" misrecognized as GodanSa "証とす" renyokei, but actually "証+として"
           // MeCab splits as: 得(名詞) + し(する連用形) + た(過去)
-          // Exception: Real GodanSa verbs like "愛す" should not be skipped
+          // Exception: Real GodanSa verbs like "愛す", "汚す" should not be skipped
           if (best.verb_type == grammar::VerbType::GodanSa &&
-              hiragana_part == "し" && kanji_end - start_pos <= 3) {
-            // Check if the base form (漢字+す) is a registered GodanSa verb
-            std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "す";
+              utf8::endsWith(hiragana_part, "し") && kanji_end - start_pos <= 3) {
+            // Check if the base form (stem+す) is a registered GodanSa verb
+            // For single-char hiragana_part "し": base = kanji + す
+            // For multi-char like "とし": base = kanji + と + す = 証とす
+            std::string base_stem = extractSubstring(codepoints, start_pos, stem_end);
+            std::string base_form = base_stem + "す";
             if (!vh::isVerbInDictionary(dict_manager, base_form)) {
-              // Not a registered verb - likely サ変 pattern, skip to prefer noun+し split
+              // Not a registered verb - likely サ変 or compound particle pattern
               continue;
             }
           }
@@ -934,6 +938,19 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             // Found in dictionary - give strong bonus (not for suru-verbs)
             base_cost = verb_opts.base_cost_verified +
                         (1.0F - best.confidence) * verb_opts.confidence_cost_scale_medium;
+            // Godan-ra renyokei ambiguity: 降り can be from 降る(godan-ra) or
+            // 降りる(ichidan). When ichidan form exists in dict, penalize godan-ra
+            // so the more specific ichidan interpretation wins.
+            if (best.verb_type == grammar::VerbType::GodanRa &&
+                utf8::endsWith(surface, "り")) {
+              std::string ichidan_base = surface + "る";
+              if (vh::isVerbInDictionary(dict_manager, ichidan_base)) {
+                base_cost += 1.0F;
+                SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface
+                                          << "\" +1.0 (godan_ra_ichidan_ambiguity, "
+                                          << ichidan_base << " in dict)\n");
+              }
+            }
           }
           // Penalty for compound adjective patterns (verb renyokei + やすい/にくい/がたい)
           // MeCab splits these: 使いにくい → 使い + にくい
@@ -2128,16 +2145,18 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         }
         if (matched_verb_type == grammar::VerbType::Unknown &&
             !starts_with_dict_noun && !remainder_is_dict_verb) {
-          // Skip inflection fallback for 3+ kanji stems
+          // Skip inflection fallback for single-kanji and 3+ kanji stems
           // without dictionary entry.
-          // E.g., 画像貼っ (3 kanji) → NOT verb 画像貼る
-          // Allow 2-kanji stems: 手伝う, 見舞う etc. are common verbs
+          // Single kanji: 車っ → NOT verb 車る (common nouns + って)
+          // All real single-kanji godan verbs should be in L2 dictionary.
+          // 3+ kanji: 画像貼っ → NOT verb 画像貼る
+          // Allow only 2-kanji stems: 手伝う, 見舞う etc. are common verbs
           // that may not be in dictionary but inflection analysis can verify
           size_t kanji_char_count = kanji_end - start_pos;
-          if (kanji_char_count >= 3) {
+          if (kanji_char_count != 2) {
             SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem
-                                      << "\" too many kanji chars (" << kanji_char_count
-                                      << ") for non-dict sokuonbin\n");
+                                      << "\" kanji chars (" << kanji_char_count
+                                      << ") not 2, skip non-dict sokuonbin\n");
           } else {
           // Minimum length: kanji + っ + て/た = kanji_end + 2 (inclusive)
           float best_conf = 0.0F;
@@ -2193,6 +2212,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Inflection-only matches get neutral cost (0) to avoid false positives
           // like 像っ (from 像る which is not a real verb)
           std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
+          // Dict-matched verbs get bonus (-0.5) to beat unsplit forms
+          // Inflection-only matches (2-kanji stems only) get neutral cost
           const float sokuonbin_cost = matched_via_dict ? -0.5F : 0.0F;
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface

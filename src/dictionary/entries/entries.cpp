@@ -634,7 +634,7 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
 
       // Parallel/Addition (並列・添加)
       conj("又", ""), conj("及び", ""),
-      conj("並びに", ""), conj("且つ", ""),
+      conj("並びに", ""), conj("且つ", ""), conj("かつ", "且つ"),
       conj("更に", ""), conj("次に", ""),
       conj("しかも", ""), conj("そのうえ", ""),
 

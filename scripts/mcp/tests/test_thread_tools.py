@@ -1,0 +1,558 @@
+"""Tests for thread check tools."""
+
+import asyncio
+import json
+import shutil
+
+import pytest
+
+from suzume_mcp.tools.thread_tools import (
+    _is_japanese,
+    _list_bugs,
+    _load_progress,
+    _next_bug_id,
+    _normalize_width,
+    _process_lines,
+    _sanitize_filename,
+    _save_progress,
+    classify_diff,
+    summarize_diffs,
+    thread_bugs_clear,
+    thread_bugs_list,
+    thread_bugs_resolve,
+    thread_clear_issues,
+    thread_issues_summary,
+    thread_next,
+    thread_report_bug,
+    thread_reset_progress,
+    thread_scan,
+    thread_status,
+)
+
+pytestmark = pytest.mark.skipif(
+    shutil.which("mecab") is None,
+    reason="MeCab not installed",
+)
+
+
+def run(coro):
+    return asyncio.run(coro)
+
+
+def parse_json(result_str: str) -> dict:
+    """Parse JSON result from tool function."""
+    return json.loads(result_str)
+
+
+# ============================================================================
+# classify_diff
+# ============================================================================
+
+
+class TestClassifyDiff:
+    def test_over_split(self):
+        # Suzume has more tokens than expected
+        assert classify_diff("デカチンポ 画像", "デカ チンポ 画像") == "over-split"
+
+    def test_under_split(self):
+        # Suzume has fewer tokens than expected
+        assert classify_diff("二次 エロ 画像", "二次エロ 画像") == "under-split"
+
+    def test_boundary(self):
+        # Same count but different boundaries
+        assert classify_diff("恒例二 次", "恒例 二次") == "boundary"
+
+    def test_minor_fullwidth(self):
+        # Only fullwidth/halfwidth difference
+        assert classify_diff("２次", "2次") == "minor"
+
+    def test_exact_match_not_called(self):
+        # classify_diff is only called when there IS a diff, but test edge case
+        result = classify_diff("食べ て いる", "食べ て いる")
+        # Same tokens → same count → boundary (but in practice won't be called)
+        assert result in ("boundary", "minor")
+
+    def test_empty(self):
+        assert classify_diff("", "foo") == "empty"
+        assert classify_diff("foo", "") == "empty"
+
+
+class TestSummarizeDiffs:
+    def test_summary(self):
+        issues = [
+            {"diff_type": "over-split"},
+            {"diff_type": "over-split"},
+            {"diff_type": "under-split"},
+            {"diff_type": "boundary"},
+        ]
+        result = summarize_diffs(issues)
+        assert result == {"over-split": 2, "under-split": 1, "boundary": 1}
+
+    def test_empty(self):
+        assert summarize_diffs([]) == {}
+
+    def test_missing_key(self):
+        issues = [{"foo": "bar"}, {"diff_type": "over-split"}]
+        result = summarize_diffs(issues)
+        assert result == {"unknown": 1, "over-split": 1}
+
+
+# ============================================================================
+# Helper functions
+# ============================================================================
+
+
+class TestIsJapanese:
+    def test_hiragana(self):
+        assert _is_japanese("たべる")
+
+    def test_katakana(self):
+        assert _is_japanese("カタカナ")
+
+    def test_kanji(self):
+        assert _is_japanese("漢字")
+
+    def test_ascii_only(self):
+        assert not _is_japanese("hello world")
+
+    def test_mixed(self):
+        assert _is_japanese("Hello世界")
+
+
+class TestNormalizeWidth:
+    def test_fullwidth_digits(self):
+        assert _normalize_width("２次元") == "2次元"
+
+    def test_fullwidth_alpha(self):
+        assert _normalize_width("Ｈｅｌｌｏ") == "Hello"
+
+    def test_already_halfwidth(self):
+        assert _normalize_width("2次元") == "2次元"
+
+
+# ============================================================================
+# Progress tracking
+# ============================================================================
+
+
+class TestProgress:
+    def test_save_and_load(self, tmp_path, monkeypatch):
+        progress_file = tmp_path / ".progress"
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
+
+        progress = {"file": "/some/file.txt", "last_checked": 42, "problems_found": 5}
+        _save_progress(progress)
+
+        loaded = _load_progress("/some/file.txt")
+        assert loaded["last_checked"] == 42
+        assert loaded["problems_found"] == 5
+
+    def test_reset_on_file_change(self, tmp_path, monkeypatch):
+        progress_file = tmp_path / ".progress"
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
+
+        progress = {"file": "/old/file.txt", "last_checked": 100, "problems_found": 10}
+        _save_progress(progress)
+
+        loaded = _load_progress("/new/file.txt")
+        assert loaded["last_checked"] == 0
+        assert loaded["problems_found"] == 0
+
+    def test_no_file(self, tmp_path, monkeypatch):
+        progress_file = tmp_path / ".nonexistent"
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
+
+        loaded = _load_progress("/any/file.txt")
+        assert loaded["last_checked"] == 0
+
+
+# ============================================================================
+# process_lines (unit test with mock data)
+# ============================================================================
+
+
+class TestProcessLines:
+    def test_skip_empty_and_ascii(self):
+        lines = ["", "hello", "テスト"]
+        progress = {"problems_found": 0}
+        issues, processed, problems, skipped, max_line = _process_lines(
+            lines,
+            1,
+            10,
+            progress,
+            verbose=True,
+        )
+        assert processed == 3
+        assert skipped == 2  # empty + ascii-only
+        assert max_line == 3
+
+    def test_limit(self):
+        lines = ["テスト1", "テスト2", "テスト3", "テスト4"]
+        progress = {"problems_found": 0}
+        issues, processed, problems, skipped, max_line = _process_lines(
+            lines,
+            1,
+            2,
+            progress,
+            verbose=False,
+        )
+        assert processed == 2
+        assert max_line == 2
+
+    def test_from_offset(self):
+        lines = ["テスト1", "テスト2", "テスト3"]
+        progress = {"problems_found": 0}
+        issues, processed, problems, skipped, max_line = _process_lines(
+            lines,
+            3,
+            10,
+            progress,
+            verbose=True,
+        )
+        assert processed == 1
+        assert max_line == 3
+
+
+# ============================================================================
+# MCP tool integration tests
+# ============================================================================
+
+
+class TestThreadStatus:
+    def test_file_not_found(self):
+        result = parse_json(run(thread_status(input_file="/nonexistent/file.txt")))
+        assert result["status"] == "error"
+        assert "not found" in result["message"]
+
+    def test_with_temp_file(self, tmp_path, monkeypatch):
+        test_file = tmp_path / "thread_names.txt"
+        test_file.write_text("テスト1\nテスト2\nテスト3\n", encoding="utf-8")
+        progress_file = tmp_path / ".progress"
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
+
+        result = parse_json(run(thread_status(input_file=str(test_file))))
+        assert result["total_lines"] == 3
+        assert result["last_checked"] == 0
+
+
+class TestThreadNext:
+    def test_file_not_found(self):
+        result = parse_json(run(thread_next(input_file="/nonexistent/file.txt")))
+        assert result["status"] == "error"
+        assert "not found" in result["message"]
+
+    def test_small_batch(self, tmp_path, monkeypatch):
+        test_file = tmp_path / "thread_names.txt"
+        test_file.write_text("食べている\nhello\n漢字テスト\n", encoding="utf-8")
+        progress_file = tmp_path / ".progress"
+        issues_file = tmp_path / "issues.txt"
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.ISSUES_FILE", issues_file)
+
+        result = parse_json(run(thread_next(count=10, input_file=str(test_file))))
+        assert result["processed"] == 3
+        assert result["skipped"] == 1  # "hello" is ascii-only
+
+
+class TestThreadScan:
+    def test_file_not_found(self):
+        result = parse_json(run(thread_scan(input_file="/nonexistent/file.txt")))
+        assert result["status"] == "error"
+        assert "not found" in result["message"]
+
+    def test_small_batch(self, tmp_path, monkeypatch):
+        test_file = tmp_path / "thread_names.txt"
+        test_file.write_text("食べている\n走っている\n", encoding="utf-8")
+        progress_file = tmp_path / ".progress"
+        issues_file = tmp_path / "issues.txt"
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.ISSUES_FILE", issues_file)
+
+        result = parse_json(run(thread_scan(count=10, input_file=str(test_file))))
+        assert result["processed"] == 2
+
+
+class TestThreadIssuesSummary:
+    def test_no_file(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.ISSUES_FILE", tmp_path / "nonexistent.txt")
+        result = parse_json(run(thread_issues_summary()))
+        assert result["status"] == "error"
+        assert "No issues file" in result["message"]
+
+    def test_with_issues(self, tmp_path, monkeypatch):
+        issues_file = tmp_path / "issues.txt"
+        issues_file.write_text(
+            "L10\t恒例二次おっぱい\tunder-split\n"
+            "  expected: 恒例二 次 おっぱい\n"
+            "  suzume:   恒例二次 おっぱい\n"
+            "L20\tテスト文\tover-split\n"
+            "  expected: テスト文\n"
+            "  suzume:   テスト 文\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.ISSUES_FILE", issues_file)
+
+        result = parse_json(run(thread_issues_summary()))
+        assert result["total"] == 2
+        assert "under-split" in result["diff_types"]
+        assert "over-split" in result["diff_types"]
+
+
+class TestThreadResetProgress:
+    def test_reset(self, tmp_path, monkeypatch):
+        progress_file = tmp_path / ".progress"
+        progress_file.write_text("last_checked=100\n", encoding="utf-8")
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
+
+        result = parse_json(run(thread_reset_progress()))
+        assert result["status"] == "ok"
+        assert "reset" in result["message"].lower()
+        assert not progress_file.exists()
+
+
+class TestThreadClearIssues:
+    def test_clear(self, tmp_path, monkeypatch):
+        issues_file = tmp_path / "issues.txt"
+        issues_file.write_text("some issues\n", encoding="utf-8")
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.ISSUES_FILE", issues_file)
+
+        result = parse_json(run(thread_clear_issues()))
+        assert result["status"] == "ok"
+        assert "cleared" in result["message"].lower()
+        assert not issues_file.exists()
+
+
+# ============================================================================
+# Bug reporting tools
+# ============================================================================
+
+
+class TestSanitizeFilename:
+    def test_basic(self):
+        assert _sanitize_filename("おしっこしてる") == "おしっこしてる"
+
+    def test_special_chars(self):
+        result = _sanitize_filename("test/file name!@#")
+        assert "/" not in result
+        assert "!" not in result
+
+    def test_truncation(self):
+        result = _sanitize_filename("あ" * 50, max_len=10)
+        assert len(result) == 10
+
+
+class TestNextBugId:
+    def test_empty_dir(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", tmp_path / "bugs")
+        assert _next_bug_id() == 1
+
+    def test_sequential(self, tmp_path, monkeypatch):
+        bugs_dir = tmp_path / "bugs"
+        bugs_dir.mkdir()
+        (bugs_dir / "001_over-split_test.json").write_text("{}")
+        (bugs_dir / "002_boundary_test.json").write_text("{}")
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        assert _next_bug_id() == 3
+
+
+class TestThreadReportBug:
+    def test_report_basic(self, tmp_path, monkeypatch):
+        bugs_dir = tmp_path / "bugs"
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+
+        result = parse_json(
+            run(
+                thread_report_bug(
+                    text="おしっこしてる",
+                    expected="おしっこ し てる",
+                    suzume="お しっこし てる",
+                    diff_type="boundary",
+                )
+            )
+        )
+        assert result["status"] == "ok"
+        assert result["bug_id"] == 1
+        assert result["total_bugs"] == 1
+
+        files = list(bugs_dir.glob("*.json"))
+        assert len(files) == 1
+        data = json.loads(files[0].read_text(encoding="utf-8"))
+        assert data["text"] == "おしっこしてる"
+        assert data["diff_type"] == "boundary"
+
+    def test_report_with_description(self, tmp_path, monkeypatch):
+        bugs_dir = tmp_path / "bugs"
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+
+        run(
+            thread_report_bug(
+                text="テスト文",
+                expected="テスト 文",
+                suzume="テスト文",
+                description="missing candidate",
+                line_num=42,
+            )
+        )
+
+        files = list(bugs_dir.glob("*.json"))
+        data = json.loads(files[0].read_text(encoding="utf-8"))
+        assert data["description"] == "missing candidate"
+        assert data["line_num"] == 42
+
+    def test_report_auto_classify(self, tmp_path, monkeypatch):
+        bugs_dir = tmp_path / "bugs"
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+
+        run(
+            thread_report_bug(
+                text="テスト",
+                expected="テスト 文",
+                suzume="テスト文",
+            )
+        )
+        files = list(bugs_dir.glob("*.json"))
+        data = json.loads(files[0].read_text(encoding="utf-8"))
+        assert data["diff_type"] == "under-split"
+
+    def test_report_multiple(self, tmp_path, monkeypatch):
+        bugs_dir = tmp_path / "bugs"
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+
+        run(thread_report_bug(text="A", expected="a b", suzume="ab"))
+        result = parse_json(run(thread_report_bug(text="B", expected="c d", suzume="cd")))
+        assert result["total_bugs"] == 2
+        assert len(list(bugs_dir.glob("*.json"))) == 2
+
+
+class TestThreadBugsList:
+    def test_no_dir(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", tmp_path / "nope")
+        result = parse_json(run(thread_bugs_list()))
+        assert result["total"] == 0
+        assert result["bugs"] == []
+
+    def test_with_bugs(self, tmp_path, monkeypatch):
+        bugs_dir = tmp_path / "bugs"
+        bugs_dir.mkdir()
+        (bugs_dir / "001_boundary_test.json").write_text(
+            json.dumps(
+                {
+                    "id": 1,
+                    "text": "おしっこしてる",
+                    "expected": "おしっこ し てる",
+                    "suzume": "お しっこし てる",
+                    "diff_type": "boundary",
+                    "description": "sokuon false positive",
+                },
+                ensure_ascii=False,
+            )
+        )
+        (bugs_dir / "002_under-split_test.json").write_text(
+            json.dumps(
+                {
+                    "id": 2,
+                    "text": "テスト文",
+                    "expected": "テスト 文",
+                    "suzume": "テスト文",
+                    "diff_type": "under-split",
+                },
+                ensure_ascii=False,
+            )
+        )
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+
+        result = parse_json(run(thread_bugs_list()))
+        assert result["total"] == 2
+        assert "boundary" in result["diff_types"]
+        assert "under-split" in result["diff_types"]
+        # Check description is present in bug entries
+        descriptions = [b.get("description", "") for b in result["bugs"]]
+        assert "sokuon false positive" in descriptions
+
+
+class TestThreadBugsClear:
+    def test_clear(self, tmp_path, monkeypatch):
+        bugs_dir = tmp_path / "bugs"
+        bugs_dir.mkdir()
+        (bugs_dir / "001_test.json").write_text("{}")
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+
+        result = parse_json(run(thread_bugs_clear()))
+        assert result["status"] == "ok"
+        assert "cleared" in result["message"].lower()
+        assert not bugs_dir.exists()
+
+    def test_clear_nonexistent(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", tmp_path / "nope")
+        result = parse_json(run(thread_bugs_clear()))
+        assert result["status"] == "ok"
+        assert "cleared" in result["message"].lower()
+
+
+class TestThreadBugsResolve:
+    def test_resolve_by_filename(self, tmp_path, monkeypatch):
+        bugs_dir = tmp_path / "bugs"
+        bugs_dir.mkdir()
+        f = bugs_dir / "001_boundary_test.json"
+        f.write_text("{}")
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+
+        result = parse_json(run(thread_bugs_resolve("001_boundary_test.json")))
+        assert result["status"] == "ok"
+        assert result["resolved"] == "001_boundary_test.json"
+        assert not f.exists()
+
+    def test_resolve_by_id(self, tmp_path, monkeypatch):
+        bugs_dir = tmp_path / "bugs"
+        bugs_dir.mkdir()
+        f = bugs_dir / "003_over-split_foo.json"
+        f.write_text("{}")
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+
+        result = parse_json(run(thread_bugs_resolve("3")))
+        assert result["status"] == "ok"
+        assert "003_over-split_foo.json" in result["resolved"]
+        assert not f.exists()
+
+    def test_resolve_not_found(self, tmp_path, monkeypatch):
+        bugs_dir = tmp_path / "bugs"
+        bugs_dir.mkdir()
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+
+        result = parse_json(run(thread_bugs_resolve("999")))
+        assert result["status"] == "error"
+        assert "No bug file found" in result["message"]
+
+
+class TestListBugs:
+    def test_list(self, tmp_path, monkeypatch):
+        bugs_dir = tmp_path / "bugs"
+        bugs_dir.mkdir()
+        (bugs_dir / "001_test.json").write_text(
+            json.dumps(
+                {
+                    "id": 1,
+                    "text": "a",
+                    "diff_type": "over-split",
+                }
+            )
+        )
+        (bugs_dir / "002_test.json").write_text(
+            json.dumps(
+                {
+                    "id": 2,
+                    "text": "b",
+                    "diff_type": "boundary",
+                }
+            )
+        )
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+
+        bugs = _list_bugs()
+        assert len(bugs) == 2
+        assert bugs[0]["id"] == 1
+        assert bugs[1]["id"] == 2
+
+    def test_empty(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", tmp_path / "nope")
+        assert _list_bugs() == []

@@ -1,213 +1,194 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "もらって - MeCab-compatible split",
-      "expected" : [
+      "description": "もらって - MeCab-compatible split",
+      "expected": [
         {
-          "lemma" : "もらう",
-          "pos" : "Verb",
-          "surface" : "もらっ"
+          "lemma": "もらう",
+          "pos": "Verb",
+          "surface": "もらっ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "bug_morau",
-      "input" : "もらって",
-      "tags" : [
+      "id": "bug_morau",
+      "input": "もらって",
+      "tags": [
         "basic"
       ]
     },
     {
-      "description" : "昨日買った本を読んでいる - MeCab互換分割",
-      "expected" : [
+      "description": "昨日買った本を読んでいる - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "昨日"
+          "pos": "Noun",
+          "surface": "昨日"
         },
         {
-          "lemma" : "買う",
-          "pos" : "Verb",
-          "surface" : "買っ"
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "読む",
-          "pos" : "Verb",
-          "surface" : "読ん"
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いる"
+          "pos": "Auxiliary",
+          "surface": "いる"
         }
       ],
-      "id" : "complex_relative_clause",
-      "input" : "昨日買った本を読んでいる",
-      "tags" : [
+      "id": "complex_relative_clause",
+      "input": "昨日買った本を読んでいる",
+      "tags": [
         "grammar",
         "complex"
       ]
     },
     {
-      "description" : "B52: 交って - MeCab-compatible split with lemma 交う",
-      "expected" : [
+      "description": "B52: 交って - MeCab-compatible split with lemma 交う",
+      "expected": [
         {
-          "lemma" : "交う",
-          "pos" : "Verb",
-          "surface" : "交っ"
+          "lemma": "交う",
+          "pos": "Verb",
+          "surface": "交っ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いる"
+          "pos": "Auxiliary",
+          "surface": "いる"
         }
       ],
-      "id" : "majitte_verb",
-      "input" : "交っている",
-      "tags" : [
+      "id": "majitte_verb",
+      "input": "交っている",
+      "tags": [
         "verb",
         "lemma"
       ]
     },
     {
-      "description" : "iphone買った - ASCII to Japanese verb boundary - MeCab-compatible split",
-      "expected" : [
+      "description": "iphone買った - ASCII to Japanese verb boundary - MeCab-compatible split",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "iphone"
+          "pos": "Noun",
+          "surface": "iphone"
         },
         {
-          "lemma" : "買う",
-          "pos" : "Verb",
-          "surface" : "買っ"
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "script_boundary_ascii_to_verb",
-      "input" : "iphone買った",
-      "tags" : [
+      "id": "script_boundary_ascii_to_verb",
+      "input": "iphone買った",
+      "tags": [
         "script_boundary"
       ]
     },
     {
-      "description" : "本買った - noun verb without particle - MeCab-compatible split",
-      "expected" : [
+      "description": "本買った - noun verb without particle - MeCab-compatible split",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "lemma" : "買う",
-          "pos" : "Verb",
-          "surface" : "買っ"
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "script_boundary_particleless",
-      "input" : "本買った",
-      "tags" : [
+      "id": "script_boundary_particleless",
+      "input": "本買った",
+      "tags": [
         "script_boundary"
       ]
     },
     {
-      "description" : "間違う should be single Verb token",
-      "expected" : [
+      "description": "間違う should be single Verb token",
+      "expected": [
         {
-          "lemma" : "間違う",
-          "pos" : "Verb",
-          "surface" : "間違う"
+          "lemma": "間違う",
+          "pos": "Verb",
+          "surface": "間違う"
         }
       ],
-      "id" : "verb_machigau",
-      "input" : "間違う",
-      "tags" : [
+      "id": "verb_machigau",
+      "input": "間違う",
+      "tags": [
         "verb"
       ]
     },
     {
-      "description" : "間違った should have lemma 間違う",
-      "expected" : [
+      "description": "間違った should have lemma 間違う",
+      "expected": [
         {
-          "lemma" : "間違う",
-          "pos" : "Verb",
-          "surface" : "間違っ"
+          "lemma": "間違う",
+          "pos": "Verb",
+          "surface": "間違っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "verb_machigatta",
-      "input" : "間違った",
-      "tags" : [
+      "id": "verb_machigatta",
+      "input": "間違った",
+      "tags": [
         "verb"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
-      },
-      "description" : "疑ってしまう - MeCab-compatible split with lemma 疑う",
-      "expected" : [
+      "description": "疑ってしまう - MeCab-compatible split with lemma 疑う",
+      "expected": [
         {
-          "lemma" : "疑う",
-          "pos" : "Verb",
-          "surface" : "疑っ"
+          "lemma": "疑う",
+          "pos": "Verb",
+          "surface": "疑っ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "しまう"
+          "pos": "Auxiliary",
+          "surface": "しまう"
         }
       ],
-      "id" : "onbin_utagau_lemma",
-      "input" : "疑ってしまう",
-      "suzume_expected" : [
-        {
-          "lemma" : "疑る",
-          "pos" : "Verb",
-          "surface" : "疑っ"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "て"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "しまう"
-        }
-      ],
-      "tags" : [
+      "id": "onbin_utagau_lemma",
+      "input": "疑ってしまう",
+      "tags": [
         "verb",
         "onbin",
         "lemma",
@@ -215,297 +196,274 @@
       ]
     },
     {
-      "description" : "行います - GodanWa verb (split: verb stem + polite aux)",
-      "expected" : [
+      "description": "行います - GodanWa verb (split: verb stem + polite aux)",
+      "expected": [
         {
-          "lemma" : "行う",
-          "pos" : "Verb",
-          "surface" : "行い"
+          "lemma": "行う",
+          "pos": "Verb",
+          "surface": "行い"
         },
         {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "godanwa_okonaimasu",
-      "input" : "行います",
-      "tags" : [
+      "id": "godanwa_okonaimasu",
+      "input": "行います",
+      "tags": [
         "godanwa",
         "lemma"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "verb form: context-dependent POS/lemma"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "verb form: context-dependent POS/lemma"
       },
-      "description" : "景気回復に伴い - GodanWa renyokei",
-      "expected" : [
+      "description": "景気回復に伴い - GodanWa renyokei",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "景気回復"
+          "pos": "Noun",
+          "surface": "景気回復"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "伴う",
-          "pos" : "Verb",
-          "surface" : "伴い"
+          "lemma": "伴う",
+          "pos": "Verb",
+          "surface": "伴い"
         }
       ],
-      "id" : "godanwa_tomonai",
-      "input" : "景気回復に伴い",
-      "suzume_expected" : [
+      "id": "godanwa_tomonai",
+      "input": "景気回復に伴い",
+      "suzume_expected": [
         {
-          "pos" : "Noun",
-          "surface" : "景気回復"
+          "pos": "Noun",
+          "surface": "景気回復"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "伴い"
+          "pos": "Adjective",
+          "surface": "伴い"
         }
       ],
-      "tags" : [
+      "tags": [
         "godanwa",
         "renyokei"
       ]
     },
     {
-      "description" : "奪われた - godan passive (MeCab-style split)",
-      "expected" : [
+      "description": "奪われた - godan passive (MeCab-style split)",
+      "expected": [
         {
-          "lemma" : "奪う",
-          "pos" : "Verb",
-          "surface" : "奪わ"
+          "lemma": "奪う",
+          "pos": "Verb",
+          "surface": "奪わ"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
-          "surface" : "れ"
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "godan_passive",
-      "input" : "奪われた",
-      "tags" : [
+      "id": "godan_passive",
+      "input": "奪われた",
+      "tags": [
         "godan",
         "passive"
       ]
     },
     {
-      "description" : "Godan verb 買う base form",
-      "expected" : [
+      "description": "Godan verb 買う base form",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "買う"
+          "pos": "Verb",
+          "surface": "買う"
         }
       ],
-      "id" : "godan_kau_base",
-      "input" : "買う",
-      "tags" : [
+      "id": "godan_kau_base",
+      "input": "買う",
+      "tags": [
         "verb",
         "godan"
       ]
     },
     {
-      "description" : "Godan verb 買う past form - MeCab-compatible split",
-      "expected" : [
+      "description": "Godan verb 買う past form - MeCab-compatible split",
+      "expected": [
         {
-          "lemma" : "買う",
-          "pos" : "Verb",
-          "surface" : "買っ"
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "godan_kau_past",
-      "input" : "買った",
-      "tags" : [
+      "id": "godan_kau_past",
+      "input": "買った",
+      "tags": [
         "verb",
         "godan"
       ]
     },
     {
-      "description" : "Purpose clause with verb renyoukei - MeCab-compatible split",
-      "expected" : [
+      "description": "Purpose clause with verb renyoukei - MeCab-compatible split",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "買う",
-          "pos" : "Verb",
-          "surface" : "買い"
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買い"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "行く",
-          "pos" : "Verb",
-          "surface" : "行っ"
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行っ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "multi_verb_purpose",
-      "input" : "本を買いに行った",
-      "tags" : [
+      "id": "multi_verb_purpose",
+      "input": "本を買いに行った",
+      "tags": [
         "verb",
         "purpose"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
-      },
-      "description" : "S2: 揃って should have lemma 揃う, not 揃る (GodanWa euphony)",
-      "expected" : [
+      "description": "S2: 揃って should have lemma 揃う, not 揃る (GodanWa euphony)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "全員"
+          "pos": "Noun",
+          "surface": "全員"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "揃う",
-          "pos" : "Verb",
-          "surface" : "揃っ"
+          "lemma": "揃う",
+          "pos": "Verb",
+          "surface": "揃っ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "s2_sorotte_lemma",
-      "input" : "全員が揃って",
-      "suzume_expected" : [
-        {
-          "pos" : "Noun",
-          "surface" : "全員"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "が"
-        },
-        {
-          "lemma" : "揃る",
-          "pos" : "Verb",
-          "surface" : "揃っ"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "て"
-        }
-      ],
-      "tags" : [
+      "id": "s2_sorotte_lemma",
+      "input": "全員が揃って",
+      "tags": [
         "s2_fix",
         "lemma",
         "regression"
       ]
     },
     {
-      "description" : "S4: うかがう should be recognized as Godan-Wa verb (prevent う+か+が+う split)",
-      "expected" : [
+      "description": "S4: うかがう should be recognized as Godan-Wa verb (prevent う+か+が+う split)",
+      "expected": [
         {
-          "lemma" : "うかがう",
-          "pos" : "Verb",
-          "surface" : "うかがう"
+          "lemma": "うかがう",
+          "pos": "Verb",
+          "surface": "うかがう"
         }
       ],
-      "id" : "s4_ukagau_base",
-      "input" : "うかがう",
-      "tags" : [
+      "id": "s4_ukagau_base",
+      "input": "うかがう",
+      "tags": [
         "s4_fix",
         "hiragana_verb",
         "regression"
       ]
     },
     {
-      "description" : "S4: うかがった - MeCab-compatible split",
-      "expected" : [
+      "description": "S4: うかがった - MeCab-compatible split",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "話"
+          "pos": "Noun",
+          "surface": "話"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "うかがう",
-          "pos" : "Verb",
-          "surface" : "うかがっ"
+          "lemma": "うかがう",
+          "pos": "Verb",
+          "surface": "うかがっ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "s4_ukagatta",
-      "input" : "話をうかがった",
-      "tags" : [
+      "id": "s4_ukagatta",
+      "input": "話をうかがった",
+      "tags": [
         "s4_fix",
         "hiragana_verb",
         "regression"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "verb form: context-dependent POS/lemma"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "verb form: context-dependent POS/lemma"
       },
-      "description" : "しまって - MeCab-compatible split with lemma しまう",
-      "expected" : [
+      "description": "しまって - MeCab-compatible split with lemma しまう",
+      "expected": [
         {
-          "lemma" : "しまう",
-          "pos" : "Verb",
-          "surface" : "しまっ"
+          "lemma": "しまう",
+          "pos": "Verb",
+          "surface": "しまっ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "p4_shimatte_te",
-      "input" : "しまって",
-      "suzume_expected" : [
+      "id": "p4_shimatte_te",
+      "input": "しまって",
+      "suzume_expected": [
         {
-          "lemma" : "しまう",
-          "pos" : "Auxiliary",
-          "surface" : "しまっ"
+          "lemma": "しまう",
+          "pos": "Auxiliary",
+          "surface": "しまっ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "tags" : [
+      "tags": [
         "p4",
         "godanwa",
         "hiragana-verb",
@@ -513,36 +471,36 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma normalization difference"
       },
-      "description" : "あらった - GodanWa past form without dictionary, lemma should be あらう",
-      "expected" : [
+      "description": "あらった - GodanWa past form without dictionary, lemma should be あらう",
+      "expected": [
         {
-          "lemma" : "あらう",
-          "pos" : "Verb",
-          "surface" : "あらっ"
+          "lemma": "あらう",
+          "pos": "Verb",
+          "surface": "あらっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "p4_aratta_past",
-      "input" : "あらった",
-      "suzume_expected" : [
+      "id": "p4_aratta_past",
+      "input": "あらった",
+      "suzume_expected": [
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あらっ"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あらっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "tags" : [
+      "tags": [
         "p4",
         "godanwa",
         "hiragana-verb",
@@ -551,36 +509,36 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma normalization difference"
       },
-      "description" : "あらって - GodanWa te-form without dictionary, lemma should be あらう",
-      "expected" : [
+      "description": "あらって - GodanWa te-form without dictionary, lemma should be あらう",
+      "expected": [
         {
-          "lemma" : "あらう",
-          "pos" : "Verb",
-          "surface" : "あらっ"
+          "lemma": "あらう",
+          "pos": "Verb",
+          "surface": "あらっ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "p4_aratte_te",
-      "input" : "あらって",
-      "suzume_expected" : [
+      "id": "p4_aratte_te",
+      "input": "あらって",
+      "suzume_expected": [
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あらっ"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あらっ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "tags" : [
+      "tags": [
         "p4",
         "godanwa",
         "hiragana-verb",
@@ -589,51 +547,51 @@
       ]
     },
     {
-      "description" : "洗った - GodanWa past form (kanji) - MeCab-compatible split",
-      "expected" : [
+      "description": "洗った - GodanWa past form (kanji) - MeCab-compatible split",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "手"
+          "pos": "Noun",
+          "surface": "手"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "洗う",
-          "pos" : "Verb",
-          "surface" : "洗っ"
+          "lemma": "洗う",
+          "pos": "Verb",
+          "surface": "洗っ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "kanji_aratta_godanwa",
-      "input" : "手を洗った",
-      "tags" : [
+      "id": "kanji_aratta_godanwa",
+      "input": "手を洗った",
+      "tags": [
         "godanwa",
         "kanji-verb",
         "past-form"
       ]
     },
     {
-      "description" : "逢った - GodanWa past, lemma should be 逢う not 逢る (W-017)",
-      "expected" : [
+      "description": "逢った - GodanWa past, lemma should be 逢う not 逢る (W-017)",
+      "expected": [
         {
-          "lemma" : "逢う",
-          "pos" : "Verb",
-          "surface" : "逢っ"
+          "lemma": "逢う",
+          "pos": "Verb",
+          "surface": "逢っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "kanji_atta_godanwa_au",
-      "input" : "逢った",
-      "tags" : [
+      "id": "kanji_atta_godanwa_au",
+      "input": "逢った",
+      "tags": [
         "godanwa",
         "classical",
         "wagahai",
@@ -641,6 +599,6 @@
       ]
     }
   ],
-  "description" : "Godan Wa-row verbs (五段ワ行動詞) - verbs ending in う",
-  "version" : "1.0"
+  "description": "Godan Wa-row verbs (五段ワ行動詞) - verbs ending in う",
+  "version": "1.0"
 }
