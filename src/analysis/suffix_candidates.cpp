@@ -7,12 +7,15 @@
 
 #include <unordered_set>
 
+#include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "dictionary/dictionary.h"
+#include "grammar/conjugation.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
+#include "verb_candidates_helpers.h"
 
 namespace suzume::analysis {
 
@@ -529,7 +532,13 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
   if (!skip_single_char) {
     std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
     if (!surface.empty()) {
-      auto cand = makeCandidate(surface, start_pos, kanji_end + 1, core::PartOfSpeech::Noun, 1.2F, false, CandidateOrigin::NominalizedNoun);
+      // Scale cost higher for long kanji sequences to prevent absorbing
+      // following tokens (e.g., 触手画像み should not beat 触手画像+みんな)
+      float nom1_cost = 1.2F;
+      if (kanji_count >= 3) {
+        nom1_cost += static_cast<float>(kanji_count - 2) * 0.5F;
+      }
+      auto cand = makeCandidate(surface, start_pos, kanji_end + 1, core::PartOfSpeech::Noun, nom1_cost, false, CandidateOrigin::NominalizedNoun);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = 0.6F;
       cand.pattern = "nominalized_1hira";
@@ -616,6 +625,46 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
             cand.pattern = "kanji_sokuon_kanji";
 #endif
             candidates.push_back(cand);
+          }
+        }
+
+        // Check for hatsuonbin verb: 漢字+っ+漢字+ん (e.g., 吹っ飛ん from 吹っ飛ぶ)
+        // When the second kanji is followed by ん, check if kanji2+ぶ/む/ぬ is in dict
+        if (kanji2_end < codepoints.size() &&
+            codepoints[kanji2_end] == U'ん' && dict_manager != nullptr) {
+          std::string kanji2_stem = extractSubstring(codepoints, sokuon_pos + 1, kanji2_end);
+          static const std::vector<std::pair<grammar::VerbType, std::string_view>>
+              hatsuonbin_types = {
+                  {grammar::VerbType::GodanBa, "ぶ"},
+                  {grammar::VerbType::GodanMa, "む"},
+                  {grammar::VerbType::GodanNa, "ぬ"},
+              };
+
+          for (const auto& [verb_type, base_suffix] : hatsuonbin_types) {
+            std::string base_form = kanji2_stem + std::string(base_suffix);
+            if (verb_helpers::isVerbInDictionaryWithType(dict_manager, base_form, verb_type) ||
+                verb_helpers::isVerbInDictionary(dict_manager, base_form)) {
+              size_t onbin_end = kanji2_end + 1;  // Include ん
+              std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_end);
+              constexpr float kHatsuonbinCost = -0.5F;
+              auto cand = makeCandidate(onbin_surface, start_pos, onbin_end,
+                                        core::PartOfSpeech::Verb, kHatsuonbinCost, false,
+                                        CandidateOrigin::KanjiHiraganaCompound);
+              // Full base form includes the first kanji + っ
+              std::string full_kanji = extractSubstring(codepoints, start_pos, kanji2_end);
+              cand.lemma = full_kanji + std::string(base_suffix);
+              cand.conj_type = grammar::verbTypeToConjType(verb_type);
+              cand.extended_pos = core::ExtendedPOS::VerbOnbinkei;
+#ifdef SUZUME_DEBUG_INFO
+              cand.confidence = 0.9F;
+              cand.pattern = "sokuon_kanji_hatsuonbin";
+#endif
+              SUZUME_DEBUG_LOG("[SUFFIX_CAND] " << onbin_surface
+                              << " sokuon_kanji_hatsuonbin lemma=" << cand.lemma
+                              << " cost=" << kHatsuonbinCost << "\n");
+              candidates.push_back(cand);
+              break;
+            }
           }
         }
       } else if (next_type == normalize::CharType::Hiragana) {

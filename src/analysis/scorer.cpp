@@ -339,7 +339,13 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Noun) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     if (char_len >= 3 && grammar::isMixedHiraganaKanji(edge.surface)) {
-      cost += sc::kBonusMixedNoun;
+      if (char_len >= 4) {
+        // Length-scaled bonus for long mixed nouns (お兄ちゃん, お父さん, なし崩し)
+        cost += lengthScaledBonus(sc::kBonusLongMixedNounBase, char_len, 4,
+                                  -sc::kBonusLongMixedNounPerChar);
+      } else {
+        cost += sc::kBonusMixedNoun;
+      }
     }
   }
 

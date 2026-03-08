@@ -1,621 +1,621 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "Compound verb 食べ過ぎる + て form (B63: ichidan compound verb fix)",
-      "expected" : [
+      "description": "Compound verb 食べ過ぎる + て form (B63: ichidan compound verb fix)",
+      "expected": [
         {
-          "lemma" : "食べる",
-          "pos" : "Verb",
-          "surface" : "食べ"
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
         },
         {
-          "lemma" : "すぎる",
-          "pos" : "Verb",
-          "surface" : "すぎ"
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "aux_sugiru_verb",
-      "input" : "食べすぎて",
-      "tags" : [
+      "id": "aux_sugiru_verb",
+      "input": "食べすぎて",
+      "tags": [
         "compound",
         "sugiru",
         "ichidan"
       ]
     },
     {
-      "description" : "食べすぎてしまいそう - verb compound (食べ過ぎる) + て + しまう + そう (B63 ichidan compound fix)",
-      "expected" : [
+      "description": "食べすぎてしまいそう - verb compound (食べ過ぎる) + て + しまう + そう (B63 ichidan compound fix)",
+      "expected": [
         {
-          "lemma" : "食べる",
-          "pos" : "Verb",
-          "surface" : "食べ"
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
         },
         {
-          "lemma" : "すぎる",
-          "pos" : "Verb",
-          "surface" : "すぎ"
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "しまう",
-          "pos" : "Auxiliary",
-          "surface" : "しまい"
+          "lemma": "しまう",
+          "pos": "Auxiliary",
+          "surface": "しまい"
         },
         {
-          "pos" : "Adverb",
-          "surface" : "そう"
+          "pos": "Adverb",
+          "surface": "そう"
         }
       ],
-      "id" : "verb_not_adj_tabesugite",
-      "input" : "食べすぎてしまいそう",
-      "tags" : [
+      "id": "verb_not_adj_tabesugite",
+      "input": "食べすぎてしまいそう",
+      "tags": [
         "verb",
         "compound",
         "ichidan"
       ]
     },
     {
-      "description" : "B63: 抜け出す should be single compound verb, not 抜け+出す split",
-      "expected" : [
+      "description": "B63: 抜け出す should be single compound verb, not 抜け+出す split",
+      "expected": [
         {
-          "lemma" : "抜け出す",
-          "pos" : "Verb",
-          "surface" : "抜け出す"
+          "lemma": "抜け出す",
+          "pos": "Verb",
+          "surface": "抜け出す"
         }
       ],
-      "id" : "nukedasu_compound",
-      "input" : "抜け出す",
-      "tags" : [
+      "id": "nukedasu_compound",
+      "input": "抜け出す",
+      "tags": [
         "compound_verb",
         "ichidan"
       ]
     },
     {
-      "description" : "B63: 食べ込む should be single compound verb (ichidan + V2)",
-      "expected" : [
+      "description": "B63: 食べ込む should be single compound verb (ichidan + V2)",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "食べ込む"
+          "pos": "Verb",
+          "surface": "食べ込む"
         }
       ],
-      "id" : "tabekomeru_compound",
-      "input" : "食べ込む",
-      "tags" : [
+      "id": "tabekomeru_compound",
+      "input": "食べ込む",
+      "tags": [
         "compound_verb",
         "ichidan"
       ]
     },
     {
-      "description" : "B63: 駆け出す should be single compound verb (ichidan + V2)",
-      "expected" : [
+      "description": "B63: 駆け出す should be single compound verb (ichidan + V2)",
+      "expected": [
         {
-          "lemma" : "駆け出す",
-          "pos" : "Verb",
-          "surface" : "駆け出す"
+          "lemma": "駆け出す",
+          "pos": "Verb",
+          "surface": "駆け出す"
         }
       ],
-      "id" : "kakedasu_compound",
-      "input" : "駆け出す",
-      "tags" : [
+      "id": "kakedasu_compound",
+      "input": "駆け出す",
+      "tags": [
         "compound_verb",
         "ichidan"
       ]
     },
     {
-      "description" : "買ってきた - te-form + subsidiary auxiliary split",
-      "expected" : [
+      "description": "買ってきた - te-form + subsidiary auxiliary split",
+      "expected": [
         {
-          "lemma" : "買う",
-          "pos" : "Verb",
-          "surface" : "買っ"
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くる",
-          "pos" : "Auxiliary",
-          "surface" : "き"
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "script_boundary_te_form",
-      "input" : "買ってきた",
-      "tags" : [
+      "id": "script_boundary_te_form",
+      "input": "買ってきた",
+      "tags": [
         "te_form",
         "auxiliary"
       ]
     },
     {
-      "description" : "読み終わったら - compound verb pattern",
-      "expected" : [
+      "description": "読み終わったら - compound verb pattern",
+      "expected": [
         {
-          "lemma" : "読む",
-          "pos" : "Verb",
-          "surface" : "読み"
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
         },
         {
-          "lemma" : "終わる",
-          "pos" : "Verb",
-          "surface" : "終わっ"
+          "lemma": "終わる",
+          "pos": "Verb",
+          "surface": "終わっ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "たら"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
         }
       ],
-      "id" : "compound_verb_yomi_owattara",
-      "input" : "読み終わったら",
-      "tags" : [
+      "id": "compound_verb_yomi_owattara",
+      "input": "読み終わったら",
+      "tags": [
         "compound_verb"
       ]
     },
     {
-      "description" : "読み続ける - compound verb",
-      "expected" : [
+      "description": "読み続ける - compound verb",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "読み続ける"
+          "pos": "Verb",
+          "surface": "読み続ける"
         }
       ],
-      "id" : "compound_verb_yomi_tsuzukeru",
-      "input" : "読み続ける",
-      "tags" : [
+      "id": "compound_verb_yomi_tsuzukeru",
+      "input": "読み続ける",
+      "tags": [
         "compound_verb"
       ]
     },
     {
-      "description" : "歩きながら話す - nagara form godan",
-      "expected" : [
+      "description": "歩きながら話す - nagara form godan",
+      "expected": [
         {
-          "lemma" : "歩く",
-          "pos" : "Verb",
-          "surface" : "歩き"
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩き"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ながら"
+          "pos": "Particle",
+          "surface": "ながら"
         },
         {
-          "pos" : "Verb",
-          "surface" : "話す"
+          "pos": "Verb",
+          "surface": "話す"
         }
       ],
-      "id" : "compound_verb_aruki_nagara",
-      "input" : "歩きながら話す",
-      "tags" : [
+      "id": "compound_verb_aruki_nagara",
+      "input": "歩きながら話す",
+      "tags": [
         "compound_verb",
         "nagara"
       ]
     },
     {
-      "description" : "食べながら歩く - nagara form ichidan",
-      "expected" : [
+      "description": "食べながら歩く - nagara form ichidan",
+      "expected": [
         {
-          "lemma" : "食べる",
-          "pos" : "Verb",
-          "surface" : "食べ"
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ながら"
+          "pos": "Particle",
+          "surface": "ながら"
         },
         {
-          "pos" : "Verb",
-          "surface" : "歩く"
+          "pos": "Verb",
+          "surface": "歩く"
         }
       ],
-      "id" : "compound_verb_tabe_nagara",
-      "input" : "食べながら歩く",
-      "tags" : [
+      "id": "compound_verb_tabe_nagara",
+      "input": "食べながら歩く",
+      "tags": [
         "compound_verb",
         "nagara"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma normalization difference"
       },
-      "description" : "走りだしたくなかった - hiragana subsidiary verb",
-      "expected" : [
+      "description": "走りだしたくなかった - hiragana subsidiary verb",
+      "expected": [
         {
-          "lemma" : "走りだす",
-          "pos" : "Verb",
-          "surface" : "走りだし"
+          "lemma": "走りだす",
+          "pos": "Verb",
+          "surface": "走りだし"
         },
         {
-          "lemma" : "たい",
-          "pos" : "Auxiliary",
-          "surface" : "たく"
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たく"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "なかっ"
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "compound_verb_hiragana_v2_dasu",
-      "input" : "走りだしたくなかった",
-      "suzume_expected" : [
+      "id": "compound_verb_hiragana_v2_dasu",
+      "input": "走りだしたくなかった",
+      "suzume_expected": [
         {
-          "lemma" : "走り出す",
-          "pos" : "Verb",
-          "surface" : "走りだし"
+          "lemma": "走り出す",
+          "pos": "Verb",
+          "surface": "走りだし"
         },
         {
-          "lemma" : "たい",
-          "pos" : "Auxiliary",
-          "surface" : "たく"
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たく"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Adjective",
-          "surface" : "なかっ"
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なかっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "tags" : [
+      "tags": [
         "compound_verb",
         "hiragana_v2"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma normalization difference"
       },
-      "description" : "飛びこみたい - hiragana subsidiary verb",
-      "expected" : [
+      "description": "飛びこみたい - hiragana subsidiary verb",
+      "expected": [
         {
-          "lemma" : "飛びこむ",
-          "pos" : "Verb",
-          "surface" : "飛びこみ"
+          "lemma": "飛びこむ",
+          "pos": "Verb",
+          "surface": "飛びこみ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "たい"
+          "pos": "Auxiliary",
+          "surface": "たい"
         }
       ],
-      "id" : "compound_verb_hiragana_v2_komu",
-      "input" : "飛びこみたい",
-      "suzume_expected" : [
+      "id": "compound_verb_hiragana_v2_komu",
+      "input": "飛びこみたい",
+      "suzume_expected": [
         {
-          "lemma" : "飛び込む",
-          "pos" : "Verb",
-          "surface" : "飛びこみ"
+          "lemma": "飛び込む",
+          "pos": "Verb",
+          "surface": "飛びこみ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "たい"
+          "pos": "Auxiliary",
+          "surface": "たい"
         }
       ],
-      "tags" : [
+      "tags": [
         "compound_verb",
         "hiragana_v2"
       ]
     },
     {
-      "description" : "読みすぎた - hiragana subsidiary verb",
-      "expected" : [
+      "description": "読みすぎた - hiragana subsidiary verb",
+      "expected": [
         {
-          "lemma" : "読む",
-          "pos" : "Verb",
-          "surface" : "読み"
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
         },
         {
-          "lemma" : "すぎる",
-          "pos" : "Verb",
-          "surface" : "すぎ"
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "compound_verb_hiragana_v2_sugiru",
-      "input" : "読みすぎた",
-      "tags" : [
+      "id": "compound_verb_hiragana_v2_sugiru",
+      "input": "読みすぎた",
+      "tags": [
         "compound_verb",
         "hiragana_v2"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma normalization difference"
       },
-      "description" : "走り出したくなかった - kanji subsidiary verb",
-      "expected" : [
+      "description": "走り出したくなかった - kanji subsidiary verb",
+      "expected": [
         {
-          "lemma" : "走り出す",
-          "pos" : "Verb",
-          "surface" : "走り出し"
+          "lemma": "走り出す",
+          "pos": "Verb",
+          "surface": "走り出し"
         },
         {
-          "lemma" : "たい",
-          "pos" : "Auxiliary",
-          "surface" : "たく"
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たく"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "なかっ"
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "compound_verb_kanji_v2_dasu",
-      "input" : "走り出したくなかった",
-      "suzume_expected" : [
+      "id": "compound_verb_kanji_v2_dasu",
+      "input": "走り出したくなかった",
+      "suzume_expected": [
         {
-          "lemma" : "走る",
-          "pos" : "Verb",
-          "surface" : "走り"
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走り"
         },
         {
-          "lemma" : "出したくない",
-          "pos" : "Adjective",
-          "surface" : "出したく"
+          "lemma": "出したくない",
+          "pos": "Adjective",
+          "surface": "出したく"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "なかっ"
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "tags" : [
+      "tags": [
         "compound_verb",
         "kanji_v2"
       ]
     },
     {
-      "description" : "やりなおしたい - all-hiragana compound verb",
-      "expected" : [
+      "description": "やりなおしたい - all-hiragana compound verb",
+      "expected": [
         {
-          "lemma" : "やりなおす",
-          "pos" : "Verb",
-          "surface" : "やりなおし"
+          "lemma": "やりなおす",
+          "pos": "Verb",
+          "surface": "やりなおし"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "たい"
+          "pos": "Auxiliary",
+          "surface": "たい"
         }
       ],
-      "id" : "hiragana_compound_verb_yari_naosu",
-      "input" : "やりなおしたい",
-      "tags" : [
+      "id": "hiragana_compound_verb_yari_naosu",
+      "input": "やりなおしたい",
+      "tags": [
         "compound_verb",
         "hiragana"
       ]
     },
     {
-      "description" : "わかりあう - all-hiragana compound verb",
-      "expected" : [
+      "description": "わかりあう - all-hiragana compound verb",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "わかりあう"
+          "pos": "Verb",
+          "surface": "わかりあう"
         }
       ],
-      "id" : "hiragana_compound_verb_wakari_au",
-      "input" : "わかりあう",
-      "tags" : [
+      "id": "hiragana_compound_verb_wakari_au",
+      "input": "わかりあう",
+      "tags": [
         "compound_verb",
         "hiragana"
       ]
     },
     {
-      "description" : "読み込む - V1 not in dictionary but recognized by inflection analysis",
-      "expected" : [
+      "description": "読み込む - V1 not in dictionary but recognized by inflection analysis",
+      "expected": [
         {
-          "lemma" : "読み込む",
-          "pos" : "Verb",
-          "surface" : "読み込む"
+          "lemma": "読み込む",
+          "pos": "Verb",
+          "surface": "読み込む"
         }
       ],
-      "id" : "v1_inflection_fallback_yomikomu",
-      "input" : "読み込む",
-      "tags" : [
+      "id": "v1_inflection_fallback_yomikomu",
+      "input": "読み込む",
+      "tags": [
         "compound_verb",
         "v1_fallback"
       ]
     },
     {
-      "description" : "書き出す - V1 not in dictionary but recognized by inflection analysis",
-      "expected" : [
+      "description": "書き出す - V1 not in dictionary but recognized by inflection analysis",
+      "expected": [
         {
-          "lemma" : "書き出す",
-          "pos" : "Verb",
-          "surface" : "書き出す"
+          "lemma": "書き出す",
+          "pos": "Verb",
+          "surface": "書き出す"
         }
       ],
-      "id" : "v1_inflection_fallback_kakidasu",
-      "input" : "書き出す",
-      "tags" : [
+      "id": "v1_inflection_fallback_kakidasu",
+      "input": "書き出す",
+      "tags": [
         "compound_verb",
         "v1_fallback"
       ]
     },
     {
-      "description" : "試験に落ちる - noun should NOT be treated as V1 for compound verb",
-      "expected" : [
+      "description": "試験に落ちる - noun should NOT be treated as V1 for compound verb",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "試験"
+          "pos": "Noun",
+          "surface": "試験"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Verb",
-          "surface" : "落ちる"
+          "pos": "Verb",
+          "surface": "落ちる"
         }
       ],
-      "id" : "false_positive_prevention_shiken",
-      "input" : "試験に落ちる",
-      "tags" : [
+      "id": "false_positive_prevention_shiken",
+      "input": "試験に落ちる",
+      "tags": [
         "compound_verb",
         "false_positive_prevention"
       ]
     },
     {
-      "description" : "会議に出す - noun should NOT be treated as V1 for compound verb",
-      "expected" : [
+      "description": "会議に出す - noun should NOT be treated as V1 for compound verb",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "会議"
+          "pos": "Noun",
+          "surface": "会議"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Verb",
-          "surface" : "出す"
+          "pos": "Verb",
+          "surface": "出す"
         }
       ],
-      "id" : "false_positive_prevention_kaigi",
-      "input" : "会議に出す",
-      "tags" : [
+      "id": "false_positive_prevention_kaigi",
+      "input": "会議に出す",
+      "tags": [
         "compound_verb",
         "false_positive_prevention"
       ]
     },
     {
-      "description" : "恐れ入ります - humble verb (split: verb stem + polite aux)",
-      "expected" : [
+      "description": "恐れ入ります - humble verb (split: verb stem + polite aux)",
+      "expected": [
         {
-          "lemma" : "恐れ入る",
-          "pos" : "Verb",
-          "surface" : "恐れ入り"
+          "lemma": "恐れ入る",
+          "pos": "Verb",
+          "surface": "恐れ入り"
         },
         {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "humble_osoreirimasu",
-      "input" : "恐れ入ります",
-      "tags" : [
+      "id": "humble_osoreirimasu",
+      "input": "恐れ入ります",
+      "tags": [
         "humble",
         "compound"
       ]
     },
     {
-      "description" : "呼び出す - び should not be standalone",
-      "expected" : [
+      "description": "呼び出す - び should not be standalone",
+      "expected": [
         {
-          "lemma" : "呼び出す",
-          "pos" : "Verb",
-          "surface" : "呼び出す"
+          "lemma": "呼び出す",
+          "pos": "Verb",
+          "surface": "呼び出す"
         }
       ],
-      "id" : "compound_verb_yobidasu",
-      "input" : "呼び出す",
-      "tags" : [
+      "id": "compound_verb_yobidasu",
+      "input": "呼び出す",
+      "tags": [
         "strict",
         "compound",
         "verb"
       ]
     },
     {
-      "description" : "飛び込む - び should not be standalone",
-      "expected" : [
+      "description": "飛び込む - び should not be standalone",
+      "expected": [
         {
-          "lemma" : "飛び込む",
-          "pos" : "Verb",
-          "surface" : "飛び込む"
+          "lemma": "飛び込む",
+          "pos": "Verb",
+          "surface": "飛び込む"
         }
       ],
-      "id" : "compound_verb_tobikomu",
-      "input" : "飛び込む",
-      "tags" : [
+      "id": "compound_verb_tobikomu",
+      "input": "飛び込む",
+      "tags": [
         "strict",
         "compound",
         "verb"
       ]
     },
     {
-      "description" : "取り消す - り should not be standalone",
-      "expected" : [
+      "description": "取り消す - り should not be standalone",
+      "expected": [
         {
-          "lemma" : "取り消す",
-          "pos" : "Verb",
-          "surface" : "取り消す"
+          "lemma": "取り消す",
+          "pos": "Verb",
+          "surface": "取り消す"
         }
       ],
-      "id" : "compound_verb_torikesu",
-      "input" : "取り消す",
-      "tags" : [
+      "id": "compound_verb_torikesu",
+      "input": "取り消す",
+      "tags": [
         "strict",
         "compound",
         "verb"
       ]
     },
     {
-      "description" : "引き続き should not be fragmented into 4+ pieces",
-      "expected" : [
+      "description": "引き続き should not be fragmented into 4+ pieces",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "引き続き"
+          "pos": "Adverb",
+          "surface": "引き続き"
         }
       ],
-      "id" : "compound_verb_hikitsuzuki",
-      "input" : "引き続き",
-      "tags" : [
+      "id": "compound_verb_hikitsuzuki",
+      "input": "引き続き",
+      "tags": [
         "strict",
         "compound",
         "verb"
       ]
     },
     {
-      "description" : "データを読み込む - を particle should be recognized",
-      "expected" : [
+      "description": "データを読み込む - を particle should be recognized",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "データ"
+          "pos": "Noun",
+          "surface": "データ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "読み込む",
-          "pos" : "Verb",
-          "surface" : "読み込む"
+          "lemma": "読み込む",
+          "pos": "Verb",
+          "surface": "読み込む"
         }
       ],
-      "id" : "compound_verb_in_sentence",
-      "input" : "データを読み込む",
-      "tags" : [
+      "id": "compound_verb_in_sentence",
+      "input": "データを読み込む",
+      "tags": [
         "strict",
         "compound",
         "verb",
@@ -623,173 +623,173 @@
       ]
     },
     {
-      "description" : "に対して - kanji compound particles split as に + verb",
-      "expected" : [
+      "description": "に対して - kanji compound particles split as に + verb",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼"
+          "pos": "Pronoun",
+          "surface": "彼"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に対して"
+          "pos": "Particle",
+          "surface": "に対して"
         }
       ],
-      "id" : "nitaishite_compound",
-      "input" : "彼に対して",
-      "tags" : [
+      "id": "nitaishite_compound",
+      "input": "彼に対して",
+      "tags": [
         "strict",
         "particle",
         "compound"
       ]
     },
     {
-      "description" : "Compound verb 食べ始める should be single token (B63: ichidan compound verb fix)",
-      "expected" : [
+      "description": "Compound verb 食べ始める should be single token (B63: ichidan compound verb fix)",
+      "expected": [
         {
-          "lemma" : "食べる",
-          "pos" : "Verb",
-          "surface" : "食べ"
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
         },
         {
-          "pos" : "Verb",
-          "surface" : "始める"
+          "pos": "Verb",
+          "surface": "始める"
         }
       ],
-      "id" : "compound_tabe_hajimeru",
-      "input" : "食べ始める",
-      "tags" : [
+      "id": "compound_tabe_hajimeru",
+      "input": "食べ始める",
+      "tags": [
         "verb",
         "compound",
         "ichidan"
       ]
     },
     {
-      "description" : "S3: 駆け巡った should be compound verb, not split",
-      "expected" : [
+      "description": "S3: 駆け巡った should be compound verb, not split",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "世界"
+          "pos": "Noun",
+          "surface": "世界"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "駆け巡る",
-          "pos" : "Verb",
-          "surface" : "駆け巡っ"
+          "lemma": "駆け巡る",
+          "pos": "Verb",
+          "surface": "駆け巡っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "s3_kakemeguru",
-      "input" : "世界を駆け巡った",
-      "tags" : [
+      "id": "s3_kakemeguru",
+      "input": "世界を駆け巡った",
+      "tags": [
         "s3_fix",
         "compound_verb",
         "regression"
       ]
     },
     {
-      "description" : "S3: 吹き飛ばす should be compound verb",
-      "expected" : [
+      "description": "S3: 吹き飛ばす should be compound verb",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "風"
+          "pos": "Noun",
+          "surface": "風"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "吹き飛ばす",
-          "pos" : "Verb",
-          "surface" : "吹き飛ばす"
+          "lemma": "吹き飛ばす",
+          "pos": "Verb",
+          "surface": "吹き飛ばす"
         }
       ],
-      "id" : "s3_fukitobasu",
-      "input" : "風が吹き飛ばす",
-      "tags" : [
+      "id": "s3_fukitobasu",
+      "input": "風が吹き飛ばす",
+      "tags": [
         "s3_fix",
         "compound_verb",
         "regression"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma normalization difference"
       },
-      "description" : "S3: 演じきった should be compound verb with lemma 演じ切る",
-      "expected" : [
+      "description": "S3: 演じきった should be compound verb with lemma 演じ切る",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "役"
+          "pos": "Noun",
+          "surface": "役"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "演じきる",
-          "pos" : "Verb",
-          "surface" : "演じきっ"
+          "lemma": "演じきる",
+          "pos": "Verb",
+          "surface": "演じきっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "s3_enjikitta",
-      "input" : "役を演じきった",
-      "suzume_expected" : [
+      "id": "s3_enjikitta",
+      "input": "役を演じきった",
+      "suzume_expected": [
         {
-          "pos" : "Noun",
-          "surface" : "役"
+          "pos": "Noun",
+          "surface": "役"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "演じ切る",
-          "pos" : "Verb",
-          "surface" : "演じきっ"
+          "lemma": "演じ切る",
+          "pos": "Verb",
+          "surface": "演じきっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "tags" : [
+      "tags": [
         "s3_fix",
         "compound_verb",
         "regression"
       ]
     },
     {
-      "description" : "S3: 食べすぎた should split as 食べすぎ + た (renyokei priority)",
-      "expected" : [
+      "description": "S3: 食べすぎた should split as 食べすぎ + た (renyokei priority)",
+      "expected": [
         {
-          "lemma" : "食べる",
-          "pos" : "Verb",
-          "surface" : "食べ"
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
         },
         {
-          "lemma" : "すぎる",
-          "pos" : "Verb",
-          "surface" : "すぎ"
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "s3_tabesugita_split",
-      "input" : "食べすぎた",
-      "tags" : [
+      "id": "s3_tabesugita_split",
+      "input": "食べすぎた",
+      "tags": [
         "s3_fix",
         "compound_verb",
         "renyokei_priority",
@@ -797,58 +797,58 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "segmentation-diff",
-        "reason" : "compound verb boundary: 走り出し vs 走り|出したく"
+      "accepted_diff": {
+        "category": "segmentation-diff",
+        "reason": "compound verb boundary: 走り出し vs 走り|出したく"
       },
-      "description" : "S3: 走り出したくなかった should split as 走り出し + たくなかった",
-      "expected" : [
+      "description": "S3: 走り出したくなかった should split as 走り出し + たくなかった",
+      "expected": [
         {
-          "lemma" : "走り出す",
-          "pos" : "Verb",
-          "surface" : "走り出し"
+          "lemma": "走り出す",
+          "pos": "Verb",
+          "surface": "走り出し"
         },
         {
-          "lemma" : "たい",
-          "pos" : "Auxiliary",
-          "surface" : "たく"
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たく"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "なかっ"
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "s3_hashiridashi_tai_split",
-      "input" : "走り出したくなかった",
-      "suzume_expected" : [
+      "id": "s3_hashiridashi_tai_split",
+      "input": "走り出したくなかった",
+      "suzume_expected": [
         {
-          "lemma" : "走る",
-          "pos" : "Verb",
-          "surface" : "走り"
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走り"
         },
         {
-          "lemma" : "出したくない",
-          "pos" : "Adjective",
-          "surface" : "出したく"
+          "lemma": "出したくない",
+          "pos": "Adjective",
+          "surface": "出したく"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "なかっ"
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "tags" : [
+      "tags": [
         "s3_fix",
         "compound_verb",
         "renyokei_priority",
@@ -856,71 +856,71 @@
       ]
     },
     {
-      "description" : "S3: 飛び交う should be compound verb",
-      "expected" : [
+      "description": "S3: 飛び交う should be compound verb",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "言葉"
+          "pos": "Noun",
+          "surface": "言葉"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "飛び交う",
-          "pos" : "Verb",
-          "surface" : "飛び交う"
+          "lemma": "飛び交う",
+          "pos": "Verb",
+          "surface": "飛び交う"
         }
       ],
-      "id" : "s3_tobikau",
-      "input" : "言葉が飛び交う",
-      "tags" : [
+      "id": "s3_tobikau",
+      "input": "言葉が飛び交う",
+      "tags": [
         "s3_fix",
         "compound_verb",
         "regression"
       ]
     },
     {
-      "description" : "S3: 取り入れる should be compound verb",
-      "expected" : [
+      "description": "S3: 取り入れる should be compound verb",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "新しい"
+          "pos": "Adjective",
+          "surface": "新しい"
         },
         {
-          "pos" : "Noun",
-          "surface" : "方法"
+          "pos": "Noun",
+          "surface": "方法"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "取り入れる",
-          "pos" : "Verb",
-          "surface" : "取り入れる"
+          "lemma": "取り入れる",
+          "pos": "Verb",
+          "surface": "取り入れる"
         }
       ],
-      "id" : "s3_toriireru",
-      "input" : "新しい方法を取り入れる",
-      "tags" : [
+      "id": "s3_toriireru",
+      "input": "新しい方法を取り入れる",
+      "tags": [
         "s3_fix",
         "compound_verb",
         "regression"
       ]
     },
     {
-      "description" : "S3: やり直す (hiragana V1 + kanji V2) compound verb",
-      "expected" : [
+      "description": "S3: やり直す (hiragana V1 + kanji V2) compound verb",
+      "expected": [
         {
-          "lemma" : "やり直す",
-          "pos" : "Verb",
-          "surface" : "やり直す"
+          "lemma": "やり直す",
+          "pos": "Verb",
+          "surface": "やり直す"
         }
       ],
-      "id" : "s3_yarinaosu",
-      "input" : "やり直す",
-      "tags" : [
+      "id": "s3_yarinaosu",
+      "input": "やり直す",
+      "tags": [
         "s3_fix",
         "compound_verb",
         "hiragana_kanji",
@@ -928,21 +928,21 @@
       ]
     },
     {
-      "description" : "S3: 美しかった should be ADJ not compound verb (not 美し+交った)",
-      "expected" : [
+      "description": "S3: 美しかった should be ADJ not compound verb (not 美し+交った)",
+      "expected": [
         {
-          "lemma" : "美しい",
-          "pos" : "Adjective",
-          "surface" : "美しかっ"
+          "lemma": "美しい",
+          "pos": "Adjective",
+          "surface": "美しかっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "s3_adj_not_compound",
-      "input" : "美しかった",
-      "tags" : [
+      "id": "s3_adj_not_compound",
+      "input": "美しかった",
+      "tags": [
         "s3_fix",
         "adjective",
         "no_false_positive",
@@ -950,124 +950,156 @@
       ]
     },
     {
-      "description" : "付き合って - auto-generated",
-      "expected" : [
+      "description": "付き合って - auto-generated",
+      "expected": [
         {
-          "lemma" : "付き合う",
-          "pos" : "Verb",
-          "surface" : "付き合っ"
+          "lemma": "付き合う",
+          "pos": "Verb",
+          "surface": "付き合っ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "ki_ttte",
-      "input" : "付き合って",
-      "tags" : [
+      "id": "ki_ttte",
+      "input": "付き合って",
+      "tags": [
         "compound",
         "godan"
       ]
     },
     {
-      "description" : "抱きしめて - auto-generated",
-      "expected" : [
+      "description": "抱きしめて - auto-generated",
+      "expected": [
         {
-          "lemma" : "抱きしめる",
-          "pos" : "Verb",
-          "surface" : "抱きしめ"
+          "lemma": "抱きしめる",
+          "pos": "Verb",
+          "surface": "抱きしめ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "kishimete",
-      "input" : "抱きしめて",
-      "tags" : [
+      "id": "kishimete",
+      "input": "抱きしめて",
+      "tags": [
         "compound",
         "ichidan"
       ]
     },
     {
-      "description" : "引っ張って - auto-generated",
-      "expected" : [
+      "description": "引っ張って - auto-generated",
+      "expected": [
         {
-          "lemma" : "引っ張る",
-          "pos" : "Verb",
-          "surface" : "引っ張っ"
+          "lemma": "引っ張る",
+          "pos": "Verb",
+          "surface": "引っ張っ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "tt_ttte",
-      "input" : "引っ張って",
-      "tags" : [
+      "id": "tt_ttte",
+      "input": "引っ張って",
+      "tags": [
         "compound",
         "sokuon"
       ]
     },
     {
-      "description" : "思い出して - auto-generated",
-      "expected" : [
+      "description": "思い出して - auto-generated",
+      "expected": [
         {
-          "lemma" : "思い出す",
-          "pos" : "Verb",
-          "surface" : "思い出し"
+          "lemma": "思い出す",
+          "pos": "Verb",
+          "surface": "思い出し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "i_shite",
-      "input" : "思い出して",
-      "tags" : [
+      "id": "i_shite",
+      "input": "思い出して",
+      "tags": [
         "compound",
         "godan"
       ]
     },
     {
-      "description" : "突っ込む - auto-generated",
-      "expected" : [
+      "description": "突っ込む - auto-generated",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "突っ込む"
+          "pos": "Verb",
+          "surface": "突っ込む"
         }
       ],
-      "id" : "tt_mu",
-      "input" : "突っ込む"
+      "id": "tt_mu",
+      "input": "突っ込む"
     },
     {
-      "description" : "突っ込んで - auto-generated",
-      "expected" : [
+      "description": "突っ込んで - auto-generated",
+      "expected": [
         {
-          "lemma" : "突っ込む",
-          "pos" : "Verb",
-          "surface" : "突っ込ん"
+          "lemma": "突っ込む",
+          "pos": "Verb",
+          "surface": "突っ込ん"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         }
       ],
-      "id" : "tt_nde",
-      "input" : "突っ込んで"
+      "id": "tt_nde",
+      "input": "突っ込んで"
     },
     {
-      "description" : "打ち込む - auto-generated",
-      "expected" : [
+      "description": "打ち込む - auto-generated",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "打ち込む"
+          "pos": "Verb",
+          "surface": "打ち込む"
         }
       ],
-      "id" : "chi_mu",
-      "input" : "打ち込む"
+      "id": "chi_mu",
+      "input": "打ち込む"
+    },
+    {
+      "description": "Sokuonbin+hatsuonbin compound verb",
+      "expected": [
+        {
+          "lemma": "吹っ飛ぶ",
+          "pos": "Verb",
+          "surface": "吹っ飛ん"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "sokuon_hatsuonbin_fukktonda",
+      "input": "吹っ飛んだ"
+    },
+    {
+      "description": "Sokuonbin+hatsuonbin compound verb te-form",
+      "expected": [
+        {
+          "lemma": "吹っ飛ぶ",
+          "pos": "Verb",
+          "surface": "吹っ飛ん"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "sokuon_hatsuonbin_fukktonde",
+      "input": "吹っ飛んで"
     }
   ],
-  "description" : "Compound verbs",
-  "version" : "1.0"
+  "description": "Compound verbs",
+  "version": "1.0"
 }

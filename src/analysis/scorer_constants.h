@@ -504,6 +504,11 @@ constexpr float kBonusMitaiDict = -1.0F;
 // Bonus for hiragana+kanji mixed nouns from dictionary (なし崩し, みじん切り, お茶)
 constexpr float kBonusMixedNoun = -0.5F;
 
+// Length-scaled bonus for long mixed nouns (4+ chars, e.g. お兄ちゃん, お父さん)
+// Split paths accumulate PREFIX→NOUN→SUFFIX connection bonuses (~-1.7 advantage)
+constexpr float kBonusLongMixedNounBase = -1.8F;
+constexpr float kBonusLongMixedNounPerChar = -0.5F;
+
 // Bonus for long all-kanji nouns from dictionary (4+ chars)
 // Without this, split path wins due to dict+dict connection bonus (-0.5) and
 // split_candidates both-in-dict bonus (-0.2), totaling -0.7 advantage

@@ -1004,8 +1004,15 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
         size_t stem_len = tto_pos - start_pos;  // chars before っ
         // Stem should be 1-4 hiragana chars
         if (stem_len >= 1 && stem_len <= 4) {
-          // No particle skip needed here — the っと suffix is a strong enough
-          // signal for onomatopoeia (はっと, ぐっと are common patterns)
+          // Skip if stem starts with a particle character (e.g., にもっと = に+もっと)
+          char32_t first_cp = codepoints[start_pos];
+          if (stem_len >= 2 &&
+              (first_cp == U'に' || first_cp == U'は' || first_cp == U'も' ||
+               first_cp == U'を' || first_cp == U'が' || first_cp == U'で' ||
+               first_cp == U'と' || first_cp == U'か' || first_cp == U'の' ||
+               first_cp == U'へ')) {
+            break;
+          }
           std::string surface = extractSubstring(codepoints, start_pos, adv_end);
           if (!surface.empty()) {
             // Strong bonus for short patterns (はっと, ぐっと = very common)

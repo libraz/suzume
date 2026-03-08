@@ -1,0 +1,38 @@
+{
+  "cases": [
+    {
+      "description": "Causative renyokei + past tense",
+      "expected": [
+        {
+          "lemma": "眠らせる",
+          "pos": "Verb",
+          "surface": "眠らせ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "causative_nemuraseta",
+      "input": "眠らせた"
+    },
+    {
+      "description": "Causative renyokei + te-form",
+      "expected": [
+        {
+          "lemma": "眠らせる",
+          "pos": "Verb",
+          "surface": "眠らせ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "causative_nemurasete",
+      "input": "眠らせて"
+    }
+  ],
+  "description": "verb_causative tests",
+  "version": "1.0"
+}

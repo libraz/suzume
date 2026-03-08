@@ -1335,12 +1335,23 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     char32_t second_hira = codepoints[kanji_end + 1];
     // ら + せ pattern (causative renyokei)
     if (first_hira == U'ら' && second_hira == U'せ') {
-      // Only generate if followed by られ (causative-passive pattern)
-      // This prevents false positives on random ら+せ sequences
-      bool followed_by_passive = (kanji_end + 3 < hiragana_end &&
-                                   codepoints[kanji_end + 2] == U'ら' &&
-                                   codepoints[kanji_end + 3] == U'れ');
-      if (followed_by_passive) {
+      // Generate causative renyokei when followed by valid ichidan verb endings
+      // or causative-passive (られ). This covers:
+      //   眠らせた (past), 眠らせて (te-form), 眠らせない (negative),
+      //   眠らせます (polite), 眠らせられ (passive)
+      bool followed_by_valid = false;
+      if (kanji_end + 2 < codepoints.size()) {
+        char32_t next_cp = codepoints[kanji_end + 2];
+        followed_by_valid = (next_cp == U'ら' || next_cp == U'た' ||
+                             next_cp == U'て' || next_cp == U'な' ||
+                             next_cp == U'ま' || next_cp == U'ず' ||
+                             next_cp == U'ば');
+      }
+      // Also allow at end of input (bare renyokei: 眠らせ)
+      if (kanji_end + 2 >= codepoints.size()) {
+        followed_by_valid = true;
+      }
+      if (followed_by_valid) {
         size_t renyokei_end = kanji_end + 2;  // kanji + ら + せ
         std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
 

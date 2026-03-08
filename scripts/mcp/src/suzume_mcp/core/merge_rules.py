@@ -357,6 +357,24 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     if applied_rule is None:
                         applied_rule = "vowel-repeat"
 
+        # 4e. Prolonged sound mark (ー) merge
+        # Merge ー with preceding token, consecutive ーs reduce to one
+        # e.g., あの + ー → あのー, あの + ーー → あのー
+        if not merged and i + 1 < len(tokens):
+            next_surface = tokens[i + 1].get("surface", "")
+            if regex.match(r"^ー+$", next_surface):
+                combined = t.get("surface", "") + "ー"
+                lemma = t.get("lemma") or t.get("surface", "")
+                j = i + 2
+                # Skip any additional ー-only tokens
+                while j < len(tokens) and regex.match(r"^ー+$", tokens[j].get("surface", "")):
+                    j += 1
+                result.append({"surface": combined, "pos": t.get("pos", ""), "lemma": lemma + "ー"})
+                i = j
+                merged = True
+                if applied_rule is None:
+                    applied_rule = "prolonged-sound-merge"
+
         # 5. タリ活用副詞
         if not merged:
             for stem in TARI_ADVERB_STEMS:

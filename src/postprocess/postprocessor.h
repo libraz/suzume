@@ -82,6 +82,13 @@ class Postprocessor {
   static std::vector<core::Morpheme> mergeVerbRenyokeiMono(const std::vector<core::Morpheme>& morphemes);
 
   /**
+   * @brief Merge prolonged sound mark (ー) with preceding token
+   * e.g., あの + ー → あのー, すごー + ーー → すごー
+   * Also merges consecutive ーs into one.
+   */
+  static std::vector<core::Morpheme> mergeProlongedSoundMark(const std::vector<core::Morpheme>& morphemes);
+
+  /**
    * @brief Remove unwanted morphemes
    */
   std::vector<core::Morpheme> filterMorphemes(
