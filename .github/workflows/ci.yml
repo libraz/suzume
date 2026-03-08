@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: corepack enable
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -27,6 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: mymindstorm/setup-emsdk@v14
+      - run: corepack enable
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
