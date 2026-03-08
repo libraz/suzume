@@ -10,6 +10,7 @@
 #ifndef SUZUME_ANALYSIS_VERB_CANDIDATES_HELPERS_H_
 #define SUZUME_ANALYSIS_VERB_CANDIDATES_HELPERS_H_
 
+#include <algorithm>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -17,6 +18,7 @@
 #include "core/types.h"
 #include "dictionary/dictionary.h"
 #include "grammar/conjugation.h"
+#include "grammar/inflection.h"
 #include "normalize/char_type.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
@@ -202,6 +204,33 @@ bool containsTeFormAuxPattern(std::string_view surface);
  * Unlike shouldSkipCausativeAuxPattern, this uses contains() not endsWith()
  */
 bool containsCausativeAuxPattern(std::string_view surface);
+
+// =============================================================================
+// Inflection Analysis Helpers
+// =============================================================================
+
+/**
+ * @brief Get the best ichidan confidence from inflection analysis results
+ *
+ * Scans all inflection candidates for Ichidan verb type and returns
+ * the maximum confidence above the given threshold.
+ *
+ * @param candidates Inflection analysis results
+ * @param min_threshold Minimum confidence to consider (default 0.4)
+ * @return Best ichidan confidence, or 0.0 if none found
+ */
+inline float getIchidanConfidence(
+    const std::vector<grammar::InflectionCandidate>& candidates,
+    float min_threshold = 0.4F) {
+  float best = 0.0F;
+  for (const auto& cand : candidates) {
+    if (cand.verb_type == grammar::VerbType::Ichidan &&
+        cand.confidence >= min_threshold) {
+      best = std::max(best, cand.confidence);
+    }
+  }
+  return best;
+}
 
 // =============================================================================
 // Character Region Detection

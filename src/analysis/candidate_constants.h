@@ -71,6 +71,52 @@ constexpr float kNounVerbSplitBonus = -1.0F;
 // Applied when verb component is verified in dictionary
 constexpr float kVerifiedVerbBonus = -0.8F;
 
+// =============================================================================
+// Adjective Candidate Constants (adjective_candidates.cpp)
+// =============================================================================
+
+// I-adjective conjugation form split bonuses
+// Applied when generating split candidates for MeCab-compatible output.
+// E.g., 美味しくない → 美味しく + ない
+
+// く形 split bonus (kanji i-adjectives: 美味しく, 高く)
+constexpr float kAdjKuSplitBonus = -0.5F;
+// く形 split bonus (hiragana i-adjectives: しんどく, うまく)
+constexpr float kAdjKuSplitBonusWeak = -0.3F;
+// かっ形 split bonus (past tense: 美味しかっ + た)
+constexpr float kAdjKattSplitBonus = -0.1F;
+// け形 split bonus (conditional: 美味しけれ + ば)
+constexpr float kAdjKeSplitBonus = -0.1F;
+// 語幹 split bonus (stem + そう: 美味し + そう)
+constexpr float kAdjStemSplitBonus = -0.5F;
+
+// Base costs for confidence-based adjective cost formulas
+// Formula: base + (1.0 - confidence) * scale
+
+// Kanji i-adjective candidates (美味しい, 恐ろしい)
+constexpr float kKanjiAdjBaseCost = 0.2F;
+constexpr float kKanjiAdjConfScale = 0.3F;
+// Hiragana i-adjective candidates (すごい, うまい)
+constexpr float kHiraganaAdjBaseCost = 0.25F;
+constexpr float kHiraganaAdjConfScale = 0.5F;
+// Adjective stem candidates (美味し + そう, 高 + さ)
+constexpr float kAdjStemBaseCost = -0.8F;
+constexpr float kAdjStemConfScale = 0.2F;
+
+// =============================================================================
+// Verb Candidate Constants (verb_candidates_kanji.cpp, verb_candidates_hiragana.cpp)
+// =============================================================================
+
+// Shared cost values for verb candidate generation
+namespace verb_cost {
+// Standard bonus for verb candidates (mizenkei, passive, etc.)
+constexpr float kStandardBonus = -0.5F;
+// Strong bonus for verb candidates (ichidan renyokei, te/ta forms)
+constexpr float kStrongBonus = -0.8F;
+// Weak penalty for uncertain verb patterns (passive, causative, zu-form)
+constexpr float kWeakPenalty = 0.1F;
+}  // namespace verb_cost
+
 }  // namespace suzume::analysis::candidate
 
 #endif  // SUZUME_ANALYSIS_CANDIDATE_CONSTANTS_H_

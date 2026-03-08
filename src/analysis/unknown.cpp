@@ -232,7 +232,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
   if (char_types[start_pos] == normalize::CharType::Katakana) {
     auto kata_verbs =
         generateKatakanaVerbCandidates(codepoints, start_pos, char_types,
-                                       inflection_, options_.verb_candidate_options);
+                                       inflection_, dict_manager_,
+                                       options_.verb_candidate_options);
     candidates.insert(candidates.end(), kata_verbs.begin(), kata_verbs.end());
 
     auto kata_adjs =

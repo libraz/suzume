@@ -99,6 +99,7 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const grammar::Inflection& inflection,
+    const dictionary::DictionaryManager* dict_manager = nullptr,
     const VerbCandidateOptions& verb_opts = {});
 
 }  // namespace suzume::analysis

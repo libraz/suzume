@@ -12,6 +12,7 @@
 #include <cmath>
 
 #include "analysis/bigram_table.h"
+#include "analysis/candidate_constants.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "core/debug.h"
@@ -846,7 +847,7 @@ next_length:;  // Label for goto from particle-starting verb skip
     std::string surface = extractSubstring(codepoints, start_pos, split_end);
     const char* pattern_name = "passive_mizenkei";
 
-    constexpr float kCost = -0.5F;  // Negative cost to beat OTHER + AUX split
+    constexpr float kCost = candidate::verb_cost::kStandardBonus;  // Negative cost to beat OTHER + AUX split
     SUZUME_DEBUG_VERBOSE_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                           << " hiragana_" << pattern_name << " lemma=" << lemma
@@ -936,7 +937,7 @@ next_length:;  // Label for goto from particle-starting verb skip
 
     // Generate the ichidan renyokei candidate
     // Negative cost to beat the single-word verb candidate
-    constexpr float kCost = -0.5F;
+    constexpr float kCost = candidate::verb_cost::kStandardBonus;
     SUZUME_DEBUG_VERBOSE_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem
                           << " hiragana_ichidan_rareru lemma=" << lemma
@@ -1120,7 +1121,7 @@ next_length:;  // Label for goto from particle-starting verb skip
     }
 
     // Generate mizenkei candidate with explicit VerbMizenkei EPOS for bigram connection
-    constexpr float kCostNai = -0.5F;  // Negative cost to beat unsplit form
+    constexpr float kCostNai = candidate::verb_cost::kStandardBonus;  // Negative cost to beat unsplit form
     SUZUME_DEBUG_VERBOSE_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << mizenkei_surface
                           << " hiragana_mizenkei_nai lemma=" << lemma
@@ -1189,7 +1190,7 @@ next_length:;  // Label for goto from particle-starting verb skip
       }
     }
 
-    constexpr float kCostNOnbin = -0.5F;
+    constexpr float kCostNOnbin = candidate::verb_cost::kStandardBonus;
     SUZUME_DEBUG_VERBOSE_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                           << " hiragana_n_onbin_nai lemma=" << lemma
@@ -1370,7 +1371,7 @@ next_length:;  // Label for goto from particle-starting verb skip
           if (is_mi_after_te || vh::isVerbInDictionary(dict_manager, base_form)) {
             // Strong negative cost to beat particle split
             // Particle path can be as low as -0.2, so we need lower
-            constexpr float kCost = -0.5F;
+            constexpr float kCost = candidate::verb_cost::kStandardBonus;
             SUZUME_DEBUG_VERBOSE_BLOCK {
               SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface
                                   << " hiragana_ichidan_renyokei_1char lemma=" << base_form
@@ -1535,7 +1536,7 @@ next_length:;  // Label for goto from particle-starting verb skip
     if (is_followed_by_reba && !is_suru_negative_pattern) {
       std::string kateikei_surface = stem_surface + "れ";  // 連用形 + れ = 仮定形
       size_t kateikei_end = end_pos + 1;  // renyokei + れ
-      constexpr float kKateikeiCost = -0.8F;
+      constexpr float kKateikeiCost = candidate::verb_cost::kStrongBonus;
       SUZUME_DEBUG_VERBOSE_BLOCK {
         SUZUME_DEBUG_STREAM << "[VERB_CAND] " << kateikei_surface
                             << " hiragana_ichidan_kateikei lemma=" << base_form
@@ -1592,7 +1593,7 @@ next_length:;  // Label for goto from particle-starting verb skip
           bool in_dict = vh::isVerbInDictionaryWithType(dict_manager, potential_base, verb_type) ||
                          vh::isVerbInDictionary(dict_manager, potential_base);
           if (in_dict) {
-            constexpr float kHiraganaSokuonbinCost = -0.5F;
+            constexpr float kHiraganaSokuonbinCost = candidate::verb_cost::kStandardBonus;
             SUZUME_DEBUG_VERBOSE_BLOCK {
               SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                                   << " hiragana_sokuonbin lemma=" << potential_base
@@ -1684,7 +1685,7 @@ next_length:;  // Label for goto from particle-starting verb skip
           bool in_dict = vh::isVerbInDictionaryWithType(dict_manager, potential_base, verb_type) ||
                          vh::isVerbInDictionary(dict_manager, potential_base);
           if (in_dict) {
-            constexpr float kHiraganaHatsuonbinCost = -0.5F;
+            constexpr float kHiraganaHatsuonbinCost = candidate::verb_cost::kStandardBonus;
             SUZUME_DEBUG_VERBOSE_BLOCK {
               SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
                                   << " hiragana_hatsuonbin lemma=" << potential_base

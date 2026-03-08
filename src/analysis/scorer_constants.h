@@ -490,6 +490,50 @@ constexpr float kPenaltyVerbContractedNegShortStem = scale::kStrong + scale::kMi
 constexpr float kPenaltyVerbToCaseParticle = scale::kStrong;  // 1.5
 
 // =============================================================================
+// Surface-Based Cost Adjustments (scorer.cpp)
+// =============================================================================
+// These constants are used for word-cost adjustments based on surface properties.
+
+// Bonus for compound particles from dictionary (について, によって, として, etc.)
+// Multi-char particles that should not be split into verb+て patterns
+constexpr float kBonusCompoundParticle = -1.0F;
+
+// Bonus for みたい (conjecture auxiliary) from dictionary
+constexpr float kBonusMitaiDict = -1.0F;
+
+// Bonus for hiragana+kanji mixed nouns from dictionary (なし崩し, みじん切り, お茶)
+constexpr float kBonusMixedNoun = -0.5F;
+
+// Bonus for multi-char hiragana suffixes from dictionary (まみれ, だらけ, ごと)
+constexpr float kBonusLongSuffix = -1.5F;
+
+// Bonus for short hiragana verbs from dictionary (なる, ある, いる, する)
+constexpr float kBonusShortHiraganaVerb = -0.3F;
+
+// Penalty for spurious kanji+hiragana verb renyokei not in dictionary
+// E.g., 学生み (学生みる doesn't exist) - false positive
+constexpr float kPenaltySpuriousVerbRenyokei = scale::kStrong;
+
+// Penalty for short/long pure-hiragana hatsuonbin verb forms
+constexpr float kPenaltyHatsuonbinShort = scale::kRare;    // 2-4 chars
+constexpr float kPenaltyHatsuonbinLong = scale::kSevere;   // 5+ chars
+
+// Penalty for pure-hiragana verb forms containing さん pattern
+constexpr float kPenaltySanPatternVerb = scale::kSevere;
+
+// Penalty for pure-hiragana ichidan verb renyokei starting with に
+constexpr float kPenaltyNiPrefixVerb = scale::kStrong + scale::kMinor;  // 2.0
+
+// Penalty for very long pure-hiragana verb candidates not in dictionary
+constexpr float kPenaltyVeryLongHiraganaVerb = scale::kNever;
+
+// Penalty for kanji+hiragana verb renyokei ending in いし pattern
+constexpr float kPenaltyIshiVerbRenyokei = scale::kSevere;
+
+// Penalty for kanji 中 compound patterns (過剰分割防止)
+constexpr float kPenaltyKanjiChuuCompound = scale::kMinor;
+
+// =============================================================================
 // Pattern String Constants
 // =============================================================================
 // These string constants are used for pattern matching in scoring.

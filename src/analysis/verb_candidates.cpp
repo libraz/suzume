@@ -150,6 +150,7 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const grammar::Inflection& inflection,
+    const dictionary::DictionaryManager* dict_manager,
     const VerbCandidateOptions& verb_opts) {
   std::vector<UnknownCandidate> candidates;
 
@@ -296,20 +297,38 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
         std::string kata_part = extractSubstring(codepoints, start_pos, kata_end);
         std::string base_form = kata_part + "る";  // Assume godan-ra (most common for slang)
 
-        // Neutral cost — let bigram connections decide between verb+て and noun+って
-        // VerbOnbinkei→AuxTenseTa bonus makes verb path win when followed by た/て+verb
-        // Noun→ParticleQuote path wins when followed by noun/adjective
-        constexpr float kSokuonbinCost = 0.1F;
-        SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
-                              << " katakana_sokuonbin lemma=" << base_form
-                              << " cost=" << kSokuonbinCost << "\n";
+        // Skip if katakana stem is already a dict noun (e.g., フェラ, ネタ)
+        // These should be noun+って, not verb sokuonbin+て
+        bool skip_sokuonbin = false;
+        if (dict_manager) {
+          auto stem_results = dict_manager->lookup(kata_part, 0);
+          for (const auto& r : stem_results) {
+            if (r.entry && r.entry->surface == kata_part &&
+                r.entry->pos == core::PartOfSpeech::Noun) {
+              skip_sokuonbin = true;
+              break;
+            }
+          }
         }
-        candidates.push_back(makeVerbCandidate(
-            onbin_surface, start_pos, kata_end + 1, kSokuonbinCost, base_form,
-            dictionary::ConjugationType::GodanRa,
-            true, CandidateOrigin::VerbKatakana, 0.9F, "katakana_sokuonbin",
-            core::ExtendedPOS::VerbOnbinkei));
+        if (skip_sokuonbin) {
+          SUZUME_DEBUG_VERBOSE_BLOCK {
+            SUZUME_DEBUG_STREAM << "[VERB_SKIP] \"" << kata_part
+                                << "\" is dict noun, skip katakana_sokuonbin\n";
+          }
+        } else {
+          // Neutral cost — let bigram connections decide between verb+て and noun+って
+          constexpr float kSokuonbinCost = 0.1F;
+          SUZUME_DEBUG_VERBOSE_BLOCK {
+            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
+                                << " katakana_sokuonbin lemma=" << base_form
+                                << " cost=" << kSokuonbinCost << "\n";
+          }
+          candidates.push_back(makeVerbCandidate(
+              onbin_surface, start_pos, kata_end + 1, kSokuonbinCost, base_form,
+              dictionary::ConjugationType::GodanRa,
+              true, CandidateOrigin::VerbKatakana, 0.9F, "katakana_sokuonbin",
+              core::ExtendedPOS::VerbOnbinkei));
+        }
       }
     }
   }

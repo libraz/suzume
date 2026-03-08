@@ -76,6 +76,12 @@ class Postprocessor {
   static std::vector<core::Morpheme> convertPrefixVerbToNoun(const std::vector<core::Morpheme>& morphemes);
 
   /**
+   * @brief Merge verb renyokei + もの into compound noun
+   * e.g., 食べ + もの → 食べもの, 飲み + もの → 飲みもの
+   */
+  static std::vector<core::Morpheme> mergeVerbRenyokeiMono(const std::vector<core::Morpheme>& morphemes);
+
+  /**
    * @brief Remove unwanted morphemes
    */
   std::vector<core::Morpheme> filterMorphemes(

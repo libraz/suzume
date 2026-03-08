@@ -4,6 +4,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/category_cost.h"
+#include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
@@ -14,9 +15,10 @@
 
 using suzume::core::CandidateOrigin;
 namespace cost = suzume::analysis::bigram_cost;
+namespace sc = suzume::analysis::scorer;
 
 // Surface-based adjustments use cost:: namespace directly from bigram_cost.
-// See bigram_table.h for constant values.
+// See bigram_table.h and scorer_constants.h for constant values.
 
 namespace {
 
@@ -302,16 +304,14 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     // Compound particles are 3+ chars (について, によって, として, において, etc.)
     // Give strong bonus to beat verb+て split paths
     if (char_len >= 3) {
-      constexpr float kCompoundParticleBonus = -1.0F;
-      cost += kCompoundParticleBonus;
+      cost += sc::kBonusCompoundParticle;
     }
   }
 
   // Bonus for みたい (conjecture auxiliary) from dictionary
   // Works together with bigram bonuses and spurious verb penalty
   if (edge.fromDictionary() && edge.extended_pos == core::ExtendedPOS::AuxConjectureMitai) {
-    constexpr float kMitaiDictBonus = -1.0F;
-    cost += kMitaiDictBonus;
+    cost += sc::kBonusMitaiDict;
   }
 
   // Bonus for dictionary entries starting with negation prefixes (非/不/無/未)
@@ -339,9 +339,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Noun) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     if (char_len >= 3 && grammar::isMixedHiraganaKanji(edge.surface)) {
-      // Base bonus -0.5, stronger for longer words
-      constexpr float kMixedNounBonus = -0.5F;
-      cost += kMixedNounBonus;
+      cost += sc::kBonusMixedNoun;
     }
   }
 
@@ -351,8 +349,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Suffix &&
       grammar::isPureHiragana(edge.surface) &&
       edge.surface.size() >= 9) {  // 3+ chars (9+ bytes)
-    constexpr float kLongSuffixBonus = -1.5F;
-    cost += kLongSuffixBonus;
+    cost += sc::kBonusLongSuffix;
   }
 
   // Bonus for short hiragana verbs from dictionary (e.g., なる, ある, いる, する)
@@ -360,8 +357,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   // Dictionary registration indicates standalone verb usage should take precedence.
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
       grammar::isPureHiragana(edge.surface) && edge.surface.length() <= 6) {  // ≤2 chars
-    constexpr float kShortHiraganaVerbBonus = -0.3F;
-    cost += kShortHiraganaVerbBonus;
+    cost += sc::kBonusShortHiraganaVerb;
   }
 
   // Penalty for spurious kanji+hiragana verb renyokei not in dictionary
@@ -380,8 +376,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       }
     }
     if (kanji_count >= 2) {
-      constexpr float kSpuriousVerbRenyokeiPenalty = 1.5F;
-      cost += kSpuriousVerbRenyokeiPenalty;
+      cost += sc::kPenaltySpuriousVerbRenyokei;
     }
   }
 
@@ -397,8 +392,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       edge.surface.size() >= 6) {  // 2+ chars (avoid single-char like ん)
     // Reduced penalty for short forms (2-4 chars = 6-12 bytes)
     // to allow common hiragana verbs like もらっ, あげっ to compete
-    float penalty = (edge.surface.size() <= 12) ? 1.0F : 2.5F;
-    cost += penalty;
+    cost += (edge.surface.size() <= 12) ? sc::kPenaltyHatsuonbinShort : sc::kPenaltyHatsuonbinLong;
   }
 
   // Penalty for pure-hiragana verb forms containing "さん" pattern
@@ -415,8 +409,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       // 1. さん appears after 0-2 hiragana chars (likely name+さん or just さん)
       // 2. The verb form is short enough to be a misanalysis
       if (san_pos <= 6 && edge.surface.size() <= 15) {  // 0-2 chars before, up to 5 total
-        constexpr float kSanPatternVerbPenalty = 2.5F;
-        cost += kSanPatternVerbPenalty;
+        cost += sc::kPenaltySanPatternVerb;
       }
     }
   }
@@ -430,8 +423,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       grammar::isPureHiragana(edge.surface) &&
       utf8::startsWith(edge.surface, "に") &&
       edge.surface.size() >= 6 && edge.surface.size() <= 12) {  // 2-4 chars
-    constexpr float kNiPrefixVerbPenalty = 2.0F;
-    cost += kNiPrefixVerbPenalty;
+    cost += sc::kPenaltyNiPrefixVerb;
   }
 
   // Penalty for very long pure-hiragana verb candidates not in dictionary
@@ -441,8 +433,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
   if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
       grammar::isPureHiragana(edge.surface) &&
       edge.surface.size() >= 18) {  // 6+ hiragana chars (6*3=18 bytes)
-    constexpr float kVeryLongPureHiraganaVerbPenalty = 3.5F;
-    cost += kVeryLongPureHiraganaVerbPenalty;
+    cost += sc::kPenaltyVeryLongHiraganaVerb;
   }
 
   // Penalty for kanji+hiragana verb renyokei ending in いし pattern
@@ -456,8 +447,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       grammar::containsKanji(edge.surface) &&
       utf8::endsWith(edge.surface, "いし") &&
       edge.surface.size() >= 9) {  // At least 1 kanji + いし (3 + 6 bytes)
-    constexpr float kIshiVerbRenyokeiPenalty = 2.5F;
-    cost += kIshiVerbRenyokeiPenalty;
+    cost += sc::kPenaltyIshiVerbRenyokei;
   }
 
   // Penalty for pure-hiragana verb candidates ending with そう
@@ -563,8 +553,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       utf8::endsWith(edge.surface, "中") &&
       grammar::isAllKanji(edge.surface) &&
       edge.surface.size() >= 6) {  // 2+ kanji (at least N中)
-    constexpr float kKanjiChuuCompoundPenalty = 0.5F;
-    cost += kKanjiChuuCompoundPenalty;
+    cost += sc::kPenaltyKanjiChuuCompound;
   }
 
   // Debug output - show which cost was used and candidate origin (verbose level)

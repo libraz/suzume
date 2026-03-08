@@ -12,6 +12,7 @@
 #include <cmath>
 
 #include "analysis/bigram_table.h"
+#include "analysis/candidate_constants.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "core/debug.h"
@@ -170,7 +171,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
               // Negative cost to beat compound NOUN path
               // Compound NOUNs like 書きすぎた get cost ~1.0, so we need much lower
-              constexpr float kCost = -0.8F;
+              constexpr float kCost = candidate::verb_cost::kStrongBonus;
               SUZUME_DEBUG_VERBOSE_BLOCK {
                 SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                     << " godan_renyokei_sugi lemma=" << base_form
@@ -213,7 +214,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           size_t renyokei_end = kanji_end + 1;
           std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
           // Negative cost to beat compound NOUN path
-          constexpr float kCost = -0.8F;
+          constexpr float kCost = candidate::verb_cost::kStrongBonus;
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                 << " ichidan_renyokei_sugi lemma=" << base_form
@@ -284,7 +285,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
 
             if (!has_competing_ra_verb) {
-              constexpr float kCost = 0.1F;
+              constexpr float kCost = candidate::verb_cost::kWeakPenalty;
               SUZUME_DEBUG_LOG("[VERB_CAND] " << surface
                               << " godan_mizenkei_passive lemma=" << base_form
                               << " cost=" << kCost << "\n");
@@ -331,7 +332,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         }
 
         if (is_valid_godan_sa) {
-          constexpr float kCost = 0.1F;
+          constexpr float kCost = candidate::verb_cost::kWeakPenalty;
           SUZUME_DEBUG_LOG("[VERB_CAND] "
                           << surface
                           << " godan_sa_contracted_mizenkei lemma=" << base_form
@@ -404,7 +405,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               }
             }
             if (!dict_has_zu_form) {
-              constexpr float kCost = 0.1F;
+              constexpr float kCost = candidate::verb_cost::kWeakPenalty;
               SUZUME_DEBUG_LOG("[VERB_CAND] " << surface
                               << " godan_mizenkei_zu lemma=" << base_form
                               << " cost=" << kCost << "\n");
@@ -1223,16 +1224,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
         // Verify using inflection analysis on the kateikei form
         auto all_candidates = inflection.analyze(surface);
-        float ichidan_confidence = 0.0F;
-        for (const auto& cand : all_candidates) {
-          if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence >= 0.3F) {
-            ichidan_confidence = std::max(ichidan_confidence, cand.confidence);
-          }
-        }
+        float ichidan_confidence = vh::getIchidanConfidence(all_candidates, 0.3F);
 
         if (ichidan_confidence >= 0.3F) {
           // Negative cost to beat the split path 語幹+れ(受身)+ば
-          constexpr float kKateikeiCost = -0.8F;
+          constexpr float kKateikeiCost = candidate::verb_cost::kStrongBonus;
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                 << " ichidan_kateikei lemma=" << base_form
@@ -1303,17 +1299,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
           // Verify using inflection analysis
           auto all_candidates = inflection.analyze(renyokei_surface + "よう");
-          float ichidan_confidence = 0.0F;
           float min_confidence = could_be_adjective ? 0.5F : 0.3F;
-          for (const auto& cand : all_candidates) {
-            if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence >= min_confidence) {
-              ichidan_confidence = std::max(ichidan_confidence, cand.confidence);
-            }
-          }
+          float ichidan_confidence = vh::getIchidanConfidence(all_candidates, min_confidence);
 
           if (ichidan_confidence >= min_confidence) {
             // Negative cost to beat the split path 語幹+よう
-            constexpr float kVolitionalCost = -0.8F;
+            constexpr float kVolitionalCost = candidate::verb_cost::kStrongBonus;
             SUZUME_DEBUG_VERBOSE_BLOCK {
               SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                   << " ichidan_volitional lemma=" << base_form
@@ -1358,12 +1349,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
         // Verify this is a valid ichidan verb
         auto all_candidates = inflection.analyze(causative_base);
-        float ichidan_confidence = 0.0F;
-        for (const auto& cand : all_candidates) {
-          if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence >= 0.4F) {
-            ichidan_confidence = std::max(ichidan_confidence, cand.confidence);
-          }
-        }
+        float ichidan_confidence = vh::getIchidanConfidence(all_candidates);
 
         if (ichidan_confidence >= 0.4F) {
           float base_cost = verb_opts.bonus_ichidan +
@@ -1422,12 +1408,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // The best overall interpretation might be Godan (言う + れる), but
       // there should also be an Ichidan interpretation (言われる as verb)
       auto all_candidates = inflection.analyze(passive_base);
-      float ichidan_confidence = 0.0F;
-      for (const auto& cand : all_candidates) {
-        if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence >= 0.4F) {
-          ichidan_confidence = std::max(ichidan_confidence, cand.confidence);
-        }
-      }
+      float ichidan_confidence = vh::getIchidanConfidence(all_candidates);
 
       // Passive verbs are Ichidan conjugation (言われる conjugates like 食べる)
       if (ichidan_confidence >= 0.4F) {
@@ -1532,7 +1513,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
       if (is_valid_verb) {
         // Negative cost to beat single-verb inflection path (which gets optimal_length -0.5 bonus)
-        constexpr float kCost = -0.5F;
+        constexpr float kCost = candidate::verb_cost::kStandardBonus;
         SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " ichidan_stem_rare lemma=" << base_form
@@ -1566,7 +1547,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_polite_aux || is_negative_aux) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
-        constexpr float kCost = -0.5F;  // Strong bonus to beat NOUN candidate
+        constexpr float kCost = candidate::verb_cost::kStandardBonus;  // Strong bonus to beat NOUN candidate
         SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_polite lemma=" << base_form
@@ -1586,7 +1567,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_ta_aux || is_te_particle) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
-        constexpr float kCost = -0.8F;  // Strong bonus to beat unified dictionary entry
+        constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat unified dictionary entry
         SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_ta_te lemma=" << base_form
@@ -1608,7 +1589,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_toku_aux || is_chau_aux) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
-        constexpr float kCost = -0.8F;  // Strong bonus to beat unified contraction entry
+        constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat unified contraction entry
         SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_colloquial lemma=" << base_form
@@ -1628,7 +1609,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_rareru_aux) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
-        constexpr float kCost = -0.8F;  // Strong bonus to beat godan mizenkei interpretation
+        constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat godan mizenkei interpretation
         SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_rareru lemma=" << base_form
@@ -1648,7 +1629,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         // Generate 漢字+よ as volitional stem
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
         std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "る";
-        constexpr float kCost = -0.8F;  // Strong bonus to beat compound interpretation
+        constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat compound interpretation
         SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_volitional lemma=" << base_form
@@ -1669,7 +1650,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_saseru_aux) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
-        constexpr float kCost = -0.8F;  // Strong bonus to beat NOUN candidate
+        constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat NOUN candidate
         SUZUME_DEBUG_VERBOSE_BLOCK {
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                               << " single_kanji_ichidan_causative lemma=" << base_form
@@ -1942,7 +1923,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
             if (is_valid_verb) {
               std::string surface = extractSubstring(codepoints, start_pos, multi_miz_end);
-              constexpr float kCost = -0.5F;  // Same as other negative patterns
+              constexpr float kCost = candidate::verb_cost::kStandardBonus;  // Same as other negative patterns
               const char* pattern = is_nakatt_pattern ? "multi_mizenkei_nakatt" :
                                     is_n_pattern ? "multi_mizenkei_n" :
                                     "multi_mizenkei_nai";

@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+#include "analysis/candidate_constants.h"
 #include "analysis/scorer_constants.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -633,7 +634,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
 
         // Lower base cost (0.2F) to beat verb candidates after POS prior adjustment
         // ADJ prior (0.3) is higher than VERB prior (0.2), so we need lower edge cost
-        float cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
+        float cost = candidate::kKanjiAdjBaseCost + (1.0F - cand.confidence) * candidate::kKanjiAdjConfScale;
         // Bonus for adjectives confirmed in dictionary (美味しそう, 難しそう, etc.)
         // This helps beat false-positive suru verb candidates (美味する is invalid)
         if (is_dict_adjective) {
@@ -741,7 +742,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       ku_cand.end = cand.end - 2;  // 2 characters (ない)
       ku_cand.pos = core::PartOfSpeech::Adjective;
       ku_cand.lemma = cand.lemma;  // Same lemma (良い)
-      ku_cand.cost = cand.cost - 0.5F;  // Lower cost to prefer split
+      ku_cand.cost = cand.cost + candidate::kAdjKuSplitBonus;
       ku_cand.has_suffix = true;  // This is a conjugated form
       ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→AuxNegativeNai
 #ifdef SUZUME_DEBUG_INFO
@@ -760,7 +761,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       ku_cand.end = cand.end - 4;  // 4 characters (なかった)
       ku_cand.pos = core::PartOfSpeech::Adjective;
       ku_cand.lemma = cand.lemma;  // Same lemma (良い)
-      ku_cand.cost = cand.cost - 0.5F;  // Lower cost to prefer split
+      ku_cand.cost = cand.cost + candidate::kAdjKuSplitBonus;
       ku_cand.has_suffix = true;  // This is a conjugated form
       ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→AuxNegativeNai
 #ifdef SUZUME_DEBUG_INFO
@@ -779,7 +780,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       ku_cand.end = cand.end - 3;  // 3 characters (なかっ)
       ku_cand.pos = core::PartOfSpeech::Adjective;
       ku_cand.lemma = cand.lemma;  // Same lemma (良い)
-      ku_cand.cost = cand.cost - 0.5F;  // Lower cost to prefer split
+      ku_cand.cost = cand.cost + candidate::kAdjKuSplitBonus;
       ku_cand.has_suffix = true;  // This is a conjugated form
       ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→AuxNegativeNai
 #ifdef SUZUME_DEBUG_INFO
@@ -812,7 +813,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       ku_cand.end = cand.end - 1;  // 1 character (て)
       ku_cand.pos = core::PartOfSpeech::Adjective;
       ku_cand.lemma = cand.lemma;  // Same lemma (ウザい)
-      ku_cand.cost = cand.cost - 0.5F;  // Lower cost to prefer split
+      ku_cand.cost = cand.cost + candidate::kAdjKuSplitBonus;
       ku_cand.has_suffix = true;  // This is a conjugated form
       ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→ParticleConj
 #ifdef SUZUME_DEBUG_INFO
@@ -842,7 +843,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       katt_cand.end = cand.end - 1;  // 1 character (た)
       katt_cand.pos = core::PartOfSpeech::Adjective;
       katt_cand.lemma = cand.lemma;  // Same lemma (美しい, etc.)
-      katt_cand.cost = cand.cost - 0.1F;  // Lower cost to prefer split (MeCab compat)
+      katt_cand.cost = cand.cost + candidate::kAdjKattSplitBonus;
       katt_cand.has_suffix = true;  // This is a conjugated form (連用タ接続)
       katt_cand.extended_pos = core::ExtendedPOS::AdjKatt;  // For bigram: AdjKatt→AuxTenseTa
 #ifdef SUZUME_DEBUG_INFO
@@ -873,7 +874,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       ke_cand.end = cand.end - 1;  // 1 character (ば)
       ke_cand.pos = core::PartOfSpeech::Adjective;
       ke_cand.lemma = cand.lemma;  // Same lemma (美しい, etc.)
-      ke_cand.cost = cand.cost - 0.1F;  // Slightly lower cost to prefer split
+      ke_cand.cost = cand.cost + candidate::kAdjKeSplitBonus;
       ke_cand.has_suffix = true;  // This is a conjugated form (仮定形)
       ke_cand.extended_pos = core::ExtendedPOS::AdjKeForm;  // For bigram: AdjKeForm→ParticleConj
 #ifdef SUZUME_DEBUG_INFO
@@ -1270,7 +1271,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         // Base cost for hiragana i-adjective candidates
         // Use slightly elevated base to avoid fragments like ろしい beating
         // kanji adjectives like 恐ろしい (kanji adj base=0.2F)
-        float cost = 0.25F + (1.0F - cand.confidence) * 0.5F;
+        float cost = candidate::kHiraganaAdjBaseCost + (1.0F - cand.confidence) * candidate::kHiraganaAdjConfScale;
         if (has_prolonged) {
           cost -= 0.1F;  // Bonus for colloquial patterns like すごーい
           SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" -0.1 (prolonged_sound_bonus)\n");
@@ -1318,7 +1319,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       ku_cand.end = cand.end - 2;  // 2 characters (ない)
       ku_cand.pos = core::PartOfSpeech::Adjective;
       ku_cand.lemma = cand.lemma;  // Same lemma (しんどい)
-      ku_cand.cost = cand.cost - 0.3F;  // Lower cost to prefer split (MeCab-compatible)
+      ku_cand.cost = cand.cost + candidate::kAdjKuSplitBonusWeak;
       ku_cand.has_suffix = true;  // This is a conjugated form
       ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→AuxNegativeNai
 #ifdef SUZUME_DEBUG_INFO
@@ -1338,7 +1339,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       ku_cand.end = cand.end - 4;  // 4 characters (なかった)
       ku_cand.pos = core::PartOfSpeech::Adjective;
       ku_cand.lemma = cand.lemma;  // Same lemma (良い)
-      ku_cand.cost = cand.cost - 0.3F;  // Lower cost to prefer split
+      ku_cand.cost = cand.cost + candidate::kAdjKuSplitBonusWeak;
       ku_cand.has_suffix = true;  // This is a conjugated form
       ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→AuxNegativeNai
 #ifdef SUZUME_DEBUG_INFO
@@ -1358,7 +1359,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       ku_cand.end = cand.end - 3;  // 3 characters (なかっ)
       ku_cand.pos = core::PartOfSpeech::Adjective;
       ku_cand.lemma = cand.lemma;  // Same lemma (良い)
-      ku_cand.cost = cand.cost - 0.3F;  // Lower cost to prefer split
+      ku_cand.cost = cand.cost + candidate::kAdjKuSplitBonusWeak;
       ku_cand.has_suffix = true;  // This is a conjugated form
       ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→AuxNegativeNai
 #ifdef SUZUME_DEBUG_INFO
@@ -1394,7 +1395,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       katt_cand.end = cand.end - 1;  // 1 character (た)
       katt_cand.pos = core::PartOfSpeech::Adjective;
       katt_cand.lemma = cand.lemma;  // Same lemma (よい, 寒い, etc.)
-      katt_cand.cost = cand.cost - 0.1F;  // Lower cost to prefer split (MeCab compat)
+      katt_cand.cost = cand.cost + candidate::kAdjKattSplitBonus;  // Lower cost to prefer split (MeCab compat)
       katt_cand.has_suffix = true;  // This is a conjugated form (連用タ接続)
       katt_cand.extended_pos = core::ExtendedPOS::AdjKatt;  // For bigram: AdjKatt→AuxTenseTa
 #ifdef SUZUME_DEBUG_INFO
@@ -1425,7 +1426,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       ke_cand.end = cand.end - 1;  // 1 character (ば)
       ke_cand.pos = core::PartOfSpeech::Adjective;
       ke_cand.lemma = cand.lemma;  // Same lemma (よい, etc.)
-      ke_cand.cost = cand.cost - 0.1F;  // Slightly lower cost to prefer split
+      ke_cand.cost = cand.cost + candidate::kAdjKeSplitBonus;  // Slightly lower cost to prefer split
       ke_cand.has_suffix = true;  // This is a conjugated form (仮定形)
       ke_cand.extended_pos = core::ExtendedPOS::AdjKeForm;  // For bigram: AdjKeForm→ParticleConj
 #ifdef SUZUME_DEBUG_INFO
@@ -1611,7 +1612,7 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
           cand.verb_type == grammar::VerbType::IAdjective) {
         // Lower cost than pure katakana noun to prefer adjective reading
         // Cost: 0.2-0.35 based on confidence (lower = better)
-        float cost = 0.2F + (1.0F - cand.confidence) * 0.3F;
+        float cost = candidate::kKanjiAdjBaseCost + (1.0F - cand.confidence) * candidate::kKanjiAdjConfScale;
         auto adj_cand = makeIAdjCandidate(
             surface, start_pos, end_pos, cand.base_form, cost,
             CandidateOrigin::AdjectiveI, cand.confidence, "i_adjective_kata");
@@ -1637,7 +1638,7 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
       katt_cand.end = cand.end - 1;
       katt_cand.pos = core::PartOfSpeech::Adjective;
       katt_cand.lemma = cand.lemma;
-      katt_cand.cost = cand.cost - 0.1F;
+      katt_cand.cost = cand.cost + candidate::kAdjKattSplitBonus;
       katt_cand.has_suffix = true;
       katt_cand.extended_pos = core::ExtendedPOS::AdjKatt;
 #ifdef SUZUME_DEBUG_INFO
@@ -1663,7 +1664,7 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
       ku_cand.end = cand.end - 1;  // 1 character (て)
       ku_cand.pos = core::PartOfSpeech::Adjective;
       ku_cand.lemma = cand.lemma;
-      ku_cand.cost = cand.cost - 0.5F;  // Lower cost to prefer split
+      ku_cand.cost = cand.cost + candidate::kAdjKuSplitBonus;
       ku_cand.has_suffix = true;
       ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→ParticleConj
 #ifdef SUZUME_DEBUG_INFO
@@ -1689,7 +1690,7 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
       ku_cand.end = cand.end - 2;  // 2 characters (ない)
       ku_cand.pos = core::PartOfSpeech::Adjective;
       ku_cand.lemma = cand.lemma;
-      ku_cand.cost = cand.cost - 0.3F;  // Lower cost to prefer split
+      ku_cand.cost = cand.cost + candidate::kAdjKuSplitBonusWeak;
       ku_cand.has_suffix = true;
       ku_cand.extended_pos = core::ExtendedPOS::AdjRenyokei;  // For bigram: AdjRenyokei→AuxNegativeNai
 #ifdef SUZUME_DEBUG_INFO
@@ -1715,7 +1716,7 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
       ke_cand.end = cand.end - 1;
       ke_cand.pos = core::PartOfSpeech::Adjective;
       ke_cand.lemma = cand.lemma;
-      ke_cand.cost = cand.cost - 0.1F;
+      ke_cand.cost = cand.cost + candidate::kAdjKeSplitBonus;
       ke_cand.has_suffix = true;
       ke_cand.extended_pos = core::ExtendedPOS::AdjKeForm;
 #ifdef SUZUME_DEBUG_INFO
@@ -1746,7 +1747,7 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
       stem_cand.end = cand.end - 2;  // 2 characters (そう)
       stem_cand.pos = core::PartOfSpeech::Adjective;
       stem_cand.lemma = cand.lemma;
-      stem_cand.cost = cand.cost - 0.5F;  // Lower cost to prefer split
+      stem_cand.cost = cand.cost + candidate::kAdjStemSplitBonus;
       stem_cand.has_suffix = true;
       stem_cand.extended_pos = core::ExtendedPOS::AdjStem;  // For bigram: AdjStem→AuxAppearanceSou
 #ifdef SUZUME_DEBUG_INFO
@@ -1942,7 +1943,7 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       // Use strong negative cost to prefer ADJ_stem + すぎる split over compound
       // Need: stem + connection(0.5) + すぎる(0.4) < compound(0.35)
       // Required: stem < 0.35 - 0.5 - 0.4 = -0.55
-      float cost = -0.8F + (1.0F - adj_confidence) * 0.2F;
+      float cost = candidate::kAdjStemBaseCost + (1.0F - adj_confidence) * candidate::kAdjStemConfScale;
       SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ candidate stem=\"" << stem << "\" cost=" << cost << "\n");
       candidates.push_back(makeIAdjStemCandidate(
           stem, start_pos, kanji_end, base_form, cost,
@@ -2056,7 +2057,7 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       // Dictionary adjectives get strong bonus to prefer MeCab-compatible split
       // (美味しそう → 美味し + そう)
       // Need stronger negative cost like garu-connection pattern
-      float cost = -0.8F + (1.0F - adj_confidence) * 0.2F;
+      float cost = candidate::kAdjStemBaseCost + (1.0F - adj_confidence) * candidate::kAdjStemConfScale;
       SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ candidate stem=\"" << stem << "\" cost=" << cost << "\n");
       candidates.push_back(makeIAdjStemCandidate(
           stem, start_pos, stem_end, base_form, cost,

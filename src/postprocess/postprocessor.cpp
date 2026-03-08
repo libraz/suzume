@@ -48,6 +48,14 @@ std::vector<core::Morpheme> Postprocessor::process(
     SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] lemmatize: applied\n");
   }
 
+  // Merge verb renyokei + もの → compound noun (食べもの, 飲みもの, etc.)
+  // Must run after lemmatize so conj_form is set
+  before_count = result.size();
+  result = mergeVerbRenyokeiMono(result);
+  if (result.size() != before_count) {
+    SUZUME_DEBUG_LOG("[POSTPROC] mergeVerbRenyokeiMono: " << before_count << " → " << result.size() << "\n");
+  }
+
   // Merge noun compounds
   if (options_.merge_noun_compounds) {
     before_count = result.size();
@@ -173,6 +181,41 @@ std::vector<core::Morpheme> Postprocessor::convertPrefixVerbToNoun(
     }
 
     result.push_back(m);
+  }
+
+  return result;
+}
+
+std::vector<core::Morpheme> Postprocessor::mergeVerbRenyokeiMono(
+    const std::vector<core::Morpheme>& morphemes) {
+  if (morphemes.size() < 2) {
+    return morphemes;
+  }
+
+  std::vector<core::Morpheme> result;
+  result.reserve(morphemes.size());
+
+  for (size_t i = 0; i < morphemes.size(); ++i) {
+    // Check: VERB + もの(formal noun) → compound NOUN
+    // e.g., 食べ+もの → 食べもの, 飲み+もの → 飲みもの, 乗り+もの → 乗りもの
+    if (i + 1 < morphemes.size() &&
+        morphemes[i].pos == core::PartOfSpeech::Verb &&
+        morphemes[i].conj_form == grammar::ConjForm::Renyokei &&
+        morphemes[i + 1].surface == "もの" &&
+        morphemes[i + 1].features.is_formal_noun) {
+      core::Morpheme merged = morphemes[i];
+      merged.surface += morphemes[i + 1].surface;
+      merged.pos = core::PartOfSpeech::Noun;
+      merged.lemma = merged.surface;
+      merged.end = morphemes[i + 1].end;
+      merged.end_pos = morphemes[i + 1].end_pos;
+      SUZUME_DEBUG_LOG("[POSTPROC] Merged verb+もの: \"" << morphemes[i].surface
+                       << "\" + \"もの\" → \"" << merged.surface << "\"\n");
+      result.push_back(merged);
+      ++i;  // skip もの
+      continue;
+    }
+    result.push_back(morphemes[i]);
   }
 
   return result;
