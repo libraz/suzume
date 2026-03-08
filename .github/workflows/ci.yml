@@ -33,6 +33,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: yarn
+      - name: Build native CLI and compile dictionaries
+        run: |
+          cmake -B build -DBUILD_WASM=OFF
+          cmake --build build --target suzume-cli --parallel
+          cmake --build build --target build-dict
       - run: yarn install --immutable
       - run: yarn build
       - run: yarn test
