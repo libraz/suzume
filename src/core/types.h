@@ -115,6 +115,7 @@ enum class ExtendedPOS : uint8_t {
   AuxHonorific,     // 尊敬: れる、られる (honorific use)
   AuxGozaru,        // 丁重: ござる、ございます
   AuxExcessive,     // 過度: すぎる (excessive degree)
+  AuxGaru,          // ガル接続: がる (adjective stem → verb)
 
   // =========================================================================
   // Particles (41-50) - by grammatical role

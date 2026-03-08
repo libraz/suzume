@@ -1,106 +1,155 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "Cat-like speech にゃん",
-      "expected" : [
+      "description": "Cat-like speech にゃん",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "食べる"
+          "pos": "Verb",
+          "surface": "食べる"
         },
         {
-          "pos" : "Particle",
-          "surface" : "にゃん"
+          "pos": "Particle",
+          "surface": "にゃん"
         }
       ],
-      "id" : "character_nyan",
-      "input" : "食べるにゃん",
-      "tags" : [
+      "id": "character_nyan",
+      "input": "食べるにゃん",
+      "tags": [
         "character_speech",
         "cat"
       ]
     },
     {
-      "description" : "食べるもの (something to eat)",
-      "expected" : [
+      "description": "食べるもの (something to eat)",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "食べる"
+          "pos": "Verb",
+          "surface": "食べる"
         },
         {
-          "pos" : "Noun",
-          "surface" : "もの"
+          "pos": "Noun",
+          "surface": "もの"
         }
       ],
-      "id" : "formal_noun_mono",
-      "input" : "食べるもの",
-      "tags" : [
+      "id": "formal_noun_mono",
+      "input": "食べるもの",
+      "tags": [
         "grammar",
         "formal-noun"
       ]
     },
     {
-      "description" : "食べるところ (place to eat)",
-      "expected" : [
+      "description": "食べるところ (place to eat)",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "食べる"
+          "pos": "Verb",
+          "surface": "食べる"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ところ"
+          "pos": "Noun",
+          "surface": "ところ"
         }
       ],
-      "id" : "formal_noun_tokoro",
-      "input" : "食べるところ",
-      "tags" : [
+      "id": "formal_noun_tokoro",
+      "input": "食べるところ",
+      "tags": [
         "grammar",
         "formal-noun"
       ]
     },
     {
-      "description" : "います - polite form of verb いる (single auxiliary token)",
-      "expected" : [
+      "description": "います - polite form of verb いる (single auxiliary token)",
+      "expected": [
         {
-          "lemma" : "いる",
-          "pos" : "Verb",
-          "surface" : "い"
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "hiragana_verb_imasu",
-      "input" : "います",
-      "tags" : [
+      "id": "hiragana_verb_imasu",
+      "input": "います",
+      "tags": [
         "verb"
       ]
     },
     {
-      "description" : "いません - negative polite form of verb いる (MeCab-compatible split)",
-      "expected" : [
+      "description": "いません - negative polite form of verb いる (MeCab-compatible split)",
+      "expected": [
         {
-          "lemma" : "いる",
-          "pos" : "Verb",
-          "surface" : "い"
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
         },
         {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "ませ"
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ん"
+          "pos": "Auxiliary",
+          "surface": "ん"
         }
       ],
-      "id" : "hiragana_verb_imasen",
-      "input" : "いません",
-      "tags" : [
+      "id": "hiragana_verb_imasen",
+      "input": "いません",
+      "tags": [
         "verb"
       ]
+    },
+    {
+      "description": "verb renyokei + もの → compound noun merge",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "食べもの"
+        }
+      ],
+      "id": "verb_renyokei_mono_tabemono",
+      "input": "食べもの"
+    },
+    {
+      "description": "verb renyokei + もの → compound noun in sentence",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "飲みもの"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "pos": "Verb",
+          "surface": "買う"
+        }
+      ],
+      "id": "verb_renyokei_mono_nomimono",
+      "input": "飲みものを買う"
+    },
+    {
+      "description": "verb renyokei + もの → compound noun in sentence",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "読みもの"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "好き"
+        }
+      ],
+      "id": "verb_renyokei_mono_yomimono",
+      "input": "読みものが好き"
     }
   ],
-  "description" : "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows",
-  "version" : "1.0"
+  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows",
+  "version": "1.0"
 }

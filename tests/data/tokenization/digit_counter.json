@@ -1,0 +1,17 @@
+{
+  "cases": [
+    {
+      "description": "digit + 次 counter + 元 dict verification",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "2次元"
+        }
+      ],
+      "id": "digit_jigen_2d",
+      "input": "2次元"
+    }
+  ],
+  "description": "digit_counter tests",
+  "version": "1.0"
+}

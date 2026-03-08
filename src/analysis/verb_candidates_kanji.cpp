@@ -2126,43 +2126,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         }
         if (matched_verb_type == grammar::VerbType::Unknown &&
             !starts_with_dict_noun && !remainder_is_dict_verb) {
-          // Skip inflection fallback for single-kanji and 3+ kanji stems
-          // without dictionary entry.
-          // Single kanji: 車っ → NOT verb 車る (common nouns + って)
-          // All real single-kanji godan verbs should be in L2 dictionary.
-          // 3+ kanji: 画像貼っ → NOT verb 画像貼る
-          // Allow only 2-kanji stems: 手伝う, 見舞う etc. are common verbs
-          // that may not be in dictionary but inflection analysis can verify
-          size_t kanji_char_count = kanji_end - start_pos;
-          if (kanji_char_count != 2) {
-            SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem
-                                      << "\" kanji chars (" << kanji_char_count
-                                      << ") not 2, skip non-dict sokuonbin\n");
-          } else {
-          // Minimum length: kanji + っ + て/た = kanji_end + 2 (inclusive)
-          float best_conf = 0.0F;
-          for (size_t try_end = hiragana_end; try_end >= kanji_end + 2; --try_end) {
-            std::string full_surface = extractSubstring(codepoints, start_pos, try_end);
-            auto infl_results = inflection.analyze(full_surface);
-            for (const auto& result : infl_results) {
-              if (result.confidence >= 0.5F && result.confidence > best_conf) {
-                for (const auto& [verb_type, base_suffix] : sokuonbin_types) {
-                  std::string base_form = kanji_stem + std::string(base_suffix);
-                  if (result.base_form == base_form && result.verb_type == verb_type) {
-                    matched_verb_type = verb_type;
-                    matched_base_form = base_form;
-                    best_conf = result.confidence;
-                    break;
-                  }
-                }
-              }
-            }
-            // Found a match with high confidence, stop trying shorter surfaces
-            if (matched_verb_type != grammar::VerbType::Unknown) {
-              break;
-            }
-          }
-          }  // kanji_char_count < 3 (allow 2-kanji stems)
+          // Skip inflection fallback for all non-dict sokuonbin candidates.
+          // Any real godan verb should be in L2 dictionary, and dict-matched
+          // sokuonbin is handled above. Inflection-only matches produce false
+          // positives (e.g., 画像っ from 画像る) that cannot be distinguished
+          // from valid ones (手伝っ from 手伝う) by cost alone.
+          SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem
+                                    << "\" skip non-dict sokuonbin\n");
         }
 
 #ifdef SUZUME_DEBUG

@@ -1,515 +1,560 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "してる - MeCab splits as し+てる (している → してる)",
-      "expected" : [
+      "description": "してる - MeCab splits as し+てる (している → してる)",
+      "expected": [
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "てる"
+          "pos": "Auxiliary",
+          "surface": "てる"
         }
       ],
-      "id" : "contraction_shiteru",
-      "input" : "してる",
-      "tags" : [
+      "id": "contraction_shiteru",
+      "input": "してる",
+      "tags": [
         "contraction"
       ]
     },
     {
-      "description" : "見てた - MeCab splits as 見+て+た (見ていた → 見てた)",
-      "expected" : [
+      "description": "見てた - MeCab splits as 見+て+た (見ていた → 見てた)",
+      "expected": [
         {
-          "lemma" : "見る",
-          "pos" : "Verb",
-          "surface" : "見"
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
         },
         {
-          "lemma" : "てる",
-          "pos" : "Auxiliary",
-          "surface" : "て"
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "contraction_miteta",
-      "input" : "見てた",
-      "tags" : [
+      "id": "contraction_miteta",
+      "input": "見てた",
+      "tags": [
         "strict",
         "contraction"
       ]
     },
     {
-      "description" : "わからん - contracted negative of わかる (わからない→わからん)",
-      "expected" : [
+      "description": "わからん - contracted negative of わかる (わからない→わからん)",
+      "expected": [
         {
-          "lemma" : "わかる",
-          "pos" : "Verb",
-          "surface" : "わから"
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わから"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ん"
+          "pos": "Auxiliary",
+          "surface": "ん"
         }
       ],
-      "id" : "contracted_neg_wakaran",
-      "input" : "わからん",
-      "tags" : [
+      "id": "contracted_neg_wakaran",
+      "input": "わからん",
+      "tags": [
         "contraction",
         "colloquial",
         "regression"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ない: adjective vs auxiliary - context-dependent"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "ない: adjective vs auxiliary - context-dependent"
       },
-      "description" : "ないんだ - ない + んだ should not split as な + いん + だ",
-      "expected" : [
+      "description": "ないんだ - ない + んだ should not split as な + いん + だ",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "ない"
+          "pos": "Adjective",
+          "surface": "ない"
         },
         {
-          "lemma" : "の",
-          "pos" : "Particle",
-          "surface" : "ん"
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "だ"
+          "pos": "Auxiliary",
+          "surface": "だ"
         }
       ],
-      "id" : "contracted_neg_nainda",
-      "input" : "ないんだ",
-      "suzume_expected" : [
+      "id": "contracted_neg_nainda",
+      "input": "ないんだ",
+      "suzume_expected": [
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         },
         {
-          "lemma" : "の",
-          "pos" : "Particle",
-          "surface" : "ん"
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "だ"
+          "pos": "Auxiliary",
+          "surface": "だ"
         }
       ],
-      "tags" : [
+      "tags": [
         "contraction",
         "auxiliary",
         "regression"
       ]
     },
     {
-      "description" : "田中さん - should split as NOUN + SUFFIX, not VERB",
-      "expected" : [
+      "description": "田中さん - should split as NOUN + SUFFIX, not VERB",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "田中"
+          "pos": "Noun",
+          "surface": "田中"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "さん"
+          "pos": "Suffix",
+          "surface": "さん"
         }
       ],
-      "id" : "honorific_tanaka_san",
-      "input" : "田中さん",
-      "tags" : [
+      "id": "honorific_tanaka_san",
+      "input": "田中さん",
+      "tags": [
         "honorific",
         "suffix",
         "regression"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "Vanilla splits ã prefix; user dict merges"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "Vanilla splits ã prefix; user dict merges"
       },
-      "description" : "おねえさん - should not be parsed as verb おねえす",
-      "expected" : [
+      "description": "おねえさん - should not be parsed as verb おねえす",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "おねえさん"
+          "pos": "Noun",
+          "surface": "おねえさん"
         }
       ],
-      "id" : "honorific_oneesan",
-      "input" : "おねえさん",
-      "suzume_expected" : [
+      "id": "honorific_oneesan",
+      "input": "おねえさん",
+      "suzume_expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "pos" : "Interjection",
-          "surface" : "ねえ"
+          "pos": "Interjection",
+          "surface": "ねえ"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "さん"
+          "pos": "Suffix",
+          "surface": "さん"
         }
       ],
-      "tags" : [
+      "tags": [
         "honorific",
         "regression"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "Vanilla splits ã prefix; user dict merges"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "Vanilla splits ã prefix; user dict merges"
       },
-      "description" : "お姉さん - prefix + kanji noun + suffix",
-      "expected" : [
+      "description": "お姉さん - prefix + kanji noun + suffix",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "お姉さん"
+          "pos": "Noun",
+          "surface": "お姉さん"
         }
       ],
-      "id" : "honorific_onesan_kanji",
-      "input" : "お姉さん",
-      "suzume_expected" : [
+      "id": "honorific_onesan_kanji",
+      "input": "お姉さん",
+      "suzume_expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "姉"
+          "pos": "Noun",
+          "surface": "姉"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "さん"
+          "pos": "Suffix",
+          "surface": "さん"
         }
       ],
-      "tags" : [
+      "tags": [
         "honorific",
         "suffix",
         "regression"
       ]
     },
     {
-      "description" : "義母さん - compound noun + suffix",
-      "expected" : [
+      "description": "義母さん - compound noun + suffix",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "義母"
+          "pos": "Noun",
+          "surface": "義母"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "さん"
+          "pos": "Suffix",
+          "surface": "さん"
         }
       ],
-      "id" : "honorific_gibosan",
-      "input" : "義母さん",
-      "tags" : [
+      "id": "honorific_gibosan",
+      "input": "義母さん",
+      "tags": [
         "honorific",
         "suffix",
         "regression"
       ]
     },
     {
-      "description" : "壊されちゃう - auto-generated",
-      "expected" : [
+      "description": "壊されちゃう - auto-generated",
+      "expected": [
         {
-          "lemma" : "壊す",
-          "pos" : "Verb",
-          "surface" : "壊さ"
+          "lemma": "壊す",
+          "pos": "Verb",
+          "surface": "壊さ"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
-          "surface" : "れ"
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
         },
         {
-          "pos" : "Verb",
-          "surface" : "ちゃう"
+          "pos": "Verb",
+          "surface": "ちゃう"
         }
       ],
-      "id" : "sarechi_u",
-      "input" : "壊されちゃう",
-      "tags" : [
+      "id": "sarechi_u",
+      "input": "壊されちゃう",
+      "tags": [
         "contraction",
         "passive",
         "regression"
       ]
     },
     {
-      "description" : "食べられちゃう - auto-generated",
-      "expected" : [
+      "description": "食べられちゃう - auto-generated",
+      "expected": [
         {
-          "lemma" : "食べる",
-          "pos" : "Verb",
-          "surface" : "食べ"
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
         },
         {
-          "lemma" : "られる",
-          "pos" : "Auxiliary",
-          "surface" : "られ"
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
         },
         {
-          "pos" : "Verb",
-          "surface" : "ちゃう"
+          "pos": "Verb",
+          "surface": "ちゃう"
         }
       ],
-      "id" : "berarechi_u",
-      "input" : "食べられちゃう",
-      "tags" : [
+      "id": "berarechi_u",
+      "input": "食べられちゃう",
+      "tags": [
         "contraction",
         "passive",
         "regression"
       ]
     },
     {
-      "description" : "買っちゃった - auto-generated",
-      "expected" : [
+      "description": "買っちゃった - auto-generated",
+      "expected": [
         {
-          "lemma" : "買う",
-          "pos" : "Verb",
-          "surface" : "買っ"
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
         },
         {
-          "lemma" : "ちゃう",
-          "pos" : "Verb",
-          "surface" : "ちゃっ"
+          "lemma": "ちゃう",
+          "pos": "Verb",
+          "surface": "ちゃっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "ttchi_ttta",
-      "input" : "買っちゃった",
-      "tags" : [
+      "id": "ttchi_ttta",
+      "input": "買っちゃった",
+      "tags": [
         "contraction",
         "regression"
       ]
     },
     {
-      "description" : "言っちゃう - auto-generated",
-      "expected" : [
+      "description": "言っちゃう - auto-generated",
+      "expected": [
         {
-          "lemma" : "言う",
-          "pos" : "Verb",
-          "surface" : "言っ"
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
         },
         {
-          "pos" : "Verb",
-          "surface" : "ちゃう"
+          "pos": "Verb",
+          "surface": "ちゃう"
         }
       ],
-      "id" : "ttchi_u",
-      "input" : "言っちゃう",
-      "tags" : [
+      "id": "ttchi_u",
+      "input": "言っちゃう",
+      "tags": [
         "contraction",
         "regression"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ãã« lemma: ã¬ is grammatically correct (ã is renyokei of ã¬)"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "ãã« lemma: ã¬ is grammatically correct (ã is renyokei of ã¬)"
       },
-      "description" : "食べずに帰った - auto-generated",
-      "expected" : [
+      "description": "食べずに帰った - auto-generated",
+      "expected": [
         {
-          "lemma" : "食べる",
-          "pos" : "Verb",
-          "surface" : "食べ"
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
         },
         {
-          "lemma" : "ず",
-          "pos" : "Auxiliary",
-          "surface" : "ずに"
+          "lemma": "ず",
+          "pos": "Auxiliary",
+          "surface": "ずに"
         },
         {
-          "lemma" : "帰る",
-          "pos" : "Verb",
-          "surface" : "帰っ"
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "bezuni_ttta",
-      "input" : "食べずに帰った",
-      "suzume_expected" : [
+      "id": "bezuni_ttta",
+      "input": "食べずに帰った",
+      "suzume_expected": [
         {
-          "lemma" : "食べる",
-          "pos" : "Verb",
-          "surface" : "食べ"
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
         },
         {
-          "lemma" : "ぬ",
-          "pos" : "Auxiliary",
-          "surface" : "ずに"
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ずに"
         },
         {
-          "lemma" : "帰る",
-          "pos" : "Verb",
-          "surface" : "帰っ"
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ãã« lemma: ã¬ is grammatically correct"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "ãã« lemma: ã¬ is grammatically correct"
       },
-      "description" : "話さずに聞く - auto-generated",
-      "expected" : [
+      "description": "話さずに聞く - auto-generated",
+      "expected": [
         {
-          "lemma" : "話す",
-          "pos" : "Verb",
-          "surface" : "話さ"
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話さ"
         },
         {
-          "lemma" : "ず",
-          "pos" : "Auxiliary",
-          "surface" : "ずに"
+          "lemma": "ず",
+          "pos": "Auxiliary",
+          "surface": "ずに"
         },
         {
-          "pos" : "Verb",
-          "surface" : "聞く"
+          "pos": "Verb",
+          "surface": "聞く"
         }
       ],
-      "id" : "sazuni_ku",
-      "input" : "話さずに聞く",
-      "suzume_expected" : [
+      "id": "sazuni_ku",
+      "input": "話さずに聞く",
+      "suzume_expected": [
         {
-          "lemma" : "話す",
-          "pos" : "Verb",
-          "surface" : "話さ"
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話さ"
         },
         {
-          "lemma" : "ぬ",
-          "pos" : "Auxiliary",
-          "surface" : "ずに"
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ずに"
         },
         {
-          "pos" : "Verb",
-          "surface" : "聞く"
+          "pos": "Verb",
+          "surface": "聞く"
         }
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ãã« lemma: ã¬ is grammatically correct"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "ãã« lemma: ã¬ is grammatically correct"
       },
-      "description" : "考えずに - auto-generated",
-      "expected" : [
+      "description": "考えずに - auto-generated",
+      "expected": [
         {
-          "lemma" : "考える",
-          "pos" : "Verb",
-          "surface" : "考え"
+          "lemma": "考える",
+          "pos": "Verb",
+          "surface": "考え"
         },
         {
-          "lemma" : "ず",
-          "pos" : "Auxiliary",
-          "surface" : "ずに"
+          "lemma": "ず",
+          "pos": "Auxiliary",
+          "surface": "ずに"
         }
       ],
-      "id" : "ezuni",
-      "input" : "考えずに",
-      "suzume_expected" : [
+      "id": "ezuni",
+      "input": "考えずに",
+      "suzume_expected": [
         {
-          "lemma" : "考える",
-          "pos" : "Verb",
-          "surface" : "考え"
+          "lemma": "考える",
+          "pos": "Verb",
+          "surface": "考え"
         },
         {
-          "lemma" : "ぬ",
-          "pos" : "Auxiliary",
-          "surface" : "ずに"
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ずに"
         }
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ãã« lemma: ã¬ is grammatically correct"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "ãã« lemma: ã¬ is grammatically correct"
       },
-      "description" : "帰らずに済む - auto-generated",
-      "expected" : [
+      "description": "帰らずに済む - auto-generated",
+      "expected": [
         {
-          "lemma" : "帰る",
-          "pos" : "Verb",
-          "surface" : "帰ら"
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰ら"
         },
         {
-          "lemma" : "ず",
-          "pos" : "Auxiliary",
-          "surface" : "ずに"
+          "lemma": "ず",
+          "pos": "Auxiliary",
+          "surface": "ずに"
         },
         {
-          "pos" : "Verb",
-          "surface" : "済む"
+          "pos": "Verb",
+          "surface": "済む"
         }
       ],
-      "id" : "razuni_mu",
-      "input" : "帰らずに済む",
-      "suzume_expected" : [
+      "id": "razuni_mu",
+      "input": "帰らずに済む",
+      "suzume_expected": [
         {
-          "lemma" : "帰る",
-          "pos" : "Verb",
-          "surface" : "帰ら"
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰ら"
         },
         {
-          "lemma" : "ぬ",
-          "pos" : "Auxiliary",
-          "surface" : "ずに"
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ずに"
         },
         {
-          "pos" : "Verb",
-          "surface" : "済む"
+          "pos": "Verb",
+          "surface": "済む"
         }
       ]
     },
     {
-      "description" : "めちゃ楽しい - auto-generated",
-      "expected" : [
+      "description": "めちゃ楽しい - auto-generated",
+      "expected": [
         {
-          "pos" : "Other",
-          "surface" : "めちゃ"
+          "pos": "Other",
+          "surface": "めちゃ"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "楽しい"
+          "pos": "Adjective",
+          "surface": "楽しい"
         }
       ],
-      "id" : "mechi_shii",
-      "input" : "めちゃ楽しい"
+      "id": "mechi_shii",
+      "input": "めちゃ楽しい"
     },
     {
-      "description" : "めちゃ好き - auto-generated",
-      "expected" : [
+      "description": "めちゃ好き - auto-generated",
+      "expected": [
         {
-          "pos" : "Other",
-          "surface" : "めちゃ"
+          "pos": "Other",
+          "surface": "めちゃ"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "好き"
+          "pos": "Adjective",
+          "surface": "好き"
         }
       ],
-      "id" : "mechi_ki",
-      "input" : "めちゃ好き"
+      "id": "mechi_ki",
+      "input": "めちゃ好き"
+    },
+    {
+      "description": "honorific suffix くん",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "太郎"
+        },
+        {
+          "pos": "Suffix",
+          "surface": "くん"
+        }
+      ],
+      "id": "honorific_kun",
+      "input": "太郎くん"
+    },
+    {
+      "description": "honorific suffix さま",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "花子"
+        },
+        {
+          "pos": "Suffix",
+          "surface": "さま"
+        }
+      ],
+      "id": "honorific_sama",
+      "input": "花子さま"
+    },
+    {
+      "description": "honorific suffix ちゃん",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "花子"
+        },
+        {
+          "pos": "Suffix",
+          "surface": "ちゃん"
+        }
+      ],
+      "id": "honorific_chan",
+      "input": "花子ちゃん"
     }
   ],
-  "description" : "Contraction patterns (てる、ちゃう)",
-  "version" : "1.0"
+  "description": "Contraction patterns (てる、ちゃう)",
+  "version": "1.0"
 }

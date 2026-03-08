@@ -931,11 +931,36 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // E.g., は+し in はしがかかる should be はし (noun), not は+し (topic + する連用形)
   // The ParticleTopic→VerbRenyokei bonus helps はありますか but hurts はし
   // Single-char verbs after topic particle are usually mis-segmentations
+  // Exception: い (renyokei of いる) - valid in ずにはいられない pattern
   if (prev.extended_pos == core::ExtendedPOS::ParticleTopic &&
       next.pos == core::PartOfSpeech::Verb &&
       grammar::isPureHiragana(next.surface) &&
-      next.surface.size() <= 3) {  // 1 char only (3 bytes in UTF-8)
+      next.surface.size() <= 3 &&  // 1 char only (3 bytes in UTF-8)
+      next.surface != "い") {  // い+られ is valid (いる potential)
     surface_bonus += cost::kVeryRare;
+  }
+
+  // Penalty for pure-hiragana OTHER → single-char VerbRenyokei
+  // E.g., ふんど+し should be ふんどし (one word), not noun+する連用形
+  // Pure hiragana unknown sequences split before し/き/etc. are usually wrong
+  // Does not apply when prev is a known particle/aux (those have specific EPOS)
+  if (prev.pos == core::PartOfSpeech::Other &&
+      grammar::isPureHiragana(prev.surface) &&
+      prev.surface.size() >= 6 &&  // 2+ hiragana chars
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface.size() <= 3) {  // Single char (し, き, etc.)
+    surface_bonus += cost::kUncommon;
+  }
+
+  // Penalty for DET → non-dict single-kanji NOUN
+  // The DET→NOUN bigram bonus (-2.5) is too strong for unknown single-kanji tokens,
+  // causing splits like こんな+伸+びる instead of こんな+伸びる
+  // Valid DET+NOUN patterns (こんな+事, あんな+人) use dict nouns or multi-char nouns
+  if (prev.pos == core::PartOfSpeech::Determiner &&
+      next.pos == core::PartOfSpeech::Noun && !next.fromDictionary() &&
+      grammar::containsKanji(next.surface) &&
+      suzume::normalize::utf8Length(next.surface) == 1) {
+    surface_bonus += cost::kStrong;
   }
 
   // Penalty for case particle → final particle pattern
@@ -1115,11 +1140,13 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // But single-char hiragana like せ+られ should prefer AuxCausative+AuxPassive path
   // Valid patterns like 知らせ+られ have longer surfaces (2+ chars)
   // This prevents せ(VERB連用) from being selected over せ(AuxCausative)
+  // Exception: い+られ is valid (いる potential: いられない = cannot stay)
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       (next.extended_pos == core::ExtendedPOS::AuxPassive ||
        next.extended_pos == core::ExtendedPOS::AuxCausative) &&
       prev.surface.size() <= 3 &&  // Single hiragana (3 bytes)
-      grammar::isPureHiragana(prev.surface)) {  // Pure hiragana
+      grammar::isPureHiragana(prev.surface) &&
+      prev.surface != "い") {  // い+られ is valid (いる potential)
     surface_bonus += cost::kAlmostNever;  // Strongly discourage
   }
 
@@ -1467,6 +1494,18 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     }
   }
 
+  // Penalty for pure-hiragana dict NOUN → し(VerbRenyokei) pattern
+  // E.g., はな+し should be はなし (verb), not はな(NOUN) + し(する連用形)
+  // はな is a dict NOUN but not a suru-noun, so はな+し is not a valid suru compound
+  // This does not affect kanji nouns (勉強+し is valid suru compound)
+  // Use small penalty (0.08) to tip balance: はなし gap=0.013, なんし gap=0.102
+  if (prev.pos == core::PartOfSpeech::Noun && prev.fromDictionary() &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface == "し" &&
+      grammar::isPureHiragana(prev.surface)) {
+    surface_bonus += 0.08F;
+  }
+
   // Penalty for PART_準体(の) → で (any interpretation) pattern
   // This prevents ので being split into の+で
   // "ので" is a conjunction particle in L1 dictionary and should be 1 token
@@ -1476,6 +1515,18 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.surface == "の" &&
       next.surface == "で") {
     surface_bonus += cost::kVeryRare;
+  }
+
+  // Penalty for AuxCopulaDa(な) → し(PART_接続) pattern
+  // な is the adnominal form of copula だ, normally followed by a noun (きれいな人)
+  // な+し as copula+conjunction is invalid - this prevents はなし → は+な+し
+  // The bigram AuxCopulaDa→ParticleConj bonus (-0.8) is for だ+し, not な+し
+  // BUT: な+のに and な+ので are valid (嫌なのに, 嫌なので) - only penalize し
+  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+      prev.surface == "な" &&
+      next.extended_pos == core::ExtendedPOS::ParticleConj &&
+      next.surface == "し") {
+    surface_bonus += cost::kVeryRare;  // Cancel the -0.8 bonus and add penalty
   }
 
   // Penalty for AuxCopulaDa(で) → し pattern (VerbRenyokei or ParticleConj)
@@ -1610,6 +1661,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     } else if (next.extended_pos == core::ExtendedPOS::AuxCopulaDa) {
       surface_bonus += cost::kMinor;  // Penalize invalid VERB_連用→断定
     }
+  }
+
+  // Penalty for single-kanji ADJ_語幹 → AuxGaru
+  // E.g., 挙+がっ should be 挙がっ (verb onbin), not 挙(adj stem)+がっ(がる suffix)
+  // Multi-char adj stems + がる are valid (可愛+がる, 怖+がる via dict)
+  // But single-kanji adj stems are usually false positives from the candidate generator
+  if (prev.extended_pos == core::ExtendedPOS::AdjStem &&
+      suzume::normalize::utf8Length(prev.surface) == 1 &&
+      next.extended_pos == core::ExtendedPOS::AuxGaru) {
+    surface_bonus += cost::kStrong;
   }
 
   // Penalty for single-hiragana VERB_連用 → を(PART_格)

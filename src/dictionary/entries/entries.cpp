@@ -132,6 +132,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
       particle("も", EPOS::ParticleTopic),
       particle("こそ", EPOS::ParticleBinding),
       particle("さえ", EPOS::ParticleBinding),
+      particle("すら", EPOS::ParticleBinding),
       particle("でも", EPOS::ParticleAdverbial),
       particle("しか", EPOS::ParticleAdverbial),
 
@@ -152,6 +153,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
       particle("し", EPOS::ParticleConj),  // 列挙・理由 (接続助詞)
       particle("たり", EPOS::ParticleConj),  // 並立助詞 (食べたり飲んだり)
       particle("だり", EPOS::ParticleConj),  // 並立助詞 (voiced: 飲んだり)
+      particle("や", EPOS::ParticleConj),    // 並立助詞 (AやB)
 
       // Quotation particles (引用助詞)
       particle("って", EPOS::ParticleQuote),
@@ -341,8 +343,12 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Causative (使役)
       aux("せ", "せる", EPOS::AuxCausative),
       aux("せる", "せる", EPOS::AuxCausative),
+      aux("せろ", "せる", EPOS::AuxCausative),     // imperative
+      aux("せよ", "せる", EPOS::AuxCausative),     // imperative (literary)
       aux("させ", "させる", EPOS::AuxCausative),
       aux("させる", "させる", EPOS::AuxCausative),
+      aux("させろ", "させる", EPOS::AuxCausative), // imperative
+      aux("させよ", "させる", EPOS::AuxCausative), // imperative (literary)
 
       // Desiderative - たい (願望)
       aux("たい", "たい", EPOS::AuxDesireTai),
@@ -524,6 +530,17 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("すぎる", "すぎる", EPOS::AuxExcessive),
       verb("すぎ", "すぎる", EPOS::AuxExcessive),  // renyokei for すぎ+た, すぎ+て
 
+      // Adjective-stem suffix verb - がる (ガル接続)
+      // Used after adjective stems: 怖がる, 嫌がる, 可愛がる
+      // MeCab: 動詞,接尾 (suffix verb)
+      // Godan-ra conjugation: がる, がら, がり, がっ, がれ, がろ
+      verb("がる", "がる", EPOS::AuxGaru),
+      verb("がら", "がる", EPOS::AuxGaru),   // mizenkei
+      verb("がり", "がる", EPOS::AuxGaru),   // renyokei
+      verb("がっ", "がる", EPOS::AuxGaru),   // onbinkei (がった, がって)
+      verb("がれ", "がる", EPOS::AuxGaru),   // kateikei/meireikei
+      verb("がろ", "がる", EPOS::AuxGaru),   // ishikei (がろう)
+
       // Completive/Regretful - しまう (完了・遺憾)
       // MeCab treats しまう as 動詞,非自立 (non-independent verb) → maps to Auxiliary
       // Use aux() to get POS::Auxiliary for MeCab compatibility
@@ -599,7 +616,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("でナリ", "だ", EPOS::Unknown), aux("でなり", "だ", EPOS::Unknown),
 
       // Elderly/Archaic (老人・古風)
-      aux("じゃ", "だ", EPOS::AuxCopulaDa),
+      aux("じゃ", "だ", EPOS::AuxCopulaDa), aux("じゃあ", "だ", EPOS::AuxCopulaDa),
       aux("のじゃ", "のだ", EPOS::Unknown), aux("じゃろ", "だろ", EPOS::AuxCopulaDa),
 
       // Regional dialects (方言系)

@@ -517,6 +517,14 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
       skip_single_char = true;
     }
   }
+  // Skip kanji+い when kanji ends with 的 (teki na-adjective suffix)
+  // 性的い, 経済的い don't make sense — 的 forms na-adjectives, not i-adjectives
+  if (first_hiragana == U'い' && kanji_end > start_pos) {
+    char32_t last_kanji = codepoints[kanji_end - 1];
+    if (last_kanji == U'的') {
+      skip_single_char = true;
+    }
+  }
 
   if (!skip_single_char) {
     std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);

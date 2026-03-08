@@ -1908,8 +1908,18 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   base=\"" << base_form << "\" is_valid="
                        << is_valid_adjective << " conf=" << adj_confidence << "\n");
 
+      // Dictionary fallback: if inflection analysis gives low confidence but
+      // the adjective exists in the dictionary, accept it.
+      // E.g., 可愛い has conf=0 from inflection (all-kanji stem) but is in L2 dict.
       if (!is_valid_adjective) {
-        continue;
+        if (isAdjectiveInDictionary(dict_manager, base_form)) {
+          is_valid_adjective = true;
+          adj_confidence = 0.5F;
+          SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   dict fallback: \"" << base_form
+                           << "\" found in dictionary\n");
+        } else {
+          continue;
+        }
       }
 
       // Check for false positives: single-kanji stems that are also verb renyokei
@@ -1950,6 +1960,51 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
           CandidateOrigin::AdjectiveI, adj_confidence, "adj_stem_garu_conn"));
       // Don't break - allow multiple patterns to generate candidates
     }
+  }
+
+  // =============================================================================
+  // Pattern 1b: Extended adjective stem + garu-connection
+  // =============================================================================
+  // For adjectives like 恥ずかしい where the stem has extended okurigana.
+  // E.g., 恥ずかしがってる → 恥ずかし (ADJ stem) + がっ + てる
+  // E.g., 恥ずかしすぎる → 恥ずかし (ADJ stem) + すぎる
+  //
+  // Scan hiragana_part for garu patterns at non-zero positions.
+  // If kanji + hiragana_prefix + い is a dict adjective, generate stem candidate.
+  if (hiragana_part.size() >= 6) {  // Need at least 2 hiragana chars (prefix + pattern)
+    // Garu patterns to look for within hiragana_part
+    static const std::vector<std::string_view> kExtGaruPatterns = {
+        "すぎ", "がる", "がり", "がっ", "がれ", "がろ", "そう", "さ",
+    };
+
+    for (const auto& pattern : kExtGaruPatterns) {
+      // Search for pattern at each hiragana character boundary (3-byte aligned for UTF-8)
+      for (size_t byte_pos = 3; byte_pos + pattern.size() <= hiragana_part.size();
+           byte_pos += 3) {
+        if (hiragana_part.substr(byte_pos, pattern.size()) == pattern) {
+          // Found pattern at byte_pos within hiragana_part
+          std::string ext_okurigana = hiragana_part.substr(0, byte_pos);
+          std::string stem = kanji_part + ext_okurigana;
+          std::string base_form = stem + "い";
+
+          if (isAdjectiveInDictionary(dict_manager, base_form)) {
+            // Count hiragana chars in okurigana for stem_end calculation
+            size_t okurigana_chars = byte_pos / 3;
+            size_t stem_end = kanji_end + okurigana_chars;
+
+            float cost = -1.2F;
+            SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ ext_garu candidate stem=\"" << stem
+                             << "\" base=\"" << base_form << "\" pattern=\"" << pattern
+                             << "\" cost=" << cost << "\n");
+            candidates.push_back(makeIAdjStemCandidate(
+                stem, start_pos, stem_end, base_form, cost,
+                CandidateOrigin::AdjectiveI, 1.0F, "adj_stem_ext_garu"));
+            goto ext_garu_done;  // Found a match, skip remaining patterns
+          }
+        }
+      }
+    }
+    ext_garu_done:;
   }
 
   // Check for しそう, しすぎ patterns (adjective stem + auxiliary)
@@ -2088,23 +2143,13 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
     SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   ext_stem pattern: stem=\"" << stem
                      << "\" base=\"" << base_form << "\"\n");
 
-    // Validate: stem+い must be a dictionary i-adjective or a valid inflection
+    // Validate: stem+い must be a dictionary i-adjective
+    // No inflection fallback — too permissive for kanji+hiragana+さ pattern
+    // (would accept nonsense like 像くだい as adjective)
     bool is_dict_adj = isAdjectiveInDictionary(dict_manager, base_form);
     if (!is_dict_adj) {
-      // Fallback: check inflection analysis
-      auto adj_results = inflection.analyze(base_form);
-      bool is_valid = false;
-      for (const auto& result : adj_results) {
-        if (result.verb_type == grammar::VerbType::IAdjective &&
-            result.confidence >= 0.5F) {
-          is_valid = true;
-          break;
-        }
-      }
-      if (!is_valid) {
-        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   ext_stem: skip (not valid adj)\n");
-        continue;
-      }
+      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   ext_stem: skip (not dict adj)\n");
+      continue;
     }
 
     // Calculate stem end position
@@ -2120,6 +2165,30 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
         stem, start_pos, stem_end, base_form, cost,
         CandidateOrigin::AdjectiveI, is_dict_adj ? 1.0F : 0.7F, "adj_stem_ext_sa"));
     break;  // Only first valid match
+  }
+
+  // =============================================================================
+  // Pattern 4: Extended adjective stem (kanji + multi-char hiragana)
+  // =============================================================================
+  // For adjectives like 懐かしい where the okurigana extends beyond しい.
+  // E.g., 懐かしアニメ → 懐かし (ADJ stem) + アニメ (NOUN)
+  // E.g., 勇ましい → 勇まし (stem) used in adnominal form
+  //
+  // Check if kanji + full hiragana_part + い is a dictionary adjective.
+  // Only applies when hiragana_part is 2+ chars (Pattern 2 handles 1-char "し").
+  if (hiragana_part.size() >= 6) {  // 2+ hiragana chars (6+ bytes)
+    std::string stem = kanji_part + hiragana_part;
+    std::string base_form = stem + "い";
+
+    bool is_dict_adj = isAdjectiveInDictionary(dict_manager, base_form);
+    if (is_dict_adj) {
+      float cost = -1.2F;
+      SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ ext_adj candidate stem=\"" << stem
+                       << "\" base=\"" << base_form << "\" cost=" << cost << "\n");
+      candidates.push_back(makeIAdjStemCandidate(
+          stem, start_pos, hiragana_end, base_form, cost,
+          CandidateOrigin::AdjectiveI, 1.0F, "adj_stem_ext_adj"));
+    }
   }
 
   return candidates;

@@ -192,8 +192,9 @@ BigramTable::initTable() {
   // AdjBasic → AuxCopulaDesu (美しい+です) - moderate bonus
   setCell(t, EPOS::AdjBasic, EPOS::AuxCopulaDesu, cost::kModerateBonus);
 
-  // AdjBasic → ParticleFinal (美しい+ね) - minor bonus
-  setCell(t, EPOS::AdjBasic, EPOS::ParticleFinal, cost::kMinorBonus);
+  // AdjBasic → ParticleFinal (美しい+ね, エロい+よ) - moderate bonus
+  // Adjective + sentence-final particle is a very common pattern
+  setCell(t, EPOS::AdjBasic, EPOS::ParticleFinal, cost::kModerateBonus);
 
   // AdjBasic → ParticleConj (美しい+し, 高い+けど) - minor bonus
   // Helps i-adjective+conjunctive particle beat ADJ_NA+い(verb)+し path
@@ -212,6 +213,9 @@ BigramTable::initTable() {
   // Helps AUX_過度 beat VERB interpretation when both have same cost
   setCell(t, EPOS::AdjStem, EPOS::AuxExcessive, cost::kModerateBonus);
   setCell(t, EPOS::AdjNaAdj, EPOS::AuxExcessive, cost::kModerateBonus);
+
+  // AdjStem → AuxGaru (怖+がる, 可愛+がる) - moderate bonus
+  setCell(t, EPOS::AdjStem, EPOS::AuxGaru, cost::kModerateBonus);
 
   // Suffix → AuxAppearanceSou (さ+そう in なさそう) - moderate bonus
   // This completes the な+さ+そう chain for ない nominalization + appearance
@@ -301,12 +305,27 @@ BigramTable::initTable() {
   // Ensures ませんでした → ませ+ん+でし+た (negative aux ん)
   setCell(t, EPOS::AuxNegativeNu, EPOS::AuxCopulaDesu, cost::kStrongBonus);
 
+  // AuxNegativeNu → ParticleTopic (ずに+は for ずにはいられない) - strong bonus
+  // Ensures ずには → ずに+は(topic) over ずに+はいられ(verb)
+  setCell(t, EPOS::AuxNegativeNu, EPOS::ParticleTopic, cost::kStrongBonus);
+
   // ParticleNo → AuxCopulaDa (ん+だ for んだ) - strong bonus
   // Ensures んだ → ん+だ over ん+だ(VERB)
   setCell(t, EPOS::ParticleNo, EPOS::AuxCopulaDa, cost::kStrongBonus);
 
+  // ParticleNo → Noun (の+学生, の+画像) - strong bonus
+  // Genitive の + noun is fundamental Japanese grammar
+  setCell(t, EPOS::ParticleNo, EPOS::Noun, cost::kStrongBonus);
+
   // AuxDesireTai → AuxTenseTa (たかっ+た) - strong bonus
   setCell(t, EPOS::AuxDesireTai, EPOS::AuxTenseTa, cost::kStrongBonus);
+
+  // AuxTenseTa → verb forms - prohibit
+  // Past tense cannot be directly followed by verb forms
+  // Prevents した+いん+だ / した+いんだ from beating し+たい+ん+だ
+  setCell(t, EPOS::AuxTenseTa, EPOS::VerbOnbinkei, cost::kAlmostNever);
+  setCell(t, EPOS::AuxTenseTa, EPOS::VerbTaForm, cost::kAlmostNever);
+  setCell(t, EPOS::AuxTenseTa, EPOS::VerbTaraForm, cost::kAlmostNever);
 
   // AuxAspectIru → AuxTenseTa (い+た) - moderate bonus
   setCell(t, EPOS::AuxAspectIru, EPOS::AuxTenseTa, cost::kModerateBonus);
@@ -498,6 +517,11 @@ BigramTable::initTable() {
   // Without this, PART_副→VERB_連用 bonus makes で(出る) beat で(格助詞) after だけ
   // Needs to overcome: base bigram diff (0.5-0.2=0.3) + VERB_連用 bonus (-0.8)
   setCell(t, EPOS::ParticleAdverbial, EPOS::ParticleCase, cost::kVeryStrongBonus);
+
+  // ParticleAdverbial → ParticleNo (など+の, まで+の, ばかり+の)
+  // Very strong bonus: adverbial particle + の is extremely natural.
+  // Needs to overcome DET→NOUN bonus (-2.5) when competing with な+どの path.
+  setCell(t, EPOS::ParticleAdverbial, EPOS::ParticleNo, cost::kVeryStrongBonus);
 
   // ParticleAdverbial → VerbRenyokei (かも+しれ in かもしれない) - strong bonus
   // This favors かも+しれ+ない over か+もし+れない
@@ -746,6 +770,10 @@ BigramTable::initTable() {
   // AdjStem → AuxConjectureRashii: unnatural (美し+らしい should be 美しい+らしい)
   setCell(t, EPOS::AdjStem, EPOS::AuxConjectureRashii, cost::kAlmostNever);
 
+  // AdjStem → AdjBasic: prohibit (好+みらしい should be 好み+らしい)
+  // Adjective stems don't connect to unrelated i-adjective endings
+  setCell(t, EPOS::AdjStem, EPOS::AdjBasic, cost::kAlmostNever);
+
   // AdjStem → Verb/Aux: prohibit (な+い should not split ない as な(AdjStem)+い)
   // な(AdjStem of ない) should only connect to さ(nominalization) or そう(appearance)
   // Also prevents 高+すぎた winning over 高+すぎ+た
@@ -755,6 +783,7 @@ BigramTable::initTable() {
   setCell(t, EPOS::AdjStem, EPOS::VerbTaForm, cost::kAlmostNever);
   setCell(t, EPOS::AdjStem, EPOS::VerbTaraForm, cost::kAlmostNever);
   setCell(t, EPOS::AdjStem, EPOS::AuxAspectIru, cost::kAlmostNever);  // な+い(いる)
+  setCell(t, EPOS::AdjNaAdj, EPOS::AuxAspectIru, cost::kAlmostNever); // 性的+い(いる)
   setCell(t, EPOS::AdjStem, EPOS::AuxNegativeNai, cost::kAlmostNever);   // な+ない
   setCell(t, EPOS::AdjStem, EPOS::Other, cost::kAlmostNever);           // な+い(OTHER)
 
