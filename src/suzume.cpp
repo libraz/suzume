@@ -186,6 +186,6 @@ void Suzume::setMode(core::AnalysisMode mode) {
   impl_->analyzer.setMode(mode);
 }
 
-std::string Suzume::version() { return "0.1.0"; }
+std::string Suzume::version() { return "1.0.0"; }
 
 }  // namespace suzume
