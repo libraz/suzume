@@ -166,8 +166,12 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
   conj_expanded_ = 0;
   size_t duplicates_skipped = 0;
 
-  // Deduplication: track surfaces only (trie requires unique keys)
-  std::set<std::string> seen_surfaces;
+  // Deduplication: track surfaces (trie requires unique keys)
+  // When duplicate surfaces arise from different verb base forms (e.g., 降り from
+  // both 降る and 降りる), prefer the entry with the longer lemma (more specific).
+  // Only replace same-POS entries to avoid VERB overriding NOUN (e.g., 晴れ).
+  struct SeenEntry { size_t lemma_len; core::PartOfSpeech pos; };
+  std::unordered_map<std::string, SeenEntry> seen_surfaces;
 
   // Two-pass processing:
   // Pass 1: Process non-conjugating entries (nouns, adverbs, etc.) first
@@ -206,7 +210,7 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
       ++duplicates_skipped;
       continue;
     }
-    seen_surfaces.insert(base_entry.surface);
+    seen_surfaces.emplace(base_entry.surface, SeenEntry{base_entry.lemma.size(), base_entry.pos});
     writer.addEntry(base_entry);
     ++entries_compiled_;
   }
@@ -283,13 +287,23 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
       expanded_entries = expandVerb(base_entry, verb_type);
     }
 
-    // Add expanded entries with deduplication (by surface only)
+    // Add expanded entries with deduplication (by surface)
+    // When duplicate surfaces exist and both are VERB, prefer the longer lemma
+    // (e.g., 降りる > 降る for surface 降り — ichidan is more specific)
+    // Don't replace non-VERB entries (e.g., 晴れ NOUN should not be replaced by 晴れる VERB)
     for (const auto& exp_entry : expanded_entries) {
-      if (seen_surfaces.count(exp_entry.surface) > 0) {
+      auto it = seen_surfaces.find(exp_entry.surface);
+      if (it != seen_surfaces.end()) {
+        if (exp_entry.pos == it->second.pos &&
+            exp_entry.lemma.size() > it->second.lemma_len) {
+          // Replace with more specific entry (longer lemma, same POS)
+          it->second = SeenEntry{exp_entry.lemma.size(), exp_entry.pos};
+          writer.replaceEntry(exp_entry);
+        }
         ++duplicates_skipped;
         continue;
       }
-      seen_surfaces.insert(exp_entry.surface);
+      seen_surfaces.emplace(exp_entry.surface, SeenEntry{exp_entry.lemma.size(), exp_entry.pos});
 
       writer.addEntry(exp_entry);
       ++entries_compiled_;

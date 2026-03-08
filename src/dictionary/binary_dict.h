@@ -124,6 +124,11 @@ class BinaryDictWriter {
   void addEntry(const DictionaryEntry& entry);
 
   /**
+   * @brief Replace an existing entry with the same surface
+   */
+  void replaceEntry(const DictionaryEntry& entry);
+
+  /**
    * @brief Build and write to file
    * @param path Output file path
    * @return Number of bytes written on success, error on failure

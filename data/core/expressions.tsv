@@ -13,73 +13,65 @@
 # =============================================================================
 
 # --- Interjections ---
-おはよう	INTERJECTION
+
+# --- Pronouns (代名詞) ---
+あちこち	PRONOUN
+おまえ	PRONOUN
+みんな	PRONOUN
+
+# --- Interjections (感動詞) ---
+ああ	INTERJECTION
 ありがとう	INTERJECTION
-すみません	INTERJECTION
+お疲れ様	INTERJECTION
+おはよう	INTERJECTION
+おやすみ	INTERJECTION
+こんにちは	INTERJECTION
+こんばんは	INTERJECTION
 ごめんなさい	INTERJECTION
 さようなら	INTERJECTION
-こんばんは	INTERJECTION
+すみません	INTERJECTION
 何だ	INTERJECTION
-ああ	INTERJECTION
-お疲れ様	INTERJECTION
-こんにちは	INTERJECTION
 
-# --- Casual greetings ---
-またね	OTHER
-またな	OTHER
-はじめまして	OTHER
-初見です	OTHER
-
-# --- Response expressions ---
-マジかよ	OTHER
-ガチかよ	OTHER
-激しく同意	OTHER
-ないわ	OTHER
-無いわ	OTHER
-そうだね	OTHER
-
-# --- Fillers/Hesitation (フィラー・間投詞) ---
-# Note: Variable-length prolonged patterns (うわーーー) handled by emphatic pattern in tokenizer
-はぁ	OTHER
-えー	OTHER
-えーと	OTHER
-えーっと	OTHER
-えっと	OTHER
-あー	OTHER
-あーあ	OTHER
-うわ	OTHER
-うわー	OTHER
-うわーー	OTHER
-おー	OTHER
-おおー	OTHER
-へー	OTHER
-ほー	OTHER
-ふーん	OTHER
-うーん	OTHER
-んー	OTHER
-
-# --- Colloquial expressions ---
-だるい	OTHER
-がんば	OTHER
-あいよ	OTHER
-いくよ	OTHER
-ごめん	OTHER
-いや	OTHER
-
-# --- Wagahai expressions (W-016) ---
-はてな	OTHER
-
-# --- Compound particles (連語) - IMPL-012 ---
-# MeCab treats these as single tokens (格助詞,連語)
-といった	PARTICLE
-に対して	PARTICLE
-
-# --- Conjunctions ---
+# --- Conjunctions (接続詞) ---
 たとえば	CONJUNCTION
 でも	CONJUNCTION
 
-# --- Pronouns ---
-みんな	PRONOUN
-あちこち	PRONOUN
-おやすみ	INTERJECTION
-おまえ	PRONOUN
+# --- Particles (助詞) ---
+といった	PARTICLE
+に対して	PARTICLE
+
+# --- Other (その他) ---
+あいよ	OTHER
+あー	OTHER
+あーあ	OTHER
+いくよ	OTHER
+いや	OTHER
+うわ	OTHER
+うわー	OTHER
+うわーー	OTHER
+うーん	OTHER
+えっと	OTHER
+えー	OTHER
+えーっと	OTHER
+えーと	OTHER
+おおー	OTHER
+おー	OTHER
+ガチかよ	OTHER
+がんば	OTHER
+ごめん	OTHER
+そうだね	OTHER
+だるい	OTHER
+ないわ	OTHER
+無いわ	OTHER
+はぁ	OTHER
+激しく同意	OTHER
+はじめまして	OTHER
+初見です	OTHER
+はてな	OTHER
+ふーん	OTHER
+へー	OTHER
+ほー	OTHER
+マジかよ	OTHER
+またな	OTHER
+またね	OTHER
+んー	OTHER

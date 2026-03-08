@@ -340,6 +340,15 @@ void BinaryDictWriter::addEntry(const DictionaryEntry& entry) {
   entries_.push_back(entry);
 }
 
+void BinaryDictWriter::replaceEntry(const DictionaryEntry& entry) {
+  for (auto& existing : entries_) {
+    if (existing.surface == entry.surface) {
+      existing = entry;
+      return;
+    }
+  }
+}
+
 core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   if (entries_.empty()) {
     return core::makeUnexpected(

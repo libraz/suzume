@@ -7,138 +7,129 @@
 # =============================================================================
 
 # --- events ---
-FUJI ROCK FESTIVAL	NOUN
-SUMMER SONIC	NOUN
-ROCK IN JAPAN FESTIVAL	NOUN
-RISING SUN ROCK FESTIVAL	NOUN
-COUNTDOWN JAPAN	NOUN
-VIVA LA ROCK	NOUN
-SWEET LOVE SHOWER	NOUN
-甲子園	NOUN
-AWS Summit	NOUN
-Google I/O	NOUN
-
-# --- government ---
-World Bank	NOUN
-
-# --- media ---
-NHK BS	NOUN
-朝日テレビ	NOUN
-テレビ Q	NOUN
-BS-TBS	NOUN
-J SPORTS	NOUN
-AT-X	NOUN
-Amazon Prime Video	NOUN
-U-NEXT	NOUN
-DMM TV	NOUN
-YouTube Premium	NOUN
-Apple Music	NOUN
-LINE MUSIC	NOUN
-Amazon Music	NOUN
-Apple TV+	NOUN
-NHK-FM	NOUN
-TOKYO FM	NOUN
-J-WAVE	NOUN
-FM COCOLO	NOUN
-ZIP-FM	NOUN
-FM AICHI	NOUN
-The Japan Times	NOUN
-Yahoo!ニュース	NOUN
-CNET Japan	NOUN
-ZDNet Japan	NOUN
-TechCrunch Japan	NOUN
-Impress Watch	NOUN
-ASCII.jp	NOUN
-BuzzFeed Japan	NOUN
-
-# --- organizations ---
-Money Forward	NOUN
-Preferred Networks	NOUN
-PKSHA Technology	NOUN
-Square Enix	NOUN
-BANDAI NAMCO	NOUN
-KOEI TECMO	NOUN
-LEVEL-5	NOUN
-Game Freak	NOUN
-Epic Games	NOUN
-Electronic Arts	NOUN
-Riot Games	NOUN
-Rockstar Games	NOUN
-CD Projekt	NOUN
-L'Oreal	NOUN
-Estee Lauder	NOUN
-Johnson & Johnson	NOUN
-P&G	NOUN
-Coca-Cola	NOUN
-ITO EN	NOUN
-Red Bull	NOUN
-Monster Beverage	NOUN
-TULLY'S	NOUN
-Mercedes-Benz	NOUN
-Land Rover	NOUN
-General Motors	NOUN
-Louis Vuitton	NOUN
-Bottega Veneta	NOUN
-Saint Laurent	NOUN
-Patek Philippe	NOUN
-Audemars Piguet	NOUN
-New Balance	NOUN
-THE NORTH FACE	NOUN
-Arc'teryx	NOUN
-H&M	NOUN
-Fast Retailing	NOUN
-COMME des GARCONS	NOUN
-ISSEY MIYAKE	NOUN
-UNITED ARROWS	NOUN
-Goldman Sachs	NOUN
-Morgan Stanley	NOUN
-Bank of America	NOUN
-Credit Suisse	NOUN
-Deutsche Bank	NOUN
-BNP Paribas	NOUN
-Societe Generale	NOUN
-American Express	NOUN
-Khan Academy	NOUN
+20th Century Studios	NOUN
 ANYTIME FITNESS	NOUN
-GOLD'S GYM	NOUN
+ASCII.jp	NOUN
+AS Roma	NOUN
+AT-X	NOUN
+AWS Summit	NOUN
+Air France	NOUN
+Alfa Romeo	NOUN
+Amazon Music	NOUN
+Amazon Prime Video	NOUN
+American Airlines	NOUN
+American Express	NOUN
+Apple Music	NOUN
+Apple TV+	NOUN
+Arc'teryx	NOUN
+Aston Martin	NOUN
 Aston Villa	NOUN
-West Ham	NOUN
-レアル・マドリード	NOUN
-Real Madrid	NOUN
 Atletico Madrid	NOUN
+Audemars Piguet	NOUN
+BANDAI NAMCO	NOUN
+BNP Paribas	NOUN
+BS-TBS	NOUN
+Bank of America	NOUN
 Bayern Munich	NOUN
 Borussia Dortmund	NOUN
-RB Leipzig	NOUN
+Bottega Veneta	NOUN
+British Airways	NOUN
+BuzzFeed Japan	NOUN
+CD Projekt	NOUN
+CNET Japan	NOUN
+COMME des GARCONS	NOUN
+COUNTDOWN JAPAN	NOUN
+Cathay Pacific	NOUN
+Coca-Cola	NOUN
+Credit Suisse	NOUN
+D-Rocks	NOUN
+DMM TV	NOUN
+Delta Airlines	NOUN
+Deutsche Bank	NOUN
+Electronic Arts	NOUN
+Epic Games	NOUN
+Estee Lauder	NOUN
+FM AICHI	NOUN
+FM COCOLO	NOUN
+FUJI ROCK FESTIVAL	NOUN
+Fast Retailing	NOUN
+GOLD'S GYM	NOUN
+Game Freak	NOUN
+General Motors	NOUN
+Goldman Sachs	NOUN
+Google I/O	NOUN
+H&M	NOUN
+ISSEY MIYAKE	NOUN
+ITO EN	NOUN
+Impress Watch	NOUN
 Inter Milan	NOUN
-AS Roma	NOUN
-Premier League	NOUN
+J-WAVE	NOUN
+J SPORTS	NOUN
+Johnson & Johnson	NOUN
+KOEI TECMO	NOUN
+Khan Academy	NOUN
+L'Oreal	NOUN
+LEVEL-5	NOUN
+LINE MUSIC	NOUN
 La Liga	NOUN
-Serie A	NOUN
+Land Rover	NOUN
 Ligue 1	NOUN
-Red Bull Racing	NOUN
-Scuderia Ferrari	NOUN
+Louis Vuitton	NOUN
 Mercedes-AMG	NOUN
-Aston Martin	NOUN
-Alfa Romeo	NOUN
+Mercedes-Benz	NOUN
+Money Forward	NOUN
+Monster Beverage	NOUN
+Morgan Stanley	NOUN
+NHK-FM	NOUN
+NHK BS	NOUN
+New Balance	NOUN
 New York Times	NOUN
-Washington Post	NOUN
+P&G	NOUN
+PKSHA Technology	NOUN
+Patek Philippe	NOUN
+Preferred Networks	NOUN
+Premier League	NOUN
+Production I.G	NOUN
+Qatar Airways	NOUN
+RB Leipzig	NOUN
+RISING SUN ROCK FESTIVAL	NOUN
+ROCK IN JAPAN FESTIVAL	NOUN
+Real Madrid	NOUN
+Red Bull	NOUN
+Red Bull Racing	NOUN
+Riot Games	NOUN
+Rockstar Games	NOUN
+SUMMER SONIC	NOUN
+SWEET LOVE SHOWER	NOUN
+Saint Laurent	NOUN
+Scuderia Ferrari	NOUN
+Serie A	NOUN
+Singapore Airlines	NOUN
+Societe Generale	NOUN
+Sony Pictures	NOUN
+Square Enix	NOUN
+Studio Ghibli	NOUN
+THE NORTH FACE	NOUN
+TOKYO FM	NOUN
+TULLY'S	NOUN
+TechCrunch Japan	NOUN
+The Japan Times	NOUN
+U-NEXT	NOUN
+UNITED ARROWS	NOUN
+United Airlines	NOUN
+VIVA LA ROCK	NOUN
 Wall Street Journal	NOUN
 Warner Bros	NOUN
-Sony Pictures	NOUN
-20th Century Studios	NOUN
-Production I.G	NOUN
-Studio Ghibli	NOUN
-Air France	NOUN
-British Airways	NOUN
-United Airlines	NOUN
-American Airlines	NOUN
-Delta Airlines	NOUN
-Singapore Airlines	NOUN
-Cathay Pacific	NOUN
-Qatar Airways	NOUN
-
-# --- sports_teams ---
-京都サンガF.C.	NOUN
+Washington Post	NOUN
+West Ham	NOUN
+World Bank	NOUN
+Yahoo!ニュース	NOUN
+YouTube Premium	NOUN
+ZDNet Japan	NOUN
+ZIP-FM	NOUN
+朝日テレビ	NOUN
 浦安D-Rocks	NOUN
-D-Rocks	NOUN
+京都サンガF.C.	NOUN
+甲子園	NOUN
+テレビ Q	NOUN
 レアル・マドリード	NOUN

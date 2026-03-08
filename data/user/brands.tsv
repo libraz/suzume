@@ -7,380 +7,362 @@
 # =============================================================================
 
 # --- brands ---
-Louis Vuitton	NOUN
-LOUIS VUITTON	NOUN
-BOTTEGA VENETA	NOUN
-SAINT LAURENT	NOUN
-GIORGIO ARMANI	NOUN
-D&G	NOUN
-MICHAEL KORS	NOUN
-Tory Burch	NOUN
-MIU MIU	NOUN
-CANADA GOOSE	NOUN
-STONE ISLAND	NOUN
-OFF-WHITE	NOUN
-Maison Margiela	NOUN
-COMME des GARCONS	NOUN
-Yohji Yamamoto	NOUN
-ISSEY MIYAKE	NOUN
-HUMAN MADE	NOUN
+.NET Core	NOUN
+8th Wall	NOUN
+A-Frame	NOUN
 A BATHING APE	NOUN
-New Balance	NOUN
-UNDER ARMOUR	NOUN
-THE NORTH FACE	NOUN
-Arc'teryx	NOUN
-Snow Peak	NOUN
-H&M	NOUN
-Forever 21	NOUN
-UNITED ARROWS	NOUN
-URBAN RESEARCH	NOUN
-JOURNAL STANDARD	NOUN
 ADAM ET ROPE	NOUN
-GLOBAL WORK	NOUN
-LOWRYS FARM	NOUN
-studio CLIP	NOUN
-PATEK PHILIPPE	NOUN
+AQUOS sense	NOUN
+ASP.NET	NOUN
 AUDEMARS PIGUET	NOUN
-RICHARD MILLE	NOUN
-TAG Heuer	NOUN
-グランドセイコー	NOUN
-Grand Seiko	NOUN
-G-SHOCK	NOUN
-Apple Watch	NOUN
-JILL STUART	NOUN
-SK-II	NOUN
-L'Oreal	NOUN
-Estee Lauder	NOUN
-BOBBI BROWN	NOUN
-TOM FORD BEAUTY	NOUN
-IRIS OHYAMA	NOUN
-Nintendo Switch	NOUN
-Mercedes-Benz	NOUN
-Alfa Romeo	NOUN
-Land Rover	NOUN
-Coca-Cola	NOUN
-Red Bull	NOUN
-S&B	NOUN
-
-# --- companies ---
-Preferred Networks	NOUN
-Mercedes-Benz	NOUN
-General Motors	NOUN
-Y!mobile	NOUN
-McDonald's	NOUN
-びっくりドンキー	NOUN
-餃子の王将	NOUN
-SMILE-UP.	NOUN
-
-# --- products ---
-iPhone 16	NOUN
-iPhone 16 Pro	NOUN
-iPhone 15	NOUN
-iPhone 15 Pro	NOUN
-iPhone 14	NOUN
-iPhone SE	NOUN
-iPad Pro	NOUN
-iPad Air	NOUN
-iPad mini	NOUN
-Apple Watch	NOUN
-AirPods Pro	NOUN
+AWS IoT	NOUN
+Active Directory	NOUN
+Adobe XD	NOUN
 AirPods Max	NOUN
+AirPods Pro	NOUN
+Alfa Romeo	NOUN
+Alibaba Cloud	NOUN
+Alpine Linux	NOUN
+Amazon Braket	NOUN
+Amazon Echo	NOUN
+Amazon Fresh	NOUN
+Amazon Linux	NOUN
+Amazon Music	NOUN
+Amazon Prime	NOUN
+Amazon Prime Video	NOUN
+Amazon Web Services	NOUN
+Android Studio	NOUN
+Ant Design	NOUN
+Apache Airflow	NOUN
+Apache Beam	NOUN
+Apache Druid	NOUN
+Apache Flink	NOUN
+Apache Hive	NOUN
+Apache Hudi	NOUN
+Apache Iceberg	NOUN
+Apache Kafka	NOUN
+Apache Pulsar	NOUN
+Apache Spark	NOUN
+Apache Superset	NOUN
+Apex Legends	NOUN
+Apollo Client	NOUN
+App Runner	NOUN
+Apple Maps	NOUN
+Apple Music	NOUN
+Apple Pay	NOUN
+Apple Pencil	NOUN
+Apple Silicon	NOUN
 Apple TV	NOUN
+Apple TV+	NOUN
 Apple Vision Pro	NOUN
+Apple Watch	NOUN
+Arc'teryx	NOUN
+Arch Linux	NOUN
+Azure DevOps	NOUN
+Azure Functions	NOUN
+Azure IoT	NOUN
+Azure Quantum	NOUN
+BOBBI BROWN	NOUN
+BOTTEGA VENETA	NOUN
+Babylon.js	NOUN
+Blob Storage	NOUN
+Booking.com	NOUN
+Bullet Physics	NOUN
+CANADA GOOSE	NOUN
+CI/CD	NOUN
+CLIP STUDIO	NOUN
+COMME des GARCONS	NOUN
+CX-5	NOUN
+CX-60	NOUN
+Call of Duty	NOUN
+Chakra UI	NOUN
+Cloud Functions	NOUN
+Cloud Run	NOUN
+Cloud SQL	NOUN
+Cloud Spanner	NOUN
+Cloud Storage	NOUN
+Cloudflare Workers	NOUN
+Coca-Cola	NOUN
+Command R	NOUN
+Compute Engine	NOUN
+Core Ultra	NOUN
+Core Web Vitals	NOUN
+Core i5	NOUN
+Core i7	NOUN
+Core i9	NOUN
+Cosmos DB	NOUN
+Counter-Strike	NOUN
+D&G	NOUN
+D-Wave	NOUN
+DALL-E	NOUN
+DALL-E 3	NOUN
+Delta Lake	NOUN
+EA FC	NOUN
+ELDEN RING	NOUN
+ELK Stack	NOUN
+EOS R	NOUN
+Echo Dot	NOUN
+Echo Show	NOUN
+Epic Online Services	NOUN
+Estee Lauder	NOUN
+Express.js	NOUN
+Fate/Grand Order	NOUN
+Fire TV	NOUN
+Fire TV Stick	NOUN
+Fly.io	NOUN
+Forever 21	NOUN
+G-SHOCK	NOUN
+GIORGIO ARMANI	NOUN
+GLOBAL WORK	NOUN
+GPT-3.5	NOUN
+GPT-4	NOUN
+GPT-4o	NOUN
+GR III	NOUN
+GT-R	NOUN
+Galaxy Buds	NOUN
 Galaxy S24	NOUN
-Galaxy Z Fold	NOUN
-Galaxy Z Flip	NOUN
 Galaxy Tab	NOUN
 Galaxy Watch	NOUN
-Galaxy Buds	NOUN
+Galaxy Z Flip	NOUN
+Galaxy Z Fold	NOUN
+General Motors	NOUN
+Genshin Impact	NOUN
+GitHub Actions	NOUN
+GitHub Copilot	NOUN
+GitHub Flow	NOUN
+GitLab CI	NOUN
+Google Cloud	NOUN
+Google Cloud IoT	NOUN
+Google Cloud Platform	NOUN
+Google Colab	NOUN
+Google Flights	NOUN
+Google Home	NOUN
+Google Meet	NOUN
+Google Nest	NOUN
+Google Pay	NOUN
+Google Quantum AI	NOUN
+Grand Seiko	NOUN
+Great Expectations	NOUN
+H&M	NOUN
+HTC Vive	NOUN
+HTTP/2	NOUN
+HTTP/3	NOUN
+HUMAN MADE	NOUN
+Horizon Worlds	NOUN
+Hotels.com	NOUN
+Hugging Face	NOUN
+Hyper-V	NOUN
+IBM Cloud	NOUN
+IBM Quantum	NOUN
+IRIS OHYAMA	NOUN
+ISSEY MIYAKE	NOUN
+Identity V	NOUN
+Infrastructure as Code	NOUN
+Intel Foundry	NOUN
+IntelliJ IDEA	NOUN
+JILL STUART	NOUN
+JOURNAL STANDARD	NOUN
+Jetpack Compose	NOUN
+Joy-Con	NOUN
+Jupyter Notebook	NOUN
+Kafka Streams	NOUN
+Kindle Unlimited	NOUN
+L'Oreal	NOUN
+LINE Pay	NOUN
+LM Studio	NOUN
+LOUIS VUITTON	NOUN
+LOWRYS FARM	NOUN
+Land Rover	NOUN
+League of Legends	NOUN
+Let's note	NOUN
+Llama 2	NOUN
+Llama 3	NOUN
+Louis Vuitton	NOUN
+MICHAEL KORS	NOUN
+MIU MIU	NOUN
+MacBook Air	NOUN
+MacBook Pro	NOUN
+Mac Pro	NOUN
+Mac Studio	NOUN
+Mac mini	NOUN
+Maison Margiela	NOUN
+Material UI	NOUN
+McDonald's	NOUN
+Mercedes-Benz	NOUN
+Meta Quest	NOUN
+Meta Quest 3	NOUN
+Microsoft Azure	NOUN
+Microsoft Teams	NOUN
+Monte Carlo	NOUN
+N-BOX	NOUN
+Nature Remo	NOUN
+Nest Hub	NOUN
+New Balance	NOUN
+New Relic	NOUN
+Next.js	NOUN
+Nike Run Club	NOUN
+Nintendo 3DS	NOUN
+Nintendo DS	NOUN
+Nintendo Switch	NOUN
+Nintendo Switch 2	NOUN
+Node.js	NOUN
+Nothing Phone	NOUN
+Nuxt.js	NOUN
+OFF-WHITE	NOUN
+OM SYSTEM	NOUN
+Objective-C	NOUN
+Oculus Quest	NOUN
+Oculus Rift	NOUN
+OpenID Connect	NOUN
+Oracle Cloud	NOUN
+Oracle Database	NOUN
+Oura Ring	NOUN
+PATEK PHILIPPE	NOUN
+PS Vita	NOUN
+Phi-2	NOUN
+Phi-3	NOUN
+Philips Hue	NOUN
 Pixel 8	NOUN
 Pixel 8 Pro	NOUN
 Pixel 9	NOUN
-Pixel Watch	NOUN
 Pixel Buds	NOUN
 Pixel Tablet	NOUN
-AQUOS sense	NOUN
+Pixel Watch	NOUN
+Pixi.js	NOUN
+PlayStation VR	NOUN
+Power Apps	NOUN
+Power Automate	NOUN
+Power BI	NOUN
+Preferred Networks	NOUN
+Protocol Buffers	NOUN
+Pub/Sub	NOUN
+REST API	NOUN
+RICHARD MILLE	NOUN
+RISC-V	NOUN
 ROG Phone	NOUN
-Nothing Phone	NOUN
-MacBook Pro	NOUN
-MacBook Air	NOUN
-Mac mini	NOUN
-Mac Pro	NOUN
-Mac Studio	NOUN
-Surface Pro	NOUN
-Surface Laptop	NOUN
+RTX 4070	NOUN
+RTX 4080	NOUN
+RTX 4090	NOUN
+Raspberry Pi	NOUN
+Razer Blade	NOUN
+React Native	NOUN
+React Query	NOUN
+Rec Room	NOUN
+Red Bull	NOUN
+Red Hat	NOUN
+Redis Streams	NOUN
+Route 53	NOUN
+Ruby on Rails	NOUN
+S&B	NOUN
+S.RIDE	NOUN
+SAINT LAURENT	NOUN
+SK-II	NOUN
+SMILE-UP.	NOUN
+SQL Server	NOUN
+STONE ISLAND	NOUN
+Samsung Foundry	NOUN
+Segment Anything	NOUN
+Server-Sent Events	NOUN
+Service Worker	NOUN
+Shadow DOM	NOUN
+Snow Peak	NOUN
+Source Engine	NOUN
+Spring Boot	NOUN
+Stable Diffusion	NOUN
+Steam Deck	NOUN
+Styled Components	NOUN
+Sublime Text	NOUN
 Surface Book	NOUN
 Surface Go	NOUN
+Surface Laptop	NOUN
+Surface Pro	NOUN
 Surface Studio	NOUN
-TUF Gaming	NOUN
-Let's note	NOUN
-Razer Blade	NOUN
-PS Vita	NOUN
-PlayStation VR	NOUN
-Nintendo Switch	NOUN
 Switch Lite	NOUN
-Joy-Con	NOUN
-Nintendo Switch 2	NOUN
-Nintendo 3DS	NOUN
-Nintendo DS	NOUN
-Wii U	NOUN
-Xbox Series X	NOUN
-Xbox Series S	NOUN
-Xbox One	NOUN
-Xbox 360	NOUN
-Xbox Game Pass	NOUN
-Steam Deck	NOUN
-Meta Quest	NOUN
-Meta Quest 3	NOUN
-Oculus Quest	NOUN
-Oculus Rift	NOUN
-HTC Vive	NOUN
+TAG Heuer	NOUN
+TECH CAMP	NOUN
+THE NORTH FACE	NOUN
+TOM FORD BEAUTY	NOUN
+TUF Gaming	NOUN
+Tailwind CSS	NOUN
+TanStack Query	NOUN
+Three.js	NOUN
+Tory Burch	NOUN
+Travis CI	NOUN
+Tray.io	NOUN
+TypeORM	NOUN
+U-NEXT	NOUN
+UNDER ARMOUR	NOUN
+UNITED ARROWS	NOUN
+URBAN RESEARCH	NOUN
+USB-C	NOUN
+Uber Eats	NOUN
+Unreal Engine	NOUN
+VB.NET	NOUN
+VS Code	NOUN
 Valve Index	NOUN
+Vertex AI	NOUN
+Virtual DOM	NOUN
+Vision Transformer	NOUN
+Visual Basic	NOUN
+Visual Studio	NOUN
+Visual Studio Code	NOUN
+Vue.js	NOUN
+WF-1000XM5	NOUN
+WH-1000XM5	NOUN
+Web Components	NOUN
+Web Worker	NOUN
+Weights & Biases	NOUN
+Wi-Fi 6E	NOUN
+Wi-Fi 7	NOUN
 Wii Fit	NOUN
 Wii Sports	NOUN
-ELDEN RING	NOUN
-Apex Legends	NOUN
-Counter-Strike	NOUN
-League of Legends	NOUN
-Call of Duty	NOUN
-EA FC	NOUN
-Genshin Impact	NOUN
-Fate/Grand Order	NOUN
-Identity V	NOUN
-勝利の女神:NIKKE	NOUN
-Fire TV	NOUN
-Fire TV Stick	NOUN
-WH-1000XM5	NOUN
-WF-1000XM5	NOUN
-Amazon Echo	NOUN
-Echo Dot	NOUN
-Echo Show	NOUN
-Google Nest	NOUN
-Google Home	NOUN
-Nest Hub	NOUN
-EOS R	NOUN
-OM SYSTEM	NOUN
-GR III	NOUN
-Nature Remo	NOUN
-Philips Hue	NOUN
-アルファード	NOUN
-GT-R	NOUN
-N-BOX	NOUN
-CX-5	NOUN
-CX-60	NOUN
+Wii U	NOUN
+Windows Server	NOUN
+Windows Subsystem for Linux	NOUN
+Xbox 360	NOUN
+Xbox Game Pass	NOUN
+Xbox One	NOUN
+Xbox Series S	NOUN
+Xbox Series X	NOUN
+Y!mobile	NOUN
+Yahoo!カーナビ	NOUN
+Yahoo!ショッピング	NOUN
+Yahoo!乗換案内	NOUN
+Yohji Yamamoto	NOUN
 YouTube Music	NOUN
 YouTube Premium	NOUN
 YouTube Shorts	NOUN
-LINE Pay	NOUN
-Amazon Prime Video	NOUN
-U-NEXT	NOUN
-Apple TV+	NOUN
-Apple Music	NOUN
-Amazon Music	NOUN
-Kindle Unlimited	NOUN
-Amazon Prime	NOUN
-Yahoo!ショッピング	NOUN
-Amazon Fresh	NOUN
-Uber Eats	NOUN
-au PAY	NOUN
-Apple Pay	NOUN
-Google Pay	NOUN
-Booking.com	NOUN
-Hotels.com	NOUN
-Google Flights	NOUN
-S.RIDE	NOUN
-Yahoo!乗換案内	NOUN
-Apple Maps	NOUN
-Yahoo!カーナビ	NOUN
-午後の紅茶	NOUN
-SK-II	NOUN
-マジョリカマジョルカ	NOUN
-TECH CAMP	NOUN
-Oura Ring	NOUN
-Nike Run Club	NOUN
-GPT-4	NOUN
-GPT-4o	NOUN
-GitHub Copilot	NOUN
-Stable Diffusion	NOUN
-DALL-E	NOUN
-LM Studio	NOUN
-
-# --- tech ---
-Visual Basic	NOUN
-VB.NET	NOUN
-Objective-C	NOUN
-React Native	NOUN
-Vue.js	NOUN
-Next.js	NOUN
-Nuxt.js	NOUN
-Tailwind CSS	NOUN
-Styled Components	NOUN
-Material UI	NOUN
-Chakra UI	NOUN
-Ant Design	NOUN
-React Query	NOUN
-TanStack Query	NOUN
-Apollo Client	NOUN
-TypeORM	NOUN
-Node.js	NOUN
-Express.js	NOUN
-Ruby on Rails	NOUN
-Spring Boot	NOUN
-ASP.NET	NOUN
-.NET Core	NOUN
-Jetpack Compose	NOUN
-半教師あり学習	NOUN
-t-SNE	NOUN
-Jupyter Notebook	NOUN
-Google Colab	NOUN
-Hugging Face	NOUN
-GPT-4	NOUN
-GPT-4o	NOUN
-GPT-3.5	NOUN
-Llama 2	NOUN
-Llama 3	NOUN
-Phi-2	NOUN
-Phi-3	NOUN
-Command R	NOUN
-Stable Diffusion	NOUN
-DALL-E	NOUN
-DALL-E 3	NOUN
-Segment Anything	NOUN
-Vision Transformer	NOUN
-LM Studio	NOUN
-Weights & Biases	NOUN
-Amazon Web Services	NOUN
-Microsoft Azure	NOUN
-Google Cloud	NOUN
-Google Cloud Platform	NOUN
-Alibaba Cloud	NOUN
-Oracle Cloud	NOUN
-IBM Cloud	NOUN
-Cloudflare Workers	NOUN
-Fly.io	NOUN
-Route 53	NOUN
-App Runner	NOUN
-Azure Functions	NOUN
-Azure DevOps	NOUN
-Cosmos DB	NOUN
-Blob Storage	NOUN
-Cloud Functions	NOUN
-Cloud Run	NOUN
-Cloud Storage	NOUN
-Vertex AI	NOUN
-Compute Engine	NOUN
-Cloud SQL	NOUN
-Pub/Sub	NOUN
-GitHub Actions	NOUN
-GitLab CI	NOUN
-Travis CI	NOUN
-New Relic	NOUN
-ELK Stack	NOUN
-Oracle Database	NOUN
-SQL Server	NOUN
-Cloud Spanner	NOUN
-GitHub Copilot	NOUN
-Visual Studio Code	NOUN
-VS Code	NOUN
-Visual Studio	NOUN
-IntelliJ IDEA	NOUN
-Android Studio	NOUN
-Sublime Text	NOUN
-Apache Kafka	NOUN
-Apache Pulsar	NOUN
-Redis Streams	NOUN
-Kafka Streams	NOUN
-Apache Flink	NOUN
-Apache Spark	NOUN
-Apache Beam	NOUN
-OpenID Connect	NOUN
-Active Directory	NOUN
-Raspberry Pi	NOUN
 Z-Wave	NOUN
-AWS IoT	NOUN
-Azure IoT	NOUN
-Google Cloud IoT	NOUN
-GitHub Flow	NOUN
-CI/CD	NOUN
-Infrastructure as Code	NOUN
-ロードバランシング	NOUN
-REST API	NOUN
-Protocol Buffers	NOUN
-Server-Sent Events	NOUN
+au PAY	NOUN
+iPad Air	NOUN
+iPad Pro	NOUN
+iPad mini	NOUN
+iPhone 14	NOUN
+iPhone 15	NOUN
+iPhone 15 Pro	NOUN
+iPhone 16	NOUN
+iPhone 16 Pro	NOUN
+iPhone SE	NOUN
+studio CLIP	NOUN
+t-SNE	NOUN
+アルファード	NOUN
+依存性逆転の原則	NOUN
+インターフェース分離の原則	NOUN
+餃子の王将	NOUN
 クライアントサイド	NOUN
+クライアントサイドレンダリング	NOUN
+グランドセイコー	NOUN
+グローバーのアルゴリズム	NOUN
+午後の紅茶	NOUN
+サイドエフェクト	NOUN
 サーバーサイド	NOUN
 サーバーサイドレンダリング	NOUN
-クライアントサイドレンダリング	NOUN
-Core Web Vitals	NOUN
-Virtual DOM	NOUN
-Shadow DOM	NOUN
-Web Components	NOUN
-サイドエフェクト	NOUN
-Service Worker	NOUN
-Web Worker	NOUN
-単一責任の原則	NOUN
-リスコフの置換原則	NOUN
-インターフェース分離の原則	NOUN
-依存性逆転の原則	NOUN
-Microsoft Teams	NOUN
-Google Meet	NOUN
-Adobe XD	NOUN
-Red Hat	NOUN
-Arch Linux	NOUN
-Alpine Linux	NOUN
-Amazon Linux	NOUN
-Windows Server	NOUN
-Hyper-V	NOUN
-Windows Subsystem for Linux	NOUN
-Apache Airflow	NOUN
-Apache Iceberg	NOUN
-Delta Lake	NOUN
-Apache Hudi	NOUN
-Apache Hive	NOUN
-Apache Druid	NOUN
-Apache Superset	NOUN
-Power BI	NOUN
-Great Expectations	NOUN
-Monte Carlo	NOUN
-Unreal Engine	NOUN
-Pixi.js	NOUN
-Three.js	NOUN
-Babylon.js	NOUN
-Source Engine	NOUN
-Bullet Physics	NOUN
-Epic Online Services	NOUN
 ショアのアルゴリズム	NOUN
-グローバーのアルゴリズム	NOUN
-Amazon Braket	NOUN
-Azure Quantum	NOUN
-IBM Quantum	NOUN
-Google Quantum AI	NOUN
-D-Wave	NOUN
-8th Wall	NOUN
-A-Frame	NOUN
-Rec Room	NOUN
-Horizon Worlds	NOUN
-Power Automate	NOUN
-Tray.io	NOUN
-Power Apps	NOUN
-Apple Silicon	NOUN
-Core i9	NOUN
-Core i7	NOUN
-Core i5	NOUN
-Core Ultra	NOUN
-RTX 4090	NOUN
-RTX 4080	NOUN
-RTX 4070	NOUN
-RISC-V	NOUN
-Samsung Foundry	NOUN
-Intel Foundry	NOUN
-USB-C	NOUN
-Wi-Fi 7	NOUN
-Wi-Fi 6E	NOUN
-HTTP/2	NOUN
-HTTP/3	NOUN
-
-# --- brand_names (moved from core) ---
-Apple Pencil	NOUN
-CLIP STUDIO	NOUN
+勝利の女神:NIKKE	NOUN
+単一責任の原則	NOUN
 つみたてNISA	NOUN
+半教師あり学習	NOUN
+びっくりドンキー	NOUN
+マジョリカマジョルカ	NOUN
+ロードバランシング	NOUN
+リスコフの置換原則	NOUN

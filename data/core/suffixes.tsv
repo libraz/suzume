@@ -9,29 +9,28 @@
 # =============================================================================
 
 # --- Noun-forming suffixes ---
-的	SUFFIX
-化	SUFFIX
-法	SUFFIX
-論	SUFFIX
+
+# --- Suffixes (接尾辞) ---
 家	SUFFIX
 員	SUFFIX
-式	SUFFIX
+化	SUFFIX
+ヶ月	SUFFIX
+ヶ所	SUFFIX
 感	SUFFIX
-力	SUFFIX
-ら	SUFFIX
 がち	SUFFIX
 ごろ	SUFFIX
-ヶ所	SUFFIX
-ヶ月	SUFFIX
-さん	SUFFIX
 さま	SUFFIX
-度	SUFFIX
-
-# --- Plural suffixes ---
-ども	OTHER
-がた	OTHER
-
-# --- Verb-auxiliary suffixes ---
-がたい	OTHER
+さん	SUFFIX
+式	SUFFIX
+力	SUFFIX
 っ子	SUFFIX
+的	SUFFIX
+度	SUFFIX
+法	SUFFIX
+ら	SUFFIX
+論	SUFFIX
 
+# --- Other (その他) ---
+がた	OTHER
+がたい	OTHER
+ども	OTHER

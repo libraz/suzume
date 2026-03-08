@@ -973,7 +973,7 @@
       "description": "抱きしめて - auto-generated",
       "expected": [
         {
-          "lemma": "抱きしめる",
+          "lemma": "抱き締める",
           "pos": "Verb",
           "surface": "抱きしめ"
         },

@@ -1,15 +1,17 @@
 # =============================================================================
-# Suzume User Dictionary - Internet Slang & Terms
+# Suzume User Dictionary - Common Compound Words (一般複合語)
 # =============================================================================
 #
 # Format: surface<TAB>pos
 #
 # =============================================================================
 
-# --- internet_slang ---
-おんJ	NOUN
-ガチヲタ	NOUN
-なんJ	NOUN
-なんJ民	NOUN
-なんでも実況J	NOUN
-マジレス	NOUN
+# --- Adverbs (副詞) ---
+いつの間にか	ADVERB
+
+# --- Nouns (名詞) ---
+キャミソール	NOUN
+セーラー服	NOUN
+タンクトップ	NOUN
+つめあわせ	NOUN
+ノースリーブ	NOUN

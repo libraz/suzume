@@ -20,6 +20,8 @@ USER_CATEGORIES = [
     "brands",
     "organizations",
     "adult",
+    "family",
+    "common",
 ]
 
 # POS → dictionary file mapping
@@ -134,11 +136,11 @@ def _map_conj_type(token: dict) -> str:
     return ""
 
 
-def _load_dictionary() -> tuple[list[dict], dict[str, list[dict]]]:
-    """Load all core dictionary entries."""
+def _load_entries_from_files(file_list: list[str]) -> tuple[list[dict], dict[str, list[dict]]]:
+    """Load dictionary entries from a list of file paths."""
     entries = []
     by_surface: dict[str, list[dict]] = {}
-    for file_rel in ALL_DICT_FILES:
+    for file_rel in file_list:
         filepath = PROJECT_ROOT / file_rel
         if not filepath.exists():
             continue
@@ -157,6 +159,21 @@ def _load_dictionary() -> tuple[list[dict], dict[str, list[dict]]]:
             entries.append(entry)
             by_surface.setdefault(fields[0], []).append(entry)
     return entries, by_surface
+
+
+def _load_dictionary() -> tuple[list[dict], dict[str, list[dict]]]:
+    """Load all core dictionary entries."""
+    return _load_entries_from_files(list(ALL_DICT_FILES))
+
+
+def _all_user_files() -> list[str]:
+    """Return list of all user dictionary file paths."""
+    return [f"data/user/{cat}.tsv" for cat in USER_CATEGORIES]
+
+
+def _load_all_entries() -> tuple[list[dict], dict[str, list[dict]]]:
+    """Load all dictionary entries (core + user)."""
+    return _load_entries_from_files(list(ALL_DICT_FILES) + _all_user_files())
 
 
 def _find_word_in_files(word: str) -> str | None:
@@ -296,11 +313,13 @@ async def dict_check(word: str) -> str:
         "tokens": [_token_to_dict(t) for t in tokens],
     }
 
-    # Dictionary check
-    _, by_surface = _load_dictionary()
+    # Dictionary check (core + user)
+    _, by_surface = _load_all_entries()
     result["in_dictionary"] = word in by_surface
     if word in by_surface:
-        result["existing_entries"] = [f"{e['surface']}\t{e['pos']}\t{e['conj_type']}" for e in by_surface[word]]
+        result["existing_entries"] = [
+            f"{e['file']}: {e['surface']}\t{e['pos']}\t{e['conj_type']}" for e in by_surface[word]
+        ]
         result["suggestion"] = None
         return _json_result(result)
     else:
@@ -416,10 +435,17 @@ async def dict_add(
             }
         )
 
-    # Duplicate check
-    _, by_surface = _load_dictionary()
+    # Cross-dictionary duplicate check (core + user)
+    _, by_surface = _load_all_entries()
     if word in by_surface:
-        return _json_result({"status": "error", "message": f"DUPLICATE: '{word}' already exists in dictionary"})
+        existing = by_surface[word]
+        files = sorted(set(e["file"] for e in existing))
+        return _json_result(
+            {
+                "status": "error",
+                "message": f"DUPLICATE: '{word}' already exists in {', '.join(files)}",
+            }
+        )
 
     # MeCab check
     tokens = mecab_analyze(word)
@@ -453,12 +479,6 @@ async def dict_add(
         entry_line += f"\t{conj_type}"
 
     if user:
-        # User dictionary
-        dup = _find_word_in_user_files(word)
-        if dup:
-            return _json_result(
-                {"status": "error", "message": f"DUPLICATE: '{word}' already exists in user dictionary ({dup})"}
-            )
 
         target_file = PROJECT_ROOT / f"data/user/{user}.tsv"
         target_rel = f"data/user/{user}.tsv"
@@ -640,6 +660,18 @@ async def dict_validate(fix: bool = False) -> str:
         if len(entries_list) > 1:
             duplicates.append({"surface": surface, "entries": entries_list})
 
+    # Cross-dictionary duplicates (core vs user)
+    _, all_by_surface = _load_all_entries()
+    cross_duplicates = []
+    for surface, all_entries in all_by_surface.items():
+        files = set(e["file"] for e in all_entries)
+        has_core = any(f.startswith("data/core/") for f in files)
+        has_user = any(f.startswith("data/user/") for f in files)
+        if has_core and has_user:
+            cross_duplicates.append(
+                {"surface": surface, "files": sorted(files)}
+            )
+
     result: dict = {
         "total_entries": len(entries),
         "conjugated_forms": [
@@ -652,11 +684,12 @@ async def dict_validate(fix: bool = False) -> str:
             for cf in conjugated_forms
         ],
         "duplicates": [{"surface": dup["surface"], "count": len(dup["entries"])} for dup in duplicates],
+        "cross_duplicates": [{"surface": cd["surface"], "files": cd["files"]} for cd in cross_duplicates],
         "compound_words": len(mecab_split),
         "fixed": False,
     }
 
-    issues = len(conjugated_forms) + len(duplicates)
+    issues = len(conjugated_forms) + len(duplicates) + len(cross_duplicates)
     if issues > 0 and fix:
         # Remove lines (conjugated + duplicate extras)
         lines_to_remove = set()
@@ -731,7 +764,7 @@ async def dict_grep(pattern: str, user: str = "", search_all: bool = False) -> s
     if user:
         files.append(f"data/user/{user}.tsv")
     elif search_all:
-        files = list(ALL_DICT_FILES) + [f"data/user/{cat}.tsv" for cat in USER_CATEGORIES]
+        files = list(ALL_DICT_FILES) + _all_user_files()
     else:
         files = list(ALL_DICT_FILES)
 
@@ -902,6 +935,24 @@ async def dict_sort(
         "PHRASE": "Phrases (フレーズ)",
     }
 
+    # Deduplicate entries (keep first occurrence per surface)
+    seen_surfaces: set[str] = set()
+    dedup_count = 0
+    deduped_entries = []
+    for ent in entries:
+        if ent["surface"] in seen_surfaces:
+            dedup_count += 1
+            continue
+        seen_surfaces.add(ent["surface"])
+        deduped_entries.append(ent)
+    entries = deduped_entries
+
+    # Re-group after dedup
+    groups = {}
+    for ent in entries:
+        key = ent.get(group_key, None) if group_key else None
+        groups.setdefault(key, []).append(ent)
+
     # Build sorted output
     output_lines = list(header_lines)
     group_stats = []
@@ -936,6 +987,7 @@ async def dict_sort(
     result: dict = {
         "file": target_rel,
         "total_entries": len(entries),
+        "duplicates_removed": dedup_count,
         "groups": group_stats,
         "disabled": len(disabled_entries),
         "applied": False,

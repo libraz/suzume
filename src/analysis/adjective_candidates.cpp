@@ -1884,6 +1884,24 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
         continue;  // Skip - this is likely verb + やすい/にくい, not adjective + み
       }
 
+      // For 1-char patterns (み, さ), skip if the hiragana portion starts with
+      // a known dictionary word of 2+ chars. This prevents splitting known words.
+      // E.g., 像+みんな → みんな is PRON, so み is not nominalization suffix
+      if (pattern.size() <= 3 && hiragana_part.size() > pattern.size() && dict_manager) {
+        auto hira_results = dict_manager->lookup(hiragana_part, 0);
+        bool has_longer_dict_word = false;
+        for (const auto& result : hira_results) {
+          if (result.entry && result.entry->surface.size() > 3) {
+            has_longer_dict_word = true;
+            break;
+          }
+        }
+        if (has_longer_dict_word) {
+          SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   skip: hiragana starts with dict word\n");
+          continue;
+        }
+      }
+
       // Found potential i-adjective stem + garu-connection pattern
       // The stem is just the kanji portion (e.g., 高, 尊, 寒)
       std::string stem = extractSubstring(codepoints, start_pos, kanji_end);

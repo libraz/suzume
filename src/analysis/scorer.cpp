@@ -1237,13 +1237,14 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kAlmostNever;
   }
 
-  // Penalty for だ(AuxTenseTa) after non-ん words
-  // だ as past tense only follows ん-onbin: 読んだ, 飲んだ, 死んだ
+  // Penalty for だ(AuxTenseTa) after non-ん/non-い words
+  // だ as past tense follows ん-onbin (読んだ, 飲んだ) or い-onbin (泳いだ, 注いだ)
   // Without this, てる+だ(past) beats てる+だけ(adverbial particle)
   // because AuxAspectIru→AuxTenseTa bonus applies to both た and だ
   if (next.surface == "だ" &&
       next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
-      !utf8::endsWith(prev.surface, "ん")) {
+      !utf8::endsWith(prev.surface, "ん") &&
+      !utf8::endsWith(prev.surface, "い")) {
     surface_bonus += cost::kAlmostNever;
   }
 
