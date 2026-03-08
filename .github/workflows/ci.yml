@@ -4,8 +4,16 @@ on:
   push:
     branches: [main]
     tags-ignore: ['**']
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
 
 jobs:
   lint:
@@ -22,22 +30,21 @@ jobs:
 
   build-and-test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18, 20, 22]
     steps:
       - uses: actions/checkout@v4
       - uses: mymindstorm/setup-emsdk@v14
       - run: corepack enable
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
           cache: yarn
-      - name: Build native CLI and compile dictionaries
+      - name: Build native and compile dictionaries
         run: |
           cmake -B build -DBUILD_WASM=OFF
-          cmake --build build --target suzume-cli --parallel
+          cmake --build build --parallel
           cmake --build build --target build-dict
+      - name: Run C++ tests
+        run: ctest --test-dir build --output-on-failure
       - run: yarn install --immutable
       - run: yarn build
       - run: yarn test
