@@ -93,6 +93,7 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"受ける", "うける", "ける", V2VerbType::Ichidan},   // 引き受ける, 請け受ける
     {"降りる", "おりる", "りる", V2VerbType::Ichidan},   // 乗り降りる
     {"締める", "しめる", "める", V2VerbType::Ichidan},   // 抱きしめる, 締め締める
+    {"止める", "とめる", "める", V2VerbType::Ichidan},   // 受け止める, 食い止める
     {"入る", "いる", "る", V2VerbType::Godan},            // 飛び入る, 立ち入る
 };
 

@@ -1,4 +1,5 @@
 #include "dictionary/binary_dict.h"
+#include "dictionary/dictionary.h"
 
 #include <gtest/gtest.h>
 
@@ -324,6 +325,51 @@ TEST_F(BinaryDictTest, LookupOutOfBounds) {
   // Start position beyond text length
   auto results = dict.lookup("test", 100);
   EXPECT_TRUE(results.empty());
+}
+
+// Helper to build a simple binary dictionary in memory
+std::vector<uint8_t> buildTestDict(const std::string& surface,
+                                   core::PartOfSpeech pos) {
+  BinaryDictWriter writer;
+  DictionaryEntry entry;
+  entry.surface = surface;
+  entry.lemma = surface;
+  entry.pos = pos;
+  writer.addEntry(entry);
+  auto result = writer.build();
+  return result.value();
+}
+
+TEST_F(BinaryDictTest, DictionaryManagerLoadUserBinaryDictionaryFromMemory) {
+  auto dict_data = buildTestDict("りんご", core::PartOfSpeech::Noun);
+
+  DictionaryManager manager;
+  EXPECT_FALSE(manager.hasUserBinaryDictionary());
+
+  bool loaded = manager.loadUserBinaryDictionaryFromMemory(dict_data.data(),
+                                                           dict_data.size());
+  EXPECT_TRUE(loaded);
+  EXPECT_TRUE(manager.hasUserBinaryDictionary());
+
+  // Verify lookup works through manager
+  auto results = manager.lookup("りんご", 0);
+  bool found = false;
+  for (const auto& res : results) {
+    if (res.entry->surface == "りんご") {
+      found = true;
+      EXPECT_EQ(res.entry->pos, core::PartOfSpeech::Noun);
+    }
+  }
+  EXPECT_TRUE(found);
+}
+
+TEST_F(BinaryDictTest, DictionaryManagerLoadFromMemoryInvalidData) {
+  std::vector<uint8_t> bad_data(10, 0);
+
+  DictionaryManager manager;
+  EXPECT_FALSE(manager.loadUserBinaryDictionaryFromMemory(bad_data.data(),
+                                                          bad_data.size()));
+  EXPECT_FALSE(manager.hasUserBinaryDictionary());
 }
 
 }  // namespace

@@ -30,6 +30,10 @@ target_include_directories(suzume
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+target_compile_definitions(suzume PRIVATE
+  SUZUME_VERSION="${PROJECT_VERSION}"
+)
+
 # WASM C API library and executable
 if(BUILD_WASM)
   add_library(suzume_c STATIC

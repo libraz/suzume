@@ -1,6 +1,6 @@
 {
   "name": "@libraz/suzume",
-  "version": "1.0.0",
+  "version": "0.9.0",
   "type": "module",
   "packageManager": "yarn@4.12.0",
   "description": "Lightweight Japanese morphological analyzer for browser and Node.js",
@@ -29,6 +29,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "prepack": "cp README.md README.github.md && cp README.npm.md README.md",
+    "postpack": "mv README.github.md README.md",
     "prepublishOnly": "yarn clean && yarn build && yarn lint && yarn test"
   },
   "keywords": [

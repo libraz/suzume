@@ -20,7 +20,6 @@ USER_CATEGORIES = [
     "brands",
     "organizations",
     "adult",
-    "family",
     "common",
 ]
 

@@ -58,21 +58,58 @@ export interface Morpheme {
 }
 
 /**
+ * Options for tag generation
+ */
+export interface TagOptions {
+  /** POS categories to include (default: all content words) */
+  pos?: ('noun' | 'verb' | 'adjective' | 'adverb')[];
+  /** Exclude basic/common words with hiragana-only lemma (default: false) */
+  excludeBasic?: boolean;
+  /** Use lemma instead of surface form (default: true) */
+  useLemma?: boolean;
+  /** Minimum tag length in characters (default: 2) */
+  minLength?: number;
+  /** Maximum number of tags, 0 for unlimited (default: 0) */
+  maxTags?: number;
+}
+
+// Release handle ref for destructor so the destroy fn is not bound to the Suzume instance
+interface CleanupRef {
+  module: EmscriptenModule;
+  handle: number;
+}
+
+const registry = new FinalizationRegistry((ref: CleanupRef) => {
+  if (ref.handle !== 0) {
+    const destroyHandle = ref.module.cwrap('suzume_destroy', null, ['number']) as (
+      handle: number,
+    ) => void;
+    destroyHandle(ref.handle);
+    ref.handle = 0;
+  }
+});
+
+/**
  * Suzume instance for Japanese morphological analysis
  */
 export class Suzume {
   private module: EmscriptenModule;
   private handle: number;
+  private cleanupRef: CleanupRef;
   private _analyze: (handle: number, textPtr: number) => number;
   private _resultFree: (resultPtr: number) => void;
   private _generateTags: (handle: number, textPtr: number) => number;
+  private _generateTagsWithOptions: (handle: number, textPtr: number, optionsPtr: number) => number;
   private _tagsFree: (tagsPtr: number) => void;
   private _loadUserDict: (handle: number, dataPtr: number, size: number) => number;
+  private _loadBinaryDict: (handle: number, dataPtr: number, size: number) => number;
   private _version: () => number;
 
   private constructor(module: EmscriptenModule, handle: number) {
     this.module = module;
     this.handle = handle;
+    this.cleanupRef = { module, handle };
+    registry.register(this, this.cleanupRef);
 
     // Wrap C functions
     this._analyze = module.cwrap('suzume_analyze', 'number', ['number', 'number']) as (
@@ -89,11 +126,23 @@ export class Suzume {
       textPtr: number,
     ) => number;
 
+    this._generateTagsWithOptions = module.cwrap('suzume_generate_tags_with_options', 'number', [
+      'number',
+      'number',
+      'number',
+    ]) as (handle: number, textPtr: number, optionsPtr: number) => number;
+
     this._tagsFree = module.cwrap('suzume_tags_free', null, ['number']) as (
       tagsPtr: number,
     ) => void;
 
     this._loadUserDict = module.cwrap('suzume_load_user_dict', 'number', [
+      'number',
+      'number',
+      'number',
+    ]) as (handle: number, dataPtr: number, size: number) => number;
+
+    this._loadBinaryDict = module.cwrap('suzume_load_binary_dict', 'number', [
       'number',
       'number',
       'number',
@@ -196,14 +245,63 @@ export class Suzume {
    * Generate tags from Japanese text
    *
    * @param text - UTF-8 encoded Japanese text
+   * @param options - Optional tag generation options
    * @returns Array of tag strings
    */
-  generateTags(text: string): string[] {
+  generateTags(text: string, options?: TagOptions): string[] {
     const textBytes = this.module.lengthBytesUTF8(text) + 1;
     const textPtr = this.module._malloc(textBytes);
 
     try {
       this.module.stringToUTF8(text, textPtr, textBytes);
+
+      if (options) {
+        // Build pos_filter bitmask
+        let posFilter = 0;
+        if (options.pos) {
+          const posMap: Record<string, number> = { noun: 1, verb: 2, adjective: 4, adverb: 8 };
+          for (const pos of options.pos) {
+            posFilter |= posMap[pos] ?? 0;
+          }
+        }
+
+        // suzume_tag_options_t layout (wasm32):
+        //   offset 0: pos_filter (uint8_t, padded to 4 bytes due to next int)
+        //   offset 4: exclude_basic (int, 4 bytes)
+        //   offset 8: use_lemma (int, 4 bytes)
+        //   offset 12: min_length (size_t = uint32 on wasm, 4 bytes)
+        //   offset 16: max_tags (size_t = uint32 on wasm, 4 bytes)
+        const OPTIONS_SIZE = 20;
+        const optionsPtr = this.module._malloc(OPTIONS_SIZE);
+
+        try {
+          const heap = (this.module as unknown as { HEAPU8: Uint8Array }).HEAPU8;
+          const heapU32 = (this.module as unknown as { HEAPU32: Uint32Array }).HEAPU32;
+
+          // Zero out the struct first
+          heap.fill(0, optionsPtr, optionsPtr + OPTIONS_SIZE);
+
+          heap[optionsPtr] = posFilter;
+          heapU32[(optionsPtr + 4) >> 2] = options.excludeBasic ? 1 : 0;
+          heapU32[(optionsPtr + 8) >> 2] = options.useLemma !== false ? 1 : 0;
+          heapU32[(optionsPtr + 12) >> 2] = options.minLength ?? 2;
+          heapU32[(optionsPtr + 16) >> 2] = options.maxTags ?? 0;
+
+          const tagsPtr = this._generateTagsWithOptions(this.handle, textPtr, optionsPtr);
+          if (tagsPtr === 0) {
+            return [];
+          }
+
+          try {
+            return this.parseTags(tagsPtr);
+          } finally {
+            this._tagsFree(tagsPtr);
+          }
+        } finally {
+          this.module._free(optionsPtr);
+        }
+      }
+
       const tagsPtr = this._generateTags(this.handle, textPtr);
 
       if (tagsPtr === 0) {
@@ -239,6 +337,23 @@ export class Suzume {
   }
 
   /**
+   * Load binary dictionary from buffer data (as user dictionary)
+   *
+   * @param data - Binary dictionary data (.dic format)
+   * @returns true on success
+   */
+  loadBinaryDictionary(data: Uint8Array): boolean {
+    const dataPtr = this.module._malloc(data.byteLength);
+    try {
+      const heap = (this.module as unknown as { HEAPU8: Uint8Array }).HEAPU8;
+      heap.set(data, dataPtr);
+      return this._loadBinaryDict(this.handle, dataPtr, data.byteLength) === 1;
+    } finally {
+      this.module._free(dataPtr);
+    }
+  }
+
+  /**
    * Get Suzume version string
    */
   get version(): string {
@@ -247,15 +362,19 @@ export class Suzume {
   }
 
   /**
-   * Destroy the Suzume instance and free resources
+   * Destroy the Suzume instance and free resources.
+   * Called automatically via FinalizationRegistry when garbage collected,
+   * but can be called explicitly for immediate cleanup.
    */
   destroy(): void {
     if (this.handle !== 0) {
+      registry.unregister(this);
       const destroyHandle = this.module.cwrap('suzume_destroy', null, ['number']) as (
         handle: number,
       ) => void;
       destroyHandle(this.handle);
       this.handle = 0;
+      this.cleanupRef.handle = 0;
     }
   }
 

@@ -10,6 +10,7 @@
 #include <new>
 
 #include "grammar/conjugation.h"
+#include "postprocess/tag_generator.h"
 #include "suzume.h"
 
 // Internal handle structure
@@ -183,6 +184,43 @@ SUZUME_EXPORT suzume_tags_t* suzume_generate_tags(suzume_t handle,
   }
 }
 
+SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_with_options(
+    suzume_t handle, const char* text, const suzume_tag_options_t* options) {
+  if (handle == nullptr || text == nullptr || options == nullptr) {
+    return nullptr;
+  }
+
+  try {
+    suzume::postprocess::TagGeneratorOptions tag_opts;
+    tag_opts.pos_filter = options->pos_filter;
+    tag_opts.exclude_basic = (options->exclude_basic != 0);
+    tag_opts.use_lemma = (options->use_lemma != 0);
+    tag_opts.min_tag_length = options->min_length;
+    tag_opts.max_tags = options->max_tags;
+
+    auto tags = handle->instance.generateTags(text, tag_opts);
+
+    auto* result = new suzume_tags_t();
+    result->count = tags.size();
+
+    if (result->count == 0) {
+      result->tags = nullptr;
+      return result;
+    }
+
+    result->tags = new char*[result->count];
+
+    for (size_t idx = 0; idx < result->count; ++idx) {
+      result->tags[idx] = new char[tags[idx].size() + 1];
+      std::strcpy(result->tags[idx], tags[idx].c_str());
+    }
+
+    return result;
+  } catch (...) {
+    return nullptr;
+  }
+}
+
 SUZUME_EXPORT void suzume_tags_free(suzume_tags_t* tags) {
   if (tags == nullptr) {
     return;
@@ -206,6 +244,19 @@ SUZUME_EXPORT int suzume_load_user_dict(suzume_t handle, const char* data,
 
   try {
     return handle->instance.loadUserDictionaryFromMemory(data, size) ? 1 : 0;
+  } catch (...) {
+    return 0;
+  }
+}
+
+SUZUME_EXPORT int suzume_load_binary_dict(suzume_t handle, const uint8_t* data,
+                                           size_t size) {
+  if (handle == nullptr || data == nullptr) {
+    return 0;
+  }
+
+  try {
+    return handle->instance.loadBinaryDictionary(data, size) ? 1 : 0;
   } catch (...) {
     return 0;
   }

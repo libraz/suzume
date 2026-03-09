@@ -790,6 +790,30 @@ BigramTable::initTable() {
   // Note: Particle → AdjStem is allowed for patterns like やる気がなさそう (が+な+さ+そう)
 
   // =========================================================================
+  // Particle → Particle penalties (unnatural adjacent particle chains)
+  // =========================================================================
+  // These particle combinations never occur adjacent in valid Japanese.
+  // Penalizing them helps hiragana words (はし, もも, かし) compete against
+  // false particle-chain interpretations (は+し, も+も, か+し).
+
+  // PART_係 → PART_接続 (は+し, も+て): topic particle directly followed by
+  // conjunctive particle is grammatically invalid (need content between them)
+  setCell(t, EPOS::ParticleTopic, EPOS::ParticleConj, cost::kRare);
+
+  // PART_係 → PART_格 (は+が, は+を, も+に): topic+case markers never stack
+  // adjacent on the same phrase (は...が with content between is fine)
+  setCell(t, EPOS::ParticleTopic, EPOS::ParticleCase, cost::kRare);
+
+  // PART_係 → PART_係 (は+も, も+は): double topic marking never adjacent
+  setCell(t, EPOS::ParticleTopic, EPOS::ParticleTopic, cost::kVeryRare);
+
+  // PART_格 → PART_格 (が+を, を+に, に+で): case particles never stack
+  setCell(t, EPOS::ParticleCase, EPOS::ParticleCase, cost::kVeryRare);
+
+  // Note: PART_格 → PART_係 (に+は, で+は, と+は) is valid Japanese,
+  // so we intentionally do NOT penalize ParticleCase → ParticleTopic.
+
+  // =========================================================================
   // Particle → Other penalties (prevents over-segmentation of hiragana words)
   // =========================================================================
   // Patterns like も+ちろん, と+にかく are not valid Japanese morphology

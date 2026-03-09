@@ -500,10 +500,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Check if there's auxiliary content after て/で
           std::string after_te = hiragana_part.substr(te_pos + core::kJapaneseCharBytes);
           if (!after_te.empty()) {
-            // Check if char before て/で is onbin ending (い/っ/ん)
+            // Check if char before て/で is onbin ending (い/っ/ん) or
+            // godan-sa renyokei (し) — e.g., 過ごしてみた → 過ごし+て+み+た
             std::string_view before_te(hiragana_part.data() + te_pos - core::kJapaneseCharBytes,
                                        core::kJapaneseCharBytes);
-            if (before_te == "い" || before_te == "っ" || before_te == "ん") {
+            if (before_te == "い" || before_te == "っ" || before_te == "ん" ||
+                before_te == "し") {
               continue;  // Skip - let verb + て + auxiliary split win
             }
           }
@@ -1183,7 +1185,22 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
           }
         }
-        if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold && !surface_is_dict_noun) {
+        // Skip if splitting at a kanji boundary yields a known dictionary verb
+        // E.g., 血浴び → 血 + 浴び(る) — 浴びる is a dict verb, so 血浴びる is not a real verb
+        bool suffix_is_dict_verb = false;
+        if (dict_manager != nullptr && kanji_end > start_pos + 1) {
+          for (size_t split = start_pos + 1; split < kanji_end; ++split) {
+            std::string remainder = extractSubstring(codepoints, split, renyokei_end);
+            std::string remainder_base = remainder + "\xe3\x82\x8b";  // + る
+            if (vh::isVerbInDictionary(dict_manager, remainder_base)) {
+              suffix_is_dict_verb = true;
+              SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" suffix \"" << remainder_base
+                              << "\" is dict verb, skipping ichidan_renyokei\n");
+              break;
+            }
+          }
+        }
+        if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold && !surface_is_dict_noun && !suffix_is_dict_verb) {
           // Negative cost to strongly favor split over combined analysis
           // Combined forms get optimal_length bonus (-0.5), so we need to be lower
           float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_cand.confidence) * verb_opts.confidence_cost_scale_small;
@@ -1198,6 +1215,71 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               true, CandidateOrigin::VerbKanji, ichidan_cand.confidence, "ichidan_renyokei"));
         }
       }
+    }
+  }
+
+  // Try Godan-Sa renyokei stem pattern: kanji + hiragana ending in し
+  // E.g., 過ごし (過ごす), 話し (話す), 取り消し (取り消す)
+  // These are needed when the verb is not in the dictionary, to enable
+  // correct splitting at て-form boundaries (過ごし+て+み+たい)
+  // Check positions kanji_end+1 through kanji_end+3 for し-ending godan-sa renyokei
+  if (hiragana_end > kanji_end) {
+    size_t max_renyokei_end = std::min(kanji_end + 4, hiragana_end + 1);
+    for (size_t renyokei_end = kanji_end + 1; renyokei_end <= max_renyokei_end && renyokei_end <= codepoints.size(); ++renyokei_end) {
+      // Must end in し (godan-sa renyokei marker)
+      if (codepoints[renyokei_end - 1] != U'し') continue;
+
+      std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
+      auto all_cands = inflection.analyze(surface);
+
+      // Find best godan-sa candidate
+      grammar::InflectionCandidate best_sa;
+      best_sa.confidence = 0.0F;
+      for (const auto& cand : all_cands) {
+        if (cand.verb_type == grammar::VerbType::GodanSa && cand.confidence > best_sa.confidence) {
+          best_sa = cand;
+        }
+      }
+
+      if (best_sa.confidence <= 0.5F) continue;
+
+      // Skip if surface is a dictionary NOUN
+      bool surface_is_dict_noun = false;
+      if (dict_manager != nullptr) {
+        auto results = dict_manager->lookup(surface, 0);
+        for (const auto& result : results) {
+          if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Noun) {
+            surface_is_dict_noun = true;
+            break;
+          }
+        }
+      }
+      if (surface_is_dict_noun) continue;
+
+      // For short godan-sa patterns, require dict verification to avoid
+      // false positives like 悲し (not a real verb 悲す) or 春らし (not 春らす).
+      // Multi-kanji verbs (過ごし, 見逃し) are more likely real verbs.
+      size_t kanji_chars = kanji_end - start_pos;  // actual kanji count
+      if (kanji_chars <= 1 && dict_manager != nullptr) {
+        if (!vh::isVerbInDictionary(dict_manager, best_sa.base_form)) {
+          SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface
+                          << "\" godan_sa single kanji, base \"" << best_sa.base_form
+                          << "\" not in dict\n");
+          continue;
+        }
+      }
+
+      float base_cost = verb_opts.bonus_ichidan + (1.0F - best_sa.confidence) * verb_opts.confidence_cost_scale_small;
+      SUZUME_DEBUG_VERBOSE_BLOCK {
+        SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
+                            << " godan_sa_renyokei lemma=" << best_sa.base_form
+                            << " conf=" << best_sa.confidence
+                            << " cost=" << base_cost << "\n";
+      }
+      candidates.push_back(makeVerbCandidate(
+          surface, start_pos, renyokei_end, base_cost, best_sa.base_form,
+          grammar::verbTypeToConjType(best_sa.verb_type),
+          true, CandidateOrigin::VerbKanji, best_sa.confidence, "godan_sa_renyokei"));
     }
   }
 

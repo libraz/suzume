@@ -27,6 +27,7 @@ _deps/
 # Claude Code configuration
 .claude/
 CLAUDE.md
+.serena/
 
 # Design documents (internal)
 backup/
@@ -84,11 +85,5 @@ __pycache__/
 *.egg-info
 .venv/
 
-# Thread check (development tool)
-.thread_check_progress
-scripts/thread_check.pl
-.claude/skills/thread-quality-check/thread_names.txt
-.claude/skills/thread-quality-check/thread_issues.txt
-.claude/skills/thread-quality-check/bugs/
-.claude/skills/thread-quality-check/.thread_check_progress
+
 data/user/adult.tsv

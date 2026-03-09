@@ -74,6 +74,14 @@ class Suzume {
   bool loadUserDictionaryFromMemory(const char* data, size_t size);
 
   /**
+   * @brief Load binary dictionary from memory (as user dictionary)
+   * @param data Dictionary data (.dic binary format)
+   * @param size Data size in bytes
+   * @return true on success
+   */
+  bool loadBinaryDictionary(const uint8_t* data, size_t size);
+
+  /**
    * @brief Analyze text into morphemes
    * @param text UTF-8 encoded Japanese text
    * @return Vector of morphemes
@@ -95,6 +103,16 @@ class Suzume {
    * @return Vector of tag strings
    */
   std::vector<std::string> generateTags(std::string_view text) const;
+
+  /**
+   * @brief Generate tags from text with custom options
+   * @param text UTF-8 encoded Japanese text
+   * @param options Tag generation options (POS filter, exclude_basic, etc.)
+   * @return Vector of tag strings
+   */
+  std::vector<std::string> generateTags(
+      std::string_view text,
+      const postprocess::TagGeneratorOptions& options) const;
 
   /**
    * @brief Get analysis mode

@@ -1,42 +1,32 @@
 # Suzume
 
-**Japanese Tokenizer That Actually Works in the Browser**
+[![CI](https://img.shields.io/github/actions/workflow/status/libraz/suzume/ci.yml?branch=main&label=CI)](https://github.com/libraz/suzume/actions)
+[![npm](https://img.shields.io/npm/v/@libraz/suzume)](https://www.npmjs.com/package/@libraz/suzume)
+[![codecov](https://codecov.io/gh/libraz/suzume/branch/main/graph/badge.svg)](https://codecov.io/gh/libraz/suzume)
+[![License](https://img.shields.io/github/license/libraz/suzume)](https://github.com/libraz/suzume/blob/main/LICENSE)
+[![C++17](https://img.shields.io/badge/C%2B%2B-17-blue?logo=c%2B%2B)](https://en.cppreference.com/w/cpp/17)
 
-No more 50MB dictionary files. Lightweight Japanese tokenization under 300KB — runs entirely in the browser, no server required.
+A lightweight Japanese tokenizer that runs in the browser via WebAssembly. Uses feature-based analysis instead of large dictionary files.
 
-> **Suzume is a feature-driven tokenizer** designed for real-world Japanese text on the web.
-> The best of both worlds: lightweight footprint meets practical accuracy.
+[Documentation](https://suzume.libraz.net) | [Live Demo](https://suzume.libraz.net/#demo)
 
-📖 **[Documentation](https://suzume.libraz.net)** · 🎮 **[Live Demo](https://suzume.libraz.net/#demo)**
+## Overview
 
-## Why Suzume?
+Suzume tokenizes Japanese text using character patterns, connection rules, and a small dictionary (~400KB), rather than the large dictionaries (20-50MB+) used by traditional morphological analyzers like MeCab or Kuromoji. The WASM build is around 360KB gzipped.
 
-| Feature | Traditional Analyzers | Suzume |
-|---------|----------------------|--------|
-| **Bundle Size** | 20–50MB+ (dictionary) | < 300KB gzipped |
-| **Browser Support** | Limited or none | Full support |
+| | Traditional Analyzers | Suzume |
+|---|---|---|
+| **Bundle Size** | 20-50MB+ (dictionary) | <400KB gzipped |
+| **Browser Support** | Limited or none | Supported (WASM) |
 | **Server Required** | Usually yes | No |
-| **Unknown Words** | May struggle | Robust by design |
-| **POS Tagging** | ✓ | ✓ |
-| **Lemmatization** | ✓ | ✓ |
+| **POS Tagging** | Yes | Yes |
+| **Lemmatization** | Yes | Yes |
 
-> Designed for frontend and edge environments where large dictionaries and server-side processing are not viable.
+### Trade-offs
 
-### Key Features
-
-- 🚫 **No Dictionary Hell** — Forget about managing 50MB+ dictionary files
-- 🖥️ **True Client-Side** — Runs 100% in the browser, no API calls, no CORS headaches
-- 🔮 **Robust to Unknown Words** — Brand names, slang, technical terms — stable tokenization every time
-- ⚡ **Production Ready** — C++ compiled to WASM, TypeScript support, works everywhere
-
-## When to Use Suzume
-
-Suzume is ideal for:
-- **Frontend applications** that need client-side Japanese processing
-- **Edge/serverless environments** with size constraints
-- **User-generated content** where unknown words are common
-
-For deep linguistic research or corpus analysis where dictionary coverage is critical, traditional server-side analyzers may be more appropriate.
+- **Smaller footprint** — No large dictionary download; suitable for frontend, edge, and serverless environments
+- **Handles unknown words** — Feature-based analysis doesn't fail on words missing from a dictionary
+- **Less accurate on edge cases** — Traditional dictionary-based analyzers will be more accurate for specialized vocabulary and complex linguistic analysis
 
 ## Installation
 
@@ -67,9 +57,15 @@ for (const t of tokens) {
 
 // Tag extraction
 const tags = suzume.generateTags('東京スカイツリーに行きました')
-console.log(tags) // ['東京', 'スカイツリー']
+console.log(tags) // ['東京', 'スカイツリー', '行く']
 
-suzume.destroy()
+// Nouns only
+suzume.generateTags('美味しいラーメンを食べた', { pos: ['noun'] })
+// → ['ラーメン']
+
+// Exclude basic words (hiragana-only lemma like する, ある, いい)
+suzume.generateTags('今日はいい天気ですね', { excludeBasic: true })
+// → ['今日', '天気']
 ```
 
 ### Browser (CDN)
@@ -105,28 +101,11 @@ make test     # Run tests
 
 ## Documentation
 
-Full documentation is available at **[suzume.libraz.net](https://suzume.libraz.net)**:
-
 - [Getting Started](https://suzume.libraz.net/docs/getting-started) — Installation and basic usage
-- [API Reference](https://suzume.libraz.net/docs/api) — Complete API documentation
+- [API Reference](https://suzume.libraz.net/docs/api) — API documentation
 - [User Dictionary](https://suzume.libraz.net/docs/user-dictionary) — Adding custom words
-- [How It Works](https://suzume.libraz.net/docs/how-it-works) — Technical deep-dive
-
-## Use Cases
-
-- **Search indexing** — Tokenize text for full-text search
-- **Tag extraction** — Generate keywords for classification
-- **Browser apps** — Client-side Japanese processing without a server
-- **User-generated content** — Stable tokenization for noisy input
+- [How It Works](https://suzume.libraz.net/docs/how-it-works) — Technical details
 
 ## License
 
 [Apache License 2.0](LICENSE)
-
-## Contributing
-
-Contributions welcome! Please submit issues and pull requests on GitHub.
-
-## Author
-
-libraz <libraz@libraz.net>

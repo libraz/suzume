@@ -112,6 +112,27 @@ SUZUME_EXPORT suzume_tags_t* suzume_generate_tags(suzume_t handle,
                                                    const char* text);
 
 /**
+ * @brief Tag generation options
+ */
+typedef struct {
+  uint8_t pos_filter;     /**< POS bitmask: 1=noun, 2=verb, 4=adjective, 8=adverb (0=all) */
+  int exclude_basic;      /**< Exclude basic words (hiragana-only lemma) */
+  int use_lemma;          /**< Use lemma instead of surface (default: 1) */
+  size_t min_length;      /**< Minimum tag length in characters (default: 2) */
+  size_t max_tags;        /**< Maximum number of tags (0=unlimited) */
+} suzume_tag_options_t;
+
+/**
+ * @brief Generate tags from Japanese text with options
+ * @param handle Suzume handle
+ * @param text UTF-8 encoded Japanese text
+ * @param options Tag generation options
+ * @return Tags result (must be freed with suzume_tags_free)
+ */
+SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_with_options(
+    suzume_t handle, const char* text, const suzume_tag_options_t* options);
+
+/**
  * @brief Free tags result
  * @param tags Tags to free
  */
@@ -128,6 +149,16 @@ SUZUME_EXPORT void suzume_tags_free(suzume_tags_t* tags);
  */
 SUZUME_EXPORT int suzume_load_user_dict(suzume_t handle, const char* data,
                                          size_t size);
+
+/**
+ * @brief Load binary dictionary from memory (as user dictionary)
+ * @param handle Suzume handle
+ * @param data Binary dictionary data (.dic format)
+ * @param size Data size in bytes
+ * @return 1 on success, 0 on failure
+ */
+SUZUME_EXPORT int suzume_load_binary_dict(suzume_t handle, const uint8_t* data,
+                                           size_t size);
 
 // --- Utility functions ---
 

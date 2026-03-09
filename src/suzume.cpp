@@ -163,6 +163,11 @@ bool Suzume::loadUserDictionaryFromMemory(const char* data, size_t size) {
   return false;
 }
 
+bool Suzume::loadBinaryDictionary(const uint8_t* data, size_t size) {
+  return impl_->analyzer.dictionaryManager()
+      .loadUserBinaryDictionaryFromMemory(data, size);
+}
+
 std::vector<core::Morpheme> Suzume::analyze(std::string_view text) const {
   auto morphemes = impl_->analyzer.analyze(text);
   return impl_->postprocessor.process(morphemes);
@@ -179,6 +184,14 @@ std::vector<std::string> Suzume::generateTags(std::string_view text) const {
   return impl_->tag_generator.generate(morphemes);
 }
 
+std::vector<std::string> Suzume::generateTags(
+    std::string_view text,
+    const postprocess::TagGeneratorOptions& options) const {
+  auto morphemes = impl_->analyzer.analyze(text);
+  postprocess::TagGenerator generator(options);
+  return generator.generate(morphemes);
+}
+
 core::AnalysisMode Suzume::mode() const { return impl_->options.mode; }
 
 void Suzume::setMode(core::AnalysisMode mode) {
@@ -186,6 +199,6 @@ void Suzume::setMode(core::AnalysisMode mode) {
   impl_->analyzer.setMode(mode);
 }
 
-std::string Suzume::version() { return "1.0.0"; }
+std::string Suzume::version() { return SUZUME_VERSION; }
 
 }  // namespace suzume

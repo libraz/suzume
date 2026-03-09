@@ -98,6 +98,16 @@ bool DictionaryManager::loadUserBinaryDictionary(const std::string& path) {
   return result.hasValue();
 }
 
+bool DictionaryManager::loadUserBinaryDictionaryFromMemory(const uint8_t* data,
+                                                          size_t size) {
+  if (!user_binary_dict_) {
+    user_binary_dict_ = std::make_unique<BinaryDictionary>();
+  }
+
+  auto result = user_binary_dict_->loadFromMemory(data, size);
+  return result.hasValue();
+}
+
 bool DictionaryManager::hasUserBinaryDictionary() const {
   return user_binary_dict_ && user_binary_dict_->isLoaded();
 }

@@ -163,10 +163,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "Vanilla splits ã prefix; user dict merges"
-      },
       "description": "お姉さん - prefix + kanji noun + suffix",
       "expected": [
         {
@@ -176,20 +172,6 @@
       ],
       "id": "honorific_onesan_kanji",
       "input": "お姉さん",
-      "suzume_expected": [
-        {
-          "pos": "Prefix",
-          "surface": "お"
-        },
-        {
-          "pos": "Noun",
-          "surface": "姉"
-        },
-        {
-          "pos": "Suffix",
-          "surface": "さん"
-        }
-      ],
       "tags": [
         "honorific",
         "suffix",

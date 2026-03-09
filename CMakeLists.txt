@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0077 NEW)
-project(suzume VERSION 1.0.0 LANGUAGES CXX)
+
+# Read version from package.json (single source of truth)
+file(READ "${CMAKE_SOURCE_DIR}/package.json" PACKAGE_JSON)
+string(REGEX MATCH "\"version\": *\"([0-9]+\\.[0-9]+\\.[0-9]+)\"" _ "${PACKAGE_JSON}")
+project(suzume VERSION ${CMAKE_MATCH_1} LANGUAGES CXX)
 
 # Use C++17 standard
 set(CMAKE_CXX_STANDARD 17)
@@ -146,7 +150,7 @@ if(BUILD_WASM)
     -sWASM=1
     -sMODULARIZE=1
     -sEXPORT_ES6=1
-    "-sEXPORTED_FUNCTIONS=['_malloc','_free','_suzume_create','_suzume_create_with_options','_suzume_destroy','_suzume_analyze','_suzume_result_free','_suzume_generate_tags','_suzume_tags_free','_suzume_load_user_dict','_suzume_version','_suzume_malloc','_suzume_free']"
+    "-sEXPORTED_FUNCTIONS=['_malloc','_free','_suzume_create','_suzume_create_with_options','_suzume_destroy','_suzume_analyze','_suzume_result_free','_suzume_generate_tags','_suzume_generate_tags_with_options','_suzume_tags_free','_suzume_load_user_dict','_suzume_load_binary_dict','_suzume_version','_suzume_malloc','_suzume_free']"
     "-sEXPORTED_RUNTIME_METHODS=['cwrap','ccall','UTF8ToString','stringToUTF8','lengthBytesUTF8','HEAPU32']"
     -sALLOW_MEMORY_GROWTH=1
     -sSTACK_SIZE=1048576

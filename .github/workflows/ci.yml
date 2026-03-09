@@ -40,11 +40,16 @@ jobs:
           cache: yarn
       - name: Build native and compile dictionaries
         run: |
-          cmake -B build -DBUILD_WASM=OFF
+          cmake -B build -DBUILD_WASM=OFF -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_C_FLAGS="--coverage"
           cmake --build build --parallel
           cmake --build build --target build-dict
       - name: Run C++ tests
         run: ctest --test-dir build --output-on-failure
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          gcov: true
       - run: yarn install --immutable
       - run: yarn build
       - run: yarn test

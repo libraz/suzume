@@ -1,42 +1,32 @@
 # Suzume
 
-**ブラウザで動く日本語トークナイザー**
+[![CI](https://img.shields.io/github/actions/workflow/status/libraz/suzume/ci.yml?branch=main&label=CI)](https://github.com/libraz/suzume/actions)
+[![npm](https://img.shields.io/npm/v/@libraz/suzume)](https://www.npmjs.com/package/@libraz/suzume)
+[![codecov](https://codecov.io/gh/libraz/suzume/branch/main/graph/badge.svg)](https://codecov.io/gh/libraz/suzume)
+[![License](https://img.shields.io/github/license/libraz/suzume)](https://github.com/libraz/suzume/blob/main/LICENSE)
+[![C++17](https://img.shields.io/badge/C%2B%2B-17-blue?logo=c%2B%2B)](https://en.cppreference.com/w/cpp/17)
 
-50MBの辞書ファイルはもう不要。300KB以下の軽量日本語トークン化 — ブラウザで完結、サーバー不要。
+WebAssemblyでブラウザ上で動作する軽量な日本語トークナイザー。大規模辞書の代わりに特徴量ベースの解析を行います。
 
-> **Suzumeは特徴量ベースのトークナイザーです。**
-> 軽量さと実用的な精度、両方のいいとこ取り。
+[ドキュメント](https://suzume.libraz.net/ja/) | [デモ](https://suzume.libraz.net/ja/#demo)
 
-📖 **[ドキュメント](https://suzume.libraz.net/ja/)** · 🎮 **[デモ](https://suzume.libraz.net/ja/#demo)**
+## 概要
 
-## なぜ Suzume？
+Suzumeは、MeCabやKuromojiなどの従来の形態素解析器が使う大規模辞書（20〜50MB超）の代わりに、文字パターン・接続規則・小規模辞書（約400KB）で日本語テキストをトークン化します。WASMビルドはgzip圧縮で400KB未満です。
 
-| 機能 | 従来の形態素解析器 | Suzume |
-|------|-------------------|--------|
-| **バンドルサイズ** | 20〜50MB超（辞書） | 300KB以下（gzip） |
-| **ブラウザ対応** | 限定的または非対応 | フル対応 |
+| | 従来の形態素解析器 | Suzume |
+|---|---|---|
+| **バンドルサイズ** | 20〜50MB超（辞書） | 400KB未満（gzip） |
+| **ブラウザ対応** | 限定的または非対応 | 対応（WASM） |
 | **サーバー必須** | 通常は必要 | 不要 |
-| **未知語対応** | 破綻する可能性 | 設計上堅牢 |
-| **品詞タグ** | ✓ | ✓ |
-| **原形復元** | ✓ | ✓ |
+| **品詞タグ** | あり | あり |
+| **原形復元** | あり | あり |
 
-> 大規模辞書やサーバーサイド処理が現実的でない、フロントエンド・エッジ環境向けに設計されています。
+### トレードオフ
 
-### 主な特長
-
-- 🚫 **辞書地獄からの解放** — 50MB超の辞書ファイル管理は不要
-- 🖥️ **真のクライアントサイド** — 100%ブラウザで完結、APIコール不要、CORS問題なし
-- 🔮 **未知語に堅牢** — ブランド名、スラング、専門用語も安定してトークン化
-- ⚡ **本番投入可能** — C++からWASMにコンパイル、TypeScript対応、どこでも動作
-
-## Suzumeの適用領域
-
-Suzumeが最適なケース：
-- **フロントエンドアプリ** — クライアントサイドで日本語処理が必要な場合
-- **エッジ/サーバーレス環境** — サイズ制約がある場合
-- **ユーザー生成コンテンツ** — 未知語が頻出する場合
-
-辞書カバレッジが重要な深い言語学研究やコーパス分析には、従来のサーバーサイド解析器がより適切な場合があります。
+- **軽量** — 大規模辞書のダウンロードが不要。フロントエンド、エッジ、サーバーレス環境に適する
+- **未知語に対応** — 特徴量ベースのため、辞書にない単語でも解析が破綻しにくい
+- **精度の限界** — 専門用語や複雑な言語解析では、従来の辞書ベース解析器の方が高精度
 
 ## インストール
 
@@ -67,9 +57,15 @@ for (const t of tokens) {
 
 // タグ抽出
 const tags = suzume.generateTags('東京スカイツリーに行きました')
-console.log(tags) // ['東京', 'スカイツリー']
+console.log(tags) // ['東京', 'スカイツリー', '行く']
 
-suzume.destroy()
+// 名詞のみ
+suzume.generateTags('美味しいラーメンを食べた', { pos: ['noun'] })
+// → ['ラーメン']
+
+// 基本語除外（する、ある、いい などひらがなのみの原形を除外）
+suzume.generateTags('今日はいい天気ですね', { excludeBasic: true })
+// → ['今日', '天気']
 ```
 
 ### ブラウザ（CDN）
@@ -105,28 +101,11 @@ make test     # テスト実行
 
 ## ドキュメント
 
-詳細なドキュメントは **[suzume.libraz.net](https://suzume.libraz.net/ja/)** で公開しています:
-
 - [はじめる](https://suzume.libraz.net/ja/docs/getting-started) — インストールと基本的な使い方
-- [API リファレンス](https://suzume.libraz.net/ja/docs/api) — 完全な API ドキュメント
+- [API リファレンス](https://suzume.libraz.net/ja/docs/api) — APIドキュメント
 - [ユーザー辞書](https://suzume.libraz.net/ja/docs/user-dictionary) — カスタム単語の追加
 - [仕組み](https://suzume.libraz.net/ja/docs/how-it-works) — 技術的な解説
-
-## 想定ユースケース
-
-- **検索インデックス** — 全文検索用のトークン化
-- **タグ抽出** — 分類用のキーワード生成
-- **ブラウザアプリ** — サーバー不要のクライアントサイド日本語処理
-- **ユーザー生成コンテンツ** — ノイズの多い入力でも安定したトークン化
 
 ## ライセンス
 
 [Apache License 2.0](LICENSE)
-
-## コントリビューション
-
-Issue や Pull Request を歓迎します。
-
-## 作者
-
-libraz <libraz@libraz.net>

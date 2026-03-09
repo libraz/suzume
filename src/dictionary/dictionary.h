@@ -158,6 +158,14 @@ class DictionaryManager {
   bool loadUserBinaryDictionary(const std::string& path);
 
   /**
+   * @brief Load user binary dictionary from memory
+   * @param data Binary dictionary data (.dic format)
+   * @param size Data size in bytes
+   * @return true if loaded successfully
+   */
+  bool loadUserBinaryDictionaryFromMemory(const uint8_t* data, size_t size);
+
+  /**
    * @brief Check if user binary dictionary is loaded
    */
   bool hasUserBinaryDictionary() const;

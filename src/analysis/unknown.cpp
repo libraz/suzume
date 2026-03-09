@@ -20,6 +20,7 @@
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "suffix_candidates.h"
+#include "tokenizer_utils.h"
 #include "verb_candidates.h"
 
 namespace suzume::analysis {
@@ -111,13 +112,18 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
 
     case normalize::CharType::Hiragana:
       // Hiragana only: usually function words
-      // Add length penalty for longer sequences to encourage proper segmentation
-      // e.g., まじやばい should split into まじ + やばい, not stay as one word
-      // Penalty: +0.5 per character beyond 3 characters
-      if (length >= 4) {
-        return base_cost + 1.0F + (static_cast<float>(length) - 3.0F) * 0.5F;
+      // 1-char: high cost (almost always a particle/aux from L1 dict)
+      // 2-3 char: moderate cost to compete with particle chains
+      //   e.g., はし(1.4) vs は(0.2)+し(0.2)+conn(0.5)=0.9 — still loses,
+      //   but closer, and bigram penalties on bad connections can tip it
+      // 4+: increasing penalty to force segmentation
+      if (length == 1) {
+        return base_cost + 1.0F;  // 2.0: original cost
       }
-      return base_cost + 1.0F;
+      if (length <= 3) {
+        return base_cost + 0.4F;  // 1.4: compete with particle chains
+      }
+      return base_cost + 0.5F + (static_cast<float>(length) - 3.0F) * 0.5F;
 
     default:
       return base_cost + 1.5F;
@@ -275,7 +281,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
+    std::string_view text, const std::vector<char32_t>& codepoints,
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   std::vector<UnknownCandidate> candidates;
@@ -368,6 +374,17 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       matches_type = true;  // Treat 々 as part of kanji sequence
     }
 
+    // Special handling for ヶ/ケ in kanji sequences (place names, counters)
+    // e.g., 姉ヶ崎, 市ヶ谷, 霞ヶ関 should be grouped as single tokens
+    // ヶ (U+30F6) is classified as Katakana, but in these contexts it functions
+    // as a kanji-like character connecting surrounding kanji
+    if (!matches_type && start_type == normalize::CharType::Kanji &&
+        (curr_char == U'ヶ' || curr_char == U'ケ') &&
+        end_pos + 1 < char_types.size() &&
+        char_types[end_pos + 1] == normalize::CharType::Kanji) {
+      matches_type = true;  // Treat ヶ/ケ as part of kanji sequence
+    }
+
     if (!matches_type) {
       break;
     }
@@ -451,6 +468,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
         }
       }
 
+
+
       // Penalize hiragana sequences starting with particle characters
       // These could be nouns (はし, はな, にく, にゃんこ) but are less likely than
       // the particle interpretation, unless the particle path has connection penalties
@@ -467,12 +486,16 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
           // Small bonus for reduplicated patterns - they're often real words
           cost -= 0.5F;
         } else if (len == 2) {
-          // 2-char: moderate penalty (にく, はし, のり)
-          cost += 1.0F;
+          // 2-char: light penalty — bigram penalties on unnatural particle chains
+          // provide enough discouragement for false splits (は+し vs はし)
+          cost += 0.5F;
+        } else if (len == 3) {
+          // 3-char: moderate penalty (にある, によれ are likely particle chains)
+          cost += 0.8F;
         } else {
-          // 3+ char: heavier penalty scaling with length (によれ, にある)
+          // 4+ char: heavier penalty scaling with length
           // but still generated so words like にゃんこ have a chance
-          cost += 1.0F + static_cast<float>(len - 2) * 0.5F;
+          cost += 1.0F + static_cast<float>(len - 3) * 0.5F;
         }
         // Mark as has_suffix to skip exceeds_dict_length penalty in tokenizer
         has_suffix = true;

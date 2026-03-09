@@ -1173,11 +1173,13 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Progressive pattern: 食べて+い+ます should use い(AuxAspectIru), not い(VerbRenyokei)
   // This ensures て+いる patterns use the auxiliary form
   // Exception: たり/だり → し is valid (食べたり+し+てる)
+  // Exception: み (みる auxiliary = "try") after て is valid (食べて+み+たい)
   if (prev.extended_pos == core::ExtendedPOS::ParticleConj &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface.size() <= 3 &&  // Single hiragana (3 bytes)
       grammar::isPureHiragana(next.surface) &&
-      prev.surface != "たり" && prev.surface != "だり") {
+      prev.surface != "たり" && prev.surface != "だり" &&
+      next.surface != "み") {
     surface_bonus += cost::kAlmostNever;  // Strongly discourage
   }
 

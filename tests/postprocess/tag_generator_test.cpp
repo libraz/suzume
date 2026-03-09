@@ -299,6 +299,201 @@ TEST(TagGeneratorTest, CountCharsJapanese) {
   EXPECT_EQ(tags[0], "新宿駅");
 }
 
+TEST(TagGeneratorTest, PosFilterNounOnly) {
+  TagGeneratorOptions options;
+  options.pos_filter = kTagPosNoun;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));
+  morphemes.push_back(makeMorpheme("食べる", core::PartOfSpeech::Verb));
+  morphemes.push_back(makeMorpheme("美味しい", core::PartOfSpeech::Adjective));
+
+  auto tags = generator.generate(morphemes);
+  ASSERT_EQ(tags.size(), 1);
+  EXPECT_EQ(tags[0], "東京");
+}
+
+TEST(TagGeneratorTest, PosFilterVerbOnly) {
+  TagGeneratorOptions options;
+  options.pos_filter = kTagPosVerb;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));
+  morphemes.push_back(makeMorpheme("食べる", core::PartOfSpeech::Verb));
+  morphemes.push_back(makeMorpheme("美味しい", core::PartOfSpeech::Adjective));
+
+  auto tags = generator.generate(morphemes);
+  ASSERT_EQ(tags.size(), 1);
+  EXPECT_EQ(tags[0], "食べる");
+}
+
+TEST(TagGeneratorTest, PosFilterAdjectiveOnly) {
+  TagGeneratorOptions options;
+  options.pos_filter = kTagPosAdjective;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));
+  morphemes.push_back(makeMorpheme("食べる", core::PartOfSpeech::Verb));
+  morphemes.push_back(makeMorpheme("美味しい", core::PartOfSpeech::Adjective));
+
+  auto tags = generator.generate(morphemes);
+  ASSERT_EQ(tags.size(), 1);
+  EXPECT_EQ(tags[0], "美味しい");
+}
+
+TEST(TagGeneratorTest, PosFilterAdverbOnly) {
+  TagGeneratorOptions options;
+  options.pos_filter = kTagPosAdverb;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));
+  morphemes.push_back(makeMorpheme("とても", core::PartOfSpeech::Adverb));
+
+  auto tags = generator.generate(morphemes);
+  ASSERT_EQ(tags.size(), 1);
+  EXPECT_EQ(tags[0], "とても");
+}
+
+TEST(TagGeneratorTest, PosFilterMultiple) {
+  TagGeneratorOptions options;
+  options.pos_filter = kTagPosNoun | kTagPosVerb;  // NOLINT(hicpp-signed-bitwise): bit flag
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));
+  morphemes.push_back(makeMorpheme("食べる", core::PartOfSpeech::Verb));
+  morphemes.push_back(makeMorpheme("美味しい", core::PartOfSpeech::Adjective));
+
+  auto tags = generator.generate(morphemes);
+  ASSERT_EQ(tags.size(), 2);
+  EXPECT_EQ(tags[0], "東京");
+  EXPECT_EQ(tags[1], "食べる");
+}
+
+TEST(TagGeneratorTest, PosFilterZeroIncludesAll) {
+  TagGeneratorOptions options;
+  options.pos_filter = 0;  // Include all content words
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));
+  morphemes.push_back(makeMorpheme("食べる", core::PartOfSpeech::Verb));
+  morphemes.push_back(makeMorpheme("美味しい", core::PartOfSpeech::Adjective));
+
+  auto tags = generator.generate(morphemes);
+  EXPECT_EQ(tags.size(), 3);
+}
+
+TEST(TagGeneratorTest, PosFilterExcludesParticlesAndAuxiliaries) {
+  TagGeneratorOptions options;
+  options.pos_filter = kTagPosNoun;
+  // POS filter should exclude non-filterable categories even if
+  // exclude_particles/auxiliaries are false
+  options.exclude_particles = false;
+  options.exclude_auxiliaries = false;
+  options.min_tag_length = 1;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));
+  morphemes.push_back(makeMorpheme("に", core::PartOfSpeech::Particle));
+  morphemes.push_back(makeMorpheme("た", core::PartOfSpeech::Auxiliary));
+
+  auto tags = generator.generate(morphemes);
+  ASSERT_EQ(tags.size(), 1);
+  EXPECT_EQ(tags[0], "東京");
+}
+
+TEST(TagGeneratorTest, PosFilterIncludesPronounAsNoun) {
+  TagGeneratorOptions options;
+  options.pos_filter = kTagPosNoun;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("それ", core::PartOfSpeech::Pronoun));
+  morphemes.push_back(makeMorpheme("食べる", core::PartOfSpeech::Verb));
+
+  auto tags = generator.generate(morphemes);
+  ASSERT_EQ(tags.size(), 1);
+  EXPECT_EQ(tags[0], "それ");
+}
+
+TEST(TagGeneratorTest, ExcludeBasicHiraganaLemma) {
+  TagGeneratorOptions options;
+  options.exclude_basic = true;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));
+  morphemes.push_back(makeMorpheme("たべる", core::PartOfSpeech::Verb, "たべる"));
+  morphemes.push_back(makeMorpheme("食べる", core::PartOfSpeech::Verb, "食べる"));
+
+  auto tags = generator.generate(morphemes);
+  ASSERT_EQ(tags.size(), 2);
+  EXPECT_EQ(tags[0], "東京");
+  EXPECT_EQ(tags[1], "食べる");
+}
+
+TEST(TagGeneratorTest, ExcludeBasicUsesLemmaNotSurface) {
+  TagGeneratorOptions options;
+  options.exclude_basic = true;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  // Surface is kanji but lemma is hiragana - should be excluded
+  morphemes.push_back(makeMorpheme("食べ", core::PartOfSpeech::Verb, "たべる"));
+  // Surface is hiragana but lemma is kanji - should be included
+  morphemes.push_back(makeMorpheme("たべ", core::PartOfSpeech::Verb, "食べる"));
+
+  auto tags = generator.generate(morphemes);
+  ASSERT_EQ(tags.size(), 1);
+  EXPECT_EQ(tags[0], "食べる");  // Lemma used
+}
+
+TEST(TagGeneratorTest, ExcludeBasicEmptyLemmaFallsBackToSurface) {
+  TagGeneratorOptions options;
+  options.exclude_basic = true;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  core::Morpheme morph;
+  morph.surface = "りんご";
+  morph.pos = core::PartOfSpeech::Noun;
+  morph.lemma = "";  // Empty lemma, falls back to surface
+  morphemes.push_back(morph);
+
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));
+
+  auto tags = generator.generate(morphemes);
+  // "りんご" has hiragana-only surface (used as fallback), should be excluded
+  ASSERT_EQ(tags.size(), 1);
+  EXPECT_EQ(tags[0], "東京");
+}
+
+TEST(TagGeneratorTest, PosFilterAndExcludeBasicCombined) {
+  TagGeneratorOptions options;
+  options.pos_filter = kTagPosNoun | kTagPosVerb;  // NOLINT(hicpp-signed-bitwise): bit flag
+  options.exclude_basic = true;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));
+  morphemes.push_back(makeMorpheme("ある", core::PartOfSpeech::Verb, "ある"));
+  morphemes.push_back(makeMorpheme("美味しい", core::PartOfSpeech::Adjective));
+  morphemes.push_back(makeMorpheme("食べる", core::PartOfSpeech::Verb, "食べる"));
+
+  auto tags = generator.generate(morphemes);
+  // Noun+Verb filter: excludes Adjective
+  // exclude_basic: excludes "ある" (hiragana-only lemma)
+  ASSERT_EQ(tags.size(), 2);
+  EXPECT_EQ(tags[0], "東京");
+  EXPECT_EQ(tags[1], "食べる");
+}
+
 }  // namespace
 }  // namespace postprocess
 }  // namespace suzume

@@ -1,5 +1,6 @@
 #include "postprocess/tag_generator.h"
 
+#include "grammar/char_patterns.h"
 #include "normalize/utf8.h"
 
 namespace suzume::postprocess {
@@ -40,6 +41,41 @@ bool TagGenerator::shouldInclude(const core::Morpheme& morpheme) const {
   // Exclude symbols
   if (morpheme.pos == core::PartOfSpeech::Symbol) {
     return false;
+  }
+
+  // POS filter (whitelist)
+  if (options_.pos_filter != 0) {
+    uint8_t pos_bit = 0;
+    switch (morpheme.pos) {
+      case core::PartOfSpeech::Noun:
+      case core::PartOfSpeech::Pronoun:
+        pos_bit = kTagPosNoun;
+        break;
+      case core::PartOfSpeech::Verb:
+        pos_bit = kTagPosVerb;
+        break;
+      case core::PartOfSpeech::Adjective:
+        pos_bit = kTagPosAdjective;
+        break;
+      case core::PartOfSpeech::Adverb:
+        pos_bit = kTagPosAdverb;
+        break;
+      default:
+        return false;  // Not in any filterable category
+    }
+    if ((options_.pos_filter & pos_bit) == 0) {  // NOLINT(hicpp-signed-bitwise): bit flag operation
+      return false;
+    }
+  }
+
+  // Exclude basic words (hiragana-only lemma)
+  if (options_.exclude_basic) {
+    std::string_view lemma_sv = morpheme.lemma.empty()
+                                    ? std::string_view(morpheme.surface)
+                                    : std::string_view(morpheme.lemma);
+    if (grammar::isPureHiragana(lemma_sv)) {
+      return false;
+    }
   }
 
   return true;

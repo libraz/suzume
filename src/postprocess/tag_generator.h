@@ -1,6 +1,7 @@
 #ifndef SUZUME_POSTPROCESS_TAG_GENERATOR_H_
 #define SUZUME_POSTPROCESS_TAG_GENERATOR_H_
 
+#include <cstdint>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -10,6 +11,12 @@
 #include "postprocess/postprocessor.h"
 
 namespace suzume::postprocess {
+
+// POS filter bit constants for TagGeneratorOptions::pos_filter
+static constexpr uint8_t kTagPosNoun = 1 << 0;      // NOLINT(readability-magic-numbers): bit flag
+static constexpr uint8_t kTagPosVerb = 1 << 1;      // NOLINT(readability-magic-numbers): bit flag
+static constexpr uint8_t kTagPosAdjective = 1 << 2;  // NOLINT(readability-magic-numbers): bit flag
+static constexpr uint8_t kTagPosAdverb = 1 << 3;    // NOLINT(readability-magic-numbers): bit flag
 
 /**
  * @brief Tag generation options
@@ -23,6 +30,10 @@ struct TagGeneratorOptions {
   bool remove_duplicates = true;      // Remove duplicate tags
   size_t min_tag_length = 2;          // Minimum tag length (characters)
   size_t max_tags = 0;                // Maximum number of tags (0 = unlimited)
+
+  // POS filter (if any bit is set, only include matching POS)
+  uint8_t pos_filter = 0;            // 0 = include all content words
+  bool exclude_basic = false;        // Exclude basic words (hiragana-only lemma)
 };
 
 /**
