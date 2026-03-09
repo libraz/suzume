@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "description": "Regression: 棄てる ichidan verb dict entry",
+      "expected": [
+        {
+          "lemma": "棄てる",
+          "pos": "Verb",
+          "surface": "棄て"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Noun",
+          "surface": "物"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "pos": "Verb",
+          "surface": "拾う"
+        }
+      ],
+      "id": "teta_wo_u",
+      "input": "棄てた物を拾う"
+    }
+  ],
+  "description": "verb_ta_form tests",
+  "version": "1.0"
+}

@@ -1,0 +1,81 @@
+{
+  "cases": [
+    {
+      "description": "Regression: はいつまで - particle→interjection penalty + topic→pronoun bonus",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "人間"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "住居"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Pronoun",
+          "surface": "いつ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "たる",
+          "pos": "Verb",
+          "surface": "たっ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "pos": "Verb",
+          "surface": "慣れる"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "事"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_nihaitsumadetatttemo_reru_gadekinakattta",
+      "input": "人間の住居にはいつまでたっても慣れる事ができなかった"
+    }
+  ],
+  "description": "particle_topic tests",
+  "version": "1.0"
+}

@@ -487,10 +487,10 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"ようになって", "ようになって", "ようになる", kAuxNai, kAuxOutTe, kAuxOutBase});
 
   // === Explanatory のだ/んだ ===
-  entries.push_back({"んだ", "んだ", "のだ", kAuxNai, kAuxOutBase, kVerbBase});
-  entries.push_back({"んです", "んです", "のだ", kAuxNai, kAuxOutMasu, kVerbBase});
-  entries.push_back({"のだ", "のだ", "のだ", kAuxNai, kAuxOutBase, kVerbBase});
-  entries.push_back({"のです", "のです", "のだ", kAuxNai, kAuxOutMasu, kVerbBase});
+  // Removed: のだ/んだ/のです/んです are discourse-level constructions,
+  // not conjugation suffixes. Including them extends verb candidate surfaces
+  // (e.g., 窺うのだ as single verb), preventing proper tokenization.
+  // Verb base forms are still detected from shorter substrings.
 
   // === Prohibition/Permission ===
   entries.push_back({"はいけない", "はいけない", "はいけない", kAuxNai, kAuxOutBase, kAuxOutTe});
@@ -609,13 +609,8 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   // === てみる conditional ===
   entries.push_back({"みれば", "みれば", "みる", kAuxTemiru, kAuxOutBase, kAuxOutTe});
 
-  // === Explanatory んだ variants ===
-  // Connects to base form: 食べるんだもん
-  entries.push_back({"んだもの", "んだもの", "のだ", kAuxNai, kAuxOutBase, kVerbBase});
-  entries.push_back({"んだもん", "んだもん", "のだ", kAuxNai, kAuxOutBase, kVerbBase});
-  // Connects to た form: 書いたんだもん
-  entries.push_back({"んだもの", "んだもの", "のだ", kAuxNai, kAuxOutBase, kAuxOutTa});
-  entries.push_back({"んだもん", "んだもん", "のだ", kAuxNai, kAuxOutBase, kAuxOutTa});
+  // === Explanatory んだ variants (removed) ===
+  // んだもの/んだもん removed along with のだ/んだ entries above.
 
   // === Polite request forms ===
   entries.push_back({"いただけますか", "いただけますか", "いただく", kAuxTemorau, kAuxOutMasu, kAuxOutTe});

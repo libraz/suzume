@@ -677,10 +677,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "ãªããã°: conditional auxiliary classification"
-      },
       "description": "Ichidan verb 食べる conditional negative",
       "expected": [
         {
@@ -700,22 +696,6 @@
       ],
       "id": "ichidan_taberu_nakereba",
       "input": "食べなければ",
-      "suzume_expected": [
-        {
-          "lemma": "食べる",
-          "pos": "Verb",
-          "surface": "食べ"
-        },
-        {
-          "lemma": "ない",
-          "pos": "Verb",
-          "surface": "なけれ"
-        },
-        {
-          "pos": "Particle",
-          "surface": "ば"
-        }
-      ],
       "tags": [
         "verb",
         "ichidan"

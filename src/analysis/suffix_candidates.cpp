@@ -495,8 +495,10 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
       char_types[hiragana_end] == normalize::CharType::Hiragana) {
     char32_t second_hiragana = codepoints[hiragana_end];
     // Common 2-char nominalization endings
+    // Note: い is excluded — kanji+2hira ending in い is overwhelmingly
+    // i-adjective (美しい, 正しい, 激しい), not nominalized noun
     if (second_hiragana == U'げ' || second_hiragana == U'け' ||
-        second_hiragana == U'り' || second_hiragana == U'い' ||
+        second_hiragana == U'り' ||
         second_hiragana == U'え' || second_hiragana == U'し') {
       // Generate 2-hiragana candidate
       std::string surface = extractSubstring(codepoints, start_pos, hiragana_end + 1);

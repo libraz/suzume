@@ -1,496 +1,496 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "今日は天気です",
-      "expected" : [
+      "description": "今日は天気です",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "今日"
+          "pos": "Noun",
+          "surface": "今日"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "天気"
+          "pos": "Noun",
+          "surface": "天気"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "analyze_multiple_sentences",
-      "input" : "今日は天気です",
-      "tags" : [
+      "id": "analyze_multiple_sentences",
+      "input": "今日は天気です",
+      "tags": [
         "basic",
         "sentence"
       ]
     },
     {
-      "description" : "いいですね - should have です + ね",
-      "expected" : [
+      "description": "いいですね - should have です + ね",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "いい"
+          "pos": "Adjective",
+          "surface": "いい"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ね"
+          "pos": "Particle",
+          "surface": "ね"
         }
       ],
-      "id" : "bug_desune",
-      "input" : "いいですね",
-      "tags" : [
+      "id": "bug_desune",
+      "input": "いいですね",
+      "tags": [
         "basic"
       ]
     },
     {
-      "description" : "長かったです - MeCab-compatible split: 長かっ + た + です",
-      "expected" : [
+      "description": "長かったです - MeCab-compatible split: 長かっ + た + です",
+      "expected": [
         {
-          "lemma" : "長い",
-          "pos" : "Adjective",
-          "surface" : "長かっ"
+          "lemma": "長い",
+          "pos": "Adjective",
+          "surface": "長かっ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "bug_nagakatta",
-      "input" : "長かったです",
-      "tags" : [
+      "id": "bug_nagakatta",
+      "input": "長かったです",
+      "tags": [
         "basic"
       ]
     },
     {
-      "description" : "学んでいます - MeCab-compatible: 学ん + で + い + ます",
-      "expected" : [
+      "description": "学んでいます - MeCab-compatible: 学ん + で + い + ます",
+      "expected": [
         {
-          "lemma" : "学ぶ",
-          "pos" : "Verb",
-          "surface" : "学ん"
+          "lemma": "学ぶ",
+          "pos": "Verb",
+          "surface": "学ん"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
-          "surface" : "い"
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "bug_manandeimasu",
-      "input" : "学んでいます",
-      "tags" : [
+      "id": "bug_manandeimasu",
+      "input": "学んでいます",
+      "tags": [
         "basic"
       ]
     },
     {
-      "description" : "できます - MeCab-compatible: でき + ます",
-      "expected" : [
+      "description": "できます - MeCab-compatible: でき + ます",
+      "expected": [
         {
-          "lemma" : "できる",
-          "pos" : "Verb",
-          "surface" : "でき"
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
         },
         {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "bug_dekiru",
-      "input" : "できます",
-      "tags" : [
+      "id": "bug_dekiru",
+      "input": "できます",
+      "tags": [
         "basic"
       ]
     },
     {
-      "description" : "Polite auxiliary ます (split: Ichidan verb stem + aux)",
-      "expected" : [
+      "description": "Polite auxiliary ます (split: Ichidan verb stem + aux)",
+      "expected": [
         {
-          "lemma" : "食べる",
-          "pos" : "Verb",
-          "surface" : "食べ"
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
         },
         {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "aux_masu",
-      "input" : "食べます",
-      "tags" : [
+      "id": "aux_masu",
+      "input": "食べます",
+      "tags": [
         "auxiliary",
         "polite"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ãå¬¢æ§ split as ã+å¬¢+æ§ without user dict"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "ãå¬¢æ§ split as ã+å¬¢+æ§ without user dict"
       },
-      "description" : "Ojou-sama speech ですわ",
-      "expected" : [
+      "description": "Ojou-sama speech ですわ",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "お嬢様"
+          "pos": "Noun",
+          "surface": "お嬢様"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         },
         {
-          "pos" : "Particle",
-          "surface" : "わ"
+          "pos": "Particle",
+          "surface": "わ"
         }
       ],
-      "id" : "character_desuwa",
-      "input" : "お嬢様ですわ",
-      "suzume_expected" : [
+      "id": "character_desuwa",
+      "input": "お嬢様ですわ",
+      "suzume_expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "嬢"
+          "pos": "Noun",
+          "surface": "嬢"
         },
         {
-          "pos" : "Noun",
-          "surface" : "様"
+          "pos": "Noun",
+          "surface": "様"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         },
         {
-          "pos" : "Particle",
-          "surface" : "わ"
+          "pos": "Particle",
+          "surface": "わ"
         }
       ],
-      "tags" : [
+      "tags": [
         "character_speech",
         "ojousama"
       ]
     },
     {
-      "description" : "ですわ ojou-sama speech",
-      "expected" : [
+      "description": "ですわ ojou-sama speech",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "綺麗"
+          "pos": "Adjective",
+          "surface": "綺麗"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         },
         {
-          "pos" : "Particle",
-          "surface" : "わ"
+          "pos": "Particle",
+          "surface": "わ"
         }
       ],
-      "id" : "char_speech_desuwa",
-      "input" : "綺麗ですわ",
-      "tags" : [
+      "id": "char_speech_desuwa",
+      "input": "綺麗ですわ",
+      "tags": [
         "character_speech"
       ]
     },
     {
-      "description" : "家にいます - existential verb いる (single auxiliary token)",
-      "expected" : [
+      "description": "家にいます - existential verb いる (single auxiliary token)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "家"
+          "pos": "Noun",
+          "surface": "家"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Verb",
-          "surface" : "い"
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "particle_filter_ie_ni_imasu",
-      "input" : "家にいます",
-      "tags" : [
+      "id": "particle_filter_ie_ni_imasu",
+      "input": "家にいます",
+      "tags": [
         "particle",
         "filter"
       ]
     },
     {
-      "description" : "いただきます - polite form",
-      "expected" : [
+      "description": "いただきます - polite form",
+      "expected": [
         {
-          "lemma" : "いただく",
-          "pos" : "Verb",
-          "surface" : "いただき"
+          "lemma": "いただく",
+          "pos": "Verb",
+          "surface": "いただき"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "itadakimasu_verb",
-      "input" : "いただきます",
-      "tags" : [
+      "id": "itadakimasu_verb",
+      "input": "いただきます",
+      "tags": [
         "hiragana_verb"
       ]
     },
     {
-      "description" : "お世話になっております - humble progressive form - MeCab: なっ + て + おり + ます",
-      "expected" : [
+      "description": "お世話になっております - humble progressive form - MeCab: なっ + て + おり + ます",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "世話"
+          "pos": "Noun",
+          "surface": "世話"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "なる",
-          "pos" : "Verb",
-          "surface" : "なっ"
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "おる",
-          "pos" : "Auxiliary",
-          "surface" : "おり"
+          "lemma": "おる",
+          "pos": "Auxiliary",
+          "surface": "おり"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "realworld_business_email",
-      "input" : "お世話になっております",
-      "tags" : [
+      "id": "realworld_business_email",
+      "input": "お世話になっております",
+      "tags": [
         "strict",
         "realworld",
         "business"
       ]
     },
     {
-      "description" : "これはいくらですか - should have particles",
-      "expected" : [
+      "description": "これはいくらですか - should have particles",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "これ"
+          "pos": "Pronoun",
+          "surface": "これ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "いくら"
+          "pos": "Pronoun",
+          "surface": "いくら"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         },
         {
-          "pos" : "Particle",
-          "surface" : "か"
+          "pos": "Particle",
+          "surface": "か"
         }
       ],
-      "id" : "realworld_shopping",
-      "input" : "これはいくらですか",
-      "tags" : [
+      "id": "realworld_shopping",
+      "input": "これはいくらですか",
+      "tags": [
         "strict",
         "realworld",
         "conversation"
       ]
     },
     {
-      "description" : "今日は暑いですね - should recognize 今日",
-      "expected" : [
+      "description": "今日は暑いですね - should recognize 今日",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "今日"
+          "pos": "Noun",
+          "surface": "今日"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "暑い"
+          "pos": "Adjective",
+          "surface": "暑い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ね"
+          "pos": "Particle",
+          "surface": "ね"
         }
       ],
-      "id" : "realworld_weather",
-      "input" : "今日は暑いですね",
-      "tags" : [
+      "id": "realworld_weather",
+      "input": "今日は暑いですね",
+      "tags": [
         "strict",
         "realworld",
         "conversation"
       ]
     },
     {
-      "description" : "おはようございます should be at most 2 tokens",
-      "expected" : [
+      "description": "おはようございます should be at most 2 tokens",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "おはよう"
+          "pos": "Interjection",
+          "surface": "おはよう"
         },
         {
-          "lemma" : "ござる",
-          "pos" : "Auxiliary",
-          "surface" : "ござい"
+          "lemma": "ござる",
+          "pos": "Auxiliary",
+          "surface": "ござい"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "ohayougozaimasu",
-      "input" : "おはようございます",
-      "tags" : [
+      "id": "ohayougozaimasu",
+      "input": "おはようございます",
+      "tags": [
         "strict",
         "greeting"
       ]
     },
     {
-      "description" : "ありがとうございます should be at most 2 tokens",
-      "expected" : [
+      "description": "ありがとうございます should be at most 2 tokens",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "ありがとう"
+          "pos": "Interjection",
+          "surface": "ありがとう"
         },
         {
-          "lemma" : "ござる",
-          "pos" : "Auxiliary",
-          "surface" : "ござい"
+          "lemma": "ござる",
+          "pos": "Auxiliary",
+          "surface": "ござい"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "arigatougozaimasu",
-      "input" : "ありがとうございます",
-      "tags" : [
+      "id": "arigatougozaimasu",
+      "input": "ありがとうございます",
+      "tags": [
         "strict",
         "greeting"
       ]
     },
     {
-      "description" : "よろしくお願いいたします - MeCab互換分割",
-      "expected" : [
+      "description": "よろしくお願いいたします - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "よろしく"
+          "pos": "Adverb",
+          "surface": "よろしく"
         },
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "願い"
+          "pos": "Noun",
+          "surface": "願い"
         },
         {
-          "lemma" : "いたす",
-          "pos" : "Verb",
-          "surface" : "いたし"
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "yoroshiku_onegai_itashimasu",
-      "input" : "よろしくお願いいたします",
-      "tags" : [
+      "id": "yoroshiku_onegai_itashimasu",
+      "input": "よろしくお願いいたします",
+      "tags": [
         "strict",
         "business"
       ]
     },
     {
-      "description" : "なんし - kuruwa-kotoba polite auxiliary (archaic courtesan speech)",
-      "expected" : [
+      "description": "なんし - kuruwa-kotoba polite auxiliary (archaic courtesan speech)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "なん"
+          "pos": "Noun",
+          "surface": "なん"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         }
       ],
-      "id" : "kuruwa_nanshi_standalone",
-      "input" : "なんし",
-      "tags" : [
+      "id": "kuruwa_nanshi_standalone",
+      "input": "なんし",
+      "tags": [
         "character_speech",
         "kuruwa"
       ]
     },
     {
-      "description" : "おいでなんし - kuruwa-kotoba polite invitation",
-      "expected" : [
+      "description": "おいでなんし - kuruwa-kotoba polite invitation",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "おいで"
+          "pos": "Adverb",
+          "surface": "おいで"
         },
         {
-          "pos" : "Noun",
-          "surface" : "なん"
+          "pos": "Noun",
+          "surface": "なん"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         }
       ],
-      "id" : "kuruwa_oide_nanshi",
-      "input" : "おいでなんし",
-      "tags" : [
+      "id": "kuruwa_oide_nanshi",
+      "input": "おいでなんし",
+      "tags": [
         "character_speech",
         "kuruwa"
       ]
     }
   ],
-  "description" : "Politeness auxiliaries (ます、です)",
-  "version" : "1.0"
+  "description": "Politeness auxiliaries (ます、です)",
+  "version": "1.0"
 }

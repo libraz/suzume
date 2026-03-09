@@ -1,0 +1,30 @@
+{
+  "cases": [
+    {
+      "description": "Regression: 忍び足 noun + 近寄る godan-ra verb",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "忍び足"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "近寄る",
+          "pos": "Verb",
+          "surface": "近寄っ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "bi_ni_ttte",
+      "input": "忍び足に近寄って"
+    }
+  ],
+  "description": "verb_te_form tests",
+  "version": "1.0"
+}

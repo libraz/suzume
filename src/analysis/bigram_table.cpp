@@ -212,6 +212,12 @@ BigramTable::initTable() {
   // Helps i-adjective+conjunctive particle beat ADJ_NA+い(verb)+し path
   setCell(t, EPOS::AdjBasic, EPOS::ParticleConj, cost::kMinorBonus);
 
+  // AdjBasic → Noun (美しい+猫, 大きい+家, 高い+山) - moderate bonus
+  // i-adjective attributive form + noun is fundamental Japanese grammar
+  // Without this, long unknown NOUN candidates (一番美しい) beat split paths
+  setCell(t, EPOS::AdjBasic, EPOS::Noun, cost::kModerateBonus);
+  setCell(t, EPOS::AdjBasic, EPOS::NounFormal, cost::kModerateBonus);
+
   // AdjBasic → ParticleNo (少ない+の, 美味しい+の) - minor bonus
   // Without this, NOUN+ない(AUX)+の path beats adjective+の path
   // because AuxNeg→ParticleNo has a strong bonus (-0.8)
@@ -463,6 +469,10 @@ BigramTable::initTable() {
   // Pronoun → ParticleAdverbial (あれ+だけ, それ+だけ)
   setCell(t, EPOS::Pronoun, EPOS::ParticleAdverbial, cost::kStrongBonus);
 
+  // Pronoun → Adverb penalty (何+もし should be 何+も+し, not 何+もし(ADV))
+  // Pronouns are followed by particles, not adverbs. PRON→ADV is rarely valid.
+  setCell(t, EPOS::Pronoun, EPOS::Adverb, cost::kRare);
+
   // =========================================================================
   // Determiner → Noun (連体詞は名詞を修飾)
   // =========================================================================
@@ -567,6 +577,12 @@ BigramTable::initTable() {
 
   // ParticleCase → VerbShuushikei (を+食べる) - neutral
   setCell(t, EPOS::ParticleCase, EPOS::VerbShuushikei, cost::kNeutral);
+
+  // ParticleTopic/ParticleCase → Pronoun (は+いつ, は+どこ, に+何, で+誰)
+  // Particles naturally precede pronouns in questions and relative clauses
+  // は+いつ, も+何, に+どこ are very common patterns
+  setCell(t, EPOS::ParticleTopic, EPOS::Pronoun, cost::kModerateBonus);
+  setCell(t, EPOS::ParticleCase, EPOS::Pronoun, cost::kMinorBonus);
 
   // ParticleTopic → VerbShuushikei (は+食べる) - neutral
   setCell(t, EPOS::ParticleTopic, EPOS::VerbShuushikei, cost::kNeutral);
@@ -720,6 +736,11 @@ BigramTable::initTable() {
   // VerbRenyokei → AuxAppearanceSou (食べ+そう) - very strong bonus
   // Must beat adverb bonus (-1.0 for 2-char hiragana) to prefer auxiliary
   setCell(t, EPOS::VerbRenyokei, EPOS::AuxAppearanceSou, cost::kVeryStrongBonus);
+
+  // AuxAspectShimau → AuxAppearanceSou (しまい+そう) - strong bonus
+  // しまいそう (about to end up doing) is natural; AUX chain must beat ADJ+ADV path
+  // Strong bonus needed because そう(ADV) has dict bonus (-0.5) vs そう(AUX) cost (0.4)
+  setCell(t, EPOS::AuxAspectShimau, EPOS::AuxAppearanceSou, cost::kStrongBonus);
 
   // Other → AuxAppearanceSou - penalty (様態そう shouldn't appear at BOS)
   // At sentence start, そう should be demonstrative na-adjective, not appearance aux
@@ -897,6 +918,10 @@ BigramTable::initTable() {
   // Greetings like おはようございます need this to prefer dict AuxGozaru over verb candidate
   setCell(t, EPOS::Interjection, EPOS::AuxGozaru, cost::kStrongBonus);
 
+  // Adverb → ParticleTopic (少し+は, もっと+は, ちょっと+は) - minor bonus
+  // Adverb + は/も is a natural pattern; default penalty causes ADV to lose to NOUN
+  setCell(t, EPOS::Adverb, EPOS::ParticleTopic, cost::kMinorBonus);
+
   // Adverb → Noun (俄然+注目) - moderate bonus
   // Adverb modifying noun is natural and should beat kanji compound analysis
   setCell(t, EPOS::Adverb, EPOS::Noun, cost::kModerateBonus);
@@ -925,6 +950,20 @@ BigramTable::initTable() {
   // Prefix → VerbRenyokei (お+待ち as verb renyokei) - strong bonus
   // お待ち can be verb renyokei (待つ) as well as noun
   setCell(t, EPOS::Prefix, EPOS::VerbRenyokei, cost::kStrongBonus);
+
+  // =========================================================================
+  // Particle → Interjection penalties
+  // =========================================================================
+  // In running text (not dialogue), particles are never followed by interjections.
+  // Interjections appear at sentence boundaries, not after case/topic particles.
+  // E.g., にはいつ → に+は+いつ, not に+はい(INTJ)+つ
+  setCell(t, EPOS::ParticleCase, EPOS::Interjection, cost::kAlmostNever);
+  setCell(t, EPOS::ParticleTopic, EPOS::Interjection, cost::kAlmostNever);
+  setCell(t, EPOS::ParticleNo, EPOS::Interjection, cost::kAlmostNever);
+  setCell(t, EPOS::ParticleAdverbial, EPOS::Interjection, cost::kAlmostNever);
+  setCell(t, EPOS::ParticleConj, EPOS::Interjection, cost::kAlmostNever);
+  setCell(t, EPOS::ParticleQuote, EPOS::Interjection, cost::kAlmostNever);
+  setCell(t, EPOS::ParticleFinal, EPOS::Interjection, cost::kAlmostNever);
 
   return t;
 }

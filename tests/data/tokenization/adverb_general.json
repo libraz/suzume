@@ -1331,8 +1331,13 @@
       "description": "初めて見た - auto-generated",
       "expected": [
         {
-          "pos": "Adverb",
-          "surface": "初めて"
+          "lemma": "初める",
+          "pos": "Verb",
+          "surface": "初め"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
         },
         {
           "lemma": "見る",

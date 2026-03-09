@@ -1,421 +1,421 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "Copula です",
-      "expected" : [
+      "description": "Copula です",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "これ"
+          "pos": "Pronoun",
+          "surface": "これ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "aux_desu",
-      "input" : "これは本です",
-      "tags" : [
+      "id": "aux_desu",
+      "input": "これは本です",
+      "tags": [
         "auxiliary",
         "copula"
       ]
     },
     {
-      "description" : "神だった - MeCab splits as だっ + た",
-      "expected" : [
+      "description": "神だった - MeCab splits as だっ + た",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "神"
+          "pos": "Noun",
+          "surface": "神"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "だっ"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "kanji_copula_not_compound",
-      "input" : "神だった",
-      "tags" : [
+      "id": "kanji_copula_not_compound",
+      "input": "神だった",
+      "tags": [
         "copula",
         "not_compound"
       ]
     },
     {
-      "description" : "だった - MeCab splits as だっ + た, lemma is だ",
-      "expected" : [
+      "description": "だった - MeCab splits as だっ + た, lemma is だ",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "だっ"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "datta_copula_lemma",
-      "input" : "本だった",
-      "tags" : [
+      "id": "datta_copula_lemma",
+      "input": "本だった",
+      "tags": [
         "copula",
         "datta"
       ]
     },
     {
-      "description" : "Full sentence with だった - MeCab splits as だっ + た",
-      "expected" : [
+      "description": "Full sentence with だった - MeCab splits as だっ + た",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "ワンマンライブ"
+          "pos": "Noun",
+          "surface": "ワンマンライブ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "セットリスト"
+          "pos": "Noun",
+          "surface": "セットリスト"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Noun",
-          "surface" : "神"
+          "pos": "Noun",
+          "surface": "神"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "だっ"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "datta_in_sentence",
-      "input" : "ワンマンライブのセットリストが神だった",
-      "tags" : [
+      "id": "datta_in_sentence",
+      "input": "ワンマンライブのセットリストが神だった",
+      "tags": [
         "copula",
         "datta",
         "sentence"
       ]
     },
     {
-      "description" : "でした (polite past copula) - MeCab splits as でし + た",
-      "expected" : [
+      "description": "でした (polite past copula) - MeCab splits as でし + た",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "lemma" : "です",
-          "pos" : "Auxiliary",
-          "surface" : "でし"
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "deshita_copula",
-      "input" : "本でした",
-      "tags" : [
+      "id": "deshita_copula",
+      "input": "本でした",
+      "tags": [
         "copula",
         "deshita"
       ]
     },
     {
-      "description" : "であった (formal past copula) - で + あっ + た split (MeCab-compatible)",
-      "expected" : [
+      "description": "であった (formal past copula) - で + あっ + た split (MeCab-compatible)",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "重要"
+          "pos": "Adjective",
+          "surface": "重要"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "lemma" : "ある",
-          "pos" : "Auxiliary",
-          "surface" : "あっ"
+          "lemma": "ある",
+          "pos": "Auxiliary",
+          "surface": "あっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "deatta_copula",
-      "input" : "重要であった",
-      "tags" : [
+      "id": "deatta_copula",
+      "input": "重要であった",
+      "tags": [
         "copula",
         "deatta"
       ]
     },
     {
-      "description" : "Basic copula だ after noun",
-      "expected" : [
+      "description": "Basic copula だ after noun",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "学生"
+          "pos": "Noun",
+          "surface": "学生"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "だ"
+          "pos": "Auxiliary",
+          "surface": "だ"
         }
       ],
-      "id" : "copula_after_noun",
-      "input" : "学生だ",
-      "tags" : [
+      "id": "copula_after_noun",
+      "input": "学生だ",
+      "tags": [
         "copula",
         "da"
       ]
     },
     {
-      "description" : "嫌でない - na-adjective copula negation (suzume uses ADJ for na-adjectives)",
-      "expected" : [
+      "description": "嫌でない - na-adjective copula negation (suzume uses ADJ for na-adjectives)",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "嫌"
+          "pos": "Adjective",
+          "surface": "嫌"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "copula_denai_iya",
-      "input" : "嫌でない",
-      "tags" : [
+      "id": "copula_denai_iya",
+      "input": "嫌でない",
+      "tags": [
         "copula",
         "denai"
       ]
     },
     {
-      "description" : "好きでない - na-adjective copula negation",
-      "expected" : [
+      "description": "好きでない - na-adjective copula negation",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "好き"
+          "pos": "Adjective",
+          "surface": "好き"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "copula_denai_suki",
-      "input" : "好きでない",
-      "tags" : [
+      "id": "copula_denai_suki",
+      "input": "好きでない",
+      "tags": [
         "copula",
         "denai"
       ]
     },
     {
-      "description" : "静かでない - na-adjective copula negation",
-      "expected" : [
+      "description": "静かでない - na-adjective copula negation",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "静か"
+          "pos": "Adjective",
+          "surface": "静か"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "copula_denai_shizuka",
-      "input" : "静かでない",
-      "tags" : [
+      "id": "copula_denai_shizuka",
+      "input": "静かでない",
+      "tags": [
         "copula",
         "denai"
       ]
     },
     {
-      "description" : "きれいでない - na-adjective copula negation",
-      "expected" : [
+      "description": "きれいでない - na-adjective copula negation",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "きれい"
+          "pos": "Adjective",
+          "surface": "きれい"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "copula_denai_kirei",
-      "input" : "きれいでない",
-      "tags" : [
+      "id": "copula_denai_kirei",
+      "input": "きれいでない",
+      "tags": [
         "copula",
         "denai"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "segmentation-diff",
-        "reason" : "Viterbi per-POS pruning: ã§ã(PARTICLE) prunes ã(PARTICLE) before ãªã is evaluated"
+      "accepted_diff": {
+        "category": "segmentation-diff",
+        "reason": "Viterbi per-POS pruning: ã§ã(PARTICLE) prunes ã(PARTICLE) before ãªã is evaluated"
       },
-      "description" : "彼女でもない - particle も + ない, not verb もなう",
-      "expected" : [
+      "description": "彼女でもない - particle も + ない, not verb もなう",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼女"
+          "pos": "Pronoun",
+          "surface": "彼女"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Particle",
-          "surface" : "も"
+          "pos": "Particle",
+          "surface": "も"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "ない"
+          "pos": "Adjective",
+          "surface": "ない"
         }
       ],
-      "id" : "copula_demonai_kanojo",
-      "input" : "彼女でもない",
-      "suzume_expected" : [
+      "id": "copula_demonai_kanojo",
+      "input": "彼女でもない",
+      "suzume_expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼女"
+          "pos": "Pronoun",
+          "surface": "彼女"
         },
         {
-          "pos" : "Particle",
-          "surface" : "でも"
+          "pos": "Particle",
+          "surface": "でも"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "ない"
+          "pos": "Adjective",
+          "surface": "ない"
         }
       ],
-      "tags" : [
+      "tags": [
         "copula",
         "demonai",
         "T37"
       ]
     },
     {
-      "description" : "それでもない - grammar-first: で is copula (だ連用形), not particle",
-      "expected" : [
+      "description": "それでもない - grammar-first: で is copula (だ連用形), not particle",
+      "expected": [
         {
-          "pos" : "Conjunction",
-          "surface" : "それでも"
+          "pos": "Conjunction",
+          "surface": "それでも"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "ない"
+          "pos": "Adjective",
+          "surface": "ない"
         }
       ],
-      "id" : "copula_demonai_sore",
-      "input" : "それでもない",
-      "tags" : [
+      "id": "copula_demonai_sore",
+      "input": "それでもない",
+      "tags": [
         "copula",
         "demonai",
         "T37"
       ]
     },
     {
-      "description" : "彼女ではない - particle は + ない pattern",
-      "expected" : [
+      "description": "彼女ではない - particle は + ない pattern",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼女"
+          "pos": "Pronoun",
+          "surface": "彼女"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "ない"
+          "pos": "Adjective",
+          "surface": "ない"
         }
       ],
-      "id" : "copula_dewanai",
-      "input" : "彼女ではない",
-      "tags" : [
+      "id": "copula_dewanai",
+      "input": "彼女ではない",
+      "tags": [
         "copula",
         "dewanai",
         "T37"
       ]
     },
     {
-      "description" : "でない - regression test",
-      "expected" : [
+      "description": "でない - regression test",
+      "expected": [
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "denai",
-      "input" : "でない"
+      "id": "denai",
+      "input": "でない"
     },
     {
-      "description" : "であります - regression test",
-      "expected" : [
+      "description": "であります - regression test",
+      "expected": [
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "lemma" : "ある",
-          "pos" : "Auxiliary",
-          "surface" : "あり"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "dearimasu",
-      "input" : "であります"
+      "id": "dearimasu",
+      "input": "であります"
     }
   ],
-  "description" : "Copula patterns (だ、です、である)",
-  "version" : "1.0"
+  "description": "Copula patterns (だ、です、である)",
+  "version": "1.0"
 }

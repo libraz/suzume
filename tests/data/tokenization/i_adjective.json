@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "description": "Regression: AdjBasic→Noun connection bonus (美しい+猫)",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "一番"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "美しい"
+        },
+        {
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "shii_da",
+      "input": "一番美しい猫だ"
+    }
+  ],
+  "description": "i_adjective tests",
+  "version": "1.0"
+}

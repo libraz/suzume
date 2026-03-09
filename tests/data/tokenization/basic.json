@@ -1,287 +1,287 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "こんにちは - greeting",
-      "expected" : [
+      "description": "こんにちは - greeting",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "こんにちは"
+          "pos": "Interjection",
+          "surface": "こんにちは"
         }
       ],
-      "id" : "analyze_hiragana",
-      "input" : "こんにちは",
-      "tags" : [
+      "id": "analyze_hiragana",
+      "input": "こんにちは",
+      "tags": [
         "basic",
         "hiragana"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "lemma-diff",
-        "reason" : "lemma/POS normalization differences"
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "lemma/POS normalization differences"
       },
-      "description" : "あ - single hiragana",
-      "expected" : [
+      "description": "あ - single hiragana",
+      "expected": [
         {
-          "pos" : "Filler",
-          "surface" : "あ"
+          "pos": "Filler",
+          "surface": "あ"
         }
       ],
-      "id" : "edge_single_hiragana",
-      "input" : "あ",
-      "suzume_expected" : [
+      "id": "edge_single_hiragana",
+      "input": "あ",
+      "suzume_expected": [
         {
-          "pos" : "Other",
-          "surface" : "あ"
+          "pos": "Other",
+          "surface": "あ"
         }
       ],
-      "tags" : [
+      "tags": [
         "basic",
         "edge-case"
       ]
     },
     {
-      "description" : "にもかかわらず should be single Conjunction",
-      "expected" : [
+      "description": "にもかかわらず should be single Conjunction",
+      "expected": [
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Particle",
-          "surface" : "も"
+          "pos": "Particle",
+          "surface": "も"
         },
         {
-          "lemma" : "かかわる",
-          "pos" : "Verb",
-          "surface" : "かかわら"
+          "lemma": "かかわる",
+          "pos": "Verb",
+          "surface": "かかわら"
         },
         {
-          "lemma" : "ぬ",
-          "pos" : "Auxiliary",
-          "surface" : "ず"
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
         }
       ],
-      "id" : "conjunction_nimokakawarazu",
-      "input" : "にもかかわらず",
-      "tags" : [
+      "id": "conjunction_nimokakawarazu",
+      "input": "にもかかわらず",
+      "tags": [
         "conjunction"
       ]
     },
     {
-      "description" : "「こんにちは」- should recognize こんにちは",
-      "expected" : [
+      "description": "「こんにちは」- should recognize こんにちは",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "こんにちは"
+          "pos": "Interjection",
+          "surface": "こんにちは"
         }
       ],
-      "id" : "symbol_quotation",
-      "input" : "「こんにちは」",
-      "tags" : [
+      "id": "symbol_quotation",
+      "input": "「こんにちは」",
+      "tags": [
         "strict",
         "symbol"
       ]
     },
     {
-      "description" : "すみません should be single token",
-      "expected" : [
+      "description": "すみません should be single token",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "すみません"
+          "pos": "Interjection",
+          "surface": "すみません"
         }
       ],
-      "id" : "sumimasen_single",
-      "input" : "すみません",
-      "tags" : [
+      "id": "sumimasen_single",
+      "input": "すみません",
+      "tags": [
         "strict",
         "greeting"
       ]
     },
     {
-      "description" : "D3: たとえば should be CONJ, not たとえ+ば",
-      "expected" : [
+      "description": "D3: たとえば should be CONJ, not たとえ+ば",
+      "expected": [
         {
-          "lemma" : "たとえば",
-          "pos" : "Conjunction",
-          "surface" : "たとえば"
+          "lemma": "たとえば",
+          "pos": "Conjunction",
+          "surface": "たとえば"
         },
         {
-          "pos" : "Noun",
-          "surface" : "日本"
+          "pos": "Noun",
+          "surface": "日本"
         }
       ],
-      "id" : "d3_tatoeba",
-      "input" : "たとえば日本",
-      "tags" : [
+      "id": "d3_tatoeba",
+      "input": "たとえば日本",
+      "tags": [
         "d3_fix",
         "conjunction",
         "regression"
       ]
     },
     {
-      "description" : "D3: まして should be CONJ, not まし+て (suru verb misrecognition)",
-      "expected" : [
+      "description": "D3: まして should be CONJ, not まし+て (suru verb misrecognition)",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "まして"
+          "pos": "Conjunction",
+          "surface": "まして"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "無理"
+          "pos": "Adjective",
+          "surface": "無理"
         }
       ],
-      "id" : "d3_mashite",
-      "input" : "まして無理",
-      "tags" : [
+      "id": "d3_mashite",
+      "input": "まして無理",
+      "tags": [
         "d3_fix",
         "conjunction",
         "regression"
       ]
     },
     {
-      "description" : "ところが should be CONJ, not ところ+が split",
-      "expected" : [
+      "description": "ところが should be CONJ, not ところ+が split",
+      "expected": [
         {
-          "pos" : "Conjunction",
-          "surface" : "ところが"
+          "pos": "Conjunction",
+          "surface": "ところが"
         },
         {
-          "pos" : "Pronoun",
-          "surface" : "彼"
+          "pos": "Pronoun",
+          "surface": "彼"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "lemma" : "来る",
-          "pos" : "Verb",
-          "surface" : "来"
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "なかっ"
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "conj_tokoroga",
-      "input" : "ところが彼は来なかった",
-      "tags" : [
+      "id": "conj_tokoroga",
+      "input": "ところが彼は来なかった",
+      "tags": [
         "conjunction",
         "split_prevention"
       ]
     },
     {
-      "description" : "あるいは should be CONJ, not ADJ+は split - MeCab uses かも as single particle",
-      "expected" : [
+      "description": "あるいは should be CONJ, not ADJ+は split - MeCab uses かも as single particle",
+      "expected": [
         {
-          "pos" : "Conjunction",
-          "surface" : "あるいは"
+          "pos": "Conjunction",
+          "surface": "あるいは"
         },
         {
-          "pos" : "Verb",
-          "surface" : "違う"
+          "pos": "Verb",
+          "surface": "違う"
         },
         {
-          "pos" : "Particle",
-          "surface" : "かも"
+          "pos": "Particle",
+          "surface": "かも"
         }
       ],
-      "id" : "conj_aruiha",
-      "input" : "あるいは違うかも",
-      "tags" : [
+      "id": "conj_aruiha",
+      "input": "あるいは違うかも",
+      "tags": [
         "conjunction",
         "split_prevention"
       ]
     },
     {
-      "description" : "そんなら should be CONJ, not そんな+ら split",
-      "expected" : [
+      "description": "そんなら should be CONJ, not そんな+ら split",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "そん"
+          "pos": "Noun",
+          "surface": "そん"
         },
         {
-          "pos" : "Particle",
-          "surface" : "なら"
+          "pos": "Particle",
+          "surface": "なら"
         },
         {
-          "lemma" : "行く",
-          "pos" : "Verb",
-          "surface" : "行こ"
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行こ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "う"
+          "pos": "Auxiliary",
+          "surface": "う"
         }
       ],
-      "id" : "conj_sonnara",
-      "input" : "そんなら行こう",
-      "tags" : [
+      "id": "conj_sonnara",
+      "input": "そんなら行こう",
+      "tags": [
         "conjunction",
         "split_prevention"
       ]
     },
     {
-      "description" : "それにしても should be CONJ, not それ+に+して+も split",
-      "expected" : [
+      "description": "それにしても should be CONJ, not それ+に+して+も split",
+      "expected": [
         {
-          "pos" : "Conjunction",
-          "surface" : "それにしても"
+          "pos": "Conjunction",
+          "surface": "それにしても"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "高い"
+          "pos": "Adjective",
+          "surface": "高い"
         }
       ],
-      "id" : "conj_sorenishitemo",
-      "input" : "それにしても高い",
-      "tags" : [
+      "id": "conj_sorenishitemo",
+      "input": "それにしても高い",
+      "tags": [
         "conjunction",
         "split_prevention"
       ]
     },
     {
-      "description" : "いわば should be CONJ, not OTHER split",
-      "expected" : [
+      "description": "いわば should be CONJ, not OTHER split",
+      "expected": [
         {
-          "lemma" : "言わば",
-          "pos" : "Conjunction",
-          "surface" : "いわば"
+          "lemma": "言わば",
+          "pos": "Conjunction",
+          "surface": "いわば"
         },
         {
-          "pos" : "Noun",
-          "surface" : "奇跡"
+          "pos": "Noun",
+          "surface": "奇跡"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "だ"
+          "pos": "Auxiliary",
+          "surface": "だ"
         }
       ],
-      "id" : "conj_iwaba",
-      "input" : "いわば奇跡だ",
-      "tags" : [
+      "id": "conj_iwaba",
+      "input": "いわば奇跡だ",
+      "tags": [
         "conjunction",
         "split_prevention"
       ]
     },
     {
-      "description" : "ところで - regression test",
-      "expected" : [
+      "description": "ところで - regression test",
+      "expected": [
         {
-          "pos" : "Conjunction",
-          "surface" : "ところで"
+          "pos": "Conjunction",
+          "surface": "ところで"
         }
       ],
-      "id" : "tokorode",
-      "input" : "ところで"
+      "id": "tokorode",
+      "input": "ところで"
     }
   ],
-  "description" : "Basic tokenization tests",
-  "version" : "1.0"
+  "description": "Basic tokenization tests",
+  "version": "1.0"
 }

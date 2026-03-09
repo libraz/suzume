@@ -427,6 +427,28 @@ const std::vector<InflectionCandidate>& Inflection::analyze(
     }
   }
 
+  // Try stripping explanatory のだ/んだ suffixes (not in auxiliary generator
+  // to avoid extending tokenization candidates, but needed for inflection)
+  static constexpr std::string_view kExplanatorySuffixes[] = {
+      "んだ", "のだ", "んです", "のです", "んだもの", "んだもん",
+  };
+  for (const auto& suffix : kExplanatorySuffixes) {
+    if (surface.size() > suffix.size() &&
+        surface.substr(surface.size() - suffix.size()) == suffix) {
+      auto remaining = surface.substr(0, surface.size() - suffix.size());
+      // Recursively analyze what's left (it should be a verb in base form)
+      const auto& sub = analyze(remaining);
+      for (const auto& cand : sub) {
+        if (cand.confidence >= 0.5F) {
+          auto boosted = cand;
+          // Boost confidence: explanatory suffix is a strong signal
+          boosted.confidence = std::max(cand.confidence, 0.8F);
+          candidates.push_back(boosted);
+        }
+      }
+    }
+  }
+
   // Also try direct verb stem matching (for base forms and standalone renyokei)
   // Match base form (e.g., 分割する)
   auto base_candidates = matchVerbStem(surface, {}, conn::kVerbBase);

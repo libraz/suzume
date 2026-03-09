@@ -1751,6 +1751,13 @@ void addVerbSuffixNounJoinCandidates(
     return;
   }
 
+  // Reject if hiragana ends with る (verb rentaikei/dictionary form, not renyokei)
+  // e.g., 見渡せる所 should NOT become a compound noun (it's 見渡せる + 所)
+  // Valid patterns: 食べ物, 居場所 (verb renyokei + suffix)
+  if (hiragana_end > kanji_end && codepoints[hiragana_end - 1] == U'る') {
+    return;
+  }
+
   // Reject if hiragana is a single case particle (not verb renyokei)
   // e.g., 東京都渋谷区に所在 should NOT become 東京都渋谷区に所 + ... (it's ...+に+所在+...)
   // Case particles: に, で, と, を, が, は, へ, も, か, や

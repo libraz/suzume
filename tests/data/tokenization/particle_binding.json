@@ -1,1001 +1,968 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "私は - pronoun with particle",
-      "expected" : [
+      "description": "私は - pronoun with particle",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "私"
+          "pos": "Pronoun",
+          "surface": "私"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         }
       ],
-      "id" : "analyze_with_particle",
-      "input" : "私は",
-      "tags" : [
+      "id": "analyze_with_particle",
+      "input": "私は",
+      "tags": [
         "basic",
         "particle"
       ]
     },
     {
-      "description" : "は particle has lemma",
-      "expected" : [
+      "description": "は particle has lemma",
+      "expected": [
         {
-          "lemma" : "は",
-          "pos" : "Particle",
-          "surface" : "は"
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
         }
       ],
-      "id" : "morpheme_has_lemma",
-      "input" : "は",
-      "tags" : [
+      "id": "morpheme_has_lemma",
+      "input": "は",
+      "tags": [
         "basic",
         "particle"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "Archaic kuruwa-kotoba: ã treated as particle ã® instead of auxiliary"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "Archaic kuruwa-kotoba: ã treated as particle ã® instead of auxiliary"
       },
-      "description" : "Kuruwa-kotoba ありんす",
-      "expected" : [
+      "description": "Kuruwa-kotoba ありんす",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "ここ"
+          "pos": "Pronoun",
+          "surface": "ここ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あり"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ん"
+          "pos": "Auxiliary",
+          "surface": "ん"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "す"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "す"
         }
       ],
-      "id" : "kuruwa_arinsu",
-      "input" : "ここにありんす",
-      "suzume_expected" : [
+      "id": "kuruwa_arinsu",
+      "input": "ここにありんす",
+      "suzume_expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "ここ"
+          "pos": "Pronoun",
+          "surface": "ここ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あり"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
         },
         {
-          "lemma" : "の",
-          "pos" : "Particle",
-          "surface" : "ん"
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "す"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "す"
         }
       ],
-      "tags" : [
+      "tags": [
         "character_speech",
         "kuruwa"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "kuruwa kotoba: multiple POS differences in dialect form"
-      },
-      "description" : "Kuruwa-kotoba でありんした",
-      "expected" : [
+      "description": "Kuruwa-kotoba でありんした",
+      "expected": [
         {
-          "pos" : "Conjunction",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あり"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ん"
+          "pos": "Auxiliary",
+          "surface": "ん"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Particle",
-          "surface" : "か"
+          "pos": "Particle",
+          "surface": "か"
         }
       ],
-      "id" : "kuruwa_arinshita",
-      "input" : "でありんしたか",
-      "suzume_expected" : [
-        {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
-        },
-        {
-          "lemma" : "ある",
-          "pos" : "Auxiliary",
-          "surface" : "あり"
-        },
-        {
-          "lemma" : "の",
-          "pos" : "Particle",
-          "surface" : "ん"
-        },
-        {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "た"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "か"
-        }
-      ],
-      "tags" : [
+      "id": "kuruwa_arinshita",
+      "input": "でありんしたか",
+      "tags": [
         "character_speech",
         "kuruwa"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "character speech: ã§ copula and ã²ã½ ending classification"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "character speech: ã§ copula and ã²ã½ ending classification"
       },
-      "description" : "Squid character でゲソ",
-      "expected" : [
+      "description": "Squid character でゲソ",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "吾輩"
+          "pos": "Pronoun",
+          "surface": "吾輩"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "猫"
+          "pos": "Noun",
+          "surface": "猫"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ゲソ"
+          "pos": "Noun",
+          "surface": "ゲソ"
         }
       ],
-      "id" : "character_geso",
-      "input" : "吾輩は猫でゲソ",
-      "suzume_expected" : [
+      "id": "character_geso",
+      "input": "吾輩は猫でゲソ",
+      "suzume_expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "吾輩"
+          "pos": "Pronoun",
+          "surface": "吾輩"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "猫"
+          "pos": "Noun",
+          "surface": "猫"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ゲソ"
+          "pos": "Particle",
+          "surface": "ゲソ"
         }
       ],
-      "tags" : [
+      "tags": [
         "character_speech",
         "squid"
       ]
     },
     {
-      "description" : "Samurai speech ござった",
-      "expected" : [
+      "description": "Samurai speech ござった",
+      "expected": [
         {
-          "pos" : "Conjunction",
-          "surface" : "それで"
+          "pos": "Conjunction",
+          "surface": "それで"
         },
         {
-          "lemma" : "ござる",
-          "pos" : "Verb",
-          "surface" : "ござっ"
+          "lemma": "ござる",
+          "pos": "Verb",
+          "surface": "ござっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "character_gozatta",
-      "input" : "それでござった",
-      "tags" : [
+      "id": "character_gozatta",
+      "input": "それでござった",
+      "tags": [
         "character_speech",
         "samurai"
       ]
     },
     {
-      "description" : "三人の学生 (three students)",
-      "expected" : [
+      "description": "三人の学生 (three students)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "三人"
+          "pos": "Noun",
+          "surface": "三人"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "学生"
+          "pos": "Noun",
+          "surface": "学生"
         }
       ],
-      "id" : "counter_nin",
-      "input" : "三人の学生",
-      "tags" : [
+      "id": "counter_nin",
+      "input": "三人の学生",
+      "tags": [
         "grammar",
         "counter"
       ]
     },
     {
-      "description" : "二本のペン (two pens)",
-      "expected" : [
+      "description": "二本のペン (two pens)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "二本"
+          "pos": "Noun",
+          "surface": "二本"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ペン"
+          "pos": "Noun",
+          "surface": "ペン"
         }
       ],
-      "id" : "counter_hon",
-      "input" : "二本のペン",
-      "tags" : [
+      "id": "counter_hon",
+      "input": "二本のペン",
+      "tags": [
         "grammar",
         "counter"
       ]
     },
     {
-      "description" : "五個のリンゴ (five apples)",
-      "expected" : [
+      "description": "五個のリンゴ (five apples)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "五個"
+          "pos": "Noun",
+          "surface": "五個"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "リンゴ"
+          "pos": "Noun",
+          "surface": "リンゴ"
         }
       ],
-      "id" : "counter_ko",
-      "input" : "五個のリンゴ",
-      "tags" : [
+      "id": "counter_ko",
+      "input": "五個のリンゴ",
+      "tags": [
         "grammar",
         "counter"
       ]
     },
     {
-      "description" : "十枚の紙 (ten sheets of paper)",
-      "expected" : [
+      "description": "十枚の紙 (ten sheets of paper)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "十枚"
+          "pos": "Noun",
+          "surface": "十枚"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "紙"
+          "pos": "Noun",
+          "surface": "紙"
         }
       ],
-      "id" : "counter_mai",
-      "input" : "十枚の紙",
-      "tags" : [
+      "id": "counter_mai",
+      "input": "十枚の紙",
+      "tags": [
         "grammar",
         "counter"
       ]
     },
     {
-      "description" : "三冊の本 (three books)",
-      "expected" : [
+      "description": "三冊の本 (three books)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "三冊"
+          "pos": "Noun",
+          "surface": "三冊"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         }
       ],
-      "id" : "counter_satsu",
-      "input" : "三冊の本",
-      "tags" : [
+      "id": "counter_satsu",
+      "input": "三冊の本",
+      "tags": [
         "grammar",
         "counter"
       ]
     },
     {
-      "description" : "君なら大丈夫 (if it's you, it's okay)",
-      "expected" : [
+      "description": "君なら大丈夫 (if it's you, it's okay)",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "君"
+          "pos": "Pronoun",
+          "surface": "君"
         },
         {
-          "pos" : "Particle",
-          "surface" : "なら"
+          "pos": "Particle",
+          "surface": "なら"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "大丈夫"
+          "pos": "Adjective",
+          "surface": "大丈夫"
         }
       ],
-      "id" : "pattern_conditional_nara",
-      "input" : "君なら大丈夫",
-      "tags" : [
+      "id": "pattern_conditional_nara",
+      "input": "君なら大丈夫",
+      "tags": [
         "grammar",
         "pattern",
         "conditional"
       ]
     },
     {
-      "description" : "速攻で (immediately)",
-      "expected" : [
+      "description": "速攻で (immediately)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "速攻"
+          "pos": "Noun",
+          "surface": "速攻"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         }
       ],
-      "id" : "noun_de_sokkoude",
-      "input" : "速攻で",
-      "tags" : [
+      "id": "noun_de_sokkoude",
+      "input": "速攻で",
+      "tags": [
         "grammar",
         "noun-de"
       ]
     },
     {
-      "description" : "秒速で (at lightning speed)",
-      "expected" : [
+      "description": "秒速で (at lightning speed)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "秒速"
+          "pos": "Noun",
+          "surface": "秒速"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         }
       ],
-      "id" : "noun_de_byousokude",
-      "input" : "秒速で",
-      "tags" : [
+      "id": "noun_de_byousokude",
+      "input": "秒速で",
+      "tags": [
         "grammar",
         "noun-de"
       ]
     },
     {
-      "description" : "爆速で (at explosive speed)",
-      "expected" : [
+      "description": "爆速で (at explosive speed)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "爆速"
+          "pos": "Noun",
+          "surface": "爆速"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         }
       ],
-      "id" : "noun_de_bakusokude",
-      "input" : "爆速で",
-      "tags" : [
+      "id": "noun_de_bakusokude",
+      "input": "爆速で",
+      "tags": [
         "grammar",
         "noun-de"
       ]
     },
     {
-      "description" : "光速で (at the speed of light)",
-      "expected" : [
+      "description": "光速で (at the speed of light)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "光速"
+          "pos": "Noun",
+          "surface": "光速"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         }
       ],
-      "id" : "noun_de_kousokude",
-      "input" : "光速で",
-      "tags" : [
+      "id": "noun_de_kousokude",
+      "input": "光速で",
+      "tags": [
         "grammar",
         "noun-de"
       ]
     },
     {
-      "description" : "確定で (definitely)",
-      "expected" : [
+      "description": "確定で (definitely)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "確定"
+          "pos": "Noun",
+          "surface": "確定"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         }
       ],
-      "id" : "noun_de_kakuteide",
-      "input" : "確定で",
-      "tags" : [
+      "id": "noun_de_kakuteide",
+      "input": "確定で",
+      "tags": [
         "grammar",
         "noun-de"
       ]
     },
     {
-      "description" : "ソッコーで (immediately - katakana)",
-      "expected" : [
+      "description": "ソッコーで (immediately - katakana)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "ソッコー"
+          "pos": "Noun",
+          "surface": "ソッコー"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         }
       ],
-      "id" : "noun_de_sokkoude_katakana",
-      "input" : "ソッコーで",
-      "tags" : [
+      "id": "noun_de_sokkoude_katakana",
+      "input": "ソッコーで",
+      "tags": [
         "grammar",
         "noun-de"
       ]
     },
     {
-      "description" : "最後に (finally)",
-      "expected" : [
+      "description": "最後に (finally)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "最後"
+          "pos": "Noun",
+          "surface": "最後"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
-      "id" : "noun_ni_saigoni",
-      "input" : "最後に",
-      "tags" : [
+      "id": "noun_ni_saigoni",
+      "input": "最後に",
+      "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "description" : "最初に (first)",
-      "expected" : [
+      "description": "最初に (first)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "最初"
+          "pos": "Noun",
+          "surface": "最初"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
-      "id" : "noun_ni_saishoni",
-      "input" : "最初に",
-      "tags" : [
+      "id": "noun_ni_saishoni",
+      "input": "最初に",
+      "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "description" : "同時に (simultaneously)",
-      "expected" : [
+      "description": "同時に (simultaneously)",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "同時に"
+          "pos": "Adverb",
+          "surface": "同時に"
         }
       ],
-      "id" : "noun_ni_doujini",
-      "input" : "同時に",
-      "tags" : [
+      "id": "noun_ni_doujini",
+      "input": "同時に",
+      "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "description" : "反対に (conversely)",
-      "expected" : [
+      "description": "反対に (conversely)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "反対"
+          "pos": "Noun",
+          "surface": "反対"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
-      "id" : "noun_ni_hantaini",
-      "input" : "反対に",
-      "tags" : [
+      "id": "noun_ni_hantaini",
+      "input": "反対に",
+      "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "description" : "一般に (generally)",
-      "expected" : [
+      "description": "一般に (generally)",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "一般に"
+          "pos": "Adverb",
+          "surface": "一般に"
         }
       ],
-      "id" : "noun_ni_ippanni",
-      "input" : "一般に",
-      "tags" : [
+      "id": "noun_ni_ippanni",
+      "input": "一般に",
+      "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "description" : "次第に (gradually)",
-      "expected" : [
+      "description": "次第に (gradually)",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "次第に"
+          "pos": "Adverb",
+          "surface": "次第に"
         }
       ],
-      "id" : "noun_ni_shidaini",
-      "input" : "次第に",
-      "tags" : [
+      "id": "noun_ni_shidaini",
+      "input": "次第に",
+      "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "description" : "一気に (at once)",
-      "expected" : [
+      "description": "一気に (at once)",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "一気に"
+          "pos": "Adverb",
+          "surface": "一気に"
         }
       ],
-      "id" : "noun_ni_ikkini",
-      "input" : "一気に",
-      "tags" : [
+      "id": "noun_ni_ikkini",
+      "input": "一気に",
+      "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "description" : "一斉に (all at once)",
-      "expected" : [
+      "description": "一斉に (all at once)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "一斉"
+          "pos": "Noun",
+          "surface": "一斉"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
-      "id" : "noun_ni_isseini",
-      "input" : "一斉に",
-      "tags" : [
+      "id": "noun_ni_isseini",
+      "input": "一斉に",
+      "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "description" : "故意に (intentionally)",
-      "expected" : [
+      "description": "故意に (intentionally)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "故意"
+          "pos": "Noun",
+          "surface": "故意"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
-      "id" : "noun_ni_koini",
-      "input" : "故意に",
-      "tags" : [
+      "id": "noun_ni_koini",
+      "input": "故意に",
+      "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "description" : "無意識に (unconsciously)",
-      "expected" : [
+      "description": "無意識に (unconsciously)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "無意識"
+          "pos": "Noun",
+          "surface": "無意識"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
-      "id" : "noun_ni_muishikini",
-      "input" : "無意識に",
-      "tags" : [
+      "id": "noun_ni_muishikini",
+      "input": "無意識に",
+      "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "description" : "Quotation particle と with godan verb",
-      "expected" : [
+      "description": "Quotation particle と with godan verb",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "行く"
+          "pos": "Verb",
+          "surface": "行く"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "lemma" : "言う",
-          "pos" : "Verb",
-          "surface" : "言っ"
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "quotation_to_iku",
-      "input" : "行くと言った",
-      "tags" : [
+      "id": "quotation_to_iku",
+      "input": "行くと言った",
+      "tags": [
         "particle",
         "quotation"
       ]
     },
     {
-      "description" : "Quotation particle と with ichidan verb",
-      "expected" : [
+      "description": "Quotation particle と with ichidan verb",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "食べる"
+          "pos": "Verb",
+          "surface": "食べる"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "pos" : "Verb",
-          "surface" : "思う"
+          "pos": "Verb",
+          "surface": "思う"
         }
       ],
-      "id" : "quotation_to_taberu",
-      "input" : "食べると思う",
-      "tags" : [
+      "id": "quotation_to_taberu",
+      "input": "食べると思う",
+      "tags": [
         "particle",
         "quotation"
       ]
     },
     {
-      "description" : "Conditional particle と",
-      "expected" : [
+      "description": "Conditional particle と",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "春"
+          "pos": "Noun",
+          "surface": "春"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Verb",
-          "surface" : "なる"
+          "pos": "Verb",
+          "surface": "なる"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "pos" : "Verb",
-          "surface" : "咲く"
+          "pos": "Verb",
+          "surface": "咲く"
         }
       ],
-      "id" : "conditional_to",
-      "input" : "春になると咲く",
-      "tags" : [
+      "id": "conditional_to",
+      "input": "春になると咲く",
+      "tags": [
         "particle",
         "conditional"
       ]
     },
     {
-      "description" : "毎日電車で通勤 - compound nouns with particle",
-      "expected" : [
+      "description": "毎日電車で通勤 - compound nouns with particle",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "毎日"
+          "pos": "Noun",
+          "surface": "毎日"
         },
         {
-          "pos" : "Noun",
-          "surface" : "電車"
+          "pos": "Noun",
+          "surface": "電車"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "通勤"
+          "pos": "Noun",
+          "surface": "通勤"
         }
       ],
-      "id" : "compound_split_with_particle",
-      "input" : "毎日電車で通勤",
-      "tags" : [
+      "id": "compound_split_with_particle",
+      "input": "毎日電車で通勤",
+      "tags": [
         "compound_split"
       ]
     },
     {
-      "description" : "Famous tongue twister すもももももももものうち",
-      "expected" : [
+      "description": "Famous tongue twister すもももももももものうち",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "すもも"
+          "pos": "Noun",
+          "surface": "すもも"
         },
         {
-          "pos" : "Particle",
-          "surface" : "も"
+          "pos": "Particle",
+          "surface": "も"
         },
         {
-          "pos" : "Noun",
-          "surface" : "もも"
+          "pos": "Noun",
+          "surface": "もも"
         },
         {
-          "pos" : "Particle",
-          "surface" : "も"
+          "pos": "Particle",
+          "surface": "も"
         },
         {
-          "pos" : "Noun",
-          "surface" : "もも"
+          "pos": "Noun",
+          "surface": "もも"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "うち"
+          "pos": "Noun",
+          "surface": "うち"
         }
       ],
-      "id" : "sumomo_momo",
-      "input" : "すもももももももものうち",
-      "tags" : [
+      "id": "sumomo_momo",
+      "input": "すもももももももものうち",
+      "tags": [
         "famous"
       ]
     },
     {
-      "description" : "ちなみに should be Conjunction, not ちなむ verb",
-      "expected" : [
+      "description": "ちなみに should be Conjunction, not ちなむ verb",
+      "expected": [
         {
-          "pos" : "Conjunction",
-          "surface" : "ちなみに"
+          "pos": "Conjunction",
+          "surface": "ちなみに"
         },
         {
-          "pos" : "Noun",
-          "surface" : "今日"
+          "pos": "Noun",
+          "surface": "今日"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "晴れ"
+          "pos": "Noun",
+          "surface": "晴れ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "conjunction_chinamini",
-      "input" : "ちなみに今日は晴れです",
-      "tags" : [
+      "id": "conjunction_chinamini",
+      "input": "ちなみに今日は晴れです",
+      "tags": [
         "conjunction"
       ]
     },
     {
-      "description" : "堂々と - iteration mark + particle",
-      "expected" : [
+      "description": "堂々と - iteration mark + particle",
+      "expected": [
         {
-          "lemma" : "堂々",
-          "pos" : "Adverb",
-          "surface" : "堂々と"
+          "lemma": "堂々",
+          "pos": "Adverb",
+          "surface": "堂々と"
         }
       ],
-      "id" : "iteration_mark_doudou",
-      "input" : "堂々と",
-      "tags" : [
+      "id": "iteration_mark_doudou",
+      "input": "堂々と",
+      "tags": [
         "unicode",
         "odoriji"
       ]
     },
     {
-      "description" : "刻々と - iteration mark + particle",
-      "expected" : [
+      "description": "刻々と - iteration mark + particle",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "刻々"
+          "pos": "Noun",
+          "surface": "刻々"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         }
       ],
-      "id" : "iteration_mark_kokkoku",
-      "input" : "刻々と",
-      "tags" : [
+      "id": "iteration_mark_kokkoku",
+      "input": "刻々と",
+      "tags": [
         "unicode",
         "odoriji"
       ]
     },
     {
-      "description" : "を should be recognized as separate particle",
-      "expected" : [
+      "description": "を should be recognized as separate particle",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "なくす",
-          "pos" : "Verb",
-          "surface" : "なくし"
+          "lemma": "なくす",
+          "pos": "Verb",
+          "surface": "なくし"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "wo_particle_separation",
-      "input" : "本をなくした",
-      "tags" : [
+      "id": "wo_particle_separation",
+      "input": "本をなくした",
+      "tags": [
         "particle",
         "wo"
       ]
     },
     {
-      "description" : "を should not be merged with verb, なくして is unified te-form",
-      "expected" : [
+      "description": "を should not be merged with verb, なくして is unified te-form",
+      "expected": [
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "なくす",
-          "pos" : "Verb",
-          "surface" : "なくし"
+          "lemma": "なくす",
+          "pos": "Verb",
+          "surface": "なくし"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "wo_not_merged_with_verb",
-      "input" : "をなくして",
-      "tags" : [
+      "id": "wo_not_merged_with_verb",
+      "input": "をなくして",
+      "tags": [
         "particle",
         "wo"
       ]
     },
     {
-      "description" : "を should be separate particle; しまった should be auxiliary しまう",
-      "expected" : [
+      "description": "を should be separate particle; しまった should be auxiliary しまう",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "昨日"
+          "pos": "Noun",
+          "surface": "昨日"
         },
         {
-          "lemma" : "買う",
-          "pos" : "Verb",
-          "surface" : "買っ"
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ばかり"
+          "pos": "Particle",
+          "surface": "ばかり"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "なくす",
-          "pos" : "Verb",
-          "surface" : "なくし"
+          "lemma": "なくす",
+          "pos": "Verb",
+          "surface": "なくし"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "しまう",
-          "pos" : "Auxiliary",
-          "surface" : "しまっ"
+          "lemma": "しまう",
+          "pos": "Auxiliary",
+          "surface": "しまっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "wo_in_complex_sentence",
-      "input" : "昨日買ったばかりの本をなくしてしまった",
-      "tags" : [
+      "id": "wo_in_complex_sentence",
+      "input": "昨日買ったばかりの本をなくしてしまった",
+      "tags": [
         "particle",
         "wo",
         "complex",
@@ -1003,226 +970,226 @@
       ]
     },
     {
-      "description" : "ので lemma should be ので, not のる",
-      "expected" : [
+      "description": "ので lemma should be ので, not のる",
+      "expected": [
         {
-          "lemma" : "ので",
-          "pos" : "Particle",
-          "surface" : "ので"
+          "lemma": "ので",
+          "pos": "Particle",
+          "surface": "ので"
         }
       ],
-      "id" : "node_lemma",
-      "input" : "ので",
-      "tags" : [
+      "id": "node_lemma",
+      "input": "ので",
+      "tags": [
         "particle",
         "node"
       ]
     },
     {
-      "description" : "金がない should be split as 金 + が + ない",
-      "expected" : [
+      "description": "金がない should be split as 金 + が + ない",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "金"
+          "pos": "Noun",
+          "surface": "金"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "ない"
+          "pos": "Adjective",
+          "surface": "ない"
         }
       ],
-      "id" : "particle_filter_kane_ga_nai",
-      "input" : "金がない",
-      "tags" : [
+      "id": "particle_filter_kane_ga_nai",
+      "input": "金がない",
+      "tags": [
         "particle",
         "filter"
       ]
     },
     {
-      "description" : "くらい should be particle (degree), not 暗い adjective",
-      "expected" : [
+      "description": "くらい should be particle (degree), not 暗い adjective",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "これ"
+          "pos": "Pronoun",
+          "surface": "これ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "くらい"
+          "pos": "Particle",
+          "surface": "くらい"
         }
       ],
-      "id" : "kurai_degree_particle",
-      "input" : "これくらい",
-      "tags" : [
+      "id": "kurai_degree_particle",
+      "input": "これくらい",
+      "tags": [
         "particle",
         "kurai"
       ]
     },
     {
-      "description" : "ぐらい (voiced form of くらい) degree particle",
-      "expected" : [
+      "description": "ぐらい (voiced form of くらい) degree particle",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "これ"
+          "pos": "Pronoun",
+          "surface": "これ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ぐらい"
+          "pos": "Particle",
+          "surface": "ぐらい"
         }
       ],
-      "id" : "gurai_degree_particle",
-      "input" : "これぐらい",
-      "tags" : [
+      "id": "gurai_degree_particle",
+      "input": "これぐらい",
+      "tags": [
         "particle",
         "gurai"
       ]
     },
     {
-      "description" : "なんて belittling/surprise particle",
-      "expected" : [
+      "description": "なんて belittling/surprise particle",
+      "expected": [
         {
-          "pos" : "Particle",
-          "surface" : "なんて"
+          "pos": "Particle",
+          "surface": "なんて"
         },
         {
-          "pos" : "Verb",
-          "surface" : "言う"
+          "pos": "Verb",
+          "surface": "言う"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         }
       ],
-      "id" : "nante_belittling_particle",
-      "input" : "なんて言うの",
-      "tags" : [
+      "id": "nante_belittling_particle",
+      "input": "なんて言うの",
+      "tags": [
         "particle",
         "nante"
       ]
     },
     {
-      "description" : "ってば emphatic final particle",
-      "expected" : [
+      "description": "ってば emphatic final particle",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "もう"
+          "pos": "Adverb",
+          "surface": "もう"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ってば"
+          "pos": "Particle",
+          "surface": "ってば"
         }
       ],
-      "id" : "tteba_emphatic_particle",
-      "input" : "もうってば",
-      "tags" : [
+      "id": "tteba_emphatic_particle",
+      "input": "もうってば",
+      "tags": [
         "particle",
         "tteba"
       ]
     },
     {
-      "description" : "ったら topic/exclamation particle",
-      "expected" : [
+      "description": "ったら topic/exclamation particle",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "あなた"
+          "pos": "Pronoun",
+          "surface": "あなた"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ったら"
+          "pos": "Particle",
+          "surface": "ったら"
         }
       ],
-      "id" : "ttara_topic_particle",
-      "input" : "あなたったら",
-      "tags" : [
+      "id": "ttara_topic_particle",
+      "input": "あなたったら",
+      "tags": [
         "particle",
         "ttara"
       ]
     },
     {
-      "expected" : [
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         }
       ],
-      "id" : "noun_particle",
-      "input" : "本を",
-      "tags" : [
+      "id": "noun_particle",
+      "input": "本を",
+      "tags": [
         "basic",
         "particle"
       ]
     },
     {
-      "description" : "Conjunctive particle し after i-adjective",
-      "expected" : [
+      "description": "Conjunctive particle し after i-adjective",
+      "expected": [
         {
-          "lemma" : "上手い",
-          "pos" : "Adjective",
-          "surface" : "上手い"
+          "lemma": "上手い",
+          "pos": "Adjective",
+          "surface": "上手い"
         },
         {
-          "pos" : "Particle",
-          "surface" : "し"
+          "pos": "Particle",
+          "surface": "し"
         }
       ],
-      "id" : "particle_shi_iadj",
-      "input" : "上手いし",
-      "tags" : [
+      "id": "particle_shi_iadj",
+      "input": "上手いし",
+      "tags": [
         "slang",
         "particle",
         "shi"
       ]
     },
     {
-      "description" : "Conjunctive particle し after katakana adjective",
-      "expected" : [
+      "description": "Conjunctive particle し after katakana adjective",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "エモい"
+          "pos": "Adjective",
+          "surface": "エモい"
         },
         {
-          "pos" : "Particle",
-          "surface" : "し"
+          "pos": "Particle",
+          "surface": "し"
         }
       ],
-      "id" : "particle_shi_katakana_adj",
-      "input" : "エモいし",
-      "tags" : [
+      "id": "particle_shi_katakana_adj",
+      "input": "エモいし",
+      "tags": [
         "slang",
         "particle",
         "shi"
       ]
     },
     {
-      "description" : "Conjunctive particle し in casual phrase",
-      "expected" : [
+      "description": "Conjunctive particle し in casual phrase",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "エモい"
+          "pos": "Adjective",
+          "surface": "エモい"
         },
         {
-          "pos" : "Particle",
-          "surface" : "し"
+          "pos": "Particle",
+          "surface": "し"
         },
         {
-          "lemma" : "バズる",
-          "pos" : "Verb",
-          "surface" : "バズっ"
+          "lemma": "バズる",
+          "pos": "Verb",
+          "surface": "バズっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "てる"
+          "pos": "Auxiliary",
+          "surface": "てる"
         }
       ],
-      "id" : "particle_shi_phrase",
-      "input" : "エモいしバズってる",
-      "tags" : [
+      "id": "particle_shi_phrase",
+      "input": "エモいしバズってる",
+      "tags": [
         "slang",
         "particle",
         "shi",
@@ -1230,58 +1197,58 @@
       ]
     },
     {
-      "description" : "いかがでしょうか should contain いかが as single token",
-      "expected" : [
+      "description": "いかがでしょうか should contain いかが as single token",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "いかが"
+          "pos": "Adjective",
+          "surface": "いかが"
         },
         {
-          "lemma" : "です",
-          "pos" : "Auxiliary",
-          "surface" : "でしょ"
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "う"
+          "pos": "Auxiliary",
+          "surface": "う"
         },
         {
-          "pos" : "Particle",
-          "surface" : "か"
+          "pos": "Particle",
+          "surface": "か"
         }
       ],
-      "id" : "ikaga_deshouka",
-      "input" : "いかがでしょうか",
-      "tags" : [
+      "id": "ikaga_deshouka",
+      "input": "いかがでしょうか",
+      "tags": [
         "strict",
         "business"
       ]
     },
     {
-      "description" : "100円 - MeCab splits number + counter suffix",
-      "expected" : [
+      "description": "100円 - MeCab splits number + counter suffix",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "100円"
+          "pos": "Noun",
+          "surface": "100円"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "商品"
+          "pos": "Noun",
+          "surface": "商品"
         }
       ],
-      "id" : "number_counter_100yen",
-      "input" : "100円の商品",
-      "tags" : [
+      "id": "number_counter_100yen",
+      "input": "100円の商品",
+      "tags": [
         "strict",
         "number",
         "counter"
       ]
     }
   ],
-  "description" : "Binding and adverbial particles (は、も、だけ)",
-  "version" : "1.0"
+  "description": "Binding and adverbial particles (は、も、だけ)",
+  "version": "1.0"
 }

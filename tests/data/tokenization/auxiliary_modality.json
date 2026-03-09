@@ -46,40 +46,8 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "kuruwa kotoba: ãã adjective vs adverb classification"
-      },
       "description": "そうでありんす - MeCab-compatible split: そう + で + あり + ん + す",
       "expected": [
-        {
-          "pos": "Adverb",
-          "surface": "そう"
-        },
-        {
-          "lemma": "だ",
-          "pos": "Auxiliary",
-          "surface": "で"
-        },
-        {
-          "lemma": "ある",
-          "pos": "Auxiliary",
-          "surface": "あり"
-        },
-        {
-          "lemma": "の",
-          "pos": "Particle",
-          "surface": "ん"
-        },
-        {
-          "lemma": "する",
-          "pos": "Verb",
-          "surface": "す"
-        }
-      ],
-      "id": "kuruwa_dearinsu",
-      "input": "そうでありんす",
-      "suzume_expected": [
         {
           "pos": "Adjective",
           "surface": "そう"
@@ -91,12 +59,11 @@
         },
         {
           "lemma": "ある",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "あり"
         },
         {
-          "lemma": "の",
-          "pos": "Particle",
+          "pos": "Auxiliary",
           "surface": "ん"
         },
         {
@@ -105,6 +72,8 @@
           "surface": "す"
         }
       ],
+      "id": "kuruwa_dearinsu",
+      "input": "そうでありんす",
       "tags": [
         "character_speech",
         "kuruwa"

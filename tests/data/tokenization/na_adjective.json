@@ -1,0 +1,61 @@
+{
+  "cases": [
+    {
+      "description": "Regression: 気の毒 na-adjective dict entry",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "少し"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "気の毒"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思っ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shiha_no_to_ttta",
+      "input": "少しは気の毒と思った"
+    },
+    {
+      "description": "Regression: 遥か na-adjective dict entry",
+      "expected": [
+        {
+          "pos": "Adjective",
+          "surface": "遥か"
+        },
+        {
+          "pos": "Noun",
+          "surface": "向う"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "田圃"
+        }
+      ],
+      "id": "ka_uno",
+      "input": "遥か向うの田圃"
+    }
+  ],
+  "description": "na_adjective tests",
+  "version": "1.0"
+}

@@ -958,12 +958,13 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kAlmostNever;
   }
 
-  // Penalty for topic particle → short pure-hiragana verb pattern
+  // Penalty for は (topic) → short pure-hiragana verb pattern
   // E.g., は+し in はしがかかる should be はし (noun), not は+し (topic + する連用形)
-  // The ParticleTopic→VerbRenyokei bonus helps はありますか but hurts はし
-  // Single-char verbs after topic particle are usually mis-segmentations
+  // Only applies to は — other topic particles (も, こそ) naturally precede し
+  // (何もしない, 誰もしない are common patterns)
   // Exception: い (renyokei of いる) - valid in ずにはいられない pattern
   if (prev.extended_pos == core::ExtendedPOS::ParticleTopic &&
+      prev.surface == "は" &&
       next.pos == core::PartOfSpeech::Verb &&
       grammar::isPureHiragana(next.surface) &&
       next.surface.size() <= 3 &&  // 1 char only (3 bytes in UTF-8)
@@ -1556,6 +1557,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // "ので" is a conjunction particle in L1 dictionary and should be 1 token
   // But "のだ" → の|だ is correct (の+copula だ for emphasis)
   // Only penalize when next.surface == "で" to preserve の|だ split
+  // Note: のである is handled by で→ある bonus below
   if (prev.extended_pos == core::ExtendedPOS::ParticleNo &&
       prev.surface == "の" &&
       next.surface == "で") {
@@ -1671,6 +1673,19 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
       next.surface == "で") {
     surface_bonus += cost::kRare;  // 1.0: must exceed kModerateBonus (-0.5)
+  }
+
+  // Bonus for で(AuxCopulaDa) → ある/あっ/あろ (formal copula pattern)
+  // のである, ではある, であった are standard literary/formal expressions
+  // AuxCopulaDa→VerbShuushikei has kMinor penalty (0.5) which blocks this
+  // Also, の→で has kVeryRare penalty (1.8) which blocks のである
+  // Total needed: overcome 0.5 (bigram) + 1.8 (の→で) = 2.3 penalty
+  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+      prev.surface == "で" &&
+      next.pos == core::PartOfSpeech::Verb &&
+      (next.surface == "ある" || next.surface == "あっ" ||
+       next.surface == "あろ" || next.surface == "あり")) {
+    surface_bonus += cost::kVeryStrongBonus * 2;  // -3.2 to overcome penalties
   }
 
   // Penalty for で(VERB_連用 of 出る) → ない(AUX_否定): copula でない is more common
@@ -1844,9 +1859,11 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Penalty for single-kana verb renyokei after adverb
   // Single-kana renyokei (で=出る, し=する) are ambiguous with copula/particles.
   // After adverbs, copula/particle interpretation dominates (それほどで+も+ない)
+  // Exception: dict verbs (し=する) are valid after onomatopoeia ADV (じめじめ+し+た)
   if (prev.pos == core::PartOfSpeech::Adverb &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      next.surface.size() <= 3) {  // Single kana (3 bytes)
+      next.surface.size() <= 3 &&  // Single kana (3 bytes)
+      !core::hasFlag(next.flags, core::EdgeFlags::FromDictionary)) {
     surface_bonus += cost::kVeryRare;
   }
 

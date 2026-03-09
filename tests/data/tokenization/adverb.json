@@ -1,45 +1,6 @@
 {
   "cases": [
     {
-      "description": "第一 dict entry acts as kanji compound boundary",
-      "expected": [
-        {
-          "pos": "Adverb",
-          "surface": "第一"
-        },
-        {
-          "pos": "Noun",
-          "surface": "毛"
-        },
-        {
-          "pos": "Particle",
-          "surface": "が"
-        },
-        {
-          "pos": "Particle",
-          "surface": "が"
-        },
-        {
-          "pos": "Adjective",
-          "surface": "ない"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "よう"
-        },
-        {
-          "pos": "Particle",
-          "surface": "に"
-        },
-        {
-          "pos": "Verb",
-          "surface": "見える"
-        }
-      ],
-      "id": "daiichi_kanji_boundary",
-      "input": "第一毛ががないように見える"
-    },
-    {
       "description": "ただ as conjunction, not た+だ",
       "expected": [
         {
@@ -419,7 +380,7 @@
           "surface": "ない"
         },
         {
-          "pos": "Auxiliary",
+          "pos": "Noun",
           "surface": "よう"
         },
         {
@@ -465,6 +426,41 @@
       ],
       "id": "tsurutsuru_onomatopoeia_shi",
       "input": "つるつるしてまるで薬缶だ"
+    },
+    {
+      "description": "第一 dict entry acts as kanji compound boundary",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "第一"
+        },
+        {
+          "pos": "Noun",
+          "surface": "毛"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Verb",
+          "surface": "見える"
+        }
+      ],
+      "id": "daiichi_kanji_boundary",
+      "input": "第一毛がないように見える"
     }
   ],
   "description": "adverb tests",

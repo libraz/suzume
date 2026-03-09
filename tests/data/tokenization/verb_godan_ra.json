@@ -569,10 +569,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "ãªããã°: conditional auxiliary classification"
-      },
       "description": "走らなければならない - verb+ない conditional, not adjective",
       "expected": [
         {
@@ -591,7 +587,7 @@
         },
         {
           "lemma": "なる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "なら"
         },
         {
@@ -601,41 +597,12 @@
       ],
       "id": "verb_nai_conditional_hashiranakereba",
       "input": "走らなければならない",
-      "suzume_expected": [
-        {
-          "lemma": "走る",
-          "pos": "Verb",
-          "surface": "走ら"
-        },
-        {
-          "lemma": "ない",
-          "pos": "Verb",
-          "surface": "なけれ"
-        },
-        {
-          "pos": "Particle",
-          "surface": "ば"
-        },
-        {
-          "lemma": "なる",
-          "pos": "Verb",
-          "surface": "なら"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "ない"
-        }
-      ],
       "tags": [
         "verb",
         "conditional"
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "ãªããã°: conditional auxiliary classification"
-      },
       "description": "見なければ - verb negative conditional",
       "expected": [
         {
@@ -655,22 +622,6 @@
       ],
       "id": "verb_neg_cond_minakereba",
       "input": "見なければ",
-      "suzume_expected": [
-        {
-          "lemma": "見る",
-          "pos": "Verb",
-          "surface": "見"
-        },
-        {
-          "lemma": "ない",
-          "pos": "Verb",
-          "surface": "なけれ"
-        },
-        {
-          "pos": "Particle",
-          "surface": "ば"
-        }
-      ],
       "tags": [
         "verb",
         "conditional"

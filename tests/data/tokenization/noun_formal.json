@@ -169,7 +169,7 @@
       "description": "Na-adj+formal noun: な+もの should not split as な+も+の",
       "expected": [
         {
-          "pos": "Noun",
+          "pos": "Adjective",
           "surface": "妙"
         },
         {

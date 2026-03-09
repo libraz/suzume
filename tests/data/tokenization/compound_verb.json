@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "description": "Regression: verb rentaikei + 所 should not merge into compound noun",
+      "expected": [
+        {
+          "pos": "Verb",
+          "surface": "見渡せる"
+        },
+        {
+          "pos": "Noun",
+          "surface": "所"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Verb",
+          "surface": "座る"
+        }
+      ],
+      "id": "seru_ni_ru",
+      "input": "見渡せる所に座る"
+    }
+  ],
+  "description": "compound_verb tests",
+  "version": "1.0"
+}
