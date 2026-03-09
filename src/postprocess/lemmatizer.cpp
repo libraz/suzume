@@ -448,25 +448,29 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
     }
   }
 
-  // Get all candidates
-  auto candidates = inflection_.analyze(surface);
+  // Get all candidates (const reference to cached result)
+  const auto& all_candidates = inflection_.analyze(surface);
 
-  if (candidates.empty()) {
+  if (all_candidates.empty()) {
     return std::string(surface);
   }
+
+  // Apply POS/conjugation filters into a local copy only when needed
+  // Otherwise use the cached reference directly to avoid copying
+  std::vector<grammar::InflectionCandidate> filtered_storage;
+  const std::vector<grammar::InflectionCandidate>* candidates = &all_candidates;
 
   // Filter candidates by POS if specified
   // For Adjective POS, only accept IAdjective verb_type
   // This prevents 美味しそう (ADJ) from getting lemma 美味する (Suru verb)
   if (pos == core::PartOfSpeech::Adjective) {
-    std::vector<grammar::InflectionCandidate> filtered;
-    for (const auto& c : candidates) {
-      if (c.verb_type == grammar::VerbType::IAdjective) {
-        filtered.push_back(c);
+    for (const auto& cnd : *candidates) {
+      if (cnd.verb_type == grammar::VerbType::IAdjective) {
+        filtered_storage.push_back(cnd);
       }
     }
-    if (!filtered.empty()) {
-      candidates = std::move(filtered);
+    if (!filtered_storage.empty()) {
+      candidates = &filtered_storage;
     }
   }
 
@@ -474,14 +478,15 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
   // This helps when verb_candidates.cpp has determined the correct verb type
   // e.g., for 話しそう with conj_type=GodanSa, prefer 話す (GodanSa) over 話しい (IAdjective)
   if (conj_type != dictionary::ConjugationType::None) {
-    std::vector<grammar::InflectionCandidate> filtered;
-    for (const auto& c : candidates) {
-      if (grammar::verbTypeToConjType(c.verb_type) == conj_type) {
-        filtered.push_back(c);
+    std::vector<grammar::InflectionCandidate> conj_filtered;
+    for (const auto& cnd : *candidates) {
+      if (grammar::verbTypeToConjType(cnd.verb_type) == conj_type) {
+        conj_filtered.push_back(cnd);
       }
     }
-    if (!filtered.empty()) {
-      candidates = std::move(filtered);
+    if (!conj_filtered.empty()) {
+      filtered_storage = std::move(conj_filtered);
+      candidates = &filtered_storage;
     }
   }
 
@@ -490,7 +495,7 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
   // Dictionary verification compensates for confidence penalties from heuristics
   // (e.g., all-kanji i-adjective stems like 面白 get penalized but are valid)
   if (dict_manager_ != nullptr) {
-    for (const auto& candidate : candidates) {
+    for (const auto& candidate : *candidates) {
       if (candidate.confidence > 0.3F && verifyCandidateWithDictionary(candidate)) {
         return candidate.base_form;
       }
@@ -499,7 +504,7 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
 
   // Fall back to the best candidate if no dictionary match found
   // Use >= 0.5F threshold since inflection_scorer caps minimum at 0.5F
-  const auto& best = candidates.front();
+  const auto& best = candidates->front();
   if (!best.base_form.empty() && best.confidence >= 0.5F) {
     return best.base_form;
   }

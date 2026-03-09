@@ -503,7 +503,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       // Get adjective confidence for kanji + しい
       std::string adj_form = kanji_stem + "しい";
       float adj_confidence = 0.0F;
-      auto adj_results = inflection.analyze(adj_form);
+      const auto& adj_results = inflection.analyze(adj_form);
       for (const auto& result : adj_results) {
         if (result.verb_type == grammar::VerbType::IAdjective &&
             result.confidence > adj_confidence) {
@@ -514,7 +514,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
       // Get verb confidence for kanji + す
       std::string verb_form = kanji_stem + "す";
       float verb_confidence = 0.0F;
-      auto verb_results = inflection.analyze(verb_form);
+      const auto& verb_results = inflection.analyze(verb_form);
       for (const auto& result : verb_results) {
         if (result.verb_type == grammar::VerbType::GodanSa &&
             result.confidence > verb_confidence) {
@@ -610,7 +610,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // This handles cases like 美味しそう where Suru (美味する) may have higher
     // confidence than IAdjective (美味しい), but we still want to generate
     // an adjective candidate for the lattice to choose from
-    auto all_candidates = inflection.analyze(surface);
+    const auto& all_candidates = inflection.analyze(surface);
 
     for (const auto& cand : all_candidates) {
       // Require confidence >= 0.5 for i-adjectives
@@ -1090,7 +1090,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         continue;  // Skip - likely negative auxiliary, not adjective
       }
 
-      auto test_candidates = inflection.analyze(test_surface);
+      const auto& test_candidates = inflection.analyze(test_surface);
       for (const auto& cand : test_candidates) {
         if (cand.verb_type == grammar::VerbType::IAdjective &&
             cand.confidence >= 0.50F) {
@@ -1202,7 +1202,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
 
     // Check all candidates for IAdjective, not just the best one
     // This handles cases where Suru interpretation may have higher confidence
-    auto all_candidates = inflection.analyze(analysis_surface);
+    const auto& all_candidates = inflection.analyze(analysis_surface);
     for (const auto& cand : all_candidates) {
       // For hiragana-only adjectives, require higher confidence (0.55) than
       // kanji+hiragana adjectives (0.50) to avoid false positives like しそう → しい
@@ -1472,7 +1472,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
       std::string base_form = stem + "い";  // e.g., おいし → おいしい
 
       // Validate that this forms a valid i-adjective
-      auto adj_results = inflection.analyze(base_form);
+      const auto& adj_results = inflection.analyze(base_form);
       bool is_valid_adjective = false;
       float adj_confidence = 0.0F;
       for (const auto& result : adj_results) {
@@ -1496,7 +1496,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
 
       // Check verb confidence from inflection analyzer
       float verb_confidence = 0.0F;
-      auto verb_results = inflection.analyze(verb_form);
+      const auto& verb_results = inflection.analyze(verb_form);
       for (const auto& result : verb_results) {
         if ((result.verb_type == grammar::VerbType::GodanSa ||
              result.verb_type == grammar::VerbType::Suru) &&
@@ -1605,7 +1605,7 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
     }
 
     // Check all candidates for IAdjective
-    auto all_candidates = inflection.analyze(surface);
+    const auto& all_candidates = inflection.analyze(surface);
     for (const auto& cand : all_candidates) {
       // Require confidence >= 0.5 for i-adjectives
       if (cand.confidence >= 0.5F &&
@@ -1911,7 +1911,7 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       // Use lower threshold (0.35) for garu-connection patterns because:
       // - Single-kanji adjectives like 高い get lower confidence (0.42)
       // - The presence of すぎる/がる/さ strongly indicates adjective interpretation
-      auto adj_results = inflection.analyze(base_form);
+      const auto& adj_results = inflection.analyze(base_form);
       bool is_valid_adjective = false;
       float adj_confidence = 0.0F;
       for (const auto& result : adj_results) {
@@ -2059,7 +2059,7 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       std::string base_form = stem + "い";  // e.g., 難し → 難しい
 
       // Validate that this looks like a real adjective
-      auto adj_results = inflection.analyze(base_form);
+      const auto& adj_results = inflection.analyze(base_form);
       bool is_valid_adjective = false;
       float adj_confidence = 0.0F;
       for (const auto& result : adj_results) {
@@ -2083,7 +2083,7 @@ std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
       // The verb form would be: kanji_stem + す (e.g., 話 + す = 話す)
       std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
       std::string verb_form = kanji_stem + "す";  // e.g., 話す (not 話しす)
-      auto verb_results = inflection.analyze(verb_form);
+      const auto& verb_results = inflection.analyze(verb_form);
       float verb_confidence = 0.0F;
       for (const auto& result : verb_results) {
         if ((result.verb_type == grammar::VerbType::GodanSa ||

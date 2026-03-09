@@ -130,4 +130,16 @@ const std::vector<VerbEnding>& getVerbEndings() {
   return kEndings;
 }
 
+const std::unordered_map<uint16_t, std::vector<VerbEnding>>&
+getVerbEndingsByConn() {
+  static const auto kGrouped = []() {
+    std::unordered_map<uint16_t, std::vector<VerbEnding>> grouped;
+    for (const auto& ending : getVerbEndings()) {
+      grouped[ending.provides_conn].push_back(ending);
+    }
+    return grouped;
+  }();
+  return kGrouped;
+}
+
 }  // namespace suzume::grammar

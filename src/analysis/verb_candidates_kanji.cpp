@@ -262,7 +262,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               extractSubstring(codepoints, start_pos, kanji_end + 1);
 
           // Verify via inflection analysis of base form
-          auto results = inflection.analyze(base_form);
+          const auto& results = inflection.analyze(base_form);
           bool is_valid = false;
           for (const auto& cand : results) {
             if (cand.verb_type == verb_type && cand.confidence >= 0.4F) {
@@ -321,7 +321,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string base_form = kanji_stem + "す";
         std::string surface = kanji_stem + "しゃ";
 
-        auto sa_results = inflection.analyze(base_form);
+        const auto& sa_results = inflection.analyze(base_form);
         bool is_valid_godan_sa = false;
         for (const auto& cand : sa_results) {
           if (cand.verb_type == grammar::VerbType::GodanSa &&
@@ -370,7 +370,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             // Analyze mizenkei+ない form (standard negative) for better confidence
             // Base form alone (e.g., 躊躇う) may not be recognized
             std::string neg_form = surface + "ない";
-            auto infl_results = inflection.analyze(neg_form);
+            const auto& infl_results = inflection.analyze(neg_form);
             for (const auto& cand : infl_results) {
               if (cand.base_form == base_form && cand.verb_type == verb_type &&
                   cand.confidence >= 0.3F) {
@@ -553,7 +553,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // Get all inflection candidates, not just the best one
       // This handles cases where the best candidate has wrong stem but a lower-ranked
       // candidate has the correct stem (e.g., 見なければ where 見なける wins over 見る)
-      auto inflection_results = inflection.analyze(surface);
+      const auto& inflection_results = inflection.analyze(surface);
       std::string expected_stem = extractSubstring(codepoints, start_pos, stem_end);
 
       // Find a candidate with matching stem and sufficient confidence
@@ -606,10 +606,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // For っ-onbin patterns (GodanRa/Ta/Wa/Ka), use type-aware lookup to avoid
           // mismatches like 経る(GodanRa) matching 経る(Ichidan) when 経つ(GodanTa) is correct.
           // For other patterns (Suru verbs, Ichidan, etc.), use simple lookup.
-          bool is_onbin_type = (cand.verb_type == grammar::VerbType::GodanRa ||
-                                cand.verb_type == grammar::VerbType::GodanTa ||
-                                cand.verb_type == grammar::VerbType::GodanWa ||
-                                cand.verb_type == grammar::VerbType::GodanKa);
+          bool is_onbin_type = vh::isSokuonbinGodanType(cand.verb_type);
           bool in_dict = is_onbin_type
                              ? vh::isVerbInDictionaryWithType(dict_manager, cand.base_form,
                                                           cand.verb_type)
@@ -684,15 +681,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // E.g., "伝えいた" falsely matches as GodanKa "伝えく" but 伝える is ichidan
           // Exception: GodanRa (passive/causative) with "られ" suffix is valid
           // E.g., "定められた" has stem "定め" (ichidan) + passive suffix
-          bool is_godan = (best.verb_type == grammar::VerbType::GodanKa ||
-                           best.verb_type == grammar::VerbType::GodanGa ||
-                           best.verb_type == grammar::VerbType::GodanSa ||
-                           best.verb_type == grammar::VerbType::GodanTa ||
-                           best.verb_type == grammar::VerbType::GodanNa ||
-                           best.verb_type == grammar::VerbType::GodanBa ||
-                           best.verb_type == grammar::VerbType::GodanMa ||
-                           best.verb_type == grammar::VerbType::GodanRa ||
-                           best.verb_type == grammar::VerbType::GodanWa);
+          bool is_godan = vh::isGodanVerbType(best.verb_type);
           if (is_godan && stem_end > kanji_end && stem_end <= codepoints.size()) {
             // Check if the last character of the stem is e-row hiragana
             char32_t last_char = codepoints[stem_end - 1];
@@ -1139,7 +1128,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
         // Get all inflection candidates, not just the best
         // This is important for ambiguous cases like 入れ (godan 入る imperative vs ichidan 入れる renyoukei)
-        auto all_cands = inflection.analyze(surface);
+        const auto& all_cands = inflection.analyze(surface);
         // Find the best Ichidan, Suru, and Godan candidates
         grammar::InflectionCandidate ichidan_cand;
         grammar::InflectionCandidate suru_cand;
@@ -1230,7 +1219,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (codepoints[renyokei_end - 1] != U'し') continue;
 
       std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
-      auto all_cands = inflection.analyze(surface);
+      const auto& all_cands = inflection.analyze(surface);
 
       // Find best godan-sa candidate
       grammar::InflectionCandidate best_sa;
@@ -1305,7 +1294,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string base_form = renyokei_surface + "る";  // 食べ + る = 食べる
 
         // Verify using inflection analysis on the kateikei form
-        auto all_candidates = inflection.analyze(surface);
+        const auto& all_candidates = inflection.analyze(surface);
         float ichidan_confidence = vh::getIchidanConfidence(all_candidates, 0.3F);
 
         if (ichidan_confidence >= 0.3F) {
@@ -1380,7 +1369,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           }
 
           // Verify using inflection analysis
-          auto all_candidates = inflection.analyze(renyokei_surface + "よう");
+          const auto& all_candidates = inflection.analyze(renyokei_surface + "よう");
           float min_confidence = could_be_adjective ? 0.5F : 0.3F;
           float ichidan_confidence = vh::getIchidanConfidence(all_candidates, min_confidence);
 
@@ -1441,7 +1430,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string causative_base = surface + "る";
 
         // Verify this is a valid ichidan verb
-        auto all_candidates = inflection.analyze(causative_base);
+        const auto& all_candidates = inflection.analyze(causative_base);
         float ichidan_confidence = vh::getIchidanConfidence(all_candidates);
 
         if (ichidan_confidence >= 0.4F) {
@@ -1500,7 +1489,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // Use analyze() to get all interpretations, not just the best one
       // The best overall interpretation might be Godan (言う + れる), but
       // there should also be an Ichidan interpretation (言われる as verb)
-      auto all_candidates = inflection.analyze(passive_base);
+      const auto& all_candidates = inflection.analyze(passive_base);
       float ichidan_confidence = vh::getIchidanConfidence(all_candidates);
 
       // Passive verbs are Ichidan conjugation (言われる conjugates like 食べる)
@@ -1595,7 +1584,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         // Check if inflection analyzer recognizes this as Ichidan verb
         // Use >= threshold to include edge cases like 信じる (conf=0.3)
         // Check ALL candidates, not just best, because godan/ichidan may have same confidence
-        auto all_cands = inflection.analyze(base_form);
+        const auto& all_cands = inflection.analyze(base_form);
         for (const auto& cand : all_cands) {
           if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence >= 0.3F) {
             is_valid_verb = true;
@@ -2083,7 +2072,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         // Phase 2: Inflection analysis fallback
         if (matched_verb_type == grammar::VerbType::Unknown && kanji_end > start_pos) {
           std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
-          auto infl_results = inflection.analyze(full_surface);
+          const auto& infl_results = inflection.analyze(full_surface);
           float best_conf = 0.0F;
           for (const auto& result : infl_results) {
             if (result.confidence >= 0.5F && result.confidence > best_conf) {
@@ -2363,7 +2352,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // Longer patterns like となっ may be noun+particle+verb (一丸+と+なる)
       bool infl_verified = false;
       if (!in_dict && hiragana_before_onbin == 1) {
-        auto infl_results = inflection.analyze(onbin_surface + "た");
+        const auto& infl_results = inflection.analyze(onbin_surface + "た");
         for (const auto& result : infl_results) {
           if (result.verb_type == grammar::VerbType::GodanRa &&
               result.base_form == potential_base &&
@@ -2440,7 +2429,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                            vh::isVerbInDictionary(dict_manager, potential_base);
       bool infl_verified = false;
       if (!in_dict_check && hiragana_before_onbin == 1) {
-        auto infl_results = inflection.analyze(onbin_surface + "た");
+        const auto& infl_results = inflection.analyze(onbin_surface + "た");
         for (const auto& result : infl_results) {
           if (result.verb_type == grammar::VerbType::GodanRa &&
               result.base_form == potential_base &&
@@ -2510,7 +2499,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         // Phase 2: Inflection analysis fallback
         if (matched_verb_type == grammar::VerbType::Unknown) {
           std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
-          auto infl_results = inflection.analyze(full_surface);
+          const auto& infl_results = inflection.analyze(full_surface);
           float best_conf = 0.0F;
           for (const auto& result : infl_results) {
             if (result.confidence >= 0.5F && result.confidence > best_conf) {

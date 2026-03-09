@@ -15,6 +15,24 @@
 
 namespace suzume::grammar {
 
+namespace {
+
+// Check if auxiliary starts with voiced te-form (で/だ)
+inline bool isVoicedAux(std::string_view aux) {
+  return utf8::equalsAny(aux, {"で", "だ"}) ||
+         utf8::startsWith(aux, "で") ||
+         utf8::startsWith(aux, "だ");
+}
+
+// Check if auxiliary starts with unvoiced te-form (て/た)
+inline bool isUnvoicedAux(std::string_view aux) {
+  return utf8::equalsAny(aux, {"て", "た"}) ||
+         utf8::startsWith(aux, "て") ||
+         utf8::startsWith(aux, "た");
+}
+
+}  // namespace
+
 std::vector<std::pair<const AuxiliaryEntry*, size_t>>
 Inflection::matchAuxiliaries(std::string_view surface) const {
   std::vector<std::pair<const AuxiliaryEntry*, size_t>> matches;
@@ -44,14 +62,14 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
     uint16_t required_conn) const {
   std::vector<InflectionCandidate> candidates;
   candidates.reserve(16);  // Typical max candidates
-  const auto& endings = getVerbEndings();
+  const auto& endings_by_conn = getVerbEndingsByConn();
+  auto iter = endings_by_conn.find(required_conn);
+  if (iter == endings_by_conn.end()) {
+    return candidates;
+  }
+  const auto& endings = iter->second;
 
   for (const auto& ending : endings) {
-    // Check if connection is valid
-    if (ending.provides_conn != required_conn) {
-      continue;
-    }
-
     // Check if remaining ends with this verb ending
     if (remaining.size() < ending.suffix.size()) {
       continue;
@@ -124,12 +142,8 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // When analyzing with te-form auxiliary, check voicing compatibility
       if (ending.suffix == "い" && ending.is_onbin && !aux_chain.empty()) {
         const std::string& first_aux = aux_chain.back();  // First matched aux
-        bool is_voiced_aux = (utf8::equalsAny(first_aux, {"で", "だ"}) ||
-                              utf8::startsWith(first_aux, "で") ||
-                              utf8::startsWith(first_aux, "だ"));
-        bool is_unvoiced_aux = (utf8::equalsAny(first_aux, {"て", "た"}) ||
-                                utf8::startsWith(first_aux, "て") ||
-                                utf8::startsWith(first_aux, "た"));
+        bool is_voiced_aux = isVoicedAux(first_aux);
+        bool is_unvoiced_aux = isUnvoicedAux(first_aux);
         if (is_unvoiced_aux && ending.verb_type == VerbType::GodanGa) {
           continue;  // GodanGa requires voiced aux (で/だ), skip unvoiced
         }
@@ -145,10 +159,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // Pattern: 食べだ is INVALID, 食べた is correct
       if (ending.verb_type == VerbType::Ichidan && !aux_chain.empty()) {
         const std::string& first_aux = aux_chain.back();  // First matched aux
-        bool is_voiced_aux = (utf8::equalsAny(first_aux, {"で", "だ"}) ||
-                              utf8::startsWith(first_aux, "で") ||
-                              utf8::startsWith(first_aux, "だ"));
-        if (is_voiced_aux) {
+        if (isVoicedAux(first_aux)) {
           continue;  // Ichidan requires unvoiced aux (て/た), skip voiced で/だ
         }
       }
@@ -327,7 +338,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
                         << " suffix=\"" << suffix_str
                         << "\" conf=" << candidate.confidence << "\n");
 
-      candidates.push_back(candidate);
+      candidates.push_back(std::move(candidate));
     }
   }
 
@@ -336,7 +347,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
 
 std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(
     std::string_view surface,
-    const std::vector<std::string>& aux_chain,
+    std::vector<std::string>& aux_chain,
     uint16_t required_conn) const {
   std::vector<InflectionCandidate> candidates;
   candidates.reserve(32);  // Typical max candidates
@@ -350,16 +361,17 @@ std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(
       continue;
     }
 
-    // Recursively analyze remaining
+    // Recursively analyze remaining (push/pop to avoid copying aux_chain)
     std::string_view remaining = surface.substr(0, surface.size() - len);
-    std::vector<std::string> new_chain = aux_chain;
-    new_chain.push_back(aux->surface);
+    aux_chain.push_back(aux->surface);
 
     auto sub_candidates = analyzeWithAuxiliaries(
-        remaining, new_chain, aux->required_conn);
+        remaining, aux_chain, aux->required_conn);
     for (auto& cand : sub_candidates) {
       candidates.push_back(std::move(cand));
     }
+
+    aux_chain.pop_back();
   }
 
   // Also try to match verb stem directly
@@ -371,7 +383,7 @@ std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(
   return candidates;
 }
 
-std::vector<InflectionCandidate> Inflection::analyze(
+const std::vector<InflectionCandidate>& Inflection::analyze(
     std::string_view surface) const {
   // Check cache first (shared lock for reading)
   std::string key(surface);
@@ -394,8 +406,8 @@ std::vector<InflectionCandidate> Inflection::analyze(
   // A conjugated verb needs at least stem + ending
   if (surface.size() < core::kTwoJapaneseCharBytes) {  // 2 Japanese chars = 6 bytes in UTF-8
     std::unique_lock<std::shared_mutex> write_lock(cache_mutex_);
-    cache_[key] = candidates;
-    return candidates;
+    auto [iter, inserted] = cache_.emplace(std::move(key), std::move(candidates));
+    return iter->second;
   }
 
   // First, try to match auxiliaries from the end
@@ -489,11 +501,11 @@ std::vector<InflectionCandidate> Inflection::analyze(
   }
 
   // Cache the result (exclusive lock for writing)
-  {
-    std::unique_lock<std::shared_mutex> write_lock(cache_mutex_);
-    cache_[key] = candidates;
-  }
-  return candidates;
+  // Return reference to cached entry — safe because unordered_map references
+  // are not invalidated by subsequent inserts.
+  std::unique_lock<std::shared_mutex> write_lock(cache_mutex_);
+  auto [iter, inserted] = cache_.emplace(std::move(key), std::move(candidates));
+  return iter->second;
 }
 
 bool Inflection::looksConjugated(std::string_view surface) const {
@@ -524,7 +536,7 @@ InflectionCandidate Inflection::getBest(std::string_view surface) const {
   }
 
   // Not in cache, do full analysis
-  auto candidates = analyze(surface);
+  const auto& candidates = analyze(surface);
   if (candidates.empty()) {
     return {};
   }

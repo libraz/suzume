@@ -7,6 +7,7 @@
 #define SUZUME_GRAMMAR_VERB_ENDINGS_H_
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "conjugation.h"
@@ -42,6 +43,14 @@ struct VerbEnding {
  * Total: 100+ patterns covering all major conjugation forms
  */
 const std::vector<VerbEnding>& getVerbEndings();
+
+/**
+ * @brief Get verb endings grouped by provides_conn value for efficient lookup
+ * @return Reference to static map from connection ID to matching verb endings
+ *
+ * Avoids scanning all ~120 endings when only a specific connection type is needed.
+ */
+const std::unordered_map<uint16_t, std::vector<VerbEnding>>& getVerbEndingsByConn();
 
 }  // namespace suzume::grammar
 

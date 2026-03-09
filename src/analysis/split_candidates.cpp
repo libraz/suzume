@@ -371,7 +371,7 @@ void addNounVerbSplitCandidates(
 
       // Check if the verb part looks like a conjugated verb
       bool looks_like_verb = false;
-      auto candidates = inflection.analyze(verb_part);
+      const auto& candidates = inflection.analyze(verb_part);
       for (const auto& cand : candidates) {
         if (cand.confidence > 0.5F) {
           looks_like_verb = true;

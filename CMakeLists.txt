@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0077 NEW)
 
+# Default to Release build if not specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
 # Read version from package.json (single source of truth)
 file(READ "${CMAKE_SOURCE_DIR}/package.json" PACKAGE_JSON)
 string(REGEX MATCH "\"version\": *\"([0-9]+\\.[0-9]+\\.[0-9]+)\"" _ "${PACKAGE_JSON}")

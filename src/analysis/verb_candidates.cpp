@@ -109,7 +109,7 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
     }
 
     // Use inflection analyzer to get potential base forms
-    auto inflection_candidates = inflection.analyze(surface);
+    const auto& inflection_candidates = inflection.analyze(surface);
 
     for (const auto& infl_cand : inflection_candidates) {
       if (infl_cand.confidence < verb_opts.confidence_low) {
@@ -254,7 +254,7 @@ std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
     // e.g., ハメた → inflection says Suru but た is not する conjugation → use ichidan instead
     if (best.verb_type == grammar::VerbType::Suru) {
       // Suru inflection was incorrectly matched; try next best candidate
-      auto all_results = inflection.analyze(surface);
+      const auto& all_results = inflection.analyze(surface);
       best.confidence = 0.0F;
       for (const auto& cand : all_results) {
         if (cand.verb_type != grammar::VerbType::Suru &&

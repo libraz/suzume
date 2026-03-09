@@ -264,7 +264,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
 
     // Check if this looks like a conjugated verb
     // First try the best match, but also check all candidates for dictionary verbs
-    auto all_candidates = inflection.analyze(surface);
+    const auto& all_candidates = inflection.analyze(surface);
     grammar::InflectionCandidate best;
     bool is_dictionary_verb = false;
 
@@ -538,7 +538,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
       if (len_check >= 5 && normalize::isCommonParticle(first_char)) {
         // Extract remainder (surface without first character)
         std::string remainder = surface.substr(core::kJapaneseCharBytes);
-        auto remainder_cands = inflection.analyze(remainder);
+        const auto& remainder_cands = inflection.analyze(remainder);
         for (const auto& rem_cand : remainder_cands) {
           if (rem_cand.verb_type != grammar::VerbType::IAdjective &&
               rem_cand.verb_type != grammar::VerbType::Unknown &&
@@ -911,7 +911,7 @@ next_length:;  // Label for goto from particle-starting verb skip
     // These may not always be in the L2 dictionary but are valid
     if (!is_valid_ichidan) {
       // Check if inflection analysis recognizes base_form as ichidan
-      auto analysis = inflection.analyze(base_form);
+      const auto& analysis = inflection.analyze(base_form);
       if (!analysis.empty() && analysis[0].verb_type == grammar::VerbType::Ichidan &&
           analysis[0].confidence >= 0.5F) {
         is_valid_ichidan = true;
@@ -1087,7 +1087,7 @@ next_length:;  // Label for goto from particle-starting verb skip
 
     // Validate: analyze the full form (including ない) to check if it's a valid verb
     std::string full_form = mizenkei_surface + "ない";
-    auto analysis = inflection.analyze(full_form);
+    const auto& analysis = inflection.analyze(full_form);
     bool is_valid_verb = false;
     for (const auto& cand : analysis) {
       if (cand.verb_type == verb_type && cand.base_form == base_form) {
@@ -1156,7 +1156,7 @@ next_length:;  // Label for goto from particle-starting verb skip
 
     // Validate: check if the standard form (stem + らない) is a valid verb
     std::string standard_form = stem + "らない";
-    auto analysis = inflection.analyze(standard_form);
+    const auto& analysis = inflection.analyze(standard_form);
     bool is_valid_verb = false;
     for (const auto& cand : analysis) {
       if (cand.verb_type == grammar::VerbType::GodanRa && cand.base_form == base_form) {
@@ -1300,7 +1300,7 @@ next_length:;  // Label for goto from particle-starting verb skip
         // Construct full form: onbin + tense suffix (e.g., かった, やった)
         std::string_view tense_char = (next_char == U'た' || next_char == U'だ') ? "た" : "て";
         std::string full_form = stem + (is_sokuonbin ? "っ" : "ん") + std::string(tense_char);
-        auto analysis = inflection.analyze(full_form);
+        const auto& analysis = inflection.analyze(full_form);
         for (const auto& cand : analysis) {
           // Lower threshold (0.25) for short stems like かっ, やっ
           // since godan_single_hiragana_stem penalty reduces confidence
@@ -1452,7 +1452,7 @@ next_length:;  // Label for goto from particle-starting verb skip
     }
 
     // Use inflection analysis to validate - check if stem is recognized as ichidan
-    auto stem_analysis = inflection.analyze(stem_surface);
+    const auto& stem_analysis = inflection.analyze(stem_surface);
     bool found_ichidan = false;
     float ichidan_confidence = 0.0F;
     for (const auto& cand : stem_analysis) {
@@ -1613,7 +1613,7 @@ next_length:;  // Label for goto from particle-starting verb skip
         // Only for stems of 1-2 characters (e.g., や, やる → やっ)
         if (!found_dict_match && stem.size() <= 6) {  // 2 chars * 3 bytes max
           std::string full_surface = extractSubstring(codepoints, start_pos, hira_extent_end);
-          auto infl_results = inflection.analyze(full_surface);
+          const auto& infl_results = inflection.analyze(full_surface);
           for (const auto& result : infl_results) {
             if (result.confidence >= 0.5F) {
               for (const auto& [verb_type, base_suffix] : sokuonbin_types) {

@@ -97,6 +97,10 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"入る", "いる", "る", V2VerbType::Godan},            // 飛び入る, 立ち入る
 };
 
+// Sokuonbin-compatible godan verb endings (く, つ, う, る)
+// Used to try all possible base forms when analyzing っ-onbin compound verbs
+const char32_t kSokuonbinEndings[] = {U'く', U'つ', U'う', U'る'};
+
 // Generate renyokei surface from base form
 // Godan: replace ending with i-row (込む→込み, 返す→返し)
 // Ichidan: drop る (続ける→続け)
@@ -543,7 +547,7 @@ void addCompoundVerbJoinCandidates(
           // Use analyze() to get all candidates, not just the best one.
           // This is needed because for ambiguous stems (e.g., かった could be
           // from かる, かつ, or かう), we need to find the one matching our V2.
-          auto infl_results = inflection.analyze(v2_text);
+          const auto& infl_results = inflection.analyze(v2_text);
           std::string expected_base = std::string(v2_reading);
 
           for (const auto& infl_result : infl_results) {
@@ -605,7 +609,7 @@ void addCompoundVerbJoinCandidates(
                     std::string v2_text(text.substr(v2_start_byte, v2_end_byte - v2_start_byte));
 
                     // Use analyze() to search all candidates for matching base form
-                    auto infl_results = inflection.analyze(v2_text);
+                    const auto& infl_results = inflection.analyze(v2_text);
                     for (const auto& infl_result : infl_results) {
                       // Check if base form matches V2 surface (kanji form)
                       // Require the suffix to contain actual auxiliary patterns
@@ -689,7 +693,6 @@ void addCompoundVerbJoinCandidates(
     bool v1_verified = false;
     if (is_sokuonbin) {
       // Try all sokuonbin-compatible godan endings
-      static const char32_t kSokuonbinEndings[] = {U'く', U'つ', U'う', U'る'};
       for (char32_t ending : kSokuonbinEndings) {
         std::string candidate = v1_base + normalize::utf8::encode({ending});
         auto v1_results = dict_manager.lookup(candidate, 0);
@@ -732,7 +735,6 @@ void addCompoundVerbJoinCandidates(
       if (is_sokuonbin && kanji_count == 1) {
         v1_verified = true;
         // Try to determine V1 base form for compound lemma
-        static const char32_t kSokuonbinEndings[] = {U'く', U'つ', U'う', U'る'};
         for (char32_t ending : kSokuonbinEndings) {
           std::string candidate = v1_base + normalize::utf8::encode({ending});
           auto v1_results = dict_manager.lookup(candidate, 0);
@@ -805,7 +807,6 @@ void addCompoundVerbJoinCandidates(
             // For sokuonbin, v1_base is just the kanji stem (e.g., 引).
             // Inflection analysis of っ-form (e.g., 引っ) gives base_form
             // like 引く. Accept if it matches any sokuonbin candidate.
-            static const char32_t kSokuonbinEndings[] = {U'く', U'つ', U'う', U'る'};
             for (char32_t ending : kSokuonbinEndings) {
               std::string candidate = v1_base + normalize::utf8::encode({ending});
               if (infl_result.base_form == candidate) {

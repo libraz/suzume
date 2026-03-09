@@ -54,7 +54,7 @@ class Inflection {
    * @param surface Surface form: 住んでいます
    * @return Candidates with possible base forms
    */
-  std::vector<InflectionCandidate> analyze(std::string_view surface) const;
+  const std::vector<InflectionCandidate>& analyze(std::string_view surface) const;
 
   /**
    * @brief Check if surface looks like a conjugated form
@@ -71,10 +71,10 @@ class Inflection {
   std::vector<std::pair<const AuxiliaryEntry*, size_t>>
   matchAuxiliaries(std::string_view surface) const;
 
-  // Analyze by peeling off auxiliaries from right
+  // Analyze by peeling off auxiliaries from right (aux_chain mutated via push/pop)
   std::vector<InflectionCandidate> analyzeWithAuxiliaries(
       std::string_view surface,
-      const std::vector<std::string>& aux_chain,
+      std::vector<std::string>& aux_chain,
       uint16_t required_conn) const;
 
   // Try to match verb stem after removing auxiliaries

@@ -159,6 +159,13 @@ bool isCompoundAdjectivePattern(std::string_view surface);
 bool isGodanVerbType(grammar::VerbType verb_type);
 
 /**
+ * @brief Check if verb type uses sokuonbin (っ音便)
+ * @param verb_type The verb type to check
+ * @return true if GodanRa, GodanTa, GodanWa, or GodanKa
+ */
+bool isSokuonbinGodanType(grammar::VerbType verb_type);
+
+/**
  * @brief Get Godan VerbTypes that use a specific onbin pattern
  *
  * Onbin patterns:
