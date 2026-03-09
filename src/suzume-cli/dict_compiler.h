@@ -2,12 +2,25 @@
 #define SUZUME_CLI_DICT_COMPILER_H_
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "core/error.h"
 #include "tsv_parser.h"
 
 namespace suzume::cli {
+
+/**
+ * @brief Check if a dictionary entry surface is "trivial"
+ *
+ * An entry is trivial if it has 3+ codepoints, contains no spaces, and
+ * all meaningful characters (ignoring Symbol/Unknown) share the same
+ * CharType. Such entries can be filtered to reduce dictionary bloat.
+ *
+ * @param surface UTF-8 encoded surface string
+ * @return true if the entry is trivial and can be filtered out
+ */
+bool isTrivialEntry(std::string_view surface);
 
 /**
  * @brief Dictionary compiler (TSV to binary)
@@ -63,10 +76,21 @@ class DictCompiler {
    */
   void setVerbose(bool verbose) { verbose_ = verbose; }
 
+  /**
+   * @brief Enable/disable trivial entry filtering
+   *
+   * When enabled, entries are filtered out if they have 3+ codepoints,
+   * contain no spaces, and consist of only one character type (e.g., pure
+   * kanji or pure katakana). Mixed-type entries (kanji+katakana, etc.)
+   * and 2-char entries are always kept.
+   */
+  void setFilterTrivial(bool filter) { filter_trivial_ = filter; }
+
  private:
   size_t entries_compiled_ = 0;
   size_t conj_expanded_ = 0;
   bool verbose_ = false;
+  bool filter_trivial_ = false;
 };
 
 }  // namespace suzume::cli

@@ -2,7 +2,7 @@
 # Convenience wrapper for CMake build system
 
 .PHONY: help build test clean rebuild format format-check configure \
-        wasm wasm-test wasm-clean wasm-rebuild dict
+        wasm wasm-dict wasm-test wasm-clean wasm-rebuild dict
 
 # Build directories
 BUILD_DIR := build
@@ -28,7 +28,8 @@ help:
 	@echo "  make configure    - Configure CMake"
 	@echo ""
 	@echo "WASM targets (debug info disabled for smaller binary):"
-	@echo "  make wasm         - Build WASM module"
+	@echo "  make wasm         - Build WASM module (includes wasm-dict)"
+	@echo "  make wasm-dict    - Build dictionaries for WASM (--filter-trivial)"
 	@echo "  make wasm-test    - Run WASM tests"
 	@echo "  make wasm-clean   - Clean WASM build"
 	@echo "  make wasm-rebuild - Clean and rebuild WASM"
@@ -97,9 +98,22 @@ wasm-configure:
 	@echo "Configuring WASM build..."
 	emcmake cmake -B $(WASM_BUILD_DIR) -DBUILD_WASM=ON -DENABLE_DEBUG_INFO=OFF -DCMAKE_BUILD_TYPE=Release
 
+# Build WASM dictionaries using native CLI with --filter-trivial
+wasm-dict:
+	@if [ ! -f $(BUILD_DIR)/bin/suzume-cli ]; then \
+		echo "Native CLI not found. Run 'make build' first."; \
+		exit 1; \
+	fi
+	@echo "Building dictionaries for WASM (--filter-trivial)..."
+	$(BUILD_DIR)/bin/suzume-cli dict compile data/core/*.tsv data/core.dic
+	$(BUILD_DIR)/bin/suzume-cli dict compile --filter-trivial data/user/*.tsv data/user.dic
+	@echo "[WASM] user.dic built with --filter-trivial (trivial entries removed to reduce binary size)"
+
 # Build WASM module
-wasm: wasm-configure
+wasm: wasm-dict wasm-configure
 	@echo "Building WASM module..."
+	@# Force re-link so updated embedded dictionaries are picked up
+	@rm -f $(WASM_BUILD_DIR)/bin/suzume-wasm.wasm $(WASM_BUILD_DIR)/bin/suzume-wasm.js
 	cmake --build $(WASM_BUILD_DIR) --parallel
 	@echo "WASM build complete!"
 	@ls -lh dist/suzume-wasm.wasm dist/suzume.js

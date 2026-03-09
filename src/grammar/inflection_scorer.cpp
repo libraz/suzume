@@ -842,7 +842,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
         if (utf8::equalsAny(prev,
             {"べ", "め", "せ", "け", "て", "ね", "れ", "え", "げ", "ぜ", "で", "ぺ",
              "み", "き", "し", "ち", "に", "ひ", "り", "い", "ぎ", "じ", "ぢ", "び", "ぴ",
-             "か", "が", "さ", "ざ", "た", "だ", "な", "ば", "ぱ", "ま", "ら", "わ", "あ", "は"})) {
+             "か", "が", "さ", "ざ", "た", "だ", "な", "ば", "ぱ", "ま", "ら", "わ", "あ", "は",
+             "っ"})) {
           base -= inflection::kPenaltyIAdjMizenkeiPattern;
           logConfidenceAdjustment(-inflection::kPenaltyIAdjMizenkeiPattern, "i_adj_mizenkei_pattern");
         }

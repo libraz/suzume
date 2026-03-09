@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstring>
 #include <fstream>
+#include <unordered_map>
 
 #include "analysis/category_cost.h"
 #include "core/debug.h"
@@ -142,7 +143,6 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
     entry.surface = std::string(string_pool + rec.surface_offset,
                                 rec.surface_length);
     entry.pos = uint8ToPos(rec.pos);
-    // v0.8: cost removed - now derived from ExtendedPOS
 
     if (rec.lemma_length > 0) {
       entry.lemma = std::string(string_pool + rec.lemma_offset,
@@ -151,8 +151,6 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
       entry.lemma = entry.surface;
     }
 
-    // v0.8: flags and conj_type removed from DictionaryEntry
-    // Determine extended_pos from flags for backwards compatibility
     if ((rec.flags & kFlagFormalNoun) != 0) {
       entry.extended_pos = core::ExtendedPOS::NounFormal;
     } else if ((rec.flags & kFlagInterjection) != 0) {
@@ -362,37 +360,40 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
               return lhs.surface < rhs.surface;
             });
 
-  // Build string pool
+  // Build string pool with deduplication
   std::vector<char> string_pool;
+  std::unordered_map<std::string, uint32_t> string_offsets;  // dedup map
   std::vector<BinaryDictEntry> binary_entries;
   binary_entries.reserve(entries_.size());
+
+  // Helper: add string to pool, dedup identical strings
+  auto addString = [&](const std::string& str) -> uint32_t {
+    auto it = string_offsets.find(str);
+    if (it != string_offsets.end()) {
+      return it->second;
+    }
+    uint32_t offset = static_cast<uint32_t>(string_pool.size());
+    string_pool.insert(string_pool.end(), str.begin(), str.end());
+    string_offsets[str] = offset;
+    return offset;
+  };
 
   for (const auto& ent : entries_) {
     BinaryDictEntry rec{};
 
-    // Add surface to string pool
-    rec.surface_offset = static_cast<uint32_t>(string_pool.size());
-    rec.surface_length = static_cast<uint16_t>(ent.surface.size());
-    string_pool.insert(string_pool.end(),
-                       ent.surface.begin(), ent.surface.end());
+    rec.surface_offset = addString(ent.surface);
+    rec.surface_length = static_cast<uint8_t>(ent.surface.size());
 
-    // Add lemma if different from surface
     if (!ent.lemma.empty() && ent.lemma != ent.surface) {
-      rec.lemma_offset = static_cast<uint32_t>(string_pool.size());
-      rec.lemma_length = static_cast<uint16_t>(ent.lemma.size());
-      string_pool.insert(string_pool.end(),
-                         ent.lemma.begin(), ent.lemma.end());
+      rec.lemma_offset = addString(ent.lemma);
+      rec.lemma_length = static_cast<uint8_t>(ent.lemma.size());
     } else {
       rec.lemma_offset = 0;
       rec.lemma_length = 0;
     }
 
     rec.pos = posToUint8(ent.pos);
-    // v0.8: conj_type, cost, flags removed from DictionaryEntry
-    rec.conj_type = 0;  // Unused, kept for binary format compatibility
-    rec.cost = 0;       // Unused, kept for binary format compatibility
 
-    // Set flags based on extended_pos
     uint8_t flags = 0;
     if (ent.extended_pos == core::ExtendedPOS::NounFormal) {
       flags |= kFlagFormalNoun;

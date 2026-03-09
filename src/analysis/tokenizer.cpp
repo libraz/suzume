@@ -494,6 +494,53 @@ void Tokenizer::addUnknownCandidates(
         if (all_kanji) {
           skip_dict_penalty = true;
           skip_dict_reason = "all_kanji_compound";
+
+          // When a dictionary entry exists as a proper prefix of this compound,
+          // add a moderate penalty to prefer the dict-split path.
+          // E.g., 第一(dict) + 毛 should beat 第一毛(compound)
+          // Only when the prefix covers a significant portion (>= half)
+          // to avoid splitting 自然言語処理 at 自然(2/6).
+          for (const auto& result : dict_results) {
+            if (result.entry != nullptr && result.length >= 2 &&
+                result.length < len && result.length * 2 >= len &&
+                result.entry->pos != core::PartOfSpeech::Noun) {
+              constexpr float kDictPrefixPenalty = 1.5F;
+              adjusted_cost += kDictPrefixPenalty;
+              SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface
+                  << "\" (NOUN): +" << kDictPrefixPenalty
+                  << " (kanji_compound_dict_prefix, dict=\""
+                  << result.entry->surface << "\")\n");
+              break;
+            }
+          }
+
+          // When a non-NOUN dict entry from a prior position overlaps with
+          // this compound's first character, penalize the compound.
+          // E.g., その後(dict ADV, pos=0, len=3) overlaps with 後猫(pos=2)
+          // → penalize 後猫 to prefer その後+猫 split.
+          constexpr size_t kMaxLookback = 4;
+          bool found_overlap = false;
+          for (size_t back = 1;
+               back <= kMaxLookback && back <= start_pos && !found_overlap;
+               ++back) {
+            size_t prev_pos = start_pos - back;
+            size_t prev_byte = charPosToBytePos(codepoints, prev_pos);
+            auto prev_results = dict_manager_.lookup(text, prev_byte);
+            for (const auto& result : prev_results) {
+              if (result.entry != nullptr && result.length >= 2 &&
+                  result.length > back &&
+                  result.entry->pos != core::PartOfSpeech::Noun) {
+                constexpr float kDictOverlapPenalty = 1.5F;
+                adjusted_cost += kDictOverlapPenalty;
+                SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface
+                    << "\" (NOUN): +" << kDictOverlapPenalty
+                    << " (kanji_compound_dict_overlap, dict=\""
+                    << result.entry->surface << "\")\n");
+                found_overlap = true;
+                break;
+              }
+            }
+          }
         }
       }
     }
@@ -526,6 +573,28 @@ void Tokenizer::addUnknownCandidates(
       }
     }
 
+    // Check for single-kanji stem + hiragana verb (e.g., 残って, 通る, 飛ぶ)
+    // Single-kanji verb stems are common in Japanese (残る, 立つ, 打つ, etc.)
+    // These should not be penalized for exceeding dict length
+    bool is_kanji_stem_verb = false;
+    if (candidate.pos == core::PartOfSpeech::Verb &&
+        candidate.end - candidate.start >= 2 &&
+        candidate.start < char_types.size() &&
+        char_types[candidate.start] == normalize::CharType::Kanji) {
+      // Check: first char is kanji, rest are hiragana
+      bool rest_hiragana = true;
+      for (size_t idx = candidate.start + 1;
+           idx < candidate.end && idx < char_types.size(); ++idx) {
+        if (char_types[idx] != normalize::CharType::Hiragana) {
+          rest_hiragana = false;
+          break;
+        }
+      }
+      if (rest_hiragana) {
+        is_kanji_stem_verb = true;
+      }
+    }
+
     bool exceeds_dict = (max_dict_length > 0 &&
                          candidate.end - candidate.start > max_dict_length);
     if (exceeds_dict) {
@@ -549,6 +618,10 @@ void Tokenizer::addUnknownCandidates(
         SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" ("
                           << core::posToString(candidate.pos) << "): "
                           << "skip exceeds_dict_length (pure_hiragana_verb)\n");
+      } else if (is_kanji_stem_verb) {
+        SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" ("
+                          << core::posToString(candidate.pos) << "): "
+                          << "skip exceeds_dict_length (kanji_stem_verb)\n");
       } else {
         float penalty = reduced_penalty ? 1.0F : 3.5F;
         adjusted_cost += penalty;

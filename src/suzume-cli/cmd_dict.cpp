@@ -258,17 +258,36 @@ std::vector<std::string> expandGlobs(const std::vector<std::string>& paths) {
 int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
   if (args.empty()) {
     printError(
-        "Usage: suzume-cli dict compile <input.tsv>... <output.dic>\n"
-        "       suzume-cli dict compile <input.tsv>  (output: input.dic)");
+        "Usage: suzume-cli dict compile [--filter-trivial] <input.tsv>... "
+        "<output.dic>\n"
+        "       suzume-cli dict compile [--filter-trivial] <input.tsv>  "
+        "(output: input.dic)");
+    return 1;
+  }
+
+  // Extract --filter-trivial flag from args
+  bool filter_trivial = false;
+  std::vector<std::string> file_args;
+  for (const auto& arg : args) {
+    if (arg == "--filter-trivial") {
+      filter_trivial = true;
+    } else {
+      file_args.push_back(arg);
+    }
+  }
+
+  if (file_args.empty()) {
+    printError("No input files specified");
     return 1;
   }
 
   DictCompiler compiler;
   compiler.setVerbose(verbose);
+  compiler.setFilterTrivial(filter_trivial);
 
   // Single file mode: dict compile foo.tsv -> foo.dic
-  if (args.size() == 1) {
-    const std::string& tsv_path = args[0];
+  if (file_args.size() == 1) {
+    const std::string& tsv_path = file_args[0];
     std::string dic_path;
     if (tsv_path.size() >= 4 &&
         tsv_path.substr(tsv_path.size() - 4) == ".tsv") {
@@ -311,13 +330,13 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
   }
 
   // Multi-file mode: last arg is output .dic, rest are input .tsv files
-  const std::string& dic_path = args.back();
+  const std::string& dic_path = file_args.back();
   if (dic_path.size() < 4 || dic_path.substr(dic_path.size() - 4) != ".dic") {
     printError("Output file must have .dic extension: " + dic_path);
     return 1;
   }
 
-  std::vector<std::string> raw_paths(args.begin(), args.end() - 1);
+  std::vector<std::string> raw_paths(file_args.begin(), file_args.end() - 1);
   auto tsv_paths = expandGlobs(raw_paths);
 
   auto result = compiler.compileMultiple(tsv_paths, dic_path);

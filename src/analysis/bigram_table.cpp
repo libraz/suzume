@@ -458,6 +458,11 @@ BigramTable::initTable() {
   setCell(t, EPOS::Determiner, EPOS::NounFormal, kDeterminerNounBonus);
   setCell(t, EPOS::Determiner, EPOS::NounProper, kDeterminerNounBonus);
 
+  // Determiner → ParticleNo (という+の, こんな+の)
+  // 準体助詞の follows determiners naturally (same grammatical slot as nouns)
+  // Use same bonus as DET→NOUN so the の+は split path can compete
+  setCell(t, EPOS::Determiner, EPOS::ParticleNo, kDeterminerNounBonus);
+
   // =========================================================================
   // Noun → Verb (サ変動詞パターン)
   // =========================================================================

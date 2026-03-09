@@ -192,12 +192,24 @@ file(GLOB USER_TSV_FILES "${DICT_DATA_DIR}/user/*.tsv")
 
 # Custom target: build-dict - Compile all TSV dictionaries to core.dic and user.dic
 # Output goes to data/ directory so that tests and CLI can find them via ./data/core.dic
+# WASM builds use --filter-trivial for user dict to reduce binary size
+if(BUILD_WASM)
+  set(USER_DICT_FILTER "--filter-trivial")
+  set(WASM_DICT_ALERT
+    COMMAND ${CMAKE_COMMAND} -E echo "[WASM] user.dic built with --filter-trivial (trivial entries removed to reduce binary size)"
+  )
+else()
+  set(USER_DICT_FILTER "")
+  set(WASM_DICT_ALERT "")
+endif()
+
 add_custom_target(build-dict
   COMMAND ${CMAKE_COMMAND} -E echo "Building dictionaries..."
   COMMAND ${CMAKE_BINARY_DIR}/bin/suzume-cli dict compile
           ${CORE_TSV_FILES} ${DICT_DATA_DIR}/core.dic
   COMMAND ${CMAKE_BINARY_DIR}/bin/suzume-cli dict compile
-          ${USER_TSV_FILES} ${DICT_DATA_DIR}/user.dic
+          ${USER_DICT_FILTER} ${USER_TSV_FILES} ${DICT_DATA_DIR}/user.dic
+  ${WASM_DICT_ALERT}
   COMMAND ${CMAKE_COMMAND} -E echo "Dictionary build complete: ${DICT_DATA_DIR}"
   DEPENDS suzume-cli
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}

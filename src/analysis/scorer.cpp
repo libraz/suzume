@@ -249,6 +249,18 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     }
   }
 
+  // Bonus for longer hiragana nouns from dictionary (ふともも, ひとつ, etc.)
+  // These compete with adverb+noun split paths that get adverb bonus + connection bonus.
+  // E.g., ふともも(NOUN, 0.5) vs ふと(ADV, -0.5) + もも(NOUN, 0.5, conn=-0.5) = -0.5
+  // Without bonus, the split path wins even though the longer dict match is better.
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Noun &&
+      grammar::isPureHiragana(edge.surface)) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    if (char_len >= 4) {
+      cost += -1.5F;
+    }
+  }
+
   // Bonus for hiragana interjections/greetings from dictionary
   // Prevents misanalysis like さようなら → さ+よう+なら (volitional pattern)
   // or ありがとう → あり+が+とう (verb + particle + noun pattern)
@@ -981,6 +993,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       suzume::normalize::utf8Length(next.surface) == 1) {
     surface_bonus += cost::kStrong;
   }
+
 
   // Penalty for case particle → final particle pattern
   // E.g., を+な in をなくした should not split as を+な+くし+た

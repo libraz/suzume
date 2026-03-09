@@ -1,0 +1,472 @@
+{
+  "cases": [
+    {
+      "description": "第一 dict entry acts as kanji compound boundary",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "第一"
+        },
+        {
+          "pos": "Noun",
+          "surface": "毛"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "よう"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Verb",
+          "surface": "見える"
+        }
+      ],
+      "id": "daiichi_kanji_boundary",
+      "input": "第一毛ががないように見える"
+    },
+    {
+      "description": "ただ as conjunction, not た+だ",
+      "expected": [
+        {
+          "pos": "Conjunction",
+          "surface": "ただ"
+        },
+        {
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "掌"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "載せる",
+          "pos": "Verb",
+          "surface": "載せ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tada_conjunction",
+      "input": "ただ彼の掌に載せられた"
+    },
+    {
+      "description": "まるで as adverb, not まる+で",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "まるで"
+        },
+        {
+          "pos": "Noun",
+          "surface": "薬缶"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "marude_adverb",
+      "input": "まるで薬缶だ"
+    },
+    {
+      "description": "何だか as adverb, not 何だ+か",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "何だか"
+        },
+        {
+          "pos": "Adverb",
+          "surface": "フワフワ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Noun",
+          "surface": "感じ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nandaka_adverb",
+      "input": "何だかフワフワした感じがあった"
+    },
+    {
+      "description": "だいぶ as adverb",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "だいぶ"
+        },
+        {
+          "lemma": "逢う",
+          "pos": "Verb",
+          "surface": "逢っ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "daibu_adverb",
+      "input": "だいぶ逢った"
+    },
+    {
+      "description": "もっとも as conjunction, not もっと+も",
+      "expected": [
+        {
+          "pos": "Conjunction",
+          "surface": "もっとも"
+        },
+        {
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "pos": "Noun",
+          "surface": "大分"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Verb",
+          "surface": "なる"
+        }
+      ],
+      "id": "mottomo_conjunction",
+      "input": "もっとも猫の時間で行くと大分になる"
+    },
+    {
+      "description": "ふと as adverb, not ふ+と",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "ふと"
+        },
+        {
+          "pos": "Noun",
+          "surface": "気"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "付く",
+          "pos": "Verb",
+          "surface": "付い"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Verb",
+          "surface": "見る"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "pos": "Noun",
+          "surface": "書生"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "futo_adverb",
+      "input": "ふと気が付いて見ると書生はいない"
+    },
+    {
+      "description": "そうして as conjunction, not そう+し+て",
+      "expected": [
+        {
+          "pos": "Conjunction",
+          "surface": "そうして"
+        },
+        {
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "pos": "Noun",
+          "surface": "穴"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "中"
+        },
+        {
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "pos": "Noun",
+          "surface": "煙"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "pos": "Verb",
+          "surface": "吹く"
+        }
+      ],
+      "id": "soushite_conjunction",
+      "input": "そうしてその穴の中から煙を吹く"
+    },
+    {
+      "description": "その後 dict boundary prevents 後猫 kanji merge",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "その後"
+        },
+        {
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "pos": "Adverb",
+          "surface": "だいぶ"
+        },
+        {
+          "lemma": "逢う",
+          "pos": "Verb",
+          "surface": "逢っ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "sonogo_dict_boundary",
+      "input": "その後猫にもだいぶ逢った"
+    },
+    {
+      "description": "特段 as adverb, dict boundary splits from 問題",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "特段"
+        },
+        {
+          "pos": "Noun",
+          "surface": "問題"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "tokudan_adverb",
+      "input": "特段問題はない"
+    },
+    {
+      "description": "別段 dict boundary prevents 別段恐しい kanji merge",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "別段"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "恐しい"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思わ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "betsudan_dict_boundary",
+      "input": "別段恐しいとも思わなかった"
+    },
+    {
+      "description": "だいいち as adverb, boundary before 毛",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "だいいち"
+        },
+        {
+          "pos": "Noun",
+          "surface": "毛"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "よう"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Verb",
+          "surface": "見える"
+        }
+      ],
+      "id": "daiichi_hiragana_boundary",
+      "input": "だいいち毛がないように見える"
+    },
+    {
+      "description": "つるつる+し split (onomatopoeia + suru)",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "つるつる"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Adverb",
+          "surface": "まるで"
+        },
+        {
+          "pos": "Noun",
+          "surface": "薬缶"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "tsurutsuru_onomatopoeia_shi",
+      "input": "つるつるしてまるで薬缶だ"
+    }
+  ],
+  "description": "adverb tests",
+  "version": "1.0"
+}

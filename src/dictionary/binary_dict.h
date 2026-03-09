@@ -21,7 +21,7 @@ namespace suzume::dictionary {
  */
 struct BinaryDictHeader {
   uint32_t magic;           // "SZMD" (0x444D5A53)
-  uint16_t version_major;   // Major version
+  uint16_t version_major;   // Major version (2 = compact format)
   uint16_t version_minor;   // Minor version
   uint32_t entry_count;     // Number of entries
   uint32_t trie_offset;     // Offset to trie data
@@ -32,24 +32,24 @@ struct BinaryDictHeader {
   uint32_t checksum;        // CRC32 checksum (reserved)
 
   static constexpr uint32_t kMagic = 0x444D5A53;  // "SZMD"
-  static constexpr uint16_t kVersionMajor = 1;
+  static constexpr uint16_t kVersionMajor = 2;
   static constexpr uint16_t kVersionMinor = 0;
 };
 
 /**
- * @brief Binary dictionary entry record (fixed size)
+ * @brief Binary dictionary entry record v2 (compact, 12 bytes)
+ *
+ * Reduced from v1's 20 bytes by removing unused fields (conj_type, cost, reserved).
  */
 struct BinaryDictEntry {
   uint32_t surface_offset;  // Surface offset in string pool
-  uint16_t surface_length;  // Surface length
-  uint8_t pos;              // Part of speech
-  uint8_t conj_type;        // Conjugation type
   uint32_t lemma_offset;    // Lemma offset (0 = same as surface)
-  uint16_t lemma_length;    // Lemma length
-  int16_t cost;             // Cost (×100, integer)
-  uint8_t flags;            // Flags (is_formal_noun, is_low_info, etc.)
-  uint8_t reserved[3];      // Reserved for alignment
+  uint8_t surface_length;   // Surface byte length (max 255)
+  uint8_t lemma_length;     // Lemma byte length (0 = same as surface, max 255)
+  uint8_t pos;              // Part of speech
+  uint8_t flags;            // Flags (formal_noun, interjection, proper_family, proper_given)
 };
+
 
 /**
  * @brief Binary dictionary (read-only, memory-mapped friendly)

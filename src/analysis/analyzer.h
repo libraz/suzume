@@ -107,10 +107,25 @@ class Analyzer {
   core::Viterbi viterbi_;
 
   /**
+   * @brief Analyze a chunk with pretokenization (URL/date/etc. extraction)
+   */
+  std::vector<core::Morpheme> analyzeWithPretokenizer(std::string_view text,
+                                                      size_t char_offset) const;
+
+  /**
    * @brief Analyze a text span (without pretokenization)
+   *
+   * For long text, automatically splits into sentence-level chunks
+   * to keep memory usage bounded (Viterbi scales O(n) with text length).
    */
   std::vector<core::Morpheme> analyzeSpan(std::string_view text,
                                           size_t char_offset) const;
+
+  /**
+   * @brief Analyze a single chunk (no further splitting)
+   */
+  std::vector<core::Morpheme> analyzeChunk(std::string_view text,
+                                           size_t char_offset) const;
 
   /**
    * @brief Convert Viterbi result to morphemes

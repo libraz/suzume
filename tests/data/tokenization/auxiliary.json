@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "description": "であったそうだ should not be parsed as i-adjective",
+      "expected": [
+        {
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Noun",
+          "surface": "事実"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "deattasouda_not_iadj",
+      "input": "それは事実であったそうだ"
+    }
+  ],
+  "description": "auxiliary tests",
+  "version": "1.0"
+}

@@ -8,6 +8,8 @@
 #include "core/utf8_constants.h"
 #include "dictionary/binary_dict.h"
 #include "grammar/conjugation.h"
+#include "normalize/char_type.h"
+#include "normalize/utf8.h"
 
 namespace suzume::cli {
 
@@ -121,6 +123,41 @@ std::vector<dictionary::DictionaryEntry> expandVerb(
 
 }  // namespace
 
+bool isTrivialEntry(std::string_view surface) {
+  using normalize::CharType;
+
+  // Entries containing spaces are always non-trivial (multi-word)
+  if (surface.find(' ') != std::string_view::npos) {
+    return false;
+  }
+
+  auto codepoints = normalize::utf8::decode(surface);
+
+  // 2-char entries are always non-trivial (short words need dict help)
+  if (codepoints.size() <= 2) {
+    return false;
+  }
+
+  // Check if all meaningful chars have the same type
+  CharType primary_type = CharType::Unknown;
+  for (char32_t cpt : codepoints) {
+    auto char_type = normalize::classifyChar(cpt);
+    // Ignore Symbol and Unknown characters for type comparison
+    if (char_type == CharType::Symbol || char_type == CharType::Unknown) {
+      continue;
+    }
+    if (primary_type == CharType::Unknown) {
+      primary_type = char_type;
+    } else if (char_type != primary_type) {
+      // Mixed character types found: non-trivial
+      return false;
+    }
+  }
+
+  // All meaningful characters are the same type (or none found): trivial
+  return true;
+}
+
 DictCompiler::DictCompiler() = default;
 
 core::Expected<size_t, core::Error> DictCompiler::compile(
@@ -161,6 +198,35 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
                                              "No entries to compile"));
   }
 
+  // Apply trivial entry filter if enabled
+  const std::vector<TsvEntry>* active_entries = &entries;
+  std::vector<TsvEntry> filtered_entries;
+  if (filter_trivial_) {
+    filtered_entries.reserve(entries.size());
+    size_t trivial_count = 0;
+    for (const auto& entry : entries) {
+      if (isTrivialEntry(entry.surface)) {
+        ++trivial_count;
+      } else {
+        filtered_entries.push_back(entry);
+      }
+    }
+    if (verbose_ && trivial_count > 0) {
+      printInfo("Filtered " + std::to_string(trivial_count) +
+                " trivial entries (kept " +
+                std::to_string(filtered_entries.size()) + ")");
+    }
+    active_entries = &filtered_entries;
+
+    if (active_entries->empty()) {
+      return core::makeUnexpected(core::Error(
+          core::ErrorCode::InvalidInput,
+          "No entries remaining after trivial filtering"));
+    }
+  }
+
+  const auto& work_entries = *active_entries;
+
   dictionary::BinaryDictWriter writer;
   entries_compiled_ = 0;
   conj_expanded_ = 0;
@@ -186,7 +252,7 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
   };
 
   // Pass 1: Non-conjugating entries
-  for (const auto& tsv_entry : entries) {
+  for (const auto& tsv_entry : work_entries) {
     if (needsExpansion(tsv_entry)) {
       continue;  // Skip conjugating entries in pass 1
     }
@@ -216,7 +282,7 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
   }
 
   // Pass 2: Conjugating entries (verbs and i-adjectives with expansion)
-  for (const auto& tsv_entry : entries) {
+  for (const auto& tsv_entry : work_entries) {
     if (!needsExpansion(tsv_entry)) {
       continue;  // Skip non-conjugating entries in pass 2
     }

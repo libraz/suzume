@@ -1,80 +1,150 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "食べたりする - auto-generated",
-      "expected" : [
+      "description": "食べたりする - auto-generated",
+      "expected": [
         {
-          "lemma" : "食べる",
-          "pos" : "Verb",
-          "surface" : "食べ"
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "たり"
+          "pos": "Particle",
+          "surface": "たり"
         },
         {
-          "pos" : "Verb",
-          "surface" : "する"
+          "pos": "Verb",
+          "surface": "する"
         }
       ],
-      "id" : "betarisuru",
-      "input" : "食べたりする"
+      "id": "betarisuru",
+      "input": "食べたりする"
     },
     {
-      "description" : "飲んだり食べたりする - auto-generated",
-      "expected" : [
+      "description": "飲んだり食べたりする - auto-generated",
+      "expected": [
         {
-          "lemma" : "飲む",
-          "pos" : "Verb",
-          "surface" : "飲ん"
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲ん"
         },
         {
-          "pos" : "Particle",
-          "surface" : "だり"
+          "pos": "Particle",
+          "surface": "だり"
         },
         {
-          "lemma" : "食べる",
-          "pos" : "Verb",
-          "surface" : "食べ"
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "たり"
+          "pos": "Particle",
+          "surface": "たり"
         },
         {
-          "pos" : "Verb",
-          "surface" : "する"
+          "pos": "Verb",
+          "surface": "する"
         }
       ],
-      "id" : "ndari_betarisuru",
-      "input" : "飲んだり食べたりする"
+      "id": "ndari_betarisuru",
+      "input": "飲んだり食べたりする"
     },
     {
-      "description" : "見えたりしてる - auto-generated",
-      "expected" : [
+      "description": "見えたりしてる - auto-generated",
+      "expected": [
         {
-          "lemma" : "見える",
-          "pos" : "Verb",
-          "surface" : "見え"
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見え"
         },
         {
-          "pos" : "Particle",
-          "surface" : "たり"
+          "pos": "Particle",
+          "surface": "たり"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "てる"
+          "pos": "Auxiliary",
+          "surface": "てる"
         }
       ],
-      "id" : "etarishiteru",
-      "input" : "見えたりしてる"
+      "id": "etarishiteru",
+      "input": "見えたりしてる"
+    },
+    {
+      "description": "は+し split in emphatic negation pattern VERB+は+し+ない",
+      "expected": [
+        {
+          "lemma": "減る",
+          "pos": "Verb",
+          "surface": "減り"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hashi_split_verb_ha_shi",
+      "input": "減りはしなかった"
+    },
+    {
+      "description": "の+は split after という (not merged as のは noun)",
+      "expected": [
+        {
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "pos": "Noun",
+          "surface": "書生"
+        },
+        {
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ある"
+        }
+      ],
+      "id": "noha_split_after_toiu",
+      "input": "この書生というのは猫である"
     }
   ],
-  "description" : "particle tests",
-  "version" : "1.0"
+  "description": "particle tests",
+  "version": "1.0"
 }

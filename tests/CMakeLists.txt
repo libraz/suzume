@@ -23,9 +23,18 @@ set(TEST_COMMON_SOURCES
   common/test_case.cpp
 )
 
+# CLI source files needed for CLI tests
+set(CLI_SOURCES_FOR_TESTS
+  ${CMAKE_SOURCE_DIR}/src/suzume-cli/dict_compiler.cpp
+  ${CMAKE_SOURCE_DIR}/src/suzume-cli/tsv_parser.cpp
+  ${CMAKE_SOURCE_DIR}/src/suzume-cli/cli_common.cpp
+)
+
 # Test source files
 set(TEST_SOURCES
   ${TEST_COMMON_SOURCES}
+  ${CLI_SOURCES_FOR_TESTS}
+  cli/dict_compiler_test.cpp
   core/types_test.cpp
   normalize/utf8_test.cpp
   normalize/normalizer_test.cpp
@@ -59,6 +68,7 @@ add_executable(suzume_test ${TEST_SOURCES})
 # Include directories
 target_include_directories(suzume_test PRIVATE
   ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_SOURCE_DIR}/src/suzume-cli
   ${CMAKE_CURRENT_SOURCE_DIR}/common
 )
 

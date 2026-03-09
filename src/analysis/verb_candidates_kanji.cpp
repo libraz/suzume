@@ -1020,7 +1020,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           }
           bool recognized_ichidan = is_ichidan && has_valid_ichidan_stem &&
                                     best.confidence > verb_opts.confidence_ichidan_dict;
-          bool has_suffix = in_dict || recognized_ichidan;
+          // Godan verbs with single-kanji stem + high confidence are also
+          // recognized (残る, 立つ, 打つ, etc.)
+          bool recognized_godan = !is_ichidan && !in_dict &&
+              !best.stem.empty() &&
+              best.stem.size() == core::kJapaneseCharBytes &&
+              best.confidence >= verb_opts.confidence_ichidan_dict;
+          bool has_suffix = in_dict || recognized_ichidan || recognized_godan;
           // Determine extended_pos based on verb type and surface ending
           // Godan-wa verbs ending in い are renyokei (戦い), not onbinkei
           // Godan-ka/ga verbs ending in い are onbinkei (書い, 泳い)
@@ -2208,13 +2214,37 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         }
         if (matched_verb_type == grammar::VerbType::Unknown &&
             !starts_with_dict_noun && !remainder_is_dict_verb) {
-          // Skip inflection fallback for all non-dict sokuonbin candidates.
-          // Any real godan verb should be in L2 dictionary, and dict-matched
-          // sokuonbin is handled above. Inflection-only matches produce false
-          // positives (e.g., 画像っ from 画像る) that cannot be distinguished
-          // from valid ones (手伝っ from 手伝う) by cost alone.
-          SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem
-                                    << "\" skip non-dict sokuonbin\n");
+          if (kanji_stem.size() == core::kJapaneseCharBytes) {
+            // Single-kanji stem: use inflection analysis of the longer surface
+            // (kanji + っ + following chars) to find verb type.
+            // Common verbs like 残る, 立つ, 打つ may not be in L2 dictionary.
+            // Try surfaces of increasing length to get inflection result.
+            for (size_t try_end = kanji_end + 2;
+                 try_end <= codepoints.size() && try_end <= kanji_end + 4;
+                 ++try_end) {
+              std::string try_surface = extractSubstring(codepoints, start_pos, try_end);
+              auto infl_result = inflection.analyze(try_surface);
+              if (!infl_result.empty()) {
+                const auto& best = infl_result[0];
+                if (best.confidence >= 0.6F) {
+                  for (const auto& [verb_type, base_suffix] : sokuonbin_types) {
+                    if (best.verb_type == verb_type) {
+                      matched_verb_type = verb_type;
+                      matched_base_form = kanji_stem + std::string(base_suffix);
+                      SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] \"" << kanji_stem
+                          << "\" single-kanji sokuonbin → " << matched_base_form
+                          << " (infl, conf=" << best.confidence << ")\n");
+                      break;
+                    }
+                  }
+                  if (matched_verb_type != grammar::VerbType::Unknown) break;
+                }
+              }
+            }
+          } else {
+            SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem
+                                      << "\" skip non-dict sokuonbin\n");
+          }
         }
 
 #ifdef SUZUME_DEBUG
