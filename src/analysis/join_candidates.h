@@ -17,6 +17,7 @@
 #include "analysis/scorer.h"
 #include "core/lattice.h"
 #include "dictionary/dictionary.h"
+#include "grammar/inflection.h"
 #include "normalize/char_type.h"
 
 namespace suzume::analysis {
@@ -46,7 +47,8 @@ void addCompoundVerbJoinCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer);
+    const Scorer& scorer,
+    const grammar::Inflection& inflection);
 
 /**
  * @brief Add hiragana compound verb join candidates
@@ -71,7 +73,8 @@ void addHiraganaCompoundVerbJoinCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer);
+    const Scorer& scorer,
+    const grammar::Inflection& inflection);
 
 /**
  * @brief Add adjective + すぎる compound verb candidates
@@ -171,7 +174,8 @@ void addTeFormAuxiliaryCandidates(
     core::Lattice& lattice, std::string_view text,
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer);
+    const Scorer& scorer,
+    const grammar::Inflection& inflection);
 
 /**
  * @brief Add taru-adjective adverb join candidates

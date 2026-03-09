@@ -349,7 +349,8 @@ void addCompoundVerbJoinCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer) {
+    const Scorer& scorer,
+    const grammar::Inflection& inflection) {
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -429,8 +430,7 @@ void addCompoundVerbJoinCandidates(
   size_t start_byte = charPosToBytePos(codepoints, start_pos);
   size_t v2_start_byte = charPosToBytePos(codepoints, v2_start);
 
-  // Inflection analyzer for V2 detection
-  static grammar::Inflection inflection;
+  // Inflection analyzer for V2 detection (shared instance from Tokenizer)
 
   // Find extent of hiragana after v2_start for inflection analysis
   size_t v2_hiragana_end = findCharRegionEnd(char_types, v2_start, 8,
@@ -1108,7 +1108,8 @@ void addHiraganaCompoundVerbJoinCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer) {
+    const Scorer& scorer,
+    const grammar::Inflection& inflection) {
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -1248,7 +1249,6 @@ void addHiraganaCompoundVerbJoinCandidates(
 
       // Fallback: use inflection analysis for unknown V1 verbs
       if (!v1_verified) {
-        static grammar::Inflection inflection;
         auto infl_result = inflection.getBest(std::string(v1_surface));
 
         if (infl_result.confidence >= 0.5F && infl_result.base_form == v1_base) {
@@ -1572,7 +1572,8 @@ void addTeFormAuxiliaryCandidates(
     core::Lattice& lattice, std::string_view text,
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer) {
+    const Scorer& scorer,
+    const grammar::Inflection& inflection) {
   using CharType = normalize::CharType;
 
   if (start_pos >= codepoints.size()) {
@@ -1625,9 +1626,6 @@ void addTeFormAuxiliaryCandidates(
   // Find the extent of hiragana following て/で
   size_t hiragana_end = findCharRegionEnd(char_types, aux_start, 10,
                                            CharType::Hiragana);
-
-  // Use inflection analysis
-  static grammar::Inflection inflection;
 
   // Try each auxiliary pattern
   for (const auto& aux : kTeFormAuxiliaries) {

@@ -287,7 +287,8 @@ void addNounVerbSplitCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer) {
+    const Scorer& scorer,
+    const grammar::Inflection& inflection) {
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -324,7 +325,6 @@ void addNounVerbSplitCandidates(
   }
 
   // Use inflection analysis to check if verb part looks conjugated
-  static grammar::Inflection inflection;
 
   size_t start_byte = charPosToBytePos(codepoints, start_pos);
 

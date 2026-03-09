@@ -29,7 +29,8 @@ Tokenizer::Tokenizer(const dictionary::DictionaryManager& dict_manager,
                      const UnknownWordGenerator& unknown_gen)
     : dict_manager_(dict_manager),
       scorer_(scorer),
-      unknown_gen_(unknown_gen) {}
+      unknown_gen_(unknown_gen),
+      inflection_(unknown_gen.inflection()) {}
 
 core::Lattice Tokenizer::buildLattice(
     std::string_view text, const std::vector<char32_t>& codepoints,
@@ -38,46 +39,28 @@ core::Lattice Tokenizer::buildLattice(
 
   // Process each position
   for (size_t pos = 0; pos < codepoints.size(); ++pos) {
-    // Add dictionary candidates
+    // These run at every position
     addDictionaryCandidates(lattice, text, codepoints, pos);
-
-    // Add unknown word candidates
     addUnknownCandidates(lattice, text, codepoints, pos, char_types);
-
-    // Add mixed script joining candidates (Web開発, APIリクエスト, etc.)
     addMixedScriptCandidates(lattice, text, codepoints, pos, char_types);
 
-    // Add compound noun split candidates (人工知能 → 人工 + 知能)
-    addCompoundSplitCandidates(lattice, text, codepoints, pos, char_types);
+    // CharType-based dispatch: skip generators that can't match at this position
+    auto ct = char_types[pos];
+    if (ct == normalize::CharType::Kanji) {
+      addCompoundSplitCandidates(lattice, text, codepoints, pos, char_types);
+      addNounVerbSplitCandidates(lattice, text, codepoints, pos, char_types);
+      addCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
+      addPrefixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
+      addTaruAdjectiveJoinCandidates(lattice, text, codepoints, pos, char_types);
+      addVerbSuffixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
+    } else if (ct == normalize::CharType::Hiragana) {
+      addHiraganaCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
+      addTeFormAuxiliaryCandidates(lattice, text, codepoints, pos, char_types);
+    } else if (ct == normalize::CharType::Katakana) {
+      addKatakanaSugiruJoinCandidates(lattice, text, codepoints, pos, char_types);
+    }
+    // addAdjectiveSugiruJoinCandidates is a no-op — removed
 
-    // Add noun+verb split candidates (本買った → 本 + 買った)
-    addNounVerbSplitCandidates(lattice, text, codepoints, pos, char_types);
-
-    // Add compound verb join candidates (飛び + 込む → 飛び込む)
-    addCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
-
-    // Add hiragana compound verb join candidates (やり + なおす → やりなおす)
-    addHiraganaCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
-
-    // Add adjective + すぎる compound verb candidates (尊 + すぎる → 尊すぎる)
-    addAdjectiveSugiruJoinCandidates(lattice, text, codepoints, pos, char_types);
-
-    // Add katakana + すぎる compound verb candidates (ワンパターン + すぎる → ワンパターンすぎる)
-    addKatakanaSugiruJoinCandidates(lattice, text, codepoints, pos, char_types);
-
-    // Add prefix + noun join candidates (お + 水 → お水)
-    addPrefixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
-
-    // Add te-form + auxiliary verb candidates (学んで + いく → 学んで + いきたい)
-    addTeFormAuxiliaryCandidates(lattice, text, codepoints, pos, char_types);
-
-    // Add taru-adjective adverb candidates (毅然 + と → 毅然と)
-    addTaruAdjectiveJoinCandidates(lattice, text, codepoints, pos, char_types);
-
-    // Add verb+suffix noun candidates (食べ + 物 → 食べ物)
-    addVerbSuffixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
-
-    // Log candidate count per position
     SUZUME_DEBUG_LOG("[LATTICE] pos=" << pos << " candidates=" << lattice.edgesAt(pos).size() << "\n");
   }
 
@@ -669,7 +652,8 @@ void Tokenizer::addNounVerbSplitCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   analysis::addNounVerbSplitCandidates(lattice, text, codepoints, start_pos,
-                                        char_types, dict_manager_, scorer_);
+                                        char_types, dict_manager_, scorer_,
+                                        inflection_);
 }
 
 void Tokenizer::addCompoundVerbJoinCandidates(
@@ -677,7 +661,8 @@ void Tokenizer::addCompoundVerbJoinCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   analysis::addCompoundVerbJoinCandidates(lattice, text, codepoints, start_pos,
-                                           char_types, dict_manager_, scorer_);
+                                           char_types, dict_manager_, scorer_,
+                                           inflection_);
 }
 
 void Tokenizer::addHiraganaCompoundVerbJoinCandidates(
@@ -685,7 +670,8 @@ void Tokenizer::addHiraganaCompoundVerbJoinCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   analysis::addHiraganaCompoundVerbJoinCandidates(
-      lattice, text, codepoints, start_pos, char_types, dict_manager_, scorer_);
+      lattice, text, codepoints, start_pos, char_types, dict_manager_, scorer_,
+      inflection_);
 }
 
 void Tokenizer::addPrefixNounJoinCandidates(
@@ -717,7 +703,7 @@ void Tokenizer::addTeFormAuxiliaryCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   analysis::addTeFormAuxiliaryCandidates(lattice, text, codepoints, start_pos,
-                                          char_types, scorer_);
+                                          char_types, scorer_, inflection_);
 }
 
 void Tokenizer::addTaruAdjectiveJoinCandidates(

@@ -235,6 +235,11 @@ class UnknownWordGenerator {
       size_t start_pos,
       const std::vector<normalize::CharType>& char_types) const;
 
+  /**
+   * @brief Access the shared inflection analyzer
+   */
+  const grammar::Inflection& inflection() const { return inflection_; }
+
  private:
   UnknownOptions options_;
   const dictionary::DictionaryManager* dict_manager_;

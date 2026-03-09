@@ -6,7 +6,6 @@
 #include "inflection.h"
 
 #include <algorithm>
-#include <mutex>
 
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -385,16 +384,13 @@ std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(
 
 const std::vector<InflectionCandidate>& Inflection::analyze(
     std::string_view surface) const {
-  // Check cache first (shared lock for reading)
+  // Check cache first
   std::string key(surface);
-  {
-    std::shared_lock<std::shared_mutex> read_lock(cache_mutex_);
-    auto iter = cache_.find(key);
-    if (iter != cache_.end()) {
-      SUZUME_DEBUG_LOG_TRACE("[INFLECTION] \"" << surface << "\" (cached, "
-                        << iter->second.size() << " candidates)\n");
-      return iter->second;
-    }
+  auto cache_iter = cache_.find(key);
+  if (cache_iter != cache_.end()) {
+    SUZUME_DEBUG_LOG_TRACE("[INFLECTION] \"" << surface << "\" (cached, "
+                      << cache_iter->second.size() << " candidates)\n");
+    return cache_iter->second;
   }
 
   SUZUME_DEBUG_LOG_VERBOSE("[INFLECTION] Analyzing \"" << surface << "\"\n");
@@ -405,7 +401,6 @@ const std::vector<InflectionCandidate>& Inflection::analyze(
   // Early return for very short strings (less than 2 Japanese characters)
   // A conjugated verb needs at least stem + ending
   if (surface.size() < core::kTwoJapaneseCharBytes) {  // 2 Japanese chars = 6 bytes in UTF-8
-    std::unique_lock<std::shared_mutex> write_lock(cache_mutex_);
     auto [iter, inserted] = cache_.emplace(std::move(key), std::move(candidates));
     return iter->second;
   }
@@ -500,42 +495,23 @@ const std::vector<InflectionCandidate>& Inflection::analyze(
     }
   }
 
-  // Cache the result (exclusive lock for writing)
+  // Evict cache if it grows too large (avoid unbounded memory growth)
+  if (cache_.size() > 50000) {
+    cache_.clear();
+  }
+
+  // Cache the result
   // Return reference to cached entry — safe because unordered_map references
   // are not invalidated by subsequent inserts.
-  std::unique_lock<std::shared_mutex> write_lock(cache_mutex_);
   auto [iter, inserted] = cache_.emplace(std::move(key), std::move(candidates));
   return iter->second;
 }
 
 bool Inflection::looksConjugated(std::string_view surface) const {
-  // Check cache first to avoid copying (shared lock for reading)
-  std::string key(surface);
-  {
-    std::shared_lock<std::shared_mutex> read_lock(cache_mutex_);
-    auto iter = cache_.find(key);
-    if (iter != cache_.end()) {
-      return !iter->second.empty();
-    }
-  }
   return !analyze(surface).empty();
 }
 
 InflectionCandidate Inflection::getBest(std::string_view surface) const {
-  // Check cache first to avoid copying the entire vector (shared lock for reading)
-  std::string key(surface);
-  {
-    std::shared_lock<std::shared_mutex> read_lock(cache_mutex_);
-    auto iter = cache_.find(key);
-    if (iter != cache_.end()) {
-      if (iter->second.empty()) {
-        return {};
-      }
-      return iter->second.front();  // Only copy the first element
-    }
-  }
-
-  // Not in cache, do full analysis
   const auto& candidates = analyze(surface);
   if (candidates.empty()) {
     return {};

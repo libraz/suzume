@@ -8,6 +8,7 @@
 #include "analysis/unknown.h"
 #include "core/lattice.h"
 #include "dictionary/dictionary.h"
+#include "grammar/inflection.h"
 #include "normalize/char_type.h"
 
 namespace suzume::analysis {
@@ -35,6 +36,7 @@ class Tokenizer {
   const dictionary::DictionaryManager& dict_manager_;
   const Scorer& scorer_;
   const UnknownWordGenerator& unknown_gen_;
+  const grammar::Inflection& inflection_;  // Shared from unknown_gen_
 
   /**
    * @brief Add dictionary candidates at position

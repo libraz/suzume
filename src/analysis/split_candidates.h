@@ -17,6 +17,7 @@
 #include "analysis/scorer.h"
 #include "core/lattice.h"
 #include "dictionary/dictionary.h"
+#include "grammar/inflection.h"
 #include "normalize/char_type.h"
 
 namespace suzume::analysis {
@@ -92,7 +93,8 @@ void addNounVerbSplitCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer);
+    const Scorer& scorer,
+    const grammar::Inflection& inflection);
 
 }  // namespace suzume::analysis
 
