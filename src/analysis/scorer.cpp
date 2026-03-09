@@ -1139,6 +1139,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kAlmostNever;
   }
 
+  // Penalty for ADV → でも (CONJ or PART_副) pattern
+  // After adverbs, でも should split as で(copula)+も(particle)
+  // e.g., それほどでもない → それほど+で+も+ない
+  if (prev.pos == core::PartOfSpeech::Adverb &&
+      next.surface == "でも" &&
+      (next.pos == core::PartOfSpeech::Conjunction ||
+       next.extended_pos == core::ExtendedPOS::ParticleAdverbial)) {
+    surface_bonus += cost::kAlmostNever;
+  }
+
   // Penalty for NOUN/PRONOUN → だけど (CONJ) pattern
   // MeCab splits "彼女だけどいいね" as 彼女+だ+けど+いい+ね
   // だけど as conjunction is valid at sentence start or after particles,
@@ -1829,6 +1839,24 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   if (prev.extended_pos == core::ExtendedPOS::NounProperFamily &&
       next.extended_pos == core::ExtendedPOS::NounProperGiven) {
     surface_bonus += cost::kStrongBonus;  // -2.5 bonus
+  }
+
+  // Penalty for single-kana verb renyokei after adverb
+  // Single-kana renyokei (で=出る, し=する) are ambiguous with copula/particles.
+  // After adverbs, copula/particle interpretation dominates (それほどで+も+ない)
+  if (prev.pos == core::PartOfSpeech::Adverb &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface.size() <= 3) {  // Single kana (3 bytes)
+    surface_bonus += cost::kVeryRare;
+  }
+
+  // Penalty for conjunction after single-char token
+  // Conjunctions start clauses and don't follow bare single characters
+  // in running text without punctuation. This prevents verb stems
+  // (醒, 覚, 冷) from splitting before conjunctions (まして, etc.)
+  if (next.pos == core::PartOfSpeech::Conjunction &&
+      prev.surface.size() <= 3) {  // Single CJK/kana character (3 bytes)
+    surface_bonus += cost::kAlmostNever;
   }
 
   float total = base_cost + extended_cost + surface_bonus;

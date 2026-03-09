@@ -97,6 +97,15 @@ BigramTable::initTable() {
   // VerbMizenkei → AuxVolitional (食べ+よう) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxVolitional, cost::kModerateBonus);
 
+  // VerbMizenkei → Conjunction: very rare
+  // Mizenkei connects to ない/せる/れる/よう, never to conjunctions
+  // Prevents さ(mizenkei)+まして(CONJ) over さまし(renyokei)+て
+  setCell(t, EPOS::VerbMizenkei, EPOS::Conjunction, cost::kVeryRare);
+
+  // Suffix → Conjunction: rare (without punctuation, suffix+conj is unusual)
+  // Prevents さ(suffix)+まして(CONJ) over さまし(verb renyokei)+て
+  setCell(t, EPOS::Suffix, EPOS::Conjunction, cost::kRare);
+
   // Note: VerbRenyokei → AuxTenseTa is NOT set here because it would incorrectly
   // favor て as AUX over Particle. Ichidan た-form split (食べ+た) needs surface-based
   // handling in scorer.cpp to distinguish た from て.
@@ -167,6 +176,9 @@ BigramTable::initTable() {
   // VerbRenyokei → ParticleConj (食べ+て, 見+て) - moderate bonus for ichidan te-form split
   // Reduced from kStrongBonus to prevent す+ば splitting すばらしい
   setCell(t, EPOS::VerbRenyokei, EPOS::ParticleConj, cost::kModerateBonus);
+
+  // ParticleConj → AdjBasic (食べて+ほしい) - moderate bonus for te+adjective pattern
+  setCell(t, EPOS::ParticleConj, EPOS::AdjBasic, cost::kModerateBonus);
 
   // =========================================================================
   // Adjective Forms → Auxiliaries
@@ -296,6 +308,11 @@ BigramTable::initTable() {
   // AuxNegativeNai → ParticleNo (ない+ん for のだ/んだ) - strong bonus
   // Ensures ないんだ → ない+ん+だ over な+いん+だ
   setCell(t, EPOS::AuxNegativeNai, EPOS::ParticleNo, cost::kStrongBonus);
+
+  // AuxNegativeNai → ParticleConj (ない+のに, ない+ので) - strong bonus
+  // Ensures ないのに → ない+のに over ない+の+にこ+れ
+  // Without this, AUX_否定→PART_準体(-0.8) makes の path win over のに
+  setCell(t, EPOS::AuxNegativeNai, EPOS::ParticleConj, cost::kStrongBonus);
 
   // ParticleNo → AuxCopulaDesu (ん+です/でし for んです/んでした) - strong bonus
   // Ensures んでした → ん+でし+た over ん+で+し+た
@@ -505,6 +522,11 @@ BigramTable::initTable() {
   // AuxCopulaDa → Noun (さすがな+人, 静かな+部屋) - strong bonus
   // Copula な(連体形 of だ) + Noun is the na-adjective attributive pattern
   setCell(t, EPOS::AuxCopulaDa, EPOS::Noun, cost::kStrongBonus);
+
+  // AuxCopulaDa → NounFormal (な+もの, な+こと) - strong bonus
+  // Ensures 妙なもの → 妙+な+もの over 妙+な+も+の
+  // Without this, AUX_断定→PART_係(-0.5) makes も path win over もの
+  setCell(t, EPOS::AuxCopulaDa, EPOS::NounFormal, cost::kStrongBonus);
 
   // AdjStem → Suffix (な+さ in なさそう) - strong bonus for nominalization
   // This favors な(ADJ stem of ない) + さ(nominalization suffix) over さ(する mizenkei)

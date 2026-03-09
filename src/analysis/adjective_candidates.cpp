@@ -1268,6 +1268,16 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
             utf8::endsWith(surface, "さそうだ")) {
           continue;  // Skip - should be split as adj-stem + さ + そう
         }
+        // Skip candidates containing て/で in stem - indicates verb te-form boundary
+        // No genuine i-adjective has て or で in its stem
+        // e.g., さましてほしい should be さまし+て+ほしい, not a single i-adj
+        {
+          auto stem = surface.substr(0, surface.size() - 3);  // Remove trailing い (3 bytes)
+          if (stem.find("\xe3\x81\xa6") != std::string::npos ||  // て
+              stem.find("\xe3\x81\xa7") != std::string::npos) {  // で
+            continue;
+          }
+        }
         // Base cost for hiragana i-adjective candidates
         // Use slightly elevated base to avoid fragments like ろしい beating
         // kanji adjectives like 恐ろしい (kanji adj base=0.2F)

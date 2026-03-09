@@ -706,6 +706,90 @@
       ],
       "id": "single_kanji_sokuonbin_matte",
       "input": "待っていた"
+    },
+    {
+      "description": "Godan-sa verb te-form: 醒ます should not split as 醒+まして(CONJ)",
+      "expected": [
+        {
+          "lemma": "醒ます",
+          "pos": "Verb",
+          "surface": "醒まし"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "samashite_kanji_te",
+      "input": "醒まして"
+    },
+    {
+      "description": "Hiragana godan-sa te-form + ほしい: should not split as さ+まして(CONJ)",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "目"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "さます",
+          "pos": "Verb",
+          "surface": "さまし"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "ほしい"
+        }
+      ],
+      "id": "samashite_hoshii",
+      "input": "目をさましてほしい"
+    },
+    {
+      "description": "Ichidan te-form + ほしい: ParticleConj→AdjBasic bonus",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "ほしい"
+        }
+      ],
+      "id": "tabete_hoshii",
+      "input": "食べてほしい"
+    },
+    {
+      "description": "Godan-sa te-form + verb: 醒+まして(CONJ)+見る should not win",
+      "expected": [
+        {
+          "lemma": "醒ます",
+          "pos": "Verb",
+          "surface": "醒まし"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Verb",
+          "surface": "見る"
+        }
+      ],
+      "id": "samashite_miru",
+      "input": "醒まして見る"
     }
   ],
   "description": "Te-form and ta-form patterns",

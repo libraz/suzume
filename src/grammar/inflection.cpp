@@ -127,6 +127,14 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         continue;
       }
 
+      // Reject i-adjective stems ending in だ (copula)
+      // No valid i-adjective stem ends in だ - it's always noun+copula
+      // This prevents 教師だそうだ → 教師だい (false i-adj match)
+      if (ending.verb_type == VerbType::IAdjective &&
+          utf8::endsWith(stem, "だ")) {
+        continue;
+      }
+
       // Validate irregular いく pattern: GodanKa with っ-onbin only valid for い/行
       if (ending.verb_type == VerbType::GodanKa && ending.suffix == "っ" &&
           ending.is_onbin) {

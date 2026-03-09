@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "description": "Noun+copula+hearsay: should not match false i-adj stem ending in だ",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "教師"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "kyoushi_da_sou_da",
+      "input": "教師だそうだ"
+    }
+  ],
+  "description": "auxiliary_sou tests",
+  "version": "1.0"
+}

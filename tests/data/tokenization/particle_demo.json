@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "description": "ADV+で+も+ない: copula split, not でも(CONJ/PART_副)",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "それほど"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "sorehodo_demo_nai",
+      "input": "それほどでもない"
+    }
+  ],
+  "description": "particle_demo tests",
+  "version": "1.0"
+}

@@ -471,6 +471,10 @@ std::string Lemmatizer::lemmatizeByGrammar(std::string_view surface,
     }
     if (!filtered_storage.empty()) {
       candidates = &filtered_storage;
+    } else {
+      // No IAdjective candidates → na-adjective (大変, 不思議, etc.)
+      // Na-adjectives don't conjugate, lemma = surface
+      return std::string(surface);
     }
   }
 

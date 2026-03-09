@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "description": "AuxNeg→ParticleConj bonus: ない+のに should not split as ない+の+に",
+      "expected": [
+        {
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "pos": "Particle",
+          "surface": "のに"
+        },
+        {
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "おかしい"
+        }
+      ],
+      "id": "nai_noni_kore",
+      "input": "ないのにこれはおかしい"
+    }
+  ],
+  "description": "particle_conj tests",
+  "version": "1.0"
+}
