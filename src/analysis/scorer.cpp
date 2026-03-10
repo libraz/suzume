@@ -467,6 +467,16 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += sc::kPenaltyVeryLongHiraganaVerb;
   }
 
+  // Penalty for 5-char pure-hiragana verb renyokei not in dictionary
+  // E.g., "つるつるし" as godan-sa renyokei — should be つるつる(ADV) + し(する)
+  // Only renyokei: base forms like "づけられる" (from づける) are legitimate
+  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
+      edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      grammar::isPureHiragana(edge.surface) &&
+      edge.surface.size() >= 15) {  // 5+ hiragana chars (5*3=15 bytes)
+    cost += sc::kPenaltyVeryLongHiraganaVerb;
+  }
+
   // Penalty for kanji+hiragana verb renyokei ending in いし pattern
   // E.g., "願いし" as renyokei of "願いす" is spurious
   // Should be 願い + し (願う renyokei + する renyokei)

@@ -959,6 +959,38 @@
         "cat_speech",
         "W-007"
       ]
+    },
+    {
+      "description": "onomatopoeia+する should split as つるつる+し, not つるつるし(verb)",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "肌"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Adverb",
+          "surface": "つるつる"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "gatsurutsurushiteiru",
+      "input": "肌がつるつるしている"
     }
   ],
   "description": "Onomatopoeia and mimetic words",
