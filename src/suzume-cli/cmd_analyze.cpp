@@ -39,9 +39,9 @@ void outputMorpheme(const std::vector<core::Morpheme>& morphemes) {
   }
 }
 
-void outputTags(const std::vector<std::string>& tags) {
+void outputTags(const std::vector<postprocess::TagEntry>& tags) {
   for (const auto& tag : tags) {
-    std::cout << tag << "\n";
+    std::cout << tag.tag << "\t" << core::posToString(tag.pos) << "\n";
   }
 }
 

@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
     // Output tags
     auto tags = analyzer.generateTags(text);
     for (const auto& tag : tags) {
-      std::cout << tag << "\n";
+      std::cout << tag.tag << "\t" << suzume::core::posToString(tag.pos) << "\n";
     }
   } else {
     // Output morpheme analysis

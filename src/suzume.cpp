@@ -179,12 +179,12 @@ std::vector<core::Morpheme> Suzume::analyzeDebug(std::string_view text,
   return impl_->postprocessor.process(morphemes);
 }
 
-std::vector<std::string> Suzume::generateTags(std::string_view text) const {
+std::vector<postprocess::TagEntry> Suzume::generateTags(std::string_view text) const {
   auto morphemes = impl_->analyzer.analyze(text);
   return impl_->tag_generator.generate(morphemes);
 }
 
-std::vector<std::string> Suzume::generateTags(
+std::vector<postprocess::TagEntry> Suzume::generateTags(
     std::string_view text,
     const postprocess::TagGeneratorOptions& options) const {
   auto morphemes = impl_->analyzer.analyze(text);

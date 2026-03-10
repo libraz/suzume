@@ -168,14 +168,22 @@ SUZUME_EXPORT suzume_tags_t* suzume_generate_tags(suzume_t handle,
 
     if (result->count == 0) {
       result->tags = nullptr;
+      result->pos = nullptr;
       return result;
     }
 
     result->tags = new char*[result->count];
+    result->pos = new const char*[result->count];
 
     for (size_t idx = 0; idx < result->count; ++idx) {
-      result->tags[idx] = new char[tags[idx].size() + 1];
-      std::strcpy(result->tags[idx], tags[idx].c_str());
+      result->tags[idx] = new char[tags[idx].tag.size() + 1];
+      std::strcpy(result->tags[idx], tags[idx].tag.c_str());
+
+      auto pos_str = suzume::core::posToString(tags[idx].pos);
+      auto* pos_copy = new char[pos_str.size() + 1];
+      std::memcpy(pos_copy, pos_str.data(), pos_str.size());
+      pos_copy[pos_str.size()] = '\0';
+      result->pos[idx] = pos_copy;
     }
 
     return result;
@@ -205,14 +213,22 @@ SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_with_options(
 
     if (result->count == 0) {
       result->tags = nullptr;
+      result->pos = nullptr;
       return result;
     }
 
     result->tags = new char*[result->count];
+    result->pos = new const char*[result->count];
 
     for (size_t idx = 0; idx < result->count; ++idx) {
-      result->tags[idx] = new char[tags[idx].size() + 1];
-      std::strcpy(result->tags[idx], tags[idx].c_str());
+      result->tags[idx] = new char[tags[idx].tag.size() + 1];
+      std::strcpy(result->tags[idx], tags[idx].tag.c_str());
+
+      auto pos_str = suzume::core::posToString(tags[idx].pos);
+      auto* pos_copy = new char[pos_str.size() + 1];
+      std::memcpy(pos_copy, pos_str.data(), pos_str.size());
+      pos_copy[pos_str.size()] = '\0';
+      result->pos[idx] = pos_copy;
     }
 
     return result;
@@ -231,6 +247,14 @@ SUZUME_EXPORT void suzume_tags_free(suzume_tags_t* tags) {
       delete[] tags->tags[idx];
     }
     delete[] tags->tags;
+  }
+
+  if (tags->pos != nullptr) {
+    for (size_t idx = 0; idx < tags->count; ++idx) {
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+      delete[] const_cast<char*>(tags->pos[idx]);
+    }
+    delete[] tags->pos;
   }
 
   delete tags;

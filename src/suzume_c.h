@@ -52,8 +52,9 @@ typedef struct {
  * @brief Tag generation result structure
  */
 typedef struct {
-  char** tags;   /**< Array of tag strings */
-  size_t count;  /**< Number of tags */
+  char** tags;       /**< Array of tag strings */
+  const char** pos;  /**< Array of POS strings (English, e.g. "NOUN", "VERB") */
+  size_t count;      /**< Number of tags */
 } suzume_tags_t;
 
 /**

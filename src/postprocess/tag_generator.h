@@ -37,6 +37,14 @@ struct TagGeneratorOptions {
 };
 
 /**
+ * @brief Tag entry with POS information
+ */
+struct TagEntry {
+  std::string tag;
+  core::PartOfSpeech pos;
+};
+
+/**
  * @brief Tag generator from morphemes
  */
 class TagGenerator {
@@ -47,17 +55,17 @@ class TagGenerator {
   /**
    * @brief Generate tags from morphemes
    * @param morphemes Input morphemes
-   * @return Vector of tag strings
+   * @return Vector of tag entries with POS information
    */
-  std::vector<std::string> generate(
+  std::vector<TagEntry> generate(
       const std::vector<core::Morpheme>& morphemes) const;
 
   /**
    * @brief Generate tags from text using analyzer
    * @param text Input text
-   * @return Vector of tag strings
+   * @return Vector of tag entries with POS information
    */
-  static std::vector<std::string> generateFromText(std::string_view text);
+  static std::vector<TagEntry> generateFromText(std::string_view text);
 
  private:
   TagGeneratorOptions options_;

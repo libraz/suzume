@@ -58,6 +58,16 @@ export interface Morpheme {
 }
 
 /**
+ * Tag entry with POS information
+ */
+export interface Tag {
+  /** Tag text (surface or lemma) */
+  tag: string;
+  /** Part of speech (English) */
+  pos: string;
+}
+
+/**
  * Options for tag generation
  */
 export interface TagOptions {
@@ -246,9 +256,9 @@ export class Suzume {
    *
    * @param text - UTF-8 encoded Japanese text
    * @param options - Optional tag generation options
-   * @returns Array of tag strings
+   * @returns Array of tag entries with POS information
    */
-  generateTags(text: string, options?: TagOptions): string[] {
+  generateTags(text: string, options?: TagOptions): Tag[] {
     const textBytes = this.module.lengthBytesUTF8(text) + 1;
     const textPtr = this.module._malloc(textBytes);
 
@@ -275,13 +285,10 @@ export class Suzume {
         const optionsPtr = this.module._malloc(OPTIONS_SIZE);
 
         try {
-          const heap = (this.module as unknown as { HEAPU8: Uint8Array }).HEAPU8;
           const heapU32 = (this.module as unknown as { HEAPU32: Uint32Array }).HEAPU32;
 
-          // Zero out the struct first
-          heap.fill(0, optionsPtr, optionsPtr + OPTIONS_SIZE);
-
-          heap[optionsPtr] = posFilter;
+          // pos_filter is uint8_t at offset 0, padded to 4 bytes — write as uint32
+          heapU32[optionsPtr >> 2] = posFilter;
           heapU32[(optionsPtr + 4) >> 2] = options.excludeBasic ? 1 : 0;
           heapU32[(optionsPtr + 8) >> 2] = options.useLemma !== false ? 1 : 0;
           heapU32[(optionsPtr + 12) >> 2] = options.minLength ?? 2;
@@ -345,8 +352,10 @@ export class Suzume {
   loadBinaryDictionary(data: Uint8Array): boolean {
     const dataPtr = this.module._malloc(data.byteLength);
     try {
-      const heap = (this.module as unknown as { HEAPU8: Uint8Array }).HEAPU8;
-      heap.set(data, dataPtr);
+      // Derive Uint8Array view from HEAPU32's underlying buffer (HEAPU8 may not be exported)
+      const heapU32 = (this.module as unknown as { HEAPU32: Uint32Array }).HEAPU32;
+      const heapU8 = new Uint8Array(heapU32.buffer);
+      heapU8.set(data, dataPtr);
       return this._loadBinaryDict(this.handle, dataPtr, data.byteLength) === 1;
     } finally {
       this.module._free(dataPtr);
@@ -425,20 +434,26 @@ export class Suzume {
   }
 
   // Parse suzume_tags_t structure from WASM memory
-  private parseTags(tagsPtr: number): string[] {
-    // suzume_tags_t layout:
-    // - tags: pointer to char** (4 bytes on wasm32)
-    // - count: size_t (4 bytes on wasm32)
+  private parseTags(tagsPtr: number): Tag[] {
+    // suzume_tags_t layout (wasm32):
+    // - tags: pointer to char** (4 bytes)
+    // - pos: pointer to const char** (4 bytes)
+    // - count: size_t (4 bytes)
     const HEAPU32 = (this.module as unknown as { HEAPU32: Uint32Array }).HEAPU32;
 
     const tagsArrayPtr = HEAPU32[tagsPtr >> 2];
-    const count = HEAPU32[(tagsPtr >> 2) + 1];
+    const posArrayPtr = HEAPU32[(tagsPtr >> 2) + 1];
+    const count = HEAPU32[(tagsPtr >> 2) + 2];
 
-    const tags: string[] = [];
+    const tags: Tag[] = [];
 
     for (let idx = 0; idx < count; idx++) {
       const tagPtr = HEAPU32[(tagsArrayPtr >> 2) + idx];
-      tags.push(this.module.UTF8ToString(tagPtr));
+      const posPtr = HEAPU32[(posArrayPtr >> 2) + idx];
+      tags.push({
+        tag: this.module.UTF8ToString(tagPtr),
+        pos: this.module.UTF8ToString(posPtr),
+      });
     }
 
     return tags;

@@ -88,12 +88,12 @@ std::string TagGenerator::getTagString(const core::Morpheme& morpheme) const {
   return morpheme.surface;
 }
 
-std::vector<std::string> TagGenerator::generate(
+std::vector<TagEntry> TagGenerator::generate(
     const std::vector<core::Morpheme>& morphemes) const {
   // Post-process morphemes
   auto processed = postprocessor_.process(morphemes);
 
-  std::vector<std::string> tags;
+  std::vector<TagEntry> tags;
   std::unordered_set<std::string> seen;
 
   for (const auto& morpheme : processed) {
@@ -116,7 +116,7 @@ std::vector<std::string> TagGenerator::generate(
       seen.insert(tag);
     }
 
-    tags.push_back(tag);
+    tags.push_back({tag, morpheme.pos});
 
     // Check max tags
     if (options_.max_tags > 0 && tags.size() >= options_.max_tags) {
@@ -127,7 +127,7 @@ std::vector<std::string> TagGenerator::generate(
   return tags;
 }
 
-std::vector<std::string> TagGenerator::generateFromText(std::string_view /*text*/) {
+std::vector<TagEntry> TagGenerator::generateFromText(std::string_view /*text*/) {
   // This would require access to Analyzer
   // For now, return empty - caller should use Analyzer + generate()
   return {};

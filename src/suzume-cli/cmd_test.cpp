@@ -34,7 +34,10 @@ std::vector<std::string> split(const std::string& str, char delim) {
 bool runSingleTest(Suzume& analyzer, const std::string& input,
                    const std::set<std::string>& expected, bool verbose) {
   auto tags = analyzer.generateTags(input);
-  std::set<std::string> actual(tags.begin(), tags.end());
+  std::set<std::string> actual;
+  for (const auto& t : tags) {
+    actual.insert(t.tag);
+  }
 
   bool passed = (actual == expected);
 

@@ -48,7 +48,7 @@ TEST(TagGeneratorTest, ExcludeParticles) {
   auto tags = generator.generate(morphemes);
   // Particles should be excluded
   for (const auto& tag : tags) {
-    EXPECT_NE(tag, "に");
+    EXPECT_NE(tag.tag, "に");
   }
 }
 
@@ -64,6 +64,7 @@ TEST(TagGeneratorTest, IncludeParticles) {
 
   auto tags = generator.generate(morphemes);
   EXPECT_EQ(tags.size(), 2);
+  EXPECT_EQ(tags[1].pos, core::PartOfSpeech::Particle);
 }
 
 TEST(TagGeneratorTest, ExcludeAuxiliaries) {
@@ -78,7 +79,7 @@ TEST(TagGeneratorTest, ExcludeAuxiliaries) {
   auto tags = generator.generate(morphemes);
   // Auxiliaries should be excluded
   for (const auto& tag : tags) {
-    EXPECT_NE(tag, "た");
+    EXPECT_NE(tag.tag, "た");
   }
 }
 
@@ -95,8 +96,9 @@ TEST(TagGeneratorTest, IncludeAuxiliaries) {
   auto tags = generator.generate(morphemes);
   bool found_auxiliary = false;
   for (const auto& tag : tags) {
-    if (tag == "た") {
+    if (tag.tag == "た") {
       found_auxiliary = true;
+      EXPECT_EQ(tag.pos, core::PartOfSpeech::Auxiliary);
     }
   }
   EXPECT_TRUE(found_auxiliary);
@@ -112,7 +114,7 @@ TEST(TagGeneratorTest, ExcludeConjunction) {
 
   auto tags = generator.generate(morphemes);
   for (const auto& tag : tags) {
-    EXPECT_NE(tag, "そして");
+    EXPECT_NE(tag.tag, "そして");
   }
 }
 
@@ -125,7 +127,7 @@ TEST(TagGeneratorTest, ExcludeSymbol) {
 
   auto tags = generator.generate(morphemes);
   for (const auto& tag : tags) {
-    EXPECT_NE(tag, "。");
+    EXPECT_NE(tag.tag, "。");
   }
 }
 
@@ -139,7 +141,8 @@ TEST(TagGeneratorTest, UseLemma) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "食べる");  // Lemma, not surface
+  EXPECT_EQ(tags[0].tag, "食べる");  // Lemma, not surface
+  EXPECT_EQ(tags[0].pos, core::PartOfSpeech::Verb);
 }
 
 TEST(TagGeneratorTest, UseSurface) {
@@ -152,7 +155,8 @@ TEST(TagGeneratorTest, UseSurface) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "食べた");  // Surface, not lemma
+  EXPECT_EQ(tags[0].tag, "食べた");  // Surface, not lemma
+  EXPECT_EQ(tags[0].pos, core::PartOfSpeech::Verb);
 }
 
 TEST(TagGeneratorTest, MinTagLength) {
@@ -168,7 +172,7 @@ TEST(TagGeneratorTest, MinTagLength) {
   auto tags = generator.generate(morphemes);
   // "に" should be excluded (length 1 < min_tag_length 2)
   EXPECT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "東京");
+  EXPECT_EQ(tags[0].tag, "東京");
 }
 
 TEST(TagGeneratorTest, RemoveDuplicates) {
@@ -241,7 +245,7 @@ TEST(TagGeneratorTest, ExcludeFormalNouns) {
 
   auto tags = generator.generate(morphemes);
   for (const auto& tag : tags) {
-    EXPECT_NE(tag, "こと");
+    EXPECT_NE(tag.tag, "こと");
   }
 }
 
@@ -258,7 +262,7 @@ TEST(TagGeneratorTest, ExcludeLowInfoWords) {
 
   auto tags = generator.generate(morphemes);
   for (const auto& tag : tags) {
-    EXPECT_NE(tag, "ある");
+    EXPECT_NE(tag.tag, "ある");
   }
 }
 
@@ -282,7 +286,7 @@ TEST(TagGeneratorTest, EmptyLemmaFallsBackToSurface) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "東京");  // Falls back to surface
+  EXPECT_EQ(tags[0].tag, "東京");  // Falls back to surface
 }
 
 TEST(TagGeneratorTest, CountCharsJapanese) {
@@ -296,7 +300,7 @@ TEST(TagGeneratorTest, CountCharsJapanese) {
 
   auto tags = generator.generate(morphemes);
   EXPECT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "新宿駅");
+  EXPECT_EQ(tags[0].tag, "新宿駅");
 }
 
 TEST(TagGeneratorTest, PosFilterNounOnly) {
@@ -311,7 +315,8 @@ TEST(TagGeneratorTest, PosFilterNounOnly) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "東京");
+  EXPECT_EQ(tags[0].tag, "東京");
+  EXPECT_EQ(tags[0].pos, core::PartOfSpeech::Noun);
 }
 
 TEST(TagGeneratorTest, PosFilterVerbOnly) {
@@ -326,7 +331,8 @@ TEST(TagGeneratorTest, PosFilterVerbOnly) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "食べる");
+  EXPECT_EQ(tags[0].tag, "食べる");
+  EXPECT_EQ(tags[0].pos, core::PartOfSpeech::Verb);
 }
 
 TEST(TagGeneratorTest, PosFilterAdjectiveOnly) {
@@ -341,7 +347,8 @@ TEST(TagGeneratorTest, PosFilterAdjectiveOnly) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "美味しい");
+  EXPECT_EQ(tags[0].tag, "美味しい");
+  EXPECT_EQ(tags[0].pos, core::PartOfSpeech::Adjective);
 }
 
 TEST(TagGeneratorTest, PosFilterAdverbOnly) {
@@ -355,7 +362,8 @@ TEST(TagGeneratorTest, PosFilterAdverbOnly) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "とても");
+  EXPECT_EQ(tags[0].tag, "とても");
+  EXPECT_EQ(tags[0].pos, core::PartOfSpeech::Adverb);
 }
 
 TEST(TagGeneratorTest, PosFilterMultiple) {
@@ -370,8 +378,8 @@ TEST(TagGeneratorTest, PosFilterMultiple) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 2);
-  EXPECT_EQ(tags[0], "東京");
-  EXPECT_EQ(tags[1], "食べる");
+  EXPECT_EQ(tags[0].tag, "東京");
+  EXPECT_EQ(tags[1].tag, "食べる");
 }
 
 TEST(TagGeneratorTest, PosFilterZeroIncludesAll) {
@@ -405,7 +413,7 @@ TEST(TagGeneratorTest, PosFilterExcludesParticlesAndAuxiliaries) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "東京");
+  EXPECT_EQ(tags[0].tag, "東京");
 }
 
 TEST(TagGeneratorTest, PosFilterIncludesPronounAsNoun) {
@@ -419,7 +427,8 @@ TEST(TagGeneratorTest, PosFilterIncludesPronounAsNoun) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "それ");
+  EXPECT_EQ(tags[0].tag, "それ");
+  EXPECT_EQ(tags[0].pos, core::PartOfSpeech::Pronoun);
 }
 
 TEST(TagGeneratorTest, ExcludeBasicHiraganaLemma) {
@@ -434,8 +443,8 @@ TEST(TagGeneratorTest, ExcludeBasicHiraganaLemma) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 2);
-  EXPECT_EQ(tags[0], "東京");
-  EXPECT_EQ(tags[1], "食べる");
+  EXPECT_EQ(tags[0].tag, "東京");
+  EXPECT_EQ(tags[1].tag, "食べる");
 }
 
 TEST(TagGeneratorTest, ExcludeBasicUsesLemmaNotSurface) {
@@ -451,7 +460,7 @@ TEST(TagGeneratorTest, ExcludeBasicUsesLemmaNotSurface) {
 
   auto tags = generator.generate(morphemes);
   ASSERT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "食べる");  // Lemma used
+  EXPECT_EQ(tags[0].tag, "食べる");  // Lemma used
 }
 
 TEST(TagGeneratorTest, ExcludeBasicEmptyLemmaFallsBackToSurface) {
@@ -471,7 +480,7 @@ TEST(TagGeneratorTest, ExcludeBasicEmptyLemmaFallsBackToSurface) {
   auto tags = generator.generate(morphemes);
   // "りんご" has hiragana-only surface (used as fallback), should be excluded
   ASSERT_EQ(tags.size(), 1);
-  EXPECT_EQ(tags[0], "東京");
+  EXPECT_EQ(tags[0].tag, "東京");
 }
 
 TEST(TagGeneratorTest, PosFilterAndExcludeBasicCombined) {
@@ -490,8 +499,8 @@ TEST(TagGeneratorTest, PosFilterAndExcludeBasicCombined) {
   // Noun+Verb filter: excludes Adjective
   // exclude_basic: excludes "ある" (hiragana-only lemma)
   ASSERT_EQ(tags.size(), 2);
-  EXPECT_EQ(tags[0], "東京");
-  EXPECT_EQ(tags[1], "食べる");
+  EXPECT_EQ(tags[0].tag, "東京");
+  EXPECT_EQ(tags[1].tag, "食べる");
 }
 
 }  // namespace

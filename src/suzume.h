@@ -100,17 +100,17 @@ class Suzume {
   /**
    * @brief Generate tags from text
    * @param text UTF-8 encoded Japanese text
-   * @return Vector of tag strings
+   * @return Vector of tag entries with POS information
    */
-  std::vector<std::string> generateTags(std::string_view text) const;
+  std::vector<postprocess::TagEntry> generateTags(std::string_view text) const;
 
   /**
    * @brief Generate tags from text with custom options
    * @param text UTF-8 encoded Japanese text
    * @param options Tag generation options (POS filter, exclude_basic, etc.)
-   * @return Vector of tag strings
+   * @return Vector of tag entries with POS information
    */
-  std::vector<std::string> generateTags(
+  std::vector<postprocess::TagEntry> generateTags(
       std::string_view text,
       const postprocess::TagGeneratorOptions& options) const;
 
