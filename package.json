@@ -11,6 +11,7 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./wasm": "./dist/suzume-wasm.wasm",
     "./package.json": "./package.json"
   },
   "sideEffects": false,

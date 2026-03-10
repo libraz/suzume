@@ -172,14 +172,11 @@ export class Suzume {
 
     // Dynamic import of the Emscripten-generated module
     const createModule = await import('./suzume.js');
-    const module: EmscriptenModule = await createModule.default({
-      locateFile: (path: string) => {
-        if (path.endsWith('.wasm') && wasmPath) {
-          return wasmPath;
-        }
-        return path;
-      },
-    });
+    const moduleOptions: Record<string, unknown> = {};
+    if (wasmPath) {
+      moduleOptions.locateFile = (path: string) => (path.endsWith('.wasm') ? wasmPath : path);
+    }
+    const module: EmscriptenModule = await createModule.default(moduleOptions);
 
     let handle: number;
 

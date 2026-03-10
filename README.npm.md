@@ -16,15 +16,15 @@ for (const t of tokens) {
 
 // Tag extraction (returns { tag, pos } objects)
 const tags = suzume.generateTags('東京スカイツリーに行きました')
-// → [{ tag: '東京', pos: 'noun' }, { tag: 'スカイツリー', pos: 'noun' }, { tag: '行く', pos: 'verb' }]
+// → [{ tag: '東京', pos: 'NOUN' }, { tag: 'スカイツリー', pos: 'NOUN' }, { tag: '行く', pos: 'VERB' }]
 
 // Nouns only
 suzume.generateTags('美味しいラーメンを食べた', { pos: ['noun'] })
-// → [{ tag: 'ラーメン', pos: 'noun' }]
+// → [{ tag: 'ラーメン', pos: 'NOUN' }]
 
 // Exclude basic words (hiragana-only lemma like する, ある, いい)
 suzume.generateTags('今日はいい天気ですね', { excludeBasic: true })
-// → [{ tag: '今日', pos: 'noun' }, { tag: '天気', pos: 'noun' }]
+// → [{ tag: '今日', pos: 'NOUN' }, { tag: '天気', pos: 'NOUN' }]
 ```
 
 ### Browser (CDN)
@@ -36,6 +36,23 @@ suzume.generateTags('今日はいい天気ですね', { excludeBasic: true })
   const suzume = await Suzume.create()
   console.log(suzume.analyze('こんにちは'))
 </script>
+```
+
+### Bundlers (webpack, Next.js, etc.)
+
+If your bundler doesn't automatically resolve the `.wasm` file, you can specify its path manually:
+
+```typescript
+import wasmUrl from '@libraz/suzume/wasm?url' // Vite
+const suzume = await Suzume.create({ wasmPath: wasmUrl })
+```
+
+Or specify the path directly:
+
+```typescript
+const suzume = await Suzume.create({
+  wasmPath: new URL('@libraz/suzume/wasm', import.meta.url).href
+})
 ```
 
 ## Documentation
