@@ -144,8 +144,7 @@ def _append_issue(line_num: int, text: str, result: dict) -> None:
     BUGS_DIR.mkdir(parents=True, exist_ok=True)
     diff_type = result.get("diff_type", "unknown")
     bug_id = _next_bug_id()
-    slug = _sanitize_filename(text)
-    filename = f"{bug_id:03d}_{diff_type}_{slug}.json"
+    filename = f"{bug_id:03d}_{diff_type}.json"
 
     data = {
         "id": bug_id,
@@ -457,13 +456,6 @@ def _next_bug_id() -> int:
     return 1
 
 
-def _sanitize_filename(text: str, max_len: int = 30) -> str:
-    """Create a safe filename fragment from text."""
-    # Keep only safe chars
-    safe = re.sub(r"[^\w\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]", "_", text)
-    safe = re.sub(r"_+", "_", safe).strip("_")
-    return safe[:max_len]
-
 
 def _list_bugs() -> list[dict]:
     """Load all bug JSON files, sorted by ID."""
@@ -509,8 +501,7 @@ async def thread_report_bug(
         diff_type = classify_diff(expected, suzume)
 
     bug_id = _next_bug_id()
-    slug = _sanitize_filename(text)
-    filename = f"{bug_id:03d}_{diff_type}_{slug}.json"
+    filename = f"{bug_id:03d}_{diff_type}.json"
 
     data = {
         "id": bug_id,
@@ -617,76 +608,54 @@ async def thread_bugs_clear() -> str:
 
 
 @mcp.tool()
-async def thread_bugs_resolve(filename: str) -> str:
-    """Mark a bug as resolved by deleting its JSON file.
+async def thread_bugs_sweep() -> str:
+    """Re-test all bugs and auto-resolve those that are now fixed.
 
-    Args:
-        filename: Bug filename (e.g. "001_over-split_テスト.json") or bug ID number.
+    Runs _compare_surfaces on each bug's text. If suzume output now matches
+    expected, the bug file is deleted automatically.
     """
-    # Allow passing just the ID number
-    if filename.isdigit():
-        bug_id = int(filename)
-        matches = list(BUGS_DIR.glob(f"{bug_id:03d}_*.json"))
-        if not matches:
-            return _json_result({"status": "error", "message": f"No bug file found with ID {bug_id}"})
-        filepath = matches[0]
-    else:
-        filepath = BUGS_DIR / filename
+    if not BUGS_DIR.exists():
+        return _json_result({"status": "ok", "resolved_count": 0, "remaining": 0, "message": "No bugs directory"})
 
-    if not filepath.exists():
-        return _json_result({"status": "error", "message": f"Bug file not found: {filepath.name}"})
+    bug_files = sorted(BUGS_DIR.glob("*.json"))
+    if not bug_files:
+        return _json_result({"status": "ok", "resolved_count": 0, "remaining": 0, "message": "No bugs found"})
 
-    resolved_name = filepath.name
-    filepath.unlink()
-    remaining = len(list(BUGS_DIR.glob("*.json"))) if BUGS_DIR.exists() else 0
-
-    result = {
-        "status": "ok",
-        "resolved": resolved_name,
-        "remaining": remaining,
-    }
-
-    return _json_result(result)
-
-
-@mcp.tool()
-async def thread_bugs_resolve_batch(filenames: list[str]) -> str:
-    """Resolve multiple bugs at once.
-
-    Args:
-        filenames: List of bug filenames or bug ID numbers.
-    """
     resolved: list[str] = []
-    not_found: list[str] = []
+    still_open: list[dict] = []
+    errors: list[dict] = []
 
-    for name in filenames:
-        # Resolve filename to path (same logic as thread_bugs_resolve)
-        if name.isdigit():
-            bug_id = int(name)
-            matches = list(BUGS_DIR.glob(f"{bug_id:03d}_*.json")) if BUGS_DIR.exists() else []
-            if not matches:
-                not_found.append(name)
+    for filepath in bug_files:
+        try:
+            data = json.loads(filepath.read_text(encoding="utf-8"))
+            text = data.get("text", "")
+            if not text:
+                errors.append({"file": filepath.name, "error": "missing text field"})
                 continue
-            filepath = matches[0]
-        else:
-            filepath = BUGS_DIR / name
 
-        if not filepath.exists():
-            not_found.append(name)
-            continue
+            result = _compare_surfaces(text)
+            if result["match"]:
+                resolved.append(filepath.name)
+                filepath.unlink()
+            else:
+                still_open.append({
+                    "file": filepath.name,
+                    "text": text,
+                    "diff_type": result.get("diff_type", "unknown"),
+                })
+        except Exception as e:
+            errors.append({"file": filepath.name, "error": str(e)})
 
-        resolved.append(filepath.name)
-        filepath.unlink()
-
-    remaining = len(list(BUGS_DIR.glob("*.json"))) if BUGS_DIR.exists() else 0
-
-    result = {
+    result_data: dict = {
         "status": "ok",
         "resolved_count": len(resolved),
         "resolved": resolved,
-        "not_found_count": len(not_found),
-        "not_found": not_found,
-        "remaining": remaining,
+        "remaining": len(still_open),
+        "still_open": still_open,
     }
+    if errors:
+        result_data["errors"] = errors
 
-    return _json_result(result)
+    return _json_result(result_data)
+
+
