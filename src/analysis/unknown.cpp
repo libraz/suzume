@@ -281,7 +281,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
-    std::string_view text, const std::vector<char32_t>& codepoints,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
     size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   std::vector<UnknownCandidate> candidates;

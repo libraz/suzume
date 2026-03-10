@@ -489,6 +489,70 @@
         "character_speech",
         "kuruwa"
       ]
+    },
+    {
+      "description": "ます renyokei after き(くる) auxiliary — まし should be AUX not VERB(ましる)",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "参加"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shitekimashita",
+      "input": "参加してきました。"
+    },
+    {
+      "description": "ます renyokei after き(くる) auxiliary with onbin verb",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ndekimashita",
+      "input": "読んできました。"
     }
   ],
   "description": "Politeness auxiliaries (ます、です)",

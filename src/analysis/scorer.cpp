@@ -813,9 +813,12 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Surface-based bonus for VerbRenyokei → た (ichidan/irregular た-form)
   // E.g., 食べ+た, 来+た (MeCab-compatible split)
   // Must be surface == "た" to distinguish from て (particle)
+  // Guard: require kanji or dict origin to prevent false verbs like まし(ましる)
+  // from stealing た bonus over AUX_丁寧 path (参加してきました)
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface == "た" &&
-      next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
+      next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
+      (grammar::containsKanji(prev.surface) || prev.fromDictionary())) {
     surface_bonus += cost::kVeryStrongBonus;
   }
 
