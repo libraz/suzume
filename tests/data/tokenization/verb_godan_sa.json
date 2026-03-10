@@ -1,228 +1,182 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "いたします - godan sa verb (unified due to dict entry)",
-      "expected" : [
+      "description": "いたします - godan sa verb (unified due to dict entry)",
+      "expected": [
         {
-          "lemma" : "いたす",
-          "pos" : "Verb",
-          "surface" : "いたし"
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "godan_itashimasu",
-      "input" : "いたします",
-      "tags" : [
+      "id": "godan_itashimasu",
+      "input": "いたします",
+      "tags": [
         "basic",
         "godan"
       ]
     },
     {
-      "description" : "やらされた - causative-passive (MeCab: やらさ+れ+た)",
-      "expected" : [
+      "description": "やらされた - causative-passive (MeCab: やらさ+れ+た)",
+      "expected": [
         {
-          "lemma" : "やらす",
-          "pos" : "Verb",
-          "surface" : "やらさ"
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やら"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
-          "surface" : "れ"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "hiragana_verb_yarasareta",
-      "input" : "やらされた",
-      "tags" : [
+      "id": "hiragana_verb_yarasareta",
+      "input": "やらされた",
+      "tags": [
         "basic",
         "hiragana-verb"
       ]
     },
     {
-      "description" : "仕事をやらされた - MeCab互換分割",
-      "expected" : [
+      "description": "仕事をやらされた - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "仕事"
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "やらす",
-          "pos" : "Verb",
-          "surface" : "やらさ"
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やら"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
-          "surface" : "れ"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "hiragana_verb_sentence",
-      "input" : "仕事をやらされた",
-      "tags" : [
+      "id": "hiragana_verb_sentence",
+      "input": "仕事をやらされた",
+      "tags": [
         "basic",
         "hiragana-verb",
         "sentence"
       ]
     },
     {
-      "description" : "話しそう - verb renyokei + そう, not adjective",
-      "expected" : [
+      "description": "話しそう - verb renyokei + そう, not adjective",
+      "expected": [
         {
-          "lemma" : "話す",
-          "pos" : "Verb",
-          "surface" : "話し"
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話し"
         },
         {
-          "lemma" : "そう",
-          "pos" : "Auxiliary",
-          "surface" : "そう"
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
         }
       ],
-      "id" : "shi_sou_hanashisou_verb",
-      "input" : "話しそう",
-      "tags" : [
+      "id": "shi_sou_hanashisou_verb",
+      "input": "話しそう",
+      "tags": [
         "verb",
         "sou"
       ]
     },
     {
-      "description" : "試しそう - verb renyokei + そう, not adjective",
-      "expected" : [
+      "description": "試しそう - verb renyokei + そう, not adjective",
+      "expected": [
         {
-          "lemma" : "試す",
-          "pos" : "Verb",
-          "surface" : "試し"
+          "lemma": "試す",
+          "pos": "Verb",
+          "surface": "試し"
         },
         {
-          "lemma" : "そう",
-          "pos" : "Auxiliary",
-          "surface" : "そう"
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
         }
       ],
-      "id" : "shi_sou_tameshisou_verb",
-      "input" : "試しそう",
-      "tags" : [
+      "id": "shi_sou_tameshisou_verb",
+      "input": "試しそう",
+      "tags": [
         "verb",
         "sou"
       ]
     },
     {
-      "description" : "Business request - MeCab互換分割",
-      "expected" : [
+      "description": "Business request - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "ご"
+          "pos": "Prefix",
+          "surface": "ご"
         },
         {
-          "pos" : "Noun",
-          "surface" : "確認"
+          "pos": "Noun",
+          "surface": "確認"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "願い"
+          "pos": "Noun",
+          "surface": "願い"
         },
         {
-          "lemma" : "いたす",
-          "pos" : "Verb",
-          "surface" : "いたし"
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "complex_business",
-      "input" : "ご確認をお願いいたします",
-      "tags" : [
+      "id": "complex_business",
+      "input": "ご確認をお願いいたします",
+      "tags": [
         "strict",
         "complex",
         "business"
       ]
-    },
-    {
-      "description" : "やらされた - MeCab互換分割 (やらさ+れ+た)",
-      "expected" : [
-        {
-          "lemma" : "やらす",
-          "pos" : "Verb",
-          "surface" : "やらさ"
-        },
-        {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
-          "surface" : "れ"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "た"
-        }
-      ],
-      "id" : "causative_passive_yarasareta",
-      "input" : "やらされた",
-      "tags" : [
-        "causative-passive",
-        "hiragana-verb",
-        "regression"
-      ]
-    },
-    {
-      "description" : "仕事をやらされた - MeCab互換分割",
-      "expected" : [
-        {
-          "pos" : "Noun",
-          "surface" : "仕事"
-        },
-        {
-          "pos" : "Particle",
-          "surface" : "を"
-        },
-        {
-          "lemma" : "やらす",
-          "pos" : "Verb",
-          "surface" : "やらさ"
-        },
-        {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
-          "surface" : "れ"
-        },
-        {
-          "pos" : "Auxiliary",
-          "surface" : "た"
-        }
-      ],
-      "id" : "causative_passive_sentence",
-      "input" : "仕事をやらされた",
-      "tags" : [
-        "causative-passive",
-        "hiragana-verb",
-        "regression"
-      ]
     }
   ],
-  "description" : "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",
-  "version" : "1.0"
+  "description": "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",
+  "version": "1.0"
 }

@@ -94,6 +94,10 @@ BigramTable::initTable() {
   // VerbMizenkei → AuxCausative (食べ+させる) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxCausative, cost::kModerateBonus);
 
+  // VerbMizenkei → VerbMizenkei (読ま+さ, やら+さ causative pattern)
+  // Godan mizenkei + causative さ (する mizenkei) - moderate bonus
+  setCell(t, EPOS::VerbMizenkei, EPOS::VerbMizenkei, cost::kModerateBonus);
+
   // VerbMizenkei → AuxVolitional (食べ+よう) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxVolitional, cost::kModerateBonus);
 
@@ -394,6 +398,11 @@ BigramTable::initTable() {
   // Ensures なので → な+ので over な+の+で
   // Without this, PART_準体→AUX_断定 bonus makes の+で(AUX) path win
   setCell(t, EPOS::AuxCopulaDa, EPOS::ParticleConj, cost::kStrongBonus);
+
+  // AuxTenseTa → Noun/Pronoun (食べた+人, 来た+彼) - moderate bonus for past+noun
+  // POS-level AUX→NOUN=0.5 penalty is too harsh for this natural connection
+  setCell(t, EPOS::AuxTenseTa, EPOS::Noun, cost::kModerateBonus);
+  setCell(t, EPOS::AuxTenseTa, EPOS::Pronoun, cost::kModerateBonus);
 
   // AuxTenseTa → ParticleFinal (た+ね/よ) - minor bonus
   setCell(t, EPOS::AuxTenseTa, EPOS::ParticleFinal, cost::kMinorBonus);
@@ -866,6 +875,11 @@ BigramTable::initTable() {
 
   // Note: PART_格 → PART_係 (に+は, で+は, と+は) is valid Japanese,
   // so we intentionally do NOT penalize ParticleCase → ParticleTopic.
+
+  // Note: PART_接続 → PART_係 bonus is NOT set here because short particles
+  // like て, し also have PART_接続 and would incorrectly bond with は, も.
+  // Instead, compound particle (≥3 chars) + topic particle bonus is handled
+  // in scorer.cpp with surface length check.
 
   // =========================================================================
   // Particle → Other penalties (prevents over-segmentation of hiragana words)

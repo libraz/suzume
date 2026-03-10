@@ -1275,17 +1275,31 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // For short godan-sa patterns, require dict verification to avoid
       // false positives like 悲し (not a real verb 悲す) or 春らし (not 春らす).
       // Multi-kanji verbs (過ごし, 見逃し) are more likely real verbs.
+      float non_dict_penalty = 0.0F;
       size_t kanji_chars = kanji_end - start_pos;  // actual kanji count
+      size_t hira_chars = renyokei_end - kanji_end;
       if (kanji_chars <= 1 && dict_manager != nullptr) {
         if (!vh::isVerbInDictionary(dict_manager, best_sa.base_form)) {
-          SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface
-                          << "\" godan_sa single kanji, base \"" << best_sa.base_form
-                          << "\" not in dict\n");
-          continue;
+          if (hira_chars <= 1) {
+            // Single hiragana (悲し) — high false positive risk, skip
+            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface
+                            << "\" godan_sa single kanji+1hira, base \"" << best_sa.base_form
+                            << "\" not in dict\n");
+            continue;
+          }
+          // Block kanji+まし pattern (false godan-sa from verb+ます renyoukei)
+          // E.g., 来まし → 来ます (false), 出まし → 出ます (false)
+          if (codepoints[kanji_end] == U'ま') {
+            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface
+                            << "\" godan_sa kanji+まし pattern (likely verb+ます)\n");
+            continue;
+          }
+          // 2+ hiragana non-ます pattern (尽くし) — allow with penalty
+          non_dict_penalty = bigram_cost::kMinor;
         }
       }
 
-      float base_cost = verb_opts.bonus_ichidan + (1.0F - best_sa.confidence) * verb_opts.confidence_cost_scale_small;
+      float base_cost = verb_opts.bonus_ichidan + (1.0F - best_sa.confidence) * verb_opts.confidence_cost_scale_small + non_dict_penalty;
       SUZUME_DEBUG_VERBOSE_BLOCK {
         SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                             << " godan_sa_renyokei lemma=" << best_sa.base_form
@@ -2030,7 +2044,9 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // ん must be at the end of the string (hiragana_end == scan_pos + 2)
       bool is_n_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'ん' &&
           scan_pos + 2 == hiragana_end;
-      if (is_nai_pattern || is_nakatt_pattern || is_n_pattern) {
+      // Check for classical negative ぬ pattern (分からぬ, 変わらぬ)
+      bool is_nu_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'ぬ';
+      if (is_nai_pattern || is_nakatt_pattern || is_n_pattern || is_nu_pattern) {
         // Found A-row + negative pattern at scan_pos
         // The mizenkei would be from start_pos to scan_pos + 1
         size_t multi_miz_end = scan_pos + 1;
@@ -2054,6 +2070,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               constexpr float kCost = candidate::verb_cost::kStandardBonus;  // Same as other negative patterns
               const char* pattern = is_nakatt_pattern ? "multi_mizenkei_nakatt" :
                                     is_n_pattern ? "multi_mizenkei_n" :
+                                    is_nu_pattern ? "multi_mizenkei_nu" :
                                     "multi_mizenkei_nai";
               SUZUME_DEBUG_VERBOSE_BLOCK {
                 SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface

@@ -7,6 +7,7 @@ import shutil
 import pytest
 
 from suzume_mcp.tools.thread_tools import (
+    _BUGS_DIRS,
     _is_japanese,
     _list_bugs,
     _load_progress,
@@ -287,23 +288,21 @@ class TestThreadResetProgress:
 
 
 class TestNextBugId:
-    def test_empty_dir(self, tmp_path, monkeypatch):
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", tmp_path / "bugs")
-        assert _next_bug_id() == 1
+    def test_empty_dir(self, tmp_path):
+        assert _next_bug_id(tmp_path / "bugs") == 1
 
-    def test_sequential(self, tmp_path, monkeypatch):
+    def test_sequential(self, tmp_path):
         bugs_dir = tmp_path / "bugs"
         bugs_dir.mkdir()
         (bugs_dir / "001_over-split.json").write_text("{}")
         (bugs_dir / "002_boundary.json").write_text("{}")
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
-        assert _next_bug_id() == 3
+        assert _next_bug_id(bugs_dir) == 3
 
 
 class TestThreadReportBug:
     def test_report_basic(self, tmp_path, monkeypatch):
         bugs_dir = tmp_path / "bugs"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        monkeypatch.setitem(_BUGS_DIRS, "thread", bugs_dir)
 
         result = parse_json(
             run(
@@ -327,7 +326,7 @@ class TestThreadReportBug:
 
     def test_report_with_description(self, tmp_path, monkeypatch):
         bugs_dir = tmp_path / "bugs"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        monkeypatch.setitem(_BUGS_DIRS, "thread", bugs_dir)
 
         run(
             thread_report_bug(
@@ -346,7 +345,7 @@ class TestThreadReportBug:
 
     def test_report_auto_classify(self, tmp_path, monkeypatch):
         bugs_dir = tmp_path / "bugs"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        monkeypatch.setitem(_BUGS_DIRS, "thread", bugs_dir)
 
         run(
             thread_report_bug(
@@ -361,7 +360,7 @@ class TestThreadReportBug:
 
     def test_report_multiple(self, tmp_path, monkeypatch):
         bugs_dir = tmp_path / "bugs"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        monkeypatch.setitem(_BUGS_DIRS, "thread", bugs_dir)
 
         run(thread_report_bug(text="A", expected="a b", suzume="ab"))
         result = parse_json(run(thread_report_bug(text="B", expected="c d", suzume="cd")))
@@ -371,7 +370,7 @@ class TestThreadReportBug:
 
 class TestThreadBugsList:
     def test_no_dir(self, tmp_path, monkeypatch):
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", tmp_path / "nope")
+        monkeypatch.setitem(_BUGS_DIRS, "thread", tmp_path / "nope")
         result = parse_json(run(thread_bugs_list()))
         assert result["total"] == 0
         assert result["bugs"] == []
@@ -404,7 +403,7 @@ class TestThreadBugsList:
                 ensure_ascii=False,
             )
         )
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        monkeypatch.setitem(_BUGS_DIRS, "thread", bugs_dir)
 
         result = parse_json(run(thread_bugs_list()))
         assert result["total"] == 2
@@ -420,7 +419,7 @@ class TestThreadBugsClear:
         bugs_dir = tmp_path / "bugs"
         bugs_dir.mkdir()
         (bugs_dir / "001_test.json").write_text("{}")
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        monkeypatch.setitem(_BUGS_DIRS, "thread", bugs_dir)
 
         result = parse_json(run(thread_bugs_clear()))
         assert result["status"] == "ok"
@@ -428,14 +427,14 @@ class TestThreadBugsClear:
         assert not bugs_dir.exists()
 
     def test_clear_nonexistent(self, tmp_path, monkeypatch):
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", tmp_path / "nope")
+        monkeypatch.setitem(_BUGS_DIRS, "thread", tmp_path / "nope")
         result = parse_json(run(thread_bugs_clear()))
         assert result["status"] == "ok"
         assert "cleared" in result["message"].lower()
 
 
 class TestListBugs:
-    def test_list(self, tmp_path, monkeypatch):
+    def test_list(self, tmp_path):
         bugs_dir = tmp_path / "bugs"
         bugs_dir.mkdir()
         (bugs_dir / "001_test.json").write_text(
@@ -456,22 +455,20 @@ class TestListBugs:
                 }
             )
         )
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
 
-        bugs = _list_bugs()
+        bugs = _list_bugs(bugs_dir)
         assert len(bugs) == 2
         assert bugs[0]["id"] == 1
         assert bugs[1]["id"] == 2
 
-    def test_empty(self, tmp_path, monkeypatch):
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", tmp_path / "nope")
-        assert _list_bugs() == []
+    def test_empty(self, tmp_path):
+        assert _list_bugs(tmp_path / "nope") == []
 
 
 class TestThreadReportBugPattern:
     def test_pattern_field(self, tmp_path, monkeypatch):
         bugs_dir = tmp_path / "bugs"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        monkeypatch.setitem(_BUGS_DIRS, "thread", bugs_dir)
 
         run(
             thread_report_bug(
@@ -490,7 +487,7 @@ class TestThreadReportBugPattern:
 
     def test_no_pattern(self, tmp_path, monkeypatch):
         bugs_dir = tmp_path / "bugs"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        monkeypatch.setitem(_BUGS_DIRS, "thread", bugs_dir)
 
         run(
             thread_report_bug(
@@ -524,7 +521,7 @@ class TestThreadBugsListFilter:
             (bugs_dir / f"{idx:03d}_{dt}_test{idx}.json").write_text(
                 json.dumps(data, ensure_ascii=False)
             )
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        monkeypatch.setitem(_BUGS_DIRS, "thread", bugs_dir)
         return bugs_dir
 
     def test_filter_by_diff_type(self, tmp_path, monkeypatch):
@@ -602,7 +599,7 @@ class TestThreadBugsSweep:
         bugs_dir.mkdir()
         f1 = self._make_bug(bugs_dir, 1, "テスト")
         f2 = self._make_bug(bugs_dir, 2, "残るバグ")
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        monkeypatch.setitem(_BUGS_DIRS, "thread", bugs_dir)
 
         # Mock _compare_surfaces: first call matches, second doesn't
         call_count = [0]
@@ -621,7 +618,7 @@ class TestThreadBugsSweep:
         assert f2.exists()
 
     def test_sweep_empty(self, tmp_path, monkeypatch):
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", tmp_path / "nope")
+        monkeypatch.setitem(_BUGS_DIRS, "thread", tmp_path / "nope")
         result = parse_json(run(thread_bugs_sweep()))
         assert result["resolved_count"] == 0
         assert result["remaining"] == 0
@@ -631,7 +628,7 @@ class TestThreadBugsSweep:
         bugs_dir.mkdir()
         self._make_bug(bugs_dir, 1, "a")
         self._make_bug(bugs_dir, 2, "b")
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.BUGS_DIR", bugs_dir)
+        monkeypatch.setitem(_BUGS_DIRS, "thread", bugs_dir)
         monkeypatch.setattr("suzume_mcp.tools.thread_tools._compare_surfaces",
                             lambda text: {"match": True})
 

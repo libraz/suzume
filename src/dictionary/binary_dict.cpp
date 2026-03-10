@@ -214,10 +214,15 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
             entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
           } else if (!utf8::endsWith(entry.surface, "る") &&
                      entry.surface.size() <= core::kTwoJapaneseCharBytes) {
-            // Short verb forms (1-2 chars) not ending in る are likely renyokei
-            // e.g., すぎ from すぎる expansion → すぎ + ない should work
-            // Forms ending in る (する, いる, etc.) are shuushikei
-            entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
+            // Short verb forms (1-2 chars) not ending in る
+            if (grammar::endsWithARow(entry.surface) &&
+                grammar::containsKanji(entry.surface)) {
+              // Kanji + A-row ending = godan mizenkei (読ま, 書か, 行か)
+              entry.extended_pos = core::ExtendedPOS::VerbMizenkei;
+            } else {
+              // Other short forms likely renyoukei (すぎ from すぎる)
+              entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
+            }
           } else if (utf8::endsWithAny(entry.surface, {"き"sv, "ぎ"sv, "し"sv,
                      "ち"sv, "に"sv, "び"sv, "み"sv, "り"sv})) {
             // Godan verb renyokei endings (I-row hiragana except い)

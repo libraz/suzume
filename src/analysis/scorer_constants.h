@@ -595,6 +595,23 @@ constexpr const char* kIAdjNegStemKuna = "くな";      // i-adj negative stem
 constexpr const char* kIAdjCondKereba = "ければ";     // i-adj conditional: 高い→高ければ
 constexpr const char* kIAdjCondStemKere = "けれ";     // i-adj conditional stem
 
+// =============================================================================
+// Recently Extracted Constants
+// =============================================================================
+
+// VerbRenyokei (A-row ending) → VerbMizenkei(さ) causative bonus
+// E.g., やら+さ+れ+た — overcome VerbRenyokei→VerbMizenkei bigram penalty (1.8)
+constexpr float kBonusVerbCausativePattern = -3.0F;
+
+// Compound particle (≥3 chars) → topic/binding particle (は, も, が)
+// E.g., にとって+も, について+は — overcome ADV→NOUN bonus advantage
+constexpr float kBonusCompoundParticleToTopic = -2.7F;
+
+// Compound adjective length-scaled bonus (男らしい, 女らしい)
+// Formula: base + per_char * (char_len - 4) for char_len > 4
+constexpr float kBonusCompoundAdjBase = -1.0F;
+constexpr float kBonusCompoundAdjPerChar = 0.4F;
+
 }  // namespace suzume::analysis::scorer
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONSTANTS_H_

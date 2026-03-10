@@ -572,7 +572,7 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
       // Longer compounds need stronger bonus to beat noun+adj split paths
       // Must overcome NOUN→dict_ADJ surface bonus (-0.5) on the split path
       size_t char_len = suzume::normalize::utf8Length(edge.surface);
-      float bonus = -1.0F - static_cast<float>(char_len > 4 ? char_len - 4 : 0) * 0.4F;
+      float bonus = sc::kBonusCompoundAdjBase - static_cast<float>(char_len > 4 ? char_len - 4 : 0) * sc::kBonusCompoundAdjPerChar;
       cost += bonus;
     }
   }
@@ -653,6 +653,47 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.surface.size() >= 6 &&  // "すぎ" is 6 bytes
       next.surface.compare(0, 6, "すぎ") == 0) {
     surface_bonus = cost::kStrongBonus;
+  }
+
+  // VerbRenyokei → AdjBasic bonus for kanji-containing verb + adjective
+  // E.g., 尽くし+難い, 食べ+やすい — verb renyoukei + compound adjective
+  // Only when verb contains kanji to prevent false splits in hiragana sequences
+  // (e.g., おこがましい → おこ+がましい would be wrong)
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.extended_pos == core::ExtendedPOS::AdjBasic &&
+      grammar::containsKanji(prev.surface)) {
+    surface_bonus += cost::kExtraStrongBonus;
+  }
+
+  // Penalty for VerbRenyokei + し(conjunction) with kanji verb
+  // In modern Japanese, conjunction し follows shuushikei (行く+し), not renyoukei (行き+し).
+  // VerbRenyokei + し is usually a false split of godan-sa renyoukei (尽く+し → 尽くし).
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface == "し" &&
+      next.extended_pos == core::ExtendedPOS::ParticleConj &&
+      grammar::containsKanji(prev.surface)) {
+    surface_bonus += cost::kMinor;  // Penalty to discourage false split
+  }
+
+  // VerbRenyokei (A-row ending) → VerbMizenkei(さ) causative pattern
+  // E.g., やら+さ+れ+た — hiragana verb mizenkei + causative さ
+  // VerbRenyokei is used for short hiragana verbs (EPOS can't distinguish mizenkei)
+  // Need strong bonus to overcome VerbRenyokei→VerbMizenkei bigram penalty (1.8)
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.extended_pos == core::ExtendedPOS::VerbMizenkei &&
+      next.surface == "さ" &&
+      grammar::endsWithARow(prev.surface)) {
+    surface_bonus += sc::kBonusVerbCausativePattern;
+  }
+
+  // Compound particle (≥3 chars) → topic/binding particle (は, も, が)
+  // E.g., にとって+も, について+は, において+も, として+は
+  // Only applies to long compound particles to avoid boosting て+も, し+は
+  // Needs to overcome ADV→NOUN bonus advantage in competing paths
+  if (prev.extended_pos == core::ExtendedPOS::ParticleConj &&
+      next.extended_pos == core::ExtendedPOS::ParticleTopic &&
+      prev.surface.size() >= core::kThreeJapaneseCharBytes) {
+    surface_bonus += sc::kBonusCompoundParticleToTopic;
   }
 
   // Bonus for て → い (Auxiliary) pattern

@@ -63,6 +63,7 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"崩す", "くずす", "す", V2VerbType::Godan},    // 切り崩す, 打ち崩す
     {"倒す", "たおす", "す", V2VerbType::Godan},    // 打ち倒す, 蹴り倒す
     {"起こす", "おこす", "す", V2VerbType::Godan},  // 引き起こす, 呼び起こす
+    {"去る", "さる", "る", V2VerbType::Godan},      // 立ち去る, 走り去る
     // Ichidan verbs (一段)
     {"続ける", "つづける", "ける", V2VerbType::Ichidan}, // 読み続ける, 読みつづける
     {"つける", nullptr, "ける", V2VerbType::Ichidan},    // 見つける
@@ -77,6 +78,7 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"着く", "つく", "く", V2VerbType::Godan},            // 落ち着く, たどり着く
     {"取る", "とる", "る", V2VerbType::Godan},            // 搾り取る, 掠め取る
     {"越す", "こす", "す", V2VerbType::Godan},            // 引っ越す, 追い越す
+    {"越える", "こえる", "える", V2VerbType::Ichidan},   // 乗り越える, 飛び越える
     {"張る", "はる", "る", V2VerbType::Godan},            // 引っ張る, 頑張る
     {"叫ぶ", "さけぶ", "ぶ", V2VerbType::Godan},         // 泣き叫ぶ, 喚き叫ぶ
     {"注ぐ", "そそぐ", "ぐ", V2VerbType::Godan},         // 降り注ぐ, 流し注ぐ
@@ -1182,7 +1184,10 @@ void addHiraganaCompoundVerbJoinCandidates(
       if (matched_v2_len == 0) {
         std::string v2_renyokei = generateRenyokei(
             v2_surface, v2_reading, v2_verb.verb_type);
-        if (!v2_renyokei.empty() && v2_start_byte + v2_renyokei.size() <= text.size()) {
+        // Require V2 renyokei to be 2+ chars to avoid false matches
+        // (single-char で/し/き are ambiguous as particles/auxiliaries)
+        if (v2_renyokei.size() > core::kJapaneseCharBytes &&
+            v2_start_byte + v2_renyokei.size() <= text.size()) {
           std::string_view text_at_v2 = text.substr(v2_start_byte, v2_renyokei.size());
           if (text_at_v2 == v2_renyokei) {
             matched_v2_len = v2_renyokei.size();

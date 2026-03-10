@@ -184,21 +184,9 @@ TEST_F(InflectionComplexTest, TemoKamawanaiIchidan) {
 }
 
 // ===== beki =====
-
-TEST_F(InflectionComplexTest, BekiGodanKa) {
-  auto result = inflection_.getBest("書くべきだ");
-  EXPECT_EQ(result.base_form, "書く");
-}
-
-TEST_F(InflectionComplexTest, BekiIchidan) {
-  auto result = inflection_.getBest("食べるべきだった");
-  EXPECT_EQ(result.base_form, "食べる");
-}
-
-TEST_F(InflectionComplexTest, BekiSuru) {
-  auto result = inflection_.getBest("すべきではない");
-  EXPECT_EQ(result.base_form, "する");
-}
+// Beki compound tests removed: compound べき entries (べきだ, べきだった, べきではない)
+// were removed from auxiliary_generator to prevent false merging (聞くべきだ→single VERB).
+// Tokenization correctly splits as べき+だ, べき+だっ+た, べき+で+は+ない.
 
 // ===== tokoroda =====
 

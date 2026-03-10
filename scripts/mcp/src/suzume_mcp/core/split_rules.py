@@ -5,14 +5,83 @@ import regex
 from .constants import TTARA_STEMS, TTEBA_STEMS, USER_DICT_COMPOUNDS
 
 
+
+# Mapping from MeCab causative lemma ending to base verb dictionary form ending
+_CAUSATIVE_LEMMA_ENDINGS: dict[str, str] = {
+    "ます": "む",  # 飲ます → 飲む
+    "かす": "く",  # 書かす → 書く
+    "がす": "ぐ",  # 泳がす → 泳ぐ
+    "たす": "つ",  # 待たす → 待つ
+    "なす": "ぬ",  # 死なす → 死ぬ
+    "らす": "る",  # 降らす → 降る
+    "さす": "す",  # 話さす → 話す
+    "わす": "う",  # 使わす → 使う
+    "ばす": "ぶ",  # 飛ばす → 飛ぶ
+    "はす": "ふ",  # rare archaic row
+}
+
+
+def _split_causative_passive(tokens: list[dict]) -> tuple[list[dict], bool]:
+    """Pre-pass: split MeCab's merged causative さ when followed by passive れ.
+
+    MeCab sometimes merges godan verb mizenkei + causative さ into one token
+    (e.g., 飲まさ from 飲まされた), while splitting correctly in other cases
+    (e.g., 読まされた → 読ま + さ). This normalizes the inconsistency.
+
+    Pattern: verb token ending in さ + next token れ (passive auxiliary)
+    → split verb token into [verb_without_さ] + [さ]
+
+    Returns:
+        Tuple of (processed tokens, was_applied).
+    """
+    result: list[dict] = []
+    applied = False
+    i = 0
+    while i < len(tokens):
+        t = tokens[i]
+        surface = t.get("surface", "")
+        pos = t.get("pos", "")
+
+        # Check: verb token ending in さ with length >= 3 (at least 2 chars before さ)
+        if (
+            pos == "動詞"
+            and surface.endswith("さ")
+            and len(surface) >= 3
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("surface") == "れ"
+        ):
+            # The preceding chars form the verb mizenkei
+            verb_part = surface[:-1]
+            # Reconstruct base verb lemma from MeCab causative lemma
+            mecab_lemma = t.get("lemma", surface)
+            verb_lemma = verb_part  # fallback: use surface
+            for ending, replacement in _CAUSATIVE_LEMMA_ENDINGS.items():
+                if mecab_lemma.endswith(ending):
+                    verb_lemma = mecab_lemma[: -len(ending)] + replacement
+                    break
+
+            result.append({"surface": verb_part, "pos": "動詞", "lemma": verb_lemma})
+            result.append({"surface": "さ", "pos": "助動詞", "lemma": "す"})
+            applied = True
+            i += 1
+            continue
+
+        result.append(t)
+        i += 1
+
+    return result, applied
+
 def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
     """Apply Suzume split rules to MeCab tokens.
 
     Returns:
         Tuple of (split tokens, applied rule name or None).
     """
+    # Pre-pass: split merged causative さ before passive れ
+    tokens, causative_applied = _split_causative_passive(tokens)
+
     result: list[dict] = []
-    applied_rule: str | None = None
+    applied_rule: str | None = "causative-passive-split" if causative_applied else None
 
     for t in tokens:
         surface = t.get("surface", "")

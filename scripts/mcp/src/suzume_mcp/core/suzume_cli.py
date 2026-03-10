@@ -14,7 +14,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from ..server import PROJECT_ROOT
+from ..config import PROJECT_ROOT
 
 
 def _get_cli_path() -> Path:

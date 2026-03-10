@@ -211,7 +211,7 @@ std::vector<DictionaryEntry> getCompoundParticleEntries() {
       // Capacity/Viewpoint (資格・観点)
       particle("として", EPOS::ParticleConj),  // prevent と+し(VERB)+て split
       particle("にとって", EPOS::ParticleConj),
-      particle("にとっても", EPOS::ParticleAdverbial),  // prevent に+とっても(ADV) misparse
+      // にとっても removed — MeCab splits as にとって+も
       particle("に関して", EPOS::ParticleConj),  // MeCab compatible
       particle("に際して", EPOS::ParticleConj),  // MeCab compatible
       particle("に対して", EPOS::ParticleConj),

@@ -806,6 +806,24 @@ next_length:;  // Label for goto from particle-starting verb skip
       continue;
     }
 
+    // For GodanSa passive, check if this is causative+passive pattern
+    // E.g., やらさ+れ+た = causative+passive of やる (not passive of やらす)
+    // If the stem (without さ) is a valid godan verb mizenkei, penalize
+    // the merged candidate so the decomposed path (やら+さ+れ+た) can compete
+    float causative_passive_penalty = 0.0F;
+    if (verb_type == grammar::VerbType::GodanSa && dict_manager != nullptr &&
+        mizenkei_end - start_pos >= 2) {
+      char32_t stem_last = codepoints[mizenkei_end - 2];
+      auto inner_suffix = grammar::godanBaseSuffixFromARow(stem_last);
+      if (!inner_suffix.empty()) {
+        std::string inner_stem = extractSubstring(codepoints, start_pos, mizenkei_end - 2);
+        std::string inner_base = inner_stem + std::string(inner_suffix);
+        if (vh::isVerbInDictionary(dict_manager, inner_base)) {
+          causative_passive_penalty = bigram_cost::kStrong;
+        }
+      }
+    }
+
     // Skip GodanRa passive for known ichidan verbs (いる, きる, ねる, etc.)
     // These 2-char verbs ending in る are ichidan, not godan-ra.
     // The ichidan path (い+られる) is handled separately.
@@ -847,14 +865,14 @@ next_length:;  // Label for goto from particle-starting verb skip
     std::string surface = extractSubstring(codepoints, start_pos, split_end);
     const char* pattern_name = "passive_mizenkei";
 
-    constexpr float kCost = candidate::verb_cost::kStandardBonus;  // Negative cost to beat OTHER + AUX split
+    float cost = candidate::verb_cost::kStandardBonus + causative_passive_penalty;
     SUZUME_DEBUG_VERBOSE_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                           << " hiragana_" << pattern_name << " lemma=" << lemma
-                          << " cost=" << kCost << "\n";
+                          << " cost=" << cost << "\n";
     }
     candidates.push_back(makeVerbCandidate(
-        surface, start_pos, split_end, kCost, lemma,
+        surface, start_pos, split_end, cost, lemma,
         grammar::verbTypeToConjType(verb_type),
         true, CandidateOrigin::VerbHiragana, 0.9F, "hiragana_passive_mizenkei"));
     break;  // Only generate one passive candidate per length

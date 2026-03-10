@@ -15,6 +15,19 @@ PROGRESS_FILE = SKILL_DIR / ".thread_check_progress"
 BUGS_DIR = SKILL_DIR / "bugs"
 DEFAULT_FILE = SKILL_DIR / "thread_names.txt"
 
+_BUGS_DIRS = {
+    "thread": PROJECT_ROOT / ".claude" / "skills" / "thread-quality-check" / "bugs",
+    "literary": PROJECT_ROOT / ".claude" / "skills" / "literary-quality-check" / "bugs",
+}
+
+
+def _bugs_dir(source: str = "thread") -> Path:
+    """Get bugs directory for given source skill."""
+    if source in _BUGS_DIRS:
+        return _BUGS_DIRS[source]
+    # Fallback: assume skill name pattern
+    return PROJECT_ROOT / ".claude" / "skills" / f"{source}-quality-check" / "bugs"
+
 
 def _json_result(obj: dict) -> str:
     """Serialize result dict to JSON string."""
@@ -143,7 +156,7 @@ def _append_issue(line_num: int, text: str, result: dict) -> None:
     """Write issue as a JSON file in bugs/ directory (auto-detected during scan)."""
     BUGS_DIR.mkdir(parents=True, exist_ok=True)
     diff_type = result.get("diff_type", "unknown")
-    bug_id = _next_bug_id()
+    bug_id = _next_bug_id(BUGS_DIR)
     filename = f"{bug_id:03d}_{diff_type}.json"
 
     data = {
@@ -441,11 +454,11 @@ async def thread_reset_progress() -> str:
 # ============================================================================
 
 
-def _next_bug_id() -> int:
+def _next_bug_id(bugs_dir: Path) -> int:
     """Get next sequential bug ID."""
-    if not BUGS_DIR.exists():
+    if not bugs_dir.exists():
         return 1
-    existing = sorted(BUGS_DIR.glob("*.json"))
+    existing = sorted(bugs_dir.glob("*.json"))
     if not existing:
         return 1
     # Extract numeric prefix from filename
@@ -457,12 +470,12 @@ def _next_bug_id() -> int:
 
 
 
-def _list_bugs() -> list[dict]:
+def _list_bugs(bugs_dir: Path) -> list[dict]:
     """Load all bug JSON files, sorted by ID."""
-    if not BUGS_DIR.exists():
+    if not bugs_dir.exists():
         return []
     bugs = []
-    for f in sorted(BUGS_DIR.glob("*.json")):
+    for f in sorted(bugs_dir.glob("*.json")):
         try:
             data = json.loads(f.read_text(encoding="utf-8"))
             data["_file"] = f.name
@@ -481,6 +494,7 @@ async def thread_report_bug(
     line_num: int = 0,
     diff_type: str = "",
     pattern: str = "",
+    source: str = "thread",
 ) -> str:
     """Report a grammar bug found during thread scanning.
 
@@ -494,13 +508,15 @@ async def thread_report_bug(
         line_num: Optional line number in thread_names.txt.
         diff_type: Optional diff type (over-split, under-split, boundary).
         pattern: Optional pattern label for grouping (e.g. sokuonbin, compound-verb).
+        source: Bug storage source - "thread" or "literary" (default: "thread").
     """
-    BUGS_DIR.mkdir(parents=True, exist_ok=True)
+    bd = _bugs_dir(source)
+    bd.mkdir(parents=True, exist_ok=True)
 
     if not diff_type:
         diff_type = classify_diff(expected, suzume)
 
-    bug_id = _next_bug_id()
+    bug_id = _next_bug_id(bd)
     filename = f"{bug_id:03d}_{diff_type}.json"
 
     data = {
@@ -517,13 +533,13 @@ async def thread_report_bug(
     if pattern:
         data["pattern"] = pattern
 
-    filepath = BUGS_DIR / filename
+    filepath = bd / filename
     filepath.write_text(
         json.dumps(data, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
 
-    count = len(list(BUGS_DIR.glob("*.json")))
+    count = len(list(bd.glob("*.json")))
 
     result = {
         "status": "ok",
@@ -537,15 +553,18 @@ async def thread_report_bug(
 
 
 @mcp.tool()
-async def thread_bugs_list(limit: int = 50, diff_type: str = "", pattern: str = "") -> str:
+async def thread_bugs_list(
+    limit: int = 50, diff_type: str = "", pattern: str = "", source: str = "thread"
+) -> str:
     """List reported grammar bugs.
 
     Args:
         limit: Max number of bugs to show.
         diff_type: Filter by diff type (e.g. "over-split"). Empty shows all.
         pattern: Filter by pattern label (e.g. "sokuonbin"). Empty shows all.
+        source: Bug storage source - "thread" or "literary" (default: "thread").
     """
-    bugs = _list_bugs()
+    bugs = _list_bugs(_bugs_dir(source))
     if not bugs:
         return _json_result({"total": 0, "diff_types": {}, "patterns": {}, "bugs": []})
 
@@ -598,26 +617,35 @@ async def thread_bugs_list(limit: int = 50, diff_type: str = "", pattern: str = 
 
 
 @mcp.tool()
-async def thread_bugs_clear() -> str:
-    """Clear all reported bugs (delete bugs/ directory)."""
-    if BUGS_DIR.exists():
+async def thread_bugs_clear(source: str = "thread") -> str:
+    """Clear all reported bugs (delete bugs/ directory).
+
+    Args:
+        source: Bug storage source - "thread" or "literary" (default: "thread").
+    """
+    bd = _bugs_dir(source)
+    if bd.exists():
         import shutil
 
-        shutil.rmtree(BUGS_DIR)
+        shutil.rmtree(bd)
     return _json_result({"status": "ok", "message": "Bugs directory cleared"})
 
 
 @mcp.tool()
-async def thread_bugs_sweep() -> str:
+async def thread_bugs_sweep(source: str = "thread") -> str:
     """Re-test all bugs and auto-resolve those that are now fixed.
 
     Runs _compare_surfaces on each bug's text. If suzume output now matches
     expected, the bug file is deleted automatically.
+
+    Args:
+        source: Bug storage source - "thread" or "literary" (default: "thread").
     """
-    if not BUGS_DIR.exists():
+    bd = _bugs_dir(source)
+    if not bd.exists():
         return _json_result({"status": "ok", "resolved_count": 0, "remaining": 0, "message": "No bugs directory"})
 
-    bug_files = sorted(BUGS_DIR.glob("*.json"))
+    bug_files = sorted(bd.glob("*.json"))
     if not bug_files:
         return _json_result({"status": "ok", "resolved_count": 0, "remaining": 0, "message": "No bugs found"})
 

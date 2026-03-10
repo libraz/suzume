@@ -1,17 +1,8 @@
 """MCP server for Suzume Japanese morphological analysis tools."""
 
-import os
-from pathlib import Path
-
 from mcp.server.fastmcp import FastMCP
 
-# Resolve project root (scripts/mcp/../../ = project root)
-_SERVER_DIR = Path(__file__).resolve().parent.parent.parent  # src/suzume_mcp -> mcp/
-PROJECT_ROOT = _SERVER_DIR.parent.parent  # mcp/ -> scripts/ -> project root
-
-# Allow override via environment variable
-if env_root := os.environ.get("SUZUME_PROJECT_ROOT"):
-    PROJECT_ROOT = Path(env_root)
+from .config import PROJECT_ROOT  # noqa: F401 — re-exported for tools
 
 mcp = FastMCP("suzume")
 

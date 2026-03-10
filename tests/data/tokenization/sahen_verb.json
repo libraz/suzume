@@ -4,20 +4,22 @@
       "description": "Sahen noun + shi + eru/enai should split at shi boundary",
       "expected": [
         {
+          "lemma": "解決",
           "pos": "Noun",
           "surface": "解決"
         },
         {
-          "lemma": "する",
-          "pos": "Verb",
+          "lemma": "し",
+          "pos": "Particle",
           "surface": "し"
         },
         {
           "lemma": "得る",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "得"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -29,6 +31,7 @@
       "description": "Sahen noun + shi + eru should split at shi boundary",
       "expected": [
         {
+          "lemma": "解決",
           "pos": "Noun",
           "surface": "解決"
         },
@@ -38,7 +41,8 @@
           "surface": "し"
         },
         {
-          "pos": "Auxiliary",
+          "lemma": "得る",
+          "pos": "Verb",
           "surface": "得る"
         }
       ],
@@ -49,20 +53,22 @@
       "description": "Sahen noun + shi + eru/enai should split at shi boundary",
       "expected": [
         {
+          "lemma": "理解",
           "pos": "Noun",
           "surface": "理解"
         },
         {
-          "lemma": "する",
-          "pos": "Verb",
+          "lemma": "し",
+          "pos": "Particle",
           "surface": "し"
         },
         {
           "lemma": "得る",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "得"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }

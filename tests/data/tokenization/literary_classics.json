@@ -540,6 +540,490 @@
       ],
       "id": "ranuga_toiu_gaaru",
       "input": "知らぬが仏という言葉がある"
+    },
+    {
+      "description": "godan-sa renyoukei + adjective (Bug #9 regression test)",
+      "expected": [
+        {
+          "lemma": "尽くす",
+          "pos": "Verb",
+          "surface": "尽くし"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "難い"
+        }
+      ],
+      "id": "kushi_i",
+      "input": "尽くし難い"
+    },
+    {
+      "description": "verb renyoukei + adjective compound",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "やすい"
+        }
+      ],
+      "id": "beyasui",
+      "input": "食べやすい"
+    },
+    {
+      "description": "Bug #12: bungo ぬ multi-okurigana + べき splitting",
+      "expected": [
+        {
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分から"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Verb",
+          "surface": "聞く"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "karanukotoha_kubekida",
+      "input": "分からぬことは聞くべきだ"
+    },
+    {
+      "description": "Bug #12: godan-ra multi-okurigana + ぬ",
+      "expected": [
+        {
+          "lemma": "変わる",
+          "pos": "Verb",
+          "surface": "変わら"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "waranu",
+      "input": "変わらぬ"
+    },
+    {
+      "description": "Bug #12: verb shuushikei + べき splitting",
+      "expected": [
+        {
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "kubekida",
+      "input": "行くべきだ"
+    },
+    {
+      "description": "Bug #9: godan-sa renyoukei in full sentence",
+      "expected": [
+        {
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "pos": "Noun",
+          "surface": "光景"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Noun",
+          "surface": "筆舌"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "尽くす",
+          "pos": "Verb",
+          "surface": "尽くし"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "難い"
+        },
+        {
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "sono_ha_ni_kushi_imonodeattta",
+      "input": "その光景は筆舌に尽くし難いものであった"
+    },
+    {
+      "description": "AuxTenseTa→Noun bonus: き+た before noun",
+      "expected": [
+        {
+          "lemma": "越える",
+          "pos": "Verb",
+          "surface": "越え"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Pronoun",
+          "surface": "彼"
+        }
+      ],
+      "id": "etekita",
+      "input": "越えてきた彼"
+    },
+    {
+      "description": "にとっても split: にとって+も",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "にとって",
+          "pos": "Particle",
+          "surface": "にとって"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "大切",
+          "pos": "Noun",
+          "surface": "大切"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nitotttemo_da",
+      "input": "彼にとっても大切だ"
+    },
+    {
+      "description": "Combined: compound verb + きた split + にとっても split",
+      "expected": [
+        {
+          "lemma": "あらゆる",
+          "pos": "Determiner",
+          "surface": "あらゆる"
+        },
+        {
+          "lemma": "困難",
+          "pos": "Noun",
+          "surface": "困難"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "乗り越える",
+          "pos": "Verb",
+          "surface": "乗り越え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "にとって",
+          "pos": "Particle",
+          "surface": "にとって"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "今回",
+          "pos": "Noun",
+          "surface": "今回"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "試練",
+          "pos": "Noun",
+          "surface": "試練"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "厳しい",
+          "pos": "Adjective",
+          "surface": "厳しかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "arayuru_wo_ri_etekita_nitotttemo_no_ha_shikattta",
+      "input": "あらゆる困難を乗り越えてきた彼にとっても今回の試練は厳しかった"
+    },
+    {
+      "description": "Causative-passive: 読ま+さ+れ+た (godan mizenkei EPOS fix)",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "masareta",
+      "input": "読まされた"
+    },
+    {
+      "description": "Bug #8 full sentence: causative-passive in context",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "内容",
+          "pos": "Noun",
+          "surface": "内容"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "到底",
+          "pos": "Adverb",
+          "surface": "到底"
+        },
+        {
+          "lemma": "理解",
+          "pos": "Noun",
+          "surface": "理解"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        },
+        {
+          "lemma": "難い",
+          "pos": "Adjective",
+          "surface": "難い"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "masareta_no_ha_shi_imonodeattta",
+      "input": "読まされた本の内容は到底理解し難いものであった"
+    },
+    {
+      "description": "とっても as adverb (very)",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "とっても"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "元気"
+        }
+      ],
+      "id": "totttemo_genki",
+      "input": "とっても元気"
+    },
+    {
+      "description": "とっても adverb after は",
+      "expected": [
+        {
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Adverb",
+          "surface": "とっても"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "元気"
+        }
+      ],
+      "id": "ha_totttemo_genki",
+      "input": "彼はとっても元気"
+    },
+    {
+      "description": "にとって+も compound particle + も",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "にとって",
+          "pos": "Particle",
+          "surface": "にとって"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "大切",
+          "pos": "Noun",
+          "surface": "大切"
+        }
+      ],
+      "id": "nitotttemo_taisetsu",
+      "input": "彼にとっても大切"
     }
   ],
   "description": "literary_classics tests",

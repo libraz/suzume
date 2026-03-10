@@ -499,10 +499,10 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"もいいですか", "もいいですか", "もいい", kAuxNai, kAuxOutBase, kAuxOutTe});
 
   // === べき patterns ===
-  entries.push_back({"べきだ", "べきだ", "べきだ", kAuxNai, kAuxOutBase, kVerbBase});
-  entries.push_back({"べきだった", "べきだった", "べきだ", kAuxNai, kAuxOutTa, kVerbBase});
-  entries.push_back({"べきではない", "べきではない", "べきだ", kAuxNai, kAuxOutBase, kVerbBase});
-  entries.push_back({"べきです", "べきです", "べきだ", kAuxNai, kAuxOutMasu, kVerbBase});
+  // Note: べきだ/べきだった/べきではない/べきです removed — MeCab splits as
+  // べき+だ, べき+だっ+た, etc. The L1 entry for べき (AuxVolitional) handles
+  // the independent token. Compound suffix chains caused false merging
+  // (e.g., 聞くべきだ → single VERB token instead of 聞く+べき+だ).
 
   // === ところだ (connects from various forms) ===
   // From base form (終止形): 食べるところだ
@@ -602,7 +602,7 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"はいけなかった", "はいけなかった", "はいけない", kAuxNai, kAuxOutTa, kAuxOutTe});
   entries.push_back({"はだめだ", "はだめだ", "はだめだ", kAuxNai, kAuxOutBase, kAuxOutTe});
   entries.push_back({"はならなかった", "はならなかった", "はならない", kAuxNai, kAuxOutTa, kAuxOutTe});
-  entries.push_back({"べきではなかった", "べきではなかった", "べきだ", kAuxNai, kAuxOutTa, kVerbBase});
+  // べきではなかった removed (same reason as べき patterns above)
   entries.push_back({"もかまわない", "もかまわない", "もかまわない", kAuxNai, kAuxOutBase, kAuxOutTe});
   entries.push_back({"もかまわなかった", "もかまわなかった", "もかまわない", kAuxNai, kAuxOutTa, kAuxOutTe});
 

@@ -1,0 +1,129 @@
+{
+  "cases": [
+    {
+      "description": "立ち去った - auto-generated",
+      "expected": [
+        {
+          "lemma": "立ち去る",
+          "pos": "Verb",
+          "surface": "立ち去っ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "chi_ttta",
+      "input": "立ち去った"
+    },
+    {
+      "description": "走り去る - auto-generated",
+      "expected": [
+        {
+          "pos": "Verb",
+          "surface": "走り去る"
+        }
+      ],
+      "id": "ri_ru",
+      "input": "走り去る"
+    },
+    {
+      "description": "乗り越えた - auto-generated",
+      "expected": [
+        {
+          "lemma": "乗り越える",
+          "pos": "Verb",
+          "surface": "乗り越え"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ri_eta",
+      "input": "乗り越えた"
+    },
+    {
+      "description": "飛び越える - auto-generated",
+      "expected": [
+        {
+          "pos": "Verb",
+          "surface": "飛び越える"
+        }
+      ],
+      "id": "bi_eru",
+      "input": "飛び越える"
+    },
+    {
+      "description": "彼は万感の思いを胸に秘めたまま静かに立ち去った - auto-generated",
+      "expected": [
+        {
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Noun",
+          "surface": "万感"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "思い"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "pos": "Noun",
+          "surface": "胸"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "秘める",
+          "pos": "Verb",
+          "surface": "秘め"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Noun",
+          "surface": "まま"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "立ち去る",
+          "pos": "Verb",
+          "surface": "立ち去っ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_no_iwo_ni_metamama_kani_chi_ttta",
+      "input": "彼は万感の思いを胸に秘めたまま静かに立ち去った"
+    }
+  ],
+  "description": "compound_verbs tests",
+  "version": "1.0"
+}
