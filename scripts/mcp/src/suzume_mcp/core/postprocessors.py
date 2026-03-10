@@ -118,12 +118,20 @@ def postprocess_sou(tokens: list[dict]) -> None:
         if t.get("surface") != "そう":
             continue
 
-        # Adverb そう before copula -> Adjective
-        if t.get("pos") == "Adverb":
-            if i < len(tokens) - 1:
+        # 伝聞そう before copula -> Adjective
+        # Only when preceded by Auxiliary (だ/た etc.), not by Verb (様態そう)
+        pos = t.get("pos", "")
+        if pos in ("Adverb", "Auxiliary"):
+            if i < len(tokens) - 1 and i > 0:
                 nxt = tokens[i + 1].get("surface", "")
-                if regex.match(r"^(?:だ|です|でし|じゃ|じゃろ|や)", nxt):
+                prev_pos = tokens[i - 1].get("pos", "")
+                if regex.match(r"^(?:だ|です|でし|じゃ|じゃろ)", nxt) and prev_pos != "Verb":
                     t["pos"] = "Adjective"
+            elif i == 0:  # Sentence-initial そう before copula
+                if i < len(tokens) - 1:
+                    nxt = tokens[i + 1].get("surface", "")
+                    if regex.match(r"^(?:だ|です|でし|じゃ|じゃろ)", nxt):
+                        t["pos"] = "Adjective"
 
         # Katakana adjective stem + そう: Noun -> Adjective
         if i > 0:
@@ -203,23 +211,11 @@ def postprocess_de_particle(tokens: list[dict]) -> None:
             if nxt in ("は", "も"):
                 t["pos"] = "Particle"
                 t["lemma"] = "で"
-                continue
-        # で after Adjective
-        if i > 0 and tokens[i - 1].get("pos") == "Adjective":
-            t["pos"] = "Particle"
-            t["lemma"] = "で"
 
 
 def postprocess_na_adj_noun(tokens: list[dict]) -> None:
-    """Fix na-adjective stems before すぎる: Adjective -> Noun."""
-    for i, t in enumerate(tokens):
-        if t.get("pos") != "Adjective":
-            continue
-        if i < len(tokens) - 1:
-            nxt = tokens[i + 1].get("surface", "")
-            if nxt.startswith("すぎ"):
-                t["pos"] = "Noun"
-                t["lemma"] = t.get("surface", "")
+    """No-op: kept for import compatibility. Adjective stems before すぎる stay Adjective."""
+    pass
 
 
 def postprocess_tsuke_noun(tokens: list[dict]) -> None:
@@ -253,3 +249,67 @@ def postprocess_te(tokens: list[dict]) -> None:
         if prev_pos in ("Verb", "Auxiliary", "Adjective"):
             t["pos"] = "Auxiliary"
             t["lemma"] = "てる" if surface == "て" else "でる"
+
+
+def postprocess_de_aru(tokens: list[dict]) -> None:
+    """Fix で+ある pattern: で(Auxiliary) after Noun -> Particle, ある -> Verb."""
+    for i in range(1, len(tokens)):
+        t = tokens[i]
+        surface = t.get("surface", "")
+        if surface not in ("ある", "あり", "あれ", "あっ") or t.get("pos") != "Auxiliary":
+            continue
+        prev = tokens[i - 1]
+        if prev.get("surface") != "で":
+            continue
+        # で after Noun + ある: de is Particle, ある is Verb
+        if prev.get("pos") in ("Particle", "Auxiliary"):
+            if i >= 2 and tokens[i - 2].get("pos") in ("Noun", "Pronoun"):
+                prev["pos"] = "Particle"
+                prev["lemma"] = "で"
+                t["pos"] = "Verb"
+                t["lemma"] = "ある"
+            elif prev.get("pos") == "Particle":
+                t["pos"] = "Verb"
+                t["lemma"] = "ある"
+
+
+def postprocess_taihen(tokens: list[dict]) -> None:
+    """Fix 大変 before な: Adverb -> Adjective (na-adjective use)."""
+    for i, t in enumerate(tokens):
+        if t.get("surface") == "大変" and t.get("pos") == "Adverb":
+            if i < len(tokens) - 1 and tokens[i + 1].get("surface") == "な":
+                t["pos"] = "Adjective"
+
+
+def postprocess_gozai_verb(tokens: list[dict]) -> None:
+    """Fix ござい after おめでとう: Auxiliary -> Verb."""
+    for i in range(1, len(tokens)):
+        t = tokens[i]
+        if t.get("surface") == "ござい" and t.get("pos") == "Auxiliary":
+            if tokens[i - 1].get("surface") == "おめでとう":
+                t["pos"] = "Verb"
+                t["lemma"] = "ござる"
+
+
+def postprocess_you_noun(tokens: list[dict]) -> None:
+    """Fix よう: Auxiliary -> Noun (形式名詞)."""
+    for t in tokens:
+        if t.get("surface") == "よう" and t.get("pos") == "Auxiliary":
+            t["pos"] = "Noun"
+            t["lemma"] = "よう"
+
+
+def postprocess_sou_aux(tokens: list[dict]) -> None:
+    """Fix そう after Auxiliary (しまい etc.): Adverb -> Auxiliary (様態)."""
+    for i in range(1, len(tokens)):
+        t = tokens[i]
+        if t.get("surface") != "そう" or t.get("pos") != "Adverb":
+            continue
+        prev_pos = tokens[i - 1].get("pos", "")
+        if prev_pos == "Auxiliary":
+            t["pos"] = "Auxiliary"
+
+
+def postprocess_nara_verb(tokens: list[dict]) -> None:
+    """No-op: なら stays as MeCab classifies it. suzume_expected handles differences."""
+    pass

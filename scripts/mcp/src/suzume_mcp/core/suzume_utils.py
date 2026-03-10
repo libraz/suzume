@@ -8,15 +8,21 @@ from .merge_rules import apply_suzume_merge
 from .pos_mapping import correct_mecab_pos, map_mecab_pos, normalize_pos
 from .postprocessors import (
     postprocess_copula_neg,
+    postprocess_de_aru,
     postprocess_de_particle,
+    postprocess_gozai_verb,
+    postprocess_taihen,
     postprocess_demo,
     postprocess_ii,
     postprocess_ikaga,
     postprocess_iru_aux,
     postprocess_mecab_tokens,
     postprocess_na_adj_noun,
+    postprocess_nara_verb,
     postprocess_sou,
+    postprocess_sou_aux,
     postprocess_tsuke_noun,
+    postprocess_you_noun,
     preprocess_for_mecab,
 )
 from .split_rules import apply_suzume_split
@@ -87,9 +93,15 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     postprocess_ii(tokens)
     postprocess_iru_aux(tokens)
     postprocess_de_particle(tokens)
+    postprocess_de_aru(tokens)
+    postprocess_gozai_verb(tokens)
+    postprocess_taihen(tokens)
     postprocess_na_adj_noun(tokens)
     postprocess_tsuke_noun(tokens)
     postprocess_copula_neg(tokens)
+    postprocess_you_noun(tokens)
+    postprocess_sou_aux(tokens)
+    postprocess_nara_verb(tokens)
 
     # Normalize full-width alphanumeric to half-width
     fullwidth_applied = False

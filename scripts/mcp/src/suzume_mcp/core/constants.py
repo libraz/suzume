@@ -471,7 +471,6 @@ NA_ADJ_OVERRIDES: set[str] = {
 # Words to keep as Noun despite 形容動詞語幹 classification
 KEEP_AS_NOUN_NOT_ADJ: set[str] = {
     "マジ",
-    "妙",
     "不安",
     "不要",
     "乙",

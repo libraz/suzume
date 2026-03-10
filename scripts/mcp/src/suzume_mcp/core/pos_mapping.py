@@ -59,6 +59,18 @@ def map_mecab_pos(token: dict | str) -> str:
     if surface in ADVERB_OVERRIDES:
         return "Adverb"
 
+    # よろしく: always Adverb in Suzume
+    if surface == "よろしく":
+        return "Adverb"
+
+    # おめでとう: Interjection -> Adverb in Suzume
+    if surface == "おめでとう":
+        return "Adverb"
+
+    # 遥か: 副詞 -> Adjective (na-adjective used adverbially)
+    if surface == "遥か" and pos == "副詞":
+        return "Adjective"
+
     # どう: Suzume treats as ナ形容詞
     if surface == "どう" and pos == "副詞":
         return "Adjective"
@@ -129,7 +141,7 @@ def map_mecab_pos(token: dict | str) -> str:
     if surface == "なんて" and pos == "副詞":
         return "Particle"
 
-    # 大変: -> Adverb
+    # 大変: -> Adverb (postprocessor handles 大変+な -> Adjective)
     if surface == "大変" and pos in ("名詞", "副詞"):
         return "Adverb"
 
@@ -146,9 +158,23 @@ def map_mecab_pos(token: dict | str) -> str:
     if surface == "まじ" and pos == "助動詞":
         return "Adjective"
 
+
+    # や (Kansai copula): 助動詞 -> Particle
+    if surface == "や" and pos == "助動詞":
+        token["lemma"] = "や"
+        return "Particle"
+
     # で (verb): lemma fix
     if surface == "で" and pos == "動詞" and token.get("lemma") == "でる":
         token["lemma"] = "出る"
+
+    # いくら: 副詞/名詞 -> Pronoun (疑問代名詞)
+    if surface == "いくら" and pos in ("副詞", "名詞"):
+        return "Pronoun"
+
+    # まして: 副詞 -> Conjunction (接続詞用法)
+    if surface == "まして" and pos == "副詞":
+        return "Conjunction"
 
     # いわば: -> Conjunction
     if surface == "いわば" and pos == "副詞":
@@ -271,12 +297,16 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
         pos = t.get("pos", "")
 
         # Fix adjective 連用形 (〜く): always 形容詞, not 副詞
+        # Only when lemma ends in い, or surface contains kanji (正しく etc.)
+        # Excludes pure hiragana adverbs: わくわく, せっかく, とにかく, etc.
         if surface.endswith("く") and pos == "副詞":
             lemma = t.get("lemma", "")
-            if lemma.endswith(("い", "く")) or lemma == surface:
+            if lemma.endswith("い"):
                 t["pos"] = "形容詞"
-                if lemma == surface or lemma.endswith("く"):
-                    t["lemma"] = surface[:-1] + "い"
+            elif lemma == surface and regex.search(r"[\u4E00-\u9FFF]", surface):
+                # Kanji-containing surface with lemma==surface: adj 連用形
+                t["pos"] = "形容詞"
+                t["lemma"] = surface[:-1] + "い"
 
         # Fix じゃ: always 助動詞 (copula)
         if surface == "じゃ" and pos in ("助詞", "接続詞", "助動詞"):

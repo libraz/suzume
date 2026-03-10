@@ -113,17 +113,19 @@ class TestPostprocessDeParticle:
         postprocess_de_particle(tokens)
         assert tokens[0]["pos"] == "Particle"
 
-    def test_de_after_adjective(self):
+    def test_de_after_adjective_stays_auxiliary(self):
+        """で after Adjective stays Auxiliary (copula て-form)."""
         tokens = [_tok("好き", "Adjective"), _tok("で", "Auxiliary")]
         postprocess_de_particle(tokens)
-        assert tokens[1]["pos"] == "Particle"
+        assert tokens[1]["pos"] == "Auxiliary"
 
 
 class TestPostprocessNaAdjNoun:
-    def test_adj_before_sugiru(self):
+    def test_adj_before_sugiru_stays_adjective(self):
+        """Adjective stems before すぎる stay Adjective (no-op)."""
         tokens = [_tok("複雑", "Adjective"), _tok("すぎる", "Verb")]
         postprocess_na_adj_noun(tokens)
-        assert tokens[0]["pos"] == "Noun"
+        assert tokens[0]["pos"] == "Adjective"
 
 
 class TestPostprocessTsukeNoun:
