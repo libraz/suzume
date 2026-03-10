@@ -517,6 +517,12 @@ BigramTable::initTable() {
   // Prevents 驚+い+た from beating 驚い+た for verb onbin form
   setCell(t, EPOS::Noun, EPOS::AuxAspectIru, cost::kRare);
 
+  // Noun → AuxAspectKuru (先生+き) - near impossible
+  // AUX_接近 (くる/き) only appears after て-form (走ってきた, 食べてくる)
+  // Never after nouns. Needs a very high penalty to overcome the strong
+  // DET→NOUN bonus (-2.5) on prefix compounds like 先生
+  setCell(t, EPOS::Noun, EPOS::AuxAspectKuru, 5.0F);
+
   // NaAdj → AuxCopulaDa (静か+だ) - strong bonus
   setCell(t, EPOS::AdjNaAdj, EPOS::AuxCopulaDa, cost::kStrongBonus);
 

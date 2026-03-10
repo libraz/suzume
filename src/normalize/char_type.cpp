@@ -181,6 +181,9 @@ bool isNeverVerbStemAtStart(char32_t ch) {
   // Note: は is excluded - はじまる, はたらく, はなす, はしる, etc. are common verbs
   //       The particle use of は will be handled by scoring
   // を, が, へ, の are particles that never start verbs
+  // Note: While のこる(残る), のむ(飲む) etc. exist as verbs, they are typically
+  // written in kanji. Allowing の as verb stem creates too many false positives
+  // (のよう→のる, のに→のにる, etc.) that hurt accuracy more than they help.
   return ch == U'を' || ch == U'が' ||
          ch == U'へ' || ch == U'の' || ch == U'よ';
 }

@@ -985,6 +985,20 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kUncommon;
   }
 
+  // Penalty for NOUN → single-hiragana OTHER
+  // A single hiragana character classified as OTHER after a kanji NOUN is almost
+  // always a misparse: the hiragana should be part of a verb (先+生きのこる) or
+  // okurigana (読み+残す), not a standalone unknown token
+  // E.g., 先生+き(OTHER) should lose to 先+生きのこる
+  // Needs a very high penalty to overcome prefix compound bonus advantages
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      grammar::containsKanji(prev.surface) &&
+      next.pos == core::PartOfSpeech::Other &&
+      next.surface.size() == 3 &&  // Single char = 3 bytes UTF-8
+      grammar::isPureHiragana(next.surface)) {
+    surface_bonus += cost::kAlmostNever;
+  }
+
   // Penalty for DET → non-dict single-kanji NOUN
   // The DET→NOUN bigram bonus (-2.5) is too strong for unknown single-kanji tokens,
   // causing splits like こんな+伸+びる instead of こんな+伸びる
@@ -994,6 +1008,27 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       grammar::containsKanji(next.surface) &&
       suzume::normalize::utf8Length(next.surface) == 1) {
     surface_bonus += cost::kStrong;
+  }
+
+  // Penalty for DET → non-dict kanji+hiragana NOUN (nominalized verb pattern)
+  // The DET→NOUN bonus (-2.5) makes heuristic candidates like "先生き" (NOUN)
+  // too attractive, preventing correct splits like 先+生きのこる
+  // Valid DET+NOUN uses dict nouns or pure-kanji nouns; nominalized forms
+  // (kanji + 1 trailing hiragana, e.g., 先生き, 出来事み) are rare after DET
+  if (prev.pos == core::PartOfSpeech::Determiner &&
+      next.pos == core::PartOfSpeech::Noun && !next.fromDictionary()) {
+    size_t char_len = suzume::normalize::utf8Length(next.surface);
+    if (char_len >= 3 && grammar::containsKanji(next.surface) &&
+        !grammar::isAllKanji(next.surface)) {
+      // Check if surface ends with exactly 1 hiragana (nominalized pattern)
+      auto codepoints = normalize::toCodepoints(next.surface);
+      if (!codepoints.empty() &&
+          kana::isHiraganaCodepoint(codepoints.back()) &&
+          codepoints.size() >= 2 &&
+          normalize::isKanjiCodepoint(codepoints[codepoints.size() - 2])) {
+        surface_bonus += cost::kAlmostNever;
+      }
+    }
   }
 
 

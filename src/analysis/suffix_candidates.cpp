@@ -1151,6 +1151,31 @@ const std::unordered_set<char32_t>& getPrefixLikeKanji() {
   return kPrefixKanji;
 }
 
+// Temporal unit kanji that form valid compounds with temporal prefix kanji
+// E.g., 先日, 今週, 来月, 翌年, 毎朝 etc.
+const std::unordered_set<char32_t>& getTemporalUnitKanji() {
+  static const std::unordered_set<char32_t> kTemporalUnits = {
+      U'日',  // day
+      U'週',  // week
+      U'月',  // month
+      U'年',  // year
+      U'朝',  // morning
+      U'晩',  // evening
+      U'夜',  // night
+      U'回',  // time/occurrence
+      U'度',  // degree/time
+      U'般',  // 先般 (recently)
+      U'頃',  // 今頃 (around now)
+      U'春',  // spring
+      U'夏',  // summer
+      U'秋',  // autumn
+      U'冬',  // winter
+      U'期',  // period
+      U'世',  // generation (来世, 今世)
+  };
+  return kTemporalUnits;
+}
+
 // Interrogative kanji that should NOT form compounds
 // These act as strong anchors in the dictionary
 const std::unordered_set<char32_t>& getInterrogativeKanji() {
@@ -1211,6 +1236,13 @@ std::vector<UnknownCandidate> generatePrefixCompoundCandidates(
   if (interrogatives.find(second_char) != interrogatives.end()) {
     return candidates;  // Don't generate compound, let dictionary anchor win
   }
+
+  // Validate second character against temporal unit kanji
+  // Temporal prefixes (先, 今, 来, etc.) should only compound with temporal units
+  // (日, 週, 月, 年, etc.), not arbitrary kanji
+  // E.g., 先日/先週 are valid; 先生 is not a temporal compound (means "teacher")
+  const auto& temporal_units = getTemporalUnitKanji();
+  bool is_valid_temporal = (temporal_units.find(second_char) != temporal_units.end());
 
   // Generate 2-character compound (prefix + single kanji) ONLY when:
   // - Not followed by more kanji, OR
