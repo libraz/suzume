@@ -484,6 +484,12 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
         // This looks like a suru-verb pattern - skip nominalization
         return candidates;
       }
+      // Kanji after し indicates suru-verb renyoukei + kanji verb/noun
+      // e.g., 解決し得ない → 解決+し+得+ない (not 解決し+得ない)
+      if (next_pos < char_types.size() &&
+          char_types[next_pos] == normalize::CharType::Kanji) {
+        return candidates;
+      }
     }
   }
 

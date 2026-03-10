@@ -1,0 +1,547 @@
+{
+  "cases": [
+    {
+      "description": "漱石・草枕冒頭風",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "山路"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "登る",
+          "pos": "Verb",
+          "surface": "登り"
+        },
+        {
+          "pos": "Particle",
+          "surface": "ながら"
+        },
+        {
+          "lemma": "考える",
+          "pos": "Verb",
+          "surface": "考え"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_rinagara_eta",
+      "input": "山路を登りながら考えた"
+    },
+    {
+      "description": "芥川・羅生門末尾風",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "下人"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "行方"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Pronoun",
+          "surface": "誰"
+        },
+        {
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "no_ha_mo_ranai",
+      "input": "下人の行方は誰も知らない"
+    },
+    {
+      "description": "太宰・人間失格冒頭風",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "恥"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "多い"
+        },
+        {
+          "pos": "Noun",
+          "surface": "生涯"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "送る",
+          "pos": "Verb",
+          "surface": "送っ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_i_wo_ttte_mashita",
+      "input": "恥の多い生涯を送って来ました"
+    },
+    {
+      "description": "敬語多重化",
+      "expected": [
+        {
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "pos": "Noun",
+          "surface": "忙しい"
+        },
+        {
+          "pos": "Noun",
+          "surface": "ところ"
+        },
+        {
+          "lemma": "恐れ入る",
+          "pos": "Verb",
+          "surface": "恐れ入り"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "pos": "Noun",
+          "surface": "確認"
+        },
+        {
+          "lemma": "いただける",
+          "pos": "Verb",
+          "surface": "いただけ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "o_shiitokoro_re_rimasugago_itadakemasudeshi_uka",
+      "input": "お忙しいところ恐れ入りますがご確認いただけますでしょうか"
+    },
+    {
+      "description": "体言止め",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "朝靄"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "中"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Verb",
+          "surface": "浮かぶ"
+        },
+        {
+          "pos": "Noun",
+          "surface": "古城"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "影"
+        }
+      ],
+      "id": "no_ni_kabu_no",
+      "input": "朝靄の中に浮かぶ古城の影"
+    },
+    {
+      "description": "芭蕉・俳句 compound verb 飛び込む",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "古池"
+        },
+        {
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "pos": "Noun",
+          "surface": "蛙"
+        },
+        {
+          "pos": "Verb",
+          "surface": "飛び込む"
+        },
+        {
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "音"
+        }
+      ],
+      "id": "ya_bi_mu_no",
+      "input": "古池や蛙飛び込む水の音"
+    },
+    {
+      "description": "川端・雪国冒頭風 長い連体修飾",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "国境"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "長い"
+        },
+        {
+          "pos": "Noun",
+          "surface": "トンネル"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "pos": "Verb",
+          "surface": "抜ける"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "pos": "Noun",
+          "surface": "雪国"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_i_wo_keruto_deattta",
+      "input": "国境の長いトンネルを抜けると雪国であった"
+    },
+    {
+      "description": "文語否定ぬ + 漢語 硬い書き言葉",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "事態"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Noun",
+          "surface": "一刻"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "猶予"
+        },
+        {
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "許す",
+          "pos": "Verb",
+          "surface": "許さ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "pos": "Noun",
+          "surface": "状況"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "至る",
+          "pos": "Verb",
+          "surface": "至っ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_no_mo_sanu_ni_ttta",
+      "input": "事態は一刻の猶予も許さぬ状況に至った"
+    },
+    {
+      "description": "使役受動 ichidan (させ+られ)",
+      "expected": [
+        {
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Noun",
+          "surface": "母"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Adverb",
+          "surface": "無理やり"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "させる",
+          "pos": "Auxiliary",
+          "surface": "させ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_ni_yari_besaserareta",
+      "input": "彼女は母に無理やり食べさせられた"
+    },
+    {
+      "description": "体言止め 数量詞一筋",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "夕暮れ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "空"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Verb",
+          "surface": "浮かぶ"
+        },
+        {
+          "pos": "Noun",
+          "surface": "一筋"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "雲"
+        }
+      ],
+      "id": "reno_ni_kabu_no",
+      "input": "夕暮れの空に浮かぶ一筋の雲"
+    },
+    {
+      "description": "漢語 含蓄 硬い書き言葉",
+      "expected": [
+        {
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "言葉"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "深い"
+        },
+        {
+          "pos": "Noun",
+          "surface": "含蓄"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_niha_i_gaattta",
+      "input": "彼の言葉には深い含蓄があった"
+    },
+    {
+      "description": "文語否定ぬ + 慣用句",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Noun",
+          "surface": "仏"
+        },
+        {
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "pos": "Noun",
+          "surface": "言葉"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "ranuga_toiu_gaaru",
+      "input": "知らぬが仏という言葉がある"
+    }
+  ],
+  "description": "literary_classics tests",
+  "version": "1.0"
+}

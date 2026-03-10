@@ -1,0 +1,96 @@
+{
+  "cases": [
+    {
+      "description": "Sahen noun + shi + eru/enai should split at shi boundary",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "解決"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "得る",
+          "pos": "Auxiliary",
+          "surface": "得"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kaiketsu_shi_enai",
+      "input": "解決し得ない"
+    },
+    {
+      "description": "Sahen noun + shi + eru should split at shi boundary",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "解決"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "得る"
+        }
+      ],
+      "id": "kaiketsu_shi_eru",
+      "input": "解決し得る"
+    },
+    {
+      "description": "Sahen noun + shi + eru/enai should split at shi boundary",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "理解"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "得る",
+          "pos": "Auxiliary",
+          "surface": "得"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "rikai_shi_enai",
+      "input": "理解し得ない"
+    },
+    {
+      "description": "Sahen noun + shi + subsidiary verb should split at shi boundary",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "勉強"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "pos": "Verb",
+          "surface": "始める"
+        }
+      ],
+      "id": "benkyou_shi_hajimeru",
+      "input": "勉強し始める"
+    }
+  ],
+  "description": "sahen_verb tests",
+  "version": "1.0"
+}

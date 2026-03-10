@@ -1,0 +1,139 @@
+{
+  "cases": [
+    {
+      "description": "godan-ka verb + ざるを得ない should split (not merge as compound verb)",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ざる",
+          "pos": "Verb",
+          "surface": "ざる"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "得る",
+          "pos": "Verb",
+          "surface": "得"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "zaruwoenai_godan_ka",
+      "input": "行かざるを得ない"
+    },
+    {
+      "description": "godan-ka verb + ざるを得ない should split",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "ざる",
+          "pos": "Verb",
+          "surface": "ざる"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "得る",
+          "pos": "Verb",
+          "surface": "得"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "zaruwoenai_godan_ka_kaku",
+      "input": "書かざるを得ない"
+    },
+    {
+      "description": "godan-wa verb + ざるを得ない should split",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "ざる",
+          "pos": "Verb",
+          "surface": "ざる"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "得る",
+          "pos": "Verb",
+          "surface": "得"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "zaruwoenai_godan_wa",
+      "input": "言わざるを得ない"
+    },
+    {
+      "description": "godan-ka verb + ざるを得なかった should split",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ざる",
+          "pos": "Verb",
+          "surface": "ざる"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "得る",
+          "pos": "Verb",
+          "surface": "得"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "zaruwoenakatta_godan_ka",
+      "input": "行かざるを得なかった"
+    }
+  ],
+  "description": "verb_auxiliary tests",
+  "version": "1.0"
+}

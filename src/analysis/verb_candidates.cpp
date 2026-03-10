@@ -116,6 +116,14 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
         continue;
       }
 
+      // Skip inflection candidates whose suffix contains particles (を, は, が, etc.)
+      // These indicate the inflection analysis crossed a phrase boundary.
+      // E.g., 行かざるを得ない: suffix="かざるを得ない" contains を (particle)
+      // This is verb + auxiliary phrase, NOT a compound verb.
+      if (utf8::containsAny(infl_cand.suffix, {"を", "は", "が"})) {
+        continue;
+      }
+
       // Check if base form exists in dictionary as a verb
       auto results = dict_manager->lookup(infl_cand.base_form, 0);
       for (const auto& result : results) {
