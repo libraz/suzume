@@ -296,6 +296,11 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
         surface = t.get("surface", "")
         pos = t.get("pos", "")
 
+        # Fix kanji adverbs MeCab misclassifies as 名詞
+        if surface in ("特段", "別段", "格段") and pos == "名詞":
+            t["pos"] = "副詞"
+            continue
+
         # Fix adjective 連用形 (〜く): always 形容詞, not 副詞
         # Only when lemma ends in い, or surface contains kanji (正しく etc.)
         # Excludes pure hiragana adverbs: わくわく, せっかく, とにかく, etc.

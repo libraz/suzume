@@ -127,11 +127,21 @@ def postprocess_sou(tokens: list[dict]) -> None:
                 prev_pos = tokens[i - 1].get("pos", "")
                 if regex.match(r"^(?:だ|です|でし|じゃ|じゃろ)", nxt) and prev_pos != "Verb":
                     t["pos"] = "Adjective"
+                # そう before で+ある (copula である)
+                elif nxt == "で" and i < len(tokens) - 2:
+                    nxt2 = tokens[i + 2].get("surface", "")
+                    if nxt2 in ("ある", "あり", "あれ", "あっ"):
+                        t["pos"] = "Adjective"
             elif i == 0:  # Sentence-initial そう before copula
                 if i < len(tokens) - 1:
                     nxt = tokens[i + 1].get("surface", "")
                     if regex.match(r"^(?:だ|です|でし|じゃ|じゃろ)", nxt):
                         t["pos"] = "Adjective"
+                    # そう before で+ある (copula である)
+                    elif nxt == "で" and i < len(tokens) - 2:
+                        nxt2 = tokens[i + 2].get("surface", "")
+                        if nxt2 in ("ある", "あり", "あれ", "あっ"):
+                            t["pos"] = "Adjective"
 
         # Katakana adjective stem + そう: Noun -> Adjective
         if i > 0:
@@ -252,25 +262,40 @@ def postprocess_te(tokens: list[dict]) -> None:
 
 
 def postprocess_de_aru(tokens: list[dict]) -> None:
-    """Fix で+ある pattern: で(Auxiliary) after Noun -> Particle, ある -> Verb."""
-    for i in range(1, len(tokens)):
+    """Fix copula で+ある/あり/あっ pattern based on context."""
+    for i in range(len(tokens)):
         t = tokens[i]
-        surface = t.get("surface", "")
-        if surface not in ("ある", "あり", "あれ", "あっ") or t.get("pos") != "Auxiliary":
+        if t.get("surface") != "で":
             continue
-        prev = tokens[i - 1]
-        if prev.get("surface") != "で":
+        if i >= len(tokens) - 1:
             continue
-        # で after Noun + ある: de is Particle, ある is Verb
-        if prev.get("pos") in ("Particle", "Auxiliary"):
-            if i >= 2 and tokens[i - 2].get("pos") in ("Noun", "Pronoun"):
-                prev["pos"] = "Particle"
-                prev["lemma"] = "で"
-                t["pos"] = "Verb"
-                t["lemma"] = "ある"
-            elif prev.get("pos") == "Particle":
-                t["pos"] = "Verb"
-                t["lemma"] = "ある"
+
+        nxt = tokens[i + 1]
+        nxt_surface = nxt.get("surface", "")
+
+        if nxt_surface not in ("ある", "あり", "あれ", "あっ"):
+            continue
+
+        prev_pos = tokens[i - 1].get("pos", "") if i > 0 else ""
+        is_past = nxt_surface == "あっ"
+
+        if is_past and prev_pos in ("Noun", "Pronoun", "Suffix"):
+            # N+であった: で→Particle, あっ→Verb
+            t["pos"] = "Particle"
+            t["lemma"] = "で"
+            if nxt.get("pos") == "Auxiliary":
+                nxt["pos"] = "Verb"
+                nxt["lemma"] = "ある"
+        elif is_past:
+            # Na-adj+であった or other: keep as-is (copula chain)
+            pass
+        else:
+            # Present/continuous forms: で→Auxiliary(だ), ある→Verb
+            t["pos"] = "Auxiliary"
+            t["lemma"] = "だ"
+            if nxt.get("pos") == "Auxiliary":
+                nxt["pos"] = "Verb"
+                nxt["lemma"] = "ある"
 
 
 def postprocess_taihen(tokens: list[dict]) -> None:
@@ -310,6 +335,32 @@ def postprocess_sou_aux(tokens: list[dict]) -> None:
             t["pos"] = "Auxiliary"
 
 
-def postprocess_nara_verb(tokens: list[dict]) -> None:
-    """No-op: なら stays as MeCab classifies it. suzume_expected handles differences."""
+def postprocess_n_kuruwa(tokens: list[dict]) -> None:
+    """Fix ん in kuruwa dialect (after あり): Particle -> Auxiliary."""
+    for i in range(1, len(tokens)):
+        t = tokens[i]
+        if t.get("surface") != "ん" or t.get("pos") != "Particle":
+            continue
+        prev = tokens[i - 1]
+        if prev.get("surface") in ("あり", "あっ"):
+            t["pos"] = "Auxiliary"
+            t["lemma"] = "ん"
+
+
+def postprocess_nai_context(tokens: list[dict]) -> None:
+    """No-op: ない POS is too context-dependent for simple rules."""
     pass
+
+
+def postprocess_nara_verb(tokens: list[dict]) -> None:
+    """Fix なら before ない/なく/なかっ: Auxiliary -> Verb(なる)."""
+    for i in range(len(tokens) - 1):
+        t = tokens[i]
+        if t.get("surface") != "なら":
+            continue
+        if t.get("pos") not in ("Auxiliary", "Particle"):
+            continue
+        nxt_surface = tokens[i + 1].get("surface", "")
+        if nxt_surface in ("ない", "なく", "なかっ"):
+            t["pos"] = "Verb"
+            t["lemma"] = "なる"

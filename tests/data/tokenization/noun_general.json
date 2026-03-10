@@ -273,15 +273,30 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "design-difference",
+        "reason": "Suzume intentional design difference from MeCab normalization"
+      },
       "description": "第一回 (first time) - 第一 is adverb, 回 is counter suffix",
       "expected": [
         {
           "pos": "Noun",
-          "surface": "第一回"
+          "surface": "第一"
+        },
+        {
+          "pos": "Suffix",
+          "surface": "回"
         }
       ],
       "id": "numeric_ordinal",
       "input": "第一回",
+      "suzume_expected": [
+        {
+          "lemma": "第一回",
+          "pos": "Noun",
+          "surface": "第一回"
+        }
+      ],
       "tags": [
         "grammar",
         "numeric"

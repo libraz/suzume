@@ -565,6 +565,9 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       dict_verified_best.confidence = 0.0F;
 
       for (const auto& cand : inflection_results) {
+        // Skip candidates from のだ/んだ stripping — these should be split tokens
+        if (cand.has_explanatory_suffix) continue;
+
         // Use lower threshold for ichidan verbs with i-row stems (感じる, 信じる)
         // These get ichidan_kanji_i_row_stem penalty which reduces confidence
         // But NOT for e-row stems (て/で), which are often te-form splits
@@ -1143,6 +1146,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         suru_cand.confidence = 0.0F;
         godan_cand.confidence = 0.0F;
         for (const auto& cand : all_cands) {
+          if (cand.has_explanatory_suffix) continue;
           if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence > ichidan_cand.confidence) {
             ichidan_cand = cand;
           }
@@ -1231,6 +1235,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       grammar::InflectionCandidate best_sa;
       best_sa.confidence = 0.0F;
       for (const auto& cand : all_cands) {
+        if (cand.has_explanatory_suffix) continue;
         if (cand.verb_type == grammar::VerbType::GodanSa && cand.confidence > best_sa.confidence) {
           best_sa = cand;
         }

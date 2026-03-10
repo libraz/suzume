@@ -79,6 +79,10 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "design-difference",
+        "reason": "Suzume intentional design difference from MeCab normalization"
+      },
       "description": "Code review comment - MeCab互換分割",
       "expected": [
         {
@@ -94,7 +98,7 @@
           "surface": "は"
         },
         {
-          "pos": "Noun",
+          "pos": "Adjective",
           "surface": "複雑"
         },
         {
@@ -126,6 +130,58 @@
       ],
       "id": "tech_doc_code_review",
       "input": "この関数は複雑すぎるので分割してください",
+      "suzume_expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "関数",
+          "pos": "Noun",
+          "surface": "関数"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "複雑",
+          "pos": "Noun",
+          "surface": "複雑"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎる"
+        },
+        {
+          "lemma": "ので",
+          "pos": "Particle",
+          "surface": "ので"
+        },
+        {
+          "lemma": "分割",
+          "pos": "Noun",
+          "surface": "分割"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
       "tags": [
         "technical",
         "documentation"

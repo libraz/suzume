@@ -570,8 +570,9 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     // Covers both base form (い) and inflected forms (く, かっ, けれ, etc.)
     if (grammar::containsKanji(edge.surface)) {
       // Longer compounds need stronger bonus to beat noun+adj split paths
+      // Must overcome NOUN→dict_ADJ surface bonus (-0.5) on the split path
       size_t char_len = suzume::normalize::utf8Length(edge.surface);
-      float bonus = -0.5F - static_cast<float>(char_len > 4 ? char_len - 4 : 0) * 0.3F;
+      float bonus = -1.0F - static_cast<float>(char_len > 4 ? char_len - 4 : 0) * 0.4F;
       cost += bonus;
     }
   }
@@ -1860,11 +1861,39 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Single-kana renyokei (で=出る, し=する) are ambiguous with copula/particles.
   // After adverbs, copula/particle interpretation dominates (それほどで+も+ない)
   // Exception: dict verbs (し=する) are valid after onomatopoeia ADV (じめじめ+し+た)
+  // Exception: kanji verbs (見, 寝, 出) are unambiguous and valid after adverbs (初めて+見+た)
   if (prev.pos == core::PartOfSpeech::Adverb &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface.size() <= 3 &&  // Single kana (3 bytes)
+      grammar::isPureHiragana(next.surface) &&  // Only hiragana (で, し), not kanji (見, 出)
       !core::hasFlag(next.flags, core::EdgeFlags::FromDictionary)) {
     surface_bonus += cost::kVeryRare;
+  }
+
+  // Penalty for non-て/で particle/verb before い/いる auxiliary (AuxAspectIru)
+  // AuxAspectIru (い/いる) requires て-form as prerequisite: V連用+て+いる
+  // VERB_連用+い directly (し+い) or PART_接続(し)+い are grammatically invalid
+  // Note: て/で themselves also have AuxAspectIru EPOS, so exclude them as next
+  // Fixes: 一番美+し+い → 一番+美しい (wrongly split adjective 美しい)
+  if (next.extended_pos == core::ExtendedPOS::AuxAspectIru &&
+      next.surface != "て" && next.surface != "で") {
+    if (prev.extended_pos == core::ExtendedPOS::ParticleConj &&
+        prev.surface != "て" && prev.surface != "で") {
+      surface_bonus += cost::kAlmostNever;
+    } else if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+               prev.surface != "て" && prev.surface != "で") {
+      surface_bonus += cost::kAlmostNever;
+    }
+  }
+
+  // Bonus for Noun → dict i-adjective (AdjBasic)
+  // Dict adjectives are verified words — favor NOUN+ADJ split over false verb paths
+  // e.g., 一番+美しい(dict ADJ) should beat 一番+美しい(false VERB)
+  // Only for dict adjectives to avoid boosting false adj candidates (e.g., 払い)
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      next.extended_pos == core::ExtendedPOS::AdjBasic &&
+      next.fromDictionary()) {
+    surface_bonus += cost::kModerateBonus;
   }
 
   // Penalty for conjunction after single-char token

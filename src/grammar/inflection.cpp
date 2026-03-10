@@ -427,8 +427,9 @@ const std::vector<InflectionCandidate>& Inflection::analyze(
     }
   }
 
-  // Try stripping explanatory のだ/んだ suffixes (not in auxiliary generator
-  // to avoid extending tokenization candidates, but needed for inflection)
+  // Try stripping explanatory のだ/んだ suffixes for inflection analysis.
+  // Results are marked with has_explanatory_suffix so candidate generators
+  // can skip them — のだ/んだ should be separate tokens (検索単位の原則).
   static constexpr std::string_view kExplanatorySuffixes[] = {
       "んだ", "のだ", "んです", "のです", "んだもの", "んだもん",
   };
@@ -443,6 +444,7 @@ const std::vector<InflectionCandidate>& Inflection::analyze(
           auto boosted = cand;
           // Boost confidence: explanatory suffix is a strong signal
           boosted.confidence = std::max(cand.confidence, 0.8F);
+          boosted.has_explanatory_suffix = true;
           candidates.push_back(boosted);
         }
       }

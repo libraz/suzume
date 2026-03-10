@@ -327,18 +327,22 @@
       "description": "別段 dict boundary prevents 別段恐しい kanji merge",
       "expected": [
         {
+          "lemma": "別段",
           "pos": "Adverb",
           "surface": "別段"
         },
         {
+          "lemma": "恐しい",
           "pos": "Adjective",
           "surface": "恐しい"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
@@ -353,6 +357,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -428,10 +433,14 @@
       "input": "つるつるしてまるで薬缶だ"
     },
     {
+      "accepted_diff": {
+        "category": "design-difference",
+        "reason": "Suzume intentional design difference from MeCab normalization"
+      },
       "description": "第一 dict entry acts as kanji compound boundary",
       "expected": [
         {
-          "pos": "Adverb",
+          "pos": "Noun",
           "surface": "第一"
         },
         {
@@ -460,7 +469,64 @@
         }
       ],
       "id": "daiichi_kanji_boundary",
-      "input": "第一毛がないように見える"
+      "input": "第一毛がないように見える",
+      "suzume_expected": [
+        {
+          "lemma": "第一",
+          "pos": "Adverb",
+          "surface": "第一"
+        },
+        {
+          "lemma": "毛",
+          "pos": "Noun",
+          "surface": "毛"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見える"
+        }
+      ]
+    },
+    {
+      "description": "じめじめ+し+た - ABAB onomatopoeia + suru verb",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "じめじめ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "jimejime_shita",
+      "input": "じめじめした"
     }
   ],
   "description": "adverb tests",

@@ -1,0 +1,45 @@
+{
+  "cases": [
+    {
+      "description": "行く+の+だ - verb + explanatory のだ split",
+      "expected": [
+        {
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "iku_noda",
+      "input": "行くのだ"
+    },
+    {
+      "description": "食べる+ん+だ - verb + explanatory んだ split",
+      "expected": [
+        {
+          "pos": "Verb",
+          "surface": "食べる"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "taberu_nda",
+      "input": "食べるんだ"
+    }
+  ],
+  "description": "pattern_auxiliary tests",
+  "version": "1.0"
+}

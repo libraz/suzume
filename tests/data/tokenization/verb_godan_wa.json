@@ -597,6 +597,25 @@
         "wagahai",
         "W-017"
       ]
+    },
+    {
+      "description": "窺う+のだ - explanatory suffix should split as separate tokens",
+      "expected": [
+        {
+          "pos": "Verb",
+          "surface": "窺う"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ukagau_noda",
+      "input": "窺うのだ"
     }
   ],
   "description": "Godan Wa-row verbs (五段ワ行動詞) - verbs ending in う",

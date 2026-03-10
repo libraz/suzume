@@ -1,10 +1,14 @@
 {
   "cases": [
     {
+      "accepted_diff": {
+        "category": "design-difference",
+        "reason": "Suzume intentional design difference from MeCab normalization"
+      },
       "description": "AuxNeg→ParticleConj bonus: ない+のに should not split as ない+の+に",
       "expected": [
         {
-          "pos": "Auxiliary",
+          "pos": "Adjective",
           "surface": "ない"
         },
         {
@@ -25,7 +29,34 @@
         }
       ],
       "id": "nai_noni_kore",
-      "input": "ないのにこれはおかしい"
+      "input": "ないのにこれはおかしい",
+      "suzume_expected": [
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "のに",
+          "pos": "Particle",
+          "surface": "のに"
+        },
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "おかしい",
+          "pos": "Adjective",
+          "surface": "おかしい"
+        }
+      ]
     }
   ],
   "description": "particle_conj tests",

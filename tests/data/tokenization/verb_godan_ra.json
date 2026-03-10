@@ -473,7 +473,7 @@
         },
         {
           "lemma": "なる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "なら"
         },
         {
@@ -1044,24 +1044,44 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "design-difference",
+        "reason": "Suzume intentional design difference from MeCab normalization"
+      },
       "description": "過疎っている - 過疎る is a modern Japanese verb (internet slang for 'become dead/inactive')",
       "expected": [
+        {
+          "pos": "Noun",
+          "surface": "過疎"
+        },
+        {
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "pos": "Verb",
+          "surface": "いる"
+        }
+      ],
+      "id": "onbin_kasoru_lemma",
+      "input": "過疎っている",
+      "suzume_expected": [
         {
           "lemma": "過疎る",
           "pos": "Verb",
           "surface": "過疎っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
       ],
-      "id": "onbin_kasoru_lemma",
-      "input": "過疎っている",
       "tags": [
         "verb",
         "onbin",

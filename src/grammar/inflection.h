@@ -33,6 +33,7 @@ struct InflectionCandidate {
   VerbType verb_type;      ///< Verb type: GodanMa
   float confidence;        ///< Confidence: 0.0-1.0
   std::vector<std::string> morphemes;  ///< Decomposed: [ん, で, い, ます]
+  bool has_explanatory_suffix = false;  ///< True if matched via のだ/んだ stripping
 };
 
 /**

@@ -17,6 +17,18 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
     for t in tokens:
         surface = t.get("surface", "")
 
+        # 0a. Split MeCab single-token kanji adverbs ending in に
+        # e.g., 次に → 次+に, 滅多に → 滅多+に
+        if t.get("pos") == "副詞":
+            m = regex.match(r"^([\p{Han}]+)(に)$", surface)
+            if m:
+                base = m.group(1)
+                result.append({"surface": base, "pos": "名詞", "lemma": base})
+                result.append({"surface": "に", "pos": "助詞", "lemma": "に"})
+                if applied_rule is None:
+                    applied_rule = "adverb-ni-split"
+                continue
+
         # 0. Plural suffix ら
         m = regex.match(r"^(彼女|彼|僕|奴|我)ら$", surface)
         if m:

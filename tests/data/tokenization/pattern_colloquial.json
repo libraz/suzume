@@ -22,13 +22,9 @@
       "description": "やばーい (colloquial やばい with extended vowel)",
       "expected": [
         {
-          "pos": "Particle",
-          "surface": "や"
-        },
-        {
-          "lemma": "ばい",
+          "lemma": "やばい",
           "pos": "Adjective",
-          "surface": "ばーい"
+          "surface": "やばーい"
         }
       ],
       "id": "choon_yabai",
@@ -84,13 +80,9 @@
       "description": "やばーいよ (colloquial やばい with sentence final)",
       "expected": [
         {
-          "pos": "Particle",
-          "surface": "や"
-        },
-        {
-          "lemma": "ばい",
+          "lemma": "やばい",
           "pos": "Adjective",
-          "surface": "ばーい"
+          "surface": "やばーい"
         },
         {
           "pos": "Particle",

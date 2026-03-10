@@ -509,15 +509,30 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "design-difference",
+        "reason": "Suzume keeps kanji+に as single token"
+      },
       "description": "同時に (simultaneously)",
       "expected": [
         {
-          "pos": "Adverb",
-          "surface": "同時に"
+          "pos": "Noun",
+          "surface": "同時"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
       "id": "noun_ni_doujini",
       "input": "同時に",
+      "suzume_expected": [
+        {
+          "lemma": "同時に",
+          "pos": "Adverb",
+          "surface": "同時に"
+        }
+      ],
       "tags": [
         "grammar",
         "noun-ni"
@@ -543,45 +558,90 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "design-difference",
+        "reason": "Suzume keeps kanji+に as single token"
+      },
       "description": "一般に (generally)",
       "expected": [
         {
-          "pos": "Adverb",
-          "surface": "一般に"
+          "pos": "Noun",
+          "surface": "一般"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
       "id": "noun_ni_ippanni",
       "input": "一般に",
+      "suzume_expected": [
+        {
+          "lemma": "一般に",
+          "pos": "Adverb",
+          "surface": "一般に"
+        }
+      ],
       "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
+      "accepted_diff": {
+        "category": "design-difference",
+        "reason": "Suzume keeps kanji+に as single token"
+      },
       "description": "次第に (gradually)",
       "expected": [
         {
-          "pos": "Adverb",
-          "surface": "次第に"
+          "pos": "Noun",
+          "surface": "次第"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
       "id": "noun_ni_shidaini",
       "input": "次第に",
+      "suzume_expected": [
+        {
+          "lemma": "次第に",
+          "pos": "Adverb",
+          "surface": "次第に"
+        }
+      ],
       "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
+      "accepted_diff": {
+        "category": "design-difference",
+        "reason": "Suzume intentional design difference from MeCab normalization"
+      },
       "description": "一気に (at once)",
       "expected": [
         {
-          "pos": "Adverb",
-          "surface": "一気に"
+          "pos": "Noun",
+          "surface": "一気"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
       "id": "noun_ni_ikkini",
       "input": "一気に",
+      "suzume_expected": [
+        {
+          "lemma": "一気に",
+          "pos": "Adverb",
+          "surface": "一気に"
+        }
+      ],
       "tags": [
         "grammar",
         "noun-ni"

@@ -147,7 +147,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 else:
                     break
             if j > i + 1:
-                result.append({"surface": combined, "pos": "名詞", "lemma": combined})
+                result.append({"surface": combined, "pos": "名詞", "pos_sub1": "数", "lemma": combined})
                 i = j
                 merged = True
                 if applied_rule is None:
@@ -168,29 +168,27 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 else:
                     break
             if has_hyphen:
-                result.append({"surface": combined, "pos": "名詞", "lemma": combined})
+                result.append({"surface": combined, "pos": "名詞", "pos_sub1": "数", "lemma": combined})
                 i = j
                 merged = True
                 if applied_rule is None:
                     applied_rule = "address-number"
 
-        # 2b. Prefix + number + counter
+        # 2b. Prefix + number (第一, 第二, etc.)
+        # Only merge numbers, not counters — 第一+毛 should stay split
         if not merged and t.get("pos") == "接頭詞" and t.get("pos_sub1") == "数接続":
             j = i + 1
             combined = t.get("surface", "")
             while j < len(tokens):
                 nxt = tokens[j]
                 is_number = nxt.get("pos") == "名詞" and nxt.get("pos_sub1") == "数"
-                is_counter = (
-                    nxt.get("pos") == "名詞" and nxt.get("pos_sub1") == "接尾" and nxt.get("pos_sub2") == "助数詞"
-                )
-                if is_number or is_counter:
+                if is_number:
                     combined += nxt.get("surface", "")
                     j += 1
                 else:
                     break
             if j > i + 1:
-                result.append({"surface": combined, "pos": "名詞", "lemma": combined})
+                result.append({"surface": combined, "pos": "名詞", "pos_sub1": "数", "lemma": combined})
                 i = j
                 merged = True
                 if applied_rule is None:
@@ -681,6 +679,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     result, applied_rule = _postprocess_nde_split(result, applied_rule)
     result, applied_rule = _postprocess_filler_split(result, applied_rule)
     result, applied_rule = _postprocess_kuruwa(result, applied_rule)
+    result, applied_rule = _postprocess_adj_bungo(result, applied_rule)
     result, applied_rule = _postprocess_kanji_merge(result, applied_rule)
     result, applied_rule = _postprocess_search_unit_split(result, applied_rule)
     result, applied_rule = _postprocess_onomatopoeia_tto_merge(result, applied_rule)
@@ -867,6 +866,42 @@ def _postprocess_kuruwa(result: list[dict], applied_rule: str | None) -> tuple[l
     return new_result, applied_rule
 
 
+def _postprocess_adj_bungo(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Fix archaic adjective form: 恐し + いとも → 恐しい + と + も.
+
+    When 形容詞 in 文語基本形 is followed by a token starting with い + particles,
+    merge い back into the adjective and split out the particles.
+    """
+    new_result: list[dict] = []
+    skip_next = False
+    for j, curr in enumerate(result):
+        if skip_next:
+            skip_next = False
+            continue
+        if (
+            curr.get("pos") == "形容詞"
+            and curr.get("conj_form") == "文語基本形"
+            and j + 1 < len(result)
+        ):
+            nxt = result[j + 1]
+            ns = nxt.get("surface", "")
+            if ns.startswith("い") and len(ns) > 1:
+                adj_surface = curr["surface"] + "い"
+                lemma = curr.get("lemma", "")
+                if not lemma or lemma == curr["surface"]:
+                    lemma = adj_surface
+                new_result.append({"surface": adj_surface, "pos": "形容詞", "lemma": lemma})
+                rest = ns[1:]
+                for ch in rest:
+                    new_result.append({"surface": ch, "pos": "助詞", "lemma": ch})
+                skip_next = True
+                if applied_rule is None:
+                    applied_rule = "adj-bungo-fix"
+                continue
+        new_result.append(curr)
+    return new_result, applied_rule
+
+
 def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Merge consecutive all-kanji tokens."""
     merged = []
@@ -878,7 +913,7 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
             and surface != "的"
             and regex.match(r"^[\p{Han}]+$", merged[-1].get("surface", ""))
             and "々" not in merged[-1].get("surface", "")
-            and merged[-1].get("pos_sub1", "") not in ("副詞可能", "固有名詞")
+            and merged[-1].get("pos_sub1", "") not in ("副詞可能", "固有名詞", "数")
             and merged[-1].get("pos", "") != "副詞"
             and curr.get("pos_sub1", "") != "接尾"
         ):

@@ -11,6 +11,8 @@ from .postprocessors import (
     postprocess_de_aru,
     postprocess_de_particle,
     postprocess_gozai_verb,
+    postprocess_n_kuruwa,
+    postprocess_nai_context,
     postprocess_taihen,
     postprocess_demo,
     postprocess_ii,
@@ -102,6 +104,8 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     postprocess_you_noun(tokens)
     postprocess_sou_aux(tokens)
     postprocess_nara_verb(tokens)
+    postprocess_n_kuruwa(tokens)
+    postprocess_nai_context(tokens)
 
     # Normalize full-width alphanumeric to half-width
     fullwidth_applied = False

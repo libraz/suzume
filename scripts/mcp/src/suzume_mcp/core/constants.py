@@ -441,6 +441,7 @@ EMPHATIC_SOKUON: dict[str, str] = {
 ADVERB_OVERRIDES: set[str] = {
     "いずれ",
     "しどろもどろ",
+    "その後",
     "なるほど",
     "たくさん",
 }
@@ -466,6 +467,7 @@ NA_ADJ_OVERRIDES: set[str] = {
     "きれい",
     "ありきたり",
     "無限",
+    "滅多",
 }
 
 # Words to keep as Noun despite 形容動詞語幹 classification
@@ -486,7 +488,7 @@ KEEP_AS_NOUN_NOT_ADJ: set[str] = {
 NOUN_AS_PRONOUN: set[str] = {"彼氏", "彼女", "奴", "我", "わし"}
 
 # Suffix -> Noun overrides
-SUFFIX_AS_NOUN: set[str] = {"様", "末", "ごろ", "行き"}
+SUFFIX_AS_NOUN: set[str] = {"様", "末", "ごろ", "行き", "毛"}
 
 # Valid English POS values (values of POS_MAP)
 VALID_POS: set[str] = set(POS_MAP.values()) | {"Determiner", "Pronoun", "Suffix"}

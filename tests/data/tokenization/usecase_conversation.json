@@ -974,14 +974,17 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "design-difference",
+        "reason": "Suzume intentional design difference from MeCab normalization"
+      },
       "expected": [
         {
           "pos": "Noun",
           "surface": "東京"
         },
         {
-          "lemma": "行く",
-          "pos": "Verb",
+          "pos": "Noun",
           "surface": "行き"
         },
         {
@@ -989,12 +992,8 @@
           "surface": "は"
         },
         {
-          "pos": "Pronoun",
-          "surface": "何"
-        },
-        {
           "pos": "Noun",
-          "surface": "番線"
+          "surface": "何番線"
         },
         {
           "pos": "Auxiliary",
@@ -1007,6 +1006,43 @@
       ],
       "id": "travel_platform",
       "input": "東京行きは何番線ですか",
+      "suzume_expected": [
+        {
+          "lemma": "東京",
+          "pos": "Noun",
+          "surface": "東京"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行き"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "番線",
+          "pos": "Noun",
+          "surface": "番線"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
       "tags": [
         "travel"
       ]

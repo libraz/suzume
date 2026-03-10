@@ -6,10 +6,13 @@ from pathlib import Path
 
 from ..core.constants import TARI_ADVERB_STEMS
 from ..core.pos_mapping import normalize_pos
-from ..core.suzume_cli import get_suzume_debug_info
+from ..core.suzume_cli import (
+    format_expected_from_tokens as format_expected,
+    get_expected_tokens_batch_subprocess,
+    get_expected_tokens_subprocess as get_expected_tokens,
+    get_suzume_debug_info,
+)
 from ..core.suzume_utils import (
-    format_expected,
-    get_expected_tokens,
     get_suzume_rule,
     tokens_match,
 )
@@ -621,6 +624,10 @@ async def test_needs_suzume_update(file: str = "", apply: bool = False) -> str:
     needs_update = []
     by_rule: dict[str, list[dict]] = {}
 
+    # Collect all cases with their metadata for batch processing
+    all_cases_meta: list[dict] = []
+    all_inputs: list[str] = []
+
     for path in files:
         try:
             data = load_json(path)
@@ -634,36 +641,53 @@ async def test_needs_suzume_update(file: str = "", apply: bool = False) -> str:
             inp = case.get("input", "")
             if not inp:
                 continue
-            expected = case.get("expected") or []
-            correct, source, rule = get_expected_tokens(inp)
-            rule = rule or ""
+            all_cases_meta.append({
+                "path": path,
+                "basename": basename,
+                "cases_key": cases_key,
+                "idx": idx,
+                "case": case,
+                "data": data,
+                "input": inp,
+            })
+            all_inputs.append(inp)
 
-            if not tokens_match(expected, correct):
-                case_id = case.get("id", str(idx))
-                exp_str = "|".join(t.get("surface", "") for t in expected)
-                cor_str = "|".join(t["surface"] for t in correct)
-                exp_pos = "|".join(t.get("pos", "") for t in expected)
-                cor_pos = "|".join(t["pos"] for t in correct)
-                diff_type = "surface" if exp_str != cor_str else ("pos" if exp_pos != cor_pos else "lemma")
+    # Batch subprocess call: one process for all inputs
+    if all_inputs:
+        batch_results = get_expected_tokens_batch_subprocess(all_inputs)
+    else:
+        batch_results = []
 
-                entry = {
-                    "id": f"{basename}/{case_id}",
-                    "file": path,
-                    "basename": basename,
-                    "index": idx,
-                    "input": inp,
-                    "rule": rule or "mecab-only",
-                    "expected": exp_str,
-                    "correct": cor_str,
-                    "expected_pos": exp_pos,
-                    "correct_pos": cor_pos,
-                    "diff_type": diff_type,
-                    "correct_tokens": correct,
-                    "data": data,
-                    "cases_key": cases_key,
-                }
-                needs_update.append(entry)
-                by_rule.setdefault(rule or "mecab-only", []).append(entry)
+    for meta, (correct, source, rule) in zip(all_cases_meta, batch_results, strict=True):
+        expected = meta["case"].get("expected") or []
+        rule = rule or ""
+
+        if not tokens_match(expected, correct):
+            case_id = meta["case"].get("id", str(meta["idx"]))
+            exp_str = "|".join(t.get("surface", "") for t in expected)
+            cor_str = "|".join(t["surface"] for t in correct)
+            exp_pos = "|".join(t.get("pos", "") for t in expected)
+            cor_pos = "|".join(t["pos"] for t in correct)
+            diff_type = "surface" if exp_str != cor_str else ("pos" if exp_pos != cor_pos else "lemma")
+
+            entry = {
+                "id": f"{meta['basename']}/{case_id}",
+                "file": meta["path"],
+                "basename": meta["basename"],
+                "index": meta["idx"],
+                "input": meta["input"],
+                "rule": rule or "mecab-only",
+                "expected": exp_str,
+                "correct": cor_str,
+                "expected_pos": exp_pos,
+                "correct_pos": cor_pos,
+                "diff_type": diff_type,
+                "correct_tokens": correct,
+                "data": meta["data"],
+                "cases_key": meta["cases_key"],
+            }
+            needs_update.append(entry)
+            by_rule.setdefault(rule or "mecab-only", []).append(entry)
 
     if not needs_update:
         return _json_result(
@@ -917,11 +941,23 @@ async def test_batch_add(
     to_add = []
     skipped = []
 
-    for inp in inputs:
+    # First pass: filter existing, collect new inputs
+    new_inputs: list[tuple[int, str]] = []  # (original_index, input_text)
+    for i, inp in enumerate(inputs):
         existing = find_test_by_input(PROJECT_ROOT, inp)
         if existing:
             skipped.append({"input": inp, "reason": f"exists at {existing['basename']}/{existing['index']}"})
             continue
+        new_inputs.append((i, inp))
+
+    # Batch get expected tokens for all new inputs
+    if not use_suzume and new_inputs:
+        batch_texts = [inp for _, inp in new_inputs]
+        batch_results = get_expected_tokens_batch_subprocess(batch_texts)
+    else:
+        batch_results = None
+
+    for batch_idx, (orig_idx, inp) in enumerate(new_inputs):
         if use_suzume:
             suzume_tokens = _get_suzume_tokens(inp)
             if suzume_tokens:
@@ -929,7 +965,7 @@ async def test_batch_add(
             else:
                 tokens, source, rule = get_expected_tokens(inp)
         else:
-            tokens, source, rule = get_expected_tokens(inp)
+            tokens, source, rule = batch_results[batch_idx]  # type: ignore[index]
         expected = format_expected(tokens)
         to_add.append(
             {

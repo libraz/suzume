@@ -405,6 +405,30 @@
         "strict",
         "pronoun"
       ]
+    },
+    {
+      "description": "何+も+し+ない - interrogative pronoun + particle + verb",
+      "expected": [
+        {
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "nani_mo_shinai",
+      "input": "何もしない"
     }
   ],
   "description": "Pronouns",

@@ -1220,6 +1220,24 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         if (starts_with_particle && normalize::utf8Length(cand.stem) < 2) {
           continue;  // Stem too short for a valid adjective
         }
+        // For prolonged sound mark patterns, require normalized stem >= 2 characters
+        // The inflection analyzer works on the choon-expanded form (ばーい → ばあい),
+        // so cand.stem may be 2+ chars (ばあ). We must check the final normalized
+        // base form: normalizeBaseForm removes the duplicate vowel (ばあい → ばい),
+        // giving stem "ば" (1 char) which is too short for a valid adjective.
+        // e.g., ばーい → ばあい → ばい → stem "ば" (1 char) = invalid, skip
+        //       やばーい → やばあい → やばい → stem "やば" (2 chars) = valid
+        if (has_prolonged) {
+          std::string normalized_base = normalizeBaseForm(cand.base_form, codepoints, start_pos, end_pos);
+          // Stem = base form minus trailing い (3 bytes in UTF-8)
+          size_t normalized_stem_len = normalize::utf8Length(normalized_base);
+          if (normalized_stem_len >= 1) {
+            // Subtract 1 for the trailing い
+            if (normalized_stem_len - 1 < 2) {
+              continue;  // Normalized stem too short for a valid adjective
+            }
+          }
+        }
         // Skip なさそう pattern - should be split as な(ADJ stem) + さ(Suffix) + そう(AUX)
         // This pattern is the nominalization of ない + そう (appearance auxiliary)
         // The inflection analyzer incorrectly treats なさ as stem of なさい (honorific)
