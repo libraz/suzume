@@ -1758,6 +1758,13 @@ void addVerbSuffixNounJoinCandidates(
     return;
   }
 
+  // Reject if hiragana ends with に (case particle, not verb renyokei)
+  // e.g., 静かに目 should NOT become a compound noun (it's 静か+に+目)
+  // Godan-na renyokei (死に) is only 1 hiragana, already blocked by particle check
+  if (hiragana_end > kanji_end && codepoints[hiragana_end - 1] == U'に') {
+    return;
+  }
+
   // Reject if hiragana is a single case particle (not verb renyokei)
   // e.g., 東京都渋谷区に所在 should NOT become 東京都渋谷区に所 + ... (it's ...+に+所在+...)
   // Case particles: に, で, と, を, が, は, へ, も, か, や

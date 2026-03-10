@@ -227,6 +227,10 @@ def map_mecab_pos(token: dict | str) -> str:
         lemma = token.get("lemma", "")
         if lemma in VERB_NOT_AUX_LEMMAS:
             return "Verb"
+        # 来(kanji surface) -> Verb; くる(hiragana) -> Auxiliary
+        # Suzume treats kanji 来 as Verb, hiragana くる as Auxiliary
+        if lemma == "来る" and surface and not surface[0].isascii() and ord(surface[0]) >= 0x4E00:
+            return "Verb"
         return "Auxiliary"
 
     # 動詞,接尾 -> Auxiliary

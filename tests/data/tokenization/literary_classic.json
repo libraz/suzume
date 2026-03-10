@@ -1,0 +1,1002 @@
+{
+  "cases": [
+    {
+      "description": "漱石・草枕冒頭風 - ながら接続",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "山路"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "登る",
+          "pos": "Verb",
+          "surface": "登り"
+        },
+        {
+          "pos": "Particle",
+          "surface": "ながら"
+        },
+        {
+          "pos": "Adverb",
+          "surface": "こう"
+        },
+        {
+          "lemma": "考える",
+          "pos": "Verb",
+          "surface": "考え"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_rinagara_kou_eta",
+      "input": "山路を登りながら、こう考えた。"
+    },
+    {
+      "description": "芥川・羅生門風 - 体言止め否定",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "下人"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "行方"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Pronoun",
+          "surface": "誰"
+        },
+        {
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "no_ha_mo_ranai",
+      "input": "下人の行方は、誰も知らない。"
+    },
+    {
+      "description": "川端・雪国冒頭 - 長い連体修飾",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "国境"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "長い"
+        },
+        {
+          "pos": "Noun",
+          "surface": "トンネル"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "pos": "Verb",
+          "surface": "抜ける"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "pos": "Noun",
+          "surface": "雪国"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_i_wo_keruto_deattta",
+      "input": "国境の長いトンネルを抜けると雪国であった。"
+    },
+    {
+      "description": "敬語 お〜になる",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "pos": "Noun",
+          "surface": "読み"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "hao_mininatttanodesuka",
+      "input": "先生はお読みになったのですか。"
+    },
+    {
+      "description": "ichidan verb 生まれる regression test",
+      "expected": [
+        {
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "生まれる",
+          "pos": "Verb",
+          "surface": "生まれ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Particle",
+          "surface": "ばかり"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_maretabakarida",
+      "input": "彼女は生まれたばかりだ。"
+    },
+    {
+      "description": "太宰・人間失格風 — 送って来る",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "恥"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "多い"
+        },
+        {
+          "pos": "Noun",
+          "surface": "生涯"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "送る",
+          "pos": "Verb",
+          "surface": "送っ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_i_wo_ttte_mashita",
+      "input": "恥の多い生涯を送って来ました。"
+    },
+    {
+      "description": "新聞風 - ながらに接続",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "被害者"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "遺族"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Noun",
+          "surface": "涙"
+        },
+        {
+          "pos": "Particle",
+          "surface": "ながら"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "訴える",
+          "pos": "Verb",
+          "surface": "訴え"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_ha_nagarani_eta",
+      "input": "被害者の遺族は涙ながらに訴えた。"
+    },
+    {
+      "description": "論説風 - 受動態＋複合名詞",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "事態"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "収拾"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "向ける",
+          "pos": "Verb",
+          "surface": "向け"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Noun",
+          "surface": "取り組み"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "急ぐ",
+          "pos": "Verb",
+          "surface": "急が"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "れる"
+        }
+      ],
+      "id": "no_ni_keta_ri_miga_gareru",
+      "input": "事態の収拾に向けた取り組みが急がれる。"
+    },
+    {
+      "description": "四字熟語＋慣用句",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "前代未聞"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "不祥事"
+        },
+        {
+          "pos": "Particle",
+          "surface": "として"
+        },
+        {
+          "pos": "Noun",
+          "surface": "波紋"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "広げる",
+          "pos": "Verb",
+          "surface": "広げ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "no_toshite_wo_geteiru",
+      "input": "前代未聞の不祥事として波紋を広げている。"
+    },
+    {
+      "description": "慣用表現 - 身に沁みる",
+      "expected": [
+        {
+          "pos": "Adjective",
+          "surface": "厳しい"
+        },
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒"
+        },
+        {
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Noun",
+          "surface": "身"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Verb",
+          "surface": "沁みる"
+        },
+        {
+          "pos": "Noun",
+          "surface": "季節"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shii_saga_ni_miru_tonattta",
+      "input": "厳しい寒さが身に沁みる季節となった。"
+    },
+    {
+      "description": "論説風 - 長い複文",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "当該案件"
+        },
+        {
+          "pos": "Particle",
+          "surface": "について"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "慎重"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Noun",
+          "surface": "検討"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "重ねる",
+          "pos": "Verb",
+          "surface": "重ね"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Noun",
+          "surface": "上"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "pos": "Noun",
+          "surface": "判断"
+        },
+        {
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "nitsuiteha_ni_wo_neta_de_suru",
+      "input": "当該案件については慎重に検討を重ねた上で判断する。"
+    },
+    {
+      "description": "四字熟語＋受動態連鎖",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "満場一致"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "pos": "Noun",
+          "surface": "可決"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Noun",
+          "surface": "法案"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Noun",
+          "surface": "施行"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "de_sareta_ga_sareta",
+      "input": "満場一致で可決された法案が施行された。"
+    },
+    {
+      "description": "漱石・吾輩は猫である冒頭",
+      "expected": [
+        {
+          "pos": "Pronoun",
+          "surface": "吾輩"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "pos": "Verb",
+          "surface": "ある"
+        },
+        {
+          "pos": "Noun",
+          "surface": "名前"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Adverb",
+          "surface": "まだ"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "無い"
+        }
+      ],
+      "id": "ha_dearu_hamada_i",
+      "input": "吾輩は猫である。名前はまだ無い。"
+    },
+    {
+      "description": "芥川・羅生門冒頭風",
+      "expected": [
+        {
+          "pos": "Determiner",
+          "surface": "ある"
+        },
+        {
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "暮方"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "事"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "aru_no_no_dearu",
+      "input": "ある日の暮方の事である。"
+    },
+    {
+      "description": "漱石・草枕風 - 生まれて ichidan + 長い複文",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "世の中"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "住む",
+          "pos": "Verb",
+          "surface": "住み"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "にくい"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "悟る",
+          "pos": "Verb",
+          "surface": "悟っ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Noun",
+          "surface": "時"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Noun",
+          "surface": "詩"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "生まれる",
+          "pos": "Verb",
+          "surface": "生まれ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Noun",
+          "surface": "絵"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Verb",
+          "surface": "できる"
+        }
+      ],
+      "id": "no_ha_minikuito_ttta_ni_ga_marete_gadekiru",
+      "input": "世の中は住みにくいと悟った時に詩が生まれて絵ができる。"
+    },
+    {
+      "description": "長文 - 複合文 + 静かに目 regression test",
+      "expected": [
+        {
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Noun",
+          "surface": "手紙"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
+        },
+        {
+          "lemma": "終える",
+          "pos": "Auxiliary",
+          "surface": "終え"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Noun",
+          "surface": "目"
+        },
+        {
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "閉じる",
+          "pos": "Verb",
+          "surface": "閉じ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_ita_wo_mi_etekara_kani_wo_jita",
+      "input": "彼の書いた手紙を読み終えてから、静かに目を閉じた。"
+    },
+    {
+      "description": "ichidan V-てきた regression test",
+      "expected": [
+        {
+          "lemma": "生まれる",
+          "pos": "Verb",
+          "surface": "生まれ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "maretekita",
+      "input": "生まれてきた。"
+    },
+    {
+      "description": "使役+受身連鎖",
+      "expected": [
+        {
+          "pos": "Adverb",
+          "surface": "無理やり"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "させる",
+          "pos": "Auxiliary",
+          "surface": "させ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "yari_besaserareta",
+      "input": "無理やり食べさせられた。"
+    },
+    {
+      "description": "ばかりである - 書き言葉",
+      "expected": [
+        {
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "態度"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Verb",
+          "surface": "呆れる"
+        },
+        {
+          "pos": "Particle",
+          "surface": "ばかり"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "no_niha_rerubakaridearu",
+      "input": "彼の態度には呆れるばかりである。"
+    },
+    {
+      "description": "文語慣用 - 言わんとする",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Noun",
+          "surface": "理解"
+        },
+        {
+          "pos": "Verb",
+          "surface": "できる"
+        }
+      ],
+      "id": "wantosurukotoha_dekiru",
+      "input": "言わんとすることは理解できる。"
+    },
+    {
+      "description": "文語否定反復 知らず知らず",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "うち"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Noun",
+          "surface": "涙"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "溢れる",
+          "pos": "Verb",
+          "surface": "溢れ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "razu_razunouchini_ga_reta",
+      "input": "知らず知らずのうちに涙が溢れた。"
+    }
+  ],
+  "description": "literary_classic tests",
+  "version": "1.0"
+}

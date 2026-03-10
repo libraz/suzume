@@ -277,14 +277,24 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             // 泊まる (godan-ra), not passive of 泊む (godan-ma).
             // 囲まれる = passive of 囲む is OK because 囲まる is not
             // in the dictionary.
-            bool has_competing_ra_verb = false;
+            //
+            // Also skip if kanji+A-row+れる is a known ichidan verb in
+            // dictionary. E.g., 生まれる is ichidan, not passive of 生む.
+            // Without this check, 生ま(mizenkei)+れ(passive) would
+            // incorrectly win over the dictionary ichidan entry.
+            bool has_competing_verb = false;
             if (after_a == U'れ') {
               std::string ra_form = surface + "る";
-              has_competing_ra_verb =
+              has_competing_verb =
                   vh::isVerbInDictionary(dict_manager, ra_form);
+              if (!has_competing_verb) {
+                std::string ichidan_form = surface + "れる";
+                has_competing_verb =
+                    vh::isVerbInDictionary(dict_manager, ichidan_form);
+              }
             }
 
-            if (!has_competing_ra_verb) {
+            if (!has_competing_verb) {
               constexpr float kCost = candidate::verb_cost::kWeakPenalty;
               SUZUME_DEBUG_LOG("[VERB_CAND] " << surface
                               << " godan_mizenkei_passive lemma=" << base_form
@@ -997,6 +1007,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           if (vh::containsTeFormAuxPattern(surface)) {
             base_cost += bigram_cost::kStrong;  // Penalize to favor split path
           }
+          // Penalty for verb candidates absorbing post-verbal particles
+          // たばかり/だばかり = V-ta + bakari ("just did V"), always separate tokens
+          // E.g., 生まれたばかりだ should be 生まれ+た+ばかり+だ, not one token
+          if (utf8::contains(surface, "たばかり") || utf8::contains(surface, "だばかり")) {
+            base_cost += bigram_cost::kSevere;
+          }
           // Set has_suffix to skip exceeds_dict_length penalty in tokenizer.cpp
           // This applies when:
           // 1. Base form exists in dictionary as verb (in_dict)
@@ -1491,6 +1507,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // The passive base form is surface + る (e.g., 言われ → 言われる)
       std::string passive_base = surface + "る";
 
+      // Skip if passive_base is already a known ichidan verb in dictionary.
+      // E.g., 生まれる is a standalone ichidan verb, not passive of 生む.
+      // The dictionary entry provides the correct candidate with proper lemma.
+      if (vh::isVerbInDictionary(dict_manager, passive_base)) {
+        // Fall through to end of block - dict entry handles this
+      } else {
+
       // Compute the original base verb lemma by converting A-row to U-row
       // e.g., 言われる: 言 + わ + れる → 言 + う = 言う
       std::string kanji_part = extractSubstring(codepoints, start_pos, kanji_end);
@@ -1533,6 +1556,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         // as single tokens. MeCab splits them as: 言わ + れ + た
         // The renyokei form (言われ) generated above connects to auxiliary た/て/ない/etc.
       }
+      }  // end else (not dict ichidan verb)
       }  // end else (not suru passive pattern)
     }
   }
@@ -1921,6 +1945,17 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               // Skip irregular verb 来る for passive — its passive is 来+られる, not 来ら+れる
               if (is_valid_verb && is_passive_pattern && base_form == "来る") {
                 is_valid_verb = false;
+              }
+
+              // Skip godan mizenkei passive when the surface + れる is a known
+              // ichidan verb in the dictionary. E.g., 囚われる is ichidan,
+              // not passive of 囚う. The dictionary entry provides the correct
+              // candidate with proper lemma.
+              if (is_valid_verb && is_passive_pattern) {
+                std::string ichidan_form = extractSubstring(codepoints, start_pos, mizenkei_end) + "れる";
+                if (vh::isVerbInDictionary(dict_manager, ichidan_form)) {
+                  is_valid_verb = false;
+                }
               }
 
               if (is_valid_verb) {

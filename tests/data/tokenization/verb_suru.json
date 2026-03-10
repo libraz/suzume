@@ -1,34 +1,34 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "説明してくれます - MeCab互換分割",
-      "expected" : [
+      "description": "説明してくれます - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "説明"
+          "pos": "Noun",
+          "surface": "説明"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くれる",
-          "pos" : "Verb",
-          "surface" : "くれ"
+          "lemma": "くれる",
+          "pos": "Verb",
+          "surface": "くれ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "suru_te_kureru",
-      "input" : "説明してくれます",
-      "tags" : [
+      "id": "suru_te_kureru",
+      "input": "説明してくれます",
+      "tags": [
         "suru",
         "subsidiary",
         "kureru",
@@ -36,30 +36,30 @@
       ]
     },
     {
-      "description" : "確認してください - MeCab互換分割",
-      "expected" : [
+      "description": "確認してください - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "確認"
+          "pos": "Noun",
+          "surface": "確認"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Verb",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
         }
       ],
-      "id" : "suru_te_kudasai",
-      "input" : "確認してください",
-      "tags" : [
+      "id": "suru_te_kudasai",
+      "input": "確認してください",
+      "tags": [
         "suru",
         "subsidiary",
         "kudasaru",
@@ -67,34 +67,34 @@
       ]
     },
     {
-      "description" : "勉強しています - MeCab互換分割",
-      "expected" : [
+      "description": "勉強しています - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "勉強"
+          "pos": "Noun",
+          "surface": "勉強"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "いる",
-          "pos" : "Auxiliary",
-          "surface" : "い"
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "suru_te_imasu",
-      "input" : "勉強しています",
-      "tags" : [
+      "id": "suru_te_imasu",
+      "input": "勉強しています",
+      "tags": [
         "suru",
         "subsidiary",
         "iru",
@@ -102,62 +102,62 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "auxiliary verb: context-dependent classification"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "auxiliary verb: context-dependent classification"
       },
-      "description" : "確認してあります - MeCab互換分割",
-      "expected" : [
+      "description": "確認してあります - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "確認"
+          "pos": "Noun",
+          "surface": "確認"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "ある",
-          "pos" : "Auxiliary",
-          "surface" : "あり"
+          "lemma": "ある",
+          "pos": "Auxiliary",
+          "surface": "あり"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "suru_te_arimasu",
-      "input" : "確認してあります",
-      "suzume_expected" : [
+      "id": "suru_te_arimasu",
+      "input": "確認してあります",
+      "suzume_expected": [
         {
-          "pos" : "Noun",
-          "surface" : "確認"
+          "pos": "Noun",
+          "surface": "確認"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あり"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "tags" : [
+      "tags": [
         "suru",
         "subsidiary",
         "aru",
@@ -165,62 +165,62 @@
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "auxiliary verb: context-dependent classification"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "auxiliary verb: context-dependent classification"
       },
-      "description" : "準備しておきます - MeCab互換分割",
-      "expected" : [
+      "description": "準備しておきます - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "準備"
+          "pos": "Noun",
+          "surface": "準備"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "おく",
-          "pos" : "Auxiliary",
-          "surface" : "おき"
+          "lemma": "おく",
+          "pos": "Auxiliary",
+          "surface": "おき"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "suru_te_okimasu",
-      "input" : "準備しておきます",
-      "suzume_expected" : [
+      "id": "suru_te_okimasu",
+      "input": "準備しておきます",
+      "suzume_expected": [
         {
-          "pos" : "Noun",
-          "surface" : "準備"
+          "pos": "Noun",
+          "surface": "準備"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "おく",
-          "pos" : "Verb",
-          "surface" : "おき"
+          "lemma": "おく",
+          "pos": "Verb",
+          "surface": "おき"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "tags" : [
+      "tags": [
         "suru",
         "subsidiary",
         "oku",
@@ -228,309 +228,309 @@
       ]
     },
     {
-      "description" : "説明してもらう - MeCab互換分割",
-      "expected" : [
+      "description": "説明してもらう - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "説明"
+          "pos": "Noun",
+          "surface": "説明"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Verb",
-          "surface" : "もらう"
+          "pos": "Verb",
+          "surface": "もらう"
         }
       ],
-      "id" : "suru_te_morau",
-      "input" : "説明してもらう",
-      "tags" : [
+      "id": "suru_te_morau",
+      "input": "説明してもらう",
+      "tags": [
         "suru",
         "subsidiary",
         "morau"
       ]
     },
     {
-      "description" : "説明してあげる - MeCab互換分割",
-      "expected" : [
+      "description": "説明してあげる - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "説明"
+          "pos": "Noun",
+          "surface": "説明"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Verb",
-          "surface" : "あげる"
+          "pos": "Verb",
+          "surface": "あげる"
         }
       ],
-      "id" : "suru_te_ageru",
-      "input" : "説明してあげる",
-      "tags" : [
+      "id": "suru_te_ageru",
+      "input": "説明してあげる",
+      "tags": [
         "suru",
         "subsidiary",
         "ageru"
       ]
     },
     {
-      "description" : "勉強してしまう - MeCab互換分割",
-      "expected" : [
+      "description": "勉強してしまう - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "勉強"
+          "pos": "Noun",
+          "surface": "勉強"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "しまう"
+          "pos": "Auxiliary",
+          "surface": "しまう"
         }
       ],
-      "id" : "suru_te_shimau",
-      "input" : "勉強してしまう",
-      "tags" : [
+      "id": "suru_te_shimau",
+      "input": "勉強してしまう",
+      "tags": [
         "suru",
         "subsidiary",
         "shimau"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ã¿ã: auxiliary vs main verb after ã¦-form"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "ã¿ã: auxiliary vs main verb after ã¦-form"
       },
-      "description" : "説明してみる - MeCab互換分割",
-      "expected" : [
+      "description": "説明してみる - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "説明"
+          "pos": "Noun",
+          "surface": "説明"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "みる"
+          "pos": "Auxiliary",
+          "surface": "みる"
         }
       ],
-      "id" : "suru_te_miru",
-      "input" : "説明してみる",
-      "suzume_expected" : [
+      "id": "suru_te_miru",
+      "input": "説明してみる",
+      "suzume_expected": [
         {
-          "pos" : "Noun",
-          "surface" : "説明"
+          "pos": "Noun",
+          "surface": "説明"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "lemma" : "てる",
-          "pos" : "Auxiliary",
-          "surface" : "て"
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "みる"
+          "pos": "Auxiliary",
+          "surface": "みる"
         }
       ],
-      "tags" : [
+      "tags": [
         "suru",
         "subsidiary",
         "miru"
       ]
     },
     {
-      "description" : "説明してほしい - MeCab互換分割",
-      "expected" : [
+      "description": "説明してほしい - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "説明"
+          "pos": "Noun",
+          "surface": "説明"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "ほしい",
-          "pos" : "Adjective",
-          "surface" : "ほしい"
+          "lemma": "ほしい",
+          "pos": "Adjective",
+          "surface": "ほしい"
         }
       ],
-      "id" : "suru_te_hoshii",
-      "input" : "説明してほしい",
-      "tags" : [
+      "id": "suru_te_hoshii",
+      "input": "説明してほしい",
+      "tags": [
         "suru",
         "subsidiary",
         "hoshii"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "auxiliary verb: context-dependent classification"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "auxiliary verb: context-dependent classification"
       },
-      "description" : "説明してくれる - MeCab互換分割",
-      "expected" : [
+      "description": "説明してくれる - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "説明"
+          "pos": "Noun",
+          "surface": "説明"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Verb",
-          "surface" : "くれる"
+          "pos": "Verb",
+          "surface": "くれる"
         }
       ],
-      "id" : "suru_te_kureru_plain",
-      "input" : "説明してくれる",
-      "suzume_expected" : [
+      "id": "suru_te_kureru_plain",
+      "input": "説明してくれる",
+      "suzume_expected": [
         {
-          "pos" : "Noun",
-          "surface" : "説明"
+          "pos": "Noun",
+          "surface": "説明"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "くれる"
+          "pos": "Auxiliary",
+          "surface": "くれる"
         }
       ],
-      "tags" : [
+      "tags": [
         "suru",
         "subsidiary",
         "kureru"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "auxiliary verb: context-dependent classification"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "auxiliary verb: context-dependent classification"
       },
-      "description" : "勉強していく - MeCab互換分割",
-      "expected" : [
+      "description": "勉強していく - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "勉強"
+          "pos": "Noun",
+          "surface": "勉強"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Verb",
-          "surface" : "いく"
+          "pos": "Verb",
+          "surface": "いく"
         }
       ],
-      "id" : "suru_te_iku",
-      "input" : "勉強していく",
-      "suzume_expected" : [
+      "id": "suru_te_iku",
+      "input": "勉強していく",
+      "suzume_expected": [
         {
-          "pos" : "Noun",
-          "surface" : "勉強"
+          "pos": "Noun",
+          "surface": "勉強"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いく"
+          "pos": "Auxiliary",
+          "surface": "いく"
         }
       ],
-      "tags" : [
+      "tags": [
         "suru",
         "subsidiary",
         "iku"
       ]
     },
     {
-      "description" : "勉強してくる - MeCab互換分割",
-      "expected" : [
+      "description": "勉強してくる - MeCab互換分割",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "勉強"
+          "pos": "Noun",
+          "surface": "勉強"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "くる"
+          "pos": "Auxiliary",
+          "surface": "くる"
         }
       ],
-      "id" : "suru_te_kuru",
-      "input" : "勉強してくる",
-      "tags" : [
+      "id": "suru_te_kuru",
+      "input": "勉強してくる",
+      "tags": [
         "suru",
         "subsidiary",
         "kuru"
       ]
     }
   ],
-  "description" : "Suru-verb patterns with subsidiary verbs - MeCab互換分割",
-  "version" : "1.0"
+  "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割",
+  "version": "1.0"
 }

@@ -555,13 +555,17 @@ constexpr const char* kSuffixSou = "そう";       // conjecture/hearsay
 // Pattern Arrays for Auxiliary Verb Detection
 // =============================================================================
 
-// Te-form + auxiliary patterns for verb candidate penalty (16 patterns)
+// Te-form + auxiliary patterns for verb candidate penalty (17 patterns)
 // Used in: verb_candidates_helpers.cpp (containsTeFormAuxPattern)
 // Excludes てある/である/ておる/でおる/ていく/でいく/であげ (rare in compound verbs)
 constexpr const char* kTeFormAuxPenaltyPatterns[] = {
     "てくる", "でくる", "てくれ", "でくれ", "ている", "でいる",
     "てしま", "でしま", "てもら", "でもら", "てあげ",
     "ておく", "でおく", "ておい", "てみる", "でみる",
+    // Conjugated forms of くる after て: てきた, てきて, etc.
+    // き is kuru renyokei, so てき covers てきた/てきて/てきている
+    // Note: でき is NOT included — it conflicts with できる (suru potential form)
+    "てき",
 };
 constexpr size_t kTeFormAuxPenaltyPatternsSize =
     sizeof(kTeFormAuxPenaltyPatterns) / sizeof(kTeFormAuxPenaltyPatterns[0]);
