@@ -55,17 +55,17 @@ for (const t of tokens) {
   console.log(`${t.surface} [${t.posJa}]`)
 }
 
-// タグ抽出
+// タグ抽出（{ tag, pos } オブジェクトの配列を返す）
 const tags = suzume.generateTags('東京スカイツリーに行きました')
-console.log(tags) // ['東京', 'スカイツリー', '行く']
+// → [{ tag: '東京', pos: 'noun' }, { tag: 'スカイツリー', pos: 'noun' }, { tag: '行く', pos: 'verb' }]
 
 // 名詞のみ
 suzume.generateTags('美味しいラーメンを食べた', { pos: ['noun'] })
-// → ['ラーメン']
+// → [{ tag: 'ラーメン', pos: 'noun' }]
 
 // 基本語除外（する、ある、いい などひらがなのみの原形を除外）
 suzume.generateTags('今日はいい天気ですね', { excludeBasic: true })
-// → ['今日', '天気']
+// → [{ tag: '今日', pos: 'noun' }, { tag: '天気', pos: 'noun' }]
 ```
 
 ### ブラウザ（CDN）

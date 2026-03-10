@@ -14,17 +14,17 @@ for (const t of tokens) {
   console.log(`${t.surface} [${t.posJa}]`)
 }
 
-// Tag extraction
+// Tag extraction (returns { tag, pos } objects)
 const tags = suzume.generateTags('東京スカイツリーに行きました')
-console.log(tags) // ['東京', 'スカイツリー', '行く']
+// → [{ tag: '東京', pos: 'noun' }, { tag: 'スカイツリー', pos: 'noun' }, { tag: '行く', pos: 'verb' }]
 
 // Nouns only
 suzume.generateTags('美味しいラーメンを食べた', { pos: ['noun'] })
-// → ['ラーメン']
+// → [{ tag: 'ラーメン', pos: 'noun' }]
 
 // Exclude basic words (hiragana-only lemma like する, ある, いい)
 suzume.generateTags('今日はいい天気ですね', { excludeBasic: true })
-// → ['今日', '天気']
+// → [{ tag: '今日', pos: 'noun' }, { tag: '天気', pos: 'noun' }]
 ```
 
 ### Browser (CDN)
