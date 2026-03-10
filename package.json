@@ -29,8 +29,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "prepack": "cp README.md README.github.md && cp README.npm.md README.md",
-    "postpack": "mv README.github.md README.md",
+    "prepack": "cp README.md .readme-backup && cp README.npm.md README.md",
+    "postpack": "mv .readme-backup README.md",
     "prepublishOnly": "yarn clean && yarn build && yarn lint && yarn test"
   },
   "keywords": [
@@ -55,11 +55,11 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.10",
-    "lint-staged": "^16.2.7",
+    "@biomejs/biome": "^2.4.6",
+    "lint-staged": "^16.3.3",
     "simple-git-hooks": "^2.13.1",
-    "typescript": "^5.0.0",
-    "vitest": "^4.0.16"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "volta": {
     "node": "22.21.1",

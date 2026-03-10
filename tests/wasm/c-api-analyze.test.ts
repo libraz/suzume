@@ -80,7 +80,7 @@ describe('C API: analyze', () => {
     expect(verb.posJa).toBe('動詞');
     expect(verb.conjType).toBe('一段');
     expect(verb.conjForm).not.toBeNull();
-    expect(verb.conjForm!.length).toBeGreaterThan(0);
+    expect(verb.conjForm?.length).toBeGreaterThan(0);
 
     resultFree(resultPtr);
   });

@@ -27,6 +27,10 @@ CLAUDE.md
 .git/
 .gitignore
 
+# README swap artifacts
+README.npm.md
+.readme-backup
+
 # Misc
 *.log
 *.tgz
