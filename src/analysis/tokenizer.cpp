@@ -529,7 +529,8 @@ void Tokenizer::addUnknownCandidates(
             for (const auto& result : prev_results) {
               if (result.entry != nullptr && result.length >= 2 &&
                   result.length > back &&
-                  result.entry->pos != core::PartOfSpeech::Noun) {
+                  result.entry->pos != core::PartOfSpeech::Noun &&
+                  result.entry->pos != core::PartOfSpeech::Pronoun) {
                 constexpr float kDictOverlapPenalty = 1.5F;
                 adjusted_cost += kDictOverlapPenalty;
                 SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface

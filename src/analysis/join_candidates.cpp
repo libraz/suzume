@@ -455,6 +455,7 @@ void addCompoundVerbJoinCandidates(
     float confidence = 0.0F;
     V2VerbType v2_verb_type = V2VerbType::Godan;  // V2 verb type
     std::string_view v2_base_ending;              // V2 base form ending (む, す, etc.)
+    bool v1_dict_verified = false;  // true if V1 was verified via dictionary (not inflection fallback)
   };
   V2Match best_match;
 
@@ -695,6 +696,7 @@ void addCompoundVerbJoinCandidates(
 
     // Check if V1 base form is in dictionary
     bool v1_verified = false;
+    bool v1_dict_verified = false;  // tracks dict verification for cost calculation
     if (is_sokuonbin) {
       // Try all sokuonbin-compatible godan endings
       for (char32_t ending : kSokuonbinEndings) {
@@ -704,6 +706,7 @@ void addCompoundVerbJoinCandidates(
           if (result.entry != nullptr && result.entry->surface == candidate &&
               result.entry->pos == core::PartOfSpeech::Verb) {
             v1_verified = true;
+            v1_dict_verified = true;
             v1_base = candidate;
             base_ending = ending;
             break;
@@ -717,6 +720,7 @@ void addCompoundVerbJoinCandidates(
         if (result.entry != nullptr && result.entry->surface == v1_base &&
             result.entry->pos == core::PartOfSpeech::Verb) {
           v1_verified = true;
+          v1_dict_verified = true;
           break;
         }
       }
@@ -890,6 +894,7 @@ void addCompoundVerbJoinCandidates(
       best_match.v2_reading = std::string(v2_reading);
       best_match.v2_verb_type = v2_verb.verb_type;
       best_match.v2_base_ending = v2_verb.base_ending;
+      best_match.v1_dict_verified = v1_dict_verified;
     }
   }
 
@@ -950,7 +955,14 @@ void addCompoundVerbJoinCandidates(
     // Calculate cost
     float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
     const auto& opts = scorer.joinOpts();
-    float final_cost = base_cost + opts.compound_verb_bonus + opts.verified_v1_bonus;
+    // Dict-verified V1 gets full bonus; inflection-only V1 gets a penalty.
+    // Inflection analysis can verify verb forms that aren't real words (e.g., 進す),
+    // so unverified compounds should be more expensive to prevent false positives
+    // like 進し続ける winning over 前進+し+続ける.
+    float v1_bonus = best_match.v1_dict_verified
+        ? opts.verified_v1_bonus   // -0.3: reward for dictionary-confirmed V1
+        : bigram_cost::kRare;      // +1.0: penalty for inflection-only V1
+    float final_cost = base_cost + opts.compound_verb_bonus + v1_bonus;
 
     // Penalty for passive+te form (〜まれて/〜られて)
     // MeCab splits compound verb passive+te: 読み込まれて → 読み込ま|れ|て

@@ -3404,6 +3404,145 @@
       ],
       "id": "literary_shiteorareta",
       "input": "先生はその問題について深く憂慮しておられた"
+    },
+    {
+      "description": "おそらく(ADV)+は(PART) correctly split by Suzume (MeCab merges)",
+      "expected": [
+        {
+          "lemma": "おそらく",
+          "pos": "Adverb",
+          "surface": "おそらく"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "誰",
+          "pos": "Pronoun",
+          "surface": "誰"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "一度",
+          "pos": "Noun",
+          "surface": "一度"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "経験",
+          "pos": "Noun",
+          "surface": "経験"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "osoraku_wa_split",
+      "input": "おそらくは誰もが一度は経験したことであろう"
+    },
+    {
+      "description": "前進 boundary correct (was splitting as 前+進し続ける)",
+      "expected": [
+        {
+          "lemma": "幾多",
+          "pos": "Noun",
+          "surface": "幾多"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "困難",
+          "pos": "Noun",
+          "surface": "困難"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "乗り越える",
+          "pos": "Verb",
+          "surface": "乗り越え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "なお",
+          "pos": "Adverb",
+          "surface": "なお"
+        },
+        {
+          "lemma": "前進",
+          "pos": "Noun",
+          "surface": "前進"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "続ける",
+          "pos": "Verb",
+          "surface": "続ける"
+        },
+        {
+          "lemma": "姿勢",
+          "pos": "Noun",
+          "surface": "姿勢"
+        }
+      ],
+      "id": "literary_zenshin_shitsuzukeru",
+      "input": "幾多の困難を乗り越えてなお前進し続ける姿勢"
     }
   ],
   "description": "literary_classics tests",

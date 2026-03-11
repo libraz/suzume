@@ -232,6 +232,44 @@
       ],
       "id": "desiderative_neg_past_ikitaku",
       "input": "行きたくなかった"
+    },
+    {
+      "accepted_diff": {
+        "category": "compound-verb-boundary",
+        "reason": "前進 boundary fixed. し+続ける not merged (suru renyokei+subsidiary verb compound not yet supported), but 前進+し+続ける is grammatically correct."
+      },
+      "description": "Single-kanji + し should not generate godan-sa compound V1 via inflection fallback",
+      "expected": [
+        {
+          "lemma": "前進",
+          "pos": "Noun",
+          "surface": "前進"
+        },
+        {
+          "lemma": "し続ける",
+          "pos": "Verb",
+          "surface": "し続ける"
+        }
+      ],
+      "id": "suru-renyokei-not-godan-sa",
+      "input": "前進し続ける",
+      "suzume_expected": [
+        {
+          "lemma": "前進",
+          "pos": "Noun",
+          "surface": "前進"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "続ける",
+          "pos": "Verb",
+          "surface": "続ける"
+        }
+      ]
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows",
