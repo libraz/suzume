@@ -9,6 +9,7 @@
           "surface": "よく"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -31,6 +32,7 @@
           "surface": "食べ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -57,6 +59,7 @@
           "surface": "待っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -66,6 +69,7 @@
           "surface": "くれ"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -86,6 +90,7 @@
           "surface": "食べ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -95,6 +100,7 @@
           "surface": "もらわ"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -115,6 +121,7 @@
           "surface": "食べ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -124,6 +131,7 @@
           "surface": "い"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -148,6 +156,7 @@
           "surface": "忘れ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -157,6 +166,7 @@
           "surface": "しまわ"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -198,6 +208,7 @@
           "surface": "走っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -207,6 +218,7 @@
           "surface": "いか"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -227,10 +239,12 @@
           "surface": "見"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "あげる",
           "pos": "Verb",
           "surface": "あげる"
         }
@@ -251,6 +265,7 @@
           "surface": "書い"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -260,6 +275,7 @@
           "surface": "あげ"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -280,6 +296,7 @@
           "surface": "手伝っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -289,6 +306,7 @@
           "surface": "あげ"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -310,6 +328,7 @@
           "surface": "手伝っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -330,10 +349,12 @@
           "surface": "走っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -354,6 +375,7 @@
           "surface": "来"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -368,6 +390,7 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }
@@ -388,6 +411,7 @@
           "surface": "来"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -397,6 +421,7 @@
           "surface": "い"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -422,6 +447,7 @@
           "surface": "させ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -431,6 +457,7 @@
           "surface": "いただき"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -451,6 +478,7 @@
           "surface": "来"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -470,6 +498,7 @@
           "surface": "読ん"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -484,6 +513,7 @@
       "description": "につけて - suzume: につけ + て (context-dependent: に is absorbed without preceding noun)",
       "expected": [
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -493,6 +523,7 @@
           "surface": "つけ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -508,6 +539,7 @@
       "description": "につけている - suzume: につけ + て + いる (context-dependent)",
       "expected": [
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -517,10 +549,12 @@
           "surface": "つけ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -537,14 +571,17 @@
       "description": "現在3位につけている - suzume: 現在 + 3位 + に + つけ + て + いる",
       "expected": [
         {
+          "lemma": "現在",
           "pos": "Noun",
           "surface": "現在"
         },
         {
+          "lemma": "3位",
           "pos": "Noun",
           "surface": "3位"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -554,10 +591,12 @@
           "surface": "つけ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -578,6 +617,7 @@
           "surface": "つけ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -594,6 +634,7 @@
           "surface": "あけ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -610,6 +651,7 @@
           "surface": "にげ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -626,6 +668,7 @@
           "surface": "食べ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -635,6 +678,7 @@
           "surface": "いただき"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -651,10 +695,12 @@
           "surface": "残っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -671,10 +717,12 @@
           "surface": "立っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -691,6 +739,7 @@
           "surface": "待っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -700,6 +749,7 @@
           "surface": "い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -716,6 +766,7 @@
           "surface": "醒まし"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -727,10 +778,12 @@
       "description": "Hiragana godan-sa te-form + ほしい: should not split as さ+まして(CONJ)",
       "expected": [
         {
+          "lemma": "目",
           "pos": "Noun",
           "surface": "目"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -740,10 +793,12 @@
           "surface": "さまし"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "ほしい",
           "pos": "Adjective",
           "surface": "ほしい"
         }
@@ -760,10 +815,12 @@
           "surface": "食べ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "ほしい",
           "pos": "Adjective",
           "surface": "ほしい"
         }
@@ -780,10 +837,12 @@
           "surface": "醒まし"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "見る",
           "pos": "Verb",
           "surface": "見る"
         }

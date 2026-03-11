@@ -4,18 +4,22 @@
       "description": "Topic marker は",
       "expected": [
         {
+          "lemma": "彼女",
           "pos": "Pronoun",
           "surface": "彼女"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "学生",
           "pos": "Noun",
           "surface": "学生"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -31,10 +35,12 @@
       "description": "Subject marker が",
       "expected": [
         {
+          "lemma": "雨",
           "pos": "Noun",
           "surface": "雨"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -44,10 +50,12 @@
           "surface": "降っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -63,14 +71,17 @@
       "description": "Object marker を",
       "expected": [
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "読む",
           "pos": "Verb",
           "surface": "読む"
         }
@@ -86,14 +97,17 @@
       "description": "Direction marker に",
       "expected": [
         {
+          "lemma": "東京",
           "pos": "Noun",
           "surface": "東京"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         }
@@ -109,14 +123,17 @@
       "description": "Possessive の",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "車",
           "pos": "Noun",
           "surface": "車"
         }
@@ -132,18 +149,22 @@
       "description": "From から to まで",
       "expected": [
         {
+          "lemma": "東京",
           "pos": "Noun",
           "surface": "東京"
         },
         {
+          "lemma": "から",
           "pos": "Particle",
           "surface": "から"
         },
         {
+          "lemma": "大阪",
           "pos": "Noun",
           "surface": "大阪"
         },
         {
+          "lemma": "まで",
           "pos": "Particle",
           "surface": "まで"
         }
@@ -159,14 +180,17 @@
       "description": "Location marker で",
       "expected": [
         {
+          "lemma": "公園",
           "pos": "Noun",
           "surface": "公園"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "遊ぶ",
           "pos": "Verb",
           "surface": "遊ぶ"
         }
@@ -182,10 +206,12 @@
       "description": "Conjunctive particle も with verb+aux split",
       "expected": [
         {
+          "lemma": "私",
           "pos": "Pronoun",
           "surface": "私"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
@@ -195,6 +221,7 @@
           "surface": "行き"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         }

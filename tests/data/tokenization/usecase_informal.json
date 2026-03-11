@@ -4,10 +4,12 @@
       "description": "めっちゃかわいい - auto-generated",
       "expected": [
         {
+          "lemma": "めっちゃ",
           "pos": "Adverb",
           "surface": "めっちゃ"
         },
         {
+          "lemma": "かわいい",
           "pos": "Adjective",
           "surface": "かわいい"
         }
@@ -23,10 +25,12 @@
       "description": "めっちゃすごい - auto-generated",
       "expected": [
         {
+          "lemma": "めっちゃ",
           "pos": "Adverb",
           "surface": "めっちゃ"
         },
         {
+          "lemma": "すごい",
           "pos": "Adjective",
           "surface": "すごい"
         }
@@ -52,10 +56,12 @@
           "surface": "れ"
         },
         {
+          "lemma": "ちゃう",
           "pos": "Verb",
           "surface": "ちゃう"
         },
         {
+          "lemma": "よ",
           "pos": "Particle",
           "surface": "よ"
         }
@@ -77,10 +83,12 @@
           "surface": "取っ"
         },
         {
+          "lemma": "ちゃう",
           "pos": "Verb",
           "surface": "ちゃう"
         },
         {
+          "lemma": "ぞ",
           "pos": "Particle",
           "surface": "ぞ"
         }
@@ -96,14 +104,17 @@
       "description": "あちこちで遊ぶ - auto-generated",
       "expected": [
         {
+          "lemma": "あちこち",
           "pos": "Pronoun",
           "surface": "あちこち"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "遊ぶ",
           "pos": "Verb",
           "surface": "遊ぶ"
         }
@@ -119,14 +130,17 @@
       "description": "勢いで押す - auto-generated",
       "expected": [
         {
+          "lemma": "勢い",
           "pos": "Noun",
           "surface": "勢い"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "押す",
           "pos": "Verb",
           "surface": "押す"
         }
@@ -147,6 +161,7 @@
           "surface": "たまん"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }

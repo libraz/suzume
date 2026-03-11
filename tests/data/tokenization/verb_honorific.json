@@ -4,10 +4,12 @@
       "description": "Honorific verb いらっしゃる - recognized as single token",
       "expected": [
         {
+          "lemma": "先生",
           "pos": "Noun",
           "surface": "先生"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -33,6 +35,7 @@
           "surface": "ござい"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -53,6 +56,7 @@
           "surface": "いただき"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -73,10 +77,12 @@
           "surface": "教え"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "くださる",
           "pos": "Verb",
           "surface": "くださる"
         }
@@ -92,14 +98,17 @@
       "description": "Honorific prefix お with adjective",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "忙しい",
           "pos": "Noun",
           "surface": "忙しい"
         },
         {
+          "lemma": "ところ",
           "pos": "Noun",
           "surface": "ところ"
         }
@@ -115,10 +124,12 @@
       "description": "Honorific prefix ご",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -143,6 +154,7 @@
       "description": "お伝えいたします - honorific verb pattern",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
@@ -157,6 +169,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -191,10 +204,12 @@
       "description": "お茶 splits into prefix and noun",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "茶",
           "pos": "Noun",
           "surface": "茶"
         }
@@ -210,10 +225,12 @@
       "description": "ご飯 - L2 dictionary word as single noun",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "飯",
           "pos": "Noun",
           "surface": "飯"
         }
@@ -230,10 +247,12 @@
       "description": "お願い splits into prefix and noun",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "願い",
           "pos": "Noun",
           "surface": "願い"
         }
@@ -249,6 +268,7 @@
       "description": "お疲れ様 splits into prefix, noun, and suffix",
       "expected": [
         {
+          "lemma": "お疲れ様",
           "pos": "Interjection",
           "surface": "お疲れ様"
         }
@@ -264,10 +284,12 @@
       "description": "お疲れ様です splits into prefix, noun, suffix, and auxiliary",
       "expected": [
         {
+          "lemma": "お疲れ様",
           "pos": "Interjection",
           "surface": "お疲れ様"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -283,10 +305,12 @@
       "description": "Honorific verb いらっしゃる - recognized as single token",
       "expected": [
         {
+          "lemma": "先生",
           "pos": "Noun",
           "surface": "先生"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -296,6 +320,7 @@
           "surface": "いらっしゃい"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -360,6 +385,7 @@
           "surface": "くださっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -403,6 +429,7 @@
           "surface": "いらっしゃっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -445,6 +472,7 @@
           "surface": "教え"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },

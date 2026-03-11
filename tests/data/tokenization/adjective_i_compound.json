@@ -9,6 +9,7 @@
           "surface": "よ"
         },
         {
+          "lemma": "さ",
           "pos": "Suffix",
           "surface": "さ"
         }
@@ -52,6 +53,7 @@
           "surface": "悲し"
         },
         {
+          "lemma": "そう",
           "pos": "Auxiliary",
           "surface": "そう"
         }
@@ -72,10 +74,12 @@
           "surface": "美味し"
         },
         {
+          "lemma": "そう",
           "pos": "Auxiliary",
           "surface": "そう"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -85,10 +89,12 @@
           "surface": "食べ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -109,6 +115,7 @@
           "surface": "難し"
         },
         {
+          "lemma": "そう",
           "pos": "Auxiliary",
           "surface": "そう"
         }
@@ -129,6 +136,7 @@
           "surface": "楽し"
         },
         {
+          "lemma": "そう",
           "pos": "Auxiliary",
           "surface": "そう"
         }
@@ -149,6 +157,7 @@
           "surface": "嬉し"
         },
         {
+          "lemma": "そう",
           "pos": "Auxiliary",
           "surface": "そう"
         }
@@ -164,10 +173,12 @@
       "description": "B45: なさそう should have lemma ない, not なさい",
       "expected": [
         {
+          "lemma": "やる気",
           "pos": "Noun",
           "surface": "やる気"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -177,10 +188,12 @@
           "surface": "な"
         },
         {
+          "lemma": "さ",
           "pos": "Suffix",
           "surface": "さ"
         },
         {
+          "lemma": "そう",
           "pos": "Auxiliary",
           "surface": "そう"
         }
@@ -201,6 +214,7 @@
           "surface": "キモ"
         },
         {
+          "lemma": "そう",
           "pos": "Auxiliary",
           "surface": "そう"
         }
@@ -222,10 +236,12 @@
           "surface": "な"
         },
         {
+          "lemma": "さ",
           "pos": "Suffix",
           "surface": "さ"
         },
         {
+          "lemma": "そう",
           "pos": "Auxiliary",
           "surface": "そう"
         }
@@ -247,6 +263,7 @@
           "surface": "くだら"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }
@@ -268,6 +285,7 @@
           "surface": "つまら"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }

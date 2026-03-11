@@ -4,6 +4,7 @@
       "description": "勉強しています - suru verb with progressive - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -13,6 +14,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -22,6 +24,7 @@
           "surface": "い"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -37,6 +40,7 @@
       "description": "勉強して - te-form of suru verb - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -46,6 +50,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -61,6 +66,7 @@
       "description": "勉強した - past form of suru verb - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -112,6 +118,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -121,6 +128,7 @@
           "surface": "おり"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -136,6 +144,7 @@
       "description": "検討いたしております - suru noun + compound auxiliary verb",
       "expected": [
         {
+          "lemma": "検討",
           "pos": "Noun",
           "surface": "検討"
         },
@@ -145,6 +154,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -154,6 +164,7 @@
           "surface": "おり"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -169,6 +180,7 @@
       "description": "勉強いたします - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -178,6 +190,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -193,6 +206,7 @@
       "description": "検討した - suru noun + past aux - MeCab互換分割",
       "expected": [
         {
+          "lemma": "検討",
           "pos": "Noun",
           "surface": "検討"
         },
@@ -218,22 +232,27 @@
       "description": "効率的に作業する (work efficiently) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "効率",
           "pos": "Noun",
           "surface": "効率"
         },
         {
+          "lemma": "的",
           "pos": "Suffix",
           "surface": "的"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "作業",
           "pos": "Noun",
           "surface": "作業"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -251,22 +270,27 @@
       "description": "積極的に参加する (participate proactively) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "積極",
           "pos": "Noun",
           "surface": "積極"
         },
         {
+          "lemma": "的",
           "pos": "Suffix",
           "surface": "的"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "参加",
           "pos": "Noun",
           "surface": "参加"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -283,22 +307,27 @@
       "description": "具体的に説明する (explain concretely) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "具体",
           "pos": "Noun",
           "surface": "具体"
         },
         {
+          "lemma": "的",
           "pos": "Suffix",
           "surface": "的"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -315,18 +344,22 @@
       "description": "丁寧に説明する (explain politely) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "丁寧",
           "pos": "Adjective",
           "surface": "丁寧"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -343,22 +376,27 @@
       "description": "彼が来ることを知っている (know that he is coming)",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "来る",
           "pos": "Verb",
           "surface": "来る"
         },
         {
+          "lemma": "こと",
           "pos": "Noun",
           "surface": "こと"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -368,10 +406,12 @@
           "surface": "知っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -387,6 +427,7 @@
       "description": "勉強すること (studying) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -396,6 +437,7 @@
           "surface": "する"
         },
         {
+          "lemma": "こと",
           "pos": "Noun",
           "surface": "こと"
         }
@@ -432,6 +474,7 @@
       "description": "Suru verb 分析する base form (MeCab-style split)",
       "expected": [
         {
+          "lemma": "分析",
           "pos": "Noun",
           "surface": "分析"
         },
@@ -452,6 +495,7 @@
       "description": "Suru verb 確認する base form (MeCab-style split)",
       "expected": [
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -472,6 +516,7 @@
       "description": "Suru verb 説明する base form (MeCab-style split)",
       "expected": [
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
@@ -492,6 +537,7 @@
       "description": "Suru verb 処理する base form (MeCab-style split)",
       "expected": [
         {
+          "lemma": "処理",
           "pos": "Noun",
           "surface": "処理"
         },
@@ -512,6 +558,7 @@
       "description": "Suru verb 勉強している progressive (MeCab-style split)",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -521,10 +568,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -540,6 +589,7 @@
       "description": "Suru verb 確認します polite form - MeCab互換分割",
       "expected": [
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -565,6 +615,7 @@
       "description": "Suru verb 説明しない negative - MeCab互換分割",
       "expected": [
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
@@ -590,6 +641,7 @@
       "description": "Suru verb 旅行したい desiderative - MeCab互換分割",
       "expected": [
         {
+          "lemma": "旅行",
           "pos": "Noun",
           "surface": "旅行"
         },
@@ -615,6 +667,7 @@
       "description": "Suru verb 処理される passive - MeCab互換分割",
       "expected": [
         {
+          "lemma": "処理",
           "pos": "Noun",
           "surface": "処理"
         },
@@ -624,6 +677,7 @@
           "surface": "さ"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -639,6 +693,7 @@
       "description": "Suru verb 勉強させる causative - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -648,6 +703,7 @@
           "surface": "さ"
         },
         {
+          "lemma": "せる",
           "pos": "Auxiliary",
           "surface": "せる"
         }
@@ -663,6 +719,7 @@
       "description": "遅刻しそう - MeCab互換分割 (名詞 + し + そう)",
       "expected": [
         {
+          "lemma": "遅刻",
           "pos": "Noun",
           "surface": "遅刻"
         },
@@ -697,6 +754,7 @@
           "surface": "感じ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -747,6 +805,7 @@
           "surface": "感じ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -772,10 +831,12 @@
       "description": "感じがあった - nominalized 感じ as NOUN followed by が particle",
       "expected": [
         {
+          "lemma": "感じ",
           "pos": "Noun",
           "surface": "感じ"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -817,10 +878,12 @@
       "description": "人いる should split as NOUN + VERB, not single verb",
       "expected": [
         {
+          "lemma": "人",
           "pos": "Noun",
           "surface": "人"
         },
         {
+          "lemma": "いる",
           "pos": "Verb",
           "surface": "いる"
         }
@@ -840,6 +903,7 @@
       "description": "B25: 仕方ない should be NOUN + AUX, not VERB (仕方する)",
       "expected": [
         {
+          "lemma": "仕方",
           "pos": "Noun",
           "surface": "仕方"
         },
@@ -870,14 +934,17 @@
       "description": "手助けをする - nominalized noun",
       "expected": [
         {
+          "lemma": "手助け",
           "pos": "Noun",
           "surface": "手助け"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -897,10 +964,12 @@
           "surface": "みじん切り"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -915,10 +984,12 @@
       "description": "いつも来る - prefer longer token",
       "expected": [
         {
+          "lemma": "いつも",
           "pos": "Adverb",
           "surface": "いつも"
         },
         {
+          "lemma": "来る",
           "pos": "Verb",
           "surface": "来る"
         }
@@ -933,6 +1004,7 @@
       "description": "遅刻しそうです - MeCab互換分割 (名詞 + し + そう + です)",
       "expected": [
         {
+          "lemma": "遅刻",
           "pos": "Noun",
           "surface": "遅刻"
         },
@@ -947,6 +1019,7 @@
           "surface": "そう"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -978,6 +1051,7 @@
           "surface": "だっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1001,6 +1075,7 @@
           "surface": "押し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -1032,6 +1107,7 @@
           "surface": "出し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -1053,6 +1129,7 @@
           "surface": "話し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -1074,6 +1151,7 @@
           "surface": "出来"
         },
         {
+          "lemma": "まい",
           "pos": "Auxiliary",
           "surface": "まい"
         }
@@ -1095,6 +1173,7 @@
           "surface": "出来"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1111,14 +1190,17 @@
       "description": "むしろ should be Adverb (not Verb むする)",
       "expected": [
         {
+          "lemma": "むしろ",
           "pos": "Other",
           "surface": "むしろ"
         },
         {
+          "lemma": "簡単",
           "pos": "Adjective",
           "surface": "簡単"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -1133,6 +1215,7 @@
       "description": "検討いたします - MeCab互換分割",
       "expected": [
         {
+          "lemma": "検討",
           "pos": "Noun",
           "surface": "検討"
         },
@@ -1142,6 +1225,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -1157,6 +1241,7 @@
       "description": "分割し、結合する - 連用形は現状未分割",
       "expected": [
         {
+          "lemma": "分割",
           "pos": "Noun",
           "surface": "分割"
         },
@@ -1166,10 +1251,12 @@
           "surface": "し"
         },
         {
+          "lemma": "結合",
           "pos": "Noun",
           "surface": "結合"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -1185,22 +1272,27 @@
       "description": "文章を単語に分割し... - 連用形は現状未分割",
       "expected": [
         {
+          "lemma": "文章",
           "pos": "Noun",
           "surface": "文章"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "単語",
           "pos": "Noun",
           "surface": "単語"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "分割",
           "pos": "Noun",
           "surface": "分割"
         },
@@ -1210,26 +1302,32 @@
           "surface": "し"
         },
         {
+          "lemma": "それぞれ",
           "pos": "Noun",
           "surface": "それぞれ"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "品詞",
           "pos": "Noun",
           "surface": "品詞"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "特定",
           "pos": "Noun",
           "surface": "特定"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -1245,6 +1343,7 @@
       "description": "対応させていただきます - suru causative + itadaku (4 tokens)",
       "expected": [
         {
+          "lemma": "対応",
           "pos": "Noun",
           "surface": "対応"
         },
@@ -1259,6 +1358,7 @@
           "surface": "せ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1268,6 +1368,7 @@
           "surface": "いただき"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -1283,6 +1384,7 @@
       "description": "開催されました - MeCab: 開催+さ+れ+まし+た (5分割)",
       "expected": [
         {
+          "lemma": "開催",
           "pos": "Noun",
           "surface": "開催"
         },
@@ -1302,6 +1404,7 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1317,6 +1420,7 @@
       "description": "勉強されました - MeCab: 勉強+さ+れ+まし+た (5分割)",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -1336,6 +1440,7 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1351,6 +1456,7 @@
       "description": "開催されなかった - suru passive negative past - なかっ+た split",
       "expected": [
         {
+          "lemma": "開催",
           "pos": "Noun",
           "surface": "開催"
         },
@@ -1370,6 +1476,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1386,6 +1493,7 @@
       "description": "勉強されなかった - suru passive negative past - なかっ+た split",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -1405,6 +1513,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1421,6 +1530,7 @@
       "description": "勉強しろ - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -1441,6 +1551,7 @@
       "description": "勉強せよ - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -1461,6 +1572,7 @@
       "description": "練習しろ - MeCab互換分割",
       "expected": [
         {
+          "lemma": "練習",
           "pos": "Noun",
           "surface": "練習"
         },
@@ -1481,6 +1593,7 @@
       "description": "運動せよ - MeCab互換分割",
       "expected": [
         {
+          "lemma": "運動",
           "pos": "Noun",
           "surface": "運動"
         },
@@ -1501,6 +1614,7 @@
       "description": "説明しろ - MeCab互換分割",
       "expected": [
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
@@ -1521,6 +1635,7 @@
       "description": "勉強すれば - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -1530,6 +1645,7 @@
           "surface": "すれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         }
@@ -1545,6 +1661,7 @@
       "description": "勉強しよう - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -1554,6 +1671,7 @@
           "surface": "しよ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         }
@@ -1603,6 +1721,7 @@
       "description": "Ichidan verb 食べる base form",
       "expected": [
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         }
@@ -1622,10 +1741,12 @@
       "description": "「こんにちは」と言った (said 'hello') - current output without brackets",
       "expected": [
         {
+          "lemma": "こんにちは",
           "pos": "Interjection",
           "surface": "こんにちは"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -1635,6 +1756,7 @@
           "surface": "言っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1673,6 +1795,7 @@
       "description": "勉強しちゃった - MeCab: 勉強+し+ちゃっ+た (4 tokens)",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -1687,6 +1810,7 @@
           "surface": "ちゃっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1721,6 +1845,7 @@
       "description": "予約しとく - MeCab: とく is 動詞,非自立",
       "expected": [
         {
+          "lemma": "予約",
           "pos": "Noun",
           "surface": "予約"
         },
@@ -1730,6 +1855,7 @@
           "surface": "し"
         },
         {
+          "lemma": "とく",
           "pos": "Auxiliary",
           "surface": "とく"
         }
@@ -1745,6 +1871,7 @@
       "description": "勉強してる - MeCab: し + てる (てる is 動詞,非自立)",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -1754,6 +1881,7 @@
           "surface": "し"
         },
         {
+          "lemma": "てる",
           "pos": "Auxiliary",
           "surface": "てる"
         }
@@ -1773,6 +1901,7 @@
       "description": "勉強しなくて - negative te-form (MeCab-style split)",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -1783,10 +1912,11 @@
         },
         {
           "lemma": "ない",
-          "pos": "Auxiliary",
+          "pos": "Adjective",
           "surface": "なく"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -1822,6 +1952,7 @@
       "description": "説明してもらっている - MeCab互換分割",
       "expected": [
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
@@ -1831,6 +1962,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1840,10 +1972,12 @@
           "surface": "もらっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -1864,6 +1998,7 @@
           "surface": "来"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1875,10 +2010,12 @@
       "description": "堪能できる - auto-generated",
       "expected": [
         {
+          "lemma": "堪能",
           "pos": "Noun",
           "surface": "堪能"
         },
         {
+          "lemma": "できる",
           "pos": "Verb",
           "surface": "できる"
         }
@@ -1890,10 +2027,12 @@
       "description": "表現できる - auto-generated",
       "expected": [
         {
+          "lemma": "表現",
           "pos": "Noun",
           "surface": "表現"
         },
         {
+          "lemma": "できる",
           "pos": "Verb",
           "surface": "できる"
         }

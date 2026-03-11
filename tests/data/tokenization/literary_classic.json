@@ -4,10 +4,12 @@
       "description": "漱石・草枕冒頭風 - ながら接続",
       "expected": [
         {
+          "lemma": "山路",
           "pos": "Noun",
           "surface": "山路"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -17,10 +19,12 @@
           "surface": "登り"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
         {
+          "lemma": "こう",
           "pos": "Adverb",
           "surface": "こう"
         },
@@ -30,6 +34,7 @@
           "surface": "考え"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -41,26 +46,32 @@
       "description": "芥川・羅生門風 - 体言止め否定",
       "expected": [
         {
+          "lemma": "下人",
           "pos": "Noun",
           "surface": "下人"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "行方",
           "pos": "Noun",
           "surface": "行方"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "誰",
           "pos": "Pronoun",
           "surface": "誰"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
@@ -70,6 +81,7 @@
           "surface": "知ら"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -81,38 +93,47 @@
       "description": "川端・雪国冒頭 - 長い連体修飾",
       "expected": [
         {
+          "lemma": "国境",
           "pos": "Noun",
           "surface": "国境"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "長い",
           "pos": "Adjective",
           "surface": "長い"
         },
         {
+          "lemma": "トンネル",
           "pos": "Noun",
           "surface": "トンネル"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "抜ける",
           "pos": "Verb",
           "surface": "抜ける"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "雪国",
           "pos": "Noun",
           "surface": "雪国"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -122,6 +143,7 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -133,22 +155,27 @@
       "description": "敬語 お〜になる",
       "expected": [
         {
+          "lemma": "先生",
           "pos": "Noun",
           "surface": "先生"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "読み",
           "pos": "Noun",
           "surface": "読み"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -158,18 +185,22 @@
           "surface": "なっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -181,10 +212,12 @@
       "description": "ichidan verb 生まれる regression test",
       "expected": [
         {
+          "lemma": "彼女",
           "pos": "Pronoun",
           "surface": "彼女"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -194,14 +227,17 @@
           "surface": "生まれ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "ばかり",
           "pos": "Particle",
           "surface": "ばかり"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -213,22 +249,27 @@
       "description": "太宰・人間失格風 — 送って来る",
       "expected": [
         {
+          "lemma": "恥",
           "pos": "Noun",
           "surface": "恥"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "多い",
           "pos": "Adjective",
           "surface": "多い"
         },
         {
+          "lemma": "生涯",
           "pos": "Noun",
           "surface": "生涯"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -238,6 +279,7 @@
           "surface": "送っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -252,6 +294,7 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -263,30 +306,37 @@
       "description": "新聞風 - ながらに接続",
       "expected": [
         {
+          "lemma": "被害者",
           "pos": "Noun",
           "surface": "被害者"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "遺族",
           "pos": "Noun",
           "surface": "遺族"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "涙",
           "pos": "Noun",
           "surface": "涙"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -296,6 +346,7 @@
           "surface": "訴え"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -307,18 +358,22 @@
       "description": "論説風 - 受動態＋複合名詞",
       "expected": [
         {
+          "lemma": "事態",
           "pos": "Noun",
           "surface": "事態"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "収拾",
           "pos": "Noun",
           "surface": "収拾"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -328,14 +383,17 @@
           "surface": "向け"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "取り組み",
           "pos": "Noun",
           "surface": "取り組み"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -345,6 +403,7 @@
           "surface": "急が"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -356,26 +415,32 @@
       "description": "四字熟語＋慣用句",
       "expected": [
         {
+          "lemma": "前代未聞",
           "pos": "Noun",
           "surface": "前代未聞"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "不祥事",
           "pos": "Noun",
           "surface": "不祥事"
         },
         {
+          "lemma": "として",
           "pos": "Particle",
           "surface": "として"
         },
         {
+          "lemma": "波紋",
           "pos": "Noun",
           "surface": "波紋"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -385,10 +450,12 @@
           "surface": "広げ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -400,6 +467,7 @@
       "description": "慣用表現 - 身に沁みる",
       "expected": [
         {
+          "lemma": "厳しい",
           "pos": "Adjective",
           "surface": "厳しい"
         },
@@ -409,30 +477,37 @@
           "surface": "寒"
         },
         {
+          "lemma": "さ",
           "pos": "Suffix",
           "surface": "さ"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "身",
           "pos": "Noun",
           "surface": "身"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "沁みる",
           "pos": "Verb",
           "surface": "沁みる"
         },
         {
+          "lemma": "季節",
           "pos": "Noun",
           "surface": "季節"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -442,6 +517,7 @@
           "surface": "なっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -453,30 +529,37 @@
       "description": "論説風 - 長い複文",
       "expected": [
         {
+          "lemma": "当該案件",
           "pos": "Noun",
           "surface": "当該案件"
         },
         {
+          "lemma": "について",
           "pos": "Particle",
           "surface": "について"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "慎重",
           "pos": "Adjective",
           "surface": "慎重"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "検討",
           "pos": "Noun",
           "surface": "検討"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -486,22 +569,27 @@
           "surface": "重ね"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "上",
           "pos": "Noun",
           "surface": "上"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "判断",
           "pos": "Noun",
           "surface": "判断"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -513,14 +601,17 @@
       "description": "四字熟語＋受動態連鎖",
       "expected": [
         {
+          "lemma": "満場一致",
           "pos": "Noun",
           "surface": "満場一致"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "可決",
           "pos": "Noun",
           "surface": "可決"
         },
@@ -535,18 +626,22 @@
           "surface": "れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "法案",
           "pos": "Noun",
           "surface": "法案"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "施行",
           "pos": "Noun",
           "surface": "施行"
         },
@@ -561,6 +656,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -572,14 +668,17 @@
       "description": "漱石・吾輩は猫である冒頭",
       "expected": [
         {
+          "lemma": "吾輩",
           "pos": "Pronoun",
           "surface": "吾輩"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "猫",
           "pos": "Noun",
           "surface": "猫"
         },
@@ -589,22 +688,27 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         },
         {
+          "lemma": "名前",
           "pos": "Noun",
           "surface": "名前"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "まだ",
           "pos": "Adverb",
           "surface": "まだ"
         },
         {
+          "lemma": "無い",
           "pos": "Adjective",
           "surface": "無い"
         }
@@ -613,29 +717,39 @@
       "input": "吾輩は猫である。名前はまだ無い。"
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma diff: 事 lemma こと(MeCab) vs 事(Suzume)"
+      },
       "description": "芥川・羅生門冒頭風",
       "expected": [
         {
+          "lemma": "ある",
           "pos": "Determiner",
           "surface": "ある"
         },
         {
+          "lemma": "日",
           "pos": "Noun",
           "surface": "日"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "暮方",
           "pos": "Noun",
           "surface": "暮方"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "事",
           "pos": "Noun",
           "surface": "事"
         },
@@ -645,21 +759,66 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
       ],
       "id": "aru_no_no_dearu",
-      "input": "ある日の暮方の事である。"
+      "input": "ある日の暮方の事である。",
+      "suzume_expected": [
+        {
+          "lemma": "ある",
+          "pos": "Determiner",
+          "surface": "ある"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "暮方",
+          "pos": "Noun",
+          "surface": "暮方"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "事"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ]
     },
     {
       "description": "漱石・草枕風 - 生まれて ichidan + 長い複文",
       "expected": [
         {
+          "lemma": "世の中",
           "pos": "Noun",
           "surface": "世の中"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -669,10 +828,12 @@
           "surface": "住み"
         },
         {
+          "lemma": "にくい",
           "pos": "Adjective",
           "surface": "にくい"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -682,22 +843,27 @@
           "surface": "悟っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "時",
           "pos": "Noun",
           "surface": "時"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "詩",
           "pos": "Noun",
           "surface": "詩"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -707,18 +873,22 @@
           "surface": "生まれ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "絵",
           "pos": "Noun",
           "surface": "絵"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "できる",
           "pos": "Verb",
           "surface": "できる"
         }
@@ -730,10 +900,12 @@
       "description": "長文 - 複合文 + 静かに目 regression test",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
@@ -743,14 +915,17 @@
           "surface": "書い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "手紙",
           "pos": "Noun",
           "surface": "手紙"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -765,26 +940,32 @@
           "surface": "終え"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "から",
           "pos": "Particle",
           "surface": "から"
         },
         {
+          "lemma": "静か",
           "pos": "Adjective",
           "surface": "静か"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "目",
           "pos": "Noun",
           "surface": "目"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -794,6 +975,7 @@
           "surface": "閉じ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -810,6 +992,7 @@
           "surface": "生まれ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -819,6 +1002,7 @@
           "surface": "き"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -830,6 +1014,7 @@
       "description": "使役+受身連鎖",
       "expected": [
         {
+          "lemma": "無理やり",
           "pos": "Adverb",
           "surface": "無理やり"
         },
@@ -849,6 +1034,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -860,30 +1046,37 @@
       "description": "ばかりである - 書き言葉",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "態度",
           "pos": "Noun",
           "surface": "態度"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "呆れる",
           "pos": "Verb",
           "surface": "呆れる"
         },
         {
+          "lemma": "ばかり",
           "pos": "Particle",
           "surface": "ばかり"
         },
@@ -893,6 +1086,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
@@ -909,30 +1103,37 @@
           "surface": "言わ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         },
         {
+          "lemma": "こと",
           "pos": "Noun",
           "surface": "こと"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "理解",
           "pos": "Noun",
           "surface": "理解"
         },
         {
+          "lemma": "できる",
           "pos": "Verb",
           "surface": "できる"
         }
@@ -964,22 +1165,27 @@
           "surface": "ず"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "うち",
           "pos": "Noun",
           "surface": "うち"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "涙",
           "pos": "Noun",
           "surface": "涙"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -989,6 +1195,7 @@
           "surface": "溢れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1000,26 +1207,32 @@
       "description": "漱石風長文 - 茜色+複合動詞+し難い",
       "expected": [
         {
+          "lemma": "夕暮れ",
           "pos": "Noun",
           "surface": "夕暮れ"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "空",
           "pos": "Noun",
           "surface": "空"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "茜色",
           "pos": "Noun",
           "surface": "茜色"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -1029,26 +1242,32 @@
           "surface": "染まっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いく",
           "pos": "Verb",
           "surface": "いく"
         },
         {
+          "lemma": "様",
           "pos": "Noun",
           "surface": "様"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "筆舌",
           "pos": "Noun",
           "surface": "筆舌"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -1058,6 +1277,7 @@
           "surface": "尽くし"
         },
         {
+          "lemma": "難い",
           "pos": "Adjective",
           "surface": "難い"
         }
@@ -1069,10 +1289,12 @@
       "description": "使役受身+副詞+補助動詞",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -1092,26 +1314,32 @@
           "surface": "れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "内容",
           "pos": "Noun",
           "surface": "内容"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "すっかり",
           "pos": "Adverb",
           "surface": "すっかり"
         },
@@ -1121,6 +1349,7 @@
           "surface": "忘れ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1130,6 +1359,7 @@
           "surface": "しまっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1141,54 +1371,67 @@
       "description": "新聞論説文 - について+慎重に+重ねる",
       "expected": [
         {
+          "lemma": "政府",
           "pos": "Noun",
           "surface": "政府"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "今後",
           "pos": "Noun",
           "surface": "今後"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "対策",
           "pos": "Noun",
           "surface": "対策"
         },
         {
+          "lemma": "について",
           "pos": "Particle",
           "surface": "について"
         },
         {
+          "lemma": "慎重",
           "pos": "Adjective",
           "surface": "慎重"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "検討",
           "pos": "Noun",
           "surface": "検討"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "重ねる",
           "pos": "Verb",
           "surface": "重ねる"
         },
         {
+          "lemma": "方針",
           "pos": "Noun",
           "surface": "方針"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -1197,49 +1440,55 @@
       "input": "政府は今後の対策について慎重に検討を重ねる方針だ。"
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "POS/lemma limitation"
-      },
       "description": "漢語慣用句 - 枚挙に暇がない",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "功績",
           "pos": "Noun",
           "surface": "功績"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "枚挙",
           "pos": "Noun",
           "surface": "枚挙"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "暇",
           "pos": "Noun",
           "surface": "暇"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
-          "pos": "Auxiliary",
+          "lemma": "ない",
+          "pos": "Adjective",
           "surface": "ない"
         },
         {
+          "lemma": "ほど",
           "pos": "Particle",
           "surface": "ほど"
         },
@@ -1249,76 +1498,33 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
       ],
       "id": "no_ha_ni_ganaihododearu",
-      "input": "彼の功績は枚挙に暇がないほどである。",
-      "suzume_expected": [
-        {
-          "pos": "Pronoun",
-          "surface": "彼"
-        },
-        {
-          "pos": "Particle",
-          "surface": "の"
-        },
-        {
-          "pos": "Noun",
-          "surface": "功績"
-        },
-        {
-          "pos": "Particle",
-          "surface": "は"
-        },
-        {
-          "pos": "Noun",
-          "surface": "枚挙"
-        },
-        {
-          "pos": "Particle",
-          "surface": "に"
-        },
-        {
-          "pos": "Noun",
-          "surface": "暇"
-        },
-        {
-          "pos": "Particle",
-          "surface": "が"
-        },
-        {
-          "pos": "Adjective",
-          "surface": "ない"
-        },
-        {
-          "pos": "Particle",
-          "surface": "ほど"
-        },
-        {
-          "lemma": "だ",
-          "pos": "Auxiliary",
-          "surface": "で"
-        },
-        {
-          "pos": "Verb",
-          "surface": "ある"
-        }
-      ]
+      "input": "彼の功績は枚挙に暇がないほどである。"
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma/POS diff: よう/で"
+      },
       "description": "文語副詞あたかも+かのような",
       "expected": [
         {
+          "lemma": "あたかも",
           "pos": "Adverb",
           "surface": "あたかも"
         },
         {
+          "lemma": "夢",
           "pos": "Noun",
           "surface": "夢"
         },
         {
+          "lemma": "から",
           "pos": "Particle",
           "surface": "から"
         },
@@ -1328,18 +1534,91 @@
           "surface": "覚め"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "よう",
+          "pos": "Auxiliary",
+          "surface": "よう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "心持ち",
+          "pos": "Noun",
+          "surface": "心持ち"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "atakamo_kara_metakanoyouna_chideattta",
+      "input": "あたかも夢から覚めたかのような心持ちであった。",
+      "suzume_expected": [
+        {
+          "lemma": "あたかも",
+          "pos": "Adverb",
+          "surface": "あたかも"
+        },
+        {
+          "lemma": "夢",
+          "pos": "Noun",
+          "surface": "夢"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "覚める",
+          "pos": "Verb",
+          "surface": "覚め"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
           "pos": "Noun",
           "surface": "よう"
         },
@@ -1349,10 +1628,12 @@
           "surface": "な"
         },
         {
+          "lemma": "心持ち",
           "pos": "Noun",
           "surface": "心持ち"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -1362,17 +1643,17 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
-      ],
-      "id": "atakamo_kara_metakanoyouna_chideattta",
-      "input": "あたかも夢から覚めたかのような心持ちであった。"
+      ]
     },
     {
       "description": "体言止め - na形容詞+であった",
       "expected": [
         {
+          "lemma": "憂鬱",
           "pos": "Adjective",
           "surface": "憂鬱"
         },
@@ -1382,10 +1663,12 @@
           "surface": "な"
         },
         {
+          "lemma": "午後",
           "pos": "Noun",
           "surface": "午後"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -1395,6 +1678,7 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1406,34 +1690,42 @@
       "description": "々反復+副詞+複文",
       "expected": [
         {
+          "lemma": "月",
           "pos": "Noun",
           "surface": "月"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "煌々",
           "pos": "Noun",
           "surface": "煌々"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "照らす",
           "pos": "Verb",
           "surface": "照らす"
         },
         {
+          "lemma": "夜道",
           "pos": "Noun",
           "surface": "夜道"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "一人",
           "pos": "Noun",
           "surface": "一人"
         },
@@ -1443,6 +1735,7 @@
           "surface": "歩い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1451,17 +1744,24 @@
       "input": "月が煌々と照らす夜道を一人歩いた。"
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma diff: taru-adj lemma difference"
+      },
       "description": "漢語+として副詞 - kango-toshite-split正規化",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "依然と",
           "pos": "Adverb",
           "surface": "依然と"
         },
@@ -1471,14 +1771,17 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "態度",
           "pos": "Noun",
           "surface": "態度"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1488,10 +1791,12 @@
           "surface": "変えよ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -1506,17 +1811,86 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
       ],
       "id": "ha_toshite_wo_eyoutoshinakattta",
-      "input": "彼は依然として態度を変えようとしなかった。"
+      "input": "彼は依然として態度を変えようとしなかった。",
+      "suzume_expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "依然",
+          "pos": "Adverb",
+          "surface": "依然と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "態度",
+          "pos": "Noun",
+          "surface": "態度"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "変える",
+          "pos": "Verb",
+          "surface": "変えよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ]
     },
     {
       "description": "sahen verb + ざる classical negative split",
       "expected": [
         {
+          "lemma": "認識",
           "pos": "Noun",
           "surface": "認識"
         },
@@ -1531,6 +1905,7 @@
           "surface": "ざる"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1540,6 +1915,7 @@
           "surface": "得"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1551,6 +1927,7 @@
       "description": "sahen verb + ざる split (対応)",
       "expected": [
         {
+          "lemma": "対応",
           "pos": "Noun",
           "surface": "対応"
         },
@@ -1565,6 +1942,7 @@
           "surface": "ざる"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1574,6 +1952,7 @@
           "surface": "得"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1585,10 +1964,12 @@
       "description": "ください stays as single token before まし+た (VerbRenyokei)",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "越し",
           "pos": "Noun",
           "surface": "越し"
         },
@@ -1603,6 +1984,7 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1614,14 +1996,17 @@
       "description": "見守る compound verb from L2 dict",
       "expected": [
         {
+          "lemma": "見守る",
           "pos": "Verb",
           "surface": "見守る"
         },
         {
+          "lemma": "ほか",
           "pos": "Noun",
           "surface": "ほか"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -1631,6 +2016,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1642,6 +2028,7 @@
       "description": "成し遂げる compound verb from L2 dict",
       "expected": [
         {
+          "lemma": "成し遂げる",
           "pos": "Verb",
           "surface": "成し遂げる"
         }
@@ -1663,6 +2050,7 @@
           "surface": "ざる"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1672,6 +2060,7 @@
           "surface": "得"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1683,18 +2072,22 @@
       "description": "されど(conjunction) + 我が(determiner) + 揺るが+ず(classical negative)",
       "expected": [
         {
+          "lemma": "されど",
           "pos": "Conjunction",
           "surface": "されど"
         },
         {
+          "lemma": "我が",
           "pos": "Determiner",
           "surface": "我が"
         },
         {
+          "lemma": "心",
           "pos": "Noun",
           "surface": "心"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -1716,18 +2109,22 @@
       "description": "見遣る(literary verb) + 降り積もる(compound verb) conjugated forms",
       "expected": [
         {
+          "lemma": "窓",
           "pos": "Noun",
           "surface": "窓"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "外",
           "pos": "Noun",
           "surface": "外"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1737,14 +2134,17 @@
           "surface": "見遣れ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         },
         {
+          "lemma": "雪",
           "pos": "Noun",
           "surface": "雪"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -1754,6 +2154,7 @@
           "surface": "降り積もっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1763,6 +2164,7 @@
           "surface": "い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1784,6 +2186,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "ぬ",
           "pos": "Auxiliary",
           "surface": "ぬ"
         }
@@ -1795,30 +2198,37 @@
       "description": "横たわる (L2 dict) conjugated + ている",
       "expected": [
         {
+          "lemma": "問題",
           "pos": "Noun",
           "surface": "問題"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "根底",
           "pos": "Noun",
           "surface": "根底"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "矛盾",
           "pos": "Noun",
           "surface": "矛盾"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -1828,10 +2238,12 @@
           "surface": "横たわっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -1853,6 +2265,7 @@
           "surface": "ざる"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1867,6 +2280,7 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }
@@ -1878,30 +2292,37 @@
       "description": "できまい - negative volitional/conjecture",
       "expected": [
         {
+          "lemma": "時代",
           "pos": "Noun",
           "surface": "時代"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "趨勢",
           "pos": "Noun",
           "surface": "趨勢"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "逆らう",
           "pos": "Verb",
           "surface": "逆らう"
         },
         {
+          "lemma": "こと",
           "pos": "Noun",
           "surface": "こと"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -1911,6 +2332,7 @@
           "surface": "でき"
         },
         {
+          "lemma": "まい",
           "pos": "Auxiliary",
           "surface": "まい"
         }
@@ -1922,30 +2344,37 @@
       "description": "四字熟語 + 硬い書き言葉 (kanji compound)",
       "expected": [
         {
+          "lemma": "千変万化",
           "pos": "Noun",
           "surface": "千変万化"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "様相",
           "pos": "Noun",
           "surface": "様相"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "呈する",
           "pos": "Verb",
           "surface": "呈する"
         },
         {
+          "lemma": "国際情勢",
           "pos": "Noun",
           "surface": "国際情勢"
         },
         {
+          "lemma": "において",
           "pos": "Particle",
           "surface": "において"
         }
@@ -1957,14 +2386,17 @@
       "description": "新聞・論説風の長文 (kanji compound)",
       "expected": [
         {
+          "lemma": "満場一致",
           "pos": "Noun",
           "surface": "満場一致"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "可決",
           "pos": "Noun",
           "surface": "可決"
         },
@@ -1979,26 +2411,32 @@
           "surface": "れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "法案",
           "pos": "Noun",
           "surface": "法案"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "国民生活",
           "pos": "Noun",
           "surface": "国民生活"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "多大",
           "pos": "Adjective",
           "surface": "多大"
         },
@@ -2008,14 +2446,17 @@
           "surface": "な"
         },
         {
+          "lemma": "影響",
           "pos": "Noun",
           "surface": "影響"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "及ぼす",
           "pos": "Verb",
           "surface": "及ぼす"
         }
@@ -2027,22 +2468,27 @@
       "description": "涙ながらに — 慣用表現",
       "expected": [
         {
+          "lemma": "彼女",
           "pos": "Pronoun",
           "surface": "彼女"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "涙",
           "pos": "Noun",
           "surface": "涙"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -2052,6 +2498,7 @@
           "surface": "訴え"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -2063,26 +2510,32 @@
       "description": "四字熟語 + tari-adverb",
       "expected": [
         {
+          "lemma": "前代未聞",
           "pos": "Noun",
           "surface": "前代未聞"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "不祥事",
           "pos": "Noun",
           "surface": "不祥事"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "世間",
           "pos": "Noun",
           "surface": "世間"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -2097,10 +2550,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -2112,18 +2567,22 @@
       "description": "四字熟語 + として (kanji compound)",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "泰然自若",
           "pos": "Noun",
           "surface": "泰然自若"
         },
         {
+          "lemma": "として",
           "pos": "Particle",
           "surface": "として"
         },
@@ -2138,6 +2597,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -2149,14 +2609,17 @@
       "description": "ごとき (bungo comparison auxiliary, attributive)",
       "expected": [
         {
+          "lemma": "あたかも",
           "pos": "Adverb",
           "surface": "あたかも"
         },
         {
+          "lemma": "夢",
           "pos": "Noun",
           "surface": "夢"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
@@ -2166,10 +2629,12 @@
           "surface": "ごとき"
         },
         {
+          "lemma": "一瞬",
           "pos": "Noun",
           "surface": "一瞬"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -2179,6 +2644,7 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -2190,22 +2656,27 @@
       "description": "筆舌に尽くし難い — 慣用句 + し難い",
       "expected": [
         {
+          "lemma": "その",
           "pos": "Determiner",
           "surface": "その"
         },
         {
+          "lemma": "光景",
           "pos": "Noun",
           "surface": "光景"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "筆舌",
           "pos": "Noun",
           "surface": "筆舌"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -2215,6 +2686,7 @@
           "surface": "尽くし"
         },
         {
+          "lemma": "難い",
           "pos": "Adjective",
           "surface": "難い"
         }
@@ -2226,22 +2698,27 @@
       "description": "多重敬語 (承る + たく + 存じる + ます)",
       "expected": [
         {
+          "lemma": "先生",
           "pos": "Noun",
           "surface": "先生"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "話",
           "pos": "Noun",
           "surface": "話"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -2261,6 +2738,7 @@
           "surface": "存じ"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -2272,10 +2750,12 @@
       "description": "漱石「草枕」冒頭風 — 登りながら+こう+考えた",
       "expected": [
         {
+          "lemma": "山路",
           "pos": "Noun",
           "surface": "山路"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -2285,10 +2765,12 @@
           "surface": "登り"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
         {
+          "lemma": "こう",
           "pos": "Adverb",
           "surface": "こう"
         },
@@ -2298,6 +2780,7 @@
           "surface": "考え"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -2309,18 +2792,22 @@
       "description": "パスカル名言 — 考える+葦+である",
       "expected": [
         {
+          "lemma": "人間",
           "pos": "Noun",
           "surface": "人間"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "考える",
           "pos": "Verb",
           "surface": "考える"
         },
         {
+          "lemma": "葦",
           "pos": "Noun",
           "surface": "葦"
         },
@@ -2330,6 +2817,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
@@ -2341,18 +2829,22 @@
       "description": "四字熟語 + ぬ(否定) + であった",
       "expected": [
         {
+          "lemma": "喜怒哀楽",
           "pos": "Noun",
           "surface": "喜怒哀楽"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "表",
           "pos": "Noun",
           "surface": "表"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -2362,14 +2854,17 @@
           "surface": "出さ"
         },
         {
+          "lemma": "ぬ",
           "pos": "Auxiliary",
           "surface": "ぬ"
         },
         {
+          "lemma": "人物",
           "pos": "Noun",
           "surface": "人物"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -2379,6 +2874,7 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -2394,14 +2890,17 @@
       "description": "なかろう split (negative volitional)",
       "expected": [
         {
+          "lemma": "そう",
           "pos": "Adverb",
           "surface": "そう"
         },
         {
-          "pos": "Particle",
+          "lemma": "だ",
+          "pos": "Auxiliary",
           "surface": "で"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -2411,10 +2910,12 @@
           "surface": "なかろ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -2462,18 +2963,22 @@
       "description": "いかなる determiner + 屈せず + べきである",
       "expected": [
         {
+          "lemma": "いかなる",
           "pos": "Determiner",
           "surface": "いかなる"
         },
         {
+          "lemma": "困難",
           "pos": "Adjective",
           "surface": "困難"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
@@ -2488,6 +2993,7 @@
           "surface": "ず"
         },
         {
+          "lemma": "前進",
           "pos": "Noun",
           "surface": "前進"
         },
@@ -2507,6 +3013,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
@@ -2566,17 +3073,15 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "POS/lemma limitation"
-      },
       "description": "ビジネス敬語多重化",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "査収",
           "pos": "Noun",
           "surface": "査収"
         },
@@ -2586,18 +3091,22 @@
           "surface": "ください"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         },
         {
-          "pos": "Noun",
+          "lemma": "よう",
+          "pos": "Auxiliary",
           "surface": "よう"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "願い",
           "pos": "Noun",
           "surface": "願い"
         },
@@ -2607,52 +3116,13 @@
           "surface": "申し上げ"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
       ],
       "id": "go_kudasaimasuyouo_i_shi_gemasu",
-      "input": "ご査収くださいますようお願い申し上げます。",
-      "suzume_expected": [
-        {
-          "pos": "Prefix",
-          "surface": "ご"
-        },
-        {
-          "pos": "Noun",
-          "surface": "査収"
-        },
-        {
-          "lemma": "くださる",
-          "pos": "Verb",
-          "surface": "ください"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "ます"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "よう"
-        },
-        {
-          "pos": "Prefix",
-          "surface": "お"
-        },
-        {
-          "pos": "Noun",
-          "surface": "願い"
-        },
-        {
-          "lemma": "申し上げる",
-          "pos": "Verb",
-          "surface": "申し上げ"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "ます"
-        }
-      ]
+      "input": "ご査収くださいますようお願い申し上げます。"
     },
     {
       "accepted_diff": {
@@ -2662,6 +3132,7 @@
       "description": "たる + 漢語 (tari adjective)",
       "expected": [
         {
+          "lemma": "暗澹",
           "pos": "Noun",
           "surface": "暗澹"
         },
@@ -2671,18 +3142,22 @@
           "surface": "たる"
         },
         {
+          "lemma": "気持ち",
           "pos": "Noun",
           "surface": "気持ち"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "帰途",
           "pos": "Noun",
           "surface": "帰途"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -2692,6 +3167,7 @@
           "surface": "就い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -2742,6 +3218,7 @@
       "description": "俳句 — 食え+ば + なり",
       "expected": [
         {
+          "lemma": "柿",
           "pos": "Noun",
           "surface": "柿"
         },
@@ -2751,26 +3228,32 @@
           "surface": "食え"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         },
         {
+          "lemma": "鐘",
           "pos": "Noun",
           "surface": "鐘"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "鳴る",
           "pos": "Verb",
           "surface": "鳴る"
         },
         {
+          "lemma": "なり",
           "pos": "Particle",
           "surface": "なり"
         },
         {
+          "lemma": "法隆寺",
           "pos": "Noun",
           "surface": "法隆寺"
         }
@@ -2818,38 +3301,47 @@
       "description": "体言止め: susuki swaying in autumn wind, evening field",
       "expected": [
         {
+          "lemma": "秋風",
           "pos": "Noun",
           "surface": "秋風"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "揺れる",
           "pos": "Verb",
           "surface": "揺れる"
         },
         {
+          "lemma": "薄",
           "pos": "Noun",
           "surface": "薄"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "穂",
           "pos": "Noun",
           "surface": "穂"
         },
         {
+          "lemma": "夕暮れ",
           "pos": "Noun",
           "surface": "夕暮れ"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "野",
           "pos": "Noun",
           "surface": "野"
         }
@@ -2861,22 +3353,27 @@
       "description": "長い複文: long relative clause with にわたって",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "長年",
           "pos": "Noun",
           "surface": "長年"
         },
         {
+          "lemma": "にわたって",
           "pos": "Particle",
           "surface": "にわたって"
         },
         {
+          "lemma": "研究",
           "pos": "Noun",
           "surface": "研究"
         },
@@ -2886,6 +3383,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -2895,30 +3393,37 @@
           "surface": "き"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "成果",
           "pos": "Noun",
           "surface": "成果"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "ここ",
           "pos": "Pronoun",
           "surface": "ここ"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "発表",
           "pos": "Noun",
           "surface": "発表"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -2930,10 +3435,12 @@
       "description": "複文: reading father's letter, tears wouldn't stop",
       "expected": [
         {
+          "lemma": "父",
           "pos": "Noun",
           "surface": "父"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
@@ -2943,14 +3450,17 @@
           "surface": "残し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "手紙",
           "pos": "Noun",
           "surface": "手紙"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -2960,14 +3470,17 @@
           "surface": "読ん"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "涙",
           "pos": "Noun",
           "surface": "涙"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -2982,6 +3495,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -2993,38 +3507,47 @@
       "description": "複文: compound verb 降り積もる with auxiliary chain",
       "expected": [
         {
+          "lemma": "窓",
           "pos": "Noun",
           "surface": "窓"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "外",
           "pos": "Noun",
           "surface": "外"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "雪",
           "pos": "Noun",
           "surface": "雪"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "静か",
           "pos": "Adjective",
           "surface": "静か"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -3034,6 +3557,7 @@
           "surface": "降り積もっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -3043,6 +3567,7 @@
           "surface": "い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -3054,54 +3579,67 @@
       "description": "長い複文: ながらに + をも particle combination",
       "expected": [
         {
+          "lemma": "涙",
           "pos": "Noun",
           "surface": "涙"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "語る",
           "pos": "Verb",
           "surface": "語る"
         },
         {
+          "lemma": "彼女",
           "pos": "Pronoun",
           "surface": "彼女"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "姿",
           "pos": "Noun",
           "surface": "姿"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "誰",
           "pos": "Pronoun",
           "surface": "誰"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "心",
           "pos": "Noun",
           "surface": "心"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
@@ -3111,6 +3649,7 @@
           "surface": "打っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -3119,17 +3658,24 @@
       "input": "涙ながらに語る彼女の姿は、誰の心をも打った。"
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "文語: あたかも + かのような simile pattern",
       "expected": [
         {
+          "lemma": "あたかも",
           "pos": "Adverb",
           "surface": "あたかも"
         },
         {
+          "lemma": "夢",
           "pos": "Noun",
           "surface": "夢"
         },
         {
+          "lemma": "から",
           "pos": "Particle",
           "surface": "から"
         },
@@ -3139,19 +3685,23 @@
           "surface": "覚め"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
-          "pos": "Noun",
+          "lemma": "よう",
+          "pos": "Auxiliary",
           "surface": "よう"
         },
         {
@@ -3160,10 +3710,12 @@
           "surface": "な"
         },
         {
+          "lemma": "心地",
           "pos": "Noun",
           "surface": "心地"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -3173,12 +3725,80 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
       ],
       "id": "atakamo_kara_metakanoyouna_deattta",
-      "input": "あたかも夢から覚めたかのような心地であった。"
+      "input": "あたかも夢から覚めたかのような心地であった。",
+      "suzume_expected": [
+        {
+          "lemma": "あたかも",
+          "pos": "Adverb",
+          "surface": "あたかも"
+        },
+        {
+          "lemma": "夢",
+          "pos": "Noun",
+          "surface": "夢"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "覚める",
+          "pos": "Verb",
+          "surface": "覚め"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "心地",
+          "pos": "Noun",
+          "surface": "心地"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ]
     },
     {
       "accepted_diff": {
@@ -3193,14 +3813,17 @@
           "surface": "思え"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         },
         {
+          "lemma": "遠く",
           "pos": "Noun",
           "surface": "遠く"
         },
         {
+          "lemma": "へ",
           "pos": "Particle",
           "surface": "へ"
         },
@@ -3210,14 +3833,17 @@
           "surface": "来"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "もの",
           "pos": "Noun",
           "surface": "もの"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -3265,22 +3891,27 @@
       "description": "使役受身: 行か+さ+れ+た causative-passive chain",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "上司",
           "pos": "Noun",
           "surface": "上司"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "無理やり",
           "pos": "Adverb",
           "surface": "無理やり"
         },
@@ -3300,6 +3931,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -3311,14 +3943,17 @@
       "description": "受身+ざるを得ない: passive + obligatory pattern",
       "expected": [
         {
+          "lemma": "その",
           "pos": "Determiner",
           "surface": "その"
         },
         {
+          "lemma": "報告書",
           "pos": "Noun",
           "surface": "報告書"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -3328,6 +3963,7 @@
           "surface": "厳しく"
         },
         {
+          "lemma": "批判",
           "pos": "Noun",
           "surface": "批判"
         },
@@ -3347,6 +3983,7 @@
           "surface": "ざる"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -3361,6 +3998,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -3372,22 +4010,27 @@
       "description": "長い複文: compound verb 守り続ける + てきた + relative clause",
       "expected": [
         {
+          "lemma": "古来",
           "pos": "Noun",
           "surface": "古来"
         },
         {
+          "lemma": "より",
           "pos": "Particle",
           "surface": "より"
         },
         {
+          "lemma": "伝わる",
           "pos": "Verb",
           "surface": "伝わる"
         },
         {
+          "lemma": "風習",
           "pos": "Noun",
           "surface": "風習"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -3397,6 +4040,7 @@
           "surface": "守り続け"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -3406,18 +4050,22 @@
           "surface": "き"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "村",
           "pos": "Noun",
           "surface": "村"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
@@ -3433,22 +4081,27 @@
       "description": "使役+てやる: やり POS diff (Verb vs Aux)",
       "expected": [
         {
+          "lemma": "子供",
           "pos": "Noun",
           "surface": "子供"
         },
         {
+          "lemma": "たち",
           "pos": "Suffix",
           "surface": "たち"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -3463,6 +4116,7 @@
           "surface": "せ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -3472,6 +4126,7 @@
           "surface": "やり"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         }
@@ -3532,18 +4187,22 @@
       "description": "体言止め: 困難 Noun(suzume) vs Adj(mecab) before を",
       "expected": [
         {
+          "lemma": "幾多",
           "pos": "Noun",
           "surface": "幾多"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "困難",
           "pos": "Adjective",
           "surface": "困難"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -3553,6 +4212,7 @@
           "surface": "乗り越え"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -3562,22 +4222,27 @@
           "surface": "き"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "先人",
           "pos": "Noun",
           "surface": "先人"
         },
         {
+          "lemma": "たち",
           "pos": "Suffix",
           "surface": "たち"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "知恵",
           "pos": "Noun",
           "surface": "知恵"
         }
@@ -3641,22 +4306,27 @@
       "description": "論説調: 講じる+べき+である formal pattern",
       "expected": [
         {
+          "lemma": "政府",
           "pos": "Noun",
           "surface": "政府"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "対策",
           "pos": "Noun",
           "surface": "対策"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "講じる",
           "pos": "Verb",
           "surface": "講じる"
         },
@@ -3671,14 +4341,17 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "指摘",
           "pos": "Noun",
           "surface": "指摘"
         },
@@ -3688,6 +4361,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -3709,30 +4383,37 @@
           "surface": "れ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "我々",
           "pos": "Pronoun",
           "surface": "我々"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "覚悟",
           "pos": "Noun",
           "surface": "覚悟"
         },
@@ -3742,6 +4423,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
@@ -3808,9 +4490,9 @@
           "surface": "もの"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
-          "surface": "で",
-          "lemma": "だ"
+          "surface": "で"
         },
         {
           "pos": "Particle",
@@ -3830,22 +4512,27 @@
       "description": "論説: がたい POS diff (Adj vs Other)",
       "expected": [
         {
+          "lemma": "遺憾",
           "pos": "Adjective",
           "surface": "遺憾"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
         {
+          "lemma": "その",
           "pos": "Determiner",
           "surface": "その"
         },
         {
+          "lemma": "提案",
           "pos": "Noun",
           "surface": "提案"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -3855,6 +4542,7 @@
           "surface": "受け入れ"
         },
         {
+          "lemma": "がたい",
           "pos": "Adjective",
           "surface": "がたい"
         }
@@ -3901,18 +4589,22 @@
       "description": "文語: およそ POS diff, 得る Aux/Verb diff",
       "expected": [
         {
+          "lemma": "およそ",
           "pos": "Determiner",
           "surface": "およそ"
         },
         {
+          "lemma": "人間",
           "pos": "Noun",
           "surface": "人間"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "想像",
           "pos": "Noun",
           "surface": "想像"
         },
@@ -3922,14 +4614,17 @@
           "surface": "し"
         },
         {
+          "lemma": "得る",
           "pos": "Auxiliary",
           "surface": "得る"
         },
         {
+          "lemma": "限り",
           "pos": "Noun",
           "surface": "限り"
         },
         {
+          "lemma": "において",
           "pos": "Particle",
           "surface": "において"
         }
@@ -3980,6 +4675,7 @@
       "description": "文語: たるや pattern, がたい suffix, POS diffs",
       "expected": [
         {
+          "lemma": "その",
           "pos": "Determiner",
           "surface": "その"
         },
@@ -3989,6 +4685,7 @@
           "surface": "美し"
         },
         {
+          "lemma": "さ",
           "pos": "Suffix",
           "surface": "さ"
         },
@@ -3998,14 +4695,17 @@
           "surface": "たる"
         },
         {
+          "lemma": "や",
           "pos": "Particle",
           "surface": "や"
         },
         {
+          "lemma": "筆舌",
           "pos": "Noun",
           "surface": "筆舌"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -4015,6 +4715,7 @@
           "surface": "尽くし"
         },
         {
+          "lemma": "がたい",
           "pos": "Adjective",
           "surface": "がたい"
         }
@@ -4069,10 +4770,12 @@
       "description": "文語: 怒り/発し POS diff, てはならぬ prohibition",
       "expected": [
         {
+          "lemma": "怒り",
           "pos": "Noun",
           "surface": "怒り"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -4082,14 +4785,17 @@
           "surface": "任せ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "言葉",
           "pos": "Noun",
           "surface": "言葉"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -4099,10 +4805,12 @@
           "surface": "発し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -4112,6 +4820,7 @@
           "surface": "なら"
         },
         {
+          "lemma": "ぬ",
           "pos": "Auxiliary",
           "surface": "ぬ"
         }
@@ -4172,22 +4881,27 @@
       "description": "体言止め: moonlight, shadow — short poetic",
       "expected": [
         {
+          "lemma": "月明かり",
           "pos": "Noun",
           "surface": "月明かり"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "下",
           "pos": "Noun",
           "surface": "下"
         },
         {
+          "lemma": "影",
           "pos": "Noun",
           "surface": "影"
         },
         {
+          "lemma": "一つ",
           "pos": "Noun",
           "surface": "一つ"
         }
@@ -4199,26 +4913,32 @@
       "description": "枕草子風: parallel structure with 体言止め",
       "expected": [
         {
+          "lemma": "春",
           "pos": "Noun",
           "surface": "春"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "曙",
           "pos": "Noun",
           "surface": "曙"
         },
         {
+          "lemma": "夏",
           "pos": "Noun",
           "surface": "夏"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "夜",
           "pos": "Noun",
           "surface": "夜"
         }
@@ -4230,22 +4950,27 @@
       "description": "太宰風: 送ってきました auxiliary chain",
       "expected": [
         {
+          "lemma": "恥",
           "pos": "Noun",
           "surface": "恥"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "多い",
           "pos": "Adjective",
           "surface": "多い"
         },
         {
+          "lemma": "生涯",
           "pos": "Noun",
           "surface": "生涯"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -4255,6 +4980,7 @@
           "surface": "送っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -4269,6 +4995,7 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -4284,43 +5011,53 @@
       "description": "芥川風: ような simile, と clause connector. POS diff よう(Noun/Aux)",
       "expected": [
         {
+          "lemma": "老婆",
           "pos": "Noun",
           "surface": "老婆"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "話",
           "pos": "Noun",
           "surface": "話"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "終わる",
           "pos": "Verb",
           "surface": "終わる"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "下人",
           "pos": "Noun",
           "surface": "下人"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "嘲る",
           "pos": "Verb",
           "surface": "嘲る"
         },
         {
-          "pos": "Noun",
+          "lemma": "よう",
+          "pos": "Auxiliary",
           "surface": "よう"
         },
         {
@@ -4329,10 +5066,12 @@
           "surface": "な"
         },
         {
+          "lemma": "声",
           "pos": "Noun",
           "surface": "声"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -4342,6 +5081,7 @@
           "surface": "言っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -4426,10 +5166,12 @@
           "surface": "生まれ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "すみません",
           "pos": "Interjection",
           "surface": "すみません"
         }
@@ -4457,26 +5199,32 @@
       "description": "四字熟語: 異口同音 as single kanji compound",
       "expected": [
         {
+          "lemma": "異口同音",
           "pos": "Noun",
           "surface": "異口同音"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "賛成",
           "pos": "Noun",
           "surface": "賛成"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "声",
           "pos": "Noun",
           "surface": "声"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -4486,6 +5234,7 @@
           "surface": "上がっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -4501,22 +5250,27 @@
       "description": "がたい suffix POS diff (Adj/Other)",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "行動",
           "pos": "Noun",
           "surface": "行動"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "理解",
           "pos": "Noun",
           "surface": "理解"
         },
@@ -4526,14 +5280,17 @@
           "surface": "し"
         },
         {
+          "lemma": "がたい",
           "pos": "Adjective",
           "surface": "がたい"
         },
         {
+          "lemma": "もの",
           "pos": "Noun",
           "surface": "もの"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -4543,6 +5300,7 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -4611,30 +5369,37 @@
       "description": "四字熟語+まさに: boundary test for hiragana adverb after は",
       "expected": [
         {
+          "lemma": "一石二鳥",
           "pos": "Noun",
           "surface": "一石二鳥"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "まさに",
           "pos": "Adverb",
           "surface": "まさに"
         },
         {
+          "lemma": "この",
           "pos": "Determiner",
           "surface": "この"
         },
         {
+          "lemma": "こと",
           "pos": "Noun",
           "surface": "こと"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }

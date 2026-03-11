@@ -9,6 +9,7 @@
           "surface": "行か"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -34,6 +35,7 @@
           "surface": "ぬ"
         },
         {
+          "lemma": "炎",
           "pos": "Noun",
           "surface": "炎"
         }
@@ -60,6 +62,7 @@
           "surface": "ぬ"
         },
         {
+          "lemma": "意見",
           "pos": "Noun",
           "surface": "意見"
         }
@@ -86,6 +89,7 @@
           "surface": "ぬ"
         },
         {
+          "lemma": "心",
           "pos": "Noun",
           "surface": "心"
         }

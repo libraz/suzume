@@ -9,6 +9,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -139,22 +140,27 @@
       "description": "Business request - MeCab互換分割",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "願い",
           "pos": "Noun",
           "surface": "願い"
         },
@@ -164,6 +170,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }

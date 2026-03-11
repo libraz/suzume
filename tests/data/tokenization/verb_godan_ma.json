@@ -4,14 +4,17 @@
       "description": "毎朝コーヒーを飲みながら新聞を読む",
       "expected": [
         {
+          "lemma": "毎朝",
           "pos": "Noun",
           "surface": "毎朝"
         },
         {
+          "lemma": "コーヒー",
           "pos": "Noun",
           "surface": "コーヒー"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -21,18 +24,22 @@
           "surface": "飲み"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
         {
+          "lemma": "新聞",
           "pos": "Noun",
           "surface": "新聞"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "読む",
           "pos": "Verb",
           "surface": "読む"
         }
@@ -74,6 +81,7 @@
           "surface": "飲み"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         }
@@ -89,10 +97,12 @@
       "description": "コーヒーを飲みながら読む - nagara in sentence",
       "expected": [
         {
+          "lemma": "コーヒー",
           "pos": "Noun",
           "surface": "コーヒー"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -102,10 +112,12 @@
           "surface": "飲み"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
         {
+          "lemma": "読む",
           "pos": "Verb",
           "surface": "読む"
         }
@@ -126,6 +138,7 @@
           "surface": "読ま"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -141,6 +154,7 @@
       "description": "Godan verb 読む base form",
       "expected": [
         {
+          "lemma": "読む",
           "pos": "Verb",
           "surface": "読む"
         }

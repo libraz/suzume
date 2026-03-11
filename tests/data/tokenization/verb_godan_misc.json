@@ -4,10 +4,12 @@
       "description": "Cat-like speech にゃん",
       "expected": [
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         },
         {
+          "lemma": "にゃん",
           "pos": "Particle",
           "surface": "にゃん"
         }
@@ -23,10 +25,12 @@
       "description": "食べるもの (something to eat)",
       "expected": [
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         },
         {
+          "lemma": "もの",
           "pos": "Noun",
           "surface": "もの"
         }
@@ -42,10 +46,12 @@
       "description": "食べるところ (place to eat)",
       "expected": [
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         },
         {
+          "lemma": "ところ",
           "pos": "Noun",
           "surface": "ところ"
         }
@@ -66,6 +72,7 @@
           "surface": "い"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -90,6 +97,7 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }
@@ -104,6 +112,7 @@
       "description": "verb renyokei + もの → compound noun merge",
       "expected": [
         {
+          "lemma": "食べもの",
           "pos": "Noun",
           "surface": "食べもの"
         }
@@ -115,14 +124,17 @@
       "description": "verb renyokei + もの → compound noun in sentence",
       "expected": [
         {
+          "lemma": "飲みもの",
           "pos": "Noun",
           "surface": "飲みもの"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "買う",
           "pos": "Verb",
           "surface": "買う"
         }
@@ -134,14 +146,17 @@
       "description": "verb renyokei + もの → compound noun in sentence",
       "expected": [
         {
+          "lemma": "読みもの",
           "pos": "Noun",
           "surface": "読みもの"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "好き",
           "pos": "Adjective",
           "surface": "好き"
         }
@@ -153,18 +168,22 @@
       "description": "わけにはいかない is a syntactic construction, not an auxiliary suffix",
       "expected": [
         {
+          "lemma": "帰る",
           "pos": "Verb",
           "surface": "帰る"
         },
         {
+          "lemma": "わけ",
           "pos": "Noun",
           "surface": "わけ"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -179,6 +198,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -205,6 +225,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }

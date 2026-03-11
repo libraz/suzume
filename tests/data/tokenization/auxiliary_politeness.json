@@ -4,18 +4,22 @@
       "description": "今日は天気です",
       "expected": [
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "天気",
           "pos": "Noun",
           "surface": "天気"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -31,14 +35,17 @@
       "description": "いいですね - should have です + ね",
       "expected": [
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -63,6 +70,7 @@
           "surface": "た"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -82,6 +90,7 @@
           "surface": "学ん"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -91,6 +100,7 @@
           "surface": "い"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -143,6 +153,10 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "お嬢様 split as お+嬢+様 without user dict"
+      },
       "description": "Ojou-sama speech ですわ",
       "expected": [
         {
@@ -163,10 +177,6 @@
       ],
       "id": "character_desuwa",
       "input": "お嬢様ですわ",
-      "tags": [
-        "character_speech",
-        "ojousama"
-      ],
       "suzume_expected": [
         {
           "pos": "Prefix",
@@ -189,23 +199,26 @@
           "surface": "わ"
         }
       ],
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "お嬢様 split as お+嬢+様 without user dict"
-      }
+      "tags": [
+        "character_speech",
+        "ojousama"
+      ]
     },
     {
       "description": "ですわ ojou-sama speech",
       "expected": [
         {
+          "lemma": "綺麗",
           "pos": "Adjective",
           "surface": "綺麗"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "わ",
           "pos": "Particle",
           "surface": "わ"
         }
@@ -220,10 +233,12 @@
       "description": "家にいます - existential verb いる (single auxiliary token)",
       "expected": [
         {
+          "lemma": "家",
           "pos": "Noun",
           "surface": "家"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -233,6 +248,7 @@
           "surface": "い"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -253,6 +269,7 @@
           "surface": "いただき"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -267,14 +284,17 @@
       "description": "お世話になっております - humble progressive form - MeCab: なっ + て + おり + ます",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "世話",
           "pos": "Noun",
           "surface": "世話"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -284,6 +304,7 @@
           "surface": "なっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -293,6 +314,7 @@
           "surface": "おり"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -309,22 +331,27 @@
       "description": "これはいくらですか - should have particles",
       "expected": [
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "いくら",
           "pos": "Pronoun",
           "surface": "いくら"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -341,22 +368,27 @@
       "description": "今日は暑いですね - should recognize 今日",
       "expected": [
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "暑い",
           "pos": "Adjective",
           "surface": "暑い"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -373,6 +405,7 @@
       "description": "おはようございます should be at most 2 tokens",
       "expected": [
         {
+          "lemma": "おはよう",
           "pos": "Interjection",
           "surface": "おはよう"
         },
@@ -382,6 +415,7 @@
           "surface": "ござい"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -397,6 +431,7 @@
       "description": "ありがとうございます should be at most 2 tokens",
       "expected": [
         {
+          "lemma": "ありがとう",
           "pos": "Interjection",
           "surface": "ありがとう"
         },
@@ -406,6 +441,7 @@
           "surface": "ござい"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -421,14 +457,17 @@
       "description": "よろしくお願いいたします - MeCab互換分割",
       "expected": [
         {
+          "lemma": "よろしく",
           "pos": "Adverb",
           "surface": "よろしく"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "願い",
           "pos": "Noun",
           "surface": "願い"
         },
@@ -438,6 +477,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -453,6 +493,7 @@
       "description": "なんし - kuruwa-kotoba polite auxiliary (archaic courtesan speech)",
       "expected": [
         {
+          "lemma": "なん",
           "pos": "Noun",
           "surface": "なん"
         },
@@ -473,10 +514,12 @@
       "description": "おいでなんし - kuruwa-kotoba polite invitation",
       "expected": [
         {
+          "lemma": "おいで",
           "pos": "Adverb",
           "surface": "おいで"
         },
         {
+          "lemma": "なん",
           "pos": "Noun",
           "surface": "なん"
         },
@@ -497,6 +540,7 @@
       "description": "ます renyokei after き(くる) auxiliary — まし should be AUX not VERB(ましる)",
       "expected": [
         {
+          "lemma": "参加",
           "pos": "Noun",
           "surface": "参加"
         },
@@ -506,6 +550,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -520,6 +565,7 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -536,6 +582,7 @@
           "surface": "読ん"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -550,6 +597,7 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }

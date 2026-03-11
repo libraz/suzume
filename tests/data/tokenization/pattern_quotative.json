@@ -4,6 +4,7 @@
       "description": "Basic という determiner",
       "expected": [
         {
+          "lemma": "という",
           "pos": "Determiner",
           "surface": "という"
         }
@@ -19,14 +20,17 @@
       "description": "N+という+N pattern",
       "expected": [
         {
+          "lemma": "太郎",
           "pos": "Noun",
           "surface": "太郎"
         },
         {
+          "lemma": "という",
           "pos": "Determiner",
           "surface": "という"
         },
         {
+          "lemma": "名前",
           "pos": "Noun",
           "surface": "名前"
         }
@@ -42,6 +46,7 @@
       "description": "といった (past quotative determiner)",
       "expected": [
         {
+          "lemma": "といった",
           "pos": "Particle",
           "surface": "といった"
         }
@@ -57,6 +62,7 @@
       "description": "といって (quotative te-form of 言う)",
       "expected": [
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -66,6 +72,7 @@
           "surface": "いっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -81,10 +88,12 @@
       "description": "といって in sentence context (MeCab-compatible split)",
       "expected": [
         {
+          "lemma": "仕事",
           "pos": "Noun",
           "surface": "仕事"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -94,6 +103,7 @@
           "surface": "いっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -103,6 +113,7 @@
           "surface": "出かけ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -117,6 +128,7 @@
       "description": "といっても (MeCab-compatible split)",
       "expected": [
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -126,10 +138,12 @@
           "surface": "いっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         }
@@ -144,10 +158,12 @@
       "description": "といっても in sentence context (MeCab-compatible split)",
       "expected": [
         {
+          "lemma": "仕事",
           "pos": "Noun",
           "surface": "仕事"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -157,18 +173,22 @@
           "surface": "いっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
         {
+          "lemma": "簡単",
           "pos": "Adjective",
           "surface": "簡単"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -183,6 +203,7 @@
       "description": "そういって (ADV + quotative verb)",
       "expected": [
         {
+          "lemma": "そう",
           "pos": "Adverb",
           "surface": "そう"
         },
@@ -192,6 +213,7 @@
           "surface": "いっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -207,6 +229,7 @@
       "description": "こういって (quotative verb)",
       "expected": [
         {
+          "lemma": "こう",
           "pos": "Adverb",
           "surface": "こう"
         },
@@ -216,6 +239,7 @@
           "surface": "いっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -231,10 +255,12 @@
       "description": "行って should remain as 行く (not 言う)",
       "expected": [
         {
+          "lemma": "そこ",
           "pos": "Pronoun",
           "surface": "そこ"
         },
         {
+          "lemma": "へ",
           "pos": "Particle",
           "surface": "へ"
         },
@@ -244,6 +270,7 @@
           "surface": "行っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -260,6 +287,7 @@
       "description": "っていう (colloquial quotative)",
       "expected": [
         {
+          "lemma": "っていう",
           "pos": "Determiner",
           "surface": "っていう"
         }

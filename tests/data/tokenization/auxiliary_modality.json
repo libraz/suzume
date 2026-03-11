@@ -8,6 +8,7 @@
       "description": "ゐる - old kana",
       "expected": [
         {
+          "lemma": "ゐる",
           "pos": "Verb",
           "surface": "ゐる"
         }
@@ -34,6 +35,7 @@
           "surface": "行き"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         }
@@ -49,6 +51,7 @@
       "description": "そうでありんす - MeCab-compatible split: そう + で + あり + ん + す",
       "expected": [
         {
+          "lemma": "そう",
           "pos": "Adjective",
           "surface": "そう"
         },
@@ -63,6 +66,7 @@
           "surface": "あり"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         },
@@ -83,14 +87,17 @@
       "description": "Cat-like speech だにゃ",
       "expected": [
         {
+          "lemma": "猫",
           "pos": "Noun",
           "surface": "猫"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         },
         {
+          "lemma": "にゃ",
           "pos": "Particle",
           "surface": "にゃ"
         }
@@ -106,14 +113,17 @@
       "description": "Feminine speech だわ",
       "expected": [
         {
+          "lemma": "そう",
           "pos": "Adjective",
           "surface": "そう"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         },
         {
+          "lemma": "わ",
           "pos": "Particle",
           "surface": "わ"
         }
@@ -133,6 +143,7 @@
       "description": "Elderly speech じゃろう",
       "expected": [
         {
+          "lemma": "そう",
           "pos": "Adjective",
           "surface": "そう"
         },
@@ -142,6 +153,7 @@
           "surface": "じゃろ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         }
@@ -172,14 +184,17 @@
       "description": "Kansai dialect やで",
       "expected": [
         {
+          "lemma": "そう",
           "pos": "Adverb",
           "surface": "そう"
         },
         {
+          "lemma": "や",
           "pos": "Particle",
           "surface": "や"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -195,6 +210,7 @@
       "description": "かもしれない - MeCab-compatible split: かも + しれ + ない",
       "expected": [
         {
+          "lemma": "かも",
           "pos": "Particle",
           "surface": "かも"
         },
@@ -220,18 +236,22 @@
       "description": "かもしれません in sentence - MeCab-compatible split",
       "expected": [
         {
+          "lemma": "明日",
           "pos": "Noun",
           "surface": "明日"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "雨",
           "pos": "Noun",
           "surface": "雨"
         },
         {
+          "lemma": "かも",
           "pos": "Particle",
           "surface": "かも"
         },
@@ -246,6 +266,7 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }
@@ -261,6 +282,7 @@
       "description": "Negative conjecture auxiliary まい",
       "expected": [
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         },
@@ -281,6 +303,7 @@
       "description": "Obligation auxiliary べき",
       "expected": [
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         },
@@ -301,6 +324,7 @@
       "description": "Obligation auxiliary べき with copula - MeCab splits だっ + た",
       "expected": [
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         },
@@ -315,6 +339,7 @@
           "surface": "だっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -414,6 +439,7 @@
       "description": "Classical べき with Suru passive: 装飾されべき - MeCab splits さ+れ+べき",
       "expected": [
         {
+          "lemma": "装飾",
           "pos": "Noun",
           "surface": "装飾"
         },
@@ -444,28 +470,8 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "POS/lemma limitation: surfaces match, POS classification differs from MeCab"
-      },
       "description": "金がない should NOT trigger べき mizenkei split (negative test)",
       "expected": [
-        {
-          "pos": "Noun",
-          "surface": "金"
-        },
-        {
-          "pos": "Particle",
-          "surface": "が"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "ない"
-        }
-      ],
-      "id": "beki_false_positive_prevention",
-      "input": "金がない",
-      "suzume_expected": [
         {
           "lemma": "金",
           "pos": "Noun",
@@ -482,6 +488,8 @@
           "surface": "ない"
         }
       ],
+      "id": "beki_false_positive_prevention",
+      "input": "金がない",
       "tags": [
         "auxiliary",
         "negative_test"
@@ -603,6 +611,7 @@
       "description": "Classical べき with Suru passive: 処理されべき - MeCab splits さ+れ+べき",
       "expected": [
         {
+          "lemma": "処理",
           "pos": "Noun",
           "surface": "処理"
         },
@@ -734,6 +743,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -765,6 +775,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -791,6 +802,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -821,6 +833,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -886,6 +899,7 @@
           "surface": "見"
         },
         {
+          "lemma": "とく",
           "pos": "Auxiliary",
           "surface": "とく"
         }
@@ -912,6 +926,7 @@
           "surface": "とい"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -942,6 +957,7 @@
           "surface": "とい"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -979,6 +995,7 @@
           "surface": "食べ"
         },
         {
+          "lemma": "とく",
           "pos": "Auxiliary",
           "surface": "とく"
         }
@@ -1000,6 +1017,7 @@
           "surface": "読ん"
         },
         {
+          "lemma": "どく",
           "pos": "Auxiliary",
           "surface": "どく"
         }
@@ -1026,6 +1044,7 @@
           "surface": "どい"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1047,6 +1066,7 @@
           "surface": "やっ"
         },
         {
+          "lemma": "とく",
           "pos": "Auxiliary",
           "surface": "とく"
         }
@@ -1068,6 +1088,7 @@
           "surface": "書い"
         },
         {
+          "lemma": "とく",
           "pos": "Auxiliary",
           "surface": "とく"
         }
@@ -1089,6 +1110,7 @@
           "surface": "ね"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         }
@@ -1104,6 +1126,7 @@
       "description": "ねたい (envious) in sentence - MeCab treats as adjective",
       "expected": [
         {
+          "lemma": "そろそろ",
           "pos": "Adverb",
           "surface": "そろそろ"
         },
@@ -1113,6 +1136,7 @@
           "surface": "ね"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         }
@@ -1137,6 +1161,7 @@
           "surface": "で"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         }
@@ -1163,10 +1188,12 @@
       "description": "そういうわけ (that's why) - そういう is prenominal (連体詞), わけ is formal noun (形式名詞)",
       "expected": [
         {
+          "lemma": "そういう",
           "pos": "Determiner",
           "surface": "そういう"
         },
         {
+          "lemma": "わけ",
           "pos": "Noun",
           "surface": "わけ"
         }
@@ -1197,6 +1224,7 @@
           "surface": "なっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1206,6 +1234,7 @@
           "surface": "き"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1226,6 +1255,7 @@
           "surface": "降り"
         },
         {
+          "lemma": "そう",
           "pos": "Auxiliary",
           "surface": "そう"
         }
@@ -1241,6 +1271,7 @@
       "description": "そういう should be Determiner",
       "expected": [
         {
+          "lemma": "そういう",
           "pos": "Determiner",
           "surface": "そういう"
         },
@@ -1264,6 +1295,7 @@
       "description": "ないんだ should split into 2 tokens",
       "expected": [
         {
+          "lemma": "ない",
           "pos": "Adjective",
           "surface": "ない"
         },
@@ -1273,6 +1305,7 @@
           "surface": "ん"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -1308,6 +1341,7 @@
           "surface": "知ら"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         },
@@ -1317,6 +1351,7 @@
           "surface": "ん"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -1332,14 +1367,17 @@
       "description": "そう should be Adverb, not Verb",
       "expected": [
         {
+          "lemma": "そう",
           "pos": "Adjective",
           "surface": "そう"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -1355,10 +1393,12 @@
       "description": "そうかもしれません - MeCab-compatible split: そう + かも + しれ + ませ + ん",
       "expected": [
         {
+          "lemma": "そう",
           "pos": "Adverb",
           "surface": "そう"
         },
         {
+          "lemma": "かも",
           "pos": "Particle",
           "surface": "かも"
         },
@@ -1373,6 +1413,7 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }
@@ -1388,14 +1429,17 @@
       "description": "そんな should be Determiner",
       "expected": [
         {
+          "lemma": "そんな",
           "pos": "Determiner",
           "surface": "そんな"
         },
         {
+          "lemma": "こと",
           "pos": "Noun",
           "surface": "こと"
         },
         {
+          "lemma": "ない",
           "pos": "Adjective",
           "surface": "ない"
         }
@@ -1410,10 +1454,12 @@
       "description": "間違いない should be Auxiliary (certainty idiom)",
       "expected": [
         {
+          "lemma": "間違い",
           "pos": "Noun",
           "surface": "間違い"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1434,6 +1480,7 @@
           "surface": "違い"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1449,10 +1496,12 @@
       "description": "に違いない certainty expression - に is particle, 違いない is auxiliary",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -1462,6 +1511,7 @@
           "surface": "違い"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1477,10 +1527,12 @@
       "description": "電車が遅れているので遅刻しそうです - MeCab-compatible: て-form and そう split",
       "expected": [
         {
+          "lemma": "電車",
           "pos": "Noun",
           "surface": "電車"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -1490,18 +1542,22 @@
           "surface": "遅れ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         },
         {
+          "lemma": "ので",
           "pos": "Particle",
           "surface": "ので"
         },
         {
+          "lemma": "遅刻",
           "pos": "Noun",
           "surface": "遅刻"
         },
@@ -1511,10 +1567,12 @@
           "surface": "し"
         },
         {
+          "lemma": "そう",
           "pos": "Auxiliary",
           "surface": "そう"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -1531,6 +1589,7 @@
       "description": "嫌じゃない - auto-generated",
       "expected": [
         {
+          "lemma": "嫌",
           "pos": "Adjective",
           "surface": "嫌"
         },
@@ -1540,6 +1599,7 @@
           "surface": "じゃ"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1551,6 +1611,7 @@
       "description": "学生じゃない - auto-generated",
       "expected": [
         {
+          "lemma": "学生",
           "pos": "Noun",
           "surface": "学生"
         },
@@ -1560,6 +1621,7 @@
           "surface": "じゃ"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1571,6 +1633,7 @@
       "description": "元気じゃなかった - auto-generated",
       "expected": [
         {
+          "lemma": "元気",
           "pos": "Adjective",
           "surface": "元気"
         },
@@ -1585,6 +1648,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }

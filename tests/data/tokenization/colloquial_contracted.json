@@ -9,6 +9,7 @@
           "surface": "殺しゃ"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -30,6 +31,7 @@
           "surface": "し"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -46,6 +48,7 @@
           "surface": "話しゃ"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }

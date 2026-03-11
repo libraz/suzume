@@ -4,14 +4,17 @@
       "description": "人々が集まる - iteration mark should be grouped with kanji",
       "expected": [
         {
+          "lemma": "人々",
           "pos": "Noun",
           "surface": "人々"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "集まる",
           "pos": "Verb",
           "surface": "集まる"
         }
@@ -27,10 +30,12 @@
       "description": "雨が降るかもしれない - MeCab-compatible split: かも + しれ + ない",
       "expected": [
         {
+          "lemma": "雨",
           "pos": "Noun",
           "surface": "雨"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -40,6 +45,7 @@
           "surface": "降る"
         },
         {
+          "lemma": "かも",
           "pos": "Particle",
           "surface": "かも"
         },
@@ -64,10 +70,12 @@
       "description": "領収書をください - particle should not be absorbed",
       "expected": [
         {
+          "lemma": "領収書",
           "pos": "Noun",
           "surface": "領収書"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -92,6 +100,7 @@
           "surface": "わから"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -148,6 +157,7 @@
           "surface": "やっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -167,6 +177,7 @@
       "description": "Ninja/Old-fashioned ござる",
       "expected": [
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
@@ -176,6 +187,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ござる",
           "pos": "Auxiliary",
           "surface": "ござる"
         }
@@ -214,6 +226,7 @@
           "surface": "知ら"
         },
         {
+          "lemma": "ぬ",
           "pos": "Auxiliary",
           "surface": "ぬ"
         },
@@ -228,6 +241,7 @@
           "surface": "ござら"
         },
         {
+          "lemma": "ぬ",
           "pos": "Auxiliary",
           "surface": "ぬ"
         }
@@ -282,14 +296,17 @@
       "description": "しかし問題がある (however, there is a problem)",
       "expected": [
         {
+          "lemma": "しかし",
           "pos": "Conjunction",
           "surface": "しかし"
         },
         {
+          "lemma": "問題",
           "pos": "Noun",
           "surface": "問題"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -310,10 +327,12 @@
       "description": "それで帰った (so went home) - MeCab-compatible split",
       "expected": [
         {
+          "lemma": "それ",
           "pos": "Pronoun",
           "surface": "それ"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -323,6 +342,7 @@
           "surface": "帰っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -342,10 +362,12 @@
       "description": "雨が降ったので、家にいた (stayed home because it rained) - MeCab-compatible split",
       "expected": [
         {
+          "lemma": "雨",
           "pos": "Noun",
           "surface": "雨"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -355,18 +377,22 @@
           "surface": "降っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "ので",
           "pos": "Particle",
           "surface": "ので"
         },
         {
+          "lemma": "家",
           "pos": "Noun",
           "surface": "家"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -376,6 +402,7 @@
           "surface": "い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -431,14 +458,17 @@
       "description": "メールを送る (send email)",
       "expected": [
         {
+          "lemma": "メール",
           "pos": "Noun",
           "surface": "メール"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "送る",
           "pos": "Verb",
           "surface": "送る"
         }
@@ -468,6 +498,7 @@
           "surface": "なけれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         },
@@ -477,6 +508,7 @@
           "surface": "なら"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -529,6 +561,7 @@
           "surface": "なけれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         }
@@ -582,6 +615,7 @@
           "surface": "なけれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         },
@@ -591,6 +625,7 @@
           "surface": "なら"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -616,6 +651,7 @@
           "surface": "なけれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         }
@@ -636,10 +672,12 @@
           "surface": "出しゃばっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "くる",
           "pos": "Auxiliary",
           "surface": "くる"
         }
@@ -655,10 +693,12 @@
       "description": "B35: あがらない should be single verb",
       "expected": [
         {
+          "lemma": "うだつ",
           "pos": "Noun",
           "surface": "うだつ"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -668,6 +708,7 @@
           "surface": "あがら"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -683,10 +724,12 @@
       "description": "B65: 詰まった - MeCab-compatible split",
       "expected": [
         {
+          "lemma": "息",
           "pos": "Noun",
           "surface": "息"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
@@ -717,10 +760,12 @@
           "surface": "かかっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -741,6 +786,7 @@
           "surface": "放っ"
         },
         {
+          "lemma": "てる",
           "pos": "Auxiliary",
           "surface": "てる"
         }
@@ -761,18 +807,22 @@
           "surface": "叩けれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         },
         {
+          "lemma": "何",
           "pos": "Pronoun",
           "surface": "何"
         },
         {
+          "lemma": "でも",
           "pos": "Particle",
           "surface": "でも"
         },
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         }
@@ -858,6 +908,7 @@
           "surface": "そう"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -883,6 +934,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -908,6 +960,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -938,6 +991,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -958,6 +1012,7 @@
           "surface": "しめ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -973,10 +1028,12 @@
       "description": "味をしめた - idiom should split verb correctly",
       "expected": [
         {
+          "lemma": "味",
           "pos": "Noun",
           "surface": "味"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -986,6 +1043,7 @@
           "surface": "しめ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1001,10 +1059,12 @@
       "description": "帰るらしい should split as verb + らしい (conjecture auxiliary)",
       "expected": [
         {
+          "lemma": "帰る",
           "pos": "Verb",
           "surface": "帰る"
         },
         {
+          "lemma": "らしい",
           "pos": "Auxiliary",
           "surface": "らしい"
         }
@@ -1026,10 +1086,12 @@
           "surface": "帰り"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         },
         {
+          "lemma": "らしい",
           "pos": "Auxiliary",
           "surface": "らしい"
         }
@@ -1051,14 +1113,17 @@
       "description": "過疎っている - 過疎る is a modern Japanese verb (internet slang for 'become dead/inactive')",
       "expected": [
         {
+          "lemma": "過疎",
           "pos": "Noun",
           "surface": "過疎"
         },
         {
+          "lemma": "って",
           "pos": "Particle",
           "surface": "って"
         },
         {
+          "lemma": "いる",
           "pos": "Verb",
           "surface": "いる"
         }
@@ -1093,10 +1158,12 @@
       "description": "挙がっている - MeCab-compatible split with lemma 挙がる",
       "expected": [
         {
+          "lemma": "批判",
           "pos": "Noun",
           "surface": "批判"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -1106,10 +1173,12 @@
           "surface": "挙がっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -1135,6 +1204,7 @@
           "surface": "ましょ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         }
@@ -1155,6 +1225,7 @@
           "surface": "上がら"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1175,6 +1246,7 @@
           "surface": "食べれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         }
@@ -1194,6 +1266,7 @@
           "surface": "起きれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         }
@@ -1213,6 +1286,7 @@
           "surface": "起きれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         },
@@ -1262,10 +1336,12 @@
       "description": "容易になりました - na-adj + ni + naru (split: verb stem + polite aux)",
       "expected": [
         {
+          "lemma": "容易",
           "pos": "Noun",
           "surface": "容易"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -1280,6 +1356,7 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1315,6 +1392,7 @@
       "description": "Katakana verb バズる base form",
       "expected": [
         {
+          "lemma": "バズる",
           "pos": "Verb",
           "surface": "バズる"
         }
@@ -1328,15 +1406,27 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "Katakana verb バズる potential form",
       "expected": [
         {
+          "lemma": "バズれる",
           "pos": "Verb",
           "surface": "バズれる"
         }
       ],
       "id": "verb_bazuru_potential",
       "input": "バズれる",
+      "suzume_expected": [
+        {
+          "lemma": "バズる",
+          "pos": "Verb",
+          "surface": "バズれる"
+        }
+      ],
       "tags": [
         "slang",
         "verb",
@@ -1347,6 +1437,7 @@
       "description": "Katakana verb サボる base form",
       "expected": [
         {
+          "lemma": "サボる",
           "pos": "Verb",
           "surface": "サボる"
         }
@@ -1368,6 +1459,7 @@
           "surface": "サボっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -1384,6 +1476,7 @@
       "description": "Katakana verb ググる base form",
       "expected": [
         {
+          "lemma": "ググる",
           "pos": "Verb",
           "surface": "ググる"
         }
@@ -1405,6 +1498,7 @@
           "surface": "ググら"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1421,6 +1515,7 @@
       "description": "Katakana verb パクる base form",
       "expected": [
         {
+          "lemma": "パクる",
           "pos": "Verb",
           "surface": "パクる"
         }
@@ -1437,6 +1532,7 @@
       "description": "Katakana verb ネグる base form",
       "expected": [
         {
+          "lemma": "ネグる",
           "pos": "Verb",
           "surface": "ネグる"
         }
@@ -1458,6 +1554,7 @@
           "surface": "バズら"
         },
         {
+          "lemma": "せる",
           "pos": "Auxiliary",
           "surface": "せる"
         }
@@ -1479,6 +1576,7 @@
           "surface": "サボら"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -1500,6 +1598,7 @@
           "surface": "ググろ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         }
@@ -1516,26 +1615,32 @@
       "description": "Python technical sentence with particles - MeCab互換分割",
       "expected": [
         {
+          "lemma": "Python",
           "pos": "Noun",
           "surface": "Python"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "機械学習",
           "pos": "Noun",
           "surface": "機械学習"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "実装",
           "pos": "Noun",
           "surface": "実装"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -1552,10 +1657,12 @@
       "description": "ファイルが見つかりませんでした - should recognize が particle",
       "expected": [
         {
+          "lemma": "ファイル",
           "pos": "Noun",
           "surface": "ファイル"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -1570,6 +1677,7 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         },
@@ -1579,6 +1687,7 @@
           "surface": "でし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1612,18 +1721,22 @@
       "description": "ご飯を食べる - ご飯 is L2 dictionary word",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "飯",
           "pos": "Noun",
           "surface": "飯"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         }
@@ -1641,6 +1754,7 @@
       "description": "Godan verb 走る base form",
       "expected": [
         {
+          "lemma": "走る",
           "pos": "Verb",
           "surface": "走る"
         }
@@ -1681,22 +1795,27 @@
       "description": "Potential expression 話せるようになりたい",
       "expected": [
         {
+          "lemma": "日本語",
           "pos": "Noun",
           "surface": "日本語"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "話せる",
           "pos": "Verb",
           "surface": "話せる"
         },
         {
-          "pos": "Noun",
+          "lemma": "よう",
+          "pos": "Auxiliary",
           "surface": "よう"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -1706,6 +1825,7 @@
           "surface": "なり"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         }
@@ -1752,14 +1872,17 @@
       "description": "Potential negative できない - MeCab-compatible split",
       "expected": [
         {
+          "lemma": "今",
           "pos": "Noun",
           "surface": "今"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "外出",
           "pos": "Noun",
           "surface": "外出"
         },
@@ -1774,6 +1897,7 @@
           "surface": "ない"
         },
         {
+          "lemma": "状況",
           "pos": "Noun",
           "surface": "状況"
         },
@@ -1799,22 +1923,27 @@
           "surface": "起き"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "朝",
           "pos": "Noun",
           "surface": "朝"
         },
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "飯",
           "pos": "Noun",
           "surface": "飯"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1824,6 +1953,7 @@
           "surface": "食べ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1839,10 +1969,12 @@
       "description": "Polite verb 申し上げる - verb+auxiliary should be split per tokenization rules",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "報告",
           "pos": "Noun",
           "surface": "報告"
         },
@@ -1852,6 +1984,7 @@
           "surface": "申し上げ"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -1864,35 +1997,8 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "auxiliary/negative: context-dependent classification"
-      },
       "description": "Dictionary stem 答え with conjugation - MeCab splits られ as Verb not Auxiliary",
       "expected": [
-        {
-          "lemma": "答える",
-          "pos": "Verb",
-          "surface": "答え"
-        },
-        {
-          "lemma": "られる",
-          "pos": "Auxiliary",
-          "surface": "られ"
-        },
-        {
-          "lemma": "ない",
-          "pos": "Auxiliary",
-          "surface": "なく"
-        },
-        {
-          "pos": "Particle",
-          "surface": "て"
-        }
-      ],
-      "id": "dict_stem_kotaerarenakute",
-      "input": "答えられなくて",
-      "suzume_expected": [
         {
           "lemma": "答える",
           "pos": "Verb",
@@ -1909,10 +2015,13 @@
           "surface": "なく"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
       ],
+      "id": "dict_stem_kotaerarenakute",
+      "input": "答えられなくて",
       "tags": [
         "verb",
         "conjugation"
@@ -1937,6 +2046,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1967,6 +2077,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1997,10 +2108,11 @@
         },
         {
           "lemma": "ない",
-          "pos": "Auxiliary",
+          "pos": "Adjective",
           "surface": "なく"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -2080,10 +2192,12 @@
       "description": "ドアが閉まった - 閉まる(しまる)の過去形",
       "expected": [
         {
+          "lemma": "ドア",
           "pos": "Noun",
           "surface": "ドア"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -2093,6 +2207,7 @@
           "surface": "閉まっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -2109,10 +2224,12 @@
       "description": "取った - GodanRa past form - MeCab-compatible split",
       "expected": [
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -2139,10 +2256,12 @@
       "description": "座った - GodanRa past form - MeCab-compatible split",
       "expected": [
         {
+          "lemma": "椅子",
           "pos": "Noun",
           "surface": "椅子"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },

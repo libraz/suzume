@@ -4,14 +4,17 @@
       "description": "Mixed script: alphabet + kanji",
       "expected": [
         {
+          "lemma": "Web開発",
           "pos": "Noun",
           "surface": "Web開発"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "基礎",
           "pos": "Noun",
           "surface": "基礎"
         }
@@ -26,10 +29,12 @@
       "description": "Mixed script: alphabet + katakana",
       "expected": [
         {
+          "lemma": "APIリクエスト",
           "pos": "Noun",
           "surface": "APIリクエスト"
         },
         {
+          "lemma": "処理",
           "pos": "Noun",
           "surface": "処理"
         }
@@ -44,14 +49,17 @@
       "description": "Mixed script: digit + kanji - single token",
       "expected": [
         {
+          "lemma": "3月",
           "pos": "Noun",
           "surface": "3月"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "予定",
           "pos": "Noun",
           "surface": "予定"
         }
@@ -66,14 +74,17 @@
       "description": "Mixed script: multiple digits + kanji - single token",
       "expected": [
         {
+          "lemma": "100人",
           "pos": "Noun",
           "surface": "100人"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "参加",
           "pos": "Noun",
           "surface": "参加"
         }
@@ -88,18 +99,22 @@
       "description": "English word followed by particle (split: verb stem + polite aux)",
       "expected": [
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "Meeting",
           "pos": "Noun",
           "surface": "Meeting"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -109,6 +124,7 @@
           "surface": "あり"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -123,14 +139,17 @@
       "description": "CamelCase should be preserved",
       "expected": [
         {
+          "lemma": "getUserData",
           "pos": "Noun",
           "surface": "getUserData"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "呼び出す",
           "pos": "Verb",
           "surface": "呼び出す"
         }
@@ -145,14 +164,17 @@
       "description": "snake_case should be preserved",
       "expected": [
         {
+          "lemma": "user_name",
           "pos": "Noun",
           "surface": "user_name"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "設定",
           "pos": "Noun",
           "surface": "設定"
         }
@@ -167,14 +189,17 @@
       "description": "Abbreviation",
       "expected": [
         {
+          "lemma": "API",
           "pos": "Noun",
           "surface": "API"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "呼ぶ",
           "pos": "Verb",
           "surface": "呼ぶ"
         }
@@ -189,10 +214,12 @@
       "description": "Technical term with Japanese",
       "expected": [
         {
+          "lemma": "API",
           "pos": "Noun",
           "surface": "API"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -202,22 +229,27 @@
           "surface": "使っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "データ",
           "pos": "Noun",
           "surface": "データ"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "取得",
           "pos": "Noun",
           "surface": "取得"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -232,10 +264,12 @@
       "description": "Brand name in sentence - verb with polite past aux",
       "expected": [
         {
+          "lemma": "iPhone",
           "pos": "Noun",
           "surface": "iPhone"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -250,6 +284,7 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -264,14 +299,17 @@
       "description": "email + particle",
       "expected": [
         {
+          "lemma": "email",
           "pos": "Noun",
           "surface": "email"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "送る",
           "pos": "Verb",
           "surface": "送る"
         }
@@ -286,14 +324,17 @@
       "description": "server + particle",
       "expected": [
         {
+          "lemma": "server",
           "pos": "Noun",
           "surface": "server"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "接続",
           "pos": "Noun",
           "surface": "接続"
         }
@@ -308,14 +349,17 @@
       "description": "4 kanji compound stays as single token",
       "expected": [
         {
+          "lemma": "人工知能",
           "pos": "Noun",
           "surface": "人工知能"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "研究",
           "pos": "Noun",
           "surface": "研究"
         }
@@ -330,6 +374,7 @@
       "description": "Long kanji compound - 知事選挙 is a political term, kept as single token",
       "expected": [
         {
+          "lemma": "東京都知事選挙",
           "pos": "Noun",
           "surface": "東京都知事選挙"
         }
@@ -344,10 +389,12 @@
       "description": "Compound noun followed by particle",
       "expected": [
         {
+          "lemma": "情報処理技術者",
           "pos": "Noun",
           "surface": "情報処理技術者"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         }
@@ -362,10 +409,12 @@
       "description": "Natural language processing technology - preserved as single compound",
       "expected": [
         {
+          "lemma": "自然",
           "pos": "Noun",
           "surface": "自然"
         },
         {
+          "lemma": "言語処理技術",
           "pos": "Noun",
           "surface": "言語処理技術"
         }
@@ -381,14 +430,17 @@
       "description": "Organization name",
       "expected": [
         {
+          "lemma": "国立研究所",
           "pos": "Noun",
           "surface": "国立研究所"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "働く",
           "pos": "Verb",
           "surface": "働く"
         }
@@ -403,22 +455,27 @@
       "description": "について (regarding)",
       "expected": [
         {
+          "lemma": "日本",
           "pos": "Noun",
           "surface": "日本"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "文化",
           "pos": "Noun",
           "surface": "文化"
         },
         {
+          "lemma": "について",
           "pos": "Particle",
           "surface": "について"
         },
         {
+          "lemma": "話す",
           "pos": "Verb",
           "surface": "話す"
         }
@@ -433,22 +490,27 @@
       "description": "によって (by means of)",
       "expected": [
         {
+          "lemma": "場合",
           "pos": "Noun",
           "surface": "場合"
         },
         {
+          "lemma": "によって",
           "pos": "Particle",
           "surface": "によって"
         },
         {
+          "lemma": "対応",
           "pos": "Noun",
           "surface": "対応"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "変わる",
           "pos": "Verb",
           "surface": "変わる"
         }
@@ -463,10 +525,12 @@
       "description": "として (as)",
       "expected": [
         {
+          "lemma": "教師",
           "pos": "Noun",
           "surface": "教師"
         },
         {
+          "lemma": "として",
           "pos": "Particle",
           "surface": "として"
         },
@@ -476,10 +540,12 @@
           "surface": "働い"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -494,18 +560,22 @@
       "description": "お + 茶 (honorific prefix + noun)",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "茶",
           "pos": "Noun",
           "surface": "茶"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "飲む",
           "pos": "Verb",
           "surface": "飲む"
         }
@@ -520,18 +590,22 @@
       "description": "ご飯 - L2 dictionary word",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "飯",
           "pos": "Noun",
           "surface": "飯"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         }
@@ -547,10 +621,12 @@
       "description": "不 prefix",
       "expected": [
         {
+          "lemma": "不可能",
           "pos": "Adjective",
           "surface": "不可能"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -565,14 +641,17 @@
       "description": "未 prefix",
       "expected": [
         {
+          "lemma": "未確認",
           "pos": "Noun",
           "surface": "未確認"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "情報",
           "pos": "Noun",
           "surface": "情報"
         }
@@ -587,14 +666,17 @@
       "description": "非 prefix",
       "expected": [
         {
+          "lemma": "非公開",
           "pos": "Noun",
           "surface": "非公開"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "資料",
           "pos": "Noun",
           "surface": "資料"
         }
@@ -609,10 +691,12 @@
       "description": "的 suffix",
       "expected": [
         {
+          "lemma": "国際",
           "pos": "Noun",
           "surface": "国際"
         },
         {
+          "lemma": "的",
           "pos": "Suffix",
           "surface": "的"
         },
@@ -622,6 +706,7 @@
           "surface": "な"
         },
         {
+          "lemma": "問題",
           "pos": "Noun",
           "surface": "問題"
         }
@@ -636,14 +721,17 @@
       "description": "化 suffix",
       "expected": [
         {
+          "lemma": "自動",
           "pos": "Noun",
           "surface": "自動"
         },
         {
+          "lemma": "化",
           "pos": "Suffix",
           "surface": "化"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -658,14 +746,17 @@
       "description": "性 suffix - split from noun with existential ある (verb)",
       "expected": [
         {
+          "lemma": "可能性",
           "pos": "Noun",
           "surface": "可能性"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
@@ -680,14 +771,17 @@
       "description": "さん suffix - split from noun (CLAUDE.md: honorifics separate)",
       "expected": [
         {
+          "lemma": "田中",
           "pos": "Noun",
           "surface": "田中"
         },
         {
+          "lemma": "さん",
           "pos": "Suffix",
           "surface": "さん"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -697,6 +791,7 @@
           "surface": "来"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -711,18 +806,22 @@
       "description": "先生 suffix (name + suffix split)",
       "expected": [
         {
+          "lemma": "山田",
           "pos": "Noun",
           "surface": "山田"
         },
         {
+          "lemma": "先生",
           "pos": "Noun",
           "surface": "先生"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "授業",
           "pos": "Noun",
           "surface": "授業"
         }
@@ -737,10 +836,12 @@
       "description": "Volitional form 頑張ろう as single verb",
       "expected": [
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
@@ -750,6 +851,7 @@
           "surface": "頑張ろ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         }
@@ -764,14 +866,17 @@
       "description": "Numbers with Japanese units",
       "expected": [
         {
+          "lemma": "体重",
           "pos": "Noun",
           "surface": "体重"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "3キロ",
           "pos": "Noun",
           "surface": "3キロ"
         },
@@ -781,6 +886,7 @@
           "surface": "減っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -799,14 +905,17 @@
       "description": "URL-like mixed content",
       "expected": [
         {
+          "lemma": "example.com",
           "pos": "Noun",
           "surface": "example.com"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "登録",
           "pos": "Noun",
           "surface": "登録"
         },
@@ -816,6 +925,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -864,14 +974,17 @@
       "description": "People counter",
       "expected": [
         {
+          "lemma": "3人",
           "pos": "Noun",
           "surface": "3人"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         }
@@ -886,14 +999,17 @@
       "description": "Times counter - single token",
       "expected": [
         {
+          "lemma": "5回目",
           "pos": "Noun",
           "surface": "5回目"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "挑戦",
           "pos": "Noun",
           "surface": "挑戦"
         }
@@ -908,14 +1024,17 @@
       "description": "Currency",
       "expected": [
         {
+          "lemma": "100万円",
           "pos": "Noun",
           "surface": "100万円"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "買い物",
           "pos": "Noun",
           "surface": "買い物"
         }
@@ -930,18 +1049,22 @@
       "description": "Percentage",
       "expected": [
         {
+          "lemma": "売上",
           "pos": "Noun",
           "surface": "売上"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "50%",
           "pos": "Noun",
           "surface": "50%"
         },
         {
+          "lemma": "増加",
           "pos": "Noun",
           "surface": "増加"
         }
@@ -956,18 +1079,22 @@
       "description": "私",
       "expected": [
         {
+          "lemma": "私",
           "pos": "Pronoun",
           "surface": "私"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "学生",
           "pos": "Noun",
           "surface": "学生"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -982,10 +1109,12 @@
       "description": "これ with verb te-form 見て",
       "expected": [
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -995,6 +1124,7 @@
           "surface": "見"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -1009,14 +1139,17 @@
       "description": "それ",
       "expected": [
         {
+          "lemma": "それ",
           "pos": "Pronoun",
           "surface": "それ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "違う",
           "pos": "Verb",
           "surface": "違う"
         }
@@ -1031,14 +1164,17 @@
       "description": "あれ",
       "expected": [
         {
+          "lemma": "あれ",
           "pos": "Pronoun",
           "surface": "あれ"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "欲しい",
           "pos": "Adjective",
           "surface": "欲しい"
         }
@@ -1053,10 +1189,12 @@
       "description": "誰",
       "expected": [
         {
+          "lemma": "誰",
           "pos": "Pronoun",
           "surface": "誰"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -1066,6 +1204,7 @@
           "surface": "来"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1080,14 +1219,17 @@
       "description": "何",
       "expected": [
         {
+          "lemma": "何",
           "pos": "Pronoun",
           "surface": "何"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         }
@@ -1102,18 +1244,22 @@
       "description": "Brackets",
       "expected": [
         {
+          "lemma": "AI",
           "pos": "Noun",
           "surface": "AI"
         },
         {
+          "lemma": "人工知能",
           "pos": "Noun",
           "surface": "人工知能"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "発展",
           "pos": "Noun",
           "surface": "発展"
         }
@@ -1132,10 +1278,12 @@
       "description": "Japanese quotes",
       "expected": [
         {
+          "lemma": "こんにちは",
           "pos": "Interjection",
           "surface": "こんにちは"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -1145,6 +1293,7 @@
           "surface": "言っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1178,14 +1327,17 @@
       "description": "Prefecture",
       "expected": [
         {
+          "lemma": "東京都",
           "pos": "Noun",
           "surface": "東京都"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "住む",
           "pos": "Verb",
           "surface": "住む"
         }
@@ -1200,14 +1352,17 @@
       "description": "City",
       "expected": [
         {
+          "lemma": "横浜市",
           "pos": "Noun",
           "surface": "横浜市"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "働く",
           "pos": "Verb",
           "surface": "働く"
         }
@@ -1222,10 +1377,12 @@
       "description": "Ward",
       "expected": [
         {
+          "lemma": "渋谷区",
           "pos": "Noun",
           "surface": "渋谷区"
         },
         {
+          "lemma": "から",
           "pos": "Particle",
           "surface": "から"
         },
@@ -1235,6 +1392,7 @@
           "surface": "来"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }

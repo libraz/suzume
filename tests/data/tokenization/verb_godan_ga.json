@@ -1,43 +1,42 @@
 {
-  "version": "1.0",
-  "description": "Godan Ga-row verbs (五段ガ行動詞) - verbs ending in ぐ",
   "cases": [
     {
-      "id": "aitsugu_verb",
       "description": "相次ぐ should be VERB",
-      "input": "相次ぐ事件",
       "expected": [
         {
-          "surface": "相次ぐ",
+          "lemma": "相次ぐ",
           "pos": "Verb",
-          "lemma": "相次ぐ"
+          "surface": "相次ぐ"
         },
         {
-          "surface": "事件",
-          "pos": "Noun"
+          "lemma": "事件",
+          "pos": "Noun",
+          "surface": "事件"
         }
       ],
+      "id": "aitsugu_verb",
+      "input": "相次ぐ事件",
       "tags": [
         "verb",
         "L2"
       ]
     },
     {
-      "id": "godanga_oyoide_te",
       "description": "泳いで - GodanGa イ音便+で: 泳い + で(PARTICLE)",
+      "expected": [
+        {
+          "lemma": "泳ぐ",
+          "pos": "Verb",
+          "surface": "泳い"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "godanga_oyoide_te",
       "input": "泳いで",
-      "expected": [
-        {
-          "surface": "泳い",
-          "pos": "Verb",
-          "lemma": "泳ぐ"
-        },
-        {
-          "surface": "で",
-          "pos": "Particle",
-          "lemma": "で"
-        }
-      ],
       "tags": [
         "godanga",
         "i_onbin",
@@ -46,21 +45,21 @@
       ]
     },
     {
-      "id": "godanga_fuseide_te",
       "description": "防いで - GodanGa イ音便+で: 防い + で(PARTICLE)",
-      "input": "防いで",
       "expected": [
         {
-          "surface": "防い",
+          "lemma": "防ぐ",
           "pos": "Verb",
-          "lemma": "防ぐ"
+          "surface": "防い"
         },
         {
-          "surface": "で",
+          "lemma": "で",
           "pos": "Particle",
-          "lemma": "で"
+          "surface": "で"
         }
       ],
+      "id": "godanga_fuseide_te",
+      "input": "防いで",
       "tags": [
         "godanga",
         "i_onbin",
@@ -69,21 +68,21 @@
       ]
     },
     {
-      "id": "godanga_oyoida_ta",
       "description": "泳いだ - GodanGa イ音便+だ: 泳い + だ(AUX)",
-      "input": "泳いだ",
       "expected": [
         {
-          "surface": "泳い",
+          "lemma": "泳ぐ",
           "pos": "Verb",
-          "lemma": "泳ぐ"
+          "surface": "泳い"
         },
         {
-          "surface": "だ",
+          "lemma": "だ",
           "pos": "Auxiliary",
-          "lemma": "だ"
+          "surface": "だ"
         }
       ],
+      "id": "godanga_oyoida_ta",
+      "input": "泳いだ",
       "tags": [
         "godanga",
         "i_onbin",
@@ -91,5 +90,7 @@
         "mecab_compat"
       ]
     }
-  ]
+  ],
+  "description": "Godan Ga-row verbs (五段ガ行動詞) - verbs ending in ぐ",
+  "version": "1.0"
 }

@@ -9,6 +9,7 @@
           "surface": "よかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -36,6 +37,7 @@
           "surface": "た"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -59,6 +61,7 @@
           "surface": "美しかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -79,6 +82,7 @@
           "surface": "まずかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -99,6 +103,7 @@
           "surface": "エモかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -120,6 +125,7 @@
           "surface": "キモかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -141,14 +147,17 @@
           "surface": "寒"
         },
         {
+          "lemma": "さ",
           "pos": "Suffix",
           "surface": "さ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "寒し",
           "pos": "Noun",
           "surface": "寒し"
         }
@@ -170,6 +179,7 @@
           "surface": "くだら"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         },
@@ -179,6 +189,7 @@
           "surface": "かっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -200,10 +211,12 @@
           "surface": "暑かっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }

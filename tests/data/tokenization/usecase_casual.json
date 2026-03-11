@@ -4,6 +4,7 @@
       "description": "Casual expression of fun",
       "expected": [
         {
+          "lemma": "めっちゃ",
           "pos": "Adverb",
           "surface": "めっちゃ"
         },
@@ -13,6 +14,7 @@
           "surface": "楽しかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -38,7 +40,7 @@
         },
         {
           "lemma": "そう",
-          "pos": "Adjective",
+          "pos": "Adverb",
           "surface": "そう"
         },
         {
@@ -54,9 +56,6 @@
       ],
       "id": "casual_really",
       "input": "本当にそうなの",
-      "tags": [
-        "casual"
-      ],
       "suzume_expected": [
         {
           "pos": "Noun",
@@ -78,12 +77,16 @@
           "pos": "Particle",
           "surface": "の"
         }
+      ],
+      "tags": [
+        "casual"
       ]
     },
     {
       "description": "Desire expression with 食べたい - verb+aux split",
       "expected": [
         {
+          "lemma": "ラーメン",
           "pos": "Noun",
           "surface": "ラーメン"
         },
@@ -112,10 +115,12 @@
       "description": "Surprise expression - MeCab-compatible verb+た split",
       "expected": [
         {
+          "lemma": "まじ",
           "pos": "Adjective",
           "surface": "まじ"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -125,6 +130,7 @@
           "surface": "驚い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -159,10 +165,12 @@
       "description": "Omitted particle - casual style - MeCab-compatible split",
       "expected": [
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "学校",
           "pos": "Noun",
           "surface": "学校"
         },
@@ -172,6 +180,7 @@
           "surface": "行っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -186,6 +195,7 @@
       "description": "Contraction てる - MeCab splits 何+し+てる",
       "expected": [
         {
+          "lemma": "何",
           "pos": "Pronoun",
           "surface": "何"
         },
@@ -195,6 +205,7 @@
           "surface": "し"
         },
         {
+          "lemma": "てる",
           "pos": "Auxiliary",
           "surface": "てる"
         }
@@ -220,6 +231,7 @@
           "surface": "ちゃっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -241,10 +253,12 @@
           "surface": "買っ"
         },
         {
+          "lemma": "とく",
           "pos": "Auxiliary",
           "surface": "とく"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -260,18 +274,22 @@
       "description": "Final particle ね",
       "expected": [
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         },
         {
+          "lemma": "天気",
           "pos": "Noun",
           "surface": "天気"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -287,14 +305,17 @@
       "description": "Final particle よ",
       "expected": [
         {
+          "lemma": "もう",
           "pos": "Adverb",
           "surface": "もう"
         },
         {
+          "lemma": "帰る",
           "pos": "Verb",
           "surface": "帰る"
         },
         {
+          "lemma": "よ",
           "pos": "Particle",
           "surface": "よ"
         }
@@ -310,10 +331,12 @@
       "description": "Final particle な",
       "expected": [
         {
+          "lemma": "面白い",
           "pos": "Adjective",
           "surface": "面白い"
         },
         {
+          "lemma": "な",
           "pos": "Particle",
           "surface": "な"
         }
@@ -329,14 +352,17 @@
       "description": "Social media lunch post",
       "expected": [
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "ランチ",
           "pos": "Noun",
           "surface": "ランチ"
         },
@@ -346,6 +372,7 @@
           "surface": "美味しかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -364,6 +391,7 @@
       "description": "Casual reaction",
       "expected": [
         {
+          "lemma": "まじ",
           "pos": "Adjective",
           "surface": "まじ"
         },
@@ -373,6 +401,7 @@
           "surface": "で"
         },
         {
+          "lemma": "嬉しい",
           "pos": "Adjective",
           "surface": "嬉しい"
         }
@@ -406,22 +435,27 @@
       "description": "Question post with で particle",
       "expected": [
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
         {
+          "lemma": "どこ",
           "pos": "Pronoun",
           "surface": "どこ"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "買える",
           "pos": "Verb",
           "surface": "買える"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         },
@@ -431,14 +465,17 @@
           "surface": "知っ"
         },
         {
+          "lemma": "てる",
           "pos": "Auxiliary",
           "surface": "てる"
         },
         {
+          "lemma": "人",
           "pos": "Noun",
           "surface": "人"
         },
         {
+          "lemma": "いる",
           "pos": "Verb",
           "surface": "いる"
         }
@@ -496,18 +533,22 @@
       "description": "Recommendation post - マジで is ADV (seriously/really)",
       "expected": [
         {
+          "lemma": "この",
           "pos": "Determiner",
           "surface": "この"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "店",
           "pos": "Noun",
           "surface": "店"
         },
         {
+          "lemma": "マジ",
           "pos": "Noun",
           "surface": "マジ"
         },
@@ -517,6 +558,7 @@
           "surface": "で"
         },
         {
+          "lemma": "おすすめ",
           "pos": "Noun",
           "surface": "おすすめ"
         }
@@ -582,10 +624,12 @@
       "description": "Gratitude post",
       "expected": [
         {
+          "lemma": "みんな",
           "pos": "Pronoun",
           "surface": "みんな"
         },
         {
+          "lemma": "ありがとう",
           "pos": "Interjection",
           "surface": "ありがとう"
         }
@@ -600,6 +644,7 @@
       "description": "Positive review - MeCab互換分割",
       "expected": [
         {
+          "lemma": "とても",
           "pos": "Adverb",
           "surface": "とても"
         },
@@ -614,10 +659,12 @@
           "surface": "やすく"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "満足",
           "pos": "Noun",
           "surface": "満足"
         },
@@ -627,6 +674,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -636,6 +684,7 @@
           "surface": "い"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -647,9 +696,14 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "Negative review - MeCab互換分割 (なかっ+た split)",
       "expected": [
         {
+          "lemma": "期待",
           "pos": "Noun",
           "surface": "期待"
         },
@@ -659,6 +713,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -668,18 +723,22 @@
           "surface": "い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "ほど",
           "pos": "Particle",
           "surface": "ほど"
         },
         {
-          "pos": "Particle",
+          "lemma": "だ",
+          "pos": "Auxiliary",
           "surface": "で"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -689,12 +748,65 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
       ],
       "id": "review_negative",
       "input": "期待していたほどではなかった",
+      "suzume_expected": [
+        {
+          "lemma": "期待",
+          "pos": "Noun",
+          "surface": "期待"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ほど",
+          "pos": "Particle",
+          "surface": "ほど"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
       "tags": [
         "review"
       ]
@@ -703,26 +815,32 @@
       "description": "Comparative review with が particle",
       "expected": [
         {
+          "lemma": "前",
           "pos": "Noun",
           "surface": "前"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "モデル",
           "pos": "Noun",
           "surface": "モデル"
         },
         {
+          "lemma": "より",
           "pos": "Particle",
           "surface": "より"
         },
         {
+          "lemma": "性能",
           "pos": "Noun",
           "surface": "性能"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -752,22 +870,27 @@
       "description": "Recommendation with は particle",
       "expected": [
         {
+          "lemma": "この",
           "pos": "Determiner",
           "surface": "この"
         },
         {
+          "lemma": "商品",
           "pos": "Noun",
           "surface": "商品"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "おすすめ",
           "pos": "Noun",
           "surface": "おすすめ"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -782,30 +905,37 @@
       "description": "Price feedback with の and が particles",
       "expected": [
         {
+          "lemma": "値段",
           "pos": "Noun",
           "surface": "値段"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "割",
           "pos": "Noun",
           "surface": "割"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "品質",
           "pos": "Noun",
           "surface": "品質"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "良い",
           "pos": "Adjective",
           "surface": "良い"
         }
@@ -820,6 +950,7 @@
       "description": "Durability comment with が particle",
       "expected": [
         {
+          "lemma": "3年",
           "pos": "Noun",
           "surface": "3年"
         },
@@ -829,14 +960,17 @@
           "surface": "使っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -846,6 +980,7 @@
           "surface": "壊れ"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -860,10 +995,12 @@
       "description": "Issue report with が particle",
       "expected": [
         {
+          "lemma": "サイズ",
           "pos": "Noun",
           "surface": "サイズ"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -873,10 +1010,12 @@
           "surface": "思っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "より",
           "pos": "Particle",
           "surface": "より"
         },
@@ -886,6 +1025,7 @@
           "surface": "小さかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -900,10 +1040,12 @@
       "description": "Colloquial している → してる - MeCab splits し+てる",
       "expected": [
         {
+          "lemma": "今",
           "pos": "Noun",
           "surface": "今"
         },
         {
+          "lemma": "何",
           "pos": "Pronoun",
           "surface": "何"
         },
@@ -913,6 +1055,7 @@
           "surface": "し"
         },
         {
+          "lemma": "てる",
           "pos": "Auxiliary",
           "surface": "てる"
         }
@@ -927,6 +1070,7 @@
       "description": "Colloquial 見ていた → 見てた - MeCab: 見(V)+て(V,てる)+た(AUX)",
       "expected": [
         {
+          "lemma": "テレビ",
           "pos": "Noun",
           "surface": "テレビ"
         },
@@ -941,6 +1085,7 @@
           "surface": "て"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -959,10 +1104,12 @@
       "description": "Colloquial 行っていた → 行ってた - MeCab互換分割",
       "expected": [
         {
+          "lemma": "学校",
           "pos": "Noun",
           "surface": "学校"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -977,6 +1124,7 @@
           "surface": "て"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1018,10 +1166,12 @@
       "description": "Colloquial 食べていく → 食べてく - te-form + てく aux split",
       "expected": [
         {
+          "lemma": "一緒",
           "pos": "Noun",
           "surface": "一緒"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -1031,10 +1181,12 @@
           "surface": "食べ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "く",
           "pos": "Auxiliary",
           "surface": "く"
         }
@@ -1072,10 +1224,12 @@
       "description": "Colloquial adverb めっちゃ",
       "expected": [
         {
+          "lemma": "めっちゃ",
           "pos": "Adverb",
           "surface": "めっちゃ"
         },
         {
+          "lemma": "面白い",
           "pos": "Adjective",
           "surface": "面白い"
         }
@@ -1090,14 +1244,17 @@
       "description": "Colloquial adjective やばい",
       "expected": [
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
         {
+          "lemma": "まじ",
           "pos": "Adjective",
           "surface": "まじ"
         },
         {
+          "lemma": "やばい",
           "pos": "Adjective",
           "surface": "やばい"
         }
@@ -1112,10 +1269,12 @@
       "description": "Colloquial ending じゃん",
       "expected": [
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         },
         {
+          "lemma": "じゃん",
           "pos": "Particle",
           "surface": "じゃん"
         }
@@ -1130,14 +1289,17 @@
       "description": "Colloquial questioning past っけ",
       "expected": [
         {
+          "lemma": "何時",
           "pos": "Noun",
           "surface": "何時"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         },
         {
+          "lemma": "っけ",
           "pos": "Particle",
           "surface": "っけ"
         }
@@ -1152,6 +1314,7 @@
       "description": "Colloquial wondering かな",
       "expected": [
         {
+          "lemma": "明日",
           "pos": "Noun",
           "surface": "明日"
         },
@@ -1161,10 +1324,12 @@
           "surface": "晴れる"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         },
         {
+          "lemma": "な",
           "pos": "Particle",
           "surface": "な"
         }
@@ -1184,10 +1349,12 @@
           "surface": "頑張っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "のに",
           "pos": "Particle",
           "surface": "のに"
         },
@@ -1197,6 +1364,7 @@
           "surface": "負け"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }

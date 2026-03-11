@@ -4,10 +4,12 @@
       "description": "漱石・草枕冒頭風",
       "expected": [
         {
+          "lemma": "山路",
           "pos": "Noun",
           "surface": "山路"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -17,6 +19,7 @@
           "surface": "登り"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
@@ -26,6 +29,7 @@
           "surface": "考え"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -37,26 +41,32 @@
       "description": "芥川・羅生門末尾風",
       "expected": [
         {
+          "lemma": "下人",
           "pos": "Noun",
           "surface": "下人"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "行方",
           "pos": "Noun",
           "surface": "行方"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "誰",
           "pos": "Pronoun",
           "surface": "誰"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
@@ -66,6 +76,7 @@
           "surface": "知ら"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -77,22 +88,27 @@
       "description": "太宰・人間失格冒頭風",
       "expected": [
         {
+          "lemma": "恥",
           "pos": "Noun",
           "surface": "恥"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "多い",
           "pos": "Adjective",
           "surface": "多い"
         },
         {
+          "lemma": "生涯",
           "pos": "Noun",
           "surface": "生涯"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -102,6 +118,7 @@
           "surface": "送っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -116,6 +133,7 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -127,14 +145,17 @@
       "description": "敬語多重化",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "忙しい",
           "pos": "Noun",
           "surface": "忙しい"
         },
         {
+          "lemma": "ところ",
           "pos": "Noun",
           "surface": "ところ"
         },
@@ -144,18 +165,22 @@
           "surface": "恐れ入り"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -165,6 +190,7 @@
           "surface": "いただけ"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         },
@@ -174,10 +200,12 @@
           "surface": "でしょ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -189,34 +217,42 @@
       "description": "体言止め",
       "expected": [
         {
+          "lemma": "朝靄",
           "pos": "Noun",
           "surface": "朝靄"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "中",
           "pos": "Noun",
           "surface": "中"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "浮かぶ",
           "pos": "Verb",
           "surface": "浮かぶ"
         },
         {
+          "lemma": "古城",
           "pos": "Noun",
           "surface": "古城"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "影",
           "pos": "Noun",
           "surface": "影"
         }
@@ -228,30 +264,37 @@
       "description": "芭蕉・俳句 compound verb 飛び込む",
       "expected": [
         {
+          "lemma": "古池",
           "pos": "Noun",
           "surface": "古池"
         },
         {
+          "lemma": "や",
           "pos": "Particle",
           "surface": "や"
         },
         {
+          "lemma": "蛙",
           "pos": "Noun",
           "surface": "蛙"
         },
         {
+          "lemma": "飛び込む",
           "pos": "Verb",
           "surface": "飛び込む"
         },
         {
+          "lemma": "水",
           "pos": "Noun",
           "surface": "水"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "音",
           "pos": "Noun",
           "surface": "音"
         }
@@ -263,38 +306,47 @@
       "description": "川端・雪国冒頭風 長い連体修飾",
       "expected": [
         {
+          "lemma": "国境",
           "pos": "Noun",
           "surface": "国境"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "長い",
           "pos": "Adjective",
           "surface": "長い"
         },
         {
+          "lemma": "トンネル",
           "pos": "Noun",
           "surface": "トンネル"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "抜ける",
           "pos": "Verb",
           "surface": "抜ける"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "雪国",
           "pos": "Noun",
           "surface": "雪国"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -304,6 +356,7 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -315,26 +368,32 @@
       "description": "文語否定ぬ + 漢語 硬い書き言葉",
       "expected": [
         {
+          "lemma": "事態",
           "pos": "Noun",
           "surface": "事態"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "一刻",
           "pos": "Noun",
           "surface": "一刻"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "猶予",
           "pos": "Noun",
           "surface": "猶予"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
@@ -344,14 +403,17 @@
           "surface": "許さ"
         },
         {
+          "lemma": "ぬ",
           "pos": "Auxiliary",
           "surface": "ぬ"
         },
         {
+          "lemma": "状況",
           "pos": "Noun",
           "surface": "状況"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -361,6 +423,7 @@
           "surface": "至っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -372,22 +435,27 @@
       "description": "使役受動 ichidan (させ+られ)",
       "expected": [
         {
+          "lemma": "彼女",
           "pos": "Pronoun",
           "surface": "彼女"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "母",
           "pos": "Noun",
           "surface": "母"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "無理やり",
           "pos": "Adverb",
           "surface": "無理やり"
         },
@@ -407,6 +475,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -418,34 +487,42 @@
       "description": "体言止め 数量詞一筋",
       "expected": [
         {
+          "lemma": "夕暮れ",
           "pos": "Noun",
           "surface": "夕暮れ"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "空",
           "pos": "Noun",
           "surface": "空"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "浮かぶ",
           "pos": "Verb",
           "surface": "浮かぶ"
         },
         {
+          "lemma": "一筋",
           "pos": "Noun",
           "surface": "一筋"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "雲",
           "pos": "Noun",
           "surface": "雲"
         }
@@ -457,34 +534,42 @@
       "description": "漢語 含蓄 硬い書き言葉",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "言葉",
           "pos": "Noun",
           "surface": "言葉"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "深い",
           "pos": "Adjective",
           "surface": "深い"
         },
         {
+          "lemma": "含蓄",
           "pos": "Noun",
           "surface": "含蓄"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -494,6 +579,7 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -510,30 +596,37 @@
           "surface": "知ら"
         },
         {
+          "lemma": "ぬ",
           "pos": "Auxiliary",
           "surface": "ぬ"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "仏",
           "pos": "Noun",
           "surface": "仏"
         },
         {
+          "lemma": "という",
           "pos": "Determiner",
           "surface": "という"
         },
         {
+          "lemma": "言葉",
           "pos": "Noun",
           "surface": "言葉"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
@@ -550,6 +643,7 @@
           "surface": "尽くし"
         },
         {
+          "lemma": "難い",
           "pos": "Adjective",
           "surface": "難い"
         }
@@ -566,6 +660,7 @@
           "surface": "食べ"
         },
         {
+          "lemma": "やすい",
           "pos": "Adjective",
           "surface": "やすい"
         }
@@ -582,18 +677,22 @@
           "surface": "分から"
         },
         {
+          "lemma": "ぬ",
           "pos": "Auxiliary",
           "surface": "ぬ"
         },
         {
+          "lemma": "こと",
           "pos": "Noun",
           "surface": "こと"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "聞く",
           "pos": "Verb",
           "surface": "聞く"
         },
@@ -603,6 +702,7 @@
           "surface": "べき"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -619,6 +719,7 @@
           "surface": "変わら"
         },
         {
+          "lemma": "ぬ",
           "pos": "Auxiliary",
           "surface": "ぬ"
         }
@@ -630,6 +731,7 @@
       "description": "Bug #12: verb shuushikei + べき splitting",
       "expected": [
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         },
@@ -639,6 +741,7 @@
           "surface": "べき"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -650,22 +753,27 @@
       "description": "Bug #9: godan-sa renyoukei in full sentence",
       "expected": [
         {
+          "lemma": "その",
           "pos": "Determiner",
           "surface": "その"
         },
         {
+          "lemma": "光景",
           "pos": "Noun",
           "surface": "光景"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "筆舌",
           "pos": "Noun",
           "surface": "筆舌"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -675,14 +783,17 @@
           "surface": "尽くし"
         },
         {
+          "lemma": "難い",
           "pos": "Adjective",
           "surface": "難い"
         },
         {
+          "lemma": "もの",
           "pos": "Noun",
           "surface": "もの"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -692,6 +803,7 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -708,6 +820,7 @@
           "surface": "越え"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -717,10 +830,12 @@
           "surface": "き"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         }
@@ -729,14 +844,102 @@
       "input": "越えてきた彼"
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "Combined: compound verb + きた split + にとっても split",
       "expected": [
+        {
+          "lemma": "あらゆる",
+          "pos": "Determiner",
+          "surface": "あらゆる"
+        },
+        {
+          "lemma": "困難",
+          "pos": "Adjective",
+          "surface": "困難"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "乗り越える",
+          "pos": "Verb",
+          "surface": "乗り越え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "にとって",
+          "pos": "Particle",
+          "surface": "にとって"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "今回",
+          "pos": "Noun",
+          "surface": "今回"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "試練",
+          "pos": "Noun",
+          "surface": "試練"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "厳しい",
+          "pos": "Adjective",
+          "surface": "厳しかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "arayuru_wo_ri_etekita_nitotttemo_no_ha_shikattta",
+      "input": "あらゆる困難を乗り越えてきた彼にとっても今回の試練は厳しかった",
+      "suzume_expected": [
         {
           "pos": "Determiner",
           "surface": "あらゆる"
         },
         {
-          "pos": "Adjective",
+          "pos": "Noun",
           "surface": "困難"
         },
         {
@@ -798,82 +1001,7 @@
           "pos": "Auxiliary",
           "surface": "た"
         }
-      ],
-      "id": "arayuru_wo_ri_etekita_nitotttemo_no_ha_shikattta",
-      "input": "あらゆる困難を乗り越えてきた彼にとっても今回の試練は厳しかった",
-      "suzume_expected": [
-        {
-          "surface": "あらゆる",
-          "pos": "Determiner"
-        },
-        {
-          "surface": "困難",
-          "pos": "Noun"
-        },
-        {
-          "surface": "を",
-          "pos": "Particle"
-        },
-        {
-          "surface": "乗り越え",
-          "pos": "Verb",
-          "lemma": "乗り越える"
-        },
-        {
-          "surface": "て",
-          "pos": "Particle"
-        },
-        {
-          "surface": "き",
-          "pos": "Auxiliary",
-          "lemma": "くる"
-        },
-        {
-          "surface": "た",
-          "pos": "Auxiliary"
-        },
-        {
-          "surface": "彼",
-          "pos": "Pronoun"
-        },
-        {
-          "surface": "にとって",
-          "pos": "Particle"
-        },
-        {
-          "surface": "も",
-          "pos": "Particle"
-        },
-        {
-          "surface": "今回",
-          "pos": "Noun"
-        },
-        {
-          "surface": "の",
-          "pos": "Particle"
-        },
-        {
-          "surface": "試練",
-          "pos": "Noun"
-        },
-        {
-          "surface": "は",
-          "pos": "Particle"
-        },
-        {
-          "surface": "厳しかっ",
-          "pos": "Adjective",
-          "lemma": "厳しい"
-        },
-        {
-          "surface": "た",
-          "pos": "Auxiliary"
-        }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "description": "Causative-passive: 読ま+さ+れ+た (godan mizenkei EPOS fix)",
@@ -894,6 +1022,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -902,8 +1031,96 @@
       "input": "読まされた"
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "Bug #8 full sentence: causative-passive in context",
       "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "内容",
+          "pos": "Noun",
+          "surface": "内容"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "到底",
+          "pos": "Adverb",
+          "surface": "到底"
+        },
+        {
+          "lemma": "理解",
+          "pos": "Noun",
+          "surface": "理解"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "難い",
+          "pos": "Adjective",
+          "surface": "難い"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "masareta_no_ha_shi_imonodeattta",
+      "input": "読まされた本の内容は到底理解し難いものであった",
+      "suzume_expected": [
         {
           "lemma": "読む",
           "pos": "Verb",
@@ -948,8 +1165,7 @@
           "surface": "理解"
         },
         {
-          "lemma": "する",
-          "pos": "Verb",
+          "pos": "Particle",
           "surface": "し"
         },
         {
@@ -973,92 +1189,18 @@
           "pos": "Auxiliary",
           "surface": "た"
         }
-      ],
-      "id": "masareta_no_ha_shi_imonodeattta",
-      "input": "読まされた本の内容は到底理解し難いものであった",
-      "suzume_expected": [
-        {
-          "surface": "読ま",
-          "pos": "Verb",
-          "lemma": "読む"
-        },
-        {
-          "surface": "さ",
-          "pos": "Verb",
-          "lemma": "する"
-        },
-        {
-          "surface": "れ",
-          "pos": "Auxiliary",
-          "lemma": "れる"
-        },
-        {
-          "surface": "た",
-          "pos": "Auxiliary"
-        },
-        {
-          "surface": "本",
-          "pos": "Noun"
-        },
-        {
-          "surface": "の",
-          "pos": "Particle"
-        },
-        {
-          "surface": "内容",
-          "pos": "Noun"
-        },
-        {
-          "surface": "は",
-          "pos": "Particle"
-        },
-        {
-          "surface": "到底",
-          "pos": "Adverb"
-        },
-        {
-          "surface": "理解",
-          "pos": "Noun"
-        },
-        {
-          "surface": "し",
-          "pos": "Particle"
-        },
-        {
-          "surface": "難い",
-          "pos": "Adjective"
-        },
-        {
-          "surface": "もの",
-          "pos": "Noun"
-        },
-        {
-          "surface": "で",
-          "pos": "Particle"
-        },
-        {
-          "surface": "あっ",
-          "pos": "Verb",
-          "lemma": "ある"
-        },
-        {
-          "surface": "た",
-          "pos": "Auxiliary"
-        }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "description": "とっても as adverb (very)",
       "expected": [
         {
+          "lemma": "とっても",
           "pos": "Adverb",
           "surface": "とっても"
         },
         {
+          "lemma": "元気",
           "pos": "Adjective",
           "surface": "元気"
         }
@@ -1070,18 +1212,22 @@
       "description": "とっても adverb after は",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "とっても",
           "pos": "Adverb",
           "surface": "とっても"
         },
         {
+          "lemma": "元気",
           "pos": "Adjective",
           "surface": "元気"
         }
@@ -1090,14 +1236,63 @@
       "input": "彼はとっても元気"
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "なんと as exclamatory adverb should not split into なん+と",
       "expected": [
+        {
+          "lemma": "なんと",
+          "pos": "Adverb",
+          "surface": "なんと"
+        },
+        {
+          "lemma": "哀れ",
+          "pos": "Adjective",
+          "surface": "哀れ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Auxiliary",
+          "surface": "あろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "nanto_exclamatory_adverb",
+      "input": "なんと哀れなことであろうか。",
+      "suzume_expected": [
         {
           "pos": "Adverb",
           "surface": "なんと"
         },
         {
-          "pos": "Adjective",
+          "lemma": "哀れる",
+          "pos": "Verb",
           "surface": "哀れ"
         },
         {
@@ -1116,7 +1311,7 @@
         },
         {
           "lemma": "ある",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "あろ"
         },
         {
@@ -1127,64 +1322,23 @@
           "pos": "Particle",
           "surface": "か"
         }
-      ],
-      "id": "nanto_exclamatory_adverb",
-      "input": "なんと哀れなことであろうか。",
-      "suzume_expected": [
-        {
-          "surface": "なんと",
-          "pos": "Adverb"
-        },
-        {
-          "surface": "哀れ",
-          "pos": "Verb",
-          "lemma": "哀れる"
-        },
-        {
-          "surface": "な",
-          "pos": "Auxiliary",
-          "lemma": "だ"
-        },
-        {
-          "surface": "こと",
-          "pos": "Noun"
-        },
-        {
-          "surface": "で",
-          "pos": "Auxiliary",
-          "lemma": "だ"
-        },
-        {
-          "surface": "あろ",
-          "pos": "Verb",
-          "lemma": "ある"
-        },
-        {
-          "surface": "う",
-          "pos": "Auxiliary"
-        },
-        {
-          "surface": "か",
-          "pos": "Particle"
-        }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "description": "われ as classical pronoun should not split into わ+れ",
       "expected": [
         {
+          "lemma": "われ",
           "pos": "Pronoun",
           "surface": "われ"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
         {
+          "lemma": "情けない",
           "pos": "Adjective",
           "surface": "情けない"
         }
@@ -1200,14 +1354,17 @@
       "description": "かく as classical demonstrative adverb should not split into か+く",
       "expected": [
         {
+          "lemma": "かく",
           "pos": "Adverb",
           "surface": "かく"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
         {
+          "lemma": "壮大",
           "pos": "Adjective",
           "surface": "壮大"
         },
@@ -1217,10 +1374,12 @@
           "surface": "なる"
         },
         {
+          "lemma": "計画",
           "pos": "Noun",
           "surface": "計画"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1230,14 +1389,17 @@
           "surface": "立て"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "人物",
           "pos": "Noun",
           "surface": "人物"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -1247,14 +1409,17 @@
           "surface": "い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         }

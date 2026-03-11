@@ -3,22 +3,27 @@
     {
       "expected": [
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "寒い",
           "pos": "Adjective",
           "surface": "寒い"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -36,14 +41,17 @@
       },
       "expected": [
         {
+          "lemma": "駅",
           "pos": "Noun",
           "surface": "駅"
         },
         {
+          "lemma": "まで",
           "pos": "Particle",
           "surface": "まで"
         },
         {
+          "lemma": "どう",
           "pos": "Adjective",
           "surface": "どう"
         },
@@ -53,6 +61,7 @@
           "surface": "やっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -62,10 +71,12 @@
           "surface": "行き"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -115,6 +126,7 @@
     {
       "expected": [
         {
+          "lemma": "ちょっと",
           "pos": "Adverb",
           "surface": "ちょっと"
         },
@@ -124,6 +136,7 @@
           "surface": "待っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -142,6 +155,7 @@
     {
       "expected": [
         {
+          "lemma": "ありがとう",
           "pos": "Interjection",
           "surface": "ありがとう"
         },
@@ -151,6 +165,7 @@
           "surface": "ござい"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -164,6 +179,7 @@
     {
       "expected": [
         {
+          "lemma": "おはよう",
           "pos": "Interjection",
           "surface": "おはよう"
         },
@@ -173,6 +189,7 @@
           "surface": "ござい"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -186,6 +203,7 @@
     {
       "expected": [
         {
+          "lemma": "こんにちは",
           "pos": "Interjection",
           "surface": "こんにちは"
         }
@@ -199,6 +217,7 @@
     {
       "expected": [
         {
+          "lemma": "すみません",
           "pos": "Interjection",
           "surface": "すみません"
         },
@@ -208,6 +227,7 @@
           "surface": "でし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -221,22 +241,27 @@
     {
       "expected": [
         {
+          "lemma": "トイレ",
           "pos": "Noun",
           "surface": "トイレ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "どこ",
           "pos": "Pronoun",
           "surface": "どこ"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -250,22 +275,27 @@
     {
       "expected": [
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "何",
           "pos": "Pronoun",
           "surface": "何"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -279,18 +309,22 @@
     {
       "expected": [
         {
+          "lemma": "水",
           "pos": "Noun",
           "surface": "水"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "欲しい",
           "pos": "Adjective",
           "surface": "欲しい"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -304,26 +338,32 @@
     {
       "expected": [
         {
+          "lemma": "明日",
           "pos": "Noun",
           "surface": "明日"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "10時",
           "pos": "Noun",
           "surface": "10時"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "会議",
           "pos": "Noun",
           "surface": "会議"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -347,30 +387,37 @@
     {
       "expected": [
         {
+          "lemma": "来週",
           "pos": "Noun",
           "surface": "来週"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "金曜日",
           "pos": "Noun",
           "surface": "金曜日"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "いかが",
           "pos": "Adjective",
           "surface": "いかが"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -384,26 +431,32 @@
     {
       "expected": [
         {
+          "lemma": "今週",
           "pos": "Noun",
           "surface": "今週"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "忙しい",
           "pos": "Adjective",
           "surface": "忙しい"
         },
         {
+          "lemma": "ので",
           "pos": "Particle",
           "surface": "ので"
         },
         {
+          "lemma": "来週",
           "pos": "Noun",
           "surface": "来週"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -418,6 +471,7 @@
           "surface": "ましょ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         }
@@ -435,26 +489,32 @@
       },
       "expected": [
         {
+          "lemma": "3時",
           "pos": "Noun",
           "surface": "3時"
         },
         {
+          "lemma": "ごろ",
           "pos": "Noun",
           "surface": "ごろ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "どう",
           "pos": "Adjective",
           "surface": "どう"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -495,22 +555,27 @@
       "description": "MeCab互換分割",
       "expected": [
         {
+          "lemma": "明日",
           "pos": "Noun",
           "surface": "明日"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "約束",
           "pos": "Noun",
           "surface": "約束"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -520,18 +585,22 @@
           "surface": "し"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         }
@@ -546,14 +615,17 @@
       "description": "MeCab互換分割",
       "expected": [
         {
+          "lemma": "予定",
           "pos": "Noun",
           "surface": "予定"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "キャンセル",
           "pos": "Noun",
           "surface": "キャンセル"
         },
@@ -563,22 +635,27 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -592,22 +669,27 @@
     {
       "expected": [
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "いくら",
           "pos": "Pronoun",
           "surface": "いくら"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -622,10 +704,12 @@
       "description": "Payment method: カードで払えますか - potential verb with polite aux",
       "expected": [
         {
+          "lemma": "カード",
           "pos": "Noun",
           "surface": "カード"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -640,6 +724,7 @@
           "surface": "ます"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -654,14 +739,17 @@
       "description": "Counter expression 3つ + ください - ください as aux",
       "expected": [
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "3つ",
           "pos": "Noun",
           "surface": "3つ"
         },
@@ -682,18 +770,22 @@
       "description": "MeCab互換分割",
       "expected": [
         {
+          "lemma": "袋",
           "pos": "Noun",
           "surface": "袋"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "願い",
           "pos": "Noun",
           "surface": "願い"
         },
@@ -703,6 +795,7 @@
           "surface": "し"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -716,10 +809,12 @@
     {
       "expected": [
         {
+          "lemma": "領収書",
           "pos": "Noun",
           "surface": "領収書"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -738,6 +833,7 @@
     {
       "expected": [
         {
+          "lemma": "もう少し",
           "pos": "Adverb",
           "surface": "もう少し"
         },
@@ -752,10 +848,12 @@
           "surface": "なり"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -769,14 +867,17 @@
     {
       "expected": [
         {
+          "lemma": "大きい",
           "pos": "Adjective",
           "surface": "大きい"
         },
         {
+          "lemma": "サイズ",
           "pos": "Noun",
           "surface": "サイズ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -791,6 +892,7 @@
           "surface": "ます"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -802,20 +904,28 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "expected": [
         {
+          "lemma": "他",
           "pos": "Noun",
           "surface": "他"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "色",
           "pos": "Noun",
           "surface": "色"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -830,12 +940,50 @@
           "surface": "ます"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
       ],
       "id": "shop_color",
       "input": "他の色はありますか",
+      "suzume_expected": [
+        {
+          "lemma": "ほか",
+          "pos": "Noun",
+          "surface": "他"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "色",
+          "pos": "Noun",
+          "surface": "色"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
       "tags": [
         "shopping"
       ]
@@ -844,30 +992,37 @@
       "description": "MeCab互換分割",
       "expected": [
         {
+          "lemma": "来週",
           "pos": "Noun",
           "surface": "来週"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "金曜日",
           "pos": "Noun",
           "surface": "金曜日"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "二名",
           "pos": "Noun",
           "surface": "二名"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "予約",
           "pos": "Noun",
           "surface": "予約"
         },
@@ -877,18 +1032,22 @@
           "surface": "し"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         }
@@ -902,22 +1061,27 @@
     {
       "expected": [
         {
+          "lemma": "次",
           "pos": "Noun",
           "surface": "次"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "新宿",
           "pos": "Noun",
           "surface": "新宿"
         },
         {
+          "lemma": "新宿",
           "pos": "Noun",
           "surface": "新宿"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -932,18 +1096,22 @@
       "description": "Formal ております pattern (split: verb stem + polite aux)",
       "expected": [
         {
+          "lemma": "電車",
           "pos": "Noun",
           "surface": "電車"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "10分",
           "pos": "Noun",
           "surface": "10分"
         },
         {
+          "lemma": "ほど",
           "pos": "Particle",
           "surface": "ほど"
         },
@@ -953,6 +1121,7 @@
           "surface": "遅れ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -962,6 +1131,7 @@
           "surface": "おり"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -980,26 +1150,32 @@
       },
       "expected": [
         {
+          "lemma": "東京",
           "pos": "Noun",
           "surface": "東京"
         },
         {
+          "lemma": "行き",
           "pos": "Noun",
           "surface": "行き"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "何番線",
           "pos": "Noun",
           "surface": "何番線"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -1050,26 +1226,32 @@
     {
       "expected": [
         {
+          "lemma": "大阪",
           "pos": "Noun",
           "surface": "大阪"
         },
         {
+          "lemma": "まで",
           "pos": "Particle",
           "surface": "まで"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "切符",
           "pos": "Noun",
           "surface": "切符"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "一枚",
           "pos": "Noun",
           "surface": "一枚"
         },
@@ -1088,6 +1270,7 @@
     {
       "expected": [
         {
+          "lemma": "今夜",
           "pos": "Noun",
           "surface": "今夜"
         },
@@ -1097,10 +1280,12 @@
           "surface": "泊まれる"
         },
         {
+          "lemma": "部屋",
           "pos": "Noun",
           "surface": "部屋"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -1115,6 +1300,7 @@
           "surface": "ます"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -1129,22 +1315,27 @@
       "description": "MeCab互換分割",
       "expected": [
         {
+          "lemma": "ラーメン",
           "pos": "Noun",
           "surface": "ラーメン"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "一つ",
           "pos": "Noun",
           "surface": "一つ"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "願い",
           "pos": "Noun",
           "surface": "願い"
         },
@@ -1154,6 +1345,7 @@
           "surface": "し"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -1167,10 +1359,12 @@
     {
       "expected": [
         {
+          "lemma": "メニュー",
           "pos": "Noun",
           "surface": "メニュー"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1180,6 +1374,7 @@
           "surface": "見せ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1198,22 +1393,27 @@
     {
       "expected": [
         {
+          "lemma": "おすすめ",
           "pos": "Noun",
           "surface": "おすすめ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "何",
           "pos": "Pronoun",
           "surface": "何"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -1227,10 +1427,12 @@
     {
       "expected": [
         {
+          "lemma": "卵",
           "pos": "Noun",
           "surface": "卵"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -1240,6 +1442,7 @@
           "surface": "入っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1249,10 +1452,12 @@
           "surface": "い"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -1267,22 +1472,27 @@
       "description": "MeCab互換分割",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "会計",
           "pos": "Noun",
           "surface": "会計"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "願い",
           "pos": "Noun",
           "surface": "願い"
         },
@@ -1292,6 +1502,7 @@
           "surface": "し"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }

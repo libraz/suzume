@@ -4,10 +4,12 @@
       "description": "わくわくする (excited)",
       "expected": [
         {
+          "lemma": "わくわく",
           "pos": "Adverb",
           "surface": "わくわく"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -23,6 +25,7 @@
       "description": "ニャーニャー (cat meow) - AA doubled pattern with small kana",
       "expected": [
         {
+          "lemma": "ニャーニャー",
           "pos": "Adverb",
           "surface": "ニャーニャー"
         }
@@ -39,6 +42,7 @@
       "description": "ワンワン (dog bark) - AA doubled pattern",
       "expected": [
         {
+          "lemma": "ワンワン",
           "pos": "Adverb",
           "surface": "ワンワン"
         }
@@ -55,6 +59,7 @@
       "description": "キラキラ光る (sparkling)",
       "expected": [
         {
+          "lemma": "キラキラ",
           "pos": "Adverb",
           "surface": "キラキラ"
         },
@@ -75,10 +80,12 @@
       "description": "ガタガタ揺れる (shaking)",
       "expected": [
         {
+          "lemma": "ガタガタ",
           "pos": "Adverb",
           "surface": "ガタガタ"
         },
         {
+          "lemma": "揺れる",
           "pos": "Verb",
           "surface": "揺れる"
         }
@@ -94,6 +101,7 @@
       "description": "B40: とっとと should be ADV, not OTHER+PARTICLE+PARTICLE split (MeCab-compatible)",
       "expected": [
         {
+          "lemma": "とっとと",
           "pos": "Adverb",
           "surface": "とっとと"
         },
@@ -103,6 +111,7 @@
           "surface": "滅びれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         },
@@ -123,6 +132,7 @@
       "description": "せっかく should be ADV (B61)",
       "expected": [
         {
+          "lemma": "せっかく",
           "pos": "Adverb",
           "surface": "せっかく"
         },
@@ -132,6 +142,7 @@
           "surface": "な"
         },
         {
+          "lemma": "ので",
           "pos": "Particle",
           "surface": "ので"
         }
@@ -147,6 +158,7 @@
       "description": "うっかり should be ADV (B62) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "うっかり",
           "pos": "Adverb",
           "surface": "うっかり"
         },
@@ -156,6 +168,7 @@
           "surface": "忘れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -171,6 +184,7 @@
       "description": "すっかり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "すっかり",
           "pos": "Adverb",
           "surface": "すっかり"
         },
@@ -180,6 +194,7 @@
           "surface": "変わっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -195,6 +210,7 @@
       "description": "ぴったり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "ぴったり",
           "pos": "Adverb",
           "surface": "ぴったり"
         },
@@ -215,6 +231,7 @@
       "description": "さっぱり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "さっぱり",
           "pos": "Adverb",
           "surface": "さっぱり"
         },
@@ -224,6 +241,7 @@
           "surface": "わから"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -239,6 +257,7 @@
       "description": "あっさり should be ADV (B62) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "あっさり",
           "pos": "Adverb",
           "surface": "あっさり"
         },
@@ -248,6 +267,7 @@
           "surface": "負け"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -263,6 +283,7 @@
       "description": "こっそり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "こっそり",
           "pos": "Adverb",
           "surface": "こっそり"
         },
@@ -283,6 +304,7 @@
       "description": "ぐっすり should be ADV (B62) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "ぐっすり",
           "pos": "Adverb",
           "surface": "ぐっすり"
         },
@@ -292,6 +314,7 @@
           "surface": "眠れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -307,6 +330,7 @@
       "description": "めっきり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "めっきり",
           "pos": "Adverb",
           "surface": "めっきり"
         },
@@ -316,6 +340,7 @@
           "surface": "減っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -331,6 +356,7 @@
       "description": "がっかり should be ADV (B62) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "がっかり",
           "pos": "Adverb",
           "surface": "がっかり"
         },
@@ -340,6 +366,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -355,6 +382,7 @@
       "description": "びっくり should be ADV (B62) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "びっくり",
           "pos": "Adverb",
           "surface": "びっくり"
         },
@@ -364,6 +392,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -379,6 +408,7 @@
       "description": "ちゃっかり should be ADV (B62) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "ちゃっかり",
           "pos": "Adverb",
           "surface": "ちゃっかり"
         },
@@ -393,6 +423,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -408,10 +439,12 @@
       "description": "のんびり should be ADV (B62) - NOTE: 過ごす POS needs separate fix (should be VERB)",
       "expected": [
         {
+          "lemma": "のんびり",
           "pos": "Adverb",
           "surface": "のんびり"
         },
         {
+          "lemma": "過ごす",
           "pos": "Verb",
           "surface": "過ごす"
         }
@@ -427,6 +460,7 @@
       "description": "ぼんやり should be ADV (B62) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "ぼんやり",
           "pos": "Adverb",
           "surface": "ぼんやり"
         },
@@ -436,6 +470,7 @@
           "surface": "見"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -445,6 +480,7 @@
           "surface": "い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -460,6 +496,7 @@
       "description": "どっさり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "どっさり",
           "pos": "Adverb",
           "surface": "どっさり"
         },
@@ -469,6 +506,7 @@
           "surface": "届い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -484,6 +522,7 @@
       "description": "ばったり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "ばったり",
           "pos": "Adverb",
           "surface": "ばったり"
         },
@@ -493,6 +532,7 @@
           "surface": "会っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -508,6 +548,7 @@
       "description": "きっちり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "きっちり",
           "pos": "Adverb",
           "surface": "きっちり"
         },
@@ -528,6 +569,7 @@
       "description": "ぎっしり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "ぎっしり",
           "pos": "Adverb",
           "surface": "ぎっしり"
         },
@@ -537,6 +579,7 @@
           "surface": "詰まっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -552,6 +595,7 @@
       "description": "じっくり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "じっくり",
           "pos": "Adverb",
           "surface": "じっくり"
         },
@@ -572,6 +616,7 @@
       "description": "ちょっぴり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "ちょっぴり",
           "pos": "Adverb",
           "surface": "ちょっぴり"
         },
@@ -592,10 +637,12 @@
       "description": "こってり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "こってり",
           "pos": "Adverb",
           "surface": "こってり"
         },
         {
+          "lemma": "味",
           "pos": "Noun",
           "surface": "味"
         }
@@ -611,6 +658,7 @@
       "description": "ふっくら should be ADV (B62) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "ふっくら",
           "pos": "Other",
           "surface": "ふっくら"
         },
@@ -620,6 +668,7 @@
           "surface": "焼け"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -635,6 +684,7 @@
       "description": "ぽっかり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "ぽっかり",
           "pos": "Adverb",
           "surface": "ぽっかり"
         },
@@ -655,6 +705,7 @@
       "description": "むっつり should be ADV (B62)",
       "expected": [
         {
+          "lemma": "むっつり",
           "pos": "Adverb",
           "surface": "むっつり"
         },
@@ -675,6 +726,7 @@
       "description": "わざわざ should be ADV (already working)",
       "expected": [
         {
+          "lemma": "わざわざ",
           "pos": "Adverb",
           "surface": "わざわざ"
         },
@@ -684,6 +736,7 @@
           "surface": "来"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -700,6 +753,7 @@
       "description": "たまたま should be ADV - NOTE: 見つけた splitting needs separate fix",
       "expected": [
         {
+          "lemma": "たまたま",
           "pos": "Adverb",
           "surface": "たまたま"
         },
@@ -725,6 +779,7 @@
       "description": "そろそろ should be ADV (already working)",
       "expected": [
         {
+          "lemma": "そろそろ",
           "pos": "Adverb",
           "surface": "そろそろ"
         },
@@ -746,6 +801,7 @@
       "description": "しっかり should be ADV (already working)",
       "expected": [
         {
+          "lemma": "しっかり",
           "pos": "Adverb",
           "surface": "しっかり"
         },
@@ -767,6 +823,7 @@
       "description": "はっきり should be ADV (already working)",
       "expected": [
         {
+          "lemma": "はっきり",
           "pos": "Adverb",
           "surface": "はっきり"
         },
@@ -788,6 +845,7 @@
       "description": "ゆっくり should be ADV (already working)",
       "expected": [
         {
+          "lemma": "ゆっくり",
           "pos": "Adverb",
           "surface": "ゆっくり"
         },
@@ -809,10 +867,12 @@
       "description": "やっぱり should be ADV (already working)",
       "expected": [
         {
+          "lemma": "やっぱり",
           "pos": "Adverb",
           "surface": "やっぱり"
         },
         {
+          "lemma": "無理",
           "pos": "Adjective",
           "surface": "無理"
         }
@@ -829,10 +889,12 @@
       "description": "どさり should be ADV (ABり型) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "どさり",
           "pos": "Adverb",
           "surface": "どさり"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -842,6 +904,7 @@
           "surface": "倒れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -858,10 +921,12 @@
       "description": "ばたり should be ADV (ABり型) - 擬態語として1トークン",
       "expected": [
         {
+          "lemma": "ばたり",
           "pos": "Adverb",
           "surface": "ばたり"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -871,6 +936,7 @@
           "surface": "倒れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -887,18 +953,22 @@
       "description": "がたり should be ADV (ABり型) - MeCab互換分割",
       "expected": [
         {
+          "lemma": "がたり",
           "pos": "Adverb",
           "surface": "がたり"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "音",
           "pos": "Noun",
           "surface": "音"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -908,6 +978,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -924,10 +995,12 @@
       "description": "ニャーニャー - cat onomatopoeia, not AUX よ (W-007)",
       "expected": [
         {
+          "lemma": "ニャーニャー",
           "pos": "Adverb",
           "surface": "ニャーニャー"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         }
@@ -945,10 +1018,12 @@
       "description": "にゃー - dialectal AUX should still work",
       "expected": [
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         },
         {
+          "lemma": "にゃー",
           "pos": "Particle",
           "surface": "にゃー"
         }
@@ -965,14 +1040,17 @@
       "description": "onomatopoeia+する should split as つるつる+し, not つるつるし(verb)",
       "expected": [
         {
+          "lemma": "肌",
           "pos": "Noun",
           "surface": "肌"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "つるつる",
           "pos": "Adverb",
           "surface": "つるつる"
         },
@@ -982,10 +1060,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }

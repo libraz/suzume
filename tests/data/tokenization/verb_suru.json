@@ -4,6 +4,7 @@
       "description": "説明してくれます - MeCab互換分割",
       "expected": [
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
@@ -13,6 +14,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -22,6 +24,7 @@
           "surface": "くれ"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -39,6 +42,7 @@
       "description": "確認してください - MeCab互換分割",
       "expected": [
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -48,6 +52,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -70,6 +75,7 @@
       "description": "勉強しています - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -79,6 +85,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -88,6 +95,7 @@
           "surface": "い"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -109,6 +117,7 @@
       "description": "確認してあります - MeCab互換分割",
       "expected": [
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -118,6 +127,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -127,6 +137,7 @@
           "surface": "あり"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -172,6 +183,7 @@
       "description": "準備しておきます - MeCab互換分割",
       "expected": [
         {
+          "lemma": "準備",
           "pos": "Noun",
           "surface": "準備"
         },
@@ -181,6 +193,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -190,6 +203,7 @@
           "surface": "おき"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -231,6 +245,7 @@
       "description": "説明してもらう - MeCab互換分割",
       "expected": [
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
@@ -240,10 +255,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "もらう",
           "pos": "Verb",
           "surface": "もらう"
         }
@@ -260,6 +277,7 @@
       "description": "説明してあげる - MeCab互換分割",
       "expected": [
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
@@ -269,10 +287,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "あげる",
           "pos": "Verb",
           "surface": "あげる"
         }
@@ -289,6 +309,7 @@
       "description": "勉強してしまう - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -298,10 +319,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "しまう",
           "pos": "Auxiliary",
           "surface": "しまう"
         }
@@ -322,6 +345,7 @@
       "description": "説明してみる - MeCab互換分割",
       "expected": [
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
@@ -331,10 +355,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "みる",
           "pos": "Auxiliary",
           "surface": "みる"
         }
@@ -371,6 +397,7 @@
       "description": "説明してほしい - MeCab互換分割",
       "expected": [
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
@@ -380,6 +407,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -405,6 +433,7 @@
       "description": "説明してくれる - MeCab互換分割",
       "expected": [
         {
+          "lemma": "説明",
           "pos": "Noun",
           "surface": "説明"
         },
@@ -414,10 +443,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "くれる",
           "pos": "Verb",
           "surface": "くれる"
         }
@@ -457,6 +488,7 @@
       "description": "勉強していく - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -466,10 +498,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いく",
           "pos": "Verb",
           "surface": "いく"
         }
@@ -505,6 +539,7 @@
       "description": "勉強してくる - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -514,10 +549,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "くる",
           "pos": "Auxiliary",
           "surface": "くる"
         }

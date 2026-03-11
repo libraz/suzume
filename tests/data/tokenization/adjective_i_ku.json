@@ -9,6 +9,7 @@
           "surface": "よく"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -31,6 +32,7 @@
           "surface": "よく"
         },
         {
+          "lemma": "分かる",
           "pos": "Verb",
           "surface": "分かる"
         }
@@ -102,10 +104,12 @@
       "description": "B33: 無く should be adjective renyoukei",
       "expected": [
         {
+          "lemma": "休む",
           "pos": "Verb",
           "surface": "休む"
         },
         {
+          "lemma": "こと",
           "pos": "Noun",
           "surface": "こと"
         },
@@ -197,6 +201,7 @@
           "surface": "ウザく"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }

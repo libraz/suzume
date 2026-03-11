@@ -4,18 +4,22 @@
       "description": "Regression: AdjBasic→Noun connection bonus (美しい+猫)",
       "expected": [
         {
+          "lemma": "一番",
           "pos": "Noun",
           "surface": "一番"
         },
         {
+          "lemma": "美しい",
           "pos": "Adjective",
           "surface": "美しい"
         },
         {
+          "lemma": "猫",
           "pos": "Noun",
           "surface": "猫"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }

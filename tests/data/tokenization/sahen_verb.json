@@ -1,9 +1,14 @@
 {
   "cases": [
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "Sahen noun + shi + eru/enai should split at shi boundary",
       "expected": [
         {
+          "lemma": "解決",
           "pos": "Noun",
           "surface": "解決"
         },
@@ -18,6 +23,7 @@
           "surface": "得"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -26,31 +32,50 @@
       "input": "解決し得ない",
       "suzume_expected": [
         {
-          "surface": "解決",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "解決"
         },
         {
-          "surface": "し",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "し"
         },
         {
-          "surface": "得",
+          "lemma": "得る",
           "pos": "Verb",
-          "lemma": "得る"
+          "surface": "得"
         },
         {
-          "surface": "ない",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "Sahen noun + shi + eru should split at shi boundary",
       "expected": [
+        {
+          "lemma": "解決",
+          "pos": "Noun",
+          "surface": "解決"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "得る",
+          "pos": "Auxiliary",
+          "surface": "得る"
+        }
+      ],
+      "id": "kaiketsu_shi_eru",
+      "input": "解決し得る",
+      "suzume_expected": [
         {
           "pos": "Noun",
           "surface": "解決"
@@ -61,31 +86,10 @@
           "surface": "し"
         },
         {
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "得る"
         }
-      ],
-      "id": "kaiketsu_shi_eru",
-      "input": "解決し得る",
-      "suzume_expected": [
-        {
-          "surface": "解決",
-          "pos": "Noun"
-        },
-        {
-          "surface": "し",
-          "pos": "Verb",
-          "lemma": "する"
-        },
-        {
-          "surface": "得る",
-          "pos": "Verb"
-        }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "accepted_diff": {
@@ -95,6 +99,7 @@
       "description": "Sahen noun + shi + eru/enai should split at shi boundary",
       "expected": [
         {
+          "lemma": "理解",
           "pos": "Noun",
           "surface": "理解"
         },
@@ -109,6 +114,7 @@
           "surface": "得"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -142,6 +148,7 @@
       "description": "Sahen noun + shi + subsidiary verb should split at shi boundary",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -151,6 +158,7 @@
           "surface": "し"
         },
         {
+          "lemma": "始める",
           "pos": "Verb",
           "surface": "始める"
         }

@@ -4,14 +4,17 @@
       "description": "API with を particle",
       "expected": [
         {
+          "lemma": "API",
           "pos": "Noun",
           "surface": "API"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "呼ぶ",
           "pos": "Verb",
           "surface": "呼ぶ"
         }
@@ -28,14 +31,17 @@
       "description": "CamelCase function name preserved with を particle",
       "expected": [
         {
+          "lemma": "getUserData",
           "pos": "Noun",
           "surface": "getUserData"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "呼ぶ",
           "pos": "Verb",
           "surface": "呼ぶ"
         }

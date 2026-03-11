@@ -9,6 +9,7 @@
           "surface": "言わ"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -35,6 +36,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -61,6 +63,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -92,6 +95,7 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }
@@ -119,6 +123,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -145,6 +150,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -166,6 +172,7 @@
           "surface": "いわ"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -197,6 +204,7 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }
@@ -220,6 +228,7 @@
           "surface": "書か"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -241,6 +250,7 @@
           "surface": "読ま"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -262,6 +272,7 @@
           "surface": "聞か"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -283,6 +294,7 @@
           "surface": "飲ま"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -304,6 +316,7 @@
           "surface": "食べ"
         },
         {
+          "lemma": "られる",
           "pos": "Auxiliary",
           "surface": "られる"
         }
@@ -334,6 +347,7 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }
@@ -356,6 +370,7 @@
           "surface": "見"
         },
         {
+          "lemma": "られる",
           "pos": "Auxiliary",
           "surface": "られる"
         }
@@ -376,6 +391,7 @@
           "surface": "さ"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -401,6 +417,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -426,6 +443,7 @@
           "surface": "来ら"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -452,10 +470,12 @@
       "description": "彼に言われた - Passive in sentence context (MeCab-style split)",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -470,6 +490,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -485,10 +506,12 @@
       "description": "先生に褒められた - Passive with agent (ichidan splits)",
       "expected": [
         {
+          "lemma": "先生",
           "pos": "Noun",
           "surface": "先生"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -503,6 +526,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -529,6 +553,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "ちゃう",
           "pos": "Verb",
           "surface": "ちゃう"
         }
@@ -555,6 +580,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "ちゃう",
           "pos": "Verb",
           "surface": "ちゃう"
         }
@@ -576,6 +602,7 @@
           "surface": "晒さ"
         },
         {
+          "lemma": "れる",
           "pos": "Auxiliary",
           "surface": "れる"
         }
@@ -601,6 +628,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         }

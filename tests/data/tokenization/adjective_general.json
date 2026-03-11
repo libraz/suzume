@@ -4,6 +4,7 @@
       "description": "めちゃくちゃな話 - auto-generated",
       "expected": [
         {
+          "lemma": "めちゃくちゃ",
           "pos": "Adjective",
           "surface": "めちゃくちゃ"
         },
@@ -13,6 +14,7 @@
           "surface": "な"
         },
         {
+          "lemma": "話",
           "pos": "Noun",
           "surface": "話"
         }
@@ -28,10 +30,12 @@
       "description": "おっかない顔 - auto-generated",
       "expected": [
         {
+          "lemma": "おっかない",
           "pos": "Adjective",
           "surface": "おっかない"
         },
         {
+          "lemma": "顔",
           "pos": "Noun",
           "surface": "顔"
         }
@@ -47,10 +51,12 @@
       "description": "甘いもの - auto-generated",
       "expected": [
         {
+          "lemma": "甘い",
           "pos": "Adjective",
           "surface": "甘い"
         },
         {
+          "lemma": "もの",
           "pos": "Noun",
           "surface": "もの"
         }
@@ -66,10 +72,12 @@
       "description": "辛いもの - auto-generated",
       "expected": [
         {
+          "lemma": "辛い",
           "pos": "Adjective",
           "surface": "辛い"
         },
         {
+          "lemma": "もの",
           "pos": "Noun",
           "surface": "もの"
         }
@@ -85,10 +93,12 @@
       "description": "暗い部屋 - auto-generated",
       "expected": [
         {
+          "lemma": "暗い",
           "pos": "Adjective",
           "surface": "暗い"
         },
         {
+          "lemma": "部屋",
           "pos": "Noun",
           "surface": "部屋"
         }
@@ -109,10 +119,12 @@
           "surface": "甘く"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "美味しい",
           "pos": "Adjective",
           "surface": "美味しい"
         }
@@ -133,6 +145,7 @@
           "surface": "辛く"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -148,10 +161,12 @@
       "description": "大きな木 - auto-generated",
       "expected": [
         {
+          "lemma": "大きな",
           "pos": "Determiner",
           "surface": "大きな"
         },
         {
+          "lemma": "木",
           "pos": "Noun",
           "surface": "木"
         }

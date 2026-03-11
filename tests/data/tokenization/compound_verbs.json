@@ -9,6 +9,7 @@
           "surface": "立ち去っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -20,6 +21,7 @@
       "description": "走り去る - auto-generated",
       "expected": [
         {
+          "lemma": "走り去る",
           "pos": "Verb",
           "surface": "走り去る"
         }
@@ -36,6 +38,7 @@
           "surface": "乗り越え"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -47,6 +50,7 @@
       "description": "飛び越える - auto-generated",
       "expected": [
         {
+          "lemma": "飛び越える",
           "pos": "Verb",
           "surface": "飛び越える"
         }
@@ -58,34 +62,42 @@
       "description": "彼は万感の思いを胸に秘めたまま静かに立ち去った - auto-generated",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "万感",
           "pos": "Noun",
           "surface": "万感"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "思い",
           "pos": "Noun",
           "surface": "思い"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "胸",
           "pos": "Noun",
           "surface": "胸"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -95,18 +107,22 @@
           "surface": "秘め"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "まま",
           "pos": "Noun",
           "surface": "まま"
         },
         {
+          "lemma": "静か",
           "pos": "Adjective",
           "surface": "静か"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -116,6 +132,7 @@
           "surface": "立ち去っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }

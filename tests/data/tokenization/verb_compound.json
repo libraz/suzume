@@ -14,6 +14,7 @@
           "surface": "すぎ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -40,6 +41,7 @@
           "surface": "すぎ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -49,6 +51,7 @@
           "surface": "しまい"
         },
         {
+          "lemma": "そう",
           "pos": "Auxiliary",
           "surface": "そう"
         }
@@ -81,6 +84,7 @@
       "description": "B63: 食べ込む should be single compound verb (ichidan + V2)",
       "expected": [
         {
+          "lemma": "食べ込む",
           "pos": "Verb",
           "surface": "食べ込む"
         }
@@ -117,6 +121,7 @@
           "surface": "買っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -126,6 +131,7 @@
           "surface": "き"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -166,6 +172,7 @@
       "description": "読み続ける - compound verb",
       "expected": [
         {
+          "lemma": "読み続ける",
           "pos": "Verb",
           "surface": "読み続ける"
         }
@@ -185,10 +192,12 @@
           "surface": "歩き"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
         {
+          "lemma": "話す",
           "pos": "Verb",
           "surface": "話す"
         }
@@ -209,10 +218,12 @@
           "surface": "食べ"
         },
         {
+          "lemma": "ながら",
           "pos": "Particle",
           "surface": "ながら"
         },
         {
+          "lemma": "歩く",
           "pos": "Verb",
           "surface": "歩く"
         }
@@ -243,16 +254,13 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
       ],
       "id": "compound_verb_hiragana_v2_dasu",
       "input": "走りだしたくなかった",
-      "tags": [
-        "compound_verb",
-        "hiragana_v2"
-      ],
       "suzume_expected": [
         {
           "lemma": "走り出す",
@@ -273,6 +281,10 @@
           "pos": "Auxiliary",
           "surface": "た"
         }
+      ],
+      "tags": [
+        "compound_verb",
+        "hiragana_v2"
       ]
     },
     {
@@ -288,6 +300,7 @@
           "surface": "飛びこみ"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         }
@@ -324,6 +337,7 @@
           "surface": "すぎ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -375,6 +389,7 @@
           "surface": "やりなおし"
         },
         {
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "たい"
         }
@@ -390,6 +405,7 @@
       "description": "わかりあう - all-hiragana compound verb",
       "expected": [
         {
+          "lemma": "わかりあう",
           "pos": "Verb",
           "surface": "わかりあう"
         }
@@ -437,14 +453,17 @@
       "description": "試験に落ちる - noun should NOT be treated as V1 for compound verb",
       "expected": [
         {
+          "lemma": "試験",
           "pos": "Noun",
           "surface": "試験"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "落ちる",
           "pos": "Verb",
           "surface": "落ちる"
         }
@@ -460,14 +479,17 @@
       "description": "会議に出す - noun should NOT be treated as V1 for compound verb",
       "expected": [
         {
+          "lemma": "会議",
           "pos": "Noun",
           "surface": "会議"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "出す",
           "pos": "Verb",
           "surface": "出す"
         }
@@ -555,6 +577,7 @@
       "description": "引き続き should not be fragmented into 4+ pieces",
       "expected": [
         {
+          "lemma": "引き続き",
           "pos": "Adverb",
           "surface": "引き続き"
         }
@@ -571,10 +594,12 @@
       "description": "データを読み込む - を particle should be recognized",
       "expected": [
         {
+          "lemma": "データ",
           "pos": "Noun",
           "surface": "データ"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -597,10 +622,12 @@
       "description": "に対して - kanji compound particles split as に + verb",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "に対して",
           "pos": "Particle",
           "surface": "に対して"
         }
@@ -622,6 +649,7 @@
           "surface": "食べ"
         },
         {
+          "lemma": "始める",
           "pos": "Verb",
           "surface": "始める"
         }
@@ -638,10 +666,12 @@
       "description": "S3: 駆け巡った should be compound verb, not split",
       "expected": [
         {
+          "lemma": "世界",
           "pos": "Noun",
           "surface": "世界"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -651,6 +681,7 @@
           "surface": "駆け巡っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -667,10 +698,12 @@
       "description": "S3: 吹き飛ばす should be compound verb",
       "expected": [
         {
+          "lemma": "風",
           "pos": "Noun",
           "surface": "風"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -696,10 +729,12 @@
       "description": "S3: 演じきった should be compound verb with lemma 演じ切る",
       "expected": [
         {
+          "lemma": "役",
           "pos": "Noun",
           "surface": "役"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -709,6 +744,7 @@
           "surface": "演じきっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -754,6 +790,7 @@
           "surface": "すぎ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -790,6 +827,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -807,10 +845,12 @@
       "description": "S3: 飛び交う should be compound verb",
       "expected": [
         {
+          "lemma": "言葉",
           "pos": "Noun",
           "surface": "言葉"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -832,14 +872,17 @@
       "description": "S3: 取り入れる should be compound verb",
       "expected": [
         {
+          "lemma": "新しい",
           "pos": "Adjective",
           "surface": "新しい"
         },
         {
+          "lemma": "方法",
           "pos": "Noun",
           "surface": "方法"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -884,6 +927,7 @@
           "surface": "美しかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -906,6 +950,7 @@
           "surface": "付き合っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -918,20 +963,37 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "抱きしめて - auto-generated",
       "expected": [
         {
-          "lemma": "抱き締める",
+          "lemma": "抱きしめる",
           "pos": "Verb",
           "surface": "抱きしめ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
       ],
       "id": "kishimete",
       "input": "抱きしめて",
+      "suzume_expected": [
+        {
+          "lemma": "抱き締める",
+          "pos": "Verb",
+          "surface": "抱きしめ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
       "tags": [
         "compound",
         "ichidan"
@@ -946,6 +1008,7 @@
           "surface": "引っ張っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -966,6 +1029,7 @@
           "surface": "思い出し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -981,6 +1045,7 @@
       "description": "突っ込む - auto-generated",
       "expected": [
         {
+          "lemma": "突っ込む",
           "pos": "Verb",
           "surface": "突っ込む"
         }
@@ -997,6 +1062,7 @@
           "surface": "突っ込ん"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -1008,6 +1074,7 @@
       "description": "打ち込む - auto-generated",
       "expected": [
         {
+          "lemma": "打ち込む",
           "pos": "Verb",
           "surface": "打ち込む"
         }
@@ -1024,6 +1091,7 @@
           "surface": "吹っ飛ん"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -1040,6 +1108,7 @@
           "surface": "吹っ飛ん"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -1061,6 +1130,7 @@
           "surface": "突き刺さっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }

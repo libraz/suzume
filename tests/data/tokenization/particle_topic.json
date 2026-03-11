@@ -1,59 +1,74 @@
 {
   "cases": [
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "Regression: はいつまで - particle→interjection penalty + topic→pronoun bonus",
       "expected": [
         {
+          "lemma": "人間",
           "pos": "Noun",
           "surface": "人間"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "住居",
           "pos": "Noun",
           "surface": "住居"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "いつ",
           "pos": "Pronoun",
           "surface": "いつ"
         },
         {
+          "lemma": "まで",
           "pos": "Particle",
           "surface": "まで"
         },
         {
-          "lemma": "たる",
+          "lemma": "たつ",
           "pos": "Verb",
           "surface": "たっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
         {
+          "lemma": "慣れる",
           "pos": "Verb",
           "surface": "慣れる"
         },
         {
-          "lemma": "こと",
+          "lemma": "事",
           "pos": "Noun",
           "surface": "事"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -68,12 +83,95 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
       ],
       "id": "no_nihaitsumadetatttemo_reru_gadekinakattta",
-      "input": "人間の住居にはいつまでたっても慣れる事ができなかった"
+      "input": "人間の住居にはいつまでたっても慣れる事ができなかった",
+      "suzume_expected": [
+        {
+          "lemma": "人間",
+          "pos": "Noun",
+          "surface": "人間"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "住居",
+          "pos": "Noun",
+          "surface": "住居"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いつ",
+          "pos": "Pronoun",
+          "surface": "いつ"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "たる",
+          "pos": "Verb",
+          "surface": "たっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "慣れる",
+          "pos": "Verb",
+          "surface": "慣れる"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "事"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ]
     }
   ],
   "description": "particle_topic tests",

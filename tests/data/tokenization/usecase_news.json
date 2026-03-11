@@ -4,26 +4,32 @@
       "description": "News announcement pattern - MeCab互換分割",
       "expected": [
         {
+          "lemma": "政府",
           "pos": "Noun",
           "surface": "政府"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "新しい",
           "pos": "Adjective",
           "surface": "新しい"
         },
         {
+          "lemma": "政策",
           "pos": "Noun",
           "surface": "政策"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "発表",
           "pos": "Noun",
           "surface": "発表"
         },
@@ -48,30 +54,37 @@
       "description": "Citation pattern",
       "expected": [
         {
+          "lemma": "関係者",
           "pos": "Noun",
           "surface": "関係者"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "よる",
           "pos": "Verb",
           "surface": "よる"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "問題",
           "pos": "Noun",
           "surface": "問題"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "ない",
           "pos": "Adjective",
           "surface": "ない"
         }
@@ -86,14 +99,17 @@
       "description": "Event description - passive verb 行われた MeCab互換分割",
       "expected": [
         {
+          "lemma": "昨日",
           "pos": "Noun",
           "surface": "昨日"
         },
         {
+          "lemma": "記者会見",
           "pos": "Noun",
           "surface": "記者会見"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -108,6 +124,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -123,22 +140,27 @@
       "description": "Incident report - MeCab互換分割",
       "expected": [
         {
+          "lemma": "事故",
           "pos": "Noun",
           "surface": "事故"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "3人",
           "pos": "Noun",
           "surface": "3人"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "負傷",
           "pos": "Noun",
           "surface": "負傷"
         },
@@ -163,22 +185,27 @@
       "description": "Investigation report - MeCab互換分割",
       "expected": [
         {
+          "lemma": "警察",
           "pos": "Noun",
           "surface": "警察"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "原因",
           "pos": "Noun",
           "surface": "原因"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "調査",
           "pos": "Noun",
           "surface": "調査"
         },
@@ -188,10 +215,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -206,30 +235,37 @@
       "description": "Election news - MeCab互換分割",
       "expected": [
         {
+          "lemma": "選挙",
           "pos": "Noun",
           "surface": "選挙"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "与党",
           "pos": "Noun",
           "surface": "与党"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "過半数",
           "pos": "Noun",
           "surface": "過半数"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "獲得",
           "pos": "Noun",
           "surface": "獲得"
         },
@@ -254,18 +290,22 @@
       "description": "Weather forecast with のち (after) as temporal noun",
       "expected": [
         {
+          "lemma": "明日",
           "pos": "Noun",
           "surface": "明日"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "晴れ",
           "pos": "Noun",
           "surface": "晴れ"
         },
         {
+          "lemma": "のち",
           "pos": "Noun",
           "surface": "のち"
         },
@@ -280,6 +320,7 @@
           "surface": "でしょ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         }
@@ -294,14 +335,17 @@
       "description": "Weather warning - MeCab互換分割（大雨警報は複合語として統一）",
       "expected": [
         {
+          "lemma": "大雨警報",
           "pos": "Noun",
           "surface": "大雨警報"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "発令",
           "pos": "Noun",
           "surface": "発令"
         },
@@ -321,6 +365,7 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -335,26 +380,32 @@
       "description": "Temperature description - MeCab shows 最高気温 as compound and 度 as noun suffix",
       "expected": [
         {
+          "lemma": "最高気温",
           "pos": "Noun",
           "surface": "最高気温"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "30度",
           "pos": "Noun",
           "surface": "30度"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "予想",
           "pos": "Noun",
           "surface": "予想"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -369,18 +420,22 @@
       "description": "Rain probability",
       "expected": [
         {
+          "lemma": "降水確率",
           "pos": "Noun",
           "surface": "降水確率"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "60%",
           "pos": "Noun",
           "surface": "60%"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -395,18 +450,22 @@
       "description": "Wind information",
       "expected": [
         {
+          "lemma": "北西",
           "pos": "Noun",
           "surface": "北西"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "風",
           "pos": "Noun",
           "surface": "風"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -416,6 +475,7 @@
           "surface": "強く"
         },
         {
+          "lemma": "吹く",
           "pos": "Verb",
           "surface": "吹く"
         },
@@ -425,6 +485,7 @@
           "surface": "でしょ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         }
@@ -439,30 +500,37 @@
       "description": "Game result - MeCab互換分割",
       "expected": [
         {
+          "lemma": "日本代表",
           "pos": "Noun",
           "surface": "日本代表"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "2",
           "pos": "Noun",
           "surface": "2"
         },
         {
+          "lemma": "対",
           "pos": "Noun",
           "surface": "対"
         },
         {
+          "lemma": "1",
           "pos": "Noun",
           "surface": "1"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "勝利",
           "pos": "Noun",
           "surface": "勝利"
         },
@@ -472,6 +540,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -486,14 +555,17 @@
       "description": "Player comment - MeCab splits チーム/一丸 and 戦い/たい",
       "expected": [
         {
+          "lemma": "チーム",
           "pos": "Noun",
           "surface": "チーム"
         },
         {
+          "lemma": "一丸",
           "pos": "Noun",
           "surface": "一丸"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -503,6 +575,7 @@
           "surface": "なっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -527,30 +600,37 @@
       "description": "Game schedule",
       "expected": [
         {
+          "lemma": "試合",
           "pos": "Noun",
           "surface": "試合"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "午後",
           "pos": "Noun",
           "surface": "午後"
         },
         {
+          "lemma": "7時",
           "pos": "Noun",
           "surface": "7時"
         },
         {
+          "lemma": "から",
           "pos": "Particle",
           "surface": "から"
         },
         {
+          "lemma": "開始予定",
           "pos": "Noun",
           "surface": "開始予定"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -565,14 +645,17 @@
       "description": "Ranking - いる as verb in progressive",
       "expected": [
         {
+          "lemma": "現在",
           "pos": "Noun",
           "surface": "現在"
         },
         {
+          "lemma": "3位",
           "pos": "Noun",
           "surface": "3位"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -582,10 +665,12 @@
           "surface": "つけ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -601,30 +686,37 @@
       "description": "Injury report - MeCab互換分割",
       "expected": [
         {
+          "lemma": "選手",
           "pos": "Noun",
           "surface": "選手"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "怪我",
           "pos": "Noun",
           "surface": "怪我"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "ため",
           "pos": "Noun",
           "surface": "ため"
         },
         {
+          "lemma": "欠場",
           "pos": "Noun",
           "surface": "欠場"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -643,38 +735,47 @@
       "description": "Academic hypothesis - MeCab shows 本研究 unified",
       "expected": [
         {
+          "lemma": "本研究",
           "pos": "Noun",
           "surface": "本研究"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "以下",
           "pos": "Noun",
           "surface": "以下"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "仮説",
           "pos": "Noun",
           "surface": "仮説"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "検証",
           "pos": "Noun",
           "surface": "検証"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -736,18 +837,22 @@
       "description": "Research result - MeCab shows られ as verb and 有意な as adjective",
       "expected": [
         {
+          "lemma": "実験",
           "pos": "Noun",
           "surface": "実験"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "結果",
           "pos": "Noun",
           "surface": "結果"
         },
         {
+          "lemma": "有意",
           "pos": "Adjective",
           "surface": "有意"
         },
@@ -757,10 +862,12 @@
           "surface": "な"
         },
         {
+          "lemma": "差",
           "pos": "Noun",
           "surface": "差"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -775,6 +882,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -794,34 +902,42 @@
       "description": "Conclusion statement",
       "expected": [
         {
+          "lemma": "以上",
           "pos": "Noun",
           "surface": "以上"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "結果",
           "pos": "Noun",
           "surface": "結果"
         },
         {
+          "lemma": "から",
           "pos": "Particle",
           "surface": "から"
         },
         {
+          "lemma": "次",
           "pos": "Noun",
           "surface": "次"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
-          "pos": "Noun",
+          "lemma": "よう",
+          "pos": "Auxiliary",
           "surface": "よう"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -831,6 +947,7 @@
           "surface": "結論づけ"
         },
         {
+          "lemma": "られる",
           "pos": "Auxiliary",
           "surface": "られる"
         }
@@ -891,30 +1008,37 @@
       "description": "Method description - Current suzume unifies compounds",
       "expected": [
         {
+          "lemma": "本研究",
           "pos": "Noun",
           "surface": "本研究"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "アンケート",
           "pos": "Noun",
           "surface": "アンケート"
         },
         {
+          "lemma": "調査",
           "pos": "Noun",
           "surface": "調査"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "実施",
           "pos": "Noun",
           "surface": "実施"
         },
@@ -924,6 +1048,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -985,10 +1110,12 @@
       "description": "Reference citation - Current suzume unifies によれば and compounds",
       "expected": [
         {
+          "lemma": "先行研究",
           "pos": "Noun",
           "surface": "先行研究"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -998,18 +1125,22 @@
           "surface": "よれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         },
         {
+          "lemma": "効果",
           "pos": "Noun",
           "surface": "効果"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -1024,10 +1155,12 @@
           "surface": "れ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -1043,38 +1176,47 @@
       "description": "Limitation statement",
       "expected": [
         {
+          "lemma": "本研究",
           "pos": "Noun",
           "surface": "本研究"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "いくつ",
           "pos": "Pronoun",
           "surface": "いくつ"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "限界",
           "pos": "Noun",
           "surface": "限界"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
@@ -1093,50 +1235,62 @@
       "description": "News article style - Current suzume unifies 経済政策",
       "expected": [
         {
+          "lemma": "政府",
           "pos": "Noun",
           "surface": "政府"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "昨日",
           "pos": "Noun",
           "surface": "昨日"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "閣議",
           "pos": "Noun",
           "surface": "閣議"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "新しい",
           "pos": "Adjective",
           "surface": "新しい"
         },
         {
+          "lemma": "経済政策",
           "pos": "Noun",
           "surface": "経済政策"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "正式",
           "pos": "Adjective",
           "surface": "正式"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "決定",
           "pos": "Noun",
           "surface": "決定"
         },
@@ -1146,14 +1300,17 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "発表",
           "pos": "Noun",
           "surface": "発表"
         },
@@ -1163,6 +1320,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1257,30 +1415,37 @@
       "description": "Narrative style - Current suzume treats 欠かさ as adjective and 好き as adjective",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "昔",
           "pos": "Noun",
           "surface": "昔"
         },
         {
+          "lemma": "から",
           "pos": "Particle",
           "surface": "から"
         },
         {
+          "lemma": "音楽",
           "pos": "Noun",
           "surface": "音楽"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "好き",
           "pos": "Adjective",
           "surface": "好き"
         },
@@ -1290,22 +1455,27 @@
           "surface": "で"
         },
         {
+          "lemma": "毎日",
           "pos": "Noun",
           "surface": "毎日"
         },
         {
+          "lemma": "ピアノ",
           "pos": "Noun",
           "surface": "ピアノ"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "練習",
           "pos": "Noun",
           "surface": "練習"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1320,6 +1490,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1420,18 +1591,22 @@
       "description": "Multi-step instructions - Current suzume unifies 起動し and 設定画面",
       "expected": [
         {
+          "lemma": "まず",
           "pos": "Adverb",
           "surface": "まず"
         },
         {
+          "lemma": "電源",
           "pos": "Noun",
           "surface": "電源"
         },
         {
+          "lemma": "ボタン",
           "pos": "Noun",
           "surface": "ボタン"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1441,10 +1616,12 @@
           "surface": "押し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "起動",
           "pos": "Noun",
           "surface": "起動"
         },
@@ -1454,30 +1631,37 @@
           "surface": "し"
         },
         {
+          "lemma": "次",
           "pos": "Noun",
           "surface": "次"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "設定画面",
           "pos": "Noun",
           "surface": "設定画面"
         },
         {
+          "lemma": "から",
           "pos": "Particle",
           "surface": "から"
         },
         {
+          "lemma": "言語",
           "pos": "Noun",
           "surface": "言語"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "選択",
           "pos": "Noun",
           "surface": "選択"
         },
@@ -1487,6 +1671,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1602,22 +1787,27 @@
       "description": "Complex conditional - Current suzume unifies しよう and います",
       "expected": [
         {
+          "lemma": "もし",
           "pos": "Adverb",
           "surface": "もし"
         },
         {
+          "lemma": "明日",
           "pos": "Noun",
           "surface": "明日"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "天気",
           "pos": "Noun",
           "surface": "天気"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -1627,22 +1817,27 @@
           "surface": "良けれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         },
         {
+          "lemma": "公園",
           "pos": "Noun",
           "surface": "公園"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "ピクニック",
           "pos": "Noun",
           "surface": "ピクニック"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1652,10 +1847,12 @@
           "surface": "しよ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -1665,6 +1862,7 @@
           "surface": "思っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1674,6 +1872,7 @@
           "surface": "い"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -1770,42 +1969,52 @@
       "description": "Explanation style - Current suzume treats compound verb 読み込む differently",
       "expected": [
         {
+          "lemma": "この",
           "pos": "Determiner",
           "surface": "この"
         },
         {
+          "lemma": "問題",
           "pos": "Noun",
           "surface": "問題"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "発生",
           "pos": "Noun",
           "surface": "発生"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         },
         {
+          "lemma": "原因",
           "pos": "Noun",
           "surface": "原因"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "設定",
           "pos": "Noun",
           "surface": "設定"
         },
         {
+          "lemma": "ファイル",
           "pos": "Noun",
           "surface": "ファイル"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -1825,6 +2034,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1834,14 +2044,17 @@
           "surface": "い"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         },
         {
+          "lemma": "こと",
           "pos": "Noun",
           "surface": "こと"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -1948,18 +2161,22 @@
       "description": "Teacher instruction - 35ページ unified, ください as verb",
       "expected": [
         {
+          "lemma": "教科書",
           "pos": "Noun",
           "surface": "教科書"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "35ページ",
           "pos": "Noun",
           "surface": "35ページ"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1969,6 +2186,7 @@
           "surface": "開い"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1988,22 +2206,27 @@
       "description": "Student question - verb stem + ません splits",
       "expected": [
         {
+          "lemma": "この",
           "pos": "Determiner",
           "surface": "この"
         },
         {
+          "lemma": "問題",
           "pos": "Noun",
           "surface": "問題"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "解き方",
           "pos": "Noun",
           "surface": "解き方"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -2018,6 +2241,7 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }
@@ -2033,26 +2257,32 @@
       "description": "Homework assignment - MeCab互換分割",
       "expected": [
         {
+          "lemma": "明日",
           "pos": "Noun",
           "surface": "明日"
         },
         {
+          "lemma": "まで",
           "pos": "Particle",
           "surface": "まで"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "宿題",
           "pos": "Noun",
           "surface": "宿題"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "提出",
           "pos": "Noun",
           "surface": "提出"
         },
@@ -2062,6 +2292,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -2078,33 +2309,44 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "Teacher explanation (split: verb stem + polite aux)",
       "expected": [
         {
+          "lemma": "この",
           "pos": "Determiner",
           "surface": "この"
         },
         {
+          "lemma": "公式",
           "pos": "Noun",
           "surface": "公式"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "次",
           "pos": "Noun",
           "surface": "次"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
-          "pos": "Noun",
+          "lemma": "よう",
+          "pos": "Auxiliary",
           "surface": "よう"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -2114,12 +2356,60 @@
           "surface": "使い"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
       ],
       "id": "education_explanation",
       "input": "この公式は次のように使います",
+      "suzume_expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "公式",
+          "pos": "Noun",
+          "surface": "公式"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "次",
+          "pos": "Noun",
+          "surface": "次"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "使う",
+          "pos": "Verb",
+          "surface": "使い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
       "tags": [
         "education"
       ]
@@ -2128,10 +2418,12 @@
       "description": "Group work instruction - compound verb 話し合う unified with split ください",
       "expected": [
         {
+          "lemma": "グループ",
           "pos": "Noun",
           "surface": "グループ"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -2141,6 +2433,7 @@
           "surface": "話し合っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },

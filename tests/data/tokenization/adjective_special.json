@@ -17,15 +17,27 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma diff: MeCab lemma=平然と, Suzume lemma=平然"
+      },
       "description": "平然と (calmly)",
       "expected": [
         {
+          "lemma": "平然と",
           "pos": "Adverb",
           "surface": "平然と"
         }
       ],
       "id": "taru_adj_heizento",
       "input": "平然と",
+      "suzume_expected": [
+        {
+          "lemma": "平然",
+          "pos": "Adverb",
+          "surface": "平然と"
+        }
+      ],
       "tags": [
         "grammar",
         "taru-adjective"
@@ -67,10 +79,12 @@
       "description": "溌剌と (vigorously)",
       "expected": [
         {
+          "lemma": "溌剌",
           "pos": "Noun",
           "surface": "溌剌"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         }
@@ -83,38 +97,74 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma diff: taru-adj MeCab lemma includes と, Suzume lemma does not"
+      },
       "description": "悠然と (leisurely)",
       "expected": [
         {
+          "lemma": "悠然と",
           "pos": "Adverb",
           "surface": "悠然と"
         }
       ],
       "id": "taru_adj_yuuzento",
       "input": "悠然と",
+      "suzume_expected": [
+        {
+          "lemma": "悠然",
+          "pos": "Adverb",
+          "surface": "悠然と"
+        }
+      ],
       "tags": [
         "grammar",
         "taru-adjective"
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "同じ should be DET (連体詞), not VERB (W-015)",
       "expected": [
         {
+          "lemma": "同じ",
           "pos": "Determiner",
           "surface": "同じ"
         },
         {
+          "lemma": "事",
           "pos": "Noun",
           "surface": "事"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         }
       ],
       "id": "det_onaji",
       "input": "同じ事を",
+      "suzume_expected": [
+        {
+          "lemma": "同じ",
+          "pos": "Determiner",
+          "surface": "同じ"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "事"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        }
+      ],
       "tags": [
         "determiner",
         "wagahai",

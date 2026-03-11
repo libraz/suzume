@@ -8,22 +8,27 @@
       "description": "AuxNeg→ParticleConj bonus: ない+のに should not split as ない+の+に",
       "expected": [
         {
+          "lemma": "ない",
           "pos": "Adjective",
           "surface": "ない"
         },
         {
+          "lemma": "のに",
           "pos": "Particle",
           "surface": "のに"
         },
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "おかしい",
           "pos": "Adjective",
           "surface": "おかしい"
         }

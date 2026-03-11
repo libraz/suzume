@@ -9,10 +9,12 @@
           "surface": "食べ"
         },
         {
+          "lemma": "たり",
           "pos": "Particle",
           "surface": "たり"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -29,6 +31,7 @@
           "surface": "飲ん"
         },
         {
+          "lemma": "だり",
           "pos": "Particle",
           "surface": "だり"
         },
@@ -38,10 +41,12 @@
           "surface": "食べ"
         },
         {
+          "lemma": "たり",
           "pos": "Particle",
           "surface": "たり"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -58,6 +63,7 @@
           "surface": "見え"
         },
         {
+          "lemma": "たり",
           "pos": "Particle",
           "surface": "たり"
         },
@@ -67,6 +73,7 @@
           "surface": "し"
         },
         {
+          "lemma": "てる",
           "pos": "Auxiliary",
           "surface": "てる"
         }
@@ -83,6 +90,7 @@
           "surface": "減り"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -97,6 +105,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -108,26 +117,32 @@
       "description": "の+は split after という (not merged as のは noun)",
       "expected": [
         {
+          "lemma": "この",
           "pos": "Determiner",
           "surface": "この"
         },
         {
+          "lemma": "書生",
           "pos": "Noun",
           "surface": "書生"
         },
         {
+          "lemma": "という",
           "pos": "Determiner",
           "surface": "という"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "猫",
           "pos": "Noun",
           "surface": "猫"
         },
@@ -137,6 +152,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }

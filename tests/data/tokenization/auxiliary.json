@@ -4,18 +4,22 @@
       "description": "であったそうだ should not be parsed as i-adjective",
       "expected": [
         {
+          "lemma": "それ",
           "pos": "Pronoun",
           "surface": "それ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "事実",
           "pos": "Noun",
           "surface": "事実"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -25,14 +29,17 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "そう",
           "pos": "Adjective",
           "surface": "そう"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }

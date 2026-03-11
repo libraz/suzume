@@ -87,7 +87,8 @@ class TestFormatExpected:
         assert result[0]["pos"] == "Verb"
         assert result[0]["lemma"] == "食べる"
 
-    def test_no_lemma_when_same(self):
+    def test_lemma_included_when_same(self):
+        """Lemma is always included, even when same as surface."""
         tokens = [{"surface": "食べる", "pos": "Verb", "lemma": "食べる"}]
         result = format_expected(tokens)
-        assert "lemma" not in result[0]
+        assert result[0]["lemma"] == "食べる"

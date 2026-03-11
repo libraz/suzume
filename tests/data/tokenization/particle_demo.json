@@ -1,27 +1,57 @@
 {
   "cases": [
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "ADV+で+も+ない: copula split, not でも(CONJ/PART_副)",
       "expected": [
         {
+          "lemma": "それほど",
           "pos": "Adverb",
           "surface": "それほど"
         },
         {
-          "pos": "Particle",
+          "lemma": "だ",
+          "pos": "Auxiliary",
           "surface": "で"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
         {
+          "lemma": "ない",
           "pos": "Adjective",
           "surface": "ない"
         }
       ],
       "id": "sorehodo_demo_nai",
-      "input": "それほどでもない"
+      "input": "それほどでもない",
+      "suzume_expected": [
+        {
+          "lemma": "それほど",
+          "pos": "Adverb",
+          "surface": "それほど"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ]
     }
   ],
   "description": "particle_demo tests",

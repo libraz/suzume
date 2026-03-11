@@ -4,18 +4,22 @@
       "description": "Noun+copula+hearsay: should not match false i-adj stem ending in だ",
       "expected": [
         {
+          "lemma": "教師",
           "pos": "Noun",
           "surface": "教師"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         },
         {
+          "lemma": "そう",
           "pos": "Adjective",
           "surface": "そう"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }

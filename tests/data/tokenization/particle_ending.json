@@ -9,10 +9,12 @@
           "surface": "行き"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -28,14 +30,17 @@
       "description": "Confirmation particle ね",
       "expected": [
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -51,10 +56,12 @@
       "description": "Emphasis particle よ",
       "expected": [
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         },
         {
+          "lemma": "よ",
           "pos": "Particle",
           "surface": "よ"
         }
@@ -70,18 +77,22 @@
       "description": "Feminine sentence ending わね",
       "expected": [
         {
+          "lemma": "そう",
           "pos": "Adjective",
           "surface": "そう"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         },
         {
+          "lemma": "わ",
           "pos": "Particle",
           "surface": "わ"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -97,14 +108,17 @@
       "description": "Wonder particle かな",
       "expected": [
         {
+          "lemma": "行ける",
           "pos": "Verb",
           "surface": "行ける"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         },
         {
+          "lemma": "な",
           "pos": "Particle",
           "surface": "な"
         }
@@ -120,10 +134,12 @@
       "description": "Feminine wonder particle かしら (unified)",
       "expected": [
         {
+          "lemma": "大丈夫",
           "pos": "Adjective",
           "surface": "大丈夫"
         },
         {
+          "lemma": "かしら",
           "pos": "Particle",
           "surface": "かしら"
         }
@@ -139,10 +155,12 @@
       "description": "Masculine emphasis particle ぞ",
       "expected": [
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         },
         {
+          "lemma": "ぞ",
           "pos": "Particle",
           "surface": "ぞ"
         }
@@ -158,10 +176,12 @@
       "description": "Masculine casual particle ぜ",
       "expected": [
         {
+          "lemma": "やる",
           "pos": "Verb",
           "surface": "やる"
         },
         {
+          "lemma": "ぜ",
           "pos": "Particle",
           "surface": "ぜ"
         }
@@ -177,14 +197,17 @@
       "description": "Sentence ending particles よ + ね",
       "expected": [
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         },
         {
+          "lemma": "よ",
           "pos": "Particle",
           "surface": "よ"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -201,14 +224,17 @@
       "description": "Sentence ending particles か + な",
       "expected": [
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         },
         {
+          "lemma": "な",
           "pos": "Particle",
           "surface": "な"
         }
@@ -225,10 +251,12 @@
       "description": "だけども - conjunctive particle けども",
       "expected": [
         {
+          "lemma": "だけど",
           "pos": "Conjunction",
           "surface": "だけど"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         }

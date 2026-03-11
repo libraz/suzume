@@ -4,6 +4,7 @@
       "description": "こんにちは - greeting",
       "expected": [
         {
+          "lemma": "こんにちは",
           "pos": "Interjection",
           "surface": "こんにちは"
         }
@@ -23,7 +24,8 @@
       "description": "あ - single hiragana",
       "expected": [
         {
-          "pos": "Filler",
+          "lemma": "あ",
+          "pos": "Other",
           "surface": "あ"
         }
       ],
@@ -44,10 +46,12 @@
       "description": "にもかかわらず should be single Conjunction",
       "expected": [
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
@@ -72,6 +76,7 @@
       "description": "「こんにちは」- should recognize こんにちは",
       "expected": [
         {
+          "lemma": "こんにちは",
           "pos": "Interjection",
           "surface": "こんにちは"
         }
@@ -87,6 +92,7 @@
       "description": "すみません should be single token",
       "expected": [
         {
+          "lemma": "すみません",
           "pos": "Interjection",
           "surface": "すみません"
         }
@@ -107,6 +113,7 @@
           "surface": "たとえば"
         },
         {
+          "lemma": "日本",
           "pos": "Noun",
           "surface": "日本"
         }
@@ -123,10 +130,12 @@
       "description": "D3: まして should be CONJ, not まし+て (suru verb misrecognition)",
       "expected": [
         {
+          "lemma": "まして",
           "pos": "Conjunction",
           "surface": "まして"
         },
         {
+          "lemma": "無理",
           "pos": "Adjective",
           "surface": "無理"
         }
@@ -143,14 +152,17 @@
       "description": "ところが should be CONJ, not ところ+が split",
       "expected": [
         {
+          "lemma": "ところが",
           "pos": "Conjunction",
           "surface": "ところが"
         },
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -165,6 +177,7 @@
           "surface": "なかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -177,23 +190,47 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "あるいは should be CONJ, not ADJ+は split - MeCab uses かも as single particle",
       "expected": [
         {
+          "lemma": "あるいは",
           "pos": "Conjunction",
           "surface": "あるいは"
         },
         {
+          "lemma": "違う",
           "pos": "Verb",
           "surface": "違う"
         },
         {
+          "lemma": "かも",
           "pos": "Particle",
           "surface": "かも"
         }
       ],
       "id": "conj_aruiha",
       "input": "あるいは違うかも",
+      "suzume_expected": [
+        {
+          "lemma": "或いは",
+          "pos": "Conjunction",
+          "surface": "あるいは"
+        },
+        {
+          "lemma": "違う",
+          "pos": "Verb",
+          "surface": "違う"
+        },
+        {
+          "lemma": "かも",
+          "pos": "Particle",
+          "surface": "かも"
+        }
+      ],
       "tags": [
         "conjunction",
         "split_prevention"
@@ -203,10 +240,12 @@
       "description": "そんなら should be CONJ, not そんな+ら split",
       "expected": [
         {
+          "lemma": "そん",
           "pos": "Noun",
           "surface": "そん"
         },
         {
+          "lemma": "なら",
           "pos": "Particle",
           "surface": "なら"
         },
@@ -216,6 +255,7 @@
           "surface": "行こ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         }
@@ -231,10 +271,12 @@
       "description": "それにしても should be CONJ, not それ+に+して+も split",
       "expected": [
         {
+          "lemma": "それにしても",
           "pos": "Conjunction",
           "surface": "それにしても"
         },
         {
+          "lemma": "高い",
           "pos": "Adjective",
           "surface": "高い"
         }
@@ -255,10 +297,12 @@
           "surface": "いわば"
         },
         {
+          "lemma": "奇跡",
           "pos": "Noun",
           "surface": "奇跡"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -274,6 +318,7 @@
       "description": "ところで - regression test",
       "expected": [
         {
+          "lemma": "ところで",
           "pos": "Conjunction",
           "surface": "ところで"
         }
@@ -285,30 +330,37 @@
       "description": "まことに as single adverb token (not は+ま+こと+に)",
       "expected": [
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "態度",
           "pos": "Noun",
           "surface": "態度"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "まことに",
           "pos": "Adverb",
           "surface": "まことに"
         },
         {
+          "lemma": "傍若無人",
           "pos": "Noun",
           "surface": "傍若無人"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
@@ -318,6 +370,7 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -326,48 +379,8 @@
       "input": "彼の態度はまことに傍若無人であった。"
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "POS/lemma limitation: surfaces match, POS classification differs from MeCab"
-      },
       "description": "しかしながら as lexicalized conjunction (not しかし+ながら)",
       "expected": [
-        {
-          "pos": "Conjunction",
-          "surface": "しかしながら"
-        },
-        {
-          "pos": "Determiner",
-          "surface": "その"
-        },
-        {
-          "pos": "Noun",
-          "surface": "主張"
-        },
-        {
-          "pos": "Particle",
-          "surface": "に"
-        },
-        {
-          "pos": "Particle",
-          "surface": "は"
-        },
-        {
-          "pos": "Noun",
-          "surface": "根拠"
-        },
-        {
-          "pos": "Particle",
-          "surface": "が"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "ない"
-        }
-      ],
-      "id": "shikashinagara_sono_niha_ganai",
-      "input": "しかしながら、その主張には根拠がない。",
-      "suzume_expected": [
         {
           "lemma": "しかしながら",
           "pos": "Conjunction",
@@ -408,7 +421,9 @@
           "pos": "Adjective",
           "surface": "ない"
         }
-      ]
+      ],
+      "id": "shikashinagara_sono_niha_ganai",
+      "input": "しかしながら、その主張には根拠がない。"
     }
   ],
   "description": "Basic tokenization tests",

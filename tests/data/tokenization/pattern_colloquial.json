@@ -63,6 +63,7 @@
           "surface": "すごーい"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -85,6 +86,7 @@
           "surface": "やばーい"
         },
         {
+          "lemma": "よ",
           "pos": "Particle",
           "surface": "よ"
         }
@@ -99,15 +101,27 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma diff: elongated form lemma difference"
+      },
       "description": "すごーーい (consecutive prolonged marks)",
       "expected": [
         {
+          "lemma": "すごーーい",
           "pos": "Adjective",
           "surface": "すごーーい"
         }
       ],
       "id": "choon_consecutive_sugoi",
       "input": "すごーーい",
+      "suzume_expected": [
+        {
+          "lemma": "すごい",
+          "pos": "Adjective",
+          "surface": "すごーーい"
+        }
+      ],
       "tags": [
         "grammar",
         "i-adjective",
@@ -117,15 +131,27 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma diff: elongated form lemma difference"
+      },
       "description": "かわいーー (consecutive prolonged marks at end)",
       "expected": [
         {
+          "lemma": "かわいーー",
           "pos": "Adjective",
           "surface": "かわいーー"
         }
       ],
       "id": "choon_consecutive_kawaii",
       "input": "かわいーー",
+      "suzume_expected": [
+        {
+          "lemma": "かわいい",
+          "pos": "Adjective",
+          "surface": "かわいーー"
+        }
+      ],
       "tags": [
         "grammar",
         "i-adjective",
@@ -143,6 +169,7 @@
           "surface": "行く"
         },
         {
+          "lemma": "って",
           "pos": "Particle",
           "surface": "って"
         },
@@ -178,6 +205,7 @@
           "surface": "ちゃっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -198,6 +226,7 @@
           "surface": "やっ"
         },
         {
+          "lemma": "とく",
           "pos": "Auxiliary",
           "surface": "とく"
         }
@@ -213,10 +242,12 @@
       "description": "Slang phrase めっちゃエモい",
       "expected": [
         {
+          "lemma": "めっちゃ",
           "pos": "Adverb",
           "surface": "めっちゃ"
         },
         {
+          "lemma": "エモい",
           "pos": "Adjective",
           "surface": "エモい"
         }
@@ -232,6 +263,7 @@
       "description": "Slang phrase 超バズった",
       "expected": [
         {
+          "lemma": "超",
           "pos": "Noun",
           "surface": "超"
         },
@@ -241,6 +273,7 @@
           "surface": "バズっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -260,6 +293,7 @@
       "description": "Slang phrase マジでキモい",
       "expected": [
         {
+          "lemma": "マジ",
           "pos": "Noun",
           "surface": "マジ"
         },
@@ -269,6 +303,7 @@
           "surface": "で"
         },
         {
+          "lemma": "キモい",
           "pos": "Adjective",
           "surface": "キモい"
         }
@@ -298,14 +333,17 @@
       "description": "Slang phrase ガチでサボる (ガチで as adverb 'seriously')",
       "expected": [
         {
+          "lemma": "ガチ",
           "pos": "Noun",
           "surface": "ガチ"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "サボる",
           "pos": "Verb",
           "surface": "サボる"
         }
@@ -325,6 +363,7 @@
       "description": "Internet slang phrase マジで尊い",
       "expected": [
         {
+          "lemma": "マジ",
           "pos": "Noun",
           "surface": "マジ"
         },
@@ -334,6 +373,7 @@
           "surface": "で"
         },
         {
+          "lemma": "尊い",
           "pos": "Adjective",
           "surface": "尊い"
         }
@@ -374,10 +414,12 @@
           "surface": "すぎ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "しんどい",
           "pos": "Adjective",
           "surface": "しんどい"
         }
@@ -394,6 +436,7 @@
       "description": "Nominalized noun 推し standalone (T54)",
       "expected": [
         {
+          "lemma": "推し",
           "pos": "Noun",
           "surface": "推し"
         }
@@ -411,10 +454,12 @@
       "description": "Nominalized noun 推し with particle の",
       "expected": [
         {
+          "lemma": "推し",
           "pos": "Noun",
           "surface": "推し"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         }
@@ -432,14 +477,17 @@
       "description": "Internet slang phrase 推しのライブ",
       "expected": [
         {
+          "lemma": "推し",
           "pos": "Noun",
           "surface": "推し"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "ライブ",
           "pos": "Noun",
           "surface": "ライブ"
         }
@@ -454,19 +502,37 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma diff: emphatic sokuon lemma difference"
+      },
       "description": "ですっ - emphatic sokuon after auxiliary",
       "expected": [
         {
+          "lemma": "大丈夫",
           "pos": "Adjective",
           "surface": "大丈夫"
         },
         {
+          "lemma": "ですっ",
           "pos": "Auxiliary",
           "surface": "ですっ"
         }
       ],
       "id": "emphatic_sokuon_desu",
       "input": "大丈夫ですっ",
+      "suzume_expected": [
+        {
+          "lemma": "大丈夫",
+          "pos": "Adjective",
+          "surface": "大丈夫"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "ですっ"
+        }
+      ],
       "tags": [
         "emphatic",
         "sokuon"
@@ -476,6 +542,7 @@
       "description": "行くっ - emphatic sokuon after verb",
       "expected": [
         {
+          "lemma": "行くっ",
           "pos": "Verb",
           "surface": "行くっ"
         }
@@ -488,15 +555,27 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma diff: emphatic sokuon lemma difference"
+      },
       "description": "ますっっ - multiple emphatic sokuon",
       "expected": [
         {
+          "lemma": "ますっっ",
           "pos": "Auxiliary",
           "surface": "ますっっ"
         }
       ],
       "id": "emphatic_sokuon_multiple",
       "input": "ますっっ",
+      "suzume_expected": [
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ますっっ"
+        }
+      ],
       "tags": [
         "emphatic",
         "sokuon"
@@ -541,14 +620,17 @@
           "surface": "き"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "ああ",
           "pos": "Interjection",
           "surface": "ああ"
         },
         {
+          "lemma": "ああ",
           "pos": "Interjection",
           "surface": "ああ"
         }
@@ -572,15 +654,27 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "すごいいいい - vowel repetition for emphasis",
       "expected": [
         {
+          "lemma": "すごいいいい",
           "pos": "Adjective",
           "surface": "すごいいいい"
         }
       ],
       "id": "vowel_repeat_sugoi",
       "input": "すごいいいい",
+      "suzume_expected": [
+        {
+          "lemma": "すごい",
+          "pos": "Adjective",
+          "surface": "すごいいいい"
+        }
+      ],
       "tags": [
         "emphatic",
         "vowel_repeat"

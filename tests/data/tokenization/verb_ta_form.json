@@ -1,6 +1,10 @@
 {
   "cases": [
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "Regression: 棄てる ichidan verb dict entry",
       "expected": [
         {
@@ -9,24 +13,55 @@
           "surface": "棄て"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "物",
           "pos": "Noun",
           "surface": "物"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "拾う",
           "pos": "Verb",
           "surface": "拾う"
         }
       ],
       "id": "teta_wo_u",
-      "input": "棄てた物を拾う"
+      "input": "棄てた物を拾う",
+      "suzume_expected": [
+        {
+          "lemma": "棄てる",
+          "pos": "Verb",
+          "surface": "棄て"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "物"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "拾う",
+          "pos": "Verb",
+          "surface": "拾う"
+        }
+      ]
     }
   ],
   "description": "verb_ta_form tests",

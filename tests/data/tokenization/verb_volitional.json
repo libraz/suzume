@@ -9,10 +9,12 @@
           "surface": "書こ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -22,10 +24,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -42,10 +46,12 @@
           "surface": "食べよ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -55,10 +61,12 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "いる",
           "pos": "Auxiliary",
           "surface": "いる"
         }
@@ -75,10 +83,12 @@
           "surface": "逃げよ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -88,6 +98,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -104,14 +115,17 @@
           "surface": "行こ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }

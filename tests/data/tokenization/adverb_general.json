@@ -4,10 +4,12 @@
       "description": "B32: あんだけ should be single adverb",
       "expected": [
         {
+          "lemma": "あん",
           "pos": "Noun",
           "surface": "あん"
         },
         {
+          "lemma": "だけ",
           "pos": "Particle",
           "surface": "だけ"
         }
@@ -28,10 +30,12 @@
           "surface": "こん"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         },
         {
+          "lemma": "け",
           "pos": "Particle",
           "surface": "け"
         }
@@ -47,10 +51,12 @@
       "description": "B32: そんだけ should be single adverb",
       "expected": [
         {
+          "lemma": "そん",
           "pos": "Noun",
           "surface": "そん"
         },
         {
+          "lemma": "だけ",
           "pos": "Particle",
           "surface": "だけ"
         }
@@ -66,6 +72,7 @@
       "description": "B34: 一際 should be adverb",
       "expected": [
         {
+          "lemma": "一際",
           "pos": "Adverb",
           "surface": "一際"
         },
@@ -85,6 +92,7 @@
       "description": "B36: 思わず should be ADV, not NOUN; しまった should be auxiliary しまう",
       "expected": [
         {
+          "lemma": "思わず",
           "pos": "Adverb",
           "surface": "思わず"
         },
@@ -94,6 +102,7 @@
           "surface": "言っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -103,6 +112,7 @@
           "surface": "しまっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -118,10 +128,12 @@
       "description": "俄然 should be ADV, not NOUN (compound split fix)",
       "expected": [
         {
+          "lemma": "俄然",
           "pos": "Adverb",
           "surface": "俄然"
         },
         {
+          "lemma": "注目",
           "pos": "Noun",
           "surface": "注目"
         }
@@ -137,10 +149,12 @@
       "description": "めっちゃ should be Adverb",
       "expected": [
         {
+          "lemma": "めっちゃ",
           "pos": "Adverb",
           "surface": "めっちゃ"
         },
         {
+          "lemma": "面白い",
           "pos": "Adjective",
           "surface": "面白い"
         }
@@ -156,14 +170,17 @@
       "description": "今すぐ should be Adverb",
       "expected": [
         {
+          "lemma": "今",
           "pos": "Noun",
           "surface": "今"
         },
         {
+          "lemma": "すぐ",
           "pos": "Adverb",
           "surface": "すぐ"
         },
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         }
@@ -178,14 +195,17 @@
       "description": "もし should be Adverb",
       "expected": [
         {
+          "lemma": "もし",
           "pos": "Adverb",
           "surface": "もし"
         },
         {
+          "lemma": "雨",
           "pos": "Noun",
           "surface": "雨"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -210,22 +230,27 @@
       "description": "それぞれ should be single Adverb token",
       "expected": [
         {
+          "lemma": "それぞれ",
           "pos": "Noun",
           "surface": "それぞれ"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "意見",
           "pos": "Noun",
           "surface": "意見"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "述べる",
           "pos": "Verb",
           "surface": "述べる"
         }
@@ -240,14 +265,17 @@
       "description": "たくさん should be Adverb, not split",
       "expected": [
         {
+          "lemma": "たくさん",
           "pos": "Adverb",
           "surface": "たくさん"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         }
@@ -262,10 +290,12 @@
       "description": "いつも should be Adverb, not split",
       "expected": [
         {
+          "lemma": "いつも",
           "pos": "Adverb",
           "surface": "いつも"
         },
         {
+          "lemma": "元気",
           "pos": "Adjective",
           "surface": "元気"
         }
@@ -280,10 +310,12 @@
       "description": "まず should be Adverb",
       "expected": [
         {
+          "lemma": "まず",
           "pos": "Adverb",
           "surface": "まず"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -303,10 +335,12 @@
       "description": "いつも楽しい",
       "expected": [
         {
+          "lemma": "いつも",
           "pos": "Adverb",
           "surface": "いつも"
         },
         {
+          "lemma": "楽しい",
           "pos": "Adjective",
           "surface": "楽しい"
         }
@@ -322,14 +356,17 @@
       "description": "いつもの店 - NOT いつ + もの + 店",
       "expected": [
         {
+          "lemma": "いつも",
           "pos": "Adverb",
           "surface": "いつも"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "店",
           "pos": "Noun",
           "surface": "店"
         }
@@ -349,18 +386,22 @@
       "description": "たとえ should be Adverb (conditional) - grammar-first: で(AUX,だ)+も(PARTICLE)",
       "expected": [
         {
+          "lemma": "たとえ",
           "pos": "Adverb",
           "surface": "たとえ"
         },
         {
+          "lemma": "雨",
           "pos": "Noun",
           "surface": "雨"
         },
         {
+          "lemma": "でも",
           "pos": "Conjunction",
           "surface": "でも"
         },
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         }
@@ -393,10 +434,12 @@
       "description": "あまりにも - あまり should be ADV, not VERB あまる",
       "expected": [
         {
+          "lemma": "あまりに",
           "pos": "Adverb",
           "surface": "あまりに"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         }
@@ -412,6 +455,7 @@
       "description": "いかが should be single token",
       "expected": [
         {
+          "lemma": "いかが",
           "pos": "Adverb",
           "surface": "いかが"
         }
@@ -427,6 +471,7 @@
       "description": "どうして should be single token",
       "expected": [
         {
+          "lemma": "どうして",
           "pos": "Adverb",
           "surface": "どうして"
         }
@@ -442,6 +487,7 @@
       "description": "よろしく should be single token",
       "expected": [
         {
+          "lemma": "よろしく",
           "pos": "Adverb",
           "surface": "よろしく"
         }
@@ -457,6 +503,7 @@
       "description": "D1: なるほど should be ADV, not なる+ほど",
       "expected": [
         {
+          "lemma": "なるほど",
           "pos": "Adverb",
           "surface": "なるほど"
         }
@@ -473,10 +520,12 @@
       "description": "D1: もちろん should be ADV, not も+ちろん",
       "expected": [
         {
+          "lemma": "もちろん",
           "pos": "Adverb",
           "surface": "もちろん"
         },
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         }
@@ -493,10 +542,12 @@
       "description": "D1: もはや should be ADV, not も+は+や",
       "expected": [
         {
+          "lemma": "もはや",
           "pos": "Adverb",
           "surface": "もはや"
         },
         {
+          "lemma": "遅い",
           "pos": "Adjective",
           "surface": "遅い"
         }
@@ -513,10 +564,12 @@
       "description": "D1: いきなり should be ADV, not いき+なり",
       "expected": [
         {
+          "lemma": "いきなり",
           "pos": "Adverb",
           "surface": "いきなり"
         },
         {
+          "lemma": "走る",
           "pos": "Verb",
           "surface": "走る"
         }
@@ -533,10 +586,12 @@
       "description": "D1: とりあえず should be ADV, not と+りあえず",
       "expected": [
         {
+          "lemma": "とりあえず",
           "pos": "Adverb",
           "surface": "とりあえず"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         }
@@ -553,10 +608,12 @@
       "description": "D1: ぜひ should be ADV, not AUX",
       "expected": [
         {
+          "lemma": "ぜひ",
           "pos": "Adverb",
           "surface": "ぜひ"
         },
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         }
@@ -573,6 +630,7 @@
       "description": "D1: とにかく should be ADV, not と+に+かく",
       "expected": [
         {
+          "lemma": "とにかく",
           "pos": "Adverb",
           "surface": "とにかく"
         },
@@ -582,6 +640,7 @@
           "surface": "始めよ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         }
@@ -598,6 +657,7 @@
       "description": "D1: すでに should be ADV, not す+で+に",
       "expected": [
         {
+          "lemma": "すでに",
           "pos": "Adverb",
           "surface": "すでに"
         },
@@ -607,6 +667,7 @@
           "surface": "終わっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -623,10 +684,12 @@
       "description": "D2: いざ should be ADV, not AUX - MeCab splits なっ + たら",
       "expected": [
         {
+          "lemma": "いざ",
           "pos": "Adverb",
           "surface": "いざ"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -653,14 +716,17 @@
       "description": "D2: やたら should be ADV",
       "expected": [
         {
+          "lemma": "やたら",
           "pos": "Adverb",
           "surface": "やたら"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "高い",
           "pos": "Adjective",
           "surface": "高い"
         }
@@ -677,10 +743,12 @@
       "description": "D2: あらかじめ should be ADV",
       "expected": [
         {
+          "lemma": "あらかじめ",
           "pos": "Adverb",
           "surface": "あらかじめ"
         },
         {
+          "lemma": "準備",
           "pos": "Noun",
           "surface": "準備"
         }
@@ -697,10 +765,12 @@
       "description": "D2: どうせ should be ADV",
       "expected": [
         {
+          "lemma": "どうせ",
           "pos": "Adverb",
           "surface": "どうせ"
         },
         {
+          "lemma": "無理",
           "pos": "Adjective",
           "surface": "無理"
         }
@@ -717,10 +787,12 @@
       "description": "D2: ひたすら should be ADV",
       "expected": [
         {
+          "lemma": "ひたすら",
           "pos": "Adverb",
           "surface": "ひたすら"
         },
         {
+          "lemma": "走る",
           "pos": "Verb",
           "surface": "走る"
         }
@@ -737,10 +809,12 @@
       "description": "D2: つくづく should be ADV",
       "expected": [
         {
+          "lemma": "つくづく",
           "pos": "Adverb",
           "surface": "つくづく"
         },
         {
+          "lemma": "思う",
           "pos": "Verb",
           "surface": "思う"
         }
@@ -757,6 +831,7 @@
       "description": "S7: ほんわか should be ADV (not ほん+わ+か)",
       "expected": [
         {
+          "lemma": "ほんわか",
           "pos": "Adverb",
           "surface": "ほんわか"
         }
@@ -773,6 +848,7 @@
       "description": "S7: しどろもどろ should be ADV (not し+どろ+も+どろ)",
       "expected": [
         {
+          "lemma": "しどろもどろ",
           "pos": "Adverb",
           "surface": "しどろもどろ"
         }
@@ -789,10 +865,12 @@
       "description": "あとで (later) - MeCab-compatible split: あと(NOUN) + で(PARTICLE)",
       "expected": [
         {
+          "lemma": "あと",
           "pos": "Noun",
           "surface": "あと"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -808,6 +886,7 @@
       "description": "到底 (utterly/by no means) - adverb for negative expressions",
       "expected": [
         {
+          "lemma": "到底",
           "pos": "Adverb",
           "surface": "到底"
         }
@@ -823,6 +902,7 @@
       "description": "いずれ (eventually/either) - adverb for future time or choice",
       "expected": [
         {
+          "lemma": "いずれ",
           "pos": "Adverb",
           "surface": "いずれ"
         }
@@ -838,6 +918,7 @@
       "description": "ちっとも should be single ADV, not ちっ+と+も split",
       "expected": [
         {
+          "lemma": "ちっとも",
           "pos": "Adverb",
           "surface": "ちっとも"
         },
@@ -847,6 +928,7 @@
           "surface": "分から"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -867,6 +949,7 @@
           "surface": "大いに"
         },
         {
+          "lemma": "期待",
           "pos": "Noun",
           "surface": "期待"
         },
@@ -887,10 +970,12 @@
       "description": "なにしろ should be single ADV, not PRON+VERB split",
       "expected": [
         {
+          "lemma": "なにしろ",
           "pos": "Adverb",
           "surface": "なにしろ"
         },
         {
+          "lemma": "忙しい",
           "pos": "Adjective",
           "surface": "忙しい"
         }
@@ -903,54 +988,114 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma/POS diff: よう Noun vs Auxiliary"
+      },
       "description": "あたかも should be single ADV",
       "expected": [
         {
+          "lemma": "あたかも",
           "pos": "Adverb",
           "surface": "あたかも"
         },
         {
+          "lemma": "夢",
           "pos": "Noun",
           "surface": "夢"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
-          "pos": "Noun",
+          "lemma": "よう",
+          "pos": "Auxiliary",
           "surface": "よう"
         }
       ],
       "id": "adv_atakamo",
       "input": "あたかも夢のよう",
+      "suzume_expected": [
+        {
+          "lemma": "あたかも",
+          "pos": "Adverb",
+          "surface": "あたかも"
+        },
+        {
+          "lemma": "夢",
+          "pos": "Noun",
+          "surface": "夢"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        }
+      ],
       "tags": [
         "adverb",
         "split_prevention"
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "さながら should be single ADV",
       "expected": [
         {
+          "lemma": "さながら",
           "pos": "Adverb",
           "surface": "さながら"
         },
         {
+          "lemma": "映画",
           "pos": "Noun",
           "surface": "映画"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
-          "pos": "Noun",
+          "lemma": "よう",
+          "pos": "Auxiliary",
           "surface": "よう"
         }
       ],
       "id": "adv_sanagara",
       "input": "さながら映画のよう",
+      "suzume_expected": [
+        {
+          "lemma": "さながら",
+          "pos": "Adverb",
+          "surface": "さながら"
+        },
+        {
+          "lemma": "映画",
+          "pos": "Noun",
+          "surface": "映画"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        }
+      ],
       "tags": [
         "adverb",
         "split_prevention"
@@ -960,6 +1105,7 @@
       "description": "もしかすると雨かも - MeCab-compatible split: もしか(ADV) + する(VERB) + と(PARTICLE)",
       "expected": [
         {
+          "lemma": "もしか",
           "pos": "Adverb",
           "surface": "もしか"
         },
@@ -969,14 +1115,17 @@
           "surface": "する"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "雨",
           "pos": "Noun",
           "surface": "雨"
         },
         {
+          "lemma": "かも",
           "pos": "Particle",
           "surface": "かも"
         }
@@ -992,14 +1141,17 @@
       "description": "少々 should be ADV, not NOUN",
       "expected": [
         {
+          "lemma": "少々",
           "pos": "Adverb",
           "surface": "少々"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "待ち",
           "pos": "Noun",
           "surface": "待ち"
         },
@@ -1020,10 +1172,12 @@
       "description": "多少 should be ADV, not NOUN",
       "expected": [
         {
+          "lemma": "多少",
           "pos": "Adverb",
           "surface": "多少"
         },
         {
+          "lemma": "高い",
           "pos": "Adjective",
           "surface": "高い"
         }
@@ -1039,6 +1193,7 @@
       "description": "若干 standalone should be ADV",
       "expected": [
         {
+          "lemma": "若干",
           "pos": "Noun",
           "surface": "若干"
         }
@@ -1054,6 +1209,7 @@
       "description": "大体 (kanji) standalone should be ADV",
       "expected": [
         {
+          "lemma": "大体",
           "pos": "Noun",
           "surface": "大体"
         }
@@ -1069,6 +1225,7 @@
       "description": "だいたい should be ADV - MeCab-compatible lemma is hiragana",
       "expected": [
         {
+          "lemma": "だいたい",
           "pos": "Adverb",
           "surface": "だいたい"
         },
@@ -1078,6 +1235,7 @@
           "surface": "終わっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1094,10 +1252,12 @@
       "description": "いったい should be ADV, not いっ+たい split (MeCab-compatible hiragana lemma)",
       "expected": [
         {
+          "lemma": "いったい",
           "pos": "Adverb",
           "surface": "いったい"
         },
         {
+          "lemma": "何だ",
           "pos": "Interjection",
           "surface": "何だ"
         }
@@ -1114,10 +1274,12 @@
       "description": "せめて should be ADV, not VERB せめる te-form",
       "expected": [
         {
+          "lemma": "せめて",
           "pos": "Adverb",
           "surface": "せめて"
         },
         {
+          "lemma": "一つ",
           "pos": "Noun",
           "surface": "一つ"
         }
@@ -1149,10 +1311,12 @@
       "description": "ほぼ should be ADV, not AUX",
       "expected": [
         {
+          "lemma": "ほぼ",
           "pos": "Adverb",
           "surface": "ほぼ"
         },
         {
+          "lemma": "完成",
           "pos": "Noun",
           "surface": "完成"
         }
@@ -1168,6 +1332,7 @@
       "description": "到底 should be ADV, not NOUN (W-012)",
       "expected": [
         {
+          "lemma": "到底",
           "pos": "Adverb",
           "surface": "到底"
         },
@@ -1177,6 +1342,7 @@
           "surface": "助から"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -1194,6 +1360,7 @@
       "description": "再び should be ADV, not NOUN (W-012)",
       "expected": [
         {
+          "lemma": "再び",
           "pos": "Adverb",
           "surface": "再び"
         },
@@ -1216,10 +1383,12 @@
       "description": "こっそり見る - auto-generated",
       "expected": [
         {
+          "lemma": "こっそり",
           "pos": "Adverb",
           "surface": "こっそり"
         },
         {
+          "lemma": "見る",
           "pos": "Verb",
           "surface": "見る"
         }
@@ -1235,10 +1404,12 @@
       "description": "こっそり食べる - auto-generated",
       "expected": [
         {
+          "lemma": "こっそり",
           "pos": "Adverb",
           "surface": "こっそり"
         },
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         }
@@ -1254,10 +1425,12 @@
       "description": "ぐっすり眠る - auto-generated",
       "expected": [
         {
+          "lemma": "ぐっすり",
           "pos": "Adverb",
           "surface": "ぐっすり"
         },
         {
+          "lemma": "眠る",
           "pos": "Verb",
           "surface": "眠る"
         }
@@ -1273,10 +1446,12 @@
       "description": "いっぱいある - auto-generated",
       "expected": [
         {
+          "lemma": "いっぱい",
           "pos": "Adverb",
           "surface": "いっぱい"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
@@ -1292,10 +1467,12 @@
       "description": "ほんとに好き - auto-generated",
       "expected": [
         {
+          "lemma": "ほんとに",
           "pos": "Adverb",
           "surface": "ほんとに"
         },
         {
+          "lemma": "好き",
           "pos": "Adjective",
           "surface": "好き"
         }
@@ -1311,6 +1488,7 @@
       "description": "初めて会った - auto-generated",
       "expected": [
         {
+          "lemma": "初めて",
           "pos": "Adverb",
           "surface": "初めて"
         },
@@ -1320,6 +1498,7 @@
           "surface": "会っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1331,6 +1510,7 @@
       "description": "初めて見た - auto-generated",
       "expected": [
         {
+          "lemma": "初めて",
           "pos": "Adverb",
           "surface": "初めて"
         },
@@ -1340,6 +1520,7 @@
           "surface": "見"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1351,6 +1532,7 @@
       "description": "Dict adverb おめでとう: should not split",
       "expected": [
         {
+          "lemma": "おめでとう",
           "pos": "Adverb",
           "surface": "おめでとう"
         },
@@ -1360,6 +1542,7 @@
           "surface": "ござい"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }

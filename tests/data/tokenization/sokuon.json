@@ -1,107 +1,115 @@
 {
-  "name": "Sokuon",
-  "description": "Tests for sokuon (促音) patterns: 漢字+っ+漢字/平仮名",
   "cases": [
     {
-      "id": "sokuon_kanji_kanji",
       "description": "Kanji + っ + Kanji pattern (横っ面) with known GodanRa verb - MeCab splits て-form",
+      "expected": [
+        {
+          "lemma": "横っ面",
+          "pos": "Noun",
+          "surface": "横っ面"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "張る",
+          "pos": "Verb",
+          "surface": "張っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "sokuon_kanji_kanji",
       "input": "横っ面を張って",
-      "expected": [
-        {
-          "surface": "横っ面",
-          "pos": "Noun"
-        },
-        {
-          "surface": "を",
-          "pos": "Particle"
-        },
-        {
-          "surface": "張っ",
-          "pos": "Verb",
-          "lemma": "張る"
-        },
-        {
-          "surface": "て",
-          "pos": "Particle"
-        }
-      ],
       "tags": [
         "sokuon",
         "compound"
       ]
     },
     {
-      "id": "sokuon_kanji_kanji_totte",
       "description": "Kanji + っ + Kanji pattern (取っ手)",
-      "input": "取っ手を持つ",
       "expected": [
         {
-          "surface": "取っ手",
-          "pos": "Noun"
+          "lemma": "取っ手",
+          "pos": "Noun",
+          "surface": "取っ手"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "surface": "持つ",
+          "lemma": "持つ",
           "pos": "Verb",
-          "lemma": "持つ"
+          "surface": "持つ"
         }
       ],
+      "id": "sokuon_kanji_kanji_totte",
+      "input": "取っ手を持つ",
       "tags": [
         "sokuon",
         "compound"
       ]
     },
     {
-      "id": "sokuon_verb_ta_form",
       "description": "Verb ta-form with っ should NOT match sokuon compound pattern",
-      "input": "減った",
       "expected": [
         {
-          "surface": "減っ",
+          "lemma": "減る",
           "pos": "Verb",
-          "lemma": "減る"
+          "surface": "減っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
+      "id": "sokuon_verb_ta_form",
+      "input": "減った",
       "tags": [
         "sokuon",
         "verb"
       ]
     },
     {
-      "id": "sokuon_verb_te_form",
       "description": "Verb te-form with っ should NOT match sokuon compound pattern",
-      "input": "勝って帰った",
       "expected": [
         {
-          "surface": "勝っ",
+          "lemma": "勝つ",
           "pos": "Verb",
-          "lemma": "勝つ"
+          "surface": "勝っ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "surface": "帰っ",
+          "lemma": "帰る",
           "pos": "Verb",
-          "lemma": "帰る"
+          "surface": "帰っ"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
+      "id": "sokuon_verb_te_form",
+      "input": "勝って帰った",
       "tags": [
         "sokuon",
         "verb"
       ]
     }
-  ]
+  ],
+  "description": "Tests for sokuon (促音) patterns: 漢字+っ+漢字/平仮名",
+  "name": "Sokuon"
 }

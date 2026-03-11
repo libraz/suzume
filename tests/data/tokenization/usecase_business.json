@@ -4,14 +4,17 @@
       "description": "Business email opening: お世話になっております - compound auxiliary form",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "世話",
           "pos": "Noun",
           "surface": "世話"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -21,6 +24,7 @@
           "surface": "なっ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -30,6 +34,7 @@
           "surface": "おり"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -45,10 +50,12 @@
       "description": "Internal greeting: お疲れ様です",
       "expected": [
         {
+          "lemma": "お疲れ様",
           "pos": "Interjection",
           "surface": "お疲れ様"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -64,10 +71,12 @@
       "description": "Polite request: ご確認ください",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -88,30 +97,37 @@
       "description": "Polite request: ご検討のほどよろしくお願いいたします - MeCab互換分割",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "検討",
           "pos": "Noun",
           "surface": "検討"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "ほど",
           "pos": "Particle",
           "surface": "ほど"
         },
         {
+          "lemma": "よろしく",
           "pos": "Adverb",
           "surface": "よろしく"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "願い",
           "pos": "Noun",
           "surface": "願い"
         },
@@ -121,6 +137,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -136,14 +153,17 @@
       "description": "Standard closing: よろしくお願いいたします - MeCab互換分割",
       "expected": [
         {
+          "lemma": "よろしく",
           "pos": "Adverb",
           "surface": "よろしく"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "願い",
           "pos": "Noun",
           "surface": "願い"
         },
@@ -153,6 +173,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -168,18 +189,22 @@
       "description": "Closing: 以上、よろしくお願いします - MeCab互換分割",
       "expected": [
         {
+          "lemma": "以上",
           "pos": "Noun",
           "surface": "以上"
         },
         {
+          "lemma": "よろしく",
           "pos": "Adverb",
           "surface": "よろしく"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "願い",
           "pos": "Noun",
           "surface": "願い"
         },
@@ -189,6 +214,7 @@
           "surface": "し"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -204,14 +230,17 @@
       "description": "Attachment notification - MeCab互換分割",
       "expected": [
         {
+          "lemma": "資料",
           "pos": "Noun",
           "surface": "資料"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "添付",
           "pos": "Noun",
           "surface": "添付"
         },
@@ -226,18 +255,22 @@
           "surface": "まし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "ので",
           "pos": "Particle",
           "surface": "ので"
         },
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -258,10 +291,12 @@
       "description": "Response request: ご返信いただけますと幸いです (itadakemasu = potential of itadaku)",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "返信",
           "pos": "Noun",
           "surface": "返信"
         },
@@ -271,18 +306,22 @@
           "surface": "いただけ"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "幸い",
           "pos": "Adjective",
           "surface": "幸い"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -302,6 +341,7 @@
       "description": "Apology: 申し訳ございませんが",
       "expected": [
         {
+          "lemma": "申し訳",
           "pos": "Noun",
           "surface": "申し訳"
         },
@@ -316,10 +356,12 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         }
@@ -359,6 +401,7 @@
       "description": "Inquiry: いかがでしょうか",
       "expected": [
         {
+          "lemma": "いかが",
           "pos": "Adjective",
           "surface": "いかが"
         },
@@ -368,10 +411,12 @@
           "surface": "でしょ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -387,14 +432,17 @@
       "description": "Full date format: 2024年12月23日付けで",
       "expected": [
         {
+          "lemma": "2024年12月23日",
           "pos": "Noun",
           "surface": "2024年12月23日"
         },
         {
+          "lemma": "付け",
           "pos": "Noun",
           "surface": "付け"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -410,14 +458,17 @@
       "description": "Currency: 100万円の請求書",
       "expected": [
         {
+          "lemma": "100万円",
           "pos": "Noun",
           "surface": "100万円"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "請求書",
           "pos": "Noun",
           "surface": "請求書"
         }
@@ -433,14 +484,17 @@
       "description": "Large currency: 3億5000万円の売上",
       "expected": [
         {
+          "lemma": "3億5000万円",
           "pos": "Noun",
           "surface": "3億5000万円"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "売上",
           "pos": "Noun",
           "surface": "売上"
         }
@@ -456,22 +510,27 @@
       "description": "Company name: 株式会社ABCの田中様",
       "expected": [
         {
+          "lemma": "株式会社",
           "pos": "Noun",
           "surface": "株式会社"
         },
         {
+          "lemma": "ABC",
           "pos": "Noun",
           "surface": "ABC"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "田中",
           "pos": "Noun",
           "surface": "田中"
         },
         {
+          "lemma": "様",
           "pos": "Noun",
           "surface": "様"
         }
@@ -487,18 +546,22 @@
       "description": "Address: 東京都渋谷区に所在する - MeCab互換分割",
       "expected": [
         {
+          "lemma": "東京都渋谷区",
           "pos": "Noun",
           "surface": "東京都渋谷区"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "所在",
           "pos": "Noun",
           "surface": "所在"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -514,22 +577,27 @@
       "description": "Deadline: 今月末までに提出してください - MeCab互換分割",
       "expected": [
         {
+          "lemma": "今月",
           "pos": "Noun",
           "surface": "今月"
         },
         {
+          "lemma": "末",
           "pos": "Noun",
           "surface": "末"
         },
         {
+          "lemma": "まで",
           "pos": "Particle",
           "surface": "まで"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "提出",
           "pos": "Noun",
           "surface": "提出"
         },
@@ -539,6 +607,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -559,14 +628,17 @@
       "description": "Topic marker: 契約内容について確認する - MeCab互換分割",
       "expected": [
         {
+          "lemma": "契約内容",
           "pos": "Noun",
           "surface": "契約内容"
         },
         {
+          "lemma": "について",
           "pos": "Particle",
           "surface": "について"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -587,18 +659,22 @@
       "description": "Topic marker: 本件に関して報告する - MeCab互換分割",
       "expected": [
         {
+          "lemma": "本件",
           "pos": "Noun",
           "surface": "本件"
         },
         {
+          "lemma": "に関して",
           "pos": "Particle",
           "surface": "に関して"
         },
         {
+          "lemma": "報告",
           "pos": "Noun",
           "surface": "報告"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -614,18 +690,22 @@
       "description": "Capacity: 代表者として署名する (として compound particle)",
       "expected": [
         {
+          "lemma": "代表者",
           "pos": "Noun",
           "surface": "代表者"
         },
         {
+          "lemma": "として",
           "pos": "Particle",
           "surface": "として"
         },
         {
+          "lemma": "署名",
           "pos": "Noun",
           "surface": "署名"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -641,26 +721,32 @@
       "description": "Meeting time: 明日の10時に会議があります (split: verb stem + polite aux)",
       "expected": [
         {
+          "lemma": "明日",
           "pos": "Noun",
           "surface": "明日"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "10時",
           "pos": "Noun",
           "surface": "10時"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "会議",
           "pos": "Noun",
           "surface": "会議"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -686,22 +772,27 @@
       "description": "Next week: 来週の月曜日に打ち合わせ",
       "expected": [
         {
+          "lemma": "来週",
           "pos": "Noun",
           "surface": "来週"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "月曜日",
           "pos": "Noun",
           "surface": "月曜日"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "打ち合わせ",
           "pos": "Noun",
           "surface": "打ち合わせ"
         }
@@ -717,22 +808,27 @@
       "description": "This month: 今月の予定を確認する - MeCab互換分割",
       "expected": [
         {
+          "lemma": "今月",
           "pos": "Noun",
           "surface": "今月"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "予定",
           "pos": "Noun",
           "surface": "予定"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -753,22 +849,27 @@
       "description": "Postponement: 会議を来週に延期します - MeCab互換分割",
       "expected": [
         {
+          "lemma": "会議",
           "pos": "Noun",
           "surface": "会議"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "来週",
           "pos": "Noun",
           "surface": "来週"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "延期",
           "pos": "Noun",
           "surface": "延期"
         },
@@ -795,18 +896,22 @@
       "description": "Time range: 14時から16時まで",
       "expected": [
         {
+          "lemma": "14時",
           "pos": "Noun",
           "surface": "14時"
         },
         {
+          "lemma": "から",
           "pos": "Particle",
           "surface": "から"
         },
         {
+          "lemma": "16時",
           "pos": "Noun",
           "surface": "16時"
         },
         {
+          "lemma": "まで",
           "pos": "Particle",
           "surface": "まで"
         }
@@ -826,6 +931,7 @@
       "description": "Transaction: お振込みは翌営業日に反映されます - MeCab互換分割",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
@@ -835,18 +941,22 @@
           "surface": "振込み"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "翌営業日",
           "pos": "Noun",
           "surface": "翌営業日"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "反映",
           "pos": "Noun",
           "surface": "反映"
         },
@@ -861,6 +971,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -916,22 +1027,27 @@
       "description": "Interest rate: 金利は年率0.5%です",
       "expected": [
         {
+          "lemma": "金利",
           "pos": "Noun",
           "surface": "金利"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "年率",
           "pos": "Noun",
           "surface": "年率"
         },
         {
+          "lemma": "0.5%",
           "pos": "Noun",
           "surface": "0.5%"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -947,22 +1063,27 @@
       "description": "Budget: 予算は500万円を予定しています - MeCab互換分割",
       "expected": [
         {
+          "lemma": "予算",
           "pos": "Noun",
           "surface": "予算"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "500万円",
           "pos": "Noun",
           "surface": "500万円"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "予定",
           "pos": "Noun",
           "surface": "予定"
         },
@@ -972,6 +1093,7 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -981,6 +1103,7 @@
           "surface": "い"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -996,14 +1119,17 @@
       "description": "Invoice: 請求書を発行いたします - MeCab互換分割",
       "expected": [
         {
+          "lemma": "請求書",
           "pos": "Noun",
           "surface": "請求書"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "発行",
           "pos": "Noun",
           "surface": "発行"
         },
@@ -1013,6 +1139,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -1032,34 +1159,42 @@
       "description": "Payment: お支払いは月末締め翌月払いです",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "支払い",
           "pos": "Noun",
           "surface": "支払い"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "月",
           "pos": "Noun",
           "surface": "月"
         },
         {
+          "lemma": "末締め",
           "pos": "Noun",
           "surface": "末締め"
         },
         {
+          "lemma": "翌",
           "pos": "Prefix",
           "surface": "翌"
         },
         {
+          "lemma": "月払い",
           "pos": "Noun",
           "surface": "月払い"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -1115,22 +1250,27 @@
       "description": "Terms: 本サービスの利用に際して",
       "expected": [
         {
+          "lemma": "本",
           "pos": "Prefix",
           "surface": "本"
         },
         {
+          "lemma": "サービス",
           "pos": "Noun",
           "surface": "サービス"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "利用",
           "pos": "Noun",
           "surface": "利用"
         },
         {
+          "lemma": "に際して",
           "pos": "Particle",
           "surface": "に際して"
         }
@@ -1168,22 +1308,27 @@
       "description": "Prohibition: 以下の行為を禁止します - MeCab互換分割",
       "expected": [
         {
+          "lemma": "以下",
           "pos": "Noun",
           "surface": "以下"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "行為",
           "pos": "Noun",
           "surface": "行為"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "禁止",
           "pos": "Noun",
           "surface": "禁止"
         },
@@ -1210,30 +1355,37 @@
       "description": "Contract: 甲は乙に対して責任を負う",
       "expected": [
         {
+          "lemma": "甲",
           "pos": "Noun",
           "surface": "甲"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "乙",
           "pos": "Noun",
           "surface": "乙"
         },
         {
+          "lemma": "に対して",
           "pos": "Particle",
           "surface": "に対して"
         },
         {
+          "lemma": "責任",
           "pos": "Noun",
           "surface": "責任"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "負う",
           "pos": "Verb",
           "surface": "負う"
         }
@@ -1249,10 +1401,12 @@
       "description": "Cause: 法律によって定められた - MeCab互換分割",
       "expected": [
         {
+          "lemma": "法律",
           "pos": "Noun",
           "surface": "法律"
         },
         {
+          "lemma": "によって",
           "pos": "Particle",
           "surface": "によって"
         },
@@ -1267,6 +1421,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1282,14 +1437,17 @@
       "description": "Place: 本契約において定める",
       "expected": [
         {
+          "lemma": "本契約",
           "pos": "Noun",
           "surface": "本契約"
         },
         {
+          "lemma": "において",
           "pos": "Particle",
           "surface": "において"
         },
         {
+          "lemma": "定める",
           "pos": "Verb",
           "surface": "定める"
         }
@@ -1305,10 +1463,12 @@
       "description": "Basis: 規約に基づいて処理する - MeCab互換分割",
       "expected": [
         {
+          "lemma": "規約",
           "pos": "Noun",
           "surface": "規約"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -1318,14 +1478,17 @@
           "surface": "基づい"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "処理",
           "pos": "Noun",
           "surface": "処理"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -1345,14 +1508,17 @@
       "description": "Inquiry: 商品がまだ届いていないのですが",
       "expected": [
         {
+          "lemma": "商品",
           "pos": "Noun",
           "surface": "商品"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "まだ",
           "pos": "Adverb",
           "surface": "まだ"
         },
@@ -1362,6 +1528,7 @@
           "surface": "届い"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1371,18 +1538,22 @@
           "surface": "い"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         }
@@ -1447,10 +1618,12 @@
       "description": "Apology: 大変申し訳ございませんでした",
       "expected": [
         {
+          "lemma": "大変",
           "pos": "Adverb",
           "surface": "大変"
         },
         {
+          "lemma": "申し訳",
           "pos": "Noun",
           "surface": "申し訳"
         },
@@ -1465,6 +1638,7 @@
           "surface": "ませ"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         },
@@ -1474,6 +1648,7 @@
           "surface": "でし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1526,18 +1701,22 @@
       "description": "Return: 返品の手続きについて教えてください",
       "expected": [
         {
+          "lemma": "返品",
           "pos": "Noun",
           "surface": "返品"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "手続き",
           "pos": "Noun",
           "surface": "手続き"
         },
         {
+          "lemma": "について",
           "pos": "Particle",
           "surface": "について"
         },
@@ -1547,6 +1726,7 @@
           "surface": "教え"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1567,18 +1747,22 @@
       "description": "Confirmation: ご注文内容を確認させていただきます - MeCab互換分割",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "注文内容",
           "pos": "Noun",
           "surface": "注文内容"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -1593,6 +1777,7 @@
           "surface": "せ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -1602,6 +1787,7 @@
           "surface": "いただき"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -1617,14 +1803,17 @@
       "description": "Contact: お問い合わせありがとうございます",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "問い合わせ",
           "pos": "Noun",
           "surface": "問い合わせ"
         },
         {
+          "lemma": "ありがとう",
           "pos": "Interjection",
           "surface": "ありがとう"
         },
@@ -1634,6 +1823,7 @@
           "surface": "ござい"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -1649,22 +1839,27 @@
       "description": "Notice: 下記の通りお知らせいたします - MeCab互換分割",
       "expected": [
         {
+          "lemma": "下記",
           "pos": "Noun",
           "surface": "下記"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "通り",
           "pos": "Noun",
           "surface": "通り"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "知らせ",
           "pos": "Noun",
           "surface": "知らせ"
         },
@@ -1674,6 +1869,7 @@
           "surface": "いたし"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -1689,22 +1885,27 @@
       "description": "Decision: 以下の事項を決定しました - MeCab互換分割",
       "expected": [
         {
+          "lemma": "以下",
           "pos": "Noun",
           "surface": "以下"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "事項",
           "pos": "Noun",
           "surface": "事項"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "決定",
           "pos": "Noun",
           "surface": "決定"
         },
@@ -1736,30 +1937,37 @@
       "description": "Citation: 報告によると問題はない",
       "expected": [
         {
+          "lemma": "報告",
           "pos": "Noun",
           "surface": "報告"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "よる",
           "pos": "Verb",
           "surface": "よる"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "問題",
           "pos": "Noun",
           "surface": "問題"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "ない",
           "pos": "Adjective",
           "surface": "ない"
         }
@@ -1775,14 +1983,17 @@
       "description": "Viewpoint: 会社にとって重要な決定",
       "expected": [
         {
+          "lemma": "会社",
           "pos": "Noun",
           "surface": "会社"
         },
         {
+          "lemma": "にとって",
           "pos": "Particle",
           "surface": "にとって"
         },
         {
+          "lemma": "重要",
           "pos": "Adjective",
           "surface": "重要"
         },
@@ -1792,6 +2003,7 @@
           "surface": "な"
         },
         {
+          "lemma": "決定",
           "pos": "Noun",
           "surface": "決定"
         }
@@ -1807,14 +2019,17 @@
       "description": "People counter: 3人で行く",
       "expected": [
         {
+          "lemma": "3人",
           "pos": "Noun",
           "surface": "3人"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         }
@@ -1830,14 +2045,17 @@
       "description": "Times counter: 5回目の挑戦",
       "expected": [
         {
+          "lemma": "5回目",
           "pos": "Noun",
           "surface": "5回目"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "挑戦",
           "pos": "Noun",
           "surface": "挑戦"
         }
@@ -1853,18 +2071,22 @@
       "description": "Item counter: 10個の商品を",
       "expected": [
         {
+          "lemma": "10個",
           "pos": "Noun",
           "surface": "10個"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "商品",
           "pos": "Noun",
           "surface": "商品"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         }
@@ -1880,18 +2102,22 @@
       "description": "Percentage: 売上が20%増加した - MeCab互換分割",
       "expected": [
         {
+          "lemma": "売上",
           "pos": "Noun",
           "surface": "売上"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "20%",
           "pos": "Noun",
           "surface": "20%"
         },
         {
+          "lemma": "増加",
           "pos": "Noun",
           "surface": "増加"
         },
@@ -1901,6 +2127,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1916,22 +2143,27 @@
       "description": "Compound particle: この件については後日",
       "expected": [
         {
+          "lemma": "この",
           "pos": "Determiner",
           "surface": "この"
         },
         {
+          "lemma": "件",
           "pos": "Noun",
           "surface": "件"
         },
         {
+          "lemma": "について",
           "pos": "Particle",
           "surface": "について"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "後日",
           "pos": "Noun",
           "surface": "後日"
         }
@@ -1947,18 +2179,22 @@
       "description": "Compound particle として: 代表者として署名する",
       "expected": [
         {
+          "lemma": "代表者",
           "pos": "Noun",
           "surface": "代表者"
         },
         {
+          "lemma": "として",
           "pos": "Particle",
           "surface": "として"
         },
         {
+          "lemma": "署名",
           "pos": "Noun",
           "surface": "署名"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -1974,14 +2210,17 @@
       "description": "Compound particle をもって: 本日をもって終了",
       "expected": [
         {
+          "lemma": "本日",
           "pos": "Noun",
           "surface": "本日"
         },
         {
+          "lemma": "をもって",
           "pos": "Particle",
           "surface": "をもって"
         },
         {
+          "lemma": "終了",
           "pos": "Noun",
           "surface": "終了"
         }

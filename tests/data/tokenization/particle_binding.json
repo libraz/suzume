@@ -4,10 +4,12 @@
       "description": "私は - pronoun with particle",
       "expected": [
         {
+          "lemma": "私",
           "pos": "Pronoun",
           "surface": "私"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         }
@@ -43,10 +45,12 @@
       "description": "Kuruwa-kotoba ありんす",
       "expected": [
         {
+          "lemma": "ここ",
           "pos": "Pronoun",
           "surface": "ここ"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -56,6 +60,7 @@
           "surface": "あり"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         },
@@ -111,6 +116,7 @@
           "surface": "あり"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         },
@@ -120,10 +126,12 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -143,22 +151,27 @@
       "description": "Squid character でゲソ",
       "expected": [
         {
+          "lemma": "吾輩",
           "pos": "Pronoun",
           "surface": "吾輩"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "猫",
           "pos": "Noun",
           "surface": "猫"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "ゲソ",
           "pos": "Noun",
           "surface": "ゲソ"
         }
@@ -197,6 +210,7 @@
       "description": "Samurai speech ござった",
       "expected": [
         {
+          "lemma": "それで",
           "pos": "Conjunction",
           "surface": "それで"
         },
@@ -206,6 +220,7 @@
           "surface": "ござっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -221,14 +236,17 @@
       "description": "三人の学生 (three students)",
       "expected": [
         {
+          "lemma": "三人",
           "pos": "Noun",
           "surface": "三人"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "学生",
           "pos": "Noun",
           "surface": "学生"
         }
@@ -244,14 +262,17 @@
       "description": "二本のペン (two pens)",
       "expected": [
         {
+          "lemma": "二本",
           "pos": "Noun",
           "surface": "二本"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "ペン",
           "pos": "Noun",
           "surface": "ペン"
         }
@@ -267,14 +288,17 @@
       "description": "五個のリンゴ (five apples)",
       "expected": [
         {
+          "lemma": "五個",
           "pos": "Noun",
           "surface": "五個"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "リンゴ",
           "pos": "Noun",
           "surface": "リンゴ"
         }
@@ -290,14 +314,17 @@
       "description": "十枚の紙 (ten sheets of paper)",
       "expected": [
         {
+          "lemma": "十枚",
           "pos": "Noun",
           "surface": "十枚"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "紙",
           "pos": "Noun",
           "surface": "紙"
         }
@@ -313,14 +340,17 @@
       "description": "三冊の本 (three books)",
       "expected": [
         {
+          "lemma": "三冊",
           "pos": "Noun",
           "surface": "三冊"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         }
@@ -336,14 +366,17 @@
       "description": "君なら大丈夫 (if it's you, it's okay)",
       "expected": [
         {
+          "lemma": "君",
           "pos": "Pronoun",
           "surface": "君"
         },
         {
+          "lemma": "なら",
           "pos": "Particle",
           "surface": "なら"
         },
         {
+          "lemma": "大丈夫",
           "pos": "Adjective",
           "surface": "大丈夫"
         }
@@ -360,10 +393,12 @@
       "description": "速攻で (immediately)",
       "expected": [
         {
+          "lemma": "速攻",
           "pos": "Noun",
           "surface": "速攻"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -379,10 +414,12 @@
       "description": "秒速で (at lightning speed)",
       "expected": [
         {
+          "lemma": "秒速",
           "pos": "Noun",
           "surface": "秒速"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -398,10 +435,12 @@
       "description": "爆速で (at explosive speed)",
       "expected": [
         {
+          "lemma": "爆速",
           "pos": "Noun",
           "surface": "爆速"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -417,10 +456,12 @@
       "description": "光速で (at the speed of light)",
       "expected": [
         {
+          "lemma": "光速",
           "pos": "Noun",
           "surface": "光速"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -436,10 +477,12 @@
       "description": "確定で (definitely)",
       "expected": [
         {
+          "lemma": "確定",
           "pos": "Noun",
           "surface": "確定"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -455,10 +498,12 @@
       "description": "ソッコーで (immediately - katakana)",
       "expected": [
         {
+          "lemma": "ソッコー",
           "pos": "Noun",
           "surface": "ソッコー"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -474,10 +519,12 @@
       "description": "最後に (finally)",
       "expected": [
         {
+          "lemma": "最後",
           "pos": "Noun",
           "surface": "最後"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -493,10 +540,12 @@
       "description": "最初に (first)",
       "expected": [
         {
+          "lemma": "最初",
           "pos": "Noun",
           "surface": "最初"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -512,10 +561,12 @@
       "description": "同時に (simultaneously)",
       "expected": [
         {
+          "lemma": "同時",
           "pos": "Noun",
           "surface": "同時"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -531,10 +582,12 @@
       "description": "反対に (conversely)",
       "expected": [
         {
+          "lemma": "反対",
           "pos": "Noun",
           "surface": "反対"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -550,10 +603,12 @@
       "description": "一般に (generally)",
       "expected": [
         {
+          "lemma": "一般",
           "pos": "Noun",
           "surface": "一般"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -569,10 +624,12 @@
       "description": "次第に (gradually)",
       "expected": [
         {
+          "lemma": "次第",
           "pos": "Noun",
           "surface": "次第"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -588,10 +645,12 @@
       "description": "一気に (at once)",
       "expected": [
         {
+          "lemma": "一気",
           "pos": "Noun",
           "surface": "一気"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -607,10 +666,12 @@
       "description": "一斉に (all at once)",
       "expected": [
         {
+          "lemma": "一斉",
           "pos": "Noun",
           "surface": "一斉"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -626,10 +687,12 @@
       "description": "故意に (intentionally)",
       "expected": [
         {
+          "lemma": "故意",
           "pos": "Noun",
           "surface": "故意"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -645,10 +708,12 @@
       "description": "無意識に (unconsciously)",
       "expected": [
         {
+          "lemma": "無意識",
           "pos": "Noun",
           "surface": "無意識"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -664,10 +729,12 @@
       "description": "Quotation particle と with godan verb",
       "expected": [
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -693,14 +760,17 @@
       "description": "Quotation particle と with ichidan verb",
       "expected": [
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "思う",
           "pos": "Verb",
           "surface": "思う"
         }
@@ -716,22 +786,27 @@
       "description": "Conditional particle と",
       "expected": [
         {
+          "lemma": "春",
           "pos": "Noun",
           "surface": "春"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "なる",
           "pos": "Verb",
           "surface": "なる"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "咲く",
           "pos": "Verb",
           "surface": "咲く"
         }
@@ -747,18 +822,22 @@
       "description": "毎日電車で通勤 - compound nouns with particle",
       "expected": [
         {
+          "lemma": "毎日",
           "pos": "Noun",
           "surface": "毎日"
         },
         {
+          "lemma": "電車",
           "pos": "Noun",
           "surface": "電車"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "通勤",
           "pos": "Noun",
           "surface": "通勤"
         }
@@ -773,30 +852,37 @@
       "description": "Famous tongue twister すもももももももものうち",
       "expected": [
         {
+          "lemma": "すもも",
           "pos": "Noun",
           "surface": "すもも"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
         {
+          "lemma": "もも",
           "pos": "Noun",
           "surface": "もも"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
         {
+          "lemma": "もも",
           "pos": "Noun",
           "surface": "もも"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "うち",
           "pos": "Noun",
           "surface": "うち"
         }
@@ -811,22 +897,27 @@
       "description": "ちなみに should be Conjunction, not ちなむ verb",
       "expected": [
         {
+          "lemma": "ちなみに",
           "pos": "Conjunction",
           "surface": "ちなみに"
         },
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "晴れ",
           "pos": "Noun",
           "surface": "晴れ"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -857,10 +948,12 @@
       "description": "刻々と - iteration mark + particle",
       "expected": [
         {
+          "lemma": "刻々",
           "pos": "Noun",
           "surface": "刻々"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         }
@@ -876,10 +969,12 @@
       "description": "を should be recognized as separate particle",
       "expected": [
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -905,6 +1000,7 @@
       "description": "を should not be merged with verb, なくして is unified te-form",
       "expected": [
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -914,6 +1010,7 @@
           "surface": "なくし"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -929,6 +1026,7 @@
       "description": "を should be separate particle; しまった should be auxiliary しまう",
       "expected": [
         {
+          "lemma": "昨日",
           "pos": "Noun",
           "surface": "昨日"
         },
@@ -938,22 +1036,27 @@
           "surface": "買っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "ばかり",
           "pos": "Particle",
           "surface": "ばかり"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -963,6 +1066,7 @@
           "surface": "なくし"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -972,6 +1076,7 @@
           "surface": "しまっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1009,15 +1114,18 @@
       "description": "金がない should be split as 金 + が + ない",
       "expected": [
         {
+          "lemma": "金",
           "pos": "Noun",
           "surface": "金"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
-          "pos": "Auxiliary",
+          "lemma": "ない",
+          "pos": "Adjective",
           "surface": "ない"
         }
       ],
@@ -1046,10 +1154,12 @@
       "description": "くらい should be particle (degree), not 暗い adjective",
       "expected": [
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
         {
+          "lemma": "くらい",
           "pos": "Particle",
           "surface": "くらい"
         }
@@ -1065,10 +1175,12 @@
       "description": "ぐらい (voiced form of くらい) degree particle",
       "expected": [
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
         {
+          "lemma": "ぐらい",
           "pos": "Particle",
           "surface": "ぐらい"
         }
@@ -1084,14 +1196,17 @@
       "description": "なんて belittling/surprise particle",
       "expected": [
         {
+          "lemma": "なんて",
           "pos": "Particle",
           "surface": "なんて"
         },
         {
+          "lemma": "言う",
           "pos": "Verb",
           "surface": "言う"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         }
@@ -1107,10 +1222,12 @@
       "description": "ってば emphatic final particle",
       "expected": [
         {
+          "lemma": "もう",
           "pos": "Adverb",
           "surface": "もう"
         },
         {
+          "lemma": "ってば",
           "pos": "Particle",
           "surface": "ってば"
         }
@@ -1126,10 +1243,12 @@
       "description": "ったら topic/exclamation particle",
       "expected": [
         {
+          "lemma": "あなた",
           "pos": "Pronoun",
           "surface": "あなた"
         },
         {
+          "lemma": "ったら",
           "pos": "Particle",
           "surface": "ったら"
         }
@@ -1144,10 +1263,12 @@
     {
       "expected": [
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         }
@@ -1168,6 +1289,7 @@
           "surface": "上手い"
         },
         {
+          "lemma": "し",
           "pos": "Particle",
           "surface": "し"
         }
@@ -1184,10 +1306,12 @@
       "description": "Conjunctive particle し after katakana adjective",
       "expected": [
         {
+          "lemma": "エモい",
           "pos": "Adjective",
           "surface": "エモい"
         },
         {
+          "lemma": "し",
           "pos": "Particle",
           "surface": "し"
         }
@@ -1204,10 +1328,12 @@
       "description": "Conjunctive particle し in casual phrase",
       "expected": [
         {
+          "lemma": "エモい",
           "pos": "Adjective",
           "surface": "エモい"
         },
         {
+          "lemma": "し",
           "pos": "Particle",
           "surface": "し"
         },
@@ -1217,6 +1343,7 @@
           "surface": "バズっ"
         },
         {
+          "lemma": "てる",
           "pos": "Auxiliary",
           "surface": "てる"
         }
@@ -1234,6 +1361,7 @@
       "description": "いかがでしょうか should contain いかが as single token",
       "expected": [
         {
+          "lemma": "いかが",
           "pos": "Adjective",
           "surface": "いかが"
         },
@@ -1243,10 +1371,12 @@
           "surface": "でしょ"
         },
         {
+          "lemma": "う",
           "pos": "Auxiliary",
           "surface": "う"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -1262,14 +1392,17 @@
       "description": "100円 - MeCab splits number + counter suffix",
       "expected": [
         {
+          "lemma": "100円",
           "pos": "Noun",
           "surface": "100円"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "商品",
           "pos": "Noun",
           "surface": "商品"
         }

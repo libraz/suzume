@@ -148,13 +148,12 @@ def tokens_match(a: list[dict], b: list[dict]) -> bool:
 
 
 def format_expected(tokens: list[dict]) -> list[dict]:
-    """Format tokens for JSON output."""
+    """Format tokens for JSON output. Always includes lemma."""
     result = []
     for t in tokens:
         entry: dict = {"surface": t["surface"], "pos": t["pos"]}
         lemma = t.get("lemma", "")
-        if lemma and lemma != t["surface"]:
-            entry["lemma"] = lemma
+        entry["lemma"] = lemma if lemma else t["surface"]
         result.append(entry)
     return result
 

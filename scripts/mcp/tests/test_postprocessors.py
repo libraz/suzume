@@ -108,10 +108,11 @@ class TestPostprocessIruAux:
 
 
 class TestPostprocessDeParticle:
-    def test_de_before_ha(self):
+    def test_de_before_ha_stays_auxiliary(self):
+        """で before は stays Auxiliary (no-op: MeCab distinguishes copula/particle)."""
         tokens = [_tok("で", "Auxiliary"), _tok("は", "Particle")]
         postprocess_de_particle(tokens)
-        assert tokens[0]["pos"] == "Particle"
+        assert tokens[0]["pos"] == "Auxiliary"
 
     def test_de_after_adjective_stays_auxiliary(self):
         """で after Adjective stays Auxiliary (copula て-form)."""

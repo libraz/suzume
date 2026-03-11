@@ -4,6 +4,7 @@
       "description": "いい should be recognized as Adjective with lemma よい",
       "expected": [
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         }
@@ -20,10 +21,12 @@
       "description": "いい天気 - いい as attributive form",
       "expected": [
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         },
         {
+          "lemma": "天気",
           "pos": "Noun",
           "surface": "天気"
         }
@@ -40,6 +43,7 @@
       "description": "よい should be recognized as Adjective",
       "expected": [
         {
+          "lemma": "よい",
           "pos": "Adjective",
           "surface": "よい"
         }
@@ -61,6 +65,7 @@
           "surface": "よけれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         }
@@ -78,10 +83,12 @@
       "description": "いいです - polite form with いい",
       "expected": [
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -99,14 +106,17 @@
       "description": "いいよね - with sentence-ending particles",
       "expected": [
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         },
         {
+          "lemma": "よ",
           "pos": "Particle",
           "surface": "よ"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -124,22 +134,27 @@
       "description": "私は猫が好き - mixed sentence",
       "expected": [
         {
+          "lemma": "私",
           "pos": "Pronoun",
           "surface": "私"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "猫",
           "pos": "Noun",
           "surface": "猫"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "好き",
           "pos": "Adjective",
           "surface": "好き"
         }
@@ -155,14 +170,17 @@
       "description": "えっ！？本当に？ - mixed punctuation",
       "expected": [
         {
+          "lemma": "えっ",
           "pos": "Interjection",
           "surface": "えっ"
         },
         {
+          "lemma": "本当",
           "pos": "Noun",
           "surface": "本当"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -178,10 +196,12 @@
       "description": "とても面白い - とても should be one adverb",
       "expected": [
         {
+          "lemma": "とても",
           "pos": "Adverb",
           "surface": "とても"
         },
         {
+          "lemma": "面白い",
           "pos": "Adjective",
           "surface": "面白い"
         }
@@ -193,19 +213,37 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "Youth slang っす",
       "expected": [
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         },
         {
+          "lemma": "っす",
           "pos": "Auxiliary",
           "surface": "っす"
         }
       ],
       "id": "character_ssu",
       "input": "いいっす",
+      "suzume_expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っす"
+        }
+      ],
       "tags": [
         "character_speech",
         "youth"
@@ -215,6 +253,7 @@
       "description": "静かな部屋 (quiet room)",
       "expected": [
         {
+          "lemma": "静か",
           "pos": "Adjective",
           "surface": "静か"
         },
@@ -224,6 +263,7 @@
           "surface": "な"
         },
         {
+          "lemma": "部屋",
           "pos": "Noun",
           "surface": "部屋"
         }
@@ -239,10 +279,12 @@
       "description": "高い山 (high mountain)",
       "expected": [
         {
+          "lemma": "高い",
           "pos": "Adjective",
           "surface": "高い"
         },
         {
+          "lemma": "山",
           "pos": "Noun",
           "surface": "山"
         }
@@ -258,14 +300,17 @@
       "description": "今日は暑い (it's hot today)",
       "expected": [
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "暑い",
           "pos": "Adjective",
           "surface": "暑い"
         }
@@ -281,14 +326,17 @@
       "description": "この服は安い (this clothes is cheap)",
       "expected": [
         {
+          "lemma": "この",
           "pos": "Determiner",
           "surface": "この"
         },
         {
+          "lemma": "服",
           "pos": "Noun",
           "surface": "服"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -329,6 +377,7 @@
           "surface": "面白い"
         },
         {
+          "lemma": "な",
           "pos": "Particle",
           "surface": "な"
         }
@@ -344,10 +393,12 @@
       "description": "今日は寒いですね - single-kanji i-adjective 寒い",
       "expected": [
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -357,10 +408,12 @@
           "surface": "寒い"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "ね",
           "pos": "Particle",
           "surface": "ね"
         }
@@ -437,10 +490,12 @@
       "description": "美しいらしい should split as adjective + らしい (conjecture auxiliary)",
       "expected": [
         {
+          "lemma": "美しい",
           "pos": "Adjective",
           "surface": "美しい"
         },
         {
+          "lemma": "らしい",
           "pos": "Auxiliary",
           "surface": "らしい"
         }
@@ -474,10 +529,12 @@
       "description": "春らしい should be single token (suffix pattern, not conjecture)",
       "expected": [
         {
+          "lemma": "春",
           "pos": "Noun",
           "surface": "春"
         },
         {
+          "lemma": "らしい",
           "pos": "Auxiliary",
           "surface": "らしい"
         }
@@ -509,6 +566,7 @@
       "description": "Katakana adjective エモい base form",
       "expected": [
         {
+          "lemma": "エモい",
           "pos": "Adjective",
           "surface": "エモい"
         }
@@ -525,6 +583,7 @@
       "description": "Katakana adjective キモい base form",
       "expected": [
         {
+          "lemma": "キモい",
           "pos": "Adjective",
           "surface": "キモい"
         }
@@ -541,6 +600,7 @@
       "description": "Katakana adjective ウザい base form",
       "expected": [
         {
+          "lemma": "ウザい",
           "pos": "Adjective",
           "surface": "ウザい"
         }
@@ -557,6 +617,7 @@
       "description": "Katakana adjective ダサい base form",
       "expected": [
         {
+          "lemma": "ダサい",
           "pos": "Adjective",
           "surface": "ダサい"
         }
@@ -578,6 +639,7 @@
           "surface": "エモけれ"
         },
         {
+          "lemma": "ば",
           "pos": "Particle",
           "surface": "ば"
         }
@@ -594,6 +656,7 @@
       "description": "Colloquial adjective しんどい base form",
       "expected": [
         {
+          "lemma": "しんどい",
           "pos": "Adjective",
           "surface": "しんどい"
         }
@@ -627,10 +690,12 @@
       "description": "Phase2-1: めでたい should be ADJ, not め+でたい",
       "expected": [
         {
+          "lemma": "めでたい",
           "pos": "Adjective",
           "surface": "めでたい"
         },
         {
+          "lemma": "話",
           "pos": "Noun",
           "surface": "話"
         }
@@ -647,10 +712,12 @@
       "description": "Phase2-1: ありがたい should be ADJ, not あり+がたい",
       "expected": [
         {
+          "lemma": "ありがたい",
           "pos": "Adjective",
           "surface": "ありがたい"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -667,10 +734,12 @@
       "description": "Phase2-1: おもしろい should be ADJ, not お+も+しろい",
       "expected": [
         {
+          "lemma": "おもしろい",
           "pos": "Adjective",
           "surface": "おもしろい"
         },
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         }
@@ -692,6 +761,7 @@
           "surface": "やわらかい"
         },
         {
+          "lemma": "パン",
           "pos": "Noun",
           "surface": "パン"
         }
@@ -708,10 +778,12 @@
       "description": "Phase2-1: あたたかい should be ADJ",
       "expected": [
         {
+          "lemma": "あたたかい",
           "pos": "Adjective",
           "surface": "あたたかい"
         },
         {
+          "lemma": "スープ",
           "pos": "Noun",
           "surface": "スープ"
         }
@@ -728,10 +800,12 @@
       "description": "Phase2-1: つめたい should be ADJ",
       "expected": [
         {
+          "lemma": "つめたい",
           "pos": "Adjective",
           "surface": "つめたい"
         },
         {
+          "lemma": "水",
           "pos": "Noun",
           "surface": "水"
         }
@@ -753,6 +827,7 @@
           "surface": "つまらない"
         },
         {
+          "lemma": "映画",
           "pos": "Noun",
           "surface": "映画"
         }
@@ -791,6 +866,7 @@
           "surface": "くだらない"
         },
         {
+          "lemma": "話",
           "pos": "Noun",
           "surface": "話"
         }
@@ -812,6 +888,7 @@
           "surface": "おとなしい"
         },
         {
+          "lemma": "子",
           "pos": "Noun",
           "surface": "子"
         }
@@ -833,6 +910,7 @@
           "surface": "すばらしい"
         },
         {
+          "lemma": "景色",
           "pos": "Noun",
           "surface": "景色"
         }
@@ -854,6 +932,7 @@
           "surface": "あぶない"
         },
         {
+          "lemma": "橋",
           "pos": "Noun",
           "surface": "橋"
         }
@@ -870,10 +949,12 @@
       "description": "だらしない - grammar-first: single i-adjective (ナイ形容詞), not だらし+ない split",
       "expected": [
         {
+          "lemma": "だらしない",
           "pos": "Adjective",
           "surface": "だらしない"
         },
         {
+          "lemma": "格好",
           "pos": "Noun",
           "surface": "格好"
         }
@@ -890,10 +971,12 @@
       "description": "S5 fix: ものたりない should be ADJ (not もの+たりする)",
       "expected": [
         {
+          "lemma": "ものたりない",
           "pos": "Adjective",
           "surface": "ものたりない"
         },
         {
+          "lemma": "結果",
           "pos": "Noun",
           "surface": "結果"
         }
@@ -915,6 +998,7 @@
           "surface": "いたたまれない"
         },
         {
+          "lemma": "気持ち",
           "pos": "Noun",
           "surface": "気持ち"
         }
@@ -953,6 +1037,7 @@
           "surface": "おびただしい"
         },
         {
+          "lemma": "数",
           "pos": "Noun",
           "surface": "数"
         }
@@ -974,6 +1059,7 @@
           "surface": "かまびすしい"
         },
         {
+          "lemma": "声",
           "pos": "Noun",
           "surface": "声"
         }
@@ -990,10 +1076,12 @@
       "description": "S5 fix: うやうやしい should be ADJ (not う+やうやしい)",
       "expected": [
         {
+          "lemma": "うやうやしい",
           "pos": "Adjective",
           "surface": "うやうやしい"
         },
         {
+          "lemma": "態度",
           "pos": "Noun",
           "surface": "態度"
         }
@@ -1010,6 +1098,7 @@
       "description": "S5 fix: こころもとない should be ADJ (not ここ+ろ+も+と+ない)",
       "expected": [
         {
+          "lemma": "こころもとない",
           "pos": "Adjective",
           "surface": "こころもとない"
         }
@@ -1044,6 +1133,7 @@
       "description": "まじでやばい - slang adjective in context",
       "expected": [
         {
+          "lemma": "まじ",
           "pos": "Adjective",
           "surface": "まじ"
         },
@@ -1053,6 +1143,7 @@
           "surface": "で"
         },
         {
+          "lemma": "やばい",
           "pos": "Adjective",
           "surface": "やばい"
         }
@@ -1093,10 +1184,12 @@
           "surface": "おこがましい"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         }
@@ -1170,6 +1263,7 @@
           "surface": "はなはだしい"
         },
         {
+          "lemma": "勘違い",
           "pos": "Noun",
           "surface": "勘違い"
         }
@@ -1186,10 +1280,12 @@
       "description": "おかしいと - hiragana i-adjective followed by quotative particle",
       "expected": [
         {
+          "lemma": "おかしい",
           "pos": "Adjective",
           "surface": "おかしい"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         }
@@ -1205,10 +1301,12 @@
       "description": "善い - classical variant of よい (W-013)",
       "expected": [
         {
+          "lemma": "善い",
           "pos": "Adjective",
           "surface": "善い"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -1225,14 +1323,17 @@
       "description": "好い - classical variant of よい (W-013)",
       "expected": [
         {
+          "lemma": "好い",
           "pos": "Adjective",
           "surface": "好い"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         }
@@ -1249,10 +1350,12 @@
       "description": "がおさんである - 固有名詞検出はMeCab差異許容 (W-001)",
       "expected": [
         {
+          "lemma": "がお",
           "pos": "Noun",
           "surface": "がお"
         },
         {
+          "lemma": "さん",
           "pos": "Suffix",
           "surface": "さん"
         },
@@ -1262,6 +1365,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
@@ -1284,6 +1388,7 @@
           "surface": "高"
         },
         {
+          "lemma": "さ",
           "pos": "Suffix",
           "surface": "さ"
         }
@@ -1295,6 +1400,7 @@
       "description": "つめたい - regression test",
       "expected": [
         {
+          "lemma": "つめたい",
           "pos": "Adjective",
           "surface": "つめたい"
         }
@@ -1306,6 +1412,7 @@
       "description": "grammar-first: ナイ形容詞 as single token",
       "expected": [
         {
+          "lemma": "だらしない",
           "pos": "Adjective",
           "surface": "だらしない"
         }
@@ -1317,6 +1424,7 @@
       "description": "気持ちよい - auto-generated",
       "expected": [
         {
+          "lemma": "気持ちよい",
           "pos": "Adjective",
           "surface": "気持ちよい"
         }
@@ -1333,6 +1441,7 @@
           "surface": "気持ちよかっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1356,6 +1465,7 @@
       "description": "Dict adjective: should not split as お+めでたい",
       "expected": [
         {
+          "lemma": "おめでたい",
           "pos": "Adjective",
           "surface": "おめでたい"
         }

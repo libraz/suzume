@@ -4,6 +4,7 @@
       "description": "ごめんなさい - apology as single token",
       "expected": [
         {
+          "lemma": "ごめんなさい",
           "pos": "Interjection",
           "surface": "ごめんなさい"
         }
@@ -19,6 +20,7 @@
       "description": "おはよう - morning greeting",
       "expected": [
         {
+          "lemma": "おはよう",
           "pos": "Interjection",
           "surface": "おはよう"
         }
@@ -34,6 +36,7 @@
       "description": "ありがとう - thanks",
       "expected": [
         {
+          "lemma": "ありがとう",
           "pos": "Interjection",
           "surface": "ありがとう"
         }
@@ -49,6 +52,7 @@
       "description": "すみません - excuse me/sorry",
       "expected": [
         {
+          "lemma": "すみません",
           "pos": "Interjection",
           "surface": "すみません"
         }
@@ -64,6 +68,7 @@
       "description": "こんにちは - hello (daytime greeting)",
       "expected": [
         {
+          "lemma": "こんにちは",
           "pos": "Interjection",
           "surface": "こんにちは"
         }
@@ -79,6 +84,7 @@
       "description": "こんばんは - good evening",
       "expected": [
         {
+          "lemma": "こんばんは",
           "pos": "Interjection",
           "surface": "こんばんは"
         }
@@ -94,6 +100,7 @@
       "description": "さようなら - goodbye",
       "expected": [
         {
+          "lemma": "さようなら",
           "pos": "Interjection",
           "surface": "さようなら"
         }

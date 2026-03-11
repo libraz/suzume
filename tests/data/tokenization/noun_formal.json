@@ -4,6 +4,7 @@
       "description": "勉強させられていたところだった - ところ formal noun - MeCab互換分割",
       "expected": [
         {
+          "lemma": "勉強",
           "pos": "Noun",
           "surface": "勉強"
         },
@@ -23,6 +24,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
@@ -32,10 +34,12 @@
           "surface": "い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "ところ",
           "pos": "Noun",
           "surface": "ところ"
         },
@@ -45,6 +49,7 @@
           "surface": "だっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -59,10 +64,12 @@
       "description": "日付けで should split 付け as suffix from で",
       "expected": [
         {
+          "lemma": "日付け",
           "pos": "Noun",
           "surface": "日付け"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -77,14 +84,17 @@
       "description": "2024年12月23日付けで",
       "expected": [
         {
+          "lemma": "2024年12月23日",
           "pos": "Noun",
           "surface": "2024年12月23日"
         },
         {
+          "lemma": "付け",
           "pos": "Noun",
           "surface": "付け"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -124,15 +134,18 @@
       "description": "はずがない - formal noun hazu + negative",
       "expected": [
         {
+          "lemma": "はず",
           "pos": "Noun",
           "surface": "はず"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
-          "pos": "Auxiliary",
+          "lemma": "ない",
+          "pos": "Adjective",
           "surface": "ない"
         }
       ],
@@ -163,18 +176,22 @@
       "description": "ほか should be single Noun (not ほ+か)",
       "expected": [
         {
+          "lemma": "思い",
           "pos": "Noun",
           "surface": "思い"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "ほか",
           "pos": "Noun",
           "surface": "ほか"
         },
         {
+          "lemma": "うまい",
           "pos": "Adjective",
           "surface": "うまい"
         }
@@ -190,6 +207,7 @@
       "description": "Na-adj+formal noun: な+もの should not split as な+も+の",
       "expected": [
         {
+          "lemma": "妙",
           "pos": "Adjective",
           "surface": "妙"
         },
@@ -199,10 +217,12 @@
           "surface": "な"
         },
         {
+          "lemma": "もの",
           "pos": "Noun",
           "surface": "もの"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -214,6 +234,7 @@
       "description": "Na-adj+formal noun: な+もの should not split as な+も+の",
       "expected": [
         {
+          "lemma": "不思議",
           "pos": "Adjective",
           "surface": "不思議"
         },
@@ -223,10 +244,12 @@
           "surface": "な"
         },
         {
+          "lemma": "もの",
           "pos": "Noun",
           "surface": "もの"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -238,6 +261,7 @@
       "description": "Na-adj lemma fix: 大変 lemma should not be 大変る",
       "expected": [
         {
+          "lemma": "大変",
           "pos": "Adjective",
           "surface": "大変"
         },
@@ -247,10 +271,12 @@
           "surface": "な"
         },
         {
+          "lemma": "こと",
           "pos": "Noun",
           "surface": "こと"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }

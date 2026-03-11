@@ -4,10 +4,12 @@
       "description": "Honorific お + 水",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "水",
           "pos": "Noun",
           "surface": "水"
         }
@@ -23,6 +25,7 @@
       "description": "Honorific お + 金",
       "expected": [
         {
+          "lemma": "お金",
           "pos": "Noun",
           "surface": "お金"
         }
@@ -38,10 +41,12 @@
       "description": "Honorific お + 店",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "店",
           "pos": "Noun",
           "surface": "店"
         }
@@ -57,10 +62,12 @@
       "description": "Honorific お + 酒",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "酒",
           "pos": "Noun",
           "surface": "酒"
         }
@@ -76,10 +83,12 @@
       "description": "Honorific お + 花",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "花",
           "pos": "Noun",
           "surface": "花"
         }
@@ -95,10 +104,12 @@
       "description": "Honorific お + 茶",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "茶",
           "pos": "Noun",
           "surface": "茶"
         }
@@ -114,10 +125,12 @@
       "description": "Honorific お + 菓子",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "菓子",
           "pos": "Noun",
           "surface": "菓子"
         }
@@ -133,10 +146,12 @@
       "description": "Honorific お + 世話",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "世話",
           "pos": "Noun",
           "surface": "世話"
         }
@@ -152,10 +167,12 @@
       "description": "Honorific お + 返事",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "返事",
           "pos": "Noun",
           "surface": "返事"
         }
@@ -171,10 +188,12 @@
       "description": "Honorific お + 手数",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "手数",
           "pos": "Noun",
           "surface": "手数"
         }
@@ -194,10 +213,12 @@
       "description": "Honorific お + 元気",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "元気",
           "pos": "Adjective",
           "surface": "元気"
         }
@@ -223,10 +244,12 @@
       "description": "Honorific お + 名前",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "名前",
           "pos": "Noun",
           "surface": "名前"
         }
@@ -242,10 +265,12 @@
       "description": "Honorific お + 客",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "客",
           "pos": "Noun",
           "surface": "客"
         }
@@ -259,12 +284,13 @@
     },
     {
       "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "ãå®¢æ§ in user dict only, test skips user dict"
+        "category": "boundary",
+        "reason": "Surface diff: Suzume splits お+客+様 (no user dict), MeCab merges お客様"
       },
       "description": "Honorific お + 客 + 様",
       "expected": [
         {
+          "lemma": "お客様",
           "pos": "Noun",
           "surface": "お客様"
         }
@@ -273,16 +299,19 @@
       "input": "お客様",
       "suzume_expected": [
         {
+          "surface": "お",
           "pos": "Prefix",
-          "surface": "お"
+          "lemma": "お"
         },
         {
+          "surface": "客",
           "pos": "Noun",
-          "surface": "客"
+          "lemma": "客"
         },
         {
+          "surface": "様",
           "pos": "Noun",
-          "surface": "様"
+          "lemma": "様"
         }
       ],
       "tags": [
@@ -294,10 +323,12 @@
       "description": "Honorific お + 願い (nominalized verb)",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "願い",
           "pos": "Noun",
           "surface": "願い"
         }
@@ -313,10 +344,12 @@
       "description": "Honorific お + 疲れ",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "疲れ",
           "pos": "Noun",
           "surface": "疲れ"
         }
@@ -332,10 +365,12 @@
       "description": "Honorific お + 問い合わせ",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "問い合わせ",
           "pos": "Noun",
           "surface": "問い合わせ"
         }
@@ -351,10 +386,12 @@
       "description": "Honorific お + 待ち (nominalized verb)",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "待ち",
           "pos": "Noun",
           "surface": "待ち"
         }
@@ -370,10 +407,12 @@
       "description": "Honorific お + 知らせ (nominalized verb)",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "知らせ",
           "pos": "Noun",
           "surface": "知らせ"
         }
@@ -389,10 +428,12 @@
       "description": "Honorific お + 申し込み",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "申し込み",
           "pos": "Noun",
           "surface": "申し込み"
         }
@@ -408,10 +449,12 @@
       "description": "Honorific お + 支払い",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "支払い",
           "pos": "Noun",
           "surface": "支払い"
         }
@@ -427,10 +470,12 @@
       "description": "Honorific お + 届け (nominalized verb)",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "届け",
           "pos": "Noun",
           "surface": "届け"
         }
@@ -446,10 +491,12 @@
       "description": "Honorific お + 受け取り (nominalized compound noun)",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "受け取り",
           "pos": "Noun",
           "surface": "受け取り"
         }
@@ -465,6 +512,7 @@
       "description": "Honorific お + 買い上げ",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
@@ -489,6 +537,7 @@
       "description": "Honorific お + 預かり (nominalized verb)",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
@@ -519,10 +568,12 @@
       "description": "Honorific お + 見舞い",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "見舞い",
           "pos": "Noun",
           "surface": "見舞い"
         }
@@ -538,10 +589,12 @@
       "description": "Honorific お + 迎え",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "迎え",
           "pos": "Noun",
           "surface": "迎え"
         }
@@ -557,10 +610,12 @@
       "description": "Honorific お + 答え (nominalized verb)",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "答え",
           "pos": "Noun",
           "surface": "答え"
         }
@@ -576,10 +631,12 @@
       "description": "Honorific お + 断り",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "断り",
           "pos": "Noun",
           "surface": "断り"
         }
@@ -595,10 +652,12 @@
       "description": "Honorific お + 帰り",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "帰り",
           "pos": "Noun",
           "surface": "帰り"
         }
@@ -614,10 +673,12 @@
       "description": "Honorific お + 呼び",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "呼び",
           "pos": "Noun",
           "surface": "呼び"
         }
@@ -637,6 +698,7 @@
       "description": "Honorific お + 引き取り",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
@@ -667,10 +729,12 @@
       "description": "ご飯 - common word registered in L2 dictionary",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "飯",
           "pos": "Noun",
           "surface": "飯"
         }
@@ -687,10 +751,12 @@
       "description": "Honorific ご + 覧",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "覧",
           "pos": "Noun",
           "surface": "覧"
         }
@@ -706,10 +772,12 @@
       "description": "Honorific ご + 確認",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         }
@@ -725,10 +793,12 @@
       "description": "Honorific ご + 注意",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "注意",
           "pos": "Noun",
           "surface": "注意"
         }
@@ -744,10 +814,12 @@
       "description": "Honorific ご + 連絡",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "連絡",
           "pos": "Noun",
           "surface": "連絡"
         }
@@ -763,10 +835,12 @@
       "description": "Honorific ご + 協力",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "協力",
           "pos": "Noun",
           "surface": "協力"
         }
@@ -782,10 +856,12 @@
       "description": "Honorific ご + 理解",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "理解",
           "pos": "Noun",
           "surface": "理解"
         }
@@ -801,10 +877,12 @@
       "description": "Honorific ご + 検討",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "検討",
           "pos": "Noun",
           "surface": "検討"
         }
@@ -820,10 +898,12 @@
       "description": "Honorific ご + 返信",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "返信",
           "pos": "Noun",
           "surface": "返信"
         }
@@ -839,10 +919,12 @@
       "description": "Honorific ご + 注文",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "注文",
           "pos": "Noun",
           "surface": "注文"
         }
@@ -858,10 +940,12 @@
       "description": "Honorific ご + 意見",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "意見",
           "pos": "Noun",
           "surface": "意見"
         }
@@ -877,6 +961,7 @@
       "description": "Negation 不 + 安 (compound word)",
       "expected": [
         {
+          "lemma": "不安",
           "pos": "Noun",
           "surface": "不安"
         }
@@ -892,6 +977,7 @@
       "description": "Negation 不 + 要 (compound word)",
       "expected": [
         {
+          "lemma": "不要",
           "pos": "Noun",
           "surface": "不要"
         }
@@ -907,6 +993,7 @@
       "description": "Negation 不 + 便 (compound word)",
       "expected": [
         {
+          "lemma": "不便",
           "pos": "Noun",
           "surface": "不便"
         }
@@ -922,6 +1009,7 @@
       "description": "Negation 不 + 可能 (compound word)",
       "expected": [
         {
+          "lemma": "不可能",
           "pos": "Adjective",
           "surface": "不可能"
         }
@@ -937,6 +1025,7 @@
       "description": "Not yet 未 + 経験 (compound word)",
       "expected": [
         {
+          "lemma": "未経験",
           "pos": "Noun",
           "surface": "未経験"
         }
@@ -952,6 +1041,7 @@
       "description": "Not yet 未 + 確認 (compound word)",
       "expected": [
         {
+          "lemma": "未確認",
           "pos": "Noun",
           "surface": "未確認"
         }
@@ -967,6 +1057,7 @@
       "description": "Not yet 未 + 知 (compound word)",
       "expected": [
         {
+          "lemma": "未知",
           "pos": "Noun",
           "surface": "未知"
         }
@@ -982,6 +1073,7 @@
       "description": "Non 非 + 常 (compound word)",
       "expected": [
         {
+          "lemma": "非常",
           "pos": "Adjective",
           "surface": "非常"
         }
@@ -997,6 +1089,7 @@
       "description": "Non 非 + 公開 (compound word)",
       "expected": [
         {
+          "lemma": "非公開",
           "pos": "Noun",
           "surface": "非公開"
         }
@@ -1012,6 +1105,7 @@
       "description": "Super 超 + 人 (compound word)",
       "expected": [
         {
+          "lemma": "超人",
           "pos": "Noun",
           "surface": "超人"
         }
@@ -1027,6 +1121,7 @@
       "description": "Re 再 + 開 (compound word)",
       "expected": [
         {
+          "lemma": "再開",
           "pos": "Noun",
           "surface": "再開"
         }
@@ -1042,6 +1137,7 @@
       "description": "Re 再 + 確認 (compound word)",
       "expected": [
         {
+          "lemma": "再確認",
           "pos": "Noun",
           "surface": "再確認"
         }
@@ -1057,14 +1153,17 @@
       "description": "お水 in sentence context",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "水",
           "pos": "Noun",
           "surface": "水"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -1085,10 +1184,12 @@
       "description": "ご確認 in sentence context",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "確認",
           "pos": "Noun",
           "surface": "確認"
         },
@@ -1109,10 +1210,12 @@
       "description": "不可能 in sentence context (compound word preserved)",
       "expected": [
         {
+          "lemma": "不可能",
           "pos": "Adjective",
           "surface": "不可能"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -1132,6 +1235,7 @@
       "description": "Just prefix お alone",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Interjection",
           "surface": "お"
         }
@@ -1153,18 +1257,22 @@
       "description": "おかし is a word (お菓子), not prefix + unknown",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "かし",
           "pos": "Noun",
           "surface": "かし"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         }
@@ -1180,14 +1288,17 @@
       "description": "Double prefix ご + お + 水",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "水",
           "pos": "Noun",
           "surface": "水"
         }

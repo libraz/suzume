@@ -4,10 +4,12 @@
       "description": "B27: 胡散臭い should be single adjective",
       "expected": [
         {
+          "lemma": "胡散臭い",
           "pos": "Adjective",
           "surface": "胡散臭い"
         },
         {
+          "lemma": "団体",
           "pos": "Noun",
           "surface": "団体"
         }
@@ -27,6 +29,7 @@
       "description": "B30: 引きこもり should be single noun",
       "expected": [
         {
+          "lemma": "引き",
           "pos": "Noun",
           "surface": "引き"
         },
@@ -57,10 +60,12 @@
       "description": "お買い物 - prefix + compound noun",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "買い物",
           "pos": "Noun",
           "surface": "買い物"
         }
@@ -76,6 +81,7 @@
       "description": "飲み会 - compound noun",
       "expected": [
         {
+          "lemma": "飲み会",
           "pos": "Noun",
           "surface": "飲み会"
         }
@@ -90,6 +96,7 @@
       "description": "食べ物 - compound noun",
       "expected": [
         {
+          "lemma": "食べ物",
           "pos": "Noun",
           "surface": "食べ物"
         }
@@ -104,6 +111,7 @@
       "description": "飲み物 - compound noun",
       "expected": [
         {
+          "lemma": "飲み物",
           "pos": "Noun",
           "surface": "飲み物"
         }
@@ -118,6 +126,7 @@
       "description": "買い物 - compound noun",
       "expected": [
         {
+          "lemma": "買い物",
           "pos": "Noun",
           "surface": "買い物"
         }
@@ -132,14 +141,17 @@
       "description": "買い物に行く - compound noun + particle + verb",
       "expected": [
         {
+          "lemma": "買い物",
           "pos": "Noun",
           "surface": "買い物"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         }
@@ -154,6 +166,7 @@
       "description": "玉ねぎ - single kanji + hiragana compound noun",
       "expected": [
         {
+          "lemma": "玉ねぎ",
           "pos": "Noun",
           "surface": "玉ねぎ"
         }
@@ -169,10 +182,12 @@
       "description": "火だるま - single kanji + hiragana compound noun",
       "expected": [
         {
+          "lemma": "火",
           "pos": "Noun",
           "surface": "火"
         },
         {
+          "lemma": "だるま",
           "pos": "Noun",
           "surface": "だるま"
         }
@@ -188,6 +203,7 @@
       "description": "水たまり - single kanji + hiragana compound noun",
       "expected": [
         {
+          "lemma": "水たまり",
           "pos": "Noun",
           "surface": "水たまり"
         }
@@ -203,14 +219,17 @@
       "description": "玉ねぎを切る - compound in sentence",
       "expected": [
         {
+          "lemma": "玉ねぎ",
           "pos": "Noun",
           "surface": "玉ねぎ"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "切る",
           "pos": "Verb",
           "surface": "切る"
         }
@@ -226,14 +245,17 @@
       "description": "今後 is recognized as single compound noun from dictionary",
       "expected": [
         {
+          "lemma": "今後",
           "pos": "Noun",
           "surface": "今後"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "方針",
           "pos": "Noun",
           "surface": "方針"
         }
@@ -249,6 +271,7 @@
       "description": "自然言語処理 stays as single compound (6 chars)",
       "expected": [
         {
+          "lemma": "自然言語処理",
           "pos": "Noun",
           "surface": "自然言語処理"
         }
@@ -265,6 +288,7 @@
       "description": "人工知能 should stay as single compound",
       "expected": [
         {
+          "lemma": "人工知能",
           "pos": "Noun",
           "surface": "人工知能"
         }
@@ -281,6 +305,7 @@
       "description": "機械学習 should stay as single compound",
       "expected": [
         {
+          "lemma": "機械学習",
           "pos": "Noun",
           "surface": "機械学習"
         }
@@ -297,10 +322,12 @@
       "description": "について should be recognized as compound particle",
       "expected": [
         {
+          "lemma": "日本",
           "pos": "Noun",
           "surface": "日本"
         },
         {
+          "lemma": "について",
           "pos": "Particle",
           "surface": "について"
         }
@@ -317,10 +344,12 @@
       "description": "によって should be recognized as compound particle",
       "expected": [
         {
+          "lemma": "風",
           "pos": "Noun",
           "surface": "風"
         },
         {
+          "lemma": "によって",
           "pos": "Particle",
           "surface": "によって"
         }
@@ -337,10 +366,12 @@
       "description": "として should be recognized as compound particle",
       "expected": [
         {
+          "lemma": "代表",
           "pos": "Noun",
           "surface": "代表"
         },
         {
+          "lemma": "として",
           "pos": "Particle",
           "surface": "として"
         }
@@ -357,6 +388,7 @@
       "description": "今夏 (this summer) - 今+kanji compound preserved as single token",
       "expected": [
         {
+          "lemma": "今夏",
           "pos": "Noun",
           "surface": "今夏"
         }
@@ -372,6 +404,7 @@
       "description": "今晩 (tonight) - 今+kanji compound preserved as single token",
       "expected": [
         {
+          "lemma": "今晩",
           "pos": "Noun",
           "surface": "今晩"
         }
@@ -387,6 +420,7 @@
       "description": "今期 (this term) - 今+kanji compound preserved as single token",
       "expected": [
         {
+          "lemma": "今期",
           "pos": "Noun",
           "surface": "今期"
         }
@@ -402,6 +436,7 @@
       "description": "今回 (this time) - 今+kanji compound preserved as single token",
       "expected": [
         {
+          "lemma": "今回",
           "pos": "Noun",
           "surface": "今回"
         }

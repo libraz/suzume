@@ -4,6 +4,7 @@
       "description": "Simple kanji word 世界",
       "expected": [
         {
+          "lemma": "世界",
           "pos": "Noun",
           "surface": "世界"
         }
@@ -18,6 +19,7 @@
       "description": "独立行政法人情報処理推進機構 - very long compound preserved as single token",
       "expected": [
         {
+          "lemma": "独立行政法人情報処理推進機構",
           "pos": "Noun",
           "surface": "独立行政法人情報処理推進機構"
         }
@@ -33,6 +35,7 @@
       "description": "空 - single kanji",
       "expected": [
         {
+          "lemma": "空",
           "pos": "Noun",
           "surface": "空"
         }
@@ -48,6 +51,7 @@
       "description": "コーヒー - long vowel mark",
       "expected": [
         {
+          "lemma": "コーヒー",
           "pos": "Noun",
           "surface": "コーヒー"
         }
@@ -63,10 +67,12 @@
       "description": "でも大丈夫 (but it's okay)",
       "expected": [
         {
+          "lemma": "でも",
           "pos": "Conjunction",
           "surface": "でも"
         },
         {
+          "lemma": "大丈夫",
           "pos": "Adjective",
           "surface": "大丈夫"
         }
@@ -82,6 +88,7 @@
       "description": "昨日 (yesterday)",
       "expected": [
         {
+          "lemma": "昨日",
           "pos": "Noun",
           "surface": "昨日"
         }
@@ -97,6 +104,7 @@
       "description": "コンピューター (computer)",
       "expected": [
         {
+          "lemma": "コンピューター",
           "pos": "Noun",
           "surface": "コンピューター"
         }
@@ -112,10 +120,12 @@
       "description": "インターネット接続 (internet connection)",
       "expected": [
         {
+          "lemma": "インターネット",
           "pos": "Noun",
           "surface": "インターネット"
         },
         {
+          "lemma": "接続",
           "pos": "Noun",
           "surface": "接続"
         }
@@ -131,6 +141,7 @@
       "description": "高校生 (high school student)",
       "expected": [
         {
+          "lemma": "高校生",
           "pos": "Noun",
           "surface": "高校生"
         }
@@ -150,10 +161,12 @@
       "description": "東京（とうきょう） - reading kept as single token, symbols filtered",
       "expected": [
         {
+          "lemma": "東京",
           "pos": "Noun",
           "surface": "東京"
         },
         {
+          "lemma": "とうきょう",
           "pos": "Noun",
           "surface": "とうきょう"
         }
@@ -179,6 +192,7 @@
       "description": "百二十三 (123 in Japanese)",
       "expected": [
         {
+          "lemma": "百二十三",
           "pos": "Noun",
           "surface": "百二十三"
         }
@@ -194,6 +208,7 @@
       "description": "3時間 - number + counter as single token",
       "expected": [
         {
+          "lemma": "3時間",
           "pos": "Noun",
           "surface": "3時間"
         }
@@ -209,6 +224,7 @@
       "description": "3キロ (3 kilograms)",
       "expected": [
         {
+          "lemma": "3キロ",
           "pos": "Noun",
           "surface": "3キロ"
         }
@@ -225,6 +241,7 @@
       "description": "100ゴールド (game currency)",
       "expected": [
         {
+          "lemma": "100ゴールド",
           "pos": "Noun",
           "surface": "100ゴールド"
         }
@@ -242,6 +259,7 @@
       "description": "50アデナ (game currency)",
       "expected": [
         {
+          "lemma": "50アデナ",
           "pos": "Noun",
           "surface": "50アデナ"
         }
@@ -259,6 +277,7 @@
       "description": "1000ケロ (game currency)",
       "expected": [
         {
+          "lemma": "1000ケロ",
           "pos": "Noun",
           "surface": "1000ケロ"
         }
@@ -280,10 +299,12 @@
       "description": "第一回 (first time) - 第一 is adverb, 回 is counter suffix",
       "expected": [
         {
+          "lemma": "第一",
           "pos": "Noun",
           "surface": "第一"
         },
         {
+          "lemma": "回",
           "pos": "Suffix",
           "surface": "回"
         }
@@ -306,6 +327,7 @@
       "description": "10メートル (10 meters)",
       "expected": [
         {
+          "lemma": "10メートル",
           "pos": "Noun",
           "surface": "10メートル"
         }
@@ -322,6 +344,7 @@
       "description": "5センチ (5 centimeters)",
       "expected": [
         {
+          "lemma": "5センチ",
           "pos": "Noun",
           "surface": "5センチ"
         }
@@ -338,6 +361,7 @@
       "description": "200グラム (200 grams)",
       "expected": [
         {
+          "lemma": "200グラム",
           "pos": "Noun",
           "surface": "200グラム"
         }
@@ -354,6 +378,7 @@
       "description": "500円 - number + counter as single token",
       "expected": [
         {
+          "lemma": "500円",
           "pos": "Noun",
           "surface": "500円"
         }
@@ -370,6 +395,7 @@
       "description": "100ドル (100 dollars)",
       "expected": [
         {
+          "lemma": "100ドル",
           "pos": "Noun",
           "surface": "100ドル"
         }
@@ -386,6 +412,7 @@
       "description": "80パーセント (80 percent)",
       "expected": [
         {
+          "lemma": "80パーセント",
           "pos": "Noun",
           "surface": "80パーセント"
         }
@@ -402,6 +429,7 @@
       "description": "300カロリー (300 calories)",
       "expected": [
         {
+          "lemma": "300カロリー",
           "pos": "Noun",
           "surface": "300カロリー"
         }
@@ -418,6 +446,7 @@
       "description": "2リットル (2 liters)",
       "expected": [
         {
+          "lemma": "2リットル",
           "pos": "Noun",
           "surface": "2リットル"
         }
@@ -434,6 +463,7 @@
       "description": "50ページ (50 pages)",
       "expected": [
         {
+          "lemma": "50ページ",
           "pos": "Noun",
           "surface": "50ページ"
         }
@@ -450,6 +480,7 @@
       "description": "1000ポイント (1000 points)",
       "expected": [
         {
+          "lemma": "1000ポイント",
           "pos": "Noun",
           "surface": "1000ポイント"
         }
@@ -470,14 +501,17 @@
       "description": "B31: 何でもあり should be noun idiom",
       "expected": [
         {
+          "lemma": "何",
           "pos": "Pronoun",
           "surface": "何"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
@@ -487,10 +521,12 @@
           "surface": "あり"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         },
         {
+          "lemma": "な",
           "pos": "Particle",
           "surface": "な"
         }
@@ -535,6 +571,7 @@
           "surface": "しびれ"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -589,14 +626,17 @@
       "description": "B43: 売り上げ should be NOUN when followed by case particle",
       "expected": [
         {
+          "lemma": "売り上げ",
           "pos": "Noun",
           "surface": "売り上げ"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "伸ばす",
           "pos": "Verb",
           "surface": "伸ばす"
         }
@@ -611,6 +651,7 @@
       "description": "B44: 盛りだくさん should be NOUN, not 盛りだく+さん split",
       "expected": [
         {
+          "lemma": "盛りだくさん",
           "pos": "Noun",
           "surface": "盛りだくさん"
         }
@@ -625,10 +666,12 @@
       "description": "毎日電車 - should split into two nouns",
       "expected": [
         {
+          "lemma": "毎日",
           "pos": "Noun",
           "surface": "毎日"
         },
         {
+          "lemma": "電車",
           "pos": "Noun",
           "surface": "電車"
         }
@@ -643,6 +686,7 @@
       "description": "楽しみ - noun (not split)",
       "expected": [
         {
+          "lemma": "楽しみ",
           "pos": "Noun",
           "surface": "楽しみ"
         }
@@ -657,6 +701,7 @@
       "description": "でっちあげ should be single NOUN",
       "expected": [
         {
+          "lemma": "でっちあげ",
           "pos": "Noun",
           "surface": "でっちあげ"
         }
@@ -672,14 +717,17 @@
       "description": "ほう in ほうがいい should be NOUN",
       "expected": [
         {
+          "lemma": "ほう",
           "pos": "Noun",
           "surface": "ほう"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         }
@@ -695,10 +743,12 @@
       "description": "きっかけ should be single NOUN",
       "expected": [
         {
+          "lemma": "きっかけ",
           "pos": "Noun",
           "surface": "きっかけ"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -714,10 +764,12 @@
       "description": "大きな should be DET (rentaishi)",
       "expected": [
         {
+          "lemma": "大きな",
           "pos": "Determiner",
           "surface": "大きな"
         },
         {
+          "lemma": "議論",
           "pos": "Noun",
           "surface": "議論"
         }
@@ -733,6 +785,7 @@
       "description": "金儲け should be single NOUN",
       "expected": [
         {
+          "lemma": "金儲け",
           "pos": "Noun",
           "surface": "金儲け"
         },
@@ -753,10 +806,12 @@
       "description": "あだ名 should be single NOUN",
       "expected": [
         {
+          "lemma": "あだ名",
           "pos": "Noun",
           "surface": "あだ名"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
@@ -777,10 +832,12 @@
       "description": "なし崩し should be single NOUN",
       "expected": [
         {
+          "lemma": "なし崩し",
           "pos": "Noun",
           "surface": "なし崩し"
         },
         {
+          "lemma": "的",
           "pos": "Suffix",
           "surface": "的"
         }
@@ -796,10 +853,12 @@
       "description": "毎朝コーヒー should split into 2 tokens",
       "expected": [
         {
+          "lemma": "毎朝",
           "pos": "Noun",
           "surface": "毎朝"
         },
         {
+          "lemma": "コーヒー",
           "pos": "Noun",
           "surface": "コーヒー"
         }
@@ -814,10 +873,12 @@
       "description": "こんな should be Determiner",
       "expected": [
         {
+          "lemma": "こんな",
           "pos": "Determiner",
           "surface": "こんな"
         },
         {
+          "lemma": "天気",
           "pos": "Noun",
           "surface": "天気"
         }
@@ -832,10 +893,12 @@
       "description": "あんな should be Determiner",
       "expected": [
         {
+          "lemma": "あんな",
           "pos": "Determiner",
           "surface": "あんな"
         },
         {
+          "lemma": "人",
           "pos": "Noun",
           "surface": "人"
         }
@@ -850,10 +913,12 @@
       "description": "どんな should be Determiner",
       "expected": [
         {
+          "lemma": "どんな",
           "pos": "Determiner",
           "surface": "どんな"
         },
         {
+          "lemma": "問題",
           "pos": "Noun",
           "surface": "問題"
         }
@@ -868,6 +933,7 @@
       "description": "時分 should be recognized as separate Noun",
       "expected": [
         {
+          "lemma": "若い",
           "pos": "Adjective",
           "surface": "若い"
         },
@@ -888,14 +954,17 @@
       "description": "居る時分学校 should split 時分 as separate token",
       "expected": [
         {
+          "lemma": "居る",
           "pos": "Verb",
           "surface": "居る"
         },
         {
+          "lemma": "時分",
           "pos": "Noun",
           "surface": "時分"
         },
         {
+          "lemma": "学校",
           "pos": "Noun",
           "surface": "学校"
         }
@@ -911,6 +980,7 @@
       "description": "人々 - iteration mark should be grouped with kanji",
       "expected": [
         {
+          "lemma": "人々",
           "pos": "Noun",
           "surface": "人々"
         }
@@ -926,6 +996,7 @@
       "description": "日々 - iteration mark should be grouped with kanji",
       "expected": [
         {
+          "lemma": "日々",
           "pos": "Noun",
           "surface": "日々"
         }
@@ -941,6 +1012,7 @@
       "description": "時々 - iteration mark should be grouped with kanji",
       "expected": [
         {
+          "lemma": "時々",
           "pos": "Noun",
           "surface": "時々"
         }
@@ -956,14 +1028,17 @@
       "description": "時々妙に - should split at 々 boundary, 妙 is na-adjective (妙に = strangely)",
       "expected": [
         {
+          "lemma": "時々",
           "pos": "Noun",
           "surface": "時々"
         },
         {
+          "lemma": "妙",
           "pos": "Adjective",
           "surface": "妙"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         }
@@ -980,6 +1055,7 @@
       "description": "ワンパターンすぎた recognized as compound verb (noun + すぎる) with た split, not ワンパター + ンすぎた",
       "expected": [
         {
+          "lemma": "ワンパターン",
           "pos": "Noun",
           "surface": "ワンパターン"
         },
@@ -989,6 +1065,7 @@
           "surface": "すぎ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1006,6 +1083,7 @@
       "description": "シンプルすぎて recognized as compound verb (noun + すぎる) with て split, not シンプ + ルすぎて",
       "expected": [
         {
+          "lemma": "シンプル",
           "pos": "Adjective",
           "surface": "シンプル"
         },
@@ -1015,6 +1093,7 @@
           "surface": "すぎ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }
@@ -1032,10 +1111,12 @@
       "description": "ご飯 - L2 dictionary word",
       "expected": [
         {
+          "lemma": "ご",
           "pos": "Prefix",
           "surface": "ご"
         },
         {
+          "lemma": "飯",
           "pos": "Noun",
           "surface": "飯"
         }
@@ -1053,10 +1134,12 @@
       "description": "お茶 splits into prefix + noun",
       "expected": [
         {
+          "lemma": "お",
           "pos": "Prefix",
           "surface": "お"
         },
         {
+          "lemma": "茶",
           "pos": "Noun",
           "surface": "茶"
         }
@@ -1073,10 +1156,12 @@
       "description": "Noun + noun splitting still works",
       "expected": [
         {
+          "lemma": "明日",
           "pos": "Noun",
           "surface": "明日"
         },
         {
+          "lemma": "雨",
           "pos": "Noun",
           "surface": "雨"
         }
@@ -1092,10 +1177,12 @@
       "description": "AI（人工知能）- should recognize AI and 人工知能",
       "expected": [
         {
+          "lemma": "AI",
           "pos": "Noun",
           "surface": "AI"
         },
         {
+          "lemma": "人工知能",
           "pos": "Noun",
           "surface": "人工知能"
         }
@@ -1111,18 +1198,22 @@
       "description": "Honorific suffix 先生 (name + suffix split)",
       "expected": [
         {
+          "lemma": "佐藤",
           "pos": "Noun",
           "surface": "佐藤"
         },
         {
+          "lemma": "先生",
           "pos": "Noun",
           "surface": "先生"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "授業",
           "pos": "Noun",
           "surface": "授業"
         }
@@ -1137,10 +1228,12 @@
       "description": "Derivational suffix 的",
       "expected": [
         {
+          "lemma": "国際",
           "pos": "Noun",
           "surface": "国際"
         },
         {
+          "lemma": "的",
           "pos": "Suffix",
           "surface": "的"
         },
@@ -1150,6 +1243,7 @@
           "surface": "な"
         },
         {
+          "lemma": "会議",
           "pos": "Noun",
           "surface": "会議"
         }
@@ -1164,10 +1258,12 @@
       "description": "ありきたり is a na-adjective",
       "expected": [
         {
+          "lemma": "ありきたり",
           "pos": "Adjective",
           "surface": "ありきたり"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -1184,14 +1280,17 @@
       "description": "S2: たたずまい should be NOUN, not たたずする (suru verb misrecognition)",
       "expected": [
         {
+          "lemma": "たたずまい",
           "pos": "Noun",
           "surface": "たたずまい"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "良い",
           "pos": "Adjective",
           "surface": "良い"
         }
@@ -1208,6 +1307,7 @@
       "description": "D4: のち should be recognized as temporal NOUN (後), prevent の+ち split",
       "expected": [
         {
+          "lemma": "のち",
           "pos": "Noun",
           "surface": "のち"
         }
@@ -1224,10 +1324,12 @@
       "description": "D4: 晴れのち曇り - weather forecast pattern with のち (after)",
       "expected": [
         {
+          "lemma": "晴れ",
           "pos": "Noun",
           "surface": "晴れ"
         },
         {
+          "lemma": "のち",
           "pos": "Noun",
           "surface": "のち"
         },
@@ -1250,6 +1352,7 @@
       "description": "L1: コミュニケーション (9 chars) should be single NOUN, not split",
       "expected": [
         {
+          "lemma": "コミュニケーション",
           "pos": "Noun",
           "surface": "コミュニケーション"
         }
@@ -1267,6 +1370,7 @@
       "description": "L1: ドキュメンテーション (10 chars) should be single NOUN",
       "expected": [
         {
+          "lemma": "ドキュメンテーション",
           "pos": "Noun",
           "surface": "ドキュメンテーション"
         }
@@ -1284,6 +1388,7 @@
       "description": "L1: インフラストラクチャー (11 chars) should be single NOUN",
       "expected": [
         {
+          "lemma": "インフラストラクチャー",
           "pos": "Noun",
           "surface": "インフラストラクチャー"
         }
@@ -1301,6 +1406,7 @@
       "description": "L1: アクセシビリティ (8 chars) should be single NOUN",
       "expected": [
         {
+          "lemma": "アクセシビリティ",
           "pos": "Noun",
           "surface": "アクセシビリティ"
         }
@@ -1318,14 +1424,17 @@
       "description": "S3: はし (橋/箸) should be recognized as NOUN, not split as は+し",
       "expected": [
         {
+          "lemma": "はし",
           "pos": "Noun",
           "surface": "はし"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "かかる",
           "pos": "Verb",
           "surface": "かかる"
         }
@@ -1342,14 +1451,17 @@
       "description": "S3: にく (肉) should be recognized as NOUN, not split as に+く",
       "expected": [
         {
+          "lemma": "にく",
           "pos": "Noun",
           "surface": "にく"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "たべる",
           "pos": "Verb",
           "surface": "たべる"
         }
@@ -1370,14 +1482,17 @@
       "description": "S3: はな (花/鼻) should be recognized as NOUN",
       "expected": [
         {
+          "lemma": "はな",
           "pos": "Noun",
           "surface": "はな"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "みる",
           "pos": "Verb",
           "surface": "みる"
         }
@@ -1408,14 +1523,17 @@
       "description": "S3: のり (海苔) should be recognized as NOUN",
       "expected": [
         {
+          "lemma": "のり",
           "pos": "Noun",
           "surface": "のり"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "たべる",
           "pos": "Verb",
           "surface": "たべる"
         }
@@ -1432,6 +1550,7 @@
       "description": "マスカラ (mascara) - katakana loanword preserved as single token",
       "expected": [
         {
+          "lemma": "マスカラ",
           "pos": "Noun",
           "surface": "マスカラ"
         }
@@ -1447,18 +1566,22 @@
       "description": "今日中 (within today) as single compound noun with bound noun 中",
       "expected": [
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "中",
           "pos": "Noun",
           "surface": "中"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "届く",
           "pos": "Verb",
           "surface": "届く"
         }
@@ -1474,14 +1597,17 @@
       "description": "世界中 (throughout the world) as single compound noun",
       "expected": [
         {
+          "lemma": "世界中",
           "pos": "Noun",
           "surface": "世界中"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "話題",
           "pos": "Noun",
           "surface": "話題"
         }
@@ -1497,10 +1623,12 @@
       "description": "一日中 (all day long) as single compound noun",
       "expected": [
         {
+          "lemma": "一日中",
           "pos": "Noun",
           "surface": "一日中"
         },
         {
+          "lemma": "働く",
           "pos": "Verb",
           "surface": "働く"
         }
@@ -1516,10 +1644,12 @@
       "description": "今日 splits correctly when followed by other kanji",
       "expected": [
         {
+          "lemma": "今日",
           "pos": "Noun",
           "surface": "今日"
         },
         {
+          "lemma": "学校",
           "pos": "Noun",
           "surface": "学校"
         },
@@ -1529,6 +1659,7 @@
           "surface": "行っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1544,14 +1675,17 @@
       "description": "翌営業日 (next business day) as single compound",
       "expected": [
         {
+          "lemma": "翌営業日",
           "pos": "Noun",
           "surface": "翌営業日"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "届く",
           "pos": "Verb",
           "surface": "届く"
         }
@@ -1567,14 +1701,17 @@
       "description": "先行研究 (prior research) as single compound in academic context",
       "expected": [
         {
+          "lemma": "先行研究",
           "pos": "Noun",
           "surface": "先行研究"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "参照",
           "pos": "Noun",
           "surface": "参照"
         }
@@ -1590,10 +1727,12 @@
       "description": "家にいた - regression test",
       "expected": [
         {
+          "lemma": "家",
           "pos": "Noun",
           "surface": "家"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -1603,6 +1742,7 @@
           "surface": "い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -1614,6 +1754,7 @@
       "description": "おかず - auto-generated",
       "expected": [
         {
+          "lemma": "おかず",
           "pos": "Noun",
           "surface": "おかず"
         }
@@ -1629,6 +1770,7 @@
       "description": "ふともも - auto-generated",
       "expected": [
         {
+          "lemma": "ふともも",
           "pos": "Noun",
           "surface": "ふともも"
         }
@@ -1644,6 +1786,7 @@
       "description": "おでん - auto-generated",
       "expected": [
         {
+          "lemma": "おでん",
           "pos": "Noun",
           "surface": "おでん"
         }
@@ -1659,6 +1802,7 @@
       "description": "おもち - auto-generated",
       "expected": [
         {
+          "lemma": "おもち",
           "pos": "Noun",
           "surface": "おもち"
         }
@@ -1674,14 +1818,17 @@
       "description": "たそがれの空 - auto-generated",
       "expected": [
         {
+          "lemma": "たそがれ",
           "pos": "Noun",
           "surface": "たそがれ"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "空",
           "pos": "Noun",
           "surface": "空"
         }
@@ -1697,14 +1844,17 @@
       "description": "彼氏は優しい - auto-generated",
       "expected": [
         {
+          "lemma": "彼氏",
           "pos": "Pronoun",
           "surface": "彼氏"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "優しい",
           "pos": "Adjective",
           "surface": "優しい"
         }

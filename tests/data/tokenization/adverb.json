@@ -4,22 +4,27 @@
       "description": "ただ as conjunction, not た+だ",
       "expected": [
         {
+          "lemma": "ただ",
           "pos": "Conjunction",
           "surface": "ただ"
         },
         {
+          "lemma": "彼",
           "pos": "Pronoun",
           "surface": "彼"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "掌",
           "pos": "Noun",
           "surface": "掌"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -34,6 +39,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -45,14 +51,17 @@
       "description": "まるで as adverb, not まる+で",
       "expected": [
         {
+          "lemma": "まるで",
           "pos": "Adverb",
           "surface": "まるで"
         },
         {
+          "lemma": "薬缶",
           "pos": "Noun",
           "surface": "薬缶"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -64,10 +73,12 @@
       "description": "何だか as adverb, not 何だ+か",
       "expected": [
         {
+          "lemma": "何だか",
           "pos": "Adverb",
           "surface": "何だか"
         },
         {
+          "lemma": "フワフワ",
           "pos": "Adverb",
           "surface": "フワフワ"
         },
@@ -77,14 +88,17 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "感じ",
           "pos": "Noun",
           "surface": "感じ"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -94,6 +108,7 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -105,6 +120,7 @@
       "description": "だいぶ as adverb",
       "expected": [
         {
+          "lemma": "だいぶ",
           "pos": "Adverb",
           "surface": "だいぶ"
         },
@@ -114,6 +130,7 @@
           "surface": "逢っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -125,42 +142,52 @@
       "description": "もっとも as conjunction, not もっと+も",
       "expected": [
         {
+          "lemma": "もっとも",
           "pos": "Conjunction",
           "surface": "もっとも"
         },
         {
+          "lemma": "猫",
           "pos": "Noun",
           "surface": "猫"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "時間",
           "pos": "Noun",
           "surface": "時間"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "大分",
           "pos": "Noun",
           "surface": "大分"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "なる",
           "pos": "Verb",
           "surface": "なる"
         }
@@ -172,14 +199,17 @@
       "description": "ふと as adverb, not ふ+と",
       "expected": [
         {
+          "lemma": "ふと",
           "pos": "Adverb",
           "surface": "ふと"
         },
         {
+          "lemma": "気",
           "pos": "Noun",
           "surface": "気"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -189,22 +219,27 @@
           "surface": "付い"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "見る",
           "pos": "Verb",
           "surface": "見る"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "書生",
           "pos": "Noun",
           "surface": "書生"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -214,6 +249,7 @@
           "surface": "い"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -225,38 +261,47 @@
       "description": "そうして as conjunction, not そう+し+て",
       "expected": [
         {
+          "lemma": "そうして",
           "pos": "Conjunction",
           "surface": "そうして"
         },
         {
+          "lemma": "その",
           "pos": "Determiner",
           "surface": "その"
         },
         {
+          "lemma": "穴",
           "pos": "Noun",
           "surface": "穴"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "中",
           "pos": "Noun",
           "surface": "中"
         },
         {
+          "lemma": "から",
           "pos": "Particle",
           "surface": "から"
         },
         {
+          "lemma": "煙",
           "pos": "Noun",
           "surface": "煙"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "吹く",
           "pos": "Verb",
           "surface": "吹く"
         }
@@ -268,22 +313,27 @@
       "description": "その後 dict boundary prevents 後猫 kanji merge",
       "expected": [
         {
+          "lemma": "その後",
           "pos": "Adverb",
           "surface": "その後"
         },
         {
+          "lemma": "猫",
           "pos": "Noun",
           "surface": "猫"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
         {
+          "lemma": "だいぶ",
           "pos": "Adverb",
           "surface": "だいぶ"
         },
@@ -293,6 +343,7 @@
           "surface": "逢っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -304,18 +355,22 @@
       "description": "特段 as adverb, dict boundary splits from 問題",
       "expected": [
         {
+          "lemma": "特段",
           "pos": "Adverb",
           "surface": "特段"
         },
         {
+          "lemma": "問題",
           "pos": "Noun",
           "surface": "問題"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "ない",
           "pos": "Adjective",
           "surface": "ない"
         }
@@ -324,8 +379,51 @@
       "input": "特段問題はない"
     },
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "別段 dict boundary prevents 別段恐しい kanji merge",
       "expected": [
+        {
+          "lemma": "別段",
+          "pos": "Adverb",
+          "surface": "別段"
+        },
+        {
+          "lemma": "恐い",
+          "pos": "Adjective",
+          "surface": "恐しい"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思わ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "betsudan_dict_boundary",
+      "input": "別段恐しいとも思わなかった",
+      "suzume_expected": [
         {
           "lemma": "別段",
           "pos": "Adverb",
@@ -361,13 +459,54 @@
           "pos": "Auxiliary",
           "surface": "た"
         }
-      ],
-      "id": "betsudan_dict_boundary",
-      "input": "別段恐しいとも思わなかった"
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "だいいち as adverb, boundary before 毛",
       "expected": [
+        {
+          "lemma": "だいいち",
+          "pos": "Adverb",
+          "surface": "だいいち"
+        },
+        {
+          "lemma": "毛",
+          "pos": "Noun",
+          "surface": "毛"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Auxiliary",
+          "surface": "よう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見える"
+        }
+      ],
+      "id": "daiichi_hiragana_boundary",
+      "input": "だいいち毛がないように見える",
+      "suzume_expected": [
         {
           "pos": "Adverb",
           "surface": "だいいち"
@@ -385,7 +524,7 @@
           "surface": "ない"
         },
         {
-          "pos": "Noun",
+          "pos": "Auxiliary",
           "surface": "よう"
         },
         {
@@ -396,48 +535,13 @@
           "pos": "Verb",
           "surface": "見える"
         }
-      ],
-      "id": "daiichi_hiragana_boundary",
-      "input": "だいいち毛がないように見える",
-      "suzume_expected": [
-        {
-          "surface": "だいいち",
-          "pos": "Adverb"
-        },
-        {
-          "surface": "毛",
-          "pos": "Noun"
-        },
-        {
-          "surface": "が",
-          "pos": "Particle"
-        },
-        {
-          "surface": "ない",
-          "pos": "Auxiliary"
-        },
-        {
-          "surface": "よう",
-          "pos": "Auxiliary"
-        },
-        {
-          "surface": "に",
-          "pos": "Particle"
-        },
-        {
-          "surface": "見える",
-          "pos": "Verb"
-        }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "description": "つるつる+し split (onomatopoeia + suru)",
       "expected": [
         {
+          "lemma": "つるつる",
           "pos": "Adverb",
           "surface": "つるつる"
         },
@@ -447,18 +551,22 @@
           "surface": "し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "まるで",
           "pos": "Adverb",
           "surface": "まるで"
         },
         {
+          "lemma": "薬缶",
           "pos": "Noun",
           "surface": "薬缶"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -474,30 +582,37 @@
       "description": "第一 dict entry acts as kanji compound boundary",
       "expected": [
         {
+          "lemma": "第一",
           "pos": "Noun",
           "surface": "第一"
         },
         {
+          "lemma": "毛",
           "pos": "Noun",
           "surface": "毛"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
-          "pos": "Auxiliary",
+          "lemma": "ない",
+          "pos": "Adjective",
           "surface": "ない"
         },
         {
-          "pos": "Noun",
+          "lemma": "よう",
+          "pos": "Auxiliary",
           "surface": "よう"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "見える",
           "pos": "Verb",
           "surface": "見える"
         }
@@ -546,6 +661,7 @@
       "description": "じめじめ+し+た - ABAB onomatopoeia + suru verb",
       "expected": [
         {
+          "lemma": "じめじめ",
           "pos": "Adverb",
           "surface": "じめじめ"
         },
@@ -555,6 +671,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }

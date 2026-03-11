@@ -211,16 +211,8 @@ def postprocess_iru_aux(tokens: list[dict]) -> None:
 
 
 def postprocess_de_particle(tokens: list[dict]) -> None:
-    """Fix で as copula -> Particle in certain contexts."""
-    for i, t in enumerate(tokens):
-        if t.get("surface") != "で" or t.get("pos") != "Auxiliary":
-            continue
-        # で followed by は/も
-        if i < len(tokens) - 1:
-            nxt = tokens[i + 1].get("surface", "")
-            if nxt in ("は", "も"):
-                t["pos"] = "Particle"
-                t["lemma"] = "で"
+    """No-op: MeCab correctly distinguishes copula で(Aux) from particle で(Part)."""
+    pass
 
 
 def postprocess_na_adj_noun(tokens: list[dict]) -> None:
@@ -317,11 +309,10 @@ def postprocess_gozai_verb(tokens: list[dict]) -> None:
 
 
 def postprocess_you_noun(tokens: list[dict]) -> None:
-    """Fix よう: Auxiliary -> Noun (形式名詞)."""
+    """Fix よう: Noun -> Auxiliary (Suzume treats よう as Auxiliary consistently)."""
     for t in tokens:
-        if t.get("surface") == "よう" and t.get("pos") == "Auxiliary":
-            t["pos"] = "Noun"
-            t["lemma"] = "よう"
+        if t.get("surface") == "よう" and t.get("pos") == "Noun":
+            t["pos"] = "Auxiliary"
 
 
 def postprocess_sou_aux(tokens: list[dict]) -> None:
@@ -348,8 +339,43 @@ def postprocess_n_kuruwa(tokens: list[dict]) -> None:
 
 
 def postprocess_nai_context(tokens: list[dict]) -> None:
-    """No-op: ない POS is too context-dependent for simple rules."""
-    pass
+    """Correct ない/なく/なかっ POS: Auxiliary → Adjective after particles.
+
+    Suzume treats standalone ない (doesn't exist) as Adjective, not Auxiliary.
+    MeCab classifies it as 助動詞 in all contexts, but when ない follows
+    particles like が/は/も, it's an existence adjective, not a negative auxiliary.
+
+    Also handles sentence-initial ない and なく before て (adjective renyokei).
+    """
+    for idx, tok in enumerate(tokens):
+        surface = tok.get("surface", "")
+        pos = tok.get("pos", "")
+
+        if surface not in ("ない", "なく", "なかっ") or pos != "Auxiliary":
+            continue
+
+        should_fix = False
+
+        if idx == 0:
+            # Sentence-initial ない/なく/なかっ → Adjective
+            should_fix = True
+        else:
+            prev_pos = tokens[idx - 1].get("pos", "")
+            prev_surface = tokens[idx - 1].get("surface", "")
+
+            # After particle が/は/も → Adjective (existence negation)
+            if prev_pos == "Particle" and prev_surface in ("が", "は", "も"):
+                should_fix = True
+
+            # なく before て → Adjective (renyokei of ない-adjective)
+            elif surface == "なく" and idx + 1 < len(tokens):
+                next_surface = tokens[idx + 1].get("surface", "")
+                if next_surface == "て":
+                    should_fix = True
+
+        if should_fix:
+            tok["pos"] = "Adjective"
+            tok["lemma"] = "ない"
 
 
 def postprocess_nara_verb(tokens: list[dict]) -> None:

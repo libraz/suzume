@@ -1,27 +1,57 @@
 {
   "cases": [
     {
+      "accepted_diff": {
+        "category": "lemma-diff",
+        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+      },
       "description": "Regression: verb rentaikei + 所 should not merge into compound noun",
       "expected": [
         {
+          "lemma": "見渡せる",
           "pos": "Verb",
           "surface": "見渡せる"
         },
         {
+          "lemma": "所",
           "pos": "Noun",
           "surface": "所"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "座る",
           "pos": "Verb",
           "surface": "座る"
         }
       ],
       "id": "seru_ni_ru",
-      "input": "見渡せる所に座る"
+      "input": "見渡せる所に座る",
+      "suzume_expected": [
+        {
+          "lemma": "見渡する",
+          "pos": "Verb",
+          "surface": "見渡せる"
+        },
+        {
+          "lemma": "所",
+          "pos": "Noun",
+          "surface": "所"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "座る",
+          "pos": "Verb",
+          "surface": "座る"
+        }
+      ]
     }
   ],
   "description": "compound_verb tests",

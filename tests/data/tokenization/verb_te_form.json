@@ -4,10 +4,12 @@
       "description": "Regression: 忍び足 noun + 近寄る godan-ra verb",
       "expected": [
         {
+          "lemma": "忍び足",
           "pos": "Noun",
           "surface": "忍び足"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -17,6 +19,7 @@
           "surface": "近寄っ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         }

@@ -4,18 +4,22 @@
       "description": "Copula です",
       "expected": [
         {
+          "lemma": "これ",
           "pos": "Pronoun",
           "surface": "これ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         }
@@ -31,6 +35,7 @@
       "description": "神だった - MeCab splits as だっ + た",
       "expected": [
         {
+          "lemma": "神",
           "pos": "Noun",
           "surface": "神"
         },
@@ -40,6 +45,7 @@
           "surface": "だっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -55,6 +61,7 @@
       "description": "だった - MeCab splits as だっ + た, lemma is だ",
       "expected": [
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         },
@@ -64,6 +71,7 @@
           "surface": "だっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -79,22 +87,27 @@
       "description": "Full sentence with だった - MeCab splits as だっ + た",
       "expected": [
         {
+          "lemma": "ワンマンライブ",
           "pos": "Noun",
           "surface": "ワンマンライブ"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "セットリスト",
           "pos": "Noun",
           "surface": "セットリスト"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "神",
           "pos": "Noun",
           "surface": "神"
         },
@@ -104,6 +117,7 @@
           "surface": "だっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -120,6 +134,7 @@
       "description": "でした (polite past copula) - MeCab splits as でし + た",
       "expected": [
         {
+          "lemma": "本",
           "pos": "Noun",
           "surface": "本"
         },
@@ -129,6 +144,7 @@
           "surface": "でし"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -144,6 +160,7 @@
       "description": "であった (formal past copula) - で + あっ + た split (MeCab-compatible)",
       "expected": [
         {
+          "lemma": "重要",
           "pos": "Adjective",
           "surface": "重要"
         },
@@ -158,6 +175,7 @@
           "surface": "あっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -173,10 +191,12 @@
       "description": "Basic copula だ after noun",
       "expected": [
         {
+          "lemma": "学生",
           "pos": "Noun",
           "surface": "学生"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -192,6 +212,7 @@
       "description": "嫌でない - na-adjective copula negation (suzume uses ADJ for na-adjectives)",
       "expected": [
         {
+          "lemma": "嫌",
           "pos": "Adjective",
           "surface": "嫌"
         },
@@ -201,6 +222,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -216,6 +238,7 @@
       "description": "好きでない - na-adjective copula negation",
       "expected": [
         {
+          "lemma": "好き",
           "pos": "Adjective",
           "surface": "好き"
         },
@@ -225,6 +248,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -240,6 +264,7 @@
       "description": "静かでない - na-adjective copula negation",
       "expected": [
         {
+          "lemma": "静か",
           "pos": "Adjective",
           "surface": "静か"
         },
@@ -249,6 +274,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -264,6 +290,7 @@
       "description": "きれいでない - na-adjective copula negation",
       "expected": [
         {
+          "lemma": "きれい",
           "pos": "Adjective",
           "surface": "きれい"
         },
@@ -273,6 +300,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -292,18 +320,22 @@
       "description": "彼女でもない - particle も + ない, not verb もなう",
       "expected": [
         {
+          "lemma": "彼女",
           "pos": "Pronoun",
           "surface": "彼女"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
         {
+          "lemma": "ない",
           "pos": "Adjective",
           "surface": "ない"
         }
@@ -334,10 +366,12 @@
       "description": "それでもない - grammar-first: で is copula (だ連用形), not particle",
       "expected": [
         {
+          "lemma": "それでも",
           "pos": "Conjunction",
           "surface": "それでも"
         },
         {
+          "lemma": "ない",
           "pos": "Adjective",
           "surface": "ない"
         }
@@ -354,18 +388,22 @@
       "description": "彼女ではない - particle は + ない pattern",
       "expected": [
         {
+          "lemma": "彼女",
           "pos": "Pronoun",
           "surface": "彼女"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "ない",
           "pos": "Adjective",
           "surface": "ない"
         }
@@ -387,6 +425,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }
@@ -408,6 +447,7 @@
           "surface": "あり"
         },
         {
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ます"
         }
@@ -419,30 +459,37 @@
       "description": "すなわち as single conjunction token (not す+なわち)",
       "expected": [
         {
+          "lemma": "すなわち",
           "pos": "Conjunction",
           "surface": "すなわち"
         },
         {
+          "lemma": "人間",
           "pos": "Noun",
           "surface": "人間"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "矛盾",
           "pos": "Noun",
           "surface": "矛盾"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "塊",
           "pos": "Noun",
           "surface": "塊"
         },
@@ -452,6 +499,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }

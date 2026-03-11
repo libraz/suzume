@@ -4,14 +4,17 @@
       "description": "行く+の+だ - verb + explanatory のだ split",
       "expected": [
         {
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行く"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -23,6 +26,7 @@
       "description": "食べる+ん+だ - verb + explanatory んだ split",
       "expected": [
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         },
@@ -32,6 +36,7 @@
           "surface": "ん"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }

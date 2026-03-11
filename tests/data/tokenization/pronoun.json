@@ -4,6 +4,7 @@
       "description": "あなた - hiragana pronoun, MeCab-compatible lemma is hiragana",
       "expected": [
         {
+          "lemma": "あなた",
           "pos": "Pronoun",
           "surface": "あなた"
         }
@@ -19,10 +20,12 @@
       "description": "私たち - plural pronoun",
       "expected": [
         {
+          "lemma": "私",
           "pos": "Pronoun",
           "surface": "私"
         },
         {
+          "lemma": "たち",
           "pos": "Suffix",
           "surface": "たち"
         }
@@ -38,10 +41,12 @@
       "description": "僕たち - plural pronoun",
       "expected": [
         {
+          "lemma": "僕",
           "pos": "Pronoun",
           "surface": "僕"
         },
         {
+          "lemma": "たち",
           "pos": "Suffix",
           "surface": "たち"
         }
@@ -57,10 +62,12 @@
       "description": "俺たち - plural pronoun",
       "expected": [
         {
+          "lemma": "俺",
           "pos": "Pronoun",
           "surface": "俺"
         },
         {
+          "lemma": "たち",
           "pos": "Suffix",
           "surface": "たち"
         }
@@ -76,10 +83,12 @@
       "description": "皆さん - collective pronoun",
       "expected": [
         {
+          "lemma": "皆",
           "pos": "Pronoun",
           "surface": "皆"
         },
         {
+          "lemma": "さん",
           "pos": "Suffix",
           "surface": "さん"
         }
@@ -95,6 +104,7 @@
       "description": "みんな - collective pronoun",
       "expected": [
         {
+          "lemma": "みんな",
           "pos": "Pronoun",
           "surface": "みんな"
         }
@@ -114,14 +124,17 @@
       "description": "Samurai pronoun 拙者 - MeCab shows 拙者 as NOUN not PRON",
       "expected": [
         {
+          "lemma": "拙者",
           "pos": "Pronoun",
           "surface": "拙者"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "侍",
           "pos": "Noun",
           "surface": "侍"
         },
@@ -131,6 +144,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ござる",
           "pos": "Auxiliary",
           "surface": "ござる"
         }
@@ -169,14 +183,17 @@
       "description": "Old-fashioned pronoun 我輩",
       "expected": [
         {
+          "lemma": "我輩",
           "pos": "Pronoun",
           "surface": "我輩"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "猫",
           "pos": "Noun",
           "surface": "猫"
         },
@@ -186,6 +203,7 @@
           "surface": "で"
         },
         {
+          "lemma": "ある",
           "pos": "Verb",
           "surface": "ある"
         }
@@ -201,14 +219,17 @@
       "description": "Samurai pronoun 某",
       "expected": [
         {
+          "lemma": "某",
           "pos": "Pronoun",
           "surface": "某"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "参る",
           "pos": "Verb",
           "surface": "参る"
         }
@@ -225,14 +246,17 @@
       "description": "B39: お前 should be PRON, not PREFIX+NOUN split",
       "expected": [
         {
+          "lemma": "お前",
           "pos": "Pronoun",
           "surface": "お前"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "話",
           "pos": "Noun",
           "surface": "話"
         }
@@ -247,10 +271,12 @@
       "description": "こいつ should be single Pronoun (not こい+つ)",
       "expected": [
         {
+          "lemma": "こいつ",
           "pos": "Pronoun",
           "surface": "こいつ"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -260,6 +286,7 @@
           "surface": "バレ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -275,18 +302,22 @@
       "description": "そいつ should be single Pronoun",
       "expected": [
         {
+          "lemma": "そいつ",
           "pos": "Pronoun",
           "surface": "そいつ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "誰",
           "pos": "Pronoun",
           "surface": "誰"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -302,10 +333,12 @@
       "description": "あいつ should be single Pronoun",
       "expected": [
         {
+          "lemma": "あいつ",
           "pos": "Pronoun",
           "surface": "あいつ"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
@@ -315,6 +348,7 @@
           "surface": "来"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -330,18 +364,22 @@
       "description": "どいつ should be single Pronoun",
       "expected": [
         {
+          "lemma": "どいつ",
           "pos": "Pronoun",
           "surface": "どいつ"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "犯人",
           "pos": "Noun",
           "surface": "犯人"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -357,14 +395,17 @@
       "description": "Demonstrative pronoun それ",
       "expected": [
         {
+          "lemma": "それ",
           "pos": "Pronoun",
           "surface": "それ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "何",
           "pos": "Pronoun",
           "surface": "何"
         }
@@ -379,22 +420,27 @@
       "description": "それ should be recognized as pronoun",
       "expected": [
         {
+          "lemma": "それ",
           "pos": "Pronoun",
           "surface": "それ"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "何",
           "pos": "Pronoun",
           "surface": "何"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "か",
           "pos": "Particle",
           "surface": "か"
         }
@@ -410,10 +456,12 @@
       "description": "何+も+し+ない - interrogative pronoun + particle + verb",
       "expected": [
         {
+          "lemma": "何",
           "pos": "Pronoun",
           "surface": "何"
         },
         {
+          "lemma": "も",
           "pos": "Particle",
           "surface": "も"
         },
@@ -423,6 +471,7 @@
           "surface": "し"
         },
         {
+          "lemma": "ない",
           "pos": "Auxiliary",
           "surface": "ない"
         }

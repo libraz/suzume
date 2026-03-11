@@ -4,18 +4,22 @@
       "description": "Regression: 気の毒 na-adjective dict entry",
       "expected": [
         {
+          "lemma": "少し",
           "pos": "Adverb",
           "surface": "少し"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "気の毒",
           "pos": "Adjective",
           "surface": "気の毒"
         },
         {
+          "lemma": "と",
           "pos": "Particle",
           "surface": "と"
         },
@@ -25,6 +29,7 @@
           "surface": "思っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -36,18 +41,22 @@
       "description": "Regression: 遥か na-adjective dict entry",
       "expected": [
         {
+          "lemma": "遥か",
           "pos": "Adjective",
           "surface": "遥か"
         },
         {
+          "lemma": "向う",
           "pos": "Noun",
           "surface": "向う"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "田圃",
           "pos": "Noun",
           "surface": "田圃"
         }

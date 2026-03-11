@@ -4,10 +4,12 @@
       "description": "学生たち - noun + suffix split",
       "expected": [
         {
+          "lemma": "学生",
           "pos": "Noun",
           "surface": "学生"
         },
         {
+          "lemma": "たち",
           "pos": "Suffix",
           "surface": "たち"
         }
@@ -22,10 +24,12 @@
       "description": "田中さん - noun + honorific suffix split",
       "expected": [
         {
+          "lemma": "田中",
           "pos": "Noun",
           "surface": "田中"
         },
         {
+          "lemma": "さん",
           "pos": "Suffix",
           "surface": "さん"
         }
@@ -40,18 +44,22 @@
       "description": "子供たちが遊ぶ - noun + suffix split",
       "expected": [
         {
+          "lemma": "子供",
           "pos": "Noun",
           "surface": "子供"
         },
         {
+          "lemma": "たち",
           "pos": "Suffix",
           "surface": "たち"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "遊ぶ",
           "pos": "Verb",
           "surface": "遊ぶ"
         }
@@ -66,10 +74,12 @@
       "description": "先生さん should split as 先生 + さん",
       "expected": [
         {
+          "lemma": "先生",
           "pos": "Noun",
           "surface": "先生"
         },
         {
+          "lemma": "さん",
           "pos": "Suffix",
           "surface": "さん"
         }
@@ -84,14 +94,17 @@
       "description": "皮ごと食べる - ごと as suffix",
       "expected": [
         {
+          "lemma": "皮",
           "pos": "Noun",
           "surface": "皮"
         },
         {
+          "lemma": "ごと",
           "pos": "Suffix",
           "surface": "ごと"
         },
         {
+          "lemma": "食べる",
           "pos": "Verb",
           "surface": "食べる"
         }
@@ -111,14 +124,17 @@
       "description": "日ごとに強くなる - ごと + に pattern",
       "expected": [
         {
+          "lemma": "日",
           "pos": "Noun",
           "surface": "日"
         },
         {
+          "lemma": "ごと",
           "pos": "Suffix",
           "surface": "ごと"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -128,6 +144,7 @@
           "surface": "強く"
         },
         {
+          "lemma": "なる",
           "pos": "Verb",
           "surface": "なる"
         }
@@ -166,6 +183,7 @@
       "description": "数ヶ月 should stay as one token",
       "expected": [
         {
+          "lemma": "数ヶ月",
           "pos": "Noun",
           "surface": "数ヶ月"
         }
@@ -181,6 +199,7 @@
       "description": "数ヶ所 should stay as one token",
       "expected": [
         {
+          "lemma": "数ヶ所",
           "pos": "Noun",
           "surface": "数ヶ所"
         }
@@ -196,10 +215,12 @@
       "description": "付けで should not split into 付 + け",
       "expected": [
         {
+          "lemma": "付け",
           "pos": "Noun",
           "surface": "付け"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -219,10 +240,12 @@
       "description": "日付けで - MeCab splits as 日 + 付け + で",
       "expected": [
         {
+          "lemma": "日付け",
           "pos": "Noun",
           "surface": "日付け"
         },
         {
+          "lemma": "で",
           "pos": "Particle",
           "surface": "で"
         }
@@ -243,10 +266,12 @@
           "surface": "あり"
         },
         {
+          "lemma": "がち",
           "pos": "Suffix",
           "surface": "がち"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -263,6 +288,7 @@
       "description": "S6: なりがち should be NOUN, not なり+が+ち",
       "expected": [
         {
+          "lemma": "そう",
           "pos": "Adverb",
           "surface": "そう"
         },
@@ -272,6 +298,7 @@
           "surface": "なり"
         },
         {
+          "lemma": "がち",
           "pos": "Suffix",
           "surface": "がち"
         }
@@ -297,10 +324,12 @@
           "surface": "忘れ"
         },
         {
+          "lemma": "がち",
           "pos": "Suffix",
           "surface": "がち"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -331,18 +360,22 @@
       "description": "S6: がち should be recognized as suffix",
       "expected": [
         {
+          "lemma": "遅れ",
           "pos": "Noun",
           "surface": "遅れ"
         },
         {
+          "lemma": "がち",
           "pos": "Suffix",
           "surface": "がち"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
+          "lemma": "なる",
           "pos": "Verb",
           "surface": "なる"
         }
@@ -359,6 +392,7 @@
       "description": "読み方 - nominalized verb + 方 (way of reading)",
       "expected": [
         {
+          "lemma": "読み方",
           "pos": "Noun",
           "surface": "読み方"
         }
@@ -374,6 +408,7 @@
       "description": "書き方 - nominalized verb + 方 (way of writing)",
       "expected": [
         {
+          "lemma": "書き方",
           "pos": "Noun",
           "surface": "書き方"
         }
@@ -389,6 +424,7 @@
       "description": "使い方 - nominalized verb + 方 (way of using)",
       "expected": [
         {
+          "lemma": "使い方",
           "pos": "Noun",
           "surface": "使い方"
         }
@@ -409,6 +445,7 @@
           "surface": "美しい"
         },
         {
+          "lemma": "方",
           "pos": "Noun",
           "surface": "方"
         }
@@ -429,18 +466,22 @@
           "surface": "書い"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         },
         {
+          "lemma": "方",
           "pos": "Noun",
           "surface": "方"
         },
         {
+          "lemma": "が",
           "pos": "Particle",
           "surface": "が"
         },
         {
+          "lemma": "いい",
           "pos": "Adjective",
           "surface": "いい"
         }
@@ -456,10 +497,12 @@
       "description": "泥だらけ - auto-generated",
       "expected": [
         {
+          "lemma": "泥",
           "pos": "Noun",
           "surface": "泥"
         },
         {
+          "lemma": "だらけ",
           "pos": "Suffix",
           "surface": "だらけ"
         }
@@ -471,10 +514,12 @@
       "description": "傷だらけ - auto-generated",
       "expected": [
         {
+          "lemma": "傷",
           "pos": "Noun",
           "surface": "傷"
         },
         {
+          "lemma": "だらけ",
           "pos": "Suffix",
           "surface": "だらけ"
         }
@@ -486,14 +531,17 @@
       "description": "っぱなし suffix after verb renyokei",
       "expected": [
         {
+          "lemma": "出し",
           "pos": "Noun",
           "surface": "出し"
         },
         {
+          "lemma": "っぱなし",
           "pos": "Suffix",
           "surface": "っぱなし"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }

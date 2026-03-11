@@ -9,6 +9,7 @@
           "surface": "し"
         },
         {
+          "lemma": "てる",
           "pos": "Auxiliary",
           "surface": "てる"
         }
@@ -33,6 +34,7 @@
           "surface": "て"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -53,6 +55,7 @@
           "surface": "わから"
         },
         {
+          "lemma": "ん",
           "pos": "Auxiliary",
           "surface": "ん"
         }
@@ -73,6 +76,7 @@
       "description": "ないんだ - ない + んだ should not split as な + いん + だ",
       "expected": [
         {
+          "lemma": "ない",
           "pos": "Adjective",
           "surface": "ない"
         },
@@ -82,6 +86,7 @@
           "surface": "ん"
         },
         {
+          "lemma": "だ",
           "pos": "Auxiliary",
           "surface": "だ"
         }
@@ -113,10 +118,12 @@
       "description": "田中さん - should split as NOUN + SUFFIX, not VERB",
       "expected": [
         {
+          "lemma": "田中",
           "pos": "Noun",
           "surface": "田中"
         },
         {
+          "lemma": "さん",
           "pos": "Suffix",
           "surface": "さん"
         }
@@ -137,6 +144,7 @@
       "description": "おねえさん - should not be parsed as verb おねえす",
       "expected": [
         {
+          "lemma": "おねえさん",
           "pos": "Noun",
           "surface": "おねえさん"
         }
@@ -166,6 +174,7 @@
       "description": "お姉さん - prefix + kanji noun + suffix",
       "expected": [
         {
+          "lemma": "お姉さん",
           "pos": "Noun",
           "surface": "お姉さん"
         }
@@ -182,10 +191,12 @@
       "description": "義母さん - compound noun + suffix",
       "expected": [
         {
+          "lemma": "義母",
           "pos": "Noun",
           "surface": "義母"
         },
         {
+          "lemma": "さん",
           "pos": "Suffix",
           "surface": "さん"
         }
@@ -212,6 +223,7 @@
           "surface": "れ"
         },
         {
+          "lemma": "ちゃう",
           "pos": "Verb",
           "surface": "ちゃう"
         }
@@ -238,6 +250,7 @@
           "surface": "られ"
         },
         {
+          "lemma": "ちゃう",
           "pos": "Verb",
           "surface": "ちゃう"
         }
@@ -264,6 +277,7 @@
           "surface": "ちゃっ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -284,6 +298,7 @@
           "surface": "言っ"
         },
         {
+          "lemma": "ちゃう",
           "pos": "Verb",
           "surface": "ちゃう"
         }
@@ -318,6 +333,7 @@
           "surface": "帰っ"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
@@ -364,6 +380,7 @@
           "surface": "ずに"
         },
         {
+          "lemma": "聞く",
           "pos": "Verb",
           "surface": "聞く"
         }
@@ -438,6 +455,7 @@
           "surface": "ずに"
         },
         {
+          "lemma": "済む",
           "pos": "Verb",
           "surface": "済む"
         }
@@ -465,10 +483,12 @@
       "description": "めちゃ楽しい - auto-generated",
       "expected": [
         {
+          "lemma": "めちゃ",
           "pos": "Other",
           "surface": "めちゃ"
         },
         {
+          "lemma": "楽しい",
           "pos": "Adjective",
           "surface": "楽しい"
         }
@@ -480,10 +500,12 @@
       "description": "めちゃ好き - auto-generated",
       "expected": [
         {
+          "lemma": "めちゃ",
           "pos": "Other",
           "surface": "めちゃ"
         },
         {
+          "lemma": "好き",
           "pos": "Adjective",
           "surface": "好き"
         }
@@ -495,10 +517,12 @@
       "description": "honorific suffix くん",
       "expected": [
         {
+          "lemma": "太郎",
           "pos": "Noun",
           "surface": "太郎"
         },
         {
+          "lemma": "くん",
           "pos": "Suffix",
           "surface": "くん"
         }
@@ -510,10 +534,12 @@
       "description": "honorific suffix さま",
       "expected": [
         {
+          "lemma": "花子",
           "pos": "Noun",
           "surface": "花子"
         },
         {
+          "lemma": "さま",
           "pos": "Suffix",
           "surface": "さま"
         }
@@ -525,10 +551,12 @@
       "description": "honorific suffix ちゃん",
       "expected": [
         {
+          "lemma": "花子",
           "pos": "Noun",
           "surface": "花子"
         },
         {
+          "lemma": "ちゃん",
           "pos": "Suffix",
           "surface": "ちゃん"
         }
