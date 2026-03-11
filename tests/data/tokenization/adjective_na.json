@@ -783,10 +783,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "design-difference",
-        "reason": "Suzume intentional design difference from MeCab normalization"
-      },
       "description": "本当に (really)",
       "expected": [
         {
@@ -800,13 +796,6 @@
       ],
       "id": "na_hontouni",
       "input": "本当に",
-      "suzume_expected": [
-        {
-          "lemma": "本当に",
-          "pos": "Adverb",
-          "surface": "本当に"
-        }
-      ],
       "tags": [
         "grammar",
         "na-adjective",

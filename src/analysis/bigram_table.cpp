@@ -354,6 +354,10 @@ BigramTable::initTable() {
   // AuxDesireTai → AuxTenseTa (たかっ+た) - strong bonus
   setCell(t, EPOS::AuxDesireTai, EPOS::AuxTenseTa, cost::kStrongBonus);
 
+  // AuxDesireTai → AuxNegativeNai (たく+ない/なかっ) - moderate bonus
+  // 走り出したくなかった → 走り出し+たく+なかっ+た (not 走り+出したく+なかっ+た)
+  setCell(t, EPOS::AuxDesireTai, EPOS::AuxNegativeNai, cost::kModerateBonus);
+
   // AuxTenseTa → verb forms - prohibit
   // Past tense cannot be directly followed by verb forms
   // Prevents した+いん+だ / した+いんだ from beating し+たい+ん+だ

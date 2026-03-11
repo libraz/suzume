@@ -225,10 +225,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "POS/lemma normalization difference"
-      },
       "description": "走りだしたくなかった - hiragana subsidiary verb",
       "expected": [
         {
@@ -253,6 +249,10 @@
       ],
       "id": "compound_verb_hiragana_v2_dasu",
       "input": "走りだしたくなかった",
+      "tags": [
+        "compound_verb",
+        "hiragana_v2"
+      ],
       "suzume_expected": [
         {
           "lemma": "走り出す",
@@ -266,17 +266,13 @@
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "なかっ"
         },
         {
           "pos": "Auxiliary",
           "surface": "た"
         }
-      ],
-      "tags": [
-        "compound_verb",
-        "hiragana_v2"
       ]
     },
     {
@@ -340,10 +336,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "POS/lemma normalization difference"
-      },
       "description": "走り出したくなかった - kanji subsidiary verb",
       "expected": [
         {
@@ -369,27 +361,6 @@
       ],
       "id": "compound_verb_kanji_v2_dasu",
       "input": "走り出したくなかった",
-      "suzume_expected": [
-        {
-          "lemma": "走る",
-          "pos": "Verb",
-          "surface": "走り"
-        },
-        {
-          "lemma": "出したくない",
-          "pos": "Adjective",
-          "surface": "出したく"
-        },
-        {
-          "lemma": "ない",
-          "pos": "Auxiliary",
-          "surface": "なかっ"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "た"
-        }
-      ],
       "tags": [
         "compound_verb",
         "kanji_v2"
@@ -819,35 +790,12 @@
           "surface": "なかっ"
         },
         {
-          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }
       ],
       "id": "s3_hashiridashi_tai_split",
       "input": "走り出したくなかった",
-      "suzume_expected": [
-        {
-          "lemma": "走る",
-          "pos": "Verb",
-          "surface": "走り"
-        },
-        {
-          "lemma": "出したくない",
-          "pos": "Adjective",
-          "surface": "出したく"
-        },
-        {
-          "lemma": "ない",
-          "pos": "Auxiliary",
-          "surface": "なかっ"
-        },
-        {
-          "lemma": "た",
-          "pos": "Auxiliary",
-          "surface": "た"
-        }
-      ],
       "tags": [
         "s3_fix",
         "compound_verb",

@@ -1092,6 +1092,32 @@
       ],
       "id": "ichidan_shuushikei_suteruwake",
       "input": "捨てるわけにはいかぬ"
+    },
+    {
+      "description": "Ichidan verb renyokei + desiderative たい should not be recognized as i-adjective",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "desiderative_neg_past_tabetaku",
+      "input": "食べたくなかった"
     }
   ],
   "description": "Ichidan verbs (一段動詞)",

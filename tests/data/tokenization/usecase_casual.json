@@ -24,42 +24,20 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "ãã: adverb vs adjective before copula"
-      },
       "description": "Casual confirmation",
       "expected": [
         {
+          "lemma": "本当",
           "pos": "Noun",
           "surface": "本当"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
         {
-          "pos": "Adverb",
-          "surface": "そう"
-        },
-        {
-          "lemma": "だ",
-          "pos": "Auxiliary",
-          "surface": "な"
-        },
-        {
-          "pos": "Particle",
-          "surface": "の"
-        }
-      ],
-      "id": "casual_really",
-      "input": "本当にそうなの",
-      "suzume_expected": [
-        {
-          "pos": "Adverb",
-          "surface": "本当に"
-        },
-        {
+          "lemma": "そう",
           "pos": "Adjective",
           "surface": "そう"
         },
@@ -69,12 +47,37 @@
           "surface": "な"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         }
       ],
+      "id": "casual_really",
+      "input": "本当にそうなの",
       "tags": [
         "casual"
+      ],
+      "suzume_expected": [
+        {
+          "pos": "Noun",
+          "surface": "本当"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        }
       ]
     },
     {

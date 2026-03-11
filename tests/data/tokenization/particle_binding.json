@@ -509,10 +509,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "design-difference",
-        "reason": "Suzume keeps kanji+に as single token"
-      },
       "description": "同時に (simultaneously)",
       "expected": [
         {
@@ -526,13 +522,6 @@
       ],
       "id": "noun_ni_doujini",
       "input": "同時に",
-      "suzume_expected": [
-        {
-          "lemma": "同時に",
-          "pos": "Adverb",
-          "surface": "同時に"
-        }
-      ],
       "tags": [
         "grammar",
         "noun-ni"
@@ -558,10 +547,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "design-difference",
-        "reason": "Suzume keeps kanji+に as single token"
-      },
       "description": "一般に (generally)",
       "expected": [
         {
@@ -575,23 +560,12 @@
       ],
       "id": "noun_ni_ippanni",
       "input": "一般に",
-      "suzume_expected": [
-        {
-          "lemma": "一般に",
-          "pos": "Adverb",
-          "surface": "一般に"
-        }
-      ],
       "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "accepted_diff": {
-        "category": "design-difference",
-        "reason": "Suzume keeps kanji+に as single token"
-      },
       "description": "次第に (gradually)",
       "expected": [
         {
@@ -605,23 +579,12 @@
       ],
       "id": "noun_ni_shidaini",
       "input": "次第に",
-      "suzume_expected": [
-        {
-          "lemma": "次第に",
-          "pos": "Adverb",
-          "surface": "次第に"
-        }
-      ],
       "tags": [
         "grammar",
         "noun-ni"
       ]
     },
     {
-      "accepted_diff": {
-        "category": "design-difference",
-        "reason": "Suzume intentional design difference from MeCab normalization"
-      },
       "description": "一気に (at once)",
       "expected": [
         {
@@ -635,13 +598,6 @@
       ],
       "id": "noun_ni_ikkini",
       "input": "一気に",
-      "suzume_expected": [
-        {
-          "lemma": "一気に",
-          "pos": "Adverb",
-          "surface": "一気に"
-        }
-      ],
       "tags": [
         "grammar",
         "noun-ni"
@@ -1046,6 +1002,10 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "金がない should be split as 金 + が + ない",
       "expected": [
         {
@@ -1063,28 +1023,24 @@
       ],
       "id": "particle_filter_kane_ga_nai",
       "input": "金がない",
+      "suzume_expected": [
+        {
+          "pos": "Noun",
+          "surface": "金"
+        },
+        {
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
       "tags": [
         "particle",
         "filter"
-      ],
-      "suzume_expected": [
-        {
-          "surface": "金",
-          "pos": "Noun"
-        },
-        {
-          "surface": "が",
-          "pos": "Particle"
-        },
-        {
-          "surface": "ない",
-          "pos": "Adjective"
-        }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "description": "くらい should be particle (degree), not 暗い adjective",

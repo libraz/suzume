@@ -152,10 +152,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "design-difference",
-        "reason": "Suzume intentional design difference from MeCab normalization"
-      },
       "description": "えっ！？本当に？ - mixed punctuation",
       "expected": [
         {
@@ -173,18 +169,6 @@
       ],
       "id": "edge_mixed_punctuation",
       "input": "えっ！？本当に？",
-      "suzume_expected": [
-        {
-          "lemma": "えっ",
-          "pos": "Interjection",
-          "surface": "えっ"
-        },
-        {
-          "lemma": "本当に",
-          "pos": "Adverb",
-          "surface": "本当に"
-        }
-      ],
       "tags": [
         "basic",
         "edge-case"

@@ -185,6 +185,32 @@
       ],
       "id": "wake_niha_ikanakatta",
       "input": "帰るわけにはいかなかった"
+    },
+    {
+      "description": "Verb renyokei + desiderative たい should not be recognized as i-adjective",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行き"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "desiderative_neg_past_ikitaku",
+      "input": "行きたくなかった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows",

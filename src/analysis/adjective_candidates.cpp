@@ -640,6 +640,33 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
           }
         }
 
+        // Skip verb renyokei + たい patterns (desiderative auxiliary)
+        // The inflection engine may identify verb+たい conjugations as i-adjectives:
+        //   行きたくなかった → base_form=行きたくない (contains たくない)
+        //   行きたかった → base_form=行きたい (ends with たい)
+        // Real adjective: 冷たくなかった → base_form=冷たくない, char before たくない is 冷 (kanji)
+        // False adjective: 行きたくなかった → base_form=行きたくない, char before たくない is き (hiragana)
+        {
+          std::string_view base_sv(cand.base_form);
+          // Determine the stem before the たい-related suffix
+          std::string_view before_tai;
+          if (utf8::endsWith(base_sv, "たくない") &&
+              base_sv.size() > 4 * core::kJapaneseCharBytes) {
+            // Negative form: 行きたくない → check char before たくない
+            before_tai = base_sv.substr(0, base_sv.size() - 4 * core::kJapaneseCharBytes);
+          } else if (utf8::endsWith(base_sv, "たい") &&
+                     base_sv.size() > 2 * core::kJapaneseCharBytes) {
+            // Base form: 行きたい → check char before たい
+            before_tai = base_sv.substr(0, base_sv.size() - 2 * core::kJapaneseCharBytes);
+          }
+          if (!before_tai.empty()) {
+            auto last_cp = utf8::decodeFirstChar(utf8::lastChar(before_tai));
+            if (last_cp != 0 && kana::isHiraganaCodepoint(last_cp)) {
+              continue;  // Verb renyokei + たい, not a real adjective
+            }
+          }
+        }
+
         // Lower base cost (0.2F) to beat verb candidates after POS prior adjustment
         // ADJ prior (0.3) is higher than VERB prior (0.2), so we need lower edge cost
         float cost = candidate::kKanjiAdjBaseCost + (1.0F - cand.confidence) * candidate::kKanjiAdjConfScale;

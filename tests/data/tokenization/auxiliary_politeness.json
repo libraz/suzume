@@ -143,27 +143,30 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "ãå¬¢æ§ split as ã+å¬¢+æ§ without user dict"
-      },
       "description": "Ojou-sama speech ですわ",
       "expected": [
         {
+          "lemma": "お嬢様",
           "pos": "Noun",
           "surface": "お嬢様"
         },
         {
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "です"
         },
         {
+          "lemma": "わ",
           "pos": "Particle",
           "surface": "わ"
         }
       ],
       "id": "character_desuwa",
       "input": "お嬢様ですわ",
+      "tags": [
+        "character_speech",
+        "ojousama"
+      ],
       "suzume_expected": [
         {
           "pos": "Prefix",
@@ -186,10 +189,10 @@
           "surface": "わ"
         }
       ],
-      "tags": [
-        "character_speech",
-        "ojousama"
-      ]
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "お嬢様 split as お+嬢+様 without user dict"
+      }
     },
     {
       "description": "ですわ ojou-sama speech",

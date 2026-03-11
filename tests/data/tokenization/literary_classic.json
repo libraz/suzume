@@ -1197,6 +1197,10 @@
       "input": "政府は今後の対策について慎重に検討を重ねる方針だ。"
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "漢語慣用句 - 枚挙に暇がない",
       "expected": [
         {
@@ -1253,59 +1257,55 @@
       "input": "彼の功績は枚挙に暇がないほどである。",
       "suzume_expected": [
         {
-          "surface": "彼",
-          "pos": "Pronoun"
+          "pos": "Pronoun",
+          "surface": "彼"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "surface": "功績",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "功績"
         },
         {
-          "surface": "は",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "surface": "枚挙",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "枚挙"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "surface": "暇",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "暇"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "surface": "ない",
-          "pos": "Adjective"
+          "pos": "Adjective",
+          "surface": "ない"
         },
         {
-          "surface": "ほど",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "ほど"
         },
         {
-          "surface": "で",
+          "lemma": "だ",
           "pos": "Auxiliary",
-          "lemma": "だ"
+          "surface": "で"
         },
         {
-          "surface": "ある",
-          "pos": "Verb"
+          "pos": "Verb",
+          "surface": "ある"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "description": "文語副詞あたかも+かのような",
@@ -2455,6 +2455,10 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "いかなる determiner + 屈せず + べきである",
       "expected": [
         {
@@ -2511,61 +2515,61 @@
       "input": "いかなる困難にも屈せず前進すべきである。",
       "suzume_expected": [
         {
-          "surface": "いかなる",
-          "pos": "Determiner"
+          "pos": "Determiner",
+          "surface": "いかなる"
         },
         {
-          "surface": "困難",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "困難"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "surface": "も",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "も"
         },
         {
-          "surface": "屈せ",
+          "lemma": "屈せる",
           "pos": "Verb",
-          "lemma": "屈せる"
+          "surface": "屈せ"
         },
         {
-          "surface": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "lemma": "ぬ"
+          "surface": "ず"
         },
         {
-          "surface": "前進",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "前進"
         },
         {
-          "surface": "す",
+          "lemma": "する",
           "pos": "Verb",
-          "lemma": "する"
+          "surface": "す"
         },
         {
-          "surface": "べき",
+          "lemma": "べし",
           "pos": "Auxiliary",
-          "lemma": "べし"
+          "surface": "べき"
         },
         {
-          "surface": "で",
+          "lemma": "だ",
           "pos": "Auxiliary",
-          "lemma": "だ"
+          "surface": "で"
         },
         {
-          "surface": "ある",
-          "pos": "Verb"
+          "pos": "Verb",
+          "surface": "ある"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "ビジネス敬語多重化",
       "expected": [
         {
@@ -2611,50 +2615,50 @@
       "input": "ご査収くださいますようお願い申し上げます。",
       "suzume_expected": [
         {
-          "surface": "ご",
-          "pos": "Prefix"
+          "pos": "Prefix",
+          "surface": "ご"
         },
         {
-          "surface": "査収",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "査収"
         },
         {
-          "surface": "ください",
+          "lemma": "くださる",
           "pos": "Verb",
-          "lemma": "くださる"
+          "surface": "ください"
         },
         {
-          "surface": "ます",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "surface": "ます"
         },
         {
-          "surface": "よう",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "surface": "よう"
         },
         {
-          "surface": "お",
-          "pos": "Prefix"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "surface": "願い",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "願い"
         },
         {
-          "surface": "申し上げ",
+          "lemma": "申し上げる",
           "pos": "Verb",
-          "lemma": "申し上げる"
+          "surface": "申し上げ"
         },
         {
-          "surface": "ます",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "たる + 漢語 (tari adjective)",
       "expected": [
         {
@@ -2696,45 +2700,45 @@
       "input": "暗澹たる気持ちで帰途に就いた。",
       "suzume_expected": [
         {
-          "surface": "暗澹",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "暗澹"
         },
         {
-          "surface": "たる",
-          "pos": "Verb"
-        },
-        {
-          "surface": "気持ち",
-          "pos": "Noun"
-        },
-        {
-          "surface": "で",
-          "pos": "Particle"
-        },
-        {
-          "surface": "帰途",
-          "pos": "Noun"
-        },
-        {
-          "surface": "に",
-          "pos": "Particle"
-        },
-        {
-          "surface": "就い",
           "pos": "Verb",
-          "lemma": "就く"
+          "surface": "たる"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos": "Noun",
+          "surface": "気持ち"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "pos": "Noun",
+          "surface": "帰途"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "就く",
+          "pos": "Verb",
+          "surface": "就い"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "俳句 — 食え+ば + なり",
       "expected": [
         {
@@ -2775,44 +2779,40 @@
       "input": "柿食えば鐘が鳴るなり法隆寺",
       "suzume_expected": [
         {
-          "surface": "柿",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "柿"
         },
         {
-          "surface": "食え",
+          "lemma": "食う",
           "pos": "Verb",
-          "lemma": "食う"
+          "surface": "食え"
         },
         {
-          "surface": "ば",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "ば"
         },
         {
-          "surface": "鐘",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "鐘"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "surface": "鳴る",
-          "pos": "Verb"
-        },
-        {
-          "surface": "なり",
           "pos": "Verb",
-          "lemma": "なる"
+          "surface": "鳴る"
         },
         {
-          "surface": "法隆寺",
-          "pos": "Noun"
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なり"
+        },
+        {
+          "pos": "Noun",
+          "surface": "法隆寺"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "description": "体言止め: susuki swaying in autumn wind, evening field",
@@ -3181,6 +3181,10 @@
       "input": "あたかも夢から覚めたかのような心地であった。"
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "文語: 遠く as adj renyokei, POS diff Noun/Verb",
       "expected": [
         {
@@ -3222,44 +3226,40 @@
       "input": "思えば遠くへ来たものだ。",
       "suzume_expected": [
         {
-          "surface": "思え",
+          "lemma": "思う",
           "pos": "Verb",
-          "lemma": "思う"
+          "surface": "思え"
         },
         {
-          "surface": "ば",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "ば"
         },
         {
-          "surface": "遠く",
-          "pos": "Verb"
-        },
-        {
-          "surface": "へ",
-          "pos": "Particle"
-        },
-        {
-          "surface": "来",
           "pos": "Verb",
-          "lemma": "来る"
+          "surface": "遠く"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos": "Particle",
+          "surface": "へ"
         },
         {
-          "surface": "もの",
-          "pos": "Noun"
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
         },
         {
-          "surface": "だ",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "description": "使役受身: 行か+さ+れ+た causative-passive chain",
@@ -3426,6 +3426,10 @@
       "input": "古来より伝わる風習を守り続けてきた村がある。"
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "使役+てやる: やり POS diff (Verb vs Aux)",
       "expected": [
         {
@@ -3476,55 +3480,55 @@
       "input": "子供たちに本を読ませてやりたい。",
       "suzume_expected": [
         {
-          "surface": "子供",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "子供"
         },
         {
-          "surface": "たち",
-          "pos": "Suffix"
+          "pos": "Suffix",
+          "surface": "たち"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "surface": "本",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "surface": "読ま",
+          "lemma": "読む",
           "pos": "Verb",
-          "lemma": "読む"
+          "surface": "読ま"
         },
         {
-          "surface": "せ",
+          "lemma": "せる",
           "pos": "Auxiliary",
-          "lemma": "せる"
+          "surface": "せ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "surface": "やり",
+          "lemma": "やる",
           "pos": "Verb",
-          "lemma": "やる"
+          "surface": "やり"
         },
         {
-          "surface": "たい",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "surface": "たい"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "体言止め: 困難 Noun(suzume) vs Adj(mecab) before を",
       "expected": [
         {
@@ -3582,60 +3586,56 @@
       "input": "幾多の困難を乗り越えてきた先人たちの知恵。",
       "suzume_expected": [
         {
-          "surface": "幾多",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "幾多"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "surface": "困難",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "困難"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "surface": "乗り越え",
+          "lemma": "乗り越える",
           "pos": "Verb",
-          "lemma": "乗り越える"
+          "surface": "乗り越え"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "surface": "き",
+          "lemma": "くる",
           "pos": "Auxiliary",
-          "lemma": "くる"
+          "surface": "き"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "surface": "先人",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "先人"
         },
         {
-          "surface": "たち",
-          "pos": "Suffix"
+          "pos": "Suffix",
+          "surface": "たち"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "surface": "知恵",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "知恵"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "description": "論説調: 講じる+べき+である formal pattern",
@@ -3753,11 +3753,49 @@
       "description": "論説: 断じ+て (verb renyokei, Suzume correct split)",
       "expected": [
         {
+          "lemma": "断じて",
           "pos": "Adverb",
           "surface": "断じて"
         },
         {
           "lemma": "許す",
+          "pos": "Verb",
+          "surface": "許さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "jite_sarerumonodehanai",
+      "input": "断じて許されるものではない。",
+      "suzume_expected": [
+        {
+          "pos": "Adverb",
+          "surface": "断じて"
+        },
+        {
           "pos": "Verb",
           "surface": "許さ"
         },
@@ -3770,63 +3808,25 @@
           "surface": "もの"
         },
         {
-          "pos": "Particle",
-          "surface": "で"
+          "pos": "Auxiliary",
+          "surface": "で",
+          "lemma": "だ"
         },
         {
           "pos": "Particle",
           "surface": "は"
         },
         {
-          "pos": "Auxiliary",
+          "pos": "Adjective",
           "surface": "ない"
         }
-      ],
-      "id": "jite_sarerumonodehanai",
-      "input": "断じて許されるものではない。",
-      "suzume_expected": [
-        {
-          "surface": "断じ",
-          "pos": "Verb",
-          "lemma": "断じる"
-        },
-        {
-          "surface": "て",
-          "pos": "Particle"
-        },
-        {
-          "surface": "許さ",
-          "pos": "Verb",
-          "lemma": "許す"
-        },
-        {
-          "surface": "れる",
-          "pos": "Auxiliary"
-        },
-        {
-          "surface": "もの",
-          "pos": "Noun"
-        },
-        {
-          "surface": "で",
-          "pos": "Auxiliary",
-          "lemma": "だ"
-        },
-        {
-          "surface": "は",
-          "pos": "Particle"
-        },
-        {
-          "surface": "ない",
-          "pos": "Adjective"
-        }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "論説: がたい POS diff (Adj vs Other)",
       "expected": [
         {
@@ -3863,41 +3863,41 @@
       "input": "遺憾ながら、その提案は受け入れがたい。",
       "suzume_expected": [
         {
-          "surface": "遺憾",
-          "pos": "Adjective"
+          "pos": "Adjective",
+          "surface": "遺憾"
         },
         {
-          "surface": "ながら",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "ながら"
         },
         {
-          "surface": "その",
-          "pos": "Determiner"
+          "pos": "Determiner",
+          "surface": "その"
         },
         {
-          "surface": "提案",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "提案"
         },
         {
-          "surface": "は",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "surface": "受け入れ",
+          "lemma": "受け入れる",
           "pos": "Verb",
-          "lemma": "受け入れる"
+          "surface": "受け入れ"
         },
         {
-          "surface": "がたい",
-          "pos": "Other"
+          "pos": "Other",
+          "surface": "がたい"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "文語: およそ POS diff, 得る Aux/Verb diff",
       "expected": [
         {
@@ -3938,45 +3938,45 @@
       "input": "およそ人間の想像し得る限りにおいて。",
       "suzume_expected": [
         {
-          "surface": "およそ",
-          "pos": "Other"
+          "pos": "Other",
+          "surface": "およそ"
         },
         {
-          "surface": "人間",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "人間"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "surface": "想像",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "想像"
         },
         {
-          "surface": "し",
+          "lemma": "する",
           "pos": "Verb",
-          "lemma": "する"
+          "surface": "し"
         },
         {
-          "surface": "得る",
-          "pos": "Verb"
+          "pos": "Verb",
+          "surface": "得る"
         },
         {
-          "surface": "限り",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "限り"
         },
         {
-          "surface": "において",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "において"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "文語: たるや pattern, がたい suffix, POS diffs",
       "expected": [
         {
@@ -4023,49 +4023,49 @@
       "input": "その美しさたるや、筆舌に尽くしがたい。",
       "suzume_expected": [
         {
-          "surface": "その",
-          "pos": "Determiner"
+          "pos": "Determiner",
+          "surface": "その"
         },
         {
-          "surface": "美し",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "美し"
         },
         {
-          "surface": "さ",
-          "pos": "Suffix"
+          "pos": "Suffix",
+          "surface": "さ"
         },
         {
-          "surface": "たる",
-          "pos": "Verb"
-        },
-        {
-          "surface": "や",
-          "pos": "Particle"
-        },
-        {
-          "surface": "筆舌",
-          "pos": "Noun"
-        },
-        {
-          "surface": "に",
-          "pos": "Particle"
-        },
-        {
-          "surface": "尽くし",
           "pos": "Verb",
-          "lemma": "尽くす"
+          "surface": "たる"
         },
         {
-          "surface": "がたい",
-          "pos": "Other"
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "pos": "Noun",
+          "surface": "筆舌"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "尽くす",
+          "pos": "Verb",
+          "surface": "尽くし"
+        },
+        {
+          "pos": "Other",
+          "surface": "がたい"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "文語: 怒り/発し POS diff, てはならぬ prohibition",
       "expected": [
         {
@@ -4120,57 +4120,53 @@
       "input": "怒りに任せて言葉を発してはならぬ。",
       "suzume_expected": [
         {
-          "surface": "怒り",
+          "lemma": "怒る",
           "pos": "Verb",
-          "lemma": "怒る"
+          "surface": "怒り"
         },
         {
-          "surface": "に",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "surface": "任せ",
+          "lemma": "任せる",
           "pos": "Verb",
-          "lemma": "任せる"
+          "surface": "任せ"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "surface": "言葉",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "言葉"
         },
         {
-          "surface": "を",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "surface": "発し",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "発し"
         },
         {
-          "surface": "て",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "surface": "は",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "surface": "なら",
+          "lemma": "なる",
           "pos": "Verb",
-          "lemma": "なる"
+          "surface": "なら"
         },
         {
-          "surface": "ぬ",
-          "pos": "Auxiliary"
+          "pos": "Auxiliary",
+          "surface": "ぬ"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "description": "体言止め: moonlight, shadow — short poetic",
@@ -4281,6 +4277,10 @@
       "input": "恥の多い生涯を送ってきました。"
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "芥川風: ような simile, と clause connector. POS diff よう(Noun/Aux)",
       "expected": [
         {
@@ -4350,74 +4350,74 @@
       "input": "老婆の話が終わると、下人は嘲るような声で言った。",
       "suzume_expected": [
         {
-          "surface": "老婆",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "老婆"
         },
         {
-          "surface": "の",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "surface": "話",
-          "pos": "Noun"
+          "pos": "Noun",
+          "surface": "話"
         },
         {
-          "surface": "が",
-          "pos": "Particle"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "surface": "終わる",
-          "pos": "Verb"
-        },
-        {
-          "surface": "と",
-          "pos": "Particle"
-        },
-        {
-          "surface": "下人",
-          "pos": "Noun"
-        },
-        {
-          "surface": "は",
-          "pos": "Particle"
-        },
-        {
-          "surface": "嘲る",
-          "pos": "Verb"
-        },
-        {
-          "surface": "よう",
-          "pos": "Auxiliary"
-        },
-        {
-          "surface": "な",
-          "pos": "Auxiliary",
-          "lemma": "だ"
-        },
-        {
-          "surface": "声",
-          "pos": "Noun"
-        },
-        {
-          "surface": "で",
-          "pos": "Particle"
-        },
-        {
-          "surface": "言っ",
           "pos": "Verb",
-          "lemma": "言う"
+          "surface": "終わる"
         },
         {
-          "surface": "た",
-          "pos": "Auxiliary"
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "pos": "Noun",
+          "surface": "下人"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Verb",
+          "surface": "嘲る"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "よう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "pos": "Noun",
+          "surface": "声"
+        },
+        {
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation"
+      },
       "description": "太宰: て POS diff (Particle/Aux)",
       "expected": [
         {
@@ -4438,24 +4438,20 @@
       "input": "生まれてすみません。",
       "suzume_expected": [
         {
-          "surface": "生まれ",
+          "lemma": "生まれる",
           "pos": "Verb",
-          "lemma": "生まれる"
+          "surface": "生まれ"
         },
         {
-          "surface": "て",
+          "lemma": "てる",
           "pos": "Auxiliary",
-          "lemma": "てる"
+          "surface": "て"
         },
         {
-          "surface": "すみません",
-          "pos": "Interjection"
+          "pos": "Interjection",
+          "surface": "すみません"
         }
-      ],
-      "accepted_diff": {
-        "reason": "POS/lemma limitation",
-        "category": "pos-limitation"
-      }
+      ]
     },
     {
       "description": "四字熟語: 異口同音 as single kanji compound",

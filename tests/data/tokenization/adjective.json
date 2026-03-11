@@ -1,0 +1,27 @@
+{
+  "cases": [
+    {
+      "description": "Real i-adjective 冷たい negative past should still work",
+      "expected": [
+        {
+          "lemma": "冷たい",
+          "pos": "Adjective",
+          "surface": "冷たく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "real_adj_tsumetaku_nakatta",
+      "input": "冷たくなかった"
+    }
+  ],
+  "description": "adjective tests",
+  "version": "1.0"
+}
