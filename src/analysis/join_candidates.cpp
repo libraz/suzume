@@ -964,14 +964,13 @@ void addCompoundVerbJoinCandidates(
         : bigram_cost::kRare;      // +1.0: penalty for inflection-only V1
     float final_cost = base_cost + opts.compound_verb_bonus + v1_bonus;
 
-    // Penalty for passive+te form (〜まれて/〜られて)
-    // MeCab splits compound verb passive+te: 読み込まれて → 読み込ま|れ|て
-    // This helps the split path win over the combined form
-    if (utf8::endsWith(compound_surface, "まれて") ||
-        utf8::endsWith(compound_surface, "まれた") ||
-        utf8::endsWith(compound_surface, "られて") ||
-        utf8::endsWith(compound_surface, "られた")) {
-      final_cost += bigram_cost::kSevere;  // Strong penalty to favor split path
+    // Penalty for compound verbs that absorb auxiliary suffixes (た/て/れる/etc.)
+    // When includes_aux is true, the compound has absorbed an inflectional suffix
+    // that should split off (e.g., 語り継がれる → 語り継が|れる).
+    // Te-stem and mizenkei candidates are generated separately (below) to provide
+    // the split path; this penalty ensures the split path wins over the merged form.
+    if (best_match.includes_aux) {
+      final_cost += bigram_cost::kMinor;  // 0.5 penalty to favor split path
     }
 
     uint8_t flags = core::LatticeEdge::kFromDictionary;

@@ -1173,6 +1173,55 @@
       ],
       "id": "compound_furumau",
       "input": "振る舞う"
+    },
+    {
+      "description": "compound verb passive split: 語り継ぐ mizenkei + れる",
+      "expected": [
+        {
+          "lemma": "語り継ぐ",
+          "pos": "Verb",
+          "surface": "語り継が"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "ri_garerudearou",
+      "input": "語り継がれるであろう"
+    },
+    {
+      "description": "compound verb passive split: 読み込む mizenkei + れる",
+      "expected": [
+        {
+          "lemma": "読み込む",
+          "pos": "Verb",
+          "surface": "読み込ま"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        }
+      ],
+      "id": "mi_mareru",
+      "input": "読み込まれる"
     }
   ],
   "description": "Compound verbs",
