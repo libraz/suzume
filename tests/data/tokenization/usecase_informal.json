@@ -1,164 +1,164 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "めっちゃかわいい - auto-generated",
-      "expected" : [
+      "description": "めっちゃかわいい - auto-generated",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "めっちゃ"
+          "pos": "Adverb",
+          "surface": "めっちゃ"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "かわいい"
+          "pos": "Adjective",
+          "surface": "かわいい"
         }
       ],
-      "id" : "mettchi_kawaii",
-      "input" : "めっちゃかわいい",
-      "tags" : [
+      "id": "mettchi_kawaii",
+      "input": "めっちゃかわいい",
+      "tags": [
         "informal",
         "slang"
       ]
     },
     {
-      "description" : "めっちゃすごい - auto-generated",
-      "expected" : [
+      "description": "めっちゃすごい - auto-generated",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "めっちゃ"
+          "pos": "Adverb",
+          "surface": "めっちゃ"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "すごい"
+          "pos": "Adjective",
+          "surface": "すごい"
         }
       ],
-      "id" : "mettchi_sugoi",
-      "input" : "めっちゃすごい",
-      "tags" : [
+      "id": "mettchi_sugoi",
+      "input": "めっちゃすごい",
+      "tags": [
         "informal",
         "slang"
       ]
     },
     {
-      "description" : "壊されちゃうよ - auto-generated",
-      "expected" : [
+      "description": "壊されちゃうよ - auto-generated",
+      "expected": [
         {
-          "lemma" : "壊す",
-          "pos" : "Verb",
-          "surface" : "壊さ"
+          "lemma": "壊す",
+          "pos": "Verb",
+          "surface": "壊さ"
         },
         {
-          "lemma" : "れる",
-          "pos" : "Auxiliary",
-          "surface" : "れ"
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
         },
         {
-          "pos" : "Verb",
-          "surface" : "ちゃう"
+          "pos": "Verb",
+          "surface": "ちゃう"
         },
         {
-          "pos" : "Particle",
-          "surface" : "よ"
+          "pos": "Particle",
+          "surface": "よ"
         }
       ],
-      "id" : "sarechi_uyo",
-      "input" : "壊されちゃうよ",
-      "tags" : [
+      "id": "sarechi_uyo",
+      "input": "壊されちゃうよ",
+      "tags": [
         "informal",
         "passive",
         "contraction"
       ]
     },
     {
-      "description" : "取っちゃうぞ - auto-generated",
-      "expected" : [
+      "description": "取っちゃうぞ - auto-generated",
+      "expected": [
         {
-          "lemma" : "取る",
-          "pos" : "Verb",
-          "surface" : "取っ"
+          "lemma": "取る",
+          "pos": "Verb",
+          "surface": "取っ"
         },
         {
-          "pos" : "Verb",
-          "surface" : "ちゃう"
+          "pos": "Verb",
+          "surface": "ちゃう"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ぞ"
+          "pos": "Particle",
+          "surface": "ぞ"
         }
       ],
-      "id" : "ttchi_uzo",
-      "input" : "取っちゃうぞ",
-      "tags" : [
+      "id": "ttchi_uzo",
+      "input": "取っちゃうぞ",
+      "tags": [
         "informal",
         "contraction"
       ]
     },
     {
-      "description" : "あちこちで遊ぶ - auto-generated",
-      "expected" : [
+      "description": "あちこちで遊ぶ - auto-generated",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "あちこち"
+          "pos": "Pronoun",
+          "surface": "あちこち"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Verb",
-          "surface" : "遊ぶ"
+          "pos": "Verb",
+          "surface": "遊ぶ"
         }
       ],
-      "id" : "achikochide_bu",
-      "input" : "あちこちで遊ぶ",
-      "tags" : [
+      "id": "achikochide_bu",
+      "input": "あちこちで遊ぶ",
+      "tags": [
         "pronoun",
         "colloquial"
       ]
     },
     {
-      "description" : "勢いで押す - auto-generated",
-      "expected" : [
+      "description": "勢いで押す - auto-generated",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "勢い"
+          "pos": "Noun",
+          "surface": "勢い"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Verb",
-          "surface" : "押す"
+          "pos": "Verb",
+          "surface": "押す"
         }
       ],
-      "id" : "ide_su",
-      "input" : "勢いで押す",
-      "tags" : [
+      "id": "ide_su",
+      "input": "勢いで押す",
+      "tags": [
         "noun",
         "context"
       ]
     },
     {
-      "description" : "たまんない - auto-generated",
-      "expected" : [
+      "description": "たまんない - auto-generated",
+      "expected": [
         {
-          "lemma" : "たまる",
-          "pos" : "Verb",
-          "surface" : "たまん"
+          "lemma": "たまる",
+          "pos": "Verb",
+          "surface": "たまん"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "tamannai",
-      "input" : "たまんない",
-      "tags" : [
+      "id": "tamannai",
+      "input": "たまんない",
+      "tags": [
         "contraction",
         "colloquial"
       ]
     }
   ],
-  "description" : "usecase_informal tests",
-  "version" : "1.0"
+  "description": "usecase_informal tests",
+  "version": "1.0"
 }

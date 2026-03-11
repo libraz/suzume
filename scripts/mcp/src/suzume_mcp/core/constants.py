@@ -291,6 +291,13 @@ HIRAGANA_COMPOUNDS: dict[str, str] = {
 SEARCH_UNIT_COMPOUNDS: dict[str, str] = {
 }
 
+# Kanji prefix compounds: MeCab splits kanji prefix (接頭詞) + kana-containing noun/verb.
+# Maps prefix kanji → set of following token surfaces that form a valid compound.
+# Used to merge 微+笑み → 微笑み, 微+笑む → 微笑む, etc.
+KANJI_PREFIX_COMPOUNDS: dict[str, set[str]] = {
+    "微": {"笑み", "笑む", "笑ん", "笑え", "笑っ", "笑わ", "笑い"},
+}
+
 # Family/honorific terms that merge with お prefix
 FAMILY_TERMS: set[str] = {
     "兄ちゃん",
@@ -444,6 +451,7 @@ ADVERB_OVERRIDES: set[str] = {
     "その後",
     "なるほど",
     "たくさん",
+    "かく",
 }
 
 # Pronoun overrides (名詞 -> Pronoun)
@@ -482,6 +490,7 @@ KEEP_AS_NOUN_NOT_ADJ: set[str] = {
     "容易",
     "積極",
     "健康",
+    "傍若無人",
 }
 
 # Noun -> Pronoun overrides

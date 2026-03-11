@@ -1115,8 +1115,9 @@ next_length:;  // Label for goto from particle-starting verb skip
     }
 
     // Also check if base form exists in dictionary
+    bool is_in_dict = vh::isVerbInDictionary(dict_manager, base_form);
     if (!is_valid_verb) {
-      is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
+      is_valid_verb = is_in_dict;
     }
 
     // Minimum stem length check: need at least 2 chars in mizenkei to be meaningful
@@ -1138,15 +1139,20 @@ next_length:;  // Label for goto from particle-starting verb skip
       }
     }
 
-    // Generate mizenkei candidate with explicit VerbMizenkei EPOS for bigram connection
-    constexpr float kCostNai = candidate::verb_cost::kStandardBonus;  // Negative cost to beat unsplit form
+    // Dict-verified verbs get standard bonus; unverified get weaker cost
+    // to prevent false hiragana verb candidates (e.g., はいか from はいく)
+    // from beating particle+verb splits (は+いか)
+    float cost_nai = candidate::verb_cost::kStandardBonus;  // -0.5
+    if (!is_in_dict && mizenkei_surface.size() >= 6) {  // 2+ char stems
+      cost_nai = 0.5F;  // Positive cost for unverified candidates
+    }
     SUZUME_DEBUG_VERBOSE_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << mizenkei_surface
                           << " hiragana_mizenkei_nai lemma=" << lemma
-                          << " cost=" << kCostNai << "\n";
+                          << " cost=" << cost_nai << "\n";
     }
     candidates.push_back(makeVerbCandidate(
-        mizenkei_surface, start_pos, mizenkei_end, kCostNai, lemma,
+        mizenkei_surface, start_pos, mizenkei_end, cost_nai, lemma,
         grammar::verbTypeToConjType(verb_type),
         true, CandidateOrigin::VerbHiragana, 0.9F, "hiragana_mizenkei_nai",
         core::ExtendedPOS::VerbMizenkei));

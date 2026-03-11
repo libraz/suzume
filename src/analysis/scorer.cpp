@@ -208,6 +208,19 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += cost::kModerateBonus;  // -0.5 to beat godan-wa verb candidate
   }
 
+  // Bonus for kanji+okurigana i-adjectives from dictionary (情けない, etc.)
+  // These compete with verb renyokei + ない split paths that get strong
+  // VERB_連用→AUX_否定 connection bonus (-0.8).
+  // Pattern: kanji-containing, 4+ chars, ending in い, from dictionary
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Adjective &&
+      edge.extended_pos != core::ExtendedPOS::AdjStem &&
+      grammar::containsKanji(edge.surface) &&
+      edge.surface.size() >= 4 * core::kJapaneseCharBytes &&
+      utf8::endsWith(edge.surface, "い")) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    cost += lengthScaledBonus(-1.5F, char_len, 4, 0.3F);
+  }
+
   // Bonus for hiragana adverbs from dictionary
   // Prevents misanalysis as verb+ん (e.g., たくさん → たくさ+ん)
   // and compound splits (e.g., どうして → どう+し+て)
@@ -685,6 +698,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kMinor;  // Penalty to discourage false split
   }
 
+
   // VerbRenyokei (A-row ending) → VerbMizenkei(さ) causative pattern
   // E.g., やら+さ+れ+た — hiragana verb mizenkei + causative さ
   // VerbRenyokei is used for short hiragana verbs (EPOS can't distinguish mizenkei)
@@ -947,7 +961,8 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // which skips mizenkei_zu generation when verb+ず is in the dictionary.
   if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei &&
       next.pos == core::PartOfSpeech::Auxiliary &&
-      (next.surface == "ず" || next.surface == "ずに")) {
+      (next.surface == "ず" || next.surface == "ずに" ||
+       next.surface == "ざる" || next.surface == "ざれ")) {
     surface_bonus += cost::kStrongBonus;
   }
 
@@ -1500,16 +1515,19 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kAlmostNever;
   }
 
-  // Penalty for dictionary verb inflection + ず (classical negative)
-  // E.g., 思わ+ず should be 思わず (lexicalized adverb), not 思わ (dict) + ず (aux)
-  // Dictionary-generated verb forms + ず rarely occur; 〜ず forms are lexicalized
-  // Note: ん (contracted negative) is excluded - 分からん, 知らん are common patterns
-  // Note: ぬ (classical negative) is excluded - ござらぬ, 知らぬ are valid character speech
-  // Note: まい (negative volitional/conjecture) is excluded - 出来まい, 行くまい are valid
+  // Penalty for short pure-hiragana dict verb + ず (classical negative)
+  // E.g., おか+ず should be おかず (noun), not おか (dict verb おく) + ず (aux)
+  // Short pure-hiragana verbs + ず are likely false parses of nouns/adverbs
+  // Long verbs (かかわら+ず) and kanji verbs (表さ+ず) are productive grammar
+  // Lexicalized forms like 思わず have their own dict entries (ADV) that win anyway
+  // Note: ん, ぬ, まい, ざる, ざれ excluded — common productive patterns
   if (prev.pos == core::PartOfSpeech::Verb &&
       prev.fromDictionary() &&
+      grammar::isPureHiragana(prev.surface) &&
+      prev.surface.size() <= 9 &&  // ≤3 hiragana chars (9 bytes)
       next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
-      next.surface != "ん" && next.surface != "ぬ" && next.surface != "まい") {  // Penalize ず only
+      next.surface != "ん" && next.surface != "ぬ" && next.surface != "まい" &&
+      next.surface != "ざる" && next.surface != "ざれ") {
     surface_bonus += cost::kAlmostNever;
   }
 
@@ -1640,6 +1658,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.surface == "し" &&
       grammar::isPureHiragana(prev.surface)) {
     surface_bonus += 0.08F;
+  }
+
+  // Bonus for multi-kanji NOUN → せ(VerbMizenkei) sahen pattern
+  // 認識+せ, 期待+せ: favors split over merged 認識せ/期待せ verb candidate
+  // Only for 2+ kanji nouns (sahen-compatible), not single-kanji like 下+さ
+  if (prev.pos == core::PartOfSpeech::Noun &&
+      next.extended_pos == core::ExtendedPOS::VerbMizenkei &&
+      next.surface == "せ" &&
+      prev.surface.size() >= 6) {  // 2+ kanji = 6+ bytes in UTF-8
+    surface_bonus += cost::kStrongBonus;
   }
 
   // Penalty for PART_準体(の) → で (any interpretation) pattern
@@ -1786,6 +1814,15 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       prev.surface == "で" &&
       next.extended_pos == core::ExtendedPOS::AuxNegativeNai) {
     surface_bonus += cost::kStrong;
+  }
+
+  // Bonus for ParticleTopic → なかろ (AuxNegativeNai volitional stem)
+  // Helps は+なかろ+う split beat fake godan-ra verb candidate なかろう
+  // Only targets なかろ — other forms (ない, なかっ, なけれ) can be ADJ or AUX
+  if (prev.extended_pos == core::ExtendedPOS::ParticleTopic &&
+      next.extended_pos == core::ExtendedPOS::AuxNegativeNai &&
+      next.surface == "なかろ") {
+    surface_bonus += cost::kModerateBonus;
   }
 
   // Penalty for NOUN/PRON → で(VERB_連用 of 出る): verb で after noun is rare

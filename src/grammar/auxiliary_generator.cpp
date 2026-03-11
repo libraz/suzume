@@ -233,13 +233,10 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"まい", "まい", "まい", kAuxNai, kAuxOutBase, kVerbBase});
   entries.push_back({"まい", "まい", "まい", kAuxNai, kAuxOutBase, kVerbMizenkei});
 
-  // === Volitional + とする ===
-  entries.push_back({"うとする", "うとする", "とする", kAuxNai, kAuxOutBase, kVerbVolitional});
-  entries.push_back({"うとした", "うとした", "とする", kAuxNai, kAuxOutTa, kVerbVolitional});
-  entries.push_back({"うとして", "うとして", "とする", kAuxNai, kAuxOutTe, kVerbVolitional});
-  entries.push_back({"ようとする", "ようとする", "とする", kAuxNai, kAuxOutBase, kVerbVolitional});
-  entries.push_back({"ようとした", "ようとした", "とする", kAuxNai, kAuxOutTa, kVerbVolitional});
-  entries.push_back({"ようとして", "ようとして", "とする", kAuxNai, kAuxOutTe, kVerbVolitional});
+  // Removed: Volitional + とする (うとする, ようとする, etc.)
+  // These are multi-word constructions (volitional + quotative と + する) that
+  // should be split as う+と+する, not absorbed as single auxiliary suffixes.
+  // See also: DoesNotGenerateMultiWordConstructions test.
 
   // === Renyokei compounds ===
   entries.push_back({"ながら", "ながら", "ながら", kAuxRenyokei, kAuxOutBase, kVerbRenyokei});
@@ -492,11 +489,8 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   // (e.g., 窺うのだ as single verb), preventing proper tokenization.
   // Verb base forms are still detected from shorter substrings.
 
-  // === Prohibition/Permission ===
-  entries.push_back({"はいけない", "はいけない", "はいけない", kAuxNai, kAuxOutBase, kAuxOutTe});
-  entries.push_back({"はならない", "はならない", "はならない", kAuxNai, kAuxOutBase, kAuxOutTe});
-  entries.push_back({"もいい", "もいい", "もいい", kAuxNai, kAuxOutBase, kAuxOutTe});
-  entries.push_back({"もいいですか", "もいいですか", "もいい", kAuxNai, kAuxOutBase, kAuxOutTe});
+  // Removed: はいけない, はならない, もいい, もいいですか — multi-word constructions
+  // (V-て+は+いけない etc.), not conjugation suffixes. Causes false verb absorption.
 
   // === べき patterns ===
   // Note: べきだ/べきだった/べきではない/べきです removed — MeCab splits as
@@ -504,57 +498,10 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   // the independent token. Compound suffix chains caused false merging
   // (e.g., 聞くべきだ → single VERB token instead of 聞く+べき+だ).
 
-  // === ところだ (connects from various forms) ===
-  // From base form (終止形): 食べるところだ
-  entries.push_back({"ところだ", "ところだ", "ところだ", kAuxNai, kAuxOutBase, kVerbBase});
-  entries.push_back({"ところだった", "ところだった", "ところだ", kAuxNai, kAuxOutTa, kVerbBase});
-  entries.push_back({"ところです", "ところです", "ところだ", kAuxNai, kAuxOutMasu, kVerbBase});
-  // From た form (past): 食べたところだ, いたところだった
-  entries.push_back({"ところだ", "ところだ", "ところだ", kAuxNai, kAuxOutBase, kAuxOutTa});
-  entries.push_back({"ところだった", "ところだった", "ところだ", kAuxNai, kAuxOutTa, kAuxOutTa});
-  entries.push_back({"ところです", "ところです", "ところだ", kAuxNai, kAuxOutMasu, kAuxOutTa});
-  entries.push_back({"ところでした", "ところでした", "ところだ", kAuxNai, kAuxOutTa, kAuxOutTa});
-  // From auxiliary base form: 読んでいるところだ (ている形 + ところだ)
-  entries.push_back({"ところだ", "ところだ", "ところだ", kAuxNai, kAuxOutBase, kAuxOutBase});
-  entries.push_back({"ところだった", "ところだった", "ところだ", kAuxNai, kAuxOutTa, kAuxOutBase});
-  entries.push_back({"ところです", "ところです", "ところだ", kAuxNai, kAuxOutMasu, kAuxOutBase});
-  entries.push_back({"ところでした", "ところでした", "ところだ", kAuxNai, kAuxOutTa, kAuxOutBase});
-
-  // === ばかりだ ===
-  entries.push_back({"ばかりだ", "ばかりだ", "ばかりだ", kAuxNai, kAuxOutBase, kAuxOutTa});
-  entries.push_back({"ばかりだった", "ばかりだった", "ばかりだ", kAuxNai, kAuxOutTa, kAuxOutTa});
-  entries.push_back({"ばかりです", "ばかりです", "ばかりだ", kAuxNai, kAuxOutMasu, kAuxOutTa});
-
-  // === っぱなし ===
-  entries.push_back({"っぱなしだ", "っぱなしだ", "っぱなし", kAuxNai, kAuxOutBase, kVerbRenyokei});
-  entries.push_back({"っぱなしで", "っぱなしで", "っぱなし", kAuxNai, kAuxOutTe, kVerbRenyokei});
-
-  // === ざるを得ない ===
-  entries.push_back({"ざるを得ない", "ざるをえない", "ざるを得ない", kAuxNai, kAuxOutBase, kVerbMizenkei});
-  entries.push_back({"ざるを得なかった", "ざるをえなかった", "ざるを得ない", kAuxNai, kAuxOutTa, kVerbMizenkei});
-
-  // === ずにはいられない ===
-  entries.push_back({"ずにはいられない", "ずにはいられない", "ずにはいられない", kAuxNai, kAuxOutBase, kVerbMizenkei});
-
-  // === わけにはいかない ===
-  // From verb base form: 行くわけにはいかない
-  entries.push_back({"わけにはいかない", "わけにはいかない", "わけにはいかない", kAuxNai, kAuxOutBase, kVerbBase});
-  entries.push_back({"わけにはいかなかった", "わけにはいかなかった", "わけにはいかない", kAuxNai, kAuxOutTa, kVerbBase});
-  entries.push_back({"わけにはいきません", "わけにはいきません", "わけにはいかない", kAuxNai, kAuxOutMasu, kVerbBase});
-  // From auxiliary base form: 書かないわけにはいかない (ない形 + わけにはいかない)
-  entries.push_back({"わけにはいかない", "わけにはいかない", "わけにはいかない", kAuxNai, kAuxOutBase, kAuxOutBase});
-  entries.push_back({"わけにはいかなかった", "わけにはいかなかった", "わけにはいかない", kAuxNai, kAuxOutTa, kAuxOutBase});
-  entries.push_back({"わけにはいきません", "わけにはいきません", "わけにはいかない", kAuxNai, kAuxOutMasu, kAuxOutBase});
-
-  // === Volitional + ている ===
-  entries.push_back({"うとしている", "うとしている", "とする", kAuxNai, kAuxOutBase, kVerbVolitional});
-  entries.push_back({"うとしていた", "うとしていた", "とする", kAuxNai, kAuxOutTa, kVerbVolitional});
-  entries.push_back({"ようとしている", "ようとしている", "とする", kAuxNai, kAuxOutBase, kVerbVolitional});
-  entries.push_back({"ようとしていた", "ようとしていた", "とする", kAuxNai, kAuxOutTa, kVerbVolitional});
-
-  // === ようになる + ている/てくる ===
-  entries.push_back({"ようになっている", "ようになっている", "ようになる", kAuxNai, kAuxOutBase, kAuxOutBase});
-  entries.push_back({"ようになってきた", "ようになってきた", "ようになる", kAuxNai, kAuxOutTa, kAuxOutBase});
+  // Removed: ところだ/ばかりだ/っぱなし/ざるを得ない/ずにはいられない/
+  // わけにはいかない/うとしている/ようとしている/ようになっている — all are
+  // multi-word constructions (formal noun+copula, particle chains, etc.) that
+  // should be split into individual tokens, not absorbed as auxiliary suffixes.
 
   // === Causative-passive + たい (させられ) ===
   entries.push_back({"させられたい", "させられたい", "させられる", kAuxSeru, kAuxOutBase, kVerbMizenkei});
@@ -598,13 +545,10 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"なくてはいけなかった", "なくてはいけなかった", "なくてはいけない", kAuxNai, kAuxOutTa, kVerbMizenkei});
   entries.push_back({"なきゃならない", "なきゃならない", "なきゃならない", kAuxNai, kAuxOutBase, kVerbMizenkei});
 
-  // === Prohibition/Permission (past forms) ===
-  entries.push_back({"はいけなかった", "はいけなかった", "はいけない", kAuxNai, kAuxOutTa, kAuxOutTe});
-  entries.push_back({"はだめだ", "はだめだ", "はだめだ", kAuxNai, kAuxOutBase, kAuxOutTe});
-  entries.push_back({"はならなかった", "はならなかった", "はならない", kAuxNai, kAuxOutTa, kAuxOutTe});
-  // べきではなかった removed (same reason as べき patterns above)
-  entries.push_back({"もかまわない", "もかまわない", "もかまわない", kAuxNai, kAuxOutBase, kAuxOutTe});
-  entries.push_back({"もかまわなかった", "もかまわなかった", "もかまわない", kAuxNai, kAuxOutTa, kAuxOutTe});
+  // Removed: はいけなかった, はだめだ, はならなかった, べきではなかった,
+  // もかまわない, もかまわなかった, ばかりなのに, っぱなしにする,
+  // ざるを得ません, ずにはいられなかった
+  // (extended forms of removed multi-word constructions above)
 
   // === てみる conditional ===
   entries.push_back({"みれば", "みれば", "みる", kAuxTemiru, kAuxOutBase, kAuxOutTe});
@@ -621,17 +565,13 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"ことができて", "ことができて", "ことができる", kAuxNai, kAuxOutTe, kVerbBase});
   entries.push_back({"ことができなかった", "ことができなかった", "ことができる", kAuxNai, kAuxOutTa, kVerbBase});
 
-  // === ばかり extended ===
-  entries.push_back({"ばかりなのに", "ばかりなのに", "ばかりだ", kAuxNai, kAuxOutBase, kAuxOutTa});
+  // ばかりなのに removed (multi-word construction)
 
-  // === っぱなし extended ===
-  entries.push_back({"っぱなしにする", "っぱなしにする", "っぱなし", kAuxNai, kAuxOutBase, kVerbRenyokei});
+  // っぱなしにする removed (multi-word construction)
 
-  // === ざるを得ない polite ===
-  entries.push_back({"ざるを得ません", "ざるをえません", "ざるを得ない", kAuxNai, kAuxOutMasu, kVerbMizenkei});
+  // ざるを得ません removed (multi-word construction)
 
-  // === ずにはいられない past ===
-  entries.push_back({"ずにはいられなかった", "ずにはいられなかった", "ずにはいられない", kAuxNai, kAuxOutTa, kVerbMizenkei});
+  // ずにはいられなかった removed (multi-word construction)
 
   // === ている extended for compound verbs ===
   entries.push_back({"すぎている", "すぎている", "すぎる", kAuxRenyokei, kAuxOutBase, kVerbRenyokei});

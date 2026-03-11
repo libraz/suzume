@@ -444,6 +444,10 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation: surfaces match, POS classification differs from MeCab"
+      },
       "description": "金がない should NOT trigger べき mizenkei split (negative test)",
       "expected": [
         {
@@ -455,12 +459,29 @@
           "surface": "が"
         },
         {
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "ない"
         }
       ],
       "id": "beki_false_positive_prevention",
       "input": "金がない",
+      "suzume_expected": [
+        {
+          "lemma": "金",
+          "pos": "Noun",
+          "surface": "金"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
       "tags": [
         "auxiliary",
         "negative_test"

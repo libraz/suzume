@@ -153,10 +153,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "verb form: context-dependent POS classification"
-      },
       "description": "B29: 上手くいく - MeCab互換分割 (上手く+いっ+て)",
       "expected": [
         {
@@ -176,22 +172,6 @@
       ],
       "id": "umaku_iku",
       "input": "上手くいって",
-      "suzume_expected": [
-        {
-          "lemma": "上手い",
-          "pos": "Adjective",
-          "surface": "上手く"
-        },
-        {
-          "lemma": "いる",
-          "pos": "Verb",
-          "surface": "い"
-        },
-        {
-          "pos": "Particle",
-          "surface": "って"
-        }
-      ],
       "tags": [
         "adjective",
         "verb"
@@ -559,10 +539,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "verb form: context-dependent POS classification"
-      },
       "description": "Phase1-2: いって - MeCab-compatible split",
       "expected": [
         {
@@ -582,22 +558,6 @@
       ],
       "id": "phase1_2_itte",
       "input": "早くいって",
-      "suzume_expected": [
-        {
-          "lemma": "早い",
-          "pos": "Adjective",
-          "surface": "早く"
-        },
-        {
-          "lemma": "いる",
-          "pos": "Verb",
-          "surface": "い"
-        },
-        {
-          "pos": "Particle",
-          "surface": "って"
-        }
-      ],
       "tags": [
         "phase1_2_fix",
         "iku",
@@ -690,6 +650,38 @@
         "lemma",
         "regression"
       ]
+    },
+    {
+      "description": "にはいかない: は+いか split (not はいか as false verb)",
+      "expected": [
+        {
+          "pos": "Verb",
+          "surface": "捨てる"
+        },
+        {
+          "pos": "Noun",
+          "surface": "わけ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Verb",
+          "surface": "いか"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "niha_ikanai_split",
+      "input": "捨てるわけにはいかない"
     }
   ],
   "description": "Godan Ka-row verbs (五段カ行動詞) - verbs ending in く",

@@ -1,212 +1,212 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "Topic marker は",
-      "expected" : [
+      "description": "Topic marker は",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼女"
+          "pos": "Pronoun",
+          "surface": "彼女"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "学生"
+          "pos": "Noun",
+          "surface": "学生"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "case_particle_wa",
-      "input" : "彼女は学生です",
-      "tags" : [
+      "id": "case_particle_wa",
+      "input": "彼女は学生です",
+      "tags": [
         "particle",
         "case"
       ]
     },
     {
-      "description" : "Subject marker が",
-      "expected" : [
+      "description": "Subject marker が",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "雨"
+          "pos": "Noun",
+          "surface": "雨"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "降る",
-          "pos" : "Verb",
-          "surface" : "降っ"
+          "lemma": "降る",
+          "pos": "Verb",
+          "surface": "降っ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いる"
+          "pos": "Auxiliary",
+          "surface": "いる"
         }
       ],
-      "id" : "case_particle_ga",
-      "input" : "雨が降っている",
-      "tags" : [
+      "id": "case_particle_ga",
+      "input": "雨が降っている",
+      "tags": [
         "particle",
         "case"
       ]
     },
     {
-      "description" : "Object marker を",
-      "expected" : [
+      "description": "Object marker を",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "本"
+          "pos": "Noun",
+          "surface": "本"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Verb",
-          "surface" : "読む"
+          "pos": "Verb",
+          "surface": "読む"
         }
       ],
-      "id" : "case_particle_wo",
-      "input" : "本を読む",
-      "tags" : [
+      "id": "case_particle_wo",
+      "input": "本を読む",
+      "tags": [
         "particle",
         "case"
       ]
     },
     {
-      "description" : "Direction marker に",
-      "expected" : [
+      "description": "Direction marker に",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "東京"
+          "pos": "Noun",
+          "surface": "東京"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Verb",
-          "surface" : "行く"
+          "pos": "Verb",
+          "surface": "行く"
         }
       ],
-      "id" : "case_particle_ni",
-      "input" : "東京に行く",
-      "tags" : [
+      "id": "case_particle_ni",
+      "input": "東京に行く",
+      "tags": [
         "particle",
         "case"
       ]
     },
     {
-      "description" : "Possessive の",
-      "expected" : [
+      "description": "Possessive の",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "彼"
+          "pos": "Pronoun",
+          "surface": "彼"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "車"
+          "pos": "Noun",
+          "surface": "車"
         }
       ],
-      "id" : "case_particle_no",
-      "input" : "彼の車",
-      "tags" : [
+      "id": "case_particle_no",
+      "input": "彼の車",
+      "tags": [
         "particle",
         "case"
       ]
     },
     {
-      "description" : "From から to まで",
-      "expected" : [
+      "description": "From から to まで",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "東京"
+          "pos": "Noun",
+          "surface": "東京"
         },
         {
-          "pos" : "Particle",
-          "surface" : "から"
+          "pos": "Particle",
+          "surface": "から"
         },
         {
-          "pos" : "Noun",
-          "surface" : "大阪"
+          "pos": "Noun",
+          "surface": "大阪"
         },
         {
-          "pos" : "Particle",
-          "surface" : "まで"
+          "pos": "Particle",
+          "surface": "まで"
         }
       ],
-      "id" : "case_particle_kara_made",
-      "input" : "東京から大阪まで",
-      "tags" : [
+      "id": "case_particle_kara_made",
+      "input": "東京から大阪まで",
+      "tags": [
         "particle",
         "case"
       ]
     },
     {
-      "description" : "Location marker で",
-      "expected" : [
+      "description": "Location marker で",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "公園"
+          "pos": "Noun",
+          "surface": "公園"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Verb",
-          "surface" : "遊ぶ"
+          "pos": "Verb",
+          "surface": "遊ぶ"
         }
       ],
-      "id" : "case_particle_de",
-      "input" : "公園で遊ぶ",
-      "tags" : [
+      "id": "case_particle_de",
+      "input": "公園で遊ぶ",
+      "tags": [
         "particle",
         "case"
       ]
     },
     {
-      "description" : "Conjunctive particle も with verb+aux split",
-      "expected" : [
+      "description": "Conjunctive particle も with verb+aux split",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "私"
+          "pos": "Pronoun",
+          "surface": "私"
         },
         {
-          "pos" : "Particle",
-          "surface" : "も"
+          "pos": "Particle",
+          "surface": "も"
         },
         {
-          "lemma" : "行く",
-          "pos" : "Verb",
-          "surface" : "行き"
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行き"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "たい"
+          "pos": "Auxiliary",
+          "surface": "たい"
         }
       ],
-      "id" : "case_particle_mo",
-      "input" : "私も行きたい",
-      "tags" : [
+      "id": "case_particle_mo",
+      "input": "私も行きたい",
+      "tags": [
         "particle",
         "case"
       ]
     }
   ],
-  "description" : "Case particles (が、を、に、で)",
-  "version" : "1.0"
+  "description": "Case particles (が、を、に、で)",
+  "version": "1.0"
 }

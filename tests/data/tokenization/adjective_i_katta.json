@@ -1,21 +1,21 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "よかった (past form) - MeCab-compatible lemma is よい",
-      "expected" : [
+      "description": "よかった (past form) - MeCab-compatible lemma is よい",
+      "expected": [
         {
-          "lemma" : "よい",
-          "pos" : "Adjective",
-          "surface" : "よかっ"
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よかっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "yokatta_past",
-      "input" : "よかった",
-      "tags" : [
+      "id": "yokatta_past",
+      "input": "よかった",
+      "tags": [
         "irregular",
         "i_adjective",
         "yoi",
@@ -23,26 +23,26 @@
       ]
     },
     {
-      "description" : "よかったです - MeCab-compatible split: よかっ + た + です",
-      "expected" : [
+      "description": "よかったです - MeCab-compatible split: よかっ + た + です",
+      "expected": [
         {
-          "lemma" : "よい",
-          "pos" : "Adjective",
-          "surface" : "よかっ"
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よかっ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "yokatta_desu_polite_past",
-      "input" : "よかったです",
-      "tags" : [
+      "id": "yokatta_desu_polite_past",
+      "input": "よかったです",
+      "tags": [
         "irregular",
         "i_adjective",
         "yoi",
@@ -51,167 +51,167 @@
       ]
     },
     {
-      "description" : "美しかった should be Adjective with lemma 美しい",
-      "expected" : [
+      "description": "美しかった should be Adjective with lemma 美しい",
+      "expected": [
         {
-          "lemma" : "美しい",
-          "pos" : "Adjective",
-          "surface" : "美しかっ"
+          "lemma": "美しい",
+          "pos": "Adjective",
+          "surface": "美しかっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "i_adj_utsukushikatta",
-      "input" : "美しかった",
-      "tags" : [
+      "id": "i_adj_utsukushikatta",
+      "input": "美しかった",
+      "tags": [
         "i_adjective",
         "past"
       ]
     },
     {
-      "description" : "まずかった - hiragana adjective conjugation",
-      "expected" : [
+      "description": "まずかった - hiragana adjective conjugation",
+      "expected": [
         {
-          "lemma" : "まずい",
-          "pos" : "Adjective",
-          "surface" : "まずかっ"
+          "lemma": "まずい",
+          "pos": "Adjective",
+          "surface": "まずかっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "hiragana_adj_mazukatta",
-      "input" : "まずかった",
-      "tags" : [
+      "id": "hiragana_adj_mazukatta",
+      "input": "まずかった",
+      "tags": [
         "i_adjective",
         "hiragana"
       ]
     },
     {
-      "description" : "Katakana adjective エモい past form",
-      "expected" : [
+      "description": "Katakana adjective エモい past form",
+      "expected": [
         {
-          "lemma" : "エモい",
-          "pos" : "Adjective",
-          "surface" : "エモかっ"
+          "lemma": "エモい",
+          "pos": "Adjective",
+          "surface": "エモかっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "adj_emoi_past",
-      "input" : "エモかった",
-      "tags" : [
+      "id": "adj_emoi_past",
+      "input": "エモかった",
+      "tags": [
         "slang",
         "adjective",
         "katakana"
       ]
     },
     {
-      "description" : "Katakana adjective キモい past form",
-      "expected" : [
+      "description": "Katakana adjective キモい past form",
+      "expected": [
         {
-          "lemma" : "キモい",
-          "pos" : "Adjective",
-          "surface" : "キモかっ"
+          "lemma": "キモい",
+          "pos": "Adjective",
+          "surface": "キモかっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "adj_kimoi_past",
-      "input" : "キモかった",
-      "tags" : [
+      "id": "adj_kimoi_past",
+      "input": "キモかった",
+      "tags": [
         "slang",
         "adjective",
         "katakana"
       ]
     },
     {
-      "description" : "寒し - classical shuushikei of 寒い (W-014)",
-      "expected" : [
+      "description": "寒し - classical shuushikei of 寒い (W-014)",
+      "expected": [
         {
-          "lemma" : "寒い",
-          "pos" : "Adjective",
-          "surface" : "寒"
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "さ"
+          "pos": "Suffix",
+          "surface": "さ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "寒し"
+          "pos": "Noun",
+          "surface": "寒し"
         }
       ],
-      "id" : "classical_samushi",
-      "input" : "寒さは寒し",
-      "tags" : [
+      "id": "classical_samushi",
+      "input": "寒さは寒し",
+      "tags": [
         "classical",
         "wagahai",
         "W-014"
       ]
     },
     {
-      "description" : "くだらんかった - contracted past form of くだらなかった",
-      "expected" : [
+      "description": "くだらんかった - contracted past form of くだらなかった",
+      "expected": [
         {
-          "lemma" : "くだる",
-          "pos" : "Verb",
-          "surface" : "くだら"
+          "lemma": "くだる",
+          "pos": "Verb",
+          "surface": "くだら"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ん"
+          "pos": "Auxiliary",
+          "surface": "ん"
         },
         {
-          "lemma" : "かる",
-          "pos" : "Verb",
-          "surface" : "かっ"
+          "lemma": "かる",
+          "pos": "Verb",
+          "surface": "かっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "contracted_kudaranai_past",
-      "input" : "くだらんかった",
-      "tags" : [
+      "id": "contracted_kudaranai_past",
+      "input": "くだらんかった",
+      "tags": [
         "contraction",
         "colloquial",
         "regression"
       ]
     },
     {
-      "description" : "暑かったね - regression test",
-      "expected" : [
+      "description": "暑かったね - regression test",
+      "expected": [
         {
-          "lemma" : "暑い",
-          "pos" : "Adjective",
-          "surface" : "暑かっ"
+          "lemma": "暑い",
+          "pos": "Adjective",
+          "surface": "暑かっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ね"
+          "pos": "Particle",
+          "surface": "ね"
         }
       ],
-      "id" : "k6691katttane",
-      "input" : "暑かったね"
+      "id": "k6691katttane",
+      "input": "暑かったね"
     }
   ],
-  "description" : "I-adjectives past forms (過去形) - katta forms, past negative, past with desu",
-  "version" : "1.0"
+  "description": "I-adjectives past forms (過去形) - katta forms, past negative, past with desu",
+  "version": "1.0"
 }

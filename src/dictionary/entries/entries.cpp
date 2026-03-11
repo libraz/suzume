@@ -261,14 +261,17 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("ない", "ない", EPOS::AuxNegativeNai),
       aux("なかっ", "ない", EPOS::AuxNegativeNai),  // 連用タ接続
       aux("なけれ", "ない", EPOS::AuxNegativeNai),  // 仮定形 (なけれ+ば)
+      aux("なかろ", "ない", EPOS::AuxNegativeNai),  // 推量形 (なかろ+う)
 
       // Negation - ぬ/ず (文語否定)
       aux("ぬ", "ぬ", EPOS::AuxNegativeNu),
       aux("ず", "ぬ", EPOS::AuxNegativeNu),   // lemma is ぬ per MeCab
       aux("ずに", "ぬ", EPOS::AuxNegativeNu),
       aux("ずとも", "ぬ", EPOS::AuxNegativeNu),
-      aux("ごとく", "ごとく", EPOS::Unknown),
-      aux("ごとき", "ごとき", EPOS::Unknown),
+      aux("ざる", "ぬ", EPOS::AuxNegativeNu),  // 連体形 (せざるを得ない)
+      aux("ざれ", "ぬ", EPOS::AuxNegativeNu),  // 已然形 (あらざれば)
+      aux("ごとく", "ごとし", EPOS::Adverb),   // 如く (比況連用形)
+      aux("ごとき", "ごとし", EPOS::Determiner), // 如き (比況連体形)
       // じゃない: removed - split as じゃ(AuxCopulaDa) + ない(AuxNegativeNai)
       aux("ん", "ん", EPOS::AuxNegativeNu),
 
@@ -324,6 +327,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       verb("し", "する", EPOS::VerbRenyokei),
       verb("す", "する", EPOS::VerbShuushikei),
       verb("さ", "する", EPOS::VerbMizenkei),
+      verb("せ", "する", EPOS::VerbMizenkei),  // 認識せざるを得ない
 
       // Kuru verb stem form (カ変動詞語幹活用形) - VERB, not AUX
       // MeCab: 来た → 来(連用形) + た(過去)
@@ -432,6 +436,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: 傷だらけ → 傷 + だらけ (noun + suffix)
       suffix("だらけ", "だらけ"),
 
+      // Verb renyokei suffix っぱなし (出しっぱなし, 置きっぱなし)
+      // MeCab: 出しっぱなし → 出し + っぱなし (verb renyokei + suffix)
+      suffix("っぱなし", "っぱなし"),
+
       // Adjective suffixes - connect after verb renyokei (V連用形接続)
       // MeCab: 使いにくい → 使い + にくい, 読みやすい → 読み + やすい
       adj("にくい", "にくい", EPOS::AdjBasic),
@@ -483,8 +491,9 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
 
       // Request - ください is VERB (くださる) in MeCab
       // くださる is special ra-row godan with irregular imperative form ください
-      verb("ください", "くださる", EPOS::VerbShuushikei),
-      verb("下さい", "下さる", EPOS::VerbShuushikei),
+      // Uses VerbRenyokei to allow connection to ます (くださいました)
+      verb("ください", "くださる", EPOS::VerbRenyokei),
+      verb("下さい", "下さる", EPOS::VerbRenyokei),
       verb("くださいませ", "くださる", EPOS::VerbShuushikei),
 
       // Special ra-row godan verbs (五段ラ行特殊) with い-form renyokei
@@ -696,7 +705,8 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
       det("こんな", ""), det("そんな", ""), det("あんな", ""), det("どんな", ""),
 
       // Other determiners (連体詞)
-      det("ある", ""), det("あらゆる", ""), det("いわゆる", ""), det("おかしな", ""),
+      det("ある", ""), det("あらゆる", ""), det("いかなる", ""), det("いわゆる", ""),
+      det("おかしな", ""),
       det("同じ", ""),  // same - prevent VERB confusion
 
       // Demonstrative manner determiners (指示様態連体詞)
@@ -715,6 +725,9 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
 
       // Determiners with kanji - B51: lowered cost to prioritize over NOUN unknown
       det("大きな", ""), det("小さな", ""),
+
+      // Classical possessive determiner (我が家, 我が子, 我が国)
+      det("我が", ""),
   };
 }
 
@@ -760,6 +773,7 @@ std::vector<DictionaryEntry> getPronounEntries() {
 
       // Archaic/Samurai (武家・古風)
       pronoun("我", ""),
+      pronoun("われ", ""),  // 我/吾 classical first-person pronoun
       pronoun("拙者", ""),
       pronoun("貴殿", ""),
       pronoun("某", ""),
@@ -809,6 +823,11 @@ std::vector<DictionaryEntry> getPronounEntries() {
       // The te-form bonus makes どう+して+VERB cheaper than どうして+VERB
       adv("どうして", ""),
       adv("なぜ", ""),
+
+      // Classical/literary adverbs (古語・文語副詞)
+      adv("かく", ""),     // 斯く - classical demonstrative adverb (=こう/such)
+      adv("なんと", ""),   // exclamatory adverb (感嘆副詞)
+      adv("なんとか", ""), // indefinite adverb (somehow/one way or another)
 
       // Degree adverbs (程度副詞) - very common, prevent misparse
       // とても could be split as と+て+も without this entry

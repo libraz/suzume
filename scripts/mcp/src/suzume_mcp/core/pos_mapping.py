@@ -218,7 +218,7 @@ def map_mecab_pos(token: dict | str) -> str:
     if pos == "名詞" and pos_sub1 == "特殊" and pos_sub2 == "助動詞語幹":
         return "Auxiliary"
 
-    # 名詞,非自立,形容動詞語幹 (みたい) -> Auxiliary
+# 名詞,非自立,形容動詞語幹 (みたい) -> Auxiliary
     if pos == "名詞" and pos_sub1 == "非自立" and pos_sub2 == "形容動詞語幹":
         return "Auxiliary"
 
@@ -328,11 +328,30 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
                 t["pos"] = "助動詞"
                 t["lemma"] = "ない"
 
+        # Fix ない after が (particle): 形容詞 -> 助動詞 (negation auxiliary)
+        if surface == "ない" and pos == "形容詞":
+            if idx > 0 and tokens[idx - 1].get("surface") == "が" and tokens[idx - 1].get("pos") in ("助詞", "Particle"):
+                t["pos"] = "助動詞"
+                t["lemma"] = "ない"
+
         # Fix な after じゃ: 助詞 -> 助動詞
         if surface == "な" and pos == "助詞":
             if idx > 0 and tokens[idx - 1].get("surface") == "じゃ":
                 t["pos"] = "助動詞"
                 t["lemma"] = "だ"
+
+        # Fix 得 before し/する: Suzume treats as 得る(ichidan) renyokei
+        # MeCab treats as sahen noun (得する), Suzume has 得る in dict
+        if surface == "得" and pos == "名詞":
+            if idx + 1 < len(tokens) and tokens[idx + 1].get("surface") in (
+                "し",
+                "する",
+                "さ",
+                "せ",
+                "でき",
+            ):
+                t["pos"] = "動詞"
+                t["lemma"] = "得る"
 
         # Fix particles misclassified as Noun
         if surface in PARTICLE_CORRECTIONS and pos == "Noun":

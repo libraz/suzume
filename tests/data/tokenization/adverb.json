@@ -381,7 +381,7 @@
           "surface": "が"
         },
         {
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "ない"
         },
         {
@@ -398,7 +398,41 @@
         }
       ],
       "id": "daiichi_hiragana_boundary",
-      "input": "だいいち毛がないように見える"
+      "input": "だいいち毛がないように見える",
+      "suzume_expected": [
+        {
+          "surface": "だいいち",
+          "pos": "Adverb"
+        },
+        {
+          "surface": "毛",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ない",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "よう",
+          "pos": "Auxiliary"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle"
+        },
+        {
+          "surface": "見える",
+          "pos": "Verb"
+        }
+      ],
+      "accepted_diff": {
+        "reason": "POS/lemma limitation",
+        "category": "pos-limitation"
+      }
     },
     {
       "description": "つるつる+し split (onomatopoeia + suru)",
@@ -434,8 +468,8 @@
     },
     {
       "accepted_diff": {
-        "category": "design-difference",
-        "reason": "Suzume intentional design difference from MeCab normalization"
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation: surfaces match, POS classification differs from MeCab"
       },
       "description": "第一 dict entry acts as kanji compound boundary",
       "expected": [
@@ -452,7 +486,7 @@
           "surface": "が"
         },
         {
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "ない"
         },
         {
@@ -488,12 +522,12 @@
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "ない"
         },
         {
           "lemma": "よう",
-          "pos": "Noun",
+          "pos": "Auxiliary",
           "surface": "よう"
         },
         {

@@ -903,7 +903,14 @@ def _postprocess_adj_bungo(result: list[dict], applied_rule: str | None) -> tupl
 
 
 def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
-    """Merge consecutive all-kanji tokens."""
+    """Merge consecutive all-kanji tokens.
+
+    Also merges single-kanji + kanji-starting tokens when MeCab incorrectly
+    splits compound words (e.g., 微+笑み → 微笑み).
+    """
+    # Specific kanji+hiragana compounds that MeCab splits incorrectly
+    _KANJI_HIRA_MERGES = {"微": {"笑み"}}
+
     merged = []
     for curr in result:
         surface = curr.get("surface", "")
@@ -916,6 +923,16 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
             and merged[-1].get("pos_sub1", "") not in ("副詞可能", "固有名詞", "数")
             and merged[-1].get("pos", "") != "副詞"
             and curr.get("pos_sub1", "") != "接尾"
+        ):
+            merged[-1]["surface"] += surface
+            merged[-1]["lemma"] = merged[-1]["surface"]
+            merged[-1]["pos"] = "名詞"
+            if applied_rule is None:
+                applied_rule = "kanji-merge"
+        elif (
+            merged
+            and merged[-1].get("surface", "") in _KANJI_HIRA_MERGES
+            and surface in _KANJI_HIRA_MERGES[merged[-1]["surface"]]
         ):
             merged[-1]["surface"] += surface
             merged[-1]["lemma"] = merged[-1]["surface"]

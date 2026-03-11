@@ -1057,7 +1057,7 @@
           "surface": "が"
         },
         {
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "ない"
         }
       ],
@@ -1066,7 +1066,25 @@
       "tags": [
         "particle",
         "filter"
-      ]
+      ],
+      "suzume_expected": [
+        {
+          "surface": "金",
+          "pos": "Noun"
+        },
+        {
+          "surface": "が",
+          "pos": "Particle"
+        },
+        {
+          "surface": "ない",
+          "pos": "Adjective"
+        }
+      ],
+      "accepted_diff": {
+        "reason": "POS/lemma limitation",
+        "category": "pos-limitation"
+      }
     },
     {
       "description": "くらい should be particle (degree), not 暗い adjective",

@@ -588,8 +588,14 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     // Skip patterns that are clearly verb negatives, not adjectives
     // 〜かない, 〜がない, etc. are Godan verb mizenkei + ない patterns
     // 〜しない is Suru verb + ない, 〜べない is Ichidan verb + ない
+    // Exception: dictionary-confirmed adjectives (情けない, 味気ない, etc.)
+    // These are genuine i-adjectives whose okurigana coincidentally matches
+    // verb negative patterns but must not be blocked.
     if (grammar::endsWithVerbNegative(hiragana_part)) {
-      continue;  // Skip - verb negative pattern, not adjective
+      if (!isAdjectiveInDictionary(dict_manager, surface)) {
+        continue;  // Skip - verb negative pattern, not adjective
+      }
+      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_NAI] dict-confirmed nai-adj: \"" << surface << "\"\n");
     }
 
     // Skip patterns that are サ変動詞 + て + auxiliary
@@ -613,6 +619,8 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
     const auto& all_candidates = inflection.analyze(surface);
 
     for (const auto& cand : all_candidates) {
+      // Require confidence >= 0.5 for i-adjectives
+      // Base forms like 寒い get exactly 0.5, conjugated forms like 美しかった get 0.68+
       // Require confidence >= 0.5 for i-adjectives
       // Base forms like 寒い get exactly 0.5, conjugated forms like 美しかった get 0.68+
       if (cand.confidence >= 0.5F &&

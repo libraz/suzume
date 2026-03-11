@@ -1098,6 +1098,27 @@
       ],
       "id": "sokuon_hatsuonbin_fukktonde",
       "input": "吹っ飛んで"
+    },
+    {
+      "description": "ADJ連用+compound verb: 深く+突き刺さっ+た",
+      "expected": [
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深く"
+        },
+        {
+          "lemma": "突き刺さる",
+          "pos": "Verb",
+          "surface": "突き刺さっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "fukaku_tsukisasatta",
+      "input": "深く突き刺さった"
     }
   ],
   "description": "Compound verbs",

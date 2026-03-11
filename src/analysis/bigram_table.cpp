@@ -199,6 +199,10 @@ BigramTable::initTable() {
   // This is a very common Japanese pattern (美しくなる, 大きくなる, etc.)
   setCell(t, EPOS::AdjRenyokei, EPOS::VerbRenyokei, cost::kStrongBonus);
 
+  // AdjRenyokei → VerbOnbinkei (深く+突き刺さっ, 美しく+咲い) - moderate bonus
+  // Adverb form of adjective directly modifying verb in onbin (past/te) form
+  setCell(t, EPOS::AdjRenyokei, EPOS::VerbOnbinkei, cost::kModerateBonus);
+
   // AdjKatt → AuxTenseTa (美しかっ+た) - strong bonus
   setCell(t, EPOS::AdjKatt, EPOS::AuxTenseTa, cost::kStrongBonus);
 
@@ -310,6 +314,9 @@ BigramTable::initTable() {
 
   // AuxNegativeNai → AuxTenseTa (なかっ+た) - strong bonus
   setCell(t, EPOS::AuxNegativeNai, EPOS::AuxTenseTa, cost::kStrongBonus);
+
+  // AuxNegativeNai → AuxVolitional (なかろ+う) - strong bonus
+  setCell(t, EPOS::AuxNegativeNai, EPOS::AuxVolitional, cost::kStrongBonus);
 
   // AuxNegativeNu → AuxTenseTa (んかっ+た for contracted negative past)
   // Ensures くだらんかった → くだら+ん+かっ+た over くだ+らんかっ+た
@@ -644,6 +651,16 @@ BigramTable::initTable() {
   // Suffix + Adverb is grammatically unusual; そう after さ is AuxAppearance
   setCell(t, EPOS::Suffix, EPOS::Adverb, cost::kVeryRare);
 
+  // AuxVolitional → ParticleCase (う+と quotative) - minor bonus
+  // Volitional + と is common (書こうと思う, 食べようとする)
+  // Keep bonus small to avoid changing よう POS in 次のように (NounFormal vs AuxVolitional)
+  setCell(t, EPOS::AuxVolitional, EPOS::ParticleCase, cost::kMinorBonus);
+
+  // AuxVolitional → ParticleConj (う+として) - strong penalty
+  // Volitional form (う/よう) is not followed by conjunctive particles (として, ながら)
+  // 書こうとしている should split as 書こ+う+と+し+て+いる, not 書こ+う+として+いる
+  setCell(t, EPOS::AuxVolitional, EPOS::ParticleConj, cost::kStrong);
+
   // AuxAspectOku → AuxVolitional (とい+う) - strong penalty
   // Prevents とい+う from beating という (quotative determiner)
   // とい (contracted ておく form) + う (volitional) is grammatically invalid
@@ -821,6 +838,13 @@ BigramTable::initTable() {
   // Renyokei followed by mizenkei is grammatically unusual
   // Legitimate patterns like 食べ+すぎ use Renyokei→Renyokei (すぎ is renyokei)
   setCell(t, EPOS::VerbRenyokei, EPOS::VerbMizenkei, cost::kVeryRare);
+
+  // VerbRenyokei → VerbOnbinkei (突き+刺さっ) - minor penalty
+  // Verb renyokei directly followed by another verb in onbin form only occurs
+  // in compound verbs (突き刺さる, 走り出す). When the compound is in the
+  // dictionary, the merged token should be preferred over the split path.
+  // Surface-based bonus in scorer.cpp adds extra penalty for kanji verbs.
+  setCell(t, EPOS::VerbRenyokei, EPOS::VerbOnbinkei, cost::kNegligible);
 
   // AdjBasic → VerbMizenkei (盛りだく+さ) - strong penalty
   // Adjective 終止形 followed by verb 未然形 is grammatically unusual

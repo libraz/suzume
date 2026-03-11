@@ -414,6 +414,50 @@
       ],
       "id": "dearimasu",
       "input": "であります"
+    },
+    {
+      "description": "すなわち as single conjunction token (not す+なわち)",
+      "expected": [
+        {
+          "pos": "Conjunction",
+          "surface": "すなわち"
+        },
+        {
+          "pos": "Noun",
+          "surface": "人間"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "pos": "Noun",
+          "surface": "矛盾"
+        },
+        {
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "pos": "Noun",
+          "surface": "塊"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "sunawachi_toha_no_dearu",
+      "input": "すなわち、人間とは矛盾の塊である。"
     }
   ],
   "description": "Copula patterns (だ、です、である)",

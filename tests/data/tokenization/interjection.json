@@ -1,111 +1,111 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "ごめんなさい - apology as single token",
-      "expected" : [
+      "description": "ごめんなさい - apology as single token",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "ごめんなさい"
+          "pos": "Interjection",
+          "surface": "ごめんなさい"
         }
       ],
-      "id" : "gomennasai_unified",
-      "input" : "ごめんなさい",
-      "tags" : [
+      "id": "gomennasai_unified",
+      "input": "ごめんなさい",
+      "tags": [
         "interjection",
         "apology"
       ]
     },
     {
-      "description" : "おはよう - morning greeting",
-      "expected" : [
+      "description": "おはよう - morning greeting",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "おはよう"
+          "pos": "Interjection",
+          "surface": "おはよう"
         }
       ],
-      "id" : "ohayou",
-      "input" : "おはよう",
-      "tags" : [
+      "id": "ohayou",
+      "input": "おはよう",
+      "tags": [
         "interjection",
         "greeting"
       ]
     },
     {
-      "description" : "ありがとう - thanks",
-      "expected" : [
+      "description": "ありがとう - thanks",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "ありがとう"
+          "pos": "Interjection",
+          "surface": "ありがとう"
         }
       ],
-      "id" : "arigatou",
-      "input" : "ありがとう",
-      "tags" : [
+      "id": "arigatou",
+      "input": "ありがとう",
+      "tags": [
         "interjection",
         "thanks"
       ]
     },
     {
-      "description" : "すみません - excuse me/sorry",
-      "expected" : [
+      "description": "すみません - excuse me/sorry",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "すみません"
+          "pos": "Interjection",
+          "surface": "すみません"
         }
       ],
-      "id" : "sumimasen",
-      "input" : "すみません",
-      "tags" : [
+      "id": "sumimasen",
+      "input": "すみません",
+      "tags": [
         "interjection",
         "apology"
       ]
     },
     {
-      "description" : "こんにちは - hello (daytime greeting)",
-      "expected" : [
+      "description": "こんにちは - hello (daytime greeting)",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "こんにちは"
+          "pos": "Interjection",
+          "surface": "こんにちは"
         }
       ],
-      "id" : "konnichiwa",
-      "input" : "こんにちは",
-      "tags" : [
+      "id": "konnichiwa",
+      "input": "こんにちは",
+      "tags": [
         "interjection",
         "greeting"
       ]
     },
     {
-      "description" : "こんばんは - good evening",
-      "expected" : [
+      "description": "こんばんは - good evening",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "こんばんは"
+          "pos": "Interjection",
+          "surface": "こんばんは"
         }
       ],
-      "id" : "konbanwa",
-      "input" : "こんばんは",
-      "tags" : [
+      "id": "konbanwa",
+      "input": "こんばんは",
+      "tags": [
         "interjection",
         "greeting"
       ]
     },
     {
-      "description" : "さようなら - goodbye",
-      "expected" : [
+      "description": "さようなら - goodbye",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "さようなら"
+          "pos": "Interjection",
+          "surface": "さようなら"
         }
       ],
-      "id" : "sayonara",
-      "input" : "さようなら",
-      "tags" : [
+      "id": "sayonara",
+      "input": "さようなら",
+      "tags": [
         "interjection",
         "greeting"
       ]
     }
   ],
-  "description" : "Interjections and greetings (感動詞・挨拶)",
-  "version" : "1.0"
+  "description": "Interjections and greetings (感動詞・挨拶)",
+  "version": "1.0"
 }

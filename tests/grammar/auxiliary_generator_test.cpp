@@ -1,6 +1,6 @@
 
-// Auxiliary generator compatibility tests
-// Ensures new generator produces all patterns from old hardcoded implementation
+// Auxiliary generator tests
+// Verifies generated auxiliary surfaces match expected patterns
 
 #include "grammar/auxiliary_generator.h"
 
@@ -30,112 +30,87 @@ class AuxiliaryGeneratorTest : public ::testing::Test {
   std::set<std::string> generated_surfaces_;
 };
 
-// Old implementation surfaces (309 unique patterns)
-// Extracted from git show HEAD:src/grammar/auxiliaries.cpp
-const std::vector<std::string> kOldSurfaces = {
-    "あげた", "あげる", "あった", "あります", "ある",  // あげます → あげ+ます
-    "い", "いく", "いた", "いただいた", "いただいて", "いただきました",
-    "いただきます", "いただく", "いただけます", "いただけますか", "いただける",
-    "いった", "いって", "いて", "いました", "います", "いる",
-    "う", "うとした", "うとして", "うとしていた", "うとしている", "うとする",
-    "おいた", "おいて", "おきます", "おく", "おった", "おりました",
-    "おりまして", "おります", "おる",
-    "かけた", "かけて", "かけている", "かける", "かった", "かったら",
-    "きた", "きて", "きます",
-    "く", "ください", "くださいました", "くださいます", "くださった", "くださって",
-    "くださる", "くて", "くない", "くなかった", "くなった", "くなって",
-    "くなる", "くる", "くれた", "くれる", "ければ",  // くれます → くれ+ます
-    "ことができた", "ことができて", "ことができない", "ことができなかった", "ことができる",
-    "さ", "させた", "させて", "させない", "させなかった", "させなくて",
-    "させます", "させられた", "させられたい", "させられたかった", "させられたくて",
-    "させられたくない", "させられたくなかった", "させられて", "させられない",
-    "させられなくて", "させられなくなった", "させられなくなって", "させられなくなる",
-    "させられます", "させられる", "させる",
-    "された", "されて", "されない", "されなかった", "されなくて",
-    "されました", "されます", "されません", "される",
-    "ざるを得ない", "ざるを得なかった", "ざるを得ません",
-    "しまいます", "しまう", "しまった", "しまって",
-    "じゃう", "じゃった", "じゃって",
-    "すぎた", "すぎて", "すぎている", "すぎない", "すぎなかった",
-    "すぎました", "すぎます", "すぎる",
-    "ずにはいられない", "ずにはいられなかった",
-    "せた", "せて", "せない", "せなかった", "せなくて", "せます",
-    "せられた", "せられたい", "せられたかった", "せられたくて", "せられたくない",
-    "せられたくなかった", "せられて", "せられない", "せられなくて",
-    "せられなくなった", "せられなくなって", "せられなくなる",
-    "せられました", "せられます", "せられません", "せられる", "せる",
-    "そう", "そうだ", "そうだった", "そうでした", "そうです", "そうな", "そうに",
-    "た", "たい", "たかった", "たくて", "たくない", "たくなかった",
-    "たら", "たり", "たりした", "たりして", "たりする",
-    "だ", "だら", "だり", "だりした", "だりして", "だりする",
-    "ちゃう", "ちゃった", "ちゃって",
-    "っぱなしだ", "っぱなしで", "っぱなしにする",
-    "て", "で",
-    "といた", "とく",
-    "ところだ", "ところだった", "ところです",
-    "ない", "ないで", "ないでいた", "ないでいる",
-    "ないといけない", "ないといけなかった",
-    "なかった", "ながら",
-    "なきゃ", "なきゃいけない", "なきゃならない",
-    "なくちゃ", "なくて", "なくてはいけない", "なくてはいけなかった",
-    "なくなった", "なくなって", "なくなってしまう", "なくなってしまった", "なくなる",
-    "なければ", "なければならない", "なければならなかった",
-    "にくい", "にくかった", "にくく", "にくくて",
-    // "のだ", "のです",  // Removed: のだ/のです are split as の+だ/の+です
-    "はいけない", "はいけなかった", "はだめだ", "はならない", "はならなかった",
-    "ば",
-    "ばかりだ", "ばかりだった", "ばかりです", "ばかりなのに",
-    // "べきだ", "べきだった", "べきです", "べきではない", "べきではなかった",
-    // Removed: べき compound suffixes split as べき+だ, べき+だっ+た, etc.
-    "ほしい", "ほしかった", "ほしくない",
-    "ました", "ましょう", "ます", "ません", "ませんでした",
-    "みた", "みたら", "みて", "みます", "みる", "みれば",
-    "もいい", "もいいですか", "もかまわない", "もかまわなかった",
-    "もらう", "もらった", "もらって",  // もらいます → もらい+ます
-    "やすい", "やすかった", "やすく", "やすくて",
-    "よう", "ようとした", "ようとして", "ようとしていた", "ようとしている", "ようとする",
-    "ようになった", "ようになって", "ようになっている", "ようになってきた", "ようになる",
-    "られた", "られて", "られない", "られなかった", "られなくて",
-    "られなくなった", "られなくなって", "られなくなってしまう", "られなくなってしまった",
-    "られなくなる", "られます", "られる",
-    "る",
-    "れた", "れて", "れない", "れなかった", "れなくて",
-    "れなくなった", "れなくなって", "れなくなる", "れます", "れる",
-    "わけにはいかない", "わけにはいかなかった", "わけにはいきません",
-    // "んだ", "んだもの", "んだもん", "んです",  // Removed: のだ/んだ are split as の+だ/ん+だ
-    "出した", "出して", "出す",
-    "直した", "直して", "直している", "直す",
-    "終えた", "終えて", "終える",
-    "終わった", "終わって", "終わる",
-    "続けた", "続けて", "続けている", "続ける",
-};
-
-// Test that generator produces all old surfaces
-TEST_F(AuxiliaryGeneratorTest, CoversAllOldSurfaces) {
-  std::vector<std::string> missing;
-  for (const auto& surface : kOldSurfaces) {
-    if (!hasSurface(surface)) {
-      missing.push_back(surface);
-    }
-  }
-
-  if (!missing.empty()) {
-    std::string msg = "Missing surfaces (" + std::to_string(missing.size()) + "):\n";
-    for (const auto& s : missing) {
-      msg += "  " + s + "\n";
-    }
-    FAIL() << msg;
-  }
+// Verify generator produces expected number of unique surfaces
+TEST_F(AuxiliaryGeneratorTest, GeneratesExpectedCount) {
+  // Generator produces ~406 unique surfaces (conjugation forms of auxiliary
+  // bases plus special patterns). Allow some tolerance for future additions.
+  EXPECT_GE(generated_surfaces_.size(), 390);
 }
 
-// Test generator produces reasonable number of entries
-TEST_F(AuxiliaryGeneratorTest, GeneratesReasonableCount) {
-  // Old implementation had 345 entries (with duplicates)
-  // New generator should produce at least 309 unique surfaces
-  EXPECT_GE(generated_surfaces_.size(), 300);
+// Verify multi-word constructions are NOT generated (they cause false verb
+// absorption). These were intentionally removed.
+TEST_F(AuxiliaryGeneratorTest, DoesNotGenerateMultiWordConstructions) {
+  // Prohibition/Permission (て+は+いけない etc.)
+  EXPECT_FALSE(hasSurface("はいけない"));
+  EXPECT_FALSE(hasSurface("はいけなかった"));
+  EXPECT_FALSE(hasSurface("はならない"));
+  EXPECT_FALSE(hasSurface("はならなかった"));
+  EXPECT_FALSE(hasSurface("はだめだ"));
+  EXPECT_FALSE(hasSurface("もいい"));
+  EXPECT_FALSE(hasSurface("もいいですか"));
+  EXPECT_FALSE(hasSurface("もかまわない"));
+  EXPECT_FALSE(hasSurface("もかまわなかった"));
+
+  // Formal noun + copula
+  EXPECT_FALSE(hasSurface("ところだ"));
+  EXPECT_FALSE(hasSurface("ところだった"));
+  EXPECT_FALSE(hasSurface("ところです"));
+
+  // ばかり + copula
+  EXPECT_FALSE(hasSurface("ばかりだ"));
+  EXPECT_FALSE(hasSurface("ばかりだった"));
+  EXPECT_FALSE(hasSurface("ばかりです"));
+  EXPECT_FALSE(hasSurface("ばかりなのに"));
+
+  // っぱなし + copula/particle
+  EXPECT_FALSE(hasSurface("っぱなしだ"));
+  EXPECT_FALSE(hasSurface("っぱなしで"));
+  EXPECT_FALSE(hasSurface("っぱなしにする"));
+
+  // Multi-particle chains
+  EXPECT_FALSE(hasSurface("ざるを得ない"));
+  EXPECT_FALSE(hasSurface("ざるを得なかった"));
+  EXPECT_FALSE(hasSurface("ざるを得ません"));
+  EXPECT_FALSE(hasSurface("ずにはいられない"));
+  EXPECT_FALSE(hasSurface("ずにはいられなかった"));
+  EXPECT_FALSE(hasSurface("わけにはいかない"));
+  EXPECT_FALSE(hasSurface("わけにはいかなかった"));
+  EXPECT_FALSE(hasSurface("わけにはいきません"));
+
+  // Volitional + とする (split as う+と+する, よう+と+する)
+  EXPECT_FALSE(hasSurface("うとする"));
+  EXPECT_FALSE(hasSurface("うとした"));
+  EXPECT_FALSE(hasSurface("うとして"));
+  EXPECT_FALSE(hasSurface("ようとする"));
+  EXPECT_FALSE(hasSurface("ようとした"));
+  EXPECT_FALSE(hasSurface("ようとして"));
+
+  // Volitional + ている (volitional + と+する+ている)
+  EXPECT_FALSE(hasSurface("うとしている"));
+  EXPECT_FALSE(hasSurface("うとしていた"));
+  EXPECT_FALSE(hasSurface("ようとしている"));
+  EXPECT_FALSE(hasSurface("ようとしていた"));
+
+  // ようになる + ている
+  EXPECT_FALSE(hasSurface("ようになっている"));
+  EXPECT_FALSE(hasSurface("ようになってきた"));
+
+  // べき + copula (split as べき+だ etc.)
+  EXPECT_FALSE(hasSurface("べきだ"));
+  EXPECT_FALSE(hasSurface("べきだった"));
+  EXPECT_FALSE(hasSurface("べきです"));
+  EXPECT_FALSE(hasSurface("べきではない"));
+  EXPECT_FALSE(hasSurface("べきではなかった"));
+
+  // のだ/んだ (split as の+だ, ん+だ)
+  EXPECT_FALSE(hasSurface("のだ"));
+  EXPECT_FALSE(hasSurface("のです"));
+  EXPECT_FALSE(hasSurface("んだ"));
+  EXPECT_FALSE(hasSurface("んです"));
 }
 
-// Test specific critical patterns exist
+// === Core conjugation patterns ===
+
 TEST_F(AuxiliaryGeneratorTest, HasMasuForms) {
   EXPECT_TRUE(hasSurface("ます"));
   EXPECT_TRUE(hasSurface("ました"));
@@ -248,6 +223,53 @@ TEST_F(AuxiliaryGeneratorTest, HasSugiruForms) {
   EXPECT_TRUE(hasSurface("すぎた"));
   EXPECT_TRUE(hasSurface("すぎて"));
   EXPECT_TRUE(hasSurface("すぎます"));
+}
+
+TEST_F(AuxiliaryGeneratorTest, HasVolitionalForms) {
+  EXPECT_TRUE(hasSurface("よう"));
+  // Volitional + とする removed (multi-word: う+と+する should split)
+  EXPECT_FALSE(hasSurface("ようとした"));
+  EXPECT_FALSE(hasSurface("ようとして"));
+  EXPECT_FALSE(hasSurface("ようとする"));
+  EXPECT_TRUE(hasSurface("ようになった"));
+  EXPECT_TRUE(hasSurface("ようになって"));
+  EXPECT_TRUE(hasSurface("ようになる"));
+}
+
+TEST_F(AuxiliaryGeneratorTest, HasObligationForms) {
+  EXPECT_TRUE(hasSurface("ないといけない"));
+  EXPECT_TRUE(hasSurface("ないといけなかった"));
+  EXPECT_TRUE(hasSurface("なければならない"));
+  EXPECT_TRUE(hasSurface("なければならなかった"));
+  EXPECT_TRUE(hasSurface("なくてはいけない"));
+  EXPECT_TRUE(hasSurface("なくてはいけなかった"));
+  EXPECT_TRUE(hasSurface("なきゃいけない"));
+  EXPECT_TRUE(hasSurface("なきゃならない"));
+}
+
+TEST_F(AuxiliaryGeneratorTest, HasSouForms) {
+  EXPECT_TRUE(hasSurface("そう"));
+  EXPECT_TRUE(hasSurface("そうだ"));
+  EXPECT_TRUE(hasSurface("そうだった"));
+  EXPECT_TRUE(hasSurface("そうです"));
+  EXPECT_TRUE(hasSurface("そうな"));
+  EXPECT_TRUE(hasSurface("そうに"));
+}
+
+TEST_F(AuxiliaryGeneratorTest, HasColloquialContractions) {
+  EXPECT_TRUE(hasSurface("てる"));   // ている contracted
+  EXPECT_TRUE(hasSurface("てた"));   // ていた contracted
+  EXPECT_TRUE(hasSurface("てない")); // ていない contracted
+  EXPECT_TRUE(hasSurface("でる"));   // でいる contracted
+  EXPECT_TRUE(hasSurface("でた"));   // でいた contracted
+}
+
+TEST_F(AuxiliaryGeneratorTest, HasKotogaDekiruForms) {
+  EXPECT_TRUE(hasSurface("ことができる"));
+  EXPECT_TRUE(hasSurface("ことができた"));
+  EXPECT_TRUE(hasSurface("ことができて"));
+  EXPECT_TRUE(hasSurface("ことができない"));
+  EXPECT_TRUE(hasSurface("ことができなかった"));
 }
 
 }  // namespace

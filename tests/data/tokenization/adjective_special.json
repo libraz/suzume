@@ -1,127 +1,127 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "毅然と (resolutely)",
-      "expected" : [
+      "description": "毅然と (resolutely)",
+      "expected": [
         {
-          "lemma" : "毅然",
-          "pos" : "Adverb",
-          "surface" : "毅然と"
+          "lemma": "毅然",
+          "pos": "Adverb",
+          "surface": "毅然と"
         }
       ],
-      "id" : "taru_adj_kizento",
-      "input" : "毅然と",
-      "tags" : [
+      "id": "taru_adj_kizento",
+      "input": "毅然と",
+      "tags": [
         "grammar",
         "taru-adjective"
       ]
     },
     {
-      "description" : "平然と (calmly)",
-      "expected" : [
+      "description": "平然と (calmly)",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "平然と"
+          "pos": "Adverb",
+          "surface": "平然と"
         }
       ],
-      "id" : "taru_adj_heizento",
-      "input" : "平然と",
-      "tags" : [
+      "id": "taru_adj_heizento",
+      "input": "平然と",
+      "tags": [
         "grammar",
         "taru-adjective"
       ]
     },
     {
-      "description" : "泰然と (composedly) - X然と pattern treated as single adverb",
-      "expected" : [
+      "description": "泰然と (composedly) - X然と pattern treated as single adverb",
+      "expected": [
         {
-          "lemma" : "泰然",
-          "pos" : "Adverb",
-          "surface" : "泰然と"
+          "lemma": "泰然",
+          "pos": "Adverb",
+          "surface": "泰然と"
         }
       ],
-      "id" : "taru_adj_taizento",
-      "input" : "泰然と",
-      "tags" : [
+      "id": "taru_adj_taizento",
+      "input": "泰然と",
+      "tags": [
         "grammar",
         "taru-adjective"
       ]
     },
     {
-      "description" : "颯爽と (gallantly)",
-      "expected" : [
+      "description": "颯爽と (gallantly)",
+      "expected": [
         {
-          "lemma" : "颯爽",
-          "pos" : "Adverb",
-          "surface" : "颯爽と"
+          "lemma": "颯爽",
+          "pos": "Adverb",
+          "surface": "颯爽と"
         }
       ],
-      "id" : "taru_adj_sassouto",
-      "input" : "颯爽と",
-      "tags" : [
+      "id": "taru_adj_sassouto",
+      "input": "颯爽と",
+      "tags": [
         "grammar",
         "taru-adjective"
       ]
     },
     {
-      "description" : "溌剌と (vigorously)",
-      "expected" : [
+      "description": "溌剌と (vigorously)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "溌剌"
+          "pos": "Noun",
+          "surface": "溌剌"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         }
       ],
-      "id" : "taru_adj_hatsuratsuto",
-      "input" : "溌剌と",
-      "tags" : [
+      "id": "taru_adj_hatsuratsuto",
+      "input": "溌剌と",
+      "tags": [
         "grammar",
         "taru-adjective"
       ]
     },
     {
-      "description" : "悠然と (leisurely)",
-      "expected" : [
+      "description": "悠然と (leisurely)",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "悠然と"
+          "pos": "Adverb",
+          "surface": "悠然と"
         }
       ],
-      "id" : "taru_adj_yuuzento",
-      "input" : "悠然と",
-      "tags" : [
+      "id": "taru_adj_yuuzento",
+      "input": "悠然と",
+      "tags": [
         "grammar",
         "taru-adjective"
       ]
     },
     {
-      "description" : "同じ should be DET (連体詞), not VERB (W-015)",
-      "expected" : [
+      "description": "同じ should be DET (連体詞), not VERB (W-015)",
+      "expected": [
         {
-          "pos" : "Determiner",
-          "surface" : "同じ"
+          "pos": "Determiner",
+          "surface": "同じ"
         },
         {
-          "pos" : "Noun",
-          "surface" : "事"
+          "pos": "Noun",
+          "surface": "事"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         }
       ],
-      "id" : "det_onaji",
-      "input" : "同じ事を",
-      "tags" : [
+      "id": "det_onaji",
+      "input": "同じ事を",
+      "tags": [
         "determiner",
         "wagahai",
         "W-015"
       ]
     }
   ],
-  "description" : "Taru-adjectives and irregular adjectives",
-  "version" : "1.0"
+  "description": "Taru-adjectives and irregular adjectives",
+  "version": "1.0"
 }

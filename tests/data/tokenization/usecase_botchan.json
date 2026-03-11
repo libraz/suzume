@@ -1,169 +1,169 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma normalization difference"
       },
-      "description" : "坊っちゃん冒頭 - 親譲りの無鉄砲で小供の時から損ばかりしている",
-      "expected" : [
+      "description": "坊っちゃん冒頭 - 親譲りの無鉄砲で小供の時から損ばかりしている",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "親譲り"
+          "pos": "Noun",
+          "surface": "親譲り"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "無鉄砲"
+          "pos": "Noun",
+          "surface": "無鉄砲"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "小供"
+          "pos": "Noun",
+          "surface": "小供"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "時"
+          "pos": "Noun",
+          "surface": "時"
         },
         {
-          "pos" : "Particle",
-          "surface" : "から"
+          "pos": "Particle",
+          "surface": "から"
         },
         {
-          "pos" : "Noun",
-          "surface" : "損"
+          "pos": "Noun",
+          "surface": "損"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ばかり"
+          "pos": "Particle",
+          "surface": "ばかり"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いる"
+          "pos": "Auxiliary",
+          "surface": "いる"
         }
       ],
-      "id" : "botchan_opening",
-      "input" : "親譲りの無鉄砲で小供の時から損ばかりしている",
-      "suzume_expected" : [
+      "id": "botchan_opening",
+      "input": "親譲りの無鉄砲で小供の時から損ばかりしている",
+      "suzume_expected": [
         {
-          "pos" : "Noun",
-          "surface" : "親譲り"
+          "pos": "Noun",
+          "surface": "親譲り"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "無鉄砲"
+          "pos": "Adjective",
+          "surface": "無鉄砲"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "小供"
+          "pos": "Noun",
+          "surface": "小供"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "時"
+          "pos": "Noun",
+          "surface": "時"
         },
         {
-          "pos" : "Particle",
-          "surface" : "から"
+          "pos": "Particle",
+          "surface": "から"
         },
         {
-          "pos" : "Noun",
-          "surface" : "損"
+          "pos": "Noun",
+          "surface": "損"
         },
         {
-          "pos" : "Particle",
-          "surface" : "ばかり"
+          "pos": "Particle",
+          "surface": "ばかり"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いる"
+          "pos": "Auxiliary",
+          "surface": "いる"
         }
       ],
-      "tags" : [
+      "tags": [
         "literature",
         "botchan"
       ]
     },
     {
-      "description" : "そこから飛び降りる事は出来まい - compound verb split + negative presumption unified",
-      "expected" : [
+      "description": "そこから飛び降りる事は出来まい - compound verb split + negative presumption unified",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "そこ"
+          "pos": "Pronoun",
+          "surface": "そこ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "から"
+          "pos": "Particle",
+          "surface": "から"
         },
         {
-          "pos" : "Verb",
-          "surface" : "飛び降りる"
+          "pos": "Verb",
+          "surface": "飛び降りる"
         },
         {
-          "pos" : "Noun",
-          "surface" : "事"
+          "pos": "Noun",
+          "surface": "事"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "lemma" : "出来る",
-          "pos" : "Verb",
-          "surface" : "出来"
+          "lemma": "出来る",
+          "pos": "Verb",
+          "surface": "出来"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "まい"
+          "pos": "Auxiliary",
+          "surface": "まい"
         }
       ],
-      "id" : "botchan_impossible_jump",
-      "input" : "そこから飛び降りる事は出来まい",
-      "tags" : [
+      "id": "botchan_impossible_jump",
+      "input": "そこから飛び降りる事は出来まい",
+      "tags": [
         "literature",
         "botchan"
       ]
     }
   ],
-  "version" : "1.0"
+  "version": "1.0"
 }

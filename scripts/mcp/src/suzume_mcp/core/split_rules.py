@@ -61,7 +61,7 @@ def _split_causative_passive(tokens: list[dict]) -> tuple[list[dict], bool]:
                     break
 
             result.append({"surface": verb_part, "pos": "動詞", "lemma": verb_lemma})
-            result.append({"surface": "さ", "pos": "助動詞", "lemma": "す"})
+            result.append({"surface": "さ", "pos": "動詞", "lemma": "する"})
             applied = True
             i += 1
             continue
@@ -172,6 +172,20 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 result.append({"surface": m.group(2), "pos": "名詞", "lemma": m.group(2)})
                 if applied_rule is None:
                     applied_rule = "kanji-katakana-split"
+                continue
+
+        # 8a. Kango + として adverbs: 依然として → 依然と|し|て
+        # MeCab treats these as single adverbs, but they are taru-adjective
+        # adverb forms (漢語 + と) + する conjugation (し + て)
+        if t.get("pos") == "副詞":
+            m = regex.match(r"^([\p{Han}]{2,}と)(して)$", surface)
+            if m:
+                adv_part = m.group(1)
+                result.append({"surface": adv_part, "pos": "副詞", "lemma": adv_part})
+                result.append({"surface": "し", "pos": "動詞", "lemma": "する"})
+                result.append({"surface": "て", "pos": "助詞", "lemma": "て"})
+                if applied_rule is None:
+                    applied_rule = "kango-toshite-split"
                 continue
 
         # 8. Copula negation: じゃない -> じゃ|ない

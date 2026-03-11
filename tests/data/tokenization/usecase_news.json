@@ -638,7 +638,7 @@
     {
       "accepted_diff": {
         "category": "pos-limitation",
-        "reason": "POS/lemma normalization difference"
+        "reason": "で in では: Suzume=copula(だ), MeCab=Particle. Both valid; Suzume's interpretation is acceptable"
       },
       "description": "Academic hypothesis - MeCab shows 本研究 unified",
       "expected": [
@@ -683,6 +683,7 @@
       "input": "本研究では以下の仮説を検証する",
       "suzume_expected": [
         {
+          "lemma": "本研究",
           "pos": "Noun",
           "surface": "本研究"
         },
@@ -692,30 +693,37 @@
           "surface": "で"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "以下",
           "pos": "Noun",
           "surface": "以下"
         },
         {
+          "lemma": "の",
           "pos": "Particle",
           "surface": "の"
         },
         {
+          "lemma": "仮説",
           "pos": "Noun",
           "surface": "仮説"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "検証",
           "pos": "Noun",
           "surface": "検証"
         },
         {
+          "lemma": "する",
           "pos": "Verb",
           "surface": "する"
         }
@@ -878,7 +886,7 @@
     {
       "accepted_diff": {
         "category": "pos-limitation",
-        "reason": "POS/lemma normalization difference"
+        "reason": "で in では: Suzume=copula(だ), MeCab=Particle. Both valid; Suzume's interpretation is acceptable"
       },
       "description": "Method description - Current suzume unifies compounds",
       "expected": [
@@ -924,6 +932,7 @@
       "input": "本研究ではアンケート調査を実施した",
       "suzume_expected": [
         {
+          "lemma": "本研究",
           "pos": "Noun",
           "surface": "本研究"
         },
@@ -933,22 +942,27 @@
           "surface": "で"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
         {
+          "lemma": "アンケート",
           "pos": "Noun",
           "surface": "アンケート"
         },
         {
+          "lemma": "調査",
           "pos": "Noun",
           "surface": "調査"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
+          "lemma": "実施",
           "pos": "Noun",
           "surface": "実施"
         },
@@ -958,6 +972,7 @@
           "surface": "し"
         },
         {
+          "lemma": "た",
           "pos": "Auxiliary",
           "surface": "た"
         }

@@ -1040,6 +1040,58 @@
       ],
       "id": "k964drite",
       "input": "降りて"
+    },
+    {
+      "description": "Multi-char hiragana ichidan renyokei: 聞こえ (聞こえる stem with 2 hiragana chars)",
+      "expected": [
+        {
+          "lemma": "聞こえる",
+          "pos": "Verb",
+          "surface": "聞こえ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "くる"
+        }
+      ],
+      "id": "ichidan_multi_hira_kikoeru",
+      "input": "聞こえてくる"
+    },
+    {
+      "description": "Ichidan shuushikei: 捨てる+わけ (not compound noun 捨てるわけ)",
+      "expected": [
+        {
+          "pos": "Verb",
+          "surface": "捨てる"
+        },
+        {
+          "pos": "Noun",
+          "surface": "わけ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Verb",
+          "surface": "いか"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "ichidan_shuushikei_suteruwake",
+      "input": "捨てるわけにはいかぬ"
     }
   ],
   "description": "Ichidan verbs (一段動詞)",

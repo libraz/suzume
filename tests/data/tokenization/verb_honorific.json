@@ -1,468 +1,468 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "Honorific verb いらっしゃる - recognized as single token",
-      "expected" : [
+      "description": "Honorific verb いらっしゃる - recognized as single token",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "先生"
+          "pos": "Noun",
+          "surface": "先生"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "いらっしゃる",
-          "pos" : "Verb",
-          "surface" : "いらっしゃる"
+          "lemma": "いらっしゃる",
+          "pos": "Verb",
+          "surface": "いらっしゃる"
         }
       ],
-      "id" : "keigo_irassharu",
-      "input" : "先生がいらっしゃる",
-      "tags" : [
+      "id": "keigo_irassharu",
+      "input": "先生がいらっしゃる",
+      "tags": [
         "keigo",
         "honorific"
       ]
     },
     {
-      "description" : "Polite auxiliary ございます",
-      "expected" : [
+      "description": "Polite auxiliary ございます",
+      "expected": [
         {
-          "lemma" : "ござる",
-          "pos" : "Verb",
-          "surface" : "ござい"
+          "lemma": "ござる",
+          "pos": "Verb",
+          "surface": "ござい"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "keigo_gozaimasu",
-      "input" : "ございます",
-      "tags" : [
+      "id": "keigo_gozaimasu",
+      "input": "ございます",
+      "tags": [
         "keigo",
         "polite"
       ]
     },
     {
-      "description" : "Humble verb いただく",
-      "expected" : [
+      "description": "Humble verb いただく",
+      "expected": [
         {
-          "lemma" : "いただく",
-          "pos" : "Verb",
-          "surface" : "いただき"
+          "lemma": "いただく",
+          "pos": "Verb",
+          "surface": "いただき"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "keigo_itadaku",
-      "input" : "いただきます",
-      "tags" : [
+      "id": "keigo_itadaku",
+      "input": "いただきます",
+      "tags": [
         "keigo",
         "humble"
       ]
     },
     {
-      "description" : "Honorific verb くださる - te-form unified",
-      "expected" : [
+      "description": "Honorific verb くださる - te-form unified",
+      "expected": [
         {
-          "lemma" : "教える",
-          "pos" : "Verb",
-          "surface" : "教え"
+          "lemma": "教える",
+          "pos": "Verb",
+          "surface": "教え"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Verb",
-          "surface" : "くださる"
+          "pos": "Verb",
+          "surface": "くださる"
         }
       ],
-      "id" : "keigo_kudasaru",
-      "input" : "教えてくださる",
-      "tags" : [
+      "id": "keigo_kudasaru",
+      "input": "教えてくださる",
+      "tags": [
         "keigo",
         "honorific"
       ]
     },
     {
-      "description" : "Honorific prefix お with adjective",
-      "expected" : [
+      "description": "Honorific prefix お with adjective",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "忙しい"
+          "pos": "Noun",
+          "surface": "忙しい"
         },
         {
-          "pos" : "Noun",
-          "surface" : "ところ"
+          "pos": "Noun",
+          "surface": "ところ"
         }
       ],
-      "id" : "keigo_o_prefix",
-      "input" : "お忙しいところ",
-      "tags" : [
+      "id": "keigo_o_prefix",
+      "input": "お忙しいところ",
+      "tags": [
         "keigo",
         "prefix"
       ]
     },
     {
-      "description" : "Honorific prefix ご",
-      "expected" : [
+      "description": "Honorific prefix ご",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "ご"
+          "pos": "Prefix",
+          "surface": "ご"
         },
         {
-          "pos" : "Noun",
-          "surface" : "確認"
+          "pos": "Noun",
+          "surface": "確認"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Verb",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
         }
       ],
-      "id" : "keigo_go_prefix",
-      "input" : "ご確認ください",
-      "tags" : [
+      "id": "keigo_go_prefix",
+      "input": "ご確認ください",
+      "tags": [
         "keigo",
         "prefix"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ä¼ã: verb renyokei vs noun - nominalization"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "ä¼ã: verb renyokei vs noun - nominalization"
       },
-      "description" : "お伝えいたします - honorific verb pattern",
-      "expected" : [
+      "description": "お伝えいたします - honorific verb pattern",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "lemma" : "伝える",
-          "pos" : "Verb",
-          "surface" : "伝え"
+          "lemma": "伝える",
+          "pos": "Verb",
+          "surface": "伝え"
         },
         {
-          "lemma" : "いたす",
-          "pos" : "Verb",
-          "surface" : "いたし"
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "honorific_verb_otsutae",
-      "input" : "お伝えいたします",
-      "suzume_expected" : [
+      "id": "honorific_verb_otsutae",
+      "input": "お伝えいたします",
+      "suzume_expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "伝え"
+          "pos": "Noun",
+          "surface": "伝え"
         },
         {
-          "lemma" : "いたす",
-          "pos" : "Verb",
-          "surface" : "いたし"
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "tags" : [
+      "tags": [
         "honorific",
         "verb"
       ]
     },
     {
-      "description" : "お茶 splits into prefix and noun",
-      "expected" : [
+      "description": "お茶 splits into prefix and noun",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "茶"
+          "pos": "Noun",
+          "surface": "茶"
         }
       ],
-      "id" : "ocha_split",
-      "input" : "お茶",
-      "tags" : [
+      "id": "ocha_split",
+      "input": "お茶",
+      "tags": [
         "strict",
         "honorific"
       ]
     },
     {
-      "description" : "ご飯 - L2 dictionary word as single noun",
-      "expected" : [
+      "description": "ご飯 - L2 dictionary word as single noun",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "ご"
+          "pos": "Prefix",
+          "surface": "ご"
         },
         {
-          "pos" : "Noun",
-          "surface" : "飯"
+          "pos": "Noun",
+          "surface": "飯"
         }
       ],
-      "id" : "gohan_split",
-      "input" : "ご飯",
-      "tags" : [
+      "id": "gohan_split",
+      "input": "ご飯",
+      "tags": [
         "strict",
         "honorific",
         "dictionary"
       ]
     },
     {
-      "description" : "お願い splits into prefix and noun",
-      "expected" : [
+      "description": "お願い splits into prefix and noun",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "願い"
+          "pos": "Noun",
+          "surface": "願い"
         }
       ],
-      "id" : "onegai_split",
-      "input" : "お願い",
-      "tags" : [
+      "id": "onegai_split",
+      "input": "お願い",
+      "tags": [
         "strict",
         "honorific"
       ]
     },
     {
-      "description" : "お疲れ様 splits into prefix, noun, and suffix",
-      "expected" : [
+      "description": "お疲れ様 splits into prefix, noun, and suffix",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "お疲れ様"
+          "pos": "Interjection",
+          "surface": "お疲れ様"
         }
       ],
-      "id" : "otsukareama_split",
-      "input" : "お疲れ様",
-      "tags" : [
+      "id": "otsukareama_split",
+      "input": "お疲れ様",
+      "tags": [
         "strict",
         "honorific"
       ]
     },
     {
-      "description" : "お疲れ様です splits into prefix, noun, suffix, and auxiliary",
-      "expected" : [
+      "description": "お疲れ様です splits into prefix, noun, suffix, and auxiliary",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "お疲れ様"
+          "pos": "Interjection",
+          "surface": "お疲れ様"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "otsukare_sama_desu",
-      "input" : "お疲れ様です",
-      "tags" : [
+      "id": "otsukare_sama_desu",
+      "input": "お疲れ様です",
+      "tags": [
         "strict",
         "keigo"
       ]
     },
     {
-      "description" : "Honorific verb いらっしゃる - recognized as single token",
-      "expected" : [
+      "description": "Honorific verb いらっしゃる - recognized as single token",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "先生"
+          "pos": "Noun",
+          "surface": "先生"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "いらっしゃる",
-          "pos" : "Verb",
-          "surface" : "いらっしゃい"
+          "lemma": "いらっしゃる",
+          "pos": "Verb",
+          "surface": "いらっしゃい"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "honorific_irassharu",
-      "input" : "先生がいらっしゃいます",
-      "tags" : [
+      "id": "honorific_irassharu",
+      "input": "先生がいらっしゃいます",
+      "tags": [
         "verb",
         "honorific"
       ]
     },
     {
-      "description" : "いらっしゃった - MeCab互換分割: いらっしゃっ + た",
-      "expected" : [
+      "description": "いらっしゃった - MeCab互換分割: いらっしゃっ + た",
+      "expected": [
         {
-          "lemma" : "いらっしゃる",
-          "pos" : "Verb",
-          "surface" : "いらっしゃっ"
+          "lemma": "いらっしゃる",
+          "pos": "Verb",
+          "surface": "いらっしゃっ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "keigo_irasshatta_split",
-      "input" : "いらっしゃった",
-      "tags" : [
+      "id": "keigo_irasshatta_split",
+      "input": "いらっしゃった",
+      "tags": [
         "keigo",
         "honorific",
         "mecab_compat"
       ]
     },
     {
-      "description" : "おっしゃって - MeCab互換分割: おっしゃっ + て",
-      "expected" : [
+      "description": "おっしゃって - MeCab互換分割: おっしゃっ + て",
+      "expected": [
         {
-          "lemma" : "おっしゃる",
-          "pos" : "Verb",
-          "surface" : "おっしゃっ"
+          "lemma": "おっしゃる",
+          "pos": "Verb",
+          "surface": "おっしゃっ"
         },
         {
-          "lemma" : "て",
-          "pos" : "Particle",
-          "surface" : "て"
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "keigo_osshatte_split",
-      "input" : "おっしゃって",
-      "tags" : [
+      "id": "keigo_osshatte_split",
+      "input": "おっしゃって",
+      "tags": [
         "keigo",
         "honorific",
         "mecab_compat"
       ]
     },
     {
-      "description" : "くださった - MeCab互換分割: くださっ + た",
-      "expected" : [
+      "description": "くださった - MeCab互換分割: くださっ + た",
+      "expected": [
         {
-          "lemma" : "くださる",
-          "pos" : "Verb",
-          "surface" : "くださっ"
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "くださっ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "keigo_kudasatta_split",
-      "input" : "くださった",
-      "tags" : [
+      "id": "keigo_kudasatta_split",
+      "input": "くださった",
+      "tags": [
         "keigo",
         "honorific",
         "mecab_compat"
       ]
     },
     {
-      "description" : "なさって - MeCab互換分割: なさっ + て",
-      "expected" : [
+      "description": "なさって - MeCab互換分割: なさっ + て",
+      "expected": [
         {
-          "lemma" : "なさる",
-          "pos" : "Verb",
-          "surface" : "なさっ"
+          "lemma": "なさる",
+          "pos": "Verb",
+          "surface": "なさっ"
         },
         {
-          "lemma" : "て",
-          "pos" : "Particle",
-          "surface" : "て"
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "keigo_nasatte_split",
-      "input" : "なさって",
-      "tags" : [
+      "id": "keigo_nasatte_split",
+      "input": "なさって",
+      "tags": [
         "keigo",
         "honorific",
         "mecab_compat"
       ]
     },
     {
-      "description" : "いらっしゃってください - 敬語動詞分割＋ください",
-      "expected" : [
+      "description": "いらっしゃってください - 敬語動詞分割＋ください",
+      "expected": [
         {
-          "lemma" : "いらっしゃる",
-          "pos" : "Verb",
-          "surface" : "いらっしゃっ"
+          "lemma": "いらっしゃる",
+          "pos": "Verb",
+          "surface": "いらっしゃっ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Verb",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
         }
       ],
-      "id" : "keigo_irasshatte_kudasai",
-      "input" : "いらっしゃってください",
-      "tags" : [
+      "id": "keigo_irasshatte_kudasai",
+      "input": "いらっしゃってください",
+      "tags": [
         "keigo",
         "honorific",
         "mecab_compat"
       ]
     },
     {
-      "description" : "下さい - auto-generated",
-      "expected" : [
+      "description": "下さい - auto-generated",
+      "expected": [
         {
-          "lemma" : "下さる",
-          "pos" : "Verb",
-          "surface" : "下さい"
+          "lemma": "下さる",
+          "pos": "Verb",
+          "surface": "下さい"
         }
       ],
-      "id" : "sai",
-      "input" : "下さい",
-      "tags" : [
+      "id": "sai",
+      "input": "下さい",
+      "tags": [
         "honorific",
         "kanji"
       ]
     },
     {
-      "description" : "教えて下さい - auto-generated",
-      "expected" : [
+      "description": "教えて下さい - auto-generated",
+      "expected": [
         {
-          "lemma" : "教える",
-          "pos" : "Verb",
-          "surface" : "教え"
+          "lemma": "教える",
+          "pos": "Verb",
+          "surface": "教え"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "下さる",
-          "pos" : "Verb",
-          "surface" : "下さい"
+          "lemma": "下さる",
+          "pos": "Verb",
+          "surface": "下さい"
         }
       ],
-      "id" : "ete_sai",
-      "input" : "教えて下さい",
-      "tags" : [
+      "id": "ete_sai",
+      "input": "教えて下さい",
+      "tags": [
         "honorific",
         "kanji",
         "te_form"
       ]
     }
   ],
-  "description" : "Honorific verbs (敬語動詞)",
-  "version" : "1.0"
+  "description": "Honorific verbs (敬語動詞)",
+  "version": "1.0"
 }

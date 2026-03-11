@@ -963,6 +963,15 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             base_cost += 2.0F;  // Strong penalty to force split
             SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (compound_adj_penalty)\n");
           }
+          // Penalize 2-kanji verb candidates whose base form is not in dict
+          // Most real 2-kanji verbs (行う, 伴う, etc.) are in the dictionary.
+          // False 2-kanji patterns like 柿食えば (柿 + 食えば) have base 柿食う
+          // which is not a real verb. Apply penalty so noun + verb split wins.
+          if (kanji_count == 2 && !in_dict) {
+            base_cost += bigram_cost::kRare;
+            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface
+                                      << "\" +1.0 (two_kanji_non_dict_penalty)\n");
+          }
           // Penalty for verb candidates containing みたい suffix
           // みたい is a na-adjective (like ~, seems ~), not a verb suffix
           // E.g., 猫みたい should be 猫 + みたい, not VERB 猫む
@@ -1058,24 +1067,29 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               verb_epos = core::ExtendedPOS::VerbOnbinkei;
             }
           }
-          // Skip if surface is registered as NOUN in dictionary
+          // Skip if surface is registered as NOUN or ADJECTIVE in dictionary
           // This prevents nominalized verb forms (思い, 間違い, 戦い, 願い) from
           // being tokenized as VERB when they are explicitly registered as nouns
+          // Also prevents i-adjectives (美しい, 正しい, 楽しい) from being
+          // misclassified as godan-wa verbs (base 美しう, etc.)
           // This check applies to godan-wa renyokei forms (ending in い)
           bool skip_godan_wa_renyokei = false;
           if (verb_epos == core::ExtendedPOS::VerbRenyokei && dict_manager != nullptr) {
             auto results = dict_manager->lookup(surface, 0);
             for (const auto& result : results) {
               if (result.entry != nullptr &&
-                  result.entry->pos == core::PartOfSpeech::Noun) {
+                  (result.entry->pos == core::PartOfSpeech::Noun ||
+                   result.entry->pos == core::PartOfSpeech::Adjective)) {
                 skip_godan_wa_renyokei = true;
-                SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict NOUN, skipping godan-wa renyokei\n");
+                SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict "
+                    << (result.entry->pos == core::PartOfSpeech::Noun ? "NOUN" : "ADJ")
+                    << ", skipping godan-wa renyokei\n");
                 break;
               }
             }
           }
           if (skip_godan_wa_renyokei) {
-            continue;  // Skip this candidate, use dictionary NOUN instead
+            continue;  // Skip this candidate, use dictionary entry instead
           }
           // Skip ichidan ta-form if stem is registered as NOUN in dictionary
           // e.g., 感じた → stem 感じ is dict NOUN, so skip (prefer 感じ(NOUN) + た(AUX))
@@ -1228,6 +1242,98 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               surface, start_pos, renyokei_end, base_cost, ichidan_cand.base_form,
               grammar::verbTypeToConjType(ichidan_cand.verb_type),
               true, CandidateOrigin::VerbKanji, ichidan_cand.confidence, "ichidan_renyokei"));
+          // Also generate shuushikei (dictionary form) if followed by る
+          // E.g., 捨てるわけ → 捨てる (VERB shuushikei) + わけ (NOUN)
+          // Without this, compound noun 捨てるわけ wins over split path
+          // Restricted to single-kanji stems or dict-verified verbs to avoid
+          // false merges like 間+炒める → 間炒める (suffix + verb)
+          if (renyokei_end < codepoints.size() && codepoints[renyokei_end] == U'る') {
+            bool is_single_kanji = (kanji_end - start_pos == 1);
+            bool is_in_dict = (dict_manager != nullptr &&
+                               vh::isVerbInDictionary(dict_manager, ichidan_cand.base_form));
+            if (is_single_kanji || is_in_dict) {
+              size_t shuushi_end = renyokei_end + 1;
+              std::string shuushi_surface = extractSubstring(codepoints, start_pos, shuushi_end);
+              float shuushi_cost = base_cost + 0.1F;  // Slightly higher than renyokei
+              candidates.push_back(makeVerbCandidate(
+                  shuushi_surface, start_pos, shuushi_end, shuushi_cost,
+                  ichidan_cand.base_form,
+                  grammar::verbTypeToConjType(ichidan_cand.verb_type),
+                  true, CandidateOrigin::VerbKanji, ichidan_cand.confidence,
+                  "ichidan_shuushikei"));
+            }
+          }
+        }
+      }
+    }
+    // Try multi-char hiragana ichidan renyokei: kanji + 2 hiragana ending in e-row
+    // Handles verbs like 聞こえる where stem is 聞こえ (2 hiragana chars after kanji)
+    // The first hiragana (こ) is not e-row/i-row so single-char path misses it
+    // Only try kanji_end+2 with strict validation to avoid false positives
+    if (hiragana_end >= kanji_end + 2) {
+      char32_t first_hira = codepoints[kanji_end];
+      char32_t second_hira = codepoints[kanji_end + 1];
+      // Only enter if first hira is o-row (こ, そ, と, の, etc.) — the only
+      // row that produces valid multi-char ichidan stems (e.g., 聞こえる).
+      // Other rows are either:
+      // - e-row/i-row: handled by single-char path above
+      // - u-row: kanji+u-row = complete godan verb (行く, 書く)
+      // - a-row: godan mizenkei + passive/causative (壊され, 揉まれ)
+      bool first_is_o_row = (first_hira == U'お' || first_hira == U'こ' || first_hira == U'そ' ||
+                             first_hira == U'と' || first_hira == U'の' || first_hira == U'ほ' ||
+                             first_hira == U'も' || first_hira == U'よ' || first_hira == U'ろ' ||
+                             first_hira == U'ご' || first_hira == U'ぞ' || first_hira == U'ど' ||
+                             first_hira == U'ぼ' || first_hira == U'ぽ');
+      if (first_is_o_row &&
+          (grammar::isERowCodepoint(second_hira) || grammar::isIRowCodepoint(second_hira))) {
+        size_t renyokei_end = kanji_end + 2;
+        std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
+        const auto& all_cands = inflection.analyze(surface);
+        grammar::InflectionCandidate ichidan_cand;
+        grammar::InflectionCandidate suru_cand;
+        grammar::InflectionCandidate godan_cand;
+        ichidan_cand.confidence = 0.0F;
+        suru_cand.confidence = 0.0F;
+        godan_cand.confidence = 0.0F;
+        for (const auto& cand : all_cands) {
+          if (cand.has_explanatory_suffix) continue;
+          if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence > ichidan_cand.confidence) {
+            ichidan_cand = cand;
+          }
+          if (cand.verb_type == grammar::VerbType::Suru && cand.confidence > suru_cand.confidence) {
+            suru_cand = cand;
+          }
+          if (vh::isGodanVerbType(cand.verb_type) && cand.confidence > godan_cand.confidence) {
+            godan_cand = cand;
+          }
+        }
+        bool prefer_suru = (suru_cand.confidence > ichidan_cand.confidence);
+        bool prefer_godan = (godan_cand.confidence > ichidan_cand.confidence);
+        // Higher confidence threshold for multi-char stems to avoid false positives
+        constexpr float kMultiCharIchidanThreshold = 0.45F;
+        // Skip surfaces ending in ない — almost always adjective (少ない) or negative suffix
+        bool ends_in_nai = (second_hira == U'い' && first_hira == U'な');
+        if (!prefer_suru && !prefer_godan && !ends_in_nai &&
+            ichidan_cand.confidence > kMultiCharIchidanThreshold) {
+          bool surface_is_dict_entry = false;
+          if (dict_manager != nullptr) {
+            auto results = dict_manager->lookup(surface, 0);
+            for (const auto& result : results) {
+              if (result.entry != nullptr &&
+                  (result.entry->pos == core::PartOfSpeech::Noun ||
+                   result.entry->pos == core::PartOfSpeech::Adjective)) {
+                surface_is_dict_entry = true;
+                break;
+              }
+            }
+          }
+          if (!surface_is_dict_entry) {
+            float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_cand.confidence) * verb_opts.confidence_cost_scale_small;
+            candidates.push_back(makeVerbCandidate(
+                surface, start_pos, renyokei_end, base_cost, ichidan_cand.base_form,
+                grammar::verbTypeToConjType(ichidan_cand.verb_type),
+                true, CandidateOrigin::VerbKanji, ichidan_cand.confidence, "ichidan_renyokei_multi"));
+          }
         }
       }
     }

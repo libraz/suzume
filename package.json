@@ -51,7 +51,7 @@
   "bugs": {
     "url": "https://github.com/libraz/suzume/issues"
   },
-  "homepage": "https://github.com/libraz/suzume#readme",
+  "homepage": "https://suzume.libraz.net",
   "engines": {
     "node": ">=18.0.0"
   },

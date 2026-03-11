@@ -1,488 +1,507 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "学生たち - noun + suffix split",
-      "expected" : [
+      "description": "学生たち - noun + suffix split",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "学生"
+          "pos": "Noun",
+          "surface": "学生"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "たち"
+          "pos": "Suffix",
+          "surface": "たち"
         }
       ],
-      "id" : "noun_plus_tachi",
-      "input" : "学生たち",
-      "tags" : [
+      "id": "noun_plus_tachi",
+      "input": "学生たち",
+      "tags": [
         "suffix"
       ]
     },
     {
-      "description" : "田中さん - noun + honorific suffix split",
-      "expected" : [
+      "description": "田中さん - noun + honorific suffix split",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "田中"
+          "pos": "Noun",
+          "surface": "田中"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "さん"
+          "pos": "Suffix",
+          "surface": "さん"
         }
       ],
-      "id" : "noun_plus_san",
-      "input" : "田中さん",
-      "tags" : [
+      "id": "noun_plus_san",
+      "input": "田中さん",
+      "tags": [
         "suffix"
       ]
     },
     {
-      "description" : "子供たちが遊ぶ - noun + suffix split",
-      "expected" : [
+      "description": "子供たちが遊ぶ - noun + suffix split",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "子供"
+          "pos": "Noun",
+          "surface": "子供"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "たち"
+          "pos": "Suffix",
+          "surface": "たち"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Verb",
-          "surface" : "遊ぶ"
+          "pos": "Verb",
+          "surface": "遊ぶ"
         }
       ],
-      "id" : "kodomo_tachi",
-      "input" : "子供たちが遊ぶ",
-      "tags" : [
+      "id": "kodomo_tachi",
+      "input": "子供たちが遊ぶ",
+      "tags": [
         "suffix"
       ]
     },
     {
-      "description" : "先生さん should split as 先生 + さん",
-      "expected" : [
+      "description": "先生さん should split as 先生 + さん",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "先生"
+          "pos": "Noun",
+          "surface": "先生"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "さん"
+          "pos": "Suffix",
+          "surface": "さん"
         }
       ],
-      "id" : "suffix_sensei_san",
-      "input" : "先生さん",
-      "tags" : [
+      "id": "suffix_sensei_san",
+      "input": "先生さん",
+      "tags": [
         "suffix"
       ]
     },
     {
-      "description" : "皮ごと食べる - ごと as suffix",
-      "expected" : [
+      "description": "皮ごと食べる - ごと as suffix",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "皮"
+          "pos": "Noun",
+          "surface": "皮"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "ごと"
+          "pos": "Suffix",
+          "surface": "ごと"
         },
         {
-          "pos" : "Verb",
-          "surface" : "食べる"
+          "pos": "Verb",
+          "surface": "食べる"
         }
       ],
-      "id" : "suffix_goto_food",
-      "input" : "皮ごと食べる",
-      "tags" : [
+      "id": "suffix_goto_food",
+      "input": "皮ごと食べる",
+      "tags": [
         "suffix",
         "known_issue"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ãªã: auxiliary vs main verb - context-dependent"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "ãªã: auxiliary vs main verb - context-dependent"
       },
-      "description" : "日ごとに強くなる - ごと + に pattern",
-      "expected" : [
+      "description": "日ごとに強くなる - ごと + に pattern",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "日"
+          "pos": "Noun",
+          "surface": "日"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "ごと"
+          "pos": "Suffix",
+          "surface": "ごと"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "強い",
-          "pos" : "Adjective",
-          "surface" : "強く"
+          "lemma": "強い",
+          "pos": "Adjective",
+          "surface": "強く"
         },
         {
-          "pos" : "Verb",
-          "surface" : "なる"
+          "pos": "Verb",
+          "surface": "なる"
         }
       ],
-      "id" : "suffix_goto_ni",
-      "input" : "日ごとに強くなる",
-      "suzume_expected" : [
+      "id": "suffix_goto_ni",
+      "input": "日ごとに強くなる",
+      "suzume_expected": [
         {
-          "pos" : "Noun",
-          "surface" : "日"
+          "pos": "Noun",
+          "surface": "日"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "ごと"
+          "pos": "Suffix",
+          "surface": "ごと"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "lemma" : "強い",
-          "pos" : "Adjective",
-          "surface" : "強く"
+          "lemma": "強い",
+          "pos": "Adjective",
+          "surface": "強く"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "なる"
+          "pos": "Auxiliary",
+          "surface": "なる"
         }
       ],
-      "tags" : [
+      "tags": [
         "suffix",
         "known_issue"
       ]
     },
     {
-      "description" : "数ヶ月 should stay as one token",
-      "expected" : [
+      "description": "数ヶ月 should stay as one token",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "数ヶ月"
+          "pos": "Noun",
+          "surface": "数ヶ月"
         }
       ],
-      "id" : "counter_kagetsu",
-      "input" : "数ヶ月",
-      "tags" : [
+      "id": "counter_kagetsu",
+      "input": "数ヶ月",
+      "tags": [
         "counter",
         "suffix"
       ]
     },
     {
-      "description" : "数ヶ所 should stay as one token",
-      "expected" : [
+      "description": "数ヶ所 should stay as one token",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "数ヶ所"
+          "pos": "Noun",
+          "surface": "数ヶ所"
         }
       ],
-      "id" : "counter_kasho",
-      "input" : "数ヶ所",
-      "tags" : [
+      "id": "counter_kasho",
+      "input": "数ヶ所",
+      "tags": [
         "counter",
         "suffix"
       ]
     },
     {
-      "description" : "付けで should not split into 付 + け",
-      "expected" : [
+      "description": "付けで should not split into 付 + け",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "付け"
+          "pos": "Noun",
+          "surface": "付け"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         }
       ],
-      "id" : "tsuke_not_split",
-      "input" : "付けで",
-      "tags" : [
+      "id": "tsuke_not_split",
+      "input": "付けで",
+      "tags": [
         "strict",
         "suffix"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "日付け: noun vs verb - dictionary-dependent"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "日付け: noun vs verb - dictionary-dependent"
       },
-      "description" : "日付けで - MeCab splits as 日 + 付け + で",
-      "expected" : [
+      "description": "日付けで - MeCab splits as 日 + 付け + で",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "日付け"
+          "pos": "Noun",
+          "surface": "日付け"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         }
       ],
-      "id" : "hizuke_de",
-      "input" : "日付けで",
-      "tags" : [
+      "id": "hizuke_de",
+      "input": "日付けで",
+      "tags": [
         "strict",
         "suffix"
       ]
     },
     {
-      "description" : "S6: ありがち should be NOUN, not あり+が+ち",
-      "expected" : [
+      "description": "S6: ありがち should be NOUN, not あり+が+ち",
+      "expected": [
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あり"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "がち"
+          "pos": "Suffix",
+          "surface": "がち"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "だ"
+          "pos": "Auxiliary",
+          "surface": "だ"
         }
       ],
-      "id" : "s6_arigachi",
-      "input" : "ありがちだ",
-      "tags" : [
+      "id": "s6_arigachi",
+      "input": "ありがちだ",
+      "tags": [
         "s6_fix",
         "gachi",
         "regression"
       ]
     },
     {
-      "description" : "S6: なりがち should be NOUN, not なり+が+ち",
-      "expected" : [
+      "description": "S6: なりがち should be NOUN, not なり+が+ち",
+      "expected": [
         {
-          "pos" : "Adverb",
-          "surface" : "そう"
+          "pos": "Adverb",
+          "surface": "そう"
         },
         {
-          "lemma" : "なる",
-          "pos" : "Verb",
-          "surface" : "なり"
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なり"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "がち"
+          "pos": "Suffix",
+          "surface": "がち"
         }
       ],
-      "id" : "s6_narigachi",
-      "input" : "そうなりがち",
-      "tags" : [
+      "id": "s6_narigachi",
+      "input": "そうなりがち",
+      "tags": [
         "s6_fix",
         "gachi",
         "regression"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "ãã¡: suffix classification - context-dependent"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "ãã¡: suffix classification - context-dependent"
       },
-      "description" : "S6: 忘れがち should be NOUN, not 忘れ+が+ち",
-      "expected" : [
+      "description": "S6: 忘れがち should be NOUN, not 忘れ+が+ち",
+      "expected": [
         {
-          "lemma" : "忘れる",
-          "pos" : "Verb",
-          "surface" : "忘れ"
+          "lemma": "忘れる",
+          "pos": "Verb",
+          "surface": "忘れ"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "がち"
+          "pos": "Suffix",
+          "surface": "がち"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "だ"
+          "pos": "Auxiliary",
+          "surface": "だ"
         }
       ],
-      "id" : "s6_wasuregachi",
-      "input" : "忘れがちだ",
-      "suzume_expected" : [
+      "id": "s6_wasuregachi",
+      "input": "忘れがちだ",
+      "suzume_expected": [
         {
-          "pos" : "Noun",
-          "surface" : "忘れ"
+          "pos": "Noun",
+          "surface": "忘れ"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "がち"
+          "pos": "Suffix",
+          "surface": "がち"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "だ"
+          "pos": "Auxiliary",
+          "surface": "だ"
         }
       ],
-      "tags" : [
+      "tags": [
         "s6_fix",
         "gachi",
         "regression"
       ]
     },
     {
-      "description" : "S6: がち should be recognized as suffix",
-      "expected" : [
+      "description": "S6: がち should be recognized as suffix",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "遅れ"
+          "pos": "Noun",
+          "surface": "遅れ"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "がち"
+          "pos": "Suffix",
+          "surface": "がち"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Verb",
-          "surface" : "なる"
+          "pos": "Verb",
+          "surface": "なる"
         }
       ],
-      "id" : "s6_gachi_suffix",
-      "input" : "遅れがちになる",
-      "tags" : [
+      "id": "s6_gachi_suffix",
+      "input": "遅れがちになる",
+      "tags": [
         "s6_fix",
         "gachi",
         "regression"
       ]
     },
     {
-      "description" : "読み方 - nominalized verb + 方 (way of reading)",
-      "expected" : [
+      "description": "読み方 - nominalized verb + 方 (way of reading)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "読み方"
+          "pos": "Noun",
+          "surface": "読み方"
         }
       ],
-      "id" : "kata_yomikata",
-      "input" : "読み方",
-      "tags" : [
+      "id": "kata_yomikata",
+      "input": "読み方",
+      "tags": [
         "kata",
         "nominalized"
       ]
     },
     {
-      "description" : "書き方 - nominalized verb + 方 (way of writing)",
-      "expected" : [
+      "description": "書き方 - nominalized verb + 方 (way of writing)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "書き方"
+          "pos": "Noun",
+          "surface": "書き方"
         }
       ],
-      "id" : "kata_kakikata",
-      "input" : "書き方",
-      "tags" : [
+      "id": "kata_kakikata",
+      "input": "書き方",
+      "tags": [
         "kata",
         "nominalized"
       ]
     },
     {
-      "description" : "使い方 - nominalized verb + 方 (way of using)",
-      "expected" : [
+      "description": "使い方 - nominalized verb + 方 (way of using)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "使い方"
+          "pos": "Noun",
+          "surface": "使い方"
         }
       ],
-      "id" : "kata_tsukaikata",
-      "input" : "使い方",
-      "tags" : [
+      "id": "kata_tsukaikata",
+      "input": "使い方",
+      "tags": [
         "kata",
         "nominalized"
       ]
     },
     {
-      "description" : "美しい方 - adjective + 方 (person, not method)",
-      "expected" : [
+      "description": "美しい方 - adjective + 方 (person, not method)",
+      "expected": [
         {
-          "lemma" : "美しい",
-          "pos" : "Adjective",
-          "surface" : "美しい"
+          "lemma": "美しい",
+          "pos": "Adjective",
+          "surface": "美しい"
         },
         {
-          "pos" : "Noun",
-          "surface" : "方"
+          "pos": "Noun",
+          "surface": "方"
         }
       ],
-      "id" : "kata_vs_person_utsukushii",
-      "input" : "美しい方",
-      "tags" : [
+      "id": "kata_vs_person_utsukushii",
+      "input": "美しい方",
+      "tags": [
         "kata",
         "person"
       ]
     },
     {
-      "description" : "書いた方がいい - ta-form + 方 (person/should, not method)",
-      "expected" : [
+      "description": "書いた方がいい - ta-form + 方 (person/should, not method)",
+      "expected": [
         {
-          "lemma" : "書く",
-          "pos" : "Verb",
-          "surface" : "書い"
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         },
         {
-          "pos" : "Noun",
-          "surface" : "方"
+          "pos": "Noun",
+          "surface": "方"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "いい"
+          "pos": "Adjective",
+          "surface": "いい"
         }
       ],
-      "id" : "kata_vs_person_kaita",
-      "input" : "書いた方がいい",
-      "tags" : [
+      "id": "kata_vs_person_kaita",
+      "input": "書いた方がいい",
+      "tags": [
         "kata",
         "recommendation"
       ]
     },
     {
-      "description" : "泥だらけ - auto-generated",
-      "expected" : [
+      "description": "泥だらけ - auto-generated",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "泥"
+          "pos": "Noun",
+          "surface": "泥"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "だらけ"
+          "pos": "Suffix",
+          "surface": "だらけ"
         }
       ],
-      "id" : "darake",
-      "input" : "泥だらけ"
+      "id": "darake",
+      "input": "泥だらけ"
     },
     {
-      "description" : "傷だらけ - auto-generated",
-      "expected" : [
+      "description": "傷だらけ - auto-generated",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "傷"
+          "pos": "Noun",
+          "surface": "傷"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "だらけ"
+          "pos": "Suffix",
+          "surface": "だらけ"
         }
       ],
-      "id" : "kizu_darake",
-      "input" : "傷だらけ"
+      "id": "kizu_darake",
+      "input": "傷だらけ"
+    },
+    {
+      "description": "っぱなし suffix after verb renyokei",
+      "expected": [
+        {
+          "pos": "Noun",
+          "surface": "出し"
+        },
+        {
+          "pos": "Suffix",
+          "surface": "っぱなし"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ppanashi_dashippanashi",
+      "input": "出しっぱなしだ"
     }
   ],
-  "description" : "Suffixes (さん、的、化)",
-  "version" : "1.0"
+  "description": "Suffixes (さん、的、化)",
+  "version": "1.0"
 }

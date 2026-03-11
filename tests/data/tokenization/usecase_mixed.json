@@ -1,1250 +1,1250 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "Mixed script: alphabet + kanji",
-      "expected" : [
+      "description": "Mixed script: alphabet + kanji",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "Web開発"
+          "pos": "Noun",
+          "surface": "Web開発"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "基礎"
+          "pos": "Noun",
+          "surface": "基礎"
         }
       ],
-      "id" : "mixed_script_alphabet_kanji",
-      "input" : "Web開発の基礎",
-      "tags" : [
+      "id": "mixed_script_alphabet_kanji",
+      "input": "Web開発の基礎",
+      "tags": [
         "mixed_script"
       ]
     },
     {
-      "description" : "Mixed script: alphabet + katakana",
-      "expected" : [
+      "description": "Mixed script: alphabet + katakana",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "APIリクエスト"
+          "pos": "Noun",
+          "surface": "APIリクエスト"
         },
         {
-          "pos" : "Noun",
-          "surface" : "処理"
+          "pos": "Noun",
+          "surface": "処理"
         }
       ],
-      "id" : "mixed_script_alphabet_katakana",
-      "input" : "APIリクエスト処理",
-      "tags" : [
+      "id": "mixed_script_alphabet_katakana",
+      "input": "APIリクエスト処理",
+      "tags": [
         "mixed_script"
       ]
     },
     {
-      "description" : "Mixed script: digit + kanji - single token",
-      "expected" : [
+      "description": "Mixed script: digit + kanji - single token",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "3月"
+          "pos": "Noun",
+          "surface": "3月"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "予定"
+          "pos": "Noun",
+          "surface": "予定"
         }
       ],
-      "id" : "mixed_script_digit_kanji",
-      "input" : "3月の予定",
-      "tags" : [
+      "id": "mixed_script_digit_kanji",
+      "input": "3月の予定",
+      "tags": [
         "mixed_script"
       ]
     },
     {
-      "description" : "Mixed script: multiple digits + kanji - single token",
-      "expected" : [
+      "description": "Mixed script: multiple digits + kanji - single token",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "100人"
+          "pos": "Noun",
+          "surface": "100人"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Noun",
-          "surface" : "参加"
+          "pos": "Noun",
+          "surface": "参加"
         }
       ],
-      "id" : "mixed_script_multiple_digit_kanji",
-      "input" : "100人が参加",
-      "tags" : [
+      "id": "mixed_script_multiple_digit_kanji",
+      "input": "100人が参加",
+      "tags": [
         "mixed_script"
       ]
     },
     {
-      "description" : "English word followed by particle (split: verb stem + polite aux)",
-      "expected" : [
+      "description": "English word followed by particle (split: verb stem + polite aux)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "今日"
+          "pos": "Noun",
+          "surface": "今日"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "Meeting"
+          "pos": "Noun",
+          "surface": "Meeting"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "ある",
-          "pos" : "Verb",
-          "surface" : "あり"
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ます"
+          "pos": "Auxiliary",
+          "surface": "ます"
         }
       ],
-      "id" : "english_with_particle",
-      "input" : "今日はMeetingがあります",
-      "tags" : [
+      "id": "english_with_particle",
+      "input": "今日はMeetingがあります",
+      "tags": [
         "english_in_japanese"
       ]
     },
     {
-      "description" : "CamelCase should be preserved",
-      "expected" : [
+      "description": "CamelCase should be preserved",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "getUserData"
+          "pos": "Noun",
+          "surface": "getUserData"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Verb",
-          "surface" : "呼び出す"
+          "pos": "Verb",
+          "surface": "呼び出す"
         }
       ],
-      "id" : "english_camelcase",
-      "input" : "getUserDataを呼び出す",
-      "tags" : [
+      "id": "english_camelcase",
+      "input": "getUserDataを呼び出す",
+      "tags": [
         "english_in_japanese"
       ]
     },
     {
-      "description" : "snake_case should be preserved",
-      "expected" : [
+      "description": "snake_case should be preserved",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "user_name"
+          "pos": "Noun",
+          "surface": "user_name"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "設定"
+          "pos": "Noun",
+          "surface": "設定"
         }
       ],
-      "id" : "english_snakecase",
-      "input" : "user_nameを設定",
-      "tags" : [
+      "id": "english_snakecase",
+      "input": "user_nameを設定",
+      "tags": [
         "english_in_japanese"
       ]
     },
     {
-      "description" : "Abbreviation",
-      "expected" : [
+      "description": "Abbreviation",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "API"
+          "pos": "Noun",
+          "surface": "API"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Verb",
-          "surface" : "呼ぶ"
+          "pos": "Verb",
+          "surface": "呼ぶ"
         }
       ],
-      "id" : "english_abbreviation",
-      "input" : "APIを呼ぶ",
-      "tags" : [
+      "id": "english_abbreviation",
+      "input": "APIを呼ぶ",
+      "tags": [
         "english_in_japanese"
       ]
     },
     {
-      "description" : "Technical term with Japanese",
-      "expected" : [
+      "description": "Technical term with Japanese",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "API"
+          "pos": "Noun",
+          "surface": "API"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "使う",
-          "pos" : "Verb",
-          "surface" : "使っ"
+          "lemma": "使う",
+          "pos": "Verb",
+          "surface": "使っ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Noun",
-          "surface" : "データ"
+          "pos": "Noun",
+          "surface": "データ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Noun",
-          "surface" : "取得"
+          "pos": "Noun",
+          "surface": "取得"
         },
         {
-          "pos" : "Verb",
-          "surface" : "する"
+          "pos": "Verb",
+          "surface": "する"
         }
       ],
-      "id" : "english_technical_term",
-      "input" : "APIを使ってデータを取得する",
-      "tags" : [
+      "id": "english_technical_term",
+      "input": "APIを使ってデータを取得する",
+      "tags": [
         "english_in_japanese"
       ]
     },
     {
-      "description" : "Brand name in sentence - verb with polite past aux",
-      "expected" : [
+      "description": "Brand name in sentence - verb with polite past aux",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "iPhone"
+          "pos": "Noun",
+          "surface": "iPhone"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "買う",
-          "pos" : "Verb",
-          "surface" : "買い"
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買い"
         },
         {
-          "lemma" : "ます",
-          "pos" : "Auxiliary",
-          "surface" : "まし"
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "english_brand_name",
-      "input" : "iPhoneを買いました",
-      "tags" : [
+      "id": "english_brand_name",
+      "input": "iPhoneを買いました",
+      "tags": [
         "english_in_japanese"
       ]
     },
     {
-      "description" : "email + particle",
-      "expected" : [
+      "description": "email + particle",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "email"
+          "pos": "Noun",
+          "surface": "email"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Verb",
-          "surface" : "送る"
+          "pos": "Verb",
+          "surface": "送る"
         }
       ],
-      "id" : "english_email_send",
-      "input" : "emailを送る",
-      "tags" : [
+      "id": "english_email_send",
+      "input": "emailを送る",
+      "tags": [
         "english_in_japanese"
       ]
     },
     {
-      "description" : "server + particle",
-      "expected" : [
+      "description": "server + particle",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "server"
+          "pos": "Noun",
+          "surface": "server"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Noun",
-          "surface" : "接続"
+          "pos": "Noun",
+          "surface": "接続"
         }
       ],
-      "id" : "english_server_connect",
-      "input" : "serverに接続",
-      "tags" : [
+      "id": "english_server_connect",
+      "input": "serverに接続",
+      "tags": [
         "english_in_japanese"
       ]
     },
     {
-      "description" : "4 kanji compound stays as single token",
-      "expected" : [
+      "description": "4 kanji compound stays as single token",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "人工知能"
+          "pos": "Noun",
+          "surface": "人工知能"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "研究"
+          "pos": "Noun",
+          "surface": "研究"
         }
       ],
-      "id" : "compound_four_kanji",
-      "input" : "人工知能の研究",
-      "tags" : [
+      "id": "compound_four_kanji",
+      "input": "人工知能の研究",
+      "tags": [
         "compound_noun"
       ]
     },
     {
-      "description" : "Long kanji compound - 知事選挙 is a political term, kept as single token",
-      "expected" : [
+      "description": "Long kanji compound - 知事選挙 is a political term, kept as single token",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "東京都知事選挙"
+          "pos": "Noun",
+          "surface": "東京都知事選挙"
         }
       ],
-      "id" : "compound_long_kanji",
-      "input" : "東京都知事選挙",
-      "tags" : [
+      "id": "compound_long_kanji",
+      "input": "東京都知事選挙",
+      "tags": [
         "compound_noun"
       ]
     },
     {
-      "description" : "Compound noun followed by particle",
-      "expected" : [
+      "description": "Compound noun followed by particle",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "情報処理技術者"
+          "pos": "Noun",
+          "surface": "情報処理技術者"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         }
       ],
-      "id" : "compound_with_particle",
-      "input" : "情報処理技術者が",
-      "tags" : [
+      "id": "compound_with_particle",
+      "input": "情報処理技術者が",
+      "tags": [
         "compound_noun"
       ]
     },
     {
-      "description" : "Natural language processing technology - preserved as single compound",
-      "expected" : [
+      "description": "Natural language processing technology - preserved as single compound",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "自然"
+          "pos": "Noun",
+          "surface": "自然"
         },
         {
-          "pos" : "Noun",
-          "surface" : "言語処理技術"
+          "pos": "Noun",
+          "surface": "言語処理技術"
         }
       ],
-      "id" : "compound_natural_language",
-      "input" : "自然言語処理技術",
-      "tags" : [
+      "id": "compound_natural_language",
+      "input": "自然言語処理技術",
+      "tags": [
         "compound_noun",
         "long-compound"
       ]
     },
     {
-      "description" : "Organization name",
-      "expected" : [
+      "description": "Organization name",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "国立研究所"
+          "pos": "Noun",
+          "surface": "国立研究所"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Verb",
-          "surface" : "働く"
+          "pos": "Verb",
+          "surface": "働く"
         }
       ],
-      "id" : "compound_organization",
-      "input" : "国立研究所で働く",
-      "tags" : [
+      "id": "compound_organization",
+      "input": "国立研究所で働く",
+      "tags": [
         "compound_noun"
       ]
     },
     {
-      "description" : "について (regarding)",
-      "expected" : [
+      "description": "について (regarding)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "日本"
+          "pos": "Noun",
+          "surface": "日本"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "文化"
+          "pos": "Noun",
+          "surface": "文化"
         },
         {
-          "pos" : "Particle",
-          "surface" : "について"
+          "pos": "Particle",
+          "surface": "について"
         },
         {
-          "pos" : "Verb",
-          "surface" : "話す"
+          "pos": "Verb",
+          "surface": "話す"
         }
       ],
-      "id" : "expression_ni_tsuite",
-      "input" : "日本の文化について話す",
-      "tags" : [
+      "id": "expression_ni_tsuite",
+      "input": "日本の文化について話す",
+      "tags": [
         "compound_expression"
       ]
     },
     {
-      "description" : "によって (by means of)",
-      "expected" : [
+      "description": "によって (by means of)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "場合"
+          "pos": "Noun",
+          "surface": "場合"
         },
         {
-          "pos" : "Particle",
-          "surface" : "によって"
+          "pos": "Particle",
+          "surface": "によって"
         },
         {
-          "pos" : "Noun",
-          "surface" : "対応"
+          "pos": "Noun",
+          "surface": "対応"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Verb",
-          "surface" : "変わる"
+          "pos": "Verb",
+          "surface": "変わる"
         }
       ],
-      "id" : "expression_ni_yotte",
-      "input" : "場合によって対応が変わる",
-      "tags" : [
+      "id": "expression_ni_yotte",
+      "input": "場合によって対応が変わる",
+      "tags": [
         "compound_expression"
       ]
     },
     {
-      "description" : "として (as)",
-      "expected" : [
+      "description": "として (as)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "教師"
+          "pos": "Noun",
+          "surface": "教師"
         },
         {
-          "pos" : "Particle",
-          "surface" : "として"
+          "pos": "Particle",
+          "surface": "として"
         },
         {
-          "lemma" : "働く",
-          "pos" : "Verb",
-          "surface" : "働い"
+          "lemma": "働く",
+          "pos": "Verb",
+          "surface": "働い"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "いる"
+          "pos": "Auxiliary",
+          "surface": "いる"
         }
       ],
-      "id" : "expression_to_shite",
-      "input" : "教師として働いている",
-      "tags" : [
+      "id": "expression_to_shite",
+      "input": "教師として働いている",
+      "tags": [
         "compound_expression"
       ]
     },
     {
-      "description" : "お + 茶 (honorific prefix + noun)",
-      "expected" : [
+      "description": "お + 茶 (honorific prefix + noun)",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "お"
+          "pos": "Prefix",
+          "surface": "お"
         },
         {
-          "pos" : "Noun",
-          "surface" : "茶"
+          "pos": "Noun",
+          "surface": "茶"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Verb",
-          "surface" : "飲む"
+          "pos": "Verb",
+          "surface": "飲む"
         }
       ],
-      "id" : "prefix_honorific_o",
-      "input" : "お茶を飲む",
-      "tags" : [
+      "id": "prefix_honorific_o",
+      "input": "お茶を飲む",
+      "tags": [
         "prefix_suffix"
       ]
     },
     {
-      "description" : "ご飯 - L2 dictionary word",
-      "expected" : [
+      "description": "ご飯 - L2 dictionary word",
+      "expected": [
         {
-          "pos" : "Prefix",
-          "surface" : "ご"
+          "pos": "Prefix",
+          "surface": "ご"
         },
         {
-          "pos" : "Noun",
-          "surface" : "飯"
+          "pos": "Noun",
+          "surface": "飯"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Verb",
-          "surface" : "食べる"
+          "pos": "Verb",
+          "surface": "食べる"
         }
       ],
-      "id" : "prefix_honorific_go",
-      "input" : "ご飯を食べる",
-      "tags" : [
+      "id": "prefix_honorific_go",
+      "input": "ご飯を食べる",
+      "tags": [
         "prefix_suffix",
         "dictionary"
       ]
     },
     {
-      "description" : "不 prefix",
-      "expected" : [
+      "description": "不 prefix",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "不可能"
+          "pos": "Adjective",
+          "surface": "不可能"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "だ"
+          "pos": "Auxiliary",
+          "surface": "だ"
         }
       ],
-      "id" : "prefix_negation_fu",
-      "input" : "不可能だ",
-      "tags" : [
+      "id": "prefix_negation_fu",
+      "input": "不可能だ",
+      "tags": [
         "prefix_suffix"
       ]
     },
     {
-      "description" : "未 prefix",
-      "expected" : [
+      "description": "未 prefix",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "未確認"
+          "pos": "Noun",
+          "surface": "未確認"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "情報"
+          "pos": "Noun",
+          "surface": "情報"
         }
       ],
-      "id" : "prefix_negation_mi",
-      "input" : "未確認の情報",
-      "tags" : [
+      "id": "prefix_negation_mi",
+      "input": "未確認の情報",
+      "tags": [
         "prefix_suffix"
       ]
     },
     {
-      "description" : "非 prefix",
-      "expected" : [
+      "description": "非 prefix",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "非公開"
+          "pos": "Noun",
+          "surface": "非公開"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "資料"
+          "pos": "Noun",
+          "surface": "資料"
         }
       ],
-      "id" : "prefix_negation_hi",
-      "input" : "非公開の資料",
-      "tags" : [
+      "id": "prefix_negation_hi",
+      "input": "非公開の資料",
+      "tags": [
         "prefix_suffix"
       ]
     },
     {
-      "description" : "的 suffix",
-      "expected" : [
+      "description": "的 suffix",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "国際"
+          "pos": "Noun",
+          "surface": "国際"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "的"
+          "pos": "Suffix",
+          "surface": "的"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "な"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
         },
         {
-          "pos" : "Noun",
-          "surface" : "問題"
+          "pos": "Noun",
+          "surface": "問題"
         }
       ],
-      "id" : "suffix_teki",
-      "input" : "国際的な問題",
-      "tags" : [
+      "id": "suffix_teki",
+      "input": "国際的な問題",
+      "tags": [
         "prefix_suffix"
       ]
     },
     {
-      "description" : "化 suffix",
-      "expected" : [
+      "description": "化 suffix",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "自動"
+          "pos": "Noun",
+          "surface": "自動"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "化"
+          "pos": "Suffix",
+          "surface": "化"
         },
         {
-          "pos" : "Verb",
-          "surface" : "する"
+          "pos": "Verb",
+          "surface": "する"
         }
       ],
-      "id" : "suffix_ka",
-      "input" : "自動化する",
-      "tags" : [
+      "id": "suffix_ka",
+      "input": "自動化する",
+      "tags": [
         "prefix_suffix"
       ]
     },
     {
-      "description" : "性 suffix - split from noun with existential ある (verb)",
-      "expected" : [
+      "description": "性 suffix - split from noun with existential ある (verb)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "可能性"
+          "pos": "Noun",
+          "surface": "可能性"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Verb",
-          "surface" : "ある"
+          "pos": "Verb",
+          "surface": "ある"
         }
       ],
-      "id" : "suffix_sei",
-      "input" : "可能性がある",
-      "tags" : [
+      "id": "suffix_sei",
+      "input": "可能性がある",
+      "tags": [
         "prefix_suffix"
       ]
     },
     {
-      "description" : "さん suffix - split from noun (CLAUDE.md: honorifics separate)",
-      "expected" : [
+      "description": "さん suffix - split from noun (CLAUDE.md: honorifics separate)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "田中"
+          "pos": "Noun",
+          "surface": "田中"
         },
         {
-          "pos" : "Suffix",
-          "surface" : "さん"
+          "pos": "Suffix",
+          "surface": "さん"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "来る",
-          "pos" : "Verb",
-          "surface" : "来"
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "suffix_san",
-      "input" : "田中さんが来た",
-      "tags" : [
+      "id": "suffix_san",
+      "input": "田中さんが来た",
+      "tags": [
         "prefix_suffix"
       ]
     },
     {
-      "description" : "先生 suffix (name + suffix split)",
-      "expected" : [
+      "description": "先生 suffix (name + suffix split)",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "山田"
+          "pos": "Noun",
+          "surface": "山田"
         },
         {
-          "pos" : "Noun",
-          "surface" : "先生"
+          "pos": "Noun",
+          "surface": "先生"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "授業"
+          "pos": "Noun",
+          "surface": "授業"
         }
       ],
-      "id" : "suffix_sensei",
-      "input" : "山田先生の授業",
-      "tags" : [
+      "id": "suffix_sensei",
+      "input": "山田先生の授業",
+      "tags": [
         "prefix_suffix"
       ]
     },
     {
-      "description" : "Volitional form 頑張ろう as single verb",
-      "expected" : [
+      "description": "Volitional form 頑張ろう as single verb",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "今日"
+          "pos": "Noun",
+          "surface": "今日"
         },
         {
-          "pos" : "Particle",
-          "surface" : "も"
+          "pos": "Particle",
+          "surface": "も"
         },
         {
-          "lemma" : "頑張る",
-          "pos" : "Verb",
-          "surface" : "頑張ろ"
+          "lemma": "頑張る",
+          "pos": "Verb",
+          "surface": "頑張ろ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "う"
+          "pos": "Auxiliary",
+          "surface": "う"
         }
       ],
-      "id" : "number_text_effort",
-      "input" : "今日も頑張ろう",
-      "tags" : [
+      "id": "number_text_effort",
+      "input": "今日も頑張ろう",
+      "tags": [
         "number_special"
       ]
     },
     {
-      "description" : "Numbers with Japanese units",
-      "expected" : [
+      "description": "Numbers with Japanese units",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "体重"
+          "pos": "Noun",
+          "surface": "体重"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Noun",
-          "surface" : "3キロ"
+          "pos": "Noun",
+          "surface": "3キロ"
         },
         {
-          "lemma" : "減る",
-          "pos" : "Verb",
-          "surface" : "減っ"
+          "lemma": "減る",
+          "pos": "Verb",
+          "surface": "減っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "number_units",
-      "input" : "体重が3キロ減った",
-      "tags" : [
+      "id": "number_units",
+      "input": "体重が3キロ減った",
+      "tags": [
         "number_special"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma normalization difference"
       },
-      "description" : "URL-like mixed content",
-      "expected" : [
+      "description": "URL-like mixed content",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "example.com"
+          "pos": "Noun",
+          "surface": "example.com"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "登録"
+          "pos": "Noun",
+          "surface": "登録"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Verb",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
         }
       ],
-      "id" : "number_url_like",
-      "input" : "example.comで登録してください",
-      "suzume_expected" : [
+      "id": "number_url_like",
+      "input": "example.comで登録してください",
+      "suzume_expected": [
         {
-          "pos" : "Noun",
-          "surface" : "example.com"
+          "pos": "Noun",
+          "surface": "example.com"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "で"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
-          "pos" : "Noun",
-          "surface" : "登録"
+          "pos": "Noun",
+          "surface": "登録"
         },
         {
-          "lemma" : "する",
-          "pos" : "Verb",
-          "surface" : "し"
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "lemma" : "くださる",
-          "pos" : "Verb",
-          "surface" : "ください"
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
         }
       ],
-      "tags" : [
+      "tags": [
         "number_special"
       ]
     },
     {
-      "description" : "People counter",
-      "expected" : [
+      "description": "People counter",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "3人"
+          "pos": "Noun",
+          "surface": "3人"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Verb",
-          "surface" : "行く"
+          "pos": "Verb",
+          "surface": "行く"
         }
       ],
-      "id" : "number_counter_nin",
-      "input" : "3人で行く",
-      "tags" : [
+      "id": "number_counter_nin",
+      "input": "3人で行く",
+      "tags": [
         "number_special"
       ]
     },
     {
-      "description" : "Times counter - single token",
-      "expected" : [
+      "description": "Times counter - single token",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "5回目"
+          "pos": "Noun",
+          "surface": "5回目"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "挑戦"
+          "pos": "Noun",
+          "surface": "挑戦"
         }
       ],
-      "id" : "number_counter_kai",
-      "input" : "5回目の挑戦",
-      "tags" : [
+      "id": "number_counter_kai",
+      "input": "5回目の挑戦",
+      "tags": [
         "number_special"
       ]
     },
     {
-      "description" : "Currency",
-      "expected" : [
+      "description": "Currency",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "100万円"
+          "pos": "Noun",
+          "surface": "100万円"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "買い物"
+          "pos": "Noun",
+          "surface": "買い物"
         }
       ],
-      "id" : "number_currency",
-      "input" : "100万円の買い物",
-      "tags" : [
+      "id": "number_currency",
+      "input": "100万円の買い物",
+      "tags": [
         "number_special"
       ]
     },
     {
-      "description" : "Percentage",
-      "expected" : [
+      "description": "Percentage",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "売上"
+          "pos": "Noun",
+          "surface": "売上"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Noun",
-          "surface" : "50%"
+          "pos": "Noun",
+          "surface": "50%"
         },
         {
-          "pos" : "Noun",
-          "surface" : "増加"
+          "pos": "Noun",
+          "surface": "増加"
         }
       ],
-      "id" : "number_percent",
-      "input" : "売上が50%増加",
-      "tags" : [
+      "id": "number_percent",
+      "input": "売上が50%増加",
+      "tags": [
         "number_special"
       ]
     },
     {
-      "description" : "私",
-      "expected" : [
+      "description": "私",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "私"
+          "pos": "Pronoun",
+          "surface": "私"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Noun",
-          "surface" : "学生"
+          "pos": "Noun",
+          "surface": "学生"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "です"
+          "pos": "Auxiliary",
+          "surface": "です"
         }
       ],
-      "id" : "pronoun_watashi",
-      "input" : "私は学生です",
-      "tags" : [
+      "id": "pronoun_watashi",
+      "input": "私は学生です",
+      "tags": [
         "pronoun"
       ]
     },
     {
-      "description" : "これ with verb te-form 見て",
-      "expected" : [
+      "description": "これ with verb te-form 見て",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "これ"
+          "pos": "Pronoun",
+          "surface": "これ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "lemma" : "見る",
-          "pos" : "Verb",
-          "surface" : "見"
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "pronoun_kore",
-      "input" : "これを見て",
-      "tags" : [
+      "id": "pronoun_kore",
+      "input": "これを見て",
+      "tags": [
         "pronoun"
       ]
     },
     {
-      "description" : "それ",
-      "expected" : [
+      "description": "それ",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "それ"
+          "pos": "Pronoun",
+          "surface": "それ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "は"
+          "pos": "Particle",
+          "surface": "は"
         },
         {
-          "pos" : "Verb",
-          "surface" : "違う"
+          "pos": "Verb",
+          "surface": "違う"
         }
       ],
-      "id" : "pronoun_sore",
-      "input" : "それは違う",
-      "tags" : [
+      "id": "pronoun_sore",
+      "input": "それは違う",
+      "tags": [
         "pronoun"
       ]
     },
     {
-      "description" : "あれ",
-      "expected" : [
+      "description": "あれ",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "あれ"
+          "pos": "Pronoun",
+          "surface": "あれ"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "欲しい"
+          "pos": "Adjective",
+          "surface": "欲しい"
         }
       ],
-      "id" : "pronoun_are",
-      "input" : "あれが欲しい",
-      "tags" : [
+      "id": "pronoun_are",
+      "input": "あれが欲しい",
+      "tags": [
         "pronoun"
       ]
     },
     {
-      "description" : "誰",
-      "expected" : [
+      "description": "誰",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "誰"
+          "pos": "Pronoun",
+          "surface": "誰"
         },
         {
-          "pos" : "Particle",
-          "surface" : "が"
+          "pos": "Particle",
+          "surface": "が"
         },
         {
-          "lemma" : "来る",
-          "pos" : "Verb",
-          "surface" : "来"
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "pronoun_dare",
-      "input" : "誰が来た",
-      "tags" : [
+      "id": "pronoun_dare",
+      "input": "誰が来た",
+      "tags": [
         "pronoun"
       ]
     },
     {
-      "description" : "何",
-      "expected" : [
+      "description": "何",
+      "expected": [
         {
-          "pos" : "Pronoun",
-          "surface" : "何"
+          "pos": "Pronoun",
+          "surface": "何"
         },
         {
-          "pos" : "Particle",
-          "surface" : "を"
+          "pos": "Particle",
+          "surface": "を"
         },
         {
-          "pos" : "Verb",
-          "surface" : "食べる"
+          "pos": "Verb",
+          "surface": "食べる"
         }
       ],
-      "id" : "pronoun_nani",
-      "input" : "何を食べる",
-      "tags" : [
+      "id": "pronoun_nani",
+      "input": "何を食べる",
+      "tags": [
         "pronoun"
       ]
     },
     {
-      "description" : "Brackets",
-      "expected" : [
+      "description": "Brackets",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "AI"
+          "pos": "Noun",
+          "surface": "AI"
         },
         {
-          "pos" : "Noun",
-          "surface" : "人工知能"
+          "pos": "Noun",
+          "surface": "人工知能"
         },
         {
-          "pos" : "Particle",
-          "surface" : "の"
+          "pos": "Particle",
+          "surface": "の"
         },
         {
-          "pos" : "Noun",
-          "surface" : "発展"
+          "pos": "Noun",
+          "surface": "発展"
         }
       ],
-      "id" : "symbol_brackets",
-      "input" : "AI（人工知能）の発展",
-      "tags" : [
+      "id": "symbol_brackets",
+      "input": "AI（人工知能）の発展",
+      "tags": [
         "symbol"
       ]
     },
     {
-      "accepted_diff" : {
-        "category" : "pos-limitation",
-        "reason" : "POS/lemma normalization difference"
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma normalization difference"
       },
-      "description" : "Japanese quotes",
-      "expected" : [
+      "description": "Japanese quotes",
+      "expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "こんにちは"
+          "pos": "Interjection",
+          "surface": "こんにちは"
         },
         {
-          "pos" : "Particle",
-          "surface" : "と"
+          "pos": "Particle",
+          "surface": "と"
         },
         {
-          "lemma" : "言う",
-          "pos" : "Verb",
-          "surface" : "言っ"
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "symbol_japanese_quotes",
-      "input" : "「こんにちは」と言った",
-      "suzume_expected" : [
+      "id": "symbol_japanese_quotes",
+      "input": "「こんにちは」と言った",
+      "suzume_expected": [
         {
-          "pos" : "Interjection",
-          "surface" : "こんにちは"
+          "pos": "Interjection",
+          "surface": "こんにちは"
         },
         {
-          "pos" : "Other",
-          "surface" : "と"
+          "pos": "Other",
+          "surface": "と"
         },
         {
-          "lemma" : "言う",
-          "pos" : "Verb",
-          "surface" : "言っ"
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "tags" : [
+      "tags": [
         "symbol"
       ]
     },
     {
-      "description" : "Prefecture",
-      "expected" : [
+      "description": "Prefecture",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "東京都"
+          "pos": "Noun",
+          "surface": "東京都"
         },
         {
-          "pos" : "Particle",
-          "surface" : "に"
+          "pos": "Particle",
+          "surface": "に"
         },
         {
-          "pos" : "Verb",
-          "surface" : "住む"
+          "pos": "Verb",
+          "surface": "住む"
         }
       ],
-      "id" : "admin_prefecture",
-      "input" : "東京都に住む",
-      "tags" : [
+      "id": "admin_prefecture",
+      "input": "東京都に住む",
+      "tags": [
         "administrative"
       ]
     },
     {
-      "description" : "City",
-      "expected" : [
+      "description": "City",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "横浜市"
+          "pos": "Noun",
+          "surface": "横浜市"
         },
         {
-          "pos" : "Particle",
-          "surface" : "で"
+          "pos": "Particle",
+          "surface": "で"
         },
         {
-          "pos" : "Verb",
-          "surface" : "働く"
+          "pos": "Verb",
+          "surface": "働く"
         }
       ],
-      "id" : "admin_city",
-      "input" : "横浜市で働く",
-      "tags" : [
+      "id": "admin_city",
+      "input": "横浜市で働く",
+      "tags": [
         "administrative"
       ]
     },
     {
-      "description" : "Ward",
-      "expected" : [
+      "description": "Ward",
+      "expected": [
         {
-          "pos" : "Noun",
-          "surface" : "渋谷区"
+          "pos": "Noun",
+          "surface": "渋谷区"
         },
         {
-          "pos" : "Particle",
-          "surface" : "から"
+          "pos": "Particle",
+          "surface": "から"
         },
         {
-          "lemma" : "来る",
-          "pos" : "Verb",
-          "surface" : "来"
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "admin_ward",
-      "input" : "渋谷区から来た",
-      "tags" : [
+      "id": "admin_ward",
+      "input": "渋谷区から来た",
+      "tags": [
         "administrative"
       ]
     }
   ],
-  "version" : "1.0"
+  "version": "1.0"
 }

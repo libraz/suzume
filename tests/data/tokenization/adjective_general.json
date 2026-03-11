@@ -1,165 +1,165 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "めちゃくちゃな話 - auto-generated",
-      "expected" : [
+      "description": "めちゃくちゃな話 - auto-generated",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "めちゃくちゃ"
+          "pos": "Adjective",
+          "surface": "めちゃくちゃ"
         },
         {
-          "lemma" : "だ",
-          "pos" : "Auxiliary",
-          "surface" : "な"
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
         },
         {
-          "pos" : "Noun",
-          "surface" : "話"
+          "pos": "Noun",
+          "surface": "話"
         }
       ],
-      "id" : "mechi_kuchi_na",
-      "input" : "めちゃくちゃな話",
-      "tags" : [
+      "id": "mechi_kuchi_na",
+      "input": "めちゃくちゃな話",
+      "tags": [
         "adjective",
         "colloquial"
       ]
     },
     {
-      "description" : "おっかない顔 - auto-generated",
-      "expected" : [
+      "description": "おっかない顔 - auto-generated",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "おっかない"
+          "pos": "Adjective",
+          "surface": "おっかない"
         },
         {
-          "pos" : "Noun",
-          "surface" : "顔"
+          "pos": "Noun",
+          "surface": "顔"
         }
       ],
-      "id" : "ottkanai",
-      "input" : "おっかない顔",
-      "tags" : [
+      "id": "ottkanai",
+      "input": "おっかない顔",
+      "tags": [
         "adjective",
         "colloquial"
       ]
     },
     {
-      "description" : "甘いもの - auto-generated",
-      "expected" : [
+      "description": "甘いもの - auto-generated",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "甘い"
+          "pos": "Adjective",
+          "surface": "甘い"
         },
         {
-          "pos" : "Noun",
-          "surface" : "もの"
+          "pos": "Noun",
+          "surface": "もの"
         }
       ],
-      "id" : "imono",
-      "input" : "甘いもの",
-      "tags" : [
+      "id": "imono",
+      "input": "甘いもの",
+      "tags": [
         "adjective",
         "context"
       ]
     },
     {
-      "description" : "辛いもの - auto-generated",
-      "expected" : [
+      "description": "辛いもの - auto-generated",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "辛い"
+          "pos": "Adjective",
+          "surface": "辛い"
         },
         {
-          "pos" : "Noun",
-          "surface" : "もの"
+          "pos": "Noun",
+          "surface": "もの"
         }
       ],
-      "id" : "karai_mono",
-      "input" : "辛いもの",
-      "tags" : [
+      "id": "karai_mono",
+      "input": "辛いもの",
+      "tags": [
         "adjective",
         "context"
       ]
     },
     {
-      "description" : "暗い部屋 - auto-generated",
-      "expected" : [
+      "description": "暗い部屋 - auto-generated",
+      "expected": [
         {
-          "pos" : "Adjective",
-          "surface" : "暗い"
+          "pos": "Adjective",
+          "surface": "暗い"
         },
         {
-          "pos" : "Noun",
-          "surface" : "部屋"
+          "pos": "Noun",
+          "surface": "部屋"
         }
       ],
-      "id" : "kurai_heya",
-      "input" : "暗い部屋",
-      "tags" : [
+      "id": "kurai_heya",
+      "input": "暗い部屋",
+      "tags": [
         "adjective",
         "context"
       ]
     },
     {
-      "description" : "甘くて美味しい - auto-generated",
-      "expected" : [
+      "description": "甘くて美味しい - auto-generated",
+      "expected": [
         {
-          "lemma" : "甘い",
-          "pos" : "Adjective",
-          "surface" : "甘く"
+          "lemma": "甘い",
+          "pos": "Adjective",
+          "surface": "甘く"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         },
         {
-          "pos" : "Adjective",
-          "surface" : "美味しい"
+          "pos": "Adjective",
+          "surface": "美味しい"
         }
       ],
-      "id" : "kute_shii",
-      "input" : "甘くて美味しい",
-      "tags" : [
+      "id": "kute_shii",
+      "input": "甘くて美味しい",
+      "tags": [
         "adjective",
         "renyokei"
       ]
     },
     {
-      "description" : "辛くない - auto-generated",
-      "expected" : [
+      "description": "辛くない - auto-generated",
+      "expected": [
         {
-          "lemma" : "辛い",
-          "pos" : "Adjective",
-          "surface" : "辛く"
+          "lemma": "辛い",
+          "pos": "Adjective",
+          "surface": "辛く"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "kunai",
-      "input" : "辛くない",
-      "tags" : [
+      "id": "kunai",
+      "input": "辛くない",
+      "tags": [
         "adjective",
         "renyokei"
       ]
     },
     {
-      "description" : "大きな木 - auto-generated",
-      "expected" : [
+      "description": "大きな木 - auto-generated",
+      "expected": [
         {
-          "pos" : "Determiner",
-          "surface" : "大きな"
+          "pos": "Determiner",
+          "surface": "大きな"
         },
         {
-          "pos" : "Noun",
-          "surface" : "木"
+          "pos": "Noun",
+          "surface": "木"
         }
       ],
-      "id" : "kina",
-      "input" : "大きな木"
+      "id": "kina",
+      "input": "大きな木"
     }
   ],
-  "description" : "adjective_general tests",
-  "version" : "1.0"
+  "description": "adjective_general tests",
+  "version": "1.0"
 }

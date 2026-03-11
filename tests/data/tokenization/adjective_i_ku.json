@@ -1,21 +1,21 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "description" : "よくない (negative form) - MeCab-compatible split: よく + ない",
-      "expected" : [
+      "description": "よくない (negative form) - MeCab-compatible split: よく + ない",
+      "expected": [
         {
-          "lemma" : "よい",
-          "pos" : "Adjective",
-          "surface" : "よく"
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よく"
         },
         {
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "yokunai_negative",
-      "input" : "よくない",
-      "tags" : [
+      "id": "yokunai_negative",
+      "input": "よくない",
+      "tags": [
         "irregular",
         "i_adjective",
         "yoi",
@@ -23,21 +23,21 @@
       ]
     },
     {
-      "description" : "よく (adverbial form) - MeCab-compatible lemma is よい",
-      "expected" : [
+      "description": "よく (adverbial form) - MeCab-compatible lemma is よい",
+      "expected": [
         {
-          "lemma" : "よい",
-          "pos" : "Adjective",
-          "surface" : "よく"
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よく"
         },
         {
-          "pos" : "Verb",
-          "surface" : "分かる"
+          "pos": "Verb",
+          "surface": "分かる"
         }
       ],
-      "id" : "yoku_adverbial",
-      "input" : "よく分かる",
-      "tags" : [
+      "id": "yoku_adverbial",
+      "input": "よく分かる",
+      "tags": [
         "irregular",
         "i_adjective",
         "yoi",
@@ -45,126 +45,126 @@
       ]
     },
     {
-      "description" : "おいしくない - MeCab互換分割: おいしく + ない",
-      "expected" : [
+      "description": "おいしくない - MeCab互換分割: おいしく + ない",
+      "expected": [
         {
-          "lemma" : "おいしい",
-          "pos" : "Adjective",
-          "surface" : "おいしく"
+          "lemma": "おいしい",
+          "pos": "Adjective",
+          "surface": "おいしく"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "hiragana_adj_oishikunai",
-      "input" : "おいしくない",
-      "tags" : [
+      "id": "hiragana_adj_oishikunai",
+      "input": "おいしくない",
+      "tags": [
         "i_adjective",
         "hiragana",
         "mecab_compat"
       ]
     },
     {
-      "description" : "美しくなりたかった - ADJ連用形 + なる + たい pattern",
-      "expected" : [
+      "description": "美しくなりたかった - ADJ連用形 + なる + たい pattern",
+      "expected": [
         {
-          "lemma" : "美しい",
-          "pos" : "Adjective",
-          "surface" : "美しく"
+          "lemma": "美しい",
+          "pos": "Adjective",
+          "surface": "美しく"
         },
         {
-          "lemma" : "なる",
-          "pos" : "Verb",
-          "surface" : "なり"
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なり"
         },
         {
-          "lemma" : "たい",
-          "pos" : "Auxiliary",
-          "surface" : "たかっ"
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たかっ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "adj_ku_naru_tai",
-      "input" : "美しくなりたかった",
-      "tags" : [
+      "id": "adj_ku_naru_tai",
+      "input": "美しくなりたかった",
+      "tags": [
         "i_adjective",
         "naru",
         "tai"
       ]
     },
     {
-      "description" : "B33: 無く should be adjective renyoukei",
-      "expected" : [
+      "description": "B33: 無く should be adjective renyoukei",
+      "expected": [
         {
-          "pos" : "Verb",
-          "surface" : "休む"
+          "pos": "Verb",
+          "surface": "休む"
         },
         {
-          "pos" : "Noun",
-          "surface" : "こと"
+          "pos": "Noun",
+          "surface": "こと"
         },
         {
-          "lemma" : "無い",
-          "pos" : "Adjective",
-          "surface" : "無く"
+          "lemma": "無い",
+          "pos": "Adjective",
+          "surface": "無く"
         }
       ],
-      "id" : "naku_adj",
-      "input" : "休むこと無く",
-      "tags" : [
+      "id": "naku_adj",
+      "input": "休むこと無く",
+      "tags": [
         "adjective",
         "kanji"
       ]
     },
     {
-      "description" : "良くなかった - adjective negative past form - MeCab-compatible split",
-      "expected" : [
+      "description": "良くなかった - adjective negative past form - MeCab-compatible split",
+      "expected": [
         {
-          "lemma" : "良い",
-          "pos" : "Adjective",
-          "surface" : "良く"
+          "lemma": "良い",
+          "pos": "Adjective",
+          "surface": "良く"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "なかっ"
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
         },
         {
-          "lemma" : "た",
-          "pos" : "Auxiliary",
-          "surface" : "た"
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
         }
       ],
-      "id" : "yokunakatta_adjective_negative_past",
-      "input" : "良くなかった",
-      "tags" : [
+      "id": "yokunakatta_adjective_negative_past",
+      "input": "良くなかった",
+      "tags": [
         "adjective",
         "negative"
       ]
     },
     {
-      "description" : "Katakana adjective エモい negative form - MeCab互換分割",
-      "expected" : [
+      "description": "Katakana adjective エモい negative form - MeCab互換分割",
+      "expected": [
         {
-          "lemma" : "エモい",
-          "pos" : "Adjective",
-          "surface" : "エモく"
+          "lemma": "エモい",
+          "pos": "Adjective",
+          "surface": "エモく"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "adj_emoi_negative",
-      "input" : "エモくない",
-      "tags" : [
+      "id": "adj_emoi_negative",
+      "input": "エモくない",
+      "tags": [
         "slang",
         "adjective",
         "katakana",
@@ -172,66 +172,66 @@
       ]
     },
     {
-      "description" : "Katakana adjective ダサい adverbial form",
-      "expected" : [
+      "description": "Katakana adjective ダサい adverbial form",
+      "expected": [
         {
-          "lemma" : "ダサい",
-          "pos" : "Adjective",
-          "surface" : "ダサく"
+          "lemma": "ダサい",
+          "pos": "Adjective",
+          "surface": "ダサく"
         }
       ],
-      "id" : "adj_dasai_adverbial",
-      "input" : "ダサく",
-      "tags" : [
+      "id": "adj_dasai_adverbial",
+      "input": "ダサく",
+      "tags": [
         "slang",
         "adjective",
         "katakana"
       ]
     },
     {
-      "description" : "Katakana adjective ウザい te-form",
-      "expected" : [
+      "description": "Katakana adjective ウザい te-form",
+      "expected": [
         {
-          "lemma" : "ウザい",
-          "pos" : "Adjective",
-          "surface" : "ウザく"
+          "lemma": "ウザい",
+          "pos": "Adjective",
+          "surface": "ウザく"
         },
         {
-          "pos" : "Particle",
-          "surface" : "て"
+          "pos": "Particle",
+          "surface": "て"
         }
       ],
-      "id" : "adj_uzai_te",
-      "input" : "ウザくて",
-      "tags" : [
+      "id": "adj_uzai_te",
+      "input": "ウザくて",
+      "tags": [
         "slang",
         "adjective",
         "conjugation"
       ]
     },
     {
-      "description" : "Colloquial adjective しんどい negative form (MeCab-compatible split)",
-      "expected" : [
+      "description": "Colloquial adjective しんどい negative form (MeCab-compatible split)",
+      "expected": [
         {
-          "lemma" : "しんどい",
-          "pos" : "Adjective",
-          "surface" : "しんどく"
+          "lemma": "しんどい",
+          "pos": "Adjective",
+          "surface": "しんどく"
         },
         {
-          "lemma" : "ない",
-          "pos" : "Auxiliary",
-          "surface" : "ない"
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
         }
       ],
-      "id" : "adj_shindoi_negative",
-      "input" : "しんどくない",
-      "tags" : [
+      "id": "adj_shindoi_negative",
+      "input": "しんどくない",
+      "tags": [
         "slang",
         "adjective",
         "colloquial"
       ]
     }
   ],
-  "description" : "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",
-  "version" : "1.0"
+  "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",
+  "version": "1.0"
 }

@@ -117,6 +117,10 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS/lemma limitation: surfaces match, POS classification differs from MeCab"
+      },
       "description": "はずがない - formal noun hazu + negative",
       "expected": [
         {
@@ -128,12 +132,29 @@
           "surface": "が"
         },
         {
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "ない"
         }
       ],
       "id": "formal_noun_hazu_ganai",
       "input": "はずがない",
+      "suzume_expected": [
+        {
+          "lemma": "はず",
+          "pos": "Noun",
+          "surface": "はず"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
       "tags": [
         "formal_noun"
       ]

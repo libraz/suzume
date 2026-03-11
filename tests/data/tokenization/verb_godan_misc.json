@@ -148,6 +148,43 @@
       ],
       "id": "verb_renyokei_mono_yomimono",
       "input": "読みものが好き"
+    },
+    {
+      "description": "わけにはいかない is a syntactic construction, not an auxiliary suffix",
+      "expected": [
+        {
+          "pos": "Verb",
+          "surface": "帰る"
+        },
+        {
+          "pos": "Noun",
+          "surface": "わけ"
+        },
+        {
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Verb",
+          "surface": "いか"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wake_niha_ikanakatta",
+      "input": "帰るわけにはいかなかった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows",

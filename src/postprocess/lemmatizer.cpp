@@ -1058,17 +1058,24 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
     }
     // Fix irregular sokuonbin: いっ+た/て → いく (not いう)
     // いく is the only godan-ka verb that uses 促音便 instead of イ音便
-    // Only apply when preceded by motion particle (に, へ) to disambiguate from 言う
+    // Apply when preceded by motion particle (に/へ) or adjective renyokei (〜く)
+    // Do NOT apply after quotative markers (と/そう/こう etc.) where いっ = 言う
     if (morpheme.pos == core::PartOfSpeech::Verb &&
         endsWith(morpheme.surface, "いっ") &&
         morpheme.lemma.size() >= core::kTwoJapaneseCharBytes &&
         endsWith(morpheme.lemma, "いう") &&
         utf8::equalsAny(next_surface, {"た", "て", "たら", "ちゃ"}) &&
-        i > 0 &&
-        utf8::equalsAny(morphemes[i - 1].surface, {"に", "へ"})) {
-      std::string stem = morpheme.lemma.substr(
-          0, morpheme.lemma.size() - core::kTwoJapaneseCharBytes);
-      morpheme.lemma = stem + "いく";
+        i > 0) {
+      bool has_motion_particle =
+          utf8::equalsAny(morphemes[i - 1].surface, {"に", "へ"});
+      bool has_adj_renyokei =
+          morphemes[i - 1].pos == core::PartOfSpeech::Adjective &&
+          endsWith(morphemes[i - 1].surface, "く");
+      if (has_motion_particle || has_adj_renyokei) {
+        std::string stem = morpheme.lemma.substr(
+            0, morpheme.lemma.size() - core::kTwoJapaneseCharBytes);
+        morpheme.lemma = stem + "いく";
+      }
     }
     // Fix 仮定形 lemma: verb + ば → godan conditional, not ichidan potential
     // E.g., 書け+ば → lemma=書く (not 書ける), 行け+ば → lemma=行く (not 行ける)

@@ -44,16 +44,9 @@ TEST_F(InflectionComplexTest, NakerebaNaranaiIchidan) {
 }
 
 // ===== youtosuru =====
-
-TEST_F(InflectionComplexTest, YouToSuruGodanKa) {
-  auto result = inflection_.getBest("書こうとした");
-  EXPECT_EQ(result.base_form, "書く");
-}
-
-TEST_F(InflectionComplexTest, YouToSuruIchidan) {
-  auto result = inflection_.getBest("食べようとしている");
-  EXPECT_EQ(result.base_form, "食べる");
-}
+// Removed: YouToSuruGodanKa/YouToSuruIchidan
+// うとする/ようとする auxiliary patterns removed (multi-word construction).
+// Inflection no longer recognizes 書こうとした as single verb form.
 
 // ===== kotogadekiru =====
 
@@ -148,39 +141,42 @@ TEST_F(InflectionComplexTest, NikuiIchidan) {
 }
 
 // ===== sezaruwoenai =====
+// Removed: ざるを得ない is a multi-word construction, no longer an auxiliary.
 
 TEST_F(InflectionComplexTest, SezaruWoEnaiGodanKa) {
   auto result = inflection_.getBest("書かざるを得ない");
-  EXPECT_EQ(result.base_form, "書く");
+  EXPECT_NE(result.base_form, "書く");
 }
 
 TEST_F(InflectionComplexTest, SezaruWoEnaiIchidan) {
   auto result = inflection_.getBest("食べざるを得なかった");
-  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_NE(result.base_form, "食べる");
 }
 
 // ===== tewaikenai/tewanaranaai =====
+// Removed: てはいけない/てはならない are multi-word constructions, no longer auxiliaries.
 
 TEST_F(InflectionComplexTest, TeWaIkenaiGodanKa) {
   auto result = inflection_.getBest("書いてはいけない");
-  EXPECT_EQ(result.base_form, "書く");
+  EXPECT_NE(result.base_form, "書く");
 }
 
 TEST_F(InflectionComplexTest, TeWaNaranaiIchidan) {
   auto result = inflection_.getBest("食べてはならない");
-  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_NE(result.base_form, "食べる");
 }
 
 // ===== temoii/temokamawanai =====
+// Removed: てもいい/てもかまわない are multi-word constructions, no longer auxiliaries.
 
 TEST_F(InflectionComplexTest, TemoIiGodanKa) {
   auto result = inflection_.getBest("書いてもいい");
-  EXPECT_EQ(result.base_form, "書く");
+  EXPECT_NE(result.base_form, "書く");
 }
 
 TEST_F(InflectionComplexTest, TemoKamawanaiIchidan) {
   auto result = inflection_.getBest("食べてもかまわない");
-  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_NE(result.base_form, "食べる");
 }
 
 // ===== beki =====
@@ -189,44 +185,47 @@ TEST_F(InflectionComplexTest, TemoKamawanaiIchidan) {
 // Tokenization correctly splits as べき+だ, べき+だっ+た, べき+で+は+ない.
 
 // ===== tokoroda =====
+// Removed: ところだ is a multi-word construction, no longer an auxiliary.
 
 TEST_F(InflectionComplexTest, TokorodaAboutToGodanKa) {
   auto result = inflection_.getBest("書くところだ");
-  EXPECT_EQ(result.base_form, "書く");
+  EXPECT_NE(result.base_form, "書く");
 }
 
 TEST_F(InflectionComplexTest, TokorodaJustDidIchidan) {
   auto result = inflection_.getBest("食べたところだ");
-  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_NE(result.base_form, "食べる");
 }
 
 TEST_F(InflectionComplexTest, TokorodaProgressiveGodanMa) {
   auto result = inflection_.getBest("読んでいるところだった");
-  EXPECT_EQ(result.base_form, "読む");
+  EXPECT_NE(result.base_form, "読む");
 }
 
 // ===== bakari =====
+// Removed: ばかり+copula is a multi-word construction, no longer an auxiliary.
 
 TEST_F(InflectionComplexTest, BakariJustDidGodanKa) {
   auto result = inflection_.getBest("書いたばかりだ");
-  EXPECT_EQ(result.base_form, "書く");
+  EXPECT_NE(result.base_form, "書く");
 }
 
 TEST_F(InflectionComplexTest, BakariIchidan) {
   auto result = inflection_.getBest("食べたばかりなのに");
-  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_NE(result.base_form, "食べる");
 }
 
 // ===== ppanashi =====
+// Removed: っぱなし+copula/particle is a multi-word construction, no longer an auxiliary.
 
 TEST_F(InflectionComplexTest, PpanashiGodanKa) {
   auto result = inflection_.getBest("開けっぱなしだ");
-  EXPECT_EQ(result.base_form, "開ける");
+  EXPECT_NE(result.base_form, "開ける");
 }
 
 TEST_F(InflectionComplexTest, PpanashiGodanRa) {
   auto result = inflection_.getBest("出しっぱなしにする");
-  EXPECT_EQ(result.base_form, "出す");
+  EXPECT_NE(result.base_form, "出す");
 }
 
 // ===== kakeru =====
@@ -290,27 +289,29 @@ TEST_F(InflectionComplexTest, NaosuIchidan) {
 }
 
 // ===== zuniwairareanai =====
+// Removed: ずにはいられない is a multi-word construction, no longer an auxiliary.
 
 TEST_F(InflectionComplexTest, ZuniWaIrarenaiGodanKa) {
   auto result = inflection_.getBest("笑わずにはいられない");
-  EXPECT_EQ(result.base_form, "笑う");
+  EXPECT_NE(result.base_form, "笑う");
 }
 
 TEST_F(InflectionComplexTest, ZuniWaIrarenaiIchidan) {
   auto result = inflection_.getBest("食べずにはいられなかった");
-  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_NE(result.base_form, "食べる");
 }
 
 // ===== wakeniwaikanaai =====
+// Removed: わけにはいかない is a multi-word construction, no longer an auxiliary.
 
 TEST_F(InflectionComplexTest, WakeNiWaIkanaiGodanKa) {
   auto result = inflection_.getBest("書かないわけにはいかない");
-  EXPECT_EQ(result.base_form, "書く");
+  EXPECT_NE(result.base_form, "書く");
 }
 
 TEST_F(InflectionComplexTest, WakeNiWaIkanaiIchidan) {
   auto result = inflection_.getBest("食べるわけにはいかなかった");
-  EXPECT_EQ(result.base_form, "食べる");
+  EXPECT_NE(result.base_form, "食べる");
 }
 
 }  // namespace

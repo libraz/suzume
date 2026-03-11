@@ -1,0 +1,125 @@
+{
+  "cases": [
+    {
+      "description": "volitional+とする: う+と+し+て+いる split (not として compound)",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書こ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "kakoutoshiteiru",
+      "input": "書こうとしている"
+    },
+    {
+      "description": "ichidan volitional+とする split",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べよ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "tabeyoutoshiteiru",
+      "input": "食べようとしている"
+    },
+    {
+      "description": "ichidan volitional+とした split",
+      "expected": [
+        {
+          "lemma": "逃げる",
+          "pos": "Verb",
+          "surface": "逃げよ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nigeyoutoshita",
+      "input": "逃げようとした"
+    },
+    {
+      "description": "godan volitional+とする split",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行こ"
+        },
+        {
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "ikoutosuru",
+      "input": "行こうとする"
+    }
+  ],
+  "description": "verb_volitional tests",
+  "version": "1.0"
+}
