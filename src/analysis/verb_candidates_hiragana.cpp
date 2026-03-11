@@ -918,6 +918,14 @@ next_length:;  // Label for goto from particle-starting verb skip
     if (stem_end <= start_pos) continue;
 
     std::string stem = extractSubstring(codepoints, start_pos, stem_end);
+
+    // Skip stems containing て or で - these are te-form + subsidiary verb patterns
+    // E.g., しておられた → stem=してお is actually して(te-form)+おる(subsidiary), not ichidan しておる
+    //       つないでおられた → stem=つないでお is つないで(te-form)+おる, not ichidan
+    if (stem.find("て") != std::string::npos || stem.find("で") != std::string::npos) {
+      continue;
+    }
+
     std::string base_form = stem + "る";  // Ichidan base form = stem + る
 
     // Validate: check if base form is a known ichidan verb
@@ -1372,7 +1380,7 @@ next_length:;  // Label for goto from particle-starting verb skip
     char32_t first_char = codepoints[start_pos];
     // Check for e-row hiragana (ichidan renyokei ending)
     // e-row: ね(ねる), め(める), け(ける), etc.
-    // Special: み(みる) after て/で (common auxiliary "try" verb)
+    // Special: み(みる) after て/で or ても/でも (common auxiliary "try" verb)
     // Note: き after て is くる(irregular), not きる - only み is safe here
     bool is_mi_after_te = false;
     if (first_char == U'み' && start_pos > 0) {
@@ -1380,12 +1388,27 @@ next_length:;  // Label for goto from particle-starting verb skip
       if (prev_char == U'て' || prev_char == U'で') {
         is_mi_after_te = true;
       }
+      // Also check ても/でも pattern: て+も+み or で+も+み
+      // E.g., 思ってもみなかった → て+も+み+なかっ+た
+      if (!is_mi_after_te && prev_char == U'も' && start_pos >= 2) {
+        char32_t prev_prev_char = codepoints[start_pos - 2];
+        if (prev_prev_char == U'て' || prev_prev_char == U'で') {
+          is_mi_after_te = true;
+        }
+      }
     }
     if (grammar::isERowCodepoint(first_char) || is_mi_after_te) {
-      // Check if followed by te/ta particle
+      // Check if followed by te/ta particle or negative auxiliary (なかっ/ない)
       if (start_pos + 1 < codepoints.size()) {
         char32_t next_char = codepoints[start_pos + 1];
-        if (next_char == U'て' || next_char == U'た') {
+        // Standard te/ta follow-up
+        bool is_valid_follow = (next_char == U'て' || next_char == U'た');
+        // For み after て/で (auxiliary みる): also accept ない/なかった follow-up
+        // E.g., てみなかった → て+み+なかっ+た, てみない → て+み+ない
+        if (!is_valid_follow && is_mi_after_te && next_char == U'な') {
+          is_valid_follow = true;
+        }
+        if (is_valid_follow) {
           // Construct base form (stem + る)
           std::string stem_surface = extractSubstring(codepoints, start_pos, start_pos + 1);
           std::string base_form = stem_surface + "る";

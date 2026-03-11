@@ -85,6 +85,7 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"張る", "はる", "る", V2VerbType::Godan},            // 引っ張る, 頑張る
     {"叫ぶ", "さけぶ", "ぶ", V2VerbType::Godan},         // 泣き叫ぶ, 喚き叫ぶ
     {"注ぐ", "そそぐ", "ぐ", V2VerbType::Godan},         // 降り注ぐ, 流し注ぐ
+    {"継ぐ", "つぐ", "ぐ", V2VerbType::Godan},           // 語り継ぐ, 受け継ぐ, 引き継ぐ
     {"刺す", "さす", "す", V2VerbType::Godan},            // 突き刺す, 差し刺す
     {"望む", "のぞむ", "む", V2VerbType::Godan},          // 待ち望む, 見望む
     {"落とす", "おとす", "す", V2VerbType::Godan},       // 切り落とす, 打ち落とす

@@ -1093,6 +1093,10 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "おる added to L2 dict as GODAN_RA verb. おり is now VerbRenyokei (dict-backed) instead of Auxiliary. Verb POS is grammatically correct — MeCab's Auxiliary is for grammaticalized ておる pattern."
+      },
       "description": "Formal ております pattern (split: verb stem + polite aux)",
       "expected": [
         {
@@ -1138,6 +1142,48 @@
       ],
       "id": "travel_delay",
       "input": "電車が10分ほど遅れております",
+      "suzume_expected": [
+        {
+          "lemma": "電車",
+          "pos": "Noun",
+          "surface": "電車"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "10分",
+          "pos": "Noun",
+          "surface": "10分"
+        },
+        {
+          "lemma": "ほど",
+          "pos": "Particle",
+          "surface": "ほど"
+        },
+        {
+          "lemma": "遅れる",
+          "pos": "Verb",
+          "surface": "遅れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おる",
+          "pos": "Verb",
+          "surface": "おり"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
       "tags": [
         "travel",
         "formal"

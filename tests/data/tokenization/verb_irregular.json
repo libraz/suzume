@@ -138,9 +138,39 @@
       "tags": [
         "basic",
         "suru"
-      ]
+      ],
+      "suzume_expected": [
+        {
+          "surface": "いたし",
+          "pos": "Verb",
+          "lemma": "いたす"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle",
+          "lemma": "て"
+        },
+        {
+          "surface": "おり",
+          "pos": "Verb",
+          "lemma": "おる"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
+      ],
+      "accepted_diff": {
+        "category": "dict-pos-change",
+        "reason": "おる added to L2 dict as GODAN_RA verb; おり is now dict-backed VerbRenyokei (Verb) not Auxiliary"
+      }
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "おる added to L2 dict as GODAN_RA verb. おり is now VerbRenyokei (dict-backed) instead of Auxiliary. Verb POS is grammatically correct — MeCab's Auxiliary is for grammaticalized ておる pattern."
+      },
       "description": "検討いたしております - suru noun + compound auxiliary verb",
       "expected": [
         {
@@ -171,6 +201,33 @@
       ],
       "id": "suru_kentou",
       "input": "検討いたしております",
+      "suzume_expected": [
+        {
+          "lemma": "検討",
+          "pos": "Noun",
+          "surface": "検討"
+        },
+        {
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おる",
+          "pos": "Verb",
+          "surface": "おり"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
       "tags": [
         "basic",
         "suru"

@@ -44,7 +44,48 @@
       "tags": [
         "business",
         "email"
-      ]
+      ],
+      "suzume_expected": [
+        {
+          "surface": "お",
+          "pos": "Prefix",
+          "lemma": "お"
+        },
+        {
+          "surface": "世話",
+          "pos": "Noun",
+          "lemma": "世話"
+        },
+        {
+          "surface": "に",
+          "pos": "Particle",
+          "lemma": "に"
+        },
+        {
+          "surface": "なっ",
+          "pos": "Verb",
+          "lemma": "なる"
+        },
+        {
+          "surface": "て",
+          "pos": "Particle",
+          "lemma": "て"
+        },
+        {
+          "surface": "おり",
+          "pos": "Verb",
+          "lemma": "おる"
+        },
+        {
+          "surface": "ます",
+          "pos": "Auxiliary",
+          "lemma": "ます"
+        }
+      ],
+      "accepted_diff": {
+        "category": "dict-pos-change",
+        "reason": "おる added to L2 dict as GODAN_RA verb; おり is now dict-backed VerbRenyokei (Verb) not Auxiliary"
+      }
     },
     {
       "description": "Internal greeting: お疲れ様です",

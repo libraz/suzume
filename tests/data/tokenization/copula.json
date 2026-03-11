@@ -385,6 +385,10 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "で in ではない is copula だ te-form (Auxiliary), not particle. で→は surface bonus correctly promotes AuxCopulaDa path."
+      },
       "description": "彼女ではない - particle は + ない pattern",
       "expected": [
         {
@@ -410,6 +414,28 @@
       ],
       "id": "copula_dewanai",
       "input": "彼女ではない",
+      "suzume_expected": [
+        {
+          "lemma": "彼女",
+          "pos": "Noun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
       "tags": [
         "copula",
         "dewanai",

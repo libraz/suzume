@@ -1137,6 +1137,42 @@
       ],
       "id": "fukaku_tsukisasatta",
       "input": "深く突き刺さった"
+    },
+    {
+      "description": "compound verb 受け継ぐ - 継ぐ as subsidiary verb",
+      "expected": [
+        {
+          "lemma": "受け継ぐ",
+          "pos": "Verb",
+          "surface": "受け継ぐ"
+        }
+      ],
+      "id": "compound_uketsugu",
+      "input": "受け継ぐ"
+    },
+    {
+      "description": "compound verb 引き継ぐ - 継ぐ as subsidiary verb",
+      "expected": [
+        {
+          "lemma": "引き継ぐ",
+          "pos": "Verb",
+          "surface": "引き継ぐ"
+        }
+      ],
+      "id": "compound_hikitsugu",
+      "input": "引き継ぐ"
+    },
+    {
+      "description": "lexicalized compound verb 振る舞う - L2 dict entry",
+      "expected": [
+        {
+          "lemma": "振る舞う",
+          "pos": "Verb",
+          "surface": "振る舞う"
+        }
+      ],
+      "id": "compound_furumau",
+      "input": "振る舞う"
     }
   ],
   "description": "Compound verbs",

@@ -281,6 +281,10 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "おる(GODAN_RA) in dict → おり is VerbRenyokei, not Auxiliary"
+      },
       "description": "お世話になっております - humble progressive form - MeCab: なっ + て + おり + ます",
       "expected": [
         {
@@ -321,6 +325,43 @@
       ],
       "id": "realworld_business_email",
       "input": "お世話になっております",
+      "suzume_expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "世話",
+          "pos": "Noun",
+          "surface": "世話"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おる",
+          "pos": "Verb",
+          "surface": "おり"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
       "tags": [
         "strict",
         "realworld",

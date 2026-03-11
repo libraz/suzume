@@ -1651,16 +1651,13 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kStrongBonus;
   }
 
-  // Penalty for PART_準体(の) → で (any interpretation) pattern
-  // This prevents ので being split into の+で
-  // "ので" is a conjunction particle in L1 dictionary and should be 1 token
-  // But "のだ" → の|だ is correct (の+copula だ for emphasis)
-  // Only penalize when next.surface == "で" to preserve の|だ split
-  // Note: のである is handled by で→ある bonus below
+  // Penalty for PART_準体(の) → で to prevent ので splitting
+  // High penalty keeps ので merged in conjunctive use (寒いので出かけた)
+  // For のではない pattern, the downstream で→は surface bonus overcomes this
   if (prev.extended_pos == core::ExtendedPOS::ParticleNo &&
       prev.surface == "の" &&
       next.surface == "で") {
-    surface_bonus += cost::kVeryRare;
+    surface_bonus += cost::kVeryRare;  // 1.8
   }
 
   // Penalty for AuxCopulaDa(な) → し(PART_接続) pattern
@@ -1776,15 +1773,25 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
 
   // Bonus for で(AuxCopulaDa) → ある/あっ/あろ (formal copula pattern)
   // のである, ではある, であった are standard literary/formal expressions
-  // AuxCopulaDa→VerbShuushikei has kMinor penalty (0.5) which blocks this
-  // Also, の→で has kVeryRare penalty (1.8) which blocks のである
-  // Total needed: overcome 0.5 (bigram) + 1.8 (の→で) = 2.3 penalty
+  // AuxCopulaDa→VerbShuushikei has kMinor (0.5) bigram + kVeryRare (1.8) の→で surface
+  // Total penalty to overcome: ~2.3
   if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
       prev.surface == "で" &&
       next.pos == core::PartOfSpeech::Verb &&
       (next.surface == "ある" || next.surface == "あっ" ||
        next.surface == "あろ" || next.surface == "あり")) {
-    surface_bonus += cost::kVeryStrongBonus * 2;  // -3.2 to overcome penalties
+    surface_bonus += cost::kVeryStrongBonus * 2;  // -3.2 to overcome ~2.3 total penalty
+  }
+
+  // Bonus for で(AuxCopulaDa) → は(ParticleTopic) surface connection
+  // Helps のではない/のではなく pattern split の+で+は despite の→で penalty (1.8)
+  // Only fires when で is split from の (not when ので stays as single token)
+  // Safe: で(AuxCopulaDa)+は is always correct when it occurs (ではない, ではなく)
+  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+      prev.surface == "で" &&
+      next.extended_pos == core::ExtendedPOS::ParticleTopic &&
+      next.surface == "は") {
+    surface_bonus += cost::kVeryStrongBonus;  // -1.6
   }
 
   // Penalty for で(VERB_連用 of 出る) → ない(AUX_否定): copula でない is more common

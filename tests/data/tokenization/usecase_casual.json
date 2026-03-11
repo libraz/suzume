@@ -697,8 +697,8 @@
     },
     {
       "accepted_diff": {
-        "category": "lemma-diff",
-        "reason": "Lemma normalization difference between MeCab and Suzume (e.g. 事vsこと, 平然vs平然と, kanji vs hiragana lemma)"
+        "category": "pos-limitation",
+        "reason": "で in ではなかった is copula だ te-form (Auxiliary), not particle. で→は surface bonus correctly promotes AuxCopulaDa path."
       },
       "description": "Negative review - MeCab互換分割 (なかっ+た split)",
       "expected": [
@@ -787,8 +787,8 @@
           "surface": "ほど"
         },
         {
-          "lemma": "で",
-          "pos": "Particle",
+          "lemma": "だ",
+          "pos": "Auxiliary",
           "surface": "で"
         },
         {
