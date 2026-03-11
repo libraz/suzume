@@ -5,6 +5,7 @@
 
 #include "join_candidates.h"
 
+#include "bigram_table.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -17,6 +18,8 @@
 namespace suzume::analysis {
 
 namespace {
+
+using CharType = normalize::CharType;
 
 // V2 Subsidiary verbs for compound verb joining
 // Verb type determines how to generate renyokei from base form
@@ -353,8 +356,6 @@ void addCompoundVerbJoinCandidates(
     const dictionary::DictionaryManager& dict_manager,
     const Scorer& scorer,
     const grammar::Inflection& inflection) {
-  using CharType = normalize::CharType;
-
   if (start_pos >= char_types.size()) {
     return;
   }
@@ -462,7 +463,7 @@ void addCompoundVerbJoinCandidates(
 
     // Determine if this is a renyokei entry by checking if base_form != surface
     // Renyokei entries: 過ぎ (base 過ぎる), 出し (base 出す), etc.
-    bool is_renyokei_entry = (std::string(v2_verb.surface) != std::string(v2_verb.surface));
+    bool is_renyokei_entry = false;
 
     // Check if text at v2_start matches this V2 verb (kanji or reading)
     bool matched_kanji = false;
@@ -957,7 +958,7 @@ void addCompoundVerbJoinCandidates(
         utf8::endsWith(compound_surface, "まれた") ||
         utf8::endsWith(compound_surface, "られて") ||
         utf8::endsWith(compound_surface, "られた")) {
-      final_cost += 2.5F;  // Strong penalty to favor split path
+      final_cost += bigram_cost::kSevere;  // Strong penalty to favor split path
     }
 
     uint8_t flags = core::LatticeEdge::kFromDictionary;
@@ -1112,8 +1113,6 @@ void addHiraganaCompoundVerbJoinCandidates(
     const dictionary::DictionaryManager& dict_manager,
     const Scorer& scorer,
     const grammar::Inflection& inflection) {
-  using CharType = normalize::CharType;
-
   if (start_pos >= char_types.size()) {
     return;
   }
@@ -1366,6 +1365,7 @@ void addKatakanaSugiruJoinCandidates(
   (void)scorer;
   return;
 
+#if 0  // Unreachable: katakana+sugiru compound disabled for MeCab compatibility
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -1443,6 +1443,7 @@ void addKatakanaSugiruJoinCandidates(
                       final_cost, flags, compound_base);
     }
   }
+#endif  // Unreachable katakana+sugiru
 }
 
 void addPrefixNounJoinCandidates(
@@ -1451,8 +1452,6 @@ void addPrefixNounJoinCandidates(
     const std::vector<normalize::CharType>& char_types,
     const dictionary::DictionaryManager& dict_manager,
     const Scorer& scorer) {
-  using CharType = normalize::CharType;
-
   if (start_pos >= codepoints.size()) {
     return;
   }
@@ -1579,8 +1578,6 @@ void addTeFormAuxiliaryCandidates(
     const std::vector<normalize::CharType>& char_types,
     const Scorer& scorer,
     const grammar::Inflection& inflection) {
-  using CharType = normalize::CharType;
-
   if (start_pos >= codepoints.size()) {
     return;
   }
@@ -1694,8 +1691,6 @@ void addVerbSuffixNounJoinCandidates(
     const std::vector<normalize::CharType>& char_types,
     [[maybe_unused]] const dictionary::DictionaryManager& dict_manager,
     const Scorer& scorer) {
-  using CharType = normalize::CharType;
-
   if (start_pos >= codepoints.size()) {
     return;
   }
@@ -1829,8 +1824,6 @@ void addTaruAdjectiveJoinCandidates(
     const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types,
     const Scorer& scorer) {
-  using CharType = normalize::CharType;
-
   if (start_pos >= codepoints.size()) {
     return;
   }

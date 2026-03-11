@@ -89,6 +89,8 @@ constexpr float kVeryRare = 1.8F;       // Very rare
 constexpr float kSevere = 2.5F;         // Severe violation
 constexpr float kAlmostNever = 3.0F;    // Almost never happens
 constexpr float kNever = 3.5F;          // Near prohibition
+constexpr float kExtremeBonus = -2.0F;  // Extreme bonus for grammatically necessary connections
+constexpr float kProhibitive = 5.0F;   // Absolute prohibition — exceeds kNever
 
 }  // namespace bigram_cost
 

@@ -13,7 +13,9 @@
 #include "normalize/utf8.h"
 #include "grammar/char_patterns.h"
 
+#ifdef SUZUME_DEBUG_INFO
 using suzume::core::CandidateOrigin;
+#endif
 namespace cost = suzume::analysis::bigram_cost;
 namespace sc = suzume::analysis::scorer;
 
@@ -82,14 +84,6 @@ constexpr float kBigramCostTable[13][13] = {
 }  // namespace
 
 namespace suzume::analysis {
-
-// static
-void Scorer::logAdjustment(float amount, [[maybe_unused]] const char* reason) {
-  if (amount != 0.0F) {
-    SUZUME_DEBUG_LOG_VERBOSE("  " << reason << ": "
-                            << (amount > 0 ? "+" : "") << amount << "\n");
-  }
-}
 
 Scorer::Scorer(const ScorerOptions& options) : options_(options) {}
 
@@ -881,25 +875,15 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
     surface_bonus += cost::kSevere;  // Cancel VerbRenyokei→た bonus
   }
 
-  // Surface-based bonus for でし → た (polite past copula)
+  // Surface-based bonus for でし → た/たら (polite past copula / conditional)
   // 本でした should be 本+でし+た, not 本+で+し+た
-  // The competing path is Noun→で(PARTICLE)→し(VERB)→た with VerbRenyokei→た bonus
-  // We need a stronger bonus for でし→た to beat the で+し+た path
-  if (prev.surface == "でし" &&
-      prev.extended_pos == core::ExtendedPOS::AuxCopulaDesu &&
-      next.surface == "た" &&
-      next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
-    surface_bonus += cost::kVeryStrongBonus;  // Additional bonus to beat で+し+た
-  }
-
-  // Surface-based bonus for でし → たら (polite past copula conditional)
   // でしたら should be でし+たら (conditional), not でし+た+ら
-  // Similar to でし→た but for the conditional form
+  // The competing path is Noun→で(PARTICLE)→し(VERB)→た with VerbRenyokei→た bonus
   if (prev.surface == "でし" &&
       prev.extended_pos == core::ExtendedPOS::AuxCopulaDesu &&
-      next.surface == "たら" &&
+      (next.surface == "た" || next.surface == "たら") &&
       next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
-    surface_bonus += cost::kVeryStrongBonus;  // Bonus to beat でし+た+ら path
+    surface_bonus += cost::kVeryStrongBonus;
   }
 
   // Penalty for た(AuxTenseTa) → ら(Suffix) pattern
@@ -983,11 +967,11 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // E.g., 見つけた should be 見つけ+た, not 見+つけ+た
   // Exception: multi-kanji noun + でき should split (外出+でき+ない)
   // Single kanji NOUN often forms compound verbs with following verb stems
-  bool is_single_kanji_noun = (prev.surface.size() == 3);  // UTF-8: 1 kanji = 3 bytes
   if (prev.extended_pos == core::ExtendedPOS::Noun &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface != "し" && next.surface != "せ" &&
-      next.surface.size() <= 6 && is_single_kanji_noun) {
+      next.surface.size() <= 6 &&
+      prev.surface.size() == core::kJapaneseCharBytes) {
     surface_bonus += cost::kRare;  // Cancel the bigram bonus
   }
 
@@ -1631,10 +1615,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       utf8::contains(prev.surface, "っ")) {
     // Check if it's kanji+っ+kanji pattern
     bool has_sokuon_between_kanji = false;
-    std::vector<char32_t> codepoints;
-    for (char32_t cp : suzume::normalize::utf8::decode(prev.surface)) {
-      codepoints.push_back(cp);
-    }
+    auto codepoints = normalize::toCodepoints(prev.surface);
     for (size_t i = 1; i + 1 < codepoints.size(); ++i) {
       if (codepoints[i] == U'っ' &&
           suzume::normalize::isKanjiCodepoint(codepoints[i - 1]) &&
@@ -1657,7 +1638,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
       next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.surface == "し" &&
       grammar::isPureHiragana(prev.surface)) {
-    surface_bonus += 0.08F;
+    surface_bonus += sc::kPenaltyHiraganaNounToSuruTip;
   }
 
   // Bonus for multi-kanji NOUN → せ(VerbMizenkei) sahen pattern

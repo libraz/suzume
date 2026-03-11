@@ -146,12 +146,6 @@ class Scorer : public IScorer {
    */
   float bigramCost(core::PartOfSpeech prev, core::PartOfSpeech next) const;
 
-  /**
-   * @brief Log adjustment for debug output
-   * @param amount Adjustment amount (negative = bonus, positive = penalty)
-   * @param reason Description of the adjustment
-   */
-  static void logAdjustment(float amount, const char* reason);
 };
 
 }  // namespace suzume::analysis

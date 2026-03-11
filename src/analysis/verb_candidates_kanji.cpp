@@ -1197,8 +1197,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         //   and get penalized by ichidan_kanji_i_row_stem, so need lower threshold
         // - E-row (べ, れ, etc.): use 0.28 threshold to catch renyoukei like 入れ (conf=0.3)
         //   while avoiding too many false positives
-        bool is_i_row = grammar::isIRowCodepoint(first_hira);
-        float conf_threshold = is_i_row ? verb_opts.confidence_ichidan_dict : verb_opts.confidence_ichidan_dict;
+        float conf_threshold = verb_opts.confidence_ichidan_dict;
         // Skip if surface is registered as NOUN in dictionary
         // This prevents nominalized verb forms (売り上げ, 楽しみ, 晴れ) from being tokenized as VERB
         // when they are explicitly registered as nouns

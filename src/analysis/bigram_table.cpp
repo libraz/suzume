@@ -190,7 +190,7 @@ BigramTable::initTable() {
 
   // AdjRenyokei → AuxNegativeNai (美しく+ない) - very strong bonus for MeCab-compatible split
   // This needs to beat the full-form hiragana adjective bonus (e.g., しんどくない as single token)
-  setCell(t, EPOS::AdjRenyokei, EPOS::AuxNegativeNai, -2.0F);
+  setCell(t, EPOS::AdjRenyokei, EPOS::AuxNegativeNai, cost::kExtremeBonus);
 
   // AdjRenyokei → ParticleConj (美しく+て, ウザく+て) - strong bonus for te-form split
   setCell(t, EPOS::AdjRenyokei, EPOS::ParticleConj, cost::kStrongBonus);
@@ -541,7 +541,7 @@ BigramTable::initTable() {
   // AUX_接近 (くる/き) only appears after て-form (走ってきた, 食べてくる)
   // Never after nouns. Needs a very high penalty to overcome the strong
   // DET→NOUN bonus (-2.5) on prefix compounds like 先生
-  setCell(t, EPOS::Noun, EPOS::AuxAspectKuru, 5.0F);
+  setCell(t, EPOS::Noun, EPOS::AuxAspectKuru, cost::kProhibitive);
 
   // NaAdj → AuxCopulaDa (静か+だ) - strong bonus
   setCell(t, EPOS::AdjNaAdj, EPOS::AuxCopulaDa, cost::kStrongBonus);

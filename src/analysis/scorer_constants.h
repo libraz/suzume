@@ -612,6 +612,10 @@ constexpr float kBonusCompoundParticleToTopic = -2.7F;
 constexpr float kBonusCompoundAdjBase = -1.0F;
 constexpr float kBonusCompoundAdjPerChar = 0.4F;
 
+// Pure-hiragana dict NOUN → し(suru renyokei) gap adjustment
+// Tips balance: はなし(gap=0.013) vs なんし(gap=0.102)
+constexpr float kPenaltyHiraganaNounToSuruTip = 0.08F;
+
 }  // namespace suzume::analysis::scorer
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONSTANTS_H_
