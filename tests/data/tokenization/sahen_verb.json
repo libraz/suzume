@@ -1,10 +1,6 @@
 {
   "cases": [
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "POS/lemma limitation"
-      },
       "description": "Sahen noun + shi + eru/enai should split at shi boundary",
       "expected": [
         {
@@ -29,26 +25,7 @@
         }
       ],
       "id": "kaiketsu_shi_enai",
-      "input": "解決し得ない",
-      "suzume_expected": [
-        {
-          "pos": "Noun",
-          "surface": "解決"
-        },
-        {
-          "pos": "Particle",
-          "surface": "し"
-        },
-        {
-          "lemma": "得る",
-          "pos": "Verb",
-          "surface": "得"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "ない"
-        }
-      ]
+      "input": "解決し得ない"
     },
     {
       "accepted_diff": {
@@ -92,10 +69,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "POS/lemma limitation: surfaces match, POS classification differs from MeCab"
-      },
       "description": "Sahen noun + shi + eru/enai should split at shi boundary",
       "expected": [
         {
@@ -120,29 +93,7 @@
         }
       ],
       "id": "rikai_shi_enai",
-      "input": "理解し得ない",
-      "suzume_expected": [
-        {
-          "lemma": "理解",
-          "pos": "Noun",
-          "surface": "理解"
-        },
-        {
-          "lemma": "し",
-          "pos": "Particle",
-          "surface": "し"
-        },
-        {
-          "lemma": "得る",
-          "pos": "Verb",
-          "surface": "得"
-        },
-        {
-          "lemma": "ない",
-          "pos": "Auxiliary",
-          "surface": "ない"
-        }
-      ]
+      "input": "理解し得ない"
     },
     {
       "description": "Sahen noun + shi + subsidiary verb should split at shi boundary",

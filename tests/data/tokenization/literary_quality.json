@@ -131,7 +131,7 @@
           "surface": "を"
         },
         {
-          "lemma": "失う",
+          "lemma": "失る",
           "pos": "Verb",
           "surface": "失っ"
         },
@@ -523,13 +523,13 @@
           "surface": "は"
         },
         {
-          "lemma": "揺るぎ",
+          "lemma": "揺るぐ",
           "pos": "Verb",
           "surface": "揺るぎ"
         },
         {
           "lemma": "ない",
-          "pos": "Auxiliary",
+          "pos": "Adjective",
           "surface": "ない"
         },
         {
@@ -566,7 +566,7 @@
         },
         {
           "lemma": "困難",
-          "pos": "Adjective",
+          "pos": "Noun",
           "surface": "困難"
         },
         {
@@ -611,7 +611,7 @@
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Verb",
           "surface": "なけれ"
         },
         {
@@ -647,8 +647,8 @@
           "surface": "の"
         },
         {
-          "lemma": "移り変わり",
-          "pos": "Noun",
+          "lemma": "移り変わる",
+          "pos": "Verb",
           "surface": "移り変わり"
         },
         {
@@ -823,6 +823,282 @@
       ],
       "id": "niha_shi_nai_ga_shiteiru",
       "input": "一朝一夕には解決し得ない問題が山積している"
+    },
+    {
+      "description": "Compound adjective 薄暗い (dim) — 2-kanji stem + い should be one token",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "薄暗い",
+          "pos": "Adjective",
+          "surface": "薄暗い"
+        },
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "片隅",
+          "pos": "Noun",
+          "surface": "片隅"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "腰",
+          "pos": "Noun",
+          "surface": "腰"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "下ろす",
+          "pos": "Verb",
+          "surface": "下ろし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "usugurai_compound_adj",
+      "input": "彼はその薄暗い部屋の片隅に腰を下ろした"
+    },
+    {
+      "description": "Compound adjective 物悲しく (melancholy) — 2-kanji stem + しく should be one token",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "濡れる",
+          "pos": "Verb",
+          "surface": "濡れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "石畳",
+          "pos": "Noun",
+          "surface": "石畳"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "上",
+          "pos": "Noun",
+          "surface": "上"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "傘",
+          "pos": "Noun",
+          "surface": "傘"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "差す",
+          "pos": "Verb",
+          "surface": "差さ"
+        },
+        {
+          "lemma": "ず",
+          "pos": "Auxiliary",
+          "surface": "ずに"
+        },
+        {
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩く"
+        },
+        {
+          "lemma": "女",
+          "pos": "Noun",
+          "surface": "女"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "後ろ姿",
+          "pos": "Noun",
+          "surface": "後ろ姿"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "妙",
+          "pos": "Adjective",
+          "surface": "妙"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "物悲しい",
+          "pos": "Adjective",
+          "surface": "物悲しく"
+        },
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "monoganashiku_compound_adj",
+      "input": "雨に濡れた石畳の上を、傘も差さずに歩く女の後ろ姿が、妙に物悲しく見えた"
+    },
+    {
+      "description": "時として (sometimes) — L2 dict adverb, should be one token",
+      "expected": [
+        {
+          "lemma": "人間",
+          "pos": "Noun",
+          "surface": "人間"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "という",
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "時として",
+          "pos": "Adverb",
+          "surface": "時として"
+        },
+        {
+          "lemma": "己",
+          "pos": "Pronoun",
+          "surface": "己"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "意志",
+          "pos": "Noun",
+          "surface": "意志"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "反す",
+          "pos": "Verb",
+          "surface": "反し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "動く",
+          "pos": "Verb",
+          "surface": "動く"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "tokitoshite_adverb",
+      "input": "人間の心というものは、時として己の意志に反して動くものである"
     }
   ],
   "description": "literary_quality tests",

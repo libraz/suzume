@@ -520,6 +520,12 @@ BigramTable::initTable() {
   // Use same bonus as DET→NOUN so the の+は split path can compete
   setCell(t, EPOS::Determiner, EPOS::ParticleNo, kDeterminerNounBonus);
 
+  // Determiner → Adjective (その+薄暗い+部屋, この+大きい+建物)
+  // Determiners modify adjective+noun combinations in Japanese
+  // Uses same bonus as DET→NOUN to allow adjective path to compete
+  setCell(t, EPOS::Determiner, EPOS::AdjBasic, kDeterminerNounBonus);
+  setCell(t, EPOS::Determiner, EPOS::AdjRenyokei, kDeterminerNounBonus);
+
   // =========================================================================
   // Noun → Verb (サ変動詞パターン)
   // =========================================================================
