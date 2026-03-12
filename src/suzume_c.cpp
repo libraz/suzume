@@ -118,6 +118,13 @@ SUZUME_EXPORT suzume_result_t* suzume_analyze(suzume_t handle,
         result->morphemes[idx].conj_type = nullptr;
         result->morphemes[idx].conj_form = nullptr;
       }
+
+      // Extended POS
+      auto epos_str = suzume::core::extendedPosToString(morph.extended_pos);
+      auto* epos = new char[epos_str.size() + 1];
+      std::memcpy(epos, epos_str.data(), epos_str.size());
+      epos[epos_str.size()] = '\0';
+      result->morphemes[idx].extended_pos = epos;
     }
 
     return result;
@@ -147,6 +154,8 @@ SUZUME_EXPORT void suzume_result_free(suzume_result_t* result) {
       delete[] const_cast<char*>(result->morphemes[idx].conj_type);
       // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       delete[] const_cast<char*>(result->morphemes[idx].conj_form);
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+      delete[] const_cast<char*>(result->morphemes[idx].extended_pos);
     }
     delete[] result->morphemes;
   }

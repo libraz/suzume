@@ -154,6 +154,22 @@ bool shouldSkipSouPattern(std::string_view surface, grammar::VerbType verb_type)
 bool isCompoundAdjectivePattern(std::string_view surface);
 
 /**
+ * @brief Check if surface contains adj renyokei + なる conjugation pattern
+ *
+ * Matches: くなっ, くなり, くなる, くなれ anywhere in the string.
+ * Used to skip/penalize false candidates that absorb adj く-form + なる.
+ */
+bool containsKuNaruPattern(std::string_view surface);
+
+/**
+ * @brief Check if surface ends with adj renyokei + なる conjugation pattern
+ *
+ * Matches: くなる, くなっ, くなり, くなれ, くなら, くなった, くなって at the end.
+ * Used to penalize kanji i-adjective candidates absorbing く+なる suffix.
+ */
+bool endsWithKuNaruPattern(std::string_view surface);
+
+/**
  * @brief Check if verb type is a Godan verb
  */
 bool isGodanVerbType(grammar::VerbType verb_type);

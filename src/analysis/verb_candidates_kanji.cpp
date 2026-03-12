@@ -1122,10 +1122,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // e.g., 得なくなった should split as 得+なく+なっ+た, not merge as 得る(ichidan)
           // The suffix contains くなっ/くなり/くなる/くなれ = adj renyokei + なる conjugation
           if (!best.suffix.empty() &&
-              (best.suffix.find("くなっ") != std::string::npos ||
-               best.suffix.find("くなり") != std::string::npos ||
-               best.suffix.find("くなる") != std::string::npos ||
-               best.suffix.find("くなれ") != std::string::npos)) {
+              vh::containsKuNaruPattern(best.suffix)) {
             base_cost += bigram_cost::kSevere;  // Force split
             SUZUME_DEBUG_LOG("[COST_ADJ] \"" << surface << "\" +" << bigram_cost::kSevere << " (ku_naru_verb_suffix)\n");
           }

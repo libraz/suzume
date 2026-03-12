@@ -60,11 +60,6 @@ if(BUILD_WASM)
   )
 endif()
 
-# CLI executable (legacy)
-if(BUILD_CLI AND NOT BUILD_WASM)
-  add_subdirectory(cli)
-endif()
-
 # Independent CLI tool (suzume-cli)
 if(NOT BUILD_WASM)
   add_subdirectory(suzume-cli)

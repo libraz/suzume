@@ -368,6 +368,7 @@ std::vector<core::Morpheme> Analyzer::analyzeChunk(std::string_view text,
     core::Morpheme morpheme;
     morpheme.surface = std::string(edge.surface);
     morpheme.pos = edge.pos;
+    morpheme.extended_pos = edge.extended_pos;
     morpheme.start = char_offset + edge.start;
     morpheme.end = char_offset + edge.end;
     morpheme.start_pos = char_offset + edge.start;
@@ -409,6 +410,7 @@ std::vector<core::Morpheme> Analyzer::pathToMorphemes(const core::ViterbiResult&
     core::Morpheme morpheme;
     morpheme.surface = std::string(edge.surface);
     morpheme.pos = edge.pos;
+    morpheme.extended_pos = edge.extended_pos;
     morpheme.start = edge.start;
     morpheme.end = edge.end;
     morpheme.start_pos = edge.start;

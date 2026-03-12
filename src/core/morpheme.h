@@ -21,6 +21,7 @@ struct Morpheme {
   size_t start{0};                       // Start character index
   size_t end{0};                         // End character index
   PartOfSpeech pos{PartOfSpeech::Noun};  // Part of speech
+  ExtendedPOS extended_pos{ExtendedPOS::Unknown};  // Extended (fine-grained) POS
   std::string lemma;                     // Lemma (for verbs/adjectives)
   std::string reading;                   // Reading in hiragana
   dictionary::ConjugationType conj_type{dictionary::ConjugationType::None};  // Conjugation type

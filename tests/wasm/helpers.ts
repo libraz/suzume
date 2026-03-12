@@ -31,8 +31,8 @@ export function allocString(module: WasmModule, text: string): number {
   return ptr;
 }
 
-// suzume_morpheme_t layout: 7 pointers (28 bytes on wasm32)
-export const MORPHEME_SIZE = 28;
+// suzume_morpheme_t layout: 8 pointers (32 bytes on wasm32)
+export const MORPHEME_SIZE = 32;
 
 export interface ParsedMorpheme {
   surface: string;
@@ -42,6 +42,7 @@ export interface ParsedMorpheme {
   posJa: string;
   conjType: string | null;
   conjForm: string | null;
+  extendedPos: string;
 }
 
 export function parseMorphemes(module: WasmModule, resultPtr: number): ParsedMorpheme[] {
@@ -58,6 +59,7 @@ export function parseMorphemes(module: WasmModule, resultPtr: number): ParsedMor
     const posJaPtr = module.HEAPU32[(morphPtr >> 2) + 4];
     const conjTypePtr = module.HEAPU32[(morphPtr >> 2) + 5];
     const conjFormPtr = module.HEAPU32[(morphPtr >> 2) + 6];
+    const extendedPosPtr = module.HEAPU32[(morphPtr >> 2) + 7];
 
     morphemes.push({
       surface: module.UTF8ToString(surfacePtr),
@@ -67,6 +69,7 @@ export function parseMorphemes(module: WasmModule, resultPtr: number): ParsedMor
       posJa: module.UTF8ToString(posJaPtr),
       conjType: conjTypePtr !== 0 ? module.UTF8ToString(conjTypePtr) : null,
       conjForm: conjFormPtr !== 0 ? module.UTF8ToString(conjFormPtr) : null,
+      extendedPos: module.UTF8ToString(extendedPosPtr),
     });
   }
   return morphemes;

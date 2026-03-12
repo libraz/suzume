@@ -179,6 +179,7 @@ std::vector<core::Morpheme> Postprocessor::convertPrefixVerbToNoun(
         // e.g., 願い(VERB) → 願い(NOUN) after お
         if (m.pos == core::PartOfSpeech::Verb) {
           m.pos = core::PartOfSpeech::Noun;
+          m.extended_pos = core::ExtendedPOS::Noun;
           // Keep surface as lemma for nominalized form
           m.lemma = m.surface;
           SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Nominalized: " << m.surface
@@ -213,6 +214,7 @@ std::vector<core::Morpheme> Postprocessor::mergeVerbRenyokeiMono(
       core::Morpheme merged = morphemes[i];
       merged.surface += morphemes[i + 1].surface;
       merged.pos = core::PartOfSpeech::Noun;
+      merged.extended_pos = core::ExtendedPOS::Noun;
       merged.lemma = merged.surface;
       merged.end = morphemes[i + 1].end;
       merged.end_pos = morphemes[i + 1].end_pos;

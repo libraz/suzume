@@ -55,6 +55,8 @@ export interface Morpheme {
   conjType: string | null;
   /** Conjugation form (Japanese, e.g., "連用形", "終止形") - null for non-conjugating words */
   conjForm: string | null;
+  /** Extended POS subcategory (English, e.g., "VerbRenyokei", "AuxTenseTa") */
+  extendedPos: string;
 }
 
 /**
@@ -396,7 +398,7 @@ export class Suzume {
 
     const morphemes: Morpheme[] = [];
 
-    // suzume_morpheme_t layout (7 pointers = 28 bytes on wasm32):
+    // suzume_morpheme_t layout (8 pointers = 32 bytes on wasm32):
     // - surface: pointer
     // - pos: pointer
     // - base_form: pointer
@@ -404,7 +406,8 @@ export class Suzume {
     // - pos_ja: pointer
     // - conj_type: pointer
     // - conj_form: pointer
-    const MORPHEME_SIZE = 28;
+    // - extended_pos: pointer
+    const MORPHEME_SIZE = 32;
 
     for (let idx = 0; idx < count; idx++) {
       const morphPtr = morphemesPtr + idx * MORPHEME_SIZE;
@@ -415,6 +418,7 @@ export class Suzume {
       const posJaPtr = HEAPU32[(morphPtr >> 2) + 4];
       const conjTypePtr = HEAPU32[(morphPtr >> 2) + 5];
       const conjFormPtr = HEAPU32[(morphPtr >> 2) + 6];
+      const extendedPosPtr = HEAPU32[(morphPtr >> 2) + 7];
 
       morphemes.push({
         surface: this.module.UTF8ToString(surfacePtr),
@@ -424,6 +428,7 @@ export class Suzume {
         posJa: this.module.UTF8ToString(posJaPtr),
         conjType: conjTypePtr !== 0 ? this.module.UTF8ToString(conjTypePtr) : null,
         conjForm: conjFormPtr !== 0 ? this.module.UTF8ToString(conjFormPtr) : null,
+        extendedPos: this.module.UTF8ToString(extendedPosPtr),
       });
     }
 

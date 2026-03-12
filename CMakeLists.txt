@@ -18,7 +18,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Build options
-option(BUILD_CLI "Build CLI executable" ON)
 option(BUILD_TESTING "Build tests" ON)
 option(BUILD_WASM "Build for WebAssembly" OFF)
 option(ENABLE_COVERAGE "Enable code coverage" OFF)

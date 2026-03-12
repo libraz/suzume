@@ -36,13 +36,20 @@ set(TEST_SOURCES
   ${CLI_SOURCES_FOR_TESTS}
   cli/dict_compiler_test.cpp
   core/types_test.cpp
+  core/types_extended_test.cpp
+  core/error_test.cpp
+  core/string_pool_test.cpp
   normalize/utf8_test.cpp
+  normalize/char_type_test.cpp
   normalize/normalizer_test.cpp
   dictionary/trie_test.cpp
   dictionary/double_array_test.cpp
   dictionary/binary_dict_test.cpp
   # dictionary/core_dict_test.cpp  # v0.8: removed (verb expansion deleted)
   dictionary/user_dict_test.cpp
+  dictionary/dict_string_pool_test.cpp
+  grammar/conjugator_test.cpp
+  grammar/connection_test.cpp
   grammar/conjugation_test.cpp
   grammar/inflection_basic_test.cpp
   grammar/inflection_potential_test.cpp
@@ -57,6 +64,7 @@ set(TEST_SOURCES
   analysis/scorer_options_loader_test.cpp
   output/japanese_format_test.cpp
   postprocess/tag_generator_test.cpp
+  integration/suzume_api_test.cpp
   # Universal test: auto-discovers all JSON files in tests/data/tokenization/
   # New JSON files are automatically picked up without creating C++ files
   integration/universal_tokenization_test.cpp

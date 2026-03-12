@@ -698,13 +698,7 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
         // Must have at least 2 chars before くなる to avoid penalizing standalone patterns
         if (!is_dict_adjective && surface.size() >= 3 * core::kJapaneseCharBytes) {
           // Check for くなる/くなっ/くなり/くなれ/くなら/くなった patterns
-          if (utf8::endsWith(surface, "くなる") ||
-              utf8::endsWith(surface, "くなっ") ||
-              utf8::endsWith(surface, "くなり") ||
-              utf8::endsWith(surface, "くなれ") ||
-              utf8::endsWith(surface, "くなら") ||
-              utf8::endsWith(surface, "くなった") ||
-              utf8::endsWith(surface, "くなって")) {
+          if (verb_helpers::endsWithKuNaruPattern(surface)) {
             cost += candidate::kAdjSplitForcePenalty;  // Force adj く-form + なる split
             SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (ku_naru_split)\n");
           }
@@ -1334,10 +1328,7 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         // Skip adj renyokei + なる patterns — these are adj く-form + auxiliary verb なる
         // e.g., なくなった = なく(adj renyokei) + なっ(なる) + た, not a single adjective
         //       よくなった = よく(adj renyokei) + なっ(なる) + た
-        if (surface.find("くなっ") != std::string::npos ||
-            surface.find("くなり") != std::string::npos ||
-            surface.find("くなる") != std::string::npos ||
-            surface.find("くなれ") != std::string::npos) {
+        if (verb_helpers::containsKuNaruPattern(surface)) {
           continue;
         }
         // Base cost for hiragana i-adjective candidates
