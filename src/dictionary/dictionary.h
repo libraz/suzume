@@ -60,6 +60,7 @@ struct LookupResult {
   uint32_t entry_id;
   size_t length;           // Match length in characters
   const DictionaryEntry* entry;
+  bool from_user_dict = false;  // True if from user dictionary (Layer 4)
 };
 
 /**

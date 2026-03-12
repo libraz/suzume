@@ -3543,6 +3543,284 @@
       ],
       "id": "literary_zenshin_shitsuzukeru",
       "input": "幾多の困難を乗り越えてなお前進し続ける姿勢"
+    },
+    {
+      "description": "太宰治 人間失格冒頭 — てきました auxiliary chain",
+      "expected": [
+        {
+          "lemma": "恥",
+          "pos": "Noun",
+          "surface": "恥"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "多い",
+          "pos": "Adjective",
+          "surface": "多い"
+        },
+        {
+          "lemma": "生涯",
+          "pos": "Noun",
+          "surface": "生涯"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "送る",
+          "pos": "Verb",
+          "surface": "送っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ningen_shikkaku_opening",
+      "input": "恥の多い生涯を送ってきました"
+    },
+    {
+      "description": "敬語多重化 + にもかかわらず — honorific prefix + くださる",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "忙しい",
+          "pos": "Noun",
+          "surface": "忙しい"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "かかわる",
+          "pos": "Verb",
+          "surface": "かかわら"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        },
+        {
+          "lemma": "丁寧",
+          "pos": "Adjective",
+          "surface": "丁寧"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "答え",
+          "pos": "Noun",
+          "surface": "答え"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "keigo_nimokakawrazu",
+      "input": "先生はお忙しいにもかかわらず丁寧にお答えくださいました"
+    },
+    {
+      "description": "四字熟語 千変万化 + 硬い書き言葉",
+      "expected": [
+        {
+          "lemma": "千変万化",
+          "pos": "Noun",
+          "surface": "千変万化"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "lemma": "世の中",
+          "pos": "Noun",
+          "surface": "世の中"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "不変",
+          "pos": "Noun",
+          "surface": "不変"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "など",
+          "pos": "Particle",
+          "surface": "など"
+        },
+        {
+          "lemma": "存在",
+          "pos": "Noun",
+          "surface": "存在"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "yojijukugo_senpenbanke",
+      "input": "千変万化する世の中にあって不変のものなど存在しない"
+    },
+    {
+      "description": "受動態+ほか+否定 — 書き言葉パターン",
+      "expected": [
+        {
+          "lemma": "一切",
+          "pos": "Noun",
+          "surface": "一切"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "時",
+          "pos": "Noun",
+          "surface": "時"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "流れる",
+          "pos": "Verb",
+          "surface": "流れ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "委ねる",
+          "pos": "Verb",
+          "surface": "委ね"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られる"
+        },
+        {
+          "lemma": "ほか",
+          "pos": "Noun",
+          "surface": "ほか"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "yudane_rareru_hoka",
+      "input": "一切は時の流れに委ねられるほかはなかった"
     }
   ],
   "description": "literary_classics tests",

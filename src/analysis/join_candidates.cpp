@@ -67,6 +67,9 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"倒す", "たおす", "す", V2VerbType::Godan},    // 打ち倒す, 蹴り倒す
     {"起こす", "おこす", "す", V2VerbType::Godan},  // 引き起こす, 呼び起こす
     {"去る", "さる", "る", V2VerbType::Godan},      // 立ち去る, 走り去る
+    {"開く", "ひらく", "く", V2VerbType::Godan},    // 切り開く, 押し開く
+    {"組む", "くむ", "む", V2VerbType::Godan},      // 取り組む, 組み組む
+    {"上る", "のぼる", "る", V2VerbType::Godan},    // 立ち上る, 這い上る
     // Ichidan verbs (一段)
     {"続ける", "つづける", "ける", V2VerbType::Ichidan}, // 読み続ける, 読みつづける
     {"つける", nullptr, "ける", V2VerbType::Ichidan},    // 見つける

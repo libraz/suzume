@@ -70,7 +70,7 @@
     "pre-commit": "yarn lint-staged"
   },
   "lint-staged": {
-    "*.{ts,js}": [
+    "{js,tests/wasm}/**/*.{ts,js}": [
       "biome check --write"
     ]
   }

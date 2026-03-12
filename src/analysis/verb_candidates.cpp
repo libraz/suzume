@@ -124,6 +124,19 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
         continue;
       }
 
+      // Skip inflection candidates whose suffix includes auxiliary endings
+      // (た, て, で, たら, etc.) that should be separate tokens.
+      // E.g., 振る舞った → suffix="った" includes た (past tense aux)
+      // The shorter form (振る舞っ, onbinkei) will be matched in a later iteration,
+      // allowing proper split: 振る舞っ + た
+      if (utf8::endsWith(infl_cand.suffix, "た") ||
+          utf8::endsWith(infl_cand.suffix, "て") ||
+          utf8::endsWith(infl_cand.suffix, "で") ||
+          utf8::endsWith(infl_cand.suffix, "たら") ||
+          utf8::endsWith(infl_cand.suffix, "たり")) {
+        continue;
+      }
+
       // Check if base form exists in dictionary as a verb
       auto results = dict_manager->lookup(infl_cand.base_form, 0);
       for (const auto& result : results) {

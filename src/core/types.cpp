@@ -119,6 +119,25 @@ PartOfSpeech stringToPos(std::string_view str) {
   return PartOfSpeech::Other;
 }
 
+ExtendedPOS posToDefaultExtendedPOS(PartOfSpeech pos) {
+  switch (pos) {
+    case PartOfSpeech::Noun: return ExtendedPOS::Noun;
+    case PartOfSpeech::Verb: return ExtendedPOS::VerbShuushikei;
+    case PartOfSpeech::Adjective: return ExtendedPOS::AdjBasic;
+    case PartOfSpeech::Adverb: return ExtendedPOS::Adverb;
+    case PartOfSpeech::Particle: return ExtendedPOS::ParticleCase;
+    case PartOfSpeech::Auxiliary: return ExtendedPOS::AuxTenseTa;
+    case PartOfSpeech::Pronoun: return ExtendedPOS::Pronoun;
+    case PartOfSpeech::Conjunction: return ExtendedPOS::Conjunction;
+    case PartOfSpeech::Determiner: return ExtendedPOS::Determiner;
+    case PartOfSpeech::Prefix: return ExtendedPOS::Prefix;
+    case PartOfSpeech::Suffix: return ExtendedPOS::Suffix;
+    case PartOfSpeech::Symbol: return ExtendedPOS::Symbol;
+    case PartOfSpeech::Interjection: return ExtendedPOS::Interjection;
+    default: return ExtendedPOS::Unknown;
+  }
+}
+
 bool isTaggable(PartOfSpeech pos) {
   return pos == PartOfSpeech::Noun || pos == PartOfSpeech::Verb || pos == PartOfSpeech::Adjective ||
          pos == PartOfSpeech::Adverb;

@@ -66,6 +66,9 @@ std::vector<LookupResult> DictionaryManager::lookup(std::string_view text,
   // Lookup in custom user dictionaries (Layer 4: CSV/TSV files)
   for (const auto& user_dict : user_dicts_) {
     auto user_results = user_dict->lookup(text, start_pos);
+    for (auto& r : user_results) {
+      r.from_user_dict = true;
+    }
     results.insert(results.end(), user_results.begin(), user_results.end());
   }
 

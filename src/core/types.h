@@ -221,6 +221,14 @@ std::string_view posToJapanese(PartOfSpeech pos);
 PartOfSpeech stringToPos(std::string_view str);
 
 /**
+ * @brief Map PartOfSpeech to a default ExtendedPOS
+ *
+ * Used by user dictionary (Layer 4) entries which only specify POS,
+ * not ExtendedPOS. Maps to the most common/neutral ExtendedPOS for each POS.
+ */
+ExtendedPOS posToDefaultExtendedPOS(PartOfSpeech pos);
+
+/**
  * @brief Check if POS is taggable (content word)
  */
 bool isTaggable(PartOfSpeech pos);

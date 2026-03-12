@@ -323,6 +323,12 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("られ", "られる", EPOS::AuxPassive),
       aux("られる", "られる", EPOS::AuxPassive),
 
+      // Potential auxiliary - 得る (える/うる)
+      // Literary potential: し+え+ない (cannot do), し+える (can do)
+      aux("え", "える", EPOS::AuxPotential),    // renyokei: 看過しえない
+      aux("える", "える", EPOS::AuxPotential),  // shuushikei: 看過しえる
+      aux("うる", "うる", EPOS::AuxPotential),   // alternative shuushikei: 看過しうる
+
       // Suru verb stem forms (サ変動詞語幹活用形) - VERB, not AUX
       verb("し", "する", EPOS::VerbRenyokei),
       verb("す", "する", EPOS::VerbShuushikei),

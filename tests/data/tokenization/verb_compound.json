@@ -1222,6 +1222,145 @@
       ],
       "id": "mi_mareru",
       "input": "読み込まれる"
+    },
+    {
+      "description": "切り開いた - auto-generated",
+      "expected": [
+        {
+          "lemma": "切り開く",
+          "pos": "Verb",
+          "surface": "切り開い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ri_ita",
+      "input": "切り開いた"
+    },
+    {
+      "description": "取り組んできた - auto-generated",
+      "expected": [
+        {
+          "lemma": "取り組む",
+          "pos": "Verb",
+          "surface": "取り組ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ri_ndekita",
+      "input": "取り組んできた"
+    },
+    {
+      "description": "立ち上っていた - auto-generated",
+      "expected": [
+        {
+          "lemma": "立ち上る",
+          "pos": "Verb",
+          "surface": "立ち上っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "chi_ttteita",
+      "input": "立ち上っていた"
+    },
+    {
+      "description": "振る舞った - auto-generated",
+      "expected": [
+        {
+          "lemma": "振る舞う",
+          "pos": "Verb",
+          "surface": "振る舞っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ru_ttta",
+      "input": "振る舞った"
+    },
+    {
+      "description": "切り開かれた - auto-generated",
+      "expected": [
+        {
+          "lemma": "切り開く",
+          "pos": "Verb",
+          "surface": "切り開か"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ri_kareta",
+      "input": "切り開かれた"
+    },
+    {
+      "description": "取り組む - auto-generated",
+      "expected": [
+        {
+          "lemma": "取り組む",
+          "pos": "Verb",
+          "surface": "取り組む"
+        }
+      ],
+      "id": "ri_mu",
+      "input": "取り組む"
+    },
+    {
+      "description": "押し開いた - auto-generated",
+      "expected": [
+        {
+          "lemma": "押し開く",
+          "pos": "Verb",
+          "surface": "押し開い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shi_ita",
+      "input": "押し開いた"
     }
   ],
   "description": "Compound verbs",

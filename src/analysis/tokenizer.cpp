@@ -109,6 +109,9 @@ void Tokenizer::addDictionaryCandidates(
     // Create edge
     // v0.8: flags derived from extended_pos, cost from getCategoryCost()
     uint8_t flags = core::LatticeEdge::kFromDictionary;
+    if (result.from_user_dict) {
+      flags |= core::LatticeEdge::kFromUserDict;
+    }
     if (result.entry->extended_pos == core::ExtendedPOS::NounFormal) {
       flags |= core::LatticeEdge::kIsFormalNoun;
     }

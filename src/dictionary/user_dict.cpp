@@ -140,6 +140,7 @@ core::Expected<size_t, core::Error> UserDictionary::parseCSV(
       }
     }
 
+    entry.extended_pos = core::posToDefaultExtendedPOS(entry.pos);
     addEntry(entry);
     ++count;
   }
