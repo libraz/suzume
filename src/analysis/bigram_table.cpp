@@ -548,6 +548,14 @@ BigramTable::initTable() {
   // For idiomatic patterns meaning "certain" or "no doubt"
   setCell(t, EPOS::Noun, EPOS::AuxNegativeNai, cost::kModerateBonus);
 
+  // Noun → AuxCausative (色褪+せる) - strong penalty
+  // Causative auxiliary only follows verb mizenkei, never nouns
+  setCell(t, EPOS::Noun, EPOS::AuxCausative, cost::kStrong);
+
+  // Noun → AuxPassive (色褪+れる) - strong penalty
+  // Passive auxiliary only follows verb mizenkei, never nouns
+  setCell(t, EPOS::Noun, EPOS::AuxPassive, cost::kStrong);
+
   // Noun → AuxAspectIru (驚+い) - moderate penalty
   // Nouns don't directly connect to いる auxiliary; need particle (彼が+いる)
   // Prevents 驚+い+た from beating 驚い+た for verb onbin form
@@ -844,10 +852,11 @@ BigramTable::initTable() {
   // Prohibited/Penalized Connections (Grammatically Invalid or Unlikely)
   // =========================================================================
 
-  // Note: VerbRenyokei → VerbRenyokei is NOT prohibited because:
-  // - Legitimate: 食べ+すぎる (auxiliary verb compound)
-  // - Spurious cases like 食べ→るみ are handled by scorer penalty for
-  //   non-dictionary kanji+hiragana verb renyokei candidates
+  // Note: VerbRenyokei → VerbRenyokei is NOT explicitly bonused because
+  // a bonus breaks compound verbs (抱きしめて→抱き+しめ+て).
+  // Legitimate patterns like 食べ+すぎる are handled by compound verb path.
+  // Honorific patterns (待ち+いただけ) are handled by penalizing false
+  // godan-wa candidates in verb_candidates_kanji.cpp.
 
   // VerbTaForm → VerbMizenkei (盛りだ+くさ) - strong penalty
   // Two verbs in sequence without auxiliary/particle is grammatically unusual

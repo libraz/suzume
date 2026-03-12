@@ -590,9 +590,17 @@ void addCompoundVerbJoinCandidates(
             // Use 0.3 threshold for inflected forms since short stems get lower confidence
             // Require the suffix to contain actual auxiliary patterns (た/て/etc.),
             // not just renyokei endings (し/み/etc.) to ensure complete inflected form
+            //
+            // Verify verb type consistency: if V2 is godan, reject ichidan
+            // inflection matches (and vice versa). This prevents e.g. いた
+            // (ichidan いる ta-form) from falsely matching godan 入る(いる).
             if (infl_result.confidence >= 0.3F &&
                 infl_result.base_form == expected_base &&
-                hasAuxiliarySuffix(infl_result.suffix)) {
+                hasAuxiliarySuffix(infl_result.suffix) &&
+                !(v2_verb.verb_type == V2VerbType::Godan &&
+                  infl_result.verb_type == grammar::VerbType::Ichidan) &&
+                !(v2_verb.verb_type == V2VerbType::Ichidan &&
+                  infl_result.verb_type != grammar::VerbType::Ichidan)) {
               matched_inflected = true;
               matched_len = v2_end_byte - v2_start_byte;
               inflection_includes_aux = true;  // Mark that this match includes aux

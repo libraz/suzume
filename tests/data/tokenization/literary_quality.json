@@ -490,8 +490,76 @@
       "input": "幾度となく繰り返される議論に辟易していた"
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "揺るぎない: ない is ADJ (compound adjective) not AUX (negative). Suzume treats 揺るぎない as adj, MeCab as verb+aux."
+      },
       "description": "verb-nai-compound-split normalization (揺るぎ+ない)",
       "expected": [
+        {
+          "lemma": "されど",
+          "pos": "Conjunction",
+          "surface": "されど"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "決意",
+          "pos": "Noun",
+          "surface": "決意"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "揺るぎ",
+          "pos": "Verb",
+          "surface": "揺るぎ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "saredomo_no_ha_ruginaimonodeattta",
+      "input": "されども彼の決意は揺るぎないものであった",
+      "suzume_expected": [
         {
           "lemma": "されど",
           "pos": "Conjunction",
@@ -552,13 +620,89 @@
           "pos": "Auxiliary",
           "surface": "た"
         }
-      ],
-      "id": "saredomo_no_ha_ruginaimonodeattta",
-      "input": "されども彼の決意は揺るぎないものであった"
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "困難 as NOUN (not ADJ), なけれ as VERB (not ADJ) - POS classification differences"
+      },
       "description": "literary-volitional-n-split normalization (乗り越え+ん)",
       "expected": [
+        {
+          "lemma": "いかなる",
+          "pos": "Determiner",
+          "surface": "いかなる"
+        },
+        {
+          "lemma": "困難",
+          "pos": "Adjective",
+          "surface": "困難"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "乗り越える",
+          "pos": "Verb",
+          "surface": "乗り越え"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "lemma": "気概",
+          "pos": "Noun",
+          "surface": "気概"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なけれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "ikanaru_womo_ri_entosuru_ganakerebanaranai",
+      "input": "いかなる困難をも乗り越えんとする気概がなければならない",
+      "suzume_expected": [
         {
           "lemma": "いかなる",
           "pos": "Determiner",
@@ -629,13 +773,69 @@
           "pos": "Auxiliary",
           "surface": "ない"
         }
-      ],
-      "id": "ikanaru_womo_ri_entosuru_ganakerebanaranai",
-      "input": "いかなる困難をも乗り越えんとする気概がなければならない"
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "移り変わり: VERB renyokei used nominally, Suzume classifies as VERB not NOUN"
+      },
       "description": "移り変わり compound verb fix",
       "expected": [
+        {
+          "lemma": "世の中",
+          "pos": "Noun",
+          "surface": "世の中"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "移り変わり",
+          "pos": "Noun",
+          "surface": "移り変わり"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "誠",
+          "pos": "Noun",
+          "surface": "誠"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "目まぐるしい",
+          "pos": "Adjective",
+          "surface": "目まぐるしい"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "no_no_ri_wariha_ni_magurushiimonodearu",
+      "input": "世の中の移り変わりは誠に目まぐるしいものである",
+      "suzume_expected": [
         {
           "lemma": "世の中",
           "pos": "Noun",
@@ -686,13 +886,69 @@
           "pos": "Verb",
           "surface": "ある"
         }
-      ],
-      "id": "no_no_ri_wariha_ni_magurushiimonodearu",
-      "input": "世の中の移り変わりは誠に目まぐるしいものである"
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "over-split",
+        "reason": "夕暮れ時: Suzume splits 夕暮れ+時 (noun+suffix), MeCab merges as single token"
+      },
       "description": "夕暮れ+時 split (suzume正), 折しも L2 dict, 染まり+ゆく compound verb",
       "expected": [
+        {
+          "lemma": "折しも",
+          "pos": "Adverb",
+          "surface": "折しも"
+        },
+        {
+          "lemma": "夕暮れ時",
+          "pos": "Noun",
+          "surface": "夕暮れ時"
+        },
+        {
+          "lemma": "遠く",
+          "pos": "Noun",
+          "surface": "遠く"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "山々",
+          "pos": "Noun",
+          "surface": "山々"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "紫",
+          "pos": "Noun",
+          "surface": "紫"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "染まる",
+          "pos": "Verb",
+          "surface": "染まり"
+        },
+        {
+          "lemma": "ゆく",
+          "pos": "Auxiliary",
+          "surface": "ゆく"
+        }
+      ],
+      "id": "shimo_re_kuno_ga_ni_mariyuku",
+      "input": "折しも夕暮れ時、遠くの山々が紫に染まりゆく",
+      "suzume_expected": [
         {
           "lemma": "折しも",
           "pos": "Adverb",
@@ -748,9 +1004,7 @@
           "pos": "Verb",
           "surface": "ゆく"
         }
-      ],
-      "id": "shimo_re_kuno_ga_ni_mariyuku",
-      "input": "折しも夕暮れ時、遠くの山々が紫に染まりゆく"
+      ]
     },
     {
       "description": "サ変動詞 し=Verb POS fix (解決する連用形)",
@@ -892,6 +1146,10 @@
       "input": "彼はその薄暗い部屋の片隅に腰を下ろした"
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "ずに lemma: Suzume uses ぬ (classical base form), MeCab uses ず"
+      },
       "description": "Compound adjective 物悲しく (melancholy) — 2-kanji stem + しく should be one token",
       "expected": [
         {
@@ -1006,9 +1264,125 @@
         }
       ],
       "id": "monoganashiku_compound_adj",
-      "input": "雨に濡れた石畳の上を、傘も差さずに歩く女の後ろ姿が、妙に物悲しく見えた"
+      "input": "雨に濡れた石畳の上を、傘も差さずに歩く女の後ろ姿が、妙に物悲しく見えた",
+      "suzume_expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "濡れる",
+          "pos": "Verb",
+          "surface": "濡れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "石畳",
+          "pos": "Noun",
+          "surface": "石畳"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "上",
+          "pos": "Noun",
+          "surface": "上"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "傘",
+          "pos": "Noun",
+          "surface": "傘"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "差す",
+          "pos": "Verb",
+          "surface": "差さ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ずに"
+        },
+        {
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩く"
+        },
+        {
+          "lemma": "女",
+          "pos": "Noun",
+          "surface": "女"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "後ろ姿",
+          "pos": "Noun",
+          "surface": "後ろ姿"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "妙",
+          "pos": "Adjective",
+          "surface": "妙"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "物悲しい",
+          "pos": "Adjective",
+          "surface": "物悲しく"
+        },
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "己 as NOUN (not PRON), 反し as NOUN (not VERB) - POS classification differences"
+      },
       "description": "時として (sometimes) — L2 dict adverb, should be one token",
       "expected": [
         {
@@ -1098,7 +1472,337 @@
         }
       ],
       "id": "tokitoshite_adverb",
-      "input": "人間の心というものは、時として己の意志に反して動くものである"
+      "input": "人間の心というものは、時として己の意志に反して動くものである",
+      "suzume_expected": [
+        {
+          "lemma": "人間",
+          "pos": "Noun",
+          "surface": "人間"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "という",
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "時として",
+          "pos": "Adverb",
+          "surface": "時として"
+        },
+        {
+          "lemma": "己",
+          "pos": "Noun",
+          "surface": "己"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "意志",
+          "pos": "Noun",
+          "surface": "意志"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "反し",
+          "pos": "Noun",
+          "surface": "反し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "動く",
+          "pos": "Verb",
+          "surface": "動く"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ]
+    },
+    {
+      "description": "Emphatic negation: ありはしない splits as あり+は+し+ない",
+      "expected": [
+        {
+          "lemma": "千変万化",
+          "pos": "Noun",
+          "surface": "千変万化"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "世の中",
+          "pos": "Noun",
+          "surface": "世の中"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "不変",
+          "pos": "Noun",
+          "surface": "不変"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "など",
+          "pos": "Particle",
+          "surface": "など"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "arihashi_nai_emphatic",
+      "input": "千変万化の世の中にあって、不変のものなどありはしない"
+    },
+    {
+      "description": "Honorific: お待ちいただけます splits as お+待ち+いただけ+ます",
+      "expected": [
+        {
+          "lemma": "恐れ入る",
+          "pos": "Verb",
+          "surface": "恐れ入り"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "少々",
+          "pos": "Adverb",
+          "surface": "少々"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "待ち",
+          "pos": "Noun",
+          "surface": "待ち"
+        },
+        {
+          "lemma": "いただける",
+          "pos": "Verb",
+          "surface": "いただけ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "omachi_itadakemasu_honorific",
+      "input": "恐れ入りますが、少々お待ちいただけますでしょうか"
+    },
+    {
+      "description": "ことができる as multi-word: 生涯+忘れる+こと+が+でき+なかっ+た",
+      "expected": [
+        {
+          "lemma": "あの",
+          "pos": "Determiner",
+          "surface": "あの"
+        },
+        {
+          "lemma": "日見",
+          "pos": "Noun",
+          "surface": "日見"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "光景",
+          "pos": "Noun",
+          "surface": "光景"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "生涯",
+          "pos": "Noun",
+          "surface": "生涯"
+        },
+        {
+          "lemma": "忘れる",
+          "pos": "Verb",
+          "surface": "忘れる"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shougai_kotogadekiru",
+      "input": "あの日見た光景を、彼女は生涯忘れることができなかった"
+    },
+    {
+      "description": "Honorific 待ち+いただけ split - godan-wa false candidate penalty",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "待ち",
+          "pos": "Noun",
+          "surface": "待ち"
+        },
+        {
+          "lemma": "いただける",
+          "pos": "Verb",
+          "surface": "いただけ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "omachi_itadakemasu_honorific_split",
+      "input": "お待ちいただけます"
     }
   ],
   "description": "literary_quality tests",

@@ -1126,6 +1126,23 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             base_cost += bigram_cost::kSevere;  // Force split
             SUZUME_DEBUG_LOG("[COST_ADJ] \"" << surface << "\" +" << bigram_cost::kSevere << " (ku_naru_verb_suffix)\n");
           }
+          // Penalize unverified godan-wa candidates that extend beyond a
+          // shorter dict verb at the same position. These false positives
+          // absorb い from the next word (いただく, いく, etc.)
+          // e.g., 待ちい (base=待ちう) extends beyond 待ち (dict verb 待つ)
+          if (best.verb_type == grammar::VerbType::GodanWa && !in_dict &&
+              dict_manager != nullptr) {
+            auto prefix_results = dict_manager->lookup(surface, 0);
+            for (const auto& result : prefix_results) {
+              if (result.entry != nullptr &&
+                  result.entry->pos == core::PartOfSpeech::Verb &&
+                  result.length < surface.size()) {
+                base_cost += 2.0F;
+                SUZUME_DEBUG_LOG("[COST_ADJ] \"" << surface << "\" +2.0 (godan_wa_exceeds_dict_verb)\n");
+                break;
+              }
+            }
+          }
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                 << " base=" << best.base_form

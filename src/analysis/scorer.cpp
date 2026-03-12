@@ -1017,12 +1017,14 @@ float Scorer::connectionCost(const core::LatticeEdge& prev,
   // Only applies to は — other topic particles (も, こそ) naturally precede し
   // (何もしない, 誰もしない are common patterns)
   // Exception: い (renyokei of いる) - valid in ずにはいられない pattern
+  // Exception: し (renyokei of する) - valid in emphatic negation ありはしない pattern
   if (prev.extended_pos == core::ExtendedPOS::ParticleTopic &&
       prev.surface == "は" &&
       next.pos == core::PartOfSpeech::Verb &&
       grammar::isPureHiragana(next.surface) &&
       next.surface.size() <= 3 &&  // 1 char only (3 bytes in UTF-8)
-      next.surface != "い") {  // い+られ is valid (いる potential)
+      next.surface != "い" &&  // い+られ is valid (いる potential)
+      next.surface != "し") {  // し+ない is valid (emphatic negation)
     surface_bonus += cost::kVeryRare;
   }
 

@@ -473,10 +473,9 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"たくなってくる", "たくなってくる", "たい", kAuxTai, kAuxOutBase, kVerbRenyokei});
   entries.push_back({"たくなってきます", "たくなってきます", "たい", kAuxTai, kAuxOutMasu, kVerbRenyokei});
 
-  // === Ability patterns ===
-  entries.push_back({"ことができる", "ことができる", "ことができる", kAuxNai, kAuxOutBase, kVerbBase});
-  entries.push_back({"ことができた", "ことができた", "ことができる", kAuxNai, kAuxOutTa, kVerbBase});
-  entries.push_back({"ことができない", "ことができない", "ことができる", kAuxNai, kAuxOutBase, kVerbBase});
+  // Removed: ことができる/ことができた/ことができない — multi-word constructions
+  // (こと+が+でき+る), not conjugation suffixes. Causes false verb absorption
+  // (e.g., 忘れることができなかった → single VERB token).
 
   // === ようになる ===
   entries.push_back({"ようになる", "ようになる", "ようになる", kAuxNai, kAuxOutBase, kAuxOutBase});
@@ -561,9 +560,8 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   entries.push_back({"くださいました", "くださいました", "くださる", kAuxTekureru, kAuxOutTa, kAuxOutTe});
   entries.push_back({"おりまして", "おりまして", "おる", kAuxTeiru, kAuxOutTe, kAuxOutTe});
 
-  // === ことができる extended ===
-  entries.push_back({"ことができて", "ことができて", "ことができる", kAuxNai, kAuxOutTe, kVerbBase});
-  entries.push_back({"ことができなかった", "ことができなかった", "ことができる", kAuxNai, kAuxOutTa, kVerbBase});
+  // Removed: ことができて/ことができなかった — multi-word constructions
+  // (see ことができる removal above).
 
   // ばかりなのに removed (multi-word construction)
 

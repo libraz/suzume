@@ -264,12 +264,13 @@ TEST_F(AuxiliaryGeneratorTest, HasColloquialContractions) {
   EXPECT_TRUE(hasSurface("でた"));   // でいた contracted
 }
 
-TEST_F(AuxiliaryGeneratorTest, HasKotogaDekiruForms) {
-  EXPECT_TRUE(hasSurface("ことができる"));
-  EXPECT_TRUE(hasSurface("ことができた"));
-  EXPECT_TRUE(hasSurface("ことができて"));
-  EXPECT_TRUE(hasSurface("ことができない"));
-  EXPECT_TRUE(hasSurface("ことができなかった"));
+// ことができる forms removed (multi-word construction, not auxiliary suffix)
+TEST_F(AuxiliaryGeneratorTest, KotogaDekiruFormsRemoved) {
+  EXPECT_FALSE(hasSurface("ことができる"));
+  EXPECT_FALSE(hasSurface("ことができた"));
+  EXPECT_FALSE(hasSurface("ことができて"));
+  EXPECT_FALSE(hasSurface("ことができない"));
+  EXPECT_FALSE(hasSurface("ことができなかった"));
 }
 
 }  // namespace

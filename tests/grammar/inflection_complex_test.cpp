@@ -49,16 +49,9 @@ TEST_F(InflectionComplexTest, NakerebaNaranaiIchidan) {
 // Inflection no longer recognizes 書こうとした as single verb form.
 
 // ===== kotogadekiru =====
-
-TEST_F(InflectionComplexTest, KotoGaDekiruGodanKa) {
-  auto result = inflection_.getBest("書くことができた");
-  EXPECT_EQ(result.base_form, "書く");
-}
-
-TEST_F(InflectionComplexTest, KotoGaDekiruIchidan) {
-  auto result = inflection_.getBest("食べることができない");
-  EXPECT_EQ(result.base_form, "食べる");
-}
+// Removed: KotoGaDekiruGodanKa/KotoGaDekiruIchidan
+// ことができる auxiliary patterns removed (multi-word construction).
+// Inflection no longer recognizes 書くことができた as single verb form.
 
 // ===== Casual explanatory forms =====
 

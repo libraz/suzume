@@ -270,6 +270,175 @@
           "surface": "続ける"
         }
       ]
+    },
+    {
+      "description": "ことができる is multi-word, not single auxiliary",
+      "expected": [
+        {
+          "lemma": "生涯",
+          "pos": "Noun",
+          "surface": "生涯"
+        },
+        {
+          "lemma": "忘れる",
+          "pos": "Verb",
+          "surface": "忘れる"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kotogadekiru-multi-word",
+      "input": "生涯忘れることができなかった"
+    },
+    {
+      "description": "ことができる splits as こと+が+できる",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べる"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "できる"
+        }
+      ],
+      "id": "kotogadekiru-ichidan",
+      "input": "食べることができる"
+    },
+    {
+      "description": "ことができない splits as こと+が+でき+ない",
+      "expected": [
+        {
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話す"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kotogadekinai-godan",
+      "input": "話すことができない"
+    },
+    {
+      "description": "色褪せる splits as 色+褪せる (both 1-token and 2-token acceptable)",
+      "expected": [
+        {
+          "lemma": "色",
+          "pos": "Noun",
+          "surface": "色"
+        },
+        {
+          "lemma": "褪せる",
+          "pos": "Verb",
+          "surface": "褪せる"
+        }
+      ],
+      "id": "iroaseru-compound-verb",
+      "input": "色褪せる"
+    },
+    {
+      "description": "食べさせる - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "させる",
+          "pos": "Auxiliary",
+          "surface": "させる"
+        }
+      ],
+      "id": "besaseru",
+      "input": "食べさせる"
+    },
+    {
+      "description": "行かせる - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せる"
+        }
+      ],
+      "id": "kaseru",
+      "input": "行かせる"
+    },
+    {
+      "description": "走らせる - regression test",
+      "expected": [
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走ら"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せる"
+        }
+      ],
+      "id": "raseru",
+      "input": "走らせる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows",

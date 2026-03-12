@@ -323,6 +323,8 @@ void Tokenizer::addUnknownCandidates(
         if (result.entry != nullptr) {
           // Case 1: Dictionary entry is also a verb/adjective
           // But allow ず-ending candidates (adverbialized forms)
+          // Case 1: Dictionary entry is also a verb/adjective
+          // But allow ず-ending candidates (adverbialized forms)
           if ((result.entry->pos == core::PartOfSpeech::Verb ||
                result.entry->pos == core::PartOfSpeech::Adjective) &&
               !ends_with_zu) {
