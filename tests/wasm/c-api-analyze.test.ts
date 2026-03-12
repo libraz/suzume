@@ -115,6 +115,36 @@ describe('C API: analyze', () => {
     resultFree(resultPtr);
   });
 
+  it('should return extendedPos for all morphemes', () => {
+    const textPtr = allocString(module, '猫が走る');
+    const resultPtr = analyze(handle, textPtr);
+    module._free(textPtr);
+
+    const morphemes = parseMorphemes(module, resultPtr);
+    expect(morphemes.length).toBeGreaterThan(0);
+
+    for (const m of morphemes) {
+      expect(typeof m.extendedPos).toBe('string');
+      expect(m.extendedPos.length).toBeGreaterThan(0);
+    }
+
+    resultFree(resultPtr);
+  });
+
+  it('should return correct extendedPos for verb conjugation forms', () => {
+    // 食べた → 食べ(VerbRenyokei) + た(AuxPast)
+    const textPtr = allocString(module, '食べた');
+    const resultPtr = analyze(handle, textPtr);
+    module._free(textPtr);
+
+    const morphemes = parseMorphemes(module, resultPtr);
+    const verb = morphemes[0];
+    expect(verb.surface).toBe('食べ');
+    expect(verb.extendedPos).toBe('VERB_連用');
+
+    resultFree(resultPtr);
+  });
+
   it('should analyze full sentence with mixed POS', () => {
     const textPtr = allocString(module, '私は東京に行った');
     const resultPtr = analyze(handle, textPtr);
