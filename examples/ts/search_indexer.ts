@@ -63,9 +63,7 @@ function search(query: string): number[] {
     }
   }
 
-  return [...scores.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([id]) => id);
+  return [...scores.entries()].sort((a, b) => b[1] - a[1]).map(([id]) => id);
 }
 
 console.log('\nSearch "渋谷 カフェ":', search('渋谷 カフェ'));

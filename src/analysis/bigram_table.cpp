@@ -95,6 +95,10 @@ BigramTable::initTable() {
   // Literary potential 得る: 看過しえない, 理解しえた, 想像しうる
   setCell(t, EPOS::VerbRenyokei, EPOS::AuxPotential, cost::kModerateBonus);
 
+  // AuxPotential → AuxNegativeNai (え+ない) - strong bonus
+  // Literary potential + negation: 看過しえない, 理解しえない
+  setCell(t, EPOS::AuxPotential, EPOS::AuxNegativeNai, cost::kStrongBonus);
+
   // VerbMizenkei → AuxCausative (食べ+させる) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxCausative, cost::kModerateBonus);
 

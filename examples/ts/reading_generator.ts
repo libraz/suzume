@@ -17,9 +17,7 @@ const morphemes = suzume.analyze(text);
 console.log('Surface\tReading\tPOS\tBase\tConj');
 console.log('------\t-------\t---\t----\t----');
 for (const m of morphemes) {
-  console.log(
-    `${m.surface}\t${m.reading}\t${m.pos}\t${m.baseForm}\t${m.conjForm ?? '-'}`,
-  );
+  console.log(`${m.surface}\t${m.reading}\t${m.pos}\t${m.baseForm}\t${m.conjForm ?? '-'}`);
 }
 
 // Generate furigana HTML

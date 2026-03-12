@@ -1326,10 +1326,19 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
         // e.g., さましてほしい should be さまし+て+ほしい, not a single i-adj
         {
           auto stem = surface.substr(0, surface.size() - 3);  // Remove trailing い (3 bytes)
-          if (stem.find("\xe3\x81\xa6") != std::string::npos ||  // て
-              stem.find("\xe3\x81\xa7") != std::string::npos) {  // で
+          if (stem.find("て") != std::string::npos ||
+              stem.find("で") != std::string::npos) {
             continue;
           }
+        }
+        // Skip adj renyokei + なる patterns — these are adj く-form + auxiliary verb なる
+        // e.g., なくなった = なく(adj renyokei) + なっ(なる) + た, not a single adjective
+        //       よくなった = よく(adj renyokei) + なっ(なる) + た
+        if (surface.find("くなっ") != std::string::npos ||
+            surface.find("くなり") != std::string::npos ||
+            surface.find("くなる") != std::string::npos ||
+            surface.find("くなれ") != std::string::npos) {
+          continue;
         }
         // Base cost for hiragana i-adjective candidates
         // Use slightly elevated base to avoid fragments like ろしい beating

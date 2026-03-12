@@ -1118,6 +1118,17 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict VERB, skipping unknown candidate\n");
             continue;
           }
+          // Penalize verb candidates absorbing adj く-form + なる suffix chain
+          // e.g., 得なくなった should split as 得+なく+なっ+た, not merge as 得る(ichidan)
+          // The suffix contains くなっ/くなり/くなる/くなれ = adj renyokei + なる conjugation
+          if (!best.suffix.empty() &&
+              (best.suffix.find("くなっ") != std::string::npos ||
+               best.suffix.find("くなり") != std::string::npos ||
+               best.suffix.find("くなる") != std::string::npos ||
+               best.suffix.find("くなれ") != std::string::npos)) {
+            base_cost += bigram_cost::kSevere;  // Force split
+            SUZUME_DEBUG_LOG("[COST_ADJ] \"" << surface << "\" +" << bigram_cost::kSevere << " (ku_naru_verb_suffix)\n");
+          }
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
                                 << " base=" << best.base_form
@@ -1219,7 +1230,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         if (dict_manager != nullptr && kanji_end > start_pos + 1) {
           for (size_t split = start_pos + 1; split < kanji_end; ++split) {
             std::string remainder = extractSubstring(codepoints, split, renyokei_end);
-            std::string remainder_base = remainder + "\xe3\x82\x8b";  // + る
+            std::string remainder_base = remainder + "る";
             if (vh::isVerbInDictionary(dict_manager, remainder_base)) {
               suffix_is_dict_verb = true;
               SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" suffix \"" << remainder_base
