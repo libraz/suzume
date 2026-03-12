@@ -39,6 +39,14 @@ NAI_ADJECTIVES: list[str] = [
     "こころもとない",
 ]
 
+# Compound adjectives that MeCab merges as single tokens but Suzume
+# correctly splits as verb renyokei + ない.
+# These are open-class (verb+ない is productive), so Suzume's split is correct.
+# MeCab has them as dictionary entries, but Suzume analyzes structurally.
+VERB_NAI_COMPOUND_ADJECTIVES: list[str] = [
+    "揺るぎない",
+]
+
 # Counter/unit patterns (unused - kept for reference)
 COUNTER_UNITS: list[str] = [
     "人",

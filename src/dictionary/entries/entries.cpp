@@ -328,6 +328,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("え", "える", EPOS::AuxPotential),    // renyokei: 看過しえない
       aux("える", "える", EPOS::AuxPotential),  // shuushikei: 看過しえる
       aux("うる", "うる", EPOS::AuxPotential),   // alternative shuushikei: 看過しうる
+      aux("得", "得る", EPOS::AuxPotential),     // kanji renyokei: 解決し得ない
 
       // Suru verb stem forms (サ変動詞語幹活用形) - VERB, not AUX
       verb("し", "する", EPOS::VerbRenyokei),
@@ -589,6 +590,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("いって", "いく", EPOS::AuxAspectIku),
       verb("いか", "いく", EPOS::VerbShuushikei),
       aux("いかない", "いく", EPOS::AuxAspectIku),
+      // Literary form ゆく (classical 行く)
+      verb("ゆく", "ゆく", EPOS::VerbShuushikei),
+      verb("ゆき", "ゆく", EPOS::VerbRenyokei),
+      verb("ゆか", "ゆく", EPOS::VerbMizenkei),
+      verb("ゆけ", "ゆく", EPOS::VerbMeireikei),
       aux("くる", "くる", EPOS::AuxAspectKuru),
       // MeCab compat: split き+た/て/ます separately
       aux("き", "くる", EPOS::AuxAspectKuru),

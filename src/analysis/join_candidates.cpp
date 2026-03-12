@@ -47,6 +47,8 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"続く", "つづく", "く", V2VerbType::Godan},    // 引き続く
     {"返す", "かえす", "す", V2VerbType::Godan},    // 繰り返す, 繰りかえす
     {"返る", "かえる", "る", V2VerbType::Godan},    // 振り返る, 振りかえる
+    {"変わる", "かわる", "る", V2VerbType::Godan},  // 移り変わる, 生まれ変わる
+    {"替わる", "かわる", "る", V2VerbType::Godan},  // 入れ替わる, 切り替わる
     {"つかる", nullptr, "る", V2VerbType::Godan},   // 見つかる
     {"合う", "あう", "う", V2VerbType::Godan},      // 話し合う, 話しあう
     {"消す", "けす", "す", V2VerbType::Godan},      // 取り消す
@@ -421,10 +423,35 @@ void addCompoundVerbJoinCandidates(
     // have already been excluded because they set base_ending in the loop above.
     bool is_i_row_stem = grammar::isIRowCodepoint(hira);
 
-    // For E/I-row stems (valid ichidan patterns), V2 starts after the stem
-    // For non-E/I-row, look for V2 starting at the hiragana position (e.g., つける)
-    // This allows patterns like 見 + つける = 見つける where つ is U-row
-    v2_start = (is_e_row_stem || is_i_row_stem) ? (kanji_end + 1) : kanji_end;
+    if (is_e_row_stem || is_i_row_stem) {
+      // Single-char ichidan stem: 食べ+込む, 落ち+着く
+      v2_start = kanji_end + 1;
+    } else {
+      // Check for multi-char ichidan stem: 生まれ+変わる (生まれる has stem まれ)
+      // Scan hiragana sequence to see if last char is e-row/i-row (ichidan marker)
+      bool found_multi_ichidan = false;
+      size_t scan_pos = kanji_end + 1;
+      // Limit scan to 3 additional hiragana chars (max stem like まれ = 2 chars)
+      size_t scan_limit = std::min(scan_pos + 2, codepoints.size());
+      while (scan_pos < scan_limit &&
+             char_types[scan_pos] == CharType::Hiragana) {
+        char32_t scan_char = codepoints[scan_pos];
+        if (grammar::isERowCodepoint(scan_char) ||
+            grammar::isIRowCodepoint(scan_char)) {
+          // Found e/i-row ending: valid multi-char ichidan stem
+          // V2 starts after this character
+          v2_start = scan_pos + 1;
+          found_multi_ichidan = true;
+          break;
+        }
+        ++scan_pos;
+      }
+      if (!found_multi_ichidan) {
+        // For non-E/I-row, look for V2 starting at the hiragana position
+        // This allows patterns like 見 + つける = 見つける where つ is U-row
+        v2_start = kanji_end;
+      }
+    }
   } else {
     v2_start = kanji_end + 1;
   }

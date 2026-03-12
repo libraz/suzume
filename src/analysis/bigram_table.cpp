@@ -91,13 +91,15 @@ BigramTable::initTable() {
   // The ichidan causative verb (知らせる) renyokei should connect to passive
   setCell(t, EPOS::VerbRenyokei, EPOS::AuxPassive, cost::kStrongBonus);
 
-  // VerbRenyokei → AuxPotential (し+え, し+える) - moderate bonus
+  // VerbRenyokei → AuxPotential (し+え, し+える) - strong bonus
   // Literary potential 得る: 看過しえない, 理解しえた, 想像しうる
-  setCell(t, EPOS::VerbRenyokei, EPOS::AuxPotential, cost::kModerateBonus);
+  // Must be strong to beat single_kanji_ichidan_polite VERB path for 得
+  setCell(t, EPOS::VerbRenyokei, EPOS::AuxPotential, cost::kStrongBonus);
 
-  // AuxPotential → AuxNegativeNai (え+ない) - strong bonus
-  // Literary potential + negation: 看過しえない, 理解しえない
-  setCell(t, EPOS::AuxPotential, EPOS::AuxNegativeNai, cost::kStrongBonus);
+  // AuxPotential → AuxNegativeNai (え+ない, 得+ない) - extra strong bonus
+  // Literary potential + negation: 看過しえない, 解決し得ない
+  // Needs extra strength to overcome base AUX→AUX category penalty (0.3)
+  setCell(t, EPOS::AuxPotential, EPOS::AuxNegativeNai, cost::kExtraStrongBonus);
 
   // VerbMizenkei → AuxCausative (食べ+させる) - moderate bonus
   setCell(t, EPOS::VerbMizenkei, EPOS::AuxCausative, cost::kModerateBonus);

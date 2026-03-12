@@ -177,13 +177,25 @@ std::vector<core::Morpheme> Postprocessor::convertPrefixVerbToNoun(
       if (utf8::equalsAny(prefix_surface, {"お", "ご", "御"})) {
         // Convert VERB to NOUN (renyoukei nominalization)
         // e.g., 願い(VERB) → 願い(NOUN) after お
+        // Exception: when followed by causative auxiliary (せ/させ),
+        // the verb is part of a causative construction (お聞かせ, お知らせ)
+        // and should remain as VERB
         if (m.pos == core::PartOfSpeech::Verb) {
-          m.pos = core::PartOfSpeech::Noun;
-          m.extended_pos = core::ExtendedPOS::Noun;
-          // Keep surface as lemma for nominalized form
-          m.lemma = m.surface;
-          SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Nominalized: " << m.surface
-                           << " (VERB → NOUN after " << prefix_surface << ")\n");
+          bool followed_by_causative = false;
+          if (i + 1 < morphemes.size()) {
+            const auto& next = morphemes[i + 1];
+            if (next.extended_pos == core::ExtendedPOS::AuxCausative) {
+              followed_by_causative = true;
+            }
+          }
+          if (!followed_by_causative) {
+            m.pos = core::PartOfSpeech::Noun;
+            m.extended_pos = core::ExtendedPOS::Noun;
+            // Keep surface as lemma for nominalized form
+            m.lemma = m.surface;
+            SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Nominalized: " << m.surface
+                             << " (VERB → NOUN after " << prefix_surface << ")\n");
+          }
         }
       }
     }

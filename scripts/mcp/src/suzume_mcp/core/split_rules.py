@@ -2,7 +2,7 @@
 
 import regex
 
-from .constants import TTARA_STEMS, TTEBA_STEMS, USER_DICT_COMPOUNDS
+from .constants import TTARA_STEMS, TTEBA_STEMS, USER_DICT_COMPOUNDS, VERB_NAI_COMPOUND_ADJECTIVES
 
 
 
@@ -220,6 +220,35 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 result.append({"surface": verb_part, "pos": "動詞", "lemma": "する"})
             if applied_rule is None:
                 applied_rule = "onomatopoeia-tto-suru-split"
+            continue
+
+        # 10. Verb+ない compound adjective split
+        # MeCab merges verb renyokei + ない as single adjective token
+        # (e.g., 揺るぎない, 何気ない), but Suzume correctly splits them
+        if t.get("pos") == "形容詞" and surface in VERB_NAI_COMPOUND_ADJECTIVES:
+            verb_part = surface[:-len("ない")]
+            result.append({"surface": verb_part, "pos": "動詞", "lemma": verb_part})
+            result.append({"surface": "ない", "pos": "助動詞", "lemma": "ない"})
+            if applied_rule is None:
+                applied_rule = "verb-nai-compound-split"
+            continue
+
+        # 11. Literary volitional ん: verb+ん → verb + ん
+        # MeCab merges ichidan verb + ん (literary volitional =む/よう)
+        # as single token with conj_form 体言接続特殊
+        # e.g., 乗り越えん → 乗り越え + ん, 越えん → 越え + ん
+        if (
+            t.get("pos") == "動詞"
+            and surface.endswith("ん")
+            and len(surface) >= 2
+            and t.get("conj_form") == "体言接続特殊"
+        ):
+            verb_part = surface[:-len("ん")]
+            lemma = t.get("lemma", "")
+            result.append({"surface": verb_part, "pos": "動詞", "lemma": lemma})
+            result.append({"surface": "ん", "pos": "助動詞", "lemma": "ん"})
+            if applied_rule is None:
+                applied_rule = "literary-volitional-n-split"
             continue
 
         # No split needed
