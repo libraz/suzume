@@ -57,15 +57,15 @@ for (const t of tokens) {
 
 // Tag extraction (returns { tag, pos } objects)
 const tags = suzume.generateTags('東京スカイツリーに行きました')
-// → [{ tag: '東京', pos: 'noun' }, { tag: 'スカイツリー', pos: 'noun' }, { tag: '行く', pos: 'verb' }]
+// → [{ tag: '東京', pos: 'NOUN' }, { tag: 'スカイツリー', pos: 'NOUN' }, { tag: '行く', pos: 'VERB' }]
 
 // Nouns only
 suzume.generateTags('美味しいラーメンを食べた', { pos: ['noun'] })
-// → [{ tag: 'ラーメン', pos: 'noun' }]
+// → [{ tag: 'ラーメン', pos: 'NOUN' }]
 
 // Exclude basic words (hiragana-only lemma like する, ある, いい)
 suzume.generateTags('今日はいい天気ですね', { excludeBasic: true })
-// → [{ tag: '今日', pos: 'noun' }, { tag: '天気', pos: 'noun' }]
+// → [{ tag: '今日', pos: 'NOUN' }, { tag: '天気', pos: 'NOUN' }]
 ```
 
 ### Browser (CDN)
