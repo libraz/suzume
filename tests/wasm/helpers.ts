@@ -31,14 +31,13 @@ export function allocString(module: WasmModule, text: string): number {
   return ptr;
 }
 
-// suzume_morpheme_t layout: 8 pointers (32 bytes on wasm32)
-export const MORPHEME_SIZE = 32;
+// suzume_morpheme_t layout: 7 pointers (28 bytes on wasm32)
+export const MORPHEME_SIZE = 28;
 
 export interface ParsedMorpheme {
   surface: string;
   pos: string;
   baseForm: string;
-  reading: string;
   posJa: string;
   conjType: string | null;
   conjForm: string | null;
@@ -55,17 +54,15 @@ export function parseMorphemes(module: WasmModule, resultPtr: number): ParsedMor
     const surfacePtr = module.HEAPU32[morphPtr >> 2];
     const posPtr = module.HEAPU32[(morphPtr >> 2) + 1];
     const baseFormPtr = module.HEAPU32[(morphPtr >> 2) + 2];
-    const readingPtr = module.HEAPU32[(morphPtr >> 2) + 3];
-    const posJaPtr = module.HEAPU32[(morphPtr >> 2) + 4];
-    const conjTypePtr = module.HEAPU32[(morphPtr >> 2) + 5];
-    const conjFormPtr = module.HEAPU32[(morphPtr >> 2) + 6];
-    const extendedPosPtr = module.HEAPU32[(morphPtr >> 2) + 7];
+    const posJaPtr = module.HEAPU32[(morphPtr >> 2) + 3];
+    const conjTypePtr = module.HEAPU32[(morphPtr >> 2) + 4];
+    const conjFormPtr = module.HEAPU32[(morphPtr >> 2) + 5];
+    const extendedPosPtr = module.HEAPU32[(morphPtr >> 2) + 6];
 
     morphemes.push({
       surface: module.UTF8ToString(surfacePtr),
       pos: module.UTF8ToString(posPtr),
       baseForm: module.UTF8ToString(baseFormPtr),
-      reading: module.UTF8ToString(readingPtr),
       posJa: module.UTF8ToString(posJaPtr),
       conjType: conjTypePtr !== 0 ? module.UTF8ToString(conjTypePtr) : null,
       conjForm: conjFormPtr !== 0 ? module.UTF8ToString(conjFormPtr) : null,

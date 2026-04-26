@@ -1023,7 +1023,7 @@ void addCompoundVerbJoinCandidates(
       lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos),
                       static_cast<uint32_t>(compound_end_pos), core::PartOfSpeech::Verb,
                       final_cost, flags, compound_lemma,
-                      dictionary::ConjugationType::None, {},
+                      dictionary::ConjugationType::None,
                       core::CandidateOrigin::Unknown, 0.0F, "compound_mizenkei",
                       core::ExtendedPOS::VerbMizenkei, "compound_mizenkei");
       return;
@@ -1061,7 +1061,7 @@ void addCompoundVerbJoinCandidates(
       lattice.addEdge(stem, static_cast<uint32_t>(start_pos),
                       static_cast<uint32_t>(stem_end_pos), core::PartOfSpeech::Verb,
                       final_cost, flags, compound_lemma,
-                      dictionary::ConjugationType::None, {},
+                      dictionary::ConjugationType::None,
                       core::CandidateOrigin::Unknown, 0.0F, "compound_te_stem",
                       epos, "compound_te_stem");
       return true;
@@ -1142,7 +1142,7 @@ void addCompoundVerbJoinCandidates(
         lattice.addEdge(stem, static_cast<uint32_t>(start_pos),
                         static_cast<uint32_t>(stem_end_pos), core::PartOfSpeech::Verb,
                         mizenkei_cost, flags, compound_lemma,
-                        dictionary::ConjugationType::None, {},
+                        dictionary::ConjugationType::None,
                         core::CandidateOrigin::Unknown, 0.0F, "compound_mizenkei",
                         core::ExtendedPOS::VerbMizenkei, "compound_mizenkei");
         return true;
@@ -1356,7 +1356,7 @@ void addHiraganaCompoundVerbJoinCandidates(
         lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos),
                         static_cast<uint32_t>(compound_end_pos), core::PartOfSpeech::Verb,
                         final_cost, flags, compound_base,
-                        dictionary::ConjugationType::None, {},
+                        dictionary::ConjugationType::None,
                         core::CandidateOrigin::Unknown, 0.0F, "hira_compound_renyokei",
                         core::ExtendedPOS::VerbRenyokei, "hira_compound_renyokei");
       } else {

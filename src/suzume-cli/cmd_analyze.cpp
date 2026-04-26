@@ -5,32 +5,11 @@
 #include <sstream>
 
 #include "grammar/conjugation.h"
-#include "normalize/utf8.h"
 #include "suzume.h"
 
 namespace suzume::cli {
 
 namespace {
-
-// Convert hiragana to katakana
-std::string hiraganaToKatakana(std::string_view hiragana) {
-  if (hiragana.empty()) {
-    return "";
-  }
-
-  std::vector<char32_t> codepoints = normalize::utf8::decode(hiragana);
-
-  for (char32_t& cp : codepoints) {
-    // Hiragana range: U+3041-U+3096
-    // Katakana range: U+30A1-U+30F6
-    // Offset: 0x60 (96)
-    if (cp >= 0x3041 && cp <= 0x3096) {
-      cp += 0x60;
-    }
-  }
-
-  return normalize::utf8::encode(codepoints);
-}
 
 void outputMorpheme(const std::vector<core::Morpheme>& morphemes) {
   for (const auto& morpheme : morphemes) {
@@ -81,12 +60,8 @@ void outputChasen(const std::vector<core::Morpheme>& morphemes) {
     // Surface form
     std::cout << mor.surface << "\t";
 
-    // Reading (in katakana)
-    if (!mor.reading.empty()) {
-      std::cout << hiraganaToKatakana(mor.reading) << "\t";
-    } else {
-      std::cout << "*\t";
-    }
+    // Reading column placeholder (Suzume does not generate readings)
+    std::cout << "*\t";
 
     // Lemma (base form)
     std::cout << mor.getLemma() << "\t";

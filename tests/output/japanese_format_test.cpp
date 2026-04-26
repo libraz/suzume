@@ -2,8 +2,8 @@
  * @file japanese_format_test.cpp
  * @brief Tests for Japanese morphological output formatting
  *
- * Tests Japanese POS names, verb type names, conjugation form names,
- * and reading output for detailed morphological analysis output.
+ * Tests Japanese POS names, verb type names, and conjugation form names
+ * for detailed morphological analysis output.
  */
 
 #include <gtest/gtest.h>
@@ -424,25 +424,6 @@ TEST_F(JapaneseFormatIntegrationTest, VerbWithConjType_GodanMa) {
 
   auto verb_type = grammar::conjTypeToVerbType(morphemes[0].conj_type);
   EXPECT_EQ(verb_type, grammar::VerbType::GodanMa);
-}
-
-// Test reading field propagation
-// Note: Reading propagation is not yet implemented in dictionary entries
-TEST_F(JapaneseFormatIntegrationTest, ReadingPropagation_Pronoun) {
-  auto morphemes = analyzer_.analyze("私");
-  ASSERT_GE(morphemes.size(), 1);
-  EXPECT_EQ(morphemes[0].surface, "私");
-  EXPECT_EQ(morphemes[0].pos, core::PartOfSpeech::Pronoun);
-  // Reading propagation TODO: dictionary entries need reading field populated
-}
-
-TEST_F(JapaneseFormatIntegrationTest, ReadingPropagation_Adjective) {
-  // Use single-kanji adjective that's in L1
-  auto morphemes = analyzer_.analyze("寒い");
-  ASSERT_GE(morphemes.size(), 1);
-  EXPECT_EQ(morphemes[0].surface, "寒い");
-  EXPECT_EQ(morphemes[0].pos, core::PartOfSpeech::Adjective);
-  // Reading propagation TODO: dictionary entries need reading field populated
 }
 
 // Test conjugation form detection in analysis pipeline

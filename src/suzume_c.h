@@ -34,7 +34,6 @@ typedef struct {
   const char* surface;        /**< Surface form (UTF-8) */
   const char* pos;            /**< Part of speech (English) */
   const char* base_form;      /**< Base/dictionary form */
-  const char* reading;        /**< Reading in katakana */
   const char* pos_ja;         /**< Part of speech (Japanese) */
   const char* conj_type;      /**< Conjugation type (Japanese) */
   const char* conj_form;      /**< Conjugation form (Japanese) */

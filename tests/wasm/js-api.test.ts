@@ -48,7 +48,6 @@ describe('JS API: struct layout compatibility', () => {
     expect(typeof m.surface).toBe('string');
     expect(typeof m.pos).toBe('string');
     expect(typeof m.baseForm).toBe('string');
-    expect(typeof m.reading).toBe('string');
     expect(typeof m.posJa).toBe('string');
     // conjType/conjForm can be string or null
     expect(m.conjType === null || typeof m.conjType === 'string').toBe(true);

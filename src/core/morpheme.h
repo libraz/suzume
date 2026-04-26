@@ -23,7 +23,6 @@ struct Morpheme {
   PartOfSpeech pos{PartOfSpeech::Noun};  // Part of speech
   ExtendedPOS extended_pos{ExtendedPOS::Unknown};  // Extended (fine-grained) POS
   std::string lemma;                     // Lemma (for verbs/adjectives)
-  std::string reading;                   // Reading in hiragana
   dictionary::ConjugationType conj_type{dictionary::ConjugationType::None};  // Conjugation type
   grammar::ConjForm conj_form{grammar::ConjForm::Base};  // Conjugation form
 

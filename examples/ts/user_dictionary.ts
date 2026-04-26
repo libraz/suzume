@@ -18,8 +18,8 @@ for (const m of suzume.analyze(text)) {
   console.log(`  ${m.surface} [${m.pos}]`);
 }
 
-// Load user dictionary (TSV format: surface\tPOS\treading)
-const dictData = '初音ミク\tNOUN\tはつねみく\n';
+// Load user dictionary (TSV format: surface\tPOS; extra columns ignored)
+const dictData = '初音ミク\tNOUN\n';
 const loaded = suzume.loadUserDictionary(dictData);
 console.log(`\nDictionary loaded: ${loaded}`);
 

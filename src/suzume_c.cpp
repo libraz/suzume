@@ -88,10 +88,6 @@ SUZUME_EXPORT suzume_result_t* suzume_analyze(suzume_t handle,
       base_form[lemma.size()] = '\0';
       result->morphemes[idx].base_form = base_form;
 
-      auto* reading = new char[morph.reading.size() + 1];
-      std::strcpy(reading, morph.reading.c_str());
-      result->morphemes[idx].reading = reading;
-
       // Japanese POS
       auto pos_ja_str = suzume::core::posToJapanese(morph.pos);
       auto* pos_ja = new char[pos_ja_str.size() + 1];
@@ -146,8 +142,6 @@ SUZUME_EXPORT void suzume_result_free(suzume_result_t* result) {
       delete[] const_cast<char*>(result->morphemes[idx].pos);
       // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       delete[] const_cast<char*>(result->morphemes[idx].base_form);
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-      delete[] const_cast<char*>(result->morphemes[idx].reading);
       // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       delete[] const_cast<char*>(result->morphemes[idx].pos_ja);
       // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)

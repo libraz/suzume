@@ -25,7 +25,6 @@ for (const m of morphemes) {
     pos: m.pos,
     posJa: m.posJa,
     baseForm: m.baseForm,
-    reading: m.reading,
     conjType: m.conjType,
     conjForm: m.conjForm,
   });

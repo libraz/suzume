@@ -32,7 +32,6 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
                         PartOfSpeech pos, float cost, uint8_t flags,
                         std::string_view lemma,
                         dictionary::ConjugationType conj_type,
-                        std::string_view reading,
                         [[maybe_unused]] CandidateOrigin origin,
                         [[maybe_unused]] float origin_confidence,
                         [[maybe_unused]] std::string_view origin_detail,
@@ -51,13 +50,6 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
   if (!lemma.empty()) {
     lemma_storage_.emplace_back(lemma);
     stored_lemma = lemma_storage_.back();
-  }
-
-  // Store reading if provided
-  std::string_view stored_reading;
-  if (!reading.empty()) {
-    reading_storage_.emplace_back(reading);
-    stored_reading = reading_storage_.back();
   }
 
 #ifdef SUZUME_DEBUG_INFO
@@ -109,7 +101,6 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
   edge.cost = cost;
   edge.flags = static_cast<EdgeFlags>(flags);
   edge.lemma = stored_lemma;
-  edge.reading = stored_reading;
   edge.conj_type = conj_type;
 #ifdef SUZUME_DEBUG_INFO
   edge.origin = origin;
@@ -182,7 +173,6 @@ void Lattice::clear() {
   all_edges_.clear();
   surface_storage_.clear();
   lemma_storage_.clear();
-  reading_storage_.clear();
 #ifdef SUZUME_DEBUG_INFO
   origin_detail_storage_.clear();
   epos_source_storage_.clear();

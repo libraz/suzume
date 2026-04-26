@@ -47,7 +47,6 @@ struct LatticeEdge {
   float cost{0.0F};                        // Cost
   EdgeFlags flags{EdgeFlags::None};        // Flags
   std::string_view lemma;                  // Lemma (optional)
-  std::string_view reading;                // Reading in hiragana (optional)
   dictionary::ConjugationType conj_type{dictionary::ConjugationType::None};  // Conjugation type
 
 #ifdef SUZUME_DEBUG_INFO
@@ -109,7 +108,6 @@ class Lattice {
    * @param flags Flags
    * @param lemma Lemma (optional)
    * @param conj_type Conjugation type (optional)
-   * @param reading Reading in hiragana (optional)
    * @param origin Candidate origin for debug (optional)
    * @param origin_confidence Origin confidence for debug (optional)
    * @param origin_detail Origin detail pattern for debug (optional)
@@ -121,7 +119,6 @@ class Lattice {
                  PartOfSpeech pos, float cost, uint8_t flags,
                  std::string_view lemma = {},
                  dictionary::ConjugationType conj_type = dictionary::ConjugationType::None,
-                 std::string_view reading = {},
                  CandidateOrigin origin = CandidateOrigin::Unknown,
                  float origin_confidence = 0.0F,
                  std::string_view origin_detail = {},
@@ -170,7 +167,6 @@ class Lattice {
   std::vector<LatticeEdge> all_edges_;  // All edges (primary storage)
   std::deque<std::string> surface_storage_;  // Storage for surface strings (deque for stable pointers)
   std::deque<std::string> lemma_storage_;    // Storage for lemma strings (deque for stable pointers)
-  std::deque<std::string> reading_storage_;  // Storage for reading strings (deque for stable pointers)
 #ifdef SUZUME_DEBUG_INFO
   std::deque<std::string> origin_detail_storage_;  // Storage for origin detail strings (deque for stable pointers)
   std::deque<std::string> epos_source_storage_;    // Storage for epos_source strings (deque for stable pointers)

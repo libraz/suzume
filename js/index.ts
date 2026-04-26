@@ -47,8 +47,6 @@ export interface Morpheme {
   pos: string;
   /** Base/dictionary form */
   baseForm: string;
-  /** Reading in katakana */
-  reading: string;
   /** Part of speech (Japanese) */
   posJa: string;
   /** Conjugation type (Japanese, e.g., "一段", "五段・カ行") - null for non-conjugating words */
@@ -398,33 +396,30 @@ export class Suzume {
 
     const morphemes: Morpheme[] = [];
 
-    // suzume_morpheme_t layout (8 pointers = 32 bytes on wasm32):
+    // suzume_morpheme_t layout (7 pointers = 28 bytes on wasm32):
     // - surface: pointer
     // - pos: pointer
     // - base_form: pointer
-    // - reading: pointer
     // - pos_ja: pointer
     // - conj_type: pointer
     // - conj_form: pointer
     // - extended_pos: pointer
-    const MORPHEME_SIZE = 32;
+    const MORPHEME_SIZE = 28;
 
     for (let idx = 0; idx < count; idx++) {
       const morphPtr = morphemesPtr + idx * MORPHEME_SIZE;
       const surfacePtr = HEAPU32[morphPtr >> 2];
       const posPtr = HEAPU32[(morphPtr >> 2) + 1];
       const baseFormPtr = HEAPU32[(morphPtr >> 2) + 2];
-      const readingPtr = HEAPU32[(morphPtr >> 2) + 3];
-      const posJaPtr = HEAPU32[(morphPtr >> 2) + 4];
-      const conjTypePtr = HEAPU32[(morphPtr >> 2) + 5];
-      const conjFormPtr = HEAPU32[(morphPtr >> 2) + 6];
-      const extendedPosPtr = HEAPU32[(morphPtr >> 2) + 7];
+      const posJaPtr = HEAPU32[(morphPtr >> 2) + 3];
+      const conjTypePtr = HEAPU32[(morphPtr >> 2) + 4];
+      const conjFormPtr = HEAPU32[(morphPtr >> 2) + 5];
+      const extendedPosPtr = HEAPU32[(morphPtr >> 2) + 6];
 
       morphemes.push({
         surface: this.module.UTF8ToString(surfacePtr),
         pos: this.module.UTF8ToString(posPtr),
         baseForm: this.module.UTF8ToString(baseFormPtr),
-        reading: this.module.UTF8ToString(readingPtr),
         posJa: this.module.UTF8ToString(posJaPtr),
         conjType: conjTypePtr !== 0 ? this.module.UTF8ToString(conjTypePtr) : null,
         conjForm: conjFormPtr !== 0 ? this.module.UTF8ToString(conjFormPtr) : null,

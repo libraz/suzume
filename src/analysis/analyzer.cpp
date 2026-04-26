@@ -380,10 +380,6 @@ std::vector<core::Morpheme> Analyzer::analyzeChunk(std::string_view text,
       morpheme.lemma = morpheme.surface;
     }
 
-    if (!edge.reading.empty()) {
-      morpheme.reading = std::string(edge.reading);
-    }
-
     morpheme.features.is_dictionary = edge.fromDictionary();
     morpheme.features.is_user_dict = edge.fromUserDict();
     morpheme.features.is_formal_noun = edge.isFormalNoun();
@@ -420,10 +416,6 @@ std::vector<core::Morpheme> Analyzer::pathToMorphemes(const core::ViterbiResult&
       morpheme.lemma = std::string(edge.lemma);
     } else {
       morpheme.lemma = morpheme.surface;
-    }
-
-    if (!edge.reading.empty()) {
-      morpheme.reading = std::string(edge.reading);
     }
 
     morpheme.features.is_dictionary = edge.fromDictionary();
