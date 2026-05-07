@@ -388,7 +388,7 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(Ve
           // {"ない", false},   // Negative: Excluded - split as 食べ + ない (MeCab compat)
           {"ん", false, core::ExtendedPOS::VerbMizenkei},  // Contracted negative: 食べん (mizenkei + ん)
           // {"なかった", ...}  // Excluded for MeCab compat: split as 食べ+なかっ+た
-          {"れば", false, core::ExtendedPOS::VerbKateikei},  // Conditional: 食べれば
+          {"れ", false, core::ExtendedPOS::VerbKateikei},  // Conditional stem: 食べれ (split: 食べれ + ば)
           // {"たら", false},   // Conditional: Excluded - split as 食べ + たら
           {"よ", false, core::ExtendedPOS::VerbMizenkei},  // Volitional mizenkei: 食べよ (splits as 食べよ + う)
           {"ろ", false, core::ExtendedPOS::VerbMeireikei},  // Imperative: 食べろ
@@ -440,7 +440,10 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(Ve
       // 書かなかった excluded for MeCab compat: split as 書か+なかっ+た
 
       // Conditional
-      suffixes.push_back({e + "ば", false, core::ExtendedPOS::VerbKateikei});  // Conditional: 書けば
+      // Kateikei (仮定形) standalone, for MeCab-compatible split: 書け + ば.
+      // Godan e-row form serves as both kateikei and meireikei; emit both
+      // ExtendedPOS so the kateikei + ば split path can win over a merged form.
+      suffixes.push_back({e, false, core::ExtendedPOS::VerbKateikei});  // Conditional stem: 書け
 
       // Volitional mizenkei (for MeCab-compatible split: 書こ + う)
       suffixes.push_back({o, false, core::ExtendedPOS::VerbMizenkei});  // Volitional mizenkei: 書こ

@@ -762,6 +762,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
     surface_bonus += cost::kStrongBonus;
   }
 
+  // Bonus for Noun → VerbMeireikei "せよ"/"しろ" (サ変動詞の命令形)
+  // E.g., 勉強せよ → 勉強+せよ, 運動しろ → 運動+しろ
+  // Without this, default-AUX char_speech candidates for せよ/しろ can beat
+  // the legitimate dict VERB imperative entry. Restricted to the suru-imperative
+  // surfaces so godan imperative forms (柿+食え) are not falsely boosted.
+  if (prev.pos == core::PartOfSpeech::Noun && next.extended_pos == core::ExtendedPOS::VerbMeireikei &&
+      (next.surface == "せよ" || next.surface == "しろ")) {
+    surface_bonus += cost::kStrongBonus;
+  }
+
   // Surface-based bonus for VerbRenyokei → た (ichidan/irregular た-form)
   // E.g., 食べ+た, 来+た (MeCab-compatible split)
   // Must be surface == "た" to distinguish from て (particle)
@@ -856,7 +866,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // because AUX_否定古 → next token connections have default (high) cost.
   // Note: lexicalized forms like 思わず(ADV) are handled by the candidate generator
   // which skips mizenkei_zu generation when verb+ず is in the dictionary.
-  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && next.pos == core::PartOfSpeech::Auxiliary &&
+  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
       (next.surface == "ず" || next.surface == "ずに" || next.surface == "ざる" || next.surface == "ざれ")) {
     surface_bonus += cost::kStrongBonus;
   }

@@ -481,10 +481,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "auxiliary verb: context-dependent classification"
-      },
       "description": "勉強していく - MeCab互換分割",
       "expected": [
         {
@@ -510,25 +506,6 @@
       ],
       "id": "suru_te_iku",
       "input": "勉強していく",
-      "suzume_expected": [
-        {
-          "pos": "Noun",
-          "surface": "勉強"
-        },
-        {
-          "lemma": "する",
-          "pos": "Verb",
-          "surface": "し"
-        },
-        {
-          "pos": "Particle",
-          "surface": "て"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "いく"
-        }
-      ],
       "tags": [
         "suru",
         "subsidiary",

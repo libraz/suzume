@@ -113,6 +113,11 @@ std::array<std::array<float, BigramTable::kSize>, BigramTable::kSize> BigramTabl
   // Prevents さ(mizenkei)+まして(CONJ) over さまし(renyokei)+て
   setCell(t, EPOS::VerbMizenkei, EPOS::Conjunction, cost::kVeryRare);
 
+  // VerbMizenkei → ParticleFinal: very rare
+  // Mizenkei never directly connects to sentence-ending particles
+  // Prevents 勉強+せ(mizenkei)+よ(final) over 勉強+せよ(imperative dict entry)
+  setCell(t, EPOS::VerbMizenkei, EPOS::ParticleFinal, cost::kVeryRare);
+
   // Suffix → Conjunction: rare (without punctuation, suffix+conj is unusual)
   // Prevents さ(suffix)+まして(CONJ) over さまし(verb renyokei)+て
   setCell(t, EPOS::Suffix, EPOS::Conjunction, cost::kRare);

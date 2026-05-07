@@ -394,6 +394,16 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
         continue;  // Skip - let te-form split win
       }
     }
+    // Filter ていく/ていっ/ていけ (te + iku directional aspect) at 4+ chars
+    // E.g., していく → し+て+いく (not a single verb)
+    //       していった → し+て+いっ+た, していって → し+て+いっ+て
+    if (end_pos - start_pos >= 4) {
+      if (surface.find("ていく") != std::string::npos || surface.find("ていっ") != std::string::npos ||
+          surface.find("ていけ") != std::string::npos || surface.find("ていか") != std::string::npos) {
+        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" skip te_iku_pattern\n");
+        continue;  // Skip - let te + iku split win
+      }
+    }
 
     // Check for 3-4 char hiragana verb ending with た/だ (past form) BEFORE threshold check
     // e.g., つかれた (疲れた), ねむった (眠った), おきた (起きた)
@@ -502,16 +512,22 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
     if (best.confidence > conf_threshold && best.verb_type != grammar::VerbType::IAdjective) {
       // Skip long particle-starting verb candidates when remainder is a valid verb form
       // e.g., "になっております" should be "に" + "なっております", not a single verb
+      //       "はならぬ" should be "は" + "なら" + "ぬ", not a godan-ra negative
       // This prevents false verbs like "になる" + conjugation from being recognized
-      // Only apply to 5+ char forms to preserve short verbs (にる, にげる, etc.)
+      // Apply to 4+ char forms; remainder check ensures genuine verbs are preserved
       size_t len_check = end_pos - start_pos;
-      if (len_check >= 5 && normalize::isCommonParticle(first_char)) {
+      if (len_check >= 4 && normalize::isCommonParticle(first_char)) {
         // Extract remainder (surface without first character)
         std::string remainder = surface.substr(core::kJapaneseCharBytes);
         const auto& remainder_cands = inflection.analyze(remainder);
+        // Use a relaxed confidence threshold (0.3) for 4-char surfaces — for
+        // remainders with 1-char stems like なる→なら+ぬ the score is hit by
+        // godan_ra_single_hiragana (-0.3) so confidence sits around 0.37 even
+        // for genuinely valid forms. The 5+ char path keeps the stricter 0.5.
+        float min_conf = (len_check >= 5) ? 0.5F : 0.3F;
         for (const auto& rem_cand : remainder_cands) {
           if (rem_cand.verb_type != grammar::VerbType::IAdjective && rem_cand.verb_type != grammar::VerbType::Unknown &&
-              rem_cand.confidence >= 0.5F) {
+              rem_cand.confidence >= min_conf) {
             // Remainder looks like a valid verb form - skip this candidate
             // to let particle + verb split win
             SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" skip particle_start_verb (particle=U+"

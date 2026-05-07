@@ -432,6 +432,19 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(const std::vecto
   // Skip potential suru-verb patterns: 漢字2字+し followed by suru-auxiliary
   // e.g., 勉強しちゃった → 勉強 + し + ちゃっ + た (not 勉強し + ちゃった)
   size_t kanji_count = kanji_end - start_pos;
+  // For sahen-compatible 2+ kanji nouns, せ is mizenkei (勉強せよ), not a
+  // nominalization ending. Skip nominalized noun candidate here so the
+  // 勉強+せよ dictionary path can win.
+  if (first_hiragana == U'せ' && kanji_count >= 2) {
+    size_t next_pos = kanji_end + 1;
+    if (next_pos < codepoints.size()) {
+      char32_t next_char = codepoints[next_pos];
+      // せ followed by imperative よ, passive ら/れ, causative ら, etc.
+      if (next_char == U'よ' || next_char == U'ら' || next_char == U'れ' || next_char == U'ず') {
+        return candidates;
+      }
+    }
+  }
   if (first_hiragana == U'し' && kanji_count >= 2) {
     // Check for suru-auxiliary patterns following し
     size_t next_pos = kanji_end + 1;
