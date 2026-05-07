@@ -134,6 +134,21 @@ TEST(UserDictTest, LoadFromMemoryWithComments) {
   EXPECT_EQ(result.value(), 2);
 }
 
+TEST(UserDictTest, LoadFromMemorySkipsIndentedComments) {
+  UserDictionary dict;
+
+  const char* csv_data =
+      "  # This is an indented comment\n"
+      "\t# This is a tab-indented comment\n"
+      "東京,NOUN,0.5\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  ASSERT_TRUE(result.hasValue());
+  EXPECT_EQ(result.value(), 1);
+  EXPECT_EQ(dict.size(), 1);
+  EXPECT_FALSE(dict.lookup("東京", 0).empty());
+}
+
 TEST(UserDictTest, LoadFromMemoryWithWhitespace) {
   UserDictionary dict;
 
@@ -144,6 +159,79 @@ TEST(UserDictTest, LoadFromMemoryWithWhitespace) {
   auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
   ASSERT_TRUE(result.hasValue());
   EXPECT_EQ(result.value(), 2);
+}
+
+TEST(UserDictTest, LoadFromMemoryAcceptsPosAliases) {
+  UserDictionary dict;
+
+  const char* csv_data =
+      "東京,PROPN,0.5\n"
+      "静か,ADJECTIVE,0.5\n"
+      "すぐ,ADVERB,0.5\n"
+      "です,AUXILIARY,0.5\n"
+      "ね,INTERJECTION,0.5\n"
+      "記号,SYM,0.5\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  ASSERT_TRUE(result.hasValue());
+  EXPECT_EQ(result.value(), 6);
+
+  ASSERT_NE(dict.getEntry(0), nullptr);
+  EXPECT_EQ(dict.getEntry(0)->pos, core::PartOfSpeech::Noun);
+  ASSERT_NE(dict.getEntry(1), nullptr);
+  EXPECT_EQ(dict.getEntry(1)->pos, core::PartOfSpeech::Adjective);
+  ASSERT_NE(dict.getEntry(2), nullptr);
+  EXPECT_EQ(dict.getEntry(2)->pos, core::PartOfSpeech::Adverb);
+  ASSERT_NE(dict.getEntry(3), nullptr);
+  EXPECT_EQ(dict.getEntry(3)->pos, core::PartOfSpeech::Auxiliary);
+  ASSERT_NE(dict.getEntry(4), nullptr);
+  EXPECT_EQ(dict.getEntry(4)->pos, core::PartOfSpeech::Interjection);
+  ASSERT_NE(dict.getEntry(5), nullptr);
+  EXPECT_EQ(dict.getEntry(5)->pos, core::PartOfSpeech::Symbol);
+}
+
+TEST(UserDictTest, LoadFromMemoryRejectsInvalidPos) {
+  UserDictionary dict;
+
+  const char* csv_data = "東京,BADPOS,0.5\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("Invalid POS at line 1: BADPOS"), std::string::npos);
+  EXPECT_EQ(dict.size(), 0);
+}
+
+TEST(UserDictTest, LoadFromMemoryRejectsEmptySurface) {
+  UserDictionary dict;
+
+  const char* csv_data = ",NOUN,0.5\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("Empty surface at line 1"), std::string::npos);
+  EXPECT_EQ(dict.size(), 0);
+}
+
+TEST(UserDictTest, LoadFromMemoryRejectsQuotedEmptySurface) {
+  UserDictionary dict;
+
+  const char* csv_data = "\"\",NOUN,0.5\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("Empty surface at line 1"), std::string::npos);
+  EXPECT_EQ(dict.size(), 0);
+}
+
+TEST(UserDictTest, LoadFromMemoryRejectsEmptyPos) {
+  UserDictionary dict;
+
+  const char* csv_data = "東京,,0.5\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("Empty POS at line 1"), std::string::npos);
+  EXPECT_EQ(dict.size(), 0);
 }
 
 TEST(UserDictTest, LoadFromMemoryInvalidLine) {
@@ -280,6 +368,25 @@ TEST(UserDictTest, LoadFromMemoryFailureDoesNotPartiallyAppendEntries) {
   const char* csv_data =
       "東京,NOUN,0.5\n"
       "\"大阪,NOUN,0.5\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_EQ(dict.size(), 1);
+  EXPECT_TRUE(dict.lookup("東京", 0).empty());
+  EXPECT_FALSE(dict.lookup("既存", 0).empty());
+}
+
+TEST(UserDictTest, LoadFromMemoryInvalidPosDoesNotPartiallyAppendEntries) {
+  UserDictionary dict;
+
+  DictionaryEntry existing;
+  existing.surface = "既存";
+  existing.pos = core::PartOfSpeech::Noun;
+  dict.addEntry(existing);
+
+  const char* csv_data =
+      "東京,NOUN,0.5\n"
+      "大阪,BADPOS,0.5\n";
 
   auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
   EXPECT_FALSE(result.hasValue());

@@ -102,6 +102,54 @@ ParsedLine parseDelimitedLine(std::string_view line, char delimiter) {
   return result;
 }
 
+core::Expected<core::PartOfSpeech, core::Error> parseUserDictPos(std::string_view field, size_t line_number) {
+  if (field == "NOUN" || field == "名詞" || field == "PROPN" || field == "PROPER_NOUN") {
+    return core::PartOfSpeech::Noun;
+  }
+  if (field == "VERB" || field == "動詞") {
+    return core::PartOfSpeech::Verb;
+  }
+  if (field == "ADJ" || field == "ADJECTIVE" || field == "形容詞") {
+    return core::PartOfSpeech::Adjective;
+  }
+  if (field == "ADV" || field == "ADVERB" || field == "副詞") {
+    return core::PartOfSpeech::Adverb;
+  }
+  if (field == "PARTICLE" || field == "助詞") {
+    return core::PartOfSpeech::Particle;
+  }
+  if (field == "AUX" || field == "AUXILIARY" || field == "助動詞") {
+    return core::PartOfSpeech::Auxiliary;
+  }
+  if (field == "CONJ" || field == "CONJUNCTION" || field == "接続詞") {
+    return core::PartOfSpeech::Conjunction;
+  }
+  if (field == "DET" || field == "DETERMINER" || field == "ADNOMINAL" || field == "連体詞") {
+    return core::PartOfSpeech::Determiner;
+  }
+  if (field == "PRON" || field == "PRONOUN" || field == "代名詞") {
+    return core::PartOfSpeech::Pronoun;
+  }
+  if (field == "PREFIX" || field == "接頭辞") {
+    return core::PartOfSpeech::Prefix;
+  }
+  if (field == "SUFFIX" || field == "接尾辞") {
+    return core::PartOfSpeech::Suffix;
+  }
+  if (field == "INTJ" || field == "INTERJECTION" || field == "感動詞") {
+    return core::PartOfSpeech::Interjection;
+  }
+  if (field == "SYMBOL" || field == "SYM" || field == "記号") {
+    return core::PartOfSpeech::Symbol;
+  }
+  if (field == "OTHER" || field == "PHRASE" || field == "その他") {
+    return core::PartOfSpeech::Other;
+  }
+
+  return core::Error(core::ErrorCode::InvalidInput,
+                     "Invalid POS at line " + std::to_string(line_number) + ": " + std::string(field));
+}
+
 }  // namespace
 
 UserDictionary::UserDictionary() = default;
@@ -174,10 +222,6 @@ core::Expected<size_t, core::Error> UserDictionary::parseCSV(std::string_view cs
 
   while (std::getline(stream, line)) {
     ++line_number;
-    // Skip empty lines and comments
-    if (line.empty() || line[0] == '#') {
-      continue;
-    }
 
     // Trim whitespace
     size_t start = line.find_first_not_of(" \t\r\n");
@@ -186,6 +230,10 @@ core::Expected<size_t, core::Error> UserDictionary::parseCSV(std::string_view cs
       continue;
     }
     line = line.substr(start, end - start + 1);
+
+    if (line[0] == '#') {
+      continue;
+    }
 
     // Detect delimiter: tab for TSV, comma for CSV
     char delimiter = (line.find('\t') != std::string::npos) ? '\t' : ',';
@@ -202,9 +250,20 @@ core::Expected<size_t, core::Error> UserDictionary::parseCSV(std::string_view cs
       continue;  // Skip invalid lines
     }
 
+    if (fields[0].empty()) {
+      return core::Error(core::ErrorCode::InvalidInput, "Empty surface at line " + std::to_string(line_number));
+    }
+    if (fields[1].empty()) {
+      return core::Error(core::ErrorCode::InvalidInput, "Empty POS at line " + std::to_string(line_number));
+    }
+
     DictionaryEntry entry;
     entry.surface = fields[0];
-    entry.pos = core::stringToPos(fields[1]);
+    auto pos_result = parseUserDictPos(fields[1], line_number);
+    if (!pos_result.hasValue()) {
+      return pos_result.error();
+    }
+    entry.pos = pos_result.value();
 
     // TSV format: surface, pos, reading, cost, conj_type
     // CSV format: surface, pos, cost, lemma

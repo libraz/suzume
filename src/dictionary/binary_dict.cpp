@@ -52,6 +52,13 @@ core::PartOfSpeech uint8ToPos(uint8_t val) {
   return static_cast<core::PartOfSpeech>(val);
 }
 
+template <typename T>
+T readPod(const std::vector<uint8_t>& data, size_t offset) {
+  T value{};
+  std::memcpy(&value, data.data() + offset, sizeof(T));
+  return value;
+}
+
 }  // namespace
 
 // BinaryDictionary implementation
@@ -111,62 +118,61 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const std::vecto
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary file too small"));
   }
 
-  const auto* header = reinterpret_cast<const BinaryDictHeader*>(data.data());
+  const auto header = readPod<BinaryDictHeader>(data, 0);
 
   // Validate magic
-  if (header->magic != BinaryDictHeader::kMagic) {
+  if (header.magic != BinaryDictHeader::kMagic) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary magic number"));
   }
 
   // Validate version
-  if (header->version_major != BinaryDictHeader::kVersionMajor) {
+  if (header.version_major != BinaryDictHeader::kVersionMajor) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Unsupported dictionary version"));
   }
-  if (header->version_minor > BinaryDictHeader::kVersionMinor) {
+  if (header.version_minor > BinaryDictHeader::kVersionMinor) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Unsupported dictionary minor version"));
   }
 
   // Validate offsets and section ranges before reading variable-length data.
-  if (header->trie_offset > data.size() || header->trie_size > data.size() - header->trie_offset ||
-      header->entry_offset > data.size() || header->string_offset > data.size()) {
+  if (header.trie_offset > data.size() || header.trie_size > data.size() - header.trie_offset ||
+      header.entry_offset > data.size() || header.string_offset > data.size()) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary offsets"));
   }
-  if (header->trie_offset < sizeof(BinaryDictHeader) ||
-      header->entry_offset < header->trie_offset + header->trie_size) {
+  if (header.trie_offset < sizeof(BinaryDictHeader) ||
+      header.entry_offset < header.trie_offset + header.trie_size) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary section order"));
   }
 
-  size_t entry_count = header->entry_count;
+  size_t entry_count = header.entry_count;
   if (entry_count > (std::numeric_limits<size_t>::max() / sizeof(BinaryDictEntry))) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary entry table too large"));
   }
 
   size_t entry_table_size = entry_count * sizeof(BinaryDictEntry);
-  if (header->entry_offset > data.size() || entry_table_size > data.size() - header->entry_offset ||
-      header->entry_offset + entry_table_size > header->string_offset) {
+  if (header.entry_offset > data.size() || entry_table_size > data.size() - header.entry_offset ||
+      header.entry_offset + entry_table_size > header.string_offset) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary entry table"));
   }
 
-  if (header->string_offset < header->entry_offset + entry_table_size) {
+  if (header.string_offset < header.entry_offset + entry_table_size) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary string pool offset"));
   }
 
-  size_t string_pool_size = data.size() - header->string_offset;
+  size_t string_pool_size = data.size() - header.string_offset;
 
   // Load trie
-  if (!trie.deserialize(data.data() + header->trie_offset, header->trie_size)) {
+  if (!trie.deserialize(data.data() + header.trie_offset, header.trie_size)) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Failed to load dictionary trie"));
   }
 
   // Load entries
-  const auto* entry_data = reinterpret_cast<const BinaryDictEntry*>(data.data() + header->entry_offset);
-  const char* string_pool = reinterpret_cast<const char*>(data.data() + header->string_offset);
+  const char* string_pool = reinterpret_cast<const char*>(data.data() + header.string_offset);
 
   entries.clear();
   entries.reserve(entry_count);
 
-  for (uint32_t idx = 0; idx < header->entry_count; ++idx) {
-    const auto& rec = entry_data[idx];
+  for (uint32_t idx = 0; idx < header.entry_count; ++idx) {
+    const auto rec = readPod<BinaryDictEntry>(data, header.entry_offset + idx * sizeof(BinaryDictEntry));
 
     if (rec.surface_offset > string_pool_size || rec.surface_length > string_pool_size - rec.surface_offset) {
       return core::makeUnexpected(
