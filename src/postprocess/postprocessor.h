@@ -43,6 +43,11 @@ class Postprocessor {
    */
   std::vector<core::Morpheme> process(const std::vector<core::Morpheme>& morphemes) const;
 
+  /**
+   * @brief Update post-processing options while keeping dictionary-aware lemmatization.
+   */
+  void setOptions(const PostprocessOptions& options) { options_ = options; }
+
  private:
   PostprocessOptions options_;
   Lemmatizer lemmatizer_;

@@ -27,6 +27,37 @@ bool isAsciiWhitespace(char chr) {
   return chr == ' ' || chr == '\t';
 }
 
+bool isNumericField(std::string_view field) {
+  if (field.empty()) {
+    return false;
+  }
+  bool seen_digit = false;
+  for (char chr : field) {
+    if (chr >= '0' && chr <= '9') {
+      seen_digit = true;
+      continue;
+    }
+    if (chr == '.' || chr == '-' || chr == '+') {
+      continue;
+    }
+    return false;
+  }
+  return seen_digit;
+}
+
+bool isConjugationTypeField(std::string_view field) {
+  return field == "Ichidan" || field == "GodanKa" || field == "GodanGa" || field == "GodanSa" ||
+         field == "GodanTa" || field == "GodanNa" || field == "GodanBa" || field == "GodanMa" ||
+         field == "GodanRa" || field == "GodanWa" || field == "Suru" || field == "Kuru" ||
+         field == "IAdjective" || field == "NaAdjective" || field == "Interjection" ||
+         field == "ProperFamily" || field == "ProperGiven" || field == "None" || field == "ICHIDAN" ||
+         field == "GODAN_KA" || field == "GODAN_GA" || field == "GODAN_SA" || field == "GODAN_TA" ||
+         field == "GODAN_NA" || field == "GODAN_BA" || field == "GODAN_MA" || field == "GODAN_RA" ||
+         field == "GODAN_WA" || field == "SURU" || field == "KURU" || field == "I_ADJ" ||
+         field == "NA_ADJ" || field == "INTERJECTION" || field == "PROPER_FAMILY" ||
+         field == "PROPER_GIVEN" || field == "NONE";
+}
+
 ParsedLine parseDelimitedLine(std::string_view line, char delimiter) {
   ParsedLine result;
   std::string field;
@@ -265,16 +296,22 @@ core::Expected<size_t, core::Error> UserDictionary::parseCSV(std::string_view cs
     }
     entry.pos = pos_result.value();
 
-    // TSV format: surface, pos, reading, cost, conj_type
+    // TSV format:
+    //   surface, pos, conj_type                 (compiler-compatible, no lemma)
+    //   surface, pos, lemma                     (runtime convenience)
+    //   surface, pos, conj_type, lemma          (runtime convenience)
+    //   surface, pos, reading, cost, conj, lemma (legacy extension)
     // CSV format: surface, pos, cost, lemma
     bool is_tsv = (delimiter == '\t');
 
-    // v0.8: Simplified - cost and conj_type removed from DictionaryEntry
-    // Cost is now derived from ExtendedPOS via getCategoryCost()
     if (is_tsv) {
-      // TSV format: surface, pos, reading, cost, conj_type
-      // Fields 2-4 (reading, cost, conj_type) are ignored
-      (void)fields;  // suppress unused warning
+      if (fields.size() > 5) {
+        entry.lemma = fields[5];
+      } else if (fields.size() == 4 && !isNumericField(fields[3])) {
+        entry.lemma = fields[3];
+      } else if (fields.size() == 3 && !isNumericField(fields[2]) && !isConjugationTypeField(fields[2])) {
+        entry.lemma = fields[2];
+      }
     } else {
       // CSV format: surface, pos, cost, lemma
       // Field 2 (cost) is ignored

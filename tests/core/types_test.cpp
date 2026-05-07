@@ -39,6 +39,12 @@ TEST(TypesTest, AnalysisModeHasCorrectValues) {
   EXPECT_NE(AnalysisMode::Search, AnalysisMode::Split);
 }
 
+TEST(TypesTest, PosCountMatchesEnumRange) {
+  EXPECT_EQ(static_cast<size_t>(PartOfSpeech::Count_), 15u);
+  EXPECT_EQ(posToString(PartOfSpeech::Count_), "OTHER");
+  EXPECT_EQ(posToExtendedPos(PartOfSpeech::Count_), ExtendedPOS::Other);
+}
+
 }  // namespace
 }  // namespace core
 }  // namespace suzume

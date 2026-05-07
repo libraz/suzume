@@ -19,7 +19,7 @@ namespace suzume::analysis {
 class Tokenizer {
  public:
   Tokenizer(const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
-            const UnknownWordGenerator& unknown_gen);
+            const UnknownWordGenerator& unknown_gen, core::AnalysisMode mode = core::AnalysisMode::Normal);
 
   /**
    * @brief Build lattice from text
@@ -36,6 +36,7 @@ class Tokenizer {
   const Scorer& scorer_;
   const UnknownWordGenerator& unknown_gen_;
   const grammar::Inflection& inflection_;  // Shared from unknown_gen_
+  core::AnalysisMode mode_;
 
   /**
    * @brief Add dictionary candidates at position

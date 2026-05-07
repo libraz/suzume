@@ -35,6 +35,12 @@ export interface SuzumeOptions {
   preserveCase?: boolean;
   /** Preserve symbols/emoji in output, default: false */
   preserveSymbols?: boolean;
+  /** Analysis mode, default: normal */
+  mode?: 'normal' | 'search' | 'split';
+  /** Apply lemmatization, default: true */
+  lemmatize?: boolean;
+  /** Merge consecutive noun compounds, default: false */
+  mergeCompounds?: boolean;
 }
 
 /**
@@ -119,6 +125,16 @@ interface CLayouts {
     minLength: number;
     maxTags: number;
   };
+  extendedOptions: {
+    size: number;
+    structSize: number;
+    preserveVu: number;
+    preserveCase: number;
+    preserveSymbols: number;
+    mode: number;
+    lemmatize: number;
+    mergeCompounds: number;
+  };
 }
 
 const registry = new FinalizationRegistry((ref: CleanupRef) => {
@@ -150,7 +166,7 @@ export class Suzume {
   private layouts: CLayouts;
   private unregisterToken = {};
 
-  private constructor(module: EmscriptenModule, handle: number) {
+  private constructor(module: EmscriptenModule, handle: number, layouts?: CLayouts) {
     this.module = module;
     this.handle = handle;
     this.cleanupRef = { module, handle };
@@ -195,7 +211,7 @@ export class Suzume {
 
     this._version = module.cwrap('suzume_version', 'number', []) as () => number;
     this._lastError = module.cwrap('suzume_last_error', 'number', []) as () => number;
-    this.layouts = Suzume.loadCLayouts(module);
+    this.layouts = layouts ?? Suzume.loadCLayouts(module);
   }
 
   private static loadCLayouts(module: EmscriptenModule): CLayouts {
@@ -204,6 +220,11 @@ export class Suzume {
     const sizeofTags = module.cwrap('suzume_sizeof_tags', 'number', []) as () => number;
     const sizeofTagOptions = module.cwrap(
       'suzume_sizeof_tag_options',
+      'number',
+      [],
+    ) as () => number;
+    const sizeofExtendedOptions = module.cwrap(
+      'suzume_sizeof_extended_options',
       'number',
       [],
     ) as () => number;
@@ -217,6 +238,9 @@ export class Suzume {
       field: number,
     ) => number;
     const offsetofTagOptions = module.cwrap('suzume_offsetof_tag_options', 'number', [
+      'number',
+    ]) as (field: number) => number;
+    const offsetofExtendedOptions = module.cwrap('suzume_offsetof_extended_options', 'number', [
       'number',
     ]) as (field: number) => number;
 
@@ -250,6 +274,16 @@ export class Suzume {
         minLength: offsetofTagOptions(3),
         maxTags: offsetofTagOptions(4),
       },
+      extendedOptions: {
+        size: sizeofExtendedOptions(),
+        structSize: offsetofExtendedOptions(0),
+        preserveVu: offsetofExtendedOptions(1),
+        preserveCase: offsetofExtendedOptions(2),
+        preserveSymbols: offsetofExtendedOptions(3),
+        mode: offsetofExtendedOptions(4),
+        lemmatize: offsetofExtendedOptions(5),
+        mergeCompounds: offsetofExtendedOptions(6),
+      },
     };
   }
 
@@ -269,6 +303,7 @@ export class Suzume {
       moduleOptions.locateFile = (path: string) => (path.endsWith('.wasm') ? wasmPath : path);
     }
     const module: EmscriptenModule = await createModule.default(moduleOptions);
+    const layouts = Suzume.loadCLayouts(module);
 
     let handle: number;
 
@@ -276,23 +311,40 @@ export class Suzume {
       options &&
       (options.preserveVu !== undefined ||
         options.preserveCase !== undefined ||
-        options.preserveSymbols !== undefined)
+        options.preserveSymbols !== undefined ||
+        options.mode !== undefined ||
+        options.lemmatize !== undefined ||
+        options.mergeCompounds !== undefined)
     ) {
       // Create with options
-      // suzume_options_t layout: 3 ints (12 bytes on wasm32)
-      const OPTIONS_SIZE = 12;
+      const layout = layouts.extendedOptions;
+      const OPTIONS_SIZE = layout.size;
       const optionsPtr = module._malloc(OPTIONS_SIZE);
 
       try {
         const heap = (module as unknown as { HEAPU32: Uint32Array }).HEAPU32;
+        const modeMap: Record<NonNullable<SuzumeOptions['mode']>, number> = {
+          normal: 0,
+          search: 1,
+          split: 2,
+        };
+        const selectedMode = options.mode ?? 'normal';
+        const modeValue = modeMap[selectedMode];
+        if (modeValue === undefined) {
+          throw new Error(`Invalid Suzume mode: ${String(options.mode)}`);
+        }
+        heap[(optionsPtr + layout.structSize) >> 2] = OPTIONS_SIZE;
         // preserve_vu: default true
-        heap[optionsPtr >> 2] = options.preserveVu !== false ? 1 : 0;
+        heap[(optionsPtr + layout.preserveVu) >> 2] = options.preserveVu !== false ? 1 : 0;
         // preserve_case: default true
-        heap[(optionsPtr >> 2) + 1] = options.preserveCase !== false ? 1 : 0;
+        heap[(optionsPtr + layout.preserveCase) >> 2] = options.preserveCase !== false ? 1 : 0;
         // preserve_symbols: default false
-        heap[(optionsPtr >> 2) + 2] = options.preserveSymbols === true ? 1 : 0;
+        heap[(optionsPtr + layout.preserveSymbols) >> 2] = options.preserveSymbols === true ? 1 : 0;
+        heap[(optionsPtr + layout.mode) >> 2] = modeValue;
+        heap[(optionsPtr + layout.lemmatize) >> 2] = options.lemmatize !== false ? 1 : 0;
+        heap[(optionsPtr + layout.mergeCompounds) >> 2] = options.mergeCompounds === true ? 1 : 0;
 
-        const createWithOptions = module.cwrap('suzume_create_with_options', 'number', [
+        const createWithOptions = module.cwrap('suzume_create_with_extended_options', 'number', [
           'number',
         ]) as (optionsPtr: number) => number;
         handle = createWithOptions(optionsPtr);
@@ -315,7 +367,7 @@ export class Suzume {
       );
     }
 
-    return new Suzume(module, handle);
+    return new Suzume(module, handle, layouts);
   }
 
   /**

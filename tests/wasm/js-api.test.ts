@@ -13,6 +13,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Suzume } from '../../dist/index.js';
 import {
   allocString,
+  EXTENDED_OPTIONS_LAYOUT,
   getModule,
   MORPHEME_LAYOUT,
   parseMorphemes,
@@ -158,12 +159,51 @@ describe('JS API: struct layout compatibility', () => {
     destroy(h);
   });
 
+  it('create_with_extended_options accepts split mode', () => {
+    const initOptions = module.cwrap('suzume_init_extended_options', null, ['number']) as (
+      optionsPtr: number,
+    ) => void;
+    const createWithOptions = module.cwrap('suzume_create_with_extended_options', 'number', [
+      'number',
+    ]) as (optionsPtr: number) => number;
+    const analyze = module.cwrap('suzume_analyze', 'number', ['number', 'number']) as (
+      h: number,
+      t: number,
+    ) => number;
+    const resultFree = module.cwrap('suzume_result_free', null, ['number']) as (r: number) => void;
+    const destroy = module.cwrap('suzume_destroy', null, ['number']) as (h: number) => void;
+
+    const optionsPtr = module._malloc(EXTENDED_OPTIONS_LAYOUT.size);
+    initOptions(optionsPtr);
+    module.HEAPU32[(optionsPtr + EXTENDED_OPTIONS_LAYOUT.mode) >> 2] = 2;
+
+    const h = createWithOptions(optionsPtr);
+    module._free(optionsPtr);
+
+    try {
+      expect(h).toBeGreaterThan(0);
+      const textPtr = allocString(module, 'API開発');
+      const resultPtr = analyze(h, textPtr);
+      module._free(textPtr);
+      const morphemes = parseMorphemes(module, resultPtr);
+      resultFree(resultPtr);
+      expect(morphemes.length).toBeGreaterThan(1);
+    } finally {
+      destroy(h);
+    }
+  });
+
   it('exported C layout functions match JS parser constants', () => {
     const sizeofResult = module.cwrap('suzume_sizeof_result', 'number', []) as () => number;
     const sizeofMorpheme = module.cwrap('suzume_sizeof_morpheme', 'number', []) as () => number;
     const sizeofTags = module.cwrap('suzume_sizeof_tags', 'number', []) as () => number;
     const sizeofTagOptions = module.cwrap(
       'suzume_sizeof_tag_options',
+      'number',
+      [],
+    ) as () => number;
+    const sizeofExtendedOptions = module.cwrap(
+      'suzume_sizeof_extended_options',
       'number',
       [],
     ) as () => number;
@@ -177,6 +217,9 @@ describe('JS API: struct layout compatibility', () => {
       field: number,
     ) => number;
     const offsetofTagOptions = module.cwrap('suzume_offsetof_tag_options', 'number', [
+      'number',
+    ]) as (field: number) => number;
+    const offsetofExtendedOptions = module.cwrap('suzume_offsetof_extended_options', 'number', [
       'number',
     ]) as (field: number) => number;
 
@@ -195,6 +238,11 @@ describe('JS API: struct layout compatibility', () => {
     expect(sizeofTagOptions()).toBe(TAG_OPTIONS_LAYOUT.size);
     expect(offsetofTagOptions(0)).toBe(TAG_OPTIONS_LAYOUT.posFilter);
     expect(offsetofTagOptions(4)).toBe(TAG_OPTIONS_LAYOUT.maxTags);
+
+    expect(sizeofExtendedOptions()).toBe(EXTENDED_OPTIONS_LAYOUT.size);
+    expect(offsetofExtendedOptions(0)).toBe(EXTENDED_OPTIONS_LAYOUT.structSize);
+    expect(offsetofExtendedOptions(4)).toBe(EXTENDED_OPTIONS_LAYOUT.mode);
+    expect(offsetofExtendedOptions(6)).toBe(EXTENDED_OPTIONS_LAYOUT.mergeCompounds);
   });
 
   it('last_error reports invalid C API calls', () => {
@@ -269,8 +317,19 @@ describe('JS API: error reporting', () => {
 
     try {
       expect(() => suzume.loadBinaryDictionaryOrThrow(new Uint8Array([0, 1, 2, 3]))).toThrow(
-        /Failed to load binary dictionary/,
+        /Dictionary file too small/,
       );
+    } finally {
+      suzume.destroy();
+    }
+  });
+
+  it('create forwards extended JS options', async () => {
+    const suzume = await Suzume.create({ mode: 'split', lemmatize: true, mergeCompounds: false });
+
+    try {
+      const morphemes = suzume.analyze('API開発');
+      expect(morphemes.length).toBeGreaterThan(1);
     } finally {
       suzume.destroy();
     }

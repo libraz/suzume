@@ -82,7 +82,7 @@ class Analyzer {
   /**
    * @brief Set analysis mode
    */
-  void setMode(core::AnalysisMode mode) { options_.mode = mode; }
+  void setMode(core::AnalysisMode mode);
 
   /**
    * @brief Get dictionary manager reference

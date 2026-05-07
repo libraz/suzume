@@ -71,7 +71,7 @@ Analyzer::Analyzer(const AnalyzerOptions& options)
       scorer_(options.scorer_options),
       unknown_gen_(options.unknown_options, &dict_manager_),
       tokenizer_(nullptr) {
-  tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
+  tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_, options_.mode);
 }
 
 Analyzer::~Analyzer() = default;
@@ -79,20 +79,28 @@ Analyzer::~Analyzer() = default;
 void Analyzer::addUserDictionary(std::shared_ptr<dictionary::UserDictionary> dict) {
   dict_manager_.addUserDictionary(std::move(dict));
   // Rebuild tokenizer with new dictionary
-  tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
+  tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_, options_.mode);
 }
 
 bool Analyzer::tryAutoLoadCoreDictionary() {
   bool loaded = dict_manager_.tryAutoLoadCoreDictionary();
   if (loaded) {
     // Rebuild tokenizer with new dictionary
-    tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
+    tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_, options_.mode);
   }
   return loaded;
 }
 
 bool Analyzer::hasCoreBinaryDictionary() const {
   return dict_manager_.hasCoreBinaryDictionary();
+}
+
+void Analyzer::setMode(core::AnalysisMode mode) {
+  if (options_.mode == mode) {
+    return;
+  }
+  options_.mode = mode;
+  tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_, options_.mode);
 }
 
 std::vector<core::Morpheme> Analyzer::analyze(std::string_view text) const {
@@ -205,6 +213,7 @@ std::vector<core::Morpheme> Analyzer::analyzeWithPretokenizer(std::string_view t
       core::Morpheme morpheme;
       morpheme.surface = tok.surface;
       morpheme.pos = tok.pos;
+      morpheme.extended_pos = core::posToExtendedPos(tok.pos);
       morpheme.lemma = tok.surface;
       morpheme.start_pos = char_offset;
 

@@ -2,6 +2,8 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
+#include <fstream>
 
 #include "suzume.h"
 
@@ -63,6 +65,37 @@ TEST_F(SuzumeApiTest, SetModeRoundtrip) {
   EXPECT_EQ(instance.mode(), core::AnalysisMode::Normal);
 }
 
+TEST_F(SuzumeApiTest, SplitModeDisablesMixedScriptJoinCandidates) {
+  SuzumeOptions normal_opts = makeTestOptions();
+  normal_opts.mode = core::AnalysisMode::Normal;
+  Suzume normal(normal_opts);
+
+  SuzumeOptions split_opts = makeTestOptions();
+  split_opts.mode = core::AnalysisMode::Split;
+  Suzume split(split_opts);
+
+  auto normal_results = normal.analyze("API開発");
+  auto split_results = split.analyze("API開発");
+
+  ASSERT_FALSE(normal_results.empty());
+  ASSERT_FALSE(split_results.empty());
+  EXPECT_EQ(normal_results.front().surface, "API開発");
+  EXPECT_GT(split_results.size(), normal_results.size());
+}
+
+TEST_F(SuzumeApiTest, SetModeUpdatesTokenizerAndPostprocessor) {
+  Suzume instance(makeTestOptions());
+
+  auto normal_results = instance.analyze("API開発");
+  instance.setMode(core::AnalysisMode::Split);
+  auto split_results = instance.analyze("API開発");
+
+  ASSERT_FALSE(normal_results.empty());
+  ASSERT_FALSE(split_results.empty());
+  EXPECT_EQ(normal_results.front().surface, "API開発");
+  EXPECT_GT(split_results.size(), normal_results.size());
+}
+
 TEST_F(SuzumeApiTest, AnalyzeSimpleText) {
   Suzume instance(makeTestOptions());
   // "Tokyo is beautiful"
@@ -93,6 +126,14 @@ TEST_F(SuzumeApiTest, AnalyzeSingleCharacter) {
   // Single kanji "mountain"
   auto results = instance.analyze("\xe5\xb1\xb1");
   EXPECT_FALSE(results.empty());
+}
+
+TEST_F(SuzumeApiTest, PretokenizedMorphemesHaveExtendedPos) {
+  Suzume instance(makeTestOptions());
+  auto results = instance.analyze("https://example.com");
+  ASSERT_EQ(results.size(), 1u);
+  EXPECT_EQ(results[0].pos, core::PartOfSpeech::Noun);
+  EXPECT_EQ(results[0].extended_pos, core::ExtendedPOS::Noun);
 }
 
 TEST_F(SuzumeApiTest, GenerateTagsReturnsResults) {
@@ -204,6 +245,46 @@ TEST_F(SuzumeApiTest, LoadBinaryDictionaryFromInvalidMemory) {
   const uint8_t bad_data[] = {0x00, 0x01, 0x02, 0x03};
   bool result = instance.loadBinaryDictionary(bad_data, sizeof(bad_data));
   EXPECT_FALSE(result);
+}
+
+TEST_F(SuzumeApiTest, LoadBinaryDictionaryResultReportsParseError) {
+  Suzume instance(makeTestOptions());
+  const uint8_t bad_data[] = {0x00, 0x01, 0x02, 0x03};
+  auto result = instance.loadBinaryDictionaryResult(bad_data, sizeof(bad_data));
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("Dictionary file too small"), std::string::npos);
+}
+
+TEST_F(SuzumeApiTest, AutoDictionaryLoadWarningsAreRecorded) {
+#ifndef __EMSCRIPTEN__
+  namespace fs = std::filesystem;
+
+  const char* old_data_dir = std::getenv("SUZUME_DATA_DIR");
+  std::string old_value = old_data_dir != nullptr ? old_data_dir : "";
+
+  fs::path dir = fs::temp_directory_path() / "suzume_bad_dict_test";
+  fs::create_directories(dir);
+  {
+    std::ofstream file(dir / "core.dic", std::ios::binary);
+    const char bad_data[] = {0x00, 0x01, 0x02, 0x03};
+    file.write(bad_data, sizeof(bad_data));
+  }
+
+  setenv("SUZUME_DATA_DIR", dir.string().c_str(), 1);
+  SuzumeOptions opts = makeTestOptions();
+  Suzume instance(opts);
+  if (old_data_dir != nullptr) {
+    setenv("SUZUME_DATA_DIR", old_value.c_str(), 1);
+  } else {
+    unsetenv("SUZUME_DATA_DIR");
+  }
+  fs::remove_all(dir);
+
+  auto warnings = instance.dictionaryWarnings();
+  ASSERT_FALSE(warnings.empty());
+  EXPECT_NE(warnings.front().find("Failed to auto-load dictionary"), std::string::npos);
+  EXPECT_NE(warnings.front().find("Dictionary file too small"), std::string::npos);
+#endif
 }
 
 TEST_F(SuzumeApiTest, ScorerEnvWarningsAreSilentByDefault) {

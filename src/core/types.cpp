@@ -33,6 +33,7 @@ std::string_view posToString(PartOfSpeech pos) {
       return "INTJ";
     case PartOfSpeech::Symbol:
       return "SYMBOL";
+    case PartOfSpeech::Count_:
     case PartOfSpeech::Other:
     case PartOfSpeech::Unknown:
     default:
@@ -68,6 +69,7 @@ std::string_view posToJapanese(PartOfSpeech pos) {
       return "感動詞";
     case PartOfSpeech::Symbol:
       return "記号";
+    case PartOfSpeech::Count_:
     case PartOfSpeech::Other:
     case PartOfSpeech::Unknown:
     default:
@@ -147,6 +149,7 @@ ExtendedPOS posToDefaultExtendedPOS(PartOfSpeech pos) {
       return ExtendedPOS::Symbol;
     case PartOfSpeech::Interjection:
       return ExtendedPOS::Interjection;
+    case PartOfSpeech::Count_:
     default:
       return ExtendedPOS::Unknown;
   }
@@ -469,6 +472,7 @@ ExtendedPOS posToExtendedPos(PartOfSpeech pos) {
       return ExtendedPOS::Interjection;
     case PartOfSpeech::Symbol:
       return ExtendedPOS::Symbol;
+    case PartOfSpeech::Count_:
     case PartOfSpeech::Other:
     case PartOfSpeech::Unknown:
     default:

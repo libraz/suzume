@@ -100,6 +100,19 @@ class Suzume {
   bool loadBinaryDictionary(const uint8_t* data, size_t size);
 
   /**
+   * @brief Load binary dictionary from memory with error details
+   * @param data Dictionary data (.dic binary format)
+   * @param size Data size in bytes
+   * @return Number of loaded entries on success, error on failure
+   */
+  core::Expected<size_t, core::Error> loadBinaryDictionaryResult(const uint8_t* data, size_t size);
+
+  /**
+   * @brief Warnings produced while auto-loading dictionaries at construction.
+   */
+  std::vector<std::string> dictionaryWarnings() const;
+
+  /**
    * @brief Analyze text into morphemes
    * @param text UTF-8 encoded Japanese text
    * @return Vector of morphemes

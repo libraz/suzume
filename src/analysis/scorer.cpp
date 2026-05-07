@@ -54,6 +54,7 @@ constexpr size_t posToIndex(suzume::core::PartOfSpeech pos) {
     case suzume::core::PartOfSpeech::Interjection:
     case suzume::core::PartOfSpeech::Other:
     case suzume::core::PartOfSpeech::Unknown:
+    case suzume::core::PartOfSpeech::Count_:
       return 12;
   }
   return 12;

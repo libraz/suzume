@@ -19,8 +19,7 @@ class IScorer;
 
 namespace suzume::core {
 
-// Number of PartOfSpeech types (Unknown=0 to Other=13)
-inline constexpr size_t kNumPosTypes = 15;  // Must match PartOfSpeech enum count
+inline constexpr size_t kNumPosTypes = static_cast<size_t>(PartOfSpeech::Count_);
 
 /**
  * @brief Viterbi result with path and cost

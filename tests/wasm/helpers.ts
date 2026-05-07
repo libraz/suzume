@@ -47,6 +47,17 @@ export const TAG_OPTIONS_LAYOUT = {
   maxTags: 16,
 } as const;
 
+export const EXTENDED_OPTIONS_LAYOUT = {
+  size: 28,
+  structSize: 0,
+  preserveVu: 4,
+  preserveCase: 8,
+  preserveSymbols: 12,
+  mode: 16,
+  lemmatize: 20,
+  mergeCompounds: 24,
+} as const;
+
 // Shared module instance (loaded once across all test files)
 let cachedModule: WasmModule | null = null;
 

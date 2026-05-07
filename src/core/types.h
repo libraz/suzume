@@ -25,7 +25,8 @@ enum class PartOfSpeech : uint8_t {
   Suffix,        // 接尾辞
   Interjection,  // 感動詞
   Symbol,        // 記号
-  Other          // その他
+  Other,         // その他
+  Count_         // Number of POS values
 };
 
 /**

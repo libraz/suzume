@@ -76,12 +76,15 @@ const CoreDictionary& DictionaryManager::coreDictionary() const {
 }
 
 bool DictionaryManager::loadCoreDictionary(const std::string& path) {
+  return loadCoreDictionaryResult(path).hasValue();
+}
+
+core::Expected<size_t, core::Error> DictionaryManager::loadCoreDictionaryResult(const std::string& path) {
   if (!core_binary_dict_) {
     core_binary_dict_ = std::make_unique<BinaryDictionary>();
   }
 
-  auto result = core_binary_dict_->loadFromFile(path);
-  return result.hasValue();
+  return core_binary_dict_->loadFromFile(path);
 }
 
 bool DictionaryManager::hasCoreBinaryDictionary() const {
@@ -89,21 +92,28 @@ bool DictionaryManager::hasCoreBinaryDictionary() const {
 }
 
 bool DictionaryManager::loadUserBinaryDictionary(const std::string& path) {
+  return loadUserBinaryDictionaryResult(path).hasValue();
+}
+
+core::Expected<size_t, core::Error> DictionaryManager::loadUserBinaryDictionaryResult(const std::string& path) {
   if (!user_binary_dict_) {
     user_binary_dict_ = std::make_unique<BinaryDictionary>();
   }
 
-  auto result = user_binary_dict_->loadFromFile(path);
-  return result.hasValue();
+  return user_binary_dict_->loadFromFile(path);
 }
 
 bool DictionaryManager::loadUserBinaryDictionaryFromMemory(const uint8_t* data, size_t size) {
+  return loadUserBinaryDictionaryFromMemoryResult(data, size).hasValue();
+}
+
+core::Expected<size_t, core::Error> DictionaryManager::loadUserBinaryDictionaryFromMemoryResult(const uint8_t* data,
+                                                                                                size_t size) {
   if (!user_binary_dict_) {
     user_binary_dict_ = std::make_unique<BinaryDictionary>();
   }
 
-  auto result = user_binary_dict_->loadFromMemory(data, size);
-  return result.hasValue();
+  return user_binary_dict_->loadFromMemory(data, size);
 }
 
 bool DictionaryManager::hasUserBinaryDictionary() const {

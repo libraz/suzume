@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 
+#include "core/error.h"
 #include "core/types.h"
 
 namespace suzume::dictionary {
@@ -146,6 +147,11 @@ class DictionaryManager {
   bool loadCoreDictionary(const std::string& path);
 
   /**
+   * @brief Load core binary dictionary from file with error details
+   */
+  core::Expected<size_t, core::Error> loadCoreDictionaryResult(const std::string& path);
+
+  /**
    * @brief Check if core binary dictionary is loaded
    */
   bool hasCoreBinaryDictionary() const;
@@ -158,12 +164,22 @@ class DictionaryManager {
   bool loadUserBinaryDictionary(const std::string& path);
 
   /**
+   * @brief Load user binary dictionary from file with error details
+   */
+  core::Expected<size_t, core::Error> loadUserBinaryDictionaryResult(const std::string& path);
+
+  /**
    * @brief Load user binary dictionary from memory
    * @param data Binary dictionary data (.dic format)
    * @param size Data size in bytes
    * @return true if loaded successfully
    */
   bool loadUserBinaryDictionaryFromMemory(const uint8_t* data, size_t size);
+
+  /**
+   * @brief Load user binary dictionary from memory with error details
+   */
+  core::Expected<size_t, core::Error> loadUserBinaryDictionaryFromMemoryResult(const uint8_t* data, size_t size);
 
   /**
    * @brief Check if user binary dictionary is loaded

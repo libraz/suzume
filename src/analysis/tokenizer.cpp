@@ -25,8 +25,12 @@ namespace suzume::analysis {
 using verb_helpers::getHiraganaVowel;
 
 Tokenizer::Tokenizer(const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
-                     const UnknownWordGenerator& unknown_gen)
-    : dict_manager_(dict_manager), scorer_(scorer), unknown_gen_(unknown_gen), inflection_(unknown_gen.inflection()) {}
+                     const UnknownWordGenerator& unknown_gen, core::AnalysisMode mode)
+    : dict_manager_(dict_manager),
+      scorer_(scorer),
+      unknown_gen_(unknown_gen),
+      inflection_(unknown_gen.inflection()),
+      mode_(mode) {}
 
 core::Lattice Tokenizer::buildLattice(std::string_view text, const std::vector<char32_t>& codepoints,
                                       const std::vector<normalize::CharType>& char_types) const {
@@ -37,22 +41,30 @@ core::Lattice Tokenizer::buildLattice(std::string_view text, const std::vector<c
     // These run at every position
     addDictionaryCandidates(lattice, text, codepoints, pos);
     addUnknownCandidates(lattice, text, codepoints, pos, char_types);
-    addMixedScriptCandidates(lattice, text, codepoints, pos, char_types);
+    if (mode_ != core::AnalysisMode::Split) {
+      addMixedScriptCandidates(lattice, text, codepoints, pos, char_types);
+    }
 
     // CharType-based dispatch: skip generators that can't match at this position
     auto ct = char_types[pos];
     if (ct == normalize::CharType::Kanji) {
       addCompoundSplitCandidates(lattice, text, codepoints, pos, char_types);
       addNounVerbSplitCandidates(lattice, text, codepoints, pos, char_types);
-      addCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
-      addPrefixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
-      addTaruAdjectiveJoinCandidates(lattice, text, codepoints, pos, char_types);
-      addVerbSuffixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
+      if (mode_ != core::AnalysisMode::Split) {
+        addCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
+        addPrefixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
+        addTaruAdjectiveJoinCandidates(lattice, text, codepoints, pos, char_types);
+        addVerbSuffixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
+      }
     } else if (ct == normalize::CharType::Hiragana) {
-      addHiraganaCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
+      if (mode_ != core::AnalysisMode::Split) {
+        addHiraganaCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
+      }
       addTeFormAuxiliaryCandidates(lattice, text, codepoints, pos, char_types);
     } else if (ct == normalize::CharType::Katakana) {
-      addKatakanaSugiruJoinCandidates(lattice, text, codepoints, pos, char_types);
+      if (mode_ != core::AnalysisMode::Split) {
+        addKatakanaSugiruJoinCandidates(lattice, text, codepoints, pos, char_types);
+      }
     }
     // addAdjectiveSugiruJoinCandidates is a no-op — removed
 

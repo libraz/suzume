@@ -66,6 +66,24 @@ typedef struct {
   int preserve_symbols; /**< Preserve symbols/emoji (don't remove from output) */
 } suzume_options_t;
 
+/**
+ * @brief Extended analysis options structure.
+ *
+ * Set size to sizeof(suzume_extended_options_t). Unknown future fields are ignored
+ * when size is smaller than the field offset. Use
+ * suzume_init_extended_options() before overriding individual fields so default
+ * true values such as preserve_case and lemmatize are preserved.
+ */
+typedef struct {
+  uint32_t size;        /**< Structure size for forward/backward compatibility */
+  int preserve_vu;      /**< Preserve ヴ (don't normalize to ビ etc.) */
+  int preserve_case;    /**< Preserve case (don't lowercase ASCII) */
+  int preserve_symbols; /**< Preserve symbols/emoji (don't remove from output) */
+  int mode;             /**< 0=normal, 1=search, 2=split */
+  int lemmatize;        /**< Apply lemmatization */
+  int merge_compounds;  /**< Merge consecutive noun compounds */
+} suzume_extended_options_t;
+
 // --- Lifecycle functions ---
 
 /**
@@ -80,6 +98,20 @@ SUZUME_EXPORT suzume_t suzume_create(void);
  * @return Handle to Suzume instance, or NULL on failure
  */
 SUZUME_EXPORT suzume_t suzume_create_with_options(const suzume_options_t* options);
+
+/**
+ * @brief Initialize extended options with Suzume defaults
+ * @param options Pointer to options structure to initialize
+ * @note Passing NULL is allowed and has no effect.
+ */
+SUZUME_EXPORT void suzume_init_extended_options(suzume_extended_options_t* options);
+
+/**
+ * @brief Create a new Suzume instance with extended options
+ * @param options Pointer to extended options structure
+ * @return Handle to Suzume instance, or NULL on failure
+ */
+SUZUME_EXPORT suzume_t suzume_create_with_extended_options(const suzume_extended_options_t* options);
 
 /**
  * @brief Destroy Suzume instance and free resources
@@ -199,6 +231,11 @@ SUZUME_EXPORT size_t suzume_sizeof_tags(void);
 SUZUME_EXPORT size_t suzume_sizeof_tag_options(void);
 
 /**
+ * @brief Get sizeof(suzume_extended_options_t)
+ */
+SUZUME_EXPORT size_t suzume_sizeof_extended_options(void);
+
+/**
  * @brief Get byte offset of field in suzume_result_t
  * @param field 0=morphemes, 1=count
  */
@@ -223,6 +260,14 @@ SUZUME_EXPORT size_t suzume_offsetof_tags(uint32_t field);
  *              3=min_length, 4=max_tags
  */
 SUZUME_EXPORT size_t suzume_offsetof_tag_options(uint32_t field);
+
+/**
+ * @brief Get byte offset of field in suzume_extended_options_t
+ * @param field 0=size, 1=preserve_vu, 2=preserve_case,
+ *              3=preserve_symbols, 4=mode, 5=lemmatize,
+ *              6=merge_compounds
+ */
+SUZUME_EXPORT size_t suzume_offsetof_extended_options(uint32_t field);
 
 /**
  * @brief Allocate memory (for WASM interop)

@@ -309,6 +309,34 @@ TEST(UserDictTest, LoadFromMemoryWithLemma) {
   EXPECT_EQ(entry->lemma, "食べる");
 }
 
+TEST(UserDictTest, LoadFromMemoryTSVWithRuntimeLemma) {
+  UserDictionary dict;
+
+  const char* tsv_data = "食べた\tVERB\t食べる\n";
+
+  auto result = dict.loadFromMemory(tsv_data, strlen(tsv_data));
+  ASSERT_TRUE(result.hasValue());
+  EXPECT_EQ(result.value(), 1);
+
+  const DictionaryEntry* entry = dict.getEntry(0);
+  ASSERT_NE(entry, nullptr);
+  EXPECT_EQ(entry->lemma, "食べる");
+}
+
+TEST(UserDictTest, LoadFromMemoryTSVCompilerConjTypeIsNotMistakenForLemma) {
+  UserDictionary dict;
+
+  const char* tsv_data = "食べる\tVERB\tIchidan\n";
+
+  auto result = dict.loadFromMemory(tsv_data, strlen(tsv_data));
+  ASSERT_TRUE(result.hasValue());
+  EXPECT_EQ(result.value(), 1);
+
+  const DictionaryEntry* entry = dict.getEntry(0);
+  ASSERT_NE(entry, nullptr);
+  EXPECT_TRUE(entry->lemma.empty());
+}
+
 TEST(UserDictTest, LoadFromMemoryCSVQuotedFields) {
   UserDictionary dict;
 
