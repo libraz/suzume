@@ -289,10 +289,11 @@ SUZUME_EXPORT int suzume_load_user_dict(suzume_t handle, const char* data, size_
 
   clearLastError();
   try {
-    if (handle->instance.loadUserDictionaryFromMemory(data, size)) {
+    auto result = handle->instance.loadUserDictionaryFromMemoryResult(data, size);
+    if (result.hasValue()) {
       return 1;
     }
-    setLastError("Failed to load user dictionary");
+    setLastError(result.error().message);
     return 0;
   } catch (...) {
     setLastErrorFromException();

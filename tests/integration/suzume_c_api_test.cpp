@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <cstddef>
+#include <cstring>
 
 #include "suzume_c.h"
 
@@ -26,6 +27,27 @@ TEST(SuzumeCApiTest, LastErrorClearsAfterSuccess) {
 
   suzume_result_free(result);
   suzume_destroy(handle);
+}
+
+TEST(SuzumeCApiTest, LoadUserDictReportsParseDetails) {
+  suzume_t handle = suzume_create();
+  ASSERT_NE(handle, nullptr);
+
+  const char* csv_data = "\"東京,NOUN,0.5\n";
+  EXPECT_EQ(suzume_load_user_dict(handle, csv_data, std::strlen(csv_data)), 0);
+
+  std::string error = suzume_last_error();
+  EXPECT_NE(error.find("Invalid CSV quoting"), std::string::npos);
+  EXPECT_NE(error.find("unterminated quoted field"), std::string::npos);
+
+  suzume_destroy(handle);
+}
+
+TEST(SuzumeCApiTest, FreeNullPointersAreNoOps) {
+  suzume_destroy(nullptr);
+  suzume_result_free(nullptr);
+  suzume_tags_free(nullptr);
+  suzume_free(nullptr);
 }
 
 TEST(SuzumeCApiTest, LayoutFunctionsMatchNativeStructs) {

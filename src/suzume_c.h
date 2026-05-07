@@ -84,6 +84,7 @@ SUZUME_EXPORT suzume_t suzume_create_with_options(const suzume_options_t* option
 /**
  * @brief Destroy Suzume instance and free resources
  * @param handle Suzume handle
+ * @note Passing NULL is allowed and has no effect.
  */
 SUZUME_EXPORT void suzume_destroy(suzume_t handle);
 
@@ -93,13 +94,15 @@ SUZUME_EXPORT void suzume_destroy(suzume_t handle);
  * @brief Analyze Japanese text into morphemes
  * @param handle Suzume handle
  * @param text UTF-8 encoded Japanese text
- * @return Analysis result (must be freed with suzume_result_free)
+ * @return Analysis result allocated by Suzume, or NULL on failure.
+ *         Non-NULL results must be freed exactly once with suzume_result_free.
  */
 SUZUME_EXPORT suzume_result_t* suzume_analyze(suzume_t handle, const char* text);
 
 /**
  * @brief Free analysis result
  * @param result Result to free
+ * @note Passing NULL is allowed and has no effect.
  */
 SUZUME_EXPORT void suzume_result_free(suzume_result_t* result);
 
@@ -107,7 +110,8 @@ SUZUME_EXPORT void suzume_result_free(suzume_result_t* result);
  * @brief Generate tags from Japanese text
  * @param handle Suzume handle
  * @param text UTF-8 encoded Japanese text
- * @return Tags result (must be freed with suzume_tags_free)
+ * @return Tags result allocated by Suzume, or NULL on failure.
+ *         Non-NULL results must be freed exactly once with suzume_tags_free.
  */
 SUZUME_EXPORT suzume_tags_t* suzume_generate_tags(suzume_t handle, const char* text);
 
@@ -127,7 +131,8 @@ typedef struct {
  * @param handle Suzume handle
  * @param text UTF-8 encoded Japanese text
  * @param options Tag generation options
- * @return Tags result (must be freed with suzume_tags_free)
+ * @return Tags result allocated by Suzume, or NULL on failure.
+ *         Non-NULL results must be freed exactly once with suzume_tags_free.
  */
 SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_with_options(suzume_t handle, const char* text,
                                                                const suzume_tag_options_t* options);
@@ -135,6 +140,7 @@ SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_with_options(suzume_t handle, 
 /**
  * @brief Free tags result
  * @param tags Tags to free
+ * @note Passing NULL is allowed and has no effect.
  */
 SUZUME_EXPORT void suzume_tags_free(suzume_tags_t* tags);
 
@@ -228,6 +234,7 @@ SUZUME_EXPORT void* suzume_malloc(size_t size);
 /**
  * @brief Free memory (for WASM interop)
  * @param ptr Pointer to free
+ * @note Passing NULL is allowed and has no effect.
  */
 SUZUME_EXPORT void suzume_free(void* ptr);
 

@@ -10,6 +10,7 @@
  * WASM function calls. This file tests the JS-specific concerns.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { Suzume } from '../../dist/index.js';
 import {
   allocString,
   getModule,
@@ -235,5 +236,26 @@ describe('JS API: struct layout compatibility', () => {
     expect(tags.length).toBeGreaterThan(0);
 
     tagsFree(tagsPtr);
+  });
+});
+
+describe('JS API: error reporting', () => {
+  it('exposes last C API error after a failed dictionary load', async () => {
+    const suzume = await Suzume.create();
+
+    try {
+      expect(suzume.loadUserDictionary('"東京,NOUN,0.5\n')).toBe(false);
+      expect(suzume.lastError).toContain('Invalid CSV quoting');
+      expect(suzume.lastError).toContain('unterminated quoted field');
+    } finally {
+      suzume.destroy();
+    }
+  });
+
+  it('throws when a destroyed instance is used', async () => {
+    const suzume = await Suzume.create();
+    suzume.destroy();
+
+    expect(() => suzume.analyze('東京')).toThrow('Suzume instance has been destroyed');
   });
 });

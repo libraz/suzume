@@ -9,6 +9,11 @@ namespace suzume::dictionary {
 
 namespace {
 
+struct ParsedLine {
+  std::vector<std::string> fields;
+  std::string error;
+};
+
 std::string trimAsciiWhitespace(std::string field) {
   size_t field_start = field.find_first_not_of(" \t");
   size_t field_end = field.find_last_not_of(" \t");
@@ -18,34 +23,83 @@ std::string trimAsciiWhitespace(std::string field) {
   return field.substr(field_start, field_end - field_start + 1);
 }
 
-std::vector<std::string> parseDelimitedLine(std::string_view line, char delimiter) {
-  std::vector<std::string> fields;
+bool isAsciiWhitespace(char chr) {
+  return chr == ' ' || chr == '\t';
+}
+
+ParsedLine parseDelimitedLine(std::string_view line, char delimiter) {
+  ParsedLine result;
   std::string field;
   bool in_quotes = false;
+  bool after_closing_quote = false;
+  bool field_has_non_space = false;
+
+  if (delimiter != ',') {
+    std::stringstream stream{std::string(line)};
+    std::string item;
+    while (std::getline(stream, item, delimiter)) {
+      result.fields.push_back(trimAsciiWhitespace(item));
+    }
+    return result;
+  }
 
   for (size_t idx = 0; idx < line.size(); ++idx) {
     char chr = line[idx];
-    if (delimiter == ',' && chr == '"') {
+
+    if (chr == '"') {
       if (in_quotes && idx + 1 < line.size() && line[idx + 1] == '"') {
         field.push_back('"');
         ++idx;
-      } else {
-        in_quotes = !in_quotes;
+        field_has_non_space = true;
+        continue;
       }
+
+      if (in_quotes) {
+        in_quotes = false;
+        after_closing_quote = true;
+        continue;
+      }
+
+      if (field_has_non_space) {
+        result.error = "quote found inside an unquoted field";
+        return result;
+      }
+
+      field.clear();
+      in_quotes = true;
+      field_has_non_space = true;
       continue;
     }
 
     if (chr == delimiter && !in_quotes) {
-      fields.push_back(trimAsciiWhitespace(field));
+      result.fields.push_back(trimAsciiWhitespace(field));
       field.clear();
+      after_closing_quote = false;
+      field_has_non_space = false;
       continue;
     }
 
+    if (after_closing_quote) {
+      if (isAsciiWhitespace(chr)) {
+        continue;
+      }
+      result.error = "unexpected character after closing quote";
+      return result;
+    }
+
+    if (!isAsciiWhitespace(chr)) {
+      field_has_non_space = true;
+    }
     field.push_back(chr);
   }
 
-  fields.push_back(trimAsciiWhitespace(field));
-  return fields;
+  if (in_quotes) {
+    result.error = "unterminated quoted field";
+    return result;
+  }
+
+  result.fields.push_back(trimAsciiWhitespace(field));
+  return result;
 }
 
 }  // namespace
@@ -111,13 +165,15 @@ void UserDictionary::clear() {
 }
 
 core::Expected<size_t, core::Error> UserDictionary::parseCSV(std::string_view csv_data) {
-  size_t count = 0;
+  std::vector<DictionaryEntry> parsed_entries;
 
   std::string line;
   std::string csv_str(csv_data);
   std::istringstream stream(csv_str);
+  size_t line_number = 0;
 
   while (std::getline(stream, line)) {
+    ++line_number;
     // Skip empty lines and comments
     if (line.empty() || line[0] == '#') {
       continue;
@@ -134,7 +190,12 @@ core::Expected<size_t, core::Error> UserDictionary::parseCSV(std::string_view cs
     // Detect delimiter: tab for TSV, comma for CSV
     char delimiter = (line.find('\t') != std::string::npos) ? '\t' : ',';
 
-    auto fields = parseDelimitedLine(line, delimiter);
+    auto parsed = parseDelimitedLine(line, delimiter);
+    if (!parsed.error.empty()) {
+      return core::Error(core::ErrorCode::InvalidInput,
+                         "Invalid CSV quoting at line " + std::to_string(line_number) + ": " + parsed.error);
+    }
+    auto& fields = parsed.fields;
 
     // Minimum: surface, pos
     if (fields.size() < 2) {
@@ -164,11 +225,14 @@ core::Expected<size_t, core::Error> UserDictionary::parseCSV(std::string_view cs
     }
 
     entry.extended_pos = core::posToDefaultExtendedPOS(entry.pos);
-    addEntry(entry);
-    ++count;
+    parsed_entries.push_back(std::move(entry));
   }
 
-  return count;
+  for (const auto& entry : parsed_entries) {
+    addEntry(entry);
+  }
+
+  return parsed_entries.size();
 }
 
 void UserDictionary::rebuildTrie() {

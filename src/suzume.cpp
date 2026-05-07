@@ -136,27 +136,35 @@ Suzume::Suzume(Suzume&&) noexcept = default;
 Suzume& Suzume::operator=(Suzume&&) noexcept = default;
 
 bool Suzume::loadUserDictionary(const std::string& path) {
+  return loadUserDictionaryResult(path).hasValue();
+}
+
+core::Expected<size_t, core::Error> Suzume::loadUserDictionaryResult(const std::string& path) {
   // For CSV/TSV custom dictionaries
   auto dict = std::make_shared<dictionary::UserDictionary>();
   auto result = dict->loadFromFile(path);
   if (result.hasValue()) {
     impl_->custom_dict = dict;
     impl_->analyzer.addUserDictionary(dict);
-    return true;
+    return result.value();
   }
-  return false;
+  return result.error();
 }
 
 bool Suzume::loadUserDictionaryFromMemory(const char* data, size_t size) {
+  return loadUserDictionaryFromMemoryResult(data, size).hasValue();
+}
+
+core::Expected<size_t, core::Error> Suzume::loadUserDictionaryFromMemoryResult(const char* data, size_t size) {
   // For CSV/TSV custom dictionaries
   auto dict = std::make_shared<dictionary::UserDictionary>();
   auto result = dict->loadFromMemory(data, size);
   if (result.hasValue()) {
     impl_->custom_dict = dict;
     impl_->analyzer.addUserDictionary(dict);
-    return true;
+    return result.value();
   }
-  return false;
+  return result.error();
 }
 
 bool Suzume::loadBinaryDictionary(const uint8_t* data, size_t size) {

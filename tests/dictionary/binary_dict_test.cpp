@@ -232,6 +232,27 @@ TEST_F(BinaryDictTest, LoadRejectsOutOfRangeStringReference) {
   EXPECT_FALSE(result.hasValue());
 }
 
+TEST_F(BinaryDictTest, LoadFailurePreservesExistingDictionary) {
+  auto good_data = buildTestDict("keep", core::PartOfSpeech::Noun);
+  auto bad_data = buildTestDict("bad", core::PartOfSpeech::Noun);
+  const auto* header = reinterpret_cast<const BinaryDictHeader*>(bad_data.data());
+  auto* entry = reinterpret_cast<BinaryDictEntry*>(bad_data.data() + header->entry_offset);
+  entry->surface_offset = static_cast<uint32_t>(bad_data.size());
+
+  BinaryDictionary dict;
+  auto good_result = dict.loadFromMemory(good_data.data(), good_data.size());
+  ASSERT_TRUE(good_result.hasValue());
+
+  auto bad_result = dict.loadFromMemory(bad_data.data(), bad_data.size());
+  EXPECT_FALSE(bad_result.hasValue());
+  EXPECT_TRUE(dict.isLoaded());
+  EXPECT_EQ(dict.size(), 1u);
+
+  auto results = dict.lookup("keep", 0);
+  ASSERT_EQ(results.size(), 1u);
+  EXPECT_EQ(results[0].entry->surface, "keep");
+}
+
 TEST_F(BinaryDictTest, LoadRejectsUnsupportedMinorVersion) {
   auto data = buildTestDict("test", core::PartOfSpeech::Noun);
   auto* header = reinterpret_cast<BinaryDictHeader*>(data.data());

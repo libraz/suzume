@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <cstdlib>
+#include <cstring>
 
 #include "suzume.h"
 
@@ -167,10 +168,35 @@ TEST_F(SuzumeApiTest, LoadUserDictionaryFromInvalidPath) {
   EXPECT_FALSE(result);
 }
 
+TEST_F(SuzumeApiTest, LoadUserDictionaryResultReportsInvalidPath) {
+  Suzume instance(makeTestOptions());
+  auto result = instance.loadUserDictionaryResult("/nonexistent/path/dict.csv");
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("Failed to open dictionary file"), std::string::npos);
+}
+
 TEST_F(SuzumeApiTest, LoadUserDictionaryFromNullMemory) {
   Suzume instance(makeTestOptions());
   bool result = instance.loadUserDictionaryFromMemory(nullptr, 0);
   EXPECT_FALSE(result);
+}
+
+TEST_F(SuzumeApiTest, LoadUserDictionaryFromMemoryResultReportsParseError) {
+  Suzume instance(makeTestOptions());
+  const char* csv_data = "\"東京,NOUN,0.5\n";
+  auto result = instance.loadUserDictionaryFromMemoryResult(csv_data, std::strlen(csv_data));
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("unterminated quoted field"), std::string::npos);
+}
+
+TEST_F(SuzumeApiTest, LoadUserDictionaryFromMemoryResultReportsEntryCount) {
+  Suzume instance(makeTestOptions());
+  const char* csv_data =
+      "東京,NOUN,0.5\n"
+      "大阪,NOUN,0.5\n";
+  auto result = instance.loadUserDictionaryFromMemoryResult(csv_data, std::strlen(csv_data));
+  ASSERT_TRUE(result.hasValue());
+  EXPECT_EQ(result.value(), 2u);
 }
 
 TEST_F(SuzumeApiTest, LoadBinaryDictionaryFromInvalidMemory) {

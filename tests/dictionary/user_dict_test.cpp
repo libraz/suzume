@@ -236,6 +236,58 @@ TEST(UserDictTest, LoadFromMemoryCSVQuotedFields) {
   EXPECT_EQ(entry->lemma, "東\"阪");
 }
 
+TEST(UserDictTest, LoadFromMemoryRejectsUnterminatedQuotedField) {
+  UserDictionary dict;
+
+  const char* csv_data = "\"東京,NOUN,0.5\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("unterminated quoted field"), std::string::npos);
+  EXPECT_EQ(dict.size(), 0);
+}
+
+TEST(UserDictTest, LoadFromMemoryRejectsTextAfterClosingQuote) {
+  UserDictionary dict;
+
+  const char* csv_data = "\"東京\"bad,NOUN,0.5\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("unexpected character after closing quote"), std::string::npos);
+  EXPECT_EQ(dict.size(), 0);
+}
+
+TEST(UserDictTest, LoadFromMemoryRejectsQuoteInsideUnquotedField) {
+  UserDictionary dict;
+
+  const char* csv_data = "東\"京,NOUN,0.5\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("quote found inside an unquoted field"), std::string::npos);
+  EXPECT_EQ(dict.size(), 0);
+}
+
+TEST(UserDictTest, LoadFromMemoryFailureDoesNotPartiallyAppendEntries) {
+  UserDictionary dict;
+
+  DictionaryEntry existing;
+  existing.surface = "既存";
+  existing.pos = core::PartOfSpeech::Noun;
+  dict.addEntry(existing);
+
+  const char* csv_data =
+      "東京,NOUN,0.5\n"
+      "\"大阪,NOUN,0.5\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_EQ(dict.size(), 1);
+  EXPECT_TRUE(dict.lookup("東京", 0).empty());
+  EXPECT_FALSE(dict.lookup("既存", 0).empty());
+}
+
 // v0.8: LoadFromMemoryInvalidCost test removed (cost field no longer exists)
 
 TEST(UserDictTest, LookupAtDifferentPositions) {

@@ -104,7 +104,8 @@ class BinaryDictionary : public IDictionary {
   std::vector<DictionaryEntry> entries_;
   std::vector<uint8_t> data_;  // Owned copy of binary data
 
-  core::Expected<size_t, core::Error> parseData();
+  core::Expected<size_t, core::Error> parseData(const std::vector<uint8_t>& data, DoubleArray& trie,
+                                                std::vector<DictionaryEntry>& entries);
 };
 
 /**

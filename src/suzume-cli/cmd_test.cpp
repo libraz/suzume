@@ -121,8 +121,10 @@ int cmdTestSingle(const std::vector<std::string>& args, bool verbose, const std:
   Suzume analyzer(options);
 
   for (const auto& path : dict_paths) {
-    if (!analyzer.loadUserDictionary(path)) {
-      printWarning("Failed to load dictionary: " + path);
+    auto load_result = analyzer.loadUserDictionaryResult(path);
+    if (!load_result.hasValue()) {
+      printError("Failed to load dictionary: " + path + ": " + load_result.error().message);
+      return 1;
     }
   }
 
@@ -186,8 +188,10 @@ int cmdTestFile(const std::vector<std::string>& args, bool verbose, const std::v
   Suzume analyzer(options);
 
   for (const auto& path : dict_paths) {
-    if (!analyzer.loadUserDictionary(path)) {
-      printWarning("Failed to load dictionary: " + path);
+    auto load_result = analyzer.loadUserDictionaryResult(path);
+    if (!load_result.hasValue()) {
+      printError("Failed to load dictionary: " + path + ": " + load_result.error().message);
+      return 1;
     }
   }
 
@@ -230,8 +234,10 @@ int cmdTestBenchmark(const std::vector<std::string>& args, bool /* verbose */,
   Suzume analyzer(options);
 
   for (const auto& path : dict_paths) {
-    if (!analyzer.loadUserDictionary(path)) {
-      printWarning("Failed to load dictionary: " + path);
+    auto load_result = analyzer.loadUserDictionaryResult(path);
+    if (!load_result.hasValue()) {
+      printError("Failed to load dictionary: " + path + ": " + load_result.error().message);
+      return 1;
     }
   }
 

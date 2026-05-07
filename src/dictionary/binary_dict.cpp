@@ -68,28 +68,50 @@ core::Expected<size_t, core::Error> BinaryDictionary::loadFromFile(const std::st
   size_t file_size = static_cast<size_t>(file.tellg());
   file.seekg(0);
 
-  data_.resize(file_size);
-  if (!file.read(reinterpret_cast<char*>(data_.data()), file_size)) {
+  std::vector<uint8_t> loaded_data(file_size);
+  if (!file.read(reinterpret_cast<char*>(loaded_data.data()), file_size)) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InternalError, "Failed to read dictionary file: " + path));
   }
 
-  return parseData();
+  DoubleArray loaded_trie;
+  std::vector<DictionaryEntry> loaded_entries;
+  auto result = parseData(loaded_data, loaded_trie, loaded_entries);
+  if (!result.hasValue()) {
+    return result;
+  }
+
+  data_ = std::move(loaded_data);
+  trie_ = std::move(loaded_trie);
+  entries_ = std::move(loaded_entries);
+  return result;
 }
 
 core::Expected<size_t, core::Error> BinaryDictionary::loadFromMemory(const uint8_t* data, size_t size) {
   if (data == nullptr || size == 0) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Empty dictionary data"));
   }
-  data_.assign(data, data + size);
-  return parseData();
+
+  std::vector<uint8_t> loaded_data(data, data + size);
+  DoubleArray loaded_trie;
+  std::vector<DictionaryEntry> loaded_entries;
+  auto result = parseData(loaded_data, loaded_trie, loaded_entries);
+  if (!result.hasValue()) {
+    return result;
+  }
+
+  data_ = std::move(loaded_data);
+  trie_ = std::move(loaded_trie);
+  entries_ = std::move(loaded_entries);
+  return result;
 }
 
-core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
-  if (data_.size() < sizeof(BinaryDictHeader)) {
+core::Expected<size_t, core::Error> BinaryDictionary::parseData(const std::vector<uint8_t>& data, DoubleArray& trie,
+                                                                std::vector<DictionaryEntry>& entries) {
+  if (data.size() < sizeof(BinaryDictHeader)) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary file too small"));
   }
 
-  const auto* header = reinterpret_cast<const BinaryDictHeader*>(data_.data());
+  const auto* header = reinterpret_cast<const BinaryDictHeader*>(data.data());
 
   // Validate magic
   if (header->magic != BinaryDictHeader::kMagic) {
@@ -105,8 +127,8 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
   }
 
   // Validate offsets and section ranges before reading variable-length data.
-  if (header->trie_offset > data_.size() || header->trie_size > data_.size() - header->trie_offset ||
-      header->entry_offset > data_.size() || header->string_offset > data_.size()) {
+  if (header->trie_offset > data.size() || header->trie_size > data.size() - header->trie_offset ||
+      header->entry_offset > data.size() || header->string_offset > data.size()) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary offsets"));
   }
   if (header->trie_offset < sizeof(BinaryDictHeader) ||
@@ -120,7 +142,7 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
   }
 
   size_t entry_table_size = entry_count * sizeof(BinaryDictEntry);
-  if (header->entry_offset > data_.size() || entry_table_size > data_.size() - header->entry_offset ||
+  if (header->entry_offset > data.size() || entry_table_size > data.size() - header->entry_offset ||
       header->entry_offset + entry_table_size > header->string_offset) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary entry table"));
   }
@@ -129,19 +151,19 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary string pool offset"));
   }
 
-  size_t string_pool_size = data_.size() - header->string_offset;
+  size_t string_pool_size = data.size() - header->string_offset;
 
   // Load trie
-  if (!trie_.deserialize(data_.data() + header->trie_offset, header->trie_size)) {
+  if (!trie.deserialize(data.data() + header->trie_offset, header->trie_size)) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Failed to load dictionary trie"));
   }
 
   // Load entries
-  const auto* entry_data = reinterpret_cast<const BinaryDictEntry*>(data_.data() + header->entry_offset);
-  const char* string_pool = reinterpret_cast<const char*>(data_.data() + header->string_offset);
+  const auto* entry_data = reinterpret_cast<const BinaryDictEntry*>(data.data() + header->entry_offset);
+  const char* string_pool = reinterpret_cast<const char*>(data.data() + header->string_offset);
 
-  entries_.clear();
-  entries_.reserve(entry_count);
+  entries.clear();
+  entries.reserve(entry_count);
 
   for (uint32_t idx = 0; idx < header->entry_count; ++idx) {
     const auto& rec = entry_data[idx];
@@ -310,10 +332,10 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
                                                        << " has epos=UNKNOWN (cost=2.0)\n");
     }
 
-    entries_.push_back(std::move(entry));
+    entries.push_back(std::move(entry));
   }
 
-  return entries_.size();
+  return entries.size();
 }
 
 std::vector<LookupResult> BinaryDictionary::lookup(std::string_view text, size_t start_pos) const {

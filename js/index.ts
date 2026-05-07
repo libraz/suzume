@@ -146,6 +146,7 @@ export class Suzume {
   private _loadUserDict: (handle: number, dataPtr: number, size: number) => number;
   private _loadBinaryDict: (handle: number, dataPtr: number, size: number) => number;
   private _version: () => number;
+  private _lastError: () => number;
   private layouts: CLayouts;
   private unregisterToken = {};
 
@@ -193,6 +194,7 @@ export class Suzume {
     ]) as (handle: number, dataPtr: number, size: number) => number;
 
     this._version = module.cwrap('suzume_version', 'number', []) as () => number;
+    this._lastError = module.cwrap('suzume_last_error', 'number', []) as () => number;
     this.layouts = Suzume.loadCLayouts(module);
   }
 
@@ -304,7 +306,13 @@ export class Suzume {
     }
 
     if (handle === 0) {
-      throw new Error('Failed to create Suzume instance');
+      const lastError = module.cwrap('suzume_last_error', 'number', []) as () => number;
+      const message = module.UTF8ToString(lastError());
+      throw new Error(
+        message
+          ? `Failed to create Suzume instance: ${message}`
+          : 'Failed to create Suzume instance',
+      );
     }
 
     return new Suzume(module, handle);
@@ -327,7 +335,7 @@ export class Suzume {
       const resultPtr = this._analyze(this.handle, textPtr);
 
       if (resultPtr === 0) {
-        return [];
+        throw new Error(`Suzume analyze failed: ${this.lastError || 'unknown error'}`);
       }
 
       try {
@@ -380,7 +388,7 @@ export class Suzume {
 
           const tagsPtr = this._generateTagsWithOptions(this.handle, textPtr, optionsPtr);
           if (tagsPtr === 0) {
-            return [];
+            throw new Error(`Suzume tag generation failed: ${this.lastError || 'unknown error'}`);
           }
 
           try {
@@ -396,7 +404,7 @@ export class Suzume {
       const tagsPtr = this._generateTags(this.handle, textPtr);
 
       if (tagsPtr === 0) {
-        return [];
+        throw new Error(`Suzume tag generation failed: ${this.lastError || 'unknown error'}`);
       }
 
       try {
@@ -458,6 +466,13 @@ export class Suzume {
 
     const versionPtr = this._version();
     return this.module.UTF8ToString(versionPtr);
+  }
+
+  /**
+   * Last C API error for this thread, or empty string if the last C API call succeeded.
+   */
+  get lastError(): string {
+    return this.module.UTF8ToString(this._lastError());
   }
 
   /**

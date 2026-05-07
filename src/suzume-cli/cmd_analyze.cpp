@@ -143,8 +143,10 @@ int cmdAnalyze(const CommandArgs& args) {
 
   // Load dictionaries
   for (const auto& dict_path : args.dict_paths) {
-    if (!analyzer.loadUserDictionary(dict_path)) {
-      printWarning("Failed to load dictionary: " + dict_path);
+    auto load_result = analyzer.loadUserDictionaryResult(dict_path);
+    if (!load_result.hasValue()) {
+      printError("Failed to load dictionary: " + dict_path + ": " + load_result.error().message);
+      return 1;
     } else if (args.verbose) {
       printInfo("Loaded dictionary: " + dict_path);
     }
