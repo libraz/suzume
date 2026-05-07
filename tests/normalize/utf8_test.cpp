@@ -372,9 +372,6 @@ TEST(Utf8Test, Boundary_MaxValidCodepoint) {
 }
 
 // ===== Invalid UTF-8 Handling Tests =====
-// Note: These tests verify the current behavior of isValidUtf8.
-// Strict UTF-8 validation would reject overlong sequences and surrogates,
-// but the current implementation may be lenient for performance reasons.
 
 TEST(Utf8Test, Invalid_ContinuationByteFirst) {
   // Continuation byte at start
@@ -408,35 +405,50 @@ TEST(Utf8Test, Invalid_TooLargeCodepoint) {
   EXPECT_FALSE(isValidUtf8(too_large));
 }
 
-// The following tests document current behavior.
-// Strict UTF-8 validation would reject these, but current impl is lenient.
-
-TEST(Utf8Test, Lenient_Overlong2Byte) {
+TEST(Utf8Test, Invalid_Overlong2Byte) {
   // Overlong encoding of ASCII
   // 'a' (U+0061) encoded as 2 bytes: C1 A1
-  // Note: Current implementation is lenient and accepts this
   std::string overlong = "\xC1\xA1";
-  // Just ensure it doesn't crash; behavior may vary
-  auto result = isValidUtf8(overlong);
-  (void)result;  // Suppress unused variable warning
+  EXPECT_FALSE(isValidUtf8(overlong));
+  auto cps = toCodepoints(overlong);
+  ASSERT_EQ(cps.size(), 1);
+  EXPECT_EQ(cps[0], 0xFFFD);
 }
 
-TEST(Utf8Test, Lenient_Overlong3Byte) {
+TEST(Utf8Test, Invalid_Overlong3Byte) {
   // Overlong encoding of 2-byte character
   // U+007F encoded as 3 bytes: E0 81 BF
-  // Note: Current implementation is lenient
   std::string overlong = "\xE0\x81\xBF";
-  auto result = isValidUtf8(overlong);
-  (void)result;
+  EXPECT_FALSE(isValidUtf8(overlong));
 }
 
-TEST(Utf8Test, Lenient_SurrogateHalf) {
+TEST(Utf8Test, Invalid_Overlong4Byte) {
+  // U+FFFF encoded as 4 bytes is overlong.
+  std::string overlong = "\xF0\x8F\xBF\xBF";
+  EXPECT_FALSE(isValidUtf8(overlong));
+}
+
+TEST(Utf8Test, Invalid_SurrogateHalf) {
   // UTF-8 encoding of surrogate half (illegal in strict UTF-8)
-  // U+D800 would be: ED A0 80
-  // Note: Current implementation is lenient
   std::string surrogate = "\xED\xA0\x80";
-  auto result = isValidUtf8(surrogate);
-  (void)result;
+  EXPECT_FALSE(isValidUtf8(surrogate));
+  auto cps = toCodepoints(surrogate);
+  ASSERT_EQ(cps.size(), 1);
+  EXPECT_EQ(cps[0], 0xFFFD);
+}
+
+TEST(Utf8Test, Invalid_FourByteAboveUnicodeMax) {
+  // U+110000 is one past the maximum valid Unicode scalar value.
+  std::string too_large = "\xF4\x90\x80\x80";
+  EXPECT_FALSE(isValidUtf8(too_large));
+  auto cps = toCodepoints(too_large);
+  ASSERT_EQ(cps.size(), 1);
+  EXPECT_EQ(cps[0], 0xFFFD);
+}
+
+TEST(Utf8Test, Invalid_EncodeSurrogateAndAboveUnicodeMaxAsReplacement) {
+  EXPECT_EQ(encodeUtf8(0xD800), "\xEF\xBF\xBD");
+  EXPECT_EQ(encodeUtf8(0x110000), "\xEF\xBF\xBD");
 }
 
 // ===== Edge Cases =====

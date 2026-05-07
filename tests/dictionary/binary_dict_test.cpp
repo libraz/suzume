@@ -232,6 +232,42 @@ TEST_F(BinaryDictTest, LoadRejectsOutOfRangeStringReference) {
   EXPECT_FALSE(result.hasValue());
 }
 
+TEST_F(BinaryDictTest, LoadRejectsInvalidPosValue) {
+  auto data = buildTestDict("test", core::PartOfSpeech::Noun);
+  const auto* header = reinterpret_cast<const BinaryDictHeader*>(data.data());
+  auto* entry = reinterpret_cast<BinaryDictEntry*>(data.data() + header->entry_offset);
+  entry->pos = static_cast<uint8_t>(core::PartOfSpeech::Count_);
+
+  BinaryDictionary dict;
+  auto result = dict.loadFromMemory(data.data(), data.size());
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("Invalid dictionary POS value"), std::string::npos);
+}
+
+TEST_F(BinaryDictTest, LoadRejectsInvalidExtendedPosValue) {
+  auto data = buildTestDict("test", core::PartOfSpeech::Noun);
+  const auto* header = reinterpret_cast<const BinaryDictHeader*>(data.data());
+  auto* entry = reinterpret_cast<BinaryDictEntry*>(data.data() + header->entry_offset);
+  entry->extended_pos = static_cast<uint8_t>(core::ExtendedPOS::Count_);
+
+  BinaryDictionary dict;
+  auto result = dict.loadFromMemory(data.data(), data.size());
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("Invalid dictionary extended POS value"), std::string::npos);
+}
+
+TEST_F(BinaryDictTest, LoadRejectsEmptySurface) {
+  auto data = buildTestDict("test", core::PartOfSpeech::Noun);
+  const auto* header = reinterpret_cast<const BinaryDictHeader*>(data.data());
+  auto* entry = reinterpret_cast<BinaryDictEntry*>(data.data() + header->entry_offset);
+  entry->surface_length = 0;
+
+  BinaryDictionary dict;
+  auto result = dict.loadFromMemory(data.data(), data.size());
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("surface must not be empty"), std::string::npos);
+}
+
 TEST_F(BinaryDictTest, LoadFailurePreservesExistingDictionary) {
   auto good_data = buildTestDict("keep", core::PartOfSpeech::Noun);
   auto bad_data = buildTestDict("bad", core::PartOfSpeech::Noun);
@@ -294,6 +330,43 @@ TEST_F(BinaryDictTest, BuildRejectsTooLongSurfaceOrLemma) {
 
   auto lemma_result = lemma_writer.build();
   EXPECT_FALSE(lemma_result.hasValue());
+}
+
+TEST_F(BinaryDictTest, BuildRejectsEmptySurface) {
+  BinaryDictWriter writer;
+
+  DictionaryEntry entry;
+  entry.surface = "";
+  entry.lemma = "";
+  entry.pos = core::PartOfSpeech::Noun;
+  writer.addEntry(entry);
+
+  auto result = writer.build();
+  EXPECT_FALSE(result.hasValue());
+  EXPECT_NE(result.error().message.find("surface must not be empty"), std::string::npos);
+}
+
+TEST_F(BinaryDictTest, BuildRejectsInvalidPosOrExtendedPos) {
+  BinaryDictWriter invalid_pos_writer;
+  DictionaryEntry invalid_pos;
+  invalid_pos.surface = "bad-pos";
+  invalid_pos.pos = core::PartOfSpeech::Count_;
+  invalid_pos_writer.addEntry(invalid_pos);
+
+  auto pos_result = invalid_pos_writer.build();
+  EXPECT_FALSE(pos_result.hasValue());
+  EXPECT_NE(pos_result.error().message.find("invalid POS"), std::string::npos);
+
+  BinaryDictWriter invalid_epos_writer;
+  DictionaryEntry invalid_epos;
+  invalid_epos.surface = "bad-epos";
+  invalid_epos.pos = core::PartOfSpeech::Noun;
+  invalid_epos.extended_pos = core::ExtendedPOS::Count_;
+  invalid_epos_writer.addEntry(invalid_epos);
+
+  auto epos_result = invalid_epos_writer.build();
+  EXPECT_FALSE(epos_result.hasValue());
+  EXPECT_NE(epos_result.error().message.find("invalid extended POS"), std::string::npos);
 }
 
 TEST_F(BinaryDictTest, LemmaHandling) {

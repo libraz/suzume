@@ -23,6 +23,28 @@ TEST(UserDictTest, AddEntry) {
   EXPECT_EQ(dict.size(), 1);
 }
 
+TEST(UserDictTest, AddEntryRejectsInvalidEntry) {
+  UserDictionary dict;
+
+  DictionaryEntry empty_surface;
+  empty_surface.pos = core::PartOfSpeech::Noun;
+  dict.addEntry(empty_surface);
+
+  DictionaryEntry invalid_pos;
+  invalid_pos.surface = "壊れた";
+  invalid_pos.pos = static_cast<core::PartOfSpeech>(255);
+  dict.addEntry(invalid_pos);
+
+  DictionaryEntry invalid_extended_pos;
+  invalid_extended_pos.surface = "壊れた";
+  invalid_extended_pos.pos = core::PartOfSpeech::Noun;
+  invalid_extended_pos.extended_pos = static_cast<core::ExtendedPOS>(255);
+  dict.addEntry(invalid_extended_pos);
+
+  EXPECT_EQ(dict.size(), 0);
+  EXPECT_TRUE(dict.lookup("壊れた", 0).empty());
+}
+
 TEST(UserDictTest, GetEntry) {
   UserDictionary dict;
 

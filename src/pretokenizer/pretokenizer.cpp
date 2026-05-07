@@ -156,7 +156,7 @@ bool PreTokenizer::tryMatchUrl(std::string_view text, size_t pos, PreToken& toke
 bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& token) const {
   // Match patterns: YYYY年MM月DD日, YYYY年MM月, YYYY年
   std::string year_str;
-  size_t idx = parseDigits(text, pos, year_str);
+  size_t idx = parseInteger(text, pos, year_str);
 
   if (year_str.empty() || year_str.size() < 1 || year_str.size() > 4) {
     return false;
@@ -176,7 +176,7 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
 
   // Try to match month
   std::string month_str;
-  size_t month_end = parseDigits(text, idx, month_str);
+  size_t month_end = parseInteger(text, idx, month_str);
 
   if (!month_str.empty() && month_str.size() <= 2) {
     byte_pos = month_end;
@@ -187,7 +187,7 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
 
         // Try to match day
         std::string day_str;
-        size_t day_end = parseDigits(text, idx, day_str);
+        size_t day_end = parseInteger(text, idx, day_str);
 
         if (!day_str.empty() && day_str.size() <= 2) {
           byte_pos = day_end;

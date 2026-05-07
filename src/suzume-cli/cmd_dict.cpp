@@ -128,8 +128,7 @@ int cmdDictInfo(const std::vector<std::string>& args, bool /* verbose */) {
     }
 
     std::cout << "Dictionary: " << path << "\n";
-    std::cout << "Format: Binary v"
-              << dictionary::BinaryDictHeader::kVersionMajor << "."
+    std::cout << "Format: Binary v" << dictionary::BinaryDictHeader::kVersionMajor << "."
               << dictionary::BinaryDictHeader::kVersionMinor << "\n";
     std::cout << "Entries: " << dict.size() << "\n";
 

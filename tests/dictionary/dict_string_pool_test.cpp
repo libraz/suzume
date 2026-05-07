@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <cstdint>
+#include <cstring>
+
 #include "dictionary/string_pool.h"
 
 namespace suzume {
@@ -122,11 +125,67 @@ TEST(DictStringPoolTest, LoadFromMemoryZeroSize) {
   EXPECT_FALSE(pool.loadFromMemory(nullptr, 0));
 }
 
+TEST(DictStringPoolTest, LoadFromMemoryNullDataWithNonZeroSize) {
+  DictStringPool pool;
+  EXPECT_FALSE(pool.loadFromMemory(nullptr, 8));
+}
+
+TEST(DictStringPoolTest, LoadFromMemoryRejectsHugeCount) {
+  std::vector<char> data(8, '\0');
+  uint32_t count = UINT32_MAX;
+  uint32_t data_size = 0;
+  std::memcpy(data.data(), &count, sizeof(count));
+  std::memcpy(data.data() + sizeof(count), &data_size, sizeof(data_size));
+
+  DictStringPool pool;
+  EXPECT_FALSE(pool.loadFromMemory(data.data(), data.size()));
+}
+
+TEST(DictStringPoolTest, LoadFromMemoryRejectsOutOfRangeString) {
+  std::vector<char> data(8 + sizeof(uint32_t) + sizeof(uint32_t) + 3, '\0');
+  uint32_t count = 1;
+  uint32_t data_size = 3;
+  uint32_t offset = 2;
+  uint32_t length = 2;
+  std::memcpy(data.data(), &count, sizeof(count));
+  std::memcpy(data.data() + 4, &data_size, sizeof(data_size));
+  std::memcpy(data.data() + 8, &offset, sizeof(offset));
+  std::memcpy(data.data() + 8 + sizeof(offset), &length, sizeof(length));
+  std::memcpy(data.data() + 8 + sizeof(offset) + sizeof(length), "abc", 3);
+
+  DictStringPool pool;
+  pool.add("kept");
+  EXPECT_FALSE(pool.loadFromMemory(data.data(), data.size()));
+  EXPECT_EQ(pool.size(), 1u);
+  EXPECT_EQ(pool.get(0), "kept");
+}
+
 TEST(DictStringPoolTest, AddEmptyString) {
   DictStringPool pool;
   uint32_t idx = pool.add("");
   EXPECT_TRUE(pool.get(idx).empty());
   EXPECT_EQ(pool.size(), 1u);
+}
+
+TEST(DictStringPoolTest, AddLongStringDoesNotTruncate) {
+  DictStringPool pool;
+  std::string long_string(70000, 'x');
+  uint32_t idx = pool.add(long_string);
+
+  EXPECT_EQ(pool.get(idx), long_string);
+}
+
+TEST(DictStringPoolTest, SerializeAndLoadLongStringRoundtrip) {
+  DictStringPool pool;
+  std::string long_string(70000, 'x');
+  pool.add(long_string);
+
+  auto data = pool.serialize();
+  ASSERT_FALSE(data.empty());
+
+  DictStringPool loaded;
+  EXPECT_TRUE(loaded.loadFromMemory(data.data(), data.size()));
+  EXPECT_EQ(loaded.get(0), long_string);
 }
 
 }  // namespace

@@ -3,6 +3,9 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <climits>
+#include <cstdint>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -69,6 +72,22 @@ TEST_F(DoubleArrayTest, BuildMismatchedSizeFails) {
   std::vector<uint32_t> values = {1};  // Size mismatch
 
   EXPECT_FALSE(trie_.build(keys, values));
+}
+
+TEST_F(DoubleArrayTest, BuildRejectsNegativeSignedValue) {
+  std::vector<std::string> keys = {"a"};
+  std::vector<int32_t> values = {-1};
+
+  EXPECT_FALSE(trie_.build(keys, values));
+  EXPECT_TRUE(trie_.empty());
+}
+
+TEST_F(DoubleArrayTest, BuildRejectsUintValueOutsideSignedResultRange) {
+  std::vector<std::string> keys = {"a"};
+  std::vector<uint32_t> values = {static_cast<uint32_t>(INT32_MAX) + 1u};
+
+  EXPECT_FALSE(trie_.build(keys, values));
+  EXPECT_TRUE(trie_.empty());
 }
 
 TEST_F(DoubleArrayTest, CommonPrefixSearchBasic) {
@@ -193,10 +212,30 @@ TEST_F(DoubleArrayTest, DeserializeInvalidData) {
   // Too short
   std::vector<uint8_t> short_data = {'D', 'A', '0', '1'};
   EXPECT_FALSE(trie2.deserialize(short_data.data(), short_data.size()));
+  EXPECT_FALSE(trie2.deserialize(nullptr, 8));
 
   // Wrong magic number
   std::vector<uint8_t> bad_magic = {'X', 'X', 'X', 'X', 0, 0, 0, 0};
   EXPECT_FALSE(trie2.deserialize(bad_magic.data(), bad_magic.size()));
+
+  // Unit count claims far more data than the buffer contains. This must be
+  // rejected without overflowing the expected-size calculation on 32-bit builds.
+  std::vector<uint8_t> huge_count = {'D', 'A', '0', '2', 0, 0, 0, 0};
+  uint32_t num_units = UINT32_MAX;
+  std::memcpy(huge_count.data() + 4, &num_units, sizeof(num_units));
+  EXPECT_FALSE(trie2.deserialize(huge_count.data(), huge_count.size()));
+}
+
+TEST_F(DoubleArrayTest, DeserializeFailurePreservesExistingTrie) {
+  std::vector<std::string> keys = {"a"};
+  std::vector<uint32_t> values = {7};
+  EXPECT_TRUE(trie_.build(keys, values));
+
+  std::vector<uint8_t> huge_count = {'D', 'A', '0', '2', 0, 0, 0, 0};
+  uint32_t num_units = UINT32_MAX;
+  std::memcpy(huge_count.data() + 4, &num_units, sizeof(num_units));
+  EXPECT_FALSE(trie_.deserialize(huge_count.data(), huge_count.size()));
+  EXPECT_EQ(trie_.exactMatch("a"), 7);
 }
 
 TEST_F(DoubleArrayTest, Clear) {

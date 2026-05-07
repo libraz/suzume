@@ -125,12 +125,12 @@ SUZUME_EXPORT suzume_t suzume_create_with_extended_options(const suzume_extended
                                  offsetof(suzume_extended_options_t, preserve_vu) + sizeof(options->preserve_vu))) {
         opts.normalize_options.preserve_vu = (options->preserve_vu != 0);
       }
-      if (hasExtendedOptionField(options, offsetof(suzume_extended_options_t, preserve_case) +
-                                              sizeof(options->preserve_case))) {
+      if (hasExtendedOptionField(options,
+                                 offsetof(suzume_extended_options_t, preserve_case) + sizeof(options->preserve_case))) {
         opts.normalize_options.preserve_case = (options->preserve_case != 0);
       }
-      if (hasExtendedOptionField(options, offsetof(suzume_extended_options_t, preserve_symbols) +
-                                              sizeof(options->preserve_symbols))) {
+      if (hasExtendedOptionField(
+              options, offsetof(suzume_extended_options_t, preserve_symbols) + sizeof(options->preserve_symbols))) {
         opts.remove_symbols = (options->preserve_symbols == 0);
       }
       if (hasExtendedOptionField(options, offsetof(suzume_extended_options_t, mode) + sizeof(options->mode))) {
@@ -145,8 +145,8 @@ SUZUME_EXPORT suzume_t suzume_create_with_extended_options(const suzume_extended
                                  offsetof(suzume_extended_options_t, lemmatize) + sizeof(options->lemmatize))) {
         opts.lemmatize = (options->lemmatize != 0);
       }
-      if (hasExtendedOptionField(options, offsetof(suzume_extended_options_t, merge_compounds) +
-                                              sizeof(options->merge_compounds))) {
+      if (hasExtendedOptionField(
+              options, offsetof(suzume_extended_options_t, merge_compounds) + sizeof(options->merge_compounds))) {
         opts.merge_compounds = (options->merge_compounds != 0);
       }
     }

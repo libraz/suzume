@@ -53,7 +53,7 @@ class UserDictionary : public IDictionary {
   /**
    * @brief Lookup entries at position
    * @param text Text to search
-   * @param start_pos Start position (character index)
+   * @param start_pos Start position in bytes
    * @return Vector of lookup results
    */
   std::vector<LookupResult> lookup(std::string_view text, size_t start_pos) const override;

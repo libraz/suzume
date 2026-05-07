@@ -46,16 +46,23 @@ bool isNumericField(std::string_view field) {
 }
 
 bool isConjugationTypeField(std::string_view field) {
-  return field == "Ichidan" || field == "GodanKa" || field == "GodanGa" || field == "GodanSa" ||
-         field == "GodanTa" || field == "GodanNa" || field == "GodanBa" || field == "GodanMa" ||
-         field == "GodanRa" || field == "GodanWa" || field == "Suru" || field == "Kuru" ||
-         field == "IAdjective" || field == "NaAdjective" || field == "Interjection" ||
-         field == "ProperFamily" || field == "ProperGiven" || field == "None" || field == "ICHIDAN" ||
-         field == "GODAN_KA" || field == "GODAN_GA" || field == "GODAN_SA" || field == "GODAN_TA" ||
-         field == "GODAN_NA" || field == "GODAN_BA" || field == "GODAN_MA" || field == "GODAN_RA" ||
-         field == "GODAN_WA" || field == "SURU" || field == "KURU" || field == "I_ADJ" ||
-         field == "NA_ADJ" || field == "INTERJECTION" || field == "PROPER_FAMILY" ||
-         field == "PROPER_GIVEN" || field == "NONE";
+  return field == "Ichidan" || field == "GodanKa" || field == "GodanGa" || field == "GodanSa" || field == "GodanTa" ||
+         field == "GodanNa" || field == "GodanBa" || field == "GodanMa" || field == "GodanRa" || field == "GodanWa" ||
+         field == "Suru" || field == "Kuru" || field == "IAdjective" || field == "NaAdjective" ||
+         field == "Interjection" || field == "ProperFamily" || field == "ProperGiven" || field == "None" ||
+         field == "ICHIDAN" || field == "GODAN_KA" || field == "GODAN_GA" || field == "GODAN_SA" ||
+         field == "GODAN_TA" || field == "GODAN_NA" || field == "GODAN_BA" || field == "GODAN_MA" ||
+         field == "GODAN_RA" || field == "GODAN_WA" || field == "SURU" || field == "KURU" || field == "I_ADJ" ||
+         field == "NA_ADJ" || field == "INTERJECTION" || field == "PROPER_FAMILY" || field == "PROPER_GIVEN" ||
+         field == "NONE";
+}
+
+bool isValidPos(core::PartOfSpeech pos) {
+  return static_cast<size_t>(pos) < static_cast<size_t>(core::PartOfSpeech::Count_);
+}
+
+bool isValidExtendedPos(core::ExtendedPOS extended_pos) {
+  return static_cast<size_t>(extended_pos) < static_cast<size_t>(core::ExtendedPOS::Count_);
 }
 
 ParsedLine parseDelimitedLine(std::string_view line, char delimiter) {
@@ -207,6 +214,10 @@ core::Expected<size_t, core::Error> UserDictionary::loadFromMemory(const char* d
 }
 
 void UserDictionary::addEntry(const DictionaryEntry& entry) {
+  if (entry.surface.empty() || !isValidPos(entry.pos) || !isValidExtendedPos(entry.extended_pos)) {
+    return;
+  }
+
   auto idx = static_cast<uint32_t>(entries_.size());
   entries_.push_back(entry);
   trie_.insert(entry.surface, idx);

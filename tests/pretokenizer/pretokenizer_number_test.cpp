@@ -76,6 +76,13 @@ TEST_F(PreTokenizerNumberTest, MatchDate_WithSurroundingParticles) {
   EXPECT_TRUE(found_date);
 }
 
+TEST_F(PreTokenizerNumberTest, MatchDate_DoesNotAcceptDecimalYear) {
+  auto result = pretokenizer_.process("20.24年の予定");
+  for (const auto& token : result.tokens) {
+    EXPECT_NE(token.type, PreTokenType::Date);
+  }
+}
+
 // ===== Currency tests =====
 
 TEST_F(PreTokenizerNumberTest, MatchCurrency_Basic) {

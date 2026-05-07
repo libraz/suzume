@@ -83,7 +83,7 @@ class IDictionary {
   /**
    * @brief Lookup entries at position
    * @param text Text to search
-   * @param start_pos Start position (character index)
+   * @param start_pos Start position in bytes
    * @return Vector of lookup results
    */
   virtual std::vector<LookupResult> lookup(std::string_view text, size_t start_pos) const = 0;
@@ -129,7 +129,7 @@ class DictionaryManager {
   /**
    * @brief Lookup entries from all dictionaries
    * @param text Text to search
-   * @param start_pos Start position (character index)
+   * @param start_pos Start position in bytes
    * @return Combined lookup results from core and user dictionaries
    */
   std::vector<LookupResult> lookup(std::string_view text, size_t start_pos) const;

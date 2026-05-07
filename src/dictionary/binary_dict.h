@@ -48,8 +48,8 @@ struct BinaryDictEntry {
   uint8_t lemma_length;     // Lemma byte length (0 = same as surface, max 255)
   uint8_t pos;              // Part of speech
   uint8_t flags;            // Flags (formal_noun, interjection, proper_family, proper_given)
-  uint8_t extended_pos;      // Extended POS for fine-grained connection scoring
-  uint8_t reserved[3];       // Reserved, must be zero
+  uint8_t extended_pos;     // Extended POS for fine-grained connection scoring
+  uint8_t reserved[3];      // Reserved, must be zero
 };
 
 /**

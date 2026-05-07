@@ -52,6 +52,10 @@ core::PartOfSpeech uint8ToPos(uint8_t val) {
   return static_cast<core::PartOfSpeech>(val);
 }
 
+bool isValidPos(uint8_t val) {
+  return val < static_cast<uint8_t>(core::PartOfSpeech::Count_);
+}
+
 uint8_t extendedPosToUint8(core::ExtendedPOS epos) {
   return static_cast<uint8_t>(epos);
 }
@@ -61,6 +65,10 @@ core::ExtendedPOS uint8ToExtendedPos(uint8_t val) {
     return core::ExtendedPOS::Unknown;
   }
   return static_cast<core::ExtendedPOS>(val);
+}
+
+bool isValidExtendedPos(uint8_t val) {
+  return val < static_cast<uint8_t>(core::ExtendedPOS::Count_);
 }
 
 struct BinaryDictEntryV0 {
@@ -158,8 +166,7 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const std::vecto
       header.entry_offset > data.size() || header.string_offset > data.size()) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary offsets"));
   }
-  if (header.trie_offset < sizeof(BinaryDictHeader) ||
-      header.entry_offset < header.trie_offset + header.trie_size) {
+  if (header.trie_offset < sizeof(BinaryDictHeader) || header.entry_offset < header.trie_offset + header.trie_size) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary section order"));
   }
 
@@ -211,6 +218,18 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const std::vecto
     if (rec.surface_offset > string_pool_size || rec.surface_length > string_pool_size - rec.surface_offset) {
       return core::makeUnexpected(
           core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary surface string range"));
+    }
+
+    if (rec.surface_length == 0) {
+      return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary surface must not be empty"));
+    }
+
+    if (!isValidPos(rec.pos)) {
+      return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary POS value"));
+    }
+
+    if (header.version_minor >= 1 && !isValidExtendedPos(rec.extended_pos)) {
+      return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary extended POS value"));
     }
 
     if (rec.lemma_length > 0 &&
@@ -459,6 +478,10 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   for (const auto& ent : entries_) {
     BinaryDictEntry rec{};
 
+    if (ent.surface.empty()) {
+      return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary surface must not be empty"));
+    }
+
     if (ent.surface.size() > std::numeric_limits<uint8_t>::max()) {
       return core::makeUnexpected(
           core::Error(core::ErrorCode::InvalidInput, "Dictionary surface exceeds 255 bytes: " + ent.surface));
@@ -467,6 +490,15 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
     if (!ent.lemma.empty() && ent.lemma.size() > std::numeric_limits<uint8_t>::max()) {
       return core::makeUnexpected(
           core::Error(core::ErrorCode::InvalidInput, "Dictionary lemma exceeds 255 bytes: " + ent.lemma));
+    }
+
+    if (!isValidPos(posToUint8(ent.pos))) {
+      return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary entry has invalid POS"));
+    }
+
+    if (!isValidExtendedPos(extendedPosToUint8(ent.extended_pos))) {
+      return core::makeUnexpected(
+          core::Error(core::ErrorCode::InvalidInput, "Dictionary entry has invalid extended POS"));
     }
 
     rec.surface_offset = addString(ent.surface);

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <limits>
 #include <stdexcept>
 
 namespace suzume::dictionary {
@@ -75,6 +76,11 @@ bool DoubleArray::build(const std::vector<std::string>& keys, const std::vector<
       return false;
     }
   }
+  for (int32_t value : values) {
+    if (value < 0) {
+      return false;
+    }
+  }
 
   // Initialize build state
   BuildState state;
@@ -110,6 +116,9 @@ bool DoubleArray::build(const std::vector<std::string>& keys, const std::vector<
 bool DoubleArray::build(const std::vector<std::string>& keys, const std::vector<uint32_t>& values) {
   std::vector<int32_t> signed_values(values.size());
   for (size_t idx = 0; idx < values.size(); ++idx) {
+    if (values[idx] > static_cast<uint32_t>(std::numeric_limits<int32_t>::max())) {
+      return false;
+    }
     signed_values[idx] = static_cast<int32_t>(values[idx]);
   }
   return build(keys, signed_values);
@@ -338,6 +347,10 @@ std::vector<uint8_t> DoubleArray::serialize() const {
 }
 
 bool DoubleArray::deserialize(const uint8_t* data, size_t size) {
+  if (data == nullptr) {
+    return false;
+  }
+
   if (size < 8) {
     return false;
   }
@@ -352,14 +365,14 @@ bool DoubleArray::deserialize(const uint8_t* data, size_t size) {
   std::memcpy(&num_units, data + 4, 4);
 
   // Validate size
-  size_t expected = 8 + num_units * sizeof(Unit);
-  if (size < expected) {
+  if (static_cast<size_t>(num_units) > (size - 8) / sizeof(Unit)) {
     return false;
   }
 
   // Read units
-  units_.resize(num_units);
-  std::memcpy(units_.data(), data + 8, num_units * sizeof(Unit));
+  std::vector<Unit> loaded_units(num_units);
+  std::memcpy(loaded_units.data(), data + 8, static_cast<size_t>(num_units) * sizeof(Unit));
+  units_ = std::move(loaded_units);
 
   return true;
 }
