@@ -52,6 +52,26 @@ core::PartOfSpeech uint8ToPos(uint8_t val) {
   return static_cast<core::PartOfSpeech>(val);
 }
 
+uint8_t extendedPosToUint8(core::ExtendedPOS epos) {
+  return static_cast<uint8_t>(epos);
+}
+
+core::ExtendedPOS uint8ToExtendedPos(uint8_t val) {
+  if (val >= static_cast<uint8_t>(core::ExtendedPOS::Count_)) {
+    return core::ExtendedPOS::Unknown;
+  }
+  return static_cast<core::ExtendedPOS>(val);
+}
+
+struct BinaryDictEntryV0 {
+  uint32_t surface_offset;
+  uint32_t lemma_offset;
+  uint8_t surface_length;
+  uint8_t lemma_length;
+  uint8_t pos;
+  uint8_t flags;
+};
+
 template <typename T>
 T readPod(const std::vector<uint8_t>& data, size_t offset) {
   T value{};
@@ -148,7 +168,8 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const std::vecto
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary entry table too large"));
   }
 
-  size_t entry_table_size = entry_count * sizeof(BinaryDictEntry);
+  size_t entry_record_size = header.version_minor >= 1 ? sizeof(BinaryDictEntry) : sizeof(BinaryDictEntryV0);
+  size_t entry_table_size = entry_count * entry_record_size;
   if (header.entry_offset > data.size() || entry_table_size > data.size() - header.entry_offset ||
       header.entry_offset + entry_table_size > header.string_offset) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary entry table"));
@@ -172,7 +193,20 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const std::vecto
   entries.reserve(entry_count);
 
   for (uint32_t idx = 0; idx < header.entry_count; ++idx) {
-    const auto rec = readPod<BinaryDictEntry>(data, header.entry_offset + idx * sizeof(BinaryDictEntry));
+    BinaryDictEntry rec{};
+    size_t entry_pos = header.entry_offset + idx * entry_record_size;
+    if (header.version_minor >= 1) {
+      rec = readPod<BinaryDictEntry>(data, entry_pos);
+    } else {
+      const auto legacy = readPod<BinaryDictEntryV0>(data, entry_pos);
+      rec.surface_offset = legacy.surface_offset;
+      rec.lemma_offset = legacy.lemma_offset;
+      rec.surface_length = legacy.surface_length;
+      rec.lemma_length = legacy.lemma_length;
+      rec.pos = legacy.pos;
+      rec.flags = legacy.flags;
+      rec.extended_pos = static_cast<uint8_t>(core::ExtendedPOS::Unknown);
+    }
 
     if (rec.surface_offset > string_pool_size || rec.surface_length > string_pool_size - rec.surface_offset) {
       return core::makeUnexpected(
@@ -194,7 +228,11 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const std::vecto
       entry.lemma = entry.surface;
     }
 
-    if ((rec.flags & kFlagFormalNoun) != 0) {
+    entry.extended_pos = uint8ToExtendedPos(rec.extended_pos);
+
+    if (entry.extended_pos != core::ExtendedPOS::Unknown) {
+      // Use the serialized fine-grained category when present.
+    } else if ((rec.flags & kFlagFormalNoun) != 0) {
       entry.extended_pos = core::ExtendedPOS::NounFormal;
     } else if ((rec.flags & kFlagInterjection) != 0) {
       entry.extended_pos = core::ExtendedPOS::Interjection;
@@ -443,6 +481,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
     }
 
     rec.pos = posToUint8(ent.pos);
+    rec.extended_pos = extendedPosToUint8(ent.extended_pos);
 
     uint8_t flags = 0;
     if (ent.extended_pos == core::ExtendedPOS::NounFormal) {

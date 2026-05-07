@@ -8,7 +8,6 @@
 
 #include "core/morpheme.h"
 #include "core/types.h"
-#include "postprocess/postprocessor.h"
 
 namespace suzume::postprocess {
 
@@ -68,7 +67,6 @@ class TagGenerator {
 
  private:
   TagGeneratorOptions options_;
-  Postprocessor postprocessor_;
 
   /**
    * @brief Check if morpheme should be included as tag

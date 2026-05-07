@@ -33,7 +33,7 @@ struct BinaryDictHeader {
 
   static constexpr uint32_t kMagic = 0x444D5A53;  // "SZMD"
   static constexpr uint16_t kVersionMajor = 2;
-  static constexpr uint16_t kVersionMinor = 0;
+  static constexpr uint16_t kVersionMinor = 1;
 };
 
 /**
@@ -48,6 +48,8 @@ struct BinaryDictEntry {
   uint8_t lemma_length;     // Lemma byte length (0 = same as surface, max 255)
   uint8_t pos;              // Part of speech
   uint8_t flags;            // Flags (formal_noun, interjection, proper_family, proper_given)
+  uint8_t extended_pos;      // Extended POS for fine-grained connection scoring
+  uint8_t reserved[3];       // Reserved, must be zero
 };
 
 /**

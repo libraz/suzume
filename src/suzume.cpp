@@ -183,14 +183,16 @@ std::vector<core::Morpheme> Suzume::analyzeDebug(std::string_view text, core::La
 
 std::vector<postprocess::TagEntry> Suzume::generateTags(std::string_view text) const {
   auto morphemes = impl_->analyzer.analyze(text);
-  return impl_->tag_generator.generate(morphemes);
+  auto processed = impl_->postprocessor.process(morphemes);
+  return impl_->tag_generator.generate(processed);
 }
 
 std::vector<postprocess::TagEntry> Suzume::generateTags(std::string_view text,
                                                         const postprocess::TagGeneratorOptions& options) const {
   auto morphemes = impl_->analyzer.analyze(text);
+  auto processed = impl_->postprocessor.process(morphemes);
   postprocess::TagGenerator generator(options);
-  return generator.generate(morphemes);
+  return generator.generate(processed);
 }
 
 core::AnalysisMode Suzume::mode() const {

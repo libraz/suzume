@@ -331,6 +331,39 @@ TEST_F(BinaryDictTest, LemmaHandling) {
   EXPECT_EQ(results2[0].entry->lemma, "walk");
 }
 
+TEST_F(BinaryDictTest, ExtendedPosRoundTrip) {
+  BinaryDictWriter writer;
+
+  DictionaryEntry verb;
+  verb.surface = "食べ";
+  verb.lemma = "食べる";
+  verb.pos = core::PartOfSpeech::Verb;
+  verb.extended_pos = core::ExtendedPOS::VerbRenyokei;
+  writer.addEntry(verb);
+
+  DictionaryEntry particle;
+  particle.surface = "て";
+  particle.lemma = "て";
+  particle.pos = core::PartOfSpeech::Particle;
+  particle.extended_pos = core::ExtendedPOS::ParticleConj;
+  writer.addEntry(particle);
+
+  auto build_result = writer.build();
+  ASSERT_TRUE(build_result.hasValue());
+
+  BinaryDictionary dict;
+  auto load_result = dict.loadFromMemory(build_result.value().data(), build_result.value().size());
+  ASSERT_TRUE(load_result.hasValue());
+
+  auto verb_results = dict.lookup("食べて", 0);
+  ASSERT_FALSE(verb_results.empty());
+  EXPECT_EQ(verb_results[0].entry->extended_pos, core::ExtendedPOS::VerbRenyokei);
+
+  auto particle_results = dict.lookup("て", 0);
+  ASSERT_FALSE(particle_results.empty());
+  EXPECT_EQ(particle_results[0].entry->extended_pos, core::ExtendedPOS::ParticleConj);
+}
+
 TEST_F(BinaryDictTest, FlagsHandling) {
   BinaryDictWriter writer;
 

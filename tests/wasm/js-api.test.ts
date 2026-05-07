@@ -252,6 +252,30 @@ describe('JS API: error reporting', () => {
     }
   });
 
+  it('loadUserDictionaryOrThrow includes C API parse details', async () => {
+    const suzume = await Suzume.create();
+
+    try {
+      expect(() => suzume.loadUserDictionaryOrThrow('"東京,NOUN,0.5\n')).toThrow(
+        /Invalid CSV quoting.*unterminated quoted field/,
+      );
+    } finally {
+      suzume.destroy();
+    }
+  });
+
+  it('loadBinaryDictionaryOrThrow includes C API parse details', async () => {
+    const suzume = await Suzume.create();
+
+    try {
+      expect(() => suzume.loadBinaryDictionaryOrThrow(new Uint8Array([0, 1, 2, 3]))).toThrow(
+        /Failed to load binary dictionary/,
+      );
+    } finally {
+      suzume.destroy();
+    }
+  });
+
   it('throws when a destroyed instance is used', async () => {
     const suzume = await Suzume.create();
     suzume.destroy();

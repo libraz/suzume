@@ -1,7 +1,6 @@
 #include "dict_compiler.h"
 
 #include <iostream>
-#include <set>
 #include <tuple>
 
 #include "cli_common.h"
@@ -422,28 +421,9 @@ core::Expected<size_t, core::Error> DictCompiler::compileMultiple(const std::vec
     printInfo("Total entries before deduplication: " + std::to_string(all_entries.size()));
   }
 
-  // Deduplicate by surface (trie requires unique keys)
-  std::set<std::string> seen_surfaces;
-  std::vector<TsvEntry> unique_entries;
-  unique_entries.reserve(all_entries.size());
-
-  for (const auto& entry : all_entries) {
-    if (seen_surfaces.count(entry.surface) == 0) {
-      seen_surfaces.insert(entry.surface);
-      unique_entries.push_back(entry);
-    }
-  }
-
-  if (verbose_) {
-    size_t skipped = all_entries.size() - unique_entries.size();
-    if (skipped > 0) {
-      printInfo("Skipped " + std::to_string(skipped) + " duplicate surfaces during merge");
-    }
-  }
-
   // Validate entries
   std::vector<std::string> issues;
-  size_t issue_count = suzume::cli::TsvParser::validate(unique_entries, &issues);
+  size_t issue_count = suzume::cli::TsvParser::validate(all_entries, &issues);
   if (issue_count > 0) {
     for (const auto& issue : issues) {
       printError(issue);
@@ -452,7 +432,7 @@ core::Expected<size_t, core::Error> DictCompiler::compileMultiple(const std::vec
         core::Error(core::ErrorCode::InvalidInput, "Validation failed: " + std::to_string(issue_count) + " error(s)"));
   }
 
-  return compileEntries(unique_entries, dic_path);
+  return compileEntries(all_entries, dic_path);
 }
 
 core::Expected<size_t, core::Error> DictCompiler::decompile(const std::string& dic_path,

@@ -86,13 +86,10 @@ std::string TagGenerator::getTagString(const core::Morpheme& morpheme) const {
 }
 
 std::vector<TagEntry> TagGenerator::generate(const std::vector<core::Morpheme>& morphemes) const {
-  // Post-process morphemes
-  auto processed = postprocessor_.process(morphemes);
-
   std::vector<TagEntry> tags;
   std::unordered_set<std::string> seen;
 
-  for (const auto& morpheme : processed) {
+  for (const auto& morpheme : morphemes) {
     if (!shouldInclude(morpheme)) {
       continue;
     }

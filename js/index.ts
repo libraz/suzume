@@ -438,6 +438,17 @@ export class Suzume {
   }
 
   /**
+   * Load user dictionary from string data, throwing with C API details on failure.
+   *
+   * @param data - Dictionary data in CSV format
+   */
+  loadUserDictionaryOrThrow(data: string): void {
+    if (!this.loadUserDictionary(data)) {
+      throw new Error(`Suzume user dictionary load failed: ${this.lastError || 'unknown error'}`);
+    }
+  }
+
+  /**
    * Load binary dictionary from buffer data (as user dictionary)
    *
    * @param data - Binary dictionary data (.dic format)
@@ -455,6 +466,17 @@ export class Suzume {
       return this._loadBinaryDict(this.handle, dataPtr, data.byteLength) === 1;
     } finally {
       this.module._free(dataPtr);
+    }
+  }
+
+  /**
+   * Load binary dictionary from buffer data, throwing with C API details on failure.
+   *
+   * @param data - Binary dictionary data (.dic format)
+   */
+  loadBinaryDictionaryOrThrow(data: Uint8Array): void {
+    if (!this.loadBinaryDictionary(data)) {
+      throw new Error(`Suzume binary dictionary load failed: ${this.lastError || 'unknown error'}`);
     }
   }
 
