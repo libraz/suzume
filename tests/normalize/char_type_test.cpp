@@ -125,7 +125,7 @@ TEST(CharTypeTest, ClassifyCJKSymbols) {
 }
 
 TEST(CharTypeTest, ClassifyAsciiPunctuation) {
-  EXPECT_EQ(classifyChar(U' '), CharType::Symbol);   // Space
+  EXPECT_EQ(classifyChar(U' '), CharType::Symbol);  // Space
   EXPECT_EQ(classifyChar(U'!'), CharType::Symbol);
   EXPECT_EQ(classifyChar(U'.'), CharType::Symbol);
   EXPECT_EQ(classifyChar(U':'), CharType::Symbol);
@@ -364,10 +364,10 @@ TEST(CharTypeTest, IsExtendedParticleFalse) {
 // ============================================================================
 
 TEST(CharTypeTest, IsProlongedSoundMark) {
-  EXPECT_TRUE(isProlongedSoundMark(0x30FC));   // ー
+  EXPECT_TRUE(isProlongedSoundMark(0x30FC));  // ー
   EXPECT_FALSE(isProlongedSoundMark(U'あ'));
-  EXPECT_FALSE(isProlongedSoundMark(U'-'));     // ASCII hyphen
-  EXPECT_FALSE(isProlongedSoundMark(0x2014));   // Em dash
+  EXPECT_FALSE(isProlongedSoundMark(U'-'));    // ASCII hyphen
+  EXPECT_FALSE(isProlongedSoundMark(0x2014));  // Em dash
 }
 
 // ============================================================================
@@ -411,7 +411,7 @@ TEST(CharTypeTest, IsRegionalIndicator) {
 // ============================================================================
 
 TEST(CharTypeTest, IsIterationMark) {
-  EXPECT_TRUE(isIterationMark(0x3005));   // 々
+  EXPECT_TRUE(isIterationMark(0x3005));  // 々
   EXPECT_FALSE(isIterationMark(U'人'));
   EXPECT_FALSE(isIterationMark(0x3006));
   EXPECT_FALSE(isIterationMark(0x3004));
@@ -501,15 +501,19 @@ TEST(CharTypeTest, IsORowHiragana) {
 TEST(CharTypeTest, HiraganaRowMutualExclusion) {
   // Each hiragana should belong to exactly one row
   // Spot-check a few characters
-  char32_t test_chars[] = {U'あ', U'い', U'う', U'え', U'お',
-                           U'か', U'き', U'く', U'け', U'こ'};
+  char32_t test_chars[] = {U'あ', U'い', U'う', U'え', U'お', U'か', U'き', U'く', U'け', U'こ'};
   for (auto chr : test_chars) {
     int count = 0;
-    if (isARowHiragana(chr)) count++;
-    if (isIRowHiragana(chr)) count++;
-    if (isURowHiragana(chr)) count++;
-    if (isERowHiragana(chr)) count++;
-    if (isORowHiragana(chr)) count++;
+    if (isARowHiragana(chr))
+      count++;
+    if (isIRowHiragana(chr))
+      count++;
+    if (isURowHiragana(chr))
+      count++;
+    if (isERowHiragana(chr))
+      count++;
+    if (isORowHiragana(chr))
+      count++;
     EXPECT_EQ(count, 1) << "Character should belong to exactly one row";
   }
 }

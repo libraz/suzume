@@ -25,11 +25,11 @@ namespace suzume::grammar {
  * Contains the base form and metadata needed to generate all conjugated forms.
  */
 struct AuxiliaryBase {
-  std::string surface;        ///< Base form surface (e.g., "いる")
-  std::string reading;        ///< Base form reading (e.g., "いる")
-  VerbType conj_type;         ///< Conjugation type for expansion
-  uint16_t left_id;           ///< Connection input ID
-  uint16_t required_conn;     ///< Required connection from preceding stem
+  std::string surface;     ///< Base form surface (e.g., "いる")
+  std::string reading;     ///< Base form reading (e.g., "いる")
+  VerbType conj_type;      ///< Conjugation type for expansion
+  uint16_t left_id;        ///< Connection input ID
+  uint16_t required_conn;  ///< Required connection from preceding stem
 };
 
 /**

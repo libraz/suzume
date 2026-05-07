@@ -47,8 +47,7 @@ std::string formNameFromConnId(uint16_t conn_id) {
 }
 
 // Helper to print conjugation stems for a verb/adjective
-void printConjugationStems(const std::string& base_form,
-                           dictionary::ConjugationType conj_type) {
+void printConjugationStems(const std::string& base_form, dictionary::ConjugationType conj_type) {
   auto verb_type = grammar::conjTypeToVerbType(conj_type);
   if (verb_type == grammar::VerbType::Unknown) {
     return;  // Not a conjugatable type
@@ -129,7 +128,9 @@ int cmdDictInfo(const std::vector<std::string>& args, bool /* verbose */) {
     }
 
     std::cout << "Dictionary: " << path << "\n";
-    std::cout << "Format: Binary v1.0\n";
+    std::cout << "Format: Binary v"
+              << dictionary::BinaryDictHeader::kVersionMajor << "."
+              << dictionary::BinaryDictHeader::kVersionMinor << "\n";
     std::cout << "Entries: " << dict.size() << "\n";
 
     // File size
@@ -183,8 +184,7 @@ int cmdDictValidate(const std::vector<std::string>& args, bool /* verbose */) {
     printWarning(issue);
   }
 
-  std::cout << "Found " << issue_count << " issues in " << result.value().size()
-            << " entries\n";
+  std::cout << "Found " << issue_count << " issues in " << result.value().size() << " entries\n";
   return 1;
 }
 
@@ -193,8 +193,7 @@ int cmdDictValidate(const std::vector<std::string>& args, bool /* verbose */) {
 // yields no matches.
 std::vector<std::string> expandGlob(const std::string& pattern) {
   // Check if the pattern contains glob characters
-  if (pattern.find('*') == std::string::npos &&
-      pattern.find('?') == std::string::npos) {
+  if (pattern.find('*') == std::string::npos && pattern.find('?') == std::string::npos) {
     return {pattern};
   }
 
@@ -220,8 +219,7 @@ std::vector<std::string> expandGlob(const std::string& pattern) {
       regex_str += ".*";
     } else if (ch == '?') {
       regex_str += ".";
-    } else if (ch == '.' || ch == '^' || ch == '$' || ch == '+' ||
-               ch == '(' || ch == ')' || ch == '[' || ch == ']' ||
+    } else if (ch == '.' || ch == '^' || ch == '$' || ch == '+' || ch == '(' || ch == ')' || ch == '[' || ch == ']' ||
                ch == '|' || ch == '\\') {
       regex_str += '\\';
       regex_str += ch;
@@ -234,8 +232,7 @@ std::vector<std::string> expandGlob(const std::string& pattern) {
   std::vector<std::string> matches;
 
   for (const auto& entry : fs::directory_iterator(dir)) {
-    if (entry.is_regular_file() &&
-        std::regex_match(entry.path().filename().string(), re)) {
+    if (entry.is_regular_file() && std::regex_match(entry.path().filename().string(), re)) {
       matches.push_back(entry.path().string());
     }
   }
@@ -289,8 +286,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
   if (file_args.size() == 1) {
     const std::string& tsv_path = file_args[0];
     std::string dic_path;
-    if (tsv_path.size() >= 4 &&
-        tsv_path.substr(tsv_path.size() - 4) == ".tsv") {
+    if (tsv_path.size() >= 4 && tsv_path.substr(tsv_path.size() - 4) == ".tsv") {
       dic_path = tsv_path.substr(0, tsv_path.size() - 4) + ".dic";
     } else {
       dic_path = tsv_path + ".dic";
@@ -306,8 +302,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
         return 1;
       }
 
-      std::cout << "Compiled " << result.value() << " entries to " << dic_path
-                << "\n";
+      std::cout << "Compiled " << result.value() << " entries to " << dic_path << "\n";
       return 0;
     }
 
@@ -324,8 +319,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
       return 1;
     }
 
-    std::cout << "Compiled " << result.value() << " entries to " << dic_path
-              << "\n";
+    std::cout << "Compiled " << result.value() << " entries to " << dic_path << "\n";
     return 0;
   }
 
@@ -345,8 +339,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
     return 1;
   }
 
-  std::cout << "Compiled " << result.value() << " entries to " << dic_path
-            << "\n";
+  std::cout << "Compiled " << result.value() << " entries to " << dic_path << "\n";
   return 0;
 }
 
@@ -378,8 +371,7 @@ int cmdDictDecompile(const std::vector<std::string>& args, bool verbose) {
     return 1;
   }
 
-  std::cout << "Decompiled " << result.value() << " entries to " << tsv_path
-            << "\n";
+  std::cout << "Decompiled " << result.value() << " entries to " << tsv_path << "\n";
   return 0;
 }
 
@@ -398,7 +390,10 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
     if (args[idx].substr(0, 6) == "--pos=") {
       pos_filter = args[idx].substr(6);
     } else if (args[idx].substr(0, 8) == "--limit=") {
-      limit = std::stoul(args[idx].substr(8));
+      if (!parseSizeOption(args[idx].substr(8), &limit)) {
+        printError("Invalid limit: " + args[idx].substr(8));
+        return 1;
+      }
     }
   }
 
@@ -419,13 +414,12 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
         continue;
       }
 
-      if (!pos_filter.empty() &&
-          core::posToString(entry->pos) != pos_filter) {
+      if (!pos_filter.empty() && core::posToString(entry->pos) != pos_filter) {
         continue;
       }
 
-      std::cout << entry->surface << "\t" << core::posToString(entry->pos)
-                << "\t" << entry->lemma << "\t" << 0.0F /* v0.8: cost removed */ << "\n";
+      std::cout << entry->surface << "\t" << core::posToString(entry->pos) << "\t" << entry->lemma << "\t"
+                << 0.0F /* v0.8: cost removed */ << "\n";
 
       ++count;
       if (limit > 0 && count >= limit) {
@@ -445,8 +439,7 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
 
     size_t count = 0;
     for (const auto& entry : result.value()) {
-      if (!pos_filter.empty() &&
-          core::posToString(entry.pos) != pos_filter) {
+      if (!pos_filter.empty() && core::posToString(entry.pos) != pos_filter) {
         continue;
       }
 
@@ -480,9 +473,8 @@ int cmdDictSearch(const std::vector<std::string>& args, bool /* verbose */) {
       regex_str += ".*";
     } else if (chr == '?') {
       regex_str += ".";
-    } else if (chr == '.' || chr == '^' || chr == '$' || chr == '+' ||
-               chr == '(' || chr == ')' || chr == '[' || chr == ']' ||
-               chr == '|' || chr == '\\') {
+    } else if (chr == '.' || chr == '^' || chr == '$' || chr == '+' || chr == '(' || chr == ')' || chr == '[' ||
+               chr == ']' || chr == '|' || chr == '\\') {
       regex_str += '\\';
       regex_str += chr;
     } else {
@@ -531,10 +523,8 @@ int cmdDictLookup(const std::vector<std::string>& args, bool /* verbose */) {
   for (const auto& result : results) {
     // Only show exact matches (same length as input)
     if (result.entry != nullptr && result.entry->surface == word) {
-      std::cout << result.entry->surface << "\t"
-                << core::posToString(result.entry->pos);
-      if (!result.entry->lemma.empty() &&
-          result.entry->lemma != result.entry->surface) {
+      std::cout << result.entry->surface << "\t" << core::posToString(result.entry->pos);
+      if (!result.entry->lemma.empty() && result.entry->lemma != result.entry->surface) {
         std::cout << "\t(lemma: " << result.entry->lemma << ")";
       }
       std::cout << "\n";
@@ -666,4 +656,4 @@ int cmdDict(const CommandArgs& args) {
   return 1;
 }
 
-}  // namespace cli
+}  // namespace suzume::cli

@@ -10,9 +10,9 @@
 // 2. Compound verb patterns (勉強しろ via auxiliary chain)
 // 3. Conjugation generation (for display/generation, not parsing)
 
-#include "grammar/inflection.h"
-
 #include <gtest/gtest.h>
+
+#include "grammar/inflection.h"
 
 namespace suzume::grammar {
 namespace {

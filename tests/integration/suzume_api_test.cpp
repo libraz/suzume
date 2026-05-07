@@ -1,6 +1,8 @@
-#include "suzume.h"
-
 #include <gtest/gtest.h>
+
+#include <cstdlib>
+
+#include "suzume.h"
 
 namespace suzume {
 namespace {
@@ -63,8 +65,7 @@ TEST_F(SuzumeApiTest, SetModeRoundtrip) {
 TEST_F(SuzumeApiTest, AnalyzeSimpleText) {
   Suzume instance(makeTestOptions());
   // "Tokyo is beautiful"
-  auto results = instance.analyze(
-      "\xe6\x9d\xb1\xe4\xba\xac\xe3\x81\xaf\xe7\xbe\x8e\xe3\x81\x97\xe3\x81\x84");
+  auto results = instance.analyze("\xe6\x9d\xb1\xe4\xba\xac\xe3\x81\xaf\xe7\xbe\x8e\xe3\x81\x97\xe3\x81\x84");
   EXPECT_FALSE(results.empty());
 
   // Check that surfaces are non-empty
@@ -96,8 +97,7 @@ TEST_F(SuzumeApiTest, AnalyzeSingleCharacter) {
 TEST_F(SuzumeApiTest, GenerateTagsReturnsResults) {
   Suzume instance(makeTestOptions());
   // "Tokyo is beautiful"
-  auto tags = instance.generateTags(
-      "\xe6\x9d\xb1\xe4\xba\xac\xe3\x81\xaf\xe7\xbe\x8e\xe3\x81\x97\xe3\x81\x84");
+  auto tags = instance.generateTags("\xe6\x9d\xb1\xe4\xba\xac\xe3\x81\xaf\xe7\xbe\x8e\xe3\x81\x97\xe3\x81\x84");
   EXPECT_FALSE(tags.empty());
 
   // Tags should have non-empty tag strings
@@ -112,9 +112,8 @@ TEST_F(SuzumeApiTest, GenerateTagsWithCustomOptions) {
   tag_opts.exclude_particles = true;
   tag_opts.min_tag_length = 1;
 
-  auto tags = instance.generateTags(
-      "\xe6\x9d\xb1\xe4\xba\xac\xe3\x81\xaf\xe7\xbe\x8e\xe3\x81\x97\xe3\x81\x84",
-      tag_opts);
+  auto tags =
+      instance.generateTags("\xe6\x9d\xb1\xe4\xba\xac\xe3\x81\xaf\xe7\xbe\x8e\xe3\x81\x97\xe3\x81\x84", tag_opts);
   EXPECT_FALSE(tags.empty());
 }
 
@@ -149,8 +148,7 @@ TEST_F(SuzumeApiTest, AnalyzeWithLemmatizeOption) {
   Suzume instance(opts);
 
   // "ate" (tabeta) - past tense of taberu
-  auto results = instance.analyze(
-      "\xe9\xa3\x9f\xe3\x81\xb9\xe3\x81\x9f");
+  auto results = instance.analyze("\xe9\xa3\x9f\xe3\x81\xb9\xe3\x81\x9f");
   EXPECT_FALSE(results.empty());
 }
 
@@ -159,8 +157,7 @@ TEST_F(SuzumeApiTest, AnalyzeWithMergeCompoundsOption) {
   opts.merge_compounds = true;
   Suzume instance(opts);
 
-  auto results = instance.analyze(
-      "\xe6\x9d\xb1\xe4\xba\xac\xe3\x81\xaf\xe7\xbe\x8e\xe3\x81\x97\xe3\x81\x84");
+  auto results = instance.analyze("\xe6\x9d\xb1\xe4\xba\xac\xe3\x81\xaf\xe7\xbe\x8e\xe3\x81\x97\xe3\x81\x84");
   EXPECT_FALSE(results.empty());
 }
 
@@ -181,6 +178,34 @@ TEST_F(SuzumeApiTest, LoadBinaryDictionaryFromInvalidMemory) {
   const uint8_t bad_data[] = {0x00, 0x01, 0x02, 0x03};
   bool result = instance.loadBinaryDictionary(bad_data, sizeof(bad_data));
   EXPECT_FALSE(result);
+}
+
+TEST_F(SuzumeApiTest, ScorerEnvWarningsAreSilentByDefault) {
+#ifndef __EMSCRIPTEN__
+  setenv("SUZUME_SCORER_UNARY_noun_prior", "not-a-number", 1);
+  testing::internal::CaptureStderr();
+  { Suzume instance(makeTestOptions()); }
+  std::string stderr_output = testing::internal::GetCapturedStderr();
+  unsetenv("SUZUME_SCORER_UNARY_noun_prior");
+
+  EXPECT_TRUE(stderr_output.empty());
+#endif
+}
+
+TEST_F(SuzumeApiTest, ScorerEnvWarningsCanBeReported) {
+#ifndef __EMSCRIPTEN__
+  setenv("SUZUME_SCORER_UNARY_noun_prior", "not-a-number", 1);
+  testing::internal::CaptureStderr();
+  {
+    SuzumeOptions opts = makeTestOptions();
+    opts.report_scorer_config = true;
+    Suzume instance(opts);
+  }
+  std::string stderr_output = testing::internal::GetCapturedStderr();
+  unsetenv("SUZUME_SCORER_UNARY_noun_prior");
+
+  EXPECT_NE(stderr_output.find("Invalid value"), std::string::npos);
+#endif
 }
 
 }  // namespace

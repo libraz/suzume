@@ -5,8 +5,7 @@
 
 namespace suzume::test {
 
-bool hasParticle(const std::vector<core::Morpheme>& result,
-                 const std::string& surface) {
+bool hasParticle(const std::vector<core::Morpheme>& result, const std::string& surface) {
   for (const auto& mor : result) {
     if (mor.surface == surface && mor.pos == core::PartOfSpeech::Particle) {
       return true;
@@ -15,8 +14,7 @@ bool hasParticle(const std::vector<core::Morpheme>& result,
   return false;
 }
 
-bool hasSurface(const std::vector<core::Morpheme>& result,
-                const std::string& surface) {
+bool hasSurface(const std::vector<core::Morpheme>& result, const std::string& surface) {
   for (const auto& mor : result) {
     if (mor.surface == surface) {
       return true;
@@ -25,8 +23,7 @@ bool hasSurface(const std::vector<core::Morpheme>& result,
   return false;
 }
 
-std::vector<std::string> getSurfaces(
-    const std::vector<core::Morpheme>& result) {
+std::vector<std::string> getSurfaces(const std::vector<core::Morpheme>& result) {
   std::vector<std::string> surfaces;
   surfaces.reserve(result.size());
   for (const auto& mor : result) {

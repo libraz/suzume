@@ -19,16 +19,14 @@ bool endsWithVerbNegative(std::string_view surface) {
   // Godan verb mizenkei + ない (a-row + ない)
   // か(ka), が(ga), さ(sa), た(ta), ば(ba), ま(ma), な(na), ら(ra), わ(wa)
   if (utf8::equalsAny(last9,
-      {"かない", "がない", "さない", "たない", "ばない",
-       "まない", "らない", "わない", "なない"})) {
+                      {"かない", "がない", "さない", "たない", "ばない", "まない", "らない", "わない", "なない"})) {
     return true;
   }
 
   // Ichidan verb + ない (e-row/i-row stem ending + ない)
   // 食べない → べない, 見ない → みない, etc.
   // Note: These patterns can appear when a kanji is followed by hiragana
-  if (utf8::equalsAny(last9,
-      {"べない", "めない", "せない", "てない", "ねない", "けない", "げない", "れない"})) {
+  if (utf8::equalsAny(last9, {"べない", "めない", "せない", "てない", "ねない", "けない", "げない", "れない"})) {
     return true;
   }
 
@@ -65,8 +63,7 @@ bool endsWithNegativeBecomePattern(std::string_view surface) {
   // せられなくなった (24 bytes): short causative-passive + negative + become
   // られなくなった (21 bytes): passive/potential + negative + become + past
   // れなくなった (18 bytes): short passive/potential + negative + become + past
-  return utf8::endsWithAny(surface,
-      {"させられなくなった", "せられなくなった", "られなくなった", "れなくなった"});
+  return utf8::endsWithAny(surface, {"させられなくなった", "せられなくなった", "られなくなった", "れなくなった"});
 }
 
 bool endsWithGodanNegativeRenyokei(std::string_view surface) {

@@ -60,12 +60,15 @@ std::string conjTypeToString(dictionary::ConjugationType conj_type) {
       return "NA_ADJ";
     case dictionary::ConjugationType::Interjection:
       return "INTJ";
+    case dictionary::ConjugationType::ProperFamily:
+      return "FAMILY";
+    case dictionary::ConjugationType::ProperGiven:
+      return "GIVEN";
   }
   return "";
 }
 
-std::optional<dictionary::ConjugationType> parseConjType(
-    const std::string& str) {
+std::optional<dictionary::ConjugationType> parseConjType(const std::string& str) {
   if (str.empty() || str == "NONE") {
     return dictionary::ConjugationType::None;
   }
@@ -120,9 +123,8 @@ std::optional<core::PartOfSpeech> parsePos(const std::string& str) {
   // if the input was actually "OTHER" or just invalid
   if (pos == core::PartOfSpeech::Other && str != "OTHER") {
     // Check if it's a known POS
-    if (utf8::equalsAny(str, {"NOUN", "PROPN", "VERB", "ADJECTIVE", "ADJ",
-                               "ADVERB", "ADV", "PARTICLE", "AUXILIARY", "AUX",
-                               "CONJUNCTION", "CONJ", "SYMBOL", "SYM"})) {
+    if (utf8::equalsAny(str, {"NOUN", "PROPN", "VERB", "ADJECTIVE", "ADJ", "ADVERB", "ADV", "PARTICLE", "AUXILIARY",
+                              "AUX", "CONJUNCTION", "CONJ", "SYMBOL", "SYM"})) {
       return pos;
     }
     return std::nullopt;

@@ -526,8 +526,8 @@ constexpr float kBonusShortHiraganaVerb = -0.3F;
 constexpr float kPenaltySpuriousVerbRenyokei = scale::kStrong;
 
 // Penalty for short/long pure-hiragana hatsuonbin verb forms
-constexpr float kPenaltyHatsuonbinShort = scale::kRare;    // 2-4 chars
-constexpr float kPenaltyHatsuonbinLong = scale::kSevere;   // 5+ chars
+constexpr float kPenaltyHatsuonbinShort = scale::kRare;   // 2-4 chars
+constexpr float kPenaltyHatsuonbinLong = scale::kSevere;  // 5+ chars
 
 // Penalty for pure-hiragana verb forms containing さん pattern
 constexpr float kPenaltySanPatternVerb = scale::kSevere;
@@ -549,7 +549,7 @@ constexpr float kPenaltyKanjiChuuCompound = scale::kMinor;
 // =============================================================================
 
 // Suffix pattern for auxiliary detection
-constexpr const char* kSuffixSou = "そう";       // conjecture/hearsay
+constexpr const char* kSuffixSou = "そう";  // conjecture/hearsay
 
 // =============================================================================
 // Pattern Arrays for Auxiliary Verb Detection
@@ -559,9 +559,22 @@ constexpr const char* kSuffixSou = "そう";       // conjecture/hearsay
 // Used in: verb_candidates_helpers.cpp (containsTeFormAuxPattern)
 // Excludes てある/である/ておる/でおる/ていく/でいく/であげ (rare in compound verbs)
 constexpr const char* kTeFormAuxPenaltyPatterns[] = {
-    "てくる", "でくる", "てくれ", "でくれ", "ている", "でいる",
-    "てしま", "でしま", "てもら", "でもら", "てあげ",
-    "ておく", "でおく", "ておい", "てみる", "でみる",
+    "てくる",
+    "でくる",
+    "てくれ",
+    "でくれ",
+    "ている",
+    "でいる",
+    "てしま",
+    "でしま",
+    "てもら",
+    "でもら",
+    "てあげ",
+    "ておく",
+    "でおく",
+    "ておい",
+    "てみる",
+    "でみる",
     // Conjugated forms of くる after て: てきた, てきて, etc.
     // き is kuru renyokei, so てき covers てきた/てきて/てきている
     // Note: でき is NOT included — it conflicts with できる (suru potential form)
@@ -574,8 +587,8 @@ constexpr size_t kTeFormAuxPenaltyPatternsSize =
 // Used in: verb_candidates_helpers.cpp (containsCausativeAuxPattern)
 // Pattern: verb mizenkei + せ/させ + auxiliary (ない/て/た/ず/る/ろ/よ/なく)
 constexpr const char* kCausativeAuxPenaltyPatterns[] = {
-    "せない", "せなく", "せなかっ", "せて", "せた", "せず", "せる", "せろ", "せよ",
-    "させない", "させなく", "させて", "させた", "させず", "させる", "させろ", "させよ",
+    "せない",   "せなく",   "せなかっ", "せて",   "せた",   "せず",   "せる",   "せろ",   "せよ",
+    "させない", "させなく", "させて",   "させた", "させず", "させる", "させろ", "させよ",
 };
 constexpr size_t kCausativeAuxPenaltyPatternsSize =
     sizeof(kCausativeAuxPenaltyPatterns) / sizeof(kCausativeAuxPenaltyPatterns[0]);

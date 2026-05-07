@@ -31,13 +31,11 @@ struct UnknownCandidate;
  * @param dict_manager Dictionary manager for base form verification
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateCompoundVerbCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager,
-    const VerbCandidateOptions& verb_opts = {});
+std::vector<UnknownCandidate> generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                             const std::vector<normalize::CharType>& char_types,
+                                                             const grammar::Inflection& inflection,
+                                                             const dictionary::DictionaryManager* dict_manager,
+                                                             const VerbCandidateOptions& verb_opts = {});
 
 /**
  * @brief Generate verb candidates (kanji + conjugation endings)
@@ -52,13 +50,11 @@ std::vector<UnknownCandidate> generateCompoundVerbCandidates(
  * @param dict_manager Dictionary manager for suffix checking
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateVerbCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager,
-    const VerbCandidateOptions& verb_opts = {});
+std::vector<UnknownCandidate> generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                     const std::vector<normalize::CharType>& char_types,
+                                                     const grammar::Inflection& inflection,
+                                                     const dictionary::DictionaryManager* dict_manager,
+                                                     const VerbCandidateOptions& verb_opts = {});
 
 /**
  * @brief Generate hiragana verb candidates (pure hiragana verbs like いく, くる)
@@ -73,13 +69,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
  * @param dict_manager Dictionary manager for base form verification
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager,
-    const VerbCandidateOptions& verb_opts = {});
+std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                             const std::vector<normalize::CharType>& char_types,
+                                                             const grammar::Inflection& inflection,
+                                                             const dictionary::DictionaryManager* dict_manager,
+                                                             const VerbCandidateOptions& verb_opts = {});
 
 /**
  * @brief Generate katakana verb candidates (e.g., バズる, サボる, ググる)
@@ -95,11 +89,8 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
  * @return Vector of candidates
  */
 std::vector<UnknownCandidate> generateKatakanaVerbCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager = nullptr,
+    const std::vector<char32_t>& codepoints, size_t start_pos, const std::vector<normalize::CharType>& char_types,
+    const grammar::Inflection& inflection, const dictionary::DictionaryManager* dict_manager = nullptr,
     const VerbCandidateOptions& verb_opts = {});
 
 }  // namespace suzume::analysis

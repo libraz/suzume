@@ -23,8 +23,9 @@ struct SuzumeOptions {
   core::AnalysisMode mode = core::AnalysisMode::Normal;
   bool lemmatize = true;
   bool merge_compounds = false;
-  bool remove_symbols = true;  // Remove symbol-only morphemes (default: true)
+  bool remove_symbols = true;         // Remove symbol-only morphemes (default: true)
   bool skip_user_dictionary = false;  // Skip auto-loading user.dic (for testing)
+  bool report_scorer_config = false;  // Print scorer config status/warnings
   postprocess::TagGeneratorOptions tag_options;
   normalize::NormalizeOptions normalize_options;
   analysis::ScorerOptions scorer_options;  // Scoring parameters (tunable at runtime)
@@ -94,8 +95,7 @@ class Suzume {
    * @param out_lattice Output lattice (if not null)
    * @return Vector of morphemes
    */
-  std::vector<core::Morpheme> analyzeDebug(std::string_view text,
-                                           core::Lattice* out_lattice) const;
+  std::vector<core::Morpheme> analyzeDebug(std::string_view text, core::Lattice* out_lattice) const;
 
   /**
    * @brief Generate tags from text
@@ -110,9 +110,8 @@ class Suzume {
    * @param options Tag generation options (POS filter, exclude_basic, etc.)
    * @return Vector of tag entries with POS information
    */
-  std::vector<postprocess::TagEntry> generateTags(
-      std::string_view text,
-      const postprocess::TagGeneratorOptions& options) const;
+  std::vector<postprocess::TagEntry> generateTags(std::string_view text,
+                                                  const postprocess::TagGeneratorOptions& options) const;
 
   /**
    * @brief Get analysis mode

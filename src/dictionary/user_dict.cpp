@@ -1,20 +1,61 @@
 #include "dictionary/user_dict.h"
 
-#include "core/types.h"
-
 #include <fstream>
 #include <sstream>
 
+#include "core/types.h"
+
 namespace suzume::dictionary {
+
+namespace {
+
+std::string trimAsciiWhitespace(std::string field) {
+  size_t field_start = field.find_first_not_of(" \t");
+  size_t field_end = field.find_last_not_of(" \t");
+  if (field_start == std::string::npos) {
+    return "";
+  }
+  return field.substr(field_start, field_end - field_start + 1);
+}
+
+std::vector<std::string> parseDelimitedLine(std::string_view line, char delimiter) {
+  std::vector<std::string> fields;
+  std::string field;
+  bool in_quotes = false;
+
+  for (size_t idx = 0; idx < line.size(); ++idx) {
+    char chr = line[idx];
+    if (delimiter == ',' && chr == '"') {
+      if (in_quotes && idx + 1 < line.size() && line[idx + 1] == '"') {
+        field.push_back('"');
+        ++idx;
+      } else {
+        in_quotes = !in_quotes;
+      }
+      continue;
+    }
+
+    if (chr == delimiter && !in_quotes) {
+      fields.push_back(trimAsciiWhitespace(field));
+      field.clear();
+      continue;
+    }
+
+    field.push_back(chr);
+  }
+
+  fields.push_back(trimAsciiWhitespace(field));
+  return fields;
+}
+
+}  // namespace
 
 UserDictionary::UserDictionary() = default;
 
-core::Expected<size_t, core::Error> UserDictionary::loadFromFile(
-    const std::string& path) {
+core::Expected<size_t, core::Error> UserDictionary::loadFromFile(const std::string& path) {
   std::ifstream file(path);
   if (!file.is_open()) {
-    return core::Error(core::ErrorCode::FileNotFound,
-                       "Failed to open dictionary file: " + path);
+    return core::Error(core::ErrorCode::FileNotFound, "Failed to open dictionary file: " + path);
   }
 
   std::stringstream buffer;
@@ -23,8 +64,7 @@ core::Expected<size_t, core::Error> UserDictionary::loadFromFile(
   return loadFromMemory(content.c_str(), content.size());
 }
 
-core::Expected<size_t, core::Error> UserDictionary::loadFromMemory(
-    const char* data, size_t size) {
+core::Expected<size_t, core::Error> UserDictionary::loadFromMemory(const char* data, size_t size) {
   if (data == nullptr || size == 0) {
     return core::Error(core::ErrorCode::InvalidInput, "Empty dictionary data");
   }
@@ -39,8 +79,7 @@ void UserDictionary::addEntry(const DictionaryEntry& entry) {
   trie_.insert(entry.surface, idx);
 }
 
-std::vector<LookupResult> UserDictionary::lookup(std::string_view text,
-                                                 size_t start_pos) const {
+std::vector<LookupResult> UserDictionary::lookup(std::string_view text, size_t start_pos) const {
   std::vector<LookupResult> results;
 
   auto matches = trie_.prefixMatch(text, start_pos);
@@ -71,8 +110,7 @@ void UserDictionary::clear() {
   trie_.clear();
 }
 
-core::Expected<size_t, core::Error> UserDictionary::parseCSV(
-    std::string_view csv_data) {
+core::Expected<size_t, core::Error> UserDictionary::parseCSV(std::string_view csv_data) {
   size_t count = 0;
 
   std::string line;
@@ -96,22 +134,7 @@ core::Expected<size_t, core::Error> UserDictionary::parseCSV(
     // Detect delimiter: tab for TSV, comma for CSV
     char delimiter = (line.find('\t') != std::string::npos) ? '\t' : ',';
 
-    // Parse fields
-    std::vector<std::string> fields;
-    std::string field;
-    std::istringstream line_stream(line);
-
-    while (std::getline(line_stream, field, delimiter)) {
-      // Trim field
-      size_t field_start = field.find_first_not_of(" \t");
-      size_t field_end = field.find_last_not_of(" \t");
-      if (field_start != std::string::npos) {
-        field = field.substr(field_start, field_end - field_start + 1);
-      } else {
-        field.clear();
-      }
-      fields.push_back(field);
-    }
+    auto fields = parseDelimitedLine(line, delimiter);
 
     // Minimum: surface, pos
     if (fields.size() < 2) {
@@ -155,4 +178,4 @@ void UserDictionary::rebuildTrie() {
   }
 }
 
-}  // namespace dictionary
+}  // namespace suzume::dictionary

@@ -2,9 +2,9 @@
 // Inflection tests: Basic conjugations, Passive, Causative, Iku irregular,
 // I-adjective, Analyze, LooksConjugated, Honorific
 
-#include "grammar/inflection.h"
-
 #include <gtest/gtest.h>
+
+#include "grammar/inflection.h"
 
 namespace suzume::grammar {
 namespace {

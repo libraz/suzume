@@ -99,8 +99,7 @@ std::string fromCodepoints(const std::vector<char32_t>& codepoints);
  * @param end End index (exclusive)
  * @return UTF-8 string, or empty if range is invalid
  */
-std::string encodeRange(const std::vector<char32_t>& codepoints,
-                        size_t start, size_t end);
+std::string encodeRange(const std::vector<char32_t>& codepoints, size_t start, size_t end);
 
 /**
  * @brief Namespace alias for convenience

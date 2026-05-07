@@ -40,12 +40,9 @@ namespace suzume::analysis {
  * @param char_types Character types for each position
  * @param scorer Scorer for POS priors
  */
-void addMixedScriptCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer,
-    const dictionary::DictionaryManager& dict_manager);
+void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
+                              size_t start_pos, const std::vector<normalize::CharType>& char_types,
+                              const Scorer& scorer, const dictionary::DictionaryManager& dict_manager);
 
 /**
  * @brief Add compound noun split candidates
@@ -64,12 +61,9 @@ void addMixedScriptCandidates(
  * @param char_types Character types for each position
  * @param dict_manager Dictionary manager for lookups
  */
-void addCompoundSplitCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer);
+void addCompoundSplitCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
+                                size_t start_pos, const std::vector<normalize::CharType>& char_types,
+                                const dictionary::DictionaryManager& dict_manager, const Scorer& scorer);
 
 /**
  * @brief Add noun+verb split candidates at kanji boundaries
@@ -88,13 +82,10 @@ void addCompoundSplitCandidates(
  * @param char_types Character types for each position
  * @param dict_manager Dictionary manager for lookups
  */
-void addNounVerbSplitCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer,
-    const grammar::Inflection& inflection);
+void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
+                                size_t start_pos, const std::vector<normalize::CharType>& char_types,
+                                const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
+                                const grammar::Inflection& inflection);
 
 }  // namespace suzume::analysis
 

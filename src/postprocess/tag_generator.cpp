@@ -13,13 +13,11 @@ size_t TagGenerator::countChars(std::string_view str) {
 
 bool TagGenerator::shouldInclude(const core::Morpheme& morpheme) const {
   // Exclude by POS
-  if (options_.exclude_particles &&
-      morpheme.pos == core::PartOfSpeech::Particle) {
+  if (options_.exclude_particles && morpheme.pos == core::PartOfSpeech::Particle) {
     return false;
   }
 
-  if (options_.exclude_auxiliaries &&
-      morpheme.pos == core::PartOfSpeech::Auxiliary) {
+  if (options_.exclude_auxiliaries && morpheme.pos == core::PartOfSpeech::Auxiliary) {
     return false;
   }
 
@@ -70,9 +68,8 @@ bool TagGenerator::shouldInclude(const core::Morpheme& morpheme) const {
 
   // Exclude basic words (hiragana-only lemma)
   if (options_.exclude_basic) {
-    std::string_view lemma_sv = morpheme.lemma.empty()
-                                    ? std::string_view(morpheme.surface)
-                                    : std::string_view(morpheme.lemma);
+    std::string_view lemma_sv =
+        morpheme.lemma.empty() ? std::string_view(morpheme.surface) : std::string_view(morpheme.lemma);
     if (grammar::isPureHiragana(lemma_sv)) {
       return false;
     }
@@ -88,8 +85,7 @@ std::string TagGenerator::getTagString(const core::Morpheme& morpheme) const {
   return morpheme.surface;
 }
 
-std::vector<TagEntry> TagGenerator::generate(
-    const std::vector<core::Morpheme>& morphemes) const {
+std::vector<TagEntry> TagGenerator::generate(const std::vector<core::Morpheme>& morphemes) const {
   // Post-process morphemes
   auto processed = postprocessor_.process(morphemes);
 
@@ -133,4 +129,4 @@ std::vector<TagEntry> TagGenerator::generateFromText(std::string_view /*text*/) 
   return {};
 }
 
-}  // namespace postprocess
+}  // namespace suzume::postprocess

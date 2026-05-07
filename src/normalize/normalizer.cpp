@@ -45,21 +45,21 @@ char32_t halfwidthKatakanaToFullwidth(char32_t codepoint) {
     // Simplified mapping (main characters only)
     // Real implementation would need complete mapping table
     static const char32_t kMapping[] = {
-        0x30F2,                                                          // ｦ -> ヲ
-        0x30A1, 0x30A3, 0x30A5, 0x30A7, 0x30A9,                          // ｧｨｩｪｫ -> ァィゥェォ
-        0x30E3, 0x30E5, 0x30E7,                                          // ｬｭｮ -> ャュョ
-        0x30C3,                                                          // ｯ -> ッ
-        0x30FC,                                                          // ｰ -> ー
-        0x30A2, 0x30A4, 0x30A6, 0x30A8, 0x30AA,                          // ｱｲｳｴｵ -> アイウエオ
-        0x30AB, 0x30AD, 0x30AF, 0x30B1, 0x30B3,                          // ｶｷｸｹｺ -> カキクケコ
-        0x30B5, 0x30B7, 0x30B9, 0x30BB, 0x30BD,                          // ｻｼｽｾｿ -> サシスセソ
-        0x30BF, 0x30C1, 0x30C4, 0x30C6, 0x30C8,                          // ﾀﾁﾂﾃﾄ -> タチツテト
-        0x30CA, 0x30CB, 0x30CC, 0x30CD, 0x30CE,                          // ﾅﾆﾇﾈﾉ -> ナニヌネノ
-        0x30CF, 0x30D2, 0x30D5, 0x30D8, 0x30DB,                          // ﾊﾋﾌﾍﾎ -> ハヒフヘホ
-        0x30DE, 0x30DF, 0x30E0, 0x30E1, 0x30E2,                          // ﾏﾐﾑﾒﾓ -> マミムメモ
-        0x30E4, 0x30E6, 0x30E8,                                          // ﾔﾕﾖ -> ヤユヨ
-        0x30E9, 0x30EA, 0x30EB, 0x30EC, 0x30ED,                          // ﾗﾘﾙﾚﾛ -> ラリルレロ
-        0x30EF, 0x30F3,                                                  // ﾜﾝ -> ワン
+        0x30F2,                                  // ｦ -> ヲ
+        0x30A1, 0x30A3, 0x30A5, 0x30A7, 0x30A9,  // ｧｨｩｪｫ -> ァィゥェォ
+        0x30E3, 0x30E5, 0x30E7,                  // ｬｭｮ -> ャュョ
+        0x30C3,                                  // ｯ -> ッ
+        0x30FC,                                  // ｰ -> ー
+        0x30A2, 0x30A4, 0x30A6, 0x30A8, 0x30AA,  // ｱｲｳｴｵ -> アイウエオ
+        0x30AB, 0x30AD, 0x30AF, 0x30B1, 0x30B3,  // ｶｷｸｹｺ -> カキクケコ
+        0x30B5, 0x30B7, 0x30B9, 0x30BB, 0x30BD,  // ｻｼｽｾｿ -> サシスセソ
+        0x30BF, 0x30C1, 0x30C4, 0x30C6, 0x30C8,  // ﾀﾁﾂﾃﾄ -> タチツテト
+        0x30CA, 0x30CB, 0x30CC, 0x30CD, 0x30CE,  // ﾅﾆﾇﾈﾉ -> ナニヌネノ
+        0x30CF, 0x30D2, 0x30D5, 0x30D8, 0x30DB,  // ﾊﾋﾌﾍﾎ -> ハヒフヘホ
+        0x30DE, 0x30DF, 0x30E0, 0x30E1, 0x30E2,  // ﾏﾐﾑﾒﾓ -> マミムメモ
+        0x30E4, 0x30E6, 0x30E8,                  // ﾔﾕﾖ -> ヤユヨ
+        0x30E9, 0x30EA, 0x30EB, 0x30EC, 0x30ED,  // ﾗﾘﾙﾚﾛ -> ラリルレロ
+        0x30EF, 0x30F3,                          // ﾜﾝ -> ワン
     };
     size_t idx = codepoint - 0xFF66;
     if (idx < sizeof(kMapping) / sizeof(kMapping[0])) {
@@ -212,8 +212,7 @@ core::Result<std::string> Normalizer::normalize(std::string_view text) const {
     char32_t codepoint = decodeUtf8(text, pos);
 
     // Apply normalization with options
-    char32_t normalized_cp =
-        fullwidthToHalfwidth(codepoint, options_.preserve_case);
+    char32_t normalized_cp = fullwidthToHalfwidth(codepoint, options_.preserve_case);
     normalized_cp = halfwidthKatakanaToFullwidth(normalized_cp);
 
     // Look ahead for half-width dakuten/handakuten
@@ -242,8 +241,7 @@ core::Result<std::string> Normalizer::normalize(std::string_view text) const {
     codepoint = normalized_cp;
 
     // Handle vu-series normalization (ヴァ→バ, etc.) - skip if preserve_vu
-    if (!options_.preserve_vu &&
-        (codepoint == kKatakanaVu || codepoint == kHiraganaVu)) {
+    if (!options_.preserve_vu && (codepoint == kKatakanaVu || codepoint == kHiraganaVu)) {
       next_pos = pos;
       if (next_pos < text.size()) {
         char32_t next_cp = decodeUtf8(text, next_pos);

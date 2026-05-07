@@ -16,6 +16,7 @@
 // =============================================================================
 
 #include <array>
+
 #include "core/types.h"
 
 namespace suzume::analysis {
@@ -76,7 +77,7 @@ constexpr float kModerateBonus = -0.5F;     // Normal grammatical connection
 constexpr float kMinorBonus = -0.25F;       // Slight preference
 
 // Neutral
-constexpr float kNeutral = 0.0F;         // No preference
+constexpr float kNeutral = 0.0F;  // No preference
 
 // Penalties (positive values - discourage connection)
 // Named by likelihood: use when connection has this probability level
@@ -90,7 +91,7 @@ constexpr float kSevere = 2.5F;         // Severe violation
 constexpr float kAlmostNever = 3.0F;    // Almost never happens
 constexpr float kNever = 3.5F;          // Near prohibition
 constexpr float kExtremeBonus = -2.0F;  // Extreme bonus for grammatically necessary connections
-constexpr float kProhibitive = 5.0F;   // Absolute prohibition — exceeds kNever
+constexpr float kProhibitive = 5.0F;    // Absolute prohibition — exceeds kNever
 
 }  // namespace bigram_cost
 

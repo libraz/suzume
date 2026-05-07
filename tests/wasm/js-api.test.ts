@@ -10,7 +10,17 @@
  * WASM function calls. This file tests the JS-specific concerns.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { allocString, getModule, parseMorphemes, parseTags, type WasmModule } from './helpers';
+import {
+  allocString,
+  getModule,
+  MORPHEME_LAYOUT,
+  parseMorphemes,
+  parseTags,
+  RESULT_LAYOUT,
+  TAG_OPTIONS_LAYOUT,
+  TAGS_LAYOUT,
+  type WasmModule,
+} from './helpers';
 
 describe('JS API: struct layout compatibility', () => {
   let module: WasmModule;
@@ -93,9 +103,9 @@ describe('JS API: struct layout compatibility', () => {
     module._free(textPtr);
 
     // Verify struct layout directly
-    const tagsArrayPtr = module.HEAPU32[tagsPtr >> 2]; // offset 0: char** tags
-    const posArrayPtr = module.HEAPU32[(tagsPtr >> 2) + 1]; // offset 1: const char** pos
-    const count = module.HEAPU32[(tagsPtr >> 2) + 2]; // offset 2: size_t count
+    const tagsArrayPtr = module.HEAPU32[(tagsPtr + TAGS_LAYOUT.tags) >> 2];
+    const posArrayPtr = module.HEAPU32[(tagsPtr + TAGS_LAYOUT.pos) >> 2];
+    const count = module.HEAPU32[(tagsPtr + TAGS_LAYOUT.count) >> 2];
 
     expect(tagsArrayPtr).toBeGreaterThan(0);
     expect(posArrayPtr).toBeGreaterThan(0);
@@ -147,6 +157,56 @@ describe('JS API: struct layout compatibility', () => {
     destroy(h);
   });
 
+  it('exported C layout functions match JS parser constants', () => {
+    const sizeofResult = module.cwrap('suzume_sizeof_result', 'number', []) as () => number;
+    const sizeofMorpheme = module.cwrap('suzume_sizeof_morpheme', 'number', []) as () => number;
+    const sizeofTags = module.cwrap('suzume_sizeof_tags', 'number', []) as () => number;
+    const sizeofTagOptions = module.cwrap(
+      'suzume_sizeof_tag_options',
+      'number',
+      [],
+    ) as () => number;
+    const offsetofResult = module.cwrap('suzume_offsetof_result', 'number', ['number']) as (
+      field: number,
+    ) => number;
+    const offsetofMorpheme = module.cwrap('suzume_offsetof_morpheme', 'number', ['number']) as (
+      field: number,
+    ) => number;
+    const offsetofTags = module.cwrap('suzume_offsetof_tags', 'number', ['number']) as (
+      field: number,
+    ) => number;
+    const offsetofTagOptions = module.cwrap('suzume_offsetof_tag_options', 'number', [
+      'number',
+    ]) as (field: number) => number;
+
+    expect(sizeofResult()).toBe(RESULT_LAYOUT.size);
+    expect(offsetofResult(0)).toBe(RESULT_LAYOUT.morphemes);
+    expect(offsetofResult(1)).toBe(RESULT_LAYOUT.count);
+
+    expect(sizeofMorpheme()).toBe(MORPHEME_LAYOUT.size);
+    expect(offsetofMorpheme(0)).toBe(MORPHEME_LAYOUT.surface);
+    expect(offsetofMorpheme(6)).toBe(MORPHEME_LAYOUT.extendedPos);
+
+    expect(sizeofTags()).toBe(TAGS_LAYOUT.size);
+    expect(offsetofTags(0)).toBe(TAGS_LAYOUT.tags);
+    expect(offsetofTags(2)).toBe(TAGS_LAYOUT.count);
+
+    expect(sizeofTagOptions()).toBe(TAG_OPTIONS_LAYOUT.size);
+    expect(offsetofTagOptions(0)).toBe(TAG_OPTIONS_LAYOUT.posFilter);
+    expect(offsetofTagOptions(4)).toBe(TAG_OPTIONS_LAYOUT.maxTags);
+  });
+
+  it('last_error reports invalid C API calls', () => {
+    const analyze = module.cwrap('suzume_analyze', 'number', ['number', 'number']) as (
+      h: number,
+      t: number,
+    ) => number;
+    const lastError = module.cwrap('suzume_last_error', 'number', []) as () => number;
+
+    expect(analyze(0, 0)).toBe(0);
+    expect(module.UTF8ToString(lastError())).toContain('null handle');
+  });
+
   it('tag_options struct layout: 5 fields at 20 bytes', () => {
     const generateTagsWithOptions = module.cwrap('suzume_generate_tags_with_options', 'number', [
       'number',
@@ -156,15 +216,15 @@ describe('JS API: struct layout compatibility', () => {
     const tagsFree = module.cwrap('suzume_tags_free', null, ['number']) as (t: number) => void;
 
     const textPtr = allocString(module, '東京タワー');
-    const optionsPtr = module._malloc(20);
+    const optionsPtr = module._malloc(TAG_OPTIONS_LAYOUT.size);
 
     // Layout: pos_filter(uint8→uint32), exclude_basic(int), use_lemma(int),
     //         min_length(size_t), max_tags(size_t)
-    module.HEAPU32[optionsPtr >> 2] = 0; // all POS
-    module.HEAPU32[(optionsPtr + 4) >> 2] = 0; // exclude_basic=false
-    module.HEAPU32[(optionsPtr + 8) >> 2] = 1; // use_lemma=true
-    module.HEAPU32[(optionsPtr + 12) >> 2] = 1; // min_length=1
-    module.HEAPU32[(optionsPtr + 16) >> 2] = 0; // max_tags=unlimited
+    module.HEAPU32[(optionsPtr + TAG_OPTIONS_LAYOUT.posFilter) >> 2] = 0;
+    module.HEAPU32[(optionsPtr + TAG_OPTIONS_LAYOUT.excludeBasic) >> 2] = 0;
+    module.HEAPU32[(optionsPtr + TAG_OPTIONS_LAYOUT.useLemma) >> 2] = 1;
+    module.HEAPU32[(optionsPtr + TAG_OPTIONS_LAYOUT.minLength) >> 2] = 1;
+    module.HEAPU32[(optionsPtr + TAG_OPTIONS_LAYOUT.maxTags) >> 2] = 0;
 
     const tagsPtr = generateTagsWithOptions(handle, textPtr, optionsPtr);
     module._free(textPtr);

@@ -15,9 +15,9 @@ namespace suzume::postprocess {
  */
 struct PostprocessOptions {
   bool merge_noun_compounds = false;  // Merge consecutive nouns
-  bool lemmatize = true;             // Apply lemmatization
-  bool remove_symbols = true;        // Remove symbol-only morphemes
-  size_t min_surface_length = 1;     // Minimum surface length to keep
+  bool lemmatize = true;              // Apply lemmatization
+  bool remove_symbols = true;         // Remove symbol-only morphemes
+  size_t min_surface_length = 1;      // Minimum surface length to keep
 };
 
 /**
@@ -32,8 +32,7 @@ class Postprocessor {
    * @param dict_manager Dictionary manager for verifying lemma candidates
    * @param options Post-processing options
    */
-  Postprocessor(const dictionary::DictionaryManager* dict_manager,
-                const PostprocessOptions& options = {});
+  Postprocessor(const dictionary::DictionaryManager* dict_manager, const PostprocessOptions& options = {});
 
   ~Postprocessor() = default;
 
@@ -42,8 +41,7 @@ class Postprocessor {
    * @param morphemes Input morphemes
    * @return Processed morphemes
    */
-  std::vector<core::Morpheme> process(
-      const std::vector<core::Morpheme>& morphemes) const;
+  std::vector<core::Morpheme> process(const std::vector<core::Morpheme>& morphemes) const;
 
  private:
   PostprocessOptions options_;
@@ -91,8 +89,7 @@ class Postprocessor {
   /**
    * @brief Remove unwanted morphemes
    */
-  std::vector<core::Morpheme> filterMorphemes(
-      const std::vector<core::Morpheme>& morphemes) const;
+  std::vector<core::Morpheme> filterMorphemes(const std::vector<core::Morpheme>& morphemes) const;
 };
 
 }  // namespace suzume::postprocess

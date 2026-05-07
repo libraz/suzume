@@ -17,24 +17,24 @@ namespace suzume::dictionary {
  * Used for correct lemmatization of conjugated forms.
  */
 enum class ConjugationType : uint8_t {
-  None = 0,         // No conjugation (nouns, etc.)
-  Ichidan = 1,      // Ichidan verb (食べる, 見る)
-  GodanKa = 2,      // Godan K-row (書く, 歩く)
-  GodanGa = 3,      // Godan G-row (泳ぐ, 急ぐ)
-  GodanSa = 4,      // Godan S-row (話す, 出す)
-  GodanTa = 5,      // Godan T-row (持つ, 待つ)
-  GodanNa = 6,      // Godan N-row (死ぬ)
-  GodanBa = 7,      // Godan B-row (遊ぶ, 飛ぶ)
-  GodanMa = 8,      // Godan M-row (読む, 住む)
-  GodanRa = 9,      // Godan R-row (取る, 走る)
-  GodanWa = 10,     // Godan W-row (買う, 会う)
-  Suru = 11,        // Suru verb (勉強する)
-  Kuru = 12,        // Kuru verb (来る)
-  IAdjective = 13,  // I-adjective (美しい, 高い)
-  NaAdjective = 14, // Na-adjective (静かだ)
-  Interjection = 15, // 感動詞 (何だ, ああ, おい)
-  ProperFamily = 16, // 固有名詞(姓): 優木, 田中
-  ProperGiven = 17,  // 固有名詞(名): せつ菜, 太郎
+  None = 0,           // No conjugation (nouns, etc.)
+  Ichidan = 1,        // Ichidan verb (食べる, 見る)
+  GodanKa = 2,        // Godan K-row (書く, 歩く)
+  GodanGa = 3,        // Godan G-row (泳ぐ, 急ぐ)
+  GodanSa = 4,        // Godan S-row (話す, 出す)
+  GodanTa = 5,        // Godan T-row (持つ, 待つ)
+  GodanNa = 6,        // Godan N-row (死ぬ)
+  GodanBa = 7,        // Godan B-row (遊ぶ, 飛ぶ)
+  GodanMa = 8,        // Godan M-row (読む, 住む)
+  GodanRa = 9,        // Godan R-row (取る, 走る)
+  GodanWa = 10,       // Godan W-row (買う, 会う)
+  Suru = 11,          // Suru verb (勉強する)
+  Kuru = 12,          // Kuru verb (来る)
+  IAdjective = 13,    // I-adjective (美しい, 高い)
+  NaAdjective = 14,   // Na-adjective (静かだ)
+  Interjection = 15,  // 感動詞 (何だ, ああ, おい)
+  ProperFamily = 16,  // 固有名詞(姓): 優木, 田中
+  ProperGiven = 17,   // 固有名詞(名): せつ菜, 太郎
 };
 
 /**
@@ -47,10 +47,10 @@ enum class ConjugationType : uint8_t {
  *   4. No reading - not needed for core functionality
  */
 struct DictionaryEntry {
-  std::string surface;                // Surface string
-  core::PartOfSpeech pos;             // Part of speech
+  std::string surface;                                         // Surface string
+  core::PartOfSpeech pos;                                      // Part of speech
   core::ExtendedPOS extended_pos{core::ExtendedPOS::Unknown};  // Extended POS
-  std::string lemma;                  // Lemma (optional)
+  std::string lemma;                                           // Lemma (optional)
 };
 
 /**
@@ -58,7 +58,7 @@ struct DictionaryEntry {
  */
 struct LookupResult {
   uint32_t entry_id;
-  size_t length;           // Match length in characters
+  size_t length;  // Match length in characters
   const DictionaryEntry* entry;
   bool from_user_dict = false;  // True if from user dictionary (Layer 4)
 };
@@ -131,8 +131,7 @@ class DictionaryManager {
    * @param start_pos Start position (character index)
    * @return Combined lookup results from core and user dictionaries
    */
-  std::vector<LookupResult> lookup(std::string_view text,
-                                   size_t start_pos) const;
+  std::vector<LookupResult> lookup(std::string_view text, size_t start_pos) const;
 
   /**
    * @brief Get the core dictionary

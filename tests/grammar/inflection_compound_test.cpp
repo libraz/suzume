@@ -2,9 +2,9 @@
 // Inflection tests: Compound verb patterns (temiru, teshimau, temorau, etc.),
 // Triple/Quadruple compounds, Passive/Causative + compound
 
-#include "grammar/inflection.h"
-
 #include <gtest/gtest.h>
+
+#include "grammar/inflection.h"
 
 namespace suzume::grammar {
 namespace {
@@ -83,16 +83,14 @@ TEST_F(InflectionCompoundTest, CompoundTeAgetaIchidan) {
 
 TEST_F(InflectionCompoundTest, CompoundTeAgetaGodanWa) {
   auto result = inflection_.getBest("買ってあげた");
-  EXPECT_TRUE(result.base_form == "買う" || result.base_form == "買る" ||
-              result.base_form == "買つ");
+  EXPECT_TRUE(result.base_form == "買う" || result.base_form == "買る" || result.base_form == "買つ");
 }
 
 // ===== Compound verb: teoru =====
 
 TEST_F(InflectionCompoundTest, CompoundTeOrimasu) {
   auto result = inflection_.getBest("待っております");
-  EXPECT_TRUE(result.base_form == "待つ" || result.base_form == "待る" ||
-              result.base_form == "待う");
+  EXPECT_TRUE(result.base_form == "待つ" || result.base_form == "待る" || result.base_form == "待う");
 }
 
 TEST_F(InflectionCompoundTest, CompoundTeOrimasita) {

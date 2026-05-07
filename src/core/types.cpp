@@ -121,20 +121,34 @@ PartOfSpeech stringToPos(std::string_view str) {
 
 ExtendedPOS posToDefaultExtendedPOS(PartOfSpeech pos) {
   switch (pos) {
-    case PartOfSpeech::Noun: return ExtendedPOS::Noun;
-    case PartOfSpeech::Verb: return ExtendedPOS::VerbShuushikei;
-    case PartOfSpeech::Adjective: return ExtendedPOS::AdjBasic;
-    case PartOfSpeech::Adverb: return ExtendedPOS::Adverb;
-    case PartOfSpeech::Particle: return ExtendedPOS::ParticleCase;
-    case PartOfSpeech::Auxiliary: return ExtendedPOS::AuxTenseTa;
-    case PartOfSpeech::Pronoun: return ExtendedPOS::Pronoun;
-    case PartOfSpeech::Conjunction: return ExtendedPOS::Conjunction;
-    case PartOfSpeech::Determiner: return ExtendedPOS::Determiner;
-    case PartOfSpeech::Prefix: return ExtendedPOS::Prefix;
-    case PartOfSpeech::Suffix: return ExtendedPOS::Suffix;
-    case PartOfSpeech::Symbol: return ExtendedPOS::Symbol;
-    case PartOfSpeech::Interjection: return ExtendedPOS::Interjection;
-    default: return ExtendedPOS::Unknown;
+    case PartOfSpeech::Noun:
+      return ExtendedPOS::Noun;
+    case PartOfSpeech::Verb:
+      return ExtendedPOS::VerbShuushikei;
+    case PartOfSpeech::Adjective:
+      return ExtendedPOS::AdjBasic;
+    case PartOfSpeech::Adverb:
+      return ExtendedPOS::Adverb;
+    case PartOfSpeech::Particle:
+      return ExtendedPOS::ParticleCase;
+    case PartOfSpeech::Auxiliary:
+      return ExtendedPOS::AuxTenseTa;
+    case PartOfSpeech::Pronoun:
+      return ExtendedPOS::Pronoun;
+    case PartOfSpeech::Conjunction:
+      return ExtendedPOS::Conjunction;
+    case PartOfSpeech::Determiner:
+      return ExtendedPOS::Determiner;
+    case PartOfSpeech::Prefix:
+      return ExtendedPOS::Prefix;
+    case PartOfSpeech::Suffix:
+      return ExtendedPOS::Suffix;
+    case PartOfSpeech::Symbol:
+      return ExtendedPOS::Symbol;
+    case PartOfSpeech::Interjection:
+      return ExtendedPOS::Interjection;
+    default:
+      return ExtendedPOS::Unknown;
   }
 }
 
@@ -205,98 +219,164 @@ const char* originToString(CandidateOrigin origin) {
 std::string_view extendedPosToString(ExtendedPOS epos) {
   switch (epos) {
     // Verb forms
-    case ExtendedPOS::VerbShuushikei: return "VERB_終止";
-    case ExtendedPOS::VerbRenyokei: return "VERB_連用";
-    case ExtendedPOS::VerbMizenkei: return "VERB_未然";
-    case ExtendedPOS::VerbOnbinkei: return "VERB_音便";
-    case ExtendedPOS::VerbTeForm: return "VERB_て形";
-    case ExtendedPOS::VerbKateikei: return "VERB_仮定";
-    case ExtendedPOS::VerbMeireikei: return "VERB_命令";
-    case ExtendedPOS::VerbRentaikei: return "VERB_連体";
-    case ExtendedPOS::VerbTaForm: return "VERB_た形";
-    case ExtendedPOS::VerbTaraForm: return "VERB_たら形";
+    case ExtendedPOS::VerbShuushikei:
+      return "VERB_終止";
+    case ExtendedPOS::VerbRenyokei:
+      return "VERB_連用";
+    case ExtendedPOS::VerbMizenkei:
+      return "VERB_未然";
+    case ExtendedPOS::VerbOnbinkei:
+      return "VERB_音便";
+    case ExtendedPOS::VerbTeForm:
+      return "VERB_て形";
+    case ExtendedPOS::VerbKateikei:
+      return "VERB_仮定";
+    case ExtendedPOS::VerbMeireikei:
+      return "VERB_命令";
+    case ExtendedPOS::VerbRentaikei:
+      return "VERB_連体";
+    case ExtendedPOS::VerbTaForm:
+      return "VERB_た形";
+    case ExtendedPOS::VerbTaraForm:
+      return "VERB_たら形";
 
     // Adjective forms
-    case ExtendedPOS::AdjBasic: return "ADJ_終止";
-    case ExtendedPOS::AdjRenyokei: return "ADJ_連用";
-    case ExtendedPOS::AdjStem: return "ADJ_語幹";
-    case ExtendedPOS::AdjKatt: return "ADJ_かっ";
-    case ExtendedPOS::AdjKeForm: return "ADJ_け形";
-    case ExtendedPOS::AdjNaAdj: return "ADJ_NA";
+    case ExtendedPOS::AdjBasic:
+      return "ADJ_終止";
+    case ExtendedPOS::AdjRenyokei:
+      return "ADJ_連用";
+    case ExtendedPOS::AdjStem:
+      return "ADJ_語幹";
+    case ExtendedPOS::AdjKatt:
+      return "ADJ_かっ";
+    case ExtendedPOS::AdjKeForm:
+      return "ADJ_け形";
+    case ExtendedPOS::AdjNaAdj:
+      return "ADJ_NA";
 
     // Auxiliaries - Tense
-    case ExtendedPOS::AuxTenseTa: return "AUX_過去";
-    case ExtendedPOS::AuxTenseMasu: return "AUX_丁寧";
+    case ExtendedPOS::AuxTenseTa:
+      return "AUX_過去";
+    case ExtendedPOS::AuxTenseMasu:
+      return "AUX_丁寧";
 
     // Auxiliaries - Negation
-    case ExtendedPOS::AuxNegativeNai: return "AUX_否定";
-    case ExtendedPOS::AuxNegativeNu: return "AUX_否定古";
+    case ExtendedPOS::AuxNegativeNai:
+      return "AUX_否定";
+    case ExtendedPOS::AuxNegativeNu:
+      return "AUX_否定古";
 
     // Auxiliaries - Desire/Volition
-    case ExtendedPOS::AuxDesireTai: return "AUX_願望";
-    case ExtendedPOS::AuxVolitional: return "AUX_意志";
+    case ExtendedPOS::AuxDesireTai:
+      return "AUX_願望";
+    case ExtendedPOS::AuxVolitional:
+      return "AUX_意志";
 
     // Auxiliaries - Voice
-    case ExtendedPOS::AuxPassive: return "AUX_受身";
-    case ExtendedPOS::AuxCausative: return "AUX_使役";
-    case ExtendedPOS::AuxPotential: return "AUX_可能";
+    case ExtendedPOS::AuxPassive:
+      return "AUX_受身";
+    case ExtendedPOS::AuxCausative:
+      return "AUX_使役";
+    case ExtendedPOS::AuxPotential:
+      return "AUX_可能";
 
     // Auxiliaries - Aspect
-    case ExtendedPOS::AuxAspectIru: return "AUX_継続";
-    case ExtendedPOS::AuxAspectShimau: return "AUX_完了";
-    case ExtendedPOS::AuxAspectOku: return "AUX_準備";
-    case ExtendedPOS::AuxAspectMiru: return "AUX_試行";
-    case ExtendedPOS::AuxAspectIku: return "AUX_進行";
-    case ExtendedPOS::AuxAspectKuru: return "AUX_接近";
+    case ExtendedPOS::AuxAspectIru:
+      return "AUX_継続";
+    case ExtendedPOS::AuxAspectShimau:
+      return "AUX_完了";
+    case ExtendedPOS::AuxAspectOku:
+      return "AUX_準備";
+    case ExtendedPOS::AuxAspectMiru:
+      return "AUX_試行";
+    case ExtendedPOS::AuxAspectIku:
+      return "AUX_進行";
+    case ExtendedPOS::AuxAspectKuru:
+      return "AUX_接近";
 
     // Auxiliaries - Appearance/Conjecture
-    case ExtendedPOS::AuxAppearanceSou: return "AUX_様態";
-    case ExtendedPOS::AuxConjectureRashii: return "AUX_推定";
-    case ExtendedPOS::AuxConjectureMitai: return "AUX_みたい";
+    case ExtendedPOS::AuxAppearanceSou:
+      return "AUX_様態";
+    case ExtendedPOS::AuxConjectureRashii:
+      return "AUX_推定";
+    case ExtendedPOS::AuxConjectureMitai:
+      return "AUX_みたい";
 
     // Auxiliaries - Copula
-    case ExtendedPOS::AuxCopulaDa: return "AUX_断定";
-    case ExtendedPOS::AuxCopulaDesu: return "AUX_丁寧断定";
+    case ExtendedPOS::AuxCopulaDa:
+      return "AUX_断定";
+    case ExtendedPOS::AuxCopulaDesu:
+      return "AUX_丁寧断定";
 
     // Auxiliaries - Other
-    case ExtendedPOS::AuxHonorific: return "AUX_尊敬";
-    case ExtendedPOS::AuxGozaru: return "AUX_丁重";
-    case ExtendedPOS::AuxExcessive: return "AUX_過度";
-    case ExtendedPOS::AuxGaru: return "AUX_ガル";
+    case ExtendedPOS::AuxHonorific:
+      return "AUX_尊敬";
+    case ExtendedPOS::AuxGozaru:
+      return "AUX_丁重";
+    case ExtendedPOS::AuxExcessive:
+      return "AUX_過度";
+    case ExtendedPOS::AuxGaru:
+      return "AUX_ガル";
 
     // Particles
-    case ExtendedPOS::ParticleCase: return "PART_格";
-    case ExtendedPOS::ParticleTopic: return "PART_係";
-    case ExtendedPOS::ParticleFinal: return "PART_終";
-    case ExtendedPOS::ParticleConj: return "PART_接続";
-    case ExtendedPOS::ParticleQuote: return "PART_引用";
-    case ExtendedPOS::ParticleAdverbial: return "PART_副";
-    case ExtendedPOS::ParticleNo: return "PART_準体";
-    case ExtendedPOS::ParticleBinding: return "PART_係結";
+    case ExtendedPOS::ParticleCase:
+      return "PART_格";
+    case ExtendedPOS::ParticleTopic:
+      return "PART_係";
+    case ExtendedPOS::ParticleFinal:
+      return "PART_終";
+    case ExtendedPOS::ParticleConj:
+      return "PART_接続";
+    case ExtendedPOS::ParticleQuote:
+      return "PART_引用";
+    case ExtendedPOS::ParticleAdverbial:
+      return "PART_副";
+    case ExtendedPOS::ParticleNo:
+      return "PART_準体";
+    case ExtendedPOS::ParticleBinding:
+      return "PART_係結";
 
     // Nouns
-    case ExtendedPOS::Noun: return "NOUN";
-    case ExtendedPOS::NounFormal: return "NOUN_形式";
-    case ExtendedPOS::NounVerbal: return "NOUN_転成";
-    case ExtendedPOS::NounProper: return "NOUN_固有";
-    case ExtendedPOS::NounProperFamily: return "NOUN_姓";
-    case ExtendedPOS::NounProperGiven: return "NOUN_名";
-    case ExtendedPOS::NounNumber: return "NOUN_数";
+    case ExtendedPOS::Noun:
+      return "NOUN";
+    case ExtendedPOS::NounFormal:
+      return "NOUN_形式";
+    case ExtendedPOS::NounVerbal:
+      return "NOUN_転成";
+    case ExtendedPOS::NounProper:
+      return "NOUN_固有";
+    case ExtendedPOS::NounProperFamily:
+      return "NOUN_姓";
+    case ExtendedPOS::NounProperGiven:
+      return "NOUN_名";
+    case ExtendedPOS::NounNumber:
+      return "NOUN_数";
 
     // Pronouns
-    case ExtendedPOS::Pronoun: return "PRON";
-    case ExtendedPOS::PronounInterrogative: return "PRON_疑問";
+    case ExtendedPOS::Pronoun:
+      return "PRON";
+    case ExtendedPOS::PronounInterrogative:
+      return "PRON_疑問";
 
     // Others
-    case ExtendedPOS::Adverb: return "ADV";
-    case ExtendedPOS::AdverbQuotative: return "ADV_引用";
-    case ExtendedPOS::Conjunction: return "CONJ";
-    case ExtendedPOS::Determiner: return "DET";
-    case ExtendedPOS::Prefix: return "PREFIX";
-    case ExtendedPOS::Suffix: return "SUFFIX";
-    case ExtendedPOS::Symbol: return "SYMBOL";
-    case ExtendedPOS::Interjection: return "INTJ";
-    case ExtendedPOS::Other: return "OTHER";
+    case ExtendedPOS::Adverb:
+      return "ADV";
+    case ExtendedPOS::AdverbQuotative:
+      return "ADV_引用";
+    case ExtendedPOS::Conjunction:
+      return "CONJ";
+    case ExtendedPOS::Determiner:
+      return "DET";
+    case ExtendedPOS::Prefix:
+      return "PREFIX";
+    case ExtendedPOS::Suffix:
+      return "SUFFIX";
+    case ExtendedPOS::Symbol:
+      return "SYMBOL";
+    case ExtendedPOS::Interjection:
+      return "INTJ";
+    case ExtendedPOS::Other:
+      return "OTHER";
 
     case ExtendedPOS::Unknown:
     case ExtendedPOS::Count_:

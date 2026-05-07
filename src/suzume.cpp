@@ -82,10 +82,10 @@ struct Suzume::Impl {
     analysis::ScorerOptions scorer_opts = opts.scorer_options;
 #ifndef __EMSCRIPTEN__
     // Load from environment variables (SUZUME_SCORER_CONFIG and SUZUME_SCORER_*)
-    auto result = analysis::ScorerOptionsLoader::loadFromEnv(scorer_opts);
+    auto result = analysis::ScorerOptionsLoader::loadFromEnv(scorer_opts, opts.report_scorer_config);
 
     // Output status message when config is active (debug feature)
-    if (result.hasConfig()) {
+    if (opts.report_scorer_config && result.hasConfig()) {
       std::cerr << "[scorer-config] ";
       if (!result.config_path.empty()) {
         std::cerr << "json=" << result.config_path;
@@ -106,10 +106,7 @@ struct Suzume::Impl {
       : options(opts),
         analyzer(analysis::AnalyzerOptions{opts.mode, loadScorerConfig(opts), {}, opts.normalize_options}),
         postprocessor(&analyzer.dictionaryManager(),
-                      postprocess::PostprocessOptions{
-                          opts.merge_compounds,
-                          opts.lemmatize,
-                          opts.remove_symbols}),
+                      postprocess::PostprocessOptions{opts.merge_compounds, opts.lemmatize, opts.remove_symbols}),
         tag_generator(opts.tag_options) {
     // Auto-load core.dic if found (binary format)
     std::string core_path = findDictionary("core.dic");
@@ -130,8 +127,7 @@ struct Suzume::Impl {
 
 Suzume::Suzume() : Suzume(SuzumeOptions{}) {}
 
-Suzume::Suzume(const SuzumeOptions& options)
-    : impl_(std::make_unique<Impl>(options)) {}
+Suzume::Suzume(const SuzumeOptions& options) : impl_(std::make_unique<Impl>(options)) {}
 
 Suzume::~Suzume() = default;
 
@@ -164,8 +160,7 @@ bool Suzume::loadUserDictionaryFromMemory(const char* data, size_t size) {
 }
 
 bool Suzume::loadBinaryDictionary(const uint8_t* data, size_t size) {
-  return impl_->analyzer.dictionaryManager()
-      .loadUserBinaryDictionaryFromMemory(data, size);
+  return impl_->analyzer.dictionaryManager().loadUserBinaryDictionaryFromMemory(data, size);
 }
 
 std::vector<core::Morpheme> Suzume::analyze(std::string_view text) const {
@@ -173,8 +168,7 @@ std::vector<core::Morpheme> Suzume::analyze(std::string_view text) const {
   return impl_->postprocessor.process(morphemes);
 }
 
-std::vector<core::Morpheme> Suzume::analyzeDebug(std::string_view text,
-                                                  core::Lattice* out_lattice) const {
+std::vector<core::Morpheme> Suzume::analyzeDebug(std::string_view text, core::Lattice* out_lattice) const {
   auto morphemes = impl_->analyzer.analyzeDebug(text, out_lattice);
   return impl_->postprocessor.process(morphemes);
 }
@@ -184,21 +178,24 @@ std::vector<postprocess::TagEntry> Suzume::generateTags(std::string_view text) c
   return impl_->tag_generator.generate(morphemes);
 }
 
-std::vector<postprocess::TagEntry> Suzume::generateTags(
-    std::string_view text,
-    const postprocess::TagGeneratorOptions& options) const {
+std::vector<postprocess::TagEntry> Suzume::generateTags(std::string_view text,
+                                                        const postprocess::TagGeneratorOptions& options) const {
   auto morphemes = impl_->analyzer.analyze(text);
   postprocess::TagGenerator generator(options);
   return generator.generate(morphemes);
 }
 
-core::AnalysisMode Suzume::mode() const { return impl_->options.mode; }
+core::AnalysisMode Suzume::mode() const {
+  return impl_->options.mode;
+}
 
 void Suzume::setMode(core::AnalysisMode mode) {
   impl_->options.mode = mode;
   impl_->analyzer.setMode(mode);
 }
 
-std::string Suzume::version() { return SUZUME_VERSION; }
+std::string Suzume::version() {
+  return SUZUME_VERSION;
+}
 
 }  // namespace suzume

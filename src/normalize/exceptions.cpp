@@ -15,24 +15,77 @@ namespace suzume::normalize {
 
 const std::unordered_set<std::string_view> kSingleKanjiExceptions = {
     // Counters (助数詞)
-    "人", "日", "月", "年", "時", "分", "秒", "本", "冊", "個",
-    "枚", "台", "回", "件", "円", "点", "度", "番", "階", "歳",
+    "人",
+    "日",
+    "月",
+    "年",
+    "時",
+    "分",
+    "秒",
+    "本",
+    "冊",
+    "個",
+    "枚",
+    "台",
+    "回",
+    "件",
+    "円",
+    "点",
+    "度",
+    "番",
+    "階",
+    "歳",
     // Administrative units (行政単位)
-    "国", "市", "県", "区", "町", "村",
+    "国",
+    "市",
+    "県",
+    "区",
+    "町",
+    "村",
     // Common standalone nouns (基本名詞)
-    "家", "駅", "店", "道", "海", "山", "川", "森", "空", "雨",
+    "家",
+    "駅",
+    "店",
+    "道",
+    "海",
+    "山",
+    "川",
+    "森",
+    "空",
+    "雨",
     // Spatial relations (空間)
-    "上", "下", "中", "外", "内", "前", "後",
+    "上",
+    "下",
+    "中",
+    "外",
+    "内",
+    "前",
+    "後",
     // Directions (方角)
-    "東", "西", "南", "北",
+    "東",
+    "西",
+    "南",
+    "北",
     // Seasons (季節)
-    "春", "夏", "秋", "冬",
+    "春",
+    "夏",
+    "秋",
+    "冬",
     // Times of day and temporal nouns (時間帯・時間名詞)
-    "朝", "昼", "夜", "今",
+    "朝",
+    "昼",
+    "夜",
+    "今",
     // Interrogatives (疑問詞)
-    "何", "誰",
+    "何",
+    "誰",
     // Pronouns (代名詞) - very common standalone kanji
-    "私", "僕", "俺", "君", "彼", "我",
+    "私",
+    "僕",
+    "俺",
+    "君",
+    "彼",
+    "我",
 };
 
 // =============================================================================
@@ -45,15 +98,28 @@ const std::unordered_set<std::string_view> kSingleKanjiExceptions = {
 
 const std::unordered_set<std::string_view> kSingleHiraganaExceptions = {
     // Case particles (格助詞) - also in kParticleStrings, kana::kCaseParticles
-    "が", "を", "に", "で", "と", "へ", "の",
+    "が",
+    "を",
+    "に",
+    "で",
+    "と",
+    "へ",
+    "の",
     // Binding particles (係助詞) - also in kParticleStrings, kana::kBindingParticles
-    "は", "も",
+    "は",
+    "も",
     // Final particles (終助詞) - see kana::kFinalParticles
-    "か", "な", "ね", "よ", "わ",
+    "か",
+    "な",
+    "ね",
+    "よ",
+    "わ",
     // Auxiliary (助動詞)
-    "だ", "た",
+    "だ",
+    "た",
     // Conjunctive particles (接続助詞) - see kana::kConjunctiveParticles
-    "て", "ば",
+    "て",
+    "ば",
 };
 
 // =============================================================================
@@ -136,13 +202,24 @@ const std::vector<std::string_view> kHiraganaCompoundVerbAuxPrefixes = {
 
 const std::unordered_set<std::string_view> kParticleStrings = {
     // Case particles (格助詞) - also in kSingleHiraganaExceptions, kana::kCaseParticles
-    "が", "を", "に", "で", "と", "へ", "の",
+    "が",
+    "を",
+    "に",
+    "で",
+    "と",
+    "へ",
+    "の",
     // Binding particles (係助詞) - also in kSingleHiraganaExceptions, kana::kBindingParticles
-    "は", "も",
+    "は",
+    "も",
     // Other particles (副助詞・接続助詞)
-    "や", "か",
+    "や",
+    "か",
     // Compound particles (複合助詞)
-    "から", "まで", "より", "ほど",
+    "から",
+    "まで",
+    "より",
+    "ほど",
 };
 
 // =============================================================================
@@ -153,9 +230,11 @@ const std::unordered_set<std::string_view> kParticleStrings = {
 
 const std::unordered_set<std::string_view> kCopulaStrings = {
     // Basic copula (基本形)
-    "だ", "です",
+    "だ",
+    "です",
     // Past forms (過去形)
-    "だった", "でした",
+    "だった",
+    "でした",
     // Partial forms (途中形) - for mid-word positions
     "でし",
     // Formal copula (文語形)
@@ -186,11 +265,19 @@ const std::unordered_set<std::string_view> kFormalNounStrings = {
 
 const std::unordered_set<char32_t> kParticleCodepoints = {
     // Case particles (格助詞)
-    U'が', U'を', U'に', U'で', U'と', U'へ', U'の',
+    U'が',
+    U'を',
+    U'に',
+    U'で',
+    U'と',
+    U'へ',
+    U'の',
     // Binding particles (係助詞)
-    U'は', U'も',
+    U'は',
+    U'も',
     // Other particles (副助詞)
-    U'や', U'か',
+    U'や',
+    U'か',
 };
 
 }  // namespace suzume::normalize

@@ -13,8 +13,7 @@ namespace {
 
 void outputMorpheme(const std::vector<core::Morpheme>& morphemes) {
   for (const auto& morpheme : morphemes) {
-    std::cout << morpheme.surface << "\t" << core::posToString(morpheme.pos)
-              << "\t" << morpheme.lemma << "\n";
+    std::cout << morpheme.surface << "\t" << core::posToString(morpheme.pos) << "\t" << morpheme.lemma << "\n";
   }
 }
 
@@ -24,18 +23,17 @@ void outputTags(const std::vector<postprocess::TagEntry>& tags) {
   }
 }
 
-void outputJson(const std::string& input,
-                const std::vector<core::Morpheme>& morphemes) {
+void outputJson(const std::string& input, const std::vector<core::Morpheme>& morphemes) {
   std::cout << "{\n";
-  std::cout << R"(  "input": ")" << input << "\",\n";
+  std::cout << R"(  "input": ")" << jsonEscape(input) << "\",\n";
   std::cout << "  \"morphemes\": [\n";
 
   for (size_t idx = 0; idx < morphemes.size(); ++idx) {
     const auto& mor = morphemes[idx];
     std::cout << "    {";
-    std::cout << R"("surface": ")" << mor.surface << "\", ";
+    std::cout << R"("surface": ")" << jsonEscape(mor.surface) << "\", ";
     std::cout << R"("pos": ")" << core::posToString(mor.pos) << "\", ";
-    std::cout << R"("lemma": ")" << mor.lemma << "\"";
+    std::cout << R"("lemma": ")" << jsonEscape(mor.lemma) << "\"";
     std::cout << "}";
     if (idx + 1 < morphemes.size()) {
       std::cout << ",";
@@ -49,9 +47,8 @@ void outputJson(const std::string& input,
 
 void outputTsv(const std::vector<core::Morpheme>& morphemes) {
   for (const auto& mor : morphemes) {
-    std::cout << mor.surface << "\t" << core::posToString(mor.pos) << "\t"
-              << mor.lemma << "\t" << mor.start_pos << "\t" << mor.end_pos
-              << "\n";
+    std::cout << mor.surface << "\t" << core::posToString(mor.pos) << "\t" << mor.lemma << "\t" << mor.start_pos << "\t"
+              << mor.end_pos << "\n";
   }
 }
 
@@ -70,8 +67,7 @@ void outputChasen(const std::vector<core::Morpheme>& morphemes) {
     std::cout << core::posToJapanese(mor.pos) << "\t";
 
     // Conjugation type and form (for verbs and adjectives)
-    if (mor.pos == core::PartOfSpeech::Verb ||
-        mor.pos == core::PartOfSpeech::Adjective) {
+    if (mor.pos == core::PartOfSpeech::Verb || mor.pos == core::PartOfSpeech::Adjective) {
       auto verb_type = grammar::conjTypeToVerbType(mor.conj_type);
       std::cout << grammar::verbTypeToJapanese(verb_type) << "\t";
       std::cout << grammar::conjFormToJapanese(mor.conj_form);
@@ -141,6 +137,7 @@ int cmdAnalyze(const CommandArgs& args) {
   // Default is remove symbols (true), flag inverts to preserve
   options.remove_symbols = !args.preserve_symbols;
   options.skip_user_dictionary = args.no_user_dict;
+  options.report_scorer_config = args.verbose;
 
   Suzume analyzer(options);
 
@@ -173,8 +170,7 @@ int cmdAnalyze(const CommandArgs& args) {
     // Show diff (simplified)
     std::cout << "[Diff]\n";
     if (base_morphemes.size() != morphemes.size()) {
-      std::cout << "Morpheme count: " << base_morphemes.size() << " -> "
-                << morphemes.size() << "\n";
+      std::cout << "Morpheme count: " << base_morphemes.size() << " -> " << morphemes.size() << "\n";
     } else {
       std::cout << "No structural difference\n";
     }
@@ -204,9 +200,8 @@ int cmdAnalyze(const CommandArgs& args) {
       if (!edges.empty()) {
         std::cout << "Position " << pos << ":\n";
         for (const auto& edge : edges) {
-          std::cout << "  [" << edge.start << "-" << edge.end << "] "
-                    << edge.surface << " (" << core::posToString(edge.pos)
-                    << ") cost=" << edge.cost;
+          std::cout << "  [" << edge.start << "-" << edge.end << "] " << edge.surface << " ("
+                    << core::posToString(edge.pos) << ") cost=" << edge.cost;
           if (!edge.lemma.empty()) {
             std::cout << " lemma=" << edge.lemma;
           }

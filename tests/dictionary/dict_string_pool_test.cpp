@@ -1,6 +1,6 @@
-#include "dictionary/string_pool.h"
-
 #include <gtest/gtest.h>
+
+#include "dictionary/string_pool.h"
 
 namespace suzume {
 namespace dictionary {

@@ -31,8 +31,7 @@ std::vector<std::string> split(const std::string& str, char delim) {
   return result;
 }
 
-bool runSingleTest(Suzume& analyzer, const std::string& input,
-                   const std::set<std::string>& expected, bool verbose) {
+bool runSingleTest(Suzume& analyzer, const std::string& input, const std::set<std::string>& expected, bool verbose) {
   auto tags = analyzer.generateTags(input);
   std::set<std::string> actual;
   for (const auto& t : tags) {
@@ -65,10 +64,8 @@ bool runSingleTest(Suzume& analyzer, const std::string& input,
       std::vector<std::string> missing;
       std::vector<std::string> extra;
 
-      std::set_difference(expected.begin(), expected.end(), actual.begin(),
-                          actual.end(), std::back_inserter(missing));
-      std::set_difference(actual.begin(), actual.end(), expected.begin(),
-                          expected.end(), std::back_inserter(extra));
+      std::set_difference(expected.begin(), expected.end(), actual.begin(), actual.end(), std::back_inserter(missing));
+      std::set_difference(actual.begin(), actual.end(), expected.begin(), expected.end(), std::back_inserter(extra));
 
       if (!missing.empty()) {
         std::cout << "  Missing:  ";
@@ -90,8 +87,7 @@ bool runSingleTest(Suzume& analyzer, const std::string& input,
   return passed;
 }
 
-int cmdTestSingle(const std::vector<std::string>& args, bool verbose,
-                  const std::vector<std::string>& dict_paths) {
+int cmdTestSingle(const std::vector<std::string>& args, bool verbose, const std::vector<std::string>& dict_paths) {
   std::string input;
   std::string expect_str;
 
@@ -134,8 +130,7 @@ int cmdTestSingle(const std::vector<std::string>& args, bool verbose,
   return passed ? 0 : 1;
 }
 
-int cmdTestFile(const std::vector<std::string>& args, bool verbose,
-                const std::vector<std::string>& dict_paths) {
+int cmdTestFile(const std::vector<std::string>& args, bool verbose, const std::vector<std::string>& dict_paths) {
   std::string test_file;
 
   for (size_t idx = 0; idx < args.size(); ++idx) {
@@ -172,8 +167,7 @@ int cmdTestFile(const std::vector<std::string>& args, bool verbose,
     // Parse: input<TAB>expected_tags (comma-separated)
     size_t tab = line.find('\t');
     if (tab == std::string::npos) {
-      printWarning("Invalid test line " + std::to_string(line_num) +
-                   ": missing tab");
+      printWarning("Invalid test line " + std::to_string(line_num) + ": missing tab");
       continue;
     }
 
@@ -182,8 +176,7 @@ int cmdTestFile(const std::vector<std::string>& args, bool verbose,
     test.line_number = line_num;
 
     auto expected_list = split(line.substr(tab + 1), ',');
-    test.expected_tags = std::set<std::string>(expected_list.begin(),
-                                                expected_list.end());
+    test.expected_tags = std::set<std::string>(expected_list.begin(), expected_list.end());
 
     tests.push_back(std::move(test));
   }
@@ -211,23 +204,23 @@ int cmdTestFile(const std::vector<std::string>& args, bool verbose,
   }
 
   std::cout << "\n";
-  std::cout << "Results: " << passed << " passed, " << failed << " failed, "
-            << tests.size() << " total\n";
+  std::cout << "Results: " << passed << " passed, " << failed << " failed, " << tests.size() << " total\n";
 
   return failed > 0 ? 1 : 0;
 }
 
-int cmdTestBenchmark(const std::vector<std::string>& args,
-                     bool /* verbose */,
+int cmdTestBenchmark(const std::vector<std::string>& args, bool /* verbose */,
                      const std::vector<std::string>& dict_paths) {
   size_t iterations = 1000;
   std::string corpus_file;
 
   for (size_t idx = 0; idx < args.size(); ++idx) {
     if (args[idx].substr(0, 13) == "--iterations=") {
-      iterations = std::stoul(args[idx].substr(13));
-    } else if ((args[idx] == "-f" || args[idx] == "--file") &&
-               idx + 1 < args.size()) {
+      if (!parseSizeOption(args[idx].substr(13), &iterations)) {
+        printError("Invalid iterations: " + args[idx].substr(13));
+        return 1;
+      }
+    } else if ((args[idx] == "-f" || args[idx] == "--file") && idx + 1 < args.size()) {
       corpus_file = args[idx + 1];
     }
   }
@@ -276,8 +269,8 @@ int cmdTestBenchmark(const std::vector<std::string>& args,
     total_chars += text.size();
   }
 
-  std::cout << "Benchmark: " << iterations << " iterations, " << texts.size()
-            << " texts, " << total_chars << " chars total\n";
+  std::cout << "Benchmark: " << iterations << " iterations, " << texts.size() << " texts, " << total_chars
+            << " chars total\n";
 
   // Warmup
   for (const auto& text : texts) {
@@ -298,18 +291,14 @@ int cmdTestBenchmark(const std::vector<std::string>& args,
   }
 
   auto end = std::chrono::high_resolution_clock::now();
-  auto duration =
-      std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
   auto ms_total = static_cast<double>(duration.count());
-  double chars_per_sec =
-      (static_cast<double>(total_chars) * iterations) / (ms_total / 1000.0);
+  double chars_per_sec = (static_cast<double>(total_chars) * iterations) / (ms_total / 1000.0);
 
   std::cout << "Time: " << ms_total << " ms\n";
-  std::cout << "Throughput: " << static_cast<size_t>(chars_per_sec)
-            << " chars/sec\n";
-  std::cout << "Per text: " << (ms_total / (iterations * texts.size()))
-            << " ms avg\n";
+  std::cout << "Throughput: " << static_cast<size_t>(chars_per_sec) << " chars/sec\n";
+  std::cout << "Per text: " << (ms_total / (iterations * texts.size())) << " ms avg\n";
 
   return 0;
 }

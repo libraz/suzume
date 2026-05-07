@@ -1,7 +1,7 @@
+#include <vector>
+
 #include "core/types.h"
 #include "dictionary/dictionary.h"
-
-#include <vector>
 
 namespace suzume::dictionary::entries {
 
@@ -58,8 +58,7 @@ inline DictionaryEntry det(const char* s, const char* lemma = "") {
 
 // Noun helper: creates NOUN entry
 // Usage: noun("机"), noun("こと", "", EPOS::NounFormal)
-inline DictionaryEntry noun(const char* s, const char* lemma = "",
-                            EPOS epos = EPOS::Noun) {
+inline DictionaryEntry noun(const char* s, const char* lemma = "", EPOS epos = EPOS::Noun) {
   return {s, POS::Noun, epos, lemma};
 }
 
@@ -150,7 +149,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
       particle("けど", EPOS::ParticleConj),
       particle("けども", EPOS::ParticleConj),
       particle("けれども", EPOS::ParticleConj),
-      particle("し", EPOS::ParticleConj),  // 列挙・理由 (接続助詞)
+      particle("し", EPOS::ParticleConj),    // 列挙・理由 (接続助詞)
       particle("たり", EPOS::ParticleConj),  // 並立助詞 (食べたり飲んだり)
       particle("だり", EPOS::ParticleConj),  // 並立助詞 (voiced: 飲んだり)
       particle("や", EPOS::ParticleConj),    // 並立助詞 (AやB)
@@ -167,7 +166,7 @@ std::vector<DictionaryEntry> getParticleEntries() {
       particle("わ", EPOS::ParticleFinal),
       particle("ぞ", EPOS::ParticleFinal),
       particle("ぜ", EPOS::ParticleFinal),
-      particle("の", EPOS::ParticleNo),  // nominalizer
+      particle("の", EPOS::ParticleNo),               // nominalizer
       {"ん", POS::Particle, EPOS::ParticleNo, "の"},  // colloquial の
       particle("じゃん", EPOS::ParticleFinal),
       particle("っけ", EPOS::ParticleFinal),
@@ -239,22 +238,22 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       aux("だっ", "だ", EPOS::AuxCopulaDa),  // 連用タ接続形
       aux("で", "だ", EPOS::AuxCopulaDa),    // copula renyokei
       aux("だったら", "だ", EPOS::AuxCopulaDa),
-      aux("な", "だ", EPOS::AuxCopulaDa),    // attributive form (連体形)
+      aux("な", "だ", EPOS::AuxCopulaDa),  // attributive form (連体形)
 
       // Copula/Assertion - です (丁寧断定)
       aux("です", "です", EPOS::AuxCopulaDesu),
       aux("でし", "です", EPOS::AuxCopulaDesu),  // renyoukei of です
       aux("でしたら", "です", EPOS::AuxCopulaDesu),
       // で+ある pattern - ある is a separate auxiliary (MeCab compatible)
-      aux("ある", "ある", EPOS::AuxCopulaDa),   // で+ある (assertion)
-      aux("あっ", "ある", EPOS::AuxCopulaDa),   // で+あっ+た (sokuonbin before た)
-      aux("あり", "ある", EPOS::AuxCopulaDa),   // で+あり+ます
-      aux("あれ", "ある", EPOS::AuxCopulaDa),   // で+あれ+ば (conditional)
+      aux("ある", "ある", EPOS::AuxCopulaDa),  // で+ある (assertion)
+      aux("あっ", "ある", EPOS::AuxCopulaDa),  // で+あっ+た (sokuonbin before た)
+      aux("あり", "ある", EPOS::AuxCopulaDa),  // で+あり+ます
+      aux("あれ", "ある", EPOS::AuxCopulaDa),  // で+あれ+ば (conditional)
 
       // Polite (丁寧) - ます
       aux("ます", "ます", EPOS::AuxTenseMasu),
-      aux("まし", "ます", EPOS::AuxTenseMasu),  // renyoukei
-      aux("ませ", "ます", EPOS::AuxTenseMasu),  // mizenkei
+      aux("まし", "ます", EPOS::AuxTenseMasu),    // renyoukei
+      aux("ませ", "ます", EPOS::AuxTenseMasu),    // mizenkei
       aux("ましょ", "ます", EPOS::AuxTenseMasu),  // mizenkei, connects to う
 
       // Negation - ない (否定)
@@ -265,13 +264,13 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
 
       // Negation - ぬ/ず (文語否定)
       aux("ぬ", "ぬ", EPOS::AuxNegativeNu),
-      aux("ず", "ぬ", EPOS::AuxNegativeNu),   // lemma is ぬ per MeCab
+      aux("ず", "ぬ", EPOS::AuxNegativeNu),  // lemma is ぬ per MeCab
       aux("ずに", "ぬ", EPOS::AuxNegativeNu),
       aux("ずとも", "ぬ", EPOS::AuxNegativeNu),
-      aux("ざる", "ぬ", EPOS::AuxNegativeNu),  // 連体形 (せざるを得ない)
-      aux("ざれ", "ぬ", EPOS::AuxNegativeNu),  // 已然形 (あらざれば)
-      aux("ごとく", "ごとし", EPOS::Adverb),   // 如く (比況連用形)
-      aux("ごとき", "ごとし", EPOS::Determiner), // 如き (比況連体形)
+      aux("ざる", "ぬ", EPOS::AuxNegativeNu),     // 連体形 (せざるを得ない)
+      aux("ざれ", "ぬ", EPOS::AuxNegativeNu),     // 已然形 (あらざれば)
+      aux("ごとく", "ごとし", EPOS::Adverb),      // 如く (比況連用形)
+      aux("ごとき", "ごとし", EPOS::Determiner),  // 如き (比況連体形)
       // じゃない: removed - split as じゃ(AuxCopulaDa) + ない(AuxNegativeNai)
       aux("ん", "ん", EPOS::AuxNegativeNu),
 
@@ -284,7 +283,7 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Conjecture/Volitional (推量・意志) - う/よう
       aux("う", "う", EPOS::AuxVolitional),
       aux("よう", "よう", EPOS::AuxVolitional),
-      aux("だろ", "だ", EPOS::AuxCopulaDa),  // mizenkei, connects to う
+      aux("だろ", "だ", EPOS::AuxCopulaDa),        // mizenkei, connects to う
       aux("でしょ", "です", EPOS::AuxCopulaDesu),  // mizenkei, connects to う
 
       // Negative conjecture (否定推量)
@@ -327,8 +326,8 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Literary potential: し+え+ない (cannot do), し+える (can do)
       aux("え", "える", EPOS::AuxPotential),    // renyokei: 看過しえない
       aux("える", "える", EPOS::AuxPotential),  // shuushikei: 看過しえる
-      aux("うる", "うる", EPOS::AuxPotential),   // alternative shuushikei: 看過しうる
-      aux("得", "得る", EPOS::AuxPotential),     // kanji renyokei: 解決し得ない
+      aux("うる", "うる", EPOS::AuxPotential),  // alternative shuushikei: 看過しうる
+      aux("得", "得る", EPOS::AuxPotential),    // kanji renyokei: 解決し得ない
 
       // Suru verb stem forms (サ変動詞語幹活用形) - VERB, not AUX
       verb("し", "する", EPOS::VerbRenyokei),
@@ -354,12 +353,12 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Causative (使役)
       aux("せ", "せる", EPOS::AuxCausative),
       aux("せる", "せる", EPOS::AuxCausative),
-      aux("せろ", "せる", EPOS::AuxCausative),     // imperative
-      aux("せよ", "せる", EPOS::AuxCausative),     // imperative (literary)
+      aux("せろ", "せる", EPOS::AuxCausative),  // imperative
+      aux("せよ", "せる", EPOS::AuxCausative),  // imperative (literary)
       aux("させ", "させる", EPOS::AuxCausative),
       aux("させる", "させる", EPOS::AuxCausative),
-      aux("させろ", "させる", EPOS::AuxCausative), // imperative
-      aux("させよ", "させる", EPOS::AuxCausative), // imperative (literary)
+      aux("させろ", "させる", EPOS::AuxCausative),  // imperative
+      aux("させよ", "させる", EPOS::AuxCausative),  // imperative (literary)
 
       // Desiderative - たい (願望)
       aux("たい", "たい", EPOS::AuxDesireTai),
@@ -551,11 +550,11 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab: 動詞,接尾 (suffix verb)
       // Godan-ra conjugation: がる, がら, がり, がっ, がれ, がろ
       verb("がる", "がる", EPOS::AuxGaru),
-      verb("がら", "がる", EPOS::AuxGaru),   // mizenkei
-      verb("がり", "がる", EPOS::AuxGaru),   // renyokei
-      verb("がっ", "がる", EPOS::AuxGaru),   // onbinkei (がった, がって)
-      verb("がれ", "がる", EPOS::AuxGaru),   // kateikei/meireikei
-      verb("がろ", "がる", EPOS::AuxGaru),   // ishikei (がろう)
+      verb("がら", "がる", EPOS::AuxGaru),  // mizenkei
+      verb("がり", "がる", EPOS::AuxGaru),  // renyokei
+      verb("がっ", "がる", EPOS::AuxGaru),  // onbinkei (がった, がって)
+      verb("がれ", "がる", EPOS::AuxGaru),  // kateikei/meireikei
+      verb("がろ", "がる", EPOS::AuxGaru),  // ishikei (がろう)
 
       // Completive/Regretful - しまう (完了・遺憾)
       // MeCab treats しまう as 動詞,非自立 (non-independent verb) → maps to Auxiliary
@@ -604,46 +603,72 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Removed のだ/のです/のでした/んだ/んです/んでした to allow split
 
       // Kuruwa-kotoba (廓言葉)
-      aux("ありんす", "ある", EPOS::Unknown), aux("ありんした", "ある", EPOS::Unknown), aux("ありんせん", "ある", EPOS::Unknown),
-      aux("ざんす", "ある", EPOS::Unknown), aux("ざんせん", "ある", EPOS::Unknown),
-      aux("でありんす", "だ", EPOS::Unknown), aux("でありんした", "だ", EPOS::Unknown),
-      aux("なんし", "ます", EPOS::Unknown), aux("なんした", "ます", EPOS::Unknown),
+      aux("ありんす", "ある", EPOS::Unknown),
+      aux("ありんした", "ある", EPOS::Unknown),
+      aux("ありんせん", "ある", EPOS::Unknown),
+      aux("ざんす", "ある", EPOS::Unknown),
+      aux("ざんせん", "ある", EPOS::Unknown),
+      aux("でありんす", "だ", EPOS::Unknown),
+      aux("でありんした", "だ", EPOS::Unknown),
+      aux("なんし", "ます", EPOS::Unknown),
+      aux("なんした", "ます", EPOS::Unknown),
 
       // Cat-like (猫系) - sentence-final particles (な/ね/よ variants)
-      particle("にゃ", EPOS::ParticleFinal), particle("にゃん", EPOS::ParticleFinal), particle("にゃー", EPOS::ParticleFinal),
-      aux("だにゃ", "だよ", EPOS::Unknown), aux("だにゃん", "だよ", EPOS::Unknown),
-      aux("ですにゃ", "ですよ", EPOS::Unknown), aux("ですにゃん", "ですよ", EPOS::Unknown),
+      particle("にゃ", EPOS::ParticleFinal),
+      particle("にゃん", EPOS::ParticleFinal),
+      particle("にゃー", EPOS::ParticleFinal),
+      aux("だにゃ", "だよ", EPOS::Unknown),
+      aux("だにゃん", "だよ", EPOS::Unknown),
+      aux("ですにゃ", "ですよ", EPOS::Unknown),
+      aux("ですにゃん", "ですよ", EPOS::Unknown),
 
       // Squid character (イカ娘) - sentence-final particle (MeCab: Noun)
       // Note: で+ゲソ should split as で(Particle)+ゲソ(Noun)
-      particle("ゲソ", EPOS::ParticleFinal), particle("げそ", EPOS::ParticleFinal),
+      particle("ゲソ", EPOS::ParticleFinal),
+      particle("げそ", EPOS::ParticleFinal),
 
       // Ojou-sama/Lady speech (お嬢様言葉)
-      aux("ですわ", "です", EPOS::Unknown), aux("ですの", "です", EPOS::Unknown),
-      aux("ますの", "ます", EPOS::Unknown), aux("だわ", "だ", EPOS::Unknown),
+      aux("ですわ", "です", EPOS::Unknown),
+      aux("ですの", "です", EPOS::Unknown),
+      aux("ますの", "ます", EPOS::Unknown),
+      aux("だわ", "だ", EPOS::Unknown),
 
       // Youth slang (若者言葉)
-      aux("っす", "です", EPOS::Unknown), aux("っした", "でした", EPOS::Unknown), aux("っすか", "ですか", EPOS::Unknown),
+      aux("っす", "です", EPOS::Unknown),
+      aux("っした", "でした", EPOS::Unknown),
+      aux("っすか", "ですか", EPOS::Unknown),
 
       // Rabbit-like (兎系)
-      aux("ぴょん", "だ", EPOS::Unknown), aux("ピョン", "だ", EPOS::Unknown),
+      aux("ぴょん", "だ", EPOS::Unknown),
+      aux("ピョン", "だ", EPOS::Unknown),
 
       // Ninja/Old-fashioned (忍者・古風)
-      aux("ござる", "だ", EPOS::Unknown), aux("でござる", "だ", EPOS::Unknown),
-      aux("ござった", "だった", EPOS::Unknown), aux("でござった", "だった", EPOS::Unknown),
-      aux("ござらぬ", "ではない", EPOS::Unknown), aux("ござらん", "ではない", EPOS::Unknown),
+      aux("ござる", "だ", EPOS::Unknown),
+      aux("でござる", "だ", EPOS::Unknown),
+      aux("ござった", "だった", EPOS::Unknown),
+      aux("でござった", "だった", EPOS::Unknown),
+      aux("ござらぬ", "ではない", EPOS::Unknown),
+      aux("ござらん", "ではない", EPOS::Unknown),
       aux("でございます", "です", EPOS::Unknown),
-      aux("ナリ", "だ", EPOS::Unknown), aux("なり", "だ", EPOS::Unknown),
-      aux("でナリ", "だ", EPOS::Unknown), aux("でなり", "だ", EPOS::Unknown),
+      aux("ナリ", "だ", EPOS::Unknown),
+      aux("なり", "だ", EPOS::Unknown),
+      aux("でナリ", "だ", EPOS::Unknown),
+      aux("でなり", "だ", EPOS::Unknown),
 
       // Elderly/Archaic (老人・古風)
-      aux("じゃ", "だ", EPOS::AuxCopulaDa), aux("じゃあ", "だ", EPOS::AuxCopulaDa),
-      aux("のじゃ", "のだ", EPOS::Unknown), aux("じゃろ", "だろ", EPOS::AuxCopulaDa),
+      aux("じゃ", "だ", EPOS::AuxCopulaDa),
+      aux("じゃあ", "だ", EPOS::AuxCopulaDa),
+      aux("のじゃ", "のだ", EPOS::Unknown),
+      aux("じゃろ", "だろ", EPOS::AuxCopulaDa),
 
       // Regional dialects (方言系)
-      aux("ぜよ", "だ", EPOS::Unknown), aux("だべ", "だ", EPOS::Unknown), aux("やんけ", "だ", EPOS::Unknown),
-      aux("や", "だ", EPOS::Unknown), aux("やねん", "だ", EPOS::Unknown),
-      aux("だっちゃ", "だ", EPOS::Unknown), aux("ばい", "だ", EPOS::Unknown),
+      aux("ぜよ", "だ", EPOS::Unknown),
+      aux("だべ", "だ", EPOS::Unknown),
+      aux("やんけ", "だ", EPOS::Unknown),
+      aux("や", "だ", EPOS::Unknown),
+      aux("やねん", "だ", EPOS::Unknown),
+      aux("だっちゃ", "だ", EPOS::Unknown),
+      aux("ばい", "だ", EPOS::Unknown),
 
       // Robot/Mechanical (ロボット・機械)
       aux("デス", "です", EPOS::Unknown),
@@ -657,38 +682,60 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
 std::vector<DictionaryEntry> getConjunctionEntries() {
   return {
       // Sequential (順接)
-      conj("従って", ""), conj("故に", ""),
-      conj("そして", ""), conj("それから", ""), conj("それで", ""),
-      conj("だから", ""), conj("そのため", ""),
+      conj("従って", ""),
+      conj("故に", ""),
+      conj("そして", ""),
+      conj("それから", ""),
+      conj("それで", ""),
+      conj("だから", ""),
+      conj("そのため", ""),
       conj("したがって", "従って"),
 
       // Adversative (逆接)
-      conj("しかし", ""), conj("だが", ""), conj("けれども", ""),
+      conj("しかし", ""),
+      conj("だが", ""),
+      conj("けれども", ""),
       conj("だけど", ""),  // colloquial variant
-      conj("ところが", ""), conj("それでも", ""),
-      conj("でも", ""), conj("だって", ""),  // にもかかわらず removed for MeCab compat
+      conj("ところが", ""),
+      conj("それでも", ""),
+      conj("でも", ""),
+      conj("だって", ""),  // にもかかわらず removed for MeCab compat
       conj("どころか", ""),
       conj("ものの", ""),
 
       // Parallel/Addition (並列・添加)
-      conj("又", ""), conj("及び", ""),
-      conj("並びに", ""), conj("且つ", ""), conj("かつ", "且つ"),
-      conj("更に", ""), conj("次に", ""),
-      conj("しかも", ""), conj("そのうえ", ""),
+      conj("又", ""),
+      conj("及び", ""),
+      conj("並びに", ""),
+      conj("且つ", ""),
+      conj("かつ", "且つ"),
+      conj("更に", ""),
+      conj("次に", ""),
+      conj("しかも", ""),
+      conj("そのうえ", ""),
 
       // Alternative (選択)
-      conj("或いは", ""), conj("若しくは", ""),
-      conj("または", ""), conj("それとも", ""),
-      conj("あるいは", "或いは"), conj("もしくは", "若しくは"),
+      conj("或いは", ""),
+      conj("若しくは", ""),
+      conj("または", ""),
+      conj("それとも", ""),
+      conj("あるいは", "或いは"),
+      conj("もしくは", "若しくは"),
 
       // Explanation/Supplement (説明・補足)
-      conj("即ち", ""), conj("例えば", ""),
-      conj("但し", ""), conj("尚", ""),
-      conj("つまり", ""), conj("たとえば", ""), conj("なぜなら", ""),
-      conj("ちなみに", ""), conj("まして", ""),
+      conj("即ち", ""),
+      conj("例えば", ""),
+      conj("但し", ""),
+      conj("尚", ""),
+      conj("つまり", ""),
+      conj("たとえば", ""),
+      conj("なぜなら", ""),
+      conj("ちなみに", ""),
+      conj("まして", ""),
 
       // Topic change (転換)
-      conj("さて", ""), conj("ところで", ""),
+      conj("さて", ""),
+      conj("ところで", ""),
       // Note: では removed to allow で+は splitting in ではない patterns
       // MeCab splits 彼女ではない as 彼女+で+は+ない, not 彼女+では+ない
       conj("それでは", ""),
@@ -697,12 +744,15 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
       conj("のみならず", ""),
 
       // Additional conjunctions
-      conj("いわば", "言わば"), conj("言わば", ""),
-      conj("さもないと", ""), conj("さもなければ", ""),
+      conj("いわば", "言わば"),
+      conj("言わば", ""),
+      conj("さもないと", ""),
+      conj("さもなければ", ""),
       // そんなら removed: MeCab splits as そん+なら
       conj("それにしても", ""),
       adv("ともかく", ""),
-      conj("いずれにしても", ""), conj("いずれにせよ", ""),
+      conj("いずれにしても", ""),
+      conj("いずれにせよ", ""),
   };
 }
 
@@ -712,19 +762,30 @@ std::vector<DictionaryEntry> getConjunctionEntries() {
 std::vector<DictionaryEntry> getDeterminerEntries() {
   return {
       // Demonstrative determiners (指示連体詞) - この/その/あの/どの
-      det("この", ""), det("その", ""), det("あの", ""), det("どの", ""),
+      det("この", ""),
+      det("その", ""),
+      det("あの", ""),
+      det("どの", ""),
       // Demonstrative determiners (指示連体詞) - こんな/そんな/あんな/どんな
-      det("こんな", ""), det("そんな", ""), det("あんな", ""), det("どんな", ""),
+      det("こんな", ""),
+      det("そんな", ""),
+      det("あんな", ""),
+      det("どんな", ""),
 
       // Other determiners (連体詞)
-      det("ある", ""), det("あらゆる", ""), det("いかなる", ""), det("いわゆる", ""),
+      det("ある", ""),
+      det("あらゆる", ""),
+      det("いかなる", ""),
+      det("いわゆる", ""),
       det("おかしな", ""),
       det("同じ", ""),  // same - prevent VERB confusion
 
       // Demonstrative manner determiners (指示様態連体詞)
       // Lower cost to compete with X + いう (VERB cost 0.3) splits
-      det("こういう", ""), det("そういう", ""),
-      det("ああいう", ""), det("どういう", ""),
+      det("こういう", ""),
+      det("そういう", ""),
+      det("ああいう", ""),
+      det("どういう", ""),
 
       // Quotative determiners (引用連体詞) - prevents incorrect split like 病+とい+う
       // Lower cost to beat と(PARTICLE,-0.4)+いった(VERB,-0.034)+conn(0.2)=-0.232
@@ -736,7 +797,8 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
       // MeCab splits as と+いっ+て, こう+いっ+て, etc.
 
       // Determiners with kanji - B51: lowered cost to prioritize over NOUN unknown
-      det("大きな", ""), det("小さな", ""),
+      det("大きな", ""),
+      det("小さな", ""),
 
       // Classical possessive determiner (我が家, 我が子, 我が国)
       det("我が", ""),
@@ -798,24 +860,35 @@ std::vector<DictionaryEntry> getPronounEntries() {
       pronoun("みんな", ""),
 
       // Demonstrative - proximal (近称)
-      pronoun("これ", ""), pronoun("ここ", ""), pronoun("こちら", ""),
+      pronoun("これ", ""),
+      pronoun("ここ", ""),
+      pronoun("こちら", ""),
       // Colloquial demonstratives - prevent っち split
-      pronoun("こっち", ""), pronoun("そっち", ""),
-      pronoun("あっち", ""), pronoun("どっち", ""),
+      pronoun("こっち", ""),
+      pronoun("そっち", ""),
+      pronoun("あっち", ""),
+      pronoun("どっち", ""),
 
       // Demonstrative - medial (中称)
-      pronoun("それ", ""), pronoun("そこ", ""), pronoun("そちら", ""),
+      pronoun("それ", ""),
+      pronoun("そこ", ""),
+      pronoun("そちら", ""),
 
       // Demonstrative - distal (遠称)
       pronoun("あれ", ""),
-      pronoun("あそこ", ""), pronoun("あちら", ""),
+      pronoun("あそこ", ""),
+      pronoun("あちら", ""),
 
       // Demonstrative - person reference (こそあど+いつ)
-      pronoun("こいつ", ""), pronoun("そいつ", ""),
-      pronoun("あいつ", ""), pronoun("どいつ", ""),
+      pronoun("こいつ", ""),
+      pronoun("そいつ", ""),
+      pronoun("あいつ", ""),
+      pronoun("どいつ", ""),
 
       // Demonstrative - interrogative (不定称)
-      pronoun("どれ", ""), pronoun("どこ", ""), pronoun("どちら", ""),
+      pronoun("どれ", ""),
+      pronoun("どこ", ""),
+      pronoun("どちら", ""),
 
       // Indefinite (不定代名詞) - kanji with reading
       // Low cost to act as strong anchors against prefix compounds (今何 → 今+何)
@@ -824,7 +897,9 @@ std::vector<DictionaryEntry> getPronounEntries() {
       pronoun("何", ""),
 
       // Interrogatives (疑問詞)
-      pronoun("いつ", ""), pronoun("いくつ", ""), pronoun("いくら", ""),
+      pronoun("いつ", ""),
+      pronoun("いくつ", ""),
+      pronoun("いくら", ""),
       // どう/いかが can take だ/です (どうですか, いかがですか)
       // Register as both adverb and na-adjective for correct copula connection
       adv("どう", ""),
@@ -837,9 +912,9 @@ std::vector<DictionaryEntry> getPronounEntries() {
       adv("なぜ", ""),
 
       // Classical/literary adverbs (古語・文語副詞)
-      adv("かく", ""),     // 斯く - classical demonstrative adverb (=こう/such)
-      adv("なんと", ""),   // exclamatory adverb (感嘆副詞)
-      adv("なんとか", ""), // indefinite adverb (somehow/one way or another)
+      adv("かく", ""),      // 斯く - classical demonstrative adverb (=こう/such)
+      adv("なんと", ""),    // exclamatory adverb (感嘆副詞)
+      adv("なんとか", ""),  // indefinite adverb (somehow/one way or another)
 
       // Degree adverbs (程度副詞) - very common, prevent misparse
       // とても could be split as と+て+も without this entry
@@ -905,36 +980,35 @@ std::vector<DictionaryEntry> getFormalNounEntries() {
 std::vector<DictionaryEntry> getInterjectionEntries() {
   return {
       // Common interjections (exclamations)
-      intj("えっ"),      // Surprise
-      intj("ええ"),      // Affirmation/Surprise
-      intj("あっ"),      // Realization
-      intj("ああ"),      // Agreement/Sigh
-      intj("おお"),      // Amazement
-      intj("うわ"),      // Surprise
-      intj("うわっ"),    // Surprise (emphatic)
-      intj("わあ"),      // Amazement
-      intj("へえ"),      // Interest
-      intj("ふーん"),    // Understanding/Disinterest
-      intj("ふうん"),    // Understanding
+      intj("えっ"),    // Surprise
+      intj("ええ"),    // Affirmation/Surprise
+      intj("あっ"),    // Realization
+      intj("ああ"),    // Agreement/Sigh
+      intj("おお"),    // Amazement
+      intj("うわ"),    // Surprise
+      intj("うわっ"),  // Surprise (emphatic)
+      intj("わあ"),    // Amazement
+      intj("へえ"),    // Interest
+      intj("ふーん"),  // Understanding/Disinterest
+      intj("ふうん"),  // Understanding
       // Note: ほう removed - formal noun usage (ほうがいい) is more common
-      intj("おい"),      // Calling attention
-      intj("おーい"),    // Calling from afar
-      intj("あれ"),      // Confusion
-      intj("あれっ"),    // Confusion (emphatic)
-      intj("まあ"),      // Surprise/Moderation
-      intj("ねえ"),      // Attention-getting (also particle, but standalone usage)
+      intj("おい"),    // Calling attention
+      intj("おーい"),  // Calling from afar
+      intj("あれ"),    // Confusion
+      intj("あれっ"),  // Confusion (emphatic)
+      intj("まあ"),    // Surprise/Moderation
+      intj("ねえ"),    // Attention-getting (also particle, but standalone usage)
       // Responses
-      intj("はい"),      // Yes
-      intj("いいえ"),    // No
-      intj("うん"),      // Casual yes
-      intj("ううん"),    // Casual no
+      intj("はい"),    // Yes
+      intj("いいえ"),  // No
+      intj("うん"),    // Casual yes
+      intj("ううん"),  // Casual no
       // Hesitation/Filler
-      intj("えーと"),    // Hesitation
-      intj("えっと"),    // Hesitation
-      intj("あの"),      // Hesitation (also determiner)
-      intj("その"),      // Hesitation (rare, also determiner)
+      intj("えーと"),  // Hesitation
+      intj("えっと"),  // Hesitation
+      intj("あの"),    // Hesitation (also determiner)
+      intj("その"),    // Hesitation (rare, also determiner)
   };
 }
-
 
 }  // namespace suzume::dictionary::entries

@@ -1,0 +1,45 @@
+#include <gtest/gtest.h>
+
+#include <cstddef>
+
+#include "suzume_c.h"
+
+namespace {
+
+TEST(SuzumeCApiTest, LastErrorReportsInvalidArguments) {
+  EXPECT_EQ(suzume_analyze(nullptr, "test"), nullptr);
+
+  std::string error = suzume_last_error();
+  EXPECT_NE(error.find("null handle"), std::string::npos);
+}
+
+TEST(SuzumeCApiTest, LastErrorClearsAfterSuccess) {
+  EXPECT_EQ(suzume_analyze(nullptr, "test"), nullptr);
+  ASSERT_STRNE(suzume_last_error(), "");
+
+  suzume_t handle = suzume_create();
+  ASSERT_NE(handle, nullptr);
+
+  suzume_result_t* result = suzume_analyze(handle, "東京");
+  ASSERT_NE(result, nullptr);
+  EXPECT_STREQ(suzume_last_error(), "");
+
+  suzume_result_free(result);
+  suzume_destroy(handle);
+}
+
+TEST(SuzumeCApiTest, LayoutFunctionsMatchNativeStructs) {
+  EXPECT_EQ(suzume_sizeof_result(), sizeof(suzume_result_t));
+  EXPECT_EQ(suzume_sizeof_morpheme(), sizeof(suzume_morpheme_t));
+  EXPECT_EQ(suzume_sizeof_tags(), sizeof(suzume_tags_t));
+  EXPECT_EQ(suzume_sizeof_tag_options(), sizeof(suzume_tag_options_t));
+
+  EXPECT_EQ(suzume_offsetof_result(0), offsetof(suzume_result_t, morphemes));
+  EXPECT_EQ(suzume_offsetof_result(1), offsetof(suzume_result_t, count));
+  EXPECT_EQ(suzume_offsetof_morpheme(6), offsetof(suzume_morpheme_t, extended_pos));
+  EXPECT_EQ(suzume_offsetof_tags(2), offsetof(suzume_tags_t, count));
+  EXPECT_EQ(suzume_offsetof_tag_options(4), offsetof(suzume_tag_options_t, max_tags));
+  EXPECT_EQ(suzume_offsetof_result(99), static_cast<size_t>(-1));
+}
+
+}  // namespace

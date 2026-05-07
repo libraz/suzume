@@ -2,9 +2,9 @@
 // Inflection tests: Complex patterns (colloquial, obligation, attempt,
 // ability, casual, tari, nagara, sugiru, etc.)
 
-#include "grammar/inflection.h"
-
 #include <gtest/gtest.h>
+
+#include "grammar/inflection.h"
 
 namespace suzume::grammar {
 namespace {

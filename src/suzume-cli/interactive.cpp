@@ -14,8 +14,7 @@ namespace suzume::cli {
 // Constructor and Core Methods
 // =============================================================================
 
-InteractiveSession::InteractiveSession(std::string tsv_path)
-    : tsv_path_(std::move(tsv_path)) {}
+InteractiveSession::InteractiveSession(std::string tsv_path) : tsv_path_(std::move(tsv_path)) {}
 
 int InteractiveSession::run() {
   // Load Layer 1 cache (hardcoded entries)
@@ -29,8 +28,7 @@ int InteractiveSession::run() {
       printError("Failed to load dictionary: " + last_error_);
       return 1;
     }
-    std::cout << "Loaded " << entries_.size() << " entries from " << tsv_path_
-              << "\n";
+    std::cout << "Loaded " << entries_.size() << " entries from " << tsv_path_ << "\n";
   } else {
     std::cout << "Creating new dictionary: " << tsv_path_ << "\n";
   }
@@ -134,8 +132,7 @@ std::string InteractiveSession::getPrompt() const {
   return prompt;
 }
 
-std::vector<std::string> InteractiveSession::parseCommandLine(
-    std::string_view line) {
+std::vector<std::string> InteractiveSession::parseCommandLine(std::string_view line) {
   std::vector<std::string> args;
   std::string current;
   bool in_quotes = false;
@@ -248,12 +245,11 @@ void InteractiveSession::loadLayer1Cache() {
 }
 
 void InteractiveSession::printLayeredEntry(const LayeredEntry& entry) {
-  std::cout << "  Layer " << static_cast<int>(entry.layer) << ": "
-            << entry.surface << " [" << core::posToString(entry.pos) << "]\n";
+  std::cout << "  Layer " << static_cast<int>(entry.layer) << ": " << entry.surface << " ["
+            << core::posToString(entry.pos) << "]\n";
 }
 
-std::vector<LayeredEntry> InteractiveSession::findInAllLayers(
-    const std::string& surface) const {
+std::vector<LayeredEntry> InteractiveSession::findInAllLayers(const std::string& surface) const {
   std::vector<LayeredEntry> results;
 
   // Search Layer 1 (hardcoded)
@@ -277,8 +273,7 @@ std::vector<LayeredEntry> InteractiveSession::findInAllLayers(
   return results;
 }
 
-bool InteractiveSession::existsInOtherLayers(const std::string& surface,
-                                              core::PartOfSpeech pos) const {
+bool InteractiveSession::existsInOtherLayers(const std::string& surface, core::PartOfSpeech pos) const {
   // Check Layer 1
   for (const auto& entry : layer1_cache_) {
     if (entry.surface == surface && entry.pos == pos) {
@@ -288,8 +283,7 @@ bool InteractiveSession::existsInOtherLayers(const std::string& surface,
   return false;
 }
 
-std::map<core::PartOfSpeech, size_t> InteractiveSession::countByPos(
-    const std::vector<LayeredEntry>& entries) const {
+std::map<core::PartOfSpeech, size_t> InteractiveSession::countByPos(const std::vector<LayeredEntry>& entries) const {
   std::map<core::PartOfSpeech, size_t> counts;
   for (const auto& entry : entries) {
     counts[entry.pos]++;

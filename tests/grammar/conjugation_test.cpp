@@ -148,10 +148,14 @@ TEST_F(ConjugationTest, GenerateIchidan) {
   bool found_te = false;
 
   for (const auto& form : forms) {
-    if (form.surface == "食べる") found_base = true;
-    if (form.surface == "食べない") found_nai = true;
-    if (form.surface == "食べた") found_ta = true;
-    if (form.surface == "食べて") found_te = true;
+    if (form.surface == "食べる")
+      found_base = true;
+    if (form.surface == "食べない")
+      found_nai = true;
+    if (form.surface == "食べた")
+      found_ta = true;
+    if (form.surface == "食べて")
+      found_te = true;
   }
 
   EXPECT_TRUE(found_base);
@@ -173,9 +177,12 @@ TEST_F(ConjugationTest, GenerateGodanKa) {
   bool found_ta = false;  // 書いた (音便)
 
   for (const auto& form : forms) {
-    if (form.surface == "書く") found_base = true;
-    if (form.surface == "書かない") found_nai = true;
-    if (form.surface == "書いた") found_ta = true;
+    if (form.surface == "書く")
+      found_base = true;
+    if (form.surface == "書かない")
+      found_nai = true;
+    if (form.surface == "書いた")
+      found_ta = true;
   }
 
   EXPECT_TRUE(found_base);
@@ -188,7 +195,8 @@ TEST_F(ConjugationTest, GenerateGodanGa) {
 
   bool found_ta = false;  // 泳いだ (濁音)
   for (const auto& form : forms) {
-    if (form.surface == "泳いだ") found_ta = true;
+    if (form.surface == "泳いだ")
+      found_ta = true;
   }
   EXPECT_TRUE(found_ta);
 }
@@ -198,7 +206,8 @@ TEST_F(ConjugationTest, GenerateGodanSa) {
 
   bool found_ta = false;  // 話した (音便なし)
   for (const auto& form : forms) {
-    if (form.surface == "話した") found_ta = true;
+    if (form.surface == "話した")
+      found_ta = true;
   }
   EXPECT_TRUE(found_ta);
 }
@@ -208,7 +217,8 @@ TEST_F(ConjugationTest, GenerateGodanTa) {
 
   bool found_ta = false;  // 立った (促音便)
   for (const auto& form : forms) {
-    if (form.surface == "立った") found_ta = true;
+    if (form.surface == "立った")
+      found_ta = true;
   }
   EXPECT_TRUE(found_ta);
 }
@@ -218,7 +228,8 @@ TEST_F(ConjugationTest, GenerateGodanNa) {
 
   bool found_ta = false;  // 死んだ (撥音便 + 濁音)
   for (const auto& form : forms) {
-    if (form.surface == "死んだ") found_ta = true;
+    if (form.surface == "死んだ")
+      found_ta = true;
   }
   EXPECT_TRUE(found_ta);
 }
@@ -228,7 +239,8 @@ TEST_F(ConjugationTest, GenerateGodanBa) {
 
   bool found_ta = false;  // 遊んだ (撥音便 + 濁音)
   for (const auto& form : forms) {
-    if (form.surface == "遊んだ") found_ta = true;
+    if (form.surface == "遊んだ")
+      found_ta = true;
   }
   EXPECT_TRUE(found_ta);
 }
@@ -238,7 +250,8 @@ TEST_F(ConjugationTest, GenerateGodanMa) {
 
   bool found_ta = false;  // 読んだ (撥音便 + 濁音)
   for (const auto& form : forms) {
-    if (form.surface == "読んだ") found_ta = true;
+    if (form.surface == "読んだ")
+      found_ta = true;
   }
   EXPECT_TRUE(found_ta);
 }
@@ -248,7 +261,8 @@ TEST_F(ConjugationTest, GenerateGodanRa) {
 
   bool found_ta = false;  // 走った (促音便)
   for (const auto& form : forms) {
-    if (form.surface == "走った") found_ta = true;
+    if (form.surface == "走った")
+      found_ta = true;
   }
   EXPECT_TRUE(found_ta);
 }
@@ -256,11 +270,13 @@ TEST_F(ConjugationTest, GenerateGodanRa) {
 TEST_F(ConjugationTest, GenerateGodanWa) {
   auto forms = conjugator_.generate("買う", VerbType::GodanWa);
 
-  bool found_ta = false;  // 買った (促音便)
+  bool found_ta = false;   // 買った (促音便)
   bool found_nai = false;  // 買わない
   for (const auto& form : forms) {
-    if (form.surface == "買った") found_ta = true;
-    if (form.surface == "買わない") found_nai = true;
+    if (form.surface == "買った")
+      found_ta = true;
+    if (form.surface == "買わない")
+      found_nai = true;
   }
   EXPECT_TRUE(found_ta);
   EXPECT_TRUE(found_nai);
@@ -278,9 +294,12 @@ TEST_F(ConjugationTest, GenerateSuru) {
   bool found_ta = false;
 
   for (const auto& form : forms) {
-    if (form.surface == "する") found_base = true;
-    if (form.surface == "しない") found_nai = true;
-    if (form.surface == "した") found_ta = true;
+    if (form.surface == "する")
+      found_base = true;
+    if (form.surface == "しない")
+      found_nai = true;
+    if (form.surface == "した")
+      found_ta = true;
   }
 
   EXPECT_TRUE(found_base);
@@ -296,9 +315,12 @@ TEST_F(ConjugationTest, GenerateSuruCompound) {
   bool found_ta = false;
 
   for (const auto& form : forms) {
-    if (form.surface == "勉強する") found_base = true;
-    if (form.surface == "勉強しない") found_nai = true;
-    if (form.surface == "勉強した") found_ta = true;
+    if (form.surface == "勉強する")
+      found_base = true;
+    if (form.surface == "勉強しない")
+      found_nai = true;
+    if (form.surface == "勉強した")
+      found_ta = true;
   }
 
   EXPECT_TRUE(found_base);
@@ -314,9 +336,12 @@ TEST_F(ConjugationTest, GenerateKuru) {
   bool found_kita = false;   // きた
 
   for (const auto& form : forms) {
-    if (form.surface == "来る") found_base = true;
-    if (form.surface == "来こない") found_konai = true;
-    if (form.surface == "来きた") found_kita = true;
+    if (form.surface == "来る")
+      found_base = true;
+    if (form.surface == "来こない")
+      found_konai = true;
+    if (form.surface == "来きた")
+      found_kita = true;
   }
 
   EXPECT_TRUE(found_base);
@@ -332,15 +357,19 @@ TEST_F(ConjugationTest, GenerateIAdjective) {
   auto forms = conjugator_.generate("高い", VerbType::IAdjective);
 
   bool found_base = false;
-  bool found_kunai = false;   // くない
-  bool found_katta = false;   // かった
-  bool found_kute = false;    // くて
+  bool found_kunai = false;  // くない
+  bool found_katta = false;  // かった
+  bool found_kute = false;   // くて
 
   for (const auto& form : forms) {
-    if (form.surface == "高い") found_base = true;
-    if (form.surface == "高くない") found_kunai = true;
-    if (form.surface == "高かった") found_katta = true;
-    if (form.surface == "高くて") found_kute = true;
+    if (form.surface == "高い")
+      found_base = true;
+    if (form.surface == "高くない")
+      found_kunai = true;
+    if (form.surface == "高かった")
+      found_katta = true;
+    if (form.surface == "高くて")
+      found_kute = true;
   }
 
   EXPECT_TRUE(found_base);

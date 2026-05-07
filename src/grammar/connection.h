@@ -34,12 +34,12 @@ constexpr uint16_t kBOS = 0x0000;  // Beginning of sentence
 constexpr uint16_t kEOS = 0x0001;  // End of sentence
 
 // === Verb stem endings (0x01xx) ===
-constexpr uint16_t kVerbBase = 0x0100;      // 終止形: 書く
-constexpr uint16_t kVerbMizenkei = 0x0101;  // 未然形: 書か
-constexpr uint16_t kVerbRenyokei = 0x0102;  // 連用形: 書き
-constexpr uint16_t kVerbOnbinkei = 0x0103;  // 音便形: 書い (te/ta-ready)
-constexpr uint16_t kVerbPotential = 0x0104; // 可能形語幹: 書け (e-row)
-constexpr uint16_t kIAdjStem = 0x0105;      // い形容詞語幹: 美し (ku-form ready)
+constexpr uint16_t kVerbBase = 0x0100;        // 終止形: 書く
+constexpr uint16_t kVerbMizenkei = 0x0101;    // 未然形: 書か
+constexpr uint16_t kVerbRenyokei = 0x0102;    // 連用形: 書き
+constexpr uint16_t kVerbOnbinkei = 0x0103;    // 音便形: 書い (te/ta-ready)
+constexpr uint16_t kVerbPotential = 0x0104;   // 可能形語幹: 書け (e-row)
+constexpr uint16_t kIAdjStem = 0x0105;        // い形容詞語幹: 美し (ku-form ready)
 constexpr uint16_t kVerbVolitional = 0x0106;  // 意志形: 書こう, 食べよう
 constexpr uint16_t kVerbKatei = 0x0107;       // 仮定形: 書け (e-row for Godan)
 constexpr uint16_t kVerbMeireikei = 0x0108;   // 命令形: 書け, 食べろ, しろ
@@ -110,9 +110,7 @@ class ConnectionMatrix {
     uint32_t key;  // (left_id << 16) | right_id
     int16_t cost;
 
-    bool operator<(const ConnectionEntry& other) const {
-      return key < other.key;
-    }
+    bool operator<(const ConnectionEntry& other) const { return key < other.key; }
   };
 
   std::vector<ConnectionEntry> entries_;

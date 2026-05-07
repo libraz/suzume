@@ -20,12 +20,12 @@ namespace suzume::grammar {
  * a conjugated form to identify the base verb.
  */
 struct AuxiliaryEntry {
-  std::string surface;    ///< Surface form (e.g., "ています", "された")
-  std::string reading;    ///< Reading in hiragana (e.g., "ています", "された")
-  std::string lemma;      ///< Base/lemma form (e.g., "いる", "される")
-  uint16_t left_id;       ///< What this auxiliary requires (connection input)
-  uint16_t right_id;      ///< What this auxiliary provides (connection output)
-  uint16_t required_conn; ///< Required connection from preceding stem
+  std::string surface;     ///< Surface form (e.g., "ています", "された")
+  std::string reading;     ///< Reading in hiragana (e.g., "ています", "された")
+  std::string lemma;       ///< Base/lemma form (e.g., "いる", "される")
+  uint16_t left_id;        ///< What this auxiliary requires (connection input)
+  uint16_t right_id;       ///< What this auxiliary provides (connection output)
+  uint16_t required_conn;  ///< Required connection from preceding stem
 };
 
 /**

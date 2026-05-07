@@ -1,9 +1,9 @@
 
 // Pretokenizer tests for URL and Email patterns
 
-#include "pretokenizer/pretokenizer.h"
-
 #include <gtest/gtest.h>
+
+#include "pretokenizer/pretokenizer.h"
 
 namespace suzume::pretokenizer {
 namespace {
@@ -69,8 +69,7 @@ TEST_F(PreTokenizerUrlTest, MatchUrl_Localhost) {
 }
 
 TEST_F(PreTokenizerUrlTest, MatchUrl_MultipleInText) {
-  auto result =
-      pretokenizer_.process("参照: https://a.com と https://b.com");
+  auto result = pretokenizer_.process("参照: https://a.com と https://b.com");
   int url_count = 0;
   for (const auto& token : result.tokens) {
     if (token.type == PreTokenType::Url) {
@@ -135,8 +134,7 @@ TEST_F(PreTokenizerUrlTest, MatchEmail_InJapaneseText) {
 }
 
 TEST_F(PreTokenizerUrlTest, MatchEmail_MultipleInText) {
-  auto result =
-      pretokenizer_.process("a@example.com と b@example.com");
+  auto result = pretokenizer_.process("a@example.com と b@example.com");
   int email_count = 0;
   for (const auto& token : result.tokens) {
     if (token.type == PreTokenType::Email) {
@@ -185,8 +183,10 @@ TEST_F(PreTokenizerUrlTest, EmailVsMention_EmailWins) {
   bool has_email = false;
   bool has_mention = false;
   for (const auto& token : result.tokens) {
-    if (token.type == PreTokenType::Email) has_email = true;
-    if (token.type == PreTokenType::Mention) has_mention = true;
+    if (token.type == PreTokenType::Email)
+      has_email = true;
+    if (token.type == PreTokenType::Mention)
+      has_mention = true;
   }
   EXPECT_TRUE(has_email);
   EXPECT_FALSE(has_mention);

@@ -25,9 +25,8 @@
 
 namespace suzume::analysis {
 
-UnknownWordGenerator::UnknownWordGenerator(
-    const UnknownOptions& options,
-    const dictionary::DictionaryManager* dict_manager)
+UnknownWordGenerator::UnknownWordGenerator(const UnknownOptions& options,
+                                           const dictionary::DictionaryManager* dict_manager)
     : options_(options), dict_manager_(dict_manager) {}
 
 size_t UnknownWordGenerator::getMaxLength(normalize::CharType ctype) const {
@@ -130,10 +129,9 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
   }
 }
 
-std::vector<UnknownCandidate> UnknownWordGenerator::generate(
-    std::string_view text, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types) const {
+std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view text,
+                                                             const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                             const std::vector<normalize::CharType>& char_types) const {
   std::vector<UnknownCandidate> candidates;
 
   if (start_pos >= char_types.size()) {
@@ -145,10 +143,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
   // Also handles katakana patterns (ニャーニャー, ワンワン, etc.)
   if (char_types[start_pos] == normalize::CharType::Hiragana ||
       char_types[start_pos] == normalize::CharType::Katakana) {
-    auto onomatopoeia =
-        generateOnomatopoeiaCandidates(codepoints, start_pos, char_types);
-    candidates.insert(candidates.end(), onomatopoeia.begin(),
-                      onomatopoeia.end());
+    auto onomatopoeia = generateOnomatopoeiaCandidates(codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), onomatopoeia.begin(), onomatopoeia.end());
   }
 
   // Generate verb candidates (kanji + hiragana conjugation endings)
@@ -158,100 +154,76 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
 
     // Generate compound verb candidates (kanji + hiragana + kanji + hiragana)
     // e.g., 恐れ入ります, 差し上げます, 申し上げます
-    auto compound_verbs =
-        generateCompoundVerbCandidates(text, codepoints, start_pos, char_types);
-    candidates.insert(candidates.end(), compound_verbs.begin(),
-                      compound_verbs.end());
+    auto compound_verbs = generateCompoundVerbCandidates(text, codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), compound_verbs.begin(), compound_verbs.end());
 
     // Generate i-adjective candidates (kanji + hiragana conjugation endings)
-    auto adjs =
-        generateAdjectiveCandidates(text, codepoints, start_pos, char_types);
+    auto adjs = generateAdjectiveCandidates(text, codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), adjs.begin(), adjs.end());
 
     // Generate i-adjective STEM candidates (難し, 美し for 難しそう, 美しすぎる)
     // This enables MeCab-compatible split: 難しそう → 難し(ADJ) + そう(AUX)
-    auto adj_stems =
-        generateAdjectiveStemCandidates(text, codepoints, start_pos, char_types);
+    auto adj_stems = generateAdjectiveStemCandidates(text, codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), adj_stems.begin(), adj_stems.end());
 
     // Generate na-adjective candidates (〜的 patterns)
-    auto na_adjs =
-        generateNaAdjectiveCandidates(text, codepoints, start_pos, char_types);
+    auto na_adjs = generateNaAdjectiveCandidates(text, codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), na_adjs.begin(), na_adjs.end());
 
     // Generate nominalized noun candidates (kanji + short hiragana)
     // e.g., 手助け, 片付け, 引き上げ
-    auto nom_nouns =
-        generateNominalizedNounCandidates(text, codepoints, start_pos, char_types);
+    auto nom_nouns = generateNominalizedNounCandidates(text, codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), nom_nouns.begin(), nom_nouns.end());
 
     // Generate kanji + hiragana compound noun candidates
     // e.g., 玉ねぎ, 水たまり
     // Pass dict_manager to skip compounds when hiragana portion is a known word
-    auto compound_nouns =
-        generateKanjiHiraganaCompoundCandidates(codepoints, start_pos, char_types, dict_manager_);
-    candidates.insert(candidates.end(), compound_nouns.begin(),
-                      compound_nouns.end());
+    auto compound_nouns = generateKanjiHiraganaCompoundCandidates(codepoints, start_pos, char_types, dict_manager_);
+    candidates.insert(candidates.end(), compound_nouns.begin(), compound_nouns.end());
 
     // Generate がち suffix candidates for kanji verb stems
     // e.g., 忘れがち, 遅れがち
-    auto gachi_suffix =
-        generateGachiSuffixCandidates(codepoints, start_pos, char_types);
-    candidates.insert(candidates.end(), gachi_suffix.begin(),
-                      gachi_suffix.end());
+    auto gachi_suffix = generateGachiSuffixCandidates(codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), gachi_suffix.begin(), gachi_suffix.end());
 
     // Generate counter candidates for numeral + つ patterns
     // e.g., 一つ, 二つ, ..., 九つ (closed class)
-    auto counters =
-        generateCounterCandidates(codepoints, start_pos, char_types);
+    auto counters = generateCounterCandidates(codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), counters.begin(), counters.end());
 
     // Generate prefix + single kanji compound candidates
     // e.g., 今日, 今週, 本日, 全国 (prefix-like compounds)
-    auto prefix_compounds =
-        generatePrefixCompoundCandidates(codepoints, start_pos, char_types);
-    candidates.insert(candidates.end(), prefix_compounds.begin(),
-                      prefix_compounds.end());
+    auto prefix_compounds = generatePrefixCompoundCandidates(codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), prefix_compounds.begin(), prefix_compounds.end());
   }
 
   // Generate hiragana verb candidates (pure hiragana verbs like いく, くる)
   if (char_types[start_pos] == normalize::CharType::Hiragana) {
-    auto hiragana_verbs =
-        generateHiraganaVerbCandidates(text, codepoints, start_pos, char_types);
-    candidates.insert(candidates.end(), hiragana_verbs.begin(),
-                      hiragana_verbs.end());
+    auto hiragana_verbs = generateHiraganaVerbCandidates(text, codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), hiragana_verbs.begin(), hiragana_verbs.end());
 
     // Generate hiragana i-adjective candidates (まずい, おいしい, etc.)
-    auto hiragana_adjs =
-        generateHiraganaAdjectiveCandidates(text, codepoints, start_pos, char_types);
-    candidates.insert(candidates.end(), hiragana_adjs.begin(),
-                      hiragana_adjs.end());
+    auto hiragana_adjs = generateHiraganaAdjectiveCandidates(text, codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), hiragana_adjs.begin(), hiragana_adjs.end());
 
     // Generate productive suffix candidates (ありがち, 忘れっぽい, etc.)
-    auto productive_suffix =
-        generateProductiveSuffixCandidates(codepoints, start_pos, char_types);
-    candidates.insert(candidates.end(), productive_suffix.begin(),
-                      productive_suffix.end());
+    auto productive_suffix = generateProductiveSuffixCandidates(codepoints, start_pos, char_types);
+    candidates.insert(candidates.end(), productive_suffix.begin(), productive_suffix.end());
   }
 
   // Generate katakana verb/adjective candidates (slang: バズる, エモい, etc.)
   if (char_types[start_pos] == normalize::CharType::Katakana) {
-    auto kata_verbs =
-        generateKatakanaVerbCandidates(codepoints, start_pos, char_types,
-                                       inflection_, dict_manager_,
-                                       options_.verb_candidate_options);
+    auto kata_verbs = generateKatakanaVerbCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_,
+                                                     options_.verb_candidate_options);
     candidates.insert(candidates.end(), kata_verbs.begin(), kata_verbs.end());
 
-    auto kata_adjs =
-        generateKatakanaAdjectiveCandidates(codepoints, start_pos, char_types,
-                                            inflection_);
+    auto kata_adjs = generateKatakanaAdjectiveCandidates(codepoints, start_pos, char_types, inflection_);
     candidates.insert(candidates.end(), kata_adjs.begin(), kata_adjs.end());
   }
 
   // Generate counter candidates for digit + つ patterns (e.g., 3つ, 10個)
   if (char_types[start_pos] == normalize::CharType::Digit) {
-    auto counters =
-        generateCounterCandidates(codepoints, start_pos, char_types);
+    auto counters = generateCounterCandidates(codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), counters.begin(), counters.end());
   }
 
@@ -264,16 +236,14 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
   candidates.insert(candidates.end(), alphanum.begin(), alphanum.end());
 
   // Generate with suffix separation for kanji
-  if (options_.separate_suffix &&
-      char_types[start_pos] == normalize::CharType::Kanji) {
+  if (options_.separate_suffix && char_types[start_pos] == normalize::CharType::Kanji) {
     auto suffix = generateWithSuffix(text, codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), suffix.begin(), suffix.end());
   }
 
   // Generate character speech candidates (キャラ語尾)
   if (options_.enable_character_speech) {
-    auto char_speech =
-        generateCharacterSpeechCandidates(text, codepoints, start_pos, char_types);
+    auto char_speech = generateCharacterSpeechCandidates(text, codepoints, start_pos, char_types);
     candidates.insert(candidates.end(), char_speech.begin(), char_speech.end());
   }
 
@@ -281,8 +251,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   std::vector<UnknownCandidate> candidates;
 
@@ -304,16 +273,15 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
   if (start_type == normalize::CharType::Hiragana) {
     char32_t first_char = codepoints[start_pos];
     // Only は, に, へ, の can start hiragana nouns
-    if (first_char == U'は' || first_char == U'に' ||
-        first_char == U'へ' || first_char == U'の') {
+    if (first_char == U'は' || first_char == U'に' || first_char == U'へ' || first_char == U'の') {
       started_with_particle = true;  // Generate but with penalty
     }
 
     // Skip small kana (拗音・促音) - Japanese words don't start with these
     // ゃゅょぁぃぅぇぉっ are always part of compound sounds (e.g., きょう not ょう)
-    if (first_char == U'ゃ' || first_char == U'ゅ' || first_char == U'ょ' ||
-        first_char == U'ぁ' || first_char == U'ぃ' || first_char == U'ぅ' ||
-        first_char == U'ぇ' || first_char == U'ぉ' || first_char == U'っ') {
+    if (first_char == U'ゃ' || first_char == U'ゅ' || first_char == U'ょ' || first_char == U'ぁ' ||
+        first_char == U'ぃ' || first_char == U'ぅ' || first_char == U'ぇ' || first_char == U'ぉ' ||
+        first_char == U'っ') {
       return candidates;  // Phonologically impossible word start
     }
 
@@ -341,11 +309,9 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
     // Special handling for prolonged sound mark (ー) in hiragana sequences
     // Colloquial expressions like すごーい, やばーい, かわいー use ー in hiragana
     // Also handle consecutive prolonged marks: すごーーい, やばーーーい
-    if (!matches_type && start_type == normalize::CharType::Hiragana &&
-        normalize::isProlongedSoundMark(curr_char)) {
+    if (!matches_type && start_type == normalize::CharType::Hiragana && normalize::isProlongedSoundMark(curr_char)) {
       // Check if followed by hiragana, another ー, or end of text (かわいー)
-      if (end_pos + 1 >= char_types.size() ||
-          char_types[end_pos + 1] == normalize::CharType::Hiragana ||
+      if (end_pos + 1 >= char_types.size() || char_types[end_pos + 1] == normalize::CharType::Hiragana ||
           normalize::isProlongedSoundMark(codepoints[end_pos + 1])) {
         matches_type = true;  // Treat ー as part of hiragana sequence
       }
@@ -353,15 +319,13 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
 
     // Special handling for emoji modifiers (ZWJ, variation selectors, skin tones)
     // These should always be grouped with the preceding emoji
-    if (!matches_type && start_type == normalize::CharType::Emoji &&
-        normalize::isEmojiModifier(curr_char)) {
+    if (!matches_type && start_type == normalize::CharType::Emoji && normalize::isEmojiModifier(curr_char)) {
       matches_type = true;  // Treat modifiers as part of emoji sequence
     }
 
     // Special handling for regional indicators (country flags)
     // Two regional indicators together form a flag emoji (e.g., 🇯🇵)
-    if (!matches_type && start_type == normalize::CharType::Emoji &&
-        normalize::isRegionalIndicator(curr_char)) {
+    if (!matches_type && start_type == normalize::CharType::Emoji && normalize::isRegionalIndicator(curr_char)) {
       matches_type = true;  // Treat regional indicators as part of emoji sequence
     }
 
@@ -369,8 +333,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
     // e.g., 人々, 日々, 堂々, 時々 should be grouped as single tokens
     // The iteration mark U+3005 is classified as Symbol, but it should be
     // treated as part of the kanji sequence when following kanji
-    if (!matches_type && start_type == normalize::CharType::Kanji &&
-        normalize::isIterationMark(curr_char)) {
+    if (!matches_type && start_type == normalize::CharType::Kanji && normalize::isIterationMark(curr_char)) {
       matches_type = true;  // Treat 々 as part of kanji sequence
     }
 
@@ -378,10 +341,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
     // e.g., 姉ヶ崎, 市ヶ谷, 霞ヶ関 should be grouped as single tokens
     // ヶ (U+30F6) is classified as Katakana, but in these contexts it functions
     // as a kanji-like character connecting surrounding kanji
-    if (!matches_type && start_type == normalize::CharType::Kanji &&
-        (curr_char == U'ヶ' || curr_char == U'ケ') &&
-        end_pos + 1 < char_types.size() &&
-        char_types[end_pos + 1] == normalize::CharType::Kanji) {
+    if (!matches_type && start_type == normalize::CharType::Kanji && (curr_char == U'ヶ' || curr_char == U'ケ') &&
+        end_pos + 1 < char_types.size() && char_types[end_pos + 1] == normalize::CharType::Kanji) {
       matches_type = true;  // Treat ヶ/ケ as part of kanji sequence
     }
 
@@ -402,9 +363,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       if (!started_with_particle) {
         // Common particles (は, に, へ, の) + で, と, も, か (word boundaries)
         // Note: Don't include「や」as it's also the stem of「やる」verb
-        if (curr_char == U'は' || curr_char == U'に' || curr_char == U'へ' ||
-            curr_char == U'の' || curr_char == U'で' || curr_char == U'と' ||
-            curr_char == U'も' || curr_char == U'か') {
+        if (curr_char == U'は' || curr_char == U'に' || curr_char == U'へ' || curr_char == U'の' ||
+            curr_char == U'で' || curr_char == U'と' || curr_char == U'も' || curr_char == U'か') {
           break;  // Stop before the particle
         }
       }
@@ -420,8 +380,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
     if (!surface.empty()) {
       // Particle-start hiragana sequences are potential nouns (はし, はな, にく)
       // Use NOUN POS instead of OTHER to avoid exceeds_dict_length penalty
-      core::PartOfSpeech pos = started_with_particle ? core::PartOfSpeech::Noun
-                                                     : getPosForType(start_type);
+      core::PartOfSpeech pos = started_with_particle ? core::PartOfSpeech::Noun : getPosForType(start_type);
       float cost = getCostForType(start_type, len);
 
       // Penalize kanji sequences ending with common suffixes (様, 氏, 的)
@@ -436,8 +395,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       // Skip kanji sequences starting with iteration mark (々)
       // 々 always attaches to the preceding kanji (人々, 時々)
       // It can never start a word
-      if (start_type == normalize::CharType::Kanji &&
-          normalize::isIterationMark(codepoints[start_pos])) {
+      if (start_type == normalize::CharType::Kanji && normalize::isIterationMark(codepoints[start_pos])) {
         continue;
       }
 
@@ -468,8 +426,6 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
         }
       }
 
-
-
       // Penalize hiragana sequences starting with particle characters
       // These could be nouns (はし, はな, にく, にゃんこ) but are less likely than
       // the particle interpretation, unless the particle path has connection penalties
@@ -480,8 +436,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
         }
         // Check if this is a reduplicated pattern (same character repeated)
         // Reduplicated hiragana like はは (母), ちち (父) are likely real words
-        bool is_reduplicated = (len == 2 &&
-            codepoints[start_pos] == codepoints[start_pos + 1]);
+        bool is_reduplicated = (len == 2 && codepoints[start_pos] == codepoints[start_pos + 1]);
         if (is_reduplicated) {
           // Small bonus for reduplicated patterns - they're often real words
           cost -= 0.5F;
@@ -504,14 +459,24 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = started_with_particle ? 0.7F : 1.0F;
       switch (start_type) {
-        case normalize::CharType::Kanji: cand.pattern = "kanji_seq"; break;
-        case normalize::CharType::Katakana: cand.pattern = "kata_seq"; break;
+        case normalize::CharType::Kanji:
+          cand.pattern = "kanji_seq";
+          break;
+        case normalize::CharType::Katakana:
+          cand.pattern = "kata_seq";
+          break;
         case normalize::CharType::Hiragana:
           cand.pattern = started_with_particle ? "hira_noun_seq" : "hira_seq";
           break;
-        case normalize::CharType::Alphabet: cand.pattern = "alpha_seq"; break;
-        case normalize::CharType::Digit: cand.pattern = "digit_seq"; break;
-        default: cand.pattern = "other_seq"; break;
+        case normalize::CharType::Alphabet:
+          cand.pattern = "alpha_seq";
+          break;
+        case normalize::CharType::Digit:
+          cand.pattern = "digit_seq";
+          break;
+        default:
+          cand.pattern = "other_seq";
+          break;
       }
 #endif
       candidates.push_back(cand);
@@ -522,8 +487,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateAlphanumeric(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   std::vector<UnknownCandidate> candidates;
 
@@ -534,8 +498,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAlphanumeric(
   normalize::CharType start_type = char_types[start_pos];
 
   // Only for alphabet or digit start
-  if (start_type != normalize::CharType::Alphabet &&
-      start_type != normalize::CharType::Digit) {
+  if (start_type != normalize::CharType::Alphabet && start_type != normalize::CharType::Digit) {
     return candidates;
   }
 
@@ -546,8 +509,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAlphanumeric(
   bool has_digit = false;
   bool has_underscore = false;
 
-  while (end_pos < char_types.size() &&
-         end_pos - start_pos < options_.max_alphanumeric_length) {
+  while (end_pos < char_types.size() && end_pos - start_pos < options_.max_alphanumeric_length) {
     normalize::CharType ctype = char_types[end_pos];
     char32_t ch = codepoints[end_pos];
     if (ctype == normalize::CharType::Alphabet) {
@@ -561,8 +523,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAlphanumeric(
       // Only if followed by alphanumeric (avoid trailing underscore)
       if (end_pos + 1 < char_types.size()) {
         normalize::CharType next_type = char_types[end_pos + 1];
-        if (next_type == normalize::CharType::Alphabet ||
-            next_type == normalize::CharType::Digit) {
+        if (next_type == normalize::CharType::Alphabet || next_type == normalize::CharType::Digit) {
           has_underscore = true;
           ++end_pos;
           continue;
@@ -583,7 +544,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAlphanumeric(
     if (!surface.empty()) {
       // Give identifiers with underscores a bonus to prefer them over splits
       float cost = is_identifier ? 0.5F : 0.8F;
-      auto cand = makeCandidate(surface, start_pos, end_pos, core::PartOfSpeech::Noun, cost, false, CandidateOrigin::Alphanumeric);
+      auto cand = makeCandidate(surface, start_pos, end_pos, core::PartOfSpeech::Noun, cost, false,
+                                CandidateOrigin::Alphanumeric);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = 1.0F;
       cand.pattern = is_identifier ? "identifier" : "alphanum_mixed";
@@ -596,90 +558,73 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateAlphanumeric(
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateWithSuffix(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
   return analysis::generateWithSuffix(codepoints, start_pos, char_types, options_);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateCompoundVerbCandidates(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
-  return analysis::generateCompoundVerbCandidates(
-      codepoints, start_pos, char_types, inflection_, dict_manager_,
-      options_.verb_candidate_options);
+  return analysis::generateCompoundVerbCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_,
+                                                  options_.verb_candidate_options);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateVerbCandidates(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
-  return analysis::generateVerbCandidates(
-      codepoints, start_pos, char_types, inflection_, dict_manager_,
-      options_.verb_candidate_options);
+  return analysis::generateVerbCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_,
+                                          options_.verb_candidate_options);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateHiraganaVerbCandidates(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
-  return analysis::generateHiraganaVerbCandidates(
-      codepoints, start_pos, char_types, inflection_, dict_manager_,
-      options_.verb_candidate_options);
+  return analysis::generateHiraganaVerbCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_,
+                                                  options_.verb_candidate_options);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateAdjectiveCandidates(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
-  return analysis::generateAdjectiveCandidates(
-      codepoints, start_pos, char_types, inflection_, dict_manager_);
+  return analysis::generateAdjectiveCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateAdjectiveStemCandidates(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
-  return analysis::generateAdjectiveStemCandidates(
-      codepoints, start_pos, char_types, inflection_, dict_manager_);
+  return analysis::generateAdjectiveStemCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateHiraganaAdjectiveCandidates(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
-  return analysis::generateHiraganaAdjectiveCandidates(
-      codepoints, start_pos, char_types, inflection_);
+  return analysis::generateHiraganaAdjectiveCandidates(codepoints, start_pos, char_types, inflection_);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateNaAdjectiveCandidates(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
-  return analysis::generateNaAdjectiveCandidates(
-      codepoints, start_pos, char_types, options_);
+  return analysis::generateNaAdjectiveCandidates(codepoints, start_pos, char_types, options_);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateNominalizedNounCandidates(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   // Delegate to the standalone function
   return analysis::generateNominalizedNounCandidates(codepoints, start_pos, char_types);
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandidates(
-    std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    std::string_view /*text*/, const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   std::vector<UnknownCandidate> candidates;
 
@@ -690,8 +635,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
   normalize::CharType start_type = char_types[start_pos];
 
   // Only for hiragana or katakana starting positions
-  if (start_type != normalize::CharType::Hiragana &&
-      start_type != normalize::CharType::Katakana) {
+  if (start_type != normalize::CharType::Hiragana && start_type != normalize::CharType::Katakana) {
     return candidates;
   }
 
@@ -702,9 +646,9 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
       return candidates;
     }
     // Skip small kana (ゃゅょぁぃぅぇぉっ) - these don't start words
-    if (first_char == U'ゃ' || first_char == U'ゅ' || first_char == U'ょ' ||
-        first_char == U'ぁ' || first_char == U'ぃ' || first_char == U'ぅ' ||
-        first_char == U'ぇ' || first_char == U'ぉ' || first_char == U'っ') {
+    if (first_char == U'ゃ' || first_char == U'ゅ' || first_char == U'ょ' || first_char == U'ぁ' ||
+        first_char == U'ぃ' || first_char == U'ぅ' || first_char == U'ぇ' || first_char == U'ぉ' ||
+        first_char == U'っ') {
       return candidates;
     }
   }
@@ -712,9 +656,9 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
   // Skip small katakana as well
   if (start_type == normalize::CharType::Katakana) {
     char32_t first_char = codepoints[start_pos];
-    if (first_char == U'ャ' || first_char == U'ュ' || first_char == U'ョ' ||
-        first_char == U'ァ' || first_char == U'ィ' || first_char == U'ゥ' ||
-        first_char == U'ェ' || first_char == U'ォ' || first_char == U'ッ') {
+    if (first_char == U'ャ' || first_char == U'ュ' || first_char == U'ョ' || first_char == U'ァ' ||
+        first_char == U'ィ' || first_char == U'ゥ' || first_char == U'ェ' || first_char == U'ォ' ||
+        first_char == U'ッ') {
       return candidates;
     }
   }
@@ -727,17 +671,14 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
     // and colloquial auxiliaries (ちゃ,じゃ,etc.)
     // Excludes: grammar chars handled by dict (た,さ,ら,く,あ,け,い,す,る)
     //           and kana that never start auxiliaries (ぱ行,ば行 sound-symbolics, etc.)
-    bool valid_starter =
-        first_char == U'ぞ' || first_char == U'じ' || first_char == U'の' ||
-        first_char == U'な' || first_char == U'ね' || first_char == U'よ' ||
-        first_char == U'わ' || first_char == U'で' || first_char == U'だ' ||
-        first_char == U'ま' || first_char == U'や' || first_char == U'か' ||
-        first_char == U'が' || first_char == U'べ' || first_char == U'ち' ||
-        first_char == U'に' || first_char == U'せ' || first_char == U'ず' ||
-        first_char == U'ど' || first_char == U'て' || first_char == U'も' ||
-        first_char == U'み' || first_char == U'ん' || first_char == U'こ' ||
-        first_char == U'そ' || first_char == U'と' || first_char == U'お' ||
-        first_char == U'は' || first_char == U'へ';
+    bool valid_starter = first_char == U'ぞ' || first_char == U'じ' || first_char == U'の' || first_char == U'な' ||
+                         first_char == U'ね' || first_char == U'よ' || first_char == U'わ' || first_char == U'で' ||
+                         first_char == U'だ' || first_char == U'ま' || first_char == U'や' || first_char == U'か' ||
+                         first_char == U'が' || first_char == U'べ' || first_char == U'ち' || first_char == U'に' ||
+                         first_char == U'せ' || first_char == U'ず' || first_char == U'ど' || first_char == U'て' ||
+                         first_char == U'も' || first_char == U'み' || first_char == U'ん' || first_char == U'こ' ||
+                         first_char == U'そ' || first_char == U'と' || first_char == U'お' || first_char == U'は' ||
+                         first_char == U'へ';
     if (!valid_starter) {
       return candidates;
     }
@@ -748,8 +689,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
 
   // Find end of same-type sequence (limited to max_character_speech_length)
   size_t end_pos = start_pos + 1;
-  while (end_pos < text_len && end_pos - start_pos < max_len &&
-         char_types[end_pos] == start_type) {
+  while (end_pos < text_len && end_pos - start_pos < max_len && char_types[end_pos] == start_type) {
     ++end_pos;
   }
 
@@ -762,11 +702,9 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
     char32_t next_char = codepoints[pos];
 
     // Punctuation marks
-    if (next_char == U'。' || next_char == U'！' || next_char == U'？' ||
-        next_char == U'、' || next_char == U',' || next_char == U'.' ||
-        next_char == U'!' || next_char == U'?' || next_char == U'…' ||
-        next_char == U'」' || next_char == U'』' || next_char == U'"' ||
-        next_char == U'\n' || next_char == U'\r') {
+    if (next_char == U'。' || next_char == U'！' || next_char == U'？' || next_char == U'、' || next_char == U',' ||
+        next_char == U'.' || next_char == U'!' || next_char == U'?' || next_char == U'…' || next_char == U'」' ||
+        next_char == U'』' || next_char == U'"' || next_char == U'\n' || next_char == U'\r') {
       return true;
     }
 
@@ -801,7 +739,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
       // This prevents だけ from being generated as AUX (which gets VerbOnbinkei → AuxTenseTa bonus)
       static const std::vector<std::string_view> kParticleSurfaces = {
           "だけ", "ばかり", "ほど", "くらい", "ぐらい", "など", "なんて",
-          "しか", "まで", "より", "から", "かも", "でも",
+          "しか", "まで",   "より", "から",   "かも",   "でも",
       };
       bool is_particle_surface = false;
       for (const auto& p : kParticleSurfaces) {
@@ -854,12 +792,11 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
 
       // Mark as Auxiliary so it connects properly after verbs/adjectives
       float cost = options_.character_speech_cost + length_penalty;
-      auto cand = makeCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Auxiliary, cost, false, CandidateOrigin::CharacterSpeech);
+      auto cand = makeCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Auxiliary, cost, false,
+                                CandidateOrigin::CharacterSpeech);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = 0.5F;
-      cand.pattern = (start_type == normalize::CharType::Hiragana)
-                         ? "char_speech_hira"
-                         : "char_speech_kata";
+      cand.pattern = (start_type == normalize::CharType::Hiragana) ? "char_speech_hira" : "char_speech_kata";
 #endif
       candidates.push_back(cand);
     }
@@ -869,8 +806,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateCharacterSpeechCandi
 }
 
 std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
+    const std::vector<char32_t>& codepoints, size_t start_pos,
     const std::vector<normalize::CharType>& char_types) const {
   std::vector<UnknownCandidate> candidates;
 
@@ -883,18 +819,23 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
 
   // Helper to check if a character belongs to the same script group or is a modifier
   auto isSameScriptOrModifier = [&](size_t pos) -> bool {
-    if (pos >= char_types.size()) return false;
-    if (pos >= codepoints.size()) return false;
+    if (pos >= char_types.size())
+      return false;
+    if (pos >= codepoints.size())
+      return false;
     // Same char type
-    if (char_types[pos] == start_type) return true;
+    if (char_types[pos] == start_type)
+      return true;
     // Prolonged sound mark (ー) can appear in both hiragana and katakana words
-    if (normalize::isProlongedSoundMark(codepoints[pos])) return true;
+    if (normalize::isProlongedSoundMark(codepoints[pos]))
+      return true;
     return false;
   };
 
   // Helper to check if a character is small kana (part of previous mora)
   auto isSmallKanaAt = [&](size_t pos) -> bool {
-    if (pos >= codepoints.size()) return false;
+    if (pos >= codepoints.size())
+      return false;
     std::string ch = normalize::encodeRange(codepoints, pos, pos + 1);
     return grammar::isSmallKana(ch);
   };
@@ -927,7 +868,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
       if (!isSmallKanaAt(start_pos) && !isSmallKanaAt(start_pos + half_len)) {
         std::string surface = extractSubstring(codepoints, start_pos, seq_end);
         if (!surface.empty()) {
-          auto cand = makeCandidate(surface, start_pos, seq_end, core::PartOfSpeech::Adverb, -1.0F, true, CandidateOrigin::Onomatopoeia);
+          auto cand = makeCandidate(surface, start_pos, seq_end, core::PartOfSpeech::Adverb, -1.0F, true,
+                                    CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
           cand.confidence = 1.0F;
           cand.pattern = "aa_doubled";
@@ -961,7 +903,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
         // Excludes AAAA pattern (e.g., もももも) where all chars are the same
         std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
         if (!surface.empty()) {
-          auto cand = makeCandidate(surface, start_pos, start_pos + 4, core::PartOfSpeech::Adverb, 0.1F, true, CandidateOrigin::Onomatopoeia);
+          auto cand = makeCandidate(surface, start_pos, start_pos + 4, core::PartOfSpeech::Adverb, 0.1F, true,
+                                    CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
           cand.confidence = 1.0F;
           cand.pattern = "abab_pattern";
@@ -988,7 +931,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
         } else {
           std::string surface = extractSubstring(codepoints, start_pos, start_pos + 3);
           if (!surface.empty()) {
-            auto cand = makeCandidate(surface, start_pos, start_pos + 3, core::PartOfSpeech::Adverb, 0.7F, true, CandidateOrigin::Onomatopoeia);
+            auto cand = makeCandidate(surface, start_pos, start_pos + 3, core::PartOfSpeech::Adverb, 0.7F, true,
+                                      CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
             cand.confidence = 0.7F;
             cand.pattern = "ab_ri_pattern";
@@ -1001,7 +945,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
       else if (seq_len == 4 && isSmallKanaAt(start_pos + 1)) {
         std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
         if (!surface.empty()) {
-          auto cand = makeCandidate(surface, start_pos, start_pos + 4, core::PartOfSpeech::Adverb, 0.2F, true, CandidateOrigin::Onomatopoeia);
+          auto cand = makeCandidate(surface, start_pos, start_pos + 4, core::PartOfSpeech::Adverb, 0.2F, true,
+                                    CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
           cand.confidence = 0.8F;
           cand.pattern = "xtu_cv_ri_pattern";
@@ -1018,11 +963,9 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
   // E.g., はっとした, ぐっときた, どきっとした, ぷるんっとした
   if (seq_len >= 3 && start_type == normalize::CharType::Hiragana) {
     // Look for っと at various positions within the sequence
-    for (size_t tto_pos = start_pos + 1; tto_pos + 1 < seq_end && tto_pos <= start_pos + 4;
-         ++tto_pos) {
-      if (codepoints[tto_pos] == U'\u3063' &&      // っ (small tsu)
-          tto_pos + 1 < seq_end &&
-          codepoints[tto_pos + 1] == U'\u3068') {   // と
+    for (size_t tto_pos = start_pos + 1; tto_pos + 1 < seq_end && tto_pos <= start_pos + 4; ++tto_pos) {
+      if (codepoints[tto_pos] == U'\u3063' &&                               // っ (small tsu)
+          tto_pos + 1 < seq_end && codepoints[tto_pos + 1] == U'\u3068') {  // と
         size_t adv_end = tto_pos + 2;
         size_t stem_len = tto_pos - start_pos;  // chars before っ
         // Stem should be 1-4 hiragana chars
@@ -1030,10 +973,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
           // Skip if stem starts with a particle character (e.g., にもっと = に+もっと)
           char32_t first_cp = codepoints[start_pos];
           if (stem_len >= 2 &&
-              (first_cp == U'に' || first_cp == U'は' || first_cp == U'も' ||
-               first_cp == U'を' || first_cp == U'が' || first_cp == U'で' ||
-               first_cp == U'と' || first_cp == U'か' || first_cp == U'の' ||
-               first_cp == U'へ')) {
+              (first_cp == U'に' || first_cp == U'は' || first_cp == U'も' || first_cp == U'を' || first_cp == U'が' ||
+               first_cp == U'で' || first_cp == U'と' || first_cp == U'か' || first_cp == U'の' || first_cp == U'へ')) {
             break;
           }
           std::string surface = extractSubstring(codepoints, start_pos, adv_end);
@@ -1041,9 +982,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateOnomatopoeiaCandidat
             // Strong bonus for short patterns (はっと, ぐっと = very common)
             // Needs to beat hiragana verb candidates that absorb the っと
             float cost = (stem_len <= 2) ? -1.5F : -0.5F;
-            auto cand = makeCandidate(surface, start_pos, adv_end,
-                core::PartOfSpeech::Adverb, cost, true,
-                CandidateOrigin::Onomatopoeia);
+            auto cand = makeCandidate(surface, start_pos, adv_end, core::PartOfSpeech::Adverb, cost, true,
+                                      CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
             cand.confidence = 0.9F;
             cand.pattern = "x_tto_pattern";

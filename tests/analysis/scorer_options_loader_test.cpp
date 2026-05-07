@@ -23,9 +23,7 @@ class TempJsonFile {
     file << content;
   }
 
-  ~TempJsonFile() {
-    std::remove(path_.c_str());
-  }
+  ~TempJsonFile() { std::remove(path_.c_str()); }
 
   const std::string& path() const { return path_; }
 
@@ -250,14 +248,11 @@ TEST_F(DefaultValuesTest, SplitOptionsDefaults) {
 // Helper RAII class to set/unset environment variables
 class ScopedEnv {
  public:
-  explicit ScopedEnv(const std::string& name, const std::string& value)
-      : name_(name) {
+  explicit ScopedEnv(const std::string& name, const std::string& value) : name_(name) {
     setenv(name.c_str(), value.c_str(), 1);
   }
 
-  ~ScopedEnv() {
-    unsetenv(name_.c_str());
-  }
+  ~ScopedEnv() { unsetenv(name_.c_str()); }
 
  private:
   std::string name_;

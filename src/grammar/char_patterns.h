@@ -15,12 +15,12 @@ namespace suzume::grammar {
 
 // Import kana constants for backward compatibility
 // These are now defined in core/kana_constants.h
-using kana::kOnbinEndings;
-using kana::kOnbinCount;
-using kana::kMizenkeiEndings;
 using kana::kMizenkeiCount;
-using kana::kRenyokeiEndings;
+using kana::kMizenkeiEndings;
+using kana::kOnbinCount;
+using kana::kOnbinEndings;
 using kana::kRenyokeiCount;
+using kana::kRenyokeiEndings;
 
 /**
  * @brief Check if stem ends with e-row hiragana (common Ichidan endings)

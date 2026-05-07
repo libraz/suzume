@@ -31,12 +31,10 @@ struct UnknownOptions;
  * @param dict_manager Dictionary manager for base form validation (optional)
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateAdjectiveCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager = nullptr);
+std::vector<UnknownCandidate> generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                          const std::vector<normalize::CharType>& char_types,
+                                                          const grammar::Inflection& inflection,
+                                                          const dictionary::DictionaryManager* dict_manager = nullptr);
 
 /**
  * @brief Generate na-adjective candidates (〜的 patterns)
@@ -50,11 +48,9 @@ std::vector<UnknownCandidate> generateAdjectiveCandidates(
  * @param options Unknown word generation options
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const UnknownOptions& options);
+std::vector<UnknownCandidate> generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                            const std::vector<normalize::CharType>& char_types,
+                                                            const UnknownOptions& options);
 
 /**
  * @brief Generate hiragana i-adjective candidates (pure hiragana like まずい)
@@ -68,11 +64,10 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
  * @param inflection Inflection analyzer for conjugation detection
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection);
+std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints,
+                                                                  size_t start_pos,
+                                                                  const std::vector<normalize::CharType>& char_types,
+                                                                  const grammar::Inflection& inflection);
 
 /**
  * @brief Generate katakana i-adjective candidates (e.g., エモい, キモい, ウザい)
@@ -87,11 +82,10 @@ std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
  * @param inflection Inflection analyzer for conjugation detection
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection);
+std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(const std::vector<char32_t>& codepoints,
+                                                                  size_t start_pos,
+                                                                  const std::vector<normalize::CharType>& char_types,
+                                                                  const grammar::Inflection& inflection);
 
 /**
  * @brief Generate i-adjective STEM candidates (e.g., 難し, 美し, 楽し)
@@ -113,11 +107,8 @@ std::vector<UnknownCandidate> generateKatakanaAdjectiveCandidates(
  * @return Vector of candidates (adjective stems only)
  */
 std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager = nullptr);
+    const std::vector<char32_t>& codepoints, size_t start_pos, const std::vector<normalize::CharType>& char_types,
+    const grammar::Inflection& inflection, const dictionary::DictionaryManager* dict_manager = nullptr);
 
 }  // namespace suzume::analysis
 

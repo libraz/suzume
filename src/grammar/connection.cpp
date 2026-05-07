@@ -7,10 +7,11 @@
 
 namespace suzume::grammar {
 
-ConnectionMatrix::ConnectionMatrix() { initRules(); }
+ConnectionMatrix::ConnectionMatrix() {
+  initRules();
+}
 
-void ConnectionMatrix::addRule(uint16_t left_id, uint16_t right_id,
-                               int16_t cost) {
+void ConnectionMatrix::addRule(uint16_t left_id, uint16_t right_id, int16_t cost) {
   uint32_t key = (static_cast<uint32_t>(left_id) << 16) | right_id;
   entries_.push_back({key, cost});
 }
@@ -74,13 +75,11 @@ void ConnectionMatrix::initRules() {
   std::sort(entries_.begin(), entries_.end());
 }
 
-int16_t ConnectionMatrix::getCost(uint16_t left_right_id,
-                                  uint16_t right_left_id) const {
+int16_t ConnectionMatrix::getCost(uint16_t left_right_id, uint16_t right_left_id) const {
   uint32_t key = (static_cast<uint32_t>(left_right_id) << 16) | right_left_id;
 
   ConnectionEntry target{key, 0};
-  auto iter =
-      std::lower_bound(entries_.begin(), entries_.end(), target);
+  auto iter = std::lower_bound(entries_.begin(), entries_.end(), target);
 
   if (iter != entries_.end() && iter->key == key) {
     return iter->cost;
@@ -88,8 +87,7 @@ int16_t ConnectionMatrix::getCost(uint16_t left_right_id,
   return kInfinite;
 }
 
-bool ConnectionMatrix::canConnect(uint16_t left_right_id,
-                                  uint16_t right_left_id) const {
+bool ConnectionMatrix::canConnect(uint16_t left_right_id, uint16_t right_left_id) const {
   return getCost(left_right_id, right_left_id) != kInfinite;
 }
 
@@ -97,6 +95,8 @@ namespace {
 ConnectionMatrix g_connection_matrix;
 }  // namespace
 
-const ConnectionMatrix& getConnectionMatrix() { return g_connection_matrix; }
+const ConnectionMatrix& getConnectionMatrix() {
+  return g_connection_matrix;
+}
 
 }  // namespace suzume::grammar

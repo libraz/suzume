@@ -21,30 +21,25 @@ namespace fs = std::filesystem;
 // Test fixture for universal tokenization tests
 class UniversalTokenizationTest : public ::testing::Test {
  protected:
-  void verifyMorphemes(const std::string& input,
-                       const std::vector<core::Morpheme>& result,
+  void verifyMorphemes(const std::string& input, const std::vector<core::Morpheme>& result,
                        const std::vector<ExpectedMorpheme>& expected) {
     SCOPED_TRACE("Input: " + input);
 
-    ASSERT_EQ(result.size(), expected.size())
-        << "Morpheme count mismatch for: " << input;
+    ASSERT_EQ(result.size(), expected.size()) << "Morpheme count mismatch for: " << input;
 
     for (size_t i = 0; i < expected.size(); ++i) {
       SCOPED_TRACE("Morpheme index: " + std::to_string(i));
 
-      EXPECT_EQ(result[i].surface, expected[i].surface)
-          << "Surface mismatch at index " << i;
+      EXPECT_EQ(result[i].surface, expected[i].surface) << "Surface mismatch at index " << i;
 
       if (!expected[i].pos.empty()) {
         EXPECT_EQ(result[i].pos, expected[i].posEnum())
-            << "POS mismatch at index " << i << " for surface '"
-            << result[i].surface << "'";
+            << "POS mismatch at index " << i << " for surface '" << result[i].surface << "'";
       }
 
       if (!expected[i].lemma.empty()) {
         EXPECT_EQ(result[i].lemma, expected[i].lemma)
-            << "Lemma mismatch at index " << i << " for surface '"
-            << result[i].surface << "'";
+            << "Lemma mismatch at index " << i << " for surface '" << result[i].surface << "'";
       }
     }
   }
@@ -141,16 +136,14 @@ void loadAllTestData() {
       }
     } catch (const std::exception& e) {
       // Skip files that fail to load
-      std::cerr << "Warning: Failed to load " << json_path << ": " << e.what()
-                << std::endl;
+      std::cerr << "Warning: Failed to load " << json_path << ": " << e.what() << std::endl;
     }
   }
 }
 
 // Parameterized test class
-class UniversalTokenizationParamTest
-    : public UniversalTokenizationTest,
-      public ::testing::WithParamInterface<TestDataEntry> {};
+class UniversalTokenizationParamTest : public UniversalTokenizationTest,
+                                       public ::testing::WithParamInterface<TestDataEntry> {};
 
 TEST_P(UniversalTokenizationParamTest, Tokenize) {
   const auto& entry = GetParam();
@@ -161,10 +154,8 @@ TEST_P(UniversalTokenizationParamTest, Tokenize) {
 
 // Custom name generator that includes suite name for disambiguation
 struct UniversalTestNameGenerator {
-  std::string operator()(
-      const ::testing::TestParamInfo<TestDataEntry>& info) const {
-    return info.param.suite_name + "_" +
-           sanitizeTestName(info.param.test_case.id);
+  std::string operator()(const ::testing::TestParamInfo<TestDataEntry>& info) const {
+    return info.param.suite_name + "_" + sanitizeTestName(info.param.test_case.id);
   }
 };
 
@@ -176,8 +167,7 @@ struct TestDataInitializer {
 // Global initializer - runs before INSTANTIATE_TEST_SUITE_P
 static TestDataInitializer g_initializer;
 
-INSTANTIATE_TEST_SUITE_P(AutoDiscovered, UniversalTokenizationParamTest,
-                         ::testing::ValuesIn(getTestData()),
+INSTANTIATE_TEST_SUITE_P(AutoDiscovered, UniversalTokenizationParamTest, ::testing::ValuesIn(getTestData()),
                          UniversalTestNameGenerator());
 
 }  // namespace

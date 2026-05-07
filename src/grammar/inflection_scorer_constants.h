@@ -427,25 +427,25 @@ constexpr float kPenaltySuruDirectNai = scale::kProhibitive;  // 3.5F
 // Includes: 漢字+い (上一段), 漢字+じ (ザ行一段), etc.
 inline constexpr const char* kValidKanjiIStemExceptions[] = {
     // 漢字+い (kami-ichidan / 上一段)
-    "用い",   // 用いる (to use)
-    "率い",   // 率いる (to lead)
-    "報い",   // 報いる (to repay)
+    "用い",  // 用いる (to use)
+    "率い",  // 率いる (to lead)
+    "報い",  // 報いる (to repay)
     // 漢字+じ (za-row ichidan / ザ行一段)
-    "論じ",   // 論じる (to discuss)
-    "信じ",   // 信じる (to believe)
-    "感じ",   // 感じる (to feel)
-    "応じ",   // 応じる (to respond)
-    "演じ",   // 演じる (to perform)
-    "生じ",   // 生じる (to arise)
-    "禁じ",   // 禁じる (to prohibit)
-    "通じ",   // 通じる (to communicate)
-    "命じ",   // 命じる (to order)
-    "準じ",   // 準じる (to conform)
-    "案じ",   // 案じる (to worry)
-    "重んじ", // 重んじる (to value)
+    "論じ",    // 論じる (to discuss)
+    "信じ",    // 信じる (to believe)
+    "感じ",    // 感じる (to feel)
+    "応じ",    // 応じる (to respond)
+    "演じ",    // 演じる (to perform)
+    "生じ",    // 生じる (to arise)
+    "禁じ",    // 禁じる (to prohibit)
+    "通じ",    // 通じる (to communicate)
+    "命じ",    // 命じる (to order)
+    "準じ",    // 準じる (to conform)
+    "案じ",    // 案じる (to worry)
+    "重んじ",  // 重んじる (to value)
     // 漢字+び (ba-row ichidan)
-    "帯び",   // 帯びる (to wear)
-    "浴び"    // 浴びる (to bathe)
+    "帯び",  // 帯びる (to wear)
+    "浴び"   // 浴びる (to bathe)
 };
 inline constexpr size_t kValidKanjiIStemExceptionCount =
     sizeof(kValidKanjiIStemExceptions) / sizeof(kValidKanjiIStemExceptions[0]);
@@ -453,8 +453,8 @@ inline constexpr size_t kValidKanjiIStemExceptionCount =
 // Valid て-ending Ichidan stems (exceptions to て-form confusion)
 // 捨てる, 棄てる have legitimate て-ending stems
 inline constexpr const char* kTeEndingStemExceptionKanji[] = {
-    "捨",     // 捨てる (to throw away)
-    "棄"      // 棄てる (to abandon)
+    "捨",  // 捨てる (to throw away)
+    "棄"   // 棄てる (to abandon)
 };
 inline constexpr size_t kTeEndingStemExceptionKanjiCount =
     sizeof(kTeEndingStemExceptionKanji) / sizeof(kTeEndingStemExceptionKanji[0]);
@@ -462,17 +462,17 @@ inline constexpr size_t kTeEndingStemExceptionKanjiCount =
 // Invalid single-hiragana stems for Ichidan (these are irregular verbs)
 // く → くる (Kuru), す → する (Suru), こ → Kuru mizenkei
 inline constexpr const char* kInvalidIchidanSingleStems[] = {
-    "く",     // くる (Kuru verb)
-    "す",     // する (Suru verb)
-    "こ"      // Kuru mizenkei suffix
+    "く",  // くる (Kuru verb)
+    "す",  // する (Suru verb)
+    "こ"   // Kuru mizenkei suffix
 };
 inline constexpr size_t kInvalidIchidanSingleStemCount =
     sizeof(kInvalidIchidanSingleStems) / sizeof(kInvalidIchidanSingleStems[0]);
 
 // Valid pure-hiragana Ichidan stems (common auxiliary patterns)
 inline constexpr const char* kValidHiraganaStemExceptions[] = {
-    "すぎ",   // すぎる (to exceed, auxiliary: too much)
-    "でき"    // できる (to be able)
+    "すぎ",  // すぎる (to exceed, auxiliary: too much)
+    "でき"   // できる (to be able)
 };
 inline constexpr size_t kValidHiraganaStemExceptionCount =
     sizeof(kValidHiraganaStemExceptions) / sizeof(kValidHiraganaStemExceptions[0]);
@@ -481,8 +481,8 @@ inline constexpr size_t kValidHiraganaStemExceptionCount =
 // These are exceptions to the rule that penalizes 2-char ら-ending stems as verb mizenkei
 // E.g., つら (辛い/つらい), きら (嫌い/きらい) are valid i-adjective stems
 inline constexpr const char* kValidIAdjRaStemExceptions[] = {
-    "つら",   // 辛い (つらい) - painful, hard
-    "きら"    // 嫌い (きらい) - dislike
+    "つら",  // 辛い (つらい) - painful, hard
+    "きら"   // 嫌い (きらい) - dislike
 };
 inline constexpr size_t kValidIAdjRaStemExceptionCount =
     sizeof(kValidIAdjRaStemExceptions) / sizeof(kValidIAdjRaStemExceptions[0]);
@@ -492,18 +492,13 @@ inline constexpr const char* kKuruKanji = "来";
 
 // Common particles that cannot be verb stems
 // Used for Ichidan single-hiragana particle stem validation
-inline constexpr const char* kParticleStemList[] = {
-    "も", "は", "が", "を", "に", "へ", "と", "で",
-    "よ", "ね", "わ", "な", "か", "ぞ", "さ", "ば"
-};
-inline constexpr size_t kParticleStemListCount =
-    sizeof(kParticleStemList) / sizeof(kParticleStemList[0]);
+inline constexpr const char* kParticleStemList[] = {"も", "は", "が", "を", "に", "へ", "と", "で",
+                                                    "よ", "ね", "わ", "な", "か", "ぞ", "さ", "ば"};
+inline constexpr size_t kParticleStemListCount = sizeof(kParticleStemList) / sizeof(kParticleStemList[0]);
 
 // Particles that form invalid な-stem patterns with GodanWa
 // E.g., もな (も + ない), はな (は + ない)
-inline constexpr const char* kParticleNaStemPrefixes[] = {
-    "も", "は", "が", "を", "に", "へ", "と", "で", "か"
-};
+inline constexpr const char* kParticleNaStemPrefixes[] = {"も", "は", "が", "を", "に", "へ", "と", "で", "か"};
 inline constexpr size_t kParticleNaStemPrefixCount =
     sizeof(kParticleNaStemPrefixes) / sizeof(kParticleNaStemPrefixes[0]);
 

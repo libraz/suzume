@@ -49,46 +49,40 @@ bool isSingleKanjiIchidan(char32_t c);
  * @param pos Part of speech to match
  * @return true if an exact-match entry with the specified POS exists
  */
-bool hasDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
-                        std::string_view surface,
+bool hasDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface,
                         core::PartOfSpeech pos);
 
 /**
  * @brief Check if a base form exists in dictionary as a verb
  */
-inline bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager,
-                               std::string_view base_form) {
+inline bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form) {
   return hasDictionaryEntry(dict_manager, base_form, core::PartOfSpeech::Verb);
 }
 
 /**
  * @brief Check if a base form exists in dictionary as an adjective
  */
-inline bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager,
-                                    std::string_view base_form) {
+inline bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form) {
   return hasDictionaryEntry(dict_manager, base_form, core::PartOfSpeech::Adjective);
 }
 
 /**
  * @brief Check if a verb is in dictionary with matching conjugation type
  */
-bool isVerbInDictionaryWithType(const dictionary::DictionaryManager* dict_manager,
-                                std::string_view base_form,
+bool isVerbInDictionaryWithType(const dictionary::DictionaryManager* dict_manager, std::string_view base_form,
                                 grammar::VerbType verb_type);
 
 /**
  * @brief Check if a surface has a non-verb entry in dictionary
  */
-bool hasNonVerbDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
-                               std::string_view surface);
+bool hasNonVerbDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface);
 
 /**
  * @brief Check if a surface has a particle entry in dictionary
  *
  * Used to detect compound particles (について, によって, として, etc.)
  */
-bool hasParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
-                                std::string_view surface);
+bool hasParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface);
 
 // =============================================================================
 // Candidate Sorting
@@ -129,8 +123,7 @@ bool isTeTaFormSokuon(const std::vector<char32_t>& codepoints, size_t sokuon_pos
  * For each verb/adjective candidate, checks if input continues with emphatic
  * characters and creates an extended variant.
  */
-void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
-                         const std::vector<char32_t>& codepoints);
+void addEmphaticVariants(std::vector<UnknownCandidate>& candidates, const std::vector<char32_t>& codepoints);
 
 // =============================================================================
 // Pattern Skip Helpers
@@ -193,8 +186,7 @@ bool isSokuonbinGodanType(grammar::VerbType verb_type);
  * @param onbin Onbin pattern to match ("い", "っ", "ん", or "")
  * @return Vector of (VerbType, base_suffix) pairs
  */
-std::vector<std::pair<grammar::VerbType, std::string_view>>
-getGodanTypesByOnbin(std::string_view onbin);
+std::vector<std::pair<grammar::VerbType, std::string_view>> getGodanTypesByOnbin(std::string_view onbin);
 
 /**
  * @brief Check if surface contains passive/potential auxiliary patterns
@@ -242,13 +234,11 @@ bool containsCausativeAuxPattern(std::string_view surface);
  * @param min_threshold Minimum confidence to consider (default 0.4)
  * @return Best ichidan confidence, or 0.0 if none found
  */
-inline float getIchidanConfidence(
-    const std::vector<grammar::InflectionCandidate>& candidates,
-    float min_threshold = 0.4F) {
+inline float getIchidanConfidence(const std::vector<grammar::InflectionCandidate>& candidates,
+                                  float min_threshold = 0.4F) {
   float best = 0.0F;
   for (const auto& cand : candidates) {
-    if (cand.verb_type == grammar::VerbType::Ichidan &&
-        cand.confidence >= min_threshold) {
+    if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence >= min_threshold) {
       best = std::max(best, cand.confidence);
     }
   }

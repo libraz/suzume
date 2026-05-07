@@ -34,7 +34,7 @@ struct UnknownOptions {
   // When enabled, short hiragana/katakana at sentence-end positions
   // are treated as potential character speech suffixes with lower cost.
   bool enable_character_speech = true;
-  float character_speech_cost = 0.6F;  // Higher than dict suffix (0.5) to prefer dict
+  float character_speech_cost = 0.6F;      // Higher than dict suffix (0.5) to prefer dict
   size_t max_character_speech_length = 4;  // Max codepoints for pattern match
 
   // Verb candidate generation options
@@ -58,9 +58,9 @@ struct UnknownCandidate {
 #ifdef SUZUME_DEBUG_INFO
   // Debug: candidate origin tracking (excluded from release/WASM builds)
   CandidateOrigin origin{CandidateOrigin::Unknown};
-  float confidence{0.0F};  // Inflection analysis confidence (for verbs/adj)
-  std::string pattern;     // Pattern detail (e.g., "ichidan_te_form")
-  std::string epos_source; // Where ExtendedPOS was set (e.g., "verb_cand_kanji")
+  float confidence{0.0F};   // Inflection analysis confidence (for verbs/adj)
+  std::string pattern;      // Pattern detail (e.g., "ichidan_te_form")
+  std::string epos_source;  // Where ExtendedPOS was set (e.g., "verb_cand_kanji")
 #endif
 };
 
@@ -82,25 +82,21 @@ struct UnknownCandidate {
  * @param pattern Pattern name (debug only)
  * @param extended_pos Extended POS for bigram (optional)
  */
-inline UnknownCandidate makeVerbCandidate(
-    const std::string& surface, size_t start, size_t end,
-    float cost, const std::string& lemma,
-    dictionary::ConjugationType conj_type,
-    bool has_suffix = false,
-    [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
-    [[maybe_unused]] float confidence = 0.0F,
-    [[maybe_unused]] const char* pattern = nullptr,
-    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
-    [[maybe_unused]] const char* epos_source = nullptr) {
+inline UnknownCandidate makeVerbCandidate(const std::string& surface, size_t start, size_t end, float cost,
+                                          const std::string& lemma, dictionary::ConjugationType conj_type,
+                                          bool has_suffix = false,
+                                          [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
+                                          [[maybe_unused]] float confidence = 0.0F,
+                                          [[maybe_unused]] const char* pattern = nullptr,
+                                          core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
+                                          [[maybe_unused]] const char* epos_source = nullptr) {
   UnknownCandidate cand;
   cand.surface = surface;
   cand.start = start;
   cand.end = end;
   cand.pos = core::PartOfSpeech::Verb;
   // Auto-detect verb form from surface if not specified
-  cand.extended_pos = (extended_pos != core::ExtendedPOS::Unknown)
-                          ? extended_pos
-                          : core::detectVerbForm(surface, {});
+  cand.extended_pos = (extended_pos != core::ExtendedPOS::Unknown) ? extended_pos : core::detectVerbForm(surface, {});
   cand.cost = cost;
   cand.lemma = lemma;
   cand.conj_type = conj_type;
@@ -132,21 +128,18 @@ inline UnknownCandidate makeVerbCandidate(
  * @param origin Candidate origin (debug only)
  * @param extended_pos Extended POS for bigram (optional)
  */
-inline UnknownCandidate makeNounCandidate(
-    const std::string& surface, size_t start, size_t end,
-    float cost, bool has_suffix = false,
-    [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
-    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
-    [[maybe_unused]] const char* epos_source = nullptr) {
+inline UnknownCandidate makeNounCandidate(const std::string& surface, size_t start, size_t end, float cost,
+                                          bool has_suffix = false,
+                                          [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
+                                          core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
+                                          [[maybe_unused]] const char* epos_source = nullptr) {
   UnknownCandidate cand;
   cand.surface = surface;
   cand.start = start;
   cand.end = end;
   cand.pos = core::PartOfSpeech::Noun;
   // Default to Noun if not specified
-  cand.extended_pos = (extended_pos != core::ExtendedPOS::Unknown)
-                          ? extended_pos
-                          : core::ExtendedPOS::Noun;
+  cand.extended_pos = (extended_pos != core::ExtendedPOS::Unknown) ? extended_pos : core::ExtendedPOS::Noun;
   cand.cost = cost;
   cand.has_suffix = has_suffix;
 #ifdef SUZUME_DEBUG_INFO
@@ -173,21 +166,18 @@ inline UnknownCandidate makeNounCandidate(
  * @param origin Candidate origin (debug only)
  * @param extended_pos Extended POS for bigram (optional)
  */
-inline UnknownCandidate makeCandidate(
-    const std::string& surface, size_t start, size_t end,
-    core::PartOfSpeech pos, float cost, bool has_suffix = false,
-    [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
-    core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
-    [[maybe_unused]] const char* epos_source = nullptr) {
+inline UnknownCandidate makeCandidate(const std::string& surface, size_t start, size_t end, core::PartOfSpeech pos,
+                                      float cost, bool has_suffix = false,
+                                      [[maybe_unused]] CandidateOrigin origin = CandidateOrigin::Unknown,
+                                      core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
+                                      [[maybe_unused]] const char* epos_source = nullptr) {
   UnknownCandidate cand;
   cand.surface = surface;
   cand.start = start;
   cand.end = end;
   cand.pos = pos;
   // Use posToExtendedPos if not specified
-  cand.extended_pos = (extended_pos != core::ExtendedPOS::Unknown)
-                          ? extended_pos
-                          : core::posToExtendedPos(pos);
+  cand.extended_pos = (extended_pos != core::ExtendedPOS::Unknown) ? extended_pos : core::posToExtendedPos(pos);
   cand.cost = cost;
   cand.has_suffix = has_suffix;
 #ifdef SUZUME_DEBUG_INFO
@@ -211,9 +201,8 @@ inline UnknownCandidate makeCandidate(
  */
 class UnknownWordGenerator {
  public:
-  explicit UnknownWordGenerator(
-      const UnknownOptions& options = {},
-      const dictionary::DictionaryManager* dict_manager = nullptr);
+  explicit UnknownWordGenerator(const UnknownOptions& options = {},
+                                const dictionary::DictionaryManager* dict_manager = nullptr);
   ~UnknownWordGenerator() = default;
 
   // Non-copyable, non-movable
@@ -230,10 +219,8 @@ class UnknownWordGenerator {
    * @param char_types Character types
    * @return Vector of candidates
    */
-  std::vector<UnknownCandidate> generate(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
-      const std::vector<normalize::CharType>& char_types) const;
+  std::vector<UnknownCandidate> generate(std::string_view text, const std::vector<char32_t>& codepoints,
+                                         size_t start_pos, const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Access the shared inflection analyzer
@@ -252,57 +239,50 @@ class UnknownWordGenerator {
    * if the base form exists in dictionary.
    */
   std::vector<UnknownCandidate> generateCompoundVerbCandidates(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
+      std::string_view text, const std::vector<char32_t>& codepoints, size_t start_pos,
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate verb candidates (kanji + conjugation endings)
    */
-  std::vector<UnknownCandidate> generateVerbCandidates(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
-      const std::vector<normalize::CharType>& char_types) const;
+  std::vector<UnknownCandidate> generateVerbCandidates(std::string_view text, const std::vector<char32_t>& codepoints,
+                                                       size_t start_pos,
+                                                       const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate hiragana verb candidates (pure hiragana verbs like いく, くる)
    */
   std::vector<UnknownCandidate> generateHiraganaVerbCandidates(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
+      std::string_view text, const std::vector<char32_t>& codepoints, size_t start_pos,
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate i-adjective candidates (kanji + conjugation endings)
    */
-  std::vector<UnknownCandidate> generateAdjectiveCandidates(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
-      const std::vector<normalize::CharType>& char_types) const;
+  std::vector<UnknownCandidate> generateAdjectiveCandidates(std::string_view text,
+                                                            const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                            const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate i-adjective STEM candidates (難し, 美し for MeCab-compatible split)
    */
   std::vector<UnknownCandidate> generateAdjectiveStemCandidates(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
+      std::string_view text, const std::vector<char32_t>& codepoints, size_t start_pos,
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate hiragana i-adjective candidates (pure hiragana like まずい)
    */
   std::vector<UnknownCandidate> generateHiraganaAdjectiveCandidates(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
+      std::string_view text, const std::vector<char32_t>& codepoints, size_t start_pos,
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate na-adjective candidates (〜的 patterns)
    */
-  std::vector<UnknownCandidate> generateNaAdjectiveCandidates(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
-      const std::vector<normalize::CharType>& char_types) const;
+  std::vector<UnknownCandidate> generateNaAdjectiveCandidates(std::string_view text,
+                                                              const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                              const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate nominalized noun candidates (kanji + short hiragana)
@@ -313,33 +293,29 @@ class UnknownWordGenerator {
    *   - 引き上げ (from 引き上げる)
    */
   std::vector<UnknownCandidate> generateNominalizedNounCandidates(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
+      std::string_view text, const std::vector<char32_t>& codepoints, size_t start_pos,
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate candidates for same-type sequences
    */
-  std::vector<UnknownCandidate> generateBySameType(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
-      const std::vector<normalize::CharType>& char_types) const;
+  std::vector<UnknownCandidate> generateBySameType(std::string_view text, const std::vector<char32_t>& codepoints,
+                                                   size_t start_pos,
+                                                   const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate alphanumeric sequence candidates
    */
-  std::vector<UnknownCandidate> generateAlphanumeric(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
-      const std::vector<normalize::CharType>& char_types) const;
+  std::vector<UnknownCandidate> generateAlphanumeric(std::string_view text, const std::vector<char32_t>& codepoints,
+                                                     size_t start_pos,
+                                                     const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate candidates with suffix separation
    */
-  std::vector<UnknownCandidate> generateWithSuffix(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
-      const std::vector<normalize::CharType>& char_types) const;
+  std::vector<UnknownCandidate> generateWithSuffix(std::string_view text, const std::vector<char32_t>& codepoints,
+                                                   size_t start_pos,
+                                                   const std::vector<normalize::CharType>& char_types) const;
 
   /**
    * @brief Generate character speech pattern candidates (キャラ語尾)
@@ -351,8 +327,7 @@ class UnknownWordGenerator {
    * Examples: ナリ, ござる, だわ, etc.
    */
   std::vector<UnknownCandidate> generateCharacterSpeechCandidates(
-      std::string_view text, const std::vector<char32_t>& codepoints,
-      size_t start_pos,
+      std::string_view text, const std::vector<char32_t>& codepoints, size_t start_pos,
       const std::vector<normalize::CharType>& char_types) const;
 
   /**
@@ -363,8 +338,7 @@ class UnknownWordGenerator {
    * These are recognized as adverbs.
    */
   std::vector<UnknownCandidate> generateOnomatopoeiaCandidates(
-      const std::vector<char32_t>& codepoints,
-      size_t start_pos,
+      const std::vector<char32_t>& codepoints, size_t start_pos,
       const std::vector<normalize::CharType>& char_types) const;
 
   /**

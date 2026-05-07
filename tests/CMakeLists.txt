@@ -32,8 +32,10 @@ set(CLI_SOURCES_FOR_TESTS
 
 # Test source files
 set(TEST_SOURCES
+  ${CMAKE_SOURCE_DIR}/src/suzume_c.cpp
   ${TEST_COMMON_SOURCES}
   ${CLI_SOURCES_FOR_TESTS}
+  cli/cli_common_test.cpp
   cli/dict_compiler_test.cpp
   core/types_test.cpp
   core/types_extended_test.cpp
@@ -65,6 +67,7 @@ set(TEST_SOURCES
   output/japanese_format_test.cpp
   postprocess/tag_generator_test.cpp
   integration/suzume_api_test.cpp
+  integration/suzume_c_api_test.cpp
   # Universal test: auto-discovers all JSON files in tests/data/tokenization/
   # New JSON files are automatically picked up without creating C++ files
   integration/universal_tokenization_test.cpp

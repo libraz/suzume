@@ -1,6 +1,6 @@
-#include "core/types.h"
-
 #include <gtest/gtest.h>
+
+#include "core/types.h"
 
 namespace suzume {
 namespace core {

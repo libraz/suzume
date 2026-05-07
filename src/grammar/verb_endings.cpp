@@ -76,10 +76,10 @@ const std::vector<VerbEnding> kIrregularEndings = {
     {"", "る", VerbType::Ichidan, conn::kVerbOnbinkei, true},
     {"", "る", VerbType::Ichidan, conn::kVerbRenyokei, false},
     {"", "る", VerbType::Ichidan, conn::kVerbMizenkei, false},
-    {"れ", "る", VerbType::Ichidan, conn::kVerbKatei, false},      // Hypothetical: 食べれ(ば)
-    {"ろ", "る", VerbType::Ichidan, conn::kVerbMeireikei, false},  // Imperative: 食べろ
-    {"よ", "る", VerbType::Ichidan, conn::kVerbVolitional, false}, // Volitional stem
-    {"る", "る", VerbType::Ichidan, conn::kVerbBase, false},       // Base/dictionary form
+    {"れ", "る", VerbType::Ichidan, conn::kVerbKatei, false},       // Hypothetical: 食べれ(ば)
+    {"ろ", "る", VerbType::Ichidan, conn::kVerbMeireikei, false},   // Imperative: 食べろ
+    {"よ", "る", VerbType::Ichidan, conn::kVerbVolitional, false},  // Volitional stem
+    {"る", "る", VerbType::Ichidan, conn::kVerbBase, false},        // Base/dictionary form
 
     // サ変 (する)
     {"し", "する", VerbType::Suru, conn::kVerbOnbinkei, true},
@@ -90,21 +90,21 @@ const std::vector<VerbEnding> kIrregularEndings = {
     {"", "する", VerbType::Suru, conn::kVerbMizenkei, false},
     // Empty suffix for suru-verb + してる/してた contraction
     {"", "する", VerbType::Suru, conn::kVerbOnbinkei, true},
-    {"すれ", "する", VerbType::Suru, conn::kVerbKatei, false},     // すれば
-    {"しろ", "する", VerbType::Suru, conn::kVerbMeireikei, false}, // Imperative: しろ
-    {"せよ", "する", VerbType::Suru, conn::kVerbMeireikei, false}, // Imperative (classical): せよ
-    {"しよ", "する", VerbType::Suru, conn::kVerbVolitional, false}, // しよう
-    {"する", "する", VerbType::Suru, conn::kVerbBase, false},    // Base/dictionary form
-    {"す", "する", VerbType::Suru, conn::kVerbBase, false},      // すべき special
+    {"すれ", "する", VerbType::Suru, conn::kVerbKatei, false},       // すれば
+    {"しろ", "する", VerbType::Suru, conn::kVerbMeireikei, false},   // Imperative: しろ
+    {"せよ", "する", VerbType::Suru, conn::kVerbMeireikei, false},   // Imperative (classical): せよ
+    {"しよ", "する", VerbType::Suru, conn::kVerbVolitional, false},  // しよう
+    {"する", "する", VerbType::Suru, conn::kVerbBase, false},        // Base/dictionary form
+    {"す", "する", VerbType::Suru, conn::kVerbBase, false},          // すべき special
 
     // カ変 (来る)
     {"き", "くる", VerbType::Kuru, conn::kVerbOnbinkei, true},
     {"き", "くる", VerbType::Kuru, conn::kVerbRenyokei, false},
     {"こ", "くる", VerbType::Kuru, conn::kVerbMizenkei, false},
-    {"くれ", "くる", VerbType::Kuru, conn::kVerbKatei, false},     // くれば
-    {"こい", "くる", VerbType::Kuru, conn::kVerbMeireikei, false}, // Imperative: こい
-    {"こよ", "くる", VerbType::Kuru, conn::kVerbVolitional, false}, // こよう
-    {"くる", "くる", VerbType::Kuru, conn::kVerbBase, false},    // Base/dictionary form
+    {"くれ", "くる", VerbType::Kuru, conn::kVerbKatei, false},       // くれば
+    {"こい", "くる", VerbType::Kuru, conn::kVerbMeireikei, false},   // Imperative: こい
+    {"こよ", "くる", VerbType::Kuru, conn::kVerbVolitional, false},  // こよう
+    {"くる", "くる", VerbType::Kuru, conn::kVerbBase, false},        // Base/dictionary form
 
     // い形容詞 (美しい)
     {"", "い", VerbType::IAdjective, conn::kIAdjStem, false},
@@ -130,8 +130,7 @@ const std::vector<VerbEnding>& getVerbEndings() {
   return kEndings;
 }
 
-const std::unordered_map<uint16_t, std::vector<VerbEnding>>&
-getVerbEndingsByConn() {
+const std::unordered_map<uint16_t, std::vector<VerbEnding>>& getVerbEndingsByConn() {
   static const auto kGrouped = []() {
     std::unordered_map<uint16_t, std::vector<VerbEnding>> grouped;
     for (const auto& ending : getVerbEndings()) {

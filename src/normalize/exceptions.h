@@ -66,8 +66,7 @@ inline bool isSingleKanjiException(std::string_view surface) {
 
 // Check if a surface is a valid single-hiragana exception
 inline bool isSingleHiraganaException(std::string_view surface) {
-  return kSingleHiraganaExceptions.find(surface) !=
-         kSingleHiraganaExceptions.end();
+  return kSingleHiraganaExceptions.find(surface) != kSingleHiraganaExceptions.end();
 }
 
 // Check if a codepoint is a valid single-character verb stem
@@ -77,21 +76,18 @@ inline bool isValidSingleCharVerbStem(char32_t ch) {
 
 // Check if first character indicates a compound verb auxiliary
 inline bool isCompoundVerbAuxStart(std::string_view first_char) {
-  return kCompoundVerbAuxFirstChars.find(first_char) !=
-         kCompoundVerbAuxFirstChars.end();
+  return kCompoundVerbAuxFirstChars.find(first_char) != kCompoundVerbAuxFirstChars.end();
 }
 
 // Check if surface is a hiragana compound verb auxiliary
 inline bool isHiraganaCompoundVerbAux(std::string_view surface) {
-  return kHiraganaCompoundVerbAux.find(surface) !=
-         kHiraganaCompoundVerbAux.end();
+  return kHiraganaCompoundVerbAux.find(surface) != kHiraganaCompoundVerbAux.end();
 }
 
 // Check if surface starts with a hiragana compound verb auxiliary prefix
 inline bool startsWithHiraganaCompoundVerbAux(std::string_view surface) {
   for (const auto& prefix : kHiraganaCompoundVerbAuxPrefixes) {
-    if (surface.size() >= prefix.size() &&
-        surface.substr(0, prefix.size()) == prefix) {
+    if (surface.size() >= prefix.size() && surface.substr(0, prefix.size()) == prefix) {
       return true;
     }
   }

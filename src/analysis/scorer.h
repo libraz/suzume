@@ -41,9 +41,9 @@ struct ScorerOptions {
   struct OptimalLength {
     size_t noun_min = 2;
     size_t noun_max = 16;  // Long compounds like 独立行政法人情報処理推進機構
-    size_t verb_min = 3;  // Keep at 3 to avoid promoting verb split (食べた→食べ+た)
-    size_t verb_max = 12; // Increased to accommodate long conjugated forms
-                          // e.g., かけられなくなった (9 chars), 食べさせられなくなった (10 chars)
+    size_t verb_min = 3;   // Keep at 3 to avoid promoting verb split (食べた→食べ+た)
+    size_t verb_max = 12;  // Increased to accommodate long conjugated forms
+                           // e.g., かけられなくなった (9 chars), 食べさせられなくなった (10 chars)
     size_t adj_min = 2;
     size_t adj_max = 6;
     size_t katakana_min = 3;
@@ -55,28 +55,28 @@ struct ScorerOptions {
   // Format: {prev}_{next} where prev/next are POS categories
   struct BigramOverrides {
     // High-impact pairs (adjust with caution)
-    float noun_to_suffix = std::numeric_limits<float>::quiet_NaN();   // default: -0.8
-    float prefix_to_noun = std::numeric_limits<float>::quiet_NaN();   // default: -1.5
-    float prefix_to_verb = std::numeric_limits<float>::quiet_NaN();   // default: -0.5
-    float pron_to_aux = std::numeric_limits<float>::quiet_NaN();      // default: 0.2
+    float noun_to_suffix = std::numeric_limits<float>::quiet_NaN();  // default: -0.8
+    float prefix_to_noun = std::numeric_limits<float>::quiet_NaN();  // default: -1.5
+    float prefix_to_verb = std::numeric_limits<float>::quiet_NaN();  // default: -0.5
+    float pron_to_aux = std::numeric_limits<float>::quiet_NaN();     // default: 0.2
 
     // Verb connections
-    float verb_to_verb = std::numeric_limits<float>::quiet_NaN();     // default: 0.8
-    float verb_to_noun = std::numeric_limits<float>::quiet_NaN();     // default: 0.2
-    float verb_to_aux = std::numeric_limits<float>::quiet_NaN();      // default: 0.0
+    float verb_to_verb = std::numeric_limits<float>::quiet_NaN();  // default: 0.8
+    float verb_to_noun = std::numeric_limits<float>::quiet_NaN();  // default: 0.2
+    float verb_to_aux = std::numeric_limits<float>::quiet_NaN();   // default: 0.0
 
     // Adjective connections
-    float adj_to_aux = std::numeric_limits<float>::quiet_NaN();       // default: 0.5
-    float adj_to_verb = std::numeric_limits<float>::quiet_NaN();      // default: 0.5
-    float adj_to_adj = std::numeric_limits<float>::quiet_NaN();       // default: 0.8
+    float adj_to_aux = std::numeric_limits<float>::quiet_NaN();   // default: 0.5
+    float adj_to_verb = std::numeric_limits<float>::quiet_NaN();  // default: 0.5
+    float adj_to_adj = std::numeric_limits<float>::quiet_NaN();   // default: 0.8
 
     // Particle connections
-    float part_to_verb = std::numeric_limits<float>::quiet_NaN();     // default: 0.2
-    float part_to_noun = std::numeric_limits<float>::quiet_NaN();     // default: 0.0
+    float part_to_verb = std::numeric_limits<float>::quiet_NaN();  // default: 0.2
+    float part_to_noun = std::numeric_limits<float>::quiet_NaN();  // default: 0.0
 
     // Auxiliary connections
-    float aux_to_part = std::numeric_limits<float>::quiet_NaN();      // default: 0.0
-    float aux_to_aux = std::numeric_limits<float>::quiet_NaN();       // default: 0.3
+    float aux_to_part = std::numeric_limits<float>::quiet_NaN();  // default: 0.0
+    float aux_to_aux = std::numeric_limits<float>::quiet_NaN();   // default: 0.3
   } bigram;
 
   // Candidate generation options (join/split costs)
@@ -117,8 +117,7 @@ class Scorer : public IScorer {
    * @param next Next edge
    * @return Connection cost
    */
-  float connectionCost(const core::LatticeEdge& prev,
-                       const core::LatticeEdge& next) const override;
+  float connectionCost(const core::LatticeEdge& prev, const core::LatticeEdge& next) const override;
 
   /**
    * @brief Get POS prior
@@ -145,7 +144,6 @@ class Scorer : public IScorer {
    * Uses BigramOverrides if set, otherwise falls back to default table
    */
   float bigramCost(core::PartOfSpeech prev, core::PartOfSpeech next) const;
-
 };
 
 }  // namespace suzume::analysis

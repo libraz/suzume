@@ -1,11 +1,10 @@
-#include "interactive.h"
-
 #include <iomanip>
 #include <iostream>
 #include <regex>
 
 #include "cli_common.h"
 #include "dict_compiler.h"
+#include "interactive.h"
 #include "interactive_utils.h"
 #include "suzume.h"
 
@@ -48,21 +47,18 @@ bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
   // Check for existing entry with same surface and POS in current file
   for (const auto& existing : entries_) {
     if (existing.surface == entry.surface && existing.pos == entry.pos) {
-      printError("Entry already exists: " + entry.surface + " (" +
-                 std::string(core::posToString(entry.pos)) + ")");
+      printError("Entry already exists: " + entry.surface + " (" + std::string(core::posToString(entry.pos)) + ")");
       return true;
     }
     if (existing.surface == entry.surface && existing.pos != entry.pos) {
-      std::cout << "Note: Entry " << entry.surface << " ("
-                << core::posToString(existing.pos)
+      std::cout << "Note: Entry " << entry.surface << " (" << core::posToString(existing.pos)
                 << ") exists with different POS\n";
     }
   }
 
   // Check Layer 1 (hardcoded) for same surface+POS
   if (existsInOtherLayers(entry.surface, entry.pos)) {
-    std::cout << "Note: \"" << entry.surface
-              << "\" exists in Layer 1 (hardcoded)\n";
+    std::cout << "Note: \"" << entry.surface << "\" exists in Layer 1 (hardcoded)\n";
   }
 
   // Check if the word is already analyzed correctly without adding to dictionary
@@ -72,10 +68,8 @@ bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
 
   if (morphemes.size() == 1 && morphemes[0].surface == entry.surface) {
     // Already recognized as single token with correct surface
-    std::cout << "Warning: \"" << entry.surface
-              << "\" is already analyzed correctly as single token.\n";
-    std::cout << "  Current analysis: " << morphemes[0].surface << " ["
-              << core::posToString(morphemes[0].pos) << "]\n";
+    std::cout << "Warning: \"" << entry.surface << "\" is already analyzed correctly as single token.\n";
+    std::cout << "  Current analysis: " << morphemes[0].surface << " [" << core::posToString(morphemes[0].pos) << "]\n";
 
     // Check if POS also matches
     if (morphemes[0].pos == entry.pos) {
@@ -107,8 +101,7 @@ bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
 
   entries_.push_back(entry);
   modified_ = true;
-  std::cout << "Added: " << entry.surface << " ("
-            << core::posToString(entry.pos) << ")\n";
+  std::cout << "Added: " << entry.surface << " (" << core::posToString(entry.pos) << ")\n";
 
   return true;
 }
@@ -140,8 +133,7 @@ bool InteractiveSession::cmdRemove(const std::vector<std::string>& args) {
     }
 
     if (match) {
-      std::cout << "Removed: " << iter->surface << " ("
-                << core::posToString(iter->pos) << ")\n";
+      std::cout << "Removed: " << iter->surface << " (" << core::posToString(iter->pos) << ")\n";
       iter = entries_.erase(iter);
       ++removed;
       modified_ = true;
@@ -216,7 +208,10 @@ bool InteractiveSession::cmdList(const std::vector<std::string>& args) {
     } else if (arg.substr(0, 10) == "--pattern=") {
       pattern = arg.substr(10);
     } else if (arg.substr(0, 8) == "--limit=") {
-      limit = std::stoul(arg.substr(8));
+      if (!parseSizeOption(arg.substr(8), &limit)) {
+        printError("Invalid limit: " + arg.substr(8));
+        return true;
+      }
     }
   }
 
@@ -229,9 +224,8 @@ bool InteractiveSession::cmdList(const std::vector<std::string>& args) {
         regex_str += ".*";
       } else if (chr == '?') {
         regex_str += ".";
-      } else if (chr == '.' || chr == '^' || chr == '$' || chr == '+' ||
-                 chr == '(' || chr == ')' || chr == '[' || chr == ']' ||
-                 chr == '|' || chr == '\\') {
+      } else if (chr == '.' || chr == '^' || chr == '$' || chr == '+' || chr == '(' || chr == ')' || chr == '[' ||
+                 chr == ']' || chr == '|' || chr == '\\') {
         regex_str += '\\';
         regex_str += chr;
       } else {
@@ -244,8 +238,7 @@ bool InteractiveSession::cmdList(const std::vector<std::string>& args) {
   size_t count = 0;
   for (const auto& entry : entries_) {
     // Apply POS filter
-    if (!pos_filter.empty() &&
-        toUpper(std::string(core::posToString(entry.pos))) != pos_filter) {
+    if (!pos_filter.empty() && toUpper(std::string(core::posToString(entry.pos))) != pos_filter) {
       continue;
     }
 
@@ -287,9 +280,8 @@ bool InteractiveSession::cmdSearch(const std::vector<std::string>& args) {
       regex_str += ".*";
     } else if (chr == '?') {
       regex_str += ".";
-    } else if (chr == '.' || chr == '^' || chr == '$' || chr == '+' ||
-               chr == '(' || chr == ')' || chr == '[' || chr == ']' ||
-               chr == '|' || chr == '\\') {
+    } else if (chr == '.' || chr == '^' || chr == '$' || chr == '+' || chr == '(' || chr == ')' || chr == '[' ||
+               chr == ']' || chr == '|' || chr == '\\') {
       regex_str += '\\';
       regex_str += chr;
     } else {
@@ -311,8 +303,7 @@ bool InteractiveSession::cmdSearch(const std::vector<std::string>& args) {
   return true;
 }
 
-bool InteractiveSession::cmdValidate(
-    const std::vector<std::string>& /* args */) {
+bool InteractiveSession::cmdValidate(const std::vector<std::string>& /* args */) {
   TsvParser parser;
   std::vector<std::string> issues;
   size_t issue_count = suzume::cli::TsvParser::validate(entries_, &issues);
@@ -323,8 +314,7 @@ bool InteractiveSession::cmdValidate(
     for (const auto& issue : issues) {
       printWarning(issue);
     }
-    std::cout << "Found " << issue_count << " issues in " << entries_.size()
-              << " entries\n";
+    std::cout << "Found " << issue_count << " issues in " << entries_.size() << " entries\n";
   }
 
   return true;
@@ -342,8 +332,7 @@ bool InteractiveSession::cmdCompile(const std::vector<std::string>& args) {
       printError("Failed to save before compile: " + last_error_);
       return true;
     }
-    std::cout << "Saved " << entries_.size() << " entries to " << tsv_path_
-              << "\n";
+    std::cout << "Saved " << entries_.size() << " entries to " << tsv_path_ << "\n";
   }
 
   const std::string& output_path = args[0];
@@ -355,8 +344,7 @@ bool InteractiveSession::cmdCompile(const std::vector<std::string>& args) {
     return true;
   }
 
-  std::cout << "Compiled " << result.value() << " entries to " << output_path
-            << "\n";
+  std::cout << "Compiled " << result.value() << " entries to " << output_path << "\n";
   return true;
 }
 
@@ -382,8 +370,7 @@ bool InteractiveSession::cmdAnalyze(const std::vector<std::string>& args) {
   auto morphemes = analyzer.analyze(text);
 
   for (const auto& morpheme : morphemes) {
-    std::cout << morpheme.surface << "\t" << core::posToString(morpheme.pos)
-              << "\t" << morpheme.lemma << "\n";
+    std::cout << morpheme.surface << "\t" << core::posToString(morpheme.pos) << "\t" << morpheme.lemma << "\n";
   }
 
   return true;
@@ -395,8 +382,7 @@ bool InteractiveSession::cmdSave(const std::vector<std::string>& /* args */) {
     return true;
   }
 
-  std::cout << "Saved " << entries_.size() << " entries to " << tsv_path_
-            << "\n";
+  std::cout << "Saved " << entries_.size() << " entries to " << tsv_path_ << "\n";
   return true;
 }
 
@@ -469,8 +455,7 @@ bool InteractiveSession::cmdFind(const std::vector<std::string>& args) {
   if (results.empty()) {
     std::cout << "No entries found for \"" << surface << "\"\n";
   } else {
-    std::cout << "Found " << results.size() << " entries for \"" << surface
-              << "\":\n";
+    std::cout << "Found " << results.size() << " entries for \"" << surface << "\":\n";
     for (const auto& entry : results) {
       printLayeredEntry(entry);
     }
@@ -486,8 +471,7 @@ bool InteractiveSession::cmdStats(const std::vector<std::string>& /* args */) {
   auto layer1_counts = countByPos(layer1_cache_);
   std::cout << "Layer 1 (hardcoded): " << layer1_cache_.size() << " entries\n";
   for (const auto& [pos, count] : layer1_counts) {
-    std::cout << "  " << std::setw(12) << std::left << core::posToString(pos)
-              << ": " << count << "\n";
+    std::cout << "  " << std::setw(12) << std::left << core::posToString(pos) << ": " << count << "\n";
   }
 
   // Current working file stats
@@ -508,12 +492,10 @@ bool InteractiveSession::cmdStats(const std::vector<std::string>& /* args */) {
     working_counts[entry.pos]++;
   }
   for (const auto& [pos, count] : working_counts) {
-    std::cout << "  " << std::setw(12) << std::left << core::posToString(pos)
-              << ": " << count << "\n";
+    std::cout << "  " << std::setw(12) << std::left << core::posToString(pos) << ": " << count << "\n";
   }
 
-  std::cout << "\nTotal: " << (layer1_cache_.size() + entries_.size())
-            << " entries\n\n";
+  std::cout << "\nTotal: " << (layer1_cache_.size() + entries_.size()) << " entries\n\n";
 
   return true;
 }
@@ -588,15 +570,13 @@ bool InteractiveSession::cmdImport(const std::vector<std::string>& args) {
   size_t skipped_dup = 0;
   size_t skipped_layer1 = 0;
 
-  std::cout << "Importing " << import_entries.size() << " entries from "
-            << import_path << "...\n";
+  std::cout << "Importing " << import_entries.size() << " entries from " << import_path << "...\n";
 
   for (const auto& import_entry : import_entries) {
     // Check for duplicates in current file
     bool exists_current = false;
     for (const auto& existing : entries_) {
-      if (existing.surface == import_entry.surface &&
-          existing.pos == import_entry.pos) {
+      if (existing.surface == import_entry.surface && existing.pos == import_entry.pos) {
         exists_current = true;
         break;
       }
@@ -607,8 +587,8 @@ bool InteractiveSession::cmdImport(const std::vector<std::string>& args) {
         ++skipped_dup;
         continue;
       }
-      std::cout << "  Skipped (duplicate): " << import_entry.surface << " ("
-                << core::posToString(import_entry.pos) << ")\n";
+      std::cout << "  Skipped (duplicate): " << import_entry.surface << " (" << core::posToString(import_entry.pos)
+                << ")\n";
       ++skipped_dup;
       continue;
     }
@@ -619,8 +599,7 @@ bool InteractiveSession::cmdImport(const std::vector<std::string>& args) {
         ++skipped_layer1;
         continue;
       }
-      std::cout << "  Note: " << import_entry.surface
-                << " exists in Layer 1 (hardcoded)\n";
+      std::cout << "  Note: " << import_entry.surface << " exists in Layer 1 (hardcoded)\n";
     }
 
     entries_.push_back(import_entry);

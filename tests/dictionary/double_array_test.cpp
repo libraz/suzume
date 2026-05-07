@@ -130,11 +130,11 @@ TEST_F(DoubleArrayTest, CommonPrefixSearchNoMatch) {
 
 TEST_F(DoubleArrayTest, JapaneseText) {
   std::vector<std::string> keys = {
-      "あ",        // Hiragana A
-      "あい",      // Hiragana AI
-      "東",        // Kanji East
-      "東京",      // Tokyo
-      "東京都",    // Tokyo Metropolis
+      "あ",      // Hiragana A
+      "あい",    // Hiragana AI
+      "東",      // Kanji East
+      "東京",    // Tokyo
+      "東京都",  // Tokyo Metropolis
   };
   std::vector<uint32_t> values = {1, 2, 3, 4, 5};
 
@@ -156,8 +156,7 @@ TEST_F(DoubleArrayTest, JapaneseText) {
 
   // Test exact match
   for (size_t idx = 0; idx < sorted_keys.size(); ++idx) {
-    EXPECT_EQ(trie_.exactMatch(sorted_keys[idx]),
-              static_cast<int32_t>(sorted_values[idx]));
+    EXPECT_EQ(trie_.exactMatch(sorted_keys[idx]), static_cast<int32_t>(sorted_values[idx]));
   }
 
   // Test common prefix search

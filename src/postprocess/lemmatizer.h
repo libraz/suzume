@@ -54,9 +54,7 @@ class Lemmatizer {
    * @param next_lemma Optional: lemma of the next morpheme (for context-dependent forms)
    * @return Detected conjugation form
    */
-  static grammar::ConjForm detectConjForm(std::string_view surface,
-                                          std::string_view lemma,
-                                          core::PartOfSpeech pos,
+  static grammar::ConjForm detectConjForm(std::string_view surface, std::string_view lemma, core::PartOfSpeech pos,
                                           std::string_view next_lemma = "");
 
  private:
@@ -71,17 +69,15 @@ class Lemmatizer {
    * @param pos Optional POS to filter candidates (Adjective filters to IAdjective only)
    * @param conj_type Optional conjugation type hint to prefer matching candidates
    */
-  std::string lemmatizeByGrammar(std::string_view surface,
-                                  core::PartOfSpeech pos = core::PartOfSpeech::Other,
-                                  dictionary::ConjugationType conj_type = dictionary::ConjugationType::None) const;
+  std::string lemmatizeByGrammar(std::string_view surface, core::PartOfSpeech pos = core::PartOfSpeech::Other,
+                                 dictionary::ConjugationType conj_type = dictionary::ConjugationType::None) const;
 
   /**
    * @brief Verify candidate base form against dictionary
    * @param candidate Inflection candidate to verify
    * @return true if candidate matches dictionary entry with correct conj_type
    */
-  bool verifyCandidateWithDictionary(
-      const grammar::InflectionCandidate& candidate) const;
+  bool verifyCandidateWithDictionary(const grammar::InflectionCandidate& candidate) const;
 
   /**
    * @brief Check if string ends with suffix

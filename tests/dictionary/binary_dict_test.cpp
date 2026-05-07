@@ -1,12 +1,14 @@
 #include "dictionary/binary_dict.h"
-#include "dictionary/dictionary.h"
 
 #include <gtest/gtest.h>
 
 #include <algorithm>
 #include <cstdio>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
+
+#include "dictionary/dictionary.h"
 
 namespace suzume {
 namespace dictionary {
@@ -26,6 +28,18 @@ class BinaryDictTest : public ::testing::Test {
 
   std::filesystem::path temp_file_;
 };
+
+// Helper to build a simple binary dictionary in memory
+std::vector<uint8_t> buildTestDict(const std::string& surface, core::PartOfSpeech pos) {
+  BinaryDictWriter writer;
+  DictionaryEntry entry;
+  entry.surface = surface;
+  entry.lemma = surface;
+  entry.pos = pos;
+  writer.addEntry(entry);
+  auto result = writer.build();
+  return result.value();
+}
 
 TEST_F(BinaryDictTest, WriteAndLoadEmpty) {
   BinaryDictWriter writer;
@@ -97,8 +111,7 @@ TEST_F(BinaryDictTest, WriteAndLoadMultipleEntries) {
 
   // Load from memory
   BinaryDictionary dict;
-  auto load_result = dict.loadFromMemory(build_result.value().data(),
-                                          build_result.value().size());
+  auto load_result = dict.loadFromMemory(build_result.value().data(), build_result.value().size());
   ASSERT_TRUE(load_result.hasValue());
   EXPECT_EQ(load_result.value(), 3u);
 
@@ -140,8 +153,7 @@ TEST_F(BinaryDictTest, WriteAndLoadJapanese) {
   ASSERT_TRUE(build_result.hasValue());
 
   BinaryDictionary dict;
-  auto load_result = dict.loadFromMemory(build_result.value().data(),
-                                          build_result.value().size());
+  auto load_result = dict.loadFromMemory(build_result.value().data(), build_result.value().size());
   ASSERT_TRUE(load_result.hasValue());
 
   // Lookup from different position
@@ -197,6 +209,70 @@ TEST_F(BinaryDictTest, LoadInvalidData) {
   bad_magic[0] = 'X';
   auto result2 = dict.loadFromMemory(bad_magic.data(), bad_magic.size());
   EXPECT_FALSE(result2.hasValue());
+}
+
+TEST_F(BinaryDictTest, LoadRejectsTruncatedEntryTable) {
+  auto data = buildTestDict("test", core::PartOfSpeech::Noun);
+  auto* header = reinterpret_cast<BinaryDictHeader*>(data.data());
+  header->entry_count += 100;
+
+  BinaryDictionary dict;
+  auto result = dict.loadFromMemory(data.data(), data.size());
+  EXPECT_FALSE(result.hasValue());
+}
+
+TEST_F(BinaryDictTest, LoadRejectsOutOfRangeStringReference) {
+  auto data = buildTestDict("test", core::PartOfSpeech::Noun);
+  const auto* header = reinterpret_cast<const BinaryDictHeader*>(data.data());
+  auto* entry = reinterpret_cast<BinaryDictEntry*>(data.data() + header->entry_offset);
+  entry->surface_offset = static_cast<uint32_t>(data.size());
+
+  BinaryDictionary dict;
+  auto result = dict.loadFromMemory(data.data(), data.size());
+  EXPECT_FALSE(result.hasValue());
+}
+
+TEST_F(BinaryDictTest, LoadRejectsUnsupportedMinorVersion) {
+  auto data = buildTestDict("test", core::PartOfSpeech::Noun);
+  auto* header = reinterpret_cast<BinaryDictHeader*>(data.data());
+  header->version_minor = BinaryDictHeader::kVersionMinor + 1;
+
+  BinaryDictionary dict;
+  auto result = dict.loadFromMemory(data.data(), data.size());
+  EXPECT_FALSE(result.hasValue());
+}
+
+TEST_F(BinaryDictTest, LoadRejectsOverlappingSections) {
+  auto data = buildTestDict("test", core::PartOfSpeech::Noun);
+  auto* header = reinterpret_cast<BinaryDictHeader*>(data.data());
+  header->entry_offset = header->trie_offset;
+
+  BinaryDictionary dict;
+  auto result = dict.loadFromMemory(data.data(), data.size());
+  EXPECT_FALSE(result.hasValue());
+}
+
+TEST_F(BinaryDictTest, BuildRejectsTooLongSurfaceOrLemma) {
+  BinaryDictWriter writer;
+
+  DictionaryEntry long_surface;
+  long_surface.surface = std::string(256, 'a');
+  long_surface.lemma = long_surface.surface;
+  long_surface.pos = core::PartOfSpeech::Noun;
+  writer.addEntry(long_surface);
+
+  auto surface_result = writer.build();
+  EXPECT_FALSE(surface_result.hasValue());
+
+  BinaryDictWriter lemma_writer;
+  DictionaryEntry long_lemma;
+  long_lemma.surface = "short";
+  long_lemma.lemma = std::string(256, 'b');
+  long_lemma.pos = core::PartOfSpeech::Noun;
+  lemma_writer.addEntry(long_lemma);
+
+  auto lemma_result = lemma_writer.build();
+  EXPECT_FALSE(lemma_result.hasValue());
 }
 
 TEST_F(BinaryDictTest, LemmaHandling) {
@@ -327,27 +403,13 @@ TEST_F(BinaryDictTest, LookupOutOfBounds) {
   EXPECT_TRUE(results.empty());
 }
 
-// Helper to build a simple binary dictionary in memory
-std::vector<uint8_t> buildTestDict(const std::string& surface,
-                                   core::PartOfSpeech pos) {
-  BinaryDictWriter writer;
-  DictionaryEntry entry;
-  entry.surface = surface;
-  entry.lemma = surface;
-  entry.pos = pos;
-  writer.addEntry(entry);
-  auto result = writer.build();
-  return result.value();
-}
-
 TEST_F(BinaryDictTest, DictionaryManagerLoadUserBinaryDictionaryFromMemory) {
   auto dict_data = buildTestDict("りんご", core::PartOfSpeech::Noun);
 
   DictionaryManager manager;
   EXPECT_FALSE(manager.hasUserBinaryDictionary());
 
-  bool loaded = manager.loadUserBinaryDictionaryFromMemory(dict_data.data(),
-                                                           dict_data.size());
+  bool loaded = manager.loadUserBinaryDictionaryFromMemory(dict_data.data(), dict_data.size());
   EXPECT_TRUE(loaded);
   EXPECT_TRUE(manager.hasUserBinaryDictionary());
 
@@ -367,8 +429,7 @@ TEST_F(BinaryDictTest, DictionaryManagerLoadFromMemoryInvalidData) {
   std::vector<uint8_t> bad_data(10, 0);
 
   DictionaryManager manager;
-  EXPECT_FALSE(manager.loadUserBinaryDictionaryFromMemory(bad_data.data(),
-                                                          bad_data.size()));
+  EXPECT_FALSE(manager.loadUserBinaryDictionaryFromMemory(bad_data.data(), bad_data.size()));
   EXPECT_FALSE(manager.hasUserBinaryDictionary());
 }
 

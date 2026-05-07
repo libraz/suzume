@@ -13,8 +13,8 @@ namespace suzume::test {
 // Expected morpheme in a test case
 struct ExpectedMorpheme {
   std::string surface;
-  std::string pos;      // String representation of POS (e.g., "Noun", "Verb")
-  std::string lemma;    // Optional: empty if not checked
+  std::string pos;    // String representation of POS (e.g., "Noun", "Verb")
+  std::string lemma;  // Optional: empty if not checked
 
   // Convert string POS to PartOfSpeech enum
   core::PartOfSpeech posEnum() const;
@@ -28,13 +28,13 @@ struct AcceptedDiff {
 
 // A single test case
 struct TestCase {
-  std::string id;                           // Unique identifier
-  std::string input;                        // Input text to analyze
-  std::vector<ExpectedMorpheme> expected;   // Expected morphemes (MeCab-compatible)
+  std::string id;                                 // Unique identifier
+  std::string input;                              // Input text to analyze
+  std::vector<ExpectedMorpheme> expected;         // Expected morphemes (MeCab-compatible)
   std::vector<ExpectedMorpheme> suzume_expected;  // Suzume's expected output (if different)
-  AcceptedDiff accepted_diff;               // Reason for accepted difference
-  std::vector<std::string> tags;            // Tags for filtering (e.g., "verb", "basic")
-  std::string description;                  // Optional description
+  AcceptedDiff accepted_diff;                     // Reason for accepted difference
+  std::vector<std::string> tags;                  // Tags for filtering (e.g., "verb", "basic")
+  std::string description;                        // Optional description
 
   // Check if this test case has a specific tag
   bool hasTag(const std::string& tag) const;
@@ -46,9 +46,7 @@ struct TestCase {
   }
 
   // Check if this test case has an accepted difference
-  bool hasAcceptedDiff() const {
-    return !suzume_expected.empty();
-  }
+  bool hasAcceptedDiff() const { return !suzume_expected.empty(); }
 };
 
 // Collection of test cases

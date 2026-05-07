@@ -42,16 +42,14 @@ class TsvParser {
    * @param path File path
    * @return Entries on success, error on failure
    */
-  core::Expected<std::vector<TsvEntry>, core::Error> parseFile(
-      const std::string& path);
+  core::Expected<std::vector<TsvEntry>, core::Error> parseFile(const std::string& path);
 
   /**
    * @brief Parse TSV string
    * @param content TSV content
    * @return Entries on success, error on failure
    */
-  core::Expected<std::vector<TsvEntry>, core::Error> parseString(
-      std::string_view content);
+  core::Expected<std::vector<TsvEntry>, core::Error> parseString(std::string_view content);
 
   /**
    * @brief Parse single TSV line
@@ -92,8 +90,7 @@ class TsvParser {
  * @param entries Entries to write
  * @return Number of entries written, or error
  */
-core::Expected<size_t, core::Error> writeTsvFile(
-    const std::string& path, const std::vector<TsvEntry>& entries);
+core::Expected<size_t, core::Error> writeTsvFile(const std::string& path, const std::vector<TsvEntry>& entries);
 
 /**
  * @brief Convert TsvEntry to DictionaryEntry

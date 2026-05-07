@@ -32,7 +32,9 @@ namespace {
 
 }  // namespace
 
-CoreDictionary::CoreDictionary() { initializeEntries(); }
+CoreDictionary::CoreDictionary() {
+  initializeEntries();
+}
 
 void CoreDictionary::initializeEntries() {
   // ==========================================================================
@@ -54,10 +56,8 @@ void CoreDictionary::initializeEntries() {
   auto interjections = entries::getInterjectionEntries();
 
   // Reserve space
-  entries_.reserve(particles.size() + compound_particles.size() +
-                   auxiliaries.size() + conjunctions.size() +
-                   determiners.size() + pronouns.size() + formal_nouns.size() +
-                   interjections.size());
+  entries_.reserve(particles.size() + compound_particles.size() + auxiliaries.size() + conjunctions.size() +
+                   determiners.size() + pronouns.size() + formal_nouns.size() + interjections.size());
 
   // Collect entries (trie built after sorting)
   auto addEntries = [this](const std::vector<DictionaryEntry>& source) {
@@ -78,9 +78,7 @@ void CoreDictionary::initializeEntries() {
   // Sort entries by surface for Double-Array compatibility
   // Use stable_sort to preserve relative order of entries with same surface
   std::stable_sort(entries_.begin(), entries_.end(),
-                   [](const DictionaryEntry& lhs, const DictionaryEntry& rhs) {
-                     return lhs.surface < rhs.surface;
-                   });
+                   [](const DictionaryEntry& lhs, const DictionaryEntry& rhs) { return lhs.surface < rhs.surface; });
 
   // Build Double-Array trie
   buildTrie();
@@ -130,8 +128,7 @@ namespace {
 /**
  * @brief Count UTF-8 characters in a byte range
  */
-size_t countUtf8Chars(std::string_view text, size_t start_byte,
-                      size_t byte_length) {
+size_t countUtf8Chars(std::string_view text, size_t start_byte, size_t byte_length) {
   size_t char_count = 0;
   size_t end_byte = start_byte + byte_length;
 
@@ -148,8 +145,7 @@ size_t countUtf8Chars(std::string_view text, size_t start_byte,
 
 }  // namespace
 
-std::vector<LookupResult> CoreDictionary::lookup(std::string_view text,
-                                                 size_t start_pos) const {
+std::vector<LookupResult> CoreDictionary::lookup(std::string_view text, size_t start_pos) const {
   std::vector<LookupResult> results;
 
   if (entries_.empty() || start_pos >= text.size()) {
@@ -192,4 +188,4 @@ const DictionaryEntry* CoreDictionary::getEntry(uint32_t idx) const {
   return nullptr;
 }
 
-}  // namespace dictionary
+}  // namespace suzume::dictionary

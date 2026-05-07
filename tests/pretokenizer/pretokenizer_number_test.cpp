@@ -1,9 +1,9 @@
 
 // Pretokenizer tests for number patterns (date, currency, storage, version, percentage, time)
 
-#include "pretokenizer/pretokenizer.h"
-
 #include <gtest/gtest.h>
+
+#include "pretokenizer/pretokenizer.h"
 
 namespace suzume::pretokenizer {
 namespace {
@@ -55,8 +55,7 @@ TEST_F(PreTokenizerNumberTest, MatchDate_MonthDay) {
 }
 
 TEST_F(PreTokenizerNumberTest, MatchDate_MultipleInText) {
-  auto result =
-      pretokenizer_.process("2024年1月1日から2024年12月31日まで");
+  auto result = pretokenizer_.process("2024年1月1日から2024年12月31日まで");
   int date_count = 0;
   for (const auto& token : result.tokens) {
     if (token.type == PreTokenType::Date) {
@@ -120,8 +119,7 @@ TEST_F(PreTokenizerNumberTest, MatchCurrency_Large) {
 }
 
 TEST_F(PreTokenizerNumberTest, MatchCurrency_MultipleInText) {
-  auto result =
-      pretokenizer_.process("商品A: 1000円、商品B: 2000円");
+  auto result = pretokenizer_.process("商品A: 1000円、商品B: 2000円");
   int currency_count = 0;
   for (const auto& token : result.tokens) {
     if (token.type == PreTokenType::Currency) {
@@ -354,8 +352,7 @@ TEST_F(PreTokenizerNumberTest, MatchTime_InJapaneseText) {
 }
 
 TEST_F(PreTokenizerNumberTest, MatchTime_MultipleInText) {
-  auto result =
-      pretokenizer_.process("10時から12時まで");
+  auto result = pretokenizer_.process("10時から12時まで");
   int time_count = 0;
   for (const auto& token : result.tokens) {
     if (token.type == PreTokenType::Time) {

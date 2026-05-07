@@ -29,8 +29,7 @@ struct UnknownOptions;
  * @param end End index (exclusive)
  * @return UTF-8 encoded string
  */
-std::string extractSubstring(const std::vector<char32_t>& codepoints,
-                             size_t start, size_t end);
+std::string extractSubstring(const std::vector<char32_t>& codepoints, size_t start, size_t end);
 
 /**
  * @brief Suffix entry for kanji compounds
@@ -62,11 +61,9 @@ const std::vector<std::string_view>& getNaAdjSuffixes();
  * @param options Unknown word generation options
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateWithSuffix(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const UnknownOptions& options);
+std::vector<UnknownCandidate> generateWithSuffix(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                 const std::vector<normalize::CharType>& char_types,
+                                                 const UnknownOptions& options);
 
 /**
  * @brief Generate nominalized noun candidates
@@ -81,10 +78,9 @@ std::vector<UnknownCandidate> generateWithSuffix(
  * @param char_types Character types for each position
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateNominalizedNounCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types);
+std::vector<UnknownCandidate> generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints,
+                                                                size_t start_pos,
+                                                                const std::vector<normalize::CharType>& char_types);
 
 /**
  * @brief Generate kanji + hiragana compound noun candidates
@@ -103,9 +99,7 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(
  * @return Vector of candidates
  */
 std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
+    const std::vector<char32_t>& codepoints, size_t start_pos, const std::vector<normalize::CharType>& char_types,
     const dictionary::DictionaryManager* dict_manager = nullptr);
 
 /**
@@ -122,10 +116,9 @@ std::vector<UnknownCandidate> generateKanjiHiraganaCompoundCandidates(
  * @param char_types Character types for each position
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateProductiveSuffixCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types);
+std::vector<UnknownCandidate> generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
+                                                                 size_t start_pos,
+                                                                 const std::vector<normalize::CharType>& char_types);
 
 /**
  * @brief Generate がち suffix candidates for kanji+hiragana sequences
@@ -139,10 +132,8 @@ std::vector<UnknownCandidate> generateProductiveSuffixCandidates(
  * @param char_types Character types for each position
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateGachiSuffixCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types);
+std::vector<UnknownCandidate> generateGachiSuffixCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                            const std::vector<normalize::CharType>& char_types);
 
 /**
  * @brief Generate counter candidates for numeral + つ patterns
@@ -158,10 +149,8 @@ std::vector<UnknownCandidate> generateGachiSuffixCandidates(
  * @param char_types Character types for each position
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generateCounterCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types);
+std::vector<UnknownCandidate> generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                        const std::vector<normalize::CharType>& char_types);
 
 /**
  * @brief Generate prefix + single kanji compound candidates
@@ -178,10 +167,9 @@ std::vector<UnknownCandidate> generateCounterCandidates(
  * @param char_types Character types for each position
  * @return Vector of candidates
  */
-std::vector<UnknownCandidate> generatePrefixCompoundCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types);
+std::vector<UnknownCandidate> generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints,
+                                                               size_t start_pos,
+                                                               const std::vector<normalize::CharType>& char_types);
 
 /**
  * @brief Check if a codepoint is a prefix-like kanji

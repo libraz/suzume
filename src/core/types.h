@@ -11,21 +11,21 @@ namespace suzume::core {
  * @brief Part of speech types (minimal set for tag generation)
  */
 enum class PartOfSpeech : uint8_t {
-  Unknown,      // 不明
-  Noun,         // 名詞
-  Verb,         // 動詞
-  Adjective,    // 形容詞
-  Adverb,       // 副詞
-  Particle,     // 助詞
-  Auxiliary,    // 助動詞
-  Conjunction,  // 接続詞
-  Determiner,   // 連体詞
-  Pronoun,      // 代名詞
-  Prefix,       // 接頭辞
-  Suffix,       // 接尾辞
-  Interjection, // 感動詞
-  Symbol,       // 記号
-  Other         // その他
+  Unknown,       // 不明
+  Noun,          // 名詞
+  Verb,          // 動詞
+  Adjective,     // 形容詞
+  Adverb,        // 副詞
+  Particle,      // 助詞
+  Auxiliary,     // 助動詞
+  Conjunction,   // 接続詞
+  Determiner,    // 連体詞
+  Pronoun,       // 代名詞
+  Prefix,        // 接頭辞
+  Suffix,        // 接尾辞
+  Interjection,  // 感動詞
+  Symbol,        // 記号
+  Other          // その他
 };
 
 /**
@@ -53,46 +53,46 @@ enum class ExtendedPOS : uint8_t {
   // =========================================================================
   // Verb forms (1-10) - by conjugation form (活用形)
   // =========================================================================
-  VerbShuushikei,   // 終止形: dictionary form (食べる, 書く)
-  VerbRenyokei,     // 連用形: continuative form (食べ, 書き)
-  VerbMizenkei,     // 未然形: irrealis form (食べ-, 書か-)
-  VerbOnbinkei,     // 音便形: euphonic change form (書い-, 泳い-)
-  VerbTeForm,       // て形: te-form (食べて, 書いて)
-  VerbKateikei,     // 仮定形: conditional form (食べれば, 書けば)
-  VerbMeireikei,    // 命令形: imperative form (食べろ, 書け)
-  VerbRentaikei,    // 連体形: attributive form (same as shuushi for modern Japanese)
-  VerbTaForm,       // た形: past form (食べた, 書いた) - for unified past verbs
-  VerbTaraForm,     // たら形: conditional past form (食べたら, 書いたら)
+  VerbShuushikei,  // 終止形: dictionary form (食べる, 書く)
+  VerbRenyokei,    // 連用形: continuative form (食べ, 書き)
+  VerbMizenkei,    // 未然形: irrealis form (食べ-, 書か-)
+  VerbOnbinkei,    // 音便形: euphonic change form (書い-, 泳い-)
+  VerbTeForm,      // て形: te-form (食べて, 書いて)
+  VerbKateikei,    // 仮定形: conditional form (食べれば, 書けば)
+  VerbMeireikei,   // 命令形: imperative form (食べろ, 書け)
+  VerbRentaikei,   // 連体形: attributive form (same as shuushi for modern Japanese)
+  VerbTaForm,      // た形: past form (食べた, 書いた) - for unified past verbs
+  VerbTaraForm,    // たら形: conditional past form (食べたら, 書いたら)
 
   // =========================================================================
   // Adjective forms (11-20) - by conjugation form
   // =========================================================================
-  AdjBasic,         // 終止形: basic form (美しい, 高い)
-  AdjRenyokei,      // 連用形(く): adverbial form (美しく, 高く)
-  AdjStem,          // 語幹: stem for ガル接続 (美しー, 高ー)
-  AdjKatt,          // かっ形: past stem (美しかっ-, 高かっ-)
-  AdjKeForm,        // け形: conditional stem (美しけれ-, 高けれ-)
-  AdjNaAdj,         // ナ形容詞: na-adjective stem (静か, 綺麗)
+  AdjBasic,     // 終止形: basic form (美しい, 高い)
+  AdjRenyokei,  // 連用形(く): adverbial form (美しく, 高く)
+  AdjStem,      // 語幹: stem for ガル接続 (美しー, 高ー)
+  AdjKatt,      // かっ形: past stem (美しかっ-, 高かっ-)
+  AdjKeForm,    // け形: conditional stem (美しけれ-, 高けれ-)
+  AdjNaAdj,     // ナ形容詞: na-adjective stem (静か, 綺麗)
 
   // =========================================================================
   // Auxiliaries (21-40) - by function (機能別)
   // =========================================================================
   // Tense auxiliaries
-  AuxTenseTa,       // 過去: た、だ
-  AuxTenseMasu,     // 丁寧: ます、まし、ませ
+  AuxTenseTa,    // 過去: た、だ
+  AuxTenseMasu,  // 丁寧: ます、まし、ませ
 
   // Negation auxiliaries
-  AuxNegativeNai,   // 否定: ない、なかっ (adjective-like conjugation)
-  AuxNegativeNu,    // 否定(古語): ぬ、ん
+  AuxNegativeNai,  // 否定: ない、なかっ (adjective-like conjugation)
+  AuxNegativeNu,   // 否定(古語): ぬ、ん
 
   // Desire/Volition auxiliaries
-  AuxDesireTai,     // 願望: たい、たかっ (adjective-like)
-  AuxVolitional,    // 意志/推量: う、よう
+  AuxDesireTai,   // 願望: たい、たかっ (adjective-like)
+  AuxVolitional,  // 意志/推量: う、よう
 
   // Voice auxiliaries
-  AuxPassive,       // 受身: れる、られる、られ
-  AuxCausative,     // 使役: せる、させる、させ
-  AuxPotential,     // 可能: れる、られる (context-dependent)
+  AuxPassive,    // 受身: れる、られる、られ
+  AuxCausative,  // 使役: せる、させる、させ
+  AuxPotential,  // 可能: れる、られる (context-dependent)
 
   // Aspect auxiliaries
   AuxAspectIru,     // 継続: いる、い、おる
@@ -103,48 +103,48 @@ enum class ExtendedPOS : uint8_t {
   AuxAspectKuru,    // 接近: くる
 
   // Appearance/Conjecture auxiliaries
-  AuxAppearanceSou, // 様態: そう (after renyokei/stem)
-  AuxConjectureRashii, // 推定: らしい
-  AuxConjectureMitai,  // 推定: みたい
+  AuxAppearanceSou,     // 様態: そう (after renyokei/stem)
+  AuxConjectureRashii,  // 推定: らしい
+  AuxConjectureMitai,   // 推定: みたい
 
   // Copula auxiliaries
-  AuxCopulaDa,      // 断定: だ、で、な、なら
-  AuxCopulaDesu,    // 丁寧断定: です、でし
+  AuxCopulaDa,    // 断定: だ、で、な、なら
+  AuxCopulaDesu,  // 丁寧断定: です、でし
 
   // Other auxiliaries
-  AuxHonorific,     // 尊敬: れる、られる (honorific use)
-  AuxGozaru,        // 丁重: ござる、ございます
-  AuxExcessive,     // 過度: すぎる (excessive degree)
-  AuxGaru,          // ガル接続: がる (adjective stem → verb)
+  AuxHonorific,  // 尊敬: れる、られる (honorific use)
+  AuxGozaru,     // 丁重: ござる、ございます
+  AuxExcessive,  // 過度: すぎる (excessive degree)
+  AuxGaru,       // ガル接続: がる (adjective stem → verb)
 
   // =========================================================================
   // Particles (41-50) - by grammatical role
   // =========================================================================
-  ParticleCase,     // 格助詞: が、を、に、で、へ、と、から、まで、より
-  ParticleTopic,    // 係助詞: は、も
-  ParticleFinal,    // 終助詞: ね、よ、わ、な、か、さ
-  ParticleConj,     // 接続助詞: て、で、ば、ながら、たり、から、けど
-  ParticleQuote,    // 引用助詞: と（引用）
-  ParticleAdverbial,// 副助詞: ばかり、だけ、ほど、しか、など、まで
-  ParticleNo,       // 準体助詞: の (nominalizer)
-  ParticleBinding,  // 係結び: こそ、さえ、すら
+  ParticleCase,       // 格助詞: が、を、に、で、へ、と、から、まで、より
+  ParticleTopic,      // 係助詞: は、も
+  ParticleFinal,      // 終助詞: ね、よ、わ、な、か、さ
+  ParticleConj,       // 接続助詞: て、で、ば、ながら、たり、から、けど
+  ParticleQuote,      // 引用助詞: と（引用）
+  ParticleAdverbial,  // 副助詞: ばかり、だけ、ほど、しか、など、まで
+  ParticleNo,         // 準体助詞: の (nominalizer)
+  ParticleBinding,    // 係結び: こそ、さえ、すら
 
   // =========================================================================
   // Nouns (51-55)
   // =========================================================================
-  Noun,             // 普通名詞: general nouns
-  NounFormal,       // 形式名詞: こと、もの、ところ、わけ
-  NounVerbal,       // 動詞連用形転成名詞: 読み、書き (nominalized verb)
-  NounProper,       // 固有名詞: proper nouns
-  NounProperFamily, // 固有名詞(姓): family names (優木, 田中)
-  NounProperGiven,  // 固有名詞(名): given names (せつ菜, 太郎)
-  NounNumber,       // 数詞: numbers
+  Noun,              // 普通名詞: general nouns
+  NounFormal,        // 形式名詞: こと、もの、ところ、わけ
+  NounVerbal,        // 動詞連用形転成名詞: 読み、書き (nominalized verb)
+  NounProper,        // 固有名詞: proper nouns
+  NounProperFamily,  // 固有名詞(姓): family names (優木, 田中)
+  NounProperGiven,   // 固有名詞(名): given names (せつ菜, 太郎)
+  NounNumber,        // 数詞: numbers
 
   // =========================================================================
   // Pronouns (56-58)
   // =========================================================================
-  Pronoun,          // 代名詞: 私、あなた、これ、それ
-  PronounInterrogative, // 疑問詞: 何、誰、どこ、いつ
+  Pronoun,               // 代名詞: 私、あなた、これ、それ
+  PronounInterrogative,  // 疑問詞: 何、誰、どこ、いつ
 
   // =========================================================================
   // Other categories (59-65)
@@ -160,7 +160,7 @@ enum class ExtendedPOS : uint8_t {
   Other,            // その他
 
   // Count marker (for array sizing)
-  Count_            // Total number of categories
+  Count_  // Total number of categories
 };
 
 /**
@@ -179,25 +179,25 @@ enum class AnalysisMode : uint8_t {
  */
 enum class CandidateOrigin : uint8_t {
   Unknown = 0,
-  Dictionary,          // 辞書からの直接候補
-  VerbKanji,           // 漢字+ひらがな動詞 (食べる)
-  VerbHiragana,        // ひらがな動詞 (いく, できる)
-  VerbKatakana,        // カタカナ動詞 (バズる)
-  VerbCompound,        // 複合動詞 (恐れ入る)
-  AdjectiveI,          // イ形容詞 (美しい)
-  AdjectiveIHiragana,  // ひらがなイ形容詞 (まずい)
-  AdjectiveNa,         // ナ形容詞・的形容詞 (理性的)
-  NominalizedNoun,     // 連用形転成名詞 (手助け)
-  SuffixPattern,       // 接尾辞パターン (〜化, 〜性)
-  SameType,            // 同一文字種 (漢字列, カタカナ列)
-  Alphanumeric,        // 英数字
-  Onomatopoeia,        // オノマトペ (わくわく)
-  CharacterSpeech,     // キャラ語尾 (ナリ, ござる)
-  Split,               // 分割候補 (NOUN+VERB)
-  Join,                // 結合候補 (複合動詞結合)
+  Dictionary,             // 辞書からの直接候補
+  VerbKanji,              // 漢字+ひらがな動詞 (食べる)
+  VerbHiragana,           // ひらがな動詞 (いく, できる)
+  VerbKatakana,           // カタカナ動詞 (バズる)
+  VerbCompound,           // 複合動詞 (恐れ入る)
+  AdjectiveI,             // イ形容詞 (美しい)
+  AdjectiveIHiragana,     // ひらがなイ形容詞 (まずい)
+  AdjectiveNa,            // ナ形容詞・的形容詞 (理性的)
+  NominalizedNoun,        // 連用形転成名詞 (手助け)
+  SuffixPattern,          // 接尾辞パターン (〜化, 〜性)
+  SameType,               // 同一文字種 (漢字列, カタカナ列)
+  Alphanumeric,           // 英数字
+  Onomatopoeia,           // オノマトペ (わくわく)
+  CharacterSpeech,        // キャラ語尾 (ナリ, ござる)
+  Split,                  // 分割候補 (NOUN+VERB)
+  Join,                   // 結合候補 (複合動詞結合)
   KanjiHiraganaCompound,  // 漢字+ひらがな複合名詞 (玉ねぎ)
-  Counter,             // 数量詞パターン (一つ〜九つ)
-  PrefixCompound,      // 接頭的複合語 (今日, 本日, 全国)
+  Counter,                // 数量詞パターン (一つ〜九つ)
+  PrefixCompound,         // 接頭的複合語 (今日, 本日, 全国)
 };
 
 /**

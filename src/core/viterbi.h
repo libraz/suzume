@@ -26,8 +26,8 @@ inline constexpr size_t kNumPosTypes = 15;  // Must match PartOfSpeech enum coun
  * @brief Viterbi result with path and cost
  */
 struct ViterbiResult {
-  std::vector<size_t> path;   // Edge IDs in order
-  float total_cost{0.0F};     // Total path cost
+  std::vector<size_t> path;  // Edge IDs in order
+  float total_cost{0.0F};    // Total path cost
 };
 
 /**
@@ -152,9 +152,8 @@ class Viterbi {
           size_t next_pos_idx = static_cast<size_t>(edge.pos);
 
           SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VITERBI] pos=" << pos << " \"" << edge.surface
-                      << "\" (" << posToString(edge.pos) << "/"
-                      << extendedPosToString(edge.extended_pos) << ")";
+            SUZUME_DEBUG_STREAM << "[VITERBI] pos=" << pos << " \"" << edge.surface << "\" (" << posToString(edge.pos)
+                                << "/" << extendedPosToString(edge.extended_pos) << ")";
 #ifdef SUZUME_DEBUG_INFO
             if (edge.origin != CandidateOrigin::Unknown) {
               SUZUME_DEBUG_STREAM << " [src:" << originToString(edge.origin);
@@ -164,9 +163,8 @@ class Viterbi {
               SUZUME_DEBUG_STREAM << "]";
             }
 #endif
-            SUZUME_DEBUG_STREAM << " from " << posToString(static_cast<PartOfSpeech>(pos_idx))
-                      << " word=" << word_cost << " conn=" << conn_cost
-                      << " total=" << total << "\n";
+            SUZUME_DEBUG_STREAM << " from " << posToString(static_cast<PartOfSpeech>(pos_idx)) << " word=" << word_cost
+                                << " conn=" << conn_cost << " total=" << total << "\n";
           }
 
           // Bounds check - skip edges that go beyond text length
@@ -231,9 +229,9 @@ class Viterbi {
       SUZUME_DEBUG_STREAM << "[VITERBI] Best path (cost=" << result.total_cost << "): ";
       for (size_t i = 0; i < result.path.size(); ++i) {
         const auto& edge = lattice.getEdge(result.path[i]);
-        if (i > 0) SUZUME_DEBUG_STREAM << " → ";
-        SUZUME_DEBUG_STREAM << "\"" << edge.surface << "\"("
-                            << posToString(edge.pos) << "/"
+        if (i > 0)
+          SUZUME_DEBUG_STREAM << " → ";
+        SUZUME_DEBUG_STREAM << "\"" << edge.surface << "\"(" << posToString(edge.pos) << "/"
                             << extendedPosToString(edge.extended_pos) << ")";
       }
       // Show margin over second-best if available
@@ -251,7 +249,8 @@ class Viterbi {
           size_t ru_pos_idx = second_final_pos_idx;
           while (ru_pos > 0) {
             const auto& state = states_by_pos[ru_pos][ru_pos_idx];
-            if (!state.valid || state.prev_edge < 0) break;
+            if (!state.valid || state.prev_edge < 0)
+              break;
             const auto& prev_edges = lattice.edgesAt(state.prev_pos);
             runner_up_path.push_back(prev_edges[static_cast<size_t>(state.prev_edge)].id);
             ru_pos = state.prev_pos;
@@ -263,9 +262,9 @@ class Viterbi {
             SUZUME_DEBUG_STREAM << "[VITERBI] Runner-up (cost=" << second_cost << "): ";
             for (size_t i = 0; i < runner_up_path.size(); ++i) {
               const auto& edge = lattice.getEdge(runner_up_path[i]);
-              if (i > 0) SUZUME_DEBUG_STREAM << " → ";
-              SUZUME_DEBUG_STREAM << "\"" << edge.surface << "\"("
-                                  << posToString(edge.pos) << ")";
+              if (i > 0)
+                SUZUME_DEBUG_STREAM << " → ";
+              SUZUME_DEBUG_STREAM << "\"" << edge.surface << "\"(" << posToString(edge.pos) << ")";
             }
             SUZUME_DEBUG_STREAM << "\n";
           }

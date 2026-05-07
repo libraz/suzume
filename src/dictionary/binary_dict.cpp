@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstring>
 #include <fstream>
+#include <limits>
 #include <unordered_map>
 
 #include "analysis/category_cost.h"
@@ -27,8 +28,7 @@ constexpr uint8_t kFlagProperGiven = 0x20;
  * @param byte_length Length in bytes
  * @return Number of UTF-8 characters
  */
-size_t countUtf8Chars(std::string_view text, size_t start_byte,
-                      size_t byte_length) {
+size_t countUtf8Chars(std::string_view text, size_t start_byte, size_t byte_length) {
   size_t char_count = 0;
   size_t end_byte = start_byte + byte_length;
 
@@ -59,13 +59,10 @@ core::PartOfSpeech uint8ToPos(uint8_t val) {
 BinaryDictionary::BinaryDictionary() = default;
 BinaryDictionary::~BinaryDictionary() = default;
 
-core::Expected<size_t, core::Error> BinaryDictionary::loadFromFile(
-    const std::string& path) {
+core::Expected<size_t, core::Error> BinaryDictionary::loadFromFile(const std::string& path) {
   std::ifstream file(path, std::ios::binary | std::ios::ate);
   if (!file) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::FileNotFound,
-                    "Failed to open dictionary file: " + path));
+    return core::makeUnexpected(core::Error(core::ErrorCode::FileNotFound, "Failed to open dictionary file: " + path));
   }
 
   size_t file_size = static_cast<size_t>(file.tellg());
@@ -73,80 +70,98 @@ core::Expected<size_t, core::Error> BinaryDictionary::loadFromFile(
 
   data_.resize(file_size);
   if (!file.read(reinterpret_cast<char*>(data_.data()), file_size)) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::InternalError,
-                    "Failed to read dictionary file: " + path));
+    return core::makeUnexpected(core::Error(core::ErrorCode::InternalError, "Failed to read dictionary file: " + path));
   }
 
   return parseData();
 }
 
-core::Expected<size_t, core::Error> BinaryDictionary::loadFromMemory(
-    const uint8_t* data, size_t size) {
+core::Expected<size_t, core::Error> BinaryDictionary::loadFromMemory(const uint8_t* data, size_t size) {
+  if (data == nullptr || size == 0) {
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Empty dictionary data"));
+  }
   data_.assign(data, data + size);
   return parseData();
 }
 
 core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
   if (data_.size() < sizeof(BinaryDictHeader)) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::InvalidInput,
-                    "Dictionary file too small"));
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary file too small"));
   }
 
   const auto* header = reinterpret_cast<const BinaryDictHeader*>(data_.data());
 
   // Validate magic
   if (header->magic != BinaryDictHeader::kMagic) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::InvalidInput,
-                    "Invalid dictionary magic number"));
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary magic number"));
   }
 
   // Validate version
   if (header->version_major != BinaryDictHeader::kVersionMajor) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::InvalidInput,
-                    "Unsupported dictionary version"));
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Unsupported dictionary version"));
+  }
+  if (header->version_minor > BinaryDictHeader::kVersionMinor) {
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Unsupported dictionary minor version"));
   }
 
-  // Validate offsets
-  if (header->trie_offset + header->trie_size > data_.size() ||
-      header->entry_offset > data_.size() ||
-      header->string_offset > data_.size()) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::InvalidInput,
-                    "Invalid dictionary offsets"));
+  // Validate offsets and section ranges before reading variable-length data.
+  if (header->trie_offset > data_.size() || header->trie_size > data_.size() - header->trie_offset ||
+      header->entry_offset > data_.size() || header->string_offset > data_.size()) {
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary offsets"));
   }
+  if (header->trie_offset < sizeof(BinaryDictHeader) ||
+      header->entry_offset < header->trie_offset + header->trie_size) {
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary section order"));
+  }
+
+  size_t entry_count = header->entry_count;
+  if (entry_count > (std::numeric_limits<size_t>::max() / sizeof(BinaryDictEntry))) {
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary entry table too large"));
+  }
+
+  size_t entry_table_size = entry_count * sizeof(BinaryDictEntry);
+  if (header->entry_offset > data_.size() || entry_table_size > data_.size() - header->entry_offset ||
+      header->entry_offset + entry_table_size > header->string_offset) {
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary entry table"));
+  }
+
+  if (header->string_offset < header->entry_offset + entry_table_size) {
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary string pool offset"));
+  }
+
+  size_t string_pool_size = data_.size() - header->string_offset;
 
   // Load trie
-  if (!trie_.deserialize(data_.data() + header->trie_offset,
-                         header->trie_size)) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::InvalidInput,
-                    "Failed to load dictionary trie"));
+  if (!trie_.deserialize(data_.data() + header->trie_offset, header->trie_size)) {
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Failed to load dictionary trie"));
   }
 
   // Load entries
-  const auto* entry_data = reinterpret_cast<const BinaryDictEntry*>(
-      data_.data() + header->entry_offset);
-  const char* string_pool = reinterpret_cast<const char*>(
-      data_.data() + header->string_offset);
+  const auto* entry_data = reinterpret_cast<const BinaryDictEntry*>(data_.data() + header->entry_offset);
+  const char* string_pool = reinterpret_cast<const char*>(data_.data() + header->string_offset);
 
   entries_.clear();
-  entries_.reserve(header->entry_count);
+  entries_.reserve(entry_count);
 
   for (uint32_t idx = 0; idx < header->entry_count; ++idx) {
     const auto& rec = entry_data[idx];
 
+    if (rec.surface_offset > string_pool_size || rec.surface_length > string_pool_size - rec.surface_offset) {
+      return core::makeUnexpected(
+          core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary surface string range"));
+    }
+
+    if (rec.lemma_length > 0 &&
+        (rec.lemma_offset > string_pool_size || rec.lemma_length > string_pool_size - rec.lemma_offset)) {
+      return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary lemma string range"));
+    }
+
     DictionaryEntry entry;
-    entry.surface = std::string(string_pool + rec.surface_offset,
-                                rec.surface_length);
+    entry.surface = std::string(string_pool + rec.surface_offset, rec.surface_length);
     entry.pos = uint8ToPos(rec.pos);
 
     if (rec.lemma_length > 0) {
-      entry.lemma = std::string(string_pool + rec.lemma_offset,
-                                rec.lemma_length);
+      entry.lemma = std::string(string_pool + rec.lemma_offset, rec.lemma_length);
     } else {
       entry.lemma = entry.surface;
     }
@@ -197,14 +212,13 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
           if (utf8::endsWithAny(entry.surface, {"っ"sv, "ん"sv})) {
             // Sokuonbin (っ) or hatsuonbin (ん): あっ, 飲ん, etc.
             entry.extended_pos = core::ExtendedPOS::VerbOnbinkei;
-          } else if (utf8::endsWith(entry.surface, "い") &&
-                     entry.surface.size() > core::kTwoJapaneseCharBytes) {
+          } else if (utf8::endsWith(entry.surface, "い") && entry.surface.size() > core::kTwoJapaneseCharBytes) {
             // Godan-ka/ga i-onbin (い音便) for 3+ char compound verbs
             // e.g., たどり着い from たどり着く, 引っかい from 引っかく
             // Short forms (1-2 chars) are handled by the short-verb rules below
             entry.extended_pos = core::ExtendedPOS::VerbOnbinkei;
-          } else if (utf8::endsWithAny(entry.surface, {"れば"sv, "けば"sv, "せば"sv,
-                     "てば"sv, "ねば"sv, "べば"sv, "めば"sv, "えば"sv})) {
+          } else if (utf8::endsWithAny(entry.surface, {"れば"sv, "けば"sv, "せば"sv, "てば"sv, "ねば"sv, "べば"sv,
+                                                       "めば"sv, "えば"sv})) {
             // Conditional form
             entry.extended_pos = core::ExtendedPOS::VerbKateikei;
           } else if (entry.surface.size() == core::kJapaneseCharBytes) {
@@ -212,26 +226,24 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
             // e.g., い from いる expansion, not shuushikei
             // This prevents incorrect VERB_終止→AUX_意志 connections like と→い→う
             entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
-          } else if (!utf8::endsWith(entry.surface, "る") &&
-                     entry.surface.size() <= core::kTwoJapaneseCharBytes) {
+          } else if (!utf8::endsWith(entry.surface, "る") && entry.surface.size() <= core::kTwoJapaneseCharBytes) {
             // Short verb forms (1-2 chars) not ending in る
-            if (grammar::endsWithARow(entry.surface) &&
-                grammar::containsKanji(entry.surface)) {
+            if (grammar::endsWithARow(entry.surface) && grammar::containsKanji(entry.surface)) {
               // Kanji + A-row ending = godan mizenkei (読ま, 書か, 行か)
               entry.extended_pos = core::ExtendedPOS::VerbMizenkei;
             } else {
               // Other short forms likely renyoukei (すぎ from すぎる)
               entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
             }
-          } else if (utf8::endsWithAny(entry.surface, {"き"sv, "ぎ"sv, "し"sv,
-                     "ち"sv, "に"sv, "び"sv, "み"sv, "り"sv})) {
+          } else if (utf8::endsWithAny(entry.surface,
+                                       {"き"sv, "ぎ"sv, "し"sv, "ち"sv, "に"sv, "び"sv, "み"sv, "り"sv})) {
             // Godan verb renyokei endings (I-row hiragana except い)
             // e.g., いただき from いただく → いただき + ます should work
             // Note: い excluded because godan-wa renyokei (思い) would need
             // disambiguation from noun/adj uses. Short forms are handled above.
             entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
-          } else if (utf8::endsWithAny(entry.surface, {"え"sv, "け"sv, "げ"sv,
-                     "せ"sv, "ぜ"sv, "ね"sv, "べ"sv, "め"sv, "れ"sv}) &&
+          } else if (utf8::endsWithAny(entry.surface,
+                                       {"え"sv, "け"sv, "げ"sv, "せ"sv, "ぜ"sv, "ね"sv, "べ"sv, "め"sv, "れ"sv}) &&
                      entry.surface.size() > core::kTwoJapaneseCharBytes) {
             // Ichidan verb renyokei endings (E-row hiragana)
             // e.g., いただけ from いただける, 成し遂げ from 成し遂げる
@@ -239,8 +251,7 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
             // Short E-row forms are handled by the 1-2 char rule above
             // Note: て/で excluded — conflicts with te-form (捨て, 出で)
             entry.extended_pos = core::ExtendedPOS::VerbRenyokei;
-          } else if (grammar::endsWithARow(entry.surface) &&
-                     entry.surface.size() > core::kTwoJapaneseCharBytes) {
+          } else if (grammar::endsWithARow(entry.surface) && entry.surface.size() > core::kTwoJapaneseCharBytes) {
             // Godan verb mizenkei endings (A-row hiragana)
             // e.g., サボら from サボる → サボら + れる (passive) should work
             // Only for 3+ char forms to avoid conflicts with short words
@@ -295,8 +306,8 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
     // These entries get high cost (2.0) which may cause unexpected tokenization
     // At trace level (SUZUME_DEBUG=3) to avoid flooding output at lower levels
     if (entry.extended_pos == core::ExtendedPOS::Unknown) {
-      SUZUME_DEBUG_LOG_TRACE("[DICT_LOAD] WARNING: \"" << entry.surface << "\" pos="
-          << core::posToString(entry.pos) << " has epos=UNKNOWN (cost=2.0)\n");
+      SUZUME_DEBUG_LOG_TRACE("[DICT_LOAD] WARNING: \"" << entry.surface << "\" pos=" << core::posToString(entry.pos)
+                                                       << " has epos=UNKNOWN (cost=2.0)\n");
     }
 
     entries_.push_back(std::move(entry));
@@ -305,8 +316,7 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData() {
   return entries_.size();
 }
 
-std::vector<LookupResult> BinaryDictionary::lookup(std::string_view text,
-                                                    size_t start_pos) const {
+std::vector<LookupResult> BinaryDictionary::lookup(std::string_view text, size_t start_pos) const {
   std::vector<LookupResult> results;
 
   if (!isLoaded() || start_pos >= text.size()) {
@@ -355,16 +365,12 @@ void BinaryDictWriter::replaceEntry(const DictionaryEntry& entry) {
 
 core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   if (entries_.empty()) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::InvalidInput,
-                    "No entries to write"));
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "No entries to write"));
   }
 
   // Sort entries by surface for trie building
   std::sort(entries_.begin(), entries_.end(),
-            [](const DictionaryEntry& lhs, const DictionaryEntry& rhs) {
-              return lhs.surface < rhs.surface;
-            });
+            [](const DictionaryEntry& lhs, const DictionaryEntry& rhs) { return lhs.surface < rhs.surface; });
 
   // Build string pool with deduplication
   std::vector<char> string_pool;
@@ -386,6 +392,16 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
 
   for (const auto& ent : entries_) {
     BinaryDictEntry rec{};
+
+    if (ent.surface.size() > std::numeric_limits<uint8_t>::max()) {
+      return core::makeUnexpected(
+          core::Error(core::ErrorCode::InvalidInput, "Dictionary surface exceeds 255 bytes: " + ent.surface));
+    }
+
+    if (!ent.lemma.empty() && ent.lemma.size() > std::numeric_limits<uint8_t>::max()) {
+      return core::makeUnexpected(
+          core::Error(core::ErrorCode::InvalidInput, "Dictionary lemma exceeds 255 bytes: " + ent.lemma));
+    }
 
     rec.surface_offset = addString(ent.surface);
     rec.surface_length = static_cast<uint8_t>(ent.surface.size());
@@ -431,9 +447,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
 
   DoubleArray trie;
   if (!trie.build(keys, values)) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::InternalError,
-                    "Failed to build dictionary trie"));
+    return core::makeUnexpected(core::Error(core::ErrorCode::InternalError, "Failed to build dictionary trie"));
   }
 
   auto trie_data = trie.serialize();
@@ -481,8 +495,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   return output;
 }
 
-core::Expected<size_t, core::Error> BinaryDictWriter::writeToFile(
-    const std::string& path) {
+core::Expected<size_t, core::Error> BinaryDictWriter::writeToFile(const std::string& path) {
   auto result = build();
   if (!result) {
     return core::makeUnexpected(result.error());
@@ -491,16 +504,14 @@ core::Expected<size_t, core::Error> BinaryDictWriter::writeToFile(
   std::ofstream file(path, std::ios::binary);
   if (!file) {
     return core::makeUnexpected(
-        core::Error(core::ErrorCode::InternalError,
-                    "Failed to create dictionary file: " + path));
+        core::Error(core::ErrorCode::InternalError, "Failed to create dictionary file: " + path));
   }
 
   const auto& data = result.value();
   file.write(reinterpret_cast<const char*>(data.data()), data.size());
   if (!file) {
     return core::makeUnexpected(
-        core::Error(core::ErrorCode::InternalError,
-                    "Failed to write dictionary file: " + path));
+        core::Error(core::ErrorCode::InternalError, "Failed to write dictionary file: " + path));
   }
 
   return data.size();

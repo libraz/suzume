@@ -14,6 +14,39 @@ export interface WasmModule {
   HEAPU32: Uint32Array;
 }
 
+export const RESULT_LAYOUT = {
+  size: 8,
+  morphemes: 0,
+  count: 4,
+} as const;
+
+export const MORPHEME_LAYOUT = {
+  size: 28,
+  surface: 0,
+  pos: 4,
+  baseForm: 8,
+  posJa: 12,
+  conjType: 16,
+  conjForm: 20,
+  extendedPos: 24,
+} as const;
+
+export const TAGS_LAYOUT = {
+  size: 12,
+  tags: 0,
+  pos: 4,
+  count: 8,
+} as const;
+
+export const TAG_OPTIONS_LAYOUT = {
+  size: 20,
+  posFilter: 0,
+  excludeBasic: 4,
+  useLemma: 8,
+  minLength: 12,
+  maxTags: 16,
+} as const;
+
 // Shared module instance (loaded once across all test files)
 let cachedModule: WasmModule | null = null;
 
@@ -31,9 +64,6 @@ export function allocString(module: WasmModule, text: string): number {
   return ptr;
 }
 
-// suzume_morpheme_t layout: 7 pointers (28 bytes on wasm32)
-export const MORPHEME_SIZE = 28;
-
 export interface ParsedMorpheme {
   surface: string;
   pos: string;
@@ -45,19 +75,19 @@ export interface ParsedMorpheme {
 }
 
 export function parseMorphemes(module: WasmModule, resultPtr: number): ParsedMorpheme[] {
-  const morphemesPtr = module.HEAPU32[resultPtr >> 2];
-  const count = module.HEAPU32[(resultPtr >> 2) + 1];
+  const morphemesPtr = module.HEAPU32[(resultPtr + RESULT_LAYOUT.morphemes) >> 2];
+  const count = module.HEAPU32[(resultPtr + RESULT_LAYOUT.count) >> 2];
   const morphemes: ParsedMorpheme[] = [];
 
   for (let i = 0; i < count; i++) {
-    const morphPtr = morphemesPtr + i * MORPHEME_SIZE;
-    const surfacePtr = module.HEAPU32[morphPtr >> 2];
-    const posPtr = module.HEAPU32[(morphPtr >> 2) + 1];
-    const baseFormPtr = module.HEAPU32[(morphPtr >> 2) + 2];
-    const posJaPtr = module.HEAPU32[(morphPtr >> 2) + 3];
-    const conjTypePtr = module.HEAPU32[(morphPtr >> 2) + 4];
-    const conjFormPtr = module.HEAPU32[(morphPtr >> 2) + 5];
-    const extendedPosPtr = module.HEAPU32[(morphPtr >> 2) + 6];
+    const morphPtr = morphemesPtr + i * MORPHEME_LAYOUT.size;
+    const surfacePtr = module.HEAPU32[(morphPtr + MORPHEME_LAYOUT.surface) >> 2];
+    const posPtr = module.HEAPU32[(morphPtr + MORPHEME_LAYOUT.pos) >> 2];
+    const baseFormPtr = module.HEAPU32[(morphPtr + MORPHEME_LAYOUT.baseForm) >> 2];
+    const posJaPtr = module.HEAPU32[(morphPtr + MORPHEME_LAYOUT.posJa) >> 2];
+    const conjTypePtr = module.HEAPU32[(morphPtr + MORPHEME_LAYOUT.conjType) >> 2];
+    const conjFormPtr = module.HEAPU32[(morphPtr + MORPHEME_LAYOUT.conjForm) >> 2];
+    const extendedPosPtr = module.HEAPU32[(morphPtr + MORPHEME_LAYOUT.extendedPos) >> 2];
 
     morphemes.push({
       surface: module.UTF8ToString(surfacePtr),
@@ -79,9 +109,9 @@ export interface ParsedTag {
 }
 
 export function parseTags(module: WasmModule, tagsPtr: number): ParsedTag[] {
-  const tagsArrayPtr = module.HEAPU32[tagsPtr >> 2];
-  const posArrayPtr = module.HEAPU32[(tagsPtr >> 2) + 1];
-  const count = module.HEAPU32[(tagsPtr >> 2) + 2];
+  const tagsArrayPtr = module.HEAPU32[(tagsPtr + TAGS_LAYOUT.tags) >> 2];
+  const posArrayPtr = module.HEAPU32[(tagsPtr + TAGS_LAYOUT.pos) >> 2];
+  const count = module.HEAPU32[(tagsPtr + TAGS_LAYOUT.count) >> 2];
   const tags: ParsedTag[] = [];
 
   for (let i = 0; i < count; i++) {
@@ -96,5 +126,5 @@ export function parseTags(module: WasmModule, tagsPtr: number): ParsedTag[] {
 }
 
 export function getTagCount(module: WasmModule, tagsPtr: number): number {
-  return module.HEAPU32[(tagsPtr >> 2) + 2];
+  return module.HEAPU32[(tagsPtr + TAGS_LAYOUT.count) >> 2];
 }

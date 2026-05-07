@@ -27,23 +27,20 @@ std::string getHomeDir() {
 }  // namespace
 #endif  // __EMSCRIPTEN__
 
-DictionaryManager::DictionaryManager()
-    : core_dict_(std::make_unique<CoreDictionary>()) {}
+DictionaryManager::DictionaryManager() : core_dict_(std::make_unique<CoreDictionary>()) {}
 
 DictionaryManager::~DictionaryManager() = default;
 
 DictionaryManager::DictionaryManager(DictionaryManager&&) noexcept = default;
 DictionaryManager& DictionaryManager::operator=(DictionaryManager&&) noexcept = default;
 
-void DictionaryManager::addUserDictionary(
-    std::shared_ptr<UserDictionary> dict) {
+void DictionaryManager::addUserDictionary(std::shared_ptr<UserDictionary> dict) {
   if (dict) {
     user_dicts_.push_back(std::move(dict));
   }
 }
 
-std::vector<LookupResult> DictionaryManager::lookup(std::string_view text,
-                                                    size_t start_pos) const {
+std::vector<LookupResult> DictionaryManager::lookup(std::string_view text, size_t start_pos) const {
   std::vector<LookupResult> results;
 
   // Lookup in core dictionary (Layer 1: hardcoded)
@@ -59,8 +56,7 @@ std::vector<LookupResult> DictionaryManager::lookup(std::string_view text,
   // Lookup in user binary dictionary (Layer 3: user.dic)
   if (user_binary_dict_ && user_binary_dict_->isLoaded()) {
     auto user_binary_results = user_binary_dict_->lookup(text, start_pos);
-    results.insert(results.end(), user_binary_results.begin(),
-                   user_binary_results.end());
+    results.insert(results.end(), user_binary_results.begin(), user_binary_results.end());
   }
 
   // Lookup in custom user dictionaries (Layer 4: CSV/TSV files)
@@ -101,8 +97,7 @@ bool DictionaryManager::loadUserBinaryDictionary(const std::string& path) {
   return result.hasValue();
 }
 
-bool DictionaryManager::loadUserBinaryDictionaryFromMemory(const uint8_t* data,
-                                                          size_t size) {
+bool DictionaryManager::loadUserBinaryDictionaryFromMemory(const uint8_t* data, size_t size) {
   if (!user_binary_dict_) {
     user_binary_dict_ = std::make_unique<BinaryDictionary>();
   }

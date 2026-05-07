@@ -36,94 +36,83 @@ struct ConjSuffix {
 // Note: Te-form entries are kept for inflection analysis but skipped during generation
 // (MeCab-compatible te-form split: VERB renyokei + て(PARTICLE))
 constexpr ConjSuffix kIchidanFull[] = {
-    {"る", conn::kAuxOutBase},   {"た", conn::kAuxOutTa},
-    {"たら", conn::kAuxOutBase}, {"て", conn::kAuxOutTe},
-    {"ます", conn::kAuxOutMasu}, {"ました", conn::kAuxOutTa},
-    {"ない", conn::kAuxOutBase}, {"なかった", conn::kAuxOutTa},
-    {"なくて", conn::kAuxOutTe},
+    {"る", conn::kAuxOutBase},   {"た", conn::kAuxOutTa},       {"たら", conn::kAuxOutBase},
+    {"て", conn::kAuxOutTe},     {"ます", conn::kAuxOutMasu},   {"ました", conn::kAuxOutTa},
+    {"ない", conn::kAuxOutBase}, {"なかった", conn::kAuxOutTa}, {"なくて", conn::kAuxOutTe},
 };
 
 // Te-attachment limited forms (4 suffixes, no negative, no masu)
 // Note: ます/ました forms are intentionally excluded for MeCab compatibility
 // MeCab splits: くれます → くれ(VERB) + ます(AUX), not くれます(AUX)
 constexpr ConjSuffix kIchidanTeAttach[] = {
-    {"る", conn::kAuxOutBase},   {"た", conn::kAuxOutTa},
-    {"たら", conn::kAuxOutBase}, {"て", conn::kAuxOutTe},
+    {"る", conn::kAuxOutBase},
+    {"た", conn::kAuxOutTa},
+    {"たら", conn::kAuxOutBase},
+    {"て", conn::kAuxOutTe},
 };
 
 // Progressive いる forms (6 suffixes, no negative)
 // MeCab-compatible: negative is split as い(mizenkei) + ない(AUX)
 // E.g., 食べていない → 食べ+て+い+ない, not 食べ+て+いない
 constexpr ConjSuffix kIchidanProgressive[] = {
-    {"る", conn::kAuxOutBase},   {"た", conn::kAuxOutTa},
-    {"たら", conn::kAuxOutBase}, {"て", conn::kAuxOutTe},
-    {"ます", conn::kAuxOutMasu}, {"ました", conn::kAuxOutTa},
+    {"る", conn::kAuxOutBase}, {"た", conn::kAuxOutTa},     {"たら", conn::kAuxOutBase},
+    {"て", conn::kAuxOutTe},   {"ます", conn::kAuxOutMasu}, {"ました", conn::kAuxOutTa},
 };
 
 // Godan-Wa (五段わ行) - full
 constexpr ConjSuffix kGodanWaFull[] = {
-    {"う", conn::kAuxOutBase},       {"った", conn::kAuxOutTa},
-    {"ったら", conn::kAuxOutBase},   {"って", conn::kAuxOutTe},
-    {"います", conn::kAuxOutMasu},   {"いました", conn::kAuxOutTa},
-    {"わない", conn::kAuxOutBase},   {"わなかった", conn::kAuxOutTa},
-    {"わなくて", conn::kAuxOutTe},
+    {"う", conn::kAuxOutBase},     {"った", conn::kAuxOutTa},       {"ったら", conn::kAuxOutBase},
+    {"って", conn::kAuxOutTe},     {"います", conn::kAuxOutMasu},   {"いました", conn::kAuxOutTa},
+    {"わない", conn::kAuxOutBase}, {"わなかった", conn::kAuxOutTa}, {"わなくて", conn::kAuxOutTe},
 };
 
 // Godan-Wa te-attachment (no masu for MeCab compatibility)
 constexpr ConjSuffix kGodanWaTeAttach[] = {
-    {"う", conn::kAuxOutBase},     {"った", conn::kAuxOutTa},
-    {"ったら", conn::kAuxOutBase}, {"って", conn::kAuxOutTe},
+    {"う", conn::kAuxOutBase},
+    {"った", conn::kAuxOutTa},
+    {"ったら", conn::kAuxOutBase},
+    {"って", conn::kAuxOutTe},
 };
 
 // Godan-Ka (五段か行) - full
 constexpr ConjSuffix kGodanKaFull[] = {
-    {"く", conn::kAuxOutBase},     {"いた", conn::kAuxOutTa},
-    {"いたら", conn::kAuxOutBase}, {"いて", conn::kAuxOutTe},
-    {"きます", conn::kAuxOutMasu}, {"きました", conn::kAuxOutTa},
-    {"かない", conn::kAuxOutBase}, {"かなかった", conn::kAuxOutTa},
-    {"かなくて", conn::kAuxOutTe},
+    {"く", conn::kAuxOutBase},     {"いた", conn::kAuxOutTa},       {"いたら", conn::kAuxOutBase},
+    {"いて", conn::kAuxOutTe},     {"きます", conn::kAuxOutMasu},   {"きました", conn::kAuxOutTa},
+    {"かない", conn::kAuxOutBase}, {"かなかった", conn::kAuxOutTa}, {"かなくて", conn::kAuxOutTe},
 };
 
 // Godan-Sa (五段さ行) - full
 constexpr ConjSuffix kGodanSaFull[] = {
-    {"す", conn::kAuxOutBase},     {"した", conn::kAuxOutTa},
-    {"したら", conn::kAuxOutBase}, {"して", conn::kAuxOutTe},
-    {"します", conn::kAuxOutMasu}, {"しました", conn::kAuxOutTa},
-    {"さない", conn::kAuxOutBase}, {"さなかった", conn::kAuxOutTa},
-    {"さなくて", conn::kAuxOutTe},
+    {"す", conn::kAuxOutBase},     {"した", conn::kAuxOutTa},       {"したら", conn::kAuxOutBase},
+    {"して", conn::kAuxOutTe},     {"します", conn::kAuxOutMasu},   {"しました", conn::kAuxOutTa},
+    {"さない", conn::kAuxOutBase}, {"さなかった", conn::kAuxOutTa}, {"さなくて", conn::kAuxOutTe},
 };
 
 // Godan-Ra (五段ら行) - full
 constexpr ConjSuffix kGodanRaFull[] = {
-    {"る", conn::kAuxOutBase},     {"った", conn::kAuxOutTa},
-    {"ったら", conn::kAuxOutBase}, {"って", conn::kAuxOutTe},
-    {"ります", conn::kAuxOutMasu}, {"りました", conn::kAuxOutTa},
-    {"らない", conn::kAuxOutBase}, {"らなかった", conn::kAuxOutTa},
-    {"らなくて", conn::kAuxOutTe},
+    {"る", conn::kAuxOutBase},     {"った", conn::kAuxOutTa},       {"ったら", conn::kAuxOutBase},
+    {"って", conn::kAuxOutTe},     {"ります", conn::kAuxOutMasu},   {"りました", conn::kAuxOutTa},
+    {"らない", conn::kAuxOutBase}, {"らなかった", conn::kAuxOutTa}, {"らなくて", conn::kAuxOutTe},
 };
 
 // Kuru (カ変) - irregular, full forms
 constexpr ConjSuffix kKuruFull[] = {
-    {"くる", conn::kAuxOutBase},     {"きた", conn::kAuxOutTa},
-    {"きたら", conn::kAuxOutBase},   {"きて", conn::kAuxOutTe},
-    {"きます", conn::kAuxOutMasu},   {"きました", conn::kAuxOutTa},
-    {"こない", conn::kAuxOutBase},   {"こなかった", conn::kAuxOutTa},
-    {"こなくて", conn::kAuxOutTe},
+    {"くる", conn::kAuxOutBase},   {"きた", conn::kAuxOutTa},       {"きたら", conn::kAuxOutBase},
+    {"きて", conn::kAuxOutTe},     {"きます", conn::kAuxOutMasu},   {"きました", conn::kAuxOutTa},
+    {"こない", conn::kAuxOutBase}, {"こなかった", conn::kAuxOutTa}, {"こなくて", conn::kAuxOutTe},
 };
 
 // I-adjective (い形容詞)
 constexpr ConjSuffix kIAdjective[] = {
-    {"い", conn::kAuxOutBase},       {"かった", conn::kAuxOutTa},
-    {"くて", conn::kAuxOutTe},       {"くない", conn::kAuxOutBase},
-    {"くなかった", conn::kAuxOutTa}, {"ければ", conn::kAuxOutBase},
+    {"い", conn::kAuxOutBase},     {"かった", conn::kAuxOutTa},     {"くて", conn::kAuxOutTe},
+    {"くない", conn::kAuxOutBase}, {"くなかった", conn::kAuxOutTa}, {"ければ", conn::kAuxOutBase},
     {"く", conn::kAuxOutBase},  // adverbial
 };
 
 // Masu (ます) - special (no stem)
 constexpr ConjSuffix kMasu[] = {
-    {"ます", conn::kAuxOutMasu},       {"ました", conn::kAuxOutTa},
-    {"ません", conn::kAuxOutBase},     {"ましょう", conn::kAuxOutBase},
-    {"ませんでした", conn::kAuxOutTa},
+    {"ます", conn::kAuxOutMasu},     {"ました", conn::kAuxOutTa},       {"ません", conn::kAuxOutBase},
+    {"ましょう", conn::kAuxOutBase}, {"ませんでした", conn::kAuxOutTa},
 };
 
 // =============================================================================
@@ -135,30 +124,26 @@ constexpr ConjSuffix kMasu[] = {
 // For MeCab-compatible te-form split, the scoring (connection rules) makes
 // the split path VERB(renyokei/onbinkei) + て(PARTICLE) win over unified te-form.
 template <size_t N>
-std::vector<AuxiliaryEntry> generateWithStem(
-    const AuxiliaryBase& base, const ConjSuffix (&suffixes)[N]) {
+std::vector<AuxiliaryEntry> generateWithStem(const AuxiliaryBase& base, const ConjSuffix (&suffixes)[N]) {
   std::string stem = dropLastChar(base.surface);
   std::string reading_stem = dropLastChar(base.reading);
 
   std::vector<AuxiliaryEntry> result;
   result.reserve(N);
   for (const auto& suf : suffixes) {
-    result.push_back({stem + suf.suffix, reading_stem + suf.suffix,
-                      base.surface, base.left_id, suf.right_id,
-                      base.required_conn});
+    result.push_back(
+        {stem + suf.suffix, reading_stem + suf.suffix, base.surface, base.left_id, suf.right_id, base.required_conn});
   }
   return result;
 }
 
 // Generate forms using full forms (no stem, for irregular verbs)
 template <size_t N>
-std::vector<AuxiliaryEntry> generateFullForms(
-    const AuxiliaryBase& base, const ConjSuffix (&forms)[N]) {
+std::vector<AuxiliaryEntry> generateFullForms(const AuxiliaryBase& base, const ConjSuffix (&forms)[N]) {
   std::vector<AuxiliaryEntry> result;
   result.reserve(N);
   for (const auto& form : forms) {
-    result.push_back({form.suffix, form.suffix, base.surface,
-                      base.left_id, form.right_id, base.required_conn});
+    result.push_back({form.suffix, form.suffix, base.surface, base.left_id, form.right_id, base.required_conn});
   }
   return result;
 }
@@ -168,16 +153,14 @@ std::vector<AuxiliaryEntry> generateMasuForms(const AuxiliaryBase& base) {
   std::vector<AuxiliaryEntry> result;
   result.reserve(std::size(kMasu));
   for (const auto& form : kMasu) {
-    result.push_back({form.suffix, form.suffix, "ます",
-                      base.left_id, form.right_id, base.required_conn});
+    result.push_back({form.suffix, form.suffix, "ます", base.left_id, form.right_id, base.required_conn});
   }
   return result;
 }
 
 // No conjugation - single form only
 std::vector<AuxiliaryEntry> generateNoConjForms(const AuxiliaryBase& base) {
-  return {{base.surface, base.reading, base.surface, base.left_id,
-           conn::kAuxOutBase, base.required_conn}};
+  return {{base.surface, base.reading, base.surface, base.left_id, conn::kAuxOutBase, base.required_conn}};
 }
 
 // Add special patterns that cannot be auto-generated
@@ -540,8 +523,10 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
 
   // === Obligation patterns (past forms) ===
   entries.push_back({"ないといけなかった", "ないといけなかった", "ないといけない", kAuxNai, kAuxOutTa, kVerbMizenkei});
-  entries.push_back({"なければならなかった", "なければならなかった", "なければならない", kAuxNai, kAuxOutTa, kVerbMizenkei});
-  entries.push_back({"なくてはいけなかった", "なくてはいけなかった", "なくてはいけない", kAuxNai, kAuxOutTa, kVerbMizenkei});
+  entries.push_back(
+      {"なければならなかった", "なければならなかった", "なければならない", kAuxNai, kAuxOutTa, kVerbMizenkei});
+  entries.push_back(
+      {"なくてはいけなかった", "なくてはいけなかった", "なくてはいけない", kAuxNai, kAuxOutTa, kVerbMizenkei});
   entries.push_back({"なきゃならない", "なきゃならない", "なきゃならない", kAuxNai, kAuxOutBase, kVerbMizenkei});
 
   // Removed: はいけなかった, はだめだ, はならなかった, べきではなかった,
@@ -634,9 +619,8 @@ const std::vector<AuxiliaryBase>& getAuxiliaryBases() {
 std::vector<AuxiliaryEntry> expandAuxiliaryBase(const AuxiliaryBase& base) {
   // Benefactive te-attachments (てくれる, てもらう, てあげる) use limited forms
   // to avoid over-matching like 待ってくれない → 待つ (wrong)
-  bool is_benefactive = (base.left_id == conn::kAuxTemorau ||
-                         base.left_id == conn::kAuxTekureru ||
-                         base.left_id == conn::kAuxTeageru);
+  bool is_benefactive =
+      (base.left_id == conn::kAuxTemorau || base.left_id == conn::kAuxTekureru || base.left_id == conn::kAuxTeageru);
 
   // Progressive ている uses forms without negative
   // MeCab-compatible split: い(mizenkei) + ない(AUX) instead of いない(single)
@@ -652,8 +636,7 @@ std::vector<AuxiliaryEntry> expandAuxiliaryBase(const AuxiliaryBase& base) {
       }
       return generateWithStem(base, kIchidanFull);
     case VerbType::GodanWa:
-      return is_benefactive ? generateWithStem(base, kGodanWaTeAttach)
-                            : generateWithStem(base, kGodanWaFull);
+      return is_benefactive ? generateWithStem(base, kGodanWaTeAttach) : generateWithStem(base, kGodanWaFull);
     case VerbType::GodanKa:
       return generateWithStem(base, kGodanKaFull);
     case VerbType::GodanSa:
@@ -687,10 +670,9 @@ std::vector<AuxiliaryEntry> generateAllAuxiliaries() {
   addSpecialPatterns(result);
 
   // Sort by surface length (longest first) for greedy matching
-  std::sort(result.begin(), result.end(),
-            [](const AuxiliaryEntry& lhs, const AuxiliaryEntry& rhs) {
-              return lhs.surface.size() > rhs.surface.size();
-            });
+  std::sort(result.begin(), result.end(), [](const AuxiliaryEntry& lhs, const AuxiliaryEntry& rhs) {
+    return lhs.surface.size() > rhs.surface.size();
+  });
 
   return result;
 }

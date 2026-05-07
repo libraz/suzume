@@ -9,7 +9,6 @@ the latest normalization code from disk.
 import asyncio
 import json
 import os
-import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -30,10 +29,8 @@ def get_suzume_surfaces(text: str, cli_path: Path | None = None) -> list[str]:
     if not cli.exists():
         return []
 
-    escaped = shlex.quote(text)
     result = subprocess.run(
-        f"'{cli}' {escaped}",
-        shell=True,
+        [str(cli), text],
         capture_output=True,
         text=True,
     )

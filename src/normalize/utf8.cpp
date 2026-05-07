@@ -60,8 +60,7 @@ char32_t decodeUtf8(std::string_view str, size_t& pos) {
       return 0xFFFD;
     }
     pos += 4;
-    return ((byte1 & 0x07) << 18) | ((byte2 & 0x3F) << 12) | ((byte3 & 0x3F) << 6) |
-           (byte4 & 0x3F);
+    return ((byte1 & 0x07) << 18) | ((byte2 & 0x3F) << 12) | ((byte3 & 0x3F) << 6) | (byte4 & 0x3F);
   }
 
   pos += 1;
@@ -151,8 +150,7 @@ std::string fromCodepoints(const std::vector<char32_t>& codepoints) {
   return result;
 }
 
-std::string encodeRange(const std::vector<char32_t>& codepoints,
-                        size_t start, size_t end) {
+std::string encodeRange(const std::vector<char32_t>& codepoints, size_t start, size_t end) {
   if (start >= codepoints.size() || end > codepoints.size() || start >= end) {
     return "";
   }

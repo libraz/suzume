@@ -4,7 +4,9 @@
 
 namespace suzume::dictionary {
 
-DictStringPool::DictStringPool() { data_.reserve(4096); }
+DictStringPool::DictStringPool() {
+  data_.reserve(4096);
+}
 
 uint32_t DictStringPool::add(std::string_view str) {
   auto id = static_cast<uint32_t>(offsets_.size());
@@ -37,7 +39,7 @@ void DictStringPool::clear() {
 
 std::vector<char> DictStringPool::serialize() const {
   std::vector<char> result;
-  size_t total_size = sizeof(uint32_t) * 2 +              // count + data_size
+  size_t total_size = sizeof(uint32_t) * 2 +                // count + data_size
                       offsets_.size() * sizeof(uint32_t) +  // offsets
                       lengths_.size() * sizeof(uint16_t) +  // lengths
                       data_.size();                         // data

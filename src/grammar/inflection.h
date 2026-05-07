@@ -27,12 +27,12 @@ namespace suzume::grammar {
  * @brief Analysis candidate from inflection analysis
  */
 struct InflectionCandidate {
-  std::string base_form;   ///< Inferred base form: 住む
-  std::string stem;        ///< Stem: 住
-  std::string suffix;      ///< Suffix chain: んでいます
-  VerbType verb_type;      ///< Verb type: GodanMa
-  float confidence;        ///< Confidence: 0.0-1.0
-  std::vector<std::string> morphemes;  ///< Decomposed: [ん, で, い, ます]
+  std::string base_form;                ///< Inferred base form: 住む
+  std::string stem;                     ///< Stem: 住
+  std::string suffix;                   ///< Suffix chain: んでいます
+  VerbType verb_type;                   ///< Verb type: GodanMa
+  float confidence;                     ///< Confidence: 0.0-1.0
+  std::vector<std::string> morphemes;   ///< Decomposed: [ん, で, い, ます]
   bool has_explanatory_suffix = false;  ///< True if matched via のだ/んだ stripping
 };
 
@@ -68,25 +68,19 @@ class Inflection {
 
  private:
   // Try matching auxiliary at end of surface
-  std::vector<std::pair<const AuxiliaryEntry*, size_t>>
-  matchAuxiliaries(std::string_view surface) const;
+  std::vector<std::pair<const AuxiliaryEntry*, size_t>> matchAuxiliaries(std::string_view surface) const;
 
   // Analyze by peeling off auxiliaries from right (aux_chain mutated via push/pop)
-  std::vector<InflectionCandidate> analyzeWithAuxiliaries(
-      std::string_view surface,
-      std::vector<std::string>& aux_chain,
-      uint16_t required_conn) const;
+  std::vector<InflectionCandidate> analyzeWithAuxiliaries(std::string_view surface, std::vector<std::string>& aux_chain,
+                                                          uint16_t required_conn) const;
 
   // Try to match verb stem after removing auxiliaries
-  std::vector<InflectionCandidate> matchVerbStem(
-      std::string_view remaining,
-      const std::vector<std::string>& aux_chain,
-      uint16_t required_conn) const;
+  std::vector<InflectionCandidate> matchVerbStem(std::string_view remaining, const std::vector<std::string>& aux_chain,
+                                                 uint16_t required_conn) const;
 
   // Cache for analyze() results (mutable for const methods)
   // Note: single-threaded only. Add synchronization if multi-threading is needed.
-  mutable std::unordered_map<std::string, std::vector<InflectionCandidate>>
-      cache_;
+  mutable std::unordered_map<std::string, std::vector<InflectionCandidate>> cache_;
 };
 
 }  // namespace suzume::grammar

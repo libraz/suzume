@@ -51,9 +51,9 @@ constexpr float kAlphaKatakanaBonus = -0.3F;
 
 // Digit + Kanji split bonuses
 // E.g., 5分, 3月, 100人
-constexpr float kDigitKanji1Bonus = -0.2F;  // 1-kanji counter
-constexpr float kDigitKanji2Bonus = -0.2F;  // 2-kanji counter
-constexpr float kDigitKanji3Penalty = 0.5F; // 3+ kanji (rare, likely wrong)
+constexpr float kDigitKanji1Bonus = -0.2F;   // 1-kanji counter
+constexpr float kDigitKanji2Bonus = -0.2F;   // 2-kanji counter
+constexpr float kDigitKanji3Penalty = 0.5F;  // 3+ kanji (rare, likely wrong)
 
 // Dictionary word split bonus
 // Applied when split creates a dictionary-verified word

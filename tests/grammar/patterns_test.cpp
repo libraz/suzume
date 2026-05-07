@@ -83,7 +83,7 @@ TEST_F(VerbNegativeTest, Suru_Shinai) {
 // Patterns that should NOT match
 TEST_F(VerbNegativeTest, NotVerbNegative_Adjective) {
   EXPECT_FALSE(endsWithVerbNegative("美味しくない"));  // Adjective negative
-  EXPECT_FALSE(endsWithVerbNegative("面白くない"));   // Adjective negative
+  EXPECT_FALSE(endsWithVerbNegative("面白くない"));    // Adjective negative
 }
 
 TEST_F(VerbNegativeTest, NotVerbNegative_TooShort) {

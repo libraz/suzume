@@ -26,32 +26,32 @@ namespace suzume::grammar {
  */
 enum class VerbType : uint8_t {
   Unknown = 0,
-  Ichidan,    // 一段: 食べる、見る
-  GodanKa,    // 五段か行: 書く
-  GodanGa,    // 五段が行: 泳ぐ
-  GodanSa,    // 五段さ行: 話す
-  GodanTa,    // 五段た行: 持つ
-  GodanNa,    // 五段な行: 死ぬ
-  GodanBa,    // 五段ば行: 遊ぶ
-  GodanMa,    // 五段ま行: 読む
-  GodanRa,    // 五段ら行: 取る
-  GodanWa,    // 五段わ行: 買う
-  Suru,       // サ変: する
-  Kuru,       // カ変: 来る
-  IAdjective, // い形容詞: 高い
+  Ichidan,     // 一段: 食べる、見る
+  GodanKa,     // 五段か行: 書く
+  GodanGa,     // 五段が行: 泳ぐ
+  GodanSa,     // 五段さ行: 話す
+  GodanTa,     // 五段た行: 持つ
+  GodanNa,     // 五段な行: 死ぬ
+  GodanBa,     // 五段ば行: 遊ぶ
+  GodanMa,     // 五段ま行: 読む
+  GodanRa,     // 五段ら行: 取る
+  GodanWa,     // 五段わ行: 買う
+  Suru,        // サ変: する
+  Kuru,        // カ変: 来る
+  IAdjective,  // い形容詞: 高い
 };
 
 /**
  * @brief Conjugation form (活用形)
  */
 enum class ConjForm : uint8_t {
-  Base = 0,     // 終止形/基本形: 書く
-  Mizenkei,     // 未然形: 書か
-  Renyokei,     // 連用形: 書き
-  Onbinkei,     // 音便形: 書い
-  Kateikei,     // 仮定形: 書け
-  Meireikei,    // 命令形: 書け
-  Ishikei,      // 意志形: 書こ
+  Base = 0,   // 終止形/基本形: 書く
+  Mizenkei,   // 未然形: 書か
+  Renyokei,   // 連用形: 書き
+  Onbinkei,   // 音便形: 書い
+  Kateikei,   // 仮定形: 書け
+  Meireikei,  // 命令形: 書け
+  Ishikei,    // 意志形: 書こ
 };
 
 /**
@@ -81,13 +81,13 @@ class Conjugation {
    * Used for reverse inflection analysis and verb ending generation.
    */
   struct GodanRow {
-    char32_t base_vowel;    // 終止形母音: く, ぐ, す, etc.
-    char32_t a_row;         // あ段 (未然形): か, が, さ, etc.
-    char32_t i_row;         // い段 (連用形): き, ぎ, し, etc.
-    char32_t e_row;         // え段 (仮定/命令形): け, げ, せ, etc.
-    char32_t o_row;         // お段 (意志形): こ, ご, そ, etc.
-    std::string onbin;      // 音便形: い, っ, ん, "" (empty for サ行)
-    bool voiced_ta;         // た→だ: true for が/な/ば/ま行
+    char32_t base_vowel;  // 終止形母音: く, ぐ, す, etc.
+    char32_t a_row;       // あ段 (未然形): か, が, さ, etc.
+    char32_t i_row;       // い段 (連用形): き, ぎ, し, etc.
+    char32_t e_row;       // え段 (仮定/命令形): け, げ, せ, etc.
+    char32_t o_row;       // お段 (意志形): こ, ご, そ, etc.
+    std::string onbin;    // 音便形: い, っ, ん, "" (empty for サ行)
+    bool voiced_ta;       // た→だ: true for が/な/ば/ま行
   };
 
   /**
@@ -109,16 +109,15 @@ class Conjugation {
    * @param type Verb type: GodanKa
    * @return All conjugated surface forms with info
    */
-  std::vector<ConjugatedForm> generate(const std::string& base_form,
-                                       VerbType type) const;
+  std::vector<ConjugatedForm> generate(const std::string& base_form, VerbType type) const;
 
   /**
    * @brief Suffix info for dictionary expansion (MeCab-compatible)
    */
   struct DictionarySuffix {
-    std::string suffix;                // Suffix to add to stem: った
-    bool is_potential;                 // True if this is a potential form
-    core::ExtendedPOS extended_pos;    // ExtendedPOS for this form
+    std::string suffix;              // Suffix to add to stem: った
+    bool is_potential;               // True if this is a potential form
+    core::ExtendedPOS extended_pos;  // ExtendedPOS for this form
   };
 
   /**
@@ -145,9 +144,7 @@ class Conjugation {
   static VerbType detectType(const std::string& base_form);
 
  private:
-  std::vector<ConjugatedForm> generateGodan(const std::string& stem,
-                                            const std::string& base_form,
-                                            VerbType type) const;
+  std::vector<ConjugatedForm> generateGodan(const std::string& stem, const std::string& base_form, VerbType type) const;
   static std::vector<ConjugatedForm> generateIchidan(const std::string& stem, const std::string& base_form);
   static std::vector<ConjugatedForm> generateSuru(const std::string& stem, const std::string& base_form);
   static std::vector<ConjugatedForm> generateKuru(const std::string& stem, const std::string& base_form);

@@ -23,9 +23,7 @@ class AuxiliaryGeneratorTest : public ::testing::Test {
     }
   }
 
-  bool hasSurface(const std::string& surface) const {
-    return generated_surfaces_.count(surface) > 0;
-  }
+  bool hasSurface(const std::string& surface) const { return generated_surfaces_.count(surface) > 0; }
 
   std::set<std::string> generated_surfaces_;
 };
@@ -257,11 +255,11 @@ TEST_F(AuxiliaryGeneratorTest, HasSouForms) {
 }
 
 TEST_F(AuxiliaryGeneratorTest, HasColloquialContractions) {
-  EXPECT_TRUE(hasSurface("てる"));   // ている contracted
-  EXPECT_TRUE(hasSurface("てた"));   // ていた contracted
-  EXPECT_TRUE(hasSurface("てない")); // ていない contracted
-  EXPECT_TRUE(hasSurface("でる"));   // でいる contracted
-  EXPECT_TRUE(hasSurface("でた"));   // でいた contracted
+  EXPECT_TRUE(hasSurface("てる"));    // ている contracted
+  EXPECT_TRUE(hasSurface("てた"));    // ていた contracted
+  EXPECT_TRUE(hasSurface("てない"));  // ていない contracted
+  EXPECT_TRUE(hasSurface("でる"));    // でいる contracted
+  EXPECT_TRUE(hasSurface("でた"));    // でいた contracted
 }
 
 // ことができる forms removed (multi-word construction, not auxiliary suffix)

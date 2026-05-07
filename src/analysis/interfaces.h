@@ -35,8 +35,7 @@ class INormalizer {
    * @param text Text to analyze
    * @return Vector of character types
    */
-  virtual std::vector<normalize::CharType> getCharTypes(
-      std::string_view text) const = 0;
+  virtual std::vector<normalize::CharType> getCharTypes(std::string_view text) const = 0;
 
  protected:
   INormalizer() = default;
@@ -60,8 +59,7 @@ class IDictionaryLookup {
    * @param start_pos Start position (character index)
    * @return Vector of lookup results
    */
-  virtual std::vector<dictionary::LookupResult> lookup(
-      std::string_view text, size_t start_pos) const = 0;
+  virtual std::vector<dictionary::LookupResult> lookup(std::string_view text, size_t start_pos) const = 0;
 
  protected:
   IDictionaryLookup() = default;
@@ -92,8 +90,7 @@ class IScorer {
    * @param next Next edge
    * @return Connection cost
    */
-  virtual float connectionCost(const core::LatticeEdge& prev,
-                               const core::LatticeEdge& next) const = 0;
+  virtual float connectionCost(const core::LatticeEdge& prev, const core::LatticeEdge& next) const = 0;
 
  protected:
   IScorer() = default;

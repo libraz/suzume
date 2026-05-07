@@ -47,6 +47,16 @@ void printWarning(std::string_view message);
 void printInfo(std::string_view message);
 
 /**
+ * @brief Parse a non-negative integer option.
+ */
+bool parseSizeOption(std::string_view value, size_t* out);
+
+/**
+ * @brief Escape a string for JSON output.
+ */
+std::string jsonEscape(std::string_view value);
+
+/**
  * @brief Read all lines from stdin
  * @return Vector of lines
  */
@@ -93,11 +103,11 @@ struct CommandArgs {
   bool compare = false;
 
   // Normalization options (defaults preserve original)
-  bool normalize_vu = false;    // --normalize-vu: convert ヴ→ビ
-  bool lowercase = false;       // --lowercase: convert to lowercase
+  bool normalize_vu = false;  // --normalize-vu: convert ヴ→ビ
+  bool lowercase = false;     // --lowercase: convert to lowercase
 
   // Postprocess options
-  bool preserve_symbols = false; // --preserve-symbols: keep symbols in output
+  bool preserve_symbols = false;  // --preserve-symbols: keep symbols in output
 };
 
 /**

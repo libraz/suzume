@@ -24,8 +24,8 @@ using CharType = normalize::CharType;
 // V2 Subsidiary verbs for compound verb joining
 // Verb type determines how to generate renyokei from base form
 enum class V2VerbType : uint8_t {
-  Godan,   // 五段: 込む→込み, 返す→返し (replace ending with i-row)
-  Ichidan, // 一段: 続ける→続け, 上げる→上げ (drop る)
+  Godan,    // 五段: 込む→込み, 返す→返し (replace ending with i-row)
+  Ichidan,  // 一段: 続ける→続け, 上げる→上げ (drop る)
 };
 
 struct SubsidiaryVerb {
@@ -73,39 +73,39 @@ const SubsidiaryVerb kSubsidiaryVerbs[] = {
     {"組む", "くむ", "む", V2VerbType::Godan},      // 取り組む, 組み組む
     {"上る", "のぼる", "る", V2VerbType::Godan},    // 立ち上る, 這い上る
     // Ichidan verbs (一段)
-    {"続ける", "つづける", "ける", V2VerbType::Ichidan}, // 読み続ける, 読みつづける
-    {"つける", nullptr, "ける", V2VerbType::Ichidan},    // 見つける
-    {"替える", "かえる", "える", V2VerbType::Ichidan},   // 切り替える
-    {"換える", "かえる", "える", V2VerbType::Ichidan},   // 入れ換える
-    {"合わせる", "あわせる", "せる", V2VerbType::Ichidan}, // 組み合わせる
-    {"切れる", "きれる", "れる", V2VerbType::Ichidan},   // 使い切れる
-    {"出る", "でる", "る", V2VerbType::Ichidan},         // 飛び出る
-    {"上げる", "あげる", "げる", V2VerbType::Ichidan},   // 売り上げる, 取り上げる
-    {"下げる", "さげる", "げる", V2VerbType::Ichidan},   // 引き下げる
-    {"抜ける", "ぬける", "ける", V2VerbType::Ichidan},   // 突き抜ける
-    {"着く", "つく", "く", V2VerbType::Godan},            // 落ち着く, たどり着く
-    {"取る", "とる", "る", V2VerbType::Godan},            // 搾り取る, 掠め取る
-    {"越す", "こす", "す", V2VerbType::Godan},            // 引っ越す, 追い越す
-    {"越える", "こえる", "える", V2VerbType::Ichidan},   // 乗り越える, 飛び越える
-    {"張る", "はる", "る", V2VerbType::Godan},            // 引っ張る, 頑張る
-    {"叫ぶ", "さけぶ", "ぶ", V2VerbType::Godan},         // 泣き叫ぶ, 喚き叫ぶ
-    {"注ぐ", "そそぐ", "ぐ", V2VerbType::Godan},         // 降り注ぐ, 流し注ぐ
-    {"継ぐ", "つぐ", "ぐ", V2VerbType::Godan},           // 語り継ぐ, 受け継ぐ, 引き継ぐ
-    {"刺す", "さす", "す", V2VerbType::Godan},            // 突き刺す, 差し刺す
-    {"望む", "のぞむ", "む", V2VerbType::Godan},          // 待ち望む, 見望む
-    {"落とす", "おとす", "す", V2VerbType::Godan},       // 切り落とす, 打ち落とす
-    {"落ちる", "おちる", "ちる", V2VerbType::Ichidan},   // 転げ落ちる
-    {"掛ける", "かける", "ける", V2VerbType::Ichidan},   // 呼び掛ける, 働き掛ける
-    {"付ける", "つける", "ける", V2VerbType::Ichidan},   // 押し付ける, 決め付ける
-    {"入れる", "いれる", "れる", V2VerbType::Ichidan},   // 取り入れる, 持ち入れる
-    {"分ける", "わける", "ける", V2VerbType::Ichidan},   // 切り分ける, 振り分ける
-    {"立てる", "たてる", "てる", V2VerbType::Ichidan},   // 組み立てる, 打ち立てる
-    {"広げる", "ひろげる", "げる", V2VerbType::Ichidan}, // 繰り広げる, 押し広げる
-    {"受ける", "うける", "ける", V2VerbType::Ichidan},   // 引き受ける, 請け受ける
-    {"降りる", "おりる", "りる", V2VerbType::Ichidan},   // 乗り降りる
-    {"締める", "しめる", "める", V2VerbType::Ichidan},   // 抱きしめる, 締め締める
-    {"止める", "とめる", "める", V2VerbType::Ichidan},   // 受け止める, 食い止める
-    {"入る", "いる", "る", V2VerbType::Godan},            // 飛び入る, 立ち入る
+    {"続ける", "つづける", "ける", V2VerbType::Ichidan},    // 読み続ける, 読みつづける
+    {"つける", nullptr, "ける", V2VerbType::Ichidan},       // 見つける
+    {"替える", "かえる", "える", V2VerbType::Ichidan},      // 切り替える
+    {"換える", "かえる", "える", V2VerbType::Ichidan},      // 入れ換える
+    {"合わせる", "あわせる", "せる", V2VerbType::Ichidan},  // 組み合わせる
+    {"切れる", "きれる", "れる", V2VerbType::Ichidan},      // 使い切れる
+    {"出る", "でる", "る", V2VerbType::Ichidan},            // 飛び出る
+    {"上げる", "あげる", "げる", V2VerbType::Ichidan},      // 売り上げる, 取り上げる
+    {"下げる", "さげる", "げる", V2VerbType::Ichidan},      // 引き下げる
+    {"抜ける", "ぬける", "ける", V2VerbType::Ichidan},      // 突き抜ける
+    {"着く", "つく", "く", V2VerbType::Godan},              // 落ち着く, たどり着く
+    {"取る", "とる", "る", V2VerbType::Godan},              // 搾り取る, 掠め取る
+    {"越す", "こす", "す", V2VerbType::Godan},              // 引っ越す, 追い越す
+    {"越える", "こえる", "える", V2VerbType::Ichidan},      // 乗り越える, 飛び越える
+    {"張る", "はる", "る", V2VerbType::Godan},              // 引っ張る, 頑張る
+    {"叫ぶ", "さけぶ", "ぶ", V2VerbType::Godan},            // 泣き叫ぶ, 喚き叫ぶ
+    {"注ぐ", "そそぐ", "ぐ", V2VerbType::Godan},            // 降り注ぐ, 流し注ぐ
+    {"継ぐ", "つぐ", "ぐ", V2VerbType::Godan},              // 語り継ぐ, 受け継ぐ, 引き継ぐ
+    {"刺す", "さす", "す", V2VerbType::Godan},              // 突き刺す, 差し刺す
+    {"望む", "のぞむ", "む", V2VerbType::Godan},            // 待ち望む, 見望む
+    {"落とす", "おとす", "す", V2VerbType::Godan},          // 切り落とす, 打ち落とす
+    {"落ちる", "おちる", "ちる", V2VerbType::Ichidan},      // 転げ落ちる
+    {"掛ける", "かける", "ける", V2VerbType::Ichidan},      // 呼び掛ける, 働き掛ける
+    {"付ける", "つける", "ける", V2VerbType::Ichidan},      // 押し付ける, 決め付ける
+    {"入れる", "いれる", "れる", V2VerbType::Ichidan},      // 取り入れる, 持ち入れる
+    {"分ける", "わける", "ける", V2VerbType::Ichidan},      // 切り分ける, 振り分ける
+    {"立てる", "たてる", "てる", V2VerbType::Ichidan},      // 組み立てる, 打ち立てる
+    {"広げる", "ひろげる", "げる", V2VerbType::Ichidan},    // 繰り広げる, 押し広げる
+    {"受ける", "うける", "ける", V2VerbType::Ichidan},      // 引き受ける, 請け受ける
+    {"降りる", "おりる", "りる", V2VerbType::Ichidan},      // 乗り降りる
+    {"締める", "しめる", "める", V2VerbType::Ichidan},      // 抱きしめる, 締め締める
+    {"止める", "とめる", "める", V2VerbType::Ichidan},      // 受け止める, 食い止める
+    {"入る", "いる", "る", V2VerbType::Godan},              // 飛び入る, 立ち入る
 };
 
 // Sokuonbin-compatible godan verb endings (く, つ, う, る)
@@ -115,11 +115,10 @@ const char32_t kSokuonbinEndings[] = {U'く', U'つ', U'う', U'る'};
 // Generate renyokei surface from base form
 // Godan: replace ending with i-row (込む→込み, 返す→返し)
 // Ichidan: drop る (続ける→続け)
-inline std::string generateRenyokei(std::string_view surface,
-                                    std::string_view reading,
-                                    V2VerbType verb_type) {
+inline std::string generateRenyokei(std::string_view surface, std::string_view reading, V2VerbType verb_type) {
   std::string_view base = reading.empty() ? surface : reading;
-  if (base.empty()) return "";
+  if (base.empty())
+    return "";
 
   if (verb_type == V2VerbType::Ichidan) {
     // Drop final る (3 bytes in UTF-8)
@@ -131,10 +130,12 @@ inline std::string generateRenyokei(std::string_view surface,
 
   // Godan: replace last hiragana with i-row equivalent
   // む→み, す→し, く→き, ぐ→ぎ, う→い, る→り, つ→ち, ぬ→に, ぶ→び
-  if (base.size() < 3) return "";
+  if (base.size() < 3)
+    return "";
   char32_t last_cp = utf8::decodeLastChar(base);
   auto i_row = grammar::godanIRowSuffixFromURow(last_cp);
-  if (i_row.empty()) return "";  // Unknown ending
+  if (i_row.empty())
+    return "";  // Unknown ending
   std::string result(base.substr(0, base.size() - 3));
   result += i_row;
   return result;
@@ -143,11 +144,10 @@ inline std::string generateRenyokei(std::string_view surface,
 // Generate mizenkei surface from base form
 // Godan: replace ending with a-row (込む→込ま, 返す→返さ)
 // Ichidan: drop る (続ける→続け, same as renyokei for ichidan)
-inline std::string generateMizenkei(std::string_view surface,
-                                     std::string_view reading,
-                                     V2VerbType verb_type) {
+inline std::string generateMizenkei(std::string_view surface, std::string_view reading, V2VerbType verb_type) {
   std::string_view base = reading.empty() ? surface : reading;
-  if (base.empty()) return "";
+  if (base.empty())
+    return "";
 
   if (verb_type == V2VerbType::Ichidan) {
     // Drop final る (3 bytes in UTF-8) — same as renyokei
@@ -159,10 +159,12 @@ inline std::string generateMizenkei(std::string_view surface,
 
   // Godan: replace last hiragana with a-row equivalent
   // む→ま, す→さ, く→か, ぐ→が, う→わ, る→ら, つ→た, ぬ→な, ぶ→ば
-  if (base.size() < 3) return "";
+  if (base.size() < 3)
+    return "";
   char32_t last_cp = utf8::decodeLastChar(base);
   auto a_row = grammar::godanARowSuffixFromURow(last_cp);
-  if (a_row.empty()) return "";  // Unknown ending
+  if (a_row.empty())
+    return "";  // Unknown ending
   std::string result(base.substr(0, base.size() - 3));
   result += a_row;
   return result;
@@ -179,22 +181,25 @@ enum class TeFormType : uint8_t {
 
 // Determine te-form type and suffix from verb ending
 inline TeFormType getTeFormType(std::string_view base_ending) {
-  if (base_ending == "く" || base_ending == "ぐ") return TeFormType::Ionbin;
-  if (base_ending == "つ" || base_ending == "う" || base_ending == "る") return TeFormType::Sokuonbin;
-  if (base_ending == "む" || base_ending == "ぶ" || base_ending == "ぬ") return TeFormType::Hatsuonbin;
-  if (base_ending == "す") return TeFormType::Renyokei;
+  if (base_ending == "く" || base_ending == "ぐ")
+    return TeFormType::Ionbin;
+  if (base_ending == "つ" || base_ending == "う" || base_ending == "る")
+    return TeFormType::Sokuonbin;
+  if (base_ending == "む" || base_ending == "ぶ" || base_ending == "ぬ")
+    return TeFormType::Hatsuonbin;
+  if (base_ending == "す")
+    return TeFormType::Renyokei;
   // Default for ichidan
   return TeFormType::Ichidan;
 }
 
 // Generate te-form euphonic stem (before て/で)
 // Returns: stem and whether it uses で (vs て)
-inline std::pair<std::string, bool> generateTeFormStem(std::string_view surface,
-                                                        std::string_view reading,
-                                                        V2VerbType verb_type,
-                                                        std::string_view base_ending) {
+inline std::pair<std::string, bool> generateTeFormStem(std::string_view surface, std::string_view reading,
+                                                       V2VerbType verb_type, std::string_view base_ending) {
   std::string_view base = reading.empty() ? surface : reading;
-  if (base.empty() || base.size() < 3) return {"", false};
+  if (base.empty() || base.size() < 3)
+    return {"", false};
 
   if (verb_type == V2VerbType::Ichidan) {
     // Drop final る (3 bytes in UTF-8)
@@ -214,7 +219,7 @@ inline std::pair<std::string, bool> generateTeFormStem(std::string_view surface,
       return {result, false};  // っ+て
     case TeFormType::Hatsuonbin:
       result += "ん";
-      return {result, true};   // ん+で
+      return {result, true};  // ん+で
     case TeFormType::Renyokei:
       result += "し";
       return {result, false};  // し+て
@@ -224,8 +229,7 @@ inline std::pair<std::string, bool> generateTeFormStem(std::string_view surface,
 }
 
 // Generate kanji renyokei from kanji surface
-inline std::string generateKanjiRenyokei(std::string_view kanji_surface,
-                                         std::string_view reading,
+inline std::string generateKanjiRenyokei(std::string_view kanji_surface, std::string_view reading,
                                          V2VerbType verb_type) {
   if (reading.empty()) {
     return generateRenyokei(kanji_surface, "", verb_type);
@@ -233,7 +237,8 @@ inline std::string generateKanjiRenyokei(std::string_view kanji_surface,
   // For kanji+okurigana, need to replace okurigana with renyokei
   // E.g., 込む(こむ) → 込み, 続ける(つづける) → 続け
   std::string hiragana_renyokei = generateRenyokei(reading, "", verb_type);
-  if (hiragana_renyokei.empty()) return "";
+  if (hiragana_renyokei.empty())
+    return "";
 
   // Find where kanji ends and okurigana begins
   // Kanji surface should have same kanji prefix as reading suffix is okurigana
@@ -246,7 +251,8 @@ inline std::string generateKanjiRenyokei(std::string_view kanji_surface,
       break;
     }
   }
-  if (kanji_bytes == 0) return "";
+  if (kanji_bytes == 0)
+    return "";
 
   // Kanji prefix + hiragana renyokei suffix
   std::string result(kanji_surface.substr(0, kanji_bytes));
@@ -259,8 +265,8 @@ inline std::string generateKanjiRenyokei(std::string_view kanji_surface,
 
 // 連用形 (continuative form) endings for Godan verbs
 struct RenyokeiPattern {
-  char32_t renyokei;   // 連用形 ending
-  char32_t base;       // Base form ending
+  char32_t renyokei;  // 連用形 ending
+  char32_t base;      // Base form ending
 };
 
 const RenyokeiPattern kGodanRenyokei[] = {
@@ -291,22 +297,22 @@ const ProductivePrefix kProductivePrefixes[] = {
     // E.g., お水 → お(PREFIX) + 水(NOUN), not お水(NOUN)
 
     // Negation prefixes
-    {U'不', -0.4F, true},   // 不安, 不要, 不便
-    {U'未', -0.4F, true},   // 未経験, 未確認
-    {U'非', -0.4F, true},   // 非常, 非公開
-    {U'無', -0.4F, true},   // 無理, 無料
+    {U'不', -0.4F, true},  // 不安, 不要, 不便
+    {U'未', -0.4F, true},  // 未経験, 未確認
+    {U'非', -0.4F, true},  // 非常, 非公開
+    {U'無', -0.4F, true},  // 無理, 無料
 
     // Degree/quantity prefixes
-    {U'超', -0.3F, true},   // 超人, 超高速
-    {U'再', -0.4F, true},   // 再開, 再確認
-    {U'準', -0.4F, true},   // 準備, 準決勝
-    {U'副', -0.4F, true},   // 副社長, 副作用
-    {U'総', -0.4F, true},   // 総合, 総数
-    {U'各', -0.4F, true},   // 各地, 各種
-    {U'両', -0.4F, true},   // 両方, 両手
-    {U'最', -0.4F, true},   // 最高, 最新
-    {U'全', -0.4F, true},   // 全部, 全員
-    {U'半', -0.4F, true},   // 半分, 半額
+    {U'超', -0.3F, true},  // 超人, 超高速
+    {U'再', -0.4F, true},  // 再開, 再確認
+    {U'準', -0.4F, true},  // 準備, 準決勝
+    {U'副', -0.4F, true},  // 副社長, 副作用
+    {U'総', -0.4F, true},  // 総合, 総数
+    {U'各', -0.4F, true},  // 各地, 各種
+    {U'両', -0.4F, true},  // 両方, 両手
+    {U'最', -0.4F, true},  // 最高, 最新
+    {U'全', -0.4F, true},  // 全部, 全員
+    {U'半', -0.4F, true},  // 半分, 半額
 };
 
 constexpr size_t kNumPrefixes = sizeof(kProductivePrefixes) / sizeof(kProductivePrefixes[0]);
@@ -348,20 +354,19 @@ const TeFormAuxiliary kTeFormAuxiliaries[] = {
  * Note: で is for hatsuonbin te-form (読ん+で, 飛ん+で)
  */
 inline bool hasAuxiliarySuffix(std::string_view suffix) {
-  if (suffix.empty()) return false;
+  if (suffix.empty())
+    return false;
   // Note: "ます" excluded for MeCab-compatible split (e.g., 申し上げます → 申し上げ + ます)
   return utf8::containsAny(suffix, {"た", "て", "で", "だ", "ない", "れ"});
 }
 
 }  // namespace
 
-void addCompoundVerbJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer,
-    const grammar::Inflection& inflection) {
+void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text,
+                                   const std::vector<char32_t>& codepoints, size_t start_pos,
+                                   const std::vector<normalize::CharType>& char_types,
+                                   const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
+                                   const grammar::Inflection& inflection) {
   if (start_pos >= char_types.size()) {
     return;
   }
@@ -372,12 +377,10 @@ void addCompoundVerbJoinCandidates(
   }
 
   // Find the kanji portion (V1 stem)
-  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 4,
-                                        CharType::Kanji);
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 4, CharType::Kanji);
 
   // Next must be hiragana (連用形 ending)
-  if (kanji_end >= char_types.size() ||
-      char_types[kanji_end] != CharType::Hiragana) {
+  if (kanji_end >= char_types.size() || char_types[kanji_end] != CharType::Hiragana) {
     return;
   }
 
@@ -396,11 +399,10 @@ void addCompoundVerbJoinCandidates(
   // Check for sokuonbin (っ) compound pattern: 突っ込む, 引っ張る, ぶっ壊す
   // Sokuonbin verbs: godan-ka(く), godan-ta(つ), godan-wa(う), godan-ra(る)
   bool is_sokuonbin = (base_ending == 0 && renyokei_char == U'っ');
-  SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] pos=" << start_pos
-      << " kanji_end=" << kanji_end
-      << " renyokei=" << normalize::utf8::encode({renyokei_char})
-      << " base_ending=" << (base_ending ? normalize::utf8::encode({base_ending}) : "0")
-      << " sokuonbin=" << is_sokuonbin << "\n");
+  SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] pos=" << start_pos << " kanji_end=" << kanji_end << " renyokei="
+                                             << normalize::utf8::encode({renyokei_char}) << " base_ending="
+                                             << (base_ending ? normalize::utf8::encode({base_ending}) : "0")
+                                             << " sokuonbin=" << is_sokuonbin << "\n");
 
   // If not a 連用形 ending, this might be an Ichidan verb
   bool is_ichidan = (base_ending == 0 && !is_sokuonbin);
@@ -433,11 +435,9 @@ void addCompoundVerbJoinCandidates(
       size_t scan_pos = kanji_end + 1;
       // Limit scan to 3 additional hiragana chars (max stem like まれ = 2 chars)
       size_t scan_limit = std::min(scan_pos + 2, codepoints.size());
-      while (scan_pos < scan_limit &&
-             char_types[scan_pos] == CharType::Hiragana) {
+      while (scan_pos < scan_limit && char_types[scan_pos] == CharType::Hiragana) {
         char32_t scan_char = codepoints[scan_pos];
-        if (grammar::isERowCodepoint(scan_char) ||
-            grammar::isIRowCodepoint(scan_char)) {
+        if (grammar::isERowCodepoint(scan_char) || grammar::isIRowCodepoint(scan_char)) {
           // Found e/i-row ending: valid multi-char ichidan stem
           // V2 starts after this character
           v2_start = scan_pos + 1;
@@ -467,8 +467,7 @@ void addCompoundVerbJoinCandidates(
   // Inflection analyzer for V2 detection (shared instance from Tokenizer)
 
   // Find extent of hiragana after v2_start for inflection analysis
-  size_t v2_hiragana_end = findCharRegionEnd(char_types, v2_start, 8,
-                                              CharType::Hiragana);
+  size_t v2_hiragana_end = findCharRegionEnd(char_types, v2_start, 8, CharType::Hiragana);
 
   // Look for V2 (subsidiary verb)
   // We collect the best match rather than returning immediately.
@@ -477,15 +476,15 @@ void addCompoundVerbJoinCandidates(
   struct V2Match {
     size_t matched_len = 0;
     std::string compound_base;
-    bool is_renyokei = false;      // true if matched via renyokei entry
-    bool is_mizenkei = false;      // true if matched via mizenkei form
-    bool includes_aux = false;     // true if inflection match includes aux suffix
+    bool is_renyokei = false;          // true if matched via renyokei entry
+    bool is_mizenkei = false;          // true if matched via mizenkei form
+    bool includes_aux = false;         // true if inflection match includes aux suffix
     bool matched_via_reading = false;  // true if V2 was matched via hiragana reading
-    std::string v2_reading;        // V2 hiragana reading (for hiragana te-stem generation)
+    std::string v2_reading;            // V2 hiragana reading (for hiragana te-stem generation)
     float confidence = 0.0F;
     V2VerbType v2_verb_type = V2VerbType::Godan;  // V2 verb type
     std::string_view v2_base_ending;              // V2 base form ending (む, す, etc.)
-    bool v1_dict_verified = false;  // true if V1 was verified via dictionary (not inflection fallback)
+    bool v1_dict_verified = false;                // true if V1 was verified via dictionary (not inflection fallback)
   };
   V2Match best_match;
 
@@ -515,8 +514,7 @@ void addCompoundVerbJoinCandidates(
     }
 
     // Try reading (hiragana) match if kanji didn't match
-    if (!matched_kanji && !v2_reading.empty() &&
-        v2_start_byte + v2_reading.size() <= text.size()) {
+    if (!matched_kanji && !v2_reading.empty() && v2_start_byte + v2_reading.size() <= text.size()) {
       std::string_view text_at_v2 = text.substr(v2_start_byte, v2_reading.size());
       if (text_at_v2 == v2_reading) {
         matched_reading = true;
@@ -533,8 +531,7 @@ void addCompoundVerbJoinCandidates(
       std::string hira_renyokei = generateRenyokei(v2_reading, "", v2_verb.verb_type);
 
       // Try kanji renyokei match
-      if (!kanji_renyokei.empty() &&
-          v2_start_byte + kanji_renyokei.size() <= text.size()) {
+      if (!kanji_renyokei.empty() && v2_start_byte + kanji_renyokei.size() <= text.size()) {
         std::string_view text_at_v2 = text.substr(v2_start_byte, kanji_renyokei.size());
         if (text_at_v2 == kanji_renyokei) {
           matched_renyokei = true;
@@ -544,8 +541,7 @@ void addCompoundVerbJoinCandidates(
       }
 
       // Try hiragana renyokei match if kanji didn't match
-      if (!matched_renyokei && !hira_renyokei.empty() &&
-          v2_start_byte + hira_renyokei.size() <= text.size()) {
+      if (!matched_renyokei && !hira_renyokei.empty() && v2_start_byte + hira_renyokei.size() <= text.size()) {
         std::string_view text_at_v2 = text.substr(v2_start_byte, hira_renyokei.size());
         if (text_at_v2 == hira_renyokei) {
           // Skip Ichidan V1 + V2「出る」renyokei (で) match
@@ -569,10 +565,8 @@ void addCompoundVerbJoinCandidates(
     if (!matched_kanji && !matched_reading && !matched_renyokei && !v2_reading.empty()) {
       std::string_view base_ending(v2_verb.base_ending);
       // Only try inflection for base forms (ending in る/す/く/う/む/つ/ぶ/ぐ/ぬ or ichidan endings)
-      if (utf8::equalsAny(base_ending,
-          {"る", "す", "く", "う", "む", "つ", "ぶ", "ぐ", "ぬ",
-           "める", "ける", "れる", "える", "げる", "てる", "せる", "ちる"})) {
-
+      if (utf8::equalsAny(base_ending, {"る", "す", "く", "う", "む", "つ", "ぶ", "ぐ", "ぬ", "める", "ける", "れる",
+                                        "える", "げる", "てる", "せる", "ちる"})) {
         // Case 1: Hiragana V2 inflected forms (e.g., きった from きる, かった from かう)
         // Try different lengths for V2 inflected form (shortest match first)
         for (size_t v2_end = v2_start + 2; v2_end <= v2_hiragana_end; ++v2_end) {
@@ -594,20 +588,18 @@ void addCompoundVerbJoinCandidates(
             // Verify verb type consistency: if V2 is godan, reject ichidan
             // inflection matches (and vice versa). This prevents e.g. いた
             // (ichidan いる ta-form) from falsely matching godan 入る(いる).
-            if (infl_result.confidence >= 0.3F &&
-                infl_result.base_form == expected_base &&
+            if (infl_result.confidence >= 0.3F && infl_result.base_form == expected_base &&
                 hasAuxiliarySuffix(infl_result.suffix) &&
-                !(v2_verb.verb_type == V2VerbType::Godan &&
-                  infl_result.verb_type == grammar::VerbType::Ichidan) &&
-                !(v2_verb.verb_type == V2VerbType::Ichidan &&
-                  infl_result.verb_type != grammar::VerbType::Ichidan)) {
+                !(v2_verb.verb_type == V2VerbType::Godan && infl_result.verb_type == grammar::VerbType::Ichidan) &&
+                !(v2_verb.verb_type == V2VerbType::Ichidan && infl_result.verb_type != grammar::VerbType::Ichidan)) {
               matched_inflected = true;
               matched_len = v2_end_byte - v2_start_byte;
               inflection_includes_aux = true;  // Mark that this match includes aux
               break;
             }
           }
-          if (matched_inflected) break;
+          if (matched_inflected)
+            break;
         }
 
         // Case 2: Kanji V2 inflected forms (e.g., 巡った from 巡る)
@@ -635,16 +627,13 @@ void addCompoundVerbJoinCandidates(
             if (v2_start_byte + kanji_prefix_byte_len <= text.size()) {
               std::string_view text_kanji_prefix = text.substr(v2_start_byte, kanji_prefix_byte_len);
               std::string v2_kanji_prefix = normalize::utf8::encode(
-                  std::vector<char32_t>(v2_surface_decoded.begin(),
-                                        v2_surface_decoded.begin() + kanji_prefix_len));
+                  std::vector<char32_t>(v2_surface_decoded.begin(), v2_surface_decoded.begin() + kanji_prefix_len));
 
               if (text_kanji_prefix == v2_kanji_prefix) {
                 // Find the hiragana suffix after the kanji prefix
                 size_t hira_start = v2_start + kanji_prefix_len;
-                if (hira_start < codepoints.size() &&
-                    char_types[hira_start] == CharType::Hiragana) {
-                  size_t hira_end = findCharRegionEnd(char_types, hira_start, 6,
-                                                       CharType::Hiragana);
+                if (hira_start < codepoints.size() && char_types[hira_start] == CharType::Hiragana) {
+                  size_t hira_end = findCharRegionEnd(char_types, hira_start, 6, CharType::Hiragana);
 
                   // Try inflection on kanji+hiragana portion (shortest match first)
                   for (size_t v2_end = hira_start + 1; v2_end <= hira_end; ++v2_end) {
@@ -656,8 +645,7 @@ void addCompoundVerbJoinCandidates(
                     for (const auto& infl_result : infl_results) {
                       // Check if base form matches V2 surface (kanji form)
                       // Require the suffix to contain actual auxiliary patterns
-                      if (infl_result.confidence >= 0.35F &&
-                          infl_result.base_form == v2_surface &&
+                      if (infl_result.confidence >= 0.35F && infl_result.base_form == v2_surface &&
                           hasAuxiliarySuffix(infl_result.suffix)) {
                         matched_inflected = true;
                         matched_len = v2_end_byte - v2_start_byte;
@@ -665,7 +653,8 @@ void addCompoundVerbJoinCandidates(
                         break;
                       }
                     }
-                    if (matched_inflected) break;
+                    if (matched_inflected)
+                      break;
                   }
                 }
               }
@@ -683,16 +672,18 @@ void addCompoundVerbJoinCandidates(
       // Try kanji mizenkei (込ま from 込む)
       std::string kanji_mizen = generateMizenkei(v2_surface, "", v2_verb.verb_type);
       // Try hiragana mizenkei (こま from こむ)
-      std::string hira_mizen = !v2_reading.empty()
-          ? generateMizenkei(v2_reading, "", v2_verb.verb_type) : "";
+      std::string hira_mizen = !v2_reading.empty() ? generateMizenkei(v2_reading, "", v2_verb.verb_type) : "";
 
       auto tryMizenMatch = [&](const std::string& mizen) -> bool {
-        if (mizen.empty() || v2_start_byte + mizen.size() > text.size()) return false;
+        if (mizen.empty() || v2_start_byte + mizen.size() > text.size())
+          return false;
         std::string_view text_at_v2 = text.substr(v2_start_byte, mizen.size());
-        if (text_at_v2 != mizen) return false;
+        if (text_at_v2 != mizen)
+          return false;
         // Must be followed by passive れ or causative せ
         size_t after_byte = v2_start_byte + mizen.size();
-        if (after_byte + 3 > text.size()) return false;
+        if (after_byte + 3 > text.size())
+          return false;
         std::string_view after = text.substr(after_byte, 3);
         return after == "れ" || after == "せ";
       };
@@ -706,16 +697,14 @@ void addCompoundVerbJoinCandidates(
       }
     }
 
-    if (!matched_kanji && !matched_reading && !matched_renyokei &&
-        !matched_inflected && !matched_mizenkei) {
+    if (!matched_kanji && !matched_reading && !matched_renyokei && !matched_inflected && !matched_mizenkei) {
       continue;
     }
 
-    SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] V2 matched: " << v2_verb.surface
-        << " kanji=" << matched_kanji << " reading=" << matched_reading
-        << " renyokei=" << matched_renyokei << " inflected=" << matched_inflected
-        << " mizenkei=" << matched_mizenkei
-        << " len=" << matched_len << "\n");
+    SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] V2 matched: "
+                             << v2_verb.surface << " kanji=" << matched_kanji << " reading=" << matched_reading
+                             << " renyokei=" << matched_renyokei << " inflected=" << matched_inflected
+                             << " mizenkei=" << matched_mizenkei << " len=" << matched_len << "\n");
 
     // Build the V1 base form for verification
     std::string v1_base;
@@ -750,7 +739,8 @@ void addCompoundVerbJoinCandidates(
             break;
           }
         }
-        if (v1_verified) break;
+        if (v1_verified)
+          break;
       }
     } else {
       auto v1_results = dict_manager.lookup(v1_base, 0);
@@ -764,9 +754,8 @@ void addCompoundVerbJoinCandidates(
       }
     }
 
-    SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] V1 base=" << v1_base
-        << " verified=" << v1_verified
-        << " sokuonbin=" << is_sokuonbin << "\n");
+    SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] V1 base=" << v1_base << " verified=" << v1_verified
+                                                   << " sokuonbin=" << is_sokuonbin << "\n");
 
     // Fallback: use inflection analysis for unknown V1 verbs
     // This allows compound verbs like 読み込む where 読む is not in dictionary
@@ -791,7 +780,8 @@ void addCompoundVerbJoinCandidates(
               break;
             }
           }
-          if (v1_base == candidate) break;
+          if (v1_base == candidate)
+            break;
         }
       }
 
@@ -883,8 +873,7 @@ void addCompoundVerbJoinCandidates(
 
       // Check if full surface could be an i-adjective
       auto full_infl = inflection.getBest(full_surface);
-      if (full_infl.confidence >= 0.5F &&
-          full_infl.verb_type == grammar::VerbType::IAdjective) {
+      if (full_infl.confidence >= 0.5F && full_infl.verb_type == grammar::VerbType::IAdjective) {
         // Full surface is likely an adjective, skip compound verb
         continue;
       }
@@ -907,13 +896,12 @@ void addCompoundVerbJoinCandidates(
     if (best_match.matched_len == 0) {
       // First valid match
       should_update = true;
-    } else if (matched_renyokei && best_match.is_renyokei &&
-               matched_len > best_match.matched_len) {
+    } else if (matched_renyokei && best_match.is_renyokei && matched_len > best_match.matched_len) {
       // Longer renyokei match beats shorter renyokei match
       // This makes 出し (6 bytes) beat 出 (3 bytes) for V1+V2 compounds
       should_update = true;
-    } else if (is_renyokei_entry && (matched_kanji || matched_reading) &&
-               best_match.includes_aux && !best_match.is_renyokei) {
+    } else if (is_renyokei_entry && (matched_kanji || matched_reading) && best_match.includes_aux &&
+               !best_match.is_renyokei) {
       // Renyokei exact match beats inflection match that includes aux
       // This makes 食べすぎ (renyokei) beat 食べすぎた (inflection+aux)
       should_update = true;
@@ -937,7 +925,7 @@ void addCompoundVerbJoinCandidates(
   }
 
   SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] best_match.len=" << best_match.matched_len
-      << " base=" << best_match.compound_base << "\n");
+                                                        << " base=" << best_match.compound_base << "\n");
 
   // After checking all V2 entries, use the best match if found
   if (best_match.matched_len > 0) {
@@ -970,17 +958,15 @@ void addCompoundVerbJoinCandidates(
     // when standalone, while allowing 切り替えた, 打ち合わせて to be parsed as compound verbs.
     auto noun_check_results = dict_manager.lookup(compound_surface, 0);
     for (const auto& result : noun_check_results) {
-      if (result.entry != nullptr &&
-          result.entry->pos == core::PartOfSpeech::Noun &&
+      if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Noun &&
           result.entry->surface == compound_surface) {
         // Check if followed by auxiliary suffix
         bool followed_by_aux = false;
         if (compound_end_pos < codepoints.size()) {
           char32_t next_cp = codepoints[compound_end_pos];
           // た/て/で/な(い)/れ/ら/ま(す) indicate verb conjugation
-          followed_by_aux = (next_cp == U'た' || next_cp == U'て' || next_cp == U'で' ||
-                             next_cp == U'な' || next_cp == U'れ' || next_cp == U'ら' ||
-                             next_cp == U'ま' || next_cp == U'ず');
+          followed_by_aux = (next_cp == U'た' || next_cp == U'て' || next_cp == U'で' || next_cp == U'な' ||
+                             next_cp == U'れ' || next_cp == U'ら' || next_cp == U'ま' || next_cp == U'ず');
         }
         if (!followed_by_aux) {
           SUZUME_DEBUG_LOG("[COMPOUND_SKIP] \"" << compound_surface << "\" is dict NOUN, skipping compound verb\n");
@@ -997,9 +983,8 @@ void addCompoundVerbJoinCandidates(
     // Inflection analysis can verify verb forms that aren't real words (e.g., 進す),
     // so unverified compounds should be more expensive to prevent false positives
     // like 進し続ける winning over 前進+し+続ける.
-    float v1_bonus = best_match.v1_dict_verified
-        ? opts.verified_v1_bonus   // -0.3: reward for dictionary-confirmed V1
-        : bigram_cost::kRare;      // +1.0: penalty for inflection-only V1
+    float v1_bonus = best_match.v1_dict_verified ? opts.verified_v1_bonus  // -0.3: reward for dictionary-confirmed V1
+                                                 : bigram_cost::kRare;     // +1.0: penalty for inflection-only V1
     float final_cost = base_cost + opts.compound_verb_bonus + v1_bonus;
 
     // Penalty for compound verbs that absorb auxiliary suffixes (た/て/れる/etc.)
@@ -1020,50 +1005,47 @@ void addCompoundVerbJoinCandidates(
     // Mizenkei match: add VerbMizenkei edge and return (no te-stem/mizenkei derivation)
     // E.g., 打ち込ま (mizenkei of 打ち込む) for passive 打ち込まれ
     if (best_match.is_mizenkei) {
-      lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos),
-                      static_cast<uint32_t>(compound_end_pos), core::PartOfSpeech::Verb,
-                      final_cost, flags, compound_lemma,
-                      dictionary::ConjugationType::None,
-                      core::CandidateOrigin::Unknown, 0.0F, "compound_mizenkei",
-                      core::ExtendedPOS::VerbMizenkei, "compound_mizenkei");
+      lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
+                      core::PartOfSpeech::Verb, final_cost, flags, compound_lemma, dictionary::ConjugationType::None,
+                      core::CandidateOrigin::Unknown, 0.0F, "compound_mizenkei", core::ExtendedPOS::VerbMizenkei,
+                      "compound_mizenkei");
       return;
     }
 
-    lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos),
-                    static_cast<uint32_t>(compound_end_pos), core::PartOfSpeech::Verb,
-                    final_cost, flags, compound_lemma);
+    lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
+                    core::PartOfSpeech::Verb, final_cost, flags, compound_lemma);
 
     // MeCab compatibility: Generate te-form euphonic stem candidate
     // This enables MeCab-compatible te-form splitting: 話し合って → 話し合っ|て
     // Without this, the compound verb te-form (話し合って) would be a single token.
-    auto [te_stem, uses_de] = generateTeFormStem(
-        best_match.compound_base, "", best_match.v2_verb_type, best_match.v2_base_ending);
+    auto [te_stem, uses_de] =
+        generateTeFormStem(best_match.compound_base, "", best_match.v2_verb_type, best_match.v2_base_ending);
 
     // Helper lambda to add te-stem edge
     auto addTeStemEdge = [&](const std::string& stem) {
-      if (stem.empty() || stem.size() >= compound_surface.size()) return false;
+      if (stem.empty() || stem.size() >= compound_surface.size())
+        return false;
       std::string_view text_prefix = text.substr(start_byte, stem.size());
-      if (text_prefix != stem) return false;
+      if (text_prefix != stem)
+        return false;
 
       auto stem_decoded = normalize::utf8::decode(stem);
       size_t stem_end_pos = start_pos + stem_decoded.size();
-      if (stem_end_pos > codepoints.size()) return false;
+      if (stem_end_pos > codepoints.size())
+        return false;
 
       // Determine ExtendedPOS based on te-form type
       auto te_type = getTeFormType(best_match.v2_base_ending);
       core::ExtendedPOS epos;
       if (te_type == TeFormType::Renyokei) {
-        epos = core::ExtendedPOS::VerbRenyokei;   // 話し (サ行)
+        epos = core::ExtendedPOS::VerbRenyokei;  // 話し (サ行)
       } else {
-        epos = core::ExtendedPOS::VerbOnbinkei;   // 書い, 買っ, 読ん, etc.
+        epos = core::ExtendedPOS::VerbOnbinkei;  // 書い, 買っ, 読ん, etc.
       }
 
-      lattice.addEdge(stem, static_cast<uint32_t>(start_pos),
-                      static_cast<uint32_t>(stem_end_pos), core::PartOfSpeech::Verb,
-                      final_cost, flags, compound_lemma,
-                      dictionary::ConjugationType::None,
-                      core::CandidateOrigin::Unknown, 0.0F, "compound_te_stem",
-                      epos, "compound_te_stem");
+      lattice.addEdge(stem, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(stem_end_pos),
+                      core::PartOfSpeech::Verb, final_cost, flags, compound_lemma, dictionary::ConjugationType::None,
+                      core::CandidateOrigin::Unknown, 0.0F, "compound_te_stem", epos, "compound_te_stem");
       return true;
     };
 
@@ -1073,8 +1055,7 @@ void addCompoundVerbJoinCandidates(
     // If kanji te-stem didn't match and V2 was matched via hiragana reading,
     // also try a hiragana te-stem. This handles cases like:
     // 演じきった (input uses hiragana き, not kanji 切)
-    if (!added_te_stem && best_match.matched_via_reading &&
-        !best_match.v2_reading.empty()) {
+    if (!added_te_stem && best_match.matched_via_reading && !best_match.v2_reading.empty()) {
       // Build hiragana compound base: V1 renyokei + V2 hiragana reading
       // compound_base is V1 renyokei + V2 kanji surface
       // We need to replace V2 kanji with V2 hiragana
@@ -1082,14 +1063,13 @@ void addCompoundVerbJoinCandidates(
       for (const auto& v2_verb : kSubsidiaryVerbs) {
         std::string_view v2_surface(v2_verb.surface);
         if (best_match.compound_base.size() >= v2_surface.size() &&
-            best_match.compound_base.compare(
-                best_match.compound_base.size() - v2_surface.size(),
-                v2_surface.size(), v2_surface) == 0) {
+            best_match.compound_base.compare(best_match.compound_base.size() - v2_surface.size(), v2_surface.size(),
+                                             v2_surface) == 0) {
           size_t v1_len = best_match.compound_base.size() - v2_surface.size();
           std::string v1_part = best_match.compound_base.substr(0, v1_len);
           std::string hira_compound_base = v1_part + best_match.v2_reading;
-          auto [hira_te_stem, hira_uses_de] = generateTeFormStem(
-              hira_compound_base, "", best_match.v2_verb_type, best_match.v2_base_ending);
+          auto [hira_te_stem, hira_uses_de] =
+              generateTeFormStem(hira_compound_base, "", best_match.v2_verb_type, best_match.v2_base_ending);
           addTeStemEdge(hira_te_stem);
           break;
         }
@@ -1102,17 +1082,15 @@ void addCompoundVerbJoinCandidates(
     // or split as 読み + 込まれる.
     {
       // Generate compound mizenkei: V1 renyokei + V2 mizenkei
-      std::string mizenkei = generateMizenkei(
-          best_match.compound_base, "", best_match.v2_verb_type);
+      std::string mizenkei = generateMizenkei(best_match.compound_base, "", best_match.v2_verb_type);
       // For V2 matched via hiragana reading, also try hiragana mizenkei
       std::string hira_mizenkei;
       if (best_match.matched_via_reading && !best_match.v2_reading.empty()) {
         for (const auto& v2_verb : kSubsidiaryVerbs) {
           std::string_view v2_surface(v2_verb.surface);
           if (best_match.compound_base.size() >= v2_surface.size() &&
-              best_match.compound_base.compare(
-                  best_match.compound_base.size() - v2_surface.size(),
-                  v2_surface.size(), v2_surface) == 0) {
+              best_match.compound_base.compare(best_match.compound_base.size() - v2_surface.size(), v2_surface.size(),
+                                               v2_surface) == 0) {
             size_t v1_len = best_match.compound_base.size() - v2_surface.size();
             std::string v1_part = best_match.compound_base.substr(0, v1_len);
             std::string hira_base = v1_part + best_match.v2_reading;
@@ -1123,27 +1101,29 @@ void addCompoundVerbJoinCandidates(
       }
 
       auto addMizenkeiEdge = [&](const std::string& stem) {
-        if (stem.empty() || stem.size() >= compound_surface.size()) return false;
+        if (stem.empty() || stem.size() >= compound_surface.size())
+          return false;
         std::string_view text_prefix = text.substr(start_byte, stem.size());
-        if (text_prefix != stem) return false;
+        if (text_prefix != stem)
+          return false;
 
         auto stem_decoded = normalize::utf8::decode(stem);
         size_t stem_end_pos = start_pos + stem_decoded.size();
-        if (stem_end_pos > codepoints.size()) return false;
+        if (stem_end_pos > codepoints.size())
+          return false;
 
         // Check that what follows is a passive/causative marker (れ or せ)
         if (stem_end_pos < codepoints.size()) {
           char32_t next_char = codepoints[stem_end_pos];
-          if (next_char != U'れ' && next_char != U'せ') return false;
+          if (next_char != U'れ' && next_char != U'せ')
+            return false;
         }
 
         // Use base cost without passive+te penalty
         float mizenkei_cost = base_cost + opts.compound_verb_bonus + opts.verified_v1_bonus;
-        lattice.addEdge(stem, static_cast<uint32_t>(start_pos),
-                        static_cast<uint32_t>(stem_end_pos), core::PartOfSpeech::Verb,
-                        mizenkei_cost, flags, compound_lemma,
-                        dictionary::ConjugationType::None,
-                        core::CandidateOrigin::Unknown, 0.0F, "compound_mizenkei",
+        lattice.addEdge(stem, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(stem_end_pos),
+                        core::PartOfSpeech::Verb, mizenkei_cost, flags, compound_lemma,
+                        dictionary::ConjugationType::None, core::CandidateOrigin::Unknown, 0.0F, "compound_mizenkei",
                         core::ExtendedPOS::VerbMizenkei, "compound_mizenkei");
         return true;
       };
@@ -1156,13 +1136,11 @@ void addCompoundVerbJoinCandidates(
   }
 }
 
-void addHiraganaCompoundVerbJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer,
-    const grammar::Inflection& inflection) {
+void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text,
+                                           const std::vector<char32_t>& codepoints, size_t start_pos,
+                                           const std::vector<normalize::CharType>& char_types,
+                                           const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
+                                           const grammar::Inflection& inflection) {
   if (start_pos >= char_types.size()) {
     return;
   }
@@ -1231,12 +1209,10 @@ void addHiraganaCompoundVerbJoinCandidates(
 
       // Try V2 renyokei match (e.g., あげ from あげる for とりあげない)
       if (matched_v2_len == 0) {
-        std::string v2_renyokei = generateRenyokei(
-            v2_surface, v2_reading, v2_verb.verb_type);
+        std::string v2_renyokei = generateRenyokei(v2_surface, v2_reading, v2_verb.verb_type);
         // Require V2 renyokei to be 2+ chars to avoid false matches
         // (single-char で/し/き are ambiguous as particles/auxiliaries)
-        if (v2_renyokei.size() > core::kJapaneseCharBytes &&
-            v2_start_byte + v2_renyokei.size() <= text.size()) {
+        if (v2_renyokei.size() > core::kJapaneseCharBytes && v2_start_byte + v2_renyokei.size() <= text.size()) {
           std::string_view text_at_v2 = text.substr(v2_start_byte, v2_renyokei.size());
           if (text_at_v2 == v2_renyokei) {
             matched_v2_len = v2_renyokei.size();
@@ -1259,9 +1235,8 @@ void addHiraganaCompoundVerbJoinCandidates(
       // Note: と excluded from filter because とる is a common V1 verb,
       // and V1 minimum length of 2 chars prevents particle と (1 char) from matching
       char32_t first_char = codepoints[start_pos];
-      if (first_char == U'を' || first_char == U'が' || first_char == U'は' ||
-          first_char == U'に' || first_char == U'で' ||
-          first_char == U'へ' || first_char == U'の' || first_char == U'も') {
+      if (first_char == U'を' || first_char == U'が' || first_char == U'は' || first_char == U'に' ||
+          first_char == U'で' || first_char == U'へ' || first_char == U'の' || first_char == U'も') {
         continue;
       }
 
@@ -1283,7 +1258,8 @@ void addHiraganaCompoundVerbJoinCandidates(
 
       if (!is_ichidan) {
         // Godan: replace last char with base ending
-        v1_base = std::string(v1_surface.substr(0, v1_surface.size() - core::kJapaneseCharBytes));  // Remove last hiragana
+        v1_base =
+            std::string(v1_surface.substr(0, v1_surface.size() - core::kJapaneseCharBytes));  // Remove last hiragana
         v1_base += normalize::utf8::encode({base_ending});
       } else {
         // Ichidan: add る
@@ -1340,8 +1316,8 @@ void addHiraganaCompoundVerbJoinCandidates(
       // Compound base (lemma) = V1 renyokei + V2 in appropriate form
       // When V2 matched via kanji surface: use kanji (やり + 直す = やり直す)
       // When V2 matched via hiragana reading: use hiragana (やり + なおす = やりなおす)
-      std::string compound_base = std::string(v1_surface) +
-          std::string(matched_v2_via_reading ? v2_reading : v2_surface);
+      std::string compound_base =
+          std::string(v1_surface) + std::string(matched_v2_via_reading ? v2_reading : v2_surface);
 
       // Calculate cost
       float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
@@ -1353,16 +1329,13 @@ void addHiraganaCompoundVerbJoinCandidates(
       if (matched_v2_renyokei) {
         // V2 matched in renyokei form — add compound renyokei candidate
         // e.g., とりあげ (from とりあげる) for とりあげない
-        lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos),
-                        static_cast<uint32_t>(compound_end_pos), core::PartOfSpeech::Verb,
-                        final_cost, flags, compound_base,
-                        dictionary::ConjugationType::None,
-                        core::CandidateOrigin::Unknown, 0.0F, "hira_compound_renyokei",
-                        core::ExtendedPOS::VerbRenyokei, "hira_compound_renyokei");
+        lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
+                        core::PartOfSpeech::Verb, final_cost, flags, compound_base, dictionary::ConjugationType::None,
+                        core::CandidateOrigin::Unknown, 0.0F, "hira_compound_renyokei", core::ExtendedPOS::VerbRenyokei,
+                        "hira_compound_renyokei");
       } else {
-        lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos),
-                        static_cast<uint32_t>(compound_end_pos), core::PartOfSpeech::Verb,
-                        final_cost, flags, compound_base);
+        lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
+                        core::PartOfSpeech::Verb, final_cost, flags, compound_base);
       }
 
       return;  // Found a match, stop searching
@@ -1370,12 +1343,10 @@ void addHiraganaCompoundVerbJoinCandidates(
   }
 }
 
-void addAdjectiveSugiruJoinCandidates(
-    core::Lattice& /*lattice*/, std::string_view /*text*/,
-    const std::vector<char32_t>& /*codepoints*/, size_t /*start_pos*/,
-    const std::vector<normalize::CharType>& /*char_types*/,
-    const dictionary::DictionaryManager& /*dict_manager*/,
-    const Scorer& /*scorer*/) {
+void addAdjectiveSugiruJoinCandidates(core::Lattice& /*lattice*/, std::string_view /*text*/,
+                                      const std::vector<char32_t>& /*codepoints*/, size_t /*start_pos*/,
+                                      const std::vector<normalize::CharType>& /*char_types*/,
+                                      const dictionary::DictionaryManager& /*dict_manager*/, const Scorer& /*scorer*/) {
   // MeCab compatibility: i-adjective + すぎる should be split as separate tokens
   // MeCab output for 高すぎる:
   //   高    形容詞,自立,*,*,形容詞・アウオ段,ガル接続,高い,タカ,タカ
@@ -1392,11 +1363,9 @@ void addAdjectiveSugiruJoinCandidates(
   return;
 }
 
-void addKatakanaSugiruJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer) {
+void addKatakanaSugiruJoinCandidates(core::Lattice& lattice, std::string_view text,
+                                     const std::vector<char32_t>& codepoints, size_t start_pos,
+                                     const std::vector<normalize::CharType>& char_types, const Scorer& scorer) {
   // DISABLED: MeCab splits KATAKANA + すぎる into separate tokens:
   //   シンプル 名詞,一般,*,*,*,*,*
   //   すぎる   動詞,非自立,*,*,一段,基本形,すぎる,スギル,スギル
@@ -1415,7 +1384,7 @@ void addKatakanaSugiruJoinCandidates(
   (void)scorer;
   return;
 
-#if 0  // Unreachable: katakana+sugiru compound disabled for MeCab compatibility
+#if 0   // Unreachable: katakana+sugiru compound disabled for MeCab compatibility
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -1496,12 +1465,9 @@ void addKatakanaSugiruJoinCandidates(
 #endif  // Unreachable katakana+sugiru
 }
 
-void addPrefixNounJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer) {
+void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
+                                 size_t start_pos, const std::vector<normalize::CharType>& char_types,
+                                 const dictionary::DictionaryManager& dict_manager, const Scorer& scorer) {
   if (start_pos >= codepoints.size()) {
     return;
   }
@@ -1533,16 +1499,14 @@ void addPrefixNounJoinCandidates(
       return;
     }
   } else {
-    if (char_types[noun_start] != CharType::Kanji &&
-        char_types[noun_start] != CharType::Katakana) {
+    if (char_types[noun_start] != CharType::Kanji && char_types[noun_start] != CharType::Katakana) {
       return;
     }
   }
 
   // Find the end of the noun part
   CharType noun_type = char_types[noun_start];
-  size_t noun_end = findCharRegionEnd(char_types, noun_start,
-                                       kMaxNounLenForPrefix, noun_type);
+  size_t noun_end = findCharRegionEnd(char_types, noun_start, kMaxNounLenForPrefix, noun_type);
 
   if (noun_end <= noun_start) {
     return;
@@ -1555,8 +1519,7 @@ void addPrefixNounJoinCandidates(
   size_t dict_noun_end = noun_end;
 
   for (const auto& result : noun_results) {
-    if (result.entry != nullptr &&
-        result.entry->pos == core::PartOfSpeech::Noun) {
+    if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Noun) {
       if (result.length > dict_noun_end - noun_start) {
         dict_noun_end = noun_start + result.length;
         noun_in_dict = true;
@@ -1582,8 +1545,7 @@ void addPrefixNounJoinCandidates(
   auto combined_results = dict_manager.lookup(text, start_byte);
 
   for (const auto& result : combined_results) {
-    if (result.entry != nullptr &&
-        result.length == noun_end - start_pos) {
+    if (result.entry != nullptr && result.length == noun_end - start_pos) {
       return;  // Already in dictionary
     }
   }
@@ -1617,17 +1579,14 @@ void addPrefixNounJoinCandidates(
 
   uint8_t flags = core::LatticeEdge::kIsUnknown;
 
-  lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
-                  static_cast<uint32_t>(noun_end), core::PartOfSpeech::Noun,
+  lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(noun_end), core::PartOfSpeech::Noun,
                   final_cost, flags, "");
 }
 
-void addTeFormAuxiliaryCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer,
-    const grammar::Inflection& inflection) {
+void addTeFormAuxiliaryCandidates(core::Lattice& lattice, std::string_view text,
+                                  const std::vector<char32_t>& codepoints, size_t start_pos,
+                                  const std::vector<normalize::CharType>& char_types, const Scorer& scorer,
+                                  const grammar::Inflection& inflection) {
   if (start_pos >= codepoints.size()) {
     return;
   }
@@ -1666,8 +1625,7 @@ void addTeFormAuxiliaryCandidates(
 
   // Check if there's hiragana following
   size_t aux_start = start_pos + 1;
-  if (aux_start >= codepoints.size() ||
-      char_types[aux_start] != CharType::Hiragana) {
+  if (aux_start >= codepoints.size() || char_types[aux_start] != CharType::Hiragana) {
     return;
   }
 
@@ -1676,8 +1634,7 @@ void addTeFormAuxiliaryCandidates(
   size_t aux_start_byte = charPosToBytePos(codepoints, aux_start);
 
   // Find the extent of hiragana following て/で
-  size_t hiragana_end = findCharRegionEnd(char_types, aux_start, 10,
-                                           CharType::Hiragana);
+  size_t hiragana_end = findCharRegionEnd(char_types, aux_start, 10, CharType::Hiragana);
 
   // Try each auxiliary pattern
   for (const auto& aux : kTeFormAuxiliaries) {
@@ -1695,11 +1652,9 @@ void addTeFormAuxiliaryCandidates(
     size_t stem_char_len = normalize::utf8::decode(std::string(stem)).size();
 
     // Try different lengths after the stem
-    for (size_t aux_end = aux_start + stem_char_len;
-         aux_end <= hiragana_end && aux_end <= aux_start + 8; ++aux_end) {
+    for (size_t aux_end = aux_start + stem_char_len; aux_end <= hiragana_end && aux_end <= aux_start + 8; ++aux_end) {
       size_t aux_end_byte = charPosToBytePos(codepoints, aux_end);
-      std::string aux_surface(text.substr(aux_start_byte,
-                                          aux_end_byte - aux_start_byte));
+      std::string aux_surface(text.substr(aux_start_byte, aux_end_byte - aux_start_byte));
 
       auto best = inflection.getBest(aux_surface);
       if (best.confidence > 0.4F && best.base_form == aux.base_form) {
@@ -1708,10 +1663,8 @@ void addTeFormAuxiliaryCandidates(
         // This allows proper analysis of patterns like 教えてあげない
         if (aux.is_benefactive) {
           // Check if the surface ends with negative patterns
-          bool is_negative = utf8::endsWith(aux_surface, "ない") ||
-                             utf8::endsWith(aux_surface, "なく") ||
-                             utf8::endsWith(aux_surface, "なかった") ||
-                             utf8::endsWith(aux_surface, "なくて");
+          bool is_negative = utf8::endsWith(aux_surface, "ない") || utf8::endsWith(aux_surface, "なく") ||
+                             utf8::endsWith(aux_surface, "なかった") || utf8::endsWith(aux_surface, "なくて");
           if (is_negative) {
             continue;  // Don't create compound for benefactive negative
           }
@@ -1720,14 +1673,12 @@ void addTeFormAuxiliaryCandidates(
         size_t combo_end_byte = aux_end_byte;
         std::string combo_surface(text.substr(te_byte, combo_end_byte - te_byte));
 
-        float final_cost = scorer.posPrior(core::PartOfSpeech::Verb) +
-                           scorer.joinOpts().te_form_aux_bonus;
+        float final_cost = scorer.posPrior(core::PartOfSpeech::Verb) + scorer.joinOpts().te_form_aux_bonus;
 
         uint8_t flags = core::LatticeEdge::kIsUnknown;
 
-        lattice.addEdge(combo_surface, static_cast<uint32_t>(start_pos),
-                        static_cast<uint32_t>(aux_end), core::PartOfSpeech::Verb,
-                        final_cost, flags, aux.base_form);
+        lattice.addEdge(combo_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(aux_end),
+                        core::PartOfSpeech::Verb, final_cost, flags, aux.base_form);
 
         break;
       }
@@ -1735,12 +1686,11 @@ void addTeFormAuxiliaryCandidates(
   }
 }
 
-void addVerbSuffixNounJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    [[maybe_unused]] const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer) {
+void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view text,
+                                     const std::vector<char32_t>& codepoints, size_t start_pos,
+                                     const std::vector<normalize::CharType>& char_types,
+                                     [[maybe_unused]] const dictionary::DictionaryManager& dict_manager,
+                                     const Scorer& scorer) {
   if (start_pos >= codepoints.size()) {
     return;
   }
@@ -1821,10 +1771,8 @@ void addVerbSuffixNounJoinCandidates(
   // These cannot be verb renyokei endings
   if (hiragana_end - kanji_end == 1) {
     char32_t hira_char = codepoints[kanji_end];
-    if (hira_char == U'に' || hira_char == U'で' || hira_char == U'と' ||
-        hira_char == U'を' || hira_char == U'が' || hira_char == U'は' ||
-        hira_char == U'へ' || hira_char == U'も' || hira_char == U'か' ||
-        hira_char == U'や') {
+    if (hira_char == U'に' || hira_char == U'で' || hira_char == U'と' || hira_char == U'を' || hira_char == U'が' ||
+        hira_char == U'は' || hira_char == U'へ' || hira_char == U'も' || hira_char == U'か' || hira_char == U'や') {
       return;
     }
   }
@@ -1864,16 +1812,13 @@ void addVerbSuffixNounJoinCandidates(
 
   uint8_t flags = core::LatticeEdge::kFromDictionary;
 
-  lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
-                  static_cast<uint32_t>(end_pos), core::PartOfSpeech::Noun,
+  lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), core::PartOfSpeech::Noun,
                   final_cost, flags, surface);  // lemma = surface for compound nouns
 }
 
-void addTaruAdjectiveJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer) {
+void addTaruAdjectiveJoinCandidates(core::Lattice& lattice, std::string_view text,
+                                    const std::vector<char32_t>& codepoints, size_t start_pos,
+                                    const std::vector<normalize::CharType>& char_types, const Scorer& scorer) {
   if (start_pos >= codepoints.size()) {
     return;
   }
@@ -1929,8 +1874,7 @@ void addTaruAdjectiveJoinCandidates(
 
   uint8_t flags = core::LatticeEdge::kFromDictionary;
 
-  lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
-                  static_cast<uint32_t>(end_pos), core::PartOfSpeech::Adverb,
+  lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), core::PartOfSpeech::Adverb,
                   final_cost, flags, lemma);
 }
 

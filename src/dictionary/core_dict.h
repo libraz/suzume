@@ -1,11 +1,11 @@
 #ifndef SUZUME_DICTIONARY_CORE_DICT_H_
 #define SUZUME_DICTIONARY_CORE_DICT_H_
 
-#include "dictionary/dictionary.h"
-#include "dictionary/double_array.h"
-
 #include <memory>
 #include <vector>
+
+#include "dictionary/dictionary.h"
+#include "dictionary/double_array.h"
 
 namespace suzume::dictionary {
 
@@ -31,8 +31,7 @@ class CoreDictionary : public IDictionary {
    * @param start_pos Start position (character index)
    * @return Vector of lookup results
    */
-  std::vector<LookupResult> lookup(std::string_view text,
-                                   size_t start_pos) const override;
+  std::vector<LookupResult> lookup(std::string_view text, size_t start_pos) const override;
 
   /**
    * @brief Get entry by ID

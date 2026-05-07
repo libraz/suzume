@@ -20,16 +20,16 @@ namespace suzume::dictionary {
  * @brief Binary dictionary header
  */
 struct BinaryDictHeader {
-  uint32_t magic;           // "SZMD" (0x444D5A53)
-  uint16_t version_major;   // Major version (2 = compact format)
-  uint16_t version_minor;   // Minor version
-  uint32_t entry_count;     // Number of entries
-  uint32_t trie_offset;     // Offset to trie data
-  uint32_t trie_size;       // Size of trie data
-  uint32_t entry_offset;    // Offset to entry array
-  uint32_t string_offset;   // Offset to string pool
-  uint32_t flags;           // Reserved flags
-  uint32_t checksum;        // CRC32 checksum (reserved)
+  uint32_t magic;          // "SZMD" (0x444D5A53)
+  uint16_t version_major;  // Major version (2 = compact format)
+  uint16_t version_minor;  // Minor version
+  uint32_t entry_count;    // Number of entries
+  uint32_t trie_offset;    // Offset to trie data
+  uint32_t trie_size;      // Size of trie data
+  uint32_t entry_offset;   // Offset to entry array
+  uint32_t string_offset;  // Offset to string pool
+  uint32_t flags;          // Reserved flags
+  uint32_t checksum;       // CRC32 checksum (reserved)
 
   static constexpr uint32_t kMagic = 0x444D5A53;  // "SZMD"
   static constexpr uint16_t kVersionMajor = 2;
@@ -49,7 +49,6 @@ struct BinaryDictEntry {
   uint8_t pos;              // Part of speech
   uint8_t flags;            // Flags (formal_noun, interjection, proper_family, proper_given)
 };
-
 
 /**
  * @brief Binary dictionary (read-only, memory-mapped friendly)
@@ -78,14 +77,12 @@ class BinaryDictionary : public IDictionary {
    * @param size Data size
    * @return Number of entries on success, error on failure
    */
-  core::Expected<size_t, core::Error> loadFromMemory(const uint8_t* data,
-                                                      size_t size);
+  core::Expected<size_t, core::Error> loadFromMemory(const uint8_t* data, size_t size);
 
   /**
    * @brief Lookup entries at position
    */
-  std::vector<LookupResult> lookup(std::string_view text,
-                                   size_t start_pos) const override;
+  std::vector<LookupResult> lookup(std::string_view text, size_t start_pos) const override;
 
   /**
    * @brief Get entry by ID

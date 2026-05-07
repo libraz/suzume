@@ -13,30 +13,30 @@ namespace suzume::pretokenizer {
  * @brief Type of pre-tokenized element
  */
 enum class PreTokenType : uint8_t {
-  Url,        // URL (https://...)
-  Email,      // Email address
-  Date,       // Date (2024年12月23日)
-  Time,       // Time (14時30分)
-  Currency,   // Currency (100万円)
-  Version,    // Version (v2.0.1)
-  Storage,    // Storage size (3.5GB)
-  Percentage, // Percentage (50%)
-  Hashtag,    // Hashtag (#プログラミング)
-  Mention,    // Mention (@user)
-  Number,     // Plain number
-  AsciiSeq,   // ASCII sequence with dots (example.com)
-  Boundary,   // Sentence boundary (。！？)
+  Url,         // URL (https://...)
+  Email,       // Email address
+  Date,        // Date (2024年12月23日)
+  Time,        // Time (14時30分)
+  Currency,    // Currency (100万円)
+  Version,     // Version (v2.0.1)
+  Storage,     // Storage size (3.5GB)
+  Percentage,  // Percentage (50%)
+  Hashtag,     // Hashtag (#プログラミング)
+  Mention,     // Mention (@user)
+  Number,      // Plain number
+  AsciiSeq,    // ASCII sequence with dots (example.com)
+  Boundary,    // Sentence boundary (。！？)
 };
 
 /**
  * @brief Pre-tokenized element (confirmed token)
  */
 struct PreToken {
-  std::string surface;      // Surface string
-  size_t start;             // Start position (byte offset)
-  size_t end;               // End position (byte offset)
-  PreTokenType type;        // Token type
-  core::PartOfSpeech pos;   // Part of speech
+  std::string surface;     // Surface string
+  size_t start;            // Start position (byte offset)
+  size_t end;              // End position (byte offset)
+  PreTokenType type;       // Token type
+  core::PartOfSpeech pos;  // Part of speech
 };
 
 /**
@@ -189,8 +189,7 @@ class PreTokenizer {
    * @param token Output token if matched
    * @return true if matched
    */
-  bool tryMatchAsciiWithDots(std::string_view text, size_t pos,
-                              PreToken& token) const;
+  bool tryMatchAsciiWithDots(std::string_view text, size_t pos, PreToken& token) const;
 
   /**
    * @brief Check if character is sentence boundary

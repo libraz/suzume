@@ -25,10 +25,10 @@ namespace {
 // candidate::kNounVerbSplitBonus, kVerifiedVerbBonus
 
 // Maximum lengths for mixed script segments
-constexpr size_t kMaxAlphaLen = 12;   // Reasonable limit for English words
-constexpr size_t kMaxDigitLen = 8;    // Reasonable limit for numbers
-constexpr size_t kMaxJapaneseLen = 8; // Reasonable limit for Japanese part
-constexpr size_t kMaxDigitKanjiLen = 3; // Max kanji for digit+kanji (counters)
+constexpr size_t kMaxAlphaLen = 12;      // Reasonable limit for English words
+constexpr size_t kMaxDigitLen = 8;       // Reasonable limit for numbers
+constexpr size_t kMaxJapaneseLen = 8;    // Reasonable limit for Japanese part
+constexpr size_t kMaxDigitKanjiLen = 3;  // Max kanji for digit+kanji (counters)
 
 using normalize::isCounterKanji;
 
@@ -46,12 +46,9 @@ constexpr size_t kMaxVerbHiraganaLen = 8;
 
 }  // namespace
 
-void addMixedScriptCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer,
-    const dictionary::DictionaryManager& dict_manager) {
+void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
+                              size_t start_pos, const std::vector<normalize::CharType>& char_types,
+                              const Scorer& scorer, const dictionary::DictionaryManager& dict_manager) {
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -66,10 +63,8 @@ void addMixedScriptCandidates(
   }
 
   // Find the end of the first segment (continuous same type)
-  size_t max_first_len =
-      (first_type == CharType::Alphabet) ? kMaxAlphaLen : kMaxDigitLen;
-  size_t first_end = findCharRegionEnd(char_types, start_pos, max_first_len,
-                                        first_type);
+  size_t max_first_len = (first_type == CharType::Alphabet) ? kMaxAlphaLen : kMaxDigitLen;
+  size_t first_end = findCharRegionEnd(char_types, start_pos, max_first_len, first_type);
 
   // Check if there's a second segment to join with
   if (first_end >= char_types.size()) {
@@ -102,8 +97,7 @@ void addMixedScriptCandidates(
   }
 
   // Find the maximum extent of the second segment
-  size_t max_end = findCharRegionEnd(char_types, first_end, max_second_len,
-                                      second_type);
+  size_t max_end = findCharRegionEnd(char_types, first_end, max_second_len, second_type);
 
   size_t start_byte = charPosToBytePos(codepoints, start_pos);
   float base_cost = scorer.posPrior(core::PartOfSpeech::Noun);
@@ -149,8 +143,7 @@ void addMixedScriptCandidates(
         // Counter prefix + non-counter kanji: only allow when the full kanji
         // portion exists as a dictionary entry (e.g., 次元 in dict → 2次元 OK)
         size_t kanji_start_byte = charPosToBytePos(codepoints, first_end);
-        std::string kanji_part(text.substr(kanji_start_byte,
-                                           end_byte - kanji_start_byte));
+        std::string kanji_part(text.substr(kanji_start_byte, end_byte - kanji_start_byte));
         auto lookup = dict_manager.lookup(kanji_part, 0);
         bool found_exact = false;
         for (const auto& r : lookup) {
@@ -167,10 +160,9 @@ void addMixedScriptCandidates(
       }
 
       float final_cost = base_cost + length_adjustment;
-      SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_MIX] \"" << surface << "\": digit+kanji"
-                        << kanji_len << " adj=" << length_adjustment << "\n");
-      lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
-                      static_cast<uint32_t>(candidate_end),
+      SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_MIX] \"" << surface << "\": digit+kanji" << kanji_len
+                                                << " adj=" << length_adjustment << "\n");
+      lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(candidate_end),
                       core::PartOfSpeech::Noun, final_cost, flags, "");
     }
   } else {
@@ -179,20 +171,16 @@ void addMixedScriptCandidates(
     std::string surface(text.substr(start_byte, end_byte - start_byte));
     float final_cost = base_cost + base_bonus;
     SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_MIX] \"" << surface << "\": alpha+"
-                      << (second_type == CharType::Kanji ? "kanji" : "katakana")
-                      << " bonus=" << base_bonus << "\n");
-    lattice.addEdge(surface, static_cast<uint32_t>(start_pos),
-                    static_cast<uint32_t>(max_end), core::PartOfSpeech::Noun,
+                                              << (second_type == CharType::Kanji ? "kanji" : "katakana")
+                                              << " bonus=" << base_bonus << "\n");
+    lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(max_end), core::PartOfSpeech::Noun,
                     final_cost, flags, "");
   }
 }
 
-void addCompoundSplitCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer) {
+void addCompoundSplitCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
+                                size_t start_pos, const std::vector<normalize::CharType>& char_types,
+                                const dictionary::DictionaryManager& dict_manager, const Scorer& scorer) {
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -205,8 +193,7 @@ void addCompoundSplitCandidates(
   }
 
   // Find the end of the kanji sequence
-  size_t kanji_end = findCharRegionEnd(char_types, start_pos, kMaxCompoundLen,
-                                        CharType::Kanji);
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, kMaxCompoundLen, CharType::Kanji);
 
   size_t kanji_len = kanji_end - start_pos;
 
@@ -232,8 +219,7 @@ void addCompoundSplitCandidates(
 
     for (const auto& result : first_results) {
       if (result.entry != nullptr && result.length == split_point &&
-          (result.entry->pos == core::PartOfSpeech::Noun ||
-           result.entry->pos == core::PartOfSpeech::Adjective)) {
+          (result.entry->pos == core::PartOfSpeech::Noun || result.entry->pos == core::PartOfSpeech::Adjective)) {
         // Allow NOUN and ADJ (na-adjectives can function as nominal in compounds)
         // This prevents ADV/VERB from being incorrectly reregistered as NOUN
         first_in_dict = true;
@@ -250,8 +236,7 @@ void addCompoundSplitCandidates(
 
     for (const auto& result : second_results) {
       if (result.entry != nullptr && result.length == kanji_len - split_point &&
-          (result.entry->pos == core::PartOfSpeech::Noun ||
-           result.entry->pos == core::PartOfSpeech::Adjective)) {
+          (result.entry->pos == core::PartOfSpeech::Noun || result.entry->pos == core::PartOfSpeech::Adjective)) {
         second_in_dict = true;
         break;
       }
@@ -261,34 +246,28 @@ void addCompoundSplitCandidates(
     if (first_in_dict || second_in_dict) {
       // Add the first part as a candidate
       std::string first_surface(text.substr(start_byte, first_end_byte - start_byte));
-      uint8_t flags = first_in_dict ? core::LatticeEdge::kFromDictionary
-                                     : core::LatticeEdge::kIsUnknown;
+      uint8_t flags = first_in_dict ? core::LatticeEdge::kFromDictionary : core::LatticeEdge::kIsUnknown;
       if (first_is_formal_noun) {
         flags |= core::LatticeEdge::kIsFormalNoun;
       }
 
-      lattice.addEdge(first_surface, static_cast<uint32_t>(start_pos),
-                      static_cast<uint32_t>(first_end), core::PartOfSpeech::Noun,
-                      first_cost, flags, "");
+      lattice.addEdge(first_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(first_end),
+                      core::PartOfSpeech::Noun, first_cost, flags, "");
 
       // If both parts are in dictionary, give extra bonus
       if (first_in_dict && second_in_dict) {
         float bonus_cost = first_cost - 0.2F;
-        lattice.addEdge(first_surface, static_cast<uint32_t>(start_pos),
-                        static_cast<uint32_t>(first_end), core::PartOfSpeech::Noun,
-                        bonus_cost, flags, "");
+        lattice.addEdge(first_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(first_end),
+                        core::PartOfSpeech::Noun, bonus_cost, flags, "");
       }
     }
   }
 }
 
-void addNounVerbSplitCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer,
-    const grammar::Inflection& inflection) {
+void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
+                                size_t start_pos, const std::vector<normalize::CharType>& char_types,
+                                const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
+                                const grammar::Inflection& inflection) {
   using CharType = normalize::CharType;
 
   if (start_pos >= char_types.size()) {
@@ -301,8 +280,7 @@ void addNounVerbSplitCandidates(
   }
 
   // Find the extent of kanji sequence
-  size_t kanji_end = findCharRegionEnd(char_types, start_pos, kMaxNounLen + 3,
-                                        CharType::Kanji);
+  size_t kanji_end = findCharRegionEnd(char_types, start_pos, kMaxNounLen + 3, CharType::Kanji);
 
   // Need at least 2 kanji to consider noun+verb split
   if (kanji_end - start_pos < 2) {
@@ -310,14 +288,12 @@ void addNounVerbSplitCandidates(
   }
 
   // Check if hiragana follows (potential verb ending)
-  if (kanji_end >= char_types.size() ||
-      char_types[kanji_end] != CharType::Hiragana) {
+  if (kanji_end >= char_types.size() || char_types[kanji_end] != CharType::Hiragana) {
     return;
   }
 
   // Find the maximum extent of hiragana sequence
-  size_t max_hiragana_end = findCharRegionEnd(char_types, kanji_end, 10,
-                                               CharType::Hiragana);
+  size_t max_hiragana_end = findCharRegionEnd(char_types, kanji_end, 10, CharType::Hiragana);
 
   // Need at least 1 hiragana for verb ending
   if (max_hiragana_end <= kanji_end) {
@@ -342,8 +318,7 @@ void addNounVerbSplitCandidates(
     float noun_cost = 1.0F;
 
     for (const auto& result : noun_results) {
-      if (result.entry != nullptr && result.length == noun_len &&
-          result.entry->pos == core::PartOfSpeech::Noun) {
+      if (result.entry != nullptr && result.length == noun_len && result.entry->pos == core::PartOfSpeech::Noun) {
         noun_in_dict = true;
         // v0.8: cost from extended_pos
         noun_cost = getCategoryCost(result.entry->extended_pos);
@@ -387,8 +362,7 @@ void addNounVerbSplitCandidates(
         }
         auto base_results = dict_manager.lookup(cand.base_form, 0);
         for (const auto& result : base_results) {
-          if (result.entry != nullptr &&
-              result.entry->surface == cand.base_form &&
+          if (result.entry != nullptr && result.entry->surface == cand.base_form &&
               result.entry->pos == core::PartOfSpeech::Verb) {
             base_in_dict = true;
             break;
@@ -433,9 +407,8 @@ void addNounVerbSplitCandidates(
             auto alt_results = dict_manager.lookup(alt_word, 0);
             for (const auto& result : alt_results) {
               if (result.entry != nullptr && result.entry->surface == alt_word) {
-                SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] skip \"" << noun_surface
-                    << "\" + \"" << verb_part
-                    << "\": alt dict word \"" << alt_word << "\" exists\n");
+                SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] skip \"" << noun_surface << "\" + \"" << verb_part
+                                                              << "\": alt dict word \"" << alt_word << "\" exists\n");
                 goto next_split;
               }
             }
@@ -447,9 +420,9 @@ void addNounVerbSplitCandidates(
               auto comp_results = dict_manager.lookup(compound, 0);
               for (const auto& result : comp_results) {
                 if (result.entry != nullptr && result.entry->surface == compound) {
-                  SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] skip \"" << noun_surface
-                      << "\" + \"" << verb_part
-                      << "\": compound \"" << compound << "\" is dict word\n");
+                  SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] skip \"" << noun_surface << "\" + \"" << verb_part
+                                                                << "\": compound \"" << compound
+                                                                << "\" is dict word\n");
                   goto next_split;
                 }
               }
@@ -458,39 +431,36 @@ void addNounVerbSplitCandidates(
         }
 
         {
-        const auto& opts = scorer.splitOpts();
-        float final_noun_cost = noun_cost + opts.noun_verb_split_bonus;
+          const auto& opts = scorer.splitOpts();
+          float final_noun_cost = noun_cost + opts.noun_verb_split_bonus;
 
-        if (base_in_dict) {
-          final_noun_cost += opts.verified_verb_bonus;
-        }
+          if (base_in_dict) {
+            final_noun_cost += opts.verified_verb_bonus;
+          }
 
-        if (noun_in_dict && base_in_dict) {
-          final_noun_cost -= 0.2F;
-        }
+          if (noun_in_dict && base_in_dict) {
+            final_noun_cost -= 0.2F;
+          }
 
-        // Penalty for single-kanji noun + verb split
-        // E.g., 勘+違い should prefer 勘違い (compound noun)
-        // Single-kanji nouns rarely form valid noun+verb compounds
-        if (noun_surface.size() == 3) {  // Single kanji (3 bytes UTF-8)
-          final_noun_cost += bigram_cost::kStrong;
-        }
+          // Penalty for single-kanji noun + verb split
+          // E.g., 勘+違い should prefer 勘違い (compound noun)
+          // Single-kanji nouns rarely form valid noun+verb compounds
+          if (noun_surface.size() == 3) {  // Single kanji (3 bytes UTF-8)
+            final_noun_cost += bigram_cost::kStrong;
+          }
 
-        SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] \"" << noun_surface << "\" + \"" << verb_part
-                          << "\": noun_dict=" << noun_in_dict
-                          << " verb_dict=" << base_in_dict
-                          << " cost=" << final_noun_cost << "\n");
+          SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] \"" << noun_surface << "\" + \"" << verb_part
+                                                   << "\": noun_dict=" << noun_in_dict << " verb_dict=" << base_in_dict
+                                                   << " cost=" << final_noun_cost << "\n");
 
-        uint8_t noun_flags = noun_in_dict ? core::LatticeEdge::kFromDictionary
-                                           : core::LatticeEdge::kIsUnknown;
+          uint8_t noun_flags = noun_in_dict ? core::LatticeEdge::kFromDictionary : core::LatticeEdge::kIsUnknown;
 
-        lattice.addEdge(noun_surface, static_cast<uint32_t>(start_pos),
-                        static_cast<uint32_t>(verb_start), core::PartOfSpeech::Noun,
-                        final_noun_cost, noun_flags, "");
+          lattice.addEdge(noun_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(verb_start),
+                          core::PartOfSpeech::Noun, final_noun_cost, noun_flags, "");
 
-        break;
+          break;
         }  // end alt-dict-word check scope
-        next_split:;
+      next_split:;
       }
     }
   }

@@ -6,8 +6,6 @@
  * Split from verb_candidates.cpp for maintainability.
  */
 
-#include "verb_candidates.h"
-
 #include <algorithm>
 #include <cmath>
 
@@ -24,37 +22,33 @@
 #include "normalize/utf8.h"
 #include "suffix_candidates.h"
 #include "unknown.h"
+#include "verb_candidates.h"
 
 namespace suzume::analysis {
 
 // Alias for helper functions
 namespace vh = verb_helpers;
 
-std::vector<UnknownCandidate> generateVerbCandidates(
-    const std::vector<char32_t>& codepoints,
-    size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const grammar::Inflection& inflection,
-    const dictionary::DictionaryManager* dict_manager,
-    const VerbCandidateOptions& verb_opts) {
+std::vector<UnknownCandidate> generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                     const std::vector<normalize::CharType>& char_types,
+                                                     const grammar::Inflection& inflection,
+                                                     const dictionary::DictionaryManager* dict_manager,
+                                                     const VerbCandidateOptions& verb_opts) {
   std::vector<UnknownCandidate> candidates;
 
-  if (start_pos >= char_types.size() ||
-      char_types[start_pos] != normalize::CharType::Kanji) {
+  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
     return candidates;
   }
 
   // Find kanji portion (typically 1-2 characters for verbs)
-  size_t kanji_end = vh::findCharRegionEnd(char_types, start_pos, 3,
-                                            normalize::CharType::Kanji);
+  size_t kanji_end = vh::findCharRegionEnd(char_types, start_pos, 3, normalize::CharType::Kanji);
 
   if (kanji_end == start_pos) {
     return candidates;
   }
 
   // Look for hiragana after kanji
-  if (kanji_end >= char_types.size() ||
-      char_types[kanji_end] != normalize::CharType::Hiragana) {
+  if (kanji_end >= char_types.size() || char_types[kanji_end] != normalize::CharType::Hiragana) {
     return candidates;
   }
 
@@ -90,11 +84,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // E.g., 脱がせる, 脱がさない, 脱がず
           // が+な: only allow if kanji+ぐ is a known godan-ga verb
           // E.g., 脱がない (脱ぐ exists) vs 金がない (金ぐ doesn't exist)
-          if (next_char == U'る' || next_char == U'ら' ||
-              next_char == U'り' || next_char == U'っ' ||
-              next_char == U'れ' ||
-              next_char == U'せ' ||
-              next_char == U'さ' || next_char == U'ず') {
+          if (next_char == U'る' || next_char == U'ら' || next_char == U'り' || next_char == U'っ' ||
+              next_char == U'れ' || next_char == U'せ' || next_char == U'さ' || next_char == U'ず') {
             is_verb_pattern = true;
           }
           // が+な: verify kanji+ぐ exists as godan-ga verb in dictionary
@@ -118,8 +109,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   // The inflection module will determine if the full string is a valid
   // conjugated verb. This allows patterns like "飲みながら" (nomi-nagara)
   // where "が" is part of the auxiliary "ながら", not a standalone particle.
-  size_t hiragana_end = vh::findCharRegionEnd(char_types, kanji_end, 12,
-                                               normalize::CharType::Hiragana);
+  size_t hiragana_end = vh::findCharRegionEnd(char_types, kanji_end, 12, normalize::CharType::Hiragana);
 
   // Need at least some hiragana for a conjugated verb
   if (hiragana_end <= kanji_end) {
@@ -144,10 +134,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     // び→GodanBa, み→GodanMa, り→GodanRa
     if (grammar::isIRowCodepoint(first_hira)) {
       // Verify this is followed by すぎ
-      if (kanji_end + 1 < codepoints.size() &&
-          codepoints[kanji_end + 1] == U'す' &&
-          kanji_end + 2 < codepoints.size() &&
-          codepoints[kanji_end + 2] == U'ぎ') {
+      if (kanji_end + 1 < codepoints.size() && codepoints[kanji_end + 1] == U'す' &&
+          kanji_end + 2 < codepoints.size() && codepoints[kanji_end + 2] == U'ぎ') {
         // Determine verb type from I-row ending
         grammar::VerbType verb_type = grammar::verbTypeFromIRowCodepoint(first_hira);
         if (verb_type != grammar::VerbType::Unknown) {
@@ -162,8 +150,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
             if (!is_valid_verb) {
               auto infl_result = inflection.getBest(base_form);
-              is_valid_verb = infl_result.confidence > 0.5F &&
-                              vh::isGodanVerbType(infl_result.verb_type);
+              is_valid_verb = infl_result.confidence > 0.5F && vh::isGodanVerbType(infl_result.verb_type);
             }
 
             if (is_valid_verb) {
@@ -173,15 +160,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               // Compound NOUNs like 書きすぎた get cost ~1.0, so we need much lower
               constexpr float kCost = candidate::verb_cost::kStrongBonus;
               SUZUME_DEBUG_VERBOSE_BLOCK {
-                SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                                    << " godan_renyokei_sugi lemma=" << base_form
+                SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " godan_renyokei_sugi lemma=" << base_form
                                     << " cost=" << kCost << "\n";
               }
               candidates.push_back(makeVerbCandidate(
-                  surface, start_pos, renyokei_end, kCost, base_form,
-                  grammar::verbTypeToConjType(verb_type),
-                  true, CandidateOrigin::VerbKanji, 0.9F, "godan_renyokei_sugi",
-                  core::ExtendedPOS::VerbRenyokei));
+                  surface, start_pos, renyokei_end, kCost, base_form, grammar::verbTypeToConjType(verb_type), true,
+                  CandidateOrigin::VerbKanji, 0.9F, "godan_renyokei_sugi", core::ExtendedPOS::VerbRenyokei));
             }
           }
         }
@@ -193,10 +177,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     //       見せすぎる → 見せ (renyokei of 見せる) + すぎる
     if (grammar::isERowCodepoint(first_hira)) {
       // Verify this is followed by すぎ
-      if (kanji_end + 1 < codepoints.size() &&
-          codepoints[kanji_end + 1] == U'す' &&
-          kanji_end + 2 < codepoints.size() &&
-          codepoints[kanji_end + 2] == U'ぎ') {
+      if (kanji_end + 1 < codepoints.size() && codepoints[kanji_end + 1] == U'す' &&
+          kanji_end + 2 < codepoints.size() && codepoints[kanji_end + 2] == U'ぎ') {
         // Construct base form: kanji + first_hira + る (e.g., 食 + べ + る = 食べる)
         std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
         std::string ichidan_stem = kanji_stem + normalize::encodeUtf8(first_hira);
@@ -206,8 +188,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
         if (!is_valid_verb) {
           auto infl_result = inflection.getBest(base_form);
-          is_valid_verb = infl_result.confidence > 0.5F &&
-                          infl_result.verb_type == grammar::VerbType::Ichidan;
+          is_valid_verb = infl_result.confidence > 0.5F && infl_result.verb_type == grammar::VerbType::Ichidan;
         }
 
         if (is_valid_verb) {
@@ -216,15 +197,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Negative cost to beat compound NOUN path
           constexpr float kCost = candidate::verb_cost::kStrongBonus;
           SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                                << " ichidan_renyokei_sugi lemma=" << base_form
+            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " ichidan_renyokei_sugi lemma=" << base_form
                                 << " cost=" << kCost << "\n";
           }
-          candidates.push_back(makeVerbCandidate(
-              surface, start_pos, renyokei_end, kCost, base_form,
-              dictionary::ConjugationType::Ichidan,
-              true, CandidateOrigin::VerbKanji, 0.9F, "ichidan_renyokei_sugi",
-              core::ExtendedPOS::VerbRenyokei));
+          candidates.push_back(makeVerbCandidate(surface, start_pos, renyokei_end, kCost, base_form,
+                                                 dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKanji,
+                                                 0.9F, "ichidan_renyokei_sugi", core::ExtendedPOS::VerbRenyokei));
         }
       }
     }
@@ -241,25 +219,19 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   // Only single-kanji stems: multi-kanji + さ + れ is suru-verb (処理される)
   // The inflection module doesn't recognize kanji+A-row as godan mizenkei,
   // so we generate this candidate explicitly.
-  if (kanji_end - start_pos == 1 &&
-      kanji_end < hiragana_end &&
-      grammar::isARowCodepoint(codepoints[kanji_end])) {
+  if (kanji_end - start_pos == 1 && kanji_end < hiragana_end && grammar::isARowCodepoint(codepoints[kanji_end])) {
     char32_t a_row = codepoints[kanji_end];
     size_t after_a_pos = kanji_end + 1;
     if (after_a_pos < codepoints.size()) {
       char32_t after_a = codepoints[after_a_pos];
       // A-row + れ (passive) or A-row + せ (causative)
       if (after_a == U'れ' || after_a == U'せ') {
-        grammar::VerbType verb_type =
-            grammar::verbTypeFromARowCodepoint(a_row);
-        std::string_view base_suffix =
-            grammar::godanBaseSuffixFromARow(a_row);
+        grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(a_row);
+        std::string_view base_suffix = grammar::godanBaseSuffixFromARow(a_row);
         if (verb_type != grammar::VerbType::Unknown && !base_suffix.empty()) {
-          std::string kanji_stem =
-              extractSubstring(codepoints, start_pos, kanji_end);
+          std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
           std::string base_form = kanji_stem + std::string(base_suffix);
-          std::string surface =
-              extractSubstring(codepoints, start_pos, kanji_end + 1);
+          std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
 
           // Verify via inflection analysis of base form
           const auto& results = inflection.analyze(base_form);
@@ -285,25 +257,20 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             bool has_competing_verb = false;
             if (after_a == U'れ') {
               std::string ra_form = surface + "る";
-              has_competing_verb =
-                  vh::isVerbInDictionary(dict_manager, ra_form);
+              has_competing_verb = vh::isVerbInDictionary(dict_manager, ra_form);
               if (!has_competing_verb) {
                 std::string ichidan_form = surface + "れる";
-                has_competing_verb =
-                    vh::isVerbInDictionary(dict_manager, ichidan_form);
+                has_competing_verb = vh::isVerbInDictionary(dict_manager, ichidan_form);
               }
             }
 
             if (!has_competing_verb) {
               constexpr float kCost = candidate::verb_cost::kWeakPenalty;
-              SUZUME_DEBUG_LOG("[VERB_CAND] " << surface
-                              << " godan_mizenkei_passive lemma=" << base_form
-                              << " cost=" << kCost << "\n");
+              SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_mizenkei_passive lemma=" << base_form
+                                              << " cost=" << kCost << "\n");
               candidates.push_back(makeVerbCandidate(
-                  surface, start_pos, kanji_end + 1, kCost, base_form,
-                  grammar::verbTypeToConjType(verb_type), true,
-                  CandidateOrigin::VerbKanji, 0.8F, "godan_mizenkei_passive",
-                  core::ExtendedPOS::VerbMizenkei));
+                  surface, start_pos, kanji_end + 1, kCost, base_form, grammar::verbTypeToConjType(verb_type), true,
+                  CandidateOrigin::VerbKanji, 0.8F, "godan_mizenkei_passive", core::ExtendedPOS::VerbMizenkei));
             }
           }
         }
@@ -317,25 +284,21 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   //       話しゃれる → 話しゃ (contracted mizenkei of 話す) + れる (passive)
   //       出しゃしない → 出しゃ (contracted) + し + ない (emphatic neg)
   // Only single-kanji stems (same constraint as godan-sa mizenkei above)
-  if (kanji_end - start_pos == 1 &&
-      kanji_end + 1 < hiragana_end &&
-      codepoints[kanji_end] == U'し' &&
+  if (kanji_end - start_pos == 1 && kanji_end + 1 < hiragana_end && codepoints[kanji_end] == U'し' &&
       codepoints[kanji_end + 1] == U'ゃ') {
     size_t after_sha = kanji_end + 2;
     if (after_sha < codepoints.size()) {
       char32_t after = codepoints[after_sha];
       // しゃ + れ (passive) or しゃ + せ (causative) or しゃ + し (emphatic)
       if (after == U'れ' || after == U'せ' || after == U'し') {
-        std::string kanji_stem =
-            extractSubstring(codepoints, start_pos, kanji_end);
+        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = kanji_stem + "す";
         std::string surface = kanji_stem + "しゃ";
 
         const auto& sa_results = inflection.analyze(base_form);
         bool is_valid_godan_sa = false;
         for (const auto& cand : sa_results) {
-          if (cand.verb_type == grammar::VerbType::GodanSa &&
-              cand.confidence >= 0.4F) {
+          if (cand.verb_type == grammar::VerbType::GodanSa && cand.confidence >= 0.4F) {
             is_valid_godan_sa = true;
             break;
           }
@@ -343,15 +306,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
         if (is_valid_godan_sa) {
           constexpr float kCost = candidate::verb_cost::kWeakPenalty;
-          SUZUME_DEBUG_LOG("[VERB_CAND] "
-                          << surface
-                          << " godan_sa_contracted_mizenkei lemma=" << base_form
-                          << " cost=" << kCost << "\n");
-          candidates.push_back(makeVerbCandidate(
-              surface, start_pos, kanji_end + 2, kCost, base_form,
-              grammar::verbTypeToConjType(grammar::VerbType::GodanSa), false,
-              CandidateOrigin::VerbKanji, 0.8F, "godan_sa_contracted_mizenkei",
-              core::ExtendedPOS::VerbMizenkei));
+          SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_sa_contracted_mizenkei lemma=" << base_form
+                                          << " cost=" << kCost << "\n");
+          candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end + 2, kCost, base_form,
+                                                 grammar::verbTypeToConjType(grammar::VerbType::GodanSa), false,
+                                                 CandidateOrigin::VerbKanji, 0.8F, "godan_sa_contracted_mizenkei",
+                                                 core::ExtendedPOS::VerbMizenkei));
         }
       }
     }
@@ -382,8 +342,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             std::string neg_form = surface + "ない";
             const auto& infl_results = inflection.analyze(neg_form);
             for (const auto& cand : infl_results) {
-              if (cand.base_form == base_form && cand.verb_type == verb_type &&
-                  cand.confidence >= 0.3F) {
+              if (cand.base_form == base_form && cand.verb_type == verb_type && cand.confidence >= 0.3F) {
                 is_valid = true;
                 break;
               }
@@ -416,14 +375,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
             if (!dict_has_zu_form) {
               constexpr float kCost = candidate::verb_cost::kWeakPenalty;
-              SUZUME_DEBUG_LOG("[VERB_CAND] " << surface
-                              << " godan_mizenkei_zu lemma=" << base_form
-                              << " cost=" << kCost << "\n");
+              SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_mizenkei_zu lemma=" << base_form
+                                              << " cost=" << kCost << "\n");
               candidates.push_back(makeVerbCandidate(
-                  surface, start_pos, kanji_end + 1, kCost, base_form,
-                  grammar::verbTypeToConjType(verb_type),
-                  true, CandidateOrigin::VerbKanji, 0.8F, "godan_mizenkei_zu",
-                  core::ExtendedPOS::VerbMizenkei));
+                  surface, start_pos, kanji_end + 1, kCost, base_form, grammar::verbTypeToConjType(verb_type), true,
+                  CandidateOrigin::VerbKanji, 0.8F, "godan_mizenkei_zu", core::ExtendedPOS::VerbMizenkei));
             }
           }
         }
@@ -461,15 +417,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (dict_manager != nullptr) {
         auto suffix_results = dict_manager->lookup(hiragana_part, 0);
         for (const auto& result : suffix_results) {
-          if (result.entry != nullptr &&
-              result.entry->surface == hiragana_part) {
+          if (result.entry != nullptr && result.entry->surface == hiragana_part) {
             // For single-kanji stems, only skip if POS is Suffix (honorifics like さん)
             // For multi-kanji stems, skip any suffix pattern
             bool is_suffix_pos = (result.entry->pos == core::PartOfSpeech::Suffix);
             bool is_multi_kanji = (kanji_end - start_pos >= 2);
-            if (is_suffix_pos ||
-                (is_multi_kanji && (result.entry->extended_pos == core::ExtendedPOS::Suffix ||
-                                    result.entry->pos == core::PartOfSpeech::Other))) {
+            if (is_suffix_pos || (is_multi_kanji && (result.entry->extended_pos == core::ExtendedPOS::Suffix ||
+                                                     result.entry->pos == core::PartOfSpeech::Other))) {
               // Exception: さ + れ/せ is godan-sa mizenkei + passive/causative
               if (hiragana_part == "さ" && end_pos < codepoints.size()) {
                 char32_t next_char = codepoints[end_pos];
@@ -491,8 +445,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // Skip patterns that contain ください (polite request auxiliary)
       // e.g., 待ちください → 待ち + ください, not 待ちく + ださい
       // This prevents false compound verb analysis like 待ちく (待つ+来る renyokei)
-      if (hiragana_part.find("ください") != std::string::npos ||
-          hiragana_part.find("くださ") != std::string::npos) {
+      if (hiragana_part.find("ください") != std::string::npos || hiragana_part.find("くださ") != std::string::npos) {
         continue;  // Skip - let VERB + ください split win
       }
 
@@ -514,8 +467,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             // godan-sa renyokei (し) — e.g., 過ごしてみた → 過ごし+て+み+た
             std::string_view before_te(hiragana_part.data() + te_pos - core::kJapaneseCharBytes,
                                        core::kJapaneseCharBytes);
-            if (before_te == "い" || before_te == "っ" || before_te == "ん" ||
-                before_te == "し") {
+            if (before_te == "い" || before_te == "っ" || before_te == "ん" || before_te == "し") {
               continue;  // Skip - let verb + て + auxiliary split win
             }
           }
@@ -550,9 +502,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Check if the preceding part could be a valid verb renyokei
           // Renyokei typically ends in い/り/き/ぎ/し/み/び/ち/に
           char32_t second_last_char = codepoints[end_pos - 2];
-          if (second_last_char == U'い' || second_last_char == U'り' ||
-              second_last_char == U'き' || second_last_char == U'ぎ' ||
-              second_last_char == U'し' || second_last_char == U'み' ||
+          if (second_last_char == U'い' || second_last_char == U'り' || second_last_char == U'き' ||
+              second_last_char == U'ぎ' || second_last_char == U'し' || second_last_char == U'み' ||
               second_last_char == U'び' || second_last_char == U'ち') {
             continue;  // Skip - likely nominalized noun + particle
           }
@@ -576,31 +527,27 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
       for (const auto& cand : inflection_results) {
         // Skip candidates from のだ/んだ stripping — these should be split tokens
-        if (cand.has_explanatory_suffix) continue;
+        if (cand.has_explanatory_suffix)
+          continue;
 
         // Use lower threshold for ichidan verbs with i-row stems (感じる, 信じる)
         // These get ichidan_kanji_i_row_stem penalty which reduces confidence
         // But NOT for e-row stems (て/で), which are often te-form splits
         // Also NOT for single-kanji + い patterns (人い → 人 + いる, not a verb)
         bool is_i_row_ichidan = false;
-        if (cand.verb_type == grammar::VerbType::Ichidan &&
-            !cand.stem.empty() &&
+        if (cand.verb_type == grammar::VerbType::Ichidan && !cand.stem.empty() &&
             cand.stem.size() >= core::kJapaneseCharBytes) {
-          std::string_view last_char(
-              cand.stem.data() + cand.stem.size() - core::kJapaneseCharBytes,
-              core::kJapaneseCharBytes);
+          std::string_view last_char(cand.stem.data() + cand.stem.size() - core::kJapaneseCharBytes,
+                                     core::kJapaneseCharBytes);
           if (grammar::endsWithIRow(last_char)) {
             // Stem has at least 2 chars?
             if (cand.stem.size() >= 2 * core::kJapaneseCharBytes) {
               // Check if stem is single-kanji + い (e.g., 人い)
               // This pattern is almost always NOUN + いる, not a single verb
               // Valid ichidan stems are typically multi-char (感じ, 信じ, etc.)
-              std::string kanji_part(cand.stem.data(),
-                                     cand.stem.size() - core::kJapaneseCharBytes);
+              std::string kanji_part(cand.stem.data(), cand.stem.size() - core::kJapaneseCharBytes);
               // If kanji part is exactly 1 kanji (3 bytes), it's likely NOUN + いる
-              bool is_single_kanji_i =
-                  (kanji_part.size() == core::kJapaneseCharBytes &&
-                   last_char == "い");
+              bool is_single_kanji_i = (kanji_part.size() == core::kJapaneseCharBytes && last_char == "い");
               // Multi-char kanji portion like 感じ is a valid ichidan stem
               is_i_row_ichidan = !is_single_kanji_i;
             } else {
@@ -609,21 +556,16 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
           }
         }
-        float conf_threshold = is_i_row_ichidan
-                                   ? verb_opts.confidence_ichidan_dict
-                                   : verb_opts.confidence_standard;
-        if (cand.stem == expected_stem &&
-            cand.confidence > conf_threshold &&
+        float conf_threshold = is_i_row_ichidan ? verb_opts.confidence_ichidan_dict : verb_opts.confidence_standard;
+        if (cand.stem == expected_stem && cand.confidence > conf_threshold &&
             cand.verb_type != grammar::VerbType::IAdjective) {
           // Check if this candidate's base_form exists in dictionary
           // For っ-onbin patterns (GodanRa/Ta/Wa/Ka), use type-aware lookup to avoid
           // mismatches like 経る(GodanRa) matching 経る(Ichidan) when 経つ(GodanTa) is correct.
           // For other patterns (Suru verbs, Ichidan, etc.), use simple lookup.
           bool is_onbin_type = vh::isSokuonbinGodanType(cand.verb_type);
-          bool in_dict = is_onbin_type
-                             ? vh::isVerbInDictionaryWithType(dict_manager, cand.base_form,
-                                                          cand.verb_type)
-                             : vh::isVerbInDictionary(dict_manager, cand.base_form);
+          bool in_dict = is_onbin_type ? vh::isVerbInDictionaryWithType(dict_manager, cand.base_form, cand.verb_type)
+                                       : vh::isVerbInDictionary(dict_manager, cand.base_form);
 
           if (in_dict) {
             // Prefer dictionary-verified candidates
@@ -648,18 +590,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // Use lower threshold for valid i-row ichidan stems (感じ, 信じ, etc.)
       // but not single-kanji + い patterns (人い → 人 + いる)
       bool proceed_is_i_row_ichidan = false;
-      if (best.verb_type == grammar::VerbType::Ichidan &&
-          !best.stem.empty() &&
+      if (best.verb_type == grammar::VerbType::Ichidan && !best.stem.empty() &&
           best.stem.size() >= 2 * core::kJapaneseCharBytes) {
-        std::string_view last_char(
-            best.stem.data() + best.stem.size() - core::kJapaneseCharBytes,
-            core::kJapaneseCharBytes);
+        std::string_view last_char(best.stem.data() + best.stem.size() - core::kJapaneseCharBytes,
+                                   core::kJapaneseCharBytes);
         if (grammar::endsWithIRow(last_char)) {
-          std::string kanji_part(best.stem.data(),
-                                 best.stem.size() - core::kJapaneseCharBytes);
-          bool is_single_kanji_i =
-              (kanji_part.size() == core::kJapaneseCharBytes &&
-               last_char == "い");
+          std::string kanji_part(best.stem.data(), best.stem.size() - core::kJapaneseCharBytes);
+          bool is_single_kanji_i = (kanji_part.size() == core::kJapaneseCharBytes && last_char == "い");
           proceed_is_i_row_ichidan = !is_single_kanji_i;
         }
       }
@@ -668,498 +605,479 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // These are typically suru-verb causative/passive patterns:
       //   勉強させられた → 勉強 + さ + せ + られ + た (NOT ichidan 勉強さる)
       // Valid ichidan stems end in e-row or i-row, not a-row
-      if (best.verb_type == grammar::VerbType::Ichidan &&
-          !best.stem.empty() &&
+      if (best.verb_type == grammar::VerbType::Ichidan && !best.stem.empty() &&
           best.stem.size() >= 2 * core::kJapaneseCharBytes) {
-        std::string_view last_char(
-            best.stem.data() + best.stem.size() - core::kJapaneseCharBytes,
-            core::kJapaneseCharBytes);
+        std::string_view last_char(best.stem.data() + best.stem.size() - core::kJapaneseCharBytes,
+                                   core::kJapaneseCharBytes);
         // さ is a-row hiragana (not valid for ichidan verb stems)
         if (last_char == "さ") {
           SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface
-              << "\" stem ends with さ (suru-verb causative pattern)\n");
+                                                    << "\" stem ends with さ (suru-verb causative pattern)\n");
           continue;
         }
       }
       // Dictionary-verified candidates use lower threshold (0.3)
       // This allows hiragana verbs like いわれる (conf=0.33) to be recognized
-      float proceed_threshold = is_dict_verified
-                                    ? verb_opts.confidence_ichidan_dict
-                                    : (proceed_is_i_row_ichidan
-                                           ? verb_opts.confidence_ichidan_dict
-                                           : verb_opts.confidence_standard);
+      float proceed_threshold = is_dict_verified ? verb_opts.confidence_ichidan_dict
+                                                 : (proceed_is_i_row_ichidan ? verb_opts.confidence_ichidan_dict
+                                                                             : verb_opts.confidence_standard);
       if (best.confidence > proceed_threshold) {
-          // Reject Godan verbs with stems ending in e-row hiragana
-          // E-row endings (え,け,せ,て,ね,へ,め,れ) are typically ichidan stems
-          // E.g., "伝えいた" falsely matches as GodanKa "伝えく" but 伝える is ichidan
-          // Exception: GodanRa (passive/causative) with "られ" suffix is valid
-          // E.g., "定められた" has stem "定め" (ichidan) + passive suffix
-          bool is_godan = vh::isGodanVerbType(best.verb_type);
-          if (is_godan && stem_end > kanji_end && stem_end <= codepoints.size()) {
-            // Check if the last character of the stem is e-row hiragana
-            char32_t last_char = codepoints[stem_end - 1];
-            if (grammar::isERowCodepoint(last_char)) {
-              // Exception: GodanRa with passive/causative suffix (られ) is valid
-              // This occurs with ichidan verb stem + passive auxiliary
-              bool is_passive_pattern =
-                  (best.verb_type == grammar::VerbType::GodanRa &&
-                   utf8::contains(surface, "られ"));
-              if (!is_passive_pattern) {
-                continue;  // Skip - e-row stem is typically ichidan, not godan
-              }
+        // Reject Godan verbs with stems ending in e-row hiragana
+        // E-row endings (え,け,せ,て,ね,へ,め,れ) are typically ichidan stems
+        // E.g., "伝えいた" falsely matches as GodanKa "伝えく" but 伝える is ichidan
+        // Exception: GodanRa (passive/causative) with "られ" suffix is valid
+        // E.g., "定められた" has stem "定め" (ichidan) + passive suffix
+        bool is_godan = vh::isGodanVerbType(best.verb_type);
+        if (is_godan && stem_end > kanji_end && stem_end <= codepoints.size()) {
+          // Check if the last character of the stem is e-row hiragana
+          char32_t last_char = codepoints[stem_end - 1];
+          if (grammar::isERowCodepoint(last_char)) {
+            // Exception: GodanRa with passive/causative suffix (られ) is valid
+            // This occurs with ichidan verb stem + passive auxiliary
+            bool is_passive_pattern = (best.verb_type == grammar::VerbType::GodanRa && utf8::contains(surface, "られ"));
+            if (!is_passive_pattern) {
+              continue;  // Skip - e-row stem is typically ichidan, not godan
             }
           }
+        }
 
-          // Skip Suru verb renyokei (し) if followed by te/ta form particles
-          // e.g., "勉強して" should be parsed as single token, not "勉強し" + "て"
-          if (best.verb_type == grammar::VerbType::Suru &&
-              hiragana_part == "し" && end_pos < codepoints.size()) {
-            char32_t next_char = codepoints[end_pos];
-            if (next_char == U'て' || next_char == U'た' ||
-                next_char == U'で' || next_char == U'だ') {
-              continue;  // Skip - let the longer te-form candidate win
-            }
+        // Skip Suru verb renyokei (し) if followed by te/ta form particles
+        // e.g., "勉強して" should be parsed as single token, not "勉強し" + "て"
+        if (best.verb_type == grammar::VerbType::Suru && hiragana_part == "し" && end_pos < codepoints.size()) {
+          char32_t next_char = codepoints[end_pos];
+          if (next_char == U'て' || next_char == U'た' || next_char == U'で' || next_char == U'だ') {
+            continue;  // Skip - let the longer te-form candidate win
           }
+        }
 
-          // Skip GodanSa renyokei (漢字+し/漢字+とし etc.) when not in dictionary
-          // e.g., "得し" misrecognized as GodanSa "得す" renyokei, but actually "得+し"
-          // e.g., "証とし" misrecognized as GodanSa "証とす" renyokei, but actually "証+として"
-          // MeCab splits as: 得(名詞) + し(する連用形) + た(過去)
-          // Exception: Real GodanSa verbs like "愛す", "汚す" should not be skipped
-          if (best.verb_type == grammar::VerbType::GodanSa &&
-              utf8::endsWith(hiragana_part, "し") && kanji_end - start_pos <= 3) {
-            // Check if the base form (stem+す) is a registered GodanSa verb
-            // For single-char hiragana_part "し": base = kanji + す
-            // For multi-char like "とし": base = kanji + と + す = 証とす
-            std::string base_stem = extractSubstring(codepoints, start_pos, stem_end);
-            std::string base_form = base_stem + "す";
-            if (!vh::isVerbInDictionary(dict_manager, base_form)) {
-              // Not a registered verb - likely サ変 or compound particle pattern
-              continue;
-            }
-          }
-
-          // Skip GodanMa renyokei (漢字+み) when base form is not in dictionary.
-          // Renyokei み competes with auxiliary みたい — without dict verification,
-          // 猫みたい (noun+aux) cannot be distinguished from 読みたい (verb+aux).
-          // Requires all single-kanji GODAN_MA verbs to be enumerated in L2 dict.
-          if (best.verb_type == grammar::VerbType::GodanMa &&
-              hiragana_part == "み" && kanji_end - start_pos <= 3) {
-            std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "む";
-            if (!vh::isVerbInDictionary(dict_manager, base_form)) {
-              continue;
-            }
-          }
-
-          // Skip verb + ます auxiliary patterns
-          if (vh::shouldSkipMasuAuxPattern(surface, best.verb_type)) {
-            continue;  // Skip - let the split (verb + dictionary aux) win
-          }
-
-          // Skip verb + そう auxiliary patterns
-          if (vh::shouldSkipSouPattern(surface, best.verb_type)) {
-            continue;  // Skip - let the split (verb renyokei + そう) win
-          }
-
-          // Skip verb + passive auxiliary patterns (れる, れた, etc.)
-          // For auxiliary separation: 書かれる → 書か + れる
-          if (vh::shouldSkipPassiveAuxPattern(surface, best.verb_type)) {
-            continue;  // Skip - let the split (verb mizenkei + passive aux) win
-          }
-
-          // Skip verb + causative auxiliary patterns (せる, させる, etc.)
-          // For auxiliary separation: 書かせる → 書か + せる
-          if (vh::shouldSkipCausativeAuxPattern(surface, best.verb_type)) {
-            continue;  // Skip - let the split (verb mizenkei + causative aux) win
-          }
-
-          // Skip suru-verb auxiliary patterns (して, した, している, etc.)
-          // For MeCab-compatible split: 勉強して → 勉強 + して
-          size_t kanji_count = kanji_end - start_pos;
-          if (vh::shouldSkipSuruVerbAuxPattern(surface, kanji_count)) {
-            continue;  // Skip - let the split (noun + suru-aux) win
-          }
-
-          // Skip て+subsidiary verb patterns (てもらう, てくれ, てあげ, etc.)
-          // For MeCab-compatible split: 助けてもらう → 助け + て + もらう
-          //                            食べてくれる → 食べ + て + くれる
-          // These patterns should be split to allow subsidiary verb analysis
-          if (surface.find("てもらう") != std::string::npos ||
-              surface.find("てもらっ") != std::string::npos ||
-              surface.find("てもらい") != std::string::npos ||
-              surface.find("てもらえ") != std::string::npos ||
-              surface.find("てくれる") != std::string::npos ||
-              surface.find("てくれま") != std::string::npos ||
-              surface.find("てくれた") != std::string::npos ||
-              surface.find("てくれて") != std::string::npos ||
-              surface.find("てくれな") != std::string::npos ||
-              surface.find("てほしい") != std::string::npos ||
-              surface.find("てあげる") != std::string::npos ||
-              surface.find("てあげま") != std::string::npos ||
-              surface.find("てあげた") != std::string::npos) {
-            continue;  // Skip - let the split (verb te-form + subsidiary verb) win
-          }
-
-          // Skip volitional patterns ending with よう (e.g., 食べよう)
-          // For MeCab-compatible split: 食べよう → 食べよ + う
-          if (surface.size() >= 6 && surface.compare(surface.size() - 6, 6, "よう") == 0) {
-            continue;  // Skip - let the split (verb + volitional aux) win
-          }
-
-          // Skip godan volitional patterns ending with おう (e.g., 行こう, 書こう)
-          // For MeCab-compatible split: 行こう → 行こ + う
-          // O-row + う patterns: こう, ごう, そう, とう, のう, ぼう, もう, ろう, おう
-          if (surface.size() >= 6) {
-            std::string last_two = surface.substr(surface.size() - 6);  // 2 hiragana = 6 bytes
-            if (last_two == "こう" || last_two == "ごう" || last_two == "そう" ||
-                last_two == "とう" || last_two == "のう" || last_two == "ぼう" ||
-                last_two == "もう" || last_two == "ろう" || last_two == "おう") {
-              continue;  // Skip - let the split (verb mizenkei + う) win
-            }
-          }
-
-          // Skip sokuonbin + auxiliary verb patterns (買っとく, 行っちゃう)
-          // For MeCab-compatible split: 買っとく → 買っ + とく
-          // Check if suffix after っ is a registered auxiliary verb (とく, ちゃう, ちまう)
-          bool skip_sokuonbin_aux = false;
-          if (dict_manager && surface.size() >= 9) {  // っ(3) + 2char auxiliary minimum
-            // Find っ position and check if suffix is auxiliary verb in dictionary
-            auto surface_cps = normalize::utf8::decode(surface);
-            for (size_t i = 1; i < surface_cps.size() && !skip_sokuonbin_aux; ++i) {
-              if (surface_cps[i] == U'っ' && i + 1 < surface_cps.size()) {
-                // Get suffix after っ
-                std::vector<char32_t> suffix_cps(surface_cps.begin() + i + 1, surface_cps.end());
-                std::string suffix = normalize::utf8::encode(suffix_cps);
-                // Check if suffix is an auxiliary verb (AuxAspectOku: とく, AuxAspectShimau: ちゃう/ちまう)
-                auto results = dict_manager->lookup(suffix, 0);
-                for (const auto& r : results) {
-                  if (r.entry && r.entry->surface == suffix &&
-                      (r.entry->extended_pos == core::ExtendedPOS::AuxAspectOku ||
-                       r.entry->extended_pos == core::ExtendedPOS::AuxAspectShimau)) {
-                    SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface
-                        << "\" sokuonbin+aux (" << suffix << ")\n");
-                    skip_sokuonbin_aux = true;
-                    break;
-                  }
-                }
-              }
-            }
-          }
-          if (skip_sokuonbin_aux) {
-            continue;  // Skip - let the split (verb sokuonbin + auxiliary) win
-          }
-
-          // Lower cost for higher confidence matches
-          float base_cost = verb_opts.base_cost_standard + (1.0F - best.confidence) * verb_opts.confidence_cost_scale;
-          // MeCab compatibility: Suru verbs should split as noun + する
-          // Add penalty for unified suru-verb candidates to prefer split
-          // e.g., 勉強する → 勉強 + する (split preferred)
-          if (best.verb_type == grammar::VerbType::Suru &&
-              best.stem.size() >= core::kTwoJapaneseCharBytes) {
-            // Penalize unified suru-verb to prefer noun + する/される/させる split
-            base_cost += 3.0F;
-            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (suru_split_penalty)\n");
-          }
-          // Penalize ALL verb candidates with prefix-like kanji at start
-          // e.g., 今何する/今何してる should split, not be single verb
-          // This applies to all verb types (suru, ichidan, godan)
-          if (best.stem.size() >= core::kTwoJapaneseCharBytes) {
-            auto stem_codepoints = normalize::utf8::decode(best.stem);
-            if (!stem_codepoints.empty() && isPrefixLikeKanji(stem_codepoints[0])) {
-              // Heavy penalty to force split
-              base_cost += 3.0F;
-              SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (prefix_kanji_penalty)\n");
-            }
-          }
-          // Penalize verb candidates starting with interrogative kanji (何, 誰, 幾)
-          // e.g., 何してる should split as 何|し|てる, not be single verb
-          // Interrogatives are standalone words, not verb stems
-          {
-            auto stem_codepoints = normalize::utf8::decode(best.stem);
-            if (!stem_codepoints.empty() && isInterrogativeKanji(stem_codepoints[0])) {
-              // Heavy penalty to force split
-              base_cost += 3.0F;
-              SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (interrogative_kanji_penalty)\n");
-            }
-          }
-          // Skip patterns where removing first kanji leaves a valid dictionary verb
-          // e.g., 本買った → 本 + 買った, where 買う is a dict verb
-          // This handles particleless noun+verb patterns: 本買った, 服買った, 車買った
-          if (dict_manager != nullptr && kanji_count == 2) {
-            auto stem_cps = normalize::utf8::decode(best.stem);
-            if (stem_cps.size() == 2) {
-              // Get second kanji as potential verb stem
-              std::string remainder_stem = normalize::utf8::encode({stem_cps[1]});
-              // Check if remainder + verb ending is a dictionary verb
-              std::string_view conj_suffix;
-              switch (best.verb_type) {
-                case grammar::VerbType::GodanKa: conj_suffix = "く"; break;
-                case grammar::VerbType::GodanGa: conj_suffix = "ぐ"; break;
-                case grammar::VerbType::GodanSa: conj_suffix = "す"; break;
-                case grammar::VerbType::GodanTa: conj_suffix = "つ"; break;
-                case grammar::VerbType::GodanNa: conj_suffix = "ぬ"; break;
-                case grammar::VerbType::GodanBa: conj_suffix = "ぶ"; break;
-                case grammar::VerbType::GodanMa: conj_suffix = "む"; break;
-                case grammar::VerbType::GodanRa: conj_suffix = "る"; break;
-                case grammar::VerbType::GodanWa: conj_suffix = "う"; break;
-                case grammar::VerbType::Ichidan: conj_suffix = "る"; break;
-                default: conj_suffix = ""; break;
-              }
-              if (!conj_suffix.empty()) {
-                std::string remainder_base = remainder_stem + std::string(conj_suffix);
-                if (vh::isVerbInDictionary(dict_manager, remainder_base)) {
-                  // Skip this candidate - prefer noun + verb split
-                  SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface
-                                            << "\" remainder \"" << remainder_base << "\" is dict verb\n");
-                  continue;
-                }
-              }
-            }
-          }
-          // Penalize single-kanji + いる verb candidates (both godan-ra and ichidan)
-          // e.g., 人いる should split as 人 + いる (noun + verb), not be verb
-          // Most single kanji + いる patterns are NOUN + existence verb いる
-          // Valid single-kanji verbs: 入る, 走る, 居る (いる), 見る, etc.
-          // These should be in dictionary, so dictionary bonus will override
-          {
-            auto surface_cps = normalize::utf8::decode(surface);
-            // Check if pattern is: 1 kanji + いる
-            if (surface_cps.size() == 3 &&
-                normalize::isKanjiCodepoint(surface_cps[0]) &&
-                surface_cps[1] == U'い' && surface_cps[2] == U'る') {
-              // Single kanji + いる pattern - penalize to prefer NOUN + いる split
-              base_cost += 2.5F;
-              SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.5 (single_kanji_iru_penalty)\n");
-            }
-          }
-          // Check if base form exists in dictionary - significant bonus for known verbs
-          // This helps 行われた (base=行う) beat 行(suffix)+われた split
-          // Skip compound adjective patterns (verb renyoukei + にくい/やすい/がたい)
-          // Skip suru-verbs - they should split as noun + する for MeCab compatibility
-          bool is_comp_adj = vh::isCompoundAdjectivePattern(surface);
-          bool in_dict = vh::isVerbInDictionary(dict_manager, best.base_form);
-          bool is_suru = (best.verb_type == grammar::VerbType::Suru);
-          if (!is_comp_adj && in_dict && !is_suru) {
-            // Found in dictionary - give strong bonus (not for suru-verbs)
-            base_cost = verb_opts.base_cost_verified +
-                        (1.0F - best.confidence) * verb_opts.confidence_cost_scale_medium;
-            // Godan-ra renyokei ambiguity: 降り can be from 降る(godan-ra) or
-            // 降りる(ichidan). When ichidan form exists in dict, penalize godan-ra
-            // so the more specific ichidan interpretation wins.
-            if (best.verb_type == grammar::VerbType::GodanRa &&
-                utf8::endsWith(surface, "り")) {
-              std::string ichidan_base = surface + "る";
-              if (vh::isVerbInDictionary(dict_manager, ichidan_base)) {
-                base_cost += 1.0F;
-                SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface
-                                          << "\" +1.0 (godan_ra_ichidan_ambiguity, "
-                                          << ichidan_base << " in dict)\n");
-              }
-            }
-          }
-          // Penalty for compound adjective patterns (verb renyokei + やすい/にくい/がたい)
-          // MeCab splits these: 使いにくい → 使い + にくい
-          if (is_comp_adj) {
-            base_cost += 2.0F;  // Strong penalty to force split
-            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (compound_adj_penalty)\n");
-          }
-          // Penalize 2-kanji verb candidates whose base form is not in dict
-          // Most real 2-kanji verbs (行う, 伴う, etc.) are in the dictionary.
-          // False 2-kanji patterns like 柿食えば (柿 + 食えば) have base 柿食う
-          // which is not a real verb. Apply penalty so noun + verb split wins.
-          if (kanji_count == 2 && !in_dict) {
-            base_cost += bigram_cost::kRare;
-            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface
-                                      << "\" +1.0 (two_kanji_non_dict_penalty)\n");
-          }
-          // Penalty for verb candidates containing みたい suffix
-          // みたい is a na-adjective (like ~, seems ~), not a verb suffix
-          // E.g., 猫みたい should be 猫 + みたい, not VERB 猫む
-          if (utf8::contains(surface, "みたい")) {
-            base_cost += verb_opts.penalty_single_char;
-          }
-          // Penalty for verb candidates ending with auxiliary たい/たく/たかっ
-          // MeCab splits verb + auxiliary たい (desiderative)
-          // E.g., 戦いたい = 戦い + たい, not single VERB
-          if (utf8::endsWith(surface, "たい") || utf8::endsWith(surface, "たく") ||
-              utf8::endsWith(surface, "たかっ")) {
-            base_cost += bigram_cost::kRare;  // Penalize to favor split path
-          }
-          // Penalty for verb candidates containing causative auxiliary chains
-          // MeCab splits: 欠かせない → 欠か+せ+ない, 食べさせた → 食べ+させ+た
-          if (vh::containsCausativeAuxPattern(surface)) {
-            base_cost += bigram_cost::kStrong;  // Penalize to favor split path
-          }
-          // Penalty for verb candidates ending with auxiliary まい (negative volitional)
-          // MeCab splits verb + auxiliary まい
-          // E.g., 出来まい = 出来 + まい, 行くまい = 行く + まい
-          if (utf8::endsWith(surface, "まい")) {
-            base_cost += bigram_cost::kStrong;  // Penalize to favor split path
-          }
-          // Penalty for verb candidates ending with らしい (conjecture auxiliary)
-          // MeCab splits verb/adj + らしい
-          // E.g., 帰りたいらしい = 帰り + たい + らしい
-          if (utf8::endsWith(surface, "らしい") || utf8::endsWith(surface, "らしく") ||
-              utf8::endsWith(surface, "らしかっ")) {
-            base_cost += bigram_cost::kStrong;  // Penalize to favor split path
-          }
-          // Penalty for verb candidates ending with passive+te form (〜まれて/〜られて)
-          // MeCab splits compound verb passive+te: 読み込まれて → 読み込ま|れ|て
-          // E.g., 読み込まれていない = 読み込ま + れ + て + い + ない
-          if (utf8::endsWith(surface, "まれて") || utf8::endsWith(surface, "まれた") ||
-              utf8::endsWith(surface, "られて") || utf8::endsWith(surface, "られた")) {
-            base_cost += bigram_cost::kVeryRare + bigram_cost::kNegligible;  // 2.0F
-          }
-          // Penalty for verb candidates containing て+auxiliary verb chains
-          // MeCab splits: 付いてくる → 付い+て+くる, 集まってくる → 集まっ+て+くる
-          // These are syntactic constructions (V-te + auxiliary), not single verb forms
-          if (vh::containsTeFormAuxPattern(surface)) {
-            base_cost += bigram_cost::kStrong;  // Penalize to favor split path
-          }
-          // Penalty for verb candidates absorbing post-verbal particles
-          // たばかり/だばかり = V-ta + bakari ("just did V"), always separate tokens
-          // E.g., 生まれたばかりだ should be 生まれ+た+ばかり+だ, not one token
-          if (utf8::contains(surface, "たばかり") || utf8::contains(surface, "だばかり")) {
-            base_cost += bigram_cost::kSevere;
-          }
-          // Set has_suffix to skip exceeds_dict_length penalty in tokenizer.cpp
-          // This applies when:
-          // 1. Base form exists in dictionary as verb (in_dict)
-          // 2. OR: Ichidan verb with valid i-row stem (感じる, not 人いる)
-          //    that passes confidence threshold
-          bool is_ichidan = (best.verb_type == grammar::VerbType::Ichidan);
-          bool has_valid_ichidan_stem = false;
-          if (is_ichidan && !best.stem.empty() &&
-              best.stem.size() >= 2 * core::kJapaneseCharBytes) {
-            // Check if stem ends with i-row hiragana (not e-row)
-            // E-row endings are often te-form (見て) or copula (嫌で), not ichidan stems
-            // Also exclude single-kanji + い patterns (人い → 人 + いる)
-            std::string_view last_char(
-                best.stem.data() + best.stem.size() - core::kJapaneseCharBytes,
-                core::kJapaneseCharBytes);
-            if (grammar::endsWithIRow(last_char)) {
-              std::string kanji_part(best.stem.data(),
-                                     best.stem.size() - core::kJapaneseCharBytes);
-              bool is_single_kanji_i =
-                  (kanji_part.size() == core::kJapaneseCharBytes &&
-                   last_char == "い");
-              has_valid_ichidan_stem = !is_single_kanji_i;
-            }
-          }
-          bool recognized_ichidan = is_ichidan && has_valid_ichidan_stem &&
-                                    best.confidence > verb_opts.confidence_ichidan_dict;
-          // Godan verbs with single-kanji stem + high confidence are also
-          // recognized (残る, 立つ, 打つ, etc.)
-          bool recognized_godan = !is_ichidan && !in_dict &&
-              !best.stem.empty() &&
-              best.stem.size() == core::kJapaneseCharBytes &&
-              best.confidence >= verb_opts.confidence_ichidan_dict;
-          bool has_suffix = in_dict || recognized_ichidan || recognized_godan;
-          // Determine extended_pos based on verb type and surface ending
-          // Godan-wa verbs ending in い are renyokei (戦い), not onbinkei
-          // Godan-ka/ga verbs ending in い are onbinkei (書い, 泳い)
-          core::ExtendedPOS verb_epos = core::ExtendedPOS::Unknown;  // Auto-detect
-          if (utf8::endsWith(surface, "い")) {
-            if (best.verb_type == grammar::VerbType::GodanWa) {
-              verb_epos = core::ExtendedPOS::VerbRenyokei;
-            } else if (best.verb_type == grammar::VerbType::GodanKa ||
-                       best.verb_type == grammar::VerbType::GodanGa) {
-              verb_epos = core::ExtendedPOS::VerbOnbinkei;
-            }
-          }
-          // Skip if surface is registered as NOUN or ADJECTIVE in dictionary
-          // This prevents nominalized verb forms (思い, 間違い, 戦い, 願い) from
-          // being tokenized as VERB when they are explicitly registered as nouns
-          // Also prevents i-adjectives (美しい, 正しい, 楽しい) from being
-          // misclassified as godan-wa verbs (base 美しう, etc.)
-          // This check applies to godan-wa renyokei forms (ending in い)
-          bool skip_godan_wa_renyokei = false;
-          if (verb_epos == core::ExtendedPOS::VerbRenyokei && dict_manager != nullptr) {
-            auto results = dict_manager->lookup(surface, 0);
-            for (const auto& result : results) {
-              if (result.entry != nullptr &&
-                  (result.entry->pos == core::PartOfSpeech::Noun ||
-                   result.entry->pos == core::PartOfSpeech::Adjective)) {
-                skip_godan_wa_renyokei = true;
-                SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict "
-                    << (result.entry->pos == core::PartOfSpeech::Noun ? "NOUN" : "ADJ")
-                    << ", skipping godan-wa renyokei\n");
-                break;
-              }
-            }
-          }
-          if (skip_godan_wa_renyokei) {
-            continue;  // Skip this candidate, use dictionary entry instead
-          }
-          // Skip ichidan ta-form if stem is registered as NOUN in dictionary
-          // e.g., 感じた → stem 感じ is dict NOUN, so skip (prefer 感じ(NOUN) + た(AUX))
-          // This prevents nominalized verb renyokei forms from appearing as conjugated verbs
-          bool skip_ichidan_ta = false;
-          if (best.verb_type == grammar::VerbType::Ichidan && dict_manager != nullptr &&
-              !best.stem.empty()) {
-            // The stem for ichidan ta-form is the renyokei (e.g., 感じ for 感じた)
-            auto stem_results = dict_manager->lookup(best.stem, 0);
-            for (const auto& result : stem_results) {
-              if (result.entry != nullptr &&
-                  result.entry->pos == core::PartOfSpeech::Noun) {
-                skip_ichidan_ta = true;
-                SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" stem \"" << best.stem << "\" is dict NOUN, skipping ichidan ta-form\n");
-                break;
-              }
-            }
-          }
-          if (skip_ichidan_ta) {
-            continue;  // Skip this candidate, prefer NOUN + た split
-          }
-          // Skip if surface is already a registered VERB in dictionary
-          // The dict entry has correct lemma; this unknown candidate would have wrong lemma
-          // E.g., 下さい is dict verb (lemma=下さる), skip godan-wa candidate (lemma=下さう)
-          if (!in_dict && vh::isVerbInDictionary(dict_manager, surface)) {
-            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict VERB, skipping unknown candidate\n");
+        // Skip GodanSa renyokei (漢字+し/漢字+とし etc.) when not in dictionary
+        // e.g., "得し" misrecognized as GodanSa "得す" renyokei, but actually "得+し"
+        // e.g., "証とし" misrecognized as GodanSa "証とす" renyokei, but actually "証+として"
+        // MeCab splits as: 得(名詞) + し(する連用形) + た(過去)
+        // Exception: Real GodanSa verbs like "愛す", "汚す" should not be skipped
+        if (best.verb_type == grammar::VerbType::GodanSa && utf8::endsWith(hiragana_part, "し") &&
+            kanji_end - start_pos <= 3) {
+          // Check if the base form (stem+す) is a registered GodanSa verb
+          // For single-char hiragana_part "し": base = kanji + す
+          // For multi-char like "とし": base = kanji + と + す = 証とす
+          std::string base_stem = extractSubstring(codepoints, start_pos, stem_end);
+          std::string base_form = base_stem + "す";
+          if (!vh::isVerbInDictionary(dict_manager, base_form)) {
+            // Not a registered verb - likely サ変 or compound particle pattern
             continue;
           }
-          // Penalize verb candidates absorbing adj く-form + なる suffix chain
-          // e.g., 得なくなった should split as 得+なく+なっ+た, not merge as 得る(ichidan)
-          // The suffix contains くなっ/くなり/くなる/くなれ = adj renyokei + なる conjugation
-          if (!best.suffix.empty() &&
-              vh::containsKuNaruPattern(best.suffix)) {
-            base_cost += bigram_cost::kSevere;  // Force split
-            SUZUME_DEBUG_LOG("[COST_ADJ] \"" << surface << "\" +" << bigram_cost::kSevere << " (ku_naru_verb_suffix)\n");
+        }
+
+        // Skip GodanMa renyokei (漢字+み) when base form is not in dictionary.
+        // Renyokei み competes with auxiliary みたい — without dict verification,
+        // 猫みたい (noun+aux) cannot be distinguished from 読みたい (verb+aux).
+        // Requires all single-kanji GODAN_MA verbs to be enumerated in L2 dict.
+        if (best.verb_type == grammar::VerbType::GodanMa && hiragana_part == "み" && kanji_end - start_pos <= 3) {
+          std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "む";
+          if (!vh::isVerbInDictionary(dict_manager, base_form)) {
+            continue;
           }
-          // Penalize unverified godan-wa candidates that extend beyond a
-          // shorter dict verb at the same position. These false positives
-          // absorb い from the next word (いただく, いく, etc.)
-          // e.g., 待ちい (base=待ちう) extends beyond 待ち (dict verb 待つ)
-          if (best.verb_type == grammar::VerbType::GodanWa && !in_dict &&
-              dict_manager != nullptr) {
-            auto prefix_results = dict_manager->lookup(surface, 0);
-            for (const auto& result : prefix_results) {
-              if (result.entry != nullptr &&
-                  result.entry->pos == core::PartOfSpeech::Verb &&
-                  result.length < surface.size()) {
-                base_cost += 2.0F;
-                SUZUME_DEBUG_LOG("[COST_ADJ] \"" << surface << "\" +2.0 (godan_wa_exceeds_dict_verb)\n");
-                break;
+        }
+
+        // Skip verb + ます auxiliary patterns
+        if (vh::shouldSkipMasuAuxPattern(surface, best.verb_type)) {
+          continue;  // Skip - let the split (verb + dictionary aux) win
+        }
+
+        // Skip verb + そう auxiliary patterns
+        if (vh::shouldSkipSouPattern(surface, best.verb_type)) {
+          continue;  // Skip - let the split (verb renyokei + そう) win
+        }
+
+        // Skip verb + passive auxiliary patterns (れる, れた, etc.)
+        // For auxiliary separation: 書かれる → 書か + れる
+        if (vh::shouldSkipPassiveAuxPattern(surface, best.verb_type)) {
+          continue;  // Skip - let the split (verb mizenkei + passive aux) win
+        }
+
+        // Skip verb + causative auxiliary patterns (せる, させる, etc.)
+        // For auxiliary separation: 書かせる → 書か + せる
+        if (vh::shouldSkipCausativeAuxPattern(surface, best.verb_type)) {
+          continue;  // Skip - let the split (verb mizenkei + causative aux) win
+        }
+
+        // Skip suru-verb auxiliary patterns (して, した, している, etc.)
+        // For MeCab-compatible split: 勉強して → 勉強 + して
+        size_t kanji_count = kanji_end - start_pos;
+        if (vh::shouldSkipSuruVerbAuxPattern(surface, kanji_count)) {
+          continue;  // Skip - let the split (noun + suru-aux) win
+        }
+
+        // Skip て+subsidiary verb patterns (てもらう, てくれ, てあげ, etc.)
+        // For MeCab-compatible split: 助けてもらう → 助け + て + もらう
+        //                            食べてくれる → 食べ + て + くれる
+        // These patterns should be split to allow subsidiary verb analysis
+        if (surface.find("てもらう") != std::string::npos || surface.find("てもらっ") != std::string::npos ||
+            surface.find("てもらい") != std::string::npos || surface.find("てもらえ") != std::string::npos ||
+            surface.find("てくれる") != std::string::npos || surface.find("てくれま") != std::string::npos ||
+            surface.find("てくれた") != std::string::npos || surface.find("てくれて") != std::string::npos ||
+            surface.find("てくれな") != std::string::npos || surface.find("てほしい") != std::string::npos ||
+            surface.find("てあげる") != std::string::npos || surface.find("てあげま") != std::string::npos ||
+            surface.find("てあげた") != std::string::npos) {
+          continue;  // Skip - let the split (verb te-form + subsidiary verb) win
+        }
+
+        // Skip volitional patterns ending with よう (e.g., 食べよう)
+        // For MeCab-compatible split: 食べよう → 食べよ + う
+        if (surface.size() >= 6 && surface.compare(surface.size() - 6, 6, "よう") == 0) {
+          continue;  // Skip - let the split (verb + volitional aux) win
+        }
+
+        // Skip godan volitional patterns ending with おう (e.g., 行こう, 書こう)
+        // For MeCab-compatible split: 行こう → 行こ + う
+        // O-row + う patterns: こう, ごう, そう, とう, のう, ぼう, もう, ろう, おう
+        if (surface.size() >= 6) {
+          std::string last_two = surface.substr(surface.size() - 6);  // 2 hiragana = 6 bytes
+          if (last_two == "こう" || last_two == "ごう" || last_two == "そう" || last_two == "とう" ||
+              last_two == "のう" || last_two == "ぼう" || last_two == "もう" || last_two == "ろう" ||
+              last_two == "おう") {
+            continue;  // Skip - let the split (verb mizenkei + う) win
+          }
+        }
+
+        // Skip sokuonbin + auxiliary verb patterns (買っとく, 行っちゃう)
+        // For MeCab-compatible split: 買っとく → 買っ + とく
+        // Check if suffix after っ is a registered auxiliary verb (とく, ちゃう, ちまう)
+        bool skip_sokuonbin_aux = false;
+        if (dict_manager && surface.size() >= 9) {  // っ(3) + 2char auxiliary minimum
+          // Find っ position and check if suffix is auxiliary verb in dictionary
+          auto surface_cps = normalize::utf8::decode(surface);
+          for (size_t i = 1; i < surface_cps.size() && !skip_sokuonbin_aux; ++i) {
+            if (surface_cps[i] == U'っ' && i + 1 < surface_cps.size()) {
+              // Get suffix after っ
+              std::vector<char32_t> suffix_cps(surface_cps.begin() + i + 1, surface_cps.end());
+              std::string suffix = normalize::utf8::encode(suffix_cps);
+              // Check if suffix is an auxiliary verb (AuxAspectOku: とく, AuxAspectShimau: ちゃう/ちまう)
+              auto results = dict_manager->lookup(suffix, 0);
+              for (const auto& r : results) {
+                if (r.entry && r.entry->surface == suffix &&
+                    (r.entry->extended_pos == core::ExtendedPOS::AuxAspectOku ||
+                     r.entry->extended_pos == core::ExtendedPOS::AuxAspectShimau)) {
+                  SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" sokuonbin+aux (" << suffix << ")\n");
+                  skip_sokuonbin_aux = true;
+                  break;
+                }
               }
             }
           }
-          SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                                << " base=" << best.base_form
-                                << " cost=" << base_cost
-                                << " in_dict=" << in_dict
-                                << " has_suffix=" << has_suffix << "\n";
-          }
-          // Don't set lemma here - let lemmatizer derive it with dictionary verification
-          // The lemmatizer will use stem-matching logic to pick the correct base form
-          candidates.push_back(makeVerbCandidate(
-              surface, start_pos, end_pos, base_cost, "",
-              grammar::verbTypeToConjType(best.verb_type),
-              has_suffix, CandidateOrigin::VerbKanji, best.confidence,
-              grammar::verbTypeToString(best.verb_type).data(),
-              verb_epos));
-          // Don't break - try other stem lengths too
         }
+        if (skip_sokuonbin_aux) {
+          continue;  // Skip - let the split (verb sokuonbin + auxiliary) win
+        }
+
+        // Lower cost for higher confidence matches
+        float base_cost = verb_opts.base_cost_standard + (1.0F - best.confidence) * verb_opts.confidence_cost_scale;
+        // MeCab compatibility: Suru verbs should split as noun + する
+        // Add penalty for unified suru-verb candidates to prefer split
+        // e.g., 勉強する → 勉強 + する (split preferred)
+        if (best.verb_type == grammar::VerbType::Suru && best.stem.size() >= core::kTwoJapaneseCharBytes) {
+          // Penalize unified suru-verb to prefer noun + する/される/させる split
+          base_cost += 3.0F;
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (suru_split_penalty)\n");
+        }
+        // Penalize ALL verb candidates with prefix-like kanji at start
+        // e.g., 今何する/今何してる should split, not be single verb
+        // This applies to all verb types (suru, ichidan, godan)
+        if (best.stem.size() >= core::kTwoJapaneseCharBytes) {
+          auto stem_codepoints = normalize::utf8::decode(best.stem);
+          if (!stem_codepoints.empty() && isPrefixLikeKanji(stem_codepoints[0])) {
+            // Heavy penalty to force split
+            base_cost += 3.0F;
+            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (prefix_kanji_penalty)\n");
+          }
+        }
+        // Penalize verb candidates starting with interrogative kanji (何, 誰, 幾)
+        // e.g., 何してる should split as 何|し|てる, not be single verb
+        // Interrogatives are standalone words, not verb stems
+        {
+          auto stem_codepoints = normalize::utf8::decode(best.stem);
+          if (!stem_codepoints.empty() && isInterrogativeKanji(stem_codepoints[0])) {
+            // Heavy penalty to force split
+            base_cost += 3.0F;
+            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (interrogative_kanji_penalty)\n");
+          }
+        }
+        // Skip patterns where removing first kanji leaves a valid dictionary verb
+        // e.g., 本買った → 本 + 買った, where 買う is a dict verb
+        // This handles particleless noun+verb patterns: 本買った, 服買った, 車買った
+        if (dict_manager != nullptr && kanji_count == 2) {
+          auto stem_cps = normalize::utf8::decode(best.stem);
+          if (stem_cps.size() == 2) {
+            // Get second kanji as potential verb stem
+            std::string remainder_stem = normalize::utf8::encode({stem_cps[1]});
+            // Check if remainder + verb ending is a dictionary verb
+            std::string_view conj_suffix;
+            switch (best.verb_type) {
+              case grammar::VerbType::GodanKa:
+                conj_suffix = "く";
+                break;
+              case grammar::VerbType::GodanGa:
+                conj_suffix = "ぐ";
+                break;
+              case grammar::VerbType::GodanSa:
+                conj_suffix = "す";
+                break;
+              case grammar::VerbType::GodanTa:
+                conj_suffix = "つ";
+                break;
+              case grammar::VerbType::GodanNa:
+                conj_suffix = "ぬ";
+                break;
+              case grammar::VerbType::GodanBa:
+                conj_suffix = "ぶ";
+                break;
+              case grammar::VerbType::GodanMa:
+                conj_suffix = "む";
+                break;
+              case grammar::VerbType::GodanRa:
+                conj_suffix = "る";
+                break;
+              case grammar::VerbType::GodanWa:
+                conj_suffix = "う";
+                break;
+              case grammar::VerbType::Ichidan:
+                conj_suffix = "る";
+                break;
+              default:
+                conj_suffix = "";
+                break;
+            }
+            if (!conj_suffix.empty()) {
+              std::string remainder_base = remainder_stem + std::string(conj_suffix);
+              if (vh::isVerbInDictionary(dict_manager, remainder_base)) {
+                // Skip this candidate - prefer noun + verb split
+                SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" remainder \"" << remainder_base
+                                                          << "\" is dict verb\n");
+                continue;
+              }
+            }
+          }
+        }
+        // Penalize single-kanji + いる verb candidates (both godan-ra and ichidan)
+        // e.g., 人いる should split as 人 + いる (noun + verb), not be verb
+        // Most single kanji + いる patterns are NOUN + existence verb いる
+        // Valid single-kanji verbs: 入る, 走る, 居る (いる), 見る, etc.
+        // These should be in dictionary, so dictionary bonus will override
+        {
+          auto surface_cps = normalize::utf8::decode(surface);
+          // Check if pattern is: 1 kanji + いる
+          if (surface_cps.size() == 3 && normalize::isKanjiCodepoint(surface_cps[0]) && surface_cps[1] == U'い' &&
+              surface_cps[2] == U'る') {
+            // Single kanji + いる pattern - penalize to prefer NOUN + いる split
+            base_cost += 2.5F;
+            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.5 (single_kanji_iru_penalty)\n");
+          }
+        }
+        // Check if base form exists in dictionary - significant bonus for known verbs
+        // This helps 行われた (base=行う) beat 行(suffix)+われた split
+        // Skip compound adjective patterns (verb renyoukei + にくい/やすい/がたい)
+        // Skip suru-verbs - they should split as noun + する for MeCab compatibility
+        bool is_comp_adj = vh::isCompoundAdjectivePattern(surface);
+        bool in_dict = vh::isVerbInDictionary(dict_manager, best.base_form);
+        bool is_suru = (best.verb_type == grammar::VerbType::Suru);
+        if (!is_comp_adj && in_dict && !is_suru) {
+          // Found in dictionary - give strong bonus (not for suru-verbs)
+          base_cost = verb_opts.base_cost_verified + (1.0F - best.confidence) * verb_opts.confidence_cost_scale_medium;
+          // Godan-ra renyokei ambiguity: 降り can be from 降る(godan-ra) or
+          // 降りる(ichidan). When ichidan form exists in dict, penalize godan-ra
+          // so the more specific ichidan interpretation wins.
+          if (best.verb_type == grammar::VerbType::GodanRa && utf8::endsWith(surface, "り")) {
+            std::string ichidan_base = surface + "る";
+            if (vh::isVerbInDictionary(dict_manager, ichidan_base)) {
+              base_cost += 1.0F;
+              SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +1.0 (godan_ra_ichidan_ambiguity, "
+                                                       << ichidan_base << " in dict)\n");
+            }
+          }
+        }
+        // Penalty for compound adjective patterns (verb renyokei + やすい/にくい/がたい)
+        // MeCab splits these: 使いにくい → 使い + にくい
+        if (is_comp_adj) {
+          base_cost += 2.0F;  // Strong penalty to force split
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (compound_adj_penalty)\n");
+        }
+        // Penalize 2-kanji verb candidates whose base form is not in dict
+        // Most real 2-kanji verbs (行う, 伴う, etc.) are in the dictionary.
+        // False 2-kanji patterns like 柿食えば (柿 + 食えば) have base 柿食う
+        // which is not a real verb. Apply penalty so noun + verb split wins.
+        if (kanji_count == 2 && !in_dict) {
+          base_cost += bigram_cost::kRare;
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +1.0 (two_kanji_non_dict_penalty)\n");
+        }
+        // Penalty for verb candidates containing みたい suffix
+        // みたい is a na-adjective (like ~, seems ~), not a verb suffix
+        // E.g., 猫みたい should be 猫 + みたい, not VERB 猫む
+        if (utf8::contains(surface, "みたい")) {
+          base_cost += verb_opts.penalty_single_char;
+        }
+        // Penalty for verb candidates ending with auxiliary たい/たく/たかっ
+        // MeCab splits verb + auxiliary たい (desiderative)
+        // E.g., 戦いたい = 戦い + たい, not single VERB
+        if (utf8::endsWith(surface, "たい") || utf8::endsWith(surface, "たく") || utf8::endsWith(surface, "たかっ")) {
+          base_cost += bigram_cost::kRare;  // Penalize to favor split path
+        }
+        // Penalty for verb candidates containing causative auxiliary chains
+        // MeCab splits: 欠かせない → 欠か+せ+ない, 食べさせた → 食べ+させ+た
+        if (vh::containsCausativeAuxPattern(surface)) {
+          base_cost += bigram_cost::kStrong;  // Penalize to favor split path
+        }
+        // Penalty for verb candidates ending with auxiliary まい (negative volitional)
+        // MeCab splits verb + auxiliary まい
+        // E.g., 出来まい = 出来 + まい, 行くまい = 行く + まい
+        if (utf8::endsWith(surface, "まい")) {
+          base_cost += bigram_cost::kStrong;  // Penalize to favor split path
+        }
+        // Penalty for verb candidates ending with らしい (conjecture auxiliary)
+        // MeCab splits verb/adj + らしい
+        // E.g., 帰りたいらしい = 帰り + たい + らしい
+        if (utf8::endsWith(surface, "らしい") || utf8::endsWith(surface, "らしく") ||
+            utf8::endsWith(surface, "らしかっ")) {
+          base_cost += bigram_cost::kStrong;  // Penalize to favor split path
+        }
+        // Penalty for verb candidates ending with passive+te form (〜まれて/〜られて)
+        // MeCab splits compound verb passive+te: 読み込まれて → 読み込ま|れ|て
+        // E.g., 読み込まれていない = 読み込ま + れ + て + い + ない
+        if (utf8::endsWith(surface, "まれて") || utf8::endsWith(surface, "まれた") ||
+            utf8::endsWith(surface, "られて") || utf8::endsWith(surface, "られた")) {
+          base_cost += bigram_cost::kVeryRare + bigram_cost::kNegligible;  // 2.0F
+        }
+        // Penalty for verb candidates containing て+auxiliary verb chains
+        // MeCab splits: 付いてくる → 付い+て+くる, 集まってくる → 集まっ+て+くる
+        // These are syntactic constructions (V-te + auxiliary), not single verb forms
+        if (vh::containsTeFormAuxPattern(surface)) {
+          base_cost += bigram_cost::kStrong;  // Penalize to favor split path
+        }
+        // Penalty for verb candidates absorbing post-verbal particles
+        // たばかり/だばかり = V-ta + bakari ("just did V"), always separate tokens
+        // E.g., 生まれたばかりだ should be 生まれ+た+ばかり+だ, not one token
+        if (utf8::contains(surface, "たばかり") || utf8::contains(surface, "だばかり")) {
+          base_cost += bigram_cost::kSevere;
+        }
+        // Set has_suffix to skip exceeds_dict_length penalty in tokenizer.cpp
+        // This applies when:
+        // 1. Base form exists in dictionary as verb (in_dict)
+        // 2. OR: Ichidan verb with valid i-row stem (感じる, not 人いる)
+        //    that passes confidence threshold
+        bool is_ichidan = (best.verb_type == grammar::VerbType::Ichidan);
+        bool has_valid_ichidan_stem = false;
+        if (is_ichidan && !best.stem.empty() && best.stem.size() >= 2 * core::kJapaneseCharBytes) {
+          // Check if stem ends with i-row hiragana (not e-row)
+          // E-row endings are often te-form (見て) or copula (嫌で), not ichidan stems
+          // Also exclude single-kanji + い patterns (人い → 人 + いる)
+          std::string_view last_char(best.stem.data() + best.stem.size() - core::kJapaneseCharBytes,
+                                     core::kJapaneseCharBytes);
+          if (grammar::endsWithIRow(last_char)) {
+            std::string kanji_part(best.stem.data(), best.stem.size() - core::kJapaneseCharBytes);
+            bool is_single_kanji_i = (kanji_part.size() == core::kJapaneseCharBytes && last_char == "い");
+            has_valid_ichidan_stem = !is_single_kanji_i;
+          }
+        }
+        bool recognized_ichidan =
+            is_ichidan && has_valid_ichidan_stem && best.confidence > verb_opts.confidence_ichidan_dict;
+        // Godan verbs with single-kanji stem + high confidence are also
+        // recognized (残る, 立つ, 打つ, etc.)
+        bool recognized_godan = !is_ichidan && !in_dict && !best.stem.empty() &&
+                                best.stem.size() == core::kJapaneseCharBytes &&
+                                best.confidence >= verb_opts.confidence_ichidan_dict;
+        bool has_suffix = in_dict || recognized_ichidan || recognized_godan;
+        // Determine extended_pos based on verb type and surface ending
+        // Godan-wa verbs ending in い are renyokei (戦い), not onbinkei
+        // Godan-ka/ga verbs ending in い are onbinkei (書い, 泳い)
+        core::ExtendedPOS verb_epos = core::ExtendedPOS::Unknown;  // Auto-detect
+        if (utf8::endsWith(surface, "い")) {
+          if (best.verb_type == grammar::VerbType::GodanWa) {
+            verb_epos = core::ExtendedPOS::VerbRenyokei;
+          } else if (best.verb_type == grammar::VerbType::GodanKa || best.verb_type == grammar::VerbType::GodanGa) {
+            verb_epos = core::ExtendedPOS::VerbOnbinkei;
+          }
+        }
+        // Skip if surface is registered as NOUN or ADJECTIVE in dictionary
+        // This prevents nominalized verb forms (思い, 間違い, 戦い, 願い) from
+        // being tokenized as VERB when they are explicitly registered as nouns
+        // Also prevents i-adjectives (美しい, 正しい, 楽しい) from being
+        // misclassified as godan-wa verbs (base 美しう, etc.)
+        // This check applies to godan-wa renyokei forms (ending in い)
+        bool skip_godan_wa_renyokei = false;
+        if (verb_epos == core::ExtendedPOS::VerbRenyokei && dict_manager != nullptr) {
+          auto results = dict_manager->lookup(surface, 0);
+          for (const auto& result : results) {
+            if (result.entry != nullptr &&
+                (result.entry->pos == core::PartOfSpeech::Noun || result.entry->pos == core::PartOfSpeech::Adjective)) {
+              skip_godan_wa_renyokei = true;
+              SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict "
+                                                << (result.entry->pos == core::PartOfSpeech::Noun ? "NOUN" : "ADJ")
+                                                << ", skipping godan-wa renyokei\n");
+              break;
+            }
+          }
+        }
+        if (skip_godan_wa_renyokei) {
+          continue;  // Skip this candidate, use dictionary entry instead
+        }
+        // Skip ichidan ta-form if stem is registered as NOUN in dictionary
+        // e.g., 感じた → stem 感じ is dict NOUN, so skip (prefer 感じ(NOUN) + た(AUX))
+        // This prevents nominalized verb renyokei forms from appearing as conjugated verbs
+        bool skip_ichidan_ta = false;
+        if (best.verb_type == grammar::VerbType::Ichidan && dict_manager != nullptr && !best.stem.empty()) {
+          // The stem for ichidan ta-form is the renyokei (e.g., 感じ for 感じた)
+          auto stem_results = dict_manager->lookup(best.stem, 0);
+          for (const auto& result : stem_results) {
+            if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Noun) {
+              skip_ichidan_ta = true;
+              SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" stem \"" << best.stem
+                                                << "\" is dict NOUN, skipping ichidan ta-form\n");
+              break;
+            }
+          }
+        }
+        if (skip_ichidan_ta) {
+          continue;  // Skip this candidate, prefer NOUN + た split
+        }
+        // Skip if surface is already a registered VERB in dictionary
+        // The dict entry has correct lemma; this unknown candidate would have wrong lemma
+        // E.g., 下さい is dict verb (lemma=下さる), skip godan-wa candidate (lemma=下さう)
+        if (!in_dict && vh::isVerbInDictionary(dict_manager, surface)) {
+          SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict VERB, skipping unknown candidate\n");
+          continue;
+        }
+        // Penalize verb candidates absorbing adj く-form + なる suffix chain
+        // e.g., 得なくなった should split as 得+なく+なっ+た, not merge as 得る(ichidan)
+        // The suffix contains くなっ/くなり/くなる/くなれ = adj renyokei + なる conjugation
+        if (!best.suffix.empty() && vh::containsKuNaruPattern(best.suffix)) {
+          base_cost += bigram_cost::kSevere;  // Force split
+          SUZUME_DEBUG_LOG("[COST_ADJ] \"" << surface << "\" +" << bigram_cost::kSevere << " (ku_naru_verb_suffix)\n");
+        }
+        // Penalize unverified godan-wa candidates that extend beyond a
+        // shorter dict verb at the same position. These false positives
+        // absorb い from the next word (いただく, いく, etc.)
+        // e.g., 待ちい (base=待ちう) extends beyond 待ち (dict verb 待つ)
+        if (best.verb_type == grammar::VerbType::GodanWa && !in_dict && dict_manager != nullptr) {
+          auto prefix_results = dict_manager->lookup(surface, 0);
+          for (const auto& result : prefix_results) {
+            if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Verb &&
+                result.length < surface.size()) {
+              base_cost += 2.0F;
+              SUZUME_DEBUG_LOG("[COST_ADJ] \"" << surface << "\" +2.0 (godan_wa_exceeds_dict_verb)\n");
+              break;
+            }
+          }
+        }
+        SUZUME_DEBUG_VERBOSE_BLOCK {
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " base=" << best.base_form << " cost=" << base_cost
+                              << " in_dict=" << in_dict << " has_suffix=" << has_suffix << "\n";
+        }
+        // Don't set lemma here - let lemmatizer derive it with dictionary verification
+        // The lemmatizer will use stem-matching logic to pick the correct base form
+        candidates.push_back(makeVerbCandidate(
+            surface, start_pos, end_pos, base_cost, "", grammar::verbTypeToConjType(best.verb_type), has_suffix,
+            CandidateOrigin::VerbKanji, best.confidence, grammar::verbTypeToString(best.verb_type).data(), verb_epos));
+        // Don't break - try other stem lengths too
+      }
     }
   }
 
@@ -1201,7 +1119,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         suru_cand.confidence = 0.0F;
         godan_cand.confidence = 0.0F;
         for (const auto& cand : all_cands) {
-          if (cand.has_explanatory_suffix) continue;
+          if (cand.has_explanatory_suffix)
+            continue;
           if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence > ichidan_cand.confidence) {
             ichidan_cand = cand;
           }
@@ -1230,8 +1149,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         if (dict_manager != nullptr) {
           auto results = dict_manager->lookup(surface, 0);
           for (const auto& result : results) {
-            if (result.entry != nullptr &&
-                result.entry->pos == core::PartOfSpeech::Noun) {
+            if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Noun) {
               surface_is_dict_noun = true;
               SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict NOUN, skipping ichidan_renyokei\n");
               break;
@@ -1248,24 +1166,26 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             if (vh::isVerbInDictionary(dict_manager, remainder_base)) {
               suffix_is_dict_verb = true;
               SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" suffix \"" << remainder_base
-                              << "\" is dict verb, skipping ichidan_renyokei\n");
+                                                << "\" is dict verb, skipping ichidan_renyokei\n");
               break;
             }
           }
         }
-        if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold && !surface_is_dict_noun && !suffix_is_dict_verb) {
+        if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold && !surface_is_dict_noun &&
+            !suffix_is_dict_verb) {
           // Negative cost to strongly favor split over combined analysis
           // Combined forms get optimal_length bonus (-0.5), so we need to be lower
-          float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_cand.confidence) * verb_opts.confidence_cost_scale_small;
+          float base_cost =
+              verb_opts.bonus_ichidan + (1.0F - ichidan_cand.confidence) * verb_opts.confidence_cost_scale_small;
           // Set has_suffix=true to skip exceeds_dict_length penalty for MeCab compatibility
           // Ichidan renyokei stems are valid morphological units (論じ, 信じ, etc.)
           // Set lemma to the base form (e.g., 入れ → 入れる, 論じ → 論じる)
           // This is critical for correct lemmatization when the surface is ambiguous
           // (e.g., 入れ could be godan 入る imperative or ichidan 入れる renyoukei)
-          candidates.push_back(makeVerbCandidate(
-              surface, start_pos, renyokei_end, base_cost, ichidan_cand.base_form,
-              grammar::verbTypeToConjType(ichidan_cand.verb_type),
-              true, CandidateOrigin::VerbKanji, ichidan_cand.confidence, "ichidan_renyokei"));
+          candidates.push_back(makeVerbCandidate(surface, start_pos, renyokei_end, base_cost, ichidan_cand.base_form,
+                                                 grammar::verbTypeToConjType(ichidan_cand.verb_type), true,
+                                                 CandidateOrigin::VerbKanji, ichidan_cand.confidence,
+                                                 "ichidan_renyokei"));
           // Also generate shuushikei (dictionary form) if followed by る
           // E.g., 捨てるわけ → 捨てる (VERB shuushikei) + わけ (NOUN)
           // Without this, compound noun 捨てるわけ wins over split path
@@ -1273,18 +1193,15 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // false merges like 間+炒める → 間炒める (suffix + verb)
           if (renyokei_end < codepoints.size() && codepoints[renyokei_end] == U'る') {
             bool is_single_kanji = (kanji_end - start_pos == 1);
-            bool is_in_dict = (dict_manager != nullptr &&
-                               vh::isVerbInDictionary(dict_manager, ichidan_cand.base_form));
+            bool is_in_dict = (dict_manager != nullptr && vh::isVerbInDictionary(dict_manager, ichidan_cand.base_form));
             if (is_single_kanji || is_in_dict) {
               size_t shuushi_end = renyokei_end + 1;
               std::string shuushi_surface = extractSubstring(codepoints, start_pos, shuushi_end);
               float shuushi_cost = base_cost + 0.1F;  // Slightly higher than renyokei
-              candidates.push_back(makeVerbCandidate(
-                  shuushi_surface, start_pos, shuushi_end, shuushi_cost,
-                  ichidan_cand.base_form,
-                  grammar::verbTypeToConjType(ichidan_cand.verb_type),
-                  true, CandidateOrigin::VerbKanji, ichidan_cand.confidence,
-                  "ichidan_shuushikei"));
+              candidates.push_back(
+                  makeVerbCandidate(shuushi_surface, start_pos, shuushi_end, shuushi_cost, ichidan_cand.base_form,
+                                    grammar::verbTypeToConjType(ichidan_cand.verb_type), true,
+                                    CandidateOrigin::VerbKanji, ichidan_cand.confidence, "ichidan_shuushikei"));
             }
           }
         }
@@ -1303,13 +1220,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // - e-row/i-row: handled by single-char path above
       // - u-row: kanji+u-row = complete godan verb (行く, 書く)
       // - a-row: godan mizenkei + passive/causative (壊され, 揉まれ)
-      bool first_is_o_row = (first_hira == U'お' || first_hira == U'こ' || first_hira == U'そ' ||
-                             first_hira == U'と' || first_hira == U'の' || first_hira == U'ほ' ||
-                             first_hira == U'も' || first_hira == U'よ' || first_hira == U'ろ' ||
-                             first_hira == U'ご' || first_hira == U'ぞ' || first_hira == U'ど' ||
+      bool first_is_o_row = (first_hira == U'お' || first_hira == U'こ' || first_hira == U'そ' || first_hira == U'と' ||
+                             first_hira == U'の' || first_hira == U'ほ' || first_hira == U'も' || first_hira == U'よ' ||
+                             first_hira == U'ろ' || first_hira == U'ご' || first_hira == U'ぞ' || first_hira == U'ど' ||
                              first_hira == U'ぼ' || first_hira == U'ぽ');
-      if (first_is_o_row &&
-          (grammar::isERowCodepoint(second_hira) || grammar::isIRowCodepoint(second_hira))) {
+      if (first_is_o_row && (grammar::isERowCodepoint(second_hira) || grammar::isIRowCodepoint(second_hira))) {
         size_t renyokei_end = kanji_end + 2;
         std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
         const auto& all_cands = inflection.analyze(surface);
@@ -1320,7 +1235,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         suru_cand.confidence = 0.0F;
         godan_cand.confidence = 0.0F;
         for (const auto& cand : all_cands) {
-          if (cand.has_explanatory_suffix) continue;
+          if (cand.has_explanatory_suffix)
+            continue;
           if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence > ichidan_cand.confidence) {
             ichidan_cand = cand;
           }
@@ -1337,26 +1253,25 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         constexpr float kMultiCharIchidanThreshold = 0.45F;
         // Skip surfaces ending in ない — almost always adjective (少ない) or negative suffix
         bool ends_in_nai = (second_hira == U'い' && first_hira == U'な');
-        if (!prefer_suru && !prefer_godan && !ends_in_nai &&
-            ichidan_cand.confidence > kMultiCharIchidanThreshold) {
+        if (!prefer_suru && !prefer_godan && !ends_in_nai && ichidan_cand.confidence > kMultiCharIchidanThreshold) {
           bool surface_is_dict_entry = false;
           if (dict_manager != nullptr) {
             auto results = dict_manager->lookup(surface, 0);
             for (const auto& result : results) {
-              if (result.entry != nullptr &&
-                  (result.entry->pos == core::PartOfSpeech::Noun ||
-                   result.entry->pos == core::PartOfSpeech::Adjective)) {
+              if (result.entry != nullptr && (result.entry->pos == core::PartOfSpeech::Noun ||
+                                              result.entry->pos == core::PartOfSpeech::Adjective)) {
                 surface_is_dict_entry = true;
                 break;
               }
             }
           }
           if (!surface_is_dict_entry) {
-            float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_cand.confidence) * verb_opts.confidence_cost_scale_small;
-            candidates.push_back(makeVerbCandidate(
-                surface, start_pos, renyokei_end, base_cost, ichidan_cand.base_form,
-                grammar::verbTypeToConjType(ichidan_cand.verb_type),
-                true, CandidateOrigin::VerbKanji, ichidan_cand.confidence, "ichidan_renyokei_multi"));
+            float base_cost =
+                verb_opts.bonus_ichidan + (1.0F - ichidan_cand.confidence) * verb_opts.confidence_cost_scale_small;
+            candidates.push_back(makeVerbCandidate(surface, start_pos, renyokei_end, base_cost, ichidan_cand.base_form,
+                                                   grammar::verbTypeToConjType(ichidan_cand.verb_type), true,
+                                                   CandidateOrigin::VerbKanji, ichidan_cand.confidence,
+                                                   "ichidan_renyokei_multi"));
           }
         }
       }
@@ -1370,9 +1285,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   // Check positions kanji_end+1 through kanji_end+3 for し-ending godan-sa renyokei
   if (hiragana_end > kanji_end) {
     size_t max_renyokei_end = std::min(kanji_end + 4, hiragana_end + 1);
-    for (size_t renyokei_end = kanji_end + 1; renyokei_end <= max_renyokei_end && renyokei_end <= codepoints.size(); ++renyokei_end) {
+    for (size_t renyokei_end = kanji_end + 1; renyokei_end <= max_renyokei_end && renyokei_end <= codepoints.size();
+         ++renyokei_end) {
       // Must end in し (godan-sa renyokei marker)
-      if (codepoints[renyokei_end - 1] != U'し') continue;
+      if (codepoints[renyokei_end - 1] != U'し')
+        continue;
 
       std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
       const auto& all_cands = inflection.analyze(surface);
@@ -1381,13 +1298,15 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       grammar::InflectionCandidate best_sa;
       best_sa.confidence = 0.0F;
       for (const auto& cand : all_cands) {
-        if (cand.has_explanatory_suffix) continue;
+        if (cand.has_explanatory_suffix)
+          continue;
         if (cand.verb_type == grammar::VerbType::GodanSa && cand.confidence > best_sa.confidence) {
           best_sa = cand;
         }
       }
 
-      if (best_sa.confidence <= 0.5F) continue;
+      if (best_sa.confidence <= 0.5F)
+        continue;
 
       // Skip if surface is a dictionary NOUN
       bool surface_is_dict_noun = false;
@@ -1400,7 +1319,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           }
         }
       }
-      if (surface_is_dict_noun) continue;
+      if (surface_is_dict_noun)
+        continue;
 
       // For short godan-sa patterns, require dict verification to avoid
       // false positives like 悲し (not a real verb 悲す) or 春らし (not 春らす).
@@ -1412,16 +1332,14 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         if (!vh::isVerbInDictionary(dict_manager, best_sa.base_form)) {
           if (hira_chars <= 1) {
             // Single hiragana (悲し) — high false positive risk, skip
-            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface
-                            << "\" godan_sa single kanji+1hira, base \"" << best_sa.base_form
-                            << "\" not in dict\n");
+            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" godan_sa single kanji+1hira, base \""
+                                              << best_sa.base_form << "\" not in dict\n");
             continue;
           }
           // Block kanji+まし pattern (false godan-sa from verb+ます renyoukei)
           // E.g., 来まし → 来ます (false), 出まし → 出ます (false)
           if (codepoints[kanji_end] == U'ま') {
-            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface
-                            << "\" godan_sa kanji+まし pattern (likely verb+ます)\n");
+            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" godan_sa kanji+まし pattern (likely verb+ます)\n");
             continue;
           }
           // 2+ hiragana non-ます pattern (尽くし) — allow with penalty
@@ -1429,17 +1347,15 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         }
       }
 
-      float base_cost = verb_opts.bonus_ichidan + (1.0F - best_sa.confidence) * verb_opts.confidence_cost_scale_small + non_dict_penalty;
+      float base_cost = verb_opts.bonus_ichidan + (1.0F - best_sa.confidence) * verb_opts.confidence_cost_scale_small +
+                        non_dict_penalty;
       SUZUME_DEBUG_VERBOSE_BLOCK {
-        SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                            << " godan_sa_renyokei lemma=" << best_sa.base_form
-                            << " conf=" << best_sa.confidence
-                            << " cost=" << base_cost << "\n";
+        SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " godan_sa_renyokei lemma=" << best_sa.base_form
+                            << " conf=" << best_sa.confidence << " cost=" << base_cost << "\n";
       }
-      candidates.push_back(makeVerbCandidate(
-          surface, start_pos, renyokei_end, base_cost, best_sa.base_form,
-          grammar::verbTypeToConjType(best_sa.verb_type),
-          true, CandidateOrigin::VerbKanji, best_sa.confidence, "godan_sa_renyokei"));
+      candidates.push_back(makeVerbCandidate(surface, start_pos, renyokei_end, base_cost, best_sa.base_form,
+                                             grammar::verbTypeToConjType(best_sa.verb_type), true,
+                                             CandidateOrigin::VerbKanji, best_sa.confidence, "godan_sa_renyokei"));
     }
   }
 
@@ -1455,8 +1371,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     if (grammar::isERowCodepoint(first_hira) || grammar::isIRowCodepoint(first_hira)) {
       size_t renyokei_end = kanji_end + 1;  // kanji + e/i-row
       // Check for れ + ば pattern after renyokei
-      if (renyokei_end + 1 < codepoints.size() &&
-          codepoints[renyokei_end] == U'れ' &&
+      if (renyokei_end + 1 < codepoints.size() && codepoints[renyokei_end] == U'れ' &&
           codepoints[renyokei_end + 1] == U'ば') {
         // E.g., 食べ + れ + ば → 食べれ is kateikei
         size_t kateikei_end = renyokei_end + 1;  // renyokei + れ
@@ -1472,16 +1387,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Negative cost to beat the split path 語幹+れ(受身)+ば
           constexpr float kKateikeiCost = candidate::verb_cost::kStrongBonus;
           SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                                << " ichidan_kateikei lemma=" << base_form
-                                << " conf=" << ichidan_confidence
-                                << " cost=" << kKateikeiCost << "\n";
+            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " ichidan_kateikei lemma=" << base_form
+                                << " conf=" << ichidan_confidence << " cost=" << kKateikeiCost << "\n";
           }
           candidates.push_back(makeVerbCandidate(
-              surface, start_pos, kateikei_end, kKateikeiCost, base_form,
-              dictionary::ConjugationType::Ichidan,
-              true, CandidateOrigin::VerbKanji, ichidan_confidence, "ichidan_kateikei",
-              core::ExtendedPOS::VerbKateikei));
+              surface, start_pos, kateikei_end, kKateikeiCost, base_form, dictionary::ConjugationType::Ichidan, true,
+              CandidateOrigin::VerbKanji, ichidan_confidence, "ichidan_kateikei", core::ExtendedPOS::VerbKateikei));
         }
       }
 
@@ -1492,16 +1403,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       //       始める → 始めよう → 始めよ + う
       // Generate volitional stem candidate (renyokei + よ) when followed by う
       // Check pattern: renyokei + よ + う
-      if (renyokei_end + 1 < codepoints.size() &&
-          codepoints[renyokei_end] == U'よ' &&
+      if (renyokei_end + 1 < codepoints.size() && codepoints[renyokei_end] == U'よ' &&
           codepoints[renyokei_end + 1] == U'う') {
         // Skip suru-verb pattern: 漢字 + し + よう
         // Suru-verbs (勉強しよう, 説明しよう) should be split as: 漢字|しよ|う
         // Check if renyokei ends with し preceded by kanji
         bool is_suru_pattern = false;
-        if (renyokei_end > start_pos &&
-            codepoints[renyokei_end - 1] == U'し' &&
-            renyokei_end - 1 > start_pos) {
+        if (renyokei_end > start_pos && codepoints[renyokei_end - 1] == U'し' && renyokei_end - 1 > start_pos) {
           // Check if there's at least one kanji before し
           bool has_kanji_before = false;
           for (size_t i = start_pos; i < renyokei_end - 1; ++i) {
@@ -1517,8 +1425,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // E.g., 食べ + よ + う → 食べよ is volitional stem
           size_t volitional_end = renyokei_end + 1;  // renyokei + よ
           std::string surface = extractSubstring(codepoints, start_pos, volitional_end);
-          std::string renyokei_surface =
-              extractSubstring(codepoints, start_pos, renyokei_end);
+          std::string renyokei_surface = extractSubstring(codepoints, start_pos, renyokei_end);
           std::string base_form = renyokei_surface + "る";  // 食べ + る = 食べる
 
           // Check if renyokei looks like an adjective (kanji+い pattern)
@@ -1526,8 +1433,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Require higher confidence to avoid false volitional candidates
           // like 良いよ(う) being parsed as volitional of non-existent 良いる
           bool could_be_adjective = false;
-          if (renyokei_end > start_pos + 1 &&
-              codepoints[renyokei_end - 1] == U'い') {
+          if (renyokei_end > start_pos + 1 && codepoints[renyokei_end - 1] == U'い') {
             // Check if chars before い are all kanji
             bool all_kanji_before_i = true;
             for (size_t k = start_pos; k < renyokei_end - 1; ++k) {
@@ -1548,16 +1454,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             // Negative cost to beat the split path 語幹+よう
             constexpr float kVolitionalCost = candidate::verb_cost::kStrongBonus;
             SUZUME_DEBUG_VERBOSE_BLOCK {
-              SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                                  << " ichidan_volitional lemma=" << base_form
-                                  << " conf=" << ichidan_confidence
-                                  << " cost=" << kVolitionalCost << "\n";
+              SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " ichidan_volitional lemma=" << base_form
+                                  << " conf=" << ichidan_confidence << " cost=" << kVolitionalCost << "\n";
             }
-            candidates.push_back(makeVerbCandidate(
-                surface, start_pos, volitional_end, kVolitionalCost, base_form,
-                dictionary::ConjugationType::Ichidan,
-                true, CandidateOrigin::VerbKanji, ichidan_confidence, "ichidan_volitional",
-                core::ExtendedPOS::VerbMizenkei));
+            candidates.push_back(makeVerbCandidate(surface, start_pos, volitional_end, kVolitionalCost, base_form,
+                                                   dictionary::ConjugationType::Ichidan, true,
+                                                   CandidateOrigin::VerbKanji, ichidan_confidence, "ichidan_volitional",
+                                                   core::ExtendedPOS::VerbMizenkei));
           }
         }
       }
@@ -1584,10 +1487,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       bool followed_by_valid = false;
       if (kanji_end + 2 < codepoints.size()) {
         char32_t next_cp = codepoints[kanji_end + 2];
-        followed_by_valid = (next_cp == U'ら' || next_cp == U'た' ||
-                             next_cp == U'て' || next_cp == U'な' ||
-                             next_cp == U'ま' || next_cp == U'ず' ||
-                             next_cp == U'ば');
+        followed_by_valid = (next_cp == U'ら' || next_cp == U'た' || next_cp == U'て' || next_cp == U'な' ||
+                             next_cp == U'ま' || next_cp == U'ず' || next_cp == U'ば');
       }
       // Also allow at end of input (bare renyokei: 眠らせ)
       if (kanji_end + 2 >= codepoints.size()) {
@@ -1605,15 +1506,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         float ichidan_confidence = vh::getIchidanConfidence(all_candidates);
 
         if (ichidan_confidence >= 0.4F) {
-          float base_cost = verb_opts.bonus_ichidan +
-                            (1.0F - ichidan_confidence) * verb_opts.confidence_cost_scale_small;
-          SUZUME_DEBUG_LOG_VERBOSE(
-              "[VERB_CAND] " << surface << " causative_renyokei lemma=" << causative_base
-                             << " conf=" << ichidan_confidence << " cost=" << base_cost << "\n");
-          candidates.push_back(makeVerbCandidate(
-              surface, start_pos, renyokei_end, base_cost, causative_base,
-              grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
-              true, CandidateOrigin::VerbKanji, ichidan_confidence, "causative_renyokei"));
+          float base_cost =
+              verb_opts.bonus_ichidan + (1.0F - ichidan_confidence) * verb_opts.confidence_cost_scale_small;
+          SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] " << surface << " causative_renyokei lemma=" << causative_base
+                                                  << " conf=" << ichidan_confidence << " cost=" << base_cost << "\n");
+          candidates.push_back(makeVerbCandidate(surface, start_pos, renyokei_end, base_cost, causative_base,
+                                                 grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true,
+                                                 CandidateOrigin::VerbKanji, ichidan_confidence, "causative_renyokei"));
         }
       }
     }
@@ -1637,70 +1536,67 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       // Also skip single kanji + さ + れ as these are typically not real verbs
       // e.g., 強される is not a verb (強い is adjective, 強 is noun)
       std::string kanji_check = extractSubstring(codepoints, start_pos, kanji_end);
-      bool is_suru_passive_pattern = (first_hira == U'さ' &&
-                                      grammar::isAllKanji(kanji_check));
+      bool is_suru_passive_pattern = (first_hira == U'さ' && grammar::isAllKanji(kanji_check));
       if (is_suru_passive_pattern) {
         // Skip - this should be handled as noun + される auxiliary
         // Continue to next pattern
       } else {
+        size_t renyokei_end = kanji_end + 2;  // kanji + a-row + れ
+        std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
 
-      size_t renyokei_end = kanji_end + 2;  // kanji + a-row + れ
-      std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
+        // Check if this is a valid passive verb stem
+        // The passive base form is surface + る (e.g., 言われ → 言われる)
+        std::string passive_base = surface + "る";
 
-      // Check if this is a valid passive verb stem
-      // The passive base form is surface + る (e.g., 言われ → 言われる)
-      std::string passive_base = surface + "る";
+        // Skip if passive_base is already a known ichidan verb in dictionary.
+        // E.g., 生まれる is a standalone ichidan verb, not passive of 生む.
+        // The dictionary entry provides the correct candidate with proper lemma.
+        if (vh::isVerbInDictionary(dict_manager, passive_base)) {
+          // Fall through to end of block - dict entry handles this
+        } else {
+          // Compute the original base verb lemma by converting A-row to U-row
+          // e.g., 言われる: 言 + わ + れる → 言 + う = 言う
+          std::string kanji_part = extractSubstring(codepoints, start_pos, kanji_end);
+          std::string_view u_row_suffix = grammar::godanBaseSuffixFromARow(first_hira);
+          std::string base_lemma = kanji_part + std::string(u_row_suffix);
 
-      // Skip if passive_base is already a known ichidan verb in dictionary.
-      // E.g., 生まれる is a standalone ichidan verb, not passive of 生む.
-      // The dictionary entry provides the correct candidate with proper lemma.
-      if (vh::isVerbInDictionary(dict_manager, passive_base)) {
-        // Fall through to end of block - dict entry handles this
-      } else {
+          // Use analyze() to get all interpretations, not just the best one
+          // The best overall interpretation might be Godan (言う + れる), but
+          // there should also be an Ichidan interpretation (言われる as verb)
+          const auto& all_candidates = inflection.analyze(passive_base);
+          float ichidan_confidence = vh::getIchidanConfidence(all_candidates);
 
-      // Compute the original base verb lemma by converting A-row to U-row
-      // e.g., 言われる: 言 + わ + れる → 言 + う = 言う
-      std::string kanji_part = extractSubstring(codepoints, start_pos, kanji_end);
-      std::string_view u_row_suffix = grammar::godanBaseSuffixFromARow(first_hira);
-      std::string base_lemma = kanji_part + std::string(u_row_suffix);
+          // Passive verbs are Ichidan conjugation (言われる conjugates like 食べる)
+          if (ichidan_confidence >= 0.4F) {
+            // Check if followed by べき (classical obligation)
+            // For 書かれべき pattern, we want 書か + れべき, not 書かれ + べき
+            bool is_beki_pattern = false;
+            if (renyokei_end < codepoints.size()) {
+              char32_t next_char = codepoints[renyokei_end];
+              if (next_char == U'べ') {
+                is_beki_pattern = true;
+              }
+            }
 
-      // Use analyze() to get all interpretations, not just the best one
-      // The best overall interpretation might be Godan (言う + れる), but
-      // there should also be an Ichidan interpretation (言われる as verb)
-      const auto& all_candidates = inflection.analyze(passive_base);
-      float ichidan_confidence = vh::getIchidanConfidence(all_candidates);
+            // Calculate base cost for passive candidates
+            // Add penalty so the MeCab-compatible split path (縛ら+れ) can compete
+            // Without this, the merged form (縛られ) has too low a cost (-0.16)
+            // and always beats the split path (縛ら(0.1) + れ(aux))
+            float base_cost = verb_opts.bonus_ichidan +
+                              (1.0F - ichidan_confidence) * verb_opts.confidence_cost_scale_small + bigram_cost::kMinor;
 
-      // Passive verbs are Ichidan conjugation (言われる conjugates like 食べる)
-      if (ichidan_confidence >= 0.4F) {
-        // Check if followed by べき (classical obligation)
-        // For 書かれべき pattern, we want 書か + れべき, not 書かれ + べき
-        bool is_beki_pattern = false;
-        if (renyokei_end < codepoints.size()) {
-          char32_t next_char = codepoints[renyokei_end];
-          if (next_char == U'べ') {
-            is_beki_pattern = true;
+            // Skip renyokei candidate for べき patterns
+            if (!is_beki_pattern) {
+              candidates.push_back(makeVerbCandidate(
+                  surface, start_pos, renyokei_end, base_cost, base_lemma, dictionary::ConjugationType::Ichidan, false,
+                  CandidateOrigin::VerbKanji, ichidan_confidence, "godan_passive_renyokei"));
+            }
+
+            // NOTE: Passive verb conjugated forms (言われる, 言われた, etc.) are NOT generated
+            // as single tokens. MeCab splits them as: 言わ + れ + た
+            // The renyokei form (言われ) generated above connects to auxiliary た/て/ない/etc.
           }
-        }
-
-        // Calculate base cost for passive candidates
-        // Add penalty so the MeCab-compatible split path (縛ら+れ) can compete
-        // Without this, the merged form (縛られ) has too low a cost (-0.16)
-        // and always beats the split path (縛ら(0.1) + れ(aux))
-        float base_cost = verb_opts.bonus_ichidan + (1.0F - ichidan_confidence) * verb_opts.confidence_cost_scale_small + bigram_cost::kMinor;
-
-        // Skip renyokei candidate for べき patterns
-        if (!is_beki_pattern) {
-          candidates.push_back(makeVerbCandidate(
-              surface, start_pos, renyokei_end, base_cost, base_lemma,
-              dictionary::ConjugationType::Ichidan,
-              false, CandidateOrigin::VerbKanji, ichidan_confidence, "godan_passive_renyokei"));
-        }
-
-        // NOTE: Passive verb conjugated forms (言われる, 言われた, etc.) are NOT generated
-        // as single tokens. MeCab splits them as: 言わ + れ + た
-        // The renyokei form (言われ) generated above connects to auxiliary た/て/ない/etc.
-      }
-      }  // end else (not dict ichidan verb)
+        }  // end else (not dict ichidan verb)
       }  // end else (not suru passive pattern)
     }
   }
@@ -1727,8 +1623,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (grammar::isERowCodepoint(first_hira) || grammar::isIRowCodepoint(first_hira)) {
         size_t ichidan_stem_end = kanji_end + 1;
         // Check for られ pattern (at least 2 chars)
-        if (ichidan_stem_end + 1 < codepoints.size() &&
-            codepoints[ichidan_stem_end] == U'ら' &&
+        if (ichidan_stem_end + 1 < codepoints.size() && codepoints[ichidan_stem_end] == U'ら' &&
             codepoints[ichidan_stem_end + 1] == U'れ') {
           has_rare_suffix = true;
           stem_end = ichidan_stem_end;
@@ -1743,9 +1638,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (vh::isSingleKanjiIchidan(kanji_char)) {
         // Check for られ suffix right after the single kanji
         using namespace suzume::core::hiragana;
-        if (kanji_end + 1 < codepoints.size() &&
-            codepoints[kanji_end] == kRa &&
-            codepoints[kanji_end + 1] == kRe) {
+        if (kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == kRa && codepoints[kanji_end + 1] == kRe) {
           has_rare_suffix = true;
           stem_end = kanji_end;
         }
@@ -1776,14 +1669,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         // Negative cost to beat single-verb inflection path (which gets optimal_length -0.5 bonus)
         constexpr float kCost = candidate::verb_cost::kStandardBonus;
         SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                              << " ichidan_stem_rare lemma=" << base_form
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " ichidan_stem_rare lemma=" << base_form
                               << " cost=" << kCost << "\n";
         }
-        candidates.push_back(makeVerbCandidate(
-            surface, start_pos, stem_end, kCost, base_form,
-            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
-            true, CandidateOrigin::VerbKanji, 0.9F, "ichidan_stem_rare"));
+        candidates.push_back(makeVerbCandidate(surface, start_pos, stem_end, kCost, base_form,
+                                               grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true,
+                                               CandidateOrigin::VerbKanji, 0.9F, "ichidan_stem_rare"));
       }
     }
   }
@@ -1802,22 +1693,19 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       bool is_polite_aux = (h1 == kMa && h2 == kSu);
       // Negative auxiliary ない and its conjugations:
       // ない (終止/連体), なく (連用), なかっ (た接続), なけれ (仮定)
-      bool is_negative_aux =
-          (h1 == kNa && (h2 == kI || h2 == kKu || h2 == kKa || h2 == kKe));
+      bool is_negative_aux = (h1 == kNa && (h2 == kI || h2 == kKu || h2 == kKa || h2 == kKe));
 
       if (is_polite_aux || is_negative_aux) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
         constexpr float kCost = candidate::verb_cost::kStandardBonus;  // Strong bonus to beat NOUN candidate
         SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                              << " single_kanji_ichidan_polite lemma=" << base_form
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " single_kanji_ichidan_polite lemma=" << base_form
                               << " cost=" << kCost << "\n";
         }
-        candidates.push_back(makeVerbCandidate(
-            surface, start_pos, kanji_end, kCost, base_form,
-            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
-            true, CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_polite"));
+        candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end, kCost, base_form,
+                                               grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true,
+                                               CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_polite"));
       }
 
       // Also handle た and て patterns for single-kanji Ichidan verbs
@@ -1830,14 +1718,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string base_form = surface + "る";
         constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat unified dictionary entry
         SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                              << " single_kanji_ichidan_ta_te lemma=" << base_form
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " single_kanji_ichidan_ta_te lemma=" << base_form
                               << " cost=" << kCost << "\n";
         }
-        candidates.push_back(makeVerbCandidate(
-            surface, start_pos, kanji_end, kCost, base_form,
-            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
-            true, CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_ta_te"));
+        candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end, kCost, base_form,
+                                               grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true,
+                                               CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_ta_te"));
       }
 
       // Handle colloquial contraction patterns for single-kanji Ichidan verbs
@@ -1852,14 +1738,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string base_form = surface + "る";
         constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat unified contraction entry
         SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                              << " single_kanji_ichidan_colloquial lemma=" << base_form
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " single_kanji_ichidan_colloquial lemma=" << base_form
                               << " cost=" << kCost << "\n";
         }
-        candidates.push_back(makeVerbCandidate(
-            surface, start_pos, kanji_end, kCost, base_form,
-            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
-            true, CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_colloquial"));
+        candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end, kCost, base_form,
+                                               grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true,
+                                               CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_colloquial"));
       }
 
       // Handle られる pattern for single-kanji Ichidan verbs
@@ -1870,16 +1754,15 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_rareru_aux) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         std::string base_form = surface + "る";
-        constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat godan mizenkei interpretation
+        constexpr float kCost =
+            candidate::verb_cost::kStrongBonus;  // Strong bonus to beat godan mizenkei interpretation
         SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                              << " single_kanji_ichidan_rareru lemma=" << base_form
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " single_kanji_ichidan_rareru lemma=" << base_form
                               << " cost=" << kCost << "\n";
         }
-        candidates.push_back(makeVerbCandidate(
-            surface, start_pos, kanji_end, kCost, base_form,
-            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
-            true, CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_rareru"));
+        candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end, kCost, base_form,
+                                               grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true,
+                                               CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_rareru"));
       }
 
       // Handle volitional pattern for single-kanji Ichidan verbs
@@ -1892,15 +1775,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "る";
         constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat compound interpretation
         SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                              << " single_kanji_ichidan_volitional lemma=" << base_form
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " single_kanji_ichidan_volitional lemma=" << base_form
                               << " cost=" << kCost << "\n";
         }
-        candidates.push_back(makeVerbCandidate(
-            surface, start_pos, kanji_end + 1, kCost, base_form,
-            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
-            true, CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_volitional",
-            core::ExtendedPOS::VerbMizenkei));
+        candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end + 1, kCost, base_form,
+                                               grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true,
+                                               CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_volitional",
+                                               core::ExtendedPOS::VerbMizenkei));
       }
 
       // Handle causative させ/させる/させられ pattern for single-kanji Ichidan verbs
@@ -1913,15 +1794,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         std::string base_form = surface + "る";
         constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat NOUN candidate
         SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                              << " single_kanji_ichidan_causative lemma=" << base_form
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " single_kanji_ichidan_causative lemma=" << base_form
                               << " cost=" << kCost << "\n";
         }
         candidates.push_back(makeVerbCandidate(
-            surface, start_pos, kanji_end, kCost, base_form,
-            grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
-            true, CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_causative",
-            core::ExtendedPOS::VerbMizenkei));
+            surface, start_pos, kanji_end, kCost, base_form, grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
+            true, CandidateOrigin::VerbKanji, 0.9F, "single_kanji_ichidan_causative", core::ExtendedPOS::VerbMizenkei));
       }
     }
   }
@@ -1945,8 +1823,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         bool is_nu_pattern = false;
         bool is_passive_pattern = false;
         if (next_char == U'れ') {
-          if (mizenkei_end + 2 < codepoints.size() &&
-              codepoints[mizenkei_end + 1] == U'べ' &&
+          if (mizenkei_end + 2 < codepoints.size() && codepoints[mizenkei_end + 1] == U'べ' &&
               codepoints[mizenkei_end + 2] == U'き') {
             // Check for れべき pattern
             is_beki_pattern = true;
@@ -1961,8 +1838,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                 is_passive_pattern = true;
               }
               // れな (れない, れなかった)
-              else if (after_re == U'な' && re_pos + 2 < codepoints.size() &&
-                       codepoints[re_pos + 2] == U'い') {
+              else if (after_re == U'な' && re_pos + 2 < codepoints.size() && codepoints[re_pos + 2] == U'い') {
                 is_passive_pattern = true;
               }
               // れま (れます, れました, れません)
@@ -1995,16 +1871,14 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         // E.g., 行かない → 行か (mizenkei) + ない (negative AUX)
         //       書かない → 書か (mizenkei) + ない
         bool is_nai_pattern = false;
-        if (next_char == U'な' && mizenkei_end + 1 < codepoints.size() &&
-            codepoints[mizenkei_end + 1] == U'い') {
+        if (next_char == U'な' && mizenkei_end + 1 < codepoints.size() && codepoints[mizenkei_end + 1] == U'い') {
           is_nai_pattern = true;
         }
         // Check for past negative なかっ pattern (MeCab-compatible split)
         // E.g., 書かなかった → 書か (mizenkei) + なかっ (negative past AUX) + た
         //       行かなかった → 行か (mizenkei) + なかっ + た
         bool is_nakatt_pattern = false;
-        if (next_char == U'な' && mizenkei_end + 3 < codepoints.size() &&
-            codepoints[mizenkei_end + 1] == U'か' &&
+        if (next_char == U'な' && mizenkei_end + 3 < codepoints.size() && codepoints[mizenkei_end + 1] == U'か' &&
             codepoints[mizenkei_end + 2] == U'っ') {
           is_nakatt_pattern = true;
         }
@@ -2031,7 +1905,8 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             }
           }
         }
-        if (is_beki_pattern || is_nu_pattern || is_n_pattern || is_nai_pattern || is_nakatt_pattern || is_passive_pattern || is_causative_pattern) {
+        if (is_beki_pattern || is_nu_pattern || is_n_pattern || is_nai_pattern || is_nakatt_pattern ||
+            is_passive_pattern || is_causative_pattern) {
           // Derive VerbType from the A-row ending (e.g., か → GodanKa)
           grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(first_hira);
           if (verb_type != grammar::VerbType::Unknown) {
@@ -2051,102 +1926,98 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               //       Not: 見さ + せ + られ + た (godan 見す doesn't exist)
               // Real godan-sa verbs (話す, 出す, 消す) have multi-char stems (話さ, 出さ, 消さ)
               if (is_causative_pattern && kanji_stem.size() == 3) {  // 3 bytes = 1 kanji
-                is_suru_verb_pattern = true;  // Skip generation
+                is_suru_verb_pattern = true;                         // Skip generation
               }
             }
             if (is_suru_verb_pattern) {
               // Skip mizenkei generation for Suru verb patterns
             } else {
-            // Get base suffix (e.g., か → く for GodanKa)
-            std::string_view base_suffix = grammar::godanBaseSuffixFromARow(first_hira);
-            if (!base_suffix.empty()) {
-              // Construct base form: stem + base_suffix (e.g., 書 + く = 書く)
-              std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-              std::string base_form = kanji_stem + std::string(base_suffix);
+              // Get base suffix (e.g., か → く for GodanKa)
+              std::string_view base_suffix = grammar::godanBaseSuffixFromARow(first_hira);
+              if (!base_suffix.empty()) {
+                // Construct base form: stem + base_suffix (e.g., 書 + く = 書く)
+                std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+                std::string base_form = kanji_stem + std::string(base_suffix);
 
-              // Verify the base form is a valid verb
-              // First check dictionary, then fall back to inflection analysis
-              // IMPORTANT: For passive pattern, require dictionary check only for
-              // most verb rows. The inflection analyzer is too permissive and will
-              // accept patterns like 泊む (from 泊まれる) which don't exist.
-              // EXCEPTIONS that allow inflection fallback:
-              // - WA-row (わ行): passive (奪われる) doesn't conflict with potential
-              // - RA-row (ら行): Xらる is not a valid modern verb, so Xられる
-              //   is always passive of Xる (e.g., 縛られる = passive of 縛る)
-              bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
-              // For passive pattern, allow inflection fallback for WA-row and RA-row
-              bool allow_inflection_fallback = !is_passive_pattern ||
-                  first_hira == U'わ' || first_hira == U'ら';
-              if (!is_valid_verb && allow_inflection_fallback) {
-                // For non-passive patterns (ない, ぬ, etc.), allow inflection fallback
-                // For WA-row passive, also allow with higher confidence threshold
-                float threshold = is_passive_pattern ? 0.6F : 0.5F;
-                auto infl_result = inflection.getBest(base_form);
-                is_valid_verb = infl_result.confidence > threshold &&
-                                vh::isGodanVerbType(infl_result.verb_type);
-              }
+                // Verify the base form is a valid verb
+                // First check dictionary, then fall back to inflection analysis
+                // IMPORTANT: For passive pattern, require dictionary check only for
+                // most verb rows. The inflection analyzer is too permissive and will
+                // accept patterns like 泊む (from 泊まれる) which don't exist.
+                // EXCEPTIONS that allow inflection fallback:
+                // - WA-row (わ行): passive (奪われる) doesn't conflict with potential
+                // - RA-row (ら行): Xらる is not a valid modern verb, so Xられる
+                //   is always passive of Xる (e.g., 縛られる = passive of 縛る)
+                bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
+                // For passive pattern, allow inflection fallback for WA-row and RA-row
+                bool allow_inflection_fallback = !is_passive_pattern || first_hira == U'わ' || first_hira == U'ら';
+                if (!is_valid_verb && allow_inflection_fallback) {
+                  // For non-passive patterns (ない, ぬ, etc.), allow inflection fallback
+                  // For WA-row passive, also allow with higher confidence threshold
+                  float threshold = is_passive_pattern ? 0.6F : 0.5F;
+                  auto infl_result = inflection.getBest(base_form);
+                  is_valid_verb = infl_result.confidence > threshold && vh::isGodanVerbType(infl_result.verb_type);
+                }
 
-              // Skip irregular verb 来る for passive — its passive is 来+られる, not 来ら+れる
-              if (is_valid_verb && is_passive_pattern && base_form == "来る") {
-                is_valid_verb = false;
-              }
-
-              // Skip godan mizenkei passive when the surface + れる is a known
-              // ichidan verb in the dictionary. E.g., 囚われる is ichidan,
-              // not passive of 囚う. The dictionary entry provides the correct
-              // candidate with proper lemma.
-              if (is_valid_verb && is_passive_pattern) {
-                std::string ichidan_form = extractSubstring(codepoints, start_pos, mizenkei_end) + "れる";
-                if (vh::isVerbInDictionary(dict_manager, ichidan_form)) {
+                // Skip irregular verb 来る for passive — its passive is 来+られる, not 来ら+れる
+                if (is_valid_verb && is_passive_pattern && base_form == "来る") {
                   is_valid_verb = false;
                 }
-              }
 
-              if (is_valid_verb) {
-                std::string surface = extractSubstring(codepoints, start_pos, mizenkei_end);
-                // Cost varies by pattern:
-                // - ぬ pattern: negative cost (-0.5F) to beat combined verb form
-                //   揃わぬ(VERB) gets ~-0.1 total, so split needs lower cost
-                // - ん pattern: negative cost (-0.5F) for contracted negative
-                //   行かん(VERB) should split to 行か + ん
-                // - ない pattern: negative cost (-0.5F) for standard negative
-                //   行かない(VERB) should split to 行か + ない
-                // - passive pattern: negative cost (-0.5F) for MeCab-compatible split
-                //   言われる(VERB) gets ~0.15, so split (言わ+れる) needs lower cost
-                // - べき pattern: moderate cost (0.2F) for classical obligation
-                float cost = 0.2F;  // default for beki
-                if (is_nu_pattern || is_n_pattern || is_nai_pattern) {
-                  cost = -0.5F;
-                } else if (is_passive_pattern) {
-                  cost = -0.5F;
+                // Skip godan mizenkei passive when the surface + れる is a known
+                // ichidan verb in the dictionary. E.g., 囚われる is ichidan,
+                // not passive of 囚う. The dictionary entry provides the correct
+                // candidate with proper lemma.
+                if (is_valid_verb && is_passive_pattern) {
+                  std::string ichidan_form = extractSubstring(codepoints, start_pos, mizenkei_end) + "れる";
+                  if (vh::isVerbInDictionary(dict_manager, ichidan_form)) {
+                    is_valid_verb = false;
+                  }
                 }
-                const char* debug_pattern = is_nu_pattern ? "nu" :
-                                            is_n_pattern ? "n" :
-                                            is_nai_pattern ? "nai" :
-                                            is_passive_pattern ? "passive" : "beki";
-                SUZUME_DEBUG_VERBOSE_BLOCK {
-                  SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                                      << " godan_mizenkei lemma=" << base_form
-                                      << " cost=" << cost
-                                      << " pattern=" << debug_pattern
-                                      << "\n";
+
+                if (is_valid_verb) {
+                  std::string surface = extractSubstring(codepoints, start_pos, mizenkei_end);
+                  // Cost varies by pattern:
+                  // - ぬ pattern: negative cost (-0.5F) to beat combined verb form
+                  //   揃わぬ(VERB) gets ~-0.1 total, so split needs lower cost
+                  // - ん pattern: negative cost (-0.5F) for contracted negative
+                  //   行かん(VERB) should split to 行か + ん
+                  // - ない pattern: negative cost (-0.5F) for standard negative
+                  //   行かない(VERB) should split to 行か + ない
+                  // - passive pattern: negative cost (-0.5F) for MeCab-compatible split
+                  //   言われる(VERB) gets ~0.15, so split (言わ+れる) needs lower cost
+                  // - べき pattern: moderate cost (0.2F) for classical obligation
+                  float cost = 0.2F;  // default for beki
+                  if (is_nu_pattern || is_n_pattern || is_nai_pattern) {
+                    cost = -0.5F;
+                  } else if (is_passive_pattern) {
+                    cost = -0.5F;
+                  }
+                  const char* debug_pattern = is_nu_pattern        ? "nu"
+                                              : is_n_pattern       ? "n"
+                                              : is_nai_pattern     ? "nai"
+                                              : is_passive_pattern ? "passive"
+                                                                   : "beki";
+                  SUZUME_DEBUG_VERBOSE_BLOCK {
+                    SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " godan_mizenkei lemma=" << base_form
+                                        << " cost=" << cost << " pattern=" << debug_pattern << "\n";
+                  }
+                  const char* info_pattern = is_nu_pattern        ? "godan_mizenkei_nu"
+                                             : is_n_pattern       ? "godan_mizenkei_n"
+                                             : is_nai_pattern     ? "godan_mizenkei_nai"
+                                             : is_nakatt_pattern  ? "godan_mizenkei_nakatt"
+                                             : is_passive_pattern ? "godan_mizenkei_passive"
+                                                                  : "godan_mizenkei";
+                  // Use explicit VerbMizenkei EPOS for negative/passive patterns to enable bigram connection
+                  core::ExtendedPOS epos =
+                      (is_nu_pattern || is_n_pattern || is_nai_pattern || is_nakatt_pattern || is_passive_pattern)
+                          ? core::ExtendedPOS::VerbMizenkei
+                          : core::ExtendedPOS::Unknown;
+                  candidates.push_back(makeVerbCandidate(surface, start_pos, mizenkei_end, cost, base_form,
+                                                         grammar::verbTypeToConjType(verb_type), true,
+                                                         CandidateOrigin::VerbKanji, 0.9F, info_pattern, epos));
                 }
-                const char* info_pattern = is_nu_pattern ? "godan_mizenkei_nu" :
-                                           is_n_pattern ? "godan_mizenkei_n" :
-                                           is_nai_pattern ? "godan_mizenkei_nai" :
-                                           is_nakatt_pattern ? "godan_mizenkei_nakatt" :
-                                           is_passive_pattern ? "godan_mizenkei_passive" :
-                                           "godan_mizenkei";
-                // Use explicit VerbMizenkei EPOS for negative/passive patterns to enable bigram connection
-                core::ExtendedPOS epos = (is_nu_pattern || is_n_pattern || is_nai_pattern || is_nakatt_pattern || is_passive_pattern)
-                    ? core::ExtendedPOS::VerbMizenkei
-                    : core::ExtendedPOS::Unknown;
-                candidates.push_back(makeVerbCandidate(
-                    surface, start_pos, mizenkei_end, cost, base_form,
-                    grammar::verbTypeToConjType(verb_type),
-                    true, CandidateOrigin::VerbKanji, 0.9F, info_pattern, epos));
               }
-            }
             }  // else (not Suru verb pattern)
           }
         }
@@ -2166,14 +2037,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       char32_t next_char = codepoints[scan_pos + 1];
       // Check if cur_char is A-row and followed by negative pattern
       bool is_nai_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'な' &&
-          scan_pos + 2 < codepoints.size() && codepoints[scan_pos + 2] == U'い';
+                            scan_pos + 2 < codepoints.size() && codepoints[scan_pos + 2] == U'い';
       bool is_nakatt_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'な' &&
-          scan_pos + 3 < codepoints.size() && codepoints[scan_pos + 2] == U'か' &&
-          codepoints[scan_pos + 3] == U'っ';
+                               scan_pos + 3 < codepoints.size() && codepoints[scan_pos + 2] == U'か' &&
+                               codepoints[scan_pos + 3] == U'っ';
       // Check for contracted negative ん pattern (分からん, 始まらん)
       // ん must be at the end of the string (hiragana_end == scan_pos + 2)
-      bool is_n_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'ん' &&
-          scan_pos + 2 == hiragana_end;
+      bool is_n_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'ん' && scan_pos + 2 == hiragana_end;
       // Check for classical negative ぬ pattern (分からぬ, 変わらぬ)
       bool is_nu_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'ぬ';
       if (is_nai_pattern || is_nakatt_pattern || is_n_pattern || is_nu_pattern) {
@@ -2192,26 +2062,22 @@ std::vector<UnknownCandidate> generateVerbCandidates(
             bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
             if (!is_valid_verb) {
               auto infl_result = inflection.getBest(base_form);
-              is_valid_verb = infl_result.confidence > 0.5F &&
-                              vh::isGodanVerbType(infl_result.verb_type);
+              is_valid_verb = infl_result.confidence > 0.5F && vh::isGodanVerbType(infl_result.verb_type);
             }
             if (is_valid_verb) {
               std::string surface = extractSubstring(codepoints, start_pos, multi_miz_end);
               constexpr float kCost = candidate::verb_cost::kStandardBonus;  // Same as other negative patterns
-              const char* pattern = is_nakatt_pattern ? "multi_mizenkei_nakatt" :
-                                    is_n_pattern ? "multi_mizenkei_n" :
-                                    is_nu_pattern ? "multi_mizenkei_nu" :
-                                    "multi_mizenkei_nai";
+              const char* pattern = is_nakatt_pattern ? "multi_mizenkei_nakatt"
+                                    : is_n_pattern    ? "multi_mizenkei_n"
+                                    : is_nu_pattern   ? "multi_mizenkei_nu"
+                                                      : "multi_mizenkei_nai";
               SUZUME_DEBUG_VERBOSE_BLOCK {
-                SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                                    << " " << pattern << " lemma=" << base_form
+                SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " " << pattern << " lemma=" << base_form
                                     << " cost=" << kCost << "\n";
               }
               candidates.push_back(makeVerbCandidate(
-                  surface, start_pos, multi_miz_end, kCost, base_form,
-                  grammar::verbTypeToConjType(verb_type),
-                  true, CandidateOrigin::VerbKanji, 0.9F, pattern,
-                  core::ExtendedPOS::VerbMizenkei));
+                  surface, start_pos, multi_miz_end, kCost, base_form, grammar::verbTypeToConjType(verb_type), true,
+                  CandidateOrigin::VerbKanji, 0.9F, pattern, core::ExtendedPOS::VerbMizenkei));
             }
           }
         }
@@ -2290,14 +2156,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           constexpr float kOnbinCost = candidate::verb_cost::kStandardBonus;
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
-                                << " kanji_onbin_contraction lemma=" << matched_base_form
-                                << " cost=" << kOnbinCost << "\n";
+                                << " kanji_onbin_contraction lemma=" << matched_base_form << " cost=" << kOnbinCost
+                                << "\n";
           }
           const char* pattern = is_hatsuonbin ? "kanji_hatsuonbin" : "kanji_ikuon";
-          candidates.push_back(makeVerbCandidate(
-              onbin_surface, start_pos, kanji_end + 1, kOnbinCost, matched_base_form,
-              grammar::verbTypeToConjType(matched_verb_type),
-              true, CandidateOrigin::VerbKanji, 0.9F, pattern));
+          candidates.push_back(makeVerbCandidate(onbin_surface, start_pos, kanji_end + 1, kOnbinCost, matched_base_form,
+                                                 grammar::verbTypeToConjType(matched_verb_type), true,
+                                                 CandidateOrigin::VerbKanji, 0.9F, pattern));
         }
       }
     }
@@ -2316,18 +2181,16 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     if (first_hira == U'っ' && kanji_end + 1 < hiragana_end) {
       char32_t next_char = codepoints[kanji_end + 1];
       // Basic te/ta form patterns (て, た, たら, たり), ちゃう (ち), and とく (と) contractions
-      bool is_te_ta_pattern =
-          (next_char == U'て' || next_char == U'た' || next_char == U'ち' || next_char == U'と');
+      bool is_te_ta_pattern = (next_char == U'て' || next_char == U'た' || next_char == U'ち' || next_char == U'と');
       if (is_te_ta_pattern) {
         // Determine candidate verb types based on sokuonbin
         // っ-onbin: GodanRa, GodanTa, GodanWa, GodanKa (行く is irregular)
-        static const std::vector<std::pair<grammar::VerbType, std::string_view>>
-            sokuonbin_types = {
-                {grammar::VerbType::GodanKa, "く"},  // 行く (irregular)
-                {grammar::VerbType::GodanRa, "る"},
-                {grammar::VerbType::GodanTa, "つ"},
-                {grammar::VerbType::GodanWa, "う"},
-            };
+        static const std::vector<std::pair<grammar::VerbType, std::string_view>> sokuonbin_types = {
+            {grammar::VerbType::GodanKa, "く"},  // 行く (irregular)
+            {grammar::VerbType::GodanRa, "る"},
+            {grammar::VerbType::GodanTa, "つ"},
+            {grammar::VerbType::GodanWa, "う"},
+        };
         // Get the kanji stem
         std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
 
@@ -2375,12 +2238,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               if (result.entry != nullptr && result.entry->surface == prefix &&
                   result.entry->pos == core::PartOfSpeech::Noun) {
                 starts_with_dict_noun = true;
-                SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem
-                                          << "\" starts with dict noun \"" << prefix << "\"\n");
+                SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" starts with dict noun \"" << prefix
+                                                          << "\"\n");
                 break;
               }
             }
-            if (starts_with_dict_noun) break;
+            if (starts_with_dict_noun)
+              break;
           }
           // Also check: if removing single-kanji prefix leaves a valid dict verb
           // E.g., 本買う → 本 + 買う, where 買う is a dict verb
@@ -2392,23 +2256,20 @@ std::vector<UnknownCandidate> generateVerbCandidates(
               std::string remainder_base = remainder_stem + std::string(base_suffix);
               if (vh::isVerbInDictionary(dict_manager, remainder_base)) {
                 remainder_is_dict_verb = true;
-                SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem
-                                          << "\" remainder \"" << remainder_base << "\" is dict verb\n");
+                SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" remainder \"" << remainder_base
+                                                          << "\" is dict verb\n");
                 break;
               }
             }
           }
         }
-        if (matched_verb_type == grammar::VerbType::Unknown &&
-            !starts_with_dict_noun && !remainder_is_dict_verb) {
+        if (matched_verb_type == grammar::VerbType::Unknown && !starts_with_dict_noun && !remainder_is_dict_verb) {
           if (kanji_stem.size() == core::kJapaneseCharBytes) {
             // Single-kanji stem: use inflection analysis of the longer surface
             // (kanji + っ + following chars) to find verb type.
             // Common verbs like 残る, 立つ, 打つ may not be in L2 dictionary.
             // Try surfaces of increasing length to get inflection result.
-            for (size_t try_end = kanji_end + 2;
-                 try_end <= codepoints.size() && try_end <= kanji_end + 4;
-                 ++try_end) {
+            for (size_t try_end = kanji_end + 2; try_end <= codepoints.size() && try_end <= kanji_end + 4; ++try_end) {
               std::string try_surface = extractSubstring(codepoints, start_pos, try_end);
               auto infl_result = inflection.analyze(try_surface);
               if (!infl_result.empty()) {
@@ -2418,19 +2279,19 @@ std::vector<UnknownCandidate> generateVerbCandidates(
                     if (best.verb_type == verb_type) {
                       matched_verb_type = verb_type;
                       matched_base_form = kanji_stem + std::string(base_suffix);
-                      SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] \"" << kanji_stem
-                          << "\" single-kanji sokuonbin → " << matched_base_form
-                          << " (infl, conf=" << best.confidence << ")\n");
+                      SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] \"" << kanji_stem << "\" single-kanji sokuonbin → "
+                                                                << matched_base_form
+                                                                << " (infl, conf=" << best.confidence << ")\n");
                       break;
                     }
                   }
-                  if (matched_verb_type != grammar::VerbType::Unknown) break;
+                  if (matched_verb_type != grammar::VerbType::Unknown)
+                    break;
                 }
               }
             }
           } else {
-            SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem
-                                      << "\" skip non-dict sokuonbin\n");
+            SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" skip non-dict sokuonbin\n");
           }
         }
 
@@ -2441,8 +2302,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           constexpr float kSokuonbinCost = candidate::verb_cost::kStandardBonus;
           for (const auto& cand : all_sokuonbin_candidates) {
             bool is_selected = (cand.type == matched_verb_type);
-            SUZUME_DEBUG_STREAM << "  - " << cand.base_form << " ("
-                                << grammar::verbTypeToString(cand.type) << "): "
+            SUZUME_DEBUG_STREAM << "  - " << cand.base_form << " (" << grammar::verbTypeToString(cand.type) << "): "
                                 << "dict_match=" << (cand.dict_match ? "YES" : "NO")
                                 << ", score=" << (cand.dict_match ? kSokuonbinCost : 0.0F)
                                 << (is_selected ? "" : " (skipped)") << "\n";
@@ -2466,16 +2326,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           // Inflection-only matches (2-kanji stems only) get neutral cost
           const float sokuonbin_cost = matched_via_dict ? -0.5F : 0.0F;
           SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
-                                << " kanji_sokuonbin lemma=" << matched_base_form
-                                << " cost=" << sokuonbin_cost
-                                << (matched_via_dict ? " (dict)" : " (infl)") << "\n";
+            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " kanji_sokuonbin lemma=" << matched_base_form
+                                << " cost=" << sokuonbin_cost << (matched_via_dict ? " (dict)" : " (infl)") << "\n";
           }
-          candidates.push_back(makeVerbCandidate(
-              onbin_surface, start_pos, kanji_end + 1, sokuonbin_cost, matched_base_form,
-              grammar::verbTypeToConjType(matched_verb_type),
-              true, CandidateOrigin::VerbKanji, 0.9F, "kanji_sokuonbin",
-              core::ExtendedPOS::VerbOnbinkei));
+          candidates.push_back(makeVerbCandidate(onbin_surface, start_pos, kanji_end + 1, sokuonbin_cost,
+                                                 matched_base_form, grammar::verbTypeToConjType(matched_verb_type),
+                                                 true, CandidateOrigin::VerbKanji, 0.9F, "kanji_sokuonbin",
+                                                 core::ExtendedPOS::VerbOnbinkei));
         }
       }
     }
@@ -2496,8 +2353,7 @@ std::vector<UnknownCandidate> generateVerbCandidates(
     // Look for っ at position hiragana_end - 2 (second to last)
     char32_t second_last = codepoints[hiragana_end - 2];
     char32_t last_char = codepoints[hiragana_end - 1];
-    bool is_sokuonbin_te_ta = (second_last == U'っ' &&
-                               (last_char == U'た' || last_char == U'て'));
+    bool is_sokuonbin_te_ta = (second_last == U'っ' && (last_char == U'た' || last_char == U'て'));
     // Hiragana between kanji and っ should be 1-2 chars
     // hiragana_end - kanji_end = total hiragana chars (including っ and た/て)
     // So hiragana before っ = (hiragana_end - kanji_end) - 2
@@ -2526,90 +2382,84 @@ std::vector<UnknownCandidate> generateVerbCandidates(
         // E.g., 良くなった = 良く + なっ + た, not 良くなる as single verb
         // MeCab splits: 高くなった → 高く + なっ + た
       } else {
-      // Skip godan終止形 + っ + て pattern - this is verb + って(quotative)
-      // E.g., 行くって = 行く + って, 食べるって = 食べる + って
-      // Godan 終止形 endings: く, す, つ, う, ぐ, ぶ, む, ぬ, る
-      // The sokuonbin of godan verbs drops the ending (行く→行っ), not adds っ (行くっ is invalid)
-      // Check if hiragana_part ends with godan終止形 + っ
-      bool is_quotative_pattern = false;
-      if (last_char == U'て' && hiragana_part.size() >= 6 /* at least 2 chars: Xっ */) {
-        // Get the character before っ (second to last in hiragana_part)
-        // hiragana_part ends with っ (which is at onbin_end - 1)
-        // The char before っ is at position onbin_end - 2
-        char32_t char_before_sokuon = codepoints[onbin_end - 2];
-        is_quotative_pattern = (char_before_sokuon == U'く' || char_before_sokuon == U'す' ||
-                                char_before_sokuon == U'つ' || char_before_sokuon == U'う' ||
-                                char_before_sokuon == U'ぐ' || char_before_sokuon == U'ぶ' ||
-                                char_before_sokuon == U'む' || char_before_sokuon == U'ぬ' ||
-                                char_before_sokuon == U'る');
-      }
-      if (is_quotative_pattern) {
-        // Skip: this is likely quotative って, not extended sokuonbin
-      } else {
-      // Build potential base form and verify it exists in dictionary or inflection
-      // This prevents false positives like 食べてしまる
-      std::string stem = extractSubstring(codepoints, start_pos, onbin_end - 1);
-      std::string potential_base = stem + "る";
-
-      // Skip if hiragana before っ is だ (copula pattern)
-      // E.g., 本だった = 本 + だっ + た (noun + copula), not 本だる (verb)
-      // But 閉まった = 閉まっ + た (verb 閉まる) is valid
-      char32_t char_before_sokuon = codepoints[hiragana_end - 3];
-      if (char_before_sokuon == U'だ') {
-        // This is a copula pattern (NOUN + だった), not a verb
-        // Skip candidate generation
-      } else {
-      // Check dictionary first
-      bool in_dict = vh::isVerbInDictionaryWithType(dict_manager, potential_base,
-                                                     grammar::VerbType::GodanRa) ||
-                     vh::isVerbInDictionary(dict_manager, potential_base);
-
-      // Fallback: inflection analysis for common patterns like 閉まる
-      // Only use inflection for short hiragana patterns (1 char before っ)
-      // Longer patterns like となっ may be noun+particle+verb (一丸+と+なる)
-      bool infl_verified = false;
-      if (!in_dict && hiragana_before_onbin == 1) {
-        const auto& infl_results = inflection.analyze(onbin_surface + "た");
-        for (const auto& result : infl_results) {
-          if (result.verb_type == grammar::VerbType::GodanRa &&
-              result.base_form == potential_base &&
-              result.confidence >= 0.3F) {
-            infl_verified = true;
-            break;
-          }
+        // Skip godan終止形 + っ + て pattern - this is verb + って(quotative)
+        // E.g., 行くって = 行く + って, 食べるって = 食べる + って
+        // Godan 終止形 endings: く, す, つ, う, ぐ, ぶ, む, ぬ, る
+        // The sokuonbin of godan verbs drops the ending (行く→行っ), not adds っ (行くっ is invalid)
+        // Check if hiragana_part ends with godan終止形 + っ
+        bool is_quotative_pattern = false;
+        if (last_char == U'て' && hiragana_part.size() >= 6 /* at least 2 chars: Xっ */) {
+          // Get the character before っ (second to last in hiragana_part)
+          // hiragana_part ends with っ (which is at onbin_end - 1)
+          // The char before っ is at position onbin_end - 2
+          char32_t char_before_sokuon = codepoints[onbin_end - 2];
+          is_quotative_pattern =
+              (char_before_sokuon == U'く' || char_before_sokuon == U'す' || char_before_sokuon == U'つ' ||
+               char_before_sokuon == U'う' || char_before_sokuon == U'ぐ' || char_before_sokuon == U'ぶ' ||
+               char_before_sokuon == U'む' || char_before_sokuon == U'ぬ' || char_before_sokuon == U'る');
         }
-      }
+        if (is_quotative_pattern) {
+          // Skip: this is likely quotative って, not extended sokuonbin
+        } else {
+          // Build potential base form and verify it exists in dictionary or inflection
+          // This prevents false positives like 食べてしまる
+          std::string stem = extractSubstring(codepoints, start_pos, onbin_end - 1);
+          std::string potential_base = stem + "る";
 
-      // Skip if this is an i-adjective katt-form (美しかっ → 美しい, 高かっ → 高い)
-      // The stem ends with か, so remove か and add い to get adjective base form
-      // E.g., stem="美しか" → adj_base="美しい"
-      bool is_adj_katt_form = false;
-      if (stem.size() >= core::kTwoJapaneseCharBytes && utf8::endsWith(stem, "か")) {
-        std::string adj_base = stem.substr(0, stem.size() - core::kJapaneseCharBytes) + "い";
-        if (vh::isAdjectiveInDictionary(dict_manager, adj_base)) {
-          is_adj_katt_form = true;
-          SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] " << onbin_surface
-                                  << " skip: i-adj \"" << adj_base << "\" in dict\n");
-        }
-      }
+          // Skip if hiragana before っ is だ (copula pattern)
+          // E.g., 本だった = 本 + だっ + た (noun + copula), not 本だる (verb)
+          // But 閉まった = 閉まっ + た (verb 閉まる) is valid
+          char32_t char_before_sokuon = codepoints[hiragana_end - 3];
+          if (char_before_sokuon == U'だ') {
+            // This is a copula pattern (NOUN + だった), not a verb
+            // Skip candidate generation
+          } else {
+            // Check dictionary first
+            bool in_dict = vh::isVerbInDictionaryWithType(dict_manager, potential_base, grammar::VerbType::GodanRa) ||
+                           vh::isVerbInDictionary(dict_manager, potential_base);
 
-      if (!is_adj_katt_form && (in_dict || infl_verified)) {
-        // Verified - generate candidate
-        constexpr float kExtendedSokuonbinCost = candidate::verb_cost::kModerateBonus;
-        SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
-                              << " extended_sokuonbin lemma=" << potential_base
-                              << (in_dict ? " [dict]" : " [infl]")
-                              << " cost=" << kExtendedSokuonbinCost << "\n";
-        }
-        candidates.push_back(makeVerbCandidate(
-            onbin_surface, start_pos, onbin_end, kExtendedSokuonbinCost, potential_base,
-            grammar::verbTypeToConjType(grammar::VerbType::GodanRa),
-            true, CandidateOrigin::VerbKanji, 0.9F, "extended_sokuonbin",
-            core::ExtendedPOS::VerbOnbinkei));
-      }
-      }  // end else (not copula だ pattern)
-      }  // end else (not quotative って pattern)
+            // Fallback: inflection analysis for common patterns like 閉まる
+            // Only use inflection for short hiragana patterns (1 char before っ)
+            // Longer patterns like となっ may be noun+particle+verb (一丸+と+なる)
+            bool infl_verified = false;
+            if (!in_dict && hiragana_before_onbin == 1) {
+              const auto& infl_results = inflection.analyze(onbin_surface + "た");
+              for (const auto& result : infl_results) {
+                if (result.verb_type == grammar::VerbType::GodanRa && result.base_form == potential_base &&
+                    result.confidence >= 0.3F) {
+                  infl_verified = true;
+                  break;
+                }
+              }
+            }
+
+            // Skip if this is an i-adjective katt-form (美しかっ → 美しい, 高かっ → 高い)
+            // The stem ends with か, so remove か and add い to get adjective base form
+            // E.g., stem="美しか" → adj_base="美しい"
+            bool is_adj_katt_form = false;
+            if (stem.size() >= core::kTwoJapaneseCharBytes && utf8::endsWith(stem, "か")) {
+              std::string adj_base = stem.substr(0, stem.size() - core::kJapaneseCharBytes) + "い";
+              if (vh::isAdjectiveInDictionary(dict_manager, adj_base)) {
+                is_adj_katt_form = true;
+                SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] " << onbin_surface << " skip: i-adj \"" << adj_base
+                                                        << "\" in dict\n");
+              }
+            }
+
+            if (!is_adj_katt_form && (in_dict || infl_verified)) {
+              // Verified - generate candidate
+              constexpr float kExtendedSokuonbinCost = candidate::verb_cost::kModerateBonus;
+              SUZUME_DEBUG_VERBOSE_BLOCK {
+                SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " extended_sokuonbin lemma=" << potential_base
+                                    << (in_dict ? " [dict]" : " [infl]") << " cost=" << kExtendedSokuonbinCost << "\n";
+              }
+              candidates.push_back(makeVerbCandidate(
+                  onbin_surface, start_pos, onbin_end, kExtendedSokuonbinCost, potential_base,
+                  grammar::verbTypeToConjType(grammar::VerbType::GodanRa), true, CandidateOrigin::VerbKanji, 0.9F,
+                  "extended_sokuonbin", core::ExtendedPOS::VerbOnbinkei));
+            }
+          }  // end else (not copula だ pattern)
+        }  // end else (not quotative って pattern)
       }  // end else (not なかっ pattern)
     }
   }
@@ -2622,12 +2472,15 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   if (hiragana_end - kanji_end >= 3) {
     // Scan for っ in hiragana portion (not at the very end - that's handled above)
     for (size_t pos = kanji_end; pos + 2 < hiragana_end; ++pos) {
-      if (codepoints[pos] != U'っ') continue;
+      if (codepoints[pos] != U'っ')
+        continue;
       char32_t after_sokuon = codepoints[pos + 1];
-      if (after_sokuon != U'て' && after_sokuon != U'で') continue;
+      if (after_sokuon != U'て' && after_sokuon != U'で')
+        continue;
       // Found っ+て/で NOT at end of surface - check if followed by auxiliary
       size_t hiragana_before_onbin = pos - kanji_end;
-      if (hiragana_before_onbin < 1 || hiragana_before_onbin > 2) continue;
+      if (hiragana_before_onbin < 1 || hiragana_before_onbin > 2)
+        continue;
 
       size_t onbin_end = pos + 1;  // Position after っ
       std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_end);
@@ -2636,20 +2489,18 @@ std::vector<UnknownCandidate> generateVerbCandidates(
 
       // Check hiragana part for known false patterns
       std::string hiragana_part = extractSubstring(codepoints, kanji_end, onbin_end);
-      if (hiragana_part == "なかっ" || hiragana_part == "であっ" ||
-          utf8::startsWith(hiragana_part, "といっ") || hiragana_part == "くなっ") {
+      if (hiragana_part == "なかっ" || hiragana_part == "であっ" || utf8::startsWith(hiragana_part, "といっ") ||
+          hiragana_part == "くなっ") {
         continue;
       }
 
-      bool in_dict_check = vh::isVerbInDictionaryWithType(dict_manager, potential_base,
-                                                           grammar::VerbType::GodanRa) ||
+      bool in_dict_check = vh::isVerbInDictionaryWithType(dict_manager, potential_base, grammar::VerbType::GodanRa) ||
                            vh::isVerbInDictionary(dict_manager, potential_base);
       bool infl_verified = false;
       if (!in_dict_check && hiragana_before_onbin == 1) {
         const auto& infl_results = inflection.analyze(onbin_surface + "た");
         for (const auto& result : infl_results) {
-          if (result.verb_type == grammar::VerbType::GodanRa &&
-              result.base_form == potential_base &&
+          if (result.verb_type == grammar::VerbType::GodanRa && result.base_form == potential_base &&
               result.confidence >= 0.3F) {
             infl_verified = true;
             break;
@@ -2660,16 +2511,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (in_dict_check || infl_verified) {
         constexpr float kTeAuxSokuonbinCost = candidate::verb_cost::kModerateBonus;
         SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
-                              << " te_aux_sokuonbin lemma=" << potential_base
-                              << (in_dict_check ? " [dict]" : " [infl]")
-                              << " cost=" << kTeAuxSokuonbinCost << "\n";
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " te_aux_sokuonbin lemma=" << potential_base
+                              << (in_dict_check ? " [dict]" : " [infl]") << " cost=" << kTeAuxSokuonbinCost << "\n";
         }
-        candidates.push_back(makeVerbCandidate(
-            onbin_surface, start_pos, onbin_end, kTeAuxSokuonbinCost, potential_base,
-            grammar::verbTypeToConjType(grammar::VerbType::GodanRa),
-            true, CandidateOrigin::VerbKanji, 0.9F, "te_aux_sokuonbin",
-            core::ExtendedPOS::VerbOnbinkei));
+        candidates.push_back(makeVerbCandidate(onbin_surface, start_pos, onbin_end, kTeAuxSokuonbinCost, potential_base,
+                                               grammar::verbTypeToConjType(grammar::VerbType::GodanRa), true,
+                                               CandidateOrigin::VerbKanji, 0.9F, "te_aux_sokuonbin",
+                                               core::ExtendedPOS::VerbOnbinkei));
       }
       break;  // Only process first っ+て/で occurrence
     }
@@ -2692,12 +2540,11 @@ std::vector<UnknownCandidate> generateVerbCandidates(
       if (is_de_da_pattern) {
         // Determine candidate verb types based on hatsuonbin
         // ん-onbin: GodanMa, GodanBa, GodanNa
-        static const std::vector<std::pair<grammar::VerbType, std::string_view>>
-            hatsuonbin_types = {
-                {grammar::VerbType::GodanMa, "む"},
-                {grammar::VerbType::GodanBa, "ぶ"},
-                {grammar::VerbType::GodanNa, "ぬ"},
-            };
+        static const std::vector<std::pair<grammar::VerbType, std::string_view>> hatsuonbin_types = {
+            {grammar::VerbType::GodanMa, "む"},
+            {grammar::VerbType::GodanBa, "ぶ"},
+            {grammar::VerbType::GodanNa, "ぬ"},
+        };
         // Get the kanji stem
         std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
 
@@ -2738,15 +2585,13 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
           constexpr float kHatsuonbinCost = candidate::verb_cost::kStandardBonus;
           SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
-                                << " kanji_hatsuonbin lemma=" << matched_base_form
+            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " kanji_hatsuonbin lemma=" << matched_base_form
                                 << " cost=" << kHatsuonbinCost << "\n";
           }
-          candidates.push_back(makeVerbCandidate(
-              onbin_surface, start_pos, kanji_end + 1, kHatsuonbinCost, matched_base_form,
-              grammar::verbTypeToConjType(matched_verb_type),
-              true, CandidateOrigin::VerbKanji, 0.9F, "kanji_hatsuonbin",
-              core::ExtendedPOS::VerbOnbinkei));
+          candidates.push_back(makeVerbCandidate(onbin_surface, start_pos, kanji_end + 1, kHatsuonbinCost,
+                                                 matched_base_form, grammar::verbTypeToConjType(matched_verb_type),
+                                                 true, CandidateOrigin::VerbKanji, 0.9F, "kanji_hatsuonbin",
+                                                 core::ExtendedPOS::VerbOnbinkei));
         }
       }
     }
@@ -2758,27 +2603,27 @@ std::vector<UnknownCandidate> generateVerbCandidates(
   // - Standalone single ん: 死ん (end of token, no following で/だ)
   if (kanji_end < hiragana_end) {
     for (size_t n_pos = kanji_end; n_pos < hiragana_end; ++n_pos) {
-      if (codepoints[n_pos] != U'ん') continue;
+      if (codepoints[n_pos] != U'ん')
+        continue;
 
       bool at_end = (n_pos + 1 >= hiragana_end);
-      bool followed_by_de_da =
-          (!at_end) && (codepoints[n_pos + 1] == U'で' || codepoints[n_pos + 1] == U'だ');
+      bool followed_by_de_da = (!at_end) && (codepoints[n_pos + 1] == U'で' || codepoints[n_pos + 1] == U'だ');
 
       // Skip: n_pos == kanji_end && !at_end is already handled by de/da handler above
-      if (n_pos == kanji_end && !at_end) continue;
+      if (n_pos == kanji_end && !at_end)
+        continue;
       // Only valid: at end of hiragana region, or followed by で/だ
-      if (!at_end && !followed_by_de_da) continue;
+      if (!at_end && !followed_by_de_da)
+        continue;
 
       std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-      std::string hira_stem =
-          (n_pos > kanji_end) ? extractSubstring(codepoints, kanji_end, n_pos) : "";
+      std::string hira_stem = (n_pos > kanji_end) ? extractSubstring(codepoints, kanji_end, n_pos) : "";
 
-      static const std::vector<std::pair<grammar::VerbType, std::string_view>>
-          n_onbin_types = {
-              {grammar::VerbType::GodanMa, "む"},
-              {grammar::VerbType::GodanBa, "ぶ"},
-              {grammar::VerbType::GodanNa, "ぬ"},
-          };
+      static const std::vector<std::pair<grammar::VerbType, std::string_view>> n_onbin_types = {
+          {grammar::VerbType::GodanMa, "む"},
+          {grammar::VerbType::GodanBa, "ぶ"},
+          {grammar::VerbType::GodanNa, "ぬ"},
+      };
 
       for (const auto& [verb_type, base_suffix] : n_onbin_types) {
         std::string base_form = kanji_stem + hira_stem + std::string(base_suffix);
@@ -2787,15 +2632,12 @@ std::vector<UnknownCandidate> generateVerbCandidates(
           std::string onbin_surface = extractSubstring(codepoints, start_pos, n_pos + 1);
           constexpr float kHatsuonbinCost = candidate::verb_cost::kStandardBonus;
           SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
-                                << " kanji_hatsuonbin_standalone lemma=" << base_form
+            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " kanji_hatsuonbin_standalone lemma=" << base_form
                                 << " cost=" << kHatsuonbinCost << "\n";
           }
           candidates.push_back(makeVerbCandidate(
-              onbin_surface, start_pos, n_pos + 1, kHatsuonbinCost, base_form,
-              grammar::verbTypeToConjType(verb_type),
-              true, CandidateOrigin::VerbKanji, 0.9F, "kanji_hatsuonbin",
-              core::ExtendedPOS::VerbOnbinkei));
+              onbin_surface, start_pos, n_pos + 1, kHatsuonbinCost, base_form, grammar::verbTypeToConjType(verb_type),
+              true, CandidateOrigin::VerbKanji, 0.9F, "kanji_hatsuonbin", core::ExtendedPOS::VerbOnbinkei));
           break;
         }
       }

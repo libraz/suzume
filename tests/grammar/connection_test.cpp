@@ -132,11 +132,9 @@ TEST_F(ConnectionTest, GetCostPenalizedConnection) {
 }
 
 TEST_F(ConnectionTest, GetCostInfiniteForUnknown) {
-  EXPECT_EQ(matrix_.getCost(0xFFFF, 0xFFFF),
-            ConnectionMatrix::kInfinite);
+  EXPECT_EQ(matrix_.getCost(0xFFFF, 0xFFFF), ConnectionMatrix::kInfinite);
   // Verb base cannot connect to ない
-  EXPECT_EQ(matrix_.getCost(conn::kVerbBase, conn::kAuxNai),
-            ConnectionMatrix::kInfinite);
+  EXPECT_EQ(matrix_.getCost(conn::kVerbBase, conn::kAuxNai), ConnectionMatrix::kInfinite);
 }
 
 // ============================================================================
@@ -146,20 +144,14 @@ TEST_F(ConnectionTest, GetCostInfiniteForUnknown) {
 TEST_F(ConnectionTest, ConnectionConstantsAreDistinct) {
   // Verify key connection IDs are unique
   uint16_t ids[] = {
-      conn::kBOS,           conn::kEOS,
-      conn::kVerbBase,      conn::kVerbMizenkei,
-      conn::kVerbRenyokei,  conn::kVerbOnbinkei,
-      conn::kAuxMasu,       conn::kAuxNai,
-      conn::kAuxTa,         conn::kAuxTe,
-      conn::kAuxOutBase,    conn::kAuxOutTe,
-      conn::kParticle,      conn::kNoun,
+      conn::kBOS,          conn::kEOS,      conn::kVerbBase, conn::kVerbMizenkei, conn::kVerbRenyokei,
+      conn::kVerbOnbinkei, conn::kAuxMasu,  conn::kAuxNai,   conn::kAuxTa,        conn::kAuxTe,
+      conn::kAuxOutBase,   conn::kAuxOutTe, conn::kParticle, conn::kNoun,
   };
   size_t count = sizeof(ids) / sizeof(ids[0]);
   for (size_t idx = 0; idx < count; idx++) {
     for (size_t jdx = idx + 1; jdx < count; jdx++) {
-      EXPECT_NE(ids[idx], ids[jdx])
-          << "Connection IDs at index " << idx << " and " << jdx
-          << " should be distinct";
+      EXPECT_NE(ids[idx], ids[jdx]) << "Connection IDs at index " << idx << " and " << jdx << " should be distinct";
     }
   }
 }

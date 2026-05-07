@@ -28,8 +28,7 @@ struct Error {
   ErrorCode code;
   std::string message;
 
-  Error(ErrorCode err_code, std::string msg = "")
-      : code(err_code), message(std::move(msg)) {}
+  Error(ErrorCode err_code, std::string msg = "") : code(err_code), message(std::move(msg)) {}
 
   bool isSuccess() const { return code == ErrorCode::Success; }
   explicit operator bool() const { return !isSuccess(); }
@@ -116,8 +115,7 @@ class Expected {
 
   // Conversion from Unexpected
   Expected(const Unexpected<E>& unexp) : error_(unexp.error), has_value_(false) {}
-  Expected(Unexpected<E>&& unexp)
-      : error_(std::move(unexp).error), has_value_(false) {}
+  Expected(Unexpected<E>&& unexp) : error_(std::move(unexp).error), has_value_(false) {}
 
   bool hasValue() const { return has_value_; }
   explicit operator bool() const { return has_value_; }

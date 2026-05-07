@@ -9,8 +9,7 @@ CharType classifyChar(char32_t codepoint) {
   }
 
   // Katakana: U+30A0-U+30FF, U+31F0-U+31FF (small), U+FF66-U+FF9F (half-width)
-  if ((codepoint >= 0x30A0 && codepoint <= 0x30FF) ||
-      (codepoint >= 0x31F0 && codepoint <= 0x31FF) ||
+  if ((codepoint >= 0x30A0 && codepoint <= 0x30FF) || (codepoint >= 0x31F0 && codepoint <= 0x31FF) ||
       (codepoint >= 0xFF66 && codepoint <= 0xFF9F)) {
     return CharType::Katakana;
   }
@@ -34,14 +33,12 @@ CharType classifyChar(char32_t codepoint) {
   }
 
   // ASCII alphabet
-  if ((codepoint >= 'A' && codepoint <= 'Z') ||
-      (codepoint >= 'a' && codepoint <= 'z')) {
+  if ((codepoint >= 'A' && codepoint <= 'Z') || (codepoint >= 'a' && codepoint <= 'z')) {
     return CharType::Alphabet;
   }
 
   // Full-width alphabet
-  if ((codepoint >= 0xFF21 && codepoint <= 0xFF3A) ||
-      (codepoint >= 0xFF41 && codepoint <= 0xFF5A)) {
+  if ((codepoint >= 0xFF21 && codepoint <= 0xFF3A) || (codepoint >= 0xFF41 && codepoint <= 0xFF5A)) {
     return CharType::Alphabet;
   }
 
@@ -158,8 +155,7 @@ bool canCombine(CharType first_type, CharType second_type) {
 
 bool isCommonParticle(char32_t ch) {
   // Common particles: を, が, は, に, へ, の
-  return ch == U'を' || ch == U'が' || ch == U'は' ||
-         ch == U'に' || ch == U'へ' || ch == U'の';
+  return ch == U'を' || ch == U'が' || ch == U'は' || ch == U'に' || ch == U'へ' || ch == U'の';
 }
 
 bool isNeverVerbStemAfterKanji(char32_t ch) {
@@ -184,15 +180,13 @@ bool isNeverVerbStemAtStart(char32_t ch) {
   // Note: While のこる(残る), のむ(飲む) etc. exist as verbs, they are typically
   // written in kanji. Allowing の as verb stem creates too many false positives
   // (のよう→のる, のに→のにる, etc.) that hurt accuracy more than they help.
-  return ch == U'を' || ch == U'が' ||
-         ch == U'へ' || ch == U'の' || ch == U'よ';
+  return ch == U'を' || ch == U'が' || ch == U'へ' || ch == U'の' || ch == U'よ';
 }
 
 bool isDemonstrativeStart(char32_t first, char32_t second) {
   // Check for こ/そ/あ/ど + れ/こ/ち patterns (demonstrative pronouns)
   // Examples: これ, それ, あれ, どれ, ここ, そこ, あそこ, どこ, etc.
-  return (first == U'こ' || first == U'そ' ||
-          first == U'あ' || first == U'ど') &&
+  return (first == U'こ' || first == U'そ' || first == U'あ' || first == U'ど') &&
          (second == U'れ' || second == U'こ' || second == U'ち');
 }
 
@@ -207,8 +201,7 @@ bool isExtendedParticle(char32_t ch) {
   // Common particles: を, が, は, に, へ, の
   // Sentence-final: か, ね, よ, わ
   // Additional: で, と, も
-  return isCommonParticle(ch) || ch == U'か' || ch == U'ね' ||
-         ch == U'よ' || ch == U'わ' || ch == U'で' ||
+  return isCommonParticle(ch) || ch == U'か' || ch == U'ね' || ch == U'よ' || ch == U'わ' || ch == U'で' ||
          ch == U'と' || ch == U'も';
 }
 
@@ -220,19 +213,24 @@ bool isProlongedSoundMark(char32_t ch) {
 
 bool isEmojiModifier(char32_t ch) {
   // ZWJ (Zero Width Joiner) - combines emojis
-  if (ch == 0x200D) return true;
+  if (ch == 0x200D)
+    return true;
 
   // Variation Selectors (text vs emoji presentation)
-  if (ch >= 0xFE0E && ch <= 0xFE0F) return true;
+  if (ch >= 0xFE0E && ch <= 0xFE0F)
+    return true;
 
   // Skin tone modifiers (Fitzpatrick scale)
-  if (ch >= 0x1F3FB && ch <= 0x1F3FF) return true;
+  if (ch >= 0x1F3FB && ch <= 0x1F3FF)
+    return true;
 
   // Combining Enclosing Keycap
-  if (ch == 0x20E3) return true;
+  if (ch == 0x20E3)
+    return true;
 
   // Tag characters (used in subdivision flags)
-  if (ch >= 0xE0020 && ch <= 0xE007F) return true;
+  if (ch >= 0xE0020 && ch <= 0xE007F)
+    return true;
 
   return false;
 }
@@ -250,45 +248,34 @@ bool isIterationMark(char32_t ch) {
 
 bool isARowHiragana(char32_t ch) {
   // A-row (あ段): あ, か, が, さ, ざ, た, だ, な, は, ば, ぱ, ま, や, ら, わ
-  return ch == U'あ' || ch == U'か' || ch == U'が' ||
-         ch == U'さ' || ch == U'ざ' || ch == U'た' ||
-         ch == U'だ' || ch == U'な' || ch == U'は' ||
-         ch == U'ば' || ch == U'ぱ' || ch == U'ま' ||
-         ch == U'や' || ch == U'ら' || ch == U'わ';
+  return ch == U'あ' || ch == U'か' || ch == U'が' || ch == U'さ' || ch == U'ざ' || ch == U'た' || ch == U'だ' ||
+         ch == U'な' || ch == U'は' || ch == U'ば' || ch == U'ぱ' || ch == U'ま' || ch == U'や' || ch == U'ら' ||
+         ch == U'わ';
 }
 
 bool isIRowHiragana(char32_t ch) {
   // I-row (い段): い, き, ぎ, し, じ, ち, ぢ, に, ひ, び, ぴ, み, り
-  return ch == U'い' || ch == U'き' || ch == U'ぎ' ||
-         ch == U'し' || ch == U'じ' || ch == U'ち' ||
-         ch == U'ぢ' || ch == U'に' || ch == U'ひ' ||
-         ch == U'び' || ch == U'ぴ' || ch == U'み' || ch == U'り';
+  return ch == U'い' || ch == U'き' || ch == U'ぎ' || ch == U'し' || ch == U'じ' || ch == U'ち' || ch == U'ぢ' ||
+         ch == U'に' || ch == U'ひ' || ch == U'び' || ch == U'ぴ' || ch == U'み' || ch == U'り';
 }
 
 bool isURowHiragana(char32_t ch) {
   // U-row (う段): う, く, ぐ, す, ず, つ, づ, ぬ, ふ, ぶ, ぷ, む, ゆ, る
-  return ch == U'う' || ch == U'く' || ch == U'ぐ' ||
-         ch == U'す' || ch == U'ず' || ch == U'つ' ||
-         ch == U'づ' || ch == U'ぬ' || ch == U'ふ' ||
-         ch == U'ぶ' || ch == U'ぷ' || ch == U'む' ||
-         ch == U'ゆ' || ch == U'る';
+  return ch == U'う' || ch == U'く' || ch == U'ぐ' || ch == U'す' || ch == U'ず' || ch == U'つ' || ch == U'づ' ||
+         ch == U'ぬ' || ch == U'ふ' || ch == U'ぶ' || ch == U'ぷ' || ch == U'む' || ch == U'ゆ' || ch == U'る';
 }
 
 bool isERowHiragana(char32_t ch) {
   // E-row (え段): え, け, げ, せ, ぜ, て, で, ね, へ, べ, ぺ, め, れ
-  return ch == U'え' || ch == U'け' || ch == U'げ' ||
-         ch == U'せ' || ch == U'ぜ' || ch == U'て' ||
-         ch == U'で' || ch == U'ね' || ch == U'へ' ||
-         ch == U'べ' || ch == U'ぺ' || ch == U'め' || ch == U'れ';
+  return ch == U'え' || ch == U'け' || ch == U'げ' || ch == U'せ' || ch == U'ぜ' || ch == U'て' || ch == U'で' ||
+         ch == U'ね' || ch == U'へ' || ch == U'べ' || ch == U'ぺ' || ch == U'め' || ch == U'れ';
 }
 
 bool isORowHiragana(char32_t ch) {
   // O-row (お段): お, こ, ご, そ, ぞ, と, ど, の, ほ, ぼ, ぽ, も, よ, ろ, を
-  return ch == U'お' || ch == U'こ' || ch == U'ご' ||
-         ch == U'そ' || ch == U'ぞ' || ch == U'と' ||
-         ch == U'ど' || ch == U'の' || ch == U'ほ' ||
-         ch == U'ぼ' || ch == U'ぽ' || ch == U'も' ||
-         ch == U'よ' || ch == U'ろ' || ch == U'を';
+  return ch == U'お' || ch == U'こ' || ch == U'ご' || ch == U'そ' || ch == U'ぞ' || ch == U'と' || ch == U'ど' ||
+         ch == U'の' || ch == U'ほ' || ch == U'ぼ' || ch == U'ぽ' || ch == U'も' || ch == U'よ' || ch == U'ろ' ||
+         ch == U'を';
 }
 
 bool isKanjiCodepoint(char32_t ch) {
@@ -305,26 +292,84 @@ bool isKanjiCodepoint(char32_t ch) {
 bool isCounterKanji(char32_t cp) {
   switch (cp) {
     // Currency/value
-    case U'円': case U'銭': case U'万': case U'億': case U'兆':
+    case U'円':
+    case U'銭':
+    case U'万':
+    case U'億':
+    case U'兆':
     // Time
-    case U'分': case U'秒': case U'時': case U'日': case U'月':
-    case U'年': case U'週': case U'期': case U'世':
+    case U'分':
+    case U'秒':
+    case U'時':
+    case U'日':
+    case U'月':
+    case U'年':
+    case U'週':
+    case U'期':
+    case U'世':
     // General counters
-    case U'個': case U'本': case U'人': case U'台': case U'枚':
-    case U'杯': case U'回': case U'歳': case U'才': case U'階':
-    case U'号': case U'番': case U'匹': case U'冊': case U'件':
-    case U'丁': case U'通': case U'発': case U'点': case U'票':
-    case U'頭': case U'羽': case U'着': case U'足': case U'軒':
-    case U'組': case U'曲': case U'巻': case U'畳': case U'割':
-    case U'部': case U'面': case U'問': case U'章': case U'棟':
-    case U'戸': case U'席': case U'食': case U'泊': case U'口':
-    case U'束': case U'両': case U'機': case U'基': case U'隻':
+    case U'個':
+    case U'本':
+    case U'人':
+    case U'台':
+    case U'枚':
+    case U'杯':
+    case U'回':
+    case U'歳':
+    case U'才':
+    case U'階':
+    case U'号':
+    case U'番':
+    case U'匹':
+    case U'冊':
+    case U'件':
+    case U'丁':
+    case U'通':
+    case U'発':
+    case U'点':
+    case U'票':
+    case U'頭':
+    case U'羽':
+    case U'着':
+    case U'足':
+    case U'軒':
+    case U'組':
+    case U'曲':
+    case U'巻':
+    case U'畳':
+    case U'割':
+    case U'部':
+    case U'面':
+    case U'問':
+    case U'章':
+    case U'棟':
+    case U'戸':
+    case U'席':
+    case U'食':
+    case U'泊':
+    case U'口':
+    case U'束':
+    case U'両':
+    case U'機':
+    case U'基':
+    case U'隻':
     // Units/measures
-    case U'度': case U'倍': case U'段': case U'級': case U'位':
-    case U'種': case U'色': case U'名': case U'話': case U'連':
-    case U'敗': case U'勝': case U'戦':
+    case U'度':
+    case U'倍':
+    case U'段':
+    case U'級':
+    case U'位':
+    case U'種':
+    case U'色':
+    case U'名':
+    case U'話':
+    case U'連':
+    case U'敗':
+    case U'勝':
+    case U'戦':
     // Compound second char (時間, 分間, 年間, 世紀, etc.)
-    case U'間': case U'紀':
+    case U'間':
+    case U'紀':
     // Ordinal/sequential
     case U'次':
       return true;

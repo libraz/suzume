@@ -24,22 +24,21 @@ struct IAdjSuffix {
 };
 
 const std::vector<IAdjSuffix> kIAdjSuffixes = {
-    {"い", core::ExtendedPOS::AdjBasic},            // Base form: 美しい
+    {"い", core::ExtendedPOS::AdjBasic},  // Base form: 美しい
     // MeCab compatibility: かった/くなかった are NOT stored as single tokens
     // They should be split: かった → かっ + た, くなかった → く + なかっ + た
-    {"かっ", core::ExtendedPOS::AdjKatt},           // Ta-connection (連用タ接続): 美しかっ+た
-    {"くない", core::ExtendedPOS::AdjBasic},        // Negative: 美しくない
-    {"くなかっ", core::ExtendedPOS::AdjBasic},      // Negative past before た: 美しくなかっ+た
-    {"くて", core::ExtendedPOS::AdjRenyokei},       // Te-form: 美しくて
-    {"ければ", core::ExtendedPOS::AdjKeForm},       // Conditional: 美しければ
-    {"く", core::ExtendedPOS::AdjRenyokei},         // Adverbial/Renyokei: 美しく
-    {"かったら", core::ExtendedPOS::AdjKeForm},     // Conditional past: 美しかったら
-    {"そう", core::ExtendedPOS::AdjStem},           // Looks like: 美しそう
+    {"かっ", core::ExtendedPOS::AdjKatt},        // Ta-connection (連用タ接続): 美しかっ+た
+    {"くない", core::ExtendedPOS::AdjBasic},     // Negative: 美しくない
+    {"くなかっ", core::ExtendedPOS::AdjBasic},   // Negative past before た: 美しくなかっ+た
+    {"くて", core::ExtendedPOS::AdjRenyokei},    // Te-form: 美しくて
+    {"ければ", core::ExtendedPOS::AdjKeForm},    // Conditional: 美しければ
+    {"く", core::ExtendedPOS::AdjRenyokei},      // Adverbial/Renyokei: 美しく
+    {"かったら", core::ExtendedPOS::AdjKeForm},  // Conditional past: 美しかったら
+    {"そう", core::ExtendedPOS::AdjStem},        // Looks like: 美しそう
 };
 
 // Expand i-adjective entry into all conjugated forms
-std::vector<dictionary::DictionaryEntry> expandIAdjective(
-    const dictionary::DictionaryEntry& entry) {
+std::vector<dictionary::DictionaryEntry> expandIAdjective(const dictionary::DictionaryEntry& entry) {
   std::vector<dictionary::DictionaryEntry> result;
 
   // Check if it ends with い
@@ -94,9 +93,8 @@ std::vector<dictionary::DictionaryEntry> expandIAdjective(
 }
 
 // Expand verb entry into conjugated forms using Conjugation engine
-std::vector<dictionary::DictionaryEntry> expandVerb(
-    const dictionary::DictionaryEntry& entry,
-    grammar::VerbType verb_type) {
+std::vector<dictionary::DictionaryEntry> expandVerb(const dictionary::DictionaryEntry& entry,
+                                                    grammar::VerbType verb_type) {
   std::vector<dictionary::DictionaryEntry> result;
 
   if (verb_type == grammar::VerbType::Unknown) {
@@ -160,8 +158,7 @@ bool isTrivialEntry(std::string_view surface) {
 
 DictCompiler::DictCompiler() = default;
 
-core::Expected<size_t, core::Error> DictCompiler::compile(
-    const std::string& tsv_path, const std::string& dic_path) {
+core::Expected<size_t, core::Error> DictCompiler::compile(const std::string& tsv_path, const std::string& dic_path) {
   TsvParser parser;
   auto parse_result = parser.parseFile(tsv_path);
 
@@ -172,8 +169,7 @@ core::Expected<size_t, core::Error> DictCompiler::compile(
   const auto& entries = parse_result.value();
 
   if (verbose_) {
-    printInfo("Parsed " + std::to_string(entries.size()) + " entries from " +
-              tsv_path);
+    printInfo("Parsed " + std::to_string(entries.size()) + " entries from " + tsv_path);
   }
 
   // Validate entries
@@ -183,19 +179,17 @@ core::Expected<size_t, core::Error> DictCompiler::compile(
     for (const auto& issue : issues) {
       printError(issue);
     }
-    return core::makeUnexpected(core::Error(
-        core::ErrorCode::InvalidInput,
-        "Validation failed: " + std::to_string(issue_count) + " error(s)"));
+    return core::makeUnexpected(
+        core::Error(core::ErrorCode::InvalidInput, "Validation failed: " + std::to_string(issue_count) + " error(s)"));
   }
 
   return compileEntries(entries, dic_path);
 }
 
-core::Expected<size_t, core::Error> DictCompiler::compileEntries(
-    const std::vector<TsvEntry>& entries, const std::string& dic_path) {
+core::Expected<size_t, core::Error> DictCompiler::compileEntries(const std::vector<TsvEntry>& entries,
+                                                                 const std::string& dic_path) {
   if (entries.empty()) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput,
-                                             "No entries to compile"));
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "No entries to compile"));
   }
 
   // Apply trivial entry filter if enabled
@@ -212,16 +206,14 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
       }
     }
     if (verbose_ && trivial_count > 0) {
-      printInfo("Filtered " + std::to_string(trivial_count) +
-                " trivial entries (kept " +
+      printInfo("Filtered " + std::to_string(trivial_count) + " trivial entries (kept " +
                 std::to_string(filtered_entries.size()) + ")");
     }
     active_entries = &filtered_entries;
 
     if (active_entries->empty()) {
-      return core::makeUnexpected(core::Error(
-          core::ErrorCode::InvalidInput,
-          "No entries remaining after trivial filtering"));
+      return core::makeUnexpected(
+          core::Error(core::ErrorCode::InvalidInput, "No entries remaining after trivial filtering"));
     }
   }
 
@@ -236,7 +228,10 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
   // When duplicate surfaces arise from different verb base forms (e.g., 降り from
   // both 降る and 降りる), prefer the entry with the longer lemma (more specific).
   // Only replace same-POS entries to avoid VERB overriding NOUN (e.g., 晴れ).
-  struct SeenEntry { size_t lemma_len; core::PartOfSpeech pos; };
+  struct SeenEntry {
+    size_t lemma_len;
+    core::PartOfSpeech pos;
+  };
   std::unordered_map<std::string, SeenEntry> seen_surfaces;
 
   // Two-pass processing:
@@ -246,8 +241,7 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
 
   // Helper lambda to check if entry needs conjugation expansion
   auto needsExpansion = [](const TsvEntry& entry) {
-    return (entry.pos == core::PartOfSpeech::Adjective &&
-            entry.conj_type == dictionary::ConjugationType::IAdjective) ||
+    return (entry.pos == core::PartOfSpeech::Adjective && entry.conj_type == dictionary::ConjugationType::IAdjective) ||
            entry.pos == core::PartOfSpeech::Verb;
   };
 
@@ -360,8 +354,7 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
     for (const auto& exp_entry : expanded_entries) {
       auto it = seen_surfaces.find(exp_entry.surface);
       if (it != seen_surfaces.end()) {
-        if (exp_entry.pos == it->second.pos &&
-            exp_entry.lemma.size() > it->second.lemma_len) {
+        if (exp_entry.pos == it->second.pos && exp_entry.lemma.size() > it->second.lemma_len) {
           // Replace with more specific entry (longer lemma, same POS)
           it->second = SeenEntry{exp_entry.lemma.size(), exp_entry.pos};
           writer.replaceEntry(exp_entry);
@@ -380,13 +373,11 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
   }
 
   if (verbose_ && conj_expanded_ > 0) {
-    printInfo("Expanded " + std::to_string(conj_expanded_) +
-              " conjugated forms");
+    printInfo("Expanded " + std::to_string(conj_expanded_) + " conjugated forms");
   }
 
   if (verbose_ && duplicates_skipped > 0) {
-    printInfo("Skipped " + std::to_string(duplicates_skipped) +
-              " duplicate entries");
+    printInfo("Skipped " + std::to_string(duplicates_skipped) + " duplicate entries");
   }
 
   auto write_result = writer.writeToFile(dic_path);
@@ -395,20 +386,17 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(
   }
 
   if (verbose_) {
-    printInfo("Compiled " + std::to_string(entries_compiled_) +
-              " entries to " + dic_path);
-    printInfo("Output size: " + std::to_string(write_result.value()) +
-              " bytes");
+    printInfo("Compiled " + std::to_string(entries_compiled_) + " entries to " + dic_path);
+    printInfo("Output size: " + std::to_string(write_result.value()) + " bytes");
   }
 
   return entries_compiled_;
 }
 
-core::Expected<size_t, core::Error> DictCompiler::compileMultiple(
-    const std::vector<std::string>& tsv_paths, const std::string& dic_path) {
+core::Expected<size_t, core::Error> DictCompiler::compileMultiple(const std::vector<std::string>& tsv_paths,
+                                                                  const std::string& dic_path) {
   if (tsv_paths.empty()) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::InvalidInput, "No input files specified"));
+    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "No input files specified"));
   }
 
   std::vector<TsvEntry> all_entries;
@@ -418,23 +406,20 @@ core::Expected<size_t, core::Error> DictCompiler::compileMultiple(
   for (const auto& tsv_path : tsv_paths) {
     auto parse_result = parser.parseFile(tsv_path);
     if (!parse_result.hasValue()) {
-      return core::makeUnexpected(core::Error(
-          core::ErrorCode::ParseError,
-          "Failed to parse " + tsv_path + ": " + parse_result.error().message));
+      return core::makeUnexpected(core::Error(core::ErrorCode::ParseError,
+                                              "Failed to parse " + tsv_path + ": " + parse_result.error().message));
     }
 
     const auto& entries = parse_result.value();
     all_entries.insert(all_entries.end(), entries.begin(), entries.end());
 
     if (verbose_) {
-      printInfo("Parsed " + std::to_string(entries.size()) + " entries from " +
-                tsv_path);
+      printInfo("Parsed " + std::to_string(entries.size()) + " entries from " + tsv_path);
     }
   }
 
   if (verbose_) {
-    printInfo("Total entries before deduplication: " +
-              std::to_string(all_entries.size()));
+    printInfo("Total entries before deduplication: " + std::to_string(all_entries.size()));
   }
 
   // Deduplicate by surface (trie requires unique keys)
@@ -452,8 +437,7 @@ core::Expected<size_t, core::Error> DictCompiler::compileMultiple(
   if (verbose_) {
     size_t skipped = all_entries.size() - unique_entries.size();
     if (skipped > 0) {
-      printInfo("Skipped " + std::to_string(skipped) +
-                " duplicate surfaces during merge");
+      printInfo("Skipped " + std::to_string(skipped) + " duplicate surfaces during merge");
     }
   }
 
@@ -464,9 +448,8 @@ core::Expected<size_t, core::Error> DictCompiler::compileMultiple(
     for (const auto& issue : issues) {
       printError(issue);
     }
-    return core::makeUnexpected(core::Error(
-        core::ErrorCode::InvalidInput,
-        "Validation failed: " + std::to_string(issue_count) + " error(s)"));
+    return core::makeUnexpected(
+        core::Error(core::ErrorCode::InvalidInput, "Validation failed: " + std::to_string(issue_count) + " error(s)"));
   }
 
   return compileEntries(unique_entries, dic_path);
@@ -501,8 +484,7 @@ core::Expected<size_t, core::Error> DictCompiler::decompile(const std::string& d
   }
 
   if (verbose_) {
-    printInfo("Decompiled " + std::to_string(entries.size()) +
-              " entries to " + tsv_path);
+    printInfo("Decompiled " + std::to_string(entries.size()) + " entries to " + tsv_path);
   }
 
   return entries.size();

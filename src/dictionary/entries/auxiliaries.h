@@ -34,5 +34,5 @@ namespace suzume::dictionary::entries {
  */
 std::vector<DictionaryEntry> getAuxiliaryEntries();
 
-}  // namespace suzume::entries::dictionary
+}  // namespace suzume::dictionary::entries
 #endif  // SUZUME_DICTIONARY_ENTRIES_AUXILIARIES_H_

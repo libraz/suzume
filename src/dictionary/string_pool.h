@@ -68,9 +68,9 @@ class DictStringPool {
   bool loadFromMemory(const char* data, size_t size);
 
  private:
-  std::string data_;                // Concatenated strings
-  std::vector<uint32_t> offsets_;   // Start offset for each string
-  std::vector<uint16_t> lengths_;   // Length of each string
+  std::string data_;               // Concatenated strings
+  std::vector<uint32_t> offsets_;  // Start offset for each string
+  std::vector<uint16_t> lengths_;  // Length of each string
 };
 
 }  // namespace suzume::dictionary

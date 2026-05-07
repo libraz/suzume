@@ -7,8 +7,7 @@ namespace postprocess {
 namespace {
 
 // Helper to create a morpheme
-core::Morpheme makeMorpheme(const std::string& surface, core::PartOfSpeech pos,
-                            const std::string& lemma = "") {
+core::Morpheme makeMorpheme(const std::string& surface, core::PartOfSpeech pos, const std::string& lemma = "") {
   core::Morpheme m;
   m.surface = surface;
   m.pos = pos;
@@ -224,8 +223,7 @@ TEST(TagGeneratorTest, UnlimitedTags) {
 
   std::vector<core::Morpheme> morphemes;
   for (int i = 0; i < 100; ++i) {
-    morphemes.push_back(
-        makeMorpheme("タグ" + std::to_string(i), core::PartOfSpeech::Noun));
+    morphemes.push_back(makeMorpheme("タグ" + std::to_string(i), core::PartOfSpeech::Noun));
   }
 
   auto tags = generator.generate(morphemes);
@@ -295,8 +293,8 @@ TEST(TagGeneratorTest, CountCharsJapanese) {
   TagGenerator generator(options);
 
   std::vector<core::Morpheme> morphemes;
-  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));   // 2 chars
-  morphemes.push_back(makeMorpheme("新宿駅", core::PartOfSpeech::Noun)); // 3 chars
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));    // 2 chars
+  morphemes.push_back(makeMorpheme("新宿駅", core::PartOfSpeech::Noun));  // 3 chars
 
   auto tags = generator.generate(morphemes);
   EXPECT_EQ(tags.size(), 1);

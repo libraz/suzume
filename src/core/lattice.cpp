@@ -28,14 +28,10 @@ void Lattice::addEdge(const LatticeEdge& edge) {
   }
 }
 
-size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
-                        PartOfSpeech pos, float cost, uint8_t flags,
-                        std::string_view lemma,
-                        dictionary::ConjugationType conj_type,
-                        [[maybe_unused]] CandidateOrigin origin,
-                        [[maybe_unused]] float origin_confidence,
-                        [[maybe_unused]] std::string_view origin_detail,
-                        ExtendedPOS extended_pos,
+size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end, PartOfSpeech pos, float cost,
+                        uint8_t flags, std::string_view lemma, dictionary::ConjugationType conj_type,
+                        [[maybe_unused]] CandidateOrigin origin, [[maybe_unused]] float origin_confidence,
+                        [[maybe_unused]] std::string_view origin_detail, ExtendedPOS extended_pos,
                         [[maybe_unused]] std::string_view epos_source) {
   if (start > text_length_ || end > text_length_ || all_edges_.size() >= kMaxEdges) {
     return static_cast<size_t>(-1);
@@ -107,8 +103,9 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end,
   edge.origin_confidence = origin_confidence;
   edge.origin_detail = stored_origin_detail;
   // Use provided epos_source if available, otherwise use auto-detected source
-  edge.epos_source = !stored_epos_source.empty() ? stored_epos_source :
-                     (auto_epos_source ? std::string_view(auto_epos_source) : std::string_view{});
+  edge.epos_source = !stored_epos_source.empty()
+                         ? stored_epos_source
+                         : (auto_epos_source ? std::string_view(auto_epos_source) : std::string_view{});
 #endif
 
   all_edges_.push_back(edge);

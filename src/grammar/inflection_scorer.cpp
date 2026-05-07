@@ -23,8 +23,7 @@ namespace {
 // Helper to log confidence adjustments
 void logConfidenceAdjustment(float amount, [[maybe_unused]] const char* reason) {
   if (amount != 0.0F) {
-    SUZUME_DEBUG_LOG_TRACE("  " << reason << ": "
-                            << (amount > 0 ? "+" : "") << amount << "\n");
+    SUZUME_DEBUG_LOG_TRACE("  " << reason << ": " << (amount > 0 ? "+" : "") << amount << "\n");
   }
 }
 
@@ -32,7 +31,8 @@ void logConfidenceAdjustment(float amount, [[maybe_unused]] const char* reason) 
 template <size_t N>
 bool isInArray(std::string_view s, const char* const (&arr)[N]) {
   for (size_t i = 0; i < N; ++i) {
-    if (s == arr[i]) return true;
+    if (s == arr[i])
+      return true;
   }
   return false;
 }
@@ -40,18 +40,15 @@ bool isInArray(std::string_view s, const char* const (&arr)[N]) {
 
 namespace suzume::grammar {
 
-float calculateConfidence(VerbType type, std::string_view stem,
-                          size_t aux_total_len, size_t aux_count,
-                          uint16_t required_conn, size_t suffix_len,
-                          const InflectionScorerOptions* opts) {
+float calculateConfidence(VerbType type, std::string_view stem, size_t aux_total_len, size_t aux_count,
+                          uint16_t required_conn, size_t suffix_len, const InflectionScorerOptions* opts) {
   float base = GET_OPT(base_confidence, inflection::kBaseConfidence);
   size_t stem_len = stem.size();
 
-  SUZUME_DEBUG_LOG_TRACE("[INFL_SCORE] stem=\"" << stem << "\" type="
-                     << static_cast<int>(type) << " aux_len=" << aux_total_len
-                     << " aux_count=" << aux_count << " conn=" << required_conn
-                     << " suffix_len=" << suffix_len
-                     << ": base=" << base << "\n");
+  SUZUME_DEBUG_LOG_TRACE("[INFL_SCORE] stem=\"" << stem << "\" type=" << static_cast<int>(type)
+                                                << " aux_len=" << aux_total_len << " aux_count=" << aux_count
+                                                << " conn=" << required_conn << " suffix_len=" << suffix_len
+                                                << ": base=" << base << "\n");
 
   // Stem length penalties/bonuses
   // Very long stems are suspicious (likely wrong analysis)
@@ -124,7 +121,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
       if (utf8::equalsAny(last_char, {"っ", "ん"})) {
         // っ and ん are always onbin markers
         base -= inflection::kPenaltyIchidanOnbinMarkerStemInvalid;
-        logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid, "ichidan_onbin_marker_stem_invalid");
+        logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid,
+                                "ichidan_onbin_marker_stem_invalid");
       } else if (last_char == "い") {
         // い can be onbin marker OR part of legitimate ichidan stem
         // Valid い-ending ichidan stems:
@@ -134,7 +132,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
                                 isInArray(stem, inflection::kValidKanjiIStemExceptions));
         if (!is_valid_i_stem) {
           base -= inflection::kPenaltyIchidanOnbinMarkerStemInvalid;
-          logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid, "ichidan_onbin_marker_stem_invalid");
+          logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid,
+                                  "ichidan_onbin_marker_stem_invalid");
         }
       }
     }
@@ -144,9 +143,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
     // E.g., 続く + よう → 続くる (wrong) - should be 続こう
     if (required_conn == conn::kVerbVolitional && stem_len >= core::kJapaneseCharBytes) {
       std::string_view last_char = utf8::lastChar(stem);
-      bool is_godan_base_ending = utf8::equalsAny(last_char, {
-          "く", "す", "ぐ", "つ", "ぬ", "む", "ぶ", "う"
-      });
+      bool is_godan_base_ending = utf8::equalsAny(last_char, {"く", "す", "ぐ", "つ", "ぬ", "む", "ぶ", "う"});
       if (is_godan_base_ending) {
         base -= inflection::kPenaltyIchidanVolitionalGodanStem;
         logConfidenceAdjustment(-inflection::kPenaltyIchidanVolitionalGodanStem, "ichidan_volitional_godan_stem");
@@ -193,10 +190,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // Pure potential forms (書ける, 読める) are treated as independent Ichidan verbs
       // when aux_count==0. This is a deliberate design choice.
       // With auxiliaries (書けない, 読めなかった), they correctly trace back to Godan.
-      bool is_potential_context =
-          required_conn == conn::kVerbRenyokei ||
-          required_conn == conn::kVerbMizenkei ||
-          (required_conn == conn::kVerbBase && aux_count > 0);
+      bool is_potential_context = required_conn == conn::kVerbRenyokei || required_conn == conn::kVerbMizenkei ||
+                                  (required_conn == conn::kVerbBase && aux_count > 0);
       // Ichidan stems ending in て are suspicious as base forms
       // "来て" as Ichidan stem → "来てる" is wrong; it's actually 来る te-form
       // Exception: 捨てる, 棄てる have legitimate て-ending stems
@@ -245,9 +240,10 @@ float calculateConfidence(VerbType type, std::string_view stem,
         // Strong penalty: kanji+ + せ is suru-verb imperative, not Ichidan
         // e.g., 勉強せ = 勉強する imperative, not 勉強せる
         base -= inflection::kPenaltyIchidanSuruImperativeSePattern;
-        logConfidenceAdjustment(-inflection::kPenaltyIchidanSuruImperativeSePattern, "ichidan_suru_imperative_se_pattern");
+        logConfidenceAdjustment(-inflection::kPenaltyIchidanSuruImperativeSePattern,
+                                "ichidan_suru_imperative_se_pattern");
       } else if (stem_len == core::kTwoJapaneseCharBytes && is_potential_context &&
-          endsWithKanji(stem.substr(0, core::kJapaneseCharBytes)) && is_common_potential_ending) {
+                 endsWithKanji(stem.substr(0, core::kJapaneseCharBytes)) && is_common_potential_ending) {
         // 読め could be Ichidan 読める or Godan potential of 読む
         // Prefer Godan potential interpretation (読む is more common than treating 読める as Ichidan)
         // Strong penalty to overcome the 0.95 cap tie
@@ -291,9 +287,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
       if (stem_len >= core::kJapaneseCharBytes) {
         std::string_view last_char = utf8::lastChar(stem);
         if (utf8::equalsAny(last_char, {
-            "う", "く", "す", "つ", "ぬ", "ふ", "む", "る",  // voiceless
-            "ぐ", "ず", "づ", "ぶ", "ぷ"  // voiced
-        })) {
+                                           "う", "く", "す", "つ", "ぬ", "ふ", "む", "る",  // voiceless
+                                           "ぐ", "ず", "づ", "ぶ", "ぷ"                     // voiced
+                                       })) {
           // Strong penalty - this pattern is grammatically impossible for Ichidan
           base -= inflection::kPenaltyIchidanURowStemInvalid;
           logConfidenceAdjustment(-inflection::kPenaltyIchidanURowStemInvalid, "ichidan_u_row_stem_invalid");
@@ -308,7 +304,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // Apply strong penalty when stem ends with kanji + い in renyokei context
       if (required_conn == conn::kVerbRenyokei && stem_len >= core::kTwoJapaneseCharBytes) {
         std::string_view last3 = stem.substr(stem_len - core::kJapaneseCharBytes);  // Last 3 bytes = い
-        std::string_view prev3 = stem.substr(stem_len - core::kTwoJapaneseCharBytes, core::kJapaneseCharBytes);  // Previous char
+        std::string_view prev3 =
+            stem.substr(stem_len - core::kTwoJapaneseCharBytes, core::kJapaneseCharBytes);  // Previous char
         if (last3 == "い" && endsWithKanji(prev3)) {
           // Stem ends with kanji + い, likely Godan renyokei misanalysis
           // Use stronger penalty than generic "looks godan"
@@ -348,7 +345,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
           // Ichidan verbs don't have onbin - this is wrong analysis
           // e.g., 侍で should NOT be analyzed as Ichidan stem + で (te-form)
           base -= inflection::kPenaltyIchidanSingleKanjiOnbinInvalid;
-          logConfidenceAdjustment(-inflection::kPenaltyIchidanSingleKanjiOnbinInvalid, "ichidan_single_kanji_onbin_invalid");
+          logConfidenceAdjustment(-inflection::kPenaltyIchidanSingleKanjiOnbinInvalid,
+                                  "ichidan_single_kanji_onbin_invalid");
         }
       } else if (aux_count == 1 && aux_total_len == core::kTwoJapaneseCharBytes &&
                  required_conn == conn::kVerbRenyokei) {
@@ -405,8 +403,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
   //   - Must be recognized as legitimate Ichidan verb
   // P5-3: Added exception for でき (from できる - to be able)
   bool is_valid_hiragana_stem = isInArray(stem, inflection::kValidHiraganaStemExceptions);
-  if (type == VerbType::Ichidan && stem_len >= core::kTwoJapaneseCharBytes &&
-      isPureHiragana(stem) && !is_valid_hiragana_stem) {
+  if (type == VerbType::Ichidan && stem_len >= core::kTwoJapaneseCharBytes && isPureHiragana(stem) &&
+      !is_valid_hiragana_stem) {
     float pen = GET_OPT(penalty_pure_hiragana_stem, inflection::kPenaltyPureHiraganaStem);
     base -= pen;
     logConfidenceAdjustment(-pen, "ichidan_pure_hiragana_stem");
@@ -478,8 +476,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
     if (type == VerbType::GodanWa && stem_len >= core::kTwoJapaneseCharBytes) {
       base += inflection::kBonusGodanWaMultiKanji;
       logConfidenceAdjustment(inflection::kBonusGodanWaMultiKanji, "godan_wa_multi_kanji");
-    } else if ((type == VerbType::GodanRa || type == VerbType::GodanTa) &&
-               stem_len >= core::kTwoJapaneseCharBytes) {
+    } else if ((type == VerbType::GodanRa || type == VerbType::GodanTa) && stem_len >= core::kTwoJapaneseCharBytes) {
       base -= inflection::kPenaltyGodanRaTaMultiKanji;
       logConfidenceAdjustment(-inflection::kPenaltyGodanRaTaMultiKanji, "godan_ra_ta_multi_kanji");
     } else if (type == VerbType::GodanRa && stem_len == core::kJapaneseCharBytes) {
@@ -526,8 +523,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Suru/Kuru imperative boost: しろ, せよ, こい have empty stems
   // These must win over competing Ichidan/Godan interpretations
   // (しろ vs しる, こい vs こう)
-  if (stem.empty() && required_conn == conn::kVerbMeireikei &&
-      (type == VerbType::Suru || type == VerbType::Kuru)) {
+  if (stem.empty() && required_conn == conn::kVerbMeireikei && (type == VerbType::Suru || type == VerbType::Kuru)) {
     base += inflection::kBonusSuruKuruImperative;
     logConfidenceAdjustment(inflection::kBonusSuruKuruImperative, "suru_kuru_imperative");
   }
@@ -550,11 +546,12 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // In mizenkei context, single-hiragana stems that are common particles
   // should be heavily penalized. E.g., もない = も(PARTICLE) + ない(AUX),
   // NOT もる(VERB) + ない. Common particles: も, は, が, を, に, へ, と, で, よ, ね, わ, な
-  if (type == VerbType::Ichidan && stem_len == core::kJapaneseCharBytes &&
-      required_conn == conn::kVerbMizenkei && !endsWithKanji(stem)) {
+  if (type == VerbType::Ichidan && stem_len == core::kJapaneseCharBytes && required_conn == conn::kVerbMizenkei &&
+      !endsWithKanji(stem)) {
     // Check if stem is a common particle
     if (isInArray(stem, inflection::kParticleStemList)) {
-      float pen = GET_OPT(penalty_ichidan_single_hiragana_particle, inflection::kPenaltyIchidanSingleHiraganaParticleStem);
+      float pen =
+          GET_OPT(penalty_ichidan_single_hiragana_particle, inflection::kPenaltyIchidanSingleHiraganaParticleStem);
       base -= pen;
       logConfidenceAdjustment(-pen, "ichidan_single_hiragana_particle_stem");
     }
@@ -582,9 +579,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Exception: い(く) is a valid GodanKa verb (行く)
   // GodanWa with single hiragana stem (ら→らう, ま→まう) are typically not real verbs
   // Real GodanWa verbs like 買う, 舞う use kanji stems
-  bool is_godan_non_ra = (type == VerbType::GodanKa || type == VerbType::GodanGa ||
-                          type == VerbType::GodanSa || type == VerbType::GodanTa ||
-                          type == VerbType::GodanNa || type == VerbType::GodanBa ||
+  bool is_godan_non_ra = (type == VerbType::GodanKa || type == VerbType::GodanGa || type == VerbType::GodanSa ||
+                          type == VerbType::GodanTa || type == VerbType::GodanNa || type == VerbType::GodanBa ||
                           type == VerbType::GodanMa || type == VerbType::GodanWa);
   if (is_godan_non_ra && stem_len == core::kJapaneseCharBytes && !containsKanji(stem)) {
     // Exception: い(く) = 行く is valid
@@ -602,10 +598,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // - GodanNa: only 死ぬ exists
   // - GodanBa: 飛ぶ, 遊ぶ - always in kanji
   // GodanKa/Sa/Ta excluded - いく, なくす, もつ are common in hiragana
-  bool is_godan_hiragana_rare = (type == VerbType::GodanMa || type == VerbType::GodanGa ||
-                                  type == VerbType::GodanNa || type == VerbType::GodanBa);
-  if (is_godan_hiragana_rare && stem_len >= core::kTwoJapaneseCharBytes &&
-      isPureHiragana(stem)) {
+  bool is_godan_hiragana_rare = (type == VerbType::GodanMa || type == VerbType::GodanGa || type == VerbType::GodanNa ||
+                                 type == VerbType::GodanBa);
+  if (is_godan_hiragana_rare && stem_len >= core::kTwoJapaneseCharBytes && isPureHiragana(stem)) {
     float pen = GET_OPT(penalty_godan_non_ra_pure_hiragana, inflection::kPenaltyGodanNonRaPureHiraganaStem);
     base -= pen;
     logConfidenceAdjustment(-pen, "godan_hiragana_rare_stem");
@@ -616,8 +611,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Invalid: おねえす, おにいす (3+ char hiragana stems don't form real verbs)
   // Suru verbs almost never have pure hiragana stems (attach to kanji/katakana nouns)
   bool is_godan_sa_or_suru = (type == VerbType::GodanSa || type == VerbType::Suru);
-  if (is_godan_sa_or_suru && stem_len >= core::kThreeJapaneseCharBytes &&
-      isPureHiragana(stem)) {
+  if (is_godan_sa_or_suru && stem_len >= core::kThreeJapaneseCharBytes && isPureHiragana(stem)) {
     base -= inflection::kPenaltyGodanSaSuruPureHiraganaLongStem;
     logConfidenceAdjustment(-inflection::kPenaltyGodanSaSuruPureHiraganaLongStem,
                             "godan_sa_suru_pure_hiragana_long_stem");
@@ -642,11 +636,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // E.g., えする, あする, みくする - pure hiragana are not valid Suru noun stems
   // Valid Suru stems: 勉強, ダウンロード (kanji or katakana)
   // Note: GodanSa 2-char stems ARE valid (なくす, もらす), so this only applies to Suru
-  if (type == VerbType::Suru && stem_len <= core::kTwoJapaneseCharBytes &&
-      isPureHiragana(stem)) {
+  if (type == VerbType::Suru && stem_len <= core::kTwoJapaneseCharBytes && isPureHiragana(stem)) {
     base -= inflection::kPenaltyGodanSaSuruPureHiraganaLongStem;
-    logConfidenceAdjustment(-inflection::kPenaltyGodanSaSuruPureHiraganaLongStem,
-                            "suru_short_hiragana_stem");
+    logConfidenceAdjustment(-inflection::kPenaltyGodanSaSuruPureHiraganaLongStem, "suru_short_hiragana_stem");
   }
 
   // GodanNa (ナ行五段) is extremely rare - only 死ぬ exists in modern Japanese
@@ -687,11 +679,11 @@ float calculateConfidence(VerbType type, std::string_view stem,
   if (type == VerbType::IAdjective && stem_len >= core::kFourJapaneseCharBytes) {
     // Check for common auxiliary patterns in the stem
     bool has_aux_pattern = utf8::containsAny(stem, {
-        "てしま", "でしま",  // te-form + shimau
-        "ている", "でいる",  // te-form + iru
-        "ておい", "でおい",  // te-form + oku
-        "てき", "でき"       // te-form + kuru
-    });
+                                                       "てしま", "でしま",  // te-form + shimau
+                                                       "ている", "でいる",  // te-form + iru
+                                                       "ておい", "でおい",  // te-form + oku
+                                                       "てき", "でき"       // te-form + kuru
+                                                   });
     if (has_aux_pattern) {
       float pen = GET_OPT(penalty_i_adj_verb_aux_pattern, inflection::kPenaltyIAdjVerbAuxPattern);
       base -= pen;
@@ -824,8 +816,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
       // Only penalize ら endings - other a-row endings may be valid i-adj stems
       // E.g., やば (やばい), なさ (なさい with そう) are valid i-adjectives
       // Exception: つら (辛い), きら (嫌い) are valid i-adjective stems
-      if (stem_len == core::kTwoJapaneseCharBytes && isPureHiragana(stem) &&
-          last == "ら" &&
+      if (stem_len == core::kTwoJapaneseCharBytes && isPureHiragana(stem) && last == "ら" &&
           !isInArray(stem, inflection::kValidIAdjRaStemExceptions)) {
         base -= inflection::kPenaltyIAdjMizenkeiPattern;
         logConfidenceAdjustment(-inflection::kPenaltyIAdjMizenkeiPattern, "i_adj_2char_ra_stem");
@@ -839,11 +830,9 @@ float calculateConfidence(VerbType type, std::string_view stem,
         // If previous char is hiragana, this looks like verb mizenkei
         // Include all rows: a-row (godan mizenkei), e-row (ichidan), i-row, etc.
         // e-row, i-row, a-row hiragana (ichidan, godan renyokei, mizenkei)
-        if (utf8::equalsAny(prev,
-            {"べ", "め", "せ", "け", "て", "ね", "れ", "え", "げ", "ぜ", "で", "ぺ",
-             "み", "き", "し", "ち", "に", "ひ", "り", "い", "ぎ", "じ", "ぢ", "び", "ぴ",
-             "か", "が", "さ", "ざ", "た", "だ", "な", "ば", "ぱ", "ま", "ら", "わ", "あ", "は",
-             "っ"})) {
+        if (utf8::equalsAny(prev, {"べ", "め", "せ", "け", "て", "ね", "れ", "え", "げ", "ぜ", "で", "ぺ", "み", "き",
+                                   "し", "ち", "に", "ひ", "り", "い", "ぎ", "じ", "ぢ", "び", "ぴ", "か", "が", "さ",
+                                   "ざ", "た", "だ", "な", "ば", "ぱ", "ま", "ら", "わ", "あ", "は", "っ"})) {
           base -= inflection::kPenaltyIAdjMizenkeiPattern;
           logConfidenceAdjustment(-inflection::kPenaltyIAdjMizenkeiPattern, "i_adj_mizenkei_pattern");
         }
@@ -902,13 +891,11 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // can legitimately end with any hiragana, including a-row characters.
   // Exception: GodanRa with わ-ending stems (終わる, 変わる, 代わる, etc.)
   // These verbs have わ as part of the stem: 終わ + った = 終わった
-  if (required_conn == conn::kVerbOnbinkei && stem_len >= core::kTwoJapaneseCharBytes &&
-      type != VerbType::GodanSa) {
+  if (required_conn == conn::kVerbOnbinkei && stem_len >= core::kTwoJapaneseCharBytes && type != VerbType::GodanSa) {
     std::string_view last = stem.substr(stem_len - core::kJapaneseCharBytes);
     // Skip penalty for GodanRa with わ ending - legitimate pattern for 終わる etc.
     bool is_godan_ra_wa = (type == VerbType::GodanRa && last == "わ");
-    if (!is_godan_ra_wa &&
-        utf8::equalsAny(last, {"か", "が", "さ", "た", "な", "ば", "ま", "ら", "わ"})) {
+    if (!is_godan_ra_wa && utf8::equalsAny(last, {"か", "が", "さ", "た", "な", "ば", "ま", "ら", "わ"})) {
       // Stems ending in a-row are suspicious for onbinkei context
       base -= inflection::kPenaltyOnbinkeiARowStem;
       logConfidenceAdjustment(-inflection::kPenaltyOnbinkeiARowStem, "onbinkei_a_row_stem");
@@ -920,8 +907,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // But stems ending in e-row are almost always Ichidan verb renyokei forms
   // Real Godan onbin: 書いた (書く), 飲んだ (飲む) - stems end in kanji
   // This prevents "伝えいた" from being parsed as GodanKa "伝えく"
-  if (required_conn == conn::kVerbOnbinkei && stem_len >= core::kTwoJapaneseCharBytes &&
-      endsWithERow(stem) && type != VerbType::Ichidan) {
+  if (required_conn == conn::kVerbOnbinkei && stem_len >= core::kTwoJapaneseCharBytes && endsWithERow(stem) &&
+      type != VerbType::Ichidan) {
     // E-row endings are ichidan stems, not godan
     // 伝え, 食べ, 見せ are all ichidan renyokei forms
     base -= inflection::kPenaltyOnbinkeiERowNonIchidan;
@@ -954,9 +941,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
       type != VerbType::IAdjective) {
     // Skip penalty for っ-onbin verbs (GodanWa/Ra/Ta) in onbinkei context
     // These are legitimate Godan verbs, not サ変名詞 misanalyses
-    bool is_tsu_onbin_type = (type == VerbType::GodanWa ||
-                              type == VerbType::GodanRa ||
-                              type == VerbType::GodanTa);
+    bool is_tsu_onbin_type = (type == VerbType::GodanWa || type == VerbType::GodanRa || type == VerbType::GodanTa);
     // GodanSa verbs like 目指す, 見逃す have 2-kanji stems
     // These should NOT be penalized as サ変名詞
     if (type == VerbType::GodanSa) {
@@ -999,8 +984,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Pattern "Xえる" or "Xべる" is much more likely Ichidan than Godan potential base
   if (required_conn == conn::kVerbPotential && stem_len == core::kJapaneseCharBytes &&
       aux_total_len > core::kJapaneseCharBytes && aux_count == 1) {
-    if (type != VerbType::Ichidan && type != VerbType::Suru &&
-        type != VerbType::Kuru) {
+    if (type != VerbType::Ichidan && type != VerbType::Suru && type != VerbType::Kuru) {
       base += inflection::kBonusGodanPotential;
       logConfidenceAdjustment(inflection::kBonusGodanPotential, "godan_potential");
     }
@@ -1022,12 +1006,10 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // The べ/え in "食べ" is part of the Ichidan stem, not a potential suffix
   // Penalty scales with aux_count to handle very long compound patterns
   if (required_conn == conn::kVerbPotential && stem_len == core::kJapaneseCharBytes && aux_count >= 2) {
-    if (type != VerbType::Ichidan && type != VerbType::Suru &&
-        type != VerbType::Kuru) {
+    if (type != VerbType::Ichidan && type != VerbType::Suru && type != VerbType::Kuru) {
       // Scale penalty with compound depth
       float penalty = inflection::kPenaltyPotentialCompoundBase +
-                      inflection::kPenaltyPotentialCompoundPerAux *
-                          static_cast<float>(aux_count - 1);
+                      inflection::kPenaltyPotentialCompoundPerAux * static_cast<float>(aux_count - 1);
       float capped_penalty = std::min(penalty, inflection::kPenaltyPotentialCompoundMax);
       base -= capped_penalty;
       logConfidenceAdjustment(-capped_penalty, "potential_compound");
@@ -1039,8 +1021,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Pattern: 幸いで → 幸いる (WRONG) vs 幸い + で (particle)
   // But: 食べて → 食べる (CORRECT), やって → やる (CORRECT) are valid
   // Only apply to stems ending in "い" which are typically na-adjectives
-  if (type == VerbType::Ichidan && required_conn == conn::kVerbOnbinkei &&
-      aux_count == 1 && aux_total_len == core::kJapaneseCharBytes && stem_len >= core::kTwoJapaneseCharBytes) {
+  if (type == VerbType::Ichidan && required_conn == conn::kVerbOnbinkei && aux_count == 1 &&
+      aux_total_len == core::kJapaneseCharBytes && stem_len >= core::kTwoJapaneseCharBytes) {
     std::string_view last = stem.substr(stem_len - core::kJapaneseCharBytes);
 
     // Stems ending in "い" are likely na-adjectives (幸い, 厄介, etc.)
@@ -1057,8 +1039,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // Pattern: stem ends with kanji + い, often a noun form of a verb
   // Common noun patterns: 間違い (from 間違う), 違い (from 違う), 誤り(異なり)...
   // These should be analyzed as NOUN + ない, not Ichidan verb conjugation
-  if (type == VerbType::Ichidan && required_conn == conn::kVerbMizenkei &&
-      stem_len >= core::kTwoJapaneseCharBytes) {
+  if (type == VerbType::Ichidan && required_conn == conn::kVerbMizenkei && stem_len >= core::kTwoJapaneseCharBytes) {
     std::string_view last = stem.substr(stem_len - core::kJapaneseCharBytes);
     if (last == "い") {
       // Check if the character before い is kanji (common noun pattern)
@@ -1076,8 +1057,7 @@ float calculateConfidence(VerbType type, std::string_view stem,
   // E.g., "読んする" is not valid - 読ん is Godan onbin form, not suru stem
   // Suru verbs don't have onbin forms; the し renyokei is used instead
   // This check applies regardless of kanji/hiragana ending
-  if (type == VerbType::Suru && stem_len >= core::kTwoJapaneseCharBytes &&
-      required_conn == conn::kVerbOnbinkei) {
+  if (type == VerbType::Suru && stem_len >= core::kTwoJapaneseCharBytes && required_conn == conn::kVerbOnbinkei) {
     std::string_view last_char = utf8::lastChar(stem);
     if (utf8::equalsAny(last_char, {"っ", "ん", "い"})) {
       base -= inflection::kPenaltySuruOnbinStemInvalid;
@@ -1103,8 +1083,8 @@ float calculateConfidence(VerbType type, std::string_view stem,
     // aux_len == 6 (ない) or 12 (なかった) with empty verb suffix is invalid
     // aux_len >= 9 with empty suffix is likely valid (された=9, させた=9, etc.)
     bool has_empty_verb_suffix = (suffix_len == aux_total_len);
-    bool is_direct_nai_pattern = has_empty_verb_suffix &&
-        (aux_total_len == 6 || aux_total_len == 12);  // ない or なかった
+    bool is_direct_nai_pattern =
+        has_empty_verb_suffix && (aux_total_len == 6 || aux_total_len == 12);  // ない or なかった
     if (is_direct_nai_pattern) {
       base -= inflection::kPenaltySuruDirectNai;
       logConfidenceAdjustment(-inflection::kPenaltySuruDirectNai, "suru_direct_nai");
@@ -1121,16 +1101,14 @@ float calculateConfidence(VerbType type, std::string_view stem,
     // The "す" suffix pattern is for すべき (classical) only
     // When stem + す = 目指す, this should be GodanSa, not Suru
     // Penalize Suru with 3-byte suffix in kVerbBase context
-    if (type == VerbType::Suru && required_conn == conn::kVerbBase &&
-        suffix_len == core::kJapaneseCharBytes) {
+    if (type == VerbType::Suru && required_conn == conn::kVerbBase && suffix_len == core::kJapaneseCharBytes) {
       // Strong penalty: Suru verbs don't end in just す in base form
       // 勉強する (not 勉強す), 準備する (not 準備す)
       base -= inflection::kPenaltyGodanSaTwoKanji;  // Reuse existing constant
       logConfidenceAdjustment(-inflection::kPenaltyGodanSaTwoKanji, "suru_short_suffix_base");
     }
 
-    bool is_shi_context = (required_conn == conn::kVerbRenyokei ||
-                           required_conn == conn::kVerbOnbinkei);
+    bool is_shi_context = (required_conn == conn::kVerbRenyokei || required_conn == conn::kVerbOnbinkei);
     if (is_shi_context) {
       // Only apply Suru boost for 2-kanji stems (6 bytes)
       // Single-kanji stems (3 bytes) like 出す, 消す are GodanSa

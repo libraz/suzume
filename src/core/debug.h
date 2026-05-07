@@ -30,7 +30,8 @@ class Debug {
   static int getLevel() {
     static const int level = [] {
       const char* env = std::getenv("SUZUME_DEBUG");
-      if (env == nullptr) return 0;
+      if (env == nullptr)
+        return 0;
       int val = std::atoi(env);
       return val > 0 ? val : 1;  // "any value" defaults to 1
     }();
@@ -46,27 +47,27 @@ class Debug {
 
 }  // namespace suzume::core
 
-#define SUZUME_DEBUG_LOG(expr) \
-  do {                         \
+#define SUZUME_DEBUG_LOG(expr)              \
+  do {                                      \
     if (suzume::core::Debug::isEnabled()) { \
-      suzume::core::Debug::log() << expr; \
-    }                          \
+      suzume::core::Debug::log() << expr;   \
+    }                                       \
   } while (0)
 
 // Verbose (level 2+) - cache hits, detailed scoring
-#define SUZUME_DEBUG_LOG_VERBOSE(expr) \
-  do {                         \
+#define SUZUME_DEBUG_LOG_VERBOSE(expr)      \
+  do {                                      \
     if (suzume::core::Debug::isVerbose()) { \
-      suzume::core::Debug::log() << expr; \
-    }                          \
+      suzume::core::Debug::log() << expr;   \
+    }                                       \
   } while (0)
 
 // Trace (level 3+) - all candidates, intermediate steps
-#define SUZUME_DEBUG_LOG_TRACE(expr) \
-  do {                         \
+#define SUZUME_DEBUG_LOG_TRACE(expr)      \
+  do {                                    \
     if (suzume::core::Debug::isTrace()) { \
       suzume::core::Debug::log() << expr; \
-    }                          \
+    }                                     \
   } while (0)
 
 // Additional macros for complex debug blocks
@@ -89,11 +90,16 @@ class Debug {
 // Dummy stream that discards everything (for rare direct stream usage)
 namespace suzume::core {
 struct NullStream {
-  template<typename T>
-  NullStream& operator<<(const T&) { return *this; }
+  template <typename T>
+  NullStream& operator<<(const T&) {
+    return *this;
+  }
   NullStream& operator<<(std::ostream& (*)(std::ostream&)) { return *this; }
 };
-inline NullStream& nullStream() { static NullStream ns; return ns; }
+inline NullStream& nullStream() {
+  static NullStream ns;
+  return ns;
+}
 }  // namespace suzume::core
 #define SUZUME_DEBUG_STREAM suzume::core::nullStream()
 

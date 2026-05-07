@@ -72,8 +72,7 @@ class Analyzer {
    * @param out_lattice Output lattice (if not null)
    * @return Vector of morphemes
    */
-  std::vector<core::Morpheme> analyzeDebug(std::string_view text,
-                                           core::Lattice* out_lattice) const;
+  std::vector<core::Morpheme> analyzeDebug(std::string_view text, core::Lattice* out_lattice) const;
 
   /**
    * @brief Get analysis mode
@@ -90,9 +89,7 @@ class Analyzer {
    *
    * Used for dictionary-aware lemmatization.
    */
-  const dictionary::DictionaryManager& dictionaryManager() const {
-    return dict_manager_;
-  }
+  const dictionary::DictionaryManager& dictionaryManager() const { return dict_manager_; }
 
   dictionary::DictionaryManager& dictionaryManager() { return dict_manager_; }
 
@@ -109,8 +106,7 @@ class Analyzer {
   /**
    * @brief Analyze a chunk with pretokenization (URL/date/etc. extraction)
    */
-  std::vector<core::Morpheme> analyzeWithPretokenizer(std::string_view text,
-                                                      size_t char_offset) const;
+  std::vector<core::Morpheme> analyzeWithPretokenizer(std::string_view text, size_t char_offset) const;
 
   /**
    * @brief Analyze a text span (without pretokenization)
@@ -118,14 +114,12 @@ class Analyzer {
    * For long text, automatically splits into sentence-level chunks
    * to keep memory usage bounded (Viterbi scales O(n) with text length).
    */
-  std::vector<core::Morpheme> analyzeSpan(std::string_view text,
-                                          size_t char_offset) const;
+  std::vector<core::Morpheme> analyzeSpan(std::string_view text, size_t char_offset) const;
 
   /**
    * @brief Analyze a single chunk (no further splitting)
    */
-  std::vector<core::Morpheme> analyzeChunk(std::string_view text,
-                                           size_t char_offset) const;
+  std::vector<core::Morpheme> analyzeChunk(std::string_view text, size_t char_offset) const;
 
   /**
    * @brief Convert Viterbi result to morphemes

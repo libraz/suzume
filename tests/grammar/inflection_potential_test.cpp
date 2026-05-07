@@ -2,9 +2,9 @@
 // Inflection tests: Potential forms, Potential negative/past,
 // Potential + naru, Potential form ambiguity
 
-#include "grammar/inflection.h"
-
 #include <gtest/gtest.h>
+
+#include "grammar/inflection.h"
 
 namespace suzume::grammar {
 namespace {

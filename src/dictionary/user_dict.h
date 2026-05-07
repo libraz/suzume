@@ -1,13 +1,13 @@
 #ifndef SUZUME_DICTIONARY_USER_DICT_H_
 #define SUZUME_DICTIONARY_USER_DICT_H_
 
-#include "core/error.h"
-#include "dictionary/dictionary.h"
-#include "dictionary/trie.h"
-
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "core/error.h"
+#include "dictionary/dictionary.h"
+#include "dictionary/trie.h"
 
 namespace suzume::dictionary {
 
@@ -41,8 +41,7 @@ class UserDictionary : public IDictionary {
    * @param size Data size
    * @return Number of entries on success, error on failure
    */
-  core::Expected<size_t, core::Error> loadFromMemory(const char* data,
-                                                     size_t size);
+  core::Expected<size_t, core::Error> loadFromMemory(const char* data, size_t size);
 
   /**
    * @brief Add a single entry
@@ -57,8 +56,7 @@ class UserDictionary : public IDictionary {
    * @param start_pos Start position (character index)
    * @return Vector of lookup results
    */
-  std::vector<LookupResult> lookup(std::string_view text,
-                                   size_t start_pos) const override;
+  std::vector<LookupResult> lookup(std::string_view text, size_t start_pos) const override;
 
   /**
    * @brief Get entry by ID

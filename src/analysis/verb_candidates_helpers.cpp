@@ -22,14 +22,14 @@ namespace suzume::analysis::verb_helpers {
 // =============================================================================
 
 namespace {
-constexpr char32_t kSingleKanjiIchidanList[] = {
-    U'見', U'居', U'着', U'寝', U'煮', U'似',
-    U'経', U'干', U'射', U'得', U'出', U'鋳'};
+constexpr char32_t kSingleKanjiIchidanList[] = {U'見', U'居', U'着', U'寝', U'煮', U'似',
+                                                U'経', U'干', U'射', U'得', U'出', U'鋳'};
 }  // namespace
 
 bool isSingleKanjiIchidan(char32_t c) {
   for (char32_t k : kSingleKanjiIchidanList) {
-    if (c == k) return true;
+    if (c == k)
+      return true;
   }
   return false;
 }
@@ -38,30 +38,24 @@ bool isSingleKanjiIchidan(char32_t c) {
 // Dictionary Lookup Helpers
 // =============================================================================
 
-bool hasDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
-                        std::string_view surface,
+bool hasDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface,
                         core::PartOfSpeech pos) {
   if (dict_manager == nullptr || surface.empty()) {
     return false;
   }
   auto results = dict_manager->lookup(surface, 0);
   for (const auto& result : results) {
-    if (result.entry != nullptr && result.entry->surface == surface &&
-        result.entry->pos == pos) {
-      SUZUME_DEBUG_LOG_TRACE("[DICT] \"" << surface << "\" ("
-                             << core::posToString(pos) << "/"
-                             << core::extendedPosToString(result.entry->extended_pos)
-                             << ") = FOUND\n");
+    if (result.entry != nullptr && result.entry->surface == surface && result.entry->pos == pos) {
+      SUZUME_DEBUG_LOG_TRACE("[DICT] \"" << surface << "\" (" << core::posToString(pos) << "/"
+                                         << core::extendedPosToString(result.entry->extended_pos) << ") = FOUND\n");
       return true;
     }
   }
-  SUZUME_DEBUG_LOG_TRACE("[DICT] \"" << surface << "\" ("
-                          << core::posToString(pos) << ") = NOT_FOUND\n");
+  SUZUME_DEBUG_LOG_TRACE("[DICT] \"" << surface << "\" (" << core::posToString(pos) << ") = NOT_FOUND\n");
   return false;
 }
 
-bool isVerbInDictionaryWithType(const dictionary::DictionaryManager* dict_manager,
-                                std::string_view base_form,
+bool isVerbInDictionaryWithType(const dictionary::DictionaryManager* dict_manager, std::string_view base_form,
                                 grammar::VerbType verb_type) {
   if (dict_manager == nullptr || base_form.empty()) {
     return false;
@@ -78,23 +72,20 @@ bool isVerbInDictionaryWithType(const dictionary::DictionaryManager* dict_manage
   return false;
 }
 
-bool hasNonVerbDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
-                               std::string_view surface) {
+bool hasNonVerbDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface) {
   if (dict_manager == nullptr) {
     return false;
   }
   auto results = dict_manager->lookup(surface, 0);
   for (const auto& result : results) {
-    if (result.entry != nullptr && result.entry->surface == surface &&
-        result.entry->pos != core::PartOfSpeech::Verb) {
+    if (result.entry != nullptr && result.entry->surface == surface && result.entry->pos != core::PartOfSpeech::Verb) {
       return true;
     }
   }
   return false;
 }
 
-bool hasParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
-                                std::string_view surface) {
+bool hasParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface) {
   if (dict_manager == nullptr) {
     return false;
   }
@@ -114,9 +105,7 @@ bool hasParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manage
 
 void sortCandidatesByCost(std::vector<UnknownCandidate>& candidates) {
   std::sort(candidates.begin(), candidates.end(),
-            [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
-              return lhs.cost < rhs.cost;
-            });
+            [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) { return lhs.cost < rhs.cost; });
 }
 
 // =============================================================================
@@ -125,8 +114,8 @@ void sortCandidatesByCost(std::vector<UnknownCandidate>& candidates) {
 
 bool isEmphaticChar(char32_t c) {
   return c == core::hiragana::kSmallTsu ||  // っ
-         c == U'ッ' ||                       // katakana sokuon
-         c == U'ー' ||                       // chouon
+         c == U'ッ' ||                      // katakana sokuon
+         c == U'ー' ||                      // chouon
          // Small hiragana vowels
          c == U'ぁ' || c == U'ぃ' || c == U'ぅ' || c == U'ぇ' || c == U'ぉ' ||
          // Small katakana vowels
@@ -145,22 +134,28 @@ char32_t getHiraganaVowel(char32_t c) {
   // Vowel table: 'a'/'i'/'u'/'e'/'o' or 0 for no-vowel (ん, っ)
   // Index = codepoint - 0x3041, covers ぁ through ゖ (86 chars)
   static constexpr char kVowelTable[86] = {
-      'a','a','i','i','u','u','e','e','o','o','a','a','i','i','u',  // ぁ-く
-      'u','e','e','o','o','a','a','i','i','u','u','e','e','o','o',  // ぐ-ぞ
-      'a','a','i','i', 0 ,'u','u','e','e','o','o','a','i','u','e',  // た-ね
-      'o','a','a','a','i','i','i','u','u','u','e','e','e','o','o',  // の-ぼ
-      'o','a','i','u','e','o','a','a','u','u','o','o','a','i','u','e',  // ぽ-れ
-      'o','a','a','i','e','o', 0 ,'u','a','e',  // ろ-ゖ
+      'a', 'a', 'i', 'i', 'u', 'u', 'e', 'e', 'o', 'o', 'a', 'a', 'i', 'i', 'u',       // ぁ-く
+      'u', 'e', 'e', 'o', 'o', 'a', 'a', 'i', 'i', 'u', 'u', 'e', 'e', 'o', 'o',       // ぐ-ぞ
+      'a', 'a', 'i', 'i', 0,   'u', 'u', 'e', 'e', 'o', 'o', 'a', 'i', 'u', 'e',       // た-ね
+      'o', 'a', 'a', 'a', 'i', 'i', 'i', 'u', 'u', 'u', 'e', 'e', 'e', 'o', 'o',       // の-ぼ
+      'o', 'a', 'i', 'u', 'e', 'o', 'a', 'a', 'u', 'u', 'o', 'o', 'a', 'i', 'u', 'e',  // ぽ-れ
+      'o', 'a', 'a', 'i', 'e', 'o', 0,   'u', 'a', 'e',                                // ろ-ゖ
   };
 
   char vowel = kVowelTable[c - kHiraganaStart];
   switch (vowel) {
-    case 'a': return U'あ';
-    case 'i': return U'い';
-    case 'u': return U'う';
-    case 'e': return U'え';
-    case 'o': return U'お';
-    default:  return 0;
+    case 'a':
+      return U'あ';
+    case 'i':
+      return U'い';
+    case 'u':
+      return U'う';
+    case 'e':
+      return U'え';
+    case 'o':
+      return U'お';
+    default:
+      return 0;
   }
 }
 
@@ -173,14 +168,12 @@ bool isTeTaFormSokuon(const std::vector<char32_t>& codepoints, size_t sokuon_pos
   return next == core::hiragana::kTe || next == core::hiragana::kTa;
 }
 
-void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
-                         const std::vector<char32_t>& codepoints) {
+void addEmphaticVariants(std::vector<UnknownCandidate>& candidates, const std::vector<char32_t>& codepoints) {
   std::vector<UnknownCandidate> emphatic_variants;
 
   for (const auto& cand : candidates) {
     // Only extend verb and adjective candidates
-    if (cand.pos != core::PartOfSpeech::Verb &&
-        cand.pos != core::PartOfSpeech::Adjective) {
+    if (cand.pos != core::PartOfSpeech::Verb && cand.pos != core::PartOfSpeech::Adjective) {
       continue;
     }
 
@@ -192,8 +185,7 @@ void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
       char32_t c = codepoints[emphatic_end];
       if (isEmphaticChar(c)) {
         // Special case: っ followed by て/た is verb te-form, not emphatic
-        if ((c == core::hiragana::kSmallTsu || c == U'ッ') &&
-            isTeTaFormSokuon(codepoints, emphatic_end)) {
+        if ((c == core::hiragana::kSmallTsu || c == U'ッ') && isTeTaFormSokuon(codepoints, emphatic_end)) {
           break;  // Stop - this is part of a verb, not emphatic
         }
         emphatic_suffix += normalize::encodeUtf8(c);
@@ -216,8 +208,7 @@ void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
         size_t vowel_start = emphatic_end;
 
         // Count consecutive occurrences of the expected vowel
-        while (emphatic_end < codepoints.size() &&
-               codepoints[emphatic_end] == expected_vowel) {
+        while (emphatic_end < codepoints.size() && codepoints[emphatic_end] == expected_vowel) {
           ++vowel_repeat_count;
           ++emphatic_end;
         }
@@ -244,8 +235,7 @@ void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
 
       if (vowel_repeat_count >= 2) {
         // Give a BONUS for vowel repetition to compete with split alternatives
-        float char_count =
-            static_cast<float>(emphatic_suffix.size() / core::kJapaneseCharBytes);
+        float char_count = static_cast<float>(emphatic_suffix.size() / core::kJapaneseCharBytes);
         cost_adjustment = -0.5F + 0.05F * char_count;
       } else {
         // Standard emphatic chars (sokuon/chouon/small vowels) use penalty
@@ -271,10 +261,8 @@ void addEmphaticVariants(std::vector<UnknownCandidate>& candidates,
 
 bool shouldSkipMasuAuxPattern(std::string_view surface, grammar::VerbType verb_type) {
   // Check if surface ends with ます/ました/ましょう/ません
-  bool has_masu_aux = utf8::endsWith(surface, "ましょう") ||
-                      utf8::endsWith(surface, "ました") ||
-                      utf8::endsWith(surface, "ません") ||
-                      utf8::endsWith(surface, "ます");
+  bool has_masu_aux = utf8::endsWith(surface, "ましょう") || utf8::endsWith(surface, "ました") ||
+                      utf8::endsWith(surface, "ません") || utf8::endsWith(surface, "ます");
 
   if (!has_masu_aux) {
     return false;
@@ -282,16 +270,14 @@ bool shouldSkipMasuAuxPattern(std::string_view surface, grammar::VerbType verb_t
 
   // Don't skip suru-verb passive/causative patterns (され, させ)
   bool is_suru_passive_causative =
-      (verb_type == grammar::VerbType::Suru &&
-       utf8::containsAny(surface, {"され", "させ"}));
+      (verb_type == grammar::VerbType::Suru && utf8::containsAny(surface, {"され", "させ"}));
 
   return !is_suru_passive_causative;
 }
 
 bool shouldSkipSouPattern(std::string_view surface, grammar::VerbType verb_type) {
   // Check for そう/そうです/そうだ at end
-  bool has_sou_pattern = utf8::endsWith(surface, "そうです") ||
-                         utf8::endsWith(surface, "そうだ") ||
+  bool has_sou_pattern = utf8::endsWith(surface, "そうです") || utf8::endsWith(surface, "そうだ") ||
                          utf8::endsWith(surface, scorer::kSuffixSou);
 
   // Don't skip i-adjective patterns
@@ -304,33 +290,25 @@ bool isCompoundAdjectivePattern(std::string_view surface) {
   }
   // Check for auxiliary adjective patterns in various conjugation forms
   if (utf8::containsAny(surface, {
-      "にくい", "にくく", "にくか", "にくけ", "にくさ",  // difficult to do
-      "やすい", "やすく", "やすか", "やすけ", "やすさ",  // easy to do
-      "がたい", "がたく", "がたか", "がたけ", "がたさ"   // hard to do
-  })) {
+                                     "にくい", "にくく", "にくか", "にくけ", "にくさ",  // difficult to do
+                                     "やすい", "やすく", "やすか", "やすけ", "やすさ",  // easy to do
+                                     "がたい", "がたく", "がたか", "がたけ", "がたさ"   // hard to do
+                                 })) {
     return true;
   }
   // Also check stem forms at end of surface (e.g., 使いにく for 使いにく+い split)
-  return utf8::endsWith(surface, "にく") ||
-         utf8::endsWith(surface, "やす") ||
-         utf8::endsWith(surface, "がた");
+  return utf8::endsWith(surface, "にく") || utf8::endsWith(surface, "やす") || utf8::endsWith(surface, "がた");
 }
 
 bool containsKuNaruPattern(std::string_view surface) {
-  return surface.find("くなっ") != std::string::npos ||
-         surface.find("くなり") != std::string::npos ||
-         surface.find("くなる") != std::string::npos ||
-         surface.find("くなれ") != std::string::npos;
+  return surface.find("くなっ") != std::string::npos || surface.find("くなり") != std::string::npos ||
+         surface.find("くなる") != std::string::npos || surface.find("くなれ") != std::string::npos;
 }
 
 bool endsWithKuNaruPattern(std::string_view surface) {
-  return utf8::endsWith(surface, "くなる") ||
-         utf8::endsWith(surface, "くなっ") ||
-         utf8::endsWith(surface, "くなり") ||
-         utf8::endsWith(surface, "くなれ") ||
-         utf8::endsWith(surface, "くなら") ||
-         utf8::endsWith(surface, "くなった") ||
-         utf8::endsWith(surface, "くなって");
+  return utf8::endsWith(surface, "くなる") || utf8::endsWith(surface, "くなっ") || utf8::endsWith(surface, "くなり") ||
+         utf8::endsWith(surface, "くなれ") || utf8::endsWith(surface, "くなら") ||
+         utf8::endsWith(surface, "くなった") || utf8::endsWith(surface, "くなって");
 }
 
 bool isGodanVerbType(grammar::VerbType verb_type) {
@@ -339,14 +317,11 @@ bool isGodanVerbType(grammar::VerbType verb_type) {
 }
 
 bool isSokuonbinGodanType(grammar::VerbType verb_type) {
-  return verb_type == grammar::VerbType::GodanRa ||
-         verb_type == grammar::VerbType::GodanTa ||
-         verb_type == grammar::VerbType::GodanWa ||
-         verb_type == grammar::VerbType::GodanKa;
+  return verb_type == grammar::VerbType::GodanRa || verb_type == grammar::VerbType::GodanTa ||
+         verb_type == grammar::VerbType::GodanWa || verb_type == grammar::VerbType::GodanKa;
 }
 
-std::vector<std::pair<grammar::VerbType, std::string_view>>
-getGodanTypesByOnbin(std::string_view onbin) {
+std::vector<std::pair<grammar::VerbType, std::string_view>> getGodanTypesByOnbin(std::string_view onbin) {
   // Build lookup table on first access (thread-safe in C++11+)
   // Maps onbin pattern → vector of (VerbType, base_suffix) pairs
   static const auto kOnbinLookup = []() {
@@ -383,12 +358,8 @@ bool shouldSkipPassiveAuxPattern(std::string_view surface, grammar::VerbType ver
   }
 
   // Passive patterns: れる, れた, れて, れない, れます, れたい, れたく
-  return utf8::endsWith(surface, "れる") ||
-         utf8::endsWith(surface, "れた") ||
-         utf8::endsWith(surface, "れて") ||
-         utf8::endsWith(surface, "れない") ||
-         utf8::endsWith(surface, "れます") ||
-         utf8::endsWith(surface, "れたい") ||
+  return utf8::endsWith(surface, "れる") || utf8::endsWith(surface, "れた") || utf8::endsWith(surface, "れて") ||
+         utf8::endsWith(surface, "れない") || utf8::endsWith(surface, "れます") || utf8::endsWith(surface, "れたい") ||
          utf8::endsWith(surface, "れたく");
 }
 
@@ -400,18 +371,14 @@ bool shouldSkipCausativeAuxPattern(std::string_view surface, grammar::VerbType v
 
   // Godan causative: せる, せた, せて
   if (isGodanVerbType(verb_type)) {
-    return utf8::endsWith(surface, "せる") ||
-           utf8::endsWith(surface, "せた") ||
-           utf8::endsWith(surface, "せて");
+    return utf8::endsWith(surface, "せる") || utf8::endsWith(surface, "せた") || utf8::endsWith(surface, "せて");
   }
 
   // Causative-passive patterns for all verb types (including Ichidan)
   // E.g., 聞かせられた → 聞か + せ + られ + た (MeCab-compatible split)
   // These look like Ichidan verbs but contain causative+passive auxiliary chain
-  if (utf8::endsWith(surface, "せられる") ||
-      utf8::endsWith(surface, "せられた") ||
-      utf8::endsWith(surface, "せられて") ||
-      utf8::endsWith(surface, "せられない")) {
+  if (utf8::endsWith(surface, "せられる") || utf8::endsWith(surface, "せられた") ||
+      utf8::endsWith(surface, "せられて") || utf8::endsWith(surface, "せられない")) {
     return true;
   }
   return false;
@@ -426,45 +393,34 @@ bool shouldSkipSuruVerbAuxPattern(std::string_view surface, size_t kanji_count) 
   // Check for suru-verb auxiliary suffixes
   static const std::vector<std::string_view> kSuruAuxSuffixes = {
       // Basic conjugations
-      "して", "した", "しない", "します", "しました", "しません",
-      "している", "していた", "していない", "しています", "していました",
-      "したい", "しよう", "しろ", "せよ", "すれば", "しそう",
-      "しなかった", "しませんでした",
+      "して", "した", "しない", "します", "しました", "しません", "している", "していた", "していない", "しています",
+      "していました", "したい", "しよう", "しろ", "せよ", "すれば", "しそう", "しなかった", "しませんでした",
       // Negative te-form
       "しなくて", "しないで", "しなく",
       // Conditional/conjunctive forms
       "しなければ", "しながら", "しつつ", "したら", "しましたら",
       // Colloquial contractions
-      "しちゃう", "しちゃった", "しちゃって", "しちゃいます",
-      "しちまう", "しちまった", "しちまって",
-      "しとく", "しといた", "しといて", "しときます",
-      "してる", "してた", "してます", "してました",
+      "しちゃう", "しちゃった", "しちゃって", "しちゃいます", "しちまう", "しちまった", "しちまって", "しとく",
+      "しといた", "しといて", "しときます", "してる", "してた", "してます", "してました",
       // te-form + subsidiary verbs
-      "してみる", "していく", "してくる", "してもらう", "してあげる",
-      "してしまう", "してくれる", "してほしい", "してください", "してくれます",
-      "してあります", "しておきます", "しておく",
+      "してみる", "していく", "してくる", "してもらう", "してあげる", "してしまう", "してくれる", "してほしい",
+      "してください", "してくれます", "してあります", "しておきます", "しておく",
       // Subsidiary verbs past/te-forms
-      "してみた", "してみて", "していった", "していって",
-      "してきた", "してきて", "してもらった", "してもらって",
-      "してあげた", "してあげて", "してくれた", "してくれて",
-      "してしまった", "してしまって", "しておいた", "しておいて",
+      "してみた", "してみて", "していった", "していって", "してきた", "してきて", "してもらった", "してもらって",
+      "してあげた", "してあげて", "してくれた", "してくれて", "してしまった", "してしまって", "しておいた",
+      "しておいて",
       // Progressive forms of subsidiary verbs
-      "してもらっている", "してもらっていた", "してもらっています",
-      "してあげている", "してあげていた", "してあげています",
-      "してくれている", "してくれていた", "してくれています",
-      "していっている", "していっていた",
+      "してもらっている", "してもらっていた", "してもらっています", "してあげている", "してあげていた",
+      "してあげています", "してくれている", "してくれていた", "してくれています", "していっている", "していっていた",
       "してきている", "してきていた", "してきています",
       // Passive forms (される conjugations)
-      "される", "された", "されない", "されます", "されました",
-      "されている", "されていた", "されています", "されていました",
-      "されて", "されれば", "されたら",
+      "される", "された", "されない", "されます", "されました", "されている", "されていた", "されています",
+      "されていました", "されて", "されれば", "されたら",
       // Causative forms (させる conjugations)
-      "させる", "させた", "させない", "させます", "させました",
-      "させている", "させていた", "させています",
-      "させて", "させれば", "させたら",
+      "させる", "させた", "させない", "させます", "させました", "させている", "させていた", "させています", "させて",
+      "させれば", "させたら",
       // Causative-passive forms
-      "させられる", "させられた", "させられて", "させられます"
-  };
+      "させられる", "させられた", "させられて", "させられます"};
 
   for (const auto& suffix : kSuruAuxSuffixes) {
     if (utf8::endsWith(surface, suffix) && surface.size() > suffix.size()) {

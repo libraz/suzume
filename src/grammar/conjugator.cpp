@@ -16,11 +16,11 @@ namespace {
 
 // Godan row data
 struct GodanRow {
-  char32_t base_char;   // 終止形: く
-  char32_t a_row;       // 未然形: か
-  char32_t i_row;       // 連用形: き
-  std::string onbin;    // 音便: い, っ, ん
-  bool voiced;          // た→だ
+  char32_t base_char;  // 終止形: く
+  char32_t a_row;      // 未然形: か
+  char32_t i_row;      // 連用形: き
+  std::string onbin;   // 音便: い, っ, ん
+  bool voiced;         // た→だ
 };
 
 const GodanRow* getGodanRow(VerbType type) {
@@ -47,8 +47,7 @@ const GodanRow* getGodanRow(VerbType type) {
 
 Conjugator::Conjugator() = default;
 
-std::string Conjugator::getStem(const std::string& base_form,
-                                VerbType type) const {
+std::string Conjugator::getStem(const std::string& base_form, VerbType type) const {
   return conjugation_.getStem(base_form, type);
 }
 
@@ -56,8 +55,7 @@ VerbType Conjugator::detectType(const std::string& base_form) const {
   return conjugation_.detectType(base_form);
 }
 
-std::vector<StemForm> Conjugator::generateStems(const std::string& base_form,
-                                                VerbType type) const {
+std::vector<StemForm> Conjugator::generateStems(const std::string& base_form, VerbType type) const {
   std::string stem = getStem(base_form, type);
 
   // Get base suffix (e.g., く for GodanKa)
@@ -92,9 +90,8 @@ std::vector<StemForm> Conjugator::generateStems(const std::string& base_form,
   }
 }
 
-std::vector<StemForm> Conjugator::generateGodanStems(
-    const std::string& stem, const std::string& base_form,
-    VerbType type) const {
+std::vector<StemForm> Conjugator::generateGodanStems(const std::string& stem, const std::string& base_form,
+                                                     VerbType type) const {
   std::vector<StemForm> forms;
   const auto* row = getGodanRow(type);
   if (row == nullptr) {
@@ -125,8 +122,7 @@ std::vector<StemForm> Conjugator::generateGodanStems(
   return forms;
 }
 
-std::vector<StemForm> Conjugator::generateIchidanStems(
-    const std::string& stem, const std::string& base_form) const {
+std::vector<StemForm> Conjugator::generateIchidanStems(const std::string& stem, const std::string& base_form) const {
   std::vector<StemForm> forms;
   VerbType type = VerbType::Ichidan;
 
@@ -142,8 +138,7 @@ std::vector<StemForm> Conjugator::generateIchidanStems(
   return forms;
 }
 
-std::vector<StemForm> Conjugator::generateSuruStems(
-    const std::string& stem, const std::string& base_form) const {
+std::vector<StemForm> Conjugator::generateSuruStems(const std::string& stem, const std::string& base_form) const {
   std::vector<StemForm> forms;
   VerbType type = VerbType::Suru;
 
@@ -156,8 +151,7 @@ std::vector<StemForm> Conjugator::generateSuruStems(
   return forms;
 }
 
-std::vector<StemForm> Conjugator::generateKuruStems(
-    const std::string& stem, const std::string& base_form) const {
+std::vector<StemForm> Conjugator::generateKuruStems(const std::string& stem, const std::string& base_form) const {
   std::vector<StemForm> forms;
   VerbType type = VerbType::Kuru;
 

@@ -64,7 +64,7 @@ struct InflectionScorerOptions {
   float penalty_godan_te_stem = std::numeric_limits<float>::quiet_NaN();
 
   /// Helper to get value with fallback to constant
-  template<typename T>
+  template <typename T>
   static float getOrDefault(float opt_val, T const_val) {
     return std::isnan(opt_val) ? static_cast<float>(const_val) : opt_val;
   }
@@ -92,10 +92,8 @@ struct InflectionScorerOptions {
  * - Context-specific patterns (onbin, mizenkei, renyokei)
  * - Disambiguation between similar patterns (Suru vs GodanSa)
  */
-float calculateConfidence(VerbType type, std::string_view stem,
-                          size_t aux_total_len, size_t aux_count,
-                          uint16_t required_conn, size_t suffix_len,
-                          const InflectionScorerOptions* opts = nullptr);
+float calculateConfidence(VerbType type, std::string_view stem, size_t aux_total_len, size_t aux_count,
+                          uint16_t required_conn, size_t suffix_len, const InflectionScorerOptions* opts = nullptr);
 
 }  // namespace suzume::grammar
 

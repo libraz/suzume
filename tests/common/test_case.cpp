@@ -5,20 +5,34 @@
 namespace suzume::test {
 
 core::PartOfSpeech ExpectedMorpheme::posEnum() const {
-  if (pos == "Noun") return core::PartOfSpeech::Noun;
-  if (pos == "Verb") return core::PartOfSpeech::Verb;
-  if (pos == "Adjective") return core::PartOfSpeech::Adjective;
-  if (pos == "Adverb") return core::PartOfSpeech::Adverb;
-  if (pos == "Particle") return core::PartOfSpeech::Particle;
-  if (pos == "Auxiliary") return core::PartOfSpeech::Auxiliary;
-  if (pos == "Conjunction") return core::PartOfSpeech::Conjunction;
-  if (pos == "Determiner") return core::PartOfSpeech::Determiner;
-  if (pos == "Pronoun") return core::PartOfSpeech::Pronoun;
-  if (pos == "Prefix") return core::PartOfSpeech::Prefix;
-  if (pos == "Suffix") return core::PartOfSpeech::Suffix;
-  if (pos == "Symbol") return core::PartOfSpeech::Symbol;
-  if (pos == "Other") return core::PartOfSpeech::Other;
-  if (pos == "Interjection") return core::PartOfSpeech::Interjection;
+  if (pos == "Noun")
+    return core::PartOfSpeech::Noun;
+  if (pos == "Verb")
+    return core::PartOfSpeech::Verb;
+  if (pos == "Adjective")
+    return core::PartOfSpeech::Adjective;
+  if (pos == "Adverb")
+    return core::PartOfSpeech::Adverb;
+  if (pos == "Particle")
+    return core::PartOfSpeech::Particle;
+  if (pos == "Auxiliary")
+    return core::PartOfSpeech::Auxiliary;
+  if (pos == "Conjunction")
+    return core::PartOfSpeech::Conjunction;
+  if (pos == "Determiner")
+    return core::PartOfSpeech::Determiner;
+  if (pos == "Pronoun")
+    return core::PartOfSpeech::Pronoun;
+  if (pos == "Prefix")
+    return core::PartOfSpeech::Prefix;
+  if (pos == "Suffix")
+    return core::PartOfSpeech::Suffix;
+  if (pos == "Symbol")
+    return core::PartOfSpeech::Symbol;
+  if (pos == "Other")
+    return core::PartOfSpeech::Other;
+  if (pos == "Interjection")
+    return core::PartOfSpeech::Interjection;
   return core::PartOfSpeech::Unknown;
 }
 

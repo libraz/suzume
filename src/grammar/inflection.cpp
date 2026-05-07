@@ -18,22 +18,17 @@ namespace {
 
 // Check if auxiliary starts with voiced te-form (で/だ)
 inline bool isVoicedAux(std::string_view aux) {
-  return utf8::equalsAny(aux, {"で", "だ"}) ||
-         utf8::startsWith(aux, "で") ||
-         utf8::startsWith(aux, "だ");
+  return utf8::equalsAny(aux, {"で", "だ"}) || utf8::startsWith(aux, "で") || utf8::startsWith(aux, "だ");
 }
 
 // Check if auxiliary starts with unvoiced te-form (て/た)
 inline bool isUnvoicedAux(std::string_view aux) {
-  return utf8::equalsAny(aux, {"て", "た"}) ||
-         utf8::startsWith(aux, "て") ||
-         utf8::startsWith(aux, "た");
+  return utf8::equalsAny(aux, {"て", "た"}) || utf8::startsWith(aux, "て") || utf8::startsWith(aux, "た");
 }
 
 }  // namespace
 
-std::vector<std::pair<const AuxiliaryEntry*, size_t>>
-Inflection::matchAuxiliaries(std::string_view surface) const {
+std::vector<std::pair<const AuxiliaryEntry*, size_t>> Inflection::matchAuxiliaries(std::string_view surface) const {
   std::vector<std::pair<const AuxiliaryEntry*, size_t>> matches;
   matches.reserve(8);  // Typical max matches
   const auto& auxiliaries = getAuxiliaries();
@@ -43,11 +38,10 @@ Inflection::matchAuxiliaries(std::string_view surface) const {
       size_t start = surface.size() - aux.surface.size();
       if (surface.substr(start) == aux.surface) {
         matches.emplace_back(&aux, aux.surface.size());
-        SUZUME_DEBUG_LOG_TRACE("  [AUX MATCH] \"" << surface << "\" ends with \""
-                         << aux.surface << "\" (lemma=" << aux.lemma
-                         << ", left_id=0x" << std::hex << aux.left_id
-                         << ", right_id=0x" << aux.right_id
-                         << ", requires=0x" << aux.required_conn << std::dec << ")\n");
+        SUZUME_DEBUG_LOG_TRACE("  [AUX MATCH] \"" << surface << "\" ends with \"" << aux.surface
+                                                  << "\" (lemma=" << aux.lemma << ", left_id=0x" << std::hex
+                                                  << aux.left_id << ", right_id=0x" << aux.right_id << ", requires=0x"
+                                                  << aux.required_conn << std::dec << ")\n");
       }
     }
   }
@@ -55,10 +49,9 @@ Inflection::matchAuxiliaries(std::string_view surface) const {
   return matches;
 }
 
-std::vector<InflectionCandidate> Inflection::matchVerbStem(
-    std::string_view remaining,
-    const std::vector<std::string>& aux_chain,
-    uint16_t required_conn) const {
+std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view remaining,
+                                                           const std::vector<std::string>& aux_chain,
+                                                           uint16_t required_conn) const {
   std::vector<InflectionCandidate> candidates;
   candidates.reserve(16);  // Typical max candidates
   const auto& endings_by_conn = getVerbEndingsByConn();
@@ -100,12 +93,10 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // Valid Suru patterns require non-empty suffix (し, さ) to connect to aux
       if (stem.size() < core::kJapaneseCharBytes &&
           !(ending.verb_type == VerbType::Suru &&
-            (ending.suffix == "す" || ending.suffix == "し" ||
-             ending.suffix == "しろ" || ending.suffix == "せよ" ||
+            (ending.suffix == "す" || ending.suffix == "し" || ending.suffix == "しろ" || ending.suffix == "せよ" ||
              ending.suffix == "すれ")) &&
           !(ending.verb_type == VerbType::Kuru &&
-            (ending.suffix == "こ" || ending.suffix == "き" ||
-             ending.suffix == "こい" || ending.suffix == "くれ"))) {
+            (ending.suffix == "こ" || ending.suffix == "き" || ending.suffix == "こい" || ending.suffix == "くれ"))) {
         continue;
       }
 
@@ -113,8 +104,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // (prevents "書いて" from being parsed as Ichidan "書いてる")
       // Exception: Allow standalone renyokei matching for verb + AUX patterns
       // (e.g., 食べ + ます, 見 + ましょう) - these connect to dictionary AUX
-      if (ending.suffix.empty() && aux_chain.empty() &&
-          ending.verb_type == VerbType::Ichidan &&
+      if (ending.suffix.empty() && aux_chain.empty() && ending.verb_type == VerbType::Ichidan &&
           required_conn != conn::kVerbRenyokei) {
         continue;
       }
@@ -130,14 +120,12 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // Reject i-adjective stems ending in だ (copula)
       // No valid i-adjective stem ends in だ - it's always noun+copula
       // This prevents 教師だそうだ → 教師だい (false i-adj match)
-      if (ending.verb_type == VerbType::IAdjective &&
-          utf8::endsWith(stem, "だ")) {
+      if (ending.verb_type == VerbType::IAdjective && utf8::endsWith(stem, "だ")) {
         continue;
       }
 
       // Validate irregular いく pattern: GodanKa with っ-onbin only valid for い/行
-      if (ending.verb_type == VerbType::GodanKa && ending.suffix == "っ" &&
-          ending.is_onbin) {
+      if (ending.verb_type == VerbType::GodanKa && ending.suffix == "っ" && ending.is_onbin) {
         if (stem != "い" && stem != "行") {
           continue;  // Skip invalid irregular pattern
         }
@@ -210,16 +198,13 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
         if (stem.size() >= core::kJapaneseCharBytes) {
           std::string_view last_char = utf8::lastChar(stem);
           // These hiragana at the end of stem indicate a particle or non-suru pattern
-          if (utf8::equalsAny(last_char, {
-              "で", "に", "を", "が", "は", "も", "と", "へ", "か", "や", "の"
-          })) {
+          if (utf8::equalsAny(last_char, {"で", "に", "を", "が", "は", "も", "と", "へ", "か", "や", "の"})) {
             invalid_stem = true;
           }
           // Reject suru stems containing て/で (te-form markers) anywhere in longer stems
           // E.g., "基づいて処理" should be 基づいて(verb) + 処理する, not a single suru verb
           // This check applies to stems >= 9 bytes (3+ characters) to avoid false positives
-          if (stem.size() >= core::kThreeJapaneseCharBytes &&
-              utf8::containsAny(stem, {"て", "で"})) {
+          if (stem.size() >= core::kThreeJapaneseCharBytes && utf8::containsAny(stem, {"て", "で"})) {
             invalid_stem = true;
           }
           // For empty suffix suru patterns (e.g., 開催+された), the stem must
@@ -230,15 +215,13 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
             // Check if last character is hiragana (verb conjugation suffix)
             // A-row: あ か が さ た な は ば ま ら わ
             // These are common mizenkei endings for godan verbs
-            if (utf8::equalsAny(last_char,
-                {"あ", "か", "が", "さ", "た", "な", "ば", "ま", "ら", "わ"})) {
+            if (utf8::equalsAny(last_char, {"あ", "か", "が", "さ", "た", "な", "ば", "ま", "ら", "わ"})) {
               invalid_stem = true;
             }
             // E-row: け げ せ て ね べ め れ え
             // These are common potential stems or Ichidan stem endings
             // This prevents 話せ + なくなった → 話せする (wrong)
-            if (utf8::equalsAny(last_char,
-                {"け", "げ", "せ", "て", "ね", "べ", "め", "れ", "え"})) {
+            if (utf8::equalsAny(last_char, {"け", "げ", "せ", "て", "ね", "べ", "め", "れ", "え"})) {
               invalid_stem = true;
             }
             // Single-kanji stems are NOT valid for empty suffix suru patterns
@@ -274,15 +257,13 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       candidate.stem = stem;
       candidate.suffix = suffix_str;
       candidate.verb_type = actual_verb_type;  // Use remapped type for 来→Kuru
-      candidate.confidence = calculateConfidence(
-          actual_verb_type, stem, aux_total_len, aux_chain.size(), required_conn,
-          suffix_str.size());
+      candidate.confidence = calculateConfidence(actual_verb_type, stem, aux_total_len, aux_chain.size(), required_conn,
+                                                 suffix_str.size());
 
       // Ichidan verbs use て/た for te/ta-form, NOT で/だ
       // で/だ are only used for 撥音便 Godan verbs (読む→読んで/読んだ, 遊ぶ→遊んで/遊んだ)
       // Penalize Ichidan + で/だ combinations heavily
-      if (actual_verb_type == VerbType::Ichidan &&
-          suffix_str.size() >= core::kJapaneseCharBytes) {
+      if (actual_verb_type == VerbType::Ichidan && suffix_str.size() >= core::kJapaneseCharBytes) {
         // Use string_view::substr to avoid creating temporary std::string
         std::string_view suffix_view(suffix_str);
         std::string_view first_char = suffix_view.substr(0, core::kJapaneseCharBytes);
@@ -295,21 +276,19 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       // Contracted progressive past: 見てた, 食べてた should split as 見+て+た, 食べ+て+た
       // MeCab splits these, so penalize single-token analysis with suffix starting with てた/でた
       // This ensures 見 + て(VERB) + た(AUX) path wins over 見てた(VERB)
-      if (actual_verb_type == VerbType::Ichidan &&
-          suffix_str.size() >= core::kTwoJapaneseCharBytes) {
+      if (actual_verb_type == VerbType::Ichidan && suffix_str.size() >= core::kTwoJapaneseCharBytes) {
         // Use starts_with for safer comparison
         if (suffix_str.rfind("てた", 0) == 0 || suffix_str.rfind("でた", 0) == 0) {
           candidate.confidence -= inflection::kPenaltyIchidanContractedProgressivePast;
           SUZUME_DEBUG_LOG_VERBOSE("  ichidan_contracted_progressive_past: -"
-                            << inflection::kPenaltyIchidanContractedProgressivePast << "\n");
+                                   << inflection::kPenaltyIchidanContractedProgressivePast << "\n");
         }
       }
 
       // Contracted progressive verb stem (〜て/〜で ending as stem of 〜てる/〜でる)
       // 見て + た → base=見てる is wrong; should be 見 + て + た
       // Penalize stems ending in て/で that are analyzed as 〜てる/〜でる conjugations
-      if (actual_verb_type == VerbType::Ichidan &&
-          stem.size() >= core::kTwoJapaneseCharBytes) {
+      if (actual_verb_type == VerbType::Ichidan && stem.size() >= core::kTwoJapaneseCharBytes) {
         // Check last character of stem (use std::string_view on stem directly)
         std::string_view stem_view(stem);
         std::string_view stem_end = stem_view.substr(stem_view.size() - core::kJapaneseCharBytes);
@@ -318,7 +297,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
           // These stems (見て, 食べて) are te-forms, not contracted progressive stems
           candidate.confidence -= inflection::kPenaltyIchidanContractedProgressivePast;
           SUZUME_DEBUG_LOG_VERBOSE("  ichidan_contracted_progressive_stem: -"
-                            << inflection::kPenaltyIchidanContractedProgressivePast << "\n");
+                                   << inflection::kPenaltyIchidanContractedProgressivePast << "\n");
         }
       }
 
@@ -329,8 +308,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
       if (suffix_str.size() >= core::kTwoJapaneseCharBytes) {
         std::string_view suffix_view(suffix_str);
         // Check if suffix ends with てる, てた, でる, でた
-        std::string_view suffix_end = suffix_view.substr(
-            suffix_view.size() - core::kTwoJapaneseCharBytes);
+        std::string_view suffix_end = suffix_view.substr(suffix_view.size() - core::kTwoJapaneseCharBytes);
         if (utf8::equalsAny(suffix_end, {"てる", "てた", "でる", "でた"})) {
           candidate.confidence -= 0.8F;  // Strong penalty to prefer split
           SUZUME_DEBUG_LOG_VERBOSE("  contracted_progressive_ending: -0.8\n");
@@ -339,11 +317,9 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
 
       candidate.morphemes = aux_chain;
 
-      SUZUME_DEBUG_LOG_TRACE("  [STEM MATCH] \"" << remaining << "\" → base=\""
-                        << base_form << "\" stem=\"" << stem
-                        << "\" type=" << static_cast<int>(actual_verb_type)
-                        << " suffix=\"" << suffix_str
-                        << "\" conf=" << candidate.confidence << "\n");
+      SUZUME_DEBUG_LOG_TRACE("  [STEM MATCH] \"" << remaining << "\" → base=\"" << base_form << "\" stem=\"" << stem
+                                                 << "\" type=" << static_cast<int>(actual_verb_type) << " suffix=\""
+                                                 << suffix_str << "\" conf=" << candidate.confidence << "\n");
 
       candidates.push_back(std::move(candidate));
     }
@@ -352,10 +328,9 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(
   return candidates;
 }
 
-std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(
-    std::string_view surface,
-    std::vector<std::string>& aux_chain,
-    uint16_t required_conn) const {
+std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(std::string_view surface,
+                                                                    std::vector<std::string>& aux_chain,
+                                                                    uint16_t required_conn) const {
   std::vector<InflectionCandidate> candidates;
   candidates.reserve(32);  // Typical max candidates
 
@@ -372,8 +347,7 @@ std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(
     std::string_view remaining = surface.substr(0, surface.size() - len);
     aux_chain.push_back(aux->surface);
 
-    auto sub_candidates = analyzeWithAuxiliaries(
-        remaining, aux_chain, aux->required_conn);
+    auto sub_candidates = analyzeWithAuxiliaries(remaining, aux_chain, aux->required_conn);
     for (auto& cand : sub_candidates) {
       candidates.push_back(std::move(cand));
     }
@@ -390,14 +364,13 @@ std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(
   return candidates;
 }
 
-const std::vector<InflectionCandidate>& Inflection::analyze(
-    std::string_view surface) const {
+const std::vector<InflectionCandidate>& Inflection::analyze(std::string_view surface) const {
   // Check cache first
   std::string key(surface);
   auto cache_iter = cache_.find(key);
   if (cache_iter != cache_.end()) {
-    SUZUME_DEBUG_LOG_TRACE("[INFLECTION] \"" << surface << "\" (cached, "
-                      << cache_iter->second.size() << " candidates)\n");
+    SUZUME_DEBUG_LOG_TRACE("[INFLECTION] \"" << surface << "\" (cached, " << cache_iter->second.size()
+                                             << " candidates)\n");
     return cache_iter->second;
   }
 
@@ -420,8 +393,7 @@ const std::vector<InflectionCandidate>& Inflection::analyze(
     std::string_view remaining = surface.substr(0, surface.size() - len);
     std::vector<std::string> aux_chain{aux->surface};
 
-    auto sub_candidates = analyzeWithAuxiliaries(
-        remaining, aux_chain, aux->required_conn);
+    auto sub_candidates = analyzeWithAuxiliaries(remaining, aux_chain, aux->required_conn);
     for (auto& cand : sub_candidates) {
       candidates.push_back(std::move(cand));
     }
@@ -434,8 +406,7 @@ const std::vector<InflectionCandidate>& Inflection::analyze(
       "んだ", "のだ", "んです", "のです", "んだもの", "んだもん",
   };
   for (const auto& suffix : kExplanatorySuffixes) {
-    if (surface.size() > suffix.size() &&
-        surface.substr(surface.size() - suffix.size()) == suffix) {
+    if (surface.size() > suffix.size() && surface.substr(surface.size() - suffix.size()) == suffix) {
       auto remaining = surface.substr(0, surface.size() - suffix.size());
       // Recursively analyze what's left (it should be a verb in base form)
       const auto& sub = analyze(remaining);
@@ -473,14 +444,11 @@ const std::vector<InflectionCandidate>& Inflection::analyze(
   // - Suru (しろ, せよ): する conditional is すれば (no overlap)
   // - Ichidan (食べろ, 起きろ): conditional is 食べれば (no ろ/よ forms)
   // - Kuru (こい): くる conditional is くれば (no overlap)
-  auto meireikei_candidates =
-      matchVerbStem(surface, {}, conn::kVerbMeireikei);
+  auto meireikei_candidates = matchVerbStem(surface, {}, conn::kVerbMeireikei);
   for (auto& cand : meireikei_candidates) {
     // Include Suru, Ichidan, and Kuru imperatives (safe patterns)
     // Exclude Godan imperatives to avoid conditional form regression
-    if (cand.verb_type == VerbType::Suru ||
-        cand.verb_type == VerbType::Ichidan ||
-        cand.verb_type == VerbType::Kuru) {
+    if (cand.verb_type == VerbType::Suru || cand.verb_type == VerbType::Ichidan || cand.verb_type == VerbType::Kuru) {
       candidates.push_back(std::move(cand));
     }
   }
@@ -491,34 +459,28 @@ const std::vector<InflectionCandidate>& Inflection::analyze(
   // Sort by confidence (descending)
   // Use stable_sort to preserve the original order for candidates with equal
   // confidence. This ensures consistent behavior regardless of pattern count.
-  std::stable_sort(candidates.begin(), candidates.end(),
-                   [](const InflectionCandidate& lhs,
-                      const InflectionCandidate& rhs) {
-                     return lhs.confidence > rhs.confidence;
-                   });
+  std::stable_sort(
+      candidates.begin(), candidates.end(),
+      [](const InflectionCandidate& lhs, const InflectionCandidate& rhs) { return lhs.confidence > rhs.confidence; });
 
   // Remove duplicates (same base_form and verb_type)
-  auto dup_end = std::unique(
-      candidates.begin(), candidates.end(),
-      [](const InflectionCandidate& lhs, const InflectionCandidate& rhs) {
-        return lhs.base_form == rhs.base_form && lhs.verb_type == rhs.verb_type;
-      });
+  auto dup_end = std::unique(candidates.begin(), candidates.end(),
+                             [](const InflectionCandidate& lhs, const InflectionCandidate& rhs) {
+                               return lhs.base_form == rhs.base_form && lhs.verb_type == rhs.verb_type;
+                             });
   candidates.erase(dup_end, candidates.end());
 
   // Debug: print final candidates (level 1: top candidate only, level 2: all)
   SUZUME_DEBUG_IF(!candidates.empty() && candidates[0].confidence >= 0.5F) {
-    SUZUME_DEBUG_STREAM << "[INFLECTION] \"" << surface << "\" → "
-                        << candidates[0].base_form << " ("
-                        << verbTypeToString(candidates[0].verb_type)
-                        << ", conf=" << candidates[0].confidence << ")\n";
+    SUZUME_DEBUG_STREAM << "[INFLECTION] \"" << surface << "\" → " << candidates[0].base_form << " ("
+                        << verbTypeToString(candidates[0].verb_type) << ", conf=" << candidates[0].confidence << ")\n";
   }
   SUZUME_DEBUG_TRACE_BLOCK {
     if (!candidates.empty()) {
       SUZUME_DEBUG_STREAM << "[INFLECTION] Full results for \"" << surface << "\":\n";
       for (size_t i = 0; i < candidates.size() && i < 5; ++i) {
         const auto& c = candidates[i];
-        SUZUME_DEBUG_STREAM << "  " << (i + 1) << ". base=\"" << c.base_form
-                            << "\" " << verbTypeToString(c.verb_type)
+        SUZUME_DEBUG_STREAM << "  " << (i + 1) << ". base=\"" << c.base_form << "\" " << verbTypeToString(c.verb_type)
                             << " conf=" << c.confidence << "\n";
       }
       if (candidates.size() > 5) {

@@ -68,11 +68,11 @@ constexpr char32_t kRe = U'れ';  // れ (0x308C)
 constexpr char32_t kRu = U'る';  // る (0x308B)
 
 // Te/ta forms
-constexpr char32_t kTe = U'て';  // て (0x3066)
-constexpr char32_t kTa = U'た';  // た (0x305F)
-constexpr char32_t kDe = U'で';  // で (0x3067)
-constexpr char32_t kDa = U'だ';  // だ (0x3060)
-constexpr char32_t kTo = U'と';  // と (0x3068)
+constexpr char32_t kTe = U'て';   // て (0x3066)
+constexpr char32_t kTa = U'た';   // た (0x305F)
+constexpr char32_t kDe = U'で';   // で (0x3067)
+constexpr char32_t kDa = U'だ';   // だ (0x3060)
+constexpr char32_t kTo = U'と';   // と (0x3068)
 constexpr char32_t kChi = U'ち';  // ち (0x3061)
 
 // Sokuon (促音)
@@ -107,25 +107,22 @@ constexpr char32_t kSe = U'せ';  // せ (0x305B)
 namespace utf8 {
 
 using suzume::core::kJapaneseCharBytes;
-using suzume::core::kTwoJapaneseCharBytes;
 using suzume::core::kThreeJapaneseCharBytes;
+using suzume::core::kTwoJapaneseCharBytes;
 
 /// Check if string ends with the given suffix
 /// @param s The string to check
 /// @param suffix The suffix to look for
 /// @return true if s ends with suffix
-[[nodiscard]] inline constexpr bool endsWith(std::string_view s,
-                                              std::string_view suffix) noexcept {
-  return s.size() >= suffix.size() &&
-         s.substr(s.size() - suffix.size()) == suffix;
+[[nodiscard]] inline constexpr bool endsWith(std::string_view s, std::string_view suffix) noexcept {
+  return s.size() >= suffix.size() && s.substr(s.size() - suffix.size()) == suffix;
 }
 
 /// Check if string starts with the given prefix
 /// @param s The string to check
 /// @param prefix The prefix to look for
 /// @return true if s starts with prefix
-[[nodiscard]] inline constexpr bool startsWith(std::string_view s,
-                                                std::string_view prefix) noexcept {
+[[nodiscard]] inline constexpr bool startsWith(std::string_view s, std::string_view prefix) noexcept {
   return s.size() >= prefix.size() && s.substr(0, prefix.size()) == prefix;
 }
 
@@ -133,8 +130,7 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @param s The string to check
 /// @param substr The substring to look for
 /// @return true if s contains substr
-[[nodiscard]] inline constexpr bool contains(std::string_view s,
-                                              std::string_view substr) noexcept {
+[[nodiscard]] inline constexpr bool contains(std::string_view s, std::string_view substr) noexcept {
   return s.find(substr) != std::string_view::npos;
 }
 
@@ -142,9 +138,7 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @param s The string to check
 /// @param patterns List of patterns to search for
 /// @return true if s contains any of the patterns
-[[nodiscard]] inline bool containsAny(
-    std::string_view s,
-    std::initializer_list<std::string_view> patterns) noexcept {
+[[nodiscard]] inline bool containsAny(std::string_view s, std::initializer_list<std::string_view> patterns) noexcept {
   for (const auto& pattern : patterns) {
     if (s.find(pattern) != std::string_view::npos) {
       return true;
@@ -157,9 +151,7 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @param s The string to check
 /// @param values List of values to compare against
 /// @return true if s equals any of the values
-[[nodiscard]] inline bool equalsAny(
-    std::string_view s,
-    std::initializer_list<std::string_view> values) noexcept {
+[[nodiscard]] inline bool equalsAny(std::string_view s, std::initializer_list<std::string_view> values) noexcept {
   for (const auto& value : values) {
     if (s == value) {
       return true;
@@ -172,12 +164,9 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @param s The string to check
 /// @param suffixes List of suffixes to check
 /// @return true if s ends with any of the suffixes
-[[nodiscard]] inline bool endsWithAny(
-    std::string_view s,
-    std::initializer_list<std::string_view> suffixes) noexcept {
+[[nodiscard]] inline bool endsWithAny(std::string_view s, std::initializer_list<std::string_view> suffixes) noexcept {
   for (const auto& suffix : suffixes) {
-    if (s.size() >= suffix.size() &&
-        s.substr(s.size() - suffix.size()) == suffix) {
+    if (s.size() >= suffix.size() && s.substr(s.size() - suffix.size()) == suffix) {
       return true;
     }
   }
@@ -188,9 +177,7 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @param s The string to check
 /// @param prefixes List of prefixes to check
 /// @return true if s starts with any of the prefixes
-[[nodiscard]] inline bool startsWithAny(
-    std::string_view s,
-    std::initializer_list<std::string_view> prefixes) noexcept {
+[[nodiscard]] inline bool startsWithAny(std::string_view s, std::initializer_list<std::string_view> prefixes) noexcept {
   for (const auto& prefix : prefixes) {
     if (s.size() >= prefix.size() && s.substr(0, prefix.size()) == prefix) {
       return true;
@@ -203,8 +190,7 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @param s The source string
 /// @param n Number of bytes to get
 /// @return The last N bytes, or empty if s.size() < n
-[[nodiscard]] inline constexpr std::string_view lastNBytes(
-    std::string_view s, size_t n) noexcept {
+[[nodiscard]] inline constexpr std::string_view lastNBytes(std::string_view s, size_t n) noexcept {
   return s.size() >= n ? s.substr(s.size() - n) : std::string_view{};
 }
 
@@ -212,8 +198,7 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @param s The source string
 /// @param n Number of bytes to get
 /// @return The first N bytes, or entire string if s.size() < n
-[[nodiscard]] inline constexpr std::string_view firstNBytes(
-    std::string_view s, size_t n) noexcept {
+[[nodiscard]] inline constexpr std::string_view firstNBytes(std::string_view s, size_t n) noexcept {
   return s.substr(0, n);
 }
 
@@ -221,8 +206,7 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @param s The source string
 /// @param n Number of bytes to drop from end
 /// @return String without last N bytes, or empty if s.size() < n
-[[nodiscard]] inline constexpr std::string_view dropLast(std::string_view s,
-                                                          size_t n) noexcept {
+[[nodiscard]] inline constexpr std::string_view dropLast(std::string_view s, size_t n) noexcept {
   return s.size() >= n ? s.substr(0, s.size() - n) : std::string_view{};
 }
 
@@ -230,8 +214,7 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @param s The source string
 /// @param n Number of bytes to drop from start
 /// @return String without first N bytes, or empty if s.size() < n
-[[nodiscard]] inline constexpr std::string_view dropFirst(std::string_view s,
-                                                           size_t n) noexcept {
+[[nodiscard]] inline constexpr std::string_view dropFirst(std::string_view s, size_t n) noexcept {
   return s.size() >= n ? s.substr(n) : std::string_view{};
 }
 
@@ -239,32 +222,27 @@ using suzume::core::kThreeJapaneseCharBytes;
 // These use byte counts, not character counts
 
 /// Get the last Japanese character (3 bytes)
-[[nodiscard]] inline constexpr std::string_view lastChar(
-    std::string_view s) noexcept {
+[[nodiscard]] inline constexpr std::string_view lastChar(std::string_view s) noexcept {
   return lastNBytes(s, kJapaneseCharBytes);
 }
 
 /// Get the last 2 Japanese characters (6 bytes)
-[[nodiscard]] inline constexpr std::string_view last2Chars(
-    std::string_view s) noexcept {
+[[nodiscard]] inline constexpr std::string_view last2Chars(std::string_view s) noexcept {
   return lastNBytes(s, kTwoJapaneseCharBytes);
 }
 
 /// Get the last 3 Japanese characters (9 bytes)
-[[nodiscard]] inline constexpr std::string_view last3Chars(
-    std::string_view s) noexcept {
+[[nodiscard]] inline constexpr std::string_view last3Chars(std::string_view s) noexcept {
   return lastNBytes(s, kThreeJapaneseCharBytes);
 }
 
 /// Drop the last Japanese character (3 bytes)
-[[nodiscard]] inline constexpr std::string_view dropLastChar(
-    std::string_view s) noexcept {
+[[nodiscard]] inline constexpr std::string_view dropLastChar(std::string_view s) noexcept {
   return dropLast(s, kJapaneseCharBytes);
 }
 
 /// Drop the last 2 Japanese characters (6 bytes)
-[[nodiscard]] inline constexpr std::string_view dropLast2Chars(
-    std::string_view s) noexcept {
+[[nodiscard]] inline constexpr std::string_view dropLast2Chars(std::string_view s) noexcept {
   return dropLast(s, kTwoJapaneseCharBytes);
 }
 
@@ -282,7 +260,8 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @param pos Byte position
 /// @return true if position starts a 3-byte sequence (Japanese character)
 [[nodiscard]] inline bool is3ByteUtf8At(std::string_view s, size_t pos) noexcept {
-  if (pos + kJapaneseCharBytes > s.size()) return false;
+  if (pos + kJapaneseCharBytes > s.size())
+    return false;
   auto byte = static_cast<unsigned char>(s[pos]);
   return (byte & 0xF0) == 0xE0;
 }
@@ -293,17 +272,18 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @return Unicode codepoint
 [[nodiscard]] inline char32_t decode3ByteUtf8At(std::string_view s, size_t pos) noexcept {
   const auto* ptr = reinterpret_cast<const unsigned char*>(s.data() + pos);
-  return static_cast<char32_t>(
-      ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F));
+  return static_cast<char32_t>(((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F));
 }
 
 /// Decode last Japanese character as codepoint
 /// @param s The string (must have at least 3 bytes)
 /// @return Unicode codepoint, or 0 if invalid
 [[nodiscard]] inline char32_t decodeLastChar(std::string_view s) noexcept {
-  if (s.size() < kJapaneseCharBytes) return 0;
+  if (s.size() < kJapaneseCharBytes)
+    return 0;
   size_t pos = s.size() - kJapaneseCharBytes;
-  if (!is3ByteUtf8At(s, pos)) return 0;
+  if (!is3ByteUtf8At(s, pos))
+    return 0;
   return decode3ByteUtf8At(s, pos);
 }
 
@@ -311,7 +291,8 @@ using suzume::core::kThreeJapaneseCharBytes;
 /// @param s The string (must have at least 3 bytes)
 /// @return Unicode codepoint, or 0 if invalid
 [[nodiscard]] inline char32_t decodeFirstChar(std::string_view s) noexcept {
-  if (!is3ByteUtf8At(s, 0)) return 0;
+  if (!is3ByteUtf8At(s, 0))
+    return 0;
   return decode3ByteUtf8At(s, 0);
 }
 

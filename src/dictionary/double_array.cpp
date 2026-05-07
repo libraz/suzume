@@ -37,8 +37,7 @@ size_t DoubleArray::BuildState::findBase(const std::vector<uint8_t>& children) {
   size_t first_child = children[0];
 
   // Start searching from next_check_pos
-  for (size_t base_cand = std::max(next_check_pos, first_child);
-       base_cand < units.size() + kBlockSize; ++base_cand) {
+  for (size_t base_cand = std::max(next_check_pos, first_child); base_cand < units.size() + kBlockSize; ++base_cand) {
     // Check if all children positions are available
     bool all_empty = true;
     for (uint8_t child : children) {
@@ -60,8 +59,7 @@ size_t DoubleArray::BuildState::findBase(const std::vector<uint8_t>& children) {
 // DoubleArray implementation
 DoubleArray::DoubleArray() = default;
 
-bool DoubleArray::build(const std::vector<std::string>& keys,
-                        const std::vector<int32_t>& values) {
+bool DoubleArray::build(const std::vector<std::string>& keys, const std::vector<int32_t>& values) {
   if (keys.size() != values.size()) {
     return false;
   }
@@ -109,8 +107,7 @@ bool DoubleArray::build(const std::vector<std::string>& keys,
   return true;
 }
 
-bool DoubleArray::build(const std::vector<std::string>& keys,
-                        const std::vector<uint32_t>& values) {
+bool DoubleArray::build(const std::vector<std::string>& keys, const std::vector<uint32_t>& values) {
   std::vector<int32_t> signed_values(values.size());
   for (size_t idx = 0; idx < values.size(); ++idx) {
     signed_values[idx] = static_cast<int32_t>(values[idx]);
@@ -118,11 +115,9 @@ bool DoubleArray::build(const std::vector<std::string>& keys,
   return build(keys, signed_values);
 }
 
-void DoubleArray::buildRecursive(BuildState& state,
-                                 const std::vector<std::string>& keys,
-                                 const std::vector<int32_t>& values,
-                                 size_t begin, size_t end,
-                                 size_t depth, size_t parent_pos) {
+void DoubleArray::buildRecursive(BuildState& state, const std::vector<std::string>& keys,
+                                 const std::vector<int32_t>& values, size_t begin, size_t end, size_t depth,
+                                 size_t parent_pos) {
   if (begin >= end) {
     return;
   }
@@ -206,8 +201,7 @@ void DoubleArray::buildRecursive(BuildState& state,
     }
 
     // Recurse
-    buildRecursive(state, keys, values, range_begin, range_end,
-                   depth + 1, child_pos);
+    buildRecursive(state, keys, values, range_begin, range_end, depth + 1, child_pos);
 
     range_begin = range_end;
   }
@@ -260,8 +254,8 @@ int32_t DoubleArray::exactMatch(std::string_view key) const {
   return units_[leaf_pos].value();
 }
 
-std::vector<DoubleArray::Result> DoubleArray::commonPrefixSearch(
-    std::string_view text, size_t start, size_t max_results) const {
+std::vector<DoubleArray::Result> DoubleArray::commonPrefixSearch(std::string_view text, size_t start,
+                                                                 size_t max_results) const {
   std::vector<Result> results;
 
   if (units_.empty() || start >= text.size()) {
@@ -275,9 +269,7 @@ std::vector<DoubleArray::Result> DoubleArray::commonPrefixSearch(
     size_t base_val = units_[node_pos].base();
     size_t leaf_pos = base_val ^ 0;
 
-    if (leaf_pos < units_.size() &&
-        units_[leaf_pos].check == node_pos &&
-        units_[leaf_pos].hasLeaf()) {
+    if (leaf_pos < units_.size() && units_[leaf_pos].check == node_pos && units_[leaf_pos].hasLeaf()) {
       Result res{};
       res.value = units_[leaf_pos].value();
       res.length = idx - start;
@@ -372,4 +364,4 @@ bool DoubleArray::deserialize(const uint8_t* data, size_t size) {
   return true;
 }
 
-}  // namespace dictionary
+}  // namespace suzume::dictionary

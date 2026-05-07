@@ -76,7 +76,8 @@ inline TestSuite JsonLoader::parse() {
       while (peek() != ']') {
         suite.cases.push_back(parseTestCase());
         skipWhitespace();
-        if (peek() == ',') consume();
+        if (peek() == ',')
+          consume();
         skipWhitespace();
       }
       expect(']');
@@ -88,17 +89,23 @@ inline TestSuite JsonLoader::parse() {
       int depth = 0;
       while (pos_ < json_.size()) {
         char c = peek();
-        if (c == '{' || c == '[') depth++;
+        if (c == '{' || c == '[')
+          depth++;
         else if (c == '}' || c == ']') {
-          if (depth == 0) break;
+          if (depth == 0)
+            break;
           depth--;
-        } else if (c == ',' && depth == 0) break;
-        else if (c == '"') parseString();
-        else consume();
+        } else if (c == ',' && depth == 0)
+          break;
+        else if (c == '"')
+          parseString();
+        else
+          consume();
       }
     }
     skipWhitespace();
-    if (peek() == ',') consume();
+    if (peek() == ',')
+      consume();
     skipWhitespace();
   }
   expect('}');
@@ -137,27 +144,33 @@ inline TestCase JsonLoader::parseTestCase() {
       // Skip unknown key-value pair
       parseString();
       expect(':');
-      if (peek() == '"') parseString();
+      if (peek() == '"')
+        parseString();
       else if (peek() == '[') {
         int depth = 1;
         consume();
         while (depth > 0 && pos_ < json_.size()) {
-          if (peek() == '[') depth++;
-          else if (peek() == ']') depth--;
+          if (peek() == '[')
+            depth++;
+          else if (peek() == ']')
+            depth--;
           consume();
         }
       } else if (peek() == '{') {
         int depth = 1;
         consume();
         while (depth > 0 && pos_ < json_.size()) {
-          if (peek() == '{') depth++;
-          else if (peek() == '}') depth--;
+          if (peek() == '{')
+            depth++;
+          else if (peek() == '}')
+            depth--;
           consume();
         }
       }
     }
     skipWhitespace();
-    if (peek() == ',') consume();
+    if (peek() == ',')
+      consume();
     skipWhitespace();
   }
   expect('}');
@@ -187,7 +200,8 @@ inline ExpectedMorpheme JsonLoader::parseMorpheme() {
       parseString();
     }
     skipWhitespace();
-    if (peek() == ',') consume();
+    if (peek() == ',')
+      consume();
     skipWhitespace();
   }
   expect('}');
@@ -202,7 +216,8 @@ inline std::vector<ExpectedMorpheme> JsonLoader::parseMorphemeArray() {
   while (peek() != ']') {
     result.push_back(parseMorpheme());
     skipWhitespace();
-    if (peek() == ',') consume();
+    if (peek() == ',')
+      consume();
     skipWhitespace();
   }
   expect(']');
@@ -229,7 +244,8 @@ inline AcceptedDiff JsonLoader::parseAcceptedDiff() {
       parseString();
     }
     skipWhitespace();
-    if (peek() == ',') consume();
+    if (peek() == ',')
+      consume();
     skipWhitespace();
   }
   expect('}');
@@ -244,7 +260,8 @@ inline std::vector<std::string> JsonLoader::parseStringArray() {
   while (peek() != ']') {
     result.push_back(parseString());
     skipWhitespace();
-    if (peek() == ',') consume();
+    if (peek() == ',')
+      consume();
     skipWhitespace();
   }
   expect(']');
@@ -259,11 +276,21 @@ inline std::string JsonLoader::parseString() {
     if (json_[pos_] == '\\' && pos_ + 1 < json_.size()) {
       pos_++;
       switch (json_[pos_]) {
-        case 'n': result += '\n'; break;
-        case 't': result += '\t'; break;
-        case 'r': result += '\r'; break;
-        case '"': result += '"'; break;
-        case '\\': result += '\\'; break;
+        case 'n':
+          result += '\n';
+          break;
+        case 't':
+          result += '\t';
+          break;
+        case 'r':
+          result += '\r';
+          break;
+        case '"':
+          result += '"';
+          break;
+        case '\\':
+          result += '\\';
+          break;
         case 'u': {
           // Unicode escape \uXXXX
           if (pos_ + 4 < json_.size()) {
@@ -284,7 +311,9 @@ inline std::string JsonLoader::parseString() {
           }
           break;
         }
-        default: result += json_[pos_]; break;
+        default:
+          result += json_[pos_];
+          break;
       }
     } else {
       result += json_[pos_];
@@ -297,8 +326,7 @@ inline std::string JsonLoader::parseString() {
 
 inline void JsonLoader::skipWhitespace() {
   while (pos_ < json_.size() &&
-         (json_[pos_] == ' ' || json_[pos_] == '\t' ||
-          json_[pos_] == '\n' || json_[pos_] == '\r')) {
+         (json_[pos_] == ' ' || json_[pos_] == '\t' || json_[pos_] == '\n' || json_[pos_] == '\r')) {
     pos_++;
   }
 }
@@ -317,9 +345,8 @@ inline char JsonLoader::consume() {
 inline void JsonLoader::expect(char c) {
   skipWhitespace();
   if (peek() != c) {
-    throw std::runtime_error(
-        std::string("Expected '") + c + "' but got '" + peek() +
-        "' at position " + std::to_string(pos_));
+    throw std::runtime_error(std::string("Expected '") + c + "' but got '" + peek() + "' at position " +
+                             std::to_string(pos_));
   }
   consume();
 }

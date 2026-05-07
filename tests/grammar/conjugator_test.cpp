@@ -18,8 +18,7 @@ class ConjugatorTest : public ::testing::Test {
   Conjugator conjugator_;
 
   // Helper to find a stem form by its right_id
-  const StemForm* findByRightId(const std::vector<StemForm>& forms,
-                                uint16_t right_id) const {
+  const StemForm* findByRightId(const std::vector<StemForm>& forms, uint16_t right_id) const {
     for (const auto& form : forms) {
       if (form.right_id == right_id) {
         return &form;
@@ -350,11 +349,9 @@ TEST_F(ConjugatorTest, AllGodanFormsHaveFourStems) {
     VerbType type;
   };
   TestCase cases[] = {
-      {"書く", VerbType::GodanKa}, {"泳ぐ", VerbType::GodanGa},
-      {"話す", VerbType::GodanSa}, {"持つ", VerbType::GodanTa},
-      {"死ぬ", VerbType::GodanNa}, {"遊ぶ", VerbType::GodanBa},
-      {"読む", VerbType::GodanMa}, {"走る", VerbType::GodanRa},
-      {"買う", VerbType::GodanWa},
+      {"書く", VerbType::GodanKa}, {"泳ぐ", VerbType::GodanGa}, {"話す", VerbType::GodanSa},
+      {"持つ", VerbType::GodanTa}, {"死ぬ", VerbType::GodanNa}, {"遊ぶ", VerbType::GodanBa},
+      {"読む", VerbType::GodanMa}, {"走る", VerbType::GodanRa}, {"買う", VerbType::GodanWa},
   };
   for (const auto& tc : cases) {
     auto forms = conjugator_.generateStems(tc.base, tc.type);

@@ -2,9 +2,9 @@
 // Pretokenizer tests for text patterns (sentence boundary, hashtag, mention,
 // complex cases, edge cases)
 
-#include "pretokenizer/pretokenizer.h"
-
 #include <gtest/gtest.h>
+
+#include "pretokenizer/pretokenizer.h"
 
 namespace suzume::pretokenizer {
 namespace {
@@ -223,8 +223,7 @@ TEST_F(PreTokenizerTextTest, NoMatch_MentionEmpty) {
 // ===== Complex Text Tests =====
 
 TEST_F(PreTokenizerTextTest, Complex_TechnicalDocument) {
-  auto result = pretokenizer_.process(
-      "2024年12月にv2.0.1をリリース。https://example.com を参照");
+  auto result = pretokenizer_.process("2024年12月にv2.0.1をリリース。https://example.com を参照");
 
   // Should have: date, version, boundary, url
   EXPECT_GE(result.tokens.size(), 3);
@@ -234,9 +233,12 @@ TEST_F(PreTokenizerTextTest, Complex_TechnicalDocument) {
   bool has_url = false;
 
   for (const auto& token : result.tokens) {
-    if (token.type == PreTokenType::Date) has_date = true;
-    if (token.type == PreTokenType::Version) has_version = true;
-    if (token.type == PreTokenType::Url) has_url = true;
+    if (token.type == PreTokenType::Date)
+      has_date = true;
+    if (token.type == PreTokenType::Version)
+      has_version = true;
+    if (token.type == PreTokenType::Url)
+      has_url = true;
   }
 
   EXPECT_TRUE(has_date);
@@ -245,8 +247,7 @@ TEST_F(PreTokenizerTextTest, Complex_TechnicalDocument) {
 }
 
 TEST_F(PreTokenizerTextTest, Complex_TechnicalDocument2) {
-  auto result = pretokenizer_.process(
-      "https://example.com でv2.0.1をダウンロード。ファイルサイズ: 512MB");
+  auto result = pretokenizer_.process("https://example.com でv2.0.1をダウンロード。ファイルサイズ: 512MB");
 
   bool has_url = false;
   bool has_version = false;
@@ -254,10 +255,14 @@ TEST_F(PreTokenizerTextTest, Complex_TechnicalDocument2) {
   bool has_boundary = false;
 
   for (const auto& token : result.tokens) {
-    if (token.type == PreTokenType::Url) has_url = true;
-    if (token.type == PreTokenType::Version) has_version = true;
-    if (token.type == PreTokenType::Storage) has_storage = true;
-    if (token.type == PreTokenType::Boundary) has_boundary = true;
+    if (token.type == PreTokenType::Url)
+      has_url = true;
+    if (token.type == PreTokenType::Version)
+      has_version = true;
+    if (token.type == PreTokenType::Storage)
+      has_storage = true;
+    if (token.type == PreTokenType::Boundary)
+      has_boundary = true;
   }
 
   EXPECT_TRUE(has_url);
@@ -267,17 +272,19 @@ TEST_F(PreTokenizerTextTest, Complex_TechnicalDocument2) {
 }
 
 TEST_F(PreTokenizerTextTest, Complex_NewsArticle) {
-  auto result = pretokenizer_.process(
-      "2024年12月23日。売上高は前年比120%で、1億円を達成。");
+  auto result = pretokenizer_.process("2024年12月23日。売上高は前年比120%で、1億円を達成。");
 
   bool has_date = false;
   bool has_percentage = false;
   bool has_currency = false;
 
   for (const auto& token : result.tokens) {
-    if (token.type == PreTokenType::Date) has_date = true;
-    if (token.type == PreTokenType::Percentage) has_percentage = true;
-    if (token.type == PreTokenType::Currency) has_currency = true;
+    if (token.type == PreTokenType::Date)
+      has_date = true;
+    if (token.type == PreTokenType::Percentage)
+      has_percentage = true;
+    if (token.type == PreTokenType::Currency)
+      has_currency = true;
   }
 
   EXPECT_TRUE(has_date);
@@ -286,8 +293,7 @@ TEST_F(PreTokenizerTextTest, Complex_NewsArticle) {
 }
 
 TEST_F(PreTokenizerTextTest, Complex_TechnicalDocumentWithEmail) {
-  auto result = pretokenizer_.process(
-      "詳細は user@example.com にお問い合わせください。");
+  auto result = pretokenizer_.process("詳細は user@example.com にお問い合わせください。");
   bool has_email = false;
   for (const auto& token : result.tokens) {
     if (token.type == PreTokenType::Email) {
@@ -298,15 +304,16 @@ TEST_F(PreTokenizerTextTest, Complex_TechnicalDocumentWithEmail) {
 }
 
 TEST_F(PreTokenizerTextTest, Complex_ScheduleWithTime) {
-  auto result = pretokenizer_.process(
-      "2024年12月23日 14時30分に会議室Aで開催。");
+  auto result = pretokenizer_.process("2024年12月23日 14時30分に会議室Aで開催。");
 
   bool has_date = false;
   bool has_time = false;
 
   for (const auto& token : result.tokens) {
-    if (token.type == PreTokenType::Date) has_date = true;
-    if (token.type == PreTokenType::Time) has_time = true;
+    if (token.type == PreTokenType::Date)
+      has_date = true;
+    if (token.type == PreTokenType::Time)
+      has_time = true;
   }
 
   EXPECT_TRUE(has_date);
@@ -326,12 +333,18 @@ TEST_F(PreTokenizerTextTest, Complex_AllPatterns) {
   bool has_percentage = false;
 
   for (const auto& token : result.tokens) {
-    if (token.type == PreTokenType::Date) has_date = true;
-    if (token.type == PreTokenType::Time) has_time = true;
-    if (token.type == PreTokenType::Email) has_email = true;
-    if (token.type == PreTokenType::Url) has_url = true;
-    if (token.type == PreTokenType::Currency) has_currency = true;
-    if (token.type == PreTokenType::Percentage) has_percentage = true;
+    if (token.type == PreTokenType::Date)
+      has_date = true;
+    if (token.type == PreTokenType::Time)
+      has_time = true;
+    if (token.type == PreTokenType::Email)
+      has_email = true;
+    if (token.type == PreTokenType::Url)
+      has_url = true;
+    if (token.type == PreTokenType::Currency)
+      has_currency = true;
+    if (token.type == PreTokenType::Percentage)
+      has_percentage = true;
   }
 
   EXPECT_TRUE(has_date);
@@ -343,17 +356,19 @@ TEST_F(PreTokenizerTextTest, Complex_AllPatterns) {
 }
 
 TEST_F(PreTokenizerTextTest, Complex_SNSPost) {
-  auto result = pretokenizer_.process(
-      "@alice #hello を投稿しました。詳細は https://example.com を参照。");
+  auto result = pretokenizer_.process("@alice #hello を投稿しました。詳細は https://example.com を参照。");
 
   bool has_mention = false;
   bool has_hashtag = false;
   bool has_url = false;
 
   for (const auto& token : result.tokens) {
-    if (token.type == PreTokenType::Mention) has_mention = true;
-    if (token.type == PreTokenType::Hashtag) has_hashtag = true;
-    if (token.type == PreTokenType::Url) has_url = true;
+    if (token.type == PreTokenType::Mention)
+      has_mention = true;
+    if (token.type == PreTokenType::Hashtag)
+      has_hashtag = true;
+    if (token.type == PreTokenType::Url)
+      has_url = true;
   }
 
   EXPECT_TRUE(has_mention);
@@ -374,12 +389,18 @@ TEST_F(PreTokenizerTextTest, Complex_AllPatternsIncludingSNS) {
   bool has_url = false;
 
   for (const auto& token : result.tokens) {
-    if (token.type == PreTokenType::Date) has_date = true;
-    if (token.type == PreTokenType::Time) has_time = true;
-    if (token.type == PreTokenType::Mention) has_mention = true;
-    if (token.type == PreTokenType::Hashtag) has_hashtag = true;
-    if (token.type == PreTokenType::Email) has_email = true;
-    if (token.type == PreTokenType::Url) has_url = true;
+    if (token.type == PreTokenType::Date)
+      has_date = true;
+    if (token.type == PreTokenType::Time)
+      has_time = true;
+    if (token.type == PreTokenType::Mention)
+      has_mention = true;
+    if (token.type == PreTokenType::Hashtag)
+      has_hashtag = true;
+    if (token.type == PreTokenType::Email)
+      has_email = true;
+    if (token.type == PreTokenType::Url)
+      has_url = true;
   }
 
   EXPECT_TRUE(has_date);
@@ -429,8 +450,7 @@ TEST_F(PreTokenizerTextTest, EdgeCase_ConsecutiveCurrency) {
 
 TEST_F(PreTokenizerTextTest, EdgeCase_NestedPatterns) {
   // URL containing date-like pattern
-  auto result =
-      pretokenizer_.process("https://example.com/2024/12/23/article");
+  auto result = pretokenizer_.process("https://example.com/2024/12/23/article");
   ASSERT_GE(result.tokens.size(), 1);
   EXPECT_EQ(result.tokens[0].type, PreTokenType::Url);
 }

@@ -1,17 +1,15 @@
 """MeCab interface - subprocess-based MeCab analysis."""
 
 import asyncio
-import shlex
 
 
 def mecab_analyze(text: str) -> list[dict]:
     """Run MeCab on text and return parsed tokens (synchronous)."""
     import subprocess
 
-    escaped = shlex.quote(text)
     result = subprocess.run(
-        f"echo {escaped} | mecab",
-        shell=True,
+        ["mecab"],
+        input=text + "\n",
         capture_output=True,
         text=True,
     )

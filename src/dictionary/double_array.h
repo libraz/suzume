@@ -25,8 +25,8 @@ class DoubleArray {
    * @brief Result of common prefix search
    */
   struct Result {
-    int32_t value;    // Associated value (entry index)
-    size_t length;    // Match length in bytes
+    int32_t value;  // Associated value (entry index)
+    size_t length;  // Match length in bytes
   };
 
   DoubleArray();
@@ -46,14 +46,12 @@ class DoubleArray {
    *
    * @note Keys MUST be sorted. Unsorted keys will cause incorrect results.
    */
-  bool build(const std::vector<std::string>& keys,
-             const std::vector<int32_t>& values);
+  bool build(const std::vector<std::string>& keys, const std::vector<int32_t>& values);
 
   /**
    * @brief Build with uint32_t values (convenience overload)
    */
-  bool build(const std::vector<std::string>& keys,
-             const std::vector<uint32_t>& values);
+  bool build(const std::vector<std::string>& keys, const std::vector<uint32_t>& values);
 
   /**
    * @brief Search for exact match
@@ -69,9 +67,7 @@ class DoubleArray {
    * @param max_results Maximum number of results (0 = unlimited)
    * @return Vector of matching results (value, length)
    */
-  std::vector<Result> commonPrefixSearch(std::string_view text,
-                                         size_t start = 0,
-                                         size_t max_results = 0) const;
+  std::vector<Result> commonPrefixSearch(std::string_view text, size_t start = 0, size_t max_results = 0) const;
 
   /**
    * @brief Get size of the double-array (number of units)
@@ -142,11 +138,8 @@ class DoubleArray {
     size_t findBase(const std::vector<uint8_t>& children);
   };
 
-  void buildRecursive(BuildState& state,
-                      const std::vector<std::string>& keys,
-                      const std::vector<int32_t>& values,
-                      size_t begin, size_t end,
-                      size_t depth, size_t parent_pos);
+  void buildRecursive(BuildState& state, const std::vector<std::string>& keys, const std::vector<int32_t>& values,
+                      size_t begin, size_t end, size_t depth, size_t parent_pos);
 };
 
 }  // namespace suzume::dictionary

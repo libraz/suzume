@@ -221,6 +221,21 @@ TEST(UserDictTest, LoadFromMemoryWithLemma) {
   EXPECT_EQ(entry->lemma, "食べる");
 }
 
+TEST(UserDictTest, LoadFromMemoryCSVQuotedFields) {
+  UserDictionary dict;
+
+  const char* csv_data = "\"東京,大阪\",NOUN,0.5,\"東\"\"阪\"\n";
+
+  auto result = dict.loadFromMemory(csv_data, strlen(csv_data));
+  ASSERT_TRUE(result.hasValue());
+  EXPECT_EQ(result.value(), 1);
+
+  const DictionaryEntry* entry = dict.getEntry(0);
+  ASSERT_NE(entry, nullptr);
+  EXPECT_EQ(entry->surface, "東京,大阪");
+  EXPECT_EQ(entry->lemma, "東\"阪");
+}
+
 // v0.8: LoadFromMemoryInvalidCost test removed (cost field no longer exists)
 
 TEST(UserDictTest, LookupAtDifferentPositions) {

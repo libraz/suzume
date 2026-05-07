@@ -115,12 +115,10 @@ class InteractiveSession {
 
   // Cross-layer search
   std::vector<LayeredEntry> findInAllLayers(const std::string& surface) const;
-  bool existsInOtherLayers(const std::string& surface,
-                           core::PartOfSpeech pos) const;
+  bool existsInOtherLayers(const std::string& surface, core::PartOfSpeech pos) const;
 
   // Statistics helpers
-  std::map<core::PartOfSpeech, size_t> countByPos(
-      const std::vector<LayeredEntry>& entries) const;
+  std::map<core::PartOfSpeech, size_t> countByPos(const std::vector<LayeredEntry>& entries) const;
 };
 
 /**

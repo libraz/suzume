@@ -10,7 +10,9 @@ namespace suzume::pretokenizer {
 namespace {
 
 // Check if byte is ASCII digit
-bool isAsciiDigit(char chr) { return chr >= '0' && chr <= '9'; }
+bool isAsciiDigit(char chr) {
+  return chr >= '0' && chr <= '9';
+}
 
 // Check if byte is ASCII alpha
 bool isAsciiAlpha(char chr) {
@@ -18,7 +20,9 @@ bool isAsciiAlpha(char chr) {
 }
 
 // Check if byte is ASCII alphanumeric
-bool isAsciiAlnum(char chr) { return isAsciiDigit(chr) || isAsciiAlpha(chr); }
+bool isAsciiAlnum(char chr) {
+  return isAsciiDigit(chr) || isAsciiAlpha(chr);
+}
 
 // Check if this is a full-width digit (０-９)
 bool isFullwidthDigit(char32_t codepoint) {
@@ -96,8 +100,7 @@ bool startsWithCI(std::string_view text, size_t pos, std::string_view prefix) {
   for (size_t idx = 0; idx < prefix.size(); ++idx) {
     char txt_c = text[pos + idx];
     char pre_c = prefix[idx];
-    if (std::tolower(static_cast<unsigned char>(txt_c)) !=
-        std::tolower(static_cast<unsigned char>(pre_c))) {
+    if (std::tolower(static_cast<unsigned char>(txt_c)) != std::tolower(static_cast<unsigned char>(pre_c))) {
       return false;
     }
   }
@@ -106,8 +109,7 @@ bool startsWithCI(std::string_view text, size_t pos, std::string_view prefix) {
 
 }  // namespace
 
-bool PreTokenizer::tryMatchUrl(std::string_view text, size_t pos,
-                               PreToken& token) const {
+bool PreTokenizer::tryMatchUrl(std::string_view text, size_t pos, PreToken& token) const {
   // Check for http:// or https://
   bool is_https = startsWithCI(text, pos, "https://");
   bool is_http = !is_https && startsWithCI(text, pos, "http://");
@@ -123,11 +125,10 @@ bool PreTokenizer::tryMatchUrl(std::string_view text, size_t pos,
   while (idx < text.size()) {
     char chr = text[idx];
     // URL-safe characters
-    if (isAsciiAlnum(chr) || chr == '-' || chr == '.' || chr == '_' ||
-        chr == '~' || chr == ':' || chr == '/' || chr == '?' || chr == '#' ||
-        chr == '[' || chr == ']' || chr == '@' || chr == '!' || chr == '$' ||
-        chr == '&' || chr == '\'' || chr == '(' || chr == ')' || chr == '*' ||
-        chr == '+' || chr == ',' || chr == ';' || chr == '=' || chr == '%') {
+    if (isAsciiAlnum(chr) || chr == '-' || chr == '.' || chr == '_' || chr == '~' || chr == ':' || chr == '/' ||
+        chr == '?' || chr == '#' || chr == '[' || chr == ']' || chr == '@' || chr == '!' || chr == '$' || chr == '&' ||
+        chr == '\'' || chr == '(' || chr == ')' || chr == '*' || chr == '+' || chr == ',' || chr == ';' || chr == '=' ||
+        chr == '%') {
       ++idx;
     } else {
       break;
@@ -135,8 +136,8 @@ bool PreTokenizer::tryMatchUrl(std::string_view text, size_t pos,
   }
 
   // Remove trailing punctuation that's likely not part of URL
-  while (idx > start && (text[idx - 1] == '.' || text[idx - 1] == ',' ||
-                         text[idx - 1] == ')' || text[idx - 1] == '\'')) {
+  while (idx > start &&
+         (text[idx - 1] == '.' || text[idx - 1] == ',' || text[idx - 1] == ')' || text[idx - 1] == '\'')) {
     --idx;
   }
 
@@ -152,8 +153,7 @@ bool PreTokenizer::tryMatchUrl(std::string_view text, size_t pos,
   return false;
 }
 
-bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos,
-                                PreToken& token) const {
+bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& token) const {
   // Match patterns: YYYY年MM月DD日, YYYY年MM月, YYYY年
   std::string year_str;
   size_t idx = parseDigits(text, pos, year_str);
@@ -214,8 +214,7 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos,
   return false;
 }
 
-bool PreTokenizer::tryMatchCurrency(std::string_view text, size_t pos,
-                                    PreToken& token) const {
+bool PreTokenizer::tryMatchCurrency(std::string_view text, size_t pos, PreToken& token) const {
   // Match patterns: 数字+[万億兆]?円
   std::string num_str;
   size_t idx = parseDigits(text, pos, num_str);
@@ -255,8 +254,7 @@ bool PreTokenizer::tryMatchCurrency(std::string_view text, size_t pos,
   return true;
 }
 
-bool PreTokenizer::tryMatchStorage(std::string_view text, size_t pos,
-                                   PreToken& token) const {
+bool PreTokenizer::tryMatchStorage(std::string_view text, size_t pos, PreToken& token) const {
   // Match patterns: 数字[KMGT]?B
   std::string num_str;
   size_t idx = parseDigits(text, pos, num_str);
@@ -271,8 +269,8 @@ bool PreTokenizer::tryMatchStorage(std::string_view text, size_t pos,
 
   // Optional: K, M, G, T prefix
   char prefix = text[idx];
-  if (prefix == 'K' || prefix == 'k' || prefix == 'M' || prefix == 'm' ||
-      prefix == 'G' || prefix == 'g' || prefix == 'T' || prefix == 't') {
+  if (prefix == 'K' || prefix == 'k' || prefix == 'M' || prefix == 'm' || prefix == 'G' || prefix == 'g' ||
+      prefix == 'T' || prefix == 't') {
     ++idx;
   }
 
@@ -290,8 +288,7 @@ bool PreTokenizer::tryMatchStorage(std::string_view text, size_t pos,
   return true;
 }
 
-bool PreTokenizer::tryMatchVersion(std::string_view text, size_t pos,
-                                   PreToken& token) const {
+bool PreTokenizer::tryMatchVersion(std::string_view text, size_t pos, PreToken& token) const {
   // Match patterns: v?数字.数字(.数字)*
   size_t idx = pos;
 
@@ -338,8 +335,7 @@ bool PreTokenizer::tryMatchVersion(std::string_view text, size_t pos,
   return true;
 }
 
-bool PreTokenizer::tryMatchPercentage(std::string_view text, size_t pos,
-                                      PreToken& token) const {
+bool PreTokenizer::tryMatchPercentage(std::string_view text, size_t pos, PreToken& token) const {
   // Match patterns: 数字%
   std::string num_str;
   size_t idx = parseDigits(text, pos, num_str);
@@ -374,8 +370,7 @@ bool PreTokenizer::tryMatchPercentage(std::string_view text, size_t pos,
   return true;
 }
 
-bool PreTokenizer::tryMatchAddressNumber(std::string_view text, size_t pos,
-                                          PreToken& token) const {
+bool PreTokenizer::tryMatchAddressNumber(std::string_view text, size_t pos, PreToken& token) const {
   // Match address number patterns: 1-2-3, 1-2-3-4 etc.
   // Pattern: digit(s) + (hyphen + digit(s))+
   std::string num_str;
@@ -420,14 +415,12 @@ bool PreTokenizer::tryMatchAddressNumber(std::string_view text, size_t pos,
   return true;
 }
 
-bool PreTokenizer::tryMatchEmail(std::string_view text, size_t pos,
-                                  PreToken& token) const {
+bool PreTokenizer::tryMatchEmail(std::string_view text, size_t pos, PreToken& token) const {
   // Match email: local-part@domain
   // Check that we're not starting in the middle of an email-like string
   if (pos > 0) {
     char prev = text[pos - 1];
-    if (isAsciiAlnum(prev) || prev == '.' || prev == '-' || prev == '_' ||
-        prev == '+' || prev == '@') {
+    if (isAsciiAlnum(prev) || prev == '.' || prev == '-' || prev == '_' || prev == '+' || prev == '@') {
       return false;
     }
   }
@@ -438,8 +431,7 @@ bool PreTokenizer::tryMatchEmail(std::string_view text, size_t pos,
   // Parse local-part: alphanumeric, dot, hyphen, underscore, plus
   while (idx < text.size()) {
     char chr = text[idx];
-    if (isAsciiAlnum(chr) || chr == '.' || chr == '-' || chr == '_' ||
-        chr == '+') {
+    if (isAsciiAlnum(chr) || chr == '.' || chr == '-' || chr == '_' || chr == '+') {
       ++idx;
     } else {
       break;
@@ -479,8 +471,7 @@ bool PreTokenizer::tryMatchEmail(std::string_view text, size_t pos,
   }
 
   // Domain must not start/end with dot or hyphen
-  if (domain[0] == '.' || domain[0] == '-' ||
-      domain[domain.size() - 1] == '.' || domain[domain.size() - 1] == '-') {
+  if (domain[0] == '.' || domain[0] == '-' || domain[domain.size() - 1] == '.' || domain[domain.size() - 1] == '-') {
     return false;
   }
 
@@ -492,8 +483,7 @@ bool PreTokenizer::tryMatchEmail(std::string_view text, size_t pos,
   return true;
 }
 
-bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos,
-                                PreToken& token) const {
+bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos, PreToken& token) const {
   // Match patterns: HH時, HH時MM分, HH時MM分SS秒
   // Check that we're not starting in the middle of a number
   if (pos > 0) {
@@ -582,8 +572,7 @@ bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos,
 //       This means #ありがとう style hashtags won't work, but they are rare
 bool isHashtagChar(char32_t codepoint) {
   // ASCII alphanumeric and underscore
-  if ((codepoint >= 'a' && codepoint <= 'z') ||
-      (codepoint >= 'A' && codepoint <= 'Z') ||
+  if ((codepoint >= 'a' && codepoint <= 'z') || (codepoint >= 'A' && codepoint <= 'Z') ||
       (codepoint >= '0' && codepoint <= '9') || codepoint == '_') {
     return true;
   }
@@ -603,8 +592,7 @@ bool isHashtagChar(char32_t codepoint) {
   return false;
 }
 
-bool PreTokenizer::tryMatchHashtag(std::string_view text, size_t pos,
-                                    PreToken& token) const {
+bool PreTokenizer::tryMatchHashtag(std::string_view text, size_t pos, PreToken& token) const {
   // Match pattern: # + (Japanese chars | alphanumeric | underscore)+
   if (pos >= text.size()) {
     return false;
@@ -649,8 +637,7 @@ bool PreTokenizer::tryMatchHashtag(std::string_view text, size_t pos,
   return true;
 }
 
-bool PreTokenizer::tryMatchMention(std::string_view text, size_t pos,
-                                    PreToken& token) const {
+bool PreTokenizer::tryMatchMention(std::string_view text, size_t pos, PreToken& token) const {
   // Match pattern: @ + (alphanumeric | underscore)+
   // Must NOT be followed by domain (that would be email)
   if (pos >= text.size()) {
@@ -714,8 +701,7 @@ bool PreTokenizer::tryMatchMention(std::string_view text, size_t pos,
   return true;
 }
 
-bool PreTokenizer::tryMatchAsciiWithDots(std::string_view text, size_t pos,
-                                          PreToken& token) const {
+bool PreTokenizer::tryMatchAsciiWithDots(std::string_view text, size_t pos, PreToken& token) const {
   // Match ASCII alphanumeric sequences with embedded dots
   // Pattern: alnum+ (. alnum+)+
   // e.g., example.com, foo.bar.baz
@@ -733,8 +719,7 @@ bool PreTokenizer::tryMatchAsciiWithDots(std::string_view text, size_t pos,
     char chr = text[idx];
     if (isAsciiAlnum(chr)) {
       ++idx;
-    } else if (chr == '.' && idx + 1 < text.size() &&
-               isAsciiAlnum(text[idx + 1])) {
+    } else if (chr == '.' && idx + 1 < text.size() && isAsciiAlnum(text[idx + 1])) {
       // Dot followed by alphanumeric
       has_dot = true;
       ++idx;
@@ -757,9 +742,8 @@ bool PreTokenizer::tryMatchAsciiWithDots(std::string_view text, size_t pos,
 }
 
 bool PreTokenizer::isSentenceBoundary(char32_t codepoint) const {
-  return codepoint == U'。' || codepoint == U'！' || codepoint == U'？' ||
-         codepoint == U'!' || codepoint == U'?' || codepoint == U'\n' ||
-         codepoint == U'・';  // Nakaguro: token boundary (splits カタカナ・カタカナ)
+  return codepoint == U'。' || codepoint == U'！' || codepoint == U'？' || codepoint == U'!' || codepoint == U'?' ||
+         codepoint == U'\n' || codepoint == U'・';  // Nakaguro: token boundary (splits カタカナ・カタカナ)
 }
 
 PreTokenResult PreTokenizer::process(std::string_view text) const {
@@ -780,15 +764,11 @@ PreTokenResult PreTokenizer::process(std::string_view text) const {
     // Note: Email must come before Mention (emails have @ followed by domain)
     // Note: Percentage must come before Version to avoid "3.14%" being parsed as version
     // Note: Date must come before Time (日付 includes 日 which looks like time suffix)
-    if (tryMatchUrl(text, pos, token) || tryMatchEmail(text, pos, token) ||
-        tryMatchHashtag(text, pos, token) || tryMatchMention(text, pos, token) ||
-        tryMatchDate(text, pos, token) || tryMatchTime(text, pos, token) ||
-        tryMatchCurrency(text, pos, token) ||
-        tryMatchStorage(text, pos, token) ||
-        tryMatchPercentage(text, pos, token) ||
-        tryMatchAddressNumber(text, pos, token) ||
-        tryMatchVersion(text, pos, token) ||
-        tryMatchAsciiWithDots(text, pos, token)) {
+    if (tryMatchUrl(text, pos, token) || tryMatchEmail(text, pos, token) || tryMatchHashtag(text, pos, token) ||
+        tryMatchMention(text, pos, token) || tryMatchDate(text, pos, token) || tryMatchTime(text, pos, token) ||
+        tryMatchCurrency(text, pos, token) || tryMatchStorage(text, pos, token) ||
+        tryMatchPercentage(text, pos, token) || tryMatchAddressNumber(text, pos, token) ||
+        tryMatchVersion(text, pos, token) || tryMatchAsciiWithDots(text, pos, token)) {
       // Add span before this token if any
       if (pos > span_start) {
         result.spans.push_back({span_start, pos});

@@ -42,13 +42,11 @@ namespace suzume::analysis {
  * @param dict_manager Dictionary manager for lookups
  * @param scorer Scorer for POS priors
  */
-void addCompoundVerbJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer,
-    const grammar::Inflection& inflection);
+void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text,
+                                   const std::vector<char32_t>& codepoints, size_t start_pos,
+                                   const std::vector<normalize::CharType>& char_types,
+                                   const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
+                                   const grammar::Inflection& inflection);
 
 /**
  * @brief Add hiragana compound verb join candidates
@@ -68,13 +66,11 @@ void addCompoundVerbJoinCandidates(
  * @param dict_manager Dictionary manager for lookups
  * @param scorer Scorer for POS priors
  */
-void addHiraganaCompoundVerbJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer,
-    const grammar::Inflection& inflection);
+void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text,
+                                           const std::vector<char32_t>& codepoints, size_t start_pos,
+                                           const std::vector<normalize::CharType>& char_types,
+                                           const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
+                                           const grammar::Inflection& inflection);
 
 /**
  * @brief Add adjective + すぎる compound verb candidates
@@ -94,12 +90,10 @@ void addHiraganaCompoundVerbJoinCandidates(
  * @param dict_manager Dictionary manager for lookups
  * @param scorer Scorer for POS priors
  */
-void addAdjectiveSugiruJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer);
+void addAdjectiveSugiruJoinCandidates(core::Lattice& lattice, std::string_view text,
+                                      const std::vector<char32_t>& codepoints, size_t start_pos,
+                                      const std::vector<normalize::CharType>& char_types,
+                                      const dictionary::DictionaryManager& dict_manager, const Scorer& scorer);
 
 /**
  * @brief Add katakana word + すぎる compound verb candidates
@@ -119,11 +113,9 @@ void addAdjectiveSugiruJoinCandidates(
  * @param char_types Character types for each position
  * @param scorer Scorer for POS priors
  */
-void addKatakanaSugiruJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer);
+void addKatakanaSugiruJoinCandidates(core::Lattice& lattice, std::string_view text,
+                                     const std::vector<char32_t>& codepoints, size_t start_pos,
+                                     const std::vector<normalize::CharType>& char_types, const Scorer& scorer);
 
 /**
  * @brief Add prefix + noun join candidates
@@ -145,12 +137,9 @@ void addKatakanaSugiruJoinCandidates(
  * @param dict_manager Dictionary manager for lookups
  * @param scorer Scorer for POS priors
  */
-void addPrefixNounJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer);
+void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
+                                 size_t start_pos, const std::vector<normalize::CharType>& char_types,
+                                 const dictionary::DictionaryManager& dict_manager, const Scorer& scorer);
 
 /**
  * @brief Add te-form + auxiliary verb split candidates
@@ -170,12 +159,10 @@ void addPrefixNounJoinCandidates(
  * @param char_types Character types for each position
  * @param scorer Scorer for POS priors
  */
-void addTeFormAuxiliaryCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer,
-    const grammar::Inflection& inflection);
+void addTeFormAuxiliaryCandidates(core::Lattice& lattice, std::string_view text,
+                                  const std::vector<char32_t>& codepoints, size_t start_pos,
+                                  const std::vector<normalize::CharType>& char_types, const Scorer& scorer,
+                                  const grammar::Inflection& inflection);
 
 /**
  * @brief Add taru-adjective adverb join candidates
@@ -196,11 +183,9 @@ void addTeFormAuxiliaryCandidates(
  * @param char_types Character types for each position
  * @param scorer Scorer for POS priors
  */
-void addTaruAdjectiveJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const Scorer& scorer);
+void addTaruAdjectiveJoinCandidates(core::Lattice& lattice, std::string_view text,
+                                    const std::vector<char32_t>& codepoints, size_t start_pos,
+                                    const std::vector<normalize::CharType>& char_types, const Scorer& scorer);
 
 /**
  * @brief Add verb renyokei + suffix noun join candidates
@@ -221,12 +206,10 @@ void addTaruAdjectiveJoinCandidates(
  * @param dict_manager Dictionary manager for lookups
  * @param scorer Scorer for POS priors
  */
-void addVerbSuffixNounJoinCandidates(
-    core::Lattice& lattice, std::string_view text,
-    const std::vector<char32_t>& codepoints, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types,
-    const dictionary::DictionaryManager& dict_manager,
-    const Scorer& scorer);
+void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view text,
+                                     const std::vector<char32_t>& codepoints, size_t start_pos,
+                                     const std::vector<normalize::CharType>& char_types,
+                                     const dictionary::DictionaryManager& dict_manager, const Scorer& scorer);
 
 }  // namespace suzume::analysis
 

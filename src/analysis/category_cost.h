@@ -1,10 +1,10 @@
 #ifndef SUZUME_ANALYSIS_CATEGORY_COST_H_
 #define SUZUME_ANALYSIS_CATEGORY_COST_H_
 
-#include "core/types.h"
-
 #include <array>
 #include <cstddef>
+
+#include "core/types.h"
 
 namespace suzume::analysis {
 
@@ -32,8 +32,7 @@ using core::ExtendedPOS;
 
 namespace detail {
 
-constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)>
-    kCategoryCostTable = []() constexpr {
+constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCategoryCostTable = []() constexpr {
   std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> table{};
 
   // Initialize all to moderate cost
@@ -124,19 +123,19 @@ constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)>
   // ===========================================================================
   // Nouns (0.5-0.6)
   // ===========================================================================
-  table[static_cast<size_t>(ExtendedPOS::Noun)] = 0.5F;          // 普通名詞
-  table[static_cast<size_t>(ExtendedPOS::NounFormal)] = 0.4F;    // 形式名詞
-  table[static_cast<size_t>(ExtendedPOS::NounVerbal)] = 0.5F;    // 連用形転成
-  table[static_cast<size_t>(ExtendedPOS::NounProper)] = 0.5F;    // 固有名詞
-  table[static_cast<size_t>(ExtendedPOS::NounProperFamily)] = 0.3F; // 固有名詞(姓)
-  table[static_cast<size_t>(ExtendedPOS::NounProperGiven)] = 0.3F;  // 固有名詞(名)
-  table[static_cast<size_t>(ExtendedPOS::NounNumber)] = 0.4F;    // 数詞
+  table[static_cast<size_t>(ExtendedPOS::Noun)] = 0.5F;              // 普通名詞
+  table[static_cast<size_t>(ExtendedPOS::NounFormal)] = 0.4F;        // 形式名詞
+  table[static_cast<size_t>(ExtendedPOS::NounVerbal)] = 0.5F;        // 連用形転成
+  table[static_cast<size_t>(ExtendedPOS::NounProper)] = 0.5F;        // 固有名詞
+  table[static_cast<size_t>(ExtendedPOS::NounProperFamily)] = 0.3F;  // 固有名詞(姓)
+  table[static_cast<size_t>(ExtendedPOS::NounProperGiven)] = 0.3F;   // 固有名詞(名)
+  table[static_cast<size_t>(ExtendedPOS::NounNumber)] = 0.4F;        // 数詞
 
   // ===========================================================================
   // Pronouns (0.4-0.5)
   // ===========================================================================
-  table[static_cast<size_t>(ExtendedPOS::Pronoun)] = 0.4F;              // 代名詞
-  table[static_cast<size_t>(ExtendedPOS::PronounInterrogative)] = 0.4F; // 疑問詞
+  table[static_cast<size_t>(ExtendedPOS::Pronoun)] = 0.4F;               // 代名詞
+  table[static_cast<size_t>(ExtendedPOS::PronounInterrogative)] = 0.4F;  // 疑問詞
 
   // ===========================================================================
   // Others (0.4-0.8)

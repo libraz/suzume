@@ -18,8 +18,7 @@ float BigramTable::getCost(core::ExtendedPOS prev, core::ExtendedPOS next) {
   return table_[prev_idx][next_idx];
 }
 
-const std::array<std::array<float, BigramTable::kSize>, BigramTable::kSize>&
-BigramTable::getTable() {
+const std::array<std::array<float, BigramTable::kSize>, BigramTable::kSize>& BigramTable::getTable() {
   return table_;
 }
 
@@ -37,16 +36,14 @@ float BigramTable::getCostByIndex(size_t prev_idx, size_t next_idx) {
 namespace {
 
 // Helper to set a single cell
-inline void setCell(std::array<std::array<float, BigramTable::kSize>,
-                               BigramTable::kSize>& table,
-                    EPOS prev, EPOS next, float value) {
+inline void setCell(std::array<std::array<float, BigramTable::kSize>, BigramTable::kSize>& table, EPOS prev, EPOS next,
+                    float value) {
   table[static_cast<size_t>(prev)][static_cast<size_t>(next)] = value;
 }
 
 }  // namespace
 
-std::array<std::array<float, BigramTable::kSize>, BigramTable::kSize>
-BigramTable::initTable() {
+std::array<std::array<float, BigramTable::kSize>, BigramTable::kSize> BigramTable::initTable() {
   std::array<std::array<float, kSize>, kSize> t{};
 
   // Initialize all cells to neutral
@@ -898,9 +895,9 @@ BigramTable::initTable() {
   setCell(t, EPOS::AdjStem, EPOS::VerbMizenkei, cost::kAlmostNever);
   setCell(t, EPOS::AdjStem, EPOS::VerbTaForm, cost::kAlmostNever);
   setCell(t, EPOS::AdjStem, EPOS::VerbTaraForm, cost::kAlmostNever);
-  setCell(t, EPOS::AdjStem, EPOS::AuxAspectIru, cost::kAlmostNever);  // な+い(いる)
-  setCell(t, EPOS::AdjNaAdj, EPOS::AuxAspectIru, cost::kAlmostNever); // 性的+い(いる)
-  setCell(t, EPOS::AdjStem, EPOS::AuxNegativeNai, cost::kAlmostNever);   // な+ない
+  setCell(t, EPOS::AdjStem, EPOS::AuxAspectIru, cost::kAlmostNever);    // な+い(いる)
+  setCell(t, EPOS::AdjNaAdj, EPOS::AuxAspectIru, cost::kAlmostNever);   // 性的+い(いる)
+  setCell(t, EPOS::AdjStem, EPOS::AuxNegativeNai, cost::kAlmostNever);  // な+ない
   setCell(t, EPOS::AdjStem, EPOS::Other, cost::kAlmostNever);           // な+い(OTHER)
 
   // Note: Particle → AdjStem is allowed for patterns like やる気がなさそう (が+な+さ+そう)
@@ -1042,7 +1039,7 @@ BigramTable::initTable() {
 }
 
 // Initialize the static table
-const std::array<std::array<float, BigramTable::kSize>, BigramTable::kSize>
-    BigramTable::table_ = BigramTable::initTable();
+const std::array<std::array<float, BigramTable::kSize>, BigramTable::kSize> BigramTable::table_ =
+    BigramTable::initTable();
 
 }  // namespace suzume::analysis

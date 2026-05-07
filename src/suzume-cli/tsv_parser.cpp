@@ -9,13 +9,10 @@ namespace suzume::cli {
 
 TsvParser::TsvParser() = default;
 
-core::Expected<std::vector<TsvEntry>, core::Error> TsvParser::parseFile(
-    const std::string& path) {
+core::Expected<std::vector<TsvEntry>, core::Error> TsvParser::parseFile(const std::string& path) {
   std::ifstream file(path);
   if (!file) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::FileNotFound,
-                    "Failed to open TSV file: " + path));
+    return core::makeUnexpected(core::Error(core::ErrorCode::FileNotFound, "Failed to open TSV file: " + path));
   }
 
   std::stringstream buffer;
@@ -23,8 +20,7 @@ core::Expected<std::vector<TsvEntry>, core::Error> TsvParser::parseFile(
   return parseString(buffer.str());
 }
 
-core::Expected<std::vector<TsvEntry>, core::Error> TsvParser::parseString(
-    std::string_view content) {
+core::Expected<std::vector<TsvEntry>, core::Error> TsvParser::parseString(std::string_view content) {
   std::vector<TsvEntry> entries;
   entries_parsed_ = 0;
   comment_lines_ = 0;
@@ -82,8 +78,7 @@ core::Expected<std::vector<TsvEntry>, core::Error> TsvParser::parseString(
   return entries;
 }
 
-core::Expected<TsvEntry, core::Error> TsvParser::parseLine(
-    std::string_view line, size_t line_number) {
+core::Expected<TsvEntry, core::Error> TsvParser::parseLine(std::string_view line, size_t line_number) {
   TsvEntry entry;
   entry.line_number = line_number;
 
@@ -101,24 +96,21 @@ core::Expected<TsvEntry, core::Error> TsvParser::parseLine(
   }
 
   if (fields.empty()) {
-    return core::makeUnexpected(core::Error(
-        core::ErrorCode::ParseError,
-        "Line " + std::to_string(line_number) + ": Empty line"));
+    return core::makeUnexpected(
+        core::Error(core::ErrorCode::ParseError, "Line " + std::to_string(line_number) + ": Empty line"));
   }
 
   // Field 0: surface (required)
   entry.surface = std::string(fields[0]);
   if (entry.surface.empty()) {
-    return core::makeUnexpected(core::Error(
-        core::ErrorCode::ParseError,
-        "Line " + std::to_string(line_number) + ": Empty surface"));
+    return core::makeUnexpected(
+        core::Error(core::ErrorCode::ParseError, "Line " + std::to_string(line_number) + ": Empty surface"));
   }
 
   // Field 1: POS (required)
   if (fields.size() < 2) {
-    return core::makeUnexpected(core::Error(
-        core::ErrorCode::ParseError,
-        "Line " + std::to_string(line_number) + ": Missing POS field"));
+    return core::makeUnexpected(
+        core::Error(core::ErrorCode::ParseError, "Line " + std::to_string(line_number) + ": Missing POS field"));
   }
 
   // Check for INTERJECTION before parsing POS (to set conj_type marker)
@@ -154,15 +146,13 @@ core::Expected<TsvEntry, core::Error> TsvParser::parseLine(
   return entry;
 }
 
-core::Expected<core::PartOfSpeech, core::Error> TsvParser::parsePos(
-    std::string_view str, size_t line) {
+core::Expected<core::PartOfSpeech, core::Error> TsvParser::parsePos(std::string_view str, size_t line) {
   // Trim whitespace
   size_t start = str.find_first_not_of(" \t");
   size_t end = str.find_last_not_of(" \t");
   if (start == std::string_view::npos) {
-    return core::makeUnexpected(core::Error(
-        core::ErrorCode::ParseError,
-        "Line " + std::to_string(line) + ": Empty POS"));
+    return core::makeUnexpected(
+        core::Error(core::ErrorCode::ParseError, "Line " + std::to_string(line) + ": Empty POS"));
   }
   str = str.substr(start, end - start + 1);
 
@@ -213,13 +203,11 @@ core::Expected<core::PartOfSpeech, core::Error> TsvParser::parsePos(
     return core::PartOfSpeech::Suffix;
   }
 
-  return core::makeUnexpected(core::Error(
-      core::ErrorCode::ParseError,
-      "Line " + std::to_string(line) + ": Invalid POS: " + std::string(str)));
+  return core::makeUnexpected(
+      core::Error(core::ErrorCode::ParseError, "Line " + std::to_string(line) + ": Invalid POS: " + std::string(str)));
 }
 
-core::Expected<dictionary::ConjugationType, core::Error>
-TsvParser::parseConjType(std::string_view str, size_t line) {
+core::Expected<dictionary::ConjugationType, core::Error> TsvParser::parseConjType(std::string_view str, size_t line) {
   // Trim whitespace
   size_t start = str.find_first_not_of(" \t");
   size_t end = str.find_last_not_of(" \t");
@@ -280,14 +268,11 @@ TsvParser::parseConjType(std::string_view str, size_t line) {
     return dictionary::ConjugationType::ProperGiven;
   }
 
-  return core::makeUnexpected(
-      core::Error(core::ErrorCode::ParseError,
-                  "Line " + std::to_string(line) +
-                      ": Invalid conjugation type: " + std::string(str)));
+  return core::makeUnexpected(core::Error(
+      core::ErrorCode::ParseError, "Line " + std::to_string(line) + ": Invalid conjugation type: " + std::string(str)));
 }
 
-size_t TsvParser::validate(const std::vector<TsvEntry>& entries,
-                           std::vector<std::string>* issues) {
+size_t TsvParser::validate(const std::vector<TsvEntry>& entries, std::vector<std::string>* issues) {
   std::set<std::pair<std::string, core::PartOfSpeech>> seen;
   size_t issue_count = 0;
 
@@ -297,21 +282,18 @@ size_t TsvParser::validate(const std::vector<TsvEntry>& entries,
       ++issue_count;
       if (issues != nullptr) {
         std::string pos_str(core::posToString(entry.pos));
-        issues->push_back("Duplicate entry at line " +
-                          std::to_string(entry.line_number) + ": " +
-                          entry.surface + " (" + pos_str + ")");
+        issues->push_back("Duplicate entry at line " + std::to_string(entry.line_number) + ": " + entry.surface + " (" +
+                          pos_str + ")");
       }
     }
     seen.insert(key);
 
     // Check conjugation type for verbs/adjectives
-    if (entry.pos == core::PartOfSpeech::Verb ||
-        entry.pos == core::PartOfSpeech::Adjective) {
+    if (entry.pos == core::PartOfSpeech::Verb || entry.pos == core::PartOfSpeech::Adjective) {
       if (entry.conj_type == dictionary::ConjugationType::None) {
         ++issue_count;
         if (issues != nullptr) {
-          issues->push_back("Missing conjugation type at line " +
-                            std::to_string(entry.line_number) + ": " +
+          issues->push_back("Missing conjugation type at line " + std::to_string(entry.line_number) + ": " +
                             entry.surface);
         }
       }
@@ -321,12 +303,10 @@ size_t TsvParser::validate(const std::vector<TsvEntry>& entries,
   return issue_count;
 }
 
-core::Expected<size_t, core::Error> writeTsvFile(
-    const std::string& path, const std::vector<TsvEntry>& entries) {
+core::Expected<size_t, core::Error> writeTsvFile(const std::string& path, const std::vector<TsvEntry>& entries) {
   std::ofstream file(path);
   if (!file) {
-    return core::makeUnexpected(core::Error(
-        core::ErrorCode::InternalError, "Failed to create file: " + path));
+    return core::makeUnexpected(core::Error(core::ErrorCode::InternalError, "Failed to create file: " + path));
   }
 
   // Write header comment
@@ -403,4 +383,4 @@ dictionary::DictionaryEntry tsvToDictEntry(const TsvEntry& tsv_entry) {
   return entry;
 }
 
-}  // namespace cli
+}  // namespace suzume::cli

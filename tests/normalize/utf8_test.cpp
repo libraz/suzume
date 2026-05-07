@@ -378,7 +378,9 @@ TEST(Utf8Test, Boundary_MaxValidCodepoint) {
 
 TEST(Utf8Test, Invalid_ContinuationByteFirst) {
   // Continuation byte at start
-  std::string invalid = "\x80" "abc";  // Separate to avoid hex escape issue
+  std::string invalid =
+      "\x80"
+      "abc";  // Separate to avoid hex escape issue
   EXPECT_FALSE(isValidUtf8(invalid));
 }
 
@@ -465,13 +467,17 @@ TEST(Utf8Test, EdgeCase_VeryLongString) {
 
 TEST(Utf8Test, EdgeCase_AllByteSequenceLengths) {
   // Test string with 1, 2, 3, and 4 byte characters
-  std::string mixed = "a" "\xC2\xA9" "日" "😀";  // a, ©, 日, 😀
+  std::string mixed =
+      "a"
+      "\xC2\xA9"
+      "日"
+      "😀";  // a, ©, 日, 😀
   auto cps = toCodepoints(mixed);
   ASSERT_EQ(cps.size(), 4);
-  EXPECT_EQ(cps[0], U'a');       // 1 byte
-  EXPECT_EQ(cps[1], U'©');       // 2 bytes
-  EXPECT_EQ(cps[2], U'日');      // 3 bytes
-  EXPECT_EQ(cps[3], U'😀');      // 4 bytes
+  EXPECT_EQ(cps[0], U'a');   // 1 byte
+  EXPECT_EQ(cps[1], U'©');   // 2 bytes
+  EXPECT_EQ(cps[2], U'日');  // 3 bytes
+  EXPECT_EQ(cps[3], U'😀');  // 4 bytes
 }
 
 // ===== Roundtrip Tests =====

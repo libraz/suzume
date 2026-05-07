@@ -1,5 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { allocString, getModule, getTagCount, parseTags, type WasmModule } from './helpers';
+import {
+  allocString,
+  getModule,
+  getTagCount,
+  parseTags,
+  TAG_OPTIONS_LAYOUT,
+  type WasmModule,
+} from './helpers';
 
 describe('C API: generate_tags', () => {
   let module: WasmModule;
@@ -88,12 +95,12 @@ describe('C API: generate_tags', () => {
         maxTags?: number;
       },
     ): number {
-      const ptr = module._malloc(20);
-      module.HEAPU32[ptr >> 2] = opts.posFilter ?? 0;
-      module.HEAPU32[(ptr + 4) >> 2] = opts.excludeBasic ? 1 : 0;
-      module.HEAPU32[(ptr + 8) >> 2] = opts.useLemma !== false ? 1 : 0;
-      module.HEAPU32[(ptr + 12) >> 2] = opts.minLength ?? 2;
-      module.HEAPU32[(ptr + 16) >> 2] = opts.maxTags ?? 0;
+      const ptr = module._malloc(TAG_OPTIONS_LAYOUT.size);
+      module.HEAPU32[(ptr + TAG_OPTIONS_LAYOUT.posFilter) >> 2] = opts.posFilter ?? 0;
+      module.HEAPU32[(ptr + TAG_OPTIONS_LAYOUT.excludeBasic) >> 2] = opts.excludeBasic ? 1 : 0;
+      module.HEAPU32[(ptr + TAG_OPTIONS_LAYOUT.useLemma) >> 2] = opts.useLemma !== false ? 1 : 0;
+      module.HEAPU32[(ptr + TAG_OPTIONS_LAYOUT.minLength) >> 2] = opts.minLength ?? 2;
+      module.HEAPU32[(ptr + TAG_OPTIONS_LAYOUT.maxTags) >> 2] = opts.maxTags ?? 0;
       return ptr;
     }
 

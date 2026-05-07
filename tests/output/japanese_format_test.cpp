@@ -170,144 +170,122 @@ class ConjFormDetectionTest : public ::testing::Test {};
 
 // Verb: Mizenkei (未然形) - negative, passive, causative
 TEST_F(ConjFormDetectionTest, Verb_Mizenkei_Negative) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "食べない", "食べる", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("食べない", "食べる", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Mizenkei);
 }
 
 TEST_F(ConjFormDetectionTest, Verb_Mizenkei_Passive) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "食べられる", "食べる", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("食べられる", "食べる", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Mizenkei);
 }
 
 TEST_F(ConjFormDetectionTest, Verb_Mizenkei_Causative) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "食べさせる", "食べる", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("食べさせる", "食べる", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Mizenkei);
 }
 
 // Verb: Renyokei (連用形) - masu, ta, te
 TEST_F(ConjFormDetectionTest, Verb_Renyokei_Masu) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "食べます", "食べる", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("食べます", "食べる", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Renyokei);
 }
 
 TEST_F(ConjFormDetectionTest, Verb_Renyokei_Ta) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "食べた", "食べる", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("食べた", "食べる", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Renyokei);
 }
 
 TEST_F(ConjFormDetectionTest, Verb_Renyokei_Te) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "食べて", "食べる", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("食べて", "食べる", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Renyokei);
 }
 
 TEST_F(ConjFormDetectionTest, Verb_Renyokei_Teiru) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "食べている", "食べる", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("食べている", "食べる", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Renyokei);
 }
 
 // Verb: Kateikei (仮定形) - ba
 TEST_F(ConjFormDetectionTest, Verb_Kateikei_Ba) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "食べれば", "食べる", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("食べれば", "食べる", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Kateikei);
 }
 
 TEST_F(ConjFormDetectionTest, Verb_Kateikei_Godan) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "書けば", "書く", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("書けば", "書く", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Kateikei);
 }
 
 // Verb: Meireikei (命令形) - ro, e
 TEST_F(ConjFormDetectionTest, Verb_Meireikei_Ichidan) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "食べろ", "食べる", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("食べろ", "食べる", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Meireikei);
 }
 
 TEST_F(ConjFormDetectionTest, Verb_Meireikei_Godan) {
   // Godan imperative ends in 'e' sound - current implementation returns Renyokei
   // as fallback for unrecognized conjugated forms
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "書け", "書く", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("書け", "書く", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Renyokei);
 }
 
 // Verb: Ishikei (意志形) - ou, you
 TEST_F(ConjFormDetectionTest, Verb_Ishikei_Ichidan) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "食べよう", "食べる", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("食べよう", "食べる", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Ishikei);
 }
 
 TEST_F(ConjFormDetectionTest, Verb_Ishikei_Godan) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "書こう", "書く", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("書こう", "書く", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Ishikei);
 }
 
 // Verb: Base form (終止形)
 TEST_F(ConjFormDetectionTest, Verb_Base_Ichidan) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "食べる", "食べる", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("食べる", "食べる", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Base);
 }
 
 TEST_F(ConjFormDetectionTest, Verb_Base_Godan) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "書く", "書く", core::PartOfSpeech::Verb);
+  auto form = postprocess::Lemmatizer::detectConjForm("書く", "書く", core::PartOfSpeech::Verb);
   EXPECT_EQ(form, grammar::ConjForm::Base);
 }
 
 // Adjective conjugation forms
 TEST_F(ConjFormDetectionTest, Adjective_Renyokei_Ku) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "美しく", "美しい", core::PartOfSpeech::Adjective);
+  auto form = postprocess::Lemmatizer::detectConjForm("美しく", "美しい", core::PartOfSpeech::Adjective);
   EXPECT_EQ(form, grammar::ConjForm::Renyokei);
 }
 
 TEST_F(ConjFormDetectionTest, Adjective_Onbinkei_Katta) {
   // "かった" ends with "った" which matches onbinkei pattern first
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "美しかった", "美しい", core::PartOfSpeech::Adjective);
+  auto form = postprocess::Lemmatizer::detectConjForm("美しかった", "美しい", core::PartOfSpeech::Adjective);
   EXPECT_EQ(form, grammar::ConjForm::Onbinkei);
 }
 
 TEST_F(ConjFormDetectionTest, Adjective_Mizenkei_Kunai) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "美しくない", "美しい", core::PartOfSpeech::Adjective);
+  auto form = postprocess::Lemmatizer::detectConjForm("美しくない", "美しい", core::PartOfSpeech::Adjective);
   EXPECT_EQ(form, grammar::ConjForm::Mizenkei);
 }
 
 TEST_F(ConjFormDetectionTest, Adjective_Kateikei_Kereba) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "美しければ", "美しい", core::PartOfSpeech::Adjective);
+  auto form = postprocess::Lemmatizer::detectConjForm("美しければ", "美しい", core::PartOfSpeech::Adjective);
   EXPECT_EQ(form, grammar::ConjForm::Kateikei);
 }
 
 TEST_F(ConjFormDetectionTest, Adjective_Base) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "美しい", "美しい", core::PartOfSpeech::Adjective);
+  auto form = postprocess::Lemmatizer::detectConjForm("美しい", "美しい", core::PartOfSpeech::Adjective);
   EXPECT_EQ(form, grammar::ConjForm::Base);
 }
 
 // Non-verb/adjective should return Base
 TEST_F(ConjFormDetectionTest, Noun_ReturnsBase) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "学校", "学校", core::PartOfSpeech::Noun);
+  auto form = postprocess::Lemmatizer::detectConjForm("学校", "学校", core::PartOfSpeech::Noun);
   EXPECT_EQ(form, grammar::ConjForm::Base);
 }
 
 TEST_F(ConjFormDetectionTest, Particle_ReturnsBase) {
-  auto form = postprocess::Lemmatizer::detectConjForm(
-      "は", "は", core::PartOfSpeech::Particle);
+  auto form = postprocess::Lemmatizer::detectConjForm("は", "は", core::PartOfSpeech::Particle);
   EXPECT_EQ(form, grammar::ConjForm::Base);
 }
 
@@ -318,33 +296,27 @@ TEST_F(ConjFormDetectionTest, Particle_ReturnsBase) {
 class ConjTypeToVerbTypeTest : public ::testing::Test {};
 
 TEST_F(ConjTypeToVerbTypeTest, None) {
-  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::None),
-            grammar::VerbType::Unknown);
+  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::None), grammar::VerbType::Unknown);
 }
 
 TEST_F(ConjTypeToVerbTypeTest, Ichidan) {
-  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::Ichidan),
-            grammar::VerbType::Ichidan);
+  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::Ichidan), grammar::VerbType::Ichidan);
 }
 
 TEST_F(ConjTypeToVerbTypeTest, GodanKa) {
-  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::GodanKa),
-            grammar::VerbType::GodanKa);
+  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::GodanKa), grammar::VerbType::GodanKa);
 }
 
 TEST_F(ConjTypeToVerbTypeTest, Suru) {
-  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::Suru),
-            grammar::VerbType::Suru);
+  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::Suru), grammar::VerbType::Suru);
 }
 
 TEST_F(ConjTypeToVerbTypeTest, Kuru) {
-  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::Kuru),
-            grammar::VerbType::Kuru);
+  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::Kuru), grammar::VerbType::Kuru);
 }
 
 TEST_F(ConjTypeToVerbTypeTest, IAdjective) {
-  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::IAdjective),
-            grammar::VerbType::IAdjective);
+  EXPECT_EQ(grammar::conjTypeToVerbType(dictionary::ConjugationType::IAdjective), grammar::VerbType::IAdjective);
 }
 
 // =============================================================================

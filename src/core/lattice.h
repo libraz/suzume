@@ -26,8 +26,7 @@ enum class EdgeFlags : uint8_t {
 };
 
 inline EdgeFlags operator|(EdgeFlags lhs, EdgeFlags rhs) {
-  return static_cast<EdgeFlags>(static_cast<uint8_t>(lhs) |
-                                static_cast<uint8_t>(rhs));
+  return static_cast<EdgeFlags>(static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs));
 }
 
 inline bool hasFlag(EdgeFlags flags, EdgeFlags flag) {
@@ -38,23 +37,23 @@ inline bool hasFlag(EdgeFlags flags, EdgeFlags flag) {
  * @brief Lattice edge (morpheme candidate)
  */
 struct LatticeEdge {
-  uint32_t id{0};                          // Edge ID
-  uint32_t start{0};                       // Start position (character index)
-  uint32_t end{0};                         // End position (character index)
-  std::string_view surface;                // Surface string (StringPool reference)
-  PartOfSpeech pos{PartOfSpeech::Unknown}; // Part of speech
-  ExtendedPOS extended_pos{ExtendedPOS::Unknown}; // Extended POS for fine-grained bigram
-  float cost{0.0F};                        // Cost
-  EdgeFlags flags{EdgeFlags::None};        // Flags
-  std::string_view lemma;                  // Lemma (optional)
+  uint32_t id{0};                                                            // Edge ID
+  uint32_t start{0};                                                         // Start position (character index)
+  uint32_t end{0};                                                           // End position (character index)
+  std::string_view surface;                                                  // Surface string (StringPool reference)
+  PartOfSpeech pos{PartOfSpeech::Unknown};                                   // Part of speech
+  ExtendedPOS extended_pos{ExtendedPOS::Unknown};                            // Extended POS for fine-grained bigram
+  float cost{0.0F};                                                          // Cost
+  EdgeFlags flags{EdgeFlags::None};                                          // Flags
+  std::string_view lemma;                                                    // Lemma (optional)
   dictionary::ConjugationType conj_type{dictionary::ConjugationType::None};  // Conjugation type
 
 #ifdef SUZUME_DEBUG_INFO
   // Debug: candidate origin tracking (excluded from release/WASM builds)
   CandidateOrigin origin{CandidateOrigin::Unknown};
-  float origin_confidence{0.0F};           // Inflection confidence (for debug)
-  std::string_view origin_detail;          // Pattern detail (e.g., "ichidan_te_form")
-  std::string_view epos_source;            // Where ExtendedPOS was set (e.g., "binary_dict", "l1_dict")
+  float origin_confidence{0.0F};   // Inflection confidence (for debug)
+  std::string_view origin_detail;  // Pattern detail (e.g., "ichidan_te_form")
+  std::string_view epos_source;    // Where ExtendedPOS was set (e.g., "binary_dict", "l1_dict")
 #endif
 
   // Flag constants for compatibility
@@ -115,14 +114,10 @@ class Lattice {
    * @param epos_source Where ExtendedPOS was determined (optional, for debug)
    * @return Edge ID
    */
-  size_t addEdge(std::string_view surface, uint32_t start, uint32_t end,
-                 PartOfSpeech pos, float cost, uint8_t flags,
-                 std::string_view lemma = {},
-                 dictionary::ConjugationType conj_type = dictionary::ConjugationType::None,
-                 CandidateOrigin origin = CandidateOrigin::Unknown,
-                 float origin_confidence = 0.0F,
-                 std::string_view origin_detail = {},
-                 ExtendedPOS extended_pos = ExtendedPOS::Unknown,
+  size_t addEdge(std::string_view surface, uint32_t start, uint32_t end, PartOfSpeech pos, float cost, uint8_t flags,
+                 std::string_view lemma = {}, dictionary::ConjugationType conj_type = dictionary::ConjugationType::None,
+                 CandidateOrigin origin = CandidateOrigin::Unknown, float origin_confidence = 0.0F,
+                 std::string_view origin_detail = {}, ExtendedPOS extended_pos = ExtendedPOS::Unknown,
                  std::string_view epos_source = {});
 
   /**
@@ -164,9 +159,9 @@ class Lattice {
   size_t text_length_{0};
   size_t edge_count_{0};
   std::vector<std::vector<uint32_t>> edge_indices_by_start_;  // Edge indices per position
-  std::vector<LatticeEdge> all_edges_;  // All edges (primary storage)
-  std::deque<std::string> surface_storage_;  // Storage for surface strings (deque for stable pointers)
-  std::deque<std::string> lemma_storage_;    // Storage for lemma strings (deque for stable pointers)
+  std::vector<LatticeEdge> all_edges_;                        // All edges (primary storage)
+  std::deque<std::string> surface_storage_;                   // Storage for surface strings (deque for stable pointers)
+  std::deque<std::string> lemma_storage_;                     // Storage for lemma strings (deque for stable pointers)
 #ifdef SUZUME_DEBUG_INFO
   std::deque<std::string> origin_detail_storage_;  // Storage for origin detail strings (deque for stable pointers)
   std::deque<std::string> epos_source_storage_;    // Storage for epos_source strings (deque for stable pointers)

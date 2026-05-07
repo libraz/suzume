@@ -38,5 +38,5 @@ namespace suzume::dictionary::entries {
  */
 std::vector<DictionaryEntry> getConjunctionEntries();
 
-}  // namespace suzume::entries::dictionary
+}  // namespace suzume::dictionary::entries
 #endif  // SUZUME_DICTIONARY_ENTRIES_CONJUNCTIONS_H_

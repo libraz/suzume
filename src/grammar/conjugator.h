@@ -46,8 +46,7 @@ class Conjugator {
    * @param type Verb type: GodanKa
    * @return Vector of stem forms with connection IDs
    */
-  std::vector<StemForm> generateStems(const std::string& base_form,
-                                      VerbType type) const;
+  std::vector<StemForm> generateStems(const std::string& base_form, VerbType type) const;
 
   /**
    * @brief Get the stem (remove ending) from base form
@@ -65,15 +64,10 @@ class Conjugator {
  private:
   Conjugation conjugation_;
 
-  std::vector<StemForm> generateGodanStems(const std::string& stem,
-                                           const std::string& base_form,
-                                           VerbType type) const;
-  std::vector<StemForm> generateIchidanStems(const std::string& stem,
-                                             const std::string& base_form) const;
-  std::vector<StemForm> generateSuruStems(const std::string& stem,
-                                          const std::string& base_form) const;
-  std::vector<StemForm> generateKuruStems(const std::string& stem,
-                                          const std::string& base_form) const;
+  std::vector<StemForm> generateGodanStems(const std::string& stem, const std::string& base_form, VerbType type) const;
+  std::vector<StemForm> generateIchidanStems(const std::string& stem, const std::string& base_form) const;
+  std::vector<StemForm> generateSuruStems(const std::string& stem, const std::string& base_form) const;
+  std::vector<StemForm> generateKuruStems(const std::string& stem, const std::string& base_form) const;
 };
 
 }  // namespace suzume::grammar

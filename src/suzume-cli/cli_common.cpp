@@ -3,6 +3,9 @@
 #include <unistd.h>
 
 #include <cstring>
+#include <iomanip>
+#include <limits>
+#include <sstream>
 
 #include "suzume.h"
 
@@ -50,6 +53,69 @@ void printWarning(std::string_view message) {
 
 void printInfo(std::string_view message) {
   std::cerr << "info: " << message << "\n";
+}
+
+bool parseSizeOption(std::string_view value, size_t* out) {
+  if (out == nullptr || value.empty()) {
+    return false;
+  }
+  for (char chr : value) {
+    if (chr < '0' || chr > '9') {
+      return false;
+    }
+  }
+
+  try {
+    size_t parsed_len = 0;
+    unsigned long long parsed = std::stoull(std::string(value), &parsed_len, 10);
+    if (parsed_len != value.size() || parsed > std::numeric_limits<size_t>::max()) {
+      return false;
+    }
+    *out = static_cast<size_t>(parsed);
+    return true;
+  } catch (...) {
+    return false;
+  }
+}
+
+std::string jsonEscape(std::string_view value) {
+  std::ostringstream out;
+  out << std::hex << std::setfill('0');
+
+  for (unsigned char chr : value) {
+    switch (chr) {
+      case '"':
+        out << "\\\"";
+        break;
+      case '\\':
+        out << "\\\\";
+        break;
+      case '\b':
+        out << "\\b";
+        break;
+      case '\f':
+        out << "\\f";
+        break;
+      case '\n':
+        out << "\\n";
+        break;
+      case '\r':
+        out << "\\r";
+        break;
+      case '\t':
+        out << "\\t";
+        break;
+      default:
+        if (chr < 0x20) {
+          out << "\\u" << std::setw(4) << static_cast<int>(chr);
+        } else {
+          out << static_cast<char>(chr);
+        }
+        break;
+    }
+  }
+
+  return out.str();
 }
 
 std::vector<std::string> readStdin() {
@@ -190,8 +256,7 @@ CommandArgs parseArgs(int argc, char* argv[]) {
     if (arg[0] != '-') {
       if (args.command.empty()) {
         // Check if it's a known command
-        if (arg == "analyze" || arg == "dict" || arg == "test" ||
-            arg == "version" || arg == "help") {
+        if (arg == "analyze" || arg == "dict" || arg == "test" || arg == "version" || arg == "help") {
           args.command = arg;
         } else {
           // Not a command, treat as text input (implicit analyze)

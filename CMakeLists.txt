@@ -154,7 +154,7 @@ if(BUILD_WASM)
     -sWASM=1
     -sMODULARIZE=1
     -sEXPORT_ES6=1
-    "-sEXPORTED_FUNCTIONS=['_malloc','_free','_suzume_create','_suzume_create_with_options','_suzume_destroy','_suzume_analyze','_suzume_result_free','_suzume_generate_tags','_suzume_generate_tags_with_options','_suzume_tags_free','_suzume_load_user_dict','_suzume_load_binary_dict','_suzume_version','_suzume_malloc','_suzume_free']"
+    "-sEXPORTED_FUNCTIONS=['_malloc','_free','_suzume_create','_suzume_create_with_options','_suzume_destroy','_suzume_analyze','_suzume_result_free','_suzume_generate_tags','_suzume_generate_tags_with_options','_suzume_tags_free','_suzume_load_user_dict','_suzume_load_binary_dict','_suzume_version','_suzume_last_error','_suzume_sizeof_result','_suzume_sizeof_morpheme','_suzume_sizeof_tags','_suzume_sizeof_tag_options','_suzume_offsetof_result','_suzume_offsetof_morpheme','_suzume_offsetof_tags','_suzume_offsetof_tag_options','_suzume_malloc','_suzume_free']"
     "-sEXPORTED_RUNTIME_METHODS=['cwrap','ccall','UTF8ToString','stringToUTF8','lengthBytesUTF8','HEAPU32']"
     -sALLOW_MEMORY_GROWTH=1
     -sSTACK_SIZE=1048576

@@ -27,15 +27,18 @@ inline size_t sentenceBoundaryLen(std::string_view text, size_t pos) {
     auto c1 = static_cast<unsigned char>(text[pos + 1]);
     auto c2 = static_cast<unsigned char>(text[pos + 2]);
     // 。(U+3002) = E3 80 82
-    if (c1 == 0x80 && c2 == 0x82) return 3;
+    if (c1 == 0x80 && c2 == 0x82)
+      return 3;
   }
   if (pos + 2 < text.size() && c == 0xEF) {
     auto c1 = static_cast<unsigned char>(text[pos + 1]);
     auto c2 = static_cast<unsigned char>(text[pos + 2]);
     // ！(U+FF01) = EF BC 81
-    if (c1 == 0xBC && c2 == 0x81) return 3;
+    if (c1 == 0xBC && c2 == 0x81)
+      return 3;
     // ？(U+FF1F) = EF BC 9F
-    if (c1 == 0xBC && c2 == 0x9F) return 3;
+    if (c1 == 0xBC && c2 == 0x9F)
+      return 3;
   }
   return 0;
 }
@@ -68,26 +71,22 @@ Analyzer::Analyzer(const AnalyzerOptions& options)
       scorer_(options.scorer_options),
       unknown_gen_(options.unknown_options, &dict_manager_),
       tokenizer_(nullptr) {
-  tokenizer_ =
-      std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
+  tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
 }
 
 Analyzer::~Analyzer() = default;
 
-void Analyzer::addUserDictionary(
-    std::shared_ptr<dictionary::UserDictionary> dict) {
+void Analyzer::addUserDictionary(std::shared_ptr<dictionary::UserDictionary> dict) {
   dict_manager_.addUserDictionary(std::move(dict));
   // Rebuild tokenizer with new dictionary
-  tokenizer_ =
-      std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
+  tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
 }
 
 bool Analyzer::tryAutoLoadCoreDictionary() {
   bool loaded = dict_manager_.tryAutoLoadCoreDictionary();
   if (loaded) {
     // Rebuild tokenizer with new dictionary
-    tokenizer_ =
-        std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
+    tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_);
   }
   return loaded;
 }
@@ -116,7 +115,7 @@ std::vector<core::Morpheme> Analyzer::analyze(std::string_view text) const {
     size_t scan_end = std::min(pos + kMaxChunkBytes, text.size());
     size_t best_break = 0;
 
-    for (size_t i = pos; i < scan_end; ) {
+    for (size_t i = pos; i < scan_end;) {
       size_t blen = sentenceBoundaryLen(text, i);
       if (blen > 0) {
         best_break = i + blen;
@@ -138,8 +137,7 @@ std::vector<core::Morpheme> Analyzer::analyze(std::string_view text) const {
       }
     }
 
-    auto morphemes = analyzeWithPretokenizer(
-        text.substr(pos, chunk_end - pos), char_pos);
+    auto morphemes = analyzeWithPretokenizer(text.substr(pos, chunk_end - pos), char_pos);
     for (auto& m : morphemes) {
       result.push_back(std::move(m));
     }
@@ -151,8 +149,7 @@ std::vector<core::Morpheme> Analyzer::analyze(std::string_view text) const {
   return result;
 }
 
-std::vector<core::Morpheme> Analyzer::analyzeWithPretokenizer(
-    std::string_view text, size_t base_char_offset) const {
+std::vector<core::Morpheme> Analyzer::analyzeWithPretokenizer(std::string_view text, size_t base_char_offset) const {
   if (text.empty()) {
     return {};
   }
@@ -190,8 +187,7 @@ std::vector<core::Morpheme> Analyzer::analyzeWithPretokenizer(
     items.push_back({span.start, span.end, false, idx});
   }
 
-  std::sort(items.begin(), items.end(),
-            [](const Item& lhs, const Item& rhs) { return lhs.start < rhs.start; });
+  std::sort(items.begin(), items.end(), [](const Item& lhs, const Item& rhs) { return lhs.start < rhs.start; });
 
   for (const auto& item : items) {
     // Calculate character offset at this byte position
@@ -242,8 +238,7 @@ std::vector<core::Morpheme> Analyzer::analyzeWithPretokenizer(
   return result;
 }
 
-std::vector<core::Morpheme> Analyzer::analyzeSpan(std::string_view text,
-                                                  size_t char_offset) const {
+std::vector<core::Morpheme> Analyzer::analyzeSpan(std::string_view text, size_t char_offset) const {
   if (text.empty()) {
     return {};
   }
@@ -263,7 +258,7 @@ std::vector<core::Morpheme> Analyzer::analyzeSpan(std::string_view text,
     size_t scan_end = std::min(pos + kMaxChunkBytes, text.size());
     size_t best_break = 0;  // byte position of best break point (after boundary char)
 
-    for (size_t i = pos; i < scan_end; ) {
+    for (size_t i = pos; i < scan_end;) {
       size_t blen = sentenceBoundaryLen(text, i);
       if (blen > 0) {
         best_break = i + blen;
@@ -289,8 +284,7 @@ std::vector<core::Morpheme> Analyzer::analyzeSpan(std::string_view text,
     }
 
     // Analyze this chunk
-    auto morphemes = analyzeChunk(text.substr(pos, chunk_end - pos),
-                                  char_offset + char_pos);
+    auto morphemes = analyzeChunk(text.substr(pos, chunk_end - pos), char_offset + char_pos);
     for (auto& m : morphemes) {
       result.push_back(std::move(m));
     }
@@ -303,8 +297,7 @@ std::vector<core::Morpheme> Analyzer::analyzeSpan(std::string_view text,
   return result;
 }
 
-std::vector<core::Morpheme> Analyzer::analyzeChunk(std::string_view text,
-                                                   size_t char_offset) const {
+std::vector<core::Morpheme> Analyzer::analyzeChunk(std::string_view text, size_t char_offset) const {
   if (text.empty()) {
     return {};
   }
@@ -314,8 +307,7 @@ std::vector<core::Morpheme> Analyzer::analyzeChunk(std::string_view text,
   if (!core::isSuccess(norm_result)) {
     SUZUME_DEBUG_BLOCK {
       auto& error = std::get<core::Error>(norm_result);
-      SUZUME_DEBUG_STREAM << "[ANALYZER] Normalization failed: "
-                          << error.message
+      SUZUME_DEBUG_STREAM << "[ANALYZER] Normalization failed: " << error.message
                           << " (code=" << static_cast<int>(error.code) << ")\n";
     }
     return {};
@@ -340,8 +332,7 @@ std::vector<core::Morpheme> Analyzer::analyzeChunk(std::string_view text,
   }
 
   // Build lattice
-  core::Lattice lattice =
-      tokenizer_->buildLattice(normalized, codepoints, char_types);
+  core::Lattice lattice = tokenizer_->buildLattice(normalized, codepoints, char_types);
 
   // Check if lattice is valid
   if (!lattice.isValid()) {
@@ -433,8 +424,7 @@ std::vector<core::Morpheme> Analyzer::pathToMorphemes(const core::ViterbiResult&
   return morphemes;
 }
 
-std::vector<core::Morpheme> Analyzer::analyzeDebug(std::string_view text,
-                                                   core::Lattice* out_lattice) const {
+std::vector<core::Morpheme> Analyzer::analyzeDebug(std::string_view text, core::Lattice* out_lattice) const {
   if (text.empty()) {
     return {};
   }
@@ -445,8 +435,7 @@ std::vector<core::Morpheme> Analyzer::analyzeDebug(std::string_view text,
     // Log normalization failure (likely invalid UTF-8 input)
     SUZUME_DEBUG_BLOCK {
       auto& error = std::get<core::Error>(norm_result);
-      SUZUME_DEBUG_STREAM << "[ANALYZER] Normalization failed in analyzeDebug: "
-                          << error.message
+      SUZUME_DEBUG_STREAM << "[ANALYZER] Normalization failed in analyzeDebug: " << error.message
                           << " (code=" << static_cast<int>(error.code) << ")\n";
     }
     return {};  // Return empty vector for invalid input
@@ -471,8 +460,7 @@ std::vector<core::Morpheme> Analyzer::analyzeDebug(std::string_view text,
   }
 
   // Build lattice
-  core::Lattice lattice =
-      tokenizer_->buildLattice(normalized, codepoints, char_types);
+  core::Lattice lattice = tokenizer_->buildLattice(normalized, codepoints, char_types);
 
   // Check if lattice is valid
   if (!lattice.isValid()) {

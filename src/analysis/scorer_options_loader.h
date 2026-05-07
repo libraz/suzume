@@ -49,8 +49,8 @@ struct JsonValue {
 
 /// Result of loading scorer options from environment
 struct ScorerLoadResult {
-  std::string config_path;   // Path to JSON config file (if loaded)
-  int env_override_count{0}; // Number of individual env overrides applied
+  std::string config_path;    // Path to JSON config file (if loaded)
+  int env_override_count{0};  // Number of individual env overrides applied
 
   bool hasConfig() const { return !config_path.empty() || env_override_count > 0; }
 };
@@ -63,8 +63,7 @@ class ScorerOptionsLoader {
   /// @param options Output options (modified on success)
   /// @param error_msg Optional error message output (nullptr to ignore)
   /// @return true on success, false on failure
-  static bool loadFromFile(const std::string& path, ScorerOptions& options,
-                           std::string* error_msg = nullptr);
+  static bool loadFromFile(const std::string& path, ScorerOptions& options, std::string* error_msg = nullptr);
 
 #ifndef __EMSCRIPTEN__
   /// Apply environment variable overrides to scorer options
@@ -72,12 +71,14 @@ class ScorerOptionsLoader {
   /// @param options Options to modify
   /// @return Number of overrides applied
   static int applyEnvOverrides(ScorerOptions& options);
+  static int applyEnvOverrides(ScorerOptions& options, bool report_warnings);
 
   /// Load scorer options from environment variables
   /// Checks SUZUME_SCORER_CONFIG for JSON file path, then individual overrides
   /// @param options Options to modify
   /// @return Result containing what was loaded
   static ScorerLoadResult loadFromEnv(ScorerOptions& options);
+  static ScorerLoadResult loadFromEnv(ScorerOptions& options, bool report_warnings);
 #endif
 
  private:
@@ -100,8 +101,7 @@ class ScorerOptionsLoader {
   static void applyVerbCandidateOptions(VerbCandidateOptions& opts, const JsonValue& json);
 
   /// Apply inflection scorer options from JSON
-  static void applyInflectionOptions(grammar::InflectionScorerOptions& opts,
-                                     const JsonValue& json);
+  static void applyInflectionOptions(grammar::InflectionScorerOptions& opts, const JsonValue& json);
 
   // JSON parser internals (exception-free)
   class Parser {
@@ -149,13 +149,18 @@ inline void ScorerOptionsLoader::Parser::setError(const char* msg) {
 }
 
 inline JsonValue ScorerOptionsLoader::Parser::parseValue() {
-  if (has_error_) return JsonValue{};
+  if (has_error_)
+    return JsonValue{};
   skipWhitespace();
   char c = peek();
-  if (c == '{') return parseObject();
-  if (c == '[') return parseArray();
-  if (c == '"') return parseString();
-  if (c == '-' || (c >= '0' && c <= '9')) return parseNumber();
+  if (c == '{')
+    return parseObject();
+  if (c == '[')
+    return parseArray();
+  if (c == '"')
+    return parseString();
+  if (c == '-' || (c >= '0' && c <= '9'))
+    return parseNumber();
   if (c == 'n') {  // null
     pos_ += 4;
     return JsonValue{};
@@ -180,13 +185,15 @@ inline JsonValue ScorerOptionsLoader::Parser::parseValue() {
 
 inline JsonValue ScorerOptionsLoader::Parser::parseObject() {
   JsonValue result;
-  if (has_error_) return result;
+  if (has_error_)
+    return result;
   result.type = JsonValue::Type::Object;
   consume();  // '{'
   skipWhitespace();
   while (!has_error_ && peek() != '}' && peek() != '\0') {
     auto key = parseString();
-    if (has_error_) return result;
+    if (has_error_)
+      return result;
     skipWhitespace();
     if (!match(':')) {
       setError("Expected ':' in object");
@@ -194,46 +201,64 @@ inline JsonValue ScorerOptionsLoader::Parser::parseObject() {
     }
     skipWhitespace();
     result.object_value[key.string_value] = parseValue();
-    if (has_error_) return result;
+    if (has_error_)
+      return result;
     skipWhitespace();
-    if (peek() == ',') consume();
+    if (peek() == ',')
+      consume();
     skipWhitespace();
   }
-  if (peek() == '}') consume();  // '}'
+  if (peek() == '}')
+    consume();  // '}'
   return result;
 }
 
 inline JsonValue ScorerOptionsLoader::Parser::parseArray() {
   JsonValue result;
-  if (has_error_) return result;
+  if (has_error_)
+    return result;
   result.type = JsonValue::Type::Array;
   consume();  // '['
   skipWhitespace();
   while (!has_error_ && peek() != ']' && peek() != '\0') {
     parseValue();  // Skip array values for now
-    if (has_error_) return result;
+    if (has_error_)
+      return result;
     skipWhitespace();
-    if (peek() == ',') consume();
+    if (peek() == ',')
+      consume();
     skipWhitespace();
   }
-  if (peek() == ']') consume();  // ']'
+  if (peek() == ']')
+    consume();  // ']'
   return result;
 }
 
 inline JsonValue ScorerOptionsLoader::Parser::parseString() {
   JsonValue result;
-  if (has_error_) return result;
+  if (has_error_)
+    return result;
   result.type = JsonValue::Type::String;
   consume();  // '"'
   while (!has_error_ && pos_ < json_.size() && json_[pos_] != '"') {
     if (json_[pos_] == '\\' && pos_ + 1 < json_.size()) {
       pos_++;
       switch (json_[pos_]) {
-        case 'n': result.string_value += '\n'; break;
-        case 't': result.string_value += '\t'; break;
-        case '"': result.string_value += '"'; break;
-        case '\\': result.string_value += '\\'; break;
-        default: result.string_value += json_[pos_]; break;
+        case 'n':
+          result.string_value += '\n';
+          break;
+        case 't':
+          result.string_value += '\t';
+          break;
+        case '"':
+          result.string_value += '"';
+          break;
+        case '\\':
+          result.string_value += '\\';
+          break;
+        default:
+          result.string_value += json_[pos_];
+          break;
       }
     } else {
       result.string_value += json_[pos_];
@@ -248,19 +273,25 @@ inline JsonValue ScorerOptionsLoader::Parser::parseString() {
 
 inline JsonValue ScorerOptionsLoader::Parser::parseNumber() {
   JsonValue result;
-  if (has_error_) return result;
+  if (has_error_)
+    return result;
   result.type = JsonValue::Type::Number;
   size_t start = pos_;
-  if (peek() == '-') consume();
-  while (pos_ < json_.size() && (json_[pos_] >= '0' && json_[pos_] <= '9')) pos_++;
+  if (peek() == '-')
+    consume();
+  while (pos_ < json_.size() && (json_[pos_] >= '0' && json_[pos_] <= '9'))
+    pos_++;
   if (pos_ < json_.size() && json_[pos_] == '.') {
     pos_++;
-    while (pos_ < json_.size() && (json_[pos_] >= '0' && json_[pos_] <= '9')) pos_++;
+    while (pos_ < json_.size() && (json_[pos_] >= '0' && json_[pos_] <= '9'))
+      pos_++;
   }
   if (pos_ < json_.size() && (json_[pos_] == 'e' || json_[pos_] == 'E')) {
     pos_++;
-    if (pos_ < json_.size() && (json_[pos_] == '+' || json_[pos_] == '-')) pos_++;
-    while (pos_ < json_.size() && (json_[pos_] >= '0' && json_[pos_] <= '9')) pos_++;
+    if (pos_ < json_.size() && (json_[pos_] == '+' || json_[pos_] == '-'))
+      pos_++;
+    while (pos_ < json_.size() && (json_[pos_] >= '0' && json_[pos_] <= '9'))
+      pos_++;
   }
   if (pos_ > start) {
     result.number_value = std::stof(json_.substr(start, pos_ - start));
@@ -270,8 +301,7 @@ inline JsonValue ScorerOptionsLoader::Parser::parseNumber() {
 
 inline void ScorerOptionsLoader::Parser::skipWhitespace() {
   while (pos_ < json_.size() &&
-         (json_[pos_] == ' ' || json_[pos_] == '\t' ||
-          json_[pos_] == '\n' || json_[pos_] == '\r')) {
+         (json_[pos_] == ' ' || json_[pos_] == '\t' || json_[pos_] == '\n' || json_[pos_] == '\r')) {
     pos_++;
   }
 }
@@ -298,9 +328,10 @@ inline bool ScorerOptionsLoader::Parser::match(char c) {
 
 // Helper macro to set option from JSON
 #define SET_OPT(opts, field, json, key) \
-  do { \
-    auto* v = json.get(key); \
-    if (v && v->isNumber()) opts.field = v->asFloat(); \
+  do {                                  \
+    auto* v = json.get(key);            \
+    if (v && v->isNumber())             \
+      opts.field = v->asFloat();        \
   } while (0)
 
 inline void ScorerOptionsLoader::applyJoinOptions(JoinOptions& opts, const JsonValue& json) {
@@ -353,14 +384,14 @@ inline void ScorerOptionsLoader::applyUnaryOptions(ScorerOptions& opts, const Js
 }
 
 // Helper macro for size_t options
-#define SET_SIZE_OPT(opts, field, json, key) \
-  do { \
-    auto* v = json.get(key); \
-    if (v && v->isNumber()) opts.field = static_cast<size_t>(v->asFloat()); \
+#define SET_SIZE_OPT(opts, field, json, key)          \
+  do {                                                \
+    auto* v = json.get(key);                          \
+    if (v && v->isNumber())                           \
+      opts.field = static_cast<size_t>(v->asFloat()); \
   } while (0)
 
-inline void ScorerOptionsLoader::applyOptimalLengthOptions(
-    ScorerOptions::OptimalLength& opts, const JsonValue& json) {
+inline void ScorerOptionsLoader::applyOptimalLengthOptions(ScorerOptions::OptimalLength& opts, const JsonValue& json) {
   SET_SIZE_OPT(opts, noun_min, json, "noun_min");
   SET_SIZE_OPT(opts, noun_max, json, "noun_max");
   SET_SIZE_OPT(opts, verb_min, json, "verb_min");
@@ -371,8 +402,7 @@ inline void ScorerOptionsLoader::applyOptimalLengthOptions(
   SET_SIZE_OPT(opts, katakana_max, json, "katakana_max");
 }
 
-inline void ScorerOptionsLoader::applyBigramOptions(
-    ScorerOptions::BigramOverrides& opts, const JsonValue& json) {
+inline void ScorerOptionsLoader::applyBigramOptions(ScorerOptions::BigramOverrides& opts, const JsonValue& json) {
   SET_OPT(opts, noun_to_suffix, json, "noun_to_suffix");
   SET_OPT(opts, prefix_to_noun, json, "prefix_to_noun");
   SET_OPT(opts, prefix_to_verb, json, "prefix_to_verb");
@@ -389,8 +419,7 @@ inline void ScorerOptionsLoader::applyBigramOptions(
   SET_OPT(opts, aux_to_aux, json, "aux_to_aux");
 }
 
-inline void ScorerOptionsLoader::applyVerbCandidateOptions(
-    VerbCandidateOptions& opts, const JsonValue& json) {
+inline void ScorerOptionsLoader::applyVerbCandidateOptions(VerbCandidateOptions& opts, const JsonValue& json) {
   // Confidence thresholds
   SET_OPT(opts, confidence_low, json, "confidence_low");
   SET_OPT(opts, confidence_standard, json, "confidence_standard");
@@ -417,8 +446,7 @@ inline void ScorerOptionsLoader::applyVerbCandidateOptions(
   SET_OPT(opts, confidence_cost_scale, json, "confidence_cost_scale");
 }
 
-inline void ScorerOptionsLoader::applyInflectionOptions(
-    grammar::InflectionScorerOptions& opts, const JsonValue& json) {
+inline void ScorerOptionsLoader::applyInflectionOptions(grammar::InflectionScorerOptions& opts, const JsonValue& json) {
   // Base configuration
   SET_OPT(opts, base_confidence, json, "base_confidence");
   SET_OPT(opts, confidence_floor, json, "confidence_floor");
@@ -452,8 +480,7 @@ inline void ScorerOptionsLoader::applyInflectionOptions(
   SET_OPT(opts, penalty_suru_single_kanji, json, "penalty_suru_single_kanji");
 
   // Single hiragana stem penalties
-  SET_OPT(opts, penalty_ichidan_single_hiragana_particle, json,
-          "penalty_ichidan_single_hiragana_particle");
+  SET_OPT(opts, penalty_ichidan_single_hiragana_particle, json, "penalty_ichidan_single_hiragana_particle");
   SET_OPT(opts, penalty_pure_hiragana_stem, json, "penalty_pure_hiragana_stem");
   SET_OPT(opts, penalty_godan_single_hiragana_stem, json, "penalty_godan_single_hiragana_stem");
   SET_OPT(opts, penalty_godan_non_ra_pure_hiragana, json, "penalty_godan_non_ra_pure_hiragana");
@@ -462,11 +489,11 @@ inline void ScorerOptionsLoader::applyInflectionOptions(
 #undef SET_SIZE_OPT
 #undef SET_OPT
 
-inline bool ScorerOptionsLoader::loadFromFile(const std::string& path, ScorerOptions& options,
-                                              std::string* error_msg) {
+inline bool ScorerOptionsLoader::loadFromFile(const std::string& path, ScorerOptions& options, std::string* error_msg) {
   std::ifstream file(path);
   if (!file) {
-    if (error_msg) *error_msg = "Cannot open file: " + path;
+    if (error_msg)
+      *error_msg = "Cannot open file: " + path;
     return false;
   }
   std::stringstream buffer;
@@ -478,12 +505,14 @@ inline bool ScorerOptionsLoader::loadFromFile(const std::string& path, ScorerOpt
 
   // Check for parse errors
   if (parser.hasError()) {
-    if (error_msg) *error_msg = std::string("JSON parse error: ") + parser.errorMessage();
+    if (error_msg)
+      *error_msg = std::string("JSON parse error: ") + parser.errorMessage();
     return false;
   }
 
   if (!root.isObject()) {
-    if (error_msg) *error_msg = "JSON root must be an object";
+    if (error_msg)
+      *error_msg = "JSON root must be an object";
     return false;
   }
 
@@ -491,10 +520,12 @@ inline bool ScorerOptionsLoader::loadFromFile(const std::string& path, ScorerOpt
   if (auto* cands = root.get("candidates")) {
     if (cands->isObject()) {
       if (auto* join = cands->get("join")) {
-        if (join->isObject()) applyJoinOptions(options.candidates.join, *join);
+        if (join->isObject())
+          applyJoinOptions(options.candidates.join, *join);
       }
       if (auto* split = cands->get("split")) {
-        if (split->isObject()) applySplitOptions(options.candidates.split, *split);
+        if (split->isObject())
+          applySplitOptions(options.candidates.split, *split);
       }
     }
   }
@@ -539,14 +570,17 @@ inline bool ScorerOptionsLoader::loadFromFile(const std::string& path, ScorerOpt
 namespace env_override_internal {
 
 // Helper to try parsing float from environment variable
-inline bool tryGetEnvFloat(const char* name, float& out) {
+inline bool tryGetEnvFloat(const char* name, float& out, bool report_warnings) {
   const char* value = std::getenv(name);
-  if (!value) return false;
+  if (!value)
+    return false;
 
   char* end = nullptr;
   float parsed = std::strtof(value, &end);
   if (end == value || *end != '\0') {
-    std::cerr << "warning: Invalid value for " << name << ": " << value << "\n";
+    if (report_warnings) {
+      std::cerr << "warning: Invalid value for " << name << ": " << value << "\n";
+    }
     return false;
   }
   out = parsed;
@@ -554,12 +588,17 @@ inline bool tryGetEnvFloat(const char* name, float& out) {
 }
 
 // Macro to check and apply single environment variable
-#define TRY_ENV(section, field) \
-  if (tryGetEnvFloat("SUZUME_SCORER_" section "_" #field, opts.field)) count++
+#define TRY_ENV(section, field)                                                         \
+  if (tryGetEnvFloat("SUZUME_SCORER_" section "_" #field, opts.field, report_warnings)) \
+  count++
 
 }  // namespace env_override_internal
 
 inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
+  return applyEnvOverrides(options, true);
+}
+
+inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options, bool report_warnings) {
   using namespace env_override_internal;
   int count = 0;
   float size_helper = 0.0F;  // Helper for size_t conversions
@@ -613,35 +652,35 @@ inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
   // Optimal length options (SUZUME_SCORER_OPTLEN_*)
   {
     auto& opts = options.optimal_length;
-    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_noun_min", size_helper)) {
+    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_noun_min", size_helper, report_warnings)) {
       opts.noun_min = static_cast<size_t>(size_helper);
       count++;
     }
-    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_noun_max", size_helper)) {
+    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_noun_max", size_helper, report_warnings)) {
       opts.noun_max = static_cast<size_t>(size_helper);
       count++;
     }
-    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_verb_min", size_helper)) {
+    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_verb_min", size_helper, report_warnings)) {
       opts.verb_min = static_cast<size_t>(size_helper);
       count++;
     }
-    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_verb_max", size_helper)) {
+    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_verb_max", size_helper, report_warnings)) {
       opts.verb_max = static_cast<size_t>(size_helper);
       count++;
     }
-    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_adj_min", size_helper)) {
+    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_adj_min", size_helper, report_warnings)) {
       opts.adj_min = static_cast<size_t>(size_helper);
       count++;
     }
-    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_adj_max", size_helper)) {
+    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_adj_max", size_helper, report_warnings)) {
       opts.adj_max = static_cast<size_t>(size_helper);
       count++;
     }
-    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_katakana_min", size_helper)) {
+    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_katakana_min", size_helper, report_warnings)) {
       opts.katakana_min = static_cast<size_t>(size_helper);
       count++;
     }
-    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_katakana_max", size_helper)) {
+    if (tryGetEnvFloat("SUZUME_SCORER_OPTLEN_katakana_max", size_helper, report_warnings)) {
       opts.katakana_max = static_cast<size_t>(size_helper);
       count++;
     }
@@ -736,6 +775,10 @@ inline int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
 }
 
 inline ScorerLoadResult ScorerOptionsLoader::loadFromEnv(ScorerOptions& options) {
+  return loadFromEnv(options, true);
+}
+
+inline ScorerLoadResult ScorerOptionsLoader::loadFromEnv(ScorerOptions& options, bool report_warnings) {
   ScorerLoadResult result;
 
   // Check for SUZUME_SCORER_CONFIG environment variable (JSON file path)
@@ -745,13 +788,14 @@ inline ScorerLoadResult ScorerOptionsLoader::loadFromEnv(ScorerOptions& options)
     if (loadFromFile(config_path, options, &error_msg)) {
       result.config_path = config_path;
     } else {
-      std::cerr << "warning: Failed to load scorer config from SUZUME_SCORER_CONFIG: "
-                << error_msg << "\n";
+      if (report_warnings) {
+        std::cerr << "warning: Failed to load scorer config from SUZUME_SCORER_CONFIG: " << error_msg << "\n";
+      }
     }
   }
 
   // Apply individual environment variable overrides (highest priority)
-  result.env_override_count = applyEnvOverrides(options);
+  result.env_override_count = applyEnvOverrides(options, report_warnings);
 
   return result;
 }
