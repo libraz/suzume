@@ -431,9 +431,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // MeCab treats these as single tokens, but grammatically ら is a suffix
       suffix("ら", "ら"),
 
-      // Na-adjective forming suffix 的 (論理的, 科学的, 経済的)
-      // MeCab: 論理的な → 論理 + 的 + な (suffix + copula rentaikei)
-      suffix("的", "的"),
+      // Note: 的 was previously L1 SUFFIX, but Suzume's tokenizer use case
+      // prefers X+的 as one search unit (論理的, 科学的, 経済的). Merging is
+      // handled by kanji-merge normalization. 的+な (na-adj formation) still
+      // splits as 論理的(NOUN) + な(AuxCopula) without a 的 SUFFIX node.
 
       // NOTE: 中 suffix removed - MeCab treats 世界中/一日中 as single NOUN
 

@@ -1,8 +1,56 @@
 {
   "cases": [
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "POS classification design diff (pre-existing)"
+      },
       "description": "ただ as conjunction, not た+だ",
       "expected": [
+        {
+          "lemma": "ただ",
+          "pos": "Conjunction",
+          "surface": "ただ"
+        },
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "掌",
+          "pos": "Noun",
+          "surface": "掌"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "載せる",
+          "pos": "Verb",
+          "surface": "載せ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tada_conjunction",
+      "input": "ただ彼の掌に載せられた",
+      "suzume_expected": [
         {
           "lemma": "ただ",
           "pos": "Adverb",
@@ -43,9 +91,7 @@
           "pos": "Auxiliary",
           "surface": "た"
         }
-      ],
-      "id": "tada_conjunction",
-      "input": "ただ彼の掌に載せられた"
+      ]
     },
     {
       "description": "まるで as adverb, not まる+で",

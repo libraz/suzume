@@ -137,10 +137,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "Vanilla splits ã prefix; user dict merges"
-      },
       "description": "おねえさん - should not be parsed as verb おねえす",
       "expected": [
         {
@@ -151,20 +147,6 @@
       ],
       "id": "honorific_oneesan",
       "input": "おねえさん",
-      "suzume_expected": [
-        {
-          "pos": "Prefix",
-          "surface": "お"
-        },
-        {
-          "pos": "Interjection",
-          "surface": "ねえ"
-        },
-        {
-          "pos": "Suffix",
-          "surface": "さん"
-        }
-      ],
       "tags": [
         "honorific",
         "regression"

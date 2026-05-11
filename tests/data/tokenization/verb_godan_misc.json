@@ -373,8 +373,21 @@
       "input": "話すことができない"
     },
     {
+      "accepted_diff": {
+        "category": "design-diff",
+        "reason": "MeCab normalize merges 色+褪せる via kanji-merge, but Suzume splits at kanji/hiragana boundary; both acceptable"
+      },
       "description": "色褪せる splits as 色+褪せる (both 1-token and 2-token acceptable)",
       "expected": [
+        {
+          "lemma": "色褪せる",
+          "pos": "Verb",
+          "surface": "色褪せる"
+        }
+      ],
+      "id": "iroaseru-compound-verb",
+      "input": "色褪せる",
+      "suzume_expected": [
         {
           "lemma": "色",
           "pos": "Noun",
@@ -385,9 +398,7 @@
           "pos": "Verb",
           "surface": "褪せる"
         }
-      ],
-      "id": "iroaseru-compound-verb",
-      "input": "色褪せる"
+      ]
     },
     {
       "description": "食べさせる - regression test",

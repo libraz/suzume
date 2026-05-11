@@ -252,7 +252,15 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                         applied_rule = "brand+number"
 
         # 2d. Prefix + Noun (kanji only)
-        if not merged and t.get("pos") == "接頭詞" and t.get("pos_sub1") == "名詞接続" and i + 1 < len(tokens):
+        # Suzume design: 御 is a productive prefix that always splits off
+        # (御 + 尽力, 御 + 挨拶, 御 + 協力). Skip merge for 御 prefix.
+        if (
+            not merged
+            and t.get("pos") == "接頭詞"
+            and t.get("pos_sub1") == "名詞接続"
+            and t.get("surface", "") != "御"
+            and i + 1 < len(tokens)
+        ):
             nxt = tokens[i + 1]
             if nxt.get("pos") == "名詞":
                 combined = t.get("surface", "") + nxt.get("surface", "")
@@ -403,6 +411,20 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     merged = True
                     if applied_rule is None:
                         applied_rule = "verb-renyokei+kai"
+
+        # 5a'. Verb renyokei + 方 (歩き方, やり方, 読み方, 言い方)
+        # As a tokenizer, V連用形+方 should be a single search unit.
+        if not merged and t.get("pos") == "動詞" and t.get("conj_form") == "連用形":
+            j = i + 1
+            if j < len(tokens):
+                nxt = tokens[j]
+                if nxt.get("surface") == "方" and nxt.get("pos") == "名詞" and nxt.get("pos_sub1") == "接尾":
+                    combined = t.get("surface", "") + "方"
+                    result.append({"surface": combined, "pos": "名詞", "lemma": combined})
+                    i = j + 1
+                    merged = True
+                    if applied_rule is None:
+                        applied_rule = "verb-renyokei+kata"
 
         # 5b. Proper noun + region suffix
         if not merged and t.get("pos") == "名詞" and t.get("pos_sub1") == "固有名詞" and t.get("pos_sub2") == "地域":
@@ -681,6 +703,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     result, applied_rule = _postprocess_kuruwa(result, applied_rule)
     result, applied_rule = _postprocess_adj_bungo(result, applied_rule)
     result, applied_rule = _postprocess_kanji_merge(result, applied_rule)
+    result, applied_rule = _postprocess_nickname_merge(result, applied_rule)
     result, applied_rule = _postprocess_search_unit_split(result, applied_rule)
     result, applied_rule = _postprocess_onomatopoeia_tto_merge(result, applied_rule)
     result, applied_rule = _postprocess_ascii_dot_merge(result, applied_rule)
@@ -902,6 +925,57 @@ def _postprocess_adj_bungo(result: list[dict], applied_rule: str | None) -> tupl
     return new_result, applied_rule
 
 
+def _postprocess_nickname_merge(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Merge hiragana nickname + honorific into a single token.
+
+    Tokenizer use case: short hiragana nicknames like たっちゃん / ゆうちゃん /
+    けんちゃん / わんちゃん should be one search unit, not split as stem+suffix.
+    Kanji or katakana names (太郎+ちゃん, ピー+ちゃん) keep splitting.
+
+    Also handles MeCab's misparses where the nickname spans 3+ tokens
+    (e.g., たっちゃん → たっ + ちゃ + ん). The scan greedily concatenates
+    consecutive hiragana tokens (preceding `prev_is_prefix == False`) and
+    merges when the concatenated surface is short hiragana stem + honorific.
+    """
+    honorifics = ("ちゃん", "くん", "さん")
+    hira_re = regex.compile(r"^[\p{Hiragana}っー]+$")
+
+    merged: list[dict] = []
+    i = 0
+    while i < len(result):
+        # Hiragana run starting at i that ends with a honorific. Skip if prev
+        # is a prefix (お/ご) — let family-merge handle those.
+        prev_is_prefix = merged and merged[-1].get("pos", "") == "接頭詞"
+        if not prev_is_prefix and i < len(result) and hira_re.match(result[i].get("surface", "")):
+            j = i
+            run = ""
+            while j < len(result) and hira_re.match(result[j].get("surface", "")):
+                run += result[j].get("surface", "")
+                j += 1
+            matched = False
+            for h in honorifics:
+                if run.endswith(h):
+                    stem = run[: len(run) - len(h)]
+                    # Stem 2-3 hiragana chars. 1-char stems (e.g., おさん) are
+                    # too short and risk false merges (がおさん → が+おさん bad).
+                    if 2 <= len(stem) <= 3:
+                        merged.append({"surface": run, "pos": "名詞", "lemma": run})
+                        i = j
+                        if applied_rule is None:
+                            applied_rule = "nickname-merge"
+                        matched = True
+                        break
+            if matched:
+                continue
+            # No nickname match — append the current token and continue
+            merged.append(result[i])
+            i += 1
+            continue
+        merged.append(result[i])
+        i += 1
+    return merged, applied_rule
+
+
 def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Merge consecutive all-kanji tokens.
 
@@ -914,19 +988,28 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
     merged = []
     for curr in result:
         surface = curr.get("surface", "")
-        # Suzume design: 家 is not treated as SUFFIX, so X+家 compounds merge
-        # (e.g., 思想家, 政治家, 専門家). 的/様/氏 keep splitting via the pos_sub1
-        # 接尾 skip below.
-        is_merge_allowed_suffix = surface == "家"
+        # Suzume design: tokenizer use case prefers X+suffix as a single search
+        # unit. These suffixes are not treated as token boundaries; X+SUFFIX
+        # merges via kanji-merge.
+        #   家/力/化/法/論/員/式/感/的 — productive but one search unit
+        # 様/氏 keep splitting (honorific separates from name).
+        is_merge_allowed_suffix = surface in ("家", "力", "化", "法", "論", "員", "式", "感", "的")
+        # Suzume design: 御 is a productive prefix that always splits off
+        # (御 + 尽力, 御 + 挨拶, 御 + 協力). Skip kanji-merge after 御 prefix tokens.
+        prev_is_go_prefix = (
+            merged
+            and merged[-1].get("surface", "") == "御"
+            and merged[-1].get("pos", "") == "接頭詞"
+        )
         if (
             merged
             and regex.match(r"^[\p{Han}]+$", surface)
-            and surface != "的"
             and regex.match(r"^[\p{Han}]+$", merged[-1].get("surface", ""))
             and "々" not in merged[-1].get("surface", "")
             and merged[-1].get("pos_sub1", "") not in ("副詞可能", "固有名詞", "数")
             and merged[-1].get("pos", "") != "副詞"
             and (curr.get("pos_sub1", "") != "接尾" or is_merge_allowed_suffix)
+            and not prev_is_go_prefix
         ):
             merged[-1]["surface"] += surface
             merged[-1]["lemma"] = merged[-1]["surface"]

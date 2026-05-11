@@ -89,14 +89,9 @@
       "description": "理性的に (rationally) - 〜的 pattern",
       "expected": [
         {
-          "lemma": "理性",
+          "lemma": "理性的",
           "pos": "Noun",
-          "surface": "理性"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "理性的"
         },
         {
           "lemma": "に",
@@ -116,14 +111,9 @@
       "description": "論理的に (logically) - 〜的 pattern",
       "expected": [
         {
-          "lemma": "論理",
+          "lemma": "論理的",
           "pos": "Noun",
-          "surface": "論理"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "論理的"
         },
         {
           "lemma": "に",
@@ -143,14 +133,9 @@
       "description": "効率的に (efficiently) - 〜的 pattern",
       "expected": [
         {
-          "lemma": "効率",
+          "lemma": "効率的",
           "pos": "Noun",
-          "surface": "効率"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "効率的"
         },
         {
           "lemma": "に",
@@ -170,14 +155,9 @@
       "description": "論理的な説明 (logical explanation) - attributive form",
       "expected": [
         {
-          "lemma": "論理",
+          "lemma": "論理的",
           "pos": "Noun",
-          "surface": "論理"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "論理的"
         },
         {
           "lemma": "だ",
@@ -203,14 +183,9 @@
       "description": "効率的な方法 (efficient method) - attributive form",
       "expected": [
         {
-          "lemma": "効率",
+          "lemma": "効率的",
           "pos": "Noun",
-          "surface": "効率"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "効率的"
         },
         {
           "lemma": "だ",
@@ -236,14 +211,9 @@
       "description": "理性的に考える (think rationally)",
       "expected": [
         {
-          "lemma": "理性",
+          "lemma": "理性的",
           "pos": "Noun",
-          "surface": "理性"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "理性的"
         },
         {
           "lemma": "に",
@@ -269,14 +239,9 @@
       "description": "感情的になる (become emotional)",
       "expected": [
         {
-          "lemma": "感情",
+          "lemma": "感情的",
           "pos": "Noun",
-          "surface": "感情"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "感情的"
         },
         {
           "lemma": "に",
@@ -302,14 +267,9 @@
       "description": "科学的な根拠 (scientific evidence)",
       "expected": [
         {
-          "lemma": "科学",
+          "lemma": "科学的",
           "pos": "Noun",
-          "surface": "科学"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "科学的"
         },
         {
           "lemma": "だ",

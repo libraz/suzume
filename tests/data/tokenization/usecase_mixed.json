@@ -691,14 +691,9 @@
       "description": "的 suffix",
       "expected": [
         {
-          "lemma": "国際",
+          "lemma": "国際的",
           "pos": "Noun",
-          "surface": "国際"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "国際的"
         },
         {
           "lemma": "だ",
@@ -721,14 +716,9 @@
       "description": "化 suffix",
       "expected": [
         {
-          "lemma": "自動",
+          "lemma": "自動化",
           "pos": "Noun",
-          "surface": "自動"
-        },
-        {
-          "lemma": "化",
-          "pos": "Suffix",
-          "surface": "化"
+          "surface": "自動化"
         },
         {
           "lemma": "する",

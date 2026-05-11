@@ -367,6 +367,8 @@ HONORIFIC_EXCEPTIONS: set[str] = {
     "嫁さん",
     "客様",
     "客さん",
+    "皆様",
+    "皆さん",
 }
 
 # Words where お/ご is part of the lexeme (not separable prefix)

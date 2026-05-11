@@ -59,6 +59,7 @@ core::Lattice Tokenizer::buildLattice(std::string_view text, const std::vector<c
     } else if (ct == normalize::CharType::Hiragana) {
       if (mode_ != core::AnalysisMode::Split) {
         addHiraganaCompoundVerbJoinCandidates(lattice, text, codepoints, pos, char_types);
+        addVerbSuffixNounJoinCandidates(lattice, text, codepoints, pos, char_types);
       }
       addTeFormAuxiliaryCandidates(lattice, text, codepoints, pos, char_types);
     } else if (ct == normalize::CharType::Katakana) {

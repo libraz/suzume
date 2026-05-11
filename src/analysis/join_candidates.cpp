@@ -1726,6 +1726,39 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     return;
   }
 
+  // Hiragana-only stem + 方 (やり方, あり方) — V連用形 written entirely in hiragana.
+  // Only emit when we're at a word boundary (start of input or preceded by
+  // non-kanji), so we don't emit しい方 (from 美しい方) or similar adjective tails.
+  if (char_types[start_pos] == CharType::Hiragana) {
+    if (start_pos > 0 && char_types[start_pos - 1] == CharType::Kanji) {
+      return;
+    }
+    if (start_pos + 2 >= codepoints.size() || codepoints[start_pos + 2] != U'方') {
+      return;
+    }
+    if (char_types[start_pos + 1] != CharType::Hiragana) {
+      return;
+    }
+    // Allow godan-ra renyokei (り: やる→やり, ある→あり) and godan-wa renyokei
+    // (い: 言う→いい). 言う often has its stem-only renyokei written as いい
+    // even when the kanji 言 is omitted.
+    char32_t c1 = codepoints[start_pos + 1];
+    if (c1 != U'り' && c1 != U'い') {
+      return;
+    }
+    size_t end_pos = start_pos + 3;
+    size_t start_byte = charPosToBytePos(codepoints, start_pos);
+    size_t end_byte = charPosToBytePos(codepoints, end_pos);
+    std::string surface(text.substr(start_byte, end_byte - start_byte));
+    float base_cost = scorer.posPrior(core::PartOfSpeech::Noun);
+    constexpr float kCompoundNounBonus = -1.0F;
+    float final_cost = base_cost + kCompoundNounBonus;
+    uint8_t flags = core::LatticeEdge::kFromDictionary;
+    lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
+                    core::PartOfSpeech::Noun, final_cost, flags, surface);
+    return;
+  }
+
   // Must start with kanji (verb stem)
   if (char_types[start_pos] != CharType::Kanji) {
     return;
@@ -1775,10 +1808,10 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     return;
   }
 
-  // Reject if hiragana ends with い (i-adjective basic form, not verb renyokei)
-  // e.g., 美しい方 should NOT become a compound noun (it's 美しい + 方[person])
-  // Valid patterns: 読み方, 書き方 (verb renyokei + 方[method])
-  if (hiragana_end > kanji_end && codepoints[hiragana_end - 1] == U'い') {
+  // Reject if hiragana ends with い AND hiragana run is 2+ chars (i-adjective).
+  // e.g., 美しい方 (kanji+しい) is an adjective + noun, not a compound.
+  // But 言い方 (kanji+い, single hiragana い) is godan-wa V連用形 + 方 — valid.
+  if (hiragana_end > kanji_end + 1 && codepoints[hiragana_end - 1] == U'い') {
     return;
   }
 

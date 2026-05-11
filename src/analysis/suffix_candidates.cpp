@@ -63,17 +63,20 @@ std::string extractSubstring(const std::vector<char32_t>& codepoints, size_t sta
 const std::vector<SuffixEntry>& getSuffixEntries() {
   static const std::vector<SuffixEntry> kSuffixes = {
       {"化する", core::PartOfSpeech::Verb},
-      {"化", core::PartOfSpeech::Suffix},
+      // Tokenizer use case: keep X+SUFFIX as one search unit. The following
+      // suffixes are merged via kanji-merge normalization, not split here:
+      //   家/力/化/法/論/員/式/感/的 (productive but one search unit)
+      // {"化", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (国際化, 自動化)
       {"性", core::PartOfSpeech::Suffix},
       // {"率", core::PartOfSpeech::Suffix},  // Removed: causes over-segmentation (降水確率→降水確+率)
-      {"法", core::PartOfSpeech::Suffix},
-      {"論", core::PartOfSpeech::Suffix},
+      // {"法", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (解決法, 民法)
+      // {"論", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (進化論, 理論)
       // {"者", core::PartOfSpeech::Suffix},  // Removed: causes over-segmentation (代表者→代表+者)
       // {"家", core::PartOfSpeech::Suffix},  // Removed: causes over-segmentation (大家/思想家/政治家/etc.)
-      {"員", core::PartOfSpeech::Suffix},
-      {"式", core::PartOfSpeech::Suffix},
-      {"感", core::PartOfSpeech::Suffix},
-      {"力", core::PartOfSpeech::Suffix},
+      // {"員", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (会社員, 公務員)
+      // {"式", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (計算式, 結婚式)
+      // {"感", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (達成感, 違和感)
+      // {"力", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (説得力, 影響力)
       {"度", core::PartOfSpeech::Suffix},
       {"方", core::PartOfSpeech::Suffix},  // 歩き方, やり方 (V連用形+方)
       {"中", core::PartOfSpeech::Suffix},  // 一日中, 今日中 (N+中) - MeCab treats as suffix
@@ -193,6 +196,34 @@ std::vector<UnknownCandidate> generateProductiveSuffixCandidates(const std::vect
         candidates.push_back(makeSuffixCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Adjective, 0.4F,
                                                  surface, 0.85F, "stem_ppoi", dictionary::ConjugationType::IAdjective));
         return candidates;  // Found valid っぽい candidate
+      }
+    }
+
+    // Pattern 3: Short hiragana nickname + ちゃん/くん/さん
+    // Examples: たっちゃん, ゆうちゃん, けんちゃん, わんちゃん, けんくん
+    // Also lexicalized family terms: おねえさん, おにいさん, おかあさん, おとうさん
+    // Tokenizer use case: treat as a single search unit. Restrict stem to 1-3
+    // hiragana chars so we don't merge full names (e.g., はなこさん stays split).
+    if (surface.size() >= 9) {  // at least 1-char stem (3 bytes) + 2+ char honorific
+      for (const auto* honorific : {"ちゃん", "くん", "さん"}) {
+        std::string_view h(honorific);
+        if (!utf8::endsWith(surface, h)) {
+          continue;
+        }
+        std::string_view stem = std::string_view(surface).substr(0, surface.size() - h.size());
+        size_t stem_chars = stem.size() / 3;  // Each hiragana = 3 bytes in UTF-8
+        if (stem_chars >= 2 && stem_chars <= 3) {
+          // Stronger bonus when stem starts with お/ご (lexicalized family terms
+          // like おねえさん, おかあさん) so the 1-token path beats お(PREFIX) +
+          // nickname split, which gets a -1.3 PREFIX→NOUN bigram bonus.
+          bool starts_with_honorific_prefix =
+              stem.size() >= 3 && (stem.compare(0, 3, "お") == 0 || stem.compare(0, 3, "ご") == 0);
+          float cost = starts_with_honorific_prefix ? -1.5F : -0.5F;
+          candidates.push_back(makeSuffixCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Noun, cost,
+                                                   surface, 0.9F, "hira_nickname"));
+          return candidates;
+        }
+        break;
       }
     }
   }

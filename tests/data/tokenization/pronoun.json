@@ -83,14 +83,9 @@
       "description": "皆さん - collective pronoun",
       "expected": [
         {
-          "lemma": "皆",
-          "pos": "Pronoun",
-          "surface": "皆"
-        },
-        {
-          "lemma": "さん",
-          "pos": "Suffix",
-          "surface": "さん"
+          "lemma": "皆さん",
+          "pos": "Noun",
+          "surface": "皆さん"
         }
       ],
       "id": "pronoun_minasan",

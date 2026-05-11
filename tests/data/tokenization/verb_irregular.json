@@ -289,14 +289,9 @@
       "description": "効率的に作業する (work efficiently) - MeCab互換分割",
       "expected": [
         {
-          "lemma": "効率",
+          "lemma": "効率的",
           "pos": "Noun",
-          "surface": "効率"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "効率的"
         },
         {
           "lemma": "に",
@@ -324,17 +319,16 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "kanji-merge produces 積極的 NOUN; MeCab pos_sub1=形容動詞語幹 maps to Adjective. POS-only diff acceptable for tokenizer use case."
+      },
       "description": "積極的に参加する (participate proactively) - MeCab互換分割",
       "expected": [
         {
-          "lemma": "積極",
-          "pos": "Noun",
-          "surface": "積極"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "lemma": "積極的",
+          "pos": "Adjective",
+          "surface": "積極的"
         },
         {
           "lemma": "に",
@@ -354,6 +348,28 @@
       ],
       "id": "teki_sekkyokuteki_sankasuru",
       "input": "積極的に参加する",
+      "suzume_expected": [
+        {
+          "lemma": "積極的",
+          "pos": "Noun",
+          "surface": "積極的"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "参加",
+          "pos": "Noun",
+          "surface": "参加"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
       "tags": [
         "grammar",
         "na-adjective",
@@ -364,14 +380,9 @@
       "description": "具体的に説明する (explain concretely) - MeCab互換分割",
       "expected": [
         {
-          "lemma": "具体",
+          "lemma": "具体的",
           "pos": "Noun",
-          "surface": "具体"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "具体的"
         },
         {
           "lemma": "に",

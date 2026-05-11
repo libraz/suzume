@@ -396,9 +396,11 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       }
 
       // Penalize kanji sequences starting with the prefix kanji 御.
-      // 御 is an L1 PREFIX entry; absorbing it into a 2+ char kanji_seq lets
-      // the suffix path mis-split 御尽力 as 御尽 + 力 instead of 御 + 尽力.
-      // The +2.0 penalty makes the PREFIX path (御 + 尽力 NOUN compound) win.
+      // 御 is an L1 PREFIX entry and should split off as a productive prefix
+      // (御 + 尽力, 御 + 挨拶, 御 + 協力). The +2.0 penalty makes the PREFIX path
+      // win over any 2+ char kanji_seq starting with 御. Lexicalized 御-X nouns
+      // (御者, 御所, 御曹司) come from the dictionary and get a separate bonus
+      // in scorer.cpp to beat the prefix path.
       if (start_type == normalize::CharType::Kanji && len >= 2 && codepoints[start_pos] == U'御') {
         cost += 2.0F;
       }
@@ -491,6 +493,22 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       }
 #endif
       candidates.push_back(cand);
+
+      // Emit a standalone SUFFIX candidate for plural-honorific 方 when it sits
+      // at the tail of a kanji_seq (i.e., preceded by another kanji). Enables
+      // splits like 皆様(NOUN) + 方(SUFFIX) for 皆様方. Restricting to "prev is
+      // kanji" avoids false splits like その方(NOUN), 北の方(NOUN) where 方 is
+      // a standalone noun, not a plural-honorific suffix.
+      if (start_type == normalize::CharType::Kanji && len == 1 && codepoints[start_pos] == U'方' &&
+          start_pos > 0 && char_types[start_pos - 1] == normalize::CharType::Kanji) {
+        auto suffix_cand = makeCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Suffix, 0.5F,
+                                         /*has_suffix=*/true, CandidateOrigin::SameType);
+#ifdef SUZUME_DEBUG_INFO
+        suffix_cand.confidence = 1.0F;
+        suffix_cand.pattern = "tail_suffix_方";
+#endif
+        candidates.push_back(suffix_cand);
+      }
     }
   }
 

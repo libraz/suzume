@@ -829,6 +829,10 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "pos-limitation",
+        "reason": "的 standalone is Suffix in MeCab but Suzume produces Noun (L1 SUFFIX entry removed for X+的 merge support)."
+      },
       "description": "なし崩し should be single NOUN",
       "expected": [
         {
@@ -844,6 +848,18 @@
       ],
       "id": "nashikuzushi_noun",
       "input": "なし崩し的",
+      "suzume_expected": [
+        {
+          "lemma": "なし崩し",
+          "pos": "Noun",
+          "surface": "なし崩し"
+        },
+        {
+          "lemma": "的",
+          "pos": "Noun",
+          "surface": "的"
+        }
+      ],
       "tags": [
         "noun",
         "L2"
@@ -1228,14 +1244,9 @@
       "description": "Derivational suffix 的",
       "expected": [
         {
-          "lemma": "国際",
+          "lemma": "国際的",
           "pos": "Noun",
-          "surface": "国際"
-        },
-        {
-          "lemma": "的",
-          "pos": "Suffix",
-          "surface": "的"
+          "surface": "国際的"
         },
         {
           "lemma": "だ",
