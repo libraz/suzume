@@ -1381,7 +1381,7 @@
     {
       "accepted_diff": {
         "category": "pos-limitation",
-        "reason": "己 as NOUN (not PRON), 反し as NOUN (not VERB) - POS classification differences"
+        "reason": "己: Suzume Noun vs MeCab Pronoun (pos-classification); 反し: Suzume Verb(連用) vs MeCab Noun(nominalized) — Suzume's grammar-first analysis"
       },
       "description": "時として (sometimes) — L2 dict adverb, should be one token",
       "expected": [
@@ -1530,8 +1530,8 @@
           "surface": "に"
         },
         {
-          "lemma": "反し",
-          "pos": "Noun",
+          "lemma": "反す",
+          "pos": "Verb",
           "surface": "反し"
         },
         {

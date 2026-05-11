@@ -914,6 +914,10 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
     merged = []
     for curr in result:
         surface = curr.get("surface", "")
+        # Suzume design: 家 is not treated as SUFFIX, so X+家 compounds merge
+        # (e.g., 思想家, 政治家, 専門家). 的/様/氏 keep splitting via the pos_sub1
+        # 接尾 skip below.
+        is_merge_allowed_suffix = surface == "家"
         if (
             merged
             and regex.match(r"^[\p{Han}]+$", surface)
@@ -922,7 +926,7 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
             and "々" not in merged[-1].get("surface", "")
             and merged[-1].get("pos_sub1", "") not in ("副詞可能", "固有名詞", "数")
             and merged[-1].get("pos", "") != "副詞"
-            and curr.get("pos_sub1", "") != "接尾"
+            and (curr.get("pos_sub1", "") != "接尾" or is_merge_allowed_suffix)
         ):
             merged[-1]["surface"] += surface
             merged[-1]["lemma"] = merged[-1]["surface"]

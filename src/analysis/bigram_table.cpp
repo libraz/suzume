@@ -528,6 +528,23 @@ std::array<std::array<float, BigramTable::kSize>, BigramTable::kSize> BigramTabl
   setCell(t, EPOS::Determiner, EPOS::AdjBasic, kDeterminerNounBonus);
   setCell(t, EPOS::Determiner, EPOS::AdjRenyokei, kDeterminerNounBonus);
 
+  // ParticleCase → Determiner (rare; 連体詞 rarely follows case particles)
+  // Determiners introduce a new modifier clause and don't follow が/を/に/と/から/etc.
+  // Counteracts overly strong DET→NOUN bonus for verb-ambiguous hiragana DET like かかる
+  // (e.g., 壁にかかる絵 should be VERB, not DET).
+  setCell(t, EPOS::ParticleCase, EPOS::Determiner, cost::kStrong);
+
+  // AuxTenseTa → Determiner (past tense should not be followed by determiner)
+  // Prevents over-greedy match of L1 DET like かの in `た+か+の` (e.g., 覚めたかのような).
+  // The correct parse is た(past) + か(question particle) + の(particle).
+  // Needs kSevere to outweigh the DET→NounFormal bonus (-2.5 for かの→よう).
+  setCell(t, EPOS::AuxTenseTa, EPOS::Determiner, cost::kSevere);
+
+  // Pronoun → Determiner (pronoun does not directly take a determiner)
+  // Prevents over-greedy match of L1 DET like かの in `いくつ+か+の` (e.g., いくつかの限界).
+  // The correct parse is いくつ(pronoun) + か(particle) + の(particle).
+  setCell(t, EPOS::Pronoun, EPOS::Determiner, cost::kStrong);
+
   // =========================================================================
   // Noun → Verb (サ変動詞パターン)
   // =========================================================================

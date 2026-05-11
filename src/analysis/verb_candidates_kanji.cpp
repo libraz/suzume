@@ -909,6 +909,57 @@ std::vector<UnknownCandidate> generateVerbCandidates(const std::vector<char32_t>
           base_cost += bigram_cost::kRare;
           SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +1.0 (two_kanji_non_dict_penalty)\n");
         }
+        // Penalize ichidan verb candidates with pure single-kanji stem (no hiragana)
+        // when base form is not in dict.
+        // Real ichidan verbs with single-kanji stems (見る, 着る, 居る, etc.) are in
+        // the dictionary, while real multi-char stems like 食べ (食べる) need no penalty.
+        // False patterns like 心る (from "心なく" misparsed as ichidan) have a pure
+        // single-kanji stem and should be penalized to favor noun + aux split.
+        if (!in_dict && best.verb_type == grammar::VerbType::Ichidan && !best.stem.empty() &&
+            best.stem.size() == core::kJapaneseCharBytes) {
+          base_cost += bigram_cost::kRare;
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface
+                                                   << "\" +1.0 (single_kanji_stem_ichidan_non_dict_penalty)\n");
+        }
+        // Penalize unverified godan candidates that look like NOUN+AUX/VERB misanalysis.
+        // Skip ichidan (handled above) and Suru (handled earlier).
+        // Two patterns are penalized:
+        //   (a) godan-ka with stem ending in な (心なく → 心+なく): なく is AUX_過去 of ない.
+        //   (b) hiragana-only portion of base form is a 2+ char dict AUX/VERB
+        //       (e.g., 我ある — ある is dict VERB).
+        if (!in_dict && kanji_count == 1 && dict_manager != nullptr &&
+            best.verb_type != grammar::VerbType::Ichidan && best.verb_type != grammar::VerbType::Suru) {
+          bool penalized = false;
+          // Pattern (a): godan-ka with stem ending in な
+          if (best.verb_type == grammar::VerbType::GodanKa && !best.stem.empty() &&
+              utf8::endsWith(best.stem, "な")) {
+            base_cost += bigram_cost::kRare;
+            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface
+                                                     << "\" +1.0 (godan_ka_kanji_na_suffix_non_dict_penalty)\n");
+            penalized = true;
+          }
+          // Pattern (b): hiragana-only portion of base form is a 2+ char dict AUX/VERB.
+          // Restricted to 2+ chars to avoid false matches with single-char endings
+          // (う = AuxVolitional, but all real godan-wa verbs end in う: 思う, 戦う etc.)
+          if (!penalized && !best.base_form.empty()) {
+            auto base_cps = normalize::utf8::decode(best.base_form);
+            if (base_cps.size() >= 3 && normalize::isKanjiCodepoint(base_cps[0])) {
+              std::vector<char32_t> hira_only(base_cps.begin() + 1, base_cps.end());
+              std::string hira_portion = normalize::utf8::encode(hira_only);
+              auto results = dict_manager->lookup(hira_portion, 0);
+              for (const auto& result : results) {
+                if (result.entry != nullptr && result.entry->surface == hira_portion &&
+                    (result.entry->pos == core::PartOfSpeech::Auxiliary ||
+                     result.entry->pos == core::PartOfSpeech::Verb)) {
+                  base_cost += bigram_cost::kRare;
+                  SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \""
+                                           << surface << "\" +1.0 (single_kanji_godan_hira_is_dict_word_penalty)\n");
+                  break;
+                }
+              }
+            }
+          }
+        }
         // Penalty for verb candidates containing みたい suffix
         // みたい is a na-adjective (like ~, seems ~), not a verb suffix
         // E.g., 猫みたい should be 猫 + みたい, not VERB 猫む
@@ -1331,19 +1382,23 @@ std::vector<UnknownCandidate> generateVerbCandidates(const std::vector<char32_t>
       if (kanji_chars <= 1 && dict_manager != nullptr) {
         if (!vh::isVerbInDictionary(dict_manager, best_sa.base_form)) {
           if (hira_chars <= 1) {
-            // Single hiragana (悲し) — high false positive risk, skip
-            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" godan_sa single kanji+1hira, base \""
-                                              << best_sa.base_form << "\" not in dict\n");
-            continue;
+            // Single kanji + 1 hiragana (呈し, 訴え, 課し etc.).
+            // Many one-kanji 漢語サ変動詞 stems exist; the verb candidate must
+            // be available so it can compete with NOUN nominalization. Use
+            // strong non-dict penalty so 悲し (no real 悲す verb) still loses to
+            // NOUN/adjective interpretations, while 呈し (followed by 、/aux)
+            // can win via context.
+            non_dict_penalty = bigram_cost::kStrong;
+          } else {
+            // Block kanji+まし pattern (false godan-sa from verb+ます renyoukei)
+            // E.g., 来まし → 来ます (false), 出まし → 出ます (false)
+            if (codepoints[kanji_end] == U'ま') {
+              SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" godan_sa kanji+まし pattern (likely verb+ます)\n");
+              continue;
+            }
+            // 2+ hiragana non-ます pattern (尽くし) — allow with penalty
+            non_dict_penalty = bigram_cost::kMinor;
           }
-          // Block kanji+まし pattern (false godan-sa from verb+ます renyoukei)
-          // E.g., 来まし → 来ます (false), 出まし → 出ます (false)
-          if (codepoints[kanji_end] == U'ま') {
-            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" godan_sa kanji+まし pattern (likely verb+ます)\n");
-            continue;
-          }
-          // 2+ hiragana non-ます pattern (尽くし) — allow with penalty
-          non_dict_penalty = bigram_cost::kMinor;
         }
       }
 

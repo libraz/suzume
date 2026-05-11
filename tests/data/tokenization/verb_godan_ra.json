@@ -355,10 +355,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "auxiliary/negative: context-dependent classification"
-      },
       "description": "雨が降ったので、家にいた (stayed home because it rained) - MeCab-compatible split",
       "expected": [
         {
@@ -409,46 +405,6 @@
       ],
       "id": "complex_multiple_clauses",
       "input": "雨が降ったので、家にいた",
-      "suzume_expected": [
-        {
-          "pos": "Noun",
-          "surface": "雨"
-        },
-        {
-          "pos": "Particle",
-          "surface": "が"
-        },
-        {
-          "lemma": "降る",
-          "pos": "Verb",
-          "surface": "降っ"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "た"
-        },
-        {
-          "pos": "Particle",
-          "surface": "ので"
-        },
-        {
-          "pos": "Suffix",
-          "surface": "家"
-        },
-        {
-          "pos": "Particle",
-          "surface": "に"
-        },
-        {
-          "lemma": "いる",
-          "pos": "Verb",
-          "surface": "い"
-        },
-        {
-          "pos": "Auxiliary",
-          "surface": "た"
-        }
-      ],
       "tags": [
         "grammar",
         "complex"

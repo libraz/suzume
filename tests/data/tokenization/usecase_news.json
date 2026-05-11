@@ -1584,10 +1584,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "POS diff: て after 押し - Suzume Particle vs MeCab Auxiliary"
-      },
       "description": "Multi-step instructions - Current suzume unifies 起動し and 設定画面",
       "expected": [
         {
@@ -1683,98 +1679,6 @@
       ],
       "id": "long_instructions",
       "input": "まず電源ボタンを押して起動し、次に設定画面から言語を選択してください",
-      "suzume_expected": [
-        {
-          "lemma": "まず",
-          "pos": "Adverb",
-          "surface": "まず"
-        },
-        {
-          "lemma": "電源",
-          "pos": "Noun",
-          "surface": "電源"
-        },
-        {
-          "lemma": "ボタン",
-          "pos": "Noun",
-          "surface": "ボタン"
-        },
-        {
-          "lemma": "を",
-          "pos": "Particle",
-          "surface": "を"
-        },
-        {
-          "lemma": "押し",
-          "pos": "Noun",
-          "surface": "押し"
-        },
-        {
-          "lemma": "て",
-          "pos": "Particle",
-          "surface": "て"
-        },
-        {
-          "lemma": "起動",
-          "pos": "Noun",
-          "surface": "起動"
-        },
-        {
-          "lemma": "する",
-          "pos": "Verb",
-          "surface": "し"
-        },
-        {
-          "lemma": "次",
-          "pos": "Noun",
-          "surface": "次"
-        },
-        {
-          "lemma": "に",
-          "pos": "Particle",
-          "surface": "に"
-        },
-        {
-          "lemma": "設定画面",
-          "pos": "Noun",
-          "surface": "設定画面"
-        },
-        {
-          "lemma": "から",
-          "pos": "Particle",
-          "surface": "から"
-        },
-        {
-          "lemma": "言語",
-          "pos": "Noun",
-          "surface": "言語"
-        },
-        {
-          "lemma": "を",
-          "pos": "Particle",
-          "surface": "を"
-        },
-        {
-          "lemma": "選択",
-          "pos": "Noun",
-          "surface": "選択"
-        },
-        {
-          "lemma": "する",
-          "pos": "Verb",
-          "surface": "し"
-        },
-        {
-          "lemma": "て",
-          "pos": "Particle",
-          "surface": "て"
-        },
-        {
-          "lemma": "くださる",
-          "pos": "Verb",
-          "surface": "ください"
-        }
-      ],
       "tags": [
         "long"
       ]

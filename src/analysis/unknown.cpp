@@ -383,13 +383,24 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generateBySameType(
       core::PartOfSpeech pos = started_with_particle ? core::PartOfSpeech::Noun : getPosForType(start_type);
       float cost = getCostForType(start_type, len);
 
-      // Penalize kanji sequences ending with common suffixes (様, 氏, 的)
-      // to encourage NOUN + SUFFIX separation (e.g., 客様 → 客 + 様, 論理的 → 論理 + 的)
+      // Penalize kanji sequences ending with honorific/title suffixes (様, 氏)
+      // to encourage NOUN + SUFFIX separation (e.g., 客様 → 客 + 様, 田中様 → 田中 + 様)
+      // Note: 的 was removed — kanji_seq cost 1.0 with 1-char prefix (目+的 = 1.1)
+      // naturally keeps 目的/動的/知的/射的 as 1 token while 論理+的 still splits
+      // (2-char prefix gives 論理(1.0)+的(SUFFIX 0.5)-0.8 = 0.7 < 1.0).
       if (start_type == normalize::CharType::Kanji && len >= 2) {
         char32_t last_char = codepoints[candidate_end - 1];
-        if (last_char == U'様' || last_char == U'氏' || last_char == U'的') {
+        if (last_char == U'様' || last_char == U'氏') {
           cost += 4.0F;  // Strong penalty to prefer NOUN + SUFFIX path
         }
+      }
+
+      // Penalize kanji sequences starting with the prefix kanji 御.
+      // 御 is an L1 PREFIX entry; absorbing it into a 2+ char kanji_seq lets
+      // the suffix path mis-split 御尽力 as 御尽 + 力 instead of 御 + 尽力.
+      // The +2.0 penalty makes the PREFIX path (御 + 尽力 NOUN compound) win.
+      if (start_type == normalize::CharType::Kanji && len >= 2 && codepoints[start_pos] == U'御') {
+        cost += 2.0F;
       }
 
       // Skip kanji sequences starting with iteration mark (々)

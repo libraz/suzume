@@ -315,21 +315,39 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
     auto noun_results = dict_manager.lookup(text, start_byte);
     bool noun_in_dict = false;
     bool is_formal_noun = false;
+    bool noun_surface_is_non_noun_dict = false;
     float noun_cost = 1.0F;
 
     for (const auto& result : noun_results) {
-      if (result.entry != nullptr && result.length == noun_len && result.entry->pos == core::PartOfSpeech::Noun) {
-        noun_in_dict = true;
-        // v0.8: cost from extended_pos
-        noun_cost = getCategoryCost(result.entry->extended_pos);
-        is_formal_noun = (result.entry->extended_pos == core::ExtendedPOS::NounFormal);
-        break;
+      if (result.entry != nullptr && result.length == noun_len) {
+        if (result.entry->pos == core::PartOfSpeech::Noun) {
+          noun_in_dict = true;
+          // v0.8: cost from extended_pos
+          noun_cost = getCategoryCost(result.entry->extended_pos);
+          is_formal_noun = (result.entry->extended_pos == core::ExtendedPOS::NounFormal);
+          break;
+        }
+        // Surface exists in dict but as non-noun (Adverb, Conjunction, Determiner etc.).
+        // Don't fabricate a fake NOUN split candidate that would shadow the dict POS.
+        if (result.entry->pos == core::PartOfSpeech::Adverb ||
+            result.entry->pos == core::PartOfSpeech::Conjunction ||
+            result.entry->pos == core::PartOfSpeech::Determiner ||
+            result.entry->pos == core::PartOfSpeech::Adjective) {
+          noun_surface_is_non_noun_dict = true;
+        }
       }
     }
 
     // Skip N+V split if noun is a formal/bound noun (e.g., 中, 上, 下)
     // These typically attach to preceding nouns, not verbs
     if (is_formal_noun) {
+      continue;
+    }
+
+    // Skip N+V split if the noun surface is a non-noun dict entry (Adv/Conj/Det/Adj).
+    // Generating a fake NOUN here suppresses the correct POS (e.g., 早速/Adverb)
+    // because the SPLIT_NV bonus undercuts the dict candidate's category cost.
+    if (noun_surface_is_non_noun_dict && !noun_in_dict) {
       continue;
     }
 

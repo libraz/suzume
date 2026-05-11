@@ -333,6 +333,16 @@ float Scorer::wordCost(const core::LatticeEdge& edge) const {
     cost += lengthScaledBonus(-3.0F, char_len, 2, 0.5F);
   }
 
+  // Bonus for dictionary NOUN entries starting with honorific prefix kanji 御
+  // E.g., 御者, 御所, 御曹司 are lexicalized words where 御 is part of the noun,
+  // not a separable prefix. Without this bonus, the strong PREFIX→NOUN bigram
+  // bonus (-1.3) makes 御(PREFIX) + X split path cheaper than the dict entry.
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Noun && edge.surface.size() >= 6 &&
+      edge.surface.compare(0, 3, "御") == 0) {
+    size_t char_len = suzume::normalize::utf8Length(edge.surface);
+    cost += lengthScaledBonus(-1.0F, char_len, 2, 0.3F);
+  }
+
   // Bonus for hiragana+kanji mixed nouns from dictionary (e.g., なし崩し, みじん切り, お茶)
   // These are idiomatic expressions that should not be split
   // E.g., なし崩し should not be split as な+し+崩し (AUX+PARTICLE+NOUN)
@@ -1075,10 +1085,27 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // makes the split path cheaper than the compound path.
   // This penalty counteracts that for single-kanji-to-single-kanji transitions,
   // without affecting multi-kanji noun + suffix (e.g., 学生+たち, 科学+的).
+  // Exceptions:
+  // - 様/氏: handled by +4.0 kanji_seq penalty in unknown.cpp (always split)
+  // - 的: removed from kanji_seq penalty; 1-char + 的 stays merged naturally
+  //   (目的, 動的, 知的), 2+ char + 的 still splits via bigram bonus (論理+的)
   if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix &&
       prev.surface.size() == core::kJapaneseCharBytes && next.surface.size() == core::kJapaneseCharBytes &&
-      grammar::isAllKanji(prev.surface)) {
+      grammar::isAllKanji(prev.surface) && next.surface != "様" && next.surface != "氏") {
     surface_bonus += cost::kRare;  // +1.0 to counteract -0.8 bonus
+  }
+
+  // Penalty for 3+ char non-dict kanji NOUN → 1-char SUFFIX pattern
+  // For non-dict 3+ char kanji NOUN preceding a single-kanji suffix, the 4-char
+  // input is often two 2-char kango compounds (新規 + 手法) rather than
+  // a 3+1 stem+suffix split (新規手 + 法). Penalize to let the whole-word
+  // (or 2+2 split) compete fairly. Dict-verified 3-char NOUNs (e.g., 政治学+者 if
+  // 政治学 were in dict) keep the bonus, since they represent intended compounds.
+  if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix &&
+      !prev.fromDictionary() && prev.surface.size() >= 3 * core::kJapaneseCharBytes &&
+      next.surface.size() == core::kJapaneseCharBytes && grammar::isAllKanji(prev.surface) &&
+      grammar::isAllKanji(next.surface)) {
+    surface_bonus += cost::kRare;  // +1.0 to neutralize -0.8 bigram bonus
   }
 
   // Penalty for pronoun-like NOUN + でも pattern (limited)

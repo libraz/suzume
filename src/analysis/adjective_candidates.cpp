@@ -1046,6 +1046,20 @@ std::vector<UnknownCandidate> generateNaAdjectiveCandidates(const std::vector<ch
       return candidates;
     }
 
+    // Skip if な is followed by く/い/か — these indicate ない (auxiliary/adjective)
+    // attached to the preceding noun, not a な-adjective stem.
+    // Examples:
+    //   私心なく → 私心 + ない連用 (not 私心(ADJ_NA) + く)
+    //   仕方ない → 仕方 + ない (not 仕方(ADJ_NA) + い)
+    //   関係なかった → 関係 + なかっ (か triggers naかった past form)
+    // Real な-adjectives followed by these forms (静かなく) are not standard Japanese.
+    if (kanji_end + 1 < codepoints.size()) {
+      char32_t after_na = codepoints[kanji_end + 1];
+      if (after_na == U'く' || after_na == U'い' || after_na == U'か') {
+        return candidates;
+      }
+    }
+
     // Found kanji compound + な - potential na-adjective stem
     // Cost similar to dictionary na-adjectives but with small penalty for unknown
     candidates.push_back(makeNaAdjCandidate(kanji_seq, start_pos, kanji_end, 0.5F, true, 0.8F, "na_adjective_stem"));

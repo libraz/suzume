@@ -110,6 +110,10 @@
       ]
     },
     {
+      "accepted_diff": {
+        "category": "dict-pos-change",
+        "reason": "おる added to L2 dict as GODAN_RA verb; おり is now dict-backed VerbRenyokei (Verb) not Auxiliary"
+      },
       "description": "いたしております - humble suru verb unified",
       "expected": [
         {
@@ -135,36 +139,32 @@
       ],
       "id": "suru_itashite",
       "input": "いたしております",
+      "suzume_expected": [
+        {
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おる",
+          "pos": "Verb",
+          "surface": "おり"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
       "tags": [
         "basic",
         "suru"
-      ],
-      "suzume_expected": [
-        {
-          "surface": "いたし",
-          "pos": "Verb",
-          "lemma": "いたす"
-        },
-        {
-          "surface": "て",
-          "pos": "Particle",
-          "lemma": "て"
-        },
-        {
-          "surface": "おり",
-          "pos": "Verb",
-          "lemma": "おる"
-        },
-        {
-          "surface": "ます",
-          "pos": "Auxiliary",
-          "lemma": "ます"
-        }
-      ],
-      "accepted_diff": {
-        "category": "dict-pos-change",
-        "reason": "おる added to L2 dict as GODAN_RA verb; おり is now dict-backed VerbRenyokei (Verb) not Auxiliary"
-      }
+      ]
     },
     {
       "accepted_diff": {
@@ -1120,10 +1120,6 @@
       ]
     },
     {
-      "accepted_diff": {
-        "category": "pos-limitation",
-        "reason": "verb form: context-dependent POS/lemma"
-      },
       "description": "押して should be GodanSa verb (押す), not Suru (押しする)",
       "expected": [
         {
@@ -1139,16 +1135,6 @@
       ],
       "id": "godan_sa_oshite",
       "input": "押して",
-      "suzume_expected": [
-        {
-          "pos": "Noun",
-          "surface": "押し"
-        },
-        {
-          "pos": "Particle",
-          "surface": "て"
-        }
-      ],
       "tags": [
         "verb",
         "godan-sa",

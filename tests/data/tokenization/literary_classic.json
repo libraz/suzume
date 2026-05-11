@@ -4765,7 +4765,7 @@
     {
       "accepted_diff": {
         "category": "pos-limitation",
-        "reason": "POS/lemma limitation"
+        "reason": "怒り: Suzume Verb(renyokei nominalized 怒る) vs MeCab Noun; なら: Suzume Verb(なる mizenkei) vs MeCab Auxiliary — Suzume grammar-first analysis"
       },
       "description": "文語: 怒り/発し POS diff, てはならぬ prohibition",
       "expected": [
@@ -4834,6 +4834,7 @@
           "surface": "怒り"
         },
         {
+          "lemma": "に",
           "pos": "Particle",
           "surface": "に"
         },
@@ -4843,26 +4844,32 @@
           "surface": "任せ"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "言葉",
           "pos": "Noun",
           "surface": "言葉"
         },
         {
+          "lemma": "を",
           "pos": "Particle",
           "surface": "を"
         },
         {
-          "pos": "Noun",
+          "lemma": "発す",
+          "pos": "Verb",
           "surface": "発し"
         },
         {
+          "lemma": "て",
           "pos": "Particle",
           "surface": "て"
         },
         {
+          "lemma": "は",
           "pos": "Particle",
           "surface": "は"
         },
@@ -4872,6 +4879,7 @@
           "surface": "なら"
         },
         {
+          "lemma": "ぬ",
           "pos": "Auxiliary",
           "surface": "ぬ"
         }

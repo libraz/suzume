@@ -976,6 +976,37 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
       }
     }
 
+    // Skip if a hiragana-V2 variant of compound_base is registered as VERB in dictionary.
+    // E.g., compound_base=取り掛かる but dict has 取りかかる: prefer dict's hiragana lemma.
+    // This handles modern Japanese where mixed kanji+hiragana compounds (取りかかる, 引き起こす)
+    // are conventionally written without normalizing V2 to kanji.
+    if (best_match.matched_via_reading && !best_match.v2_reading.empty() &&
+        best_match.compound_base.size() > best_match.v2_reading.size()) {
+      // V1 portion = compound_base minus the V2 kanji suffix; replace with V2 reading.
+      // We can't compute v2 kanji length directly here, so reconstruct from compound_base.
+      // Find where compound_base differs from v2_reading at the end.
+      // Simpler approach: v1_portion length = compound_base.size() - len(kanji_v2_in_compound_base).
+      // The kanji V2 portion is what was appended via `compound_base += v2_verb.surface` in the loop.
+      // We saved that as the suffix after the V1 renyokei. Length-wise it's v2_kanji_len_bytes,
+      // which equals compound_base.size() - (v2_start_byte - start_byte).
+      // v1 renyokei text = text[start_byte .. v2_start_byte] (independent of is_ichidan because
+      // for ichidan v1_renyokei_end == v2_start_byte; for godan v1_renyokei_end == v2_start_byte
+      // since the renyokei character is the last char of v1, inside the start..v2_start span).
+      std::string v1_renyokei_text(text.substr(start_byte, v2_start_byte - start_byte));
+      std::string hira_v2_compound = v1_renyokei_text + best_match.v2_reading;
+      if (hira_v2_compound != best_match.compound_base) {
+        auto verb_check = dict_manager.lookup(hira_v2_compound, 0);
+        for (const auto& result : verb_check) {
+          if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Verb &&
+              result.entry->surface == hira_v2_compound) {
+            SUZUME_DEBUG_LOG("[COMPOUND_SKIP] kanji compound \""
+                             << best_match.compound_base << "\" yields to dict verb \"" << hira_v2_compound << "\"\n");
+            return;
+          }
+        }
+      }
+    }
+
     // Calculate cost
     float base_cost = scorer.posPrior(core::PartOfSpeech::Verb);
     const auto& opts = scorer.joinOpts();

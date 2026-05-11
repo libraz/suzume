@@ -69,7 +69,7 @@ const std::vector<SuffixEntry>& getSuffixEntries() {
       {"法", core::PartOfSpeech::Suffix},
       {"論", core::PartOfSpeech::Suffix},
       // {"者", core::PartOfSpeech::Suffix},  // Removed: causes over-segmentation (代表者→代表+者)
-      {"家", core::PartOfSpeech::Suffix},
+      // {"家", core::PartOfSpeech::Suffix},  // Removed: causes over-segmentation (大家/思想家/政治家/etc.)
       {"員", core::PartOfSpeech::Suffix},
       {"式", core::PartOfSpeech::Suffix},
       {"感", core::PartOfSpeech::Suffix},
@@ -347,6 +347,25 @@ std::vector<UnknownCandidate> generateWithSuffix(const std::vector<char32_t>& co
       // Calculate stem length in codepoints
       auto suffix_codepoints = normalize::utf8::decode(std::string(suffix));
       size_t stem_end = end_pos - suffix_codepoints.size();
+      size_t stem_codepoint_len = stem_end - start_pos;
+
+      // Restrict suffix-stem split to 2-char kanji stems.
+      // Typical kango "X+suffix" patterns (思想家, 国際法, 公務員) all have a 2-char stem.
+      // 3+ char stems before a 1-char suffix usually indicate the kanji_seq is actually
+      // two adjacent kango compounds (e.g., 新規手法 = 新規 + 手法, not 新規手 + 法).
+      // Longer stems with a real suffix (大企業家) are reached via the PREFIX path
+      // (大 prefix + 企業家 → 企業 + 家).
+      if (stem_codepoint_len > 2) {
+        continue;
+      }
+
+      // Skip suffix-stem when the stem starts with the L1 PREFIX kanji 御.
+      // The prefix path (御 + 尽力 NOUN) should win over 御尽 + 力 (suffix path).
+      // Without this skip, suffix path cost (0.7) + NOUN→SUFFIX bonus (-0.8) makes
+      // 御尽 + 力 cheaper than 御(PREFIX) + 尽力(kanji_seq).
+      if (codepoints[start_pos] == U'御') {
+        continue;
+      }
 
       if (stem_end > start_pos + 1) {
         // Add stem candidate
@@ -524,13 +543,25 @@ std::vector<UnknownCandidate> generateNominalizedNounCandidates(const std::vecto
       if (kanji_count >= 3) {
         nom1_cost += static_cast<float>(kanji_count - 2) * 0.5F;
       }
-      auto cand = makeCandidate(surface, start_pos, kanji_end + 1, core::PartOfSpeech::Noun, nom1_cost, false,
-                                CandidateOrigin::NominalizedNoun);
+      // Single kanji + し followed by sentence punctuation (、。) is almost
+      // always 一字漢語サ変動詞 renyokei in formal/literary text (呈し、訴し、),
+      // not a nominalized noun. Skip to let the VERB candidate win.
+      bool skip_nom_single_kanji_shi = false;
+      if (kanji_count == 1 && first_hiragana == U'し' && kanji_end + 1 < codepoints.size()) {
+        char32_t after = codepoints[kanji_end + 1];
+        if (after == U'、' || after == U'。') {
+          skip_nom_single_kanji_shi = true;
+        }
+      }
+      if (!skip_nom_single_kanji_shi) {
+        auto cand = makeCandidate(surface, start_pos, kanji_end + 1, core::PartOfSpeech::Noun, nom1_cost, false,
+                                  CandidateOrigin::NominalizedNoun);
 #ifdef SUZUME_DEBUG_INFO
-      cand.confidence = 0.6F;
-      cand.pattern = "nominalized_1hira";
+        cand.confidence = 0.6F;
+        cand.pattern = "nominalized_1hira";
 #endif
-      candidates.push_back(cand);
+        candidates.push_back(cand);
+      }
     }
   }
 

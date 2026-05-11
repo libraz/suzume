@@ -205,6 +205,7 @@ std::vector<DictionaryEntry> getCompoundParticleEntries() {
 
       // Place/Situation (場所・状況)
       particle("において", EPOS::ParticleConj),  // prevent に+おい(verb)+て split
+      particle("における", EPOS::ParticleCase),  // prevent に+おける split
       particle("にて", EPOS::ParticleCase),
 
       // Capacity/Viewpoint (資格・観点)
@@ -400,6 +401,10 @@ std::vector<DictionaryEntry> getAuxiliaryEntries() {
       // Honorific prefix ご (ご確認, ご報告, ご連絡)
       // MeCab: ご確認 → ご(接頭辞) + 確認(名詞)
       prefix("ご", "ご"),
+
+      // Honorific prefix 御 (御尽力, 御挨拶, 御協力 - kanji form, mostly literary/formal)
+      // MeCab: 御尽力 → 御(接頭辞) + 尽力(名詞)
+      prefix("御", "御"),
 
       // Note: Negation prefixes (未, 非, 不, 無) are NOT registered
       // MeCab splits them but Suzume keeps them unified for practical tokenization
@@ -805,6 +810,16 @@ std::vector<DictionaryEntry> getDeterminerEntries() {
 
       // Classical possessive determiner (我が家, 我が子, 我が国)
       det("我が", ""),
+
+      // Classical/literary determiner (斯かる = such, this kind of)
+      // Note: shares hiragana surface with godan-ra verb 掛かる/懸かる (L2: かかる).
+      // L1 Determiner competes with VERB in determiner+NOUN contexts (かかる事態).
+      det("かかる", ""),
+
+      // Classical/literary determiner (彼の = that, the aforementioned)
+      // Without L1, over-splits to か(unknown)+の(particle).
+      // Same pattern as かかる above.
+      det("かの", ""),
   };
 }
 
@@ -932,6 +947,10 @@ std::vector<DictionaryEntry> getPronounEntries() {
       adv("ちょうど", ""),
       // Temporal adverbs - common, prevent misclassification
       adv("まだ", ""),
+
+      // Compound adverb (改めて = anew/once more) - 動詞「改める」連用形+て の語彙化
+      // MeCab: 改めて → 改めて(副詞)
+      adv("改めて", ""),
   };
 }
 
