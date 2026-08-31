@@ -240,8 +240,7 @@ bool embedsAuxiliaryOnOnbinStem(const std::vector<char32_t>& codepoints, size_t 
       continue;
     }
     if (hasDictionaryEntryFrom(dict_manager, codepoints, aux_start, 1, end_pos - aux_start,
-                               core::PartOfSpeech::Auxiliary,
-                               [](const dictionary::DictionaryEntry&) { return true; })) {
+                               core::PartOfSpeech::Auxiliary, nullptr)) {
       return true;
     }
   }
@@ -249,11 +248,10 @@ bool embedsAuxiliaryOnOnbinStem(const std::vector<char32_t>& codepoints, size_t 
 }
 
 bool auxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
-                        size_t pos, bool (*accept)(core::ExtendedPOS)) {
+                        size_t pos, EntryAccept accept) {
   constexpr size_t kAuxiliaryProbe = 3;
-  return hasDictionaryEntryFrom(
-      dict_manager, codepoints, pos, 1, kAuxiliaryProbe, core::PartOfSpeech::Auxiliary,
-      [accept](const dictionary::DictionaryEntry& entry) { return accept(entry.extended_pos); });
+  return hasDictionaryEntryFrom(dict_manager, codepoints, pos, 1, kAuxiliaryProbe, core::PartOfSpeech::Auxiliary,
+                                accept);
 }
 
 bool classicalAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager,

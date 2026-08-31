@@ -15,6 +15,7 @@
 #include <string_view>
 #include <vector>
 
+#include "analysis/dictionary_probe.h"
 #include "core/types.h"
 #include "dictionary/dictionary.h"
 #include "grammar/conjugation.h"
@@ -511,7 +512,7 @@ bool embedsAuxiliaryOnOnbinStem(const std::vector<char32_t>& codepoints, size_t 
  * probe stays a category decision (see the ExtendedPOS predicates in types.h).
  */
 bool auxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
-                        size_t pos, bool (*accept)(core::ExtendedPOS));
+                        size_t pos, EntryAccept accept);
 
 /**
  * @brief True when a literary (文語) auxiliary starts at @p pos.

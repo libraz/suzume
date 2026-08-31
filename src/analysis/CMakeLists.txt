@@ -53,6 +53,7 @@ add_library(suzume_analysis OBJECT
   tokenizer_dictionary.cpp
   tokenizer_dictionary_special.cpp
   tokenizer_unknown.cpp
+  dictionary_probe.cpp
   tokenizer_utils.cpp
   unknown.cpp
   unknown_same_type.cpp

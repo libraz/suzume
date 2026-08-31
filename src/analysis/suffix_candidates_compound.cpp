@@ -71,7 +71,7 @@ bool boundarySplitsDictionaryParticle(const dictionary::DictionaryManager* dict_
   const size_t probe_end = std::min(codepoints.size(), end_pos + 2);
   for (size_t start = scan_start; start < end_pos; ++start) {
     if (hasDictionaryEntryFrom(dict_manager, codepoints, start, end_pos + 1 - start, probe_end - start,
-                               core::PartOfSpeech::Particle, [](const dictionary::DictionaryEntry&) { return true; })) {
+                               core::PartOfSpeech::Particle, nullptr)) {
       return true;
     }
   }

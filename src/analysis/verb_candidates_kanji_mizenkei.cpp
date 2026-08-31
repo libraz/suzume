@@ -446,7 +446,9 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
         const bool is_classical_conjecture_pattern =
             stem_is_lone_kanji &&
             vh::auxiliaryFollowsAt(dict_manager, codepoints, mizenkei_end,
-                                   [](core::ExtendedPOS epos) { return epos == core::ExtendedPOS::AuxVolitional; });
+                                   [](const dictionary::DictionaryEntry& entry) {
+                                     return entry.extended_pos == core::ExtendedPOS::AuxVolitional;
+                                   });
         // Check for colloquial contracted negative ん pattern
         // E.g., 行かん → 行か (mizenkei) + ん (contracted negative AUX)
         //       言わん → 言わ (mizenkei) + ん

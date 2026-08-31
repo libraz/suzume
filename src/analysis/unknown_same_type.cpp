@@ -289,7 +289,7 @@ bool startsAfterDictionaryVerb(const std::vector<char32_t>& codepoints,
     return false;
   }
   return hasDictionaryEntryFrom(dict_manager, codepoints, start_pos - 1, 2, run_end - start_pos + 1,
-                                core::PartOfSpeech::Verb, [](const dictionary::DictionaryEntry&) { return true; });
+                                core::PartOfSpeech::Verb, nullptr);
 }
 
 // A same-type run can also begin inside a dictionary adjective's okurigana
@@ -304,7 +304,7 @@ bool startsAfterDictionaryAdjective(const std::vector<char32_t>& codepoints,
     return false;
   }
   return hasDictionaryEntryFrom(dict_manager, codepoints, start_pos - 1, 2, run_end - start_pos + 1,
-                                core::PartOfSpeech::Adjective, [](const dictionary::DictionaryEntry&) { return true; });
+                                core::PartOfSpeech::Adjective, nullptr);
 }
 
 }  // namespace

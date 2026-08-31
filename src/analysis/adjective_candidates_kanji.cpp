@@ -101,7 +101,7 @@ bool containsDictionaryVerbBoundary(const std::vector<char32_t>& codepoints, siz
   constexpr size_t kMinimumVerbLength = 2;
   for (size_t verb_start = start_pos + 1; verb_start + 1 < end_pos; ++verb_start) {
     if (hasDictionaryEntryFrom(dict_manager, codepoints, verb_start, kMinimumVerbLength, end_pos - 1 - verb_start,
-                               core::PartOfSpeech::Verb, [](const dictionary::DictionaryEntry&) { return true; })) {
+                               core::PartOfSpeech::Verb, nullptr)) {
       return true;
     }
   }
