@@ -28,6 +28,7 @@ src/analysis/compound_verb_forms.cpp	0	0	0
 src/analysis/compound_verb_match.cpp	0	4	0
 src/analysis/compound_verb_verify.cpp	0	0	0
 src/analysis/compound_verb_voice.cpp	0	0	0
+src/analysis/dictionary_probe.cpp	0	0	0
 src/analysis/dictionary_probe.h	0	0	0
 src/analysis/join_candidates.h	0	0	0
 src/analysis/join_compound_verb.cpp	0	0	0
@@ -40,14 +41,14 @@ src/analysis/scorer.cpp	0	186	0
 src/analysis/scorer.h	0	23	0
 src/analysis/scorer_bigram_overrides.h	0	0	0
 src/analysis/scorer_boundary_cost.cpp	0	0	0
-src/analysis/scorer_connection_cost.cpp	37	23	53
+src/analysis/scorer_connection_cost.cpp	37	23	52
 src/analysis/scorer_connection_rules.h	0	0	0
 src/analysis/scorer_connection_rules_honorific.cpp	13	2	36
 src/analysis/scorer_connection_rules_internal.h	0	0	0
 src/analysis/scorer_connection_rules_lexical.cpp	6	1	52
 src/analysis/scorer_connection_rules_negative.cpp	6	1	33
 src/analysis/scorer_connection_rules_particle.cpp	6	2	26
-src/analysis/scorer_connection_rules_renyokei.cpp	8	4	98
+src/analysis/scorer_connection_rules_renyokei.cpp	8	4	97
 src/analysis/scorer_connection_rules_suffix.cpp	1	8	68
 src/analysis/scorer_connection_rules_verb.cpp	8	0	12
 src/analysis/scorer_connection_rules_voice.cpp	2	2	28
