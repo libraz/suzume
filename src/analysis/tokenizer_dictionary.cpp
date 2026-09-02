@@ -633,6 +633,26 @@ bool hasPrecedingQuantityEdge(const core::Lattice& lattice, size_t end_pos) {
   });
 }
 
+// Whether a verb continuative built on a kanji stem reaches past this position.
+// Its okurigana starts on the same i-row mora two of the kana numerals do
+// (思い|つつ against 思|いつつ, 読み|つつ against 読|みっつ), so a numeral opening
+// there would be opening inside a word.  A stem is at most one mora shorter than
+// the run it heads, so probing back that far reaches every such continuative.
+bool insideKanjiVerbOkurigana(const core::Lattice& lattice, size_t start_pos) {
+  constexpr size_t kStemProbeChars = 4;
+  const size_t probe_start = start_pos > kStemProbeChars ? start_pos - kStemProbeChars : 0;
+  for (size_t stem_start = probe_start; stem_start < start_pos; ++stem_start) {
+    const bool spans = core::anyEdgeStartingAt(lattice, stem_start, [start_pos](const core::LatticeEdge& edge) {
+      return edge.pos == core::PartOfSpeech::Verb && edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+             edge.end > start_pos;
+    });
+    if (spans) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // A formal noun after the negative-quote frame (…ん+と) must not hide a
 // dictionary verb irrealis plus the following negative auxiliary.  This is a
 // structural ambiguity: the formal-noun edge has no predicate host there,
@@ -986,7 +1006,8 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // quantity. Repeated/distributive quantities are owned by the dedicated
     // counter candidate, while this position otherwise begins a particle or
     // predicate (一つ+と+おもう, not 一つ+とお+も+う).
-    if (result.entry->extended_pos == core::ExtendedPOS::NounNumber && hasPrecedingQuantityEdge(lattice, start_pos)) {
+    if (result.entry->extended_pos == core::ExtendedPOS::NounNumber &&
+        (hasPrecedingQuantityEdge(lattice, start_pos) || insideKanjiVerbOkurigana(lattice, start_pos))) {
       continue;
     }
 
