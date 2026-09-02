@@ -36,6 +36,10 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
       return grammar::isListingParticleTariSurface(edge.surface) ? boundary_cost.eos : sc::scale::kNeutral;
     case sc::EosBoundaryGate::NonDictionary:
       return edge.fromDictionary() ? sc::scale::kNeutral : boundary_cost.eos;
+    case sc::EosBoundaryGate::IzenkeiNegative:
+      // Only the 已然形 ね is barred: it needs ば or ど(も) after it, while the
+      // other cells of the same auxiliary close a clause (読ま+ず, 知ら+ぬ).
+      return grammar::isSingleHiragana(edge.surface, U'ね') ? boundary_cost.eos : sc::scale::kNeutral;
     case sc::EosBoundaryGate::AfterContent:
       // The sentence start arrives here as Unknown, and a punctuation mark
       // opens a fragment; in both the token introduces what follows instead.

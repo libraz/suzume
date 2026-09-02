@@ -447,6 +447,12 @@ constexpr float kEosRenyokeiFormalNounPenalty = scale::kAlmostNever;
 // fabricated irrealis covering the conditional なら+ば wins over the copula
 // plus its particle when nothing follows (雨ならば as 雨+ならば).
 constexpr float kEosMizenkeiPenalty = scale::kAlmostNever;
+// ね is the 已然形 of the classical negative ぬ, so it requires ば or ど(も)
+// after it and cannot end a sentence. Its siblings ず/ぬ/ん/じ close a clause
+// perfectly well, which is why the row is gated on the form rather than on the
+// auxiliary. Without it the sentence-final particle ね is read as this
+// auxiliary and drags a fabricated irrealis in front of it (らし+いよ+ね).
+constexpr float kEosIzenkeiNegativePenalty = scale::kStrong;
 
 enum class EosBoundaryGate {
   Always,
@@ -454,6 +460,7 @@ enum class EosBoundaryGate {
   ListingParticle,
   NonDictionary,
   AfterContent,
+  IzenkeiNegative,
 };
 
 struct BoundaryCost {
@@ -513,6 +520,8 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)].eos = kEosShortRenyokeiPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)].eos_gate = EosBoundaryGate::SingleCodepoint;
   table[static_cast<size_t>(core::ExtendedPOS::VerbMizenkei)].eos = kEosMizenkeiPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::AuxNegativeNu)].eos = kEosIzenkeiNegativePenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::AuxNegativeNu)].eos_gate = EosBoundaryGate::IzenkeiNegative;
 
   return table;
 }();
