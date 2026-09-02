@@ -469,6 +469,75 @@
       ],
       "id": "wagahai_wa_neko",
       "input": "吾輩は猫である"
+    },
+    {
+      "description": "bare nominal opens the predicate slot for a classical nidan attributive",
+      "expected": [
+        {
+          "lemma": "月",
+          "pos": "Noun",
+          "surface": "月"
+        },
+        {
+          "lemma": "老ゆ",
+          "pos": "Verb",
+          "surface": "老ゆる"
+        },
+        {
+          "lemma": "につれ",
+          "pos": "Particle",
+          "surface": "につれ"
+        },
+        {
+          "lemma": "光",
+          "pos": "Noun",
+          "surface": "光"
+        },
+        {
+          "lemma": "弱る",
+          "pos": "Verb",
+          "surface": "弱る"
+        }
+      ],
+      "id": "tsuki_oyuru_ni_tsure",
+      "input": "月老ゆるにつれ光弱る"
+    },
+    {
+      "description": "bare nominal opens the predicate slot for a classical nidan attributive",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "老ゆ",
+          "pos": "Verb",
+          "surface": "老ゆる"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "自然",
+          "pos": "Adjective",
+          "surface": "自然"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "理",
+          "pos": "Noun",
+          "surface": "理"
+        }
+      ],
+      "id": "hito_oyuru_wa_shizen",
+      "input": "人老ゆるは自然の理"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",

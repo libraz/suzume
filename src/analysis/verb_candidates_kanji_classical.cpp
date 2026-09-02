@@ -14,6 +14,7 @@
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/verb_endings.h"
+#include "normalize/char_type.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
 #include "verb_candidates.h"
@@ -212,7 +213,7 @@ bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_po
   if (vh::followsCaseParticle(dict_manager, codepoints, start_pos)) {
     return true;
   }
-  if (dict_manager == nullptr || start_pos == 0) {
+  if (start_pos == 0) {
     return false;
   }
   // A focus particle opens a 係り結び whose 結び is the attributive cell, so it
@@ -220,7 +221,7 @@ bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_po
   // これ+なむ+求むる+道). Its members run to two morae, so probe back that far.
   constexpr size_t kFocusParticleChars = 2;
   const size_t scan_start = start_pos > kFocusParticleChars ? start_pos - kFocusParticleChars : 0;
-  for (size_t particle_start = scan_start; particle_start < start_pos; ++particle_start) {
+  for (size_t particle_start = scan_start; dict_manager != nullptr && particle_start < start_pos; ++particle_start) {
     const auto* particle = dict_manager->lookupExact(extractSubstring(codepoints, particle_start, start_pos),
                                                      core::PartOfSpeech::Particle);
     if (particle != nullptr && (particle->extended_pos == core::ExtendedPOS::ParticleNo ||
@@ -230,7 +231,13 @@ bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_po
       return true;
     }
   }
-  return false;
+  // Classical Japanese drops the nominative marker as readily as it writes it,
+  // so a bare nominal opens the same slot a case particle does (月老ゆる for
+  // 月が老ゆる). Script tells that apart from a position inside a word: a
+  // nominal ends on kanji, katakana or a numeral, while a hiragana neighbour
+  // that is not one of the particles above is the okurigana of the word this
+  // position sits in.
+  return normalize::classifyChar(codepoints[start_pos - 1]) != normalize::CharType::Hiragana;
 }
 
 // A bigrade verb spells its 終止形 as the kanji stem plus the row's U-row kana
