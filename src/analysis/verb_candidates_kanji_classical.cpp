@@ -265,8 +265,14 @@ bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_po
 void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
                                     size_t hiragana_end, const dictionary::DictionaryManager* dict_manager,
                                     std::vector<UnknownCandidate>& candidates) {
-  if (kanji_end != start_pos + 1 || kanji_end >= hiragana_end ||
-      !opensPredicateSlot(codepoints, start_pos, dict_manager)) {
+  // The stem is one kanji, and it is the last one of the run: whatever precedes
+  // it is the nominal argument that opens the predicate slot, which is the same
+  // evidence a written case particle gives (木の|葉|落つる, 灯|消ゆる).
+  if (kanji_end == start_pos || kanji_end >= hiragana_end) {
+    return;
+  }
+  const size_t stem_start = kanji_end - 1;
+  if (!opensPredicateSlot(codepoints, stem_start, dict_manager)) {
     return;
   }
   const char32_t terminal = codepoints[kanji_end];
@@ -274,7 +280,7 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
   // The same kana spell classical auxiliaries that take a 未然形 or a 連用形
   // (見+つる, 見+ぬる). Behind a stem that is a verb on its own, the kana is that
   // auxiliary and not the row's ending.
-  if (grammar::isClassicalAuxiliaryHomographKana(terminal) && vh::isSingleKanjiIchidan(codepoints[start_pos])) {
+  if (grammar::isClassicalAuxiliaryHomographKana(terminal) && vh::isSingleKanjiIchidan(codepoints[stem_start])) {
     return;
   }
   if (!grammar::isBigradeTerminalKana(terminal)) {
@@ -290,10 +296,10 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
        !shuushikeiEndsAt(codepoints, kanji_end + 1, dict_manager))) {
     return;
   }
-  const std::string lemma = extractSubstring(codepoints, start_pos, kanji_end + 1);
+  const std::string lemma = extractSubstring(codepoints, stem_start, kanji_end + 1);
   const size_t end_pos = is_attributive ? kanji_end + 2 : kanji_end + 1;
   candidates.push_back(
-      makeVerbCandidate(extractSubstring(codepoints, start_pos, end_pos), start_pos, end_pos,
+      makeVerbCandidate(extractSubstring(codepoints, stem_start, end_pos), stem_start, end_pos,
                         candidate::verb_cost::kClassicalHaRowLicensedCost, lemma, dictionary::ConjugationType::Ichidan,
                         true, CandidateOrigin::VerbKanji, candidate::kNoConfidence, "classical_nidan_cell",
                         is_attributive ? core::ExtendedPOS::VerbRentaikei : core::ExtendedPOS::VerbShuushikei));
