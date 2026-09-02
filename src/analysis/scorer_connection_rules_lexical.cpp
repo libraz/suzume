@@ -211,15 +211,20 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
-  // A generated verb-onbin candidate whose reconstructed lemma ends in ぬ
-  // is a contracted negative (読まん, 書かん), not a lexical onbin form.
-  // Before connective で, keep the productive mizenkei + ん + でも chain.
-  if (prev.extended_pos == core::ExtendedPOS::VerbOnbinkei && utf8::endsWith(prev.lemma, "ぬ") &&
-      utf8::startsWith(next.surface, "で") &&
+  // A negative selects the connective で, so the productive mizenkei + ん +
+  // で + も chain keeps that boundary and the fused adverbial particle has no
+  // reading in front of it. The negative reaches this position two ways: a
+  // generated verb-onbin candidate whose reconstructed lemma ends in ぬ is a
+  // contracted negative (読まん, 書かん) rather than a lexical onbin form, and
+  // the auxiliary also stands as its own token (食べ+ん+で+も).
+  const bool follows_negative =
+      prev.extended_pos == core::ExtendedPOS::AuxNegativeNu ||
+      (prev.extended_pos == core::ExtendedPOS::VerbOnbinkei && utf8::endsWith(prev.lemma, "ぬ"));
+  if (follows_negative && utf8::startsWith(next.surface, "で") &&
       (next.extended_pos == core::ExtendedPOS::ParticleConj ||
        next.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
        next.extended_pos == core::ExtendedPOS::Conjunction)) {
-    SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
+    SUZUME_CONNECTION_ADD(bonus, cost::kSevere);
   }
 
   // Penalty for VerbOnbinkei(ん) → Verb(でる) pattern
