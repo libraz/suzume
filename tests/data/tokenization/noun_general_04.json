@@ -336,6 +336,75 @@
       ],
       "id": "moyawarakai_da",
       "input": "秋もやわらかい光だ。"
+    },
+    {
+      "description": "Case particle after a deverbal noun is not absorbed into a fabricated irrealis",
+      "expected": [
+        {
+          "lemma": "優先順位",
+          "pos": "Noun",
+          "surface": "優先順位"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "変わり",
+          "pos": "Noun",
+          "surface": "変わり"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "ni_wariganai",
+      "input": "優先順位に変わりがない。"
+    },
+    {
+      "description": "Past negative of the same deverbal noun plus nominative",
+      "expected": [
+        {
+          "lemma": "信念",
+          "pos": "Noun",
+          "surface": "信念"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "変わり",
+          "pos": "Noun",
+          "surface": "変わり"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_wariganakattta",
+      "input": "信念に変わりがなかった。"
     }
   ],
   "description": "General nouns (part 4/4)",

@@ -1512,6 +1512,230 @@
       ],
       "id": "ni_shite_su",
       "input": "紙に、記して残す。"
+    },
+    {
+      "description": "Genuine godan-ga irrealis keeps its candidate",
+      "expected": [
+        {
+          "lemma": "揺るぐ",
+          "pos": "Verb",
+          "surface": "揺るが"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "事実",
+          "pos": "Noun",
+          "surface": "事実"
+        }
+      ],
+      "id": "ruganai",
+      "input": "揺るがない事実。"
+    },
+    {
+      "description": "Classical copula on a nominal host under quotation stays separate",
+      "expected": [
+        {
+          "lemma": "時",
+          "pos": "Noun",
+          "surface": "時"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "金",
+          "pos": "Noun",
+          "surface": "金"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "昔",
+          "pos": "Noun",
+          "surface": "昔"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "ha_narito_kara_wareteiru",
+      "input": "時は金なりと昔から言われている。"
+    },
+    {
+      "description": "Same construction with a different nominal host",
+      "expected": [
+        {
+          "lemma": "継続",
+          "pos": "Noun",
+          "surface": "継続"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "力",
+          "pos": "Noun",
+          "surface": "力"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "信じる",
+          "pos": "Verb",
+          "surface": "信じ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進も"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "ha_narito_jite_mou",
+      "input": "継続は力なりと信じて進もう。"
+    },
+    {
+      "description": "Deverbal noun before a case particle keeps its nominal reading",
+      "expected": [
+        {
+          "lemma": "身なり",
+          "pos": "Noun",
+          "surface": "身なり"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "整える",
+          "pos": "Verb",
+          "surface": "整える"
+        }
+      ],
+      "id": "nariwo_eru",
+      "input": "身なりを整える。"
+    },
+    {
+      "description": "Kanji plus ha-row kana is a compound noun, not a fabricated ichidan stem",
+      "expected": [
+        {
+          "lemma": "肩ひじ",
+          "pos": "Noun",
+          "surface": "肩ひじ"
+        },
+        {
+          "lemma": "張る",
+          "pos": "Verb",
+          "surface": "張る"
+        }
+      ],
+      "id": "hiji_ru",
+      "input": "肩ひじ張る。"
+    },
+    {
+      "description": "Same compound before a case particle",
+      "expected": [
+        {
+          "lemma": "肩ひじ",
+          "pos": "Noun",
+          "surface": "肩ひじ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "張る",
+          "pos": "Verb",
+          "surface": "張ら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "hijiwo_ranai",
+      "input": "肩ひじを張らない。"
+    },
+    {
+      "description": "Ichidan stem before the classical negative keeps its candidate",
+      "expected": [
+        {
+          "lemma": "消える",
+          "pos": "Verb",
+          "surface": "消え"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "lemma": "炎",
+          "pos": "Noun",
+          "surface": "炎"
+        }
+      ],
+      "id": "enu",
+      "input": "消えぬ炎。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
