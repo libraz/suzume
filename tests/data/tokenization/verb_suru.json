@@ -2876,6 +2876,48 @@
       ],
       "id": "shitagawakaranai",
       "input": "説明したがわからない。"
+    },
+    {
+      "description": "否定対照: 未登録の1字漢字＋サ変は名詞＋する のまま",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_shite_ita",
+      "input": "彼は、心して聞いた。"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割",

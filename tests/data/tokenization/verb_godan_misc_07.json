@@ -1443,6 +1443,75 @@
       ],
       "id": "moyashiwo_u",
       "input": "もやしを買う。"
+    },
+    {
+      "description": "読点直後の五段サ行連用形が1字漢字名詞＋サ変に負けない",
+      "expected": [
+        {
+          "lemma": "瞳",
+          "pos": "Noun",
+          "surface": "瞳"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "映す",
+          "pos": "Verb",
+          "surface": "映し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "また",
+          "pos": "Adverb",
+          "surface": "また"
+        },
+        {
+          "lemma": "映す",
+          "pos": "Verb",
+          "surface": "映す"
+        }
+      ],
+      "id": "ha_shite_mata_su",
+      "input": "瞳は、映して、また映す。"
+    },
+    {
+      "description": "同機構の別語彙（記す）",
+      "expected": [
+        {
+          "lemma": "紙",
+          "pos": "Noun",
+          "surface": "紙"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "記す",
+          "pos": "Verb",
+          "surface": "記し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "残す",
+          "pos": "Verb",
+          "surface": "残す"
+        }
+      ],
+      "id": "ni_shite_su",
+      "input": "紙に、記して残す。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
