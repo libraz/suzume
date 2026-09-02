@@ -781,6 +781,80 @@
       ],
       "id": "ritarunari",
       "input": "散りたるなり"
+    },
+    {
+      "description": "和語数詞が動詞連用形の送り仮名の中で開かない",
+      "expected": [
+        {
+          "lemma": "絶える",
+          "pos": "Verb",
+          "surface": "絶え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あら"
+        },
+        {
+          "lemma": "じ",
+          "pos": "Auxiliary",
+          "surface": "じ"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思い"
+        },
+        {
+          "lemma": "つつ",
+          "pos": "Particle",
+          "surface": "つつ"
+        }
+      ],
+      "id": "etearajito_itsutsu",
+      "input": "絶えてあらじと思いつつ。"
+    },
+    {
+      "description": "同じ形の否定対照（マ行五段連用形＋つつ）",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
+        },
+        {
+          "lemma": "つつ",
+          "pos": "Particle",
+          "surface": "つつ"
+        },
+        {
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩く"
+        }
+      ],
+      "id": "wo_mitsutsu_ku",
+      "input": "本を読みつつ歩く"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
