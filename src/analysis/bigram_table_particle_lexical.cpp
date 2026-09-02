@@ -672,6 +672,12 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       {EPOS::Noun, EPOS::AuxClassicalNari, cost::kVeryStrongBonus},
       {EPOS::NounFormal, EPOS::AuxClassicalNari, cost::kVeryStrongBonus},
 
+      // The copula also takes a verbal predicate, and there it selects the
+      // attributive (灯+消ゆる+なり). Without the pair the only bonus on offer
+      // goes to the finite form in front of the homographic conjunctive
+      // particle, so a kanji run that swallows the stem wins the clause.
+      {EPOS::VerbRentaikei, EPOS::AuxClassicalNari, cost::kVeryStrongBonus},
+
       // The classical past auxiliary follows a verb's renyokei and its
       // 已然形 licenses the conditional particle (見+けれ+ば). These two
       // connections disambiguate the auxiliary chain from an unrelated
