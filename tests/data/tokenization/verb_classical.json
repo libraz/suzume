@@ -1,0 +1,156 @@
+{
+  "cases": [
+    {
+      "description": "A single-kanji ha-row verb in the adnominal position",
+      "expected": [
+        {
+          "lemma": "神",
+          "pos": "Noun",
+          "surface": "神"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "思ふ",
+          "pos": "Verb",
+          "surface": "思ふ"
+        },
+        {
+          "lemma": "間",
+          "pos": "Noun",
+          "surface": "間"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "世",
+          "pos": "Noun",
+          "surface": "世"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "移ろふ",
+          "pos": "Verb",
+          "surface": "移ろふ"
+        }
+      ],
+      "id": "wo_fu_ni_ha_rofu",
+      "input": "神を思ふ間に世は移ろふ"
+    },
+    {
+      "description": "The same adnominal position with a different stem",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "舞ふ",
+          "pos": "Verb",
+          "surface": "舞ふ"
+        },
+        {
+          "lemma": "間",
+          "pos": "Noun",
+          "surface": "間"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "no_fu_ni",
+      "input": "花の舞ふ間に"
+    },
+    {
+      "description": "A ha-row continuative before the adnominal cell of the classical perfect",
+      "expected": [
+        {
+          "lemma": "理",
+          "pos": "Noun",
+          "surface": "理"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "適ふ",
+          "pos": "Verb",
+          "surface": "適ひ"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        }
+      ],
+      "id": "ni_hitaru",
+      "input": "理に適ひたる"
+    },
+    {
+      "description": "Negative control: the lexical verb the fabricated candidate borrowed its spelling from",
+      "expected": [
+        {
+          "lemma": "湯",
+          "pos": "Noun",
+          "surface": "湯"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "浸る",
+          "pos": "Verb",
+          "surface": "浸る"
+        }
+      ],
+      "id": "ni_ru",
+      "input": "湯に浸る"
+    },
+    {
+      "description": "The same cell with a different stem, modifying a nominal",
+      "expected": [
+        {
+          "lemma": "言ふ",
+          "pos": "Verb",
+          "surface": "言ひ"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "言葉",
+          "pos": "Noun",
+          "surface": "言葉"
+        }
+      ],
+      "id": "hitaru",
+      "input": "言ひたる言葉"
+    }
+  ],
+  "description": "verb_classical tests",
+  "version": "1.0"
+}
