@@ -210,6 +210,44 @@ _KANA_NUMBER_COUNTERS = tuple(
 _FIXED_FUNCTION_SEARCH_UNITS = tuple(sorted(FIXED_FUNCTION_SEARCH_UNITS, key=len, reverse=True))
 _FIXED_INFLECTED_FUNCTION_UNITS = tuple(sorted(FIXED_INFLECTED_FUNCTION_UNITS, key=len, reverse=True))
 _KEYCAP_EMOJI = regex.compile(r"[0-9#*]\uFE0F?\u20E3")
+# Characters a hashtag body may contain. A tag ends at whitespace, punctuation or any
+# other symbol, so the body class is exactly "word text" in any script.
+_HASHTAG_BODY_CLASS = r"[\p{Han}\p{Hiragana}\p{Katakana}\p{Latin}\p{Nd}_\u30FC\u3005]"
+HASHTAG_BODY_CHAR = regex.compile(_HASHTAG_BODY_CLASS)
+HASHTAG_BODY_RUN = regex.compile(_HASHTAG_BODY_CLASS + "+")
+# A kana run carrying at least one ー that is not word-final: emphatic lengthening
+# rather than a token boundary. A trailing ー is left to prolonged-sound-merge.
+_KANA_PROLONGED_RUN = regex.compile(r"[\p{Hiragana}ー]+")
+_MEDIAL_PROLONGED_RUN = regex.compile(r"\p{Hiragana}+ー+\p{Hiragana}+")
+
+
+def _single_token_at(text: str, offset: int, surface: str) -> dict | None:
+    """Read `text` and return the token starting at `offset` when it is exactly `surface`."""
+    cursor = 0
+    for token in mecab_analyze(text):
+        if cursor == offset:
+            return token if token.get("surface") == surface else None
+        cursor += len(token.get("surface", ""))
+        if cursor > offset:
+            return None
+    return None
+
+
+def _opens_hashtag(text: str, pos: int) -> bool:
+    """A marker opens a tag at a text boundary.
+
+    Start of input, whitespace, punctuation, or the marker of a preceding tag
+    (#東京#テスト) all qualify. Scanning back over body characters and running out of
+    text means the marker sits inside an ordinary word (C#).
+    """
+    cursor = pos
+    while cursor > 0:
+        if not HASHTAG_BODY_CHAR.match(text[cursor - 1]):
+            return True
+        cursor -= 1
+    return pos == 0
+
+
 _PRETOKENIZED_QUANTITY = regex.compile(r"(?:\d{1,3}(?:,\d{3})+|\d+)円")
 _PRETOKENIZED_COMMA_NUMBER = regex.compile(r"\d{1,3}(?:,\d{3})+")
 _PRETOKENIZED_EMAIL = regex.compile(r"[A-Za-z0-9][A-Za-z0-9._+\-]*@[A-Za-z0-9\-]+(?:\.[A-Za-z0-9\-]+)+")
@@ -1258,18 +1296,66 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 if applied_rule is None:
                     applied_rule = "nominal+derived-adjective"
 
-        # 4e. Prolonged sound mark (ー) merge
-        # Merge ー with preceding token, consecutive ーs reduce to one
-        # e.g., あの + ー → あのー, あの + ーー → あのー
+        # 4e. Emphatic lengthening inside a word
+        # A ー between two kana is emphasis, not a boundary, but the reference analyzer
+        # breaks at it and invents readings for the pieces (ひどーい → ひ/どー/い).
+        # Strip the marks and re-read: when the plain form is one word, the lengthened
+        # surface is that word. This must precede the trailing-ー merge below, which
+        # would otherwise close the token at the mark and hide the medial case.
+        if not merged and _MEDIAL_PROLONGED_RUN.match(remaining):
+            run = _KANA_PROLONGED_RUN.match(remaining).group(0)
+            end = len(run)
+            while end > 0:
+                candidate = run[:end]
+                if _MEDIAL_PROLONGED_RUN.fullmatch(candidate):
+                    plain = candidate.replace("ー", "")
+                    # Re-read in place, not in isolation: a bare たい is a noun to the
+                    # analyzer, an auxiliary after a continuative verb.
+                    base = _single_token_at(
+                        text[:pos_in_text] + plain + text[pos_in_text + len(candidate) :],
+                        pos_in_text,
+                        plain,
+                    )
+                    if base is not None:
+                        consumed = 0
+                        j = i
+                        while j < len(tokens) and consumed < len(candidate):
+                            consumed += len(tokens[j].get("surface", ""))
+                            j += 1
+                        if consumed == len(candidate):
+                            result.append(
+                                {
+                                    "surface": candidate,
+                                    "pos": base.get("pos", ""),
+                                    "lemma": base.get("lemma") or plain,
+                                }
+                            )
+                            i = j
+                            merged = True
+                            if applied_rule is None:
+                                applied_rule = "emphatic-lengthening"
+                        break
+                end -= 1
+
+        # 4f. Prolonged sound mark (ー) merge
+        # Merge a trailing ー with the preceding token. Every mark is kept, because
+        # dropping the repeats would leave the token sequence no longer covering the
+        # input (うれしーーー). The one exception mirrors the tokenizer's own
+        # normalization: repeated marks directly before a kanji are separator-like
+        # elongation and collapse to a single mark (長いーー音 → 長いー音).
         if not merged and i + 1 < len(tokens):
             next_surface = tokens[i + 1].get("surface", "")
             if regex.match(r"^ー+$", next_surface):
-                combined = t.get("surface", "") + "ー"
-                lemma = t.get("lemma") or t.get("surface", "")
+                marks = next_surface
                 j = i + 2
-                # Skip any additional ー-only tokens
                 while j < len(tokens) and regex.match(r"^ー+$", tokens[j].get("surface", "")):
+                    marks += tokens[j].get("surface", "")
                     j += 1
+                following = remaining[len(t.get("surface", "")) + len(marks) :][:1]
+                if len(marks) > 1 and regex.match(r"\p{Han}", following):
+                    marks = "ー"
+                combined = t.get("surface", "") + marks
+                lemma = t.get("lemma") or t.get("surface", "")
                 result.append({"surface": combined, "pos": t.get("pos", ""), "lemma": lemma})
                 i = j
                 merged = True
@@ -1519,13 +1605,23 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     applied_rule = "mention"
 
         # 7c. Hashtag pattern
+        # A hashtag is a single search unit: the marker plus every following token
+        # that is still hashtag-body text. Stopping after one token would cut a tag
+        # whose body spans several morphemes (#経済成長, #美しい景色).
         if not merged and t.get("surface") in ("#", "＃"):
-            if i + 1 < len(tokens):
-                ns = tokens[i + 1].get("surface", "")
-                if regex.match(r"^[\p{Katakana}\p{Han}A-Za-z0-9_]+$", ns):
-                    combined = t["surface"] + ns
+            marker = t["surface"]
+            body_match = HASHTAG_BODY_RUN.match(remaining, len(marker)) if _opens_hashtag(text, pos_in_text) else None
+            body = body_match.group(0) if body_match else ""
+            if body:
+                consumed = 0
+                j = i + 1
+                while j < len(tokens) and consumed < len(body):
+                    consumed += len(tokens[j].get("surface", ""))
+                    j += 1
+                if consumed == len(body):
+                    combined = marker + body
                     result.append({"surface": combined, "pos": "名詞", "lemma": combined})
-                    i += 2
+                    i = j
                     merged = True
                     if applied_rule is None:
                         applied_rule = "hashtag"

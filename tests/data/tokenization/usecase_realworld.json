@@ -456,19 +456,9 @@
       "description": "Hashtag - currently extends to end of same script",
       "expected": [
         {
-          "lemma": "#プログラミング",
+          "lemma": "#プログラミングを学ぶ",
           "pos": "Noun",
-          "surface": "#プログラミング"
-        },
-        {
-          "lemma": "を",
-          "pos": "Particle",
-          "surface": "を"
-        },
-        {
-          "lemma": "学ぶ",
-          "pos": "Verb",
-          "surface": "学ぶ"
+          "surface": "#プログラミングを学ぶ"
         }
       ],
       "id": "pretokenizer_hashtag",

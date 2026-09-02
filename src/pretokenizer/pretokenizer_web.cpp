@@ -160,9 +160,11 @@ bool PreTokenizer::tryMatchEmail(std::string_view text, size_t pos, PreToken& to
 namespace {
 
 // Check if codepoint is valid for hashtag content
-// Allows: Katakana, Kanji, alphanumeric, underscore
-// Note: Hiragana is excluded to avoid including particles like を, は, が
-//       This means #ありがとう style hashtags won't work, but they are rare
+// Allows: Hiragana, Katakana, Kanji, alphanumeric, underscore
+// A tag is a single search unit and ends at whitespace, punctuation or any other
+// symbol, so the body class is word text in any script. Particles inside a tag
+// (#今日は…) belong to the tag; the marker only opens one at a text boundary,
+// which is what keeps は#… from starting a tag mid-sentence.
 bool isHashtagChar(char32_t codepoint) {
   // ASCII alphanumeric and underscore
   if ((codepoint >= 'a' && codepoint <= 'z') || (codepoint >= 'A' && codepoint <= 'Z') ||
@@ -183,8 +185,30 @@ bool isHashtagChar(char32_t codepoint) {
       (codepoint >= U'ａ' && codepoint <= U'ｚ') || codepoint == U'＿') {
     return true;
   }
-  // Hiragana is NOT allowed - to avoid particles being included
-  return false;
+  // Hiragana (U+3041-U+3096) and the iteration mark 々.
+  if (codepoint >= 0x3041 && codepoint <= 0x3096) {
+    return true;
+  }
+  return codepoint == U'々';
+}
+
+// A marker opens a tag at a text boundary — start of input, whitespace, punctuation,
+// or the marker of a preceding tag (#東京#テスト). Scanning back over body characters
+// and running out of text means the marker sits inside an ordinary word (C#).
+bool opensHashtag(std::string_view text, size_t pos) {
+  size_t cursor = pos;
+  while (cursor > 0) {
+    size_t start = cursor - 1;
+    while (start > 0 && (static_cast<unsigned char>(text[start]) & 0xC0U) == 0x80U) {
+      --start;
+    }
+    size_t decode_pos = start;
+    if (!isHashtagChar(normalize::decodeUtf8(text, decode_pos))) {
+      return true;
+    }
+    cursor = start;
+  }
+  return pos == 0;
 }
 
 }  // namespace
@@ -201,6 +225,9 @@ bool PreTokenizer::tryMatchHashtag(std::string_view text, size_t pos, PreToken& 
   char32_t codepoint = normalize::decodeUtf8(text, byte_pos);
 
   if (codepoint != '#') {
+    return false;
+  }
+  if (!opensHashtag(text, pos)) {
     return false;
   }
   idx = byte_pos;
