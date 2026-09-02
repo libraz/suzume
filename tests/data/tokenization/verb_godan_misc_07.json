@@ -58,6 +58,107 @@
       ],
       "id": "ni_chi_ri_mu",
       "input": "駅に立ち寄り休む"
+    },
+    {
+      "description": "Negative control: the bare emphasis noun keeps its own boundary before a case particle",
+      "expected": [
+        {
+          "lemma": "マジ",
+          "pos": "Noun",
+          "surface": "マジ"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "焦る",
+          "pos": "Verb",
+          "surface": "焦っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "de_ttta_2",
+      "input": "マジで焦った"
+    },
+    {
+      "description": "A case particle plus a plain-form verb keeps its boundary",
+      "expected": [
+        {
+          "lemma": "条件",
+          "pos": "Noun",
+          "surface": "条件"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "従う",
+          "pos": "Verb",
+          "surface": "従う"
+        },
+        {
+          "lemma": "必要",
+          "pos": "Adjective",
+          "surface": "必要"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "ni_shitagau_plain_form",
+      "input": "条件に従う必要がある。"
+    },
+    {
+      "description": "Same boundary with a different host noun",
+      "expected": [
+        {
+          "lemma": "規則",
+          "pos": "Noun",
+          "surface": "規則"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "従う",
+          "pos": "Verb",
+          "surface": "従う"
+        },
+        {
+          "lemma": "必要",
+          "pos": "Adjective",
+          "surface": "必要"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "ni_shitagau_plain_form_variant",
+      "input": "規則に従う必要がある。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",

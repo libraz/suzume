@@ -135,6 +135,16 @@ def _is_single_i_adjective(text: str) -> bool:
     return bool(tokens and len(tokens) == 1 and tokens[0].get("pos") == "形容詞")
 
 
+def _kanji_noun_token(surface: str) -> dict | None:
+    """Read `surface` and return it when it is exactly one kanji-bearing noun."""
+    if not surface or not regex.search(r"\p{Han}", surface):
+        return None
+    tokens = _reanalyze_exact(surface)
+    if tokens is None or len(tokens) != 1 or tokens[0].get("pos") != "名詞":
+        return None
+    return tokens[0]
+
+
 def _as_independent_token(token: dict) -> dict:
     """Drop context-bound subcategories when a span is an independent morpheme."""
     return {
@@ -244,6 +254,44 @@ def _split_lexicalized_morpheme_boundaries(token: dict) -> list[dict] | None:
             ):
                 continue
             return [_as_independent_token(head_tokens[0]), *(_as_independent_token(part) for part in tail_tokens)]
+
+    # A 連語 headword that swallows a case particle is not one word: に従う is に + 従う
+    # and 上と下 is 上 + と + 下. The reference dictionary lists them as a single 助詞 or
+    # 名詞 only in some positions, and reading the headword on its own already produces
+    # the boundaries. Closed-class compounds (けれども) stay merged because their
+    # decomposition carries no independent word.
+    if pos == "助詞" and surface == lemma and lemma not in FIXED_FUNCTION_SEARCH_UNITS:
+        # A particle headword that is a case particle plus a plain-form verb is not a
+        # function word: に従う is に + 従う. Reading the headword on its own already
+        # produces the boundary. The lexicalized て-form compounds (に従って, を通じて)
+        # keep their own surface, so surface != lemma leaves them untouched.
+        isolated = _reanalyze_exact(lemma) or []
+        if (
+            len(isolated) == 2
+            and isolated[0].get("pos") == "助詞"
+            and isolated[1].get("pos") == "動詞"
+            and isolated[1].get("conj_form") == "基本形"
+        ):
+            return [_as_independent_token(part) for part in isolated]
+
+    if pos == "名詞" and surface == lemma:
+        # A headword the reference dictionary holds whole (上と下) never splits on
+        # re-analysis, so try the boundary directly: a bare case particle between two
+        # kanji-bearing nouns is a phrase, not a word. Requiring kanji on both sides
+        # keeps ordinary kana nouns (まとめ, ひとで) out.
+        for match in regex.finditer(r"[とにをへがで]", lemma):
+            host, particle, tail = lemma[: match.start()], match.group(0), lemma[match.end() :]
+            host_noun = _kanji_noun_token(host)
+            tail_noun = _kanji_noun_token(tail)
+            if host_noun is None or tail_noun is None:
+                continue
+            # Built directly rather than re-read: a lone case particle comes back
+            # from the analyzer as a filler.
+            return [
+                _as_independent_token(host_noun),
+                {"surface": particle, "pos": "助詞", "lemma": particle},
+                _as_independent_token(tail_noun),
+            ]
 
     if pos not in ("動詞", "形容詞", "副詞"):
         return None

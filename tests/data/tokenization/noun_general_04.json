@@ -1,0 +1,152 @@
+{
+  "cases": [
+    {
+      "description": "Emphasis noun plus question particle plus final particle stays split",
+      "expected": [
+        {
+          "lemma": "マジ",
+          "pos": "Noun",
+          "surface": "マジ"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "kayo",
+      "input": "マジかよ"
+    },
+    {
+      "description": "Negative control: an emoji between nouns is unaffected",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "😱",
+          "pos": "Other",
+          "surface": "😱"
+        },
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        }
+      ],
+      "id": "unnamed_33",
+      "input": "犬😱猫"
+    },
+    {
+      "description": "Negative control: a bare ellipsis is still removed",
+      "expected": [
+        {
+          "lemma": "テスト",
+          "pos": "Noun",
+          "surface": "テスト"
+        }
+      ],
+      "id": "unnamed_34",
+      "input": "テスト…"
+    },
+    {
+      "description": "A hashtag body containing hiragana is not cut mid-word",
+      "expected": [
+        {
+          "lemma": "#美しい景色",
+          "pos": "Noun",
+          "surface": "#美しい景色"
+        }
+      ],
+      "id": "#_shii",
+      "input": "#美しい景色"
+    },
+    {
+      "description": "Negative control: the marker inside a word does not open a hashtag",
+      "expected": [
+        {
+          "lemma": "C",
+          "pos": "Noun",
+          "surface": "C"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "好き",
+          "pos": "Adjective",
+          "surface": "好き"
+        }
+      ],
+      "id": "c#ga_ki",
+      "input": "C#が好き"
+    },
+    {
+      "description": "A hashtag whose body spans several morphemes stays one search unit",
+      "expected": [
+        {
+          "lemma": "#健康管理",
+          "pos": "Noun",
+          "surface": "#健康管理"
+        }
+      ],
+      "id": "hashtag_kenkou_kanri",
+      "input": "#健康管理"
+    },
+    {
+      "description": "Negative control: a single-morpheme hashtag is unchanged",
+      "expected": [
+        {
+          "lemma": "#東京",
+          "pos": "Noun",
+          "surface": "#東京"
+        }
+      ],
+      "id": "hashtag_toukyou",
+      "input": "#東京"
+    },
+    {
+      "description": "A case particle between two kanji nouns is a phrase, not a word",
+      "expected": [
+        {
+          "lemma": "上",
+          "pos": "Noun",
+          "surface": "上"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "下",
+          "pos": "Noun",
+          "surface": "下"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "関係",
+          "pos": "Noun",
+          "surface": "関係"
+        }
+      ],
+      "id": "ue_to_shita_phrase",
+      "input": "上と下の関係。"
+    }
+  ],
+  "description": "General nouns (part 4/4)",
+  "version": "1.0"
+}

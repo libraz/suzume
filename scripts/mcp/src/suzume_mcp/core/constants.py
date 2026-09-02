@@ -654,6 +654,9 @@ FIXED_FUNCTION_SEARCH_UNITS: dict[str, str] = {
     # never stands alone here; the compound has no internal boundary.
     "や否や": "助詞",
     "がてら": "助詞",
+    # Registered as one compound case particle in the tokenizer's L1
+    # (src/dictionary/entries/compound_particles.cpp), so the oracle keeps it whole too.
+    "にわたる": "助詞",
     # Regional predicate tails. The reference analyzer has no entry for them and
     # guesses an internal boundary (だ+べ, やん+け), but each is one closed
     # copular or final form.

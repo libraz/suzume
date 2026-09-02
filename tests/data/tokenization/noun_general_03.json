@@ -2172,8 +2172,25 @@
       ],
       "id": "biyori",
       "input": "遊びより大事"
+    },
+    {
+      "description": "Colloquial emphasis noun followed by the question particle stays split",
+      "expected": [
+        {
+          "lemma": "マジ",
+          "pos": "Noun",
+          "surface": "マジ"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "ka",
+      "input": "マジか！"
     }
   ],
-  "description": "General nouns (part 3/3)",
+  "description": "General nouns (part 3/4)",
   "version": "1.0"
 }
