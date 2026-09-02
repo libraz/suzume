@@ -142,6 +142,15 @@ bool isBoundVerbPrefix(std::string_view surface);
 bool isBigradeTerminalKana(char32_t code);
 
 /**
+ * @brief Whether a U-row kana still ends a modern Godan 終止形
+ *
+ * The rows the modern paradigm kept (書く, 過ぐ, 立つ, 死ぬ, 求む… as 五段) are
+ * reached by the conjugation table on their own, so a bigrade terminal only
+ * needs its own candidate on the rows the paradigm dropped (越ゆ, 出づ).
+ */
+bool isModernGodanTerminalKana(char32_t code);
+
+/**
  * @brief Whether a U-row kana also spells a classical auxiliary
  *
  * つ, ぬ, む, る, ふ and す open auxiliaries that attach to a 未然形 or a

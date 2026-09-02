@@ -106,6 +106,17 @@ bool clauseEndsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   return next == U'。' || next == U'、' || next == U'！' || next == U'？' || next == U'」';
 }
 
+// A 終止形 closes its clause or carries an auxiliary that attaches to one: the
+// conjectural べし and its negative counterpart まじ, the volitional む, and the
+// hearsay なり. Anything else after the cell belongs to a different form.
+bool shuushikeiEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
+                      const dictionary::DictionaryManager* dict_manager) {
+  return clauseEndsAt(codepoints, pos) ||
+         dictionaryTailFollowsAt(codepoints, pos, dict_manager, core::PartOfSpeech::Auxiliary,
+                                 {core::ExtendedPOS::AuxClassicalBeshi, core::ExtendedPOS::AuxNegativeMai,
+                                  core::ExtendedPOS::AuxVolitional, core::ExtendedPOS::AuxClassicalNari});
+}
+
 /**
  * @brief Evidence found after a paradigm cell.
  *
@@ -151,12 +162,8 @@ HaRowLicense haRowCellLicense(core::ExtendedPOS cell, const std::vector<char32_t
       license.licensed = clauseEndsAt(codepoints, end_pos);
       break;
     case core::ExtendedPOS::VerbShuushikei:
-      // 終止形 closes a clause or carries a terminal-attaching auxiliary.
-      license.closed_class_tail =
-          dictionaryTailFollowsAt(codepoints, end_pos, dict_manager, core::PartOfSpeech::Auxiliary,
-                                  {core::ExtendedPOS::AuxClassicalBeshi, core::ExtendedPOS::AuxVolitional,
-                                   core::ExtendedPOS::AuxClassicalNari});
-      license.licensed = clauseEndsAt(codepoints, end_pos);
+      license.licensed = shuushikeiEndsAt(codepoints, end_pos, dict_manager);
+      license.closed_class_tail = license.licensed && !clauseEndsAt(codepoints, end_pos);
       break;
     case core::ExtendedPOS::VerbKateikei:
       // 已然形 stands before a concessive or conditional conjunction (思へ+ど,
@@ -218,7 +225,11 @@ bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_po
   }
   // A focus particle opens a 係り結び whose 結び is the attributive cell, so it
   // marks the same predicate slot the case particles do (これ+ぞ+求むる+物,
-  // これ+なむ+求むる+道). Its members run to two morae, so probe back that far.
+  // これ+なむ+求むる+道). Classical や is the same 係助詞 but is carried as the
+  // modern coordinating particle, so the conjunctive class joins the probe: what
+  // it proves is only that the position starts a word rather than sitting inside
+  // one, which any particle boundary establishes. Its members run to two morae,
+  // so probe back that far.
   constexpr size_t kFocusParticleChars = 2;
   const size_t scan_start = start_pos > kFocusParticleChars ? start_pos - kFocusParticleChars : 0;
   for (size_t particle_start = scan_start; dict_manager != nullptr && particle_start < start_pos; ++particle_start) {
@@ -227,6 +238,7 @@ bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_po
     if (particle != nullptr && (particle->extended_pos == core::ExtendedPOS::ParticleNo ||
                                 particle->extended_pos == core::ExtendedPOS::ParticleBinding ||
                                 particle->extended_pos == core::ExtendedPOS::ParticleTopic ||
+                                particle->extended_pos == core::ExtendedPOS::ParticleConj ||
                                 particle->extended_pos == core::ExtendedPOS::ParticleFinal)) {
       return true;
     }
@@ -265,10 +277,17 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
   if (grammar::isClassicalAuxiliaryHomographKana(terminal) && vh::isSingleKanjiIchidan(codepoints[start_pos])) {
     return;
   }
-  if (!is_attributive && terminal != U'ゆ') {
+  if (!grammar::isBigradeTerminalKana(terminal)) {
     return;
   }
-  if (is_attributive ? !grammar::isBigradeTerminalKana(terminal) : !clauseEndsAt(codepoints, kanji_end + 1)) {
+  // The 連体形 needs a candidate on every row, since its trailing る otherwise
+  // reads as a separate auxiliary. The 終止形 needs one only where the modern
+  // paradigm cannot reach the form: the rows it kept are built by the
+  // conjugation table on their own (受く, 過ぐ), and the ha row has its own
+  // paradigm above, which leaves 越ゆ and 出づ.
+  if (!is_attributive &&
+      (grammar::isModernGodanTerminalKana(terminal) || classicalHaRowCell(terminal) != core::ExtendedPOS::Unknown ||
+       !shuushikeiEndsAt(codepoints, kanji_end + 1, dict_manager))) {
     return;
   }
   const std::string lemma = extractSubstring(codepoints, start_pos, kanji_end + 1);

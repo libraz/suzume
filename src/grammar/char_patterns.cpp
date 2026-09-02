@@ -190,6 +190,11 @@ bool isBigradeTerminalKana(char32_t code) {
   return std::find(kBigradeTerminals.begin(), kBigradeTerminals.end(), code) != kBigradeTerminals.end();
 }
 
+bool isModernGodanTerminalKana(char32_t code) {
+  constexpr std::array<char32_t, 9> kGodanTerminals = {U'う', U'く', U'ぐ', U'す', U'つ', U'ぬ', U'ぶ', U'む', U'る'};
+  return std::find(kGodanTerminals.begin(), kGodanTerminals.end(), code) != kGodanTerminals.end();
+}
+
 bool isClassicalAuxiliaryHomographKana(char32_t code) {
   constexpr std::array<char32_t, 6> kAuxiliaryHomographs = {U'す', U'つ', U'ぬ', U'ふ', U'む', U'る'};
   return std::find(kAuxiliaryHomographs.begin(), kAuxiliaryHomographs.end(), code) != kAuxiliaryHomographs.end();
