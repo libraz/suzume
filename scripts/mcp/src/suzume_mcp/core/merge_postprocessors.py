@@ -77,6 +77,10 @@ def _postprocess_totomoni(result: list[dict], applied_rule: str | None) -> tuple
     return merged, applied_rule
 
 
+#: The progressive subsidiary in both its spellings (食べている, 食べてる).
+_PROGRESSIVE_LEMMAS = frozenset({"いる", "てる"})
+
+
 def _postprocess_noni(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Merge の+に -> のに after a host that admits only the concessive reading.
 
@@ -86,6 +90,13 @@ def _postprocess_noni(result: list[dict], applied_rule: str | None) -> tuple[lis
     and an i-adjective closes the same cell (東京が寒いのに). A verb host is left
     split because both readings stay open there: 読むのに覚えられない is concessive
     but 読むのに時間がかかる is the goal, and nothing in the form separates them.
+
+    The progressive is the one verbal host that decides it. The dictionary reads
+    てる and いる as subsidiary verbs rather than auxiliaries, so they miss the
+    test above, but the goal reading nominalizes an action and a progressive
+    names an ongoing state instead — 食べてるのに is concessive wherever it
+    stands. The other subsidiaries stay out: 食べておくのに時間がかかる still
+    nominalizes an action.
     """
     merged = []
     skip_next = False
@@ -97,6 +108,11 @@ def _postprocess_noni(result: list[dict], applied_rule: str | None) -> tuple[lis
         host_is_attributive = (
             host.get("surface", "") in ("た", "っ", "だ")
             or host.get("pos") == "助動詞"
+            or (
+                host.get("pos") == "動詞"
+                and host.get("pos_sub1") == "非自立"
+                and host.get("lemma") in _PROGRESSIVE_LEMMAS
+            )
             or (host.get("pos") == "形容詞" and host.get("surface", "").endswith("い"))
         )
         if (
