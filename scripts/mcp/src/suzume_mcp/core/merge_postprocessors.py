@@ -560,6 +560,23 @@ def _is_single_verb(surface: str) -> bool:
     return len(tokens) == 1 and tokens[0].get("pos") == "動詞" and tokens[0].get("surface") == surface
 
 
+def _retag_suffix_without_host(tokens: list[dict]) -> list[dict]:
+    """Drop the 接尾 subtype from a noun that has no host to attach to.
+
+    A suffix attaches to a nominal, and an auxiliary is not one, so a noun in
+    that position is the head of the relative clause the auxiliary closes. The
+    dictionary reaches the suffix reading only when the classical chain in front
+    defeats it (せ+し+水 against 見+し+水, which it reads correctly), which is why
+    the repair rides with the rule that rebuilt the chain.
+    """
+    for index, token in enumerate(tokens):
+        if index == 0 or token.get("pos") != "名詞" or token.get("pos_sub1") != "接尾":
+            continue
+        if tokens[index - 1].get("pos") == "助動詞":
+            tokens[index] = {**token, "pos_sub1": "一般"}
+    return tokens
+
+
 def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Restore the boundary of the classical conjectural む.
 
@@ -609,6 +626,16 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
             and len(surface) > 1
             and surface[0] == _CLASSICAL_IRREALIS_AUX
         ):
+            # A noun cannot host む, so the deverbal reading the dictionary
+            # produced for the vowel stem has to be undone as well: the stem plus
+            # る is the vowel-stem verb it was cut from (流れ → 流れる).  Confirm
+            # that lemma against the dictionary rather than assuming it, so a
+            # nominal host the rule reached by another route keeps its POS.
+            if previous.get("pos") == "名詞":
+                stem = previous.get("surface", "")
+                lemma = stem + "る"
+                if _is_single_verb(lemma):
+                    merged[-1] = {"surface": stem, "pos": "動詞", "lemma": lemma}
             merged.append({"surface": surface[0], "pos": "助動詞", "lemma": surface[0]})
             merged.extend(mecab_analyze(surface[1:]))
             idx += 1
@@ -633,6 +660,8 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
             continue
         merged.append(token)
         idx += 1
+    if applied_rule == "classical-mu-boundary":
+        _retag_suffix_without_host(merged)
     return merged, applied_rule
 
 
