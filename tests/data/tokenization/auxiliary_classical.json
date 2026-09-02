@@ -1489,6 +1489,114 @@
       ],
       "id": "mishini",
       "input": "読みしに。"
+    },
+    {
+      "description": "The adnominal cell of the classical perfect after a godan continuative",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "散る",
+          "pos": "Verb",
+          "surface": "散り"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬる"
+        }
+      ],
+      "id": "zo_rinuru",
+      "input": "花ぞ散りぬる"
+    },
+    {
+      "description": "The realis cell of the same paradigm under a binding particle",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "散る",
+          "pos": "Verb",
+          "surface": "散り"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬれ"
+        }
+      ],
+      "id": "koso_rinure",
+      "input": "花こそ散りぬれ"
+    },
+    {
+      "description": "The realis cell with a different continuative host",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "定まる",
+          "pos": "Verb",
+          "surface": "定まり"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬれ"
+        }
+      ],
+      "id": "koso_marinure",
+      "input": "心こそ定まりぬれ"
+    },
+    {
+      "description": "Negative control: the classical negative after an irrealis keeps its reading",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "開く",
+          "pos": "Verb",
+          "surface": "開か"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "ga_kanu",
+      "input": "道が開かぬ"
     }
   ],
   "description": "auxiliary_classical tests",
