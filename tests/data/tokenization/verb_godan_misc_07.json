@@ -1268,6 +1268,48 @@
       ],
       "id": "wo_maseru",
       "input": "本を読ませる。"
+    },
+    {
+      "description": "An irrealis form cannot govern a following noun",
+      "expected": [
+        {
+          "lemma": "もし",
+          "pos": "Adverb",
+          "surface": "もし"
+        },
+        {
+          "lemma": "火曜",
+          "pos": "Noun",
+          "surface": "火曜"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "都合",
+          "pos": "Noun",
+          "surface": "都合"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "つく",
+          "pos": "Verb",
+          "surface": "つく"
+        }
+      ],
+      "id": "moshi_naraba_gatsuku",
+      "input": "もし火曜ならば都合がつく。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",

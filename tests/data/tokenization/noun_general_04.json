@@ -282,6 +282,28 @@
       ],
       "id": "naishi",
       "input": "時間ないし。"
+    },
+    {
+      "description": "An irrealis form cannot close a sentence",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "naraba",
+      "input": "雨ならば。"
     }
   ],
   "description": "General nouns (part 4/4)",

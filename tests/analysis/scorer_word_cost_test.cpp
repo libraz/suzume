@@ -71,8 +71,9 @@ TEST(ScorerBoundaryCostTest, FixedBosAndEosAdjustmentsComeFromOneExtendedPosTabl
     float expected_bos;
     float expected_eos;
   };
-  constexpr std::array<BoundaryCostCase, 16> kCases = {{
+  constexpr std::array<BoundaryCostCase, 17> kCases = {{
       {core::ExtendedPOS::Conjunction, scorer::kBosConjunctionBonus, scorer::kEosConjunctionPenalty},
+      {core::ExtendedPOS::VerbMizenkei, 0.0F, scorer::kEosMizenkeiPenalty},
       {core::ExtendedPOS::Suffix, scorer::kBosSuffixPenalty, 0.0F},
       {core::ExtendedPOS::AuxAppearanceSou, scorer::kBosAppearanceSouPenalty, 0.0F},
       {core::ExtendedPOS::AuxAspectIru, scorer::kBosAspectIruPenalty, 0.0F},
@@ -130,6 +131,13 @@ TEST(ScorerBoundaryCostTest, AppliesSurfaceGatesAfterExtendedPosLookup) {
       bigram_cost::kNeutral);
   EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::Conjunction, "しかし"), core::ExtendedPOS::Symbol),
                   bigram_cost::kNeutral);
+
+  // An irrealis form can never close a sentence, whatever its length: the
+  // auxiliary slot it opened has to be filled.
+  EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::VerbMizenkei, "なら")),
+                  scorer::kEosMizenkeiPenalty);
+  EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::VerbMizenkei, "ならば")),
+                  scorer::kEosMizenkeiPenalty);
 
   core::LatticeEdge registered_determiner = makeBoundaryEdge(core::ExtendedPOS::Determiner, "こういう");
   registered_determiner.flags = core::EdgeFlags::FromDictionary;
