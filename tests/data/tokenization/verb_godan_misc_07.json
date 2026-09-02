@@ -653,6 +653,80 @@
       ],
       "id": "ga_du",
       "input": "言葉が出づ"
+    },
+    {
+      "description": "二段語幹が漢字連の末尾に来る場合と、連体形＋文語断定の接続",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "降りる",
+          "pos": "Verb",
+          "surface": "降り"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "木",
+          "pos": "Noun",
+          "surface": "木"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "葉",
+          "pos": "Noun",
+          "surface": "葉"
+        },
+        {
+          "lemma": "落つ",
+          "pos": "Verb",
+          "surface": "落つる"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        }
+      ],
+      "id": "rite_no_tsurunari",
+      "input": "雨降りて木の葉落つるなり"
+    },
+    {
+      "description": "格助詞が漢字連の形成を阻む場合の二段連体形＋なり",
+      "expected": [
+        {
+          "lemma": "灯",
+          "pos": "Noun",
+          "surface": "灯"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "消ゆ",
+          "pos": "Verb",
+          "surface": "消ゆる"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        }
+      ],
+      "id": "ga_yurunari",
+      "input": "灯が消ゆるなり"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
