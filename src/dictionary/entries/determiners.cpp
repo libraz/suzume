@@ -66,6 +66,7 @@ EntrySpecRange getDeterminerEntries() {
       // Classical possessive determiner (我が家, 我が子, 我が国)
       det("我が", ""),
       det("わが", ""),
+      det("吾が", ""),
 
       // Classical/literary determiner (斯かる = such, this kind of)
       // Note: shares hiragana surface with godan-ra verb 掛かる/懸かる (L2: かかる).

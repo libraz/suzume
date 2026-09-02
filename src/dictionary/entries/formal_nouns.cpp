@@ -55,6 +55,7 @@ EntrySpecRange getFormalNounEntries() {
       // Temporal reference-point formal nouns (開始以来、開始以降).
       formal_noun("以来", ""),
       formal_noun("以降", ""),
+      formal_noun("以前", ""),
       // Approximate temporal point (中旬ごろ、夕方ごろに).
       formal_noun("ごろ", ""),
       formal_noun("どき", ""),
