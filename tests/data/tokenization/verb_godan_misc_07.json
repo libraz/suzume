@@ -914,6 +914,60 @@
       ],
       "id": "munoni_gakakaru",
       "input": "読むのに時間がかかる"
+    },
+    {
+      "description": "文語係助詞ぞの倒置した係り結び",
+      "expected": [
+        {
+          "lemma": "散る",
+          "pos": "Verb",
+          "surface": "散り"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        }
+      ],
+      "id": "ritaruzo",
+      "input": "散りたるぞ花。"
+    },
+    {
+      "description": "終助詞ぞの後に名詞が続く倒置（同根）",
+      "expected": [
+        {
+          "lemma": "負ける",
+          "pos": "Verb",
+          "surface": "負け"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "気持ち",
+          "pos": "Noun",
+          "surface": "気持ち"
+        }
+      ],
+      "id": "kenaizo_chi",
+      "input": "負けないぞ気持ち"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
