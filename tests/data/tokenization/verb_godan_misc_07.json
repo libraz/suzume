@@ -1421,6 +1421,28 @@
       ],
       "id": "wo_muga_reta",
       "input": "本を読むが疲れた。"
+    },
+    {
+      "description": "仮名名詞が も+や+し の助詞連鎖に負けない",
+      "expected": [
+        {
+          "lemma": "もやし",
+          "pos": "Noun",
+          "surface": "もやし"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買う"
+        }
+      ],
+      "id": "moyashiwo_u",
+      "input": "もやしを買う。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",

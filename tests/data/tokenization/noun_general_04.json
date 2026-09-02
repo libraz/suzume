@@ -304,6 +304,38 @@
       ],
       "id": "naraba",
       "input": "雨ならば。"
+    },
+    {
+      "description": "係助詞の後に接続助詞は立たない: も+や+わらかい を退ける",
+      "expected": [
+        {
+          "lemma": "秋",
+          "pos": "Noun",
+          "surface": "秋"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "やわらかい",
+          "pos": "Adjective",
+          "surface": "やわらかい"
+        },
+        {
+          "lemma": "光",
+          "pos": "Noun",
+          "surface": "光"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "moyawarakai_da",
+      "input": "秋もやわらかい光だ。"
     }
   ],
   "description": "General nouns (part 4/4)",
