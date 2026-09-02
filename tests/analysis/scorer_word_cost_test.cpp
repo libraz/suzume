@@ -72,7 +72,7 @@ TEST(ScorerBoundaryCostTest, FixedBosAndEosAdjustmentsComeFromOneExtendedPosTabl
     float expected_eos;
   };
   constexpr std::array<BoundaryCostCase, 16> kCases = {{
-      {core::ExtendedPOS::Conjunction, scorer::kBosConjunctionBonus, 0.0F},
+      {core::ExtendedPOS::Conjunction, scorer::kBosConjunctionBonus, scorer::kEosConjunctionPenalty},
       {core::ExtendedPOS::Suffix, scorer::kBosSuffixPenalty, 0.0F},
       {core::ExtendedPOS::AuxAppearanceSou, scorer::kBosAppearanceSouPenalty, 0.0F},
       {core::ExtendedPOS::AuxAspectIru, scorer::kBosAspectIruPenalty, 0.0F},
@@ -119,6 +119,17 @@ TEST(ScorerBoundaryCostTest, AppliesSurfaceGatesAfterExtendedPosLookup) {
   EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::ParticleConj, "たり")),
                   scorer::kEosListingParticlePenalty);
   EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::ParticleConj, "ので")), bigram_cost::kNeutral);
+
+  // A conjunction closing a sentence that already has content is penalized,
+  // while the same word opening an utterance or a post-punctuation fragment is
+  // exempt. The sentence start reaches eosCost as Unknown.
+  EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::Conjunction, "ないし"), core::ExtendedPOS::Noun),
+                  scorer::kEosConjunctionPenalty);
+  EXPECT_FLOAT_EQ(
+      scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::Conjunction, "しかし"), core::ExtendedPOS::Unknown),
+      bigram_cost::kNeutral);
+  EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::Conjunction, "しかし"), core::ExtendedPOS::Symbol),
+                  bigram_cost::kNeutral);
 
   core::LatticeEdge registered_determiner = makeBoundaryEdge(core::ExtendedPOS::Determiner, "こういう");
   registered_determiner.flags = core::EdgeFlags::FromDictionary;

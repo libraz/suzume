@@ -2562,6 +2562,28 @@
       ],
       "id": "korehanda_keda",
       "input": "これはんだ付けだ"
+    },
+    {
+      "description": "句読点直後の接続詞は後続文脈を導くので免除（否定対照）",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "しかし",
+          "pos": "Conjunction",
+          "surface": "しかし"
+        }
+      ],
+      "id": "da_shikashi",
+      "input": "雨だ。しかし"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい)",

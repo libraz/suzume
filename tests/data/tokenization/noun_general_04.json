@@ -260,6 +260,28 @@
       ],
       "id": "ototoi_izen",
       "input": "一昨日以前"
+    },
+    {
+      "description": "接続詞は先行要素のある文を閉じられない",
+      "expected": [
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        }
+      ],
+      "id": "naishi",
+      "input": "時間ないし。"
     }
   ],
   "description": "General nouns (part 4/4)",
