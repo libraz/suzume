@@ -745,6 +745,12 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // continuative it competes with is the cheapest word in the lattice.
       {EPOS::AuxNegativeNu, EPOS::AuxClassicalKi, cost::kExtremeBonus},
       {EPOS::AdjRenyokei, EPOS::AuxClassicalKi, cost::kVeryStrongBonus},
+      // べし inflects like an adjective and reaches the past through the same
+      // supplementary continuative (告げぬべかり+し). Its other cells never meet
+      // this auxiliary, because the classical past is admitted only where a
+      // clause ends or a nominal follows, and the continuative べく is followed
+      // by the て it introduces (起こるべく+し+て).
+      {EPOS::AuxClassicalBeshi, EPOS::AuxClassicalKi, cost::kVeryStrongBonus},
       // The 終止形 き closes a clause behind the same continuatives, but its two
       // kana also spell the regional conjunctive particle, which instead takes a
       // finite predicate or the modern past (紙書く+き, 水飲んだ+き). Those two

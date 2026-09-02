@@ -176,6 +176,12 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("べく", "べし", EPOS::AuxClassicalBeshi),    // 連用形: 注意すべく, しかるべく
       aux("べし", "べし", EPOS::AuxClassicalBeshi),    // 終止形: 見るべし, 恐るべし
       aux("べから", "べし", EPOS::AuxClassicalBeshi),  // 未然形: 読むべからず
+      // Supplementary (カリ) conjugation. The 未然形 is the cell that hosts
+      // classical negation, and the rest of the row hosts the auxiliaries that
+      // need an inflecting host: 告げぬべかりし, 行くべかるべし, 惜しむべかれど.
+      aux("べかり", "べし", EPOS::AuxClassicalBeshi),  // 連用形: 言ふべかりけり
+      aux("べかる", "べし", EPOS::AuxClassicalBeshi),  // 連体形: 行くべかるべし
+      aux("べかれ", "べし", EPOS::AuxClassicalBeshi),  // 已然形: 惜しむべかれど
 
       // Passive/Potential (受身・可能)
       aux("れ", "れる", EPOS::AuxPassive),
