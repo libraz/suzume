@@ -102,6 +102,11 @@ EntrySpecRange getAuxiliaryEntries() {
       // a clause end.
       aux("つ", "つ", EPOS::AuxClassicalPerfect),
       aux("り", "り", EPOS::AuxClassicalPerfect),  // 存続 (行けり)
+      // 完了 ぬ (ナ変). Its terminal shares a spelling with the negative ぬ, which
+      // is already registered; the cells that do not are the ones a continuative
+      // hosts (花散り+ぬる, 心こそ定まり+ぬれ).
+      aux("ぬる", "ぬ", EPOS::AuxClassicalPerfect),  // 連体形 (花ぞ散りぬる)
+      aux("ぬれ", "ぬ", EPOS::AuxClassicalPerfect),  // 已然形 (花こそ散りぬれ)
       // Classical past き: the 連体形 し and 已然形 しか both attach to a
       // continuative (読みし人, 見しかば). The 終止形 き spells the Godan-ka
       // continuative as well, so it closes a clause only behind another literary

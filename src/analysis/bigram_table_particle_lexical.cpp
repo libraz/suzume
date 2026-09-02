@@ -779,6 +779,10 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // mimetics such as AっBり from becoming a numeral plus auxiliary.
       {EPOS::Noun, EPOS::AuxClassicalPerfect, cost::kNever},
       {EPOS::NounNumber, EPOS::AuxClassicalPerfect, cost::kNever},
+      // A case particle introduces the argument of a predicate, so the predicate
+      // itself still has to follow it. The perfect's adnominal ぬる spells the
+      // hiragana verb 塗る, which does take that position (ペンキを+ぬる).
+      {EPOS::ParticleCase, EPOS::AuxClassicalPerfect, cost::kNever},
 
       // 連体形 なる (壮大なる計画): a na-adjective stem + なる is the classical adnominal 断定, not
       // the verb 成る. Only the left context (AdjNaAdj→なる) is rewarded: a right-context なる→Noun
