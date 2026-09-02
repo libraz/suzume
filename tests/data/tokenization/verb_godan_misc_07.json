@@ -2166,6 +2166,168 @@
       ],
       "id": "koso_rane",
       "input": "雪こそ降らね"
+    },
+    {
+      "description": "the conjectural selects an irrealis whose stem starts inside a kanji run",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "迷う",
+          "pos": "Verb",
+          "surface": "迷わ"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "wamu",
+      "input": "心迷わむ"
+    },
+    {
+      "description": "an irrealis before the conjectural without dictionary support for the base",
+      "expected": [
+        {
+          "lemma": "去る",
+          "pos": "Verb",
+          "surface": "去ら"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "思い",
+          "pos": "Noun",
+          "surface": "思い"
+        }
+      ],
+      "id": "ramutoshiki_i",
+      "input": "去らむとしき思い。"
+    },
+    {
+      "description": "the same boundary on a base the dictionary does not attest",
+      "expected": [
+        {
+          "lemma": "野",
+          "pos": "Noun",
+          "surface": "野"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲か"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "ni_kamu",
+      "input": "野に咲かむ"
+    },
+    {
+      "description": "an attested ba-row base keeps the irrealis against the bamu suffix",
+      "expected": [
+        {
+          "lemma": "名",
+          "pos": "Noun",
+          "surface": "名"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "呼ぶ",
+          "pos": "Verb",
+          "surface": "呼ば"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "wo_bamu",
+      "input": "名を呼ばむ"
+    },
+    {
+      "description": "the bamu derivation stays whole on a single-kanji base",
+      "expected": [
+        {
+          "lemma": "手",
+          "pos": "Noun",
+          "surface": "手"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "汗ばむ",
+          "pos": "Verb",
+          "surface": "汗ばむ"
+        }
+      ],
+      "id": "ga_bamu_2",
+      "input": "手が汗ばむ"
+    },
+    {
+      "description": "the formal noun after an ichidan continuative, not the volitional",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "beyouganai",
+      "input": "食べようがない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",

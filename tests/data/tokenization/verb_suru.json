@@ -2950,6 +2950,48 @@
       ],
       "id": "suruto_meta",
       "input": "出席すると決めた。"
+    },
+    {
+      "description": "an ichidan stem is the irrealis before the conjectural",
+      "expected": [
+        {
+          "lemma": "流れる",
+          "pos": "Verb",
+          "surface": "流れ"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "せ"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "し"
+        },
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        }
+      ],
+      "id": "remutoseshi_mo",
+      "input": "流れむとせし水も。"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割",
