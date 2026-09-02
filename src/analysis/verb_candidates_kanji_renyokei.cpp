@@ -154,15 +154,33 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // conjunctive particle and never the stem of a fabricated 見てる/経てる.
         const bool single_kanji_te_form =
             is_single_kanji && first_hira == U'て' && vh::isSingleKanjiIchidan(codepoints[start_pos]);
-        // An Ichidan verb uses the same stem before the classical negative
-        // auxiliaries ぬ/ず/ざる/ざれ as it does before ない.  In this
-        // environment the candidate surface is the full stem, so recover its
-        // lemma by appending る rather than asking the standalone inflection
+        // An Ichidan verb writes its irrealis with the same stem it writes its
+        // continuative with, so which of the two a stem is depends entirely on
+        // what follows it. Read that off the auxiliary's class rather than its
+        // spelling: the negative paradigm, the classical negative conjecture
+        // and the conjectural all select an irrealis (流れ+む, 食べ+ん,
+        // 開け+ざる), while ない is spelled out above because it is an adjective
+        // rather than a dictionary auxiliary. Without the mizenkei reading the
+        // continuative is charged for a connection it never had, and the whole
+        // run is rebuilt as one compound noun instead (流れむ).
+        // In this environment the candidate surface is the full stem, so recover
+        // its lemma by appending る rather than asking the standalone inflection
         // analyzer to interpret a final て as a te-form suffix.
+        // The conjectural is admitted only in its one-mora spellings. An Ichidan
+        // verb writes its own volitional as よう, and that spelling is equally
+        // the formal noun 様 the continuative hosts (食べ+よう+が+ない), so there
+        // the stem's role is decided by what follows the auxiliary rather than
+        // by the auxiliary itself.
         const bool classical_negative_aux_follows =
-            first_hira != U'せ' && (continuation == U'ぬ' || continuation == U'ず' ||
-                                    (continuation == U'ざ' && renyokei_end + 1 < codepoints.size() &&
-                                     (codepoints[renyokei_end + 1] == U'る' || codepoints[renyokei_end + 1] == U'れ')));
+            first_hira != U'せ' &&
+            vh::auxiliaryFollowsAt(dict_manager, codepoints, renyokei_end,
+                                   [](const dictionary::DictionaryEntry& entry) {
+                                     if (entry.extended_pos == core::ExtendedPOS::AuxVolitional) {
+                                       return normalize::utf8Length(entry.surface) == 1;
+                                     }
+                                     return entry.extended_pos == core::ExtendedPOS::AuxNegativeNu ||
+                                            entry.extended_pos == core::ExtendedPOS::AuxNegativeMai;
+                                   });
         // A multi-kanji nominal stem followed by せ+ん is the literary
         // irrealis of する (解決+せ+ん), not an unverified Ichidan verb
         // ending in ～せる.  Dictionary-verified lexical verbs such as
