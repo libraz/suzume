@@ -566,7 +566,7 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
           dict_manager_ != nullptr &&
           dict_manager_->lookupExact(extractSubstring(codepoints, start_pos, start_pos + 2) + "る",
                                      core::PartOfSpeech::Verb) != nullptr;
-      if (!normalize::isParticleCodepoint(first) && !isBareVowelMora(first) && first != U'ら' &&
+      if (!normalize::isParticleCodepoint(first) && !isBareVowelMora(first) && !kana::isRaColumnCodepoint(first) &&
           !is_godan_ra_continuative) {
         std::string surface = extractSubstring(codepoints, start_pos, start_pos + 3);
         if (!surface.empty()) {

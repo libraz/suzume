@@ -50,6 +50,16 @@ inline bool isORowCodepoint(char32_t cp) {
          cp == U'を';
 }
 
+/**
+ * @brief Whether a kana belongs to the ら column
+ *
+ * No native Japanese word starts on this column, mimetics included, so a
+ * candidate that would open one there is reading a word boundary wrong.
+ */
+inline bool isRaColumnCodepoint(char32_t cp) {
+  return cp == U'ら' || cp == U'り' || cp == U'る' || cp == U'れ' || cp == U'ろ';
+}
+
 // =============================================================================
 // Character Type Checks (Codepoint-based)
 // =============================================================================
