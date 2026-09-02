@@ -863,10 +863,34 @@ _HA_ROW_DETACHED_TAILS = ("ひ", "ふ", "へ")
 _HA_ROW_STEM_POS = ("名詞", "動詞", "形容詞", "副詞", "接尾辞")
 
 
+_HA_ROW_FRAME_STEM = "思"
+
+
 def _ha_row_fabricated_ichidan(token: dict) -> bool:
     """Whether a verb token's lemma is the 一段 reading invented for a ハ行 cell."""
     surface = token.get("surface", "")
     return token.get("pos") == "動詞" and token.get("lemma") == surface + "る"
+
+
+def _ha_row_cell_auxiliary(surface: str) -> dict | None:
+    """Split a ハ行 cell from the auxiliary a fabricated verb swallowed it into.
+
+    The cell kana does not always fall out on its own: where it opens a longer
+    run, the reference dictionary reads the whole run as an unrelated 五段 verb
+    (適+ひたる as 浸る). Writing the same run behind the one stem whose ハ行 row
+    the dictionary does carry settles what the cell actually hosts, and that
+    frame cannot be misread because the row is listed for it.
+    """
+    from .mecab import mecab_analyze
+
+    if len(surface) < 2 or surface[0] not in _HA_ROW_DETACHED_TAILS:
+        return None
+    probe = mecab_analyze(_HA_ROW_FRAME_STEM + surface)
+    if len(probe) != 2 or probe[0].get("surface") != _HA_ROW_FRAME_STEM + surface[0]:
+        return None
+    if probe[0].get("pos") != "動詞" or probe[0].get("conj_type") != "四段・ハ行":
+        return None
+    return probe[1] if probe[1].get("pos") == "助動詞" else None
 
 
 def _postprocess_ha_row_godan(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
@@ -894,9 +918,32 @@ def _postprocess_ha_row_godan(result: list[dict], applied_rule: str | None) -> t
             stem = token.get("surface", "")
             merged.append({"surface": stem + following["surface"], "pos": "動詞", "lemma": stem + "ふ"})
             idx += 2
+            # The terminal cell in front of a nominal is the adnominal, and an
+            # adnominal takes a head noun, so the following word is not the bound
+            # counter the dictionary reads it as elsewhere (舞ふ+間 against 三+間).
+            if (
+                following["surface"] == "ふ"
+                and idx < len(result)
+                and result[idx].get("pos") == "名詞"
+                and result[idx].get("pos_sub1") == "接尾"
+            ):
+                merged.append({**result[idx], "pos_sub1": "一般"})
+                idx += 1
             if applied_rule is None:
                 applied_rule = "ha-row-godan-conjugation"
             continue
+        # A longer fabricated verb hides the same cell behind its own opening
+        # kana, and what follows the cell there is an auxiliary (適+ひ+たる).
+        if following is not None and following.get("pos") == "動詞" and token.get("pos") in _HA_ROW_STEM_POS:
+            auxiliary = _ha_row_cell_auxiliary(following.get("surface", ""))
+            if auxiliary is not None:
+                stem = token.get("surface", "")
+                merged.append({"surface": stem + following["surface"][0], "pos": "動詞", "lemma": stem + "ふ"})
+                merged.append(auxiliary)
+                idx += 2
+                if applied_rule is None:
+                    applied_rule = "ha-row-godan-conjugation"
+                continue
         # The classical honorific stem is tagged as a suffix, and its imperative
         # cell then falls out as the direction particle (給+へ). A suffix never
         # takes that particle, so the pair is one 命令形 of the ハ行四段 verb.
