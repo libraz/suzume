@@ -231,6 +231,13 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // unknown noun that absorbs the particle sequence.
       {EPOS::ParticleBinding, EPOS::VerbShuushikei, cost::kVeryStrongBonus},
 
+      // The attributive closes the same slot: it heads the noun phrase a focus
+      // particle scopes over (まで+届く+荷物), and in classical Japanese it is the
+      // form a 係助詞 actually governs (水+なむ+流るる). Without this row the
+      // finite bonus above is the only one on offer, so a fabricated 終止形 that
+      // spells the attributive wins over the attributive cell itself.
+      {EPOS::ParticleBinding, EPOS::VerbRentaikei, cost::kVeryStrongBonus},
+
       // The same holds for the non-finite stems that carry a following
       // auxiliary (しか+でき+ない, しか+読ま+ない, さえ+すれ+ば). Without these
       // rows the particle's own first mora is cheap enough to be re-read as a
