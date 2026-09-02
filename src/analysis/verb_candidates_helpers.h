@@ -357,6 +357,42 @@ bool endsWithCaseParticleAfterContinuative(const dictionary::DictionaryManager* 
                                            const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 
 /**
+ * @brief Check if a candidate's conjugation ending is itself a classical auxiliary
+ *
+ * True when @p surface is @p stem plus a remainder that the dictionary knows as
+ * a classical auxiliary. The monograde and カ変 paradigms both stand on a bare
+ * stem, so every kana past it is supposed to be the conjugation ending — and a
+ * classical auxiliary is never one of those. It selects a cell and carries its
+ * own token, so a candidate spelling one has absorbed it: 来ぬ is 来 + ぬ and
+ * 食べたり is 食べ + たり, never a cell of 来る or 食べる.
+ *
+ * The godan paradigms are the reason this is keyed on the verb type at the call
+ * site rather than on the surface: 死ぬ and 読む end in the same kana as ぬ and
+ * む, but there the kana is their own terminal ending.
+ * @see fabricated closed-class absorption guards (top of this header)
+ */
+bool spellsClassicalAuxiliaryEnding(const dictionary::DictionaryManager* dict_manager, std::string_view surface,
+                                    std::string_view stem);
+
+/**
+ * @brief Check if a span ends in a multi-mora auxiliary written after okurigana
+ *
+ * True when a dictionary auxiliary of 2+ codepoints closes [.., end_pos) and at
+ * least one okurigana mora of the host precedes it from @p okurigana_start. An
+ * auxiliary selects a conjugated cell of the word in front of it, so a candidate
+ * reaching across one was assembled out of [verb] + auxiliary: 過ぎたれ is 過ぎ
+ * plus the izenkei たれ, not a cell of the non-word 過ぎたる.
+ *
+ * Requiring okurigana before the auxiliary is what keeps the nominal hosts out:
+ * 重要なれ attaches なれ straight to the kanji run, and the copula there is not
+ * absorbing a verb stem. The 2+ codepoint floor is the usual one — ぬ, き, り
+ * and the rest of the one-mora closed class are also ordinary verb endings.
+ * @see fabricated closed-class absorption guards (top of this header)
+ */
+bool endsWithAuxiliaryAfterOkurigana(const dictionary::DictionaryManager* dict_manager,
+                                     const std::vector<char32_t>& codepoints, size_t okurigana_start, size_t end_pos);
+
+/**
  * @brief Length of a multi-mora negative auxiliary written at a position
  *
  * Returns the codepoint length of the longest dictionary auxiliary starting at

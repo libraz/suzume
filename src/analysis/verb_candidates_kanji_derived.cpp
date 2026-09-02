@@ -171,8 +171,6 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
       continue;
     }
     bool has_negative_conditional = false;
-    const bool has_classical_negative_conditional =
-        particle_pos >= kanji_end + 2 && codepoints[particle_pos - 2] == U'ざ' && codepoints[particle_pos - 1] == U'れ';
     constexpr size_t kNakereLength = 3;
     for (size_t negative_pos = kanji_end; negative_pos + kNakereLength <= particle_pos; ++negative_pos) {
       if (negative_pos > start_pos && vh::naiConditionalFollowsAt(codepoints, negative_pos) &&
@@ -192,11 +190,16 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
       continue;
     }
     const auto& best = analyses.front();
-    // The classical negative auxiliary has its own kateikei ざれ before ば
-    // (担わ+ざれ+ば). Do not reinterpret the whole open-class span as the
-    // conditional of a fabricated verb ending in ざる. A dictionary-attested
+    // An auxiliary carries its own izenkei before ば (担わ+ざれ+ば,
+    // 過ぎ+たれ+ば), so the e-mora the conditional keys on belongs to the
+    // auxiliary rather than to the host verb. Reading the whole span as one
+    // conditional fabricates a lemma out of that auxiliary (過ぎたる, 担わざる).
+    // Resolve the tail from the auxiliary inventory instead of naming one cell,
+    // so the whole closed class is covered at once. A dictionary-attested
     // lexical verb such as ござる retains its genuine ござれ+ば paradigm.
-    if (has_classical_negative_conditional && !vh::isVerbInDictionary(dict_manager, best.base_form)) {
+    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    if (vh::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, kanji_end, particle_pos) &&
+        !vh::isVerbInDictionary(dict_manager, best.base_form)) {
       continue;
     }
     const auto* godan_row = grammar::Conjugation::getGodanRow(best.verb_type);

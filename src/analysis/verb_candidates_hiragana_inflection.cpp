@@ -961,6 +961,15 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
       if (is_conditional && godan_row != nullptr && end_pos >= start_pos + 3 &&
           godan_row->e_row == codepoints[end_pos - 2]) {
         const size_t stem_end = end_pos - 1;
+        // The e-mora may belong to an auxiliary's own izenkei rather than to
+        // the host verb (…ぎ+たれ+ば, …ら+ざれ+ば). Promoting the whole span
+        // then fabricates a lemma out of the auxiliary, so leave the boundary
+        // to the ordinary candidate path unless the base form is attested.
+        // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+        if (vh::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, start_pos, stem_end) &&
+            !vh::isVerbInDictionary(dict_manager, best.base_form)) {
+          continue;
+        }
         candidates.push_back(makeVerbCandidate(
             extractSubstring(codepoints, start_pos, stem_end), start_pos, stem_end, candidate::verb_cost::kStrongBonus,
             best.base_form, grammar::verbTypeToConjType(best.verb_type), true, CandidateOrigin::VerbHiragana,
