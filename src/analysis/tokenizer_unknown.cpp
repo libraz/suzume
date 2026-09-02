@@ -1329,6 +1329,28 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
       // would bury the auxiliary — here the negation — inside the noun. The
       // productive nominalizations reach their lemma from the bare cell and
       // carry no chain (読み, 身なり, 隔たり).
+      // A quotation closes a clause, so a span in front of it is read as a
+      // predicate wherever it can be one. When the continuative's own tail
+      // spells a complete multi-mora auxiliary and its lemma is a fabrication,
+      // that auxiliary is the predicate: 金なり+と is 金 + なり (the classical
+      // copula) under quotation, not a deverbal noun from the non-word 金なる.
+      // The other nominal particles select an argument instead of closing a
+      // clause, so they keep the ambiguity that 身なり+を needs.
+      bool auxiliary_tail_before_quote = false;
+      if (follows_predicate_quote && !verb_helpers::isVerbInDictionary(&dict_manager_, candidate.lemma)) {
+        // A one-mora tail is also the last mora of ordinary words, so only
+        // multi-mora auxiliaries count; none of the closed class is longer than
+        // four morae.
+        constexpr size_t kMaxAuxiliaryLen = 4;
+        const size_t max_len = std::min(kMaxAuxiliaryLen, candidate.end - candidate.start - 1);
+        for (size_t tail_len = 2; tail_len <= max_len; ++tail_len) {
+          if (dict_manager_.lookupExact(extractSubstring(codepoints, candidate.end - tail_len, candidate.end),
+                                        core::PartOfSpeech::Auxiliary) != nullptr) {
+            auxiliary_tail_before_quote = true;
+            break;
+          }
+        }
+      }
       const auto& span_analyses = inflection_.analyze(surface_str);
       const bool carries_auxiliary_chain = std::any_of(
           span_analyses.begin(), span_analyses.end(),
@@ -1336,7 +1358,8 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
       if (nominal_particle && !longer_dependent_follows && !has_lexical_nonverb_reading &&
           !is_complete_shii_adjective && !same_span_adjective_analysis && !crosses_complete_internal_boundary &&
           !crosses_noun_nagara_ni_boundary && !verb_reading_rejected && !bound_suffix_after_host &&
-          !candidate.has_suffix && !starts_with_closed_particle && !carries_auxiliary_chain) {
+          !candidate.has_suffix && !starts_with_closed_particle && !carries_auxiliary_chain &&
+          !auxiliary_tail_before_quote) {
         lattice.addEdge(surface_str, static_cast<uint32_t>(candidate.start), static_cast<uint32_t>(candidate.end),
                         core::PartOfSpeech::Noun,
                         getCategoryCost(core::ExtendedPOS::NounVerbal) + candidate::kNominalizedNounParticleBonus,
