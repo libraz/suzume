@@ -15,8 +15,11 @@ void setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
       // false particle-chain interpretations (は+し, も+も, か+し).
 
       // PART_係 → PART_接続 (は+し, も+て): topic particle directly followed by
-      // conjunctive particle is grammatically invalid (need content between them)
-      {EPOS::ParticleTopic, EPOS::ParticleConj, cost::kRare},
+      // conjunctive particle is grammatically invalid (need content between
+      // them). Valued with its two siblings below rather than a step under
+      // them: the three describe the same impossibility, and the lower value
+      // let a kana noun be read as the chain instead (朝もや as 朝+も+や).
+      {EPOS::ParticleTopic, EPOS::ParticleConj, cost::kVeryRare},
 
       // PART_係 → PART_格 (は+が, は+を, も+に): topic+case markers never stack
       // adjacent on the same phrase (は...が with content between is fine)
