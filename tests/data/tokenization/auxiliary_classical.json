@@ -1111,6 +1111,205 @@
       ],
       "id": "nareba",
       "input": "重要なれば。"
+    },
+    {
+      "description": "classical perfect izenkei closes a kakari-musubi clause",
+      "expected": [
+        {
+          "lemma": "君",
+          "pos": "Pronoun",
+          "surface": "君"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知り"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たれ"
+        }
+      ],
+      "id": "koso_ritare",
+      "input": "君こそ知りたれ"
+    },
+    {
+      "description": "the perfect izenkei takes the passive continuative as its host",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "開く",
+          "pos": "Verb",
+          "surface": "開か"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たれ"
+        }
+      ],
+      "id": "koso_karetare",
+      "input": "道こそ開かれたれ"
+    },
+    {
+      "description": "godan continuative host for the clause-final perfect izenkei",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲き"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たれ"
+        }
+      ],
+      "id": "koso_kitare",
+      "input": "花こそ咲きたれ"
+    },
+    {
+      "description": "the clause-final perfect izenkei needs no binding particle",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知り"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たれ"
+        }
+      ],
+      "id": "ga_ritare",
+      "input": "彼が知りたれ"
+    },
+    {
+      "description": "the conjunctive particle keeps licensing the perfect izenkei",
+      "expected": [
+        {
+          "lemma": "君",
+          "pos": "Pronoun",
+          "surface": "君"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知り"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たれ"
+        },
+        {
+          "lemma": "ども",
+          "pos": "Particle",
+          "surface": "ども"
+        }
+      ],
+      "id": "koso_ritaredomo",
+      "input": "君こそ知りたれども"
+    },
+    {
+      "description": "the attributive cell of the perfect is unaffected by the clause-final licence",
+      "expected": [
+        {
+          "lemma": "都",
+          "pos": "Noun",
+          "surface": "都"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "着く",
+          "pos": "Verb",
+          "surface": "着き"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        }
+      ],
+      "id": "ni_kitaru_2",
+      "input": "都に着きたる"
+    },
+    {
+      "description": "classical past izenkei after a continuative, not the exclusive particle",
+      "expected": [
+        {
+          "lemma": "月",
+          "pos": "Noun",
+          "surface": "月"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "しか"
+        }
+      ],
+      "id": "koso_shika",
+      "input": "月こそ見しか"
     }
   ],
   "description": "auxiliary_classical tests",

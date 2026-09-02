@@ -1243,6 +1243,38 @@
       ],
       "id": "d3_dake_kanji_control_water",
       "input": "水だけでも飲む。"
+    },
+    {
+      "description": "the exclusive particle keeps its reading on a nominal host",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "しか",
+          "pos": "Particle",
+          "surface": "しか"
+        }
+      ],
+      "id": "nihakoreshika",
+      "input": "私にはこれしか"
     }
   ],
   "description": "particle_adverbial tests",
