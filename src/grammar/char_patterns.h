@@ -151,6 +151,17 @@ bool isBigradeTerminalKana(char32_t code);
 bool isModernGodanTerminalKana(char32_t code);
 
 /**
+ * @brief Whether a kana can end the stem of a modern Ichidan verb
+ *
+ * ハ行 is the one row the monograde paradigm lost: its intervocalic morae
+ * shifted to ワ行, leaving no modern verb whose stem ends in okurigana ひ or へ.
+ * A candidate built on that shape is historical kana for a ワ行五段 continuative
+ * (思ひ) or simply the head of the following word (肩+ひじ). Every other i-row
+ * and e-row kana still ends a monograde stem (起き, 過ぎ, 感じ, 落ち, 浴び, 求め).
+ */
+bool isMonogradeStemFinalKana(char32_t code);
+
+/**
  * @brief Whether a U-row kana also spells a classical auxiliary
  *
  * つ, ぬ, む, る, ふ and す open auxiliaries that attach to a 未然形 or a

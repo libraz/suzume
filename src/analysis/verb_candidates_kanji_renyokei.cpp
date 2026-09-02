@@ -283,10 +283,15 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         const bool unverified_before_temporal_nominal =
             !ichidan_base_is_dict && kanji_end > start_pos + 1 &&
             grammar::startsClosedTemporalNominal(extractClosedClassProbe(codepoints, renyokei_end));
+        // The monograde paradigm has no ハ行 member, so an unattested proposal
+        // whose okurigana ends the stem there is not a verb at all: the kana
+        // opens the next word instead (肩+ひじ, not 肩ひ + じ). A registered
+        // lemma keeps its candidate, so a lexical exception stays spellable.
+        const bool shifted_row_ichidan_stem = !ichidan_base_is_dict && !grammar::isMonogradeStemFinalKana(first_hira);
         if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold && !surface_is_dict_noun &&
             !single_kanji_te_form && !suffix_is_dict_verb && !trailing_span_is_dict_suffix &&
             !suffix_is_godan_before_auxiliary && !adj_homograph_blocked && !okurigana_opens_auxiliary &&
-            !unverified_multi_kanji_suru_mizen && !unverified_before_temporal_nominal) {
+            !unverified_multi_kanji_suru_mizen && !unverified_before_temporal_nominal && !shifted_row_ichidan_stem) {
           // Negative cost to strongly favor split over combined analysis
           // Combined forms get optimal_length bonus (-0.5), so we need to be lower
           // A bound verb prefix is the one multi-kanji stem that cannot be read

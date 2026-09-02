@@ -195,6 +195,12 @@ bool isModernGodanTerminalKana(char32_t code) {
   return std::find(kGodanTerminals.begin(), kGodanTerminals.end(), code) != kGodanTerminals.end();
 }
 
+bool isMonogradeStemFinalKana(char32_t code) {
+  constexpr std::array<char32_t, 2> kShiftedRow = {U'ひ', U'へ'};
+  return (isIRowCodepoint(code) || isERowCodepoint(code)) &&
+         std::find(kShiftedRow.begin(), kShiftedRow.end(), code) == kShiftedRow.end();
+}
+
 bool isClassicalAuxiliaryHomographKana(char32_t code) {
   constexpr std::array<char32_t, 6> kAuxiliaryHomographs = {U'す', U'つ', U'ぬ', U'ふ', U'む', U'る'};
   return std::find(kAuxiliaryHomographs.begin(), kAuxiliaryHomographs.end(), code) != kAuxiliaryHomographs.end();
