@@ -352,6 +352,20 @@ bool isDerivationalNounSuffixKanji(char32_t code_point);
 bool isQuantityPhraseSuffixKanji(char32_t code_point);
 
 /**
+ * @brief Check if a kanji heads a duration noun when 間 follows it (時間, 期間)
+ *
+ * Closed class of period units. A three-kanji run whose middle character is one
+ * of them is a modifier plus that duration noun (長+時間, 短+期間), not a two-kanji
+ * stem plus the quantity-phrase suffix 間. Without the distinction 長時間 splits as
+ * 長時|間, while a non-member keeps the productive "between X" reading (部署|間,
+ * 世代|間), which is the majority pattern for a plain two-kanji noun.
+ *
+ * @param code_point Unicode codepoint
+ * @return true if codepoint heads a duration noun before 間
+ */
+bool isDurationCompoundHeadKanji(char32_t code_point);
+
+/**
  * @brief Check if a 2-kanji pair forms an adverbial (副詞可能) temporal noun.
  *
  * These nouns (現在, 昨日, 今年…) detach from a following kanji noun rather than

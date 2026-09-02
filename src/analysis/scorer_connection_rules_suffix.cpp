@@ -656,8 +656,17 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // 政治学 were in dict) keep the bonus, since they represent intended compounds.
   // A stem that already ends in a bound derivational suffix (利用者, 安全性) is a
   // derived noun, not the left half of a two-compound run, so it keeps the bonus.
+  // A two-kanji stem whose second character heads a duration noun is a modifier
+  // plus that noun (長+時間, 短+期間), not a stem plus the quantity-phrase suffix
+  // 間, so it needs the same neutralizing penalty as the 3+ char case. Keyed on
+  // the period unit rather than the length: after any other two-kanji noun the
+  // suffix keeps its productive "between X" reading (部署|間, 世代|間).
+  const size_t suffix_stem_len = normalize::utf8Length(prev.surface);
+  const bool duration_noun_tail = suffix_stem_len == 2 &&
+                                  normalize::isQuantityPhraseSuffixKanji(utf8::decodeFirstChar(next.surface)) &&
+                                  normalize::isDurationCompoundHeadKanji(utf8::decodeLastChar(prev.surface));
   if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix && !prev.fromDictionary() &&
-      normalize::utf8Length(prev.surface) >= 3 && normalize::utf8Length(next.surface) == 1 &&
+      (suffix_stem_len >= 3 || duration_noun_tail) && normalize::utf8Length(next.surface) == 1 &&
       grammar::isAllKanji(prev.surface) && grammar::isAllKanji(next.surface) &&
       !normalize::isDerivationalNounSuffixKanji(utf8::decodeLastChar(prev.surface))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kRare);  // +1.0 to neutralize -0.8 bigram bonus
