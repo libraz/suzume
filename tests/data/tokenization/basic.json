@@ -987,6 +987,33 @@
       ],
       "id": "waga_kuni_no_mirai_kyuji",
       "input": "吾が国の未来"
+    },
+    {
+      "description": "否定対照: 文頭の と終わり接続詞は統合を保つ",
+      "expected": [
+        {
+          "lemma": "そうすると",
+          "pos": "Conjunction",
+          "surface": "そうすると"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早い"
+        }
+      ],
+      "id": "sousuruto_ga_i",
+      "input": "そうすると話が早い。"
     }
   ],
   "description": "Basic tokenization tests",

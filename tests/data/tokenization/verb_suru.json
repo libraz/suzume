@@ -2918,6 +2918,38 @@
       ],
       "id": "ha_shite_ita",
       "input": "彼は、心して聞いた。"
+    },
+    {
+      "description": "サ変名詞の後の すると は する＋と（接続詞ではない）",
+      "expected": [
+        {
+          "lemma": "出席",
+          "pos": "Noun",
+          "surface": "出席"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "決める",
+          "pos": "Verb",
+          "surface": "決め"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "suruto_meta",
+      "input": "出席すると決めた。"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割",

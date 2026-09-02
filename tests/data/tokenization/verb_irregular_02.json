@@ -146,6 +146,38 @@
       ],
       "id": "moukite",
       "input": "もうきて"
+    },
+    {
+      "description": "否定対照: 文頭の すると は接続詞",
+      "expected": [
+        {
+          "lemma": "すると",
+          "pos": "Conjunction",
+          "surface": "すると"
+        },
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "suruto_ga_ta",
+      "input": "すると彼が来た。"
     }
   ],
   "description": "Irregular verbs (する、くる) (part 2/2)",
