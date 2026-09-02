@@ -473,33 +473,51 @@ def classical_adjective_lemma(mizenkei: str) -> str | None:
     return CLASSICAL_ADJECTIVE_LEMMA_OVERRIDES.get(lemma, lemma) or None
 
 
-def _kari_adjective_lemma(surface: str) -> str | None:
-    """Return the modern lemma when a surface is a カリ-conjugation adjective form.
+_KARI_CELL_POS = ("形容詞", "助動詞")
 
-    The reference dictionary carries only the 未然形 cell of the supplementary
-    conjugation (高から, 大きから), so that cell is used as the probe: a surface
-    whose カリ ending can be swapped for から and still analyze as one 形容詞 is
-    itself a cell of the same adjective's paradigm.
+
+def _kari_cell_analysis(surface: str) -> tuple[str, str] | None:
+    """Read the word class and lemma of a カリ cell off its 未然形.
+
+    The supplementary conjugation belongs to the i-adjective and to every
+    auxiliary that inflects like one (べし, たい, らしい), and the reference
+    dictionary carries the 未然形 cell of both kinds (高から, べから) while losing
+    the rest.  That cell is therefore the probe: a surface whose カリ ending can
+    be swapped for から and still analyze as one word is a cell of the same
+    paradigm, and the probe settles the word class along with the lemma.
     """
-    return classical_adjective_lemma(surface[: -len(KARI_MIZENKEI_CELL)] + KARI_MIZENKEI_CELL)
+    from .mecab import mecab_analyze
+
+    mizenkei = surface[: -len(KARI_MIZENKEI_CELL)] + KARI_MIZENKEI_CELL
+    tokens = mecab_analyze(mizenkei)
+    if len(tokens) != 1:
+        return None
+    token = tokens[0]
+    pos = token.get("pos")
+    if pos not in _KARI_CELL_POS or token.get("surface") != mizenkei:
+        return None
+    lemma = CLASSICAL_ADJECTIVE_LEMMA_OVERRIDES.get(token.get("lemma"), token.get("lemma"))
+    return (pos, lemma) if lemma else None
 
 
 def _postprocess_adj_kari(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
-    """Rebuild the classical supplementary (カリ) conjugation of an i-adjective.
+    """Rebuild the classical supplementary (カリ) conjugation.
 
-    から/かり/かる/かれ are cells of the adjective's own inflection table, not a
-    stem plus an auxiliary: there is no 助動詞 かり in the classical inventory.
-    The reference dictionary only carries the 未然形 cell, so the others fall
-    back to unrelated verbs (高+かり as かりる, 冷+たかる as たかる, 小+さかり as
-    さかる). Restore them as one 形容詞 token with the adjective's own lemma,
-    which is what the 未然形 cell already yields.
+    から/かり/かる/かれ are cells of the word's own inflection table, not a stem
+    plus an auxiliary: there is no 助動詞 かり in the classical inventory. The
+    reference dictionary only carries the 未然形 cell, so the others fall back to
+    unrelated verbs (高+かり as かりる, 冷+たかる as たかる, 小+さかり as さかる) and,
+    for the auxiliaries that inflect like an adjective, to a sentence-final
+    particle the position cannot host (べ+かり, where the 終助詞 べ closes a clause
+    and so can never stand in front of anything). Restore each run as the one
+    token the 未然形 cell already yields, word class and lemma together.
     """
     merged: list[dict] = []
     idx = 0
     while idx < len(result):
         run = ""
         matched_end = 0
-        matched_lemma = None
+        matched_cell = None
         for end in range(idx, min(idx + _KARI_MAX_TOKEN_RUN, len(result))):
             run += result[end].get("surface", "")
             # The rule repairs a split the dictionary got wrong, so a surface it
@@ -508,14 +526,15 @@ def _postprocess_adj_kari(result: list[dict], applied_rule: str | None) -> tuple
                 continue
             if len(run) <= len(KARI_MIZENKEI_CELL) or not run.endswith(_KARI_TAILS):
                 continue
-            lemma = _kari_adjective_lemma(run)
-            if lemma is not None:
+            cell = _kari_cell_analysis(run)
+            if cell is not None:
                 matched_end = end + 1
-                matched_lemma = lemma
+                matched_cell = cell
                 break
-        if matched_lemma is not None:
+        if matched_cell is not None:
+            cell_pos, cell_lemma = matched_cell
             surface = "".join(result[pos].get("surface", "") for pos in range(idx, matched_end))
-            merged.append({"surface": surface, "pos": "形容詞", "lemma": matched_lemma})
+            merged.append({"surface": surface, "pos": cell_pos, "lemma": cell_lemma})
             idx = matched_end
             if applied_rule is None:
                 applied_rule = "adj-kari-conjugation"
