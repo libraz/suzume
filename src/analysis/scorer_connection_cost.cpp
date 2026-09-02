@@ -47,14 +47,17 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   const bool incomplete_potential_before_symbol = prev.extended_pos == core::ExtendedPOS::AuxPotential &&
                                                   normalize::utf8Length(prev.surface) == 1 &&
                                                   next.extended_pos == core::ExtendedPOS::Symbol;
-  // A terminal verb cannot host the nominative case reading of が.  When が
-  // follows a clause it is a connective homograph, while the case particle
-  // requires a nominal on its left.  Penalizing only the case reading prevents
-  // a fabricated sentence-initial verb from opening a second fabricated
-  // predicate through が.
-  const bool terminal_verb_before_nominative_case = prev.extended_pos == core::ExtendedPOS::VerbShuushikei &&
-                                                    next.extended_pos == core::ExtendedPOS::ParticleCase &&
-                                                    grammar::isSingleHiragana(next.surface, U'が');
+  // が after a terminal verb has two readings, and neither is open to a
+  // fabricated predicate.  The case particle requires a nominal on its left, so
+  // it is barred there outright and the adversative conjunctive particle takes
+  // the position instead.  That connective in turn requires a clause, which an
+  // unregistered verb candidate has not established: it is what a kana run
+  // looks like when it is cut at a plausible terminal ending (ゆうがた as
+  // ゆう+が+ただ).  A registered predicate keeps the connective reading free.
+  const bool terminal_verb_before_ga =
+      prev.extended_pos == core::ExtendedPOS::VerbShuushikei &&
+      ((next.extended_pos == core::ExtendedPOS::ParticleCase && grammar::isSingleHiragana(next.surface, U'が')) ||
+       (next.extended_pos == core::ExtendedPOS::ParticleConjFinite && !prev.fromDictionary()));
   // The assertive copula predicates over a nominal.  A conditional verb form or
   // a potential auxiliary directly before it is therefore an accidental
   // homograph chain.  Restrict this to the two nonterminal readings that can
@@ -77,8 +80,8 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
                                             prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() &&
                                             normalize::utf8Length(prev.surface) == 1;
   if (invalid_aspect_iru_attachment || invalid_aspect_iku_attachment || incomplete_potential_before_symbol ||
-      terminal_verb_before_nominative_case || nonterminal_predicate_before_assertive_copula ||
-      emphatic_adverb_before_past || volitional_after_stray_kanji) {
+      terminal_verb_before_ga || nonterminal_predicate_before_assertive_copula || emphatic_adverb_before_past ||
+      volitional_after_stray_kanji) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
   if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&

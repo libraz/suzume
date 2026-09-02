@@ -192,6 +192,15 @@ enum class ExtendedPOS : uint8_t {
   // conditional clause instead of opening a place for the particle.
   VerbContractedKateikei,
 
+  // 終止形接続の接続助詞: が (逆接). Conjunctive particles divide by the form
+  // they attach to, and the two halves take opposite connection values: て,
+  // ながら and つつ follow a continuative, while this one follows a finite
+  // predicate. が is the member that needs the distinction, because its case
+  // homograph demands a nominal on the left and the two readings therefore
+  // compete for every position. The remaining finite-attaching members (から,
+  // けれど, ので, のに) have no such homograph and stay in the general class.
+  ParticleConjFinite,
+
   // Count marker (for array sizing)
   Count_  // Total number of categories
 };
@@ -396,7 +405,11 @@ constexpr bool isClassicalAuxiliaryType(ExtendedPOS epos) {
  * @brief Check if ExtendedPOS is a particle type
  */
 constexpr bool isParticleType(ExtendedPOS epos) {
-  return epos >= ExtendedPOS::ParticleCase && epos <= ExtendedPOS::ParticleBinding;
+  // The original particle block is contiguous; later particle categories are
+  // appended after it because ExtendedPOS is serialized as uint8 in the
+  // compiled dictionaries, so the range alone no longer covers the class.
+  return (epos >= ExtendedPOS::ParticleCase && epos <= ExtendedPOS::ParticleBinding) ||
+         epos == ExtendedPOS::ParticleConjFinite;
 }
 
 /**

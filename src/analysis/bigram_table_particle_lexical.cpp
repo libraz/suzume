@@ -102,6 +102,19 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // exclusive construction (する+しか+ない, 見る+しか+ない).
       {EPOS::VerbShuushikei, EPOS::ParticleBinding, cost::kVeryStrongBonus},
 
+      // 終止形接続の接続助詞 is defined by the form it attaches to, so every
+      // nonfinite cell rejects it. The rows matter because が also spells the
+      // first mora of the ガル auxiliary and of several onbin cells: without
+      // them the particle cuts 寒+がっ+て and 見+たがっ+て apart at that mora.
+      {EPOS::AdjStem, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::AdjRenyokei, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::AdjKatt, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::AdjMizenkei, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::VerbMizenkei, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::VerbRenyokei, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::VerbOnbinkei, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::VerbTeForm, EPOS::ParticleConjFinite, cost::kAlmostNever},
+
       // An irrealis verb form selects auxiliaries, not a particle. The stem is
       // unfinished, so nothing that attaches to a completed phrase can follow
       // it — a case particle no more than a focus or topic marker

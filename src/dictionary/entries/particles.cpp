@@ -38,6 +38,11 @@ EntrySpecRange getParticleEntries() {
       // Causal から after a predicate (食べたから, 読むからといって). The case
       // reading above marks a nominal source (東京から), so both are needed.
       particle("から", EPOS::ParticleConj),
+      // Adversative が after a predicate (理解できるが進展した, 読んだが疲れた).
+      // The case reading above marks a nominal subject, so both are needed; the
+      // separate category keeps the continuative-attachment bonuses of て/たり
+      // off this one, which would otherwise cut がる apart (食べたがる).
+      particle("が", EPOS::ParticleConjFinite),
 
       // Binding particles (係助詞)
       particle("しも", EPOS::ParticleBinding),

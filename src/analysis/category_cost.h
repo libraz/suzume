@@ -147,6 +147,10 @@ constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCategoryC
   table[static_cast<size_t>(ExtendedPOS::ParticleAdverbial)] = 0.3F;  // ばかり,だけ
   table[static_cast<size_t>(ExtendedPOS::ParticleNo)] = 0.2F;         // の
   table[static_cast<size_t>(ExtendedPOS::ParticleBinding)] = 0.3F;    // こそ,さえ
+  // Same closed-class cost as the rest of the conjunctive particles; only the
+  // form it attaches to differs.
+  table[static_cast<size_t>(ExtendedPOS::ParticleConjFinite)] =
+      table[static_cast<size_t>(ExtendedPOS::ParticleConj)];  // が(逆接)
 
   // ===========================================================================
   // Nouns (0.5-0.6)
