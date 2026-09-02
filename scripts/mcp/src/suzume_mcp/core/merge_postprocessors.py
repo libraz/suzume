@@ -862,14 +862,16 @@ def _postprocess_ha_row_godan(result: list[dict], applied_rule: str | None) -> t
 
 # The 終止形 of a classical 二段 verb is its kanji stem plus one U-row kana.  The
 # modern descendant is 一段, so the same stem takes the row's E-row or I-row kana
-# plus る, and that headword is what the reference dictionary does carry.
-_NIDAN_TERMINAL_ROWS: dict[str, tuple[str, str]] = {
+# plus る, and that headword is what the reference dictionary does carry.  The ダ行
+# row is the one whose kana was absorbed into the kanji's own reading (出づ -> 出る),
+# so there the modern headword is the bare stem plus る.
+_NIDAN_TERMINAL_ROWS: dict[str, tuple[str, ...]] = {
     "う": ("え", "い"),
     "く": ("け", "き"),
     "ぐ": ("げ", "ぎ"),
     "す": ("せ", "し"),
     "つ": ("て", "ち"),
-    "づ": ("で", "じ"),
+    "づ": ("で", "じ", ""),
     "ぬ": ("ね", "に"),
     "ふ": ("え", "い"),
     "ぶ": ("べ", "び"),
@@ -898,33 +900,58 @@ def _nidan_terminal_lemma(stem: str, terminal: str) -> str | None:
     return None
 
 
-def nidan_cell(token: dict, following: dict | None) -> tuple[str, str] | None:
-    """Return (surface, 終止形) when two adjacent tokens spell one 二段 finite cell.
+def _nidan_cell_match(token: dict, following: dict) -> tuple[regex.Match, str] | None:
+    """Match a 二段 cell across a token pair, allowing an unanalyzed tail.
+
+    Where the cell ends the phrase the dictionary reads its kana as one unknown
+    noun and glues whatever follows onto that token (出|づるか, 出|づまじ).  An
+    unknown word carries no analysis to preserve, so the cell may be matched
+    against a prefix of it and the rest handed back to the dictionary.
+    """
+    head, tail = token.get("surface", ""), following.get("surface", "")
+    cell = _NIDAN_CELL.match(head + tail)
+    if cell is not None:
+        return cell, ""
+    if following.get("lemma") not in ("*", "", None):
+        return None
+    for width in (2, 1):  # the cell's kana tail is the terminal plus an optional る
+        if width < len(tail) and (cell := _NIDAN_CELL.match(head + tail[:width])) is not None:
+            return cell, tail[width:]
+    return None
+
+
+def nidan_cell(token: dict, following: dict | None) -> tuple[str, str, str] | None:
+    """Return (surface, 終止形, remainder) when two tokens spell one 二段 finite cell.
 
     終止形 is the stem plus one U-row kana, 連体形 adds る and 已然形 adds れ.  The
     stem keeps whatever 送り仮名 the modern headword carries (聞こ|ゆ), so it is
     matched as a kanji head plus the kana that follow, shortest first: the longest
     stem would swallow the 連体形 る of 消|ゆ|る.  Asking the dictionary for the
     modern 一段 headword the same stem builds decides whether the pair is a verb,
-    without listing the classical paradigm.
+    without listing the classical paradigm.  The remainder is whatever the window
+    matched past the cell, and is left for the caller to re-analyze.
     """
     if following is None:
         return None
-    cell = _NIDAN_CELL.match(token.get("surface", "") + following.get("surface", ""))
-    if cell is None:
+    matched = _nidan_cell_match(token, following)
+    if matched is None:
         return None
+    cell, remainder = matched
     stem, terminal, inflection = cell.groups()
     # The same kana spell classical auxiliaries that attach to a 未然形 or a
     # 連用形 (見|つ, 見|ぬ, 見|つる).  After a stem the dictionary inflected, the
-    # kana is that auxiliary and not part of the verb.
+    # kana is that auxiliary and not part of the verb — unless the stem's lemma is
+    # the cell itself (流|るる is read as the 未然形 of 流る), where the kana is
+    # that verb's own 送り仮名.
     if (
         terminal in _NIDAN_AUXILIARY_HOMOGRAPHS
         and token.get("pos") == "動詞"
         and token.get("conj_form") in _NIDAN_INFLECTED_STEM_FORMS
+        and token.get("lemma") != stem + terminal
     ):
         return None
     lemma = _nidan_terminal_lemma(stem, terminal)
-    return None if lemma is None else (lemma + inflection, lemma)
+    return None if lemma is None else (lemma + inflection, lemma, remainder)
 
 
 def _postprocess_nidan_cell(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
@@ -942,8 +969,10 @@ def _postprocess_nidan_cell(result: list[dict], applied_rule: str | None) -> tup
         token = result[idx]
         cell = nidan_cell(token, result[idx + 1] if idx + 1 < len(result) else None)
         if cell is not None:
-            surface, lemma = cell
+            surface, lemma, remainder = cell
             merged.append({"surface": surface, "pos": "動詞", "lemma": lemma})
+            if remainder:
+                merged.extend(mecab_analyze(remainder))
             idx += 2
             if applied_rule is None:
                 applied_rule = "classical-nidan-cell"
