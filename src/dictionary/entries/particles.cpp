@@ -98,6 +98,10 @@ EntrySpecRange getParticleEntries() {
       particle("さ", EPOS::ParticleFinal),
       particle("わ", EPOS::ParticleFinal),
       particle("ぞ", EPOS::ParticleFinal),
+      // ぞ is also the classical binding particle, like こそ and なむ above: it
+      // licenses a nominal in the inverted kakari-musubi order (散りたる+ぞ+花).
+      // The modern sentence-final reading stays alongside it.
+      particle("ぞ", EPOS::ParticleBinding),
       particle("ぜ", EPOS::ParticleFinal),
       particle("の", EPOS::ParticleNo),               // nominalizer
       {"ん", POS::Particle, EPOS::ParticleNo, "の"},  // colloquial の
