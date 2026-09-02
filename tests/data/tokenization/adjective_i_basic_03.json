@@ -675,6 +675,28 @@
       ],
       "id": "mukou_before_case_particle",
       "input": "青い扉のむこうへ"
+    },
+    {
+      "description": "か が head 側に立つ既存経路（否定対照）",
+      "expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "iikana",
+      "input": "いいかな"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
