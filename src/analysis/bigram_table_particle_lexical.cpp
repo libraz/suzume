@@ -678,6 +678,11 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // particle, so a kanji run that swallows the stem wins the clause.
       {EPOS::VerbRentaikei, EPOS::AuxClassicalNari, cost::kVeryStrongBonus},
 
+      // An auxiliary in the attributive fills that slot as readily as a verb
+      // does (見つけ+たる+なり). Without the pair the chain has no bonus at all
+      // and a hiragana run ending in なり is read as one adverb.
+      {EPOS::AuxClassicalTari, EPOS::AuxClassicalNari, cost::kVeryStrongBonus},
+
       // The classical past auxiliary follows a verb's renyokei and its
       // 已然形 licenses the conditional particle (見+けれ+ば). These two
       // connections disambiguate the auxiliary chain from an unrelated
