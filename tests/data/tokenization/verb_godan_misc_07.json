@@ -1898,6 +1898,107 @@
       ],
       "id": "wo_betari",
       "input": "菓子を食べたり"
+    },
+    {
+      "description": "ra-row stem written past the kanji keeps its hypothetical intact",
+      "expected": [
+        {
+          "lemma": "塵",
+          "pos": "Noun",
+          "surface": "塵"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "積もる",
+          "pos": "Verb",
+          "surface": "積もれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "山",
+          "pos": "Noun",
+          "surface": "山"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        }
+      ],
+      "id": "mo_moreba_tonaru",
+      "input": "塵も積もれば山となる。"
+    },
+    {
+      "description": "o-row irrealis of the same kanji still hosts the volitional",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "積む",
+          "pos": "Verb",
+          "surface": "積も"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "wo_mou",
+      "input": "本を積もう"
+    },
+    {
+      "description": "passive stem before its own past cell is unaffected by the clause-end gate",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_mareta_2",
+      "input": "本が読まれた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
