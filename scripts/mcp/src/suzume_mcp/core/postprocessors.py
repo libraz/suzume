@@ -618,6 +618,31 @@ def postprocess_classical_focus_namu(tokens: list[dict]) -> bool:
     return changed
 
 
+def postprocess_classical_copula_nari(tokens: list[dict]) -> bool:
+    """Classify classical なり on a nominal host before a quotation as the copula.
+
+    The reference analyzer already reads sentence-final なり after a noun as the
+    classical copula (時は金なり), but tags the same word as a particle as soon as
+    a quotation follows it. The host and the reading do not change: the quotative
+    と closes a clause, so what precedes it is a predicate. The listing particle
+    なり attaches to a terminal verb (行くなり来るなり), and the adverbial 〜なりに /
+    〜なりの suffix is followed by に or の, so neither is reached here.
+    """
+    changed = False
+    for idx in range(1, len(tokens) - 1):
+        token = tokens[idx]
+        if (
+            token.get("surface") == "なり"
+            and token.get("pos") == "Particle"
+            and tokens[idx - 1].get("pos") == "Noun"
+            and tokens[idx + 1].get("surface") == "と"
+        ):
+            token["pos"] = "Auxiliary"
+            token["lemma"] = "なり"
+            changed = True
+    return changed
+
+
 def postprocess_honorific_i_adjective(tokens: list[dict]) -> bool:
     """Restore an i-adjective ending in -しい after honorific prefix お."""
     changed = False
@@ -2990,6 +3015,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("closed-function-word-pos", postprocess_closed_function_words),
     ("closed-subsidiary-aux", postprocess_closed_subsidiary_aux),
     ("classical-focus-namu", postprocess_classical_focus_namu),
+    ("classical-copula-nari", postprocess_classical_copula_nari),
     ("honorific-i-adjective", postprocess_honorific_i_adjective),
     ("i-adjective-upper-bound", postprocess_i_adjective_upper_bound),
     ("kadouka-adverb", postprocess_kadouka_adverb),
