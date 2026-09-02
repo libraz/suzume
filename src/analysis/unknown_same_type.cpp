@@ -318,7 +318,10 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
 
   normalize::CharType start_type = char_types[start_pos];
   const bool starts_non_word_run = isNonWordType(start_type);
-  if (starts_non_word_run && start_pos > 0 && isNonWordType(char_types[start_pos - 1])) {
+  // Only a run of the SAME non-word class subsumes this position. Symbol and Emoji
+  // are separate classes: they carry different parts of speech, and a mixed run
+  // would take the POS of its first character.
+  if (starts_non_word_run && start_pos > 0 && char_types[start_pos - 1] == start_type) {
     return;
   }
 
@@ -404,8 +407,11 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
     normalize::CharType curr_type = char_types[end_pos];
     char32_t curr_char = codepoints[end_pos];
 
-    // Check if current character matches the sequence type
-    bool matches_type = curr_type == start_type || (starts_non_word_run && isNonWordType(curr_type));
+    // Check if current character matches the sequence type. Symbol and Emoji do not
+    // join each other: the run takes the POS of its first character, so absorbing an
+    // emoji into a symbol run would tag it SYMBOL and the symbol filter would delete
+    // text-bearing input.
+    bool matches_type = curr_type == start_type;
 
     // Variation selectors and invisible word-internal format controls modify
     // the surrounding text rather than opening a new token.

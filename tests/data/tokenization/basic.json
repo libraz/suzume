@@ -938,6 +938,28 @@
       ],
       "id": "soreha_iwa",
       "input": "それは無いわ"
+    },
+    {
+      "description": "Emoji preceded by an ellipsis keeps its own token",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "最高",
+          "pos": "Noun",
+          "surface": "最高"
+        },
+        {
+          "lemma": "😍",
+          "pos": "Other",
+          "surface": "😍"
+        }
+      ],
+      "id": "kore",
+      "input": "これ最高…😍"
     }
   ],
   "description": "Basic tokenization tests",
