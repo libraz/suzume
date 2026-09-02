@@ -171,6 +171,16 @@ bool startsPredicativeCopula(std::string_view surface);
 /** @brief Whether a surface is the fused particle/conjunction でも */
 bool isFusedDemo(std::string_view surface);
 
+/**
+ * @brief Whether a kana conjunction spells a predicate plus the conditional と
+ *
+ * すると, そうすると and さもないと are listed conjunctions whose surface is
+ * also a productive chain. Both readings compete for the same span in ordinary
+ * text, so the surface is not a fixed expression and cannot open a clause
+ * directly after a nominal host.
+ */
+bool isConditionalToConjunction(std::string_view surface);
+
 /** @brief Whether a surface is the benefactive formal noun おかげ */
 bool isBenefactiveFormalNoun(std::string_view surface);
 

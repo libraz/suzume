@@ -377,6 +377,12 @@ constexpr std::string_view kNegationPrefixKanji[] = {"非", "不", "無", "未"}
 constexpr float kBosSuffixPenalty = 3.0F;      // Suffix cannot lead a sentence
 constexpr float kBosConjunctionBonus = -0.5F;  // でも / しかし are natural at BOS
 constexpr float kBosDemoConjunctionBonus = scale::kDoubleVeryStrongBonus;
+// A conjunction that spells a predicate plus the conditional と (すると,
+// そうすると, さもないと) is the listed conjunction exactly where a clause
+// boundary precedes it, which is why it carries no fixed-expression word bonus
+// and is barred after a nominal host. The start of the sentence is that
+// boundary, so the reading is restored here instead of context-free.
+constexpr float kBosConditionalToConjunctionBonus = scale::kExtremeBonus;
 constexpr float kBosAppearanceSouPenalty = 0.5F;             // 様態そう should be demonstrative at BOS
 constexpr float kBosAspectIruPenalty = scale::kRare;         // いる aspect needs a preceding て-form
 constexpr float kBosAspectShimauPenalty = scale::kVeryRare;  // しまう aspect needs a preceding て-form

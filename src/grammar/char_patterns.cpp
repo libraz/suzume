@@ -218,6 +218,10 @@ bool isFusedDemo(std::string_view surface) {
          byte_pos == surface.size();
 }
 
+bool isConditionalToConjunction(std::string_view surface) {
+  return isPureHiragana(surface) && utf8::endsWith(surface, "と");
+}
+
 bool isBenefactiveFormalNoun(std::string_view surface) {
   size_t byte_pos = 0;
   return normalize::decodeUtf8(surface, byte_pos) == U'お' && normalize::decodeUtf8(surface, byte_pos) == U'か' &&

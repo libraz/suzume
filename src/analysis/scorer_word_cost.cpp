@@ -403,10 +403,14 @@ float computeFixedExpressionDictBonus(const core::LatticeEdge& edge) {
   // Prevents misanalysis like たとえば → たとえ+ば (adverb + particle)
   // These are fixed expressions that should remain as single tokens
   // Needs to beat adverb bonus path, so use stronger bonus
-  // Exclude でも - it has ambiguous interpretation (conjunction vs 副助詞)
-  // and context-dependent splitting (彼女でもない → 彼女+で+も+ない)
+  // A listed conjunction that also spells a productive chain is excluded: でも
+  // is the copula with a focus particle (彼女でもない → 彼女+で+も+ない) and the
+  // と-final members are a predicate with the conditional と (参加+する+と). For
+  // those the two readings compete for the same span in ordinary text, so the
+  // fixed-expression premise does not hold and the bonus would outweigh the
+  // rule that bars the conjunction reading after a nominal host.
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Conjunction && grammar::isPureHiragana(edge.surface) &&
-      edge.surface != "でも") {
+      !grammar::isFusedDemo(edge.surface) && !grammar::isConditionalToConjunction(edge.surface)) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     // Stronger bonus for conjunctions to beat adverb+particle splits
     // Adverb 3-char gets -3.0, plus particle gets bonus, so we need > -3.5

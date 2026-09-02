@@ -11,6 +11,9 @@ float Scorer::bosCost(const core::LatticeEdge& edge) const {
   if (edge.extended_pos == core::ExtendedPOS::Conjunction && grammar::isFusedDemo(edge.surface)) {
     return sc::kBosDemoConjunctionBonus;
   }
+  if (edge.extended_pos == core::ExtendedPOS::Conjunction && grammar::isConditionalToConjunction(edge.surface)) {
+    return sc::kBosConditionalToConjunctionBonus;
+  }
   if (edge.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isFormalNounConjunctiveParticle(edge.surface)) {
     return sc::scale::kAlmostNever;
   }

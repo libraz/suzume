@@ -126,7 +126,7 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   // coordinating conjunction joins two nominals with no clause boundary
   // anywhere, and barring it there shatters an all-hiragana coordination
   // (りんご+または+みかん).
-  const bool conditional_to_conjunction = grammar::isPureHiragana(next.surface) && utf8::endsWith(next.surface, "と");
+  const bool conditional_to_conjunction = grammar::isConditionalToConjunction(next.surface);
   // The conditional と reaches one host class further than the other two: an
   // adverb in that slot modifies the very predicate the conjunction spells
   // (もしか+する+と), so it is no more a clause boundary than a bare noun is.
