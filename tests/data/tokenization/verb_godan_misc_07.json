@@ -968,6 +968,124 @@
       ],
       "id": "kenaizo_chi",
       "input": "負けないぞ気持ち"
+    },
+    {
+      "description": "Classical adjective attributive keeps its boundary before a bound noun head",
+      "expected": [
+        {
+          "lemma": "落ちる",
+          "pos": "Verb",
+          "surface": "落ち"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        },
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高き"
+        },
+        {
+          "lemma": "所",
+          "pos": "Noun",
+          "surface": "所"
+        },
+        {
+          "lemma": "より",
+          "pos": "Particle",
+          "surface": "より"
+        }
+      ],
+      "id": "chikeri_ki_yori",
+      "input": "落ちけり、高き所より。"
+    },
+    {
+      "description": "Godan continuative in ki still forms a deverbal noun with a bound head",
+      "expected": [
+        {
+          "lemma": "巻き物",
+          "pos": "Noun",
+          "surface": "巻き物"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "開く",
+          "pos": "Verb",
+          "surface": "開く"
+        }
+      ],
+      "id": "ki_wo_ku",
+      "input": "巻き物を開く。"
+    },
+    {
+      "description": "A bound head does not take the first kanji of a following compound",
+      "expected": [
+        {
+          "lemma": "走れる",
+          "pos": "Verb",
+          "surface": "走れ"
+        },
+        {
+          "lemma": "目標",
+          "pos": "Noun",
+          "surface": "目標"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "地",
+          "pos": "Noun",
+          "surface": "地"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        }
+      ],
+      "id": "re_no_heto",
+      "input": "走れ目標の地へと。"
+    },
+    {
+      "description": "Bound head releases the kanji compound that follows it",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書き"
+        },
+        {
+          "lemma": "方向",
+          "pos": "Noun",
+          "surface": "方向"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "変える",
+          "pos": "Verb",
+          "surface": "変える"
+        }
+      ],
+      "id": "ki_wo_eru",
+      "input": "書き方向を変える。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",

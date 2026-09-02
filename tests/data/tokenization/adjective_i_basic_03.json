@@ -697,6 +697,33 @@
       ],
       "id": "iikana",
       "input": "いいかな"
+    },
+    {
+      "description": "Shiku-class classical attributive keeps its boundary before a bound noun head",
+      "expected": [
+        {
+          "lemma": "美しい",
+          "pos": "Adjective",
+          "surface": "美しき"
+        },
+        {
+          "lemma": "所",
+          "pos": "Noun",
+          "surface": "所"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "立つ",
+          "pos": "Verb",
+          "surface": "立つ"
+        }
+      ],
+      "id": "shiki_ni_tsu",
+      "input": "美しき所に立つ。"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
