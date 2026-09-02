@@ -1999,6 +1999,33 @@
       ],
       "id": "ga_mareta_2",
       "input": "本が読まれた"
+    },
+    {
+      "description": "ra-row stem hypothetical after a case particle",
+      "expected": [
+        {
+          "lemma": "雪",
+          "pos": "Noun",
+          "surface": "雪"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "積もる",
+          "pos": "Verb",
+          "surface": "積もれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "ga_moreba",
+      "input": "雪が積もれば"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
