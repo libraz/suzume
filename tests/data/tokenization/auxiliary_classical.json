@@ -1310,6 +1310,185 @@
       ],
       "id": "koso_shika",
       "input": "月こそ見しか"
+    },
+    {
+      "description": "Classical obligation べし in its supplementary continuative, hosting the past き before a case particle",
+      "expected": [
+        {
+          "lemma": "告げる",
+          "pos": "Verb",
+          "surface": "告げ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べかり"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "し"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "genubekarishini",
+      "input": "告げぬべかりしに。"
+    },
+    {
+      "description": "The same supplementary continuative hosting the past at a clause end",
+      "expected": [
+        {
+          "lemma": "告げる",
+          "pos": "Verb",
+          "surface": "告げ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べかり"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "し"
+        }
+      ],
+      "id": "genubekarishi",
+      "input": "告げぬべかりし。"
+    },
+    {
+      "description": "The 連体形 cell of the supplementary conjugation of べし",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べかる"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "kubekarubeshi",
+      "input": "行くべかるべし。"
+    },
+    {
+      "description": "The supplementary continuative of べし hosting けり",
+      "expected": [
+        {
+          "lemma": "言ふ",
+          "pos": "Verb",
+          "surface": "言ふ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べかり"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "fubekarikeri",
+      "input": "言ふべかりけり。"
+    },
+    {
+      "description": "Negative control: the 未然形 cell of べし keeps classical negation",
+      "expected": [
+        {
+          "lemma": "入る",
+          "pos": "Verb",
+          "surface": "入る"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べから"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        }
+      ],
+      "id": "rubekarazu",
+      "input": "入るべからず。"
+    },
+    {
+      "description": "Negative control: the continuative べく is followed by the サ変 continuative, not the classical past",
+      "expected": [
+        {
+          "lemma": "注意",
+          "pos": "Noun",
+          "surface": "注意"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "す"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べく"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "subekushite",
+      "input": "注意すべくして"
+    },
+    {
+      "description": "The 連体形 of the classical past nominalizes and takes a case particle",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "し"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "mishini",
+      "input": "読みしに。"
     }
   ],
   "description": "auxiliary_classical tests",
