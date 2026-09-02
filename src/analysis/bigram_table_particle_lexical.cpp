@@ -181,6 +181,13 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // ordinary nominalized renyokei uses.
       {EPOS::VerbRenyokei, EPOS::ParticleTopic, cost::kStrongBonus},
 
+      // ParticleTopic → ParticleNo (は+ん) - prohibitive
+      // The binding particle attaches to a nominal phrase, while the
+      // nominalizer needs the attributive form of a predicate, so neither can
+      // host the other. The pair only ever appears where a hiragana run was cut
+      // into closed-class fragments (ごはん read as ご+は+ん).
+      {EPOS::ParticleTopic, EPOS::ParticleNo, cost::kAlmostNever},
+
       // ParticleTopic/ParticleCase → Pronoun (は+いつ, は+どこ, に+何, で+誰)
       // Particles naturally precede pronouns in questions and relative clauses
       // は+いつ, も+何, に+どこ are very common patterns
