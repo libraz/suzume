@@ -538,6 +538,121 @@
       ],
       "id": "hito_oyuru_wa_shizen",
       "input": "人老ゆるは自然の理"
+    },
+    {
+      "description": "ダ行下二段の連体形が係助詞の後で1トークンになり、文末の助詞を分離する",
+      "expected": [
+        {
+          "lemma": "言葉",
+          "pos": "Noun",
+          "surface": "言葉"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "lemma": "出づ",
+          "pos": "Verb",
+          "surface": "出づる"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "ya_duruka",
+      "input": "言葉や出づるか"
+    },
+    {
+      "description": "係助詞なむの結びは連体形で、位置に依らず終止形を見出しにする",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "なむ",
+          "pos": "Particle",
+          "surface": "なむ"
+        },
+        {
+          "lemma": "流る",
+          "pos": "Verb",
+          "surface": "流るる"
+        }
+      ],
+      "id": "namu_ruru",
+      "input": "水なむ流るる"
+    },
+    {
+      "description": "接続助詞として持つ や の後でも二段連体形の述語スロットが開く",
+      "expected": [
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "lemma": "暮る",
+          "pos": "Verb",
+          "surface": "暮るる"
+        }
+      ],
+      "id": "ya_ruru",
+      "input": "日や暮るる"
+    },
+    {
+      "description": "二段終止形は終止形接続の助動詞 まじ を担って成立する",
+      "expected": [
+        {
+          "lemma": "言葉",
+          "pos": "Noun",
+          "surface": "言葉"
+        },
+        {
+          "lemma": "出づ",
+          "pos": "Verb",
+          "surface": "出づ"
+        },
+        {
+          "lemma": "まじ",
+          "pos": "Auxiliary",
+          "surface": "まじ"
+        }
+      ],
+      "id": "dumaji",
+      "input": "言葉出づまじ"
+    },
+    {
+      "description": "現代五段が到達しないダ行の二段終止形",
+      "expected": [
+        {
+          "lemma": "言葉",
+          "pos": "Noun",
+          "surface": "言葉"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "出づ",
+          "pos": "Verb",
+          "surface": "出づ"
+        }
+      ],
+      "id": "ga_du",
+      "input": "言葉が出づ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
