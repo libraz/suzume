@@ -727,6 +727,60 @@
       ],
       "id": "ga_yurunari",
       "input": "灯が消ゆるなり"
+    },
+    {
+      "description": "文語完了の連体形＋断定なりの連鎖と、読点による動詞誤読の抑止",
+      "expected": [
+        {
+          "lemma": "見つける",
+          "pos": "Verb",
+          "surface": "見つけ"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        },
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "証拠",
+          "pos": "Noun",
+          "surface": "証拠"
+        }
+      ],
+      "id": "tsuketarunari_sono",
+      "input": "見つけたるなり、その証拠。"
+    },
+    {
+      "description": "読点の無い同じ連鎖（否定対照）",
+      "expected": [
+        {
+          "lemma": "散る",
+          "pos": "Verb",
+          "surface": "散り"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        }
+      ],
+      "id": "ritarunari",
+      "input": "散りたるなり"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
