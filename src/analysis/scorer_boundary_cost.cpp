@@ -36,6 +36,12 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
       return grammar::isListingParticleTariSurface(edge.surface) ? boundary_cost.eos : sc::scale::kNeutral;
     case sc::EosBoundaryGate::NonDictionary:
       return edge.fromDictionary() ? sc::scale::kNeutral : boundary_cost.eos;
+    case sc::EosBoundaryGate::AfterContent:
+      // The sentence start arrives here as Unknown, and a punctuation mark
+      // opens a fragment; in both the token introduces what follows instead.
+      return prev_extended_pos == core::ExtendedPOS::Unknown || prev_extended_pos == core::ExtendedPOS::Symbol
+                 ? sc::scale::kNeutral
+                 : boundary_cost.eos;
   }
 
   return sc::scale::kNeutral;

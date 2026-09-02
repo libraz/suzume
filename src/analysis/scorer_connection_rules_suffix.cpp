@@ -235,9 +235,11 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
 
-  // Determiners directly modify formal nouns (このこと, どういうこと).
+  // Determiners directly modify formal nouns (このこと, どういうこと, この時).
   // Preserve that productive adnominal boundary over a split into an
-  // adverb/adjective and the independent verb いう.
+  // adverb/adjective and the independent verb いう. The pair cannot be priced
+  // by the formal noun: そのように is as grammatical as このこと, so what makes
+  // 夢かのように wrong is the literary determiner かの, not the head よう.
   if (prev.extended_pos == core::ExtendedPOS::Determiner && next.extended_pos == core::ExtendedPOS::NounFormal) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }

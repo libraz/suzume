@@ -424,6 +424,11 @@ constexpr float kEosAspectKuruPenalty = 3.0F;  // き (来 aspect) needs a follo
 constexpr float kEosListingParticlePenalty = 2.0F;  // たり listing particle needs a parallel predicate
 constexpr float kEosBindingParticleBonus = scale::kExtraStrongBonus;  // Keep standalone こそ/さえ intact
 constexpr float kEosPrefixPenalty = scale::kAlmostNever;              // Prefix requires a following host
+// A conjunction joins what precedes it to what follows, so it cannot be the last
+// morpheme of a sentence that already has material in front of it. A conjunction
+// that is the whole utterance, or that opens a fragment after a punctuation mark,
+// is exempt: there it introduces the following context instead.
+constexpr float kEosConjunctionPenalty = scale::kSevere;
 // A 連体詞 modifies the nominal after it, so it cannot close a sentence either.
 // Without this a determiner homographic with a finished predicate wins over that
 // predicate when nothing follows (とんだ read as the determiner, not 飛ん+だ).
@@ -443,6 +448,7 @@ enum class EosBoundaryGate {
   SingleCodepoint,
   ListingParticle,
   NonDictionary,
+  AfterContent,
 };
 
 struct BoundaryCost {
@@ -494,6 +500,8 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::ParticleConj)].eos = kEosListingParticlePenalty;
   table[static_cast<size_t>(core::ExtendedPOS::ParticleConj)].eos_gate = EosBoundaryGate::ListingParticle;
   table[static_cast<size_t>(core::ExtendedPOS::ParticleBinding)].eos = kEosBindingParticleBonus;
+  table[static_cast<size_t>(core::ExtendedPOS::Conjunction)].eos = kEosConjunctionPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::Conjunction)].eos_gate = EosBoundaryGate::AfterContent;
   table[static_cast<size_t>(core::ExtendedPOS::Prefix)].eos = kEosPrefixPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::Determiner)].eos = kEosDeterminerPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::Determiner)].eos_gate = EosBoundaryGate::NonDictionary;
