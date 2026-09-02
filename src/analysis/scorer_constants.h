@@ -459,6 +459,13 @@ constexpr float kEosMizenkeiPenalty = scale::kAlmostNever;
 // auxiliary. Without it the sentence-final particle ね is read as this
 // auxiliary and drags a fabricated irrealis in front of it (らし+いよ+ね).
 constexpr float kEosIzenkeiNegativePenalty = scale::kStrong;
+// The passive auxiliary's one-mora cell れ is its irrealis and continuative, so
+// it always opens a slot after itself (れ+る, れ+た, れ+ない, れ+ます). Its finite
+// cells are longer, which is why the row is gated on the form rather than on
+// the auxiliary. Without it the passive reading splits a lexical izenkei at a
+// clause end that licenses one (心こそ定まれ as 定ま+れ) and pulls a classical
+// auxiliary cell apart with it (咲きたれ as 咲き+た+れ).
+constexpr float kEosPassiveStemPenalty = scale::kAlmostNever;
 
 enum class EosBoundaryGate {
   Always,
@@ -528,6 +535,8 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::VerbMizenkei)].eos = kEosMizenkeiPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::AuxNegativeNu)].eos = kEosIzenkeiNegativePenalty;
   table[static_cast<size_t>(core::ExtendedPOS::AuxNegativeNu)].eos_gate = EosBoundaryGate::IzenkeiNegative;
+  table[static_cast<size_t>(core::ExtendedPOS::AuxPassive)].eos = kEosPassiveStemPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::AuxPassive)].eos_gate = EosBoundaryGate::SingleCodepoint;
 
   return table;
 }();
