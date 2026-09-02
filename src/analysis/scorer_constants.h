@@ -442,6 +442,11 @@ constexpr float kEosShortRenyokeiPenalty = scale::kStrong;
 // of a sentence leaves the competing volitional reading of the same run — the
 // only reading available there — to win (やめよう as やめよ+う, not やめ+よう).
 constexpr float kEosRenyokeiFormalNounPenalty = scale::kAlmostNever;
+// An irrealis form is the bare stem of an auxiliary chain, so it can never be
+// the last morpheme: something has to fill the slot it opened. Without this a
+// fabricated irrealis covering the conditional なら+ば wins over the copula
+// plus its particle when nothing follows (雨ならば as 雨+ならば).
+constexpr float kEosMizenkeiPenalty = scale::kAlmostNever;
 
 enum class EosBoundaryGate {
   Always,
@@ -507,6 +512,7 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::Determiner)].eos_gate = EosBoundaryGate::NonDictionary;
   table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)].eos = kEosShortRenyokeiPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)].eos_gate = EosBoundaryGate::SingleCodepoint;
+  table[static_cast<size_t>(core::ExtendedPOS::VerbMizenkei)].eos = kEosMizenkeiPenalty;
 
   return table;
 }();

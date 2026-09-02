@@ -765,6 +765,17 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // preserving a single lexical onbin stem (よろこん + で).
       {EPOS::VerbMizenkei, EPOS::VerbOnbinkei, cost::kAlmostNever},
 
+      // The same form cannot govern a nominal either: an irrealis opens an
+      // auxiliary slot, so a noun after it means the slot was never filled and
+      // the stem was invented to cover a conditional (雨+ならば+中止 for
+      // 雨+なら+ば+中止). The sibling rows barring every particle after an
+      // irrealis live in bigram_table_particle_lexical.cpp.
+      {EPOS::VerbMizenkei, EPOS::Noun, cost::kAlmostNever},
+      {EPOS::VerbMizenkei, EPOS::NounFormal, cost::kAlmostNever},
+      {EPOS::VerbMizenkei, EPOS::NounVerbal, cost::kAlmostNever},
+      {EPOS::VerbMizenkei, EPOS::NounProper, cost::kAlmostNever},
+      {EPOS::VerbMizenkei, EPOS::Pronoun, cost::kAlmostNever},
+
       // The volitional closes its predicate, so what follows it is a particle
       // or another auxiliary -- never a fresh verb stem. Without this the final
       // particles behind it are swallowed by a euphonic stem that happens to
