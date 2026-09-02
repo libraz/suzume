@@ -159,6 +159,316 @@
       ],
       "id": "ni_shitagau_plain_form_variant",
       "input": "規則に従う必要がある。"
+    },
+    {
+      "description": "む verb continuative + desiderative たい",
+      "expected": [
+        {
+          "lemma": "悲しむ",
+          "pos": "Verb",
+          "surface": "悲しみ"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "kanashimitai",
+      "input": "悲しみたい"
+    },
+    {
+      "description": "む verb continuative + desiderative たい",
+      "expected": [
+        {
+          "lemma": "苦しむ",
+          "pos": "Verb",
+          "surface": "苦しみ"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "kurushimitai",
+      "input": "苦しみたい"
+    },
+    {
+      "description": "two-kanji stem + quantity-phrase suffix stays one noun",
+      "expected": [
+        {
+          "lemma": "長時間",
+          "pos": "Noun",
+          "surface": "長時間"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "作業",
+          "pos": "Noun",
+          "surface": "作業"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "肩",
+          "pos": "Noun",
+          "surface": "肩"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "凝る",
+          "pos": "Verb",
+          "surface": "凝っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "choujikan_no_sagyou",
+      "input": "長時間の作業で肩が凝った。"
+    },
+    {
+      "description": "classical nidan attributive cell after the stem widening",
+      "expected": [
+        {
+          "lemma": "名",
+          "pos": "Noun",
+          "surface": "名"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "求む",
+          "pos": "Verb",
+          "surface": "求むる"
+        },
+        {
+          "lemma": "者",
+          "pos": "Noun",
+          "surface": "者"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
+        }
+      ],
+      "id": "motomuru_nidan_rentaikei",
+      "input": "名を求むる者あり"
+    },
+    {
+      "description": "kana nominal before a case particle is not a volitional",
+      "expected": [
+        {
+          "lemma": "窓",
+          "pos": "Noun",
+          "surface": "窓"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "むこう",
+          "pos": "Noun",
+          "surface": "むこう"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mado_no_mukou_wo_mita",
+      "input": "窓のむこうを見た"
+    },
+    {
+      "description": "unknown kyujitai run is read in its modern spelling",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "亂れる",
+          "pos": "Verb",
+          "surface": "亂れ"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "kyujitai_midare_keri",
+      "input": "心亂れけり"
+    },
+    {
+      "description": "terminal む before と keeps the verb whole",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲む"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nomu_to_itta_control",
+      "input": "水を飲むと言った。"
+    },
+    {
+      "description": "bare-hiragana godan-sa verb",
+      "expected": [
+        {
+          "lemma": "でかす",
+          "pos": "Verb",
+          "surface": "でかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "dekashita",
+      "input": "でかした"
+    },
+    {
+      "description": "single-kanji suru verb attributive form",
+      "expected": [
+        {
+          "lemma": "耳",
+          "pos": "Noun",
+          "surface": "耳"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "届く",
+          "pos": "Verb",
+          "surface": "届く"
+        },
+        {
+          "lemma": "声",
+          "pos": "Noun",
+          "surface": "声"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "発する",
+          "pos": "Verb",
+          "surface": "発する"
+        },
+        {
+          "lemma": "言葉",
+          "pos": "Noun",
+          "surface": "言葉"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "重い",
+          "pos": "Adjective",
+          "surface": "重い"
+        }
+      ],
+      "id": "hassuru_kotoba",
+      "input": "耳に届く声が発する言葉は重い"
+    },
+    {
+      "description": "pronoun host must not lose its first mora to the determiner",
+      "expected": [
+        {
+          "lemma": "吾輩",
+          "pos": "Pronoun",
+          "surface": "吾輩"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "wagahai_wa_neko",
+      "input": "吾輩は猫である"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",

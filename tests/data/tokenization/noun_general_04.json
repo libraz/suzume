@@ -145,6 +145,121 @@
       ],
       "id": "ue_to_shita_phrase",
       "input": "上と下の関係。"
+    },
+    {
+      "description": "two-kanji stem + 間 variant",
+      "expected": [
+        {
+          "lemma": "長期間",
+          "pos": "Noun",
+          "surface": "長期間"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "休み",
+          "pos": "Noun",
+          "surface": "休み"
+        }
+      ],
+      "id": "choukikan_no_yasumi",
+      "input": "長期間の休み"
+    },
+    {
+      "description": "non-quantity suffix keeps the noun+suffix split",
+      "expected": [
+        {
+          "lemma": "終了",
+          "pos": "Noun",
+          "surface": "終了"
+        },
+        {
+          "lemma": "後",
+          "pos": "Suffix",
+          "surface": "後"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "予定",
+          "pos": "Noun",
+          "surface": "予定"
+        }
+      ],
+      "id": "shuuryougo_no_yotei",
+      "input": "終了後の予定"
+    },
+    {
+      "description": "productive between-X 間 keeps the suffix split",
+      "expected": [
+        {
+          "lemma": "部署",
+          "pos": "Noun",
+          "surface": "部署"
+        },
+        {
+          "lemma": "間",
+          "pos": "Suffix",
+          "surface": "間"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "連携",
+          "pos": "Noun",
+          "surface": "連携"
+        }
+      ],
+      "id": "busho_kan_no_renkei",
+      "input": "部署間の連携"
+    },
+    {
+      "description": "modifier + duration noun stays one token",
+      "expected": [
+        {
+          "lemma": "短時間",
+          "pos": "Noun",
+          "surface": "短時間"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "作業",
+          "pos": "Noun",
+          "surface": "作業"
+        }
+      ],
+      "id": "tanjikan_no_sagyou",
+      "input": "短時間の作業"
+    },
+    {
+      "description": "temporal reference-point formal noun after a temporal noun",
+      "expected": [
+        {
+          "lemma": "一昨日",
+          "pos": "Noun",
+          "surface": "一昨日"
+        },
+        {
+          "lemma": "以前",
+          "pos": "Noun",
+          "surface": "以前"
+        }
+      ],
+      "id": "ototoi_izen",
+      "input": "一昨日以前"
     }
   ],
   "description": "General nouns (part 4/4)",

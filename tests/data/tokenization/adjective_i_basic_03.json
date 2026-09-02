@@ -643,6 +643,38 @@
       ],
       "id": "prolonged_ureshii_triple",
       "input": "うれしーーー"
+    },
+    {
+      "description": "kana nominal before a case particle is not a volitional",
+      "expected": [
+        {
+          "lemma": "青い",
+          "pos": "Adjective",
+          "surface": "青い"
+        },
+        {
+          "lemma": "扉",
+          "pos": "Noun",
+          "surface": "扉"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "むこう",
+          "pos": "Noun",
+          "surface": "むこう"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        }
+      ],
+      "id": "mukou_before_case_particle",
+      "input": "青い扉のむこうへ"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

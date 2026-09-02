@@ -2654,6 +2654,149 @@
       ],
       "id": "hatttoshita",
       "input": "はっとした"
+    },
+    {
+      "description": "two-kanji stem + quantity-phrase suffix stays one noun",
+      "expected": [
+        {
+          "lemma": "短期間",
+          "pos": "Noun",
+          "surface": "短期間"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "完成",
+          "pos": "Noun",
+          "surface": "完成"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "みせる",
+          "pos": "Auxiliary",
+          "surface": "みせ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tankikan_de_kansei",
+      "input": "短期間で完成させてみせた"
+    },
+    {
+      "description": "temporal reference-point formal noun before a kanji noun",
+      "expected": [
+        {
+          "lemma": "以前",
+          "pos": "Noun",
+          "surface": "以前"
+        },
+        {
+          "lemma": "成功",
+          "pos": "Noun",
+          "surface": "成功"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "izen_seikou_shita",
+      "input": "以前成功した"
+    },
+    {
+      "description": "particle + adjectival noun must not be read as the godan-sa verb",
+      "expected": [
+        {
+          "lemma": "ここ",
+          "pos": "Pronoun",
+          "surface": "ここ"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "かすか",
+          "pos": "Adjective",
+          "surface": "かすか"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "音",
+          "pos": "Noun",
+          "surface": "音"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "koko_de_kasuka_na_oto",
+      "input": "ここでかすかな音がした"
+    },
+    {
+      "description": "single-kanji suru verb terminal form",
+      "expected": [
+        {
+          "lemma": "熱",
+          "pos": "Noun",
+          "surface": "熱"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "発する",
+          "pos": "Verb",
+          "surface": "発する"
+        }
+      ],
+      "id": "netsu_wo_hassuru",
+      "input": "熱を発する"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割",

@@ -960,6 +960,33 @@
       ],
       "id": "kore",
       "input": "これ最高…😍"
+    },
+    {
+      "description": "classical possessive determiner variant",
+      "expected": [
+        {
+          "lemma": "吾が",
+          "pos": "Determiner",
+          "surface": "吾が"
+        },
+        {
+          "lemma": "国",
+          "pos": "Noun",
+          "surface": "国"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "未来",
+          "pos": "Noun",
+          "surface": "未来"
+        }
+      ],
+      "id": "waga_kuni_no_mirai_kyuji",
+      "input": "吾が国の未来"
     }
   ],
   "description": "Basic tokenization tests",
