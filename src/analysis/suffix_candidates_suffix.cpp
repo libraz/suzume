@@ -80,6 +80,26 @@ bool verbOnlyHostFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) 
   return (head == U'ら' && next == U'れ') || (head == U'な' && next == U'い');
 }
 
+// ～ばむ derives a Godan-ma verb of incipient appearance from a nominal base
+// (気色ばむ, 黄ばむ, 汗ばむ). Its 終止形 is spelled like the irrealis of a
+// ma-row verb plus the classical conjectural む, so the ordinary cells stay
+// behind a two-kanji base. The ん-onbin cell has no such reading: that form
+// exists only before the past だ / connective で, and requiring them lets a
+// single-kanji base through (黄ばんだ, not 黄ば + ん + だ).
+// The paradigm sits at file scope because the kanji verb generator has to know
+// which okurigana this homography covers; see spellsGodanMaSuffixVerbCell.
+constexpr std::array<SuffixVerbForm, 6> kGodanMaBamuForms = {{
+    {"ばむ", core::ExtendedPOS::VerbShuushikei},
+    {"ばま", core::ExtendedPOS::VerbMizenkei},
+    {"ばも", core::ExtendedPOS::VerbMizenkei},
+    {"ばみ", core::ExtendedPOS::VerbRenyokei},
+    {"ばん", core::ExtendedPOS::VerbOnbinkei},
+    {"ばめ", core::ExtendedPOS::VerbKateikei},
+}};
+constexpr ProductiveSuffixVerb kBamu = {
+    kGodanMaBamuForms.data(),       kGodanMaBamuForms.size(),          "ばむ", dictionary::ConjugationType::GodanMa,
+    "nominal_godan_ma_bamu_suffix", SuffixCellGate::OnbinNeedsPastHost};
+
 /**
  * @brief Emit the first cell of @p spec the surface at @p attach_pos spells
  *
@@ -143,6 +163,15 @@ bool appendProductiveSuffixVerbCells(const std::vector<char32_t>& codepoints, si
 }
 
 }  // namespace
+
+bool spellsGodanMaSuffixVerbCell(std::string_view okurigana) {
+  for (size_t index = 0; index < kBamu.form_count; ++index) {
+    if (okurigana == kBamu.forms[index].inflection) {
+      return true;
+    }
+  }
+  return false;
+}
 
 // =============================================================================
 // Suffix Candidate Factory Helpers
@@ -423,23 +452,6 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
     }
   }
 
-  // ～ばむ derives a Godan-ma verb of incipient appearance from a nominal base
-  // (気色ばむ, 黄ばむ, 汗ばむ). Its 終止形 is spelled like the irrealis of a
-  // ma-row verb plus the classical conjectural む, so the ordinary cells stay
-  // behind a two-kanji base. The ん-onbin cell has no such reading: that form
-  // exists only before the past だ / connective で, and requiring them lets a
-  // single-kanji base through (黄ばんだ, not 黄ば + ん + だ).
-  static constexpr std::array<SuffixVerbForm, 6> kGodanMaBamuForms = {{
-      {"ばむ", core::ExtendedPOS::VerbShuushikei},
-      {"ばま", core::ExtendedPOS::VerbMizenkei},
-      {"ばも", core::ExtendedPOS::VerbMizenkei},
-      {"ばみ", core::ExtendedPOS::VerbRenyokei},
-      {"ばん", core::ExtendedPOS::VerbOnbinkei},
-      {"ばめ", core::ExtendedPOS::VerbKateikei},
-  }};
-  static constexpr ProductiveSuffixVerb kBamu = {
-      kGodanMaBamuForms.data(),       kGodanMaBamuForms.size(),          "ばむ", dictionary::ConjugationType::GodanMa,
-      "nominal_godan_ma_bamu_suffix", SuffixCellGate::OnbinNeedsPastHost};
   if (appendProductiveSuffixVerbCells(codepoints, start_pos, base_end, kBamu, candidates)) {
     return;
   }

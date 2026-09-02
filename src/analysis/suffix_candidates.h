@@ -246,6 +246,17 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
                                             std::vector<UnknownCandidate>& candidates);
 
 /**
+ * @brief True when @p okurigana spells a cell of the Godan-ma suffix verb ばむ.
+ *
+ * That paradigm is the one productive verbalizing suffix whose cells collide
+ * with a ma-row irrealis plus a classical auxiliary (黄ばむ against 呼ばむ), so
+ * a kanji verb generator has to recognize the homography before it proposes an
+ * irrealis boundary. Answering from the paradigm's own table keeps the two
+ * sites from drifting apart.
+ */
+bool spellsGodanMaSuffixVerbCell(std::string_view okurigana);
+
+/**
  * @brief Generate counter candidates for numeral + つ patterns
  *
  * Detects closed-class counter patterns:

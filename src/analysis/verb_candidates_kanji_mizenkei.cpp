@@ -443,21 +443,25 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
         // can only be the literary one — the dictionary category decides,
         // not the spelling. Without the boundary the run reads as one
         // fabricated Godan-ma verb whose lemma is its own surface (成らむ).
-        // Restricted to a stem whose whole kanji run is one character, for the
-        // same reason GodanSa is above: a longer run is the nominal host that
-        // the complete auxiliaries らむ / けむ take (確認+らむ), and there the
-        // a-row mora is their onset rather than okurigana. Requiring the run to
-        // be complete — not merely one character measured from an interior
-        // position — is what separates 成+らむ from 確認+らむ, whose second
-        // kanji looks identical on its own.
+        // A complete auxiliary can also start at the a-row mora itself
+        // (確認+らむ), and there the mora is that auxiliary's onset rather than
+        // the verb's okurigana. Only in that position does the kanji run's
+        // length carry information, because the same two morae equally spell an
+        // irrealis plus the conjectural behind a one-kanji stem (成+ら+む); the
+        // run has to be complete, not merely one character measured from an
+        // interior position, or 確認's second kanji passes for 成. Where no
+        // auxiliary starts at the mora the reading is unambiguous, so a stem
+        // that begins inside a kanji run is admissible (心|迷わ+む).
         const bool stem_is_lone_kanji =
             kanji_end - start_pos == 1 && (start_pos == 0 || !normalize::isKanjiCodepoint(codepoints[start_pos - 1]));
+        const auto is_volitional = [](const dictionary::DictionaryEntry& entry) {
+          return entry.extended_pos == core::ExtendedPOS::AuxVolitional;
+        };
+        const bool okurigana_opens_auxiliary =
+            vh::auxiliaryFollowsAt(dict_manager, codepoints, kanji_end, is_volitional);
         const bool is_classical_conjecture_pattern =
-            stem_is_lone_kanji &&
-            vh::auxiliaryFollowsAt(dict_manager, codepoints, mizenkei_end,
-                                   [](const dictionary::DictionaryEntry& entry) {
-                                     return entry.extended_pos == core::ExtendedPOS::AuxVolitional;
-                                   });
+            (stem_is_lone_kanji || !okurigana_opens_auxiliary) && kanji_end - start_pos == 1 &&
+            vh::auxiliaryFollowsAt(dict_manager, codepoints, mizenkei_end, is_volitional);
         // Check for colloquial contracted negative ん pattern
         // E.g., 行かん → 行か (mizenkei) + ん (contracted negative AUX)
         //       言わん → 言わ (mizenkei) + ん
@@ -646,23 +650,19 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                 }
 
                 // The classical conjectural attaches to an irrealis, so the
-                // a-row mora in front of it has to belong to a verb of its own.
-                // A productive ma-row derived verb ends in exactly that shape
-                // (黄ばむ, 汗ばむ) while its apparent stem is not a verb, so an
-                // unattested base plus a complete terminal reading of the whole
-                // span is the derived verb and not an irrealis. An attested base
-                // keeps the classical reading (咲か+む).
+                // a-row mora in front of it belongs to a verb of its own —
+                // except where the okurigana spells a cell of the productive
+                // ma-row verbalizing suffix, which is the one derivation shaped
+                // like an irrealis plus this auxiliary (黄ばむ, 汗ばむ). There
+                // the split has to be decided lexically, and an attested base is
+                // the evidence that the reading is the irrealis after all
+                // (呼ば+む, 学ば+む). Every other okurigana carries no such
+                // homography, so the boundary follows from the auxiliary alone
+                // and needs no dictionary support (咲か+む, 迷わ+む, 去ら+む).
                 if (is_valid_verb && is_classical_conjecture_pattern && !is_base_dict_verb &&
-                    mizenkei_end < codepoints.size()) {
-                  const std::string whole = extractSubstring(codepoints, start_pos, mizenkei_end + 1);
-                  for (const auto& analysis : inflection.analyze(whole)) {
-                    if (grammar::isGodanVerbType(analysis.verb_type) && analysis.base_form == whole &&
-                        analysis.morphemes.empty() &&
-                        analysis.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
-                      is_valid_verb = false;
-                      break;
-                    }
-                  }
+                    mizenkei_end < codepoints.size() &&
+                    spellsGodanMaSuffixVerbCell(extractSubstring(codepoints, kanji_end, mizenkei_end + 1))) {
+                  is_valid_verb = false;
                 }
 
                 if (is_valid_verb) {
