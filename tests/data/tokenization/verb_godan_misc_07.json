@@ -2026,6 +2026,146 @@
       ],
       "id": "ga_moreba",
       "input": "雪が積もれば"
+    },
+    {
+      "description": "classical negative izenkei ne selects the godan irrealis",
+      "expected": [
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "吹く",
+          "pos": "Verb",
+          "surface": "吹か"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ね"
+        }
+      ],
+      "id": "koso_kane",
+      "input": "風こそ吹かね"
+    },
+    {
+      "description": "the same irrealis boundary in a modern conditional",
+      "expected": [
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "吹く",
+          "pos": "Verb",
+          "surface": "吹か"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ね"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "ga_kaneba",
+      "input": "風が吹かねば"
+    },
+    {
+      "description": "classical negative conjecture maji selects the godan irrealis",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "開く",
+          "pos": "Verb",
+          "surface": "開か"
+        },
+        {
+          "lemma": "まじ",
+          "pos": "Auxiliary",
+          "surface": "まじ"
+        }
+      ],
+      "id": "ga_kamaji",
+      "input": "道が開かまじ"
+    },
+    {
+      "description": "the same irrealis boundary under a focus particle",
+      "expected": [
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "吹く",
+          "pos": "Verb",
+          "surface": "吹か"
+        },
+        {
+          "lemma": "まじ",
+          "pos": "Auxiliary",
+          "surface": "まじ"
+        }
+      ],
+      "id": "koso_kamaji",
+      "input": "風こそ吹かまじ"
+    },
+    {
+      "description": "the same izenkei boundary on a dictionary verb",
+      "expected": [
+        {
+          "lemma": "雪",
+          "pos": "Noun",
+          "surface": "雪"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "降る",
+          "pos": "Verb",
+          "surface": "降ら"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ね"
+        }
+      ],
+      "id": "koso_rane",
+      "input": "雪こそ降らね"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",

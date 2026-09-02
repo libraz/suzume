@@ -751,6 +751,28 @@
       ],
       "id": "gattteiru",
       "input": "寒がっている。"
+    },
+    {
+      "description": "final particle ne after an interrogative is not an irrealis boundary",
+      "expected": [
+        {
+          "lemma": "元気",
+          "pos": "Adjective",
+          "surface": "元気"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "kane",
+      "input": "元気かね"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
