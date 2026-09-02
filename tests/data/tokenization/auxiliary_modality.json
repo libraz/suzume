@@ -2535,6 +2535,33 @@
       ],
       "id": "kokohairiguchida",
       "input": "ここはいりぐちだ"
+    },
+    {
+      "description": "係助詞は準体助詞を主要部に取れない（仮名連の閉じたクラス分断の抑止）",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "はんだ",
+          "pos": "Noun",
+          "surface": "はんだ"
+        },
+        {
+          "lemma": "付け",
+          "pos": "Noun",
+          "surface": "付け"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "korehanda_keda",
+      "input": "これはんだ付けだ"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい)",
