@@ -602,6 +602,47 @@
       ],
       "id": "mashikarazu",
       "input": "望ましからず"
+    },
+    {
+      "description": "An emoji after punctuation survives the symbol filter",
+      "expected": [
+        {
+          "lemma": "やばい",
+          "pos": "Adjective",
+          "surface": "やばい"
+        },
+        {
+          "lemma": "😱",
+          "pos": "Other",
+          "surface": "😱"
+        }
+      ],
+      "id": "yabai",
+      "input": "やばい…😱"
+    },
+    {
+      "description": "Emphatic lengthening inside a word does not open a boundary",
+      "expected": [
+        {
+          "lemma": "ひどい",
+          "pos": "Adjective",
+          "surface": "ひどーい"
+        }
+      ],
+      "id": "emphatic_lengthening_hidoi",
+      "input": "ひどーい"
+    },
+    {
+      "description": "Repeated prolonged sound marks are all preserved",
+      "expected": [
+        {
+          "lemma": "うれしい",
+          "pos": "Adjective",
+          "surface": "うれしーーー"
+        }
+      ],
+      "id": "prolonged_ureshii_triple",
+      "input": "うれしーーー"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

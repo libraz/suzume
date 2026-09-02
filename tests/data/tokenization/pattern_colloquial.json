@@ -104,7 +104,7 @@
       "description": "すごーーい (consecutive prolonged marks)",
       "expected": [
         {
-          "lemma": "すごーーい",
+          "lemma": "すごい",
           "pos": "Adjective",
           "surface": "すごーーい"
         }
@@ -123,7 +123,7 @@
       "description": "かわいーー (consecutive prolonged marks at end)",
       "expected": [
         {
-          "lemma": "かわいーー",
+          "lemma": "かわいい",
           "pos": "Adjective",
           "surface": "かわいーー"
         }

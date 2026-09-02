@@ -453,14 +453,11 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         // Set lemma to base form from inflection analysis
         // For prolonged sound mark patterns, normalize the base form
         // e.g., すごおい → すごい, やばあい → やばい
+        // normalizeBaseForm already collapses however many marks the emphasis used, so
+        // the count does not change the dictionary form: すごーい and すごーーい are both
+        // すごい. Falling back to the surface here left a non-word as the lemma.
         std::string lemma =
             has_prolonged ? normalizeBaseForm(cand.base_form, codepoints, start_pos, end_pos) : cand.base_form;
-        const size_t prolonged_count = static_cast<size_t>(
-            std::count_if(codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos),
-                          codepoints.begin() + static_cast<std::ptrdiff_t>(end_pos), normalize::isProlongedSoundMark));
-        if (prolonged_count >= 2) {
-          lemma = surface;
-        }
         const char* pattern = has_prolonged ? "i_adjective_hira_choon" : "i_adjective_hira";
         auto adjective = makeIAdjCandidate(surface, start_pos, end_pos, lemma, cost,
                                            CandidateOrigin::AdjectiveIHiragana, cand.confidence, pattern);

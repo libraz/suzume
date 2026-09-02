@@ -41,6 +41,20 @@ _GODAN_ERO_TO_BASE = {
 }
 
 
+def _is_emphatic_spelling(original: str, standard: str) -> bool:
+    """Whether `original` is `standard` written with emphatic lengthening or repetition.
+
+    Scoped to prolonged sound marks: removing them and collapsing runs of the same
+    character reduces かわいーー and すごーーい to their dictionary forms, while a genuine
+    lexical substitution (にゃー → ねえ) stays distinct. Vowel repetition without a mark
+    (すごいいいい) is left alone — the tokenizer does not yet reduce it either.
+    """
+    if original == standard or "ー" not in original:
+        return False
+    reduced = regex.sub(r"(.)\1+", r"\1", regex.sub(r"ー+", "", original))
+    return reduced == regex.sub(r"(.)\1+", r"\1", standard)
+
+
 def reports_mutation(processor: Callable[[list[dict]], object]) -> Callable[[list[dict]], bool]:
     """Adapt a mutating postprocessor to the shared changed/not-changed contract."""
 
@@ -247,6 +261,11 @@ def postprocess_mecab_tokens(
 
         lemma = token.get("lemma", "")
         for _, _, original, standard in patches:
+            # An emphatic spelling keeps the dictionary form as its lemma: かわいーー is
+            # still かわいい. Restoring the original there would make the lemma a non-word
+            # and contradict the lengthening rules, which already yield the plain form.
+            if _is_emphatic_spelling(original, standard):
+                continue
             if lemma and standard in lemma:
                 lemma = lemma.replace(standard, original, 1)
         if lemma:
