@@ -2584,6 +2584,33 @@
       ],
       "id": "da_shikashi",
       "input": "雨だ。しかし"
+    },
+    {
+      "description": "The classical negative izenkei cannot close a sentence",
+      "expected": [
+        {
+          "lemma": "本当",
+          "pos": "Noun",
+          "surface": "本当"
+        },
+        {
+          "lemma": "らしい",
+          "pos": "Auxiliary",
+          "surface": "らしい"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "rashiiyone",
+      "input": "本当らしいよね。"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい)",

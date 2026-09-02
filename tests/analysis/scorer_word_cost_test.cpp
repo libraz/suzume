@@ -71,9 +71,10 @@ TEST(ScorerBoundaryCostTest, FixedBosAndEosAdjustmentsComeFromOneExtendedPosTabl
     float expected_bos;
     float expected_eos;
   };
-  constexpr std::array<BoundaryCostCase, 17> kCases = {{
+  constexpr std::array<BoundaryCostCase, 18> kCases = {{
       {core::ExtendedPOS::Conjunction, scorer::kBosConjunctionBonus, scorer::kEosConjunctionPenalty},
       {core::ExtendedPOS::VerbMizenkei, 0.0F, scorer::kEosMizenkeiPenalty},
+      {core::ExtendedPOS::AuxNegativeNu, scorer::kBosClassicalNegativePenalty, scorer::kEosIzenkeiNegativePenalty},
       {core::ExtendedPOS::Suffix, scorer::kBosSuffixPenalty, 0.0F},
       {core::ExtendedPOS::AuxAppearanceSou, scorer::kBosAppearanceSouPenalty, 0.0F},
       {core::ExtendedPOS::AuxAspectIru, scorer::kBosAspectIruPenalty, 0.0F},
@@ -138,6 +139,13 @@ TEST(ScorerBoundaryCostTest, AppliesSurfaceGatesAfterExtendedPosLookup) {
                   scorer::kEosMizenkeiPenalty);
   EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::VerbMizenkei, "ならば")),
                   scorer::kEosMizenkeiPenalty);
+
+  // Only the 已然形 ね of the classical negative is barred at the end of a
+  // sentence; its sibling cells close a clause on their own.
+  EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::AuxNegativeNu, "ね")),
+                  scorer::kEosIzenkeiNegativePenalty);
+  EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::AuxNegativeNu, "ず")), bigram_cost::kNeutral);
+  EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::AuxNegativeNu, "ぬ")), bigram_cost::kNeutral);
 
   core::LatticeEdge registered_determiner = makeBoundaryEdge(core::ExtendedPOS::Determiner, "こういう");
   registered_determiner.flags = core::EdgeFlags::FromDictionary;
