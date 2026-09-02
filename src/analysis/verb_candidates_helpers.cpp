@@ -228,9 +228,25 @@ bool clauseEndsAt(const std::vector<char32_t>& codepoints, size_t pos) {
          following == U'）';
 }
 
+// The function words that follow a classical cell are at most three kana long
+// (ども, ばや), so a probe of that width reaches every one of them.
+constexpr size_t kFollowerProbeChars = 3;
+
+bool caseParticleFollowsAt(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
+                           size_t pos) {
+  const size_t probe_end = std::min(codepoints.size(), pos + kFollowerProbeChars);
+  for (size_t stop = pos + 1; stop <= probe_end; ++stop) {
+    const auto* particle =
+        dict_manager.lookupExact(extractSubstring(codepoints, pos, stop), core::PartOfSpeech::Particle);
+    if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_manager,
                                      const std::vector<char32_t>& codepoints, size_t end_pos, bool is_izenkei) {
-  constexpr size_t kFollowerProbeChars = 3;
   const size_t probe_end = std::min(codepoints.size(), end_pos + kFollowerProbeChars);
   if (is_izenkei) {
     for (size_t stop = end_pos + 1; stop <= probe_end; ++stop) {

@@ -1779,12 +1779,20 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // which is the reading the oracle takes (彼が知り+たれ). The continuative may
     // belong to an auxiliary rather than the verb, because a voice auxiliary
     // hosts the perfect from the same cell (開か+れ+たれ).
+    const bool follows_continuative =
+        hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) ||
+        hasPrecedingPartOfSpeech(lattice, start_pos, partOfSpeechMask(core::PartOfSpeech::Auxiliary));
     const bool izenkei_closes_clause =
-        is_classical_izenkei && verb_helpers::clauseEndsAt(codepoints, end_pos) &&
-        (hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) ||
-         hasPrecedingPartOfSpeech(lattice, start_pos, partOfSpeechMask(core::PartOfSpeech::Auxiliary)));
+        is_classical_izenkei && verb_helpers::clauseEndsAt(codepoints, end_pos) && follows_continuative;
+    // The 連体形 also nominalizes, and the nominal it forms takes a particle of
+    // its own (告げぬべかりし+に, 読みし+を). The host separates that from the サ変
+    // continuative the same kana spells: the classical past attaches to a
+    // continuative, while the サ変 verb takes the nominal it turns into a
+    // predicate, or the particle that introduces one (話を+し+に行く).
+    const bool rentaikei_nominalizes = !is_classical_izenkei && follows_continuative &&
+                                       verb_helpers::caseParticleFollowsAt(dict_manager_, codepoints, end_pos);
     if ((result.entry->extended_pos == core::ExtendedPOS::AuxClassicalKi || classical_perfect_izenkei) &&
-        !izenkei_closes_clause &&
+        !izenkei_closes_clause && !rentaikei_nominalizes &&
         !verb_helpers::classicalPastEnvironmentFollows(dict_manager_, codepoints, end_pos, is_classical_izenkei)) {
       continue;
     }

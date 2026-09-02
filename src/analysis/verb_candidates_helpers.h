@@ -956,6 +956,24 @@ bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_m
 bool clauseEndsAt(const std::vector<char32_t>& codepoints, size_t pos);
 
 /**
+ * @brief Whether a case particle begins at @p pos.
+ *
+ * A 連体形 nominalizes as well as modifies, and the nominal it forms fills an
+ * argument slot, so a case particle marks it (告げぬべかりし+に, 読みし+を). The
+ * case particle is what separates that reading from the neighbours the same
+ * kana spells: a conjunctive particle takes an inflected form instead
+ * (注意すべく+し+て), and a final particle closes the clause behind the finite
+ * cell the paradigm already covers (できな+さ+そう+だ). The probe stays within the
+ * width of the longest function word so it cannot reach into the next clause.
+ *
+ * @param dict_manager Dictionary used to probe the follower
+ * @param codepoints Full input codepoints
+ * @param pos Index just past the form being judged
+ */
+bool caseParticleFollowsAt(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
+                           size_t pos);
+
+/**
  * @brief Check whether the いただく paradigm begins at @p pos.
  *
  * The receptive humble auxiliary いただく conjugates as いただ + ka-row kana
