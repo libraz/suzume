@@ -1282,13 +1282,19 @@ def postprocess_subsidiary_yuku(tokens: list[dict]) -> bool:
 
 
 def postprocess_hiragana_purpose_noun(tokens: list[dict]) -> bool:
-    """Use a nominal search unit for hiragana activity + に + motion verb."""
+    """Use a nominal search unit for hiragana activity + に + motion verb.
+
+    する is excluded because it names no activity of its own: it only verbalizes
+    the nominal in front of it, which is already the search unit (買い物+し+に行く),
+    and the bare mora it leaves behind is not a word.
+    """
     changed = False
     motion_lemmas = {"行く", "来る", "帰る"}
     for idx in range(len(tokens) - 2):
         token = tokens[idx]
         if (
             token.get("pos") == "Verb"
+            and token.get("lemma") != "する"
             and regex.fullmatch(r"\p{Hiragana}+", token.get("surface", ""))
             and tokens[idx + 1].get("surface") == "に"
             and tokens[idx + 2].get("lemma") in motion_lemmas
@@ -1691,6 +1697,11 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
         surface = token.get("surface", "")
         lemma = token.get("lemma", surface)
         if not surface or not lemma or surface == lemma:
+            continue
+        # する derives no noun of its own: it verbalizes the nominal in front of
+        # it, which already heads the phrase, so the mora it leaves behind is not
+        # a word (勉強+し+に, 読みし+を, where the し is the classical past).
+        if lemma == "する":
             continue
         # A classical 二段 連体形 (消ゆる|を) is a finite verb heading its own
         # clause, not the productive deverbal noun a 連用形 spells.
@@ -2198,6 +2209,11 @@ def postprocess_classical_past_shi(tokens: list[dict]) -> bool:
     The modified nominal is promoted out of the suffix class for the same reason:
     an adnominal takes a head noun, so 人 there is the head rather than the bound
     counter it is elsewhere (三人).
+
+    The 連体形 also nominalizes instead of modifying, and the nominal it forms
+    fills an argument slot, so a case particle marks it (読みしに, 摘みしを). The
+    reference analyzer reads that position as the する continuative too, which
+    the same argument rules out.
     """
     for idx, token in enumerate(tokens):
         if idx == 0 or idx + 1 >= len(tokens):
@@ -2205,11 +2221,15 @@ def postprocess_classical_past_shi(tokens: list[dict]) -> bool:
         if token.get("surface") != "し" or token.get("pos") != "Verb":
             continue
         following = tokens[idx + 1]
-        if tokens[idx - 1].get("pos") != "Verb" or following.get("pos") not in ("Noun", "Suffix"):
+        if tokens[idx - 1].get("pos") != "Verb":
+            continue
+        modifies_nominal = following.get("pos") in ("Noun", "Suffix")
+        if not modifies_nominal and following.get("pos_sub1") != "格助詞":
             continue
         token["pos"] = "Auxiliary"
         token["lemma"] = "き"
-        following["pos"] = "Noun"
+        if modifies_nominal:
+            following["pos"] = "Noun"
 
 
 @reports_mutation
