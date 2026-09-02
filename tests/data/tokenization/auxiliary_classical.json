@@ -1597,6 +1597,92 @@
       ],
       "id": "ga_kanu",
       "input": "道が開かぬ"
+    },
+    {
+      "description": "The literary passive adnominal after a compound verb irrealis",
+      "expected": [
+        {
+          "lemma": "幾度",
+          "pos": "Noun",
+          "surface": "幾度"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "繰り返す",
+          "pos": "Verb",
+          "surface": "繰り返さ"
+        },
+        {
+          "lemma": "る",
+          "pos": "Auxiliary",
+          "surface": "るる"
+        },
+        {
+          "lemma": "試練",
+          "pos": "Noun",
+          "surface": "試練"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "tonaku_ri_saruru_yo",
+      "input": "幾度となく繰り返さるる試練よ。"
+    },
+    {
+      "description": "The literary passive realis before the conditional particle",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "る",
+          "pos": "Auxiliary",
+          "surface": "るれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "rarureba",
+      "input": "知らるれば"
+    },
+    {
+      "description": "The literary passive adnominal modifying a nominal",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "る",
+          "pos": "Auxiliary",
+          "surface": "るる"
+        },
+        {
+          "lemma": "文",
+          "pos": "Noun",
+          "surface": "文"
+        }
+      ],
+      "id": "karuru",
+      "input": "書かるる文"
     }
   ],
   "description": "auxiliary_classical tests",

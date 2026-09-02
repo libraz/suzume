@@ -1006,6 +1006,18 @@
       ],
       "id": "reru_2",
       "input": "生涯忘れる"
+    },
+    {
+      "description": "Negative control: a compound whose second verb ends in the same mora keeps its own paradigm",
+      "expected": [
+        {
+          "lemma": "振り返る",
+          "pos": "Verb",
+          "surface": "振り返る"
+        }
+      ],
+      "id": "ri_ru_2",
+      "input": "振り返る"
     }
   ],
   "description": "Compound verbs (part 5/5)",
