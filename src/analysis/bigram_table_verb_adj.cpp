@@ -109,6 +109,11 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // polite auxiliary (読+ませ).
       {EPOS::VerbMizenkei, EPOS::AuxCausative, cost::kStrongBonus},
 
+      // The causative has exactly one host, the irrealis above. A terminal form
+      // before it means the stem was invented to fit the auxiliary (かぶ+せる
+      // for かぶせる), so the pair is barred rather than merely unrewarded.
+      {EPOS::VerbShuushikei, EPOS::AuxCausative, cost::kAlmostNever},
+
       // VerbMizenkei → VerbMizenkei (読ま+さ, やら+さ causative pattern)
       // Godan mizenkei + causative さ (する mizenkei) - moderate bonus
       {EPOS::VerbMizenkei, EPOS::VerbMizenkei, cost::kModerateBonus},
