@@ -836,6 +836,11 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("どけ", "どく", EPOS::AuxAspectOku),
       aux("ときゃ", "とく", EPOS::AuxAspectOku),
       aux("どきゃ", "どく", EPOS::AuxAspectOku),
+      // Plain godan-ka renyokei, which the polite auxiliary selects
+      // (終わらせ+とき+ました). Its onbin sibling とい covers the te-form and the
+      // past; without this cell the same paradigm breaks apart in front of ます.
+      aux("とき", "とく", EPOS::AuxAspectOku),
+      aux("どき", "どく", EPOS::AuxAspectOku),
 
       // Directional auxiliaries - いく/くる (方向補助動詞)
       // MeCab tags as 動詞 (Verb), not 助動詞, even in subsidiary use

@@ -641,6 +641,14 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // (そんな大きな → そん(NOUN)+な(AUX_断定)+大きな).
       {EPOS::Determiner, EPOS::Determiner, cost::kStrongBonus},
 
+      // A determiner introduces the nominal it modifies, so a subsidiary verb
+      // cannot stand behind one. その+とき is the formal noun 時, and its
+      // spelling is a cell of the contracted ておく paradigm. The demonstratives
+      // that head this construction also spell a hesitation interjection, which
+      // hosts nothing at all, so the same bar applies there.
+      {EPOS::Determiner, EPOS::AuxAspectOku, cost::kProhibitive},
+      {EPOS::Interjection, EPOS::AuxAspectOku, cost::kProhibitive},
+
       // ParticleCase → Determiner (rare; 連体詞 rarely follows case particles)
       // Determiners introduce a new modifier clause and don't follow が/を/に/と/から/etc.
       // Counteracts overly strong DET→NOUN bonus for verb-ambiguous hiragana DET like かかる

@@ -216,6 +216,13 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // This handles contracted forms where ておく → とく
       {EPOS::VerbRenyokei, EPOS::AuxAspectOku, cost::kStrongBonus},
 
+      // A subsidiary verb attaches to the continuative or the onbin of the verb
+      // it supports, so the terminal is not one of its hosts. The cells of this
+      // paradigm double as the formal noun 時 (帰る+とき, 遊ん+どき), and the
+      // terminal and the adnominal share a spelling, so without this the
+      // subsidiary reading takes every relative clause that ends in one.
+      {EPOS::VerbShuushikei, EPOS::AuxAspectOku, cost::kProhibitive},
+
       // VerbRenyokei → AuxAspectShimau (食べ+ちゃっ contraction of 食べてしまう) - very strong bonus
       // This handles contracted forms where てしまう → ちゃう. Dict ちゃっ is base POS
       // Verb, so the base VERB→VERB bigram (+0.8) would cancel out a mere strong
