@@ -146,8 +146,8 @@ void appendSaRowContractedMizenkeiCandidates(const std::vector<char32_t>& codepo
   }
 }
 
-// Godan mizenkei pattern: kanji + mizenkei ending + ず/ざる/ざれ
-// (classical negative)
+// Godan mizenkei pattern: kanji + mizenkei ending + a classical negative
+// auxiliary (ず/ざる/ざれ/ね/まじ)
 // E.g., 抜かずに → 抜か (mizenkei of 抜く) + ず + に
 //       行かずに → 行か (mizenkei of 行く) + ず + に
 //       書かずに → 書か (mizenkei of 書く) + ず + に
@@ -159,12 +159,21 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
                                      size_t hiragana_end, const grammar::Inflection& inflection,
                                      const dictionary::DictionaryManager* dict_manager,
                                      std::vector<UnknownCandidate>& candidates) {
+  // Every cell of the ぬ paradigm selects the irrealis, and so does the
+  // classical negative conjecture (開か+ず, 開か+ざれ, 開か+ね, 吹か+まじ), so
+  // the trigger is the auxiliary's class rather than any one spelling of it.
+  // Naming individual cells leaves their siblings to be rebuilt as one
+  // fabricated verb (開かねる) or as a bare kanji plus two particles.
+  // The contracted ん belongs to the same class but also spells the honorific
+  // さん and the ma/ba/na-row 音便, so it is left to the guarded branch in
+  // appendGodanMizenkeiCandidates.
   size_t negative_pos = kanji_end;
   while (negative_pos < hiragana_end) {
-    const bool is_zu = codepoints[negative_pos] == U'ず';
-    const bool is_zaru_or_zare = codepoints[negative_pos] == U'ざ' && negative_pos + 1 < hiragana_end &&
-                                 (codepoints[negative_pos + 1] == U'る' || codepoints[negative_pos + 1] == U'れ');
-    if (is_zu || is_zaru_or_zare) {
+    if (codepoints[negative_pos] != U'ん' &&
+        vh::auxiliaryFollowsAt(dict_manager, codepoints, negative_pos, [](const dictionary::DictionaryEntry& entry) {
+          return entry.extended_pos == core::ExtendedPOS::AuxNegativeNu ||
+                 entry.extended_pos == core::ExtendedPOS::AuxNegativeMai;
+        })) {
       break;
     }
     ++negative_pos;
