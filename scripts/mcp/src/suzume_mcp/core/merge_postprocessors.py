@@ -583,7 +583,9 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
         # (見え, 流れ).  The dictionary holds no irrealis for the vowel-stem
         # class and reads that stem as a deverbal noun, so the POS cannot carry
         # the test — a content word ending in hiragana is the whole condition,
-        # and the conjugation class drops out of it.
+        # and the conjugation class drops out of it.  A kanji-final host is left
+        # out on purpose: there the volitional split rule reads the tail in
+        # context and keeps the case particle that re-analysis would lose.
         if (
             previous is not None
             and previous.get("pos") in ("動詞", "名詞")
