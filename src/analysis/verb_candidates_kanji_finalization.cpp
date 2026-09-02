@@ -356,6 +356,18 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
       SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated verb absorbing auxiliary negative\n");
       return;
     }
+    // A monograde or カ変 candidate whose ending is a classical auxiliary has
+    // absorbed that auxiliary: both paradigms inflect on a bare stem, so the
+    // kana past it must be a conjugation ending, and no cell of either is
+    // spelled like one of the closed class (来ぬ is 来 + ぬ, never a form of
+    // 来る). The dictionary base form is no defence here — 来る is registered
+    // and still cannot spell that cell — so this runs before the in_dict gate.
+    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    if ((best.verb_type == grammar::VerbType::Ichidan || best.verb_type == grammar::VerbType::Kuru) &&
+        vh::spellsClassicalAuxiliaryEnding(dict_manager, surface, best.stem)) {
+      SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated cell spelling a classical auxiliary\n");
+      return;
+    }
     // An inflected past predicate stays decomposed before a formal noun.
     // The lexical stem and the past auxiliary are independently available
     // (読ん+だ+ついで, 悟っ+た+時); retain that grammatical boundary unless
