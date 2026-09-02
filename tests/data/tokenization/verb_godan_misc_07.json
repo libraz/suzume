@@ -1219,6 +1219,55 @@
       ],
       "id": "ranuhodo_kada",
       "input": "知らぬほど静かだ。"
+    },
+    {
+      "description": "The causative auxiliary cannot follow a terminal form",
+      "expected": [
+        {
+          "lemma": "布",
+          "pos": "Noun",
+          "surface": "布"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "かぶせる",
+          "pos": "Verb",
+          "surface": "かぶせる"
+        }
+      ],
+      "id": "wokabuseru",
+      "input": "布をかぶせる。"
+    },
+    {
+      "description": "The causative keeps its irrealis host",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せる"
+        }
+      ],
+      "id": "wo_maseru",
+      "input": "本を読ませる。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
