@@ -218,8 +218,10 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // とも has exactly two hosts: a counted quantity, where it is the universal
   // quantifier (二人とも), and a negative/volitional auxiliary or an adjective
   // adverbial form, where it is the concessive conjunctive particle (読まずとも,
-  // 届こうとも, 少なくとも). Anywhere else the surface is the case particle と plus
-  // も, or the opening of a longer lexical word (ともだち, もっとも, 何とも).
+  // 届こうとも, 少なくとも, 答えなくとも). Both negative auxiliaries fill that
+  // slot: the classical ぬ through its 連用形 ず, the modern ない through なく.
+  // Anywhere else the surface is the case particle と plus も, or the opening of
+  // a longer lexical word (ともだち, もっとも, 何とも).
   //
   // ば/ど/ども are the same kind of rule one particle over: they complete the
   // hypothetical slot of a predicate and have no other host, so a focus particle
@@ -230,6 +232,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   const bool tomo_particle = next.pos == core::PartOfSpeech::Particle && utf8::equalsAny(next.surface, {"とも"});
   const bool quantifier_host = tomo_particle && prev.origin == core::CandidateOrigin::Counter;
   const bool unlicensed_tomo = tomo_particle && prev.extended_pos != core::ExtendedPOS::AuxNegativeNu &&
+                               prev.extended_pos != core::ExtendedPOS::AuxNegativeNai &&
                                prev.extended_pos != core::ExtendedPOS::AuxVolitional &&
                                prev.extended_pos != core::ExtendedPOS::AdjRenyokei;
   // A particle offers no inflected stem, and the passive fills the conditional

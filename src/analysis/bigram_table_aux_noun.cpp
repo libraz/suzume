@@ -235,6 +235,12 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // Classical negative → concessive particle (読ま+ず+とも).
       {EPOS::AuxNegativeNu, EPOS::ParticleConj, cost::kStrongBonus},
 
+      // The classical negative attributive scopes an adverbial particle just as
+      // it does the topic and case particles above (息絶え+ぬ+ばかり,
+      // 知ら+ぬ+ほど). Without the row a fabricated one-token verb covers the
+      // whole span instead.
+      {EPOS::AuxNegativeNu, EPOS::ParticleAdverbial, cost::kStrongBonus},
+
       // The 已然形 of the classical copula takes the conditional/conjunctive
       // particle (重要+なれ+ば). Its passive homograph is not licensed after
       // a copula, so retain the registered copular paradigm as one edge.
