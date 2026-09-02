@@ -930,6 +930,11 @@ bool naiConditionalFollowsAt(const std::vector<char32_t>& codepoints, size_t pos
  * for し, and the ordinary stem-internal kana for the one-mora perfect (見つける
  * is not 見 + つ).
  *
+ * The 已然形 has one further position, the clause-final predicate slot, which
+ * this function cannot judge because the evidence for it is the continuative in
+ * front rather than anything that follows; see @ref clauseEndsAt for the caller
+ * that pairs the two.
+ *
  * @param dict_manager Dictionary used to probe the follower
  * @param codepoints Full input codepoints
  * @param end_pos Index just past the classical form
@@ -937,6 +942,18 @@ bool naiConditionalFollowsAt(const std::vector<char32_t>& codepoints, size_t pos
  */
 bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_manager,
                                      const std::vector<char32_t>& codepoints, size_t end_pos, bool is_izenkei);
+
+/**
+ * @brief Whether a clause ends at @p pos.
+ *
+ * True at the end of the input and in front of the punctuation that closes a
+ * clause. Forms whose paradigm cell is finite need this on their right-hand
+ * side, so it is shared rather than restated per generator.
+ *
+ * @param codepoints Full input codepoints
+ * @param pos Index just past the form being judged
+ */
+bool clauseEndsAt(const std::vector<char32_t>& codepoints, size_t pos);
 
 /**
  * @brief Check whether the いただく paradigm begins at @p pos.

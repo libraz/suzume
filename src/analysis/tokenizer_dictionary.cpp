@@ -1769,9 +1769,23 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // same conjunctive particle (記録したれ+ども).
     const bool classical_perfect_izenkei = result.entry->extended_pos == core::ExtendedPOS::AuxClassicalPerfect &&
                                            grammar::spellsHypotheticalAuxiliaryCell(result.entry->surface);
+    const bool is_classical_izenkei = classical_perfect_izenkei || end_pos - start_pos > 1;
+    // 係り結び leaves the 已然形 as the clause's own predicate, so the cell also
+    // stands with no particle after it at all (雨こそ降りたれ, 月を見しか). What
+    // marks it there is the continuative it attaches to, not the follower: a
+    // case particle in that slot leaves the same kana as the ordinary noun it
+    // introduces (料理に+たれ, 背も+たれ), and requiring the binding particle
+    // itself would reject the same cell wherever the clause carries no 係助詞,
+    // which is the reading the oracle takes (彼が知り+たれ). The continuative may
+    // belong to an auxiliary rather than the verb, because a voice auxiliary
+    // hosts the perfect from the same cell (開か+れ+たれ).
+    const bool izenkei_closes_clause =
+        is_classical_izenkei && verb_helpers::clauseEndsAt(codepoints, end_pos) &&
+        (hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) ||
+         hasPrecedingPartOfSpeech(lattice, start_pos, partOfSpeechMask(core::PartOfSpeech::Auxiliary)));
     if ((result.entry->extended_pos == core::ExtendedPOS::AuxClassicalKi || classical_perfect_izenkei) &&
-        !verb_helpers::classicalPastEnvironmentFollows(dict_manager_, codepoints, end_pos,
-                                                       classical_perfect_izenkei || end_pos - start_pos > 1)) {
+        !izenkei_closes_clause &&
+        !verb_helpers::classicalPastEnvironmentFollows(dict_manager_, codepoints, end_pos, is_classical_izenkei)) {
       continue;
     }
 

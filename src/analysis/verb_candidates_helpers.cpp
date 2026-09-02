@@ -219,6 +219,15 @@ bool startsInsideGaMashiiSuffix(const std::vector<char32_t>& codepoints, size_t 
   return false;
 }
 
+bool clauseEndsAt(const std::vector<char32_t>& codepoints, size_t pos) {
+  if (pos >= codepoints.size()) {
+    return true;
+  }
+  const char32_t following = codepoints[pos];
+  return following == U'。' || following == U'、' || following == U'！' || following == U'？' || following == U'」' ||
+         following == U'）';
+}
+
 bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_manager,
                                      const std::vector<char32_t>& codepoints, size_t end_pos, bool is_izenkei) {
   constexpr size_t kFollowerProbeChars = 3;
@@ -233,14 +242,10 @@ bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_m
     }
     return false;
   }
-  if (end_pos >= codepoints.size()) {
+  if (clauseEndsAt(codepoints, end_pos)) {
     return true;
   }
   const char32_t following = codepoints[end_pos];
-  if (following == U'。' || following == U'、' || following == U'！' || following == U'？' || following == U'」' ||
-      following == U'）') {
-    return true;
-  }
   if (normalize::isKanjiCodepoint(following) || normalize::classifyChar(following) == normalize::CharType::Katakana) {
     return true;
   }
