@@ -724,6 +724,33 @@
       ],
       "id": "shiki_ni_tsu",
       "input": "美しき所に立つ。"
+    },
+    {
+      "description": "形容詞語幹＋ガル: 逆接の が が語幹の後に立たない",
+      "expected": [
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒"
+        },
+        {
+          "lemma": "がる",
+          "pos": "Verb",
+          "surface": "がっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "gattteiru",
+      "input": "寒がっている。"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

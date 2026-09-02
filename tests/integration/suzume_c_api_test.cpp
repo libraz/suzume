@@ -295,7 +295,8 @@ TEST(SuzumeCApiTest, CanonicalLabelFunctionsCoverSerializedBoundaries) {
 
   EXPECT_STREQ(suzume_extended_pos_label(0), "UNKNOWN");
   EXPECT_STREQ(suzume_extended_pos_label(83), "VERB_仮定縮約");
-  EXPECT_EQ(suzume_extended_pos_label(84), nullptr);
+  EXPECT_STREQ(suzume_extended_pos_label(84), "PART_接続終止");
+  EXPECT_EQ(suzume_extended_pos_label(85), nullptr);
 
   EXPECT_STREQ(suzume_conjugation_form_label(6), "意志形");
   EXPECT_EQ(suzume_conjugation_form_label(7), nullptr);

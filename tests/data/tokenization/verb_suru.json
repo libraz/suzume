@@ -2839,6 +2839,43 @@
       ],
       "id": "wo_shitaji_nka",
       "input": "書類を提出したじゃんか"
+    },
+    {
+      "description": "過去助動詞＋逆接の が",
+      "expected": [
+        {
+          "lemma": "説明",
+          "pos": "Noun",
+          "surface": "説明"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わから"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "shitagawakaranai",
+      "input": "説明したがわからない。"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割",

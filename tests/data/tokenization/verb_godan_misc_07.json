@@ -1342,6 +1342,85 @@
       ],
       "id": "wo_maneba",
       "input": "水を飲まねば。"
+    },
+    {
+      "description": "逆接の接続助詞 が が終止形の後で述語を割らない",
+      "expected": [
+        {
+          "lemma": "理解",
+          "pos": "Noun",
+          "surface": "理解"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "できる"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "だいぶ",
+          "pos": "Adverb",
+          "surface": "だいぶ"
+        },
+        {
+          "lemma": "進展",
+          "pos": "Noun",
+          "surface": "進展"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "dekirugadaibu_shita",
+      "input": "理解できるがだいぶ進展した。"
+    },
+    {
+      "description": "終止形＋逆接の が（辞書動詞）",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読む"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "疲れる",
+          "pos": "Verb",
+          "surface": "疲れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_muga_reta",
+      "input": "本を読むが疲れた。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",

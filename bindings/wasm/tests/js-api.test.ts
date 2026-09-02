@@ -52,7 +52,8 @@ describe('JS API: struct layout compatibility', () => {
     expect(text(32)).toBe('AUX_開始');
     expect(text(82)).toBe('AUX_文語過去キ');
     expect(text(83)).toBe('VERB_仮定縮約');
-    expect(text(84)).toBeNull();
+    expect(text(84)).toBe('PART_接続終止');
+    expect(text(85)).toBeNull();
   });
 
   it('labels every serialized conjugation code and rejects the next value', () => {

@@ -17,7 +17,8 @@ def test_extended_pos_labels_match_the_serialized_range() -> None:
     assert lib.suzume_extended_pos_label(32).decode() == "AUX_開始"
     assert lib.suzume_extended_pos_label(82).decode() == "AUX_文語過去キ"
     assert lib.suzume_extended_pos_label(83).decode() == "VERB_仮定縮約"
-    assert lib.suzume_extended_pos_label(84) is None
+    assert lib.suzume_extended_pos_label(84).decode() == "PART_接続終止"
+    assert lib.suzume_extended_pos_label(85) is None
 
 
 def test_conjugation_labels_match_the_serialized_range() -> None:

@@ -209,6 +209,7 @@ TEST(TypesExtendedTest, ExtendedPosToStringParticles) {
   EXPECT_EQ(extendedPosToString(ExtendedPOS::ParticleTopic), "PART_係");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::ParticleFinal), "PART_終");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::ParticleConj), "PART_接続");
+  EXPECT_EQ(extendedPosToString(ExtendedPOS::ParticleConjFinite), "PART_接続終止");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::ParticleNo), "PART_準体");
 }
 
@@ -297,6 +298,7 @@ TEST(TypesExtendedTest, ExtendedPosToPosParticles) {
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleTopic), PartOfSpeech::Particle);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleFinal), PartOfSpeech::Particle);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleConj), PartOfSpeech::Particle);
+  EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleConjFinite), PartOfSpeech::Particle);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleQuote), PartOfSpeech::Particle);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleAdverbial), PartOfSpeech::Particle);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleNo), PartOfSpeech::Particle);
@@ -407,6 +409,8 @@ TEST(TypesExtendedTest, IsAuxiliaryType) {
 TEST(TypesExtendedTest, IsParticleType) {
   EXPECT_TRUE(isParticleType(ExtendedPOS::ParticleCase));
   EXPECT_TRUE(isParticleType(ExtendedPOS::ParticleBinding));
+  // Appended after the original contiguous block, so the range alone misses it.
+  EXPECT_TRUE(isParticleType(ExtendedPOS::ParticleConjFinite));
   EXPECT_FALSE(isParticleType(ExtendedPOS::Noun));
   EXPECT_FALSE(isParticleType(ExtendedPOS::AuxTenseTa));
 }
