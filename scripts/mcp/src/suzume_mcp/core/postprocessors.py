@@ -2851,6 +2851,35 @@ def postprocess_classical_nari_kateikei(tokens: list[dict]) -> bool:
         token["lemma"] = "なり"
 
 
+#: Classical auxiliaries whose 連体形 ends in る (たる, なる, る).  They close a
+#: predicate, so nothing can take them as an argument.
+_CLASSICAL_ATTRIBUTIVE_AUX_LEMMAS = frozenset({"たり", "なり", "り"})
+
+
+@reports_mutation
+def postprocess_classical_nari_after_attributive(tokens: list[dict]) -> bool:
+    """Keep なり the copula where it follows an attributive auxiliary.
+
+    なり spells both the classical copula and the 連用形 of the verb なる, and a
+    comma after it tips the reference dictionary to the verb (見つけたる|なり、).
+    The verb needs a に/と-marked complement or an adjective continuative, and an
+    attributive auxiliary can fill neither, so in that position the copula is the
+    only reading — with or without the comma (散りたるなり keeps it already).
+    """
+    for idx, token in enumerate(tokens):
+        if idx == 0 or token.get("surface") != "なり" or token.get("pos") != "Verb":
+            continue
+        previous = tokens[idx - 1]
+        if (
+            previous.get("pos") != "Auxiliary"
+            or not previous.get("surface", "").endswith("る")
+            or previous.get("lemma") not in _CLASSICAL_ATTRIBUTIVE_AUX_LEMMAS
+        ):
+            continue
+        token["pos"] = "Auxiliary"
+        token["lemma"] = "なり"
+
+
 def postprocess_bound_derived_adjective(tokens: list[dict]) -> bool:
     """Rejoin the bound suffix がまし〜 when it was split at its first mora.
 
@@ -3038,6 +3067,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("sou-aux", postprocess_sou_aux),
     ("nara-verb", postprocess_nara_verb),
     ("classical-nari-kateikei", postprocess_classical_nari_kateikei),
+    ("classical-nari-after-attributive", postprocess_classical_nari_after_attributive),
     ("n-kuruwa", postprocess_n_kuruwa),
     ("nai-context", postprocess_nai_context),
     ("binding-negative-aux", postprocess_binding_negative_aux),
