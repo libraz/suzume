@@ -3784,6 +3784,23 @@
       ],
       "id": "wo_miyouganai",
       "input": "本を読みようがない"
+    },
+    {
+      "description": "Negative control: a demonstrative hosts the temporal formal noun, not the subsidiary",
+      "expected": [
+        {
+          "lemma": "あの",
+          "pos": "Determiner",
+          "surface": "あの"
+        },
+        {
+          "lemma": "とき",
+          "pos": "Noun",
+          "surface": "とき"
+        }
+      ],
+      "id": "anotoki",
+      "input": "あのとき"
     }
   ],
   "description": "Formal nouns (こと、もの、ところ)",

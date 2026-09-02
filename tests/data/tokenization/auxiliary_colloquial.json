@@ -1,0 +1,97 @@
+{
+  "cases": [
+    {
+      "description": "The plain continuative of the contracted preparation subsidiary before the polite auxiliary",
+      "expected": [
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "終わる",
+          "pos": "Verb",
+          "surface": "終わら"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "とき"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_warasetokimashita",
+      "input": "仕事を終わらせときました"
+    },
+    {
+      "description": "The same continuative after a te-form onbin",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "とき"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "itokimashita",
+      "input": "書いときました"
+    },
+    {
+      "description": "The voiced cell of the same paradigm",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "どく",
+          "pos": "Auxiliary",
+          "surface": "どき"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "ndokimasu",
+      "input": "読んどきます"
+    }
+  ],
+  "description": "auxiliary_colloquial tests",
+  "version": "1.0"
+}
