@@ -155,16 +155,23 @@ HaRowLicense haRowCellLicense(core::ExtendedPOS cell, const std::vector<char32_t
       break;
     case core::ExtendedPOS::VerbRenyokei:
       // 連用形 heads a classical predicate chain or closes a clause.
-      license.closed_class_tail =
-          dictionaryTailFollowsAt(codepoints, end_pos, dict_manager, core::PartOfSpeech::Auxiliary,
-                                  {core::ExtendedPOS::AuxClassicalKeri, core::ExtendedPOS::AuxClassicalPerfect,
-                                   core::ExtendedPOS::AuxVolitional, core::ExtendedPOS::AuxDesireTai});
+      license.closed_class_tail = dictionaryTailFollowsAt(
+          codepoints, end_pos, dict_manager, core::PartOfSpeech::Auxiliary,
+          {core::ExtendedPOS::AuxClassicalKeri, core::ExtendedPOS::AuxClassicalPerfect,
+           core::ExtendedPOS::AuxClassicalTari, core::ExtendedPOS::AuxVolitional, core::ExtendedPOS::AuxDesireTai});
       license.licensed = clauseEndsAt(codepoints, end_pos);
       break;
-    case core::ExtendedPOS::VerbShuushikei:
-      license.licensed = shuushikeiEndsAt(codepoints, end_pos, dict_manager);
-      license.closed_class_tail = license.licensed && !clauseEndsAt(codepoints, end_pos);
+    case core::ExtendedPOS::VerbShuushikei: {
+      // 四段 spells its 終止形 and its 連体形 alike, so the adnominal position
+      // licenses the cell as much as a clause end does: a nominal written
+      // straight after it is the head the cell modifies (神を思ふ+間, 花の舞ふ+間).
+      // A nominal is not a closed-class tail, so it does not name the cell
+      // outright and the weaker evidence is recorded as such.
+      const bool ends_predicate = shuushikeiEndsAt(codepoints, end_pos, dict_manager);
+      license.licensed = ends_predicate || vh::lexicalWordFollowsAt(codepoints, end_pos);
+      license.closed_class_tail = ends_predicate && !clauseEndsAt(codepoints, end_pos);
       break;
+    }
     case core::ExtendedPOS::VerbKateikei:
       // 已然形 stands before a concessive or conditional conjunction (思へ+ど,
       // 思へ+ば). The same form ends an imperative clause (書き給へ。), which is
