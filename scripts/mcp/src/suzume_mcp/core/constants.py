@@ -1220,3 +1220,24 @@ COPULAR_PREDICATE_HEADS = frozenset(
         "うだつ",
     }
 )
+
+
+# Pre-1946 kanji forms paired with their modern equivalents, as one flat run of
+# (old, new) characters.  Consulted only to re-read a character the reference
+# dictionary itself returned as unknown, so a form it already holds keeps its
+# own entry.
+_KYUJITAI_PAIRS = (
+    "亞亜惡悪壓圧圍囲醫医爲為飮飲隱隠榮栄營営衞衛驛駅圓円緣縁艷艶應応歐欧毆殴櫻桜奧奥橫横溫温穩穏假仮價価畫画會会繪絵"
+    "擴拡殼殻覺覚學学嶽岳樂楽渴渇勸勧卷巻寬寛歡歓罐缶觀観關関陷陥巖巌歸帰氣気僞偽戲戯犧犠舊旧據拠擧挙虛虚峽峡挾挟狹狭"
+    "鄕郷曉暁區区驅駆勳勲薰薫徑径惠恵揭掲溪渓經経繼継莖茎螢蛍輕軽藝芸缺欠儉倹劍剣圈圏檢検權権獻献硏研縣県險険顯顕驗験"
+    "嚴厳效効廣広恆恒鑛鉱號号國国黑黒濟済碎砕齋斎劑剤雜雑產産慘惨贊賛殘残絲糸齒歯兒児辭辞濕湿實実舍舎寫写釋釈壽寿收収"
+    "從従澁渋獸獣縱縦肅粛處処緖緒敍叙將将稱称涉渉燒焼奬奨條条狀状乘乗淨浄剩剰疊畳繩縄壤壌孃嬢讓譲釀醸觸触囑嘱眞真寢寝"
+    "愼慎盡尽圖図粹粋醉酔隨随髓髄數数樞枢瀨瀬齊斉靜静攝摂竊窃說説淺浅戰戦纖繊禪禅雙双壯壮爭争莊荘搜捜插挿巢巣曾曽瘦痩"
+    "總総藏蔵臟臓卽即屬属續続墮堕體体對対帶帯滯滞臺台瀧滝澤沢擇択單単擔担膽胆團団斷断彈弾遲遅癡痴蟲虫晝昼鑄鋳廳庁徵徴"
+    "聽聴敕勅鎭鎮傳伝轉転點点黨党盜盗燈灯當当鬪闘德徳獨独讀読屆届貳弐惱悩腦脳霸覇拜拝廢廃賣売麥麦發発髮髪拔抜晚晩蠻蛮"
+    "祕秘濱浜甁瓶拂払佛仏倂併竝並變変邊辺辨弁瓣弁辯弁舖舗步歩峯峰寶宝豐豊沒没飜翻每毎萬万滿満默黙彌弥譯訳藥薬與与譽誉"
+    "搖揺樣様謠謡來来賴頼亂乱覽覧龍竜兩両獵猟綠緑淚涙壘塁勵励禮礼隸隷靈霊齡齢曆暦歷歴戀恋鍊錬爐炉勞労樓楼錄録灣湾亙亘"
+)
+KYUJITAI_TO_SHINJITAI: dict[str, str] = {
+    _KYUJITAI_PAIRS[index]: _KYUJITAI_PAIRS[index + 1] for index in range(0, len(_KYUJITAI_PAIRS), 2)
+}

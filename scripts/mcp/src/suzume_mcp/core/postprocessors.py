@@ -13,6 +13,7 @@ from .constants import (
     COUNTER_UNITS,
     EMPHATIC_SOKUON,
     INTERROGATIVES,
+    KYUJITAI_TO_SHINJITAI,
     QUANTITY_BOUND_SUFFIXES,
     SLANG_ADJ_STEMS,
     SLANG_VERB_STEMS,
@@ -24,6 +25,7 @@ from .constants import (
 )
 from .core_lexicon import adjective_garu_stems, core_headwords
 from .mecab import mecab_analyze
+from .merge_postprocessors import NIDAN_TERMINAL_KANA
 from .pos_mapping import _is_katakana_onomatopoeia
 from .split_rules import base_from_mizenkei, base_from_renyokei
 
@@ -189,6 +191,30 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
                 "length": len(pattern),
             }
 
+    # Pre-1946 kanji forms the dictionary has no entry for come back as unknown
+    # tokens (lemma "*"), and the compound rules then glue the run into a
+    # non-word noun (心 + 亂 → 心亂), stranding the okurigana. Folding only the
+    # characters that actually landed inside an unknown token lets the
+    # dictionary read the word in its modern spelling; the offset bookkeeping
+    # below restores the original character into the surface. A form the
+    # dictionary already holds never reaches this branch, so its own entry keeps
+    # deciding the analysis.
+    if any(char in KYUJITAI_TO_SHINJITAI for char in text):
+        if raw is None:
+            raw = _raw_analysis(text)
+        for start, token in raw[1].items():
+            if token.get("lemma", "*") != "*":
+                continue
+            for offset, char in enumerate(token.get("surface", "")):
+                modern = KYUJITAI_TO_SHINJITAI.get(char)
+                if modern is None:
+                    continue
+                replacements[(start + offset, "kyujitai")] = {
+                    "original": char,
+                    "replacement": modern,
+                    "length": 1,
+                }
+
     # Multiple rule families can recognize overlapping text. Select a single,
     # leftmost longest match before either mutation or offset accounting so the
     # two passes always describe the same disjoint spans.
@@ -216,6 +242,7 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
         "unusual_name": "unusual-name",
         "word_exception": "word-exception",
         "emphatic_sokuon": "emphatic-sokuon",
+        "kyujitai": "kyujitai-fold",
     }
     rules = tuple(dict.fromkeys(rule_names[category] for _, category in replacements))
     return text, replacements, rules
@@ -1595,6 +1622,10 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
         lemma = token.get("lemma", surface)
         if not surface or not lemma or surface == lemma:
             continue
+        # A classical 二段 連体形 (消ゆる|を) is a finite verb heading its own
+        # clause, not the productive deverbal noun a 連用形 spells.
+        if surface == lemma + "る" and lemma[-1:] in NIDAN_TERMINAL_KANA:
+            continue
         following = tokens[idx + 1]
         honorific_naru = (
             idx > 0
@@ -2274,6 +2305,41 @@ def postprocess_verbal_nominalizer_mi(tokens: list[dict]) -> bool:
     return changed
 
 
+def postprocess_mu_verb_desiderative(tokens: list[dict]) -> bool:
+    """Restore the continuative boundary in a む verb + たい read as a stem + みたい.
+
+    The similative みたい selects a nominal or a terminal form, never an adjective
+    stem, so `Adj stem + みたい` is not a possible analysis. It comes from the
+    lexical みたい entry outscoring the continuative of the paired む verb on a
+    short input. The verb has to be attested to keep the rule from inventing a
+    lemma for every 〜しい adjective.
+    """
+    lexical_verbs = core_headwords("verbs.tsv")
+    changed = False
+    for idx in range(len(tokens) - 1):
+        token = tokens[idx]
+        following = tokens[idx + 1]
+        lemma = token.get("lemma", "")
+        surface = token.get("surface", "")
+        if (
+            token.get("pos") != "Adjective"
+            or not lemma.endswith("しい")
+            or surface != lemma[:-1]
+            or following.get("surface") != "みたい"
+            or following.get("pos") != "Auxiliary"
+        ):
+            continue
+        verb_lemma = surface + "む"
+        if verb_lemma not in lexical_verbs:
+            continue
+        tokens[idx : idx + 2] = [
+            {"surface": surface + "み", "pos": "Verb", "lemma": verb_lemma},
+            {"surface": "たい", "pos": "Auxiliary", "lemma": "たい"},
+        ]
+        changed = True
+    return changed
+
+
 def postprocess_shortened_causative_passive(tokens: list[dict]) -> bool:
     """Classify the bound さ in a Godan shortened causative-passive chain."""
     changed = False
@@ -2908,6 +2974,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("formal-noun-lemma", postprocess_formal_noun_lemma),
     ("adjective-nominalizer", postprocess_adjective_nominalizer),
     ("verbal-nominalizer-mi", postprocess_verbal_nominalizer_mi),
+    ("mu-verb-desiderative", postprocess_mu_verb_desiderative),
     ("shortened-causative-passive", postprocess_shortened_causative_passive),
     ("modifier-godan-imperative", postprocess_modifier_godan_imperative),
     ("contracted-shimau-aux", postprocess_shimau_aux),

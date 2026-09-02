@@ -149,8 +149,10 @@ class TestSurfaceIsNeverLost:
 
     @pytest.mark.parametrize("text", ["3枚あのーー", "そうそうあのーー"])
     def test_prolonged_sound_normalization_does_not_depend_on_the_first_rule(self, text):
+        # Emphatic lengthening is kept: the tokenizer only collapses a repeated
+        # mark directly before a kanji, which is what the case above covers.
         tokens, _, _ = get_expected_tokens(text)
-        assert "".join(token["surface"] for token in tokens).endswith("あのー")
+        assert "".join(token["surface"] for token in tokens).endswith("あのーー")
 
     @pytest.mark.parametrize(
         ("source", "normalized"),

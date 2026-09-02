@@ -64,6 +64,7 @@ from .merge_postprocessors import (
     _postprocess_tomo_particle,
     _postprocess_totomoni,
     classical_adjective_lemma,
+    nidan_cell,
 )
 from .split_rules import base_from_renyokei, bases_from_renyokei
 
@@ -260,6 +261,12 @@ _COUNTER_CHAIN_TAILS = frozenset({"年", "月", "日", "週", "時", "分", "秒
 _COUNTER_CHAIN_UNIT = regex.compile(r"[0-9０-９〇零一二三四五六七八九十百千万億兆]+[年月日時分秒間泊割]$")
 
 
+def _heads_nidan_cell(tokens: list[dict], index: int) -> bool:
+    """Whether the token at ``index`` is the stem of a classical 二段 finite cell."""
+    following = tokens[index + 1] if index + 1 < len(tokens) else None
+    return nidan_cell(tokens[index], following) is not None
+
+
 def _kanji_noun_run(tokens: list[dict], start: int) -> tuple[int, str]:
     """Return the complete mergeable kanji-noun run beginning at ``start``."""
     if start >= len(tokens):
@@ -270,6 +277,12 @@ def _kanji_noun_run(tokens: list[dict], start: int) -> tuple[int, str]:
         and token.get("pos") == "名詞"
         and token.get("pos_sub1", "") not in ("接尾", "固有名詞", "副詞可能")
     ):
+        return start, ""
+    # A kanji the dictionary reads as a bare noun is the stem of a classical 二段
+    # verb when the kana after it completes a finite cell (老|ゆる, 絶|ゆれ).
+    # Absorbing it into a compound would bury a verb inside a noun that is not a
+    # word, so the run stops before such a stem.
+    if _heads_nidan_cell(tokens, start):
         return start, ""
 
     index = start + 1
@@ -282,7 +295,7 @@ def _kanji_noun_run(tokens: list[dict], start: int) -> tuple[int, str]:
             and following.get("pos") == "名詞"
             and following.get("pos_sub1", "") not in ("接尾", "固有名詞", "形容動詞語幹", "副詞可能", "数")
         )
-        if not is_mergeable:
+        if not is_mergeable or _heads_nidan_cell(tokens, index):
             break
         combined += surface
         index += 1
@@ -1190,6 +1203,33 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     merged = True
                     if applied_rule is None:
                         applied_rule = "elongated-adjective"
+
+        # The volitional う closes a predicate, so a case particle cannot attach
+        # to it -- a case particle needs a nominal host.  A reference dictionary
+        # that lacks the kana spelling of a nominal reads its tail as the
+        # volitional of a homographic verb (むこうへ as 向く + う), which leaves
+        # the particle with nothing to govern.  The quotative と takes a clause
+        # rather than a nominal, and 意志形 + に + も is the concessive frame, so
+        # both keep the auxiliary boundary.
+        if not merged and t.get("pos") == "動詞" and i + 2 < len(tokens):
+            volitional = tokens[i + 1]
+            governing = tokens[i + 2]
+            follower = tokens[i + 3] if i + 3 < len(tokens) else None
+            if (
+                volitional.get("pos") == "助動詞"
+                and volitional.get("lemma") == "う"
+                and governing.get("pos") == "助詞"
+                and governing.get("pos_sub1") == "格助詞"
+                and governing.get("pos_sub2") == "一般"
+                and governing.get("surface") != "と"
+                and not (follower is not None and follower.get("pos_sub1") == "係助詞")
+            ):
+                nominal = t.get("surface", "") + "う"
+                result.append({"surface": nominal, "pos": "名詞", "pos_sub1": "一般", "lemma": nominal})
+                i += 2
+                merged = True
+                if applied_rule is None:
+                    applied_rule = "volitional-before-case-particle"
 
         # 4b. Vowel repetition: verb + repeated う (2+)
         if not merged and t.get("pos") == "動詞":

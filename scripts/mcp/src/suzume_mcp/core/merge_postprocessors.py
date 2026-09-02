@@ -533,6 +533,7 @@ _A_ROW_TO_U_ROW = {
     "わ": "う",
 }
 _CLASSICAL_IRREALIS_AUX = "む"
+_HIRAGANA_TAIL = regex.compile(r"\p{Hiragana}$")
 
 
 def _is_single_verb(surface: str) -> bool:
@@ -577,10 +578,16 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
                     applied_rule = "classical-mu-boundary"
                 continue
         # む opened a longer idiom the dictionary lists as one word (むとする).
+        # The stem it attaches to is a 未然形, which ends in an a-row kana for a
+        # consonant stem (行か) and in an i-/e-row kana for a vowel stem
+        # (見え, 流れ).  The dictionary holds no irrealis for the vowel-stem
+        # class and reads that stem as a deverbal noun, so the POS cannot carry
+        # the test — a content word ending in hiragana is the whole condition,
+        # and the conjugation class drops out of it.
         if (
             previous is not None
-            and previous.get("pos") == "動詞"
-            and previous.get("surface", "")[-1:] in _A_ROW_TO_U_ROW
+            and previous.get("pos") in ("動詞", "名詞")
+            and _HIRAGANA_TAIL.search(previous.get("surface", ""))
             and len(surface) > 1
             and surface[0] == _CLASSICAL_IRREALIS_AUX
         ):
@@ -877,53 +884,70 @@ _NIDAN_AUXILIARY_HOMOGRAPHS = frozenset({"す", "つ", "ぬ", "ふ", "む", "る
 _NIDAN_INFLECTED_STEM_FORMS = frozenset({"未然形", "連用形"})
 
 
-_NIDAN_CELL = regex.compile(rf"^(\p{{Han}}+)([{''.join(_NIDAN_TERMINAL_ROWS)}])(る?)$")
+_NIDAN_CELL = regex.compile(rf"^(\p{{Han}}[\p{{Han}}\p{{Hiragana}}]*?)([{''.join(_NIDAN_TERMINAL_ROWS)}])([るれ]?)$")
+# The kana a 二段 終止形 ends in, for callers that only see a rebuilt cell.
+NIDAN_TERMINAL_KANA = frozenset(_NIDAN_TERMINAL_ROWS)
 
 
 @cache
 def _nidan_terminal_lemma(stem: str, terminal: str) -> str | None:
-    """Return the 終止形 when a kanji stem plus a U-row kana is a classical 二段 verb."""
+    """Return the 終止形 when a stem plus a U-row kana is a classical 二段 verb."""
     for vowel in _NIDAN_TERMINAL_ROWS[terminal]:
         if is_single_token_of_pos(stem + vowel + "る", "動詞"):
             return stem + terminal
     return None
 
 
-def _postprocess_nidan_cell(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
-    """Rebuild the finite cells of a classical 二段 verb (受く, 越ゆ, 求むる, 流るる).
+def nidan_cell(token: dict, following: dict | None) -> tuple[str, str] | None:
+    """Return (surface, 終止形) when two adjacent tokens spell one 二段 finite cell.
 
-    終止形 is the kanji stem plus one U-row kana and 連体形 adds る, but the
-    reference dictionary carries only the modern 一段 headword, so the kana falls
-    out as whatever else it can spell — an adjective stem (受+く as くい), a bare
-    noun (越+ゆ), the カ変 くる, or the 完了 つ — and the kanji is left as a noun
-    that is not a word on its own.  Asking the dictionary for the modern headword
-    the same stem builds decides whether the pair is a verb, without listing the
-    classical paradigm.  Where the two tokens fall is not fixed (求む|る but
-    見|ゆる), so the window is matched on its combined surface.
+    終止形 is the stem plus one U-row kana, 連体形 adds る and 已然形 adds れ.  The
+    stem keeps whatever 送り仮名 the modern headword carries (聞こ|ゆ), so it is
+    matched as a kanji head plus the kana that follow, shortest first: the longest
+    stem would swallow the 連体形 る of 消|ゆ|る.  Asking the dictionary for the
+    modern 一段 headword the same stem builds decides whether the pair is a verb,
+    without listing the classical paradigm.
+    """
+    if following is None:
+        return None
+    cell = _NIDAN_CELL.match(token.get("surface", "") + following.get("surface", ""))
+    if cell is None:
+        return None
+    stem, terminal, inflection = cell.groups()
+    # The same kana spell classical auxiliaries that attach to a 未然形 or a
+    # 連用形 (見|つ, 見|ぬ, 見|つる).  After a stem the dictionary inflected, the
+    # kana is that auxiliary and not part of the verb.
+    if (
+        terminal in _NIDAN_AUXILIARY_HOMOGRAPHS
+        and token.get("pos") == "動詞"
+        and token.get("conj_form") in _NIDAN_INFLECTED_STEM_FORMS
+    ):
+        return None
+    lemma = _nidan_terminal_lemma(stem, terminal)
+    return None if lemma is None else (lemma + inflection, lemma)
+
+
+def _postprocess_nidan_cell(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Rebuild the finite cells of a classical 二段 verb (受く, 越ゆ, 求むる, 聞こゆれ).
+
+    The reference dictionary carries only the modern 一段 headword, so the kana
+    falls out as whatever else it can spell — an adjective stem (受+く as くい), a
+    bare noun (越+ゆ), the カ変 くる, or the 完了 つ — and the kanji is left as a
+    noun that is not a word on its own.  Where the two tokens fall is not fixed
+    (求む|る but 見|ゆる), so the window is matched on its combined surface.
     """
     merged: list[dict] = []
     idx = 0
     while idx < len(result):
         token = result[idx]
-        following = result[idx + 1] if idx + 1 < len(result) else None
-        cell = _NIDAN_CELL.match(token.get("surface", "") + following.get("surface", "")) if following else None
+        cell = nidan_cell(token, result[idx + 1] if idx + 1 < len(result) else None)
         if cell is not None:
-            stem, terminal, attributive = cell.groups()
-            # The same kana spell classical auxiliaries that attach to a 未然形 or
-            # a 連用形 (見|つ, 見|ぬ, 見|つる).  After a stem the dictionary
-            # inflected, the kana is that auxiliary and not part of the verb.
-            homograph = (
-                terminal in _NIDAN_AUXILIARY_HOMOGRAPHS
-                and token.get("pos") == "動詞"
-                and token.get("conj_form") in _NIDAN_INFLECTED_STEM_FORMS
-            )
-            lemma = None if homograph else _nidan_terminal_lemma(stem, terminal)
-            if lemma is not None:
-                merged.append({"surface": lemma + attributive, "pos": "動詞", "lemma": lemma})
-                idx += 2
-                if applied_rule is None:
-                    applied_rule = "classical-nidan-cell"
-                continue
+            surface, lemma = cell
+            merged.append({"surface": surface, "pos": "動詞", "lemma": lemma})
+            idx += 2
+            if applied_rule is None:
+                applied_rule = "classical-nidan-cell"
+            continue
         merged.append(token)
         idx += 1
     return merged, applied_rule
