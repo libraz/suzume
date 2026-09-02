@@ -28,20 +28,26 @@ using CharType = normalize::CharType;
 // comparison branch. `requires_verified_renyokei` admits only a dictionary-backed
 // continuative form before the head, which keeps a coincidental kanji+hiragana run
 // from being absorbed; the looser heads predate that check and keep their behavior.
+// `closes_kanji_run` says the head is the right edge of its compound, so a kanji
+// following it starts a word of its own (走れ|目標, 使い|道具, 書き|方向,
+// 置き|場所). 物 is the exception: it is itself a productive nominalizer that
+// takes a further derivational kanji (食べ物|屋, 飲み物|代, 落し物|係), so for
+// it the following kanji proves nothing.
 struct DeverbalHeadNoun {
   std::string_view surface;
   bool requires_verified_renyokei;
+  bool closes_kanji_run;
 };
 
 const DeverbalHeadNoun kDeverbalHeadNouns[] = {
-    {"物", false},   // 食べ物, 飲み物
-    {"方", false},   // 読み方, やり方
-    {"所", false},   // 居場所
-    {"目", false},   // 割れ目, 切れ目, 裂け目
-    {"手", true},    // 読み手, 書き手, 受け手
-    {"場", true},    // 売り場, 買い場
-    {"道", true},    // 使い道, 帰り道
-    {"時間", true},  // 待ち時間
+    {"物", false, false},  // 食べ物, 飲み物
+    {"方", false, true},   // 読み方, やり方
+    {"所", false, true},   // 居場所
+    {"目", false, true},   // 割れ目, 切れ目, 裂け目
+    {"手", true, true},    // 読み手, 書き手, 受け手
+    {"場", true, true},    // 売り場, 買い場
+    {"道", true, true},    // 使い道, 帰り道
+    {"時間", true, true},  // 待ち時間
 };
 
 // Longest head in the table, in codepoints.
@@ -101,6 +107,26 @@ bool hasNaAdjectiveContinuation(const std::vector<char32_t>& codepoints, size_t 
 
 bool isHiraganaHonorificPrefix(char32_t codepoint) {
   return codepoint == U'お' || codepoint == U'ご';
+}
+
+// Whether a kanji stem plus its kana tail spells an attested i-adjective rather
+// than a verb continuative. The modern 終止/連体 い is the surface itself
+// (高い所); the classical 連体 き inflects off the same base, so the dictionary
+// carries the stem plus い instead (高き所, 美しき所). Both endings are equally
+// legitimate godan continuatives (言い方, 読み方, 巻き物), which is why the
+// dictionary decides the reading rather than the kana.
+bool isAttestedAdjectiveBeforeHead(const dictionary::DictionaryManager& dict_manager,
+                                   const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end) {
+  const char32_t final_kana = codepoints[hiragana_end - 1];
+  const std::string span = extractSubstring(codepoints, start_pos, hiragana_end);
+  if (final_kana == U'い') {
+    return verb_helpers::isAdjectiveInDictionary(&dict_manager, span);
+  }
+  if (final_kana != U'き') {
+    return false;
+  }
+  const std::string base = normalize::concat(span.substr(0, span.size() - core::kJapaneseCharBytes), "い");
+  return verb_helpers::isAdjectiveInDictionary(&dict_manager, base);
 }
 
 bool isCaseParticleCodepoint(char32_t codepoint) {
@@ -692,16 +718,20 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     return;
   }
 
-  // One-mora -い can be a godan-wa continuative (言い方), but an attested
-  // i-adjective such as 古い/高い must retain its attributive boundary before
-  // every ordinary suffix-homograph noun (古い物, 高い所, 高い方). Longer -い
-  // adjective tails were rejected above; consult the dictionary here for the
-  // ambiguous one-mora case.
-  if (hiragana_end == kanji_end + 1 && codepoints[hiragana_end - 1] == U'い') {
-    const std::string potential_adjective = extractSubstring(codepoints, start_pos, hiragana_end);
-    if (verb_helpers::isAdjectiveInDictionary(&dict_manager, potential_adjective)) {
-      return;
-    }
+  // A head that closes its compound has to be the right edge of its own kanji
+  // run. When another kanji follows, that run is a word of its own and the head
+  // is its first character rather than a bound suffix (走れ|目標, 使い|道具).
+  if (head_noun->closes_kanji_run && hiragana_end + head_length < codepoints.size() &&
+      char_types[hiragana_end + head_length] == CharType::Kanji) {
+    return;
+  }
+
+  // An attested i-adjective keeps its attributive boundary before every
+  // ordinary suffix-homograph noun (古い物, 高い所, 高き所, 美しき所). Longer
+  // -い tails were rejected above; the remaining one-mora い and the classical
+  // き are ambiguous with a godan continuative, so consult the dictionary.
+  if (hiragana_end > kanji_end && isAttestedAdjectiveBeforeHead(dict_manager, codepoints, start_pos, hiragana_end)) {
+    return;
   }
 
   // We need at least some hiragana between kanji and suffix (verb renyokei ending)
