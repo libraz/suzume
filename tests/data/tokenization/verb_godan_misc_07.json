@@ -1736,6 +1736,168 @@
       ],
       "id": "enu",
       "input": "消えぬ炎。"
+    },
+    {
+      "description": "classical perfect izenkei after a verb continuative stays a separate auxiliary",
+      "expected": [
+        {
+          "lemma": "鐘",
+          "pos": "Noun",
+          "surface": "鐘"
+        },
+        {
+          "lemma": "鳴る",
+          "pos": "Verb",
+          "surface": "鳴り"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "ritareba",
+      "input": "鐘鳴りたれば"
+    },
+    {
+      "description": "multi-mora continuative before the classical perfect izenkei",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "集まる",
+          "pos": "Verb",
+          "surface": "集まり"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "maritareba",
+      "input": "人集まりたれば"
+    },
+    {
+      "description": "classical negative izenkei keeps its boundary after the generalized auxiliary guard",
+      "expected": [
+        {
+          "lemma": "責任",
+          "pos": "Noun",
+          "surface": "責任"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "担う",
+          "pos": "Verb",
+          "surface": "担わ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ざれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "wo_wazareba",
+      "input": "責任を担わざれば"
+    },
+    {
+      "description": "godan-na terminal keeps its own nu ending as one verb",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "死ぬ",
+          "pos": "Verb",
+          "surface": "死ぬ"
+        }
+      ],
+      "id": "ga_nu_2",
+      "input": "犬が死ぬ"
+    },
+    {
+      "description": "monograde stem before the classical negative auxiliary",
+      "expected": [
+        {
+          "lemma": "米",
+          "pos": "Noun",
+          "surface": "米"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "煮る",
+          "pos": "Verb",
+          "surface": "煮"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "wo_nu",
+      "input": "米を煮ぬ"
+    },
+    {
+      "description": "multi-mora monograde stem before the classical perfect auxiliary",
+      "expected": [
+        {
+          "lemma": "菓子",
+          "pos": "Noun",
+          "surface": "菓子"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たり"
+        }
+      ],
+      "id": "wo_betari",
+      "input": "菓子を食べたり"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",

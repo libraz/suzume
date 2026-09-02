@@ -178,6 +178,38 @@
       ],
       "id": "suruto_ga_ta",
       "input": "すると彼が来た。"
+    },
+    {
+      "description": "ka-hen irrealis keeps the classical negative auxiliary separate",
+      "expected": [
+        {
+          "lemma": "誰",
+          "pos": "Pronoun",
+          "surface": "誰"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "ka_nubeshi",
+      "input": "誰か来ぬべし"
     }
   ],
   "description": "Irregular verbs (する、くる) (part 2/2)",
