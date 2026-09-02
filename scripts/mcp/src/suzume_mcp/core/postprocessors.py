@@ -2232,6 +2232,30 @@ def postprocess_classical_past_shi(tokens: list[dict]) -> bool:
             following["pos"] = "Noun"
 
 
+_PERFECT_NU_CELLS = ("ぬる", "ぬれ")
+
+
+@reports_mutation
+def postprocess_classical_perfect_nu(tokens: list[dict]) -> bool:
+    """Retag ぬる / ぬれ after a verb continuative as the classical perfect ぬ.
+
+    The reference analyzer reads the terminal of this paradigm as the auxiliary
+    it is (花散り+ぬ) and then, behind the very same continuative, reads the other
+    two cells as unrelated lexical verbs — 五段 塗る for the adnominal and 一段
+    濡れる for the realis. One paradigm does not change word class cell by cell,
+    and a continuative cannot be followed by another verb's own terminal, so the
+    reading the terminal already gets covers all three.
+    """
+    for idx, token in enumerate(tokens):
+        if idx == 0 or token.get("pos") != "Verb" or token.get("surface") not in _PERFECT_NU_CELLS:
+            continue
+        previous = tokens[idx - 1]
+        if previous.get("pos") != "Verb" or not _spells_verb_continuative(previous.get("surface", "")):
+            continue
+        token["pos"] = "Auxiliary"
+        token["lemma"] = "ぬ"
+
+
 @reports_mutation
 def postprocess_ka_suru_noun(tokens: list[dict]) -> bool:
     """Keep 化-derived suru-verb nouns out of the na-adjective class."""
@@ -3153,6 +3177,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("classical-perfect-aux", postprocess_classical_perfect_aux),
     ("classical-past-keri", postprocess_classical_past_keri),
     ("classical-past-shi", postprocess_classical_past_shi),
+    ("classical-perfect-nu", postprocess_classical_perfect_nu),
     ("adverbial-temporal-prefix", postprocess_adverbial_temporal_prefix),
     ("prolonged-sound-noun", postprocess_prolonged_sound_noun),
     ("yoshi-formal-noun", postprocess_yoshi_formal_noun),
