@@ -195,6 +195,12 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("られ", "られる", EPOS::AuxPassive),
       aux("られる", "られる", EPOS::AuxPassive),
       aux("られれ", "られる", EPOS::AuxPassive),  // 仮定形 (食べ+られれ+ば)
+      // Literary passive る. Only the cells that the modern れる paradigm does
+      // not already spell are registered: the terminal る and the continuative れ
+      // are shared, while these two are the ones a literary text needs
+      // (繰り返さ+るる, 知ら+るれ+ば).
+      aux("るる", "る", EPOS::AuxPassive),        // 連体形 (思はるる心)
+      aux("るれ", "る", EPOS::AuxPassive),        // 已然形 (知らるれば)
       aux("れよ", "れる", EPOS::AuxPassive),      // 意志形語幹 (書か+れよ+う)
       aux("られよ", "られる", EPOS::AuxPassive),  // 意志形語幹 (食べ+られよ+う)
 

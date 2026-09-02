@@ -271,8 +271,9 @@ bool isHypotheticalSelectingConjunctiveParticle(std::string_view surface);
 /**
  * @brief Whether an auxiliary surface spells the cell ば/ど/ども select
  *
- * Each paradigm names that cell by its tail: the passive spells it れれ/られれ
- * (書か+れれ+ば) and the classical perfect spells it たれ (記録し+たれ+ども).
+ * Each paradigm names that cell by its tail: the modern passive spells it
+ * れれ/られれ (書か+れれ+ば), its literary counterpart spells the same slot るれ
+ * (知ら+るれ+ば) and the classical perfect spells it たれ (記録し+たれ+ども).
  * Their other cells do not — the passive's bare 未然/連用 れ, the perfect's 終止
  * たり — which is what a caller needs on either side of the boundary: whether the
  * たれ dictionary edge is licensed at all, and whether a passive form may carry

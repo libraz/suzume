@@ -141,6 +141,13 @@ inline bool isMizenkeiAuxiliaryStarter(char32_t codepoint, char32_t following) {
   if (codepoint == U'ん') {
     return following != U'で' && following != U'だ';
   }
+  // The literary passive takes the same cell as the modern れる and spells its
+  // adnominal るる and its realis るれ. Its bare terminal る is left out: one
+  // mora is the base ending of half the verbs, so a compound V2 would lose its
+  // own paradigm to it (振り返る is not 振り+返+る).
+  if (codepoint == U'る') {
+    return following == U'る' || following == U'れ';
+  }
   return codepoint == U'れ' || codepoint == U'せ' || codepoint == U'な' || codepoint == U'ず' || codepoint == U'ぬ' ||
          codepoint == U'ね' || codepoint == U'む' || codepoint == U'じ';
 }
