@@ -337,12 +337,15 @@ bool isDurationPredicateKakaru(std::string_view surface) {
 }
 
 bool isFinalParticleStackTail(std::string_view surface) {
+  // The tail slot of a final-particle stack carries the modality: the
+  // confirmation-seeking ね/な/よ and the question か (じゃん+か, よ+ね, か+な).
+  // Propositional content is always the first member, so nothing else stacks.
   // A final particle lengthens by repeating its own vowel, and the lengthened
   // form fills the same slot (かな/かなあ, よね/よねえ). Reading the tail off
   // the first mora covers both without listing the variants.
   size_t byte_pos = 0;
   const char32_t head = normalize::decodeUtf8(surface, byte_pos);
-  if (head != U'ね' && head != U'な' && head != U'よ') {
+  if (head != U'ね' && head != U'な' && head != U'よ' && head != U'か') {
     return false;
   }
   while (byte_pos < surface.size()) {

@@ -90,11 +90,12 @@ float computeParticleQuoteBonus(const core::LatticeEdge& prev, const core::Latti
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }
 
-  // A stack of sentence-final particles is licensed by its second member:
-  // only the confirmation-seeking ね/な/よ take another final particle in
-  // front of them (か+な, よ+ね, わ+ね, っけ+ね, ぜ+よ), while what stands
-  // first is unrestricted. Grant those the exemption from the general
-  // final-particle-to-final-particle penalty.
+  // A stack of sentence-final particles is licensed by its second member,
+  // which is where the modality sits: the confirmation-seeking ね/な/よ and
+  // the question か take another final particle in front of them (か+な,
+  // よ+ね, わ+ね, っけ+ね, ぜ+よ, じゃん+か), while what stands first carries
+  // the proposition and is unrestricted. Grant those the exemption from the
+  // general final-particle-to-final-particle penalty.
   if (prev.extended_pos == core::ExtendedPOS::ParticleFinal && next.extended_pos == core::ExtendedPOS::ParticleFinal &&
       grammar::isFinalParticleStackTail(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kExtremeBonus);
