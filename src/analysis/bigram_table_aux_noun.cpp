@@ -398,6 +398,13 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // verb reading of the preceding progressive form.
       {EPOS::AuxAspectIru, EPOS::ParticleNo, cost::kStrongBonus},
 
+      // The progressive is a finite predicate, so it heads a subordinate clause
+      // through a conjunctive particle exactly as the other aspect auxiliaries
+      // do (走ってる+のに, 走ってる+ので). Without the same weight the
+      // nominalizer row above carries, the two-morpheme reading always
+      // undercuts the listed conjunctive particle that spells the same run.
+      {EPOS::AuxAspectIru, EPOS::ParticleConj, cost::kStrongBonus},
+
       // The trial subsidiary みる conjugates as an Ichidan auxiliary. Its stem
       // therefore accepts the same independent tense, negation, and desiderative
       // auxiliaries as a lexical Ichidan renyokei (試してみ+ます/ない/たい).
