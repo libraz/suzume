@@ -798,6 +798,19 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                                                 << "\" fabricated mizenkei absorbing binding particle\n");
               is_valid_verb = false;
             }
+            // The same fabrication reaches one mora further out when the
+            // absorbed particle marks a case: 変わりがない is 変わり + が + ない,
+            // never the irrealis of the non-word 変わりぐ. The case particle sits
+            // at the end of the span, so the embedded-particle guard above has no
+            // suffix to see.
+            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            if (is_valid_verb && !vh::isVerbInDictionary(dict_manager, base_form) &&
+                vh::endsWithCaseParticleAfterContinuative(dict_manager, inflection, codepoints, start_pos,
+                                                          multi_miz_end)) {
+              SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << extractSubstring(codepoints, start_pos, multi_miz_end)
+                                                << "\" fabricated mizenkei absorbing case particle\n");
+              is_valid_verb = false;
+            }
             if (is_valid_verb) {
               constexpr float kCost = candidate::verb_cost::kStandardBonus;  // Same as other negative patterns
               const char* pattern = is_nakatt_pattern ? "multi_mizenkei_nakatt"

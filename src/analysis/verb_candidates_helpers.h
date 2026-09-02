@@ -337,6 +337,26 @@ bool embedsCaseParticle(const dictionary::DictionaryManager* dict_manager, const
                         size_t start_pos, size_t end_pos);
 
 /**
+ * @brief Check if a span ends in a one-mora case particle written onto a continuative
+ *
+ * embedsCaseParticle needs material on both sides of the particle, so it cannot
+ * see the argument boundary when the fabricated candidate stops on the particle
+ * itself: 変わりが is proposed as the irrealis of the non-word 変わりぐ, absorbing
+ * the nominative that marks 変わり as a subject. The multi-mora tail guard cannot
+ * reach it either, because が is a single mora and would then also match the
+ * genuine irrealis of a godan-ka verb.
+ *
+ * The host supplies the missing evidence instead: an i-row mora before the
+ * particle is what nominalizes a godan stem, and the analyzer must read the host
+ * as the continuative of some other base form. A real godan-ga irrealis has its
+ * own stem there (和らが, 揺るが), so nothing lexical is suppressed.
+ * @see fabricated closed-class absorption guards (top of this header)
+ */
+bool endsWithCaseParticleAfterContinuative(const dictionary::DictionaryManager* dict_manager,
+                                           const grammar::Inflection& inflection,
+                                           const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
+
+/**
  * @brief Length of a multi-mora negative auxiliary written at a position
  *
  * Returns the codepoint length of the longest dictionary auxiliary starting at

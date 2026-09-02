@@ -10,6 +10,7 @@
 #include "analysis/dictionary_probe.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
+#include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "verb_candidates_helpers.h"
@@ -401,6 +402,35 @@ bool embedsCaseParticle(const dictionary::DictionaryManager* dict_manager, const
     }
   }
   return false;
+}
+
+bool endsWithCaseParticleAfterContinuative(const dictionary::DictionaryManager* dict_manager,
+                                           const grammar::Inflection& inflection,
+                                           const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
+  // A deverbal noun is at least a stem plus its continuative mora, so the span
+  // needs a host of two codepoints before the particle.
+  if (dict_manager == nullptr || end_pos < start_pos + 3 || end_pos > codepoints.size()) {
+    return false;
+  }
+  const size_t particle_pos = end_pos - 1;
+  const auto* particle =
+      dict_manager->lookupExact(extractSubstring(codepoints, particle_pos, end_pos), core::PartOfSpeech::Particle);
+  if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
+    return false;
+  }
+  // The host must look like a continuative: an i-row mora is what nominalizes a
+  // godan stem. No godan verb spells its own irrealis with that mora before the
+  // one this guard rejects, which is why the shape can be required here even
+  // though the particle is a single mora (和らが, 揺るが keep their candidates).
+  if (!grammar::isIRowCodepoint(codepoints[particle_pos - 1])) {
+    return false;
+  }
+  const std::string host = extractSubstring(codepoints, start_pos, particle_pos);
+  const grammar::InflectionCandidate best = inflection.getBest(host);
+  // A host that analyses as its own base form is a terminal, not a continuative,
+  // and carries no evidence that the mora before the particle ends a word.
+  return best.base_form != host && isVerifiedVerbBase(dict_manager, inflection, best.base_form,
+                                                      candidate::verb_cost::kConstructedVerbMinConfidence, true);
 }
 
 size_t negativeAuxiliaryLengthAt(const dictionary::DictionaryManager* dict_manager,
