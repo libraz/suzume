@@ -560,14 +560,9 @@
           "surface": "てる"
         },
         {
-          "lemma": "の",
+          "lemma": "のに",
           "pos": "Particle",
-          "surface": "の"
-        },
-        {
-          "lemma": "に",
-          "pos": "Particle",
-          "surface": "に"
+          "surface": "のに"
         },
         {
           "lemma": "進む",
@@ -585,14 +580,9 @@
           "surface": "てる"
         },
         {
-          "lemma": "の",
+          "lemma": "のに",
           "pos": "Particle",
-          "surface": "の"
-        },
-        {
-          "lemma": "に",
-          "pos": "Particle",
-          "surface": "に"
+          "surface": "のに"
         },
         {
           "lemma": "進む",

@@ -855,6 +855,65 @@
       ],
       "id": "wo_mitsutsu_ku",
       "input": "本を読みつつ歩く"
+    },
+    {
+      "description": "進行相の後の のに は常に逆接の接続助詞",
+      "expected": [
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "のに",
+          "pos": "Particle",
+          "surface": "のに"
+        }
+      ],
+      "id": "ttterunoni",
+      "input": "走ってるのに"
+    },
+    {
+      "description": "終止形の後は目的の の＋に が残る（否定対照）",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読む"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "かかる",
+          "pos": "Verb",
+          "surface": "かかる"
+        }
+      ],
+      "id": "munoni_gakakaru",
+      "input": "読むのに時間がかかる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
