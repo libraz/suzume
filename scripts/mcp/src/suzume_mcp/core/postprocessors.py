@@ -643,6 +643,51 @@ def postprocess_classical_copula_nari(tokens: list[dict]) -> bool:
     return changed
 
 
+def _spells_verb_continuative(surface: str) -> bool:
+    """Whether this surface is a verb's continuative rather than a finite cell.
+
+    The reference dictionary names the cell only in the raw analysis, which the
+    mapped tokens no longer carry, so ask it in an environment that admits
+    nothing else: the polite ます selects the continuative and leaves a finite
+    form unchanged (見+ます against やる+ます).
+    """
+    from .mecab import mecab_analyze
+
+    probe = mecab_analyze(surface + "ます")
+    return (
+        len(probe) == 2
+        and probe[0].get("surface") == surface
+        and probe[0].get("pos") == "動詞"
+        and probe[0].get("conj_form") == "連用形"
+    )
+
+
+def postprocess_classical_past_izenkei_shika(tokens: list[dict]) -> bool:
+    """Classify しか after a verb continuative as the classical past auxiliary き.
+
+    The reference analyzer already reads it that way when the conditional ば
+    follows (見しかば), and tags the identical pair as the modern exclusive
+    particle as soon as the clause ends there (月こそ見しか). Nothing about the
+    host changes between the two: the exclusive particle attaches to a nominal
+    and needs a negative to complete it (これしかない, 水しか飲まない), and a
+    finite verb in front of it keeps that reading (見るしかない), so it is the
+    continuative host that decides.
+    """
+    changed = False
+    for idx in range(1, len(tokens)):
+        token = tokens[idx]
+        if (
+            token.get("surface") == "しか"
+            and token.get("pos") == "Particle"
+            and tokens[idx - 1].get("pos") == "Verb"
+            and _spells_verb_continuative(tokens[idx - 1].get("surface", ""))
+        ):
+            token["pos"] = "Auxiliary"
+            token["lemma"] = "き"
+            changed = True
+    return changed
+
+
 def postprocess_honorific_i_adjective(tokens: list[dict]) -> bool:
     """Restore an i-adjective ending in -しい after honorific prefix お."""
     changed = False
@@ -3016,6 +3061,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("closed-subsidiary-aux", postprocess_closed_subsidiary_aux),
     ("classical-focus-namu", postprocess_classical_focus_namu),
     ("classical-copula-nari", postprocess_classical_copula_nari),
+    ("classical-past-izenkei-shika", postprocess_classical_past_izenkei_shika),
     ("honorific-i-adjective", postprocess_honorific_i_adjective),
     ("i-adjective-upper-bound", postprocess_i_adjective_upper_bound),
     ("kadouka-adverb", postprocess_kadouka_adverb),
