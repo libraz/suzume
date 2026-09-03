@@ -502,7 +502,28 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
         if (base_cps.size() >= 3 && normalize::isKanjiCodepoint(base_cps[0])) {
           std::vector<char32_t> hira_only(base_cps.begin() + 1, base_cps.end());
           std::string hira_portion = normalize::utf8::encode(hira_only);
-          if (verb_helpers::hasDictionaryEntry(dict_manager, hira_portion, core::PartOfSpeech::Auxiliary) ||
+          // A dictionary verb in the tail settles the split on its own: the
+          // compound reading would need a nominal as its first element, and no
+          // compound verb is built that way (我+ある).
+          //
+          // An auxiliary does not, because a bound kana tail is exactly what
+          // okurigana looks like, and a whole class of verbs is spelled that
+          // way (惜しむ, 親しむ, 苦しむ all carry the classical causative しむ).
+          // Two things put the split back beyond doubt, either one on its own:
+          //   - the auxiliary is one a nominal can host, so noun-plus-auxiliary
+          //     is a licensed reading of the same characters (本+どす). The
+          //     bigram table already holds that judgment; an auxiliary bound to
+          //     a conjugated cell, as the causative is, is barred there.
+          //   - the candidate opened inside a kanji run, so its head is a
+          //     fragment of a compound (確認 sliced into 認+らむ). Okurigana
+          //     belongs to a whole word, and a stem never starts mid-compound,
+          //     so the tail cannot be okurigana whatever else it is.
+          const auto* aux_entry = dict_manager->lookupExact(hira_portion, core::PartOfSpeech::Auxiliary);
+          const bool nominal_hosts_auxiliary =
+              aux_entry != nullptr &&
+              BigramTable::getCost(core::ExtendedPOS::Noun, aux_entry->extended_pos) <= bigram_cost::kNeutral;
+          const bool opens_inside_kanji_run = start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]);
+          if ((aux_entry != nullptr && (nominal_hosts_auxiliary || opens_inside_kanji_run)) ||
               verb_helpers::isVerbInDictionary(dict_manager, hira_portion)) {
             base_cost += bigram_cost::kRare;
             SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface
