@@ -266,9 +266,17 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     // つまずいる or 泣う, but the sound change itself still determines く/ぐ.
     const bool contracted_shimau_follows =
         next_extended_pos == core::ExtendedPOS::AuxAspectShimau && utf8::startsWithAny(next_surface, {"ちゃ", "じゃ"});
+    // Casual speech fuses the subsidiary verb onto the て/で of the te-form
+    // (ている→てる, ておく→とく, でおく→どく, ておる→とる). The euphonic stem in
+    // front of it is unchanged, and the morpheme that selects its row is still
+    // spelled by the contraction's first mora, so the same reconstruction
+    // applies (置い+てる ← 置く, 脱い+どく ← 脱ぐ).
+    const bool contracted_te_aspect_follows = (next_extended_pos == core::ExtendedPOS::AuxAspectIru ||
+                                               next_extended_pos == core::ExtendedPOS::AuxAspectOku) &&
+                                              utf8::startsWithAny(next_surface, {"て", "で", "と", "ど"});
     const bool has_i_onbin_follower =
         utf8::equalsAny(next_surface, {"た", "て", "たり", "たら", "だ", "で", "だり", "だら"}) ||
-        contracted_shimau_follows;
+        contracted_shimau_follows || contracted_te_aspect_follows;
     if (morpheme.pos == core::PartOfSpeech::Verb && utf8::endsWith(morpheme.surface, "い") &&
         morpheme.surface.size() >= core::kTwoJapaneseCharBytes && has_i_onbin_follower &&
         !(morpheme.extended_pos == core::ExtendedPOS::VerbOnbinkei && morpheme.lemma != morpheme.surface &&
@@ -311,8 +319,9 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
         morpheme.lemma = godan_ga_base;
       } else if (has_godan_ka_entry) {
         morpheme.lemma = godan_ka_base;
-      } else if (utf8::equalsAny(next_surface, {"だ", "で", "だり", "だら"}) ||
-                 utf8::startsWith(next_surface, "じゃ")) {
+      } else if (utf8::startsWithAny(next_surface, {"だ", "で", "ど", "じゃ"})) {
+        // The voicing lives in the first mora of the te/ta morpheme, which a
+        // contraction keeps (泳い+だ, 泳い+でる, 脱い+どく all select ガ行).
         morpheme.lemma = godan_ga_base;  // GodanGa: 泳い+だ → 泳ぐ
       } else {
         morpheme.lemma = godan_ka_base;  // GodanKa: 書い+た → 書く
