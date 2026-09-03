@@ -1330,6 +1330,129 @@
       ],
       "id": "ni_tosareta_chi_ga_u",
       "input": "地面に落とされた落ち葉が舞う"
+    },
+    {
+      "description": "Literary imperative of an ichidan compound verb",
+      "expected": [
+        {
+          "lemma": "呼び続ける",
+          "pos": "Verb",
+          "surface": "呼び続けよ"
+        },
+        {
+          "lemma": "誰",
+          "pos": "Pronoun",
+          "surface": "誰"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "答える",
+          "pos": "Verb",
+          "surface": "答え"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なく"
+        },
+        {
+          "lemma": "とも",
+          "pos": "Particle",
+          "surface": "とも"
+        }
+      ],
+      "id": "bi_keyo_mo_enakutomo",
+      "input": "呼び続けよ、誰も答えなくとも。"
+    },
+    {
+      "description": "Colloquial imperative of an ichidan compound verb",
+      "expected": [
+        {
+          "lemma": "名前",
+          "pos": "Noun",
+          "surface": "名前"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "呼び続ける",
+          "pos": "Verb",
+          "surface": "呼び続けろ"
+        }
+      ],
+      "id": "wo_bi_kero",
+      "input": "名前を呼び続けろ"
+    },
+    {
+      "description": "Volitional of an ichidan compound verb",
+      "expected": [
+        {
+          "lemma": "名前",
+          "pos": "Noun",
+          "surface": "名前"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "呼び続ける",
+          "pos": "Verb",
+          "surface": "呼び続けよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "wo_bi_keyou",
+      "input": "名前を呼び続けよう"
+    },
+    {
+      "description": "Godan compound imperative before a comma",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "刻み込む",
+          "pos": "Verb",
+          "surface": "刻み込め"
+        },
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        }
+      ],
+      "id": "ni_mi_me_kono_wo",
+      "input": "心に刻み込め、この日を。"
     }
   ],
   "description": "Compound verbs (part 5/5)",
