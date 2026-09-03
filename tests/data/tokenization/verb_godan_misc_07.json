@@ -2328,6 +2328,139 @@
       ],
       "id": "beyouganai",
       "input": "食べようがない"
+    },
+    {
+      "description": "野に生く草の如くあらん - auto-generated",
+      "expected": [
+        {
+          "lemma": "野",
+          "pos": "Noun",
+          "surface": "野"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "生く",
+          "pos": "Verb",
+          "surface": "生く"
+        },
+        {
+          "lemma": "草",
+          "pos": "Noun",
+          "surface": "草"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "如し",
+          "pos": "Auxiliary",
+          "surface": "如く"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あら"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "ni_ku_no_kuaran",
+      "input": "野に生く草の如くあらん"
+    },
+    {
+      "description": "風の如くあらん - auto-generated",
+      "expected": [
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "如し",
+          "pos": "Auxiliary",
+          "surface": "如く"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あら"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "no_kuaran",
+      "input": "風の如くあらん"
+    },
+    {
+      "description": "草の如く歩く - auto-generated",
+      "expected": [
+        {
+          "lemma": "草",
+          "pos": "Noun",
+          "surface": "草"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "如し",
+          "pos": "Auxiliary",
+          "surface": "如く"
+        },
+        {
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩く"
+        }
+      ],
+      "id": "no_ku_ku",
+      "input": "草の如く歩く"
+    },
+    {
+      "description": "そこにあらん - auto-generated",
+      "expected": [
+        {
+          "lemma": "そこ",
+          "pos": "Pronoun",
+          "surface": "そこ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あら"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "sokoniaran",
+      "input": "そこにあらん"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",

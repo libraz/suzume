@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "description": "何もせん - auto-generated",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "mosen",
+      "input": "何もせん"
+    }
+  ],
+  "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",
+  "version": "1.0"
+}

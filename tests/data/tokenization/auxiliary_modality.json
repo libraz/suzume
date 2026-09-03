@@ -2611,6 +2611,33 @@
       ],
       "id": "rashiiyone",
       "input": "本当らしいよね。"
+    },
+    {
+      "description": "鬼の如き形相 - auto-generated",
+      "expected": [
+        {
+          "lemma": "鬼",
+          "pos": "Noun",
+          "surface": "鬼"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "如し",
+          "pos": "Auxiliary",
+          "surface": "如き"
+        },
+        {
+          "lemma": "形相",
+          "pos": "Noun",
+          "surface": "形相"
+        }
+      ],
+      "id": "no_ki",
+      "input": "鬼の如き形相"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい)",
