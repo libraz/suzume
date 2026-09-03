@@ -1,0 +1,104 @@
+{
+  "cases": [
+    {
+      "description": "これは義務なり - auto-generated",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "義務",
+          "pos": "Noun",
+          "surface": "義務"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        }
+      ],
+      "id": "koreha_nari",
+      "input": "これは義務なり"
+    },
+    {
+      "description": "これは学生なり - auto-generated",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "学生",
+          "pos": "Noun",
+          "surface": "学生"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        }
+      ],
+      "id": "koreha_nari_2",
+      "input": "これは学生なり"
+    },
+    {
+      "description": "燃えさかりし炎 - auto-generated",
+      "expected": [
+        {
+          "lemma": "燃えさかる",
+          "pos": "Verb",
+          "surface": "燃えさかり"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "し"
+        },
+        {
+          "lemma": "炎",
+          "pos": "Noun",
+          "surface": "炎"
+        }
+      ],
+      "id": "esakarishi",
+      "input": "燃えさかりし炎"
+    },
+    {
+      "description": "寒いし暗い - auto-generated",
+      "expected": [
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒い"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        },
+        {
+          "lemma": "暗い",
+          "pos": "Adjective",
+          "surface": "暗い"
+        }
+      ],
+      "id": "ishi_i",
+      "input": "寒いし暗い"
+    }
+  ],
+  "description": "classical_auxiliary tests",
+  "version": "1.0"
+}
