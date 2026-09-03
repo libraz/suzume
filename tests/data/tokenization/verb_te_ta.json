@@ -1484,6 +1484,154 @@
       ],
       "id": "wo_ndeshimau",
       "input": "本を読んでしまう。"
+    },
+    {
+      "description": "A te-form before the continuative auxiliary keeps its boundary after a case particle",
+      "expected": [
+        {
+          "lemma": "同僚",
+          "pos": "Noun",
+          "surface": "同僚"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "すら",
+          "pos": "Particle",
+          "surface": "すら"
+        },
+        {
+          "lemma": "秘密",
+          "pos": "Noun",
+          "surface": "秘密"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nisura_nishiteita",
+      "input": "同僚にすら秘密にしていた"
+    },
+    {
+      "description": "The same boundary holds for a bare nominal adverbial host",
+      "expected": [
+        {
+          "lemma": "元気",
+          "pos": "Adjective",
+          "surface": "元気"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nishiteita",
+      "input": "元気にしていた"
+    },
+    {
+      "description": "Negative control: a one-mora auxiliary homograph at the head of an onbin stem is not a boundary",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "たどる",
+          "pos": "Verb",
+          "surface": "たどっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wotadottta",
+      "input": "道をたどった"
+    },
+    {
+      "description": "Negative control: the te-form before a subsidiary verb is unchanged",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "持つ",
+          "pos": "Verb",
+          "surface": "持っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "いく"
+        }
+      ],
+      "id": "wo_ttteiku",
+      "input": "本を持っていく"
     }
   ],
   "description": "Te-form and ta-form patterns",
