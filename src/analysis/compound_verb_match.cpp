@@ -24,6 +24,10 @@ bool isNumeralOnlySpan(const std::vector<char32_t>& codepoints, size_t start_pos
   return true;
 }
 
+// The Ichidan imperative has two endings, the colloquial ろ and the literary
+// よ, and both attach to the bare stem.
+constexpr std::array<const char*, 2> kIchidanImperativeEndings = {"ろ", "よ"};
+
 bool hasAuxiliarySuffix(std::string_view suffix) {
   return !suffix.empty() && utf8::containsAny(suffix, {"た", "て", "で", "だ", "ない", "れ"});
 }
@@ -365,12 +369,13 @@ CompoundVerbMatch findCompoundVerbMatch(
       tryKateikei(hira_kateikei, true);
     }
 
-    // A Godan V2 exposes its o-row stem before the closed volitional auxiliary
-    // う (考え出そ+う, 取り戻そ+う). Match the stem even when a shorter V2
-    // renyokei is homographic with its prefix (出る→出), because the following
-    // auxiliary supplies decisive inflectional evidence.
+    // A V2 exposes its volitional stem before the closed auxiliary う — the
+    // o-row for a Godan verb (考え出そ+う, 取り戻そ+う), the bare stem plus よ for
+    // an Ichidan one (呼び続けよ+う). Match the stem even when a shorter V2
+    // renyokei is homographic with its prefix (出る→出, and every Ichidan stem),
+    // because the following auxiliary supplies decisive inflectional evidence.
     bool matched_volitional = false;
-    if (v2_verb.verb_type == V2VerbType::Godan) {
+    {
       const std::string kanji_volitional =
           v2_verb.joins_surface ? generateVolitionalStem(v2_surface, "", v2_verb.verb_type) : "";
       const std::string hira_volitional =
@@ -403,6 +408,10 @@ CompoundVerbMatch findCompoundVerbMatch(
       };
       tryVolitional(kanji_volitional, false);
       tryVolitional(hira_volitional, true);
+      if (matched_volitional) {
+        matched_renyokei = false;
+        is_renyokei_entry = false;
+      }
     }
 
     // Keep a Godan mizenkei before its auxiliary separate.  Otherwise an
@@ -535,28 +544,54 @@ CompoundVerbMatch findCompoundVerbMatch(
       }
     }
 
-    // Case 4: the V2 imperative, which is the same e-row surface the kateikei
-    // is built on (刻み+込め, 書き+込め). Nothing follows it, and that is what
-    // separates it from the competing readings of those characters: the
-    // conditional needs its ば, and the potential's stem needs the auxiliary it
-    // is a stem for. A predicate closing the sentence is the imperative, so the
-    // compound keeps its boundary here as it does in every other cell.
+    // Case 4: the V2 imperative. A Godan verb spells it with the e-row, the
+    // same surface the kateikei is built on (刻み+込め, 書き+込め); an Ichidan
+    // verb spells it as its stem plus ろ or よ (呼び続けろ, 呼び続けよ). Nothing
+    // follows it, and that is what separates it from the competing readings of
+    // those characters: the conditional needs its ば, the potential's stem needs
+    // the auxiliary it is a stem for, and the Ichidan stem alone is a
+    // continuative, which no sentence ends on. A predicate closing the sentence
+    // is the imperative, so the compound keeps its boundary here as it does in
+    // every other cell.
+    // The Ichidan stem is also what the renyokei match reads, and that match is
+    // there to leave a following auxiliary as its own token (申し上げ+ます). ろ
+    // and よ closing the text are not auxiliaries, and a continuative does not
+    // end a sentence, so the imperative replaces the renyokei reading there.
     bool matched_imperative = false;
-    if (!matched_kanji && !matched_reading && !matched_renyokei && !matched_potential && !matched_kateikei &&
-        !matched_volitional && !matched_inflected && !matched_mizenkei && v2_verb.verb_type == V2VerbType::Godan) {
+    if (!matched_kanji && !matched_reading && !matched_potential && !matched_kateikei && !matched_volitional &&
+        !matched_inflected && !matched_mizenkei && (!matched_renyokei || v2_verb.verb_type == V2VerbType::Ichidan)) {
       auto tryImperative = [&](const std::string& imperative, bool via_reading) {
-        if (matched_imperative || imperative.empty() || v2_start_byte + imperative.size() != text.size()) {
+        if (matched_imperative || imperative.empty() || v2_start_byte + imperative.size() > text.size()) {
           return;
         }
         if (text.substr(v2_start_byte, imperative.size()) != imperative) {
+          return;
+        }
+        // Nothing predicative follows an imperative. That is the end of the
+        // text, or a punctuation mark closing the clause for it (呼び続けよ、…).
+        const size_t imperative_end = v2_start + normalize::utf8Length(imperative);
+        if (imperative_end < char_types.size() && char_types[imperative_end] != CharType::Symbol) {
           return;
         }
         matched_imperative = true;
         matched_len = imperative.size();
         matched_renyokei_via_reading = via_reading;
       };
-      tryImperative(v2_verb.joins_surface ? generateKateikei(v2_surface, "", v2_verb.verb_type) : "", false);
-      tryImperative(!v2_reading.empty() ? generateKateikei(v2_reading, "", v2_verb.verb_type) : "", true);
+      if (v2_verb.verb_type == V2VerbType::Godan) {
+        tryImperative(v2_verb.joins_surface ? generateKateikei(v2_surface, "", v2_verb.verb_type) : "", false);
+        tryImperative(!v2_reading.empty() ? generateKateikei(v2_reading, "", v2_verb.verb_type) : "", true);
+      } else {
+        const std::string kanji_stem = v2_verb.joins_surface ? generateRenyokei(v2_surface, "", v2_verb.verb_type) : "";
+        const std::string hira_stem = !v2_reading.empty() ? generateRenyokei(v2_reading, "", v2_verb.verb_type) : "";
+        for (const auto* ending : kIchidanImperativeEndings) {
+          tryImperative(kanji_stem.empty() ? "" : normalize::concat(kanji_stem, ending), false);
+          tryImperative(hira_stem.empty() ? "" : normalize::concat(hira_stem, ending), true);
+        }
+        if (matched_imperative) {
+          matched_renyokei = false;
+          is_renyokei_entry = false;
+        }
+      }
     }
 
     if (!matched_kanji && !matched_reading && !matched_renyokei && !matched_potential && !matched_kateikei &&

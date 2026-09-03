@@ -114,10 +114,15 @@ std::string generateMizenkei(std::string_view surface, std::string_view reading,
 }
 
 std::string generateVolitionalStem(std::string_view surface, std::string_view reading, V2VerbType verb_type) {
-  if (verb_type != V2VerbType::Godan) {
-    return "";
-  }
   const std::string_view base = reading.empty() ? surface : reading;
+  // An Ichidan verb forms its volitional from the bare stem plus よ, where a
+  // Godan verb uses its o-row (続けよ+う against 出そ+う).
+  if (verb_type == V2VerbType::Ichidan) {
+    if (base.size() < core::kJapaneseCharBytes) {
+      return "";
+    }
+    return normalize::concat(base.substr(0, base.size() - core::kJapaneseCharBytes), "よ");
+  }
   return replaceGodanEnding(base, true);
 }
 
