@@ -10,6 +10,7 @@
 #include "adjective_candidates.h"
 #include "adjective_candidates_internal.h"
 #include "analysis/candidate_constants.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "normalize/utf8.h"
@@ -21,6 +22,35 @@ namespace suzume::analysis {
 using verb_helpers::addEmphaticVariants;
 using verb_helpers::isAdjectiveInDictionary;
 using verb_helpers::isVerbInDictionary;
+
+namespace {
+
+// Whether the head of a nominal opens at @p pos. A kanji and a katakana run
+// both start a lexical word, and neither spells a cell of any auxiliary, so
+// either one proves that the position before it is an adnominal slot.
+bool nominalHeadFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
+  return pos < codepoints.size() &&
+         (kana::isKanjiCodepoint(codepoints[pos]) || kana::isKatakanaCodepoint(codepoints[pos]));
+}
+
+// Whether the stem ending just before @p shi_pos is the 未然形 of a known godan
+// verb, which is what the シク活用 suffix derives an adjective from (喜ば+しい ←
+// 喜ぶ, 疑わ+しい ← 疑う, 好ま+しい ← 好む). The derivation is productive, so the
+// verb is the evidence the adjective itself cannot supply.
+bool derivesShikuFromGodanMizenkei(const std::vector<char32_t>& codepoints, size_t start_pos, size_t shi_pos,
+                                   const dictionary::DictionaryManager* dict_manager) {
+  if (shi_pos < start_pos + 2) {
+    return false;
+  }
+  const std::string_view base_suffix = grammar::godanBaseSuffixFromARow(codepoints[shi_pos - 1]);
+  if (base_suffix.empty()) {
+    return false;
+  }
+  const std::string base = extractSubstring(codepoints, start_pos, shi_pos - 1) + std::string(base_suffix);
+  return verb_helpers::isVerbInDictionary(dict_manager, base);
+}
+
+}  // namespace
 
 void adj_detail::appendKanjiIAdjPostVariants(const std::vector<char32_t>& codepoints, size_t start_pos,
                                              size_t kanji_end, size_t hiragana_end,
@@ -117,7 +147,15 @@ void adj_detail::appendKanjiIAdjPostVariants(const std::vector<char32_t>& codepo
       }
       std::string ki_stem = extractSubstring(codepoints, start_pos, ki_pos);
       std::string ki_lemma = ki_stem + "い";
-      if (!isAdjectiveInDictionary(dict_manager, ki_lemma)) {
+      // The シク活用 subclass derives productively off a godan 未然形 (喜ばしい ←
+      // 喜ぶ, 疑わしい ← 疑う), so its members cannot be enumerated; the base verb
+      // carries the evidence instead. Adnominal position settles the competing
+      // reading: it spells the classical past き, whose 終止形 cannot modify the
+      // nominal that follows, and whose 連体形 is spelled し.
+      const bool productive_shiku_attributive =
+          ki_pos > start_pos && codepoints[ki_pos - 1] == U'し' && nominalHeadFollowsAt(codepoints, ki_pos + 1) &&
+          derivesShikuFromGodanMizenkei(codepoints, start_pos, ki_pos - 1, dict_manager);
+      if (!productive_shiku_attributive && !isAdjectiveInDictionary(dict_manager, ki_lemma)) {
         continue;
       }
       // If stem + く is a real godan-ka verb, Xき is its 連用形 (行き, 焼き),
