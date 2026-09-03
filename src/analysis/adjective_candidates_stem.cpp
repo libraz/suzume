@@ -721,6 +721,17 @@ bool isModernIAdjective(const std::string& lemma, const grammar::Inflection& inf
   return false;
 }
 
+// The modern base of a ku-paradigm stem that ends in け, when that base is a
+// na-adjective spelling the same stem with か (静け -> 静か). Empty when no such
+// adjective is registered, which is the ordinary case for a verb stem in け.
+std::string classicalKuStemNaAdjectiveBase(const std::string& stem, const dictionary::DictionaryManager* dict_manager) {
+  if (!utf8::endsWith(stem, "け")) {
+    return {};
+  }
+  const std::string base = normalize::concat(utf8::dropLastChar(stem), "か");
+  return isAdjectiveInDictionary(dict_manager, base) ? base : std::string{};
+}
+
 bool hasDictionaryVerifiedVerbAnalysis(const std::string& surface, const grammar::Inflection& inflection,
                                        const dictionary::DictionaryManager* dict_manager) {
   const auto& analyses = inflection.analyze(surface);
@@ -758,7 +769,16 @@ void appendIAdjClassicalTerminalCandidates(const std::vector<char32_t>& codepoin
     if (!verb_helpers::isAdjectiveInDictionary(dict_manager, lemma)) {
       lemma = stem + "い";
       if (!verb_helpers::isAdjectiveInDictionary(dict_manager, lemma)) {
-        continue;
+        // Part of the ku paradigm survives into the modern language as a
+        // na-adjective rather than an i-adjective, and there the classical stem
+        // replaces that adjective's final か with け (静か -> 静け+し, 明らか ->
+        // 明らけ+し). Probing the か spelling recovers the base the surface no
+        // longer carries; without it the terminal falls back on an invented
+        // ichidan verb over the same stem.
+        lemma = classicalKuStemNaAdjectiveBase(stem, dict_manager);
+        if (lemma.empty()) {
+          continue;
+        }
       }
     }
     UnknownCandidate terminal;
