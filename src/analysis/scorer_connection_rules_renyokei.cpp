@@ -41,8 +41,15 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   // nominalization plus a short homographic verb from winning solely through
   // an unrelated lexical word cost.  The same semantic group covers two
   // closed inflectional continuations: 係結び+仮定形 and 〜ておく+べき.
-  const bool compound_connective =
-      prev.origin == core::CandidateOrigin::VerbCompound && next.extended_pos == core::ExtendedPOS::ParticleConj;
+  // し is excluded because it is not one of those continuations: it coordinates
+  // finite clauses and so selects a terminal form (寒いし、暗い), which a
+  // continuative is not. After one, that mora can only be the literary past き
+  // in its attributive cell (燃えさかり+し炎), and paying the compound to keep
+  // its unit through a particle it cannot take hands the boundary to the wrong
+  // reading.
+  const bool compound_connective = prev.origin == core::CandidateOrigin::VerbCompound &&
+                                   next.extended_pos == core::ExtendedPOS::ParticleConj &&
+                                   !utf8::equalsAny(next.surface, {"し"});
   const bool binding_hypothetical =
       prev.extended_pos == core::ExtendedPOS::ParticleBinding && next.extended_pos == core::ExtendedPOS::VerbKateikei;
   const bool preparatory_obligation =
