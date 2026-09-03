@@ -262,9 +262,14 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
   // A bare な licenses an attributive na-adjective stem, but なら does not:
   // nouns and na-adjectives both take conditional なら, so generating an
   // adjective for every unknown kanji compound would destroy that ambiguity.
+  // The classical copula なり and the nominalizer なの are ambiguous in the same
+  // way and are excluded for the same reason: 体言+なり is the nominal predicate
+  // and stem+なり is the classical adjective's terminal form, so the mora after
+  // な decides nothing and the neutral nominal reading stands.
   const bool followed_by_na = kanji_end < codepoints.size() && codepoints[kanji_end] == U'な' &&
                               (kanji_end + 1 >= codepoints.size() ||
-                               (codepoints[kanji_end + 1] != U'ら' && codepoints[kanji_end + 1] != U'の'));
+                               (codepoints[kanji_end + 1] != U'ら' && codepoints[kanji_end + 1] != U'の' &&
+                                codepoints[kanji_end + 1] != U'り'));
   const bool followed_by_sou =
       kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == U'そ' && codepoints[kanji_end + 1] == U'う';
   // Productive X+可能 is a capability noun compound whose following な is
