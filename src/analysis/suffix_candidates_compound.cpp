@@ -53,15 +53,24 @@ bool strandsParticleLikeMoraBeforeNominalSelector(const dictionary::DictionaryMa
          hasNominalPhraseSelectorAt(dict_manager, codepoints, candidate_end + 1);
 }
 
+// A particle and a determiner are both fixed forms of a closed class: neither
+// derives from anything or inflects, so neither has an interior a word boundary
+// could fall on.
+bool isUninflectedClosedClass(const dictionary::DictionaryEntry& entry) {
+  return entry.pos == core::PartOfSpeech::Particle || entry.pos == core::PartOfSpeech::Determiner;
+}
+
 /**
- * @brief Whether the span boundary falls inside a dictionary particle.
+ * @brief Whether the span boundary falls inside a fixed closed-class word.
  *
- * A compound noun cannot end part-way through a closed-class word: 読まれども is
- * 読ま + れ + ども, so a span reaching only 読まれど has cut the concessive
- * conjunction in half and owes its score to that cut.
+ * A compound noun cannot end part-way through one: 読まれども is 読ま + れ +
+ * ども, so a span reaching only 読まれど has cut the concessive conjunction in
+ * half and owes its score to that cut. A determiner is cut the same way when it
+ * follows a predicate, because its first mora completes a plausible mixed-script
+ * span and its second is a particle on its own (走るそ|の for 走る + その).
  */
-bool boundarySplitsDictionaryParticle(const dictionary::DictionaryManager* dict_manager,
-                                      const std::vector<char32_t>& codepoints, size_t kanji_end, size_t end_pos) {
+bool boundarySplitsClosedClassWord(const dictionary::DictionaryManager* dict_manager,
+                                   const std::vector<char32_t>& codepoints, size_t kanji_end, size_t end_pos) {
   if (dict_manager == nullptr || end_pos >= codepoints.size()) {
     return false;
   }
@@ -69,7 +78,7 @@ bool boundarySplitsDictionaryParticle(const dictionary::DictionaryManager* dict_
   const size_t probe_end = std::min(codepoints.size(), end_pos + 2);
   for (size_t start = scan_start; start < end_pos; ++start) {
     if (hasDictionaryEntryFrom(dict_manager, codepoints, start, end_pos + 1 - start, probe_end - start,
-                               core::PartOfSpeech::Particle, nullptr)) {
+                               core::PartOfSpeech::Unknown, &isUninflectedClosedClass)) {
       return true;
     }
   }
@@ -1144,9 +1153,9 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
     return;
   }
 
-  // Skip when the span boundary cuts a dictionary particle in half
-  // (読まれど|も for 読ま + れ + ども).
-  if (boundarySplitsDictionaryParticle(dict_manager, codepoints, kanji_end, hiragana_end)) {
+  // Skip when the span boundary cuts a fixed closed-class word in half
+  // (読まれど|も for 読ま + れ + ども, 走るそ|の for 走る + その).
+  if (boundarySplitsClosedClassWord(dict_manager, codepoints, kanji_end, hiragana_end)) {
     return;
   }
 
