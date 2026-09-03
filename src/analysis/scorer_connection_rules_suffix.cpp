@@ -311,10 +311,17 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
     SUZUME_CONNECTION_ADD(bonus, sc::kBonusVerifiedTerminalAfterObject);
   }
 
-  // A nominative case particle directly introduces a finite predicate. Keep a
-  // dictionary verb at this boundary ahead of a shorter homographic split.
-  if (prev.extended_pos == core::ExtendedPOS::ParticleCase && utf8::equalsAny(prev.surface, {"が"}) &&
-      next.extended_pos == core::ExtendedPOS::VerbShuushikei && next.fromDictionary()) {
+  // A case particle directly introduces a finite predicate, whatever role it
+  // marks (雪が降り積もる, 雪のように降り積もる). Keep a dictionary verb at that
+  // boundary ahead of a shorter homographic split, which for a lexical compound
+  // is its own first member: the continuative bonus below pays that member and
+  // nothing pays the compound. The accusative is excluded because the two rules
+  // above already weigh it, and the quotative と and instrumental で for the
+  // reason the sibling continuative rule gives - the boundary behind them is
+  // homographic with という and です.
+  if (prev.extended_pos == core::ExtendedPOS::ParticleCase && !utf8::equalsAny(prev.surface, {"と", "で"}) &&
+      !grammar::isAccusativeParticleWoSurface(prev.surface) && next.extended_pos == core::ExtendedPOS::VerbShuushikei &&
+      next.fromDictionary()) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }
 
