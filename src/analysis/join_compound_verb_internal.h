@@ -65,6 +65,7 @@ struct CompoundVerbMatch {
   bool is_mizenkei = false;
   bool is_volitional = false;
   bool is_kateikei = false;
+  bool is_imperative = false;
   bool is_potential = false;
   bool includes_aux = false;
   bool matched_via_reading = false;

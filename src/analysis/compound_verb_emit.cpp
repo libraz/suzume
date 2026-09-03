@@ -341,8 +341,11 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
     // and lose to 気持ち+で rather than winning as a spurious 持ちで compound.
     bool renyokei_multichar = best_match.renyokei_form && best_match.matched_len >= core::kTwoJapaneseCharBytes;
     core::ExtendedPOS compound_epos =
-        best_match.is_kateikei ? core::ExtendedPOS::VerbKateikei
-                               : (renyokei_multichar ? core::ExtendedPOS::VerbRenyokei : core::ExtendedPOS::Unknown);
+        best_match.is_imperative
+            ? core::ExtendedPOS::VerbMeireikei
+            : (best_match.is_kateikei
+                   ? core::ExtendedPOS::VerbKateikei
+                   : (renyokei_multichar ? core::ExtendedPOS::VerbRenyokei : core::ExtendedPOS::Unknown));
     const bool fuses_past_auxiliary = best_match.includes_aux && utf8::endsWithAny(compound_surface, {"た", "だ"});
     if (!fuses_past_auxiliary) {
       lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),

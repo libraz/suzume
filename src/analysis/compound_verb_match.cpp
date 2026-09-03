@@ -522,8 +522,32 @@ CompoundVerbMatch findCompoundVerbMatch(
       }
     }
 
+    // Case 4: the V2 imperative, which is the same e-row surface the kateikei
+    // is built on (刻み+込め, 書き+込め). Nothing follows it, and that is what
+    // separates it from the competing readings of those characters: the
+    // conditional needs its ば, and the potential's stem needs the auxiliary it
+    // is a stem for. A predicate closing the sentence is the imperative, so the
+    // compound keeps its boundary here as it does in every other cell.
+    bool matched_imperative = false;
     if (!matched_kanji && !matched_reading && !matched_renyokei && !matched_potential && !matched_kateikei &&
-        !matched_volitional && !matched_inflected && !matched_mizenkei) {
+        !matched_volitional && !matched_inflected && !matched_mizenkei && v2_verb.verb_type == V2VerbType::Godan) {
+      auto tryImperative = [&](const std::string& imperative, bool via_reading) {
+        if (matched_imperative || imperative.empty() || v2_start_byte + imperative.size() != text.size()) {
+          return;
+        }
+        if (text.substr(v2_start_byte, imperative.size()) != imperative) {
+          return;
+        }
+        matched_imperative = true;
+        matched_len = imperative.size();
+        matched_renyokei_via_reading = via_reading;
+      };
+      tryImperative(v2_verb.joins_surface ? generateKateikei(v2_surface, "", v2_verb.verb_type) : "", false);
+      tryImperative(!v2_reading.empty() ? generateKateikei(v2_reading, "", v2_verb.verb_type) : "", true);
+    }
+
+    if (!matched_kanji && !matched_reading && !matched_renyokei && !matched_potential && !matched_kateikei &&
+        !matched_volitional && !matched_inflected && !matched_mizenkei && !matched_imperative) {
       continue;
     }
 
@@ -544,7 +568,7 @@ CompoundVerbMatch findCompoundVerbMatch(
                              << " renyokei=" << matched_renyokei << " potential=" << matched_potential
                              << " kateikei=" << matched_kateikei << " inflected=" << matched_inflected
                              << " mizenkei=" << matched_mizenkei << " volitional=" << matched_volitional
-                             << " len=" << matched_len << "\n");
+                             << " imperative=" << matched_imperative << " len=" << matched_len << "\n");
 
     const CompoundV1Verification v1 = verifyCompoundVerbV1({
         text,
@@ -756,6 +780,11 @@ CompoundVerbMatch findCompoundVerbMatch(
       // A lexical V2 base form (続ける) takes precedence over an overlapping
       // potential form generated from a different Godan V2 (続く→続ける).
       should_update = true;
+    } else if ((matched_kanji || matched_reading || matched_renyokei) && best_match.is_imperative) {
+      // Any lexical V2 match outranks an imperative generated off a different
+      // Godan V2 that happens to spell the same characters: つけ is the
+      // continuative of the listed つける before it is the imperative of つく.
+      should_update = true;
     } else if (best_match.is_mizenkei && (matched_kanji || matched_reading)) {
       // A full V2 base-form match (組み合わせる via ichidan 合わせる) competes
       // with a shorter V2-mizenkei causative/passive reading of another table
@@ -774,6 +803,7 @@ CompoundVerbMatch findCompoundVerbMatch(
       best_match.is_mizenkei = matched_mizenkei;
       best_match.is_volitional = matched_volitional;
       best_match.is_kateikei = matched_kateikei;
+      best_match.is_imperative = matched_imperative;
       best_match.is_potential = matched_potential;
       best_match.includes_aux = inflection_includes_aux;
       best_match.matched_via_reading = matched_reading || matched_inflected || matched_renyokei_via_reading;
