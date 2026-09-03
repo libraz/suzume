@@ -116,13 +116,17 @@ float computeAdjectiveDictBonus(const core::LatticeEdge& edge) {
 float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
   float penalty{};
 
-  // Penalty for spurious kanji+hiragana verb renyokei not in dictionary
+  // Penalty for a spurious kanji+hiragana verb stem not in the dictionary
   // These are often false positives like 学生み (学生みる doesn't exist)
   // Prevents misanalysis like 学生みたい → 学生み+たい
   // Only apply to surfaces with 2+ kanji (e.g., 学生み) to avoid penalizing
   // legitimate verb renyokei like 行き, 読み, 書き
-  if (!edge.lemmaVerified() && edge.pos == core::PartOfSpeech::Verb &&
-      edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+  // An Ichidan stem spells its 未然形 and its 連用形 alike, so which cell the
+  // edge was emitted as says nothing about how real the stem is (予算増え+ぬ
+  // fabricates 予算増える exactly as 予算増え+た would). Both cells are covered.
+  const bool is_bare_verb_stem =
+      edge.extended_pos == core::ExtendedPOS::VerbRenyokei || edge.extended_pos == core::ExtendedPOS::VerbMizenkei;
+  if (!edge.lemmaVerified() && edge.pos == core::PartOfSpeech::Verb && is_bare_verb_stem &&
       edge.surface.length() >= core::kThreeJapaneseCharBytes) {  // ≥3 chars (at least 2 kanji + 1 hiragana)
     // Count kanji characters
     size_t kanji_count = 0;
@@ -132,7 +136,7 @@ float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
       }
     }
     if (kanji_count >= 2) {
-      penalty += sc::kPenaltySpuriousVerbRenyokei;
+      penalty += sc::kPenaltySpuriousVerbStem;
     }
   }
 

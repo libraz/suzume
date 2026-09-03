@@ -100,9 +100,9 @@ constexpr float kBonusShortHiraganaVerb = -0.3F;
 // to attach its following te-form particle without reopening a shorter stem.
 constexpr size_t kLongPureHiraganaOnbinMinChars = 4;
 
-// Penalty for spurious kanji+hiragana verb renyokei not in dictionary
+// Penalty for a spurious kanji+hiragana verb stem not in the dictionary
 // E.g., 学生み (学生みる doesn't exist) - false positive
-constexpr float kPenaltySpuriousVerbRenyokei = scale::kStrong;
+constexpr float kPenaltySpuriousVerbStem = scale::kStrong;
 
 // A kanji-containing 音便 candidate without a dictionary-verified lemma is
 // especially prone to absorbing a preceding noun (本あっ from 本+あっ). Unlike
