@@ -1,0 +1,92 @@
+{
+  "cases": [
+    {
+      "description": "世間を経て知識増えぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "世間",
+          "pos": "Noun",
+          "surface": "世間"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "経る",
+          "pos": "Verb",
+          "surface": "経"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "知識",
+          "pos": "Noun",
+          "surface": "知識"
+        },
+        {
+          "lemma": "増える",
+          "pos": "Verb",
+          "surface": "増え"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "wo_te_enu",
+      "input": "世間を経て知識増えぬ"
+    },
+    {
+      "description": "道開けぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "開ける",
+          "pos": "Verb",
+          "surface": "開け"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "kenu",
+      "input": "道開けぬ"
+    },
+    {
+      "description": "予算増えぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "予算",
+          "pos": "Noun",
+          "surface": "予算"
+        },
+        {
+          "lemma": "増える",
+          "pos": "Verb",
+          "surface": "増え"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "enu_2",
+      "input": "予算増えぬ"
+    }
+  ],
+  "description": "verb_ichidan_classical tests",
+  "version": "1.0"
+}
