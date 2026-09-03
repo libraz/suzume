@@ -40,9 +40,12 @@ EntrySpecRange getConjunctionEntries() {
 
       // Topic change (転換)
       conj("さて", ""), adv("さては", ""), verb("さておき", "さておく", EPOS::VerbRenyokei), conj("ところで", ""),
-      // Note: では removed to allow で+は splitting in ではない patterns
-      // MeCab splits 彼女ではない as 彼女+で+は+ない, not 彼女+では+ない
-      conj("それでは", ""),
+      // では is the copula continuative fused with the topic particle, the same
+      // shape as でも. It opens a clause only where nothing precedes it; with a
+      // host in front the same characters are the copula predicating over that
+      // host plus the particle (東京+で+は+なく). The scorer keeps the two apart
+      // through isCopulaFusedConjunction, which covers both members of the pair.
+      conj("では", ""), conj("それでは", ""),
 
       // Additional conjunctions
       conj("いわば", "言わば"), conj("言わば", ""), conj("さもないと", ""), conj("さもなければ", ""),

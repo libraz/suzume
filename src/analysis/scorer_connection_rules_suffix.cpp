@@ -680,22 +680,35 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // Conjunction→content-word bonus from relabeling nominal でも phrases.
   const bool content_before_discourse_demo =
       (core::isContentWord(prev.pos) || prev.pos == core::PartOfSpeech::Pronoun) &&
-      next.extended_pos == core::ExtendedPOS::Conjunction && grammar::isFusedDemo(next.surface);
+      next.extended_pos == core::ExtendedPOS::Conjunction && grammar::isCopulaFusedConjunction(next.surface);
+
+  // The same conjunction opens a clause, and the existential directly behind it
+  // opens nothing: there the copula continuative is building its periphrastic
+  // form and the binding particle sits inside it (で+は+ある, the topic within
+  // である). The focus member is exempt because it is a listed adverbial
+  // particle in its own right and still spells one token in that slot, while
+  // the topic member is a connective and nothing else.
+  const bool fused_topic_before_existential =
+      prev.extended_pos == core::ExtendedPOS::Conjunction &&
+      grammar::copulaFusedConjunctionParticle(prev.surface) == core::hiragana::kHa &&
+      grammar::isCopulaPeriphrasisCell(next.surface);
 
   // Penalty for ADV → でも (CONJ or PART_副) pattern
   // After adverbs, でも should split as で(copula)+も(particle)
   // e.g., それほどでもない → それほど+で+も+ない
   const bool adverb_before_fused_demo =
-      prev.pos == core::PartOfSpeech::Adverb && grammar::isFusedDemo(next.surface) &&
+      prev.pos == core::PartOfSpeech::Adverb && grammar::isCopulaFusedConjunction(next.surface) &&
       (next.pos == core::PartOfSpeech::Conjunction || next.extended_pos == core::ExtendedPOS::ParticleAdverbial);
   const bool adverb_before_focus_mo =
       prev.pos == core::PartOfSpeech::Adverb && prev.fromDictionary() && normalize::utf8Length(prev.surface) == 2 &&
       grammar::containsKanji(prev.surface) && utf8::endsWith(prev.surface, "し") &&
       next.extended_pos == core::ExtendedPOS::ParticleTopic && grammar::isSingleHiragana(next.surface, U'も');
-  if (content_before_discourse_demo || adverb_before_fused_demo || adverb_before_focus_mo) {
-    SUZUME_CONNECTION_ADD(bonus, adverb_before_fused_demo
-                                     ? cost::kAlmostNever
-                                     : (content_before_discourse_demo ? cost::kRare : cost::kDoubleVeryStrongBonus));
+  const bool fused_conjunction_unavailable = content_before_discourse_demo || fused_topic_before_existential;
+  if (fused_conjunction_unavailable || adverb_before_fused_demo || adverb_before_focus_mo) {
+    SUZUME_CONNECTION_ADD(bonus,
+                          adverb_before_fused_demo
+                              ? cost::kAlmostNever
+                              : (fused_conjunction_unavailable ? cost::kProhibitive : cost::kDoubleVeryStrongBonus));
   }
 
   // Penalty for predicate → copula-compound conjunction (だから/だけど/だが/…) pattern

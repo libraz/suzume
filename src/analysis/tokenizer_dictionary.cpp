@@ -974,6 +974,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
   const bool starts_shortened_causative_passive = contextual_candidates.starts_shortened_causative_passive;
 
   size_t longest_conjunction = 0;
+  size_t longest_fixed_conjunction = 0;
   size_t longest_interjection = 0;
   size_t longest_adverb = 0;
   size_t longest_noun = 0;
@@ -981,6 +982,17 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
   for (const auto& result : lookup_results) {
     if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Conjunction) {
       longest_conjunction = std::max(longest_conjunction, result.length);
+      // A conjunction whose surface also spells a productive chain does not own
+      // its span the way a fixed expression does: でも and では are the copula
+      // continuative with a binding particle, and the と-final members are a
+      // predicate plus the conditional と. Both readings compete for the same
+      // characters at a sentence start too (ではあるまいか is で+は+ある+まい+か),
+      // so these must not suppress the shorter auxiliary prefix below. The word
+      // scorer excludes the same two classes from the fixed-expression bonus.
+      if (!grammar::isCopulaFusedConjunction(result.entry->surface) &&
+          !grammar::isConditionalToConjunction(result.entry->surface)) {
+        longest_fixed_conjunction = std::max(longest_fixed_conjunction, result.length);
+      }
     }
     if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Interjection) {
       longest_interjection = std::max(longest_interjection, result.length);
@@ -1665,7 +1677,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     const bool unlicensed_polite_after_topic =
         result.entry->extended_pos == core::ExtendedPOS::AuxTenseMasu &&
         hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleTopic);
-    if ((sentence_initial_auxiliary || unlicensed_polite_after_topic) && result.length < longest_conjunction) {
+    if ((sentence_initial_auxiliary || unlicensed_polite_after_topic) && result.length < longest_fixed_conjunction) {
       continue;
     }
 
