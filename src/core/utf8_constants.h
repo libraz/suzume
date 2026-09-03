@@ -88,7 +88,8 @@ constexpr char32_t kChi = U'ち';  // ち (0x3061)
 constexpr char32_t kSmallTsu = U'っ';  // っ (0x3063)
 
 // Common particles
-constexpr char32_t kO = U'お';  // お (0x304A) - prefix marker
+constexpr char32_t kO = U'お';   // お (0x304A) - prefix marker
+constexpr char32_t kHa = U'は';  // は (0x306F) - topic marker
 
 // Volitional auxiliary よう/う
 constexpr char32_t kYo = U'よ';  // よ (0x3088)

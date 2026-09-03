@@ -218,10 +218,30 @@ bool startsPredicativeCopula(std::string_view surface) {
   return surface.rfind("だ", 0) == 0 || surface.rfind("です", 0) == 0 || surface.rfind("である", 0) == 0;
 }
 
-bool isFusedDemo(std::string_view surface) {
+char32_t copulaFusedConjunctionParticle(std::string_view surface) {
   size_t byte_pos = 0;
-  return normalize::decodeUtf8(surface, byte_pos) == U'で' && normalize::decodeUtf8(surface, byte_pos) == U'も' &&
-         byte_pos == surface.size();
+  if (normalize::decodeUtf8(surface, byte_pos) != U'で') {
+    return 0;
+  }
+  const char32_t binding_particle = normalize::decodeUtf8(surface, byte_pos);
+  if (byte_pos != surface.size() || (binding_particle != U'も' && binding_particle != U'は')) {
+    return 0;
+  }
+  return binding_particle;
+}
+
+bool isCopulaFusedConjunction(std::string_view surface) {
+  return copulaFusedConjunctionParticle(surface) != 0;
+}
+
+bool isCopulaPeriphrasisCell(std::string_view surface) {
+  size_t byte_pos = 0;
+  if (normalize::decodeUtf8(surface, byte_pos) != U'あ') {
+    return false;
+  }
+  const char32_t cell_ending = normalize::decodeUtf8(surface, byte_pos);
+  return byte_pos == surface.size() && (cell_ending == U'る' || cell_ending == U'り' || cell_ending == U'っ' ||
+                                        cell_ending == U'ろ' || cell_ending == U'れ');
 }
 
 bool isConditionalToConjunction(std::string_view surface) {

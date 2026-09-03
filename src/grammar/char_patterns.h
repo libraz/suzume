@@ -179,8 +179,43 @@ bool isAttributiveCopulaNa(std::string_view surface);
 /** @brief Whether a surface starts a predicative copula form (だ, です, である) */
 bool startsPredicativeCopula(std::string_view surface);
 
-/** @brief Whether a surface is the fused particle/conjunction でも */
-bool isFusedDemo(std::string_view surface);
+/**
+ * @brief Whether a surface is the copula continuative fused with a binding particle
+ *
+ * で is the continuative of the copula, and a binding particle written straight
+ * onto it opens a clause when nothing precedes it (でも, では). The class that
+ * attaches there has exactly two one-mora members, so the pair is closed. With a
+ * host in front the same characters are the copula predicating over that host
+ * plus the particle (彼女+で+も+ない, 東京+で+は+なく), which is why these
+ * conjunctions are excluded from the fixed-expression treatment the rest of the
+ * closed list gets.
+ */
+bool isCopulaFusedConjunction(std::string_view surface);
+
+/**
+ * @brief The binding particle of a copula-fused conjunction, or 0 for anything else
+ *
+ * Reports which of the two members a surface spells, for the positions where
+ * they part company. The focus member でも is also a listed adverbial particle,
+ * so it spells one token wherever a nominal phrase can host it; the topic member
+ * では is a connective and nothing else, and falls back to its two pieces.
+ */
+char32_t copulaFusedConjunctionParticle(std::string_view surface);
+
+/**
+ * @brief Whether a surface is a cell of the ある that completes the copula
+ *
+ * である is the copula's periphrastic form: the continuative で plus the
+ * existential. Its cells are what a binding particle is inserted in front of
+ * when the topic or focus is marked inside the periphrasis (で+は+ある,
+ * で+は+あり+ませ+ん). They are the ordinary paradigm of ある, so the test is
+ * derived from its stem and endings rather than listed.
+ *
+ * The judgment is made on the surface because the same kana also spell a
+ * determiner and an interjection; keying on the part of speech would let a
+ * fabricated boundary dodge the test by taking one of those tags instead.
+ */
+bool isCopulaPeriphrasisCell(std::string_view surface);
 
 /**
  * @brief Whether a kana conjunction spells a predicate plus the conditional と

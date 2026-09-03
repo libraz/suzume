@@ -414,7 +414,7 @@ float computeFixedExpressionDictBonus(const core::LatticeEdge& edge) {
   // fixed-expression premise does not hold and the bonus would outweigh the
   // rule that bars the conjunction reading after a nominal host.
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Conjunction && grammar::isPureHiragana(edge.surface) &&
-      !grammar::isFusedDemo(edge.surface) && !grammar::isConditionalToConjunction(edge.surface)) {
+      !grammar::isCopulaFusedConjunction(edge.surface) && !grammar::isConditionalToConjunction(edge.surface)) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     // Stronger bonus for conjunctions to beat adverb+particle splits
     // Adverb 3-char gets -3.0, plus particle gets bonus, so we need > -3.5
