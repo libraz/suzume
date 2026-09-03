@@ -1984,6 +1984,10 @@ def postprocess_classical_conjecture_aux(tokens: list[dict]) -> bool:
             tokens[idx - 1 : idx + 1] = [{"surface": merged, "pos": "Auxiliary", "lemma": merged}]
 
 
+_KARI_RENYOKEI_CELL = "かり"
+_KARI_HOST_POS = ("Adjective", "Auxiliary")
+
+
 def postprocess_classical_kere_aux(tokens: list[dict]) -> bool:
     """Normalize the classical past 已然形 けれ behind its host.
 
@@ -1995,14 +1999,25 @@ def postprocess_classical_kere_aux(tokens: list[dict]) -> bool:
 
     The conditional ば settles the cell on its own, without the continuative
     probe: nothing else spells けれ in front of it.
+
+    An adjective and an adjective-like auxiliary reach the same auxiliary through
+    their supplementary continuative かり (心安かり+けり), and the reference
+    analyzer splits that pair the same way — auxiliary for the terminal, the verb
+    蹴る for the realis. That host counts too.
     """
     changed = False
     for idx in range(1, len(tokens)):
         token = tokens[idx]
-        if token.get("surface") != "けれ" or tokens[idx - 1].get("pos") != "Verb":
+        if token.get("surface") != "けれ":
             continue
-        follows_conditional = idx + 1 < len(tokens) and tokens[idx + 1].get("surface") == "ば"
-        if not follows_conditional and not _spells_verb_continuative(tokens[idx - 1].get("surface", "")):
+        previous = tokens[idx - 1]
+        previous_surface = previous.get("surface", "")
+        is_verb_host = previous.get("pos") == "Verb"
+        hosts_the_past = (is_verb_host and _spells_verb_continuative(previous_surface)) or (
+            previous.get("pos") in _KARI_HOST_POS and previous_surface.endswith(_KARI_RENYOKEI_CELL)
+        )
+        follows_conditional = is_verb_host and idx + 1 < len(tokens) and tokens[idx + 1].get("surface") == "ば"
+        if not hosts_the_past and not follows_conditional:
             continue
         token["pos"] = "Auxiliary"
         token["lemma"] = "けり"
@@ -2241,6 +2256,45 @@ def postprocess_classical_past_shi(tokens: list[dict]) -> bool:
         token["lemma"] = "き"
         if modifies_nominal:
             following["pos"] = "Noun"
+
+
+_KU_TERMINAL_CELL = "けし"
+
+
+def _na_adjective_base_of_ku_terminal(surface: str) -> str | None:
+    """Recover the modern base of a ク活用 terminal whose reflex is a na-adjective.
+
+    The reference dictionary carries this paradigm wherever the modern base is an
+    i-adjective, and reads its terminal as one (深し → 形容詞, 文語基本形, 深い).
+    Where the reflex is a na-adjective the terminal is missing and comes back as
+    an unknown noun instead, although the word itself is perfectly ordinary: the
+    classical stem is the modern base with け in place of its final か. Probing
+    that spelling settles the word class along with the lemma.
+    """
+    from .mecab import mecab_analyze
+
+    if not surface.endswith(_KU_TERMINAL_CELL) or len(surface) <= len(_KU_TERMINAL_CELL):
+        return None
+    base = surface[: -len(_KU_TERMINAL_CELL)] + "か"
+    tokens = mecab_analyze(base)
+    if len(tokens) != 1 or tokens[0].get("surface") != base:
+        return None
+    if tokens[0].get("pos") != "名詞" or tokens[0].get("pos_sub1") != "形容動詞語幹":
+        return None
+    return base
+
+
+@reports_mutation
+def postprocess_classical_ku_terminal(tokens: list[dict]) -> bool:
+    """Read a ク活用 terminal as the adjective it is rather than an unknown noun."""
+    for token in tokens:
+        if token.get("pos") != "Noun" or token.get("lemma") != token.get("surface"):
+            continue
+        base = _na_adjective_base_of_ku_terminal(token.get("surface", ""))
+        if base is None:
+            continue
+        token["pos"] = "Adjective"
+        token["lemma"] = base
 
 
 _PERFECT_NU_CELLS = ("ぬる", "ぬれ")
@@ -3189,6 +3243,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("classical-past-keri", postprocess_classical_past_keri),
     ("classical-past-shi", postprocess_classical_past_shi),
     ("classical-perfect-nu", postprocess_classical_perfect_nu),
+    ("classical-ku-terminal", postprocess_classical_ku_terminal),
     ("adverbial-temporal-prefix", postprocess_adverbial_temporal_prefix),
     ("prolonged-sound-noun", postprocess_prolonged_sound_noun),
     ("yoshi-formal-noun", postprocess_yoshi_formal_noun),
