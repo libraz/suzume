@@ -773,6 +773,82 @@
       ],
       "id": "kane",
       "input": "元気かね"
+    },
+    {
+      "description": "喜ばしき知らせを聞きたり - auto-generated",
+      "expected": [
+        {
+          "lemma": "喜ばしい",
+          "pos": "Adjective",
+          "surface": "喜ばしき"
+        },
+        {
+          "lemma": "知らせ",
+          "pos": "Noun",
+          "surface": "知らせ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞き"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たり"
+        }
+      ],
+      "id": "bashiki_rasewo_kitari",
+      "input": "喜ばしき知らせを聞きたり"
+    },
+    {
+      "description": "喜ばしきニュース - auto-generated",
+      "expected": [
+        {
+          "lemma": "喜ばしい",
+          "pos": "Adjective",
+          "surface": "喜ばしき"
+        },
+        {
+          "lemma": "ニュース",
+          "pos": "Noun",
+          "surface": "ニュース"
+        }
+      ],
+      "id": "bashiki",
+      "input": "喜ばしきニュース"
+    },
+    {
+      "description": "疑わしき点を調べる - auto-generated",
+      "expected": [
+        {
+          "lemma": "疑わしい",
+          "pos": "Adjective",
+          "surface": "疑わしき"
+        },
+        {
+          "lemma": "点",
+          "pos": "Noun",
+          "surface": "点"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "調べる",
+          "pos": "Verb",
+          "surface": "調べる"
+        }
+      ],
+      "id": "washiki_wo_beru",
+      "input": "疑わしき点を調べる"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
