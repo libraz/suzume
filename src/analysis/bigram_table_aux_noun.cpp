@@ -740,6 +740,16 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // (そ+う in そうとも言える).
       {EPOS::Other, EPOS::AuxVolitional, cost::kAlmostNever},
 
+      // The passive and the causative read off that same irrealis form, so an
+      // unanalyzed fragment cannot host them either: a voice auxiliary after
+      // one means the scan entered a verb partway and left its head behind
+      // (じ+られ for にじられ). Whatever the fragment is, it is not a verb that
+      // has been inflected, which is the only thing these auxiliaries select.
+      // Listing all four irrealis-selecting auxiliaries together keeps the host
+      // set from depending on which of them a reproduction happened to reach.
+      {EPOS::Other, EPOS::AuxPassive, cost::kAlmostNever},
+      {EPOS::Other, EPOS::AuxCausative, cost::kAlmostNever},
+
       // An adjective stem cannot govern an object or case particle. This
       // preserves a competing lexical noun reading before the particle.
       {EPOS::AdjStem, EPOS::ParticleCase, cost::kAlmostNever},
