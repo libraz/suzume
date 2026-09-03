@@ -2783,6 +2783,80 @@
       ],
       "id": "iteru_2",
       "input": "今書いてる"
+    },
+    {
+      "description": "草を踏みにじる - auto-generated",
+      "expected": [
+        {
+          "lemma": "草",
+          "pos": "Noun",
+          "surface": "草"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "踏みにじる",
+          "pos": "Verb",
+          "surface": "踏みにじる"
+        }
+      ],
+      "id": "wo_minijiru",
+      "input": "草を踏みにじる"
+    },
+    {
+      "description": "足に踏みにじられた草花が復活する - auto-generated",
+      "expected": [
+        {
+          "lemma": "足",
+          "pos": "Noun",
+          "surface": "足"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "踏みにじる",
+          "pos": "Verb",
+          "surface": "踏みにじら"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "草花",
+          "pos": "Noun",
+          "surface": "草花"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "復活",
+          "pos": "Noun",
+          "surface": "復活"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "ni_minijirareta_ga_suru",
+      "input": "足に踏みにじられた草花が復活する"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
