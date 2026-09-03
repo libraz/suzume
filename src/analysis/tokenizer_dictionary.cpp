@@ -275,11 +275,18 @@ bool canSegmentAsParticles(const dictionary::DictionaryManager& dict_manager, co
 // searchable particles.  Requiring an adjective edge that crosses the start
 // and a fully particle-decomposable remainder leaves clause-initial uses of
 // the same adverb untouched.
+// "Complete" is decided by the mora in front of the terminal い. An i-adjective
+// written with okurigana has one (惜し+い), and its stem is spelled out whether
+// or not the adverb is taken. A kanji or katakana run running straight into い
+// has none: that い is the adverb's own first mora (人々+い, 学生+い, テスト+い),
+// so the adjective it completes exists only because the adverb was not taken,
+// and it would retire the adverb wherever a nominal precedes it.
 bool overlapsCompleteIAdjectiveBeforeParticles(const core::Lattice& lattice,
                                                const dictionary::DictionaryManager& dict_manager,
                                                const std::vector<char32_t>& codepoints, size_t start_pos,
                                                size_t end_pos) {
   if (start_pos == 0 || start_pos + 1 >= end_pos || codepoints[start_pos] != U'い' ||
+      !kana::isHiraganaCodepoint(codepoints[start_pos - 1]) ||
       !canSegmentAsParticles(dict_manager, codepoints, start_pos + 1, end_pos)) {
     return false;
   }
