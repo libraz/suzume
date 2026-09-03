@@ -1985,18 +1985,29 @@ def postprocess_classical_conjecture_aux(tokens: list[dict]) -> bool:
 
 
 def postprocess_classical_kere_aux(tokens: list[dict]) -> bool:
-    """Normalize the classical past 已然形 in a verb+けれ+ば chain."""
-    for idx in range(1, len(tokens) - 1):
+    """Normalize the classical past 已然形 けれ behind its host.
+
+    The reference analyzer reads the terminal of this paradigm as the auxiliary
+    it is (花咲き+けり) and then reads its 已然形, in the very same position, as
+    the 五段 verb 蹴る (信念あり+けれ).  One paradigm does not change word class
+    cell by cell, and a continuative cannot be followed by another verb's own
+    realis, so the reading the terminal already gets covers this cell too.
+
+    The conditional ば settles the cell on its own, without the continuative
+    probe: nothing else spells けれ in front of it.
+    """
+    changed = False
+    for idx in range(1, len(tokens)):
         token = tokens[idx]
-        if (
-            tokens[idx - 1].get("pos") == "Verb"
-            and token.get("surface") == "けれ"
-            and tokens[idx + 1].get("surface") == "ば"
-        ):
-            token["pos"] = "Auxiliary"
-            token["lemma"] = "けり"
-            return True
-    return False
+        if token.get("surface") != "けれ" or tokens[idx - 1].get("pos") != "Verb":
+            continue
+        follows_conditional = idx + 1 < len(tokens) and tokens[idx + 1].get("surface") == "ば"
+        if not follows_conditional and not _spells_verb_continuative(tokens[idx - 1].get("surface", "")):
+            continue
+        token["pos"] = "Auxiliary"
+        token["lemma"] = "けり"
+        changed = True
+    return changed
 
 
 @reports_mutation
