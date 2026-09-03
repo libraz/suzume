@@ -80,9 +80,20 @@ void appendIchidanStemRareCandidates(const std::vector<char32_t>& codepoints, si
     const bool has_lexical_stem_evidence =
         vh::isVerbInDictionary(dict_manager, base_form) || vh::hasNonVerbDictionaryEntry(dict_manager, surface);
 
-    // Verify the base form exists in dictionary or is valid Ichidan verb
-    bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
-    if (!is_valid_verb) {
+    // Verify the base form exists in dictionary or is valid Ichidan verb.
+    // A registered verb is stored as its expanded paradigm, so the Ichidan
+    // reading also has to find its own stem in there: 信じ is a cell of 信じる,
+    // while 踏みにじ is no cell of the Godan 踏みにじる, whose irrealis is
+    // 踏みにじら. Recognizing the base form alone would give every Godan verb
+    // whose okurigana happens to end on an e-row or i-row kana a second,
+    // Ichidan reading that outbids its real one.
+    const bool base_in_dictionary = vh::isVerbInDictionary(dict_manager, base_form);
+    bool is_valid_verb = base_in_dictionary && vh::hasDictionaryEntry(dict_manager, surface, core::PartOfSpeech::Verb);
+    // The generated reading is only consulted for a verb the dictionary has
+    // never heard of. Once the verb is registered its paradigm is settled, and
+    // an analyzer that reads any e-row okurigana as an Ichidan stem must not
+    // get to overrule it.
+    if (!is_valid_verb && !base_in_dictionary) {
       // Check if inflection analyzer recognizes this as Ichidan verb
       // Use >= threshold to include edge cases like 信じる (conf=0.3)
       // Check ALL candidates, not just best, because godan/ichidan may have same confidence
