@@ -8,6 +8,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
@@ -198,8 +199,8 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
           if (dict_manager != nullptr) {
             for (size_t particle_start = start_pos + 1; particle_start + 1 < negative_pos; ++particle_start) {
               for (size_t particle_end = particle_start + 2; particle_end < negative_pos; ++particle_end) {
-                const std::string particle_surface = extractSubstring(codepoints, particle_start, particle_end);
-                if (dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle) != nullptr) {
+                if (lookupEntryInRange(*dict_manager, codepoints, particle_start, particle_end,
+                                       core::PartOfSpeech::Particle) != nullptr) {
                   contains_internal_particle = true;
                   break;
                 }
@@ -325,9 +326,10 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
         underlying_a_row_pos = mizenkei_end - 2;
       }
       if (underlying_a_row_pos < codepoints.size()) {
-        const std::string underlying_surface = extractSubstring(codepoints, start_pos, underlying_a_row_pos + 1);
         const dictionary::DictionaryEntry* underlying_exact =
-            dict_manager == nullptr ? nullptr : dict_manager->lookupExact(underlying_surface);
+            dict_manager == nullptr
+                ? nullptr
+                : lookupEntryInRange(*dict_manager, codepoints, start_pos, underlying_a_row_pos + 1);
         if (underlying_exact != nullptr && underlying_exact->pos == core::PartOfSpeech::Verb &&
             underlying_exact->extended_pos == core::ExtendedPOS::VerbMizenkei) {
           continue;
@@ -727,8 +729,8 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
     const bool has_multi_kanji_stem = kanji_end - start_pos >= 2;
     bool follows_case_particle = false;
     if (has_multi_kanji_stem && start_pos > 0 && dict_manager != nullptr) {
-      const std::string preceding_surface = extractSubstring(codepoints, start_pos - 1, start_pos);
-      const auto* preceding_entry = dict_manager->lookupExact(preceding_surface, core::PartOfSpeech::Particle);
+      const auto* preceding_entry =
+          lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
       follows_case_particle =
           preceding_entry != nullptr && preceding_entry->extended_pos == core::ExtendedPOS::ParticleCase;
     }

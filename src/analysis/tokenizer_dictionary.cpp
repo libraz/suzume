@@ -17,6 +17,7 @@
 #include <array>
 
 #include "analysis/category_cost.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/tokenizer.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
@@ -56,8 +57,7 @@ bool endsDictionaryVerbSpanningBack(const dictionary::DictionaryManager& dict_ma
   constexpr size_t kMaxHostChars = 4;
   const size_t scan_start = start_pos > kMaxHostChars ? start_pos - kMaxHostChars : 0;
   for (size_t host_start = scan_start; host_start < start_pos; ++host_start) {
-    if (dict_manager.lookupExact(extractSubstring(codepoints, host_start, end_pos), core::PartOfSpeech::Verb) !=
-        nullptr) {
+    if (lookupEntryInRange(dict_manager, codepoints, host_start, end_pos, core::PartOfSpeech::Verb) != nullptr) {
       return true;
     }
   }
@@ -162,8 +162,7 @@ bool startsHonorificPrefixedNounWithVerbTail(const dictionary::DictionaryManager
       continue;
     }
 
-    const std::string verb_tail = extractSubstring(codepoints, start_pos, noun_end);
-    if (dict_manager.lookupExact(verb_tail, core::PartOfSpeech::Verb) != nullptr) {
+    if (lookupEntryInRange(dict_manager, codepoints, start_pos, noun_end, core::PartOfSpeech::Verb) != nullptr) {
       return true;
     }
   }
@@ -305,8 +304,7 @@ bool opensOnContentWordTailBeforeParticle(const core::Lattice& lattice,
   if (start_pos == 0 || end_pos <= start_pos + 1 || end_pos > codepoints.size()) {
     return false;
   }
-  if (dict_manager.lookupExact(extractSubstring(codepoints, start_pos + 1, end_pos), core::PartOfSpeech::Particle) ==
-      nullptr) {
+  if (lookupEntryInRange(dict_manager, codepoints, start_pos + 1, end_pos, core::PartOfSpeech::Particle) == nullptr) {
     return false;
   }
   const size_t content_end = start_pos + 1;
@@ -411,8 +409,8 @@ bool conflictsWithVerifiedCompoundBoundary(const core::Lattice& lattice,
   if (structural_compound_end == 0 || candidate_end <= structural_compound_end) {
     return false;
   }
-  const std::string outside_suffix = extractSubstring(codepoints, structural_compound_end, candidate_end);
-  return dict_manager.lookupExact(outside_suffix, core::PartOfSpeech::Particle) != nullptr;
+  return lookupEntryInRange(dict_manager, codepoints, structural_compound_end, candidate_end,
+                            core::PartOfSpeech::Particle) != nullptr;
 }
 
 // The temporal adverb いま overlaps the full polite forms of いる
@@ -1171,8 +1169,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // the suffix, so a standalone lexical noun (はにわ) remains whole.
     if (result.entry->pos == core::PartOfSpeech::Noun && result.length > 1 && hasPrecedingNominal(lattice, start_pos) &&
         lookupResultsHaveExtendedPOS(lookup_results, core::ExtendedPOS::ParticleTopic, 1) &&
-        dict_manager_.lookupExact(extractSubstring(codepoints, start_pos + 1, end_pos), core::PartOfSpeech::Noun) !=
-            nullptr) {
+        lookupEntryInRange(dict_manager_, codepoints, start_pos + 1, end_pos, core::PartOfSpeech::Noun) != nullptr) {
       continue;
     }
 

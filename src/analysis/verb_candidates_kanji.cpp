@@ -11,6 +11,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
@@ -122,8 +123,8 @@ bool hasFinitePredicateCaseParticleTail(const std::vector<char32_t>& codepoints,
   if (dict_manager == nullptr || end_pos <= start_pos + 1) {
     return false;
   }
-  const std::string particle_surface = extractSubstring(codepoints, end_pos - 1, end_pos);
-  const auto* particle = dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle);
+  const auto* particle =
+      lookupEntryInRange(*dict_manager, codepoints, end_pos - 1, end_pos, core::PartOfSpeech::Particle);
   if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
     return false;
   }
@@ -782,29 +783,30 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   // lemmas solely because their final kana resembles a renyokei marker.
   // Verified lexical verb forms remain available for genuine homographs.
   candidates.erase(
-      std::remove_if(
-          candidates.begin() + static_cast<std::ptrdiff_t>(candidate_start), candidates.end(),
-          [&](const UnknownCandidate& cand) {
-            const bool has_auxiliary_continuation =
-                cand.end < codepoints.size() && (codepoints[cand.end] == U'た' || codepoints[cand.end] == U'て');
-            const bool has_excessive_auxiliary_continuation =
-                dict_manager != nullptr && cand.end + 2 <= codepoints.size() && [&] {
-                  const auto* next = dict_manager->lookupExact(extractSubstring(codepoints, cand.end, cand.end + 2));
-                  return next != nullptr && next->extended_pos == core::ExtendedPOS::AuxExcessive;
-                }();
-            const bool has_passive_auxiliary_continuation =
-                cand.end + 1 < codepoints.size() && codepoints[cand.end] == U'ら' && codepoints[cand.end + 1] == U'れ';
-            const bool has_comma_clause_continuation =
-                vh::isCommaClauseChainingRenyokei(codepoints, cand.start, cand.end, dict_manager);
-            return cand.pos == core::PartOfSpeech::Verb && !cand.lemma_verified &&
-                   ((cand.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-                     grammar::endsWithRenyokeiMarker(cand.surface) && !has_auxiliary_continuation &&
-                     !has_excessive_auxiliary_continuation && !has_passive_auxiliary_continuation &&
-                     !has_comma_clause_continuation) ||
-                    (cand.extended_pos == core::ExtendedPOS::VerbShuushikei &&
-                     cand.surface.compare(cand.lemma) == 0)) &&
-                   vh::hasNonVerbDictionaryEntry(dict_manager, cand.surface);
-          }),
+      std::remove_if(candidates.begin() + static_cast<std::ptrdiff_t>(candidate_start), candidates.end(),
+                     [&](const UnknownCandidate& cand) {
+                       const bool has_auxiliary_continuation =
+                           cand.end < codepoints.size() &&
+                           (codepoints[cand.end] == U'た' || codepoints[cand.end] == U'て');
+                       const bool has_excessive_auxiliary_continuation =
+                           dict_manager != nullptr && cand.end + 2 <= codepoints.size() && [&] {
+                             const auto* next = lookupEntryInRange(*dict_manager, codepoints, cand.end, cand.end + 2);
+                             return next != nullptr && next->extended_pos == core::ExtendedPOS::AuxExcessive;
+                           }();
+                       const bool has_passive_auxiliary_continuation = cand.end + 1 < codepoints.size() &&
+                                                                       codepoints[cand.end] == U'ら' &&
+                                                                       codepoints[cand.end + 1] == U'れ';
+                       const bool has_comma_clause_continuation =
+                           vh::isCommaClauseChainingRenyokei(codepoints, cand.start, cand.end, dict_manager);
+                       return cand.pos == core::PartOfSpeech::Verb && !cand.lemma_verified &&
+                              ((cand.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+                                grammar::endsWithRenyokeiMarker(cand.surface) && !has_auxiliary_continuation &&
+                                !has_excessive_auxiliary_continuation && !has_passive_auxiliary_continuation &&
+                                !has_comma_clause_continuation) ||
+                               (cand.extended_pos == core::ExtendedPOS::VerbShuushikei &&
+                                cand.surface.compare(cand.lemma) == 0)) &&
+                              vh::hasNonVerbDictionaryEntry(dict_manager, cand.surface);
+                     }),
       candidates.end());
 
   // Once the dictionary licenses a ク語法 reading of a span, an unverified verb

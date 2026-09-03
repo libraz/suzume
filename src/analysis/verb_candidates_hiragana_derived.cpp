@@ -8,6 +8,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
@@ -388,8 +389,8 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
       const size_t kateikei_end = end_pos + 1;
       for (size_t te_pos = start_pos + 1; te_pos + 1 < kateikei_end; ++te_pos) {
         if (codepoints[te_pos] == core::hiragana::kTe &&
-            dict_manager->lookupExact(extractSubstring(codepoints, te_pos + 1, kateikei_end),
-                                      core::PartOfSpeech::Verb) != nullptr) {
+            lookupEntryInRange(*dict_manager, codepoints, te_pos + 1, kateikei_end, core::PartOfSpeech::Verb) !=
+                nullptr) {
           embeds_te_conditional_auxiliary = true;
           break;
         }

@@ -9,6 +9,7 @@
 #include "adjective_candidates.h"
 #include "adjective_candidates_internal.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
@@ -88,14 +89,14 @@ bool embedsGenitiveParticle(const dictionary::DictionaryManager* dict_manager, c
     return false;
   }
   for (size_t particle_pos = start_pos + 1; particle_pos + 1 < end_pos; ++particle_pos) {
-    const auto* entry = dict_manager->lookupExact(extractSubstring(codepoints, particle_pos, particle_pos + 1),
-                                                  core::PartOfSpeech::Particle);
+    const auto* entry =
+        lookupEntryInRange(*dict_manager, codepoints, particle_pos, particle_pos + 1, core::PartOfSpeech::Particle);
     if (entry != nullptr && entry->extended_pos == core::ExtendedPOS::ParticleNo) {
       if (particle_pos >= start_pos + 2) {
         return true;
       }
       if (start_pos > 0) {
-        const auto* bridged_head = dict_manager->lookupExact(extractSubstring(codepoints, start_pos - 1, particle_pos));
+        const auto* bridged_head = lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, particle_pos);
         if (bridged_head != nullptr &&
             (bridged_head->pos == core::PartOfSpeech::Noun || bridged_head->pos == core::PartOfSpeech::Particle ||
              bridged_head->pos == core::PartOfSpeech::Auxiliary)) {
@@ -167,9 +168,9 @@ void appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCandidate>& ca
   // an attached particle within a sentence (いまだ+に続く).  Restrict this
   // recovery path to a lexical word boundary; ordinary kanji adjective and
   // particle candidates retain responsibility inside a clause.
-  const bool follows_particle = start_pos > 0 && dict_manager != nullptr &&
-                                dict_manager->lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos),
-                                                          core::PartOfSpeech::Particle) != nullptr;
+  const bool follows_particle =
+      start_pos > 0 && dict_manager != nullptr &&
+      lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle) != nullptr;
   if (start_pos > 0 && char_types[start_pos - 1] != normalize::CharType::Symbol && !follows_particle) {
     return;
   }
@@ -188,8 +189,8 @@ void appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCandidate>& ca
     const size_t lookbehind = std::min<size_t>(3, start_pos);
     for (size_t particle_start = start_pos - lookbehind; particle_start < start_pos; ++particle_start) {
       for (size_t particle_end = start_pos + 1; particle_end <= prefix_end; ++particle_end) {
-        if (dict_manager->lookupExact(extractSubstring(codepoints, particle_start, particle_end),
-                                      core::PartOfSpeech::Particle) != nullptr) {
+        if (lookupEntryInRange(*dict_manager, codepoints, particle_start, particle_end, core::PartOfSpeech::Particle) !=
+            nullptr) {
           return;
         }
       }
@@ -357,9 +358,9 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
   // ゆる+すぎる, and きつ+すぎる share one productive path.  This must precede
   // the general genitive-particle guard: that guard correctly rejects broad
   // unknown sequences, but would prevent this independently verified stem.
-  const std::string first_mora = extractSubstring(codepoints, start_pos, start_pos + 1);
   const bool starts_with_closed_particle =
-      dict_manager != nullptr && dict_manager->lookupExact(first_mora, core::PartOfSpeech::Particle) != nullptr;
+      dict_manager != nullptr &&
+      lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle) != nullptr;
   // A kanji i-adjective's continuative く is already a complete edge at the
   // preceding position (高く+なり+すぎる).  Starting a second adjective stem
   // from that okurigana would reconstruct a non-word such as くなりい.  This

@@ -8,6 +8,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
@@ -387,8 +388,8 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
           constexpr size_t kParticleProbe = 3;
           const size_t max_particle_end = std::min(codepoints.size(), kanji_end + kParticleProbe);
           for (size_t particle_end = kanji_end + 2; particle_end <= max_particle_end; ++particle_end) {
-            if (dict_manager->lookupExact(extractSubstring(codepoints, kanji_end, particle_end),
-                                          core::PartOfSpeech::Particle) != nullptr) {
+            if (lookupEntryInRange(*dict_manager, codepoints, kanji_end, particle_end, core::PartOfSpeech::Particle) !=
+                nullptr) {
               sokuon_heads_dictionary_particle = true;
               SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" sokuon heads a dictionary particle\n");
               break;

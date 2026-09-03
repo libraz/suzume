@@ -2,7 +2,7 @@
  * @file compound_verb_verify.cpp
  * @brief V1 reconstruction and verification for compound verbs
  */
-
+#include "analysis/dictionary_probe.h"
 #include "join_compound_verb_internal.h"
 
 namespace suzume::analysis::compound_verb_detail {
@@ -239,8 +239,8 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
     // except at known copular, hatsuonbin, and formal-noun boundaries.
     bool starts_inside_formal_noun = false;
     if (use_inflection_fallback && is_ichidan && kanji_count == 1 && start_pos > 0) {
-      const std::string enclosing_surface = extractSubstring(codepoints, start_pos - 1, start_pos + 1);
-      const auto* enclosing_entry = dict_manager.lookupExact(enclosing_surface, core::PartOfSpeech::Noun);
+      const auto* enclosing_entry =
+          lookupEntryInRange(dict_manager, codepoints, start_pos - 1, start_pos + 1, core::PartOfSpeech::Noun);
       starts_inside_formal_noun =
           enclosing_entry != nullptr && enclosing_entry->extended_pos == core::ExtendedPOS::NounFormal;
     }

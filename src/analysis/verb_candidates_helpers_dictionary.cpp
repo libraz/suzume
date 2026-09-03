@@ -145,8 +145,8 @@ bool followsCaseMarkedArgument(const dictionary::DictionaryManager* dict_manager
     if (dict_manager == nullptr || argument_end == 0) {
       return false;
     }
-    const auto* particle = dict_manager->lookupExact(extractSubstring(codepoints, argument_end - 1, argument_end),
-                                                     core::PartOfSpeech::Particle);
+    const auto* particle =
+        lookupEntryInRange(*dict_manager, codepoints, argument_end - 1, argument_end, core::PartOfSpeech::Particle);
     if (particle == nullptr || (particle->extended_pos != core::ExtendedPOS::ParticleBinding &&
                                 particle->extended_pos != core::ExtendedPOS::ParticleTopic &&
                                 particle->extended_pos != core::ExtendedPOS::ParticleAdverbial)) {
@@ -345,7 +345,7 @@ bool startsWithFocusParticleHead(const dictionary::DictionaryManager* dict_manag
   for (size_t particle_len = 2; particle_len <= max_len; ++particle_len) {
     const size_t particle_end = hiragana_start + particle_len;
     const dictionary::DictionaryEntry* entry =
-        dict_manager->lookupExact(extractSubstring(codepoints, hiragana_start, particle_end));
+        lookupEntryInRange(*dict_manager, codepoints, hiragana_start, particle_end);
     if (entry == nullptr || (entry->extended_pos != core::ExtendedPOS::ParticleAdverbial &&
                              entry->extended_pos != core::ExtendedPOS::ParticleBinding)) {
       continue;
@@ -414,7 +414,7 @@ bool endsWithCaseParticleAfterContinuative(const dictionary::DictionaryManager* 
   }
   const size_t particle_pos = end_pos - 1;
   const auto* particle =
-      dict_manager->lookupExact(extractSubstring(codepoints, particle_pos, end_pos), core::PartOfSpeech::Particle);
+      lookupEntryInRange(*dict_manager, codepoints, particle_pos, end_pos, core::PartOfSpeech::Particle);
   if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
     return false;
   }
@@ -454,8 +454,8 @@ bool endsWithAuxiliaryAfterOkurigana(const dictionary::DictionaryManager* dict_m
   }
   const size_t max_len = std::min(kMaxAuxiliaryLen, end_pos - okurigana_start - 1);
   for (size_t aux_len = 2; aux_len <= max_len; ++aux_len) {
-    const auto* auxiliary = dict_manager->lookupExact(extractSubstring(codepoints, end_pos - aux_len, end_pos),
-                                                      core::PartOfSpeech::Auxiliary);
+    const auto* auxiliary =
+        lookupEntryInRange(*dict_manager, codepoints, end_pos - aux_len, end_pos, core::PartOfSpeech::Auxiliary);
     // けり's izenkei is spelled like the hypothetical ending every i-adjective
     // carries (なけれ, 高けれ), so that cell alone is no evidence of a boundary.
     if (auxiliary != nullptr && auxiliary->extended_pos != core::ExtendedPOS::AuxClassicalKeri) {
@@ -509,7 +509,7 @@ bool hasAuxiliaryNegativeBoundary(const dictionary::DictionaryManager* dict_mana
     return false;
   }
   auto has_exact_epos = [&](size_t span_start, size_t span_end, core::ExtendedPOS epos) {
-    const auto* entry = dict_manager->lookupExact(extractSubstring(codepoints, span_start, span_end));
+    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, span_start, span_end);
     return entry != nullptr && entry->extended_pos == epos;
   };
   for (size_t boundary = start_pos + 1; boundary + 1 < end_pos; ++boundary) {

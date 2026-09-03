@@ -7,6 +7,7 @@
 #include <initializer_list>
 
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
@@ -67,7 +68,7 @@ bool dictionaryTailFollowsAt(const std::vector<char32_t>& codepoints, size_t pos
   }
   const size_t probe_end = std::min(codepoints.size(), pos + kClassicalTailProbeChars);
   for (size_t end = pos + 1; end <= probe_end; ++end) {
-    const auto* entry = dict_manager->lookupExact(extractSubstring(codepoints, pos, end), pos_class);
+    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, pos, end, pos_class);
     if (entry == nullptr) {
       continue;
     }
@@ -240,8 +241,8 @@ bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_po
   constexpr size_t kFocusParticleChars = 2;
   const size_t scan_start = start_pos > kFocusParticleChars ? start_pos - kFocusParticleChars : 0;
   for (size_t particle_start = scan_start; dict_manager != nullptr && particle_start < start_pos; ++particle_start) {
-    const auto* particle = dict_manager->lookupExact(extractSubstring(codepoints, particle_start, start_pos),
-                                                     core::PartOfSpeech::Particle);
+    const auto* particle =
+        lookupEntryInRange(*dict_manager, codepoints, particle_start, start_pos, core::PartOfSpeech::Particle);
     if (particle != nullptr && (particle->extended_pos == core::ExtendedPOS::ParticleNo ||
                                 particle->extended_pos == core::ExtendedPOS::ParticleBinding ||
                                 particle->extended_pos == core::ExtendedPOS::ParticleTopic ||

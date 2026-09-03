@@ -11,6 +11,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
@@ -60,8 +61,8 @@ bool startsPastAuxiliaryBeforeQuote(const std::vector<char32_t>& codepoints, siz
   }
   const char32_t preceding = codepoints[start_pos - 1];
   const bool follows_onbin = preceding == U'い' || preceding == U'ん' || preceding == core::hiragana::kSmallTsu;
-  return follows_onbin && dict_manager->lookupExact(extractSubstring(codepoints, start_pos, start_pos + 1),
-                                                    core::PartOfSpeech::Auxiliary) != nullptr;
+  return follows_onbin && lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1,
+                                             core::PartOfSpeech::Auxiliary) != nullptr;
 }
 
 size_t closedOnbinTenseEnd(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -159,7 +160,7 @@ size_t completeGodanTerminalAfterCaseParticle(const std::vector<char32_t>& codep
     return 0;
   }
   const auto* preceding_particle =
-      dict_manager->lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos), core::PartOfSpeech::Particle);
+      lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
   if (preceding_particle == nullptr || preceding_particle->extended_pos != core::ExtendedPOS::ParticleCase) {
     return 0;
   }
@@ -499,7 +500,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   // keeps もの+だっ+た from becoming the fabricated onbin verb のだっ.
   if (start_pos > 0 && dict_manager != nullptr) {
     const auto* preceding_noun =
-        dict_manager->lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos + 1), core::PartOfSpeech::Noun);
+        lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos + 1, core::PartOfSpeech::Noun);
     if (preceding_noun != nullptr && preceding_noun->extended_pos == core::ExtendedPOS::NounFormal) {
       return candidates;
     }
@@ -935,8 +936,8 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   const bool negative_before_quotative =
       hiragana_end >= start_pos + 2 && codepoints[hiragana_end - 2] == U'な' && codepoints[hiragana_end - 1] == U'い' &&
       dict_manager != nullptr && hiragana_end + 3 <= codepoints.size() &&
-      dict_manager->lookupExact(extractSubstring(codepoints, hiragana_end, hiragana_end + 3),
-                                core::PartOfSpeech::Determiner) != nullptr;
+      lookupEntryInRange(*dict_manager, codepoints, hiragana_end, hiragana_end + 3, core::PartOfSpeech::Determiner) !=
+          nullptr;
   if (!has_inflected_candidate && !negative_before_quotative && closed_onbin_tense_end == 0 &&
       godan_ra_continuation_stem_end == 0) {
     return candidates;

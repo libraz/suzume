@@ -5,6 +5,7 @@
 
 #include <algorithm>
 
+#include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "dictionary/dictionary.h"
 #include "normalize/char_type.h"
@@ -257,8 +258,8 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
     constexpr size_t kMaxQuantityParticleLength = 4;
     const size_t max_particle_end = std::min(codepoints.size(), scan + kMaxQuantityParticleLength);
     for (size_t particle_end = scan + 1; particle_end <= max_particle_end; ++particle_end) {
-      const std::string particle_surface = extractSubstring(codepoints, scan, particle_end);
-      const auto* particle = dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle);
+      const auto* particle =
+          lookupEntryInRange(*dict_manager, codepoints, scan, particle_end, core::PartOfSpeech::Particle);
       if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleAdverbial) {
         followed_by_quantity_particle = true;
         break;

@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
@@ -144,8 +145,7 @@ bool crossesCaseParticleBeforePredicate(const dictionary::DictionaryManager* dic
   // A one-mora predicate behind the particle is no evidence: every godan-sa
   // stem ends in one (ながす, さがす), and the classical す is a dictionary verb.
   for (size_t pos = start_pos + 1; pos + 3 <= end_pos; ++pos) {
-    const auto* particle =
-        dict_manager->lookupExact(extractSubstring(codepoints, pos, pos + 1), core::PartOfSpeech::Particle);
+    const auto* particle = lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Particle);
     if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
       continue;
     }
@@ -236,8 +236,7 @@ bool caseParticleFollowsAt(const dictionary::DictionaryManager& dict_manager, co
                            size_t pos) {
   const size_t probe_end = std::min(codepoints.size(), pos + kFollowerProbeChars);
   for (size_t stop = pos + 1; stop <= probe_end; ++stop) {
-    const auto* particle =
-        dict_manager.lookupExact(extractSubstring(codepoints, pos, stop), core::PartOfSpeech::Particle);
+    const auto* particle = lookupEntryInRange(dict_manager, codepoints, pos, stop, core::PartOfSpeech::Particle);
     if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase) {
       return true;
     }
@@ -250,8 +249,7 @@ bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_m
   const size_t probe_end = std::min(codepoints.size(), end_pos + kFollowerProbeChars);
   if (is_izenkei) {
     for (size_t stop = end_pos + 1; stop <= probe_end; ++stop) {
-      const auto* particle =
-          dict_manager.lookupExact(extractSubstring(codepoints, end_pos, stop), core::PartOfSpeech::Particle);
+      const auto* particle = lookupEntryInRange(dict_manager, codepoints, end_pos, stop, core::PartOfSpeech::Particle);
       if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleConj) {
         return true;
       }
@@ -266,7 +264,7 @@ bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_m
     return true;
   }
   for (size_t stop = end_pos + 1; stop <= probe_end; ++stop) {
-    if (dict_manager.lookupExact(extractSubstring(codepoints, end_pos, stop), core::PartOfSpeech::Noun) != nullptr) {
+    if (lookupEntryInRange(dict_manager, codepoints, end_pos, stop, core::PartOfSpeech::Noun) != nullptr) {
       return true;
     }
   }

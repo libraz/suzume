@@ -11,6 +11,7 @@
 #include <cstdint>
 
 #include "adjective_candidates.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/unknown.h"
 #include "candidate_constants.h"
@@ -45,8 +46,7 @@ bool closesContractedVolitional(const std::vector<char32_t>& codepoints, size_t 
     return false;
   }
   for (size_t len = 2; len <= kMaxVolitionalMorae && len <= tto_pos; ++len) {
-    const auto* entry =
-        dict_manager->lookupExact(extractSubstring(codepoints, tto_pos - len, tto_pos), core::PartOfSpeech::Verb);
+    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, tto_pos - len, tto_pos, core::PartOfSpeech::Verb);
     if (entry != nullptr && entry->extended_pos == core::ExtendedPOS::VerbMizenkei) {
       return true;
     }
@@ -64,7 +64,7 @@ bool startsLongerDictionaryWord(const std::vector<char32_t>& codepoints, size_t 
   }
   const size_t probe_end = std::min(codepoints.size(), end_pos + kMaxTrailingChars);
   for (size_t word_end = end_pos + 1; word_end <= probe_end; ++word_end) {
-    if (dict_manager->lookupExact(extractSubstring(codepoints, start_pos, word_end)) != nullptr) {
+    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, word_end) != nullptr) {
       return true;
     }
   }
@@ -489,8 +489,8 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
             continue;
           }
           for (size_t particle_end = split + 1; particle_end <= mimetic_end; ++particle_end) {
-            if (dict_manager_->lookupExact(extractSubstring(codepoints, split, particle_end),
-                                           core::PartOfSpeech::Particle) != nullptr) {
+            if (lookupEntryInRange(*dict_manager_, codepoints, split, particle_end, core::PartOfSpeech::Particle) !=
+                nullptr) {
               decomposes_as_predicate_particle = true;
               break;
             }
@@ -583,9 +583,9 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
 
     // Four-character patterns like ぐったり and じっくり.
     if (seq_len >= 4 && isSmallKanaAt(start_pos + 1) && codepoints[start_pos + 3] == U'り') {
-      const std::string inflectional_tail = extractSubstring(codepoints, start_pos + 2, start_pos + 4);
       const auto* tail_particle = dict_manager_ != nullptr
-                                      ? dict_manager_->lookupExact(inflectional_tail, core::PartOfSpeech::Particle)
+                                      ? lookupEntryInRange(*dict_manager_, codepoints, start_pos + 2, start_pos + 4,
+                                                           core::PartOfSpeech::Particle)
                                       : nullptr;
       const std::string predicate_stem = extractSubstring(codepoints, start_pos, start_pos + 2);
       constexpr PartOfSpeechMask kPredicateMask =

@@ -32,15 +32,13 @@ bool hasNominalPhraseSelectorAt(const dictionary::DictionaryManager* dict_manage
   if (dict_manager == nullptr || pos >= codepoints.size()) {
     return false;
   }
-  const auto* particle =
-      dict_manager->lookupExact(extractSubstring(codepoints, pos, pos + 1), core::PartOfSpeech::Particle);
+  const auto* particle = lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Particle);
   if (particle != nullptr && (particle->extended_pos == core::ExtendedPOS::ParticleCase ||
                               particle->extended_pos == core::ExtendedPOS::ParticleTopic ||
                               particle->extended_pos == core::ExtendedPOS::ParticleNo)) {
     return true;
   }
-  const auto* auxiliary =
-      dict_manager->lookupExact(extractSubstring(codepoints, pos, pos + 1), core::PartOfSpeech::Auxiliary);
+  const auto* auxiliary = lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Auxiliary);
   return auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa;
 }
 
@@ -139,9 +137,9 @@ bool absorbsFormalNounCaseParticle(const dictionary::DictionaryManager* dict_man
   }
   for (size_t formal_end = start_pos + 1; formal_end < end_pos; ++formal_end) {
     const auto* formal_noun =
-        dict_manager->lookupExact(extractSubstring(codepoints, start_pos, formal_end), core::PartOfSpeech::Noun);
+        lookupEntryInRange(*dict_manager, codepoints, start_pos, formal_end, core::PartOfSpeech::Noun);
     const auto* case_particle =
-        dict_manager->lookupExact(extractSubstring(codepoints, formal_end, end_pos), core::PartOfSpeech::Particle);
+        lookupEntryInRange(*dict_manager, codepoints, formal_end, end_pos, core::PartOfSpeech::Particle);
     if (formal_noun != nullptr && formal_noun->extended_pos == core::ExtendedPOS::NounFormal &&
         case_particle != nullptr && case_particle->extended_pos == core::ExtendedPOS::ParticleCase) {
       return true;
@@ -226,8 +224,8 @@ bool hasGenitiveNominalSelector(const std::vector<char32_t>& codepoints,
     if (particle_start == 0 || char_types[particle_start - 1] == normalize::CharType::Hiragana) {
       continue;
     }
-    const std::string particle_surface = extractSubstring(codepoints, particle_start, start_pos - 1);
-    const auto* particle = dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle);
+    const auto* particle =
+        lookupEntryInRange(*dict_manager, codepoints, particle_start, start_pos - 1, core::PartOfSpeech::Particle);
     if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase) {
       return true;
     }
@@ -294,8 +292,8 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
     // ordinary i-adjective attribution (美しい+人) on its existing path.
     if (attributive_copula != nullptr && attributive_copula->extended_pos == core::ExtendedPOS::AuxCopulaDa &&
         selector_start + 1 < start_pos) {
-      const std::string adjective_stem = extractSubstring(codepoints, selector_start, start_pos - 1);
-      const auto* na_adjective = dict_manager->lookupExact(adjective_stem, core::PartOfSpeech::Adjective);
+      const auto* na_adjective =
+          lookupEntryInRange(*dict_manager, codepoints, selector_start, start_pos - 1, core::PartOfSpeech::Adjective);
       if (na_adjective != nullptr && na_adjective->extended_pos == core::ExtendedPOS::AdjNaAdj) {
         return true;
       }
@@ -400,8 +398,8 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
   constexpr PartOfSpeechMask kFunctionMask =
       partOfSpeechMask(core::PartOfSpeech::Particle) | partOfSpeechMask(core::PartOfSpeech::Auxiliary);
   for (size_t particle_start = start_pos + 2; particle_start < end_pos; ++particle_start) {
-    if (dict_manager->lookupExact(extractSubstring(codepoints, particle_start, end_pos),
-                                  core::PartOfSpeech::Particle) == nullptr) {
+    if (lookupEntryInRange(*dict_manager, codepoints, particle_start, end_pos, core::PartOfSpeech::Particle) ==
+        nullptr) {
       continue;
     }
     if (maximalSegmentCount(*dict_manager, codepoints, start_pos, particle_start, core::PartOfSpeech::Auxiliary) >= 1) {
@@ -415,9 +413,9 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
   // one-mora head would otherwise claim (よそう, かばん).
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
     const auto* stack_head =
-        dict_manager->lookupExact(extractSubstring(codepoints, start_pos, split), core::PartOfSpeech::Particle);
+        lookupEntryInRange(*dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Particle);
     const auto* stack_tail =
-        dict_manager->lookupExact(extractSubstring(codepoints, split, end_pos), core::PartOfSpeech::Particle);
+        lookupEntryInRange(*dict_manager, codepoints, split, end_pos, core::PartOfSpeech::Particle);
     if (stack_head != nullptr && stack_tail != nullptr &&
         stack_head->extended_pos == core::ExtendedPOS::ParticleFinal &&
         stack_tail->extended_pos == core::ExtendedPOS::ParticleFinal) {
@@ -481,7 +479,7 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
 
   constexpr size_t kMaximumSelectedHeadLength = 4;
   const auto* head_initial_particle =
-      dict_manager->lookupExact(extractSubstring(codepoints, start_pos, start_pos + 1), core::PartOfSpeech::Particle);
+      lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle);
   if (has_attributive_selector && head_initial_particle != nullptr &&
       isNominalBoundaryParticle(*head_initial_particle)) {
     return;
@@ -496,7 +494,7 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
 
     const std::string head_surface = extractSubstring(codepoints, start_pos, head_end);
     const auto* trailing_auxiliary =
-        dict_manager->lookupExact(extractSubstring(codepoints, head_end - 1, head_end), core::PartOfSpeech::Auxiliary);
+        lookupEntryInRange(*dict_manager, codepoints, head_end - 1, head_end, core::PartOfSpeech::Auxiliary);
     // A selector licenses the nominal immediately after it, not a span that
     // has swallowed the copula before a closing particle. In
     // という話だが, the selected head is 話 and だ begins its predicate; treating
@@ -561,10 +559,9 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
     // entire inflected predicate into an unknown noun.
     bool contains_predicate_auxiliary_boundary = false;
     for (size_t split = start_pos + 1; split < head_end; ++split) {
-      const auto* predicate =
-          dict_manager->lookupExact(extractSubstring(codepoints, start_pos, split), core::PartOfSpeech::Verb);
+      const auto* predicate = lookupEntryInRange(*dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Verb);
       const auto* auxiliary =
-          dict_manager->lookupExact(extractSubstring(codepoints, split, head_end), core::PartOfSpeech::Auxiliary);
+          lookupEntryInRange(*dict_manager, codepoints, split, head_end, core::PartOfSpeech::Auxiliary);
       if (predicate != nullptr && predicate->extended_pos == core::ExtendedPOS::VerbRenyokei && auxiliary != nullptr) {
         contains_predicate_auxiliary_boundary = true;
         break;

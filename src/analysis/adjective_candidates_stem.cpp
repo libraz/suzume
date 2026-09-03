@@ -9,6 +9,7 @@
 #include "adjective_candidates.h"
 #include "adjective_candidates_internal.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -918,7 +919,7 @@ bool classicalConjunctiveFollowsAt(const std::vector<char32_t>& codepoints, size
   constexpr size_t kClassicalTailProbeChars = 3;
   const size_t probe_end = std::min(codepoints.size(), pos + kClassicalTailProbeChars);
   for (size_t end = pos + 1; end <= probe_end; ++end) {
-    const auto* entry = dict_manager->lookupExact(extractSubstring(codepoints, pos, end), core::PartOfSpeech::Particle);
+    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, pos, end, core::PartOfSpeech::Particle);
     if (entry == nullptr) {
       continue;
     }
@@ -964,8 +965,7 @@ bool classicalAuxiliaryFollowsAt(const std::vector<char32_t>& codepoints, size_t
   }
   const size_t probe_end = std::min({codepoints.size(), scan_end + 1, pos + 3});
   for (size_t end = pos + 1; end <= probe_end; ++end) {
-    const auto* entry =
-        dict_manager->lookupExact(extractSubstring(codepoints, pos, end), core::PartOfSpeech::Auxiliary);
+    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, pos, end, core::PartOfSpeech::Auxiliary);
     if (entry == nullptr) {
       continue;
     }

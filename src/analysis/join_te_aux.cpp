@@ -2,7 +2,7 @@
  * @file join_te_aux.cpp
  * @brief Taru-adjective join candidate generation
  */
-
+#include "analysis/dictionary_probe.h"
 #include "join_candidates.h"
 #include "tokenizer_utils.h"
 
@@ -61,9 +61,9 @@ void addTaruAdjectiveJoinCandidates(core::Lattice& lattice, std::string_view tex
   // distinct from an ordinary adverbial use such as 毅然と進む.
   if (start_pos > 0 && kanji_end + 1 < codepoints.size() && codepoints[kanji_end + 1] == U'は') {
     const auto* left_no =
-        dict_manager.lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos), core::PartOfSpeech::Particle);
-    const auto* right_wa = dict_manager.lookupExact(extractSubstring(codepoints, kanji_end + 1, kanji_end + 2),
-                                                    core::PartOfSpeech::Particle);
+        lookupEntryInRange(dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
+    const auto* right_wa =
+        lookupEntryInRange(dict_manager, codepoints, kanji_end + 1, kanji_end + 2, core::PartOfSpeech::Particle);
     if (left_no != nullptr && left_no->extended_pos == core::ExtendedPOS::ParticleNo && right_wa != nullptr &&
         right_wa->extended_pos == core::ExtendedPOS::ParticleTopic) {
       return;

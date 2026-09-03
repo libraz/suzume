@@ -15,6 +15,7 @@
  */
 
 #include "analysis/category_cost.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/tokenizer.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
@@ -1285,11 +1286,10 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
       // retain the ambiguity needed by おもい+が/を.
       const bool follows_predicate_quote =
           nominal_particle && candidate.end < codepoints.size() && codepoints[candidate.end] == core::hiragana::kTo;
-      const auto* following_particle =
-          candidate.end < codepoints.size()
-              ? dict_manager_.lookupExact(extractSubstring(codepoints, candidate.end, candidate.end + 1),
-                                          core::PartOfSpeech::Particle)
-              : nullptr;
+      const auto* following_particle = candidate.end < codepoints.size()
+                                           ? lookupEntryInRange(dict_manager_, codepoints, candidate.end,
+                                                                candidate.end + 1, core::PartOfSpeech::Particle)
+                                           : nullptr;
       const bool follows_nominalizer =
           following_particle != nullptr && following_particle->extended_pos == core::ExtendedPOS::ParticleNo;
       // A finished adjective reading of the same span is a complete inflectional
@@ -1321,8 +1321,8 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
       // from absorbing the genitive in productive sequences such as の+わり
       // and の+うち.
       const bool starts_with_closed_particle =
-          dict_manager_.lookupExact(extractSubstring(codepoints, candidate.start, candidate.start + 1),
-                                    core::PartOfSpeech::Particle) != nullptr;
+          lookupEntryInRange(dict_manager_, codepoints, candidate.start, candidate.start + 1,
+                             core::PartOfSpeech::Particle) != nullptr;
       // A deverbal noun re-reads the continuative cell on its own. An analysis
       // that had to match an auxiliary chain to reach the lemma describes a
       // complete predicate instead (ためさ + ない), so nominalizing that span
@@ -1344,8 +1344,8 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
         constexpr size_t kMaxAuxiliaryLen = 4;
         const size_t max_len = std::min(kMaxAuxiliaryLen, candidate.end - candidate.start - 1);
         for (size_t tail_len = 2; tail_len <= max_len; ++tail_len) {
-          if (dict_manager_.lookupExact(extractSubstring(codepoints, candidate.end - tail_len, candidate.end),
-                                        core::PartOfSpeech::Auxiliary) != nullptr) {
+          if (lookupEntryInRange(dict_manager_, codepoints, candidate.end - tail_len, candidate.end,
+                                 core::PartOfSpeech::Auxiliary) != nullptr) {
             auxiliary_tail_before_quote = true;
             break;
           }

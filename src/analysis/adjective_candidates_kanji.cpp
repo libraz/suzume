@@ -58,12 +58,12 @@ bool containsAuxiliaryFinalParticleBoundary(const std::vector<char32_t>& codepoi
   }
   for (size_t auxiliary_start = start_pos + 1; auxiliary_start + 1 < end_pos; ++auxiliary_start) {
     for (size_t auxiliary_end = auxiliary_start + 1; auxiliary_end < end_pos; ++auxiliary_end) {
-      if (dict_manager->lookupExact(extractSubstring(codepoints, auxiliary_start, auxiliary_end),
-                                    core::PartOfSpeech::Auxiliary) == nullptr) {
+      if (lookupEntryInRange(*dict_manager, codepoints, auxiliary_start, auxiliary_end,
+                             core::PartOfSpeech::Auxiliary) == nullptr) {
         continue;
       }
       const auto* particle =
-          dict_manager->lookupExact(extractSubstring(codepoints, auxiliary_end, end_pos), core::PartOfSpeech::Particle);
+          lookupEntryInRange(*dict_manager, codepoints, auxiliary_end, end_pos, core::PartOfSpeech::Particle);
       if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleFinal) {
         return true;
       }
@@ -81,7 +81,7 @@ bool endsWithMultiMoraFinalParticle(const std::vector<char32_t>& codepoints, siz
   const size_t earliest = end_pos > kMaxFinalParticleChars ? end_pos - kMaxFinalParticleChars : start_pos + 1;
   for (size_t particle_start = earliest; particle_start < end_pos - 1; ++particle_start) {
     const auto* particle =
-        dict_manager->lookupExact(extractSubstring(codepoints, particle_start, end_pos), core::PartOfSpeech::Particle);
+        lookupEntryInRange(*dict_manager, codepoints, particle_start, end_pos, core::PartOfSpeech::Particle);
     if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleFinal) {
       return true;
     }

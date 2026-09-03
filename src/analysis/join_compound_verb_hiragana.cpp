@@ -2,7 +2,7 @@
  * @file join_compound_verb_hiragana.cpp
  * @brief Hiragana compound-verb join candidate generation
  */
-
+#include "analysis/dictionary_probe.h"
 #include "join_compound_verb_internal.h"
 
 namespace suzume::analysis {
@@ -26,8 +26,7 @@ size_t findParticleInitialClosedOnbinSplit(std::string_view text, const std::vec
     return codepoints.size();
   }
 
-  const std::string first_surface = extractSubstring(codepoints, start_pos, start_pos + 1);
-  if (dict_manager.lookupExact(first_surface, core::PartOfSpeech::Particle) == nullptr) {
+  if (lookupEntryInRange(dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle) == nullptr) {
     return codepoints.size();
   }
 
@@ -130,13 +129,13 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
     ++hiragana_end;
   }
   if (start_pos + 2 < hiragana_end) {
-    const std::string leading = extractSubstring(codepoints, start_pos, start_pos + 1);
-    const auto* particle = dict_manager.lookupExact(leading, core::PartOfSpeech::Particle);
+    const auto* particle =
+        lookupEntryInRange(dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle);
     const std::string whole = extractSubstring(codepoints, start_pos, hiragana_end);
-    const std::string remainder = extractSubstring(codepoints, start_pos + 1, hiragana_end);
     if (particle != nullptr && particle->extended_pos != core::ExtendedPOS::ParticleFinal &&
         dict_manager.lookupExact(whole, core::PartOfSpeech::Verb) == nullptr &&
-        dict_manager.lookupExact(remainder, core::PartOfSpeech::Verb) != nullptr) {
+        lookupEntryInRange(dict_manager, codepoints, start_pos + 1, hiragana_end, core::PartOfSpeech::Verb) !=
+            nullptr) {
       return;
     }
   }

@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -93,8 +94,8 @@ const grammar::InflectionCandidate* readContractedHypothetical(const std::vector
   // keeps its own boundary (書か + なきゃ, never a form of the non-word 書かなく).
   // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
   for (size_t tail_start = start_pos + 1; dict_manager != nullptr && tail_start < contracted_end; ++tail_start) {
-    if (dict_manager->lookupExact(extractSubstring(codepoints, tail_start, contracted_end),
-                                  core::PartOfSpeech::Auxiliary) != nullptr) {
+    if (lookupEntryInRange(*dict_manager, codepoints, tail_start, contracted_end, core::PartOfSpeech::Auxiliary) !=
+        nullptr) {
       return nullptr;
     }
   }

@@ -2,7 +2,7 @@
  * @file suffix_candidates_nominalized.cpp
  * @brief Nominalized noun candidate generation
  */
-
+#include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -471,8 +471,8 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // A dictionary i-adjective (甘い、辛い) is not a deverbal noun merely
   // because its final mora is also an i-row renyokei ending.
   if (first_hiragana == U'い' && dict_manager != nullptr) {
-    const std::string adjective_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
-    if (dict_manager->lookupExact(adjective_surface, core::PartOfSpeech::Adjective) != nullptr) {
+    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_end + 1, core::PartOfSpeech::Adjective) !=
+        nullptr) {
       skip_single_char = true;
     }
   }
@@ -484,8 +484,8 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // nominals are not deverbal at all and are carried by their own entries
   // (自ら, 半ば), so the dictionary reading still wins where one exists.
   if (grammar::isARowCodepoint(first_hiragana)) {
-    const std::string nominal_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
-    if (dict_manager == nullptr || dict_manager->lookupExact(nominal_surface, core::PartOfSpeech::Noun) == nullptr) {
+    if (dict_manager == nullptr ||
+        lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_end + 1, core::PartOfSpeech::Noun) == nullptr) {
       skip_single_char = true;
     }
   }

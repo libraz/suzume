@@ -8,6 +8,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
@@ -113,14 +114,14 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         const bool negative_aux_follows =
             continuation == U'な' && renyokei_end + 1 < codepoints.size() && codepoints[renyokei_end + 1] == U'い';
         const bool follows_topic_particle = start_pos > 0 && dict_manager != nullptr && [&] {
-          const auto* preceding = dict_manager->lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos),
-                                                            core::PartOfSpeech::Particle);
+          const auto* preceding =
+              lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
           return preceding != nullptr && preceding->extended_pos == core::ExtendedPOS::ParticleTopic;
         }();
         const bool follows_quotative_determiner =
             negative_aux_follows && renyokei_end + 5 <= codepoints.size() && dict_manager != nullptr &&
-            dict_manager->lookupExact(extractSubstring(codepoints, renyokei_end + 2, renyokei_end + 5),
-                                      core::PartOfSpeech::Determiner) != nullptr;
+            lookupEntryInRange(*dict_manager, codepoints, renyokei_end + 2, renyokei_end + 5,
+                               core::PartOfSpeech::Determiner) != nullptr;
         // The negative auxiliary resolves the shared i-row surface as an
         // Ichidan irrealis only in a predicate slot.  Without that syntactic
         // evidence, a lexical noun plus independent ない (頼り+ない) remains
@@ -262,8 +263,8 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
           constexpr size_t kAuxiliaryProbe = 4;
           const size_t max_aux_end = std::min(codepoints.size(), kanji_end + kAuxiliaryProbe);
           for (size_t aux_end = renyokei_end + 1; aux_end <= max_aux_end; ++aux_end) {
-            if (dict_manager->lookupExact(extractSubstring(codepoints, kanji_end, aux_end),
-                                          core::PartOfSpeech::Auxiliary) != nullptr) {
+            if (lookupEntryInRange(*dict_manager, codepoints, kanji_end, aux_end, core::PartOfSpeech::Auxiliary) !=
+                nullptr) {
               okurigana_opens_auxiliary = true;
               SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" okurigana opens an auxiliary, "
                                                 << "skipping ichidan_renyokei\n");
@@ -275,8 +276,8 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
           // attaches to the bare Ichidan stem, so 見ね is always 見 + ね (izenkei,
           // before ば). Other one-kana auxiliaries coincide with the stem-final
           // kana of ordinary lexical verbs (見せ, 立て) and must stay absorbed.
-          const auto* okurigana_auxiliary = dict_manager->lookupExact(
-              extractSubstring(codepoints, kanji_end, renyokei_end), core::PartOfSpeech::Auxiliary);
+          const auto* okurigana_auxiliary =
+              lookupEntryInRange(*dict_manager, codepoints, kanji_end, renyokei_end, core::PartOfSpeech::Auxiliary);
           if (okurigana_auxiliary != nullptr && okurigana_auxiliary->extended_pos == core::ExtendedPOS::AuxNegativeNu) {
             okurigana_opens_auxiliary = true;
             SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" okurigana is the classical negative, "
@@ -390,8 +391,8 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       // own clause rather than the first half of a compound verb.
       bool preceded_by_case_particle = false;
       if (start_pos > 0 && dict_manager != nullptr) {
-        const auto* preceding = dict_manager->lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos),
-                                                          core::PartOfSpeech::Particle);
+        const auto* preceding =
+            lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
         preceded_by_case_particle = preceding != nullptr && preceding->extended_pos == core::ExtendedPOS::ParticleCase;
       }
       // A bare continuative also chains straight into the predicate that follows

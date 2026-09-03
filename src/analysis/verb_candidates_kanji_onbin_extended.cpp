@@ -5,6 +5,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
@@ -55,8 +56,7 @@ bool hasStandaloneVerbTail(const dictionary::DictionaryManager* dict_manager, co
 bool hasClosedAuxiliaryTail(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                             size_t tail_start, size_t tail_end) {
   return dict_manager != nullptr && tail_start < tail_end &&
-         dict_manager->lookupExact(extractSubstring(codepoints, tail_start, tail_end), core::PartOfSpeech::Auxiliary) !=
-             nullptr;
+         lookupEntryInRange(*dict_manager, codepoints, tail_start, tail_end, core::PartOfSpeech::Auxiliary) != nullptr;
 }
 
 /**

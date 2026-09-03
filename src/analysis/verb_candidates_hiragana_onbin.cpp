@@ -8,6 +8,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
@@ -426,8 +427,8 @@ bool followsListedAdverb(const std::vector<char32_t>& codepoints, size_t start_p
     return false;
   }
   for (size_t len = 1; len <= kMaxAdverbMorae && len <= start_pos; ++len) {
-    if (dict_manager->lookupExact(extractSubstring(codepoints, start_pos - len, start_pos),
-                                  core::PartOfSpeech::Adverb) != nullptr) {
+    if (lookupEntryInRange(*dict_manager, codepoints, start_pos - len, start_pos, core::PartOfSpeech::Adverb) !=
+        nullptr) {
       return true;
     }
   }

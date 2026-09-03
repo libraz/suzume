@@ -2,7 +2,7 @@
  * @file compound_verb_emit.cpp
  * @brief Post-match validation, scoring, and edge emission for compound verbs
  */
-
+#include "analysis/dictionary_probe.h"
 #include "grammar/honorific_verbs.h"
 #include "join_compound_verb_internal.h"
 
@@ -26,8 +26,8 @@ bool containsNegativeAuxiliary(const std::vector<char32_t>& codepoints, size_t s
 
 bool followsClosedSuffix(const std::vector<char32_t>& codepoints, size_t start_pos,
                          const dictionary::DictionaryManager& dict_manager) {
-  return start_pos > 0 && dict_manager.lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos),
-                                                   core::PartOfSpeech::Suffix) != nullptr;
+  return start_pos > 0 &&
+         lookupEntryInRange(dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Suffix) != nullptr;
 }
 
 // Whether the て/で in front of V2 is the conjunctive particle rather than the
@@ -175,8 +175,8 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
     // particle supplies the closed right boundary for this distinction.
     if (v2_start > start_pos && v2_start < codepoints.size() && codepoints[v2_start] == U'で' &&
         codepoints[v2_start - 1] == U'い' && compound_end_pos < codepoints.size() &&
-        dict_manager.lookupExact(extractSubstring(codepoints, compound_end_pos, compound_end_pos + 1),
-                                 core::PartOfSpeech::Particle) != nullptr) {
+        lookupEntryInRange(dict_manager, codepoints, compound_end_pos, compound_end_pos + 1,
+                           core::PartOfSpeech::Particle) != nullptr) {
       return;
     }
 

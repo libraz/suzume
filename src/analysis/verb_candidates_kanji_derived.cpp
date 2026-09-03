@@ -8,6 +8,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
@@ -346,7 +347,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
         bool has_formal_method_continuation = false;
         if (is_volitional && dict_manager != nullptr && you_end <= codepoints.size()) {
           const auto* formal_you =
-              dict_manager->lookupExact(extractSubstring(codepoints, renyokei_end, you_end), core::PartOfSpeech::Noun);
+              lookupEntryInRange(*dict_manager, codepoints, renyokei_end, you_end, core::PartOfSpeech::Noun);
           const bool no_way_continuation = formal_you != nullptr &&
                                            formal_you->extended_pos == core::ExtendedPOS::NounFormal &&
                                            you_end < codepoints.size() && codepoints[you_end] == U'が' &&

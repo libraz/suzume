@@ -2,7 +2,7 @@
  * @file suffix_candidates_prefix.cpp
  * @brief Suffix-based unknown word candidate generation
  */
-
+#include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -113,7 +113,7 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
   // marking the boundary before it (佐藤|先生).
   if (dict_manager != nullptr && !normalize::continuesTemporalNounCompound(first_char, second_char)) {
     const auto* head =
-        dict_manager->lookupExact(extractSubstring(codepoints, start_pos, start_pos + 1), core::PartOfSpeech::Noun);
+        lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Noun);
     if (head != nullptr && head->extended_pos == core::ExtendedPOS::Noun) {
       return;
     }

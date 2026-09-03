@@ -9,6 +9,7 @@
 #include <utility>
 
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "core/utf8_constants.h"
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
@@ -98,7 +99,7 @@ bool derivesFromCompoundFormingAdjective(const std::vector<char32_t>& codepoints
   }
   for (size_t particle_start = start_pos + 1; particle_start < host_end; ++particle_start) {
     const auto* particle =
-        dict_manager->lookupExact(extractSubstring(codepoints, particle_start, host_end), core::PartOfSpeech::Particle);
+        lookupEntryInRange(*dict_manager, codepoints, particle_start, host_end, core::PartOfSpeech::Particle);
     if (particle != nullptr && std::find(kNominalPhraseParticles.begin(), kNominalPhraseParticles.end(),
                                          particle->extended_pos) != kNominalPhraseParticles.end()) {
       return false;

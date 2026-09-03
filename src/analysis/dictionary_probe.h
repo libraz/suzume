@@ -40,6 +40,20 @@ size_t acceptedDictionaryEntryLength(const dictionary::DictionaryManager* dict_m
                                      const std::vector<char32_t>& codepoints, size_t start, size_t min_len,
                                      size_t max_len, core::PartOfSpeech pos, EntryAccept accept, bool longest_first);
 
+/**
+ * @brief The dictionary entry whose surface is exactly codepoints[start, end)
+ *
+ * The single owner of the span-to-surface conversion the exact lookups share.
+ * Encoding the span at the call site inlines the UTF-8 encode loop and the
+ * temporary's teardown into every caller.
+ *
+ * @param pos Restricts the lookup to one part of speech; Unknown accepts any
+ * @return the matching entry, or nullptr if the span names none
+ */
+const dictionary::DictionaryEntry* lookupEntryInRange(const dictionary::DictionaryManager& dict_manager,
+                                                      const std::vector<char32_t>& codepoints, size_t start, size_t end,
+                                                      core::PartOfSpeech pos = core::PartOfSpeech::Unknown);
+
 /** @brief Whether any dictionary entry spanning @p start is accepted */
 inline bool hasDictionaryEntryFrom(const dictionary::DictionaryManager* dict_manager,
                                    const std::vector<char32_t>& codepoints, size_t start, size_t min_len,

@@ -5,6 +5,7 @@
 
 #include "tokenizer_utils.h"
 
+#include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/utf8_constants.h"
 #include "dictionary/dictionary.h"
@@ -130,8 +131,8 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
          verb_helpers::isVerbInDictionary(dict_manager, extractSubstring(codepoints, kanji_end - 1, continuative_end) +
                                                             normalize::encodeUtf8(core::hiragana::kRu)));
     for (size_t suffix_start = kanji_start + 1; suffix_start < kanji_end; ++suffix_start) {
-      if (dict_manager->lookupExact(extractSubstring(codepoints, suffix_start, continuative_end),
-                                    core::PartOfSpeech::Suffix) != nullptr) {
+      if (lookupEntryInRange(*dict_manager, codepoints, suffix_start, continuative_end, core::PartOfSpeech::Suffix) !=
+          nullptr) {
         if (ends_in_dictionary_verb_continuative && suffix_start + 2 >= continuative_end) {
           continue;
         }
@@ -357,8 +358,8 @@ int maximalSegmentCount(const dictionary::DictionaryManager& dict_manager, const
       continue;
     }
     for (size_t relative_end = relative_start + 1; relative_end <= span; ++relative_end) {
-      const std::string part = extractSubstring(codepoints, start_pos + relative_start, start_pos + relative_end);
-      if (dict_manager.lookupExact(part, pos) != nullptr) {
+      if (lookupEntryInRange(dict_manager, codepoints, start_pos + relative_start, start_pos + relative_end, pos) !=
+          nullptr) {
         part_count[relative_end] = std::max(part_count[relative_end], part_count[relative_start] + 1);
       }
     }

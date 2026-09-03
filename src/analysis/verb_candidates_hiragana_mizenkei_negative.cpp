@@ -8,6 +8,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
@@ -265,14 +266,13 @@ void appendMizenkeiNegativeCandidates(const std::vector<char32_t>& codepoints, s
     // fallback (資料を+しら+ぬ).  This remains tied to the auxiliary class,
     // rather than granting every one-mora continuation the same discount.
     const auto* following_auxiliary =
-        dict_manager == nullptr ? nullptr
-                                : dict_manager->lookupExact(extractSubstring(codepoints, end_pos, end_pos + aux_len),
-                                                            core::PartOfSpeech::Auxiliary);
+        dict_manager == nullptr
+            ? nullptr
+            : lookupEntryInRange(*dict_manager, codepoints, end_pos, end_pos + aux_len, core::PartOfSpeech::Auxiliary);
     const auto* preceding_particle =
         start_pos == 0 || dict_manager == nullptr
             ? nullptr
-            : dict_manager->lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos),
-                                        core::PartOfSpeech::Particle);
+            : lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
     if (!is_in_dict && following_auxiliary != nullptr &&
         following_auxiliary->extended_pos == core::ExtendedPOS::AuxNegativeNu && preceding_particle != nullptr &&
         preceding_particle->extended_pos == core::ExtendedPOS::ParticleCase) {

@@ -180,7 +180,7 @@ bool closesContentWord(const std::vector<char32_t>& codepoints, size_t start_pos
   if (dict_manager == nullptr || end_pos <= start_pos) {
     return false;
   }
-  const auto* entry = dict_manager->lookupExact(extractSubstring(codepoints, start_pos, end_pos));
+  const auto* entry = lookupEntryInRange(*dict_manager, codepoints, start_pos, end_pos);
   if (entry == nullptr) {
     return false;
   }
@@ -553,8 +553,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       if (starts_at_dictionary_verb_continuative && len > 1 && dict_manager_ != nullptr) {
         bool embeds_closed_auxiliary = false;
         for (size_t split = start_pos + 1; split < candidate_end; ++split) {
-          if (dict_manager_->lookupExact(extractSubstring(codepoints, split, candidate_end),
-                                         core::PartOfSpeech::Auxiliary) != nullptr) {
+          if (lookupEntryInRange(*dict_manager_, codepoints, split, candidate_end, core::PartOfSpeech::Auxiliary) !=
+              nullptr) {
             embeds_closed_auxiliary = true;
             break;
           }
@@ -582,10 +582,9 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           codepoints[start_pos - 1] == U'た' && codepoints[start_pos] == U'り' &&
           (candidate_end == codepoints.size() ||
            (candidate_end < codepoints.size() && isRightBoundaryParticle(codepoints[candidate_end])));
-      const bool has_verb_tail_after_ri =
-          closes_past_tari_collision_noun && dict_manager_ != nullptr &&
-          dict_manager_->lookupExact(extractSubstring(codepoints, start_pos + 1, candidate_end),
-                                     core::PartOfSpeech::Verb) != nullptr;
+      const bool has_verb_tail_after_ri = closes_past_tari_collision_noun && dict_manager_ != nullptr &&
+                                          lookupEntryInRange(*dict_manager_, codepoints, start_pos + 1, candidate_end,
+                                                             core::PartOfSpeech::Verb) != nullptr;
       const bool has_inflected_verb_reading =
           closes_past_tari_collision_noun && std::any_of(inflection_.analyze(surface).begin(),
                                                          inflection_.analyze(surface).end(), [](const auto& analysis) {
@@ -695,8 +694,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           isPrefixLikeKanji(codepoints[start_pos]) &&
           !normalize::continuesTemporalNounCompound(codepoints[start_pos], codepoints[start_pos + 1]) &&
           (start_pos == 0 || char_types[start_pos - 1] != normalize::CharType::Kanji)) {
-        const auto* head = dict_manager_->lookupExact(extractSubstring(codepoints, start_pos, start_pos + 1),
-                                                      core::PartOfSpeech::Noun);
+        const auto* head =
+            lookupEntryInRange(*dict_manager_, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Noun);
         if (head != nullptr && head->extended_pos == core::ExtendedPOS::Noun) {
           continue;
         }
@@ -749,8 +748,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // hiragana fallback must leave the particle available at the boundary.
       if (start_type == normalize::CharType::Hiragana && !started_with_particle && dict_manager_ != nullptr &&
           candidate_end > start_pos + 1) {
-        const auto* final_particle = dict_manager_->lookupExact(
-            extractSubstring(codepoints, candidate_end - 1, candidate_end), core::PartOfSpeech::Particle);
+        const auto* final_particle = lookupEntryInRange(*dict_manager_, codepoints, candidate_end - 1, candidate_end,
+                                                        core::PartOfSpeech::Particle);
         if (final_particle != nullptr && final_particle->extended_pos == core::ExtendedPOS::ParticleConj &&
             codepoints[candidate_end - 1] == U'ば') {
           continue;
@@ -764,10 +763,10 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       if (start_type == normalize::CharType::Hiragana && !started_with_particle && len >= 3 &&
           codepoints[candidate_end - 1] == U'さ' && dict_manager_ != nullptr) {
         const bool follows_prefix =
-            start_pos > 0 && dict_manager_->lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos),
-                                                        core::PartOfSpeech::Prefix) != nullptr;
-        const auto* interjection = dict_manager_->lookupExact(
-            extractSubstring(codepoints, start_pos, candidate_end - 1), core::PartOfSpeech::Interjection);
+            start_pos > 0 && lookupEntryInRange(*dict_manager_, codepoints, start_pos - 1, start_pos,
+                                                core::PartOfSpeech::Prefix) != nullptr;
+        const auto* interjection = lookupEntryInRange(*dict_manager_, codepoints, start_pos, candidate_end - 1,
+                                                      core::PartOfSpeech::Interjection);
         if (interjection != nullptr && !follows_prefix) {
           auto noun_candidate = makeCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Noun,
                                               candidate::kSelectedNominalShortHeadCost,
@@ -822,8 +821,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         const size_t probe_end = std::min(codepoints.size(), candidate_end + kSuffixProbe);
         bool heads_bound_suffix = false;
         for (size_t suffix_end = candidate_end + 1; suffix_end <= probe_end; ++suffix_end) {
-          if (dict_manager_->lookupExact(extractSubstring(codepoints, candidate_end - 1, suffix_end),
-                                         core::PartOfSpeech::Suffix) != nullptr) {
+          if (lookupEntryInRange(*dict_manager_, codepoints, candidate_end - 1, suffix_end,
+                                 core::PartOfSpeech::Suffix) != nullptr) {
             heads_bound_suffix = true;
             break;
           }
@@ -857,7 +856,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         bool opens_with_formal_noun = false;
         for (size_t head_end = start_pos + 2; head_end < candidate_end; ++head_end) {
           const auto* entry =
-              dict_manager_->lookupExact(extractSubstring(codepoints, start_pos, head_end), core::PartOfSpeech::Noun);
+              lookupEntryInRange(*dict_manager_, codepoints, start_pos, head_end, core::PartOfSpeech::Noun);
           if (entry != nullptr && entry->extended_pos == core::ExtendedPOS::NounFormal) {
             opens_with_formal_noun = true;
             break;
@@ -878,7 +877,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         bool closes_on_formal_noun = false;
         for (size_t split = start_pos + 1; split < candidate_end; ++split) {
           const auto* tail =
-              dict_manager_->lookupExact(extractSubstring(codepoints, split, candidate_end), core::PartOfSpeech::Noun);
+              lookupEntryInRange(*dict_manager_, codepoints, split, candidate_end, core::PartOfSpeech::Noun);
           if (tail != nullptr && tail->extended_pos == core::ExtendedPOS::NounFormal) {
             closes_on_formal_noun = true;
             break;
@@ -896,8 +895,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       if (start_type == normalize::CharType::Hiragana && len > 1 && dict_manager_ != nullptr) {
         bool crosses_proven_particle = false;
         for (size_t particle_pos = start_pos; particle_pos < candidate_end; ++particle_pos) {
-          const auto* particle = dict_manager_->lookupExact(
-              extractSubstring(codepoints, particle_pos, particle_pos + 1), core::PartOfSpeech::Particle);
+          const auto* particle = lookupEntryInRange(*dict_manager_, codepoints, particle_pos, particle_pos + 1,
+                                                    core::PartOfSpeech::Particle);
           if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
             continue;
           }
@@ -991,10 +990,10 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
   // clause boundary — sentence start / a preceding symbol (punctuation). の is not a
   // left boundary here (genitive marks a compound boundary).
   bool left_particle_bracket = start_pos >= 1 && isLeftBoundaryParticle(codepoints[start_pos - 1]);
-  const auto* left_particle = dict_manager_ != nullptr && start_pos >= 1
-                                  ? dict_manager_->lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos),
-                                                               core::PartOfSpeech::Particle)
-                                  : nullptr;
+  const auto* left_particle =
+      dict_manager_ != nullptr && start_pos >= 1
+          ? lookupEntryInRange(*dict_manager_, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle)
+          : nullptr;
   const bool left_genitive_bracket = left_particle != nullptr &&
                                      left_particle->extended_pos == core::ExtendedPOS::ParticleNo &&
                                      codepoints[start_pos - 1] == U'の';
@@ -1121,7 +1120,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // eligible as genuine word-internal homographs.
       const auto* single_particle =
           dict_manager_ != nullptr
-              ? dict_manager_->lookupExact(extractSubstring(codepoints, scan, scan + 1), core::PartOfSpeech::Particle)
+              ? lookupEntryInRange(*dict_manager_, codepoints, scan, scan + 1, core::PartOfSpeech::Particle)
               : nullptr;
       const bool is_genitive_particle =
           single_particle != nullptr && single_particle->extended_pos == core::ExtendedPOS::ParticleNo && curr == U'の';
@@ -1205,9 +1204,9 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // An auxiliary is bound leftward, so it brackets the run in front of it just
       // as a particle does. It does not select the run the way a case particle
       // does, so it only makes the candidate available.
-      const bool right_auxiliary = dict_manager_ != nullptr && scan < codepoints.size() &&
-                                   dict_manager_->lookupExact(extractSubstring(codepoints, scan, scan + 1),
-                                                              core::PartOfSpeech::Auxiliary) != nullptr;
+      const bool right_auxiliary =
+          dict_manager_ != nullptr && scan < codepoints.size() &&
+          lookupEntryInRange(*dict_manager_, codepoints, scan, scan + 1, core::PartOfSpeech::Auxiliary) != nullptr;
       // A two-mora run is safe when particles bracket it (私は|はし|を), or
       // when an unambiguous single case particle selects an otherwise
       // unregistered run at a clause boundary (さき|に). Quotative と and
@@ -1232,7 +1231,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           dict_manager_ != nullptr ? dict_manager_->lookupExact(promoted_surface) : nullptr;
       const auto* absorbed_auxiliary =
           dict_manager_ != nullptr && scan > start_pos
-              ? dict_manager_->lookupExact(extractSubstring(codepoints, scan - 1, scan), core::PartOfSpeech::Auxiliary)
+              ? lookupEntryInRange(*dict_manager_, codepoints, scan - 1, scan, core::PartOfSpeech::Auxiliary)
               : nullptr;
       // A sokuon-initial final particle may follow a completed nominal, but it
       // cannot license a noun candidate that has swallowed the copula
@@ -1263,7 +1262,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           right_copula && left_clause_bracket && len == 2 && !has_exact_noun && has_exact_conditional_verb;
       const auto* short_right_particle =
           dict_manager_ != nullptr && scan < codepoints.size()
-              ? dict_manager_->lookupExact(extractSubstring(codepoints, scan, scan + 1), core::PartOfSpeech::Particle)
+              ? lookupEntryInRange(*dict_manager_, codepoints, scan, scan + 1, core::PartOfSpeech::Particle)
               : nullptr;
       const bool short_bos_case_particle_bracket =
           left_clause_bracket && promoted_dictionary_reading == nullptr && short_right_particle != nullptr &&

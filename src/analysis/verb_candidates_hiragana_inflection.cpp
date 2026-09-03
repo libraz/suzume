@@ -8,6 +8,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
@@ -80,7 +81,7 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
       dict_manager->lookupExact(full_surface, core::PartOfSpeech::Verb) != nullptr;
   const auto& full_surface_candidates = inflection.analyze(full_surface);
   const auto* preceding_particle =
-      dict_manager->lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos), core::PartOfSpeech::Particle);
+      lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
   // The predicate slot is fixed by the case particle and its own host, so the
   // span that has to be a complete dictionary form is the one filling the slot.
   // The kana run can continue past it into a closed auxiliary the predicate
@@ -102,8 +103,8 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
   for (size_t terminal_end = start_pos + 3;
        follows_fixed_predicate_slot && !complete_terminal_after_case_particle && terminal_end < probe_end;
        ++terminal_end) {
-    if (dict_manager->lookupExact(extractSubstring(codepoints, terminal_end, probe_end),
-                                  core::PartOfSpeech::Auxiliary) == nullptr) {
+    if (lookupEntryInRange(*dict_manager, codepoints, terminal_end, probe_end, core::PartOfSpeech::Auxiliary) ==
+        nullptr) {
       continue;
     }
     complete_terminal_after_case_particle = is_complete_godan_terminal(terminal_end);
@@ -473,8 +474,8 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
       if (dict_manager != nullptr) {
         const size_t stem_end = end_pos - 1;
         for (size_t auxiliary_start = start_pos + 1; auxiliary_start < stem_end; ++auxiliary_start) {
-          if (dict_manager->lookupExact(extractSubstring(codepoints, auxiliary_start, stem_end),
-                                        core::PartOfSpeech::Auxiliary) != nullptr) {
+          if (lookupEntryInRange(*dict_manager, codepoints, auxiliary_start, stem_end, core::PartOfSpeech::Auxiliary) !=
+              nullptr) {
             has_internal_auxiliary_suffix = true;
             break;
           }
@@ -483,8 +484,7 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
       const bool particle_bounded_unknown_volitional =
           !is_dictionary_verb && !base_is_dict_aux && !has_internal_auxiliary_suffix && end_pos < codepoints.size() &&
           codepoints[end_pos] == U'と' && dict_manager != nullptr &&
-          dict_manager->lookupExact(extractSubstring(codepoints, end_pos, end_pos + 1), core::PartOfSpeech::Particle) !=
-              nullptr;
+          lookupEntryInRange(*dict_manager, codepoints, end_pos, end_pos + 1, core::PartOfSpeech::Particle) != nullptr;
       if (is_dictionary_verb || base_is_dict_aux || particle_bounded_unknown_volitional) {
         // Dictionary verbs already expose their 未然形 as a dict edge (なろ).
         // Aux-registered subsidiary verbs (しまう) list only hand-picked
@@ -900,8 +900,8 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
               codepoints, start_pos, dict_manager,
               dict_manager == nullptr || start_pos == 0
                   ? nullptr
-                  : dict_manager->lookupExact(extractSubstring(codepoints, start_pos - 1, start_pos),
-                                              core::PartOfSpeech::Particle))) {
+                  : lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos,
+                                       core::PartOfSpeech::Particle))) {
         base_cost += candidate::verb_cost::kModerateBonus;
       }
 
@@ -940,8 +940,8 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
         const size_t conditional_stem_end = end_pos - 1;
         for (size_t te_pos = start_pos + 1; te_pos + 1 < conditional_stem_end; ++te_pos) {
           if (codepoints[te_pos] == core::hiragana::kTe &&
-              dict_manager->lookupExact(extractSubstring(codepoints, te_pos + 1, conditional_stem_end),
-                                        core::PartOfSpeech::Verb) != nullptr) {
+              lookupEntryInRange(*dict_manager, codepoints, te_pos + 1, conditional_stem_end,
+                                 core::PartOfSpeech::Verb) != nullptr) {
             embeds_te_conditional_auxiliary = true;
             break;
           }

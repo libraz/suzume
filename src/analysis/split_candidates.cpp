@@ -7,6 +7,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/category_cost.h"
+#include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
 #include "grammar/char_patterns.h"
@@ -69,8 +70,7 @@ bool hasSuruContinuation(const std::vector<char32_t>& codepoints, size_t suffix_
 bool suffixHeadedRunAbsorbsVerifiedGodanStem(const std::vector<char32_t>& codepoints, size_t start_pos,
                                              size_t kanji_end, const dictionary::DictionaryManager& dict_manager) {
   if (start_pos >= kanji_end || kanji_end >= codepoints.size() ||
-      dict_manager.lookupExact(extractSubstring(codepoints, start_pos, start_pos + 1), core::PartOfSpeech::Suffix) ==
-          nullptr) {
+      lookupEntryInRange(dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Suffix) == nullptr) {
     return false;
   }
   const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(codepoints[kanji_end]);

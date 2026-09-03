@@ -8,6 +8,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
@@ -124,8 +125,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
     constexpr size_t kMaxKanjiLeadingAuxLength = 4;
     const size_t max_end = std::min(codepoints.size(), single_kanji_end + kMaxKanjiLeadingAuxLength);
     for (size_t aux_end = single_kanji_end + 1; aux_end <= max_end; ++aux_end) {
-      const std::string auxiliary_surface = extractSubstring(codepoints, single_kanji_end, aux_end);
-      const auto* auxiliary_entry = dict_manager->lookupExact(auxiliary_surface);
+      const auto* auxiliary_entry = lookupEntryInRange(*dict_manager, codepoints, single_kanji_end, aux_end);
       const bool is_closed_auxiliary =
           auxiliary_entry != nullptr && (auxiliary_entry->pos == core::PartOfSpeech::Auxiliary ||
                                          auxiliary_entry->extended_pos == core::ExtendedPOS::AuxInability ||
@@ -168,7 +168,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       const size_t max_aux_end = std::min(codepoints.size(), kanji_end + kNegativeAuxProbe);
       for (size_t aux_end = kanji_end + 1; aux_end <= max_aux_end; ++aux_end) {
         const auto* negative_entry =
-            dict_manager->lookupExact(extractSubstring(codepoints, kanji_end, aux_end), core::PartOfSpeech::Auxiliary);
+            lookupEntryInRange(*dict_manager, codepoints, kanji_end, aux_end, core::PartOfSpeech::Auxiliary);
         if (negative_entry != nullptr && negative_entry->extended_pos == core::ExtendedPOS::AuxNegativeNu) {
           classical_negative_follows = true;
           break;

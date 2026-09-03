@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 
+#include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
 #include "dictionary/dictionary.h"
@@ -204,7 +205,7 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
     // (手紙三通). Only the formal-noun subclass qualifies — an ordinary noun
     // after a numeral is a modified nominal, not a quantity phrase.
     const auto* formal_noun =
-        dict_manager->lookupExact(extractSubstring(codepoints, numeral_end, counter_end), core::PartOfSpeech::Noun);
+        lookupEntryInRange(*dict_manager, codepoints, numeral_end, counter_end, core::PartOfSpeech::Noun);
     const bool has_formal_noun_counter =
         formal_noun != nullptr && formal_noun->extended_pos == core::ExtendedPOS::NounFormal;
     if ((has_deverbal_counter || has_formal_noun_counter) && !inflected_predicate) {

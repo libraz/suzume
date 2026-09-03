@@ -2,7 +2,7 @@
  * @file compound_verb_match.cpp
  * @brief V1 verification and V2 matching for compound verbs
  */
-
+#include "analysis/dictionary_probe.h"
 #include "join_compound_verb_internal.h"
 
 namespace suzume::analysis::compound_verb_detail {
@@ -113,8 +113,7 @@ CompoundVerbMatch findCompoundVerbMatch(
         if (hiragana_v1_has_strong_inflection && !particle_position_is_unambiguous) {
           continue;
         }
-        const auto* particle =
-            dict_manager.lookupExact(extractSubstring(codepoints, pos, pos + 1), core::PartOfSpeech::Particle);
+        const auto* particle = lookupEntryInRange(dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Particle);
         if (particle != nullptr && particle->extended_pos != core::ExtendedPOS::ParticleFinal) {
           SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] rejected particle inside hiragana V1: "
                                    << extractSubstring(codepoints, pos, pos + 1) << "\n");
@@ -375,10 +374,10 @@ CompoundVerbMatch findCompoundVerbMatch(
         if (!hiragana_v1) {
           const size_t volitional_end = v2_start + normalize::utf8Length(stem) + 1;
           for (size_t split_pos = v2_start + 1; split_pos < volitional_end; ++split_pos) {
-            const auto* left_auxiliary = dict_manager.lookupExact(extractSubstring(codepoints, v2_start, split_pos),
-                                                                  core::PartOfSpeech::Auxiliary);
-            const auto* right_auxiliary = dict_manager.lookupExact(
-                extractSubstring(codepoints, split_pos, volitional_end), core::PartOfSpeech::Auxiliary);
+            const auto* left_auxiliary =
+                lookupEntryInRange(dict_manager, codepoints, v2_start, split_pos, core::PartOfSpeech::Auxiliary);
+            const auto* right_auxiliary =
+                lookupEntryInRange(dict_manager, codepoints, split_pos, volitional_end, core::PartOfSpeech::Auxiliary);
             if (left_auxiliary != nullptr && right_auxiliary != nullptr &&
                 right_auxiliary->extended_pos == core::ExtendedPOS::AuxAppearanceSou) {
               return;
