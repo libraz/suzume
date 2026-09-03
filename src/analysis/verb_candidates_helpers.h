@@ -447,7 +447,8 @@ bool hasAuxiliaryNegativeBoundary(const dictionary::DictionaryManager* dict_mana
  * Only an inflected cell counts. An auxiliary in its base form is a headword
  * like any other and is routinely homographic with an ordinary word or with the
  * opening morae of one (ある of あるいて, たい of たいらな), so finding one there
- * says nothing. A cell whose surface differs from its lemma exists only inside
+ * says nothing (an empty lemma is the dictionary's shorthand for "same as the
+ * surface", so it marks a base form too). A cell whose lemma differs exists only inside
  * that paradigm — なかっ is not a word, it is the past stem of ない — so meeting
  * one at the head of a span is evidence the span reaches into a closed
  * paradigm. The 2+ codepoint floor is the one the rest of this family carries:
