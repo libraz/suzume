@@ -2461,6 +2461,92 @@
       ],
       "id": "sokoniaran",
       "input": "そこにあらん"
+    },
+    {
+      "description": "時を惜しみつつ - auto-generated",
+      "expected": [
+        {
+          "lemma": "時",
+          "pos": "Noun",
+          "surface": "時"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "惜しむ",
+          "pos": "Verb",
+          "surface": "惜しみ"
+        },
+        {
+          "lemma": "つつ",
+          "pos": "Particle",
+          "surface": "つつ"
+        }
+      ],
+      "id": "wo_shimitsutsu",
+      "input": "時を惜しみつつ"
+    },
+    {
+      "description": "花を惜しみながら - auto-generated",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "惜しむ",
+          "pos": "Verb",
+          "surface": "惜しみ"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        }
+      ],
+      "id": "wo_shiminagara",
+      "input": "花を惜しみながら"
+    },
+    {
+      "description": "人に親しみを持つ - auto-generated",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "親しみ",
+          "pos": "Noun",
+          "surface": "親しみ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "持つ",
+          "pos": "Verb",
+          "surface": "持つ"
+        }
+      ],
+      "id": "ni_shimiwo_tsu",
+      "input": "人に親しみを持つ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
