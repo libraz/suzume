@@ -174,6 +174,87 @@
       ],
       "id": "ku_sen",
       "input": "早く確認せん。"
+    },
+    {
+      "description": "彼を待たん - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待た"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "wo_tan",
+      "input": "彼を待たん"
+    },
+    {
+      "description": "話が分からん - auto-generated",
+      "expected": [
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分から"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "ga_karan",
+      "input": "話が分からん"
+    },
+    {
+      "description": "空を飛んだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "空",
+          "pos": "Noun",
+          "surface": "空"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "飛ぶ",
+          "pos": "Verb",
+          "surface": "飛ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "wo_nda_4",
+      "input": "空を飛んだ"
     }
   ],
   "description": "auxiliary_negative tests",
