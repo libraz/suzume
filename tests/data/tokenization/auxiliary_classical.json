@@ -1683,6 +1683,75 @@
       ],
       "id": "karuru",
       "input": "書かるる文"
+    },
+    {
+      "description": "顔色は不安げなり - auto-generated",
+      "expected": [
+        {
+          "lemma": "顔色",
+          "pos": "Noun",
+          "surface": "顔色"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "不安",
+          "pos": "Noun",
+          "surface": "不安"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        }
+      ],
+      "id": "ha_genari",
+      "input": "顔色は不安げなり"
+    },
+    {
+      "description": "その態度は得意げなり - auto-generated",
+      "expected": [
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "態度",
+          "pos": "Noun",
+          "surface": "態度"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "得意",
+          "pos": "Noun",
+          "surface": "得意"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        }
+      ],
+      "id": "sono_ha_genari",
+      "input": "その態度は得意げなり"
     }
   ],
   "description": "auxiliary_classical tests",
