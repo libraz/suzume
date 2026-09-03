@@ -987,6 +987,15 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
       if (start_pos + normalize::utf8Length(inflection_candidate.stem) != onbin_pos) {
         continue;
       }
+      // The same reasoning bars an auxiliary standing at the head of the span.
+      // An auxiliary predicates over something already complete, so no stem is
+      // built on top of one: なかった+ん is the negative's past cell plus the
+      // nominalizer, not a form of the non-word なかったむ, even though the
+      // analysis places the stem boundary exactly where the ん sits.
+      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      if (vh::opensOnCompleteAuxiliary(dict_manager, codepoints, start_pos, onbin_pos + 1)) {
+        continue;
+      }
       const std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_pos + 1);
       candidates.push_back(makeVerbCandidate(
           onbin_surface, start_pos, onbin_pos + 1, candidate::verb_cost::kStandardBonus, inflection_candidate.base_form,

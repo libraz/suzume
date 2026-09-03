@@ -159,7 +159,17 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       const bool i_onbin_has_predicate_boundary =
           start_pos == 0 || normalize::isExtendedParticle(codepoints[start_pos - 1]) ||
           normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol;
-      if (!is_valid_verb && is_resolved_i_onbin && i_onbin_has_predicate_boundary) {
+      // No Ka/Ga-row root ends in the conjunctive て/で. Every verb spelled that
+      // way is a te-form plus a subsidiary (出て+いく, 持って+いく), so a stem
+      // ending there has absorbed the clause boundary and the い behind it opens
+      // the next predicate instead of closing this one: し+て+い+た is not a
+      // cell of the non-word してく. The phonological rescue below grants an
+      // unattested lemma on the follower alone, which is exactly where that
+      // reading needs blocking.
+      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      const bool stem_ends_on_conjunctive =
+          onbin_pos > start_pos && (codepoints[onbin_pos - 1] == U'て' || codepoints[onbin_pos - 1] == U'で');
+      if (!is_valid_verb && is_resolved_i_onbin && i_onbin_has_predicate_boundary && !stem_ends_on_conjunctive) {
         is_valid_verb = true;
       }
 
@@ -220,6 +230,16 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       // negative predicate, not the continuative of a fabricated なかう.
       if (!lemma_dict_verified && vh::hasDictionaryEntry(dict_manager, onbin_surface, core::PartOfSpeech::Auxiliary)) {
         SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << onbin_surface << "\" registered auxiliary cell\n");
+        continue;
+      }
+      // An inflected auxiliary cell can also stand at the head of the span, and
+      // there it is decidable: an auxiliary predicates over something already
+      // complete, so nothing lexical is built on top of it. A span opening on
+      // one has read the auxiliary's own cells as the okurigana of a base that
+      // is not a word (なかった+ん as a form of the non-word なかったむ).
+      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      if (!lemma_dict_verified && vh::opensOnCompleteAuxiliary(dict_manager, codepoints, start_pos, onbin_pos + 1)) {
+        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << onbin_surface << "\" opens on a complete auxiliary\n");
         continue;
       }
       // The same paradigm can also be only the span's tail, and the
