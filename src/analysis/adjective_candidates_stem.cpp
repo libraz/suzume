@@ -511,6 +511,15 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
                 hasInternalNominalDerivationalBoundary(stem, dict_manager)) {
               continue;
             }
+            // The nominalizer derives a noun, and a noun does not host the
+            // passive: a さ that れ follows is the irrealis of a godan-sa verb
+            // instead (励ま+さ+れ+ぬ, 心動か+さ+れ+ぬ). Single-kanji stems never
+            // reached this branch, which is why only the two-mora okurigana
+            // spellings broke.
+            const size_t nominalizer_end = kanji_end + (byte_pos / core::kJapaneseCharBytes) + 1;
+            if (nominalizer_end < codepoints.size() && codepoints[nominalizer_end] == U'れ') {
+              continue;
+            }
             // The さ must be the nominalizer, not the first mora of a longer
             // closed class beginning with it (飲む+さかい).
             // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
