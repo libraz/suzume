@@ -670,6 +670,17 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
         return;
       }
     }
+    // A one-kanji Ichidan stem spells its continuative bare, and the classical
+    // perfect selects exactly that (見+つ). A godan-ta verb of the same two
+    // characters is then a fabrication: the paradigm that already owns the
+    // kanji accounts for both morae. Kanji outside that closed stem set keep
+    // their godan-ta reading (発つ, 断つ, 絶つ), and a dictionary verb never
+    // reaches this point: the rule above already drops its unknown twin (待つ).
+    if (!in_dict && normalize::utf8Length(surface) == 2 && utf8::endsWith(surface, "つ") &&
+        vh::isSingleKanjiIchidan(utf8::decodeFirstChar(surface))) {
+      SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is a one-kanji Ichidan stem before the classical perfect\n");
+      return;
+    }
     // Penalize verb candidates absorbing adj く-form + なる suffix chain
     // e.g., 得なくなった should split as 得+なく+なっ+た, not merge as 得る(ichidan)
     // The suffix contains くなっ/くなり/くなる/くなれ = adj renyokei + なる conjugation
