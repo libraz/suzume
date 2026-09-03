@@ -1792,6 +1792,65 @@
       ],
       "id": "d2_shikamo_past",
       "input": "しかも間違えた"
+    },
+    {
+      "description": "The copula fused with the topic particle opens a clause at a sentence start",
+      "expected": [
+        {
+          "lemma": "では",
+          "pos": "Conjunction",
+          "surface": "では"
+        },
+        {
+          "lemma": "始める",
+          "pos": "Verb",
+          "surface": "始めよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "deha_meyou",
+      "input": "では始めよう"
+    },
+    {
+      "description": "Negative control: the same characters split after a nominal host",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "店",
+          "pos": "Noun",
+          "surface": "店"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "買える",
+          "pos": "Verb",
+          "surface": "買え"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kono_deha_enai",
+      "input": "この店では買えない"
     }
   ],
   "description": "conjunction tests",
