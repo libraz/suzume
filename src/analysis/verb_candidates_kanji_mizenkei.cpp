@@ -783,6 +783,14 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
             if (vh::embedsCaseParticle(dict_manager, codepoints, start_pos, multi_miz_end)) {
               continue;
             }
+            // The scan also reaches past an auxiliary written with a kanji, and
+            // an auxiliary heads nothing: 如く is a cell of the comparative 如し
+            // and the あら behind it opens the next predicate, not okurigana of
+            // the non-word 如くある.
+            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            if (vh::opensOnCompleteAuxiliary(dict_manager, codepoints, start_pos, multi_miz_end)) {
+              continue;
+            }
             // Verify this is a valid verb
             bool is_valid_verb = vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
                                                         candidate::verb_cost::kConstructedVerbMinConfidence, true);

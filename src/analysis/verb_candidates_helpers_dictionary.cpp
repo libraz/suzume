@@ -533,6 +533,19 @@ bool hasAuxiliaryNegativeBoundary(const dictionary::DictionaryManager* dict_mana
   return false;
 }
 
+bool opensOnCompleteAuxiliary(const dictionary::DictionaryManager* dict_manager,
+                              const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
+  if (dict_manager == nullptr || end_pos < start_pos + 2 || end_pos > codepoints.size()) {
+    return false;
+  }
+  for (size_t aux_end = start_pos + 1; aux_end < end_pos; ++aux_end) {
+    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, aux_end, core::PartOfSpeech::Auxiliary) != nullptr) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool formalNounFollowsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                          size_t pos) {
   if (dict_manager == nullptr || pos >= codepoints.size()) {

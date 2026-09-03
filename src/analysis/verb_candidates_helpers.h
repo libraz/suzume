@@ -433,6 +433,21 @@ bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manage
 bool hasAuxiliaryNegativeBoundary(const dictionary::DictionaryManager* dict_manager,
                                   const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 
+/**
+ * @brief Check whether a complete auxiliary heads a candidate span
+ *
+ * An auxiliary predicates over something already complete, so it is never the
+ * head of a lexical word: whatever follows it belongs to a separate token. A
+ * span that covers a whole auxiliary and keeps going has therefore crossed a
+ * morpheme boundary, and the kana behind the auxiliary is being read as
+ * okurigana of a word that does not exist (如く + あら analyzed as the irrealis
+ * of the non-word 如くある). The auxiliary must end strictly inside the span:
+ * one that ends with it is the auxiliary itself, spelled as its own cell.
+ * @see fabricated closed-class absorption guards (top of this header)
+ */
+bool opensOnCompleteAuxiliary(const dictionary::DictionaryManager* dict_manager,
+                              const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
+
 // True when a dictionary formal noun starts at @p pos. This lets candidate
 // generation preserve the boundary after a predicate's inflecting auxiliary.
 bool formalNounFollowsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
