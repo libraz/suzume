@@ -968,6 +968,23 @@
       ],
       "id": "ganakunattta",
       "input": "必要がなくなった。"
+    },
+    {
+      "description": "深く刻み込め - auto-generated",
+      "expected": [
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深く"
+        },
+        {
+          "lemma": "刻み込む",
+          "pos": "Verb",
+          "surface": "刻み込め"
+        }
+      ],
+      "id": "ku_mi_me",
+      "input": "深く刻み込め"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",

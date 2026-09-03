@@ -2547,6 +2547,119 @@
       ],
       "id": "ni_shimiwo_tsu",
       "input": "人に親しみを持つ"
+    },
+    {
+      "description": "聞きて心に刻み込め - auto-generated",
+      "expected": [
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞き"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "刻み込む",
+          "pos": "Verb",
+          "surface": "刻み込め"
+        }
+      ],
+      "id": "kite_ni_mi_me",
+      "input": "聞きて心に刻み込め"
+    },
+    {
+      "description": "名前が書き込めない - auto-generated",
+      "expected": [
+        {
+          "lemma": "名前",
+          "pos": "Noun",
+          "surface": "名前"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "書き込める",
+          "pos": "Verb",
+          "surface": "書き込め"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "ga_ki_menai",
+      "input": "名前が書き込めない"
+    },
+    {
+      "description": "花を惜しみつつ帰る - auto-generated",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "惜しむ",
+          "pos": "Verb",
+          "surface": "惜しみ"
+        },
+        {
+          "lemma": "つつ",
+          "pos": "Particle",
+          "surface": "つつ"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰る"
+        }
+      ],
+      "id": "wo_shimitsutsu_ru",
+      "input": "花を惜しみつつ帰る"
+    },
+    {
+      "description": "町をわたりあるく - auto-generated",
+      "expected": [
+        {
+          "lemma": "町",
+          "pos": "Noun",
+          "surface": "町"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "わたりあるく",
+          "pos": "Verb",
+          "surface": "わたりあるく"
+        }
+      ],
+      "id": "wowatariaruku",
+      "input": "町をわたりあるく"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
