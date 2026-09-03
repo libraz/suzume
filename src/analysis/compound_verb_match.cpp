@@ -80,6 +80,19 @@ CompoundVerbMatch findCompoundVerbMatch(
   const std::string_view v1_surface = text.substr(start_byte, v2_start_byte - start_byte);
   bool hiragana_v1_in_dictionary = false;
   if (hiragana_v1) {
+    // Every form a lexical compound builds on is a continuative or its onbin,
+    // and none of them ends in an a-row kana: the i-row and e-row spell the
+    // continuative, っ and ん spell the onbin, and the a-row spells the irrealis,
+    // which takes an auxiliary rather than a verb. A hiragana V1 ending there
+    // has therefore reached past the stem into the auxiliary that closes the
+    // predicate (き+た of 流れてきた, れ+た of 落とされた), and joining it would
+    // build a lexical verb on top of a finished clause. The V2 side of this
+    // boundary is guarded by the past-auxiliary test further down.
+    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    if (v2_start > start_pos && grammar::isARowCodepoint(codepoints[v2_start - 1])) {
+      SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] rejected a-row tail on hiragana V1: " << v1_surface << "\n");
+      return {};
+    }
     std::string v1_base;
     if (grammar::isSuruRenyokeiSurface(v1_surface)) {
       v1_base = "する";
@@ -618,7 +631,19 @@ CompoundVerbMatch findCompoundVerbMatch(
     // There the adjacency carries no evidence about the compound's own V1.
     const bool follows_counter = start_pos >= 2 && normalize::isCounterKanji(codepoints[start_pos - 1]) &&
                                  normalize::isNumeralCodepoint(codepoints[start_pos - 2]);
-    if (starts_inside_kanji_run && !follows_counter && !v1.dict_verified && !dict_compound_v1) {
+    // Okurigana binds to the kanji directly in front of it, so a V1 written as
+    // one kanji plus its own okurigana has a stem boundary on its left by
+    // spelling alone: nothing further back in the run can belong to it
+    // (時間|考え込む). The fabrication the blanket rule guards against has the
+    // opposite shape — the V1 there is bare kanji continuing the run, and the
+    // okurigana it would need sits after the V2 (生|涯忘れる). Whether the run
+    // in front plus this kanji spells a word of its own (達成|し続ける) is a
+    // lexical question, and the registered-noun test above is the one that
+    // answers it.
+    const bool v1_carries_okurigana =
+        kanji_end == start_pos + 1 && kanji_end < v2_start && normalize::isKanjiCodepoint(codepoints[start_pos]);
+    if (starts_inside_kanji_run && !follows_counter && !v1_carries_okurigana && !v1.dict_verified &&
+        !dict_compound_v1) {
       continue;
     }
 
