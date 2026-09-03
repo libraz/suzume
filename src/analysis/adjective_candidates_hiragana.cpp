@@ -221,6 +221,36 @@ void appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCandidate>& ca
     if (is_closed_particle_or_auxiliary && !is_adjectival_prefix) {
       return;
     }
+    // The whole-surface test above only sees a prefix that is itself one
+    // function word. A closed cell just as often *closes* a longer kana run,
+    // and the boundary then sits at the kanji: the cell predicates over what
+    // precedes it and the kanji opens the next word (ような|白い, せず|立ちつくす,
+    // しなく|続く). Only an inflected cell counts, on the same ground the rest of
+    // this family uses — a base form is homographic with too many ordinary
+    // words, while a cell whose surface differs from its lemma exists only
+    // inside its paradigm. That is what separates these from the lexical
+    // intensifiers, whose final mora is a word in its own right (the の of ほの,
+    // the す of うす, the ら of そら).
+    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    for (size_t cell_start = start_pos; cell_start < prefix_end; ++cell_start) {
+      const auto* cell =
+          lookupEntryInRange(*dict_manager, codepoints, cell_start, prefix_end, core::PartOfSpeech::Auxiliary);
+      if (cell == nullptr) {
+        cell = lookupEntryInRange(*dict_manager, codepoints, cell_start, prefix_end, core::PartOfSpeech::Particle);
+      }
+      // An empty lemma is the dictionary's shorthand for "same as the
+      // surface", so it marks a base form exactly as an equal lemma does.
+      if (cell != nullptr && !cell->lemma.empty() && cell->lemma != cell->surface) {
+        return;
+      }
+    }
+  }
+  // る is the terminal and attributive ending of every conjugating class and
+  // heads no word of its own, so a lone る in front of the kanji is the tail of
+  // the predicate behind it rather than a prefix bound to what follows
+  // (活け|る|白い菊, not 活け + the non-word る白い).
+  if (prefix_end == start_pos + 1 && codepoints[start_pos] == U'る') {
+    return;
   }
   const size_t kanji_end = findCharRegionEnd(char_types, prefix_end, 2, normalize::CharType::Kanji);
   if (kanji_end == prefix_end || kanji_end >= char_types.size() ||
@@ -242,7 +272,11 @@ void appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCandidate>& ca
     // before its lexical head.  A leading particle/auxiliary prefix was
     // rejected above, so compositional phrases such as から+美しい are not
     // absorbed into the compound candidate.
-    const bool is_renyokei = utf8::endsWith(tail_observed_surface, "く");
+    // く spells both the adjective continuative and the Godan-ka terminal. A
+    // continuative has to attach to something, so where nothing follows it the
+    // terminal reading is the only one left and the kana in front is a separate
+    // word (すぐ|着く, an adverb and a verb, not a cell of the non-word すぐ着い).
+    const bool is_renyokei = utf8::endsWith(tail_observed_surface, "く") && end_pos < codepoints.size();
     const bool is_attributive = utf8::endsWith(tail_observed_surface, "い") && end_pos < codepoints.size() &&
                                 (normalize::isKanjiCodepoint(codepoints[end_pos]) ||
                                  normalize::classifyChar(codepoints[end_pos]) == normalize::CharType::Katakana);
