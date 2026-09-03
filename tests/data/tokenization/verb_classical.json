@@ -149,6 +149,55 @@
       ],
       "id": "hitaru",
       "input": "言ひたる言葉"
+    },
+    {
+      "description": "月を見つ - auto-generated",
+      "expected": [
+        {
+          "lemma": "月",
+          "pos": "Noun",
+          "surface": "月"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "つ",
+          "pos": "Auxiliary",
+          "surface": "つ"
+        }
+      ],
+      "id": "wo_tsu_2",
+      "input": "月を見つ"
+    },
+    {
+      "description": "関係を断つ - auto-generated",
+      "expected": [
+        {
+          "lemma": "関係",
+          "pos": "Noun",
+          "surface": "関係"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "断つ",
+          "pos": "Verb",
+          "surface": "断つ"
+        }
+      ],
+      "id": "wo_tsu_3",
+      "input": "関係を断つ"
     }
   ],
   "description": "verb_classical tests",
