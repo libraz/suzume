@@ -2660,6 +2660,129 @@
       ],
       "id": "wowatariaruku",
       "input": "町をわたりあるく"
+    },
+    {
+      "description": "A euphonic i-stem before the contracted progressive is a verb, not a fabricated compound adjective",
+      "expected": [
+        {
+          "lemma": "机",
+          "pos": "Noun",
+          "surface": "机"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "上",
+          "pos": "Noun",
+          "surface": "上"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "資料",
+          "pos": "Noun",
+          "surface": "資料"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "置く",
+          "pos": "Verb",
+          "surface": "置い"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "状態",
+          "pos": "Noun",
+          "surface": "状態"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "no_no_ha_iteru_desu",
+      "input": "机の上の資料は今置いてる状態です"
+    },
+    {
+      "description": "The euphonic i-stem of a verb outside the dictionary keeps its boundary before the contracted progressive",
+      "expected": [
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲い"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "iteru",
+      "input": "今咲いてる"
+    },
+    {
+      "description": "A voiced contraction of the preparatory subsidiary still selects the ga-row lemma",
+      "expected": [
+        {
+          "lemma": "脱ぐ",
+          "pos": "Verb",
+          "surface": "脱い"
+        },
+        {
+          "lemma": "どく",
+          "pos": "Auxiliary",
+          "surface": "どく"
+        }
+      ],
+      "id": "idoku",
+      "input": "脱いどく"
+    },
+    {
+      "description": "Negative control: a dictionary verb behind the same kanji prefix is unchanged",
+      "expected": [
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "iteru_2",
+      "input": "今書いてる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
