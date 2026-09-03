@@ -1,0 +1,65 @@
+{
+  "cases": [
+    {
+      "description": "後世の人々いかに思はん - auto-generated",
+      "expected": [
+        {
+          "lemma": "後世",
+          "pos": "Noun",
+          "surface": "後世"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "人々",
+          "pos": "Noun",
+          "surface": "人々"
+        },
+        {
+          "lemma": "いかに",
+          "pos": "Adverb",
+          "surface": "いかに"
+        },
+        {
+          "lemma": "思ふ",
+          "pos": "Verb",
+          "surface": "思は"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "no_ikani_han",
+      "input": "後世の人々いかに思はん"
+    },
+    {
+      "description": "学生いかに学ぶ - auto-generated",
+      "expected": [
+        {
+          "lemma": "学生",
+          "pos": "Noun",
+          "surface": "学生"
+        },
+        {
+          "lemma": "いかに",
+          "pos": "Adverb",
+          "surface": "いかに"
+        },
+        {
+          "lemma": "学ぶ",
+          "pos": "Verb",
+          "surface": "学ぶ"
+        }
+      ],
+      "id": "ikani_bu",
+      "input": "学生いかに学ぶ"
+    }
+  ],
+  "description": "adverb_classical tests",
+  "version": "1.0"
+}
