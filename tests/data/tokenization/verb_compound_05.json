@@ -1074,6 +1074,262 @@
       ],
       "id": "mo_wazu_chitsukusu",
       "input": "何も言わず立ちつくす"
+    },
+    {
+      "description": "Lexical compound verb whose V2 is written in kana",
+      "expected": [
+        {
+          "lemma": "燃えさかる",
+          "pos": "Verb",
+          "surface": "燃えさかる"
+        },
+        {
+          "lemma": "炎",
+          "pos": "Noun",
+          "surface": "炎"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "esakaru_wo_ta",
+      "input": "燃えさかる炎を見た"
+    },
+    {
+      "description": "Compound verb with a kanji V2",
+      "expected": [
+        {
+          "lemma": "岩",
+          "pos": "Noun",
+          "surface": "岩"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "打ち砕く",
+          "pos": "Verb",
+          "surface": "打ち砕く"
+        }
+      ],
+      "id": "wo_chi_ku",
+      "input": "岩を打ち砕く"
+    },
+    {
+      "description": "Compound verb whose V2 is also a standalone dictionary verb",
+      "expected": [
+        {
+          "lemma": "古い",
+          "pos": "Adjective",
+          "surface": "古い"
+        },
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "打ち壊す",
+          "pos": "Verb",
+          "surface": "打ち壊す"
+        }
+      ],
+      "id": "i_wo_chi_su",
+      "input": "古い家を打ち壊す"
+    },
+    {
+      "description": "The same V2 stays a separate predicate after a case particle",
+      "expected": [
+        {
+          "lemma": "料理",
+          "pos": "Noun",
+          "surface": "料理"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "皿",
+          "pos": "Noun",
+          "surface": "皿"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "盛る",
+          "pos": "Verb",
+          "surface": "盛る"
+        }
+      ],
+      "id": "wo_ni_ru",
+      "input": "料理を皿に盛る"
+    },
+    {
+      "description": "Compound verb after a kanji noun that does not extend into it",
+      "expected": [
+        {
+          "lemma": "長時間",
+          "pos": "Noun",
+          "surface": "長時間"
+        },
+        {
+          "lemma": "考え込む",
+          "pos": "Verb",
+          "surface": "考え込ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "e_nda",
+      "input": "長時間考え込んだ"
+    },
+    {
+      "description": "A registered kanji noun still owns its final kanji",
+      "expected": [
+        {
+          "lemma": "目標達成",
+          "pos": "Noun",
+          "surface": "目標達成"
+        },
+        {
+          "lemma": "し続ける",
+          "pos": "Verb",
+          "surface": "し続ける"
+        }
+      ],
+      "id": "shi_keru",
+      "input": "目標達成し続ける"
+    },
+    {
+      "description": "Past auxiliary is not a compound V1",
+      "expected": [
+        {
+          "lemma": "川",
+          "pos": "Noun",
+          "surface": "川"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "流れる",
+          "pos": "Verb",
+          "surface": "流れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "落ち葉",
+          "pos": "Noun",
+          "surface": "落ち葉"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "堆積",
+          "pos": "Noun",
+          "surface": "堆積"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "ni_retekita_chi_ga_suru",
+      "input": "川に流れてきた落ち葉が堆積する"
+    },
+    {
+      "description": "Passive plus past is not a compound V1",
+      "expected": [
+        {
+          "lemma": "地面",
+          "pos": "Noun",
+          "surface": "地面"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "落とす",
+          "pos": "Verb",
+          "surface": "落とさ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "落ち葉",
+          "pos": "Noun",
+          "surface": "落ち葉"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "舞う",
+          "pos": "Verb",
+          "surface": "舞う"
+        }
+      ],
+      "id": "ni_tosareta_chi_ga_u",
+      "input": "地面に落とされた落ち葉が舞う"
     }
   ],
   "description": "Compound verbs (part 5/5)",
