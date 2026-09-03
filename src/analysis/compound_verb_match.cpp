@@ -785,6 +785,16 @@ CompoundVerbMatch findCompoundVerbMatch(
       // Godan V2 that happens to spell the same characters: つけ is the
       // continuative of the listed つける before it is the imperative of つく.
       should_update = true;
+    } else if ((matched_kanji || matched_reading) && !inflection_includes_aux && !best_match.includes_aux &&
+               !best_match.is_renyokei && !best_match.renyokei_form && !best_match.is_mizenkei &&
+               !best_match.is_potential && !best_match.is_kateikei && !best_match.is_volitional &&
+               !best_match.is_imperative && matched_len > best_match.matched_len) {
+      // Two members of the closed V2 class can both spell a base form here, one
+      // a prefix of the other (the つく of 付く inside the つくす of 尽くす).
+      // Neither carries more evidence than the other, so the ordinary
+      // longest-match rule settles it: the longer reading accounts for kana the
+      // shorter one has to hand to a separate token (立ち|つくす, not 立ちつく|す).
+      should_update = true;
     } else if (best_match.is_mizenkei && (matched_kanji || matched_reading)) {
       // A full V2 base-form match (組み合わせる via ichidan 合わせる) competes
       // with a shorter V2-mizenkei causative/passive reading of another table
