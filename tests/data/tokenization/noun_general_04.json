@@ -405,6 +405,28 @@
       ],
       "id": "ni_wariganakattta",
       "input": "信念に変わりがなかった。"
+    },
+    {
+      "description": "温もりを感じる - auto-generated",
+      "expected": [
+        {
+          "lemma": "温もり",
+          "pos": "Noun",
+          "surface": "温もり"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "感じる",
+          "pos": "Verb",
+          "surface": "感じる"
+        }
+      ],
+      "id": "moriwo_jiru",
+      "input": "温もりを感じる"
     }
   ],
   "description": "General nouns (part 4/4)",
