@@ -531,6 +531,16 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
       auto n_onbin_match = vh::firstGodanOnbinDictBase(dict_manager, lexical_stem, "ん");
       grammar::VerbType matched_type = n_onbin_match.verb_type;
       std::string matched_base = std::move(n_onbin_match.base_form);
+      // A nasal euphony replaces the continuative's own final mora (読み → 読ん,
+      // 汗ばみ → 汗ばん), so the kana in front of it is never the a-row. That row
+      // spells the irrealis, and an irrealis before ん is the contracted negative
+      // ぬ — an auxiliary of its own, whose boundary the analysis has to keep
+      // (待た+ん, 知ら+ん, 分から+ん, 読ま+ん). The euphonic reading hands its
+      // clause on to て/で/た/だ, so this only has to be settled where the kana
+      // run ends: with で or だ behind it the euphony is already proven.
+      if (at_end && n_pos > kanji_end && grammar::isARowCodepoint(codepoints[n_pos - 1])) {
+        break;
+      }
       if (matched_type == grammar::VerbType::Unknown && followed_by_de_da) {
         const std::string full_surface = extractSubstring(codepoints, start_pos, n_pos + 2);
         OnbinInflMatch infl =
