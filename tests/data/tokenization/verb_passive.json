@@ -1132,6 +1132,75 @@
       ],
       "id": "tasare_keta",
       "input": "待たされ続けた"
+    },
+    {
+      "description": "皆に励まされぬ日 - auto-generated",
+      "expected": [
+        {
+          "lemma": "皆",
+          "pos": "Pronoun",
+          "surface": "皆"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "励ます",
+          "pos": "Verb",
+          "surface": "励まさ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        }
+      ],
+      "id": "ni_masarenu",
+      "input": "皆に励まされぬ日"
+    },
+    {
+      "description": "心を動かされぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "動かす",
+          "pos": "Verb",
+          "surface": "動かさ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "wo_kasarenu",
+      "input": "心を動かされぬ"
     }
   ],
   "description": "Passive voice verbs (受身形) - MeCab-compatible split format",
