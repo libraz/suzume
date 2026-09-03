@@ -191,6 +191,20 @@ void adj_detail::appendKanjiCompoundIAdjCandidates(const std::vector<char32_t>& 
             std::string surface = extractSubstring(codepoints, start_pos, end_pos);
             if (surface.empty())
               continue;
+            // A terminal い closes its predicate: the te/ta series attaches to a
+            // stem, never to a closed cell, so an adjective never stands in front
+            // of て/た. The same kana is the Godan ka/ga euphonic stem, and that
+            // is what it is here (置い+て ← 置く). The single-kanji scan already
+            // reads the context this way; the compound scan needs it because its
+            // own verb-tail guard has to reconstruct a lemma, and the lemma of an
+            // onbin stem alone is unrecoverable (置い analyzes as the continuative
+            // of the non-word 置う, so the guard only fires for the verbs L2
+            // happens to carry).
+            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            if (codepoints[end_pos - 1] == U'い' && isVerbOnbinContextAfterI(codepoints, end_pos)) {
+              SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface << "\" い is a verb onbin stem here\n");
+              continue;
+            }
             // A focus particle is not an adjective conjugation: noun + しか(…ない)
             // shares its kana with the しい-adjective paradigm.
             // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
