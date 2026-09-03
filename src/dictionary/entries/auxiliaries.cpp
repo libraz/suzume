@@ -68,9 +68,16 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("ざり", "ぬ", EPOS::AuxNegativeNu),           // 連用形 (行かざりけり)
       aux("ざれ", "ぬ", EPOS::AuxNegativeNu),           // 已然形 (あらざれば)
       aux("ね", "ぬ", EPOS::AuxNegativeNu),             // 已然形 (行かねば, 死なねば, せねば)
-      aux("ごとし", "ごとし", EPOS::AuxSimilitudeYou),  // 如し (比況終止形)
-      aux("ごとく", "ごとし", EPOS::Adverb),            // 如く (比況連用形)
-      aux("ごとき", "ごとし", EPOS::Determiner),        // 如き (比況連体形)
+      aux("ごとし", "ごとし", EPOS::AuxSimilitudeYou),  // 比況終止形
+      aux("ごとく", "ごとし", EPOS::Adverb),            // 比況連用形
+      aux("ごとき", "ごとし", EPOS::Determiner),        // 比況連体形
+      // The same paradigm in its literary kanji spelling. Only the kana rows
+      // existed, so a kanji cell had no closed-class edge at all and the
+      // hiragana after it was read as okurigana of a fabricated verb
+      // (如く+あら analyzed as the irrealis of the non-word 如くある).
+      aux("如し", "如し", EPOS::AuxSimilitudeYou),
+      aux("如く", "如し", EPOS::Adverb),
+      aux("如き", "如し", EPOS::Determiner),
       // じゃない: removed - split as じゃ(AuxCopulaDa) + ない(AuxNegativeNai)
       aux("ん", "ん", EPOS::AuxNegativeNu),
 
