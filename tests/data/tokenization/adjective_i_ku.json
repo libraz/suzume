@@ -985,6 +985,171 @@
       ],
       "id": "ku_mi_me",
       "input": "深く刻み込め"
+    },
+    {
+      "description": "A verb terminal ending is not a kana prefix for a following i-adjective",
+      "expected": [
+        {
+          "lemma": "花瓶",
+          "pos": "Noun",
+          "surface": "花瓶"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "活ける",
+          "pos": "Verb",
+          "surface": "活ける"
+        },
+        {
+          "lemma": "白い",
+          "pos": "Adjective",
+          "surface": "白い"
+        },
+        {
+          "lemma": "菊",
+          "pos": "Noun",
+          "surface": "菊"
+        }
+      ],
+      "id": "ni_keru_i",
+      "input": "花瓶に活ける白い菊"
+    },
+    {
+      "description": "A copula cell closing the kana run marks the boundary at the following kanji",
+      "expected": [
+        {
+          "lemma": "雲",
+          "pos": "Noun",
+          "surface": "雲"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "白い",
+          "pos": "Adjective",
+          "surface": "白い"
+        },
+        {
+          "lemma": "髪",
+          "pos": "Noun",
+          "surface": "髪"
+        }
+      ],
+      "id": "noyouna_i",
+      "input": "雲のような白い髪"
+    },
+    {
+      "description": "A clause-final ku is a godan terminal, not an adjective continuative",
+      "expected": [
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "着く",
+          "pos": "Verb",
+          "surface": "着く"
+        }
+      ],
+      "id": "gaarunarabasugu_ku",
+      "input": "時間があるならばすぐ着く"
+    },
+    {
+      "description": "Negative control: a lexical intensifier whose final mora spells a particle still prefixes",
+      "expected": [
+        {
+          "lemma": "ほの暗い",
+          "pos": "Adjective",
+          "surface": "ほの暗い"
+        },
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        }
+      ],
+      "id": "hono_i",
+      "input": "ほの暗い部屋"
+    },
+    {
+      "description": "An adverb keeps its boundary before an adjective continuative after a case particle",
+      "expected": [
+        {
+          "lemma": "体調",
+          "pos": "Noun",
+          "surface": "体調"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "だいぶ",
+          "pos": "Adverb",
+          "surface": "だいぶ"
+        },
+        {
+          "lemma": "良い",
+          "pos": "Adjective",
+          "surface": "良く"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gadaibu_kunattta",
+      "input": "体調がだいぶ良くなった"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",

@@ -1018,6 +1018,62 @@
       ],
       "id": "ri_ru_2",
       "input": "振り返る"
+    },
+    {
+      "description": "Two closed V2 readings sharing a prefix resolve to the longer one",
+      "expected": [
+        {
+          "lemma": "使いつくす",
+          "pos": "Verb",
+          "surface": "使いつくす"
+        }
+      ],
+      "id": "itsukusu",
+      "input": "使いつくす"
+    },
+    {
+      "description": "Negative control: the shorter V2 still wins when nothing longer matches",
+      "expected": [
+        {
+          "lemma": "思いつく",
+          "pos": "Verb",
+          "surface": "思いつく"
+        }
+      ],
+      "id": "itsuku",
+      "input": "思いつく"
+    },
+    {
+      "description": "A negative auxiliary cell closing a kana run is not an adjective prefix for the verb behind it",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        },
+        {
+          "lemma": "立ちつくす",
+          "pos": "Verb",
+          "surface": "立ちつくす"
+        }
+      ],
+      "id": "mo_wazu_chitsukusu",
+      "input": "何も言わず立ちつくす"
     }
   ],
   "description": "Compound verbs (part 5/5)",
