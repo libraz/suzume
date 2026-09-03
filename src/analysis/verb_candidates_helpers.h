@@ -443,6 +443,16 @@ bool hasAuxiliaryNegativeBoundary(const dictionary::DictionaryManager* dict_mana
  * okurigana of a word that does not exist (如く + あら analyzed as the irrealis
  * of the non-word 如くある). The auxiliary must end strictly inside the span:
  * one that ends with it is the auxiliary itself, spelled as its own cell.
+ *
+ * Only an inflected cell counts. An auxiliary in its base form is a headword
+ * like any other and is routinely homographic with an ordinary word or with the
+ * opening morae of one (ある of あるいて, たい of たいらな), so finding one there
+ * says nothing. A cell whose surface differs from its lemma exists only inside
+ * that paradigm — なかっ is not a word, it is the past stem of ない — so meeting
+ * one at the head of a span is evidence the span reaches into a closed
+ * paradigm. The 2+ codepoint floor is the one the rest of this family carries:
+ * one mora is spelled like the opening mora of any number of words (す of
+ * すいた, た of たどっ).
  * @see fabricated closed-class absorption guards (top of this header)
  */
 bool opensOnCompleteAuxiliary(const dictionary::DictionaryManager* dict_manager,

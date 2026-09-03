@@ -538,8 +538,10 @@ bool opensOnCompleteAuxiliary(const dictionary::DictionaryManager* dict_manager,
   if (dict_manager == nullptr || end_pos < start_pos + 2 || end_pos > codepoints.size()) {
     return false;
   }
-  for (size_t aux_end = start_pos + 1; aux_end < end_pos; ++aux_end) {
-    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, aux_end, core::PartOfSpeech::Auxiliary) != nullptr) {
+  for (size_t aux_end = start_pos + 2; aux_end < end_pos; ++aux_end) {
+    const auto* entry =
+        lookupEntryInRange(*dict_manager, codepoints, start_pos, aux_end, core::PartOfSpeech::Auxiliary);
+    if (entry != nullptr && entry->surface != entry->lemma) {
       return true;
     }
   }
