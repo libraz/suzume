@@ -892,6 +892,12 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       {EPOS::Suffix, EPOS::AuxNegativeNai, cost::kRare},
       {EPOS::Suffix, EPOS::AdjBasic, cost::kStrongBonus},
 
+      // The classical copula predicates of a nominal, which is exactly what a
+      // suffix derives (不安げ+なり, 得意げ+なり). Its lexical homograph なる is
+      // a verb of becoming and reaches that nominal only through a case
+      // particle, so the bare sequence selects the copula.
+      {EPOS::Suffix, EPOS::AuxClassicalNari, cost::kVeryStrongBonus},
+
       // VerbRenyokei → recent-completion suffix (焼き+たて, 作り+たて).
       // This productive suffix competes directly with the past た + connective
       // て chain, so it needs a stronger lexicalized grammatical connection.
