@@ -1453,6 +1453,65 @@
       ],
       "id": "ni_mi_me_kono_wo",
       "input": "心に刻み込め、この日を。"
+    },
+    {
+      "description": "A lexical compound verb after an oblique case particle",
+      "expected": [
+        {
+          "lemma": "雪",
+          "pos": "Noun",
+          "surface": "雪"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "降り積もる",
+          "pos": "Verb",
+          "surface": "降り積もる"
+        },
+        {
+          "lemma": "言葉",
+          "pos": "Noun",
+          "surface": "言葉"
+        }
+      ],
+      "id": "noyouni_ri_moru",
+      "input": "雪のように降り積もる言葉"
+    },
+    {
+      "description": "A generated compound verb after a locative particle",
+      "expected": [
+        {
+          "lemma": "山",
+          "pos": "Noun",
+          "surface": "山"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "登り続ける",
+          "pos": "Verb",
+          "surface": "登り続ける"
+        }
+      ],
+      "id": "ni_ri_keru",
+      "input": "山に登り続ける"
     }
   ],
   "description": "Compound verbs (part 5/5)",
