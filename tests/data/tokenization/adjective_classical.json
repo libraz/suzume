@@ -1,0 +1,87 @@
+{
+  "cases": [
+    {
+      "description": "命絶えて世は静けし - auto-generated",
+      "expected": [
+        {
+          "lemma": "命",
+          "pos": "Noun",
+          "surface": "命"
+        },
+        {
+          "lemma": "絶える",
+          "pos": "Verb",
+          "surface": "絶え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "世",
+          "pos": "Noun",
+          "surface": "世"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静けし"
+        }
+      ],
+      "id": "ete_ha_keshi",
+      "input": "命絶えて世は静けし"
+    },
+    {
+      "description": "安かりければ眠る - auto-generated",
+      "expected": [
+        {
+          "lemma": "安い",
+          "pos": "Adjective",
+          "surface": "安かり"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "眠る",
+          "pos": "Verb",
+          "surface": "眠る"
+        }
+      ],
+      "id": "karikereba_ru",
+      "input": "安かりければ眠る"
+    },
+    {
+      "description": "夜深し - auto-generated",
+      "expected": [
+        {
+          "lemma": "夜",
+          "pos": "Noun",
+          "surface": "夜"
+        },
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深し"
+        }
+      ],
+      "id": "shi_6",
+      "input": "夜深し"
+    }
+  ],
+  "description": "adjective_classical tests",
+  "version": "1.0"
+}
