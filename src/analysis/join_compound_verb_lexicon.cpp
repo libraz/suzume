@@ -17,6 +17,17 @@ namespace suzume::analysis::compound_verb_detail {
 // 始める・過ぎる・終わる／終える are aspectual auxiliaries and remain
 // separate search units. 続ける is intentionally retained because productive
 // V1+続ける compounds form the search unit represented by this table.
+//
+// Admission criterion for a new entry, so the table grows by evidence rather
+// than one word at a time:
+//   1. The verb heads at least two established compounds with distinct V1s.
+//      Following a continuative once is a sentence, not a V2 slot.
+//   2. Neither its surface nor its reading is homographic, in that position,
+//      with a productive auxiliary or particle chain. When only one spelling
+//      collides, restrict it with the joins_* flags instead of omitting it.
+//   3. Its base form is an ordinary verb, not a bound suffix.
+// A verb that fails (1) is a lexicalized whole word and belongs in L2 as one
+// entry (取り壊す), not here.
 extern const SubsidiaryVerb kSubsidiaryVerbs[kSubsidiaryVerbCount] = {
     // Godan verbs (五段)
     {"込む", "こむ", "む", V2VerbType::Godan},        // 読み込む, 飛びこむ
@@ -50,6 +61,9 @@ extern const SubsidiaryVerb kSubsidiaryVerbs[kSubsidiaryVerbCount] = {
     {"潰す", "つぶす", "す", V2VerbType::Godan},      // 押し潰す, 叩き潰す
     {"崩す", "くずす", "す", V2VerbType::Godan},      // 切り崩す, 打ち崩す
     {"倒す", "たおす", "す", V2VerbType::Godan},      // 打ち倒す, 蹴り倒す
+    {"壊す", "こわす", "す", V2VerbType::Godan},      // 打ち壊す, ぶち壊す
+    {"砕く", "くだく", "く", V2VerbType::Godan},      // 打ち砕く, 噛み砕く
+    {"盛る", "さかる", "る", V2VerbType::Godan},      // 燃え盛る, 咲き盛る
     {"起こす", "おこす", "す", V2VerbType::Godan},    // 引き起こす, 呼び起こす
     {"去る", "さる", "る", V2VerbType::Godan},        // 立ち去る, 走り去る
     {"開く", "ひらく", "く", V2VerbType::Godan},      // 切り開く, 押し開く
