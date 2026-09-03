@@ -381,14 +381,16 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
     SUZUME_CONNECTION_ADD(surface_bonus, sc::kPenaltyGeneratedInternalBoundary);
   }
 
-  // Penalty for short hiragana verb mizenkei + ん pattern
-  // E.g., が+おさ+ん should be がお+さん (name + honorific suffix)
-  // Short hiragana verbs followed by ん are often mis-segmented names
-  // Valid patterns like 押さ+ん (kanji verb) have non-hiragana stems
-  // ん can be AUX_否定古 or PART_準体, both should be penalized
-  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && grammar::isPureHiragana(prev.surface) &&
-      prev.surface.size() <= 6 &&  // 2 chars or less (6 bytes in UTF-8)
-      next.surface == "ん" && !(prev.lemma == "する" && prev.surface == "せ") && prev.lemma != "いく") {
+  // Penalty for a fabricated short hiragana irrealis before ん. Two morae of
+  // kana are too little to establish an irrealis on their own, and a name plus
+  // an honorific spells the same run (が+おさ+ん is がお+さん). What settles it
+  // is whether the cell is spelled by a dictionary entry: the irrealis of a
+  // real verb is (せ+ん, いか+ん, あら+ん), while the misreading only ever comes
+  // out of the hiragana candidate generator. Kanji stems are unaffected either
+  // way (押さ+ん). ん can be AUX_否定古 or PART_準体, both are penalized.
+  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && !prev.fromDictionary() &&
+      grammar::isPureHiragana(prev.surface) && prev.surface.size() <= 6 &&  // 2 chars or less (6 bytes in UTF-8)
+      next.surface == "ん") {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kAlmostNever);
   }
 
