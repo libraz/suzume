@@ -129,13 +129,17 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
     if (particle_entry->extended_pos == core::ExtendedPOS::ParticleFinal) {
       continue;
     }
-    // A case particle immediately after a recognized independent host is an
-    // unambiguous boundary even when the following open-class predicate is
-    // not in the dictionary. Without this, そちら+で+やる can be swallowed by
-    // the unknown-verb scanner as the fabricated predicate でやる.
-    if (follows_particle_host && particle_entry->extended_pos == core::ExtendedPOS::ParticleCase) {
-      return true;
-    }
+    // A case particle immediately after a recognized independent host is a
+    // strong boundary (そちら+で+やる must not become the fabricated でやる), but
+    // it is only half the evidence: the host says the particle may start here,
+    // not that the kana behind it is a separate word. The remainder still has
+    // to be an attested predicate, which is what the loop below tests, so this
+    // certificate lowers the confidence bar there rather than bypassing it.
+    // Bypassing it costs the verbs whose own first mora is a particle
+    // homograph, since every one of them stands after a host too (油+で+にじむ,
+    // 踏み+にじる) and their remainder is fabricated.
+    const bool host_certifies_particle =
+        follows_particle_host && particle_entry->extended_pos == core::ExtendedPOS::ParticleCase;
     // A particle homograph can itself be the complete stem of a productive
     // open-class inflection (さえ+ない -> さえる). Preserve that lexical
     // candidate when the whole surface supplies independent morphological
@@ -210,8 +214,8 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
         // Other particle boundaries retain the confidence gate because their
         // surface forms can also begin lexical verbs.
         bool is_connective = particle_surface == "て" || particle_surface == "で";
-        if (is_verified_verb &&
-            (is_connective || candidate.confidence >= candidate::kParticleVerbBoundaryMinConfidence)) {
+        if (is_verified_verb && (is_connective || host_certifies_particle ||
+                                 candidate.confidence >= candidate::kParticleVerbBoundaryMinConfidence)) {
           if (allow_single_char_particle_after_kanji && particle_end == start_pos + 1) {
             continue;
           }
