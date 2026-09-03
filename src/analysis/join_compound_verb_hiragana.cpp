@@ -177,6 +177,32 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
       continue;
     }
 
+    // A compound joins a continuative straight to its V2, so nothing closed
+    // stands between them. A conjunctive particle at the tail of V1 is exactly
+    // such a boundary — it ends the clause the V1 belongs to — and the reading
+    // that fits is the particle's own (惜しみ + つつ + 歩く, not the compound
+    // みつつ歩く headed by the non-word みつ). The particle needs a predicate to
+    // attach to, so this only holds where the mora in front of it is one a
+    // continuative ends in: the i-row for a Godan verb, the e-row for an
+    // Ichidan one. Elsewhere the same kana are part of a single stem and the
+    // compound stands (わたり+あるく, where わ opens no cell at all).
+    bool v1_embeds_conjunctive_particle = false;
+    for (size_t particle_start = start_pos + 1; particle_start + 1 < v2_start; ++particle_start) {
+      const char32_t host_tail = codepoints[particle_start - 1];
+      if (!grammar::isIRowCodepoint(host_tail) && !grammar::isERowCodepoint(host_tail)) {
+        continue;
+      }
+      const auto* particle =
+          lookupEntryInRange(dict_manager, codepoints, particle_start, v2_start, core::PartOfSpeech::Particle);
+      if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleConj) {
+        v1_embeds_conjunctive_particle = true;
+        break;
+      }
+    }
+    if (v1_embeds_conjunctive_particle) {
+      continue;
+    }
+
     // An e-row form after topic は is an independently closed Godan
     // conditional when its reconstructed lemma is attested.
     if (is_ichidan && grammar::isERowCodepoint(v1_tail) && start_pos > 0 && codepoints[start_pos - 1] == U'は') {
