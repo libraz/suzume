@@ -1021,7 +1021,14 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           continue;
         }
       }
-      auto cand = makeCandidate(surface, start_pos, candidate_end, pos, cost, has_suffix, CandidateOrigin::SameType);
+      // A run of Latin letters or digits read as a nominal is one whose script
+      // sets it apart from the Japanese around it, and that difference decides
+      // one connection: nothing on the Japanese side modifies it attributively.
+      const bool names_foreign_nominal =
+          pos == core::PartOfSpeech::Noun &&
+          (start_type == normalize::CharType::Alphabet || start_type == normalize::CharType::Digit);
+      auto cand = makeCandidate(surface, start_pos, candidate_end, pos, cost, has_suffix, CandidateOrigin::SameType,
+                                names_foreign_nominal ? core::ExtendedPOS::NounForeign : core::ExtendedPOS::Unknown);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = started_with_particle ? 0.7F : 1.0F;
       switch (start_type) {

@@ -162,6 +162,9 @@ constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCategoryC
   table[static_cast<size_t>(ExtendedPOS::NounProperFamily)] = 0.3F;  // 固有名詞(姓)
   table[static_cast<size_t>(ExtendedPOS::NounProperGiven)] = 0.3F;   // 固有名詞(名)
   table[static_cast<size_t>(ExtendedPOS::NounNumber)] = 0.4F;        // 数詞
+  // 非日本語字種の名詞: the script says nothing about how ordinary the word is,
+  // so it costs what a noun costs and follows it if that ever changes.
+  table[static_cast<size_t>(ExtendedPOS::NounForeign)] = table[static_cast<size_t>(ExtendedPOS::Noun)];
 
   // ===========================================================================
   // Pronouns (0.4-0.5)

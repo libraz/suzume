@@ -61,6 +61,19 @@ BigramTable::EncodedTable BigramTable::initTable() {
     table[idx][static_cast<size_t>(core::ExtendedPOS::VerbContractedKateikei)] =
         table[idx][static_cast<size_t>(core::ExtendedPOS::VerbShuushikei)];
   }
+  // A nominal in Latin letters or digits is a noun in every respect the general
+  // category covers, so it inherits that profile whole rather than restating
+  // it. The one cell that differs is set below.
+  bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::Noun, core::ExtendedPOS::NounForeign);
+  // Japanese attributive modification does not reach across a script change:
+  // the run is its own orthographic unit, so nothing in front of it is reading
+  // as its modifier. The prohibition that keeps a sentence-final particle from
+  // heading a nominal is about exactly that modification (the final な against
+  // the copular attributive な), and it has no purchase here — while a final
+  // particle before a Latin run is the ordinary way a colloquial clause ends.
+  table[static_cast<size_t>(core::ExtendedPOS::ParticleFinal)][static_cast<size_t>(core::ExtendedPOS::NounForeign)] =
+      bigram_rules::encodeCost(bigram_cost::kNeutral);
+
   // A quotative demonstrative cannot directly complete an adjective stem.
   // Keep appearance そう on its auxiliary path (高+そう, キモ+そう).
   table[static_cast<size_t>(core::ExtendedPOS::AdjStem)][static_cast<size_t>(core::ExtendedPOS::AdverbQuotative)] =

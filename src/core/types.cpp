@@ -372,6 +372,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
     // Nouns
     case ExtendedPOS::Noun:
       return "NOUN";
+    case ExtendedPOS::NounForeign:
+      return "NOUN_非日本語";
     case ExtendedPOS::NounFormal:
       return "NOUN_形式";
     case ExtendedPOS::NounVerbal:

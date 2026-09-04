@@ -201,6 +201,13 @@ enum class ExtendedPOS : uint8_t {
   // けれど, ので, のに) have no such homograph and stay in the general class.
   ParticleConjFinite,
 
+  // 非日本語字種の名詞: a nominal written in Latin letters or digits. It behaves
+  // as a noun for every purpose the ordinary category covers, and inherits that
+  // whole profile — the one thing it cannot be is the head of Japanese
+  // attributive modification, because a script change is itself a boundary and
+  // nothing on the Japanese side reaches across it to modify the run.
+  NounForeign,
+
   // Count marker (for array sizing)
   Count_  // Total number of categories
 };
@@ -438,6 +445,7 @@ constexpr bool isNounType(ExtendedPOS epos) {
     case ExtendedPOS::NounProperFamily:
     case ExtendedPOS::NounProperGiven:
     case ExtendedPOS::NounNumber:
+    case ExtendedPOS::NounForeign:
       return true;
     default:
       return false;
