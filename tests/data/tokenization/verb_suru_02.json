@@ -295,6 +295,33 @@
       ],
       "id": "chi_kichi_kishita_wo_teru",
       "input": "ちょきちょきした紙を捨てる"
+    },
+    {
+      "description": "Same decomposition regardless of which spelling has the adverb entry",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "感謝",
+          "pos": "Noun",
+          "surface": "感謝"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "kara_suru",
+      "input": "心から感謝する"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

@@ -1032,6 +1032,43 @@
       ],
       "id": "shimitai_chida",
       "input": "楽しみたい気持ちだ"
+    },
+    {
+      "description": "Adverb headword swallowing a case particle gives the boundary back",
+      "expected": [
+        {
+          "lemma": "根",
+          "pos": "Noun",
+          "surface": "根"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "引き抜く",
+          "pos": "Verb",
+          "surface": "引き抜か"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "雑草",
+          "pos": "Noun",
+          "surface": "雑草"
+        }
+      ],
+      "id": "kara_ki_kareta",
+      "input": "根から引き抜かれた雑草"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
