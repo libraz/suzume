@@ -853,6 +853,87 @@
       ],
       "id": "gakirakira_ru",
       "input": "星がきらきら光る"
+    },
+    {
+      "description": "a deverbal noun from a compound verb whose second element is written in kana",
+      "expected": [
+        {
+          "lemma": "思いやり",
+          "pos": "Noun",
+          "surface": "思いやり"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "持つ",
+          "pos": "Verb",
+          "surface": "持て"
+        }
+      ],
+      "id": "iyariwo_te",
+      "input": "思いやりを持て。"
+    },
+    {
+      "description": "the same compound verb in its terminal cell",
+      "expected": [
+        {
+          "lemma": "相手",
+          "pos": "Noun",
+          "surface": "相手"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "思いやる",
+          "pos": "Verb",
+          "surface": "思いやる"
+        },
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        }
+      ],
+      "id": "wo_iyaru",
+      "input": "相手を思いやる心"
+    },
+    {
+      "description": "the same verb standing alone after a case particle is not a second element",
+      "expected": [
+        {
+          "lemma": "宿題",
+          "pos": "Noun",
+          "surface": "宿題"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やり"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "woyarimashita",
+      "input": "宿題をやりました"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
