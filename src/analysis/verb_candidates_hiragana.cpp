@@ -763,10 +763,14 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
             ++hiragana_end;
             continue;
           }
-          // Check if followed by んない (godan-ra ん音便 + negative auxiliary)
-          // e.g., わかんない = わか + ん (ら→ん音便) + ない
-          if (hiragana_end + 3 < codepoints.size() && codepoints[hiragana_end + 1] == U'ん' &&
-              codepoints[hiragana_end + 2] == U'な' && codepoints[hiragana_end + 3] == U'い') {
+          // Check if followed by ん + the negative (godan-ra ん音便 + negative
+          // auxiliary), e.g. わかんない = わか + ん (ら→ん音便) + ない. The
+          // contraction is licensed by the negative that selects the irrealis,
+          // and every cell of that paradigm selects the same one, so ask for
+          // the paradigm rather than for its dictionary form: enumerating ない
+          // alone stopped the run one mora in for わかんなかった.
+          if (hiragana_end + 1 < codepoints.size() && codepoints[hiragana_end + 1] == U'ん' &&
+              vh::naiNegativeFollowsAt(codepoints, hiragana_end + 2)) {
             ++hiragana_end;
             continue;
           }

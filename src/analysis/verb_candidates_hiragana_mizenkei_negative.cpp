@@ -387,6 +387,11 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
                                            start_pos + 2, candidate::verb_cost::kStrongBonus, true,
                                            CandidateOrigin::VerbHiragana, core::ExtendedPOS::Noun,
                                            "contracted_progressive_negative"));
+    // The frame has already decided what these two morae are, and the scan
+    // below would read the same span as a godan-ra irrealis whose base is the
+    // classical passive らる rather than a verb of the modern paradigm it
+    // reconstructs.
+    return;
   }
 
   // Pattern: stem + ん + ない where stem + る is a godan-ra verb
