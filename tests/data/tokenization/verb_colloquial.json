@@ -36,6 +36,55 @@
       ],
       "id": "go_mou_bechi_ttta",
       "input": "ご飯もう食べちゃった"
+    },
+    {
+      "description": "the ra-row negative contraction after a godan mizenkei",
+      "expected": [
+        {
+          "lemma": "読まる",
+          "pos": "Verb",
+          "surface": "読まん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "mannai",
+      "input": "読まんない"
+    },
+    {
+      "description": "the genuine ra-row contraction stays merged inside a clause",
+      "expected": [
+        {
+          "lemma": "難しい",
+          "pos": "Adjective",
+          "surface": "難しく"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "shikutewakannaiyo",
+      "input": "難しくてわかんないよ"
     }
   ],
   "description": "verb_colloquial tests",
