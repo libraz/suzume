@@ -534,18 +534,40 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
     }
   }
 
-  // Alternating nasal compound mimetics such as ABんCDん followed by the
-  // quotative と form one search unit even when the two halves differ.
-  if (has_trailing_quotative && mimetic_len == 6 && codepoints[start_pos + 2] == U'ん' &&
-      codepoints[start_pos + 5] == U'ん') {
-    auto cand = makeCandidate(extractSubstring(codepoints, start_pos, mimetic_end), start_pos, mimetic_end,
-                              core::PartOfSpeech::Adverb, candidate::kMimeticAlternatingNasalAdverbCost, true,
-                              CandidateOrigin::Onomatopoeia);
+  // Alternating nasal compound mimetics — two equal halves that each close on
+  // ん (さん|ざん, どたん|ばたん) — form one search unit even when the halves
+  // differ. The shape alone is also the shape of a kana-spelled Sino-Japanese
+  // noun (にんげん, しんぶん), so it needs licensing evidence: either a
+  // following quotative と, or sequential voicing on the second half, which is
+  // the reduplication marker itself and cannot arise across a word boundary.
+  // Like the other reduplication shapes this one is prosodically bounded, so
+  // read it off a window at start_pos instead of splitting the whole run: the
+  // form keeps its shape in front of a copula (さんざん|だ) where the run does
+  // not divide evenly.
+  if (start_type == normalize::CharType::Hiragana) {
+    for (const size_t half_len : {size_t{2}, size_t{3}}) {
+      const size_t second_half = start_pos + half_len;
+      const size_t form_end = second_half + half_len;
+      if (form_end > mimetic_end || codepoints[second_half - 1] != U'ん' || codepoints[form_end - 1] != U'ん') {
+        continue;
+      }
+      bool voiced_reduplication = kana::isSequentialVoicingPair(codepoints[start_pos], codepoints[second_half]);
+      for (size_t offset = 1; offset < half_len && voiced_reduplication; ++offset) {
+        voiced_reduplication = codepoints[start_pos + offset] == codepoints[second_half + offset];
+      }
+      const bool licensed = voiced_reduplication || (has_trailing_quotative && form_end == mimetic_end);
+      if (!licensed) {
+        continue;
+      }
+      auto cand = makeCandidate(extractSubstring(codepoints, start_pos, form_end), start_pos, form_end,
+                                core::PartOfSpeech::Adverb, candidate::kMimeticAlternatingNasalAdverbCost, true,
+                                CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
-    cand.confidence = candidate::kHighOriginConfidence;
-    cand.pattern = "abn_cdn_quotative";
+      cand.confidence = candidate::kHighOriginConfidence;
+      cand.pattern = "alternating_nasal_mimetic";
 #endif
-    candidates.push_back(std::move(cand));
+      candidates.push_back(std::move(cand));
+    }
   }
 
   // Try ABり / AっBり patterns (e.g., どさり, ばたり, ぐったり,

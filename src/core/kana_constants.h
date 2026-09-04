@@ -92,6 +92,26 @@ inline bool isKanjiCodepoint(char32_t cp) {
          (cp >= 0x2F00 && cp <= 0x2FDF);      // Kangxi Radicals
 }
 
+/**
+ * @brief Whether @p voiced is the sequentially voiced form of @p plain
+ *
+ * Sequential voicing pairs a plain obstruent with the dakuten form that follows
+ * it in the kana block (か/が, さ/ざ, た/だ, は/ば). It marks the second member
+ * of a reduplication (さん+ざん, ひと+びと), which is why the alternation is
+ * evidence about a word boundary rather than about the vowel row. Handakuten is
+ * excluded: ぱ行 is not an outcome of sequential voicing.
+ */
+inline bool isSequentialVoicingPair(char32_t plain, char32_t voiced) {
+  constexpr char32_t kVoiceableOnsets[] = {U'か', U'き', U'く', U'け', U'こ', U'さ', U'し', U'す', U'せ', U'そ',
+                                           U'た', U'ち', U'つ', U'て', U'と', U'は', U'ひ', U'ふ', U'へ', U'ほ'};
+  for (const char32_t onset : kVoiceableOnsets) {
+    if (onset == plain) {
+      return voiced == plain + 1;
+    }
+  }
+  return false;
+}
+
 inline bool isOnbinCodepoint(char32_t cp) {
   return cp == U'い' || cp == U'っ' || cp == U'ん';
 }
