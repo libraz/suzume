@@ -949,6 +949,97 @@
       ],
       "id": "ni_saretaboushiwo_u",
       "input": "風に流されたぼうしを拾う"
+    },
+    {
+      "description": "deverbal compound noun whose base verb is not listed",
+      "expected": [
+        {
+          "lemma": "枯れ葉",
+          "pos": "Noun",
+          "surface": "枯れ葉"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "舞い散る",
+          "pos": "Verb",
+          "surface": "舞い散る"
+        },
+        {
+          "lemma": "季節",
+          "pos": "Noun",
+          "surface": "季節"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "悲しみ",
+          "pos": "Noun",
+          "surface": "悲しみ"
+        }
+      ],
+      "id": "re_no_i_ru_no_sono_shimi",
+      "input": "枯れ葉の舞い散る季節の、その悲しみ。"
+    },
+    {
+      "description": "deverbal compound noun on the godan arm without a listed base verb",
+      "expected": [
+        {
+          "lemma": "焼き魚",
+          "pos": "Noun",
+          "surface": "焼き魚"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べる"
+        }
+      ],
+      "id": "ki_wo_beru",
+      "input": "焼き魚を食べる"
+    },
+    {
+      "description": "lexical entry covering the span outranks an unverified deverbal compound",
+      "expected": [
+        {
+          "lemma": "なし崩し",
+          "pos": "Noun",
+          "surface": "なし崩し"
+        },
+        {
+          "lemma": "的",
+          "pos": "Suffix",
+          "surface": "的"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "nashi_shi_ni_mu",
+      "input": "なし崩し的に進む"
     }
   ],
   "description": "General nouns (part 4/4)",
