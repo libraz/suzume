@@ -934,6 +934,77 @@
       ],
       "id": "woyarimashita",
       "input": "宿題をやりました"
+    },
+    {
+      "description": "a kanji fallback run may not end on a verb head whose okurigana follows",
+      "expected": [
+        {
+          "lemma": "外",
+          "pos": "Noun",
+          "surface": "外"
+        },
+        {
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲み"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "mitai",
+      "input": "外飲みたい"
+    },
+    {
+      "description": "the same shape with a different nominal in front",
+      "expected": [
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲み"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "mitai_2",
+      "input": "家飲みたい"
+    },
+    {
+      "description": "a one-kanji nominal before the same auxiliary keeps the auxiliary whole",
+      "expected": [
+        {
+          "lemma": "雲",
+          "pos": "Noun",
+          "surface": "雲"
+        },
+        {
+          "lemma": "みたい",
+          "pos": "Auxiliary",
+          "surface": "みたい"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "形",
+          "pos": "Noun",
+          "surface": "形"
+        }
+      ],
+      "id": "mitaina",
+      "input": "雲みたいな形"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
