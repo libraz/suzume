@@ -790,7 +790,7 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // fabricated kanji run take the mora that belongs to a classical
       // adjective terminal (道遠+し instead of 道+遠し). The sibling けり does
       // take a nominal predicate, and keeps its own bonus.
-      {EPOS::Noun, EPOS::AuxClassicalKi, cost::kStrong},
+      {EPOS::Noun, EPOS::AuxClassicalKi, cost::kProhibitive},
       // Modifying a nominal is what the 連体形 exists for, so a noun is its
       // most natural follower (ありし日, 読みし人, 過ぎし日々). Without the row
       // the auxiliary reached one for no more than the conjunctive particle it
