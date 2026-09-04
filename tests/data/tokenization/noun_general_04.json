@@ -825,6 +825,130 @@
       ],
       "id": "ni_ru_mura",
       "input": "朝露に光る草むら"
+    },
+    {
+      "description": "猫に追われたねずみが走る速さは驚異的だった。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "追う",
+          "pos": "Verb",
+          "surface": "追わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ねずみ",
+          "pos": "Noun",
+          "surface": "ねずみ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走る"
+        },
+        {
+          "lemma": "速い",
+          "pos": "Adjective",
+          "surface": "速"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "驚異的",
+          "pos": "Adjective",
+          "surface": "驚異的"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_waretanezumiga_ru_saha_dattta",
+      "input": "猫に追われたねずみが走る速さは驚異的だった。"
+    },
+    {
+      "description": "風に流されたぼうしを拾う - auto-generated",
+      "expected": [
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "流す",
+          "pos": "Verb",
+          "surface": "流さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ぼうし",
+          "pos": "Noun",
+          "surface": "ぼうし"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "拾う",
+          "pos": "Verb",
+          "surface": "拾う"
+        }
+      ],
+      "id": "ni_saretaboushiwo_u",
+      "input": "風に流されたぼうしを拾う"
     }
   ],
   "description": "General nouns (part 4/4)",
