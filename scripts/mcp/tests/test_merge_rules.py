@@ -1221,3 +1221,25 @@ class TestClassicalAdjectiveKariProbe:
         from suzume_mcp.core.merge_postprocessors import _kari_cell_analysis
 
         assert _kari_cell_analysis("べかり") == ("助動詞", "べし")
+
+
+class TestNominalBeforeConjunctiveTe:
+    def test_reopens_a_nominal_that_swallowed_the_continuative(self):
+        tokens = [
+            _tok("夜明け", pos="名詞", lemma="夜明け"),
+            _tok("て", pos="助詞", pos_sub1="格助詞", lemma="て"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "夜明けて")
+        assert [token["surface"] for token in result] == ["夜", "明け", "て"]
+        assert result[1]["lemma"] == "明ける"
+        assert result[2]["pos_sub1"] == "接続助詞"
+        assert rule == "nominal-before-conjunctive-te"
+
+    def test_leaves_the_same_nominal_before_a_case_particle(self):
+        tokens = [
+            _tok("夜明け", pos="名詞", lemma="夜明け"),
+            _tok("が", pos="助詞", pos_sub1="格助詞", lemma="が"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "夜明けが")
+        assert [token["surface"] for token in result] == ["夜明け", "が"]
+        assert rule != "nominal-before-conjunctive-te"

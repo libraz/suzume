@@ -964,6 +964,51 @@ def _postprocess_classical_kemu(result: list[dict], applied_rule: str | None) ->
     return normalized, applied_rule
 
 
+_CONJUNCTIVE_TE = "て"
+
+
+def _postprocess_nominal_before_conjunctive_te(
+    result: list[dict], applied_rule: str | None
+) -> tuple[list[dict], str | None]:
+    """Reopen a nominal that swallowed the continuative て attaches to.
+
+    て is only ever the conjunctive particle, and it takes a continuative — a
+    nominal in front of it heads no dependency the sentence could have. The
+    reference dictionary reaches that position by matching its longest nominal
+    headword and then labelling て a case particle, which is the tell: the same
+    surface comes back as a verb as soon as a case particle intervenes (夜が明けて
+    beside 夜明けて), so the reading turns on the greedy match rather than on the
+    grammar. The polite-auxiliary probe recovers the continuative and the
+    boundary in front of it, and て goes back to being conjunctive.
+    """
+    normalized: list[dict] = []
+    index = 0
+    while index < len(result):
+        token = result[index]
+        follower = result[index + 1] if index + 1 < len(result) else None
+        recovered = (
+            _continuative_verb_tokens(token.get("surface", ""))
+            if token.get("pos") == "名詞"
+            and follower is not None
+            and follower.get("surface") == _CONJUNCTIVE_TE
+            and follower.get("pos") == "助詞"
+            and follower.get("pos_sub1") == "格助詞"
+            else None
+        )
+        if recovered is None:
+            normalized.append(token)
+            index += 1
+            continue
+        normalized.extend(recovered)
+        normalized.append(
+            {"surface": _CONJUNCTIVE_TE, "pos": "助詞", "pos_sub1": "接続助詞", "lemma": _CONJUNCTIVE_TE},
+        )
+        index += 2
+        if applied_rule is None:
+            applied_rule = "nominal-before-conjunctive-te"
+    return normalized, applied_rule
+
+
 _CLASSICAL_COPULA_BASE = "なる"
 _CLASSICAL_COPULA_LEMMA = "なり"
 
