@@ -27,8 +27,8 @@ void addTaruAdjectiveJoinCandidates(core::Lattice& lattice, std::string_view tex
     return;
   }
 
-  // Look for X然と pattern where X is 1+ kanji
-  // Need at least 3 characters: X + 然 + と
+  // Look for the taru-adverb shape: a kanji nominal marked as one, plus と.
+  // Need at least 3 characters: X + marker + と
   if (start_pos + 2 >= codepoints.size()) {
     return;
   }
@@ -39,14 +39,17 @@ void addTaruAdjectiveJoinCandidates(core::Lattice& lattice, std::string_view tex
     ++kanji_end;
   }
 
-  // Need at least 2 kanji, and the last one must be 然
+  // Need at least 2 kanji, and the last one must mark the nominal as taru-style
   if (kanji_end - start_pos < 2) {
     return;
   }
 
-  // Check if the last kanji is 然
+  // Two markers derive the same adverbial: the taru-adjective suffix 然
+  // (整然と, 毅然と) and the iteration mark, whose reduplication is the other
+  // productive source of this class (淡々と, 黙々と, 延々と). Both name a manner,
+  // and neither reading leaves と as a case particle governed by the nominal.
   char32_t last_kanji = codepoints[kanji_end - 1];
-  if (last_kanji != U'然') {
+  if (last_kanji != U'然' && last_kanji != U'々') {
     return;
   }
 
@@ -74,9 +77,13 @@ void addTaruAdjectiveJoinCandidates(core::Lattice& lattice, std::string_view tex
   size_t end_pos = kanji_end + 1;  // Include と
   std::string surface(textRange(text, byte_offsets, start_pos, end_pos));
 
-  // X然 without と is the lemma
+  // The nominal without と is the lemma. A listed nominal has a reading of its
+  // own, and with the iteration mark that reading is usually a plural whose と
+  // is the comitative case particle (人々と話す, 我々と行く) — the opposite
+  // analysis. Any part of speech counts here, since the plural pronouns are not
+  // nouns.
   std::string lemma(textRange(text, byte_offsets, start_pos, kanji_end));
-  if (dict_manager.lookupExact(lemma, core::PartOfSpeech::Noun) != nullptr) {
+  if (!dict_manager.lookup(lemma, 0).empty()) {
     return;
   }
 
