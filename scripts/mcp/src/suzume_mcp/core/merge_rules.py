@@ -61,6 +61,7 @@ from .merge_postprocessors import (
     _postprocess_productive_mimetics,
     _postprocess_search_unit_split,
     _postprocess_small_kana_head_merge,
+    _postprocess_stranded_lengthening_vowel,
     _postprocess_tomo_particle,
     _postprocess_totomoni,
     classical_adjective_lemma,
@@ -2061,6 +2062,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     result, applied_rule = _postprocess_nominal_zukeru(result, applied_rule)
     result, applied_rule = _postprocess_ascii_joiner_merge(result, applied_rule)
     result, applied_rule = _postprocess_small_kana_head_merge(result, applied_rule)
+    result, applied_rule = _postprocess_stranded_lengthening_vowel(result, applied_rule)
     _postprocess_dialectal(result)
 
     return result, applied_rule

@@ -1434,6 +1434,55 @@ def _postprocess_small_kana_head_merge(result: list[dict], applied_rule: str | N
     return merged, applied_rule
 
 
+# The vowel each hiragana mora carries, used to tell an emphatic lengthening
+# from a morpheme that merely starts with the same kana.
+_MORA_VOWEL = {
+    kana: vowel
+    for vowel, row in (
+        ("あ", "あかさたなはまやらわがざだばぱゃゎぁ"),
+        ("い", "いきしちにひみりゐぎじぢびぴぃ"),
+        ("う", "うくすつぬふむゆるぐずづぶぷゅぅゔ"),
+        ("え", "えけせてねへめれゑげぜでべぺぇ"),
+        ("お", "おこそとのほもよろをごぞどぼぽょぉ"),
+    )
+    for kana in row
+}
+
+
+def _postprocess_stranded_lengthening_vowel(
+    result: list[dict], applied_rule: str | None
+) -> tuple[list[dict], str | None]:
+    """Reattach an emphatic vowel the reference analyzer left standing alone.
+
+    Drawing out a final vowel is one word, however it is spelled: すごーい and
+    すごーい written with a repeated kana are the same emphasis.  The reference
+    dictionary merges the spelling only when it happens to hold the lengthened
+    form as a headword (まあ, なあ), and otherwise strands the extra mora as a
+    filler with no analysis (そりゃ+あ, か+あ) — so the same construction comes
+    out two ways depending on the lexicon.  The construction decides instead: a
+    one-mora filler repeating the vowel of the mora in front of it is that
+    word's lengthening, and it carries no lemma of its own.  A genuine
+    interjection is tagged as one and opens its utterance, so it is untouched.
+    """
+    merged: list[dict] = []
+    for curr in result:
+        surface = curr.get("surface", "")
+        previous = merged[-1].get("surface", "") if merged else ""
+        if (
+            merged
+            and curr.get("pos") == "フィラー"
+            and surface in "あいうえお"
+            and previous
+            and _MORA_VOWEL.get(previous[-1]) == surface
+        ):
+            merged[-1]["surface"] = previous + surface
+            if applied_rule is None:
+                applied_rule = "stranded-lengthening-vowel"
+            continue
+        merged.append(curr)
+    return merged, applied_rule
+
+
 # The colloquial volitional reduces its う to a geminate before the quotative
 # と (行こう+と → 行こっと, し+よう+と → しよっと), so a run closing on っと is not
 # automatically a mimetic. The reference dictionary marks the difference: a

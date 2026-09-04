@@ -1087,3 +1087,34 @@ class TestHonorificPredicateBoundary:
         result, rule = apply_suzume_merge(tokens, "お気に入り")
         assert [token["surface"] for token in result] == ["お", "気に入り"]
         assert rule == "prefix-split"
+
+
+class TestStrandedLengtheningVowel:
+    def test_merges_filler_vowel_into_the_lengthened_word(self):
+        tokens = [
+            _tok("そりゃ", pos="接続詞", lemma="そりゃ"),
+            _tok("あ", pos="フィラー", lemma="あ"),
+            _tok("ね", pos="助詞", lemma="ね"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "そりゃあね")
+        assert [token["surface"] for token in result] == ["そりゃあ", "ね"]
+        assert result[0]["lemma"] == "そりゃ"
+        assert rule == "stranded-lengthening-vowel"
+
+    def test_keeps_a_filler_vowel_after_a_different_vowel(self):
+        tokens = [
+            _tok("これ", pos="名詞", lemma="これ"),
+            _tok("あ", pos="フィラー", lemma="あ"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "これあ")
+        assert [token["surface"] for token in result] == ["これ", "あ"]
+        assert rule != "stranded-lengthening-vowel"
+
+    def test_keeps_an_interjection_that_opens_the_utterance(self):
+        tokens = [
+            _tok("あ", pos="感動詞", lemma="あ"),
+            _tok("そう", pos="副詞", lemma="そう"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "あそう")
+        assert [token["surface"] for token in result] == ["あ", "そう"]
+        assert rule != "stranded-lengthening-vowel"
