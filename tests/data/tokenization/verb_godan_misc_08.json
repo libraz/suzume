@@ -1069,6 +1069,75 @@
       ],
       "id": "kara_ki_kareta",
       "input": "根から引き抜かれた雑草"
+    },
+    {
+      "description": "Derived verb continuative recovered from the fragments it was cut into",
+      "expected": [
+        {
+          "lemma": "謎めく",
+          "pos": "Verb",
+          "surface": "謎めき"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "文字",
+          "pos": "Noun",
+          "surface": "文字"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "語る",
+          "pos": "Verb",
+          "surface": "語る"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        }
+      ],
+      "id": "mekitaru_ha_wo_ruya",
+      "input": "謎めきたる文字は、何を語るや。"
+    },
+    {
+      "description": "Same recovery on a different host nominal",
+      "expected": [
+        {
+          "lemma": "皮肉めく",
+          "pos": "Verb",
+          "surface": "皮肉めき"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "言葉",
+          "pos": "Noun",
+          "surface": "言葉"
+        }
+      ],
+      "id": "mekitaru",
+      "input": "皮肉めきたる言葉"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

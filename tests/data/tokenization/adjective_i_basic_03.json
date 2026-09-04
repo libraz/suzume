@@ -922,6 +922,50 @@
       ],
       "id": "tanoshi",
       "input": "たのしーー"
+    },
+    {
+      "description": "Slang adjective found in the analysis rather than from a stem list",
+      "expected": [
+        {
+          "lemma": "エグい",
+          "pos": "Adjective",
+          "surface": "エグい"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "i_da_3",
+      "input": "エグい話だ"
+    },
+    {
+      "description": "Same detection on a stem no list ever named",
+      "expected": [
+        {
+          "lemma": "ムズい",
+          "pos": "Adjective",
+          "surface": "ムズい"
+        },
+        {
+          "lemma": "問題",
+          "pos": "Noun",
+          "surface": "問題"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "i_da_4",
+      "input": "ムズい問題だ"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

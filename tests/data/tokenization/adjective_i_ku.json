@@ -1296,6 +1296,28 @@
       ],
       "id": "kutemo_desu",
       "input": "暑くても大丈夫です"
+    },
+    {
+      "description": "Slang adjective in the negative continuative, stranded ku recovered",
+      "expected": [
+        {
+          "lemma": "エモい",
+          "pos": "Adjective",
+          "surface": "エモく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        }
+      ],
+      "id": "kunai_4",
+      "input": "エモくない話"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",
