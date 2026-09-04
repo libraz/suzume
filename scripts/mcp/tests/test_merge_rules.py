@@ -1523,3 +1523,25 @@ class TestDerivedVerbFragments:
         result, rule = apply_suzume_merge(tokens, "本めくり")
         assert [token["surface"] for token in result] == ["本", "めくり"]
         assert rule != "noun+derived-verb-suffix"
+
+
+class TestMannerNominalKata:
+    def test_joins_kata_to_a_continuative_the_dictionary_tagged_as_a_nominal(self):
+        tokens = [
+            _tok("動き", pos="名詞", pos_sub1="一般", lemma="動き"),
+            _tok("方", pos="名詞", pos_sub1="接尾", lemma="方"),
+            _tok("だ", pos="助動詞", lemma="だ"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "動き方だ")
+        assert [token["surface"] for token in result] == ["動き方", "だ"]
+        assert result[0]["pos"] == "名詞"
+        assert rule == "verb-renyokei+kata"
+
+    def test_keeps_the_plural_suffix_after_a_nominal_that_is_no_continuative(self):
+        tokens = [
+            _tok("先生", pos="名詞", pos_sub1="一般", lemma="先生"),
+            _tok("方", pos="名詞", pos_sub1="接尾", lemma="方"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "先生方")
+        assert [token["surface"] for token in result] == ["先生", "方"]
+        assert rule != "verb-renyokei+kata"

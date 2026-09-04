@@ -905,6 +905,18 @@ def _probe_continuative(surface: str) -> list[dict] | None:
     return [_plain(token) for token in head]
 
 
+def reads_as_continuative(surface: str) -> bool:
+    """Whether a surface is one verb standing in its continuative cell.
+
+    The reference dictionary gives a continuative the verb tag only while what
+    follows selects it, and calls the same surface a nominal otherwise. The
+    polite auxiliary selects that cell for any verb, so appending it recovers
+    the reading a construction needs when the tag has already been lost.
+    """
+    probed = _probe_continuative(surface)
+    return probed is not None and len(probed) == 1
+
+
 def _continuative_verb_tokens(surface: str) -> list[dict] | None:
     """Read a nominal back as the verb continuative it spells, if it is one.
 

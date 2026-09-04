@@ -75,6 +75,7 @@ from .merge_postprocessors import (
     _postprocess_variation_selector_merge,
     classical_adjective_lemma,
     nidan_cell,
+    reads_as_continuative,
 )
 from .split_rules import base_from_renyokei, bases_from_renyokei
 
@@ -1566,7 +1567,14 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         # 5a'. Short simple verb renyokei + 方 (歩き方, やり方, 読み方, 言い方)
         # remains a lexical search unit. Longer compound continuatives retain
         # the productive suffix boundary (打ち合わせ + 方, 組み合わせ + 方).
-        if not merged and t.get("pos") == "動詞" and t.get("conj_form") == "連用形":
+        # The host keeps the verb tag only while what follows selects the
+        # continuative cell: with the copula behind it the same 動き comes back
+        # as a nominal and the derivation is lost, so the reading is recovered
+        # from the polite auxiliary rather than read off the tag.
+        if not merged and (
+            (t.get("pos") == "動詞" and t.get("conj_form") == "連用形")
+            or (t.get("pos") == "名詞" and reads_as_continuative(t.get("surface", "")))
+        ):
             j = i + 1
             if j < len(tokens):
                 nxt = tokens[j]
