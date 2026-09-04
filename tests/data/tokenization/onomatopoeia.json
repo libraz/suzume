@@ -1224,6 +1224,237 @@
       ],
       "id": "dandan_eru",
       "input": "だんだん増える"
+    },
+    {
+      "description": "Mimetic adverb guessed as verb+noun by the reference dictionary",
+      "expected": [
+        {
+          "lemma": "準備",
+          "pos": "Noun",
+          "surface": "準備"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ばっちり",
+          "pos": "Adverb",
+          "surface": "ばっちり"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "gabattchiridekiteru",
+      "input": "準備がばっちりできてる"
+    },
+    {
+      "description": "Same mimetic guessed as adjective stem plus auxiliary",
+      "expected": [
+        {
+          "lemma": "対応",
+          "pos": "Noun",
+          "surface": "対応"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ばっちり",
+          "pos": "Adverb",
+          "surface": "ばっちり"
+        },
+        {
+          "lemma": "決まる",
+          "pos": "Verb",
+          "surface": "決まっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gabattchiri_mattta",
+      "input": "対応がばっちり決まった"
+    },
+    {
+      "description": "Geminate before a coordinating particle keeps its continuative boundary",
+      "expected": [
+        {
+          "lemma": "宿題",
+          "pos": "Noun",
+          "surface": "宿題"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Particle",
+          "surface": "たり"
+        },
+        {
+          "lemma": "遊ぶ",
+          "pos": "Verb",
+          "surface": "遊ん"
+        },
+        {
+          "lemma": "だり",
+          "pos": "Particle",
+          "surface": "だり"
+        }
+      ],
+      "id": "woyatttari_ndari",
+      "input": "宿題をやったり遊んだり"
+    },
+    {
+      "description": "Mimetic tto merge must not span a conditional auxiliary",
+      "expected": [
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        },
+        {
+          "lemma": "ちょっと",
+          "pos": "Adverb",
+          "surface": "ちょっと"
+        },
+        {
+          "lemma": "だけ",
+          "pos": "Particle",
+          "surface": "だけ"
+        },
+        {
+          "lemma": "休む",
+          "pos": "Verb",
+          "surface": "休み"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "gaatttarachi_tttodake_mitai",
+      "input": "時間があったらちょっとだけ休みたい"
+    },
+    {
+      "description": "Same guard mid-sentence after a te-form auxiliary verb",
+      "expected": [
+        {
+          "lemma": "手伝う",
+          "pos": "Verb",
+          "surface": "手伝っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "もらえる",
+          "pos": "Auxiliary",
+          "surface": "もらえ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        },
+        {
+          "lemma": "ちょっと",
+          "pos": "Adverb",
+          "surface": "ちょっと"
+        },
+        {
+          "lemma": "だけ",
+          "pos": "Particle",
+          "surface": "だけ"
+        },
+        {
+          "lemma": "楽",
+          "pos": "Adjective",
+          "surface": "楽"
+        }
+      ],
+      "id": "tttemoraetarachi_tttodake",
+      "input": "手伝ってもらえたらちょっとだけ楽"
+    },
+    {
+      "description": "Mimetic whose guessed split has no licensed attachment still merges",
+      "expected": [
+        {
+          "lemma": "にこっと",
+          "pos": "Adverb",
+          "surface": "にこっと"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑う"
+        }
+      ],
+      "id": "nikottto_u_2",
+      "input": "にこっと笑う"
+    },
+    {
+      "description": "Doubled adjective stem guessed as a stem plus two particles",
+      "expected": [
+        {
+          "lemma": "やばやば",
+          "pos": "Adverb",
+          "surface": "やばやば"
+        }
+      ],
+      "id": "yabayaba",
+      "input": "やばやば"
+    },
+    {
+      "description": "One mora held for several beats stays a single emphatic unit",
+      "expected": [
+        {
+          "lemma": "ええええ",
+          "pos": "Adverb",
+          "surface": "ええええ"
+        }
+      ],
+      "id": "eeee",
+      "input": "ええええ"
     }
   ],
   "description": "Onomatopoeia and mimetic words",
