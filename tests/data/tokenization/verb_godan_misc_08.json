@@ -430,6 +430,227 @@
       ],
       "id": "rubeki_monaku",
       "input": "見るべき景色もなく。"
+    },
+    {
+      "description": "土に根付く植物が育つ - auto-generated",
+      "expected": [
+        {
+          "lemma": "土",
+          "pos": "Noun",
+          "surface": "土"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "根付く",
+          "pos": "Verb",
+          "surface": "根付く"
+        },
+        {
+          "lemma": "植物",
+          "pos": "Noun",
+          "surface": "植物"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "育つ",
+          "pos": "Verb",
+          "surface": "育つ"
+        }
+      ],
+      "id": "ni_ku_ga_tsu",
+      "input": "土に根付く植物が育つ"
+    },
+    {
+      "description": "花が色付いた - auto-generated",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "色付く",
+          "pos": "Verb",
+          "surface": "色付い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_ita",
+      "input": "花が色付いた"
+    },
+    {
+      "description": "条件付きで認める - auto-generated",
+      "expected": [
+        {
+          "lemma": "条件",
+          "pos": "Noun",
+          "surface": "条件"
+        },
+        {
+          "lemma": "付き",
+          "pos": "Suffix",
+          "surface": "付き"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "認める",
+          "pos": "Verb",
+          "surface": "認める"
+        }
+      ],
+      "id": "kide_meru",
+      "input": "条件付きで認める"
+    },
+    {
+      "description": "目付きが鋭い - auto-generated",
+      "expected": [
+        {
+          "lemma": "目付き",
+          "pos": "Noun",
+          "surface": "目付き"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "鋭い",
+          "pos": "Adjective",
+          "surface": "鋭い"
+        }
+      ],
+      "id": "kiga_i",
+      "input": "目付きが鋭い"
+    },
+    {
+      "description": "木に根が付く - auto-generated",
+      "expected": [
+        {
+          "lemma": "木",
+          "pos": "Noun",
+          "surface": "木"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "根",
+          "pos": "Noun",
+          "surface": "根"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "付く",
+          "pos": "Verb",
+          "surface": "付く"
+        }
+      ],
+      "id": "ni_ga_ku",
+      "input": "木に根が付く"
+    },
+    {
+      "description": "子犬に名付ける - auto-generated",
+      "expected": [
+        {
+          "lemma": "子犬",
+          "pos": "Noun",
+          "surface": "子犬"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "名付ける",
+          "pos": "Verb",
+          "surface": "名付ける"
+        }
+      ],
+      "id": "ni_keru",
+      "input": "子犬に名付ける"
+    },
+    {
+      "description": "寄付が集まる - auto-generated",
+      "expected": [
+        {
+          "lemma": "寄付",
+          "pos": "Noun",
+          "surface": "寄付"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "集まる",
+          "pos": "Verb",
+          "surface": "集まる"
+        }
+      ],
+      "id": "ga_maru",
+      "input": "寄付が集まる"
+    },
+    {
+      "description": "料理の味付けをする - auto-generated",
+      "expected": [
+        {
+          "lemma": "料理",
+          "pos": "Noun",
+          "surface": "料理"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "味付け",
+          "pos": "Noun",
+          "surface": "味付け"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "no_kewosuru",
+      "input": "料理の味付けをする"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

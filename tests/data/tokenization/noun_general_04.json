@@ -454,6 +454,296 @@
       ],
       "id": "koso_nare_2",
       "input": "本こそ大切なれ。"
+    },
+    {
+      "description": "先生方が集まる - auto-generated",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "方",
+          "pos": "Suffix",
+          "surface": "方"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "集まる",
+          "pos": "Verb",
+          "surface": "集まる"
+        }
+      ],
+      "id": "ga_maru_2",
+      "input": "先生方が集まる"
+    },
+    {
+      "description": "皆様方にお願いする - auto-generated",
+      "expected": [
+        {
+          "lemma": "皆様",
+          "pos": "Noun",
+          "surface": "皆様"
+        },
+        {
+          "lemma": "方",
+          "pos": "Suffix",
+          "surface": "方"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "願い",
+          "pos": "Noun",
+          "surface": "願い"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "nio_isuru",
+      "input": "皆様方にお願いする"
+    },
+    {
+      "description": "北の方角へ進む - auto-generated",
+      "expected": [
+        {
+          "lemma": "北",
+          "pos": "Noun",
+          "surface": "北"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "方角",
+          "pos": "Noun",
+          "surface": "方角"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "no_he_mu",
+      "input": "北の方角へ進む"
+    },
+    {
+      "description": "彼方に消えていく - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼方",
+          "pos": "Noun",
+          "surface": "彼方"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "消える",
+          "pos": "Verb",
+          "surface": "消え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "いく"
+        }
+      ],
+      "id": "ni_eteiku",
+      "input": "彼方に消えていく"
+    },
+    {
+      "description": "逆さに映る水面の景色 - auto-generated",
+      "expected": [
+        {
+          "lemma": "逆さ",
+          "pos": "Noun",
+          "surface": "逆さ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "映る",
+          "pos": "Verb",
+          "surface": "映る"
+        },
+        {
+          "lemma": "水面",
+          "pos": "Noun",
+          "surface": "水面"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "景色",
+          "pos": "Noun",
+          "surface": "景色"
+        }
+      ],
+      "id": "sani_ru_no",
+      "input": "逆さに映る水面の景色"
+    },
+    {
+      "description": "冷たさが残る - auto-generated",
+      "expected": [
+        {
+          "lemma": "冷たい",
+          "pos": "Adjective",
+          "surface": "冷た"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "残る",
+          "pos": "Verb",
+          "surface": "残る"
+        }
+      ],
+      "id": "tasaga_ru",
+      "input": "冷たさが残る"
+    },
+    {
+      "description": "静かさが心地よい - auto-generated",
+      "expected": [
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "心地よい",
+          "pos": "Adjective",
+          "surface": "心地よい"
+        }
+      ],
+      "id": "kasaga_yoi",
+      "input": "静かさが心地よい"
+    },
+    {
+      "description": "逆さまに置く - auto-generated",
+      "expected": [
+        {
+          "lemma": "逆さま",
+          "pos": "Adjective",
+          "surface": "逆さま"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "置く",
+          "pos": "Verb",
+          "surface": "置く"
+        }
+      ],
+      "id": "samani_ku",
+      "input": "逆さまに置く"
+    },
+    {
+      "description": "同様に扱う - auto-generated",
+      "expected": [
+        {
+          "lemma": "同様",
+          "pos": "Adjective",
+          "surface": "同様"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "扱う",
+          "pos": "Verb",
+          "surface": "扱う"
+        }
+      ],
+      "id": "ni_u_2",
+      "input": "同様に扱う"
+    },
+    {
+      "description": "辻様へ送る - auto-generated",
+      "expected": [
+        {
+          "lemma": "辻",
+          "pos": "Noun",
+          "surface": "辻"
+        },
+        {
+          "lemma": "様",
+          "pos": "Noun",
+          "surface": "様"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "送る",
+          "pos": "Verb",
+          "surface": "送る"
+        }
+      ],
+      "id": "he_ru",
+      "input": "辻様へ送る"
     }
   ],
   "description": "General nouns (part 4/4)",
