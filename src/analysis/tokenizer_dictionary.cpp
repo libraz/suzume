@@ -962,6 +962,88 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
   return state;
 }
 
+// The longest closed-class entry a drawn-out spelling can hide, in morae. The
+// scan below runs at every position, so the window is bounded rather than open.
+constexpr size_t kElidedLookupWindow = 6;
+
+// Colloquial emphasis may hold a mora in the middle of a function word rather
+// than at its end (飲みたーい, ませーん, でーす). The mark carries no segment of
+// its own, so the word is still there — but a lookup over the literal text
+// stops at the mark and leaves whatever homograph fits the fragment (たー as the
+// past auxiliary, and い as a verb behind it). Look the entry up again with the
+// interior marks elided, and give the match the span it actually occupies.
+//
+// Only auxiliaries are admitted. An auxiliary is selected by the predicate it
+// attaches to, so its left edge is fixed by that predicate's inflection and the
+// match cannot float. A particle attaches to anything, so an elided match would
+// be free to open anywhere inside a kana run and would cut into longer words
+// through the mark (the dialectal ばい inside やばーい).
+void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictionary::DictionaryManager& dict_manager,
+                                            const std::vector<char32_t>& codepoints, size_t start_pos,
+                                            std::vector<dictionary::LookupResult>& lookup_results) {
+  const size_t window_end = std::min(codepoints.size(), start_pos + kElidedLookupWindow);
+  // The mark holds the mora in front of it, so it can neither open the window
+  // nor be the only thing in it. Scanning for one before building anything keeps
+  // the ordinary position — which has no mark — free of allocation.
+  size_t first_mark = window_end;
+  for (size_t pos = start_pos + 1; pos < window_end; ++pos) {
+    if (normalize::isProlongedSoundMark(codepoints[pos])) {
+      first_mark = pos;
+      break;
+    }
+    if (normalize::classifyChar(codepoints[pos]) != normalize::CharType::Hiragana) {
+      return;
+    }
+  }
+  if (first_mark + 1 >= window_end || normalize::classifyChar(codepoints[start_pos]) != normalize::CharType::Hiragana) {
+    return;
+  }
+
+  std::string elided;
+  std::array<size_t, kElidedLookupWindow> elided_to_original{};
+  size_t elided_length = 0;
+  for (size_t pos = start_pos; pos < window_end; ++pos) {
+    if (normalize::isProlongedSoundMark(codepoints[pos])) {
+      continue;
+    }
+    if (normalize::classifyChar(codepoints[pos]) != normalize::CharType::Hiragana) {
+      break;
+    }
+    elided += normalize::encodeUtf8(codepoints[pos]);
+    elided_to_original[elided_length] = pos;
+    ++elided_length;
+  }
+
+  dict_manager.lookupInto(elided, 0, lookup_results);
+  for (const auto& result : lookup_results) {
+    if (result.entry == nullptr || result.length < 2 || result.length > elided_length) {
+      continue;
+    }
+    if (result.entry->pos != core::PartOfSpeech::Auxiliary) {
+      continue;
+    }
+    // A match that stops before the first elided mark is the plain reading the
+    // ordinary lookup already produced.
+    const size_t end_pos = elided_to_original[result.length - 1] + 1;
+    const size_t elided_marks = (end_pos - start_pos) - result.length;
+    if (elided_marks == 0) {
+      continue;
+    }
+    const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
+    const std::string_view lemma =
+        result.entry->lemma.empty() ? std::string_view(result.entry->surface) : std::string_view(result.entry->lemma);
+    // Charged the same per mark as emphasis at a word's end: the drawn-out
+    // spelling is the marked one and must not undercut a word that owns the
+    // whole run unmarked.
+    const float cost = getCategoryCost(result.entry->extended_pos) +
+                       (candidate::kEmphaticCharacterPenalty * static_cast<float>(elided_marks));
+    lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), result.entry->pos, cost,
+                    core::LatticeEdge::kFromDictionary | core::LatticeEdge::kHasCustomCost, lemma,
+                    dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary,
+                    candidate::kDictionaryOriginConfidence, {}, result.entry->extended_pos, "dict_elided_prolonged");
+  }
+}
+
 }  // namespace
 
 void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view text,
@@ -2214,8 +2296,13 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
         }
 
         const std::string emphatic_surface = result.entry->surface + emphatic.suffix;
+        // An auxiliary closed on a glottal stop is a colloquial form of its own
+        // and keeps that spelling as its lemma (ですっ, ますっっ). Holding the
+        // final vowel adds nothing to the word, so the entry's own base form is
+        // the lemma there — otherwise a closed-class entry ends up lemmatized to
+        // a non-word (た as たああ, です as ですー).
         const bool preserves_emphatic_surface =
-            result.entry->pos == core::PartOfSpeech::Auxiliary ||
+            (result.entry->pos == core::PartOfSpeech::Auxiliary && emphatic.addsSegment()) ||
             (result.entry->pos == core::PartOfSpeech::Adjective &&
              (emphatic.standard_char_count >= 2 || emphatic.repeated_vowel_count >= 3));
         const std::string_view dictionary_lemma = result.entry->lemma.empty() ? std::string_view(result.entry->surface)
@@ -2231,6 +2318,9 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
   }
 
   tokenizer_dictionary_detail::appendSpecialGrammarCandidates(lattice, text, codepoints, start_pos, byte_pos);
+  // Runs last: it reuses the caller's buffer as scratch, which the loops above
+  // have finished with by this point.
+  addElidedProlongedDictionaryCandidates(lattice, dict_manager_, codepoints, start_pos, lookup_results);
 }
 
 }  // namespace suzume::analysis
