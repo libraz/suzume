@@ -211,8 +211,18 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
         const bool starts_naru_after_ku =
             stem_end > start_pos && codepoints[stem_end - 1] == U'く' && stem_end + 1 < codepoints.size() &&
             utf8::equalsAny(extractSubstring(codepoints, stem_end + 1, stem_end + 2), {"る", "っ", "り", "れ", "ろ"});
+        // A 形容動詞 stem is nominal, and no nominal closes on the verbal
+        // ending る — the ichidan and サ変 terminal cells do (食べる, 見る,
+        // 絶望する), and the な after one is the prohibitive final particle,
+        // not the attributive copula. Without this the reading depends on
+        // whether the base happens to be listed: 走るな and 忘れるな parse
+        // correctly only because their verbs are, while 食べるな and 見るな
+        // become an invented adjective plus a copula. The stems this rule has
+        // to leave alone end in か, ら or や (静かな, 平らな, 気さくな), none
+        // of which is a verbal ending.
+        const bool closes_on_verbal_ru = stem_end > start_pos && codepoints[stem_end - 1] == U'る';
         if (is_bare_attributive && !has_internal_particle && !contains_closed_suffix && !starts_closed_tail &&
-            !is_exact_verb_stem && !contains_passive_boundary && !starts_naru_after_ku) {
+            !is_exact_verb_stem && !contains_passive_boundary && !starts_naru_after_ku && !closes_on_verbal_ru) {
           std::string first_char_str;
           normalize::encodeUtf8(codepoints[start_pos], first_char_str);
           if (!normalize::isFormalNounSurface(first_char_str)) {
