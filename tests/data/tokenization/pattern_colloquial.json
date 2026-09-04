@@ -735,6 +735,33 @@
       ],
       "id": "beta",
       "input": "食べたー"
+    },
+    {
+      "description": "A pronoun before a verb heads no compound with the particle dropped",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "違う",
+          "pos": "Verb",
+          "surface": "違う"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ってば",
+          "pos": "Particle",
+          "surface": "ってば"
+        }
+      ],
+      "id": "sore_udattteba",
+      "input": "それ違うだってば"
     }
   ],
   "description": "Colloquial and slang patterns",
