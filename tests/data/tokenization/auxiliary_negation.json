@@ -2132,6 +2132,122 @@
       ],
       "id": "kanaitoiu",
       "input": "行かないという結論。"
+    },
+    {
+      "description": "the classical negative keeps its boundary after an ichidan syncretic stem",
+      "expected": [
+        {
+          "lemma": "最新技術",
+          "pos": "Noun",
+          "surface": "最新技術"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "さえ",
+          "pos": "Particle",
+          "surface": "さえ"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "問題",
+          "pos": "Noun",
+          "surface": "問題"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "解決",
+          "pos": "Noun",
+          "surface": "解決"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        }
+      ],
+      "id": "desaemo_wo_dekizu",
+      "input": "最新技術でさえも問題を解決できず"
+    },
+    {
+      "description": "the a-row irrealis homograph stays a noun",
+      "expected": [
+        {
+          "lemma": "おかず",
+          "pos": "Noun",
+          "surface": "おかず"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "作る",
+          "pos": "Verb",
+          "surface": "作る"
+        }
+      ],
+      "id": "okazuwo_ru",
+      "input": "おかずを作る"
+    },
+    {
+      "description": "the same boundary mid-sentence rather than at a clause end",
+      "expected": [
+        {
+          "lemma": "理由",
+          "pos": "Noun",
+          "surface": "理由"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "理解",
+          "pos": "Noun",
+          "surface": "理解"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        },
+        {
+          "lemma": "困る",
+          "pos": "Verb",
+          "surface": "困っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_dekizu_ttta",
+      "input": "理由が理解できず困った"
     }
   ],
   "description": "Negation auxiliaries (ない、ぬ)",
