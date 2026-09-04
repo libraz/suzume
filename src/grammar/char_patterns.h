@@ -134,6 +134,15 @@ bool isSinoHonorificPrefix(std::string_view surface);
 bool isBoundVerbPrefix(std::string_view surface);
 
 /**
+ * @brief Whether a kanji only ever opens a modification and never closes one
+ *
+ * These prefixes scope rightward over whatever follows them, so they cannot be
+ * the last element of a nominal compound. A run that closes on one has crossed
+ * a word boundary rather than found the end of a word.
+ */
+bool isLeftBranchingPrefixKanji(char32_t code);
+
+/**
  * @brief Whether a kana ends the 終止形 of a classical bigrade verb
  *
  * The bigrade paradigm closes on the U-row kana of its own row (受く, 過ぐ,

@@ -831,6 +831,32 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           continue;
         }
       }
+      // A sahen nominal is a predicate head: the light verb behind it takes the
+      // whole clause, so a listed noun in front of it is that clause's modifier,
+      // not the left half of a compound (直接|確認させられる). The listing is what
+      // separates the two readings — a head with no lexical identity of its own
+      // has nothing to lose by being absorbed (早期発見する stays one nominal).
+      if (start_type == normalize::CharType::Kanji && len >= 3 && dict_manager_ != nullptr &&
+          candidate_end < codepoints.size() && char_types[candidate_end] == normalize::CharType::Hiragana &&
+          (codepoints[candidate_end] == U'す' || codepoints[candidate_end] == U'し' ||
+           codepoints[candidate_end] == U'さ')) {
+        bool listed_modifier_head = false;
+        for (size_t split = start_pos + 1; split < candidate_end && !listed_modifier_head; ++split) {
+          listed_modifier_head =
+              lookupEntryInRange(*dict_manager_, codepoints, start_pos, split, core::PartOfSpeech::Noun) != nullptr;
+        }
+        if (listed_modifier_head) {
+          continue;
+        }
+      }
+      // A kanji run must not close on a prefix that scopes rightward. Such a
+      // kanji modifies what comes after it, so absorbing it into the noun behind
+      // it fabricates a compound out of two separate words (仕事|超|忙しい, not
+      // 仕事超|忙しい). The prefix keeps its own one-kanji candidate.
+      if (start_type == normalize::CharType::Kanji && len > 1 &&
+          grammar::isLeftBranchingPrefixKanji(codepoints[candidate_end - 1])) {
+        continue;
+      }
       // A quantity head cannot be joined to the one-kanji stem of a following
       // sokuonbin predicate. The sequence is a noun phrase plus a verb
       // (二件|残っ, 複数|残っ), never an unknown compound noun ending at the

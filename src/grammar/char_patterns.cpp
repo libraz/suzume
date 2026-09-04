@@ -182,6 +182,16 @@ bool isBoundVerbPrefix(std::string_view surface) {
   return byte_pos == surface.size() && (prefix == U'仕' || prefix == U'片');
 }
 
+bool isLeftBranchingPrefixKanji(char32_t code) {
+  // Kanji that only ever open a modification. They scope rightward over whatever
+  // follows and have no compound-final use of their own, so a nominal run that
+  // closes on one has crossed a word boundary (仕事|超|忙しい, 会議|各部署).
+  // Kanji that also end compounds (完全, 過激, 究極) are deliberately absent: for
+  // those the run-final position is a real reading, not a boundary error.
+  constexpr std::array<char32_t, 3> kLeftBranchingPrefixes = {U'超', U'各', U'諸'};
+  return std::find(kLeftBranchingPrefixes.begin(), kLeftBranchingPrefixes.end(), code) != kLeftBranchingPrefixes.end();
+}
+
 bool isBigradeTerminalKana(char32_t code) {
   // す is left out: サ行 bigrade is marginal, while する is the light verb every
   // sahen nominal takes, so the row would claim that construction instead.
