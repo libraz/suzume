@@ -957,7 +957,20 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     applied_rule = "denominal-ru-verb"
 
         # 2. Number + counter/katakana
-        if not merged and t.get("pos") == "名詞" and t.get("pos_sub1") == "数":
+        # 何 in front of a counter suffix fills the numeral slot — it is the
+        # interrogative quantity, and there is no reading where a pronoun takes
+        # a counter. The reference dictionary decides its subtype by position
+        # rather than by that, calling it a numeral standing alone or after a
+        # topic-marked subject and a pronoun elsewhere, which left the same
+        # phrase merged in one sentence and split in the next.
+        is_interrogative_quantity = (
+            t.get("surface") == "何"
+            and t.get("pos") == "名詞"
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("pos") == "名詞"
+            and tokens[i + 1].get("pos_sub1") == "接尾"
+        )
+        if not merged and t.get("pos") == "名詞" and (t.get("pos_sub1") == "数" or is_interrogative_quantity):
             j = i + 1
             combined = t.get("surface", "")
             while j < len(tokens):
@@ -982,6 +995,11 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 # The span marker 間 (名詞/接尾/一般) closes any duration quantity
                 # (三ヶ月+間 → 三ヶ月間).  Non-numeric dictionary heads are handled by
                 # the duration+span-kan rule immediately above.
+                # In context the reference dictionary demotes both halves at
+                # once: 何 becomes a pronoun and its counter loses the 助数詞
+                # subtype. Nothing but a counter follows 何 in the numeral slot,
+                # so the suffix is one whatever subtype it was given.
+                is_interrogative_counter = is_interrogative_quantity and j == i + 1 and np == "名詞" and ns1 == "接尾"
                 is_span_kan = (
                     ns == "間" and np == "名詞" and ns1 == "接尾" and _DURATION_BEFORE_SPAN_KAN.search(combined)
                 )
@@ -1011,6 +1029,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 if any(
                     [
                         is_counter,
+                        is_interrogative_counter,
                         is_span_kan,
                         is_calendar_month,
                         is_katakana_noun,

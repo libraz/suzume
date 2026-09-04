@@ -1254,3 +1254,23 @@ class TestClassicalPastKiBoundary:
         result, rule = apply_suzume_merge(tokens, "ほんとすき")
         assert [token["surface"] for token in result] == ["ほんと", "すき"]
         assert rule != "classical-past-ki"
+
+
+class TestInterrogativeQuantityCounter:
+    def test_merges_the_counter_when_both_halves_were_demoted(self):
+        tokens = [
+            _tok("何", pos="名詞", pos_sub1="代名詞", pos_sub2="一般", lemma="何"),
+            _tok("部", pos="名詞", pos_sub1="接尾", pos_sub2="一般", lemma="部"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "何部")
+        assert [token["surface"] for token in result] == ["何部"]
+        assert rule == "number+unit"
+
+    def test_leaves_the_interrogative_before_a_particle(self):
+        tokens = [
+            _tok("何", pos="名詞", pos_sub1="代名詞", pos_sub2="一般", lemma="何"),
+            _tok("が", pos="助詞", pos_sub1="格助詞", lemma="が"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "何が")
+        assert [token["surface"] for token in result] == ["何", "が"]
+        assert rule != "number+unit"
