@@ -1338,3 +1338,25 @@ class TestBoundPrefixAdjective:
         result, rule = apply_suzume_merge(tokens, "ことなく")
         assert [token["surface"] for token in result] == ["こと", "なく"]
         assert rule != "bound-prefix-adjective"
+
+
+class TestCompoundVerbAdnominalHomograph:
+    def test_merges_a_second_member_tagged_as_an_adnominal(self):
+        tokens = [
+            _tok("飛び", pos="動詞", pos_sub1="自立", lemma="飛ぶ", conj_form="連用形"),
+            _tok("去る", pos="連体詞", lemma="去る"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "飛び去る")
+        assert [token["surface"] for token in result] == ["飛び去る"]
+        assert rule == "compound-verb"
+
+
+class TestPlaceNameKanjiMerge:
+    def test_refuses_a_na_adjective_stem_after_a_place_name(self):
+        tokens = [
+            _tok("バリ", pos="名詞", pos_sub1="固有名詞", pos_sub2="地域", lemma="バリ"),
+            _tok("重要", pos="名詞", pos_sub1="形容動詞語幹", lemma="重要"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "バリ重要")
+        assert [token["surface"] for token in result] == ["バリ", "重要"]
+        assert rule != "proper-noun"

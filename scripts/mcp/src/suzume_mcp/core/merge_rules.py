@@ -1633,8 +1633,16 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 is_region_suffix = (
                     nxt.get("pos") == "名詞" and nxt.get("pos_sub1") == "接尾" and nxt.get("pos_sub2") == "地域"
                 )
+                # A na-adjective stem is a predicate base, not a nominal a place
+                # name compounds with. Letting it through built a proper noun out
+                # of an intensifying prefix the dictionary happens to hold as a
+                # place name and the predicate behind it, which is also why the
+                # same prefix stayed apart from an adjective and from a stem the
+                # dictionary tags as a prefix instead.
                 is_kanji_noun = (
-                    nxt.get("pos") == "名詞" and regex.match(r"^[\p{Han}]+$", ns) and nxt.get("pos_sub1") != "接尾"
+                    nxt.get("pos") == "名詞"
+                    and regex.match(r"^[\p{Han}]+$", ns)
+                    and nxt.get("pos_sub1") not in ("接尾", "形容動詞語幹")
                 )
                 if is_proper_region or is_region_suffix or is_kanji_noun:
                     combined += ns
@@ -1831,7 +1839,17 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             j = i + 1
             if j < len(tokens):
                 nxt = tokens[j]
-                if nxt.get("pos") == "動詞" and (nxt.get("lemma") or nxt.get("surface", "")) != "でる":
+                # A few second members are homographs of an adnominal, and the
+                # dictionary picks that tag by position — the same compound
+                # merges after a case-marked subject and splits inside a
+                # relative clause. Membership of the closed second-member class
+                # below is the evidence; the tag it arrived with is not.
+                v2_is_adnominal_homograph = nxt.get("pos") == "連体詞" and (
+                    nxt.get("surface", "") in COMPOUND_VERB_V2_GODAN + COMPOUND_VERB_V2_ICHIDAN
+                )
+                if (nxt.get("pos") == "動詞" or v2_is_adnominal_homograph) and (
+                    nxt.get("lemma") or nxt.get("surface", "")
+                ) != "でる":
                     next_lemma = nxt.get("lemma") or nxt.get("surface", "")
                     v2_base = ""
                     for v2 in COMPOUND_VERB_V2_GODAN + COMPOUND_VERB_V2_ICHIDAN:
