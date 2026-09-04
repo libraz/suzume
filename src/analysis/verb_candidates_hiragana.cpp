@@ -707,8 +707,19 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
       if (godan_ra_stem_end != 0) {
         godan_ra_continuation_stem_end = godan_ra_stem_end;
       }
+      // A particle is licensed by the phrase in front of it, and one mora of
+      // hiragana is not one unless the dictionary names it (ながれた, うながす:
+      // the が is the second mora of a stem, not a case marker). The verb
+      // window only widens here — the particle keeps its own edge and every
+      // candidate the split reading already had, so the two readings still
+      // compete on score rather than on which one was generated.
+      const bool particle_lacks_nominal_host =
+          hiragana_end == start_pos + 1 && dict_manager != nullptr &&
+          lookupEntryInRange(*dict_manager, codepoints, start_pos, hiragana_end, core::PartOfSpeech::Noun) == nullptr &&
+          lookupEntryInRange(*dict_manager, codepoints, start_pos, hiragana_end, core::PartOfSpeech::Pronoun) ==
+              nullptr;
       if (normalize::isNeverVerbStemAfterKanji(curr) && !(curr == U'の' && has_godan_wa_negative) &&
-          godan_ra_stem_end == 0) {
+          !particle_lacks_nominal_host && godan_ra_stem_end == 0) {
         SUZUME_DEBUG_LOG_TRACE("[HIRA_SEQ] pos=" << hiragana_end << " char=U+" << std::hex
                                                  << static_cast<uint32_t>(curr) << std::dec
                                                  << " action=break (isNeverVerbStemAfterKanji)\n");
