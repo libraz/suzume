@@ -308,6 +308,33 @@
       ],
       "id": "enclosed_mark_other",
       "input": "㊙"
+    },
+    {
+      "description": "A variation selector stays with the character it selects a form of",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "氷",
+          "pos": "Noun",
+          "surface": "氷"
+        },
+        {
+          "lemma": "❄️",
+          "pos": "Other",
+          "surface": "❄️"
+        }
+      ],
+      "id": "ga",
+      "input": "水が氷…❄️"
     }
   ],
   "description": "unicode_edge_cases tests",

@@ -872,6 +872,38 @@
       ],
       "id": "i_wo_ku_ru",
       "input": "根深い問題を注意深く見る"
+    },
+    {
+      "description": "Bound intensifying prefix on an unlisted spelling of the adjective",
+      "expected": [
+        {
+          "lemma": "耳",
+          "pos": "Noun",
+          "surface": "耳"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "残る",
+          "pos": "Verb",
+          "surface": "残る"
+        },
+        {
+          "lemma": "物哀しい",
+          "pos": "Adjective",
+          "surface": "物哀しい"
+        },
+        {
+          "lemma": "音楽",
+          "pos": "Noun",
+          "surface": "音楽"
+        }
+      ],
+      "id": "ni_ru_shii",
+      "input": "耳に残る物哀しい音楽"
     }
   ],
   "description": "Compound adjectives (〜やすい、〜にくい、〜すぎる)",
