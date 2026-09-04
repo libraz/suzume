@@ -1831,6 +1831,72 @@
       ],
       "id": "hana_sakinureba",
       "input": "花咲きぬれば見る"
+    },
+    {
+      "description": "Past-conjectural auxiliary governs the continuative in front of it",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "降りる",
+          "pos": "Verb",
+          "surface": "降り"
+        },
+        {
+          "lemma": "けむ",
+          "pos": "Auxiliary",
+          "surface": "けむ"
+        }
+      ],
+      "id": "rikemu",
+      "input": "雨降りけむ"
+    },
+    {
+      "description": "Same chain where the reference analyzer already split the continuative off",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲き"
+        },
+        {
+          "lemma": "けむ",
+          "pos": "Auxiliary",
+          "surface": "けむ"
+        }
+      ],
+      "id": "kikemu",
+      "input": "花咲きけむ"
+    },
+    {
+      "description": "Negative control: the sibling past auxiliary was already stable",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "乱れる",
+          "pos": "Verb",
+          "surface": "乱れ"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "rekeri",
+      "input": "心乱れけり"
     }
   ],
   "description": "auxiliary_classical tests",
