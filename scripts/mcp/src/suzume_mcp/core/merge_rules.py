@@ -10,6 +10,7 @@ from .constants import (
     COMPOUND_VERB_V2_SURU_ONLY,
     COUNTER_UNITS,
     DERIVED_ADJECTIVE_SUFFIX_LEMMAS,
+    DERIVED_VERB_FRAGMENT_SPAN,
     DERIVED_VERB_SUFFIX_FORMS,
     FAMILY_TERMS,
     FIXED_FUNCTION_LEMMAS,
@@ -1604,6 +1605,44 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 merged = True
                 if applied_rule is None:
                     applied_rule = "noun+derived-verb-suffix"
+
+        # 5a'''. The same derived verb, when the cell it stands in is one the
+        # reference dictionary has no entry for. It then cuts a bound suffix out
+        # of the derived verb's own material and reads whatever is left as some
+        # other word (謎 + め as a suffix + きたる as an adnominal), so the
+        # paradigm has to be found across the fragments rather than on one
+        # token. The bound-suffix tag is the evidence that the cut went through
+        # the derivation: an ordinary noun after a noun is left alone.
+        if (
+            not merged
+            and t.get("pos") == "名詞"
+            and t.get("pos_sub1") != "接尾"
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("pos_sub1") == "接尾"
+        ):
+            joined = ""
+            for span in range(i + 1, min(i + 1 + DERIVED_VERB_FRAGMENT_SPAN, len(tokens))):
+                joined += tokens[span].get("surface", "")
+                form = max(
+                    (form for form in DERIVED_VERB_SUFFIX_FORMS if joined.startswith(form)),
+                    key=len,
+                    default="",
+                )
+                if not form:
+                    continue
+                result.append(
+                    {
+                        "surface": t.get("surface", "") + form,
+                        "pos": "動詞",
+                        "lemma": t.get("surface", "") + DERIVED_VERB_SUFFIX_FORMS[form],
+                    }
+                )
+                result.extend(mecab_analyze(joined[len(form) :]))
+                i = span + 1
+                merged = True
+                if applied_rule is None:
+                    applied_rule = "noun+derived-verb-suffix"
+                break
 
         # 5b. Proper noun + region suffix
         # A destination suffix is one productive search unit with its nominal

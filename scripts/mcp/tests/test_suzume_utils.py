@@ -274,3 +274,23 @@ class TestFormatExpected:
         tokens = [{"surface": "食べる", "pos": "Verb", "lemma": "食べる"}]
         result = format_expected(tokens)
         assert result[0]["lemma"] == "食べる"
+
+
+class TestStrandedAdjectiveStem:
+    def test_finds_a_slang_adjective_no_list_names(self):
+        tokens, _, _ = get_expected_tokens("ムズい問題だ")
+        assert [token["surface"] for token in tokens] == ["ムズい", "問題", "だ"]
+        assert tokens[0]["pos"] == "Adjective"
+
+    def test_recovers_the_stranded_negative_continuative(self):
+        tokens, _, _ = get_expected_tokens("エモくない話")
+        assert [token["surface"] for token in tokens] == ["エモく", "ない", "話"]
+        assert tokens[0]["pos"] == "Adjective"
+
+    def test_leaves_a_kana_nominal_before_a_real_verb(self):
+        tokens, _, _ = get_expected_tokens("ねこいる")
+        assert [token["surface"] for token in tokens] == ["ねこ", "いる"]
+
+    def test_leaves_a_kana_nominal_before_a_real_adjective(self):
+        tokens, _, _ = get_expected_tokens("バリかっこいい")
+        assert [token["surface"] for token in tokens] == ["バリ", "かっこいい"]

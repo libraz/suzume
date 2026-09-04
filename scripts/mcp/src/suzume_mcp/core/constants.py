@@ -103,23 +103,20 @@ KANA_COUNTER_SUFFIXES: frozenset[str] = frozenset({"まい", "にん", "月"})
 QUANTITY_BOUND_SUFFIXES: frozenset[str] = frozenset({"建て", "立て"})
 
 # Slang adjective stems -> standard replacement for MeCab preprocessing.
-# Both spellings of every stem are listed: the reference dictionary knows none
-# of them, so whichever spelling is missing here breaks into kana fragments.
+# The class is open and is normally found in the analysis rather than listed
+# (see _stranded_adjective_stems). What stays here is the hiragana spellings,
+# where the analysis breaks up so far that no two-mora nominal is left to find:
+# うざかった comes back as う + ざかった and きもい as き + も + い, so the stem
+# has to be named before the text is analyzed at all.
 # A stem is only substituted where the untouched analysis leaves it unresolved
 # (see _accept_slang_match), which is what keeps the kana spellings from firing
 # inside ordinary words such as ください / 聞いたか / 答えも.
 SLANG_ADJ_STEMS: dict[str, str] = {
-    "エモ": "赤",
     "えも": "赤",
-    "キモ": "赤",
     "きも": "赤",
-    "ウザ": "赤",
     "うざ": "赤",
-    "ダサ": "赤",
     "ださ": "赤",
-    "イタ": "赤",
     "いた": "赤",
-    "ヤバ": "赤",
     "やば": "赤",
 }
 
@@ -810,6 +807,10 @@ def _godan_suffix_forms(lemma: str) -> set[str]:
 DERIVED_VERB_SUFFIX_FORMS: dict[str, str] = {
     form: lemma for lemma in ("めく", "めかす") for form in _godan_suffix_forms(lemma)
 }
+
+# How many tokens a cut-up derived verb can be spread over. The suffix itself is
+# at most three morae, and the fragment carrying its tail is one more token.
+DERIVED_VERB_FRAGMENT_SPAN: int = 3
 
 # Noun-forming state suffixes. Nothing else ends in these, so a token carrying
 # one always has the suffix boundary inside it (泥/まみれ, 開け/っぱなし).

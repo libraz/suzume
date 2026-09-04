@@ -2,6 +2,7 @@
 
 from collections.abc import Callable
 from functools import wraps
+from itertools import pairwise
 
 import regex
 
@@ -113,6 +114,43 @@ def _accept_slang_match(
     return landed is not None and landed["pos"] == native_pos and probe_count < raw_count
 
 
+# The kana an i-adjective inflects into, and a stem the dictionary does know so
+# the paradigm can be read off the substituted text.
+_ADJECTIVE_INFLECTION_KANA = frozenset("いかくけさ")
+SLANG_ADJ_SUBSTITUTE = "赤"
+
+
+def _stranded_adjective_stems(raw: tuple[int, dict[int, dict]]) -> dict[int, str]:
+    """Two-mora kana fragments that head an adjective the dictionary lacks.
+
+    Without an entry for the stem the analysis has to place the inflection kana
+    somewhere, and it invents a word for it — a bare い read as the continuative
+    of いる, a かっ read as a verb nobody uses, a く given a headword くい. The
+    invention is at most two morae and opens on an inflection kana, which a real
+    word after a kana noun (バリ + かっこいい) is not. Whether the fragment is
+    really an ending is then settled by putting a stem the dictionary does know
+    in the nominal's place and seeing whether an adjective comes back.
+    """
+    ordered = sorted(raw[1].items())
+    stems: dict[int, str] = {}
+    for (start, token), (_, following) in pairwise(ordered):
+        surface = token.get("surface", "")
+        tail = following.get("surface", "")
+        if token.get("pos") != "名詞" or not regex.fullmatch(r"[\p{Hiragana}\p{Katakana}]{2}", surface):
+            continue
+        if not tail or tail[0] not in _ADJECTIVE_INFLECTION_KANA or len(tail) > 2:
+            continue
+        stems[start] = surface
+    return stems
+
+
+def _reads_as_adjective(text: str, start: int, stem: str, standard: str) -> bool:
+    """Whether a known stem put in the fragment's place is read as an adjective."""
+    probe = text[:start] + standard + text[start + len(stem) :]
+    landed = _raw_analysis(probe)[1].get(start)
+    return landed is not None and landed.get("pos") == "形容詞"
+
+
 def _non_overlapping_replacements(candidates: dict[tuple[int, str], dict]) -> dict[tuple[int, str], dict]:
     """Keep leftmost, longest pre-analysis replacements with disjoint spans."""
     selected: dict[tuple[int, str], dict] = {}
@@ -160,6 +198,23 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
                     "replacement": standard,
                     "length": len(slang),
                 }
+
+    # Slang adjectives the list above does not name. The class is open — every
+    # season coins another one — so the stems are found in the analysis rather
+    # than listed: a two-mora kana fragment the dictionary read as a noun, with
+    # an inflection kana stranded behind it that it had to invent a word for.
+    if raw is None:
+        raw = _raw_analysis(text)
+    for start, stem in _stranded_adjective_stems(raw).items():
+        if (start, "slang_adj") in replacements:
+            continue
+        if not _reads_as_adjective(text, start, stem, SLANG_ADJ_SUBSTITUTE):
+            continue
+        replacements[(start, "slang_adj")] = {
+            "original": stem,
+            "replacement": SLANG_ADJ_SUBSTITUTE,
+            "length": len(stem),
+        }
 
     # Unusual names
     for name, standard in UNUSUAL_NAMES.items():
