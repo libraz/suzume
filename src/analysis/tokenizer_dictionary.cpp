@@ -1924,9 +1924,15 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // Other AuxAspectOku forms before う are the invalid とい+う path.
     if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectOku) {
       const bool follows_volitional = end_pos < codepoints.size() && codepoints[end_pos] == U'う';
-      const bool contracted_volitional = utf8::equalsAny(result.entry->surface, {"とこ", "どこ"}) &&
-                                         follows_volitional &&
-                                         hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbOnbinkei);
+      // The contraction is て + おく, so its host is whichever cell that て
+      // selects: the onbin form of a Godan verb (書い+とこう) but the plain
+      // continuative of an Ichidan or サ変 one (見+とこう, 作成し+とこう).
+      // Admitting only the onbin cell left the other two conjugations to fall
+      // back on the case particle plus the homographic adverb.
+      const bool contracted_volitional =
+          utf8::equalsAny(result.entry->surface, {"とこ", "どこ"}) && follows_volitional &&
+          (hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbOnbinkei) ||
+           hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei));
       if ((utf8::equalsAny(result.entry->surface, {"とこ", "どこ"}) && !contracted_volitional) ||
           (follows_volitional && !contracted_volitional)) {
         continue;

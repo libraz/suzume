@@ -500,8 +500,12 @@ bool joinsParticleToDictionaryAdverb(const core::Lattice& lattice, const diction
   // volitional う after a verb onbin form (買っ+とこ+う).  Its first mora is
   // homographic with the quotation particle, but this closed inflectional
   // chain is not a particle followed by the dictionary adverb こう.
+  // The contraction is て + おく, so the cell it attaches to is whichever one
+  // that て selects: the onbin form for a Godan verb, the plain continuative
+  // for an Ichidan or サ変 one (見+とこ+う, 作成し+とこ+う).
   if (candidate_extended_pos == core::ExtendedPOS::AuxAspectOku &&
-      hasPrecedingExtendedPOS(lattice, candidate_start, core::ExtendedPOS::VerbOnbinkei) &&
+      (hasPrecedingExtendedPOS(lattice, candidate_start, core::ExtendedPOS::VerbOnbinkei) ||
+       hasPrecedingExtendedPOS(lattice, candidate_start, core::ExtendedPOS::VerbRenyokei)) &&
       lookupResultsHaveExtendedPOS(dict_manager.lookup(text, byteOffsetAt(byte_offsets, candidate_end)),
                                    core::ExtendedPOS::AuxVolitional, 1)) {
     return false;

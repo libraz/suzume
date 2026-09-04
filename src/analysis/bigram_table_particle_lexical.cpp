@@ -340,10 +340,13 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // anything to its left (確認+し+よう+か, 計画+を+立て+よう+か).
       {EPOS::AuxVolitional, EPOS::ParticleFinal, cost::kVeryStrongBonus},
 
-      // AuxAspectOku → AuxVolitional (とい+う) - strong penalty
-      // Prevents とい+う from beating という (quotative determiner)
-      // とい (contracted ておく form) + う (volitional) is grammatically invalid
-      {EPOS::AuxAspectOku, EPOS::AuxVolitional, cost::kVeryRare},
+      // The row barring the volitional after the preparative auxiliary is gone:
+      // its target とい+う is no longer generated at all, because the candidate
+      // filter drops every cell of とく before う except the mizenkei that
+      // actually takes it. Left in place, the row penalized that one legitimate
+      // cell — the paradigm shares a category, so the table cannot tell 書い+とこ+う
+      // from とい+う and the correct reading lost a knife-edge tie to a bare
+      // hiragana run.
 
       // AuxAspectOku → ParticleQuote (とい+って) - strong penalty
       // Prevents とい+って from beating と+いっ+て (と言って)
