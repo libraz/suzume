@@ -2144,9 +2144,23 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
                       candidate::kDictionaryOriginConfidence, {}, core::ExtendedPOS::VerbRenyokei,
                       "dictionary_potential_renyokei_before_past");
     }
-    lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
-                    result.entry->pos, cost, flags, lemma, conj_type, core::CandidateOrigin::Dictionary, 1.0F, {},
-                    result.entry->extended_pos, "dict");
+    // An auxiliary cell spelled with a final sokuon is an onbin form, and what
+    // it can connect to follows from the paradigm it belongs to. The past た is
+    // always available. The connective て needs a paradigm that has a te-form at
+    // all: an auxiliary inflected as a Godan verb does (たがっ+て), while the
+    // copula's continuative is で and it has no such cell, so its onbin before て
+    // is really the plain form plus the quotative (無理|だ|って, not 無理|だっ|て).
+    const bool auxiliary_inflects_as_godan =
+        grammar::isModernGodanTerminalKana(utf8::decodeLastChar(result.entry->lemma));
+    const bool unlicensed_auxiliary_onbin =
+        result.entry->pos == core::PartOfSpeech::Auxiliary && utf8::endsWith(result.entry->surface, "っ") &&
+        end_pos < codepoints.size() && !auxiliary_inflects_as_godan &&
+        !utf8::equalsAny(extractSubstring(codepoints, end_pos, end_pos + 1), {"た"});
+    if (!unlicensed_auxiliary_onbin) {
+      lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
+                      result.entry->pos, cost, flags, lemma, conj_type, core::CandidateOrigin::Dictionary, 1.0F, {},
+                      result.entry->extended_pos, "dict");
+    }
 
     // Extend predicates and adverbs with colloquial emphasis
     // (ですっ, 行くーー, きたあああ). Unknown candidates use the same matcher.
@@ -2177,10 +2191,20 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       // closes the clause (行くっ！). Before any other kana it is neither, and taking
       // it eats the opening mora of the following word (にらめっ+こ for にらめっこ).
       const bool bare_sokuon = emphatic.suffix == "っ";
+      // Only a verb continuative owns a 促音便 cell, so only it can license the
+      // sokuon in front of the connective. An i-adjective closes its terminal on
+      // い and builds its own onbin elsewhere (忙し|かっ|た), and a na-adjective
+      // stem has no inflection at all, so a っ after either is the emphatic —
+      // which needs a clause end, not a following word (忙しい|っていう, not
+      // 忙しいっ|ていう).
+      const bool host_owns_sokuonbin_cell = result.entry->pos == core::PartOfSpeech::Verb &&
+                                            (result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei ||
+                                             result.entry->extended_pos == core::ExtendedPOS::VerbOnbinkei);
       const bool unlicensed_bare_sokuon =
           bare_sokuon && emphatic.end < codepoints.size() &&
           normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Hiragana &&
-          !utf8::equalsAny(extractSubstring(codepoints, emphatic.end, emphatic.end + 1), {"て", "た", "で", "だ"});
+          !(host_owns_sokuonbin_cell &&
+            utf8::equalsAny(extractSubstring(codepoints, emphatic.end, emphatic.end + 1), {"て", "た", "で", "だ"}));
       if (!emphatic.empty() && !unlicensed_bare_sokuon) {
         // Determine extended_pos for emphatic form
         // Sokuon-ending verb forms should be VerbOnbinkei (音便形)
