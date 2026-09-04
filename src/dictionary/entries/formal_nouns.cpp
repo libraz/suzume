@@ -140,8 +140,6 @@ EntrySpecRange getFormalNounEntries() {
       formal_noun("まま", ""),
       formal_noun("ほか", "ほか"),
       formal_noun("他", "ほか"),
-      // Fixed negative predicate: ほかなら+ない (none other than).
-      verb("ほかなら", "ほかなる", EPOS::VerbMizenkei),
       // Abstract nouns that don't form suru-verbs
       formal_noun("仕方", ""),
       formal_noun("しかた", ""),

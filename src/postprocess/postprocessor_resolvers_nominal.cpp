@@ -299,11 +299,17 @@ void resolveNominalConditionalNara(std::vector<core::Morpheme>& result) {
         predecessor.extended_pos == core::ExtendedPOS::AdjBasic || predecessor.pos == core::PartOfSpeech::Auxiliary;
     const bool limiting_chain = predecessor.surface == "のみ" && idx + 1 < result.size() &&
                                 result[idx + 1].extended_pos == core::ExtendedPOS::AuxNegativeNu;
-    const bool obligation_chain = predecessor.extended_pos == core::ExtendedPOS::AuxNegativeNai &&
-                                  utf8::equalsAny(predecessor.surface, {"なきゃ", "なけりゃ"}) &&
-                                  idx + 1 < result.size() && result[idx + 1].surface == "ない";
+    // The conditional particle opens a clause, while an irrealis is completed
+    // by what follows it. A negative auxiliary directly behind なら is
+    // therefore the verb's own cell and not a conditional at all — which holds
+    // for a formal-noun host (ほか+なら+ない) exactly as it does for the
+    // obligation chain (なきゃ+なら+ない) that used to be listed on its own.
+    // The limiting のみならず keeps the particle reading its own rule selects.
+    const bool completed_by_negative = !limiting_chain && idx + 1 < result.size() &&
+                                       (result[idx + 1].extended_pos == core::ExtendedPOS::AuxNegativeNai ||
+                                        result[idx + 1].extended_pos == core::ExtendedPOS::AuxNegativeNu);
     if ((!follows_nominal_or_finite && !limiting_chain) || nara.surface != "なら" ||
-        nara.extended_pos != core::ExtendedPOS::VerbMizenkei || obligation_chain) {
+        nara.extended_pos != core::ExtendedPOS::VerbMizenkei || completed_by_negative) {
       continue;
     }
     retag(nara, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, "なら",

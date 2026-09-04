@@ -159,14 +159,6 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
-  // The fixed negative predicate ほかならない starts after a case-marked
-  // nominal complement (原因に+ほかなら+ない). Keep its lexical verb stem
-  // together instead of reopening the formal noun ほか before ならない.
-  if (prev.extended_pos == core::ExtendedPOS::ParticleCase && next.extended_pos == core::ExtendedPOS::VerbMizenkei &&
-      next.lemma == "ほかなる") {
-    SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
-  }
-
   // The conditional allomorph たら is an auxiliary after a completed verb.
   // When another predicate follows, retain that analysis rather than the
   // homographic conjunctive-particle entry.
