@@ -85,6 +85,75 @@
       ],
       "id": "shikutewakannaiyo",
       "input": "難しくてわかんないよ"
+    },
+    {
+      "description": "the contracted progressive after a sahen continuative is not one godan verb",
+      "expected": [
+        {
+          "lemma": "営業",
+          "pos": "Noun",
+          "surface": "営業"
+        },
+        {
+          "lemma": "という",
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "toiu_woshiteru",
+      "input": "営業という仕事をしてる"
+    },
+    {
+      "description": "the same chain without the quotative determiner in front",
+      "expected": [
+        {
+          "lemma": "毎日",
+          "pos": "Noun",
+          "surface": "毎日"
+        },
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "woshiteru",
+      "input": "毎日仕事をしてる"
     }
   ],
   "description": "verb_colloquial tests",
