@@ -71,6 +71,7 @@ from .merge_postprocessors import (
     _postprocess_search_unit_split,
     _postprocess_small_kana_head_merge,
     _postprocess_stranded_lengthening_vowel,
+    _postprocess_stranded_okurigana,
     _postprocess_tomo_particle,
     _postprocess_totomoni,
     _postprocess_variation_selector_merge,
@@ -2157,6 +2158,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     result, applied_rule = _postprocess_nominal_before_conjunctive_te(result, applied_rule)
     result, applied_rule = _postprocess_derivational_nominal_suffix(result, applied_rule)
     result, applied_rule = _postprocess_ichidan_imperative_yo(result, applied_rule)
+    result, applied_rule = _postprocess_stranded_okurigana(result, applied_rule)
     result, applied_rule = _postprocess_decomposable_adverb(result, applied_rule)
     result, applied_rule = _postprocess_bound_prefix_adjective(result, applied_rule)
     result, applied_rule = _postprocess_variation_selector_merge(result, applied_rule)

@@ -1599,3 +1599,36 @@ class TestDecomposableSuruAdverb:
         result, rule = apply_suzume_merge(tokens, "どうして")
         assert [token["surface"] for token in result] == ["どうして"]
         assert rule != "decomposable-adverb"
+
+
+class TestStrandedOkurigana:
+    def test_gives_the_nominal_back_its_okurigana(self):
+        tokens = [
+            _tok("類", pos="名詞", pos_sub1="一般", lemma="類"),
+            _tok("い", pos="動詞", pos_sub1="自立", lemma="いる", conj_type="一段", conj_form="連用形"),
+            _tok("稀", pos="名詞", pos_sub1="形容動詞語幹", lemma="稀"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "類い稀")
+        assert [token["surface"] for token in result] == ["類い", "稀"]
+        assert result[0]["pos"] == "名詞"
+        assert result[0]["lemma"] == "類い"
+        assert rule == "stranded-okurigana"
+
+    def test_keeps_the_light_verb_after_a_verbal_noun(self):
+        tokens = [
+            _tok("遅刻", pos="名詞", pos_sub1="サ変接続", lemma="遅刻"),
+            _tok("し", pos="動詞", pos_sub1="自立", lemma="する", conj_type="サ変・スル", conj_form="連用形"),
+            _tok("そう", pos="名詞", pos_sub1="一般", lemma="そう"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "遅刻しそう")
+        assert [token["surface"] for token in result] == ["遅刻", "し", "そう"]
+        assert rule != "stranded-okurigana"
+
+    def test_keeps_a_verb_spelled_out_in_full(self):
+        tokens = [
+            _tok("書類", pos="名詞", pos_sub1="一般", lemma="書類"),
+            _tok("いる", pos="動詞", pos_sub1="自立", lemma="いる", conj_type="一段", conj_form="基本形"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "書類いる")
+        assert [token["surface"] for token in result] == ["書類", "いる"]
+        assert rule != "stranded-okurigana"

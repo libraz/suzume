@@ -1040,6 +1040,54 @@ def _postprocess_bound_prefix_adjective(result: list[dict], applied_rule: str | 
     return merged, applied_rule
 
 
+# What a continuative can hand its clause to. A nominal is not on the list: the
+# continuative would have to close a clause to modify one, and closing is what a
+# continuative does not do.
+_CONTINUATIVE_FOLLOWERS = frozenset({"動詞", "助詞", "助動詞", "形容詞"})
+
+
+def _postprocess_stranded_okurigana(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Give a nominal back the okurigana that was read as a verb.
+
+    A verb takes its arguments through case particles, so a bare nominal
+    directly in front of one heads no dependency at all, and a continuative
+    cannot modify the nominal behind it either — it closes nothing for the
+    nominal to attach to. Where both neighbours are nominals the middle token
+    is therefore not a verb, and when it is a single kana it is the okurigana
+    of the nominal in front of it: 類い稀 comes back as 類 + い(いる) + 稀,
+    whose lemma the sentence never contained. The same two morae are read as
+    one word as soon as they are spelled out (書類 + いる), so the reading turns
+    on the length of the kana rather than on the grammar.
+
+    Only a plain nominal qualifies. A verbal noun takes the light verb without
+    any particle by definition, and its continuative is that construction
+    rather than a stranded kana (遅刻 + し + そう), which is why the class the
+    dictionary assigns the host decides.
+    """
+    merged: list[dict] = []
+    for index, token in enumerate(result):
+        host = merged[-1] if merged else None
+        follower = result[index + 1] if index + 1 < len(result) else None
+        if (
+            host is None
+            or follower is None
+            or host.get("pos") != "名詞"
+            or host.get("pos_sub1") != "一般"
+            or token.get("pos") != "動詞"
+            or token.get("pos_sub1") != "自立"
+            or token.get("conj_form") != _CONTINUATIVE_CELL
+            or len(token.get("surface", "")) != 1
+            or follower.get("pos") in _CONTINUATIVE_FOLLOWERS
+        ):
+            merged.append(token)
+            continue
+        combined = host.get("surface", "") + token.get("surface", "")
+        merged[-1] = {**host, "surface": combined, "lemma": combined}
+        if applied_rule is None:
+            applied_rule = "stranded-okurigana"
+    return merged, applied_rule
+
+
 # The imperative an ichidan verb builds on its bare stem, and the cell the
 # reference dictionary names when it does reach that reading.
 _IMPERATIVE_YO = "よ"
