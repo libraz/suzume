@@ -775,6 +775,16 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // adjective terminal (道遠+し instead of 道+遠し). The sibling けり does
       // take a nominal predicate, and keeps its own bonus.
       {EPOS::Noun, EPOS::AuxClassicalKi, cost::kStrong},
+      // Modifying a nominal is what the 連体形 exists for, so a noun is its
+      // most natural follower (ありし日, 読みし人, 過ぎし日々). Without the row
+      // the auxiliary reached one for no more than the conjunctive particle it
+      // is homographic with, and that particle closes a clause instead, so the
+      // whole span went to whichever reading of the host was cheapest — a
+      // fabricated single-kanji adjective in 抗いし者. The 終止形 き shares this
+      // ExtendedPOS and takes no nominal, which is what bounds the magnitude:
+      // a wider bonus splits the classical adjective attributive it spells the
+      // tail of (喜ばしき, 許すまじき) into a verb plus this auxiliary.
+      {EPOS::AuxClassicalKi, EPOS::Noun, cost::kStrongBonus},
 
       // A passive predicate reaches the same auxiliaries through the passive's
       // own continuative (飲ま+れ+けり). Without the counterpart of the verb
