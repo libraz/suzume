@@ -1150,6 +1150,152 @@
       ],
       "id": "gadaibu_kunattta",
       "input": "体調がだいぶ良くなった"
+    },
+    {
+      "description": "i-adjective adverbial plus naru te-form plus auxiliary keeps every boundary inside a modifying clause",
+      "expected": [
+        {
+          "lemma": "気分",
+          "pos": "Noun",
+          "surface": "気分"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "悪い",
+          "pos": "Adjective",
+          "surface": "悪く"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "くる"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "感じ",
+          "pos": "Noun",
+          "surface": "感じ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "ga_kunatttekuruyouna_jidesu",
+      "input": "気分が悪くなってくるような感じです"
+    },
+    {
+      "description": "the same adverbial chain before a causal connective particle",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "暑い",
+          "pos": "Adjective",
+          "surface": "暑く"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "くる"
+        },
+        {
+          "lemma": "ので",
+          "pos": "Particle",
+          "surface": "ので"
+        },
+        {
+          "lemma": "窓",
+          "pos": "Noun",
+          "surface": "窓"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "開ける",
+          "pos": "Verb",
+          "surface": "開ける"
+        }
+      ],
+      "id": "ga_kunatttekurunode_wo_keru",
+      "input": "部屋が暑くなってくるので窓を開ける"
+    },
+    {
+      "description": "adjective adverbial plus connective te plus binding particle stays split",
+      "expected": [
+        {
+          "lemma": "暑い",
+          "pos": "Adjective",
+          "surface": "暑く"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "大丈夫",
+          "pos": "Adjective",
+          "surface": "大丈夫"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "kutemo_desu",
+      "input": "暑くても大丈夫です"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",
