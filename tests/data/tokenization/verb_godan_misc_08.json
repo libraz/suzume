@@ -1138,6 +1138,40 @@
       ],
       "id": "mekitaru",
       "input": "皮肉めきたる言葉"
+    },
+    {
+      "description": "emphatic sokuon on a sentence-final particle",
+      "expected": [
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞっ"
+        }
+      ],
+      "id": "yatttazott",
+      "input": "やったぞっ"
+    },
+    {
+      "description": "emphatic sokuon on a verb imperative",
+      "expected": [
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待てっ"
+        }
+      ],
+      "id": "tett",
+      "input": "待てっ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

@@ -468,7 +468,7 @@
       "description": "行くっ - emphatic sokuon after verb",
       "expected": [
         {
-          "lemma": "行くっ",
+          "lemma": "行く",
           "pos": "Verb",
           "surface": "行くっ"
         }

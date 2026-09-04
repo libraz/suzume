@@ -966,6 +966,47 @@
       ],
       "id": "i_da_4",
       "input": "ムズい問題だ"
+    },
+    {
+      "description": "clipped exclamative adjective closed by an emphatic sokuon",
+      "expected": [
+        {
+          "lemma": "すごい",
+          "pos": "Adjective",
+          "surface": "すごっ"
+        }
+      ],
+      "id": "sugott",
+      "input": "すごっ"
+    },
+    {
+      "description": "emphatic sokuon on a na-adjective stem stays one token",
+      "expected": [
+        {
+          "lemma": "きれい",
+          "pos": "Adjective",
+          "surface": "きれいっ"
+        }
+      ],
+      "id": "kireitt",
+      "input": "きれいっ"
+    },
+    {
+      "description": "the copula onbin cell is not an emphatic sokuon",
+      "expected": [
+        {
+          "lemma": "だめ",
+          "pos": "Adjective",
+          "surface": "だめ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        }
+      ],
+      "id": "damedatt",
+      "input": "だめだっ"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
