@@ -1251,6 +1251,28 @@
       ],
       "id": "imarena",
       "input": "類いまれな才能。"
+    },
+    {
+      "description": "実在動詞を語基とする複合名詞は維持する（否定対照）",
+      "expected": [
+        {
+          "lemma": "笑い声",
+          "pos": "Noun",
+          "surface": "笑い声"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "響く",
+          "pos": "Verb",
+          "surface": "響く"
+        }
+      ],
+      "id": "waraigoe_ga_hibiku",
+      "input": "笑い声が響く"
     }
   ],
   "description": "General nouns (part 4/4)",

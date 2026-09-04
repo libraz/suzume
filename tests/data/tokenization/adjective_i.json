@@ -195,6 +195,33 @@
       ],
       "id": "shigena_2",
       "input": "悲しげな顔"
+    },
+    {
+      "description": "辞書に無いイ形容詞の終止形が複合名詞に飲まれない",
+      "expected": [
+        {
+          "lemma": "蒼い",
+          "pos": "Adjective",
+          "surface": "蒼い"
+        },
+        {
+          "lemma": "空",
+          "pos": "Noun",
+          "surface": "空"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見上げる",
+          "pos": "Verb",
+          "surface": "見上げる"
+        }
+      ],
+      "id": "aoi_sora_wo_miageru",
+      "input": "蒼い空を見上げる"
     }
   ],
   "description": "adjective_i tests",
