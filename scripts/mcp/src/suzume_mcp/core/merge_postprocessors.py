@@ -870,16 +870,12 @@ _PAST_CONJECTURAL_HOST_POS = frozenset({"動詞", "助動詞"})
 _CONTINUATIVE_PROBE_AUXILIARY = "ます"
 
 
-def _continuative_verb_tokens(surface: str) -> list[dict] | None:
-    """Read a nominal back as the verb continuative it spells, if it is one.
+def _plain(token: dict) -> dict:
+    return {"surface": token.get("surface", ""), "pos": token.get("pos", ""), "lemma": token.get("lemma", "")}
 
-    The reference dictionary drops the verb reading of a continuative when what
-    follows is a form it does not know, and calls the run a noun instead. The
-    polite auxiliary is a form it does know and selects exactly that cell, so
-    appending it recovers the reading — and the boundary with it, since a
-    nominal that fused a modifier in front comes back as its parts (雨降り as
-    雨 + 降り). A genuine noun keeps its own reading under the same probe.
-    """
+
+def _probe_continuative(surface: str) -> list[dict] | None:
+    """The reference dictionary's reading of a surface followed by 〜ます."""
     from .mecab import mecab_analyze
 
     tokens = mecab_analyze(surface + _CONTINUATIVE_PROBE_AUXILIARY)
@@ -890,10 +886,37 @@ def _continuative_verb_tokens(surface: str) -> list[dict] | None:
         return None
     if "".join(token.get("surface", "") for token in head) != surface:
         return None
-    return [
-        {"surface": token.get("surface", ""), "pos": token.get("pos", ""), "lemma": token.get("lemma", "")}
-        for token in head
-    ]
+    return [_plain(token) for token in head]
+
+
+def _continuative_verb_tokens(surface: str) -> list[dict] | None:
+    """Read a nominal back as the verb continuative it spells, if it is one.
+
+    The reference dictionary drops the verb reading of a continuative when what
+    follows is a form it does not know, and calls the run a noun instead. The
+    polite auxiliary is a form it does know and selects exactly that cell, so
+    appending it recovers the reading — and the boundary with it, since a
+    nominal that fused a modifier in front comes back as its parts (雨降り as
+    雨 + 降り). A genuine noun keeps its own reading under the same probe.
+
+    A compound the dictionary holds as a headword survives the probe whole
+    (山見, 月見), because the entry outranks the reading its parts would get.
+    Probing each tail in turn recovers the boundary there: the tail is the verb
+    and the head is what modifies it.
+    """
+    from .mecab import mecab_analyze
+
+    whole = _probe_continuative(surface)
+    if whole is not None:
+        return whole
+    for split in range(1, len(surface)):
+        tail = _probe_continuative(surface[split:])
+        if tail is None or len(tail) != 1:
+            continue
+        head = mecab_analyze(surface[:split])
+        if len(head) == 1 and head[0].get("pos") == "名詞" and head[0].get("surface") == surface[:split]:
+            return [_plain(head[0]), *tail]
+    return None
 
 
 def _postprocess_classical_kemu(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
@@ -922,6 +945,57 @@ def _postprocess_classical_kemu(result: list[dict], applied_rule: str | None) ->
         normalized.append({"surface": _PAST_CONJECTURAL, "pos": "助動詞", "lemma": _PAST_CONJECTURAL})
         if applied_rule is None:
             applied_rule = "classical-past-conjectural"
+    return normalized, applied_rule
+
+
+_PAST_KI = "き"
+
+
+def _postprocess_classical_ki(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Restore the continuative the classical past き attaches to.
+
+    The auxiliary closes its clause and selects a continuative, so what sits in
+    front of it is a verb whatever the dictionary made of it. Which way that
+    goes wrong depends only on whether the dictionary happens to hold the kanji
+    pair as a noun: the same construction comes out as a nominal plus the
+    auxiliary (山見+き), as a nominal plus a fabricated doubled kana (花咲+きき),
+    or correctly (道行き+き). The auxiliary decides instead of the lexicon.
+    """
+    normalized: list[dict] = []
+    index = 0
+    while index < len(result):
+        token = result[index]
+        surface = token.get("surface", "")
+        closes_clause = index + 1 == len(result) or result[index + 1].get("pos") == "記号"
+        # The auxiliary is either its own token or the tail of a nominal that
+        # swallowed it, in which case the mora in front of it belongs to the
+        # continuative and rejoins the host.
+        # Only a nominal in front of the auxiliary needs repairing. A predicate
+        # reading already there is the analysis this rule would rebuild, and an
+        # adjective's カリ cell in particular must not be reopened (遅かり+き),
+        # even though its ending happens to probe as a verb of its own.
+        previous_pos = normalized[-1].get("pos") if normalized else None
+        if surface == _PAST_KI and token.get("pos") == "助動詞" and previous_pos == "名詞":
+            carried = ""
+        elif closes_clause and token.get("pos") == "名詞" and len(surface) > 1 and surface.endswith(_PAST_KI):
+            carried = surface[:-1]
+        else:
+            normalized.append(token)
+            index += 1
+            continue
+        host = (normalized[-1].get("surface", "") if normalized else "") + carried
+        recovered = _continuative_verb_tokens(host) if host else None
+        if recovered is None:
+            normalized.append(token)
+            index += 1
+            continue
+        if normalized:
+            normalized.pop()
+        normalized.extend(recovered)
+        normalized.append({"surface": _PAST_KI, "pos": "助動詞", "lemma": _PAST_KI})
+        index += 1
+        if applied_rule is None:
+            applied_rule = "classical-past-ki"
     return normalized, applied_rule
 
 

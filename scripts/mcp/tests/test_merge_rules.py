@@ -1149,3 +1149,41 @@ class TestClassicalPastConjectural:
         result, rule = apply_suzume_merge(tokens, "たりけむ")
         assert result[-1]["pos"] == "名詞"
         assert rule != "classical-past-conjectural"
+
+
+class TestClassicalPastKi:
+    def test_recovers_the_continuative_the_auxiliary_selects(self):
+        tokens = [
+            _tok("山見", pos="名詞", lemma="山見"),
+            _tok("き", pos="助動詞", lemma="き"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "山見き")
+        assert [token["surface"] for token in result] == ["山", "見", "き"]
+        assert [token["pos"] for token in result] == ["名詞", "動詞", "助動詞"]
+        assert rule == "classical-past-ki"
+
+    def test_splits_the_auxiliary_out_of_a_doubled_kana_nominal(self):
+        tokens = [
+            _tok("花咲", pos="名詞", lemma="花咲"),
+            _tok("きき", pos="名詞", lemma="きき"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "花咲きき")
+        assert [token["surface"] for token in result] == ["花", "咲き", "き"]
+        assert result[1]["lemma"] == "咲く"
+        assert rule == "classical-past-ki"
+
+    def test_leaves_an_adjective_kari_cell_intact(self):
+        tokens = [
+            _tok("空", pos="名詞", lemma="空"),
+            _tok("高かり", pos="形容詞", lemma="高い"),
+            _tok("き", pos="助動詞", lemma="き"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "空高かりき")
+        assert [token["surface"] for token in result] == ["空", "高かり", "き"]
+        assert rule != "classical-past-ki"
+
+    def test_leaves_a_nominal_ending_in_the_same_kana_alone(self):
+        tokens = [_tok("大好き", pos="名詞", lemma="大好き")]
+        result, rule = apply_suzume_merge(tokens, "大好き")
+        assert [token["surface"] for token in result] == ["大好き"]
+        assert rule != "classical-past-ki"
