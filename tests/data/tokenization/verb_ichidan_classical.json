@@ -240,6 +240,50 @@
       ],
       "id": "de_okurigana_medemasu",
       "input": "月を愛でます"
+    },
+    {
+      "description": "資料を用いよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "資料",
+          "pos": "Noun",
+          "surface": "資料"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "用いる",
+          "pos": "Verb",
+          "surface": "用いよ"
+        }
+      ],
+      "id": "imperative_yo_mochiiyo",
+      "input": "資料を用いよ"
+    },
+    {
+      "description": "軍を率いよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "軍",
+          "pos": "Noun",
+          "surface": "軍"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "率いる",
+          "pos": "Verb",
+          "surface": "率いよ"
+        }
+      ],
+      "id": "imperative_yo_hikiiyo",
+      "input": "軍を率いよ"
     }
   ],
   "description": "verb_ichidan_classical tests",
