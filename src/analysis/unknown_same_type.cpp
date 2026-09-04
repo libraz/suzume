@@ -998,6 +998,29 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           continue;
         }
       }
+      // A kanji fallback run must not end on a kanji that heads a verb whose
+      // okurigana is the very next character: that boundary is proven from the
+      // right (外|飲み|たい, not 外飲|みたい), and the auxiliary spelled by the
+      // stolen mora plus what follows it (みたい) is cheap enough to pay for
+      // the fabrication. A shorter run ending before that kanji keeps its
+      // candidate, which is what supplies 外 here, and a one-kanji run is
+      // exempt because there is no fabrication to reject (夢|みたい).
+      if (start_type == normalize::CharType::Kanji && len > 1 && dict_manager_ != nullptr &&
+          candidate_end < codepoints.size() && char_types[candidate_end] == normalize::CharType::Hiragana &&
+          dict_manager_->lookupExact(surface) == nullptr) {
+        const char32_t okurigana = codepoints[candidate_end];
+        const std::string head = normalize::encodeUtf8(codepoints[candidate_end - 1]);
+        const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(okurigana);
+        const bool ends_on_verb_head =
+            (!godan_ending.empty() &&
+             verb_helpers::isVerbInDictionary(dict_manager_, normalize::concat(head, godan_ending))) ||
+            (grammar::isERowCodepoint(okurigana) &&
+             verb_helpers::isVerbInDictionary(dict_manager_,
+                                              normalize::concat(head, normalize::encodeUtf8(okurigana), "る")));
+        if (ends_on_verb_head) {
+          continue;
+        }
+      }
       auto cand = makeCandidate(surface, start_pos, candidate_end, pos, cost, has_suffix, CandidateOrigin::SameType);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = started_with_particle ? 0.7F : 1.0F;
