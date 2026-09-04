@@ -3,6 +3,7 @@
  * @brief Suffix-based unknown word candidate generation
  */
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <string_view>
@@ -32,26 +33,32 @@ struct SuffixVerbForm {
   core::ExtendedPOS extended_pos;
 };
 
-/** @brief The continuation a cell needs before its productive reading holds */
-enum class SuffixCellGate : uint8_t {
+/**
+ * @brief The continuations a cell needs before its productive reading holds
+ *
+ * Each gate constrains a different cell of the paradigm, so a paradigm may need
+ * more than one of them at once; they combine as flags rather than excluding
+ * one another.
+ */
+enum SuffixCellGate : uint8_t {
   /** Every cell in the paradigm stands on its own */
-  None,
+  kGateNone = 0,
   /**
    * The bare continuative is also the nominalization of the same base, so it
    * needs an auxiliary only a verb can host (voice, te/past, negative, polite).
    */
-  RenyokeiNeedsVerbHost,
+  kGateRenyokeiNeedsVerbHost = 1U << 0U,
   /**
    * The ん-onbin cell exists only before the past だ / connective で. Every
    * other cell of that paradigm is spelled like a ma-row irrealis plus the
    * classical conjectural む, so it stays behind a two-character base.
    */
-  OnbinNeedsPastHost,
+  kGateOnbinNeedsPastHost = 1U << 1U,
   /**
    * A Godan conditional cannot host the passive auxiliary: 〜づけられ is the
    * Ichidan stem of 〜づける, not the conditional of the Godan 〜づく.
    */
-  KateikeiRejectsPassive,
+  kGateKateikeiRejectsPassive = 1U << 2U,
 };
 
 /** @brief One productive nominal-base suffix verb paradigm */
@@ -61,7 +68,7 @@ struct ProductiveSuffixVerb {
   std::string_view lemma_suffix;
   dictionary::ConjugationType conj_type;
   const char* pattern;
-  SuffixCellGate gate;
+  uint8_t gates;
 };
 
 /** @brief Whether an auxiliary only a verb can host starts at @p pos */
@@ -97,8 +104,8 @@ constexpr std::array<SuffixVerbForm, 6> kGodanMaBamuForms = {{
     {"ばめ", core::ExtendedPOS::VerbKateikei},
 }};
 constexpr ProductiveSuffixVerb kBamu = {
-    kGodanMaBamuForms.data(),       kGodanMaBamuForms.size(),          "ばむ", dictionary::ConjugationType::GodanMa,
-    "nominal_godan_ma_bamu_suffix", SuffixCellGate::OnbinNeedsPastHost};
+    kGodanMaBamuForms.data(),       kGodanMaBamuForms.size(), "ばむ", dictionary::ConjugationType::GodanMa,
+    "nominal_godan_ma_bamu_suffix", kGateOnbinNeedsPastHost};
 
 /**
  * @brief Emit the first cell of @p spec the surface at @p attach_pos spells
@@ -122,30 +129,25 @@ bool appendProductiveSuffixVerbCells(const std::vector<char32_t>& codepoints, si
         extractSubstring(codepoints, attach_pos, candidate_end) != form.inflection) {
       continue;
     }
-    switch (spec.gate) {
-      case SuffixCellGate::RenyokeiNeedsVerbHost:
-        if (form.extended_pos == core::ExtendedPOS::VerbRenyokei && !verbOnlyHostFollowsAt(codepoints, candidate_end)) {
-          continue;
-        }
-        break;
-      case SuffixCellGate::OnbinNeedsPastHost: {
-        const bool past_or_te_follows = candidate_end < codepoints.size() &&
-                                        (codepoints[candidate_end] == U'だ' || codepoints[candidate_end] == U'で');
-        const bool licensed =
-            form.extended_pos == core::ExtendedPOS::VerbOnbinkei ? past_or_te_follows : attach_pos - start_pos >= 2;
-        if (!licensed) {
-          continue;
-        }
-        break;
-      }
-      case SuffixCellGate::KateikeiRejectsPassive:
-        if (form.extended_pos == core::ExtendedPOS::VerbKateikei && candidate_end + 1 < codepoints.size() &&
-            codepoints[candidate_end] == U'ら' && codepoints[candidate_end + 1] == U'れ') {
-          continue;
-        }
-        break;
-      case SuffixCellGate::None:
-        break;
+    bool gated_out = false;
+    if ((spec.gates & kGateRenyokeiNeedsVerbHost) != 0U) {
+      gated_out = gated_out || (form.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+                                !verbOnlyHostFollowsAt(codepoints, candidate_end));
+    }
+    if ((spec.gates & kGateOnbinNeedsPastHost) != 0U) {
+      const bool past_or_te_follows = candidate_end < codepoints.size() &&
+                                      (codepoints[candidate_end] == U'だ' || codepoints[candidate_end] == U'で');
+      const bool licensed =
+          form.extended_pos == core::ExtendedPOS::VerbOnbinkei ? past_or_te_follows : attach_pos - start_pos >= 2;
+      gated_out = gated_out || !licensed;
+    }
+    if ((spec.gates & kGateKateikeiRejectsPassive) != 0U) {
+      gated_out =
+          gated_out || (form.extended_pos == core::ExtendedPOS::VerbKateikei && candidate_end + 1 < codepoints.size() &&
+                        codepoints[candidate_end] == U'ら' && codepoints[candidate_end + 1] == U'れ');
+    }
+    if (gated_out) {
+      continue;
     }
 
     const std::string surface = extractSubstring(codepoints, start_pos, candidate_end);
@@ -389,15 +391,46 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
   }};
 
   // 漢字語幹+付ける is a productive compound-verb pattern (関連付ける、
-  // 位置付ける). Restrict the base to two or more kanji so an ordinary
-  // single-kanji lexical verb keeps its normal candidate path.
+  // 位置付ける、名付ける). The base only has to be non-empty: the competing
+  // reading of a one-kanji base is a bare nominal in front of a finite verb
+  // with no case particle, which is not a clause. The continuative cell is
+  // homographic with the deverbal nominal (味付け、値付け), and there the
+  // nominal candidate wins on category cost rather than needing a gate.
   const size_t tsukeru_base_end = base_end > start_pos ? base_end - 1 : start_pos;
   if (!numeral_led_base && base_end > start_pos && codepoints[tsukeru_base_end] == U'付' &&
-      tsukeru_base_end - start_pos >= 2) {
+      tsukeru_base_end - start_pos >= 1) {
     static constexpr ProductiveSuffixVerb kTsukeru = {
         kIchidanTsukeruForms.data(),          kIchidanTsukeruForms.size(), "付ける",
-        dictionary::ConjugationType::Ichidan, "nominal_ichidan_suffix",    SuffixCellGate::None};
+        dictionary::ConjugationType::Ichidan, "nominal_ichidan_suffix",    kGateNone};
     if (appendProductiveSuffixVerbCells(codepoints, start_pos, tsukeru_base_end, kTsukeru, candidates)) {
+      return;
+    }
+  }
+
+  // 付く is the Godan half of the same pair, and the kanji spelling loses the
+  // sequential voicing that makes づく self-evidently compound-internal. The
+  // base is not length-restricted here because the competing reading — a bare
+  // nominal followed by a finite verb with no case particle — is not a clause,
+  // so the compound is the only grammatical parse (根付く, 色付く, 傷付く).
+  // That argument does not cover the continuative: 〜付き is also a nominal
+  // suffix over the same bases (目付き, 条件付き), so it needs a verb-only host.
+  static constexpr std::array<SuffixVerbForm, 6> kGodanTsukuForms = {{
+      {"付く", core::ExtendedPOS::VerbShuushikei},
+      {"付か", core::ExtendedPOS::VerbMizenkei},
+      {"付き", core::ExtendedPOS::VerbRenyokei},
+      {"付い", core::ExtendedPOS::VerbOnbinkei},
+      {"付け", core::ExtendedPOS::VerbKateikei},
+      {"付こ", core::ExtendedPOS::VerbMizenkei},
+  }};
+  if (!numeral_led_base && base_end > start_pos && codepoints[tsukeru_base_end] == U'付' &&
+      tsukeru_base_end > start_pos) {
+    static constexpr ProductiveSuffixVerb kTsuku = {kGodanTsukuForms.data(),
+                                                    kGodanTsukuForms.size(),
+                                                    "付く",
+                                                    dictionary::ConjugationType::GodanKa,
+                                                    "nominal_godan_ka_suffix",
+                                                    kGateKateikeiRejectsPassive | kGateRenyokeiNeedsVerbHost};
+    if (appendProductiveSuffixVerbCells(codepoints, start_pos, tsukeru_base_end, kTsuku, candidates)) {
       return;
     }
   }
@@ -421,7 +454,7 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
   }};
   static constexpr ProductiveSuffixVerb kZukeru = {
       kIchidanZukeruForms.data(),           kIchidanZukeruForms.size(),      "づける",
-      dictionary::ConjugationType::Ichidan, "nominal_ichidan_zukeru_suffix", SuffixCellGate::RenyokeiNeedsVerbHost};
+      dictionary::ConjugationType::Ichidan, "nominal_ichidan_zukeru_suffix", kGateRenyokeiNeedsVerbHost};
   if (appendProductiveSuffixVerbCells(codepoints, start_pos, base_end, kZukeru, candidates)) {
     return;
   }
@@ -441,12 +474,9 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
       {"びろ", core::ExtendedPOS::VerbMeireikei},
   }};
   if (base_end - start_pos >= 2) {
-    static constexpr ProductiveSuffixVerb kBiru = {kIchidanBiruForms.data(),
-                                                   kIchidanBiruForms.size(),
-                                                   "びる",
-                                                   dictionary::ConjugationType::Ichidan,
-                                                   "nominal_ichidan_biru_suffix",
-                                                   SuffixCellGate::RenyokeiNeedsVerbHost};
+    static constexpr ProductiveSuffixVerb kBiru = {
+        kIchidanBiruForms.data(),      kIchidanBiruForms.size(),  "びる", dictionary::ConjugationType::Ichidan,
+        "nominal_ichidan_biru_suffix", kGateRenyokeiNeedsVerbHost};
     if (appendProductiveSuffixVerbCells(codepoints, start_pos, base_end, kBiru, candidates)) {
       return;
     }
@@ -473,7 +503,7 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
                                                    "めかす",
                                                    dictionary::ConjugationType::GodanSa,
                                                    "nominal_godan_sa_mekasu_suffix",
-                                                   SuffixCellGate::None};
+                                                   kGateNone};
   if (appendProductiveSuffixVerbCells(codepoints, start_pos, base_end, kMekasu, candidates)) {
     return;
   }
@@ -500,9 +530,9 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
   }};
   static constexpr std::array<ProductiveSuffixVerb, 2> kGodanKaSuffixes = {{
       {kMekuForms.data(), kMekuForms.size(), "めく", dictionary::ConjugationType::GodanKa, "nominal_godan_ka_suffix",
-       SuffixCellGate::KateikeiRejectsPassive},
+       kGateKateikeiRejectsPassive},
       {kZukuForms.data(), kZukuForms.size(), "づく", dictionary::ConjugationType::GodanKa, "nominal_godan_ka_suffix",
-       SuffixCellGate::KateikeiRejectsPassive},
+       kGateKateikeiRejectsPassive},
   }};
   for (const auto& spec : kGodanKaSuffixes) {
     if (appendProductiveSuffixVerbCells(codepoints, start_pos, base_end, spec, candidates)) {
