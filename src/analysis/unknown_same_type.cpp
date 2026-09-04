@@ -651,10 +651,16 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       }
 
       // Penalize kanji sequences ending with honorific/title suffixes (様, 氏)
-      // to encourage NOUN + SUFFIX separation (e.g., 客様 → 客 + 様, 田中様 → 田中 + 様)
+      // to encourage NOUN + SUFFIX separation (e.g., 田中様 → 田中 + 様)
       // Note: 的 was removed — kanji_seq cost 1.0 with 1-char prefix (目+的 = 1.1)
       // naturally keeps 目的/動的/知的/射的 as 1 token while 論理+的 still splits
       // (2-char prefix gives 論理(1.0)+的(SUFFIX 0.5)-0.8 = 0.7 < 1.0).
+      // The host length carries no information here, unlike for the plural
+      // honorific 方 below: 様 attaches to a bare surname, and a surname is an
+      // open class that is routinely one kanji (辻様, 林様, 森様), so the
+      // penalty has to reach a two-kanji run. The lexicalized compounds that
+      // share the shape (異様, 同様, 王様, 神様, 殿様, 奥様) are a closed set and
+      // are held in the dictionary instead.
       if (start_type == normalize::CharType::Kanji && len >= 2) {
         char32_t last_char = codepoints[candidate_end - 1];
         if (last_char == U'様' || last_char == U'氏') {
@@ -997,8 +1003,18 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // splits like 皆様(NOUN) + 方(SUFFIX) for 皆様方. Restricting to "prev is
       // kanji" avoids false splits like その方(NOUN), 北の方(NOUN) where 方 is
       // a standalone noun, not a plural-honorific suffix.
-      if (start_type == normalize::CharType::Kanji && len == 1 && codepoints[start_pos] == U'方' && start_pos > 0 &&
-          char_types[start_pos - 1] == normalize::CharType::Kanji) {
+      // The host has to be a term of address, which is at least two kanji long
+      // (先生方, 皆様方, 奥様方, 客様方). Unlike 様, the plural honorific does
+      // not attach to a bare surname, so nothing open-class reaches a
+      // one-kanji host; what does is a lexicalized compound noun (彼方, 行方,
+      // 味方, 両方, 先方, 目方), where the honorific reading never applies.
+      constexpr size_t kMinPluralHonorificHost = 2;
+      size_t honorific_host_start = start_pos;
+      while (honorific_host_start > 0 && char_types[honorific_host_start - 1] == normalize::CharType::Kanji) {
+        --honorific_host_start;
+      }
+      if (start_type == normalize::CharType::Kanji && len == 1 && codepoints[start_pos] == U'方' &&
+          start_pos - honorific_host_start >= kMinPluralHonorificHost) {
         auto suffix_cand = makeCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Suffix, 0.5F,
                                          /*has_suffix=*/true, CandidateOrigin::SameType);
 #ifdef SUZUME_DEBUG_INFO
