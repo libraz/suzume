@@ -672,6 +672,69 @@
       ],
       "id": "mou_wattta",
       "input": "もう終わった。"
+    },
+    {
+      "description": "An elongation held inside the desiderative auxiliary keeps the auxiliary",
+      "expected": [
+        {
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲み"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たーい"
+        }
+      ],
+      "id": "mita_i",
+      "input": "飲みたーい"
+    },
+    {
+      "description": "Same interior elongation after an ichidan continuative",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たーい"
+        }
+      ],
+      "id": "beta_i",
+      "input": "食べたーい"
+    },
+    {
+      "description": "Interior elongation inside the polite copula",
+      "expected": [
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でーす"
+        }
+      ],
+      "id": "de_su",
+      "input": "でーす"
+    },
+    {
+      "description": "Negative control: a trailing elongation is the past auxiliary held, not the desiderative",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たー"
+        }
+      ],
+      "id": "beta",
+      "input": "食べたー"
     }
   ],
   "description": "Colloquial and slang patterns",
