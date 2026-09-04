@@ -247,6 +247,16 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // kanji-hiragana noun that spans the entire command.
       {EPOS::VerbMeireikei, EPOS::ParticleFinal, cost::kExtraStrongBonus},
 
+      // A case particle marks an argument, and an imperative is a predicate that
+      // takes one (本を読め, 水を飲め, 軍を率いよ). The row is missing rather than
+      // deliberately neutral: the adjective terminal on the far side of the same
+      // particle already carries one, so the default left every 一段 imperative
+      // spelled with よ to be re-read as its own continuative plus the
+      // homographic final particle, or as a fabricated adjective plus that
+      // particle. Kept one step below the adjective's bonus, which is the
+      // commoner reading of the pair.
+      {EPOS::ParticleCase, EPOS::VerbMeireikei, cost::kStrongBonus},
+
       // VerbShuushikei → ParticleNo (食べる+の+だ for のだ/んだ).
       // The nominalizer after a finite verb opens a productive chain with any
       // following case particle (読むのが, 読むのを, 読むのに), so it has to beat
