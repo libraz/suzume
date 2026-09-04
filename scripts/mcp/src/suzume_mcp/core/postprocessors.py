@@ -320,6 +320,41 @@ def postprocess_mecab_tokens(
     return tokens
 
 
+def repair_kanji_prefix_before_kana_noun(tokens: list[dict]) -> None:
+    """Rebuild the boundary where a stem's okurigana was read as a noun.
+
+    A kanji prefix forms a compound noun with the noun it attaches to, so that
+    host is written in kanji as well — the merge rule that joins the pair asks
+    for exactly that. A bare-hiragana noun therefore never continues one, and
+    when the analyzer emits that pair it has taken a stem's okurigana for the
+    start of the following word: 抗いし者 comes back as 抗(接頭詞) + いし(名詞) +
+    者, a split that leaves a lemma the sentence never contained and that the
+    analyzer itself does not make when the same two morae end the input
+    (抗いし alone is read 抗い + し).
+
+    The dictionary says where the boundary belongs: the prefix plus the noun's
+    first kana is a headword of its own, which is what makes the kanji a stem
+    with okurigana rather than a prefix. Both pieces are re-analyzed from
+    there, so the class each one lands in stays the dictionary's own.
+    """
+    for index in range(len(tokens) - 2, -1, -1):
+        token = tokens[index]
+        follower = tokens[index + 1]
+        if token.get("pos") != "接頭詞" or token.get("pos_sub1") != "名詞接続":
+            continue
+        prefix = token.get("surface", "")
+        noun = follower.get("surface", "")
+        if not regex.fullmatch(r"\p{Han}+", prefix):
+            continue
+        if follower.get("pos") != "名詞" or not regex.fullmatch(r"\p{Hiragana}{2,}", noun):
+            continue
+        head = prefix + noun[0]
+        analyzed = mecab_analyze(head)
+        if len(analyzed) != 1 or analyzed[0].get("surface") != head:
+            continue
+        tokens[index : index + 2] = [analyzed[0], *mecab_analyze(noun[1:])]
+
+
 def split_transparent_suru_te_adverb(tokens: list[dict]) -> None:
     """Split a lexical adverb that is transparently 名詞 + し + て.
 

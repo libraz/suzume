@@ -12,6 +12,7 @@ from .postprocessors import (
     postprocess_mecab_tokens,
     postprocessor_rules,
     preprocess_for_mecab,
+    repair_kanji_prefix_before_kana_noun,
     repair_kko_nominalizer,
     split_transparent_suru_te_adverb,
 )
@@ -204,6 +205,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     # Restore inflection boundaries the dictionary lexicalized away.  Runs here
     # because the decision needs the reading, which the merge pass drops.
     split_transparent_suru_te_adverb(raw_tokens)
+    repair_kanji_prefix_before_kana_noun(raw_tokens)
 
     # Apply Suzume merge rules
     merged, merge_rule = apply_suzume_merge(raw_tokens, normalized_text)
