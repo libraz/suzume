@@ -143,8 +143,9 @@ bool isPossibleUnknownIAdjectiveStem(const std::string& stem, const std::string&
   // adjectives retain their own morpheme boundary and are emitted elsewhere.
   const auto stem_codepoints = normalize::toCodepoints(stem);
   for (size_t boundary = 1; boundary < stem_codepoints.size(); ++boundary) {
-    const std::string left = extractSubstring(stem_codepoints, 0, boundary);
-    const auto* verb = dict_manager == nullptr ? nullptr : dict_manager->lookupExact(left, core::PartOfSpeech::Verb);
+    const auto* verb = dict_manager == nullptr
+                           ? nullptr
+                           : lookupEntryInRange(*dict_manager, stem_codepoints, 0, boundary, core::PartOfSpeech::Verb);
     if (verb != nullptr && verb->extended_pos == core::ExtendedPOS::VerbRenyokei) {
       return false;
     }

@@ -17,6 +17,12 @@ const dictionary::DictionaryEntry* lookupEntryInRange(const dictionary::Dictiona
   return dict_manager.lookupExact(extractSubstring(codepoints, start, end), pos);
 }
 
+std::vector<dictionary::LookupResult> lookupResultsInRange(const dictionary::DictionaryManager& dict_manager,
+                                                           const std::vector<char32_t>& codepoints, size_t start,
+                                                           size_t end) {
+  return dict_manager.lookup(extractSubstring(codepoints, start, end), 0);
+}
+
 size_t acceptedDictionaryEntryLength(const dictionary::DictionaryManager* dict_manager,
                                      const std::vector<char32_t>& codepoints, size_t start, size_t min_len,
                                      size_t max_len, core::PartOfSpeech pos, EntryAccept accept, bool longest_first) {

@@ -137,7 +137,7 @@ BoundAuxiliary boundAuxiliaryAt(const std::vector<char32_t>& codepoints, size_t 
   auto auxiliaries_at = [&](size_t at) {
     const size_t window_end = std::min(codepoints.size(), at + kAuxiliaryWindow);
     std::vector<std::pair<size_t, bool>> found;
-    for (const auto& match : dict_manager->lookup(extractSubstring(codepoints, at, window_end), 0)) {
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, at, window_end)) {
       if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Auxiliary) {
         const bool is_copula = match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
                                match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu;
@@ -394,7 +394,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
     // a particle-homographic unknown noun across that boundary (不変+の+もの).
     if (first_char == U'の' && dict_manager_ != nullptr && start_pos + 1 < codepoints.size()) {
       const size_t probe_end = std::min(codepoints.size(), start_pos + static_cast<size_t>(5));
-      for (const auto& match : dict_manager_->lookup(extractSubstring(codepoints, start_pos + 1, probe_end), 0)) {
+      for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, start_pos + 1, probe_end)) {
         if (match.entry != nullptr && match.entry->extended_pos == core::ExtendedPOS::NounFormal) {
           return;
         }
@@ -1053,8 +1053,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
   if (dict_manager_ != nullptr) {
     const size_t lookback = std::min(start_pos, static_cast<size_t>(4));
     for (size_t length = 1; length <= lookback; ++length) {
-      const std::string preceding = extractSubstring(codepoints, start_pos - length, start_pos);
-      const auto* entry = dict_manager_->lookupExact(preceding, core::PartOfSpeech::Determiner);
+      const auto* entry =
+          lookupEntryInRange(*dict_manager_, codepoints, start_pos - length, start_pos, core::PartOfSpeech::Determiner);
       if (entry != nullptr) {
         left_determiner_bracket = true;
         break;
@@ -1096,8 +1096,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         return false;
       }
       size_t win_end = pos + 4 < codepoints.size() ? pos + 4 : codepoints.size();
-      std::string window = extractSubstring(codepoints, pos, win_end);
-      for (const auto& res : dict_manager_->lookup(window, 0)) {
+      for (const auto& res : lookupResultsInRange(*dict_manager_, codepoints, pos, win_end)) {
         if (res.entry == nullptr) {
           continue;
         }
@@ -1115,8 +1114,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         return false;
       }
       for (size_t predicate_start = start_pos + 1; predicate_start < pos; ++predicate_start) {
-        const std::string prefix = extractSubstring(codepoints, start_pos, predicate_start);
-        const auto* noun = dict_manager_->lookupExact(prefix, core::PartOfSpeech::Noun);
+        const auto* noun =
+            lookupEntryInRange(*dict_manager_, codepoints, start_pos, predicate_start, core::PartOfSpeech::Noun);
         if (noun == nullptr || noun->extended_pos != core::ExtendedPOS::NounFormal) {
           continue;
         }
@@ -1128,8 +1127,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
             continue;
           }
           const size_t probe_end = std::min(codepoints.size(), predicate.end + static_cast<size_t>(2));
-          const std::string following = extractSubstring(codepoints, predicate.end, probe_end);
-          for (const auto& match : dict_manager_->lookup(following, 0)) {
+          for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, predicate.end, probe_end)) {
             if (match.entry != nullptr && (match.entry->extended_pos == core::ExtendedPOS::AuxNegativeNu ||
                                            match.entry->extended_pos == core::ExtendedPOS::AuxNegativeNai)) {
               return true;
@@ -1138,8 +1136,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         }
         const size_t auxiliary_limit = std::min(codepoints.size(), pos + static_cast<size_t>(5));
         for (size_t auxiliary_start = pos + 1; auxiliary_start < auxiliary_limit; ++auxiliary_start) {
-          const std::string window = extractSubstring(codepoints, auxiliary_start, auxiliary_limit);
-          for (const auto& match : dict_manager_->lookup(window, 0)) {
+          for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, auxiliary_start, auxiliary_limit)) {
             if (match.entry == nullptr || (match.entry->extended_pos != core::ExtendedPOS::AuxNegativeNu &&
                                            match.entry->extended_pos != core::ExtendedPOS::AuxNegativeNai)) {
               continue;
@@ -1251,7 +1248,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       bool right_sokuon_final_particle = false;
       if (dict_manager_ != nullptr && scan < codepoints.size() && codepoints[scan] == U'っ') {
         const size_t particle_end = std::min(codepoints.size(), scan + static_cast<size_t>(4));
-        for (const auto& match : dict_manager_->lookup(extractSubstring(codepoints, scan, particle_end), 0)) {
+        for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, scan, particle_end)) {
           if (match.entry != nullptr && match.entry->extended_pos == core::ExtendedPOS::ParticleFinal) {
             right_sokuon_final_particle = true;
             break;
@@ -1386,8 +1383,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       if (dict_manager_ != nullptr && right_particle && scan > start_pos) {
         const size_t formal_start = scan - 1;
         const size_t formal_probe_end = std::min(codepoints.size(), scan + static_cast<size_t>(3));
-        const std::string formal_probe = extractSubstring(codepoints, formal_start, formal_probe_end);
-        for (const auto& match : dict_manager_->lookup(formal_probe, 0)) {
+        for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, formal_start, formal_probe_end)) {
           if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Noun &&
               match.entry->extended_pos == core::ExtendedPOS::NounFormal && match.length > 1) {
             steals_formal_noun_head = true;

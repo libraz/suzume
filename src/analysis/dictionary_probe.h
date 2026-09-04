@@ -54,6 +54,18 @@ const dictionary::DictionaryEntry* lookupEntryInRange(const dictionary::Dictiona
                                                       const std::vector<char32_t>& codepoints, size_t start, size_t end,
                                                       core::PartOfSpeech pos = core::PartOfSpeech::Unknown);
 
+/**
+ * @brief Every dictionary entry whose surface opens codepoints[start, end)
+ *
+ * The prefix-lookup counterpart of lookupEntryInRange, for the callers that walk
+ * all the matches a span opens rather than the one that spells it exactly. It
+ * owns the same span-to-surface conversion, which otherwise inlines the UTF-8
+ * encode loop and the temporary's teardown into every caller.
+ */
+std::vector<dictionary::LookupResult> lookupResultsInRange(const dictionary::DictionaryManager& dict_manager,
+                                                           const std::vector<char32_t>& codepoints, size_t start,
+                                                           size_t end);
+
 /** @brief Whether any dictionary entry spanning @p start is accepted */
 inline bool hasDictionaryEntryFrom(const dictionary::DictionaryManager* dict_manager,
                                    const std::vector<char32_t>& codepoints, size_t start, size_t min_len,

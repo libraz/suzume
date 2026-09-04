@@ -287,9 +287,8 @@ bool hasNominalForcingParticleContinuation(const std::vector<char32_t>& codepoin
   }
 
   const size_t probe_end = std::min(codepoints.size(), pos + static_cast<size_t>(4));
-  const std::string probe = extractSubstring(codepoints, pos, probe_end);
   bool has_particle = false;
-  for (const auto& match : dict_manager->lookup(probe, 0)) {
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
     if (match.entry == nullptr) {
       continue;
     }
@@ -308,8 +307,7 @@ bool startsLongerNonParticleEntry(const std::vector<char32_t>& codepoints, size_
     return false;
   }
   const size_t probe_end = std::min(codepoints.size(), start_pos + static_cast<size_t>(4));
-  const std::string probe = extractSubstring(codepoints, start_pos, probe_end);
-  for (const auto& match : dict_manager->lookup(probe, 0)) {
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, start_pos, probe_end)) {
     if (match.entry != nullptr && match.entry->pos != core::PartOfSpeech::Particle &&
         normalize::utf8Length(match.entry->surface) > 1 && !isParticleHomograph(*dict_manager, *match.entry)) {
       return true;

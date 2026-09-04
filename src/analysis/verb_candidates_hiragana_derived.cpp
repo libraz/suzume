@@ -312,9 +312,9 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // the 2-codepoint floor on the remainder protects genuine short stems かい
     // (い = いる 連用形) and でき (き = くる 連用形).
     if (!is_dict_verb && dict_manager != nullptr && end_pos - start_pos >= 3) {
-      std::string aux_first = extractSubstring(codepoints, start_pos, start_pos + 1);
       std::string aux_remainder = extractSubstring(codepoints, start_pos + 1, end_pos);
-      if (dict_manager->lookupExact(aux_first, core::PartOfSpeech::Auxiliary) != nullptr &&
+      if (lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Auxiliary) !=
+              nullptr &&
           vh::hasDictionaryEntry(dict_manager, aux_remainder, core::PartOfSpeech::Auxiliary)) {
         continue;
       }

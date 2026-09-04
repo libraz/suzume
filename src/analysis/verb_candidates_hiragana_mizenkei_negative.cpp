@@ -44,8 +44,8 @@ bool hasFormalNounPrefixBoundary(const dictionary::DictionaryManager* dict_manag
     return false;
   }
   for (size_t prefix_len = 2; prefix_len + 2 <= total_len; ++prefix_len) {
-    const std::string prefix = extractSubstring(codepoints, start_pos, start_pos + prefix_len);
-    const auto* entry = dict_manager->lookupExact(prefix, core::PartOfSpeech::Noun);
+    const auto* entry =
+        lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + prefix_len, core::PartOfSpeech::Noun);
     if (entry != nullptr && entry->extended_pos == core::ExtendedPOS::NounFormal) {
       return true;
     }
@@ -64,8 +64,8 @@ bool hasFormalNounStemHomograph(const dictionary::DictionaryManager* dict_manage
   if (dict_manager == nullptr || mizenkei_end < start_pos + 3) {
     return false;
   }
-  const std::string prefix = extractSubstring(codepoints, start_pos, mizenkei_end - 1);
-  const auto* entry = dict_manager->lookupExact(prefix, core::PartOfSpeech::Noun);
+  const auto* entry =
+      lookupEntryInRange(*dict_manager, codepoints, start_pos, mizenkei_end - 1, core::PartOfSpeech::Noun);
   return entry != nullptr && entry->extended_pos == core::ExtendedPOS::NounFormal;
 }
 

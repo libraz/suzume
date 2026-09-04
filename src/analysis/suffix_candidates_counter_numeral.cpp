@@ -147,9 +147,9 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
   // suffix can share the same quantity boundary rule.
   if (dict_manager != nullptr && normalize::isCounterKanji(codepoints[numeral_end])) {
     size_t counter_end = numeral_end + 1;
-    std::string suffix_text = extractSubstring(codepoints, counter_end, codepoints.size());
-    const bool suffix_follows = lookupResultsHavePartOfSpeech(dict_manager->lookup(suffix_text, 0),
-                                                              partOfSpeechMask(core::PartOfSpeech::Suffix));
+    const bool suffix_follows =
+        lookupResultsHavePartOfSpeech(lookupResultsInRange(*dict_manager, codepoints, counter_end, codepoints.size()),
+                                      partOfSpeechMask(core::PartOfSpeech::Suffix));
     if (closes_duration_span) {
       std::string surface = extractSubstring(codepoints, start_pos, counter_end + 1);
       auto cand = makeCandidate(surface, start_pos, counter_end + 1, core::PartOfSpeech::Noun,
@@ -187,7 +187,7 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
       normalize::classifyChar(codepoints[numeral_end + 1]) == normalize::CharType::Hiragana) {
     const size_t counter_end = numeral_end + 2;
     const bool has_deverbal_counter =
-        lookupResultsHavePartOfSpeech(dict_manager->lookup(extractSubstring(codepoints, numeral_end, counter_end), 0),
+        lookupResultsHavePartOfSpeech(lookupResultsInRange(*dict_manager, codepoints, numeral_end, counter_end),
                                       partOfSpeechMask(core::PartOfSpeech::Verb));
     // A longer registered form of the same verb is an inflected predicate, and
     // it owns the span rather than the counter reading (二重ねる, 三切れる).

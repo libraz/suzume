@@ -327,14 +327,13 @@ bool hasInternalLexicalParticleBoundary(const std::vector<char32_t>& codepoints,
     // compound particle as well, while leaving merely particle-homographic
     // prefixes of real verbs untouched.
     if (lexical_start > start_pos) {
-      const std::string prefix = extractSubstring(codepoints, start_pos, lexical_start);
-      if (dict_manager->lookupExact(prefix, core::PartOfSpeech::Particle) == nullptr) {
+      if (lookupEntryInRange(*dict_manager, codepoints, start_pos, lexical_start, core::PartOfSpeech::Particle) ==
+          nullptr) {
         continue;
       }
     }
     for (size_t split = lexical_start + 1; split < end_pos; ++split) {
-      const std::string right = extractSubstring(codepoints, split, end_pos);
-      if (dict_manager->lookupExact(right, core::PartOfSpeech::Particle) == nullptr) {
+      if (lookupEntryInRange(*dict_manager, codepoints, split, end_pos, core::PartOfSpeech::Particle) == nullptr) {
         continue;
       }
       const std::string left = extractSubstring(codepoints, lexical_start, split);

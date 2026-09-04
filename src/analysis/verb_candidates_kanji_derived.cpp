@@ -110,8 +110,8 @@ bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t
   // auxiliary there is no okurigana left for a stem to own, so the kanji run is
   // a nominal predicate and the e-row mora is the copula's own cell
   // (重要+なれ, 大切+なれ, not the non-word 重要なる).
-  if (dict_manager != nullptr && dict_manager->lookupExact(extractSubstring(codepoints, kanji_end, cell_end),
-                                                           core::PartOfSpeech::Auxiliary) != nullptr) {
+  if (dict_manager != nullptr &&
+      lookupEntryInRange(*dict_manager, codepoints, kanji_end, cell_end, core::PartOfSpeech::Auxiliary) != nullptr) {
     return false;
   }
   const auto* godan_row = grammar::Conjugation::getGodanRow(best.verb_type);
@@ -412,8 +412,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
           if (formal_you != nullptr && formal_you->extended_pos == core::ExtendedPOS::NounFormal &&
               you_end < codepoints.size() && codepoints[you_end] == U'に') {
             const size_t probe_end = std::min(codepoints.size(), you_end + static_cast<size_t>(5));
-            const std::string probe = extractSubstring(codepoints, you_end, probe_end);
-            for (const auto& following : dict_manager->lookup(probe, 0)) {
+            for (const auto& following : lookupResultsInRange(*dict_manager, codepoints, you_end, probe_end)) {
               if (following.entry != nullptr && following.length > 1 &&
                   following.entry->extended_pos == core::ExtendedPOS::ParticleCase) {
                 nominal_case_continuation = true;

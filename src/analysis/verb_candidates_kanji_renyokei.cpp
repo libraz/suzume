@@ -674,8 +674,8 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
       if (dict_manager != nullptr && renyokei_end >= kanji_end + 2 &&
           !vh::isVerbInDictionary(dict_manager, best_sa.base_form)) {
-        std::string hiragana_tail = extractSubstring(codepoints, kanji_end, renyokei_end);
-        const auto* tail_entry = dict_manager->lookupExact(hiragana_tail, core::PartOfSpeech::Auxiliary);
+        const auto* tail_entry =
+            lookupEntryInRange(*dict_manager, codepoints, kanji_end, renyokei_end, core::PartOfSpeech::Auxiliary);
         const bool selects_godan_sa_onbin = renyokei_end < codepoints.size() &&
                                             (codepoints[renyokei_end] == U'た' || codepoints[renyokei_end] == U'て');
         if (tail_entry != nullptr &&

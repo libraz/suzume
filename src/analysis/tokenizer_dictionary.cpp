@@ -592,13 +592,11 @@ bool startsFormalNounParticleAfterPredicate(const core::Lattice& lattice,
     return false;
   }
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
-    const std::string nominal = extractSubstring(codepoints, start_pos, split);
-    const auto* noun = dict_manager.lookupExact(nominal, core::PartOfSpeech::Noun);
+    const auto* noun = lookupEntryInRange(dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Noun);
     if (noun == nullptr || noun->extended_pos != core::ExtendedPOS::NounFormal) {
       continue;
     }
-    const std::string particle = extractSubstring(codepoints, split, end_pos);
-    if (dict_manager.lookupExact(particle, core::PartOfSpeech::Particle) != nullptr) {
+    if (lookupEntryInRange(dict_manager, codepoints, split, end_pos, core::PartOfSpeech::Particle) != nullptr) {
       return true;
     }
   }
@@ -1521,10 +1519,10 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       }
       bool decomposes_as_verb_particle = false;
       for (size_t split = 1; split < result.length; ++split) {
-        const std::string left = extractSubstring(codepoints, start_pos, start_pos + split);
-        const std::string right = extractSubstring(codepoints, start_pos + split, end_pos);
-        if (dict_manager_.lookupExact(left, core::PartOfSpeech::Verb) != nullptr &&
-            dict_manager_.lookupExact(right, core::PartOfSpeech::Particle) != nullptr) {
+        if (lookupEntryInRange(dict_manager_, codepoints, start_pos, start_pos + split, core::PartOfSpeech::Verb) !=
+                nullptr &&
+            lookupEntryInRange(dict_manager_, codepoints, start_pos + split, end_pos, core::PartOfSpeech::Particle) !=
+                nullptr) {
           decomposes_as_verb_particle = true;
           break;
         }

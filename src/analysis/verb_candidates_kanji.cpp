@@ -415,8 +415,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
             char_types[predicate_end] == normalize::CharType::Hiragana)) {
       ++predicate_end;
     }
-    const std::string predicate_probe = extractSubstring(codepoints, hiragana_end, predicate_end);
-    for (const auto& result : dict_manager->lookup(predicate_probe, 0)) {
+    for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, hiragana_end, predicate_end)) {
       if (result.entry == nullptr) {
         continue;
       }

@@ -56,8 +56,8 @@ bool startsInsideMultiMoraParticle(const std::vector<char32_t>& codepoints, size
     if (end_pos - particle_start < 2) {
       continue;
     }
-    const std::string particle_surface = extractSubstring(codepoints, particle_start, end_pos);
-    if (dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle) != nullptr) {
+    if (lookupEntryInRange(*dict_manager, codepoints, particle_start, end_pos, core::PartOfSpeech::Particle) !=
+        nullptr) {
       return true;
     }
   }
@@ -437,8 +437,8 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
     constexpr size_t kMaxParticleChars = 4;
     size_t max_particle_end = std::min(max_hiragana_end, start_pos + kMaxParticleChars);
     for (size_t particle_end = start_pos + 1; particle_end <= max_particle_end; ++particle_end) {
-      std::string particle_surface = extractSubstring(codepoints, start_pos, particle_end);
-      if (dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle) == nullptr) {
+      if (lookupEntryInRange(*dict_manager, codepoints, start_pos, particle_end, core::PartOfSpeech::Particle) ==
+          nullptr) {
         continue;
       }
       for (size_t aux_end = max_hiragana_end; aux_end > particle_end; --aux_end) {
@@ -450,8 +450,8 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
         if (aux_end - particle_end < 2) {
           continue;
         }
-        std::string aux_surface = extractSubstring(codepoints, particle_end, aux_end);
-        if (dict_manager->lookupExact(aux_surface, core::PartOfSpeech::Auxiliary) != nullptr) {
+        if (lookupEntryInRange(*dict_manager, codepoints, particle_end, aux_end, core::PartOfSpeech::Auxiliary) !=
+            nullptr) {
           std::string full_surface = extractSubstring(codepoints, start_pos, max_hiragana_end);
           if (utf8::endsWith(full_surface, "く")) {
             full_surface = normalize::replaceFinalChar(full_surface, "い");

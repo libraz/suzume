@@ -6,6 +6,7 @@
 #include "adjective_candidates.h"
 #include "adjective_candidates_internal.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
@@ -139,9 +140,9 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     // the suffix reading; otherwise the explicit copula supplies the missing
     // predicative evidence for the mixed na-adjective stem.
     if (kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == U'ら' && codepoints[kanji_end + 1] == U'だ') {
-      const std::string host = extractSubstring(codepoints, start_pos, kanji_end);
-      const auto* pronoun =
-          dict_manager == nullptr ? nullptr : dict_manager->lookupExact(host, core::PartOfSpeech::Pronoun);
+      const auto* pronoun = dict_manager == nullptr ? nullptr
+                                                    : lookupEntryInRange(*dict_manager, codepoints, start_pos,
+                                                                         kanji_end, core::PartOfSpeech::Pronoun);
       const auto* copula =
           dict_manager == nullptr ? nullptr : dict_manager->lookupExact("だ", core::PartOfSpeech::Auxiliary);
       if (pronoun == nullptr && copula != nullptr && copula->extended_pos == core::ExtendedPOS::AuxCopulaDa) {
@@ -180,8 +181,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
         bool contains_closed_suffix = false;
         bool starts_closed_tail = false;
         if (dict_manager != nullptr) {
-          const std::string stem_tail = extractSubstring(codepoints, kanji_end, stem_end);
-          for (const auto& match : dict_manager->lookup(stem_tail, 0)) {
+          for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end, stem_end)) {
             if (match.entry != nullptr &&
                 (match.entry->pos == core::PartOfSpeech::Auxiliary || match.entry->pos == core::PartOfSpeech::Suffix ||
                  match.entry->pos == core::PartOfSpeech::Particle)) {
@@ -200,8 +200,8 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
             if (!grammar::isARowCodepoint(codepoints[auxiliary_start - 1])) {
               continue;
             }
-            const std::string right = extractSubstring(codepoints, auxiliary_start, stem_end);
-            const auto* auxiliary = dict_manager->lookupExact(right, core::PartOfSpeech::Auxiliary);
+            const auto* auxiliary =
+                lookupEntryInRange(*dict_manager, codepoints, auxiliary_start, stem_end, core::PartOfSpeech::Auxiliary);
             if (auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxPassive) {
               contains_passive_boundary = true;
               break;

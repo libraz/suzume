@@ -164,8 +164,7 @@ bool hasInternalNominalParticleBoundary(const std::vector<char32_t>& codepoints,
   }
   for (size_t particle_start = start_pos + 1; particle_start < end_pos; ++particle_start) {
     const size_t probe_end = std::min(codepoints.size(), particle_start + static_cast<size_t>(4));
-    const std::string probe = extractSubstring(codepoints, particle_start, probe_end);
-    for (const auto& match : dict_manager->lookup(probe, 0)) {
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, particle_start, probe_end)) {
       if (match.entry == nullptr || !isNominalBoundaryParticle(*match.entry)) {
         continue;
       }
@@ -201,8 +200,7 @@ bool hasNominalClosingParticleAt(const std::vector<char32_t>& codepoints, size_t
     return false;
   }
   const size_t probe_end = std::min(codepoints.size(), start_pos + static_cast<size_t>(4));
-  const std::string probe = extractSubstring(codepoints, start_pos, probe_end);
-  for (const auto& match : dict_manager->lookup(probe, 0)) {
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, start_pos, probe_end)) {
     if (match.entry != nullptr && isNominalClosingParticle(*match.entry)) {
       return true;
     }
@@ -372,10 +370,8 @@ bool hasAuxiliaryParticleDecomposition(const std::vector<char32_t>& codepoints, 
     return false;
   }
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
-    const std::string left = extractSubstring(codepoints, start_pos, split);
-    const std::string right = extractSubstring(codepoints, split, end_pos);
-    if (dict_manager->lookupExact(left, core::PartOfSpeech::Auxiliary) != nullptr &&
-        dict_manager->lookupExact(right, core::PartOfSpeech::Particle) != nullptr) {
+    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Auxiliary) != nullptr &&
+        lookupEntryInRange(*dict_manager, codepoints, split, end_pos, core::PartOfSpeech::Particle) != nullptr) {
       return true;
     }
   }
@@ -792,9 +788,8 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
           // suffix boundary (e.g. noun + っぽ + さ). Do not fabricate a
           // single compound noun across it; the dictionary candidates retain
           // the suffix inflection and any following nominalizer.
-          std::string suffix_portion = extractSubstring(codepoints, sokuon_pos, hira2_end);
           if (dict_manager != nullptr) {
-            for (const auto& entry : dict_manager->lookup(suffix_portion, 0)) {
+            for (const auto& entry : lookupResultsInRange(*dict_manager, codepoints, sokuon_pos, hira2_end)) {
               if (entry.entry != nullptr && entry.entry->pos == core::PartOfSpeech::Adjective) {
                 const size_t ppoi_end = sokuon_pos + 2;
                 const bool ppoi_stem_before_inflection = entry.entry->lemma == "っぽい" &&
@@ -979,9 +974,9 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
                char_types[ctx_end] == normalize::CharType::Hiragana) {
           ++ctx_end;
         }
-        std::string orphan_ctx = extractSubstring(codepoints, orphan_pos, ctx_end);
-        orphan_split_viable = lookupResultsHavePartOfSpeech(dict_manager->lookup(orphan_ctx, 0),
-                                                            partOfSpeechMask(core::PartOfSpeech::Particle));
+        orphan_split_viable =
+            lookupResultsHavePartOfSpeech(lookupResultsInRange(*dict_manager, codepoints, orphan_pos, ctx_end),
+                                          partOfSpeechMask(core::PartOfSpeech::Particle));
       }
       if (orphan_split_viable) {
         looks_like_aux = true;
@@ -1124,8 +1119,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // If so, skip compound generation to let the split path win
   // E.g., 火だるま: if だるま is in dictionary, don't generate compound
   // Only skip for exact matches - partial matches (like た in たまり) don't count
-  std::string hiragana_portion = extractSubstring(codepoints, kanji_end, hiragana_end);
-  if (dict_manager != nullptr && dict_manager->lookupExact(hiragana_portion) != nullptr) {
+  if (dict_manager != nullptr && lookupEntryInRange(*dict_manager, codepoints, kanji_end, hiragana_end) != nullptr) {
     // This allows split like 火+だるま to win.
     return;
   }

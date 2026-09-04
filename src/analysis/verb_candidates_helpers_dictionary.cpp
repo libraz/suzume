@@ -186,8 +186,7 @@ bool startsInsideDictionaryParticle(const std::vector<char32_t>& codepoints, siz
   size_t first_start = start_pos > kParticleLookback ? start_pos - kParticleLookback : 0;
   size_t probe_end = std::min(codepoints.size(), start_pos + kParticleProbe);
   for (size_t particle_start = first_start; particle_start < start_pos; ++particle_start) {
-    std::string probe = extractSubstring(codepoints, particle_start, probe_end);
-    for (const auto& match : dict_manager->lookup(probe, 0)) {
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, particle_start, probe_end)) {
       if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
           particle_start + normalize::utf8Length(match.entry->surface) > start_pos) {
         return true;
@@ -318,8 +317,8 @@ bool endsWithParticleTailOfPos(const dictionary::DictionaryManager* dict_manager
   }
   // Probe particle suffixes of 2+ codepoints, keeping a non-empty prefix.
   for (size_t particle_len = 2; start_pos + particle_len < tail_end; ++particle_len) {
-    std::string suffix = extractSubstring(codepoints, tail_end - particle_len, tail_end);
-    const dictionary::DictionaryEntry* suffix_entry = dict_manager->lookupExact(suffix);
+    const dictionary::DictionaryEntry* suffix_entry =
+        lookupEntryInRange(*dict_manager, codepoints, tail_end - particle_len, tail_end);
     if (suffix_entry != nullptr && suffix_entry->extended_pos == particle_pos) {
       return true;
     }
@@ -574,8 +573,7 @@ bool hasAuxiliaryNegativeBoundary(const dictionary::DictionaryManager* dict_mana
     return entry != nullptr && entry->extended_pos == epos;
   };
   for (size_t boundary = start_pos + 1; boundary + 1 < end_pos; ++boundary) {
-    const std::string prefix = extractSubstring(codepoints, start_pos, boundary);
-    const auto* prefix_entry = dict_manager->lookupExact(prefix);
+    const auto* prefix_entry = lookupEntryInRange(*dict_manager, codepoints, start_pos, boundary);
     const bool is_closed_class_prefix =
         prefix_entry != nullptr && (prefix_entry->pos == core::PartOfSpeech::Auxiliary ||
                                     prefix_entry->extended_pos == core::ExtendedPOS::AuxExcessive);

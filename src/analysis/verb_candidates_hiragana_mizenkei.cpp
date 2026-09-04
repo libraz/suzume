@@ -8,6 +8,7 @@
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
@@ -39,8 +40,7 @@ bool endsWithParticleAfterVerb(const dictionary::DictionaryManager* dict_manager
   }
   for (size_t prefix_len = 1; prefix_len + 2 <= total_len; ++prefix_len) {
     size_t split = start_pos + prefix_len;
-    std::string suffix = extractSubstring(codepoints, split, end_pos);
-    const dictionary::DictionaryEntry* suffix_entry = dict_manager->lookupExact(suffix);
+    const dictionary::DictionaryEntry* suffix_entry = lookupEntryInRange(*dict_manager, codepoints, split, end_pos);
     if (suffix_entry == nullptr || suffix_entry->pos != core::PartOfSpeech::Particle ||
         (suffix_entry->extended_pos != core::ExtendedPOS::ParticleBinding &&
          suffix_entry->extended_pos != core::ExtendedPOS::ParticleAdverbial)) {

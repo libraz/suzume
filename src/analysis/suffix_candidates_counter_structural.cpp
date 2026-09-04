@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include "candidate_constants.h"
+#include "dictionary_probe.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "suffix_candidates.h"
@@ -122,16 +123,14 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
   // without registering any open-class word.
   if (dict_manager != nullptr && char_types[start_pos] == normalize::CharType::Hiragana) {
     const size_t number_probe_end = std::min(codepoints.size(), start_pos + kMaxKanaNounNumberLength);
-    const std::string number_probe = extractSubstring(codepoints, start_pos, number_probe_end);
-    for (const auto& number_result : dict_manager->lookup(number_probe, 0)) {
+    for (const auto& number_result : lookupResultsInRange(*dict_manager, codepoints, start_pos, number_probe_end)) {
       if (number_result.entry == nullptr || number_result.entry->pos != core::PartOfSpeech::Noun ||
           number_result.entry->extended_pos != core::ExtendedPOS::NounNumber) {
         continue;
       }
       const size_t number_end = start_pos + number_result.length;
       const size_t suffix_probe_end = std::min(codepoints.size(), number_end + kMaxKanaCounterSuffixLength);
-      const std::string suffix_probe = extractSubstring(codepoints, number_end, suffix_probe_end);
-      for (const auto& suffix_result : dict_manager->lookup(suffix_probe, 0)) {
+      for (const auto& suffix_result : lookupResultsInRange(*dict_manager, codepoints, number_end, suffix_probe_end)) {
         if (suffix_result.entry == nullptr || suffix_result.entry->pos != core::PartOfSpeech::Suffix) {
           continue;
         }
@@ -206,8 +205,7 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
       const size_t unit_end = numeral_end + 1;
       size_t repeated_end = 0;
       const size_t kana_probe_end = std::min(codepoints.size(), unit_end + kMaxKanaNounNumberLength);
-      const std::string kana_probe = extractSubstring(codepoints, unit_end, kana_probe_end);
-      for (const auto& result : dict_manager->lookup(kana_probe, 0)) {
+      for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, unit_end, kana_probe_end)) {
         if (result.entry == nullptr || result.entry->extended_pos != core::ExtendedPOS::NounNumber ||
             result.length == 0 || codepoints[unit_end + result.length - 1] != U'つ') {
           continue;
@@ -237,10 +235,11 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
   // and standalone repetitions outside this boundary rule.
   const size_t repeated_noun_end = repeatedNumeralNounUnitEndAt(codepoints, char_types, start_pos);
   if (repeated_noun_end != 0) {
-    const std::string following = extractSubstring(codepoints, repeated_noun_end, codepoints.size());
     const bool has_registered_predicate =
         dict_manager != nullptr &&
-        lookupResultsHavePartOfSpeech(dict_manager->lookup(following, 0), partOfSpeechMask(core::PartOfSpeech::Verb));
+        lookupResultsHavePartOfSpeech(
+            lookupResultsInRange(*dict_manager, codepoints, repeated_noun_end, codepoints.size()),
+            partOfSpeechMask(core::PartOfSpeech::Verb));
     if (hasKanjiSuruPredicateAt(codepoints, char_types, repeated_noun_end, 2) || has_registered_predicate) {
       std::string surface = extractSubstring(codepoints, start_pos, repeated_noun_end);
       if (!surface.empty()) {

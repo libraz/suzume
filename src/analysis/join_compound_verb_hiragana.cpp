@@ -131,9 +131,8 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
   if (start_pos + 2 < hiragana_end) {
     const auto* particle =
         lookupEntryInRange(dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle);
-    const std::string whole = extractSubstring(codepoints, start_pos, hiragana_end);
     if (particle != nullptr && particle->extended_pos != core::ExtendedPOS::ParticleFinal &&
-        dict_manager.lookupExact(whole, core::PartOfSpeech::Verb) == nullptr &&
+        lookupEntryInRange(dict_manager, codepoints, start_pos, hiragana_end, core::PartOfSpeech::Verb) == nullptr &&
         lookupEntryInRange(dict_manager, codepoints, start_pos + 1, hiragana_end, core::PartOfSpeech::Verb) !=
             nullptr) {
       return;

@@ -67,7 +67,7 @@ bool hasClauseFinalParticleContinuation(const std::vector<char32_t>& codepoints,
   }
   constexpr size_t kParticleProbe = 3;
   const size_t probe_end = std::min(codepoints.size(), end_pos + kParticleProbe);
-  for (const auto& match : dict_manager->lookup(extractSubstring(codepoints, end_pos, probe_end), 0)) {
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, end_pos, probe_end)) {
     if (match.entry == nullptr || match.entry->extended_pos != core::ExtendedPOS::ParticleFinal) {
       continue;
     }
@@ -190,7 +190,7 @@ bool selectsNominalHost(const dictionary::DictionaryManager* dict_manager, const
   }
   // Read the copula's cells out of its own paradigm instead of listing them.
   const size_t probe_end = std::min(codepoints.size(), pos + 3);
-  for (const auto& result : dict_manager->lookup(extractSubstring(codepoints, pos, probe_end), 0)) {
+  for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
     if (result.entry != nullptr && (result.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
                                     result.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu)) {
       return true;
@@ -211,8 +211,7 @@ bool hasClosedSuffixBoundary(const std::vector<char32_t>& codepoints, size_t sta
   if (dict_manager == nullptr) {
     return false;
   }
-  const std::string whole = extractSubstring(codepoints, start_pos, end_pos);
-  if (dict_manager->lookupExact(whole, core::PartOfSpeech::Noun) != nullptr) {
+  if (lookupEntryInRange(*dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Noun) != nullptr) {
     return false;
   }
   const bool ends_in_verb_continuative =
@@ -259,8 +258,8 @@ bool hasPeriodEndNominalBoundary(const std::vector<char32_t>& codepoints, size_t
   if (candidate_end > codepoints.size()) {
     return false;
   }
-  const std::string whole = extractSubstring(codepoints, start_pos, candidate_end);
-  return dict_manager == nullptr || dict_manager->lookupExact(whole, core::PartOfSpeech::Noun) == nullptr;
+  return dict_manager == nullptr ||
+         lookupEntryInRange(*dict_manager, codepoints, start_pos, candidate_end, core::PartOfSpeech::Noun) == nullptr;
 }
 
 }  // namespace
@@ -310,8 +309,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   bool begins_particle = false;
   if (dict_manager != nullptr) {
     size_t probe_end = std::min(codepoints.size(), kanji_end + static_cast<size_t>(4));
-    std::string particle_probe = extractSubstring(codepoints, kanji_end, probe_end);
-    for (const auto& match : dict_manager->lookup(particle_probe, 0)) {
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end, probe_end)) {
       if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
           normalize::utf8Length(match.entry->surface) > 1) {
         begins_particle = true;
@@ -729,7 +727,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     {
       constexpr size_t kLexicalProbe = 6;
       const size_t probe_end = std::min(codepoints.size(), start_pos + kLexicalProbe);
-      for (const auto& match : dict_manager->lookup(extractSubstring(codepoints, start_pos, probe_end), 0)) {
+      for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, start_pos, probe_end)) {
         if (match.entry != nullptr && normalize::utf8Length(match.entry->surface) > kanji_end + 2 - start_pos) {
           longer_entry_starts_here = true;
           break;
