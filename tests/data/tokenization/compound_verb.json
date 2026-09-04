@@ -605,6 +605,43 @@
       ],
       "id": "ga_waru",
       "input": "仕事が終わる"
+    },
+    {
+      "description": "Compound verb whose second member is an adnominal homograph inside a relative clause",
+      "expected": [
+        {
+          "lemma": "鳥",
+          "pos": "Noun",
+          "surface": "鳥"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "飛び去る",
+          "pos": "Verb",
+          "surface": "飛び去る"
+        },
+        {
+          "lemma": "少年",
+          "pos": "Noun",
+          "surface": "少年"
+        }
+      ],
+      "id": "noyouni_bi_ru",
+      "input": "鳥のように飛び去る少年"
     }
   ],
   "description": "compound_verb tests",

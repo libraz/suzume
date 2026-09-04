@@ -1613,6 +1613,33 @@
       ],
       "id": "niyori",
       "input": "諸事情により中止"
+    },
+    {
+      "description": "Katakana intensifier does not compound with the predicate stem behind it",
+      "expected": [
+        {
+          "lemma": "バリ",
+          "pos": "Noun",
+          "surface": "バリ"
+        },
+        {
+          "lemma": "重要",
+          "pos": "Adjective",
+          "surface": "重要"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "ポイント",
+          "pos": "Noun",
+          "surface": "ポイント"
+        }
+      ],
+      "id": "na_10",
+      "input": "バリ重要なポイント"
     }
   ],
   "description": "Prefixes (お、ご、不、無)",
