@@ -1274,3 +1274,14 @@ class TestInterrogativeQuantityCounter:
         result, rule = apply_suzume_merge(tokens, "何が")
         assert [token["surface"] for token in result] == ["何", "が"]
         assert rule != "number+unit"
+
+
+class TestCompoundVerbPronounHost:
+    def test_refuses_a_pronoun_as_the_first_member(self):
+        tokens = [
+            _tok("それ", pos="名詞", pos_sub1="代名詞", lemma="それ"),
+            _tok("違う", pos="動詞", pos_sub1="自立", lemma="違う"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "それ違う")
+        assert [token["surface"] for token in result] == ["それ", "違う"]
+        assert rule != "compound-verb"

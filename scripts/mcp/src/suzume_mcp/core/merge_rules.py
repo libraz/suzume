@@ -1812,8 +1812,17 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         # merge rule.
         # A dependent noun keeps its own boundary: 〜たきり is the formal noun, not
         # a nominalized 切り, however well it reconstructs as one.
+        # A pronoun keeps its own boundary for the same reason and a stronger
+        # one: it is a closed-class deictic naming no event, so it heads no
+        # compound verb — however well its surface reconstructs as a
+        # continuative (それ off 逸れる, あれ off 荒れる). The reference dictionary
+        # reaches that reading only when the particle after the pronoun is
+        # dropped, which is where the merge produced a headword that is not a
+        # word.
         v1_nominal_renyokei = (
-            t.get("pos") == "名詞" and t.get("pos_sub1") != "非自立" and base_from_renyokei(v1_surface) is not None
+            t.get("pos") == "名詞"
+            and t.get("pos_sub1") not in ("非自立", "代名詞")
+            and base_from_renyokei(v1_surface) is not None
         )
         if not merged and not begins_fixed_subsidiary and (v1_verb_renyokei or v1_nominal_renyokei):
             j = i + 1
