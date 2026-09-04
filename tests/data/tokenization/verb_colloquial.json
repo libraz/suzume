@@ -1,0 +1,43 @@
+{
+  "cases": [
+    {
+      "description": "an adverb after a kanji noun is not the o-row mora of a volitional",
+      "expected": [
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "飯",
+          "pos": "Noun",
+          "surface": "飯"
+        },
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "ちゃう",
+          "pos": "Auxiliary",
+          "surface": "ちゃっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "go_mou_bechi_ttta",
+      "input": "ご飯もう食べちゃった"
+    }
+  ],
+  "description": "verb_colloquial tests",
+  "version": "1.0"
+}

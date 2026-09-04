@@ -474,6 +474,85 @@
       ],
       "id": "woyameyou",
       "input": "仕事をやめよう。"
+    },
+    {
+      "description": "the volitional whose o-row mora is a particle homograph keeps its dictionary verb",
+      "expected": [
+        {
+          "lemma": "みんな",
+          "pos": "Pronoun",
+          "surface": "みんな"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読も"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "minnade_wo_mou",
+      "input": "みんなで本を読もう"
+    },
+    {
+      "description": "the na-row volitional mora is also a particle and stays with its dictionary verb",
+      "expected": [
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "死ぬ",
+          "pos": "Verb",
+          "surface": "死の"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kani_noutoshita",
+      "input": "静かに死のうとした"
     }
   ],
   "description": "verb_volitional tests",
