@@ -29,17 +29,18 @@ TEST(NounNagaraNi, PreservesClosedParticleBoundaries) {
   EXPECT_EQ(result[4].pos, core::PartOfSpeech::Auxiliary);
 }
 
-TEST(NounNagaraNi, KeepsNounParticleBoundaryBeforeNo) {
+// Before の the same sequence is an adnominal search unit rather than a noun
+// plus a conjunctive particle, so it stays whole.
+TEST(NounNagaraNi, KeepsAdnominalSearchUnitBeforeNo) {
   auto analyzer = makeNagaraAnalyzer();
   const auto result = analyzer.analyze("昔ながらの方法");
 
-  ASSERT_EQ(result.size(), 4U);
-  EXPECT_EQ(result[0].surface, "昔");
+  ASSERT_EQ(result.size(), 3U);
+  EXPECT_EQ(result[0].surface, "昔ながら");
   EXPECT_EQ(result[0].pos, core::PartOfSpeech::Noun);
-  EXPECT_EQ(result[1].surface, "ながら");
+  EXPECT_EQ(result[1].surface, "の");
   EXPECT_EQ(result[1].pos, core::PartOfSpeech::Particle);
-  EXPECT_EQ(result[2].surface, "の");
-  EXPECT_EQ(result[3].surface, "方法");
+  EXPECT_EQ(result[2].surface, "方法");
 }
 
 TEST(NounNagaraNi, KeepsVerbRenyokeiConjunctiveParticle) {

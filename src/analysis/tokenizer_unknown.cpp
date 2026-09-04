@@ -420,12 +420,18 @@ bool hasCompleteInternalConstituentBoundary(const core::Lattice& lattice,
       continue;
     }
 
-    // A kanji-bearing prefix is a structurally valid nominal host for a
+    // A prefix that ends in kanji is a structurally valid nominal host for a
     // closed suffix.  This proof must not depend on edge insertion order:
     // same-type noun candidates may be materialized after the inflectional
     // candidate currently being considered.  A registered lexical noun for
     // the whole span is protected by the caller.
-    if (right_is_suffix && grammar::containsKanji(textRange(text, byte_offsets, candidate.start, split))) {
+    // The host has to end at the kanji run: a prefix that merely contains a
+    // kanji ends in the very kana whose analysis is in question (草む of
+    // 草むら, 花び of 花びら), and reading that kana as the tail of a nominal
+    // assumes the split it is supposed to prove.  When such a prefix really is
+    // a nominal, an edge or a candidate says so and the licensing check below
+    // finds it.
+    if (right_is_suffix && grammar::endsWithKanji(textRange(text, byte_offsets, candidate.start, split))) {
       return true;
     }
 
@@ -517,8 +523,9 @@ bool endsWithFinalParticleAfterNominalHead(const dictionary::DictionaryManager& 
 // boundary inside an otherwise plausible unknown verb continuative
 // (涙ながらに, not a deverbal noun 涙ながら + に). Require all three pieces:
 // a noun spanning the candidate's left side, the exact dictionary conjunctive
-// particle, and the following case particle. This leaves lexical search units
-// before の (昔ながらの) and ordinary predicate + ながら constructions alone.
+// particle, and the following case particle. Before の the same sequence is an
+// adnominal search unit (昔ながらの, 生まれながらの) and stays whole, which is
+// why the following particle is part of the test rather than an afterthought.
 bool hasNounNagaraNiBoundary(const core::Lattice& lattice, const dictionary::DictionaryManager& dict_manager,
                              std::string_view text, const std::vector<char32_t>& codepoints,
                              const ByteOffsets& byte_offsets, const std::vector<UnknownCandidate>& batch_candidates,
@@ -537,10 +544,10 @@ bool hasNounNagaraNiBoundary(const core::Lattice& lattice, const dictionary::Dic
 
   const auto* nagara = dict_manager.lookupExact(textRange(text, byte_offsets, nagara_start, candidate.end),
                                                 core::PartOfSpeech::Particle);
-  const auto* ni = dict_manager.lookupExact(textRange(text, byte_offsets, candidate.end, candidate.end + 1),
-                                            core::PartOfSpeech::Particle);
-  if (nagara == nullptr || nagara->extended_pos != core::ExtendedPOS::ParticleConj || ni == nullptr ||
-      ni->extended_pos != core::ExtendedPOS::ParticleCase) {
+  const auto* case_particle = dict_manager.lookupExact(textRange(text, byte_offsets, candidate.end, candidate.end + 1),
+                                                       core::PartOfSpeech::Particle);
+  if (nagara == nullptr || nagara->extended_pos != core::ExtendedPOS::ParticleConj || case_particle == nullptr ||
+      case_particle->extended_pos != core::ExtendedPOS::ParticleCase) {
     return false;
   }
 

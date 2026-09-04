@@ -1177,7 +1177,15 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
   if (!surface.empty()) {
     float cost = looks_like_aux ? 3.5F : 1.0F;
-    const bool nominal_context = !looks_like_aux && hasNominalPhraseSelectorAt(dict_manager, codepoints, hiragana_end);
+    // A clause that ends on the span is the same nominal frame a following case
+    // particle provides: nothing there can be a predicate ending, so whatever
+    // occupies the position is a nominal (草むら。 alongside 草むらに). Without
+    // this the identical compound would be priced as an unverified run purely
+    // because the sentence stopped.
+    const bool ends_clause =
+        hiragana_end >= char_types.size() || char_types[hiragana_end] == normalize::CharType::Symbol;
+    const bool nominal_context =
+        !looks_like_aux && (ends_clause || hasNominalPhraseSelectorAt(dict_manager, codepoints, hiragana_end));
     auto cand = makeCandidate(
         surface, start_pos, hiragana_end, core::PartOfSpeech::Noun, cost, false,
         nominal_context ? CandidateOrigin::KanjiHiraganaNominalCompound : CandidateOrigin::KanjiHiraganaCompound);
