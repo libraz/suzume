@@ -14,6 +14,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
+#include "grammar/honorific_verbs.h"
 #include "grammar/verb_endings.h"
 #include "normalize/char_type.h"
 #include "tokenizer_utils.h"
@@ -173,19 +174,33 @@ HaRowLicense haRowCellLicense(core::ExtendedPOS cell, const std::vector<char32_t
       license.closed_class_tail = ends_predicate && !clauseEndsAt(codepoints, end_pos);
       break;
     }
-    case core::ExtendedPOS::VerbKateikei:
+    case core::ExtendedPOS::VerbKateikei: {
       // 已然形 stands before a concessive or conditional conjunction (思へ+ど,
       // 思へ+ば). The same form ends an imperative clause (書き給へ。), which is
       // the only other environment the row kana reaches without a following
       // closed-class word.
       license.closed_class_tail = dictionaryTailFollowsAt(
           codepoints, end_pos, dict_manager, core::PartOfSpeech::Particle, {core::ExtendedPOS::ParticleConj});
-      if (!license.closed_class_tail && clauseEndsAt(codepoints, end_pos) &&
+      // Without a closed-class word behind it the cell rests on position alone,
+      // and the position it needs — a clause end after a finished predicate — is
+      // also where the direction particle sits (食べて+大阪+へ). The 未然形 branch
+      // above already settles the same homography by naming the verb: the row is
+      // the historical spelling of the modern ワ行五段 one, so the dictionary
+      // carries its headword. Ask for it here too, or every kanji run before a
+      // final へ becomes the imperative of a verb that does not exist.
+      // The classical honorific and copular ハ行四段 verbs have no modern
+      // headword to look up (給ふ, 候ふ); the grammar layer holds that closed
+      // class, and membership names the cell just as well.
+      const std::string ha_row_stem = extractSubstring(codepoints, start_pos, end_pos - 1);
+      const bool names_a_verb = vh::isVerbInDictionary(dict_manager, ha_row_stem + "う") ||
+                                grammar::isHumbleHonorificLemma(ha_row_stem + "ふ");
+      if (!license.closed_class_tail && names_a_verb && clauseEndsAt(codepoints, end_pos) &&
           predicateEndsAt(codepoints, start_pos, dict_manager)) {
         license.licensed = true;
         license.cell = core::ExtendedPOS::VerbMeireikei;
       }
       break;
+    }
     default:
       return license;
   }
