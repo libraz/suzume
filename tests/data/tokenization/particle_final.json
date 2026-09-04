@@ -376,6 +376,72 @@
       ],
       "id": "iikanattte_u",
       "input": "いいかなって思う"
+    },
+    {
+      "description": "A trailing symbol must not make an unanalyzed chunk outscore the particle reading",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "soudane",
+      "input": "そうだね〜"
+    },
+    {
+      "description": "Same clause shape with a past auxiliary before the final particle",
+      "expected": [
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "dekitane",
+      "input": "できたね〜"
+    },
+    {
+      "description": "Negative control: the same clause without a trailing symbol",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "soudane_2",
+      "input": "そうだね"
     }
   ],
   "description": "particle_final tests",
