@@ -651,6 +651,90 @@
       ],
       "id": "no_kewosuru",
       "input": "料理の味付けをする"
+    },
+    {
+      "description": "会議が延長されるとすると終了予定時刻がずれる - auto-generated",
+      "expected": [
+        {
+          "lemma": "会議",
+          "pos": "Noun",
+          "surface": "会議"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "延長",
+          "pos": "Noun",
+          "surface": "延長"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "終了予定時刻",
+          "pos": "Noun",
+          "surface": "終了予定時刻"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ずれる",
+          "pos": "Verb",
+          "surface": "ずれる"
+        }
+      ],
+      "id": "ga_sarerutosuruto_gazureru",
+      "input": "会議が延長されるとすると終了予定時刻がずれる"
+    },
+    {
+      "description": "音がずれる - auto-generated",
+      "expected": [
+        {
+          "lemma": "音",
+          "pos": "Noun",
+          "surface": "音"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ずれる",
+          "pos": "Verb",
+          "surface": "ずれる"
+        }
+      ],
+      "id": "gazureru",
+      "input": "音がずれる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
