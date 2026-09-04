@@ -382,6 +382,65 @@
       ],
       "id": "fubekarikeri_2",
       "input": "言ふべかりけり"
+    },
+    {
+      "description": "A greedy nominal match reopens when the conjunctive particle follows",
+      "expected": [
+        {
+          "lemma": "起きる",
+          "pos": "Verb",
+          "surface": "起きよ"
+        },
+        {
+          "lemma": "夜",
+          "pos": "Noun",
+          "surface": "夜"
+        },
+        {
+          "lemma": "明ける",
+          "pos": "Verb",
+          "surface": "明け"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "役務",
+          "pos": "Noun",
+          "surface": "役務"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待つ"
+        }
+      ],
+      "id": "kiyo_kete_tsu",
+      "input": "起きよ夜明けて役務待つ"
+    },
+    {
+      "description": "Negative control: the same nominal keeps its reading before a case particle",
+      "expected": [
+        {
+          "lemma": "夜明け",
+          "pos": "Noun",
+          "surface": "夜明け"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "近い",
+          "pos": "Adjective",
+          "surface": "近い"
+        }
+      ],
+      "id": "kega_i",
+      "input": "夜明けが近い"
     }
   ],
   "description": "literary_classic tests (part 2/2)",
