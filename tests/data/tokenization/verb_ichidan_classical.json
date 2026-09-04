@@ -85,6 +85,161 @@
       ],
       "id": "enu_2",
       "input": "予算増えぬ"
+    },
+    {
+      "description": "美しき庭園にて月を愛でぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "美しい",
+          "pos": "Adjective",
+          "surface": "美しき"
+        },
+        {
+          "lemma": "庭園",
+          "pos": "Noun",
+          "surface": "庭園"
+        },
+        {
+          "lemma": "にて",
+          "pos": "Particle",
+          "surface": "にて"
+        },
+        {
+          "lemma": "月",
+          "pos": "Noun",
+          "surface": "月"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "愛でる",
+          "pos": "Verb",
+          "surface": "愛で"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "de_okurigana_medenu",
+      "input": "美しき庭園にて月を愛でぬ"
+    },
+    {
+      "description": "花を愛でる - auto-generated",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "愛でる",
+          "pos": "Verb",
+          "surface": "愛でる"
+        }
+      ],
+      "id": "de_okurigana_mederu",
+      "input": "花を愛でる"
+    },
+    {
+      "description": "曲を奏でている - auto-generated",
+      "expected": [
+        {
+          "lemma": "曲",
+          "pos": "Noun",
+          "surface": "曲"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "奏でる",
+          "pos": "Verb",
+          "surface": "奏で"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "de_okurigana_kanadeteiru",
+      "input": "曲を奏でている"
+    },
+    {
+      "description": "彼は語学に秀でる - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "語学",
+          "pos": "Noun",
+          "surface": "語学"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "秀でる",
+          "pos": "Verb",
+          "surface": "秀でる"
+        }
+      ],
+      "id": "de_okurigana_hideru",
+      "input": "彼は語学に秀でる"
+    },
+    {
+      "description": "月を愛でます - auto-generated",
+      "expected": [
+        {
+          "lemma": "月",
+          "pos": "Noun",
+          "surface": "月"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "愛でる",
+          "pos": "Verb",
+          "surface": "愛で"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "de_okurigana_medemasu",
+      "input": "月を愛でます"
     }
   ],
   "description": "verb_ichidan_classical tests",
