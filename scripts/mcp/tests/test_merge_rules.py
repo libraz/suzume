@@ -1203,3 +1203,21 @@ class TestNominalCopulaNaru:
         result, rule = apply_suzume_merge(tokens, "異なら")
         assert [token["surface"] for token in result] == ["異なら"]
         assert rule != "nominal-copula-naru"
+
+
+class TestClassicalAdjectiveKariProbe:
+    def test_resolves_a_stem_whose_irrealis_collides_with_a_case_particle(self):
+        from suzume_mcp.core.merge_postprocessors import classical_adjective_lemma
+
+        assert classical_adjective_lemma("赤から") == "赤い"
+
+    def test_still_resolves_the_stems_the_first_cell_covers(self):
+        from suzume_mcp.core.merge_postprocessors import classical_adjective_lemma
+
+        assert classical_adjective_lemma("青から") == "青い"
+        assert classical_adjective_lemma("遅から") == "遅い"
+
+    def test_keeps_the_auxiliary_only_the_first_cell_resolves(self):
+        from suzume_mcp.core.merge_postprocessors import _kari_cell_analysis
+
+        assert _kari_cell_analysis("べかり") == ("助動詞", "べし")

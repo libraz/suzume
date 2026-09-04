@@ -455,7 +455,28 @@ def _postprocess_adj_bungo(result: list[dict], applied_rule: str | None) -> tupl
 
 _KARI_TAILS = ("かり", "かる", "かれ")
 KARI_MIZENKEI_CELL = "から"
+# The supplementary conjugation offers two cells the reference dictionary
+# carries, and each has a hole the other covers. から collides with the case
+# particle, so a stem that is also a noun loses the adjective reading to
+# 名詞+助詞 (赤から, where 青から and 黒から survive); かろ has no such homograph
+# but is missing for the auxiliaries that inflect the same way (べかろ). Probing
+# both is what makes the evidence lexicon-independent.
+_KARI_PROBE_CELLS = (KARI_MIZENKEI_CELL, "かろ")
 _KARI_MAX_TOKEN_RUN = 4
+
+
+def _kari_probe_token(surface: str, cell: str, expected_pos: tuple[str, ...]) -> dict | None:
+    """The single token the reference dictionary reads a probe cell as, if any."""
+    from .mecab import mecab_analyze
+
+    probe = surface[: -len(KARI_MIZENKEI_CELL)] + cell
+    tokens = mecab_analyze(probe)
+    if len(tokens) != 1:
+        return None
+    token = tokens[0]
+    if token.get("pos") not in expected_pos or token.get("surface") != probe:
+        return None
+    return token
 
 
 def classical_adjective_lemma(mizenkei: str) -> str | None:
@@ -466,16 +487,15 @@ def classical_adjective_lemma(mizenkei: str) -> str | None:
     guess whether a し belongs to the stem or to the ending.  Only its own stale
     headwords need correcting on the way out.
     """
-    from .mecab import mecab_analyze
-
-    tokens = mecab_analyze(mizenkei)
-    if len(tokens) != 1:
-        return None
-    token = tokens[0]
-    if token.get("pos") != "形容詞" or token.get("surface") != mizenkei:
-        return None
-    lemma = token.get("lemma")
-    return CLASSICAL_ADJECTIVE_LEMMA_OVERRIDES.get(lemma, lemma) or None
+    for cell in _KARI_PROBE_CELLS:
+        token = _kari_probe_token(mizenkei, cell, ("形容詞",))
+        if token is None:
+            continue
+        lemma = token.get("lemma")
+        resolved = CLASSICAL_ADJECTIVE_LEMMA_OVERRIDES.get(lemma, lemma) or None
+        if resolved:
+            return resolved
+    return None
 
 
 _KARI_CELL_POS = ("形容詞", "助動詞")
@@ -488,21 +508,17 @@ def _kari_cell_analysis(surface: str) -> tuple[str, str] | None:
     auxiliary that inflects like one (べし, たい, らしい), and the reference
     dictionary carries the 未然形 cell of both kinds (高から, べから) while losing
     the rest.  That cell is therefore the probe: a surface whose カリ ending can
-    be swapped for から and still analyze as one word is a cell of the same
+    be swapped for one and still analyze as one word is a cell of the same
     paradigm, and the probe settles the word class along with the lemma.
     """
-    from .mecab import mecab_analyze
-
-    mizenkei = surface[: -len(KARI_MIZENKEI_CELL)] + KARI_MIZENKEI_CELL
-    tokens = mecab_analyze(mizenkei)
-    if len(tokens) != 1:
-        return None
-    token = tokens[0]
-    pos = token.get("pos")
-    if pos not in _KARI_CELL_POS or token.get("surface") != mizenkei:
-        return None
-    lemma = CLASSICAL_ADJECTIVE_LEMMA_OVERRIDES.get(token.get("lemma"), token.get("lemma"))
-    return (pos, lemma) if lemma else None
+    for cell in _KARI_PROBE_CELLS:
+        token = _kari_probe_token(surface, cell, _KARI_CELL_POS)
+        if token is None:
+            continue
+        lemma = CLASSICAL_ADJECTIVE_LEMMA_OVERRIDES.get(token.get("lemma"), token.get("lemma"))
+        if lemma:
+            return (token.get("pos"), lemma)
+    return None
 
 
 def _postprocess_adj_kari(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
