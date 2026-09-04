@@ -755,6 +755,20 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 applied_rule = "ra-suffix-split"
             continue
 
+        # 0b. だって after a na-adjective stem is the copula plus the quotative,
+        # not the binding particle. The binding particle attaches to a nominal
+        # that already stands on its own (子供だって分かる); a 形容動詞語幹 needs a
+        # copula before anything can attach to it at all, so reading the whole
+        # thing as one particle deletes the predicate's assertion (無理|だ|って).
+        if surface == "だって" and t.get("pos") == "助詞" and token_index > 0:
+            previous = tokens[token_index - 1]
+            if previous.get("pos") == "名詞" and previous.get("pos_sub1") == "形容動詞語幹":
+                result.append({"surface": "だ", "pos": "助動詞", "lemma": "だ"})
+                result.append({"surface": "って", "pos": "助詞", "lemma": "って"})
+                if applied_rule is None:
+                    applied_rule = "copula-quotative-split"
+                continue
+
         # 1. ったら topic particle
         m = regex.match(r"^(.+)(ったら)$", surface)
         if m and len(m.group(1)) >= 3:
