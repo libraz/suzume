@@ -208,6 +208,22 @@ bool derivesFromCompoundFormingAdjective(const std::vector<char32_t>& codepoints
                                          const dictionary::DictionaryManager* dict_manager);
 
 /**
+ * @brief Whether an analyzed span reaches past the end of the adjective paradigm.
+ *
+ * The engine reconstructs a base form, so what the span holds beyond that base's
+ * stem is supposed to be one inflectional ending. The i-adjective endings are a
+ * closed set, and two shapes are outside it however the analyzer got there. 様態
+ * そう is a separate auxiliary and never an ending (優し|そう|だ), including for a
+ * verb continuative whose hypothesized stem + い is a non-word (書きそう). The
+ * connective て closes a clause and only ever sits at the end of an ending
+ * (寒く|て), so a て with more span behind it means the analysis swallowed a whole
+ * predicate: 悪くなってくる reads as a form of 悪い even though 悪く|なっ|て|くる is
+ * four morphemes. Both leave the boundary to the stem path, which emits the stem
+ * and lets the auxiliary or the particle attach on its own.
+ */
+bool spansPastAdjectiveEnding(const std::string& surface, const std::string& base_form);
+
+/**
  * @brief Append surface-qualified pure-hiragana i-adjective candidates.
  */
 void appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,

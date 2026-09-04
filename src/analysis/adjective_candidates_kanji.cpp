@@ -505,25 +505,9 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
           }
         }
 
-        // 様態 そう span guard: an i-adjective never inflects through そう —
-        // そう is always a separate appearance auxiliary. When the inflection
-        // engine reconstructed the base by reading そう(な/だ/に…) as an
-        // adjective ending (surface = stem + そう…, base = stem + い), the span
-        // over-reaches the stem: the AdjStem generator emits the bare stem
-        // (優し, 高, 大き) and そう attaches as its own token. This also covers
-        // verb renyokei + そう (書きそう, 遅刻しそう), whose hypothesized base
-        // stem + い is a non-word.
-        {
-          std::string_view base_sv(cand.base_form);
-          std::string_view surf_sv(surface);
-          if (utf8::endsWith(base_sv, "い")) {
-            std::string_view stem_sv = base_sv.substr(0, base_sv.size() - core::kJapaneseCharBytes);
-            if (surf_sv.size() > stem_sv.size() && utf8::startsWith(surf_sv, stem_sv) &&
-                utf8::startsWith(surf_sv.substr(stem_sv.size()), scorer::kSuffixSou)) {
-              SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface << "\" spans 様態そう, stem path handles split\n");
-              continue;
-            }
-          }
+        if (adj_detail::spansPastAdjectiveEnding(surface, cand.base_form)) {
+          SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface << "\" spans past the adjective ending\n");
+          continue;
         }
 
         // Lower base cost (0.2F) to beat verb candidates after POS prior adjustment

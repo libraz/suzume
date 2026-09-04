@@ -10,6 +10,7 @@
 
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
+#include "analysis/scorer_constants.h"
 #include "core/utf8_constants.h"
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
@@ -58,6 +59,32 @@ core::ExtendedPOS detectIAdjEpos(const std::string& surface) {
 bool opensAdjectivePastConnective(const std::vector<char32_t>& codepoints, size_t pos) {
   return pos + 1 < codepoints.size() && codepoints[pos] == U'か' && codepoints[pos + 1] == U'っ' &&
          (pos == 0 || codepoints[pos - 1] != U'な');
+}
+
+bool spansPastAdjectiveEnding(const std::string& surface, const std::string& base_form) {
+  if (!utf8::endsWith(base_form, "い")) {
+    return false;
+  }
+  const std::string_view stem = std::string_view(base_form).substr(0, base_form.size() - core::kJapaneseCharBytes);
+  if (surface.size() <= stem.size() || !utf8::startsWith(surface, stem)) {
+    return false;
+  }
+  const std::string_view ending = std::string_view(surface).substr(stem.size());
+  if (utf8::startsWith(ending, scorer::kSuffixSou)) {
+    return true;
+  }
+  // The connective is medial only when the ending continues past it. Both
+  // spellings close a clause, and the voiced one follows the same onbin stems the
+  // analyzer mistakes for a stem (読ん|で|いく).
+  for (const std::string_view connective : {"て", "で"}) {
+    for (size_t pos = ending.find(connective); pos != std::string_view::npos;
+         pos = ending.find(connective, pos + connective.size())) {
+      if (pos + connective.size() < ending.size()) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 bool isCompoundFormingAdjective(const std::string& base_form) {

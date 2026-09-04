@@ -303,21 +303,9 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         if (utf8::endsWith(surface, "げなく") && !isAdjectiveInDictionary(dict_manager, cand.base_form)) {
           continue;
         }
-        // 様態 そう is a separate auxiliary, never an inflectional ending of
-        // an i-adjective. This mirrors the kanji-adjective guard and keeps
-        // derived forms split (ほし + そう + だ, やす + そう + だ).
-        {
-          std::string_view base_sv(cand.base_form);
-          std::string_view surf_sv(surface);
-          if (utf8::endsWith(base_sv, "い")) {
-            std::string_view stem_sv = base_sv.substr(0, base_sv.size() - core::kJapaneseCharBytes);
-            if (surf_sv.size() > stem_sv.size() && utf8::startsWith(surf_sv, stem_sv) &&
-                utf8::startsWith(surf_sv.substr(stem_sv.size()), scorer::kSuffixSou)) {
-              SUZUME_DEBUG_LOG_VERBOSE("[HIRA_ADJ_SKIP] \"" << surface
-                                                            << "\" spans 様態そう, stem path handles split\n");
-              continue;
-            }
-          }
+        if (adj_detail::spansPastAdjectiveEnding(surface, cand.base_form)) {
+          SUZUME_DEBUG_LOG_VERBOSE("[HIRA_ADJ_SKIP] \"" << surface << "\" spans past the adjective ending\n");
+          continue;
         }
         // For particle-starting sequences, require stem length >= 2 characters
         // This prevents に+そうな from being recognized as にい (invalid)
