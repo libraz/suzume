@@ -43,6 +43,60 @@
       ],
       "id": "ureshimigaaru",
       "input": "うれしみがある"
+    },
+    {
+      "description": "Productive nominalizing suffix on an unlisted adjective stem",
+      "expected": [
+        {
+          "lemma": "熱み",
+          "pos": "Noun",
+          "surface": "熱み"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "感じる",
+          "pos": "Verb",
+          "surface": "感じ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "miwo_jimasu",
+      "input": "熱みを感じます"
+    },
+    {
+      "description": "Same suffix on another unlisted stem",
+      "expected": [
+        {
+          "lemma": "酸み",
+          "pos": "Noun",
+          "surface": "酸み"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "強い",
+          "pos": "Adjective",
+          "surface": "強い"
+        },
+        {
+          "lemma": "果物",
+          "pos": "Noun",
+          "surface": "果物"
+        }
+      ],
+      "id": "miga_i",
+      "input": "酸みが強い果物"
     }
   ],
   "description": "noun_derived tests",
