@@ -52,6 +52,26 @@ bool hasInternalPredicateBoundary(const std::vector<char32_t>& codepoints, size_
   return false;
 }
 
+// Whether the okurigana a mixed-script stem absorbs already closes a predicate
+// of its own. The okurigana of a k-row verb belongs to that verb (羽+ばた+く),
+// but the same stem search will just as happily swallow the continuative of an
+// embedded predicate: 登録+し is サ変, so a stem reaching past it reconstructs
+// the non-word 登録しとく out of three morphemes. サ変 is the paradigm that makes
+// this possible — its continuative is one mora and it attaches to any nominal
+// kanji run — so that is where the boundary has to be respected.
+bool absorbsInnerPredicate(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end, size_t stem_end,
+                           const grammar::Inflection& inflection) {
+  for (size_t inner_end = kanji_end + 1; inner_end <= stem_end; ++inner_end) {
+    const std::string inner = extractSubstring(codepoints, start_pos, inner_end);
+    for (const auto& analysis : inflection.analyze(inner)) {
+      if (analysis.verb_type == grammar::VerbType::Suru && analysis.confidence >= candidate::kIAdjConfMin) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 bool hasAttestedDeverbalNominalization(const grammar::InflectionCandidate& candidate,
                                        const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr) {
@@ -297,7 +317,8 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
       // cell (羽ばたい+た/て).
       const bool has_mixed_godan_ka_stem =
           has_conjunctive_initial && stem_end > kanji_end + 1 && best.verb_type == grammar::VerbType::GodanKa;
-      if (has_mixed_godan_ka_stem && (best.suffix == "いた" || best.suffix == "いて")) {
+      if (has_mixed_godan_ka_stem && (best.suffix == "いた" || best.suffix == "いて") &&
+          !absorbsInnerPredicate(codepoints, start_pos, kanji_end, stem_end, inflection)) {
         const size_t onbin_end = end_pos - 1;
         const std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_end);
         auto onbin_candidate =
