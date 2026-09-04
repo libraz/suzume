@@ -388,6 +388,21 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
       continue;
     }
 
+    // Nor may it swallow the 結び a binding particle is waiting for. ぞ and なむ
+    // demand an attributive at the end of their clause, and a classical
+    // auxiliary spells that cell with a bare verbal mora the paradigm tables
+    // read as the dictionary form of a non-word: 月ぞ出で+に+ける is the
+    // perfect's continuative plus けり, not a form of にける. The agreement is
+    // what licenses the split — と+ける decomposes exactly like に+ける, and
+    // 雪がとける keeps the verb because nothing there is demanding a cell.
+    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    if (!is_dictionary_verb && end_pos == codepoints.size() &&
+        vh::governingKakariMusubi(dict_manager, codepoints, start_pos) == vh::KakariMusubi::Rentaikei &&
+        vh::endsWithClassicalAuxiliary(dict_manager, codepoints, start_pos, end_pos)) {
+      SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" swallows the attributive musubi\n");
+      continue;
+    }
+
     // Nor may it open on the tail of a closed-class word that started before it:
     // しょう in 高いでしょうから is the last two morae of the polite copula でしょ
     // plus the volitional う, and the tables read that as the dictionary form of

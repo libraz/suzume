@@ -443,6 +443,67 @@ bool spellsClassicalAuxiliaryEnding(const dictionary::DictionaryManager* dict_ma
   return ending != nullptr && core::isClassicalAuxiliaryType(ending->extended_pos);
 }
 
+KakariMusubi governingKakariMusubi(const dictionary::DictionaryManager* dict_manager,
+                                   const std::vector<char32_t>& codepoints, size_t clause_pos) {
+  struct KakariParticle {
+    char32_t head;
+    char32_t tail;  // U'\0' for a one-mora particle.
+    KakariMusubi musubi;
+  };
+  static constexpr std::array<KakariParticle, 3> kKakariParticles = {{
+      {U'\u3053', U'\u305d', KakariMusubi::Izenkei},    // こそ
+      {U'\u305e', U'\0', KakariMusubi::Rentaikei},      // ぞ
+      {U'\u306a', U'\u3080', KakariMusubi::Rentaikei},  // なむ
+  }};
+  // A 結び sits in the same clause as its particle, and a clause is short. The
+  // window keeps the scan constant-time per candidate, which matters because
+  // every candidate generator asks this question.
+  constexpr size_t kMaxClauseChars = 24;
+  if (dict_manager == nullptr) {
+    return KakariMusubi::None;
+  }
+  const size_t scan_end = std::min(clause_pos, codepoints.size());
+  const size_t scan_start = scan_end > kMaxClauseChars ? scan_end - kMaxClauseChars : 0;
+  for (size_t end = scan_end; end > scan_start; --end) {
+    if (normalize::classifyChar(codepoints[end - 1]) == normalize::CharType::Symbol) {
+      return KakariMusubi::None;
+    }
+    for (const auto& particle : kKakariParticles) {
+      const size_t length = particle.tail == U'\0' ? 1 : 2;
+      if (end < length + scan_start && end < length) {
+        continue;
+      }
+      if (end < length || codepoints[end - 1] != (particle.tail == U'\0' ? particle.head : particle.tail)) {
+        continue;
+      }
+      if (particle.tail != U'\0' && codepoints[end - 2] != particle.head) {
+        continue;
+      }
+      // The morae have to be the particle itself rather than the tail of a word
+      // that happens to spell it (かぞえる ends its second mora in ぞ).
+      if (lookupEntryInRange(*dict_manager, codepoints, end - length, end, core::PartOfSpeech::Particle) != nullptr) {
+        return particle.musubi;
+      }
+    }
+  }
+  return KakariMusubi::None;
+}
+
+bool endsWithClassicalAuxiliary(const dictionary::DictionaryManager* dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
+  if (dict_manager == nullptr || end_pos > codepoints.size() || end_pos < start_pos + 2) {
+    return false;
+  }
+  for (size_t auxiliary_start = start_pos + 1; auxiliary_start < end_pos; ++auxiliary_start) {
+    const auto* auxiliary =
+        lookupEntryInRange(*dict_manager, codepoints, auxiliary_start, end_pos, core::PartOfSpeech::Auxiliary);
+    if (auxiliary != nullptr && core::isClassicalAuxiliaryType(auxiliary->extended_pos)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool endsWithAuxiliaryAfterOkurigana(const dictionary::DictionaryManager* dict_manager,
                                      const std::vector<char32_t>& codepoints, size_t okurigana_start, size_t end_pos) {
   // The closed class tops out at four codepoints, and a one-mora tail is also

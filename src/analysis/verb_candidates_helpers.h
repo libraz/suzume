@@ -1058,6 +1058,48 @@ std::string baseFormSuffix(grammar::VerbType verb_type);
 bool isValidIRowIchidanStem(std::string_view stem);
 
 // =============================================================================
+// 係り結び (binding particle and the clause-final cell it selects)
+// =============================================================================
+
+/**
+ * @brief The clause-final cell a binding particle demands of its 結び.
+ */
+enum class KakariMusubi : uint8_t {
+  None,       ///< No governing binding particle, or one that selects no cell.
+  Izenkei,    ///< こそ closes its clause on the 已然形.
+  Rentaikei,  ///< ぞ and なむ close theirs on the 連体形.
+};
+
+/**
+ * @brief Which cell the binding particle governing @p clause_pos demands.
+ *
+ * 係り結び is the one long-distance agreement in the language: the particle sits
+ * arbitrarily far from the form it selects, so a rule about a clause-final cell
+ * cannot read the requirement off the adjacent token. The search therefore runs
+ * leftward from @p clause_pos and stops at a clause boundary, since a particle
+ * in an earlier clause governs nothing here.
+ *
+ * The binding particles do not agree on a cell — こそ takes the 已然形 while ぞ
+ * and なむ take the 連体形, and the modern members (さえ, すら, しか, しも) select
+ * none — so the class alone is not the answer and the individual particle is
+ * resolved here once for every caller.
+ */
+KakariMusubi governingKakariMusubi(const dictionary::DictionaryManager* dict_manager,
+                                   const std::vector<char32_t>& codepoints, size_t clause_pos);
+
+/**
+ * @brief Whether a registered classical auxiliary closes [.., @p end_pos).
+ *
+ * True when a proper suffix of the span is a dictionary auxiliary of one of the
+ * classical types, so at least one mora of the span precedes it. Unlike
+ * endsWithAuxiliaryAfterOkurigana this admits a one-mora head, because the head
+ * being a whole word rather than okurigana is exactly the case it is asked
+ * about: に+ける is the perfect's continuative plus けり, not a cell of にける.
+ */
+bool endsWithClassicalAuxiliary(const dictionary::DictionaryManager* dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
+
+// =============================================================================
 // Character Region Detection
 // =============================================================================
 

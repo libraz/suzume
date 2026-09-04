@@ -62,29 +62,6 @@ bool hasAttestedInternalGodanConditional(const std::vector<char32_t>& codepoints
                                          const dictionary::DictionaryManager* dict_manager);
 
 /**
- * @brief Whether the binding particle that selects the 已然形 opens this clause.
- *
- * Of the binding particles only こそ takes the 已然形 as its 結び; ぞ and なむ
- * take the attributive, and the modern members select no cell at all. The
- * particle is therefore identified individually rather than by its class, and
- * the search stops at a clause boundary so a こそ from an earlier clause cannot
- * license a cell it does not govern.
- */
-bool bindingParticleKosoPrecedes(const std::vector<char32_t>& codepoints, size_t start_pos) {
-  constexpr size_t kKosoLength = 2;
-  for (size_t pos = start_pos; pos > 0; --pos) {
-    const char32_t codepoint = codepoints[pos - 1];
-    if (normalize::classifyChar(codepoint) == normalize::CharType::Symbol) {
-      return false;
-    }
-    if (pos >= kKosoLength && codepoints[pos - kKosoLength] == U'こ' && codepoint == U'そ') {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
  * @brief Emit the godan 已然形/仮定形 cell ending just before @p cell_end.
  *
  * The row a bare e-row mora belongs to is not recoverable from it: analyzing
@@ -281,8 +258,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // like the conditional's own cell, so the same row identification applies —
   // only the licensing context differs, because a bare e-row mora at the end of
   // a run is far more often a te-form or a continuative (出して, 食べて) than an
-  // izenkei. こそ is what rules those out: it is the one binding particle whose
-  // 結び is this cell, and the ぞ/なむ pair takes the attributive instead.
+  // izenkei. The governing binding particle is what rules those out.
   //
   // The cell is emitted as VerbKateikei rather than under an ExtendedPOS of its
   // own: the godan 已然形 and 仮定形 are one cell of one paradigm, and every
@@ -290,7 +266,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   if (hiragana_end > kanji_end && grammar::isERowCodepoint(codepoints[hiragana_end - 1]) &&
       (hiragana_end == codepoints.size() ||
        normalize::classifyChar(codepoints[hiragana_end]) == normalize::CharType::Symbol) &&
-      bindingParticleKosoPrecedes(codepoints, start_pos)) {
+      vh::governingKakariMusubi(dict_manager, codepoints, start_pos) == vh::KakariMusubi::Izenkei) {
     appendGodanIzenkeiCandidate(codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager, candidates);
   }
 

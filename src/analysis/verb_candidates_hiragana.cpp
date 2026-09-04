@@ -910,6 +910,18 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   if (vh::crossesCaseParticleBeforePredicate(dict_manager, codepoints, start_pos, godan_ra_continuation_stem_end)) {
     godan_ra_continuation_stem_end = 0;
   }
+  // Crossing the particle must not also swallow the 結び a binding particle is
+  // waiting for. ぞ and なむ demand an attributive at the end of their clause,
+  // and a classical auxiliary spells that cell with a bare verbal mora the
+  // paradigm tables read as the dictionary form of a non-word: 月ぞ出で+に+ける
+  // is the perfect's continuative plus けり, not a form of にける. The agreement
+  // is what licenses the split, so an ordinary verb of the same shape keeps its
+  // span wherever no binding particle is demanding anything (雪がとける).
+  if (godan_ra_continuation_stem_end == codepoints.size() &&
+      vh::governingKakariMusubi(dict_manager, codepoints, start_pos) == vh::KakariMusubi::Rentaikei &&
+      vh::endsWithClassicalAuxiliary(dict_manager, codepoints, start_pos, godan_ra_continuation_stem_end)) {
+    godan_ra_continuation_stem_end = 0;
+  }
   if (godan_ra_continuation_stem_end != 0) {
     const auto* row = grammar::Conjugation::getGodanRow(grammar::VerbType::GodanRa);
     const std::string surface = extractSubstring(codepoints, start_pos, godan_ra_continuation_stem_end);
