@@ -1095,6 +1095,13 @@ def _postprocess_classical_ki(result: list[dict], applied_rule: str | None) -> t
             continue
         host = (normalized[-1].get("surface", "") if normalized else "") + carried
         recovered = _continuative_verb_tokens(host) if host else None
+        # A mora carried out of the nominal is the continuative's ending, so the
+        # verb it belongs to has to reach back past it into the token in front.
+        # One built entirely from the carried material is not a verb the nominal
+        # was hiding — it is a new one, and the boundary that was already there
+        # stands (ほんと|すき, where the probe is happy to read す as する).
+        if recovered is not None and carried and len(recovered[-1].get("surface", "")) <= len(carried):
+            recovered = None
         if recovered is None:
             normalized.append(token)
             index += 1

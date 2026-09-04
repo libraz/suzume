@@ -1243,3 +1243,14 @@ class TestNominalBeforeConjunctiveTe:
         result, rule = apply_suzume_merge(tokens, "夜明けが")
         assert [token["surface"] for token in result] == ["夜明け", "が"]
         assert rule != "nominal-before-conjunctive-te"
+
+
+class TestClassicalPastKiBoundary:
+    def test_leaves_a_nominal_whose_verb_would_be_only_the_carried_mora(self):
+        tokens = [
+            _tok("ほんと", pos="感動詞", lemma="ほんと"),
+            _tok("すき", pos="名詞", lemma="すき"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "ほんとすき")
+        assert [token["surface"] for token in result] == ["ほんと", "すき"]
+        assert rule != "classical-past-ki"
