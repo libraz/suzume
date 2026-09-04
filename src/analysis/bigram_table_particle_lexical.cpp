@@ -360,6 +360,13 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // VerbShuushikei → AuxDesireTai (食べる+たい) - prohibitive
       {EPOS::VerbShuushikei, EPOS::AuxDesireTai, cost::kAlmostNever},
 
+      // The desiderative selects a verb continuative — a nominal has no event
+      // for it to want. Only a deverbal noun ever reaches the position, because
+      // it spells that continuative, and there the verb reading is the one the
+      // auxiliary asked for (楽しみ+たい). Sino-verbal nouns are no exception:
+      // する supplies the continuative (勉強+し+たい), so no noun is adjacent.
+      {EPOS::NounVerbal, EPOS::AuxDesireTai, cost::kRare},
+
       // VerbShuushikei → AuxTenseTa (食べる+た) - prohibitive
       {EPOS::VerbShuushikei, EPOS::AuxTenseTa, cost::kAlmostNever},
 
@@ -664,6 +671,15 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
 
       // AdjStem → AuxConjectureMitai: unnatural (美し+みたい should be 美しい+みたい)
       {EPOS::AdjStem, EPOS::AuxConjectureMitai, cost::kAlmostNever},
+
+      // VerbRenyokei → AuxConjectureMitai: the same nonterminal problem on the
+      // verb side. The similative compares against a complete thing — a
+      // nominal, a terminal, an adjective — and a bare continuative is none of
+      // them (食べ+みたい should be 食べる+みたい). Where it looks like one, the
+      // み is the continuative's own final mora and the auxiliary is たい
+      // (楽し+みたい against 楽しみ+たい). The te-form route to the aspectual
+      // みる is a different pair and keeps its own rule.
+      {EPOS::VerbRenyokei, EPOS::AuxConjectureMitai, cost::kAlmostNever},
 
       // AdjStem → AuxConjectureRashii: unnatural (美し+らしい should be 美しい+らしい)
       {EPOS::AdjStem, EPOS::AuxConjectureRashii, cost::kAlmostNever},

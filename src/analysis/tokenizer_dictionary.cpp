@@ -962,6 +962,52 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
   return state;
 }
 
+// Whether a surface spells the continuative of a registered verb.
+bool namesVerbContinuative(const dictionary::DictionaryManager& dict_manager, std::string_view surface) {
+  const char32_t tail = utf8::decodeLastChar(surface);
+  const std::string_view stem = utf8::dropLastChar(surface);
+  if (stem.empty()) {
+    return false;
+  }
+  const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(tail);
+  if (!godan_ending.empty() && verb_helpers::isVerbInDictionary(&dict_manager, normalize::concat(stem, godan_ending))) {
+    return true;
+  }
+  return grammar::isERowCodepoint(tail) &&
+         verb_helpers::isVerbInDictionary(&dict_manager, normalize::concat(surface, "る"));
+}
+
+// Whether a surface carries lexical content on its own, either as a listed
+// entry or as the continuative of a listed verb.
+bool namesContentUnit(const dictionary::DictionaryManager& dict_manager, std::string_view surface) {
+  return dict_manager.lookupExact(std::string(surface)) != nullptr || namesVerbContinuative(dict_manager, surface);
+}
+
+// A listed noun that spells the continuative of a listed verb and divides no
+// further is a simplex deverbal noun: its only competitor is that verb reading
+// over the very same span (楽しみ from 楽しむ). Saying so on the edge lets the
+// word scorer keep the length evidence it uses against a path that fragments a
+// span from also deciding a question it has none about, namely which of two
+// same-span readings is right. A deverbal noun that does divide (折れ+曲がり,
+// 間違い as 間+違い, 取り+込み) has a fragmenting competitor after all, so it is
+// left as an ordinary noun and keeps that evidence.
+bool namesSimplexDeverbalNoun(const dictionary::DictionaryManager& dict_manager,
+                              const dictionary::DictionaryEntry& entry) {
+  if (entry.pos != core::PartOfSpeech::Noun || entry.extended_pos != core::ExtendedPOS::Noun ||
+      !namesVerbContinuative(dict_manager, entry.surface)) {
+    return false;
+  }
+  const std::vector<char32_t> codepoints = normalize::toCodepoints(entry.surface);
+  for (size_t split = 1; split + 1 <= codepoints.size(); ++split) {
+    const std::string head = extractSubstring(codepoints, 0, split);
+    const std::string tail = extractSubstring(codepoints, split, codepoints.size());
+    if (namesContentUnit(dict_manager, head) && namesContentUnit(dict_manager, tail)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // The longest closed-class entry a drawn-out spelling can hide, in morae. The
 // scan below runs at every position, so the window is bounded rather than open.
 constexpr size_t kElidedLookupWindow = 6;
@@ -2238,9 +2284,12 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
         end_pos < codepoints.size() && !auxiliary_inflects_as_godan &&
         !utf8::equalsAny(extractSubstring(codepoints, end_pos, end_pos + 1), {"た"});
     if (!unlicensed_auxiliary_onbin) {
+      const core::ExtendedPOS entry_epos = namesSimplexDeverbalNoun(dict_manager_, *result.entry)
+                                               ? core::ExtendedPOS::NounVerbal
+                                               : result.entry->extended_pos;
       lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
                       result.entry->pos, cost, flags, lemma, conj_type, core::CandidateOrigin::Dictionary, 1.0F, {},
-                      result.entry->extended_pos, "dict");
+                      entry_epos, "dict");
     }
 
     // Extend predicates and adverbs with colloquial emphasis

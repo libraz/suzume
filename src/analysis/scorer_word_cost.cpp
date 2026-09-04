@@ -291,7 +291,16 @@ float computeNounSuffixVerbDictBonus(const core::LatticeEdge& edge) {
   // These are idiomatic expressions that should not be split
   // E.g., なし崩し should not be split as な+し+崩し (AUX+PARTICLE+NOUN)
   // Requires 3+ chars with both hiragana and kanji
-  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Noun) {
+  // A simplex deverbal noun is excluded: length is evidence against a path that
+  // fragments the span, and this one has no such competitor — the reading it
+  // loses to is its own verb reading over the very same span. Paying the bonus
+  // there settles that question on lexical accident: 楽しみ+たい goes nominal
+  // because the noun is listed, while 読み+たい and 休み+たい, which are not,
+  // read as the continuative the desiderative asked for. A deverbal noun whose
+  // span does divide keeps the bonus and is not marked NounVerbal here.
+  const bool is_simplex_deverbal_noun =
+      edge.extended_pos == core::ExtendedPOS::NounVerbal && edge.origin == core::CandidateOrigin::Dictionary;
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Noun && !is_simplex_deverbal_noun) {
     size_t char_len = suzume::normalize::utf8Length(edge.surface);
     if (char_len >= 3 && grammar::isMixedHiraganaKanji(edge.surface)) {
       if (char_len >= 4) {
