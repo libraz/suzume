@@ -1537,6 +1537,82 @@
       ],
       "id": "na_5",
       "input": "超重要な課題"
+    },
+    {
+      "description": "Intensifying prefix is not absorbed by the noun in front of it",
+      "expected": [
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "超",
+          "pos": "Noun",
+          "surface": "超"
+        },
+        {
+          "lemma": "忙しい",
+          "pos": "Adjective",
+          "surface": "忙しい"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "shiinda",
+      "input": "仕事超忙しいんだ"
+    },
+    {
+      "description": "Intensifying prefix between a kanji noun and an adjective",
+      "expected": [
+        {
+          "lemma": "会議",
+          "pos": "Noun",
+          "surface": "会議"
+        },
+        {
+          "lemma": "超",
+          "pos": "Noun",
+          "surface": "超"
+        },
+        {
+          "lemma": "長い",
+          "pos": "Adjective",
+          "surface": "長い"
+        }
+      ],
+      "id": "i_5",
+      "input": "会議超長い"
+    },
+    {
+      "description": "Left-branching prefix keeps heading its own compound",
+      "expected": [
+        {
+          "lemma": "諸事情",
+          "pos": "Noun",
+          "surface": "諸事情"
+        },
+        {
+          "lemma": "により",
+          "pos": "Particle",
+          "surface": "により"
+        },
+        {
+          "lemma": "中止",
+          "pos": "Noun",
+          "surface": "中止"
+        }
+      ],
+      "id": "niyori",
+      "input": "諸事情により中止"
     }
   ],
   "description": "Prefixes (お、ご、不、無)",

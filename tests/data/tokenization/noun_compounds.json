@@ -664,6 +664,129 @@
       ],
       "id": "rashiwo_keru",
       "input": "都会暮らしを続ける。"
+    },
+    {
+      "description": "Listed modifier is not merged into a following sahen nominal",
+      "expected": [
+        {
+          "lemma": "上司",
+          "pos": "Noun",
+          "surface": "上司"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "直接",
+          "pos": "Noun",
+          "surface": "直接"
+        },
+        {
+          "lemma": "確認",
+          "pos": "Noun",
+          "surface": "確認"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られる"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_saserarerukotoninattta",
+      "input": "上司に直接確認させられることになった"
+    },
+    {
+      "description": "Listed modifier before a sahen nominal with the plain light verb",
+      "expected": [
+        {
+          "lemma": "直接",
+          "pos": "Noun",
+          "surface": "直接"
+        },
+        {
+          "lemma": "電話",
+          "pos": "Noun",
+          "surface": "電話"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "suru_21",
+      "input": "直接電話する"
+    },
+    {
+      "description": "Unlisted modifier head stays inside the sahen compound",
+      "expected": [
+        {
+          "lemma": "早期発見",
+          "pos": "Noun",
+          "surface": "早期発見"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "suru_22",
+      "input": "早期発見する"
+    },
+    {
+      "description": "Listed noun keeps its derivational suffix",
+      "expected": [
+        {
+          "lemma": "直接的",
+          "pos": "Adjective",
+          "surface": "直接的"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "影響",
+          "pos": "Noun",
+          "surface": "影響"
+        }
+      ],
+      "id": "na_9",
+      "input": "直接的な影響"
     }
   ],
   "description": "noun_compounds tests",
