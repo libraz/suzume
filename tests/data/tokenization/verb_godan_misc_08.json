@@ -31,6 +31,80 @@
       ],
       "id": "ndauede_mu",
       "input": "読んだうえで進む"
+    },
+    {
+      "description": "lexicalized locative noun homographic with a volitional cell",
+      "expected": [
+        {
+          "lemma": "谷",
+          "pos": "Noun",
+          "surface": "谷"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "向こう",
+          "pos": "Noun",
+          "surface": "向こう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "立つ",
+          "pos": "Verb",
+          "surface": "立つ"
+        }
+      ],
+      "id": "no_kouni_tsu",
+      "input": "谷の向こうに立つ"
+    },
+    {
+      "description": "negative control: the same surface as the volitional keeps its inflectional boundary",
+      "expected": [
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "向く",
+          "pos": "Verb",
+          "surface": "向こ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_koutoshita",
+      "input": "顔を向こうとした"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
