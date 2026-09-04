@@ -396,9 +396,13 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
   // with no case particle, which is not a clause. The continuative cell is
   // homographic with the deverbal nominal (味付け、値付け), and there the
   // nominal candidate wins on category cost rather than needing a gate.
+  // Both halves attach to the same nominal bases, so they share one admission
+  // test: the kanji run ends in the suffix character and leaves a non-empty
+  // base in front of it.
   const size_t tsukeru_base_end = base_end > start_pos ? base_end - 1 : start_pos;
-  if (!numeral_led_base && base_end > start_pos && codepoints[tsukeru_base_end] == U'付' &&
-      tsukeru_base_end - start_pos >= 1) {
+  const bool has_kanji_tsuku_base =
+      !numeral_led_base && tsukeru_base_end > start_pos && codepoints[tsukeru_base_end] == U'付';
+  if (has_kanji_tsuku_base) {
     static constexpr ProductiveSuffixVerb kTsukeru = {
         kIchidanTsukeruForms.data(),          kIchidanTsukeruForms.size(), "付ける",
         dictionary::ConjugationType::Ichidan, "nominal_ichidan_suffix",    kGateNone};
@@ -408,12 +412,10 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
   }
 
   // 付く is the Godan half of the same pair, and the kanji spelling loses the
-  // sequential voicing that makes づく self-evidently compound-internal. The
-  // base is not length-restricted here because the competing reading — a bare
-  // nominal followed by a finite verb with no case particle — is not a clause,
-  // so the compound is the only grammatical parse (根付く, 色付く, 傷付く).
-  // That argument does not cover the continuative: 〜付き is also a nominal
-  // suffix over the same bases (目付き, 条件付き), so it needs a verb-only host.
+  // sequential voicing that makes づく self-evidently compound-internal
+  // (根付く, 色付く, 傷付く). The non-clause argument above does not cover the
+  // continuative: 〜付き is also a nominal suffix over the same bases (目付き,
+  // 条件付き), so that cell needs a verb-only host.
   static constexpr std::array<SuffixVerbForm, 6> kGodanTsukuForms = {{
       {"付く", core::ExtendedPOS::VerbShuushikei},
       {"付か", core::ExtendedPOS::VerbMizenkei},
@@ -422,8 +424,7 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
       {"付け", core::ExtendedPOS::VerbKateikei},
       {"付こ", core::ExtendedPOS::VerbMizenkei},
   }};
-  if (!numeral_led_base && base_end > start_pos && codepoints[tsukeru_base_end] == U'付' &&
-      tsukeru_base_end > start_pos) {
+  if (has_kanji_tsuku_base) {
     static constexpr ProductiveSuffixVerb kTsuku = {kGodanTsukuForms.data(),
                                                     kGodanTsukuForms.size(),
                                                     "付く",
