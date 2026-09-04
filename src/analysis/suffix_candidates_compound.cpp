@@ -883,6 +883,26 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
     return;
   }
 
+  // A single さ after a kanji nominal has no reading of its own here. The
+  // nominalizer derives a noun from an adjective stem and cannot take a plain
+  // nominal host; the final particle さ only occurs clause-finally. When a
+  // nominal-selecting particle follows, both are excluded by elimination and
+  // the mixed-script span is one lexical compound (逆さに映る, but 今さ、…
+  // keeps the final particle and 高さ keeps the nominalizer).
+  if (hiragana_len == 1 && first_hira == U'さ' &&
+      !isAdjectiveNominalizationSa(dict_manager, codepoints, start_pos, hiragana_end) &&
+      hasNominalPhraseSelectorAt(dict_manager, codepoints, hiragana_end)) {
+    auto cand = makeCandidate(extractSubstring(codepoints, start_pos, hiragana_end), start_pos, hiragana_end,
+                              core::PartOfSpeech::Noun, candidate::kInfixCompoundNounCost, false,
+                              CandidateOrigin::KanjiHiraganaNominalCompound);
+#ifdef SUZUME_DEBUG_INFO
+    cand.confidence = candidate::kHighOriginConfidence;
+    cand.pattern = "kanji_nominalizer_sa_compound";
+#endif
+    candidates.push_back(cand);
+    return;
+  }
+
   if (hiragana_len < 2) {
     return;
   }
