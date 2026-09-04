@@ -1,0 +1,60 @@
+{
+  "cases": [
+    {
+      "description": "Presumptive chain at a clause opening keeps its inflection boundary",
+      "expected": [
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "darounine",
+      "input": "だろうにね"
+    },
+    {
+      "description": "Polite presumptive chain at a clause opening",
+      "expected": [
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "deshi_unine",
+      "input": "でしょうにね"
+    }
+  ],
+  "description": "auxiliary_volitional tests",
+  "version": "1.0"
+}
