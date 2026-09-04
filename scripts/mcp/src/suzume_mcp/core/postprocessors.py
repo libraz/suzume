@@ -3064,7 +3064,9 @@ def postprocess_nara_verb(tokens: list[dict]) -> bool:
             t["pos"] = "Particle"
             t["lemma"] = "なら"
             continue
-        if nxt_surface in ("ない", "なく", "なかっ", "ぬ"):
+        # ず is the terminal cell of the same negative auxiliary as ぬ, so the
+        # なら in front of it is the same irrealis (ほかならず beside ほかならぬ).
+        if nxt_surface in ("ない", "なく", "なかっ", "ぬ", "ず"):
             t["pos"] = "Verb"
             t["lemma"] = "なる"
 

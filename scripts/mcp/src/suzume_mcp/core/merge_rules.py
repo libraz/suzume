@@ -56,6 +56,7 @@ from .merge_postprocessors import (
     _postprocess_nickname_merge,
     _postprocess_nidan_cell,
     _postprocess_nominal_classical_copula,
+    _postprocess_nominal_copula_naru,
     _postprocess_nominal_zukeru,
     _postprocess_noni,
     _postprocess_onomatopoeia_tto_merge,
@@ -2053,6 +2054,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     result, applied_rule = _postprocess_classical_shimu(result, applied_rule)
     result, applied_rule = _postprocess_classical_kemu(result, applied_rule)
     result, applied_rule = _postprocess_classical_ki(result, applied_rule)
+    result, applied_rule = _postprocess_nominal_copula_naru(result, applied_rule)
     result, applied_rule = _postprocess_izenkei_concessive(result, applied_rule)
     result, applied_rule = _postprocess_tomo_particle(result, applied_rule)
     result, applied_rule = _postprocess_bound_voiced_suffix(result, applied_rule)

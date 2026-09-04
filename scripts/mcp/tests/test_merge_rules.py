@@ -1187,3 +1187,19 @@ class TestClassicalPastKi:
         result, rule = apply_suzume_merge(tokens, "大好き")
         assert [token["surface"] for token in result] == ["大好き"]
         assert rule != "classical-past-ki"
+
+
+class TestNominalCopulaNaru:
+    def test_splits_a_nominal_off_a_fused_ra_row_copula(self):
+        tokens = [_tok("ほかなら", pos="動詞", lemma="ほかなる")]
+        result, rule = apply_suzume_merge(tokens, "ほかなら")
+        assert [token["surface"] for token in result] == ["ほか", "なら"]
+        assert result[0]["pos"] == "名詞"
+        assert result[1]["pos"] == "助動詞"
+        assert rule == "nominal-copula-naru"
+
+    def test_leaves_a_listed_ra_row_verb_whole(self):
+        tokens = [_tok("異なら", pos="動詞", lemma="異なる")]
+        result, rule = apply_suzume_merge(tokens, "異なら")
+        assert [token["surface"] for token in result] == ["異なら"]
+        assert rule != "nominal-copula-naru"

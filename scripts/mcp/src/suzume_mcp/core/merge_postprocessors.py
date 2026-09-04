@@ -948,6 +948,55 @@ def _postprocess_classical_kemu(result: list[dict], applied_rule: str | None) ->
     return normalized, applied_rule
 
 
+_CLASSICAL_COPULA_BASE = "なる"
+_CLASSICAL_COPULA_LEMMA = "なり"
+
+
+def _postprocess_nominal_copula_naru(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Split a nominal off the ra-row copula the reference dictionary fused it to.
+
+    The classical copula inflects like the ra-row godan verb なる, and the
+    reference dictionary reads it as that lexical verb — fusing the nominal in
+    front of it into one token whenever the pair is not a headword, and giving
+    it a lemma that is not a word (ほかなる). Whether that happens is lexical
+    accident: the same construction stays apart in kanji (外+なら) and before a
+    different auxiliary (ほか+なり+ませ+ん).
+
+    The lemma is what settles it. A real ra-row verb is a headword and comes
+    back from the dictionary as one token (異なる, 重なる, 連なる); a fused one
+    comes back as its parts, and that split is where the surface divides too.
+    """
+    from .mecab import mecab_analyze
+
+    normalized: list[dict] = []
+    for token in result:
+        lemma = token.get("lemma") or ""
+        surface = token.get("surface", "")
+        if token.get("pos") != "動詞" or lemma == _CLASSICAL_COPULA_BASE or not lemma.endswith(_CLASSICAL_COPULA_BASE):
+            normalized.append(token)
+            continue
+        probe = mecab_analyze(lemma)
+        head = probe[0].get("surface", "") if probe else ""
+        if len(probe) < 2 or probe[0].get("pos") != "名詞" or not head or not surface.startswith(head):
+            normalized.append(token)
+            continue
+        normalized.append(_plain(probe[0]))
+        # Freed from the nominal, the cell is what it always was: the classical
+        # copula after a bare nominal host, tagged exactly as the sibling rule
+        # tags it when the dictionary managed to keep the two apart.
+        normalized.append(
+            {
+                "surface": surface[len(head) :],
+                "pos": "助動詞",
+                "conj_type": "文語・ナリ",
+                "lemma": _CLASSICAL_COPULA_LEMMA,
+            },
+        )
+        if applied_rule is None:
+            applied_rule = "nominal-copula-naru"
+    return normalized, applied_rule
+
+
 _PAST_KI = "き"
 
 
