@@ -735,6 +735,70 @@
       ],
       "id": "gazureru",
       "input": "音がずれる"
+    },
+    {
+      "description": "a hiragana verb whose run is spelled by registered auxiliaries keeps its terminal cell after a case particle",
+      "expected": [
+        {
+          "lemma": "戸",
+          "pos": "Noun",
+          "surface": "戸"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "たたく",
+          "pos": "Verb",
+          "surface": "たたく"
+        },
+        {
+          "lemma": "音",
+          "pos": "Noun",
+          "surface": "音"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "wotataku_gasuru",
+      "input": "戸をたたく音がする"
+    },
+    {
+      "description": "the same verb in its onbin past cell",
+      "expected": [
+        {
+          "lemma": "尻",
+          "pos": "Noun",
+          "surface": "尻"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "たたく",
+          "pos": "Verb",
+          "surface": "たたい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wotataita",
+      "input": "尻をたたいた。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
