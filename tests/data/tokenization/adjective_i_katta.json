@@ -347,6 +347,38 @@
       ],
       "id": "kattkoyokereba",
       "input": "かっこよければ"
+    },
+    {
+      "description": "nominalizing no before a lexical adverb whose first mora completes a potential-form stem",
+      "expected": [
+        {
+          "lemma": "楽しい",
+          "pos": "Adjective",
+          "surface": "楽しかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "めっちゃ",
+          "pos": "Adverb",
+          "surface": "めっちゃ"
+        },
+        {
+          "lemma": "良い",
+          "pos": "Adjective",
+          "surface": "良い"
+        }
+      ],
+      "id": "shikatttanomettchi_i",
+      "input": "楽しかったのめっちゃ良い"
     }
   ],
   "description": "I-adjectives past forms (過去形) - katta forms, past negative, past with desu",

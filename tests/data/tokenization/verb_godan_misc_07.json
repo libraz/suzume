@@ -2857,6 +2857,70 @@
       ],
       "id": "ni_minijirareta_ga_suru",
       "input": "足に踏みにじられた草花が復活する"
+    },
+    {
+      "description": "same nominalizing no plus adverb boundary with a different host predicate",
+      "expected": [
+        {
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "めっちゃ",
+          "pos": "Adverb",
+          "surface": "めっちゃ"
+        },
+        {
+          "lemma": "美味しい",
+          "pos": "Adjective",
+          "surface": "美味しかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ndanomettchi_shikattta",
+      "input": "飲んだのめっちゃ美味しかった"
+    },
+    {
+      "description": "negative control: the tense onbin cell keeps its dictionary-attested reading",
+      "expected": [
+        {
+          "lemma": "前",
+          "pos": "Noun",
+          "surface": "前"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "のめる",
+          "pos": "Verb",
+          "surface": "のめっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ninomettta",
+      "input": "前にのめった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
