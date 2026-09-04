@@ -35,15 +35,26 @@ namespace suzume::analysis::connection_rules {
 float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   float bonus{};  // value-init to 0
 
-  // The e-row irrealis form of the polite auxiliary selects contracted
-  // negation (ませ+ん). The homographic literary volitional ん requires a
-  // lexical irrealis stem and cannot follow this polite inflectional form.
-  // Gate on the auxiliary type and vowel row so the o-row polite volitional
-  // (ましょ+う) and ordinary lexical volitionals remain available.
-  const bool invalid_polite_hatsuon_volitional = prev.extended_pos == core::ExtendedPOS::AuxTenseMasu &&
-                                                 grammar::endsWithERow(prev.surface) &&
-                                                 next.extended_pos == core::ExtendedPOS::AuxVolitional &&
-                                                 grammar::isSingleHiragana(next.surface, core::hiragana::kN);
+  // A volitional auxiliary is selected by an irrealis, so the vowel row its
+  // host ends on decides whether the host has reached the cell that carries
+  // it. Two spellings are gated, both because the row is the only evidence
+  // available:
+  //   - ん after the polite auxiliary. The e-row cell selects contracted
+  //     negation (ませ+ん), and the homographic literary volitional needs a
+  //     lexical irrealis stem instead; the o-row cell (ましょ+う) is untouched.
+  //   - the one-mora う. Every paradigm spells the irrealis it follows on the
+  //     o-row (書こ+う, だろ+う, でしょ+う, ましょ+う, なかろ+う, たろ+う), so a
+  //     host ending elsewhere has had the う cut out of the word behind it
+  //     (読ん+だ+う+え for 読ん+だ+うえ). The terminal copula shares its
+  //     ExtendedPOS with its own irrealis, which is how the だろ+う bonus
+  //     reached だ+う. The two-mora よう selects the ichidan and sa-hen stems
+  //     and is not gated here.
+  const bool volitional_host_row_mismatch =
+      next.extended_pos == core::ExtendedPOS::AuxVolitional &&
+      ((prev.extended_pos == core::ExtendedPOS::AuxTenseMasu && grammar::endsWithERow(prev.surface) &&
+        grammar::isSingleHiragana(next.surface, core::hiragana::kN)) ||
+       (grammar::isSingleHiragana(next.surface, U'う') &&
+        grammar::getVowelForChar(utf8::decodeLastChar(prev.surface)) != U'お'));
   // The classical/contracted negative ん cannot be followed by the plain
   // copula だ. In an apparent …んだ sequence after a ma/ba/na-row verb, ん is
   // the verb's hatsuonbin and だ is the past auxiliary (膨らん+だ).
@@ -71,7 +82,7 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   const bool exclusive_binding_negative = prev.extended_pos == core::ExtendedPOS::ParticleBinding &&
                                           utf8::equalsAny(prev.surface, {"しか"}) &&
                                           next.extended_pos == core::ExtendedPOS::AuxNegativeNai;
-  if (invalid_polite_hatsuon_volitional)
+  if (volitional_host_row_mismatch)
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   if (contracted_negative_before_copula)
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);

@@ -331,6 +331,15 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // its quotative boundary remains governed by the case-particle path.
       {EPOS::AuxVolitional, EPOS::ParticleConj, cost::kModerateBonus},
 
+      // The volitional is a finite sentence-final form, so a final particle is
+      // its most natural follower of all — the invitation 〜(よ)うか and the
+      // confirmations 〜(よ)うね, 〜(よ)うよ. Its ichidan and sa-hen cells are
+      // homographic with a continuative plus the formal noun よう, and that
+      // reading already carries the same bonus into the final particle, so
+      // without a row here the manner reading took every 〜ようか that had
+      // anything to its left (確認+し+よう+か, 計画+を+立て+よう+か).
+      {EPOS::AuxVolitional, EPOS::ParticleFinal, cost::kVeryStrongBonus},
+
       // AuxAspectOku → AuxVolitional (とい+う) - strong penalty
       // Prevents とい+う from beating という (quotative determiner)
       // とい (contracted ておく form) + う (volitional) is grammatically invalid
