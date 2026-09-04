@@ -393,9 +393,9 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   // Give the registered compound enough weight to beat a competing
   // nominalizer の + で path even when that path is headed by a strongly
   // selected attributive construction (と+いう+ので).
-  const bool finite_predicate_before_node = prev.extended_pos == core::ExtendedPOS::VerbShuushikei ||
-                                            prev.extended_pos == core::ExtendedPOS::AuxExcessive ||
-                                            prev.extended_pos == core::ExtendedPOS::AuxGaru;
+  const bool finite_predicate_before_node =
+      prev.extended_pos == core::ExtendedPOS::VerbShuushikei || core::isAspectAuxiliaryType(prev.extended_pos) ||
+      prev.extended_pos == core::ExtendedPOS::AuxExcessive || prev.extended_pos == core::ExtendedPOS::AuxGaru;
   const bool causal_node_after_predicate = finite_predicate_before_node &&
                                            next.extended_pos == core::ExtendedPOS::ParticleConj &&
                                            utf8::equalsAny(next.surface, {"ので"});

@@ -125,7 +125,18 @@ void setNominalParticleCosts(BigramMatrix& table) {
       // in の, the first mora belongs to that noun (あけぼの+の), not to a
       // duplicated particle chain.
       {EPOS::ParticleNo, EPOS::ParticleNo, cost::kAlmostNever},
+      // Every aspectual auxiliary heads a finite clause, and a formal noun takes
+      // that clause as its adnominal (読んでいる+よう, 暑くなってくる+よう,
+      // 食べてみる+はず). Only the continuative had the row, which left the
+      // others to be re-read as the lexical verb they came from just because the
+      // terminal form carries this bonus and their own category does not.
       {EPOS::AuxAspectIru, EPOS::NounFormal, cost::kVeryStrongBonus},
+      {EPOS::AuxAspectShimau, EPOS::NounFormal, cost::kVeryStrongBonus},
+      {EPOS::AuxAspectOku, EPOS::NounFormal, cost::kVeryStrongBonus},
+      {EPOS::AuxAspectMiru, EPOS::NounFormal, cost::kVeryStrongBonus},
+      {EPOS::AuxAspectIku, EPOS::NounFormal, cost::kVeryStrongBonus},
+      {EPOS::AuxAspectKuru, EPOS::NounFormal, cost::kVeryStrongBonus},
+      {EPOS::AuxAspectHajimeru, EPOS::NounFormal, cost::kVeryStrongBonus},
       {EPOS::ParticleQuote, EPOS::NounFormal, cost::kVeryStrongBonus},
       // The obligation predicate after a quotation particle remains an
       // auxiliary chain (…ん+と+いけ+ん), rather than reopening い as an

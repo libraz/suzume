@@ -402,6 +402,18 @@ constexpr bool isClassicalAuxiliaryType(ExtendedPOS epos) {
 }
 
 /**
+ * @brief Check if ExtendedPOS is an aspectual auxiliary verb
+ *
+ * These attach to a te-form and inflect like the lexical verb they came from, so
+ * their terminal cell closes a clause exactly as VerbShuushikei does (読んでいる,
+ * 暑くなってくる). They carry their own category because the aspect they add
+ * selects different auxiliaries, not because the predicate is any less finite.
+ */
+constexpr bool isAspectAuxiliaryType(ExtendedPOS epos) {
+  return epos >= ExtendedPOS::AuxAspectIru && epos <= ExtendedPOS::AuxAspectHajimeru;
+}
+
+/**
  * @brief Check if ExtendedPOS is a particle type
  */
 constexpr bool isParticleType(ExtendedPOS epos) {

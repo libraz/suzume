@@ -438,6 +438,19 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // a spurious そう+な+るまい segmentation.
       {EPOS::ParticleFinal, EPOS::AdjBasic, cost::kVeryRare},
 
+      // An aspectual auxiliary is barred for the same reason as the predicate
+      // cells above: it needs a te-form in front of it, which a closed clause
+      // cannot supply. The continuative いる contracts to a single mora, so
+      // without the row it is the cheapest way to spend the tail of a word the
+      // particle has already bitten into (ない → な + い).
+      {EPOS::ParticleFinal, EPOS::AuxAspectIru, cost::kVeryRare},
+      {EPOS::ParticleFinal, EPOS::AuxAspectShimau, cost::kVeryRare},
+      {EPOS::ParticleFinal, EPOS::AuxAspectOku, cost::kVeryRare},
+      {EPOS::ParticleFinal, EPOS::AuxAspectMiru, cost::kVeryRare},
+      {EPOS::ParticleFinal, EPOS::AuxAspectIku, cost::kVeryRare},
+      {EPOS::ParticleFinal, EPOS::AuxAspectKuru, cost::kVeryRare},
+      {EPOS::ParticleFinal, EPOS::AuxAspectHajimeru, cost::kVeryRare},
+
       // AuxCopulaDa → VerbOnbinkei (な+いん) - prohibit
       // (prevents ないんだ → な+いん+だ over ない+ん+だ)
       {EPOS::AuxCopulaDa, EPOS::VerbOnbinkei, cost::kAlmostNever},
