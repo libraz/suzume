@@ -744,6 +744,87 @@
       ],
       "id": "he_ru",
       "input": "辻様へ送る"
+    },
+    {
+      "description": "草むらに隠れる - auto-generated",
+      "expected": [
+        {
+          "lemma": "草むら",
+          "pos": "Noun",
+          "surface": "草むら"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "隠れる",
+          "pos": "Verb",
+          "surface": "隠れる"
+        }
+      ],
+      "id": "murani_reru",
+      "input": "草むらに隠れる"
+    },
+    {
+      "description": "草むらの奥へ進む - auto-generated",
+      "expected": [
+        {
+          "lemma": "草むら",
+          "pos": "Noun",
+          "surface": "草むら"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "奥",
+          "pos": "Noun",
+          "surface": "奥"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "murano_he_mu",
+      "input": "草むらの奥へ進む"
+    },
+    {
+      "description": "朝露に光る草むら - auto-generated",
+      "expected": [
+        {
+          "lemma": "朝露",
+          "pos": "Noun",
+          "surface": "朝露"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "光る",
+          "pos": "Verb",
+          "surface": "光る"
+        },
+        {
+          "lemma": "草むら",
+          "pos": "Noun",
+          "surface": "草むら"
+        }
+      ],
+      "id": "ni_ru_mura",
+      "input": "朝露に光る草むら"
     }
   ],
   "description": "General nouns (part 4/4)",
