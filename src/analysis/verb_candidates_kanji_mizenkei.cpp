@@ -228,7 +228,19 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
             }
           }
 
-          if (is_valid) {
+          // An irrealis whose own last mora is a registered case particle is
+          // spelled exactly like the nominative or accusative phrase it sits in
+          // (差|が|ずれる, not 差が|ず|れる). The particle reading needs no
+          // lexical evidence, so the verb reading has to bring some: 泳が+ず and
+          // 急が+ず keep their candidate because 泳ぐ and 急ぐ are attested,
+          // while 差ぐ, 刻ぐ and 程ぐ are not words at all.
+          const bool irrealis_ends_on_case_particle =
+              !dictionary_verified && dict_manager != nullptr && negative_pos > start_pos && [&] {
+                const auto* particle = lookupEntryInRange(*dict_manager, codepoints, negative_pos - 1, negative_pos,
+                                                          core::PartOfSpeech::Particle);
+                return particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase;
+              }();
+          if (is_valid && !irrealis_ends_on_case_particle) {
             // A lexicalized verb+ず entry (思わず) wins unless the following に
             // explicitly creates the productive ずに auxiliary construction.
             const bool followed_by_zu = codepoints[negative_pos] == U'ず';

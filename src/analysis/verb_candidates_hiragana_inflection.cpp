@@ -418,7 +418,19 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
     // Nor may it be spelled entirely by a chain of registered auxiliaries: the
     // paradigm tables endorse a base for any run ending in a verbal mora, so
     // ぬ+べし becomes the continuative of a non-word (ぬべす).
-    if (!is_dictionary_verb && hasAuxiliaryChainDecomposition(codepoints, start_pos, end_pos, dict_manager)) {
+    //
+    // The chain has to be licensable to be a competing reading at all. Its first
+    // element is bound leftward, so where nothing can host it — clause start, or
+    // after a particle that already closed the previous phrase — the
+    // decomposition is not an analysis of this span and the run is an ordinary
+    // open-class verb (時刻|が|ずれる, not 時刻|が|ず|れる). 死ぬ+べし and
+    // 出で+に+ける keep their host and stay rejected.
+    const bool auxiliary_chain_has_host =
+        start_pos > 0 && char_types[start_pos - 1] != normalize::CharType::Symbol &&
+        (dict_manager == nullptr || lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos,
+                                                       core::PartOfSpeech::Particle) == nullptr);
+    if (!is_dictionary_verb && auxiliary_chain_has_host &&
+        hasAuxiliaryChainDecomposition(codepoints, start_pos, end_pos, dict_manager)) {
       SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" auxiliary_chain\n");
       continue;
     }

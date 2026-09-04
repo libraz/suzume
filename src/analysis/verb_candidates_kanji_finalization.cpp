@@ -420,6 +420,31 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     const bool productive_denominal_ru = !in_dict && best.base_form == surface && utf8::endsWith(surface, "る") &&
                                          !best.stem.empty() && vh::isNounInDictionary(dict_manager, best.stem);
 
+    // A case particle inside the span is a phrase boundary the verb reading has
+    // to argue against, and an unattested base form is no argument at all
+    // (差|が|ずれる, not 差がず|れる). Two conditions keep the mora from being
+    // read as a particle where it is only okurigana: it must be strictly
+    // interior, which is why 泳が+ず is untouched, and what precedes it must end
+    // at the kanji run, so the が of 昔ながら and the と of 呼びとめる stay
+    // word-internal rather than inventing a phrase boundary mid-stem.
+    bool spans_interior_case_particle = false;
+    if (!in_dict && dict_manager != nullptr && end_pos > start_pos + 2) {
+      for (size_t particle_pos = start_pos + 1; particle_pos + 1 < end_pos; ++particle_pos) {
+        if (!normalize::isKanjiCodepoint(codepoints[particle_pos - 1])) {
+          continue;
+        }
+        const auto* particle =
+            lookupEntryInRange(*dict_manager, codepoints, particle_pos, particle_pos + 1, core::PartOfSpeech::Particle);
+        if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase) {
+          spans_interior_case_particle = true;
+          break;
+        }
+      }
+    }
+    if (spans_interior_case_particle) {
+      SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" interior_case_particle\n");
+      return;
+    }
     // Penalize 2+-kanji verb candidates whose base form is not in dict
     // Most real 2-kanji verbs (行う, 伴う, etc.) are in the dictionary.
     // False 2-kanji patterns like 柿食えば (柿 + 食えば) have base 柿食う
