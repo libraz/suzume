@@ -123,6 +123,11 @@ bool endsWithKanji(std::string_view stem) {
   return cp != 0 && kana::isKanjiCodepoint(cp);
 }
 
+bool endsWithHiragana(std::string_view stem) {
+  char32_t cp = utf8::decodeLastChar(stem);
+  return cp != 0 && kana::isHiraganaCodepoint(cp);
+}
+
 bool startsWithKanji(std::string_view stem) {
   char32_t cp = utf8::decodeFirstChar(stem);
   return cp != 0 && kana::isKanjiCodepoint(cp);

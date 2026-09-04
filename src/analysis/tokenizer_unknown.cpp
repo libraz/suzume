@@ -489,8 +489,14 @@ bool hasCompleteInternalConstituentBoundary(const core::Lattice& lattice,
       // boundary.  This prevents the generic kanji+hiragana nominalizer from
       // swallowing arbitrary hosts (家庭/初心者/読者 + 向け) without naming any
       // member of the open host class.
+      // An unverified host has to close on a script boundary to be evidence at
+      // all: one ending in hiragana ends in the very mora whose analysis is in
+      // question (花び of 花びら), so reading it as a nominal assumes the split
+      // it is meant to prove.  This is the licensing counterpart of the same
+      // test on the prefix above; a katakana or kanji host (テスト向け, 家庭向け)
+      // is unaffected because neither ends in kana under analysis.
       const bool licenses_suffix = right_is_suffix && left_pos == core::PartOfSpeech::Noun &&
-                                   (left_verified || !grammar::isPureHiragana(left_surface));
+                                   (left_verified || !grammar::endsWithHiragana(left_surface));
       return licenses_adjective || licenses_auxiliary || licenses_formal_noun || licenses_connective_particle ||
              licenses_nominal_particle || licenses_suffix;
     };

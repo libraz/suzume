@@ -57,6 +57,16 @@ bool isAllKanji(std::string_view stem);
 bool endsWithKanji(std::string_view stem);
 
 /**
+ * @brief Check if stem ends with a hiragana character
+ * @param stem The stem to check
+ * @return True if the last character is hiragana
+ *
+ * Tells a nominal host that closes on a script boundary (家庭, 初心者, テスト)
+ * from one whose last mora is okurigana still under analysis (花び of 花びら).
+ */
+bool endsWithHiragana(std::string_view stem);
+
+/**
  * @brief Check if stem starts with a kanji character
  * @param stem The stem to check
  * @return True if the first character is kanji
