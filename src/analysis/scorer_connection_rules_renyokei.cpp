@@ -50,8 +50,17 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   const bool compound_connective = prev.origin == core::CandidateOrigin::VerbCompound &&
                                    next.extended_pos == core::ExtendedPOS::ParticleConj &&
                                    !utf8::equalsAny(next.surface, {"し"});
-  const bool binding_hypothetical =
-      prev.extended_pos == core::ExtendedPOS::ParticleBinding && next.extended_pos == core::ExtendedPOS::VerbKateikei;
+  // The hypothetical a binding particle takes has to belong to a verb that
+  // exists. A pure-hiragana cell the dictionary does not know is the one shape
+  // that can be assembled out of the neighbouring closed-class morae, and the
+  // particle's own first mora is what makes those available: シク活用 adjectives
+  // spell しか at the boundary between stem and 補助活用, so 正しかりければ splits
+  // into 正 + しか + a hypothetical of the non-word りける and outbids the カリ活用
+  // cell it actually is. A kanji stem cannot be assembled that way (こそ+定まれ),
+  // and the productive kana cases are dictionary verbs (さえ+すれ+ば).
+  const bool binding_hypothetical = prev.extended_pos == core::ExtendedPOS::ParticleBinding &&
+                                    next.extended_pos == core::ExtendedPOS::VerbKateikei &&
+                                    (next.lemmaVerified() || !grammar::isPureHiragana(next.surface));
   const bool preparatory_obligation =
       prev.extended_pos == core::ExtendedPOS::AuxAspectOku && next.extended_pos == core::ExtendedPOS::AuxClassicalBeshi;
   if (compound_connective)
