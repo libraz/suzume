@@ -101,8 +101,27 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
     for (const auto& [verb_type, base_suffix] : candidates_to_try) {
       std::string base_form = normalize::concat(stem, base_suffix);
 
+      // A registered verb is stored as its whole expanded paradigm, so the
+      // godan reading has to find that paradigm's own cells in there before the
+      // entry counts as attesting it: every godan verb carries an a-row
+      // mizenkei (のら for のる, のっとら for のっとる), while a potential form
+      // such as のめる is registered on the cells of its own ichidan paradigm
+      // and has no sokuonbin at all. The demand is made only of the contraction
+      // environment. っ+た/て is the onbin's own diagnostic cell and occurs
+      // nowhere else, so the follower alone evidences the reading; っ+ち/と is
+      // shared with an ordinary boundary (ちゃ and と are particles in their own
+      // right), so a reading that claims those morae has to bring its own
+      // evidence, and the contraction's much larger bonus is what turns a wrong
+      // claim into a wrong analysis (の+めっちゃ lost to のめっ+ちゃ that way).
+      const std::string_view mizenkei_suffix = grammar::godanARowSuffixFromURow(utf8::decodeFirstChar(base_suffix));
+      const bool godan_paradigm_attested =
+          !is_contraction_pattern ||
+          (!mizenkei_suffix.empty() &&
+           vh::hasDictionaryEntry(dict_manager, normalize::concat(stem, mizenkei_suffix), core::PartOfSpeech::Verb));
+
       // Check if base form exists in dictionary as this verb type
-      bool is_valid_verb = !grammar::isSuruBaseForm(base_form) && vh::isVerbInDictionary(dict_manager, base_form) &&
+      bool is_valid_verb = !grammar::isSuruBaseForm(base_form) && godan_paradigm_attested &&
+                           vh::isVerbInDictionary(dict_manager, base_form) &&
                            hasMatchingGodanInflection(inflection, base_form, verb_type);
       // Capture dictionary attestation before the inflection fallback below may
       // set is_valid_verb on a non-dictionary base.
