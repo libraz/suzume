@@ -380,6 +380,102 @@
       ],
       "id": "literary_kayowaku",
       "input": "か弱く支えた"
+    },
+    {
+      "description": "ぎこちない動きで立ち上がる - auto-generated",
+      "expected": [
+        {
+          "lemma": "ぎこちない",
+          "pos": "Adjective",
+          "surface": "ぎこちない"
+        },
+        {
+          "lemma": "動き",
+          "pos": "Noun",
+          "surface": "動き"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "立ち上がる",
+          "pos": "Verb",
+          "surface": "立ち上がる"
+        }
+      ],
+      "id": "gikochinai_kide_chi_garu",
+      "input": "ぎこちない動きで立ち上がる"
+    },
+    {
+      "description": "せわしない毎日を過ごす - auto-generated",
+      "expected": [
+        {
+          "lemma": "せわしない",
+          "pos": "Adjective",
+          "surface": "せわしない"
+        },
+        {
+          "lemma": "毎日",
+          "pos": "Noun",
+          "surface": "毎日"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "過ごす",
+          "pos": "Verb",
+          "surface": "過ごす"
+        }
+      ],
+      "id": "sewashinai_wo_gosu",
+      "input": "せわしない毎日を過ごす"
+    },
+    {
+      "description": "人生の道は、険しく、長く、果てしなく。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "人生",
+          "pos": "Noun",
+          "surface": "人生"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "険しく",
+          "pos": "Adverb",
+          "surface": "険しく"
+        },
+        {
+          "lemma": "長く",
+          "pos": "Adverb",
+          "surface": "長く"
+        },
+        {
+          "lemma": "果てしない",
+          "pos": "Adjective",
+          "surface": "果てしなく"
+        }
+      ],
+      "id": "no_ha_shiku_ku_teshinaku",
+      "input": "人生の道は、険しく、長く、果てしなく。"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",
