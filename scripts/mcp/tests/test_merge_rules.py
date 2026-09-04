@@ -1118,3 +1118,34 @@ class TestStrandedLengtheningVowel:
         result, rule = apply_suzume_merge(tokens, "あそう")
         assert [token["surface"] for token in result] == ["あ", "そう"]
         assert rule != "stranded-lengthening-vowel"
+
+
+class TestClassicalPastConjectural:
+    def test_reads_kemu_as_an_auxiliary_over_a_verb(self):
+        tokens = [
+            _tok("行き", pos="動詞", lemma="行く"),
+            _tok("けむ", pos="名詞", lemma="けむ"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "行きけむ")
+        assert result[-1]["pos"] == "助動詞"
+        assert result[-1]["lemma"] == "けむ"
+        assert rule == "classical-past-conjectural"
+
+    def test_recovers_the_continuative_absorbed_into_a_nominal(self):
+        tokens = [
+            _tok("雨降り", pos="名詞", lemma="雨降り"),
+            _tok("けむ", pos="助詞", lemma="けむ"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "雨降りけむ")
+        assert [token["surface"] for token in result] == ["雨", "降り", "けむ"]
+        assert [token["pos"] for token in result] == ["名詞", "動詞", "助動詞"]
+        assert rule == "classical-past-conjectural"
+
+    def test_leaves_kemu_alone_without_a_host(self):
+        tokens = [
+            _tok("たり", pos="助詞", lemma="たり"),
+            _tok("けむ", pos="名詞", lemma="けむ"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "たりけむ")
+        assert result[-1]["pos"] == "名詞"
+        assert rule != "classical-past-conjectural"

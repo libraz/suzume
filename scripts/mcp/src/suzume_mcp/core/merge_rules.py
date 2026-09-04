@@ -33,6 +33,7 @@ from .merge_postprocessors import (
     _postprocess_atode,
     _postprocess_bound_suffix_noun_cell,
     _postprocess_bound_voiced_suffix,
+    _postprocess_classical_kemu,
     _postprocess_classical_mu,
     _postprocess_classical_shimu,
     _postprocess_demo_copula,
@@ -2049,6 +2050,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     result, applied_rule = _postprocess_classical_mu(result, applied_rule)
     result, applied_rule = _postprocess_ku_nominalization(result, applied_rule)
     result, applied_rule = _postprocess_classical_shimu(result, applied_rule)
+    result, applied_rule = _postprocess_classical_kemu(result, applied_rule)
     result, applied_rule = _postprocess_izenkei_concessive(result, applied_rule)
     result, applied_rule = _postprocess_tomo_particle(result, applied_rule)
     result, applied_rule = _postprocess_bound_voiced_suffix(result, applied_rule)

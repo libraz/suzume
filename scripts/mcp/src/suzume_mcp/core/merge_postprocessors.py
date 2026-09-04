@@ -863,6 +863,68 @@ def _postprocess_classical_shimu(result: list[dict], applied_rule: str | None) -
     return tagged, applied_rule
 
 
+_PAST_CONJECTURAL = "けむ"
+# The auxiliary attaches to a continuative, which a preceding predicate or
+# auxiliary already supplies; a nominal there has to be read back first.
+_PAST_CONJECTURAL_HOST_POS = frozenset({"動詞", "助動詞"})
+_CONTINUATIVE_PROBE_AUXILIARY = "ます"
+
+
+def _continuative_verb_tokens(surface: str) -> list[dict] | None:
+    """Read a nominal back as the verb continuative it spells, if it is one.
+
+    The reference dictionary drops the verb reading of a continuative when what
+    follows is a form it does not know, and calls the run a noun instead. The
+    polite auxiliary is a form it does know and selects exactly that cell, so
+    appending it recovers the reading — and the boundary with it, since a
+    nominal that fused a modifier in front comes back as its parts (雨降り as
+    雨 + 降り). A genuine noun keeps its own reading under the same probe.
+    """
+    from .mecab import mecab_analyze
+
+    tokens = mecab_analyze(surface + _CONTINUATIVE_PROBE_AUXILIARY)
+    if len(tokens) < 2 or tokens[-1].get("surface") != _CONTINUATIVE_PROBE_AUXILIARY:
+        return None
+    head = tokens[:-1]
+    if head[-1].get("pos") != "動詞":
+        return None
+    if "".join(token.get("surface", "") for token in head) != surface:
+        return None
+    return [
+        {"surface": token.get("surface", ""), "pos": token.get("pos", ""), "lemma": token.get("lemma", "")}
+        for token in head
+    ]
+
+
+def _postprocess_classical_kemu(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Read けむ as the past-conjectural auxiliary it is.
+
+    The reference dictionary has no cell for it and falls back on whatever the
+    position suggests — a particle where the clause ends, a noun inside one —
+    and neither can govern a verb. With the auxiliary reading gone the
+    continuative in front loses its own verb reading too and is absorbed into a
+    nominal, so the repair has to restore both.
+    """
+    normalized: list[dict] = []
+    for token in result:
+        if token.get("surface") != _PAST_CONJECTURAL or token.get("pos") == "助動詞" or not normalized:
+            normalized.append(token)
+            continue
+        previous = normalized[-1]
+        if previous.get("pos") not in _PAST_CONJECTURAL_HOST_POS:
+            recovered = (
+                _continuative_verb_tokens(previous.get("surface", "")) if previous.get("pos") == "名詞" else None
+            )
+            if recovered is None:
+                normalized.append(token)
+                continue
+            normalized[-1:] = recovered
+        normalized.append({"surface": _PAST_CONJECTURAL, "pos": "助動詞", "lemma": _PAST_CONJECTURAL})
+        if applied_rule is None:
+            applied_rule = "classical-past-conjectural"
+    return normalized, applied_rule
+
+
 _HA_ROW_TAILS = ("は", "ひ", "ふ", "へ")
 _HA_ROW_DETACHED_TAILS = ("ひ", "ふ", "へ")
 _HA_ROW_STEM_POS = ("名詞", "動詞", "形容詞", "副詞", "接尾辞")
