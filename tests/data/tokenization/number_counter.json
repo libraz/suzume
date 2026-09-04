@@ -1807,6 +1807,85 @@
       ],
       "id": "distributive_quantity_repetition",
       "input": "一件一件点検する"
+    },
+    {
+      "description": "Interrogative quantity plus counter stays one unit inside a sentence",
+      "expected": [
+        {
+          "lemma": "書類",
+          "pos": "Noun",
+          "surface": "書類"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "何部",
+          "pos": "Noun",
+          "surface": "何部"
+        },
+        {
+          "lemma": "必要",
+          "pos": "Adjective",
+          "surface": "必要"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "ha_nannanoka",
+      "input": "書類は何部必要なんなのか"
+    },
+    {
+      "description": "Same construction with a different counter",
+      "expected": [
+        {
+          "lemma": "何人",
+          "pos": "Noun",
+          "surface": "何人"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "masuka",
+      "input": "何人来ますか"
     }
   ],
   "description": "number_counter tests",
