@@ -285,6 +285,15 @@ def _split_lexicalized_morpheme_boundaries(token: dict) -> list[dict] | None:
             tail_noun = _kanji_noun_token(tail)
             if host_noun is None or tail_noun is None:
                 continue
+            # A case particle is free only when both sides are independent
+            # words. The reference dictionary holds 我が as an adnominal of its
+            # own and reads the identical frame that way wherever it has no
+            # whole-phrase headword to prefer (我が子, 我が身の上), so in 我が身
+            # and 我が国 the particle belongs to that determiner rather than to
+            # a phrase, and the boundary falls after it.
+            adnominal = _reanalyze_exact(host + particle)
+            if adnominal is not None and len(adnominal) == 1 and adnominal[0].get("pos") == "連体詞":
+                return [_as_independent_token(adnominal[0]), _as_independent_token(tail_noun)]
             # Built directly rather than re-read: a lone case particle comes back
             # from the analyzer as a filler.
             return [
