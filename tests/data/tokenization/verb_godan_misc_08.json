@@ -1280,6 +1280,82 @@
       ],
       "id": "i_na_wo_tsu",
       "input": "類い稀な才能を持つ。"
+    },
+    {
+      "description": "主格の後の仮名godan動詞が係助詞に割れない",
+      "expected": [
+        {
+          "lemma": "太陽",
+          "pos": "Noun",
+          "surface": "太陽"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "もたらす",
+          "pos": "Verb",
+          "surface": "もたらす"
+        },
+        {
+          "lemma": "恵み",
+          "pos": "Noun",
+          "surface": "恵み"
+        }
+      ],
+      "id": "ga_motarasu_megumi",
+      "input": "太陽がもたらす恵み"
+    },
+    {
+      "description": "対格の後の仮名godan動詞が係助詞に割れない",
+      "expected": [
+        {
+          "lemma": "変化",
+          "pos": "Noun",
+          "surface": "変化"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "もたらす",
+          "pos": "Verb",
+          "surface": "もたらす"
+        },
+        {
+          "lemma": "出来事",
+          "pos": "Noun",
+          "surface": "出来事"
+        }
+      ],
+      "id": "wo_motarasu_dekigoto",
+      "input": "変化をもたらす出来事"
+    },
+    {
+      "description": "過去助動詞の条件形が後続の主述語を導く（否定対照）",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だら"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "yondara_susumu",
+      "input": "読んだら進む"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

@@ -2814,6 +2814,38 @@
       ],
       "id": "dattte_karu",
       "input": "子供だって分かる"
+    },
+    {
+      "description": "対格に重なる文語の係助詞は維持する（否定対照）",
+      "expected": [
+        {
+          "lemma": "命",
+          "pos": "Noun",
+          "surface": "命"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "惜しむ",
+          "pos": "Verb",
+          "surface": "惜しま"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "womo_oshimanai",
+      "input": "命をも惜しまない"
     }
   ],
   "description": "Binding and adverbial particles (は、も、だけ)",
