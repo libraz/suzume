@@ -30,6 +30,41 @@ namespace vh = verb_helpers;
 
 namespace {
 
+// Whether the span is spelled by a registered continuative followed by an
+// aspectual auxiliary. That auxiliary selects the continuative of the word in
+// front of it, so when the dictionary supplies both halves the span is that pair
+// and not one word — which matters because a Godan verb's own dictionary form
+// ends on the u-row exactly as the contracted aspect auxiliaries do, letting
+// してる pass for a Godan-ra verb.
+//
+// Both halves have to be named, and the head has to be the cell the auxiliary
+// actually takes. A short head in front of a two-mora tail is otherwise just the
+// shape of an ordinary hiragana verb: と and の are particle homographs (とおる,
+// のせる), た is the past auxiliary (たてる), and さ is an irrealis, which an
+// aspectual auxiliary cannot attach to (さける).
+bool splitsIntoContinuativePlusAspectAuxiliary(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                               size_t end_pos, const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kMaxAuxiliaryChars = 4;
+  if (dict_manager == nullptr || end_pos < start_pos + 3) {
+    return false;
+  }
+  const size_t max_len = std::min(kMaxAuxiliaryChars, end_pos - start_pos - 1);
+  for (size_t aux_len = 2; aux_len <= max_len; ++aux_len) {
+    const size_t aux_start = end_pos - aux_len;
+    const auto* auxiliary =
+        lookupEntryInRange(*dict_manager, codepoints, aux_start, end_pos, core::PartOfSpeech::Auxiliary);
+    if (auxiliary == nullptr || !core::isAspectAuxiliaryType(auxiliary->extended_pos)) {
+      continue;
+    }
+    const auto* host = lookupEntryInRange(*dict_manager, codepoints, start_pos, aux_start, core::PartOfSpeech::Verb);
+    if (host != nullptr && (host->extended_pos == core::ExtendedPOS::VerbRenyokei ||
+                            host->extended_pos == core::ExtendedPOS::VerbOnbinkei)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool immediatelyFollowsParticleHost(const std::vector<char32_t>& codepoints, size_t start_pos,
                                     const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || start_pos == 0) {
@@ -1024,6 +1059,19 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
       // start a fabricated predicate such as でやる.
       if (!is_dictionary_verb &&
           verb_helpers::endsWithFocusParticleTail(dict_manager, codepoints, start_pos, end_pos)) {
+        continue;
+      }
+      // A Godan verb's own dictionary form ends on the u-row, and so do the
+      // contracted aspect auxiliaries, which lets a span claim to be the whole
+      // verb while an auxiliary sits at its end: してる is read as a Godan-ra
+      // verb してる rather than the サ変 continuative plus てる. One mora of host
+      // in front of a multi-mora dictionary auxiliary is the boundary the claim
+      // crossed, and only an attested lemma outranks it. The claim is what makes
+      // this reachable — without it the span carries no terminal form and never
+      // collects the connection an argument's predicate gets.
+      if (is_godan_dictionary_form && !vh::isVerbInDictionary(dict_manager, best.base_form) &&
+          splitsIntoContinuativePlusAspectAuxiliary(codepoints, start_pos, end_pos, dict_manager)) {
+        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" godan_form_over_auxiliary\n");
         continue;
       }
       candidates.push_back(makeVerbCandidate(
