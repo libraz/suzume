@@ -125,13 +125,29 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
   // tail would let any prefix certify the slot for the whole run.
   const bool follows_fixed_predicate_slot =
       followsKanjiOrNominalHostBeforeCaseParticle(codepoints, start_pos, dict_manager, preceding_particle);
+  // A run standing bare in the predicate slot is one word only while nothing
+  // reads it as an inflected form of an attested one. The analyzer's own
+  // confidence cannot decide that: it scores the shape of the kana, so a coined
+  // base outranks a real open-class verb whenever the real one is spelled
+  // without kanji (すらなく as a godan-ka base scores above もたらす). The
+  // attested decomposition is the evidence instead — すらなく is する plus the
+  // negative, while every reading of もたらす coins its own base.
+  const auto reads_as_inflected_dictionary_verb = [&](const auto& candidates) {
+    return std::any_of(candidates.begin(), candidates.end(), [&](const auto& candidate) {
+      return !candidate.morphemes.empty() &&
+             dict_manager->lookupExact(candidate.base_form, core::PartOfSpeech::Verb) != nullptr;
+    });
+  };
   const auto is_complete_godan_terminal = [&](size_t terminal_end) {
     const std::string terminal = extractSubstring(codepoints, start_pos, terminal_end);
     const auto& terminal_candidates =
         terminal_end == probe_end ? full_surface_candidates : inflection.analyze(terminal);
+    if (reads_as_inflected_dictionary_verb(terminal_candidates)) {
+      return false;
+    }
     return std::any_of(terminal_candidates.begin(), terminal_candidates.end(), [&](const auto& candidate) {
       return grammar::isGodanVerbType(candidate.verb_type) && candidate.base_form == terminal &&
-             candidate.morphemes.empty() && candidate.confidence >= candidate::kParticleVerbBoundaryMinConfidence;
+             candidate.morphemes.empty();
     });
   };
   bool complete_terminal_after_case_particle = follows_fixed_predicate_slot && is_complete_godan_terminal(probe_end);

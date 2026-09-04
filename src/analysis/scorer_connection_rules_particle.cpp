@@ -247,7 +247,17 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   const bool unlicensed_hypothetical = next.extended_pos == core::ExtendedPOS::ParticleConj &&
                                        grammar::isHypotheticalSelectingConjunctiveParticle(next.surface) &&
                                        unlicensed_hypothetical_host;
-  if (quantifier_host || unlicensed_tomo || unlicensed_hypothetical) {
+  // A binding particle replaces the nominative rather than stacking on it: 雨が
+  // 降る becomes 雨は降る, and 雨がは/雨がも are not Japanese. The oblique cases do
+  // survive underneath a focus particle (駅には, 道でも) — that is what the case →
+  // binding bonus exists for — and the accusative keeps the literary をも, so the
+  // nominative is the one exponent the bonus has to skip. Without this it buys a
+  // fabricated focus particle out of the first mora of the very predicate the
+  // case marks (太陽+が+も+たらす for 太陽+が+もたらす).
+  const bool unlicensed_nominative_stacking = prev.extended_pos == core::ExtendedPOS::ParticleCase &&
+                                              utf8::equalsAny(prev.surface, {"が"}) &&
+                                              next.extended_pos == core::ExtendedPOS::ParticleTopic;
+  if (quantifier_host || unlicensed_tomo || unlicensed_hypothetical || unlicensed_nominative_stacking) {
     SUZUME_CONNECTION_ADD(bonus, quantifier_host ? cost::kExtremeBonus : cost::kAlmostNever);
   }
 
