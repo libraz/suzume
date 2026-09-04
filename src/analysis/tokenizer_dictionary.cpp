@@ -199,13 +199,21 @@ bool startsInsideKanjiLedVerb(const core::Lattice& lattice, const std::vector<ch
 // adjective or auxiliary followed by a particle (ない+と, らしい+と).  Keep
 // the adverb available at a real boundary while protecting the longer
 // grammatical edge that crosses this position.
-bool startsInsideVerifiedPredicate(const core::Lattice& lattice, size_t start_pos) {
+//
+// A predicate only counts when its own right edge could be a word boundary.
+// Small kana cannot open a word, so an edge that ends just before one has not
+// finished the word it belongs to and is in no position to claim the span:
+// のめ (the potential stem of 飲む) ends before the っ of のめっちゃ, and
+// letting it suppress the adverb hands those morae to a fragment instead.
+bool startsInsideVerifiedPredicate(const core::Lattice& lattice, const std::vector<char32_t>& codepoints,
+                                   size_t start_pos) {
   const size_t scan_start = start_pos > kDictionaryLookbehindChars ? start_pos - kDictionaryLookbehindChars : 0;
   for (size_t edge_start = scan_start; edge_start < start_pos; ++edge_start) {
-    if (core::anyEdgeStartingAt(lattice, edge_start, [start_pos](const core::LatticeEdge& edge) {
+    if (core::anyEdgeStartingAt(lattice, edge_start, [&codepoints, start_pos](const core::LatticeEdge& edge) {
           return edge.end > start_pos && edge.lemmaVerified() &&
                  (edge.pos == core::PartOfSpeech::Verb || edge.pos == core::PartOfSpeech::Adjective ||
-                  edge.pos == core::PartOfSpeech::Auxiliary);
+                  edge.pos == core::PartOfSpeech::Auxiliary) &&
+                 (edge.end >= codepoints.size() || !kana::isSmallKanaCodepoint(codepoints[edge.end]));
         })) {
       return true;
     }
@@ -1550,7 +1558,8 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       continue;
     }
 
-    if (result.entry->pos == core::PartOfSpeech::Adverb && startsInsideVerifiedPredicate(lattice, start_pos)) {
+    if (result.entry->pos == core::PartOfSpeech::Adverb &&
+        startsInsideVerifiedPredicate(lattice, codepoints, start_pos)) {
       continue;
     }
 
@@ -2140,6 +2149,10 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
          result.entry->pos == core::PartOfSpeech::Adjective || result.entry->pos == core::PartOfSpeech::Adverb)) {
       // A dictionary irrealis stem cannot absorb っ before て/た as emphasis:
       // 染まっ+て belongs to the GodanRa verb 染まる, not 染ま(染む)+っ+て.
+      // The hypothetical stem is barred for the same reason, and it is where
+      // the productive potential forms are registered: かえ is the ichidan stem
+      // of かえる (the potential of 買う), which has no sokuonbin at all, so
+      // かえっ+て can only belong to the godan かえる and must keep that lemma.
       // An auxiliary cannot either: っ+て after one is the concessive particle
       // って (書い+た+って), and every genuine auxiliary onbin cell (だっ, たかっ,
       // じゃっ) is a dictionary entry in its own right.
@@ -2147,6 +2160,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
           end_pos + 1 < codepoints.size() && codepoints[end_pos] == core::hiragana::kSmallTsu &&
           (codepoints[end_pos + 1] == core::hiragana::kTe || codepoints[end_pos + 1] == core::hiragana::kTa) &&
           (result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei ||
+           result.entry->extended_pos == core::ExtendedPOS::VerbKateikei ||
            result.entry->pos == core::PartOfSpeech::Auxiliary);
       const auto emphatic = sokuon_before_te_or_ta
                                 ? verb_helpers::EmphaticSuffixMatch{}
