@@ -1,0 +1,82 @@
+{
+  "cases": [
+    {
+      "description": "the nasal euphony of an unregistered godan verb before the contracted progressive",
+      "expected": [
+        {
+          "lemma": "混む",
+          "pos": "Verb",
+          "surface": "混ん"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "でる"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "めちゃくちゃ",
+          "pos": "Adjective",
+          "surface": "めちゃくちゃ"
+        },
+        {
+          "lemma": "混雑",
+          "pos": "Noun",
+          "surface": "混雑"
+        }
+      ],
+      "id": "nderunomechi_kuchi",
+      "input": "混んでるのめちゃくちゃ混雑"
+    },
+    {
+      "description": "the same euphony inside a clause",
+      "expected": [
+        {
+          "lemma": "電車",
+          "pos": "Noun",
+          "surface": "電車"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "混む",
+          "pos": "Verb",
+          "surface": "混ん"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "でる"
+        }
+      ],
+      "id": "ga_nderu",
+      "input": "電車が混んでる"
+    },
+    {
+      "description": "a multi-mora okurigana before the nasal euphony is unaffected by the connective gate",
+      "expected": [
+        {
+          "lemma": "汗ばむ",
+          "pos": "Verb",
+          "surface": "汗ばん"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "でる"
+        }
+      ],
+      "id": "banderu",
+      "input": "汗ばんでる"
+    }
+  ],
+  "description": "verb_onbin tests",
+  "version": "1.0"
+}
