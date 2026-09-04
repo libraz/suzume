@@ -1,0 +1,72 @@
+{
+  "cases": [
+    {
+      "description": "a particle-shaped second mora has no host and stays inside the verb stem",
+      "expected": [
+        {
+          "lemma": "ながれる",
+          "pos": "Verb",
+          "surface": "ながれ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nagareta",
+      "input": "ながれた"
+    },
+    {
+      "description": "the same stem after a real case particle keeps that particle boundary",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ながれる",
+          "pos": "Verb",
+          "surface": "ながれ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ganagareta",
+      "input": "水がながれた"
+    },
+    {
+      "description": "a nominal host keeps the case particle boundary intact",
+      "expected": [
+        {
+          "lemma": "目",
+          "pos": "Noun",
+          "surface": "目"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "さめる",
+          "pos": "Verb",
+          "surface": "さめる"
+        }
+      ],
+      "id": "gasameru",
+      "input": "目がさめる"
+    }
+  ],
+  "description": "verb_ichidan_hiragana tests",
+  "version": "1.0"
+}
