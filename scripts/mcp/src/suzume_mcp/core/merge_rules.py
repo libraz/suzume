@@ -1264,6 +1264,38 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 if applied_rule is None:
                     applied_rule = "emphatic-sokuon"
 
+        # 4c-2. The colloquial negative elides the ら of a ra-row godan verb
+        # (帰らない -> 帰んない, やらない -> やんない). The reference analyzer has
+        # its own cell for it and assigns it correctly to 帰ん, やん, 座ん and
+        # 分かん, but loses the reading for a bare-hiragana stem and reads the ん
+        # as the standalone negative auxiliary instead, leaving a lemma the
+        # sentence never contained (わか/わく + ん for わかんない). The following
+        # ない is what rules that reading out: the negative ん is itself a
+        # sentence-final form (わからん), so nothing negates it a second time.
+        # The base is the ra-row verb the elided mora belongs to, which is the
+        # stem the analyzer kept plus る.
+        if (
+            not merged
+            and t.get("pos") == "動詞"
+            and (t.get("conj_type") or "").startswith("五段")
+            and "未然" in (t.get("conj_form") or "")
+            and i + 2 < len(tokens)
+            and tokens[i + 1].get("surface") == "ん"
+            and tokens[i + 1].get("pos") == "助動詞"
+            and (tokens[i + 2].get("lemma") or "") == "ない"
+        ):
+            stem = t.get("surface", "")
+            result.append({"surface": stem + "ん", "pos": "動詞", "lemma": stem + "る"})
+            # The negative is the auxiliary here, which is how the analyzer tags
+            # it wherever it recognizes the contraction itself. Reached from the
+            # standalone ん it comes back as the adjective instead, and leaving
+            # that in place would tag one construction two ways.
+            result.append({"surface": tokens[i + 2].get("surface", ""), "pos": "助動詞", "lemma": "ない"})
+            i += 3
+            merged = True
+            if applied_rule is None:
+                applied_rule = "ra-row-negative-contraction"
+
         # 4d. Adjective vowel repetition
         if not merged and t.get("pos") == "形容詞" and t.get("surface", "").endswith("い"):
             j = i + 1
