@@ -97,6 +97,12 @@ constexpr float kDerivedSuffixCompoundNounCost = -0.2F;
 // unit, competing against a continuative + noun split whose two halves are both
 // cheap on their own, so it carries the same magnitude.
 constexpr float kDeverbalCompoundNounCost = kDerivedSuffixCompoundNounCost;
+// The same compound when the continuative reconstructs no listed verb. The
+// shape still names the construction, so the search unit stays available; what
+// the missing lexical evidence costs is the discount above. Priced so a
+// dictionary entry covering the span outranks it (なし崩し|的) while the
+// continuative + noun split of an otherwise opaque run does not.
+constexpr float kUnverifiedDeverbalCompoundNounCost = bigram_cost::kRare;
 // A non-quantity nominal stem plus the closed comparison bound 以上/以下 is a
 // single search unit (必要以上, 期待以下). The strong local cost compensates
 // for the lexical adverb bonus carried by the homographic standalone 以上;

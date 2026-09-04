@@ -688,6 +688,13 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
          verb_helpers::isVerbInDictionary(
              dict_manager, normalize::concat(normalize::encodeUtf8(codepoints[kanji_end - 1]), base_ending))) ||
         (grammar::isERowCodepoint(first_hiragana) && verb_helpers::isVerbInDictionary(dict_manager, stem + "る"));
+    // Without that evidence the shape alone still describes the compound, and
+    // the paradigm it names is the same one (枯れ葉, 焼き魚, 巻き貝 differ from
+    // 立ち木 only in whether their base verb happens to be listed). What the
+    // missing evidence costs is the discount: an unverified compound has to
+    // lose to any lexical entry that covers the span (なし崩し|的), while still
+    // beating the continuative + noun split of an otherwise opaque run.
+    const bool has_continuative_shape = !base_ending.empty() || grammar::isERowCodepoint(first_hiragana);
     // A closed suffix on the right is its own morpheme (書き|先, 崩し|的), so it
     // never becomes the second half of a lexical compound.
     const bool crosses_suffix = hasClosedSuffixBoundary(codepoints, start_pos, kanji_end + 2, dict_manager);
@@ -736,11 +743,12 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
         }
       }
     }
-    if (is_verb_continuative && nominal_context && !crosses_suffix && !stem_is_closed_class &&
+    if (has_continuative_shape && nominal_context && !crosses_suffix && !stem_is_closed_class &&
         !longer_entry_starts_here) {
+      const float compound_cost =
+          is_verb_continuative ? candidate::kDeverbalCompoundNounCost : candidate::kUnverifiedDeverbalCompoundNounCost;
       auto cand = makeCandidate(extractSubstring(codepoints, start_pos, kanji_end + 2), start_pos, kanji_end + 2,
-                                core::PartOfSpeech::Noun, candidate::kDeverbalCompoundNounCost, true,
-                                CandidateOrigin::NominalizedNoun);
+                                core::PartOfSpeech::Noun, compound_cost, true, CandidateOrigin::NominalizedNoun);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = kNominalizedNounReportedConfidence;
       cand.pattern = "deverbal_compound_noun";
