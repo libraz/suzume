@@ -442,6 +442,60 @@
       ],
       "id": "soudane_2",
       "input": "そうだね"
+    },
+    {
+      "description": "A final particle before a Latin-script nominal is not attributive modification",
+      "expected": [
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        },
+        {
+          "lemma": "w",
+          "pos": "Noun",
+          "surface": "w"
+        }
+      ],
+      "id": "dekitanew",
+      "input": "できたねw"
+    },
+    {
+      "description": "Negative control: a Latin nominal keeps its ordinary noun connections",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "OK",
+          "pos": "Noun",
+          "surface": "OK"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "naraokdesu",
+      "input": "本ならOKです"
     }
   ],
   "description": "particle_final tests",
