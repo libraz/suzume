@@ -53,6 +53,147 @@
       ],
       "id": "trial_auxiliary_negative_boundary",
       "input": "試してみない"
+    },
+    {
+      "description": "an aspectual auxiliary heads the clause the causal particle takes",
+      "expected": [
+        {
+          "lemma": "外",
+          "pos": "Noun",
+          "surface": "外"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "暗い",
+          "pos": "Adjective",
+          "surface": "暗く"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "くる"
+        },
+        {
+          "lemma": "ので",
+          "pos": "Particle",
+          "surface": "ので"
+        },
+        {
+          "lemma": "早め",
+          "pos": "Noun",
+          "surface": "早め"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰る"
+        }
+      ],
+      "id": "ga_kunatttekurunode_meni_ru",
+      "input": "外が暗くなってくるので早めに帰る"
+    },
+    {
+      "description": "an aspectual auxiliary heads the clause a formal noun takes as its adnominal",
+      "expected": [
+        {
+          "lemma": "続き",
+          "pos": "Noun",
+          "surface": "続き"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "後",
+          "pos": "Noun",
+          "surface": "後"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Auxiliary",
+          "surface": "みる"
+        },
+        {
+          "lemma": "つもり",
+          "pos": "Noun",
+          "surface": "つもり"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "kiha_de_ndemirutsumoridesu",
+      "input": "続きは後で読んでみるつもりです"
+    },
+    {
+      "description": "the negative adjective before the causal particle is not a final particle plus the contracted continuative",
+      "expected": [
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "ので",
+          "pos": "Particle",
+          "surface": "ので"
+        },
+        {
+          "lemma": "急ぐ",
+          "pos": "Verb",
+          "surface": "急ぐ"
+        }
+      ],
+      "id": "ganainode_gu",
+      "input": "時間がないので急ぐ"
     }
   ],
   "description": "auxiliary_aspect tests",
