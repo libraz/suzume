@@ -85,6 +85,115 @@
       ],
       "id": "kakede_suruna",
       "input": "見かけで判断するな。"
+    },
+    {
+      "description": "a closed-class predicate after a kanji run keeps the run nominal instead of inventing a na-adjective stem",
+      "expected": [
+        {
+          "lemma": "努力",
+          "pos": "Noun",
+          "surface": "努力"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "成功",
+          "pos": "Noun",
+          "surface": "成功"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なし"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "まさに",
+          "pos": "Adverb",
+          "surface": "まさに"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nakushite_nashitohamasanisouda",
+      "input": "努力なくして成功なしとはまさにそうだ。"
+    },
+    {
+      "description": "the same literary predicate before a quotative particle",
+      "expected": [
+        {
+          "lemma": "実力",
+          "pos": "Noun",
+          "surface": "実力"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "勝利",
+          "pos": "Noun",
+          "surface": "勝利"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なし"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言う"
+        }
+      ],
+      "id": "nakushite_nashito_u",
+      "input": "実力なくして勝利なしと言う"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",
