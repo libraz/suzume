@@ -881,6 +881,47 @@
       ],
       "id": "rakana_riwo_su",
       "input": "明らかな誤りを正す"
+    },
+    {
+      "description": "Elongated i-adjective whose stem opens on the beautifying prefix mora",
+      "expected": [
+        {
+          "lemma": "おいしい",
+          "pos": "Adjective",
+          "surface": "おいしーー"
+        }
+      ],
+      "id": "oishi",
+      "input": "おいしーー"
+    },
+    {
+      "description": "Single elongation mark after the same stem stays inside the adjective",
+      "expected": [
+        {
+          "lemma": "ほんとに",
+          "pos": "Adverb",
+          "surface": "ほんとに"
+        },
+        {
+          "lemma": "おいしい",
+          "pos": "Adjective",
+          "surface": "おいしー"
+        }
+      ],
+      "id": "hontonioishi",
+      "input": "ほんとにおいしー"
+    },
+    {
+      "description": "Elongation after a shiku-paradigm ending on a stem with no prefix reading",
+      "expected": [
+        {
+          "lemma": "たのしい",
+          "pos": "Adjective",
+          "surface": "たのしーー"
+        }
+      ],
+      "id": "tanoshi",
+      "input": "たのしーー"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

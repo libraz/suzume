@@ -731,6 +731,28 @@
       ],
       "id": "korenamu_muru_naru",
       "input": "これなむ求むる道なる"
+    },
+    {
+      "description": "Classical ku-paradigm terminal with nothing behind it keeps its candidate",
+      "expected": [
+        {
+          "lemma": "空",
+          "pos": "Noun",
+          "surface": "空"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "青い",
+          "pos": "Adjective",
+          "surface": "青し"
+        }
+      ],
+      "id": "ha_shi",
+      "input": "空は青し"
     }
   ],
   "description": "classical tests",
