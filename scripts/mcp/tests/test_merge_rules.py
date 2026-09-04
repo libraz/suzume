@@ -1306,3 +1306,35 @@ class TestDerivationalNominalSuffix:
         result, rule = apply_suzume_merge(tokens, "夏み")
         assert [token["surface"] for token in result] == ["夏", "み"]
         assert rule != "derivational-nominal-suffix"
+
+
+class TestVariationSelectorMerge:
+    def test_reattaches_a_lone_variation_selector(self):
+        tokens = [
+            _tok("❄", pos="名詞", pos_sub1="サ変接続", lemma="*"),
+            _tok("️", pos="記号", pos_sub1="一般", lemma="*"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "❄️")
+        assert [token["surface"] for token in result] == ["❄️"]
+        assert rule == "variation-selector-merge"
+
+
+class TestBoundPrefixAdjective:
+    def test_joins_the_bound_prefix_to_an_unlisted_spelling(self):
+        tokens = [
+            _tok("物", pos="名詞", pos_sub1="非自立", lemma="物"),
+            _tok("哀しい", pos="形容詞", pos_sub1="自立", lemma="哀しい"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "物哀しい")
+        assert [token["surface"] for token in result] == ["物哀しい"]
+        assert result[0]["pos"] == "形容詞"
+        assert rule == "bound-prefix-adjective"
+
+    def test_leaves_a_formal_noun_before_the_negative_adjective(self):
+        tokens = [
+            _tok("こと", pos="名詞", pos_sub1="非自立", lemma="こと"),
+            _tok("なく", pos="形容詞", pos_sub1="自立", lemma="ない"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "ことなく")
+        assert [token["surface"] for token in result] == ["こと", "なく"]
+        assert rule != "bound-prefix-adjective"

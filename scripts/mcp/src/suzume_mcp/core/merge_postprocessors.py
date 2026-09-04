@@ -964,6 +964,70 @@ def _postprocess_classical_kemu(result: list[dict], applied_rule: str | None) ->
     return normalized, applied_rule
 
 
+_VARIATION_SELECTORS = regex.compile(r"^[︀-️\U000E0100-\U000E01EF]+$")
+
+
+def _postprocess_variation_selector_merge(
+    result: list[dict], applied_rule: str | None
+) -> tuple[list[dict], str | None]:
+    """Reattach a variation selector to the character it selects a form of.
+
+    A variation selector is a zero-width combining codepoint: it has no width,
+    no reading and no meaning apart from the character in front of it, so it
+    never stands alone. The reference dictionary emits one as its own token
+    whenever the base character is not a headword, which makes the same single
+    grapheme one token or two depending only on whether its emoji presentation
+    needs the selector at all.
+    """
+    merged: list[dict] = []
+    for token in result:
+        surface = token.get("surface", "")
+        if merged and surface and _VARIATION_SELECTORS.fullmatch(surface):
+            merged[-1] = {**merged[-1], "surface": merged[-1].get("surface", "") + surface}
+            if applied_rule is None:
+                applied_rule = "variation-selector-merge"
+            continue
+        merged.append(token)
+    return merged, applied_rule
+
+
+# 物 is the one dependent nominal that is also a bound intensifying prefix on an
+# adjective (物悲しい, 物寂しい, 物珍しい, 物足りない). The other members of its
+# tag take an adjective as a predicate over themselves instead, which is a
+# different construction and keeps its boundary (こと+なく, ためし+が+ない).
+_BOUND_ADJECTIVE_PREFIX = "物"
+
+
+def _postprocess_bound_prefix_adjective(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Join the bound prefix 物 to the adjective it intensifies.
+
+    In front of an adjective the morpheme is the prefix and the result is one
+    adjective; the dependent-noun reading needs something modifying it, which an
+    adjective behind it does not supply. The reference dictionary reaches the
+    prefix reading only when the pair is one of its headwords, which left one
+    spelling of the same word whole and split its variant.
+    """
+    merged: list[dict] = []
+    for token in result:
+        host = merged[-1] if merged else None
+        if (
+            host is not None
+            and host.get("surface") == _BOUND_ADJECTIVE_PREFIX
+            and host.get("pos") == "名詞"
+            and host.get("pos_sub1") == "非自立"
+            and token.get("pos") == "形容詞"
+            and token.get("pos_sub1") == "自立"
+        ):
+            combined = host.get("surface", "") + token.get("surface", "")
+            lemma = host.get("surface", "") + (token.get("lemma") or token.get("surface", ""))
+            merged[-1] = {"surface": combined, "pos": "形容詞", "pos_sub1": "自立", "lemma": lemma}
+            if applied_rule is None:
+                applied_rule = "bound-prefix-adjective"
+            continue
+        merged.append(token)
+    return merged, applied_rule
+
+
 def _heads_property_nominal(token: dict) -> bool:
     """Whether a token is the adjective stem み nominalizes."""
     return token.get("pos") == "形容詞"

@@ -31,6 +31,7 @@ from .merge_postprocessors import (
     _postprocess_adj_kari,
     _postprocess_ascii_joiner_merge,
     _postprocess_atode,
+    _postprocess_bound_prefix_adjective,
     _postprocess_bound_suffix_noun_cell,
     _postprocess_bound_voiced_suffix,
     _postprocess_classical_kemu,
@@ -69,6 +70,7 @@ from .merge_postprocessors import (
     _postprocess_stranded_lengthening_vowel,
     _postprocess_tomo_particle,
     _postprocess_totomoni,
+    _postprocess_variation_selector_merge,
     classical_adjective_lemma,
     nidan_cell,
 )
@@ -2087,6 +2089,8 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     result, applied_rule = _postprocess_nominal_copula_naru(result, applied_rule)
     result, applied_rule = _postprocess_nominal_before_conjunctive_te(result, applied_rule)
     result, applied_rule = _postprocess_derivational_nominal_suffix(result, applied_rule)
+    result, applied_rule = _postprocess_bound_prefix_adjective(result, applied_rule)
+    result, applied_rule = _postprocess_variation_selector_merge(result, applied_rule)
     result, applied_rule = _postprocess_izenkei_concessive(result, applied_rule)
     result, applied_rule = _postprocess_tomo_particle(result, applied_rule)
     result, applied_rule = _postprocess_bound_voiced_suffix(result, applied_rule)
