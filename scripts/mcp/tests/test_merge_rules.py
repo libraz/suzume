@@ -1360,3 +1360,120 @@ class TestPlaceNameKanjiMerge:
         result, rule = apply_suzume_merge(tokens, "バリ重要")
         assert [token["surface"] for token in result] == ["バリ", "重要"]
         assert rule != "proper-noun"
+
+
+class TestGuessedMimeticSpan:
+    def test_rebuilds_a_mimetic_guessed_as_a_verb_plus_a_noun(self):
+        tokens = [
+            _tok("ばっ", pos="動詞", pos_sub1="自立", conj_form="連用タ接続", lemma="ばる"),
+            _tok("ちり", pos="名詞", pos_sub1="一般", lemma="ちり"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "ばっちり")
+        assert [token["surface"] for token in result] == ["ばっちり"]
+        assert result[0]["pos"] == "副詞"
+        assert rule == "productive-mimetic"
+
+    def test_rebuilds_the_same_mimetic_guessed_as_a_stem_plus_an_auxiliary(self):
+        tokens = [
+            _tok("ばっち", pos="形容詞", pos_sub1="自立", conj_form="ガル接続", lemma="ばっちい"),
+            _tok("り", pos="助動詞", conj_form="基本形", lemma="り"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "ばっちり")
+        assert [token["surface"] for token in result] == ["ばっちり"]
+        assert result[0]["pos"] == "副詞"
+        assert rule == "productive-mimetic"
+
+    def test_keeps_a_continuative_cell_before_the_particle_that_selects_it(self):
+        tokens = [
+            _tok("やっ", pos="動詞", pos_sub1="自立", conj_form="連用タ接続", lemma="やる"),
+            _tok("たり", pos="助詞", pos_sub1="並立助詞", lemma="たり"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "やったり")
+        assert [token["surface"] for token in result] == ["やっ", "たり"]
+        assert rule != "productive-mimetic"
+
+    def test_keeps_a_continuative_cell_before_the_conditional_auxiliary(self):
+        tokens = [
+            _tok("あっ", pos="動詞", pos_sub1="自立", conj_form="連用タ接続", lemma="ある"),
+            _tok("たら", pos="助動詞", conj_form="仮定形", lemma="た"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "あったら")
+        assert [token["surface"] for token in result] == ["あっ", "たら"]
+        assert rule != "productive-mimetic"
+
+    def test_keeps_a_nominal_before_its_particle(self):
+        tokens = [
+            _tok("すもも", pos="名詞", pos_sub1="一般", lemma="すもも"),
+            _tok("も", pos="助詞", pos_sub1="係助詞", lemma="も"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "すももも")
+        assert [token["surface"] for token in result] == ["すもも", "も"]
+        assert rule != "productive-mimetic"
+
+    def test_keeps_an_adjective_stem_before_the_nominalizing_suffix(self):
+        tokens = [
+            _tok("やさし", pos="形容詞", pos_sub1="自立", conj_form="ガル接続", lemma="やさしい"),
+            _tok("さ", pos="名詞", pos_sub1="接尾", lemma="さ"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "やさしさ")
+        assert [token["surface"] for token in result] == ["やさし", "さ"]
+        assert rule != "productive-mimetic"
+
+
+class TestGuessedMimeticSpanBoundary:
+    def test_refuses_a_tto_span_that_crosses_a_conditional_auxiliary(self):
+        tokens = [
+            _tok("あっ", pos="動詞", pos_sub1="自立", conj_form="連用タ接続", lemma="ある"),
+            _tok("たら", pos="助動詞", conj_form="仮定形", lemma="た"),
+            _tok("ちょっと", pos="副詞", pos_sub1="助詞類接続", lemma="ちょっと"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "あったらちょっと")
+        assert [token["surface"] for token in result] == ["あっ", "たら", "ちょっと"]
+
+    def test_still_merges_a_tto_mimetic_with_no_licensed_attachment(self):
+        tokens = [
+            _tok("に", pos="助詞", pos_sub1="格助詞", lemma="に"),
+            _tok("こっ", pos="動詞", pos_sub1="自立", conj_form="連用タ接続", lemma="こう"),
+            _tok("と", pos="助詞", pos_sub1="格助詞", lemma="と"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "にこっと")
+        assert [token["surface"] for token in result] == ["にこっと"]
+        assert result[0]["pos"] == "副詞"
+        assert rule == "productive-mimetic"
+
+    def test_keeps_a_stacked_particle_pair_apart(self):
+        tokens = [
+            _tok("ばかり", pos="助詞", pos_sub1="副助詞", lemma="ばかり"),
+            _tok("か", pos="助詞", pos_sub1="副助詞", lemma="か"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "ばかりか")
+        assert [token["surface"] for token in result] == ["ばかり", "か"]
+        assert rule != "productive-mimetic"
+
+    def test_merges_a_doubled_stem_guessed_as_a_particle_pair(self):
+        tokens = [
+            _tok("やば", pos="形容詞", pos_sub1="自立", conj_form="ガル接続", lemma="やばい"),
+            _tok("や", pos="助動詞", conj_form="基本形", lemma="や"),
+            _tok("ば", pos="助詞", pos_sub1="接続助詞", lemma="ば"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "やばやば")
+        assert [token["surface"] for token in result] == ["やばやば"]
+        assert result[0]["pos"] == "副詞"
+        assert rule == "productive-mimetic"
+
+    def test_keeps_the_hypothetical_cell_before_its_particle(self):
+        tokens = [
+            _tok("あれ", pos="動詞", pos_sub1="自立", conj_form="仮定形", lemma="ある"),
+            _tok("ば", pos="助詞", pos_sub1="接続助詞", lemma="ば"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "あれば")
+        assert [token["surface"] for token in result] == ["あれ", "ば"]
+
+    def test_merges_an_odd_length_held_mora(self):
+        tokens = [
+            _tok("あ", pos="フィラー", lemma="あ"),
+            _tok("ああ", pos="感動詞", lemma="ああ"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "あああ")
+        assert [token["surface"] for token in result] == ["あああ"]
+        assert rule == "productive-mimetic"

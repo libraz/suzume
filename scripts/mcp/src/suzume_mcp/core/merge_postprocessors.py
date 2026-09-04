@@ -1896,6 +1896,12 @@ def _is_productive_mimetic_stem(surface: str) -> bool:
         return True
     if regex.fullmatch(r".っ.[らり]", surface):
         return True
+    # One mora held for three or more beats is emphasis, and the whole run is
+    # the word.  The dictionary segments it by whatever entries its length
+    # happens to cover, so the even lengths come back as a reduplication and
+    # the odd ones as a leftover beat plus a headword.
+    if len(set(surface)) == 1:
+        return True
     # Alternating two-mora mimetics such as ちくたく share their closing
     # mora even when the two halves are not identical.
     return length == 4 and surface[1] == surface[3]
@@ -1918,6 +1924,74 @@ def _is_split_reduplication(tokens: list[dict]) -> bool:
     if not regex.fullmatch(r"[\p{Hiragana}ー]+", surfaces[0]):
         return False
     return all(token.get("pos") in {"名詞", "副詞", "感動詞", "その他"} for token in tokens)
+
+
+# A stem cell selects no suffix of its own, so nothing attaches to it.  The
+# euphonic continuative is the opposite case: it exists only to carry the past
+# and conjunctive suffixes, whose whole series opens on た / て and their voiced
+# counterparts.  Both are named by the reference dictionary's inflection field,
+# so the licensing test needs no word list of its own.
+_STEM_ONLY_CONJ_FORMS: frozenset[str] = frozenset({"ガル接続", "語幹"})
+_EUPHONIC_CONTINUATIVE = "連用タ接続"
+_EUPHONIC_SUFFIX_HEADS = frozenset("たてだで")
+# The hypothetical particle names its cell just as plainly, and it is the one
+# conjunctive particle a single kana can imitate inside a doubled stem.
+_HYPOTHETICAL_PARTICLE = "ば"
+_HYPOTHETICAL_CELL = "仮定形"
+
+
+def _is_licensed_attachment(left: dict, right: dict) -> bool:
+    """Whether one token attaches to the one before it, proving the boundary.
+
+    Four attachments account for every real split that a mimetic's shape can
+    imitate: a bound suffix, whose left edge its host fixes; a particle after a
+    nominal, which is the ordinary noun-phrase boundary; a function word on a
+    particle, which is the ordinary stack; and an auxiliary or a conjunctive
+    particle after a predicate standing in a form that selects it.  A predicate
+    whose inflection the dictionary left unnamed proves nothing either way, so
+    it does not count as an attachment.
+    """
+    if right.get("pos_sub1") == "接尾":
+        return True
+    right_pos = right.get("pos")
+    if right_pos not in {"助詞", "助動詞"}:
+        return False
+    if left.get("pos") in {"名詞", "副詞", "代名詞", "感動詞"}:
+        return right_pos == "助詞"
+    if left.get("pos") == "助詞":
+        return True
+    if left.get("pos") not in {"動詞", "形容詞", "助動詞"}:
+        return False
+    left_form = left.get("conj_form") or ""
+    if left_form in {"", "*"} or left_form in _STEM_ONLY_CONJ_FORMS:
+        return False
+    if right.get("surface") == _HYPOTHETICAL_PARTICLE and right.get("pos_sub1") == "接続助詞":
+        return left_form == _HYPOTHETICAL_CELL
+    if left_form == _EUPHONIC_CONTINUATIVE:
+        return right.get("surface", "")[:1] in _EUPHONIC_SUFFIX_HEADS
+    return True
+
+
+def _spans_one_mimetic(tokens: list[dict]) -> bool:
+    """Whether a run of tokens is one mimetic the reference dictionary tore up.
+
+    A mimetic with no entry of its own gets guessed at, and the guess lands
+    wherever the unknown-word model happens to find a headword: the same
+    adverb comes back as a verb plus a noun in one sentence and an adjective
+    plus an auxiliary in the next.  The shape test already says the combined
+    surface is a mimetic, so what is left is to rule out a run whose split is
+    real — and a split is real exactly when something inside it attaches.
+    やっ+たり and あっ+たら put a suffix on the continuative cell that selects
+    it, すもも+も is a noun phrase and やさし+さ a derivation; ばっ+ちり puts a
+    noun after a continuative cell and ばっち+り hangs an auxiliary off an
+    adjective stem, and neither connection exists in the grammar.  A run
+    opening on an auxiliary is continuing a predicate that ended earlier.
+    """
+    if len(tokens) == 1:
+        return tokens[0].get("pos") in {"その他", "副詞", "感動詞"}
+    if tokens[0].get("pos") == "助動詞":
+        return False
+    return not any(_is_licensed_attachment(tokens[pos - 1], token) for pos, token in enumerate(tokens) if pos > 0)
 
 
 def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
@@ -1983,6 +2057,7 @@ def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | Non
                 and not closes_volitional_tto
                 and combined.endswith("っと")
                 and regex.fullmatch(r"[\p{Hiragana}ー]{3,12}", combined)
+                and _spans_one_mimetic(result[idx:end])
             ):
                 normalized.append({"surface": combined, "pos": "副詞", "lemma": combined})
                 idx = end
@@ -1998,9 +2073,9 @@ def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | Non
                 idx = end
                 matched = True
             elif _is_split_reduplication(result[idx:end]) or (
-                end == idx + 1
-                and result[idx].get("pos") in {"その他", "副詞", "感動詞"}
+                starts_at_real_boundary
                 and _is_productive_mimetic_stem(combined)
+                and _spans_one_mimetic(result[idx:end])
             ):
                 normalized.append({"surface": combined, "pos": "副詞", "lemma": combined})
                 idx = end
