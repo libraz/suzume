@@ -826,6 +826,33 @@
       ],
       "id": "sazu_beruna",
       "input": "残さず食べるな"
+    },
+    {
+      "description": "a two-codepoint reduplication before a verb is unchanged",
+      "expected": [
+        {
+          "lemma": "星",
+          "pos": "Noun",
+          "surface": "星"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "きらきら",
+          "pos": "Adverb",
+          "surface": "きらきら"
+        },
+        {
+          "lemma": "光る",
+          "pos": "Verb",
+          "surface": "光る"
+        }
+      ],
+      "id": "gakirakira_ru",
+      "input": "星がきらきら光る"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

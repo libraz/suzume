@@ -194,6 +194,70 @@
       ],
       "id": "nakushite_nashito_u",
       "input": "実力なくして勝利なしと言う"
+    },
+    {
+      "description": "a reduplicated mimetic whose halves span three codepoints stays one unit inside a longer kana run",
+      "expected": [
+        {
+          "lemma": "くしゃくしゃ",
+          "pos": "Adverb",
+          "surface": "くしゃくしゃ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "紙",
+          "pos": "Noun",
+          "surface": "紙"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "広げる",
+          "pos": "Verb",
+          "surface": "広げる"
+        }
+      ],
+      "id": "kushi_kushi_shita_wo_geru",
+      "input": "くしゃくしゃした紙を広げる"
+    },
+    {
+      "description": "the same shape before a kanji noun",
+      "expected": [
+        {
+          "lemma": "しゃきしゃき",
+          "pos": "Adverb",
+          "surface": "しゃきしゃき"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "食感",
+          "pos": "Noun",
+          "surface": "食感"
+        }
+      ],
+      "id": "shi_kishi_kishita",
+      "input": "しゃきしゃきした食感"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",
