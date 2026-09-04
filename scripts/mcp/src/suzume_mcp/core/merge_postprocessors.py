@@ -964,6 +964,45 @@ def _postprocess_classical_kemu(result: list[dict], applied_rule: str | None) ->
     return normalized, applied_rule
 
 
+def _heads_property_nominal(token: dict) -> bool:
+    """Whether a token is the adjective stem み nominalizes."""
+    return token.get("pos") == "形容詞"
+
+
+# A derivational suffix that builds a nominal from a predicate, with the base it
+# selects. It is fully productive, but the reference dictionary only joins it to
+# the host when the pair happens to be one of its headwords — 痛み and 強み come
+# back whole while 熱み and 酸み come back in pieces, which is the lexicon
+# deciding a question the morphology already answers.
+_DERIVATIONAL_NOMINAL_SUFFIXES = {
+    "み": _heads_property_nominal,
+}
+
+
+def _postprocess_derivational_nominal_suffix(
+    result: list[dict], applied_rule: str | None
+) -> tuple[list[dict], str | None]:
+    """Join a productive nominalizing suffix to the base it selects."""
+    merged: list[dict] = []
+    for token in result:
+        host = merged[-1] if merged else None
+        selects_host = _DERIVATIONAL_NOMINAL_SUFFIXES.get(token.get("surface", ""))
+        if (
+            host is None
+            or selects_host is None
+            or token.get("pos") != "名詞"
+            or token.get("pos_sub1") != "接尾"
+            or not selects_host(host)
+        ):
+            merged.append(token)
+            continue
+        combined = host.get("surface", "") + token.get("surface", "")
+        merged[-1] = {"surface": combined, "pos": "名詞", "pos_sub1": "一般", "lemma": combined}
+        if applied_rule is None:
+            applied_rule = "derivational-nominal-suffix"
+    return merged, applied_rule
+
+
 _CONJUNCTIVE_TE = "て"
 
 

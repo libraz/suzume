@@ -1285,3 +1285,24 @@ class TestCompoundVerbPronounHost:
         result, rule = apply_suzume_merge(tokens, "それ違う")
         assert [token["surface"] for token in result] == ["それ", "違う"]
         assert rule != "compound-verb"
+
+
+class TestDerivationalNominalSuffix:
+    def test_joins_the_nominalizer_to_an_unlisted_adjective_stem(self):
+        tokens = [
+            _tok("熱", pos="形容詞", pos_sub1="自立", lemma="熱い"),
+            _tok("み", pos="名詞", pos_sub1="接尾", lemma="み"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "熱み")
+        assert [token["surface"] for token in result] == ["熱み"]
+        assert result[0]["pos"] == "名詞"
+        assert rule == "derivational-nominal-suffix"
+
+    def test_leaves_the_suffix_after_a_base_it_does_not_select(self):
+        tokens = [
+            _tok("夏", pos="名詞", pos_sub1="一般", lemma="夏"),
+            _tok("み", pos="名詞", pos_sub1="接尾", lemma="み"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "夏み")
+        assert [token["surface"] for token in result] == ["夏", "み"]
+        assert rule != "derivational-nominal-suffix"
