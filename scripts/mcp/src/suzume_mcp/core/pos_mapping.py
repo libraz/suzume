@@ -7,6 +7,7 @@ import regex
 from .constants import (
     ADVERB_OVERRIDES,
     BENEFACTIVE_REQUEST_LEMMAS,
+    CLASSICAL_KERI_CONJ_TYPE,
     CLASSICAL_KI_CONJ_TYPE,
     DERIVATIONAL_SUFFIX_VERB_LEMMAS,
     DIALECT_FINAL_PARTICLES,
@@ -322,6 +323,26 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
         if pos == "記号" and (t.get("pos_sub1", "") == "アルファベット" or is_all_kanji(surface) or carries_only_text):
             t["pos"] = "名詞"
             t["pos_sub1"] = "一般"
+            continue
+
+        # The classical perfect ぬ has no continuative entry, so the reference
+        # dictionary reads the にけり chain as the case particle に followed by
+        # the ra-row verb 蹴る spelled in kana. What actually follows there is the
+        # classical past, whose cells are exactly the three spellings gated here,
+        # and the perfect's continuative attaches to a predicate rather than to a
+        # nominal — so a noun in front of the particle leaves the case reading
+        # and its verb alone (犬にける). The kanji spelling never enters the rule,
+        # so a real kick keeps its own reading (壁を蹴る).
+        if (
+            pos == "動詞"
+            and t.get("lemma") == "ける"
+            and surface in ("けり", "ける", "けれ")
+            and idx > 0
+            and tokens[idx - 1].get("surface") == "に"
+            and tokens[idx - 1].get("pos") == "助詞"
+            and (idx < 2 or tokens[idx - 2].get("pos") != "名詞")
+        ):
+            t.update({"pos": "助動詞", "pos_sub1": "*", "conj_type": CLASSICAL_KERI_CONJ_TYPE, "lemma": "けり"})
             continue
 
         # Fix kanji adverbs MeCab misclassifies as 名詞

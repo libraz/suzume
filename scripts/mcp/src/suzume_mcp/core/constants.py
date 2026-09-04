@@ -614,6 +614,7 @@ DIALECT_FINAL_PARTICLES: frozenset[str] = frozenset({"ばい", "え"})
 # continuative (あり+き), while the causal particle follows a finite predicate
 # — a terminal-form verb or the past auxiliary (書く+き, 飲ん+だ+き).
 CLASSICAL_KI_CONJ_TYPE: str = "文語・キ"
+CLASSICAL_KERI_CONJ_TYPE: str = "文語・ケリ"
 FINITE_PREDECESSOR_CONJ_FORM: str = "基本形"
 
 # Regional request forms of the benefactive くれる, mapped to the dictionary
