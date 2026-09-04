@@ -201,6 +201,43 @@
       ],
       "id": "ni_betokou",
       "input": "先に食べとこう"
+    },
+    {
+      "description": "Formal noun plus case particle plus sahen continuative stays split",
+      "expected": [
+        {
+          "lemma": "そういう",
+          "pos": "Determiner",
+          "surface": "そういう"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "とこ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "souiukotonishitokou",
+      "input": "そういうことにしとこう"
     }
   ],
   "description": "auxiliary_colloquial tests",

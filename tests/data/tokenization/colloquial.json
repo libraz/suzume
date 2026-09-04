@@ -413,6 +413,33 @@
       ],
       "id": "soreha_uyonaa",
       "input": "それは違うよなあ"
+    },
+    {
+      "description": "Na-adjective stem does not head a fabricated sokuonbin before the quotative",
+      "expected": [
+        {
+          "lemma": "好き",
+          "pos": "Adjective",
+          "surface": "好き"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kittte_ttta",
+      "input": "好きって言った"
     }
   ],
   "description": "colloquial tests",
