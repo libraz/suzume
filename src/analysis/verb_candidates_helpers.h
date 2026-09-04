@@ -523,6 +523,15 @@ struct EmphaticSuffixMatch {
   size_t repeated_vowel_count = 0;
 
   [[nodiscard]] bool empty() const { return suffix.empty(); }
+
+  // Whether the emphasis adds a segment rather than holding the vowel already
+  // there. The glottal stop is a clipped colloquial form of the word it closes
+  // (ですっ, ますっっ); a prolonged sound mark, a small vowel or a repeated
+  // vowel only draws the final mora out (ですー, たああ) and leaves the word
+  // itself unchanged.
+  [[nodiscard]] bool addsSegment() const {
+    return suffix.find("っ") != std::string::npos || suffix.find("ッ") != std::string::npos;
+  }
 };
 
 /**
