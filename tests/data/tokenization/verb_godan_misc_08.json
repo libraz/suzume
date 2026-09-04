@@ -1005,6 +1005,33 @@
       ],
       "id": "mitaina",
       "input": "雲みたいな形"
+    },
+    {
+      "description": "Listed deverbal noun reads as the continuative the desiderative selects",
+      "expected": [
+        {
+          "lemma": "楽しむ",
+          "pos": "Verb",
+          "surface": "楽しみ"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "気持ち",
+          "pos": "Noun",
+          "surface": "気持ち"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "shimitai_chida",
+      "input": "楽しみたい気持ちだ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

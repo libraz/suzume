@@ -924,6 +924,33 @@
       ],
       "id": "nikeriwo_reru",
       "input": "壁にけりを入れる"
+    },
+    {
+      "description": "Negative control: the same entry stays nominal in an argument position",
+      "expected": [
+        {
+          "lemma": "旅行",
+          "pos": "Noun",
+          "surface": "旅行"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "楽しみ",
+          "pos": "Noun",
+          "surface": "楽しみ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "ga_shimidesu",
+      "input": "旅行が楽しみです"
     }
   ],
   "description": "noun_deverbal tests",
