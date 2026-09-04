@@ -1496,6 +1496,25 @@ def _is_productive_mimetic_stem(surface: str) -> bool:
     return length == 4 and surface[1] == surface[3]
 
 
+def _is_split_reduplication(tokens: list[dict]) -> bool:
+    """Whether adjacent tokens are one reduplicated mimetic MeCab tore apart.
+
+    A mimetic half that is also a headword of its own gets segmented as that
+    word (ちょき+ちょき), while a half with no entry survives as one adverb
+    (くしゃくしゃ).  The construction is the same either way, so the shape
+    decides rather than the lexicon: two or more adjacent content tokens with
+    the identical hiragana surface are the doubling.
+    """
+    if len(tokens) < 2:
+        return False
+    surfaces = [token.get("surface", "") for token in tokens]
+    if len(set(surfaces)) != 1 or len(surfaces[0]) < 2:
+        return False
+    if not regex.fullmatch(r"[\p{Hiragana}ー]+", surfaces[0]):
+        return False
+    return all(token.get("pos") in {"名詞", "副詞", "感動詞", "その他"} for token in tokens)
+
+
 def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Rebuild productive mimetic search units from arbitrary MeCab splits.
 
@@ -1573,7 +1592,7 @@ def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | Non
                 normalized.append({"surface": "と", "pos": "助詞", "lemma": "と"})
                 idx = end
                 matched = True
-            elif (
+            elif _is_split_reduplication(result[idx:end]) or (
                 end == idx + 1
                 and result[idx].get("pos") in {"その他", "副詞", "感動詞"}
                 and _is_productive_mimetic_stem(combined)
