@@ -300,6 +300,50 @@
       ],
       "id": "ga_no_wo_eru",
       "input": "我が国の未来を考える"
+    },
+    {
+      "description": "Kakari-musubi izenkei closing the clause",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "定まる",
+          "pos": "Verb",
+          "surface": "定まれ"
+        }
+      ],
+      "id": "koso_mare",
+      "input": "心こそ定まれ"
+    },
+    {
+      "description": "Kakari-musubi izenkei on a single-kanji stem",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "湧く",
+          "pos": "Verb",
+          "surface": "湧け"
+        }
+      ],
+      "id": "koso_ke",
+      "input": "水こそ湧け"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

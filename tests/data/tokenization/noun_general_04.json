@@ -427,6 +427,33 @@
       ],
       "id": "moriwo_jiru",
       "input": "温もりを感じる"
+    },
+    {
+      "description": "Nominal predicate with the classical copula after the binding particle",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "大切",
+          "pos": "Adjective",
+          "surface": "大切"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なれ"
+        }
+      ],
+      "id": "koso_nare_2",
+      "input": "本こそ大切なれ。"
     }
   ],
   "description": "General nouns (part 4/4)",
