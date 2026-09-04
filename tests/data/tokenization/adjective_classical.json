@@ -80,6 +80,92 @@
       ],
       "id": "shi_6",
       "input": "夜深し"
+    },
+    {
+      "description": "正しかりければ進む - auto-generated",
+      "expected": [
+        {
+          "lemma": "正しい",
+          "pos": "Adjective",
+          "surface": "正しかり"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "shiku_karikereba_tadashi",
+      "input": "正しかりければ進む"
+    },
+    {
+      "description": "美しかりければ買う - auto-generated",
+      "expected": [
+        {
+          "lemma": "美しい",
+          "pos": "Adjective",
+          "surface": "美しかり"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買う"
+        }
+      ],
+      "id": "shiku_karikereba_utsukushi",
+      "input": "美しかりければ買う"
+    },
+    {
+      "description": "勉強さえすれば受かる - auto-generated",
+      "expected": [
+        {
+          "lemma": "勉強",
+          "pos": "Noun",
+          "surface": "勉強"
+        },
+        {
+          "lemma": "さえ",
+          "pos": "Particle",
+          "surface": "さえ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "すれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "受かる",
+          "pos": "Verb",
+          "surface": "受かる"
+        }
+      ],
+      "id": "binding_sae_sureba",
+      "input": "勉強さえすれば受かる"
     }
   ],
   "description": "adjective_classical tests",
