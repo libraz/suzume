@@ -2997,8 +2997,50 @@
       ],
       "id": "wakannakattta",
       "input": "わかんなかった"
+    },
+    {
+      "description": "ichidan volitional before a final particle with a case-marked phrase to its left",
+      "expected": [
+        {
+          "lemma": "次",
+          "pos": "Noun",
+          "surface": "次"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "計画",
+          "pos": "Noun",
+          "surface": "計画"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "立てる",
+          "pos": "Verb",
+          "surface": "立てよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "no_wo_teyouka",
+      "input": "次の計画を立てようか"
     }
   ],
-  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
+  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/8)",
   "version": "1.0"
 }

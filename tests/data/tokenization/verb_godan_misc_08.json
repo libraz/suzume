@@ -1,0 +1,38 @@
+{
+  "cases": [
+    {
+      "description": "negative control: the formal noun keeps its span against a one-mora volitional",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "うえ",
+          "pos": "Noun",
+          "surface": "うえ"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "ndauede_mu",
+      "input": "読んだうえで進む"
+    }
+  ],
+  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
+  "version": "1.0"
+}
