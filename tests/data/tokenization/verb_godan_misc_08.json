@@ -1172,6 +1172,77 @@
       ],
       "id": "tett",
       "input": "待てっ"
+    },
+    {
+      "description": "ichidan imperative よ stays one morpheme at the clause end",
+      "expected": [
+        {
+          "lemma": "平和",
+          "pos": "Noun",
+          "surface": "平和"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "求める",
+          "pos": "Verb",
+          "surface": "求めよ"
+        }
+      ],
+      "id": "wo_meyo",
+      "input": "平和を求めよ。"
+    },
+    {
+      "description": "a godan imperative takes the final particle, not the よ cell",
+      "expected": [
+        {
+          "lemma": "ここ",
+          "pos": "Pronoun",
+          "surface": "ここ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "集まる",
+          "pos": "Verb",
+          "surface": "集まれ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "kokoni_mareyo",
+      "input": "ここに集まれよ。"
+    },
+    {
+      "description": "a fixed adverb whose head is no adverb stays one token",
+      "expected": [
+        {
+          "lemma": "決して",
+          "pos": "Adverb",
+          "surface": "決して"
+        },
+        {
+          "lemma": "許す",
+          "pos": "Verb",
+          "surface": "許さ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "shite_sanai",
+      "input": "決して許さない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

@@ -322,6 +322,65 @@
       ],
       "id": "kara_suru",
       "input": "心から感謝する"
+    },
+    {
+      "description": "an adverb plus a verb is not a four-mora mimetic",
+      "expected": [
+        {
+          "lemma": "もしか",
+          "pos": "Adverb",
+          "surface": "もしか"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        },
+        {
+          "lemma": "困る",
+          "pos": "Verb",
+          "surface": "困る"
+        }
+      ],
+      "id": "moshikashitara_ru",
+      "input": "もしかしたら困る"
+    },
+    {
+      "description": "the modal adverb keeps its own inflection boundary",
+      "expected": [
+        {
+          "lemma": "もしか",
+          "pos": "Adverb",
+          "surface": "もしか"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "違う",
+          "pos": "Verb",
+          "surface": "違う"
+        },
+        {
+          "lemma": "かも",
+          "pos": "Particle",
+          "surface": "かも"
+        }
+      ],
+      "id": "moshikashite_ukamo",
+      "input": "もしかして違うかも"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

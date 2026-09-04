@@ -1318,6 +1318,23 @@
       ],
       "id": "kunai_4",
       "input": "エモくない話"
+    },
+    {
+      "description": "ichidan imperative よ after an adverbial adjective",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "起きる",
+          "pos": "Verb",
+          "surface": "起きよ"
+        }
+      ],
+      "id": "ku_kiyo",
+      "input": "早く起きよ。"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",
