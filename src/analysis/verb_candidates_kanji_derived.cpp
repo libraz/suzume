@@ -228,8 +228,19 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
       }
       const auto& best = *selected;
       const auto* godan_row = grammar::Conjugation::getGodanRow(best.verb_type);
+      // Two of the o-row morae that complete a mizenkei are also particles (読も,
+      // 死の), and on those the productive path doubles as a way to coin a verb
+      // out of the boundary in front of the volitional: ご飯+もう is read as a
+      // mizenkei of the non-word 飯む, which then collects the strong →意志
+      // connection. The surfaces are identical, so the only thing separating
+      // them is whether the reconstructed base is a verb at all — and every
+      // productive case that needs this mora is a common lexical verb.
+      const bool completing_mora_is_particle =
+          vh::hasParticleDictionaryEntry(dict_manager, extractSubstring(codepoints, kanji_end, kanji_end + 1));
+      const bool base_attested = selected_from_dictionary || vh::isVerbInDictionary(dict_manager, best.base_form);
       if ((selected_from_dictionary || best.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) &&
-          godan_row != nullptr && godan_row->o_row == codepoints[kanji_end] && best.base_form != full_surface) {
+          (base_attested || !completing_mora_is_particle) && godan_row != nullptr &&
+          godan_row->o_row == codepoints[kanji_end] && best.base_form != full_surface) {
         const size_t stem_end = kanji_end + 1;
         auto volitional =
             makeVerbCandidate(stem_surface, start_pos, stem_end, candidate::verb_cost::kStrongBonus, best.base_form,
