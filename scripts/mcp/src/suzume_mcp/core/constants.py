@@ -134,7 +134,14 @@ SLANG_VERB_STEMS: dict[str, str] = {
 }
 
 # タリ活用副詞: stem + と -> Adverb
+#
+# A stem ending in 然 is derived from its shape, and a reduplicated stem MeCab
+# already reads as an adverb is derived from that tag, so neither needs a line
+# here. What is left is the reduplicated stems MeCab has no adverbial reading
+# for: 煌々 is listed only as a plain noun, and 黒々 is not one token at all.
 TARI_ADVERB_STEMS: list[str] = [
+    "煌々",
+    "黒々",
     "泰然",
     "堂々",
     "悠々",

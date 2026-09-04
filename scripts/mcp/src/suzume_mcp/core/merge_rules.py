@@ -1474,6 +1474,36 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     if applied_rule is None:
                         applied_rule = "tari-adverb"
 
+        # Reduplication is the other productive source of this class (淡々と,
+        # 着々と, 深々と). MeCab already reads the reduplicated stem as an adverb
+        # where it knows the word, so that tag is what separates the taru form
+        # from a plural whose と is a case or conjunctive particle: 人々と話す and
+        # 山々と川 keep 名詞-一般 and stay split. Stems MeCab does not know at all
+        # fall through to the list below.
+        if not merged and t.get("pos") == "副詞":
+            adverb_surface = t.get("surface", "")
+            if (
+                adverb_surface.endswith("々")
+                and remaining.startswith(adverb_surface + "と")
+                and i + 1 < len(tokens)
+                and tokens[i + 1].get("pos") == "助詞"
+            ):
+                result.append({"surface": adverb_surface + "と", "pos": "副詞", "lemma": adverb_surface})
+                i += 2
+                merged = True
+                if applied_rule is None:
+                    applied_rule = "tari-adverb"
+            elif adverb_surface.endswith("々と"):
+                # MeCab reads a handful of these as one adverb already, and cites
+                # them with the connective attached. The stem is the citation form
+                # everywhere else in this class, so a taru adverb gets one lemma
+                # however it was reached.
+                result.append({"surface": adverb_surface, "pos": "副詞", "lemma": adverb_surface[:-1]})
+                i += 1
+                merged = True
+                if applied_rule is None:
+                    applied_rule = "tari-adverb"
+
         if not merged:
             for stem in TARI_ADVERB_STEMS:
                 adverb = stem + "と"
