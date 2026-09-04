@@ -301,7 +301,11 @@ bool verbFormLicensesAuxiliary(core::ExtendedPOS verb_epos, core::ExtendedPOS au
 // absorb the closed auxiliary selected by that form (確かめ+たい, しかる+べく).
 // Both the overlapping left edge and its EPOS-to-auxiliary connection are
 // required, so an incidental auxiliary homograph does not suppress a lexical
-// verb elsewhere.
+// verb elsewhere. The left edge also has to be a complete verb form rather than
+// merely be shaped like one: a reconstruction whose base form is attested
+// nowhere carries no more evidence than the candidate it would veto, and one
+// starting a mora too early vetoes exactly the reading that would have exposed
+// it (the non-word なきゃわく removing わかん from なきゃ+わかん+ない).
 bool reopensObservedVerbAuxiliaryBoundary(const core::Lattice& lattice,
                                           const dictionary::DictionaryManager& dict_manager, std::string_view text,
                                           const ByteOffsets& byte_offsets, const UnknownCandidate& candidate) {
@@ -315,7 +319,7 @@ bool reopensObservedVerbAuxiliaryBoundary(const core::Lattice& lattice,
       continue;
     }
     if (core::anyEdgeEndingAt(lattice, split, [&](const core::LatticeEdge& edge) {
-          return edge.start < candidate.start && edge.pos == core::PartOfSpeech::Verb &&
+          return edge.start < candidate.start && edge.pos == core::PartOfSpeech::Verb && edge.lemmaVerified() &&
                  verbFormLicensesAuxiliary(edge.extended_pos, auxiliary->extended_pos);
         })) {
       return true;
