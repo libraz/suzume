@@ -428,38 +428,52 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
     }
   }
 
-  // Try ABAB pattern for exactly 4 chars (traditional pattern)
-  if (mimetic_len >= 4) {
-    // Check if all 4 chars are the expected type
-    bool valid = true;
-    for (size_t i = 0; i < 4; ++i) {
-      if (!isSameScriptOrModifier(start_pos + i)) {
-        valid = false;
+  // The same reduplication may open a longer kana run instead of exhausting
+  // it (ぐちゃぐちゃ|になった, ちょきちょき|した), and there the branch above
+  // has nothing to compare halves against. Look for the doubling as a prefix,
+  // longest first, so the shape is recognized independently of what follows.
+  //
+  // The half is measured in codepoints rather than fixed at two, because a
+  // mora may be spelled with a small kana: ぐちゃ and ちょき are two morae in
+  // three codepoints, and a fixed width reads them out of alignment. The
+  // boundary conditions are what keep the halves mora-aligned — neither half
+  // may open on a small kana, and the doubling may not end in the middle of a
+  // mora either.
+  //
+  // A prefix is weaker evidence than a reduplication that is the whole run,
+  // so it keeps the weaker cost and does not return early: the surrounding
+  // readings still compete with it.
+  constexpr size_t kMinReduplicationHalf = 2;
+  for (size_t half = mimetic_len / 2; half >= kMinReduplicationHalf; --half) {
+    const size_t doubled_end = start_pos + (2 * half);
+    if (isSmallKanaAt(start_pos) || isSmallKanaAt(doubled_end)) {
+      continue;
+    }
+    bool halves_match = true;
+    bool half_is_uniform = true;
+    for (size_t offset = 0; offset < half; ++offset) {
+      if (codepoints[start_pos + offset] != codepoints[start_pos + half + offset]) {
+        halves_match = false;
         break;
       }
+      half_is_uniform = half_is_uniform && codepoints[start_pos + offset] == codepoints[start_pos];
     }
-
-    if (valid) {
-      char32_t ch0 = codepoints[start_pos];
-      char32_t ch1 = codepoints[start_pos + 1];
-      char32_t ch2 = codepoints[start_pos + 2];
-      char32_t ch3 = codepoints[start_pos + 3];
-
-      if (ch0 == ch2 && ch1 == ch3 && ch0 != ch1 && !isSmallKanaAt(start_pos)) {
-        // ABAB pattern detected (e.g., わくわく, きらきら, どきどき)
-        // Excludes AAAA pattern (e.g., もももも) where all chars are the same
-        std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
-        if (!surface.empty()) {
-          auto cand = makeCandidate(surface, start_pos, start_pos + 4, core::PartOfSpeech::Adverb, 0.1F, true,
-                                    CandidateOrigin::Onomatopoeia);
+    // A run of one repeated codepoint (もももも) is emphatic lengthening, not
+    // a reduplicated mimetic stem.
+    if (!halves_match || half_is_uniform) {
+      continue;
+    }
+    std::string surface = extractSubstring(codepoints, start_pos, doubled_end);
+    if (!surface.empty()) {
+      auto cand = makeCandidate(surface, start_pos, doubled_end, core::PartOfSpeech::Adverb, 0.1F, true,
+                                CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
-          cand.confidence = 1.0F;
-          cand.pattern = "abab_pattern";
+      cand.confidence = 1.0F;
+      cand.pattern = "reduplicated_prefix";
 #endif
-          candidates.push_back(cand);
-        }
-      }
+      candidates.push_back(cand);
     }
+    break;
   }
 
   // A heterogeneous four-mora form followed by quotative と is another
