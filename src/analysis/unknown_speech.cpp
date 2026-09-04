@@ -444,23 +444,29 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
   // so it keeps the weaker cost and does not return early: the surrounding
   // readings still compete with it.
   constexpr size_t kMinReduplicationHalf = 2;
-  for (size_t half = mimetic_len / 2; half >= kMinReduplicationHalf; --half) {
+  // A run of one repeated codepoint (もももも) is emphatic lengthening, not a
+  // reduplicated stem. Every half of such a run matches, so recognizing it
+  // once here also keeps the scan below from comparing each width in full.
+  size_t uniform_prefix = start_pos;
+  while (uniform_prefix < mimetic_end && codepoints[uniform_prefix] == codepoints[start_pos]) {
+    ++uniform_prefix;
+  }
+  for (size_t half = mimetic_len / 2; half >= kMinReduplicationHalf && uniform_prefix < mimetic_end; --half) {
     const size_t doubled_end = start_pos + (2 * half);
-    if (isSmallKanaAt(start_pos) || isSmallKanaAt(doubled_end)) {
+    // The doubling repeats the opening codepoint at the second half, so one
+    // comparison rejects most widths before the halves are walked.
+    if (codepoints[start_pos + half] != codepoints[start_pos] || isSmallKanaAt(start_pos) ||
+        isSmallKanaAt(doubled_end) || uniform_prefix - start_pos >= half) {
       continue;
     }
     bool halves_match = true;
-    bool half_is_uniform = true;
-    for (size_t offset = 0; offset < half; ++offset) {
+    for (size_t offset = 1; offset < half; ++offset) {
       if (codepoints[start_pos + offset] != codepoints[start_pos + half + offset]) {
         halves_match = false;
         break;
       }
-      half_is_uniform = half_is_uniform && codepoints[start_pos + offset] == codepoints[start_pos];
     }
-    // A run of one repeated codepoint (もももも) is emphatic lengthening, not
-    // a reduplicated mimetic stem.
-    if (!halves_match || half_is_uniform) {
+    if (!halves_match) {
       continue;
     }
     std::string surface = extractSubstring(codepoints, start_pos, doubled_end);
