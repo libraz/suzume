@@ -1040,6 +1040,87 @@
       ],
       "id": "nashi_shi_ni_mu",
       "input": "なし崩し的に進む"
+    },
+    {
+      "description": "kanji plus okurigana host cannot license a closed suffix",
+      "expected": [
+        {
+          "lemma": "花びら",
+          "pos": "Noun",
+          "surface": "花びら"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "舞う",
+          "pos": "Verb",
+          "surface": "舞う"
+        }
+      ],
+      "id": "biraga_u",
+      "input": "花びらが舞う"
+    },
+    {
+      "description": "same host with a different case particle",
+      "expected": [
+        {
+          "lemma": "花びら",
+          "pos": "Noun",
+          "surface": "花びら"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "拾う",
+          "pos": "Verb",
+          "surface": "拾う"
+        }
+      ],
+      "id": "birawo_u",
+      "input": "花びらを拾う"
+    },
+    {
+      "description": "a nominal host closing on a script boundary still licenses the suffix",
+      "expected": [
+        {
+          "lemma": "初心者",
+          "pos": "Noun",
+          "surface": "初心者"
+        },
+        {
+          "lemma": "向け",
+          "pos": "Suffix",
+          "surface": "向け"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "解説",
+          "pos": "Noun",
+          "surface": "解説"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読む"
+        }
+      ],
+      "id": "keno_wo_mu",
+      "input": "初心者向けの解説を読む"
     }
   ],
   "description": "General nouns (part 4/4)",
