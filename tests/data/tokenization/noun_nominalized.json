@@ -1,0 +1,119 @@
+{
+  "cases": [
+    {
+      "description": "Deverbal noun at a clause end is not split by the classical past auxiliary",
+      "expected": [
+        {
+          "lemma": "宝石",
+          "pos": "Noun",
+          "surface": "宝石"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "似る",
+          "pos": "Verb",
+          "surface": "似"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "輝き",
+          "pos": "Noun",
+          "surface": "輝き"
+        }
+      ],
+      "id": "ni_ta_ki",
+      "input": "宝石に似た輝き"
+    },
+    {
+      "description": "Deverbal noun at a clause end after a past attributive",
+      "expected": [
+        {
+          "lemma": "優れる",
+          "pos": "Verb",
+          "surface": "優れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "働き",
+          "pos": "Noun",
+          "surface": "働き"
+        }
+      ],
+      "id": "reta_ki",
+      "input": "優れた働き"
+    },
+    {
+      "description": "Deverbal noun at a clause end after the genitive",
+      "expected": [
+        {
+          "lemma": "音",
+          "pos": "Noun",
+          "surface": "音"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "響き",
+          "pos": "Noun",
+          "surface": "響き"
+        }
+      ],
+      "id": "no_ki_2",
+      "input": "音の響き"
+    },
+    {
+      "description": "Suspended continuative before a comma stays a verb",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
+        },
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰る"
+        }
+      ],
+      "id": "wo_mi_ni_ru",
+      "input": "本を読み、家に帰る"
+    }
+  ],
+  "description": "noun_nominalized tests",
+  "version": "1.0"
+}
