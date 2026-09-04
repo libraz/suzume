@@ -140,6 +140,16 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
       if (is_hatsuonbin) {
         // ん + ど (どく/どいた) or じ (じゃう/じゃった) or で (でる/でた/でて)
         is_contraction_pattern = (next_char == U'ど' || next_char == U'じ' || next_char == U'で');
+        // ん + で closes the euphonic cell on its own, and what follows is the
+        // contracted aspect auxiliary. Asking the analyzer to read the whole run
+        // as one verb hands it a shape no paradigm has, so where the base is not
+        // in the dictionary it answers with a fabricated Ichidan lemma instead of
+        // the Godan row the cell actually spells (混んでる → 混る, not 混む). The
+        // ikuon branch below already stops at its own closed cell for the same
+        // reason.
+        if (next_char == U'で') {
+          inflection_end = kanji_end + 2;
+        }
       } else if (is_ikuon) {
         // い + と (とく/といた) or ち (ちゃう/ちゃった). The exact
         // two-kana い+た/だ run is also a closed past form. In that case the
@@ -507,6 +517,21 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
       std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
       std::string hira_stem = (n_pos > kanji_end) ? extractSubstring(codepoints, kanji_end, n_pos) : "";
       const std::string lexical_stem = kanji_stem + hira_stem;
+
+      // The kana between the kanji and the euphony is the verb's own okurigana,
+      // and a nasal euphony belongs to a Godan verb ending in む/ぶ/ぬ, whose
+      // okurigana never spells the connective (汗ば+ん, 苦し+ん, 慈し+ん). Where
+      // it does, the run is a continuative that has already handed its clause on
+      // and the euphony belongs to whatever follows: 見+て+くん, not a euphonic
+      // cell of the non-word 見てくむ. The kanji-only stem is unaffected, and so
+      // is the case where the onbin form settles first (書い+て+く+ん+だ).
+      const bool okurigana_spells_connective =
+          std::any_of(codepoints.begin() + static_cast<std::ptrdiff_t>(kanji_end),
+                      codepoints.begin() + static_cast<std::ptrdiff_t>(n_pos),
+                      [](char32_t kana) { return kana == U'て' || kana == U'で'; });
+      if (okurigana_spells_connective) {
+        break;
+      }
 
       // A complete predicate followed by the nominalizer ん and copula だ is
       // explanatory (食べる+ん+だ, 高い+ん+だ), not a nasal-euphonic verb.
