@@ -12,7 +12,6 @@ from .constants import (
     COMPOUND_VERB_V2_ICHIDAN,
     COPULA_SURFACES,
     COUNTER_UNITS,
-    EMPHATIC_SOKUON,
     INTERROGATIVES,
     KYUJITAI_TO_SHINJITAI,
     QUANTITY_BOUND_SUFFIXES,
@@ -44,15 +43,24 @@ _GODAN_ERO_TO_BASE = {
 }
 
 
-def _is_emphatic_spelling(original: str, standard: str) -> bool:
+def _is_emphatic_spelling(original: str, standard: str, host_pos: str = "") -> bool:
     """Whether `original` is `standard` written with emphatic lengthening or repetition.
 
-    Scoped to prolonged sound marks: removing them and collapsing runs of the same
-    character reduces かわいーー and すごーーい to their dictionary forms, while a genuine
+    Scoped to the marks that spell emphasis rather than a morpheme: the prolonged
+    sound mark, and the utterance-final sokuon, which is dropped outright instead
+    of being respelled. Removing them and collapsing runs of the same character
+    reduces かわいーー and すごーーい to their dictionary forms, while a genuine
     lexical substitution (にゃー → ねえ) stays distinct. Vowel repetition without a mark
     (すごいいいい) is left alone — the tokenizer does not yet reduce it either.
     """
-    if original == standard or "ー" not in original:
+    if original == standard:
+        return False
+    if original[:-1] == standard and original[-1] in _EMPHATIC_SOKUON_MARKS:
+        # An auxiliary closed on a glottal stop is a colloquial form in its own
+        # right and keeps that spelling as its lemma (ですっ, ますっ). Holding a
+        # vowel adds nothing to the word, so that case stays normalized.
+        return host_pos != "助動詞"
+    if "ー" not in original:
         return False
     reduced = regex.sub(r"(.)\1+", r"\1", regex.sub(r"ー+", "", original))
     return reduced == regex.sub(r"(.)\1+", r"\1", standard)
@@ -118,6 +126,34 @@ def _accept_slang_match(
 # the paradigm can be read off the substituted text.
 _ADJECTIVE_INFLECTION_KANA = frozenset("いかくけさ")
 SLANG_ADJ_SUBSTITUTE = "赤"
+
+
+_EMPHATIC_SOKUON_MARKS = frozenset("っッ")
+
+
+def _emphatic_final_sokuon(text: str) -> int | None:
+    """Where a sokuon closes the utterance, with a host in front of it to carry."""
+    body = regex.sub(r"[\p{P}\p{S}\p{Z}]+$", "", text)
+    if len(body) < 2 or body[-1] not in _EMPHATIC_SOKUON_MARKS:
+        return None
+    return len(body) - 1 if body[-2] not in _EMPHATIC_SOKUON_MARKS else None
+
+
+def _invents_a_word_for(raw: tuple[int, dict[int, dict]], position: int) -> bool:
+    """Whether the token covering a position is read as a form of another word.
+
+    An auxiliary is excluded: its own onbin cell is spelled with a sokuon (だっ,
+    たかっ) and is a dictionary entry in its own right, so the mark there is a
+    form the paradigm accounts for rather than one the reading had to invent.
+    """
+    starts = [start for start in raw[1] if start <= position]
+    if not starts:
+        return False
+    token = raw[1][max(starts)]
+    if token.get("pos") == "助動詞":
+        return False
+    lemma = token.get("lemma", "")
+    return bool(lemma) and lemma != "*" and lemma != token.get("surface")
 
 
 def _stranded_adjective_stems(raw: tuple[int, dict[int, dict]]) -> dict[int, str]:
@@ -237,13 +273,23 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
                 "length": len(word),
             }
 
-    # Emphatic sokuon
-    for pattern, standard in EMPHATIC_SOKUON.items():
-        for m in regex.finditer(regex.escape(pattern) + r"(?!て)", text):
-            replacements[(m.start(), "emphatic_sokuon")] = {
-                "original": pattern,
-                "replacement": standard,
-                "length": len(pattern),
+    # An utterance-final sokuon is emphasis rather than a morpheme: the real
+    # sokuon-onbin exists only to carry the past and conjunctive suffixes, and
+    # nothing follows this one for it to carry. The dictionary still has to place
+    # the kana and invents a word for it — a bare っ read as the adjective's
+    # continuative auxiliary, an いっ read as 言う, a てっ read as てる — so the
+    # mark is dropped before the analysis and put back into the surface
+    # afterwards. A final sokuon the dictionary already reads as a word in its
+    # own right (あっ, えっ) has itself for a lemma and is left alone.
+    emphatic_sokuon = _emphatic_final_sokuon(text)
+    if emphatic_sokuon is not None:
+        if raw is None:
+            raw = _raw_analysis(text)
+        if _invents_a_word_for(raw, emphatic_sokuon):
+            replacements[(emphatic_sokuon - 1, "emphatic_sokuon")] = {
+                "original": text[emphatic_sokuon - 1 : emphatic_sokuon + 1],
+                "replacement": text[emphatic_sokuon - 1],
+                "length": 2,
             }
 
     # Pre-1946 kanji forms the dictionary has no entry for come back as unknown
@@ -346,7 +392,7 @@ def postprocess_mecab_tokens(
             # An emphatic spelling keeps the dictionary form as its lemma: かわいーー is
             # still かわいい. Restoring the original there would make the lemma a non-word
             # and contradict the lengthening rules, which already yield the plain form.
-            if _is_emphatic_spelling(original, standard):
+            if _is_emphatic_spelling(original, standard, token.get("pos", "")):
                 continue
             if lemma and standard in lemma:
                 lemma = lemma.replace(standard, original, 1)

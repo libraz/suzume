@@ -903,11 +903,6 @@ SUZUME_POS_OVERRIDE: dict[str, str] = {
     "Filler": "Other",
 }
 
-# Emphatic sokuon patterns for preprocessing
-EMPHATIC_SOKUON: dict[str, str] = {
-    "行くっ": "行く",
-}
-
 # Inflected forms of the copula. Its negation takes the supplementary
 # adjective, unlike a verbal auxiliary's, so the two are told apart by surface.
 COPULA_SURFACES: frozenset[str] = frozenset({"だ", "だっ", "で", "です", "でし", "でしょ", "な", "なら"})

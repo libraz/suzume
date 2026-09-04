@@ -294,3 +294,31 @@ class TestStrandedAdjectiveStem:
     def test_leaves_a_kana_nominal_before_a_real_adjective(self):
         tokens, _, _ = get_expected_tokens("バリかっこいい")
         assert [token["surface"] for token in tokens] == ["バリ", "かっこいい"]
+
+
+class TestEmphaticFinalSokuon:
+    def test_keeps_the_adjective_the_mark_closes(self):
+        tokens, _, _ = get_expected_tokens("すごっ")
+        assert [token["surface"] for token in tokens] == ["すごっ"]
+        assert tokens[0]["pos"] == "Adjective"
+        assert tokens[0]["lemma"] == "すごい"
+
+    def test_repairs_a_boundary_the_mark_was_glued_into(self):
+        tokens, _, _ = get_expected_tokens("きれいっ")
+        assert [token["surface"] for token in tokens] == ["きれいっ"]
+        assert tokens[0]["pos"] == "Adjective"
+
+    def test_keeps_the_mark_on_the_final_particle(self):
+        tokens, _, _ = get_expected_tokens("やったぞっ")
+        assert [token["surface"] for token in tokens] == ["やっ", "た", "ぞっ"]
+        assert tokens[-1]["pos"] == "Particle"
+        assert tokens[-1]["lemma"] == "ぞ"
+
+    def test_leaves_a_word_the_dictionary_reads_whole(self):
+        tokens, _, _ = get_expected_tokens("あっ")
+        assert [token["surface"] for token in tokens] == ["あっ"]
+        assert tokens[0]["lemma"] == "あっ"
+
+    def test_leaves_the_copula_onbin_cell_alone(self):
+        tokens, _, _ = get_expected_tokens("だめだっ")
+        assert [token["surface"] for token in tokens] == ["だめ", "だっ"]
