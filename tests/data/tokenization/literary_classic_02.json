@@ -318,6 +318,70 @@
       ],
       "id": "kugagotoshi",
       "input": "行くがごとし"
+    },
+    {
+      "description": "Supplementary conjugation on a stem that is also a noun",
+      "expected": [
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "夕陽",
+          "pos": "Noun",
+          "surface": "夕陽"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "赤い",
+          "pos": "Adjective",
+          "surface": "赤かり"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "sono_no_ha_karikeri",
+      "input": "その日の夕陽は赤かりけり"
+    },
+    {
+      "description": "Negative control: the auxiliary that only the other probe cell resolves",
+      "expected": [
+        {
+          "lemma": "言ふ",
+          "pos": "Verb",
+          "surface": "言ふ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べかり"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "fubekarikeri_2",
+      "input": "言ふべかりけり"
     }
   ],
   "description": "literary_classic tests (part 2/2)",
