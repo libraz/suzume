@@ -258,6 +258,43 @@
       ],
       "id": "shi_kishi_kishita",
       "input": "しゃきしゃきした食感"
+    },
+    {
+      "description": "a reduplication whose half is a headword of its own stays one mimetic unit",
+      "expected": [
+        {
+          "lemma": "ちょきちょき",
+          "pos": "Adverb",
+          "surface": "ちょきちょき"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "紙",
+          "pos": "Noun",
+          "surface": "紙"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "捨てる",
+          "pos": "Verb",
+          "surface": "捨てる"
+        }
+      ],
+      "id": "chi_kichi_kishita_wo_teru",
+      "input": "ちょきちょきした紙を捨てる"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",
