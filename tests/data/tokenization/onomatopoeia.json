@@ -1089,6 +1089,141 @@
       ],
       "id": "sokuon_manner_adverb_control",
       "input": "ぐったり休む"
+    },
+    {
+      "description": "Nasal reduplication with sequential voicing before a verb",
+      "expected": [
+        {
+          "lemma": "失敗",
+          "pos": "Noun",
+          "surface": "失敗"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "さんざん",
+          "pos": "Adverb",
+          "surface": "さんざん"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wosanzan_tekita",
+      "input": "失敗をさんざん見てきた"
+    },
+    {
+      "description": "Nasal reduplication with sequential voicing before a godan verb",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "さんざん",
+          "pos": "Adverb",
+          "surface": "さんざん"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "wosanzan_nda",
+      "input": "本をさんざん読んだ"
+    },
+    {
+      "description": "Nasal reduplication before the adnominal copula",
+      "expected": [
+        {
+          "lemma": "さんざん",
+          "pos": "Adverb",
+          "surface": "さんざん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "結果",
+          "pos": "Noun",
+          "surface": "結果"
+        }
+      ],
+      "id": "sanzanna",
+      "input": "さんざんな結果"
+    },
+    {
+      "description": "Six-mora nasal mimetic licensed by the quotative, halves unrelated by voicing",
+      "expected": [
+        {
+          "lemma": "がたんごとん",
+          "pos": "Adverb",
+          "surface": "がたんごとん"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "揺れる",
+          "pos": "Verb",
+          "surface": "揺れる"
+        }
+      ],
+      "id": "gatangotonto_reru",
+      "input": "がたんごとんと揺れる"
+    },
+    {
+      "description": "Exact nasal reduplication without voicing alternation",
+      "expected": [
+        {
+          "lemma": "だんだん",
+          "pos": "Adverb",
+          "surface": "だんだん"
+        },
+        {
+          "lemma": "増える",
+          "pos": "Verb",
+          "surface": "増える"
+        }
+      ],
+      "id": "dandan_eru",
+      "input": "だんだん増える"
     }
   ],
   "description": "Onomatopoeia and mimetic words",
