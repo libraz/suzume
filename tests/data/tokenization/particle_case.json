@@ -945,6 +945,75 @@
       ],
       "id": "ya_wo_u",
       "input": "本や紙を買う"
+    },
+    {
+      "description": "the direction particle at a clause end is not a classical ha-row imperative",
+      "expected": [
+        {
+          "lemma": "東京",
+          "pos": "Noun",
+          "surface": "東京"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "じゃ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "大阪",
+          "pos": "Noun",
+          "surface": "大阪"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        }
+      ],
+      "id": "ji_nakute_he",
+      "input": "東京じゃなくて大阪へ"
+    },
+    {
+      "description": "the same particle after a te-form clause boundary",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "会場",
+          "pos": "Noun",
+          "surface": "会場"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        }
+      ],
+      "id": "betekara_he",
+      "input": "食べてから会場へ"
     }
   ],
   "description": "Case particles (が、を、に、で)",
