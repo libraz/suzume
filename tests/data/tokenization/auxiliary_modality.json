@@ -2707,6 +2707,53 @@
       ],
       "id": "zo_rinikeru",
       "input": "花ぞ散りにける"
+    },
+    {
+      "description": "renyokei nominal + 方 stays one search unit before the copula",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "動き方",
+          "pos": "Noun",
+          "surface": "動き方"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "noyoudehanai_ki_da",
+      "input": "猫のようではない動き方だ。"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい)",

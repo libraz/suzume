@@ -1202,6 +1202,28 @@
       ],
       "id": "i_ni_ru",
       "input": "朝早い時間に出る"
+    },
+    {
+      "description": "renyokei nominal + 方 when the dictionary drops the verb tag",
+      "expected": [
+        {
+          "lemma": "走り方",
+          "pos": "Noun",
+          "surface": "走り方"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "悪い",
+          "pos": "Adjective",
+          "surface": "悪い"
+        }
+      ],
+      "id": "ri_ga_i",
+      "input": "走り方が悪い"
     }
   ],
   "description": "General nouns (part 4/4)",
