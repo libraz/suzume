@@ -402,7 +402,13 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // Only the ず cells are named, rather than every other cell being excluded: the
   // noun collision this rule exists for is theirs alone, and an exclusion list
   // silently captures each cell added to the paradigm afterwards (連用形 ざり).
+  // The collision is with the Godan irrealis, whose a-row mora is what makes a
+  // short cell plus ず spell an ordinary noun (おか+ず). An Ichidan verb reaches
+  // the same auxiliary through its syncretic irrealis/continuative stem, which
+  // ends on the i-row or the e-row and spells no such noun, so penalizing it
+  // only cost 理解+でき+ず its boundary.
   if (prev.pos == core::PartOfSpeech::Verb && prev.fromDictionary() && grammar::isPureHiragana(prev.surface) &&
+      grammar::isARowCodepoint(utf8::decodeLastChar(prev.surface)) &&
       prev.surface.size() <= 9 &&  // ≤3 hiragana chars (9 bytes)
       next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
       !(prev.extended_pos == core::ExtendedPOS::VerbMizenkei && prev.lemma == "する") && prev.lemma != "ある" &&
