@@ -285,7 +285,22 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
                                           !grammar::isIRowCodepoint(h1) &&
                                           vh::classicalPastEnvironmentFollows(*dict_manager, codepoints, particle_end,
                                                                               /*is_izenkei=*/false);
-        if (continuative_perfect ||
+        // The plain classical past き selects the same bare continuative as けり
+        // (山|見|き). Unlike けり it is a single i-row mora, which after a kanji
+        // is also how a ka-row godan verb spells its own continuative. The stem
+        // is already one of the ichidan verbs this branch knows, so the only
+        // thing left to rule out is that homograph: 着き belongs to 着く and not
+        // to 着る, while 見, 寝 and the rest have no ka-row counterpart.
+        const bool has_godan_ka_competitor =
+            dict_manager->lookupExact(extractSubstring(codepoints, start_pos, kanji_end) + "く",
+                                      core::PartOfSpeech::Verb) != nullptr;
+        // The auxiliary is terminal, so it also has to be able to close the
+        // clause where it sits — otherwise 着きます would open with one.
+        const bool continuative_past_ki =
+            auxiliary != nullptr && !has_godan_ka_competitor &&
+            auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalKi &&
+            vh::classicalPastEnvironmentFollows(*dict_manager, codepoints, particle_end, /*is_izenkei=*/false);
+        if (continuative_perfect || continuative_past_ki ||
             (auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalKeri)) {
           is_classical_past_aux = true;
         }
