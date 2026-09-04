@@ -59,6 +59,108 @@ bool classicalPredicateTailFollowsAt(const std::vector<char32_t>& codepoints, si
 
 bool hasAttestedInternalGodanConditional(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
                                          size_t particle_pos, const grammar::InflectionCandidate& whole,
+                                         const dictionary::DictionaryManager* dict_manager);
+
+/**
+ * @brief Whether the binding particle that selects the 已然形 opens this clause.
+ *
+ * Of the binding particles only こそ takes the 已然形 as its 結び; ぞ and なむ
+ * take the attributive, and the modern members select no cell at all. The
+ * particle is therefore identified individually rather than by its class, and
+ * the search stops at a clause boundary so a こそ from an earlier clause cannot
+ * license a cell it does not govern.
+ */
+bool bindingParticleKosoPrecedes(const std::vector<char32_t>& codepoints, size_t start_pos) {
+  constexpr size_t kKosoLength = 2;
+  for (size_t pos = start_pos; pos > 0; --pos) {
+    const char32_t codepoint = codepoints[pos - 1];
+    if (normalize::classifyChar(codepoint) == normalize::CharType::Symbol) {
+      return false;
+    }
+    if (pos >= kKosoLength && codepoints[pos - kKosoLength] == U'こ' && codepoint == U'そ') {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * @brief Emit the godan 已然形/仮定形 cell ending just before @p cell_end.
+ *
+ * The row a bare e-row mora belongs to is not recoverable from it: analyzing
+ * 定まれ alone yields the ichidan 定まれる, and only 定まれば identifies the godan
+ * 定まる. The conditional particle is therefore appended for the analysis even
+ * where the text has none, which is what lets the clause-final cell reuse the
+ * conditional's own row identification and guards rather than a second copy of
+ * them.
+ */
+bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
+                                 size_t cell_end, const grammar::Inflection& inflection,
+                                 const dictionary::DictionaryManager* dict_manager,
+                                 std::vector<UnknownCandidate>& candidates) {
+  // A negative conditional spells its own e-row mora (走らなければ), so the
+  // cell the particle keys on belongs to the negative auxiliary rather than to
+  // the host verb.
+  constexpr size_t kNakereLength = 3;
+  for (size_t negative_pos = kanji_end; negative_pos + kNakereLength <= cell_end; ++negative_pos) {
+    if (negative_pos > start_pos && vh::naiConditionalFollowsAt(codepoints, negative_pos) &&
+        (grammar::isARowCodepoint(codepoints[negative_pos - 1]) ||
+         grammar::isERowCodepoint(codepoints[negative_pos - 1]))) {
+      return false;
+    }
+  }
+  const std::string cell_surface = extractSubstring(codepoints, start_pos, cell_end);
+  const std::string full_surface = cell_surface + "ば";
+  const auto& analyses = inflection.analyze(full_surface);
+  if (analyses.empty()) {
+    return false;
+  }
+  const auto& best = analyses.front();
+  // An auxiliary carries its own izenkei before ば (担わ+ざれ+ば,
+  // 過ぎ+たれ+ば), so the e-mora the conditional keys on belongs to the
+  // auxiliary rather than to the host verb. Reading the whole span as one
+  // conditional fabricates a lemma out of that auxiliary (過ぎたる, 担わざる).
+  // Resolve the tail from the auxiliary inventory instead of naming one cell,
+  // so the whole closed class is covered at once. A dictionary-attested
+  // lexical verb such as ござる retains its genuine ござれ+ば paradigm.
+  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  if (vh::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, kanji_end, cell_end) &&
+      !vh::isVerbInDictionary(dict_manager, best.base_form)) {
+    return false;
+  }
+  // That guard only sees an auxiliary beginning after at least one okurigana
+  // mora, which is the shape a genuine verb has. When the whole tail is the
+  // auxiliary there is no okurigana left for a stem to own, so the kanji run is
+  // a nominal predicate and the e-row mora is the copula's own cell
+  // (重要+なれ, 大切+なれ, not the non-word 重要なる).
+  if (dict_manager != nullptr && dict_manager->lookupExact(extractSubstring(codepoints, kanji_end, cell_end),
+                                                           core::PartOfSpeech::Auxiliary) != nullptr) {
+    return false;
+  }
+  const auto* godan_row = grammar::Conjugation::getGodanRow(best.verb_type);
+  if (best.confidence < candidate::verb_cost::kConstructedVerbMinConfidence || godan_row == nullptr ||
+      godan_row->e_row != codepoints[cell_end - 1] || best.base_form == full_surface) {
+    return false;
+  }
+  if (hasAttestedInternalGodanConditional(codepoints, start_pos, kanji_end, cell_end, best, dict_manager)) {
+    return false;
+  }
+  // 書い+とけ+ば: the ておく contraction leaves no て for the te-form guards.
+  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  if (vh::embedsAuxiliaryOnOnbinStem(codepoints, kanji_end, cell_end, dict_manager)) {
+    return false;
+  }
+  auto conditional =
+      makeVerbCandidate(cell_surface, start_pos, cell_end, candidate::verb_cost::kStrongBonus, best.base_form,
+                        grammar::verbTypeToConjType(best.verb_type), true, CandidateOrigin::VerbKanji, best.confidence,
+                        "godan_kateikei", core::ExtendedPOS::VerbKateikei);
+  conditional.lemma_verified = vh::isVerbInDictionary(dict_manager, best.base_form);
+  candidates.push_back(std::move(conditional));
+  return true;
+}
+
+bool hasAttestedInternalGodanConditional(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
+                                         size_t particle_pos, const grammar::InflectionCandidate& whole,
                                          const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || vh::isVerbInDictionary(dict_manager, whole.base_form) || kanji_end <= start_pos + 1) {
     return false;
@@ -168,61 +270,28 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // search unit.  Checking the selected row's e-mora excludes the identical
   // surface shape of i-adjective conditionals (高けれ+ば).
   for (size_t particle_pos = kanji_end + 1; particle_pos < hiragana_end; ++particle_pos) {
-    if (codepoints[particle_pos] != U'ば') {
-      continue;
+    if (codepoints[particle_pos] == U'ば' && appendGodanIzenkeiCandidate(codepoints, start_pos, kanji_end, particle_pos,
+                                                                         inflection, dict_manager, candidates)) {
+      break;
     }
-    bool has_negative_conditional = false;
-    constexpr size_t kNakereLength = 3;
-    for (size_t negative_pos = kanji_end; negative_pos + kNakereLength <= particle_pos; ++negative_pos) {
-      if (negative_pos > start_pos && vh::naiConditionalFollowsAt(codepoints, negative_pos) &&
-          (grammar::isARowCodepoint(codepoints[negative_pos - 1]) ||
-           grammar::isERowCodepoint(codepoints[negative_pos - 1]))) {
-        has_negative_conditional = true;
-        break;
-      }
-    }
-    if (has_negative_conditional) {
-      continue;
-    }
-    const size_t full_end = particle_pos + 1;
-    const std::string full_surface = extractSubstring(codepoints, start_pos, full_end);
-    const auto& analyses = inflection.analyze(full_surface);
-    if (analyses.empty()) {
-      continue;
-    }
-    const auto& best = analyses.front();
-    // An auxiliary carries its own izenkei before ば (担わ+ざれ+ば,
-    // 過ぎ+たれ+ば), so the e-mora the conditional keys on belongs to the
-    // auxiliary rather than to the host verb. Reading the whole span as one
-    // conditional fabricates a lemma out of that auxiliary (過ぎたる, 担わざる).
-    // Resolve the tail from the auxiliary inventory instead of naming one cell,
-    // so the whole closed class is covered at once. A dictionary-attested
-    // lexical verb such as ござる retains its genuine ござれ+ば paradigm.
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
-    if (vh::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, kanji_end, particle_pos) &&
-        !vh::isVerbInDictionary(dict_manager, best.base_form)) {
-      continue;
-    }
-    const auto* godan_row = grammar::Conjugation::getGodanRow(best.verb_type);
-    if (best.confidence < candidate::verb_cost::kConstructedVerbMinConfidence || godan_row == nullptr ||
-        godan_row->e_row != codepoints[particle_pos - 1] || best.base_form == full_surface) {
-      continue;
-    }
-    if (hasAttestedInternalGodanConditional(codepoints, start_pos, kanji_end, particle_pos, best, dict_manager)) {
-      continue;
-    }
-    // 書い+とけ+ば: the ておく contraction leaves no て for the te-form guards.
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
-    if (vh::embedsAuxiliaryOnOnbinStem(codepoints, kanji_end, particle_pos, dict_manager)) {
-      continue;
-    }
-    auto conditional = makeVerbCandidate(extractSubstring(codepoints, start_pos, particle_pos), start_pos, particle_pos,
-                                         candidate::verb_cost::kStrongBonus, best.base_form,
-                                         grammar::verbTypeToConjType(best.verb_type), true, CandidateOrigin::VerbKanji,
-                                         best.confidence, "godan_kateikei", core::ExtendedPOS::VerbKateikei);
-    conditional.lemma_verified = vh::isVerbInDictionary(dict_manager, best.base_form);
-    candidates.push_back(std::move(conditional));
-    break;
+  }
+
+  // 係り結び: こそ takes the 已然形 as its 結び, and that cell closes the clause
+  // with nothing after it (心こそ定まれ, 花こそ散りぬれ). It is spelled exactly
+  // like the conditional's own cell, so the same row identification applies —
+  // only the licensing context differs, because a bare e-row mora at the end of
+  // a run is far more often a te-form or a continuative (出して, 食べて) than an
+  // izenkei. こそ is what rules those out: it is the one binding particle whose
+  // 結び is this cell, and the ぞ/なむ pair takes the attributive instead.
+  //
+  // The cell is emitted as VerbKateikei rather than under an ExtendedPOS of its
+  // own: the godan 已然形 and 仮定形 are one cell of one paradigm, and every
+  // connection rule that already reasons about it applies here unchanged.
+  if (hiragana_end > kanji_end && grammar::isERowCodepoint(codepoints[hiragana_end - 1]) &&
+      (hiragana_end == codepoints.size() ||
+       normalize::classifyChar(codepoints[hiragana_end]) == normalize::CharType::Symbol) &&
+      bindingParticleKosoPrecedes(codepoints, start_pos)) {
+    appendGodanIzenkeiCandidate(codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager, candidates);
   }
 
   // Dictionary-backed single-kanji する verbs form 仮定形 with すれ+ば
