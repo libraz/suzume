@@ -694,7 +694,14 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     // missing evidence costs is the discount: an unverified compound has to
     // lose to any lexical entry that covers the span (なし崩し|的), while still
     // beating the continuative + noun split of an otherwise opaque run.
-    const bool has_continuative_shape = !base_ending.empty() || grammar::isERowCodepoint(first_hiragana);
+    // い is the one i-row okurigana that is also how an i-adjective spells its
+    // terminal, and that reading needs no verb behind it at all (蒼い空, 高い山).
+    // Where the base verb is attested the compound still wins on the verified
+    // branch (笑い声, 買い物); without it the adjective is by far the commoner
+    // word, so the shape alone does not earn the discounted compound there.
+    const bool ambiguous_with_adjective_terminal = first_hiragana == U'い' && !is_verb_continuative;
+    const bool has_continuative_shape =
+        (!base_ending.empty() && !ambiguous_with_adjective_terminal) || grammar::isERowCodepoint(first_hiragana);
     // A closed suffix on the right is its own morpheme (書き|先, 崩し|的), so it
     // never becomes the second half of a lexical compound.
     const bool crosses_suffix = hasClosedSuffixBoundary(codepoints, start_pos, kanji_end + 2, dict_manager);
