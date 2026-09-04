@@ -90,6 +90,117 @@
       ],
       "id": "ndokimasu",
       "input": "読んどきます"
+    },
+    {
+      "description": "the contracted preparative auxiliary after a sahen continuative keeps every boundary",
+      "expected": [
+        {
+          "lemma": "データベース",
+          "pos": "Noun",
+          "surface": "データベース"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "登録",
+          "pos": "Noun",
+          "surface": "登録"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "とい"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "ni_shitoitekudasai",
+      "input": "データベースに登録しといてください"
+    },
+    {
+      "description": "the mizenkei cell of the contracted preparative auxiliary takes the volitional after a sahen continuative",
+      "expected": [
+        {
+          "lemma": "報告書",
+          "pos": "Noun",
+          "surface": "報告書"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "作成",
+          "pos": "Noun",
+          "surface": "作成"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "とこ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "wo_shitokou",
+      "input": "報告書を作成しとこう"
+    },
+    {
+      "description": "the same cell after an ichidan continuative",
+      "expected": [
+        {
+          "lemma": "先",
+          "pos": "Noun",
+          "surface": "先"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "とこ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "ni_betokou",
+      "input": "先に食べとこう"
     }
   ],
   "description": "auxiliary_colloquial tests",
