@@ -105,6 +105,201 @@
       ],
       "id": "wo_koutoshita",
       "input": "顔を向こうとした"
+    },
+    {
+      "description": "Classical past attributive after a godan-wa continuative",
+      "expected": [
+        {
+          "lemma": "抗う",
+          "pos": "Verb",
+          "surface": "抗い"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "し"
+        },
+        {
+          "lemma": "者",
+          "pos": "Noun",
+          "surface": "者"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "末路",
+          "pos": "Noun",
+          "surface": "末路"
+        }
+      ],
+      "id": "ishi_no",
+      "input": "抗いし者の末路"
+    },
+    {
+      "description": "Classical past attributive before the noun it modifies",
+      "expected": [
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "し"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "記憶",
+          "pos": "Noun",
+          "surface": "記憶"
+        }
+      ],
+      "id": "arishi_no",
+      "input": "ありし日の記憶"
+    },
+    {
+      "description": "Classical past attributive after an ichidan continuative",
+      "expected": [
+        {
+          "lemma": "過ぎる",
+          "pos": "Verb",
+          "surface": "過ぎ"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "し"
+        },
+        {
+          "lemma": "日々",
+          "pos": "Noun",
+          "surface": "日々"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思う"
+        }
+      ],
+      "id": "gishi_wo_u",
+      "input": "過ぎし日々を思う"
+    },
+    {
+      "description": "Classical past attributive twice with an adnominal possessive",
+      "expected": [
+        {
+          "lemma": "抗う",
+          "pos": "Verb",
+          "surface": "抗い"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "し"
+        },
+        {
+          "lemma": "者",
+          "pos": "Noun",
+          "surface": "者"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "末路",
+          "pos": "Noun",
+          "surface": "末路"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知り"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "し"
+        },
+        {
+          "lemma": "我が",
+          "pos": "Determiner",
+          "surface": "我が"
+        },
+        {
+          "lemma": "身",
+          "pos": "Noun",
+          "surface": "身"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "ishi_no_wo_rishi_ga_no",
+      "input": "抗いし者の末路を知りし我が身の。"
+    },
+    {
+      "description": "Adnominal possessive before a noun head",
+      "expected": [
+        {
+          "lemma": "我が",
+          "pos": "Determiner",
+          "surface": "我が"
+        },
+        {
+          "lemma": "国",
+          "pos": "Noun",
+          "surface": "国"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "未来",
+          "pos": "Noun",
+          "surface": "未来"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "考える",
+          "pos": "Verb",
+          "surface": "考える"
+        }
+      ],
+      "id": "ga_no_wo_eru",
+      "input": "我が国の未来を考える"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
