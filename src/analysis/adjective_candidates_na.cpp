@@ -34,6 +34,38 @@ bool hasIndependentAdjectiveHost(const std::vector<char32_t>& codepoints, size_t
                                     partOfSpeechMask(core::PartOfSpeech::Adjective));
 }
 
+// The な that would be the attributive copula may instead be the first mora of
+// a longer closed-class word (なら, ない, など, なし). When the dictionary can
+// name one starting there, that word is the reading and the material before it
+// is not a stem this rule invented an adjective for.
+//
+// The two callers ask for different classes, and the difference is
+// grammatical rather than incidental. An auxiliary or a particle attaches to a
+// stem, so 壮大+なる and 遺憾+ながら still have a na-adjective stem in front of
+// them; only a mixed run needs protecting there, because its own boundary is
+// what is in question. A closed-class *predicate* forms its own phrase
+// instead, so it leaves an ordinary nominal to its left (勝利+なし).
+bool startsLongerClosedForm(const std::vector<char32_t>& codepoints, size_t na_pos,
+                            const dictionary::DictionaryManager* dict_manager, PartOfSpeechMask pos_mask) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  constexpr size_t kMaxClosedFormLength = 3;
+  const std::string continuation =
+      extractSubstring(codepoints, na_pos, std::min(codepoints.size(), na_pos + kMaxClosedFormLength));
+  for (const auto& match : dict_manager->lookup(continuation, 0)) {
+    if (match.entry != nullptr && match.length > 1 && (pos_mask & partOfSpeechMask(match.entry->pos)) != 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+constexpr PartOfSpeechMask kClosedFormAfterMixedStem =
+    partOfSpeechMask(core::PartOfSpeech::Adjective) | partOfSpeechMask(core::PartOfSpeech::Auxiliary) |
+    partOfSpeechMask(core::PartOfSpeech::Particle) | partOfSpeechMask(core::PartOfSpeech::Suffix);
+constexpr PartOfSpeechMask kClosedFormAfterKanjiStem = partOfSpeechMask(core::PartOfSpeech::Adjective);
+
 void generateHiraganaNariNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                                const std::vector<normalize::CharType>& char_types,
                                                std::vector<UnknownCandidate>& candidates) {
@@ -159,20 +191,8 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     while (stem_end < codepoints.size() && stem_end - kanji_end < kMaxMixedNaAdjHiraganaLength &&
            char_types[stem_end] == normalize::CharType::Hiragana) {
       if (codepoints[stem_end] == U'な') {
-        bool starts_longer_closed_form = false;
-        if (dict_manager != nullptr) {
-          const std::string continuation =
-              extractSubstring(codepoints, stem_end, std::min(codepoints.size(), stem_end + static_cast<size_t>(3)));
-          for (const auto& match : dict_manager->lookup(continuation, 0)) {
-            if (match.entry != nullptr && match.length > 1 &&
-                (match.entry->pos == core::PartOfSpeech::Adjective ||
-                 match.entry->pos == core::PartOfSpeech::Auxiliary ||
-                 match.entry->pos == core::PartOfSpeech::Particle || match.entry->pos == core::PartOfSpeech::Suffix)) {
-              starts_longer_closed_form = true;
-              break;
-            }
-          }
-        }
+        const bool starts_longer_closed_form =
+            startsLongerClosedForm(codepoints, stem_end, dict_manager, kClosedFormAfterMixedStem);
         const bool is_bare_attributive = stem_end > kanji_end && !starts_longer_closed_form &&
                                          (stem_end + 1 >= codepoints.size() ||
                                           (codepoints[stem_end + 1] != U'ら' && codepoints[stem_end + 1] != U'の' &&
@@ -276,7 +296,11 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
   // way and are excluded for the same reason: 体言+なり is the nominal predicate
   // and stem+なり is the classical adjective's terminal form, so the mora after
   // な decides nothing and the neutral nominal reading stands.
+  // The mixed-stem rule above asks the dictionary the same question rather
+  // than listing the morae, and the kanji-only rule needs it for the literary
+  // predicate なし: 勝利なしとは is 勝利 + なし, not a stem plus the copula.
   const bool followed_by_na = kanji_end < codepoints.size() && codepoints[kanji_end] == U'な' &&
+                              !startsLongerClosedForm(codepoints, kanji_end, dict_manager, kClosedFormAfterKanjiStem) &&
                               (kanji_end + 1 >= codepoints.size() ||
                                (codepoints[kanji_end + 1] != U'ら' && codepoints[kanji_end + 1] != U'の' &&
                                 codepoints[kanji_end + 1] != U'り'));
