@@ -1897,6 +1897,99 @@
       ],
       "id": "rekeri",
       "input": "心乱れけり"
+    },
+    {
+      "description": "Classical past auxiliary after a continuative the reference analyzer had fused",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲き"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "き"
+        }
+      ],
+      "id": "kiki",
+      "input": "花咲きき"
+    },
+    {
+      "description": "Same chain with a different kanji pair the reference analyzer also fused",
+      "expected": [
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "吹く",
+          "pos": "Verb",
+          "surface": "吹き"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "き"
+        }
+      ],
+      "id": "kiki_2",
+      "input": "風吹きき"
+    },
+    {
+      "description": "Bare one-kanji ichidan continuative before the classical past auxiliary",
+      "expected": [
+        {
+          "lemma": "山",
+          "pos": "Noun",
+          "surface": "山"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "き"
+        }
+      ],
+      "id": "ki_4",
+      "input": "山見き"
+    },
+    {
+      "description": "Negative control: the same kana is ordinary okurigana when no clause end follows",
+      "expected": [
+        {
+          "lemma": "港",
+          "pos": "Noun",
+          "surface": "港"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "着く",
+          "pos": "Verb",
+          "surface": "着き"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "ni_kimasu",
+      "input": "港に着きます"
     }
   ],
   "description": "auxiliary_classical tests",
