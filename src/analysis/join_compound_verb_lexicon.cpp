@@ -40,6 +40,7 @@ extern const SubsidiaryVerb kSubsidiaryVerbs[kSubsidiaryVerbCount] = {
     {"変わる", "かわる", "る", V2VerbType::Godan},    // 移り変わる, 生まれ変わる
     {"替わる", "かわる", "る", V2VerbType::Godan},    // 入れ替わる, 切り替わる
     {"つかる", nullptr, "る", V2VerbType::Godan},     // 見つかる
+    {"やる", nullptr, "る", V2VerbType::Godan},       // 思いやる, 追いやる, 押しやる
     {"合う", "あう", "う", V2VerbType::Godan},        // 話し合う, 話しあう
     {"扱う", "あつかう", "う", V2VerbType::Godan},    // 取り扱う
     {"運ぶ", "はこぶ", "ぶ", V2VerbType::Godan},      // 持ち運ぶ

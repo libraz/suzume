@@ -122,7 +122,7 @@ struct SubsidiaryVerbRange {
   const SubsidiaryVerb* end() const { return last; }
 };
 
-inline constexpr size_t kSubsidiaryVerbCount = 179;
+inline constexpr size_t kSubsidiaryVerbCount = 180;
 extern const SubsidiaryVerb kSubsidiaryVerbs[kSubsidiaryVerbCount];
 
 inline SubsidiaryVerbRange subsidiaryVerbs() {
