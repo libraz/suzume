@@ -120,12 +120,17 @@ bool hasNominalHeadEdgeEndingAt(const core::Lattice& lattice, size_t boundary) {
   });
 }
 
+// The past auxiliary closes the clause it marks and is attributive in that
+// position (追わ+れ+た | ねずみ), exactly as the verb's own ta-form is when the
+// tense is written inside the predicate. Leaving it out made the same bracket
+// depend on whether the predicate happened to carry an auxiliary chain.
 bool hasAttributiveEdgeEndingAt(const core::Lattice& lattice, size_t boundary) {
   return core::anyEdgeEndingAt(lattice, boundary, [](const core::LatticeEdge& edge) {
     return (edge.pos == core::PartOfSpeech::Verb && (edge.extended_pos == core::ExtendedPOS::VerbShuushikei ||
                                                      edge.extended_pos == core::ExtendedPOS::VerbRentaikei ||
                                                      edge.extended_pos == core::ExtendedPOS::VerbTaForm)) ||
-           (edge.pos == core::PartOfSpeech::Adjective && edge.extended_pos == core::ExtendedPOS::AdjBasic);
+           (edge.pos == core::PartOfSpeech::Adjective && edge.extended_pos == core::ExtendedPOS::AdjBasic) ||
+           (edge.pos == core::PartOfSpeech::Auxiliary && edge.extended_pos == core::ExtendedPOS::AuxTenseTa);
   });
 }
 
@@ -229,6 +234,30 @@ bool absorbsPassiveBeforeNegative(const core::Lattice& lattice, const dictionary
   }
   return coversRegisteredAuxiliaryOnVerifiedMizenkei(lattice, dict_manager, text, byte_offsets, candidate,
                                                      core::ExtendedPOS::AuxPassive, false);
+}
+
+// A fabricated predicate cannot end on the past auxiliary when the morpheme in
+// front of that auxiliary is a closed auxiliary the lattice already proved
+// (追わ + れ + た). The past marker closes the chain those two opened, so a base
+// reconstructed across it is reading tense as okurigana — the classical
+// perfective つ makes 追われた look like the irrealis of 追われつ as soon as a
+// negative-shaped mora follows. Requiring a dictionary auxiliary rather than any
+// left edge keeps ordinary irrealis cells that merely end in た (立た+ない)
+// eligible, since nothing closed precedes their final mora.
+bool absorbsPastAfterProvenAuxiliary(const dictionary::DictionaryManager& dict_manager, std::string_view text,
+                                     const ByteOffsets& byte_offsets, const UnknownCandidate& candidate) {
+  if (candidate.pos != core::PartOfSpeech::Verb || candidate.lemma_verified || candidate.end < candidate.start + 3) {
+    return false;
+  }
+  const size_t past_start = candidate.end - 1;
+  const auto* past =
+      dict_manager.lookupExact(textRange(text, byte_offsets, past_start, candidate.end), core::PartOfSpeech::Auxiliary);
+  if (past == nullptr || past->extended_pos != core::ExtendedPOS::AuxTenseTa) {
+    return false;
+  }
+  const auto* inner = dict_manager.lookupExact(textRange(text, byte_offsets, past_start - 1, past_start),
+                                               core::PartOfSpeech::Auxiliary);
+  return inner != nullptr;
 }
 
 // A complete multi-kanji nominal stem owns its full span before a closed する
@@ -718,6 +747,9 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
     if (absorbsPassiveBeforeNegative(lattice, dict_manager_, text, codepoints, byte_offsets, candidate)) {
       continue;
     }
+    if (absorbsPastAfterProvenAuxiliary(dict_manager_, text, byte_offsets, candidate)) {
+      continue;
+    }
     if (startsInsideVerifiedNounAndAbsorbsSuru(lattice, dict_manager_, text, byte_offsets, candidate)) {
       continue;
     }
@@ -996,7 +1028,12 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
       skip_dict_penalty = true;
       skip_dict_reason = "nominal_context_compound";
     }
-    if (!skip_penalty && candidate.pos == core::PartOfSpeech::Other && candidate.end - candidate.start >= 4) {
+    // Three morae is the ordinary length of a native hiragana noun (ねずみ,
+    // たまご, さくら), so the run is not evidence of a fabricated span the way a
+    // shorter one would be.
+    constexpr size_t kMinVariedHiraganaRun = 3;
+    if (!skip_penalty && candidate.pos == core::PartOfSpeech::Other &&
+        candidate.end - candidate.start >= kMinVariedHiraganaRun) {
       if (allCharsAre(char_types, codepoints, candidate.start, candidate.end, normalize::CharType::Hiragana,
                       /*allow_choon=*/true)) {
         // Reduce penalty only for varied sequences, not runs of one repeated

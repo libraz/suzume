@@ -972,6 +972,32 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           continue;
         }
       }
+      // An auxiliary is licensed by the morpheme in front of it, so an opaque
+      // hiragana run must not open on one whose licenser is right there: that
+      // boundary is proven from the left (追わ|れ|た|ねずみ, not 追わ|れ|たねずみ).
+      // The connection table decides what counts as a licenser, so a run whose
+      // opening kana merely spell an auxiliary after an unrelated morpheme
+      // (ゆで|たまご) keeps its candidate.
+      if (start_type == normalize::CharType::Hiragana && !started_with_particle && len > 1 &&
+          dict_manager_ != nullptr) {
+        const auto* opening =
+            lookupEntryInRange(*dict_manager_, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Auxiliary);
+        bool opens_on_licensed_auxiliary = false;
+        for (size_t licenser_start = start_pos > kDictionaryLookbehindChars ? start_pos - kDictionaryLookbehindChars
+                                                                            : 0;
+             opening != nullptr && licenser_start < start_pos; ++licenser_start) {
+          const auto* licenser =
+              lookupEntryInRange(*dict_manager_, codepoints, licenser_start, start_pos, core::PartOfSpeech::Auxiliary);
+          if (licenser != nullptr &&
+              BigramTable::getCost(licenser->extended_pos, opening->extended_pos) < bigram_cost::kNeutral) {
+            opens_on_licensed_auxiliary = true;
+            break;
+          }
+        }
+        if (opens_on_licensed_auxiliary) {
+          continue;
+        }
+      }
       auto cand = makeCandidate(surface, start_pos, candidate_end, pos, cost, has_suffix, CandidateOrigin::SameType);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = started_with_particle ? 0.7F : 1.0F;
