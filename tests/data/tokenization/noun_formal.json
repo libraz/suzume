@@ -746,9 +746,14 @@
           "surface": "に"
         },
         {
-          "lemma": "ほかなる",
+          "lemma": "ほか",
+          "pos": "Noun",
+          "surface": "ほか"
+        },
+        {
+          "lemma": "なる",
           "pos": "Verb",
-          "surface": "ほかなら"
+          "surface": "なら"
         },
         {
           "lemma": "ない",
@@ -773,9 +778,14 @@
           "surface": "に"
         },
         {
-          "lemma": "ほかなる",
+          "lemma": "ほか",
+          "pos": "Noun",
+          "surface": "ほか"
+        },
+        {
+          "lemma": "なる",
           "pos": "Verb",
-          "surface": "ほかなら"
+          "surface": "なら"
         },
         {
           "lemma": "ない",
@@ -800,9 +810,14 @@
           "surface": "に"
         },
         {
-          "lemma": "ほかなる",
+          "lemma": "ほか",
+          "pos": "Noun",
+          "surface": "ほか"
+        },
+        {
+          "lemma": "なる",
           "pos": "Verb",
-          "surface": "ほかなら"
+          "surface": "なら"
         },
         {
           "lemma": "ない",
@@ -827,9 +842,14 @@
           "surface": "に"
         },
         {
-          "lemma": "ほかなる",
+          "lemma": "ほか",
+          "pos": "Noun",
+          "surface": "ほか"
+        },
+        {
+          "lemma": "なる",
           "pos": "Verb",
-          "surface": "ほかなら"
+          "surface": "なら"
         },
         {
           "lemma": "ない",
@@ -3801,6 +3821,65 @@
       ],
       "id": "anotoki",
       "input": "あのとき"
+    },
+    {
+      "description": "Formal noun and copula stay apart whichever way the pair is spelled",
+      "expected": [
+        {
+          "lemma": "ほか",
+          "pos": "Noun",
+          "surface": "ほか"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なら"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        },
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "理由",
+          "pos": "Noun",
+          "surface": "理由"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        }
+      ],
+      "id": "hokanarazu_sono_mo",
+      "input": "ほかならず、その理由も。"
+    },
+    {
+      "description": "Negative control: the conditional particle keeps its reading with no negative behind it",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        }
+      ],
+      "id": "naraii",
+      "input": "本ならいい"
     }
   ],
   "description": "Formal nouns (こと、もの、ところ)",
