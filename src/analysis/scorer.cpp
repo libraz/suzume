@@ -93,7 +93,11 @@ constexpr float kBigramCostTable[13][13] = {
     /* Pref */{-0.5F,-0.5F, 0.0F, 0.5F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F},
     /* Suff */ {0.5F, 0.8F, 0.8F, 0.5F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 1.0F, 0.3F, 0.5F, 0.5F},
     /* Sym  */ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.5F, 0.0F, 0.2F},
-    /* Other*/ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.5F, 0.5F, 0.2F, 0.2F},
+    // Sym: raised to the column's common value. An unanalyzed chunk is not a
+    // better clause-ender than an analyzed word, and the discount let a whole
+    // hiragana clause collapse into one Other edge whenever a symbol closed it
+    // (そうだね vs そうだね〜) — the segmentation flipped on the punctuation alone.
+    /* Other*/ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.5F, 0.5F, 0.5F, 0.2F},
 };
 // clang-format on
 
