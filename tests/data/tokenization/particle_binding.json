@@ -893,13 +893,8 @@
       "expected": [
         {
           "lemma": "刻々",
-          "pos": "Noun",
-          "surface": "刻々"
-        },
-        {
-          "lemma": "と",
-          "pos": "Particle",
-          "surface": "と"
+          "pos": "Adverb",
+          "surface": "刻々と"
         }
       ],
       "id": "iteration_mark_kokkoku",

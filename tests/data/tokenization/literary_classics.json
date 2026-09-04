@@ -1306,13 +1306,8 @@
         },
         {
           "lemma": "深々",
-          "pos": "Noun",
-          "surface": "深々"
-        },
-        {
-          "lemma": "と",
-          "pos": "Particle",
-          "surface": "と"
+          "pos": "Adverb",
+          "surface": "深々と"
         },
         {
           "lemma": "頭",

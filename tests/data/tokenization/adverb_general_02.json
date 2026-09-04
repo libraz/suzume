@@ -2183,6 +2183,146 @@
       ],
       "id": "ni_duku_da",
       "input": "事実に基づく報告だ。"
+    },
+    {
+      "description": "Reduplicated taru adverb before a causative-passive chain",
+      "expected": [
+        {
+          "lemma": "難しい",
+          "pos": "Adjective",
+          "surface": "難しい"
+        },
+        {
+          "lemma": "理論",
+          "pos": "Noun",
+          "surface": "理論"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "延々",
+          "pos": "Adverb",
+          "surface": "延々と"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "す",
+          "pos": "Auxiliary",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shii_wo_to_masareteita",
+      "input": "難しい理論を延々と読まされていた"
+    },
+    {
+      "description": "Reduplicated taru adverb before a verb",
+      "expected": [
+        {
+          "lemma": "着々",
+          "pos": "Adverb",
+          "surface": "着々と"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "to_mu",
+      "input": "着々と進む"
+    },
+    {
+      "description": "Reduplicated taru adverb before a sahen nominal",
+      "expected": [
+        {
+          "lemma": "黙々",
+          "pos": "Adverb",
+          "surface": "黙々と"
+        },
+        {
+          "lemma": "作業",
+          "pos": "Noun",
+          "surface": "作業"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "to_suru",
+      "input": "黙々と作業する"
+    },
+    {
+      "description": "Plural reduplication keeps the comitative particle separate",
+      "expected": [
+        {
+          "lemma": "人々",
+          "pos": "Noun",
+          "surface": "人々"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話す"
+        }
+      ],
+      "id": "to_su",
+      "input": "人々と話す"
+    },
+    {
+      "description": "Plural reduplication keeps the conjunctive particle separate",
+      "expected": [
+        {
+          "lemma": "山々",
+          "pos": "Noun",
+          "surface": "山々"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "川",
+          "pos": "Noun",
+          "surface": "川"
+        }
+      ],
+      "id": "to_2",
+      "input": "山々と川"
     }
   ],
   "description": "General adverbs (part 2/2)",

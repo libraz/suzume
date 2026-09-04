@@ -2690,13 +2690,8 @@
         },
         {
           "lemma": "黒々",
-          "pos": "Noun",
-          "surface": "黒々"
-        },
-        {
-          "lemma": "と",
-          "pos": "Particle",
-          "surface": "と"
+          "pos": "Adverb",
+          "surface": "黒々と"
         },
         {
           "lemma": "濡れる",

@@ -1594,13 +1594,8 @@
         },
         {
           "lemma": "煌々",
-          "pos": "Noun",
-          "surface": "煌々"
-        },
-        {
-          "lemma": "と",
-          "pos": "Particle",
-          "surface": "と"
+          "pos": "Adverb",
+          "surface": "煌々と"
         },
         {
           "lemma": "照らす",
