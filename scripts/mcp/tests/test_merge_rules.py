@@ -1477,3 +1477,25 @@ class TestGuessedMimeticSpanBoundary:
         result, rule = apply_suzume_merge(tokens, "あああ")
         assert [token["surface"] for token in result] == ["あああ"]
         assert rule == "productive-mimetic"
+
+
+class TestDecomposableAdverb:
+    def test_gives_back_the_case_boundary_an_adverb_entry_swallowed(self):
+        tokens = [_tok("根から", pos="副詞", pos_sub1="一般", lemma="根から")]
+        result, rule = apply_suzume_merge(tokens, "根から")
+        assert [token["surface"] for token in result] == ["根", "から"]
+        assert result[0]["pos"] == "名詞"
+        assert result[1]["pos"] == "助詞"
+        assert rule == "decomposable-adverb"
+
+    def test_decomposes_the_spelling_that_carries_the_adverb_entry(self):
+        tokens = [_tok("心から", pos="副詞", pos_sub1="助詞類接続", lemma="心から")]
+        result, rule = apply_suzume_merge(tokens, "心から")
+        assert [token["surface"] for token in result] == ["心", "から"]
+        assert rule == "decomposable-adverb"
+
+    def test_keeps_an_adverb_whose_head_is_not_a_nominal(self):
+        tokens = [_tok("根っから", pos="副詞", pos_sub1="助詞類接続", lemma="根っから")]
+        result, rule = apply_suzume_merge(tokens, "根っから")
+        assert [token["surface"] for token in result] == ["根っから"]
+        assert rule != "decomposable-adverb"

@@ -1033,6 +1033,56 @@ def _heads_property_nominal(token: dict) -> bool:
     return token.get("pos") == "形容詞"
 
 
+# An adverb headword whose surface still ends in a case particle, with the probe
+# that reads its head back and the token the tail spells. The ablative takes a
+# nominal, so appending another case particle selects the same reading.
+_DECOMPOSABLE_ADVERB_TAILS = {
+    "から": ("が", "名詞", {"surface": "から", "pos": "助詞", "pos_sub1": "格助詞", "conj_form": "*", "lemma": "から"}),
+}
+
+
+def _decomposed_adverb_head(surface: str, probe_suffix: str, head_pos: str) -> dict | None:
+    """Read an adverb's head back as the word the construction needs there."""
+    from .mecab import mecab_analyze
+
+    tokens = mecab_analyze(surface + probe_suffix)
+    if len(tokens) != 2 or tokens[0].get("surface") != surface:
+        return None
+    head = tokens[0]
+    return head if head.get("pos") == head_pos else None
+
+
+def _postprocess_decomposable_adverb(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Give back the case boundary an adverb headword swallowed.
+
+    A case particle is what makes the nominal in front of it an argument, and an
+    adverb tag over the pair takes that away — 根から comes back as one adverb
+    whose lemma is a phrase, while 家から and 枝から come back as a noun and its
+    particle. Reading the head back through another case particle settles which
+    it is without a word list.
+    """
+    expanded: list[dict] = []
+    for token in result:
+        surface = token.get("surface", "")
+        tail = next(
+            (tail for tail in _DECOMPOSABLE_ADVERB_TAILS if surface.endswith(tail) and len(surface) > len(tail)),
+            "",
+        )
+        if not tail or token.get("pos") != "副詞":
+            expanded.append(token)
+            continue
+        probe_suffix, head_pos, tail_token = _DECOMPOSABLE_ADVERB_TAILS[tail]
+        head = _decomposed_adverb_head(surface[: -len(tail)], probe_suffix, head_pos)
+        if head is None:
+            expanded.append(token)
+            continue
+        expanded.append(head)
+        expanded.append(dict(tail_token))
+        if applied_rule is None:
+            applied_rule = "decomposable-adverb"
+    return expanded, applied_rule
+
+
 # A derivational suffix that builds a nominal from a predicate, with the base it
 # selects. It is fully productive, but the reference dictionary only joins it to
 # the host when the pair happens to be one of its headwords — 痛み and 強み come
