@@ -3,6 +3,8 @@
  * @brief Prefix+noun and verb-renyokei+suffix join candidate generation
  */
 
+#include <algorithm>
+
 #include "bigram_table.h"
 #include "candidate_constants.h"
 #include "core/debug.h"

@@ -14,6 +14,8 @@
  * - Join candidates (delegated to join_candidates.h)
  */
 
+#include <algorithm>
+
 #include "analysis/category_cost.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/tokenizer.h"

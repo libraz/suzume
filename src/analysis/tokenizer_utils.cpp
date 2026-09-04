@@ -5,6 +5,8 @@
 
 #include "tokenizer_utils.h"
 
+#include <algorithm>
+
 #include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/utf8_constants.h"

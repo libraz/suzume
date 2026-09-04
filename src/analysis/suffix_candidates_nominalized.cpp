@@ -2,6 +2,8 @@
  * @file suffix_candidates_nominalized.cpp
  * @brief Nominalized noun candidate generation
  */
+#include <algorithm>
+
 #include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/debug.h"

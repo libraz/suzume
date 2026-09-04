@@ -1,5 +1,6 @@
 #include "char_type.h"
 
+#include <algorithm>
 #include <array>
 
 #include "core/kana_constants.h"

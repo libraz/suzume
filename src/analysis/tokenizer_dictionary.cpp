@@ -14,6 +14,7 @@
  * - Join candidates (delegated to join_candidates.h)
  */
 
+#include <algorithm>
 #include <array>
 
 #include "analysis/category_cost.h"
