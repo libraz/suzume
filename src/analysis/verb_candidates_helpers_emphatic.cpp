@@ -164,6 +164,14 @@ void addEmphaticVariants(std::vector<UnknownCandidate>& candidates, const std::v
       emphatic_cand.surface += emphatic.suffix;
       emphatic_cand.end = emphatic.end;
       emphatic_cand.cost += emphaticCostAdjustment(emphatic);
+      // A candidate carrying no lemma of its own is lemmatized to its surface,
+      // and the emphasis would go into it (行くっ as its own base form). Only a
+      // terminal form is its own dictionary form, so only there is the surface
+      // the emphasis was added to the right lemma; a bound cell keeps its empty
+      // lemma for the paradigm to resolve.
+      if (emphatic_cand.lemma.empty() && cand.extended_pos == core::ExtendedPOS::VerbShuushikei) {
+        emphatic_cand.lemma = cand.surface;
+      }
       // A run of emphasis marks is itself a searchable colloquial form.
       // Keep modest elongation normalized (すごーい, やばいいい), but preserve
       // longer runs such as すごーーい and すごいいいい as their own lemma.

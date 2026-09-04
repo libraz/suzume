@@ -2292,11 +2292,15 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
                       entry_epos, "dict");
     }
 
-    // Extend predicates and adverbs with colloquial emphasis
-    // (ですっ, 行くーー, きたあああ). Unknown candidates use the same matcher.
+    // Extend predicates, adverbs and particles with colloquial emphasis
+    // (ですっ, 行くーー, きたあああ, 行くよっ). Unknown candidates use the same
+    // matcher. A particle takes the mark for the same reason a predicate does —
+    // it closes the utterance — and the bare-sokuon guard below is what keeps
+    // the mark from being taken out of the next word (よっぽど, ねっとり).
     if (end_pos < codepoints.size() &&
         (result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Auxiliary ||
-         result.entry->pos == core::PartOfSpeech::Adjective || result.entry->pos == core::PartOfSpeech::Adverb)) {
+         result.entry->pos == core::PartOfSpeech::Adjective || result.entry->pos == core::PartOfSpeech::Adverb ||
+         result.entry->pos == core::PartOfSpeech::Particle)) {
       // A dictionary irrealis stem cannot absorb っ before て/た as emphasis:
       // 染まっ+て belongs to the GodanRa verb 染まる, not 染ま(染む)+っ+て.
       // The hypothetical stem is barred for the same reason, and it is where
@@ -2335,7 +2339,12 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
           normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Hiragana &&
           !(host_owns_sokuonbin_cell &&
             utf8::equalsAny(extractSubstring(codepoints, emphatic.end, emphatic.end + 1), {"て", "た", "で", "だ"}));
-      if (!emphatic.empty() && !unlicensed_bare_sokuon) {
+      // A particle takes the glottal stop, which closes the utterance, but not
+      // the prolonged mark: after a one-mora particle that spelling is also the
+      // tail of a lengthened word, and taking it there cuts the word in two
+      // (おいしーー as おい + しーー).
+      const bool unlicensed_particle_lengthening = result.entry->pos == core::PartOfSpeech::Particle && !bare_sokuon;
+      if (!emphatic.empty() && !unlicensed_bare_sokuon && !unlicensed_particle_lengthening) {
         // Determine extended_pos for emphatic form
         // Sokuon-ending verb forms should be VerbOnbinkei (音便形)
         core::ExtendedPOS emphatic_epos = result.entry->extended_pos;

@@ -794,6 +794,44 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
     break;
   }
 
+  // The clipped exclamative closes an i-adjective on its bare stem with an
+  // emphatic sokuon (すごっ, あつっ).  Nothing follows the mark -- it ends the
+  // utterance -- so no cell of the paradigm reaches the run and it falls back
+  // on an unknown noun.  The stem is the one the nominalizer above exposes, so
+  // the same reconstruction settles the reading; requiring the utterance end
+  // keeps a genuine 促音便 (いっ+て) and a doubled consonant inside a word
+  // (まっすぐ) out.
+  for (size_t stem_end = start_pos + 2; stem_end < max_hiragana_end; ++stem_end) {
+    if (codepoints[stem_end] != core::hiragana::kSmallTsu) {
+      continue;
+    }
+    const size_t after_sokuon = stem_end + 1;
+    if (after_sokuon < codepoints.size() &&
+        !(after_sokuon < char_types.size() && char_types[after_sokuon] == normalize::CharType::Symbol)) {
+      break;
+    }
+    // Reconstructing the base form is not enough on its own here: the sokuon
+    // carries no information about the word in front of it, so any two morae
+    // plus い pass an inflection check and the run turns into a coined
+    // adjective (たぞっ as たぞい). The nominalizer above can afford that check
+    // because さ is itself the evidence; this cell needs the entry.
+    const std::string base_form = extractSubstring(codepoints, start_pos, stem_end) + "い";
+    if (!isAdjectiveInDictionary(dict_manager, base_form)) {
+      break;
+    }
+    auto exclamative = makeCandidate(extractSubstring(codepoints, start_pos, after_sokuon), start_pos, after_sokuon,
+                                     core::PartOfSpeech::Adjective, candidate::kAdjStemDictionaryCost, true,
+                                     CandidateOrigin::AdjectiveIHiragana, core::ExtendedPOS::AdjBasic);
+    exclamative.lemma = base_form;
+    exclamative.lemma_verified = true;
+#ifdef SUZUME_DEBUG_INFO
+    exclamative.confidence = candidate::kDictionaryOriginConfidence;
+    exclamative.pattern = "adj_stem_hira_exclamative_sokuon";
+#endif
+    candidates.push_back(std::move(exclamative));
+    break;
+  }
+
   // Sort by cost
   verb_helpers::sortCandidatesByCost(candidates, candidate_start);
 
