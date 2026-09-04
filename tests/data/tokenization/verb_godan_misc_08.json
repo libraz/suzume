@@ -344,6 +344,92 @@
       ],
       "id": "koso_ke",
       "input": "水こそ湧け"
+    },
+    {
+      "description": "Kana verb whose head is a particle homograph, with no binding particle",
+      "expected": [
+        {
+          "lemma": "雪",
+          "pos": "Noun",
+          "surface": "雪"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "とける",
+          "pos": "Verb",
+          "surface": "とける"
+        }
+      ],
+      "id": "gatokeru",
+      "input": "雪がとける"
+    },
+    {
+      "description": "Adjective candidate must not span an embedded particle and kanji",
+      "expected": [
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかる"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        },
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        }
+      ],
+      "id": "wakarubeki_monaku",
+      "input": "わかるべき道もなく。"
+    },
+    {
+      "description": "Same construction with a different host verb and noun",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見る"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        },
+        {
+          "lemma": "景色",
+          "pos": "Noun",
+          "surface": "景色"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        }
+      ],
+      "id": "rubeki_monaku",
+      "input": "見るべき景色もなく。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

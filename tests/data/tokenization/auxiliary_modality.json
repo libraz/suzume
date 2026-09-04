@@ -2638,6 +2638,75 @@
       ],
       "id": "no_ki",
       "input": "鬼の如き形相"
+    },
+    {
+      "description": "Classical perfect chain closing a binding-particle clause",
+      "expected": [
+        {
+          "lemma": "月",
+          "pos": "Noun",
+          "surface": "月"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "出",
+          "pos": "Noun",
+          "surface": "出"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "ける"
+        }
+      ],
+      "id": "zo_denikeru",
+      "input": "月ぞ出でにける"
+    },
+    {
+      "description": "Classical perfect chain after a verb continuative",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "散り",
+          "pos": "Noun",
+          "surface": "散り"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "ける"
+        }
+      ],
+      "id": "zo_rinikeru",
+      "input": "花ぞ散りにける"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい)",
