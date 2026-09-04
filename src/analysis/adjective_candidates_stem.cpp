@@ -748,9 +748,14 @@ void appendIAdjClassicalTerminalCandidates(const std::vector<char32_t>& codepoin
     }
     // The terminal closes its clause. Any hiragana behind it continues some
     // other paradigm — the modern adjective's own (美し+かった), the sahen
-    // predicate's (確認し+て) — and that reading owns the mora.
+    // predicate's (確認し+て) — and that reading owns the mora. A prolonged
+    // sound mark is the same continuation spelled colloquially: しー is how
+    // the modern ending しい is written when the vowel is drawn out, so the
+    // mora belongs to that adjective (おいしーー is おいしい elongated, not a
+    // literary terminal followed by emphasis).
     if (shi_pos + 1 < codepoints.size() &&
-        normalize::classifyChar(codepoints[shi_pos + 1]) == normalize::CharType::Hiragana) {
+        (normalize::classifyChar(codepoints[shi_pos + 1]) == normalize::CharType::Hiragana ||
+         normalize::isProlongedSoundMark(codepoints[shi_pos + 1]))) {
       continue;
     }
     const std::string stem = extractSubstring(codepoints, start_pos, shi_pos);
