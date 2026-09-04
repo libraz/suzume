@@ -50,6 +50,7 @@ from .merge_postprocessors import (
     _postprocess_ha_row_godan,
     _postprocess_historical_kana_word,
     _postprocess_honorific_split,
+    _postprocess_ichidan_imperative_yo,
     _postprocess_izenkei_concessive,
     _postprocess_kakari_pronoun_split,
     _postprocess_kamo,
@@ -2155,6 +2156,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     result, applied_rule = _postprocess_nominal_copula_naru(result, applied_rule)
     result, applied_rule = _postprocess_nominal_before_conjunctive_te(result, applied_rule)
     result, applied_rule = _postprocess_derivational_nominal_suffix(result, applied_rule)
+    result, applied_rule = _postprocess_ichidan_imperative_yo(result, applied_rule)
     result, applied_rule = _postprocess_decomposable_adverb(result, applied_rule)
     result, applied_rule = _postprocess_bound_prefix_adjective(result, applied_rule)
     result, applied_rule = _postprocess_variation_selector_merge(result, applied_rule)

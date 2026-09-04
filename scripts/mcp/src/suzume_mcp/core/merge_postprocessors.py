@@ -1040,38 +1040,114 @@ def _postprocess_bound_prefix_adjective(result: list[dict], applied_rule: str | 
     return merged, applied_rule
 
 
+# The imperative an ichidan verb builds on its bare stem, and the cell the
+# reference dictionary names when it does reach that reading.
+_IMPERATIVE_YO = "よ"
+_ICHIDAN_CONJ_TYPE = "一段"
+_IMPERATIVE_YO_CELL = "命令ｙｏ"
+_CONTINUATIVE_CELL = "連用形"
+
+
+def _postprocess_ichidan_imperative_yo(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Join the imperative よ to the ichidan stem it inflects.
+
+    よ closes an ichidan imperative on the bare stem, and the reference
+    dictionary holds that cell — but only reaches it for the pairs its own
+    entries cover, reading the rest as the continuative plus the final
+    particle. A bare continuative closes no clause, so there is nothing in
+    front of a final particle for it to comment on, and the imperative is the
+    only reading left. Only the ichidan paradigm builds this cell: a godan
+    verb takes the e-row instead (集まれ + よ really is a final particle).
+
+    A subsidiary verb is excluded because it is not standing on a bare stem at
+    all — the te-form in front of it is what it continues, so the complex is a
+    closed predicate already and the よ behind it has something to comment on
+    (待っ + て + て + よ).
+    """
+    merged: list[dict] = []
+    for token in result:
+        host = merged[-1] if merged else None
+        if (
+            host is None
+            or token.get("surface") != _IMPERATIVE_YO
+            or token.get("pos") != "助詞"
+            or host.get("pos") != "動詞"
+            or host.get("pos_sub1") == "非自立"
+            or not (host.get("conj_type") or "").startswith(_ICHIDAN_CONJ_TYPE)
+            or host.get("conj_form") != _CONTINUATIVE_CELL
+        ):
+            merged.append(token)
+            continue
+        merged[-1] = {
+            **host,
+            "surface": host.get("surface", "") + _IMPERATIVE_YO,
+            "conj_form": _IMPERATIVE_YO_CELL,
+        }
+        if applied_rule is None:
+            applied_rule = "ichidan-imperative-yo"
+    return merged, applied_rule
+
+
 def _heads_property_nominal(token: dict) -> bool:
     """Whether a token is the adjective stem み nominalizes."""
     return token.get("pos") == "形容詞"
 
 
-# An adverb headword whose surface still ends in a case particle, with the probe
-# that reads its head back and the token the tail spells. The ablative takes a
-# nominal, so appending another case particle selects the same reading.
+# An adverb headword whose surface still ends in material of its own, with the
+# probe that reads its head back and the tokens the tail spells. The ablative
+# takes a nominal, so appending another case particle selects the same reading;
+# an adverb head needs no probe at all, since an adverb stands alone.
 _DECOMPOSABLE_ADVERB_TAILS = {
-    "から": ("が", "名詞", {"surface": "から", "pos": "助詞", "pos_sub1": "格助詞", "conj_form": "*", "lemma": "から"}),
+    "から": (
+        "が",
+        "名詞",
+        ({"surface": "から", "pos": "助詞", "pos_sub1": "格助詞", "conj_form": "*", "lemma": "から"},),
+    ),
+    "して": (
+        "",
+        "副詞",
+        (
+            {"surface": "し", "pos": "動詞", "pos_sub1": "自立", "conj_form": "連用形", "lemma": "する"},
+            {"surface": "て", "pos": "助詞", "pos_sub1": "接続助詞", "conj_form": "*", "lemma": "て"},
+        ),
+    ),
 }
+
+
+# The interrogative series, which is closed. Its members lexicalize with the
+# predicates behind them (どうして, どうやら, どうにか, どうも), so a head drawn
+# from it heads a fixed adverb rather than the productive phrase.
+_INTERROGATIVE_HEADS = frozenset({"どう", "いか", "なぜ", "なに", "なん"})
 
 
 def _decomposed_adverb_head(surface: str, probe_suffix: str, head_pos: str) -> dict | None:
     """Read an adverb's head back as the word the construction needs there."""
     from .mecab import mecab_analyze
 
+    if surface in _INTERROGATIVE_HEADS:
+        return None
     tokens = mecab_analyze(surface + probe_suffix)
-    if len(tokens) != 2 or tokens[0].get("surface") != surface:
+    if len(tokens) != (2 if probe_suffix else 1) or tokens[0].get("surface") != surface:
         return None
     head = tokens[0]
     return head if head.get("pos") == head_pos else None
 
 
 def _postprocess_decomposable_adverb(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
-    """Give back the case boundary an adverb headword swallowed.
+    """Give back the boundary an adverb headword swallowed.
 
     A case particle is what makes the nominal in front of it an argument, and an
     adverb tag over the pair takes that away — 根から comes back as one adverb
     whose lemma is a phrase, while 家から and 枝から come back as a noun and its
     particle. Reading the head back through another case particle settles which
     it is without a word list.
+
+    The continuative of する plus the conjunctive particle is the same case: the
+    entry もしかして covers it while もしかしたら and もしかすると come back in
+    pieces, so the tag turns on which of the phrases the lexicon happens to
+    hold. Requiring the head to be an adverb on its own is what keeps the
+    genuinely single adverbs out — 決して, 大して and 概して all leave a bare
+    nominal behind, and 果たして leaves two tokens.
     """
     expanded: list[dict] = []
     for token in result:
@@ -1083,13 +1159,13 @@ def _postprocess_decomposable_adverb(result: list[dict], applied_rule: str | Non
         if not tail or token.get("pos") != "副詞":
             expanded.append(token)
             continue
-        probe_suffix, head_pos, tail_token = _DECOMPOSABLE_ADVERB_TAILS[tail]
+        probe_suffix, head_pos, tail_tokens = _DECOMPOSABLE_ADVERB_TAILS[tail]
         head = _decomposed_adverb_head(surface[: -len(tail)], probe_suffix, head_pos)
         if head is None:
             expanded.append(token)
             continue
         expanded.append(head)
-        expanded.append(dict(tail_token))
+        expanded.extend(dict(tail_token) for tail_token in tail_tokens)
         if applied_rule is None:
             applied_rule = "decomposable-adverb"
     return expanded, applied_rule
@@ -2034,7 +2110,7 @@ def _is_licensed_attachment(left: dict, right: dict) -> bool:
     return True
 
 
-def _spans_one_mimetic(tokens: list[dict]) -> bool:
+def _spans_one_mimetic(tokens: list[dict], following: dict | None) -> bool:
     """Whether a run of tokens is one mimetic the reference dictionary tore up.
 
     A mimetic with no entry of its own gets guessed at, and the guess lands
@@ -2048,10 +2124,17 @@ def _spans_one_mimetic(tokens: list[dict]) -> bool:
     noun after a continuative cell and ばっち+り hangs an auxiliary off an
     adjective stem, and neither connection exists in the grammar.  A run
     opening on an auxiliary is continuing a predicate that ended earlier.
+
+    The attachment that disproves the run can also sit just past its right
+    edge, because the shape test measures morae and stops wherever the count
+    comes out: もしか + し is four morae of an alternating mimetic until the
+    たら behind it shows that the し was a verb in the cell たら selects.
     """
     if len(tokens) == 1:
         return tokens[0].get("pos") in {"その他", "副詞", "感動詞"}
     if tokens[0].get("pos") == "助動詞":
+        return False
+    if following is not None and _is_licensed_attachment(tokens[-1], following):
         return False
     return not any(_is_licensed_attachment(tokens[pos - 1], token) for pos, token in enumerate(tokens) if pos > 0)
 
@@ -2119,7 +2202,7 @@ def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | Non
                 and not closes_volitional_tto
                 and combined.endswith("っと")
                 and regex.fullmatch(r"[\p{Hiragana}ー]{3,12}", combined)
-                and _spans_one_mimetic(result[idx:end])
+                and _spans_one_mimetic(result[idx:end], result[end] if end < len(result) else None)
             ):
                 normalized.append({"surface": combined, "pos": "副詞", "lemma": combined})
                 idx = end
@@ -2137,7 +2220,7 @@ def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | Non
             elif _is_split_reduplication(result[idx:end]) or (
                 starts_at_real_boundary
                 and _is_productive_mimetic_stem(combined)
-                and _spans_one_mimetic(result[idx:end])
+                and _spans_one_mimetic(result[idx:end], result[end] if end < len(result) else None)
             ):
                 normalized.append({"surface": combined, "pos": "副詞", "lemma": combined})
                 idx = end

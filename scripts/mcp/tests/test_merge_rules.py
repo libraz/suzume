@@ -1545,3 +1545,57 @@ class TestMannerNominalKata:
         result, rule = apply_suzume_merge(tokens, "先生方")
         assert [token["surface"] for token in result] == ["先生", "方"]
         assert rule != "verb-renyokei+kata"
+
+
+class TestIchidanImperativeYo:
+    def _stem(self, surface, lemma, pos_sub1="自立"):
+        return _tok(surface, pos="動詞", pos_sub1=pos_sub1, lemma=lemma, conj_type="一段", conj_form="連用形")
+
+    def test_joins_the_imperative_yo_to_the_ichidan_stem(self):
+        tokens = [self._stem("生き", "生きる"), _tok("よ", pos="助詞", pos_sub1="終助詞", lemma="よ")]
+        result, rule = apply_suzume_merge(tokens, "生きよ")
+        assert [token["surface"] for token in result] == ["生きよ"]
+        assert result[0]["pos"] == "動詞"
+        assert result[0]["lemma"] == "生きる"
+        assert rule == "ichidan-imperative-yo"
+
+    def test_keeps_the_final_particle_after_a_godan_imperative(self):
+        tokens = [
+            _tok("集まれ", pos="動詞", pos_sub1="自立", lemma="集まる", conj_type="五段・ラ行", conj_form="命令ｅ"),
+            _tok("よ", pos="助詞", pos_sub1="終助詞", lemma="よ"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "集まれよ")
+        assert [token["surface"] for token in result] == ["集まれ", "よ"]
+        assert rule != "ichidan-imperative-yo"
+
+    def test_keeps_the_final_particle_after_a_subsidiary_verb(self):
+        tokens = [
+            _tok("待っ", pos="動詞", pos_sub1="自立", lemma="待つ", conj_type="五段・タ行", conj_form="連用タ接続"),
+            _tok("て", pos="助詞", pos_sub1="接続助詞", lemma="て"),
+            self._stem("て", "てる", pos_sub1="非自立"),
+            _tok("よ", pos="助詞", pos_sub1="終助詞", lemma="よ"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "待っててよ")
+        assert [token["surface"] for token in result] == ["待っ", "て", "て", "よ"]
+        assert rule != "ichidan-imperative-yo"
+
+
+class TestDecomposableSuruAdverb:
+    def test_decomposes_the_modal_adverb_the_lexicon_holds_whole(self):
+        tokens = [_tok("もしかして", pos="副詞", pos_sub1="一般", lemma="もしかして")]
+        result, rule = apply_suzume_merge(tokens, "もしかして")
+        assert [token["surface"] for token in result] == ["もしか", "し", "て"]
+        assert result[1]["lemma"] == "する"
+        assert rule == "decomposable-adverb"
+
+    def test_keeps_an_adverb_whose_head_is_no_adverb(self):
+        tokens = [_tok("決して", pos="副詞", pos_sub1="一般", lemma="決して")]
+        result, rule = apply_suzume_merge(tokens, "決して")
+        assert [token["surface"] for token in result] == ["決して"]
+        assert rule != "decomposable-adverb"
+
+    def test_keeps_the_fixed_interrogative_adverb(self):
+        tokens = [_tok("どうして", pos="副詞", pos_sub1="一般", lemma="どうして")]
+        result, rule = apply_suzume_merge(tokens, "どうして")
+        assert [token["surface"] for token in result] == ["どうして"]
+        assert rule != "decomposable-adverb"
