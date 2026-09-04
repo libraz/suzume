@@ -1121,6 +1121,87 @@
       ],
       "id": "keno_wo_mu",
       "input": "初心者向けの解説を読む"
+    },
+    {
+      "description": "lexicalized single-kanji-host compound adjective stays one search unit",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "素早い",
+          "pos": "Adjective",
+          "surface": "素早い"
+        }
+      ],
+      "id": "noyouni_i_2",
+      "input": "猫のように素早い。"
+    },
+    {
+      "description": "the same compound in its adverbial cell",
+      "expected": [
+        {
+          "lemma": "手早い",
+          "pos": "Adjective",
+          "surface": "手早く"
+        },
+        {
+          "lemma": "片づける",
+          "pos": "Verb",
+          "surface": "片づける"
+        }
+      ],
+      "id": "ku_dukeru",
+      "input": "手早く片づける"
+    },
+    {
+      "description": "an unlexicalized host keeps the noun plus predicate reading",
+      "expected": [
+        {
+          "lemma": "朝",
+          "pos": "Noun",
+          "surface": "朝"
+        },
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早い"
+        },
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "出る",
+          "pos": "Verb",
+          "surface": "出る"
+        }
+      ],
+      "id": "i_ni_ru",
+      "input": "朝早い時間に出る"
     }
   ],
   "description": "General nouns (part 4/4)",
