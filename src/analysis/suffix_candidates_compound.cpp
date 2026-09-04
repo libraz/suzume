@@ -1095,6 +1095,15 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
     looks_like_aux = true;
   }
 
+  // The past auxiliary た selects the same continuative the connective て does,
+  // so a span ending in it is a finished predicate rather than a compound noun
+  // (嘘じみた, 夢じみた). This is the past-tense half of the check above; the
+  // fixed nouns that happen to end in the same mora (花かるた) keep an ordinary
+  // candidate, only priced as the auxiliary-shaped span it looks like.
+  if (last_hira == U'た' && hiragana_len >= 2) {
+    looks_like_aux = true;
+  }
+
   // Patterns opening with a conjunctive particle (見ちゃだめ, 読んじゃだめ)
   if (startsWithConjunctiveParticle(dict_manager, codepoints, kanji_end, hiragana_end)) {
     looks_like_aux = true;
