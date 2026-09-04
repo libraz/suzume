@@ -199,6 +199,32 @@ bool decomposesIntoMultipleParticles(const std::vector<char32_t>& codepoints, si
   return maximalSegmentCount(*dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Particle) >= 2;
 }
 
+// The presumptive attaches to an irrealis cell and to nothing else, so a run
+// that closes on one is a predicate however ordinary its kana look (だろ+う,
+// でしょ+う). Burying it in an unregistered noun hides the inflection boundary
+// the rest of the analysis depends on.
+//
+// The host must span more than one kana. A single kana that happens to spell a
+// classical auxiliary carries no evidence about the run — く+つ decomposes that
+// way only by accident.
+bool spansPresumptiveAuxiliary(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
+                               const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || end_pos < start_pos + 3) {
+    return false;
+  }
+  for (size_t host_end = start_pos + 2; host_end < end_pos; ++host_end) {
+    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, host_end, core::PartOfSpeech::Auxiliary) == nullptr) {
+      continue;
+    }
+    const auto* presumptive =
+        lookupEntryInRange(*dict_manager, codepoints, host_end, end_pos, core::PartOfSpeech::Auxiliary);
+    if (presumptive != nullptr && presumptive->extended_pos == core::ExtendedPOS::AuxVolitional) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool isFollowedByNominalParticle(const std::vector<char32_t>& codepoints, size_t end_pos,
                                  const dictionary::DictionaryManager* dict_manager) {
   // Longest nominal-selecting particle in the closed class is three codepoints.
@@ -1197,6 +1223,13 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           hasExactPartOfSpeech(
               *dict_manager_, extractSubstring(codepoints, start_pos, run_end - 1),
               partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective))) {
+        return;
+      }
+      // A modal chain closing on the presumptive is a predicate, not an
+      // unregistered noun. At a clause opening there is no left content edge to
+      // expose its boundary, so the rescue path would bury the whole predicate
+      // inside a fabricated nominal (だろ|う|に|ね).
+      if (spansPresumptiveAuxiliary(codepoints, start_pos, run_end, dict_manager_)) {
         return;
       }
       // Right bracket: a single boundary particle, a multi-char particle start, or a
