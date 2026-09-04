@@ -10,6 +10,7 @@
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
+#include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/inflection_scorer_constants.h"
 #include "normalize/utf8.h"
@@ -328,6 +329,23 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
       // (読む+っていう), rather than a te-form that continues into an auxiliary.
       if (after_sokuon == U'て' && isGodanTerminalEnding(codepoints[pos - 1])) {
         continue;
+      }
+
+      // An unattested base is invented from the shape alone, so it must not
+      // override a reading the stem already has: the っ then belongs to the
+      // following particle instead (好き+っていう, 飲み+って). Two readings count
+      // — a dictionary entry of another word class, and the continuative cell of
+      // a registered verb, which cannot also head a new paradigm.
+      if (!vh::isVerbInDictionary(dict_manager, potential_base) && dict_manager != nullptr) {
+        const auto* stem_entry = dict_manager->lookupExact(stem);
+        const std::string_view continuative_base_suffix = grammar::godanBaseSuffixFromIRow(utf8::decodeLastChar(stem));
+        const bool stem_is_registered_continuative =
+            !continuative_base_suffix.empty() &&
+            vh::isVerbInDictionary(dict_manager, stem.substr(0, stem.size() - core::kJapaneseCharBytes) +
+                                                     std::string(continuative_base_suffix));
+        if ((stem_entry != nullptr && stem_entry->pos != core::PartOfSpeech::Verb) || stem_is_registered_continuative) {
+          continue;
+        }
       }
 
       bool in_dict_check = vh::isVerbInDictionary(dict_manager, potential_base);
