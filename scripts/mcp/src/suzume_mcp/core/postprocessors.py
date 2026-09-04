@@ -678,23 +678,32 @@ def postprocess_classical_copula_nari(tokens: list[dict]) -> bool:
     return changed
 
 
-def _spells_verb_continuative(surface: str) -> bool:
-    """Whether this surface is a verb's continuative rather than a finite cell.
+def _verb_continuative_reading(surface: str) -> dict | None:
+    """The verb reading of a surface that spells a continuative, else None.
 
     The reference dictionary names the cell only in the raw analysis, which the
     mapped tokens no longer carry, so ask it in an environment that admits
     nothing else: the polite ます selects the continuative and leaves a finite
-    form unchanged (見+ます against やる+ます).
+    form unchanged (見+ます against やる+ます). The probe stands on its own, so a
+    surface the dictionary also carries as a nominalized headword (咲き, 香り)
+    answers here even where the mapped token was given that noun reading.
     """
     from .mecab import mecab_analyze
 
     probe = mecab_analyze(surface + "ます")
-    return (
+    if (
         len(probe) == 2
         and probe[0].get("surface") == surface
         and probe[0].get("pos") == "動詞"
         and probe[0].get("conj_form") == "連用形"
-    )
+    ):
+        return probe[0]
+    return None
+
+
+def _spells_verb_continuative(surface: str) -> bool:
+    """Whether this surface is a verb's continuative rather than a finite cell."""
+    return _verb_continuative_reading(surface) is not None
 
 
 def postprocess_classical_past_izenkei_shika(tokens: list[dict]) -> bool:
@@ -2350,8 +2359,15 @@ def postprocess_classical_perfect_nu(tokens: list[dict]) -> bool:
         if idx == 0 or token.get("pos") != "Verb" or token.get("surface") not in _PERFECT_NU_CELLS:
             continue
         previous = tokens[idx - 1]
-        if previous.get("pos") != "Verb" or not _spells_verb_continuative(previous.get("surface", "")):
+        reading = _verb_continuative_reading(previous.get("surface", ""))
+        if reading is None:
             continue
+        # The perfect attaches to a predicate, so the host is that continuative
+        # whatever class the reference gave it. Where the dictionary also carries
+        # the cell as a nominalized headword it hands back the noun (花+咲き),
+        # which would leave the auxiliary hosted by something that cannot host it.
+        previous["pos"] = "Verb"
+        previous["lemma"] = reading.get("lemma", previous.get("lemma"))
         token["pos"] = "Auxiliary"
         token["lemma"] = "ぬ"
 
