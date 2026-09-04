@@ -210,7 +210,12 @@ def _postprocess_honorific_split(result: list[dict], applied_rule: str | None) -
                 if applied_rule is None:
                     applied_rule = "honorific-predicate-split"
                 continue
-        if surface not in HONORIFIC_EXCEPTIONS:
+        # An honorific attaches to a term of address, which IPADIC tags 名詞-一般
+        # or 名詞-固有名詞. A na-adjective stem never is one, so a 形容動詞語幹
+        # ending in さま carries the 様 of manner (逆さま) rather than the
+        # honorific, and its boundary is word-internal.
+        is_na_adjective_stem = t.get("pos_sub1") == "形容動詞語幹"
+        if surface not in HONORIFIC_EXCEPTIONS and not is_na_adjective_stem:
             m = regex.match(rf"^(お)?([\p{{Han}}]+)({honorific_re})$", surface)
             if m:
                 prefix, kanji, suffix = m.group(1), m.group(2), m.group(3)

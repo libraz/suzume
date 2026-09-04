@@ -2197,14 +2197,9 @@
           "surface": "は"
         },
         {
-          "lemma": "異",
-          "pos": "Noun",
-          "surface": "異"
-        },
-        {
-          "lemma": "様",
-          "pos": "Noun",
-          "surface": "様"
+          "lemma": "異様",
+          "pos": "Adjective",
+          "surface": "異様"
         },
         {
           "lemma": "に",
