@@ -1752,6 +1752,85 @@
       ],
       "id": "sono_ha_genari",
       "input": "その態度は得意げなり"
+    },
+    {
+      "description": "事成りぬれば喜びは大なり - auto-generated",
+      "expected": [
+        {
+          "lemma": "事",
+          "pos": "Noun",
+          "surface": "事"
+        },
+        {
+          "lemma": "成る",
+          "pos": "Verb",
+          "surface": "成り"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "喜び",
+          "pos": "Noun",
+          "surface": "喜び"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "大",
+          "pos": "Noun",
+          "surface": "大"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        }
+      ],
+      "id": "koto_narinureba",
+      "input": "事成りぬれば喜びは大なり"
+    },
+    {
+      "description": "花咲きぬれば見る - auto-generated",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲き"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見る"
+        }
+      ],
+      "id": "hana_sakinureba",
+      "input": "花咲きぬれば見る"
     }
   ],
   "description": "auxiliary_classical tests",

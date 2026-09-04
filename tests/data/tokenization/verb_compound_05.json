@@ -1512,6 +1512,23 @@
       ],
       "id": "ni_ri_keru",
       "input": "山に登り続ける"
+    },
+    {
+      "description": "心落ち着く - auto-generated",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "落ち着く",
+          "pos": "Verb",
+          "surface": "落ち着く"
+        }
+      ],
+      "id": "kokoro_ochitsuku",
+      "input": "心落ち着く"
     }
   ],
   "description": "Compound verbs (part 5/5)",
