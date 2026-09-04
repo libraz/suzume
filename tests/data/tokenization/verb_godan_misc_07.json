@@ -2921,6 +2921,82 @@
       ],
       "id": "ninomettta",
       "input": "前にのめった"
+    },
+    {
+      "description": "ra-row negative contraction after a contracted conditional",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なきゃ"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "naki_wakannai",
+      "input": "見なきゃわかんない"
+    },
+    {
+      "description": "same contraction with a godan host predicate",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なきゃ"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kanaki_wakannai",
+      "input": "行かなきゃわかんない"
+    },
+    {
+      "description": "the contraction before the past cell of the negative",
+      "expected": [
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wakannakattta",
+      "input": "わかんなかった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 7/7)",
