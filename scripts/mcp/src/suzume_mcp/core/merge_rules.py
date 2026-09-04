@@ -697,6 +697,23 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 )
                 if follows_verb_as_classical_ha_row:
                     continue
+                # A headword spelled like the volitional-hosting irrealis plus
+                # the auxiliary it selects is not evidence that the span is one
+                # search unit. That cell has its own label because it exists for
+                # nothing else, so the analyzer assigns it only where the
+                # inflection is real (向こ + う in 顔を向こうとした, against the
+                # noun 向こう in 塀の向こう側), and merging there would bury an
+                # inflectional boundary it had already found. The plain irrealis
+                # is not gated: it is also what an ordinary noun's first mora
+                # gets misread as, which is the case this recovery exists for
+                # (みず read as 見る + ず).
+                covers_volitional_irrealis_chain = (
+                    t.get("pos") == "動詞"
+                    and (t.get("conj_form") or "") == "未然ウ接続"
+                    and all(tokens[k].get("pos") == "助動詞" for k in range(i + 1, j))
+                )
+                if covers_volitional_irrealis_chain:
+                    continue
                 # Use the canonical POS label as a boundary marker. The raw
                 # kanji and classical-stem recovery passes operate on MeCab's
                 # Japanese POS labels and must not absorb a dictionary-backed
