@@ -159,14 +159,6 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
-  // The conditional allomorph たら is an auxiliary after a completed verb.
-  // When another predicate follows, retain that analysis rather than the
-  // homographic conjunctive-particle entry.
-  if (prev.extended_pos == core::ExtendedPOS::AuxTenseTa && utf8::equalsAny(prev.surface, {"たら"}) &&
-      next.pos == core::PartOfSpeech::Verb) {
-    SUZUME_CONNECTION_ADD(bonus, cost::kTripleVeryStrongBonus);
-  }
-
   // Classical focus なむ can precede a quotative と. The fused particle
   // provides a grammatical boundary that must outrank な + む auxiliaries.
   if (prev.extended_pos == core::ExtendedPOS::ParticleBinding && next.extended_pos == core::ExtendedPOS::ParticleCase &&

@@ -435,9 +435,11 @@ float computePastConditionalVerbBonus(const core::LatticeEdge& prev, const core:
 
   // The conditional forms of the past auxiliary introduce a following main
   // predicate (読ん+たら+進む, 読ま+せ+ん+でし+たら+進む). They are unlike a
-  // completed-past た, which must not be followed by a bare verb.
+  // completed-past た, which must not be followed by a bare verb. The consequent
+  // is a whole clause, so its predicate can stand in any cell, not only the
+  // terminal one.
   if (prev.extended_pos == core::ExtendedPOS::AuxTenseTa && utf8::equalsAny(prev.surface, {"たら", "だら"}) &&
-      next.extended_pos == core::ExtendedPOS::VerbShuushikei) {
+      next.pos == core::PartOfSpeech::Verb) {
     return sc::kBonusConditionalPredicate;
   }
   // A past conditional can introduce a negative predicate as well as an
