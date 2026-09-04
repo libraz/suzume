@@ -105,11 +105,31 @@ bool hasParticleFinalHiraganaNounContinuation(const std::vector<char32_t>& codep
 // at a clause boundary forms a complete noun phrase (雨の匂い。). Requiring
 // both sides keeps attributive predicates such as 父の残した手紙 verbal.
 bool isGenitiveClauseFinalNominal(const std::vector<char32_t>& codepoints,
-                                  const std::vector<normalize::CharType>& char_types, size_t start_pos,
-                                  size_t end_pos) {
-  return start_pos > 0 && codepoints[start_pos - 1] == U'の' &&
-         (end_pos == codepoints.size() ||
-          (end_pos < char_types.size() && char_types[end_pos] == normalize::CharType::Symbol));
+                                  const std::vector<normalize::CharType>& char_types, size_t start_pos, size_t end_pos,
+                                  const dictionary::DictionaryManager* dict_manager) {
+  const bool closes_clause = end_pos == codepoints.size() ||
+                             (end_pos < char_types.size() && char_types[end_pos] == normalize::CharType::Symbol);
+  if (start_pos == 0 || !closes_clause) {
+    return false;
+  }
+  if (codepoints[start_pos - 1] == U'の') {
+    return true;
+  }
+  // A determiner is the same kind of left bracket as the genitive: both exist to
+  // select a nominal head, and neither can stand in front of a continuative. The
+  // longest one bounds the lookbehind (いわゆる, ありとあらゆる).
+  constexpr size_t kDeterminerLookbehind = 6;
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  const size_t scan_start = start_pos > kDeterminerLookbehind ? start_pos - kDeterminerLookbehind : 0;
+  for (size_t determiner_start = scan_start; determiner_start < start_pos; ++determiner_start) {
+    if (lookupEntryInRange(*dict_manager, codepoints, determiner_start, start_pos, core::PartOfSpeech::Determiner) !=
+        nullptr) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // Whether the kanji immediately before @p okurigana_pos, taken together with
@@ -423,7 +443,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
         if (!surface.empty()) {
           float nom2_cost = 0.8F;
           if (has_particle_continuation || selects_nominal_host ||
-              isGenitiveClauseFinalNominal(codepoints, char_types, start_pos, hiragana_end + 1)) {
+              isGenitiveClauseFinalNominal(codepoints, char_types, start_pos, hiragana_end + 1, dict_manager)) {
             nom2_cost += candidate::kNominalizedNounParticleBonus;
           }
           auto cand =
@@ -549,7 +569,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       const bool has_temporal_nominal_continuation =
           grammar::startsClosedTemporalNominal(extractSubstring(codepoints, kanji_end + 1, codepoints.size()));
       if (has_particle_continuation || has_final_particle_continuation ||
-          isGenitiveClauseFinalNominal(codepoints, char_types, start_pos, kanji_end + 1) ||
+          isGenitiveClauseFinalNominal(codepoints, char_types, start_pos, kanji_end + 1, dict_manager) ||
           has_temporal_nominal_continuation || has_hiragana_noun_continuation || has_humble_auxiliary_continuation) {
         nom1_cost += candidate::kNominalizedNounParticleBonus;
       }
@@ -609,8 +629,13 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       const bool ends_on_dictionary_adjective =
           kanji_count >= 2 && verb_helpers::isAdjectiveInDictionary(
                                   dict_manager, extractSubstring(codepoints, kanji_end - 1, kanji_end + 1));
+      // The end of the input selects a nominal too. A bare continuative is not a
+      // finite form, so it cannot close a sentence on its own — the 連用中止 use
+      // hands the clause on and shows up before a comma, never at the end (似た
+      // 輝き, 優れた働き). Without this the deverbal reading has no candidate at
+      // all wherever the frame is a clause end rather than a particle.
       const bool has_explicit_nominal_selector =
-          has_particle_continuation ||
+          has_particle_continuation || kanji_end + 1 == codepoints.size() ||
           (kanji_end + 1 < char_types.size() && char_types[kanji_end + 1] == normalize::CharType::Hiragana &&
            selectsNominalHost(dict_manager, codepoints, char_types, kanji_end + 1));
       // A particle-selected continuative compound is a complete nominal even
