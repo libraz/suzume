@@ -849,6 +849,38 @@
       ],
       "id": "washiki_wo_beru",
       "input": "疑わしき点を調べる"
+    },
+    {
+      "description": "an attributive copula after a nominal na-adjective stem is unaffected",
+      "expected": [
+        {
+          "lemma": "明らか",
+          "pos": "Adjective",
+          "surface": "明らか"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "誤り",
+          "pos": "Noun",
+          "surface": "誤り"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "正す",
+          "pos": "Verb",
+          "surface": "正す"
+        }
+      ],
+      "id": "rakana_riwo_su",
+      "input": "明らかな誤りを正す"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

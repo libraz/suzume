@@ -799,6 +799,33 @@
       ],
       "id": "wotataita",
       "input": "尻をたたいた。"
+    },
+    {
+      "description": "an ichidan terminal before the prohibitive final particle stays a verb",
+      "expected": [
+        {
+          "lemma": "残す",
+          "pos": "Verb",
+          "surface": "残さ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べる"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "sazu_beruna",
+      "input": "残さず食べるな"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

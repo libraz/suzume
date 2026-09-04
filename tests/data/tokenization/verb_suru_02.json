@@ -53,6 +53,38 @@
       ],
       "id": "shiyouka",
       "input": "確認しようか"
+    },
+    {
+      "description": "a suru verb terminal before the prohibitive final particle stays a verb",
+      "expected": [
+        {
+          "lemma": "見かけ",
+          "pos": "Noun",
+          "surface": "見かけ"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "判断",
+          "pos": "Noun",
+          "surface": "判断"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "kakede_suruna",
+      "input": "見かけで判断するな。"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",
