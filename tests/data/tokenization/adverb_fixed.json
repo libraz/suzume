@@ -1612,6 +1612,102 @@
       ],
       "id": "meteareba_karu",
       "input": "初めてあれば分かる"
+    },
+    {
+      "description": "Fixed adverb is not eaten by the quotative particle",
+      "expected": [
+        {
+          "lemma": "前もって",
+          "pos": "Adverb",
+          "surface": "前もって"
+        },
+        {
+          "lemma": "確認",
+          "pos": "Noun",
+          "surface": "確認"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おく",
+          "pos": "Auxiliary",
+          "surface": "おく"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mottte_shiteokubekidattta",
+      "input": "前もって確認しておくべきだった"
+    },
+    {
+      "description": "Fixed adverb before a plain verb",
+      "expected": [
+        {
+          "lemma": "前もって",
+          "pos": "Adverb",
+          "surface": "前もって"
+        },
+        {
+          "lemma": "知らせる",
+          "pos": "Verb",
+          "surface": "知らせる"
+        }
+      ],
+      "id": "mottte_raseru",
+      "input": "前もって知らせる"
+    },
+    {
+      "description": "Binding particle before the quotative stays split",
+      "expected": [
+        {
+          "lemma": "僕",
+          "pos": "Pronoun",
+          "surface": "僕"
+        },
+        {
+          "lemma": "もつ",
+          "pos": "Verb",
+          "surface": "もっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mottte_ttta",
+      "input": "僕もって言った"
     }
   ],
   "description": "adverb_fixed tests",
