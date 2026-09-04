@@ -1224,6 +1224,33 @@
       ],
       "id": "ri_ga_i",
       "input": "走り方が悪い"
+    },
+    {
+      "description": "the same nominal before the kana spelling of the stem",
+      "expected": [
+        {
+          "lemma": "類い",
+          "pos": "Noun",
+          "surface": "類い"
+        },
+        {
+          "lemma": "まれ",
+          "pos": "Adjective",
+          "surface": "まれ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "才能",
+          "pos": "Noun",
+          "surface": "才能"
+        }
+      ],
+      "id": "imarena",
+      "input": "類いまれな才能。"
     }
   ],
   "description": "General nouns (part 4/4)",

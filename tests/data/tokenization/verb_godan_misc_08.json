@@ -1243,6 +1243,43 @@
       ],
       "id": "shite_sanai",
       "input": "決して許さない"
+    },
+    {
+      "description": "a nominal keeps the okurigana read as a one-kana verb",
+      "expected": [
+        {
+          "lemma": "類い",
+          "pos": "Noun",
+          "surface": "類い"
+        },
+        {
+          "lemma": "稀",
+          "pos": "Adjective",
+          "surface": "稀"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "才能",
+          "pos": "Noun",
+          "surface": "才能"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "持つ",
+          "pos": "Verb",
+          "surface": "持つ"
+        }
+      ],
+      "id": "i_na_wo_tsu",
+      "input": "類い稀な才能を持つ。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
