@@ -1,0 +1,50 @@
+{
+  "cases": [
+    {
+      "description": "Old-form Sino-Japanese nominal stays one token despite containing a verb-stem kanji",
+      "expected": [
+        {
+          "lemma": "未來",
+          "pos": "Noun",
+          "surface": "未來"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "語る",
+          "pos": "Verb",
+          "surface": "語る"
+        }
+      ],
+      "id": "wo_ru_7",
+      "input": "未來を語る"
+    },
+    {
+      "description": "Old-form Sino-Japanese nominal before の keeps its boundary",
+      "expected": [
+        {
+          "lemma": "將來",
+          "pos": "Noun",
+          "surface": "將來"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "夢",
+          "pos": "Noun",
+          "surface": "夢"
+        }
+      ],
+      "id": "no_21",
+      "input": "將來の夢"
+    }
+  ],
+  "description": "noun_kanji_compound tests",
+  "version": "1.0"
+}

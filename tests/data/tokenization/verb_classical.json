@@ -198,6 +198,207 @@
       ],
       "id": "wo_tsu_3",
       "input": "関係を断つ"
+    },
+    {
+      "description": "Old-form kanji カ変 mizenkei before the classical perfect and べし",
+      "expected": [
+        {
+          "lemma": "誰",
+          "pos": "Pronoun",
+          "surface": "誰"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "來る",
+          "pos": "Verb",
+          "surface": "來"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "ka_nubeshi_2",
+      "input": "誰か來ぬべし"
+    },
+    {
+      "description": "Old-form kanji カ変 before the classical past-conjecture auxiliary",
+      "expected": [
+        {
+          "lemma": "誰",
+          "pos": "Pronoun",
+          "surface": "誰"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "來る",
+          "pos": "Verb",
+          "surface": "來"
+        },
+        {
+          "lemma": "けむ",
+          "pos": "Auxiliary",
+          "surface": "けむ"
+        }
+      ],
+      "id": "ka_kemu",
+      "input": "誰か來けむ"
+    },
+    {
+      "description": "Old-form kanji カ変 mizenkei before the classical negative",
+      "expected": [
+        {
+          "lemma": "誰",
+          "pos": "Pronoun",
+          "surface": "誰"
+        },
+        {
+          "lemma": "來る",
+          "pos": "Verb",
+          "surface": "來"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ざり"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "zarikeri",
+      "input": "誰來ざりけり"
+    },
+    {
+      "description": "Old-form kanji カ変 renyokei before the classical attributive たる",
+      "expected": [
+        {
+          "lemma": "來る",
+          "pos": "Verb",
+          "surface": "來"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "四月",
+          "pos": "Noun",
+          "surface": "四月"
+        }
+      ],
+      "id": "taru",
+      "input": "來たる四月"
+    },
+    {
+      "description": "Old-form kanji カ変 terminal form",
+      "expected": [
+        {
+          "lemma": "春",
+          "pos": "Noun",
+          "surface": "春"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "來る",
+          "pos": "Verb",
+          "surface": "來る"
+        }
+      ],
+      "id": "ga_ru_3",
+      "input": "春が來る"
+    },
+    {
+      "description": "Old-form kanji カ変 mizenkei before the negative auxiliary",
+      "expected": [
+        {
+          "lemma": "誰",
+          "pos": "Pronoun",
+          "surface": "誰"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "來る",
+          "pos": "Verb",
+          "surface": "來"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "mo_nai",
+      "input": "誰も來ない"
+    },
+    {
+      "description": "Old-form kanji カ変 conditional stem",
+      "expected": [
+        {
+          "lemma": "來る",
+          "pos": "Verb",
+          "surface": "來れ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分かる"
+        }
+      ],
+      "id": "reba_karu",
+      "input": "來れば分かる"
+    },
+    {
+      "description": "Old-form kanji カ変 volitional stem keeps the auxiliary boundary",
+      "expected": [
+        {
+          "lemma": "明日",
+          "pos": "Noun",
+          "surface": "明日"
+        },
+        {
+          "lemma": "來る",
+          "pos": "Verb",
+          "surface": "來よ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "you",
+      "input": "明日來よう"
     }
   ],
   "description": "verb_classical tests",
