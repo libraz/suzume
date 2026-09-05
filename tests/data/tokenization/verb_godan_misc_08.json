@@ -1356,6 +1356,146 @@
       ],
       "id": "yondara_susumu",
       "input": "読んだら進む"
+    },
+    {
+      "description": "Kanji noun must not swallow the head of a following godan verb",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "定まる",
+          "pos": "Verb",
+          "surface": "定まる"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        }
+      ],
+      "id": "marumuzu",
+      "input": "心定まるむず"
+    },
+    {
+      "description": "Godan verb keeps its kanji head after a compound noun",
+      "expected": [
+        {
+          "lemma": "方針",
+          "pos": "Noun",
+          "surface": "方針"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "定まる",
+          "pos": "Verb",
+          "surface": "定まら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "ga_maranai",
+      "input": "方針が定まらない"
+    },
+    {
+      "description": "Deverbal compound noun keeps its okurigana",
+      "expected": [
+        {
+          "lemma": "玄関",
+          "pos": "Noun",
+          "surface": "玄関"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "鉢植え",
+          "pos": "Noun",
+          "surface": "鉢植え"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "置く",
+          "pos": "Verb",
+          "surface": "置く"
+        }
+      ],
+      "id": "ni_ewo_ku",
+      "input": "玄関に鉢植えを置く"
+    },
+    {
+      "description": "Ichidan verb keeps its kanji head after a one-kanji noun",
+      "expected": [
+        {
+          "lemma": "庭",
+          "pos": "Noun",
+          "surface": "庭"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "木",
+          "pos": "Noun",
+          "surface": "木"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "植える",
+          "pos": "Verb",
+          "surface": "植える"
+        }
+      ],
+      "id": "ni_wo_eru",
+      "input": "庭に木を植える"
+    },
+    {
+      "description": "Godan-ka verb reading of a kanji that also heads compound nouns",
+      "expected": [
+        {
+          "lemma": "扉",
+          "pos": "Noun",
+          "surface": "扉"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "開く",
+          "pos": "Verb",
+          "surface": "開く"
+        }
+      ],
+      "id": "wo_ku_3",
+      "input": "扉を開く"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
