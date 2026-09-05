@@ -1007,6 +1007,114 @@
       ],
       "id": "damedatt",
       "input": "だめだっ"
+    },
+    {
+      "description": "I-adjective terminal form before the quotative contraction",
+      "expected": [
+        {
+          "lemma": "忙しい",
+          "pos": "Adjective",
+          "surface": "忙しい"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shiittte_wareta",
+      "input": "忙しいって言われた"
+    },
+    {
+      "description": "Quotative contraction after an adjective whose stem is not a verb continuative",
+      "expected": [
+        {
+          "lemma": "新しい",
+          "pos": "Adjective",
+          "surface": "新しい"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shiittte_ita",
+      "input": "新しいって聞いた"
+    },
+    {
+      "description": "Quotative contraction after an adjective whose first kanji is a na-adjective",
+      "expected": [
+        {
+          "lemma": "楽しい",
+          "pos": "Adjective",
+          "surface": "楽しい"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思う"
+        }
+      ],
+      "id": "shiittte_u",
+      "input": "楽しいって思う"
+    },
+    {
+      "description": "Concessive particle still attaches directly to a na-adjective stem",
+      "expected": [
+        {
+          "lemma": "遺憾",
+          "pos": "Adjective",
+          "surface": "遺憾"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        },
+        {
+          "lemma": "受け入れる",
+          "pos": "Verb",
+          "surface": "受け入れ"
+        },
+        {
+          "lemma": "がたい",
+          "pos": "Adjective",
+          "surface": "がたい"
+        }
+      ],
+      "id": "nagara_ke_regatai",
+      "input": "遺憾ながら受け入れがたい"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
