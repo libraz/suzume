@@ -2754,6 +2754,33 @@
       ],
       "id": "noyoudehanai_ki_da",
       "input": "猫のようではない動き方だ。"
+    },
+    {
+      "description": "Negative control: a nominal suffix still takes the copula and its past form",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "たち",
+          "pos": "Suffix",
+          "surface": "たち"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tachidattta",
+      "input": "子供たちだった"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい)",
