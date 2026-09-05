@@ -62,6 +62,12 @@ void setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
       {EPOS::ParticleFinal, EPOS::Other, cost::kRare},
       {EPOS::ParticleConj, EPOS::Other, cost::kUncommon},
 
+      // The copula is the same case: it either closes its predicate or, in the
+      // attributive cell, hands it to a nominal, so an opaque kana fragment
+      // after one is what is left over when a longer word was cut at a mora
+      // that happens to spell it (帰宅+な+う for 帰宅+なう).
+      {EPOS::AuxCopulaDa, EPOS::Other, cost::kRare},
+
       // A case particle marks an argument, so what follows it heads a phrase:
       // a tense auxiliary has nothing to attach to there. The pair only arises
       // when a kana run is cut at a mora that also spells the past auxiliary
