@@ -116,10 +116,16 @@ std::vector<dictionary::DictionaryEntry> expandVerb(const dictionary::Dictionary
       return normalize::concat(base_entry.lemma.substr(0, base_entry.lemma.size() - source_ending.size()), ending);
     };
     const std::string kanji_lemma = lemma_for("来る");
+    const std::string old_kanji_lemma = lemma_for("來る");
     const std::string kana_lemma = lemma_for("くる");
     for (const auto& form : getKuruDictionaryForms()) {
       if (form.emit_kanji) {
         result.push_back({prefix + form.kanji_surface, core::PartOfSpeech::Verb, form.extended_pos, kanji_lemma});
+        // The old spelling is unambiguous the same way the modern one is, so
+        // it needs no separate emission gate. It keeps its own lemma because a
+        // surface written in the old form belongs to the old-form entry.
+        result.push_back(
+            {prefix + form.old_kanji_surface, core::PartOfSpeech::Verb, form.extended_pos, old_kanji_lemma});
       }
       // A one-mora kana dictionary edge (き/こ) is indistinguishable from
       // ordinary word-internal kana and receives the short-dictionary-verb

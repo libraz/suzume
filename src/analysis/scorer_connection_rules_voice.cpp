@@ -11,6 +11,7 @@
 #include "core/types.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
+#include "grammar/conjugation.h"
 #include "grammar/honorific_verbs.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
@@ -56,7 +57,7 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   // The カ変未然形 来ら takes the potential/passive auxiliary directly
   // (来ら+れる). Its full lexical form competes with this decomposition, so
   // preserve the inflectional boundary once the irregular lemma is known.
-  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && prev.lemma == "来る" &&
+  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && grammar::isKuruKanjiBaseForm(prev.lemma) &&
       next.extended_pos == core::ExtendedPOS::AuxPassive && utf8::equalsAny(next.surface, {"れる"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kDoubleVeryStrongBonus);
   }
@@ -224,7 +225,7 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   // E.g., 食べ+させ+られ+た (not 食べ+さ+せ+られ+た).  The irregular Kuru
   // form has its own L1 mizenkei connection (来さ+せ), so it is excluded.
   if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbMizenkei) &&
-      prev.lemma != "来る" && next.extended_pos == core::ExtendedPOS::AuxCausative &&
+      !grammar::isKuruKanjiBaseForm(prev.lemma) && next.extended_pos == core::ExtendedPOS::AuxCausative &&
       utf8::startsWith(next.surface, "させ")) {
     SUZUME_CONNECTION_ADD(bonus, cost::kDoubleVeryStrongBonus);
   }

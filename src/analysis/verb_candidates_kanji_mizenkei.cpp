@@ -642,7 +642,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                 }
 
                 // Skip irregular verb 来る for passive — its passive is 来+られる, not 来ら+れる
-                if (is_valid_verb && is_passive_pattern && base_form == "来る") {
+                if (is_valid_verb && is_passive_pattern && grammar::isKuruKanjiBaseForm(base_form)) {
                   is_valid_verb = false;
                 }
 

@@ -323,8 +323,8 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // A single-kanji ichidan stem can attach directly to よう (見よう, 着よう).
   // Unlike 食べよう, there is no e-row renyokei kana before よ, so emit the
   // mizenkei stem separately after inflection confirms the full form.
-  if (kanji_end == start_pos + 1 && codepoints[start_pos] != U'来' && kanji_end + 1 < codepoints.size() &&
-      codepoints[kanji_end] == U'よ' && codepoints[kanji_end + 1] == U'う') {
+  if (kanji_end == start_pos + 1 && !grammar::isKuruKanjiStem(codepoints[start_pos]) &&
+      kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == U'よ' && codepoints[kanji_end + 1] == U'う') {
     float confidence = getIchidanConfidence(analysesInRange(inflection, codepoints, start_pos, kanji_end + 2),
                                             candidate::verb_cost::kIchidanKateikeiMinConfidence);
     if (confidence >= candidate::verb_cost::kIchidanKateikeiMinConfidence) {

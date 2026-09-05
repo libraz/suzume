@@ -80,7 +80,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
           is_single_kanji &&
           vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, kanji_end + 1) + "る") &&
           first_hira == U'れ';
-      bool is_kuru_verb = is_single_kanji && codepoints[start_pos] == U'来' && !ranuki_potential_base;
+      bool is_kuru_verb = is_single_kanji && grammar::isKuruKanjiStem(codepoints[start_pos]) && !ranuki_potential_base;
       if ((is_common_particle && is_single_kanji) || is_i_adjective_suffix || is_kuru_verb) {
         // Skip this pattern - almost certainly noun + particle, i-adjective, or kuru verb
       } else {

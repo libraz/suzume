@@ -160,11 +160,11 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
     // irrealis stem of 来る: 来んとする. Kanji 来 keeps the same written stem
     // across its irregular forms, so emit that stem explicitly rather than
     // treating 来ん as a spurious onbin form.
-    if (kanji_char == U'来' && codepoints[kanji_end] == U'ん' && kanji_end + 1 < codepoints.size() &&
+    if (grammar::isKuruKanjiStem(kanji_char) && codepoints[kanji_end] == U'ん' && kanji_end + 1 < codepoints.size() &&
         codepoints[kanji_end + 1] == U'と') {
       candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end, candidate::verb_cost::kStandardBonus,
-                                             "来る", dictionary::ConjugationType::Kuru, true,
-                                             CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
+                                             grammar::kuruBaseFormOf(kanji_char), dictionary::ConjugationType::Kuru,
+                                             true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
                                              "kuru_literary_volitional_n", core::ExtendedPOS::VerbMizenkei));
     }
 
@@ -185,29 +185,29 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
         }
       }
     }
-    if (kanji_char == U'来' && classical_negative_follows) {
+    if (grammar::isKuruKanjiStem(kanji_char) && classical_negative_follows) {
       candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end, candidate::verb_cost::kStandardBonus,
-                                             "来る", dictionary::ConjugationType::Kuru, true,
-                                             CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
+                                             grammar::kuruBaseFormOf(kanji_char), dictionary::ConjugationType::Kuru,
+                                             true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
                                              "kuru_classical_negative", core::ExtendedPOS::VerbMizenkei));
     }
 
     // The irregular irrealis stem of 来る is the bare kanji before every
     // ない-family form, including the conditional (来+なけれ+ば).
-    if (kanji_char == U'来' && vh::naiConditionalFollowsAt(codepoints, kanji_end)) {
+    if (grammar::isKuruKanjiStem(kanji_char) && vh::naiConditionalFollowsAt(codepoints, kanji_end)) {
       candidates.push_back(makeVerbCandidate(
-          codepoints, start_pos, kanji_end, candidate::verb_cost::kSingleKanjiNegativeConditionalBonus, "来る",
-          dictionary::ConjugationType::Kuru, true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
-          "kuru_negative_nai", core::ExtendedPOS::VerbMizenkei));
+          codepoints, start_pos, kanji_end, candidate::verb_cost::kSingleKanjiNegativeConditionalBonus,
+          grammar::kuruBaseFormOf(kanji_char), dictionary::ConjugationType::Kuru, true, CandidateOrigin::VerbKanji,
+          candidate::kHighOriginConfidence, "kuru_negative_nai", core::ExtendedPOS::VerbMizenkei));
     }
 
     // 来る is irregular rather than ichidan, but its modern volitional still
     // spells the y-row stem plus the separate auxiliary (来よ+う).
-    if (kanji_char == U'来' && kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == U'よ' &&
+    if (grammar::isKuruKanjiStem(kanji_char) && kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == U'よ' &&
         codepoints[kanji_end + 1] == U'う') {
       candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end + 1, candidate::verb_cost::kStrongBonus,
-                                             "来る", dictionary::ConjugationType::Kuru, true,
-                                             CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
+                                             grammar::kuruBaseFormOf(kanji_char), dictionary::ConjugationType::Kuru,
+                                             true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
                                              "kuru_modern_volitional", core::ExtendedPOS::VerbMizenkei));
     }
 

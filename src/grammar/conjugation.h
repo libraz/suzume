@@ -199,7 +199,9 @@ struct GodanVowels {
  *
  * Kana and kanji spellings use different visible stems while sharing the same
  * inflection slots. Both the full-form generator and stem generator consume
- * this record to keep their output in sync.
+ * this record to keep their output in sync. The old kanji spelling 來る is a
+ * third spelling of the same paradigm, not a separate verb, and it keeps its
+ * own lemma the way the kana spelling does.
  */
 struct KuruStemForms {
   std::string base;
@@ -221,6 +223,7 @@ KuruStemForms getKuruStemForms(const std::string& base_form);
  */
 struct KuruDictionaryForm {
   std::string kanji_surface;
+  std::string old_kanji_surface;
   std::string kana_surface;
   core::ExtendedPOS extended_pos;
   bool emit_kanji{true};
@@ -236,9 +239,36 @@ std::vector<KuruDictionaryForm> getKuruDictionaryForms();
  * @brief Whether a reverse-analysis stem can belong to カ変.
  *
  * The kana spelling has an empty lexical stem because its visible こ/き/くれ
- * sequence is carried by the ending. The kanji spelling keeps 来 as its stem.
+ * sequence is carried by the ending. A kanji spelling keeps its own character
+ * as the stem.
  */
 bool isKuruStem(std::string_view stem);
+
+/**
+ * @brief Whether a codepoint is the single-kanji stem of カ変.
+ *
+ * The kanji spellings of カ変 inflect on one visible character, so candidate
+ * generation asks about the codepoint rather than the surface. Both the modern
+ * 来 and the old 來 answer yes; keeping the question here is what stops the set
+ * from being re-listed at every generation site.
+ */
+bool isKuruKanjiStem(char32_t code);
+
+/**
+ * @brief Whether a base form is a kanji spelling of カ変.
+ *
+ * The kana spelling is deliberately excluded: rules that ask this question are
+ * about the unambiguous kanji lemma, and admitting くる would widen them.
+ */
+bool isKuruKanjiBaseForm(std::string_view base_form);
+
+/**
+ * @brief The カ変 base form belonging to a single-kanji stem.
+ *
+ * A candidate generated off the stem carries the lemma of the spelling it was
+ * read from, so an old-form surface does not report a modern-form lemma.
+ */
+std::string kuruBaseFormOf(char32_t kanji_stem);
 
 /**
  * @brief Whether a base form is the irregular 促音便 verb 行く/いく.

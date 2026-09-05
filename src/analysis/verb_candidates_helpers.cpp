@@ -359,7 +359,7 @@ bool isSingleKanjiIchidan(char32_t c) {
 }
 
 bool isSingleKanjiPoliteStem(char32_t c) {
-  return isSingleKanjiIchidan(c) || c == U'来';
+  return isSingleKanjiIchidan(c) || grammar::isKuruKanjiStem(c);
 }
 
 bool isSingleKanjiIchidanSurface(std::string_view surface) {

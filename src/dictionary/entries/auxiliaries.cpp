@@ -274,6 +274,13 @@ EntrySpecRange getAuxiliaryEntries() {
       // Likewise retain the established kanji causative boundary while the
       // canonical Kuru paradigm drives the corresponding kana path.
       verb("来さ", "来る", EPOS::VerbMizenkei),
+      // The old kanji spelling is the same paradigm and needs the same three
+      // cells here rather than only in the expanded dictionary: these are what
+      // the analyzer falls back on when no compiled dictionary is loaded, so
+      // leaving them out would make the two spellings diverge in that build.
+      verb("來", "來る", EPOS::VerbRenyokei),
+      verb("來ら", "來る", EPOS::VerbMizenkei),
+      verb("來さ", "來る", EPOS::VerbMizenkei),
 
       // Deru verb stem form (一段動詞「出る」) - VERB
       // で+たい/ます needs this to split correctly (外にでたい → 外|に|で|たい)

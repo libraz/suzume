@@ -115,46 +115,102 @@ GodanVowels encodeGodanVowels(const Conjugation::GodanRow& row) {
           encodeUtf8(row.o_row)};
 }
 
+namespace {
+
+// カ変 is one irregular paradigm written three ways. The two kanji spellings
+// are a closed lexical set — the old form 來る is still current in classical
+// and pre-reform text — while every inflected cell is derived from them.
+constexpr std::array<std::string_view, 2> kKuruKanjiBaseForms = {"来る", "來る"};
+
+}  // namespace
+
 KuruStemForms getKuruStemForms(const std::string& base_form) {
-  const bool kanji = base_form == "来る";
-  if (kanji) {
-    return {base_form, "来", "来", "来", "来れ", "来よ", "来い"};
+  // Every kanji spelling of カ変 inflects on a visible stem, so its cells
+  // follow from dropping る. Only the membership of the set is lexical: the
+  // old spelling 來る is the same verb, and the reference analyzer keeps it
+  // under its own lemma rather than folding it onto the modern one.
+  for (const std::string_view kanji_base : kKuruKanjiBaseForms) {
+    if (base_form != kanji_base) {
+      continue;
+    }
+    const std::string stem(normalize::utf8Substr(base_form, 0, normalize::utf8Length(base_form) - 1));
+    return {base_form,
+            stem,
+            stem,
+            stem,
+            normalize::concat(stem, "れ"),
+            normalize::concat(stem, "よ"),
+            normalize::concat(stem, "い")};
   }
+  // The kana spelling has an empty lexical stem: its こ/き/くれ sequence is
+  // carried by the ending rather than by a visible stem.
   return {base_form, "こ", "き", "き", "くれ", "こよ", "こい"};
 }
 
 std::vector<KuruDictionaryForm> getKuruDictionaryForms() {
   const KuruStemForms kanji = getKuruStemForms("来る");
+  const KuruStemForms old_kanji = getKuruStemForms("來る");
   const KuruStemForms kana = getKuruStemForms("くる");
   return {
-      {kanji.base, kana.base, core::ExtendedPOS::VerbShuushikei},
-      {kanji.renyokei, kana.renyokei, core::ExtendedPOS::VerbRenyokei},
-      {kanji.mizenkei, kana.mizenkei, core::ExtendedPOS::VerbMizenkei},
-      {kanji.kateikei, kana.kateikei, core::ExtendedPOS::VerbKateikei},
-      {kanji.ishikei, kana.ishikei, core::ExtendedPOS::VerbMizenkei},
-      {kanji.meireikei, kana.meireikei, core::ExtendedPOS::VerbMeireikei},
+      {kanji.base, old_kanji.base, kana.base, core::ExtendedPOS::VerbShuushikei},
+      {kanji.renyokei, old_kanji.renyokei, kana.renyokei, core::ExtendedPOS::VerbRenyokei},
+      {kanji.mizenkei, old_kanji.mizenkei, kana.mizenkei, core::ExtendedPOS::VerbMizenkei},
+      {kanji.kateikei, old_kanji.kateikei, kana.kateikei, core::ExtendedPOS::VerbKateikei},
+      {kanji.ishikei, old_kanji.ishikei, kana.ishikei, core::ExtendedPOS::VerbMizenkei},
+      {kanji.meireikei, old_kanji.meireikei, kana.meireikei, core::ExtendedPOS::VerbMeireikei},
       // Standard potential/passive is a mizenkei + auxiliary chain. The
       // unambiguous kanji spelling remains a dictionary form, while the kana
       // spelling is generated contextually so its one-mora stem cannot split
       // ordinary hiragana words.
-      {kanji.mizenkei + "られる", kana.mizenkei + "られる", core::ExtendedPOS::VerbShuushikei,
-       /*emit_kanji=*/true, /*emit_kana=*/false},
+      {kanji.mizenkei + "られる", old_kanji.mizenkei + "られる", kana.mizenkei + "られる",
+       core::ExtendedPOS::VerbShuushikei, /*emit_kanji=*/true, /*emit_kana=*/false},
       // The colloquial ra-nuki potential is a lexical terminal form. Its
       // kanji spelling is safe as a dictionary entry; its kana spelling is
       // generated as a context-gated irregular candidate to avoid reopening
       // demonstrative compounds such as これより.
-      {kanji.mizenkei + "れる", kana.mizenkei + "れる", core::ExtendedPOS::VerbShuushikei,
+      {kanji.mizenkei + "れる", old_kanji.mizenkei + "れる", kana.mizenkei + "れる", core::ExtendedPOS::VerbShuushikei,
        /*emit_kanji=*/true, /*emit_kana=*/false},
       // Causative is always segmented as the Kuru mizenkei plus させる. Keep
       // its surface in the canonical paradigm without creating a competing
       // whole-word dictionary edge.
-      {kanji.mizenkei + "させる", kana.mizenkei + "させる", core::ExtendedPOS::VerbShuushikei,
-       /*emit_kanji=*/false, /*emit_kana=*/false},
+      {kanji.mizenkei + "させる", old_kanji.mizenkei + "させる", kana.mizenkei + "させる",
+       core::ExtendedPOS::VerbShuushikei, /*emit_kanji=*/false, /*emit_kana=*/false},
   };
 }
 
 bool isKuruStem(std::string_view stem) {
-  return stem.empty() || stem == "来";
+  if (stem.empty()) {
+    return true;
+  }
+  for (const std::string_view kanji_base : kKuruKanjiBaseForms) {
+    if (kanji_base.substr(0, kanji_base.size() - core::kJapaneseCharBytes) == stem) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool isKuruKanjiStem(char32_t code) {
+  for (const std::string_view kanji_base : kKuruKanjiBaseForms) {
+    size_t pos = 0;
+    if (normalize::decodeUtf8(kanji_base, pos) == code) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool isKuruKanjiBaseForm(std::string_view base_form) {
+  for (const std::string_view kanji_base : kKuruKanjiBaseForms) {
+    if (base_form == kanji_base) {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::string kuruBaseFormOf(char32_t kanji_stem) {
+  return normalize::concat(encodeUtf8(kanji_stem), "る");
 }
 
 bool isIkuBaseForm(std::string_view base_form) {

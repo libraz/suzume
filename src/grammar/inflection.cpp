@@ -218,11 +218,13 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view rema
         continue;  // Skip - Ichidan stems never end with っ
       }
 
-      // Special handling for kanji 来: should be Kuru, not Ichidan
-      // Remap 来 + Ichidan patterns to Kuru verb type
+      // A kanji カ変 stem inflects through the same visible cells as an ichidan
+      // stem, so reverse analysis reaches it through the ichidan endings and
+      // has to remap the verb type. The empty stem is excluded: that is the
+      // kana spelling, which never arrives here as an ichidan match.
       VerbType actual_verb_type = ending.verb_type;
       std::string actual_base_suffix = ending.base_suffix;
-      if (ending.verb_type == VerbType::Ichidan && stem == "来") {
+      if (ending.verb_type == VerbType::Ichidan && !stem.empty() && isKuruStem(stem)) {
         actual_verb_type = VerbType::Kuru;
         // For Kuru, base form is 来る (stem + る)
         actual_base_suffix = "る";
