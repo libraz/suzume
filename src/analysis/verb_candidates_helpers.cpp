@@ -150,7 +150,7 @@ bool crossesCaseParticleBeforePredicate(const dictionary::DictionaryManager* dic
       continue;
     }
     if (hasExactPartOfSpeech(
-            *dict_manager, extractSubstring(codepoints, pos + 1, end_pos),
+            *dict_manager, codepoints, pos + 1, end_pos,
             partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective))) {
       return true;
     }

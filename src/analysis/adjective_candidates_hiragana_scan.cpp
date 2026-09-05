@@ -319,9 +319,8 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         if (starts_with_particle && !isAdjectiveInDictionary(dict_manager, cand.base_form) &&
             (utf8::endsWith(surface, "た") || utf8::endsWith(surface, "て") || utf8::endsWith(surface, "だ") ||
              utf8::endsWith(surface, "で"))) {
-          std::string after_particle = extractSubstring(codepoints, start_pos + 1, end_pos);
           bool tail_is_dict_verb = false;
-          for (const auto& vres : inflection.analyze(after_particle)) {
+          for (const auto& vres : analysesInRange(inflection, codepoints, start_pos + 1, end_pos)) {
             if (vres.verb_type == grammar::VerbType::IAdjective) {
               continue;
             }

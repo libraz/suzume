@@ -286,8 +286,7 @@ void appendIchidanRareruCandidates(const std::vector<char32_t>& codepoints, size
     // that exact stem and lemma. Project that observed analysis instead of
     // selecting only the highest-scoring homographic Godan interpretation.
     if (!is_valid_ichidan && normalize::utf8Length(stem) >= 3) {
-      const std::string observed_surface = extractSubstring(codepoints, start_pos, hiragana_end);
-      for (const auto& observed : inflection.analyze(observed_surface)) {
+      for (const auto& observed : analysesInRange(inflection, codepoints, start_pos, hiragana_end)) {
         if (observed.verb_type == grammar::VerbType::Ichidan && observed.base_form == base_form &&
             observed.stem == stem && utf8::startsWith(observed.suffix, "られ")) {
           is_valid_ichidan = true;

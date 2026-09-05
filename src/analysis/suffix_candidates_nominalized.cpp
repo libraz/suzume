@@ -627,8 +627,8 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       // 頭|痛い). One-kanji runs are exempt — the adjective itself is the whole
       // span there, and the classical terminal handled above needs its candidate.
       const bool ends_on_dictionary_adjective =
-          kanji_count >= 2 && verb_helpers::isAdjectiveInDictionary(
-                                  dict_manager, extractSubstring(codepoints, kanji_end - 1, kanji_end + 1));
+          kanji_count >= 2 &&
+          verb_helpers::isAdjectiveInDictionary(dict_manager, codepoints, kanji_end - 1, kanji_end + 1);
       // The end of the input selects a nominal too. A bare continuative is not a
       // finite form, so it cannot close a sentence on its own — the 連用中止 use
       // hands the clause on and shows up before a comma, never at the end (似た
@@ -754,8 +754,8 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
         !longer_entry_starts_here) {
       const float compound_cost =
           is_verb_continuative ? candidate::kDeverbalCompoundNounCost : candidate::kUnverifiedDeverbalCompoundNounCost;
-      auto cand = makeCandidate(extractSubstring(codepoints, start_pos, kanji_end + 2), start_pos, kanji_end + 2,
-                                core::PartOfSpeech::Noun, compound_cost, true, CandidateOrigin::NominalizedNoun);
+      auto cand = makeCandidate(codepoints, start_pos, kanji_end + 2, core::PartOfSpeech::Noun, compound_cost, true,
+                                CandidateOrigin::NominalizedNoun);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = kNominalizedNounReportedConfidence;
       cand.pattern = "deverbal_compound_noun";
@@ -788,7 +788,7 @@ void generateReciprocalActionNounCandidates(const std::vector<char32_t>& codepoi
         codepoints[stem_end + 1] != U'こ') {
       continue;
     }
-    if (!hasExactPartOfSpeech(*dict_manager, extractSubstring(codepoints, start_pos, stem_end),
+    if (!hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, stem_end,
                               partOfSpeechMask(core::PartOfSpeech::Verb))) {
       continue;
     }

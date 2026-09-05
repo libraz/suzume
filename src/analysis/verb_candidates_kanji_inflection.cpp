@@ -62,8 +62,7 @@ bool hasInternalPredicateBoundary(const std::vector<char32_t>& codepoints, size_
 bool absorbsInnerPredicate(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end, size_t stem_end,
                            const grammar::Inflection& inflection) {
   for (size_t inner_end = kanji_end + 1; inner_end <= stem_end; ++inner_end) {
-    const std::string inner = extractSubstring(codepoints, start_pos, inner_end);
-    for (const auto& analysis : inflection.analyze(inner)) {
+    for (const auto& analysis : analysesInRange(inflection, codepoints, start_pos, inner_end)) {
       if (analysis.verb_type == grammar::VerbType::Suru && analysis.confidence >= candidate::kIAdjConfMin) {
         return true;
       }
@@ -320,9 +319,8 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
       if (has_mixed_godan_ka_stem && (best.suffix == "いた" || best.suffix == "いて") &&
           !absorbsInnerPredicate(codepoints, start_pos, kanji_end, stem_end, inflection)) {
         const size_t onbin_end = end_pos - 1;
-        const std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_end);
         auto onbin_candidate =
-            makeVerbCandidate(onbin_surface, start_pos, onbin_end, candidate::verb_cost::kStandardBonus, best.base_form,
+            makeVerbCandidate(codepoints, start_pos, onbin_end, candidate::verb_cost::kStandardBonus, best.base_form,
                               grammar::verbTypeToConjType(best.verb_type), true, CandidateOrigin::VerbKanji,
                               best.confidence, "mixed_godan_ka_onbin", core::ExtendedPOS::VerbOnbinkei);
         onbin_candidate.lemma_verified = true;

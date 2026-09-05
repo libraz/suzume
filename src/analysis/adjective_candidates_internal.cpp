@@ -121,7 +121,7 @@ bool derivesFromCompoundFormingAdjective(const std::vector<char32_t>& codepoints
       partOfSpeechMask(core::PartOfSpeech::Particle) | partOfSpeechMask(core::PartOfSpeech::Auxiliary) |
       partOfSpeechMask(core::PartOfSpeech::Determiner) | partOfSpeechMask(core::PartOfSpeech::Conjunction) |
       partOfSpeechMask(core::PartOfSpeech::Adverb) | partOfSpeechMask(core::PartOfSpeech::Prefix);
-  if (hasExactPartOfSpeech(*dict_manager, extractSubstring(codepoints, start_pos, host_end), kFunctionWordMask)) {
+  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, host_end, kFunctionWordMask)) {
     return false;
   }
   for (size_t particle_start = start_pos + 1; particle_start < host_end; ++particle_start) {

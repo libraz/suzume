@@ -79,9 +79,8 @@ void appendVerifiedTailGodanTaCompoundCandidates(const std::vector<char32_t>& co
   if (pattern == nullptr) {
     return;
   }
-  std::string surface = extractSubstring(codepoints, start_pos, end_pos);
   std::string base_form = stem + "つ";
-  candidates.push_back(makeVerbCandidate(surface, start_pos, end_pos, candidate::kVerifiedTailCompoundVerbBonus,
+  candidates.push_back(makeVerbCandidate(codepoints, start_pos, end_pos, candidate::kVerifiedTailCompoundVerbBonus,
                                          base_form, grammar::verbTypeToConjType(grammar::VerbType::GodanTa), true,
                                          CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence, pattern,
                                          extended_pos));
@@ -323,8 +322,7 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
             // Common verbs like 残る, 立つ, 打つ may not be in L2 dictionary.
             // Try surfaces of increasing length to get inflection result.
             for (size_t try_end = kanji_end + 2; try_end <= codepoints.size() && try_end <= kanji_end + 4; ++try_end) {
-              std::string try_surface = extractSubstring(codepoints, start_pos, try_end);
-              auto infl_result = inflection.analyze(try_surface);
+              auto infl_result = analysesInRange(inflection, codepoints, start_pos, try_end);
               if (!infl_result.empty()) {
                 const auto& best = infl_result[0];
                 if (best.confidence >= 0.6F) {

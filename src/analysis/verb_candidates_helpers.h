@@ -82,6 +82,19 @@ bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, std::
 bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form);
 
 /**
+ * @brief The span forms of the two lookups above
+ *
+ * They own the conversion from the codepoint range to the surface, which
+ * otherwise inlines the UTF-8 encode loop and the temporary's teardown into
+ * every caller. Callers that already hold the base form keep using the view
+ * forms.
+ */
+bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                        size_t start, size_t end);
+bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                             size_t start, size_t end);
+
+/**
  * @brief Check if a terminal is a productively formed -しい i-adjective
  *
  * The inflection analyzer can reinterpret the same bytes as the continuative of

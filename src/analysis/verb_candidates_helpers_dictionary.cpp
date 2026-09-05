@@ -8,6 +8,7 @@
 
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
+#include "analysis/tokenizer_utils.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
@@ -27,6 +28,16 @@ bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, std::
 
 bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form) {
   return hasDictionaryEntry(dict_manager, base_form, core::PartOfSpeech::Adjective);
+}
+
+bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                        size_t start, size_t end) {
+  return hasDictionaryEntry(dict_manager, extractSubstring(codepoints, start, end), core::PartOfSpeech::Verb);
+}
+
+bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                             size_t start, size_t end) {
+  return hasDictionaryEntry(dict_manager, extractSubstring(codepoints, start, end), core::PartOfSpeech::Adjective);
 }
 
 bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::Inflection& inflection) {

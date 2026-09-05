@@ -227,12 +227,11 @@ void appendClassicalShimoNidanCandidates(const std::vector<char32_t>& codepoints
   if (!follows_auxiliary) {
     return;
   }
-  const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
   const std::string lemma = extractSubstring(codepoints, start_pos, kanji_end) + "ふ";
-  candidates.push_back(makeVerbCandidate(surface, start_pos, end_pos, candidate::verb_cost::kClassicalHaRowLicensedCost,
-                                         lemma, dictionary::ConjugationType::GodanWa, true, CandidateOrigin::VerbKanji,
-                                         candidate::kNoConfidence, "classical_shimo_nidan",
-                                         core::ExtendedPOS::VerbRenyokei));
+  candidates.push_back(
+      makeVerbCandidate(codepoints, start_pos, end_pos, candidate::verb_cost::kClassicalHaRowLicensedCost, lemma,
+                        dictionary::ConjugationType::GodanWa, true, CandidateOrigin::VerbKanji,
+                        candidate::kNoConfidence, "classical_shimo_nidan", core::ExtendedPOS::VerbRenyokei));
 }
 
 // A predicate slot is opened by the argument in front of it: a case particle,
@@ -321,11 +320,10 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
   }
   const std::string lemma = extractSubstring(codepoints, stem_start, kanji_end + 1);
   const size_t end_pos = is_attributive ? kanji_end + 2 : kanji_end + 1;
-  candidates.push_back(
-      makeVerbCandidate(extractSubstring(codepoints, stem_start, end_pos), stem_start, end_pos,
-                        candidate::verb_cost::kClassicalHaRowLicensedCost, lemma, dictionary::ConjugationType::Ichidan,
-                        true, CandidateOrigin::VerbKanji, candidate::kNoConfidence, "classical_nidan_cell",
-                        is_attributive ? core::ExtendedPOS::VerbRentaikei : core::ExtendedPOS::VerbShuushikei));
+  candidates.push_back(makeVerbCandidate(
+      codepoints, stem_start, end_pos, candidate::verb_cost::kClassicalHaRowLicensedCost, lemma,
+      dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKanji, candidate::kNoConfidence,
+      "classical_nidan_cell", is_attributive ? core::ExtendedPOS::VerbRentaikei : core::ExtendedPOS::VerbShuushikei));
 }
 
 }  // namespace

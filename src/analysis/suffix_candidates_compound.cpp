@@ -397,7 +397,7 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
   constexpr PartOfSpeechMask kLexicalMask =
       partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Verb) |
       partOfSpeechMask(core::PartOfSpeech::Adjective) | partOfSpeechMask(core::PartOfSpeech::Adverb);
-  if (hasExactPartOfSpeech(*dict_manager, extractSubstring(codepoints, start_pos, end_pos), kLexicalMask)) {
+  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kLexicalMask)) {
     return false;
   }
   constexpr PartOfSpeechMask kFunctionMask =
@@ -442,7 +442,7 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
         !hasExactPartOfSpeech(*dict_manager, head_surface, partOfSpeechMask(core::PartOfSpeech::Pronoun))) {
       continue;
     }
-    if (hasExactPartOfSpeech(*dict_manager, extractSubstring(codepoints, split, end_pos), kFunctionMask)) {
+    if (hasExactPartOfSpeech(*dict_manager, codepoints, split, end_pos, kFunctionMask)) {
       return true;
     }
   }
@@ -455,11 +455,11 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
                                                  partOfSpeechMask(core::PartOfSpeech::Pronoun) |
                                                  partOfSpeechMask(core::PartOfSpeech::Determiner);
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
-    if (!hasExactPartOfSpeech(*dict_manager, extractSubstring(codepoints, start_pos, split),
+    if (!hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, split,
                               partOfSpeechMask(core::PartOfSpeech::Determiner))) {
       continue;
     }
-    if (hasExactPartOfSpeech(*dict_manager, extractSubstring(codepoints, split, end_pos), kAttestedTailMask)) {
+    if (hasExactPartOfSpeech(*dict_manager, codepoints, split, end_pos, kAttestedTailMask)) {
       return true;
     }
   }
@@ -806,10 +806,9 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
                 const bool precedes_nominalizer = ppoi_end < hira2_end && codepoints[ppoi_end] == U'さ';
                 if (kanji_len == 1 && entry.entry->lemma == "っぽい" && !precedes_nominalizer) {
                   const size_t derived_end = sokuon_pos + entry.length;
-                  auto adjective =
-                      makeCandidate(extractSubstring(codepoints, start_pos, derived_end), start_pos, derived_end,
-                                    core::PartOfSpeech::Adjective, candidate::kProductivePpoiAdjCost, false,
-                                    CandidateOrigin::KanjiHiraganaCompound, entry.entry->extended_pos);
+                  auto adjective = makeCandidate(codepoints, start_pos, derived_end, core::PartOfSpeech::Adjective,
+                                                 candidate::kProductivePpoiAdjCost, false,
+                                                 CandidateOrigin::KanjiHiraganaCompound, entry.entry->extended_pos);
                   adjective.lemma = extractSubstring(codepoints, start_pos, sokuon_pos) + "っぽい";
                   adjective.conj_type = dictionary::ConjugationType::IAdjective;
                   candidates.push_back(std::move(adjective));
@@ -823,8 +822,8 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
                 // not on individual derived words.
                 if (ppoi_end <= codepoints.size() && extractSubstring(codepoints, sokuon_pos, ppoi_end) == "っぽ") {
                   if (dict_manager->lookupExact(base + "い", core::PartOfSpeech::Adjective) != nullptr) {
-                    auto stem = makeCandidate(extractSubstring(codepoints, start_pos, ppoi_end), start_pos, ppoi_end,
-                                              core::PartOfSpeech::Adjective, candidate::kCompoundAdjBaseCost, true,
+                    auto stem = makeCandidate(codepoints, start_pos, ppoi_end, core::PartOfSpeech::Adjective,
+                                              candidate::kCompoundAdjBaseCost, true,
                                               CandidateOrigin::KanjiHiraganaCompound, core::ExtendedPOS::AdjStem);
                     stem.lemma = base + "っぽい";
                     stem.conj_type = dictionary::ConjugationType::IAdjective;
@@ -892,9 +891,8 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   if (hiragana_len == 1 && first_hira == U'さ' &&
       !isAdjectiveNominalizationSa(dict_manager, codepoints, start_pos, hiragana_end) &&
       hasNominalPhraseSelectorAt(dict_manager, codepoints, hiragana_end)) {
-    auto cand = makeCandidate(extractSubstring(codepoints, start_pos, hiragana_end), start_pos, hiragana_end,
-                              core::PartOfSpeech::Noun, candidate::kInfixCompoundNounCost, false,
-                              CandidateOrigin::KanjiHiraganaNominalCompound);
+    auto cand = makeCandidate(codepoints, start_pos, hiragana_end, core::PartOfSpeech::Noun,
+                              candidate::kInfixCompoundNounCost, false, CandidateOrigin::KanjiHiraganaNominalCompound);
 #ifdef SUZUME_DEBUG_INFO
     cand.confidence = candidate::kHighOriginConfidence;
     cand.pattern = "kanji_nominalizer_sa_compound";

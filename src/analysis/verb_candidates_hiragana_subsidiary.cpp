@@ -45,9 +45,8 @@ void appendContextualSubsidiaryCandidate(const std::vector<char32_t>& codepoints
                                          std::string_view lemma, dictionary::ConjugationType conj_type,
                                          core::ExtendedPOS extended_pos, const char* pattern, float candidate_cost,
                                          std::vector<UnknownCandidate>& candidates, core::PartOfSpeech pos) {
-  const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-  auto candidate = makeCandidate(surface, start_pos, end_pos, pos, candidate_cost, true, CandidateOrigin::VerbHiragana,
-                                 extended_pos, pattern);
+  auto candidate = makeCandidate(codepoints, start_pos, end_pos, pos, candidate_cost, true,
+                                 CandidateOrigin::VerbHiragana, extended_pos, pattern);
   candidate.lemma = lemma;
   candidate.conj_type = conj_type;
   candidates.push_back(std::move(candidate));

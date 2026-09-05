@@ -162,8 +162,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
     // treating 来ん as a spurious onbin form.
     if (kanji_char == U'来' && codepoints[kanji_end] == U'ん' && kanji_end + 1 < codepoints.size() &&
         codepoints[kanji_end + 1] == U'と') {
-      const std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
-      candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end, candidate::verb_cost::kStandardBonus,
+      candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end, candidate::verb_cost::kStandardBonus,
                                              "来る", dictionary::ConjugationType::Kuru, true,
                                              CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
                                              "kuru_literary_volitional_n", core::ExtendedPOS::VerbMizenkei));
@@ -187,8 +186,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       }
     }
     if (kanji_char == U'来' && classical_negative_follows) {
-      const std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
-      candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end, candidate::verb_cost::kStandardBonus,
+      candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end, candidate::verb_cost::kStandardBonus,
                                              "来る", dictionary::ConjugationType::Kuru, true,
                                              CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
                                              "kuru_classical_negative", core::ExtendedPOS::VerbMizenkei));
@@ -197,19 +195,17 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
     // The irregular irrealis stem of 来る is the bare kanji before every
     // ない-family form, including the conditional (来+なけれ+ば).
     if (kanji_char == U'来' && vh::naiConditionalFollowsAt(codepoints, kanji_end)) {
-      const std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
-      candidates.push_back(
-          makeVerbCandidate(surface, start_pos, kanji_end, candidate::verb_cost::kSingleKanjiNegativeConditionalBonus,
-                            "来る", dictionary::ConjugationType::Kuru, true, CandidateOrigin::VerbKanji,
-                            candidate::kHighOriginConfidence, "kuru_negative_nai", core::ExtendedPOS::VerbMizenkei));
+      candidates.push_back(makeVerbCandidate(
+          codepoints, start_pos, kanji_end, candidate::verb_cost::kSingleKanjiNegativeConditionalBonus, "来る",
+          dictionary::ConjugationType::Kuru, true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
+          "kuru_negative_nai", core::ExtendedPOS::VerbMizenkei));
     }
 
     // 来る is irregular rather than ichidan, but its modern volitional still
     // spells the y-row stem plus the separate auxiliary (来よ+う).
     if (kanji_char == U'来' && kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == U'よ' &&
         codepoints[kanji_end + 1] == U'う') {
-      const std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
-      candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end + 1, candidate::verb_cost::kStrongBonus,
+      candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end + 1, candidate::verb_cost::kStrongBonus,
                                              "来る", dictionary::ConjugationType::Kuru, true,
                                              CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
                                              "kuru_modern_volitional", core::ExtendedPOS::VerbMizenkei));
@@ -344,9 +340,8 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       }
 
       if (is_modern_volitional) {
-        const std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
         const std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "る";
-        candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end + 1, candidate::verb_cost::kStrongBonus,
+        candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end + 1, candidate::verb_cost::kStrongBonus,
                                                base_form, dictionary::ConjugationType::Ichidan, true,
                                                CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
                                                "single_kanji_ichidan_volitional", core::ExtendedPOS::VerbMizenkei));

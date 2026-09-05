@@ -1282,8 +1282,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // Godan-ga forms such as あるい+て without registering the lexical verb.
     if (result.entry->pos == core::PartOfSpeech::Verb && end_pos + 1 < codepoints.size() &&
         codepoints[end_pos] == U'い' && (codepoints[end_pos + 1] == U'て' || codepoints[end_pos + 1] == U'で')) {
-      const std::string longer_stem = extractSubstring(codepoints, start_pos, end_pos + 1);
-      const auto& longer_analyses = inflection_.analyze(longer_stem);
+      const auto& longer_analyses = analysesInRange(inflection_, codepoints, start_pos, end_pos + 1);
       const bool has_longer_ionbin = std::any_of(
           longer_analyses.begin(), longer_analyses.end(), [&](const grammar::InflectionCandidate& candidate) {
             return (candidate.verb_type == grammar::VerbType::GodanKa ||

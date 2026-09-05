@@ -297,8 +297,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                                 candidate::verb_cost::kConstructedVerbMinConfidence, true)) {
       continue;
     }
-    const std::string surface = extractSubstring(codepoints, start_pos, n_pos + 1);
-    candidates.push_back(makeVerbCandidate(surface, start_pos, n_pos + 1, candidate::verb_cost::kStandardBonus,
+    candidates.push_back(makeVerbCandidate(codepoints, start_pos, n_pos + 1, candidate::verb_cost::kStandardBonus,
                                            base_form, dictionary::ConjugationType::GodanRa, true,
                                            CandidateOrigin::VerbKanji, candidate::kVerifiedConfidence,
                                            "kanji_n_onbin_nai", core::ExtendedPOS::VerbMizenkei));
@@ -372,8 +371,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
           ++observed_end;  // Preserve the existing れまし validation span.
         }
         observed_end = std::min(observed_end, hiragana_end);
-        const std::string observed_form = extractSubstring(codepoints, start_pos, observed_end);
-        for (const auto& inflection_candidate : inflection.analyze(observed_form)) {
+        for (const auto& inflection_candidate : analysesInRange(inflection, codepoints, start_pos, observed_end)) {
           if (inflection_candidate.verb_type == verb_type && inflection_candidate.base_form == base_form &&
               inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
             is_valid_verb = true;
@@ -633,8 +631,8 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                 // productive mizenkei candidate; this remains type- and
                 // lemma-checked rather than accepting an arbitrary kanji+さ.
                 if (!is_valid_verb && is_passive_pattern && first_hira == U'さ') {
-                  const std::string observed_form = extractSubstring(codepoints, start_pos, hiragana_end);
-                  for (const auto& inflection_candidate : inflection.analyze(observed_form)) {
+                  for (const auto& inflection_candidate :
+                       analysesInRange(inflection, codepoints, start_pos, hiragana_end)) {
                     if (inflection_candidate.verb_type == verb_type && inflection_candidate.base_form == base_form &&
                         inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
                       is_valid_verb = true;
@@ -807,8 +805,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
             bool is_valid_verb = vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
                                                         candidate::verb_cost::kConstructedVerbMinConfidence, true);
             if (!is_valid_verb) {
-              const std::string observed_form = extractSubstring(codepoints, start_pos, hiragana_end);
-              for (const auto& inflected : inflection.analyze(observed_form)) {
+              for (const auto& inflected : analysesInRange(inflection, codepoints, start_pos, hiragana_end)) {
                 if (inflected.verb_type == verb_type && inflected.base_form == base_form &&
                     inflected.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
                   is_valid_verb = true;

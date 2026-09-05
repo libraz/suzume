@@ -250,8 +250,7 @@ size_t godanContinuationStemEnd(const std::vector<char32_t>& codepoints, size_t 
   // の/な/さ are all closed-class homographs inside ordinary open-class stems.
   // A real predicate beginning at が/や still marks the boundary (で+やる).
   size_t godan_sa_end = 0;
-  const std::string full_run = extractSubstring(codepoints, start_pos, run_end);
-  for (const auto& candidate : inflection.analyze(full_run)) {
+  for (const auto& candidate : analysesInRange(inflection, codepoints, start_pos, run_end)) {
     if (candidate.verb_type == grammar::VerbType::GodanSa && candidate.confidence >= verb_opts.confidence_low) {
       godan_sa_end = run_end;
       break;
@@ -389,10 +388,10 @@ void appendHiraganaRenyokeiBeforeAspect(const std::vector<char32_t>& codepoints,
     return;
   }
 
-  auto candidate = makeVerbCandidate(
-      extractSubstring(codepoints, start_pos, stem_end), start_pos, stem_end, candidate::verb_cost::kStrongBonus, lemma,
-      dictionary::ConjugationType::None, true, CandidateOrigin::VerbHiragana, candidate::kHighOriginConfidence,
-      "hiragana_renyokei_before_aspect", core::ExtendedPOS::VerbRenyokei, "aspect_follower");
+  auto candidate = makeVerbCandidate(codepoints, start_pos, stem_end, candidate::verb_cost::kStrongBonus, lemma,
+                                     dictionary::ConjugationType::None, true, CandidateOrigin::VerbHiragana,
+                                     candidate::kHighOriginConfidence, "hiragana_renyokei_before_aspect",
+                                     core::ExtendedPOS::VerbRenyokei, "aspect_follower");
   candidate.lemma_verified = true;
   candidates.push_back(std::move(candidate));
 }
@@ -655,8 +654,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   }
   if (comma_probe > start_pos + 1 &&
       vh::isCommaClauseChainingRenyokei(codepoints, start_pos, comma_probe, dict_manager)) {
-    const std::string comma_surface = extractSubstring(codepoints, start_pos, comma_probe);
-    const auto& comma_inflections = inflection.analyze(comma_surface);
+    const auto& comma_inflections = analysesInRange(inflection, codepoints, start_pos, comma_probe);
     const bool has_valid_renyokei =
         std::any_of(comma_inflections.begin(), comma_inflections.end(), [&](const auto& candidate) {
           return candidate.verb_type != grammar::VerbType::Unknown &&
@@ -997,8 +995,8 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   if (crossed_particle_guard && closed_onbin_tense_end != 0) {
     const size_t onbin_pos = closed_onbin_tense_end - 2;
     const char32_t onbin = codepoints[onbin_pos];
-    const std::string inflected_surface = extractSubstring(codepoints, start_pos, closed_onbin_tense_end);
-    for (const auto& inflection_candidate : inflection.analyze(inflected_surface)) {
+    for (const auto& inflection_candidate :
+         analysesInRange(inflection, codepoints, start_pos, closed_onbin_tense_end)) {
       const bool matching_sokuon = onbin == U'っ' && (inflection_candidate.verb_type == grammar::VerbType::GodanWa ||
                                                       inflection_candidate.verb_type == grammar::VerbType::GodanRa ||
                                                       inflection_candidate.verb_type == grammar::VerbType::GodanTa);

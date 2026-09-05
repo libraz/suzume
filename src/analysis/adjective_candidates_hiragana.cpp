@@ -819,9 +819,9 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
     if (!isAdjectiveInDictionary(dict_manager, base_form)) {
       break;
     }
-    auto exclamative = makeCandidate(extractSubstring(codepoints, start_pos, after_sokuon), start_pos, after_sokuon,
-                                     core::PartOfSpeech::Adjective, candidate::kAdjStemDictionaryCost, true,
-                                     CandidateOrigin::AdjectiveIHiragana, core::ExtendedPOS::AdjBasic);
+    auto exclamative = makeCandidate(codepoints, start_pos, after_sokuon, core::PartOfSpeech::Adjective,
+                                     candidate::kAdjStemDictionaryCost, true, CandidateOrigin::AdjectiveIHiragana,
+                                     core::ExtendedPOS::AdjBasic);
     exclamative.lemma = base_form;
     exclamative.lemma_verified = true;
 #ifdef SUZUME_DEBUG_INFO

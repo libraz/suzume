@@ -99,6 +99,24 @@ UnknownCandidate makeVerbCandidate(const std::string& surface, size_t start, siz
                                    [[maybe_unused]] const char* epos_source = nullptr);
 
 /**
+ * @brief Create a verb candidate spelled by codepoints[start, end)
+ *
+ * The span form owns the conversion from the codepoint range to the surface,
+ * which otherwise inlines the UTF-8 encode loop and the temporary's teardown
+ * into every caller. Callers that already hold the surface keep using the
+ * string form.
+ *
+ * Every span caller states its own suffix expectation, origin and confidence,
+ * so those carry no defaults here.
+ */
+UnknownCandidate makeVerbCandidate(const std::vector<char32_t>& codepoints, size_t start, size_t end, float cost,
+                                   const std::string& lemma, dictionary::ConjugationType conj_type, bool has_suffix,
+                                   CandidateOrigin origin, [[maybe_unused]] float confidence,
+                                   [[maybe_unused]] const char* pattern = nullptr,
+                                   core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
+                                   [[maybe_unused]] const char* epos_source = nullptr);
+
+/**
  * @brief Create a noun candidate
  * @param surface Surface form
  * @param start Start position (character index)
@@ -126,6 +144,18 @@ UnknownCandidate makeNounCandidate(const std::string& surface, size_t start, siz
  */
 UnknownCandidate makeCandidate(const std::string& surface, size_t start, size_t end, core::PartOfSpeech pos, float cost,
                                bool has_suffix = false, CandidateOrigin origin = CandidateOrigin::Unknown,
+                               core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
+                               [[maybe_unused]] const char* epos_source = nullptr);
+
+/**
+ * @brief Create a candidate with specified POS spelled by codepoints[start, end)
+ *
+ * The span counterpart of the string form, and the single owner of that
+ * conversion for the callers that build the surface only to hand it over.
+ */
+UnknownCandidate makeCandidate(const std::vector<char32_t>& codepoints, size_t start, size_t end,
+                               core::PartOfSpeech pos, float cost, bool has_suffix = false,
+                               CandidateOrigin origin = CandidateOrigin::Unknown,
                                core::ExtendedPOS extended_pos = core::ExtendedPOS::Unknown,
                                [[maybe_unused]] const char* epos_source = nullptr);
 

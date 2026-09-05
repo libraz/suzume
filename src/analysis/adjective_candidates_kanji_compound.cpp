@@ -97,8 +97,7 @@ void appendRenyokeiHostCompound(const std::vector<char32_t>& codepoints, size_t 
   }
 
   for (size_t end_pos = tail_end; end_pos > tail_kanji_end; --end_pos) {
-    const std::string tail_surface = extractSubstring(codepoints, hiragana_end, end_pos);
-    for (const auto& analysis : inflection.analyze(tail_surface)) {
+    for (const auto& analysis : analysesInRange(inflection, codepoints, hiragana_end, end_pos)) {
       if (analysis.verb_type != grammar::VerbType::IAdjective || analysis.confidence < candidate::kCompoundAdjConfMin ||
           !adj_detail::isCompoundFormingAdjective(analysis.base_form)) {
         continue;

@@ -543,9 +543,8 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
       pattern = "x_ny_ri_pattern";
     }
     if (pattern != nullptr) {
-      auto cand = makeCandidate(extractSubstring(codepoints, start_pos, pattern_end), start_pos, pattern_end,
-                                core::PartOfSpeech::Adverb, candidate::kMimeticNtoAdverbBonus, true,
-                                CandidateOrigin::Onomatopoeia);
+      auto cand = makeCandidate(codepoints, start_pos, pattern_end, core::PartOfSpeech::Adverb,
+                                candidate::kMimeticNtoAdverbBonus, true, CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = candidate::kHighOriginConfidence;
       cand.pattern = pattern;
@@ -579,9 +578,8 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
       if (!licensed) {
         continue;
       }
-      auto cand = makeCandidate(extractSubstring(codepoints, start_pos, form_end), start_pos, form_end,
-                                core::PartOfSpeech::Adverb, candidate::kMimeticAlternatingNasalAdverbCost, true,
-                                CandidateOrigin::Onomatopoeia);
+      auto cand = makeCandidate(codepoints, start_pos, form_end, core::PartOfSpeech::Adverb,
+                                candidate::kMimeticAlternatingNasalAdverbCost, true, CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = candidate::kHighOriginConfidence;
       cand.pattern = "alternating_nasal_mimetic";

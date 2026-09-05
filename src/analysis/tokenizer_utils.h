@@ -23,6 +23,7 @@ struct LookupResult;
 }  // namespace dictionary
 namespace grammar {
 class Inflection;
+struct InflectionCandidate;
 }  // namespace grammar
 }  // namespace suzume
 
@@ -41,6 +42,15 @@ constexpr PartOfSpeechMask partOfSpeechMask(core::PartOfSpeech pos) {
 /** Whether an exact dictionary surface has any of the requested parts of speech. */
 bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, std::string_view surface,
                           PartOfSpeechMask pos_mask);
+
+/**
+ * @brief The span form of hasExactPartOfSpeech
+ *
+ * Owns the conversion from the codepoint range to the surface, which otherwise
+ * inlines the UTF-8 encode loop and the temporary's teardown into every caller.
+ */
+bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
+                          size_t start, size_t end, PartOfSpeechMask pos_mask);
 
 /** Whether dictionary lookup results contain a requested POS, optionally at an exact character length. */
 bool lookupResultsHavePartOfSpeech(const std::vector<dictionary::LookupResult>& results, PartOfSpeechMask pos_mask,
@@ -175,6 +185,19 @@ std::string extractSubstring(const std::vector<char32_t>& codepoints, size_t sta
 
 /** Encode only the bounded closed-class lookahead starting at @p start. */
 std::string extractClosedClassProbe(const std::vector<char32_t>& codepoints, size_t start);
+
+/**
+ * @brief Inflection analyses of the surface spelled by codepoints[start, end)
+ *
+ * The single owner of the span-to-surface conversion the inflection probes
+ * share. Encoding the span at the call site inlines the UTF-8 encode loop and
+ * the temporary's teardown into every caller, and the surface itself is only
+ * ever viewed: the analysis cache keeps its own copy of whatever it retains,
+ * so the returned reference outlives the temporary.
+ */
+const std::vector<grammar::InflectionCandidate>& analysesInRange(const grammar::Inflection& inflection,
+                                                                 const std::vector<char32_t>& codepoints, size_t start,
+                                                                 size_t end);
 
 /** Whether a position begins a case/topic/nominalizer particle sequence. */
 bool startsNominalForcingParticle(const std::vector<char32_t>& codepoints, size_t pos);

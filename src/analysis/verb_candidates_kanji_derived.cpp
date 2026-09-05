@@ -289,11 +289,10 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
     const std::string suru_base = extractSubstring(codepoints, start_pos, kanji_end) + "する";
     if (vh::isVerbInDictionary(dict_manager, suru_base)) {
       const size_t kateikei_end = kanji_end + 2;
-      auto suru_candidate =
-          makeVerbCandidate(extractSubstring(codepoints, start_pos, kateikei_end), start_pos, kateikei_end,
-                            candidate::verb_cost::kStrongBonus, suru_base, dictionary::ConjugationType::Suru, true,
-                            CandidateOrigin::VerbKanji, candidate::kVerifiedConfidence,
-                            "verified_single_kanji_suru_kateikei", core::ExtendedPOS::VerbKateikei);
+      auto suru_candidate = makeVerbCandidate(codepoints, start_pos, kateikei_end, candidate::verb_cost::kStrongBonus,
+                                              suru_base, dictionary::ConjugationType::Suru, true,
+                                              CandidateOrigin::VerbKanji, candidate::kVerifiedConfidence,
+                                              "verified_single_kanji_suru_kateikei", core::ExtendedPOS::VerbKateikei);
       suru_candidate.lemma_verified = true;
       candidates.push_back(std::move(suru_candidate));
     }
@@ -326,9 +325,8 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // mizenkei stem separately after inflection confirms the full form.
   if (kanji_end == start_pos + 1 && codepoints[start_pos] != U'来' && kanji_end + 1 < codepoints.size() &&
       codepoints[kanji_end] == U'よ' && codepoints[kanji_end + 1] == U'う') {
-    std::string full_surface = extractSubstring(codepoints, start_pos, kanji_end + 2);
-    float confidence =
-        getIchidanConfidence(inflection.analyze(full_surface), candidate::verb_cost::kIchidanKateikeiMinConfidence);
+    float confidence = getIchidanConfidence(analysesInRange(inflection, codepoints, start_pos, kanji_end + 2),
+                                            candidate::verb_cost::kIchidanKateikeiMinConfidence);
     if (confidence >= candidate::verb_cost::kIchidanKateikeiMinConfidence) {
       std::string stem = extractSubstring(codepoints, start_pos, kanji_end);
       candidates.push_back(makeVerbCandidate(stem, start_pos, kanji_end, candidate::verb_cost::kStrongBonus,

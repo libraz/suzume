@@ -72,8 +72,7 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
   if (isNominalUsePrefix(first_char) && start_pos + 2 < codepoints.size() && start_pos + 2 < char_types.size() &&
       char_types[start_pos + 1] == normalize::CharType::Kanji && codepoints[start_pos + 2] == U'用' &&
       (start_pos + 3 >= char_types.size() || char_types[start_pos + 3] != normalize::CharType::Kanji)) {
-    std::string surface = extractSubstring(codepoints, start_pos, start_pos + 3);
-    candidates.push_back(makeCandidate(surface, start_pos, start_pos + 3, core::PartOfSpeech::Noun,
+    candidates.push_back(makeCandidate(codepoints, start_pos, start_pos + 3, core::PartOfSpeech::Noun,
                                        candidate::kPrefixNominalUseBonus, false, CandidateOrigin::PrefixCompound));
     return;
   }

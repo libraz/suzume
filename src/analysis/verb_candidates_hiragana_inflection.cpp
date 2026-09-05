@@ -483,7 +483,7 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
     // the modern language is frequent enough to be registered, so an unattested
     // one competing with a dictionary word is a fragment of it.
     if (!is_dictionary_verb && end_pos - start_pos == 2 && start_pos > 0 &&
-        vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos - 1, end_pos))) {
+        vh::isVerbInDictionary(dict_manager, codepoints, start_pos - 1, end_pos)) {
       SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" starts inside a dictionary verb\n");
       continue;
     }
@@ -1052,10 +1052,10 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
             !vh::isVerbInDictionary(dict_manager, best.base_form)) {
           continue;
         }
-        candidates.push_back(makeVerbCandidate(
-            extractSubstring(codepoints, start_pos, stem_end), start_pos, stem_end, candidate::verb_cost::kStrongBonus,
-            best.base_form, grammar::verbTypeToConjType(best.verb_type), true, CandidateOrigin::VerbHiragana,
-            best.confidence, "hiragana_godan_kateikei", core::ExtendedPOS::VerbKateikei));
+        candidates.push_back(makeVerbCandidate(codepoints, start_pos, stem_end, candidate::verb_cost::kStrongBonus,
+                                               best.base_form, grammar::verbTypeToConjType(best.verb_type), true,
+                                               CandidateOrigin::VerbHiragana, best.confidence,
+                                               "hiragana_godan_kateikei", core::ExtendedPOS::VerbKateikei));
         continue;
       }
 
@@ -1066,8 +1066,7 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
       if (end_pos < codepoints.size() && codepoints[end_pos] == U'に' && utf8::endsWith(surface, "ず") &&
           end_pos > start_pos + 1) {
         const size_t stem_end = end_pos - 1;
-        const std::string stem_surface = extractSubstring(codepoints, start_pos, stem_end);
-        candidates.push_back(makeVerbCandidate(stem_surface, start_pos, stem_end, candidate::verb_cost::kStrongBonus,
+        candidates.push_back(makeVerbCandidate(codepoints, start_pos, stem_end, candidate::verb_cost::kStrongBonus,
                                                best.base_form, grammar::verbTypeToConjType(best.verb_type), true,
                                                CandidateOrigin::VerbHiragana, best.confidence,
                                                "hiragana_mizenkei_before_zuni", core::ExtendedPOS::VerbMizenkei));

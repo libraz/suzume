@@ -240,7 +240,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // final morae rather than an independent predicate (しまい+ます, not
     // し+まい(まいる)+ます).
     if (!is_dict_verb && end_pos - start_pos == 2 && start_pos > 0 &&
-        vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos - 1, end_pos))) {
+        vh::isVerbInDictionary(dict_manager, codepoints, start_pos - 1, end_pos)) {
       continue;
     }
 

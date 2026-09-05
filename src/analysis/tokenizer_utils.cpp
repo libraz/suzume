@@ -148,8 +148,7 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
     }
 
     for (size_t verb_start = kanji_start; verb_start < kanji_end; ++verb_start) {
-      const std::string continuative = extractSubstring(codepoints, verb_start, continuative_end);
-      const auto& inflections = inflection.analyze(continuative);
+      const auto& inflections = analysesInRange(inflection, codepoints, verb_start, continuative_end);
       const bool names_adjective = std::any_of(
           inflections.begin(), inflections.end(), [](const grammar::InflectionCandidate& inflection_candidate) {
             return inflection_candidate.verb_type == grammar::VerbType::IAdjective &&
@@ -231,6 +230,12 @@ std::string extractSubstring(const std::vector<char32_t>& codepoints, size_t sta
 
 std::string extractClosedClassProbe(const std::vector<char32_t>& codepoints, size_t start) {
   return extractSubstring(codepoints, start, std::min(codepoints.size(), start + kClosedClassProbeChars));
+}
+
+const std::vector<grammar::InflectionCandidate>& analysesInRange(const grammar::Inflection& inflection,
+                                                                 const std::vector<char32_t>& codepoints, size_t start,
+                                                                 size_t end) {
+  return inflection.analyze(extractSubstring(codepoints, start, end));
 }
 
 bool startsNominalForcingParticle(const std::vector<char32_t>& codepoints, size_t pos) {
@@ -327,6 +332,11 @@ bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, std
     }
   }
   return false;
+}
+
+bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
+                          size_t start, size_t end, PartOfSpeechMask pos_mask) {
+  return hasExactPartOfSpeech(dict_manager, extractSubstring(codepoints, start, end), pos_mask);
 }
 
 bool lookupResultsHavePartOfSpeech(const std::vector<dictionary::LookupResult>& results, PartOfSpeechMask pos_mask,

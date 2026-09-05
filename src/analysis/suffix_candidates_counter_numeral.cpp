@@ -193,7 +193,7 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
     // it owns the span rather than the counter reading (二重ねる, 三切れる).
     bool inflected_predicate = false;
     for (size_t probe_end = counter_end + 1; probe_end <= std::min(codepoints.size(), counter_end + 2); ++probe_end) {
-      if (hasExactPartOfSpeech(*dict_manager, extractSubstring(codepoints, numeral_end, probe_end),
+      if (hasExactPartOfSpeech(*dict_manager, codepoints, numeral_end, probe_end,
                                partOfSpeechMask(core::PartOfSpeech::Verb))) {
         inflected_predicate = true;
         break;

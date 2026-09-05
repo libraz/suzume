@@ -73,9 +73,8 @@ bool hasAdjectiveRenyokeiPredicateBoundary(const std::vector<char32_t>& codepoin
       continue;
     }
 
-    const std::string adjective_surface = extractSubstring(codepoints, start_pos, predicate_start);
     bool adjective_verified = false;
-    for (const auto& analysis : inflection.analyze(adjective_surface)) {
+    for (const auto& analysis : analysesInRange(inflection, codepoints, start_pos, predicate_start)) {
       if (analysis.verb_type != grammar::VerbType::IAdjective) {
         continue;
       }
@@ -290,8 +289,7 @@ void appendNiLimitedIchidanCandidates(const std::vector<char32_t>& codepoints, s
     // The bare renyokei can be ambiguous (過ぎ → 過ぐ), while its negative
     // continuation supplies the reliable Ichidan evidence (過ぎない → 過ぎる).
     // Analyze that full inflected form, then emit only its stem as the token.
-    const std::string negative_surface = extractSubstring(codepoints, start_pos, hiragana_end);
-    for (const auto& inflected : inflection.analyze(negative_surface)) {
+    for (const auto& inflected : analysesInRange(inflection, codepoints, start_pos, hiragana_end)) {
       // Only a homograph can be resolved here, so the Ichidan base has to be an
       // attested lemma. Without that check the construction fabricates a verb
       // out of any nominal that happens to precede the negative (別に問題ない

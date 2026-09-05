@@ -271,8 +271,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     const size_t tail_hiragana_end =
         findCharRegionEnd(char_types, extended_kanji_end, 5, normalize::CharType::Hiragana);
     for (size_t end_pos = tail_hiragana_end; end_pos > extended_kanji_end; --end_pos) {
-      const std::string tail_surface = extractSubstring(codepoints, extended_kanji_end - 1, end_pos);
-      const auto& tail_analyses = inflection.analyze(tail_surface);
+      const auto& tail_analyses = analysesInRange(inflection, codepoints, extended_kanji_end - 1, end_pos);
       const bool has_productive_tail =
           std::any_of(tail_analyses.begin(), tail_analyses.end(), [](const grammar::InflectionCandidate& candidate) {
             return candidate.verb_type == grammar::VerbType::IAdjective &&
@@ -425,7 +424,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     // are excluded because they are inflectional endings, not lexical verbs.
     bool tail_is_dict_verb = false;
     for (size_t split = start_pos + 1; split + 1 < end_pos; ++split) {
-      if (isVerbInDictionary(dict_manager, extractSubstring(codepoints, split, end_pos))) {
+      if (isVerbInDictionary(dict_manager, codepoints, split, end_pos)) {
         tail_is_dict_verb = true;
         break;
       }
@@ -788,8 +787,7 @@ void generateGaMashiiHostAdjectiveCandidates(const std::vector<char32_t>& codepo
     const size_t hiragana_end =
         findCharRegionEnd(char_types, host.end, kMaxGaMashiiInflectionLength, normalize::CharType::Hiragana);
     for (size_t end_pos = hiragana_end; end_pos > host.end + kGaMashiiStemLength; --end_pos) {
-      const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-      const auto& inflection_candidates = inflection.analyze(surface);
+      const auto& inflection_candidates = analysesInRange(inflection, codepoints, start_pos, end_pos);
       const auto inflection_candidate =
           std::find_if(inflection_candidates.begin(), inflection_candidates.end(), [](const auto& candidate) {
             return candidate.verb_type == grammar::VerbType::IAdjective &&

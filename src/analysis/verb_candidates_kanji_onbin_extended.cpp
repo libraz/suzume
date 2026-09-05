@@ -51,7 +51,7 @@ bool hasStandaloneVerbTail(const dictionary::DictionaryManager* dict_manager, co
   if (dict_manager == nullptr || tail_start >= tail_end) {
     return false;
   }
-  return vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, tail_start, tail_end));
+  return vh::isVerbInDictionary(dict_manager, codepoints, tail_start, tail_end);
 }
 
 bool hasClosedAuxiliaryTail(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
@@ -107,8 +107,7 @@ bool hasVerifiedInternalOnbinPredicate(const grammar::Inflection& inflection,
     return false;
   }
   for (size_t boundary = tail_start + 1; boundary < onbin_pos; ++boundary) {
-    const std::string tail = extractSubstring(codepoints, boundary, tense_end);
-    for (const auto& result : inflection.analyze(tail)) {
+    for (const auto& result : analysesInRange(inflection, codepoints, boundary, tense_end)) {
       if (result.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence &&
           vh::isVerbInDictionary(dict_manager, result.base_form)) {
         return true;

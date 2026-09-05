@@ -519,6 +519,21 @@ UnknownCandidate makeCandidate(const std::string& surface, size_t start, size_t 
   return candidate;
 }
 
+UnknownCandidate makeVerbCandidate(const std::vector<char32_t>& codepoints, size_t start, size_t end, float cost,
+                                   const std::string& lemma, dictionary::ConjugationType conj_type, bool has_suffix,
+                                   CandidateOrigin origin, float confidence, const char* pattern,
+                                   core::ExtendedPOS extended_pos, const char* epos_source) {
+  return makeVerbCandidate(extractSubstring(codepoints, start, end), start, end, cost, lemma, conj_type, has_suffix,
+                           origin, confidence, pattern, extended_pos, epos_source);
+}
+
+UnknownCandidate makeCandidate(const std::vector<char32_t>& codepoints, size_t start, size_t end,
+                               core::PartOfSpeech pos, float cost, bool has_suffix, CandidateOrigin origin,
+                               core::ExtendedPOS extended_pos, const char* epos_source) {
+  return makeCandidate(extractSubstring(codepoints, start, end), start, end, pos, cost, has_suffix, origin,
+                       extended_pos, epos_source);
+}
+
 UnknownWordGenerator::UnknownWordGenerator(const UnknownOptions& options,
                                            const dictionary::DictionaryManager* dict_manager)
     : options_(options), dict_manager_(dict_manager), inflection_(options.inflection_scorer_options) {}

@@ -150,10 +150,9 @@ bool appendProductiveSuffixVerbCells(const std::vector<char32_t>& codepoints, si
       continue;
     }
 
-    const std::string surface = extractSubstring(codepoints, start_pos, candidate_end);
     const std::string lemma = normalize::concat(extractSubstring(codepoints, start_pos, attach_pos), spec.lemma_suffix);
-    auto candidate = makeVerbCandidate(surface, start_pos, candidate_end, candidate::kProductiveSuffixVerbCost, lemma,
-                                       spec.conj_type, true, CandidateOrigin::SuffixPattern,
+    auto candidate = makeVerbCandidate(codepoints, start_pos, candidate_end, candidate::kProductiveSuffixVerbCost,
+                                       lemma, spec.conj_type, true, CandidateOrigin::SuffixPattern,
                                        candidate::kDictionaryOriginConfidence, spec.pattern, form.extended_pos);
     // The productive suffix fixes both the lemma and the inflection, so this is
     // not an unconstrained kanji onbin candidate.

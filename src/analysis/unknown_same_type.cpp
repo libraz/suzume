@@ -1088,9 +1088,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
   if (start_type == normalize::CharType::Hiragana && hasHiraganaNominalNakuEnding(codepoints, start_pos, end_pos)) {
     const size_t nominal_end = end_pos - 2;
     const size_t nominal_len = nominal_end - start_pos;
-    std::string surface = extractSubstring(codepoints, start_pos, nominal_end);
     auto noun_cand =
-        makeCandidate(surface, start_pos, nominal_end, core::PartOfSpeech::Noun,
+        makeCandidate(codepoints, start_pos, nominal_end, core::PartOfSpeech::Noun,
                       getCostForType(start_type, nominal_len) + candidate::kHiraganaNominalNakuCandidateBonus,
                       /*has_suffix=*/true, CandidateOrigin::SameType);
 #ifdef SUZUME_DEBUG_INFO
@@ -1290,7 +1289,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // whole-run candidate (りんご, たなばた).
       if (dict_manager_ != nullptr && run_end > start_pos + 1 && codepoints[run_end - 1] == U'ん' &&
           hasExactPartOfSpeech(
-              *dict_manager_, extractSubstring(codepoints, start_pos, run_end - 1),
+              *dict_manager_, codepoints, start_pos, run_end - 1,
               partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective))) {
         return;
       }
@@ -1440,7 +1439,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         constexpr size_t kOverhangProbe = 2;
         const size_t probe_limit = std::min(codepoints.size(), scan + kOverhangProbe);
         for (size_t probe_end = scan + 1; probe_end <= probe_limit; ++probe_end) {
-          if (hasExactPartOfSpeech(*dict_manager_, extractSubstring(codepoints, probe, probe_end),
+          if (hasExactPartOfSpeech(*dict_manager_, codepoints, probe, probe_end,
                                    partOfSpeechMask(core::PartOfSpeech::Verb))) {
             cuts_into_predicate = true;
             break;

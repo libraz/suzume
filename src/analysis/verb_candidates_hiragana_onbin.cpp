@@ -230,8 +230,7 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
         if (codepoints[na_pos] != U'な' || codepoints[na_pos - 1] != U'く') {
           continue;
         }
-        const std::string adjective_renyokei = extractSubstring(codepoints, start_pos, na_pos);
-        const auto adjective_analyses = inflection.analyze(adjective_renyokei);
+        const auto adjective_analyses = analysesInRange(inflection, codepoints, start_pos, na_pos);
         contains_adjective_ku_naru =
             std::any_of(adjective_analyses.begin(), adjective_analyses.end(),
                         [](const auto& analysis) { return analysis.verb_type == grammar::VerbType::IAdjective; });
@@ -350,10 +349,9 @@ void appendSuruInabilityCandidates(const std::vector<char32_t>& codepoints, size
     return;
   }
 
-  std::string surface = extractSubstring(codepoints, start_pos, start_pos + 1);
   auto suru_candidate =
-      makeCandidate(surface, start_pos, start_pos + 1, core::PartOfSpeech::Verb, candidate::kNounVerbSplitBonus, true,
-                    CandidateOrigin::VerbHiragana, core::ExtendedPOS::VerbRenyokei, "hiragana_suru_inability");
+      makeCandidate(codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Verb, candidate::kNounVerbSplitBonus,
+                    true, CandidateOrigin::VerbHiragana, core::ExtendedPOS::VerbRenyokei, "hiragana_suru_inability");
   suru_candidate.lemma = "する";
   suru_candidate.conj_type = dictionary::ConjugationType::Suru;
   candidates.push_back(std::move(suru_candidate));
@@ -429,10 +427,10 @@ void appendKuruMizenkeiCandidates(const std::vector<char32_t>& codepoints, size_
     return;
   }
   if (ra_nuki_potential_follows) {
-    candidates.push_back(makeVerbCandidate(extractSubstring(codepoints, start_pos, start_pos + 3), start_pos,
-                                           start_pos + 3, kCost, "くる", dictionary::ConjugationType::Kuru, true,
-                                           CandidateOrigin::VerbHiragana, candidate::kHighOriginConfidence,
-                                           "hiragana_kuru_ra_nuki_potential", core::ExtendedPOS::VerbShuushikei));
+    candidates.push_back(makeVerbCandidate(codepoints, start_pos, start_pos + 3, kCost, "くる",
+                                           dictionary::ConjugationType::Kuru, true, CandidateOrigin::VerbHiragana,
+                                           candidate::kHighOriginConfidence, "hiragana_kuru_ra_nuki_potential",
+                                           core::ExtendedPOS::VerbShuushikei));
     return;
   }
   const std::string surface = extractSubstring(codepoints, start_pos, start_pos + 1);

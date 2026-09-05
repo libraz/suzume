@@ -238,8 +238,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         bool suffix_is_godan_before_auxiliary = false;
         if (!ichidan_base_is_dict && kanji_end > start_pos + 1 &&
             vh::predicateAuxiliaryFollowsAt(dict_manager, codepoints, renyokei_end)) {
-          const std::string suffix_surface = extractSubstring(codepoints, kanji_end - 1, renyokei_end);
-          for (const auto& suffix_candidate : inflection.analyze(suffix_surface)) {
+          for (const auto& suffix_candidate : analysesInRange(inflection, codepoints, kanji_end - 1, renyokei_end)) {
             if (grammar::isGodanVerbType(suffix_candidate.verb_type)) {
               suffix_is_godan_before_auxiliary = true;
               break;
@@ -360,9 +359,8 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
             bool is_in_dict = (dict_manager != nullptr && vh::isVerbInDictionary(dict_manager, ichidan_cand.base_form));
             if (is_single_kanji || is_in_dict || opens_with_bound_verb_prefix) {
               size_t shuushi_end = renyokei_end + 1;
-              std::string shuushi_surface = extractSubstring(codepoints, start_pos, shuushi_end);
               float shuushi_cost = base_cost + 0.1F;  // Slightly higher than renyokei
-              candidates.push_back(makeVerbCandidate(shuushi_surface, start_pos, shuushi_end, shuushi_cost, lemma,
+              candidates.push_back(makeVerbCandidate(codepoints, start_pos, shuushi_end, shuushi_cost, lemma,
                                                      grammar::verbTypeToConjType(ichidan_cand.verb_type), true,
                                                      CandidateOrigin::VerbKanji, ichidan_cand.confidence,
                                                      "ichidan_shuushikei"));
@@ -511,11 +509,10 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
             }
 
             if (codepoints[renyokei_end] == U'る') {
-              candidates.push_back(
-                  makeVerbCandidate(extractSubstring(codepoints, start_pos, renyokei_end + 1), start_pos,
-                                    renyokei_end + 1, base_cost + candidate::verb_cost::kWeakPenalty,
-                                    ichidan_cand.base_form, grammar::verbTypeToConjType(ichidan_cand.verb_type), true,
-                                    CandidateOrigin::VerbKanji, ichidan_cand.confidence, "ichidan_shuushikei_multi"));
+              candidates.push_back(makeVerbCandidate(
+                  codepoints, start_pos, renyokei_end + 1, base_cost + candidate::verb_cost::kWeakPenalty,
+                  ichidan_cand.base_form, grammar::verbTypeToConjType(ichidan_cand.verb_type), true,
+                  CandidateOrigin::VerbKanji, ichidan_cand.confidence, "ichidan_shuushikei_multi"));
             }
           }
         }
