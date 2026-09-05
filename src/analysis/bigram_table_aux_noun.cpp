@@ -783,6 +783,13 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // preserving a single lexical onbin stem (よろこん + で).
       {EPOS::VerbMizenkei, EPOS::VerbOnbinkei, cost::kAlmostNever},
 
+      // A terminal form closes its own clause, so it cannot fill the auxiliary
+      // slot an irrealis opens either. Without this an unlisted kana verb is
+      // cut in two at a boundary that spells one (こま + ねく for こまねく),
+      // which only shows up where the material after it is cheap enough to pay
+      // for the second stem (こまねく + しか, こまねく + だけ).
+      {EPOS::VerbMizenkei, EPOS::VerbShuushikei, cost::kAlmostNever},
+
       // The same form cannot govern a nominal either: an irrealis opens an
       // auxiliary slot, so a noun after it means the slot was never filled and
       // the stem was invented to cover a conditional (雨+ならば+中止 for
