@@ -182,6 +182,13 @@ bool startsInsideDictionaryParticle(const std::vector<char32_t>& codepoints, siz
 bool startsInsideDictionaryAuxiliary(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const dictionary::DictionaryManager* dict_manager);
 
+// True when start_pos is strictly inside a registered i-adjective spelled out
+// in full. The terminal い belongs to that adjective, so a coined verb must not
+// start on it and carry the boundary past the adjective's end
+// (楽しい + って, not 楽 + し + いっ + て).
+bool startsInsideDictionaryIAdjective(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                      const dictionary::DictionaryManager* dict_manager);
+
 // Detect a multi-mora particle beginning exactly at @p start_pos. Such a
 // closed-class prefix cannot be the first half of a productive compound verb.
 bool startsWithMultiMoraDictionaryParticle(const std::vector<char32_t>& codepoints, size_t start_pos,

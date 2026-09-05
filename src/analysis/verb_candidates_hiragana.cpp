@@ -491,6 +491,10 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
     SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] pos=" << start_pos << " inside_dictionary_auxiliary\n");
     return candidates;
   }
+  if (vh::startsInsideDictionaryIAdjective(codepoints, start_pos, dict_manager)) {
+    SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] pos=" << start_pos << " inside_dictionary_i_adjective\n");
+    return candidates;
+  }
   if (startsPastAuxiliaryBeforeQuote(codepoints, start_pos, dict_manager)) {
     SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] pos=" << start_pos << " past_auxiliary_before_quote\n");
     return candidates;

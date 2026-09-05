@@ -219,6 +219,30 @@ bool startsInsideDictionaryAuxiliary(const std::vector<char32_t>& codepoints, si
   return false;
 }
 
+bool startsInsideDictionaryIAdjective(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                      const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || start_pos == 0) {
+    return false;
+  }
+  constexpr size_t kAdjectiveLookback = 5;
+  constexpr size_t kAdjectiveProbe = 2;
+  const size_t first_start = start_pos > kAdjectiveLookback ? start_pos - kAdjectiveLookback : 0;
+  const size_t probe_end = std::min(codepoints.size(), start_pos + kAdjectiveProbe);
+  for (size_t adjective_start = first_start; adjective_start < start_pos; ++adjective_start) {
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, adjective_start, probe_end)) {
+      // Only the uninflected terminal form owns its interior. An inflected cell
+      // shares its stem with the te-form and the conditional, whose kana do open
+      // a following predicate (寒く+なる).
+      if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Adjective &&
+          utf8::endsWith(match.entry->surface, "い") &&
+          adjective_start + normalize::utf8Length(match.entry->surface) > start_pos) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 bool startsWithMultiMoraDictionaryParticle(const std::vector<char32_t>& codepoints, size_t start_pos,
                                            const dictionary::DictionaryManager* dict_manager) {
   constexpr size_t kMinimumParticleLength = 2;

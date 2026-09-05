@@ -235,6 +235,21 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
       }
     }
 
+    // The continuative of a coined V1 must not be the stem of a registered
+    // i-adjective whose terminal い is the very next character. That い closes
+    // the adjective, so handing it to a V2 that happens to begin with the same
+    // kana fabricates a verb out of an adjective stem (忙しい|って, not
+    // 忙しいっ|て with the non-word lemma 忙しいる). The whole -しい class sits
+    // on this boundary in front of the quotative contraction, and the evidence
+    // is the dictionary entry rather than an analysis of the coined form.
+    if (use_inflection_fallback && v2_start < codepoints.size() && codepoints[v2_start] == U'い') {
+      std::string adjective_terminal(text.substr(start_byte, v2_start_byte - start_byte));
+      adjective_terminal += "い";
+      if (dict_manager.lookupExact(adjective_terminal, core::PartOfSpeech::Adjective) != nullptr) {
+        use_inflection_fallback = false;
+      }
+    }
+
     // A single-kanji Ichidan stem followed by a verified V2 is productive,
     // except at known copular, hatsuonbin, and formal-noun boundaries.
     bool starts_inside_formal_noun = false;
