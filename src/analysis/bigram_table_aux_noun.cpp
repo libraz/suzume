@@ -908,6 +908,14 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // particle, so the bare sequence selects the copula.
       {EPOS::Suffix, EPOS::AuxClassicalNari, cost::kVeryStrongBonus},
 
+      // Nor the past auxiliary, for the same reason as the negatives above: it
+      // selects a continuative, and a suffix derives a nominal that does not
+      // inflect. The copula keeps its own bonus, so the nominal still predicates
+      // (名前+さん+だ); only the tense reading of the voiced allomorph is closed
+      // off, which otherwise buys a name suffix out of a past stem so that the
+      // strong past-to-conjunctive bonus can pay for it (なかっ+たん+だ+けど).
+      {EPOS::Suffix, EPOS::AuxTenseTa, cost::kAlmostNever},
+
       // VerbRenyokei → recent-completion suffix (焼き+たて, 作り+たて).
       // This productive suffix competes directly with the past た + connective
       // て chain, so it needs a stronger lexicalized grammatical connection.
