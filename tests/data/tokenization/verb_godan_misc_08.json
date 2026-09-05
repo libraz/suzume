@@ -1496,6 +1496,60 @@
       ],
       "id": "wo_ku_3",
       "input": "扉を開く"
+    },
+    {
+      "description": "Unlisted kana godan verb stays whole before a following nominal",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ひしめく",
+          "pos": "Verb",
+          "surface": "ひしめく"
+        },
+        {
+          "lemma": "会場",
+          "pos": "Noun",
+          "surface": "会場"
+        }
+      ],
+      "id": "gahishimeku",
+      "input": "人がひしめく会場"
+    },
+    {
+      "description": "Irrealis still hosts the causative auxiliary",
+      "expected": [
+        {
+          "lemma": "友達",
+          "pos": "Noun",
+          "surface": "友達"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せる"
+        }
+      ],
+      "id": "ni_kaseru",
+      "input": "友達に行かせる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
