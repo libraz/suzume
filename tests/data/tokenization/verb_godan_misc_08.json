@@ -2226,6 +2226,123 @@
       ],
       "id": "kutsuwohaitamama",
       "input": "靴を履いたまま"
+    },
+    {
+      "description": "The causative keeps its boundary before the hypothetical particle, as it does before the past auxiliary",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "kakaseba",
+      "input": "書かせば"
+    },
+    {
+      "description": "Same cell on another godan row",
+      "expected": [
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待た"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "mataseba",
+      "input": "待たせば"
+    },
+    {
+      "description": "Negative control: an e-row cell whose host verb is not attested stays the verb's own conditional",
+      "expected": [
+        {
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分かれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "wakareba",
+      "input": "分かれば"
+    },
+    {
+      "description": "Negative control: a lexicalized sa-row verb keeps its own conditional cell",
+      "expected": [
+        {
+          "lemma": "動かす",
+          "pos": "Verb",
+          "surface": "動かせ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "ugokaseba",
+      "input": "動かせば"
+    },
+    {
+      "description": "Negative control: the modern conditional fills the slot with the causative's own hypothetical cell",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "kakasereba",
+      "input": "書かせれば"
+    },
+    {
+      "description": "Negative control: a plain godan conditional has no auxiliary in its cell",
+      "expected": [
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰れ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "kaereba",
+      "input": "帰れば"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
