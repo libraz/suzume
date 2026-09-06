@@ -1340,6 +1340,14 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       const bool right_auxiliary =
           dict_manager_ != nullptr && scan < codepoints.size() &&
           lookupEntryInRange(*dict_manager_, codepoints, scan, scan + 1, core::PartOfSpeech::Auxiliary) != nullptr;
+      // A kanji run behind the kana starts a word of its own — okurigana attaches
+      // to the right of its kanji and never to the left — so the script change
+      // brackets what precedes it, and the run it closes is the modifier of that
+      // head (りんご+栽培, みかん+農家). What stands in a modifier position may be
+      // an adverb instead, so the promotion carries the same conditions the other
+      // brackets impose: a registered reading and an inflected predicate reading
+      // both keep it from firing.
+      const bool right_kanji_word = scan < codepoints.size() && char_types[scan] == normalize::CharType::Kanji;
       // A two-mora run is safe when particles bracket it (私は|はし|を), or
       // when an unambiguous single case particle selects an otherwise
       // unregistered run at a clause boundary (さき|に). Quotative と and
@@ -1418,11 +1426,12 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
                                inflection_candidate.verb_type != grammar::VerbType::IAdjective &&
                                !inflection_candidate.suffix.empty();
                       });
-      // Before a genitive the run is a modifier, so an inflected predicate
-      // reading of the whole span is the modifier (おおきい|の, 楽しい|の) and the
-      // nominal promotion must stand down, just as it does at a clause boundary.
+      // Before a genitive or a kanji head the run is a modifier, so an inflected
+      // predicate reading of the whole span is the modifier (おおきい|の, 楽しい|の)
+      // and the nominal promotion must stand down, just as it does at a clause
+      // boundary.
       const bool has_inflected_predicate_reading =
-          ((right_clause && !(left_genitive_bracket && len == 2)) ||
+          ((right_clause && !(left_genitive_bracket && len == 2)) || right_kanji_word ||
            (right_genitive_after_substantive_run && !has_deverbal_noun_shape_before_genitive)) &&
           std::any_of(promoted_inflections.begin(), promoted_inflections.end(),
                       [](const grammar::InflectionCandidate& inflection_candidate) {
@@ -1468,9 +1477,10 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           }
         }
       }
-      if ((len >= min_len || short_bos_preparatory_homograph) && (right_particle || right_clause || right_auxiliary) &&
-          !crossed_verified_predicate && !cuts_into_predicate && !has_inflected_predicate_reading &&
-          !spells_contracted_hypothetical && !steals_formal_noun_head && !absorbs_copula_before_sokuon_final &&
+      if ((len >= min_len || short_bos_preparatory_homograph) &&
+          (right_particle || right_clause || right_auxiliary || right_kanji_word) && !crossed_verified_predicate &&
+          !cuts_into_predicate && !has_inflected_predicate_reading && !spells_contracted_hypothetical &&
+          !steals_formal_noun_head && !absorbs_copula_before_sokuon_final &&
           (!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager_) ||
            has_deverbal_noun_shape_before_genitive || copula_selected_predicate_homograph) &&
           (!hasFunctionWordChainDecomposition(codepoints, start_pos, scan, dict_manager_) ||
@@ -1523,13 +1533,15 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         if (selected_nominal && !exact_reading_owns_context) {
           noun_cost += scorer::kBonusDoubleVeryStrong;
         }
-        // A substantive hiragana run at a clause boundary or immediately
-        // before genitive の is a complete nominal head when no lexical or
-        // inflected predicate analysis owns the same surface (りんご、
-        // たなばたの夜). This is weaker than a two-sided case-particle frame,
-        // but it must still outrank the fallback Other-token alternative.
-        const bool closes_unverified_nominal_head = (right_clause || right_genitive_after_substantive_run) &&
-                                                    !exact_reading_owns_context && !has_inflected_predicate_reading;
+        // A substantive hiragana run at a clause boundary, immediately before
+        // genitive の, or in front of a kanji head is a complete nominal head when
+        // no lexical or inflected predicate analysis owns the same surface
+        // (りんご、たなばたの夜, りんご栽培). This is weaker than a two-sided
+        // case-particle frame, but it must still outrank the fallback Other-token
+        // alternative.
+        const bool closes_unverified_nominal_head =
+            (right_clause || right_genitive_after_substantive_run || right_kanji_word) && !exact_reading_owns_context &&
+            !has_inflected_predicate_reading;
         if (closes_unverified_nominal_head) {
           noun_cost += scorer::scale::kStrongBonus;
         }
