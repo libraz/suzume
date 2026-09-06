@@ -1357,6 +1357,38 @@
       ],
       "id": "ha_katttandakedo",
       "input": "東京は暑かったんだけど"
+    },
+    {
+      "description": "来週も来年も忙しい - auto-generated",
+      "expected": [
+        {
+          "lemma": "来週",
+          "pos": "Noun",
+          "surface": "来週"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "来年",
+          "pos": "Noun",
+          "surface": "来年"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "忙しい",
+          "pos": "Adjective",
+          "surface": "忙しい"
+        }
+      ],
+      "id": "mo_mo_shii",
+      "input": "来週も来年も忙しい"
     }
   ],
   "description": "General nouns (part 4/4)",
