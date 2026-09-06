@@ -136,6 +136,13 @@ void setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
       {EPOS::Prefix, EPOS::ParticleNo, cost::kAlmostNever},
       {EPOS::Prefix, EPOS::ParticleBinding, cost::kAlmostNever},
 
+      // A prefix opens the word it binds to, so it needs a word boundary on its
+      // left as well. An unreadable run is the one thing that supplies none: the
+      // prefix has then started inside it, and the bonus for the nominal on its
+      // right pays for cutting the run in half (りん|ご|美味 instead of
+      // りんご|美味).
+      {EPOS::Other, EPOS::Prefix, cost::kRare},
+
       // Particles do not introduce interjections within a running phrase.
       {EPOS::ParticleCase, EPOS::Interjection, cost::kAlmostNever},
       {EPOS::ParticleTopic, EPOS::Interjection, cost::kAlmostNever},
