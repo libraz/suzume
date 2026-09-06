@@ -350,6 +350,34 @@ def _split_lexicalized_morpheme_boundaries(token: dict) -> list[dict] | None:
     return None
 
 
+def _split_quotative_headword(token: dict, following: list[dict]) -> list[dict] | None:
+    """Restore the quotative particle and verb inside a headword with no head."""
+    surface = token.get("surface", "")
+    if token.get("pos") != "助詞" or surface != token.get("lemma", surface):
+        return None
+    # Only an attributive position licenses the headword, and what stands there
+    # is a nominal, a further attributive or a prefix. A particle or auxiliary
+    # behind it closes the quotation instead, and the verb inside inflects
+    # through that slot (と+いえ+ば, と+いっ+た).
+    if not following or following[0].get("pos") not in ("助詞", "助動詞"):
+        return None
+    for split in range(1, len(surface)):
+        head, tail = surface[:split], surface[split:]
+        head_tokens = _reanalyze_exact(head)
+        if head_tokens is None or len(head_tokens) != 1 or head_tokens[0].get("pos") != "助詞":
+            continue
+        tail_tokens = _reanalyze_exact(tail)
+        if (
+            tail_tokens is None
+            or len(tail_tokens) != 1
+            or tail_tokens[0].get("pos") != "動詞"
+            or tail_tokens[0].get("conj_form") != "基本形"
+        ):
+            continue
+        return [_as_independent_token(head_tokens[0]), _as_independent_token(tail_tokens[0])]
+    return None
+
+
 def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
     """Apply Suzume split rules to MeCab tokens.
 
@@ -889,6 +917,22 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
             result.append({"surface": "も", "pos": "助詞", "pos_sub1": "係助詞", "lemma": "も"})
             if applied_rule is None:
                 applied_rule = "copular-head-demo-split"
+            continue
+
+        # The quotative headword というか is one word only where an attributive
+        # can stand. The reference dictionary already reads the standard
+        # spelling in its parts in front of a particle (本+と+いう+か) while
+        # keeping the colloquial one whole, which puts the same construction in
+        # two shapes; the attributive position is what its entry is for, so it
+        # keeps the headword there (本+という+物) and loses it elsewhere. The
+        # head has to be a particle of its own, which is what separates the
+        # quotative from the demonstrative attributives built on the same verb
+        # (そういう, こういう).
+        quotative_parts = _split_quotative_headword(t, tokens[token_index + 1 :])
+        if quotative_parts is not None:
+            result.extend(quotative_parts)
+            if applied_rule is None:
+                applied_rule = "quotative-headword-split"
             continue
 
         # 8. Copula negation: じゃない -> じゃ|ない

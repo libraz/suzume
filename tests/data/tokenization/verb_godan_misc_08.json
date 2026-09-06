@@ -1754,6 +1754,70 @@
       ],
       "id": "razu_beru",
       "input": "残らず食べる"
+    },
+    {
+      "description": "Colloquial quotative before a final particle keeps its morpheme boundaries",
+      "expected": [
+        {
+          "lemma": "つまり",
+          "pos": "Conjunction",
+          "surface": "つまり"
+        },
+        {
+          "lemma": "忙しい",
+          "pos": "Adjective",
+          "surface": "忙しい"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "tsumari_shiittteiuka",
+      "input": "つまり忙しいっていうか"
+    },
+    {
+      "description": "Colloquial quotative stays whole in the attributive position",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "っていう",
+          "pos": "Determiner",
+          "surface": "っていう"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "物"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "探す",
+          "pos": "Verb",
+          "surface": "探す"
+        }
+      ],
+      "id": "ttteiu_wo_su",
+      "input": "本っていう物を探す"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
