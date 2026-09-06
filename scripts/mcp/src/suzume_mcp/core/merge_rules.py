@@ -75,6 +75,7 @@ from .merge_postprocessors import (
     _postprocess_tomo_particle,
     _postprocess_totomoni,
     _postprocess_variation_selector_merge,
+    _postprocess_word_internal_honorific_prefix,
     classical_adjective_lemma,
     nidan_cell,
     reads_as_continuative,
@@ -2161,6 +2162,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     result, applied_rule = _postprocess_stranded_okurigana(result, applied_rule)
     result, applied_rule = _postprocess_decomposable_adverb(result, applied_rule)
     result, applied_rule = _postprocess_bound_prefix_adjective(result, applied_rule)
+    result, applied_rule = _postprocess_word_internal_honorific_prefix(result, applied_rule)
     result, applied_rule = _postprocess_variation_selector_merge(result, applied_rule)
     result, applied_rule = _postprocess_izenkei_concessive(result, applied_rule)
     result, applied_rule = _postprocess_tomo_particle(result, applied_rule)

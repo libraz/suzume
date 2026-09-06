@@ -765,6 +765,47 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
     return merged, applied_rule
 
 
+_HONORIFIC_PREFIXES = frozenset({"お", "ご"})
+# A prefix after one of these is standing where a word genuinely ended, so the
+# join below must not reach across them even when the two spell a word together
+# (と + お is also the numeral とお).
+_CLOSED_CLASS_BEFORE_PREFIX = frozenset({"助詞", "助動詞", "接続詞", "接頭詞", "記号", "動詞", "形容詞"})
+
+
+def _postprocess_word_internal_honorific_prefix(
+    result: list[dict], applied_rule: str | None
+) -> tuple[list[dict], str | None]:
+    """Rejoin an honorific prefix that landed inside a word.
+
+    The prefix opens the word it binds to, so it needs a word boundary on its
+    left as well. In front of a kanji nominal the dictionary sometimes finds one
+    where there is none, inventing a reading for the morae before it and cutting
+    an ordinary word in two (りん+ご+栽培). Whether the boundary is real is
+    decidable: joining the prefix back on and re-reading the result returns one
+    word exactly when there was no boundary, and the same word standing alone or
+    before a particle is already read whole (りんご, りんごを食べる).
+    """
+    merged: list[dict] = []
+    for token in result:
+        surface = token.get("surface", "")
+        previous = merged[-1] if merged else None
+        if (
+            previous is not None
+            and token.get("pos") == "接頭詞"
+            and surface in _HONORIFIC_PREFIXES
+            and previous.get("pos") not in _CLOSED_CLASS_BEFORE_PREFIX
+        ):
+            joined = previous.get("surface", "") + surface
+            rejoined = mecab_analyze(joined)
+            if len(rejoined) == 1 and rejoined[0].get("surface") == joined:
+                merged[-1] = rejoined[0]
+                if applied_rule is None:
+                    applied_rule = "word-internal-honorific-prefix"
+                continue
+        merged.append(token)
+    return merged, applied_rule
+
+
 _KU_NOMINALIZER = "く"
 
 
