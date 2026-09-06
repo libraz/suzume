@@ -10,7 +10,8 @@
 #include <vector>
 
 #include "core/utf8_constants.h"
-#include "grammar/conjugator.h"
+#include "grammar/conjugation.h"
+#include "grammar/verb_endings.h"
 
 namespace suzume::grammar {
 
@@ -83,14 +84,24 @@ bool isBoundDerivationalSuffixVerbLemma(std::string_view lemma) {
 }
 
 bool spellsBoundDerivationalSuffixCell(std::string_view okurigana) {
+  // The cells come from the same reverse-lookup ending table the inflection
+  // analyzer reads, so this predicate accepts exactly the spellings that
+  // analyzer can attribute to one of these lemmas. Building them from the
+  // paradigm generators instead would spell the identical set while linking
+  // every verb class's generator for the two classes this closed set uses.
   static const std::vector<std::string> kCells = [] {
-    const Conjugator conjugator;
     std::vector<std::string> cells;
     for (const std::string_view lemma : kBoundDerivationalSuffixVerbLemmas) {
       const std::string base(lemma);
       cells.push_back(base);
-      for (const auto& stem : conjugator.generateStems(base, conjugator.detectType(base))) {
-        cells.push_back(stem.surface);
+      const VerbType type = Conjugation::detectType(base);
+      const std::string stem = Conjugation::getStem(base, type);
+      for (const ConjForm form : kAllVerbConjForms) {
+        for (const auto& ending : getVerbEndingsByForm(form)) {
+          if (ending.verb_type == type) {
+            cells.push_back(stem + ending.suffix);
+          }
+        }
       }
     }
     return cells;
