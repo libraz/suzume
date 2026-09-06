@@ -1389,6 +1389,65 @@
       ],
       "id": "mo_mo_shii",
       "input": "来週も来年も忙しい"
+    },
+    {
+      "description": "たまご料理を作る - auto-generated",
+      "expected": [
+        {
+          "lemma": "たまご",
+          "pos": "Noun",
+          "surface": "たまご"
+        },
+        {
+          "lemma": "料理",
+          "pos": "Noun",
+          "surface": "料理"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "作る",
+          "pos": "Verb",
+          "surface": "作る"
+        }
+      ],
+      "id": "tamago_wo_ru",
+      "input": "たまご料理を作る"
+    },
+    {
+      "description": "熱いお茶を飲む - auto-generated",
+      "expected": [
+        {
+          "lemma": "熱い",
+          "pos": "Adjective",
+          "surface": "熱い"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "茶",
+          "pos": "Noun",
+          "surface": "茶"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲む"
+        }
+      ],
+      "id": "io_wo_mu",
+      "input": "熱いお茶を飲む"
     }
   ],
   "description": "General nouns (part 4/4)",
