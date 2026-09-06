@@ -1318,6 +1318,45 @@
       ],
       "id": "majide_ru",
       "input": "まじで困る"
+    },
+    {
+      "description": "The supplementary conjugation reaches the classical auxiliary once the stem has lexical evidence",
+      "expected": [
+        {
+          "lemma": "明るい",
+          "pos": "Adjective",
+          "surface": "明るかる"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "akarukarubeshi",
+      "input": "明るかるべし"
+    },
+    {
+      "description": "The modern paradigm of the same stem is unaffected",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "明るい",
+          "pos": "Adjective",
+          "surface": "明るい"
+        }
+      ],
+      "id": "heyagaakarui",
+      "input": "部屋が明るい"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
