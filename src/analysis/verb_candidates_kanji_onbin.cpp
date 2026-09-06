@@ -150,24 +150,21 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
           inflection_end = kanji_end + 2;
         }
       } else if (is_ikuon) {
-        // い + と (とく/といた) or ち (ちゃう/ちゃった). The exact
-        // two-kana い+た/だ run is also a closed past form. In that case the
-        // full-form inflection analysis supplies the Godan-ka/ga class even
-        // when the open-class lemma is absent from the dictionary, allowing
-        // the grammatical 音便形 + 過去 auxiliary boundary to enter the
-        // lattice (続い+た).
+        // い + と (とく/といた) or ち (ちゃう/ちゃった). The い+た/だ run is also a
+        // closed past form, and the auxiliary closes the euphonic cell on its own,
+        // so whatever stands behind it starts the next word. The cell is therefore
+        // admitted wherever it is spelled rather than only where the kana run ends
+        // (着い+た+ので and 聞い+た+って as much as 着い+た); requiring the run to end
+        // there left the verb with no euphonic candidate in front of a particle,
+        // and the analysis fell back on the Godan-wa continuative of a coined base.
+        // The inflection fallback still stops at the closed cell, as the nasal
+        // branch above does, so it is not asked to read the remainder as part of
+        // the verb.
         const bool is_past = next_char == U'た' || next_char == U'だ';
-        const bool is_exact_past_run = kanji_end + 2 == hiragana_end && is_past;
-        const bool is_past_before_quotative = is_past && kanji_end + 3 < hiragana_end &&
-                                              codepoints[kanji_end + 2] == U'っ' && codepoints[kanji_end + 3] == U'て';
-        if (is_exact_past_run || is_past_before_quotative) {
-          // The quote belongs after the completed past form.  Validate the
-          // closed い+た/だ cell itself, rather than asking inflection to
-          // interpret the following って as part of the verb.
+        if (is_past) {
           inflection_end = kanji_end + 2;
         }
-        is_contraction_pattern =
-            next_char == U'と' || next_char == U'ち' || is_exact_past_run || is_past_before_quotative;
+        is_contraction_pattern = next_char == U'と' || next_char == U'ち' || is_past;
       } else {
         // う音便 is a closed lexical GodanWa subclass, so it occurs only in
         // the simple past/te cells and only for an attested subclass stem.
