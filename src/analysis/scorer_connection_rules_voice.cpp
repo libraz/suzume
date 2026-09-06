@@ -76,13 +76,17 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   // follower must be a voice auxiliary — subsumes the connective-particle and
   // aspectual rejections for that cell, and keeps a lone さ between a nominal
   // host and an independent predicate from reading as する (紙さ書く). The
-  // other cells only reject those two followers, leaving irrealis + ば and
-  // productive causatives intact.
+  // other cells reject the connective and the aspectual, whose own host is the
+  // continuative し (し+て, し+てる). The hypothetical particles are the one
+  // exception: they select an irrealis, and this is the cell that spells it
+  // (話を+せ+ば, 恋+せ+ども), so barring them would leave that construction with
+  // no reading at all.
   if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && grammar::isSuruBaseForm(prev.lemma)) {
     const bool follows_voice_auxiliary =
         next.extended_pos == core::ExtendedPOS::AuxCausative || next.extended_pos == core::ExtendedPOS::AuxPassive;
-    const bool follows_rejected_host =
-        next.extended_pos == core::ExtendedPOS::ParticleConj || next.extended_pos == core::ExtendedPOS::AuxAspectIru;
+    const bool follows_rejected_host = (next.extended_pos == core::ExtendedPOS::ParticleConj &&
+                                        !grammar::isHypotheticalSelectingConjunctiveParticle(next.surface)) ||
+                                       next.extended_pos == core::ExtendedPOS::AuxAspectIru;
     const bool is_voice_only_cell = grammar::isSingleHiragana(prev.surface, U'さ');
     if (is_voice_only_cell ? !follows_voice_auxiliary : follows_rejected_host) {
       SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
