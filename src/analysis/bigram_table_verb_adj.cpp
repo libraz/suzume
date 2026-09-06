@@ -344,6 +344,15 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // AdjMizenkei → AuxNegativeNu (高から+ず, 美しから+ず).
       {EPOS::AdjMizenkei, EPOS::AuxNegativeNu, cost::kStrongBonus},
 
+      // The conjectural auxiliaries take a terminal, and the supplementary
+      // conjugation supplies the adjective's (楽しかる+らむ, 高かる+まじ). The verb
+      // rows above already say so for a verb; without their counterparts the
+      // adjective's boundary loses to a binding particle spelled by the stem's
+      // own kana followed by a verb coined out of the rest of the cell
+      // (楽+しか+るらむ), which the 係り結び bonus pays for.
+      {EPOS::AdjBasic, EPOS::AuxVolitional, cost::kStrongBonus},
+      {EPOS::AdjBasic, EPOS::AuxNegativeMai, cost::kStrongBonus},
+
       // AdjBasic → AuxCopulaDesu (美しい+です) - moderate bonus
       {EPOS::AdjBasic, EPOS::AuxCopulaDesu, cost::kModerateBonus},
 

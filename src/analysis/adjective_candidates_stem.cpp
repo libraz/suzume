@@ -1041,6 +1041,9 @@ bool classicalAuxiliaryFollowsAt(const std::vector<char32_t>& codepoints, size_t
       case core::ExtendedPOS::AuxClassicalKi:
       case core::ExtendedPOS::AuxClassicalBeshi:
       case core::ExtendedPOS::AuxVolitional:
+      // The negative conjecture takes a terminal exactly as the affirmative one
+      // does, so the cell it selects is the same (高かる+まじ next to 高かる+らむ).
+      case core::ExtendedPOS::AuxNegativeMai:
         return true;
       default:
         break;
@@ -1106,6 +1109,11 @@ void appendIAdjKaraZuCandidates(const std::vector<char32_t>& codepoints, size_t 
     // exhaustively, so a productively formed -しい terminal counts as the same
     // evidence: its し is the stem mora the supplementary conjugation attaches
     // to, which the passive's a-row irrealis can never supply.
+    // The requirement holds for the other cells too, even though a classical
+    // auxiliary already licenses them: accepting a merely well-formed base there
+    // lets the run start one word early and coin a compound out of whatever
+    // stands in front of it (山+高かり as 山高い, 言ふ+べかり as 言ふべい), which is
+    // the compound-stem ambiguity the lexicon is what settles.
     if (!isAdjectiveInDictionary(dict_manager, lemma) &&
         !verb_helpers::isProductiveShiiAdjectiveTerminal(lemma, inflection)) {
       continue;
