@@ -1044,6 +1044,23 @@ bool caseParticleFollowsAt(const dictionary::DictionaryManager& dict_manager, co
                            size_t pos);
 
 /**
+ * @brief Check whether a conjunctive particle selecting a hypothetical cell starts at @p pos.
+ *
+ * A paradigm cell that exists only inside a conditional is identified by that
+ * particle rather than by what the clause does (高かり+せ+ば). Restricting the
+ * match to the particles which select a hypothetical keeps the ordinary
+ * conjunctives out, since those take a continuative and would readmit the cell
+ * everywhere its spelling occurs. The probe stays within the width of the
+ * longest function word so it cannot reach into the next clause.
+ *
+ * @param dict_manager Dictionary used to probe the follower
+ * @param codepoints Full input codepoints
+ * @param pos Index just past the form being judged
+ */
+bool hypotheticalParticleFollowsAt(const dictionary::DictionaryManager& dict_manager,
+                                   const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
  * @brief Check whether the いただく paradigm begins at @p pos.
  *
  * The receptive humble auxiliary いただく conjugates as いただ + ka-row kana

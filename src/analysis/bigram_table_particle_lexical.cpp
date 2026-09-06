@@ -787,6 +787,15 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // continuative before a following classical predicate (記録+し+終へ)
       // from being re-read as the homographic past き.
       {EPOS::AuxClassicalKi, EPOS::VerbRenyokei, cost::kAlmostNever},
+      // Two cells of that paradigm exist for the conditional and nothing else —
+      // the irrealis in the counterfactual (高かり+せ+ば) and the realis in the
+      // factual (見+しか+ば) — so the conjunctive particle is the environment
+      // they are admitted in rather than an accident of their spelling. The
+      // paradigm's other cells never reach this pair, because the terminal and
+      // the attributive are admitted only where a clause ends or a nominal
+      // follows. Without the bonus the counterfactual loses its boundary to a
+      // verb fabricated across the whole span (the non-word 高かりす).
+      {EPOS::AuxClassicalKi, EPOS::ParticleConj, cost::kVeryStrongBonus},
       // The negative's continuative ざり needs the wider margin: the サ変
       // continuative it competes with is the cheapest word in the lattice.
       {EPOS::AuxNegativeNu, EPOS::AuxClassicalKi, cost::kExtremeBonus},

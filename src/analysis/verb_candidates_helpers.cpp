@@ -244,6 +244,19 @@ bool caseParticleFollowsAt(const dictionary::DictionaryManager& dict_manager, co
   return false;
 }
 
+bool hypotheticalParticleFollowsAt(const dictionary::DictionaryManager& dict_manager,
+                                   const std::vector<char32_t>& codepoints, size_t pos) {
+  const size_t probe_end = std::min(codepoints.size(), pos + kFollowerProbeChars);
+  for (size_t stop = pos + 1; stop <= probe_end; ++stop) {
+    const auto* particle = lookupEntryInRange(dict_manager, codepoints, pos, stop, core::PartOfSpeech::Particle);
+    if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleConj &&
+        grammar::isHypotheticalSelectingConjunctiveParticle(particle->surface)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_manager,
                                      const std::vector<char32_t>& codepoints, size_t end_pos, bool is_izenkei) {
   const size_t probe_end = std::min(codepoints.size(), end_pos + kFollowerProbeChars);

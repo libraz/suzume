@@ -365,6 +365,10 @@ bool spellsClassicalPerfectContinuative(std::string_view surface) {
   return utf8::equalsAny(surface, {"に"});
 }
 
+bool spellsClassicalPastIrrealis(std::string_view surface) {
+  return utf8::equalsAny(surface, {"せ"});
+}
+
 bool isColloquialConditionalNegativeSurface(std::string_view surface) {
   return surface == "なきゃ" || surface == "なけりゃ";
 }

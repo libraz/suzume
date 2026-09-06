@@ -1942,9 +1942,26 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // predicate, or the particle that introduces one (話を+し+に行く).
     const bool rentaikei_nominalizes = !is_classical_izenkei && follows_continuative &&
                                        verb_helpers::caseParticleFollowsAt(dict_manager_, codepoints, end_pos);
-    if ((result.entry->extended_pos == core::ExtendedPOS::AuxClassicalKi || classical_perfect_izenkei) &&
-        !izenkei_closes_clause && !rentaikei_nominalizes &&
-        !verb_helpers::classicalPastEnvironmentFollows(dict_manager_, codepoints, end_pos, is_classical_izenkei)) {
+    // The irrealis せ of that same paradigm is licensed by neither test above:
+    // its cell never closes a clause and never heads a nominal, because the
+    // counterfactual is the only construction that selects it. What identifies
+    // it is the pair of hosts around it — the continuative it attaches to, and
+    // the conditional particle the construction ends in (高かり+せ+ば). The two
+    // far commoner readings of the mora take neither: the サ変 irrealis follows
+    // the nominal it turns into a predicate (勉強+せ+ば), and the causative
+    // follows an irrealis rather than a continuative.
+    const bool classical_past_irrealis = result.entry->extended_pos == core::ExtendedPOS::AuxClassicalKi &&
+                                         grammar::spellsClassicalPastIrrealis(result.entry->surface);
+    if (classical_past_irrealis) {
+      const bool follows_renyokei = hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) ||
+                                    hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AdjRenyokei);
+      if (!follows_renyokei || !verb_helpers::hypotheticalParticleFollowsAt(dict_manager_, codepoints, end_pos)) {
+        continue;
+      }
+    } else if ((result.entry->extended_pos == core::ExtendedPOS::AuxClassicalKi || classical_perfect_izenkei) &&
+               !izenkei_closes_clause && !rentaikei_nominalizes &&
+               !verb_helpers::classicalPastEnvironmentFollows(dict_manager_, codepoints, end_pos,
+                                                              is_classical_izenkei)) {
       continue;
     }
 

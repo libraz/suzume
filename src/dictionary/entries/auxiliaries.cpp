@@ -127,6 +127,8 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("し", "き", EPOS::AuxClassicalKi),
       aux("しか", "き", EPOS::AuxClassicalKi),
       aux("き", "き", EPOS::AuxClassicalKi),
+      // Its 未然形 せ is registered with the causative paradigm it shares the
+      // spelling with, so an exact lookup keeps answering for the modern form.
 
       // Past/Completion - た (過去・完了)
       aux("た", "た", EPOS::AuxTenseTa),
@@ -307,6 +309,13 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("せよ", "せる", EPOS::AuxCausative),  // imperative (literary)
       aux("し", "す", EPOS::AuxCausative),      // continuative: いらし+て
       aux("す", "す", EPOS::AuxCausative),      // terminal: いらす
+      // The 未然形 of the classical past shares this spelling, and only the
+      // counterfactual selects it (高かり+せ+ば). One mora, so it is admitted only
+      // in that construction — a continuative in front of it and the conditional
+      // particle behind — and it is registered behind the causative so an exact
+      // lookup still answers with the modern paradigm.
+      // See grammar::spellsClassicalPastIrrealis.
+      aux("せ", "き", EPOS::AuxClassicalKi),
       aux("させ", "させる", EPOS::AuxCausative),
       aux("させる", "させる", EPOS::AuxCausative),
       aux("させれ", "させる", EPOS::AuxCausative),

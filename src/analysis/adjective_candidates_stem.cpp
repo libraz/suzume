@@ -998,10 +998,15 @@ bool classicalAuxiliaryFollowsAt(const std::vector<char32_t>& codepoints, size_t
   if (dict_manager == nullptr || pos >= codepoints.size()) {
     return false;
   }
+  // A spelling may carry more than one auxiliary registration, and the classical
+  // one is not always the first: the counterfactual's せ shares its mora with the
+  // causative. The question here is whether any auxiliary of the classical class
+  // starts at this position, so the probe walks every entry the span opens rather
+  // than the single one an exact lookup answers with.
   const size_t probe_end = std::min({codepoints.size(), scan_end + 1, pos + 3});
-  for (size_t end = pos + 1; end <= probe_end; ++end) {
-    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, pos, end, core::PartOfSpeech::Auxiliary);
-    if (entry == nullptr) {
+  for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
+    const auto* entry = result.entry;
+    if (entry == nullptr || entry->pos != core::PartOfSpeech::Auxiliary) {
       continue;
     }
     switch (entry->extended_pos) {

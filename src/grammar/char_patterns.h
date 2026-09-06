@@ -363,6 +363,18 @@ bool spellsHypotheticalAuxiliaryCell(std::string_view surface);
  */
 bool spellsClassicalPerfectContinuative(std::string_view surface);
 
+/**
+ * @brief Whether a classical past surface spells its irrealis cell
+ *
+ * The 未然形 of き has exactly one construction, the counterfactual 〜せば
+ * (高かり+せ+ば), so it is the one cell of that paradigm whose licensing looks at
+ * what follows rather than at what the clause does. The same mora is the サ変
+ * irrealis and the causative, both of which take a nominal or a stem instead of
+ * the continuative this cell attaches to; callers pair this with the auxiliary's
+ * class and that host so the far commoner readings are unaffected.
+ */
+bool spellsClassicalPastIrrealis(std::string_view surface);
+
 /** @brief Whether a negative auxiliary surface is a colloquial conditional form */
 bool isColloquialConditionalNegativeSurface(std::string_view surface);
 
