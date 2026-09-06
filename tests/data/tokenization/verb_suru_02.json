@@ -381,6 +381,60 @@
       ],
       "id": "moshikashite_ukamo",
       "input": "もしかして違うかも"
+    },
+    {
+      "description": "The suru irrealis hosts the hypothetical particle, which the connective rejection must not cover",
+      "expected": [
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "hanawoseba",
+      "input": "話をせば"
+    },
+    {
+      "description": "Negative control: the connective still takes the continuative rather than the irrealis",
+      "expected": [
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "hanawoshite",
+      "input": "話をして"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",
