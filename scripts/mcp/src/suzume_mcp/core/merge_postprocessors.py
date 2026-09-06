@@ -12,6 +12,8 @@ from .constants import (
     HONORIFIC_FRAME_TAILS,
     HONORIFIC_SUFFIXES,
     KANJI_PREFIX_COMPOUNDS,
+    KYUJITAI_TO_SHINJITAI,
+    LITERARY_VOLITIONAL_PARTICLE_COMPOUNDS,
     PREFIX_EXCEPTIONS,
     SEARCH_UNIT_COMPOUNDS,
 )
@@ -590,6 +592,7 @@ _A_ROW_TO_U_ROW = {
 }
 _CLASSICAL_IRREALIS_AUX = "む"
 _HIRAGANA_TAIL = regex.compile(r"\p{Hiragana}$")
+_SINGLE_KANJI = regex.compile(r"^\p{Han}$")
 
 
 def _is_single_verb(surface: str) -> bool:
@@ -598,6 +601,43 @@ def _is_single_verb(surface: str) -> bool:
 
     tokens = mecab_analyze(surface)
     return len(tokens) == 1 and tokens[0].get("pos") == "動詞" and tokens[0].get("surface") == surface
+
+
+def _bare_kanji_vowel_stem_lemma(surface: str) -> str | None:
+    """The 一段/カ変 lemma whose irrealis is this bare kanji, or None.
+
+    む attaches to an irrealis, and every consonant stem writes that cell with an
+    a-row okurigana the host ends in. A vowel stem spelled entirely in its kanji
+    has no okurigana at all (見, 寝, 得, 来), so the hiragana tail that identifies
+    every other host is simply absent and the class has to be read off the lemma
+    instead. The dictionary supplies it, and only 一段 and カ変 spell the irrealis
+    as the bare stem — which is what keeps the ラ行五段 homographs out (照 and 練
+    are not the irrealis of 照る and 練る).
+
+    The dictionary holds no pre-1946 spellings, so the probe reads the modern
+    character while the lemma keeps the one that was written (來 → 來る), which
+    is how every other kyujitai reading is reported.
+    """
+    if not _SINGLE_KANJI.match(surface):
+        return None
+    probe = KYUJITAI_TO_SHINJITAI.get(surface, surface) + "る"
+    tokens = mecab_analyze(probe)
+    if len(tokens) != 1 or tokens[0].get("pos") != "動詞" or tokens[0].get("surface") != probe:
+        return None
+    return surface + "る" if tokens[0].get("conj_type", "").startswith(("一段", "カ変")) else None
+
+
+def _promote_bare_kanji_host(merged: list[dict], previous: dict, lemma: str) -> None:
+    """Give a bare vowel stem back the verb reading its irrealis position implies.
+
+    With no okurigana to conjugate, the dictionary guesses the kanji from what
+    surrounds it and lands on a different part of speech in each position — a
+    bound suffix mid-sentence (人来), the temporal prefix at the head of one (来
+    as in 来週), a bare noun where neither fits (得). None of the three can host
+    む, so the position settles the reading whichever guess arrived.
+    """
+    if previous.get("pos") != "動詞":
+        merged[-1] = {"surface": previous.get("surface", ""), "pos": "動詞", "lemma": lemma}
 
 
 def _retag_suffix_without_host(tokens: list[dict]) -> list[dict]:
@@ -656,28 +696,44 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
         # (見え, 流れ).  The dictionary holds no irrealis for the vowel-stem
         # class and reads that stem as a deverbal noun, so the POS cannot carry
         # the test — a content word ending in hiragana is the whole condition,
-        # and the conjugation class drops out of it.  A kanji-final host is left
-        # out on purpose: there the volitional split rule reads the tail in
-        # context and keeps the case particle that re-analysis would lose.
+        # and the conjugation class drops out of it.  The one host with no
+        # hiragana to test is the vowel stem written wholly in its kanji, which
+        # the lemma identifies instead.  Any other kanji-final host is left out
+        # on purpose: there the volitional split rule reads the tail in context
+        # and keeps the case particle that re-analysis would lose.
+        bare_kanji_lemma = _bare_kanji_vowel_stem_lemma(previous.get("surface", "")) if previous is not None else None
         if (
             previous is not None
-            and previous.get("pos") in ("動詞", "名詞")
-            and _HIRAGANA_TAIL.search(previous.get("surface", ""))
             and len(surface) > 1
             and surface[0] == _CLASSICAL_IRREALIS_AUX
+            and (
+                bare_kanji_lemma is not None
+                or (previous.get("pos") in ("動詞", "名詞") and _HIRAGANA_TAIL.search(previous.get("surface", "")))
+            )
         ):
             # A noun cannot host む, so the deverbal reading the dictionary
             # produced for the vowel stem has to be undone as well: the stem plus
             # る is the vowel-stem verb it was cut from (流れ → 流れる).  Confirm
             # that lemma against the dictionary rather than assuming it, so a
             # nominal host the rule reached by another route keeps its POS.
-            if previous.get("pos") == "名詞":
+            if bare_kanji_lemma is not None:
+                _promote_bare_kanji_host(merged, previous, bare_kanji_lemma)
+            elif previous.get("pos") == "名詞":
                 stem = previous.get("surface", "")
                 lemma = stem + "る"
                 if _is_single_verb(lemma):
                     merged[-1] = {"surface": stem, "pos": "動詞", "lemma": lemma}
             merged.append({"surface": surface[0], "pos": "助動詞", "lemma": surface[0]})
-            merged.extend(mecab_analyze(surface[1:]))
+            # Re-analysis loses the context the fused token supplied, and a
+            # closed-class tail read on its own comes back as a noun (と after
+            # 見むと). Those sequences are already named as splits of the fused
+            # compound, so take the reading from there and leave the analyzer to
+            # the open-class tails it can read unaided (むとする).
+            compound = LITERARY_VOLITIONAL_PARTICLE_COMPOUNDS.get(surface)
+            if compound is not None:
+                merged.append({"surface": compound[1], "pos": "助詞", "lemma": compound[1]})
+            else:
+                merged.extend(mecab_analyze(surface[1:]))
             idx += 1
             if applied_rule is None:
                 applied_rule = "classical-mu-boundary"
@@ -688,11 +744,15 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
         # POS and the auxiliary keeps one reading across every context.
         if (
             previous is not None
-            and previous.get("pos") == "動詞"
-            and previous.get("surface", "")[-1:] in _A_ROW_TO_U_ROW
             and surface == _CLASSICAL_IRREALIS_AUX
             and token.get("pos") != "助動詞"
+            and (
+                bare_kanji_lemma is not None
+                or (previous.get("pos") == "動詞" and previous.get("surface", "")[-1:] in _A_ROW_TO_U_ROW)
+            )
         ):
+            if bare_kanji_lemma is not None:
+                _promote_bare_kanji_host(merged, previous, bare_kanji_lemma)
             merged.append({"surface": surface, "pos": "助動詞", "lemma": surface})
             idx += 1
             if applied_rule is None:
