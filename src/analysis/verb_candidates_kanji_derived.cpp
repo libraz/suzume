@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
@@ -127,11 +128,21 @@ bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t
   if (vh::embedsAuxiliaryOnOnbinStem(codepoints, kanji_end, cell_end, dict_manager)) {
     return false;
   }
-  auto conditional =
-      makeVerbCandidate(cell_surface, start_pos, cell_end, candidate::verb_cost::kStrongBonus, best.base_form,
-                        grammar::verbTypeToConjType(best.verb_type), true, CandidateOrigin::VerbKanji, best.confidence,
-                        "godan_kateikei", core::ExtendedPOS::VerbKateikei);
-  conditional.lemma_verified = vh::isVerbInDictionary(dict_manager, best.base_form);
+  // The Godan-ra table is the only route a reverse analysis has to a ヤ行
+  // bigrade 已然形, so it names the attributive as the base form. That form is
+  // not a headword of any paradigm; the terminal is (聞こゆれ -> 聞こゆ, not
+  // 聞こゆる). An attested base form is a real Godan verb and keeps its own.
+  std::string lemma = best.base_form;
+  if (!vh::isVerbInDictionary(dict_manager, lemma)) {
+    const std::string bigrade_terminal = grammar::yaRowBigradeTerminalLemma(lemma);
+    if (!bigrade_terminal.empty()) {
+      lemma = bigrade_terminal;
+    }
+  }
+  auto conditional = makeVerbCandidate(cell_surface, start_pos, cell_end, candidate::verb_cost::kStrongBonus, lemma,
+                                       grammar::verbTypeToConjType(best.verb_type), true, CandidateOrigin::VerbKanji,
+                                       best.confidence, "godan_kateikei", core::ExtendedPOS::VerbKateikei);
+  conditional.lemma_verified = vh::isVerbInDictionary(dict_manager, lemma);
   candidates.push_back(std::move(conditional));
   return true;
 }

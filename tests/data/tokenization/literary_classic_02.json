@@ -500,6 +500,80 @@
       ],
       "id": "binikeri",
       "input": "鳥飛びにけり"
+    },
+    {
+      "description": "Classical ya-row bigrade izenkei heads the verb instead of extending the kanji run",
+      "expected": [
+        {
+          "lemma": "音",
+          "pos": "Noun",
+          "surface": "音"
+        },
+        {
+          "lemma": "聞こゆ",
+          "pos": "Verb",
+          "surface": "聞こゆれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "落ち着く",
+          "pos": "Verb",
+          "surface": "落ち着く"
+        }
+      ],
+      "id": "koyureba_chi_ku",
+      "input": "音聞こゆれば心落ち着く"
+    },
+    {
+      "description": "Bigrade izenkei keeps the terminal form as its lemma",
+      "expected": [
+        {
+          "lemma": "影",
+          "pos": "Noun",
+          "surface": "影"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "見ゆ",
+          "pos": "Verb",
+          "surface": "見ゆれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知る"
+        }
+      ],
+      "id": "no_yureba_zo_ru",
+      "input": "影の見ゆれば人ぞ知る"
     }
   ],
   "description": "literary_classic tests (part 2/2)",

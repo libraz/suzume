@@ -6,6 +6,7 @@
 #ifndef SUZUME_GRAMMAR_CHAR_PATTERNS_H_
 #define SUZUME_GRAMMAR_CHAR_PATTERNS_H_
 
+#include <string>
 #include <string_view>
 
 #include "conjugation.h"  // VerbType
@@ -159,6 +160,19 @@ bool isLeftBranchingPrefixKanji(char32_t code);
  * 捨つ, 述ぶ, 求む, 越ゆ, 流る), which is also what its 連体形 adds る to.
  */
 bool isBigradeTerminalKana(char32_t code);
+
+/**
+ * @brief Terminal form behind a ヤ行 bigrade attributive, or empty
+ *
+ * A ヤ行 bigrade verb has no modern headword, so a reverse analysis reaches its
+ * cells through the Godan-ra table and reports the attributive as the base form
+ * (聞こゆれ → 聞こゆる). ゆる is the one U-row + る ending the modern paradigm
+ * never produces, so there it can only be that attributive and the terminal is
+ * the lemma; every other row also ends an ordinary Godan verb (作る, 走る).
+ *
+ * @param base_form Base form reported by inflection analysis
+ */
+std::string yaRowBigradeTerminalLemma(std::string_view base_form);
 
 /**
  * @brief Whether a U-row kana still ends a modern Godan 終止形

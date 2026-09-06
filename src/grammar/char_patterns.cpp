@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <array>
+#include <string>
 
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -203,6 +204,13 @@ bool isBigradeTerminalKana(char32_t code) {
   constexpr std::array<char32_t, 11> kBigradeTerminals = {U'う', U'く', U'ぐ', U'つ', U'づ', U'ぬ',
                                                           U'ふ', U'ぶ', U'む', U'ゆ', U'る'};
   return std::find(kBigradeTerminals.begin(), kBigradeTerminals.end(), code) != kBigradeTerminals.end();
+}
+
+std::string yaRowBigradeTerminalLemma(std::string_view base_form) {
+  if (!utf8::endsWith(base_form, "ゆる") || base_form.size() <= core::kTwoJapaneseCharBytes) {
+    return {};
+  }
+  return std::string(base_form.substr(0, base_form.size() - core::kJapaneseCharBytes));
 }
 
 bool isModernGodanTerminalKana(char32_t code) {

@@ -1052,6 +1052,13 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
             !vh::isVerbInDictionary(dict_manager, best.base_form)) {
           continue;
         }
+        // Directly after a kanji the hiragana run is that kanji's okurigana, so
+        // a stem reconstructed from it alone would start in the middle of a
+        // word (音+聞こゆれ, not 音聞+こゆれ). An attested base form is lexical
+        // evidence that outweighs the orthography; a fabricated one is not.
+        if (follows_kanji && dict_manager != nullptr && !vh::isVerbInDictionary(dict_manager, best.base_form)) {
+          continue;
+        }
         candidates.push_back(makeVerbCandidate(codepoints, start_pos, stem_end, candidate::verb_cost::kStrongBonus,
                                                best.base_form, grammar::verbTypeToConjType(best.verb_type), true,
                                                CandidateOrigin::VerbHiragana, best.confidence,
