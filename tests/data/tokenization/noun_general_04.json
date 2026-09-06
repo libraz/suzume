@@ -1448,6 +1448,109 @@
       ],
       "id": "io_wo_mu",
       "input": "熱いお茶を飲む"
+    },
+    {
+      "description": "A kanji head brackets the unregistered kana modifier in front of it",
+      "expected": [
+        {
+          "lemma": "りんご",
+          "pos": "Noun",
+          "surface": "りんご"
+        },
+        {
+          "lemma": "栽培",
+          "pos": "Noun",
+          "surface": "栽培"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "学ぶ",
+          "pos": "Verb",
+          "surface": "学ぶ"
+        }
+      ],
+      "id": "ringosaibaiwomanabu",
+      "input": "りんご栽培を学ぶ"
+    },
+    {
+      "description": "Negative control: an adverb in the modifier position keeps its own reading",
+      "expected": [
+        {
+          "lemma": "もちろん",
+          "pos": "Adverb",
+          "surface": "もちろん"
+        },
+        {
+          "lemma": "問題",
+          "pos": "Noun",
+          "surface": "問題"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "mochiron_nai",
+      "input": "もちろん問題ない"
+    },
+    {
+      "description": "Same bracket on another unregistered kana noun",
+      "expected": [
+        {
+          "lemma": "みかん",
+          "pos": "Noun",
+          "surface": "みかん"
+        },
+        {
+          "lemma": "農家",
+          "pos": "Noun",
+          "surface": "農家"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "訪ねる",
+          "pos": "Verb",
+          "surface": "訪ねる"
+        }
+      ],
+      "id": "mikannoukawotazuneru",
+      "input": "みかん農家を訪ねる"
+    },
+    {
+      "description": "Negative control: an inflected predicate reading of the modifier keeps the promotion from firing",
+      "expected": [
+        {
+          "lemma": "うれしい",
+          "pos": "Adjective",
+          "surface": "うれしい"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞く"
+        }
+      ],
+      "id": "ureshiihanashiwokiku",
+      "input": "うれしい話を聞く"
     }
   ],
   "description": "General nouns (part 4/4)",
