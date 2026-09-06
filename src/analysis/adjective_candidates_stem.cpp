@@ -971,6 +971,29 @@ bool classicalConjunctiveFollowsAt(const std::vector<char32_t>& codepoints, size
   return false;
 }
 
+// The imperative cell also stands in the paired concessive, where two of them are
+// juxtaposed with nothing in between (遅かれ早かれ, 多かれ少なかれ). Neither member
+// carries the conjunctive particle that licenses the cell everywhere else: the
+// first hands the clause straight to its partner and the second to the predicate,
+// so what identifies the construction is the adjacency itself. Each member
+// therefore looks for its partner on the side the other one is on. Both halves
+// still have to pass the adjective evidence the cell needs on its own, which is
+// what keeps an ordinary verb ending in the same two kana out (道が分かれ、).
+bool pairedImperativeCellAdjacent(const std::vector<char32_t>& codepoints, size_t start_pos, size_t cell_end) {
+  // The partner's stem is a word of its own, so a few codepoints reach its cell.
+  constexpr size_t kPairedStemProbeChars = 4;
+  if (start_pos >= 2 && codepoints[start_pos - 2] == U'か' && codepoints[start_pos - 1] == U'れ') {
+    return true;
+  }
+  const size_t probe_end = std::min(codepoints.size(), cell_end + kPairedStemProbeChars);
+  for (size_t pos = cell_end; pos + 1 < probe_end; ++pos) {
+    if (codepoints[pos] == U'か' && codepoints[pos + 1] == U'れ') {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool classicalClauseEndsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   if (pos >= codepoints.size()) {
     return true;
@@ -1054,7 +1077,8 @@ void appendIAdjKaraZuCandidates(const std::vector<char32_t>& codepoints, size_t 
     // rules out the homographic passive; without a closed particle the cell is
     // not emitted. The continuative かり may also close a literary clause.
     const bool is_kare = codepoints[kara_pos + 1] == U'れ';
-    const bool follows_conjunctive = is_kare && classicalConjunctiveFollowsAt(codepoints, cell_end, dict_manager);
+    const bool follows_conjunctive = is_kare && (classicalConjunctiveFollowsAt(codepoints, cell_end, dict_manager) ||
+                                                 pairedImperativeCellAdjacent(codepoints, start_pos, cell_end));
     const bool terminal_renyokei = codepoints[kara_pos + 1] == U'り' && classicalClauseEndsAt(codepoints, cell_end);
     const bool licensed = follows_conjunctive || terminal_renyokei ||
                           (!is_kare && classicalAuxiliaryFollowsAt(codepoints, cell_end, scan_end, dict_manager));
