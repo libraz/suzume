@@ -67,6 +67,16 @@ _LEXICALIZED_PREDICATE_COMPOUNDS: dict[str, tuple[dict, ...]] = {
 
 _COMPLETIVE_TSUKUSU_FORMS = frozenset({"尽くさ", "尽くし", "尽くす", "尽くせ", "尽くそ"})
 
+# Two causative auxiliaries share these cells, and which one a cell belongs to is
+# not a choice this rule gets to make: wherever the reference analyzer splits the
+# boundary itself it reads the e-row cell as the modern ichidan せる (書か+せ+て,
+# 待た+せ+て, 書か+せ+ば) and the a-row cell before the passive as the four-grade す
+# (書か+さ+れる).  Restoring the boundary must not change the lemma along with it,
+# or the same auxiliary comes back with two headwords depending only on whether
+# the host happened to be lexicalized.
+_CAUSATIVE_SU = "す"
+_CAUSATIVE_TAIL_LEMMAS = {"せ": "せる"}
+
 # A predicate closed by a volitional auxiliary cannot host a case particle, so
 # a として that follows one is the quotative と plus the te-form of する -- in the
 # modern spelling and in the classical む alike.
@@ -578,7 +588,13 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
             base_tokens = _reanalyze_exact(causative_base) if causative_base is not None else None
             if base_tokens is not None and len(base_tokens) == 1 and base_tokens[0].get("pos") == "動詞":
                 result.append({"surface": causative_stem, "pos": "動詞", "lemma": causative_base})
-                result.append({"surface": causative_tail, "pos": "助動詞", "lemma": "す"})
+                result.append(
+                    {
+                        "surface": causative_tail,
+                        "pos": "助動詞",
+                        "lemma": _CAUSATIVE_TAIL_LEMMAS.get(causative_tail, _CAUSATIVE_SU),
+                    }
+                )
                 if applied_rule is None:
                     applied_rule = "productive-causative-su-boundary"
                 continue
