@@ -493,12 +493,20 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   const bool adjective_before_directional_case = prev.extended_pos == core::ExtendedPOS::AdjRenyokei &&
                                                  next.extended_pos == core::ExtendedPOS::ParticleCase &&
                                                  utf8::equalsAny(next.surface, {"へ"});
-  if (verb_before_adjective || adjective_before_directional_case) {
-    if (verb_before_adjective && utf8::equalsAny(next.lemma, {"にくい", "やすい", "がたい", "づらい", "難い"})) {
-      SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
-    } else {
-      SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
-    }
+  // The suffix class is bound in both directions, which is one fact rather than
+  // two: its members have no reading of their own, so the continuative is not
+  // merely their best host but their only one, supplied by the verb itself
+  // (読み+やすい) or by a voice auxiliary standing in that slot (読ま+せ+やすい,
+  // 見+られ+やすい). Stating only the licensed side left the entry cheap enough to
+  // head a phrase behind a nominal and pay for cutting a kana run in half
+  // (の+はた+やすい instead of の+は+たやすい).
+  const bool bound_adjective_suffix = next.extended_pos == core::ExtendedPOS::AdjBasic &&
+                                      utf8::equalsAny(next.lemma, {"にくい", "やすい", "がたい", "づらい", "難い"});
+  const bool host_supplies_continuative =
+      prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.pos == core::PartOfSpeech::Auxiliary;
+  if (bound_adjective_suffix || verb_before_adjective || adjective_before_directional_case) {
+    SUZUME_CONNECTION_ADD(
+        bonus, bound_adjective_suffix && host_supplies_continuative ? cost::kVeryStrongBonus : cost::kAlmostNever);
   }
 
   // An unverified Godan-wa continuative ending in い is locally homographic
