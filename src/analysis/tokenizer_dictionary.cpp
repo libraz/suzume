@@ -2331,15 +2331,17 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       // closes the clause (行くっ！). Before any other kana it is neither, and taking
       // it eats the opening mora of the following word (にらめっ+こ for にらめっこ).
       const bool bare_sokuon = emphatic.suffix == "っ";
-      // Only a verb continuative owns a 促音便 cell, so only it can license the
-      // sokuon in front of the connective. An i-adjective closes its terminal on
-      // い and builds its own onbin elsewhere (忙し|かっ|た), and a na-adjective
+      // Only a verb's own 音便形 owns the sokuon in front of the connective. The
+      // continuative does not: the 促音便 replaces that form's last mora rather
+      // than following it (買う has 買っ, built on the stem, while 買い is the
+      // continuative and 買いっ is no cell at all), and the genuine cell reaches
+      // the lattice as an entry of its own. An i-adjective closes its terminal
+      // on い and builds its own onbin elsewhere (忙し|かっ|た), and a na-adjective
       // stem has no inflection at all, so a っ after either is the emphatic —
       // which needs a clause end, not a following word (忙しい|っていう, not
       // 忙しいっ|ていう).
       const bool host_owns_sokuonbin_cell = result.entry->pos == core::PartOfSpeech::Verb &&
-                                            (result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei ||
-                                             result.entry->extended_pos == core::ExtendedPOS::VerbOnbinkei);
+                                            result.entry->extended_pos == core::ExtendedPOS::VerbOnbinkei;
       const bool unlicensed_bare_sokuon =
           bare_sokuon && emphatic.end < codepoints.size() &&
           normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Hiragana &&
