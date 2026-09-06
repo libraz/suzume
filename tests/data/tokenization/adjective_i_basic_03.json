@@ -1157,6 +1157,72 @@
       ],
       "id": "kana_de_wo_mu",
       "input": "静かな部屋で本を読む"
+    },
+    {
+      "description": "Classical counterfactual: kari continuative + past irrealis se + ba",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高かり"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "kariseba",
+      "input": "高かりせば"
+    },
+    {
+      "description": "Same counterfactual on a shiku stem",
+      "expected": [
+        {
+          "lemma": "恐ろしい",
+          "pos": "Adjective",
+          "surface": "恐ろしかり"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "roshikariseba",
+      "input": "恐ろしかりせば"
+    },
+    {
+      "description": "Same counterfactual on a kanji shiku stem",
+      "expected": [
+        {
+          "lemma": "楽しい",
+          "pos": "Adjective",
+          "surface": "楽しかり"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "shikariseba",
+      "input": "楽しかりせば"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

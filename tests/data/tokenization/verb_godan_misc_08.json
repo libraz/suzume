@@ -1946,6 +1946,72 @@
       ],
       "id": "made_ttteittta",
       "input": "駅まで走っていった"
+    },
+    {
+      "description": "The realis cell of the same paradigm before the conditional",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "しか"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "shikaba",
+      "input": "見しかば"
+    },
+    {
+      "description": "Negative control: the causative keeps the same mora after an irrealis",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "maseba",
+      "input": "読ませば"
+    },
+    {
+      "description": "Negative control: the long causative before the same conditional",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "させる",
+          "pos": "Auxiliary",
+          "surface": "させ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "besaseba",
+      "input": "食べさせば"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
