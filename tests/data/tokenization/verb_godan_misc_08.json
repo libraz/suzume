@@ -2343,6 +2343,45 @@
       ],
       "id": "kaereba",
       "input": "帰れば"
+    },
+    {
+      "description": "The conditional reads the causative cell the way the past frame does",
+      "expected": [
+        {
+          "lemma": "飛ぶ",
+          "pos": "Verb",
+          "surface": "飛ば"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "tobaseba",
+      "input": "飛ばせば"
+    },
+    {
+      "description": "Negative control: an attested ichidan headword keeps the span whole in both frames",
+      "expected": [
+        {
+          "lemma": "光らす",
+          "pos": "Verb",
+          "surface": "光らせ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "hikaraseba",
+      "input": "光らせば"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
