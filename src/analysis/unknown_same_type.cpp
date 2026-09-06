@@ -624,11 +624,17 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           grammar::isContractedProgressiveSurface(extractSubstring(codepoints, candidate_end - 2, candidate_end));
       const bool precedes_closed_native_number =
           start_type == normalize::CharType::Hiragana && startsClosedNativeNumber(codepoints, candidate_end);
+      // What licenses the nominal reading is the genitive の with the negative
+      // predicate behind it, so the negative has to be resolved from its own
+      // paradigm rather than from its opening mora. That mora also opens the
+      // conditional なら, which follows the nominalizer instead and leaves a
+      // predicate in front of it — reading the run as a nominal there cuts an
+      // ordinary verb in half (食べる|の|なら, not 食|べる|の|なら).
       const bool closes_genitive_negative_noun =
           start_type == normalize::CharType::Hiragana && candidate_end - start_pos >= 2 &&
           !starts_at_dictionary_verb_continuative && !starts_after_dictionary_adjective &&
           candidate_end + 1 < codepoints.size() && codepoints[candidate_end] == U'の' &&
-          codepoints[candidate_end + 1] == U'な';
+          verb_helpers::naiNegativeFollowsAt(codepoints, candidate_end + 1);
       // Particle-start hiragana sequences are potential nouns (はし, はな, にく)
       // Use NOUN POS instead of OTHER to avoid exceeds_dict_length penalty
       core::PartOfSpeech pos =
