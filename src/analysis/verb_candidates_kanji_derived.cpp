@@ -63,6 +63,39 @@ bool hasAttestedInternalGodanConditional(const std::vector<char32_t>& codepoints
                                          const dictionary::DictionaryManager* dict_manager);
 
 /**
+ * @brief Whether a one-mora auxiliary closes the cell over an attested irrealis.
+ *
+ * The voice auxiliaries are one mora each, so the multi-mora guard cannot see
+ * them, and the e-row cell the conditional keys on is theirs rather than the host
+ * verb's (書か+せ+ば, 呼ば+れ+ば). A one-mora tail is also how an ordinary verb
+ * spells its own ending, though, so the irrealis in front has to be a cell of an
+ * attested verb for that reading to exist at all: 書く supplies 書か, while nothing
+ * supplies 燃や and 燃やす keeps its own paradigm.
+ */
+bool oneMoraAuxiliaryClosesAttestedIrrealis(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
+                                            size_t cell_end, const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || cell_end < kanji_end + 2) {
+    return false;
+  }
+  const auto* auxiliary =
+      lookupEntryInRange(*dict_manager, codepoints, cell_end - 1, cell_end, core::PartOfSpeech::Auxiliary);
+  // The passive spells its own hypothetical cell れれ/られれ rather than the bare
+  // mora, which is why the connection rules bar the conditional particle behind
+  // it. There is no split reading to hand the cell to there, so leaving the
+  // candidate in place keeps 呼ばれ+ば instead of a whole-run unknown.
+  if (auxiliary == nullptr || auxiliary->extended_pos == core::ExtendedPOS::AuxPassive) {
+    return false;
+  }
+  const char32_t irrealis = codepoints[cell_end - 2];
+  const std::string_view base_suffix = grammar::godanBaseSuffixFromARow(irrealis);
+  if (!grammar::isARowCodepoint(irrealis) || base_suffix.empty()) {
+    return false;
+  }
+  const std::string host = normalize::concat(extractSubstring(codepoints, start_pos, cell_end - 2), base_suffix);
+  return vh::isVerbInDictionary(dict_manager, host);
+}
+
+/**
  * @brief Emit the godan 已然形/仮定形 cell ending just before @p cell_end.
  *
  * The row a bare e-row mora belongs to is not recoverable from it: analyzing
@@ -102,7 +135,8 @@ bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t
   // so the whole closed class is covered at once. A dictionary-attested
   // lexical verb such as ござる retains its genuine ござれ+ば paradigm.
   // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
-  if (vh::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, kanji_end, cell_end) &&
+  if ((vh::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, kanji_end, cell_end) ||
+       oneMoraAuxiliaryClosesAttestedIrrealis(codepoints, start_pos, kanji_end, cell_end, dict_manager)) &&
       !vh::isVerbInDictionary(dict_manager, best.base_form)) {
     return false;
   }
