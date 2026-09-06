@@ -283,6 +283,26 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
                                               << "skipping ichidan_renyokei\n");
           }
         }
+        // The okurigana must not open a verb that exists only as a derivational
+        // suffix on a nominal host. Such a suffix carries its own left boundary,
+        // so a proposal that takes only its first mora has cut into it
+        // (嘘じみた is 嘘 + じみ + た, never 嘘じ + みた). A dictionary base keeps
+        // its candidate, because a lexical verb spelled the same way owns the
+        // kana (感じ before みたい).
+        // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+        bool okurigana_opens_bound_suffix = false;
+        if (!ichidan_base_is_dict) {
+          constexpr size_t kBoundSuffixProbe = 4;
+          const size_t max_suffix_end = std::min(codepoints.size(), kanji_end + kBoundSuffixProbe);
+          for (size_t suffix_end = kanji_end + 1; suffix_end <= max_suffix_end; ++suffix_end) {
+            if (grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, suffix_end))) {
+              okurigana_opens_bound_suffix = true;
+              SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" okurigana opens a bound derivational suffix, "
+                                                << "skipping ichidan_renyokei\n");
+              break;
+            }
+          }
+        }
         // A surface that is also a dictionary i-adjective (強い) is verbal
         // only in conjugation contexts: renyokei + た/て or mizenkei + られ/させ.
         // Elsewhere (predicate/attributive use: 力が強い, 強い風) the adjective
@@ -309,7 +329,8 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold && !surface_is_dict_noun &&
             !single_kanji_te_form && !suffix_is_dict_verb && !trailing_span_is_dict_suffix &&
             !suffix_is_godan_before_auxiliary && !adj_homograph_blocked && !okurigana_opens_auxiliary &&
-            !unverified_multi_kanji_suru_mizen && !unverified_before_temporal_nominal && !shifted_row_ichidan_stem) {
+            !okurigana_opens_bound_suffix && !unverified_multi_kanji_suru_mizen &&
+            !unverified_before_temporal_nominal && !shifted_row_ichidan_stem) {
           // Negative cost to strongly favor split over combined analysis
           // Combined forms get optimal_length bonus (-0.5), so we need to be lower
           // A bound verb prefix is the one multi-kanji stem that cannot be read

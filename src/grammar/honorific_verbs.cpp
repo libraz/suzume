@@ -5,7 +5,12 @@
 
 #include "grammar/honorific_verbs.h"
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 #include "core/utf8_constants.h"
+#include "grammar/conjugator.h"
 
 namespace suzume::grammar {
 
@@ -33,7 +38,7 @@ constexpr std::string_view kAspectualSubsidiaryLemmas[] = {"始める", "はじ�
 // Verbs that exist only as a derivational suffix on a nominal host (形式ばる,
 // 芝居がかる). Their conjugation lives in the dictionary; the host requirement
 // cannot, so callers gate the entry on it.
-constexpr std::string_view kBoundDerivationalSuffixVerbLemmas[] = {"ばる", "がかる"};
+constexpr std::string_view kBoundDerivationalSuffixVerbLemmas[] = {"ばる", "がかる", "じみる"};
 // Suffixes that address or name a person. 様/氏 are absent on purpose: their
 // kanji orthography cannot be confused with predicate material, so no caller
 // needs a host check for them.
@@ -75,6 +80,22 @@ bool isAspectualSubsidiaryLemma(std::string_view lemma) {
 
 bool isBoundDerivationalSuffixVerbLemma(std::string_view lemma) {
   return equalsAny(lemma, kBoundDerivationalSuffixVerbLemmas);
+}
+
+bool spellsBoundDerivationalSuffixCell(std::string_view okurigana) {
+  static const std::vector<std::string> kCells = [] {
+    const Conjugator conjugator;
+    std::vector<std::string> cells;
+    for (const std::string_view lemma : kBoundDerivationalSuffixVerbLemmas) {
+      const std::string base(lemma);
+      cells.push_back(base);
+      for (const auto& stem : conjugator.generateStems(base, conjugator.detectType(base))) {
+        cells.push_back(stem.surface);
+      }
+    }
+    return cells;
+  }();
+  return std::any_of(kCells.begin(), kCells.end(), [okurigana](const std::string& cell) { return cell == okurigana; });
 }
 
 bool isPersonalAddressSuffix(std::string_view surface) {

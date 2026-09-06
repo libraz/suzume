@@ -12,6 +12,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
+#include "grammar/honorific_verbs.h"
 #include "grammar/inflection_scorer_constants.h"
 #include "normalize/utf8.h"
 #include "unknown.h"
@@ -254,7 +255,15 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
               }
             }
 
-            if (!is_adj_katt_form && (in_dict || infl_verified)) {
+            // A verb that exists only as a derivational suffix on a nominal host
+            // carries its own left boundary, so the kanji in front of it is that
+            // host and not the stem of a verb (嘘 + ばっ + た). A dictionary base
+            // is the exemption, since a lexicalized compound spelled the same
+            // way is a word of its own.
+            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            const bool onbin_spells_bound_suffix = !in_dict && grammar::spellsBoundDerivationalSuffixCell(
+                                                                   extractSubstring(codepoints, kanji_end, onbin_end));
+            if (!is_adj_katt_form && !onbin_spells_bound_suffix && (in_dict || infl_verified)) {
               // Verified - generate candidate
               float cost = candidate::verb_cost::kModerateBonus;
               if (crosses_completed_past) {

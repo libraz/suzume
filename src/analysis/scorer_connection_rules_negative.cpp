@@ -294,9 +294,14 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   // this shape. Longer hiragana continuatives keep the exemption (外出+でき+ない).
   const bool bare_kanji_host = normalize::utf8Length(prev.surface) == 1 ||
                                (grammar::isAllKanji(prev.surface) && isSingleHiraganaVerbRenyokei(next));
+  // A verb that exists only as a derivational suffix on a nominal host inverts
+  // the argument: its host is a bare noun by definition (子供じみる, 形式ばる),
+  // so a one-kanji one is exactly what it takes rather than evidence of a
+  // swallowed stem.
+  const bool bound_derivational_suffix = grammar::isBoundDerivationalSuffixVerbLemma(next.lemma);
   if (prev.extended_pos == core::ExtendedPOS::Noun && next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       !grammar::isSuruRenyokeiSurface(next.surface) && next.surface != "せ" && next.surface.size() <= 6 &&
-      bare_kanji_host && !renyokei_has_okurigana) {
+      bare_kanji_host && !renyokei_has_okurigana && !bound_derivational_suffix) {
     SUZUME_CONNECTION_ADD(bonus, cost::kRare);  // Cancel the bigram bonus
   }
 

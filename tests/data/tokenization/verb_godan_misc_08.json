@@ -1572,6 +1572,124 @@
       ],
       "id": "mini_ku",
       "input": "読みに行く"
+    },
+    {
+      "description": "bound derivational suffix verb keeps its boundary on a one-kanji host",
+      "expected": [
+        {
+          "lemma": "嘘",
+          "pos": "Noun",
+          "surface": "嘘"
+        },
+        {
+          "lemma": "じみる",
+          "pos": "Verb",
+          "surface": "じみ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞く"
+        }
+      ],
+      "id": "jimita_wo_ku",
+      "input": "嘘じみた話を聞く"
+    },
+    {
+      "description": "negative control: two-kanji host keeps the same boundary",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "じみる",
+          "pos": "Verb",
+          "surface": "じみ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "態度",
+          "pos": "Noun",
+          "surface": "態度"
+        }
+      ],
+      "id": "jimita",
+      "input": "子供じみた態度"
+    },
+    {
+      "description": "negative control: the three-mora bound suffix is unchanged",
+      "expected": [
+        {
+          "lemma": "芝居",
+          "pos": "Noun",
+          "surface": "芝居"
+        },
+        {
+          "lemma": "がかる",
+          "pos": "Verb",
+          "surface": "がかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "仕草",
+          "pos": "Noun",
+          "surface": "仕草"
+        }
+      ],
+      "id": "gakattta_3",
+      "input": "芝居がかった仕草"
+    },
+    {
+      "description": "bound derivational suffix onbin on a one-kanji host",
+      "expected": [
+        {
+          "lemma": "嘘",
+          "pos": "Noun",
+          "surface": "嘘"
+        },
+        {
+          "lemma": "ばる",
+          "pos": "Verb",
+          "surface": "ばっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "態度",
+          "pos": "Noun",
+          "surface": "態度"
+        }
+      ],
+      "id": "battta_3",
+      "input": "嘘ばった態度"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

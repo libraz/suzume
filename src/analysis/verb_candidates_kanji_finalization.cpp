@@ -15,6 +15,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
+#include "grammar/honorific_verbs.h"
 #include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
@@ -352,6 +353,16 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     // A closed-class auxiliary may inflect with the same kana as an open
     // class verb. Do not let an unverified whole-span hypothesis swallow
     // its negative form: 過ぎなかった → 過ぎ + なかっ + た.
+    // A verb that exists only as a derivational suffix on a nominal host puts
+    // its own boundary in front of itself: what precedes 嘘じみ is the host 嘘,
+    // so a coined 嘘じむ has absorbed the suffix rather than named a verb. The
+    // dictionary base form is the exemption, since a lexicalized compound
+    // spelled the same way is a word of its own.
+    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    if (!in_dict && grammar::spellsBoundDerivationalSuffixCell(hiragana_part)) {
+      SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated verb absorbing bound derivational suffix\n");
+      return;
+    }
     if (!in_dict && vh::hasAuxiliaryNegativeBoundary(dict_manager, codepoints, start_pos, end_pos)) {
       SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated verb absorbing auxiliary negative\n");
       return;

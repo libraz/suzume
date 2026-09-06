@@ -426,11 +426,15 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // Exception: Kanji-initial verbs (本+買っ) are valid noun+verb (dropped を)
   // Exception: NounNumber quantity tokens (半 split off a duration-counter run)
   //            legitimately precede verbs directly (三時間|半|かかった)
+  // Exception: a verb that exists only as a derivational suffix on a nominal
+  //            host takes a bare noun by definition (嘘|じみ|た, 形式|ばっ|た),
+  //            so the shape this penalty describes is the correct one for it
   if (prev.pos == core::PartOfSpeech::Noun && prev.extended_pos != core::ExtendedPOS::NounNumber &&
       normalize::utf8Length(prev.surface) == 1 &&  // Single char
       next.pos == core::PartOfSpeech::Verb &&
       (next.extended_pos == core::ExtendedPOS::VerbRenyokei || next.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
       !(grammar::isSuruRenyokeiSurface(next.surface) && prev.fromDictionary()) &&   // サ変動詞パターン
+      !grammar::isBoundDerivationalSuffixVerbLemma(next.lemma) &&                   // 束縛派生接尾辞
       !kana::isKatakanaCodepoint(utf8::decodeFirstChar(next.surface)) &&            // Exclude katakana verbs
       !suzume::normalize::isKanjiCodepoint(utf8::decodeFirstChar(next.surface))) {  // Exclude kanji verbs
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kVeryRare);

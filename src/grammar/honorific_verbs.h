@@ -86,6 +86,19 @@ bool startsHonorificSubsidiaryVerb(std::string_view surface);
 bool isBoundDerivationalSuffixVerbLemma(std::string_view lemma);
 
 /**
+ * @brief Check whether an okurigana run spells a cell of one of those verbs
+ * @param okurigana Hiragana run following a kanji (UTF-8)
+ * @return true if the run is exactly one inflected form of a bound suffix verb
+ *
+ * The cells are conjugated from the same lemmas rather than listed, and the
+ * match is on the whole run: a kanji run followed by one of them is a nominal
+ * host plus the suffix, never a verb of its own (嘘 + じみ). Requiring the whole
+ * run keeps an ordinary verb whose okurigana merely opens with the same kana
+ * (羽ばたく is not 羽 + ばる).
+ */
+bool spellsBoundDerivationalSuffixCell(std::string_view okurigana);
+
+/**
  * @brief Check whether a surface is a personal-address suffix (さん・ちゃん・たん…)
  * @param surface Candidate token surface (UTF-8)
  * @return true if the suffix names or addresses a person
