@@ -501,6 +501,14 @@ def classical_adjective_lemma(mizenkei: str) -> str | None:
 
 
 _KARI_CELL_POS = ("形容詞", "助動詞")
+_KARI_CONTINUATIVE = "かり"
+# The cells of the classical past that a カリ continuative hosts, each mapped to
+# the follower that identifies it, or None when the cell needs none.  Both are one
+# mora and both spell a サ変 cell, which is what the reference dictionary reads
+# them as once it has missed the かり token in front of them.  The 連体形 し stands
+# on its own, modifying or nominalizing; the 未然形 せ exists only inside the
+# counterfactual, so it is taken only in front of the conditional it ends in.
+_KARI_CLASSICAL_PAST_CELLS = {"し": None, "せ": "ば"}
 
 
 def _kari_cell_analysis(surface: str) -> tuple[str, str] | None:
@@ -562,17 +570,14 @@ def _postprocess_adj_kari(result: list[dict], applied_rule: str | None) -> tuple
             if applied_rule is None:
                 applied_rule = "adj-kari-conjugation"
             # The whole point of the かり cell is to carry a classical auxiliary,
-            # so a lone し behind it is the 連体形 of the past き. The dictionary
-            # never saw the かり token, so it read that し as the サ変
-            # continuative it shares its spelling with.
-            if (
-                surface.endswith("かり")
-                and idx < len(result)
-                and result[idx].get("surface") == "し"
-                and result[idx].get("pos") == "動詞"
-            ):
-                merged.append({"surface": "し", "pos": "助動詞", "lemma": "き"})
-                idx += 1
+            # so a one-mora サ変 cell behind it belongs to the past き instead.
+            if surface.endswith(_KARI_CONTINUATIVE) and idx < len(result) and result[idx].get("pos") == "動詞":
+                cell = result[idx].get("surface", "")
+                follower = _KARI_CLASSICAL_PAST_CELLS.get(cell, "")
+                next_surface = result[idx + 1].get("surface", "") if idx + 1 < len(result) else ""
+                if cell in _KARI_CLASSICAL_PAST_CELLS and (follower is None or follower == next_surface):
+                    merged.append({"surface": cell, "pos": "助動詞", "lemma": "き"})
+                    idx += 1
             continue
         merged.append(result[idx])
         idx += 1
