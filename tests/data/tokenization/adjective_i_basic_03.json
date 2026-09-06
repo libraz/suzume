@@ -1262,6 +1262,62 @@
       ],
       "id": "kare_nakare",
       "input": "多かれ少なかれ"
+    },
+    {
+      "description": "Supplementary terminal before the present conjecture",
+      "expected": [
+        {
+          "lemma": "楽しい",
+          "pos": "Adjective",
+          "surface": "楽しかる"
+        },
+        {
+          "lemma": "らむ",
+          "pos": "Auxiliary",
+          "surface": "らむ"
+        }
+      ],
+      "id": "shikaruramu",
+      "input": "楽しかるらむ"
+    },
+    {
+      "description": "Supplementary terminal before the negative conjecture",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高かる"
+        },
+        {
+          "lemma": "まじ",
+          "pos": "Auxiliary",
+          "surface": "まじ"
+        }
+      ],
+      "id": "karumaji",
+      "input": "高かるまじ"
+    },
+    {
+      "description": "Negative control: the colloquial adjective of the same spelling",
+      "expected": [
+        {
+          "lemma": "まじ",
+          "pos": "Adjective",
+          "surface": "まじ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "困る",
+          "pos": "Verb",
+          "surface": "困る"
+        }
+      ],
+      "id": "majide_ru",
+      "input": "まじで困る"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
