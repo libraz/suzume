@@ -77,6 +77,18 @@ _COMPLETIVE_TSUKUSU_FORMS = frozenset({"尽くさ", "尽くし", "尽くす", "�
 _CAUSATIVE_SU = "す"
 _CAUSATIVE_TAIL_LEMMAS = {"せ": "せる"}
 
+# The conditional particle is where the reference analyzer prefers to read an
+# e-row cell as the hypothetical of a godan-す verb, which is what makes the same
+# host come back whole here and split before the past auxiliary.
+_HYPOTHETICAL_PARTICLE = "ば"
+# The past auxiliary is the frame that settles the cell, because there the choice
+# is made straight off the reference lexicon: an attested 〜せる headword keeps the
+# span whole (泣かせ+た, 知らせ+た) and everything else exposes the causative
+# boundary (飛ば+せ+た, 乾か+せ+た).  Asking that frame is what lets the conditional
+# agree with it without a word list.
+_PAST_FRAME_PROBE = "た"
+_CAUSATIVE_AUXILIARY_LEMMAS = frozenset({"せる", "させる"})
+
 # A predicate closed by a volitional auxiliary cannot host a case particle, so
 # a として that follows one is the quotative と plus the te-form of する -- in the
 # modern spelling and in the classical む alike.
@@ -127,6 +139,19 @@ def base_from_mizenkei(stem: str) -> str | None:
         return None
     ending = _GODAN_MIZENKEI_TO_BASE.get(stem[-1])
     return stem[:-1] + ending if ending is not None else None
+
+
+def _splits_causative_cell_before_past(surface: str) -> bool:
+    """Whether the reference analyzer exposes the cell's boundary in the past frame."""
+    probe = mecab_analyze(f"{surface}{_PAST_FRAME_PROBE}")
+    return (
+        len(probe) > 2
+        and probe[0].get("surface") == surface[:-1]
+        and probe[1].get("surface") == surface[-1:]
+        # The cell is tagged a verb at this point in the pipeline, so the lemma is
+        # what identifies it as the causative rather than the word class.
+        and probe[1].get("lemma") in _CAUSATIVE_AUXILIARY_LEMMAS
+    )
 
 
 def _reanalyze_exact(text: str) -> list[dict] | None:
@@ -571,16 +596,27 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
         # form is a lexical transitive in its own right (動かす). The core
         # lexicon carries those, and the analysis they license (動かす + passive)
         # is the one a search unit wants.
-        following_passive = tokens[token_index + 1] if token_index + 1 < len(tokens) else None
-        precedes_passive = following_passive is not None and following_passive.get("lemma") in ("れる", "られる")
+        following_token = tokens[token_index + 1] if token_index + 1 < len(tokens) else None
+        precedes_passive = following_token is not None and following_token.get("lemma") in ("れる", "られる")
         causative_su_lemma = t.get("lemma") or ""
-        productive_causative_passive = (
-            precedes_passive
-            and causative_su_lemma.endswith("す")
-            and causative_su_lemma not in core_headwords("verbs.tsv")
+        productive_causative = causative_su_lemma.endswith("す") and causative_su_lemma not in core_headwords(
+            "verbs.tsv"
+        )
+        productive_causative_passive = precedes_passive and productive_causative
+        # The conditional is the one frame that reads this cell against the grain
+        # of the past frame, so the boundary is restored there on the same terms:
+        # the す form must not be a lexical transitive of its own, and the past
+        # frame must be where the reference analyzer actually exposes the cell.
+        productive_causative_conditional = (
+            following_token is not None
+            and following_token.get("surface") == _HYPOTHETICAL_PARTICLE
+            and productive_causative
+            and _splits_causative_cell_before_past(surface)
         )
         if t.get("pos") == "動詞" and (
-            causative_su_lemma in LEXICALIZED_CAUSATIVE_SU_LEMMAS or productive_causative_passive
+            causative_su_lemma in LEXICALIZED_CAUSATIVE_SU_LEMMAS
+            or productive_causative_passive
+            or productive_causative_conditional
         ):
             causative_tail = next((form for form in ("さ", "し", "す", "せ") if surface.endswith(form)), "")
             causative_stem = surface[: -len(causative_tail)] if causative_tail else ""
