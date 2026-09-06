@@ -846,6 +846,149 @@
       ],
       "id": "hashi_split_verb_ha_shi",
       "input": "売上が減りはしなかった"
+    },
+    {
+      "description": "食べるのならいい - auto-generated",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べる"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        }
+      ],
+      "id": "berunonaraii",
+      "input": "食べるのならいい"
+    },
+    {
+      "description": "本を調べるのなら手伝う - auto-generated",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "調べる",
+          "pos": "Verb",
+          "surface": "調べる"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "手伝う",
+          "pos": "Verb",
+          "surface": "手伝う"
+        }
+      ],
+      "id": "wo_berunonara_u",
+      "input": "本を調べるのなら手伝う"
+    },
+    {
+      "description": "意味のない話を聞く - auto-generated",
+      "expected": [
+        {
+          "lemma": "意味",
+          "pos": "Noun",
+          "surface": "意味"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞く"
+        }
+      ],
+      "id": "nonai_wo_ku",
+      "input": "意味のない話を聞く"
+    },
+    {
+      "description": "関係のなかった人に会う - auto-generated",
+      "expected": [
+        {
+          "lemma": "関係",
+          "pos": "Noun",
+          "surface": "関係"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "会う",
+          "pos": "Verb",
+          "surface": "会う"
+        }
+      ],
+      "id": "nonakattta_ni_u",
+      "input": "関係のなかった人に会う"
     }
   ],
   "description": "particle tests",
