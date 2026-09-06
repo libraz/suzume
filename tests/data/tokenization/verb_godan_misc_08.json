@@ -1690,6 +1690,70 @@
       ],
       "id": "battta_3",
       "input": "嘘ばった態度"
+    },
+    {
+      "description": "Unattested hiragana conditional after a case particle keeps its own boundary",
+      "expected": [
+        {
+          "lemma": "穴",
+          "pos": "Noun",
+          "surface": "穴"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "くぐる",
+          "pos": "Verb",
+          "surface": "くぐれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "開ける",
+          "pos": "Verb",
+          "surface": "開ける"
+        }
+      ],
+      "id": "wokugureba_ga_keru",
+      "input": "穴をくぐれば道が開ける"
+    },
+    {
+      "description": "Productive irrealis plus the negative auxiliary keeps its boundary",
+      "expected": [
+        {
+          "lemma": "残る",
+          "pos": "Verb",
+          "surface": "残ら"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べる"
+        }
+      ],
+      "id": "razu_beru",
+      "input": "残らず食べる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

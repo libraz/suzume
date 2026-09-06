@@ -1592,6 +1592,42 @@ def postprocess_de_particle(tokens: list[dict]) -> bool:
         token["lemma"] = "だ"
 
 
+@reports_mutation
+def postprocess_de_after_nominal(tokens: list[dict]) -> bool:
+    """Keep で the word it is when only punctuation stands beside it.
+
+    Punctuation carries no morphology, so it cannot turn the locative case
+    particle into the copula's continuative. The analyzer nonetheless does
+    exactly that behind a non-independent noun — 空の下で休む keeps the particle
+    while 空の下で、休む does not — which leaves the same slot holding two
+    different words. Reading the run of words on its own settles it: where a
+    comma was the only difference the reading flips back, and where none was
+    involved the probe text is the original and nothing moves.
+
+    A binding particle behind the で is the one environment that selects the
+    copula on its own (本でしか, わけでも), and the rules that name it decide
+    those positions; the probe stays out of them.
+    """
+    binding_surfaces = frozenset({"も", "は", "しか", "こそ", "さえ", "すら"})
+    unpunctuated = "".join(token.get("surface", "") for token in tokens)
+    offset = 0
+    for idx, token in enumerate(tokens):
+        surface = token.get("surface", "")
+        start = offset
+        offset += len(surface)
+        if idx == 0 or surface != "で" or token.get("pos") != "Auxiliary":
+            continue
+        if tokens[idx - 1].get("pos") not in ("Noun", "Pronoun"):
+            continue
+        if idx + 1 < len(tokens) and tokens[idx + 1].get("surface") in binding_surfaces:
+            continue
+        probe = _raw_analysis(unpunctuated)[1].get(start)
+        if probe is None or probe.get("surface") != "で" or probe.get("pos") != "助詞":
+            continue
+        token["pos"] = "Particle"
+        token["lemma"] = "で"
+
+
 def postprocess_te_form_contraction(tokens: list[dict]) -> bool:
     """Tag じゃ after an onbin verb as the te-form contraction, like ちゃ.
 
@@ -3458,6 +3494,9 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("hiragana-godan-wa-terminal", postprocess_hiragana_godan_wa_terminal),
     ("honorific-request-renyokei", postprocess_honorific_request),
     ("honorific-oki-aux", postprocess_honorific_oki_aux),
+    # Ordered before the copular readings below, which name the environments
+    # that genuinely select the copula and must have the last word.
+    ("de-after-nominal", postprocess_de_after_nominal),
     ("de-particle", postprocess_de_particle),
     ("te-form-contraction-particle", postprocess_te_form_contraction),
     ("dai-final-particle", postprocess_dai_final_particle),

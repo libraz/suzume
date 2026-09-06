@@ -1335,6 +1335,58 @@
       ],
       "id": "ku_kiyo",
       "input": "早く起きよ。"
+    },
+    {
+      "description": "Lexicalized adverb from verb irrealis plus the negative auxiliary",
+      "expected": [
+        {
+          "lemma": "蒼い",
+          "pos": "Adjective",
+          "surface": "蒼い"
+        },
+        {
+          "lemma": "空",
+          "pos": "Noun",
+          "surface": "空"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "下",
+          "pos": "Noun",
+          "surface": "下"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "絶えず",
+          "pos": "Adverb",
+          "surface": "絶えず"
+        },
+        {
+          "lemma": "吹く",
+          "pos": "Verb",
+          "surface": "吹く"
+        }
+      ],
+      "id": "i_no_de_ha_ezu_ku",
+      "input": "蒼い空の下で、風は絶えず吹く。"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",
