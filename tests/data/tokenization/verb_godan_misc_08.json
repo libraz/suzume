@@ -2088,6 +2088,144 @@
       ],
       "id": "maseyasui",
       "input": "読ませやすい"
+    },
+    {
+      "description": "Godan-ka i-onbin before the past auxiliary keeps its boundary after a noun even when a final particle follows",
+      "expected": [
+        {
+          "lemma": "東京",
+          "pos": "Noun",
+          "surface": "東京"
+        },
+        {
+          "lemma": "着く",
+          "pos": "Verb",
+          "surface": "着い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "わ",
+          "pos": "Particle",
+          "surface": "わ"
+        }
+      ],
+      "id": "toukyoutsuitawa",
+      "input": "東京着いたわ"
+    },
+    {
+      "description": "The euphonic cell closes at the past auxiliary and the conjunctive particle behind it starts the next word",
+      "expected": [
+        {
+          "lemma": "東京",
+          "pos": "Noun",
+          "surface": "東京"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "着く",
+          "pos": "Verb",
+          "surface": "着い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ので",
+          "pos": "Particle",
+          "surface": "ので"
+        }
+      ],
+      "id": "toukyounitsuitanode",
+      "input": "東京に着いたので"
+    },
+    {
+      "description": "The quotative particle behind the past auxiliary is not read as part of the verb",
+      "expected": [
+        {
+          "lemma": "資料",
+          "pos": "Noun",
+          "surface": "資料"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shiryouwokaitatteitteta",
+      "input": "資料を書いたって言ってた"
+    },
+    {
+      "description": "A formal noun behind the past auxiliary keeps the euphonic cell's boundary",
+      "expected": [
+        {
+          "lemma": "靴",
+          "pos": "Noun",
+          "surface": "靴"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "履く",
+          "pos": "Verb",
+          "surface": "履い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "まま",
+          "pos": "Noun",
+          "surface": "まま"
+        }
+      ],
+      "id": "kutsuwohaitamama",
+      "input": "靴を履いたまま"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
