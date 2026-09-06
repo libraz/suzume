@@ -279,13 +279,18 @@
       "description": "Perfective continuative に selects the classical past auxiliary けり",
       "expected": [
         {
-          "lemma": "雨降り",
+          "lemma": "雨",
           "pos": "Noun",
-          "surface": "雨降り"
+          "surface": "雨"
         },
         {
-          "lemma": "に",
-          "pos": "Particle",
+          "lemma": "降りる",
+          "pos": "Verb",
+          "surface": "降り"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
           "surface": "に"
         },
         {
@@ -441,6 +446,60 @@
       ],
       "id": "kega_i",
       "input": "夜明けが近い"
+    },
+    {
+      "description": "classical perfect continuative before the literary past",
+      "expected": [
+        {
+          "lemma": "秋",
+          "pos": "Noun",
+          "surface": "秋"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "に"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "nikeri",
+      "input": "秋来にけり"
+    },
+    {
+      "description": "classical perfect continuative after a hiragana-okurigana continuative",
+      "expected": [
+        {
+          "lemma": "鳥",
+          "pos": "Noun",
+          "surface": "鳥"
+        },
+        {
+          "lemma": "飛ぶ",
+          "pos": "Verb",
+          "surface": "飛び"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "に"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "binikeri",
+      "input": "鳥飛びにけり"
     }
   ],
   "description": "literary_classic tests (part 2/2)",

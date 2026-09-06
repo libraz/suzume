@@ -755,6 +755,11 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // spelled ける. Without this the two kana win over the deverbal noun
       // they share their spelling with (壁にけりを入れる).
       {EPOS::AuxClassicalKeri, EPOS::ParticleCase, cost::kProhibitive},
+      // The perfect's continuative is the cell that reaches the literary past
+      // through another auxiliary (来+に+けり). Chain-specific like the なり+けり
+      // bonus above, and for the same reason: the continuative spells the
+      // commonest case particle, so only the follower separates them.
+      {EPOS::AuxClassicalPerfect, EPOS::AuxClassicalKeri, cost::kExtremeBonus},
 
       // An adjective reaches the same auxiliary through its supplementary (カリ)
       // conjugation, whose whole purpose is to carry these forms
@@ -834,6 +839,12 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // itself still has to follow it. The perfect's adnominal ぬる spells the
       // hiragana verb 塗る, which does take that position (ペンキを+ぬる).
       {EPOS::ParticleCase, EPOS::AuxClassicalPerfect, cost::kNever},
+      // A conjunctive particle closes the clause it joins, so no predicate cell
+      // may hang off it either. Without the row the one-mora continuative
+      // rescues a mis-analyzed nominal by taking that particle as its host
+      // (出+で+に+ける for 出で+に+ける). The copula is deliberately not barred
+      // here: the modern parallel たり shares this class (歩いたり+だっ+たり).
+      {EPOS::ParticleConj, EPOS::AuxClassicalPerfect, cost::kNever},
 
       // 連体形 なる (壮大なる計画): a na-adjective stem + なる is the classical adnominal 断定, not
       // the verb 成る. Only the left context (AdjNaAdj→なる) is rewarded: a right-context なる→Noun

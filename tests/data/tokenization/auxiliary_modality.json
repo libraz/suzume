@@ -2663,8 +2663,8 @@
           "surface": "で"
         },
         {
-          "lemma": "に",
-          "pos": "Particle",
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
           "surface": "に"
         },
         {
@@ -2690,13 +2690,13 @@
           "surface": "ぞ"
         },
         {
-          "lemma": "散り",
-          "pos": "Noun",
+          "lemma": "散る",
+          "pos": "Verb",
           "surface": "散り"
         },
         {
-          "lemma": "に",
-          "pos": "Particle",
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
           "surface": "に"
         },
         {

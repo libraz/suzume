@@ -336,6 +336,19 @@ bool isHypotheticalSelectingConjunctiveParticle(std::string_view surface);
  */
 bool spellsHypotheticalAuxiliaryCell(std::string_view surface);
 
+/**
+ * @brief Whether a classical perfect surface spells a continuative cell
+ *
+ * The one-mora cells of that class divide by what may follow them. 終止 つ and
+ * 存続 り close a clause or head a nominal, which is the environment
+ * @ref analysis::verb_helpers::classicalPastEnvironmentFollows describes; the
+ * continuative に of ナ変 完了 ぬ does neither, and instead hands the predicate
+ * to the literary past (秋来+に+けり). Callers pair this with the auxiliary's
+ * class so the far commoner case particle of the same spelling is unaffected
+ * everywhere else.
+ */
+bool spellsClassicalPerfectContinuative(std::string_view surface);
+
 /** @brief Whether a negative auxiliary surface is a colloquial conditional form */
 bool isColloquialConditionalNegativeSurface(std::string_view surface);
 

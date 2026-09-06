@@ -356,7 +356,7 @@ bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& r
 }
 
 int maximalSegmentCount(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
-                        size_t start_pos, size_t end_pos, core::PartOfSpeech pos) {
+                        size_t start_pos, size_t end_pos, core::PartOfSpeech pos, core::ExtendedPOS excluded) {
   if (start_pos >= end_pos) {
     return -1;
   }
@@ -368,8 +368,9 @@ int maximalSegmentCount(const dictionary::DictionaryManager& dict_manager, const
       continue;
     }
     for (size_t relative_end = relative_start + 1; relative_end <= span; ++relative_end) {
-      if (lookupEntryInRange(dict_manager, codepoints, start_pos + relative_start, start_pos + relative_end, pos) !=
-          nullptr) {
+      const auto* entry =
+          lookupEntryInRange(dict_manager, codepoints, start_pos + relative_start, start_pos + relative_end, pos);
+      if (entry != nullptr && entry->extended_pos != excluded) {
         part_count[relative_end] = std::max(part_count[relative_end], part_count[relative_start] + 1);
       }
     }

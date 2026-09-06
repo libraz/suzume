@@ -65,9 +65,15 @@ bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& r
  * segmented into, or -1 when no segmentation covers it entirely. Multi-mora
  * entries stay whole, so a span that is one such word counts as one part
  * rather than as its moras.
+ *
+ * @p excluded drops one category from the segmentation. Callers use it for the
+ * cells the tokenizer itself admits only inside a named chain: a registered
+ * surface the analyzer would never place here is not evidence about what the
+ * span spells.
  */
 int maximalSegmentCount(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
-                        size_t start_pos, size_t end_pos, core::PartOfSpeech pos);
+                        size_t start_pos, size_t end_pos, core::PartOfSpeech pos,
+                        core::ExtendedPOS excluded = core::ExtendedPOS::Count_);
 
 /**
  * Whether some span ending at @p end_pos, and starting at or after

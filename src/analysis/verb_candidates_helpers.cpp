@@ -271,6 +271,19 @@ bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_m
   return false;
 }
 
+bool literaryPastAuxiliaryFollowsAt(const dictionary::DictionaryManager& dict_manager,
+                                    const std::vector<char32_t>& codepoints, size_t pos) {
+  const size_t probe_end = std::min(codepoints.size(), pos + kFollowerProbeChars);
+  for (size_t stop = pos + 1; stop <= probe_end; ++stop) {
+    const auto* aux = lookupEntryInRange(dict_manager, codepoints, pos, stop, core::PartOfSpeech::Auxiliary);
+    if (aux != nullptr && (aux->extended_pos == core::ExtendedPOS::AuxClassicalKeri ||
+                           aux->extended_pos == core::ExtendedPOS::AuxClassicalKi)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool naiConditionalFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   return pos + 2 < codepoints.size() && codepoints[pos] == U'な' && codepoints[pos + 1] == U'け' &&
          codepoints[pos + 2] == U'れ';

@@ -1550,6 +1550,28 @@
       ],
       "id": "ni_kaseru",
       "input": "友達に行かせる"
+    },
+    {
+      "description": "negative control: purposive に after a continuative keeps the case particle",
+      "expected": [
+        {
+          "lemma": "読み",
+          "pos": "Noun",
+          "surface": "読み"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        }
+      ],
+      "id": "mini_ku",
+      "input": "読みに行く"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

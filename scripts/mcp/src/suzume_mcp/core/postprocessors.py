@@ -2314,6 +2314,100 @@ def postprocess_classical_perfect_aux(tokens: list[dict]) -> bool:
     return changed
 
 
+_CLASSICAL_PAST_KERI_CELLS = ("けり", "ける", "けれ")
+
+
+def _classical_past_starts_at(tokens: list[dict], idx: int) -> bool:
+    """Whether the classical past auxiliary begins at @p idx.
+
+    The けり paradigm is identified by its cell, because the reference analyzer
+    reads every one of them as the homographic 蹴る before this module retags
+    them. The nominal reading of the same kana is excluded: it is the deverbal
+    noun taking a case of its own (壁にけりを入れる), which is the one thing the
+    auxiliary never does. The 終止形 き is only ever this auxiliary once
+    something else has classified it, so it is taken on that classification.
+    """
+    if idx >= len(tokens):
+        return False
+    token = tokens[idx]
+    if token.get("pos") == "Noun":
+        return False
+    if token.get("surface") in _CLASSICAL_PAST_KERI_CELLS:
+        return True
+    return token.get("surface") == "き" and token.get("pos") == "Auxiliary"
+
+
+def _nominal_plus_continuative(surface: str) -> list[dict] | None:
+    """Split a compound headword whose tail is a verb continuative, else None.
+
+    The reference dictionary carries a handful of noun+continuative compounds as
+    single headwords (雨降り, 山登り). They are nominals everywhere except in
+    front of a predicate cell, where the tail is the verb the cell attaches to.
+    The same ます probe as @ref _verb_continuative_reading recovers the parts,
+    and the split is taken only when the probe reproduces the whole surface.
+    """
+    from .mecab import mecab_analyze
+
+    probe = mecab_analyze(surface + "ます")
+    if len(probe) != 3 or probe[2].get("surface") != "ます":
+        return None
+    head, tail = probe[0], probe[1]
+    if head.get("pos") != "名詞" or tail.get("pos") != "動詞" or tail.get("conj_form") != "連用形":
+        return None
+    if f"{head.get('surface', '')}{tail.get('surface', '')}" != surface:
+        return None
+    return [
+        {"surface": head["surface"], "pos": "Noun", "lemma": head.get("lemma", head["surface"])},
+        {"surface": tail["surface"], "pos": "Verb", "lemma": tail.get("lemma", tail["surface"])},
+    ]
+
+
+@reports_mutation
+def postprocess_classical_perfect_ni(tokens: list[dict]) -> None:
+    """Retag に between a continuative and the classical past as the perfect ぬ.
+
+    けり and き attach to a continuative, so nothing stands between them and the
+    predicate — least of all a case particle, which introduces an argument and
+    would leave the clause without the predicate it marks. The mora is the
+    continuative cell of the perfective ぬ (花散りにけり). The reference
+    dictionary carries no such cell, reads the commonest case particle instead,
+    and then, having made the preceding continuative that particle's host, hands
+    the host back as a deverbal noun.
+    """
+    idx = 1
+    while idx < len(tokens) - 1:
+        token = tokens[idx]
+        if token.get("surface") != "に" or token.get("pos") != "Particle":
+            idx += 1
+            continue
+        if not _classical_past_starts_at(tokens, idx + 1):
+            idx += 1
+            continue
+        previous = tokens[idx - 1]
+        reading = _verb_continuative_reading(previous.get("surface", ""))
+        if reading is not None:
+            previous["pos"] = "Verb"
+            previous["lemma"] = reading.get("lemma", previous.get("lemma"))
+        else:
+            parts = _nominal_plus_continuative(previous.get("surface", ""))
+            if parts is not None:
+                tokens[idx - 1 : idx] = parts
+                idx += 1
+                token = tokens[idx]
+            # An auxiliary hosts the perfect from its own continuative
+            # (飲ま+れ+に+けり) and needs no restoration; a particle host means
+            # the reference split the predicate itself and neither side can
+            # recover it, but the follower still identifies the cell (出+で+に).
+            # A nominal host is excluded: there the reference is reading an
+            # ordinary argument, and the kana after it is its case (壁にける).
+            elif previous.get("pos") not in ("Auxiliary", "Particle"):
+                idx += 1
+                continue
+        token["pos"] = "Auxiliary"
+        token["lemma"] = "ぬ"
+        idx += 1
+
+
 @reports_mutation
 def postprocess_classical_past_keri(tokens: list[dict]) -> None:
     """Restore the classical past けり after the perfective continuative に.
@@ -2323,7 +2417,9 @@ def postprocess_classical_past_keri(tokens: list[dict]) -> None:
     clause falls back to the homographic 蹴る -- which turns the preceding
     continuative into its object and leaves the clause without a tense.  The
     nominal reading of けり keeps its own 名詞 tag, so the verb tag alone
-    identifies the fallback.
+    identifies the fallback.  The continuative in front is either the case
+    particle the reference reads or the perfective cell it actually spells,
+    depending on whether the rule above could recover the predicate it hosts.
     """
     for idx in range(2, len(tokens)):
         token = tokens[idx]
@@ -2332,7 +2428,7 @@ def postprocess_classical_past_keri(tokens: list[dict]) -> None:
             token.get("surface") != "けり"
             or token.get("pos") != "Verb"
             or previous.get("surface") != "に"
-            or previous.get("pos") != "Particle"
+            or previous.get("pos") not in ("Particle", "Auxiliary")
             or tokens[idx - 2].get("pos") not in ("Noun", "Verb", "Adjective")
         ):
             continue
@@ -3394,6 +3490,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("classical-ha-row-past", postprocess_classical_ha_row_past),
     ("classical-b-row-moteiku", postprocess_classical_b_row_moteiku),
     ("classical-perfect-aux", postprocess_classical_perfect_aux),
+    ("classical-perfect-ni", postprocess_classical_perfect_ni),
     ("classical-past-keri", postprocess_classical_past_keri),
     ("classical-past-shi", postprocess_classical_past_shi),
     ("classical-perfect-nu", postprocess_classical_perfect_nu),

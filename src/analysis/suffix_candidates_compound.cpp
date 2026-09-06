@@ -407,7 +407,12 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
         nullptr) {
       continue;
     }
-    if (maximalSegmentCount(*dict_manager, codepoints, start_pos, particle_start, core::PartOfSpeech::Auxiliary) >= 1) {
+    // Every cell of the classical perfect is admitted only inside the chain its
+    // own form implies, so its presence in the dictionary says nothing about
+    // what an ordinary hiragana run spells: the one-mora continuative alone
+    // would decompose にんじん as に+ん+じ+ん.
+    if (maximalSegmentCount(*dict_manager, codepoints, start_pos, particle_start, core::PartOfSpeech::Auxiliary,
+                            core::ExtendedPOS::AuxClassicalPerfect) >= 1) {
       return true;
     }
   }

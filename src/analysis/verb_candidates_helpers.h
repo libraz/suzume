@@ -999,6 +999,21 @@ bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_m
                                      const std::vector<char32_t>& codepoints, size_t end_pos, bool is_izenkei);
 
 /**
+ * @brief Whether the literary past auxiliary begins at @p pos.
+ *
+ * The continuative cells of the classical perfect are the one environment
+ * @ref classicalPastEnvironmentFollows cannot describe: they neither close a
+ * clause nor head a nominal, they hand the predicate to another auxiliary
+ * (秋来+に+けり, 散り+に+き). What licenses them is that auxiliary itself.
+ *
+ * @param dict_manager Dictionary used to probe the follower
+ * @param codepoints Full input codepoints
+ * @param pos Index the follower would start at
+ */
+bool literaryPastAuxiliaryFollowsAt(const dictionary::DictionaryManager& dict_manager,
+                                    const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
  * @brief Whether a clause ends at @p pos.
  *
  * True at the end of the input and in front of the punctuation that closes a

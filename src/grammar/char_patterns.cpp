@@ -353,6 +353,10 @@ bool spellsHypotheticalAuxiliaryCell(std::string_view surface) {
   return utf8::endsWithAny(surface, {"れれ", "たれ", "るれ"});
 }
 
+bool spellsClassicalPerfectContinuative(std::string_view surface) {
+  return utf8::equalsAny(surface, {"に"});
+}
+
 bool isColloquialConditionalNegativeSurface(std::string_view surface) {
   return surface == "なきゃ" || surface == "なけりゃ";
 }

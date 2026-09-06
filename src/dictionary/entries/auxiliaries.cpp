@@ -114,6 +114,12 @@ EntrySpecRange getAuxiliaryEntries() {
       // hosts (花散り+ぬる, 心こそ定まり+ぬれ).
       aux("ぬる", "ぬ", EPOS::AuxClassicalPerfect),  // 連体形 (花ぞ散りぬる)
       aux("ぬれ", "ぬ", EPOS::AuxClassicalPerfect),  // 已然形 (花こそ散りぬれ)
+      // 連用形 に. One mora, and the spelling of the commonest case particle, so
+      // it is admitted only where that particle cannot stand: between a
+      // continuative and the literary past, which takes a continuative and never
+      // follows an argument marker (秋来にけり). See
+      // grammar::spellsClassicalPerfectContinuative.
+      aux("に", "ぬ", EPOS::AuxClassicalPerfect),
       // Classical past き: the 連体形 し and 已然形 しか both attach to a
       // continuative (読みし人, 見しかば). The 終止形 き spells the Godan-ka
       // continuative as well, so it closes a clause only behind another literary

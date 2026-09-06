@@ -1954,10 +1954,17 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // enough on its own, because り is the only auxiliary that takes it
     // (行け+り). A continuative precedes half the lattice, so the terminal つ
     // additionally needs the clause end its form implies (書き+つ).
+    // The continuative cell is licensed by a different follower: it hands the
+    // predicate to the literary past instead of closing the clause its own form
+    // would end (来+に+けり).
+    const bool continuative_environment =
+        grammar::spellsClassicalPerfectContinuative(result.entry->surface) &&
+        verb_helpers::literaryPastAuxiliaryFollowsAt(dict_manager_, codepoints, end_pos);
     if (result.entry->extended_pos == core::ExtendedPOS::AuxClassicalPerfect && end_pos == start_pos + 1 &&
         !hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbKateikei) &&
         !(hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) &&
-          verb_helpers::classicalPastEnvironmentFollows(dict_manager_, codepoints, end_pos, false))) {
+          (verb_helpers::classicalPastEnvironmentFollows(dict_manager_, codepoints, end_pos, false) ||
+           continuative_environment))) {
       continue;
     }
 
