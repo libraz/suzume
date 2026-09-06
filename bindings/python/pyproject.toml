@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "suzume"
 # Mirror of the version in the root CMakeLists.txt (single source of truth).
 # scripts/check_version_mirror.sh gates drift.
-version = "0.9.10"
+version = "0.9.11"
 description = "Lightweight Japanese tokenizer with POS tagging, lemmatization, and keyword extraction for Python"
 requires-python = ">=3.10"
 license = "Apache-2.0"

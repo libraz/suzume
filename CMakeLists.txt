@@ -10,7 +10,7 @@ endif()
 # Version is the single source of truth here and is mirrored into every binding
 # manifest (bindings/wasm/package.json, bindings/python/pyproject.toml). Keep them
 # in lockstep; scripts/check_version_mirror.sh gates drift.
-project(suzume VERSION 0.9.10 LANGUAGES CXX)
+project(suzume VERSION 0.9.11 LANGUAGES CXX)
 
 # Use C++17 standard
 set(CMAKE_CXX_STANDARD 17)

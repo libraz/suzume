@@ -1,6 +1,6 @@
 {
   "name": "@libraz/suzume",
-  "version": "0.9.10",
+  "version": "0.9.11",
   "type": "module",
   "packageManager": "yarn@4.18.0",
   "description": "Lightweight Japanese tokenizer with POS tagging, lemmatization, and keyword extraction for browser and Node.js",
