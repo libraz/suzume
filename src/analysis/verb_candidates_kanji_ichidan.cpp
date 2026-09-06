@@ -156,22 +156,10 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
   if (kanji_end == start_pos + 1 && hiragana_end > kanji_end) {
     char32_t kanji_char = codepoints[start_pos];
 
-    // The literary volitional ん (a euphonic form of む) attaches to the
-    // irrealis stem of 来る: 来んとする. Kanji 来 keeps the same written stem
-    // across its irregular forms, so emit that stem explicitly rather than
-    // treating 来ん as a spurious onbin form.
-    if (grammar::isKuruKanjiStem(kanji_char) && codepoints[kanji_end] == U'ん' && kanji_end + 1 < codepoints.size() &&
-        codepoints[kanji_end + 1] == U'と') {
-      candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end, candidate::verb_cost::kStandardBonus,
-                                             grammar::kuruBaseFormOf(kanji_char), dictionary::ConjugationType::Kuru,
-                                             true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
-                                             "kuru_literary_volitional_n", core::ExtendedPOS::VerbMizenkei));
-    }
-
-    // The irregular mizenkei of 来る keeps the bare kanji before the classical
-    // negative auxiliary, just as it does before ない. Resolve the cell from the
-    // auxiliary inventory instead of naming one kana, so the whole paradigm is
-    // covered at once (来+ず, 来+ぬ, 来+ざる, 来+ね).
+    // The classical negative auxiliary sits on an irrealis, and both the カ変
+    // stem below and the ichidan stem further down are that cell. Resolve it
+    // from the auxiliary inventory instead of naming one kana, so the whole
+    // paradigm is covered at once (来+ず, 来+ぬ, 来+ざる, 来+ね).
     bool classical_negative_follows = false;
     {
       constexpr size_t kNegativeAuxProbe = 3;
@@ -185,30 +173,46 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
         }
       }
     }
-    if (grammar::isKuruKanjiStem(kanji_char) && classical_negative_follows) {
-      candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end, candidate::verb_cost::kStandardBonus,
-                                             grammar::kuruBaseFormOf(kanji_char), dictionary::ConjugationType::Kuru,
-                                             true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
-                                             "kuru_classical_negative", core::ExtendedPOS::VerbMizenkei));
-    }
 
-    // The irregular irrealis stem of 来る is the bare kanji before every
-    // ない-family form, including the conditional (来+なけれ+ば).
-    if (grammar::isKuruKanjiStem(kanji_char) && vh::naiConditionalFollowsAt(codepoints, kanji_end)) {
-      candidates.push_back(makeVerbCandidate(
-          codepoints, start_pos, kanji_end, candidate::verb_cost::kSingleKanjiNegativeConditionalBonus,
-          grammar::kuruBaseFormOf(kanji_char), dictionary::ConjugationType::Kuru, true, CandidateOrigin::VerbKanji,
-          candidate::kHighOriginConfidence, "kuru_negative_nai", core::ExtendedPOS::VerbMizenkei));
-    }
+    if (grammar::isKuruKanjiStem(kanji_char)) {
+      // 来る is irregular rather than ichidan, but its irrealis is written as
+      // the bare kanji all the same, so every auxiliary that selects that cell
+      // sits directly on it. One emitter holds the reading; the environments
+      // below only say where it applies, which is what keeps a newly covered
+      // auxiliary from arriving as another copy of the same candidate.
+      const auto emit_kuru_irrealis = [&](size_t end_pos, float cost, const char* origin) {
+        candidates.push_back(makeVerbCandidate(codepoints, start_pos, end_pos, cost,
+                                               grammar::kuruBaseFormOf(kanji_char), dictionary::ConjugationType::Kuru,
+                                               true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
+                                               origin, core::ExtendedPOS::VerbMizenkei));
+      };
+      const char32_t next_kana = codepoints[kanji_end];
+      const char32_t after_next = (kanji_end + 1 < codepoints.size()) ? codepoints[kanji_end + 1] : U'\0';
 
-    // 来る is irregular rather than ichidan, but its modern volitional still
-    // spells the y-row stem plus the separate auxiliary (来よ+う).
-    if (grammar::isKuruKanjiStem(kanji_char) && kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == U'よ' &&
-        codepoints[kanji_end + 1] == U'う') {
-      candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end + 1, candidate::verb_cost::kStrongBonus,
-                                             grammar::kuruBaseFormOf(kanji_char), dictionary::ConjugationType::Kuru,
-                                             true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
-                                             "kuru_modern_volitional", core::ExtendedPOS::VerbMizenkei));
+      // The literary volitional ん is a euphonic form of む, but it is also how
+      // the negative contracts, so it is admitted only where the quotative と
+      // resolves that (来んとする).
+      if (next_kana == U'ん' && after_next == U'と') {
+        emit_kuru_irrealis(kanji_end, candidate::verb_cost::kStandardBonus, "kuru_literary_volitional_n");
+      }
+      // The classical volitional itself has no such competitor and needs no
+      // gate beyond its own mora (来む, 人来むや).
+      if (next_kana == U'む') {
+        emit_kuru_irrealis(kanji_end, candidate::verb_cost::kStandardBonus, "kuru_classical_volitional_mu");
+      }
+      if (classical_negative_follows) {
+        emit_kuru_irrealis(kanji_end, candidate::verb_cost::kStandardBonus, "kuru_classical_negative");
+      }
+      // The ない family selects the same cell, the conditional included
+      // (来+なけれ+ば).
+      if (vh::naiConditionalFollowsAt(codepoints, kanji_end)) {
+        emit_kuru_irrealis(kanji_end, candidate::verb_cost::kSingleKanjiNegativeConditionalBonus, "kuru_negative_nai");
+      }
+      // The modern volitional is the one member that writes part of the stem in
+      // kana, so its span reaches past よ to leave う as the auxiliary (来よ+う).
+      if (next_kana == U'よ' && after_next == U'う') {
+        emit_kuru_irrealis(kanji_end + 1, candidate::verb_cost::kStrongBonus, "kuru_modern_volitional");
+      }
     }
 
     if (vh::isSingleKanjiIchidan(kanji_char)) {
