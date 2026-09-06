@@ -2012,6 +2012,33 @@
       ],
       "id": "besaseba",
       "input": "食べさせば"
+    },
+    {
+      "description": "Negative control: a verb continuative ending in the same two kana",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "分かれる",
+          "pos": "Verb",
+          "surface": "分かれ"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "ga_kare_mu",
+      "input": "道が分かれ、進む"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",

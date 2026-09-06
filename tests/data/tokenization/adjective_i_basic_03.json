@@ -1223,6 +1223,45 @@
       ],
       "id": "shikariseba",
       "input": "楽しかりせば"
+    },
+    {
+      "description": "Paired concessive imperative of the supplementary conjugation",
+      "expected": [
+        {
+          "lemma": "遅い",
+          "pos": "Adjective",
+          "surface": "遅かれ"
+        },
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早かれ"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来る"
+        }
+      ],
+      "id": "kare_kare_ru",
+      "input": "遅かれ早かれ来る"
+    },
+    {
+      "description": "Same pairing where the second member carries a longer stem",
+      "expected": [
+        {
+          "lemma": "多い",
+          "pos": "Adjective",
+          "surface": "多かれ"
+        },
+        {
+          "lemma": "少ない",
+          "pos": "Adjective",
+          "surface": "少なかれ"
+        }
+      ],
+      "id": "kare_nakare",
+      "input": "多かれ少なかれ"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
