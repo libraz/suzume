@@ -627,8 +627,10 @@ void resolveDemonstrativeQuotativeOnbin(std::vector<core::Morpheme>& result) {
     const bool demonstrative_context = (demonstrative.extended_pos == core::ExtendedPOS::Adverb ||
                                         demonstrative.extended_pos == core::ExtendedPOS::AdverbQuotative) &&
                                        grammar::isDemonstrativeUAdverb(demonstrative.surface);
+    // とか introduces a quotation as と does, hedged or listed rather than plain
+    // (本とか言って), so it carries the same evidence for the euphonic form.
     const bool quotative_context =
-        demonstrative.pos == core::PartOfSpeech::Particle && utf8::equalsAny(demonstrative.surface, {"と"});
+        demonstrative.pos == core::PartOfSpeech::Particle && utf8::equalsAny(demonstrative.surface, {"と", "とか"});
     if ((!demonstrative_context && !quotative_context) || verb.surface != "いっ" || !is_te_or_past) {
       continue;
     }
