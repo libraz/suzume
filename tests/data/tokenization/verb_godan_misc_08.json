@@ -1818,6 +1818,134 @@
       ],
       "id": "ttteiu_wo_su",
       "input": "本っていう物を探す"
+    },
+    {
+      "description": "とかいって笑う - auto-generated",
+      "expected": [
+        {
+          "lemma": "とか",
+          "pos": "Particle",
+          "surface": "とか"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑う"
+        }
+      ],
+      "id": "tokaittte_u",
+      "input": "とかいって笑う"
+    },
+    {
+      "description": "本とかいって渡す - auto-generated",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "とか",
+          "pos": "Particle",
+          "surface": "とか"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "渡す",
+          "pos": "Verb",
+          "surface": "渡す"
+        }
+      ],
+      "id": "tokaittte_su",
+      "input": "本とかいって渡す"
+    },
+    {
+      "description": "代金を買いって渡す - auto-generated",
+      "expected": [
+        {
+          "lemma": "代金",
+          "pos": "Noun",
+          "surface": "代金"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買い"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "渡す",
+          "pos": "Verb",
+          "surface": "渡す"
+        }
+      ],
+      "id": "wo_ittte_su",
+      "input": "代金を買いって渡す"
+    },
+    {
+      "description": "駅まで走っていった - auto-generated",
+      "expected": [
+        {
+          "lemma": "駅",
+          "pos": "Noun",
+          "surface": "駅"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "いっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "made_ttteittta",
+      "input": "駅まで走っていった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
