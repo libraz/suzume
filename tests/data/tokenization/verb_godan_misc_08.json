@@ -2039,6 +2039,55 @@
       ],
       "id": "ga_kare_mu",
       "input": "道が分かれ、進む"
+    },
+    {
+      "description": "Topic particle after the nominalizer, in front of a kana adjective",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言う"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "たやすい",
+          "pos": "Adjective",
+          "surface": "たやすい"
+        }
+      ],
+      "id": "unohatayasui",
+      "input": "言うのはたやすい"
+    },
+    {
+      "description": "The bound adjective suffix on a voice auxiliary's continuative",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "やすい",
+          "pos": "Adjective",
+          "surface": "やすい"
+        }
+      ],
+      "id": "maseyasui",
+      "input": "読ませやすい"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
